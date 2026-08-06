@@ -1,0 +1,38 @@
+class: formula-component
+label: Formula Component
+foundational_type:
+  ontology: ufo
+  type: kind
+description: |
+  A structural mechanism inside a funding regime that performs one identifiable step of the
+  distribution calculation — computing a base cost, applying a categorical weight, measuring
+  local capacity, or capping and guaranteeing the result. It is the unit at which a regime
+  can be compared to its predecessor: two regimes may share a component and differ entirely
+  in another. A component is a mechanism, not a number; the numbers it consumes are
+  parameters.
+properties:
+  - name: name
+    type: string
+    description: The component's name as it appears in statute or department documentation
+  - name: function
+    type: text
+    description: What calculation step the component performs and on what inputs
+  - name: statutory_basis
+    type: string
+    description: Ohio Revised Code sections that define the component
+  - name: calculator
+    type: string
+    description: Name of the crates/ calculator implementing this component, if implemented
+edges:
+  - relationship: governed-by
+    target: parameter
+    direction: out
+    description: A dialable value the component consumes
+  - relationship: distributes
+    target: revenue-stream
+    direction: out
+    description: The channel of money this component allocates
+  - relationship: part-of
+    target: funding-regime
+    direction: in
+    description: The regime this component belongs to

@@ -1,0 +1,55 @@
+class: litigation
+label: Litigation
+foundational_type:
+  ontology: ufo
+  type: event
+description: |
+  A decided case testing some part of the education funding system against constitutional
+  text. It is an Event because it unfolds over an interval and has temporal parts — filing,
+  trial judgment, appeal, decision, and in Ohio's central case a sequence of four separate
+  decisions and a remand the court later withdrew jurisdiction over. Litigation is kept
+  separate from legislation because the causal arrow between them runs both ways and needs
+  to be traversable in each direction.
+properties:
+  - name: case_name
+    type: string
+    description: Short case name as commonly cited
+  - name: citation
+    type: string
+    description: Reporter citation
+  - name: court
+    type: string
+    description: Deciding court
+  - name: filed
+    type: date
+    description: Date the action was commenced
+  - name: decided
+    type: date
+    description: Date of the decision this node records
+  - name: holding
+    type: text
+    description: What the court held, and on what constitutional ground
+  - name: remedy
+    type: text
+    description: What relief was ordered, and whether it was complied with
+edges:
+  - relationship: challenges
+    target: funding-regime
+    direction: out
+    description: The regime whose constitutionality was at issue
+  - relationship: invokes
+    target: doctrine
+    direction: out
+    description: A normative principle the court reasoned from
+  - relationship: prompts
+    target: legislation
+    direction: out
+    description: An enactment passed in response to this decision
+  - relationship: decided-by
+    target: actor
+    direction: in
+    description: The court that issued the decision
+  - relationship: has-party
+    target: education-agency
+    direction: in
+    description: An agency that was a named party

@@ -1,0 +1,44 @@
+class: formula-component
+label: FSFP Base Cost Calculation
+description: |
+  The component that answers *DeRolph*'s central charge. Instead of a statewide per-pupil
+  figure set in the budget, base cost is assembled for each district from specified staffing
+  ratios — teachers per pupil at each grade band, and defined counts of counselors,
+  librarians, administrators, and support staff — applied to that district's own enrollment
+  and priced at salary and benefit levels drawn from actual reported data. [verified] Facility
+  and operational costs are added on the same build-up basis.
+
+  This is why base cost differs between two districts with identical enrollment: the ratios
+  are uniform but the prices are not, and a district in a higher-salary labor market has a
+  higher base cost for the same staffing. [verified]
+
+  The build-up only means what it claims if the input data is current. The staffing and salary
+  figures come from a reference year, and a base cost computed on a reference year several
+  years in the past describes what the staffing would have cost then, not what it costs now.
+  [inference] Whether the input year is refreshed each biennium is therefore not a technical
+  detail but the difference between a costed-out formula and a fixed per-pupil amount wearing
+  a costed-out formula's clothing — which is the argument running through
+  [H.B. 96](../legislation/hb-96-2025.yml). [inference]
+properties:
+  name: FSFP base cost calculation
+  function: |
+    For each district: apply statutory staffing ratios to enrollment to obtain required
+    personnel counts by category; price each category at salary and benefit rates derived from
+    reported data for a reference year; add facility, operations, and other specified cost
+    components; sum to a district base cost. Divide by enrollment to express as base cost per
+    pupil.
+  statutory_basis: |
+    R.C. 3317 as amended by Am. Sub. H.B. 110 (2021). Specific sections and the reference-year
+    provision not yet established. [open]
+  calculator: foundation
+links:
+  - target: ../formula-component.ont.yml
+    relationship: instance-of
+  - target: ../parameter/base-cost-per-pupil.yml
+    relationship: governed-by
+  - target: ../parameter/fsfp-phase-in-percentage.yml
+    relationship: governed-by
+  - target: ../revenue-stream/state-foundation-aid.yml
+    relationship: distributes
+  - target: ../doctrine/adequacy.yml
+    relationship: operationalizes

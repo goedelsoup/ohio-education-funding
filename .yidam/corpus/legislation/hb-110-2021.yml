@@ -1,0 +1,43 @@
+class: legislation
+label: Am. Sub. H.B. 110 (2021) — FY2022-23 Budget; Fair School Funding Plan
+description: |
+  The FY2022-23 operating budget, which enacted the Fair School Funding Plan — the
+  Cupp-Patterson plan, named for the two legislators who developed it over several years with
+  a working group of school treasurers and superintendents. [verified] It is the first Ohio
+  formula built by costing out inputs at the district level and the first to fund community
+  schools and STEM schools directly from the state rather than by deducting from a resident
+  district's foundation payment. [verified]
+
+  Three structural changes matter most. Base cost is computed per district from actual
+  staffing ratios and regional salary data rather than assigned as a statewide per-pupil
+  figure. Local capacity replaces the charge-off millage as the measure of what a district can
+  raise, and it weights income alongside property valuation rather than using property alone.
+  And students are funded where they are educated, ending the deduct mechanism. [verified]
+
+  The act specified a six-year phase-in, appropriating roughly one-sixth of the computed
+  formula amount in FY2022 and two-sixths in FY2023. [inference] It could not bind later General
+  Assemblies to continue it, and the phase-in has been re-legislated in each subsequent
+  budget — which is the central question hanging over the plan. [verified]
+properties:
+  designation: Am. Sub. H.B. 110
+  general_assembly: 134th General Assembly
+  signed: 2021-06-30
+  effective: 2021-07-01
+  subject: |
+    Enacted the FY2022-23 operating budget and established the Fair School Funding Plan:
+    district-specific base cost derived from staffing and salary inputs, a local capacity
+    measure combining property valuation and resident income, direct state funding of
+    community and STEM schools in place of the resident-district deduction, and a six-year
+    phase-in of the computed amount.
+  vetoes: Line-item vetoes recorded; education funding effect not yet assessed. [open]
+links:
+  - target: ../legislation.ont.yml
+    relationship: instance-of
+  - target: ../funding-regime/fair-school-funding-plan.yml
+    relationship: establishes
+  - target: ../parameter/base-cost-per-pupil.yml
+    relationship: sets
+  - target: ../parameter/fsfp-phase-in-percentage.yml
+    relationship: sets
+  - target: ../doctrine/adequacy.yml
+    relationship: operationalizes

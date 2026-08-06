@@ -1,0 +1,64 @@
+class: legislation
+label: Legislation
+foundational_type:
+  ontology: ufo
+  type: kind
+description: |
+  An enacted instrument of law that creates, amends, or constrains any part of the funding
+  system — a General Assembly bill, most often a biennial budget act, or a provision of the
+  Ohio Constitution. It is a Kind: a bill's identity is fixed at enactment and does not
+  survive becoming something else. Constitutional provisions are included here rather than
+  given a separate class because they occupy the same position in the graph — an authority
+  that establishes, constrains, and is litigated against.
+properties:
+  - name: designation
+    type: string
+    description: Bill designation (e.g. Am. Sub. H.B. 110) or constitutional citation
+  - name: general_assembly
+    type: string
+    description: Numbered General Assembly that passed it
+  - name: signed
+    type: date
+    description: Date signed or ratified
+  - name: effective
+    type: date
+    description: Date the operative provisions took effect
+  - name: subject
+    type: text
+    description: What the enactment did to the funding system, in two or three sentences
+  - name: vetoes
+    type: text
+    description: Line-item vetoes affecting education funding, where relevant
+edges:
+  - relationship: establishes
+    target: funding-regime
+    direction: out
+    description: A regime this enactment created
+  - relationship: sets
+    target: parameter
+    direction: out
+    description: A parameter value or method this enactment fixed
+  - relationship: creates
+    target: program
+    direction: out
+    description: A program this enactment established
+  - relationship: constrains
+    target: revenue-stream
+    direction: out
+    description: A revenue channel this enactment limited, froze, or redirected
+  - relationship: amends
+    target: legislation
+    direction: out
+    description: A prior enactment this one modified
+  - relationship: appropriates-for
+    target: fiscal-period
+    direction: out
+    description: The fiscal period or biennium this enactment funds
+  - relationship: enacted-by
+    target: actor
+    direction: in
+    description: The institution that passed or ratified it
+  - relationship: prompted-by
+    target: litigation
+    direction: in
+    description: A decision this enactment was a response to

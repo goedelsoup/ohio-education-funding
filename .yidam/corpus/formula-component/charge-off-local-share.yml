@@ -1,0 +1,40 @@
+class: formula-component
+label: Charge-Off Local Share
+description: |
+  The mechanism by which Ohio decided, for roughly three decades, how much of a district's
+  cost the district itself should bear. It multiplies a statutory millage rate by the
+  district's total assessed valuation and subtracts the product from the district's computed
+  cost; the state pays what remains. [verified]
+
+  Its defect is an assumption. The charge-off treats the statutory millage as revenue the
+  district can raise, but under [H.B. 920](../legislation/hb-920-1976.yml) a district's
+  effective operating millage is reduced as valuation rises, so many districts could not
+  levy at the assumed rate against the assumed base. [verified] A district was charged off
+  against money it did not receive — the phenomenon known in Ohio practice as phantom
+  revenue, which shows up as an unexplained shortfall between what the formula says a district
+  should have and what it actually has. [verified]
+
+  The mechanism is also blind to income. Assessed valuation alone treats a district with
+  expensive housing and modest household earnings as wealthy, and asks its residents to pay
+  accordingly. [inference] Replacing that assumption is the specific thing
+  [`fsfp-local-capacity-measure`](fsfp-local-capacity-measure.yml) was built to do.
+properties:
+  name: Charge-off local share
+  function: |
+    local_share = charge_off_millage x district_total_assessed_valuation
+    state_aid = computed_cost - local_share
+    Charge-off millage is a statutory rate applied uniformly statewide, distinct from the
+    district's own effective operating millage.
+  statutory_basis: |
+    R.C. 3317 (foundation program chapter), specific section varying by biennium. Exact
+    citations per regime not yet established. [open]
+  calculator: millage (supplies effective millage inputs); not yet independently implemented
+links:
+  - target: ../formula-component.ont.yml
+    relationship: instance-of
+  - target: ../parameter/local-share-charge-off-millage.yml
+    relationship: governed-by
+  - target: ../revenue-stream/local-property-tax.yml
+    relationship: distributes
+  - target: ../parameter/twenty-mill-floor.yml
+    relationship: interacts-with

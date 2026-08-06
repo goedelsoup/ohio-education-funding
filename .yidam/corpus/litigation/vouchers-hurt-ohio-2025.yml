@@ -1,0 +1,50 @@
+class: litigation
+label: EdChoice Constitutional Challenge (Franklin County, 2025)
+description: |
+  A challenge to Ohio's EdChoice scholarship programs brought by a coalition of public school
+  districts organized as Vouchers Hurt Ohio, filed in Franklin County Common Pleas Court in
+  2022 and decided in the districts' favor in June 2025, holding the program unconstitutional.
+  [verified]
+
+  The grounds distinguish this case sharply from *Zelman v. Simmons-Harris*, in which the
+  United States Supreme Court upheld the Cleveland voucher program against a federal
+  Establishment Clause challenge in 2002. [verified] This case is about the *Ohio*
+  constitution: the Article VI, Section 2 duty to secure a thorough and efficient system of
+  common schools, and the same section's bar on any religious or other sect having exclusive
+  right to or control of any part of the school funds. A federal ruling that vouchers do not
+  establish religion says nothing about whether Ohio's own constitution permits them.
+  [inference]
+
+  The case is a trial-level decision under appeal, so its precedential weight is limited and
+  its outcome unsettled. [inference] It is seeded here because it is the live test of whether
+  the *DeRolph* standard constrains anything in the current system, and because it makes
+  concrete why `litigation` needs to be able to challenge a `program` and not only a
+  `funding-regime`.
+
+  Case caption, docket number, the precise grounds relied on, and appellate status all need to
+  be established against the record before anything here is cited. [open]
+properties:
+  case_name: |
+    Coalition action brought by Vouchers Hurt Ohio member districts. Exact caption not yet
+    established. [open]
+  citation: |
+    Franklin County Court of Common Pleas. Docket number not yet established. [open]
+  court: Franklin County Court of Common Pleas
+  filed: 2022-01-04
+  decided: 2025-06-24
+  holding: |
+    Ohio's EdChoice scholarship program was held unconstitutional. The specific constitutional
+    grounds and the scope of the ruling must be confirmed against the opinion; filing and
+    decision dates are approximate. [open]
+  remedy: |
+    Not established here. Under appeal at the time of seeding, so no relief is in effect.
+    [open]
+links:
+  - target: ../litigation.ont.yml
+    relationship: instance-of
+  - target: ../program/edchoice-expansion.yml
+    relationship: challenges
+  - target: ../doctrine/thorough-and-efficient.yml
+    relationship: invokes
+  - target: ../legislation/ohio-constitution-article-vi-section-2.yml
+    relationship: applies

@@ -1,0 +1,42 @@
+class: program
+label: Classroom Facilities Assistance Program
+description: |
+  The state's school construction program, administered by the Ohio Facilities Construction
+  Commission and its predecessor the Ohio School Facilities Commission. It pays a share of the
+  cost of building or renovating school facilities, with the state share determined by the
+  district's relative wealth — poorer districts receive a higher percentage and are placed
+  earlier in the funding queue. [verified]
+
+  This program is the clearest direct response to *DeRolph* in Ohio's funding structure. The
+  Supreme Court of Ohio's findings included extended description of school building conditions,
+  and the state's construction program was substantially expanded in the years following.
+  [verified] It is also the reason `program` needs a `funds` edge and not only `diverts-from`:
+  this is money moving toward districts, and the capital channel is invisible in any operating
+  per-pupil figure.
+
+  The local share requirement is where the program interacts with everything else in this
+  corpus. A district receiving a high state share still must raise its own portion, typically
+  through a bond issue requiring voter approval — so a program designed to help
+  property-poor districts requires those districts to pass a levy in a tax environment shaped
+  by [H.B. 920](../legislation/hb-920-1976.yml). [inference] How often that requirement has
+  delayed or blocked projects is a question this corpus is well positioned to answer and has
+  not yet asked. [open]
+properties:
+  name: Classroom Facilities Assistance Program
+  mechanism: capital-assistance
+  eligibility: |
+    School districts, prioritized by relative wealth ranking, with the state share percentage
+    determined on the same basis. Districts must provide the local share, generally through a
+    voter-approved bond issue. Exact ranking methodology and share schedule not yet
+    established. [open]
+  amount: |
+    Not yet populated. [open] State share is a percentage of assessed project cost varying by
+    district wealth ranking.
+  appropriation_line: Capital appropriations, separate from the operating budget. [open]
+links:
+  - target: ../program.ont.yml
+    relationship: instance-of
+  - target: ../education-agency/northern-local-perry.yml
+    relationship: funds
+  - target: ../litigation/derolph-i-1997.yml
+    relationship: responds-to

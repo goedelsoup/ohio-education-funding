@@ -1,0 +1,56 @@
+class: metric
+label: State Share Percentage
+description: |
+  The fraction of a district's computed cost that the state pays rather than the district — the
+  compensation side of the equity question, where
+  [assessed valuation per pupil](assessed-valuation-per-pupil.yml) is the wealth side.
+  [verified]
+
+  Read together, the two metrics are the wealth-neutrality test. If the funding system
+  compensates for local wealth as designed, state share should fall as valuation per pupil
+  rises, and the strength and shape of that relationship is a direct measurement of how much
+  equalization the system actually performs. [inference] A weak relationship means the state is
+  distributing aid without regard to capacity; a strong one means it is, whatever the resulting
+  absolute levels.
+
+  This metric is a derived quantity, not a reported one, and the derivation is where the errors
+  are. It is a ratio of state aid to *computed cost*, not to total district revenue or total
+  district spending — a district may spend far above its computed cost from local revenue, and
+  dividing state aid by actual spending produces a different and much lower number that is
+  frequently quoted as though it were the same measure. [inference] Both numbers have uses;
+  conflating them does not.
+
+  The metric also behaves badly at the extremes. A district whose computed local share exceeds
+  its computed cost has a state share at or near zero and the ratio stops discriminating, so
+  the top of the wealth distribution compresses into a floor. [inference]
+properties:
+  name: State share percentage
+  unit: percent
+  definition: |
+    state_share_pct = state_foundation_aid / computed_formula_cost
+    where computed_formula_cost is the amount the regime in force computes for the district
+    before phase-in, and state_foundation_aid is the state's portion of that computation.
+    Distinct from state_aid / total_revenue and from state_aid / actual_expenditure, both of
+    which are different measures and must be named differently.
+  inputs: |
+    State foundation aid by agency and fiscal year — from `dew-foundation`.
+    Computed formula cost by agency and fiscal year — from the `foundation` calculator, or from
+    `lsc-budget` simulations where the calculator is not yet implemented.
+  caveats: |
+    Compresses to near zero for high-wealth districts, so it discriminates poorly at the top of
+    the distribution. Sensitive to whether the numerator is measured before or after the
+    phase-in percentage is applied — before is the design measure, after is what a district
+    receives, and they diverge by exactly the phase-in gap. Districts held on a guarantee are
+    off-formula and their computed share is not meaningful. [inference]
+  calculator: local-capacity
+links:
+  - target: ../metric.ont.yml
+    relationship: instance-of
+  - target: assessed-valuation-per-pupil.yml
+    relationship: derived-from
+  - target: ../doctrine/equity.yml
+    relationship: operationalizes
+  - target: ../education-agency/cleveland-municipal.yml
+    relationship: measures
+  - target: ../fiscal-period/fy2026.yml
+    relationship: computed-for

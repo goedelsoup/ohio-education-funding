@@ -1,0 +1,45 @@
+class: legislation
+label: Am. Sub. H.B. 96 (2025) — FY2026-27 Budget
+description: |
+  The FY2026-27 operating budget, and the third consecutive budget to decide what happens to
+  the Fair School Funding Plan's phase-in. [verified] The contested question was not whether
+  to continue the formula but which cost inputs to run it on: the plan's design contemplated
+  refreshing the staffing and salary data that feed base cost, and the act carried forward
+  the earlier input year rather than updating it. [inference]
+
+  This distinction is the reason `parameter` is a first-class node in this corpus. Continuing
+  a formula on frozen inputs while advancing its phase-in percentage produces a number that is
+  simultaneously described as full implementation and as a real-terms reduction, and both
+  descriptions are defensible depending on which parameter you hold fixed. Resolving that
+  argument requires the input year and the phase-in percentage to be separately addressable
+  values with their own series — which is exactly what
+  [`fsfp-phase-in-percentage`](../parameter/fsfp-phase-in-percentage.yml) and
+  [`base-cost-per-pupil`](../parameter/base-cost-per-pupil.yml) are for. [inference]
+
+  The specific phase-in percentages, the input year carried forward, the appropriation totals,
+  and the line-item vetoes affecting education all need to be filled from the enrolled act and
+  the LSC analysis before any claim here is load-bearing. [open]
+properties:
+  designation: Am. Sub. H.B. 96
+  general_assembly: 136th General Assembly
+  signed: 2025-06-30
+  effective: 2025-06-30
+  subject: |
+    Enacted the FY2026-27 operating budget. Continued the Fair School Funding Plan formula
+    while carrying forward prior-year cost inputs rather than refreshing them, and set the
+    phase-in appropriation levels for the biennium. Exact provisions to be confirmed against
+    the enrolled act. [open]
+  vetoes: |
+    Line-item vetoes were exercised. Which, if any, affected school funding provisions is
+    not yet established here. [open]
+links:
+  - target: ../legislation.ont.yml
+    relationship: instance-of
+  - target: hb-110-2021.yml
+    relationship: amends
+  - target: ../fiscal-period/fy2026-27.yml
+    relationship: appropriates-for
+  - target: ../parameter/fsfp-phase-in-percentage.yml
+    relationship: sets
+  - target: ../funding-regime/fair-school-funding-plan.yml
+    relationship: continues

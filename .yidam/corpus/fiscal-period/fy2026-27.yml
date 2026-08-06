@@ -1,0 +1,44 @@
+class: fiscal-period
+label: FY2026-27 Biennium
+description: |
+  The current biennium, appropriated by [Am. Sub. H.B. 96](../legislation/hb-96-2025.yml),
+  running July 1, 2025 through June 30, 2027. [verified] It is the third biennium of the
+  Fair School Funding Plan and, on the plan's original six-year design, the one in which the
+  phase-in would complete. [inference]
+
+  Two questions define it, and they are separable in a way public argument usually does not
+  make them. The first is the phase-in percentage — what fraction of the computed formula
+  amount is appropriated. The second is the reference year of the cost inputs that produce the
+  computed amount in the first place. A biennium can advance the first while freezing the
+  second, and the result is describable both as completing the phase-in and as cutting funding
+  in real terms, with both descriptions arithmetically correct. [inference] Resolving that
+  requires holding
+  [`fsfp-phase-in-percentage`](../parameter/fsfp-phase-in-percentage.yml) and
+  [`base-cost-per-pupil`](../parameter/base-cost-per-pupil.yml) as separate addressable values
+  — which is why this corpus does.
+
+  This period is also the first full biennium after the federal ESSER funds expired, so
+  district budgets in FY2026 lose a revenue source that was material for high-poverty
+  districts and immaterial for wealthy ones. [inference] Separating that effect from any
+  formula change is necessary before attributing a district's FY2026 position to state policy.
+  [open]
+
+  Enacted appropriation totals, phase-in percentages, and the cost input reference year all
+  need to be established from the act and the LSC analysis. [open]
+properties:
+  label: FY2026-27
+  kind: biennium
+  start: 2025-07-01
+  end: 2027-06-30
+  appropriating_bill: Am. Sub. H.B. 96 (136th General Assembly)
+  context: |
+    Third biennium of the Fair School Funding Plan; the biennium in which the original
+    six-year phase-in design would complete. First full biennium after federal ESSER
+    expiration. Contested on whether cost inputs were refreshed. [open]
+links:
+  - target: ../fiscal-period.ont.yml
+    relationship: instance-of
+  - target: ../funding-regime/fair-school-funding-plan.yml
+    relationship: governed-by
+  - target: ../legislation/hb-96-2025.yml
+    relationship: funded-by

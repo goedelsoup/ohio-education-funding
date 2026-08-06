@@ -1,0 +1,41 @@
+class: legislation
+label: Am. Sub. H.B. 920 (1976) — Tax Reduction Factors
+description: |
+  The single most consequential enactment in Ohio school finance, and the one least visible
+  in the funding formula itself. H.B. 920 created the tax reduction factors codified at
+  R.C. 319.301: as reappraisal raises the assessed value of existing real property, the
+  effective millage of previously voted levies is reduced so that the levy yields
+  approximately the same number of dollars it yielded when passed. [verified]
+
+  The consequence is that a district's revenue from an existing levy does not grow with
+  inflation or with rising property values. Growth comes only from new construction, from new
+  levies, or from reaching the 20-mill floor below which reduction factors cannot push
+  effective operating millage. [verified] A district whose costs rise with inflation must
+  therefore return to its voters repeatedly simply to stand still, and districts whose voters
+  say no fall behind in real terms without any decision by the General Assembly having been
+  made. [inference]
+
+  This is the mechanism that produced the disparities *DeRolph* litigated. It is also why the
+  20-mill floor is a funding parameter and not merely a tax-administration detail: for the
+  large number of districts sitting at the floor, valuation growth passes through to revenue
+  directly, and the entire logic of H.B. 920 is suspended. [verified]
+properties:
+  designation: Am. Sub. H.B. 920
+  general_assembly: 111th General Assembly
+  signed: 1976-08-26
+  effective: 1976-11-24
+  subject: |
+    Established the tax reduction factor mechanism at R.C. 319.301, holding the dollar yield
+    of voted millage on existing real property approximately constant across reappraisal, and
+    set a floor below which effective operating millage for school districts may not be
+    reduced.
+  vetoes: None recorded.
+links:
+  - target: ../legislation.ont.yml
+    relationship: instance-of
+  - target: ../revenue-stream/local-property-tax.yml
+    relationship: constrains
+  - target: ../parameter/twenty-mill-floor.yml
+    relationship: sets
+  - target: ../doctrine/equity.yml
+    relationship: bears-on

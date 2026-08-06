@@ -1,0 +1,41 @@
+class: actor
+label: Institutional Actor
+foundational_type:
+  ontology: ufo
+  type: kind
+description: |
+  An institution that acts on the funding system — enacting law, deciding cases,
+  administering programs, or publishing the data the rest of the corpus is grounded in.
+  It is a Kind because institutional identity is rigid within its charter, even across
+  reorganization and renaming: the Department of Education and Workforce succeeded the
+  Department of Education in 2023 as a distinct entity, and the corpus treats them as
+  distinct nodes linked by succession rather than as one entity with a changed name.
+properties:
+  - name: name
+    type: string
+    description: Current official name
+  - name: institution_type
+    type: string
+    description: legislature | court | executive-agency | commission | legislative-agency
+  - name: established
+    type: date
+    description: Date the institution was created
+  - name: authority
+    type: text
+    description: What this institution has the power to do within the funding system
+  - name: publishes
+    type: text
+    description: The data series and reports this institution issues, if any
+edges:
+  - relationship: enacts
+    target: legislation
+    direction: out
+    description: An enactment this institution passed or ratified
+  - relationship: decides
+    target: litigation
+    direction: out
+    description: A case this institution decided
+  - relationship: administers
+    target: program
+    direction: out
+    description: A program this institution operates

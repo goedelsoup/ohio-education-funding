@@ -1,0 +1,31 @@
+class: actor
+label: Ohio Department of Education (superseded)
+description: |
+  The state education agency from 1956 until 2023, governed by the State Board of Education —
+  a board with elected and appointed members — and headed by a Superintendent of Public
+  Instruction the board selected rather than the Governor. [verified] For most of the period
+  this corpus covers, ODE computed and disbursed the foundation payments, which makes it the
+  publisher of record for nearly every per-district state aid figure before FY2024.
+
+  The governance structure is the reason it is a separate node rather than a renamed
+  predecessor. ODE answered to an independent board; its successor answers to the Governor.
+  That is a change in who controls the agency that administers the formula, and it is
+  invisible if the two are collapsed into one node. [inference]
+properties:
+  name: Ohio Department of Education
+  institution_type: executive-agency
+  established: 1956-01-01
+  authority: |
+    Computed and disbursed foundation payments; maintained district and community school IRN
+    records; determined average daily membership; administered scholarship programs and the
+    community school deduction. Superseded 2023 by the Department of Education and Workforce.
+  publishes: |
+    School Finance Payment Reports (SFPR) and Foundation Funding files for fiscal years
+    through the transition; district typology assignments; average daily membership records.
+links:
+  - target: ../actor.ont.yml
+    relationship: instance-of
+  - target: ../education-agency/electronic-classroom-of-tomorrow.yml
+    relationship: recovered-funds-from
+  - target: ../program/cleveland-scholarship.yml
+    relationship: administers

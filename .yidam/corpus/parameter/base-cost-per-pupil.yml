@@ -1,0 +1,49 @@
+class: parameter
+label: Base Cost Per Pupil
+description: |
+  The amount the state treats as the cost of educating one student before categorical
+  additions — the single most consequential number in Ohio school funding, and the one whose
+  meaning has changed most.
+
+  Under the [foundation base cost formula](../funding-regime/foundation-base-cost-formula.yml)
+  it was a statewide figure set in the biennial budget, and the Supreme Court of Ohio found
+  in [*DeRolph I*](../litigation/derolph-i-1997.yml) that it was derived by working backward
+  from available appropriation rather than from any costing of an education. [verified] Under
+  the [Fair School Funding Plan](../funding-regime/fair-school-funding-plan.yml) it is not
+  set at all: it is computed per district from staffing ratios and regional salaries, and the
+  statewide figure is an average of district results rather than an input. [verified]
+
+  That change is why this node tracks a parameter whose type changed underneath it. Comparing
+  a pre-2022 base cost to a post-2022 one compares a policy decision to a computed output, and
+  the comparison is only meaningful if the reference year of the FSFP cost inputs is stated
+  alongside the figure. [inference]
+
+  The value series is the corpus's most important missing data. It must be assembled from
+  statute for the pre-FSFP years and from the LSC and department simulations for the FSFP
+  years, and stated in both nominal and constant dollars. [open]
+properties:
+  name: Base cost per pupil
+  unit: dollars-per-pupil
+  series: |
+    Not yet populated. [open] Requires: statutory base cost by fiscal year for FY1992-FY2009;
+    Evidence-Based Model computed adequacy per pupil for FY2010-FY2011; FSFP computed base
+    cost statewide average and district distribution for FY2022 forward, each tagged with the
+    reference year of its cost inputs. Sources: `ohio-laws` for statutory values, `lsc-budget`
+    for simulations, `dew-foundation` for realized per-district amounts.
+  statutory_basis: R.C. 3317, section varying by biennium. Exact citations not established. [open]
+  simulation_key: base_cost_per_pupil
+  sensitivity: |
+    Moves every district's computed cost proportionally before local share is applied.
+    Because state aid is the residual after local share, a given percentage change in base
+    cost produces a larger percentage change in state aid for districts with high local
+    capacity than for those with low — the same dollar increase is a smaller share of a
+    property-poor district's total. [inference] Interacts multiplicatively with
+    [fsfp-phase-in-percentage](fsfp-phase-in-percentage.yml): raising base cost while holding
+    phase-in constant delivers only the phased fraction of the increase.
+links:
+  - target: ../parameter.ont.yml
+    relationship: instance-of
+  - target: ../fiscal-period/fy2026.yml
+    relationship: valued-in
+  - target: ../doctrine/adequacy.yml
+    relationship: quantifies

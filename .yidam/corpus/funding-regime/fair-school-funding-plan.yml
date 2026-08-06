@@ -1,0 +1,55 @@
+class: funding-regime
+label: Fair School Funding Plan
+description: |
+  The regime in force, enacted by [H.B. 110](../legislation/hb-110-2021.yml) in 2021 and
+  developed over several years by Representatives Cupp and Patterson with a working group of
+  school treasurers and superintendents rather than by executive budget staff. [verified]
+  Three departures from everything before it:
+
+  **Base cost is district-specific.** Rather than one statewide per-pupil figure, each
+  district's base cost is built from staffing ratios applied to its own enrollment and priced
+  at regional salary levels. [verified] Two districts with the same enrollment can have
+  different base costs.
+
+  **Local share is capacity, not millage.** The charge-off asked what a fixed millage rate
+  would raise against a district's valuation. The local capacity measure asks what the
+  district's community can actually bear, combining property valuation with resident income —
+  which matters because a district can have high property value and low household income, and
+  the charge-off treated those districts as wealthier than they were. [verified]
+
+  **Students are funded where they are educated.** Community school and STEM school students
+  are funded directly by the state rather than by deducting from a resident district's
+  foundation payment, which removes the mechanism at the center of a decade of district
+  revenue-loss arguments. [verified]
+
+  The unresolved question is whether it is ever run as designed. It carries a six-year
+  phase-in that no enacting General Assembly could bind its successors to complete, and the
+  cost inputs that make base cost district-specific are only meaningful if they are refreshed.
+  [inference] Both are live in the FY2026-27 biennium. [open]
+properties:
+  name: Fair School Funding Plan
+  effective_from: FY2022
+  effective_to: current
+  distribution_logic: |
+    Base cost is computed per district from staffing ratios and regionally-adjusted salary
+    inputs applied to enrollment. A local capacity measure combining property valuation and
+    resident income determines the district share; the state pays the remainder. Categorical
+    weights for special education, economic disadvantage, English learners, gifted, and
+    career-technical sit on top. Community and STEM school students are funded directly rather
+    than deducted. The computed amount is appropriated at a phase-in percentage.
+  status: partially-implemented
+links:
+  - target: ../funding-regime.ont.yml
+    relationship: instance-of
+  - target: bridge-formula.yml
+    relationship: supersedes
+  - target: ../formula-component/fsfp-base-cost-calculation.yml
+    relationship: composed-of
+  - target: ../formula-component/fsfp-local-capacity-measure.yml
+    relationship: composed-of
+  - target: ../fiscal-period/fy2026-27.yml
+    relationship: active-during
+  - target: ../doctrine/adequacy.yml
+    relationship: assessed-against
+  - target: ../doctrine/thorough-and-efficient.yml
+    relationship: assessed-against

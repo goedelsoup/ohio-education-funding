@@ -1,0 +1,48 @@
+class: funding-regime
+label: Foundation Base Cost Formula
+description: |
+  The regime *DeRolph* was decided against. Its structure was simple: the state declared a
+  base cost per pupil, multiplied it by the district's average daily membership, subtracted a
+  charge-off representing what the district was deemed able to raise locally from a fixed
+  millage rate against its own valuation, and paid the difference. Categorical add-ons for
+  special education, transportation, and other purposes sat on top. [verified]
+
+  Everything turns on where the base cost number came from. The Supreme Court of Ohio found
+  in [*DeRolph I*](../litigation/derolph-i-1997.yml) that it was not derived from any study
+  of what educating a child costs, but arrived at by working backward from the money the
+  General Assembly had decided to spend — the practice this corpus records as
+  [residual budgeting](../doctrine/adequacy.yml). [verified] A per-pupil amount produced that
+  way cannot support a claim of adequacy no matter how precisely it is applied.
+
+  The charge-off compounded the problem. It assumed a district could raise a given yield from
+  a given millage, but H.B. 920's reduction factors meant many districts could not actually
+  levy at the assumed effective rate, and districts at the 20-mill floor were charged off
+  against valuation growth they were in some cases genuinely collecting and in other cases
+  not. [inference] The gap between assumed and actual local capacity is what practitioners
+  call phantom revenue. [verified]
+properties:
+  name: Foundation Base Cost Formula
+  effective_from: FY1992
+  effective_to: FY2009
+  distribution_logic: |
+    State aid = (statewide base cost per pupil x district average daily membership) - (charge-
+    off millage x district assessed valuation), plus categorical funding for special
+    education, transportation, and other designated purposes. Negative results were floored at
+    zero or at a minimum guarantee. Base cost was set in the biennial budget.
+  status: superseded
+  boundary_note: |
+    Treated here as one regime across roughly two decades because its structure was stable.
+    Substantial parameter changes occurred within it, particularly after DeRolph, including
+    the building-blocks recosting of the late 1990s. Whether those warrant separate regime
+    nodes is unresolved. [open]
+links:
+  - target: ../funding-regime.ont.yml
+    relationship: instance-of
+  - target: equal-yield-formula.yml
+    relationship: supersedes
+  - target: ../formula-component/charge-off-local-share.yml
+    relationship: composed-of
+  - target: ../doctrine/adequacy.yml
+    relationship: assessed-against
+  - target: ../doctrine/thorough-and-efficient.yml
+    relationship: assessed-against

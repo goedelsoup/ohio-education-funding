@@ -1,0 +1,44 @@
+class: funding-regime
+label: Evidence-Based Model
+description: |
+  Ohio's most direct attempt to answer *DeRolph* on its own terms, and the shortest-lived
+  regime in this corpus. Instead of declaring a base cost, the Evidence-Based Model specified
+  the resources an adequate education requires — class sizes, instructional staff per pupil,
+  counselors, tutors, professional development, technology, building operations — priced each
+  at a defined rate, and summed them into a district-specific adequacy amount. [verified]
+  The name refers to the claim that each specified resource level was supported by research
+  on what improves student outcomes.
+
+  Structurally this is the answer to residual budgeting: the amount is built up from
+  components rather than divided down from an appropriation, so the question "why this number"
+  has an answer that does not reduce to "that is what was available." [inference]
+
+  It operated for two fiscal years. H.B. 153 repealed it in 2011, before the third year of a
+  ten-year phase-in. [verified] Because it never ran at its designed funding level, the model
+  was never tested against the outcomes it was built to produce — the corpus can say what it
+  would have cost but not what it would have achieved. [inference] Its two operating years
+  also coincided with federal stabilization funding, so the state-share figures for FY2010-11
+  are not comparable to adjacent years without separating the federal component. [inference]
+properties:
+  name: Evidence-Based Model
+  effective_from: FY2010
+  effective_to: FY2011
+  distribution_logic: |
+    A district adequacy amount was built by specifying resource quantities per pupil or per
+    building (staffing ratios, support personnel, professional development, technology,
+    operations), pricing each at a defined rate, and summing. Local share was subtracted; the
+    state paid the remainder. Designed for a ten-year phase-in toward the full computed
+    amount.
+  status: superseded
+  boundary_note: |
+    Repealed by Am. Sub. H.B. 153 (2011), which has no node in this corpus yet and is a
+    named gap in the legislation class.
+links:
+  - target: ../funding-regime.ont.yml
+    relationship: instance-of
+  - target: foundation-base-cost-formula.yml
+    relationship: supersedes
+  - target: ../doctrine/adequacy.yml
+    relationship: assessed-against
+  - target: ../parameter/base-cost-per-pupil.yml
+    relationship: reframes

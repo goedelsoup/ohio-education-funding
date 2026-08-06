@@ -1,0 +1,48 @@
+class: metric
+label: Metric
+foundational_type:
+  ontology: ufo
+  type: quality
+description: |
+  A defined, computable measure over education agency data, stated precisely enough that two
+  people computing it from the same source get the same number — per-pupil expenditure,
+  assessed valuation per pupil, state share percentage, effective millage, the dispersion of
+  spending across agencies. It is a Quality inhering in the agency or the system it measures.
+  Metrics are separated from parameters because they face the opposite direction: a parameter
+  is an input policy chooses, a metric is an output policy produces.
+properties:
+  - name: name
+    type: string
+    description: The measure's name
+  - name: unit
+    type: string
+    description: dollars | dollars-per-pupil | percent | mills | ratio | index
+  - name: definition
+    type: text
+    description: The computation, stated as a formula over named inputs
+  - name: inputs
+    type: text
+    description: The source series required, and where each comes from
+  - name: caveats
+    type: text
+    description: Known ways this measure misleads, and what it excludes
+  - name: calculator
+    type: string
+    description: Name of the crates/ calculator implementing it, if implemented
+edges:
+  - relationship: measures
+    target: education-agency
+    direction: out
+    description: The agency or agency set this measure is computed over
+  - relationship: operationalizes
+    target: doctrine
+    direction: out
+    description: The normative principle this measure renders testable
+  - relationship: computed-for
+    target: fiscal-period
+    direction: out
+    description: A fiscal period for which this measure has been computed
+  - relationship: projected-by
+    target: scenario
+    direction: in
+    description: A counterfactual that forecasts this measure forward

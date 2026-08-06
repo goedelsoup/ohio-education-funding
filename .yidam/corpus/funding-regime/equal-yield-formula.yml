@@ -1,0 +1,43 @@
+class: funding-regime
+label: Equal Yield Formula
+description: |
+  The regime in force when H.B. 920 was enacted and when the funding system was first
+  challenged in court. Its logic was guaranteed yield: the state would ensure that a district
+  levying a given number of mills received a specified amount per pupil, making up the
+  difference between what the mills actually raised locally and the guaranteed level.
+  [verified] A property-poor district and a property-rich district levying the same effort
+  would, in principle, end up at the same revenue per pupil.
+
+  The principle was sound and the execution was limited in two ways that defined the next
+  three decades. The guaranteed yield level was set by appropriation rather than by any
+  measure of what an education costs, so equalization operated around an arbitrary point.
+  [inference] And equalization applied only up to a mill ceiling; districts able to levy
+  beyond it kept the full local yield, so the wealthiest districts remained free to outspend
+  the guarantee. [inference]
+
+  This is the regime the Supreme Court of Ohio upheld in
+  [*Cincinnati Bd. of Edn. v. Walter*](../litigation/cincinnati-v-walter-1979.yml) in 1979,
+  by a 4-3 vote, holding that the disparities it produced did not violate Article VI,
+  Section 2. [verified] The same disparities, grown larger, produced the opposite result
+  eighteen years later.
+properties:
+  name: Equal Yield Formula
+  effective_from: FY1976
+  effective_to: FY1991
+  distribution_logic: |
+    The state guaranteed a specified yield per pupil for a specified level of local millage,
+    paying the difference between the guarantee and what local millage actually produced. The
+    guarantee level was set by appropriation. Equalization applied up to a mill ceiling;
+    local effort above the ceiling was unequalized.
+  status: superseded
+  boundary_note: |
+    The end year is approximate. The transition from guaranteed yield to a per-pupil base cost
+    with a charge-off was incremental across several budgets rather than a single enactment,
+    and FY1992 is a reasonable but not authoritative boundary. [open]
+links:
+  - target: ../funding-regime.ont.yml
+    relationship: instance-of
+  - target: ../doctrine/equity.yml
+    relationship: assessed-against
+  - target: ../formula-component/charge-off-local-share.yml
+    relationship: composed-of

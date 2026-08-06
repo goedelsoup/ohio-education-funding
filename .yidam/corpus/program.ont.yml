@@ -1,0 +1,42 @@
+class: program
+label: Funding Program
+foundational_type:
+  ontology: ufo
+  type: relator
+description: |
+  A separately-authorized initiative that moves education money outside the base formula,
+  binding the state, a recipient, and usually a district whose funding is affected — a
+  scholarship or voucher, a facilities assistance program, a competitive grant. It is a
+  Relator rather than a bare edge because the arrangement carries its own identity and
+  history: an eligibility rule, an appropriation line, an administering body, a per-pupil
+  amount, and in several cases its own litigation. It is kept distinct from revenue-stream
+  because a voucher is not a channel of money to a district but a diversion away from one.
+properties:
+  - name: name
+    type: string
+    description: Program name as it appears in statute and appropriation documents
+  - name: mechanism
+    type: string
+    description: deduction | direct-appropriation | reimbursement | competitive-grant
+  - name: eligibility
+    type: text
+    description: Who qualifies, and how eligibility has changed over time
+  - name: amount
+    type: text
+    description: Per-recipient or per-project amount, by fiscal period
+  - name: appropriation_line
+    type: string
+    description: Budget line item identifier
+edges:
+  - relationship: diverts-from
+    target: education-agency
+    direction: out
+    description: The agency whose funding is reduced or displaced by this program
+  - relationship: created-by
+    target: legislation
+    direction: in
+    description: The enactment that established the program
+  - relationship: administered-by
+    target: actor
+    direction: in
+    description: The institution that operates the program

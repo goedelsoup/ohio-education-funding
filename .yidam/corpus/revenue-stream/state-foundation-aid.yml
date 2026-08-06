@@ -1,0 +1,48 @@
+class: revenue-stream
+label: State Foundation Aid
+description: |
+  The money the state pays education agencies through the funding formula — whatever formula
+  is in force — computed per agency and disbursed across the fiscal year in periodic payments.
+  [verified] It is the stream every `funding-regime` node in this corpus is a method for
+  distributing.
+
+  Its defining characteristic is the mirror image of the local property tax's. Local revenue
+  is voter-controlled and inflation-frozen; foundation aid is inflation-indifferent by design
+  but entirely dependent on a biennial appropriation. [inference] A district cannot vote itself
+  more foundation aid, and no enactment can guarantee it against the next General Assembly's
+  budget. The [phase-in percentage](../parameter/fsfp-phase-in-percentage.yml) is where that
+  dependence becomes visible: the formula computes an amount, and the appropriation decides
+  what fraction of it arrives.
+
+  Because foundation aid is a residual — computed cost less deemed local share — its
+  distribution is more unequal than the underlying cost, and deliberately so. A district with
+  low local capacity receives a larger share of its cost from the state. [verified] This means
+  that a uniform cut to foundation aid is not uniform in effect: it falls hardest on the
+  districts for whom it is the largest revenue share. [inference]
+properties:
+  name: State foundation aid
+  level: state
+  legal_basis: |
+    R.C. 3317 (school foundation program), with the operative formula provisions amended by
+    each biennial appropriation act.
+  restriction: |
+    Largely unrestricted general operating revenue at the district level, though categorical
+    components (special education, transportation, career-technical) carry spending and
+    reporting requirements tied to their purpose.
+  growth_behavior: |
+    Set by formula and appropriation, not by any automatic escalator. Grows when the General
+    Assembly raises base cost, advances the phase-in, or updates cost inputs; falls or
+    stagnates otherwise. Caps and guarantees can detach an agency's payment from the formula
+    result entirely.
+  series_path: Not yet populated. [open] Target: crates/ data files fed by `dew-foundation`.
+links:
+  - target: ../revenue-stream.ont.yml
+    relationship: instance-of
+  - target: ../education-agency/northern-local-perry.yml
+    relationship: funds
+  - target: ../education-agency/cleveland-municipal.yml
+    relationship: funds
+  - target: ../education-agency/eastland-fairfield-ctc.yml
+    relationship: funds
+  - target: ../doctrine/adequacy.yml
+    relationship: bears-on

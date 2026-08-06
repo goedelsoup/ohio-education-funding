@@ -1,0 +1,47 @@
+class: litigation
+label: DeRolph v. State (DeRolph I, 1997)
+description: |
+  The decision that changed the terms of Ohio school funding. The Supreme Court of Ohio held,
+  4-3, that the state's school funding system violated Article VI, Section 2, and ordered the
+  General Assembly to enact a complete systematic overhaul. [verified] The action had been
+  brought in 1991 by a coalition of districts organized as the Ohio Coalition for Equity and
+  Adequacy of School Funding, with the named plaintiff a student in
+  [Northern Local School District](../education-agency/northern-local-perry.yml). [verified]
+
+  The court identified specific defects rather than a general insufficiency, and the specificity
+  is what made the decision usable. Among them: the base cost per pupil was not derived from
+  any determination of what an education costs but by dividing available money by pupils —
+  the practice this corpus records under [adequacy](../doctrine/adequacy.yml) as residual
+  budgeting; districts were forced into borrowing to meet operating costs; school buildings
+  were in conditions the court described at length; and reliance on local property tax
+  produced disparities the state's equalization did not correct. [verified]
+
+  The remedy was the weak point, and it is the reason *DeRolph* generated four decisions rather
+  than one. The court declared the system unconstitutional and directed the General Assembly to
+  fix it, without specifying what a compliant system would contain or what would happen if one
+  did not appear. [inference]
+properties:
+  case_name: DeRolph v. State
+  citation: 78 Ohio St.3d 193 (1997)
+  court: Supreme Court of Ohio
+  filed: 1991-12-19
+  decided: 1997-03-24
+  holding: |
+    Ohio's system for funding elementary and secondary education fails to provide a thorough
+    and efficient system of common schools as required by Article VI, Section 2, and is
+    unconstitutional. Decided 4-3. Filing date to be confirmed against the record. [open]
+  remedy: |
+    A complete systematic overhaul of the school funding system, ordered of the General
+    Assembly, with jurisdiction retained. No specification of a compliant design and no
+    stated consequence for non-compliance.
+links:
+  - target: ../litigation.ont.yml
+    relationship: instance-of
+  - target: ../funding-regime/foundation-base-cost-formula.yml
+    relationship: challenges
+  - target: ../doctrine/adequacy.yml
+    relationship: invokes
+  - target: ../doctrine/thorough-and-efficient.yml
+    relationship: invokes
+  - target: ../education-agency/northern-local-perry.yml
+    relationship: has-party

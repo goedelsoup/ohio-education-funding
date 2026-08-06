@@ -1,0 +1,39 @@
+class: legislation
+label: Am. Sub. H.B. 1 (2009) — FY2010-11 Budget; Evidence-Based Model
+description: |
+  The FY2010-11 operating budget, which replaced the existing foundation formula with the
+  Evidence-Based Model — the most direct legislative attempt to answer *DeRolph*'s central
+  criticism. [verified] Rather than dividing available money by pupils and calling the
+  quotient a base cost, the EBM specified the components of an adequate education as
+  resource inputs — class sizes, instructional staff ratios, counselors, tutors, professional
+  development, technology — priced them, and summed them into a per-district amount.
+  [verified]
+
+  The model was designed for a ten-year phase-in. [verified] It survived two fiscal years.
+  H.B. 153 in 2011 repealed it before the phase-in reached its third year, which means the
+  Evidence-Based Model was never operated at the funding level it was designed around and
+  its adequacy claim was never tested. [verified]
+
+  The enactment coincided with the American Recovery and Reinvestment Act, and a substantial
+  share of the FY2010-11 education appropriation was federal stabilization money rather than
+  state revenue — a fact that makes the state-share figures for these two years
+  non-comparable to the years on either side unless the federal component is separated out.
+  [inference]
+properties:
+  designation: Am. Sub. H.B. 1
+  general_assembly: 128th General Assembly
+  signed: 2009-07-17
+  effective: 2009-07-17
+  subject: |
+    Enacted the FY2010-11 operating budget and replaced the prior foundation formula with the
+    Evidence-Based Model, which derived a per-district adequacy amount from specified
+    staffing ratios and resource inputs rather than from available appropriation divided by
+    enrollment. Designed for a ten-year phase-in.
+  vetoes: Line-item vetoes recorded; education funding effect not yet assessed. [open]
+links:
+  - target: ../legislation.ont.yml
+    relationship: instance-of
+  - target: ../funding-regime/evidence-based-model.yml
+    relationship: establishes
+  - target: ../doctrine/adequacy.yml
+    relationship: operationalizes

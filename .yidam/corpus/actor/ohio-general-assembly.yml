@@ -1,0 +1,43 @@
+class: actor
+label: Ohio General Assembly
+description: |
+  Ohio's bicameral legislature — 99 House members and 33 Senators — and the body Article VI,
+  Section 2 addresses directly: the constitutional duty to secure a thorough and efficient
+  system of common schools is laid on the General Assembly, not on the Department of
+  Education or on districts. [verified] Every funding regime in this corpus was created by an
+  act of this body, and the school funding formula is enacted inside the biennial operating
+  budget rather than as standalone legislation, which means it is renegotiated in full every
+  two years alongside every other appropriation. [verified]
+
+  That biennial rhythm is itself a structural fact about Ohio school funding. A formula
+  designed with a multi-year phase-in has no protection from a later General Assembly
+  choosing not to continue it, and the Fair School Funding Plan's phase-in has been
+  re-legislated in each of three consecutive budgets rather than guaranteed by the enactment
+  that created it. [inference]
+properties:
+  name: Ohio General Assembly
+  institution_type: legislature
+  established: 1803-03-01
+  authority: |
+    Holds the Article VI, Section 2 duty to provide for a thorough and efficient system of
+    common schools. Enacts the biennial operating budget, which carries the school funding
+    formula, the appropriation levels that determine phase-in, and the statutory text of every
+    parameter. Levies and constrains local taxation authority.
+  publishes: |
+    Enrolled bill text and session laws via the Legislative Service Commission; fiscal notes
+    and budget analyses (redbooks); the Catalog of Budget Line Items.
+links:
+  - target: ../actor.ont.yml
+    relationship: instance-of
+  - target: ../legislation/hb-920-1976.yml
+    relationship: enacts
+  - target: ../legislation/hb-66-2005.yml
+    relationship: enacts
+  - target: ../legislation/hb-1-2009.yml
+    relationship: enacts
+  - target: ../legislation/hb-110-2021.yml
+    relationship: enacts
+  - target: ../legislation/hb-96-2025.yml
+    relationship: enacts
+  - target: ../doctrine/thorough-and-efficient.yml
+    relationship: bears-duty-under

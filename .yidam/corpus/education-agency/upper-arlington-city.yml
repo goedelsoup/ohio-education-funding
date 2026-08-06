@@ -1,0 +1,43 @@
+class: education-agency
+label: Upper Arlington City School District
+description: |
+  A high-wealth suburban district in Franklin County, adjacent to Columbus, seeded as the
+  contrast case against [Northern Local](northern-local-perry.yml). Its role in this corpus is
+  to make the distributional question concrete: two districts, the same constitutional
+  entitlement, and revenue structures that have almost nothing in common. [inference]
+
+  A district at this end of the distribution experiences every mechanism in this corpus
+  differently, and often in the opposite direction. High assessed valuation per pupil means
+  local millage produces substantial revenue, so the district is far above the
+  [20-mill floor](../parameter/twenty-mill-floor.yml) and H.B. 920's reduction factors operate
+  fully — which means its existing levies are held flat in nominal terms just like everyone
+  else's, and it too must return to voters to keep pace. [inference] The difference is that
+  its voters can afford to say yes, and its base is large enough that a mill is worth far
+  more.
+
+  Under any residual formula, high local capacity means low state aid, so this district's
+  state foundation payment is small and its exposure to phase-in decisions is
+  correspondingly small. [inference] That asymmetry is the substance of the claim that a
+  uniform cut to foundation aid is not uniform in effect.
+
+  Seeded as an exemplar, not as an accusation: nothing in this node asserts that the district
+  did anything other than pass levies its residents supported.
+properties:
+  irn: Not yet established. [open]
+  agency_type: city
+  county: Franklin
+  typology: |
+    Suburban, very low poverty, high median income. Exact department typology code not yet
+    established. [open]
+  established: Not yet established. [open]
+  roles: |
+    Property-rich throughout the period covered [inference]. Above the 20-mill floor
+    [inference — requires confirmation from tax-abstract]. Low state share [inference].
+  series_path: Not yet populated. [open]
+links:
+  - target: ../education-agency.ont.yml
+    relationship: instance-of
+  - target: northern-local-perry.yml
+    relationship: peer-of
+  - target: ../doctrine/equity.yml
+    relationship: illustrates

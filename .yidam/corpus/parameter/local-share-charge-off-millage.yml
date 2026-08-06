@@ -1,0 +1,47 @@
+class: parameter
+label: Local Share Charge-Off Millage
+description: |
+  The statutory millage rate the state assumed a district could levy against its own assessed
+  valuation, used to compute the district's deemed local contribution before state aid.
+  [verified] It is the number that made the charge-off mechanism work and the number that made
+  it wrong.
+
+  The rate is uniform statewide, which is the point — it expresses a policy judgment that every
+  district should contribute the yield of the same effort. [inference] But it is applied
+  against valuation alone, and it presumes the district can actually levy at that effective
+  rate. Under [H.B. 920](../legislation/hb-920-1976.yml), a district whose reduction factors
+  have driven effective operating millage below the charge-off rate is charged for revenue it
+  is legally unable to collect at that level. [verified] The shortfall is phantom revenue, and
+  it is a direct arithmetic consequence of two provisions that were written independently.
+
+  The parameter is retired: the [Fair School Funding
+  Plan](../funding-regime/fair-school-funding-plan.yml) replaced the charge-off with a local
+  capacity measure. [verified] The node remains because it governs every state aid figure from
+  FY1992 through FY2021, and because the historical series is required for any
+  [`regime-diff`](../formula-component/fsfp-local-capacity-measure.yml) between the two
+  approaches.
+properties:
+  name: Local share charge-off millage
+  unit: mills
+  series: |
+    Not yet populated. [open] Ohio's charge-off rate moved between roughly 20 and 23 mills
+    across the foundation formula era, changing by biennium, but the year-by-year series and
+    the exact values must be taken from statute rather than from recollection. Source:
+    `ohio-laws` for statutory text, `lsc-budget` for the operative rate used in each
+    biennium's simulations.
+  statutory_basis: R.C. 3317, section varying by biennium. Exact citations not established. [open]
+  simulation_key: charge_off_millage
+  sensitivity: |
+    Raising the charge-off rate shifts cost from the state to districts, and shifts it most to
+    districts with high valuation per pupil — which sounds progressive and is, up to the point
+    where a district's effective millage is already below the rate. Beyond that point the
+    increase falls entirely on districts that cannot levy it, making the parameter regressive
+    in exactly the range where it appears otherwise. [inference] This nonlinearity is why the
+    parameter cannot be evaluated without per-district floor status.
+links:
+  - target: ../parameter.ont.yml
+    relationship: instance-of
+  - target: ../revenue-stream/local-property-tax.yml
+    relationship: assumes-yield-from
+  - target: twenty-mill-floor.yml
+    relationship: bounded-by

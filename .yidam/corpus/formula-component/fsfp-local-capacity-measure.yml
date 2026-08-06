@@ -1,0 +1,40 @@
+class: formula-component
+label: FSFP Local Capacity Measure
+description: |
+  The Fair School Funding Plan's replacement for the charge-off, and the component that most
+  changes which districts win and lose. Rather than asking what a fixed millage would raise
+  against valuation, it asks what a district's community can bear — combining assessed
+  property valuation with the income of district residents into a capacity figure, from which
+  the district's share of its own base cost is derived. [verified]
+
+  The reason income belongs in the measure is a specific Ohio failure mode. Property valuation
+  and household income diverge in two directions. A rural district with substantial
+  agricultural or industrial valuation and low household earnings looked wealthy to the
+  charge-off. A district whose housing has appreciated faster than its residents' incomes —
+  older suburbs, and much of Appalachian and Rust Belt Ohio — looked wealthy for the same
+  reason. Both were asked for local effort their residents could not sustain. [inference]
+
+  The weighting between valuation and income, and the exact derivation of the state share
+  percentage from the capacity figure, are the operative details and are not yet recorded
+  here. They are the highest-value gap in this class, because they are the parameters a
+  scenario would most usefully perturb. [open]
+properties:
+  name: FSFP local capacity measure
+  function: |
+    Combines district assessed property valuation with resident income into a local capacity
+    figure, converts that figure into a district share of computed base cost, and leaves the
+    remainder as state responsibility. Weighting between the valuation and income components
+    is set in statute. [open]
+  statutory_basis: |
+    R.C. 3317 as amended by Am. Sub. H.B. 110 (2021). Specific sections not yet established.
+    [open]
+  calculator: local-capacity
+links:
+  - target: ../formula-component.ont.yml
+    relationship: instance-of
+  - target: charge-off-local-share.yml
+    relationship: replaces
+  - target: ../revenue-stream/state-foundation-aid.yml
+    relationship: distributes
+  - target: ../doctrine/equity.yml
+    relationship: operationalizes

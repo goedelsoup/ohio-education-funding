@@ -1,0 +1,57 @@
+class: education-agency
+label: Education Agency
+foundational_type:
+  ontology: ufo
+  type: kind
+description: |
+  An IRN-bearing entity that receives Ohio public education funding and is a unit of
+  distribution in the state formula — a city, local, or exempted village school district,
+  a joint vocational school district, a community (charter) school, or a STEM school.
+  It is a Kind because the identity is rigid: an entity that ceases to be a chartered
+  education agency ceases to exist as this thing, rather than persisting in another form.
+  The contingent labels attached to agencies in this domain — property-poor, 20-mill-floor,
+  DeRolph plaintiff, guarantee district — are Roles it plays, not what it is, and several
+  are typically played at once.
+properties:
+  - name: irn
+    type: string
+    description: Information Retrieval Number; the stable statewide identifier for the agency
+  - name: agency_type
+    type: string
+    description: city | local | exempted-village | joint-vocational | community | stem
+  - name: county
+    type: string
+    description: Primary county of the agency's territory
+  - name: typology
+    type: string
+    description: Department typology grouping (rural, small town, suburban, urban) used for peer comparison
+  - name: established
+    type: date
+    description: Date the agency was chartered or organized
+  - name: roles
+    type: text
+    description: Contingent roles the agency plays or has played, each with the fiscal periods it applied
+  - name: series_path
+    type: string
+    description: Path under crates/ to this agency's committed per-fiscal-year numeric series
+edges:
+  - relationship: party-to
+    target: litigation
+    direction: out
+    description: The agency was a named plaintiff, defendant, or intervenor in the case
+  - relationship: peer-of
+    target: education-agency
+    direction: out
+    description: The agency is a comparison peer, by typology or by wealth position
+  - relationship: funded-by
+    target: revenue-stream
+    direction: in
+    description: A channel of money that reaches this agency
+  - relationship: loses-to
+    target: program
+    direction: in
+    description: A program that diverts funds away from this agency
+  - relationship: measured-by
+    target: metric
+    direction: in
+    description: A defined measure computed over this agency's series

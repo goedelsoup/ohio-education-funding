@@ -1,0 +1,45 @@
+class: education-agency
+label: Northern Local School District (Perry County)
+description: |
+  A rural district in Perry County, in Ohio's Appalachian southeast, and the origin of
+  *DeRolph v. State*: the named plaintiff was a student at Sheridan High School in this
+  district. [verified] It is seeded as the anchor case for the property-poor end of Ohio's
+  distribution.
+
+  The district is the concrete instance of the mechanism this corpus is built to explain. Low
+  assessed valuation per pupil means local millage produces little revenue; under
+  [H.B. 920](../legislation/hb-920-1976.yml) what it does produce does not grow with
+  inflation; the [charge-off](../formula-component/charge-off-local-share.yml) nonetheless
+  assumed a local contribution based on that valuation; and the resulting state aid was
+  computed against a base cost the Supreme Court of Ohio found had no derivation. [inference]
+  The building conditions the court described in *DeRolph I* were the visible end of that
+  chain.
+
+  It is also the right district against which to test whether anything changed. The
+  [Fair School Funding Plan](../funding-regime/fair-school-funding-plan.yml)'s local capacity
+  measure adds resident income to valuation, which should help a district whose community is
+  poorer than its property base suggests — and Perry County is a place where that gap is real.
+  [inference] Whether it did, and by how much, is the first calculation this corpus should
+  perform. [open]
+
+  IRN, valuation per pupil, floor status, and the full funding series are required and not yet
+  populated. [open]
+properties:
+  irn: Not yet established. [open] Source, `nces-ccd` and `dew-foundation` crosswalks.
+  agency_type: local
+  county: Perry
+  typology: |
+    Rural, high poverty. Exact department typology code not yet established. [open]
+  established: Not yet established. [open]
+  roles: |
+    DeRolph plaintiff district (1991-2003) [verified]. Property-poor throughout the period
+    covered [inference]. 20-mill floor status by fiscal period not yet determined and is a
+    priority: it determines whether reappraisal reaches the district's revenue at all. [open]
+  series_path: Not yet populated. [open]
+links:
+  - target: ../education-agency.ont.yml
+    relationship: instance-of
+  - target: ../litigation/derolph-i-1997.yml
+    relationship: party-to
+  - target: upper-arlington-city.yml
+    relationship: peer-of

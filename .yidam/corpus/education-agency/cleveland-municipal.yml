@@ -1,0 +1,44 @@
+class: education-agency
+label: Cleveland Municipal School District
+description: |
+  Ohio's largest urban district by enrollment for most of the period this corpus covers, and
+  the district where the state's voucher channel began. [verified] It is seeded because it sits
+  at the intersection of three mechanisms that operate on no other agency in the same
+  combination: high poverty, a large but declining industrial and commercial tax base, and a
+  district-specific scholarship program predating every statewide one.
+
+  Urban districts complicate the property-wealth story that Northern Local and Upper Arlington
+  tell cleanly. Cleveland's assessed valuation is large in absolute terms, so a wealth measure
+  based on valuation alone does not classify it as poor — but its enrollment and its residents'
+  incomes tell a different story, and its municipal overburden means property tax capacity is
+  shared with city services that suburban districts do not carry. [inference] This is precisely
+  the case the [FSFP local capacity measure](../formula-component/fsfp-local-capacity-measure.yml)
+  was designed to handle better than the charge-off did, and testing whether it does is a
+  concrete question this node exists to support. [open]
+
+  The [Cleveland Scholarship](../program/cleveland-scholarship.yml) makes it the longest
+  continuous case of a district funding students who attend elsewhere, which is why any
+  analysis of scholarship effects should start here rather than with the 2023 expansion —
+  there is three decades of series. [inference]
+
+  Enrollment, valuation, scholarship participation, and the funding series are all required and
+  not yet populated. [open]
+properties:
+  irn: Not yet established. [open]
+  agency_type: city
+  county: Cuyahoga
+  typology: |
+    Urban, very high poverty. Exact department typology code not yet established. [open]
+  established: Not yet established. [open]
+  roles: |
+    Cleveland Scholarship resident district since the mid-1990s [verified]. Subject to state
+    academic distress intervention for part of the period [verified — dates not yet
+    established]. High-poverty urban district throughout [verified].
+  series_path: Not yet populated. [open]
+links:
+  - target: ../education-agency.ont.yml
+    relationship: instance-of
+  - target: ../program/cleveland-scholarship.yml
+    relationship: subject-to
+  - target: ../doctrine/adequacy.yml
+    relationship: illustrates

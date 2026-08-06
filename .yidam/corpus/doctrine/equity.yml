@@ -1,0 +1,50 @@
+class: doctrine
+label: Equity
+description: |
+  The principle that a student's educational resources should not depend on the wealth of the
+  district they happen to live in — a relative standard, measured by dispersion across agencies
+  rather than against any absolute requirement. [verified as a framing in school finance
+  scholarship]
+
+  Equity is the older of the two doctrines in Ohio litigation and the one that lost first. In
+  [*Walter*](../litigation/cincinnati-v-walter-1979.yml) the Supreme Court of Ohio held, 4-3,
+  that disparity between districts did not by itself violate Article VI, Section 2. [verified]
+  The disparities continued to widen under [H.B. 920](../legislation/hb-920-1976.yml), whose
+  reduction factors made a district's revenue depend on its levy history and its voters rather
+  than on any statewide standard. [inference]
+
+  Equity is the doctrine most readily made computable, which is why it is the one this corpus
+  can test most directly: the coefficient of variation, the McLoone and Verstegen indices, and
+  the federal range ratio all measure it, and all can be computed per fiscal period from the
+  same per-agency series. [verified]
+
+  It trades against adequacy in a specific way. Perfect equity is achievable by leveling down —
+  every district equally underfunded satisfies equity and fails adequacy. [inference] Ohio has
+  never proposed leveling down, but the tension shows up in a milder form every time a reform
+  raises the floor without touching the ceiling: adequacy improves, dispersion may not.
+properties:
+  name: Equity
+  origin: |
+    School finance litigation of the 1970s; raised in Ohio in Cincinnati Bd. of Edn. v. Walter
+    (1979) and again in the DeRolph line.
+  formulation: |
+    A funding system is equitable in a fiscal period to the extent that variation in
+    per-pupil operating resources across agencies is not explained by variation in local
+    property wealth or resident income. Testable as the association between per-pupil
+    resources and assessed valuation per pupil, and as the dispersion of per-pupil resources
+    across the agency distribution.
+  contested: |
+    Whether equity means equal dollars, equal dollars adjusted for student need, or equal
+    outcomes; whether local control is a legitimate defense of disparity or its rationale;
+    and whether wealth-neutrality should be measured against property alone or against
+    property and income together — the question the Fair School Funding Plan answered by
+    including both. [open]
+links:
+  - target: ../doctrine.ont.yml
+    relationship: instance-of
+  - target: adequacy.yml
+    relationship: tensions-with
+  - target: ../legislation/ohio-constitution-article-vi-section-2.yml
+    relationship: grounded-in
+  - target: ../litigation/cincinnati-v-walter-1979.yml
+    relationship: invoked-by

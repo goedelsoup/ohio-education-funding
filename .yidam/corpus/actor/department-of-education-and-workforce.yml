@@ -1,0 +1,34 @@
+class: actor
+label: Department of Education and Workforce
+description: |
+  Ohio's state education agency since 2023, created by H.B. 33 as a cabinet-level department
+  reporting to the Governor, with a Director appointed by the Governor. [verified] The State
+  Board of Education and the Superintendent of Public Instruction were retained but stripped
+  of most operational authority, which now sits with the department. [verified]
+
+  For this corpus, DEW is the publisher of record for current-era numbers: the School Finance
+  Payment Reports that carry per-agency Fair School Funding Plan amounts, the average daily
+  membership counts the formula divides by, and the scholarship and community school
+  deduction records. A break in publisher partway through a series is exactly the kind of
+  discontinuity that produces two defensible answers to the same question, so the corpus
+  keeps the transition explicit rather than presenting an unbroken series. [inference]
+properties:
+  name: Department of Education and Workforce
+  institution_type: executive-agency
+  established: 2023-10-03
+  authority: |
+    Computes and disburses Fair School Funding Plan payments; determines average daily
+    membership; administers EdChoice, Jon Peterson, and Autism scholarships and the community
+    school deduction; maintains IRN records for all education agencies.
+  publishes: |
+    School Finance Payment Reports (SFPR); Foundation Funding data files; district typology;
+    enrollment and ADM series. Primary feed for the `dew-foundation` connector.
+links:
+  - target: ../actor.ont.yml
+    relationship: instance-of
+  - target: ohio-department-of-education.yml
+    relationship: succeeds
+  - target: ../program/edchoice-expansion.yml
+    relationship: administers
+  - target: ../program/cleveland-scholarship.yml
+    relationship: administers

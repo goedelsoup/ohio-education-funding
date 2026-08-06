@@ -1,0 +1,48 @@
+class: revenue-stream
+label: Local Property Tax
+description: |
+  The tax levied by a school district on property within its territory, historically covering
+  both real property and — until the [H.B. 66](../legislation/hb-66-2005.yml) phase-out —
+  tangible personal property used in business. It is the oldest stream in this corpus and the
+  one whose behavior explains most of what the others are reacting to.
+
+  Its defining characteristic in Ohio is that it does not grow. Under
+  [H.B. 920](../legislation/hb-920-1976.yml), reduction factors lower the effective millage of
+  existing voted levies as reappraisal raises assessed values, so a levy yields approximately
+  the same nominal dollars year after year regardless of what happens to property values.
+  [verified] Growth comes from three places only: new construction added to the tax base, new
+  levies approved by voters, and reaching the
+  [20-mill floor](../parameter/twenty-mill-floor.yml), below which reduction factors stop
+  operating. [verified]
+
+  A district's revenue trajectory is therefore set less by its wealth than by its levy
+  history and its voters' willingness. Two districts with identical valuation can be on
+  entirely different paths. [inference] And because the yield is nominally flat while costs
+  rise, a district that passes no new levy is losing real revenue every year without any
+  decision having been made by anyone. [inference] That mechanism — automatic real decline
+  absent affirmative action — is the engine of the disparities litigated in *DeRolph*.
+properties:
+  name: Local property tax
+  level: local
+  legal_basis: |
+    Ohio Const. art. XII (taxation); R.C. 5705 (tax levy law); R.C. 319.301 (reduction
+    factors); R.C. 5713 and 5715 (valuation and reappraisal).
+  restriction: |
+    Depends on the levy. Operating levies produce unrestricted general fund revenue; permanent
+    improvement, bond, and emergency levies are restricted to their stated purpose. The
+    distinction matters because the funding formula computes an operating cost, and restricted
+    revenue cannot be applied to it.
+  growth_behavior: |
+    Nominally flat for existing levies, by design. Reduction factors offset valuation growth
+    on existing real property. Exceptions: new construction, newly voted millage, inside
+    (unvoted) millage, and districts at the 20-mill floor, whose revenue rises with valuation.
+  series_path: Not yet populated. [open] Target: crates/ data files fed by `tax-abstract`.
+links:
+  - target: ../revenue-stream.ont.yml
+    relationship: instance-of
+  - target: ../education-agency/northern-local-perry.yml
+    relationship: funds
+  - target: ../education-agency/upper-arlington-city.yml
+    relationship: funds
+  - target: ../doctrine/equity.yml
+    relationship: bears-on

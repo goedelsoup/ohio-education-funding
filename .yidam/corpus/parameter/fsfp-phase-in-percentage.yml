@@ -1,0 +1,48 @@
+class: parameter
+label: FSFP Phase-In Percentage
+description: |
+  The fraction of the Fair School Funding Plan's computed formula amount that is actually
+  appropriated. The plan was designed to reach full funding over six years, and each biennial
+  budget since 2021 has set the percentage for its two fiscal years. [verified]
+
+  This parameter is the reason the corpus separates what a formula computes from what a
+  district receives. The Fair School Funding Plan can be simultaneously described as fully
+  phased in and as underfunded without either speaker being wrong, because the phase-in
+  percentage and the cost-input reference year are two different dials and only one of them
+  is usually named. [inference] A phase-in that reaches 100 percent of an amount computed on
+  stale inputs delivers less, in real terms, than the plan's designers costed — and the
+  percentage alone will not show it.
+
+  That interaction is the specific thing this node exists to make queryable. Any statement
+  about Fair School Funding Plan implementation should carry both this parameter's value and
+  the reference year on
+  [`fsfp-base-cost-calculation`](../formula-component/fsfp-base-cost-calculation.yml).
+properties:
+  name: FSFP phase-in percentage
+  unit: percent
+  series: |
+    Not yet populated with confirmed values. [open] The plan's design was a six-year phase-in
+    in equal increments, which would imply roughly 16.7 / 33.3 / 50.0 / 66.7 / 83.3 / 100
+    percent across FY2022 through FY2027, with H.B. 110 setting the first biennium, H.B. 33
+    the second, and H.B. 96 the third. [inference] The enacted percentages must be confirmed
+    against each act and the LSC analyses before use; the increments were not necessarily
+    equal and the FY2026-27 values are the contested ones. Sources: `ohio-laws`,
+    `lsc-budget`.
+  statutory_basis: |
+    Set in each biennial appropriation act rather than in permanent law, which is itself the
+    structural fact this node records. [verified]
+  simulation_key: fsfp_phase_in_pct
+  sensitivity: |
+    Scales state aid for every district on the formula, but has no effect on districts held on
+    a guarantee — for those, the phase-in percentage is inert and the guarantee is the
+    operative number. [inference] The share of districts insulated from this parameter is
+    therefore required context for any statement about what a phase-in change would do.
+links:
+  - target: ../parameter.ont.yml
+    relationship: instance-of
+  - target: ../fiscal-period/fy2026.yml
+    relationship: valued-in
+  - target: ../fiscal-period/fy2026-27.yml
+    relationship: valued-in
+  - target: base-cost-per-pupil.yml
+    relationship: scales

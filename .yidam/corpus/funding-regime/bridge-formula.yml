@@ -1,0 +1,46 @@
+class: funding-regime
+label: Bridge Formula
+description: |
+  The decade between two attempts at costing out an education, and the regime that shows what
+  Ohio does when it has no formula it believes in. Enacted by H.B. 153 in 2011 as an explicit
+  placeholder after the Evidence-Based Model was repealed, the bridge approach distributed aid
+  largely by reference to what each district had received previously, adjusted by caps
+  limiting year-over-year gains and guarantees limiting year-over-year losses. [verified]
+
+  Caps and guarantees are worth understanding as a mechanism, because they detach funding from
+  whatever the formula computes. A district whose computed amount rises sharply receives the
+  capped amount instead; a district whose computed amount falls receives the guaranteed
+  amount instead. When enough districts are on a cap or a guarantee, the operative
+  distribution is the prior year's distribution, and the formula becomes advisory. [inference]
+  How many districts sat outside the formula in each year of this period is a decisive number
+  this node does not yet carry. [open]
+
+  The period closed with the funding levels for FY2020 and FY2021 frozen rather than
+  computed. [verified] Ohio therefore entered the Fair School Funding Plan having distributed
+  aid on the basis of history rather than need for the better part of ten years, which is why
+  the plan's designers treated recosting from current data as the point of the exercise.
+  [inference]
+properties:
+  name: Bridge Formula
+  effective_from: FY2012
+  effective_to: FY2021
+  distribution_logic: |
+    Aid was set by reference to prior-year amounts, modified by successive budgets through
+    caps on year-over-year increases and guarantees against year-over-year decreases, with
+    varying formula overlays across the period. FY2020 and FY2021 were funded at frozen
+    levels.
+  status: superseded
+  boundary_note: |
+    Treated as one regime for a decade that in fact contained several distinct formula
+    overlays, including the FY2014-15 and FY2016-17 designs. Whether these warrant separate
+    regime nodes, or whether the caps-and-guarantees mechanism is the real continuity, is
+    unresolved. [open]
+links:
+  - target: ../funding-regime.ont.yml
+    relationship: instance-of
+  - target: evidence-based-model.yml
+    relationship: supersedes
+  - target: ../doctrine/adequacy.yml
+    relationship: assessed-against
+  - target: ../doctrine/equity.yml
+    relationship: assessed-against

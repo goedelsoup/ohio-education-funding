@@ -1,0 +1,45 @@
+class: revenue-stream
+label: Revenue Stream
+foundational_type:
+  ontology: ufo
+  type: relator
+description: |
+  A channel through which money reaches an education agency, binding a source of funds to a
+  recipient under a specific legal authority — local property tax levied on a district's own
+  tax base, state foundation aid, tangible personal property tax replacement payments, casino
+  revenue distribution, federal Title I. It is a Relator because the channel itself carries
+  properties worth querying independently of either endpoint: its legal basis, its
+  restrictions on use, its growth behavior, and whether it is guaranteed or appropriated
+  anew each biennium.
+properties:
+  - name: name
+    type: string
+    description: Common name of the stream
+  - name: level
+    type: string
+    description: local | state | federal
+  - name: legal_basis
+    type: string
+    description: Constitutional provision, Revised Code chapter, or federal statute authorizing the stream
+  - name: restriction
+    type: text
+    description: Whether funds are unrestricted general revenue or restricted to a stated purpose
+  - name: growth_behavior
+    type: text
+    description: How the stream's yield changes over time, and what constrains it
+  - name: series_path
+    type: string
+    description: Path under crates/ to the committed per-agency-year series for this stream
+edges:
+  - relationship: funds
+    target: education-agency
+    direction: out
+    description: The agency this channel delivers money to
+  - relationship: allocated-by
+    target: formula-component
+    direction: in
+    description: The component that determines each agency's share of this stream
+  - relationship: constrained-by
+    target: legislation
+    direction: in
+    description: An enactment that limits, freezes, or redirects this stream

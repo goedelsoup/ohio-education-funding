@@ -1,0 +1,38 @@
+class: doctrine
+label: Doctrine
+foundational_type:
+  ontology: ufo
+  type: kind
+description: |
+  A normative principle or analytical frame against which the funding system is judged —
+  the constitutional standard of a thorough and efficient system, the distinction between
+  adequacy and equity, local control, the residual-budgeting critique, phantom revenue.
+  It is a Kind because a doctrine's identity is fixed by its content: adequacy does not
+  become equity under any circumstance. Doctrines exist as nodes so the corpus can answer
+  whether a regime was fair, not only what it paid.
+properties:
+  - name: name
+    type: string
+    description: The principle's common name
+  - name: origin
+    type: string
+    description: Where the principle enters the domain — constitutional text, a decision, or scholarship
+  - name: formulation
+    type: text
+    description: The principle stated precisely enough to be applied to a specific regime
+  - name: contested
+    type: text
+    description: What is disputed about the principle, and by whom
+edges:
+  - relationship: invoked-by
+    target: litigation
+    direction: in
+    description: A case that reasoned from this principle
+  - relationship: applied-to
+    target: funding-regime
+    direction: in
+    description: A regime that has been judged against this principle
+  - relationship: operationalized-by
+    target: metric
+    direction: in
+    description: A computable measure that renders this principle testable

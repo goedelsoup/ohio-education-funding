@@ -1,0 +1,126 @@
+id: proposals
+summary: >-
+  All 12 implied edges, all 9 connectors, and all 9 calculators approved without
+  modification; nothing discarded.
+context: |
+  After writing the 13 class definitions from decision `ontology`, the full schema layer was
+  read back and examined for what it implied but did not yet declare. Three tables were
+  presented to the user.
+
+  IMPLIED EDGES PRESENTED (12):
+
+    doctrine          -[tensions-with]->    doctrine
+    doctrine          -[grounded-in]->      legislation
+    litigation        -[challenges]->       program
+    program           -[funds]->            education-agency
+    revenue-stream    -[substitutes-for]->  revenue-stream
+    fiscal-period     -[part-of]->          fiscal-period
+    litigation        -[cites]->            litigation
+    actor             -[succeeds]->         actor
+    education-agency  -[merged-into]->      education-agency
+    formula-component -[replaces]->         formula-component
+    metric            -[derived-from]->     metric
+    scenario          -[compares-to]->      scenario
+
+  The first six were characterized as structural fixes rather than enrichments, because each
+  closes a hole that makes something in the confirmed scope inexpressible:
+
+    - `doctrine` as written had zero outgoing edges. Its instances would have been
+      near-orphans, and the class could not reach the constitutional text it originates in.
+    - `litigation` could challenge only a funding-regime. The 2025 Franklin County EdChoice
+      decision challenges a program, and vouchers are in confirmed scope.
+    - `program` had only `diverts-from`. Capital facilities assistance is a positive flow to
+      a district, and the capital channel is in confirmed scope, so the entire channel was
+      unrepresentable.
+    - Ohio repeatedly substitutes one revenue stream for another (tangible personal property
+      tax replacement payments, casino revenue offsets). Without an edge the substitution
+      reads as an unexplained gap in one series and an unexplained appearance in another.
+    - A biennium contains two fiscal years. `fiscal-period.ont.yml` states this in its own
+      description while declaring only `follows`.
+
+  The remaining six were characterized as enrichments: cheap to declare now, expensive to
+  retrofit once instances exist.
+
+  CONNECTORS PRESENTED (9): dew-foundation, tax-abstract, lsc-budget, ohio-laws,
+  ohio-courts, ofcc-projects, census-f33, nces-ccd, bls-cpi.
+
+  CALCULATORS PRESENTED (9): foundation, millage, local-capacity, deduction, dispersion,
+  deflate, regime-diff, project, scenario-delta.
+decision: |
+  Everything presented was approved as presented. No item was modified or discarded.
+
+  IMPLIED EDGES — all 12 approved. Wired in step 7 both as declared edge types in the
+  relevant `.ont.yml` files and as `links:` entries on the specific instances they connect.
+  Declaring them in the schema as well as the instances keeps the class definitions an
+  accurate account of what edges exist; an instance link with no corresponding schema edge
+  would be an undeclared relationship.
+
+  CONNECTORS — all 9 approved:
+
+    dew-foundation   Dept. of Education and Workforce School Finance Payment Reports and
+                     Foundation Funding files. Feeds education-agency, revenue-stream,
+                     metric. The authoritative per-agency state aid series.
+    tax-abstract     Dept. of Taxation property tax abstracts. Feeds revenue-stream,
+                     parameter, metric. Assessed valuation, effective millage, HB 920
+                     reduction factors, 20-mill floor status.
+    lsc-budget       Legislative Service Commission redbooks and Catalog of Budget Line
+                     Items. Feeds legislation, fiscal-period, program. The only continuous
+                     appropriation-line series and the main pre-2000 source.
+    ohio-laws        General Assembly / LSC bill archive. Feeds legislation.
+    ohio-courts      Supreme Court of Ohio opinion archive. Feeds litigation.
+    ofcc-projects    Ohio Facilities Construction Commission. Feeds program,
+                     education-agency. Facilities assistance projects and local shares.
+    census-f33       Census Annual Survey of School System Finances. Feeds metric,
+                     education-agency. Cross-state comparability, roughly two-year lag.
+    nces-ccd         NCES Common Core of Data. Feeds education-agency. Enrollment,
+                     identifier crosswalks, agency boundary changes.
+    bls-cpi          BLS CPI-U and ECI. Feeds metric. Deflator series.
+
+  CALCULATORS — all 9 approved:
+
+    foundation       Per-agency state aid under a named regime, broken out by component.
+    millage          Effective millage under HB 920 reduction factors; 20-mill floor status.
+    local-capacity   State share index and local wealth position.
+    deduction        Community school and scholarship deductions against a resident district.
+    dispersion       Equity statistics across agencies: coefficient of variation, McLoone
+                     and Verstegen indices, federal range ratio.
+    deflate          Nominal to constant-dollar normalization.
+    regime-diff      Component-level difference between two regimes for one agency-year.
+    project          Forward series for ADM, assessed valuation, and revenue.
+    scenario-delta   Baseline versus perturbed run, as a per-agency table.
+
+  Approval defines the target, not the delivery. Per the bootstrap protocol, connectors are
+  invoked during seeding only where the demand threshold is met, and stubbed otherwise;
+  calculators are run during step 7 only where the seeded corpus makes the result meaningful,
+  and stubbed otherwise.
+rationale: |
+  The user approved all three tables in full, declining the narrower options offered for each
+  (six structural edges only; five state-primary connectors; four core calculators). This is
+  consistent with the scoping choices recorded in decision `ontology`, where the maximum
+  option was taken on every axis — 1851 to present, all four funding channels, district by
+  fiscal-year grain, and simulation together with projection.
+
+  On the edges, the six structural fixes were not really optional. A class with no outgoing
+  edges cannot satisfy the corpus rule that every node carry at least one outgoing link, so
+  `doctrine` had to gain one; and two confirmed scope channels — vouchers and capital — had
+  no expressible connection to the classes they act on. Approving the six enrichment edges
+  alongside them costs nothing at schema time and avoids a later revision that would have to
+  touch every affected instance.
+
+  On the connectors, the nine divide into three groups that serve different purposes and are
+  hard to trade off against each other. Five are Ohio primary sources and carry the numbers
+  and the law. Two are federal (census-f33, nces-ccd) and exist for comparability and for
+  identifier stability across agency mergers, which a 170-year panel needs. Two are
+  infrastructure: ofcc-projects for the capital channel, bls-cpi for deflation. Dropping
+  bls-cpi in particular would have quietly undermined the stated goal, since a corpus
+  spanning 1851 to the present cannot compare any two nominal figures honestly without it.
+
+  On the calculators, `project` was the only genuinely contestable item, since projection is
+  a weaker epistemic act than simulation. It was retained because the user had already
+  chosen "both simulation and projection" for what prediction should compute, and dropping it
+  would have narrowed that decision after the fact rather than implementing it.
+
+  Nothing was discarded, so there are no rejected items to record. The risk this creates is
+  scope: nine connectors and nine calculators is a large domain computer, and most will exist
+  as stubs for some time. That is acknowledged rather than mitigated — the stubs record
+  intent, and the phase that needs one builds it.

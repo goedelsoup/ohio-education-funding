@@ -1,0 +1,45 @@
+class: doctrine
+label: Thorough and Efficient
+description: |
+  The constitutional standard: the General Assembly must secure a thorough and efficient system
+  of common schools throughout the state. [verified] Every case in this corpus is an argument
+  about what those words require.
+
+  The phrase does two things at once, which is why it has supported opposite holdings on
+  similar facts. "Thorough and efficient" reads as a quality floor — a standard each school
+  must meet — while "throughout the state" reads as a uniformity requirement about the system
+  as a whole. [inference] A litigant emphasizing the first argues that some districts fall
+  below a minimum. A litigant emphasizing the second argues that the disparity between
+  districts is itself the violation. In
+  [*Walter*](../litigation/cincinnati-v-walter-1979.yml) the court found disparity alone
+  insufficient; in [*DeRolph I*](../litigation/derolph-i-1997.yml) it found the system as a
+  whole deficient. [verified]
+
+  The standard attaches to the *system*, not to any district's outcome, and it attaches to the
+  General Assembly, not to the department or to districts. [verified] Both features shape what
+  a remedy can look like: the court could declare the system invalid but had no mechanism to
+  compel a particular appropriation, and in 2003 it stopped trying. [verified]
+properties:
+  name: Thorough and efficient
+  origin: Ohio Constitution, Article VI, Section 2 (1851)
+  formulation: |
+    A system of common schools satisfies the standard when (a) every district can provide an
+    education meeting the state's own declared requirements, funded by means the district can
+    actually access, and (b) the resulting provision does not vary across the state in a way
+    attributable to the funding system rather than to local choice. Failure of either limb is
+    a violation. This is a reconstruction from the DeRolph line, not a quotation from it.
+    [inference]
+  contested: |
+    Whether the standard is a floor or a uniformity requirement; whether it is judicially
+    enforceable once declared; and whether a system found unconstitutional in 1997 and 2002 and
+    never adjudicated compliant is currently in violation. That last question has no
+    authoritative answer. [open]
+links:
+  - target: ../doctrine.ont.yml
+    relationship: instance-of
+  - target: ../legislation/ohio-constitution-article-vi-section-2.yml
+    relationship: grounded-in
+  - target: adequacy.yml
+    relationship: comprises
+  - target: equity.yml
+    relationship: comprises

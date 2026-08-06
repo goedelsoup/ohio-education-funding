@@ -1,0 +1,42 @@
+class: revenue-stream
+label: Tangible Personal Property Tax Replacement Payments
+description: |
+  State payments created by [H.B. 66](../legislation/hb-66-2005.yml) to hold districts harmless
+  for the phase-out of the tangible personal property tax on general business, and later
+  extended to the phase-down of utility tangible personal property assessment. [verified]
+  Funded from the commercial activity tax the same act created. [verified]
+
+  This node exists to make one thing traversable: a district's tax base was reduced by a state
+  decision and replaced with a state payment. The immediate effect was neutral by construction.
+  The structural effect was not. What had been a locally-levied tax — subject to the district's
+  own voted millage, growing or shrinking with local industrial activity, and beyond the reach
+  of the state budget — became an appropriation whose continuation depends on each biennium.
+  [inference] The replacement payments were designed to phase down, and the schedule has been
+  revised more than once. [verified]
+
+  The exposure is concentrated. Districts with large industrial or utility tangible personal
+  property bases lost far more of their tax base than districts without, and are correspondingly
+  more exposed to each revision of the phase-down. [inference] Identifying which districts those
+  are, and what the payments are worth to them now, is the concrete work this node points at.
+  [open]
+properties:
+  name: Tangible personal property tax replacement payments
+  level: state
+  legal_basis: |
+    Created by Am. Sub. H.B. 66 (2005); provisions codified in R.C. 5751 (commercial activity
+    tax) and the school funding chapter, with phase-down schedules revised in subsequent
+    budget acts. Exact citations not established. [open]
+  restriction: Unrestricted; paid into the district general fund as the lost tax revenue was.
+  growth_behavior: |
+    Declining by design. Scheduled to phase down after an initial hold-harmless period, with
+    the schedule repeatedly revised by later budget acts. Does not grow with the underlying
+    business activity it replaced, so a district that adds industrial capacity gains no
+    replacement revenue from it.
+  series_path: Not yet populated. [open] Target: crates/ data files fed by `dew-foundation` and `lsc-budget`.
+links:
+  - target: ../revenue-stream.ont.yml
+    relationship: instance-of
+  - target: local-property-tax.yml
+    relationship: substitutes-for
+  - target: ../doctrine/equity.yml
+    relationship: bears-on

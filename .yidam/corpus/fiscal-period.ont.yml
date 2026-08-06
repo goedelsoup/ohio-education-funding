@@ -1,0 +1,52 @@
+class: fiscal-period
+label: Fiscal Period
+foundational_type:
+  ontology: ufo
+  type: event
+description: |
+  A bounded span of state fiscal time that funding decisions attach to — an Ohio fiscal year
+  running July 1 to June 30, or the biennium a budget act appropriates for. It is an Event:
+  it unfolds over an interval and has temporal parts, and a biennium has fiscal years as
+  parts in exactly that sense. Fiscal period is a node rather than a property because it is
+  the join that makes cross-class questions answerable: without it, asking what happened in
+  the FY2026-27 biennium means scanning date strings across every other class.
+properties:
+  - name: label
+    type: string
+    description: FY2022 for a fiscal year, FY2022-23 for a biennium
+  - name: kind
+    type: string
+    description: fiscal-year | biennium
+  - name: start
+    type: date
+    description: First day of the period
+  - name: end
+    type: date
+    description: Last day of the period
+  - name: appropriating_bill
+    type: string
+    description: Designation of the budget act funding this period
+  - name: context
+    type: text
+    description: What was distinctive about this period for education funding
+edges:
+  - relationship: follows
+    target: fiscal-period
+    direction: out
+    description: The period immediately preceding this one
+  - relationship: funded-by
+    target: legislation
+    direction: in
+    description: The enactment appropriating for this period
+  - relationship: governed-by
+    target: funding-regime
+    direction: in
+    description: The regime in force during this period
+  - relationship: holds-value-of
+    target: parameter
+    direction: in
+    description: A parameter with a specific value in this period
+  - relationship: measured-in
+    target: metric
+    direction: in
+    description: A measure computed for this period

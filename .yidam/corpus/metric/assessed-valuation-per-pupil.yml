@@ -1,0 +1,54 @@
+class: metric
+label: Assessed Valuation Per Pupil
+description: |
+  The district's total assessed property valuation divided by its student count — the standard
+  measure of local taxing capacity in school finance, and the variable against which every
+  wealth-neutrality claim in this domain is tested. [verified]
+
+  It is the metric that makes [equity](../doctrine/equity.yml) empirical. The equity claim is
+  that per-pupil resources should not be explained by local property wealth; this is the
+  measure of local property wealth, and the association between it and a resource metric is
+  the claim's entire content. [inference]
+
+  Its limitations are the reason the Fair School Funding Plan does not rely on it alone.
+  Assessed valuation in Ohio is 35 percent of market value for real property, so the figure is
+  not market value and should not be described as such. [verified] More importantly, valuation
+  measures property, not the capacity of residents to pay tax on it — a district whose housing
+  has appreciated faster than its residents' incomes appears wealthy by this measure and is not.
+  [inference] That divergence is why the
+  [FSFP local capacity measure](../formula-component/fsfp-local-capacity-measure.yml) adds
+  income, and it is why this metric should be reported alongside a median income figure rather
+  than alone.
+
+  The denominator is also contested: enrollment, average daily membership, and formula ADM
+  differ, and for districts with substantial community school or scholarship participation they
+  differ materially. [verified] Which denominator is used changes the answer.
+properties:
+  name: Assessed valuation per pupil
+  unit: dollars-per-pupil
+  definition: |
+    assessed_valuation_per_pupil = district_total_assessed_valuation / student_count
+    where assessed valuation is the taxable value on the county auditor's abstract for the tax
+    year corresponding to the fiscal period, and student_count must be stated explicitly as
+    enrollment, average daily membership, or formula ADM.
+  inputs: |
+    District total assessed valuation, by tax year — from `tax-abstract`.
+    Student count, by fiscal year — from `dew-foundation`, with `nces-ccd` for crosswalks.
+  caveats: |
+    Assessed value is 35 percent of market value for real property in Ohio and is not market
+    value. Tax year and fiscal year are offset and must be aligned deliberately. The measure
+    ignores resident income entirely. Tangible personal property was part of the base before
+    the H.B. 66 phase-out, so the series has a definitional break in the late 2000s that will
+    look like a valuation collapse in industrial districts if not handled. [verified]
+  calculator: Not yet implemented. [open] Target: a helper within `local-capacity`.
+links:
+  - target: ../metric.ont.yml
+    relationship: instance-of
+  - target: ../doctrine/equity.yml
+    relationship: operationalizes
+  - target: ../education-agency/northern-local-perry.yml
+    relationship: measures
+  - target: ../education-agency/upper-arlington-city.yml
+    relationship: measures
+  - target: ../fiscal-period/fy2026.yml
+    relationship: computed-for

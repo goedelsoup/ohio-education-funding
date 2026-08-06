@@ -1,0 +1,47 @@
+class: litigation
+label: DeRolph v. State (DeRolph IV, 2002)
+description: |
+  The last of the four *DeRolph* decisions, and the one that matters most for understanding
+  where Ohio is now. The Supreme Court of Ohio reaffirmed that the school funding system was
+  unconstitutional and directed the General Assembly to enact a system that comported with
+  Article VI, Section 2. [verified]
+
+  What happened next is the essential part. In 2003 the court granted a writ of prohibition
+  barring the trial court from conducting further proceedings in the case, ending the remand.
+  [verified] The declaration of unconstitutionality was never withdrawn, and the system was
+  never adjudicated compliant. The case simply stopped.
+
+  This produces the condition every subsequent regime in this corpus operates under: a standing
+  constitutional judgment against the funding system with no court supervising a remedy.
+  [inference] It is why the [Evidence-Based Model](../funding-regime/evidence-based-model.yml)
+  could be repealed after two years without judicial consequence, why the
+  [Bridge formula](../funding-regime/bridge-formula.yml) could distribute aid by reference to
+  prior-year amounts for a decade, and why the
+  [Fair School Funding Plan](../funding-regime/fair-school-funding-plan.yml)'s phase-in depends
+  entirely on legislative willingness. [inference] Whether the current system would satisfy
+  *DeRolph* has not been tested and cannot be, on the existing record. [open]
+properties:
+  case_name: DeRolph v. State
+  citation: 97 Ohio St.3d 434, 2002-Ohio-6750
+  court: Supreme Court of Ohio
+  filed: 1991-12-19
+  decided: 2002-12-11
+  holding: |
+    Reaffirmed that Ohio's school funding system is unconstitutional under Article VI,
+    Section 2, and directed the General Assembly to enact a compliant system.
+  remedy: |
+    Directed to the General Assembly. In 2003, in a separate prohibition action, the court
+    barred further trial-court proceedings, terminating the remand without a compliance
+    finding. The prohibition action is not modeled as a separate node yet and should be.
+    [open]
+links:
+  - target: ../litigation.ont.yml
+    relationship: instance-of
+  - target: derolph-i-1997.yml
+    relationship: cites
+  - target: ../funding-regime/foundation-base-cost-formula.yml
+    relationship: challenges
+  - target: ../doctrine/thorough-and-efficient.yml
+    relationship: invokes
+  - target: ../legislation/hb-1-2009.yml
+    relationship: prompts

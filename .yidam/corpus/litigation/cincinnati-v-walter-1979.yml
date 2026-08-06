@@ -1,0 +1,42 @@
+class: litigation
+label: Cincinnati City School District Board of Education v. Walter (1979)
+description: |
+  The Supreme Court of Ohio's first modern encounter with the school funding question, decided
+  4-3 in the state's favor. [verified] Districts argued that the disparities produced by
+  reliance on local property wealth violated Article VI, Section 2 and the equal protection
+  guarantees of the Ohio Constitution. The court held they did not: the constitutional duty was
+  to provide a statewide system of common schools, and disparity in district resources did not
+  by itself establish that the system failed the standard. [verified]
+
+  The decision is the baseline against which *DeRolph* has to be read. The same constitutional
+  text produced opposite results eighteen years apart, on facts that had changed in degree
+  rather than in kind — the disparities were larger by 1997, and
+  [H.B. 920](../legislation/hb-920-1976.yml)'s reduction factors had by then been operating for
+  two decades. [inference] Whether *DeRolph I* overruled *Walter* or distinguished it on the
+  evidentiary record is a question the opinions handle less cleanly than one might expect.
+  [open]
+
+  The dissent in *Walter* is worth reading against the majority in *DeRolph I*. [open — the
+  corpus has not yet established the specific continuity, which would be a useful synthesis
+  node.]
+properties:
+  case_name: Cincinnati City School Dist. Bd. of Edn. v. Walter
+  citation: 58 Ohio St.2d 368 (1979)
+  court: Supreme Court of Ohio
+  filed: 1976-01-01
+  decided: 1979-05-30
+  holding: |
+    Article VI, Section 2 requires the General Assembly to provide a statewide system of common
+    schools; disparities in per-pupil resources arising from differences in local property
+    wealth do not by themselves render that system unconstitutional. Decided 4-3. Exact filing
+    date and procedural history to be confirmed against the reported opinion. [open]
+  remedy: None. The system was upheld and no relief was ordered.
+links:
+  - target: ../litigation.ont.yml
+    relationship: instance-of
+  - target: ../funding-regime/equal-yield-formula.yml
+    relationship: challenges
+  - target: ../doctrine/equity.yml
+    relationship: invokes
+  - target: ../doctrine/thorough-and-efficient.yml
+    relationship: invokes

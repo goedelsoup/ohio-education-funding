@@ -1,0 +1,57 @@
+class: funding-regime
+label: Funding Regime
+foundational_type:
+  ontology: ufo
+  type: phase
+description: |
+  A named statewide method for distributing state aid to education agencies, holding for a
+  bounded span of fiscal periods before being replaced. It is a Phase rather than a Kind
+  because it is a stage the funding system passes through: the system remains the same
+  system across the transition from the Evidence-Based Model to the Bridge formula to the
+  Fair School Funding Plan, but it is in a materially different condition in each, and the
+  condition change is intrinsic rather than relational.
+properties:
+  - name: name
+    type: string
+    description: The regime's common name, as used in legislative and department documents
+  - name: effective_from
+    type: string
+    description: First fiscal period in which the regime governed distribution
+  - name: effective_to
+    type: string
+    description: Last fiscal period, or "current" if still in effect
+  - name: distribution_logic
+    type: text
+    description: How the regime decides what each agency receives, in two or three sentences
+  - name: status
+    type: string
+    description: current | superseded | partially-implemented | never-fully-funded
+edges:
+  - relationship: composed-of
+    target: formula-component
+    direction: out
+    description: A structural mechanism the regime is built from
+  - relationship: supersedes
+    target: funding-regime
+    direction: out
+    description: The regime this one replaced
+  - relationship: assessed-against
+    target: doctrine
+    direction: out
+    description: A normative principle by which this regime has been judged
+  - relationship: active-during
+    target: fiscal-period
+    direction: out
+    description: A fiscal period in which this regime governed distribution
+  - relationship: established-by
+    target: legislation
+    direction: in
+    description: The enactment that created the regime
+  - relationship: challenged-by
+    target: litigation
+    direction: in
+    description: A case testing this regime against constitutional text
+  - relationship: baseline-for
+    target: scenario
+    direction: in
+    description: A counterfactual computed against this regime as its baseline

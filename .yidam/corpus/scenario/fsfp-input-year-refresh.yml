@@ -1,0 +1,67 @@
+class: scenario
+label: FSFP Cost Input Refresh vs. Freeze
+description: |
+  **Specified, not run.** [open]
+
+  The question is the one the FY2026-27 budget turned on: what is the difference, per district,
+  between running the Fair School Funding Plan on refreshed cost inputs and running it on
+  carried-forward inputs, at the same phase-in percentage?
+
+  This scenario is seeded first because it isolates the distinction this corpus was built to
+  make. The [phase-in percentage](../parameter/fsfp-phase-in-percentage.yml) and the cost input
+  reference year are separate dials, and a budget can advance one while freezing the other. The
+  public argument treats "full phase-in" and "full funding" as the same statement; they are not,
+  and the gap between them is exactly what this run measures. [inference]
+
+  The expected shape of the answer, stated in advance so the run can contradict it: because
+  [base cost](../formula-component/fsfp-base-cost-calculation.yml) is built from staffing
+  priced at regional salary levels, freezing the input year should bite hardest where salaries
+  have risen fastest since the reference year, and the effect should be larger in districts with
+  higher state share — because state aid is the residual, a given reduction in computed cost
+  falls disproportionately on the state's portion. [inference] That would mean a freeze is
+  regressive across the wealth distribution even though it is uniform in method. If the run does
+  not show that, the reasoning above is wrong and the node should say so.
+
+  **Prerequisites, none of which are met:** the `foundation` calculator does not exist; the
+  base cost series is unpopulated; the phase-in percentages are unconfirmed; and the reference
+  year carried forward by H.B. 96 has not been established from the act. [open]
+properties:
+  name: FSFP cost input refresh vs. freeze
+  question: |
+    Holding the phase-in percentage at its enacted FY2026 and FY2027 values, what is the
+    per-district difference in state foundation aid between base cost computed on refreshed
+    staffing and salary inputs and base cost computed on the inputs carried forward by
+    Am. Sub. H.B. 96?
+  perturbations: |
+    Single perturbation: the cost input reference year used by the FSFP base cost calculation.
+    Baseline = the year carried forward by H.B. 96 (not yet established). [open]
+    Perturbed = the most recent year for which staffing and salary data are available.
+    All other parameters held at enacted values, including phase-in percentage.
+  input_projections: |
+    None required for FY2026. Enrollment and valuation are observed or estimable from current
+    data. FY2027 requires projected enrollment via `project`; that leg should be reported
+    separately from the FY2026 leg so the projection uncertainty is not mixed into the
+    policy effect.
+  horizon: FY2026-FY2027
+  results_path: Not yet produced. [open]
+  confidence: |
+    Not yet run, so no confidence can be stated. When run, the result will be most sensitive to
+    the salary index used for regional adjustment and to the treatment of districts held on a
+    guarantee, for whom the perturbation is inert. The share of agencies off-formula must be
+    reported alongside any statewide total, or the total will overstate the number of districts
+    actually affected. [inference]
+links:
+  - target: ../scenario.ont.yml
+    relationship: instance-of
+  - target: ../parameter/base-cost-per-pupil.yml
+    relationship: perturbs
+  - target: ../parameter/fsfp-phase-in-percentage.yml
+    relationship: holds-fixed
+  - target: ../funding-regime/fair-school-funding-plan.yml
+    relationship: baselines-on
+  - target: ../fiscal-period/fy2026.yml
+    relationship: horizon-over
+  - target: ../metric/state-share-percentage.yml
+    relationship: projects
+  - target: ../legislation/hb-96-2025.yml
+    relationship: interrogates

@@ -1,0 +1,44 @@
+class: program
+label: EdChoice Expansion Scholarship
+description: |
+  The income-based statewide voucher program, made universally available by H.B. 33 in 2023 —
+  every Ohio student became eligible for a scholarship, with the award amount scaled by family
+  income rather than eligibility gated by it. [verified] This is the largest change to the
+  scholarship channel in Ohio's history and the reason the channel is now large enough to
+  affect statewide funding arithmetic. [inference]
+
+  The mechanism question is the one that determines whether districts lose money. Under the
+  original EdChoice design, a scholarship was funded by deducting from the resident district's
+  foundation payment — the district lost the student and the money, and if the student had
+  never attended the district, the district lost money for a student it had never educated.
+  That last case is the core of the districts' complaint. [verified] Whether and to what extent
+  the Fair School Funding Plan's direct-funding approach changed this for the expansion program
+  is not yet established here and is the highest-priority factual gap in this node. [open]
+
+  The program was held unconstitutional by a Franklin County trial court in
+  [June 2025](../litigation/vouchers-hurt-ohio-2025.yml), on Ohio constitutional grounds
+  distinct from the federal question *Zelman* settled. That ruling is under appeal. [verified]
+
+  Award amounts by income band, participation counts by resident district, and total
+  appropriation by fiscal period are all required before this node supports any quantitative
+  claim. [open]
+properties:
+  name: EdChoice Expansion Scholarship
+  mechanism: |
+    Deduction from resident district under the original design; direct appropriation in whole
+    or part under the Fair School Funding Plan. The current mechanism must be confirmed. [open]
+  eligibility: |
+    Originally income-limited. Am. Sub. H.B. 33 (2023) made all Ohio students eligible, with
+    award amount scaled by family income relative to the federal poverty level rather than
+    eligibility restricted by it. [verified] Exact bands not yet established. [open]
+  amount: Not yet populated. [open] Varies by grade band and family income.
+  appropriation_line: Not yet established. [open]
+links:
+  - target: ../program.ont.yml
+    relationship: instance-of
+  - target: ../education-agency/cleveland-municipal.yml
+    relationship: diverts-from
+  - target: ../education-agency/northern-local-perry.yml
+    relationship: diverts-from
+  - target: ../doctrine/thorough-and-efficient.yml
+    relationship: contested-under

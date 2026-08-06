@@ -1,0 +1,46 @@
+class: parameter
+label: Twenty-Mill Floor
+description: |
+  The limit below which [H.B. 920](../legislation/hb-920-1976.yml)'s tax reduction factors may
+  not push a school district's effective operating millage. Set at 20 mills for school
+  districts and 2 mills for joint vocational school districts, at R.C. 319.301. [verified]
+
+  It is a small number that does something large. For a district above the floor, reduction
+  factors neutralize valuation growth and revenue from existing levies stays roughly flat in
+  nominal terms. For a district at the floor, reduction factors stop operating and revenue
+  rises directly with assessed valuation. [verified] The two kinds of district are on
+  fundamentally different revenue trajectories, and which one a district is on is determined by
+  its levy history rather than by any current decision.
+
+  This makes the floor the highest-leverage single parameter in the system for questions about
+  local revenue, and a frequent target of reform proposals in both directions. Raising it
+  would move more districts onto valuation-linked growth; lowering it would do the opposite.
+  [inference] Any credible simulation of a property tax change has to determine floor status
+  per district first, because the same change produces opposite effects on the two groups.
+
+  How many districts sit at the floor, and how that count has moved with reappraisal cycles,
+  is a first-order number this node needs. [open]
+properties:
+  name: Twenty-mill floor
+  unit: mills
+  series: |
+    20 mills for city, local, and exempted village school districts; 2 mills for joint
+    vocational school districts. In force continuously since Am. Sub. H.B. 920 (1976).
+    [verified] Amendments to the surrounding provisions since 1976 have not moved the floor
+    itself, but this should be confirmed against current R.C. 319.301. [open]
+  statutory_basis: R.C. 319.301
+  simulation_key: twenty_mill_floor
+  sensitivity: |
+    Determines whether a district's local revenue tracks valuation growth or is held flat by
+    reduction factors — a binary regime switch, not a continuous effect. Districts at the
+    floor also experience reappraisal as a revenue event, which changes the political economy
+    of levy campaigns in those districts. [inference] Interacts with
+    [charge-off local share](../formula-component/charge-off-local-share.yml): a district
+    charged off at an assumed millage it cannot levy is the phantom revenue case.
+links:
+  - target: ../parameter.ont.yml
+    relationship: instance-of
+  - target: ../revenue-stream/local-property-tax.yml
+    relationship: constrains
+  - target: ../fiscal-period/fy2026.yml
+    relationship: valued-in

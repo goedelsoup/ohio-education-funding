@@ -1,0 +1,39 @@
+class: legislation
+label: Am. Sub. H.B. 66 (2005) — FY2006-07 Budget; Tangible Personal Property Tax Phase-Out
+description: |
+  The FY2006-07 operating budget, which phased out the tangible personal property tax on
+  general business — machinery, equipment, inventory, furniture and fixtures — over four
+  years beginning in tax year 2006, and separately phased down the assessment rate on
+  electric and natural gas utility property. [verified] The tangible personal property tax
+  had been a local property tax, levied on the same voted millage as real property, so its
+  elimination removed part of the tax base out from under every district that had industrial
+  or commercial property in it.
+
+  The act created replacement payments to hold districts harmless, funded from the new
+  commercial activity tax. [verified] Those payments were not permanent: the reimbursement
+  was scheduled to phase down, and subsequent budgets repeatedly revised the phase-down
+  schedule. [verified] The result is a structural substitution — a locally-levied,
+  locally-controlled revenue source replaced by a state appropriation subject to
+  renegotiation every biennium — concentrated in exactly the districts with the most
+  industrial property. [inference]
+
+  The per-district magnitude of the substitution and the current status of the phase-down are
+  the numbers this node most needs and does not yet carry. [open]
+properties:
+  designation: Am. Sub. H.B. 66
+  general_assembly: 126th General Assembly
+  signed: 2005-06-30
+  effective: 2005-06-30
+  subject: |
+    Enacted the FY2006-07 operating budget. Phased out the tangible personal property tax on
+    general business property beginning in tax year 2006, phased down utility tangible
+    personal property assessment rates, created the commercial activity tax, and established
+    replacement payments to school districts for the lost local tax base.
+  vetoes: Line-item vetoes recorded; education funding effect not yet assessed. [open]
+links:
+  - target: ../legislation.ont.yml
+    relationship: instance-of
+  - target: ../revenue-stream/local-property-tax.yml
+    relationship: constrains
+  - target: ../revenue-stream/tpp-replacement-payments.yml
+    relationship: creates-stream

@@ -1,0 +1,202 @@
+id: ontology
+summary: >-
+  Ohio K-12 education funding; 13 classes aligned to UFO; district x fiscal-year grain,
+  1851 to present, all four funding channels, simulation and projection both in scope.
+corpus_depth: 45
+context: |
+  The ontology-discovery dialogue opened on a domain given by the user as "Ohio education
+  funding", with the goal of tooling and a web platform that explain the history, describe
+  the current state of affairs, and predict the impact of proposed policy decisions —
+  grounded directly in concrete numbers.
+
+  Four scoping questions were put first, because each one changes the class list:
+
+  1. GRAIN — chosen: district x fiscal year. Every funding figure anchors to a specific
+     education agency and a specific fiscal year; statewide totals are derived by
+     aggregation, never authored directly. Rejected alternatives were a statewide spine
+     with exemplar districts, and statewide aggregates only. The distributional story is
+     the substance of Ohio's funding history, so the grain had to preserve it.
+
+  2. TIME SPAN — chosen: 1851 to present. Reaches back to the Ohio Constitution of 1851
+     and its "thorough and efficient system of common schools" clause (Art. VI, Sec. 2),
+     through the 1914 School Foundation Program, HB 920 (1976), the DeRolph line
+     (1991-2002), the Evidence-Based Model, the Bridge formula, and the Fair School
+     Funding Plan. Accepted cost: the pre-1975 period has little usable per-agency
+     numeric data, so early instances will be legal and structural rather than numeric.
+
+  3. CHANNELS — chosen: all four. Traditional districts and JVSDs; community (charter)
+     and STEM schools; vouchers and scholarships; capital and facilities funding. Nothing
+     was excluded. Higher education is out of scope by omission — the corpus is K-12.
+
+  4. PREDICTION — chosen: both simulation and projection. Simulation re-runs the real
+     formula against perturbed parameters and emits per-agency deltas. Projection carries
+     enrollment, valuation, and revenue series forward. The two compose: a scenario may
+     perturb parameters on top of projected inputs.
+
+  A second round settled three structural questions:
+
+  - DATA SEAT — the corpus holds schema, mechanism, legal history, metric definitions,
+    and curated exemplar agencies. Bulk per-agency-year facts (600+ agencies x ~35 years)
+    live as committed data files under crates/ and are queried by the domain computer.
+    Corpus nodes cite them rather than restating them. This keeps the graph human-readable
+    and keeps commits legible as knowledge events.
+  - PARAMETERS — first-class. Base cost per pupil, the six special-education weights, the
+    20-mill floor, phase-in percentage, and the state share index each become nodes
+    carrying a value-per-fiscal-year series and a governing statute link. Without this,
+    a counterfactual has no node to point at.
+  - DOCTRINE and ACTOR — both modeled as classes. Doctrine carries the normative frames
+    ("thorough and efficient", adequacy vs. equity, phantom revenue, residual budgeting)
+    that legislation and litigation are judged against; Actor carries the institutions
+    that enact, rule, administer, and publish.
+
+  The sketch was presented as 12 classes and 25 edge types. The user amended it by adding
+  `fiscal-period` as a 13th class, promoting the fiscal year and biennium from a property
+  to a traversable node so that budget cycles (HB 110 = FY2022-23, HB 96 = FY2026-27)
+  become anchors rather than repeated string fields.
+
+  The foundational alignment options were explained against three nodes from the confirmed
+  sketch. Under BFO, `education-agency` is a continuant while `litigation` and
+  `fiscal-period` are occurrents, and `parameter` is a quality. Under UFO,
+  `education-agency` is a Kind while "property-poor district", "20-mill-floor district",
+  and "DeRolph plaintiff" are Roles it plays contingently and simultaneously, and
+  `program` is a Relator whose amount, eligibility rules, and litigation history are worth
+  querying directly.
+decision: |
+  Thirteen classes, aligned to UFO. Each .ont.yml carries a `foundational_type` block with
+  `ontology: ufo` and a `type` drawn from the UFO vocabulary.
+
+  Classes:
+
+    education-agency   (ufo: kind)     — an IRN-bearing recipient of education funding:
+                                         city/local/exempted-village district, JVSD,
+                                         community school, or STEM school
+    funding-regime     (ufo: phase)    — a named statewide formula era with a lifespan
+    formula-component  (ufo: kind)     — a structural mechanism inside a regime
+    parameter          (ufo: quality)  — a dialable value with a per-fiscal-year series
+    revenue-stream     (ufo: relator)  — a channel of money reaching an agency
+    program            (ufo: relator)  — a separately-appropriated initiative outside the
+                                         base formula
+    legislation        (ufo: kind)     — an enacted bill or constitutional provision
+    litigation         (ufo: event)    — a decided case testing the system against
+                                         constitutional text
+    actor              (ufo: kind)     — an institution that enacts, rules, administers,
+                                         or publishes
+    doctrine           (ufo: kind)     — a normative principle or analytical frame
+    metric             (ufo: quality)  — a defined, computable measure over agency-year data
+    scenario           (ufo: situation)— a named counterfactual and its projected deltas
+    fiscal-period      (ufo: event)    — a fiscal year or biennium as a traversable anchor
+
+  Edges (confirmed):
+
+    actor             -[enacts]->             legislation
+    actor             -[decides]->            litigation
+    actor             -[administers]->        program
+    legislation       -[establishes]->        funding-regime
+    legislation       -[sets]->               parameter
+    legislation       -[creates]->            program
+    legislation       -[constrains]->         revenue-stream
+    legislation       -[amends]->             legislation
+    legislation       -[appropriates-for]->   fiscal-period
+    funding-regime    -[composed-of]->        formula-component
+    funding-regime    -[supersedes]->         funding-regime
+    funding-regime    -[assessed-against]->   doctrine
+    funding-regime    -[active-during]->      fiscal-period
+    formula-component -[governed-by]->        parameter
+    formula-component -[distributes]->        revenue-stream
+    parameter         -[valued-in]->          fiscal-period
+    revenue-stream    -[funds]->              education-agency
+    program           -[diverts-from]->       education-agency
+    litigation        -[challenges]->         funding-regime
+    litigation        -[invokes]->            doctrine
+    litigation        -[prompts]->            legislation
+    education-agency  -[party-to]->           litigation
+    education-agency  -[peer-of]->            education-agency
+    metric            -[measures]->           education-agency
+    metric            -[operationalizes]->    doctrine
+    metric            -[computed-for]->       fiscal-period
+    scenario          -[perturbs]->           parameter
+    scenario          -[projects]->           metric
+    scenario          -[baselines-on]->       funding-regime
+    scenario          -[horizon]->            fiscal-period
+    fiscal-period     -[follows]->            fiscal-period
+
+  Corpus depth: 45 seed instances, distributed toward hub classes.
+rationale: |
+  WHY THESE CLASSES.
+
+  The domain's irreducible tension is that money reaches a school from two sources that
+  move independently — a state formula the legislature sets, and a local property tax base
+  the legislature constrains but does not set. Every controversy in Ohio's funding history
+  is a consequence of the gap between them. The class list is built to make that gap
+  expressible: `funding-regime` and `parameter` model the state side, `revenue-stream`
+  models both sides as channels, `education-agency` is where they land, and `metric`
+  measures the result.
+
+  `parameter` is separated from `formula-component` because the user's goal is prediction.
+  A counterfactual is an edit to a parameter's value; if parameters are prose fields inside
+  a component node, a counterfactual has nothing to bind to and no history to diff against.
+  Separation makes the simulation surface an explicit, enumerable part of the graph.
+
+  `metric` is separated from `parameter` because they face opposite directions. A parameter
+  is an input the state chooses; a metric is an output computed from data. Fusing them
+  would blur the line between what policy sets and what policy produces — precisely the
+  line the corpus exists to illuminate.
+
+  `program` is separated from `revenue-stream` because a voucher is not a revenue channel
+  to a district — it is a diversion away from one, with its own eligibility rules,
+  appropriation line, and litigation. The `diverts-from` edge cannot be stated if the two
+  are merged. The user was offered that merge and declined it.
+
+  `doctrine` earns a class because the corpus must answer normative questions, not only
+  arithmetic ones. "Was this constitutional" and "was this equitable" are the questions the
+  history actually turns on, and they require the frames to be nodes that legislation and
+  litigation can be evaluated against.
+
+  `fiscal-period` was added by the user over the 12-class sketch. It is the right call:
+  with fiscal year as a mere property, "what happened in the FY2026-27 biennium" requires
+  scanning string fields across every class. As a node it becomes a hub that legislation,
+  parameters, regimes, metrics, and scenarios all attach to.
+
+  CONSIDERED AND DISCARDED.
+
+  - A single `policy-instrument` class fusing legislation and litigation. Discarded: the
+    two have different properties (bill number and effective date vs. citation and holding)
+    and opposite causal directions (`prompts` runs from litigation to legislation).
+  - Merging `program` into `revenue-stream` (offered, declined — see above).
+  - Dropping `scenario` and keeping counterfactuals in tooling only (offered, declined).
+    Keeping it as a class means a projection is a committed knowledge event with provenance,
+    not ephemeral tool output.
+  - An `allocation` class for the (agency, fiscal-period, stream, amount) tuple. Discarded
+    at the data-seat decision: at district x fiscal-year grain this is ~20k+ instances,
+    which would make the corpus unreadable. The tuple lives in committed data files under
+    crates/; `revenue-stream` and `metric` nodes define its schema and cite it.
+
+  WHY UFO.
+
+  This is an institutional domain, which is UFO's stated best fit, and two of its
+  constructs do real work here that BFO's continuant/occurrent split does not.
+
+  Roles: a single school district is simultaneously a taxing authority, a formula
+  recipient, a voucher-losing entity, a DeRolph plaintiff, and a 20-mill-floor district.
+  These are contingent, overlapping, and relationally defined — exactly what UFO Roles are
+  for. Under BFO they would all collapse into one continuant with a pile of boolean fields.
+
+  Relators: the interesting objects in this domain are the relationships. An EdChoice
+  deduction is not a bare edge from state to district — it carries an amount, an
+  eligibility rule, a statutory basis, and its own litigation history. Modeling `program`
+  and `revenue-stream` as Relators makes them queryable in their own right rather than
+  reducible to endpoints.
+
+  BFO was a real contender because the corpus is partly an empirical record over time, and
+  its object/event line is clean for `litigation` and `fiscal-period`. It was set aside
+  because the analytical weight in this domain sits on who-plays-what-role-under-which-
+  authority, not on distinguishing things from processes.
+
+  WHY 45.
+
+  The default of 13 would give roughly one instance per class — a schema demonstration
+  rather than a corpus. 45 allows the DeRolph-to-FSFP arc to be traversable end to end
+  with concrete numbers attached: multiple funding regimes in sequence, the bills that
+  established them, all four DeRolph rulings, and a spread of exemplar agencies across the
+  property-wealth spectrum. 70 was offered and not chosen; the difference is depth of
+  exemplar coverage, which post-genesis epistemic commits can supply.

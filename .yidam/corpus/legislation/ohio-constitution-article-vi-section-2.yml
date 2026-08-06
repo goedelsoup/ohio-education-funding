@@ -1,0 +1,35 @@
+class: legislation
+label: Ohio Constitution, Article VI, Section 2 (1851)
+description: |
+  The constitutional source of Ohio's school funding obligation, adopted with the 1851
+  Constitution: the General Assembly shall make such provisions, by taxation or otherwise, as
+  will secure a thorough and efficient system of common schools throughout the state, and no
+  religious or other sect shall have any exclusive right to or control of any part of the
+  school funds of this state. [verified]
+
+  Two features of the text do most of the work in the litigation that follows. The duty is
+  laid on the General Assembly specifically, which is why *DeRolph* ran against the State and
+  not against districts or the Department of Education. [verified] And the phrase "throughout
+  the state" is what converts an adequacy standard into a statewide one — a system can be
+  thorough and efficient in Upper Arlington and not be thorough and efficient throughout the
+  state. That reading is the hinge of *DeRolph I*. [inference]
+
+  The second clause, barring sectarian control of school funds, is a live question again: it
+  is among the grounds raised against the EdChoice scholarship programs. [open]
+properties:
+  designation: Ohio Const. art. VI, sec. 2
+  general_assembly: Constitutional Convention of 1850-51
+  signed: 1851-06-17
+  effective: 1851-09-01
+  subject: |
+    Imposes on the General Assembly a duty to secure by taxation or otherwise a thorough and
+    efficient system of common schools throughout the state, and bars any religious or other
+    sect from exclusive right to or control of any part of the school funds.
+  vetoes: Not applicable.
+links:
+  - target: ../legislation.ont.yml
+    relationship: instance-of
+  - target: ../doctrine/thorough-and-efficient.yml
+    relationship: establishes-standard
+  - target: ../actor/ohio-general-assembly.yml
+    relationship: imposes-duty-on

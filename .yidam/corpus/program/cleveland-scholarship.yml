@@ -1,0 +1,38 @@
+class: program
+label: Cleveland Scholarship and Tutoring Program
+description: |
+  Ohio's first voucher program, created in the mid-1990s for students in the Cleveland City
+  School District — a single-district program rather than a statewide one, established in the
+  context of the district's academic distress and state takeover. [verified]
+
+  Its significance is national. In *Zelman v. Simmons-Harris* (2002) the United States Supreme
+  Court upheld the program against a federal Establishment Clause challenge, holding that a
+  program of true private choice does not establish religion merely because most participating
+  families choose religious schools. [verified] That decision cleared the constitutional path
+  for voucher expansion across the country.
+
+  It did not clear the Ohio constitutional path. *Zelman* answered a federal question; whether
+  Article VI, Section 2's bar on sectarian control of school funds permits the arrangement is a
+  separate question raised in the [2025 EdChoice
+  challenge](../litigation/vouchers-hurt-ohio-2025.yml). [inference] The Cleveland program is
+  seeded here as the origin point of the scholarship channel and the reference against which the
+  statewide programs' scale should be read: it was designed as a targeted intervention in one
+  distressed district, and what grew from it was universal eligibility statewide. [inference]
+
+  Per-student amounts, participation counts, and the mechanism by which the program is charged
+  against Cleveland's funding are not yet recorded. [open]
+properties:
+  name: Cleveland Scholarship and Tutoring Program
+  mechanism: deduction
+  eligibility: |
+    Students residing in the Cleveland City School District, subject to income-based priority
+    in awarding. Established mid-1990s; exact enacting act and year not yet established. [open]
+  amount: Not yet populated. [open]
+  appropriation_line: Not yet established. [open]
+links:
+  - target: ../program.ont.yml
+    relationship: instance-of
+  - target: ../education-agency/cleveland-municipal.yml
+    relationship: diverts-from
+  - target: edchoice-expansion.yml
+    relationship: precedes

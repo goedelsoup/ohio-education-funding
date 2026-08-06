@@ -1,0 +1,49 @@
+class: parameter
+label: Formula Parameter
+foundational_type:
+  ontology: ufo
+  type: quality
+description: |
+  A single named value that a funding regime consumes and the General Assembly sets, carrying
+  a series of values across fiscal periods — a base cost per pupil, a special-education
+  category weight, the 20-mill floor, a phase-in percentage, a state share index threshold.
+  It is a Quality because it is an aspect that inheres in a formula component and cannot
+  exist independently of one. Parameters are separated from components because they are the
+  surface a counterfactual binds to: a proposed policy change is, almost always, an edit to
+  a parameter's value.
+properties:
+  - name: name
+    type: string
+    description: The parameter's name in statute or department documentation
+  - name: unit
+    type: string
+    description: dollars-per-pupil | ratio | mills | percent | count
+  - name: series
+    type: text
+    description: Value per fiscal period, with the enactment that set each value
+  - name: statutory_basis
+    type: string
+    description: Ohio Revised Code section that fixes the value or its method
+  - name: simulation_key
+    type: string
+    description: Identifier the crates/ foundation calculator uses to bind this parameter
+  - name: sensitivity
+    type: text
+    description: What moves when this parameter moves, and which agencies feel it most
+edges:
+  - relationship: valued-in
+    target: fiscal-period
+    direction: out
+    description: A fiscal period for which this parameter holds a specific value
+  - relationship: set-by
+    target: legislation
+    direction: in
+    description: The enactment that fixed this parameter's value or method
+  - relationship: consumed-by
+    target: formula-component
+    direction: in
+    description: The component that reads this parameter
+  - relationship: perturbed-by
+    target: scenario
+    direction: in
+    description: A counterfactual that alters this parameter's value

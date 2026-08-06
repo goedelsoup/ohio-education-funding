@@ -1,0 +1,43 @@
+class: education-agency
+label: Eastland-Fairfield Career and Technical Schools
+description: |
+  A joint vocational school district serving member districts across Franklin and Fairfield
+  counties, seeded because JVSDs are funded on rules that differ from traditional districts in
+  ways easy to overlook and consequential to get wrong. [inference]
+
+  A JVSD has no residents of its own in the ordinary sense. It levies property tax across the
+  combined territory of its member districts and enrolls their students part-time or
+  full-time, which means its funding depends on decisions made by districts it does not
+  control, and its student counts must be reconciled against those districts' counts to avoid
+  double-counting. [inference] Any statewide per-pupil figure that sums JVSD and member
+  district enrollment without reconciliation is wrong, and this node exists partly as a
+  standing reminder of that.
+
+  The most concrete difference is in the tax structure: under
+  [R.C. 319.301](../legislation/hb-920-1976.yml) the reduction-factor floor for a joint
+  vocational school district is 2 mills, not the 20 mills that applies to city, local, and
+  exempted village districts. [verified] A JVSD therefore reaches its floor — and begins
+  capturing valuation growth — under entirely different conditions than the districts it
+  serves.
+
+  IRN, member district list, enrollment, and funding series are required and not yet populated.
+  [open]
+properties:
+  irn: Not yet established. [open]
+  agency_type: joint-vocational
+  county: Franklin and Fairfield
+  typology: |
+    Not applicable in the standard department typology, which classifies traditional districts.
+    How JVSDs are grouped for peer comparison is unresolved. [open]
+  established: Not yet established. [open]
+  roles: |
+    Career-technical provider to member districts [verified]. Subject to the 2-mill JVSD
+    reduction-factor floor rather than the 20-mill floor [verified].
+  series_path: Not yet populated. [open]
+links:
+  - target: ../education-agency.ont.yml
+    relationship: instance-of
+  - target: ../parameter/twenty-mill-floor.yml
+    relationship: subject-to-variant-of
+  - target: ../revenue-stream/local-property-tax.yml
+    relationship: levies

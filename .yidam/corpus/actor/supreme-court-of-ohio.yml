@@ -1,0 +1,34 @@
+class: actor
+label: Supreme Court of Ohio
+description: |
+  Ohio's court of last resort — seven justices, elected — and the only institution that has
+  ever declared the state's school funding system unconstitutional. It did so in *DeRolph I*
+  (1997) and reaffirmed the declaration in *DeRolph IV* (2002), across a span in which the
+  court's composition changed and its position on remedy changed with it. [verified]
+
+  The court's role in this domain is unusual and worth stating plainly: it held the system
+  invalid four times and then, in 2003, prohibited the trial court from conducting further
+  proceedings to enforce the holding — ending the case without the system having been found
+  compliant. [verified] The result is a constitutional judgment that remains on the books
+  with no enforcement mechanism behind it, which is the central fact any account of Ohio
+  school funding since 2003 has to reckon with. [inference]
+properties:
+  name: Supreme Court of Ohio
+  institution_type: court
+  established: 1802-11-29
+  authority: |
+    Final interpretation of the Ohio Constitution, including Article VI, Section 2. Original
+    jurisdiction in prohibition, which is the vehicle by which it terminated the DeRolph
+    remand in 2003.
+  publishes: |
+    Slip and bound opinions with WebCite citations; the online opinion archive feeding the
+    `ohio-courts` connector.
+links:
+  - target: ../actor.ont.yml
+    relationship: instance-of
+  - target: ../litigation/cincinnati-v-walter-1979.yml
+    relationship: decides
+  - target: ../litigation/derolph-i-1997.yml
+    relationship: decides
+  - target: ../litigation/derolph-iv-2002.yml
+    relationship: decides

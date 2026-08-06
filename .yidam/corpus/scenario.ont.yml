@@ -1,0 +1,51 @@
+class: scenario
+label: Scenario
+foundational_type:
+  ontology: ufo
+  type: situation
+description: |
+  A named counterfactual: a set of parameter perturbations, applied against a baseline regime
+  over a stated horizon, together with the per-agency results it produces. It is a Situation
+  because it is a configuration of the domain held for inspection — a state of affairs that
+  obtains under stated assumptions rather than an entity or an event. Scenarios are corpus
+  nodes rather than ephemeral tool output so that a projection carries provenance: what was
+  assumed, which regime it baselines on, what code produced it, and when.
+properties:
+  - name: name
+    type: string
+    description: Short name for the counterfactual
+  - name: question
+    type: text
+    description: The policy question this scenario is constructed to answer
+  - name: perturbations
+    type: text
+    description: Each parameter altered, its baseline value, and its scenario value
+  - name: input_projections
+    type: text
+    description: Which input series were projected rather than observed, and by what method
+  - name: horizon
+    type: string
+    description: Fiscal periods covered by the run
+  - name: results_path
+    type: string
+    description: Path under crates/ to the committed per-agency delta output
+  - name: confidence
+    type: text
+    description: What the result is sensitive to, and where it should not be trusted
+edges:
+  - relationship: perturbs
+    target: parameter
+    direction: out
+    description: A parameter whose value this scenario alters
+  - relationship: projects
+    target: metric
+    direction: out
+    description: A measure this scenario forecasts under its assumptions
+  - relationship: baselines-on
+    target: funding-regime
+    direction: out
+    description: The regime the counterfactual is computed against
+  - relationship: horizon-over
+    target: fiscal-period
+    direction: out
+    description: A fiscal period within the run's horizon

@@ -1,0 +1,49 @@
+class: doctrine
+label: Adequacy
+description: |
+  The principle that funding must be sufficient for the education the state itself requires —
+  an absolute standard, measured against a costed-out requirement rather than against what
+  other districts receive. [verified as a framing in school finance scholarship]
+
+  Its practical content in Ohio is a critique of method. The Supreme Court of Ohio's core
+  finding in [*DeRolph I*](../litigation/derolph-i-1997.yml) was not that the base cost figure
+  was too low but that it was derived the wrong way round: the General Assembly decided what it
+  would spend and divided by pupils, rather than determining what an education costs and
+  appropriating that. [verified] This practice — residual budgeting — makes an adequacy claim
+  unfalsifiable, because the standard moves with the appropriation.
+
+  Both the [Evidence-Based Model](../funding-regime/evidence-based-model.yml) and the
+  [Fair School Funding Plan](../funding-regime/fair-school-funding-plan.yml) are direct
+  answers to that critique: each builds a cost from specified inputs so that the number has a
+  derivation independent of the budget. [verified] Neither has been operated at its computed
+  level for a sustained period, so in Ohio the adequacy question has been answered
+  methodologically and not yet fiscally. [inference]
+
+  Adequacy is satisfiable without equity. A system that funds every district to a genuine
+  costed requirement, and permits wealthy districts to spend far beyond it, is adequate and
+  unequal. [inference] Ohio's current design is of that shape.
+properties:
+  name: Adequacy
+  origin: |
+    School finance scholarship of the 1980s-90s; entered Ohio law through the DeRolph line as
+    the ground on which the base cost derivation was found deficient.
+  formulation: |
+    A funding system is adequate in a fiscal period if, for every agency, the resources
+    available for operating purposes are at least the cost of delivering the state's own
+    declared educational requirements to that agency's actual student population, where the
+    cost is derived from specified resource inputs priced at current rates and not from the
+    available appropriation.
+  contested: |
+    Whether adequacy can be determined at all, or whether every costing embeds contestable
+    judgments about what education requires; whether outcome measures or input measures
+    should define the requirement; and whether a formula computed correctly but funded at a
+    fraction is adequate in principle or only in arithmetic. [open]
+links:
+  - target: ../doctrine.ont.yml
+    relationship: instance-of
+  - target: equity.yml
+    relationship: tensions-with
+  - target: ../legislation/ohio-constitution-article-vi-section-2.yml
+    relationship: grounded-in
+  - target: ../litigation/derolph-i-1997.yml
+    relationship: invoked-by
