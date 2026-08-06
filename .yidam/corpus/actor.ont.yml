@@ -27,6 +27,10 @@ properties:
     type: text
     description: The data series and reports this institution issues, if any
 edges:
+  - relationship: succeeds
+    target: actor
+    direction: out
+    description: The institution this one replaced, inheriting its authority
   - relationship: enacts
     target: legislation
     direction: out

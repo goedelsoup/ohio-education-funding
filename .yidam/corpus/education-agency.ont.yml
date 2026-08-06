@@ -39,6 +39,10 @@ edges:
     target: litigation
     direction: out
     description: The agency was a named plaintiff, defendant, or intervenor in the case
+  - relationship: merged-into
+    target: education-agency
+    direction: out
+    description: The agency this one was consolidated into; required to keep long series continuous
   - relationship: peer-of
     target: education-agency
     direction: out

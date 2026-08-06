@@ -30,6 +30,10 @@ properties:
     type: string
     description: Name of the crates/ calculator implementing it, if implemented
 edges:
+  - relationship: derived-from
+    target: metric
+    direction: out
+    description: A measure this one is computed from; composite measures must expose their inputs
   - relationship: measures
     target: education-agency
     direction: out

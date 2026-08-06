@@ -33,6 +33,10 @@ properties:
     type: text
     description: What the result is sensitive to, and where it should not be trusted
 edges:
+  - relationship: compares-to
+    target: scenario
+    direction: out
+    description: Another counterfactual this one is set against, isolating one perturbation from another
   - relationship: perturbs
     target: parameter
     direction: out

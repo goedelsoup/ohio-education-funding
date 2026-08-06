@@ -24,6 +24,14 @@ properties:
     type: text
     description: What is disputed about the principle, and by whom
 edges:
+  - relationship: tensions-with
+    target: doctrine
+    direction: out
+    description: A principle this one trades against, such that advancing one may cost the other
+  - relationship: grounded-in
+    target: legislation
+    direction: out
+    description: The constitutional or statutory text this principle originates in
   - relationship: invoked-by
     target: litigation
     direction: in

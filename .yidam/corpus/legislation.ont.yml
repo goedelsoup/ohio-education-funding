@@ -54,6 +54,10 @@ edges:
     target: fiscal-period
     direction: out
     description: The fiscal period or biennium this enactment funds
+  - relationship: grounds
+    target: doctrine
+    direction: in
+    description: A normative principle that originates in this text
   - relationship: enacted-by
     target: actor
     direction: in

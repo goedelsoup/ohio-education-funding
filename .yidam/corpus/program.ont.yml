@@ -32,6 +32,14 @@ edges:
     target: education-agency
     direction: out
     description: The agency whose funding is reduced or displaced by this program
+  - relationship: funds
+    target: education-agency
+    direction: out
+    description: An agency this program pays money to, as capital assistance programs do
+  - relationship: challenged-by
+    target: litigation
+    direction: in
+    description: A case testing this program's lawfulness
   - relationship: created-by
     target: legislation
     direction: in

@@ -24,6 +24,10 @@ properties:
     type: string
     description: Name of the crates/ calculator implementing this component, if implemented
 edges:
+  - relationship: replaces
+    target: formula-component
+    direction: out
+    description: The component in a prior regime that occupied the same role in the calculation
   - relationship: governed-by
     target: parameter
     direction: out

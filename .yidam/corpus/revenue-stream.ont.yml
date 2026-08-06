@@ -35,6 +35,10 @@ edges:
     target: education-agency
     direction: out
     description: The agency this channel delivers money to
+  - relationship: substitutes-for
+    target: revenue-stream
+    direction: out
+    description: A stream this one was created to replace after the original was abolished or reduced
   - relationship: allocated-by
     target: formula-component
     direction: in

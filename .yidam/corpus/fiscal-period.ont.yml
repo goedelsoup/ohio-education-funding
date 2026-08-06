@@ -34,6 +34,10 @@ edges:
     target: fiscal-period
     direction: out
     description: The period immediately preceding this one
+  - relationship: part-of
+    target: fiscal-period
+    direction: out
+    description: The containing period; a fiscal year is part of a biennium
   - relationship: funded-by
     target: legislation
     direction: in

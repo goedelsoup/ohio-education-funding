@@ -37,6 +37,14 @@ edges:
     target: funding-regime
     direction: out
     description: The regime whose constitutionality was at issue
+  - relationship: challenges
+    target: program
+    direction: out
+    description: A program whose lawfulness was at issue, as distinct from a whole regime
+  - relationship: cites
+    target: litigation
+    direction: out
+    description: A prior decision this one builds on, narrows, or reaffirms
   - relationship: invokes
     target: doctrine
     direction: out
