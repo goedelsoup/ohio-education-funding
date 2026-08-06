@@ -3,31 +3,53 @@ label: FSFP Local Capacity Measure
 description: |
   The Fair School Funding Plan's replacement for the charge-off, and the component that most
   changes which districts win and lose. Rather than asking what a fixed millage would raise
-  against valuation, it asks what a district's community can bear — combining assessed
-  property valuation with the income of district residents into a capacity figure, from which
-  the district's share of its own base cost is derived. [verified]
+  against valuation, it asks what a district's community can bear — and the answer is a blend,
+  weighted **60% assessed property valuation per pupil, 20% federal adjusted gross income per
+  pupil, and 20% federal median income per pupil**, scaled by a local capacity percentage.
+  [verified]
 
-  The reason income belongs in the measure is a specific Ohio failure mode. Property valuation
-  and household income diverge in two directions. A rural district with substantial
-  agricultural or industrial valuation and low household earnings looked wealthy to the
-  charge-off. A district whose housing has appreciated faster than its residents' incomes —
-  older suburbs, and much of Appalachian and Rust Belt Ohio — looked wealthy for the same
-  reason. Both were asked for local effort their residents could not sustain. [inference]
+  That 60/20/20 split is the substance of the reform. Property alone treated a district with
+  expensive housing and modest household earnings as wealthy; splitting the income term into an
+  aggregate measure (total AGI, which rises with population and with a few very high earners)
+  and a median measure (which does not) captures a district whose totals look healthy because
+  of concentration at the top. [inference]
 
-  The weighting between valuation and income, and the exact derivation of the state share
-  percentage from the capacity figure, are the operative details and are not yet recorded
-  here. They are the highest-value gap in this class, because they are the parameters a
-  scenario would most usefully perturb. [open]
+  The scaling factor is where the progressivity actually lives, and it is a sliding scale, not
+  a constant. A district's local capacity percentage is set by the ratio of its federal median
+  income to the state's, benchmarked against the **40th highest district** on that ratio:
+  at or above that benchmark the rate is 2.5%; below the state median it is the district's own
+  ratio times 2.25%; between the two it interpolates. [verified] A district at half the state
+  median income is charged local capacity at roughly 1.125% of its blended wealth, while a
+  wealthy district pays 2.5% — so the measure is progressive in rate as well as in base.
+
+  Both wealth terms are computed as the **lesser** of the most recent year and a three-year
+  average — valuation from TY20 against TY18-20, income from TY19 against TY17-19 in the FY2022
+  calculation. [verified] Taking the lesser is a deliberate protection: a district whose
+  valuation spikes on a single reappraisal is not immediately charged for it.
+
+  Not modeled here yet: how the 40th-highest-district benchmark moves over time, and whether
+  it has. It is a single discretionary number that sets the top of the entire scale. [open]
 properties:
   name: FSFP local capacity measure
   function: |
-    Combines district assessed property valuation with resident income into a local capacity
-    figure, converts that figure into a district share of computed base cost, and leaves the
-    remainder as state responsibility. Weighting between the valuation and income components
-    is set in statute. [open]
-  statutory_basis: |
-    R.C. 3317 as amended by Am. Sub. H.B. 110 (2021). Specific sections not yet established.
-    [open]
+    Capacity Valuation V1        = lesser of (most recent TY assessed valuation) and
+                                   (3-year average of the three most recent tax years)
+    Capacity Gross Income I1     = lesser of (most recent TY federal AGI) and (3-year average)
+    C1 Assessed Valuation/Pupil  = V1 / Base Cost Enrolled ADM
+    C2 Gross Income/Pupil        = I1 / Base Cost Enrolled ADM
+    C3 Median Income/Pupil       = (federal median income x number of state tax returns) / ADM
+    C4 Income Ratio              = district federal median income / statewide federal median income
+    C5 Benchmark                 = C4 as computed for the 40th highest district
+    C6 Local Capacity Percentage = if C4 >= C5              then 0.025
+                                   if C4 >  1 and C4 < C5   then ((C4-1) x 0.0025)/(C5-1) + 0.0225
+                                   if C4 <= 1               then C4 x 0.0225
+
+    Local Capacity Per-Pupil Amount = ((C1 x 0.6) + (C2 x 0.2) + (C3 x 0.2)) x C6
+
+    Distinct from Targeted Assistance [R.C. 3317.0217], which weights district wealth
+    60% property valuation / 40% federal gross income — a different blend for a different
+    purpose, and a frequent source of confusion between the two. [verified]
+  statutory_basis: R.C. 3317.017; state share and state share percentage at 3317.017(B) and (C). [verified]
   calculator: local-capacity
 links:
   - target: ../formula-component.ont.yml
@@ -38,3 +60,7 @@ links:
     relationship: distributes
   - target: ../doctrine/equity.yml
     relationship: operationalizes
+  - target: ../metric/state-share-percentage.yml
+    relationship: determines
+  - target: ../../catalog/dew-sfpr-line-by-line.md
+    relationship: sourced-from

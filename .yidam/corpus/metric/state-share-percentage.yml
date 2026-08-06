@@ -1,47 +1,68 @@
 class: metric
 label: State Share Percentage
 description: |
-  The fraction of a district's computed cost that the state pays rather than the district — the
+  The fraction of a district's base cost that the state pays rather than the district — the
   compensation side of the equity question, where
   [assessed valuation per pupil](assessed-valuation-per-pupil.yml) is the wealth side.
   [verified]
 
-  Read together, the two metrics are the wealth-neutrality test. If the funding system
-  compensates for local wealth as designed, state share should fall as valuation per pupil
-  rises, and the strength and shape of that relationship is a direct measurement of how much
-  equalization the system actually performs. [inference] A weak relationship means the state is
-  distributing aid without regard to capacity; a strong one means it is, whatever the resulting
-  absolute levels.
+  Under the Fair School Funding Plan this is not an analyst's construct but a statutory
+  quantity with an exact definition: the state share of base cost per pupil divided by base
+  cost per pupil, **with a minimum of 5%**. [verified] The floor is not a rounding convention —
+  it is a policy decision that every district, however wealthy, receives at least 5% of its
+  computed base cost from the state, and it is why the measure stops discriminating at the top
+  of the wealth distribution. A district whose local capacity exceeds 95% of its base cost and
+  one whose capacity exceeds it several times over both report 5%.
 
-  This metric is a derived quantity, not a reported one, and the derivation is where the errors
-  are. It is a ratio of state aid to *computed cost*, not to total district revenue or total
-  district spending — a district may spend far above its computed cost from local revenue, and
-  dividing state aid by actual spending produces a different and much lower number that is
-  frequently quoted as though it were the same measure. [inference] Both numbers have uses;
-  conflating them does not.
+  Read together with valuation per pupil, the two metrics are the wealth-neutrality test. If
+  the system compensates for local wealth as designed, state share should fall as valuation per
+  pupil rises, and the strength and shape of that relationship is a direct measurement of how
+  much equalization actually occurs. [inference]
 
-  The metric also behaves badly at the extremes. A district whose computed local share exceeds
-  its computed cost has a state share at or near zero and the ratio stops discriminating, so
-  the top of the wealth distribution compresses into a floor. [inference]
+  The metric is a derived quantity and the derivation is where the errors are. It is a ratio to
+  *computed base cost*, not to total district revenue or total district spending — a district
+  may spend far above its computed cost from local revenue, and dividing state aid by actual
+  spending produces a different, much lower number that is frequently quoted as though it were
+  the same measure. [inference] Both have uses; conflating them does not.
+
+  One further trap specific to FSFP: the state share percentage is computed **before** the
+  phase-in percentage is applied, and it is then used to scale several supplemental funding
+  streams. [verified] So a district's statutory state share percentage and the share of its
+  base cost the state actually paid that year are different numbers, differing by exactly the
+  phase-in gap.
 properties:
   name: State share percentage
   unit: percent
   definition: |
-    state_share_pct = state_foundation_aid / computed_formula_cost
-    where computed_formula_cost is the amount the regime in force computes for the district
-    before phase-in, and state_foundation_aid is the state's portion of that computation.
+    State Share of Base Cost =
+      if (Local Capacity Per-Pupil / Base Cost Per-Pupil) > 0.95
+        then Base Cost Per-Pupil x 0.05 x current-year Enrolled ADM
+        else (Base Cost Per-Pupil - Local Capacity Per-Pupil) x current-year Enrolled ADM
+
+    State Share Percentage =
+      max( (State Share of Base Cost Per-Pupil / Base Cost Per-Pupil), 0.05 )
+
+    Note the ADM asymmetry: base cost per pupil and local capacity per pupil are computed from
+    prior-year or three-year-average ADM, while the state share of base cost is multiplied by
+    current-year enrolled ADM. [verified] A district with sharply changing enrollment is
+    therefore funded on a blend of two different student counts.
+
     Distinct from state_aid / total_revenue and from state_aid / actual_expenditure, both of
     which are different measures and must be named differently.
   inputs: |
-    State foundation aid by agency and fiscal year — from `dew-foundation`.
-    Computed formula cost by agency and fiscal year — from the `foundation` calculator, or from
-    `lsc-budget` simulations where the calculator is not yet implemented.
+    Base cost per pupil and local capacity per pupil by agency and fiscal year — from the
+    `foundation` and `local-capacity` calculators, or directly from the department's Detailed
+    SFPR where already computed.
+    Current-year and prior-year enrolled ADM — from `dew-foundation`.
   caveats: |
-    Compresses to near zero for high-wealth districts, so it discriminates poorly at the top of
-    the distribution. Sensitive to whether the numerator is measured before or after the
-    phase-in percentage is applied — before is the design measure, after is what a district
-    receives, and they diverge by exactly the phase-in gap. Districts held on a guarantee are
-    off-formula and their computed share is not meaningful. [inference]
+    Hard floor at 5%, so it does not discriminate among high-wealth districts at all — the top
+    of the distribution compresses onto a single value and correlation measures against wealth
+    will understate the relationship unless floored districts are identified and handled.
+    [inference]
+
+    Computed before phase-in; diverges from realized state share by the phase-in gap. Districts
+    held on a guarantee are off-formula and their computed share is not meaningful. Mixes
+    prior-year and current-year ADM by construction.
   calculator: local-capacity
 links:
   - target: ../metric.ont.yml
@@ -54,3 +75,5 @@ links:
     relationship: measures
   - target: ../fiscal-period/fy2026.yml
     relationship: computed-for
+  - target: ../../catalog/dew-sfpr-line-by-line.md
+    relationship: sourced-from
