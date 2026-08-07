@@ -1,39 +1,64 @@
 class: litigation
 label: DeRolph v. State (DeRolph I, 1997)
 description: |
-  The decision that changed the terms of Ohio school funding. The Supreme Court of Ohio held,
-  4-3, that the state's school funding system violated Article VI, Section 2, and ordered the
-  General Assembly to enact a complete systematic overhaul. [verified] The action had been
-  brought in 1991 by a coalition of districts organized as the Ohio Coalition for Equity and
-  Adequacy of School Funding, with the named plaintiff a student in
-  [Northern Local School District](../education-agency/northern-local-perry.yml). [verified]
+  The decision that changed the terms of Ohio school funding. On 24 March 1997 the Supreme
+  Court of Ohio held, 4-3, that the state's school funding system violated Article VI,
+  Section 2, and ordered a complete systematic overhaul — with compliance required within one
+  year, by 24 March 1998. [verified]
+
+  The action was filed on 19 December 1991 in Perry County by the Ohio Coalition for Equity and
+  Adequacy of School Funding, on behalf of Nathan DeRolph, then a student at Sheridan High
+  School in [Northern Local School District](../education-agency/northern-local-perry.yml).
+  [verified] Accounts differ on the scale of the plaintiff group — the coalition's complaint is
+  described as brought on behalf of some 550 districts, while other summaries name five
+  districts as the suing parties; the distinction is between coalition membership and named
+  plaintiffs and is not resolved here. [open]
+
+  The record behind it was substantial: trial ran from 25 October to 8 December 1993 before
+  Judge Linton Lewis Jr., with more than 70 witnesses and over 500 exhibits. Judge Lewis ruled
+  on 1 July 1994 that education is a fundamental right and the system unconstitutional; the
+  Perry County Court of Appeals reversed on 30 August 1995; the Supreme Court accepted
+  jurisdiction on 17 January 1996. [verified]
 
   The court identified specific defects rather than a general insufficiency, and the specificity
-  is what made the decision usable. Among them: the base cost per pupil was not derived from
-  any determination of what an education costs but by dividing available money by pupils —
-  the practice this corpus records under [adequacy](../doctrine/adequacy.yml) as residual
-  budgeting; districts were forced into borrowing to meet operating costs; school buildings
-  were in conditions the court described at length; and reliance on local property tax
-  produced disparities the state's equalization did not correct. [verified]
+  is what made the decision usable. Among them: the base cost per pupil was not derived from any
+  determination of what an education costs but by dividing available money by pupils — the
+  practice this corpus records under [adequacy](../doctrine/adequacy.yml) as residual budgeting;
+  districts were forced into borrowing to meet operating costs; school buildings were in
+  conditions the court described at length; and reliance on local property tax produced
+  disparities the state's equalization did not correct. [verified]
 
-  The remedy was the weak point, and it is the reason *DeRolph* generated four decisions rather
-  than one. The court declared the system unconstitutional and directed the General Assembly to
-  fix it, without specifying what a compliant system would contain or what would happen if one
-  did not appear. [inference]
+  A clarification followed on 25 April 1997: local property taxes could supplement but not
+  primarily fund schools, and school borrowing was permitted through 23 March 1998. [verified]
+
+  The remedy was the weak point, and it is why *DeRolph* produced four decisions rather than
+  one. The court declared the system unconstitutional and directed the General Assembly to fix
+  it, without specifying what a compliant system would contain or what would follow if none
+  appeared. [inference]
 properties:
   case_name: DeRolph v. State
-  citation: 78 Ohio St.3d 193 (1997)
+  citation: 78 Ohio St.3d 193, 1997-Ohio-84
   court: Supreme Court of Ohio
   filed: 1991-12-19
   decided: 1997-03-24
   holding: |
     Ohio's system for funding elementary and secondary education fails to provide a thorough
     and efficient system of common schools as required by Article VI, Section 2, and is
-    unconstitutional. Decided 4-3. Filing date to be confirmed against the record. [open]
+    unconstitutional. Decided 4-3; majority of Justices Douglas, Pfeifer, Resnick, and
+    Sweeney. [verified]
   remedy: |
     A complete systematic overhaul of the school funding system, ordered of the General
-    Assembly, with jurisdiction retained. No specification of a compliant design and no
-    stated consequence for non-compliance.
+    Assembly with compliance required by 24 March 1998, jurisdiction retained. Clarified
+    25 April 1997. The State's response was found unconstitutional by the trial court on
+    26 February 1999, leading to DeRolph II. [verified]
+  procedural_history: |
+    1991-12-19  Filed in Perry County by the Ohio Coalition for Equity and Adequacy
+    1993-10-25  Trial opens before Judge Linton Lewis Jr.; 70+ witnesses, 500+ exhibits
+    1993-12-08  Trial concludes
+    1994-07-01  Trial court holds education a fundamental right; system unconstitutional
+    1995-08-30  Perry County Court of Appeals reverses in a split decision
+    1996-01-17  Supreme Court of Ohio accepts jurisdiction
+    1997-03-24  DeRolph I
 links:
   - target: ../litigation.ont.yml
     relationship: instance-of
@@ -45,3 +70,5 @@ links:
     relationship: invokes
   - target: ../education-agency/northern-local-perry.yml
     relationship: has-party
+  - target: ../../catalog/derolph-litigation-record.md
+    relationship: sourced-from

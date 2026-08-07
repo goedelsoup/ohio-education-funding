@@ -2,35 +2,76 @@ class: formula-component
 label: FSFP Base Cost Calculation
 description: |
   The component that answers *DeRolph*'s central charge. Instead of a statewide per-pupil
-  figure set in the budget, base cost is assembled for each district from specified staffing
-  ratios — teachers per pupil at each grade band, and defined counts of counselors,
-  librarians, administrators, and support staff — applied to that district's own enrollment
-  and priced at salary and benefit levels drawn from actual reported data. [verified] Facility
-  and operational costs are added on the same build-up basis.
+  figure set in the budget, base cost is assembled for each district from statutory staffing
+  ratios applied to that district's own enrollment and priced at statewide average salaries.
+  [verified] Twenty-two elements in five sub-components yield a unique base cost per pupil for
+  every district and community school in the state. [verified]
 
-  This is why base cost differs between two districts with identical enrollment: the ratios
-  are uniform but the prices are not, and a district in a higher-salary labor market has a
-  higher base cost for the same staffing. [verified]
+  The teacher ratios are the core, and they are graded by grade band: one funded classroom
+  teacher per 20 kindergarten, 23 in grades 1-3, 25 in grades 4-8, 27 in grades 9-12, and 18
+  in career-technical programs. [verified] Special teachers — art, music, physical education,
+  electives — are funded at one per 150 students with a floor of six per district. [verified]
+  Support staffing follows the same pattern: one guidance counselor per 360 students in grades
+  9-12 with a minimum of one, one librarian or media staff per 1,000, one student wellness and
+  success staff per 250 with a minimum of five. [verified]
 
-  The build-up only means what it claims if the input data is current. The staffing and salary
-  figures come from a reference year, and a base cost computed on a reference year several
-  years in the past describes what the staffing would have cost then, not what it costs now.
-  [inference] Whether the input year is refreshed each biennium is therefore not a technical
-  detail but the difference between a costed-out formula and a fixed per-pupil amount wearing
-  a costed-out formula's clothing — which is the argument running through
-  [H.B. 96](../legislation/hb-96-2025.yml). [inference]
+  Each funded position is priced at a statewide average salary plus 16% for benefits — 14%
+  retirement contribution and 2% federal payroll taxes and workers' compensation — plus the
+  average employer-paid insurance cost. In FY2022 that made a funded teacher
+  ($62,696.18 x 1.16) + $14,265.53 = **$86,993.10**. [verified]
+
+  **The salaries are FY2018 averages.** [verified] That is the whole argument in one fact. The
+  build-up is only a costing if the prices are current, and pricing FY2022 staffing at FY2018
+  salaries produces a number that describes what the staffing would have cost four years
+  earlier. Teacher salaries rose from $62,353 in 2018 to $67,654 in 2022 — 8.5% — while the
+  model kept using the earlier figure. [inference, Fordham] H.B. 33 updated the reference year
+  to FY2022; [H.B. 96](../legislation/hb-96-2025.yml) held it there. [inference] The reference
+  year, not the phase-in percentage, is the parameter that decides whether this component means
+  what its name says.
+
+  The minimum staffing floors have a distributional consequence that is easy to miss: because
+  a district gets at least six special teachers and five wellness staff regardless of size,
+  small districts carry much higher per-pupil base costs — above $8,000 for the roughly
+  one-sixth of Ohio districts under about 700 students. [inference, Fordham]
 properties:
   name: FSFP base cost calculation
   function: |
-    For each district: apply statutory staffing ratios to enrollment to obtain required
-    personnel counts by category; price each category at salary and benefit rates derived from
-    reported data for a reference year; add facility, operations, and other specified cost
-    components; sum to a district base cost. Divide by enrollment to express as base cost per
-    pupil.
+    District Aggregate Base Cost = Teacher Base Cost + Student Support Base Cost + District
+    Leadership and Accountability Base Cost + Building Leadership and Operation Base Cost +
+    Athletic Co-curricular Activities Base Cost
+
+    District Base Cost Per-Pupil = District Aggregate Base Cost / District Base Cost Enrolled ADM
+    Statewide Average Base Cost Per-Pupil = Sum of district aggregates / Sum of district ADM
+
+    Teacher Base Cost = Classroom + Special + Substitute + Professional Development, where
+      Funded Classroom Teachers = (K ADM / 20) + (Gr 1-3 / 23) + (Gr 4-8 / 25) + (Gr 9-12 / 27)
+                                 + (CTE ADM / 18)
+      Funded Special Teachers   = greater of (Base Cost Enrolled ADM / 150) and 6
+      Average Teacher Base Cost = (statewide avg teacher salary x 1.16) + avg insurance cost
+      Substitute Cost           = (classroom + special teachers) x ($90 x 1.16) x 5 days
+      Professional Development  = (classroom + special) x ((salary x 1.16) / 180) x 4 days
+
+    Base Cost Enrolled ADM funds students where they are educated: resident ADM, plus entering
+    open enrollment and 80% of JVS ADM and 20% of contract vocational ADM, less exiting open
+    enrollment, community and STEM school ADM, and Jon Peterson, Autism, EdChoice, and
+    Cleveland Scholarship ADM. Uses the greater of the three-year average or the prior year,
+    which stabilizes funding for districts with declining enrollment. [verified]
   statutory_basis: |
-    R.C. 3317 as amended by Am. Sub. H.B. 110 (2021). Specific sections and the reference-year
-    provision not yet established. [open]
+    R.C. 3317.011. Teacher base cost 3317.011(D); student support 3317.011(E); district
+    leadership and accountability 3317.011(F); building leadership and operation 3317.011(G);
+    athletic co-curricular 3317.011(H). Base Cost Enrolled ADM at R.C. 3317.02(K). [verified]
   calculator: foundation
+  fy2022_inputs: |
+    Statewide average salaries used, all FY2018 [verified]:
+      Superintendent $115,615.69   Other administrator $95,727.51   Principal $91,720.36
+      Teacher $62,696.18           Counselor $63,263.80             Librarian/media $68,139.33
+      EMIS support $53,605.26      Bookkeeping/accounting $45,387.82
+      Administrative assistant $44,955.10   Clerical $32,997.90
+      Average annual employer-paid insurance $14,265.53
+    Statewide per-pupil amounts [verified]:
+      Building $1,129.78   Supplies and academic content $220.35   Athletic co-curricular $163.28
+      Academic co-curricular $42.13   Technology $37.50   ITC support $31.00
+      Building safety and security $23.29
 links:
   - target: ../formula-component.ont.yml
     relationship: instance-of
@@ -42,3 +83,7 @@ links:
     relationship: distributes
   - target: ../doctrine/adequacy.yml
     relationship: operationalizes
+  - target: ../../catalog/dew-sfpr-line-by-line.md
+    relationship: sourced-from
+  - target: ../../catalog/fordham-base-cost-critique.md
+    relationship: sourced-from

@@ -6,40 +6,65 @@ description: |
   meaning has changed most.
 
   Under the [foundation base cost formula](../funding-regime/foundation-base-cost-formula.yml)
-  it was a statewide figure set in the biennial budget, and the Supreme Court of Ohio found
-  in [*DeRolph I*](../litigation/derolph-i-1997.yml) that it was derived by working backward
-  from available appropriation rather than from any costing of an education. [verified] Under
-  the [Fair School Funding Plan](../funding-regime/fair-school-funding-plan.yml) it is not
-  set at all: it is computed per district from staffing ratios and regional salaries, and the
-  statewide figure is an average of district results rather than an input. [verified]
+  it was a statewide figure set in the biennial budget, and the Supreme Court of Ohio found in
+  [*DeRolph I*](../litigation/derolph-i-1997.yml) that it was derived by working backward from
+  available appropriation rather than from any costing of an education. [verified] Under the
+  [Fair School Funding Plan](../funding-regime/fair-school-funding-plan.yml) it is not set at
+  all: each district's base cost is built from staffing ratios and priced inputs, and the
+  statewide figure is the **quotient of the summed district aggregates over the summed
+  district ADM** — an output, not an input. [verified]
 
-  That change is why this node tracks a parameter whose type changed underneath it. Comparing
-  a pre-2022 base cost to a post-2022 one compares a policy decision to a computed output, and
-  the comparison is only meaningful if the reference year of the FSFP cost inputs is stated
-  alongside the figure. [inference]
+  The FY2022 statewide aggregate was $11,023,233,582.74 over a base cost enrolled ADM of
+  1,499,918.26, giving an average base cost per pupil of **$7,349.22**. [verified] The
+  career-technical equivalent, computed from the JVSD base cost calculation, was $8,891.03.
+  [verified]
 
-  The value series is the corpus's most important missing data. It must be assembled from
-  statute for the pre-FSFP years and from the LSC and department simulations for the FSFP
-  years, and stated in both nominal and constant dollars. [open]
+  Comparing a pre-2022 base cost to a post-2022 one compares a policy decision to a computed
+  output. The comparison is only meaningful with the reference year of the cost inputs stated
+  alongside — and the distribution matters as much as the average: districts under roughly 700
+  students, about one-sixth of Ohio districts, carry base amounts above $8,000 per pupil
+  because minimum staffing floors apply regardless of enrollment. [inference, Fordham] The
+  statewide average conceals a bimodal distribution driven by district size.
 properties:
   name: Base cost per pupil
   unit: dollars-per-pupil
   series: |
-    Not yet populated. [open] Requires: statutory base cost by fiscal year for FY1992-FY2009;
-    Evidence-Based Model computed adequacy per pupil for FY2010-FY2011; FSFP computed base
-    cost statewide average and district distribution for FY2022 forward, each tagged with the
-    reference year of its cost inputs. Sources: `ohio-laws` for statutory values, `lsc-budget`
-    for simulations, `dew-foundation` for realized per-district amounts.
-  statutory_basis: R.C. 3317, section varying by biennium. Exact citations not established. [open]
+    FY2021  $6,020.00  pre-FSFP formula amount                    [inference, Fordham]
+    FY2022  $7,349.22  statewide average, FY2018 cost inputs      [verified, department]
+    FY2023  $7,352.00  statewide average, FY2018 cost inputs      [inference, Fordham]
+    FY2025  $8,240.00  statewide average, FY2022 cost inputs      [inference, Fordham]
+    FY2026  not established                                        [open]
+    FY2027  not established                                        [open]
+
+    Supporting FY2022 detail, all verified from the department's payment report:
+      Statewide aggregate base cost      $11,023,233,582.74
+      Statewide base cost enrolled ADM    1,499,918.26
+      Career-technical base cost/pupil    $8,891.03
+      Economically disadvantaged pct      46.7239%
+      Districts receiving foundation aid  611
+      Total state foundation funding      approximately $7.5 billion
+
+    Still missing: the FY1992-FY2009 statutory series, the Evidence-Based Model's computed
+    adequacy amount for FY2010-11, and the FY2024-FY2027 statewide averages. All figures need
+    a constant-dollar companion series before any cross-era comparison. [open]
+  statutory_basis: R.C. 3317.011, with sub-components at 3317.011(D) through (H). [verified]
   simulation_key: base_cost_per_pupil
   sensitivity: |
-    Moves every district's computed cost proportionally before local share is applied.
-    Because state aid is the residual after local share, a given percentage change in base
-    cost produces a larger percentage change in state aid for districts with high local
-    capacity than for those with low — the same dollar increase is a smaller share of a
-    property-poor district's total. [inference] Interacts multiplicatively with
+    Moves every district's computed cost proportionally before local share is applied. Because
+    state aid is the residual after local capacity, a given percentage change in base cost
+    produces a larger percentage change in state aid for districts with high local capacity —
+    except at the bottom, where the 5% minimum state share floors the effect entirely.
+    [inference]
+
+    Interacts multiplicatively with
     [fsfp-phase-in-percentage](fsfp-phase-in-percentage.yml): raising base cost while holding
     phase-in constant delivers only the phased fraction of the increase.
+
+    The dominant driver is the teacher salary input. Base cost is majority personnel, priced
+    at ($62,696.18 x 1.16) + $14,265.53 = $86,993.10 per funded teacher in FY2022, so the
+    parameter's real sensitivity is to the reference year rather than to any legislative
+    choice about the number itself. [verified for the arithmetic; inference for the claim
+    about dominance]
 links:
   - target: ../parameter.ont.yml
     relationship: instance-of
@@ -47,3 +72,7 @@ links:
     relationship: valued-in
   - target: ../doctrine/adequacy.yml
     relationship: quantifies
+  - target: ../../catalog/dew-sfpr-line-by-line.md
+    relationship: sourced-from
+  - target: ../../catalog/fordham-base-cost-critique.md
+    relationship: sourced-from

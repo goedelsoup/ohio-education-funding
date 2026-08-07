@@ -5,38 +5,59 @@ description: |
   appropriated. The plan was designed to reach full funding over six years, and each biennial
   budget since 2021 has set the percentage for its two fiscal years. [verified]
 
-  This parameter is the reason the corpus separates what a formula computes from what a
-  district receives. The Fair School Funding Plan can be simultaneously described as fully
-  phased in and as underfunded without either speaker being wrong, because the phase-in
-  percentage and the cost-input reference year are two different dials and only one of them
-  is usually named. [inference] A phase-in that reaches 100 percent of an amount computed on
-  stale inputs delivers less, in real terms, than the plan's designers costed — and the
-  percentage alone will not show it.
+  The full enacted series is now known and it is close to equal sixths, but not exactly:
+  16.67, 33.33, 50, 66.67, 83.33, 100 across FY2022 through FY2027. [verified for FY2022 from
+  the department's own payment report; inference from secondary reporting for FY2026-27]
 
-  That interaction is the specific thing this node exists to make queryable. Any statement
-  about Fair School Funding Plan implementation should carry both this parameter's value and
-  the reference year on
+  Two details matter more than the headline series.
+
+  **The percentage is applied by line, not to the total.** In FY2022 the 16.67% phase-in was
+  applied to base cost, targeted assistance, special education, English learners, gifted, and
+  career-technical — but Disadvantaged Pupil Impact Aid was phased in at **0%**. [verified]
+  A district's realized phase-in therefore depended on its funding mix, and high-poverty
+  districts, whose DPIA share is largest, received a smaller effective fraction than the
+  headline number implies. Any statement that FY2022 was "funded at 16.67%" is wrong for the
+  districts DPIA exists to serve.
+
+  **Reaching 100% does not mean reaching the plan.** H.B. 96 takes the phase-in to 100% in
+  FY2027 while holding the cost inputs at FY2022 levels. [inference] The percentage and the
+  input reference year are separate dials, and only one of them is usually named — which is
+  exactly why this corpus holds them as separate nodes. See
   [`fsfp-base-cost-calculation`](../formula-component/fsfp-base-cost-calculation.yml).
 properties:
   name: FSFP phase-in percentage
   unit: percent
   series: |
-    Not yet populated with confirmed values. [open] The plan's design was a six-year phase-in
-    in equal increments, which would imply roughly 16.7 / 33.3 / 50.0 / 66.7 / 83.3 / 100
-    percent across FY2022 through FY2027, with H.B. 110 setting the first biennium, H.B. 33
-    the second, and H.B. 96 the third. [inference] The enacted percentages must be confirmed
-    against each act and the LSC analyses before use; the increments were not necessarily
-    equal and the FY2026-27 values are the contested ones. Sources: `ohio-laws`,
-    `lsc-budget`.
+    FY2022  16.67%  Am. Sub. H.B. 110 (134th GA)  [verified — department payment report]
+                    Applied to base cost, targeted assistance, special education, English
+                    learners, gifted, and career-technical. DPIA phased in at 0%. [verified]
+    FY2023  33.33%  Am. Sub. H.B. 110 (134th GA)  [inference]
+    FY2024  50%     Am. Sub. H.B. 33  (135th GA)  [inference]
+    FY2025  66.67%  Am. Sub. H.B. 33  (135th GA)  [inference]
+    FY2026  83.33%  Am. Sub. H.B. 96  (136th GA)  [inference]
+    FY2027  100%    Am. Sub. H.B. 96  (136th GA)  [inference]
+
+    FY2022 is verified against the FY2022 School Finance Payment Report line-by-line
+    explanation, which states the applied percentages by line. The remainder are from
+    secondary reporting of the LSC analyses and should be confirmed against each enacted act
+    and its Greenbook before use in a simulation — the LSC asset host could not be read
+    directly during extraction. Whether the DPIA percentage tracks the general percentage in
+    later years is not established and matters. [open]
   statutory_basis: |
     Set in each biennial appropriation act rather than in permanent law, which is itself the
-    structural fact this node records. [verified]
+    structural fact this node records. [verified] The FY2022 percentages appear in the
+    uncodified sections of Am. Sub. H.B. 110 rather than in R.C. 3317.
   simulation_key: fsfp_phase_in_pct
   sensitivity: |
     Scales state aid for every district on the formula, but has no effect on districts held on
-    a guarantee — for those, the phase-in percentage is inert and the guarantee is the
-    operative number. [inference] The share of districts insulated from this parameter is
-    therefore required context for any statement about what a phase-in change would do.
+    a guarantee — for those the phase-in percentage is inert and the guarantee is the
+    operative number. [inference] The share of districts insulated is required context for any
+    statement about what a phase-in change would do. [open]
+
+    Because the percentage is applied per line, its incidence is not uniform: a district whose
+    funding is weighted toward a component with a lower phase-in receives less than the
+    headline figure. FY2022's 0% DPIA is the extreme case and the one to test the calculator
+    against.
 links:
   - target: ../parameter.ont.yml
     relationship: instance-of
@@ -46,3 +67,7 @@ links:
     relationship: valued-in
   - target: base-cost-per-pupil.yml
     relationship: scales
+  - target: ../../catalog/dew-sfpr-line-by-line.md
+    relationship: sourced-from
+  - target: ../../catalog/lsc-hb96-analysis.md
+    relationship: sourced-from
