@@ -309,17 +309,12 @@ fn bundle_status(root: &Path) -> String {
         .map(|value| value.trim_matches(|c| c == '"' || c == ',').to_string())
         .unwrap_or_else(|| "unknown".into());
     let districts = feed.matches("\"irn\": ").count();
-    // Simulation checkpoints and forecast checkpoints both carry a `label`, and they gate
-    // different things: one the scenario builder, the other the projection band. Counting them
-    // together would report a number that matches neither of the two the page states.
-    //
-    // `low` is the discriminator rather than `fiscal_year`, which the bundle also carries at the
-    // top level — counting that made this five when it is four.
+    // Each kind is counted by a field only that kind carries, rather than by subtracting one
+    // count from another. `label` was the discriminator once and stopped being unique the moment
+    // the deflator acquired one — a subtraction is only as stable as every other user of the
+    // field it subtracts from.
+    let checkpoints = feed.matches("\"cost\": ").count();
     let forecasts = feed.matches("\"low\": ").count();
-    let checkpoints = feed
-        .matches("\"label\": ")
-        .count()
-        .saturating_sub(forecasts);
     format!(
         "| Field | Value |\n|---|---|\n\
          | Contract version | `{version}` |\n\
@@ -457,7 +452,7 @@ mod tests {
     #[test]
     fn the_bundle_status_reads_the_feed_rather_than_describing_it() {
         let status = bundle_status(&repository_root());
-        assert!(status.contains("`5.0.0`"), "{status}");
+        assert!(status.contains("`6.0.0`"), "{status}");
         assert!(
             status.contains("| Districts in the feed | 609 |"),
             "{status}"

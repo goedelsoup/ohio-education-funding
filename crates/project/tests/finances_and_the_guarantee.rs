@@ -227,6 +227,151 @@ fn guaranteed_districts_are_below_their_own_fy2020_receipts_and_formula_district
 }
 
 #[test]
+fn the_panel_spans_the_sharpest_price_change_in_forty_years() {
+    // The fact that makes every nominal statement above provisional. A district whose state aid
+    // rose 5% across this span lost a fifth of its purchasing power, and a reader given only the
+    // nominal figure would read a gain.
+    let cpi = deflate::CpiSeries::cpi_u_june();
+    let growth = cpi
+        .index_growth(FiscalYear(2020), FiscalYear(2025))
+        .expect("both endpoints are in the committed series");
+    assert!(
+        (growth - 0.2512).abs() < 0.001,
+        "CPI-U June growth {growth:.4}"
+    );
+    assert!(cpi.label().contains("CPI-U"), "the index must name itself");
+}
+
+#[test]
+fn statewide_cash_did_not_rise_in_real_terms_and_ended_a_fifth_below_where_it_started() {
+    // The headline of this phase, corrected. Nominally the balance rose from $8.37bn to a peak
+    // of $11.20bn and fell to $9.14bn — a story about a build-up and a drawdown that still ends
+    // above where it began. In FY2020 dollars it ends **below**.
+    let cpi = deflate::CpiSeries::cpi_u_june();
+    let real = |year: u16| {
+        cpi.convert(
+            statewide(year, |y| y.ending_cash),
+            FiscalYear(year),
+            FiscalYear(2020),
+        )
+        .expect("covered")
+        .value
+            / 1e9
+    };
+    let start = real(2020);
+    let peak = real(2024);
+    let end = real(2025);
+
+    assert!((start - 8.37).abs() < 0.02, "FY2020 ${start:.2}bn");
+    assert!(peak > start, "the build-up is real as well as nominal");
+    assert!(
+        end < start,
+        "FY2025 real cash ${end:.2}bn against FY2020 ${start:.2}bn — nominally it is higher"
+    );
+    let fall = 1.0 - end / start;
+    assert!(
+        fall > 0.10 && fall < 0.20,
+        "real cash ended {fall:.3} below where it started"
+    );
+}
+
+#[test]
+fn real_state_aid_fell_for_most_districts_over_the_observed_span() {
+    // Fully observed: FY2020 and FY2025 are both actuals and both endpoints are in the price
+    // series, so this needs no assumption about a future index. Nominal state aid rose for most
+    // districts across these six years. Real state aid did not.
+    let cpi = deflate::CpiSeries::cpi_u_june();
+    let money = finances();
+
+    let mut nominal_up = 0;
+    let mut real_up = 0;
+    let mut changes = Vec::new();
+    for district in &money {
+        let (Some(first), Some(last)) = (
+            district.year(FiscalYear(2020)),
+            district.year(FiscalYear(2025)),
+        ) else {
+            continue;
+        };
+        if first.unrestricted_aid <= 0.0 {
+            continue;
+        }
+        if last.unrestricted_aid > first.unrestricted_aid {
+            nominal_up += 1;
+        }
+        let real = district
+            .real_change(&cpi, |y| y.unrestricted_aid)
+            .expect("covered")
+            .expect("positive base");
+        if real > 0.0 {
+            real_up += 1;
+        }
+        changes.push(real);
+    }
+
+    let typical = median(changes.clone());
+    assert!(
+        nominal_up > changes.len() / 2,
+        "{nominal_up} of {} rose nominally",
+        changes.len()
+    );
+    assert!(
+        real_up < nominal_up,
+        "deflating cannot turn a fall into a rise: {real_up} against {nominal_up}"
+    );
+    assert!(
+        typical < 0.0,
+        "the median district's real state aid changed by {typical:.3}"
+    );
+}
+
+#[test]
+fn the_guarantee_erodes_because_it_is_a_nominal_floor() {
+    // What "held at FY2020" means once a price index is applied to it. The guarantee is written
+    // in dollars and dollars do not hold their value, so a district it protects loses ground
+    // every year by construction — not through any decision, and without anything in the
+    // formula recording that it happened.
+    //
+    // Stated over the observed span so it rests on no assumption about a future index: the
+    // FY2027 comparison in the sibling test cannot be deflated, because June 2027 has not
+    // happened.
+    let cpi = deflate::CpiSeries::cpi_u_june();
+    let money = finances();
+    let mut guaranteed = Vec::new();
+    let mut on_formula = Vec::new();
+    for record in panel() {
+        let Some(district) = for_district(&money, &record.irn) else {
+            continue;
+        };
+        let Ok(Some(real)) = district.real_change(&cpi, |y| y.unrestricted_aid) else {
+            continue;
+        };
+        if record.guarantee > 0.0 {
+            guaranteed.push(real);
+        } else {
+            on_formula.push(real);
+        }
+    }
+
+    let held = median(guaranteed.clone());
+    let other = median(on_formula.clone());
+    assert!(
+        held < other,
+        "guaranteed districts fared {held:.3} against {other:.3} on formula"
+    );
+    assert!(
+        held < 0.0,
+        "the median guaranteed district's real state aid changed {held:.3}"
+    );
+    let losing = guaranteed.iter().filter(|r| **r < 0.0).count();
+    assert!(
+        losing * 4 > guaranteed.len() * 3,
+        "only {losing} of {} guaranteed districts lost ground in real terms",
+        guaranteed.len()
+    );
+}
+
+#[test]
 fn the_pandemic_years_are_declared_so_a_reader_cannot_miss_them() {
     // Every claim above about FY2020 to FY2024 sits inside this window, and the module says so
     // rather than leaving it to a footnote nobody reads.

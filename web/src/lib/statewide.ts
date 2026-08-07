@@ -2,7 +2,97 @@
 
 import { barChart, type Bar } from "./chart.ts";
 import { count, millions, money, pct } from "./format.ts";
+import { realChange, series, type Basis } from "./real.ts";
 import type { Bundle, District } from "./types.ts";
+
+/**
+ * The financial actuals, statewide, in both bases.
+ *
+ * # Why both, side by side
+ *
+ * Nominal, the story is a build-up and a partial drawdown that still ends above where it
+ * started. In FY2020 dollars it ends **below**. Those two sentences support opposite arguments
+ * about whether Ohio's districts are better placed than they were, and the difference is
+ * entirely CPI — which rose 25.1% across the span. Showing one without the other would be
+ * picking a side by omission, so this card shows both and names the index.
+ */
+export function renderStatewideFinances(bundle: Bundle, basis: Basis): string {
+  const actuals = bundle.statewide.finances;
+  if (actuals.length === 0) return "";
+  const { years, converted, base } = series(bundle.deflator, actuals, basis);
+  const first = years[0]!;
+  const latest = years[years.length - 1]!;
+  const peak = years.reduce((a, b) => (b.ending_cash > a.ending_cash ? b : a));
+
+  const cashChange = latest.ending_cash - first.ending_cash;
+  const realAid = realChange(bundle.deflator, actuals, (y) => y.state_aid);
+  const nominalAid = actuals[actuals.length - 1]!.state_aid / actuals[0]!.state_aid - 1;
+
+  const bars: Bar[] = years.map((y) => ({
+    label: `FY${y.fiscal_year}`,
+    value: y.ending_cash,
+    hover: `FY${y.fiscal_year}: ${millions(y.ending_cash).replace("+", "")} held, ${millions(y.total_revenue).replace("+", "")} in, ${millions(y.total_expenditure).replace("+", "")} out`,
+    ...(y.fiscal_year === peak.fiscal_year || y.fiscal_year === latest.fiscal_year
+      ? { direct: millions(y.ending_cash).replace("+", "") }
+      : {}),
+  }));
+
+  const label = converted
+    ? `FY${base} dollars`
+    : basis === "real"
+      ? "nominal — the index does not cover this panel"
+      : "nominal";
+
+  return `
+    <div class="card">
+      <h2>What districts actually received, spent, and hold</h2>
+      <div class="basis" role="group" aria-label="Dollar basis">
+        <button data-basis="nominal" class="${basis === "nominal" ? "active" : ""}"
+                aria-pressed="${basis === "nominal"}">Nominal</button>
+        <button data-basis="real" class="${basis === "real" ? "active" : ""}"
+                aria-pressed="${basis === "real"}">Constant dollars</button>
+        <span class="n">Showing ${label}</span>
+      </div>
+
+      <div class="tiles">
+        <div class="tile"><div class="k">Cash held, FY${latest.fiscal_year}</div>
+          <div class="v">${millions(latest.ending_cash).replace("+", "")}</div>
+          <div class="n">${(latest.ending_cash / latest.total_expenditure).toFixed(2)} years of
+            spending at this rate</div></div>
+        <div class="tile"><div class="k">Change since FY${first.fiscal_year}</div>
+          <div class="v ${cashChange < 0 ? "loss" : "gain"}">${millions(cashChange)}</div>
+          <div class="n">${
+            converted
+              ? "in constant dollars, so this is purchasing power"
+              : "before any price index"
+          }</div></div>
+        <div class="tile"><div class="k">State aid, FY${first.fiscal_year}–FY${latest.fiscal_year}</div>
+          <div class="v ${(realAid ?? 0) < 0 ? "loss" : "gain"}">${
+            realAid == null ? "—" : pct(realAid, 1)
+          }</div>
+          <div class="n">real; ${pct(nominalAid, 1)} nominal</div></div>
+      </div>
+
+      <div class="chartwrap" data-chart="statewide-cash">${barChart(bars)}</div>
+      <p class="note">General fund cash held at 30 June, summed over the
+        ${count(bundle.statewide.districts)} districts in this feed.
+        ${
+          converted
+            ? `Deflated with <strong>${bundle.deflator?.label ?? "an index"}</strong>. Nominally
+               the balance ends ${pct(actuals[actuals.length - 1]!.ending_cash / actuals[0]!.ending_cash - 1, 0)}
+               above FY${first.fiscal_year}; in constant dollars it ends
+               ${pct(cashChange / first.ending_cash, 0)}. Both are correct and they support
+               opposite arguments, which is why this page will not show only one.`
+            : `These are the figures as filed. The panel spans the sharpest price change in forty
+               years, so switch to constant dollars before drawing a conclusion from the shape.`
+        }</p>
+      <p class="note">FY2021–FY2024 are the federal pandemic relief years: that money was booked
+        in the general fund by some districts and separately by others, so a balance rising
+        across them is not evidence about districts' own positions. These are audited actuals
+        from districts' five-year forecast filings — not the FY${bundle.fiscal_year} calculator,
+        and not comparable to it line for line.</p>
+    </div>`;
+}
 
 /** Quintiles of assessed valuation per pupil, poorest first. */
 export function wealthQuintiles(districts: District[]): District[][] {
@@ -34,7 +124,7 @@ export function guaranteeRateByQuintile(districts: District[]): Bar[] {
 }
 
 /** Render the statewide view. */
-export function renderStatewide(bundle: Bundle): string {
+export function renderStatewide(bundle: Bundle, basis: Basis = "nominal"): string {
   const s = bundle.statewide;
   const bars = guaranteeRateByQuintile(bundle.districts);
 
@@ -95,5 +185,7 @@ export function renderStatewide(bundle: Bundle): string {
         base cost however wealthy they are. That minimum is
         ${pct(s.minimum_state_share, 0)} in this model, not the 5% the Fair School Funding Plan
         was enacted with — each biennial budget sets it.</p>
-    </div>`;
+    </div>
+
+    ${renderStatewideFinances(bundle, basis)}`;
 }

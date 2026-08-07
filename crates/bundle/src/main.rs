@@ -12,7 +12,7 @@
 use std::collections::HashMap;
 
 use bundle::{
-    Bundle, Checkpoint, District, DistrictOutcome, FinanceYear, ForecastCheckpoint,
+    Bundle, Checkpoint, Deflator, District, DistrictOutcome, FinanceYear, ForecastCheckpoint,
     OutcomeStatewide, PolicyShape, Projection, Statewide, CONTRACT_VERSION,
 };
 use dispersion::{partial_correlation, wealth_neutrality};
@@ -295,6 +295,46 @@ fn to_district(
     }
 }
 
+/// Fiscal years the financial panel covers, oldest first.
+fn covered_years(districts: &[District]) -> Vec<u16> {
+    let mut years: Vec<u16> = districts
+        .iter()
+        .flat_map(|d| d.finances.iter().map(|y| y.fiscal_year))
+        .collect();
+    years.sort_unstable();
+    years.dedup();
+    years
+}
+
+/// Sum the per-district actuals into one statewide series.
+fn statewide_finances(districts: &[District]) -> Vec<FinanceYear> {
+    covered_years(districts)
+        .into_iter()
+        .map(|fiscal_year| {
+            let mut total = FinanceYear {
+                fiscal_year,
+                state_aid: 0.0,
+                local_tax: 0.0,
+                total_revenue: 0.0,
+                total_expenditure: 0.0,
+                ending_cash: 0.0,
+            };
+            for year in districts
+                .iter()
+                .flat_map(|d| d.finances.iter())
+                .filter(|y| y.fiscal_year == fiscal_year)
+            {
+                total.state_aid += year.state_aid;
+                total.local_tax += year.local_tax;
+                total.total_revenue += year.total_revenue;
+                total.total_expenditure += year.total_expenditure;
+                total.ending_cash += year.ending_cash;
+            }
+            total
+        })
+        .collect()
+}
+
 fn main() {
     // Profile columns: 3 economically disadvantaged, 4 valuation/pupil, 6 effective class 1
     // millage, 7 operating expenditure per pupil.
@@ -308,6 +348,7 @@ fn main() {
     let records = panel();
     let outcomes = joined();
     let money = finances();
+    let cpi = deflate::CpiSeries::cpi_u_june();
     let districts: Vec<District> = records
         .iter()
         .map(|record| {
@@ -356,6 +397,10 @@ fn main() {
         guarantee_total: districts.iter().map(|d| d.guarantee).sum(),
         realized_aid_total: records.iter().map(DistrictRecord::realized_aid).sum(),
         minimum_state_share: MINIMUM_STATE_SHARE,
+        // Summed over the districts in the feed, not over the 660-body panel behind it. The
+        // page cannot then disagree with the feed about which districts are in the total, and
+        // the population matches every other statewide figure here.
+        finances: statewide_finances(&districts),
         outcomes: outcome_statewide(&outcomes),
     };
 
@@ -426,6 +471,13 @@ fn main() {
         statewide,
         checkpoints,
         projection: Some(projection),
+        deflator: Some(Deflator {
+            label: cpi.label().to_string(),
+            points: covered_years(&districts)
+                .into_iter()
+                .filter_map(|year| cpi.point(FiscalYear(year)).map(|point| (year, point.index)))
+                .collect(),
+        }),
         districts,
     };
     print!("{}", bundle.to_json());

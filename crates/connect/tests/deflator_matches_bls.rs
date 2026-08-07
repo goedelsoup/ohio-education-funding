@@ -18,7 +18,11 @@ fn every_committed_index_point_matches_the_published_series() {
     let observations = cpi::parse_series(EXTRACT, ALL_ITEMS_NSA, JUNE);
     let checks = cpi::check_committed_series(&observations);
 
-    assert_eq!(checks.len(), 23, "FY2000 through FY2022");
+    assert_eq!(
+        checks.len(),
+        27,
+        "FY2000 through FY2026, less the years the Bureau has no June for"
+    );
     let disagreements: Vec<String> = checks
         .iter()
         .filter(|check| !check.agrees())

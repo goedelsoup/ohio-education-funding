@@ -45,6 +45,13 @@ without overlapping: the **FY2023 required spring update** (actuals FY2020–FY2
 *required* spring window is chosen over the optional fall and final ones because every district
 files it.
 
+**Every figure in it is nominal.** The span it covers contains the sharpest price change in forty
+years — CPI-U June rose **25.1%** from FY2020 to FY2025 — so a nominal statement about this panel
+can have the wrong *sign*, not merely the wrong magnitude. Statewide district cash ends the span
+8% above where it started in nominal dollars and 14% below in constant ones. Anything drawn from
+this source must say which basis it is in, and
+[`crates/deflate`](../../crates/deflate/) is what converts it.
+
 **Caveats:**
 
 - **Actual and forecast are different claims and this corpus extracts only the actuals.** The

@@ -33,7 +33,7 @@ test.describe("boot", () => {
     const response = await request.get("/data/bundle.json");
     expect(response.status()).toBe(200);
     const bundle = await response.json();
-    expect(bundle.contract_version).toBe("5.0.0");
+    expect(bundle.contract_version).toBe("6.0.0");
     expect(bundle.districts).toHaveLength(609);
   });
 
@@ -113,6 +113,10 @@ test.describe("the verification gate", () => {
 test.describe("tabs and links", () => {
   test("switching tabs moves the fragment and the selected panel together", async ({ page }) => {
     await page.goto("/");
+    // The tab buttons are in the inert shell and their listeners are attached by `boot()`, so a
+    // click before the feed resolves does nothing. This raced once the feed passed a megabyte;
+    // waiting for the picker to be written is waiting for boot.
+    await expect(page.locator("#pick option")).toHaveCount(609);
 
     await page.getByRole("tab", { name: "Statewide" }).click();
     await expect(page).toHaveURL(/#statewide$/);
@@ -138,7 +142,7 @@ test.describe("tabs and links", () => {
     await page.goto("/#statewide");
     await expect(page.locator("[data-panel=statewide]")).toBeVisible();
     await expect(page.locator("#statewide-out")).toContainText("Who is on the guarantee");
-    await expect(page.locator("#statewide-out svg.chart")).toBeVisible();
+    await expect(page.locator("#statewide-out svg.chart").first()).toBeVisible();
   });
 
   test("a shared scenario link arrives with its levers already set", async ({ page }) => {
@@ -407,6 +411,54 @@ test.describe("the actuals", () => {
       expect(at, "a direct label has no box").not.toBeNull();
       expect(at!.x + at!.width).toBeLessThanOrEqual(box!.x + box!.width + 1);
     }
+  });
+});
+
+test.describe("constant dollars", () => {
+  test("offers both bases and says which is showing", async ({ page }) => {
+    await page.goto("/#statewide");
+    const card = page
+      .locator("#statewide-out .card")
+      .filter({ hasText: "What districts actually received" });
+    await expect(card.locator(".basis")).toContainText("Showing nominal");
+    await expect(card.locator('[data-basis="nominal"]')).toHaveAttribute("aria-pressed", "true");
+
+    await card.locator('[data-basis="real"]').click();
+    await expect(card.locator(".basis")).toContainText("Showing FY2020 dollars");
+    // A real figure never appears without the index that produced it.
+    await expect(card).toContainText("CPI-U");
+  });
+
+  test("deflating reverses the sign of the cash story", async ({ page }) => {
+    // The reason the toggle exists rather than a footnote. Nominally the statewide balance ends
+    // above where it started; in constant dollars it ends below. Both are correct and they
+    // support opposite arguments, so the page shows both rather than picking by omission.
+    await page.goto("/#statewide");
+    const card = page
+      .locator("#statewide-out .card")
+      .filter({ hasText: "What districts actually received" });
+    const change = card.locator(".tile").filter({ hasText: "Change since" }).locator(".v");
+
+    await expect(change).toHaveClass(/gain/);
+    await card.locator('[data-basis="real"]').click();
+    await expect(change).toHaveClass(/loss/);
+    await expect(card).toContainText("support opposite arguments");
+  });
+
+  test("real state aid fell far more than nominal state aid", async ({ page }) => {
+    // The finding the price index makes visible: statewide state aid is roughly flat in nominal
+    // dollars across FY2020-FY2025 and down a fifth in real ones.
+    await page.goto("/#statewide");
+    const card = page
+      .locator("#statewide-out .card")
+      .filter({ hasText: "What districts actually received" });
+    const aid = card.locator(".tile").filter({ hasText: "State aid, FY2020" });
+    await expect(aid.locator(".v")).toContainText("-");
+    await expect(aid.locator(".n")).toContainText("nominal");
+
+    const real = Number((await aid.locator(".v").textContent())!.replace(/[^0-9.-]/g, ""));
+    const nominal = Number((await aid.locator(".n").textContent())!.replace(/[^0-9.-]/g, ""));
+    expect(real).toBeLessThan(nominal - 10);
   });
 });
 
