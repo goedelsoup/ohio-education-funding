@@ -32,24 +32,31 @@ counterfactual expressible: a scenario is this calculator invoked twice with two
 
 ## Status
 
-**Partially implemented** in [`crates/foundation/`](../../crates/foundation/src/lib.rs).
-14 tests.
+**Complete** in [`crates/foundation/`](../../crates/foundation/src/lib.rs). 18 tests.
 
-Teacher base cost [R.C. 3317.011(D)] is complete and verified: six tests reproduce the
-department's published worked example — funded classroom teachers 851.52, special teachers
-135.61, and all four cost components summing to $87,984,148.77. Five of the seven student
-support elements [3317.011(E)] are implemented.
+All five statutory sub-components and all 22 elements are implemented: teacher
+[3317.011(D)], student support [(E)], district leadership and accountability [(F)], building
+leadership and operation [(G)], and athletic co-curricular [(H)].
 
-**There is deliberately no `aggregate_base_cost` function.** District leadership,
-building leadership, and athletic co-curricular are not implemented, so any total would be
-wrong by roughly a third while looking authoritative — and would propagate into every state
-share and scenario downstream. The crate exposes what is verified and nothing that pretends to
-be more.
+**`aggregate_base_cost` now exists**, and the end-to-end test is the strong one: the five
+sub-components sum to the published aggregate of **$148,960,701.95**, a figure that also
+appears independently on the department's state share report. That verifies the components
+against each other rather than each against its own screenshot.
 
-One implementation detail is load-bearing and has its own test: funded teacher counts are
-rounded to two decimals **before** multiplication, as the department does. Keeping full
-precision instead moves the special teacher component by hundreds of dollars on a mid-sized
-district and no longer matches the published figure.
+Two structural features the implementation surfaced, neither of which is obvious from the
+statute text:
 
-A further test asserts the property the seeded scenario depends on — refreshing the salary
-inputs changes the price terms without moving staffing at all.
+- **Administrator salaries are derived, not looked up.** Only the superintendent has an explicit
+  salary band; other district administrators are priced at 82.8% of it and building leaders at
+  79.38%. A change to the superintendent band moves four elements. There is a test for this.
+- **The superintendent band is a ramp.** $160,000 above 4,000 ADM, $80,000 below 500, linearly
+  interpolated between — the only place in base cost where a price varies with district size.
+  Tested for continuity at both thresholds.
+
+Also load-bearing and separately tested: funded counts round to two decimals **before**
+multiplication, and building operation subtracts the safety per-pupil amount so safety is not
+funded twice across sub-components.
+
+Blocked on nothing for a single district. To run across all 606 it needs per-district
+grade-band enrollment and open-building counts, which the FY2024 District Profile Report does
+not carry.

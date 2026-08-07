@@ -22,10 +22,18 @@ See the class definition: [scenario.ont.yml](../scenario.ont.yml).
 
 | Node | Question | Status |
 |------|----------|--------|
-| [fsfp-input-year-refresh](fsfp-input-year-refresh.yml) | What does freezing FSFP cost inputs cost districts? | Specified, not run |
+| [fsfp-input-year-refresh](fsfp-input-year-refresh.yml) | What does freezing FSFP cost inputs cost districts? | **Run** |
 
-## Prerequisite
+The first scenario has a result: refreshing the teacher salary input from FY2022 to FY2024
+raises base cost by $352.33 per pupil, and districts on formula receive **100%** of that while
+districts at the 5% state share floor receive **5%** — a binary split rather than a gradient.
+The node had predicted "disproportionate"; the run showed something sharper, and the node
+records both the prediction and the correction.
 
-No scenario can be run until the `foundation` calculator exists and the parameter series in
-[`parameter/`](../parameter/) are populated. Both are named gaps. Until then this class holds
-questions, not answers.
+## What running a scenario requires
+
+A scenario needs the calculators its perturbation touches and the parameter values its baseline
+rests on. For this one that meant `foundation` complete through all five base cost
+sub-components and `local-capacity` for the state share step. Scenarios touching the deduct
+mechanism or cross-regime comparison still cannot run — `deduction` and `regime-diff` are
+stubs.
