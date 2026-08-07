@@ -1,0 +1,74 @@
+class: metric
+label: Effective Operating Millage
+description: |
+  The property tax rate a district actually levies for current operating expenses after
+  [H.B. 920](../legislation/hb-920-1976.yml) reduction factors, as distinct from the rate its
+  voters approved. The gap between the two is the entire H.B. 920 mechanism expressed as a
+  number.
+
+  Ohio reports it separately for **Class 1** property (residential and agricultural) and
+  **Class 2** (all other), because reduction factors are computed per class and the two diverge
+  as residential and commercial values move differently. A district can be at the floor for one
+  class and above it for the other, so "the district's effective millage" is not a single
+  quantity and any analysis must say which class it means. [verified]
+
+  This metric exists chiefly to determine floor status, which is a regime switch rather than a
+  continuous variable — see [twenty-mill-floor](../parameter/twenty-mill-floor.yml). Above the
+  floor, valuation growth on existing property does not reach revenue; at the floor it passes
+  through directly. Partitioning districts on this metric is the precondition for any credible
+  statewide property tax analysis. [inference]
+
+  **The statewide picture, TY2023, Class 1, all 606 traditional districts** [verified]:
+  median 23.40 mills, maximum 84.29, with 170 districts at exactly 20.000 and 233 within half a
+  mill of it. The distribution is therefore bimodal in effect: a large cluster pinned at the
+  floor and a long right tail of districts whose voters have approved far more than reduction
+  factors have taken away.
+
+  The spread in *voted* millage is far wider than the spread in effective millage, which is the
+  mechanism doing its work: Upper Arlington's voters approved 112.76 mills and the district
+  levies 37.09; Northern Local's approved 31.35 and it levies exactly 20. [verified] Reduction
+  factors compress the top of the distribution and the floor holds up the bottom.
+properties:
+  name: Effective operating millage
+  unit: mills
+  definition: |
+    effective_operating_millage = voted current operating millage x reduction factor,
+    subject to a statutory floor of 20 mills for city, local, and exempted village districts
+    and 2 mills for joint vocational school districts, where the floor cannot raise a rate
+    above the voted rate.
+
+    Computed and reported separately for Class 1 (residential and agricultural) and Class 2
+    (all other real property). A figure without its class is not usable.
+  inputs: |
+    Current operating millage and effective Class 1 and Class 2 millage by district and tax
+    year — FY2024 District Profile Report, and `tax-abstract` for the underlying abstracts.
+  caveats: |
+    Class 1 and Class 2 rates differ and are not interchangeable.
+
+    Five districts in the FY2024 report show an effective rate marginally above their voted
+    rate — up to 0.0004 mills — which is published rounding, not a data error. A validity check
+    with too tight a tolerance rejects good rows. [verified]
+
+    Fourteen districts report effective Class 1 rates just below 20 mills despite having voted
+    between 23 and 48. The corpus's model of the floor does not account for this and the cause
+    is unresolved. [open]
+
+    Tax year and fiscal year are offset; the FY2024 report carries TY2023 millage.
+  calculator: millage
+links:
+  - target: ../metric.ont.yml
+    relationship: instance-of
+  - target: ../parameter/twenty-mill-floor.yml
+    relationship: determines-status-against
+  - target: ../revenue-stream/local-property-tax.yml
+    relationship: measures-yield-of
+  - target: ../doctrine/equity.yml
+    relationship: operationalizes
+  - target: ../education-agency/northern-local-perry.yml
+    relationship: measures
+  - target: ../education-agency/upper-arlington-city.yml
+    relationship: measures
+  - target: ../fiscal-period/fy2026.yml
+    relationship: computed-for
+  - target: ../../catalog/cupp-district-profile-report.md
+    relationship: sourced-from

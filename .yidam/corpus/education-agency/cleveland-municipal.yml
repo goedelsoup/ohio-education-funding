@@ -29,8 +29,23 @@ description: |
   [Cleveland Scholarship](../program/cleveland-scholarship.yml) having operated in this district
   for three decades. [inference]
 
-  Enrollment, valuation, scholarship dollar amounts, and the state funding series remain
-  unpopulated. [open]
+  **The FY2024 figures confirm the urban complication and add a surprise.** Assessed valuation
+  per pupil is $184,904 — the *lowest* of the three exemplars, below Northern Local's $279,983
+  and well under the statewide median of $248,097. [verified] Cleveland's valuation is enormous
+  in absolute terms and modest per pupil, because it is divided across 32,744 students. Every
+  student in the district is economically disadvantaged: the reported share is 100%. [verified]
+
+  Yet its operating expenditure per pupil is $25,594 — the highest of the three, and roughly
+  $10,000 above the statewide median. [verified] State revenue supplies 38.4% and local 31.4%,
+  with the balance federal and other. The gap between those shares and the total is where
+  high-poverty urban districts differ structurally from both wealthy suburbs and rural
+  districts: categorical and federal streams do work here that the base formula does not.
+  [inference]
+
+  Effective Class 1 millage is 40.11 against 78.2 voted — comfortably above the floor.
+  [verified]
+
+  Scholarship dollar amounts and the state funding series by year remain unpopulated. [open]
 properties:
   irn: 043786 [verified — FY2021 IDEA Part B allocation list]
   agency_type: city
@@ -38,6 +53,14 @@ properties:
   fy2021_idea_part_b: |
     Public school students with disabilities: 8,027. Non-public: 609.
     Allocation: $12,818,292.57. Proportionate share: $903,930.07. [verified]
+  fy2024_profile: |
+    Enrolled ADM 32,743.64; economically disadvantaged 100%; students with disabilities 26.1%.
+    Classroom teachers' average salary $81,620.78.
+    Assessed valuation per pupil (FY2023) $184,903.95 — lowest of the three exemplars.
+    Current operating millage (TY2023) 78.2; effective Class 1 millage 40.1161.
+    Total operating expenditure per pupil $25,594.49 — highest of the three.
+    State revenue per pupil $10,026.96 (38.41% of total); local $8,204.61 (31.43%);
+    total revenue per pupil $26,106.19. [verified — FY2024 District Profile Report]
   typology: |
     Urban, very high poverty. Exact department typology code not yet established. [open]
   established: Not yet established. [open]

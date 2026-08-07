@@ -30,10 +30,16 @@ statewide series from FY2000 to FY2022. It carries the corpus's clearest demonst
 expenditure rose **116.8% nominally and 26.1% in real terms** — and 19.4% if federal COVID
 relief is excluded. Three correct numbers, three different arguments.
 
+| [effective-operating-millage](effective-operating-millage.yml) | mills | Equity — the local effort side |
+
+The dispersion statistics themselves are computed by
+[`crates/dispersion`](../../../crates/dispersion/) and recorded on
+[`doctrine/equity`](../doctrine/equity.yml) rather than as a node of their own, since they
+describe a distribution rather than an agency.
+
 ## Known gaps
 
-The dispersion statistics the `dispersion` calculator is specified to produce — coefficient of
-variation, McLoone and Verstegen indices, federal range ratio — have no node yet, and neither
-does effective operating millage, which determines 20-mill floor status and gates every local
-revenue question. Per-district expenditure series exist on the Auditor of State dashboard and
-are not extracted. [open]
+No metric covers the scholarship and community school diversion, so a district's net position
+is still not measurable — the `deduction` calculator remains a stub. Per-district expenditure
+series over time exist on the Auditor of State dashboard and are not extracted, so every metric
+here is a single cross-section rather than a series. [open]

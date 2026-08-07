@@ -33,6 +33,19 @@ description: |
   a district gets at least six special teachers and five wellness staff regardless of size,
   small districts carry much higher per-pupil base costs — above $8,000 for the roughly
   one-sixth of Ohio districts under about 700 students. [inference, Fordham]
+
+  **What the stale input year looks like on the ground.** FY2022 base cost priced a teacher at
+  the FY2018 statewide average of $62,696. By FY2024, the lowest-paying of this corpus's three
+  exemplar districts — [Northern Local](../education-agency/northern-local-perry.yml), rural
+  and property-modest — paid an average classroom teacher $66,775. Cleveland paid $81,621 and
+  Upper Arlington $91,750. [verified] Even after H.B. 33 refreshed the inputs to FY2022, the
+  formula prices staffing below what the *cheapest* district in this set actually pays, and
+  [H.B. 96](../legislation/hb-96-2025.yml) holds that reference year through FY2027.
+  [inference]
+
+  A district is funded for the staff the ratios say it needs, at a price no district in the
+  sample pays. That gap is not a criticism of the model's structure — the build-up is sound —
+  but it is the difference between a costing and a costing-shaped number. [inference]
 properties:
   name: FSFP base cost calculation
   function: |

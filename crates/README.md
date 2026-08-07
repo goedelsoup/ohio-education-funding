@@ -59,6 +59,7 @@ dependency resolution succeeding first.
 | [`local-capacity`](local-capacity/) | calculator | FSFP side implemented; charge-off side not | 16 |
 | [`foundation`](foundation/) | calculator | teacher base cost verified; three sub-components absent | 14 |
 | [`millage`](millage/) | calculator | implemented; awaiting real inputs | 13 |
+| [`dispersion`](dispersion/) | calculator | implemented; verified on 606 real districts | 20 |
 
 Run the gate from this directory:
 

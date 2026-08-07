@@ -13,10 +13,30 @@ description: |
   reduction factors made a district's revenue depend on its levy history and its voters rather
   than on any statewide standard. [inference]
 
-  Equity is the doctrine most readily made computable, which is why it is the one this corpus
-  can test most directly: the coefficient of variation, the McLoone and Verstegen indices, and
-  the federal range ratio all measure it, and all can be computed per fiscal period from the
-  same per-agency series. [verified]
+  Equity is the doctrine most readily made computable, and it has now been computed. Across all
+  606 traditional districts in FY2024 [verified — see
+  [`crates/dispersion`](../../../crates/dispersion/tests/cupp_fy24.rs)]:
+
+  - Operating expenditure per pupil: median $15,646, coefficient of variation **0.202**,
+    federal range ratio **1.846**. The district at the 95th percentile spends about 1.85 times
+    the district at the 5th.
+  - The distribution is right-skewed — the top half runs further above the median than the
+    bottom half runs below it — so any mean-based summary overstates the typical district.
+
+  **The wealth-neutrality result is more interesting than the dispersion.** State revenue per
+  pupil correlates with assessed valuation per pupil at **−0.549**: aid does fall as property
+  wealth rises, so equalisation is real, but property wealth explains only about 30% of the
+  variation in state aid. [verified]
+
+  Meanwhile state revenue per pupil correlates with the economically disadvantaged share at
+  **+0.630** — more tightly than with property wealth. [verified] Ohio's formula targets
+  *poverty* better than it targets *property*. Under a design that adds resident income to
+  valuation and weights disadvantaged pupils, that is the mechanism working as intended — and
+  it means the classic wealth-neutrality test, run on valuation alone, understates how much
+  targeting the system actually does. [inference]
+
+  Local revenue per pupil, by contrast, tracks valuation per pupil at above +0.7. [verified]
+  That is the disparity the state formula exists to offset, visible in isolation.
 
   It trades against adequacy in a specific way. Perfect equity is achievable by leveling down —
   every district equally underfunded satisfies equity and fails adequacy. [inference] Ohio has

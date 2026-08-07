@@ -1,0 +1,13 @@
+[package]
+name = "dispersion"
+description = "School finance equity statistics: dispersion and wealth neutrality across agencies"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+repository.workspace = true
+
+[dependencies]
+edfund-core = { path = "../edfund-core" }
+
+[lints]
+workspace = true

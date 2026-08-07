@@ -33,7 +33,23 @@ claim.
 
 ## Status
 
-**Stub — not implemented.** Blocked on per-agency resource series and on defining a per-pupil
-operating expenditure metric, which the corpus names as its largest metric gap. Must be
-composed with `deflate` for any cross-period comparison. Implementation lands in
-`crates/dispersion/`.
+**Implemented** in [`crates/dispersion/`](../../crates/dispersion/src/lib.rs). 20 tests —
+9 unit, 11 integration against real data.
+
+The crate is pure: it takes slices and returns statistics, with no filesystem or network. The
+FY2024 District Profile Report extract for all 606 traditional districts is committed as a
+fixture and drives the integration tests, so the corpus's empirical equity findings are pinned
+and cannot drift silently — a fixture refresh that moves them fails the build rather than
+quietly rewriting the conclusion.
+
+Findings now computed rather than asserted: coefficient of variation 0.202, federal range ratio
+1.846, median operating expenditure per pupil $15,646; state aid correlates with valuation per
+pupil at −0.549 and with economically disadvantaged share at +0.630; local revenue correlates
+with valuation above +0.7.
+
+`weighted_mean` is separate from `Dispersion::mean` on purpose: Ohio has enough small districts
+that the average district and the average student's district differ by more than $200 per
+pupil, and they answer different questions.
+
+**Not yet implemented:** cross-period comparison composed with `deflate`, and dispersion over
+anything but the FY2024 cross-section.

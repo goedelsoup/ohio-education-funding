@@ -6,6 +6,7 @@ members = [
     "local-capacity",
     "foundation",
     "millage",
+    "dispersion",
 ]
 
 [workspace.package]

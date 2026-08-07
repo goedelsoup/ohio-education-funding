@@ -18,8 +18,33 @@ description: |
   [inference] Any credible simulation of a property tax change has to determine floor status
   per district first, because the same change produces opposite effects on the two groups.
 
-  How many districts sit at the floor, and how that count has moved with reappraisal cycles,
-  is a first-order number this node needs. [open]
+  **How many districts sit at the floor: 170 of 606, or 28.1%, in TY2023.** [verified —
+  computed from the FY2024 District Profile Report; see
+  [`crates/dispersion`](../../../crates/dispersion/tests/cupp_fy24.rs)] A further 63 sit within
+  half a mill of it, so 233 districts — more than a third of the state — are at or effectively
+  against the floor. The statewide median effective Class 1 rate is 23.40 mills and the maximum
+  is 84.29. [verified]
+
+  That distribution is the single most important fact about Ohio local school revenue, and it
+  is not a tail phenomenon. More than a quarter of districts are on a revenue trajectory where
+  reappraisal raises income directly, and the rest are on one where it does not. Any statewide
+  property tax analysis that treats districts as homogeneous is averaging across a regime
+  boundary. [inference]
+
+  **An anomaly the corpus's model does not explain.** Twenty districts report an effective
+  Class 1 rate *below* 20 mills. Six are straightforward: they never voted 20 mills — voted
+  rates of 18.7 to 19.71 — and the floor cannot lift a rate above what voters approved. All six
+  are in Appalachian and southern Ohio counties (Vinton, Morrow, Lawrence, Jackson, Pike,
+  Scioto), which is itself worth noting: the districts levying least sit in the poorest part of
+  the state. [verified]
+
+  The other fourteen voted between 23 and 48 mills and still report effective Class 1 rates
+  between 19.72 and 19.994 — just below the floor. [verified] Nothing in the corpus's current
+  account of R.C. 319.301 explains this. Candidate explanations not yet tested: the floor may
+  be applied to a combined or differently-scoped millage base than the Class 1 figure reported
+  here, or certain levy types (emergency and other fixed-sum levies) may be excluded from the
+  floor computation while being counted in current operating millage. [open] The fourteen are
+  pinned by a regression test so a future refinement has something concrete to explain.
 properties:
   name: Twenty-mill floor
   unit: mills

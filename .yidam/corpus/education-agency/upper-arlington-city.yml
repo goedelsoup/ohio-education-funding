@@ -20,6 +20,18 @@ description: |
   correspondingly small. [inference] That asymmetry is the substance of the claim that a
   uniform cut to foundation aid is not uniform in effect.
 
+  The FY2024 figures bear this out precisely. Voters approved 112.76 operating mills — more
+  than three times Northern Local's 31.35 — and reduction factors have cut that to an effective
+  37.09, still nearly double the floor. [verified] Local revenue supplies 76.5% of the
+  district's total against a state share of 12.1%, the mirror image of Northern Local's 39%
+  local and 47.5% state. [verified]
+
+  What that buys is $18,416 per pupil of operating expenditure. [verified] Notably this is
+  *less* than Cleveland Municipal's $25,594 — a reminder that the spending order and the wealth
+  order are not the same, because high-poverty urban districts attract categorical and federal
+  funding that a wealthy suburb does not. [inference] Wealth buys autonomy from the state
+  formula more reliably than it buys the highest per-pupil spending.
+
   Seeded as an exemplar, not as an accusation: nothing in this node asserts that the district
   did anything other than pass levies its residents supported.
   First hard numbers: IRN 044933, with 1,121 public school students with disabilities in FY2021
@@ -35,6 +47,15 @@ properties:
   fy2021_idea_part_b: |
     Public school students with disabilities: 1,121. Non-public: 68.
     Allocation: $1,490,233.42. Proportionate share: $85,227.82. [verified]
+  fy2024_profile: |
+    Enrolled ADM 6,395.02; economically disadvantaged 7.27%; students with disabilities 18.53%.
+    Classroom teachers' average salary $91,750.39 — the highest of the three exemplars.
+    Assessed valuation per pupil (FY2023) $458,526.14; one mill raises $458.53 per pupil.
+    Current operating millage (TY2023) 112.76; effective Class 1 millage 37.0886 — well above
+    the floor, so reduction factors are fully operative.
+    Total operating expenditure per pupil $18,416.05.
+    State revenue per pupil $2,423.54 (12.11% of total); local $15,311.58 (76.49%);
+    total revenue per pupil $20,018.15. [verified — FY2024 District Profile Report]
   typology: |
     Suburban, very low poverty, high median income. Exact department typology code not yet
     established. [open]
