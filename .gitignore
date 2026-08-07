@@ -5,3 +5,6 @@ target/
 
 # macOS
 .DS_Store
+
+# Downloaded source publications, rebuildable from packages/extract.
+.cache/
