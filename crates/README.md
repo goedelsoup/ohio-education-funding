@@ -30,6 +30,8 @@ retrievable, and six are declared with a recorded reason. See
 - `dispersion` — equity statistics across agencies, operationalizing the `doctrine` nodes
 - `deflate` — nominal-to-real normalization, without which a corpus spanning 1851 to the
   present cannot compare any two numbers honestly
+- `project` — forward projection of enrollment with intervals, and the policy levers over it;
+  it reports simulation and forecast separately and refuses to add them
 
 A semantic index over `.yidam/corpus/` is not built at genesis — 45 nodes fit in context.
 It is added when the corpus outgrows direct retrieval, which the exemplar-agency expansion
@@ -64,6 +66,7 @@ pre-2007 `.xls` format.
 | [`foundation`](foundation/) | calculator | full base cost build-up; verified to the cent | 43 |
 | [`millage`](millage/) | calculator | implemented; verified on 606 real districts | 13 |
 | [`dispersion`](dispersion/) | calculator | implemented; verified on 606 real districts | 20 |
+| [`project`](project/) | calculator | forward projection and policy simulation | 39 |
 | [`bundle`](bundle/) | export | versioned JSON feed for [`web/`](../web/) | 6 |
 
 `spreadsheet` and `connect` are the retrieval side: everything that can fail, and nothing that

@@ -33,6 +33,8 @@ fn median(mut v: Vec<f64>) -> f64 {
 }
 
 fn main() {
+    // FY27 model columns: 2 base cost ADM, 14 base cost per pupil, 15 guarantee,
+    // 16/18 enrolled ADM FY2024 and FY2026, 19 valuation per pupil, 20 core foundation.
     // Cupp columns: 4 valuation/pupil, 6 effective class 1 millage, 7 operating EPP,
     // 3 economically disadvantaged.
     let cupp: HashMap<&str, &str> = CUPP
@@ -45,7 +47,7 @@ fn main() {
     let mut districts: Vec<District> = Vec::new();
     for line in FY27.lines().skip(1).filter(|l| !l.trim().is_empty()) {
         let Some(irn) = field(line, 0) else { continue };
-        let (Some(adm), Some(core)) = (parse(line, 2), parse(line, 19)) else {
+        let (Some(adm), Some(core)) = (parse(line, 2), parse(line, 20)) else {
             continue;
         };
         if adm <= 0.0 {
@@ -62,11 +64,11 @@ fn main() {
             formula_aid_per_pupil: core / adm,
             realized_aid_per_pupil: (core + guarantee) / adm,
             guarantee,
-            valuation_per_pupil: parse(line, 18).or_else(|| c.and_then(|l| parse(l, 4))),
+            valuation_per_pupil: parse(line, 19).or_else(|| c.and_then(|l| parse(l, 4))),
             effective_class1_millage: c.and_then(|l| parse(l, 6)),
             operating_expenditure_per_pupil: c.and_then(|l| parse(l, 7)),
             economically_disadvantaged: c.and_then(|l| parse(l, 3)),
-            enrollment_change: match (parse(line, 16), parse(line, 17)) {
+            enrollment_change: match (parse(line, 16), parse(line, 18)) {
                 (Some(a), Some(b)) if a > 0.0 => Some(b / a - 1.0),
                 _ => None,
             },

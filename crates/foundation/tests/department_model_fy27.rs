@@ -34,8 +34,8 @@ struct Row {
     funded_special: f64,
     teacher_base_cost: f64,
     guarantee: f64,
-    adm_fy22: f64,
     adm_fy24: f64,
+    adm_fy26: f64,
     valuation_per_pupil: Option<f64>,
     core_foundation: f64,
 }
@@ -68,9 +68,14 @@ impl Row {
         self.guarantee > 0.0
     }
 
-    /// Enrollment change from FY2022 to FY2024, as a fraction.
+    /// Enrollment change from FY2024 to FY2026, as a fraction.
+    ///
+    /// Named for the years the `ADM Data` sheet declares. The `Base_Cost` sheet labels the same
+    /// three columns FY22/FY23/FY24, which is stale — base cost enrolled ADM is their average,
+    /// and an FY2027 calculation averages FY2024 through FY2026. The earlier version of this
+    /// fixture carried the stale names.
     fn enrollment_change(&self) -> f64 {
-        self.adm_fy24 / self.adm_fy22 - 1.0
+        self.adm_fy26 / self.adm_fy24 - 1.0
     }
 
     /// State aid per pupil as the formula computes it, before the guarantee.
@@ -127,10 +132,10 @@ fn rows() -> Vec<Row> {
                 funded_special: f(11),
                 teacher_base_cost: f(12),
                 guarantee: f(15),
-                adm_fy22: f(16),
-                adm_fy24: f(17),
-                valuation_per_pupil: p[18].trim().parse::<f64>().ok(),
-                core_foundation: f(19),
+                adm_fy24: f(16),
+                adm_fy26: f(18),
+                valuation_per_pupil: p[19].trim().parse::<f64>().ok(),
+                core_foundation: f(20),
             }
         })
         .collect()

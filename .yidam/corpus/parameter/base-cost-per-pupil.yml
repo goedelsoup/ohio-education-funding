@@ -63,10 +63,24 @@ properties:
   simulation_key: base_cost_per_pupil
   sensitivity: |
     Moves every district's computed cost proportionally before local share is applied. Because
-    state aid is the residual after local capacity, a given percentage change in base cost
-    produces a larger percentage change in state aid for districts with high local capacity —
-    except at the bottom, where the 5% minimum state share floors the effect entirely.
-    [inference]
+    state aid is the residual after local capacity, **a dollar of extra base cost per pupil is
+    a dollar of extra state aid per pupil**, not the state's percentage of it: local capacity
+    does not move when base cost does. Scaling the state share proportionally instead is the
+    obvious-looking mistake, and it understates the cost of an increase by the whole local
+    share. [verified — `crates/project`]
+
+    The exception is the bottom of the wealth distribution, where the **minimum state share**
+    floors the effect. That minimum is **10%**, not the 5% the plan was enacted with — it is
+    set by each biennial budget and it doubled, and **138 of 609 districts sit exactly on it**
+    in the FY2027 model. [verified — the department's own Notes sheet states 0.1 for FY2026 and
+    FY2027]
+
+    The aggregate response is therefore **not linear**. Each increment lifts districts off the
+    [guarantee](../formula-component/temporary-transitional-aid-guarantee.yml) and onto a
+    formula that then has to pay them, so the marginal cost per point rises: $47.7M for the
+    first two points, $72.5M by the twentieth. A fiscal note extrapolating a large increase
+    from a small one understates it, and the error grows with the size of the proposal. See
+    [`guarantee-phase-out`](../scenario/guarantee-phase-out.yml). [verified]
 
     Interacts multiplicatively with
     [fsfp-phase-in-percentage](fsfp-phase-in-percentage.yml): raising base cost while holding

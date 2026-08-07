@@ -50,7 +50,8 @@ pub struct District {
     pub operating_expenditure_per_pupil: Option<Dollars>,
     /// Share of students economically disadvantaged, FY2024, as a fraction.
     pub economically_disadvantaged: Option<f64>,
-    /// Enrollment change FY2022 to FY2024, as a fraction.
+    /// Enrollment change FY2024 to FY2026, as a fraction. FY2026 is partly departmental
+    /// estimate rather than actual, since the calculator is published before that year closes.
     pub enrollment_change: Option<f64>,
 }
 
