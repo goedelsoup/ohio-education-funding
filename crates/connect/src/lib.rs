@@ -35,7 +35,7 @@ pub mod cache;
 pub mod conventions;
 pub mod cpi;
 pub mod fixtures;
-pub mod legacy;
+pub mod index;
 pub mod registry;
 pub mod sha256;
 
@@ -43,9 +43,9 @@ use std::path::Path;
 
 use cache::FetchError;
 use registry::Source;
-use spreadsheet::Workbook;
+use spreadsheet::AnyWorkbook;
 
-pub use fixtures::{CPI_FIXTURE, FY27_FIXTURE, PROFILE_FIXTURE};
+pub use fixtures::{CPI_FIXTURE, FY27_FIXTURE, GRADE_BANDS_FIXTURE, PROFILE_FIXTURE};
 
 pub use registry::{connector, source, Connector, Format, Status, CONNECTORS};
 
@@ -78,7 +78,7 @@ pub enum RebuildError {
     /// A source could not be read.
     Source(FetchError),
     /// A workbook could not be parsed.
-    Workbook(spreadsheet::XlsxError),
+    Workbook(spreadsheet::OpenError),
     /// A fixture could not be written.
     Io(std::io::Error),
 }
@@ -101,8 +101,8 @@ impl From<FetchError> for RebuildError {
     }
 }
 
-impl From<spreadsheet::XlsxError> for RebuildError {
-    fn from(cause: spreadsheet::XlsxError) -> Self {
+impl From<spreadsheet::OpenError> for RebuildError {
+    fn from(cause: spreadsheet::OpenError) -> Self {
         Self::Workbook(cause)
     }
 }
@@ -119,7 +119,7 @@ impl From<std::io::Error> for RebuildError {
 ///
 /// Returns [`RebuildError`] if the source is not cached, cannot be converted, or is not a
 /// readable workbook.
-pub fn open_workbook(root: &Path, source: &Source) -> Result<Workbook, RebuildError> {
+pub fn open_workbook(root: &Path, source: &Source) -> Result<AnyWorkbook, RebuildError> {
     let path = cache::cached_path(root, source);
     if !path.exists() {
         return Err(RebuildError::Source(FetchError::NotCached {
@@ -127,12 +127,10 @@ pub fn open_workbook(root: &Path, source: &Source) -> Result<Workbook, RebuildEr
             path,
         }));
     }
-    let path = if source.format == Format::LegacyXls {
-        legacy::to_xlsx(&path)?
-    } else {
-        path
-    };
-    Ok(Workbook::open(std::fs::read(path)?)?)
+    // The format is decided by the file's leading bytes, not by `source.format` or the
+    // extension. The department has published `.xls` files that were XLSX and `.xls` files that
+    // were HTML tables, so the declared format is a hint and the magic number is the fact.
+    Ok(spreadsheet::open(std::fs::read(path)?)?)
 }
 
 /// Rebuild every committed fixture from the cached sources.
@@ -219,6 +217,27 @@ pub fn rebuild(root: &Path) -> Result<Vec<Rebuilt>, RebuildError> {
         )?,
     });
 
+    // The fifth fixture, and the one that until now needed LibreOffice. The department still
+    // publishes October headcount in the pre-2007 format; `spreadsheet` reads it natively.
+    let enrollment = source("enrollment-fy24").expect("registered").1;
+    out.push(match open_workbook(root, enrollment) {
+        Ok(book) => {
+            let headcount = book.rows("fy24_hdcnt_dist")?;
+            Rebuilt::Written {
+                path: fixtures::GRADE_BANDS_FIXTURE.to_string(),
+                rows: fixtures::write_csv(
+                    &root.join(fixtures::GRADE_BANDS_FIXTURE),
+                    fixtures::GRADE_BANDS_HEADER,
+                    &fixtures::build_grade_bands(&headcount, &profile_rows),
+                )?,
+            }
+        }
+        Err(cause) => Rebuilt::Skipped {
+            path: fixtures::GRADE_BANDS_FIXTURE.to_string(),
+            reason: cause.to_string(),
+        },
+    });
+
     let cpi_source = source("cpi-u-all-items").expect("registered").1;
     out.push(match cache::read_cached(root, cpi_source) {
         Ok(bytes) => {
@@ -254,7 +273,11 @@ mod tests {
     #[test]
     fn the_fixtures_rebuild_names_point_at_files_that_exist() {
         let root = cache::repository_root();
-        for path in [fixtures::FY27_FIXTURE, fixtures::PROFILE_FIXTURE] {
+        for path in [
+            fixtures::FY27_FIXTURE,
+            fixtures::PROFILE_FIXTURE,
+            fixtures::GRADE_BANDS_FIXTURE,
+        ] {
             assert!(root.join(path).exists(), "{path} is not committed");
         }
     }

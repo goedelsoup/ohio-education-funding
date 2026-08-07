@@ -31,10 +31,16 @@
 
 #![forbid(unsafe_code)]
 
+pub mod any;
+pub mod biff;
 pub mod inflate;
+pub mod ole2;
 pub mod xlsx;
 pub mod xml;
 pub mod zip;
 
+pub use any::{open, AnyWorkbook, OpenError};
+pub use biff::{BiffError, Workbook as LegacyWorkbook};
+pub use ole2::{Compound, Ole2Error};
 pub use xlsx::{column_index, Workbook, XlsxError};
 pub use zip::{Archive, ZipError};

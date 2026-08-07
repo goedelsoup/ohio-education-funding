@@ -57,7 +57,8 @@ impl Status {
 pub enum Format {
     /// An Office Open XML workbook. [`spreadsheet`] reads these.
     Xlsx,
-    /// A pre-2007 OLE2 workbook. A different format entirely; see [`crate::legacy`].
+    /// A pre-2007 OLE2 workbook. A different format entirely, read natively by
+    /// [`spreadsheet::ole2`] and [`spreadsheet::biff`].
     LegacyXls,
     /// A tab-separated flat file, as the Bureau of Labor Statistics publishes.
     Tsv,
@@ -153,7 +154,8 @@ pub const CONNECTORS: &[Connector] = &[
                 catalog: Some("dew-october-enrollment"),
                 fixture: Some("crates/foundation/fixtures/fy24-district-grade-bands.csv"),
                 note: "October headcount by individual grade. Still published in the pre-2007 \
-                       format; district data is on the third of seven sheets.",
+                       format, which `spreadsheet` now reads natively; district data is on the \
+                       third of seven sheets.",
             },
         ],
     },

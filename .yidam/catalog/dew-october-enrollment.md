@@ -19,11 +19,10 @@ A five-column extract is committed at
 
 **Access constraints.** Free. **Still published in the pre-2007 OLE2 `.xls` format**, which is
 a compound document, not a zip, and shares nothing with XLSX beyond the extension's family
-resemblance. [`crates/spreadsheet`](../../crates/spreadsheet/) does not read it; conversion is
-delegated to headless LibreOffice, and this is consequently the **one source in the registry
-whose extraction is not reproducible from a checkout alone**. Reading it natively means an OLE2
-sector walker and a BIFF8 record parser; that is the honest completion of this connector and it
-is not done.
+resemblance. [`crates/spreadsheet`](../../crates/spreadsheet/) reads it natively — an OLE2
+sector walker and a BIFF8 record parser — so extraction from this source is reproducible from a
+checkout with no external converter. It was not, until the reader was written: the fixture was
+produced through headless LibreOffice, and that pipeline summed a withheld `<10` as zero.
 
 **Caveats:**
 
@@ -33,6 +32,13 @@ is not done.
 - **Small counts are suppressed as `<10`, not withheld as blank.** Treating that as zero
   understates any aggregate over small districts — which are exactly the districts a
   school-funding question is usually about. See `crates/connect/src/conventions.rs`.
+
+  **Five districts in this file have a suppressed grade, and they are the five smallest in
+  Ohio**: Kelleys Island, Put-in-Bay, College Corner, Vanlue, Bloomfield-Mespo. The first three
+  are outside the committed extract already. For the other two the grade band containing the
+  withheld grade is left **blank**, because a band summed over a `<10` is not a smaller band —
+  it is a band whose total is unknown. The LibreOffice-derived fixture summed them as zero and
+  recorded Vanlue's grades 9-12 as 56 where the true figure is between 57 and 65. [verified]
 - **District data is on the third of seven sheets**, which is why conversion targets `.xlsx`
   rather than CSV: LibreOffice's CSV filter exports only the active sheet.
 

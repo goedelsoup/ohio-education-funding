@@ -35,11 +35,10 @@ figure is not the annual total.
 
 ## Status
 
-**Wired.** Implemented in [`crates/connect`](../). Three publications are retrieved and two of
-the three fixtures rebuild from a checkout:
-`fy27-calculator` and `cupp-fy24` through [`spreadsheet`](../../spreadsheet/), and
-`enrollment-fy24` only with headless LibreOffice — see
-[`legacy.rs`](../src/legacy.rs) for why, and what finishing it would take.
+**Wired.** Implemented in [`crates/connect`](../). Three publications are retrieved and **all
+three fixtures rebuild from a checkout**, through [`spreadsheet`](../../spreadsheet/) — which
+now reads the pre-2007 OLE2 format natively as well as XLSX, so the LibreOffice shim this
+connector used to need is gone.
 
 The retrieval interface above was never built as written, and is left as the record of what was
 intended. What exists instead is narrower and concrete: `edfund-connect fetch`, a digest

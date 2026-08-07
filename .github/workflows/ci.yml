@@ -1,0 +1,129 @@
+# Both gates, on every push. They existed and passed for fourteen phases, and nothing ran them
+# except a person remembering to.
+#
+# Nothing here fetches from the department. Every fixture is committed and every test reads a
+# committed fixture, so CI is hermetic and a publisher's outage cannot turn the build red. The
+# retrieval path is checked by `edfund-connect verify` when someone runs it, not here.
+name: ci
+
+on:
+  push:
+    branches: ["main", "ma/*", "rigpa/*", "phase/*", "migrate/*"]
+  pull_request:
+  workflow_dispatch:
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  CARGO_TERM_COLOR: always
+
+jobs:
+  rust:
+    name: crates
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: crates
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install the pinned toolchain
+        run: rustup show && rustup component add rustfmt clippy
+
+      - uses: Swatinem/rust-cache@v2
+        with:
+          workspaces: crates
+
+      - name: fmt
+        run: cargo fmt -- --check
+
+      - name: clippy
+        run: cargo clippy --all-targets -- -D warnings
+
+      - name: test
+        run: cargo test
+
+      # The doc links are load-bearing: they are how a reader gets from a calculator to the
+      # corpus node that says what it is for, and they broke silently once already.
+      - name: doc
+        run: cargo doc --no-deps --workspace
+        env:
+          RUSTDOCFLAGS: -D warnings
+
+  web:
+    name: web
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: web
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 11
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: pnpm
+          cache-dependency-path: web/pnpm-lock.yaml
+
+      - name: Install
+        run: pnpm install --frozen-lockfile
+
+      - name: check
+        run: pnpm check
+
+      - name: unit
+        run: pnpm test:unit
+
+      - name: Install the browser
+        run: pnpm exec playwright install --with-deps chromium
+
+      # The e2e suite is what catches the class of bug unit tests structurally cannot: the
+      # verification gate held shut on every tab except the one it exists for, and only a real
+      # browser found it.
+      - name: e2e
+        run: pnpm test:e2e
+
+      - uses: actions/upload-artifact@v4
+        if: failure()
+        with:
+          name: playwright-report
+          path: web/playwright-report/
+          retention-days: 7
+
+  # Two generated artifacts, both committed, both easy to forget: the feed the site serves and
+  # the REGEN blocks the READMEs carry. If either drifts, the repository is describing itself
+  # wrongly and nothing else would notice.
+  generated:
+    name: generated files are current
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: Swatinem/rust-cache@v2
+        with:
+          workspaces: crates
+
+      - name: The web feed
+        run: |
+          cargo run --manifest-path crates/Cargo.toml -p bundle > /tmp/bundle.json
+          if ! diff -q /tmp/bundle.json web/public/data/bundle.json; then
+            echo "::error::web/public/data/bundle.json is stale."
+            echo "Regenerate: cargo run --manifest-path crates/Cargo.toml -p bundle > web/public/data/bundle.json"
+            diff /tmp/bundle.json web/public/data/bundle.json | head -40
+            exit 1
+          fi
+
+      - name: The README indexes
+        run: |
+          cargo run --manifest-path crates/Cargo.toml -p connect --bin edfund-connect -- index
+          if ! git diff --quiet; then
+            echo "::error::A REGEN block is stale. Regenerate: edfund-connect index"
+            git diff --stat
+            exit 1
+          fi

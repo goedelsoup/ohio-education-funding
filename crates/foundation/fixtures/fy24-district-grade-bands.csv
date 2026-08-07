@@ -51,7 +51,7 @@ irn,district,enrolled_adm_fy24,headcount_kindergarten,headcount_grades_1_3,headc
 046383,Blanchester Local (046383) - Clinton County,1071.2206,89,261,429,304
 046862,Bloom-Carroll Local (046862) - Fairfield County,2262.0645,154,519,919,666
 049593,Bloom-Vernon Local (049593) - Scioto County,767.8029,97,196,297,181
-050096,Bloomfield-Mespo Local (050096) - Trumbull County,198.4961,23,47,76,44
+050096,Bloomfield-Mespo Local (050096) - Trumbull County,198.4961,23,47,76,
 045211,Bluffton Exempted Village (045211) - Allen County,1144.6487,97,250,475,345
 048306,Boardman Local (048306) - Mahoning County,3649.4317,305,831,1414,1100
 049767,Botkins Local (049767) - Shelby County,614.9956,43,150,253,164
@@ -547,7 +547,7 @@ irn,district,enrolled_adm_fy24,headcount_kindergarten,headcount_grades_1_3,headc
 047464,Van Buren Local (047464) - Hancock County,1034.1789,75,249,404,295
 044966,Van Wert City (044966) - Van Wert County,1791.1577,136,444,648,579
 044958,Vandalia-Butler City (044958) - Montgomery County,2693.1087,179,612,1103,896
-047472,Vanlue Local (047472) - Hancock County,149.8833,12,12,31,56
+047472,Vanlue Local (047472) - Hancock County,149.8833,12,,,
 046821,Vermilion Local (046821) - Erie County,1581.2123,97,353,636,504
 045633,Versailles Exempted Village (045633) - Darke County,1246.3536,91,280,474,397
 050393,Vinton County Local (050393) - Vinton County,1583.7064,106,371,620,489
