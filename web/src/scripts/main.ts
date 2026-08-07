@@ -12,6 +12,7 @@ import {
 } from "../lib/scenario.ts";
 import { renderOutcomes } from "../lib/outcomes.ts";
 import { renderStatewide } from "../lib/statewide.ts";
+import type { Basis } from "../lib/real.ts";
 import { REQUIRED_CONTRACT, type Bundle, type District } from "../lib/types.ts";
 import {
   isForecastVerified,
@@ -32,6 +33,8 @@ interface State {
   selected: string;
   tab: Tab;
   levers: Levers;
+  /** Which dollars the financial panels are shown in. */
+  basis: Basis;
 }
 
 let state: State | null = null;
@@ -125,7 +128,7 @@ function render(): void {
     const district = state.byIrn.get(state.selected);
     if (district) $("#district-out").innerHTML = renderDistrict(bundle, district);
   } else if (tab === "statewide") {
-    $("#statewide-out").innerHTML = renderStatewide(bundle);
+    $("#statewide-out").innerHTML = renderStatewide(bundle, state.basis);
   } else if (tab === "outcomes") {
     $("#outcomes-out").innerHTML = renderOutcomes(bundle);
   } else if (isVerified(state.verification)) {
@@ -319,6 +322,7 @@ function boot(bundle: Bundle): void {
     selected: bundle.districts.some((d) => d.irn === "049056")
       ? "049056"
       : (bundle.districts[0]?.irn ?? ""),
+    basis: "nominal",
     tab: fromHash().tab,
     levers: defaultLevers(
       bundle.statewide.minimum_state_share,
@@ -370,6 +374,15 @@ function boot(bundle: Bundle): void {
 
   $("#prov").textContent = bundle.provenance;
   attachHover(document.body, $("#tip"));
+
+  // The nominal/constant-dollar switch. Delegated from the body because the buttons are written
+  // by the renderer and replaced on every re-render.
+  document.body.addEventListener("click", (event) => {
+    const button = (event.target as Element | null)?.closest("[data-basis]");
+    if (!button || !state) return;
+    state.basis = button.getAttribute("data-basis") === "real" ? "real" : "nominal";
+    render();
+  });
 
   if (requested.irn && state.byIrn.has(requested.irn)) {
     state.selected = requested.irn;

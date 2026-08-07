@@ -6,7 +6,7 @@
  */
 
 /** The bundle contract this page understands. */
-export const REQUIRED_CONTRACT = "5.0.0";
+export const REQUIRED_CONTRACT = "6.0.0";
 
 /**
  * The outcome side of a district, where the report card covers it.
@@ -125,6 +125,26 @@ export interface Statewide {
   minimum_state_share: number;
   /** How the funding side relates to the outcome side. `null` if no district joined. */
   outcomes: OutcomeStatewide | null;
+  /**
+   * Closed fiscal years of actuals, summed over the districts in this feed.
+   *
+   * Summed in Rust so the page and the feed cannot disagree about which districts are in the
+   * total. The panel behind it covers 660 reporting bodies including joint vocational
+   * districts; this is the 609 the feed carries.
+   */
+  finances: FinanceYear[];
+}
+
+/**
+ * A price index, so any year of the panel can be restated in another year's dollars.
+ *
+ * The choice of index is a claim, so the label travels with the numbers: CPI-U is a general
+ * consumer index and school costs are majority compensation, for which the Employment Cost Index
+ * would be better and has shorter coverage. Any real-dollar figure must name it.
+ */
+export interface Deflator {
+  label: string;
+  points: { fiscal_year: number; index: number }[];
 }
 
 /** A policy in the shape the feed serializes it. */
@@ -201,5 +221,7 @@ export interface Bundle {
   checkpoints: Checkpoint[];
   /** `null` disables the band: this feed cannot be projected. */
   projection: ProjectionMeta | null;
+  /** `null` means the feed can only be shown in nominal dollars. */
+  deflator: Deflator | null;
   districts: District[];
 }

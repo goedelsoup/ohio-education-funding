@@ -100,6 +100,16 @@ impl CpiSeries {
         self.label
     }
 
+    /// Every observation in the series, in the order it was built.
+    ///
+    /// Exists so a verification pass can iterate what the series *actually holds* rather than a
+    /// range someone wrote down. A hard-coded upper bound is how four points were once added to
+    /// this series and checked by nothing.
+    #[must_use]
+    pub fn points(&self) -> &[IndexPoint] {
+        &self.points
+    }
+
     /// Look up the observation for a fiscal year.
     #[must_use]
     pub fn point(&self, fy: FiscalYear) -> Option<IndexPoint> {
@@ -219,6 +229,13 @@ impl CpiSeries {
             (2019, 256.143),
             (2020, 257.797),
             (2021, 271.696),
+            // FY2023 onward were added when the financial panel arrived and needed them. They
+            // were never hand-transcribed: they come from the same committed BLS extract the
+            // check test reads, so they are verified on the same run that verifies the rest.
+            (2023, 305.109),
+            (2024, 314.175),
+            (2025, 322.561),
+            (2026, 333.952),
         ];
 
         // Both lists are Verified now. They stay separate because *how* a point was verified

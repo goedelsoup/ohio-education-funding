@@ -230,6 +230,27 @@ tbody tr:last-child th, tbody tr:last-child td { border-bottom: 0; }
   max-width: 320px;
 }
 
+/* The nominal / constant-dollar switch. A pair, not a checkbox: neither basis is the default
+   truth, and a checkbox would make one of them a modification of the other. */
+.basis { display: flex; align-items: center; gap: .4rem; margin-bottom: .9rem; flex-wrap: wrap; }
+.basis button {
+  font: inherit;
+  font-size: .8rem;
+  padding: .3rem .7rem;
+  border-radius: 999px;
+  border: 1px solid var(--border);
+  background: var(--surface-2);
+  color: var(--text-secondary);
+  cursor: pointer;
+}
+.basis button.active {
+  background: var(--surface-1);
+  color: var(--text-primary);
+  border-color: var(--accent-rule);
+  font-weight: 600;
+}
+.basis .n { font-size: .78rem; color: var(--text-muted); margin-left: .3rem; }
+
 .levers { display: grid; grid-template-columns: repeat(auto-fit, minmax(230px, 1fr)); gap: .9rem; }
 .lever .n { font-size: .74rem; color: var(--text-muted); margin-top: .25rem; }
 

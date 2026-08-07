@@ -138,6 +138,49 @@ impl YearRecord {
     }
 }
 
+impl YearRecord {
+    /// This year restated in `base`-year dollars.
+    ///
+    /// # Why nominal is not good enough here
+    ///
+    /// Every figure in this panel is nominal, and the span it covers — FY2020 to FY2025 —
+    /// contains the sharpest price change in forty years: **CPI-U June rose 25.1%** across it.
+    /// A district whose state aid rose 5% over those six years did not gain; it lost a fifth of
+    /// its purchasing power. Any statement about this panel made in nominal dollars is not
+    /// merely imprecise, it can have the wrong sign.
+    ///
+    /// The cash balance is converted too, on the same index. That is the right treatment for a
+    /// question about what a balance *buys*, which is the question anyone asks of a reserve.
+    ///
+    /// The index is CPI-U, a general consumer index; school costs are majority compensation,
+    /// for which the Employment Cost Index would be better and has shorter coverage. Any figure
+    /// this produces must name the index, which is why [`deflate::CpiSeries::label`] exists.
+    ///
+    /// # Errors
+    ///
+    /// Returns [`deflate::DeflateError`] if either year is absent from the series.
+    pub fn in_dollars_of(
+        &self,
+        base: FiscalYear,
+        cpi: &deflate::CpiSeries,
+    ) -> Result<Self, deflate::DeflateError> {
+        let at = |value: Dollars| cpi.convert(value, self.fiscal_year, base).map(|d| d.value);
+        Ok(Self {
+            fiscal_year: self.fiscal_year,
+            unrestricted_aid: at(self.unrestricted_aid)?,
+            restricted_aid: at(self.restricted_aid)?,
+            property_tax: at(self.property_tax)?,
+            income_tax: at(self.income_tax)?,
+            property_tax_allocation: at(self.property_tax_allocation)?,
+            total_revenue: at(self.total_revenue)?,
+            total_revenue_and_sources: at(self.total_revenue_and_sources)?,
+            total_expenditure: at(self.total_expenditure)?,
+            beginning_cash: at(self.beginning_cash)?,
+            ending_cash: at(self.ending_cash)?,
+        })
+    }
+}
+
 /// One district's six years.
 #[derive(Debug, Clone, PartialEq)]
 pub struct Finances {
@@ -190,6 +233,54 @@ impl Finances {
     pub fn cash_change(&self) -> Option<Dollars> {
         let (first, last) = self.span()?;
         Some(last.ending_cash - first.ending_cash)
+    }
+
+    /// The whole panel restated in `base`-year dollars.
+    ///
+    /// # Errors
+    ///
+    /// Returns [`deflate::DeflateError`] if any covered year is absent from the series.
+    pub fn in_dollars_of(
+        &self,
+        base: FiscalYear,
+        cpi: &deflate::CpiSeries,
+    ) -> Result<Self, deflate::DeflateError> {
+        Ok(Self {
+            irn: self.irn.clone(),
+            name: self.name.clone(),
+            county: self.county.clone(),
+            years: self
+                .years
+                .iter()
+                .map(|year| year.in_dollars_of(base, cpi))
+                .collect::<Result<_, _>>()?,
+        })
+    }
+
+    /// Real change in a measure across the span, as a fraction.
+    ///
+    /// The operation most Ohio school finance arguments actually need, and the one most often
+    /// skipped. `real_change(|y| y.unrestricted_aid)` answers "did this district's state aid
+    /// keep up with prices", which nominal figures cannot.
+    ///
+    /// # Errors
+    ///
+    /// Returns [`deflate::DeflateError`] if either endpoint year is absent from the series.
+    pub fn real_change(
+        &self,
+        cpi: &deflate::CpiSeries,
+        pick: impl Fn(&YearRecord) -> Dollars,
+    ) -> Result<Option<f64>, deflate::DeflateError> {
+        let Some((first, last)) = self.span() else {
+            return Ok(None);
+        };
+        if pick(first) <= 0.0 {
+            return Ok(None);
+        }
+        Ok(Some(
+            cpi.real_growth(pick(first), first.fiscal_year, pick(last), last.fiscal_year)?
+                .value,
+        ))
     }
 }
 

@@ -97,19 +97,21 @@ impl Check {
 #[must_use]
 pub fn check_committed_series(observations: &[Observation]) -> Vec<Check> {
     let committed = CpiSeries::cpi_u_june();
-    (2000..=2022)
-        .filter_map(|year| {
-            let fiscal_year = FiscalYear(year);
-            let point = committed.point(fiscal_year)?;
-            Some(Check {
-                fiscal_year,
-                committed: point.index,
-                published: observations
-                    .iter()
-                    .find(|observation| observation.calendar_year == year)
-                    .map(|observation| observation.index),
-                was_verified: point.confidence == Confidence::Verified,
-            })
+    // Every point the series holds, not a range written down beside it. The range was
+    // `2000..=2022`, and when FY2023 through FY2026 were added for the financial panel they fell
+    // outside it and were checked by nothing — while the count assertion in the test went on
+    // passing, because it counted the checks rather than the points.
+    committed
+        .points()
+        .iter()
+        .map(|point| Check {
+            fiscal_year: point.fiscal_year,
+            committed: point.index,
+            published: observations
+                .iter()
+                .find(|observation| observation.calendar_year == point.fiscal_year.0)
+                .map(|observation| observation.index),
+            was_verified: point.confidence == Confidence::Verified,
         })
         .collect()
 }
@@ -160,7 +162,7 @@ mod tests {
     #[test]
     fn the_committed_series_is_checkable_against_a_published_one() {
         let checks = check_committed_series(&parse_series(SAMPLE, ALL_ITEMS_NSA, JUNE));
-        assert_eq!(checks.len(), 23, "FY2000 through FY2022");
+        assert_eq!(checks.len(), 27, "every point the series holds");
 
         let fy2000 = checks.iter().find(|c| c.fiscal_year.0 == 2000).unwrap();
         assert!(fy2000.agrees());

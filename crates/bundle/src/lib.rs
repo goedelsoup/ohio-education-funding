@@ -37,6 +37,11 @@ use edfund_core::Dollars;
 
 /// The bundle schema version. Bump on any change to field names, units, or semantics.
 ///
+/// `6.0.0` added the price index and the statewide financial aggregates. Breaking because the
+/// feed now carries figures a consumer can deflate, and a page that shows the FY2020-FY2025
+/// panel in nominal dollars is not merely imprecise — across a span in which CPI-U rose 25.1%,
+/// a nominal statement about it can have the wrong sign.
+///
 /// `5.0.0` added the actuals: a `finances` array per district carrying six closed fiscal years
 /// of what it received, raised, spent, and held. Additive in shape but breaking in meaning — it
 /// is the first per-district figure in the feed that is a record rather than a model, and a
@@ -59,7 +64,7 @@ use edfund_core::Dollars;
 /// from FY2022-FY2024 to FY2024-FY2026 — the years the department's `ADM Data` sheet declares.
 /// The values did not change; what they are called did, which is exactly the kind of silent
 /// meaning change the version guard exists for.
-pub const CONTRACT_VERSION: &str = "5.0.0";
+pub const CONTRACT_VERSION: &str = "6.0.0";
 
 /// The outcome side of a district, where the report card covers it.
 ///
@@ -143,6 +148,20 @@ pub struct FinanceYear {
     pub ending_cash: Dollars,
 }
 
+/// A price index, so a consumer can restate any year of the panel in any other year's dollars.
+///
+/// Carried rather than left to the page because the choice of index is a claim. CPI-U is a
+/// general consumer index and school costs are majority compensation, for which the Employment
+/// Cost Index would be better and has shorter coverage — so the label travels with the numbers
+/// and any figure derived from them must name it.
+#[derive(Debug, Clone, PartialEq)]
+pub struct Deflator {
+    /// What the index is. Must be shown wherever a real-dollar figure is.
+    pub label: String,
+    /// One observation per covered fiscal year, oldest first.
+    pub points: Vec<(u16, f64)>,
+}
+
 /// One district, as the web layer needs it.
 #[derive(Debug, Clone, PartialEq)]
 pub struct District {
@@ -218,7 +237,7 @@ impl District {
 }
 
 /// Statewide context, so a consumer can position any district without recomputing.
-#[derive(Debug, Clone, Copy, PartialEq)]
+#[derive(Debug, Clone, PartialEq)]
 pub struct Statewide {
     /// Number of districts in the bundle.
     pub districts: usize,
@@ -244,6 +263,13 @@ pub struct Statewide {
     pub minimum_state_share: f64,
     /// How the funding side relates to the outcome side. `None` if no district joined.
     pub outcomes: Option<OutcomeStatewide>,
+    /// Closed fiscal years of actuals, summed over the districts in this feed.
+    ///
+    /// Summed in Rust rather than left to the page so that the two cannot disagree about which
+    /// districts are in the total. The panel behind it covers 660 reporting bodies including
+    /// joint vocational districts; this is the 609 traditional districts the feed carries, which
+    /// is the population every other figure on the page is over.
+    pub finances: Vec<FinanceYear>,
 }
 
 /// A policy, in the shape the web layer sends it back.
@@ -357,6 +383,8 @@ pub struct Bundle {
     pub checkpoints: Vec<Checkpoint>,
     /// How to project, and the forecasts that check the projection. `None` disables the band.
     pub projection: Option<Projection>,
+    /// The price index. `None` means the feed can only be shown in nominal dollars.
+    pub deflator: Option<Deflator>,
     /// Per-district records.
     pub districts: Vec<District>,
 }
@@ -386,6 +414,21 @@ fn num(v: f64) -> String {
     } else {
         "null".into()
     }
+}
+
+/// One `FinanceYear` as a JSON object. Shared so the per-district and statewide arrays cannot
+/// drift into different field names.
+fn finance_year(y: &FinanceYear) -> String {
+    format!(
+        "{{\"fiscal_year\": {}, \"state_aid\": {}, \"local_tax\": {}, \
+         \"total_revenue\": {}, \"total_expenditure\": {}, \"ending_cash\": {}}}",
+        y.fiscal_year,
+        num(y.state_aid),
+        num(y.local_tax),
+        num(y.total_revenue),
+        num(y.total_expenditure),
+        num(y.ending_cash)
+    )
 }
 
 fn opt(v: Option<f64>) -> String {
@@ -451,6 +494,15 @@ impl Bundle {
             "    \"minimum_state_share\": {},\n",
             num(w.minimum_state_share)
         ));
+        s.push_str("    \"finances\": [");
+        s.push_str(
+            &w.finances
+                .iter()
+                .map(finance_year)
+                .collect::<Vec<_>>()
+                .join(", "),
+        );
+        s.push_str("],\n");
         match &w.outcomes {
             None => s.push_str("    \"outcomes\": null\n"),
             Some(o) => s.push_str(&format!(
@@ -553,6 +605,23 @@ impl Bundle {
             }
         }
 
+        match &self.deflator {
+            None => s.push_str("  \"deflator\": null,\n"),
+            Some(deflator) => s.push_str(&format!(
+                "  \"deflator\": {{\"label\": \"{}\", \"points\": [{}]}},\n",
+                escape(&deflator.label),
+                deflator
+                    .points
+                    .iter()
+                    .map(|(year, index)| format!(
+                        "{{\"fiscal_year\": {year}, \"index\": {}}}",
+                        num(*index)
+                    ))
+                    .collect::<Vec<_>>()
+                    .join(", ")
+            )),
+        }
+
         s.push_str("  \"districts\": [\n");
 
         for (i, d) in self.districts.iter().enumerate() {
@@ -642,21 +711,13 @@ impl Bundle {
                 )),
             }
             s.push_str(", \"finances\": [");
-            for (at, year) in d.finances.iter().enumerate() {
-                if at > 0 {
-                    s.push_str(", ");
-                }
-                s.push_str(&format!(
-                    "{{\"fiscal_year\": {}, \"state_aid\": {}, \"local_tax\": {}, \
-                     \"total_revenue\": {}, \"total_expenditure\": {}, \"ending_cash\": {}}}",
-                    year.fiscal_year,
-                    num(year.state_aid),
-                    num(year.local_tax),
-                    num(year.total_revenue),
-                    num(year.total_expenditure),
-                    num(year.ending_cash)
-                ));
-            }
+            s.push_str(
+                &d.finances
+                    .iter()
+                    .map(finance_year)
+                    .collect::<Vec<_>>()
+                    .join(", "),
+            );
             s.push(']');
             s.push('}');
             if i + 1 < self.districts.len() {
@@ -728,6 +789,14 @@ mod tests {
             guarantee_total: 0.0,
             realized_aid_total: 0.0,
             minimum_state_share: 0.1,
+            finances: vec![FinanceYear {
+                fiscal_year: 2025,
+                state_aid: 7_890_000_000.0,
+                local_tax: 11_000_000_000.0,
+                total_revenue: 25_090_000_000.0,
+                total_expenditure: 27_600_000_000.0,
+                ending_cash: 9_140_000_000.0,
+            }],
             outcomes: Some(OutcomeStatewide {
                 districts: 606,
                 poverty_vs_performance: -0.846,
@@ -750,6 +819,7 @@ mod tests {
             statewide: zero_statewide(),
             checkpoints,
             projection: None,
+            deflator: None,
             districts,
         }
     }
@@ -869,7 +939,7 @@ mod tests {
     fn the_bundle_declares_its_contract_version() {
         assert!(bundle(vec![], vec![])
             .to_json()
-            .contains("\"contract_version\": \"5.0.0\""));
+            .contains("\"contract_version\": \"6.0.0\""));
     }
 
     #[test]

@@ -7,11 +7,13 @@ repository.workspace = true
 description = "Forward projection of funding inputs, and policy simulation over them"
 
 [dependencies]
+deflate = { path = "../deflate" }
 edfund-core = { path = "../edfund-core" }
 foundation = { path = "../foundation" }
 local-capacity = { path = "../local-capacity" }
 
 [dev-dependencies]
+deflate = { path = "../deflate" }
 dispersion = { path = "../dispersion" }
 
 [[bin]]

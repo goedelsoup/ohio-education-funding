@@ -55,3 +55,21 @@ transcribed and must be checked against BLS.
 
 Not yet implemented: the Employment Cost Index variant, which is the better deflator for
 school costs and has shorter coverage.
+
+## What the financial panel changed
+
+The series ran FY2000–FY2022 until the `dew-five-year-forecast` panel arrived needing FY2023
+onward. Four points were added from the same committed BLS extract the check test reads, so they
+were verified on the run that added them rather than transcribed and trusted.
+
+Adding them exposed a defect in the check itself. `check_committed_series` iterated a hard-coded
+`2000..=2022` rather than the series' own points, so the four new points **fell outside the range
+and were checked by nothing** — while the count assertion went on passing, because it counted the
+checks rather than the points. It now iterates `CpiSeries::points()`, which makes the check
+exhaustive by construction.
+
+The stakes are the reason this matters. Across FY2020–FY2025, CPI-U June rose **25.1%**. Ohio's
+statewide district cash balance ends that span **8% above** where it started in nominal dollars
+and **14% below** in constant ones. Both are correct and they support opposite arguments — the
+same trap this crate's opening example describes, arising again in a panel added twenty phases
+later. [verified]
