@@ -126,7 +126,7 @@ function render(): void {
   const { bundle, tab } = state;
   if (tab === "district") {
     const district = state.byIrn.get(state.selected);
-    if (district) $("#district-out").innerHTML = renderDistrict(bundle, district);
+    if (district) $("#district-out").innerHTML = renderDistrict(bundle, district, state.basis);
   } else if (tab === "statewide") {
     $("#statewide-out").innerHTML = renderStatewide(bundle, state.basis);
   } else if (tab === "outcomes") {

@@ -65,6 +65,8 @@ properties:
     prior-year and current-year ADM by construction.
   calculator: local-capacity
 links:
+  - target: enrolled-adm.yml
+    relationship: derived-from
   - target: ../metric.ont.yml
     relationship: instance-of
   - target: assessed-valuation-per-pupil.yml

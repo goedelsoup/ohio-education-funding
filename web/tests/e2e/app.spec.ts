@@ -445,6 +445,24 @@ test.describe("constant dollars", () => {
     await expect(card).toContainText("support opposite arguments");
   });
 
+  test("the district card offers the same switch as the statewide one", async ({ page }) => {
+    // The inconsistency an audit found: the district panel spans the same 25% price change and
+    // showed one basis only, on the page where a school board actually looks.
+    await page.goto(`/#district/${CLEVELAND}`);
+    const card = page
+      .locator("#district-out .card")
+      .filter({ hasText: "What it actually received" });
+    await expect(card.locator(".basis")).toContainText("Showing nominal");
+
+    await card.locator('[data-basis="real"]').click();
+    await expect(card.locator(".basis")).toContainText("Showing FY2020 dollars");
+    await expect(card).toContainText("CPI-U");
+
+    // The deficit count is a fact about each year's own dollars and must not move with the basis.
+    const aid = card.locator(".tile").filter({ hasText: "State aid, FY2020" });
+    await expect(aid).toContainText("years run at a deficit");
+  });
+
   test("real state aid fell far more than nominal state aid", async ({ page }) => {
     // The finding the price index makes visible: statewide state aid is roughly flat in nominal
     // dollars across FY2020-FY2025 and down a fifth in real ones.

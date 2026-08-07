@@ -1,0 +1,122 @@
+class: metric
+label: Enrolled ADM
+description: |
+  Average daily membership: the pupil count Ohio funds on. It is the denominator under nearly
+  every other metric in this corpus — [per-pupil operating expenditure](per-pupil-operating-expenditure.yml),
+  [assessed valuation per pupil](assessed-valuation-per-pupil.yml),
+  [state share percentage](state-share-percentage.yml) — and it had no node of its own for
+  twenty phases, which is how a denominator error propagates without anything to attach it to.
+
+  Two distinct counts wear the name, they differ for every district, and the Fair School Funding
+  Plan uses **both in the same calculation**. Conflating them is the single most common arithmetic
+  error available in Ohio school finance.
+
+properties:
+  name: Enrolled average daily membership
+  unit: pupils
+  definition: |
+    **Base cost enrolled ADM**, per R.C. 3317.011, is the greater of a three-year average and the
+    current year:
+
+        base_cost_adm = max(mean(ADM[y-2], ADM[y-1], ADM[y]), ADM[y])
+
+    The `max` is a one-way ratchet: it protects a district losing enrollment from losing funding
+    at the same rate, and gives a growing district its growth immediately. **105 of 609 districts
+    are funded on the current year** rather than the average — the growing ones. [verified]
+
+    **Current-year enrolled ADM** is the last observation alone. R.C. 3317.017 pays the state
+    share of base cost on *this* denominator, not the averaged one, so the two appear in adjacent
+    terms of one formula. A per-pupil figure computed from the wrong one is wrong by the amount
+    of the district's own enrollment trend, which is largest exactly where enrollment analysis
+    matters most.
+
+    **Projected ADM** carries the observed series forward under a damped trend:
+
+        rate  = (ADM[last] / ADM[first]) ^ (1 / years) - 1
+        value = ADM[last] * PROD over h of (1 + rate * damping^h),   damping = 0.85
+
+    Damped because enrollment trends do not persist: a district losing 2% a year does not lose
+    2% a year forever, since the decline is driven by cohorts moving through and by housing stock
+    that eventually turns over. Undamped extrapolation is the standard way to produce a confident
+    and absurd number at a ten-year horizon. 0.85 is a convention, not an estimate — three
+    observations per district cannot identify a damping parameter, and it is named as a constant
+    so a phase with a real history can replace it and see what moves.
+  inputs: |
+    The `ADM Data` sheet of the FY2027 calculator,
+    [dew-fy27-funding-calculator](../../catalog/dew-fy27-funding-calculator.md): FY2024, FY2025
+    and FY2026 enrolled ADM per district.
+    [dew-october-enrollment](../../catalog/dew-october-enrollment.md) publishes headcount by
+    individual grade, which is a **different measure** — a head count on one October day, not an
+    average over the year — and the two must not be substituted for one another.
+  caveats: |
+    **The years are labelled twice in the workbook, and once wrongly.** The `Base_Cost` sheet
+    carries the same three columns cell-for-cell under headers reading FY2022/FY2023/FY2024;
+    `ADM Data` labels the identical values FY2024/FY2025/FY2026. They cannot both be right and
+    the arithmetic settles it: base cost ADM is the three-year average of the three, and this is
+    the FY2027 calculator, which R.C. 3317.011 funds on FY2024 through FY2026. The `Base_Cost`
+    headers are left over from an earlier vintage.
+
+    This is not tidiness. The first fixture built from this file carried the stale labels, so
+    every enrollment-trend figure in this corpus was named for the wrong pair of years until it
+    was caught. [verified]
+
+    **FY2026 is partly a departmental estimate.** The calculator is published before that fiscal
+    year closes. The most recent observation in the series is therefore the least reliable one,
+    which is the opposite of the usual assumption and matters most for the projection, since the
+    trend is fitted from the endpoints.
+
+    **Three observations is not a time series.** Enough to fit a trend and nowhere near enough to
+    say how wrong the trend might be — a residual variance over three points has one degree of
+    freedom and means nothing. So a projection interval here does **not** come from the district's
+    own history. It comes from the **cross-sectional spread of district annual growth rates**
+    (sigma = 2.42% a year over FY2024-FY2026): we do not know how variable this district is, but
+    we know how much districts differ from one another, and that is a defensible floor. Every
+    interval records the prior that produced it, because an interval whose provenance is unstated
+    is decoration. [verified]
+
+    The interval widens with the **square root** of the horizon, not linearly — growth errors
+    compound as a random walk, so a five-year projection is not five times as uncertain as a
+    one-year one.
+
+    **A projection is not a simulation.** Re-running the formula with a changed parameter is
+    deterministic; carrying enrollment six years forward is a forecast. This corpus reports the
+    two apart and never sums them, because a combined figure inherits the forecast's error while
+    wearing the simulation's precision. The type system enforces it: a `Run` holds a
+    `PolicyEffect` with no interval and an optional `EnrollmentEffect` with one, and there is no
+    field containing their sum.
+  calculator: project::series, project::panel
+
+links:
+  - relationship: measures
+    target: education-agency
+    note: All 609 traditional districts in the FY2027 model.
+  - relationship: derived-from
+    target: metric
+    note: |
+      The denominator of [per-pupil operating expenditure](per-pupil-operating-expenditure.yml)
+      and [assessed valuation per pupil](assessed-valuation-per-pupil.yml). Note that
+      [expenditure per equivalent pupil](expenditure-per-equivalent-pupil.yml) uses a
+      need-weighted count instead, which is a third thing again.
+
+findings: |
+  **THE GUARANTEE MAKES A DISTRICT'S AID COMPLETELY INSENSITIVE TO ITS ENROLLMENT.** [verified]
+  The [temporary transitional aid guarantee](../formula-component/temporary-transitional-aid-guarantee.yml)
+  pays a fixed dollar amount that enrollment does not enter. For the 294 districts it funds — very
+  nearly half the state — running the FY2027 formula at FY2024, FY2025 or FY2026 enrolment
+  produces the identical figure to the cent, and projecting their enrollment forward produces a
+  flat line with no interval at all. What moves for them is the *formula's* answer, which falls
+  as enrollment does; the widening gap between the two is the guarantee.
+
+  **REMOVING THE GUARANTEE NEARLY DOUBLES THE STATE'S EXPOSURE TO ENROLLMENT FORECAST ERROR.**
+  [inference — a forecast] At FY2032 enrollment, total state aid under current law is $7,125M in
+  a band of $6,889M to $7,379M (±3.4%). With the guarantee removed the same forecast error
+  produces ±5.9%. The guarantee is a shock absorber for the *appropriation* as well as for the
+  district, and that is not usually how it is argued about. Recorded in full at
+  [guarantee phase-out](../scenario/guarantee-phase-out.yml).
+
+  **THE AID BAND IS TIGHTER THAN THE ENROLLMENT BAND THAT DRIVES IT.** [verified] Necessarily, and
+  for the same reason: half the state's aid does not respond to enrollment at all.
+
+  **[open]** Whether a damped trend is the right method, which needs an enrollment history longer
+  than three points — `nces-ccd` is where one would come from, and it is also what would handle
+  district consolidation, without which a long series is silently wrong.

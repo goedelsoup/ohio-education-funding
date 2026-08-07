@@ -86,6 +86,8 @@ properties:
       Academic co-curricular $42.13   Technology $37.50   ITC support $31.00
       Building safety and security $23.29
 links:
+  - target: ../metric/enrolled-adm.yml
+    relationship: consumes
   - target: ../formula-component.ont.yml
     relationship: instance-of
   - target: ../parameter/base-cost-per-pupil.yml
