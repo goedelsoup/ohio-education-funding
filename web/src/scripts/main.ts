@@ -6,13 +6,19 @@ import { escapeHtml, pct } from "../lib/format.ts";
 import {
   defaultLevers,
   renderControls,
+  renderProjection,
   renderScenario,
   type Levers,
 } from "../lib/scenario.ts";
 import { renderOutcomes } from "../lib/outcomes.ts";
 import { renderStatewide } from "../lib/statewide.ts";
 import { REQUIRED_CONTRACT, type Bundle, type District } from "../lib/types.ts";
-import { isVerified, verify, type Verification } from "../lib/verify.ts";
+import {
+  isForecastVerified,
+  isVerified,
+  verify,
+  type Verification,
+} from "../lib/verify.ts";
 
 const $ = <T extends HTMLElement>(selector: string): T =>
   document.querySelector(selector) as T;
@@ -58,6 +64,7 @@ function fromHash(): { tab: Tab; irn?: string; levers?: Partial<Levers> } {
       ["min", "minimumStateShare"],
       ["pb", "phaseInBaseCost"],
       ["pc", "phaseInCategorical"],
+      ["h", "horizon"],
     ] as const) {
       const value = number(key);
       if (value != null && Number.isFinite(value)) levers[field] = value;
@@ -89,6 +96,7 @@ function toHash(): void {
       min: String(l.minimumStateShare),
       pb: String(l.phaseInBaseCost),
       pc: String(l.phaseInCategorical),
+      h: String(l.horizon),
     });
     next = `#scenario?${params.toString()}`;
   }
@@ -122,14 +130,20 @@ function render(): void {
     $("#outcomes-out").innerHTML = renderOutcomes(bundle);
   } else if (isVerified(state.verification)) {
     $("#scenario-out").innerHTML = renderScenario(bundle, state.levers);
+    // The band is gated on its own checks. A forecast that failed them costs the reader the
+    // band, not the scenario builder: they are different claims and one can be wrong alone.
+    if (isForecastVerified(state.verification)) {
+      $("#projection-out").innerHTML = renderProjection(bundle, state.levers);
+    }
   }
   // An unverified feed falls through: `reportVerificationFailure()` has already written that
   // panel and rendering over it would put the scenario tab back exactly as if nothing were
   // wrong — on the one tab the check exists to hold shut.
 }
 
-function readLevers(): Levers {
+function readLevers(fallbackHorizon: number): Levers {
   const number = (id: string) => Number($<HTMLInputElement>(id).value);
+  const horizon = document.querySelector("#lv-horizon");
   return {
     guarantee: $<HTMLSelectElement>("#lv-guarantee").value as Levers["guarantee"],
     guaranteeArgument: number("#lv-arg"),
@@ -137,41 +151,66 @@ function readLevers(): Levers {
     minimumStateShare: number("#lv-min"),
     phaseInBaseCost: number("#lv-phase"),
     phaseInCategorical: number("#lv-phase-cat"),
+    horizon: horizon ? number("#lv-horizon") : fallbackHorizon,
   };
 }
 
-function syncLeverLabels(levers: Levers): void {
+function syncLeverLabels(levers: Levers, baseYear: number): void {
   const set = (id: string, text: string) => {
-    $<HTMLOutputElement>(id).textContent = text;
+    const output = document.querySelector<HTMLOutputElement>(id);
+    if (output) output.textContent = text;
   };
   set("#lv-arg-out", pct(levers.guaranteeArgument, 0));
   set("#lv-base-out", `${levers.baseCostScale >= 1 ? "+" : "−"}${pct(Math.abs(levers.baseCostScale - 1), 0)}`);
   set("#lv-min-out", pct(levers.minimumStateShare, 0));
   set("#lv-phase-out", pct(levers.phaseInBaseCost, 0));
   set("#lv-phase-cat-out", pct(levers.phaseInCategorical, 0));
+  set(
+    "#lv-horizon-out",
+    levers.horizon <= baseYear ? "not projected" : `FY${levers.horizon}`,
+  );
   // The retained-share slider only means anything for the two rules that take an argument.
   const argument = $<HTMLInputElement>("#lv-arg").closest(".lever") as HTMLElement;
   argument.hidden = levers.guarantee === "as-enacted" || levers.guarantee === "removed";
 }
 
-function wireScenario(bundle: Bundle, initial: Partial<Levers>): void {
+function wireScenario(
+  bundle: Bundle,
+  initial: Partial<Levers>,
+  forecastable: boolean,
+): void {
+  const meta = bundle.projection;
+  const baseYear = meta?.base_year ?? 0;
   $("#scenario-controls").innerHTML = renderControls(
     bundle.statewide.minimum_state_share,
+    {
+      // The horizon control appears only when a band could be drawn. Offering a year picker that
+      // produces nothing would be worse than not offering one.
+      available: forecastable,
+      baseYear,
+      maxYear: meta?.horizon ?? baseYear,
+    },
   );
   // A shared link's levers, applied before the first read of the controls.
   if (initial.guarantee) $<HTMLSelectElement>("#lv-guarantee").value = initial.guarantee;
   const put = (id: string, value: number | undefined) => {
-    if (value != null) $<HTMLInputElement>(id).value = String(value);
+    const control = document.querySelector<HTMLInputElement>(id);
+    if (control && value != null) control.value = String(value);
   };
   put("#lv-arg", initial.guaranteeArgument);
   put("#lv-base", initial.baseCostScale);
   put("#lv-min", initial.minimumStateShare);
   put("#lv-phase", initial.phaseInBaseCost);
   put("#lv-phase-cat", initial.phaseInCategorical);
+  put("#lv-horizon", initial.horizon);
+  const fallback = defaultLevers(
+    bundle.statewide.minimum_state_share,
+    baseYear,
+  ).horizon;
   const update = () => {
     if (!state) return;
-    state.levers = readLevers();
-    syncLeverLabels(state.levers);
+    state.levers = readLevers(fallback);
+    syncLeverLabels(state.levers, baseYear);
     toHash();
     render();
   };
@@ -180,13 +219,14 @@ function wireScenario(bundle: Bundle, initial: Partial<Levers>): void {
   }
   $("#scenario-reset").addEventListener("click", () => {
     if (!state) return;
-    const defaults = defaultLevers(bundle.statewide.minimum_state_share);
+    const defaults = defaultLevers(bundle.statewide.minimum_state_share, baseYear);
     $<HTMLSelectElement>("#lv-guarantee").value = defaults.guarantee;
-    $<HTMLInputElement>("#lv-arg").value = String(defaults.guaranteeArgument);
-    $<HTMLInputElement>("#lv-base").value = String(defaults.baseCostScale);
-    $<HTMLInputElement>("#lv-min").value = String(defaults.minimumStateShare);
-    $<HTMLInputElement>("#lv-phase").value = String(defaults.phaseInBaseCost);
-    $<HTMLInputElement>("#lv-phase-cat").value = String(defaults.phaseInCategorical);
+    put("#lv-arg", defaults.guaranteeArgument);
+    put("#lv-base", defaults.baseCostScale);
+    put("#lv-min", defaults.minimumStateShare);
+    put("#lv-phase", defaults.phaseInBaseCost);
+    put("#lv-phase-cat", defaults.phaseInCategorical);
+    put("#lv-horizon", defaults.horizon);
     update();
   });
   update();
@@ -224,6 +264,45 @@ function reportVerificationFailure(verification: Verification): void {
   </div>`;
 }
 
+/**
+ * Say why there is no band, rather than leaving a card silently missing.
+ *
+ * A reader who has seen the projection once and does not see it now must be told which of the
+ * two happened: this feed cannot be projected, or this page failed to reproduce the projection
+ * it was given. The second is a defect and should read like one.
+ */
+function reportForecastFailure(bundle: Bundle, verification: Verification): void {
+  if (!bundle.projection) {
+    $("#projection-out").innerHTML = `<div class="card">
+      <h2>At projected enrollment</h2>
+      <p class="note">This feed carries no projection block, so enrollment cannot be carried
+        forward. The simulation above is unaffected — it runs at published enrollment.</p>
+    </div>`;
+    return;
+  }
+  const failures = verification.forecasts.filter((c) => !c.agrees);
+  const detail =
+    verification.forecasts.length === 0
+      ? "<li>The feed declares a projection but carries no forecasts to check it against.</li>"
+      : failures
+          .map(
+            (c) =>
+              `<li><strong>${escapeHtml(c.label)}</strong>: ${c.differences
+                .map(escapeHtml)
+                .join("; ")}</li>`,
+          )
+          .join("");
+  $("#projection-out").innerHTML = `<div class="card err">
+    <h2>The projection is disabled</h2>
+    <p>This page carries its own copy of the enrollment projection so a slider does not need a
+      round trip, and checks it against forecasts computed by <code>crates/project</code> before
+      drawing a band. Those checks did not pass:</p>
+    <ul>${detail}</ul>
+    <p class="note">The Rust is authoritative. The simulation above runs at published enrollment
+      and does not depend on this.</p>
+  </div>`;
+}
+
 function boot(bundle: Bundle): void {
   if (bundle.contract_version !== REQUIRED_CONTRACT) {
     $("#district-out").innerHTML = `<div class="card err">This page reads bundle contract
@@ -241,7 +320,10 @@ function boot(bundle: Bundle): void {
       ? "049056"
       : (bundle.districts[0]?.irn ?? ""),
     tab: fromHash().tab,
-    levers: defaultLevers(bundle.statewide.minimum_state_share),
+    levers: defaultLevers(
+      bundle.statewide.minimum_state_share,
+      bundle.projection?.base_year,
+    ),
   };
 
   const picker = $<HTMLSelectElement>("#pick");
@@ -265,13 +347,25 @@ function boot(bundle: Bundle): void {
   }
 
   const requested = fromHash();
+  const forecastable = isForecastVerified(verification);
   if (isVerified(verification)) {
-    wireScenario(bundle, requested.levers ?? {});
-    $("#verified").textContent = `Formula verified against ${verification.comparisons.length} reference scenarios`;
+    wireScenario(bundle, requested.levers ?? {}, forecastable);
+    const forecasts = forecastable
+      ? ` and ${verification.forecasts.length} reference forecasts`
+      : "";
+    $("#verified").textContent =
+      `Formula verified against ${verification.comparisons.length} reference scenarios${forecasts}`;
   } else {
     reportVerificationFailure(verification);
     $("#verified").textContent = "Formula check FAILED — scenario builder disabled";
     $("#verified").classList.add("err");
+  }
+  if (!forecastable) {
+    reportForecastFailure(bundle, verification);
+    if (isVerified(verification)) {
+      $("#verified").textContent += " — projection check FAILED";
+      $("#verified").classList.add("err");
+    }
   }
 
   $("#prov").textContent = bundle.provenance;

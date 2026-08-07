@@ -11,7 +11,13 @@
  */
 
 import { apply, totals, type GuaranteeRule, type Policy } from "./policy.ts";
-import type { Bundle, Checkpoint, PolicyShape } from "./types.ts";
+import { forecast, growthPrior } from "./project.ts";
+import type {
+  Bundle,
+  Checkpoint,
+  ForecastCheckpoint,
+  PolicyShape,
+} from "./types.ts";
 
 /** Largest total-dollar disagreement treated as arithmetic noise rather than a defect. */
 export const TOLERANCE = 1.0;
@@ -78,16 +84,78 @@ export function compare(bundle: Bundle, checkpoint: Checkpoint): Comparison {
   return { label: checkpoint.label, agrees: differences.length === 0, differences };
 }
 
+/**
+ * Largest total-dollar disagreement in a *forecast* treated as noise.
+ *
+ * Looser than {@link TOLERANCE} by three orders of magnitude, and still tight: a forecast sums
+ * 606 exponentials, and `Math.exp` and Rust's `f64::exp` are not required to agree in the last
+ * bit. A thousand dollars across seven billion is 1.4 parts in ten million — far below any
+ * disagreement that would mean the two implementations had actually diverged, and far above the
+ * drift that transcendental rounding can produce.
+ */
+export const FORECAST_TOLERANCE = 1_000.0;
+
+/** Run one forecast checkpoint's policy and horizon, and compare every reported field. */
+export function compareForecast(
+  bundle: Bundle,
+  checkpoint: ForecastCheckpoint,
+): Comparison {
+  const meta = bundle.projection;
+  const differences: string[] = [];
+  if (!meta) {
+    return {
+      label: checkpoint.label,
+      agrees: false,
+      differences: ["the feed carries forecasts but no projection block to run them with"],
+    };
+  }
+
+  const effect = forecast(
+    bundle.districts,
+    toPolicy(checkpoint.policy),
+    checkpoint.fiscal_year,
+    meta.base_year,
+    meta.method,
+    meta.damping,
+    growthPrior(bundle.districts, meta.z),
+    bundle.statewide.minimum_state_share,
+  );
+
+  const near = (name: string, ours: number, theirs: number) => {
+    if (Math.abs(ours - theirs) > FORECAST_TOLERANCE) {
+      differences.push(`${name}: page ${ours.toFixed(2)}, feed ${theirs.toFixed(2)}`);
+    }
+  };
+  near("realized aid", effect.realizedAid, checkpoint.realized_aid);
+  // Both ends, not just the middle. A page that reproduced the point and got the band wrong
+  // would be the exact failure this axis exists to prevent, and it would look correct.
+  near("low end of the band", effect.low, checkpoint.low);
+  near("high end of the band", effect.high, checkpoint.high);
+  near("projected ADM", effect.adm, checkpoint.adm);
+  if (effect.onGuarantee !== checkpoint.on_guarantee) {
+    differences.push(
+      `districts on the guarantee: page ${effect.onGuarantee}, feed ${checkpoint.on_guarantee}`,
+    );
+  }
+
+  return { label: checkpoint.label, agrees: differences.length === 0, differences };
+}
+
 /** The verdict for the whole feed. */
 export interface Verification {
   ok: boolean;
   comparisons: Comparison[];
+  /** The forecast half, checked separately so one can fail without disabling the other. */
+  forecasts: Comparison[];
 }
 
-/** Run every checkpoint. */
+/** Run every checkpoint, simulation and forecast alike. */
 export function verify(bundle: Bundle): Verification {
   const comparisons = bundle.checkpoints.map((c) => compare(bundle, c));
-  return { ok: comparisons.every((c) => c.agrees), comparisons };
+  const forecasts = (bundle.projection?.checkpoints ?? []).map((c) =>
+    compareForecast(bundle, c),
+  );
+  return { ok: comparisons.every((c) => c.agrees), comparisons, forecasts };
 }
 
 /**
@@ -99,4 +167,16 @@ export function verify(bundle: Bundle): Verification {
  */
 export function isVerified(v: Verification): boolean {
   return v.ok && v.comparisons.length > 0;
+}
+
+/**
+ * Whether the band may be drawn.
+ *
+ * Deliberately separate from {@link isVerified}: the simulation and the forecast are different
+ * claims, and a projection that failed its checkpoints should cost the reader the band, not the
+ * scenario builder. The reverse also holds — a broken formula makes any forecast built on it
+ * meaningless, so this requires both.
+ */
+export function isForecastVerified(v: Verification): boolean {
+  return isVerified(v) && v.forecasts.length > 0 && v.forecasts.every((c) => c.agrees);
 }

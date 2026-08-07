@@ -68,6 +68,7 @@ body {
 .wrap { max-width: 900px; margin: 0 auto; }
 h1 { font-size: 1.4rem; margin: 0 0 .3rem; letter-spacing: -0.01em; }
 h2 { font-size: .95rem; margin: 0 0 .8rem; letter-spacing: -0.005em; }
+h3 { font-size: .82rem; margin: 1.4rem 0 .6rem; color: var(--text-secondary); font-weight: 600; }
 .sub { color: var(--text-secondary); margin: 0 0 1.5rem; font-size: .92rem; }
 
 .card {
@@ -137,6 +138,9 @@ output { font-variant-numeric: tabular-nums; color: var(--text-primary); font-we
 .gain { color: var(--series-formula); }
 .loss { color: var(--series-guarantee); }
 .tnum { font-variant-numeric: tabular-nums; }
+/* The row the published model actually uses. Weight rather than colour: the other rows are the
+   same formula at a different enrollment, not a different kind of thing. */
+tr.current th, tr.current td { color: var(--text-primary); font-weight: 600; }
 
 .scroll { overflow-x: auto; }
 table { width: 100%; border-collapse: collapse; font-size: .88rem; }
@@ -166,6 +170,39 @@ tbody tr:last-child th, tbody tr:last-child td { border-bottom: 0; }
 .axis-label { font-size: 11px; fill: var(--text-muted); }
 .bar-row { cursor: default; }
 .bar-row:hover .bar-fill, .bar-row:hover .hist { filter: brightness(1.12); }
+
+/*
+ * The fan chart. The band is the subject here, not shading behind a line, so it gets a fill AND
+ * a 2px stroke on each edge; the central estimate is dashed so it reads as one path through the
+ * band rather than as the answer with error bars around it. Both bounds are direct-labelled and
+ * the point is not — see `fanChart` in chart.ts.
+ */
+.fan-band { fill: var(--series-formula); fill-opacity: .16; }
+.fan-edge { fill: none; stroke: var(--series-formula); stroke-width: 2; }
+.fan-mid { fill: none; stroke: var(--series-formula); stroke-width: 2; stroke-dasharray: 5 4; }
+.fan-anchor { fill: var(--surface-1); stroke: var(--series-formula); stroke-width: 2; }
+.fan-bound { font-size: 12px; fill: var(--text-primary); font-variant-numeric: tabular-nums; }
+.fan-hit { fill: transparent; }
+.fan-hit:hover { fill: var(--text-primary); fill-opacity: .05; }
+
+.tile.wide { grid-column: span 2; }
+/* A range is two numbers and has to stay one line's worth of thought, so it sets a shade
+   smaller than a point estimate would. It is still the largest thing in the card. */
+.tile .v.range { font-size: 1.3rem; }
+.sw.band { background: var(--series-formula); opacity: .5; }
+.sw.dash {
+  background: repeating-linear-gradient(90deg,
+    var(--series-formula) 0 4px, transparent 4px 7px);
+  border-radius: 0;
+  height: 2px;
+  width: 14px;
+  margin-bottom: 3px;
+}
+.sw.anchor {
+  background: var(--surface-1);
+  border: 2px solid var(--series-formula);
+  border-radius: 50%;
+}
 
 #tip {
   position: fixed;

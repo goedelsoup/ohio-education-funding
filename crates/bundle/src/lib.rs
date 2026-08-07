@@ -37,6 +37,13 @@ use edfund_core::Dollars;
 
 /// The bundle schema version. Bump on any change to field names, units, or semantics.
 ///
+/// `4.0.0` added the projection axis: `adm_history` on every district, so the page can carry
+/// enrollment forward itself, and a `projection` block holding the forecast's method, its prior,
+/// and [`ForecastCheckpoint`]s the page must reproduce before it may draw a band. Breaking rather
+/// than additive because `adm_history` is required, not nullable — a district without it cannot
+/// be projected, and a feed that omitted it would produce a page silently missing half its
+/// panel.
+///
 /// `3.0.0` added the outcome axis: a nullable `outcome` object per district carrying the
 /// Performance Index, the Progress effect size, need shares, and spending on both denominators,
 /// plus the statewide correlations that say how to read them. Nullable because three districts
@@ -46,7 +53,7 @@ use edfund_core::Dollars;
 /// from FY2022-FY2024 to FY2024-FY2026 — the years the department's `ADM Data` sheet declares.
 /// The values did not change; what they are called did, which is exactly the kind of silent
 /// meaning change the version guard exists for.
-pub const CONTRACT_VERSION: &str = "3.0.0";
+pub const CONTRACT_VERSION: &str = "4.0.0";
 
 /// The outcome side of a district, where the report card covers it.
 ///
@@ -148,6 +155,14 @@ pub struct District {
     /// Enrollment change FY2024 to FY2026, as a fraction. FY2026 is partly departmental
     /// estimate, since the calculator is published before that year closes.
     pub enrollment_change: Option<f64>,
+    /// Enrolled ADM for FY2024, FY2025, FY2026 — the three years the department's `ADM Data`
+    /// sheet carries.
+    ///
+    /// Shipped as the series rather than only as [`District::enrollment_change`] because the
+    /// page projects from it. Three points is not enough to estimate this district's own
+    /// variability, which is exactly why the interval comes from the cross-sectional spread
+    /// instead; see [`Projection::sigma`].
+    pub adm_history: [f64; 3],
     /// Achievement, growth, and need. `None` for the three districts with no report card.
     pub outcome: Option<DistrictOutcome>,
 }
@@ -244,6 +259,61 @@ pub struct Checkpoint {
     pub on_guarantee: usize,
 }
 
+/// A Rust-computed *forecast* the web layer must reproduce before it may draw a band.
+///
+/// The same discipline as [`Checkpoint`], applied to the harder half. Reproducing a simulation
+/// checks one function; reproducing a forecast checks the projection, the prior, the compounding
+/// of the interval with the horizon, and the decision to re-run the whole formula at each end of
+/// the enrollment band rather than scale the central answer — which matters because the
+/// guarantee is a `max` and the aid curve has a kink no scaling reproduces.
+#[derive(Debug, Clone, PartialEq)]
+pub struct ForecastCheckpoint {
+    /// Human label, shown if the check fails.
+    pub label: String,
+    /// The policy held fixed across the horizon.
+    pub policy: PolicyShape,
+    /// The fiscal year projected to.
+    pub fiscal_year: u16,
+    /// Total realized aid at the central enrollment estimate.
+    pub realized_aid: Dollars,
+    /// Total realized aid at the low end of the enrollment band.
+    pub low: Dollars,
+    /// Total realized aid at the high end.
+    pub high: Dollars,
+    /// Projected total ADM.
+    pub adm: f64,
+    /// Districts on the guarantee at projected enrollment.
+    pub on_guarantee: usize,
+}
+
+/// How this feed's forecasts were made, and what their interval rests on.
+///
+/// The page carries its own copy of the projection so a slider does not need a round trip, as it
+/// does for the formula. This block is what makes that acceptable: the method and its parameters
+/// so the page runs the same one, and [`Projection::checkpoints`] so it has to prove it did.
+#[derive(Debug, Clone, PartialEq)]
+pub struct Projection {
+    /// The last observed fiscal year. Everything past it is forecast.
+    pub base_year: u16,
+    /// The furthest year the checkpoints reach, and the furthest the page should offer.
+    pub horizon: u16,
+    /// `damped`, `cagr`, `linear`, or `flat`.
+    pub method: String,
+    /// Per-year decay applied to the fitted growth rate. 1.0 is undamped.
+    pub damping: f64,
+    /// Standard deviation of annual enrolled-ADM growth **across districts**.
+    ///
+    /// Not this district's variability — three observations cannot give that. It is how much
+    /// districts differ from one another, used as a floor on the uncertainty.
+    pub sigma: f64,
+    /// Standard deviations spanned on each side of the point.
+    pub z: f64,
+    /// What produced [`Projection::sigma`]. Printed wherever the band is.
+    pub prior_source: String,
+    /// Forecasts the consumer must reproduce.
+    pub checkpoints: Vec<ForecastCheckpoint>,
+}
+
 /// The exported feed.
 #[derive(Debug, Clone, PartialEq)]
 pub struct Bundle {
@@ -257,6 +327,8 @@ pub struct Bundle {
     pub statewide: Statewide,
     /// Reference results the consumer must reproduce.
     pub checkpoints: Vec<Checkpoint>,
+    /// How to project, and the forecasts that check the projection. `None` disables the band.
+    pub projection: Option<Projection>,
     /// Per-district records.
     pub districts: Vec<District>,
 }
@@ -402,7 +474,58 @@ impl Bundle {
             }
             s.push('\n');
         }
-        s.push_str("  ],\n  \"districts\": [\n");
+        s.push_str("  ],\n");
+
+        match &self.projection {
+            None => s.push_str("  \"projection\": null,\n"),
+            Some(p) => {
+                s.push_str("  \"projection\": {\n");
+                s.push_str(&format!("    \"base_year\": {},\n", p.base_year));
+                s.push_str(&format!("    \"horizon\": {},\n", p.horizon));
+                s.push_str(&format!("    \"method\": \"{}\",\n", escape(&p.method)));
+                s.push_str(&format!("    \"damping\": {},\n", num(p.damping)));
+                // Six places, not the four `num` gives: sigma is a growth rate around 0.02, and
+                // rounding it to 0.0234 would move a ten-year band by enough to fail its own
+                // checkpoint.
+                s.push_str(&format!("    \"sigma\": {:.6},\n", p.sigma));
+                s.push_str(&format!("    \"z\": {},\n", num(p.z)));
+                s.push_str(&format!(
+                    "    \"prior_source\": \"{}\",\n",
+                    escape(&p.prior_source)
+                ));
+                s.push_str("    \"checkpoints\": [\n");
+                for (i, c) in p.checkpoints.iter().enumerate() {
+                    s.push_str(&format!(
+                        "      {{\"label\": \"{}\", \"policy\": {{\"guarantee\": \"{}\", \
+                         \"guarantee_argument\": {}, \"base_cost_scale\": {}, \
+                         \"minimum_state_share\": {}, \"phase_in_base_cost\": {}, \
+                         \"phase_in_categorical\": {}}}, \"fiscal_year\": {}, \
+                         \"realized_aid\": {}, \"low\": {}, \"high\": {}, \"adm\": {}, \
+                         \"on_guarantee\": {}}}",
+                        escape(&c.label),
+                        escape(c.policy.guarantee),
+                        num(c.policy.guarantee_argument),
+                        num(c.policy.base_cost_scale),
+                        num(c.policy.minimum_state_share),
+                        num(c.policy.phase_in_base_cost),
+                        num(c.policy.phase_in_categorical),
+                        c.fiscal_year,
+                        num(c.realized_aid),
+                        num(c.low),
+                        num(c.high),
+                        num(c.adm),
+                        c.on_guarantee
+                    ));
+                    if i + 1 < p.checkpoints.len() {
+                        s.push(',');
+                    }
+                    s.push('\n');
+                }
+                s.push_str("    ]\n  },\n");
+            }
+        }
+
+        s.push_str("  \"districts\": [\n");
 
         for (i, d) in self.districts.iter().enumerate() {
             s.push_str("    {");
@@ -464,6 +587,12 @@ impl Bundle {
                 "\"enrollment_change\": {}, ",
                 opt(d.enrollment_change)
             ));
+            s.push_str(&format!(
+                "\"adm_history\": [{}, {}, {}], ",
+                num(d.adm_history[0]),
+                num(d.adm_history[1]),
+                num(d.adm_history[2])
+            ));
             match &d.outcome {
                 None => s.push_str("\"outcome\": null"),
                 Some(o) => s.push_str(&format!(
@@ -518,6 +647,7 @@ mod tests {
             operating_expenditure_per_pupil: Some(11_986.62),
             economically_disadvantaged: Some(0.3881),
             enrollment_change: Some(-0.03),
+            adm_history: [2_173.0, 2_140.0, 2_107.8],
             outcome: Some(DistrictOutcome {
                 performance_index: Some(89.9),
                 performance_index_prior: Some(89.1),
@@ -566,7 +696,30 @@ mod tests {
             fiscal_year: 2027,
             statewide: zero_statewide(),
             checkpoints,
+            projection: None,
             districts,
+        }
+    }
+
+    fn projection() -> Projection {
+        Projection {
+            base_year: 2026,
+            horizon: 2036,
+            method: "damped".into(),
+            damping: 0.85,
+            sigma: 0.023_456_7,
+            z: 1.0,
+            prior_source: "cross-sectional spread of district annual enrolled-ADM growth".into(),
+            checkpoints: vec![ForecastCheckpoint {
+                label: "current law, FY2032".into(),
+                policy: checkpoint().policy,
+                fiscal_year: 2032,
+                realized_aid: 7_100_000_000.0,
+                low: 6_860_000_000.0,
+                high: 7_350_000_000.0,
+                adm: 1_500_000.0,
+                on_guarantee: 320,
+            }],
         }
     }
 
@@ -663,7 +816,67 @@ mod tests {
     fn the_bundle_declares_its_contract_version() {
         assert!(bundle(vec![], vec![])
             .to_json()
-            .contains("\"contract_version\": \"3.0.0\""));
+            .contains("\"contract_version\": \"4.0.0\""));
+    }
+
+    #[test]
+    fn a_feed_without_a_projection_says_null_rather_than_omitting_the_key() {
+        // A consumer must be able to tell "this feed cannot be projected" from "this feed is
+        // from a build that predates projection". The first disables a band; the second is a
+        // contract mismatch and should have been caught by the version guard.
+        assert!(bundle(vec![], vec![])
+            .to_json()
+            .contains("\"projection\": null"));
+    }
+
+    #[test]
+    fn the_projection_block_carries_its_method_and_the_prior_the_band_rests_on() {
+        let b = Bundle {
+            projection: Some(projection()),
+            ..bundle(vec![sample()], vec![checkpoint()])
+        };
+        let json = b.to_json();
+        assert!(json.contains("\"method\": \"damped\""));
+        assert!(json.contains("\"damping\": 0.85"));
+        assert!(json.contains("\"base_year\": 2026"));
+        assert!(json.contains("cross-sectional spread"));
+    }
+
+    #[test]
+    fn sigma_keeps_six_places_because_four_would_move_a_ten_year_band() {
+        // `num` rounds to four, which turns 0.0234567 into 0.0235 — a 0.2% shift in the half
+        // width at a ten-year horizon, which is enough to fail the checkpoint it exists to pass.
+        let json = Bundle {
+            projection: Some(projection()),
+            ..bundle(vec![], vec![])
+        }
+        .to_json();
+        assert!(json.contains("\"sigma\": 0.023457"), "{json}");
+    }
+
+    #[test]
+    fn a_forecast_checkpoint_carries_both_ends_of_its_band() {
+        // A point with no interval is the thing this whole axis exists to not ship.
+        let json = Bundle {
+            projection: Some(projection()),
+            ..bundle(vec![], vec![])
+        }
+        .to_json();
+        assert!(json.contains("\"realized_aid\": 7100000000"));
+        assert!(json.contains("\"low\": 6860000000"));
+        assert!(json.contains("\"high\": 7350000000"));
+        assert!(json.contains("\"fiscal_year\": 2032"));
+    }
+
+    #[test]
+    fn every_district_carries_the_three_years_the_projection_is_fitted_from() {
+        // Not nullable: a district without a history cannot be projected, and a page that
+        // silently dropped it would report a statewide total over a subset of the panel.
+        let json = bundle(vec![sample()], vec![]).to_json();
+        assert!(
+            json.contains("\"adm_history\": [2173, 2140, 2107.8]"),
+            "{json}"
+        );
     }
 
     #[test]

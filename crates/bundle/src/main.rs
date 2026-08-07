@@ -12,14 +12,22 @@
 use std::collections::HashMap;
 
 use bundle::{
-    Bundle, Checkpoint, District, DistrictOutcome, OutcomeStatewide, PolicyShape, Statewide,
-    CONTRACT_VERSION,
+    Bundle, Checkpoint, District, DistrictOutcome, ForecastCheckpoint, OutcomeStatewide,
+    PolicyShape, Projection, Statewide, CONTRACT_VERSION,
 };
 use dispersion::{partial_correlation, wealth_neutrality};
+use edfund_core::FiscalYear;
 use project::outcomes::{joined, Joined};
-use project::panel::{panel, DistrictRecord, MINIMUM_STATE_SHARE, MODEL_YEAR};
+use project::panel::{panel, DistrictRecord, HISTORY_YEARS, MINIMUM_STATE_SHARE, MODEL_YEAR};
 use project::policy::{GuaranteeRule, Policy};
-use project::report::simulate;
+use project::report::{enrollment_growth_prior, forecast, simulate};
+use project::series::{Method, DEFAULT_DAMPING, ONE_SIGMA};
+
+/// The furthest year the page will offer, ten past the last observation.
+///
+/// Not further: the projection is damped precisely because an undamped trend produces a
+/// confident and absurd number at a long horizon, and offering FY2050 would invite one anyway.
+const HORIZON: FiscalYear = FiscalYear(2036);
 
 /// The FY2024 District Profile Report: millage, expenditure, demographics.
 const PROFILE: &str = include_str!("../../dispersion/fixtures/cupp-fy24-district-data.csv");
@@ -120,6 +128,23 @@ fn checkpoint_policies() -> Vec<(&'static str, Policy, PolicyShape)> {
             },
             shape("as-enacted", 0.0, 1.0, MINIMUM_STATE_SHARE, 0.5, 0.0),
         ),
+    ]
+}
+
+/// The (policy, year) pairs the web layer must reproduce before it may draw a band.
+///
+/// Chosen so that reproducing them is not reproducible by accident. Current law and the
+/// guarantee removed at the *same* year is the pair that pins the guarantee's role as a shock
+/// absorber — if the page's band is right for one and wrong for the other, it has got the kink
+/// in the aid curve wrong rather than the arithmetic. A short horizon checks that the interval
+/// compounds with the square root of the years rather than linearly, and a long one at a moved
+/// base cost checks that damping is applied per year rather than once.
+fn forecast_years() -> Vec<(&'static str, usize, FiscalYear)> {
+    vec![
+        ("current law, FY2028", 0, FiscalYear(2028)),
+        ("current law, FY2032", 0, FiscalYear(2032)),
+        ("guarantee removed, FY2032", 1, FiscalYear(2032)),
+        ("base cost +5%, FY2036", 4, HORIZON),
     ]
 }
 
@@ -237,6 +262,7 @@ fn to_district(
             let [first, _, last] = record.adm_history;
             (first > 0.0).then(|| last / first - 1.0)
         },
+        adm_history: record.adm_history,
         outcome: outcome.map(|joined| DistrictOutcome {
             performance_index: joined.outcome.performance_index,
             performance_index_prior: joined.outcome.performance_index_prior,
@@ -313,13 +339,14 @@ fn main() {
         outcomes: outcome_statewide(&outcomes),
     };
 
-    let checkpoints: Vec<Checkpoint> = checkpoint_policies()
-        .into_iter()
+    let policies = checkpoint_policies();
+    let checkpoints: Vec<Checkpoint> = policies
+        .iter()
         .map(|(label, policy, shape)| {
-            let effect = simulate(&records, &policy);
+            let effect = simulate(&records, policy);
             Checkpoint {
-                label: label.to_string(),
-                policy: shape,
+                label: (*label).to_string(),
+                policy: *shape,
                 cost: effect.cost(),
                 realized_aid: effect.policy.realized_aid,
                 gainers: effect.gainers(),
@@ -329,6 +356,41 @@ fn main() {
             }
         })
         .collect();
+
+    // One method for the whole feed. A page that let the reader pick between damped and undamped
+    // would be offering a choice whose consequences it has no basis to explain — three
+    // observations per district cannot say which is right.
+    let method = Method::Damped {
+        rate: 0.0,
+        damping: DEFAULT_DAMPING,
+    };
+    let prior = enrollment_growth_prior(&records, ONE_SIGMA);
+    let projection = Projection {
+        base_year: HISTORY_YEARS[HISTORY_YEARS.len() - 1].0,
+        horizon: HORIZON.0,
+        method: method.label().to_string(),
+        damping: DEFAULT_DAMPING,
+        sigma: prior.sigma,
+        z: prior.z,
+        prior_source: prior.source.to_string(),
+        checkpoints: forecast_years()
+            .into_iter()
+            .map(|(label, index, year)| {
+                let (_, policy, shape) = &policies[index];
+                let effect = forecast(&records, policy, year, method, prior);
+                ForecastCheckpoint {
+                    label: label.to_string(),
+                    policy: *shape,
+                    fiscal_year: year.0,
+                    realized_aid: effect.realized_aid,
+                    low: effect.low,
+                    high: effect.high,
+                    adm: effect.adm,
+                    on_guarantee: effect.on_guarantee,
+                }
+            })
+            .collect(),
+    };
 
     let bundle = Bundle {
         contract_version: CONTRACT_VERSION.to_string(),
@@ -343,6 +405,7 @@ fn main() {
         fiscal_year: MODEL_YEAR.0,
         statewide,
         checkpoints,
+        projection: Some(projection),
         districts,
     };
     print!("{}", bundle.to_json());

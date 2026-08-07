@@ -31,7 +31,7 @@ test.describe("boot", () => {
     const response = await request.get("/data/bundle.json");
     expect(response.status()).toBe(200);
     const bundle = await response.json();
-    expect(bundle.contract_version).toBe("3.0.0");
+    expect(bundle.contract_version).toBe("4.0.0");
     expect(bundle.districts).toHaveLength(609);
   });
 
@@ -47,9 +47,10 @@ test.describe("the verification gate", () => {
   }) => {
     await page.goto("/");
 
-    // The central invariant of this page, as the footer states it.
+    // The central invariant of this page, as the footer states it. Both halves are counted:
+    // the simulation checkpoints and the forecasts, which are gated separately.
     await expect(page.locator("#verified")).toHaveText(
-      "Formula verified against 8 reference scenarios",
+      "Formula verified against 8 reference scenarios and 4 reference forecasts",
     );
     await expect(page.locator("#verified")).not.toHaveClass(/err/);
 
@@ -204,6 +205,125 @@ test.describe("the scenario builder", () => {
     // The minimum resets to the model's own value, not to the slider's floor.
     await expect(page.locator("#lv-min")).toHaveValue("0.1");
     await expect(page.locator("#scenario-out")).toContainText("Current law");
+  });
+});
+
+test.describe("the projection", () => {
+  test("leads with the range and demotes the point to a footnote", async ({ page }) => {
+    // The design rule this axis was blocked on, made checkable. Everywhere else on this page the
+    // large number is a point estimate; here it must be an interval, or the interval becomes a
+    // disclaimer the eye skips.
+    await page.goto("/#scenario");
+    const headline = page.locator("#projection-out .tile.wide");
+    await expect(headline.locator(".v")).toContainText("–");
+    await expect(headline.locator(".v")).toContainText("$");
+    await expect(headline.locator(".n")).toContainText("Central estimate");
+    await expect(headline.locator(".n")).toContainText("not the answer");
+  });
+
+  test("draws a band with both bounds labelled and the centre dashed", async ({ page }) => {
+    await page.goto("/#scenario");
+    const fan = page.locator('#projection-out [data-chart="fan"] svg');
+    await expect(fan.locator("path.fan-band")).toHaveCount(1);
+    await expect(fan.locator("polyline.fan-edge")).toHaveCount(2);
+    await expect(fan.locator("polyline.fan-mid")).toHaveCount(1);
+    await expect(fan.locator("text.fan-bound")).toHaveCount(2);
+    // The truncated axis says so rather than leaving it to be noticed.
+    await expect(fan.locator("text.axis-label", { hasText: "not zero" })).toHaveCount(1);
+  });
+
+  test("says it is a forecast and that the card above it is not", async ({ page }) => {
+    // Simulation and projection are different epistemic acts and the page must not let them
+    // blur. There is deliberately no figure anywhere that adds the two together.
+    await page.goto("/#scenario");
+    await expect(page.locator("#projection-out")).toContainText("This is a forecast");
+    await expect(page.locator("#projection-out")).toContainText("the card above it is not");
+
+    // Under current law the simulation card says only that nothing moves; move a lever and it
+    // has to name itself as the deterministic half.
+    await page.locator("#lv-guarantee").selectOption("removed");
+    await expect(page.locator("#scenario-out")).toContainText("This is a simulation, not a forecast");
+
+    // And the forecast card is always after the simulation, never merged into it.
+    const order = await page.evaluate(() => {
+      const scenario = document.querySelector("#scenario-out");
+      const projection = document.querySelector("#projection-out");
+      return scenario!.compareDocumentPosition(projection!) & Node.DOCUMENT_POSITION_FOLLOWING;
+    });
+    expect(order).toBeGreaterThan(0);
+  });
+
+  test("removing the guarantee visibly widens the state's exposure", async ({ page }) => {
+    await page.goto("/#scenario");
+    const width = page
+      .locator("#projection-out .tile")
+      .filter({ hasText: "Band half-width" })
+      .locator(".v");
+    const enacted = await width.textContent();
+
+    await page.locator("#lv-guarantee").selectOption("removed");
+    await expect(width).not.toHaveText(enacted ?? "");
+    const removed = await width.textContent();
+
+    const number = (s: string | null) => Number((s ?? "").replace(/[^0-9.]/g, ""));
+    expect(number(removed)).toBeGreaterThan(number(enacted) * 1.5);
+    // And the card names what it is being compared against, so the reader is not left to
+    // remember the previous number.
+    await expect(page.locator("#projection-out")).toContainText("current law at the same horizon");
+  });
+
+  test("the horizon is a control, carries into the link, and turns the band off", async ({ page }) => {
+    await page.goto("/#scenario");
+    await page.locator("#lv-horizon").fill("2034");
+    await page.locator("#lv-horizon").dispatchEvent("input");
+    await expect(page).toHaveURL(/h=2034/);
+    await expect(page.locator("#projection-out")).toContainText("FY2034");
+
+    // The base year is the off position: no forecast, said out loud rather than an empty card.
+    await page.locator("#lv-horizon").fill("2026");
+    await page.locator("#lv-horizon").dispatchEvent("input");
+    await expect(page.locator("#projection-out")).toContainText("Not projected");
+    await expect(page.locator('#projection-out [data-chart="fan"]')).toHaveCount(0);
+  });
+
+  test("a shared link opens on the horizon it was shared with", async ({ page }) => {
+    await page.goto("/#scenario?g=as-enacted&arg=0.5&base=1&min=0.1&pb=1&pc=1&h=2036");
+    await expect(page.locator("#lv-horizon")).toHaveValue("2036");
+    await expect(page.locator("#projection-out .tile.wide .k")).toContainText("FY2036");
+  });
+
+  test("the district view compares enrollment years without inventing a published one", async ({
+    page,
+  }) => {
+    // The department publishes one calculator at a time, so there is no FY2025 payment figure in
+    // this repository. The card must say that rather than labelling a computed row as published.
+    await page.goto(`/#district/${CLEVELAND}`);
+    const card = page
+      .locator("#district-out .card")
+      .filter({ hasText: "What a year of enrollment is worth here" });
+    await expect(card.locator("tbody tr")).toHaveCount(3);
+    await expect(card).toContainText("FY2026 — the model's own");
+    await expect(card).toContainText("are not published");
+    await expect(card.locator('[data-chart="district-fan"] svg')).toHaveCount(1);
+  });
+
+  test("a guaranteed district's band is flat, and the page says why", async ({ page }) => {
+    // Cleveland is on the guarantee, which pays a fixed dollar amount that enrollment does not
+    // enter. A flat band is the finding, not a broken chart, so it is captioned as one.
+    await page.goto(`/#district/${CLEVELAND}`);
+    const card = page
+      .locator("#district-out .card")
+      .filter({ hasText: "What a year of enrollment is worth here" });
+    await expect(card).toContainText("The band is flat");
+    await expect(card).toContainText("does not respond to its enrollment");
+    // One bound label, because both ends are the same number.
+    await expect(card.locator("text.fan-bound")).toHaveCount(1);
+  });
+
+  test("the footer counts the forecasts it checked, not only the scenarios", async ({ page }) => {
+    await page.goto("/");
+    await expect(page.locator("#verified")).toContainText("reference forecasts");
+    await expect(page.locator("#verified")).not.toHaveClass(/err/);
   });
 });
 
