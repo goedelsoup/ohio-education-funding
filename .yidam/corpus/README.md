@@ -86,7 +86,7 @@ Sorted by: kind, then alphabetically.
 | [`local-property-tax`](revenue-stream/local-property-tax.yml) | revenue-stream | Local Property Tax | 3 | 8 |
 | [`state-foundation-aid`](revenue-stream/state-foundation-aid.yml) | revenue-stream | State Foundation Aid | 1 | 3 |
 | [`tpp-replacement-payments`](revenue-stream/tpp-replacement-payments.yml) | revenue-stream | Tangible Personal Property Tax Replacement Payments | 1 | 2 |
-| [`fsfp-input-year-refresh`](scenario/fsfp-input-year-refresh.yml) | scenario | FSFP Cost Input Refresh vs. Freeze | 6 | 3 |
+| [`fsfp-input-year-refresh`](scenario/fsfp-input-year-refresh.yml) | scenario | FSFP Cost Input Refresh vs. Freeze | 7 | 3 |
 | [`guarantee-phase-out`](scenario/guarantee-phase-out.yml) | scenario | Phasing Out the Temporary Transitional Aid Guarantee | 15 | 1 |
 
 60 nodes across 13 classes. **2 have nothing pointing at them**, which the corpus rules treat as a gap rather than a fact about the node.

@@ -53,7 +53,7 @@ description: |
 
       statewide computed base cost increase   $496.3 million per year
       ADM-weighted average                    $344.75 per pupil
-      per-pupil range                         $338.62  to  $580.82
+      per-pupil range                         $338.62  to  $471.10
 
   The single-district extrapolation above gave $528 million; the real distribution gives
   $496.3 million. The gap is mostly denominators — the worked example's grade mix is slightly
@@ -61,10 +61,27 @@ description: |
   The two agree to within about 6%, which is the useful check on the extrapolation.
 
   **THE SPREAD HAS A SINGLE CAUSE, AND IT IS THE STAFFING MINIMUM.** The most-affected district
-  gains 1.7 times per pupil what the least-affected does — $580.82 against $338.62 — with no
-  policy choice involved. **157 of 606 districts** are small enough that the six-teacher special
-  teacher minimum binds, and their mean per-pupil gain is $370.75 against $343.53 for everyone
+  gains 1.4 times per pupil what the least-affected does — $471.10 against $338.62 — with no
+  policy choice involved. **155 of 604 districts** are small enough that the six-teacher special
+  teacher minimum binds, and their mean per-pupil gain is $368.44 against $343.53 for everyone
   else. [verified]
+
+  **REVISED, AND THE OLD FIGURE WAS AN ARTIFACT.** This corpus reported a 1.7× spread with a
+  maximum of $580.82 through four phases. That maximum belonged to Vanlue Local, and it was
+  wrong because its input was: the grade-band fixture was produced through headless LibreOffice
+  by a pipeline that summed the department's withheld `<10` grade counts **as zero**. Vanlue has
+  four withheld grades, so its headcount total was understated by up to 36 in a district of 150,
+  and the `ADM / headcount` scale factor that drives its funded teacher count was inflated by
+  nearly a third.
+
+  Reading the pre-2007 file natively — see
+  [`crates/spreadsheet`](../../../crates/spreadsheet/) — reproduced 604 of the 606 rows byte for
+  byte and left the two suppressed districts' bands blank, which is what a band containing a
+  withheld grade actually is: unknown, not smaller. Both are now outside this panel, so the
+  denominator is 604.
+
+  The spread is real and structural. It was overstated, and the overstatement came from the one
+  convention this corpus had already written down and the pipeline predated. [verified]
 
   This is the same structural feature that makes small districts expensive per pupil in the
   first place, now visible as an incidence result: a minimum that funds more positions per pupil

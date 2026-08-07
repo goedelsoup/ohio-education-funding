@@ -39,7 +39,7 @@ Two incidence findings, both structural rather than chosen:
   share floor receive **5%**. A binary split, not a gradient — the transition *is* the floor.
   The node predicted "disproportionate"; the run showed something sharper, and both the
   prediction and the correction are recorded.
-- The per-pupil gain ranges from $338.62 to $580.82, a 1.7× spread, driven entirely by the
+- The per-pupil gain ranges from $338.62 to $471.10, a 1.4× spread, driven entirely by the
   six-teacher special minimum binding in **157 of 606** districts.
 
 So a refresh is progressive twice over and a freeze regressive twice over — through the state
