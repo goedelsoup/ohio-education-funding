@@ -22,6 +22,25 @@ description: |
   Adequacy is satisfiable without equity. A system that funds every district to a genuine
   costed requirement, and permits wealthy districts to spend far beyond it, is adequate and
   unequal. [inference] Ohio's current design is of that shape.
+
+  **The outcome formulation is now half-testable, which it was not before.** `contested` below
+  records the standing question of whether outcome or input measures should define the
+  requirement. Until the corpus acquired the
+  [Performance Index](../metric/performance-index.yml) it could only ever argue the input side,
+  because it held no measure of a result. It now holds one. What it still does not hold is a
+  threshold: Ohio publishes a continuous index and no declared sufficient level, so the outcome
+  formulation can say where a district sits and not whether that is enough. An outcome-based
+  adequacy claim needs a floor the state has not set, and *DeRolph I*'s objection to residual
+  budgeting applies with equal force to a floor set after the scores come in. [inference]
+
+  A warning that belongs here rather than only on the metrics. A cross-sectional correlation
+  between spending and measured achievement is not an adequacy test in either formulation, and
+  the near-zero coefficients now recorded on
+  [expenditure per equivalent pupil](../metric/expenditure-per-equivalent-pupil.yml) should not
+  be read as bearing on this doctrine. Adequacy asks whether resources meet a costed requirement.
+  Whether districts that spend more score higher is a different question, answered by comparing
+  districts to each other rather than to a standard — which is the equity frame wearing adequacy
+  language. [inference]
 properties:
   name: Adequacy
   origin: |

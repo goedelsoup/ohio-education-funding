@@ -32,6 +32,7 @@ relief is excluded. Three correct numbers, three different arguments.
 
 | [effective-operating-millage](effective-operating-millage.yml) | mills | Equity — the local effort side |
 | [performance-index](performance-index.yml) | index | Adequacy — the outcome side |
+| [expenditure-per-equivalent-pupil](expenditure-per-equivalent-pupil.yml) | dollars per pupil | Adequacy and equity — the report card's spending measure |
 
 That last row is new and the third row's label changed to make room for it. Per-pupil operating
 expenditure had been carrying the phrase "the outcome side," which was accurate only because
@@ -44,6 +45,17 @@ performance does — coefficient of variation 0.202 against roughly 0.124 — so
 correlation between them is a weaker statement than it sounds, and the distributions should be
 quoted before the coefficient is.
 
+**Two spending metrics now sit in this class, and the difference between them is load-bearing.**
+[per-pupil-operating-expenditure](per-pupil-operating-expenditure.yml) divides by a headcount.
+[expenditure-per-equivalent-pupil](expenditure-per-equivalent-pupil.yml) divides by an ADM count
+weighted upward for disadvantage, English learners, and disability, and runs about 22% lower at
+the median. The second is what DEW prints on the report card beside the Performance Index, which
+makes it the measure any Ohio spending-versus-results argument will reach for — and a
+need-weighted denominator is a need adjustment, so an analysis using it is not unadjusted no
+matter how few covariates it has. The class rule this establishes: **name the denominator before
+quoting the number.** Metrics that share a numerator and differ in their divisor are different
+metrics, not different presentations of one.
+
 The dispersion statistics themselves are computed by
 [`crates/dispersion`](../../../crates/dispersion/) and recorded on
 [`doctrine/equity`](../doctrine/equity.yml) rather than as a node of their own, since they
@@ -55,3 +67,12 @@ No metric covers the scholarship and community school diversion, so a district's
 is still not measurable — the `deduction` calculator remains a stub. Per-district expenditure
 series over time exist on the Auditor of State dashboard and are not extracted, so every metric
 here is a single cross-section rather than a series. [open]
+
+The two report-card metrics carry **no committed per-district values at all**. Every figure on
+them is quoted from [OCG White Paper 013](../../catalog/ocg-white-paper-013.md), a secondary
+source, and tagged accordingly. Joining the 2024-2025 Performance Index and both ADM columns
+onto [`crates/dispersion/fixtures/cupp-fy24-district-data.csv`](../../../crates/dispersion/fixtures/cupp-fy24-district-data.csv)
+by IRN would make three open questions computable at once: the poverty-outcome relationship the
+federal-spending proxy only gestures at, the spending-outcome correlation on an unweighted
+denominator, and the same association split by guarantee status. It is the cheapest high-value
+extraction available to the corpus. [open]

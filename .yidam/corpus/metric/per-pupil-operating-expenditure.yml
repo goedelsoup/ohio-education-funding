@@ -33,6 +33,22 @@ description: |
   Regressing it against [valuation per pupil](assessed-valuation-per-pupil.yml) is the
   wealth-neutrality test; comparing it against base cost per pupil is the adequacy test. It
   answers neither question by itself. [inference]
+
+  **The denominator here is a headcount, and its sibling's is not.** DEW's report card publishes
+  [expenditure per equivalent pupil](expenditure-per-equivalent-pupil.yml), which divides by an
+  ADM count weighted upward for disadvantage, English learners, and disability. That measure runs
+  about 22% lower at the median — $12,856 for 2024-2025 against $15,646 here for FY2024 — and it
+  is the one sitting next to the Performance Index on the same report card, so it is the one an
+  Ohio spending-versus-results argument will reach for. The two are not interchangeable in either
+  direction, and the difference is not cosmetic: a need-weighted denominator is a need adjustment
+  that suppresses exactly the gradient this metric exposes. [verified]
+
+  That gradient, computed over the same FY2024 cross-section behind the equity findings above:
+  operating expenditure per pupil correlates with the economically disadvantaged share at
+  **+0.383** (Spearman +0.348), and mean spending by quintile of disadvantage runs $15,526,
+  $15,148, $15,787, $16,103, **$18,990**. [verified] Ohio's highest-poverty fifth of districts
+  spends about $3,400 more per headcount pupil than its lowest. Any analysis reporting that
+  spending and need are unrelated should be checked for which denominator it used first.
 properties:
   name: Per-pupil operating expenditure
   unit: dollars-per-pupil
@@ -138,6 +154,8 @@ links:
     relationship: instance-of
   - target: assessed-valuation-per-pupil.yml
     relationship: derived-from
+  - target: expenditure-per-equivalent-pupil.yml
+    relationship: compares-against
   - target: ../doctrine/adequacy.yml
     relationship: operationalizes
   - target: ../doctrine/equity.yml
