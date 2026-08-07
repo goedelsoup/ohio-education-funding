@@ -47,16 +47,46 @@ description: |
       operating expenditure per pupil, Cupp FY24       -0.388    rho -0.350
       assessed valuation per pupil (FY23)              +0.321    rho +0.372
       total expenditure per EQUIVALENT pupil (FY25)    -0.016    rho +0.048
+      Progress (value-added) effect size 2024-25       +0.375
 
-  The last row is the one that gets quoted, and the difference between it and the row above it
-  is a denominator rather than a fact about Ohio. See
-  [expenditure per equivalent pupil](expenditure-per-equivalent-pupil.yml).
+  The equivalent-pupil row is the one that gets quoted, and what separates it from the
+  unweighted row above it is a denominator rather than a fact about Ohio. See
+  [expenditure per equivalent pupil](expenditure-per-equivalent-pupil.yml). The Progress row is
+  the other outcome measure, not a correlate of spending — see
+  [progress-value-added](progress-value-added.yml) for what it does to every sign here.
 
   **A distributional asymmetry to state before any of those coefficients.** Performance has a
   coefficient of variation of about 0.124; per-pupil spending, on either denominator, about
   0.202. **Ohio districts differ from one another about 60% more in what they spend than in what
   they score.** [verified] A near-zero coefficient between a wide distribution and a narrow one
   is a weaker statement than it sounds.
+
+  **IT BARELY MOVES, AND THAT CUTS BOTH WAYS.** Three school years are held. Adjacent years
+  correlate at **+0.988** and **+0.989**, 2022-23 against 2024-25 at **+0.981**, and the median
+  district's three-year range is **2.1 points** against a cross-district standard deviation of
+  10.9. [verified] So a single-year cross-section is a fair stand-in for a district's Index, and
+  the "single year, single measure" limitation is weaker than it looks. But a measure this static
+  cannot detect anything that changes annually — including what a district spends. Over this
+  window the Index is closer to a fixed district attribute than to an annual result. [inference]
+
+  **LAGGING THE SPENDING DOES NOT HELP, AND THE DIRECTION IS THE POINT.** FY2024 per-pupil
+  spending covers the 2023-24 school year. Against the Index for the year before it, the same
+  year, and the year after: [verified]
+
+      spending one year AFTER the outcome    -0.426
+      spending contemporaneous               -0.412
+      spending one year BEFORE the outcome   -0.388
+
+  The backwards lag is the strongest of the three. A causal reading needs the opposite ordering,
+  and this is the remedy [OCG White Paper 013](../../catalog/ocg-white-paper-013.md) proposed for
+  itself — "test lagged and cumulative spending measures rather than same-year expenditure." It
+  does not rescue the analysis; it closes it off. Nothing propagates forward here. [inference]
+
+  **AND A SECOND OUTCOME MEASURE NOW SITS BESIDE THIS ONE, DISAGREEING.** Against
+  [Progress (value-added)](progress-value-added.yml), the same spending variable with the same
+  single control correlates **+0.146** where it correlates −0.125 here. The negative association
+  recorded on this metric is a property of measuring level. It does not survive the switch to a
+  measure of gain, and neither metric should be quoted on outcomes without the other. [verified]
 
   **The average student's district scores below the average district.** Unweighted mean 87.7;
   weighted by enrollment, 85.1. [verified] Ohio's larger districts score lower, which is why the
@@ -105,11 +135,11 @@ properties:
     On the published per-EQUIVALENT-pupil denominator the same table reads 87.1, 87.4, 88.6,
     88.2, 87.2 — flat. Both are computed from the same 607 districts.
 
-    **Three years are held, and only one is used.** The achievement file carries
-    `Performance Index Score 2023-2024` and `2022-2023` in the same row, and both are committed
-    to the fixture. Nothing in this corpus reads them yet. Whether a district's Index is stable
-    enough across three years for a single-year cross-section to stand in for it is a question
-    the corpus can now answer cheaply and has not. [open]
+    **Three years are held and all three are read.** Adjacent-year correlations +0.988 and
+    +0.989; 2022-23 against 2024-25 +0.981; median within-district three-year range 2.1 points.
+    Whether the three sit on one report-card methodology is not established, and a redesign
+    inside the window would show up as exactly this kind of stability if the redesign preserved
+    ranks. [open]
   caveats: |
     **It is mostly a poverty measurement.** 71.6% of its cross-district variance is the
     economically disadvantaged share. Any use of this metric that does not say so is reporting
@@ -147,6 +177,8 @@ links:
   - target: ../doctrine/equity.yml
     relationship: operationalizes
   - target: expenditure-per-equivalent-pupil.yml
+    relationship: compares-against
+  - target: progress-value-added.yml
     relationship: compares-against
   - target: ../fiscal-period/fy2024-25.yml
     relationship: computed-for

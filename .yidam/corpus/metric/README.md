@@ -31,16 +31,25 @@ expenditure rose **116.8% nominally and 26.1% in real terms** — and 19.4% if f
 relief is excluded. Three correct numbers, three different arguments.
 
 | [effective-operating-millage](effective-operating-millage.yml) | mills | Equity — the local effort side |
-| [performance-index](performance-index.yml) | index | Adequacy — the outcome side |
+| [performance-index](performance-index.yml) | index | Adequacy — the outcome side, as level |
+| [progress-value-added](progress-value-added.yml) | index | Adequacy — the outcome side, as gain |
 | [expenditure-per-equivalent-pupil](expenditure-per-equivalent-pupil.yml) | dollars per pupil | Adequacy and equity — the report card's spending measure |
 
-That last row is new and the third row's label changed to make room for it. Per-pupil operating
+Two of those rows are new and the third row's label changed to make room for them. Per-pupil operating
 expenditure had been carrying the phrase "the outcome side," which was accurate only because
 nothing in this class measured an outcome. It is a resource. The
 [Performance Index](performance-index.yml) is the outcome, and its arrival is the first time
 this corpus can put a result next to an input.
 
-Read the two together with care. Spending disperses across districts about 60% more widely than
+**The two outcome measures disagree, and the disagreement is the finding.** Holding the
+economically disadvantaged share constant, per-pupil spending correlates −0.125 with the
+Performance Index and **+0.146** with the Progress effect size. The Index is 71.5% poverty and
+almost static across three years; Progress is 10.6% poverty and centred on zero by construction.
+Quoting either alone answers a different question than the reader will assume, and neither is
+causal. The class rule that follows: **an outcome claim names whether its measure is a level or
+a gain**, exactly as a spending claim names its denominator.
+
+Read the level measure and spending together with care. Spending disperses across districts about 60% more widely than
 performance does — coefficient of variation 0.202 against roughly 0.124 — so a near-zero
 correlation between them is a weaker statement than it sounds, and the distributions should be
 quoted before the coefficient is.
@@ -48,8 +57,8 @@ quoted before the coefficient is.
 **Two spending metrics now sit in this class, and the difference between them is load-bearing.**
 [per-pupil-operating-expenditure](per-pupil-operating-expenditure.yml) divides by a headcount.
 [expenditure-per-equivalent-pupil](expenditure-per-equivalent-pupil.yml) divides by an ADM count
-weighted upward for disadvantage, English learners, and disability, and runs about 22% lower at
-the median. The second is what DEW prints on the report card beside the Performance Index, which
+weighted upward for disadvantage, English learners, and disability, and runs 21% lower at the
+median within a single file. The second is what DEW prints on the report card beside the Performance Index, which
 makes it the measure any Ohio spending-versus-results argument will reach for — and a
 need-weighted denominator is a need adjustment, so an analysis using it is not unadjusted no
 matter how few covariates it has. The class rule this establishes: **name the denominator before
@@ -68,17 +77,24 @@ is still not measurable — the `deduction` calculator remains a stub. Per-distr
 series over time exist on the Auditor of State dashboard and are not extracted, so every metric
 here is a single cross-section rather than a series. [open]
 
-That extraction has been done. The `dew-report-card` connector retrieves the three 2024-25
+That extraction has been done. The `dew-report-card` connector retrieves four 2024-25
 publications and
 [`crates/dispersion/fixtures/report-card-2425-district-data.csv`](../../../crates/dispersion/fixtures/report-card-2425-district-data.csv)
-holds 607 districts with the Performance Index, both ADM columns, and the expenditure numerator;
+holds 607 districts with three years of Performance Index, the Progress composite and effect
+size, both ADM columns, and the expenditure numerator;
 [`crates/dispersion/tests/report_card_2425.rs`](../../../crates/dispersion/tests/report_card_2425.rs)
-pins what it shows. Every figure on both report-card metrics is now computed rather than quoted.
+pins what it shows in 20 tests. Every figure on all three report-card metrics is computed rather
+than quoted.
 
-What is still missing is time. Every metric in this class remains a single cross-section, and
-the achievement file's `2023-2024` and `2022-2023` columns are committed to the fixture and read
-by nothing — so whether a district's Index is stable enough for one year to stand for it is
-answerable today and unanswered. Per-district expenditure series over time exist on the Auditor
-of State dashboard and are not extracted. The DEW pupil-weight schedule that produces the
-weighted ADM is not held, so the corpus can measure what the weighting does without being able
-to say what it is. [open]
+What is still missing is time, and less of it than before. Three years of Performance Index are
+read: the measure is almost static (adjacent years +0.988, median within-district three-year
+range 2.1 points), which settles that one year stands in for a district's Index and also means
+the measure cannot detect anything annual. Only one year of Progress is held, and a gain measure
+is noisier than a level one, so its stability is the more important of the two questions and the
+unanswered one — the file's multi-year gain sheets are unextracted. [open]
+
+Per-district expenditure series over time exist on the Auditor of State dashboard and are not
+extracted. The DEW pupil-weight schedule that produces the weighted ADM is not held, so the
+corpus can measure what the weighting does without being able to say what it is. Nothing here
+controls for English-learner share, disability share, district typology, or regional cost —
+which is what would be needed before the +0.146 on growth means much. [open]

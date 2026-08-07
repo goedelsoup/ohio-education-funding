@@ -33,6 +33,15 @@ description: |
   adequacy claim needs a floor the state has not set, and *DeRolph I*'s objection to residual
   budgeting applies with equal force to a floor set after the scores come in. [inference]
 
+  **And the outcome side turned out to be two measures, not one.** The corpus now holds Ohio's
+  [Progress (value-added)](../metric/progress-value-added.yml) component beside the Index. They
+  rank districts differently — they correlate at only +0.375 — and against the same spending
+  variable, holding poverty constant, they carry opposite signs: −0.125 on level, +0.146 on gain.
+  [verified] So "outcome measures should define the requirement" is not one position but at
+  least two, and they do not agree about which districts are succeeding. Akron City is near the
+  bottom of the state on attainment and four stars on growth. Any outcome-based adequacy standard
+  has to choose, and the choice decides which districts are found deficient. [inference]
+
   A warning that belongs here rather than only on the metrics. A cross-sectional correlation
   between spending and measured achievement is not an adequacy test in either formulation, and
   the near-zero coefficients now recorded on

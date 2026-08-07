@@ -1,0 +1,139 @@
+class: metric
+label: Progress (Value-Added)
+description: |
+  The second outcome measure, and the one that answers a different question.
+  [Performance Index](performance-index.yml) measures where a district's students *are*;
+  Progress measures how far they *moved*, by comparing observed achievement against what the
+  state's model predicted from each student's own prior performance. [verified]
+
+  The corpus acquired the Index first and immediately found that 71.6% of its cross-district
+  variance is the economically disadvantaged share — so most of what it appears to say about
+  schools is a statement about who attends them. Progress exists to strip that out. It does not
+  fully succeed: it still tracks disadvantage at **−0.325**, about 10.6% of its variance.
+  [verified] But an order of magnitude less is a different measure, not a refinement of the same
+  one, and the two correlate with each other at only **+0.375**.
+
+  **THE FINDING: THE SIGN OF THE SPENDING RELATIONSHIP DEPENDS ON WHICH OUTCOME IS ASKED.**
+  [verified — computed; see
+  [`crates/dispersion/tests/report_card_2425.rs`](../../../crates/dispersion/tests/report_card_2425.rs)]
+
+      per-pupil spending (headcount denominator) against...
+                                          raw      holding disadvantage constant
+        Performance Index  (level)      -0.337              -0.125
+        Progress effect size (growth)   +0.018              +0.146
+
+  Same spending variable, same 605 districts, same single control. Against attainment level the
+  association is negative; against growth it is positive. Neither coefficient is large — the
+  partial correlations are worth about 1.6% and 2.1% of variance respectively — and neither is
+  causal. What they establish is narrower and firmer: **the negative association this corpus
+  recorded against the Performance Index is a property of measuring level, and it does not
+  survive the switch to a measure of gain.**
+
+  The raw growth figure is near zero for a legible reason rather than because nothing is there.
+  Poorer districts spend more per headcount pupil (+0.345) and show lower growth (−0.325), so the
+  two effects cancel. Removing the confounder does not weaken the relationship; it uncovers one.
+  [inference]
+
+  **AND THE DENOMINATOR QUESTION SIMPLY DOES NOT ARISE HERE.** The finding that dominates
+  [expenditure per equivalent pupil](expenditure-per-equivalent-pupil.yml) — that dividing by a
+  need-weighted pupil count moves the headline from −0.337 to −0.015 — has no counterpart on this
+  measure. Against growth, the two divisors give **−0.039** and **+0.029**: indistinguishable.
+  [verified] That is the strongest available confirmation of why the denominator mattered in the
+  first place. It mattered because the outcome was composition-driven and the divisor was a
+  composition proxy. Take the composition out of the outcome and the divisor stops doing
+  anything.
+
+  **What this does not license.** A positive partial correlation of +0.15 in a single-year
+  cross-section with one control is not evidence that spending raises achievement. Districts that
+  spend more differ from districts that spend less in ways the economically disadvantaged share
+  does not capture — English-learner and disability shares, district typology, regional labour
+  costs, and what the money was spent on. Those are unmodelled here, and the corpus holds none of
+  them. [open] The honest statement is that on Ohio's growth measure the relationship is not
+  negative, which is a correction to a widely quoted framing rather than a discovery about
+  whether money works. [inference]
+
+  **A cautionary property that is easy to miss.** `Overall Composite` is a precision-scaled
+  statistic — a gain divided by its standard error — so it rises with the number of tested
+  students and correlates with enrollment at **+0.244**. `Overall Effect Size` is the
+  standardised gain and correlates at +0.155. The two correlate with each other at +0.917, which
+  makes the choice look immaterial. It is not: ranking districts on the composite ranks them
+  partly by size. Every figure in this corpus uses the effect size. [verified]
+properties:
+  name: Progress (value-added) effect size
+  unit: index
+  definition: |
+    The district's overall value-added effect size for the school year, from the Progress
+    component of the Ohio School Report Card: the difference between observed and model-predicted
+    achievement across tested students and subjects, standardised.
+
+    Reported alongside `Overall Composite`, which is the same gain divided by its standard error
+    and is therefore a *significance* measure rather than a *magnitude* one. Use the effect size
+    for any cross-district comparison.
+
+    The underlying value-added model is DEW's and is not transcribed here. [open]
+  inputs: |
+    Ohio School Report Cards, district-level value-added download, sheet
+    `OVERALL_VALUE_ADDED_OVERVIEW`, keyed by District IRN — from
+    [dew-report-card-value-added](../../catalog/dew-report-card-value-added.md), retrieved by the
+    `dew-report-card` connector and committed at
+    [`crates/dispersion/fixtures/report-card-2425-district-data.csv`](../../../crates/dispersion/fixtures/report-card-2425-district-data.csv).
+  series: |
+    2024-2025, 607 rated traditional districts [verified]:
+
+      mean    -0.003
+      median  +0.000
+      sd       0.083
+      range   -0.29 to +0.29
+
+    Mean effect size by quintile of operating expenditure per unweighted pupil, lowest to
+    highest: +0.000, +0.016, −0.019, −0.012, +0.004 — flat, and genuinely flat rather than flat
+    by construction, since the same quintiles run 92.5 down to 81.6 on the Performance Index.
+
+    Measured associations [verified]:
+
+      economically disadvantaged share (FY24)        -0.325
+      Performance Index 2024-25                      +0.375
+      assessed valuation per pupil (FY23)            +0.205
+      federal expenditure per equivalent pupil       -0.206
+      spending per unweighted pupil                  -0.039
+      spending per weighted pupil                    +0.029
+      prior-year (FY24) spending per pupil           +0.029
+
+    Only one year is held. The file's one-, two-, and three-year gain sheets are not extracted,
+    so the corpus cannot ask whether growth is stable the way it has asked of the Index — which
+    matters more here, because a gain measure is noisier than a level one. [open]
+  caveats: |
+    **Centred by construction.** Ohio's value-added model is normed so the state average is
+    approximately zero. This measure ranks districts against each other and cannot say whether
+    Ohio as a whole improved. Any across-year or against-state reading of it is wrong. [verified]
+
+    **Not composition-free.** 10.6% of its variance is the economically disadvantaged share.
+    Much less than the Index's 71.5%, and not zero. Treating Progress as a clean measure of a
+    school's own contribution overstates what it does.
+
+    **Noisier than a level measure**, because a difference of two estimates carries both their
+    errors — which is exactly why the department publishes the composite with confidence bands
+    and rates districts on it rather than on the raw effect size.
+
+    **Use the effect size, not the composite.** The composite carries district size.
+
+    **A gain measure and a level measure can rank a district oppositely, and routinely do.**
+    Akron City posts a Performance Index of 65.8, near the bottom of the state, with a four-star
+    Progress rating. Reading either alone will describe that district wrongly. [verified]
+
+    **Population is the same 607 rated traditional districts**, matching on IRN with no losses.
+  calculator: |
+    Published, not computed. Association statistics over it are `dispersion`.
+links:
+  - target: ../metric.ont.yml
+    relationship: instance-of
+  - target: performance-index.yml
+    relationship: compares-against
+  - target: expenditure-per-equivalent-pupil.yml
+    relationship: compares-against
+  - target: ../doctrine/adequacy.yml
+    relationship: operationalizes
+  - target: ../fiscal-period/fy2024-25.yml
+    relationship: computed-for
+  - target: ../../catalog/dew-report-card-value-added.md
+    relationship: sourced-from

@@ -64,6 +64,14 @@ was largely right. And the variable it was standing in for is far stronger than 
 paper reports: disadvantage against the Performance Index is **−0.846**, 71.6% of the variance.
 [verified]
 
+**The measure it names in Future Research answers the question differently.** The paper lists
+"add other outcome measures, including the Progress (value-added) component." Done: against
+Progress, holding disadvantage constant, per-pupil spending correlates **+0.146**, where against
+the Performance Index it correlates −0.125. Its own proposed next step reverses the sign of its
+subject. Its other proposed step — lagged rather than same-year spending — does not help either:
+FY2024 spending tracks the *prior* year's Index (−0.426) slightly better than the following
+year's (−0.388), so there is no forward-directed signal to lag into. [verified]
+
 **One correction of description.** The paper reads state-and-local spending across performance
 quintiles as "moving in the opposite direction, from $12,403 to $13,324." That row is flat within
 $200 across four quintiles and steps $984 at the top. It is a step at the wealth end, not a

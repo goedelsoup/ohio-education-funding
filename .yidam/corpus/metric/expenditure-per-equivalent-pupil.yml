@@ -53,6 +53,14 @@ description: |
   "better" is not the same. See [`skills/dispersion`](../../skills/dispersion.md) and
   [equity](../doctrine/equity.yml).
 
+  **THE MECHANISM IS CONFIRMED FROM THE OTHER SIDE.** If the divisor mattered because it is a
+  composition proxy and the outcome was composition-driven, then an outcome with the composition
+  taken out should make the divisor irrelevant. It does. Against
+  [Progress (value-added)](progress-value-added.yml), the two divisors give **−0.039** and
+  **+0.029** — indistinguishable, where against the Performance Index they give −0.337 and
+  −0.015. [verified] The denominator effect is not a general property of the spending measure;
+  it appears only when the outcome is a level.
+
   **Robust, on both denominators, across the paper's own sensitivity checks.** Excluding
   Put-in-Bay Local, excluding the top one percent of spenders, excluding the smallest-enrollment
   decile, and log-transforming all leave the weighted-denominator coefficient near zero — the
@@ -84,6 +92,12 @@ description: |
   series gives +0.383 and +0.279 independently. [verified] Ohio's poorest and
   wealthiest districts both spend above its middle, for entirely different reasons, and a single
   coefficient across that shape is two relationships cancelling.
+
+  **AND THE CORRECTED NUMBER DOES NOT SURVIVE A CHANGE OF OUTCOME.** Holding disadvantage
+  constant, per-pupil spending correlates −0.125 with attainment level and **+0.146** with
+  growth. [verified] The negative sign recorded above belongs to the level measure, not to
+  spending. Anyone quoting −0.337 as what Ohio's spending achieves is making the same category
+  of error this node was written to correct, one step further along.
 
   **A HYPOTHESIS THIS PHASE TESTED AND DROPPED.** The obvious suspicion was the
   [temporary transitional aid guarantee](../formula-component/temporary-transitional-aid-guarantee.yml):
@@ -189,6 +203,8 @@ links:
   - target: per-pupil-operating-expenditure.yml
     relationship: compares-against
   - target: performance-index.yml
+    relationship: compares-against
+  - target: progress-value-added.yml
     relationship: compares-against
   - target: ../doctrine/adequacy.yml
     relationship: operationalizes
