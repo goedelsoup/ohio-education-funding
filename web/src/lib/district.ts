@@ -1,6 +1,6 @@
 /** The district view: what the formula computes for one district, and what it actually gets. */
 
-import { fanChart, type FanPoint } from "./chart.ts";
+import { barChart, fanChart, type FanPoint } from "./chart.ts";
 import { count, escapeHtml, money, ordinal, pct, percentileOf, signedMoney } from "./format.ts";
 import { renderDistrictOutcome } from "./outcomes.ts";
 import { apply, currentLaw } from "./policy.ts";
@@ -160,6 +160,98 @@ function renderEnrollmentYears(bundle: Bundle, d: District): string {
     </div>`;
 }
 
+/** Fiscal years federal pandemic relief makes uncomparable to what came before and after. */
+const PANDEMIC_YEARS = [2021, 2022, 2023, 2024];
+
+/**
+ * What the district actually received, raised, spent, and holds.
+ *
+ * # This is the only card on the page that is not a model
+ *
+ * Every other figure here is computed: what the FY2027 formula says a district is owed, what it
+ * spent per pupil on the department's definitions, what its pupils achieved. These are audited
+ * actuals from the district's own five-year forecast filing — money that changed hands.
+ *
+ * The two are differently constructed and this card never presents one as a check on the other.
+ * The general fund is also not the whole budget: capital, food service, and most federal
+ * programmes sit in other funds, so the spending here is not the district's total.
+ */
+function renderActuals(d: District): string {
+  if (d.finances.length === 0) return "";
+  const first = d.finances[0]!;
+  const latest = d.finances[d.finances.length - 1]!;
+  const cashChange = latest.ending_cash - first.ending_cash;
+  const yearsOfSpending =
+    latest.total_expenditure > 0 ? latest.ending_cash / latest.total_expenditure : null;
+  const deficits = d.finances.filter(
+    (y) => y.total_expenditure > y.total_revenue,
+  ).length;
+
+  const peak = d.finances.reduce((a, b) => (b.ending_cash > a.ending_cash ? b : a));
+  const bars = d.finances.map((y) => ({
+    label: `FY${y.fiscal_year}`,
+    value: y.ending_cash,
+    hover: `FY${y.fiscal_year}: ${money(y.ending_cash)} held, ${money(y.total_revenue)} in, ${money(y.total_expenditure)} out`,
+    ...(y.fiscal_year === peak.fiscal_year || y.fiscal_year === latest.fiscal_year
+      ? { direct: money(y.ending_cash) }
+      : {}),
+  }));
+
+  return `
+    <div class="card">
+      <h2>What it actually received, and what it holds</h2>
+      <div class="tiles">
+        <div class="tile"><div class="k">Cash on hand, FY${latest.fiscal_year}</div>
+          <div class="v">${money(latest.ending_cash)}</div>
+          <div class="n">${
+            yearsOfSpending == null
+              ? "no spending reported"
+              : `${yearsOfSpending.toFixed(2)} years of spending at this rate`
+          }</div></div>
+        <div class="tile"><div class="k">Change since FY${first.fiscal_year}</div>
+          <div class="v ${cashChange < 0 ? "loss" : "gain"}">${signedMoney(cashChange)}</div>
+          <div class="n">carry-over into FY${latest.fiscal_year + 1} is
+            ${money(latest.ending_cash)}</div></div>
+        <div class="tile"><div class="k">Years run at a deficit</div>
+          <div class="v">${deficits} of ${d.finances.length}</div>
+          <div class="n">spending above the year's own revenue</div></div>
+      </div>
+
+      <div class="chartwrap" data-chart="cash">${barChart(bars)}</div>
+      <p class="note">Cash held at 30 June, general fund.
+        FY${PANDEMIC_YEARS[0]}–FY${PANDEMIC_YEARS[PANDEMIC_YEARS.length - 1]} are the federal
+        pandemic relief years: that money was booked in the general fund by some districts and
+        separately by others, so a balance rising across them is not evidence about this
+        district's own position.</p>
+
+      <div class="scroll"><table>
+        <thead><tr>
+          <th>Fiscal year</th><th>State aid</th><th>Local tax</th>
+          <th>Revenue</th><th>Spending</th><th>Held at 30 June</th>
+        </tr></thead>
+        <tbody>${d.finances
+          .map(
+            (y) => `<tr>
+              <th>FY${y.fiscal_year}</th>
+              <td class="tnum">${money(y.state_aid)}</td>
+              <td class="tnum">${money(y.local_tax)}</td>
+              <td class="tnum">${money(y.total_revenue)}</td>
+              <td class="tnum">${money(y.total_expenditure)}</td>
+              <td class="tnum">${money(y.ending_cash)}</td>
+            </tr>`,
+          )
+          .join("")}</tbody>
+      </table></div>
+      <p class="note">These are <strong>audited actuals</strong> from this district's own
+        five-year forecast filing — the only figures on this page that record money changing
+        hands rather than a formula's output. State aid here is unrestricted grants-in-aid as the
+        treasurer books it, which is <em>not</em> the same construction as the
+        FY${2027} calculator's total state support above; the two are not comparable line for
+        line. Local tax is property plus income tax actually collected. General fund only, so
+        capital, food service, and most federal programmes are outside it.</p>
+    </div>`;
+}
+
 /** Render one district. */
 export function renderDistrict(bundle: Bundle, d: District): string {
   const valuations = bundle.districts
@@ -233,6 +325,8 @@ export function renderDistrict(bundle: Bundle, d: District): string {
     </div>
 
     ${renderEnrollmentYears(bundle, d)}
+
+    ${renderActuals(d)}
 
     <div class="card">
       <h2>Position among Ohio's ${bundle.statewide.districts} districts</h2>

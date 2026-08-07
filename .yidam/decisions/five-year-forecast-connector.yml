@@ -1,0 +1,91 @@
+id: five-year-forecast-connector
+summary: >-
+  An eleventh connector, dew-five-year-forecast, added to the ten now approved — the
+  first retrieving what districts actually received, spent, and held rather than what a
+  formula computes for them.
+context: |
+  Decision `proposals` approved nine connectors and `report-card-connector` a tenth. Every one of
+  the ten retrieves either a *modelled* figure — what a formula computes, what a district spent
+  per pupil on the department's own definitions — or an *outcome*. None retrieves a record of
+  money arriving in a bank account, and none says what a district holds.
+
+  That gap surfaced from a direct question: can this corpus show carry-over funding and cash on
+  hand? It could not, and neither could it show a district's actual state aid in any year. The
+  FY2027 funding calculator is a single-year model carrying no prior-year amounts, and the
+  department replaces rather than archives it, so a year-over-year comparison of *published*
+  funding was unavailable from the sources already wired.
+
+  The five-year forecast is where both live. Ohio districts file under R.C. 5705.391 and the
+  department republishes every filing at
+  `https://public.education.ohio.gov/School District Five-year Forecasts/` — an open directory,
+  no key, no form, 70 files back to 2008. Each filing carries **three years of audited actuals**
+  alongside its five forecast years, so two filings three years apart tile six consecutive closed
+  years without a gap.
+
+  What it reaches that nothing else here does:
+
+    7.010 / 7.020   Beginning and ending cash balance — carry-over and cash on hand, the only
+                    measure in this corpus of what a district holds rather than what it is given.
+    1.035           Unrestricted grants-in-aid: state foundation money as the district books it,
+                    per district per year. FY2020 is the year the temporary transitional aid
+                    guarantee holds districts at, and it had until now only been *inferrable
+                    from the guarantee itself*, which made every check of the guarantee circular.
+    1.010 / 1.030   Property and income tax actually collected — the local side as revenue.
+                    `tax-abstract` would have supplied valuation and remains unbuilt.
+decision: |
+  Approved. An eleventh connector, `dew-five-year-forecast`, publisher Ohio Department of
+  Education and Workforce, feeding `education-agency`, `revenue-stream`, `metric` and
+  `fiscal-period`, status Wired, with two sources: the FY2023 and FY2026 required spring update
+  submissions. The registry test that pins the connector list is updated from ten names to
+  eleven.
+
+  It is a separate connector rather than more sources under `dew-foundation`, on the same
+  reasoning that separated `dew-report-card`: different infrastructure (`public.education.ohio.gov`
+  rather than the CMS), a different release calendar, a different filing obligation, and a
+  different epistemic status. Merging them would put a treasurer's submission and the
+  department's own calculator behind one status flag.
+
+  Two constraints are approved with it, and both are enforced in code rather than left to
+  discipline.
+
+  **Only the actuals are extracted.** Each row carries the filing year's own forecast and four
+  future ones. Those are a district treasurer's projection made under incentives — a board
+  arguing for a levy and a board defending a balance want different numbers on the same line —
+  and this repository already has a projection engine whose assumptions it can state.
+  `connect::forecast::Line::current` is parsed and named so that a caller who wants a submitted
+  forecast has to ask for it, and the committed fixture contains none.
+
+  **The parser is header-driven and refuses a headerless file.** The department has published
+  this file under three layouts: headered from FY2022, headerless with a different column order
+  from FY2013 to FY2021, and zero-padded fixed-width before that. A positional parser would read
+  a district name as a line code on the second era and return an empty result, which looks
+  exactly like a clean parse. Extending the panel before FY2020 is a per-era reader and is not
+  approved here.
+rationale: |
+  The cost is the same one `report-card-connector` weighed and it is now larger: the connector
+  count is a rough proxy for maintained surface, and the nine at genesis were chosen to bound it.
+  Eleven is a second deliberate expansion.
+
+  What justifies it is that the corpus's central subject is a *guarantee*, and until now the
+  corpus could not observe the year the guarantee is defined against. Every statement it made
+  about whether the guarantee holds districts whole was derived from the guarantee's own output.
+  Two filings and an afternoon turn that into a measurement, and the measurement disagrees with
+  the plain reading: the median guaranteed district receives **89.9%** of what it booked in
+  FY2020, in nominal dollars, while the median formula-funded district receives **118.6%**. That
+  comparison is only available because both groups can now be measured the same way against the
+  same source — which is precisely the argument the provenance rule makes for holding data rather
+  than quoting it.
+
+  The narrower option — pinning only the FY2026 filing, which alone answers the cash-on-hand
+  question — was rejected. It would carry FY2023 to FY2025 and miss FY2020 entirely, and FY2020
+  is the year that makes the guarantee checkable.
+
+  The broader option — parsing all three eras back to 2008, giving a twenty-year panel — was
+  deferred rather than rejected. It is a per-era reader against layouts with no header to
+  validate against, and the pre-2020 years would arrive without the FY2027 funding model to join
+  them to. Recorded in the catalog entry as what a later phase would take up.
+
+  A note against a future reader's assumption: approving this connector does not make the
+  general fund the district's budget. Capital, food service, and most federal programmes sit in
+  other funds, so an expenditure figure from this source is not total spending and must never be
+  compared to a per-pupil expenditure figure from the profile report without saying so.

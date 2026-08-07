@@ -12,11 +12,12 @@
 use std::collections::HashMap;
 
 use bundle::{
-    Bundle, Checkpoint, District, DistrictOutcome, ForecastCheckpoint, OutcomeStatewide,
-    PolicyShape, Projection, Statewide, CONTRACT_VERSION,
+    Bundle, Checkpoint, District, DistrictOutcome, FinanceYear, ForecastCheckpoint,
+    OutcomeStatewide, PolicyShape, Projection, Statewide, CONTRACT_VERSION,
 };
 use dispersion::{partial_correlation, wealth_neutrality};
 use edfund_core::FiscalYear;
+use project::finances::{finances, for_district, Finances};
 use project::outcomes::{joined, Joined};
 use project::panel::{panel, DistrictRecord, HISTORY_YEARS, MINIMUM_STATE_SHARE, MODEL_YEAR};
 use project::policy::{GuaranteeRule, Policy};
@@ -237,6 +238,7 @@ fn to_district(
     record: &DistrictRecord,
     profile: Option<&&str>,
     outcome: Option<&Joined>,
+    money: Option<&Finances>,
 ) -> District {
     let adm = record.base_cost_adm();
     District {
@@ -263,6 +265,22 @@ fn to_district(
             (first > 0.0).then(|| last / first - 1.0)
         },
         adm_history: record.adm_history,
+        finances: money.map_or_else(Vec::new, |f| {
+            f.years
+                .iter()
+                .map(|year| FinanceYear {
+                    fiscal_year: year.fiscal_year.0,
+                    state_aid: year.unrestricted_aid,
+                    // Property and income tax together: a district with an income tax and one
+                    // without raise the local share differently, and a page comparing only
+                    // property tax would understate the second.
+                    local_tax: year.property_tax + year.income_tax,
+                    total_revenue: year.total_revenue,
+                    total_expenditure: year.total_expenditure,
+                    ending_cash: year.ending_cash,
+                })
+                .collect()
+        }),
         outcome: outcome.map(|joined| DistrictOutcome {
             performance_index: joined.outcome.performance_index,
             performance_index_prior: joined.outcome.performance_index_prior,
@@ -289,6 +307,7 @@ fn main() {
 
     let records = panel();
     let outcomes = joined();
+    let money = finances();
     let districts: Vec<District> = records
         .iter()
         .map(|record| {
@@ -296,6 +315,7 @@ fn main() {
                 record,
                 profile.get(record.irn.as_str()),
                 outcomes.iter().find(|j| j.funding.irn == record.irn),
+                for_district(&money, &record.irn),
             )
         })
         .collect();

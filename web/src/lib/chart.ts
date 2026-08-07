@@ -35,11 +35,16 @@ export function barChart(bars: Bar[], options: { max?: number } = {}): string {
   const labelWidth = 160;
   const width = 640;
   const height = bars.length * rowHeight;
+  // Room at the right for a direct label, sized to the longest one actually present. Without
+  // this a full-length bar's value runs off the viewBox and is clipped rather than wrapped —
+  // and it is the largest bar, so it is the one most worth reading.
+  const longest = Math.max(0, ...bars.map((b) => b.direct?.length ?? 0));
+  const gutter = longest > 0 ? 16 + longest * 7.2 : 20;
 
   const rows = bars
     .map((b, i) => {
       const y = i * rowHeight + (rowHeight - barHeight) / 2;
-      const w = Math.max(2, (Math.abs(b.value) / max) * (width - labelWidth - 60));
+      const w = Math.max(2, (Math.abs(b.value) / max) * (width - labelWidth - gutter));
       const hover = escapeHtml(b.hover ?? `${b.label}: ${b.value}`);
       return `
       <g class="bar-row" data-hover="${hover}">

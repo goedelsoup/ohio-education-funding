@@ -35,6 +35,7 @@ pub mod cache;
 pub mod conventions;
 pub mod cpi;
 pub mod fixtures;
+pub mod forecast;
 pub mod index;
 pub mod registry;
 pub mod sha256;
@@ -79,6 +80,8 @@ pub enum RebuildError {
     Source(FetchError),
     /// A workbook could not be parsed.
     Workbook(spreadsheet::OpenError),
+    /// A five-year forecast filing could not be parsed.
+    Forecast(forecast::ForecastError),
     /// A fixture could not be written.
     Io(std::io::Error),
 }
@@ -88,6 +91,7 @@ impl core::fmt::Display for RebuildError {
         match self {
             Self::Source(cause) => write!(f, "{cause}"),
             Self::Workbook(cause) => write!(f, "{cause}"),
+            Self::Forecast(cause) => write!(f, "{cause}"),
             Self::Io(cause) => write!(f, "{cause}"),
         }
     }
@@ -98,6 +102,12 @@ impl std::error::Error for RebuildError {}
 impl From<FetchError> for RebuildError {
     fn from(cause: FetchError) -> Self {
         Self::Source(cause)
+    }
+}
+
+impl From<forecast::ForecastError> for RebuildError {
+    fn from(cause: forecast::ForecastError) -> Self {
+        Self::Forecast(cause)
     }
 }
 
@@ -259,6 +269,33 @@ pub fn rebuild(root: &Path) -> Result<Vec<Rebuilt>, RebuildError> {
         }
         Err(cause) => Rebuilt::Skipped {
             path: fixtures::CPI_FIXTURE.to_string(),
+            reason: cause.to_string(),
+        },
+    });
+
+    // The financial panel: two filings, three years of actuals each, tiling FY2020 to FY2025.
+    // Both must be present — half the panel is worse than none, because a series with a hole in
+    // it silently becomes a series about the years that happened to be retrievable.
+    let filings: Result<Vec<_>, RebuildError> =
+        ["five-year-forecast-fy23", "five-year-forecast-fy26"]
+            .into_iter()
+            .map(|key| {
+                let filing = source(key).expect("registered").1;
+                let bytes = cache::read_cached(root, filing)?;
+                Ok(forecast::parse(&String::from_utf8_lossy(&bytes))?)
+            })
+            .collect();
+    out.push(match filings {
+        Ok(filings) => Rebuilt::Written {
+            path: fixtures::FINANCE_FIXTURE.to_string(),
+            rows: fixtures::write_csv(
+                &root.join(fixtures::FINANCE_FIXTURE),
+                fixtures::FINANCE_HEADER,
+                &fixtures::build_finance_extract(&filings),
+            )?,
+        },
+        Err(cause) => Rebuilt::Skipped {
+            path: fixtures::FINANCE_FIXTURE.to_string(),
             reason: cause.to_string(),
         },
     });
