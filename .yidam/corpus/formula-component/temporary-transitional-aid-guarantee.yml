@@ -1,0 +1,80 @@
+class: formula-component
+label: Temporary Transitional Aid Guarantee
+description: |
+  The hold-harmless. When the Fair School Funding Plan computes less for a district than a
+  prior-year baseline, the guarantee tops the district up to that baseline instead. [verified]
+  Line [I] of the School Finance Payment Report, R.C. 3317.019.
+
+  It is called temporary and transitional. In FY2027 — the terminal year of the six-year
+  phase-in, the year the formula reaches 100% of its computed amount — **294 of 609 districts,
+  48.3%, holding 54.1% of Ohio's students, are funded by it rather than by the formula.**
+  [verified] It totals $878,974,300. The median guaranteed district sits more than three times
+  above what a meaningful base cost increase would give it, so this is not a rounding buffer
+  catching a few edge cases; for half the state it is the operative funding mechanism.
+
+  **Who is on it, and why.** Both candidate explanations point the same way and one dominates
+  clearly. [verified — computed from the department's FY27 model; see
+  [`crates/foundation/tests/department_model_fy27.rs`](../../../crates/foundation/tests/department_model_fy27.rs)]
+
+                             enrollment falling fast    stable or rising
+      wealthy (> median)              79%                     65%
+      poor    (< median)              35%                     15%
+
+  Holding enrollment constant, being above the median in assessed valuation per pupil adds
+  about 45 points to the probability of being on the guarantee. Holding wealth constant, fast
+  enrollment decline adds about 15. **Property wealth predicts the guarantee roughly three
+  times more strongly than enrollment decline does.** By quartile of valuation per pupil the
+  rate runs 13%, 37%, 68%, 76% — monotonic, and three-quarters of Ohio's wealthiest districts
+  are held above what the formula computes for them. [verified]
+
+  The mechanism is not mysterious. Under the plan's own logic a property-wealthy district has
+  high local capacity, so its computed state share is small — that is the formula working as
+  designed. The guarantee then overrides that result and pays the district what it used to get.
+  [inference]
+
+  **The consequence for equity is direct.** The corpus records that state aid tracks poverty
+  (+0.630) more tightly than property wealth (−0.549), and reads that as the formula's targeting
+  working. The guarantee is part of why the wealth relationship is not stronger: it props up
+  precisely the districts the local capacity measure would fund least.
+  [inference — see [equity](../doctrine/equity.yml)]
+
+  **It also absorbs reform.** Because a guaranteed district's top-up shrinks by exactly what its
+  formula amount gains, roughly half of any base cost increase is absorbed rather than
+  delivered — the finding that halved this corpus's
+  [input-refresh scenario](../scenario/fsfp-input-year-refresh.yml). [verified]
+
+  Not established: what baseline year each district's guarantee is measured against, and whether
+  the guarantee level has been re-based across the phase-in or carried forward unchanged from
+  the Bridge era. That determines whether the population shrinks over time or is permanent in
+  all but name. [open]
+properties:
+  name: Temporary transitional aid guarantee
+  function: |
+    If the district's computed formula funding falls below a prior-year baseline, pay the
+    difference. Reported as line [I] of the Summary School Finance Payment Report, separate from
+    core foundation funding [H], and included in total formula funding [N].
+
+    Because it is a difference rather than a rate, any increase in computed funding reduces the
+    guarantee one-for-one until the guarantee reaches zero and the district returns to formula.
+  statutory_basis: R.C. 3317.019. [verified]
+  calculator: |
+    Not implemented. The absorption effect is computed directly in
+    crates/foundation/tests/department_model_fy27.rs; a general implementation belongs in the
+    `foundation` crate once the baseline derivation is established. [open]
+  fy2027_scale: |
+    294 of 609 districts (48.3%); 54.1% of base cost enrolled ADM; $878,974,300 total.
+    Guarantee amounts: median $1,946,072, p25 $924,177, p75 $3,684,989, max $25,894,168
+    (Columbus City). [verified]
+links:
+  - target: ../formula-component.ont.yml
+    relationship: instance-of
+  - target: fsfp-base-cost-calculation.yml
+    relationship: overrides
+  - target: fsfp-local-capacity-measure.yml
+    relationship: counteracts
+  - target: ../doctrine/equity.yml
+    relationship: bears-on
+  - target: ../fiscal-period/fy2027.yml
+    relationship: measured-in
+  - target: ../../catalog/dew-fy27-funding-calculator.md
+    relationship: sourced-from

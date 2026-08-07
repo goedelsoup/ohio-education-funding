@@ -34,6 +34,9 @@ struct Row {
     funded_special: f64,
     teacher_base_cost: f64,
     guarantee: f64,
+    adm_fy22: f64,
+    adm_fy24: f64,
+    valuation_per_pupil: Option<f64>,
 }
 
 impl Row {
@@ -63,6 +66,22 @@ impl Row {
     fn on_guarantee(&self) -> bool {
         self.guarantee > 0.0
     }
+
+    /// Enrollment change from FY2022 to FY2024, as a fraction.
+    fn enrollment_change(&self) -> f64 {
+        self.adm_fy24 / self.adm_fy22 - 1.0
+    }
+}
+
+/// Median of a slice, by value.
+fn median(mut v: Vec<f64>) -> f64 {
+    v.sort_by(|a, b| a.partial_cmp(b).unwrap());
+    v[v.len() / 2]
+}
+
+/// Share of a subset that is on the guarantee, as a percentage.
+fn guarantee_rate(set: &[&Row]) -> f64 {
+    100.0 * set.iter().filter(|r| r.on_guarantee()).count() as f64 / set.len() as f64
 }
 
 fn rows() -> Vec<Row> {
@@ -87,6 +106,9 @@ fn rows() -> Vec<Row> {
                 funded_special: f(11),
                 teacher_base_cost: f(12),
                 guarantee: f(15),
+                adm_fy22: f(16),
+                adm_fy24: f(17),
+                valuation_per_pupil: p[18].trim().parse::<f64>().ok(),
             }
         })
         .collect()
@@ -264,4 +286,152 @@ fn the_median_guaranteed_district_is_far_above_its_formula_amount() {
         median > 3.0,
         "median guarantee-to-increase ratio {median:.2}"
     );
+}
+
+// ---------------------------------------------------------------------------------------
+// Why is nearly half the state on a guarantee? Two candidate causes, tested against each
+// other: property wealth and enrollment decline. Both point the same way, so the question is
+// which dominates.
+// ---------------------------------------------------------------------------------------
+
+/// Guaranteed districts are wealthier, less poor, and shrinking faster than districts on
+/// formula. Every one of these medians runs the same direction.
+#[test]
+fn guaranteed_districts_are_wealthier_and_shrinking_faster() {
+    let rs = rows();
+    let on: Vec<&Row> = rs.iter().filter(|r| r.on_guarantee()).collect();
+    let off: Vec<&Row> = rs.iter().filter(|r| !r.on_guarantee()).collect();
+
+    let val = |set: &[&Row]| median(set.iter().filter_map(|r| r.valuation_per_pupil).collect());
+    let trend = |set: &[&Row]| median(set.iter().map(|r| r.enrollment_change()).collect());
+
+    assert!(
+        val(&on) > val(&off) * 1.3,
+        "guaranteed median valuation ${:.0} vs on-formula ${:.0}",
+        val(&on),
+        val(&off)
+    );
+    assert!(
+        trend(&on) < trend(&off),
+        "guaranteed enrollment change {:.4} vs on-formula {:.4}",
+        trend(&on),
+        trend(&off)
+    );
+    // Both groups are shrinking; the guaranteed group is shrinking faster.
+    assert!(trend(&on) < 0.0 && trend(&off) < 0.0);
+}
+
+/// **Wealth dominates.** Splitting on both axes at their medians, the wealth gap in guarantee
+/// rate is roughly three times the enrollment gap.
+///
+/// ```text
+///                        enrollment falling fast   stable/rising
+///   wealthy (> median)            79%                   65%
+///   poor    (< median)            35%                   15%
+/// ```
+///
+/// Holding enrollment constant, being wealthy adds ~45 points. Holding wealth constant, fast
+/// decline adds ~15.
+#[test]
+fn property_wealth_predicts_the_guarantee_three_times_more_strongly_than_decline() {
+    let owned = rows();
+    let rs: Vec<&Row> = owned
+        .iter()
+        .filter(|r| r.valuation_per_pupil.is_some())
+        .collect();
+
+    let med_val = median(rs.iter().filter_map(|r| r.valuation_per_pupil).collect());
+    let med_trend = median(rs.iter().map(|r| r.enrollment_change()).collect());
+
+    let cell = |wealthy: bool, falling: bool| -> f64 {
+        let sub: Vec<&Row> = rs
+            .iter()
+            .filter(|r| {
+                (r.valuation_per_pupil.unwrap() > med_val) == wealthy
+                    && (r.enrollment_change() < med_trend) == falling
+            })
+            .copied()
+            .collect();
+        guarantee_rate(&sub)
+    };
+
+    let (wf, ws, pf, ps) = (
+        cell(true, true),
+        cell(true, false),
+        cell(false, true),
+        cell(false, false),
+    );
+    assert!((wf - 79.0).abs() < 4.0, "wealthy+falling {wf:.0}%");
+    assert!((ws - 65.0).abs() < 4.0, "wealthy+stable {ws:.0}%");
+    assert!((pf - 35.0).abs() < 4.0, "poor+falling {pf:.0}%");
+    assert!((ps - 15.0).abs() < 4.0, "poor+stable {ps:.0}%");
+
+    let wealth_effect = ((wf - pf) + (ws - ps)) / 2.0;
+    let decline_effect = ((wf - ws) + (pf - ps)) / 2.0;
+    assert!(
+        wealth_effect > decline_effect * 2.5,
+        "wealth {wealth_effect:.0} points vs decline {decline_effect:.0} points"
+    );
+}
+
+/// The guarantee rate rises monotonically with property wealth, from 13% in the poorest
+/// quartile to 76% in the wealthiest. Three-quarters of Ohio's wealthiest districts are held
+/// above what the formula computes for them.
+#[test]
+fn guarantee_rate_rises_monotonically_with_property_wealth() {
+    let owned = rows();
+    let mut rs: Vec<&Row> = owned
+        .iter()
+        .filter(|r| r.valuation_per_pupil.is_some())
+        .collect();
+    rs.sort_by(|a, b| {
+        a.valuation_per_pupil
+            .unwrap()
+            .partial_cmp(&b.valuation_per_pupil.unwrap())
+            .unwrap()
+    });
+    let q = rs.len() / 4;
+    let rates: Vec<f64> = (0..4)
+        .map(|i| {
+            let slice = if i < 3 {
+                &rs[i * q..(i + 1) * q]
+            } else {
+                &rs[3 * q..]
+            };
+            guarantee_rate(slice)
+        })
+        .collect();
+
+    assert!((rates[0] - 13.0).abs() < 4.0, "Q1 {:.0}%", rates[0]);
+    assert!((rates[3] - 76.0).abs() < 4.0, "Q4 {:.0}%", rates[3]);
+    for w in rates.windows(2) {
+        assert!(
+            w[1] > w[0],
+            "guarantee rate must rise with wealth: {rates:?}"
+        );
+    }
+}
+
+/// Enrollment decline predicts the guarantee too, but weakly by comparison — 58% in the
+/// fastest-declining quartile against 31% among growing districts.
+#[test]
+fn enrollment_decline_predicts_the_guarantee_but_weakly() {
+    let owned = rows();
+    let mut rs: Vec<&Row> = owned.iter().collect();
+    rs.sort_by(|a, b| {
+        a.enrollment_change()
+            .partial_cmp(&b.enrollment_change())
+            .unwrap()
+    });
+    let q = rs.len() / 4;
+    let fastest = guarantee_rate(&rs[..q]);
+    let growing = guarantee_rate(&rs[3 * q..]);
+    assert!(
+        (fastest - 58.0).abs() < 5.0,
+        "fastest decline {fastest:.0}%"
+    );
+    assert!((growing - 31.0).abs() < 5.0, "growing {growing:.0}%");
+    assert!(fastest > growing);
+    // The spread is real but far narrower than the wealth spread of 13% to 76%.
+    assert!(fastest - growing < 40.0);
 }
