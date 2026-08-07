@@ -37,6 +37,7 @@ struct Row {
     adm_fy22: f64,
     adm_fy24: f64,
     valuation_per_pupil: Option<f64>,
+    core_foundation: f64,
 }
 
 impl Row {
@@ -71,6 +72,26 @@ impl Row {
     fn enrollment_change(&self) -> f64 {
         self.adm_fy24 / self.adm_fy22 - 1.0
     }
+
+    /// State aid per pupil as the formula computes it, before the guarantee.
+    fn formula_aid_per_pupil(&self) -> f64 {
+        self.core_foundation / self.adm
+    }
+
+    /// State aid per pupil as the district actually receives it.
+    fn realized_aid_per_pupil(&self) -> f64 {
+        (self.core_foundation + self.guarantee) / self.adm
+    }
+}
+
+/// Pearson correlation between two equal-length series.
+fn correlation(xs: &[f64], ys: &[f64]) -> f64 {
+    let n = xs.len() as f64;
+    let (mx, my) = (xs.iter().sum::<f64>() / n, ys.iter().sum::<f64>() / n);
+    let cov: f64 = xs.iter().zip(ys).map(|(a, b)| (a - mx) * (b - my)).sum();
+    let vx: f64 = xs.iter().map(|a| (a - mx).powi(2)).sum();
+    let vy: f64 = ys.iter().map(|b| (b - my).powi(2)).sum();
+    cov / (vx * vy).sqrt()
 }
 
 /// Median of a slice, by value.
@@ -109,6 +130,7 @@ fn rows() -> Vec<Row> {
                 adm_fy22: f(16),
                 adm_fy24: f(17),
                 valuation_per_pupil: p[18].trim().parse::<f64>().ok(),
+                core_foundation: f(19),
             }
         })
         .collect()
@@ -434,4 +456,171 @@ fn enrollment_decline_predicts_the_guarantee_but_weakly() {
     assert!(fastest > growing);
     // The spread is real but far narrower than the wealth spread of 13% to 76%.
     assert!(fastest - growing < 40.0);
+}
+
+// ---------------------------------------------------------------------------------------
+// Running the formula without the guarantee. The corpus can compute state aid as the formula
+// determines it ([H] core foundation funding) and as districts actually receive it
+// ([H] + [I]), and compare the two directly rather than inferring the difference.
+// ---------------------------------------------------------------------------------------
+
+/// Districts with valuation data, for the wealth comparisons.
+fn with_valuation(rs: &[Row]) -> Vec<&Row> {
+    rs.iter()
+        .filter(|r| r.valuation_per_pupil.is_some())
+        .collect()
+}
+
+/// The formula equalizes more strongly than realized funding does. Removing the guarantee
+/// strengthens the association between wealth and aid from -0.605 to -0.662.
+///
+/// The effect on the correlation is modest — about 9% — which is worth stating plainly because
+/// the level effect below is not modest at all. Correlation measures how tightly aid tracks
+/// wealth, not how much money moves.
+#[test]
+fn the_guarantee_weakens_the_formulas_equalization() {
+    let owned = rows();
+    let rs = with_valuation(&owned);
+    let wealth: Vec<f64> = rs.iter().map(|r| r.valuation_per_pupil.unwrap()).collect();
+    let formula: Vec<f64> = rs.iter().map(|r| r.formula_aid_per_pupil()).collect();
+    let realized: Vec<f64> = rs.iter().map(|r| r.realized_aid_per_pupil()).collect();
+
+    let cf = correlation(&wealth, &formula);
+    let cr = correlation(&wealth, &realized);
+
+    assert!(
+        (cf - -0.662).abs() < 0.02,
+        "formula-only correlation {cf:.3}"
+    );
+    assert!((cr - -0.605).abs() < 0.02, "realized correlation {cr:.3}");
+    assert!(
+        cf.abs() > cr.abs(),
+        "the formula alone must equalize more than realized funding does"
+    );
+}
+
+/// **The level effect, which is where the guarantee actually shows up — and it is starker than
+/// the correlation suggests.**
+///
+/// Median guarantee uplift by valuation quartile: **$0, $0, $685, $1,154**. The typical district
+/// in the poorer half of Ohio receives nothing from the guarantee at all, because most such
+/// districts are not on it. The typical district in the wealthiest quartile receives $1,154 per
+/// pupil, which more than doubles the state aid the formula would give it.
+///
+/// Comparing quartile medians rather than per-district differences gives $21 and $1,658 — a
+/// different question (how far apart typical districts end up) with the same answer in
+/// direction. Both are recorded because quoting either alone invites the wrong reading.
+#[test]
+fn the_guarantee_pays_wealthy_districts_and_the_poorer_half_nothing() {
+    let owned = rows();
+    let mut rs = with_valuation(&owned);
+    rs.sort_by(|a, b| {
+        a.valuation_per_pupil
+            .unwrap()
+            .partial_cmp(&b.valuation_per_pupil.unwrap())
+            .unwrap()
+    });
+    let q = rs.len() / 4;
+    let quartile = |i: usize| -> &[&Row] {
+        if i < 3 {
+            &rs[i * q..(i + 1) * q]
+        } else {
+            &rs[3 * q..]
+        }
+    };
+    let uplift = |set: &[&Row]| {
+        median(
+            set.iter()
+                .map(|r| r.realized_aid_per_pupil() - r.formula_aid_per_pupil())
+                .collect(),
+        )
+    };
+
+    // Median per-district uplift: nothing at all in the poorer half.
+    assert!(uplift(quartile(0)) == 0.0, "Q1 median uplift must be zero");
+    assert!(uplift(quartile(1)) == 0.0, "Q2 median uplift must be zero");
+    assert!(
+        (uplift(quartile(2)) - 685.0).abs() < 80.0,
+        "Q3 uplift ${:.0}",
+        uplift(quartile(2))
+    );
+    assert!(
+        (uplift(quartile(3)) - 1_154.0).abs() < 120.0,
+        "Q4 uplift ${:.0}",
+        uplift(quartile(3))
+    );
+
+    // The same comparison on quartile medians rather than per-district differences.
+    let med_aid = |set: &[&Row], f: fn(&Row) -> f64| median(set.iter().map(|r| f(r)).collect());
+    let q1_gap = med_aid(quartile(0), Row::realized_aid_per_pupil)
+        - med_aid(quartile(0), Row::formula_aid_per_pupil);
+    let q4_gap = med_aid(quartile(3), Row::realized_aid_per_pupil)
+        - med_aid(quartile(3), Row::formula_aid_per_pupil);
+    assert!((q1_gap - 21.0).abs() < 30.0, "Q1 median gap ${q1_gap:.0}");
+    assert!(
+        (q4_gap - 1_658.0).abs() < 150.0,
+        "Q4 median gap ${q4_gap:.0}"
+    );
+
+    // And it more than doubles what the wealthiest quartile would otherwise receive.
+    let q4_formula = median(
+        quartile(3)
+            .iter()
+            .map(|r| r.formula_aid_per_pupil())
+            .collect(),
+    );
+    let q4_realized = median(
+        quartile(3)
+            .iter()
+            .map(|r| r.realized_aid_per_pupil())
+            .collect(),
+    );
+    assert!(
+        q4_realized > q4_formula * 2.0,
+        "Q4 formula ${q4_formula:.0} vs realized ${q4_realized:.0}"
+    );
+}
+
+/// A methodological point the corpus needs, because it inverts a habit.
+///
+/// For *spending*, less dispersion is more equitable. For *state aid*, the opposite: aid is
+/// compensatory, so a wide spread means strong targeting and a narrow one means weak targeting.
+///
+/// Realized aid is measurably **more equal** than formula aid — coefficient of variation 0.544
+/// against 0.677, federal range ratio 9.6 against 12.3. That equality is the guarantee
+/// flattening the compensation, not an improvement.
+#[test]
+fn realized_aid_is_more_equal_than_formula_aid_and_that_is_the_problem() {
+    let owned = rows();
+    let rs = with_valuation(&owned);
+    let stats = |vals: Vec<f64>| -> (f64, f64) {
+        let n = vals.len() as f64;
+        let mean = vals.iter().sum::<f64>() / n;
+        let sd = (vals.iter().map(|v| (v - mean).powi(2)).sum::<f64>() / n).sqrt();
+        let mut s = vals;
+        s.sort_by(|a, b| a.partial_cmp(b).unwrap());
+        (sd / mean, s[19 * s.len() / 20] / s[s.len() / 20])
+    };
+
+    let (cv_formula, frr_formula) = stats(rs.iter().map(|r| r.formula_aid_per_pupil()).collect());
+    let (cv_realized, frr_realized) =
+        stats(rs.iter().map(|r| r.realized_aid_per_pupil()).collect());
+
+    assert!(
+        (cv_formula - 0.677).abs() < 0.03,
+        "formula CV {cv_formula:.3}"
+    );
+    assert!(
+        (cv_realized - 0.544).abs() < 0.03,
+        "realized CV {cv_realized:.3}"
+    );
+    assert!(
+        cv_realized < cv_formula,
+        "the guarantee compresses the aid distribution"
+    );
+    assert!(frr_realized < frr_formula, "and narrows its range");
+    assert!(
+        frr_formula > 10.0,
+        "formula aid spans more than 10x across the distribution"
+    );
 }

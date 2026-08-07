@@ -43,6 +43,39 @@ description: |
   delivered — the finding that halved this corpus's
   [input-refresh scenario](../scenario/fsfp-input-year-refresh.yml). [verified]
 
+  **RUNNING THE FORMULA WITHOUT IT.** The department's model publishes core foundation funding
+  [H] separately from the guarantee [I], so the two can be compared directly rather than
+  inferred. [verified]
+
+  On correlation, the guarantee's effect is modest. State aid per pupil against assessed
+  valuation per pupil correlates at **−0.662 on formula alone and −0.605 as realized** — the
+  guarantee gives up about 9% of the formula's equalization.
+
+  On levels it is not modest at all. Median guarantee uplift per pupil, by valuation quartile:
+
+      Q1 poorest        $0
+      Q2                $0
+      Q3              $685
+      Q4 wealthiest  $1,154
+
+  **The typical district in the poorer half of Ohio receives nothing from the guarantee**,
+  because most such districts are not on it. The typical district in the wealthiest quartile
+  receives $1,154 per pupil — which more than doubles the $1,113 the formula would give it.
+  [verified] Comparing quartile medians instead of per-district differences gives $21 against
+  $1,658; both framings are recorded because either quoted alone invites the wrong reading.
+
+  The correlation understates this because correlation measures how tightly aid tracks wealth,
+  not how much money moves. A component can leave the ranking almost intact while transferring
+  a great deal. [inference]
+
+  **A METHODOLOGICAL POINT THIS FORCED.** For spending, less dispersion is more equitable. For
+  state aid the sign flips: aid is compensatory, so a wide spread means strong targeting and a
+  narrow one means weak targeting. Realized aid is measurably *more equal* than formula aid —
+  coefficient of variation 0.544 against 0.677, federal range ratio 9.6 against 12.3.
+  [verified] That equality is the guarantee flattening the compensation. Reporting it as an
+  improvement, which the habit from spending analysis would invite, gets the direction exactly
+  backwards. See [equity](../doctrine/equity.yml).
+
   Not established: what baseline year each district's guarantee is measured against, and whether
   the guarantee level has been re-based across the phase-in or carried forward unchanged from
   the Bridge era. That determines whether the population shrinks over time or is permanent in
