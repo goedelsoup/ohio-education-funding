@@ -182,11 +182,13 @@ pub fn rebuild(root: &Path) -> Result<Vec<Rebuilt>, RebuildError> {
     let spending = source("spend-per-pupil-2425").expect("registered").1;
     let expanded = source("expanded-list-fy25").expect("registered").1;
     let value_added = source("va-district-details-2425").expect("registered").1;
+    let details = source("district-details-2425").expect("registered").1;
 
     let achievement_book = open_workbook(root, achievement)?;
     let spending_book = open_workbook(root, spending)?;
     let expanded_book = open_workbook(root, expanded)?;
     let value_added_book = open_workbook(root, value_added)?;
+    let details_book = open_workbook(root, details)?;
 
     // Excel truncates a sheet name at 31 characters, which is why the weighted sheet is
     // "Expenditure per Equivalent Pup" and not "...Pupil". Spelling it out is not an option.
@@ -196,6 +198,8 @@ pub fn rebuild(root: &Path) -> Result<Vec<Rebuilt>, RebuildError> {
         &expanded_book.rows("Expenditure per Equivalent Pup")?,
         &expanded_book.rows("Expenditure per Pupil")?,
         &value_added_book.rows("OVERALL_VALUE_ADDED_OVERVIEW")?,
+        &value_added_book.rows("OVERALL_VA_1_YEAR_GAINS")?,
+        &details_book.rows("District_Details")?,
     );
     out.push(Rebuilt::Written {
         path: fixtures::REPORT_CARD_FIXTURE.to_string(),

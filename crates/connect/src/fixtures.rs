@@ -295,6 +295,10 @@ pub const REPORT_CARD_HEADER: &[&str] = &[
     "exp_per_equivalent_pupil_state_local_fy25",
     "progress_composite_2425",
     "progress_effect_size_2425",
+    "progress_effect_size_1yr_2425",
+    "econ_disadvantaged_pct_2425",
+    "english_learner_pct_2425",
+    "students_with_disabilities_pct_2425",
 ];
 
 /// Column positions in the Achievement download's `Performance_Index` sheet.
@@ -339,7 +343,34 @@ mod value_added_columns {
     pub const IRN: usize = 0;
     pub const COMPOSITE: usize = 5;
     pub const EFFECT_SIZE: usize = 6;
+    /// On the `*_GAINS` sheets the effect size sits one column earlier than on the overview,
+    /// because those sheets carry no star rating.
+    pub const GAINS_EFFECT_SIZE: usize = 5;
 }
+
+/// Column positions in `District_Details`, which is in long form: one row per district per
+/// student group, rather than one row per district.
+mod details_columns {
+    pub const IRN: usize = 0;
+    pub const STUDENT_GROUP: usize = 4;
+    pub const ENROLLMENT_PERCENT: usize = 6;
+}
+
+/// Student-group labels this corpus reads from `District_Details`.
+///
+/// # The economic-disadvantage share here is not the Cupp Report's
+///
+/// This one is top-coded: 87 districts report exactly 100.0% and 197 report 95% or more,
+/// because community eligibility counts every student in a qualifying district as economically
+/// disadvantaged. The Cupp Report's FY2024 measure puts 37 districts at 100%. They correlate at
+/// only +0.823 and against the Performance Index they give -0.734 and -0.846 respectively — the
+/// censored one weaker, as censoring predicts. Both are committed; neither substitutes for the
+/// other.
+const ECONOMIC_DISADVANTAGE: &str = "Economic Disadvantage";
+/// Reported for about half of districts; the rest are suppressed at fewer than ten students.
+const ENGLISH_LEARNER: &str = "English Learner";
+/// Reported for every district.
+const STUDENTS_WITH_DISABILITIES: &str = "Students with Disabilities";
 
 /// The Expanded List's label for a traditional district.
 ///
@@ -359,6 +390,8 @@ pub fn build_report_card_extract<'a>(
     weighted_rows: &'a [Vec<String>],
     unweighted_rows: &'a [Vec<String>],
     value_added_rows: &'a [Vec<String>],
+    one_year_gain_rows: &'a [Vec<String>],
+    details_rows: &'a [Vec<String>],
 ) -> Vec<Vec<String>> {
     let spending: HashMap<&str, &Vec<String>> =
         rows_by_key(spending_rows, spending_columns::IRN).collect();
@@ -375,6 +408,14 @@ pub fn build_report_card_extract<'a>(
     let unweighted = districts_only(unweighted_rows);
     let value_added: HashMap<&str, &Vec<String>> =
         rows_by_key(value_added_rows, value_added_columns::IRN).collect();
+    let one_year: HashMap<&str, &Vec<String>> =
+        rows_by_key(one_year_gain_rows, value_added_columns::IRN).collect();
+
+    // Long form: key on (IRN, student group) rather than IRN alone.
+    let mut details: HashMap<(&str, &str), &Vec<String>> = HashMap::new();
+    for (irn, row) in rows_by_key(details_rows, details_columns::IRN) {
+        details.insert((irn, cell(row, details_columns::STUDENT_GROUP).trim()), row);
+    }
 
     achievement_rows
         .iter()
@@ -386,6 +427,12 @@ pub fn build_report_card_extract<'a>(
             let irn = cell(row, achievement_columns::IRN).trim().to_string();
             let spend = spending.get(irn.as_str()).copied();
             let growth = value_added.get(irn.as_str()).copied();
+            let gain = one_year.get(irn.as_str()).copied();
+            let share = |group: &str| {
+                details
+                    .get(&(irn.as_str(), group))
+                    .and_then(|r| number(cell(r, details_columns::ENROLLMENT_PERCENT)))
+            };
             let wtd = weighted.get(irn.as_str()).copied();
             let unw = unweighted.get(irn.as_str()).copied();
 
@@ -407,6 +454,10 @@ pub fn build_report_card_extract<'a>(
                 format_value(from(spend, spending_columns::STATE_AND_LOCAL), 2),
                 format_value(from(growth, value_added_columns::COMPOSITE), 2),
                 format_value(from(growth, value_added_columns::EFFECT_SIZE), 2),
+                format_value(from(gain, value_added_columns::GAINS_EFFECT_SIZE), 2),
+                format_value(share(ECONOMIC_DISADVANTAGE), 1),
+                format_value(share(ENGLISH_LEARNER), 1),
+                format_value(share(STUDENTS_WITH_DISABILITIES), 1),
             ]
         })
         .collect()

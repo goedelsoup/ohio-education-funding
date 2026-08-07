@@ -16,7 +16,8 @@
 //! rather than quietly rewriting the corpus.
 
 use dispersion::{
-    partial_correlation, rank_correlation, wealth_neutrality, weighted_mean, Dispersion,
+    least_squares, partial_correlation, rank_correlation, wealth_neutrality, weighted_mean,
+    Dispersion,
 };
 
 const REPORT_CARD: &str = include_str!("../fixtures/report-card-2425-district-data.csv");
@@ -37,6 +38,10 @@ mod col {
     pub const PROGRESS_EFFECT_SIZE: usize = 12;
     pub const PI_2324: usize = 3;
     pub const PI_2223: usize = 4;
+    pub const PROGRESS_EFFECT_1YR: usize = 13;
+    pub const ED_SHARE_2425: usize = 14;
+    pub const EL_SHARE_2425: usize = 15;
+    pub const SWD_SHARE_2425: usize = 16;
 }
 
 /// Column indices in the profile-report fixture.
@@ -774,4 +779,221 @@ fn on_the_growth_measure_the_divisor_stops_mattering() {
     // Against -0.337 and -0.015 on the level measure: the gap was composition, and the growth
     // measure has most of the composition taken out of it.
     assert!((unweighted - weighted).abs() < 0.1);
+}
+
+// ---------------------------------------------------------------------------------------
+// The need-adjusted model
+// ---------------------------------------------------------------------------------------
+
+/// Rows with every model variable present, as column vectors.
+///
+/// English-learner share is imputed at zero where the department suppressed it. The suppression
+/// marker is a matched `<10` enrollment and `NC` percent, so these are districts with fewer than
+/// ten English learners — under 0.7% of a median district. The assumption is stated rather than
+/// hidden, and `the_model_survives_dropping_the_imputed_rows` re-runs without them.
+fn model_frame(impute_english_learner: bool) -> (Vec<Vec<f64>>, Vec<f64>, Vec<f64>, Vec<f64>) {
+    let rows = report_card();
+    let ed = joined(&rows, PROFILE, profile::IRN, profile::ECON_DISADVANTAGED);
+    let valuation = joined(&rows, PROFILE, profile::IRN, profile::VALUATION_PER_PUPIL);
+    let spending = per_pupil(&rows, col::UNWEIGHTED_ADM);
+
+    let (mut spend, mut disadvantage, mut learner, mut disability) =
+        (vec![], vec![], vec![], vec![]);
+    let (mut enrollment, mut wealth) = (vec![], vec![]);
+    let (mut level, mut growth, mut growth_one_year) = (vec![], vec![], vec![]);
+
+    for (i, row) in rows.iter().enumerate() {
+        let el = match row.get(col::EL_SHARE_2425) {
+            Some(v) => Some(v),
+            None if impute_english_learner => Some(0.0),
+            None => None,
+        };
+        let (Some(s), Some(e), Some(l), Some(d), Some(a), Some(w), Some(pi), Some(g), Some(g1)) = (
+            spending[i],
+            ed[i],
+            el,
+            row.get(col::SWD_SHARE_2425),
+            row.get(col::UNWEIGHTED_ADM),
+            valuation[i],
+            row.get(col::PERFORMANCE_INDEX),
+            row.get(col::PROGRESS_EFFECT_SIZE),
+            row.get(col::PROGRESS_EFFECT_1YR),
+        ) else {
+            continue;
+        };
+        spend.push(s);
+        disadvantage.push(e * 100.0);
+        learner.push(l);
+        disability.push(d);
+        enrollment.push(a.ln());
+        wealth.push(w / 1000.0);
+        level.push(pi);
+        growth.push(g);
+        growth_one_year.push(g1);
+    }
+    (
+        vec![spend, disadvantage, learner, disability, enrollment, wealth],
+        level,
+        growth,
+        growth_one_year,
+    )
+}
+
+/// **The need-adjusted model.** Controlling for economic disadvantage, English-learner and
+/// disability shares, district size, and property wealth, the spending coefficient is small and
+/// negative against attainment level and moderate and positive against growth.
+///
+/// This is the multivariable descriptive model OCG White Paper 013 named as its own priority
+/// next step. It does not identify an effect and this file claims none. It does establish that
+/// the sign difference between the two outcome measures is not an artifact of controlling for
+/// poverty alone.
+#[test]
+fn the_need_adjusted_model_keeps_the_sign_difference() {
+    let (predictors, level, growth, _) = model_frame(true);
+    assert_eq!(level.len(), 606);
+
+    let on_level = least_squares(&predictors, &level).unwrap();
+    let on_growth = least_squares(&predictors, &growth).unwrap();
+
+    close(
+        on_level.standardized[0],
+        -0.073,
+        0.006,
+        "spending on level, standardised",
+    );
+    close(
+        on_growth.standardized[0],
+        0.209,
+        0.006,
+        "spending on growth, standardised",
+    );
+    assert!(on_level.t_statistics[1] < -2.0 && on_growth.t_statistics[1] > 2.0);
+
+    // The level model is mostly demographics; the growth model explains far less of anything.
+    close(on_level.r_squared, 0.752, 0.005, "level model fit");
+    close(on_growth.r_squared, 0.227, 0.005, "growth model fit");
+
+    // Disadvantage dominates the level model and is present but not dominant on growth.
+    assert!(on_level.standardized[1] < -0.6);
+    assert!(on_growth.standardized[1] > -0.5 && on_growth.standardized[1] < -0.2);
+}
+
+/// Adding controls *strengthens* the growth coefficient at every step, which is the signature of
+/// a relationship being uncovered rather than manufactured.
+#[test]
+fn controls_uncover_the_growth_relationship_rather_than_creating_it() {
+    let (predictors, _, growth, _) = model_frame(true);
+    let mut betas = vec![];
+    for depth in [1usize, 2, 4, 6] {
+        let subset: Vec<Vec<f64>> = predictors.iter().take(depth).cloned().collect();
+        betas.push(least_squares(&subset, &growth).unwrap().standardized[0]);
+    }
+    close(betas[0], 0.016, 0.006, "spending alone");
+    close(betas[1], 0.147, 0.006, "plus disadvantage");
+    close(betas[3], 0.209, 0.006, "plus every control");
+    assert!(betas[0] < betas[1] && betas[1] < betas[3] + 0.01);
+}
+
+/// Property wealth predicts where a district's students are and not how far they moved. The
+/// cleanest statement of the level/gain distinction available in this data.
+#[test]
+fn wealth_predicts_attainment_but_not_growth() {
+    let (predictors, level, growth, _) = model_frame(true);
+    let on_level = least_squares(&predictors, &level).unwrap();
+    let on_growth = least_squares(&predictors, &growth).unwrap();
+    // Valuation per pupil is the sixth predictor.
+    assert!(on_level.t_statistics[6] > 2.0, "wealth predicts level");
+    assert!(
+        on_growth.t_statistics[6].abs() < 1.5,
+        "wealth does not predict growth: t = {:.2}",
+        on_growth.t_statistics[6]
+    );
+}
+
+/// The published Progress measure is a three-year average, so pairing it with one year of
+/// spending is a mismatch. The one-year gain answers the same question year-matched, and gives
+/// the same sign slightly larger.
+#[test]
+fn the_year_matched_growth_measure_agrees() {
+    let (predictors, _, growth, one_year) = model_frame(true);
+    let three = least_squares(&predictors, &growth).unwrap();
+    let single = least_squares(&predictors, &one_year).unwrap();
+    close(
+        single.standardized[0],
+        0.269,
+        0.008,
+        "one-year gain, standardised",
+    );
+    assert!(single.standardized[0] > three.standardized[0]);
+    assert!(single.t_statistics[1] > 2.0);
+}
+
+/// Dropping the districts whose English-learner share was imputed leaves the result standing.
+#[test]
+fn the_model_survives_dropping_the_imputed_rows() {
+    let (predictors, _, growth, _) = model_frame(false);
+    assert!(
+        predictors[0].len() < 400,
+        "the suppressed rows really are numerous"
+    );
+    let fit = least_squares(&predictors, &growth).unwrap();
+    assert!(
+        fit.standardized[0] > 0.1 && fit.t_statistics[1] > 2.0,
+        "complete cases: beta {:.3}, t {:.2}",
+        fit.standardized[0],
+        fit.t_statistics[1]
+    );
+}
+
+/// The report card's own economic-disadvantage share is top-coded by community eligibility and
+/// is a different variable from the Cupp Report's. Both are committed; they are not substitutes.
+#[test]
+fn the_two_economic_disadvantage_measures_are_not_the_same_variable() {
+    let rows = report_card();
+    let report_card_share = column(&rows, col::ED_SHARE_2425);
+    let cupp_share = joined(&rows, PROFILE, profile::IRN, profile::ECON_DISADVANTAGED);
+    let pi = column(&rows, col::PERFORMANCE_INDEX);
+
+    close(
+        correlate(&report_card_share, &cupp_share),
+        0.823,
+        0.005,
+        "the two measures against each other",
+    );
+    close(
+        correlate(&pi, &report_card_share),
+        -0.734,
+        0.005,
+        "top-coded measure",
+    );
+    close(correlate(&pi, &cupp_share), -0.846, 0.005, "Cupp measure");
+
+    // Saturation is the mechanism: many more districts pinned at 100% in the report-card file.
+    let at_ceiling =
+        |v: &[Option<f64>], ceiling: f64| v.iter().flatten().filter(|x| **x >= ceiling).count();
+    assert_eq!(at_ceiling(&report_card_share, 99.95), 87);
+    assert_eq!(at_ceiling(&cupp_share, 0.9995), 37);
+}
+
+/// The headline Progress figure is literally the three-year gain, not a separate calculation.
+#[test]
+fn the_published_progress_figure_is_the_three_year_gain() {
+    let rows = report_card();
+    let headline = column(&rows, col::PROGRESS_EFFECT_SIZE);
+    let one_year = column(&rows, col::PROGRESS_EFFECT_1YR);
+    // Same construct, different window: correlated but distinguishable, and the shorter window
+    // is noisier, exactly as a gain measure over fewer cohorts should be.
+    close(
+        correlate(&headline, &one_year),
+        0.904,
+        0.005,
+        "three-year against one-year",
+    );
+    let spread = |v: Vec<Option<f64>>| {
+        let values: Vec<f64> = v.into_iter().flatten().collect();
+        Dispersion::of(&values.iter().map(|x| x + 10.0).collect::<Vec<_>>())
+            .unwrap()
+            .std_dev
+    };
+    assert!(spread(one_year) > spread(headline));
 }
