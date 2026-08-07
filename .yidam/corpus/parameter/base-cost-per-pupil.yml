@@ -36,7 +36,17 @@ properties:
     FY2023  $7,352.00  statewide average, FY2018 cost inputs      [inference, Fordham]
     FY2025  $8,240.00  statewide average, FY2022 cost inputs      [inference, Fordham]
     FY2026  not established                                        [open]
-    FY2027  not established                                        [open]
+    FY2027  $8,241.61  statewide average, FY2022 cost inputs      [verified, department model]
+
+    FY2027 detail from the department's own FY27 calculator [verified]:
+      statewide aggregate base cost     $11,767,054,639.44
+      base cost enrolled ADM              1,425,005.53
+      classroom teacher salary [s5d]         $68,022.22   (FY2022 reference year)
+      average insurance cost   [s4]          $17,152.68
+
+    Note the ADM trend: 1,499,918.26 in FY2022 against 1,425,005.53 projected for FY2027, a
+    5% decline. Aggregate base cost still rises because the per-pupil figure rises faster than
+    enrollment falls. [inference]
 
     Supporting FY2022 detail, all verified from the department's payment report:
       Statewide aggregate base cost      $11,023,233,582.74

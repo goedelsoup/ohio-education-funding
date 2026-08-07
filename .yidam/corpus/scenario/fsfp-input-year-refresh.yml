@@ -72,15 +72,47 @@ description: |
   progressive twice over — once through the state share residual, and again through the
   small-district minimums — and a freeze is regressive on both.
 
-  **WHAT THIS RUN IS NOT.** It perturbs one salary of ten. Administrator, counselor, librarian,
-  and clerical salaries have all risen since FY2022 and are held fixed, so every figure here is
-  a **lower bound**. Career-technical enrollment cannot be separated in the headcount file and
-  is treated as ordinary grades 9-12, which understates funded teachers at 1:27 instead of 1:18
-  for districts with large CTE programs — pushing the same direction. Grade-band shares come
-  from headcount while the scale comes from ADM, which assumes the two distributions match. The
-  FY2022 baseline salary is secondary reporting. And districts held on a guarantee are
-  off-formula entirely and would receive none of this; the guarantee population remains
-  unmodelled and is now the largest single unquantified caveat on the result. [open]
+  **THE GUARANTEE HALVES IT.** [verified — the department's own FY27 model; see
+  [`crates/foundation/tests/department_model_fy27.rs`](../../../crates/foundation/tests/department_model_fy27.rs)]
+
+  This node previously named the guarantee population as its largest unquantified caveat. It is
+  now quantified, and it is the most consequential correction the scenario has taken:
+
+      districts on the guarantee in FY2027   294 of 609   (48.3%)
+      their share of ADM                     54.1%
+      computed base cost increase            $465.0 million
+      absorbed by the guarantee              $222.9 million
+      ACTUALLY DELIVERED                     $242.1 million   (52.1%)
+
+  A district below its guarantee floor receives the guarantee, not the formula amount. When the
+  formula amount rises, the top-up shrinks by exactly the same sum and total funding does not
+  move. So **242 districts — two in five, holding 41.8% of Ohio's students — would gain
+  nothing at all** from a reference-year refresh. Fifty-two guaranteed districts would be lifted
+  off; the median guaranteed district is held more than three times above what a refresh would
+  give it, so the guarantee is not a marginal buffer but the operative funding mechanism for
+  those districts. [verified]
+
+  This does not overturn the incidence findings above — districts on formula do receive 100%,
+  and the small-district minimums do concentrate the gain — but it shrinks the population those
+  findings describe to roughly half the state. Any statement that a refresh is worth
+  half a billion dollars to Ohio districts is wrong by a factor of two.
+
+  It also reframes the phase-in. In the terminal year of a plan designed to fund every district
+  at its computed cost, nearly half of districts are funded by a hold-harmless from the previous
+  regime instead. [inference]
+
+  **INPUTS NOW VERIFIED.** The FY2022 reference-year classroom teacher salary is **$68,022.22**,
+  the department's own [s5d] value, replacing the $67,654 from secondary reporting this node
+  previously carried. The revised figures above use it, which is part of why the computed
+  increase fell from $496.3M to $465.0M — the rest is the department's own funded-teacher counts
+  replacing the corpus's reconstruction of them.
+
+  **WHAT THIS RUN IS STILL NOT.** It perturbs one salary of ten; administrator, counselor,
+  librarian, and clerical salaries have all risen too and are held fixed, so the computed
+  increase remains a **lower bound**. It does not apply the 5% state share floor at district
+  level, so among the 315 non-guaranteed districts the wealthiest would receive less than the
+  full increase. And FY2027 has not happened — the department's model is a projection, so
+  enrollment, valuation, and income are forecast rather than observed. [open]
 
   The perturbation is now concrete. Base cost is built by applying statutory staffing ratios to
   enrollment and pricing each funded position at a **statewide average salary for a reference

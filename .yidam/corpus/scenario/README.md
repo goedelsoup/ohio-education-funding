@@ -24,9 +24,14 @@ See the class definition: [scenario.ont.yml](../scenario.ont.yml).
 |------|----------|--------|
 | [fsfp-input-year-refresh](fsfp-input-year-refresh.yml) | What does freezing FSFP cost inputs cost districts? | **Run** |
 
-The first scenario has a statewide result: refreshing the teacher salary input from FY2022 to
-FY2024 raises computed base cost by **$496.3 million a year** across all 606 districts, an
-ADM-weighted $344.75 per pupil — and that is a lower bound, being one salary category of ten.
+The first scenario has a statewide result. Refreshing the teacher salary input from the FY2022
+reference to FY2024 raises **computed** base cost by $465.0 million a year across all 609
+districts — but the temporary transitional aid guarantee absorbs $222.9 million of it, so only
+**$242.1 million, 52%, is actually delivered.** Two in five districts, holding 41.8% of Ohio's
+students, would gain nothing at all.
+
+That correction is worth more than the original number. The node had named the guarantee as its
+largest unquantified caveat; quantifying it halved the headline.
 
 Two incidence findings, both structural rather than chosen:
 
