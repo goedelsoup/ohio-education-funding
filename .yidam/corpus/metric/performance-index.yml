@@ -1,0 +1,127 @@
+class: metric
+label: Performance Index
+description: |
+  The corpus's first outcome measure. Every other metric here counts an input — what a district
+  was given, what it could raise, what it spent. This one counts a result: the distribution of a
+  district's tested students across Ohio's achievement levels, weighted so that higher levels
+  count for more, collapsed to a single continuous score. [verified]
+
+  **Its arrival changes what the corpus can be asked.** [adequacy](../doctrine/adequacy.yml)
+  records an open contest over "whether outcome measures or input measures should define the
+  requirement." Until now the corpus could only take the input side of that question, because it
+  held no outcome variable at all. The Performance Index is the outcome side, and it makes the
+  outcome formulation of adequacy testable rather than merely contested. [inference]
+
+  It does not make it *answered*. A score is not a requirement. Adequacy in the outcome
+  formulation needs a threshold — a level of measured achievement the state declares sufficient
+  — and Ohio publishes an index, not a floor. The Index tells you where a district sits; it does
+  not tell you where it was supposed to be. [inference]
+
+  **Use the Index, not the star rating.** The overall rating groups many districts into the same
+  category and cannot distinguish among them; the Index is continuous and can be ranked,
+  correlated, and quintiled. Any Ohio claim about relative district performance that quotes
+  stars is answering a coarser question than it appears to. [verified]
+
+  **Distribution, 607 rated traditional districts, 2024–2025** [verified — as published in
+  [OCG White Paper 013](../../catalog/ocg-white-paper-013.md); the DEW file has not been
+  independently pulled]: minimum 53.1, 25th percentile 81.5, median 88.2, mean 87.7, 75th
+  percentile 95.1, maximum 112.8, standard deviation 10.9.
+
+  Set that beside the spending distribution and the asymmetry is the point. Performance has a
+  coefficient of variation of about 0.124; spending per equivalent pupil, about 0.201; operating
+  expenditure per headcount pupil in the corpus's own FY2024 cross-section, 0.202. **Ohio
+  districts differ from one another about 60% more in what they spend than in what they score.**
+  [verified] That is a fact about the two distributions and not about their relationship, and it
+  is the first thing to say before any correlation between them is quoted — a near-zero
+  coefficient between a wide distribution and a narrow one is a weaker statement than it sounds.
+
+  **What is known about its relationships, and how weakly.** The corpus holds no committed
+  Performance Index values. Everything below is quoted from a secondary source:
+
+    total expenditure per equivalent pupil     Pearson -0.016   Spearman +0.048
+    same, weighted by unweighted ADM           Pearson -0.149
+    federal expenditure per equivalent pupil   Pearson -0.558   Spearman -0.694
+    state-and-local per equivalent pupil       Pearson +0.086
+
+  The first row is the one that gets quoted and the one this corpus does not accept at face
+  value — see [expenditure per equivalent pupil](expenditure-per-equivalent-pupil.yml) for why
+  the denominator is doing much of the work. The third row is the strongest single relationship
+  in that data and is a poverty signal rather than a spending effect: federal education aid is
+  allocated substantially on census counts of children in low-income families, so
+  federal-dollars-per-pupil is a proxy for disadvantage wearing a spending label. [verified]
+
+  **The corpus can test that proxy directly and has not.** It holds the economically
+  disadvantaged share for 606 districts, keyed by IRN, in
+  [`crates/dispersion/fixtures/cupp-fy24-district-data.csv`](../../../crates/dispersion/fixtures/cupp-fy24-district-data.csv).
+  Joining the Performance Index onto that file by IRN — one column — would replace every quoted
+  figure above with a computed one and would settle the poverty interpretation the secondary
+  source can only assert. This is the cheapest high-value extraction available to the corpus.
+  [open]
+properties:
+  name: Performance Index
+  unit: index
+  definition: |
+    A weighted sum over the achievement-level distribution of a district's tested students,
+    reported on the Achievement component of the Ohio School Report Card. Each state-defined
+    achievement level carries a weight that rises with the level; a district's score is the
+    weighted count divided by the number of students expected to be tested.
+
+    The exact level weights and the untested-student treatment are set by DEW and are not
+    transcribed here — they are a report-card methodology parameter, they have changed across
+    report-card redesigns, and a series that spans a redesign is broken. [open]
+
+    Reported per district per school year. The 2024-2025 field is
+    `Performance Index Score 2024-2025`.
+  inputs: |
+    Ohio School Report Cards, district-level Achievement download, sheet `Performance_Index`,
+    keyed by District IRN — from
+    [dew-report-card-achievement](../../catalog/dew-report-card-achievement.md). No connector
+    fetches it. [open]
+  series: |
+    2024-2025, 607 rated traditional districts [verified — as published, secondary]:
+
+      minimum   53.1
+      p25       81.5
+      median    88.2
+      mean      87.7
+      p75       95.1
+      maximum  112.8
+      sd        10.9      coefficient of variation ~0.124
+
+    No per-district values are committed. No prior year is held. [open]
+  caveats: |
+    **One construct.** It summarizes state-test results for tested students. It is not school
+    quality, and it is not growth — the Progress (value-added) component is designed to capture
+    achievement gain independent of starting level and is a different measure in a different
+    file. A district serving a high-need population can post a low Index and a high Progress
+    score simultaneously, and reading the Index alone will call that district failing. [verified]
+
+    **Level, not gain.** Because it measures attainment rather than growth, it is dominated by
+    student composition. Any cross-sectional association between the Index and a resource
+    measure is therefore reading composition unless composition is controlled, and none of the
+    associations recorded above control for it.
+
+    **Population is the rated set, 607 districts.** Not the 606 of the Cupp Report and not the
+    609 of the FY2027 model. Community schools, JVSDs, STEM schools, and non-rated entities are
+    out. Joining across these files requires a crosswalk, not an assumption. [verified]
+
+    **Redesign breaks.** Ohio has changed report-card methodology more than once. Comparing the
+    Index across a redesign is a definitional break of the kind
+    [`metric/ACTIONS`](ACTIONS.md) requires be recorded rather than smoothed. [open]
+  calculator: |
+    None. This metric is published, not computed — the corpus reads it rather than deriving it.
+    Cross-district distribution statistics over it belong to `dispersion` once values are
+    committed. [open]
+links:
+  - target: ../metric.ont.yml
+    relationship: instance-of
+  - target: ../doctrine/adequacy.yml
+    relationship: operationalizes
+  - target: expenditure-per-equivalent-pupil.yml
+    relationship: compares-against
+  - target: ../fiscal-period/fy2024-25.yml
+    relationship: computed-for
+  - target: ../../catalog/dew-report-card-achievement.md
+    relationship: sourced-from
+  - target: ../../catalog/ocg-white-paper-013.md
+    relationship: sourced-from

@@ -22,7 +22,7 @@ See the class definition: [metric.ont.yml](../metric.ont.yml).
 |------|------|-----------------|
 | [assessed-valuation-per-pupil](assessed-valuation-per-pupil.yml) | dollars per pupil | Equity — the wealth side |
 | [state-share-percentage](state-share-percentage.yml) | percent | Equity — the compensation side |
-| [per-pupil-operating-expenditure](per-pupil-operating-expenditure.yml) | dollars per pupil | Adequacy and equity — the outcome side |
+| [per-pupil-operating-expenditure](per-pupil-operating-expenditure.yml) | dollars per pupil | Adequacy and equity — the resource side |
 
 The third of these was named as this class's largest gap at genesis and is now populated with a
 statewide series from FY2000 to FY2022. It carries the corpus's clearest demonstration of why
@@ -31,6 +31,18 @@ expenditure rose **116.8% nominally and 26.1% in real terms** — and 19.4% if f
 relief is excluded. Three correct numbers, three different arguments.
 
 | [effective-operating-millage](effective-operating-millage.yml) | mills | Equity — the local effort side |
+| [performance-index](performance-index.yml) | index | Adequacy — the outcome side |
+
+That last row is new and the third row's label changed to make room for it. Per-pupil operating
+expenditure had been carrying the phrase "the outcome side," which was accurate only because
+nothing in this class measured an outcome. It is a resource. The
+[Performance Index](performance-index.yml) is the outcome, and its arrival is the first time
+this corpus can put a result next to an input.
+
+Read the two together with care. Spending disperses across districts about 60% more widely than
+performance does — coefficient of variation 0.202 against roughly 0.124 — so a near-zero
+correlation between them is a weaker statement than it sounds, and the distributions should be
+quoted before the coefficient is.
 
 The dispersion statistics themselves are computed by
 [`crates/dispersion`](../../../crates/dispersion/) and recorded on
