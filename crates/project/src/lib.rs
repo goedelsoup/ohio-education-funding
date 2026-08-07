@@ -46,11 +46,15 @@
 
 #![forbid(unsafe_code)]
 
+pub mod crosswalk;
+pub mod outcomes;
 pub mod panel;
 pub mod policy;
 pub mod report;
 pub mod series;
 
+pub use crosswalk::{coverage, Coverage};
+pub use outcomes::{joined, report_cards, Joined, ReportCard};
 pub use panel::{panel, DistrictRecord};
 pub use policy::{GuaranteeRule, Outcome, Policy};
 pub use report::{forecast, run, simulate, EnrollmentEffect, PolicyEffect, Run, Totals};
