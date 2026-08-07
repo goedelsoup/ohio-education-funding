@@ -1,0 +1,40 @@
+class: fiscal-period
+label: FY2024-25 Biennium
+description: |
+  July 1, 2023 through June 30, 2025 — the biennium appropriated by
+  [Am. Sub. H.B. 33](../legislation/hb-33-2023.yml), and the only one in which the Fair School
+  Funding Plan's cost inputs were refreshed. [verified]
+
+  The refresh from FY2018 to FY2022 statewide average salaries is what makes this biennium the
+  corpus's natural control case. Phase-in advanced from 50% in FY2024 to 66.67% in FY2025, and
+  the statewide average base cost moved from roughly $7,352 in FY2023 to roughly $8,240 in
+  FY2025 — about 12%. [inference] Phase-in scales the appropriation, not the computed cost, so
+  essentially all of that movement is the input refresh. [inference]
+
+  That gives the [input-refresh scenario](../scenario/fsfp-input-year-refresh.yml) a measured
+  precedent rather than a guess: this is what happened the one time Ohio updated the reference
+  year, and it is the benchmark against which
+  [H.B. 96](../legislation/hb-96-2025.yml)'s decision not to should be assessed.
+
+  The biennium also spans the end of federal COVID relief and the ODE-to-DEW transition in
+  October 2023, so both the revenue series and the publisher change inside it. [verified]
+properties:
+  label: FY2024-25
+  kind: biennium
+  start: 2023-07-01
+  end: 2025-06-30
+  appropriating_bill: Am. Sub. H.B. 33 (135th General Assembly)
+  context: |
+    The one biennium in which FSFP cost inputs were refreshed, from FY2018 to FY2022 salaries.
+    Phase-in 50% then 66.67%. Statewide average base cost reached approximately $8,240 by
+    FY2025. EdChoice eligibility became universal. The Department of Education and Workforce
+    replaced the Ohio Department of Education in October 2023, breaking the publisher series.
+links:
+  - target: ../fiscal-period.ont.yml
+    relationship: instance-of
+  - target: fy2022-23.yml
+    relationship: follows
+  - target: ../funding-regime/fair-school-funding-plan.yml
+    relationship: governed-by
+  - target: ../legislation/hb-33-2023.yml
+    relationship: funded-by

@@ -1,0 +1,52 @@
+class: legislation
+label: Am. Sub. H.B. 153 (2011) — FY2012-13 Budget; Bridge Formula
+description: |
+  The FY2012-13 operating budget, Governor Kasich's first, and the act that ended Ohio's most
+  serious attempt to cost out an education. It repealed the
+  [Evidence-Based Model](../funding-regime/evidence-based-model.yml) before the third year of a
+  ten-year phase-in and put a placeholder in its place. [verified]
+
+  The [Bridge formula](../funding-regime/bridge-formula.yml) was explicitly temporary — a
+  holding pattern until the administration devised its own model. Its logic was proportional
+  distribution of a reduction: districts received roughly the same share of a state funding cut
+  measured against their total resources including local dollars, with funding effectively
+  frozen near FY2011 levels while federal stimulus money simultaneously expired. [inference]
+  The placeholder lasted a decade.
+
+  Two further changes compounded the effect on the districts least able to absorb it. The act
+  removed the funding guarantee, and it began the phase-out of the tangible personal property
+  tax reimbursements created by [H.B. 66](hb-66-2005.yml). [verified] Those reimbursements were
+  concentrated in districts with industrial tax bases, so the phase-out fell hardest on
+  communities that had already lost the underlying tax base by state decision six years earlier
+  — a second withdrawal from the same places. [inference]
+
+  This is also the act that makes the case for modelling regimes and reimbursements separately.
+  A district in an industrial county experienced FY2012 as three simultaneous reductions — the
+  formula freeze, the stimulus expiry, and the reimbursement phase-out — none of which appears
+  in a base cost figure. [inference]
+
+  Appropriation totals, the exact reimbursement phase-out schedule, and the number of districts
+  affected are not yet recorded. [open]
+properties:
+  designation: Am. Sub. H.B. 153
+  general_assembly: 129th General Assembly
+  signed: 2011-06-30
+  effective: 2011-06-30
+  subject: |
+    Enacted the FY2012-13 operating budget. Repealed the Evidence-Based Model and replaced it
+    with the Bridge formula, distributing state aid by reference to prior-year amounts with
+    funding held near FY2011 levels. Removed the funding guarantee. Began the phase-out of
+    tangible personal property tax replacement payments. Signing date to be confirmed against
+    the enrolled act. [open]
+  vetoes: Line-item vetoes exercised; education funding effects not yet assessed. [open]
+links:
+  - target: ../legislation.ont.yml
+    relationship: instance-of
+  - target: hb-1-2009.yml
+    relationship: amends
+  - target: ../funding-regime/bridge-formula.yml
+    relationship: establishes
+  - target: ../revenue-stream/tpp-replacement-payments.yml
+    relationship: constrains
+  - target: ../doctrine/adequacy.yml
+    relationship: retreats-from

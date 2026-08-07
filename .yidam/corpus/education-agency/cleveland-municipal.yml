@@ -21,12 +21,23 @@ description: |
   analysis of scholarship effects should start here rather than with the 2023 expansion —
   there is three decades of series. [inference]
 
-  Enrollment, valuation, scholarship participation, and the funding series are all required and
-  not yet populated. [open]
+  First hard numbers: IRN 043786, with 8,027 public school students with disabilities in FY2021
+  — more than seven times Upper Arlington's count — and an IDEA Part B allocation of
+  $12,818,292.57, plus 609 non-public students and a $903,930.07 proportionate share.
+  [verified] The non-public count is the largest of the three traditional districts seeded here
+  and is a direct consequence of the
+  [Cleveland Scholarship](../program/cleveland-scholarship.yml) having operated in this district
+  for three decades. [inference]
+
+  Enrollment, valuation, scholarship dollar amounts, and the state funding series remain
+  unpopulated. [open]
 properties:
-  irn: Not yet established. [open]
+  irn: 043786 [verified — FY2021 IDEA Part B allocation list]
   agency_type: city
   county: Cuyahoga
+  fy2021_idea_part_b: |
+    Public school students with disabilities: 8,027. Non-public: 609.
+    Allocation: $12,818,292.57. Proportionate share: $903,930.07. [verified]
   typology: |
     Urban, very high poverty. Exact department typology code not yet established. [open]
   established: Not yet established. [open]

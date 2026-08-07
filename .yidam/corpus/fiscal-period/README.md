@@ -21,12 +21,24 @@ See the class definition: [fiscal-period.ont.yml](../fiscal-period.ont.yml).
 
 | Node | Kind | Appropriated by |
 |------|------|-----------------|
+| [fy2022-23](fy2022-23.yml) | biennium | Am. Sub. H.B. 110 (2021) |
+| [fy2022](fy2022.yml) | fiscal year | Am. Sub. H.B. 110 (2021) |
+| [fy2024-25](fy2024-25.yml) | biennium | Am. Sub. H.B. 33 (2023) |
 | [fy2026-27](fy2026-27.yml) | biennium | Am. Sub. H.B. 96 (2025) |
 | [fy2026](fy2026.yml) | fiscal year | Am. Sub. H.B. 96 (2025) |
+| [fy2027](fy2027.yml) | fiscal year | Am. Sub. H.B. 96 (2025) |
+
+The three biennia now chain by `follows` and carry the whole Fair School Funding Plan era, which
+makes the plan's central tension traversable rather than narrated: FY2022-23 ran on FY2018 cost
+inputs, FY2024-25 refreshed them to FY2022 and moved statewide average base cost about 12%, and
+FY2026-27 completes the phase-in while holding the inputs where H.B. 33 left them.
+
+[FY2022](fy2022.yml) is the best-documented period in the corpus — nearly every verified figure
+here is anchored to it — and [FY2027](fy2027.yml) is entirely prospective, with no actuals at
+all. Between them they mark the range within which any claim has to be located.
 
 ## Known gap
 
-Only the current biennium is seeded, so the `follows` edge has no target and no historical
-period is addressable yet. Backfilling fiscal years to at least FY2022, and biennia to at
-least FY2010-11, is required before any cross-period query works. This is the cheapest
-high-value expansion in the corpus — the nodes are small and mechanical. [open]
+Nothing before FY2022 is addressable. The Bridge formula decade and the DeRolph era have no
+periods at all, so a query about FY2012 or FY1997 has nowhere to land. Backfilling biennia to at
+least FY2010-11 remains the cheapest high-value expansion in the corpus. [open]

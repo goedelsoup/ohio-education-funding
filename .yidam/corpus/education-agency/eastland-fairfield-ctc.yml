@@ -20,10 +20,19 @@ description: |
   capturing valuation growth — under entirely different conditions than the districts it
   serves.
 
-  IRN, member district list, enrollment, and funding series are required and not yet populated.
-  [open]
+  **An absence that confirms the point.** This agency does not appear in the FY2021 IDEA Part B
+  allocation list, which names 979 entities including every traditional district, community
+  school, and county board of developmental disabilities in the state. [verified] Federal
+  special education money flows to JVSD students through their member districts, not to the
+  JVSD — so a JVSD is invisible in a dataset that otherwise covers everything. [inference]
+  Any statewide roll-up built from that list silently omits career-technical provision, and the
+  omission would be undetectable without knowing to look for it.
+
+  IRN, member district list, enrollment, and funding series remain unpopulated. [open]
 properties:
-  irn: Not yet established. [open]
+  irn: |
+    Not yet established. [open] Absent from the FY2021 IDEA Part B allocation list; a JVSD IRN
+    must come from the department's educational directory or an `nces-ccd` crosswalk instead.
   agency_type: joint-vocational
   county: Franklin and Fairfield
   typology: |

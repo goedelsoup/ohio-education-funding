@@ -1,0 +1,108 @@
+class: metric
+label: Per-Pupil Operating Expenditure
+description: |
+  What a district actually spends per student on day-to-day operations — salaries, benefits,
+  purchased services, supplies — excluding capital outlay and non-elementary-secondary
+  programs. It is the outcome side of every adequacy and equity claim in this corpus, and the
+  measure against which [base cost per pupil](../parameter/base-cost-per-pupil.yml) should be
+  read: base cost is what the state says an education costs, this is what districts spend.
+
+  **The statewide series demonstrates why deflation is not optional.** From FY2000 to FY2022,
+  Ohio public school operating expenditure per pupil rose from $7,065 to $15,314 — 116.8% in
+  nominal terms. Adjusted for inflation, the increase is **26.1%**. [verified] The same fact,
+  stated two ways, supports two entirely different arguments about whether Ohio has increased
+  its investment in schools, and both numbers are correct. This is the concrete case for the
+  `deflate` calculator being a prerequisite rather than a refinement.
+
+  A third framing is also correct and lower still: excluding federal COVID relief funds, FY2022
+  operating EPP was $14,493, making real growth **19.4%**. [verified] The $821 per-pupil gap
+  between the two FY2022 figures is larger than most policy changes this corpus models.
+
+  Total operating expenditure roughly doubled over the period, $13.0 billion to $25.8 billion,
+  while enrollment fell 8.3% from about 1.84 million to about 1.68 million. [verified] Per-pupil
+  growth is therefore partly a numerator effect and partly a denominator one, and attributing it
+  wholly to spending decisions is wrong.
+
+  Growth is broadly uniform across functions, which is itself informative — it rules out the
+  common claim that administrative bloat drove the increase. In real terms FY2000 to FY2022:
+  instruction +25.7%, support +28.2%, other +11.4%. [verified] Support grew fastest, but only
+  slightly, and from a smaller base.
+
+  **This metric is not the state's business and that is the point.** A district's operating
+  expenditure reflects local revenue, levy history, and local choice as much as state aid.
+  Regressing it against [valuation per pupil](assessed-valuation-per-pupil.yml) is the
+  wealth-neutrality test; comparing it against base cost per pupil is the adequacy test. It
+  answers neither question by itself. [inference]
+properties:
+  name: Per-pupil operating expenditure
+  unit: dollars-per-pupil
+  definition: |
+    operating_expenditure_per_pupil = total operating expenditure / enrollment
+
+    Operating expenditure covers day-to-day spending on running schools and educating students:
+    salaries, benefits, purchased services, supplies. It excludes capital outlay (buildings,
+    buses) and programs not directly related to elementary and secondary education (adult
+    education, community services).
+
+    Must be reported with (a) whether federal relief funds are included, (b) nominal or constant
+    dollars and which deflator, and (c) which entity population is counted. Omitting any of the
+    three produces a figure that cannot be compared to any other figure.
+  inputs: |
+    Total operating expenditure and enrollment by entity and fiscal year — NCES National Public
+    Education Financial Survey and Common Core of Data, via `census-f33` and `nces-ccd`.
+    Deflator — `bls-cpi`, national CPI-U all items, June of each year, aligned to fiscal year end.
+  series: |
+    Statewide, all Ohio public school entities, nominal:
+      FY2000  $7,065   [verified]
+      FY2002  ~$8,100  [verified — chart label, approximately $100 precision]
+      FY2004  ~$9,000
+      FY2006  ~$9,700
+      FY2008  ~$10,300
+      FY2010  ~$11,200
+      FY2012  ~$11,300
+      FY2014  ~$11,400
+      FY2016  ~$11,900
+      FY2018  ~$12,900
+      FY2020  ~$13,700
+      FY2022  $15,314 including COVID relief; $14,493 excluding  [verified]
+
+    Real growth FY2000-FY2022: +26.1% including relief funds, +19.4% excluding. [verified]
+    CPI growth over the same span: +71.9%. [verified]
+
+    The near-flat stretch from FY2010 to FY2014 — roughly $11.2k to $11.4k nominal, a real
+    decline — coincides with the [Bridge formula](../funding-regime/bridge-formula.yml) period
+    and the withdrawal of federal stimulus. Whether that is causal is not established here and
+    is worth a phase of its own. [open]
+
+    Per-district series are available from the Auditor's dashboard and are not yet extracted.
+    [open]
+  caveats: |
+    Entity scope is wider than the 611 districts receiving foundation funding: it includes
+    JVSDs, educational service centers, community schools, STEM schools, and state- and
+    federal-run schools, plus tuition those entities pay to private and out-of-state schools.
+    Not interchangeable with a district-only figure.
+
+    Excludes capital entirely, so a district rebuilding its schools under
+    [facilities assistance](../program/classroom-facilities-assistance.yml) shows no increase
+    here.
+
+    NCES definitions differ from Ohio's; this is not the operating cost the Ohio formula
+    computes, and comparing it directly to base cost per pupil requires stating the gap.
+
+    Enrollment denominators differ between NCES counts and Ohio ADM. [verified]
+  calculator: dispersion (for cross-agency distribution); deflate (required)
+links:
+  - target: ../metric.ont.yml
+    relationship: instance-of
+  - target: assessed-valuation-per-pupil.yml
+    relationship: derived-from
+  - target: ../doctrine/adequacy.yml
+    relationship: operationalizes
+  - target: ../doctrine/equity.yml
+    relationship: operationalizes
+  - target: ../fiscal-period/fy2022.yml
+    relationship: computed-for
+  - target: ../parameter/base-cost-per-pupil.yml
+    relationship: compares-against
+  - target: ../../catalog/auditor-longitudinal-school-finance.md
+    relationship: sourced-from

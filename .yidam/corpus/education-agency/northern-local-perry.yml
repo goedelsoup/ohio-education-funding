@@ -22,15 +22,27 @@ description: |
   [inference] Whether it did, and by how much, is the first calculation this corpus should
   perform. [open]
 
-  IRN, valuation per pupil, floor status, and the full funding series are required and not yet
-  populated. [open]
+  First hard numbers: IRN 049056, with 298 public school students with disabilities in FY2021
+  and an IDEA Part B allocation of $483,451.88. [verified] Set against
+  [Upper Arlington](upper-arlington-city.yml) — 1,121 students with disabilities and
+  $1,490,233.42 — the pair gives the corpus its first like-for-like comparison on a single
+  federal program, though on a federal formula rather than a state one.
+
+  Valuation per pupil, floor status, and the state funding series remain unpopulated. [open]
 properties:
-  irn: Not yet established. [open] Source, `nces-ccd` and `dew-foundation` crosswalks.
+  irn: |
+    049056 [verified — appears as "Northern Local" in the FY2021 IDEA Part B allocation list].
+    Distinct from Hardin Northern Local (047498). County attribution to Perry is [inference]:
+    the allocation list gives no county, and confirmation should come from an `nces-ccd`
+    crosswalk before this IRN is used to key a series.
   agency_type: local
   county: Perry
   typology: |
     Rural, high poverty. Exact department typology code not yet established. [open]
   established: Not yet established. [open]
+  fy2021_idea_part_b: |
+    Public school students with disabilities: 298. Non-public: fewer than 10 (suppressed).
+    Allocation: $483,451.88. Proportionate share: $11,095.62. [verified]
   roles: |
     DeRolph plaintiff district (1991-2003) [verified]. Property-poor throughout the period
     covered [inference]. 20-mill floor status by fiscal period not yet determined and is a

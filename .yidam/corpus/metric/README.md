@@ -22,11 +22,18 @@ See the class definition: [metric.ont.yml](../metric.ont.yml).
 |------|------|-----------------|
 | [assessed-valuation-per-pupil](assessed-valuation-per-pupil.yml) | dollars per pupil | Equity — the wealth side |
 | [state-share-percentage](state-share-percentage.yml) | percent | Equity — the compensation side |
+| [per-pupil-operating-expenditure](per-pupil-operating-expenditure.yml) | dollars per pupil | Adequacy and equity — the outcome side |
+
+The third of these was named as this class's largest gap at genesis and is now populated with a
+statewide series from FY2000 to FY2022. It carries the corpus's clearest demonstration of why
+`deflate` is a prerequisite rather than a refinement: over that span per-pupil operating
+expenditure rose **116.8% nominally and 26.1% in real terms** — and 19.4% if federal COVID
+relief is excluded. Three correct numbers, three different arguments.
 
 ## Known gaps
 
-The metric this corpus most needs and does not have is **per-pupil operating expenditure in
-constant dollars**, which is the outcome side of every equity and adequacy claim. Also missing:
-the dispersion statistics (coefficient of variation, McLoone and Verstegen indices, federal
-range ratio) that the `dispersion` calculator is specified to produce, and effective operating
-millage, which determines 20-mill floor status. [open]
+The dispersion statistics the `dispersion` calculator is specified to produce — coefficient of
+variation, McLoone and Verstegen indices, federal range ratio — have no node yet, and neither
+does effective operating millage, which determines 20-mill floor status and gates every local
+revenue question. Per-district expenditure series exist on the Auditor of State dashboard and
+are not extracted. [open]

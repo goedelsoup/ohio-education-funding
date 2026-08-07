@@ -1,0 +1,43 @@
+class: fiscal-period
+label: Fiscal Year 2022
+description: |
+  July 1, 2021 through June 30, 2022 — the first year of the
+  [Fair School Funding Plan](../funding-regime/fair-school-funding-plan.yml), and the
+  best-documented fiscal year in this corpus. [verified]
+
+  It is the reference year for almost every verified figure the corpus holds, because the
+  department's line-by-line explanation for FY2022 specifies the whole formula with its
+  statewide factor values attached. Statewide that year: aggregate base cost
+  $11,023,233,582.74 over a base cost enrolled ADM of 1,499,918.26, giving an average base cost
+  of $7,349.22 per pupil; almost $7.5 billion in state foundation funding distributed to 611
+  school districts; economically disadvantaged percentage 46.7239%. [verified]
+
+  The phase-in was 16.67% — but applied by line, and Disadvantaged Pupil Impact Aid was phased
+  in at **0%**. [verified] FY2022 is therefore the cleanest available demonstration that a
+  headline phase-in percentage is not a district's realized phase-in.
+
+  It is also a year that resists comparison in both directions. Federal COVID relief was
+  flowing, so operating expenditure per pupil reads $15,314 with relief funds and $14,493
+  without. [verified] And it is the first year of a new formula, so the FY2021 comparison
+  crosses a regime boundary rather than measuring a change within one.
+properties:
+  label: FY2022
+  kind: fiscal-year
+  start: 2021-07-01
+  end: 2022-06-30
+  appropriating_bill: Am. Sub. H.B. 110 (134th General Assembly), as corrected by H.B. 583
+  context: |
+    First year of the Fair School Funding Plan. Base cost priced from FY2018 statewide average
+    salaries. Phase-in 16.67% for base cost, targeted assistance, special education, English
+    learners, gifted, and career-technical; 0% for DPIA. 611 districts; almost $7.5 billion in
+    state foundation funding; statewide average base cost $7,349.22 per pupil. Federal COVID
+    relief funds in flow. [verified]
+links:
+  - target: ../fiscal-period.ont.yml
+    relationship: instance-of
+  - target: fy2022-23.yml
+    relationship: part-of
+  - target: ../funding-regime/fair-school-funding-plan.yml
+    relationship: governed-by
+  - target: ../legislation/hb-110-2021.yml
+    relationship: funded-by

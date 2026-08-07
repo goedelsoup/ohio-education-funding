@@ -22,10 +22,19 @@ description: |
 
   Seeded as an exemplar, not as an accusation: nothing in this node asserts that the district
   did anything other than pass levies its residents supported.
+  First hard numbers: IRN 044933, with 1,121 public school students with disabilities in FY2021
+  and an IDEA Part B allocation of $1,490,233.42, plus 68 non-public students and an $85,227.82
+  proportionate share. [verified] The non-public figure is worth noting on its own — a
+  property-rich district with a substantial private-school population in its boundaries is
+  exactly the setting in which the scholarship channel operates differently than it does in
+  [Northern Local](northern-local-perry.yml). [inference]
 properties:
-  irn: Not yet established. [open]
+  irn: 044933 [verified — FY2021 IDEA Part B allocation list]
   agency_type: city
   county: Franklin
+  fy2021_idea_part_b: |
+    Public school students with disabilities: 1,121. Non-public: 68.
+    Allocation: $1,490,233.42. Proportionate share: $85,227.82. [verified]
   typology: |
     Suburban, very low poverty, high median income. Exact department typology code not yet
     established. [open]
