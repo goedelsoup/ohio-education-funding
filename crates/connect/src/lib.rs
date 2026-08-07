@@ -178,6 +178,31 @@ pub fn rebuild(root: &Path) -> Result<Vec<Rebuilt>, RebuildError> {
         },
     ];
 
+    let achievement = source("achievement-district-2425").expect("registered").1;
+    let spending = source("spend-per-pupil-2425").expect("registered").1;
+    let expanded = source("expanded-list-fy25").expect("registered").1;
+
+    let achievement_book = open_workbook(root, achievement)?;
+    let spending_book = open_workbook(root, spending)?;
+    let expanded_book = open_workbook(root, expanded)?;
+
+    // Excel truncates a sheet name at 31 characters, which is why the weighted sheet is
+    // "Expenditure per Equivalent Pup" and not "...Pupil". Spelling it out is not an option.
+    let report_card = fixtures::build_report_card_extract(
+        &achievement_book.rows("Performance_Index")?,
+        &spending_book.rows("DISTRICT_SPENDING_PER_PUPIL")?,
+        &expanded_book.rows("Expenditure per Equivalent Pup")?,
+        &expanded_book.rows("Expenditure per Pupil")?,
+    );
+    out.push(Rebuilt::Written {
+        path: fixtures::REPORT_CARD_FIXTURE.to_string(),
+        rows: fixtures::write_csv(
+            &root.join(fixtures::REPORT_CARD_FIXTURE),
+            fixtures::REPORT_CARD_HEADER,
+            &report_card,
+        )?,
+    });
+
     let cpi_source = source("cpi-u-all-items").expect("registered").1;
     out.push(match cache::read_cached(root, cpi_source) {
         Ok(bytes) => {

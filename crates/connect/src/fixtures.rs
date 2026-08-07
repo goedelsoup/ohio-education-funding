@@ -10,6 +10,7 @@
 //! the department reposts a corrected file, the change shows up as changed numbers in a review
 //! rather than as a silently different answer.
 
+use std::collections::HashMap;
 use std::fs;
 use std::io;
 use std::path::Path;
@@ -274,6 +275,121 @@ pub fn build_profile_extract(profile_rows: &[Vec<String>]) -> Vec<Vec<String>> {
         .collect()
 }
 
+/// Columns of the 2024-25 report card fixture.
+///
+/// The two spending columns are the point of the file. `operating_expenditures_fy25` is a
+/// dollar total, and the two ADM columns beside it are the two divisors the department
+/// publishes for it. Anything computed per pupil from this fixture has to name which one it
+/// used, because the answer changes.
+pub const REPORT_CARD_HEADER: &[&str] = &[
+    "irn",
+    "district",
+    "performance_index_2425",
+    "performance_index_2324",
+    "performance_index_2223",
+    "unweighted_adm_fy25",
+    "weighted_adm_fy25",
+    "operating_expenditures_fy25",
+    "exp_per_equivalent_pupil_fy25",
+    "exp_per_equivalent_pupil_federal_fy25",
+    "exp_per_equivalent_pupil_state_local_fy25",
+];
+
+/// Column positions in the Achievement download's `Performance_Index` sheet.
+mod achievement_columns {
+    pub const IRN: usize = 0;
+    pub const NAME: usize = 1;
+    pub const PI_2425: usize = 6;
+    pub const PI_2324: usize = 15;
+    pub const PI_2223: usize = 16;
+}
+
+/// Column positions in `DISTRICT_SPENDING_PER_PUPIL`.
+///
+/// Columns 7 through 9 repeat the *statewide* figure on every row, identically. They are a
+/// comparison band for the printed report card, not district data, and summing them would
+/// produce a statewide average multiplied by 607.
+mod spending_columns {
+    pub const IRN: usize = 0;
+    pub const EQUIVALENT: usize = 4;
+    pub const FEDERAL: usize = 5;
+    pub const STATE_AND_LOCAL: usize = 6;
+}
+
+/// Column positions in both Expanded List per-pupil sheets, which share a layout and differ
+/// only in what column 3 divides by.
+mod expanded_columns {
+    pub const IRN: usize = 0;
+    pub const ORG_TYPE: usize = 2;
+    pub const ADM: usize = 3;
+    pub const OPERATING_EXPENDITURES: usize = 4;
+}
+
+/// The Expanded List's label for a traditional district.
+///
+/// The file also carries 320 community schools, 49 JVSDs, 19 eschools and 8 STEM schools. The
+/// report card's district files carry none of them, so an unfiltered join drops silently to the
+/// intersection and looks like it worked.
+const PUBLIC_DISTRICT: &str = "Public District";
+
+/// Join the three 2024-25 report card publications on IRN.
+///
+/// Rows are emitted only for districts present in the achievement file with a Performance
+/// Index, which is the rated population — the spending and enrollment files are wider.
+#[must_use]
+pub fn build_report_card_extract<'a>(
+    achievement_rows: &'a [Vec<String>],
+    spending_rows: &'a [Vec<String>],
+    weighted_rows: &'a [Vec<String>],
+    unweighted_rows: &'a [Vec<String>],
+) -> Vec<Vec<String>> {
+    let spending: HashMap<&str, &Vec<String>> =
+        rows_by_key(spending_rows, spending_columns::IRN).collect();
+
+    // The Expanded List is keyed by IRN across every org type it covers, so the filter is part
+    // of the lookup rather than a step after it. Without it the join drops silently to the
+    // intersection and looks like it worked.
+    let districts_only = |rows: &'a [Vec<String>]| -> HashMap<&'a str, &'a Vec<String>> {
+        rows_by_key(rows, expanded_columns::IRN)
+            .filter(|(_, row)| cell(row, expanded_columns::ORG_TYPE).trim() == PUBLIC_DISTRICT)
+            .collect()
+    };
+    let weighted = districts_only(weighted_rows);
+    let unweighted = districts_only(unweighted_rows);
+
+    achievement_rows
+        .iter()
+        .skip(1)
+        .filter(|row| !cell(row, achievement_columns::IRN).trim().is_empty())
+        .filter(|row| !is_statewide_row(row, achievement_columns::NAME))
+        .filter(|row| number(cell(row, achievement_columns::PI_2425)).is_some())
+        .map(|row| {
+            let irn = cell(row, achievement_columns::IRN).trim().to_string();
+            let spend = spending.get(irn.as_str()).copied();
+            let wtd = weighted.get(irn.as_str()).copied();
+            let unw = unweighted.get(irn.as_str()).copied();
+
+            let from = |table: Option<&Vec<String>>, index: usize| {
+                table.and_then(|r| number(cell(r, index)))
+            };
+
+            vec![
+                irn.clone(),
+                clean_name(cell(row, achievement_columns::NAME)),
+                format_value(number(cell(row, achievement_columns::PI_2425)), 1),
+                format_value(number(cell(row, achievement_columns::PI_2324)), 1),
+                format_value(number(cell(row, achievement_columns::PI_2223)), 1),
+                format_value(from(unw, expanded_columns::ADM), 4),
+                format_value(from(wtd, expanded_columns::ADM), 4),
+                format_value(from(wtd, expanded_columns::OPERATING_EXPENDITURES), 2),
+                format_value(from(spend, spending_columns::EQUIVALENT), 2),
+                format_value(from(spend, spending_columns::FEDERAL), 2),
+                format_value(from(spend, spending_columns::STATE_AND_LOCAL), 2),
+            ]
+        })
+        .collect()
+}
+
 /// Write a fixture with LF endings, so git sees no spurious churn on a rebuild.
 ///
 /// # Errors
@@ -300,6 +416,9 @@ pub const FY27_FIXTURE: &str = "crates/foundation/fixtures/fy27-department-model
 pub const PROFILE_FIXTURE: &str = "crates/dispersion/fixtures/cupp-fy24-district-data.csv";
 /// Where the deflator's check fixture is written, relative to the repository root.
 pub const CPI_FIXTURE: &str = "crates/connect/fixtures/cpi-u-june.tsv";
+/// Where the 2024-25 report card fixture is written, relative to the repository root.
+pub const REPORT_CARD_FIXTURE: &str =
+    "crates/dispersion/fixtures/report-card-2425-district-data.csv";
 
 /// Reduce the Bureau's 2.7 MB all-series flat file to the one series and period the deflator
 /// uses.
