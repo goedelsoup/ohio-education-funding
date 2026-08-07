@@ -71,7 +71,7 @@ Sorted by: kind, then alphabetically.
 | [`vouchers-hurt-ohio-2025`](litigation/vouchers-hurt-ohio-2025.yml) | litigation | EdChoice Constitutional Challenge (Franklin County, 2025) | 0 | 3 |
 | [`assessed-valuation-per-pupil`](metric/assessed-valuation-per-pupil.yml) | metric | Assessed Valuation Per Pupil | 5 | 3 |
 | [`effective-operating-millage`](metric/effective-operating-millage.yml) | metric | Effective Operating Millage | 2 | 1 |
-| [`enrolled-adm`](metric/enrolled-adm.yml) | metric | Enrolled ADM | 10 | 4 |
+| [`enrolled-adm`](metric/enrolled-adm.yml) | metric | Enrolled ADM | 11 | 4 |
 | [`expenditure-per-equivalent-pupil`](metric/expenditure-per-equivalent-pupil.yml) | metric | Expenditure Per Equivalent Pupil | 15 | 6 |
 | [`general-fund-cash-balance`](metric/general-fund-cash-balance.yml) | metric | General Fund Cash Balance | 4 | 2 |
 | [`per-pupil-operating-expenditure`](metric/per-pupil-operating-expenditure.yml) | metric | Per-Pupil Operating Expenditure | 7 | 4 |

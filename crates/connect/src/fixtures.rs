@@ -76,6 +76,8 @@ pub const FY27_HEADER: &[&str] = &[
     "core_foundation_funding",
     "base_cost_state_share",
     "total_state_support",
+    "total_transfers",
+    "net_state_funding",
 ];
 
 /// Column positions in the department's `Base_Cost` sheet, whose header is on the fourth row.
@@ -114,6 +116,16 @@ mod summary_columns {
     /// is paid, and the corpus has been comparing the first against figures that behave like the
     /// second.
     pub const TOTAL_STATE_SUPPORT: usize = 20;
+    /// `U - Total Transfers (S + T)` — educational service center charges plus other
+    /// adjustments.
+    ///
+    /// Extracted to settle a question by measurement rather than by assertion: whether the
+    /// FY2027 report carries the voucher and community school channel. It does not. Under the
+    /// Fair School Funding Plan community and STEM students are funded directly rather than
+    /// deducted, and these lines are small and are something else.
+    pub const TOTAL_TRANSFERS: usize = 27;
+    /// `V - Net State Funding (R + U)` — total state support after transfers.
+    pub const NET_STATE_FUNDING: usize = 28;
 }
 
 /// Column positions in the `ADM Data` sheet.
@@ -235,6 +247,14 @@ pub fn build_fy27_model(
             ),
             format_value(
                 cell_number(summary_row, summary_columns::TOTAL_STATE_SUPPORT),
+                2,
+            ),
+            format_value(
+                Some(cell_number(summary_row, summary_columns::TOTAL_TRANSFERS).unwrap_or(0.0)),
+                2,
+            ),
+            format_value(
+                cell_number(summary_row, summary_columns::NET_STATE_FUNDING),
                 2,
             ),
         ]);
