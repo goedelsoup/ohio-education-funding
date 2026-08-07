@@ -192,6 +192,45 @@ description: |
   Still open: whether the statute or subsequent budget acts contemplate re-basing, and what the
   FY2020 figure itself was composed of — the Bridge formula distributed largely by reference to
   still earlier years, so the anchor may reach back further than 2020. [open]
+
+  **THE INCIDENCE OF REMOVAL, AS A DISTRIBUTION RATHER THAN A TOTAL.** [verified —
+  [`crates/scenario-delta`](../../../crates/scenario-delta/)] The corpus has carried "$879
+  million, 294 districts" for several phases. Crossed against wealth, per pupil:
+
+      valuation quintile    per-pupil loss on removal
+      Q1 (poorest)                    -136.84
+      Q2                              -270.84
+      Q3                              -490.24
+      Q4                            -1,025.91
+      Q5 (wealthiest)                 -937.40
+
+  and against the state share of base cost, where it is starker still: the 138 districts at the
+  minimum state share lose **$1,003.87** per pupil, against **$160.27** for the quintile the
+  formula supports most. The guarantee pays most, per pupil, to the districts the formula says
+  need it least. [verified]
+
+  Two things this does *not* say. The gradient is **not monotone** — Q4 loses more per pupil than
+  Q5, because the wealthiest districts are small and already floored, so less distance separates
+  their formula amount from their baseline. Any claim that the guarantee's benefit rises without
+  limit in wealth breaks here. [verified] And the poorest quintile does receive something: 15 of
+  its 121 districts are on the guarantee. This is a strong tendency, not a rule. [verified]
+
+  **A PERTURBATION IS INERT FOR A GUARANTEED DISTRICT, EXACTLY.** Not approximately: a district
+  paid by the guarantee under two policies that differ anywhere except in the guarantee itself
+  moves by **0.000000**, because the guarantee is a `max` against a fixed baseline and the same
+  number leaves the same branch twice. For a base cost increase, 256 of 609 districts are in that
+  condition. This is why the guarantee is the only lever with a distinct incidence: every other
+  one is blocked for the same half of the state. [verified]
+
+  **AND THE MODEL CANNOT SEE THE FLOOR UNDER A FORMULA DISTRICT.** The baseline is recoverable
+  only for districts *currently* held, because being held is the sole thing that discloses it.
+  The 315 districts the formula pays each have an FY2020 baseline sitting below their current
+  amount, and no committed source carries it. A simulated **cut** therefore lets them fall past a
+  floor that would really catch them: at a 5% phase-in the model has them lose 95% of their aid
+  and puts nobody on the guarantee. Those districts hold **46% of Ohio's students**, so any
+  scenario that reduces formula aid overstates its savings by an amount the corpus cannot bound.
+  [verified for the model's behaviour; the size of the real-world correction is [open] and needs
+  FY2020 per-district payments for districts not on the guarantee]
 properties:
   name: Temporary transitional aid guarantee
   function: |

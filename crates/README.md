@@ -32,6 +32,9 @@ retrievable, and six are declared with a recorded reason. See
   present cannot compare any two numbers honestly
 - `project` — forward projection of enrollment with intervals, and the policy levers over it;
   it reports simulation and forecast separately and refuses to add them
+- `scenario-delta` — the winners-and-losers table between two runs, with incidence across
+  wealth and state share; a total cannot be constructed without the count of districts it
+  fails to reach, and both orderings of the table are returned or neither is
 
 A semantic index over `.yidam/corpus/` is not built at genesis — 45 nodes fit in context.
 It is added when the corpus outgrows direct retrieval, which the exemplar-agency expansion
@@ -67,6 +70,7 @@ pre-2007 `.xls` format.
 | [`millage`](millage/) | calculator | implemented; verified on 606 real districts |
 | [`dispersion`](dispersion/) | calculator | dispersion, correlation, partial, OLS |
 | [`project`](project/) | calculator | projection, policy levers, the district crosswalk |
+| [`scenario-delta`](scenario-delta/) | calculator | delta table, reach, incidence bands |
 | [`bundle`](bundle/) | export | versioned feed and scenario checkpoints for [`web/`](../web/) |
 
 Test counts are not in that table on purpose: they are derivable, they drifted by 41 across
@@ -110,15 +114,16 @@ Fields per crate: name, capability type (connector/calculator/feature-engineerin
 | [`bundle`](bundle/) | Export a versioned JSON feed of the corpus's district-level findings for the web layer | 18 |
 | [`connect`](connect/) | Retrieval and extraction: the department's publications into committed fixtures | 81 |
 | [`deflate`](deflate/) | Convert nominal Ohio school finance figures to constant dollars, fiscal-year aligned | 11 |
-| [`dispersion`](dispersion/) | School finance equity statistics: dispersion and wealth neutrality across agencies | 61 |
+| [`dispersion`](dispersion/) | School finance equity statistics: dispersion and wealth neutrality across agencies | 62 |
 | [`edfund-core`](edfund-core/) | Shared domain types for the Ohio education funding computer | 7 |
 | [`foundation`](foundation/) | Fair School Funding Plan base cost build-up, per R.C. 3317.011 | 44 |
 | [`local-capacity`](local-capacity/) | Fair School Funding Plan local capacity and state share, per R.C. 3317.017 | 18 |
 | [`millage`](millage/) | Effective operating millage under H.B. 920 reduction factors, and 20-mill floor status | 13 |
 | [`project`](project/) | Forward projection of funding inputs, and policy simulation over them | 93 |
+| [`scenario-delta`](scenario-delta/) | Winners and losers between two funding runs, with incidence and the off-formula count | 23 |
 | [`spreadsheet`](spreadsheet/) | Read the department's published workbooks with no dependencies | 70 |
 
-10 crates, 416 test functions, no crates.io dependencies. `cargo test` reports a different total: it adds doc-tests and counts each integration binary separately.
+11 crates, 440 test functions, no crates.io dependencies. `cargo test` reports a different total: it adds doc-tests and counts each integration binary separately.
 <!-- /REGEN -->
 
 ## Index status
