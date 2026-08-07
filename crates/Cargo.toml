@@ -1,0 +1,21 @@
+[workspace]
+resolver = "2"
+members = [
+    "edfund-core",
+    "deflate",
+    "local-capacity",
+    "foundation",
+    "millage",
+]
+
+[workspace.package]
+version = "0.1.0"
+edition = "2021"
+license = "MIT"
+repository = "https://github.com/goedelsoup/ohio-education-funding"
+
+[workspace.lints.rust]
+missing_docs = "warn"
+
+[workspace.lints.clippy]
+all = { level = "deny", priority = -1 }

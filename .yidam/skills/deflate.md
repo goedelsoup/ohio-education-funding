@@ -40,6 +40,18 @@ calendar year of the same number.
 
 ## Status
 
-**Stub — not implemented.** Blocked only on `bls-cpi`, whose series are small enough to commit
-as fixtures. This is the cheapest calculator to build and a prerequisite for most of the
-others — build it first. Implementation lands in `crates/deflate/`.
+**Implemented** in [`crates/deflate/`](../../crates/deflate/src/lib.rs). 10 tests.
+
+The CPI-U June series for FY2000-FY2022 is committed as a fixture. Three tests reproduce the
+Ohio Auditor of State's independently published figures exactly — 71.9% CPI growth, 26.1% real
+per-pupil growth, and 19.4% excluding COVID relief — which is what verifies both the code and
+the two anchor index points at once.
+
+**Confidence propagates.** Index points carry `Confidence::Verified` or `Unverified`; only
+FY2000 and FY2022 are verified, being the two the Auditor's figures pin down. A result takes
+the weaker of its two endpoints, so a caller writing into the corpus knows whether the claim
+is `[verified]` or `[inference]` without having to reason about it. The remaining years are
+transcribed and must be checked against BLS.
+
+Not yet implemented: the Employment Cost Index variant, which is the better deflator for
+school costs and has shorter coverage.

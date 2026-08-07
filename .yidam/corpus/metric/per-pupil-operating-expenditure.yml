@@ -69,10 +69,42 @@ properties:
     Real growth FY2000-FY2022: +26.1% including relief funds, +19.4% excluding. [verified]
     CPI growth over the same span: +71.9%. [verified]
 
-    The near-flat stretch from FY2010 to FY2014 — roughly $11.2k to $11.4k nominal, a real
-    decline — coincides with the [Bridge formula](../funding-regime/bridge-formula.yml) period
-    and the withdrawal of federal stimulus. Whether that is causal is not established here and
-    is worth a phase of its own. [open]
+    Constant FY2022 dollars, computed by the `deflate` calculator
+    (`cargo run --example epp_real_series -p deflate`):
+
+      FY2000  $12,143    baseline    [verified]
+      FY2002  $13,341    +9.9%       [inference]
+      FY2004  $14,058   +15.8%       [inference]
+      FY2006  $14,166   +16.7%       [inference]
+      FY2008  $13,948   +14.9%       [inference]
+      FY2010  $15,226   +25.4%       [inference]
+      FY2012  $14,591   +20.2%       [inference]
+      FY2014  $14,173   +16.7%       [inference]
+      FY2016  $14,629   +20.5%       [inference]
+      FY2018  $15,169   +24.9%       [inference]
+      FY2020  $15,747   +29.7%       [inference]
+      FY2022  $15,314   +26.1%       [verified]
+      FY2022  $14,493   +19.4%       excluding federal relief  [verified]
+
+    Intermediate rows are [inference] on both sides: the nominal figures are chart-label
+    approximations to about $100, and the CPI observations between FY2000 and FY2022 are
+    transcribed rather than checked against BLS. The endpoints are verified on both.
+
+    TWO FINDINGS THE NOMINAL SERIES CONCEALS. [inference]
+
+    Real per-pupil spending did not grow steadily — it fell. From FY2010 to FY2014 it dropped
+    from $15,226 to $14,173, a real decline of about 7%, leaving FY2014 statistically
+    indistinguishable from FY2006's $14,166. Eight years of no real gain. That trough sits
+    inside the [Bridge formula](../funding-regime/bridge-formula.yml) decade and coincides with
+    the withdrawal of federal stimulus. Causation is still not established, but the shape is no
+    longer merely "near-flat" — it is a decline and a recovery, and the recovery did not reach
+    the FY2010 level again until FY2018.
+
+    Real spending peaked in FY2020, not FY2022. At $15,747 it stands about $433 above the
+    FY2022 figure of $15,314. Federal COVID relief arrived while prices were still low and was
+    then eroded by the FY2021-22 inflation, so the nominal high and the real high are two
+    years apart. The FY2020 nominal input is a chart approximation, so the gap should be
+    confirmed against exact figures — but it exceeds the approximation error. [open]
 
     Per-district series are available from the Auditor's dashboard and are not yet extracted.
     [open]

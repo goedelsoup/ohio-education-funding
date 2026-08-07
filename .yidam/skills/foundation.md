@@ -32,10 +32,24 @@ counterfactual expressible: a scenario is this calculator invoked twice with two
 
 ## Status
 
-**Stub — not implemented.** Blocked on two things: the parameter value series in
-[`parameter/`](../corpus/parameter/) are all `[open]`, and the per-agency input series do not
-exist until `dew-foundation` and `tax-abstract` are built. Implementation lands in
-`crates/foundation/`.
+**Partially implemented** in [`crates/foundation/`](../../crates/foundation/src/lib.rs).
+14 tests.
 
-Implement the Fair School Funding Plan first — it is the only regime with a live policy
-question attached — then work backward.
+Teacher base cost [R.C. 3317.011(D)] is complete and verified: six tests reproduce the
+department's published worked example — funded classroom teachers 851.52, special teachers
+135.61, and all four cost components summing to $87,984,148.77. Five of the seven student
+support elements [3317.011(E)] are implemented.
+
+**There is deliberately no `aggregate_base_cost` function.** District leadership,
+building leadership, and athletic co-curricular are not implemented, so any total would be
+wrong by roughly a third while looking authoritative — and would propagate into every state
+share and scenario downstream. The crate exposes what is verified and nothing that pretends to
+be more.
+
+One implementation detail is load-bearing and has its own test: funded teacher counts are
+rounded to two decimals **before** multiplication, as the department does. Keeping full
+precision instead moves the special teacher component by hundreds of dollars on a mid-sized
+district and no longer matches the published figure.
+
+A further test asserts the property the seeded scenario depends on — refreshing the salary
+inputs changes the price terms without moving staffing at all.

@@ -1,0 +1,13 @@
+[package]
+name = "foundation"
+description = "Fair School Funding Plan base cost build-up, per R.C. 3317.011"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+repository.workspace = true
+
+[dependencies]
+edfund-core = { path = "../edfund-core" }
+
+[lints]
+workspace = true

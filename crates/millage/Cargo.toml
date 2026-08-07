@@ -1,0 +1,13 @@
+[package]
+name = "millage"
+description = "Effective operating millage under H.B. 920 reduction factors, and 20-mill floor status"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+repository.workspace = true
+
+[dependencies]
+edfund-core = { path = "../edfund-core" }
+
+[lints]
+workspace = true

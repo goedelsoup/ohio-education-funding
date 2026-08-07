@@ -1,0 +1,7 @@
+# Rust build artifacts. The yidam template repository this was derived from carries a
+# 6.1 GB crates/*/target tree; keeping it out of history matters here.
+target/
+**/target/
+
+# macOS
+.DS_Store

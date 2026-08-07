@@ -41,6 +41,46 @@ A semantic index over `.yidam/corpus/` is not built at genesis — 45 nodes fit 
 It is added when the corpus outgrows direct retrieval, which the exemplar-agency expansion
 will force before anything else does.
 
+## Workspace
+
+The Rust workspace root is [`Cargo.toml`](Cargo.toml) in this directory, so all Rust lives
+under `crates/` and the repository root stays free of build configuration. The connector
+directories are interface stubs and are not workspace members.
+
+**No external dependencies.** Every calculator is pure `std`. That keeps the domain computer
+hermetic and fast to build, and it means a committed
+[`scenario`](../.yidam/corpus/scenario/) result can be reproduced years later without a
+dependency resolution succeeding first.
+
+| Crate | Kind | Status | Tests |
+|---|---|---|---|
+| [`edfund-core`](edfund-core/) | types | shared `FiscalYear`, `AgencyType`, rounding | 7 |
+| [`deflate`](deflate/) | calculator | implemented | 10 |
+| [`local-capacity`](local-capacity/) | calculator | FSFP side implemented; charge-off side not | 16 |
+| [`foundation`](foundation/) | calculator | teacher base cost verified; three sub-components absent | 14 |
+| [`millage`](millage/) | calculator | implemented; awaiting real inputs | 13 |
+
+Run the gate from this directory:
+
+```
+cargo fmt -- --check
+cargo clippy --all-targets -- -D warnings
+cargo test
+```
+
+### On floating point
+
+Ohio's formulas are ratio-heavy, so this workspace uses `f64` with **explicit rounding at the
+points the department rounds**, and proves correctness by reproducing published figures to the
+cent rather than by relying on a fixed-point type. Where the department's worked examples show
+a rounded intermediate, the code rounds there too — and there is a test asserting that doing it
+the other way no longer matches.
+
+The one place this leaks is decimal ties: `1.005` is stored just below the midpoint and rounds
+down. That limitation is documented and tested in `edfund-core` rather than hidden, because a
+future input landing on a genuine tie would need decimal arithmetic, not a different rounding
+mode.
+
 ## Crates
 
 <!-- REGEN: yidam crates-index
