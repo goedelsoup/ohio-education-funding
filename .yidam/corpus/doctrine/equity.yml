@@ -38,6 +38,19 @@ description: |
   Local revenue per pupil, by contrast, tracks valuation per pupil at above +0.7. [verified]
   That is the disparity the state formula exists to offset, visible in isolation.
 
+  **One reason the wealth relationship is not stronger has now been identified.** The
+  [temporary transitional aid guarantee](../formula-component/temporary-transitional-aid-guarantee.yml)
+  holds 48.3% of districts above what the formula computes for them, and its incidence rises
+  monotonically with property wealth — 13% of the poorest quartile against 76% of the
+  wealthiest. [verified] The local capacity measure reduces state aid to wealthy districts by
+  design; the guarantee then restores it. The two mechanisms work against each other, and the
+  −0.549 correlation is the net of them rather than a measurement of what the formula alone
+  does. [inference]
+
+  This is a case where an equity statistic computed on realized funding answers a different
+  question from the same statistic computed on the formula. Distinguishing them requires
+  running the formula without the guarantee, which the corpus can now nearly do. [open]
+
   It trades against adequacy in a specific way. Perfect equity is achievable by leveling down —
   every district equally underfunded satisfies equity and fails adequacy. [inference] Ohio has
   never proposed leveling down, but the tension shows up in a milder form every time a reform
