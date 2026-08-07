@@ -5,6 +5,7 @@ import { count, escapeHtml, money, ordinal, pct, percentileOf, signedMoney } fro
 import { renderDistrictOutcome } from "./outcomes.ts";
 import { apply, currentLaw } from "./policy.ts";
 import { forecastPath, growthPrior, observations } from "./project.ts";
+import { realChange, series, type Basis } from "./real.ts";
 import type { Bundle, District } from "./types.ts";
 
 function strip(label: string, value: number | null, sorted: number[]): string {
@@ -176,19 +177,23 @@ const PANDEMIC_YEARS = [2021, 2022, 2023, 2024];
  * The general fund is also not the whole budget: capital, food service, and most federal
  * programmes sit in other funds, so the spending here is not the district's total.
  */
-function renderActuals(d: District): string {
+function renderActuals(bundle: Bundle, d: District, basis: Basis): string {
   if (d.finances.length === 0) return "";
-  const first = d.finances[0]!;
-  const latest = d.finances[d.finances.length - 1]!;
+  const { years: shown, converted, base } = series(bundle.deflator, d.finances, basis);
+  const first = shown[0]!;
+  const latest = shown[shown.length - 1]!;
   const cashChange = latest.ending_cash - first.ending_cash;
   const yearsOfSpending =
     latest.total_expenditure > 0 ? latest.ending_cash / latest.total_expenditure : null;
+  // Counted on the published figures: whether a year was run at a deficit is a fact about that
+  // year's own dollars, and deflating both sides cannot change it.
   const deficits = d.finances.filter(
     (y) => y.total_expenditure > y.total_revenue,
   ).length;
+  const realAid = realChange(bundle.deflator, d.finances, (y) => y.state_aid);
 
-  const peak = d.finances.reduce((a, b) => (b.ending_cash > a.ending_cash ? b : a));
-  const bars = d.finances.map((y) => ({
+  const peak = shown.reduce((a, b) => (b.ending_cash > a.ending_cash ? b : a));
+  const bars = shown.map((y) => ({
     label: `FY${y.fiscal_year}`,
     value: y.ending_cash,
     hover: `FY${y.fiscal_year}: ${money(y.ending_cash)} held, ${money(y.total_revenue)} in, ${money(y.total_expenditure)} out`,
@@ -200,6 +205,15 @@ function renderActuals(d: District): string {
   return `
     <div class="card">
       <h2>What it actually received, and what it holds</h2>
+      <div class="basis" role="group" aria-label="Dollar basis">
+        <button data-basis="nominal" class="${basis === "nominal" ? "active" : ""}"
+                aria-pressed="${basis === "nominal"}">Nominal</button>
+        <button data-basis="real" class="${basis === "real" ? "active" : ""}"
+                aria-pressed="${basis === "real"}">Constant dollars</button>
+        <span class="n">Showing ${
+          converted ? `FY${base} dollars` : "nominal"
+        }</span>
+      </div>
       <div class="tiles">
         <div class="tile"><div class="k">Cash on hand, FY${latest.fiscal_year}</div>
           <div class="v">${money(latest.ending_cash)}</div>
@@ -212,13 +226,20 @@ function renderActuals(d: District): string {
           <div class="v ${cashChange < 0 ? "loss" : "gain"}">${signedMoney(cashChange)}</div>
           <div class="n">carry-over into FY${latest.fiscal_year + 1} is
             ${money(latest.ending_cash)}</div></div>
-        <div class="tile"><div class="k">Years run at a deficit</div>
-          <div class="v">${deficits} of ${d.finances.length}</div>
-          <div class="n">spending above the year's own revenue</div></div>
+        <div class="tile"><div class="k">State aid, FY${first.fiscal_year}–FY${latest.fiscal_year}</div>
+          <div class="v ${(realAid ?? 0) < 0 ? "loss" : "gain"}">${
+            realAid == null ? "—" : pct(realAid, 1)
+          }</div>
+          <div class="n">real; ${pct(
+            d.finances[d.finances.length - 1]!.state_aid / d.finances[0]!.state_aid - 1,
+            1,
+          )} nominal. ${deficits} of ${d.finances.length} years run at a deficit</div></div>
       </div>
 
       <div class="chartwrap" data-chart="cash">${barChart(bars)}</div>
-      <p class="note">Cash held at 30 June, general fund.
+      <p class="note">Cash held at 30 June, general fund${
+        converted ? `, in FY${base} dollars — deflated with ${escapeHtml(bundle.deflator?.label ?? "an index")}` : ""
+      }.
         FY${PANDEMIC_YEARS[0]}–FY${PANDEMIC_YEARS[PANDEMIC_YEARS.length - 1]} are the federal
         pandemic relief years: that money was booked in the general fund by some districts and
         separately by others, so a balance rising across them is not evidence about this
@@ -229,7 +250,7 @@ function renderActuals(d: District): string {
           <th>Fiscal year</th><th>State aid</th><th>Local tax</th>
           <th>Revenue</th><th>Spending</th><th>Held at 30 June</th>
         </tr></thead>
-        <tbody>${d.finances
+        <tbody>${shown
           .map(
             (y) => `<tr>
               <th>FY${y.fiscal_year}</th>
@@ -253,7 +274,7 @@ function renderActuals(d: District): string {
 }
 
 /** Render one district. */
-export function renderDistrict(bundle: Bundle, d: District): string {
+export function renderDistrict(bundle: Bundle, d: District, basis: Basis = "nominal"): string {
   const valuations = bundle.districts
     .map((x) => x.valuation_per_pupil)
     .filter((v): v is number => v != null)
@@ -326,7 +347,7 @@ export function renderDistrict(bundle: Bundle, d: District): string {
 
     ${renderEnrollmentYears(bundle, d)}
 
-    ${renderActuals(d)}
+    ${renderActuals(bundle, d, basis)}
 
     <div class="card">
       <h2>Position among Ohio's ${bundle.statewide.districts} districts</h2>
