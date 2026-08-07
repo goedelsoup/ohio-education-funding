@@ -3,7 +3,26 @@ name: dispersion
 description: Compute equity statistics across Ohio education agencies for a fiscal period — coefficient of variation, McLoone and Verstegen indices, federal range ratio, wealth neutrality
 ---
 
-# Calculator: dispersion (stub)
+# Calculator: dispersion
+
+## Before computing: is the subject a resource or a compensation?
+
+The direction of "better" is not the same, and getting it backwards is easy because the
+familiar case is the resource one.
+
+- **Resources** — spending per pupil, total revenue per pupil. Less dispersion is more
+  equitable. This is what the indices were designed for.
+- **Compensation** — state aid per pupil. Aid exists to offset unequal local capacity, so a
+  *wide* spread means strong targeting and a *narrow* one means weak targeting.
+
+Ohio supplies the cautionary case. Realized state aid is measurably more equal than
+formula-computed aid — coefficient of variation 0.544 against 0.677, federal range ratio 9.6
+against 12.3 — because the
+[guarantee](../corpus/formula-component/temporary-transitional-aid-guarantee.yml) tops up
+precisely the wealthy districts the formula funds least. Read with the spending habit, that
+looks like the system becoming fairer. It is the compensation being flattened.
+
+Every figure this skill produces must name its subject.
 
 **Computes.** The distribution of per-pupil resources across agencies for a fiscal period, and
 the standard school-finance equity statistics over it.
