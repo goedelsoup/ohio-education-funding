@@ -29,6 +29,8 @@ properties:
   name: Base cost per pupil
   unit: dollars-per-pupil
   series: |
+    FY2006  $5,283.00  statutory base cost, foundation formula    [inference]
+    FY2007  $5,403.00  statutory base cost, foundation formula    [inference]
     FY2021  $6,020.00  pre-FSFP formula amount                    [inference, Fordham]
     FY2022  $7,349.22  statewide average, FY2018 cost inputs      [verified, department]
     FY2023  $7,352.00  statewide average, FY2018 cost inputs      [inference, Fordham]

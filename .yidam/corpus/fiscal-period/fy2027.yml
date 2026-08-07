@@ -1,0 +1,44 @@
+class: fiscal-period
+label: Fiscal Year 2027
+description: |
+  July 1, 2026 through June 30, 2027 — the second year of the
+  [FY2026-27 biennium](fy2026-27.yml), and the year the Fair School Funding Plan's six-year
+  phase-in reaches 100%. [inference]
+
+  It is the period this corpus was built to be able to describe precisely, because two true
+  statements about it point in opposite directions. The phase-in will be complete: the state
+  will appropriate the full computed formula amount for the first time since the plan was
+  enacted. And the computed amount will be priced from FY2022 staffing and salary data, five
+  years stale by then, because [H.B. 96](../legislation/hb-96-2025.yml) carried the reference
+  year forward rather than refreshing it. [inference]
+
+  "Fully funded" and "funded below its own costing" are both accurate descriptions of FY2027.
+  They differ only in which parameter is held fixed, which is why
+  [`fsfp-phase-in-percentage`](../parameter/fsfp-phase-in-percentage.yml) and
+  [`base-cost-per-pupil`](../parameter/base-cost-per-pupil.yml) are separate addressable nodes
+  rather than one figure.
+
+  A projection year: nothing here is observed. Enrollment, valuation, and the resulting
+  per-district amounts all require the `project` calculator, and any figure attributed to
+  FY2027 must be tagged as an estimate. [open]
+properties:
+  label: FY2027
+  kind: fiscal-year
+  start: 2026-07-01
+  end: 2027-06-30
+  appropriating_bill: Am. Sub. H.B. 96 (136th General Assembly)
+  context: |
+    Terminal year of the FSFP six-year phase-in; the percentage reaches 100% while base cost
+    inputs remain at FY2022. Entirely prospective at the time of writing — no actuals exist and
+    every figure is a projection.
+links:
+  - target: ../fiscal-period.ont.yml
+    relationship: instance-of
+  - target: fy2026.yml
+    relationship: follows
+  - target: fy2026-27.yml
+    relationship: part-of
+  - target: ../funding-regime/fair-school-funding-plan.yml
+    relationship: governed-by
+  - target: ../legislation/hb-96-2025.yml
+    relationship: funded-by

@@ -1,0 +1,33 @@
+class: fiscal-period
+label: FY2022-23 Biennium
+description: |
+  July 1, 2021 through June 30, 2023 — the biennium appropriated by
+  [Am. Sub. H.B. 110](../legislation/hb-110-2021.yml), and the one in which the Fair School
+  Funding Plan began. [verified]
+
+  Phase-in ran 16.67% in FY2022 and 33.33% in FY2023, with base cost priced from FY2018
+  statewide average salaries in both years. [verified for FY2022; inference for FY2023] The
+  statewide average base cost was $7,349.22 in FY2022 and approximately $7,352 in FY2023 —
+  essentially flat, which is what a frozen input year produces. [inference] That flatness is the
+  first observable instance of the pattern the corpus tracks through
+  [H.B. 33](../legislation/hb-33-2023.yml) and [H.B. 96](../legislation/hb-96-2025.yml).
+
+  H.B. 583 of the same General Assembly made technical corrections to the formula in June 2022,
+  incorporated into the FY2022 calculations. [verified] It has no node here. [open]
+properties:
+  label: FY2022-23
+  kind: biennium
+  start: 2021-07-01
+  end: 2023-06-30
+  appropriating_bill: Am. Sub. H.B. 110 (134th General Assembly)
+  context: |
+    First biennium of the Fair School Funding Plan. Phase-in 16.67% then 33.33%. Cost inputs
+    FY2018 throughout. Federal COVID relief funds in flow across both years, which distorts any
+    comparison to adjacent biennia.
+links:
+  - target: ../fiscal-period.ont.yml
+    relationship: instance-of
+  - target: ../funding-regime/fair-school-funding-plan.yml
+    relationship: governed-by
+  - target: ../legislation/hb-110-2021.yml
+    relationship: funded-by
