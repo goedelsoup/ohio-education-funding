@@ -32,6 +32,38 @@ projection depends on floor status, which is itself a projected quantity.
 
 ## Status
 
-**Stub — not implemented.** The earlier reading, that this belonged outside `crates/` because
-the mature time-series tooling is Python, no longer holds: `packages/` has been retired and the
-whole domain computer is Rust. Blocked on the historical series, not on the language.
+**Implemented** in [`crates/project`](../../crates/project/). Enrollment projection with
+intervals, and a policy simulator over it.
+
+The earlier reading — that this belonged outside `crates/` because the mature time-series
+tooling is Python — no longer holds: `packages/` has been retired and the whole domain computer
+is Rust. It was also the wrong reason. What the projection needed was not a library but a
+history, and it still does.
+
+### The rule above is enforced by the types
+
+A [`Run`](../../crates/project/src/report.rs) holds a `PolicyEffect` with no interval and an
+optional `EnrollmentEffect` with one. There is no field containing their sum, and the CLI prints
+them under separate headings with a sentence saying why.
+
+### The Ohio-specific constraints, and how each fared
+
+**Valuation moves in reappraisal steps on a county cycle.** Not implemented, and not because it
+is hard: the corpus has exactly one valuation observation per district. `Method::Assumed` lets a
+caller supply a rate and records it as the caller's assumption. Blocked on
+[`tax-abstract`](../../crates/connect/sources/tax-abstract.md). Local capacity is 60% valuation,
+so **every projection of the local side of Ohio school funding is currently an assumption**.
+
+**A statewide enrollment trend applied uniformly is wrong everywhere.** Respected — every
+district is projected from its own three observations, and 105 of 609 are growing.
+
+**Revenue projection depends on floor status, which is itself projected.** Not reached. Revenue
+is not projected at all; only enrollment is, and only aid is computed from it.
+
+### What is still missing
+
+A longer enrollment history. Three observations per district is enough to fit a trend and not
+enough to estimate how wrong it might be, so the intervals rest on a cross-sectional prior
+rather than on each district's own variability. The `nces-ccd` connector is where a real panel
+would come from — and it is also what would handle consolidation, without which a long series
+is silently wrong.

@@ -27,7 +27,7 @@
 //!   salary across all 606 districts in the FY2024 District Profile Report. `[verified]`
 
 use foundation::{aggregate_base_cost, DistrictEnrollment, StatewideFactors};
-use local_capacity::{state_share, MINIMUM_STATE_SHARE};
+use local_capacity::{state_share, MINIMUM_STATE_SHARE_FY2022};
 
 /// The FY2022 reference-year teacher salary carried forward by H.B. 96. [inference]
 const FY2022_TEACHER_SALARY: f64 = 67_654.0;
@@ -129,8 +129,9 @@ fn main() {
     for capacity in [
         500.0_f64, 1_500.0, 2_027.0, 4_000.0, 6_000.0, 7_000.0, 12_000.0,
     ] {
-        let s_frozen = state_share(a.per_pupil, capacity, adm).unwrap();
-        let s_refreshed = state_share(b.per_pupil, capacity, adm).unwrap();
+        let s_frozen = state_share(a.per_pupil, capacity, adm, MINIMUM_STATE_SHARE_FY2022).unwrap();
+        let s_refreshed =
+            state_share(b.per_pupil, capacity, adm, MINIMUM_STATE_SHARE_FY2022).unwrap();
         let gain = s_refreshed.percentage * b.per_pupil - s_frozen.percentage * a.per_pupil;
         let captured = gain / (b.per_pupil - a.per_pupil);
         let marker = if s_frozen.at_minimum {
@@ -154,8 +155,8 @@ fn main() {
          increase. A district held at the {:.0}% floor receives {:.0}% of it. Refreshing the\n\
          input year is therefore progressive, and freezing it is regressive — uniform in method,\n\
          not in effect.",
-        MINIMUM_STATE_SHARE * 100.0,
-        MINIMUM_STATE_SHARE * 100.0
+        MINIMUM_STATE_SHARE_FY2022 * 100.0,
+        MINIMUM_STATE_SHARE_FY2022 * 100.0
     );
     println!();
     println!(

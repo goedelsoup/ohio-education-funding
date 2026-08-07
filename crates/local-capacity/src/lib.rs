@@ -129,12 +129,27 @@ pub const RATE_AT_BENCHMARK: f64 = 0.025;
 /// Capacity rate coefficient applied at or below the statewide median income.
 pub const RATE_AT_STATE_MEDIAN: f64 = 0.0225;
 
-/// The statutory minimum share of base cost the state pays, however wealthy the district.
+/// The minimum share of base cost the state pays, however wealthy the district, **as the Fair
+/// School Funding Plan was enacted for FY2022**.
 ///
-/// This floor is why [`state_share_percentage`] stops discriminating at the top of the wealth
+/// This floor is why [`state_share`] stops discriminating at the top of the wealth
 /// distribution: a district whose local capacity exceeds 95% of its base cost and one whose
-/// capacity exceeds it several times over both report 5%.
-pub const MINIMUM_STATE_SHARE: f64 = 0.05;
+/// capacity exceeds it several times over both report the same share.
+///
+/// # It is not a constant, and treating it as one was wrong here
+///
+/// The percentage is set by each biennial budget, not fixed in permanent law, and it has
+/// **doubled**: the department's FY2027 calculator states a minimum state share of `0.1` for
+/// both FY2026 and FY2027, on its `Notes` sheet, in as many words. In the FY2027 model 138 of
+/// 609 districts — 22.7% — sit exactly on it. That is a large policy fact this crate concealed
+/// by hard-coding the FY2022 figure and applying it to every year.
+///
+/// Callers pass the year's value to [`state_share`]. These constants name the two that are
+/// known.
+pub const MINIMUM_STATE_SHARE_FY2022: f64 = 0.05;
+
+/// The minimum state share for FY2026 and FY2027, per the department's own model.
+pub const MINIMUM_STATE_SHARE_FY2027: f64 = 0.10;
 
 fn lesser_of_recent_and_average(recent: f64, three_year: [f64; 3]) -> f64 {
     let average = three_year.iter().sum::<f64>() / 3.0;
@@ -221,7 +236,9 @@ pub struct StateShare {
 /// themselves computed from prior-year or three-year-average ADM, so a district with sharply
 /// changing enrollment is funded on a blend of two different student counts.
 ///
-/// No district receives less than [`MINIMUM_STATE_SHARE`] of its base cost.
+/// No district receives less than `minimum_share` of its base cost — a figure each biennial
+/// budget sets, and which doubled between FY2022 and FY2026. See
+/// [`MINIMUM_STATE_SHARE_FY2022`] and [`MINIMUM_STATE_SHARE_FY2027`].
 ///
 /// # Errors
 ///
@@ -230,12 +247,13 @@ pub fn state_share(
     base_cost_per_pupil: Dollars,
     local_capacity_per_pupil: Dollars,
     current_year_enrolled_adm: Adm,
+    minimum_share: f64,
 ) -> Result<StateShare, CapacityError> {
     if base_cost_per_pupil <= 0.0 {
         return Err(CapacityError::NonPositiveAdm);
     }
     let residual = base_cost_per_pupil - local_capacity_per_pupil;
-    let floor = base_cost_per_pupil * MINIMUM_STATE_SHARE;
+    let floor = base_cost_per_pupil * minimum_share;
     let at_minimum = residual < floor;
     let per_pupil = if at_minimum { floor } else { residual };
     Ok(StateShare {
@@ -253,8 +271,15 @@ pub fn state_share(
 pub fn state_share_percentage(
     base_cost_per_pupil: Dollars,
     local_capacity_per_pupil: Dollars,
+    minimum_share: f64,
 ) -> Result<f64, CapacityError> {
-    Ok(state_share(base_cost_per_pupil, local_capacity_per_pupil, 1.0)?.percentage)
+    Ok(state_share(
+        base_cost_per_pupil,
+        local_capacity_per_pupil,
+        1.0,
+        minimum_share,
+    )?
+    .percentage)
 }
 
 #[cfg(test)]
@@ -410,7 +435,7 @@ mod tests {
 
     #[test]
     fn state_share_is_the_residual_after_local_capacity() {
-        let share = state_share(7_000.0, 2_000.0, 1_000.0).unwrap();
+        let share = state_share(7_000.0, 2_000.0, 1_000.0, MINIMUM_STATE_SHARE_FY2022).unwrap();
         assert!((share.amount - 5_000_000.0).abs() < 1e-6);
         assert!((share.percentage - 5.0 / 7.0).abs() < 1e-9);
         assert!(!share.at_minimum);
@@ -420,11 +445,13 @@ mod tests {
     /// districts: two districts with very different capacity report the same 5%.
     #[test]
     fn state_share_floors_at_five_percent_for_wealthy_districts() {
-        let merely_rich = state_share(7_000.0, 6_900.0, 1_000.0).unwrap();
-        let extremely_rich = state_share(7_000.0, 30_000.0, 1_000.0).unwrap();
+        let merely_rich =
+            state_share(7_000.0, 6_900.0, 1_000.0, MINIMUM_STATE_SHARE_FY2022).unwrap();
+        let extremely_rich =
+            state_share(7_000.0, 30_000.0, 1_000.0, MINIMUM_STATE_SHARE_FY2022).unwrap();
         assert!(merely_rich.at_minimum && extremely_rich.at_minimum);
-        assert!((merely_rich.percentage - MINIMUM_STATE_SHARE).abs() < 1e-12);
-        assert!((extremely_rich.percentage - MINIMUM_STATE_SHARE).abs() < 1e-12);
+        assert!((merely_rich.percentage - MINIMUM_STATE_SHARE_FY2022).abs() < 1e-12);
+        assert!((extremely_rich.percentage - MINIMUM_STATE_SHARE_FY2022).abs() < 1e-12);
         assert!(
             (merely_rich.amount - extremely_rich.amount).abs() < 1e-9,
             "the floor erases the difference between them"
@@ -434,9 +461,10 @@ mod tests {
     #[test]
     fn state_share_percentage_never_falls_below_the_floor() {
         for capacity in [0.0, 1_000.0, 6_650.0, 7_000.0, 100_000.0] {
-            let pct = state_share_percentage(7_000.0, capacity).unwrap();
+            let pct =
+                state_share_percentage(7_000.0, capacity, MINIMUM_STATE_SHARE_FY2022).unwrap();
             assert!(
-                pct >= MINIMUM_STATE_SHARE - 1e-12,
+                pct >= MINIMUM_STATE_SHARE_FY2022 - 1e-12,
                 "capacity {capacity} gave {pct}"
             );
         }
@@ -445,8 +473,34 @@ mod tests {
     #[test]
     fn state_share_rejects_non_positive_base_cost() {
         assert_eq!(
-            state_share(0.0, 100.0, 10.0),
+            state_share(0.0, 100.0, 10.0, MINIMUM_STATE_SHARE_FY2022),
             Err(CapacityError::NonPositiveAdm)
         );
+    }
+}
+
+#[cfg(test)]
+mod minimum_share_tests {
+    use super::*;
+
+    #[test]
+    fn the_minimum_state_share_doubled_between_the_two_known_biennia() {
+        // Not a refactor for its own sake. The FY2027 calculator's Notes sheet states 0.1 for
+        // FY2026 and FY2027; the crate had 0.05 hard-coded from the FY2022 worked example and
+        // applied it to every year.
+        assert!((MINIMUM_STATE_SHARE_FY2027 - 2.0 * MINIMUM_STATE_SHARE_FY2022).abs() < 1e-12);
+    }
+
+    #[test]
+    fn the_floor_binds_at_ten_percent_where_it_would_not_at_five() {
+        // A district whose local capacity is 93% of base cost: computed share 7%, which clears
+        // the FY2022 floor and is lifted by the FY2027 one. This is the band the change moved.
+        let (base, capacity) = (10_000.0, 9_300.0);
+        let old = state_share(base, capacity, 1.0, MINIMUM_STATE_SHARE_FY2022).unwrap();
+        let new = state_share(base, capacity, 1.0, MINIMUM_STATE_SHARE_FY2027).unwrap();
+        assert!(!old.at_minimum);
+        assert!(new.at_minimum);
+        assert!((old.percentage - 0.07).abs() < 1e-12);
+        assert!((new.percentage - 0.10).abs() < 1e-12);
     }
 }

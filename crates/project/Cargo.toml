@@ -1,0 +1,19 @@
+[package]
+name = "project"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+repository.workspace = true
+description = "Forward projection of funding inputs, and policy simulation over them"
+
+[dependencies]
+edfund-core = { path = "../edfund-core" }
+foundation = { path = "../foundation" }
+local-capacity = { path = "../local-capacity" }
+
+[[bin]]
+name = "edfund-project"
+path = "src/main.rs"
+
+[lints]
+workspace = true

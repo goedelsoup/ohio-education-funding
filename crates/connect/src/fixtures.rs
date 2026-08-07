@@ -68,10 +68,12 @@ pub const FY27_HEADER: &[&str] = &[
     "aggregate_base_cost",
     "base_cost_per_pupil",
     "temp_transitional_aid_guarantee",
-    "enrolled_adm_fy22",
     "enrolled_adm_fy24",
+    "enrolled_adm_fy25",
+    "enrolled_adm_fy26",
     "assessed_valuation_per_pupil_fy23",
     "core_foundation_funding",
+    "base_cost_state_share",
 ];
 
 /// Column positions in the department's `Base_Cost` sheet, whose header is on the fourth row.
@@ -79,8 +81,6 @@ pub const FY27_HEADER: &[&str] = &[
 mod base_cost_columns {
     pub const NAME: usize = 1;
     pub const BUILDINGS: usize = 3;
-    pub const ADM_FY22: usize = 4;
-    pub const ADM_FY24: usize = 6;
     pub const ADM: usize = 7;
     pub const KINDERGARTEN: usize = 8;
     pub const GRADES_1_3: usize = 9;
@@ -98,8 +98,34 @@ mod base_cost_columns {
 /// Column positions in `Summary_SFPR`.
 mod summary_columns {
     pub const NAME: usize = 1;
+    /// `[A] Base Cost Calculated` — the state share of base cost alone.
+    pub const BASE_COST_SHARE: usize = 3;
+    /// `[H] Core Foundation Funding Calc` — base cost share plus targeted assistance, special
+    /// education, DPIA, English learner, gifted, and CTE. Formula aid, not base cost aid.
     pub const CORE: usize = 10;
     pub const GUARANTEE: usize = 11;
+}
+
+/// Column positions in the `ADM Data` sheet.
+///
+/// # The enrolled-ADM years are labelled twice, and once wrongly
+///
+/// `Base_Cost` carries the same three ADM columns, cell for cell, under the headers
+/// `[b1] FY22`, `[b2] FY23`, `[b3] FY24`. `ADM Data` labels the identical values `[b1] FY24`,
+/// `[b2] FY25`, `[b3] FY26`. They cannot both be right, and the arithmetic settles it: base
+/// cost enrolled ADM is the three-year average of the three, and this is the **FY2027**
+/// calculator, which R.C. 3317.011 funds on FY2024 through FY2026. The `Base_Cost` headers are
+/// left over from an earlier vintage of the workbook.
+///
+/// This matters beyond tidiness. The first fixture built from this file carried the stale
+/// labels, so every enrollment-trend figure in the corpus was named for the wrong pair of
+/// years — and the later two of the three are themselves partly departmental estimate rather
+/// than actual, which a label reading "FY2022 to FY2024" conceals entirely.
+mod adm_columns {
+    pub const BUILDINGS_FY25: usize = 25;
+    pub const ADM_FY24: usize = 26;
+    pub const ADM_FY25: usize = 27;
+    pub const ADM_FY26: usize = 28;
 }
 
 /// Column positions in the District Profile Report's `District Data` sheet.
@@ -121,6 +147,7 @@ mod profile_columns {
 pub fn build_fy27_model(
     base_cost_rows: &[Vec<String>],
     summary_rows: &[Vec<String>],
+    adm_rows: &[Vec<String>],
     profile_rows: &[Vec<String>],
 ) -> Vec<Vec<String>> {
     use base_cost_columns as bc;
@@ -135,6 +162,8 @@ pub fn build_fy27_model(
         .map(|row| (cell(row, profile_columns::IRN).trim(), row))
         .collect();
 
+    let adm_history: Vec<(&str, &Vec<String>)> = rows_by_key(adm_rows, 0).collect();
+
     let mut districts: Vec<(&str, &Vec<String>)> = rows_by_key(base_cost_rows, 0).collect();
     districts.sort_by(|a, b| a.0.cmp(b.0));
 
@@ -148,6 +177,14 @@ pub fn build_fy27_model(
         let Some(adm) = cell_number(row, bc::ADM).filter(|adm| *adm > 0.0) else {
             continue;
         };
+        // Enrolled ADM comes from `ADM Data` rather than `Base_Cost`, because only that sheet
+        // labels the years correctly. See the note on `adm_columns`.
+        let history = adm_history
+            .iter()
+            .find(|(key, _)| *key == irn)
+            .map(|(_, r)| *r);
+        let adm_year = |column: usize| history.and_then(|row| cell_number(row, column));
+
         let valuation_per_pupil = valuation
             .iter()
             .find(|(key, _)| *key == irn)
@@ -157,7 +194,10 @@ pub fn build_fy27_model(
             irn.to_string(),
             clean_name(cell(row, bc::NAME)),
             format_value(Some(adm), 4),
-            format_value(cell_number(row, bc::BUILDINGS), 0),
+            format_value(
+                adm_year(adm_columns::BUILDINGS_FY25).or_else(|| cell_number(row, bc::BUILDINGS)),
+                0,
+            ),
             format_value(cell_number(row, bc::KINDERGARTEN), 4),
             format_value(cell_number(row, bc::GRADES_1_3), 4),
             format_value(cell_number(row, bc::GRADES_4_8), 4),
@@ -174,10 +214,15 @@ pub fn build_fy27_model(
                 Some(cell_number(summary_row, summary_columns::GUARANTEE).unwrap_or(0.0)),
                 2,
             ),
-            format_value(cell_number(row, bc::ADM_FY22), 4),
-            format_value(cell_number(row, bc::ADM_FY24), 4),
+            format_value(adm_year(adm_columns::ADM_FY24), 4),
+            format_value(adm_year(adm_columns::ADM_FY25), 4),
+            format_value(adm_year(adm_columns::ADM_FY26), 4),
             format_value(valuation_per_pupil, 2),
             format_value(cell_number(summary_row, summary_columns::CORE), 2),
+            format_value(
+                cell_number(summary_row, summary_columns::BASE_COST_SHARE),
+                2,
+            ),
         ]);
     }
     out
@@ -336,13 +381,20 @@ mod tests {
             row(4, &[(0, "District IRN"), (1, "District Names")]),
             row(
                 12,
-                &[(0, "043786"), (1, "Cleveland"), (10, "10000000"), (11, "0")],
+                &[
+                    (0, "043786"),
+                    (1, "Cleveland"),
+                    (3, "4000000"),
+                    (10, "10000000"),
+                    (11, "0"),
+                ],
             ),
             row(
                 12,
                 &[
                     (0, "049056"),
                     (1, "Northern"),
+                    (3, "3000000"),
                     (10, "7000000"),
                     (11, "2500000"),
                 ],
@@ -357,6 +409,28 @@ mod tests {
                     (11, "888888888"),
                 ],
             ),
+        ]
+    }
+
+    /// The `ADM Data` sheet: a header, then one row per district. Only the columns the builder
+    /// reads are populated.
+    fn adm_rows() -> Vec<Vec<String>> {
+        let district = |irn: &str, buildings: &str, fy24: &str, fy25: &str, fy26: &str| {
+            row(
+                29,
+                &[
+                    (0, irn),
+                    (25, buildings),
+                    (26, fy24),
+                    (27, fy25),
+                    (28, fy26),
+                ],
+            )
+        };
+        vec![
+            row(2, &[(0, "District IRN"), (1, "District")]),
+            district("043786", "10", "2200", "2150", "2100"),
+            district("049056", "3", "2200", "2150", "2100"),
         ]
     }
 
@@ -386,7 +460,12 @@ mod tests {
     }
 
     fn model() -> Vec<Vec<String>> {
-        build_fy27_model(&base_cost_rows(), &summary_rows(), &profile_rows())
+        build_fy27_model(
+            &base_cost_rows(),
+            &summary_rows(),
+            &adm_rows(),
+            &profile_rows(),
+        )
     }
 
     fn field<'a>(rows: &'a [Vec<String>], irn: &str, column: &str) -> &'a str {
@@ -414,6 +493,26 @@ mod tests {
         for row in model() {
             assert_eq!(row.len(), FY27_HEADER.len());
         }
+    }
+
+    #[test]
+    fn the_adm_history_is_named_for_the_years_the_adm_data_sheet_declares() {
+        // Base_Cost labels the same three columns FY22/FY23/FY24. It is stale, and a fixture
+        // built from those labels names every enrollment trend for the wrong pair of years.
+        let rows = model();
+        assert_eq!(field(&rows, "043786", "enrolled_adm_fy24"), "2200");
+        assert_eq!(field(&rows, "043786", "enrolled_adm_fy25"), "2150");
+        assert_eq!(field(&rows, "043786", "enrolled_adm_fy26"), "2100");
+    }
+
+    #[test]
+    fn the_base_cost_state_share_is_kept_apart_from_total_formula_aid() {
+        // Summary_SFPR column 3 is base cost alone; column 10 adds targeted assistance,
+        // special education, DPIA, English learner, gifted, and CTE. A state-share lever acts
+        // on the first and would be wrong applied to the second.
+        let rows = model();
+        assert_eq!(field(&rows, "049056", "base_cost_state_share"), "3000000");
+        assert_eq!(field(&rows, "049056", "core_foundation_funding"), "7000000");
     }
 
     #[test]
@@ -453,7 +552,12 @@ mod tests {
 
     #[test]
     fn skips_a_district_missing_from_the_summary_sheet() {
-        let rows = build_fy27_model(&base_cost_rows(), &summary_rows()[..1], &profile_rows());
+        let rows = build_fy27_model(
+            &base_cost_rows(),
+            &summary_rows()[..1],
+            &adm_rows(),
+            &profile_rows(),
+        );
         assert!(rows.is_empty());
     }
 
@@ -461,7 +565,7 @@ mod tests {
     fn skips_a_district_with_no_usable_adm() {
         let mut base = base_cost_rows();
         base[5][7] = "0".into();
-        let rows = build_fy27_model(&base, &summary_rows(), &profile_rows());
+        let rows = build_fy27_model(&base, &summary_rows(), &adm_rows(), &profile_rows());
         assert_eq!(
             rows.iter().map(|r| r[0].as_str()).collect::<Vec<_>>(),
             ["043786"]
@@ -472,7 +576,7 @@ mod tests {
     fn commas_are_stripped_from_district_names() {
         let mut base = base_cost_rows();
         base[5][1] = "Northern Local, Perry".into();
-        let rows = build_fy27_model(&base, &summary_rows(), &profile_rows());
+        let rows = build_fy27_model(&base, &summary_rows(), &adm_rows(), &profile_rows());
         assert!(!rows[1][1].contains(','));
         assert_eq!(rows[1][1], "Northern Local  Perry");
     }
@@ -481,7 +585,7 @@ mod tests {
     fn trailing_whitespace_is_stripped_from_district_names() {
         let mut base = base_cost_rows();
         base[5][1] = "Bellefontaine City ".into();
-        let rows = build_fy27_model(&base, &summary_rows(), &profile_rows());
+        let rows = build_fy27_model(&base, &summary_rows(), &adm_rows(), &profile_rows());
         assert_eq!(rows[1][1], "Bellefontaine City");
     }
 
