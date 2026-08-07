@@ -60,6 +60,18 @@ pub struct DistrictRecord {
     /// Base cost share plus targeted assistance, special education, DPIA, English learner,
     /// gifted, and career-technical. This is formula aid.
     pub core_foundation_funding: Dollars,
+    /// `[R] Total State Support` — every state payment the report carries.
+    ///
+    /// Wider than [`DistrictRecord::realized_aid`], which is core foundation funding plus the
+    /// guarantee. The difference is transportation, preschool special education, special
+    /// education transportation, and the performance supplement: real money, paid to the
+    /// district, and **outside the base the guarantee holds it at**.
+    ///
+    /// The distinction is not pedantic. Comparing `realized_aid` against a figure that behaves
+    /// like this one — a district's booked state receipts, for instance — compares a narrow
+    /// construction against a broad one and produces a shortfall that is definitional rather
+    /// than real. This corpus did exactly that for two phases.
+    pub total_state_support: Dollars,
     /// Temporary transitional aid guarantee.
     pub guarantee: Dollars,
     /// Enrolled ADM in each of [`HISTORY_YEARS`].
@@ -182,6 +194,7 @@ mod column {
     pub const VALUATION_PER_PUPIL: usize = 19;
     pub const CORE_FOUNDATION: usize = 20;
     pub const BASE_COST_STATE_SHARE: usize = 21;
+    pub const TOTAL_STATE_SUPPORT: usize = 22;
 }
 
 /// The header this loader expects, so a fixture reshaped without updating [`column`] fails
@@ -191,7 +204,7 @@ adm_kindergarten,adm_grades_1_3,adm_grades_4_8_non_cte,adm_grades_9_12_non_cte,a
 adm_grades_9_12_total,funded_classroom_teachers,funded_special_teachers,teacher_base_cost,\
 aggregate_base_cost,base_cost_per_pupil,temp_transitional_aid_guarantee,enrolled_adm_fy24,\
 enrolled_adm_fy25,enrolled_adm_fy26,assessed_valuation_per_pupil_fy23,core_foundation_funding,\
-base_cost_state_share";
+base_cost_state_share,total_state_support";
 
 /// Every district in the department's FY2027 model.
 ///
@@ -244,6 +257,7 @@ pub fn panel() -> Vec<DistrictRecord> {
                 base_cost_per_pupil: required(column::BASE_COST_PER_PUPIL),
                 base_cost_state_share: required(column::BASE_COST_STATE_SHARE),
                 core_foundation_funding: required(column::CORE_FOUNDATION),
+                total_state_support: required(column::TOTAL_STATE_SUPPORT),
                 guarantee: required(column::GUARANTEE),
                 adm_history: [
                     required(column::ADM_FY24),

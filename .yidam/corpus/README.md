@@ -31,7 +31,7 @@ Sorted by: kind, then alphabetically.
 | [`department-of-education-and-workforce`](actor/department-of-education-and-workforce.yml) | actor | Department of Education and Workforce | 0 | 1 |
 | [`ohio-department-of-education`](actor/ohio-department-of-education.yml) | actor | Ohio Department of Education (superseded) | 0 | 2 |
 | [`ohio-general-assembly`](actor/ohio-general-assembly.yml) | actor | Ohio General Assembly | 0 | 1 |
-| [`supreme-court-of-ohio`](actor/supreme-court-of-ohio.yml) | actor | Supreme Court of Ohio | 0 | 0 |
+| [`supreme-court-of-ohio`](actor/supreme-court-of-ohio.yml) | actor | Supreme Court of Ohio | 0 | 3 |
 | [`adequacy`](doctrine/adequacy.yml) | doctrine | Adequacy | 6 | 19 |
 | [`equity`](doctrine/equity.yml) | doctrine | Equity | 5 | 21 |
 | [`thorough-and-efficient`](doctrine/thorough-and-efficient.yml) | doctrine | Thorough and Efficient | 2 | 9 |
@@ -51,7 +51,7 @@ Sorted by: kind, then alphabetically.
 | [`charge-off-local-share`](formula-component/charge-off-local-share.yml) | formula-component | Charge-Off Local Share | 2 | 5 |
 | [`fsfp-base-cost-calculation`](formula-component/fsfp-base-cost-calculation.yml) | formula-component | FSFP Base Cost Calculation | 3 | 6 |
 | [`fsfp-local-capacity-measure`](formula-component/fsfp-local-capacity-measure.yml) | formula-component | FSFP Local Capacity Measure | 0 | 7 |
-| [`temporary-transitional-aid-guarantee`](formula-component/temporary-transitional-aid-guarantee.yml) | formula-component | Temporary Transitional Aid Guarantee | 6 | 5 |
+| [`temporary-transitional-aid-guarantee`](formula-component/temporary-transitional-aid-guarantee.yml) | formula-component | Temporary Transitional Aid Guarantee | 9 | 6 |
 | [`bridge-formula`](funding-regime/bridge-formula.yml) | funding-regime | Bridge Formula | 3 | 6 |
 | [`equal-yield-formula`](funding-regime/equal-yield-formula.yml) | funding-regime | Equal Yield Formula | 1 | 2 |
 | [`evidence-based-model`](funding-regime/evidence-based-model.yml) | funding-regime | Evidence-Based Model | 0 | 5 |
@@ -70,9 +70,10 @@ Sorted by: kind, then alphabetically.
 | [`derolph-iv-2002`](litigation/derolph-iv-2002.yml) | litigation | DeRolph v. State (DeRolph IV, 2002) | 3 | 1 |
 | [`vouchers-hurt-ohio-2025`](litigation/vouchers-hurt-ohio-2025.yml) | litigation | EdChoice Constitutional Challenge (Franklin County, 2025) | 0 | 3 |
 | [`assessed-valuation-per-pupil`](metric/assessed-valuation-per-pupil.yml) | metric | Assessed Valuation Per Pupil | 5 | 2 |
-| [`effective-operating-millage`](metric/effective-operating-millage.yml) | metric | Effective Operating Millage | 2 | 0 |
+| [`effective-operating-millage`](metric/effective-operating-millage.yml) | metric | Effective Operating Millage | 2 | 1 |
 | [`expenditure-per-equivalent-pupil`](metric/expenditure-per-equivalent-pupil.yml) | metric | Expenditure Per Equivalent Pupil | 15 | 5 |
-| [`per-pupil-operating-expenditure`](metric/per-pupil-operating-expenditure.yml) | metric | Per-Pupil Operating Expenditure | 7 | 2 |
+| [`general-fund-cash-balance`](metric/general-fund-cash-balance.yml) | metric | General Fund Cash Balance | 4 | 2 |
+| [`per-pupil-operating-expenditure`](metric/per-pupil-operating-expenditure.yml) | metric | Per-Pupil Operating Expenditure | 7 | 3 |
 | [`performance-index`](metric/performance-index.yml) | metric | Performance Index | 12 | 6 |
 | [`progress-value-added`](metric/progress-value-added.yml) | metric | Progress (Value-Added) | 7 | 3 |
 | [`state-share-percentage`](metric/state-share-percentage.yml) | metric | State Share Percentage | 1 | 2 |
@@ -89,7 +90,7 @@ Sorted by: kind, then alphabetically.
 | [`fsfp-input-year-refresh`](scenario/fsfp-input-year-refresh.yml) | scenario | FSFP Cost Input Refresh vs. Freeze | 7 | 3 |
 | [`guarantee-phase-out`](scenario/guarantee-phase-out.yml) | scenario | Phasing Out the Temporary Transitional Aid Guarantee | 15 | 1 |
 
-60 nodes across 13 classes. **2 have nothing pointing at them**, which the corpus rules treat as a gap rather than a fact about the node.
+61 nodes across 13 classes. **0 have nothing pointing at them**, which the corpus rules treat as a gap rather than a fact about the node.
 <!-- /REGEN -->
 
 ## Semantic index status

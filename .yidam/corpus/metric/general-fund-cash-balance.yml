@@ -1,0 +1,108 @@
+class: metric
+label: General Fund Cash Balance
+description: |
+  What a district *holds*, as against what it is given or what it spends. The general fund's cash
+  balance at 1 July (carry-over) and 30 June (ending balance), from the district's own five-year
+  forecast filing under R.C. 5705.391.
+
+  Every other metric in this corpus measures a flow the state controls or a formula computes.
+  This one measures a stock the district controls, and it is the only figure here that a board
+  can point to when it says it cannot afford something — or that a legislator can point to when
+  they say it can.
+
+  It is also the first per-district figure in this corpus that is a **record of money that
+  changed hands** rather than a model. That distinction is load-bearing everywhere it appears:
+  the funding calculator says what a district is owed, this says what its treasurer booked.
+
+properties:
+  name: General fund ending cash balance, and its carry-over
+  unit: dollars
+  definition: |
+    Forecast line 7.020, ending cash balance at 30 June, excluding proposed renewal, replacement
+    and new levies. Its companion 7.010 is the same quantity at 1 July — the carry-over from the
+    year before — and within a single filing the identity is exact:
+
+        7.020(year) = 7.010(year+1)
+        7.010 + (2.080 total revenue and other financing sources) - (5.050 total expenditures
+               and other financing uses) = 7.020
+
+    The second identity closes on 2.080 and **not** on 1.070 total revenue, which excludes
+    transfers, advances and note proceeds. Using 1.070 leaves the balance unreconciled for all
+    but a handful of districts, which is how the wrong line was caught. [verified]
+
+    Reported against the scale of the operation rather than alone:
+
+        cash as years of spending = 7.020 / 5.050
+
+    A dollar figure is meaningless without it. The same $10M is a year of reserve for a small
+    district and three weeks for a large one, and Ohio sets no statutory minimum, so this is a
+    comparison figure and never a compliance one.
+  inputs: |
+    [dew-five-year-forecast](../../catalog/dew-five-year-forecast.md), two pinned filings whose
+    audited-actual windows tile FY2020-FY2025 without a gap. 660 reporting bodies, covering all
+    609 traditional districts the FY2027 funding model pays.
+    [bls-cpi-u](../../catalog/bls-cpi-u.md) for any statement in constant dollars.
+  caveats: |
+    **General fund only.** Capital, food service, and most federal programmes sit in other funds.
+    A balance here is not the district's total resources and an expenditure here is not its total
+    spending. It must never be compared line-for-line with
+    [per-pupil operating expenditure](per-pupil-operating-expenditure.yml), which is computed on
+    the department's own definitions over a different base.
+
+    **FY2021-FY2024 are the federal pandemic relief years.** ESSER money was booked in the
+    general fund by some districts and separately by others, and it arrived and stopped on a
+    schedule with nothing to do with Ohio's formula. A balance rising across that span is not
+    evidence about a district's own position. Named in code as
+    `project::finances::Finances::pandemic_years` rather than left to a footnote.
+
+    **Nominal figures across this span can have the wrong sign.** CPI-U June rose 25.1% from
+    FY2020 to FY2025. Statewide the balance ends 8% *above* where it started in nominal dollars
+    and 14% *below* in constant ones, over the 609 districts in the platform feed. Both are
+    correct and they support opposite arguments, which is why nothing here may be quoted without
+    its basis. [verified]
+
+    **The panel is not one continuously audited series.** The two filings report the FY2022/FY2023
+    seam three years apart and disagree about it for more than half of districts — median $2,
+    90th percentile $9,054, ten districts over $1M, largest $13.3M. Those are reclassifications
+    across the relief years, not errors, and the corpus states them rather than smoothing them.
+
+    **A submitted forecast is not a measurement.** Each filing carries five projected years made
+    by a treasurer under incentives — a board arguing for a levy and a board defending a balance
+    want different numbers on the same line. Only the audited actuals are extracted; the
+    committed fixture contains no forecast value.
+  calculator: project::finances
+
+links:
+  - relationship: measures
+    target: education-agency
+    note: |
+      Every traditional district and joint vocational school district that filed. One exception:
+      Green Local (IRN 049619) is in the FY2027 funding model and in the FY2023 filing and absent
+      from the FY2026 one, so it carries FY2020-FY2022 only. Pinned as
+      `project::finances::PARTIAL` rather than absorbed, because a panel that silently varies its
+      membership by year produces statewide figures over a different set of districts each time.
+  - relationship: derived-from
+    target: metric
+    note: Reported against total expenditure, which is the same filing's line 5.050.
+
+findings: |
+  **STATEWIDE BALANCES ROSE THROUGH THE RELIEF YEARS AND FELL IN THE FIRST YEAR AFTER THEM.**
+  [verified] Over the 660 filing bodies, ending cash rose in every year from $8.37bn in FY2020
+  to $11.20bn in FY2024, then fell to $9.14bn. It is the only fall in the series. In FY2020
+  dollars the same series ends *below* where it began.
+
+  **FY2025 IS THE YEAR SPENDING CAUGHT UP.** [verified] Revenue rose 4.9% and spending rose
+  16.5%, and it was not a handful of large districts — the median district raised spending 13.7%.
+  **460 of 659 ran a deficit**, against fewer than half the year before. The difference came out
+  of the balances above.
+
+  **THE GUARANTEE IS NOT PRODUCING DISTRICTS THAT SIT ON CASH.** [verified] A standing claim, and
+  the panel does not support it: guaranteed districts hold a median 0.319 years of spending
+  against 0.338 for districts on the formula — about a week less, in the direction opposite to
+  the claim. See
+  [temporary transitional aid guarantee](../formula-component/temporary-transitional-aid-guarantee.yml),
+  which is where the guarantee's own erosion in real terms is recorded.
+
+  **[open]** Whether the FY2025 drawdown continues, which needs the FY2027 filing and one more
+  closed year. **[open]** How much of the FY2021-FY2024 build-up was ESSER booked in the general
+  fund, which the forecast lines cannot separate and the federal award data could.

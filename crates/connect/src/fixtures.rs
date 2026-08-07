@@ -75,6 +75,7 @@ pub const FY27_HEADER: &[&str] = &[
     "assessed_valuation_per_pupil_fy23",
     "core_foundation_funding",
     "base_cost_state_share",
+    "total_state_support",
 ];
 
 /// Column positions in the department's `Base_Cost` sheet, whose header is on the fourth row.
@@ -105,6 +106,14 @@ mod summary_columns {
     /// education, DPIA, English learner, gifted, and CTE. Formula aid, not base cost aid.
     pub const CORE: usize = 10;
     pub const GUARANTEE: usize = 11;
+    /// `[R] Total State Support` — every state payment the report carries, including the ones
+    /// the guarantee's base excludes: transportation, preschool special education, special
+    /// education transportation, and the performance supplement.
+    ///
+    /// Carried because `CORE + GUARANTEE` is what a district is held at and `TOTAL` is what it
+    /// is paid, and the corpus has been comparing the first against figures that behave like the
+    /// second.
+    pub const TOTAL_STATE_SUPPORT: usize = 20;
 }
 
 /// Column positions in the `ADM Data` sheet.
@@ -222,6 +231,10 @@ pub fn build_fy27_model(
             format_value(cell_number(summary_row, summary_columns::CORE), 2),
             format_value(
                 cell_number(summary_row, summary_columns::BASE_COST_SHARE),
+                2,
+            ),
+            format_value(
+                cell_number(summary_row, summary_columns::TOTAL_STATE_SUPPORT),
                 2,
             ),
         ]);

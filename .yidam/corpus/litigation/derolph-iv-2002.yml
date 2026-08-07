@@ -51,6 +51,8 @@ properties:
 links:
   - target: ../litigation.ont.yml
     relationship: instance-of
+  - target: ../actor/supreme-court-of-ohio.yml
+    relationship: decided-by
   - target: derolph-i-1997.yml
     relationship: cites
   - target: ../funding-regime/foundation-base-cost-formula.yml
