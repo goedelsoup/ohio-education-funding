@@ -99,6 +99,21 @@ description: |
   spending. Anyone quoting −0.337 as what Ohio's spending achieves is making the same category
   of error this node was written to correct, one step further along.
 
+  **AND THERE IS NOW A CONCRETE CASE.** [Toledo City](../education-agency/toledo-city.yml)
+  divides $440.2 million of FY2025 operating expenditure by 21,160 enrolled pupils or by 30,758
+  weighted ones: **$20,805 or $14,312**, a 45% spread on one district in one year. Both numbers
+  have been published about Toledo — the second in
+  [White Paper 013](../../catalog/ocg-white-paper-013.md), the first three weeks later in
+  [fact-check RL-2026-021](../../catalog/ocg-fact-check-021.md) — by the same author, with
+  neither noting the other's basis. [verified] The abstract argument on this node has a district
+  attached to it.
+
+  The fact-check also shows the rule generalising past this metric. It compares
+  special-education spending per *total* pupil across two districts whose disability shares are
+  21.9% and 11.3%, and reads the residual as heavier need in the urban district. Per student
+  with a disability the comparison reverses. A denominator does not have to be need-weighted to
+  be the wrong population. [inference]
+
   **A HYPOTHESIS THIS PHASE TESTED AND DROPPED.** The obvious suspicion was the
   [temporary transitional aid guarantee](../formula-component/temporary-transitional-aid-guarantee.yml):
   48.3% of districts are funded off-formula against an un-rebased FY2020 baseline, so much of the
@@ -220,3 +235,7 @@ links:
     relationship: sourced-from
   - target: ../../catalog/ocg-white-paper-013.md
     relationship: sourced-from
+  - target: ../../catalog/ocg-fact-check-021.md
+    relationship: sourced-from
+  - target: ../education-agency/toledo-city.yml
+    relationship: measures

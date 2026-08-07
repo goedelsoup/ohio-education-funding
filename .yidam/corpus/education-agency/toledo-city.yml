@@ -1,0 +1,93 @@
+class: education-agency
+label: Toledo City School District
+description: |
+  Ohio's fourth-largest district and the corpus's second urban exemplar, seeded because a
+  circulating claim about its special-education spending made it the subject of a published
+  fact-check and because the pair it forms with
+  [Perrysburg](perrysburg-exempted-village.yml) — eleven miles apart, one urban and one
+  exempted village — is a sharper contrast than any this corpus previously held. [verified]
+
+  **FY2025 in one line:** 21,160 pupils, $440.2 million of operating expenditure, **$20,805 per
+  headcount pupil**, a Performance Index of 60.4, and a Progress effect size of −0.02.
+  [verified — computed; see
+  [`crates/dispersion/tests/expenditure_functions_fy25.rs`](../../../crates/dispersion/tests/expenditure_functions_fy25.rs)]
+
+  **It is the corpus's clearest case of the denominator problem in the wild.** The same
+  operating total divided by weighted ADM gives **$14,312** — which is what the report card
+  prints as expenditure per equivalent pupil, and what
+  [OCG White Paper 013](../../catalog/ocg-white-paper-013.md) analysed. Divided by headcount it
+  gives $20,805, which is what
+  [OCG fact-check RL-2026-021](../../catalog/ocg-fact-check-021.md) reported three weeks later.
+  A 45% spread for one district in one year, in two publications from one author, neither
+  noting the other's basis. [verified] Toledo's weighted ADM is 30,758 against 21,160 enrolled —
+  a weight ratio of 1.45, the consequence of a 98.9% economically disadvantaged share and a
+  21.9% disability share.
+
+  **WHERE ITS EXTRA SPENDING GOES, WHICH IS NOT WHERE THE ARGUMENT ASSUMED.** Toledo spends
+  $6,173 more per pupil than Perrysburg and a markedly *smaller* share of it in a classroom:
+  [verified]
+
+                                    Toledo     Perrysburg
+      instruction                    51.3%          62.6%
+      classroom instruction (CRI)    63.4%          73.1%
+      operations and maintenance     14.8%           7.7%
+      school administration           8.5%           4.8%
+      pupil support                   8.1%           8.5%
+      pupil transportation            1.6%           3.4%
+
+  The function-level gap is an order of magnitude more informative than the special-education
+  share the circulating claim happened to name, and it comes from the same file that fact-check
+  already cited. Plant and building administration are where an old, large, dispersed physical
+  estate shows up in an operating budget; whether that is inefficiency or the cost of the
+  buildings Toledo actually has is not a question a share can answer. [inference]
+
+  **AND A CORRECTION THE FACT-CHECK ITSELF INVITES.** It reports Toledo spending $2,766 per
+  pupil on special-education instruction against Perrysburg's $2,032–$2,363, and reads the
+  difference as "consistent with a modestly heavier student-need profile." Toledo's disability
+  share is 21.9% against Perrysburg's 11.3% — nearly double, not modest. Normalised by the
+  population actually served, Toledo spends roughly **$12,600 per student with a disability**
+  against Perrysburg's **$18,000–$20,900**: about a third less, not somewhat more. [inference —
+  the special-education dollars are the fact-check's, from audited statements this corpus does
+  not hold; the shares are the report card's, so this is an order-of-magnitude normalisation
+  rather than an audited per-pupil cost. A 1.94x population difference against a 1.36x spending
+  difference leaves no room for the sign to return.]
+
+  This is the corpus's denominator rule arriving a third time and from a new direction. The
+  first two were about dividing spending by a need-weighted pupil count; this one is about
+  dividing special-education spending by a population that is mostly not receiving it. [inference]
+
+  Not yet held: audited-statement figures, the scholarship and community-school deduction that a
+  district of this size and poverty carries, and any year before FY2024. [open]
+properties:
+  irn: "044909" [verified — report card district files]
+  agency_type: city
+  county: Lucas
+  fy2025_profile: |
+    Enrolled ADM (unweighted) 21,159.75; weighted ADM 30,758; weight ratio 1.454.
+    Operating expenditure $440,219,539.58 — $20,805 per headcount pupil, $14,312 per
+    equivalent pupil.
+    Economically disadvantaged 98.9% (report-card measure, top-coded by community eligibility);
+    students with disabilities 21.9%; English learners 2.4%.
+    Performance Index 60.4 (2024-25), 57.9 (2023-24), 58.8 (2022-23).
+    Progress effect size −0.02; composite −5.07. [verified]
+  typology: |
+    Urban, very high poverty. Exact department typology code not established. [open]
+  established: Not yet established. [open]
+  roles: |
+    Major urban district throughout the period held [verified]. Subject of OCG fact-check
+    RL-2026-021 [verified]. Guarantee status in the FY2027 department model not yet read onto
+    this node. [open]
+  series_path: |
+    crates/dispersion/fixtures/report-card-2425-district-data.csv and
+    crates/dispersion/fixtures/expenditure-functions-fy25.csv, keyed by IRN 044909.
+links:
+  - target: ../education-agency.ont.yml
+    relationship: instance-of
+  - target: perrysburg-exempted-village.yml
+    relationship: compares-to
+  - target: ../metric/expenditure-per-equivalent-pupil.yml
+    relationship: measured-by
+  - target: ../doctrine/equity.yml
+    relationship: illustrates
+  - target: ../../catalog/ocg-fact-check-021.md
+    relationship: sourced-from

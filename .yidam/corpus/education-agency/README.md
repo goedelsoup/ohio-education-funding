@@ -33,10 +33,26 @@ See the class definition: [education-agency.ont.yml](../education-agency.ont.yml
 | [cleveland-municipal](cleveland-municipal.yml) | city | Largest urban district; origin of the voucher channel |
 | [eastland-fairfield-ctc](eastland-fairfield-ctc.yml) | joint-vocational | JVSDs are funded differently, including a 2-mill floor |
 | [electronic-classroom-of-tomorrow](electronic-classroom-of-tomorrow.yml) | community | The enrollment-funding failure case |
+| [toledo-city](toledo-city.yml) | city | Urban; the denominator problem in the wild |
+| [perrysburg-exempted-village](perrysburg-exempted-village.yml) | exempted-village | Ordinary well-off suburb; Toledo's comparator |
+
+**The last two are a pair and should be read as one.** Eleven miles apart across the Maumee, one
+urban and one exempted village, they are the subject of
+[OCG fact-check RL-2026-021](../../catalog/ocg-fact-check-021.md) and between them carry three
+things the corpus wanted a concrete case for: a district whose headcount and equivalent-pupil
+spending differ by 45% and which two publications from one author reported on different bases; a
+function-level comparison showing the urban district spending $6,173 more per pupil and a
+markedly smaller share of it in a classroom; and a special-education share whose denominator is
+the wrong population, which reverses the comparison once the disability shares (21.9% against
+11.3%) are put beside it.
+
+Perrysburg was chosen over a wealthier suburb deliberately. It spends *below* the statewide
+median, which is what makes it a fair test of whether an urban district's spending is unusual —
+[Upper Arlington](upper-arlington-city.yml) answers a different question.
 
 ## Known gaps
 
-No exempted village district and no STEM school, so two of the six agency types are
-unrepresented. No suburban district of moderate wealth — the current set is deliberately
+No STEM school, so one of the six agency types is unrepresented; the exempted village gap is
+closed by [Perrysburg](perrysburg-exempted-village.yml). No suburban district of moderate wealth — the current set is deliberately
 polarized and the middle of the distribution, where most Ohio students actually are, is
 missing. [open]
