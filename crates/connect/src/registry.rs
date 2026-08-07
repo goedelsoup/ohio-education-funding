@@ -193,6 +193,19 @@ pub const CONNECTORS: &[Connector] = &[
                        lower than one.",
             },
             Source {
+                key: "va-district-details-2425",
+                url: "https://reportcardstorage.education.ohio.gov/data-download-2025/\
+                      2425_VA_DIST_DETAILS.xlsx?sv=2020-08-04&ss=b&srt=sco&sp=rlx\
+                      &se=2031-07-28T05:10:18Z&st=2021-07-27T21:10:18Z&spr=https\
+                      &sig=nPOvW%2Br2caitHi%2F8WhYwU7xqalHo0dFrudeJq%2B%2Bmyuo%3D",
+                filename: "va-district-details-2425.xlsx",
+                format: Format::Xlsx,
+                catalog: Some("dew-report-card-value-added"),
+                fixture: Some(crate::fixtures::REPORT_CARD_FIXTURE),
+                note: "The Progress component — growth rather than attainment. Use the effect \
+                       size, not the composite index: the composite scales with student count.",
+            },
+            Source {
                 key: "expanded-list-fy25",
                 url: "https://reportcardstorage.education.ohio.gov/data-download-2025/\
                       FY25%20Expanded%20List.xlsx?sv=2020-08-04&ss=b&srt=sco&sp=rlx\

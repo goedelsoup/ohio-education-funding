@@ -33,6 +33,10 @@ mod col {
     pub const EQUIVALENT_PUPIL: usize = 8;
     pub const FEDERAL: usize = 9;
     pub const STATE_AND_LOCAL: usize = 10;
+    pub const PROGRESS_COMPOSITE: usize = 11;
+    pub const PROGRESS_EFFECT_SIZE: usize = 12;
+    pub const PI_2324: usize = 3;
+    pub const PI_2223: usize = 4;
 }
 
 /// Column indices in the profile-report fixture.
@@ -550,4 +554,224 @@ fn the_guarantee_does_not_explain_the_denominator_gap() {
         Dispersion::of(&v).unwrap().mean
     };
     assert!(mean(&guaranteed) > mean(&on_formula) + 3.0);
+}
+
+// ---------------------------------------------------------------------------------------
+// Time: the Index barely moves, and lagging the spending does not help
+// ---------------------------------------------------------------------------------------
+
+/// The Performance Index is very nearly a fixed district trait over the three years held.
+///
+/// This cuts both ways and both matter. It means a single-year cross-section is a fair stand-in
+/// for a district's Index, so the source paper's "single year" limitation is weaker than it
+/// feared. It also means the measure cannot detect anything that changes annually — including
+/// any change in what a district spends.
+#[test]
+fn the_performance_index_is_almost_static_across_three_years() {
+    let rows = report_card();
+    let years = [col::PI_2223, col::PI_2324, col::PERFORMANCE_INDEX];
+    for pair in years.windows(2) {
+        let r = correlate(&column(&rows, pair[0]), &column(&rows, pair[1]));
+        assert!(r > 0.98, "adjacent years correlate at {r:.4}");
+    }
+    close(
+        correlate(
+            &column(&rows, col::PI_2223),
+            &column(&rows, col::PERFORMANCE_INDEX),
+        ),
+        0.981,
+        0.003,
+        "2022-23 against 2024-25",
+    );
+
+    // Within-district movement against between-district spread: 2.1 points against sd 10.9.
+    let mut ranges: Vec<f64> = rows
+        .iter()
+        .filter_map(|r| {
+            let v: Vec<f64> = years.iter().filter_map(|c| r.get(*c)).collect();
+            (v.len() == 3).then(|| {
+                v.iter().copied().fold(f64::MIN, f64::max)
+                    - v.iter().copied().fold(f64::MAX, f64::min)
+            })
+        })
+        .collect();
+    ranges.sort_by(f64::total_cmp);
+    close(
+        ranges[ranges.len() / 2],
+        2.1,
+        0.2,
+        "median three-year range",
+    );
+}
+
+/// Lagging the spending measure — the source paper's own proposed next step — does not help,
+/// and the direction rules out a forward-propagating effect.
+///
+/// FY2024 spending covers the 2023-24 school year. Correlated against the Index for the year
+/// before it, the same year, and the year after, the association is flat and slightly
+/// *strongest* looking backwards. Whatever this relationship is, nothing is flowing forward
+/// from the dollars to the scores.
+#[test]
+fn lagging_the_spending_does_not_change_the_association() {
+    let rows = report_card();
+    let spending = joined(&rows, PROFILE, profile::IRN, profile::OPERATING_EPP);
+
+    let before = correlate(&column(&rows, col::PI_2223), &spending); // spending after outcome
+    let same = correlate(&column(&rows, col::PI_2324), &spending); // contemporaneous
+    let after = correlate(&column(&rows, col::PERFORMANCE_INDEX), &spending); // spending before
+
+    close(
+        before,
+        -0.426,
+        0.003,
+        "FY24 spending against the prior year's Index",
+    );
+    close(
+        same,
+        -0.412,
+        0.003,
+        "FY24 spending against the same year's Index",
+    );
+    close(
+        after,
+        -0.388,
+        0.003,
+        "FY24 spending against the following year's Index",
+    );
+
+    // The backwards lag is the strongest of the three. A causal reading requires the opposite.
+    assert!(before < after, "no forward-directed signal");
+}
+
+// ---------------------------------------------------------------------------------------
+// Growth rather than level, where the sign changes
+// ---------------------------------------------------------------------------------------
+
+/// Ohio's value-added model is normed to a state average of zero, so this measure ranks
+/// districts against each other and says nothing about whether Ohio improved.
+#[test]
+fn the_progress_measure_is_centred_by_construction() {
+    let rows = report_card();
+    let effect: Vec<f64> = column(&rows, col::PROGRESS_EFFECT_SIZE)
+        .into_iter()
+        .flatten()
+        .collect();
+    assert_eq!(effect.len(), 607);
+    let mean = effect.iter().sum::<f64>() / effect.len() as f64;
+    assert!(mean.abs() < 0.01, "centred on zero, got {mean:+.4}");
+    assert!(effect.iter().copied().fold(f64::MIN, f64::max) < 0.35);
+}
+
+/// The composite scales with student count and the effect size does not, so only one of them
+/// compares districts.
+#[test]
+fn the_composite_carries_district_size_and_the_effect_size_carries_less() {
+    let rows = report_card();
+    let adm = column(&rows, col::UNWEIGHTED_ADM);
+    let composite = correlate(&column(&rows, col::PROGRESS_COMPOSITE), &adm);
+    let effect = correlate(&column(&rows, col::PROGRESS_EFFECT_SIZE), &adm);
+    close(composite, 0.244, 0.003, "composite against enrollment");
+    close(effect, 0.155, 0.003, "effect size against enrollment");
+    // They agree closely enough that the difference is easy to miss, which is the hazard.
+    assert!(
+        correlate(
+            &column(&rows, col::PROGRESS_COMPOSITE),
+            &column(&rows, col::PROGRESS_EFFECT_SIZE)
+        ) > 0.9
+    );
+}
+
+/// **The finding.** Holding disadvantage constant, the same spending variable correlates
+/// negatively with attainment level and positively with growth.
+///
+/// Neither coefficient is large and neither is causal. What they establish is narrower and
+/// firmer: the negative association this corpus recorded against the Performance Index is a
+/// property of measuring *level*, and it does not survive the switch to a measure of *gain*.
+#[test]
+fn spending_flips_sign_between_the_level_measure_and_the_growth_measure() {
+    let rows = report_card();
+    let ed = joined(&rows, PROFILE, profile::IRN, profile::ECON_DISADVANTAGED);
+    let spending = per_pupil(&rows, col::UNWEIGHTED_ADM);
+
+    let partial_against = |outcome: Vec<Option<f64>>| {
+        // Same complete cases for all three coefficients.
+        let present: Vec<bool> = outcome
+            .iter()
+            .zip(&ed)
+            .zip(&spending)
+            .map(|((o, e), s)| o.is_some() && e.is_some() && s.is_some())
+            .collect();
+        let keep = |v: &[Option<f64>]| -> Vec<Option<f64>> {
+            v.iter()
+                .zip(&present)
+                .map(|(x, ok)| if *ok { *x } else { None })
+                .collect()
+        };
+        let (outcome, ed, spending) = (keep(&outcome), keep(&ed), keep(&spending));
+        partial_correlation(
+            correlate(&outcome, &spending),
+            correlate(&outcome, &ed),
+            correlate(&spending, &ed),
+        )
+        .unwrap()
+    };
+
+    let level = partial_against(column(&rows, col::PERFORMANCE_INDEX));
+    let growth = partial_against(column(&rows, col::PROGRESS_EFFECT_SIZE));
+
+    close(level, -0.125, 0.005, "level measure, holding disadvantage");
+    close(growth, 0.146, 0.005, "growth measure, holding disadvantage");
+    assert!(level < 0.0 && growth > 0.0, "the sign flips");
+}
+
+/// Growth is much less bound to composition than level — but not free of it.
+#[test]
+fn growth_is_less_poverty_bound_than_level_without_being_independent_of_it() {
+    let rows = report_card();
+    let ed = joined(&rows, PROFILE, profile::IRN, profile::ECON_DISADVANTAGED);
+
+    let level = correlate(&column(&rows, col::PERFORMANCE_INDEX), &ed);
+    let growth = correlate(&column(&rows, col::PROGRESS_EFFECT_SIZE), &ed);
+    close(
+        level,
+        -0.846,
+        0.003,
+        "Performance Index against disadvantage",
+    );
+    close(
+        growth,
+        -0.325,
+        0.003,
+        "Progress effect size against disadvantage",
+    );
+
+    // 71.5% of variance against 10.6%. Both real; one an order of magnitude larger.
+    assert!(level * level > 6.0 * growth * growth);
+
+    // And the two outcome measures are far from interchangeable.
+    close(
+        correlate(
+            &column(&rows, col::PERFORMANCE_INDEX),
+            &column(&rows, col::PROGRESS_EFFECT_SIZE),
+        ),
+        0.375,
+        0.003,
+        "level against growth",
+    );
+}
+
+/// Raw, with no control, spending has no association with growth at all — on either divisor.
+/// The denominator question that dominates the level measure simply does not arise here.
+#[test]
+fn on_the_growth_measure_the_divisor_stops_mattering() {
+    let rows = report_card();
+    let growth = column(&rows, col::PROGRESS_EFFECT_SIZE);
+    let unweighted = correlate(&growth, &per_pupil(&rows, col::UNWEIGHTED_ADM));
+    let weighted = correlate(&growth, &per_pupil(&rows, col::WEIGHTED_ADM));
+
+    assert!(unweighted.abs() < 0.06, "unweighted: {unweighted:+.3}");
+    assert!(weighted.abs() < 0.06, "weighted: {weighted:+.3}");
+    // Against -0.337 and -0.015 on the level measure: the gap was composition, and the growth
+    // measure has most of the composition taken out of it.
+    assert!((unweighted - weighted).abs() < 0.1);
 }

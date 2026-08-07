@@ -293,6 +293,8 @@ pub const REPORT_CARD_HEADER: &[&str] = &[
     "exp_per_equivalent_pupil_fy25",
     "exp_per_equivalent_pupil_federal_fy25",
     "exp_per_equivalent_pupil_state_local_fy25",
+    "progress_composite_2425",
+    "progress_effect_size_2425",
 ];
 
 /// Column positions in the Achievement download's `Performance_Index` sheet.
@@ -325,6 +327,20 @@ mod expanded_columns {
     pub const OPERATING_EXPENDITURES: usize = 4;
 }
 
+/// Column positions in `OVERALL_VALUE_ADDED_OVERVIEW`.
+///
+/// # Two growth numbers, and only one of them compares districts
+///
+/// `Overall Composite` is a precision-scaled statistic — a gain divided by its standard error —
+/// so it grows with the number of tested students and correlates with enrollment at +0.24.
+/// `Overall Effect Size` is the standardised gain and does not. Ranking districts on the
+/// composite ranks them partly by size; every association in this corpus uses the effect size.
+mod value_added_columns {
+    pub const IRN: usize = 0;
+    pub const COMPOSITE: usize = 5;
+    pub const EFFECT_SIZE: usize = 6;
+}
+
 /// The Expanded List's label for a traditional district.
 ///
 /// The file also carries 320 community schools, 49 JVSDs, 19 eschools and 8 STEM schools. The
@@ -342,6 +358,7 @@ pub fn build_report_card_extract<'a>(
     spending_rows: &'a [Vec<String>],
     weighted_rows: &'a [Vec<String>],
     unweighted_rows: &'a [Vec<String>],
+    value_added_rows: &'a [Vec<String>],
 ) -> Vec<Vec<String>> {
     let spending: HashMap<&str, &Vec<String>> =
         rows_by_key(spending_rows, spending_columns::IRN).collect();
@@ -356,6 +373,8 @@ pub fn build_report_card_extract<'a>(
     };
     let weighted = districts_only(weighted_rows);
     let unweighted = districts_only(unweighted_rows);
+    let value_added: HashMap<&str, &Vec<String>> =
+        rows_by_key(value_added_rows, value_added_columns::IRN).collect();
 
     achievement_rows
         .iter()
@@ -366,6 +385,7 @@ pub fn build_report_card_extract<'a>(
         .map(|row| {
             let irn = cell(row, achievement_columns::IRN).trim().to_string();
             let spend = spending.get(irn.as_str()).copied();
+            let growth = value_added.get(irn.as_str()).copied();
             let wtd = weighted.get(irn.as_str()).copied();
             let unw = unweighted.get(irn.as_str()).copied();
 
@@ -385,6 +405,8 @@ pub fn build_report_card_extract<'a>(
                 format_value(from(spend, spending_columns::EQUIVALENT), 2),
                 format_value(from(spend, spending_columns::FEDERAL), 2),
                 format_value(from(spend, spending_columns::STATE_AND_LOCAL), 2),
+                format_value(from(growth, value_added_columns::COMPOSITE), 2),
+                format_value(from(growth, value_added_columns::EFFECT_SIZE), 2),
             ]
         })
         .collect()
