@@ -6,7 +6,7 @@
  */
 
 /** The bundle contract this page understands. */
-export const REQUIRED_CONTRACT = "3.0.0";
+export const REQUIRED_CONTRACT = "4.0.0";
 
 /**
  * The outcome side of a district, where the report card covers it.
@@ -77,6 +77,13 @@ export interface District {
   economically_disadvantaged: number | null;
   /** FY2024 to FY2026. FY2026 is partly departmental estimate. */
   enrollment_change: number | null;
+  /**
+   * Enrolled ADM for FY2024, FY2025, FY2026 — the years `projection.base_year` ends.
+   *
+   * Not nullable: a district without a history cannot be projected, and a page that quietly
+   * dropped it would report a statewide total over a subset of the panel.
+   */
+  adm_history: [number, number, number];
   /** Achievement, growth, and need. `null` for the three districts with no report card. */
   outcome: DistrictOutcome | null;
 }
@@ -126,6 +133,43 @@ export interface Checkpoint {
   on_guarantee: number;
 }
 
+/**
+ * A Rust-computed forecast this page must reproduce before it may draw a band.
+ *
+ * The same discipline as {@link Checkpoint}, applied to the harder half. Reproducing a simulation
+ * checks one function; reproducing a forecast checks the projection, the prior, how the interval
+ * compounds with the horizon, and the decision to re-run the formula at each end of the
+ * enrollment band rather than scale the middle.
+ */
+export interface ForecastCheckpoint {
+  label: string;
+  policy: PolicyShape;
+  fiscal_year: number;
+  realized_aid: number;
+  low: number;
+  high: number;
+  adm: number;
+  on_guarantee: number;
+}
+
+/** How this feed's forecasts were made, and what their interval rests on. */
+export interface ProjectionMeta {
+  /** The last observed fiscal year. Everything past it is forecast. */
+  base_year: number;
+  /** The furthest year the checkpoints reach, and the furthest this page should offer. */
+  horizon: number;
+  method: "last-observed" | "cagr" | "damped" | "linear";
+  damping: number;
+  /**
+   * Standard deviation of annual enrolled-ADM growth **across districts** — not within one.
+   * Three observations cannot give a district's own variability.
+   */
+  sigma: number;
+  z: number;
+  prior_source: string;
+  checkpoints: ForecastCheckpoint[];
+}
+
 /** The whole feed. */
 export interface Bundle {
   contract_version: string;
@@ -133,5 +177,7 @@ export interface Bundle {
   fiscal_year: number;
   statewide: Statewide;
   checkpoints: Checkpoint[];
+  /** `null` disables the band: this feed cannot be projected. */
+  projection: ProjectionMeta | null;
   districts: District[];
 }

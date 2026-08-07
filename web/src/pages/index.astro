@@ -61,6 +61,12 @@ import "../styles/app.css";
           </p>
         </div>
         <div id="scenario-out"></div>
+        <!--
+          Separate from #scenario-out, and always after it: the simulation is exact and the
+          projection is a forecast. They are gated on separate checks and one can be disabled
+          without the other.
+        -->
+        <div id="projection-out"></div>
       </section>
 
       <footer>

@@ -155,6 +155,118 @@ export function divergingHistogram(
   </svg>`;
 }
 
+/** One year of a fan chart. */
+export interface FanPoint {
+  year: number;
+  point: number;
+  low: number;
+  high: number;
+  /** An observed year: the band has no width and the line is drawn solid. */
+  observed: boolean;
+}
+
+/**
+ * A fan chart: a quantity over time whose **interval is the subject**.
+ *
+ * Every other chart on this page draws a point. This one draws a range, and the drawing rules
+ * follow from that rather than from convention:
+ *
+ * - The band is a filled area with a 2px stroke on each edge, so it reads as a mark rather than
+ *   as shading behind one.
+ * - The central estimate is **dashed**. A solid centre line reads as the answer with error bars
+ *   around it; a dashed one reads as one path through a band, which is what it is.
+ * - Both bounds are direct-labelled at the terminal year. The point is not, because the whole
+ *   claim of this figure is that the two ends are the finding.
+ * - The y axis is truncated to the band's own range — a band a tenth of a percent wide would be
+ *   invisible against a zero baseline — so both y bounds are labelled to say so outright.
+ *
+ * Not a dual-axis chart, and there is nothing here that could make one.
+ */
+export function fanChart(
+  points: FanPoint[],
+  format: (v: number) => string,
+  hover: (p: FanPoint) => string,
+): string {
+  if (points.length < 2) return "";
+  const width = 640;
+  const height = 220;
+  const padTop = 14;
+  const padBottom = 26;
+  const padRight = 104;
+  const plot = width - padRight;
+
+  const lows = points.map((p) => p.low);
+  const highs = points.map((p) => p.high);
+  let min = Math.min(...lows);
+  let max = Math.max(...highs);
+  const pad = (max - min) * 0.12 || Math.abs(max) * 0.02 || 1;
+  min -= pad;
+  max += pad;
+
+  const x = (i: number) => (i / (points.length - 1)) * plot;
+  const y = (v: number) =>
+    padTop + (1 - (v - min) / (max - min)) * (height - padTop - padBottom);
+  const at = (i: number, v: number) => `${x(i).toFixed(1)},${y(v).toFixed(1)}`;
+
+  const band =
+    "M " +
+    points.map((p, i) => at(i, p.high)).join(" L ") +
+    " L " +
+    [...points].reverse().map((p, i) => at(points.length - 1 - i, p.low)).join(" L ") +
+    " Z";
+
+  const line = (pick: (p: FanPoint) => number) =>
+    points.map((p, i) => at(i, pick(p))).join(" ");
+
+  // The observed anchor, drawn solid and separately: it is exact, and a reader must be able to
+  // see where measurement stops and forecast starts without consulting a legend.
+  const observed = points.filter((p) => p.observed);
+  const anchor = points.findIndex((p) => !p.observed);
+  const seam = anchor > 0 ? anchor - 1 : 0;
+
+  const last = points[points.length - 1]!;
+  // A band that never opens. Not a degenerate chart to hide — for a district the guarantee pays,
+  // aid does not move with enrollment at all, and the flat line is the finding.
+  const degenerate = last.high - last.low < Math.max(1e-9, Math.abs(last.point) * 1e-6);
+  const columns = points
+    .map((p, i) => {
+      const w = plot / (points.length - 1);
+      return `<rect class="fan-hit" x="${(x(i) - w / 2).toFixed(1)}" y="0"
+        width="${w.toFixed(1)}" height="${height - padBottom}"
+        data-hover="${escapeHtml(hover(p))}"></rect>`;
+    })
+    .join("");
+
+  return `<svg class="chart" viewBox="0 0 ${width} ${height}" role="img"
+    aria-label="Projected range from ${points[0]!.year} to ${last.year}, ${format(last.low)} to ${format(last.high)}">
+    <path class="fan-band" d="${band}"></path>
+    <polyline class="fan-edge" points="${line((p) => p.high)}"></polyline>
+    <polyline class="fan-edge" points="${line((p) => p.low)}"></polyline>
+    <polyline class="fan-mid" points="${line((p) => p.point)}"></polyline>
+    ${
+      observed.length > 0
+        ? `<circle class="fan-anchor" cx="${x(seam).toFixed(1)}" cy="${y(points[seam]!.point).toFixed(1)}" r="4"></circle>`
+        : ""
+    }
+    <text class="fan-bound" x="${(plot + 8).toFixed(1)}" y="${y(last.high).toFixed(1)}"
+          dominant-baseline="middle">${escapeHtml(format(last.high))}</text>
+    ${
+      // One label, not two identical ones, when the band has collapsed — which happens for a
+      // district whose aid the guarantee makes independent of its enrollment.
+      degenerate
+        ? ""
+        : `<text class="fan-bound" x="${(plot + 8).toFixed(1)}" y="${y(last.low).toFixed(1)}"
+             dominant-baseline="middle">${escapeHtml(format(last.low))}</text>`
+    }
+    <line class="axis" x1="0" y1="${height - padBottom}" x2="${plot}" y2="${height - padBottom}"></line>
+    <text class="axis-label" x="0" y="${height - 8}">FY${points[0]!.year}</text>
+    <text class="axis-label" x="${plot}" y="${height - 8}" text-anchor="end">FY${last.year}</text>
+    <text class="axis-label" x="${(plot / 2).toFixed(1)}" y="${height - 8}"
+          text-anchor="middle">axis starts at ${escapeHtml(format(min))}, not zero</text>
+    ${columns}
+  </svg>`;
+}
+
 /**
  * Attach a hover tooltip to every mark carrying `data-hover` inside `root`.
  *

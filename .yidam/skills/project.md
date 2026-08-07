@@ -48,6 +48,18 @@ A [`Run`](../../crates/project/src/report.rs) holds a `PolicyEffect` with no int
 optional `EnrollmentEffect` with one. There is no field containing their sum, and the CLI prints
 them under separate headings with a sentence saying why.
 
+The [platform](../../web/) now enforces the same rule structurally rather than by wording: the
+simulation and the forecast are separate cards, gated on separate checks, and the forecast is
+always below. The bundle contract carries `adm_history` per district and a `projection` block
+with `ForecastCheckpoint`s, and the browser must reproduce every one **at both ends of the band**
+before it draws it — a page that reproduced the point and got the interval wrong would look
+correct. The design answer that unblocked it was to make the range the headline number and demote
+the point to a footnote; see [web/README.md](../../web/README.md).
+
+The corpus's own forecast — total state aid at FY2032 of **$7,125M in a band of $6,889M to
+$7,379M** under current law, widening to **±5.9%** with the guarantee removed — is now reproduced
+by a third implementation, in TypeScript, from the feed. [verified]
+
 ### The Ohio-specific constraints, and how each fared
 
 **Valuation moves in reappraisal steps on a county cycle.** Not implemented, and not because it
