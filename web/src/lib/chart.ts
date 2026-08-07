@@ -163,6 +163,14 @@ export interface FanPoint {
   high: number;
   /** An observed year: the band has no width and the line is drawn solid. */
   observed: boolean;
+  /**
+   * A second quantity in the same units, drawn as a bare line in the contrasting hue.
+   *
+   * Used where the banded series alone would say nothing. For a district the guarantee pays,
+   * realized aid is flat by construction and the formula's own answer is the thing that moves;
+   * the vertical distance between the two is what the guarantee costs.
+   */
+  reference?: number;
 }
 
 /**
@@ -204,8 +212,11 @@ export function fanChart(
   const padRight = 104;
   const plot = width - padRight;
 
-  const lows = points.map((p) => p.low);
-  const highs = points.map((p) => p.high);
+  const references = points
+    .map((p) => p.reference)
+    .filter((v): v is number => v != null);
+  const lows = points.map((p) => p.low).concat(references);
+  const highs = points.map((p) => p.high).concat(references);
   let min = Math.min(...lows);
   let max = Math.max(...highs);
   const pad = (max - min) * 0.12 || Math.abs(max) * 0.02 || 1;
@@ -261,6 +272,14 @@ export function fanChart(
       // inside a zero-width band would say the opposite.
       observed.length > 1
         ? `<polyline class="fan-observed" points="${seg(observed, 0, (p) => p.point)}"></polyline>`
+        : ""
+    }
+    ${
+      references.length === points.length
+        ? `<polyline class="fan-reference" points="${seg(points, 0, (p) => p.reference ?? 0)}"></polyline>
+           <text class="fan-bound reference" x="${(plot + 8).toFixed(1)}"
+                 y="${y(last.reference ?? 0).toFixed(1)}"
+                 dominant-baseline="middle">${escapeHtml(format(last.reference ?? 0))}</text>`
         : ""
     }
     ${

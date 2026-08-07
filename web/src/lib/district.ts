@@ -80,7 +80,16 @@ function renderEnrollmentYears(bundle: Bundle, d: District): string {
     low: p.low,
     high: p.high,
     observed: p.observed,
+    // The second line, only where the first one says nothing. A guaranteed district's aid is a
+    // fixed dollar amount, so its band is a horizontal line and a chart of it alone is a chart
+    // of nothing; what the formula computes for it falls with enrollment, and the gap between
+    // the two is the guarantee doing its job. Spread rather than `undefined`, because the
+    // property is optional and an explicit undefined is not the same thing.
+    ...(insensitive ? { reference: p.formulaAid } : {}),
   }));
+  const gapNow = path.find((p) => p.fiscalYear === meta.base_year);
+  const widening =
+    gapNow && end.realizedAid - end.formulaAid - (gapNow.realizedAid - gapNow.formulaAid);
 
   return `
     <div class="card">
@@ -125,11 +134,24 @@ function renderEnrollmentYears(bundle: Bundle, d: District): string {
             ? `FY${p.year}: ${money(p.point)} at published enrollment — exact`
             : `FY${p.year}: ${money(p.low)} – ${money(p.high)}, central ${money(p.point)}`,
       )}</div>
+      ${
+        insensitive
+          ? `<div class="legend">
+               <span><i class="sw formula"></i> What the district receives</span>
+               <span><i class="sw guarantee"></i> What the formula computes</span>
+             </div>`
+          : ""
+      }
       <p class="note">${
         insensitive
-          ? `The band is flat. This district's state aid does not respond to its enrollment at
-             all under current law, because the guarantee pays it a fixed amount and the
-             formula — which does respond — is not what it is paid on.`
+          ? `<strong>The flat line is what this district receives, and it is flat by
+             construction.</strong> The guarantee pays a fixed dollar amount that enrollment does
+             not enter, so no forecast of its enrollment moves it and it has no band. The line
+             that falls is what the formula computes at that enrollment
+             — ${money(end.formulaAid)} by FY${end.fiscalYear} against ${money(end.realizedAid)}
+             received. The gap between them is the guarantee, and on this projection it
+             ${(widening ?? 0) > 0 ? "widens by" : "narrows by"}
+             ${money(Math.abs(widening ?? 0))} over the horizon.`
           : `The range, not the line, is the finding: at FY${end.fiscalYear} enrollment this
              district's aid is somewhere between ${money(end.low)} and ${money(end.high)}. The
              band is the cross-sectional spread of district enrollment growth, not this

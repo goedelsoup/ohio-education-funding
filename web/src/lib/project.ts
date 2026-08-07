@@ -228,6 +228,14 @@ export interface EnrollmentEffect {
   fiscalYear: number;
   /** Total realized aid at the central enrollment estimate. */
   realizedAid: number;
+  /**
+   * Total *formula* aid at the same enrollment — what the formula computes before the guarantee.
+   *
+   * Carried alongside because for a district the guarantee pays, realized aid is the only thing
+   * on the chart that does not move, and the whole story is in the gap between the two: the
+   * formula computes less as enrollment falls, and the guarantee pays the difference.
+   */
+  formulaAid: number;
   /** Total realized aid at the low end of the enrollment band. */
   low: number;
   /** Total realized aid at the high end. */
@@ -257,6 +265,7 @@ export function forecast(
   modelMinimumStateShare: number,
 ): EnrollmentEffect {
   let point = 0;
+  let formula = 0;
   let low = 0;
   let high = 0;
   let adm = 0;
@@ -275,6 +284,7 @@ export function forecast(
     const at = (value: number) => apply(d, policy, value, modelMinimumStateShare);
     const central = at(projected.point);
     point += central.realizedAid;
+    formula += central.formulaAid;
     // A smaller district draws less aid, so the enrollment band's low end is the aid band's low
     // end. That holds because every lever here is monotone in ADM.
     low += at(projected.low).realizedAid;
@@ -283,7 +293,16 @@ export function forecast(
     if (central.onGuarantee) onGuarantee++;
   }
 
-  return { fiscalYear: through, realizedAid: point, low, high, adm, onGuarantee, observed: false };
+  return {
+    fiscalYear: through,
+    realizedAid: point,
+    formulaAid: formula,
+    low,
+    high,
+    adm,
+    onGuarantee,
+    observed: false,
+  };
 }
 
 /**
@@ -319,18 +338,21 @@ export function forecastPath(
   const years = districts[0]?.adm_history.length ?? 0;
   for (let index = 0; index < years; index++) {
     let aid = 0;
+    let formula = 0;
     let adm = 0;
     let onGuarantee = 0;
     for (const d of districts) {
       const value = d.adm_history[index] ?? 0;
       const outcome = apply(d, policy, value, modelMinimumStateShare);
       aid += outcome.realizedAid;
+      formula += outcome.formulaAid;
       adm += value;
       if (outcome.onGuarantee) onGuarantee++;
     }
     path.push({
       fiscalYear: baseYear - (years - 1) + index,
       realizedAid: aid,
+      formulaAid: formula,
       // An observed year has no interval. Not a zero-width one — none: the enrollment it was
       // computed at is published, so there is nothing to be uncertain about.
       low: aid,

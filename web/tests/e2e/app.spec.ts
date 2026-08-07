@@ -327,17 +327,36 @@ test.describe("the projection", () => {
     await expect(card.locator('[data-chart="district-fan"] svg')).toHaveCount(1);
   });
 
-  test("a guaranteed district's band is flat, and the page says why", async ({ page }) => {
+  test("a guaranteed district shows what the formula computes beside what it receives", async ({
+    page,
+  }) => {
     // Cleveland is on the guarantee, which pays a fixed dollar amount that enrollment does not
-    // enter. A flat band is the finding, not a broken chart, so it is captioned as one.
+    // enter — so its band is a flat line and a chart of it alone is a chart of nothing. Nearly
+    // half of Ohio's districts are in this position, so this is the common case, not the edge.
     await page.goto(`/#district/${CLEVELAND}`);
     const card = page
       .locator("#district-out .card")
       .filter({ hasText: "What a year of enrollment is worth here" });
-    await expect(card).toContainText("The band is flat");
-    await expect(card).toContainText("does not respond to its enrollment");
-    // One bound label, because both ends are the same number.
-    await expect(card.locator("text.fan-bound")).toHaveCount(1);
+
+    await expect(card).toContainText("flat by construction");
+    await expect(card).toContainText("The gap between them is the guarantee");
+
+    // Two series: the flat realized line and the falling formula line, in the two validated
+    // hues, each direct-labelled at the terminal year.
+    await expect(card.locator("polyline.fan-reference")).toHaveCount(1);
+    await expect(card.locator("text.fan-bound")).toHaveCount(2);
+    await expect(card.locator(".legend")).toContainText("What the formula computes");
+  });
+
+  test("a formula-funded district gets a band and no second line", async ({ page }) => {
+    // The reference line exists because a flat band says nothing. Where the band already says
+    // something, a second series would be one more mark for no extra claim.
+    await page.goto("/#district/046763");
+    const card = page
+      .locator("#district-out .card")
+      .filter({ hasText: "What a year of enrollment is worth here" });
+    await expect(card.locator("polyline.fan-reference")).toHaveCount(0);
+    await expect(card).toContainText("The range, not the line, is the finding");
   });
 
   test("the footer counts the forecasts it checked, not only the scenarios", async ({ page }) => {
