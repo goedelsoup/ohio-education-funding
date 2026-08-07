@@ -60,6 +60,10 @@ dependency resolution succeeding first.
 | [`foundation`](foundation/) | calculator | teacher base cost verified; three sub-components absent | 14 |
 | [`millage`](millage/) | calculator | implemented; awaiting real inputs | 13 |
 | [`dispersion`](dispersion/) | calculator | implemented; verified on 606 real districts | 20 |
+| [`bundle`](bundle/) | export | versioned JSON feed for [`web/`](../web/) | 6 |
+
+`bundle` is the only crate that is neither a connector nor a calculator: it is the export seam
+between the corpus and the web layer, and the only one with a binary.
 
 Run the gate from this directory:
 
