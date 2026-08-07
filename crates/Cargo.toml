@@ -8,6 +8,8 @@ members = [
     "millage",
     "dispersion",
     "bundle",
+    "spreadsheet",
+    "connect",
 ]
 
 [workspace.package]

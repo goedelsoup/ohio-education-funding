@@ -51,6 +51,6 @@ year end. CPI grew 71.9% from June 2000 to June 2022. [verified]
 
 ## Feeds connectors
 
-[`census-f33`](../../crates/census-f33/README.md) and
-[`nces-ccd`](../../crates/nces-ccd/README.md) — the underlying series — and
-[`bls-cpi`](../../crates/bls-cpi/README.md) for the deflator.
+[`census-f33`](../../crates/connect/sources/census-f33.md) and
+[`nces-ccd`](../../crates/connect/sources/nces-ccd.md) — the underlying series — and
+[`bls-cpi`](../../crates/connect/sources/bls-cpi.md) for the deflator.

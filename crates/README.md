@@ -13,18 +13,12 @@ mechanism, and exemplars rather than bulk facts, so the per-agency-year numbers 
 files and are queried through this layer. A corpus node cites a series; it does not restate
 it.
 
-**Connectors** adapt the primary publishers of Ohio funding data:
-
-- `dew-foundation` — Department of Education and Workforce School Finance Payment Reports
-  and Foundation Funding files; the authoritative per-agency state aid series
-- `tax-abstract` — Department of Taxation property tax abstracts; assessed valuation,
-  effective millage, tax reduction factors, and the 20-mill floor determination
-- `lsc-budget` — Legislative Service Commission budget analyses and line-item catalog;
-  appropriation history by fiscal period
-- `census-f33` — Census Annual Survey of School System Finances; the cross-state comparable
-  revenue and expenditure series
-- `ofcc-projects` — Ohio Facilities Construction Commission project and assistance data for
-  the capital channel
+**Connectors** adapt the primary publishers of Ohio funding data. All nine approved at genesis
+now live in one crate, [`connect`](connect/), as a registry whose status is checked by a test
+rather than asserted in a README. Two are wired — `dew-foundation` and `bls-cpi` — one is
+retrievable, and six are declared with a recorded reason. See
+[`connect/README.md`](connect/README.md) for the table and
+[`connect/sources/`](connect/sources/) for what each is for.
 
 **Calculators** are pure, deterministic, and the reason parameters are first-class nodes:
 
@@ -44,26 +38,37 @@ will force before anything else does.
 ## Workspace
 
 The Rust workspace root is [`Cargo.toml`](Cargo.toml) in this directory, so all Rust lives
-under `crates/` and the repository root stays free of build configuration. The connector
-directories are interface stubs and are not workspace members.
+under `crates/` and the repository root stays free of build configuration. Every directory here
+is now a real crate; the nine connector stubs were folded into [`connect`](connect/) and their
+prose kept at [`connect/sources/`](connect/sources/).
 
-**No external dependencies.** Every calculator is pure `std`. That keeps the domain computer
-hermetic and fast to build, and it means a committed
+**No external dependencies.** Every crate is pure `std` — including the XLSX reader, which
+means a zip reader, a DEFLATE decompressor, and an XML parser written here rather than pulled
+in. That keeps the domain computer hermetic and fast to build; it means a committed
 [`scenario`](../.yidam/corpus/scenario/) result can be reproduced years later without a
-dependency resolution succeeding first.
+dependency resolution succeeding first; and it means the *refresh* path keeps working too,
+which matters more — an extraction pipeline that will not run is a corpus that cannot be
+updated.
+
+Two system binaries are used, both named where they are used and neither needed to build or
+compute: **curl** for HTTPS, and **LibreOffice** for the one source still published in the
+pre-2007 `.xls` format.
 
 | Crate | Kind | Status | Tests |
 |---|---|---|---|
 | [`edfund-core`](edfund-core/) | types | shared `FiscalYear`, `AgencyType`, rounding | 7 |
-| [`deflate`](deflate/) | calculator | implemented | 10 |
+| [`spreadsheet`](spreadsheet/) | reader | inflate, zip, XML, XLSX — no dependencies | 47 |
+| [`connect`](connect/) | connectors | registry, cache, digests, fixture builders | 58 |
+| [`deflate`](deflate/) | calculator | implemented; series verified against BLS | 11 |
 | [`local-capacity`](local-capacity/) | calculator | FSFP side implemented; charge-off side not | 16 |
-| [`foundation`](foundation/) | calculator | teacher base cost verified; three sub-components absent | 14 |
-| [`millage`](millage/) | calculator | implemented; awaiting real inputs | 13 |
+| [`foundation`](foundation/) | calculator | full base cost build-up; verified to the cent | 43 |
+| [`millage`](millage/) | calculator | implemented; verified on 606 real districts | 13 |
 | [`dispersion`](dispersion/) | calculator | implemented; verified on 606 real districts | 20 |
 | [`bundle`](bundle/) | export | versioned JSON feed for [`web/`](../web/) | 6 |
 
-`bundle` is the only crate that is neither a connector nor a calculator: it is the export seam
-between the corpus and the web layer, and the only one with a binary.
+`spreadsheet` and `connect` are the retrieval side: everything that can fail, and nothing that
+computes a funding figure. `bundle` is the export seam between the corpus and the web layer.
+Those three are the crates with binaries; the calculators are libraries.
 
 Run the gate from this directory:
 

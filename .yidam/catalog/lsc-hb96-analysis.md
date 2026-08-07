@@ -41,4 +41,4 @@ two series.
 
 ## Feeds connector
 
-[`lsc-budget`](../../crates/lsc-budget/README.md)
+[`lsc-budget`](../../crates/connect/sources/lsc-budget.md)

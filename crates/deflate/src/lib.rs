@@ -172,10 +172,23 @@ impl CpiSeries {
     /// CPI-U, US city average, all items, not seasonally adjusted, June observation of each
     /// fiscal year's ending calendar year.
     ///
-    /// FY2000 and FY2022 are [`Confidence::Verified`]: together they reproduce the Ohio
-    /// Auditor of State's independently published 71.9% CPI growth and its 26.1% and 19.4%
-    /// real per-pupil expenditure growth figures. The intervening years are transcribed and
-    /// **unverified** — check them against BLS before resting a claim on them.
+    /// FY2000 and FY2022 were verified first, by reproducing the Ohio Auditor of State's
+    /// independently published 71.9% CPI growth and its 26.1% and 19.4% real per-pupil
+    /// expenditure growth figures. The rest were transcribed by hand and carried
+    /// [`Confidence::Unverified`] until the `bls-cpi` connector was built.
+    ///
+    /// Every point is now [`Confidence::Verified`] against the Bureau's own published series,
+    /// and `crates/connect/tests/deflator_matches_bls.rs` re-checks all twenty-three on every
+    /// test run from a committed extract of that file. The check is what carries the claim; the
+    /// marking here only records it.
+    ///
+    /// # What the check found
+    ///
+    /// FY2016 was transcribed as `241.038`. The Bureau publishes `241.018`. Twenty-two of
+    /// twenty-three points were typed correctly and one was not, which is about the error rate
+    /// hand transcription actually has — and the reason a series should not be trusted because
+    /// it looks plausible. The effect on any real-dollar figure is small; the point is that
+    /// nothing in this workspace could have found it without going back to the source.
     ///
     /// CPI-U is a general consumer price index. School costs are majority compensation, for
     /// which the Employment Cost Index is a better deflator with shorter coverage. Any figure
@@ -199,7 +212,8 @@ impl CpiSeries {
             (2013, 233.504),
             (2014, 238.343),
             (2015, 238.638),
-            (2016, 241.038),
+            // Transcribed as 241.038; the Bureau publishes 241.018. Corrected from the source.
+            (2016, 241.018),
             (2017, 244.955),
             (2018, 251.989),
             (2019, 256.143),
@@ -207,18 +221,17 @@ impl CpiSeries {
             (2021, 271.696),
         ];
 
+        // Both lists are Verified now. They stay separate because *how* a point was verified
+        // differs — the two endpoints against an independent publication, the rest against the
+        // agency itself — and a future correction should know which is which.
         let mut points: Vec<IndexPoint> = VERIFIED
             .iter()
+            .chain(TRANSCRIBED.iter())
             .map(|&(fy, index)| IndexPoint {
                 fiscal_year: FiscalYear(fy),
                 index,
                 confidence: Confidence::Verified,
             })
-            .chain(TRANSCRIBED.iter().map(|&(fy, index)| IndexPoint {
-                fiscal_year: FiscalYear(fy),
-                index,
-                confidence: Confidence::Unverified,
-            }))
             .collect();
         points.sort_by_key(|p| p.fiscal_year);
         Self::from_points("CPI-U all items, June, NSA", points)
@@ -292,13 +305,47 @@ mod tests {
 
     #[test]
     fn result_takes_the_weaker_endpoint_confidence() {
-        let cpi = CpiSeries::cpi_u_june();
-        let mixed = cpi.convert(100.0, FiscalYear(2010), FY2022).unwrap();
+        // Built here rather than taken from the CPI series, because the rule is about mixing
+        // confidences and must hold whatever state a particular series happens to be in.
+        let series = CpiSeries::from_points(
+            "test",
+            vec![
+                IndexPoint {
+                    fiscal_year: FiscalYear(2010),
+                    index: 200.0,
+                    confidence: Confidence::Unverified,
+                },
+                IndexPoint {
+                    fiscal_year: FiscalYear(2022),
+                    index: 300.0,
+                    confidence: Confidence::Verified,
+                },
+            ],
+        );
+        let mixed = series
+            .convert(100.0, FiscalYear(2010), FiscalYear(2022))
+            .unwrap();
         assert_eq!(
             mixed.confidence,
             Confidence::Unverified,
             "an unverified endpoint must contaminate the result"
         );
+    }
+
+    #[test]
+    fn the_cpi_series_is_verified_end_to_end() {
+        // Every point has been checked against the Bureau's published file; the check itself
+        // lives in crates/connect/tests/deflator_matches_bls.rs. If a point is ever added by
+        // transcription, this fails and says where the check belongs.
+        let cpi = CpiSeries::cpi_u_june();
+        for year in 2000..=2022 {
+            let point = cpi.point(FiscalYear(year)).expect("covered");
+            assert_eq!(
+                point.confidence,
+                Confidence::Verified,
+                "FY{year} is not verified; check it in crates/connect (`edfund-connect cpi`)"
+            );
+        }
     }
 
     #[test]

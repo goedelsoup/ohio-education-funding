@@ -57,5 +57,5 @@ plus `xml.etree` — an XLSX is a zip of XML — with no third-party library req
 
 ## Feeds connector
 
-[`dew-foundation`](../../crates/dew-foundation/README.md), and via `tax-abstract` for the
+[`dew-foundation`](../../crates/connect/sources/dew-foundation.md), and via `tax-abstract` for the
 millage and valuation columns.

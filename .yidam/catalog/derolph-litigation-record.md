@@ -37,4 +37,4 @@ clarification and the prohibition inside the relevant nodes.
 
 ## Feeds connector
 
-[`ohio-courts`](../../crates/ohio-courts/README.md)
+[`ohio-courts`](../../crates/connect/sources/ohio-courts.md)
