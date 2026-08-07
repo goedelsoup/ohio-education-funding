@@ -1,0 +1,13 @@
+[package]
+name = "deflate"
+description = "Convert nominal Ohio school finance figures to constant dollars, fiscal-year aligned"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+repository.workspace = true
+
+[dependencies]
+edfund-core = { path = "../edfund-core" }
+
+[lints]
+workspace = true

@@ -30,6 +30,17 @@ Return both figures for any agency-year where both are computable, not just the 
 
 ## Status
 
-**Stub — not implemented.** Blocked on `tax-abstract` for valuation, `census-f33` or an
-income source for the income component, and on establishing the FSFP capacity weighting, which
-is `[open]` in the component node. Implementation lands in `crates/local-capacity/`.
+**FSFP side implemented** in [`crates/local-capacity/`](../../crates/local-capacity/src/lib.rs).
+16 tests.
+
+Six tests reproduce the department's published worked example line by line — capacity
+valuation, capacity gross income, all three per-pupil terms, the income ratio, the sliding
+capacity rate, and the $2,027.00 bottom line. `state_share` and `state_share_percentage`
+implement R.C. 3317.017(B) and (C) including the 5% floor, and report whether the floor was
+binding so that a wealth-neutrality analysis can exclude floored districts rather than
+silently flattening its own signal.
+
+**Not implemented: the charge-off side.** The pre-FY2022 mechanism has no code, so the
+cross-regime comparison this skill was specified to support cannot yet be run. That needs
+[`local-share-charge-off-millage`](../corpus/parameter/local-share-charge-off-millage.yml)
+populated first — its series is still `[open]`.

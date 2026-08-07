@@ -31,5 +31,17 @@ millage this calculator returns.
 
 ## Status
 
-**Stub — not implemented.** Blocked on `tax-abstract`. Implementation lands in
-`crates/millage/`.
+**Implemented** in [`crates/millage/`](../../crates/millage/src/lib.rs). 13 tests.
+
+The tests encode the mechanism rather than any particular district's numbers, because no
+per-district valuation series exists yet: doubling valuation halves effective millage and holds
+the dollar yield exactly flat; yields stay flat across four successive reappraisals; the floor
+binds at 20 mills for districts and 2 for JVSDs; and — the one that matters for policy — the
+same reappraisal raises revenue for a floored district while leaving an unfloored one
+unchanged.
+
+Two guards worth naming, both of which would otherwise produce plausible nonsense: a district
+that voted 12 mills is never pushed up to 20 by the floor, and falling valuation never raises
+an effective rate above what voters approved.
+
+**Blocked on `tax-abstract`** for real inputs. The logic is ready; the data is not.
