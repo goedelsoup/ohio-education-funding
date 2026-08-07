@@ -1,0 +1,14 @@
+[package]
+name = "scenario-delta"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+repository.workspace = true
+description = "Winners and losers between two funding runs, with incidence and the off-formula count"
+
+[dependencies]
+edfund-core = { path = "../edfund-core" }
+project = { path = "../project" }
+
+[lints]
+workspace = true

@@ -124,12 +124,49 @@ description: |
   increase fell from $496.3M to $465.0M — the rest is the department's own funded-teacher counts
   replacing the corpus's reconstruction of them.
 
+  **THE STATE SHARE FLOOR IS NOT A SMALL CORRECTION, AND THE $242.1M ABOVE DOES NOT APPLY IT.**
+  This node has recorded, through several phases, that the run "does not apply the 5% state share
+  floor at district level, so among the non-guaranteed districts the wealthiest would receive
+  less than the full increase." That item is now measured by
+  [`scenario-delta`](../../skills/scenario-delta.md), and the omission is larger than the
+  wording implied. Applying the floor **and** the guarantee, at district level, to a uniform
+  increase of the same statewide size:
+
+      computed base cost increase        465.0
+        less the ADM denominators         -7.6   base cost averages three years;
+                                                 the state share is paid on this one
+        less the minimum state share    -118.7   138 districts keep a tenth of it
+        less the guarantee              -141.6   256 districts keep none of it
+      delivered as state aid             197.1   42.4% of the computed increase
+
+  [verified — see
+  [`crates/scenario-delta/tests/who_a_change_reaches.rs`](../../../crates/scenario-delta/tests/who_a_change_reaches.rs)]
+
+  So the deliverable share is **42.4%, not 52.1%**, and a third mechanism was missing from the
+  accounting entirely: base cost is computed on a three-year average ADM while the state share is
+  paid on the current year, which costs a shrinking state a further $7.6M. The two figures are
+  not strictly comparable — the run above perturbs one salary per district and this one applies a
+  uniform scale of the same statewide magnitude — so treat 42.4% as the corrected order of
+  magnitude rather than as a replacement to four significant figures. [inference for the
+  comparison; verified for each decomposition term]
+
+  **AND THE MECHANISM BEHIND THE INCIDENCE RESULT WAS MISATTRIBUTED.** This node credits the
+  floor for cutting wealthy districts out: "wealthier districts are cut out almost entirely by
+  the floor." The guarantee does more of that work. Across valuation quintiles the count held on
+  the guarantee runs 10, 31, 39, 88, 88 — and in the wealthiest quintile 90 districts are
+  guaranteed, 95 are at the floor, and **73 are both**, so the two cannot be summed as
+  independent mechanisms. In the poorest quintile **no district is at the floor at all**, so
+  there the floor explains nothing whatever. [verified]
+
+  The direction of the finding is unchanged and its magnitude is sharper than stated: per pupil,
+  the increase pays $305.63 to the poorest quintile and $20.81 to the wealthiest, a ratio of
+  about fifteen to one. A refresh is progressive; the reason is mostly that wealthy districts are
+  on the guarantee. [verified]
+
   **WHAT THIS RUN IS STILL NOT.** It perturbs one salary of ten; administrator, counselor,
   librarian, and clerical salaries have all risen too and are held fixed, so the computed
-  increase remains a **lower bound**. It does not apply the 5% state share floor at district
-  level, so among the 315 non-guaranteed districts the wealthiest would receive less than the
-  full increase. And FY2027 has not happened — the department's model is a projection, so
-  enrollment, valuation, and income are forecast rather than observed. [open]
+  increase remains a **lower bound**. And FY2027 has not happened — the department's model is a
+  projection, so enrollment, valuation, and income are forecast rather than observed. [open]
 
   The perturbation is now concrete. Base cost is built by applying statutory staffing ratios to
   enrollment and pricing each funded position at a **statewide average salary for a reference

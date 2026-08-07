@@ -402,11 +402,24 @@ fn holding_disadvantage_constant_shrinks_every_spending_relationship() {
     );
 }
 
-/// Every sensitivity scenario the paper ran, on both divisors. Its own conclusion — that the
-/// near-zero result is not driven by outliers or small districts — holds; so does the opposite
-/// result on the other denominator.
+/// **Only one of the two estimates is stable, and it is not the published one.**
+///
+/// This test previously asserted that the weighted-denominator coefficient "stays near zero"
+/// across the paper's own sensitivity checks and called that robustness. It is not. A near-zero
+/// estimate staying near zero is arithmetic, not stability: across three scenarios the published
+/// measure **changes sign** and its magnitude varies by a factor of eight, while the headcount
+/// measure moves by 0.018 and never leaves the same conclusion.
+///
+///     scenario                              published    headcount
+///     all districts                          -0.0155      -0.3365
+///     excluding the highest per-pupil         -0.0042      -0.3546
+///     excluding enrollment under 582          +0.0358      -0.3371
+///
+/// So the paper's robustness claim survives only as a statement about a quantity too small to
+/// have a direction. That is the correct reading of its own sensitivity table, and it is a
+/// stronger objection than "the denominator matters".
 #[test]
-fn the_divisor_gap_survives_the_papers_own_sensitivity_checks() {
+fn only_the_headcount_estimate_is_stable_across_the_papers_sensitivity_checks() {
     let all = report_card();
     let scenarios: Vec<(&str, Vec<&Row>)> = vec![
         ("all districts", all.iter().collect()),
@@ -428,20 +441,128 @@ fn the_divisor_gap_survives_the_papers_own_sensitivity_checks() {
         }),
     ];
 
+    let mut published = Vec::new();
+    let mut headcount = Vec::new();
     for (name, subset) in scenarios {
         let rows: Vec<Row> = subset.into_iter().map(|r| Row(r.0.clone())).collect();
         let pi = column(&rows, col::PERFORMANCE_INDEX);
         let weighted = correlate(&pi, &per_pupil(&rows, col::WEIGHTED_ADM));
         let unweighted = correlate(&pi, &per_pupil(&rows, col::UNWEIGHTED_ADM));
         assert!(
-            weighted.abs() < 0.08,
-            "{name}: weighted divisor should stay near zero, got {weighted:.3}"
-        );
-        assert!(
             unweighted < -0.30,
-            "{name}: unweighted divisor should stay clearly negative, got {unweighted:.3}"
+            "{name}: headcount divisor should stay clearly negative, got {unweighted:.4}"
         );
+        published.push(weighted);
+        headcount.push(unweighted);
     }
+
+    close(published[0], -0.0155, 0.0005, "published, all districts");
+    close(
+        published[1],
+        -0.0042,
+        0.0005,
+        "published, less the top spender",
+    );
+    close(
+        published[2],
+        0.0358,
+        0.0005,
+        "published, less the small districts",
+    );
+    close(headcount[0], -0.3365, 0.0005, "headcount, all districts");
+    close(
+        headcount[1],
+        -0.3546,
+        0.0005,
+        "headcount, less the top spender",
+    );
+    close(
+        headcount[2],
+        -0.3371,
+        0.0005,
+        "headcount, less the small districts",
+    );
+
+    // The headcount estimate is stable in the sense the word is normally used: every scenario
+    // supports the same claim at nearly the same strength.
+    let spread = |v: &[f64]| {
+        v.iter().cloned().fold(f64::MIN, f64::max) - v.iter().cloned().fold(f64::MAX, f64::min)
+    };
+    assert!(
+        spread(&headcount) < 0.02,
+        "headcount spread {:.4}",
+        spread(&headcount)
+    );
+
+    // The published estimate is not. It crosses zero, so the scenarios do not agree on the
+    // direction of the association — the one thing a coefficient is for.
+    assert!(
+        published.iter().cloned().fold(f64::MAX, f64::min) < 0.0
+            && published.iter().cloned().fold(f64::MIN, f64::max) > 0.0,
+        "the published coefficient should change sign across scenarios: {published:?}"
+    );
+    let magnitudes: Vec<f64> = published.iter().map(|c| c.abs()).collect();
+    let ratio = magnitudes.iter().cloned().fold(f64::MIN, f64::max)
+        / magnitudes.iter().cloned().fold(f64::MAX, f64::min);
+    assert!(
+        ratio > 5.0,
+        "published magnitude varies {ratio:.1}x across scenarios"
+    );
+}
+
+/// Weighting districts by their students moves the published coefficient by an order of
+/// magnitude, which is the sharpest single demonstration that it is not a stable estimate.
+///
+/// The corpus carried `-0.149` and `-0.547` for several phases with nothing asserting them.
+#[test]
+fn enrollment_weighting_moves_the_published_coefficient_tenfold() {
+    let rows = report_card();
+    let pi = column(&rows, col::PERFORMANCE_INDEX);
+    let adm = column(&rows, col::UNWEIGHTED_ADM);
+
+    // Pearson correlation with each district weighted by its students. Written here rather than
+    // in `dispersion` because it is a reading of one table, not an equity statistic.
+    let weighted_correlation = |values: &[Option<f64>]| {
+        let triples: Vec<(f64, f64, f64)> = pi
+            .iter()
+            .zip(values)
+            .zip(&adm)
+            .filter_map(|((y, x), w)| Some(((*y)?, (*x)?, (*w)?)))
+            .collect();
+        let total: f64 = triples.iter().map(|(_, _, w)| w).sum();
+        let mean = |pick: fn(&(f64, f64, f64)) -> f64| {
+            triples.iter().map(|t| pick(t) * t.2).sum::<f64>() / total
+        };
+        let (mean_y, mean_x) = (mean(|t| t.0), mean(|t| t.1));
+        let covariance: f64 = triples
+            .iter()
+            .map(|t| t.2 * (t.0 - mean_y) * (t.1 - mean_x))
+            .sum();
+        let var_y: f64 = triples.iter().map(|t| t.2 * (t.0 - mean_y).powi(2)).sum();
+        let var_x: f64 = triples.iter().map(|t| t.2 * (t.1 - mean_x).powi(2)).sum();
+        covariance / (var_y * var_x).sqrt()
+    };
+
+    let published = weighted_correlation(&per_pupil(&rows, col::WEIGHTED_ADM));
+    let headcount = weighted_correlation(&per_pupil(&rows, col::UNWEIGHTED_ADM));
+    close(
+        published,
+        -0.149,
+        0.002,
+        "enrollment-weighted, published divisor",
+    );
+    close(
+        headcount,
+        -0.547,
+        0.002,
+        "enrollment-weighted, headcount divisor",
+    );
+
+    // Against the district-weighted figures of -0.0155 and -0.3365: the published coefficient
+    // moves by a factor of about ten, the headcount one by about 1.6. Both deepen, and only one
+    // of them was ever near enough to zero for the move to change what it says.
+    assert!(published / -0.0155 > 8.0, "published moved {published:.4}");
+    assert!(headcount / -0.3365 < 2.0, "headcount moved {headcount:.4}");
 }
 
 /// Weighting districts by their students strengthens the relationship on both divisors, and the

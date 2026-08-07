@@ -35,7 +35,7 @@ Fields per skill: filename, name, description, agents that invoke it.
 | [`millage`](millage.md) | Compute effective operating millage under HB 920 reduction factors and determine 20-mill floor status for an agency and tax year |
 | [`project`](project.md) | Forward-project per-agency enrollment, assessed valuation, and revenue series with uncertainty intervals, as inputs to scenario runs |
 | [`regime-diff`](regime-diff.md) | Difference two funding regimes at component level for the same agency-year, attributing the change to specific mechanisms rather than reporting a net total |
-| [`scenario-delta`](scenario-delta.md) | Produce the per-agency winners-and-losers table between a baseline run and a perturbed run, with incidence across wealth and typology |
+| [`scenario-delta`](scenario-delta.md) | Produce the per-agency winners-and-losers table between a baseline run and a perturbed run, with incidence across wealth and state share |
 <!-- /REGEN -->
 
 ## Inherited from prelude
