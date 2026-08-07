@@ -61,13 +61,31 @@ description: |
   −0.015. [verified] The denominator effect is not a general property of the spending measure;
   it appears only when the outcome is a level.
 
-  **Robust, on both denominators, across the paper's own sensitivity checks.** Excluding
-  Put-in-Bay Local, excluding the top one percent of spenders, excluding the smallest-enrollment
-  decile, and log-transforming all leave the weighted-denominator coefficient near zero — the
-  paper's conclusion, and it holds — and all leave the unweighted-denominator coefficient near
-  −0.34. Weighting districts by enrollment deepens both: −0.149 published, **−0.547** on a
-  headcount denominator. [verified] The divergence is not an outlier artifact in either
-  direction.
+  **ONLY ONE OF THE TWO ESTIMATES IS STABLE, AND IT IS NOT THE PUBLISHED ONE.** [verified —
+  [`crates/dispersion/tests/report_card_2425.rs`](../../../crates/dispersion/tests/report_card_2425.rs)]
+
+  This node previously recorded the sensitivity checks as showing the result "robust, on both
+  denominators," and that was too generous to the published measure. Run them out:
+
+      scenario                              published    headcount
+      all districts                          -0.0155      -0.3365
+      excluding the highest per-pupil        -0.0042      -0.3546
+      excluding enrollment under 582         +0.0358      -0.3371
+
+  The headcount coefficient moves by **0.018** across every check and never stops saying the same
+  thing. The published coefficient **changes sign** — the scenarios do not agree on the direction
+  of the association, which is the one thing a coefficient is for — and its magnitude varies by a
+  factor of eight.
+
+  Weighting districts by enrollment separates them further: **−0.149** published against
+  **−0.547** on a headcount denominator. That is a tenfold move in the published figure and a
+  1.6× move in the other. [verified]
+
+  So "near zero in every case" is stability only in the sense that near-zero numbers stay near
+  zero. The paper's robustness claim survives as a statement about a quantity too small to have a
+  direction, and not as evidence that its estimate is reliable. This is the sharper objection and
+  the one the corpus should make: not *the denominator matters*, but **one of these two estimates
+  is stable under the paper's own checks and it is not the one it published.**
 
   **AND A SECOND SOURCE AGREES.** The corpus's independent FY2024 Cupp Report headcount series,
   a different file for a different year, correlates with the Performance Index at **−0.388**.
