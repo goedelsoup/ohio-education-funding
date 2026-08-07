@@ -86,12 +86,21 @@ size, both ADM columns, and the expenditure numerator;
 pins what it shows in 20 tests. Every figure on all three report-card metrics is computed rather
 than quoted.
 
+**The need-adjusted model exists.** `dispersion::least_squares` fits it and
+[`crates/dispersion/tests/report_card_2425.rs`](../../../crates/dispersion/tests/report_card_2425.rs)
+pins it across 27 tests: controlling for economic disadvantage, English-learner and disability
+shares, district size, and property wealth, the standardised spending coefficient is −0.073 on
+attainment level and +0.209 on growth. Missing from the specification: district typology,
+regional cost, and what the money was spent on. The last of those is not a column anywhere in
+this workspace and is the largest omission by far.
+
 What is still missing is time, and less of it than before. Three years of Performance Index are
 read: the measure is almost static (adjacent years +0.988, median within-district three-year
 range 2.1 points), which settles that one year stands in for a district's Index and also means
-the measure cannot detect anything annual. Only one year of Progress is held, and a gain measure
-is noisier than a level one, so its stability is the more important of the two questions and the
-unanswered one — the file's multi-year gain sheets are unextracted. [open]
+the measure cannot detect anything annual. The published Progress figure turns out to be a
+three-year average, and its one-, two- and three-year windows rank districts nearly alike
+(+0.904 to +0.968), so it is more stable than a single-year gain would be. Whether growth is
+stable across *separate* years remains unanswerable from the 2024-25 file alone. [open]
 
 Per-district expenditure series over time exist on the Auditor of State dashboard and are not
 extracted. The DEW pupil-weight schedule that produces the weighted ADM is not held, so the

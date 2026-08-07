@@ -43,14 +43,45 @@ description: |
   composition proxy. Take the composition out of the outcome and the divisor stops doing
   anything.
 
-  **What this does not license.** A positive partial correlation of +0.15 in a single-year
-  cross-section with one control is not evidence that spending raises achievement. Districts that
-  spend more differ from districts that spend less in ways the economically disadvantaged share
-  does not capture — English-learner and disability shares, district typology, regional labour
-  costs, and what the money was spent on. Those are unmodelled here, and the corpus holds none of
-  them. [open] The honest statement is that on Ohio's growth measure the relationship is not
-  negative, which is a correction to a widely quoted framing rather than a discovery about
-  whether money works. [inference]
+  **THE NEED-ADJUSTED MODEL HAS NOW BEEN RUN, AND THE SIGN DIFFERENCE SURVIVES IT.** Controlling
+  for economic disadvantage, English-learner and disability shares, log enrollment, and assessed
+  valuation per pupil — the specification
+  [OCG White Paper 013](../../catalog/ocg-white-paper-013.md) named as its own priority next step
+  — the standardised spending coefficient is: [verified]
+
+      on the Performance Index (level)      -0.073   t = -2.84   model R2 0.752
+      on Progress effect size  (growth)     +0.209   t = +4.60   model R2 0.227
+
+  **The growth coefficient strengthens at every step as controls are added** — +0.016 with
+  spending alone, +0.147 adding disadvantage, +0.209 with the full set. That is the signature of
+  a relationship being uncovered by controls rather than manufactured by them; a coefficient that
+  appears only in the saturated model is the pattern to distrust, and this is its opposite.
+  [inference]
+
+  **The published measure is a three-year average, so the year-matched check matters.** The
+  overview effect size is identical to the three-year gain (r = 1.0000), which pairs three years
+  of growth with one year of spending. Re-running the full model on the **one-year** gain gives
+  a standardised coefficient of **+0.269**, t = +5.75 — same sign, slightly larger. The mismatch
+  was not carrying the result. [verified]
+
+  **And wealth separates the two measures cleanly.** In the same model, assessed valuation per
+  pupil predicts attainment level (t = +3.12) and does not predict growth at all (t = +0.06).
+  [verified] Property wealth tells you where a district's students are, not how far they moved —
+  which is close to the sharpest statement of the level/gain distinction this data supports, and
+  bears directly on [equity](../doctrine/equity.yml).
+
+  **What this does not license.** A standardised coefficient of +0.21 in a single-year
+  cross-section is not evidence that spending raises achievement, and six controls do not make it
+  one. Adding controls removes the part of an association the controls explain; it does not turn
+  the remainder into an effect. What remains unmodelled is not a list of minor omissions:
+  district typology, regional labour cost, and — the largest — **what the money was actually
+  spent on**, which no column in this workspace measures. A district that spends more on
+  instruction and one that spends more on transportation are the same observation here. [open]
+
+  The honest statement is unchanged in substance and firmer in support: on Ohio's growth measure
+  the relationship is not negative, and it survives the controls that were supposed to explain
+  it away. That corrects a widely quoted framing. It does not settle whether money works.
+  [inference]
 
   **A cautionary property that is easy to miss.** `Overall Composite` is a precision-scaled
   statistic — a gain divided by its standard error — so it rises with the number of tested
@@ -99,9 +130,16 @@ properties:
       spending per weighted pupil                    +0.029
       prior-year (FY24) spending per pupil           +0.029
 
-    Only one year is held. The file's one-, two-, and three-year gain sheets are not extracted,
-    so the corpus cannot ask whether growth is stable the way it has asked of the Index — which
-    matters more here, because a gain measure is noisier than a level one. [open]
+    Window structure, all ending in 2024-25 [verified]:
+
+      published overview effect size  ==  three-year gain   (r = 1.0000, sd 0.0829)
+      two-year gain                       r +0.968 with it   sd 0.0899
+      one-year gain                       r +0.904 with it   sd 0.0989
+
+    The headline figure is a three-year average. Shorter windows are noisier, as a gain measure
+    over fewer cohorts should be, and all three rank districts nearly alike. Whether growth is
+    stable across *separate* years — as distinct from across nested windows ending in the same
+    year — is still not answerable from this file. [open]
   caveats: |
     **Centred by construction.** Ohio's value-added model is normed so the state average is
     approximately zero. This measure ranks districts against each other and cannot say whether

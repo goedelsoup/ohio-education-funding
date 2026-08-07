@@ -72,6 +72,15 @@ subject. Its other proposed step — lagged rather than same-year spending — d
 FY2024 spending tracks the *prior* year's Index (−0.426) slightly better than the following
 year's (−0.388), so there is no forward-directed signal to lag into. [verified]
 
+**Its priority next step has been taken, and it reverses the paper's subject.** The paper names
+"a need-adjusted, multivariable descriptive model relating Performance Index to per-pupil spending
+while accounting for economically disadvantaged, English-learner, and disability shares, district
+enrollment, typology, and local wealth" as its first Future Research item. That model now exists
+in this corpus, missing only typology. The standardised spending coefficient is **−0.073** on the
+Performance Index and **+0.209** on the Progress component. [verified] Its own proposed test
+returns opposite signs depending on which of Ohio's two published outcome measures is used, and
+the paper analysed only one of them.
+
 **One correction of description.** The paper reads state-and-local spending across performance
 quintiles as "moving in the opposite direction, from $12,403 to $13,324." That row is flat within
 $200 across four quintiles and steps $984 at the top. It is a step at the wealth end, not a
