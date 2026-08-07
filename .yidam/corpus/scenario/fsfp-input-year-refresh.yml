@@ -1,13 +1,55 @@
 class: scenario
 label: FSFP Cost Input Refresh vs. Freeze
 description: |
-  **Specified, not run.** [open] But no longer under-specified: the extraction phase resolved
-  every parameter this run needs except the input series themselves.
+  **RUN.** First result. Reproduce with `cargo run --example input_year_refresh -p foundation`.
 
-  The question is the one the FY2026-27 budget turned on: what is the difference, per district,
-  between running the Fair School Funding Plan on refreshed cost inputs and running it on the
-  FY2022 inputs [H.B. 96](../legislation/hb-96-2025.yml) carried forward, at the same phase-in
+  The question is the one the FY2026-27 budget turned on: what is the difference between
+  running the Fair School Funding Plan on refreshed cost inputs and running it on the FY2022
+  inputs [H.B. 96](../legislation/hb-96-2025.yml) carried forward, at the same phase-in
   percentage?
+
+  **THE ANSWER, on the department's own published worked example district** (20,342.13 base
+  cost enrolled ADM, 43 buildings), perturbing the classroom teacher salary from the FY2022
+  reference of $67,654 to an FY2024 refresh of $73,777.08 — a 9.1% rise:
+
+      base cost per pupil    $7,608.05  ->  $7,960.38     +$352.33   (+4.63%)
+      aggregate base cost  $154,763,912 -> $161,931,078  +$7,167,165
+
+  Only the teacher sub-component moves; student support, district leadership, building
+  operations, and athletics are unchanged by construction, because the perturbation touches one
+  price term. A 9.1% salary rise produces a 4.63% base cost rise — teacher cost is roughly half
+  of base cost for a district this size. [verified]
+
+  Scaled to Ohio's FY2022 base cost enrolled ADM of 1,499,918.26, a comparable refresh raises
+  **computed base cost statewide by roughly $528 million a year, from the teacher salary term
+  alone.** [inference — assumes this district's cost structure is representative] The state's
+  appropriation consequence is a different and smaller number; see the incidence result below.
+
+  **THE INCIDENCE RESULT IS SHARPER THAN PREDICTED.** This node predicted, before the run, that
+  freezing would fall "disproportionately on the state's portion" and be regressive. It is not
+  disproportionate — it is binary:
+
+      local capacity/pupil     share of the increase the district receives
+      $500 - $7,000            100%
+      $12,000 (at 5% floor)      5%
+
+  Because state aid is the residual after local capacity, a district on formula receives the
+  **entire** base cost increase, whatever its wealth. A district whose capacity has pushed it to
+  the 5% minimum state share receives 5% of it. There is no gradient between the two — the
+  transition is the floor itself. [verified]
+
+  So refreshing the input year is progressive and freezing it is regressive, and the mechanism
+  is not that poorer districts gain proportionally more but that wealthier districts are cut out
+  almost entirely by the floor. Given that
+  [170 of 606 districts sit at the 20-mill floor](../parameter/twenty-mill-floor.yml) — a
+  different floor, but correlated with wealth — the share of districts insulated from an input
+  refresh is a first-order question this run does not yet answer. [open]
+
+  **WHAT THIS RUN IS NOT.** It perturbs one salary of ten. Administrator, counselor, librarian,
+  and clerical salaries have all risen since FY2022 and are held fixed here, so $352.33 per
+  pupil is a **lower bound** on a real refresh. It uses one district rather than 606, because
+  per-district grade-band enrollment is not yet retrieved. And the FY2022 baseline salary is
+  secondary reporting rather than the department's own figure. [open]
 
   The perturbation is now concrete. Base cost is built by applying statutory staffing ratios to
   enrollment and pricing each funded position at a **statewide average salary for a reference
@@ -61,16 +103,30 @@ properties:
     separately from the FY2026 leg so projection uncertainty is not mixed into the policy
     effect.
   horizon: FY2026-FY2027
-  results_path: Not yet produced. [open]
+  results_path: |
+    crates/foundation/examples/input_year_refresh.rs — the runner is the result, because it is
+    deterministic and dependency-free. Re-running it reproduces the figures exactly; there is no
+    separate output artifact to drift from the code that made it.
+  results: |
+    Worked example district, 20,342.13 base cost enrolled ADM:
+      teacher salary input      $67,654.00 -> $73,777.08   (+9.05%)
+      teacher base cost        $93,787,359 -> $100,954,525
+      aggregate base cost     $154,763,912 -> $161,931,078  (+$7,167,165)
+      base cost per pupil        $7,608.05 -> $7,960.38     (+$352.33, +4.63%)
+    All other sub-components unchanged. [verified]
   confidence: |
-    Not yet run. When run, the result will be most sensitive to which salary series is used for
-    the refreshed year and to the treatment of the two insulated groups — districts at the 5%
-    state share floor and districts on a guarantee. The count and enrollment share of both must
-    be reported alongside any statewide total, or the total will overstate how many districts
-    the change actually reaches. [inference]
+    The direction and the incidence structure are robust: they follow from the residual
+    definition of state share and the 5% floor, both of which are statutory and both of which
+    are verified against the department's published calculation.
 
-    Blocked on: the `foundation` calculator, and per-district FY2026 base cost inputs and
-    enrolled ADM from `dew-foundation`. [open]
+    The magnitude is a lower bound and should be quoted as one. Perturbing one salary of ten
+    understates a real refresh; the other nine categories would each add to it.
+
+    Two sensitivities remain untested. The FY2022 baseline salary is secondary reporting, so the
+    9.05% gap could be off by a point or so in either direction. And districts held on a
+    guarantee are off-formula entirely and would receive none of the increase — the guarantee
+    population is not modelled here at all, so the "100%" column overstates coverage by however
+    many districts are guaranteed. [open]
 links:
   - target: ../scenario.ont.yml
     relationship: instance-of
