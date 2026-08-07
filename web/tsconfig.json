@@ -1,0 +1,30 @@
+{
+  "//": "No npm dependencies. `tsc` compiles src/ to app/, which is committed so the page is deployable as static files with no build step at the far end. Imports are written with .ts specifiers so `node --test` can run the sources directly; tsc rewrites them to .js on the way out, so one set of files is both the tested thing and the shipped thing.",
+  "compilerOptions": {
+    "target": "ES2022",
+    "module": "ES2022",
+    "moduleResolution": "bundler",
+    "lib": [
+      "ES2022",
+      "DOM",
+      "DOM.Iterable"
+    ],
+    "outDir": "app",
+    "rootDir": "src",
+    "strict": true,
+    "noUncheckedIndexedAccess": true,
+    "noImplicitOverride": true,
+    "noFallthroughCasesInSwitch": true,
+    "exactOptionalPropertyTypes": true,
+    "verbatimModuleSyntax": true,
+    "removeComments": false,
+    "declaration": false,
+    "sourceMap": false,
+    "skipLibCheck": true,
+    "allowImportingTsExtensions": true,
+    "rewriteRelativeImportExtensions": true
+  },
+  "include": [
+    "src/**/*.ts"
+  ]
+}

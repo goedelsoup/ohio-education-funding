@@ -202,14 +202,24 @@ pub fn apply(record: &DistrictRecord, policy: &Policy, current_year_adm: f64) ->
         1.0
     };
 
-    let base_cost_aid = if at_minimum {
-        // The floor is `minimum × base cost per pupil × ADM`, so its modelled value scales by
-        // the ratio of the new minimum to the modelled one, by the base cost scale, and by ADM.
+    let base_cost_aid = if censored {
+        // Already on the floor as published, so its aid *is* the floor: scale the modelled
+        // value by the ratio of the new minimum to the modelled one, by the base cost scale,
+        // and by ADM. Deriving it from `base_cost_per_pupil` instead would lose the cents the
+        // fixture rounds, and current law would stop being exactly the identity.
+        //
+        // The condition is `censored`, not `at_minimum`. Using the latter — which also covers a
+        // district pulled *below* a raised floor — sends a district whose published share is not
+        // the floor through a formula that assumes it is, and multiplies its share by the ratio
+        // of the minimums instead of setting it to the floor. That was the bug, and the Rust
+        // tests here did not catch it: they asserted nobody loses aid and every gainer sits
+        // below the new floor, and the wrong branch satisfies both.
         record.base_cost_state_share
             * adm_ratio
             * policy.base_cost_scale
             * (policy.minimum_state_share / MINIMUM_STATE_SHARE)
     } else if residual_per_pupil < floor_per_pupil {
+        // Above the published floor but below a raised one: the floor is what it gets.
         floor_per_pupil * current_year_adm
     } else {
         record.base_cost_state_share * adm_ratio + increase_per_pupil * current_year_adm
@@ -418,6 +428,42 @@ mod tests {
         let gain = outcome.formula_aid - record.core_foundation_funding;
         let full = record.aggregate_base_cost * (scale - 1.0);
         assert!(gain > 0.0 && gain < full * 0.2, "{gain} of {full}");
+        assert!(outcome.at_minimum_state_share);
+    }
+
+    #[test]
+    fn a_district_pulled_below_a_raised_floor_receives_exactly_the_floor() {
+        // The test that was missing. A district above the published minimum but below a raised
+        // one must get `minimum × base cost per pupil × current-year ADM` — not its published
+        // share scaled by the ratio of the minimums, which is only right for a district that
+        // was already on the floor. The web layer's independent implementation found this; the
+        // Rust tests around it did not, because the wrong answer is still an increase and still
+        // confined to districts below the new floor.
+        let raised = 0.15;
+        let record = panel()
+            .into_iter()
+            .find(|r| !r.at_minimum_state_share() && r.state_share_fraction() < raised - 0.001)
+            .expect("a district between the published floor and a 15% one");
+
+        let outcome = apply(
+            &record,
+            &Policy {
+                minimum_state_share: raised,
+                ..Policy::current_law()
+            },
+            record.current_year_adm,
+        );
+        let expected = raised * record.base_cost_per_pupil * record.current_year_adm
+            + record.categorical_funding();
+        // Asserted on formula aid rather than realized: every such district happens to be on
+        // the guarantee, so its receipt does not move even though its computed formula does.
+        assert!(
+            (outcome.formula_aid - expected).abs() < 0.02,
+            "{}: {:.2} vs {:.2}",
+            record.name,
+            outcome.formula_aid,
+            expected
+        );
         assert!(outcome.at_minimum_state_share);
     }
 

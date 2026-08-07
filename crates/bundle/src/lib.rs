@@ -11,6 +11,19 @@
 //! refuse to render rather than guess, because a field silently changing meaning is worse than
 //! a page that does not load. Bump it on any change to field names or units.
 //!
+//! # Checkpoints, and why a duplicated implementation is acceptable here
+//!
+//! The scenario builder in the web layer re-derives what `project::policy::apply` computes, in
+//! TypeScript, so that moving a slider does not require a round trip. Two implementations of
+//! the same formula is normally a bad trade: they drift, and the one nobody runs is the one
+//! that is wrong.
+//!
+//! [`Checkpoint`] is the answer. The bundle carries Rust-computed results for a set of named
+//! policies, and the page verifies its own arithmetic against them **before** it will render a
+//! scenario. If the two disagree the page says so and disables the tab. The duplication is then
+//! load-bearing in only one direction: the Rust is authoritative and the TypeScript has to prove
+//! it agrees, on every page load, against the real 609-district panel.
+//!
 //! # Why hand-rolled JSON
 //!
 //! The workspace has no external dependencies, deliberately — a committed
@@ -23,25 +36,40 @@
 use edfund_core::Dollars;
 
 /// The bundle schema version. Bump on any change to field names, units, or semantics.
-pub const CONTRACT_VERSION: &str = "1.0.0";
+///
+/// `2.0.0` added the scenario inputs and checkpoints, and renamed the enrollment-change years
+/// from FY2022-FY2024 to FY2024-FY2026 — the years the department's `ADM Data` sheet declares.
+/// The values did not change; what they are called did, which is exactly the kind of silent
+/// meaning change the version guard exists for.
+pub const CONTRACT_VERSION: &str = "2.0.0";
 
 /// One district, as the web layer needs it.
 #[derive(Debug, Clone, PartialEq)]
 pub struct District {
     /// Information Retrieval Number, the stable statewide identifier.
     pub irn: String,
-    /// District name as published, including county.
+    /// District name as published.
     pub name: String,
-    /// Base cost enrolled ADM, FY2027 model.
+    /// Base cost enrolled ADM — the greater of the three-year average and the current year.
     pub adm: f64,
+    /// Current-year enrolled ADM, FY2026. The denominator the state share is paid on.
+    pub current_year_adm: f64,
     /// District base cost per pupil, FY2027.
     pub base_cost_per_pupil: Dollars,
+    /// Aggregate base cost, all five sub-components.
+    pub aggregate_base_cost: Dollars,
+    /// The state's share of base cost alone, before every categorical.
+    pub base_cost_state_share: Dollars,
+    /// Targeted assistance, special education, DPIA, English learner, gifted, career-technical.
+    pub categorical_funding: Dollars,
     /// State aid per pupil as the formula computes it, before the guarantee.
     pub formula_aid_per_pupil: Dollars,
     /// State aid per pupil as the district receives it.
     pub realized_aid_per_pupil: Dollars,
     /// Temporary transitional aid guarantee, total dollars.
     pub guarantee: Dollars,
+    /// Whether the minimum state share is what sets this district's base cost aid.
+    pub at_minimum_state_share: bool,
     /// Assessed valuation per pupil, FY2023.
     pub valuation_per_pupil: Option<Dollars>,
     /// Effective Class 1 operating millage, TY2023.
@@ -51,7 +79,7 @@ pub struct District {
     /// Share of students economically disadvantaged, FY2024, as a fraction.
     pub economically_disadvantaged: Option<f64>,
     /// Enrollment change FY2024 to FY2026, as a fraction. FY2026 is partly departmental
-    /// estimate rather than actual, since the calculator is published before that year closes.
+    /// estimate, since the calculator is published before that year closes.
     pub enrollment_change: Option<f64>,
 }
 
@@ -78,7 +106,7 @@ impl District {
 }
 
 /// Statewide context, so a consumer can position any district without recomputing.
-#[derive(Debug, Clone, PartialEq)]
+#[derive(Debug, Clone, Copy, PartialEq)]
 pub struct Statewide {
     /// Number of districts in the bundle.
     pub districts: usize,
@@ -86,6 +114,8 @@ pub struct Statewide {
     pub on_guarantee: usize,
     /// Districts at the 20-mill floor.
     pub at_millage_floor: usize,
+    /// Districts whose base cost aid is set by the minimum state share.
+    pub at_minimum_state_share: usize,
     /// Median assessed valuation per pupil.
     pub median_valuation_per_pupil: Dollars,
     /// Median operating expenditure per pupil.
@@ -96,6 +126,51 @@ pub struct Statewide {
     pub wealth_neutrality_realized: f64,
     /// Total guarantee dollars.
     pub guarantee_total: Dollars,
+    /// Total realized state aid.
+    pub realized_aid_total: Dollars,
+    /// The minimum state share this model operates under.
+    pub minimum_state_share: f64,
+}
+
+/// A policy, in the shape the web layer sends it back.
+#[derive(Debug, Clone, Copy, PartialEq)]
+pub struct PolicyShape {
+    /// `as-enacted`, `removed`, `rebase`, or `phase-out`.
+    pub guarantee: &'static str,
+    /// The factor or remaining share, where the rule takes one.
+    pub guarantee_argument: f64,
+    /// Multiplier on aggregate base cost.
+    pub base_cost_scale: f64,
+    /// Minimum state share of base cost.
+    pub minimum_state_share: f64,
+    /// Appropriated fraction of base cost aid.
+    pub phase_in_base_cost: f64,
+    /// Appropriated fraction of categorical aid.
+    pub phase_in_categorical: f64,
+}
+
+/// A Rust-computed result the web layer must reproduce before it is allowed to compute more.
+///
+/// See the crate note. This is what makes a second implementation of the formula acceptable.
+#[derive(Debug, Clone, PartialEq)]
+pub struct Checkpoint {
+    /// Human label, shown if the check fails.
+    pub label: String,
+    /// The policy that produced it. Without this a consumer could verify a number while
+    /// computing a different scenario from the one the number belongs to.
+    pub policy: PolicyShape,
+    /// Change in total state aid against current law.
+    pub cost: Dollars,
+    /// Total realized aid under the policy.
+    pub realized_aid: Dollars,
+    /// Districts whose aid rises.
+    pub gainers: usize,
+    /// Districts whose aid falls.
+    pub losers: usize,
+    /// Districts the policy does not reach.
+    pub unmoved: usize,
+    /// Districts on the guarantee under the policy.
+    pub on_guarantee: usize,
 }
 
 /// The exported feed.
@@ -105,8 +180,12 @@ pub struct Bundle {
     pub contract_version: String,
     /// What the figures describe and where they came from.
     pub provenance: String,
+    /// The fiscal year the model computes.
+    pub fiscal_year: u16,
     /// Statewide aggregates.
     pub statewide: Statewide,
+    /// Reference results the consumer must reproduce.
+    pub checkpoints: Vec<Checkpoint>,
     /// Per-district records.
     pub districts: Vec<District>,
 }
@@ -129,7 +208,7 @@ fn escape(s: &str) -> String {
 
 fn num(v: f64) -> String {
     if v.is_finite() {
-        format!("{:.4}", v)
+        format!("{v:.4}")
             .trim_end_matches('0')
             .trim_end_matches('.')
             .to_string()
@@ -149,7 +228,7 @@ impl Bundle {
     /// feed diffs cleanly and a regenerated one shows only real changes.
     #[must_use]
     pub fn to_json(&self) -> String {
-        let mut s = String::with_capacity(self.districts.len() * 220 + 1024);
+        let mut s = String::with_capacity(self.districts.len() * 320 + 4096);
         s.push_str("{\n");
         s.push_str(&format!(
             "  \"contract_version\": \"{}\",\n",
@@ -159,6 +238,8 @@ impl Bundle {
             "  \"provenance\": \"{}\",\n",
             escape(&self.provenance)
         ));
+        s.push_str(&format!("  \"fiscal_year\": {},\n", self.fiscal_year));
+
         let w = &self.statewide;
         s.push_str("  \"statewide\": {\n");
         s.push_str(&format!("    \"districts\": {},\n", w.districts));
@@ -166,6 +247,10 @@ impl Bundle {
         s.push_str(&format!(
             "    \"at_millage_floor\": {},\n",
             w.at_millage_floor
+        ));
+        s.push_str(&format!(
+            "    \"at_minimum_state_share\": {},\n",
+            w.at_minimum_state_share
         ));
         s.push_str(&format!(
             "    \"median_valuation_per_pupil\": {},\n",
@@ -184,18 +269,72 @@ impl Bundle {
             num(w.wealth_neutrality_realized)
         ));
         s.push_str(&format!(
-            "    \"guarantee_total\": {}\n",
+            "    \"guarantee_total\": {},\n",
             num(w.guarantee_total)
         ));
-        s.push_str("  },\n  \"districts\": [\n");
+        s.push_str(&format!(
+            "    \"realized_aid_total\": {},\n",
+            num(w.realized_aid_total)
+        ));
+        s.push_str(&format!(
+            "    \"minimum_state_share\": {}\n",
+            num(w.minimum_state_share)
+        ));
+        s.push_str("  },\n");
+
+        s.push_str("  \"checkpoints\": [\n");
+        for (i, c) in self.checkpoints.iter().enumerate() {
+            s.push_str(&format!(
+                "    {{\"label\": \"{}\", \"policy\": {{\"guarantee\": \"{}\", \
+                 \"guarantee_argument\": {}, \"base_cost_scale\": {}, \
+                 \"minimum_state_share\": {}, \"phase_in_base_cost\": {}, \
+                 \"phase_in_categorical\": {}}}, \"cost\": {}, \"realized_aid\": {}, \
+                 \"gainers\": {}, \"losers\": {}, \"unmoved\": {}, \"on_guarantee\": {}}}",
+                escape(&c.label),
+                escape(c.policy.guarantee),
+                num(c.policy.guarantee_argument),
+                num(c.policy.base_cost_scale),
+                num(c.policy.minimum_state_share),
+                num(c.policy.phase_in_base_cost),
+                num(c.policy.phase_in_categorical),
+                num(c.cost),
+                num(c.realized_aid),
+                c.gainers,
+                c.losers,
+                c.unmoved,
+                c.on_guarantee
+            ));
+            if i + 1 < self.checkpoints.len() {
+                s.push(',');
+            }
+            s.push('\n');
+        }
+        s.push_str("  ],\n  \"districts\": [\n");
+
         for (i, d) in self.districts.iter().enumerate() {
             s.push_str("    {");
             s.push_str(&format!("\"irn\": \"{}\", ", escape(&d.irn)));
             s.push_str(&format!("\"name\": \"{}\", ", escape(&d.name)));
             s.push_str(&format!("\"adm\": {}, ", num(d.adm)));
             s.push_str(&format!(
+                "\"current_year_adm\": {}, ",
+                num(d.current_year_adm)
+            ));
+            s.push_str(&format!(
                 "\"base_cost_per_pupil\": {}, ",
                 num(d.base_cost_per_pupil)
+            ));
+            s.push_str(&format!(
+                "\"aggregate_base_cost\": {}, ",
+                num(d.aggregate_base_cost)
+            ));
+            s.push_str(&format!(
+                "\"base_cost_state_share\": {}, ",
+                num(d.base_cost_state_share)
+            ));
+            s.push_str(&format!(
+                "\"categorical_funding\": {}, ",
+                num(d.categorical_funding)
             ));
             s.push_str(&format!(
                 "\"formula_aid_per_pupil\": {}, ",
@@ -208,6 +347,10 @@ impl Bundle {
             s.push_str(&format!("\"guarantee\": {}, ", num(d.guarantee)));
             s.push_str(&format!("\"on_guarantee\": {}, ", d.on_guarantee()));
             s.push_str(&format!("\"at_millage_floor\": {}, ", d.at_millage_floor()));
+            s.push_str(&format!(
+                "\"at_minimum_state_share\": {}, ",
+                d.at_minimum_state_share
+            ));
             s.push_str(&format!(
                 "\"valuation_per_pupil\": {}, ",
                 opt(d.valuation_per_pupil)
@@ -248,15 +391,67 @@ mod tests {
             irn: "049056".into(),
             name: "Northern Local".into(),
             adm: 2_193.81,
+            current_year_adm: 2_107.80,
             base_cost_per_pupil: 8_100.0,
+            aggregate_base_cost: 17_769_861.0,
+            base_cost_state_share: 6_000_000.0,
+            categorical_funding: 8_038_562.0,
             formula_aid_per_pupil: 6_400.0,
             realized_aid_per_pupil: 6_400.0,
             guarantee: 0.0,
+            at_minimum_state_share: false,
             valuation_per_pupil: Some(279_983.24),
             effective_class1_millage: Some(20.0),
             operating_expenditure_per_pupil: Some(11_986.62),
             economically_disadvantaged: Some(0.3881),
             enrollment_change: Some(-0.03),
+        }
+    }
+
+    fn zero_statewide() -> Statewide {
+        Statewide {
+            districts: 1,
+            on_guarantee: 0,
+            at_millage_floor: 1,
+            at_minimum_state_share: 0,
+            median_valuation_per_pupil: 0.0,
+            median_operating_expenditure_per_pupil: 0.0,
+            wealth_neutrality_formula: 0.0,
+            wealth_neutrality_realized: 0.0,
+            guarantee_total: 0.0,
+            realized_aid_total: 0.0,
+            minimum_state_share: 0.1,
+        }
+    }
+
+    fn bundle(districts: Vec<District>, checkpoints: Vec<Checkpoint>) -> Bundle {
+        Bundle {
+            contract_version: CONTRACT_VERSION.into(),
+            provenance: "test".into(),
+            fiscal_year: 2027,
+            statewide: zero_statewide(),
+            checkpoints,
+            districts,
+        }
+    }
+
+    fn checkpoint() -> Checkpoint {
+        Checkpoint {
+            label: "guarantee removed".into(),
+            policy: PolicyShape {
+                guarantee: "removed",
+                guarantee_argument: 0.0,
+                base_cost_scale: 1.0,
+                minimum_state_share: 0.1,
+                phase_in_base_cost: 1.0,
+                phase_in_categorical: 1.0,
+            },
+            cost: -879_000_000.0,
+            realized_aid: 6_402_000_000.0,
+            gainers: 0,
+            losers: 294,
+            unmoved: 315,
+            on_guarantee: 0,
         }
     }
 
@@ -300,27 +495,9 @@ mod tests {
             name: r#"St. "Mary" \ Local"#.into(),
             ..sample()
         };
-        let b = Bundle {
-            contract_version: CONTRACT_VERSION.into(),
-            provenance: "test".into(),
-            statewide: zero_statewide(),
-            districts: vec![odd],
-        };
-        let json = b.to_json();
-        assert!(json.contains(r#"St. \"Mary\" \\ Local"#));
-    }
-
-    fn zero_statewide() -> Statewide {
-        Statewide {
-            districts: 1,
-            on_guarantee: 0,
-            at_millage_floor: 1,
-            median_valuation_per_pupil: 0.0,
-            median_operating_expenditure_per_pupil: 0.0,
-            wealth_neutrality_formula: 0.0,
-            wealth_neutrality_realized: 0.0,
-            guarantee_total: 0.0,
-        }
+        assert!(bundle(vec![odd], vec![])
+            .to_json()
+            .contains(r#"St. \"Mary\" \\ Local"#));
     }
 
     #[test]
@@ -333,13 +510,7 @@ mod tests {
             enrollment_change: None,
             ..sample()
         };
-        let b = Bundle {
-            contract_version: CONTRACT_VERSION.into(),
-            provenance: "test".into(),
-            statewide: zero_statewide(),
-            districts: vec![sparse],
-        };
-        let json = b.to_json();
+        let json = bundle(vec![sparse], vec![]).to_json();
         assert!(json.contains("\"valuation_per_pupil\": null"));
         assert!(
             !json.contains("\"valuation_per_pupil\": 0"),
@@ -349,23 +520,43 @@ mod tests {
 
     #[test]
     fn serialization_is_deterministic() {
-        let b = Bundle {
-            contract_version: CONTRACT_VERSION.into(),
-            provenance: "test".into(),
-            statewide: zero_statewide(),
-            districts: vec![sample(), sample()],
-        };
+        let b = bundle(vec![sample(), sample()], vec![checkpoint()]);
         assert_eq!(b.to_json(), b.to_json());
     }
 
     #[test]
     fn the_bundle_declares_its_contract_version() {
-        let b = Bundle {
-            contract_version: CONTRACT_VERSION.into(),
-            provenance: "test".into(),
-            statewide: zero_statewide(),
-            districts: vec![],
-        };
-        assert!(b.to_json().contains("\"contract_version\": \"1.0.0\""));
+        assert!(bundle(vec![], vec![])
+            .to_json()
+            .contains("\"contract_version\": \"2.0.0\""));
+    }
+
+    #[test]
+    fn checkpoints_carry_the_policy_that_produced_them() {
+        let json = bundle(vec![], vec![checkpoint()]).to_json();
+        assert!(json.contains("\"guarantee\": \"removed\""));
+        assert!(json.contains("\"cost\": -879000000"));
+        assert!(json.contains("\"unmoved\": 315"));
+    }
+
+    #[test]
+    fn an_empty_checkpoint_list_still_produces_valid_json() {
+        assert!(bundle(vec![sample()], vec![])
+            .to_json()
+            .contains("\"checkpoints\": [\n  ],"));
+    }
+
+    #[test]
+    fn the_scenario_inputs_are_present_for_every_district() {
+        // The web layer cannot re-derive a policy without these four.
+        let json = bundle(vec![sample()], vec![]).to_json();
+        for field in [
+            "aggregate_base_cost",
+            "base_cost_state_share",
+            "categorical_funding",
+            "current_year_adm",
+        ] {
+            assert!(json.contains(field), "{field} missing from the feed");
+        }
     }
 }
