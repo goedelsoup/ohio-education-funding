@@ -136,7 +136,7 @@ impl StatewideFactors {
     /// The FY2027 factors, priced from **FY2022** statewide averages.
     ///
     /// Taken from the department's own `FY27 TRAD State Foundation Funding Calculator`. These
-    /// are the inputs [H.B. 96](../../.yidam/corpus/legislation/hb-96-2025.yml) carries forward
+    /// are the inputs [H.B. 96](../../../.yidam/corpus/legislation/hb-96-2025.yml) carries forward
     /// rather than refreshing, so comparing them against
     /// [`Self::fy2022`] shows exactly what one reference-year update was worth: the teacher
     /// salary moved from $62,696.18 to $68,022.22 and the insurance cost from $14,265.53 to

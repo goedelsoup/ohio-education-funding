@@ -1,7 +1,7 @@
 //! Export a versioned JSON feed of the corpus's district-level findings.
 //!
-//! [`web/`](../../web/) consumes a bundled export rather than reading
-//! [`.yidam/corpus/`](../../.yidam/corpus/) directly. The corpus is markdown and YAML written
+//! [`web/`](../../../web/) consumes a bundled export rather than reading
+//! [`.yidam/corpus/`](../../../.yidam/corpus/) directly. The corpus is markdown and YAML written
 //! for traversal by people and agents; the platform needs numbers for 609 districts. This
 //! crate is the seam between them.
 //!
@@ -27,7 +27,7 @@
 //! # Why hand-rolled JSON
 //!
 //! The workspace has no external dependencies, deliberately — a committed
-//! [`scenario`](../../.yidam/corpus/scenario/) result should be reproducible years from now
+//! [`scenario`](../../../.yidam/corpus/scenario/) result should be reproducible years from now
 //! without a dependency resolution succeeding first. Serializing a fixed, known schema is a
 //! few dozen lines, so that constraint costs nothing here.
 
@@ -37,11 +37,78 @@ use edfund_core::Dollars;
 
 /// The bundle schema version. Bump on any change to field names, units, or semantics.
 ///
+/// `3.0.0` added the outcome axis: a nullable `outcome` object per district carrying the
+/// Performance Index, the Progress effect size, need shares, and spending on both denominators,
+/// plus the statewide correlations that say how to read them. Nullable because three districts
+/// have no report card — see [`project::crosswalk`].
+///
 /// `2.0.0` added the scenario inputs and checkpoints, and renamed the enrollment-change years
 /// from FY2022-FY2024 to FY2024-FY2026 — the years the department's `ADM Data` sheet declares.
 /// The values did not change; what they are called did, which is exactly the kind of silent
 /// meaning change the version guard exists for.
-pub const CONTRACT_VERSION: &str = "2.0.0";
+pub const CONTRACT_VERSION: &str = "3.0.0";
+
+/// The outcome side of a district, where the report card covers it.
+///
+/// # Two spending figures and two poverty figures, both on purpose
+///
+/// `per_equivalent_pupil` divides by a need-weighted count and is the department's published
+/// figure; `per_enrolled_pupil` divides by the headcount. Against a composition-driven outcome
+/// the first is substantially a composition proxy, and the corpus's central denominator finding
+/// is the gap between them. Shipping only one would make that finding unstateable in the
+/// interface that is supposed to explain it.
+///
+/// `economically_disadvantaged` is the report card's, which is top-coded by community
+/// eligibility. The profile report's untop-coded share stays on [`District`] itself.
+#[derive(Debug, Clone, Copy, PartialEq)]
+pub struct DistrictOutcome {
+    /// Performance Index, 2024-25. Ohio's attainment-level measure.
+    pub performance_index: Option<f64>,
+    /// Performance Index, 2023-24.
+    pub performance_index_prior: Option<f64>,
+    /// Performance Index, 2022-23.
+    pub performance_index_earliest: Option<f64>,
+    /// Value-added effect size — Ohio's growth measure, already a three-year average.
+    pub progress_effect_size: Option<f64>,
+    /// Operating expenditure per enrolled pupil, FY2025.
+    pub per_enrolled_pupil: Option<Dollars>,
+    /// Operating expenditure per need-weighted pupil, FY2025. The published figure.
+    pub per_equivalent_pupil: Option<Dollars>,
+    /// Economically disadvantaged share, 2024-25, top-coded.
+    pub economically_disadvantaged: Option<f64>,
+    /// English learner share, 2024-25.
+    pub english_learner: Option<f64>,
+    /// Students with disabilities share, 2024-25.
+    pub students_with_disabilities: Option<f64>,
+}
+
+/// Statewide relationships between the funding side and the outcome side.
+///
+/// Every one is a correlation over the joined panel and none identifies an effect. They are in
+/// the feed rather than left to the page to compute, because the page would then have to choose
+/// which poverty measure to control for, and that choice moves the answer.
+#[derive(Debug, Clone, Copy, PartialEq)]
+pub struct OutcomeStatewide {
+    /// Districts with both a funding record and a report card.
+    pub districts: usize,
+    /// Poverty against the Performance Index. The dominant relationship in the data.
+    pub poverty_vs_performance: f64,
+    /// Guarantee status against the Performance Index, raw.
+    pub guarantee_vs_performance: f64,
+    /// The same, holding poverty constant.
+    pub guarantee_vs_performance_controlled: f64,
+    /// Spending per enrolled pupil against growth, holding poverty constant.
+    pub spending_vs_growth_controlled: f64,
+    /// Spending per *weighted* pupil against the Performance Index, raw — the published
+    /// near-zero figure whose denominator the corpus disputes.
+    pub weighted_spending_vs_performance: f64,
+    /// Spending per *enrolled* pupil against the Performance Index, raw.
+    pub enrolled_spending_vs_performance: f64,
+    /// Median Performance Index among districts on the guarantee.
+    pub median_performance_on_guarantee: f64,
+    /// Median Performance Index among districts on the formula.
+    pub median_performance_on_formula: f64,
+}
 
 /// One district, as the web layer needs it.
 #[derive(Debug, Clone, PartialEq)]
@@ -81,6 +148,8 @@ pub struct District {
     /// Enrollment change FY2024 to FY2026, as a fraction. FY2026 is partly departmental
     /// estimate, since the calculator is published before that year closes.
     pub enrollment_change: Option<f64>,
+    /// Achievement, growth, and need. `None` for the three districts with no report card.
+    pub outcome: Option<DistrictOutcome>,
 }
 
 impl District {
@@ -130,6 +199,8 @@ pub struct Statewide {
     pub realized_aid_total: Dollars,
     /// The minimum state share this model operates under.
     pub minimum_state_share: f64,
+    /// How the funding side relates to the outcome side. `None` if no district joined.
+    pub outcomes: Option<OutcomeStatewide>,
 }
 
 /// A policy, in the shape the web layer sends it back.
@@ -277,9 +348,31 @@ impl Bundle {
             num(w.realized_aid_total)
         ));
         s.push_str(&format!(
-            "    \"minimum_state_share\": {}\n",
+            "    \"minimum_state_share\": {},\n",
             num(w.minimum_state_share)
         ));
+        match &w.outcomes {
+            None => s.push_str("    \"outcomes\": null\n"),
+            Some(o) => s.push_str(&format!(
+                "    \"outcomes\": {{\"districts\": {}, \"poverty_vs_performance\": {}, \
+                 \"guarantee_vs_performance\": {}, \
+                 \"guarantee_vs_performance_controlled\": {}, \
+                 \"spending_vs_growth_controlled\": {}, \
+                 \"weighted_spending_vs_performance\": {}, \
+                 \"enrolled_spending_vs_performance\": {}, \
+                 \"median_performance_on_guarantee\": {}, \
+                 \"median_performance_on_formula\": {}}}\n",
+                o.districts,
+                num(o.poverty_vs_performance),
+                num(o.guarantee_vs_performance),
+                num(o.guarantee_vs_performance_controlled),
+                num(o.spending_vs_growth_controlled),
+                num(o.weighted_spending_vs_performance),
+                num(o.enrolled_spending_vs_performance),
+                num(o.median_performance_on_guarantee),
+                num(o.median_performance_on_formula),
+            )),
+        }
         s.push_str("  },\n");
 
         s.push_str("  \"checkpoints\": [\n");
@@ -368,9 +461,29 @@ impl Bundle {
                 opt(d.economically_disadvantaged)
             ));
             s.push_str(&format!(
-                "\"enrollment_change\": {}",
+                "\"enrollment_change\": {}, ",
                 opt(d.enrollment_change)
             ));
+            match &d.outcome {
+                None => s.push_str("\"outcome\": null"),
+                Some(o) => s.push_str(&format!(
+                    "\"outcome\": {{\"performance_index\": {}, \
+                     \"performance_index_prior\": {}, \
+                     \"performance_index_earliest\": {}, \
+                     \"progress_effect_size\": {}, \"per_enrolled_pupil\": {}, \
+                     \"per_equivalent_pupil\": {}, \"economically_disadvantaged\": {}, \
+                     \"english_learner\": {}, \"students_with_disabilities\": {}}}",
+                    opt(o.performance_index),
+                    opt(o.performance_index_prior),
+                    opt(o.performance_index_earliest),
+                    opt(o.progress_effect_size),
+                    opt(o.per_enrolled_pupil),
+                    opt(o.per_equivalent_pupil),
+                    opt(o.economically_disadvantaged),
+                    opt(o.english_learner),
+                    opt(o.students_with_disabilities),
+                )),
+            }
             s.push('}');
             if i + 1 < self.districts.len() {
                 s.push(',');
@@ -405,6 +518,17 @@ mod tests {
             operating_expenditure_per_pupil: Some(11_986.62),
             economically_disadvantaged: Some(0.3881),
             enrollment_change: Some(-0.03),
+            outcome: Some(DistrictOutcome {
+                performance_index: Some(89.9),
+                performance_index_prior: Some(89.1),
+                performance_index_earliest: Some(88.4),
+                progress_effect_size: Some(0.0),
+                per_enrolled_pupil: Some(14_512.0),
+                per_equivalent_pupil: Some(11_986.62),
+                economically_disadvantaged: Some(38.8),
+                english_learner: Some(0.4),
+                students_with_disabilities: Some(15.2),
+            }),
         }
     }
 
@@ -421,6 +545,17 @@ mod tests {
             guarantee_total: 0.0,
             realized_aid_total: 0.0,
             minimum_state_share: 0.1,
+            outcomes: Some(OutcomeStatewide {
+                districts: 606,
+                poverty_vs_performance: -0.846,
+                guarantee_vs_performance: 0.187,
+                guarantee_vs_performance_controlled: 0.035,
+                spending_vs_growth_controlled: 0.146,
+                weighted_spending_vs_performance: -0.015,
+                enrolled_spending_vs_performance: -0.337,
+                median_performance_on_guarantee: 89.9,
+                median_performance_on_formula: 85.6,
+            }),
         }
     }
 
@@ -528,7 +663,38 @@ mod tests {
     fn the_bundle_declares_its_contract_version() {
         assert!(bundle(vec![], vec![])
             .to_json()
-            .contains("\"contract_version\": \"2.0.0\""));
+            .contains("\"contract_version\": \"3.0.0\""));
+    }
+
+    #[test]
+    fn a_district_without_a_report_card_serializes_a_null_outcome() {
+        // Three districts have none. `null` rather than an object of nulls, so a consumer can
+        // tell "no report card" from "a report card with nothing in it".
+        let none = District {
+            outcome: None,
+            ..sample()
+        };
+        let json = bundle(vec![none], vec![]).to_json();
+        assert!(json.contains("\"outcome\": null"));
+        assert!(!json.contains("\"performance_index\""));
+    }
+
+    #[test]
+    fn the_outcome_block_carries_both_spending_denominators() {
+        // The corpus's central denominator finding is the gap between them. Shipping one would
+        // make it unstateable in the interface meant to explain it.
+        let json = bundle(vec![sample()], vec![]).to_json();
+        assert!(json.contains("\"per_enrolled_pupil\": 14512"));
+        assert!(json.contains("\"per_equivalent_pupil\": 11986.62"));
+    }
+
+    #[test]
+    fn the_statewide_outcomes_carry_the_raw_and_the_controlled_figure() {
+        // A page showing +0.187 without +0.035 beside it would be stating the confound as a
+        // finding, which is the specific thing this axis was built to prevent.
+        let json = bundle(vec![], vec![]).to_json();
+        assert!(json.contains("\"guarantee_vs_performance\": 0.187"));
+        assert!(json.contains("\"guarantee_vs_performance_controlled\": 0.035"));
     }
 
     #[test]

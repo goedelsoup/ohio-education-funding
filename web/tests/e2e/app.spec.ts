@@ -31,7 +31,7 @@ test.describe("boot", () => {
     const response = await request.get("/data/bundle.json");
     expect(response.status()).toBe(200);
     const bundle = await response.json();
-    expect(bundle.contract_version).toBe("2.0.0");
+    expect(bundle.contract_version).toBe("3.0.0");
     expect(bundle.districts).toHaveLength(609);
   });
 
@@ -260,5 +260,58 @@ test.describe("presentation", () => {
       () => document.documentElement.scrollWidth - document.documentElement.clientWidth,
     );
     expect(overflow, "the document scrolls horizontally").toBeLessThanOrEqual(0);
+  });
+});
+
+test.describe("the outcome view", () => {
+  test("shows the raw guarantee association and the controlled one on the same screen", async ({
+    page,
+  }) => {
+    // The specific thing this view exists to prevent is a reader taking +0.187 as a finding.
+    // If the controlled figure ever stops being rendered beside it, this fails.
+    await page.goto("/#outcomes");
+    const panel = page.locator('[data-panel="outcomes"]');
+    await expect(panel).toBeVisible();
+    await expect(panel).toContainText("+0.187");
+    await expect(panel).toContainText("+0.035");
+    await expect(panel).toContainText("holding poverty constant");
+  });
+
+  test("names both spending denominators rather than quoting one number", async ({ page }) => {
+    await page.goto("/#outcomes");
+    const panel = page.locator('[data-panel="outcomes"]');
+    await expect(panel).toContainText("need-weighted");
+    await expect(panel).toContainText("enrolled");
+  });
+
+  test("the poverty chart falls left to right", async ({ page }) => {
+    await page.goto("/#outcomes");
+    // toHaveCount auto-retries; allTextContents does not, and the panel is written by script
+    // after the feed loads.
+    const labels = page.locator('[data-chart="poverty-quintiles"] .bar-value');
+    await expect(labels).toHaveCount(5);
+    const numbers = (await labels.allTextContents()).map(Number);
+    for (let i = 1; i < numbers.length; i++) {
+      expect(numbers[i]!).toBeLessThan(numbers[i - 1]!);
+    }
+  });
+
+  test("a district with no report card says so instead of showing blanks", async ({ page }) => {
+    // Kelleys Island: in the funding model, absent from every outcome file.
+    await page.goto("/#district/046797");
+    await expect(page.locator("#district-out")).toContainText("No report card is published");
+  });
+
+  test("a district with a report card shows its three-year index", async ({ page }) => {
+    await page.goto("/#district/049056");
+    const out = page.locator("#district-out");
+    await expect(out).toContainText("Performance Index, 2024-25");
+    await expect(out).toContainText("Performance Index, 2022-23");
+  });
+
+  test("the outcome tab is linkable like the others", async ({ page }) => {
+    await page.goto("/");
+    await page.getByRole("tab", { name: "Outcomes" }).click();
+    await expect(page).toHaveURL(/#outcomes$/);
   });
 });

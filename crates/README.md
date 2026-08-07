@@ -59,15 +59,15 @@ pre-2007 `.xls` format.
 | Crate | Kind | Status | Tests |
 |---|---|---|---|
 | [`edfund-core`](edfund-core/) | types | shared `FiscalYear`, `AgencyType`, rounding | 7 |
-| [`spreadsheet`](spreadsheet/) | reader | inflate, zip, XML, XLSX — no dependencies | 47 |
-| [`connect`](connect/) | connectors | registry, cache, digests, fixture builders | 58 |
+| [`spreadsheet`](spreadsheet/) | reader | inflate, zip, XML, XLSX — no dependencies | 48 |
+| [`connect`](connect/) | connectors | registry, cache, digests, fixture builders | 62 |
 | [`deflate`](deflate/) | calculator | implemented; series verified against BLS | 11 |
-| [`local-capacity`](local-capacity/) | calculator | FSFP side implemented; charge-off side not | 16 |
+| [`local-capacity`](local-capacity/) | calculator | FSFP side implemented; charge-off side not | 18 |
 | [`foundation`](foundation/) | calculator | full base cost build-up; verified to the cent | 43 |
 | [`millage`](millage/) | calculator | implemented; verified on 606 real districts | 13 |
-| [`dispersion`](dispersion/) | calculator | implemented; verified on 606 real districts | 20 |
-| [`project`](project/) | calculator | forward projection and policy simulation | 39 |
-| [`bundle`](bundle/) | export | versioned feed and scenario checkpoints for [`web/`](../web/) | 10 |
+| [`dispersion`](dispersion/) | calculator | dispersion, correlation, partial, OLS | 61 |
+| [`project`](project/) | calculator | projection, policy levers, the district crosswalk | 66 |
+| [`bundle`](bundle/) | export | versioned feed and scenario checkpoints for [`web/`](../web/) | 13 |
 
 `spreadsheet` and `connect` are the retrieval side: everything that can fail, and nothing that
 computes a funding figure. `bundle` is the export seam between the corpus and the web layer.

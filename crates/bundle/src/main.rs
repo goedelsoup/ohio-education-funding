@@ -11,8 +11,12 @@
 
 use std::collections::HashMap;
 
-use bundle::{Bundle, Checkpoint, District, PolicyShape, Statewide, CONTRACT_VERSION};
-use dispersion::wealth_neutrality;
+use bundle::{
+    Bundle, Checkpoint, District, DistrictOutcome, OutcomeStatewide, PolicyShape, Statewide,
+    CONTRACT_VERSION,
+};
+use dispersion::{partial_correlation, wealth_neutrality};
+use project::outcomes::{joined, Joined};
 use project::panel::{panel, DistrictRecord, MINIMUM_STATE_SHARE, MODEL_YEAR};
 use project::policy::{GuaranteeRule, Policy};
 use project::report::simulate;
@@ -119,7 +123,96 @@ fn checkpoint_policies() -> Vec<(&'static str, Policy, PolicyShape)> {
     ]
 }
 
-fn to_district(record: &DistrictRecord, profile: Option<&&str>) -> District {
+/// Pearson correlation over two equal-length series.
+fn correlation(xs: &[f64], ys: &[f64]) -> f64 {
+    wealth_neutrality(xs, ys).map_or(f64::NAN, |w| w.correlation)
+}
+
+/// `xs` against `ys` holding `control` constant.
+fn controlling_for(xs: &[f64], ys: &[f64], control: &[f64]) -> f64 {
+    partial_correlation(
+        correlation(xs, ys),
+        correlation(xs, control),
+        correlation(ys, control),
+    )
+    .unwrap_or(f64::NAN)
+}
+
+/// Three aligned series over the districts where every one of the three is present.
+fn aligned(
+    records: &[Joined],
+    x: impl Fn(&Joined) -> Option<f64>,
+    y: impl Fn(&Joined) -> Option<f64>,
+) -> (Vec<f64>, Vec<f64>, Vec<f64>) {
+    let mut xs = Vec::new();
+    let mut ys = Vec::new();
+    let mut control = Vec::new();
+    for record in records {
+        let (Some(a), Some(b), Some(c)) = (x(record), y(record), record.economically_disadvantaged)
+        else {
+            continue;
+        };
+        xs.push(a);
+        ys.push(b);
+        control.push(c);
+    }
+    (xs, ys, control)
+}
+
+/// The statewide outcome block, or `None` if nothing joined.
+fn outcome_statewide(records: &[Joined]) -> Option<OutcomeStatewide> {
+    if records.is_empty() {
+        return None;
+    }
+    let index = |r: &Joined| r.outcome.performance_index;
+    let growth = |r: &Joined| r.outcome.progress_effect_size;
+    let guarantee = |r: &Joined| Some(if r.on_guarantee() { 1.0 } else { 0.0 });
+    let enrolled = |r: &Joined| r.outcome.per_enrolled_pupil();
+    let weighted = |r: &Joined| r.outcome.per_equivalent_pupil;
+
+    let (poverty_series, index_series, _) =
+        aligned(records, |r| r.economically_disadvantaged, index);
+    let (guarantee_series, guarantee_index, guarantee_poverty) = aligned(records, guarantee, index);
+    let (spend_series, growth_series, spend_poverty) = aligned(records, enrolled, growth);
+    let (weighted_series, weighted_index, _) = aligned(records, weighted, index);
+    let (enrolled_series, enrolled_index, _) = aligned(records, enrolled, index);
+
+    let median_index = |on: bool| {
+        median(
+            records
+                .iter()
+                .filter(|r| r.on_guarantee() == on)
+                .filter_map(index)
+                .collect(),
+        )
+    };
+
+    Some(OutcomeStatewide {
+        districts: records.len(),
+        poverty_vs_performance: correlation(&poverty_series, &index_series),
+        guarantee_vs_performance: correlation(&guarantee_series, &guarantee_index),
+        guarantee_vs_performance_controlled: controlling_for(
+            &guarantee_series,
+            &guarantee_index,
+            &guarantee_poverty,
+        ),
+        spending_vs_growth_controlled: controlling_for(
+            &spend_series,
+            &growth_series,
+            &spend_poverty,
+        ),
+        weighted_spending_vs_performance: correlation(&weighted_series, &weighted_index),
+        enrolled_spending_vs_performance: correlation(&enrolled_series, &enrolled_index),
+        median_performance_on_guarantee: median_index(true),
+        median_performance_on_formula: median_index(false),
+    })
+}
+
+fn to_district(
+    record: &DistrictRecord,
+    profile: Option<&&str>,
+    outcome: Option<&Joined>,
+) -> District {
     let adm = record.base_cost_adm();
     District {
         irn: record.irn.clone(),
@@ -144,6 +237,17 @@ fn to_district(record: &DistrictRecord, profile: Option<&&str>) -> District {
             let [first, _, last] = record.adm_history;
             (first > 0.0).then(|| last / first - 1.0)
         },
+        outcome: outcome.map(|joined| DistrictOutcome {
+            performance_index: joined.outcome.performance_index,
+            performance_index_prior: joined.outcome.performance_index_prior,
+            performance_index_earliest: joined.outcome.performance_index_earliest,
+            progress_effect_size: joined.outcome.progress_effect_size,
+            per_enrolled_pupil: joined.outcome.per_enrolled_pupil(),
+            per_equivalent_pupil: joined.outcome.per_equivalent_pupil,
+            economically_disadvantaged: joined.outcome.economically_disadvantaged,
+            english_learner: joined.outcome.english_learner,
+            students_with_disabilities: joined.outcome.students_with_disabilities,
+        }),
     }
 }
 
@@ -158,9 +262,16 @@ fn main() {
         .collect();
 
     let records = panel();
+    let outcomes = joined();
     let districts: Vec<District> = records
         .iter()
-        .map(|record| to_district(record, profile.get(record.irn.as_str())))
+        .map(|record| {
+            to_district(
+                record,
+                profile.get(record.irn.as_str()),
+                outcomes.iter().find(|j| j.funding.irn == record.irn),
+            )
+        })
         .collect();
 
     let paired: Vec<(f64, f64, f64)> = districts
@@ -199,6 +310,7 @@ fn main() {
         guarantee_total: districts.iter().map(|d| d.guarantee).sum(),
         realized_aid_total: records.iter().map(DistrictRecord::realized_aid).sum(),
         minimum_state_share: MINIMUM_STATE_SHARE,
+        outcomes: outcome_statewide(&outcomes),
     };
 
     let checkpoints: Vec<Checkpoint> = checkpoint_policies()
@@ -224,7 +336,9 @@ fn main() {
                      an actual) joined with the FY2024 District Profile Report. Base cost, \
                      guarantee, and formula funding are FY2027; enrolled ADM is FY2024-FY2026, \
                      of which FY2026 is partly departmental estimate; millage is TY2023; \
-                     expenditure and demographics are FY2024. See .yidam/catalog/."
+                     expenditure and demographics are FY2024. Achievement, growth, need, and \
+                     FY2025 spending are the 2024-25 Ohio School Report Card, joined on IRN \
+                     across the 606 districts every panel covers. See .yidam/catalog/."
             .to_string(),
         fiscal_year: MODEL_YEAR.0,
         statewide,

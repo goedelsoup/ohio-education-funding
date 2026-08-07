@@ -33,7 +33,9 @@ projection depends on floor status, which is itself a projected quantity.
 ## Status
 
 **Implemented** in [`crates/project`](../../crates/project/). Enrollment projection with
-intervals, and a policy simulator over it.
+intervals, a policy simulator over it, and — since the outcome axis arrived — the district
+crosswalk and the funding-to-report-card join that every joined statement in this corpus is
+now computed on.
 
 The earlier reading — that this belonged outside `crates/` because the mature time-series
 tooling is Python — no longer holds: `packages/` has been retired and the whole domain computer

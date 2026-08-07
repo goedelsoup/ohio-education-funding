@@ -6,7 +6,7 @@
 //!
 //! # The connector/calculator split
 //!
-//! [PHASES.md](../../.yidam/.vendor/prelude/PHASES.md) draws the line: connectors are
+//! [PHASES.md](../../../.yidam/.vendor/prelude/PHASES.md) draws the line: connectors are
 //! side-effecting and may fail, calculators are pure and deterministic. Everything here can
 //! fail — a URL moves, a workbook changes shape, the network is not there. Nothing here
 //! computes a funding figure. That is why an extraction commit and an assessment commit have
@@ -16,7 +16,7 @@
 //!
 //! Extraction can be re-run freely *because* the findings are pinned downstream. A source
 //! revision that moves the guarantee count, the millage floor count, or a scenario result fails
-//! a test in [`foundation`](../foundation/) or [`dispersion`](../dispersion/) rather than
+//! a test in [`foundation`](../../foundation/) or [`dispersion`](../../dispersion/) rather than
 //! passing silently into the corpus. The digest manifest in [`cache`] closes the other
 //! direction: it records exactly which published file a fixture was built from, so a changed
 //! answer can always be traced to a changed source.

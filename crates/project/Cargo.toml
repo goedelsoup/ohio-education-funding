@@ -11,6 +11,9 @@ edfund-core = { path = "../edfund-core" }
 foundation = { path = "../foundation" }
 local-capacity = { path = "../local-capacity" }
 
+[dev-dependencies]
+dispersion = { path = "../dispersion" }
+
 [[bin]]
 name = "edfund-project"
 path = "src/main.rs"
