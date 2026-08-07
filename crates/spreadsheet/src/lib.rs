@@ -6,15 +6,15 @@
 //!
 //! # Why that constraint is kept here too
 //!
-//! [`edfund_core`](../edfund_core/) explains the rule for calculators: a
-//! [`scenario`](../../.yidam/corpus/scenario/) result should be reproducible years from now
+//! [`edfund_core`](../../edfund-core/) explains the rule for calculators: a
+//! [`scenario`](../../../.yidam/corpus/scenario/) result should be reproducible years from now
 //! without a dependency resolution succeeding first. The rule matters at least as much on the
 //! retrieval side, where the alternative is an extraction pipeline that stops working when a
 //! transitive dependency yanks a version — and an extraction pipeline that will not run is a
 //! corpus that cannot be refreshed.
 //!
 //! This layer knows about *formats*. It knows nothing about Ohio: no IRNs, no fiscal years, no
-//! suppressed-count conventions. Those live in [`connect`](../connect/), which is where the
+//! suppressed-count conventions. Those live in [`connect`](../../connect/), which is where the
 //! department-specific knowledge belongs and where it can be revised when a publication
 //! changes shape.
 //!

@@ -40,7 +40,7 @@ calendar year of the same number.
 
 ## Status
 
-**Implemented** in [`crates/deflate/`](../../crates/deflate/src/lib.rs). 10 tests.
+**Implemented** in [`crates/deflate/`](../../crates/deflate/src/lib.rs). 11 tests.
 
 The CPI-U June series for FY2000-FY2022 is committed as a fixture. Three tests reproduce the
 Ohio Auditor of State's independently published figures exactly — 71.9% CPI growth, 26.1% real

@@ -52,7 +52,7 @@ claim.
 
 ## Status
 
-**Implemented** in [`crates/dispersion/`](../../crates/dispersion/src/lib.rs). 20 tests —
+**Implemented** in [`crates/dispersion/`](../../crates/dispersion/src/lib.rs). 61 tests —
 9 unit, 11 integration against real data.
 
 The crate is pure: it takes slices and returns statistics, with no filesystem or network. The

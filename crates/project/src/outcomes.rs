@@ -19,7 +19,7 @@
 //! corpus finding by a tenth and look like tidying.
 //!
 //! [`ReportCard::economically_disadvantaged`] is the report card's. The profile report's stays
-//! where it is, in [`crate::panel`]'s sibling fixture, and callers controlling for poverty
+//! where it is, in [`mod@crate::panel`]'s sibling fixture, and callers controlling for poverty
 //! should say which one they used.
 
 use edfund_core::Dollars;

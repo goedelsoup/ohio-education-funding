@@ -16,7 +16,7 @@
 //!
 //! # Two acts, kept apart
 //!
-//! The [`project` skill](../../.yidam/skills/project.md) sets the rule this crate is organised
+//! The [`project` skill](../../../.yidam/skills/project.md) sets the rule this crate is organised
 //! around: **simulation and projection are not the same epistemic act.** Re-running a formula
 //! with a changed parameter is deterministic. Projecting enrollment five years out is a
 //! forecast. A result that adds them together reports forecast error as though it were policy
@@ -36,7 +36,7 @@
 //!
 //! [`series::Method::Assumed`] therefore exists: a caller may supply a rate, and it is recorded
 //! as the caller's assumption rather than as something fitted. Getting past that needs the
-//! `tax-abstract` connector, which is [declared and blocked](../connect/sources/tax-abstract.md).
+//! `tax-abstract` connector, which is [declared and blocked](../../connect/sources/tax-abstract.md).
 //! Since local capacity is 60% valuation, every projection of the *local* side of Ohio school
 //! funding is currently an assumption wearing a number.
 //!

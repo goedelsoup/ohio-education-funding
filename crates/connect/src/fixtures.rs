@@ -597,7 +597,7 @@ pub const FUNCTIONS_FIXTURE: &str = "crates/dispersion/fixtures/expenditure-func
 /// uses.
 ///
 /// Committing the extract rather than the whole file is what makes the deflator's verification
-/// hermetic: [`deflate`](../deflate/) can claim its index points are checked against the
+/// hermetic: [`deflate`](../../deflate/) can claim its index points are checked against the
 /// agency, and a test proves it without a network. Lines are kept in their published form so
 /// [`crate::cpi::parse_series`] reads the extract and the original identically.
 #[must_use]

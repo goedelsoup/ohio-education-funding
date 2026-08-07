@@ -21,8 +21,8 @@
 //! 114.4. The fourth-smallest district, Vanlue Local at 123.9, appears in all three panels.
 //! Every other district in the state appears in all three, so the complete panel is **606**.
 //!
-//! That the exclusions track size is [verified] from the data. *Why* each publication draws its
-//! line where it does is [inference]: neither the report card nor the profile report states a
+//! That the exclusions track size is `[verified]` from the data. *Why* each publication draws its
+//! line where it does is `[inference]`: neither the report card nor the profile report states a
 //! minimum-size rule in the files this corpus holds, and Put-in-Bay's appearing in one but not
 //! the other means there is more than one rule at work.
 //!

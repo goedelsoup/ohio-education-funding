@@ -9,8 +9,8 @@
 //! So the interval does not come from the district's own history. It comes from the
 //! **cross-sectional spread of district growth rates**: we do not know how variable this
 //! district is, but we know how much districts differ from one another, and that is a defensible
-//! floor on the uncertainty. Every [`Interval`] records which prior produced it, because an
-//! interval whose provenance is unstated is decoration.
+//! floor on the uncertainty. Every [`Projection`] records the [`Prior`] that produced its
+//! interval, because an interval whose provenance is unstated is decoration.
 
 use edfund_core::FiscalYear;
 
@@ -25,7 +25,7 @@ pub struct Observation {
 
 /// Whether a figure rests on observed inputs or projected ones.
 ///
-/// This is the distinction the [`project` skill](../../.yidam/skills/project.md) insists on:
+/// This is the distinction the [`project` skill](../../../.yidam/skills/project.md) insists on:
 /// re-running a formula with a changed parameter is deterministic, and forecasting enrollment
 /// five years out is not. A result that mixes them without saying so reports forecast error as
 /// though it were policy effect.

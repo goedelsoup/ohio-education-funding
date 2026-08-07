@@ -27,6 +27,36 @@ description: |
   rate runs 13%, 37%, 68%, 76% — monotonic, and three-quarters of Ohio's wealthiest districts
   are held above what the formula computes for them. [verified]
 
+  **DOES IT BUY ANYTHING? THE CORPUS CAN NOW ASK, AND THE ANSWER IS NO — CAREFULLY.**
+  Joining the funding model to the 2024-25 report card across the 606 districts every panel
+  covers, guarantee status looks like it predicts achievement: districts on the guarantee score
+  **+0.187** against the Performance Index, median 89.9 against 85.6. Holding economic
+  disadvantage constant the association is **+0.035**. [verified — see
+  [`crates/project/tests/guarantee_and_outcomes.rs`](../../../crates/project/tests/guarantee_and_outcomes.rs)]
+
+  The whole of it is poverty. Guaranteed districts are less poor — median economically
+  disadvantaged share 42.8% against 51.9% — which is the same wealth gradient established
+  above, arriving on the outcome side as an achievement effect that is not there. The result
+  holds for Ohio's growth measure as well, and for a continuous reading of guarantee dependence
+  rather than the binary one: every combination lands under 0.06 once poverty is held. [verified]
+
+  This is the sharpest instance of a rule this corpus wrote down after being caught by it: most
+  district-level correlates of the Performance Index are poverty in disguise.
+
+  **What it does not say.** Not that the guarantee is useless, and not that its money does
+  nothing. Districts are not assigned to the guarantee at random — they are on it because their
+  FY2020 receipt exceeded what the formula now computes, which is a function of the same wealth
+  and enrollment history that predicts their outcomes. Nothing here identifies an effect. What
+  it rules out is the argument from the raw gap: *guaranteed districts perform better, so the
+  guarantee is working.* That gap is a composition artifact. [inference]
+
+  A caution the same join makes checkable. **State aid per pupil is not a spending measure.** It
+  is 38% of the median district's operating budget and substitutes for local revenue rather than
+  adding to it: holding poverty constant, state aid per pupil and total operating spending per
+  pupil track each other at +0.035. So the corpus's +0.146 for spending against growth and the
+  -0.247 for aid against growth are not in tension — they are different variables, and reading
+  one as the other is a mistake this node exists to make hard. [verified]
+
   The mechanism is not mysterious. Under the plan's own logic a property-wealthy district has
   high local capacity, so its computed state share is small — that is the formula working as
   designed. The guarantee then overrides that result and pays the district what it used to get.

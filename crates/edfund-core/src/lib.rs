@@ -2,7 +2,7 @@
 //!
 //! Deliberately dependency-free. Every calculator in this workspace is pure and
 //! deterministic — no network, no filesystem, no clock — so that a
-//! [`scenario`](../../.yidam/corpus/scenario/) node can commit its output as a
+//! [`scenario`](../../../.yidam/corpus/scenario/) node can commit its output as a
 //! reproducible knowledge claim.
 //!
 //! # On money and floating point

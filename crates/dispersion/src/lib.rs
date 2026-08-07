@@ -1,6 +1,6 @@
 //! Equity statistics over Ohio education agencies.
 //!
-//! This crate turns [`doctrine/equity`](../../.yidam/corpus/doctrine/equity.yml) from a
+//! This crate turns [`doctrine/equity`](../../../.yidam/corpus/doctrine/equity.yml) from a
 //! rhetorical position into a hypothesis about data. Equity claims in school finance are
 //! claims about a *distribution*, and the standard measures disagree with each other by
 //! design — which is the point.

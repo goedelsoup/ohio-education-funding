@@ -284,8 +284,16 @@ fn the_published_near_zero_correlation_turns_on_a_single_tiny_district() {
     // enrolled-denominator figure moves by a twentieth over the same swap. A near-zero result
     // that one small district can move by seventy percent was never carrying much.
     let records = joined();
-    let (weighted, index, _) = series(&records, |r| r.outcome.per_equivalent_pupil, performance_index);
-    let (enrolled, index_again, _) = series(&records, |r| r.outcome.per_enrolled_pupil(), performance_index);
+    let (weighted, index, _) = series(
+        &records,
+        |r| r.outcome.per_equivalent_pupil,
+        performance_index,
+    );
+    let (enrolled, index_again, _) = series(
+        &records,
+        |r| r.outcome.per_enrolled_pupil(),
+        performance_index,
+    );
 
     let weighted_606 = correlation(&weighted, &index);
     let enrolled_606 = correlation(&enrolled, &index_again);

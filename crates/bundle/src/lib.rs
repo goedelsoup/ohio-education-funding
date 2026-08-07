@@ -1,7 +1,7 @@
 //! Export a versioned JSON feed of the corpus's district-level findings.
 //!
-//! [`web/`](../../web/) consumes a bundled export rather than reading
-//! [`.yidam/corpus/`](../../.yidam/corpus/) directly. The corpus is markdown and YAML written
+//! [`web/`](../../../web/) consumes a bundled export rather than reading
+//! [`.yidam/corpus/`](../../../.yidam/corpus/) directly. The corpus is markdown and YAML written
 //! for traversal by people and agents; the platform needs numbers for 609 districts. This
 //! crate is the seam between them.
 //!
@@ -27,7 +27,7 @@
 //! # Why hand-rolled JSON
 //!
 //! The workspace has no external dependencies, deliberately — a committed
-//! [`scenario`](../../.yidam/corpus/scenario/) result should be reproducible years from now
+//! [`scenario`](../../../.yidam/corpus/scenario/) result should be reproducible years from now
 //! without a dependency resolution succeeding first. Serializing a fixed, known schema is a
 //! few dozen lines, so that constraint costs nothing here.
 

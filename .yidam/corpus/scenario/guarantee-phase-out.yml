@@ -72,57 +72,72 @@ description: |
   Only **two** districts move onto the guarantee between FY2027 and FY2032 under current law,
   294 to 292 — enrollment decline barely changes the count, because it is already nearly half.
 properties:
-  regime: fair-school-funding-plan
-  fiscal_year: 2027
-  baseline: |
-    The department's FY2027 TRAD State Foundation Funding Calculator, published 16 December
-    2025. Reproduced to the cent by `project::policy::current_law`, which is what makes every
-    delta above a difference rather than an estimate.
-  levers: |
-    guarantee            as-enacted | removed | rebase:<factor> | phase-out:<remaining>
-    base_cost_scale      multiplier on aggregate base cost
-    minimum_state_share  10% in this model, not the 5% the plan was enacted with
-    phase_in             base cost and categoricals separately
-  method: |
-    Simulation at observed enrollment for every figure except the FY2032 block, which projects
-    each district's enrolled ADM by a damped trend (damping 0.85) from its FY2024-FY2026
-    history and re-runs the whole formula at the low, central, and high ends of each band.
+  name: Phasing out the temporary transitional aid guarantee
+  question: |
+    What does removing, re-basing, or phasing out the temporary transitional aid guarantee do
+    to Ohio's districts, and what does raising base cost cost while it is in place?
+  perturbations: |
+    guarantee            as-enacted -> removed | rebase:<factor> | phase-out:<remaining>
+    base_cost_scale      1.00 -> 1.02, 1.05, 1.10, 1.20
+    minimum_state_share  0.10 as enacted for FY2026-27, not the 0.05 the plan began with
+    phase_in             base cost and categoricals separately, both 1.00 at baseline
 
-    The interval is re-run rather than scaled because the guarantee is a `max`: a district can
-    be on formula at high enrollment and on the guarantee at low enrollment, and the aid curve
-    has a kink there that scaling a central answer cannot reproduce.
-  caveats: |
-    **The interval is not this district's uncertainty.** Three observations cannot estimate a
-    variance. It rests on the cross-sectional spread of district growth rates — how much
-    districts differ from one another — used as a floor. A district with genuinely volatile
-    enrollment has a wider true interval than this reports. [open]
+    Every run is a simulation at observed enrollment against the department's own FY2027 model,
+    which `project::policy::current_law` reproduces to the cent for all 609 districts. Only the
+    FY2032 block projects anything.
+  input_projections: |
+    One leg only, and it is reported apart from every other figure. Enrolled ADM is carried to
+    FY2032 by a damped trend (damping 0.85) from each district's FY2024-FY2026 history, and the
+    whole formula is re-run at the low, central, and high end of each district's band rather
+    than scaling a central answer — the guarantee is a `max`, so the aid curve has a kink that
+    scaling cannot reproduce.
 
-    **FY2026 is not fully an actual.** The calculator is published before that fiscal year
-    closes, so the last observation in every history is partly departmental estimate.
+    Assessed valuation is held fixed. It cannot be projected: the corpus has one observation per
+    district and Ohio valuation steps on a county reappraisal cycle rather than moving smoothly.
+    Local capacity is 60% valuation, so the local side of every projection here is an assumption.
+  horizon: FY2027, with one projected leg to FY2032
+  results_path: |
+    crates/project — `cargo run -p project --bin edfund-project -- --guarantee <rule>`.
+    Pinned by crates/project/tests/ and by the checkpoints in crates/bundle, which the web
+    layer re-derives and must reproduce before it will render a scenario.
+  results: |
+    removal              -$879.0M    294 districts cut, 315 untouched
+    half phase-out       -$439.5M    294 districts cut, 315 untouched
+    rebase to 90%        -$248.2M    294 districts cut, 315 untouched
 
-    **The damping factor is a convention, not an estimate.** 0.85 is what damped-trend
-    forecasting commonly defaults to; three observations cannot identify it and there is no
-    Ohio-specific study here to borrow one from. [open]
+    base cost   state cost    on guarantee    marginal cost per point
+    +2%          +$95.4M          272            $47.7M
+    +5%         +$255.3M          247            $53.3M
+    +10%        +$569.7M          207            $62.9M
+    +20%       +$1,294.6M         156            $72.5M
 
-    **Valuation is held fixed.** It cannot be projected — the corpus has one observation per
-    district. Local capacity is 60% valuation, so a scenario in which property values move
-    differently from enrollment is out of reach until
-    [`tax-abstract`](../../../crates/connect/sources/tax-abstract.md) exists. Every figure here
-    holds the local side still, which is certainly wrong and unquantifiably so. [open]
+    FY2032 at projected enrollment, current law: $7,125M in a band of $6,889M to $7,379M.
+    The same with the guarantee removed: $6,060M in a band of $5,711M to $6,430M.
+  confidence: |
+    The simulation figures are exact against the department's model and carry no interval.
 
-    **138 districts sit at the minimum state share** and their response to a base cost increase
+    The FY2032 band is not this district's uncertainty. Three observations cannot estimate a
+    variance, so the interval rests on the cross-sectional spread of district growth rates used
+    as a floor; a district with genuinely volatile enrollment has a wider true interval than
+    this reports. FY2026 is itself partly departmental estimate. The damping factor is a
+    convention rather than a fitted parameter. [open]
+
+    138 districts sit at the minimum state share and their response to a base cost increase
     cannot be computed, because the floor censors the quantity it would be computed from. They
-    are held at the floor, which understates the gain for any whose local capacity is only just
-    above the threshold — so the marginal-cost table above is a **lower bound**. [inference]
-relations:
-  perturbs:
-    - ../formula-component/fsfp-base-cost-calculation.yml
-    - ../formula-component/temporary-transitional-aid-guarantee.yml
-    - ../parameter/fsfp-phase-in-percentage.yml
-  refines:
-    - ./fsfp-input-year-refresh.yml
-  evidence:
-    - ../../catalog/dew-fy27-funding-calculator.md
-  bears_on:
-    - ../doctrine/equity.yml
-    - ../funding-regime/bridge-formula.yml
+    are held at the floor, which makes the marginal-cost table a lower bound. [inference]
+links: |
+  Perturbs [fsfp-base-cost-calculation](../formula-component/fsfp-base-cost-calculation.yml)
+  and [temporary-transitional-aid-guarantee](../formula-component/temporary-transitional-aid-guarantee.yml),
+  against the [fsfp-phase-in-percentage](../parameter/fsfp-phase-in-percentage.yml) and
+  [base-cost-per-pupil](../parameter/base-cost-per-pupil.yml) parameters.
+
+  Baselines on [fair-school-funding-plan](../funding-regime/fair-school-funding-plan.yml), and
+  the guarantee's own baseline is a year of [bridge-formula](../funding-regime/bridge-formula.yml).
+
+  Horizon over [fy2027](../fiscal-period/fy2027.yml) and [fy2026-27](../fiscal-period/fy2026-27.yml).
+
+  Refines [fsfp-input-year-refresh](fsfp-input-year-refresh.yml), whose single-district refresh
+  this generalises to the whole state. Bears on [equity](../doctrine/equity.yml) and
+  [adequacy](../doctrine/adequacy.yml).
+
+  Evidence: [dew-fy27-funding-calculator](../../catalog/dew-fy27-funding-calculator.md).
