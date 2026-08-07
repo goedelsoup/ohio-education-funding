@@ -1,0 +1,188 @@
+/*
+ * Two series appear anywhere in this platform — formula aid and guarantee, reused as gain and
+ * loss — in the categorical slots validated for both surfaces: #2a78d6/#eb6834 on light,
+ * #3987e5/#d95926 on dark. All six checks pass in both modes. Dark is a selected step from the
+ * same ramps rather than an inversion, and `data-theme` beats the OS setting in both directions.
+ *
+ * Where the two are used as a diverging pair — the scenario histogram — zero is neutral gray,
+ * never a hue.
+ */
+
+:root {
+  color-scheme: light;
+  --surface-0: #f4f4f2;
+  --surface-1: #fcfcfb;
+  --surface-2: #eeeeea;
+  --border: #dcdcd6;
+  --text-primary: #0b0b0b;
+  --text-secondary: #52514e;
+  --text-muted: #75746e;
+  --series-formula: #2a78d6;
+  --series-guarantee: #eb6834;
+  --neutral-mark: #a8a79f;
+  --accent-rule: #c9c8c1;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:where(:not([data-theme="light"])) {
+    color-scheme: dark;
+    --surface-0: #111110;
+    --surface-1: #1a1a19;
+    --surface-2: #222220;
+    --border: #35342f;
+    --text-primary: #ffffff;
+    --text-secondary: #c3c2b7;
+    --text-muted: #96958c;
+    --series-formula: #3987e5;
+    --series-guarantee: #d95926;
+    --neutral-mark: #6d6c64;
+    --accent-rule: #45443e;
+  }
+}
+
+:root[data-theme="dark"] {
+  color-scheme: dark;
+  --surface-0: #111110;
+  --surface-1: #1a1a19;
+  --surface-2: #222220;
+  --border: #35342f;
+  --text-primary: #ffffff;
+  --text-secondary: #c3c2b7;
+  --text-muted: #96958c;
+  --series-formula: #3987e5;
+  --series-guarantee: #d95926;
+  --neutral-mark: #6d6c64;
+  --accent-rule: #45443e;
+}
+
+* { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  padding: 2rem 1.25rem 4rem;
+  background: var(--surface-0);
+  color: var(--text-primary);
+  font: 15px/1.55 ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+}
+
+.wrap { max-width: 900px; margin: 0 auto; }
+h1 { font-size: 1.4rem; margin: 0 0 .3rem; letter-spacing: -0.01em; }
+h2 { font-size: .95rem; margin: 0 0 .8rem; letter-spacing: -0.005em; }
+.sub { color: var(--text-secondary); margin: 0 0 1.5rem; font-size: .92rem; }
+
+.card {
+  background: var(--surface-1);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 1.15rem 1.25rem;
+  margin-bottom: 1.1rem;
+}
+
+label { display: block; font-size: .8rem; color: var(--text-secondary); margin-bottom: .35rem; }
+select, input[type="range"] {
+  width: 100%;
+  font: inherit;
+  color: var(--text-primary);
+  background: var(--surface-2);
+  border: 1px solid var(--border);
+  border-radius: 7px;
+  padding: .5rem .6rem;
+}
+input[type="range"] { padding: .35rem 0; accent-color: var(--series-formula); }
+output { font-variant-numeric: tabular-nums; color: var(--text-primary); font-weight: 600; }
+
+/* Tabs. The filter row sits above the content, in one row. */
+.tabs { display: flex; gap: .4rem; margin-bottom: 1.1rem; flex-wrap: wrap; }
+.tabs button {
+  font: inherit;
+  padding: .45rem .85rem;
+  border-radius: 7px;
+  border: 1px solid var(--border);
+  background: var(--surface-1);
+  color: var(--text-secondary);
+  cursor: pointer;
+}
+.tabs button.active {
+  background: var(--surface-2);
+  color: var(--text-primary);
+  border-color: var(--accent-rule);
+  font-weight: 600;
+}
+
+.tiles { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: .7rem; margin-bottom: 1.1rem; }
+.tile { background: var(--surface-1); border: 1px solid var(--border); border-radius: 10px; padding: .85rem 1rem; }
+.tile .k { font-size: .74rem; text-transform: uppercase; letter-spacing: .04em; color: var(--text-muted); }
+.tile .v { font-size: 1.5rem; font-weight: 650; letter-spacing: -0.02em; font-variant-numeric: tabular-nums; margin: .15rem 0; }
+.tile .n { font-size: .78rem; color: var(--text-secondary); }
+
+/* Stacked bar: a 2px surface gap so the two quantities read as separate. */
+.barwrap { margin: .2rem 0 0; }
+.bar { display: flex; height: 22px; border-radius: 5px; overflow: hidden; background: var(--surface-2); gap: 2px; }
+.seg { height: 100%; border-radius: 4px; }
+.seg.only { border-radius: 4px; }
+.seg.formula { background: var(--series-formula); }
+.seg.guarantee { background: var(--series-guarantee); }
+
+.legend { display: flex; gap: 1.1rem; flex-wrap: wrap; margin-top: .55rem; font-size: .82rem; color: var(--text-secondary); }
+.sw { display: inline-block; width: 10px; height: 10px; border-radius: 3px; margin-right: .35rem; vertical-align: baseline; }
+.sw.formula, .sw.gain { background: var(--series-formula); }
+.sw.guarantee, .sw.loss { background: var(--series-guarantee); }
+
+.flags { display: flex; gap: .4rem; flex-wrap: wrap; margin-top: .9rem; }
+.flag { font-size: .76rem; padding: .2rem .5rem; border-radius: 999px; border: 1px solid var(--border); color: var(--text-secondary); background: var(--surface-2); }
+
+.note { color: var(--text-secondary); font-size: .86rem; margin: .9rem 0 0; }
+.note code { background: var(--surface-2); padding: .1rem .3rem; border-radius: 4px; }
+.err { color: var(--series-guarantee); }
+.gain { color: var(--series-formula); }
+.loss { color: var(--series-guarantee); }
+.tnum { font-variant-numeric: tabular-nums; }
+
+.scroll { overflow-x: auto; }
+table { width: 100%; border-collapse: collapse; font-size: .88rem; }
+th, td { text-align: left; padding: .42rem .5rem; border-bottom: 1px solid var(--border); }
+thead th { color: var(--text-muted); font-size: .76rem; text-transform: uppercase; letter-spacing: .04em; }
+th { font-weight: 500; color: var(--text-secondary); }
+td { text-align: right; font-variant-numeric: tabular-nums; }
+tbody tr:last-child th, tbody tr:last-child td { border-bottom: 0; }
+
+.strip-row { margin-bottom: 1rem; }
+.strip-head { display: flex; justify-content: space-between; font-size: .86rem; }
+.strip { position: relative; height: 8px; border-radius: 4px; background: var(--surface-2); margin: .4rem 0 .3rem; }
+.marker { position: absolute; top: -3px; width: 3px; height: 14px; border-radius: 2px; background: var(--text-primary); }
+.scale { display: flex; justify-content: space-between; font-size: .74rem; color: var(--text-muted); }
+
+/* Charts. Marks are thin, axes recessive, text wears text tokens rather than series color. */
+.chartwrap { overflow-x: auto; }
+.chart { width: 100%; height: auto; display: block; }
+.bar-fill { fill: var(--series-formula); }
+.bar-label { font-size: 12px; fill: var(--text-secondary); }
+.bar-value { font-size: 12px; fill: var(--text-primary); font-variant-numeric: tabular-nums; }
+.hist { fill: var(--neutral-mark); }
+.hist.gain { fill: var(--series-formula); }
+.hist.loss { fill: var(--series-guarantee); }
+.axis { stroke: var(--accent-rule); stroke-width: 1; }
+.zero { stroke: var(--text-muted); stroke-width: 1; stroke-dasharray: 3 3; }
+.axis-label { font-size: 11px; fill: var(--text-muted); }
+.bar-row { cursor: default; }
+.bar-row:hover .bar-fill, .bar-row:hover .hist { filter: brightness(1.12); }
+
+#tip {
+  position: fixed;
+  z-index: 10;
+  pointer-events: none;
+  background: var(--surface-1);
+  color: var(--text-primary);
+  border: 1px solid var(--accent-rule);
+  border-radius: 7px;
+  padding: .35rem .55rem;
+  font-size: .8rem;
+  box-shadow: 0 2px 10px rgb(0 0 0 / 18%);
+  max-width: 320px;
+}
+
+.levers { display: grid; grid-template-columns: repeat(auto-fit, minmax(230px, 1fr)); gap: .9rem; }
+.lever .n { font-size: .74rem; color: var(--text-muted); margin-top: .25rem; }
+
+footer { color: var(--text-muted); font-size: .78rem; margin-top: 1.5rem; }
+footer p { margin: .35rem 0; }

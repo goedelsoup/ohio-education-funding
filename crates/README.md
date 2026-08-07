@@ -67,7 +67,7 @@ pre-2007 `.xls` format.
 | [`millage`](millage/) | calculator | implemented; verified on 606 real districts | 13 |
 | [`dispersion`](dispersion/) | calculator | implemented; verified on 606 real districts | 20 |
 | [`project`](project/) | calculator | forward projection and policy simulation | 39 |
-| [`bundle`](bundle/) | export | versioned JSON feed for [`web/`](../web/) | 6 |
+| [`bundle`](bundle/) | export | versioned feed and scenario checkpoints for [`web/`](../web/) | 10 |
 
 `spreadsheet` and `connect` are the retrieval side: everything that can fail, and nothing that
 computes a funding figure. `bundle` is the export seam between the corpus and the web layer.
