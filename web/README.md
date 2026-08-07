@@ -9,6 +9,7 @@ Three views:
   receives, and where the difference comes from.
 - **Statewide** — who is on the guarantee, whether state aid offsets property wealth, and the
   two floors.
+- **Outcomes** — what districts achieve, and how little of it the funding side explains.
 - **Scenario** — move a lever and see who it reaches, across all 609 districts, in the browser.
 
 Every view is linkable: `#district/043786`, `#statewide`,
@@ -120,6 +121,20 @@ getting its published share scaled by the ratio of the minimums instead of the f
 was worth $4.7 million and 273 Rust tests did not catch it, because the wrong answer is still an
 increase and still confined to districts below the new floor. The independent implementation
 disagreed, and the disagreement was the signal.
+
+## The outcome view exists to prevent two mistakes
+
+Not to display the Performance Index. To make these hard:
+
+**Reading a correlation with poverty as a correlation with something else.** Poverty explains
+Ohio's attainment measure at −0.846. The guarantee is the sharpest case: districts it protects
+score +0.187 higher, and +0.035 once poverty is held constant. Every association on that tab is
+rendered with its controlled figure beside it, and an e2e test fails if one ever appears alone.
+
+**Quoting a per-pupil number without its denominator.** The department divides operating
+spending by a need-weighted pupil count. Against a composition-driven outcome that is mostly a
+composition proxy — the same numerator gives −0.004 one way and −0.355 the other. Both are in
+the feed and both are on the page.
 
 ## Design notes
 

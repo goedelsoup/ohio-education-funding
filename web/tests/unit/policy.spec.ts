@@ -18,6 +18,7 @@ import { compare, isVerified, toPolicy, verify } from "../../src/lib/verify.ts";
 import { bin } from "../../src/lib/chart.ts";
 import { money, millions, ordinal, pct, percentileOf, signedMoney } from "../../src/lib/format.ts";
 import { guaranteeRateByQuintile, wealthQuintiles } from "../../src/lib/statewide.ts";
+import { performanceByPoverty, povertyQuintiles } from "../../src/lib/outcomes.ts";
 import { REQUIRED_CONTRACT, type Bundle } from "../../src/lib/types.ts";
 
 const bundle: Bundle = JSON.parse(
@@ -191,4 +192,66 @@ test("percentile is the share strictly below", () => {
   expect(percentileOf([1, 2, 3, 4], 3)).toBe(0.5);
   expect(percentileOf([1, 2, 3, 4], 1)).toBe(0);
   expect(percentileOf([], 1)).toBe(0);
+});
+
+test("outcomes: the feed carries an outcome block for every district with a report card", () => {
+  const withOutcome = bundle.districts.filter((d) => d.outcome != null);
+  expect(withOutcome.length).toBe(bundle.statewide.outcomes!.districts);
+  // And the three without one are null rather than an object of nulls, so "no report card"
+  // stays distinguishable from "a report card with nothing in it".
+  const without = bundle.districts.filter((d) => d.outcome == null);
+  expect(without.length).toBe(3);
+});
+
+test("outcomes: carries the raw guarantee association and the controlled one together", () => {
+  // A page showing +0.187 without +0.035 beside it would be stating the confound as a
+  // finding, which is the one thing this axis exists to prevent.
+  const o = bundle.statewide.outcomes!;
+  expect(Math.abs(o.guarantee_vs_performance)).toBeGreaterThan(0.15);
+  expect(Math.abs(o.guarantee_vs_performance_controlled)).toBeLessThan(0.06);
+});
+
+test("outcomes: carries both spending denominators, and they disagree", () => {
+  const o = bundle.statewide.outcomes!;
+  expect(Math.abs(o.weighted_spending_vs_performance)).toBeLessThan(0.05);
+  expect(o.enrolled_spending_vs_performance).toBeLessThan(-0.25);
+});
+
+test("outcomes: poverty quintiles keep every district that has both variables", () => {
+  const groups = povertyQuintiles(bundle.districts);
+  const kept = groups.reduce((n, g) => n + g.length, 0);
+  const eligible = bundle.districts.filter(
+    (d) => d.economically_disadvantaged != null && d.outcome?.performance_index != null,
+  ).length;
+  expect(kept).toBe(eligible);
+  expect(groups.length).toBe(5);
+});
+
+test("outcomes: the Performance Index falls monotonically across poverty fifths", () => {
+  // The relationship the whole view is built to foreground. If it ever stopped being
+  // monotone the copy on that card would be wrong, not just the chart.
+  const medians = performanceByPoverty(bundle.districts).map((b) => b.value);
+  for (let i = 1; i < medians.length; i++) {
+    expect(medians[i]!).toBeLessThan(medians[i - 1]!);
+  }
+});
+
+test("outcomes: every district with a report card has a spending figure on both denominators", () => {
+  const broken = bundle.districts.filter(
+    (d) =>
+      d.outcome != null &&
+      (d.outcome.per_enrolled_pupil == null || d.outcome.per_equivalent_pupil == null),
+  );
+  expect(broken.map((d) => d.name)).toEqual([]);
+});
+
+test("outcomes: spending per enrolled pupil is never below spending per weighted pupil", () => {
+  // The weighted count scales the enrolled one upward, so the weighted per-pupil figure is
+  // always the smaller. Inverting this would flip the denominator finding.
+  for (const d of bundle.districts) {
+    if (!d.outcome?.per_enrolled_pupil || !d.outcome.per_equivalent_pupil) continue;
+    expect(d.outcome.per_enrolled_pupil).toBeGreaterThanOrEqual(
+      d.outcome.per_equivalent_pupil - 0.01,
+    );
+  }
 });

@@ -6,7 +6,50 @@
  */
 
 /** The bundle contract this page understands. */
-export const REQUIRED_CONTRACT = "2.0.0";
+export const REQUIRED_CONTRACT = "3.0.0";
+
+/**
+ * The outcome side of a district, where the report card covers it.
+ *
+ * Two spending figures because the choice of divisor is the corpus's central finding about
+ * this data: `per_equivalent_pupil` divides by a need-weighted count and is the department's
+ * published number, `per_enrolled_pupil` divides by the headcount. Against an outcome that is
+ * itself driven by composition, the first is substantially a composition proxy.
+ *
+ * `economically_disadvantaged` is the report card's, which is top-coded by community
+ * eligibility. The untop-coded share is `District.economically_disadvantaged`.
+ */
+export interface DistrictOutcome {
+  /** Ohio's attainment-level measure, 2024-25. */
+  performance_index: number | null;
+  performance_index_prior: number | null;
+  performance_index_earliest: number | null;
+  /** Ohio's growth measure, already a three-year average as published. */
+  progress_effect_size: number | null;
+  per_enrolled_pupil: number | null;
+  per_equivalent_pupil: number | null;
+  economically_disadvantaged: number | null;
+  english_learner: number | null;
+  students_with_disabilities: number | null;
+}
+
+/**
+ * Statewide relationships between funding and outcomes.
+ *
+ * Every field is a correlation and none identifies an effect. The raw and controlled guarantee
+ * figures are both present because showing one without the other states a confound as a finding.
+ */
+export interface OutcomeStatewide {
+  districts: number;
+  poverty_vs_performance: number;
+  guarantee_vs_performance: number;
+  guarantee_vs_performance_controlled: number;
+  spending_vs_growth_controlled: number;
+  weighted_spending_vs_performance: number;
+  enrolled_spending_vs_performance: number;
+  median_performance_on_guarantee: number;
+  median_performance_on_formula: number;
+}
 
 /** One district, as the feed carries it. */
 export interface District {
@@ -34,6 +77,8 @@ export interface District {
   economically_disadvantaged: number | null;
   /** FY2024 to FY2026. FY2026 is partly departmental estimate. */
   enrollment_change: number | null;
+  /** Achievement, growth, and need. `null` for the three districts with no report card. */
+  outcome: DistrictOutcome | null;
 }
 
 /** Statewide aggregates, so a district can be positioned without recomputing. */
@@ -49,6 +94,8 @@ export interface Statewide {
   guarantee_total: number;
   realized_aid_total: number;
   minimum_state_share: number;
+  /** How the funding side relates to the outcome side. `null` if no district joined. */
+  outcomes: OutcomeStatewide | null;
 }
 
 /** A policy in the shape the feed serializes it. */

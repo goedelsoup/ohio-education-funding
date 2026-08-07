@@ -275,6 +275,37 @@ fn the_result_survives_a_rank_based_reading() {
 }
 
 #[test]
+fn the_published_near_zero_correlation_turns_on_a_single_tiny_district() {
+    // The complete panel is 607 minus Put-in-Bay, and that one district — 77 weighted pupils,
+    // the largest quantisation error in the file — accounts for most of the magnitude the
+    // weighted-denominator correlation has at all: -0.0155 over 607 becomes -0.0043 over 606.
+    //
+    // So the published figure is not merely denominator-driven, it is fragile. The corpus's own
+    // enrolled-denominator figure moves by a twentieth over the same swap. A near-zero result
+    // that one small district can move by seventy percent was never carrying much.
+    let records = joined();
+    let (weighted, index, _) = series(&records, |r| r.outcome.per_equivalent_pupil, performance_index);
+    let (enrolled, index_again, _) = series(&records, |r| r.outcome.per_enrolled_pupil(), performance_index);
+
+    let weighted_606 = correlation(&weighted, &index);
+    let enrolled_606 = correlation(&enrolled, &index_again);
+
+    // Published over 607: -0.0155 weighted, -0.3365 enrolled.
+    assert!(
+        (weighted_606 - -0.0043).abs() < 0.002,
+        "weighted over the complete panel is {weighted_606:.4}"
+    );
+    assert!(
+        (weighted_606 - -0.0155).abs() > 0.008,
+        "one district should move the weighted figure appreciably"
+    );
+    assert!(
+        (enrolled_606 - -0.3365).abs() < 0.03,
+        "the enrolled figure should be near its published value: {enrolled_606:.4}"
+    );
+}
+
+#[test]
 fn nothing_here_is_computed_on_the_three_excluded_districts() {
     // The crosswalk's exceptions are outside every figure above. Stated as a test so that a
     // future join which quietly included them would have to say so.

@@ -1,6 +1,6 @@
 ---
 /**
- * The whole document. There is one page: the three views are tabs over one feed, and which one
+ * The whole document. There is one page: the four views are tabs over one feed, and which one
  * is showing lives in the URL fragment so a view stays linkable.
  *
  * The markup here is the shell only — every figure in it is written by `src/scripts/main.ts`
@@ -30,6 +30,7 @@ import "../styles/app.css";
       <div class="tabs" role="tablist">
         <button data-tab="district" role="tab" aria-selected="true">District</button>
         <button data-tab="statewide" role="tab" aria-selected="false">Statewide</button>
+        <button data-tab="outcomes" role="tab" aria-selected="false">Outcomes</button>
         <button data-tab="scenario" role="tab" aria-selected="false">Scenario</button>
       </div>
 
@@ -43,6 +44,10 @@ import "../styles/app.css";
 
       <section data-panel="statewide" role="tabpanel" hidden>
         <div id="statewide-out"></div>
+      </section>
+
+      <section data-panel="outcomes" role="tabpanel" hidden>
+        <div id="outcomes-out"></div>
       </section>
 
       <section data-panel="scenario" role="tabpanel" hidden>

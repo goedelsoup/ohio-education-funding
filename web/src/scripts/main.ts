@@ -9,6 +9,7 @@ import {
   renderScenario,
   type Levers,
 } from "../lib/scenario.ts";
+import { renderOutcomes } from "../lib/outcomes.ts";
 import { renderStatewide } from "../lib/statewide.ts";
 import { REQUIRED_CONTRACT, type Bundle, type District } from "../lib/types.ts";
 import { isVerified, verify, type Verification } from "../lib/verify.ts";
@@ -16,7 +17,7 @@ import { isVerified, verify, type Verification } from "../lib/verify.ts";
 const $ = <T extends HTMLElement>(selector: string): T =>
   document.querySelector(selector) as T;
 
-type Tab = "district" | "statewide" | "scenario";
+type Tab = "district" | "statewide" | "outcomes" | "scenario";
 
 interface State {
   bundle: Bundle;
@@ -41,6 +42,7 @@ function fromHash(): { tab: Tab; irn?: string; levers?: Partial<Levers> } {
   const [route, query] = raw.split("?");
   const [tab, irn] = (route ?? "").split("/");
   if (tab === "statewide") return { tab: "statewide" };
+  if (tab === "outcomes") return { tab: "outcomes" };
   if (tab === "scenario") {
     const params = new URLSearchParams(query ?? "");
     const number = (key: string) =>
@@ -76,8 +78,8 @@ function toHash(): void {
   let next: string;
   if (state.tab === "district") {
     next = `#district/${state.selected}`;
-  } else if (state.tab === "statewide") {
-    next = "#statewide";
+  } else if (state.tab === "statewide" || state.tab === "outcomes") {
+    next = `#${state.tab}`;
   } else {
     const l = state.levers;
     const params = new URLSearchParams({
@@ -116,6 +118,8 @@ function render(): void {
     if (district) $("#district-out").innerHTML = renderDistrict(bundle, district);
   } else if (tab === "statewide") {
     $("#statewide-out").innerHTML = renderStatewide(bundle);
+  } else if (tab === "outcomes") {
+    $("#outcomes-out").innerHTML = renderOutcomes(bundle);
   } else if (isVerified(state.verification)) {
     $("#scenario-out").innerHTML = renderScenario(bundle, state.levers);
   }

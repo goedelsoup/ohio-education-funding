@@ -1,6 +1,7 @@
 /** The district view: what the formula computes for one district, and what it actually gets. */
 
 import { escapeHtml, money, ordinal, pct, percentileOf } from "./format.ts";
+import { renderDistrictOutcome } from "./outcomes.ts";
 import type { Bundle, District } from "./types.ts";
 
 function strip(label: string, value: number | null, sorted: number[]): string {
@@ -98,6 +99,8 @@ export function renderDistrict(bundle: Bundle, d: District): string {
       ${strip("Assessed valuation per pupil", d.valuation_per_pupil, valuations)}
       ${strip("Operating expenditure per pupil", d.operating_expenditure_per_pupil, expenditures)}
     </div>
+
+    ${renderDistrictOutcome(d)}
 
     <div class="card">
       <h2>Detail</h2>
