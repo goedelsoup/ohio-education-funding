@@ -301,9 +301,204 @@ pub fn partial_correlation(
     Ok((a_with_b - a_with_control * b_with_control) / denominator)
 }
 
+/// A fitted least-squares model.
+#[derive(Debug, Clone, PartialEq)]
+pub struct Regression {
+    /// Number of observations.
+    pub n: usize,
+    /// Intercept, then one coefficient per predictor in the order given.
+    pub coefficients: Vec<f64>,
+    /// Standard error of each coefficient, aligned to `coefficients`.
+    pub standard_errors: Vec<f64>,
+    /// Coefficient over its standard error. Above about 2 in absolute value is conventionally
+    /// "detectable"; this crate reports the statistic and takes no view.
+    pub t_statistics: Vec<f64>,
+    /// Slope coefficients rescaled to standard deviations of predictor per standard deviation
+    /// of outcome — one per predictor, with no intercept term.
+    ///
+    /// These are what make predictors on different scales comparable. A raw coefficient on
+    /// dollars-per-pupil and one on a percentage share cannot be read against each other.
+    pub standardized: Vec<f64>,
+    /// Share of outcome variance the model explains.
+    pub r_squared: f64,
+    /// The same, penalised for the number of predictors.
+    pub adjusted_r_squared: f64,
+}
+
+/// Fit an ordinary least-squares model of `outcome` on `predictors`.
+///
+/// `predictors` is column-major: one inner slice per variable, each the length of `outcome`.
+/// An intercept is added automatically.
+///
+/// # This is a description, not an identification
+///
+/// Adding controls to a cross-section removes the part of an association that the controls
+/// explain. It does not turn the remainder into an effect. Every caution on
+/// [`partial_correlation`] applies with more force here, because a model with six predictors
+/// looks far more like an answer than a correlation does. Ohio districts differ in what they
+/// spend money *on*, and no column in this workspace measures that.
+///
+/// # Errors
+///
+/// Returns [`DispersionError::LengthMismatch`] if any predictor differs in length from the
+/// outcome, [`DispersionError::TooFewObservations`] if there are not more observations than
+/// coefficients, and [`DispersionError::DegenerateDistribution`] if the predictors are
+/// collinear or one has no variation.
+pub fn least_squares(
+    predictors: &[Vec<f64>],
+    outcome: &[f64],
+) -> Result<Regression, DispersionError> {
+    let n = outcome.len();
+    let k = predictors.len();
+    let p = k + 1;
+    if predictors.iter().any(|column| column.len() != n) {
+        return Err(DispersionError::LengthMismatch);
+    }
+    if n <= p {
+        return Err(DispersionError::TooFewObservations);
+    }
+
+    // Centring the predictors leaves every slope unchanged and greatly improves conditioning:
+    // this workspace regresses dollars-per-pupil in the tens of thousands alongside shares
+    // between 0 and 100, and the uncentred normal equations lose precision on that spread.
+    let means: Vec<f64> = predictors
+        .iter()
+        .map(|c| c.iter().sum::<f64>() / n as f64)
+        .collect();
+    let row = |i: usize| -> Vec<f64> {
+        let mut r = Vec::with_capacity(p);
+        r.push(1.0);
+        r.extend((0..k).map(|j| predictors[j][i] - means[j]));
+        r
+    };
+
+    let mut normal = vec![vec![0.0; p * 2]; p];
+    let mut rhs = vec![0.0; p];
+    for (i, y) in outcome.iter().enumerate() {
+        let x = row(i);
+        for a in 0..p {
+            rhs[a] += x[a] * y;
+            for b in 0..p {
+                normal[a][b] += x[a] * x[b];
+            }
+        }
+    }
+    for (a, r) in normal.iter_mut().enumerate() {
+        r[p + a] = 1.0;
+    }
+
+    // Gauss-Jordan with partial pivoting, inverting in place alongside the identity.
+    for column in 0..p {
+        let pivot = (column..p)
+            .max_by(|a, b| {
+                normal[*a][column]
+                    .abs()
+                    .total_cmp(&normal[*b][column].abs())
+            })
+            .expect("at least one row");
+        normal.swap(column, pivot);
+        let divisor = normal[column][column];
+        if divisor.abs() < 1e-10 {
+            return Err(DispersionError::DegenerateDistribution);
+        }
+        for v in normal[column].iter_mut() {
+            *v /= divisor;
+        }
+        for r in 0..p {
+            if r != column && normal[r][column] != 0.0 {
+                let factor = normal[r][column];
+                for c in 0..(p * 2) {
+                    normal[r][c] -= factor * normal[column][c];
+                }
+            }
+        }
+    }
+    let inverse: Vec<Vec<f64>> = normal.iter().map(|r| r[p..].to_vec()).collect();
+
+    let coefficients: Vec<f64> = (0..p)
+        .map(|a| (0..p).map(|b| inverse[a][b] * rhs[b]).sum())
+        .collect();
+
+    let mean_outcome = outcome.iter().sum::<f64>() / n as f64;
+    let mut residual_sum = 0.0;
+    let mut total_sum = 0.0;
+    for (i, y) in outcome.iter().enumerate() {
+        let x = row(i);
+        let fitted: f64 = (0..p).map(|a| coefficients[a] * x[a]).sum();
+        residual_sum += (y - fitted).powi(2);
+        total_sum += (y - mean_outcome).powi(2);
+    }
+    if total_sum == 0.0 {
+        return Err(DispersionError::DegenerateDistribution);
+    }
+
+    let variance = residual_sum / (n - p) as f64;
+    let standard_errors: Vec<f64> = (0..p).map(|a| (variance * inverse[a][a]).sqrt()).collect();
+    let t_statistics: Vec<f64> = (0..p)
+        .map(|a| coefficients[a] / standard_errors[a])
+        .collect();
+
+    let deviation = |v: &[f64]| {
+        let m = v.iter().sum::<f64>() / v.len() as f64;
+        (v.iter().map(|x| (x - m).powi(2)).sum::<f64>() / v.len() as f64).sqrt()
+    };
+    let outcome_sd = deviation(outcome);
+    let standardized: Vec<f64> = (0..k)
+        .map(|j| coefficients[j + 1] * deviation(&predictors[j]) / outcome_sd)
+        .collect();
+
+    let r_squared = 1.0 - residual_sum / total_sum;
+    Ok(Regression {
+        n,
+        coefficients,
+        standard_errors,
+        t_statistics,
+        standardized,
+        r_squared,
+        adjusted_r_squared: 1.0 - (1.0 - r_squared) * (n - 1) as f64 / (n - p) as f64,
+    })
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    #[test]
+    fn least_squares_recovers_a_known_plane() {
+        // y = 3 + 2a - 1b exactly; the fit must return it and explain everything.
+        let a = vec![1.0, 2.0, 3.0, 4.0, 5.0, 6.0];
+        let b = vec![2.0, 1.0, 4.0, 3.0, 6.0, 5.0];
+        let y: Vec<f64> = a.iter().zip(&b).map(|(x, z)| 3.0 + 2.0 * x - z).collect();
+        let fit = least_squares(&[a, b], &y).unwrap();
+        assert!((fit.coefficients[1] - 2.0).abs() < 1e-9);
+        assert!((fit.coefficients[2] + 1.0).abs() < 1e-9);
+        assert!(fit.r_squared > 1.0 - 1e-9);
+    }
+
+    /// With one predictor the standardised coefficient is the correlation, which is the
+    /// cheapest available check that the scaling is right.
+    #[test]
+    fn a_single_predictor_standardises_to_its_correlation() {
+        let x = vec![1.0, 3.0, 2.0, 7.0, 5.0, 4.0, 9.0];
+        let y = vec![2.0, 2.5, 4.0, 6.0, 5.5, 3.0, 8.0];
+        let fit = least_squares(&[x.clone()], &y).unwrap();
+        let r = wealth_neutrality(&x, &y).unwrap().correlation;
+        assert!((fit.standardized[0] - r).abs() < 1e-9);
+        assert!((fit.r_squared - r * r).abs() < 1e-9);
+    }
+
+    #[test]
+    fn least_squares_rejects_collinear_and_undersized_input() {
+        let x = vec![1.0, 2.0, 3.0, 4.0, 5.0];
+        let doubled: Vec<f64> = x.iter().map(|v| v * 2.0).collect();
+        let y = vec![1.0, 3.0, 2.0, 5.0, 4.0];
+        assert!(least_squares(&[x.clone(), doubled], &y).is_err());
+        assert!(least_squares(&[vec![1.0, 2.0], vec![3.0, 4.0]], &[1.0, 2.0]).is_err());
+        assert_eq!(
+            least_squares(&[vec![1.0, 2.0, 3.0]], &[1.0, 2.0]),
+            Err(DispersionError::LengthMismatch)
+        );
+    }
 
     #[test]
     fn rank_correlation_is_one_for_any_monotone_transform() {
