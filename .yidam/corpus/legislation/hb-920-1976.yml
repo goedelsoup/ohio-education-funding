@@ -35,6 +35,8 @@ links:
     relationship: instance-of
   - target: ../revenue-stream/local-property-tax.yml
     relationship: constrains
+  - target: ../metric/effective-operating-millage.yml
+    relationship: produces
   - target: ../parameter/twenty-mill-floor.yml
     relationship: sets
   - target: ../doctrine/equity.yml

@@ -208,6 +208,8 @@ properties:
     population is not modelled here at all, so the "100%" column overstates coverage by however
     many districts are guaranteed. [open]
 links:
+  - target: ../../catalog/dew-october-enrollment.md
+    relationship: sourced-from
   - target: ../scenario.ont.yml
     relationship: instance-of
   - target: ../parameter/base-cost-per-pupil.yml

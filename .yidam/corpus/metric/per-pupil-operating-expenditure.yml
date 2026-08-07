@@ -162,6 +162,8 @@ properties:
     Enrollment denominators differ between NCES counts and Ohio ADM. [verified]
   calculator: dispersion (for cross-agency distribution); deflate (required)
 links:
+  - target: general-fund-cash-balance.yml
+    relationship: contrasts-with
   - target: ../metric.ont.yml
     relationship: instance-of
   - target: assessed-valuation-per-pupil.yml

@@ -143,6 +143,47 @@ description: |
   holds them there — and for the wealthiest quartile the plan produces less than half of it.
   [inference]
 
+  **FY2020 IS NOW OBSERVED, AND THE BASELINE IS NOT A DISTRICT'S FY2020 RECEIPTS.** [verified —
+  [dew-five-year-forecast](../../catalog/dew-five-year-forecast.md), FY2023 filing, line 1.035]
+  Until this source arrived, FY2020 could only be recovered *from the guarantee*, which made
+  every check of the guarantee circular. Districts' audited FY2020 unrestricted grants-in-aid
+  are now an independent observation, and the first thing they establish is a distinction the
+  recovery above cannot make on its own:
+
+      FY2027 figure as a share of observed FY2020 booked state aid, 294 guaranteed districts
+        core foundation + guarantee   median 0.899      <- the base the guarantee holds them at
+        total state support           median 1.107      <- what the district is actually paid
+
+  The observation falls **between** the two, which is what a definitional gap looks like rather
+  than a funding one. The statutory base excludes transportation, preschool special education,
+  special education transportation, and the performance supplement; a district's booked
+  unrestricted aid includes them.
+
+  This corpus reported the 0.899 as a shortfall for two phases. It is not one. A narrow FY2027
+  numerator over a broad FY2020 denominator manufactures a gap, and the recovery above is
+  correct for what it claims — the share of the *statutory base* the formula reaches — and wrong
+  for anything that behaves like total receipts. `panel::DistrictRecord::total_state_support`
+  exists so the two cannot be confused again. [verified]
+
+  What survived the correction is the comparison against a control, which was the same size on
+  either construction: guaranteed districts sit about 25 points below formula-funded ones
+  (1.107 against 1.354 wide, 0.899 against 1.186 narrow). A level can be wrong in a way a
+  contrast measured the same way is not. [verified]
+
+  **THE GUARANTEE IS A NOMINAL FLOOR, SO IT ERODES BY CONSTRUCTION.** [verified —
+  [dew-five-year-forecast](../../catalog/dew-five-year-forecast.md) both endpoints,
+  [bls-cpi-u](../../catalog/bls-cpi-u.md) deflator] The clearest statement available, because it
+  is measured entirely within one source on one definition and touches the calculator nowhere.
+  Real change in booked state aid, FY2020 to FY2025, deflated by CPI-U June:
+
+      median guaranteed district   -18.2%      270 of 294 lost ground
+      median formula district       -3.3%      184 of 314 lost ground
+
+  A guarantee written in dollars cannot hold its value. A district it protects loses ground
+  every year through no decision by anyone, and nothing in the formula records that it happened.
+  "Held at FY2020" is a statement about nominal dollars only, and across FY2020-FY2025 prices
+  rose 25.1%. [verified]
+
   So "temporary transitional" describes the intent and not the mechanism. A guarantee anchored
   to a fixed historical year does not expire; it is escaped, district by district, only as the
   formula grows past a level set in 2020. On the FY2027 evidence, for half of these districts
@@ -170,6 +211,8 @@ properties:
     Guarantee amounts: median $1,946,072, p25 $924,177, p75 $3,684,989, max $25,894,168
     (Columbus City). [verified]
 links:
+  - target: ../metric/general-fund-cash-balance.yml
+    relationship: measured-against
   - target: ../formula-component.ont.yml
     relationship: instance-of
   - target: fsfp-base-cost-calculation.yml

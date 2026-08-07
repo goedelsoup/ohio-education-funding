@@ -34,6 +34,8 @@ properties:
 links:
   - target: ../litigation.ont.yml
     relationship: instance-of
+  - target: ../actor/supreme-court-of-ohio.yml
+    relationship: decided-by
   - target: ../funding-regime/equal-yield-formula.yml
     relationship: challenges
   - target: ../doctrine/equity.yml

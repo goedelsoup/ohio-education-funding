@@ -182,48 +182,84 @@ fn the_guarantee_is_not_producing_districts_that_sit_on_cash() {
 }
 
 #[test]
-fn guaranteed_districts_are_below_their_own_fy2020_receipts_and_formula_districts_are_above() {
-    // The guarantee holds a district at FY2020. FY2020 is now an observation rather than an
-    // inference, so the claim is checkable for the first time — with the caveat in the module
-    // note that booked aid and formula output are differently constructed.
+fn the_guarantee_base_is_narrower_than_a_district_s_booked_state_receipts() {
+    // The correction this phase exists for.
     //
-    // That caveat is exactly why the control matters. A definitional gap between the two
-    // measures would move both groups together. It does not: the median guaranteed district
-    // receives less in FY2027 than it booked in FY2020, in nominal dollars, while the median
-    // formula district receives a fifth more.
+    // Two phases reported that the median guaranteed district receives 89.9% of what it booked
+    // in FY2020, and called the shortfall a finding. It was a construction mismatch. Realized aid
+    // is core foundation funding plus the guarantee — the base the guarantee holds a district at
+    // — and it excludes transportation, preschool special education, special education
+    // transportation, and the performance supplement. Booked unrestricted grants-in-aid includes
+    // them. A narrow FY2027 numerator over a broad FY2020 denominator manufactures a shortfall.
+    //
+    // With the numerator widened to what the district is actually paid, the ratio crosses one:
+    // the observed FY2020 figure sits *between* the two FY2027 constructions, which is what a
+    // definitional gap looks like rather than a funding one.
+    let money = finances();
+    let mut held = Vec::new();
+    let mut paid = Vec::new();
+    for record in panel() {
+        if record.guarantee <= 0.0 {
+            continue;
+        }
+        let Some(district) = for_district(&money, &record.irn) else {
+            continue;
+        };
+        let Some(observed) = district.guarantee_baseline_aid().filter(|b| *b > 0.0) else {
+            continue;
+        };
+        held.push(record.realized_aid() / observed);
+        paid.push(record.total_state_support / observed);
+    }
+    assert_eq!(held.len(), 294);
+
+    let narrow = median(held);
+    let wide = median(paid);
+    assert!(
+        (narrow - 0.899).abs() < 0.01,
+        "core + guarantee {narrow:.3}"
+    );
+    assert!((wide - 1.107).abs() < 0.01, "total state support {wide:.3}");
+    assert!(
+        narrow < 1.0 && wide > 1.0,
+        "the observation must fall between the two constructions, or the gap is not definitional"
+    );
+}
+
+#[test]
+fn the_guarantee_gap_against_formula_districts_survives_the_correction() {
+    // What the construction mismatch did *not* invalidate. The level was wrong on both
+    // constructions; the comparison between two groups measured the same way was not, and it is
+    // the same size either way — about 25 points.
+    //
+    // This is the argument for always stating a ratio against a control rather than alone. The
+    // control absorbed an error in the numerator that the level could not.
     let money = finances();
     let mut guaranteed = Vec::new();
     let mut on_formula = Vec::new();
     for record in panel() {
-        let Some(finances) = for_district(&money, &record.irn) else {
+        let Some(district) = for_district(&money, &record.irn) else {
             continue;
         };
-        let Some(baseline) = finances.guarantee_baseline_aid().filter(|b| *b > 0.0) else {
+        let Some(observed) = district.guarantee_baseline_aid().filter(|b| *b > 0.0) else {
             continue;
         };
-        let ratio = record.realized_aid() / baseline;
+        let ratio = record.total_state_support / observed;
         if record.guarantee > 0.0 {
             guaranteed.push(ratio);
         } else {
             on_formula.push(ratio);
         }
     }
-
-    let held = median(guaranteed.clone());
-    let other = median(on_formula.clone());
-    assert!((held - 0.899).abs() < 0.01, "guaranteed {held:.3}");
-    assert!((other - 1.186).abs() < 0.01, "formula {other:.3}");
+    let held = median(guaranteed);
+    let other = median(on_formula);
+    assert!((held - 1.107).abs() < 0.01, "guaranteed {held:.3}");
+    assert!((other - 1.354).abs() < 0.01, "formula {other:.3}");
     assert!(
-        held < 1.0 && other > 1.0,
-        "the groups fall on opposite sides of parity"
+        other - held > 0.20,
+        "the gap between the groups is {:.3}, and it was 0.287 on the narrow construction",
+        other - held
     );
-
-    let below = |v: &[f64]| v.iter().filter(|r| **r < 1.0).count();
-    assert_eq!(below(&guaranteed), 244, "of {}", guaranteed.len());
-    assert_eq!(below(&on_formula), 65, "of {}", on_formula.len());
-
-    // And this is before inflation. In real terms the guaranteed group is far further down —
-    // which is what "held at FY2020" means once a price index is applied to it.
 }
 
 #[test]
