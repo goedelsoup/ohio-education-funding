@@ -27,6 +27,24 @@ description: |
   calculation. [verified] Taking the lesser is a deliberate protection: a district whose
   valuation spikes on a single reappraisal is not immediately charged for it.
 
+  **The minimum state share is 10%, and this corpus had it at 5%.** The Fair School Funding
+  Plan was enacted with a 5% floor and `crates/local-capacity` encoded that as a constant. The
+  department's FY2027 calculator states **0.1** for both FY2026 and FY2027, on its `Notes`
+  sheet, in as many words. It is set by each biennial budget rather than fixed in permanent law,
+  and it doubled. **138 of 609 districts — 22.7% — sit exactly on it**, receiving a floor rather
+  than a computed share. [verified]
+
+  That is a large fact about how the measure actually operates. For those 138 districts the
+  entire apparatus above — the three wealth terms, the 60/20/20 blend, the progressive rate
+  schedule, the 40th-highest-district benchmark — determines nothing. Their aid is a flat
+  percentage of base cost. The measure's discrimination stops at the point where a fifth of
+  Ohio's districts sit, and doubling the floor moved that point without changing anything the
+  formula computes.
+
+  It also censors the data. Where the floor binds, local capacity per pupil is not recoverable
+  from published aid by subtraction: all that can be said is that it exceeds 90% of base cost.
+  [verified]
+
   Not modeled here yet: how the 40th-highest-district benchmark moves over time, and whether
   it has. It is a single discretionary number that sets the top of the entire scale. [open]
 properties:
