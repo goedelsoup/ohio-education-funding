@@ -158,6 +158,57 @@ pub const CONNECTORS: &[Connector] = &[
         ],
     },
     Connector {
+        key: "dew-report-card",
+        publisher: "Ohio Department of Education and Workforce",
+        feeds: &["metric", "education-agency"],
+        status: Status::Wired,
+        note: "The only publisher of an Ohio district outcome measure, and — in the Expanded \
+               List — of one expenditure numerator against two different pupil denominators.",
+        sources: &[
+            Source {
+                key: "achievement-district-2425",
+                url: "https://reportcardstorage.education.ohio.gov/data-download-2025/\
+                      24-25_Achievement_District.xlsx?sv=2020-08-04&ss=b&srt=sco&sp=rlx\
+                      &se=2031-07-28T05:10:18Z&st=2021-07-27T21:10:18Z&spr=https\
+                      &sig=nPOvW%2Br2caitHi%2F8WhYwU7xqalHo0dFrudeJq%2B%2Bmyuo%3D",
+                filename: "achievement-district-2425.xlsx",
+                format: Format::Xlsx,
+                catalog: Some("dew-report-card-achievement"),
+                fixture: Some(crate::fixtures::REPORT_CARD_FIXTURE),
+                note: "Performance Index for 607 rated traditional districts, with the two \
+                       prior years in the same row.",
+            },
+            Source {
+                key: "spend-per-pupil-2425",
+                url: "https://reportcardstorage.education.ohio.gov/data-download-2025/\
+                      2425_DISTRICT_SPEND_PER_PUPIL.xlsx?sv=2020-08-04&ss=b&srt=sco&sp=rlx\
+                      &se=2031-07-28T05:10:18Z&st=2021-07-27T21:10:18Z&spr=https\
+                      &sig=nPOvW%2Br2caitHi%2F8WhYwU7xqalHo0dFrudeJq%2B%2Bmyuo%3D",
+                filename: "district-spend-per-pupil-2425.xlsx",
+                format: Format::Xlsx,
+                catalog: Some("dew-report-card-spending"),
+                fixture: Some(crate::fixtures::REPORT_CARD_FIXTURE),
+                note: "Expenditure per EQUIVALENT pupil. The denominator is weighted for \
+                       disadvantage, so this is not a headcount average and is about 21% \
+                       lower than one.",
+            },
+            Source {
+                key: "expanded-list-fy25",
+                url: "https://reportcardstorage.education.ohio.gov/data-download-2025/\
+                      FY25%20Expanded%20List.xlsx?sv=2020-08-04&ss=b&srt=sco&sp=rlx\
+                      &se=2031-07-28T05:10:18Z&st=2021-07-27T21:10:18Z&spr=https\
+                      &sig=nPOvW%2Br2caitHi%2F8WhYwU7xqalHo0dFrudeJq%2B%2Bmyuo%3D",
+                filename: "fy25-expanded-list.xlsx",
+                format: Format::Xlsx,
+                catalog: Some("dew-expenditure-expanded-list"),
+                fixture: Some(crate::fixtures::REPORT_CARD_FIXTURE),
+                note: "One operating-expenditure numerator on two sheets, divided by weighted \
+                       ADM on one and unweighted ADM on the other. Covers community schools, \
+                       JVSDs, STEM and eschools too; filter on org type.",
+            },
+        ],
+    },
+    Connector {
         key: "bls-cpi",
         publisher: "U.S. Bureau of Labor Statistics",
         feeds: &["metric", "fiscal-period"],
@@ -295,7 +346,8 @@ mod tests {
 
     #[test]
     fn every_connector_approved_in_the_ontology_is_present() {
-        // The nine from decisions/proposals.yml. A connector dropping out of this list is a
+        // The nine from decisions/proposals.yml, plus dew-report-card from
+        // decisions/report-card-connector.yml. A connector dropping out of this list is a
         // decision, not an oversight, and should fail here first.
         let expected = [
             "dew-foundation",
@@ -307,6 +359,7 @@ mod tests {
             "census-f33",
             "nces-ccd",
             "bls-cpi",
+            "dew-report-card",
         ];
         for key in expected {
             assert!(

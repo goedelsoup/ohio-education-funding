@@ -1,0 +1,76 @@
+id: report-card-connector
+summary: >-
+  A tenth connector, dew-report-card, added to the nine approved at genesis — the
+  first retrieving outcome data rather than finance data.
+context: |
+  Decision `proposals` approved nine connectors, all of them finance-side: department payment
+  reports, tax abstracts, LSC appropriations, statute and case archives, facilities projects,
+  Census F-33, NCES CCD, and BLS CPI. That list was drawn when the corpus had no outcome
+  variable and no intention of acquiring one — every metric in scope measured what a district
+  was given, could raise, or spent.
+
+  The `outcome-axis` phase changed that. Evaluating an external white paper that correlated the
+  Ohio School Report Card's Performance Index against its expenditure-per-equivalent-pupil
+  figure required both variables, and the corpus held neither. The evaluation could be written
+  from the paper's published tables, and was, but every figure in it was secondary — quoted
+  rather than computed — and the corpus's central objection to the paper was a claim about the
+  data that could only be settled by holding the data.
+
+  `crates/connect/src/registry.rs` pins the connector list at nine in a test, deliberately:
+  "A connector dropping out of this list is a decision, not an oversight, and should fail here
+  first." Adding one is the same kind of event and is recorded here for the same reason.
+
+  Three publications were identified, all on the report card's public download API
+  (`edu-prd-reportcard-datarefresh-api.azurewebsites.net/api/v2/Categories`, which enumerates
+  every file with its storage URL):
+
+    24-25_Achievement_District.xlsx    Performance Index, 607 rated traditional districts,
+                                       with the 2023-24 and 2022-23 scores in the same row.
+    2425_DISTRICT_SPEND_PER_PUPIL.xlsx Expenditure per equivalent pupil, federal and
+                                       state-and-local components.
+    FY25 Expanded List.xlsx            Operating expenditures with BOTH weighted and
+                                       unweighted ADM, per IRN, on separate sheets.
+
+  The third is why the connector earns its place. It carries one numerator against two
+  denominators, which turns the corpus's denominator objection from an argument into a
+  measurement.
+decision: |
+  Approved. A tenth connector, `dew-report-card`, publisher Ohio Department of Education and
+  Workforce, feeding `metric` and `education-agency`, status Wired, with the three sources
+  above. The registry test that pins the connector list is updated from nine names to ten.
+
+  It is a separate connector rather than three more sources under `dew-foundation`. The two
+  publish different things for different purposes on different infrastructure: `dew-foundation`
+  retrieves finance files from `education.ohio.gov` under Finance and Funding, and this one
+  retrieves report-card files from `reportcardstorage.education.ohio.gov` under an accountability
+  program with its own release calendar and its own methodology revisions. Merging them would
+  put a Performance Index redesign and a payment-report revision behind one status flag.
+
+  One operational detail is recorded because it will otherwise look like a bug. The storage host
+  requires a read-only SAS query string, which the report card's own public web application
+  embeds in its JavaScript bundle in clear text and which expires 2031-07-28. Without it the
+  storage host answers `ResourceNotFound` with HTTP 404 rather than 403, so a fetch that omits
+  the token looks like a moved file rather than an authorization failure. The token is committed
+  in the registry alongside the URLs it belongs to.
+rationale: |
+  The alternative was to leave the two new metrics carrying only secondary figures, which the
+  corpus's own provenance rule makes untenable: "Every numeric claim in the corpus should reach
+  a catalog entry in one hop." Quoting a white paper that quotes the department is two hops, and
+  the intermediate hop is exactly where the corpus disagreed with the paper.
+
+  Against that, the cost is real and worth naming. The connector count is a rough proxy for how
+  much surface this repository maintains, and the nine were chosen to bound it. Ten is a
+  deliberate expansion, justified by the specific fact that the report card is the only
+  publisher of an Ohio district outcome measure, and the corpus cannot answer an outcome
+  question without one.
+
+  The narrower option — adding only the Expanded List, which alone settles the denominator
+  question — was rejected. It would leave the Performance Index itself uncomputable, and the
+  denominator finding is only interesting because of what it does to a correlation with the
+  Index.
+
+  A note against a future reader's assumption: approving this connector does not approve the
+  outcome measure as an adequacy standard. See `corpus/metric/performance-index.yml`, which
+  records that Ohio publishes an index and no threshold, and `corpus/doctrine/adequacy.yml`,
+  which records that a spending-outcome correlation is not an adequacy test in either
+  formulation.
