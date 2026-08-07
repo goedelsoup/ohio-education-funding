@@ -227,9 +227,122 @@ pub fn wealth_neutrality(
     })
 }
 
+/// Fractional ranks with ties averaged, as Spearman's coefficient requires.
+fn ranks(values: &[f64]) -> Vec<f64> {
+    let mut order: Vec<usize> = (0..values.len()).collect();
+    order.sort_by(|a, b| {
+        values[*a]
+            .partial_cmp(&values[*b])
+            .expect("no NaN in a series")
+    });
+
+    let mut out = vec![0.0; values.len()];
+    let mut i = 0;
+    while i < order.len() {
+        let mut j = i;
+        while j + 1 < order.len() && values[order[j + 1]] == values[order[i]] {
+            j += 1;
+        }
+        // Ties share the average of the ranks they span. Assigning them in encounter order
+        // instead makes the coefficient depend on input order, which is how a rank statistic
+        // silently stops being one.
+        #[allow(clippy::cast_precision_loss)]
+        let shared = (i + j) as f64 / 2.0 + 1.0;
+        for slot in &order[i..=j] {
+            out[*slot] = shared;
+        }
+        i = j + 1;
+    }
+    out
+}
+
+/// Spearman's rank correlation between two paired series.
+///
+/// Prefer this to Pearson wherever a single extreme district can carry the result — Ohio's
+/// spending distribution has an island district four times above the 99th percentile, and the
+/// two coefficients disagreeing is itself informative.
+///
+/// # Errors
+///
+/// Returns [`DispersionError`] on mismatched lengths, fewer than two pairs, or a series with no
+/// variation.
+pub fn rank_correlation(a: &[f64], b: &[f64]) -> Result<f64, DispersionError> {
+    Ok(wealth_neutrality(&ranks(a), &ranks(b))?.correlation)
+}
+
+/// The correlation between two series with a third held constant.
+///
+/// Takes coefficients rather than series because the three pairings are usually already
+/// computed, and because the caller has to have thought about which variable is the control.
+///
+/// # What this is for, and what it is not
+///
+/// In this domain the honest use is subtractive: showing how much of an association survives
+/// once a known confounder is removed. Ohio's economically disadvantaged share correlates with
+/// the Performance Index at −0.85, so almost any district-level correlate of the Index is
+/// partly that variable in disguise, and reporting one without this check overstates it.
+///
+/// It does not establish a causal path. Holding one measured confounder constant is not the
+/// same as adjustment, and this crate has no model.
+///
+/// # Errors
+///
+/// Returns [`DispersionError::DegenerateDistribution`] if either control correlation is ±1,
+/// which leaves nothing to hold constant.
+pub fn partial_correlation(
+    a_with_b: f64,
+    a_with_control: f64,
+    b_with_control: f64,
+) -> Result<f64, DispersionError> {
+    let denominator = ((1.0 - a_with_control.powi(2)) * (1.0 - b_with_control.powi(2))).sqrt();
+    if denominator == 0.0 || !denominator.is_finite() {
+        return Err(DispersionError::DegenerateDistribution);
+    }
+    Ok((a_with_b - a_with_control * b_with_control) / denominator)
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    #[test]
+    fn rank_correlation_is_one_for_any_monotone_transform() {
+        // The whole point of the rank coefficient: a series and its cube are the same ranking,
+        // where Pearson would report a weaker association.
+        let x: [f64; 6] = [1.0, 2.0, 3.0, 4.0, 5.0, 9.0];
+        let cubed: Vec<f64> = x.iter().map(|v| v.powi(3)).collect();
+        assert!((rank_correlation(&x, &cubed).unwrap() - 1.0).abs() < 1e-12);
+        assert!(wealth_neutrality(&x, &cubed).unwrap().correlation < 0.98);
+    }
+
+    #[test]
+    fn tied_values_share_an_averaged_rank() {
+        // Three-way tie across ranks 2, 3 and 4 averages to 3 for all of them.
+        assert_eq!(
+            ranks(&[10.0, 20.0, 20.0, 20.0, 30.0]),
+            vec![1.0, 3.0, 3.0, 3.0, 5.0]
+        );
+        // And the coefficient must not depend on the order the ties arrive in.
+        let a = [5.0, 5.0, 1.0, 9.0];
+        let b = [2.0, 7.0, 1.0, 8.0];
+        let mut ra = a;
+        ra.swap(0, 1);
+        let mut rb = b;
+        rb.swap(0, 1);
+        let forward = rank_correlation(&a, &b).unwrap();
+        let swapped = rank_correlation(&ra, &rb).unwrap();
+        assert!((forward - swapped).abs() < 1e-12);
+    }
+
+    #[test]
+    fn partial_correlation_removes_a_shared_driver() {
+        // Two series correlated only through a control fall to zero when it is held constant.
+        assert!(partial_correlation(0.25, 0.5, 0.5).unwrap().abs() < 1e-12);
+        // An association independent of the control survives untouched.
+        assert!((partial_correlation(-0.6, 0.0, 0.0).unwrap() + 0.6).abs() < 1e-12);
+        // Nothing left to hold constant.
+        assert!(partial_correlation(0.3, 1.0, 0.4).is_err());
+    }
 
     #[test]
     fn a_perfectly_equal_distribution_has_zero_dispersion() {
