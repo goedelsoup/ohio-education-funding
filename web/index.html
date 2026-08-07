@@ -1,0 +1,321 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Ohio school funding — district view</title>
+<style>
+  :root {
+    color-scheme: light;
+    --surface-0: #f4f4f2;
+    --surface-1: #fcfcfb;
+    --border:    #dcdcd6;
+    --text-primary:   #0b0b0b;
+    --text-secondary: #52514e;
+    --text-muted:     #75746e;
+    --series-formula:   #2a78d6;
+    --series-guarantee: #eb6834;
+    --accent-rule: #c9c8c1;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:where(:not([data-theme="light"])) {
+      color-scheme: dark;
+      --surface-0: #111110;
+      --surface-1: #1a1a19;
+      --border:    #35342f;
+      --text-primary:   #ffffff;
+      --text-secondary: #c3c2b7;
+      --text-muted:     #96958c;
+      --series-formula:   #3987e5;
+      --series-guarantee: #d95926;
+      --accent-rule: #45443e;
+    }
+  }
+  :root[data-theme="dark"] {
+    color-scheme: dark;
+    --surface-0: #111110;
+    --surface-1: #1a1a19;
+    --border:    #35342f;
+    --text-primary:   #ffffff;
+    --text-secondary: #c3c2b7;
+    --text-muted:     #96958c;
+    --series-formula:   #3987e5;
+    --series-guarantee: #d95926;
+    --accent-rule: #45443e;
+  }
+
+  * { box-sizing: border-box; }
+  body {
+    margin: 0; padding: 2rem 1.25rem 4rem;
+    background: var(--surface-0); color: var(--text-primary);
+    font: 15px/1.55 ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  }
+  .wrap { max-width: 880px; margin: 0 auto; }
+  h1 { font-size: 1.4rem; margin: 0 0 .3rem; letter-spacing: -0.01em; }
+  .sub { color: var(--text-secondary); margin: 0 0 1.75rem; font-size: .92rem; }
+  .card {
+    background: var(--surface-1); border: 1px solid var(--border);
+    border-radius: 10px; padding: 1.15rem 1.25rem; margin-bottom: 1.1rem;
+  }
+  label { display: block; font-size: .8rem; color: var(--text-secondary);
+          text-transform: uppercase; letter-spacing: .06em; margin-bottom: .4rem; }
+  select, input {
+    width: 100%; padding: .6rem .7rem; font: inherit;
+    background: var(--surface-0); color: var(--text-primary);
+    border: 1px solid var(--border); border-radius: 7px;
+  }
+  .tiles { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: .85rem; }
+  .tile { background: var(--surface-1); border: 1px solid var(--border);
+          border-radius: 10px; padding: .9rem 1rem; }
+  .tile .k { font-size: .74rem; text-transform: uppercase; letter-spacing: .06em;
+             color: var(--text-muted); margin-bottom: .35rem; }
+  .tile .v { font-size: 1.5rem; font-weight: 600; letter-spacing: -0.02em;
+             font-variant-numeric: tabular-nums; }
+  .tile .n { font-size: .8rem; color: var(--text-secondary); margin-top: .2rem; }
+
+  .barwrap { margin-top: .3rem; }
+  .bar { display: flex; height: 30px; border-radius: 4px; overflow: hidden; background: var(--surface-0); }
+  .seg { height: 100%; }
+  .seg.formula   { background: var(--series-formula); border-radius: 4px 0 0 4px; }
+  .seg.guarantee { background: var(--series-guarantee); border-radius: 0 4px 4px 0;
+                   box-shadow: -2px 0 0 0 var(--surface-1); }
+  .seg.only      { border-radius: 4px; }
+  .legend { display: flex; gap: 1.1rem; margin-top: .6rem; font-size: .84rem;
+            color: var(--text-secondary); flex-wrap: wrap; }
+  .legend span { display: inline-flex; align-items: center; gap: .4rem; }
+  .sw { width: 11px; height: 11px; border-radius: 3px; display: inline-block; }
+
+  .strip { position: relative; height: 8px; border-radius: 4px; margin: .55rem 0 .3rem;
+           background: linear-gradient(to right, var(--border), var(--accent-rule)); }
+  .marker { position: absolute; top: -4px; width: 3px; height: 16px; border-radius: 2px;
+            background: var(--text-primary); box-shadow: 0 0 0 2px var(--surface-1); }
+  .scale { display: flex; justify-content: space-between; font-size: .76rem; color: var(--text-muted);
+           font-variant-numeric: tabular-nums; }
+  .flags { display: flex; gap: .5rem; flex-wrap: wrap; margin-top: .1rem; }
+  .flag { font-size: .78rem; padding: .22rem .55rem; border-radius: 999px;
+          border: 1px solid var(--border); color: var(--text-secondary); }
+  h2 { font-size: .82rem; text-transform: uppercase; letter-spacing: .07em;
+       color: var(--text-muted); margin: 0 0 .8rem; font-weight: 600; }
+  table { width: 100%; border-collapse: collapse; font-size: .88rem; }
+  th, td { text-align: left; padding: .42rem 0; border-bottom: 1px solid var(--border); }
+  td:last-child, th:last-child { text-align: right; font-variant-numeric: tabular-nums; }
+  .note { font-size: .84rem; color: var(--text-secondary); }
+  .err { color: var(--series-guarantee); }
+  .scroll { overflow-x: auto; }
+  code { background: var(--surface-0); padding: .1rem .3rem; border-radius: 4px; font-size: .85em; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>Ohio school funding — district view</h1>
+  <p class="sub">
+    What the Fair School Funding Plan computes for a district, what it actually receives, and
+    where the difference comes from. FY2027 projection.
+  </p>
+
+  <div class="card">
+    <label for="pick">District</label>
+    <select id="pick"><option>Loading…</option></select>
+  </div>
+
+  <div id="out"></div>
+
+  <div class="card">
+    <h2>Statewide</h2>
+    <div id="statewide" class="note">Loading…</div>
+  </div>
+
+  <p class="note" id="prov"></p>
+</div>
+
+<script>
+const $ = (s) => document.querySelector(s);
+const money = (v, d = 0) => v == null ? "—" :
+  "$" + v.toLocaleString("en-US", { minimumFractionDigits: d, maximumFractionDigits: d });
+const pct = (v, d = 1) => v == null ? "—" : (v * 100).toFixed(d) + "%";
+// 1st, 2nd, 3rd, 4th … 11th, 12th, 13th … 21st.
+const ordinal = (n) => {
+  const t = n % 100;
+  if (t >= 11 && t <= 13) return n + "th";
+  return n + ({ 1: "st", 2: "nd", 3: "rd" }[n % 10] || "th");
+};
+
+let DATA = null;
+
+function percentileOf(values, v) {
+  const below = values.filter((x) => x < v).length;
+  return below / values.length;
+}
+
+function render(d) {
+  const withVal = DATA.districts.filter((x) => x.valuation_per_pupil != null);
+  const vals = withVal.map((x) => x.valuation_per_pupil).sort((a, b) => a - b);
+  const epps = DATA.districts.filter((x) => x.operating_expenditure_per_pupil != null)
+                             .map((x) => x.operating_expenditure_per_pupil).sort((a, b) => a - b);
+
+  const formulaPP = d.formula_aid_per_pupil;
+  const realizedPP = d.realized_aid_per_pupil;
+  const guaranteePP = realizedPP - formulaPP;
+  const total = Math.max(realizedPP, 1);
+  const fW = (formulaPP / total) * 100;
+  const gW = (guaranteePP / total) * 100;
+
+  const valPct = d.valuation_per_pupil != null ? percentileOf(vals, d.valuation_per_pupil) : null;
+  const eppPct = d.operating_expenditure_per_pupil != null
+    ? percentileOf(epps, d.operating_expenditure_per_pupil) : null;
+
+  const flags = [];
+  if (d.on_guarantee) flags.push("Funded by the guarantee, not the formula");
+  else flags.push("On formula");
+  if (d.at_millage_floor) flags.push("At the 20-mill floor");
+  if (d.enrollment_change != null && d.enrollment_change < 0)
+    flags.push("Enrollment down " + pct(-d.enrollment_change) + " FY22→FY24");
+
+  $("#out").innerHTML = `
+    <div class="tiles" style="margin-bottom:1.1rem">
+      <div class="tile"><div class="k">Base cost / pupil</div>
+        <div class="v">${money(d.base_cost_per_pupil)}</div>
+        <div class="n">what the plan says it costs</div></div>
+      <div class="tile"><div class="k">State aid / pupil</div>
+        <div class="v">${money(realizedPP)}</div>
+        <div class="n">${d.on_guarantee
+          ? money(guaranteePP) + " of it from the guarantee" : "all from the formula"}</div></div>
+      <div class="tile"><div class="k">Enrolled ADM</div>
+        <div class="v">${d.adm.toLocaleString("en-US", { maximumFractionDigits: 0 })}</div>
+        <div class="n">base cost enrolled</div></div>
+    </div>
+
+    <div class="card">
+      <h2>Where the state aid comes from</h2>
+      <div class="barwrap">
+        <div class="bar" role="img" aria-label="Formula aid ${money(formulaPP)} per pupil, guarantee ${money(guaranteePP)} per pupil">
+          <div class="seg formula ${gW <= 0 ? "only" : ""}" style="width:${fW}%"></div>
+          ${gW > 0 ? `<div class="seg guarantee" style="width:${gW}%"></div>` : ""}
+        </div>
+        <div class="legend">
+          <span><i class="sw" style="background:var(--series-formula)"></i>
+            Formula ${money(formulaPP)}/pupil</span>
+          ${gW > 0 ? `<span><i class="sw" style="background:var(--series-guarantee)"></i>
+            Guarantee ${money(guaranteePP)}/pupil</span>` : ""}
+        </div>
+      </div>
+      <p class="note" style="margin:.9rem 0 0">${
+        d.on_guarantee
+          ? `The formula computes ${money(formulaPP)} per pupil. This district receives
+             ${money(realizedPP)} because the temporary transitional aid guarantee holds it at
+             what it received in <strong>FY2020</strong> — a year Ohio froze funding under the
+             Bridge formula rather than computing it. The formula produces
+             <strong>${pct(formulaPP / realizedPP, 0)}</strong> of that level.`
+          : `This district is funded by the formula. Any increase in its computed base cost
+             reaches it in full, unlike the ${DATA.statewide.on_guarantee} districts held on
+             the guarantee.`
+      }</p>
+      <div class="flags" style="margin-top:.9rem">
+        ${flags.map((f) => `<span class="flag">${f}</span>`).join("")}
+      </div>
+    </div>
+
+    <div class="card">
+      <h2>Position among Ohio's ${DATA.statewide.districts} districts</h2>
+      ${strip("Assessed valuation per pupil", d.valuation_per_pupil, valPct, vals)}
+      ${strip("Operating expenditure per pupil", d.operating_expenditure_per_pupil, eppPct, epps)}
+    </div>
+
+    <div class="card">
+      <h2>Detail</h2>
+      <div class="scroll"><table>
+        <tbody>
+          <tr><th>Base cost per pupil</th><td>${money(d.base_cost_per_pupil, 2)}</td></tr>
+          <tr><th>Formula aid per pupil</th><td>${money(formulaPP, 2)}</td></tr>
+          <tr><th>Guarantee per pupil</th><td>${money(guaranteePP, 2)}</td></tr>
+          <tr><th>Guarantee, total</th><td>${money(d.guarantee)}</td></tr>
+          <tr><th>Assessed valuation per pupil</th><td>${money(d.valuation_per_pupil)}</td></tr>
+          <tr><th>Effective Class 1 millage</th><td>${
+            d.effective_class1_millage == null ? "—" : d.effective_class1_millage.toFixed(2)}</td></tr>
+          <tr><th>Operating expenditure per pupil</th><td>${money(d.operating_expenditure_per_pupil)}</td></tr>
+          <tr><th>Economically disadvantaged</th><td>${pct(d.economically_disadvantaged)}</td></tr>
+          <tr><th>Enrollment change FY22→FY24</th><td>${
+            d.enrollment_change == null ? "—" : pct(d.enrollment_change)}</td></tr>
+        </tbody>
+      </table></div>
+    </div>`;
+}
+
+function strip(label, value, p, sorted) {
+  if (value == null) return `<p class="note">${label}: not reported.</p>`;
+  return `
+    <div style="margin-bottom:1rem">
+      <div style="display:flex;justify-content:space-between;font-size:.86rem">
+        <span>${label}</span>
+        <strong style="font-variant-numeric:tabular-nums">${money(value)}</strong>
+      </div>
+      <div class="strip"><div class="marker" style="left:calc(${(p * 100).toFixed(1)}% - 1.5px)"></div></div>
+      <div class="scale"><span>${money(sorted[0])}</span>
+        <span>${ordinal(Math.round(p * 100))} percentile</span>
+        <span>${money(sorted[sorted.length - 1])}</span></div>
+    </div>`;
+}
+
+function renderStatewide() {
+  const s = DATA.statewide;
+  $("#statewide").innerHTML = `
+    <div class="scroll"><table>
+      <tbody>
+        <tr><th>Districts</th><td>${s.districts}</td></tr>
+        <tr><th>Funded by the guarantee, not the formula</th>
+            <td>${s.on_guarantee} (${pct(s.on_guarantee / s.districts, 0)})</td></tr>
+        <tr><th>Guarantee, total</th><td>${money(s.guarantee_total)}</td></tr>
+        <tr><th>At the 20-mill floor</th>
+            <td>${s.at_millage_floor} (${pct(s.at_millage_floor / s.districts, 0)})</td></tr>
+        <tr><th>Median assessed valuation per pupil</th><td>${money(s.median_valuation_per_pupil)}</td></tr>
+        <tr><th>Median operating expenditure per pupil</th>
+            <td>${money(s.median_operating_expenditure_per_pupil)}</td></tr>
+        <tr><th>Aid vs. wealth — formula only</th><td>${s.wealth_neutrality_formula.toFixed(3)}</td></tr>
+        <tr><th>Aid vs. wealth — as received</th><td>${s.wealth_neutrality_realized.toFixed(3)}</td></tr>
+      </tbody>
+    </table></div>
+    <p class="note" style="margin:.9rem 0 0">
+      State aid tracks property wealth at ${s.wealth_neutrality_formula.toFixed(3)} on the formula
+      alone and ${s.wealth_neutrality_realized.toFixed(3)} as districts actually receive it. The
+      guarantee gives up part of the formula's equalization, because it tops up the districts the
+      local capacity measure funds least.
+    </p>`;
+}
+
+fetch("data/bundle.json")
+  .then((r) => { if (!r.ok) throw new Error("HTTP " + r.status); return r.json(); })
+  .then((json) => {
+    DATA = json;
+    if (json.contract_version !== "1.0.0") {
+      $("#out").innerHTML = `<div class="card err">This page reads bundle contract 1.0.0;
+        the feed declares ${json.contract_version}. Refusing to render rather than guess at
+        field meanings.</div>`;
+      return;
+    }
+    const sel = $("#pick");
+    sel.innerHTML = "";
+    [...json.districts]
+      .sort((a, b) => a.name.localeCompare(b.name))
+      .forEach((d) => {
+        const o = document.createElement("option");
+        o.value = d.irn; o.textContent = d.name;
+        sel.appendChild(o);
+      });
+    const byIrn = new Map(json.districts.map((d) => [d.irn, d]));
+    sel.addEventListener("change", () => render(byIrn.get(sel.value)));
+    sel.value = json.districts.some((d) => d.irn === "049056") ? "049056" : json.districts[0].irn;
+    render(byIrn.get(sel.value));
+    renderStatewide();
+    $("#prov").textContent = json.provenance;
+  })
+  .catch((e) => {
+    $("#out").innerHTML = `<div class="card"><p class="err">Could not load
+      <code>data/bundle.json</code> (${e.message}).</p>
+      <p class="note">Browsers block <code>fetch</code> from <code>file://</code>. Serve the
+      directory over HTTP:</p>
+      <p class="note"><code>cd web &amp;&amp; python3 -m http.server 8000</code> then open
+      <code>http://localhost:8000</code>.</p></div>`;
+  });
+</script>
+</body>
+</html>
