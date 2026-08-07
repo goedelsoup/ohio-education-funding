@@ -24,11 +24,21 @@ See the class definition: [scenario.ont.yml](../scenario.ont.yml).
 |------|----------|--------|
 | [fsfp-input-year-refresh](fsfp-input-year-refresh.yml) | What does freezing FSFP cost inputs cost districts? | **Run** |
 
-The first scenario has a result: refreshing the teacher salary input from FY2022 to FY2024
-raises base cost by $352.33 per pupil, and districts on formula receive **100%** of that while
-districts at the 5% state share floor receive **5%** — a binary split rather than a gradient.
-The node had predicted "disproportionate"; the run showed something sharper, and the node
-records both the prediction and the correction.
+The first scenario has a statewide result: refreshing the teacher salary input from FY2022 to
+FY2024 raises computed base cost by **$496.3 million a year** across all 606 districts, an
+ADM-weighted $344.75 per pupil — and that is a lower bound, being one salary category of ten.
+
+Two incidence findings, both structural rather than chosen:
+
+- Districts on formula receive **100%** of any base cost increase; districts at the 5% state
+  share floor receive **5%**. A binary split, not a gradient — the transition *is* the floor.
+  The node predicted "disproportionate"; the run showed something sharper, and both the
+  prediction and the correction are recorded.
+- The per-pupil gain ranges from $338.62 to $580.82, a 1.7× spread, driven entirely by the
+  six-teacher special minimum binding in **157 of 606** districts.
+
+So a refresh is progressive twice over and a freeze regressive twice over — through the state
+share residual, and again through the small-district staffing minimums.
 
 ## What running a scenario requires
 
