@@ -34,11 +34,32 @@ a definitional artifact, not an economic event.
 
 ## Status
 
-**Declared.** Approved in [decisions/proposals.yml](../../../.yidam/decisions/proposals.yml);
-no endpoint wired.
+**Wired**, for one table of the abstracts and two tax years of it.
 
-Abstracts are published per tax year at unstable URLs, one workbook per table, and the district
-table's layout changes across years. In the meantime the millage and valuation columns of the
-[District Profile Report](../../../.yidam/catalog/cupp-district-profile-report.md) stand in —
-which covers one year for traditional districts only, and is why the corpus can say how many
-districts sit at the 20-mill floor *now* and not how that number moved.
+[Table SD-1](../../../.yidam/catalog/dot-sd1-school-district-taxes.md) — taxable value by class
+and real property taxes charged for current expenses, per district, compiled from the DTE-13 and
+DTE-14 abstracts — is retrieved for TY2023 and TY2024 and committed as
+[`sd1-district-taxes.csv`](../../dispersion/fixtures/sd1-district-taxes.csv). That is the local
+half as a *levy*. It is not yet the local half as an effective rate history, and the reduction
+factor series the `floor_status` interface above describes is still not retrieved: SD-1 publishes
+a calculated Class I rate per district per year, which is a check on
+[`millage`](../../millage/) rather than a replacement for the reduction factors it applies.
+
+**What was blocking it, and what was actually true.** The recorded reason was "unstable URLs, one
+workbook per table, with the district table's layout changing across years". Two of those three
+held and the third did not.
+
+- The layout does **not** change across years. TY2023 and TY2024 carry an identical 28-column
+  table. What changes is the *worksheet names* — `ExJVS` and `SD1DATWK23` against `ExJVS24` and
+  `SD1DAT24` — and the height of the banner above the header. Matching sheets on their stem and
+  finding the header by content covers it, in about ten lines.
+- One workbook per table is true, and so is one worksheet per JVSD basis: SD-1 ships the same
+  districts twice, with and without the joint vocational operating levy. Both are carried.
+- The URLs are unstable, but the harder problem was not named: **`tax.ohio.gov` answers a
+  non-browser user agent with a 403 page under a 404 status**, for URLs that resolve in a
+  browser. Fetching from `dam.assets.ohio.gov` — the asset host the site's own pages link to —
+  gets the same bytes without inspection.
+
+The [District Profile Report](../../../.yidam/catalog/cupp-district-profile-report.md) no longer
+has to stand in for valuation, and the 20-mill floor count can now be asked of two years rather
+than one.

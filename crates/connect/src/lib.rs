@@ -300,7 +300,67 @@ pub fn rebuild(root: &Path) -> Result<Vec<Rebuilt>, RebuildError> {
         },
     });
 
+    // The local side: taxable value by class and real property taxes charged, two tax years.
+    // Both are needed for the same reason the forecast filings both are — one year gives a
+    // level, and the question this table exists to answer is about a change.
+    let abstracts: Result<Vec<_>, RebuildError> = [(2023, "sd1-ty2023"), (2024, "sd1-ty2024")]
+        .into_iter()
+        .map(|(tax_year, key)| {
+            let book = open_workbook(root, source(key).expect("registered").1)?;
+            let excluding = sheet_by_prefix(&book, "ExJVS")?;
+            let including = sheet_by_prefix(&book, "SD1DAT")?;
+            Ok((tax_year, excluding, including))
+        })
+        .collect();
+    out.push(match abstracts {
+        Ok(abstracts) => {
+            let years: Vec<fixtures::Sd1Year<'_>> = abstracts
+                .iter()
+                .map(|(tax_year, excluding, including)| fixtures::Sd1Year {
+                    tax_year: *tax_year,
+                    excluding_jvsd: excluding,
+                    including_jvsd: including,
+                })
+                .collect();
+            Rebuilt::Written {
+                path: fixtures::SD1_FIXTURE.to_string(),
+                rows: fixtures::write_csv(
+                    &root.join(fixtures::SD1_FIXTURE),
+                    fixtures::SD1_HEADER,
+                    &fixtures::build_sd1_extract(&years),
+                )?,
+            }
+        }
+        Err(cause) => Rebuilt::Skipped {
+            path: fixtures::SD1_FIXTURE.to_string(),
+            reason: cause.to_string(),
+        },
+    });
+
     Ok(out)
+}
+
+/// Read the one worksheet whose name begins with `prefix`.
+///
+/// The Department of Taxation renames SD-1's worksheets between tax years: `ExJVS` and
+/// `SD1DATWK23` in the TY2023 workbook against `ExJVS24` and `SD1DAT24` in TY2024. The stem is
+/// stable and the year suffix is not, which is most of what
+/// [`tax-abstract`](../sources/tax-abstract.md) was blocked on for twelve phases. Matching the
+/// stem is the whole fix, and it is here rather than in [`fixtures`] because it is a property of
+/// how the file is published, not of what the numbers mean.
+///
+/// With no match, the prefix is passed through to the reader so the error names it and lists the
+/// sheets that are actually there — better than a bare `None` when the department renames again.
+fn sheet_by_prefix(
+    book: &spreadsheet::AnyWorkbook,
+    prefix: &str,
+) -> Result<Vec<Vec<String>>, RebuildError> {
+    let name = book
+        .sheet_names()
+        .into_iter()
+        .find(|name| name.starts_with(prefix))
+        .map_or_else(|| prefix.to_string(), str::to_string);
+    Ok(book.rows(&name)?)
 }
 
 #[cfg(test)]

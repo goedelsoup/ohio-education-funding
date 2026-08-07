@@ -27,8 +27,8 @@ checks** rather than a status that a reader has to take on faith:
 |---|---|---|
 | [`dew-foundation`](sources/dew-foundation.md) | **wired** | FY2027 funding calculator, District Profile Report, October headcount |
 | [`bls-cpi`](sources/bls-cpi.md) | **wired** | CPI-U all items, from the Bureau's flat file |
+| [`tax-abstract`](sources/tax-abstract.md) | **wired** | Table SD-1: taxable value by class and real property taxes charged, TY2023 and TY2024 |
 | [`census-f33`](sources/census-f33.md) | retrievable | one year of the school finance survey; no parser |
-| [`tax-abstract`](sources/tax-abstract.md) | declared | — |
 | [`lsc-budget`](sources/lsc-budget.md) | declared | — |
 | [`ohio-laws`](sources/ohio-laws.md) | declared | — |
 | [`ohio-courts`](sources/ohio-courts.md) | declared | — |
@@ -36,9 +36,15 @@ checks** rather than a status that a reader has to take on faith:
 | [`nces-ccd`](sources/nces-ccd.md) | declared | — |
 
 A `declared` connector says **what blocks it** — that string is a field on the record, and a
-test fails if it is missing or too short to mean anything. Seven of nine being blocked is the
+test fails if it is missing or too short to mean anything. Six of eleven being blocked is the
 honest state; the reasons are mostly "published as PDF" and "no bulk export", which is what
 public data in this domain actually looks like.
+
+Those strings are a hypothesis, not a finding, and `tax-abstract` is the case that showed the
+difference. It sat `declared` for twelve phases behind "the district table's layout changing
+across years." The layout does not change across years — the *worksheet names* do, and the
+actual obstacle, unrecorded because nobody had tried, was that `tax.ohio.gov` serves a 403 page
+to any non-browser agent. A blocker worth trusting is one somebody has attempted.
 
 Every source a committed fixture is built from must name a
 [`.yidam/catalog/`](../../.yidam/catalog/) node, and a test asserts the node exists. Provenance

@@ -294,13 +294,37 @@ pub const CONNECTORS: &[Connector] = &[
         key: "tax-abstract",
         publisher: "Ohio Department of Taxation",
         feeds: &["revenue-stream", "parameter", "metric"],
-        status: Status::Declared {
-            blocked_on: "abstracts are published per tax year at unstable URLs, one workbook \
-                         per table, with the district table's layout changing across years",
-        },
+        status: Status::Wired,
         note: "Without this the local half of Ohio school funding is invisible, and the local \
                half is where the disparities live.",
-        sources: &[],
+        sources: &[
+            Source {
+                key: "sd1-ty2023",
+                url: "https://dam.assets.ohio.gov/raw/upload/tax.ohio.gov/tax_analysis/\
+                      tax_data_series/school_district_data/sd1/SD1CY23.xlsx",
+                filename: "sd1-ty2023.xlsx",
+                format: Format::Xlsx,
+                catalog: Some("dot-sd1-school-district-taxes"),
+                fixture: Some(crate::fixtures::SD1_FIXTURE),
+                note: "The prior tax year, carried so that a change in taxes charged can be \
+                       separated from the level. Its worksheets are named `ExJVS` and \
+                       `SD1DATWK23`, against `ExJVS24` and `SD1DAT24` a year later — the \
+                       layout drift this connector was blocked on, now handled by prefix.",
+            },
+            Source {
+                key: "sd1-ty2024",
+                url: "https://dam.assets.ohio.gov/raw/upload/tax.ohio.gov/tax_analysis/\
+                      tax_data_series/school_district_data/sd1/SD1CY24.xlsx",
+                filename: "sd1-ty2024.xlsx",
+                format: Format::Xlsx,
+                catalog: Some("dot-sd1-school-district-taxes"),
+                fixture: Some(crate::fixtures::SD1_FIXTURE),
+                note: "Taxable value by class and real property taxes charged for current \
+                       expenses, per district, from the DTE-13/DTE-14 abstracts. Taxes charged \
+                       is a levy, not a receipt, and it is gross of the rollback, owner-\
+                       occupancy and homestead credits the state reimburses.",
+            },
+        ],
     },
     Connector {
         key: "lsc-budget",

@@ -8,13 +8,19 @@
 //! Each convention below cost something to learn. They are tests, not comments, for that
 //! reason: every one of them produces a confidently wrong number rather than an error.
 
-/// Strings the department writes where there is no value.
+/// Strings a publisher writes where there is no value.
 ///
 /// The spreadsheet error markers appear because the published workbooks contain live formulas
 /// whose cached results are errors — a district with no reported denominator leaves `#DIV/0!`
 /// in the cell, and that is data about the district, not a number.
+///
+/// `N/A` and `NA` are the Department of Taxation's, and they are both here because that
+/// department used one spelling in the TY2023 SD-1 workbook and the other in TY2024. Listing
+/// them changes no result today — an unparseable cell already yields `None` — but it is the
+/// difference between a convention that is recorded and one that is merely survived, and the
+/// next table to carry `NA` in a column this workspace does extract will find it handled.
 pub const MISSING: &[&str] = &[
-    "", "#N/A", "#DIV/0!", "#VALUE!", "#REF!", "#NULL!", "#NAME?",
+    "", "#N/A", "#DIV/0!", "#VALUE!", "#REF!", "#NULL!", "#NAME?", "N/A", "NA",
 ];
 
 /// A count small enough that publishing it would identify students.
@@ -114,6 +120,14 @@ mod tests {
     #[test]
     fn department_missing_markers_become_none() {
         for marker in ["", "#N/A", "#DIV/0!", "   ", "#REF!"] {
+            assert_eq!(number(marker), None, "{marker}");
+        }
+    }
+
+    #[test]
+    fn the_taxation_departments_two_spellings_of_not_applicable_both_become_none() {
+        // One publisher, two tax years, two spellings: `NA` in SD1CY23 and `N/A` in SD1CY24.
+        for marker in ["N/A", "NA", " NA "] {
             assert_eq!(number(marker), None, "{marker}");
         }
     }
