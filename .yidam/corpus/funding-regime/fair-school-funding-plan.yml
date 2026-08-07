@@ -29,10 +29,23 @@ description: |
 
   The cost inputs tell a different story. Base cost was priced from FY2018 salaries for the
   first two years, refreshed to FY2022 by [H.B. 33](../legislation/hb-33-2023.yml), and held at
-  FY2022 by [H.B. 96](../legislation/hb-96-2025.yml) through FY2027. [inference] By the year the
-  formula reaches 100% of its computed amount, that amount will be priced from data five years
-  old. Both statements — fully phased in, and funded below its own costing — are true, which is
-  why this corpus keeps the two dials as separate nodes. [inference]
+  FY2022 by [H.B. 96](../legislation/hb-96-2025.yml) through FY2027. [verified — the
+  department's FY27 model prices a teacher at $68,022.22, the FY2022 statewide average] By the
+  year the formula reaches 100% of its computed amount, that amount is priced from data five
+  years old. Both statements — fully phased in, and funded below its own costing — are true,
+  which is why this corpus keeps the two dials as separate nodes.
+
+  **And a third fact undercuts both.** In FY2027, the terminal year, **294 of 609 districts —
+  48.3%, holding 54.1% of Ohio's students — are funded by the temporary transitional aid
+  guarantee rather than by the formula at all.** [verified] The guarantee is a hold-harmless
+  carried forward from what districts received before, and it totals $878,974,300.
+
+  So the plan reaches 100% phase-in of a computed amount that nearly half of districts do not
+  receive, priced from inputs five years stale. A regime designed to fund every district at its
+  own costed requirement ends its phase-in with half the state still on a floor inherited from
+  the regime it replaced. [inference] Whether that reflects a formula that would cut those
+  districts absent the guarantee, or enrollment decline outrunning the formula, or both, is not
+  established here and is the sharpest open question about the plan. [open]
 properties:
   name: Fair School Funding Plan
   effective_from: FY2022

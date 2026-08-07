@@ -133,6 +133,50 @@ impl StatewideFactors {
         }
     }
 
+    /// The FY2027 factors, priced from **FY2022** statewide averages.
+    ///
+    /// Taken from the department's own `FY27 TRAD State Foundation Funding Calculator`. These
+    /// are the inputs [H.B. 96](../../.yidam/corpus/legislation/hb-96-2025.yml) carries forward
+    /// rather than refreshing, so comparing them against
+    /// [`Self::fy2022`] shows exactly what one reference-year update was worth: the teacher
+    /// salary moved from $62,696.18 to $68,022.22 and the insurance cost from $14,265.53 to
+    /// $17,152.68.
+    ///
+    /// Three values are **assumed unchanged** from FY2022 because the calculator does not
+    /// expose them: the substitute daily rate and the superintendent and treasurer salary
+    /// bands. All three are statutory figures rather than data-derived averages, and the
+    /// assumption is confirmed for the substitute rate by the teacher base cost reproducing
+    /// the department's per-district figures to the cent.
+    #[must_use]
+    pub const fn fy2027() -> Self {
+        Self {
+            teacher_salary: 68_022.22,
+            superintendent_salary: 123_639.30,
+            other_administrator_salary: 100_368.71,
+            principal_salary: 97_627.89,
+            counselor_salary: 68_712.57,
+            librarian_salary: 74_063.83,
+            emis_salary: 55_972.97,
+            bookkeeping_salary: 49_696.52,
+            administrative_assistant_salary: 45_333.05,
+            clerical_salary: 34_356.24,
+            insurance: 17_152.68,
+            benefit_multiplier: 1.16,
+            substitute_daily_rate: 90.0,
+            superintendent_salary_large: 160_000.0,
+            superintendent_salary_small: 80_000.0,
+            treasurer_salary_large: 130_000.0,
+            treasurer_salary_small: 60_000.0,
+            academic_cocurricular_per_pupil: 48.09,
+            athletic_cocurricular_per_pupil: 192.21,
+            safety_per_pupil: 36.20,
+            supplies_per_pupil: 243.81,
+            technology_per_pupil: 37.50,
+            itc_per_pupil: 31.00,
+            building_per_pupil: 1_418.16,
+        }
+    }
+
     /// The fully-loaded annual cost of one funded position at a given salary.
     ///
     /// Rounded to cents, matching the department's published average teacher base cost of
