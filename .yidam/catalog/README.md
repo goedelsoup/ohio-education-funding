@@ -20,7 +20,27 @@ Fields per entry: slug, source type (paper/dataset/API/database/other), descript
                   corpus citation count (used-by).
 Sorted by: type, then slug.
 -->
-_Run `yidam catalog-audit` to populate._
+| Entry | Title | Cited by |
+|---|---|--:|
+| [`auditor-longitudinal-school-finance`](auditor-longitudinal-school-finance.md) | Longitudinal School Finance Study — Ohio Auditor of State | 1 |
+| [`bls-cpi-u`](bls-cpi-u.md) | CPI-U all items — the Bureau of Labor Statistics flat file | 1 |
+| [`cupp-district-profile-report`](cupp-district-profile-report.md) | District Profile Report — the "Cupp Report" | 2 |
+| [`derolph-litigation-record`](derolph-litigation-record.md) | DeRolph Litigation Record | 2 |
+| [`dew-expenditure-expanded-list`](dew-expenditure-expanded-list.md) | FY2025 Expenditure Expanded List | 1 |
+| [`dew-fy27-funding-calculator`](dew-fy27-funding-calculator.md) | FY27 TRAD State Foundation Funding Calculator | 2 |
+| [`dew-october-enrollment`](dew-october-enrollment.md) | October headcount by grade | 0 |
+| [`dew-report-card-achievement`](dew-report-card-achievement.md) | Ohio School Report Cards — District Achievement Download | 1 |
+| [`dew-report-card-district-details`](dew-report-card-district-details.md) | Ohio School Report Cards — District Details | 1 |
+| [`dew-report-card-spending`](dew-report-card-spending.md) | Ohio School Report Cards — District Spending Per Pupil | 1 |
+| [`dew-report-card-value-added`](dew-report-card-value-added.md) | Ohio School Report Cards — District Value-Added Details | 1 |
+| [`dew-sfpr-line-by-line`](dew-sfpr-line-by-line.md) | School Finance Payment Report — Line by Line Explanation | 6 |
+| [`fordham-base-cost-critique`](fordham-base-cost-critique.md) | Fordham Institute — Ohio Base Cost Model Commentary | 2 |
+| [`lsc-hb96-analysis`](lsc-hb96-analysis.md) | LSC Budget Analysis — H.B. 96 (FY2026-27) | 2 |
+| [`ocg-fact-check-021`](ocg-fact-check-021.md) | OCG Ground Truth Fact-Check RL-2026-021 — Toledo–Perrysburg Special-Needs Spending | 3 |
+| [`ocg-white-paper-013`](ocg-white-paper-013.md) | OCG White Paper No. 013 — Does Per-Pupil Spending Track Academic Performance? | 4 |
+| [`ode-idea-part-b-allocations`](ode-idea-part-b-allocations.md) | IDEA Part B Allocations to Districts | 0 |
+
+17 entries, 2 not yet cited by any corpus node. 9 retrieved files are pinned by SHA-256 in [`crates/connect/source-digests.txt`](../../crates/connect/source-digests.txt).
 <!-- /REGEN -->
 
 ## Adding a source

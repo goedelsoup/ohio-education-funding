@@ -9,6 +9,9 @@ decompressor, and an XML parser. This crate is all three, with no dependencies.
 | [`zip`](src/zip.rs) | zip central directory, stored and deflated members, CRC-32 |
 | [`xml`](src/xml.rs) | a pull parser for the subset SpreadsheetML uses |
 | [`xlsx`](src/xlsx.rs) | shared strings, sheet list, rows |
+| [`ole2`](src/ole2.rs) | compound files — the container a pre-2007 `.xls` lives in |
+| [`biff`](src/biff.rs) | BIFF8 records: the workbook inside that container |
+| [`any`](src/any.rs) | open either format, decided by the leading bytes |
 
 ## Why write this rather than depend on it
 
@@ -40,11 +43,20 @@ one pass over data already in memory and turns a subtle decompression bug into a
 worth paying for when the decompressor is hand-written for this workspace, because the
 alternative is a wrong number in a fixture that no test would think to question.
 
+## Both formats, decided by the bytes
+
+Ohio publishes in both: the funding calculator and the report card are XLSX, October enrollment
+headcount is still the 1997 format. [`any::open`](src/any.rs) sniffs the magic number rather
+than trusting the extension, because the extension has been wrong — the department has shipped
+`.xls` files that were XLSX and `.xls` files that were HTML tables.
+
+Reading the legacy format natively removed the last external dependency from the extraction
+pipeline. It also found something: the LibreOffice-derived fixture it replaced summed a withheld
+`<10` grade count as zero, understating two districts' grade bands.
+
 ## What it does not do
 
-No compression, no encryption, no Zip64 beyond reading the extra field, no OLE2. Legacy `.xls`
-is a different format entirely and lives in [`connect::legacy`](../connect/src/legacy.rs),
-where the gap is documented rather than papered over.
+No compression, no encryption, no Zip64 beyond reading the extra field, no writing.
 
 This layer knows about *formats*. It knows nothing about Ohio — no IRNs, no fiscal years, no
 suppressed-count conventions. Those live in [`connect`](../connect/), where they can be revised

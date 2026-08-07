@@ -42,6 +42,22 @@ const FY2022_TEACHER_SALARY: f64 = 67_654.0;
 const FY2024_TEACHER_SALARY: f64 = 73_777.08;
 const BENEFIT_MULTIPLIER: f64 = 1.16;
 
+/// Districts whose grade bands cannot be totalled, because the department withholds at least
+/// one grade's count.
+///
+/// Both are among the five smallest in Ohio, which is the whole of why they are here: `<10` is
+/// published where a real count would identify students. The fixture leaves such a band blank
+/// rather than summing the grades that were published — a band summed over a withheld grade is
+/// not a smaller band, it is a band whose total is unknown, and the earlier version of this
+/// fixture recorded Vanlue's grades 9-12 as 56 when the true figure is between 57 and 65.
+///
+/// Named as a constant so that a fixture refresh which suppressed more districts would fail the
+/// count below rather than quietly shrinking the panel every figure here is computed on.
+const SUPPRESSED_BANDS: &[&str] = &[
+    "Bloomfield-Mespo Local (050096) - Trumbull County",
+    "Vanlue Local (047472) - Hancock County",
+];
+
 struct District {
     name: String,
     adm: f64,
@@ -101,24 +117,30 @@ fn districts() -> Vec<District> {
         .lines()
         .skip(1)
         .filter(|l| !l.trim().is_empty())
-        .map(|line| {
+        .filter_map(|line| {
             let p: Vec<&str> = line.split(',').collect();
-            let f = |i: usize| p[i].trim().parse::<f64>().expect("numeric fixture column");
-            District {
+            let f = |i: usize| p[i].trim().parse::<f64>().ok();
+            Some(District {
                 name: p[1].to_string(),
-                adm: f(2),
-                kindergarten: f(3),
-                grades_1_3: f(4),
-                grades_4_8: f(5),
-                grades_9_12: f(6),
-            }
+                adm: f(2)?,
+                kindergarten: f(3)?,
+                grades_1_3: f(4)?,
+                grades_4_8: f(5)?,
+                grades_9_12: f(6)?,
+            })
         })
+        // A district with a withheld grade has no total to scale by, so it is outside every
+        // figure in this file. Which districts, and that there are only two, is asserted below.
         .collect()
 }
 
 #[test]
 fn fixture_covers_every_traditional_district() {
-    assert_eq!(districts().len(), 606);
+    assert_eq!(
+        districts().len(),
+        606 - SUPPRESSED_BANDS.len(),
+        "every district with a complete set of grade bands"
+    );
 }
 
 /// The statewide headline. Refreshing the classroom teacher salary input from the FY2022
@@ -147,25 +169,36 @@ fn weighted_average_delta_is_about_345_per_pupil() {
     );
 }
 
-/// The per-pupil effect is far from uniform: the most-affected district gains about 1.7 times
+/// The per-pupil effect is far from uniform: the most-affected district gains about 1.4 times
 /// what the least-affected does, purely from staffing structure.
+///
+/// # This figure was 1.7 and the difference was a bug
+///
+/// The old maximum, $580.82, belonged to Vanlue Local — one of the two districts now outside
+/// this panel because the department withholds some of its grade counts. The fixture that
+/// preceded this one summed those withheld grades as zero, understating Vanlue's headcount
+/// total by up to 36 in a district of 150 and inflating the `adm / headcount` scale factor by
+/// nearly a third. The most extreme point of a spread this test reports was substantially an
+/// artifact of that.
+///
+/// The spread is real and still large. It was overstated.
 #[test]
-fn per_pupil_effect_varies_by_seventy_percent_across_districts() {
+fn per_pupil_effect_varies_by_forty_percent_across_districts() {
     let ds = districts();
     let mut pp: Vec<f64> = ds.iter().map(District::refresh_delta_per_pupil).collect();
     pp.sort_by(|a, b| a.partial_cmp(b).unwrap());
     let (min, max) = (pp[0], pp[pp.len() - 1]);
 
     assert!((min - 338.62).abs() < 1.0, "min was {min:.2}");
-    assert!((max - 580.82).abs() < 1.0, "max was {max:.2}");
+    assert!((max - 471.10).abs() < 1.0, "max was {max:.2}");
     assert!(
-        max / min > 1.65,
-        "spread was {:.2}x, expected about 1.7x",
+        max / min > 1.35,
+        "spread was {:.2}x, expected about 1.4x",
         max / min
     );
 }
 
-/// The mechanism behind the spread: 157 districts are small enough that the six-teacher
+/// The mechanism behind the spread: 155 districts are small enough that the six-teacher
 /// special minimum binds, so they are funded for more teaching positions per pupil than the
 /// ratios alone would give — and a salary refresh pays them more per pupil as a result.
 ///
@@ -177,14 +210,14 @@ fn the_special_teacher_minimum_concentrates_the_gain_in_small_districts() {
     let binding: Vec<&District> = ds.iter().filter(|d| d.special_minimum_binds()).collect();
     let free: Vec<&District> = ds.iter().filter(|d| !d.special_minimum_binds()).collect();
 
-    assert_eq!(binding.len(), 157);
+    assert_eq!(binding.len(), 155);
 
     let mean = |set: &[&District]| -> f64 {
         set.iter().map(|d| d.refresh_delta_per_pupil()).sum::<f64>() / set.len() as f64
     };
     let (small, rest) = (mean(&binding), mean(&free));
     assert!(
-        (small - 370.75).abs() < 2.0,
+        (small - 368.44).abs() < 2.0,
         "small-district mean was {small:.2}"
     );
     assert!(
@@ -213,6 +246,27 @@ fn no_district_loses_from_a_refresh() {
 
 /// Sanity: grade-band shares must sum to the whole, so applying them to ADM must reconstruct
 /// ADM. Guards against a fixture where a grade column was dropped.
+#[test]
+fn exactly_two_districts_have_a_band_the_department_withholds() {
+    // The exclusion this file's panel rests on, pinned in both directions: the fixture must
+    // still hold 606 rows, and exactly the two named must be the ones without a total.
+    let rows = FIXTURE
+        .lines()
+        .skip(1)
+        .filter(|l| !l.trim().is_empty())
+        .count();
+    assert_eq!(rows, 606);
+
+    let incomplete: Vec<String> = FIXTURE
+        .lines()
+        .skip(1)
+        .filter(|line| !line.trim().is_empty())
+        .filter(|line| line.split(',').skip(3).any(|cell| cell.trim().is_empty()))
+        .map(|line| line.split(',').nth(1).unwrap_or_default().to_string())
+        .collect();
+    assert_eq!(incomplete, SUPPRESSED_BANDS);
+}
+
 #[test]
 fn grade_bands_account_for_all_reported_headcount() {
     for d in districts() {

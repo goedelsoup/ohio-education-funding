@@ -60,11 +60,13 @@ revision that moves the guarantee count, the millage floor count, or a scenario 
 test in [`foundation`](../foundation/) or [`dispersion`](../dispersion/) rather than passing
 silently into the corpus.
 
-That is not hypothetical. Rebuilding these fixtures in Rust changed nine lines of
+That is not hypothetical, twice over. Rebuilding these fixtures in Rust changed nine lines of
 `fy27-department-model.csv`, all in one column: the predecessor formatter trimmed trailing
 zeros off integers, so a district with **10** school buildings was recorded as **1** and one
-with 30 as 3. Nine districts carried a wrong building count. Nothing noticed, because building
-count feeds the leadership sub-components and the verified figure was teacher base cost.
+with 30 as 3. And reading the October headcount natively changed two lines of
+`fy24-district-grade-bands.csv`: the LibreOffice-derived pipeline summed a withheld `<10` as
+zero, recording Vanlue Local's grades 9-12 as 56 when the true figure is between 57 and 65.
+Both errors were invisible to every test that existed at the time.
 
 ## Three conventions that cost something to learn
 
@@ -81,14 +83,13 @@ produces a confidently wrong number rather than an error:
 
 ## Dependencies
 
-None from crates.io. Two on the system, both named where they are used:
+None from crates.io. One on the system, named where it is used:
 
 - **curl**, for HTTPS. TLS is the one thing in this pipeline that should not be hand-written
   next to a DEFLATE decoder. See the module note in [`cache.rs`](src/cache.rs).
-- **LibreOffice**, for one source. The department still publishes October enrollment as a
-  pre-2007 OLE2 file, which is a different format entirely. Reading it natively means an OLE2
-  sector walker and a BIFF8 record parser; that is the honest completion of `dew-foundation`
-  and it is not done. It is why `rebuild` regenerates two of the three department fixtures.
+**LibreOffice is no longer one of them.** The department still publishes October enrollment as
+a pre-2007 OLE2 file, and [`spreadsheet`](../spreadsheet/) now reads it natively — so `rebuild`
+regenerates every committed fixture from a checkout, with no external converter.
 
 Set `EDFUND_CONTACT` to an email address before fetching from the Bureau of Labor Statistics:
 it rejects any request whose `User-Agent` has no contact, with a bare 403 and no explanation.
