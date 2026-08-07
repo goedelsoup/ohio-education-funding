@@ -1,0 +1,12 @@
+# Astro's build output. Unlike the `app/` tree this replaced, it is NOT committed: it is
+# reproducible from `src/` with `pnpm build`, and a hashed bundle in history is churn.
+dist/
+.astro/
+
+node_modules/
+
+# Playwright
+test-results/
+playwright-report/
+blob-report/
+.playwright/

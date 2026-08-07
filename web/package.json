@@ -1,0 +1,26 @@
+{
+  "name": "ohio-education-funding-web",
+  "private": true,
+  "type": "module",
+  "description": "The interface layer for the Ohio school funding model: district, statewide, and scenario views over the crates/bundle feed.",
+  "scripts": {
+    "dev": "astro dev",
+    "build": "astro build",
+    "preview": "astro preview",
+    "check": "astro check",
+    "test": "pnpm test:unit && pnpm test:e2e",
+    "test:unit": "vitest run",
+    "test:watch": "vitest",
+    "test:e2e": "playwright test"
+  },
+  "devDependencies": {
+    "@astrojs/check": "^0.9.10",
+    "@playwright/test": "^1.62.1",
+    "@types/node": "^26.1.2",
+    "astro": "^7.2.0",
+    "typescript": "^6.0.3",
+    "vite": "^8.2.1",
+    "vitest": "^4.1.10"
+  },
+  "packageManager": "pnpm@11.13.1"
+}

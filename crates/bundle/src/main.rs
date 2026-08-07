@@ -1,7 +1,7 @@
 //! Build the web feed from the district panel and the profile-report fixture.
 //!
 //! ```text
-//! cargo run -p bundle > ../web/data/bundle.json
+//! cargo run -p bundle > ../web/public/data/bundle.json
 //! ```
 //!
 //! A thin shell: it takes [`project::panel`] as the source of the funding model, joins the

@@ -1,17 +1,17 @@
 /** Wiring: load the feed, check the contract, check our own arithmetic, render the tabs. */
 
-import { attachHover } from "./chart.ts";
-import { renderDistrict } from "./district.ts";
-import { escapeHtml, pct } from "./format.ts";
+import { attachHover } from "../lib/chart.ts";
+import { renderDistrict } from "../lib/district.ts";
+import { escapeHtml, pct } from "../lib/format.ts";
 import {
   defaultLevers,
   renderControls,
   renderScenario,
   type Levers,
-} from "./scenario.ts";
-import { renderStatewide } from "./statewide.ts";
-import { REQUIRED_CONTRACT, type Bundle, type District } from "./types.ts";
-import { isVerified, verify, type Verification } from "./verify.ts";
+} from "../lib/scenario.ts";
+import { renderStatewide } from "../lib/statewide.ts";
+import { REQUIRED_CONTRACT, type Bundle, type District } from "../lib/types.ts";
+import { isVerified, verify, type Verification } from "../lib/verify.ts";
 
 const $ = <T extends HTMLElement>(selector: string): T =>
   document.querySelector(selector) as T;
@@ -116,9 +116,12 @@ function render(): void {
     if (district) $("#district-out").innerHTML = renderDistrict(bundle, district);
   } else if (tab === "statewide") {
     $("#statewide-out").innerHTML = renderStatewide(bundle);
-  } else {
+  } else if (isVerified(state.verification)) {
     $("#scenario-out").innerHTML = renderScenario(bundle, state.levers);
   }
+  // An unverified feed falls through: `reportVerificationFailure()` has already written that
+  // panel and rendering over it would put the scenario tab back exactly as if nothing were
+  // wrong — on the one tab the check exists to hold shut.
 }
 
 function readLevers(): Levers {
@@ -277,7 +280,12 @@ function boot(bundle: Bundle): void {
   showTab(requested.tab);
 }
 
-fetch("data/bundle.json")
+// Fetched at runtime rather than imported, so it stays outside the bundle: regenerating the
+// feed is a `cargo run` redirect into `public/`, not a rebuild of the site. `BASE_URL` is what
+// Vite was configured with, so this still resolves when the site is deployed under a sub-path.
+const FEED = `${import.meta.env.BASE_URL}data/bundle.json`;
+
+fetch(FEED)
   .then((response) => {
     if (!response.ok) throw new Error(`HTTP ${response.status}`);
     return response.json() as Promise<Bundle>;
@@ -286,9 +294,12 @@ fetch("data/bundle.json")
   .catch((error: unknown) => {
     const message = error instanceof Error ? error.message : String(error);
     $("#district-out").innerHTML = `<div class="card">
-      <p class="err">Could not load <code>data/bundle.json</code> (${escapeHtml(message)}).</p>
-      <p class="note">Browsers block <code>fetch</code> from <code>file://</code>. Serve the
-        directory over HTTP:</p>
-      <p class="note"><code>node web/serve.mjs</code>, then open
-        <code>http://localhost:8000</code>.</p></div>`;
+      <p class="err">Could not load <code>${escapeHtml(FEED)}</code> (${escapeHtml(message)}).</p>
+      <p class="note">The feed is served from <code>public/data/</code>. If this is a local
+        checkout, the page has to be served over HTTP — browsers block <code>fetch</code> from
+        <code>file://</code>:</p>
+      <p class="note"><code>pnpm --dir web dev</code>, then open the URL it prints.</p>
+      <p class="note">If the file is missing, regenerate it:
+        <code>cargo run -p bundle --manifest-path crates/Cargo.toml &gt; web/public/data/bundle.json</code>.</p>
+      </div>`;
   });

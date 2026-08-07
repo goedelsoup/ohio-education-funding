@@ -8,7 +8,7 @@
 
 import { bin, divergingHistogram } from "./chart.ts";
 import { count, escapeHtml, millions, money, pct, signedMoney } from "./format.ts";
-import { applyAll, currentLaw, totals, type Outcome, type Policy } from "./policy.ts";
+import { applyAll, totals, type Outcome, type Policy } from "./policy.ts";
 import type { Bundle } from "./types.ts";
 
 /** The state the controls hold. */
