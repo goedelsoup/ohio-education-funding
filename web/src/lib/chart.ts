@@ -35,11 +35,16 @@ export function barChart(bars: Bar[], options: { max?: number } = {}): string {
   const labelWidth = 160;
   const width = 640;
   const height = bars.length * rowHeight;
+  // Room at the right for a direct label, sized to the longest one actually present. Without
+  // this a full-length bar's value runs off the viewBox and is clipped rather than wrapped —
+  // and it is the largest bar, so it is the one most worth reading.
+  const longest = Math.max(0, ...bars.map((b) => b.direct?.length ?? 0));
+  const gutter = longest > 0 ? 16 + longest * 7.2 : 20;
 
   const rows = bars
     .map((b, i) => {
       const y = i * rowHeight + (rowHeight - barHeight) / 2;
-      const w = Math.max(2, (Math.abs(b.value) / max) * (width - labelWidth - 60));
+      const w = Math.max(2, (Math.abs(b.value) / max) * (width - labelWidth - gutter));
       const hover = escapeHtml(b.hover ?? `${b.label}: ${b.value}`);
       return `
       <g class="bar-row" data-hover="${hover}">
@@ -163,6 +168,14 @@ export interface FanPoint {
   high: number;
   /** An observed year: the band has no width and the line is drawn solid. */
   observed: boolean;
+  /**
+   * A second quantity in the same units, drawn as a bare line in the contrasting hue.
+   *
+   * Used where the banded series alone would say nothing. For a district the guarantee pays,
+   * realized aid is flat by construction and the formula's own answer is the thing that moves;
+   * the vertical distance between the two is what the guarantee costs.
+   */
+  reference?: number;
 }
 
 /**
@@ -204,8 +217,11 @@ export function fanChart(
   const padRight = 104;
   const plot = width - padRight;
 
-  const lows = points.map((p) => p.low);
-  const highs = points.map((p) => p.high);
+  const references = points
+    .map((p) => p.reference)
+    .filter((v): v is number => v != null);
+  const lows = points.map((p) => p.low).concat(references);
+  const highs = points.map((p) => p.high).concat(references);
   let min = Math.min(...lows);
   let max = Math.max(...highs);
   const pad = (max - min) * 0.12 || Math.abs(max) * 0.02 || 1;
@@ -261,6 +277,14 @@ export function fanChart(
       // inside a zero-width band would say the opposite.
       observed.length > 1
         ? `<polyline class="fan-observed" points="${seg(observed, 0, (p) => p.point)}"></polyline>`
+        : ""
+    }
+    ${
+      references.length === points.length
+        ? `<polyline class="fan-reference" points="${seg(points, 0, (p) => p.reference ?? 0)}"></polyline>
+           <text class="fan-bound reference" x="${(plot + 8).toFixed(1)}"
+                 y="${y(last.reference ?? 0).toFixed(1)}"
+                 dominant-baseline="middle">${escapeHtml(format(last.reference ?? 0))}</text>`
         : ""
     }
     ${

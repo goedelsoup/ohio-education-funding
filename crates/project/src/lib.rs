@@ -47,6 +47,7 @@
 #![forbid(unsafe_code)]
 
 pub mod crosswalk;
+pub mod finances;
 pub mod outcomes;
 pub mod panel;
 pub mod policy;

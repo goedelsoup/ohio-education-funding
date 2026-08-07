@@ -21,7 +21,9 @@ test.describe("boot", () => {
 
     // The picker is written from the feed; "Loading…" is the inert shell.
     await expect(page.locator("#pick option")).toHaveCount(609);
-    await expect(page.locator("#district-out .tile")).toHaveCount(3);
+    // The headline row. The page carries more tiles further down — the actuals card has its
+    // own — so this is scoped to the first group rather than counting every tile on the page.
+    await expect(page.locator("#district-out .tiles").first().locator(".tile")).toHaveCount(3);
     await expect(page.locator("#district-out .err")).toHaveCount(0);
     expect(failures, "the page threw while booting").toEqual([]);
   });
@@ -31,7 +33,7 @@ test.describe("boot", () => {
     const response = await request.get("/data/bundle.json");
     expect(response.status()).toBe(200);
     const bundle = await response.json();
-    expect(bundle.contract_version).toBe("4.0.0");
+    expect(bundle.contract_version).toBe("5.0.0");
     expect(bundle.districts).toHaveLength(609);
   });
 
@@ -84,7 +86,7 @@ test.describe("the verification gate", () => {
     await expect(page.locator("#lv-guarantee")).toHaveCount(0);
     // The published-figure views read the feed rather than recomputing it, so they still work.
     await page.getByRole("tab", { name: "District" }).click();
-    await expect(page.locator("#district-out .tile")).toHaveCount(3);
+    await expect(page.locator("#district-out .tiles").first().locator(".tile")).toHaveCount(3);
   });
 
   test("refuses to render a feed on a different contract", async ({ page }) => {
@@ -98,6 +100,7 @@ test.describe("the verification gate", () => {
     await page.goto("/");
     await expect(page.locator("#district-out .err")).toContainText("99.0.0");
     await expect(page.locator("#district-out .tile")).toHaveCount(0);
+
   });
 
   test("explains itself when the feed is missing", async ({ page }) => {
@@ -327,23 +330,83 @@ test.describe("the projection", () => {
     await expect(card.locator('[data-chart="district-fan"] svg')).toHaveCount(1);
   });
 
-  test("a guaranteed district's band is flat, and the page says why", async ({ page }) => {
+  test("a guaranteed district shows what the formula computes beside what it receives", async ({
+    page,
+  }) => {
     // Cleveland is on the guarantee, which pays a fixed dollar amount that enrollment does not
-    // enter. A flat band is the finding, not a broken chart, so it is captioned as one.
+    // enter — so its band is a flat line and a chart of it alone is a chart of nothing. Nearly
+    // half of Ohio's districts are in this position, so this is the common case, not the edge.
     await page.goto(`/#district/${CLEVELAND}`);
     const card = page
       .locator("#district-out .card")
       .filter({ hasText: "What a year of enrollment is worth here" });
-    await expect(card).toContainText("The band is flat");
-    await expect(card).toContainText("does not respond to its enrollment");
-    // One bound label, because both ends are the same number.
-    await expect(card.locator("text.fan-bound")).toHaveCount(1);
+
+    await expect(card).toContainText("flat by construction");
+    await expect(card).toContainText("The gap between them is the guarantee");
+
+    // Two series: the flat realized line and the falling formula line, in the two validated
+    // hues, each direct-labelled at the terminal year.
+    await expect(card.locator("polyline.fan-reference")).toHaveCount(1);
+    await expect(card.locator("text.fan-bound")).toHaveCount(2);
+    await expect(card.locator(".legend")).toContainText("What the formula computes");
+  });
+
+  test("a formula-funded district gets a band and no second line", async ({ page }) => {
+    // The reference line exists because a flat band says nothing. Where the band already says
+    // something, a second series would be one more mark for no extra claim.
+    await page.goto("/#district/046763");
+    const card = page
+      .locator("#district-out .card")
+      .filter({ hasText: "What a year of enrollment is worth here" });
+    await expect(card.locator("polyline.fan-reference")).toHaveCount(0);
+    await expect(card).toContainText("The range, not the line, is the finding");
   });
 
   test("the footer counts the forecasts it checked, not only the scenarios", async ({ page }) => {
     await page.goto("/");
     await expect(page.locator("#verified")).toContainText("reference forecasts");
     await expect(page.locator("#verified")).not.toHaveClass(/err/);
+  });
+});
+
+test.describe("the actuals", () => {
+  test("shows six closed years of money that changed hands", async ({ page }) => {
+    await page.goto(`/#district/${CLEVELAND}`);
+    const card = page
+      .locator("#district-out .card")
+      .filter({ hasText: "What it actually received, and what it holds" });
+    await expect(card.locator("tbody tr")).toHaveCount(6);
+    await expect(card.locator("tbody tr").first()).toContainText("FY2020");
+    await expect(card.locator("tbody tr").last()).toContainText("FY2025");
+    await expect(card.locator('[data-chart="cash"] svg')).toHaveCount(1);
+  });
+
+  test("says these are actuals and not the calculator's output", async ({ page }) => {
+    // The one card on this page that is a record rather than a model. Rendering it beside the
+    // FY2027 figures without saying which is which would present a measurement and a projection
+    // as the same kind of claim.
+    await page.goto(`/#district/${CLEVELAND}`);
+    const card = page
+      .locator("#district-out .card")
+      .filter({ hasText: "What it actually received, and what it holds" });
+    await expect(card).toContainText("audited actuals");
+    await expect(card).toContainText("not the same construction");
+    await expect(card).toContainText("General fund only");
+    // And the relief years are declared rather than left in a footnote nobody reads.
+    await expect(card).toContainText("federal pandemic relief years");
+  });
+
+  test("a direct label on the longest bar is not clipped", async ({ page }) => {
+    // The largest bar is the one most worth reading, and it is the one whose label runs off the
+    // viewBox if the chart does not reserve a gutter for it.
+    await page.goto(`/#district/${CLEVELAND}`);
+    const svg = page.locator('#district-out [data-chart="cash"] svg');
+    const box = await svg.boundingBox();
+    for (const label of await svg.locator("text.bar-value").all()) {
+      const at = await label.boundingBox();
+      expect(at, "a direct label has no box").not.toBeNull();
+      expect(at!.x + at!.width).toBeLessThanOrEqual(box!.x + box!.width + 1);
+    }
   });
 });
 

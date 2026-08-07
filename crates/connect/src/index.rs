@@ -457,7 +457,7 @@ mod tests {
     #[test]
     fn the_bundle_status_reads_the_feed_rather_than_describing_it() {
         let status = bundle_status(&repository_root());
-        assert!(status.contains("`4.0.0`"), "{status}");
+        assert!(status.contains("`5.0.0`"), "{status}");
         assert!(
             status.contains("| Districts in the feed | 609 |"),
             "{status}"

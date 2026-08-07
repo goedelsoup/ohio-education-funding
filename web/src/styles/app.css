@@ -182,6 +182,9 @@ tbody tr:last-child th, tbody tr:last-child td { border-bottom: 0; }
 .fan-mid { fill: none; stroke: var(--series-formula); stroke-width: 2; stroke-dasharray: 5 4; }
 /* Measurement, not estimate: solid, and outside the band. */
 .fan-observed { fill: none; stroke: var(--series-formula); stroke-width: 2; }
+/* The second series, in the contrasting hue of the validated pair. Never a generated colour. */
+.fan-reference { fill: none; stroke: var(--series-guarantee); stroke-width: 2; }
+.fan-bound.reference { fill: var(--series-guarantee); }
 .fan-anchor { fill: var(--surface-1); stroke: var(--series-formula); stroke-width: 2; }
 .fan-bound { font-size: 12px; fill: var(--text-primary); font-variant-numeric: tabular-nums; }
 .fan-hit { fill: transparent; }

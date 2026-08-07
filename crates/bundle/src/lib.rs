@@ -37,6 +37,12 @@ use edfund_core::Dollars;
 
 /// The bundle schema version. Bump on any change to field names, units, or semantics.
 ///
+/// `5.0.0` added the actuals: a `finances` array per district carrying six closed fiscal years
+/// of what it received, raised, spent, and held. Additive in shape but breaking in meaning — it
+/// is the first per-district figure in the feed that is a record rather than a model, and a
+/// consumer that rendered it beside the FY2027 calculator's output without saying which was
+/// which would present a measurement and a projection as the same kind of claim.
+///
 /// `4.0.0` added the projection axis: `adm_history` on every district, so the page can carry
 /// enrollment forward itself, and a `projection` block holding the forecast's method, its prior,
 /// and [`ForecastCheckpoint`]s the page must reproduce before it may draw a band. Breaking rather
@@ -53,7 +59,7 @@ use edfund_core::Dollars;
 /// from FY2022-FY2024 to FY2024-FY2026 — the years the department's `ADM Data` sheet declares.
 /// The values did not change; what they are called did, which is exactly the kind of silent
 /// meaning change the version guard exists for.
-pub const CONTRACT_VERSION: &str = "4.0.0";
+pub const CONTRACT_VERSION: &str = "5.0.0";
 
 /// The outcome side of a district, where the report card covers it.
 ///
@@ -117,6 +123,26 @@ pub struct OutcomeStatewide {
     pub median_performance_on_formula: f64,
 }
 
+/// One closed fiscal year of a district's general fund. Every figure is an audited actual.
+///
+/// From the district's own five-year forecast filing, not from the funding calculator. The two
+/// are differently constructed and the feed never presents one as a check on the other.
+#[derive(Debug, Clone, Copy, PartialEq)]
+pub struct FinanceYear {
+    /// Fiscal year, ending 30 June.
+    pub fiscal_year: u16,
+    /// Unrestricted grants-in-aid: state foundation money as the district books it.
+    pub state_aid: Dollars,
+    /// Property tax plus income tax — the local levy yield actually collected.
+    pub local_tax: Dollars,
+    /// Total general fund revenue.
+    pub total_revenue: Dollars,
+    /// Total expenditures and other financing uses.
+    pub total_expenditure: Dollars,
+    /// Cash balance at 30 June. What the district holds.
+    pub ending_cash: Dollars,
+}
+
 /// One district, as the web layer needs it.
 #[derive(Debug, Clone, PartialEq)]
 pub struct District {
@@ -165,6 +191,8 @@ pub struct District {
     pub adm_history: [f64; 3],
     /// Achievement, growth, and need. `None` for the three districts with no report card.
     pub outcome: Option<DistrictOutcome>,
+    /// Six closed fiscal years of actuals, oldest first. Empty where no filing was found.
+    pub finances: Vec<FinanceYear>,
 }
 
 impl District {
@@ -613,6 +641,23 @@ impl Bundle {
                     opt(o.students_with_disabilities),
                 )),
             }
+            s.push_str(", \"finances\": [");
+            for (at, year) in d.finances.iter().enumerate() {
+                if at > 0 {
+                    s.push_str(", ");
+                }
+                s.push_str(&format!(
+                    "{{\"fiscal_year\": {}, \"state_aid\": {}, \"local_tax\": {}, \
+                     \"total_revenue\": {}, \"total_expenditure\": {}, \"ending_cash\": {}}}",
+                    year.fiscal_year,
+                    num(year.state_aid),
+                    num(year.local_tax),
+                    num(year.total_revenue),
+                    num(year.total_expenditure),
+                    num(year.ending_cash)
+                ));
+            }
+            s.push(']');
             s.push('}');
             if i + 1 < self.districts.len() {
                 s.push(',');
@@ -648,6 +693,14 @@ mod tests {
             economically_disadvantaged: Some(0.3881),
             enrollment_change: Some(-0.03),
             adm_history: [2_173.0, 2_140.0, 2_107.8],
+            finances: vec![FinanceYear {
+                fiscal_year: 2025,
+                state_aid: 10_252_524.0,
+                local_tax: 6_000_000.0,
+                total_revenue: 21_000_000.0,
+                total_expenditure: 22_000_000.0,
+                ending_cash: 7_500_000.0,
+            }],
             outcome: Some(DistrictOutcome {
                 performance_index: Some(89.9),
                 performance_index_prior: Some(89.1),
@@ -816,7 +869,7 @@ mod tests {
     fn the_bundle_declares_its_contract_version() {
         assert!(bundle(vec![], vec![])
             .to_json()
-            .contains("\"contract_version\": \"4.0.0\""));
+            .contains("\"contract_version\": \"5.0.0\""));
     }
 
     #[test]

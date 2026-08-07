@@ -1,6 +1,6 @@
 /** The district view: what the formula computes for one district, and what it actually gets. */
 
-import { fanChart, type FanPoint } from "./chart.ts";
+import { barChart, fanChart, type FanPoint } from "./chart.ts";
 import { count, escapeHtml, money, ordinal, pct, percentileOf, signedMoney } from "./format.ts";
 import { renderDistrictOutcome } from "./outcomes.ts";
 import { apply, currentLaw } from "./policy.ts";
@@ -80,7 +80,16 @@ function renderEnrollmentYears(bundle: Bundle, d: District): string {
     low: p.low,
     high: p.high,
     observed: p.observed,
+    // The second line, only where the first one says nothing. A guaranteed district's aid is a
+    // fixed dollar amount, so its band is a horizontal line and a chart of it alone is a chart
+    // of nothing; what the formula computes for it falls with enrollment, and the gap between
+    // the two is the guarantee doing its job. Spread rather than `undefined`, because the
+    // property is optional and an explicit undefined is not the same thing.
+    ...(insensitive ? { reference: p.formulaAid } : {}),
   }));
+  const gapNow = path.find((p) => p.fiscalYear === meta.base_year);
+  const widening =
+    gapNow && end.realizedAid - end.formulaAid - (gapNow.realizedAid - gapNow.formulaAid);
 
   return `
     <div class="card">
@@ -125,16 +134,121 @@ function renderEnrollmentYears(bundle: Bundle, d: District): string {
             ? `FY${p.year}: ${money(p.point)} at published enrollment — exact`
             : `FY${p.year}: ${money(p.low)} – ${money(p.high)}, central ${money(p.point)}`,
       )}</div>
+      ${
+        insensitive
+          ? `<div class="legend">
+               <span><i class="sw formula"></i> What the district receives</span>
+               <span><i class="sw guarantee"></i> What the formula computes</span>
+             </div>`
+          : ""
+      }
       <p class="note">${
         insensitive
-          ? `The band is flat. This district's state aid does not respond to its enrollment at
-             all under current law, because the guarantee pays it a fixed amount and the
-             formula — which does respond — is not what it is paid on.`
+          ? `<strong>The flat line is what this district receives, and it is flat by
+             construction.</strong> The guarantee pays a fixed dollar amount that enrollment does
+             not enter, so no forecast of its enrollment moves it and it has no band. The line
+             that falls is what the formula computes at that enrollment
+             — ${money(end.formulaAid)} by FY${end.fiscalYear} against ${money(end.realizedAid)}
+             received. The gap between them is the guarantee, and on this projection it
+             ${(widening ?? 0) > 0 ? "widens by" : "narrows by"}
+             ${money(Math.abs(widening ?? 0))} over the horizon.`
           : `The range, not the line, is the finding: at FY${end.fiscalYear} enrollment this
              district's aid is somewhere between ${money(end.low)} and ${money(end.high)}. The
              band is the cross-sectional spread of district enrollment growth, not this
              district's own history — three observations cannot give that.`
       }</p>
+    </div>`;
+}
+
+/** Fiscal years federal pandemic relief makes uncomparable to what came before and after. */
+const PANDEMIC_YEARS = [2021, 2022, 2023, 2024];
+
+/**
+ * What the district actually received, raised, spent, and holds.
+ *
+ * # This is the only card on the page that is not a model
+ *
+ * Every other figure here is computed: what the FY2027 formula says a district is owed, what it
+ * spent per pupil on the department's definitions, what its pupils achieved. These are audited
+ * actuals from the district's own five-year forecast filing — money that changed hands.
+ *
+ * The two are differently constructed and this card never presents one as a check on the other.
+ * The general fund is also not the whole budget: capital, food service, and most federal
+ * programmes sit in other funds, so the spending here is not the district's total.
+ */
+function renderActuals(d: District): string {
+  if (d.finances.length === 0) return "";
+  const first = d.finances[0]!;
+  const latest = d.finances[d.finances.length - 1]!;
+  const cashChange = latest.ending_cash - first.ending_cash;
+  const yearsOfSpending =
+    latest.total_expenditure > 0 ? latest.ending_cash / latest.total_expenditure : null;
+  const deficits = d.finances.filter(
+    (y) => y.total_expenditure > y.total_revenue,
+  ).length;
+
+  const peak = d.finances.reduce((a, b) => (b.ending_cash > a.ending_cash ? b : a));
+  const bars = d.finances.map((y) => ({
+    label: `FY${y.fiscal_year}`,
+    value: y.ending_cash,
+    hover: `FY${y.fiscal_year}: ${money(y.ending_cash)} held, ${money(y.total_revenue)} in, ${money(y.total_expenditure)} out`,
+    ...(y.fiscal_year === peak.fiscal_year || y.fiscal_year === latest.fiscal_year
+      ? { direct: money(y.ending_cash) }
+      : {}),
+  }));
+
+  return `
+    <div class="card">
+      <h2>What it actually received, and what it holds</h2>
+      <div class="tiles">
+        <div class="tile"><div class="k">Cash on hand, FY${latest.fiscal_year}</div>
+          <div class="v">${money(latest.ending_cash)}</div>
+          <div class="n">${
+            yearsOfSpending == null
+              ? "no spending reported"
+              : `${yearsOfSpending.toFixed(2)} years of spending at this rate`
+          }</div></div>
+        <div class="tile"><div class="k">Change since FY${first.fiscal_year}</div>
+          <div class="v ${cashChange < 0 ? "loss" : "gain"}">${signedMoney(cashChange)}</div>
+          <div class="n">carry-over into FY${latest.fiscal_year + 1} is
+            ${money(latest.ending_cash)}</div></div>
+        <div class="tile"><div class="k">Years run at a deficit</div>
+          <div class="v">${deficits} of ${d.finances.length}</div>
+          <div class="n">spending above the year's own revenue</div></div>
+      </div>
+
+      <div class="chartwrap" data-chart="cash">${barChart(bars)}</div>
+      <p class="note">Cash held at 30 June, general fund.
+        FY${PANDEMIC_YEARS[0]}–FY${PANDEMIC_YEARS[PANDEMIC_YEARS.length - 1]} are the federal
+        pandemic relief years: that money was booked in the general fund by some districts and
+        separately by others, so a balance rising across them is not evidence about this
+        district's own position.</p>
+
+      <div class="scroll"><table>
+        <thead><tr>
+          <th>Fiscal year</th><th>State aid</th><th>Local tax</th>
+          <th>Revenue</th><th>Spending</th><th>Held at 30 June</th>
+        </tr></thead>
+        <tbody>${d.finances
+          .map(
+            (y) => `<tr>
+              <th>FY${y.fiscal_year}</th>
+              <td class="tnum">${money(y.state_aid)}</td>
+              <td class="tnum">${money(y.local_tax)}</td>
+              <td class="tnum">${money(y.total_revenue)}</td>
+              <td class="tnum">${money(y.total_expenditure)}</td>
+              <td class="tnum">${money(y.ending_cash)}</td>
+            </tr>`,
+          )
+          .join("")}</tbody>
+      </table></div>
+      <p class="note">These are <strong>audited actuals</strong> from this district's own
+        five-year forecast filing — the only figures on this page that record money changing
+        hands rather than a formula's output. State aid here is unrestricted grants-in-aid as the
+        treasurer books it, which is <em>not</em> the same construction as the
+        FY${2027} calculator's total state support above; the two are not comparable line for
+        line. Local tax is property plus income tax actually collected. General fund only, so
+        capital, food service, and most federal programmes are outside it.</p>
     </div>`;
 }
 
@@ -211,6 +325,8 @@ export function renderDistrict(bundle: Bundle, d: District): string {
     </div>
 
     ${renderEnrollmentYears(bundle, d)}
+
+    ${renderActuals(d)}
 
     <div class="card">
       <h2>Position among Ohio's ${bundle.statewide.districts} districts</h2>

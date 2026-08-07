@@ -6,7 +6,7 @@
  */
 
 /** The bundle contract this page understands. */
-export const REQUIRED_CONTRACT = "4.0.0";
+export const REQUIRED_CONTRACT = "5.0.0";
 
 /**
  * The outcome side of a district, where the report card covers it.
@@ -86,6 +86,28 @@ export interface District {
   adm_history: [number, number, number];
   /** Achievement, growth, and need. `null` for the three districts with no report card. */
   outcome: DistrictOutcome | null;
+  /**
+   * Six closed fiscal years of **actuals**, oldest first. Empty where no filing was found.
+   *
+   * The only figures in this feed that are a record rather than a model. They come from the
+   * district's own five-year forecast filing, not from the funding calculator, and the two are
+   * differently constructed — see `.yidam/catalog/dew-five-year-forecast.md`. Never render one
+   * as a check on the other.
+   */
+  finances: FinanceYear[];
+}
+
+/** One closed fiscal year of a district's general fund. Audited actuals. */
+export interface FinanceYear {
+  fiscal_year: number;
+  /** Unrestricted grants-in-aid: state foundation money as the district books it. */
+  state_aid: number;
+  /** Property tax plus income tax — the local levy yield actually collected. */
+  local_tax: number;
+  total_revenue: number;
+  total_expenditure: number;
+  /** Cash balance at 30 June. What the district holds. */
+  ending_cash: number;
 }
 
 /** Statewide aggregates, so a district can be positioned without recomputing. */

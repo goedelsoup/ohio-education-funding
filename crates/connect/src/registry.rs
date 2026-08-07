@@ -257,6 +257,40 @@ pub const CONNECTORS: &[Connector] = &[
         }],
     },
     Connector {
+        key: "dew-five-year-forecast",
+        publisher: "Ohio Department of Education and Workforce",
+        feeds: &["education-agency", "revenue-stream", "metric", "fiscal-period"],
+        status: Status::Wired,
+        note: "The only per-district record here of money that changed hands rather than money \
+               a formula computed — and the only one carrying what a district holds.",
+        sources: &[
+            Source {
+                key: "five-year-forecast-fy23",
+                url: "https://public.education.ohio.gov/School%20District%20Five-year%20Forecasts/\
+                      FY23_5YR_Forecast_Required_Spring%20Update%20Submissions.txt",
+                filename: "five-year-forecast-fy23.txt",
+                format: Format::Tsv,
+                catalog: Some("dew-five-year-forecast"),
+                fixture: Some(crate::fixtures::FINANCE_FIXTURE),
+                note: "Actuals for FY2020, FY2021 and FY2022. FY2020 is the year the temporary \
+                       transitional aid guarantee holds districts at, which this corpus has \
+                       until now only been able to infer.",
+            },
+            Source {
+                key: "five-year-forecast-fy26",
+                url: "https://public.education.ohio.gov/School%20District%20Five-year%20Forecasts/\
+                      FY26_Financial_Forecast_Required_Spring_Update_Submissions.txt",
+                filename: "five-year-forecast-fy26.txt",
+                format: Format::Tsv,
+                catalog: Some("dew-five-year-forecast"),
+                fixture: Some(crate::fixtures::FINANCE_FIXTURE),
+                note: "Actuals for FY2023, FY2024 and FY2025. Picks up exactly where the FY2023 \
+                       filing's actuals stop, and the two must agree about the cash balance at \
+                       the instant they meet.",
+            },
+        ],
+    },
+    Connector {
         key: "tax-abstract",
         publisher: "Ohio Department of Taxation",
         feeds: &["revenue-stream", "parameter", "metric"],
@@ -377,7 +411,8 @@ mod tests {
     #[test]
     fn every_connector_approved_in_the_ontology_is_present() {
         // The nine from decisions/proposals.yml, plus dew-report-card from
-        // decisions/report-card-connector.yml. A connector dropping out of this list is a
+        // decisions/report-card-connector.yml and dew-five-year-forecast from
+        // decisions/five-year-forecast-connector.yml. A connector dropping out of this list is a
         // decision, not an oversight, and should fail here first.
         let expected = [
             "dew-foundation",
@@ -390,6 +425,7 @@ mod tests {
             "nces-ccd",
             "bls-cpi",
             "dew-report-card",
+            "dew-five-year-forecast",
         ];
         for key in expected {
             assert!(
