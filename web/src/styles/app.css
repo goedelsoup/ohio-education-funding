@@ -180,6 +180,8 @@ tbody tr:last-child th, tbody tr:last-child td { border-bottom: 0; }
 .fan-band { fill: var(--series-formula); fill-opacity: .16; }
 .fan-edge { fill: none; stroke: var(--series-formula); stroke-width: 2; }
 .fan-mid { fill: none; stroke: var(--series-formula); stroke-width: 2; stroke-dasharray: 5 4; }
+/* Measurement, not estimate: solid, and outside the band. */
+.fan-observed { fill: none; stroke: var(--series-formula); stroke-width: 2; }
 .fan-anchor { fill: var(--surface-1); stroke: var(--series-formula); stroke-width: 2; }
 .fan-bound { font-size: 12px; fill: var(--text-primary); font-variant-numeric: tabular-nums; }
 .fan-hit { fill: transparent; }
@@ -202,6 +204,13 @@ tbody tr:last-child th, tbody tr:last-child td { border-bottom: 0; }
   background: var(--surface-1);
   border: 2px solid var(--series-formula);
   border-radius: 50%;
+}
+.sw.solid {
+  background: var(--series-formula);
+  border-radius: 0;
+  height: 2px;
+  width: 14px;
+  margin-bottom: 3px;
 }
 
 #tip {

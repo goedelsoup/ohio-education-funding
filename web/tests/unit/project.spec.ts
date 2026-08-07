@@ -201,7 +201,7 @@ test("removing the guarantee widens the state's exposure to enrollment error", (
   expect(removed).toBeGreaterThan(enacted * 1.5);
 });
 
-test("the path anchors on the simulation and only then starts forecasting", () => {
+test("the path carries every observed year before it starts forecasting", () => {
   const path = forecastPath(
     bundle.districts,
     currentLaw(model),
@@ -212,17 +212,69 @@ test("the path anchors on the simulation and only then starts forecasting", () =
     growthPrior(bundle.districts, meta.z),
     model,
   );
-  expect(path.length).toBe(4);
-  const anchor = path[0]!;
-  expect(anchor.observed).toBe(true);
-  expect(anchor.low).toBe(anchor.realizedAid);
-  expect(anchor.high).toBe(anchor.realizedAid);
-  // The anchor is current law at published enrollment: the number the simulation card shows.
-  expect(Math.abs(anchor.realizedAid - bundle.statewide.realized_aid_total)).toBeLessThan(1);
-  for (const point of path.slice(1)) {
-    expect(point.observed).toBe(false);
+  // Three observed years and three projected ones. The observed half is the evidence for the
+  // forecast, and a chart that dropped it would ask the reader to take its starting value on
+  // faith.
+  expect(path.length).toBe(6);
+  expect(path.map((p) => p.fiscalYear)).toEqual([2024, 2025, 2026, 2027, 2028, 2029]);
+
+  const observed = path.filter((p) => p.observed);
+  expect(observed.map((p) => p.fiscalYear)).toEqual([2024, 2025, 2026]);
+  for (const point of observed) {
+    // No interval at all, not a zero-width one: the enrollment is published.
+    expect(point.low).toBe(point.realizedAid);
+    expect(point.high).toBe(point.realizedAid);
+  }
+
+  // The seam is current law at the department's own enrollment — the number the simulation card
+  // shows — so the chart joins the card above it rather than starting somewhere new.
+  const seam = observed[observed.length - 1]!;
+  expect(seam.fiscalYear).toBe(meta.base_year);
+  expect(Math.abs(seam.realizedAid - bundle.statewide.realized_aid_total)).toBeLessThan(1);
+
+  for (const point of path.filter((p) => !p.observed)) {
     expect(point.low).toBeLessThan(point.high);
   }
+});
+
+test("the observed years are the department's own enrolled ADM, not a re-derivation", () => {
+  const path = forecastPath(
+    bundle.districts,
+    currentLaw(model),
+    meta.base_year + 1,
+    meta.base_year,
+    meta.method,
+    meta.damping,
+    growthPrior(bundle.districts, meta.z),
+    model,
+  );
+  const observed = path.filter((p) => p.observed);
+  for (const [index, point] of observed.entries()) {
+    const total = bundle.districts.reduce((sum, d) => sum + d.adm_history[index]!, 0);
+    expect(Math.abs(point.adm - total), `FY${point.fiscalYear}`).toBeLessThan(1e-6);
+  }
+  // Enrollment fell over the three observed years, which is why the trend points down.
+  expect(observed[0]!.adm).toBeGreaterThan(observed[observed.length - 1]!.adm);
+});
+
+test("the fan draws the observed run-up solid and outside the band", () => {
+  const points: FanPoint[] = [
+    { year: 2024, point: 104, low: 104, high: 104, observed: true },
+    { year: 2025, point: 102, low: 102, high: 102, observed: true },
+    { year: 2026, point: 100, low: 100, high: 100, observed: true },
+    { year: 2027, point: 99, low: 95, high: 103, observed: false },
+    { year: 2028, point: 98, low: 91, high: 105, observed: false },
+  ];
+  const svg = fanChart(points, (v) => `$${v.toFixed(0)}`, (p) => `FY${p.year}`);
+  // One solid polyline over the observed years, one dashed over the projected ones.
+  expect(svg).toContain("fan-observed");
+  expect(svg).toContain("fan-mid");
+  // The band starts at the seam, not at the origin: three projected vertices, not five.
+  const band = /class="fan-band" d="M ([^"]*)"/.exec(svg)?.[1] ?? "";
+  expect(band.split(" L ").length).toBe(6);
+  // The axis opens on the first observed year rather than on the forecast.
+  expect(svg).toContain(">FY2024<");
+  expect(svg).toContain(">FY2028<");
 });
 
 test("the fan chart labels both bounds and dashes the centre", () => {

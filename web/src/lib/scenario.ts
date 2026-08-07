@@ -207,6 +207,9 @@ export function renderProjection(bundle: Bundle, levers: Levers): string {
   );
   const end = path[path.length - 1]!;
   const start = path[0]!;
+  // The seam, not the first point: the forecast departs from the last observed year, and that is
+  // the enrollment the projected one should be read against.
+  const seam = path.filter((p) => p.observed).at(-1) ?? start;
   const width = (end.high - end.low) / (2 * end.realizedAid);
 
   // The same horizon under current law, so the reader can see what the guarantee is doing to
@@ -252,7 +255,8 @@ export function renderProjection(bundle: Bundle, levers: Levers): string {
           }</div></div>
         <div class="tile"><div class="k">Projected enrolled ADM</div>
           <div class="v">${count(Math.round(end.adm))}</div>
-          <div class="n">from ${count(Math.round(start.adm))} in FY${start.fiscalYear}</div></div>
+          <div class="n">from ${count(Math.round(seam.adm))} observed in
+            FY${seam.fiscalYear}</div></div>
       </div>
 
       <div class="chartwrap" data-chart="fan">${fanChart(
@@ -264,9 +268,10 @@ export function renderProjection(bundle: Bundle, levers: Levers): string {
             : `FY${p.year}: ${range(p.low, p.high)}, central ${millions(p.point).replace("+", "")}`,
       )}</div>
       <div class="legend">
-        <span><i class="sw band"></i> Range of total state aid</span>
+        <span><i class="sw solid"></i> Observed enrollment, exact</span>
+        <span><i class="sw anchor"></i> Last observed year</span>
+        <span><i class="sw band"></i> Range at projected enrollment</span>
         <span><i class="sw dash"></i> Central estimate</span>
-        <span><i class="sw anchor"></i> Last observed year, no forecast</span>
       </div>
 
       <p class="note">This is a <strong>forecast</strong>, and the card above it is not. The
