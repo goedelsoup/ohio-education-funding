@@ -372,6 +372,104 @@ const ENGLISH_LEARNER: &str = "English Learner";
 /// Reported for every district.
 const STUDENTS_WITH_DISABILITIES: &str = "Students with Disabilities";
 
+/// Columns of the FY2025 expenditure-function fixture.
+pub const FUNCTIONS_HEADER: &[&str] = &[
+    "irn",
+    "district",
+    "unweighted_adm_fy25",
+    "operating_expenditure_per_pupil_fy25",
+    "instruction_per_pupil",
+    "pupil_support_per_pupil",
+    "instructional_staff_support_per_pupil",
+    "classroom_instruction_per_pupil",
+    "general_admin_per_pupil",
+    "school_admin_per_pupil",
+    "operations_maintenance_per_pupil",
+    "pupil_transportation_per_pupil",
+    "other_support_per_pupil",
+    "food_service_per_pupil",
+    "nonclassroom_per_pupil",
+];
+
+/// Column positions on the Expanded List's `Expenditure per Pupil` sheet.
+///
+/// Everything from `INSTRUCTION` onward is already a per-pupil dollar figure on the unweighted
+/// denominator; `OPERATING_TOTAL` is a whole-district dollar total. Mixing the two is the
+/// obvious error and the reason they are named apart here.
+///
+/// The department's two roll-ups partition operating spending exactly:
+/// `CLASSROOM_INSTRUCTION` = instruction + pupil support + instructional staff support, and
+/// `NONCLASSROOM` = the six administrative, plant, transport and food rows. The pair sums to
+/// operating expenditure per pupil, which
+/// [`crates/dispersion/tests/expenditure_functions_fy25.rs`](../../dispersion/tests/expenditure_functions_fy25.rs)
+/// checks rather than assumes. Construction, debt and non-operating rows sit outside it and are
+/// deliberately not carried here.
+mod function_columns {
+    pub const ADM: usize = 3;
+    pub const OPERATING_TOTAL: usize = 4;
+    pub const INSTRUCTION: usize = 7;
+    pub const PUPIL_SUPPORT: usize = 8;
+    pub const INSTRUCTIONAL_STAFF_SUPPORT: usize = 9;
+    pub const CLASSROOM_INSTRUCTION: usize = 10;
+    pub const GENERAL_ADMIN: usize = 11;
+    pub const SCHOOL_ADMIN: usize = 12;
+    pub const OPERATIONS_MAINTENANCE: usize = 13;
+    pub const PUPIL_TRANSPORTATION: usize = 14;
+    pub const OTHER_SUPPORT: usize = 15;
+    pub const FOOD_SERVICE: usize = 16;
+    pub const NONCLASSROOM: usize = 17;
+}
+
+/// Extract per-pupil operating spending by function for traditional districts.
+///
+/// Reads the `Expenditure per Pupil` sheet — the headcount-denominator one. The department also
+/// publishes the identical layout over weighted ADM, and every figure here would be about a
+/// fifth smaller on that sheet without a single function changing its share.
+#[must_use]
+pub fn build_function_extract(unweighted_rows: &[Vec<String>]) -> Vec<Vec<String>> {
+    use function_columns as f;
+    let per_pupil = [
+        f::INSTRUCTION,
+        f::PUPIL_SUPPORT,
+        f::INSTRUCTIONAL_STAFF_SUPPORT,
+        f::CLASSROOM_INSTRUCTION,
+        f::GENERAL_ADMIN,
+        f::SCHOOL_ADMIN,
+        f::OPERATIONS_MAINTENANCE,
+        f::PUPIL_TRANSPORTATION,
+        f::OTHER_SUPPORT,
+        f::FOOD_SERVICE,
+        f::NONCLASSROOM,
+    ];
+    let mut out: Vec<Vec<String>> = rows_by_key(unweighted_rows, expanded_columns::IRN)
+        .filter(|(_, row)| cell(row, expanded_columns::ORG_TYPE).trim() == PUBLIC_DISTRICT)
+        .map(|(irn, row)| {
+            let adm = number(cell(row, f::ADM));
+            let total = number(cell(row, f::OPERATING_TOTAL));
+            let mut record = vec![
+                irn.to_string(),
+                clean_name(cell(row, expanded_columns::IRN + 1)),
+                format_value(adm, 4),
+                format_value(
+                    match (total, adm) {
+                        (Some(t), Some(a)) if a > 0.0 => Some(t / a),
+                        _ => None,
+                    },
+                    2,
+                ),
+            ];
+            record.extend(
+                per_pupil
+                    .iter()
+                    .map(|i| format_value(number(cell(row, *i)), 2)),
+            );
+            record
+        })
+        .collect();
+    out.sort_by(|a, b| a[0].cmp(&b[0]));
+    out
+}
+
 /// The Expanded List's label for a traditional district.
 ///
 /// The file also carries 320 community schools, 49 JVSDs, 19 eschools and 8 STEM schools. The
@@ -492,6 +590,8 @@ pub const CPI_FIXTURE: &str = "crates/connect/fixtures/cpi-u-june.tsv";
 /// Where the 2024-25 report card fixture is written, relative to the repository root.
 pub const REPORT_CARD_FIXTURE: &str =
     "crates/dispersion/fixtures/report-card-2425-district-data.csv";
+/// Where the FY2025 expenditure-function fixture is written, relative to the repository root.
+pub const FUNCTIONS_FIXTURE: &str = "crates/dispersion/fixtures/expenditure-functions-fy25.csv";
 
 /// Reduce the Bureau's 2.7 MB all-series flat file to the one series and period the deflator
 /// uses.

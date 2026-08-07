@@ -201,6 +201,15 @@ pub fn rebuild(root: &Path) -> Result<Vec<Rebuilt>, RebuildError> {
         &value_added_book.rows("OVERALL_VA_1_YEAR_GAINS")?,
         &details_book.rows("District_Details")?,
     );
+    let unweighted_rows = expanded_book.rows("Expenditure per Pupil")?;
+    out.push(Rebuilt::Written {
+        path: fixtures::FUNCTIONS_FIXTURE.to_string(),
+        rows: fixtures::write_csv(
+            &root.join(fixtures::FUNCTIONS_FIXTURE),
+            fixtures::FUNCTIONS_HEADER,
+            &fixtures::build_function_extract(&unweighted_rows),
+        )?,
+    });
     out.push(Rebuilt::Written {
         path: fixtures::REPORT_CARD_FIXTURE.to_string(),
         rows: fixtures::write_csv(
