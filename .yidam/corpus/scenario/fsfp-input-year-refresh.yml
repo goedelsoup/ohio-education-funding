@@ -45,11 +45,42 @@ description: |
   different floor, but correlated with wealth — the share of districts insulated from an input
   refresh is a first-order question this run does not yet answer. [open]
 
+  **STATEWIDE, ALL 606 DISTRICTS.** [verified — see
+  [`crates/foundation/tests/statewide_refresh.rs`](../../../crates/foundation/tests/statewide_refresh.rs)]
+
+  Grade-band shares from the department's October FY2024 headcount file, scaled by each
+  district's base cost enrolled ADM:
+
+      statewide computed base cost increase   $496.3 million per year
+      ADM-weighted average                    $344.75 per pupil
+      per-pupil range                         $338.62  to  $580.82
+
+  The single-district extrapolation above gave $528 million; the real distribution gives
+  $496.3 million. The gap is mostly denominators — the worked example's grade mix is slightly
+  richer than the state's, and FY2024 ADM is lower than the FY2022 base cost ADM used to scale.
+  The two agree to within about 6%, which is the useful check on the extrapolation.
+
+  **THE SPREAD HAS A SINGLE CAUSE, AND IT IS THE STAFFING MINIMUM.** The most-affected district
+  gains 1.7 times per pupil what the least-affected does — $580.82 against $338.62 — with no
+  policy choice involved. **157 of 606 districts** are small enough that the six-teacher special
+  teacher minimum binds, and their mean per-pupil gain is $370.75 against $343.53 for everyone
+  else. [verified]
+
+  This is the same structural feature that makes small districts expensive per pupil in the
+  first place, now visible as an incidence result: a minimum that funds more positions per pupil
+  also pays out more per pupil when the price of a position rises. [inference] So a refresh is
+  progressive twice over — once through the state share residual, and again through the
+  small-district minimums — and a freeze is regressive on both.
+
   **WHAT THIS RUN IS NOT.** It perturbs one salary of ten. Administrator, counselor, librarian,
-  and clerical salaries have all risen since FY2022 and are held fixed here, so $352.33 per
-  pupil is a **lower bound** on a real refresh. It uses one district rather than 606, because
-  per-district grade-band enrollment is not yet retrieved. And the FY2022 baseline salary is
-  secondary reporting rather than the department's own figure. [open]
+  and clerical salaries have all risen since FY2022 and are held fixed, so every figure here is
+  a **lower bound**. Career-technical enrollment cannot be separated in the headcount file and
+  is treated as ordinary grades 9-12, which understates funded teachers at 1:27 instead of 1:18
+  for districts with large CTE programs — pushing the same direction. Grade-band shares come
+  from headcount while the scale comes from ADM, which assumes the two distributions match. The
+  FY2022 baseline salary is secondary reporting. And districts held on a guarantee are
+  off-formula entirely and would receive none of this; the guarantee population remains
+  unmodelled and is now the largest single unquantified caveat on the result. [open]
 
   The perturbation is now concrete. Base cost is built by applying statutory staffing ratios to
   enrollment and pricing each funded position at a **statewide average salary for a reference
