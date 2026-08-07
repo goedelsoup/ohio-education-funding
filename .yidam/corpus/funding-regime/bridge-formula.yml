@@ -41,6 +41,22 @@ description: |
   aid on the basis of history rather than need for the better part of ten years, which is why
   the plan's designers treated recosting from current data as the point of the exercise.
   [inference]
+
+  **And this regime did not end when it was superseded.** FY2020 — one of the two frozen years,
+  under a formula that was explicitly a placeholder — is the baseline for the Fair School
+  Funding Plan's
+  [temporary transitional aid guarantee](../formula-component/temporary-transitional-aid-guarantee.yml),
+  and it has never been re-based. [verified] In FY2027, at 100% phase-in, **48.3% of Ohio
+  districts are funded at their FY2020 level rather than by the plan**, at a cost of $879
+  million. [verified]
+
+  So the Bridge formula's last frozen year still governs the funding of nearly half the state
+  seven years after the regime was replaced. The plan that was meant to end distribution-by-
+  history inherited it as a floor. [inference] Whether that is a transitional artefact that
+  erodes as the formula grows, or a permanent feature, depends on facts the corpus does not
+  have — but for the wealthiest quartile of guaranteed districts the FY2027 formula produces
+  only 43% of the FY2020 level, so erosion would be slow. [verified for the ratio; inference
+  for the conclusion]
 properties:
   name: Bridge Formula
   effective_from: FY2012

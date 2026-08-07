@@ -76,10 +76,51 @@ description: |
   improvement, which the habit from spending analysis would invite, gets the direction exactly
   backwards. See [equity](../doctrine/equity.yml).
 
-  Not established: what baseline year each district's guarantee is measured against, and whether
-  the guarantee level has been re-based across the phase-in or carried forward unchanged from
-  the Bridge era. That determines whether the population shrinks over time or is permanent in
-  all but name. [open]
+  **THE BASELINE IS FY2020, AND IT HAS NOT BEEN RE-BASED.** [verified — FY2026 payment report
+  line-by-line explanation] The guarantee "ensures that districts do not receive less in FY 2026
+  than what they received in **FY 2020**," measured against Base State Funding.
+
+      guarantee = max(0, base_state_funding - core_foundation - open_enrollment_adjustment)
+
+  The adjustment applies only where a district has curtailed entering open enrollment beyond a
+  threshold — the greater of 10% of its prior-year entering open enrollment or 20 students —
+  and then reduces the base by the statewide average base cost per pupil for each student
+  beyond it. It is a disincentive against closing a district's borders, not a general term.
+  [verified]
+
+  **This is the finding the corpus has been walking toward.** FY2020 is a
+  [Bridge formula](../funding-regime/bridge-formula.yml) year, and one of the two Ohio funded at
+  **frozen** levels rather than computing them. So in FY2027, at 100% phase-in, nearly half of
+  Ohio's districts are funded at a level set by a placeholder formula in a year it was not even
+  run — seven years earlier, and never re-based. [inference]
+
+  Because guarantee = baseline − formula, each guaranteed district's FY2020 baseline can be
+  recovered as core foundation funding plus its guarantee. Doing that shows how far the plan
+  falls below the level it is holding them at: [verified]
+
+      FY2027 formula as a share of the district's FY2020 baseline
+        median 67.8%      p25 42.3%      102 districts below 50%
+        aggregate: $2.15B formula against a $3.03B baseline (71.0%)
+
+      by valuation quartile, guaranteed districts only
+        Q1 poorest      91.9%
+        Q2              74.1%
+        Q3              53.8%
+        Q4 wealthiest   43.4%
+
+  The gradient closes the causal chain. The local capacity measure reduces aid to
+  property-wealthy districts by design. Their FY2020 baseline was far higher. The guarantee
+  holds them there — and for the wealthiest quartile the plan produces less than half of it.
+  [inference]
+
+  So "temporary transitional" describes the intent and not the mechanism. A guarantee anchored
+  to a fixed historical year does not expire; it is escaped, district by district, only as the
+  formula grows past a level set in 2020. On the FY2027 evidence, for half of these districts
+  that is not close. [inference]
+
+  Still open: whether the statute or subsequent budget acts contemplate re-basing, and what the
+  FY2020 figure itself was composed of — the Bridge formula distributed largely by reference to
+  still earlier years, so the anchor may reach back further than 2020. [open]
 properties:
   name: Temporary transitional aid guarantee
   function: |

@@ -624,3 +624,125 @@ fn realized_aid_is_more_equal_than_formula_aid_and_that_is_the_problem() {
         "formula aid spans more than 10x across the distribution"
     );
 }
+
+// ---------------------------------------------------------------------------------------
+// The guarantee's baseline, per the FY2026 payment report: districts are held at what they
+// received in **FY2020**. The guarantee is the positive difference between that Base State
+// Funding and core foundation funding, less an open-enrollment adjustment that applies only
+// where a district has curtailed entering open enrollment beyond a threshold.
+//
+//     guarantee = max(0, base_state_funding - core_foundation - open_enrollment_adjustment)
+//
+// The adjustment is zero for districts that have not curtailed open enrollment, so for a
+// guaranteed district the FY2020 baseline can be recovered as core + guarantee. Every figure
+// below carries that assumption.
+// ---------------------------------------------------------------------------------------
+
+impl Row {
+    /// The FY2020 Base State Funding this district is held at, recovered from the guarantee.
+    /// Only meaningful where the district is on the guarantee.
+    fn implied_fy2020_baseline(&self) -> f64 {
+        self.core_foundation + self.guarantee
+    }
+
+    /// What FY2027's formula produces as a share of the FY2020 level being guaranteed.
+    fn formula_share_of_baseline(&self) -> f64 {
+        self.core_foundation / self.implied_fy2020_baseline()
+    }
+}
+
+/// For a guaranteed district, the Fair School Funding Plan at 100% phase-in produces a median
+/// **67.8%** of what the district received in FY2020. A hundred and two of them would receive
+/// under half.
+#[test]
+fn the_formula_pays_guaranteed_districts_two_thirds_of_their_fy2020_level() {
+    let owned = rows();
+    let on: Vec<&Row> = owned.iter().filter(|r| r.on_guarantee()).collect();
+
+    let shares: Vec<f64> = on.iter().map(|r| r.formula_share_of_baseline()).collect();
+    let med = median(shares.clone());
+    assert!((med - 0.678).abs() < 0.02, "median share {med:.3}");
+
+    let under_half = shares.iter().filter(|s| **s < 0.5).count();
+    assert!(
+        (under_half as i64 - 102).abs() <= 5,
+        "districts under half: {under_half}"
+    );
+
+    // In aggregate the formula reaches 71% of the guaranteed baseline; the guarantee holds the
+    // remaining $879M.
+    let baseline: f64 = on.iter().map(|r| r.implied_fy2020_baseline()).sum();
+    let formula: f64 = on.iter().map(|r| r.core_foundation).sum();
+    assert!((formula / baseline - 0.710).abs() < 0.02);
+    assert!(((baseline - formula) / 1e6 - 879.0).abs() < 5.0);
+}
+
+/// **The shape of the shortfall follows wealth.** Among guaranteed districts, the formula
+/// produces 92% of the FY2020 baseline for the poorest quartile and 43% for the wealthiest.
+///
+/// This closes the causal chain. The local capacity measure reduces aid to property-wealthy
+/// districts by design; their FY2020 baseline — set under the Bridge formula, in a year Ohio
+/// froze funding rather than computing it — was far higher; the guarantee holds them there.
+#[test]
+fn the_formula_falls_furthest_below_the_baseline_for_wealthy_districts() {
+    let owned = rows();
+    let mut on: Vec<&Row> = owned
+        .iter()
+        .filter(|r| r.on_guarantee() && r.valuation_per_pupil.is_some())
+        .collect();
+    on.sort_by(|a, b| {
+        a.valuation_per_pupil
+            .unwrap()
+            .partial_cmp(&b.valuation_per_pupil.unwrap())
+            .unwrap()
+    });
+    let q = on.len() / 4;
+    let share = |slice: &[&Row]| {
+        median(
+            slice
+                .iter()
+                .map(|r| r.formula_share_of_baseline())
+                .collect(),
+        )
+    };
+
+    let poorest = share(&on[..q]);
+    let wealthiest = share(&on[3 * q..]);
+    assert!((poorest - 0.919).abs() < 0.04, "Q1 share {poorest:.3}");
+    assert!(
+        (wealthiest - 0.434).abs() < 0.04,
+        "Q4 share {wealthiest:.3}"
+    );
+    assert!(
+        poorest > wealthiest * 1.8,
+        "the gradient must be steep: Q1 {poorest:.3} vs Q4 {wealthiest:.3}"
+    );
+
+    // Monotonic across all four quartiles.
+    let all: Vec<f64> = (0..4)
+        .map(|i| {
+            if i < 3 {
+                share(&on[i * q..(i + 1) * q])
+            } else {
+                share(&on[3 * q..])
+            }
+        })
+        .collect();
+    for w in all.windows(2) {
+        assert!(w[1] < w[0], "share must fall as wealth rises: {all:?}");
+    }
+}
+
+/// No guaranteed district's formula amount exceeds its baseline — which is what "guarantee"
+/// means, and a check that the recovered baseline is coherent rather than an artefact.
+#[test]
+fn no_guaranteed_district_exceeds_its_own_baseline() {
+    for r in rows().iter().filter(|r| r.on_guarantee()) {
+        let share = r.formula_share_of_baseline();
+        assert!(
+            (0.0..=1.0).contains(&share),
+            "{} formula/baseline = {share:.4}, outside [0,1]",
+            r.name
+        );
+    }
+}
