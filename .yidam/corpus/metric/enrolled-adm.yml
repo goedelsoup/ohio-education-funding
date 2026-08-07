@@ -117,6 +117,8 @@ findings: |
   **THE AID BAND IS TIGHTER THAN THE ENROLLMENT BAND THAT DRIVES IT.** [verified] Necessarily, and
   for the same reason: half the state's aid does not respond to enrollment at all.
 
+  See [dew-mr81-enrollment-archive](../../catalog/dew-mr81-enrollment-archive.md).
+
   **[open]** Whether a damped trend is the right method, which needs an enrollment history longer
   than three points — `nces-ccd` is where one would come from, and it is also what would handle
   district consolidation, without which a long series is silently wrong.

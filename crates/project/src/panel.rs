@@ -72,6 +72,17 @@ pub struct DistrictRecord {
     /// construction against a broad one and produces a shortfall that is definitional rather
     /// than real. This corpus did exactly that for two phases.
     pub total_state_support: Dollars,
+    /// `U - Total Transfers` — educational service center charges plus other adjustments.
+    ///
+    /// **Not the voucher channel.** Under the Fair School Funding Plan community and STEM
+    /// students are funded directly rather than deducted from the resident district, and no line
+    /// in this report carries a scholarship deduction. Cleveland Municipal's transfers are
+    /// -$3.8M against $322.6M of total state support; a deduction channel would be two orders
+    /// larger. Carried so that claim is checkable rather than asserted — see
+    /// [`crate::finances`] and the `deduction` skill for what is still missing.
+    pub total_transfers: Dollars,
+    /// `V - Net State Funding` — total state support after transfers.
+    pub net_state_funding: Dollars,
     /// Temporary transitional aid guarantee.
     pub guarantee: Dollars,
     /// Enrolled ADM in each of [`HISTORY_YEARS`].
@@ -195,6 +206,8 @@ mod column {
     pub const CORE_FOUNDATION: usize = 20;
     pub const BASE_COST_STATE_SHARE: usize = 21;
     pub const TOTAL_STATE_SUPPORT: usize = 22;
+    pub const TOTAL_TRANSFERS: usize = 23;
+    pub const NET_STATE_FUNDING: usize = 24;
 }
 
 /// The header this loader expects, so a fixture reshaped without updating [`column`] fails
@@ -204,7 +217,7 @@ adm_kindergarten,adm_grades_1_3,adm_grades_4_8_non_cte,adm_grades_9_12_non_cte,a
 adm_grades_9_12_total,funded_classroom_teachers,funded_special_teachers,teacher_base_cost,\
 aggregate_base_cost,base_cost_per_pupil,temp_transitional_aid_guarantee,enrolled_adm_fy24,\
 enrolled_adm_fy25,enrolled_adm_fy26,assessed_valuation_per_pupil_fy23,core_foundation_funding,\
-base_cost_state_share,total_state_support";
+base_cost_state_share,total_state_support,total_transfers,net_state_funding";
 
 /// Every district in the department's FY2027 model.
 ///
@@ -258,6 +271,8 @@ pub fn panel() -> Vec<DistrictRecord> {
                 base_cost_state_share: required(column::BASE_COST_STATE_SHARE),
                 core_foundation_funding: required(column::CORE_FOUNDATION),
                 total_state_support: required(column::TOTAL_STATE_SUPPORT),
+                total_transfers: required(column::TOTAL_TRANSFERS),
+                net_state_funding: required(column::NET_STATE_FUNDING),
                 guarantee: required(column::GUARANTEE),
                 adm_history: [
                     required(column::ADM_FY24),
