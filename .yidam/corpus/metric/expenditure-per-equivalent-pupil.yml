@@ -8,112 +8,106 @@ description: |
   report card, which makes it the measure most likely to be reached for in any Ohio
   spending-versus-results argument, and the one least suited to it.
 
-  It is not [per-pupil operating expenditure](per-pupil-operating-expenditure.yml). Different
-  numerator definition, different denominator, and a median about 22% lower: $12,856 across 607
-  districts for 2024-2025 against $15,646 across 605 for FY2024 on a headcount denominator.
-  [verified] Quoting one where a reader expects the other understates Ohio school spending by
-  roughly a fifth.
+  It is not [per-pupil operating expenditure](per-pupil-operating-expenditure.yml). Within the
+  FY2025 Expanded List, where the department publishes the same expenditure total over both
+  divisors, the equivalent-pupil figure is **21% lower at the median**: $12,854 against $16,289.
+  [verified] Quoting one where a reader expects the other understates Ohio school spending by a
+  fifth.
 
   **THE FINDING: A NEED-WEIGHTED DENOMINATOR IS A NEED ADJUSTMENT, AND IT RUNS ONE WAY.**
 
-  Weighting the denominator for disadvantage means a high-need district divides the same dollars
-  by a larger number and reports a lower figure. High need also means low measured achievement.
-  So the measure depresses reported spending precisely in the districts that score lowest — and
-  a spending-versus-performance correlation computed on it is pushed toward zero from below,
-  mechanically, before any district is looked at. [inference]
+  This was recorded as an argument. It is now a measurement, and it is larger than the argument
+  predicted. [verified — computed; see
+  [`crates/dispersion/tests/report_card_2425.rs`](../../../crates/dispersion/tests/report_card_2425.rs)]
+
+      Performance Index against FY2025 operating expenditures
+        divided by WEIGHTED ADM      -0.015     (the published measure)
+        divided by UNWEIGHTED ADM    -0.337
+
+  One numerator. Two divisors the department publishes side by side in one workbook. The same
+  607 districts, the same school year, no covariates, no model. The correlation moves from
+  nothing to something because of which column was in the denominator.
 
   This is why [OCG White Paper 013](../../catalog/ocg-white-paper-013.md) can report Pearson
-  **-0.016** between total spending per equivalent pupil and the Performance Index and describe
-  the analysis as *unadjusted*. The word is true of the model — no covariates — and false of the
-  measure. The paper's own stated limitation, "no need-adjusted model in this version,"
-  understates it: there is a need adjustment, it is inside the independent variable, it applies
-  to one side only, and it points in the direction that flattens the result. [inference]
+  −0.016 and describe the analysis as *unadjusted*. The word is true of the model — no
+  covariates — and false of the measure. The paper's stated limitation, "no need-adjusted model
+  in this version," understates it: there is a need adjustment, it is inside the independent
+  variable, it applies to one side only, and it points in the direction that flattens the result.
 
-  **How much is being divided out.** On a headcount denominator, computed over the corpus's own
-  FY2024 cross-section of 605 districts
-  ([`crates/dispersion/fixtures/cupp-fy24-district-data.csv`](../../../crates/dispersion/fixtures/cupp-fy24-district-data.csv)):
-  [verified]
+  **The mechanism, measured.** The ratio of the two ADM columns is very nearly a poverty index:
 
-      operating expenditure per pupil vs economically disadvantaged share
-        Pearson +0.383     Spearman +0.348
+      weighted ADM / unweighted ADM      median 1.261, range 1.05 to 1.62
+        against economically disadvantaged share    +0.800
+        against Performance Index                   -0.745
 
-      mean operating expenditure per pupil, by quintile of disadvantage (low -> high)
-        $15,526   $15,148   $15,787   $16,103   $18,990
+  [verified] Dividing by that ratio is dividing by a proxy for the outcome variable. It removes
+  the thing being measured, and the near-zero coefficient is what is left.
 
-  Ohio's highest-poverty fifth of districts spends about **$3,400 more per headcount pupil** than
-  the lowest, a 22% gap. That gradient is what the weighted denominator is built to normalize —
-  legitimately, for its own purpose of comparing districts at like service levels. It is not
-  legitimate to normalize it away and then report the residual as evidence that spending and
-  performance are unrelated. [inference]
+  **What the corrected relationship is, and is not.** Holding the economically disadvantaged
+  share constant, the unweighted-denominator association falls from −0.355 to **−0.125**, still
+  detectable but small. [verified] So roughly two-thirds of it is poverty. It is *not* evidence
+  that spending depresses achievement — the corrected reading points the other way. Ohio spends
+  more per headcount pupil where need is greater, need drives measured attainment, and a
+  negative association is compensation working. The corpus's standing rule applies: a statistic
+  must name whether its subject is a resource or a compensation, because the direction of
+  "better" is not the same. See [`skills/dispersion`](../../skills/dispersion.md) and
+  [equity](../doctrine/equity.yml).
 
-  **A second, independent signal pointing the same way.** The relationship between district size
-  and per-pupil spending is measured twice, on the two denominators:
+  **Robust, on both denominators, across the paper's own sensitivity checks.** Excluding
+  Put-in-Bay Local, excluding the top one percent of spenders, excluding the smallest-enrollment
+  decile, and log-transforming all leave the weighted-denominator coefficient near zero — the
+  paper's conclusion, and it holds — and all leave the unweighted-denominator coefficient near
+  −0.34. Weighting districts by enrollment deepens both: −0.149 published, **−0.547** on a
+  headcount denominator. [verified] The divergence is not an outlier artifact in either
+  direction.
 
-      enrollment vs spending per EQUIVALENT pupil, 2024-25    Spearman -0.366   [secondary]
-      enrolled ADM vs operating expenditure per pupil, FY2024 Spearman -0.158   [verified]
+  **AND A SECOND SOURCE AGREES.** The corpus's independent FY2024 Cupp Report headcount series,
+  a different file for a different year, correlates with the Performance Index at **−0.388**.
+  [verified] Two headcount measures from two publications give −0.337 and −0.388. The published
+  equivalent-pupil measure gives −0.016. The odd one out is the one with the weighted divisor.
 
-  The same relationship, more than twice as strong under the weighted denominator. Ohio's large
-  districts are its high-need districts; weighting the denominator deflates them; the small-
-  district spending premium is inflated as a result. Different years and definitions, so this is
-  corroborating and not conclusive — but it points where the argument above says it should.
-  [inference]
-
-  **THE TEST IS ONE COLUMN.** `FY25_Expanded_List.xlsx`, which White Paper 013 already cites for
-  enrollment, publishes `Unweighted ADM` and `Weighted ADM` on separate sheets for the same IRNs.
-  Recomputing total expenditure on unweighted ADM and re-running the correlation settles this
-  without new data, new sources, or a model. The corpus's expectation is a materially more
-  negative coefficient; it declines to predict a magnitude, because the mapping from
-  disadvantage to Performance Index is not held here. [open]
-
-  **WHAT THE PAPER'S OWN TABLE 3 SHOWS, READ AGAINST THIS CORPUS.** Sorting districts by
-  performance rather than spending, the paper reports total spending as "roughly flat" and
-  state-and-local as "moving in the opposite direction, from $12,403 to $13,324." The second
-  description is wrong in a way the corpus can correct. The row is:
+  **WHAT THE PAPER'S TABLE 3 SHOWS, READ AGAINST THIS CORPUS.** Sorting districts by performance
+  rather than spending, the paper reports total spending as "roughly flat" and state-and-local as
+  "moving in the opposite direction, from $12,403 to $13,324." The second description is wrong in
+  a way the corpus can correct. The row is:
 
       performance quintile      Q1(low)    Q2      Q3      Q4      Q5(high)
       state & local / pupil     $12,403 $12,436 $12,236 $12,340   $13,324
       federal / pupil            $1,108    $704    $686    $486      $382
 
-  State-and-local is flat within $200 across four quintiles and then steps $984 at the top. That
-  is not a gradient; it is a step, and the corpus names the mechanism — local revenue per pupil
-  tracks assessed valuation per pupil at **+0.807**. [verified] The federal row is the need
-  channel and is monotone. So "roughly flat" total spending is the sum of two opposing gradients:
-  a need channel declining with performance and a wealth step at the top. The corpus's own
-  headcount data shows the same U-shape directly, by quintile of valuation per pupil: [verified]
+  State-and-local is flat within $200 across four quintiles and then steps $984 at the top. Not
+  a gradient, a step — and the corpus names the mechanism: local revenue per pupil tracks
+  assessed valuation per pupil at **+0.807**. [verified] "Roughly flat" total spending is a need
+  channel declining with performance plus a wealth step at the summit. Both gradients show
+  directly in the computed data: FY2025 spending per unweighted pupil correlates with the
+  disadvantaged share at +0.345 *and* with valuation per pupil at +0.281, and the FY2024 Cupp
+  series gives +0.383 and +0.279 independently. [verified] Ohio's poorest and
+  wealthiest districts both spend above its middle, for entirely different reasons, and a single
+  coefficient across that shape is two relationships cancelling.
 
-      $16,990   $15,319   $15,141   $16,051   $18,053
+  **A HYPOTHESIS THIS PHASE TESTED AND DROPPED.** The obvious suspicion was the
+  [temporary transitional aid guarantee](../formula-component/temporary-transitional-aid-guarantee.yml):
+  48.3% of districts are funded off-formula against an un-rebased FY2020 baseline, so much of the
+  spending variation being correlated ought to be a frozen historical artifact. It is not the
+  explanation. Splitting the 607 districts on FY2027 guarantee status leaves the denominator gap
+  intact in both halves — guaranteed districts −0.389, on-formula districts −0.299, and both
+  near zero on the weighted divisor. [verified] The guarantee moves a great deal of money and
+  does not move this. Recorded because a negative result that was expected to be positive is
+  worth more than an untested suspicion.
 
-  Ohio's poorest and wealthiest districts both spend above its middle, for entirely different
-  reasons. A single correlation coefficient across that shape is close to uninformative, and its
-  nearness to zero is not evidence of no relationship — it is two relationships cancelling.
-  [inference]
-
-  **ONE THING THIS DOES NOT LICENSE.** None of the above establishes that spending raises
-  achievement. The corrected reading points the other way if anything — Ohio spends more where
-  need is greater, which is compensation working, and a negative headcount association would be
-  targeting rather than failure. The corpus's standing rule applies: a statistic must name
-  whether its subject is a resource or a compensation, because the direction of "better" is not
-  the same. See [`skills/dispersion`](../../skills/dispersion.md) and
-  [equity](../doctrine/equity.yml). Cross-sectional spending against contemporaneous attainment
-  cannot separate the two, on either denominator. [inference]
-
-  **A THIRD DISTORTION, NOT YET SIZED.** Cross-sectional spending is also not a clean read on
-  funding policy, because 48.3% of districts are funded off-formula by the
-  [temporary transitional aid guarantee](../formula-component/temporary-transitional-aid-guarantee.yml)
-  against an un-rebased FY2020 baseline, with incidence rising from 13% to 76% across wealth
-  quartiles. Part of the spending variation being correlated against outcomes is a frozen
-  historical artifact. Splitting guaranteed from on-formula districts before reading any
-  spending-outcome association is the obvious next cut and has not been done. [open]
+  One guarantee finding does survive, and it corroborates the corpus: guaranteed districts
+  average a Performance Index of 89.8 against 85.7 for on-formula districts. [verified] The
+  guarantee holds up property-wealthy districts, and property-wealthy districts score higher.
 properties:
   name: Expenditure per equivalent pupil
   unit: dollars-per-pupil
   definition: |
     expenditure_per_equivalent_pupil = qualifying district expenditures / weighted ADM
 
-    Qualifying expenditures are organized through DEW's Expenditure Flow Model into comparable
-    categories. Weighted ADM is average daily membership adjusted upward by DEW formulas
-    intended to reflect the additional service costs associated with economically disadvantaged
-    students, English learners, and students with disabilities.
+    Qualifying expenditures are organized through DEW's Expenditure Flow Model. Weighted ADM is
+    average daily membership adjusted upward by DEW formulas intended to reflect the additional
+    service costs associated with economically disadvantaged students, English learners, and
+    students with disabilities. The weight schedule itself is not held in this corpus. [open]
 
     Reported all-funds and split into two components that sum to it exactly:
       - federal funds per equivalent pupil
@@ -127,57 +121,68 @@ properties:
   inputs: |
     Expenditures per equivalent pupil and its two components, by district and school year, keyed
     by District IRN — from
-    [dew-report-card-spending](../../catalog/dew-report-card-spending.md). No connector fetches
-    it. [open]
+    [dew-report-card-spending](../../catalog/dew-report-card-spending.md).
 
-    Unweighted and weighted ADM by IRN — from DEW's FY2025 Expenditure Expanded List, not yet
-    catalogued. Required for the denominator test above. [open]
+    Operating expenditures with both weighted and unweighted ADM — from the
+    [FY2025 Expenditure Expanded List](../../catalog/dew-expenditure-expanded-list.md). This is
+    the file that makes the denominator testable rather than arguable.
+
+    Both retrieved by the `dew-report-card` connector and committed at
+    [`crates/dispersion/fixtures/report-card-2425-district-data.csv`](../../../crates/dispersion/fixtures/report-card-2425-district-data.csv).
   series: |
-    2024-2025, 607 rated traditional districts [verified — as published, secondary]:
+    2024-2025, 607 rated traditional districts, as published [verified — computed from the
+    committed fixture, and reproducing OCG White Paper 013 exactly]:
 
                           min      p25   median     mean      p75       max
       total            $8,913  $11,615  $12,856  $13,224  $14,254   $46,716
       state & local    $8,014  $10,976  $12,200  $12,549  $13,644   $46,101
       federal            $106     $392     $526     $675     $786    $4,530
 
-    Total standard deviation $2,660, coefficient of variation 0.201 — which matches the 0.202
-    that `crates/dispersion` computes over the FY2024 Cupp Report on a headcount denominator, in
-    a different year from a different file. The dispersion survives the denominator change even
-    though the level does not. [verified]
+    The same expenditures over the other divisor, FY2025:
 
-    Implied component standard deviations, solved from the published correlation set and the
-    covariance identity: federal about $483, state-and-local about $2,639. [inference]
+      per unweighted pupil   median $16,289   mean $16,920   cv 0.202   p5 $12,936   p95 $22,715
+      per weighted pupil     median $12,854   mean $13,223   cv 0.201
 
-    The maximum is Put-in-Bay Local, an island district at $46,716. Excluding it moves the
-    total-spending correlation from -0.016 to -0.004; excluding the seven districts above the
-    99th-percentile cutoff of $22,486 moves it to +0.053; log-transforming moves it to -0.003.
-    The result is not outlier-driven, which is a genuine finding and is not the same as the
-    result being real. [verified — as published, secondary]
+    **Dispersion survives the denominator change; the level does not.** Both coefficients of
+    variation are 0.20, and both match the 0.202 that `crates/dispersion` computes over the
+    FY2024 Cupp Report. Three measures, two years, two divisors, one spread. The weighting moves
+    every district's figure down by roughly a quarter without much changing how far apart they
+    are — which is why a dispersion statistic is a poor detector of the problem and a correlation
+    against an outcome is a good one. [verified]
 
-    No per-district values are committed. [open]
+    The FY2025 headcount median of $16,289 against the Cupp Report's FY2024 $15,646 is a 4.1%
+    year-over-year rise from an independent publication. [verified]
   caveats: |
     **The denominator is a partial need adjustment.** Any analysis calling itself unadjusted
     while using this measure is adjusted on one side. This is the main entry above.
 
     **Not comparable to headcount per-pupil figures**, including
     [per-pupil operating expenditure](per-pupil-operating-expenditure.yml), NCES figures, Census
-    F-33 figures, or district five-year forecasts. About 22% lower at the median in the one year
-    both are held.
+    F-33 figures, or district five-year forecasts. 21% lower at the median within one file.
 
     **Components sum to the total.** Federal and state-and-local are shares of one quantity.
+
+    **Weighted ADM is published as a whole number; unweighted ADM carries four decimals.** So a
+    recomputed per-equivalent-pupil figure carries quantisation noise inversely proportional to
+    district size — Put-in-Bay Local at 77 weighted pupils reconstructs $86 from its published
+    $46,716. Immaterial in aggregate, material for any single small district. [verified]
 
     **Federal relief inclusion is unstated.** The corpus records that including or excluding
     COVID relief moved statewide per-pupil expenditure by $821 in FY2022. The 2024-2025 federal
     mean of $675 is consistent with Title I and IDEA alone, so the tail is probably exhausted,
     but the source does not say. [open]
 
-    **All-funds, not operating.** The relationship to the operating/capital split that
-    per-pupil operating expenditure enforces has not been established here. [open]
+    **All-funds on the report card, operating on the Expanded List.** The two numerators are not
+    identical and the relationship between them has not been established. Every cross-denominator
+    comparison above uses the Expanded List's single operating-expenditure total for both sides,
+    which is what makes it a controlled comparison. [verified]
 
     **Population is 607 rated traditional districts**, not the corpus's 606 or 609.
   calculator: |
-    None. Published, not computed. Distribution statistics over it belong to `dispersion` once
-    values are committed; the unweighted-ADM recomputation is a `dispersion` job too. [open]
+    Published, not computed. Distribution and association statistics over it are `dispersion`;
+    the unweighted-ADM recomputation lives in
+    [`crates/dispersion/tests/report_card_2425.rs`](../../../crates/dispersion/tests/report_card_2425.rs)
+    and is pinned so a fixture refresh that moves it fails the build.
 links:
   - target: ../metric.ont.yml
     relationship: instance-of
@@ -194,6 +199,8 @@ links:
   - target: ../fiscal-period/fy2024-25.yml
     relationship: computed-for
   - target: ../../catalog/dew-report-card-spending.md
+    relationship: sourced-from
+  - target: ../../catalog/dew-expenditure-expanded-list.md
     relationship: sourced-from
   - target: ../../catalog/ocg-white-paper-013.md
     relationship: sourced-from

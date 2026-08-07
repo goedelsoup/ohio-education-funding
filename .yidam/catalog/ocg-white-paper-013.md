@@ -26,16 +26,18 @@ and a seven-row sensitivity table.
 | Spending distribution, 607 districts | median $12,856, mean $13,224, SD $2,660 |
 | Performance Index distribution | min 53.1, median 88.2, mean 87.7, max 112.8, SD 10.9 |
 
-**Arithmetic audit — passes.** Every internal reconstruction this corpus could perform
-reconciles to the published value: quintile means × counts return the reported spending mean
-($13,223.7 against $13,224) and Performance Index mean (87.70 against 87.7) from both the
-spending and the performance quintile tables; the Fisher-z interval, the three p-values, and the
-partial correlation all reproduce from the stated coefficients and n = 607; Table 3's components
-sum to its totals in every row. Solving the covariance identity
-`r_t·σ_t = r_f·σ_f + r_sl·σ_sl` jointly with `σ_t² = σ_f² + σ_sl² + 2r_fsl·σ_f·σ_sl` implies
-σ(federal) ≈ $483 and σ(state-and-local) ≈ $2,639, both consistent with the published quantiles.
-The reported correlation set is mutually consistent. [verified — recomputed from the published
-tables; the underlying DEW files have **not** been independently pulled]
+**Replicated against the primary sources — every figure reproduces.** The corpus now retrieves
+the same three DEW files and recomputes the paper's results from them. To the precision the paper
+displays, all of it lands: −0.016, Spearman +0.048, federal −0.558, state-and-local +0.086,
+enrollment-weighted −0.149, enrollment against spending ρ −0.366, median $12,856, mean $13,224,
+and the Performance Index at median 88.2, mean 87.7, sd 10.9, range 53.1 to 112.8. Pinned in
+[`crates/dispersion/tests/report_card_2425.rs`](../../crates/dispersion/tests/report_card_2425.rs).
+[verified]
+
+This is an unusually clean replication and it should be said plainly: the paper's arithmetic is
+correct, its sources are cited accurately enough to find and reproduce, its sensitivity table
+holds, and its stated caveats are honest. The disagreement below is about measurement, not
+competence.
 
 **Independent corroboration of a corpus figure.** Its spending dispersion, CV = $2,660/$13,224 =
 **0.201**, matches the coefficient of variation of **0.202** that
@@ -43,15 +45,29 @@ tables; the underlying DEW files have **not** been independently pulled]
 different year, different source file, different denominator, same dispersion. This is the first
 external check on that statistic. [verified]
 
-**Where this corpus departs from it.** The paper's central claim is that the association is
-near zero. The corpus's position, recorded at
-[`metric/expenditure-per-equivalent-pupil`](../corpus/metric/expenditure-per-equivalent-pupil.yml),
-is that the near-zero coefficient is substantially a product of the need-weighted denominator
-inside the spending variable, that "unadjusted" is therefore true of the model and not of the
-measure, and that the paper's own enrollment-weighted result (−0.149) is the one more consistent
-with what the corpus knows about how Ohio spending is distributed. The paper's stated limitation
-— "no need-adjusted model in this version" — understates the issue: there is a need adjustment,
-on one side, running in a known direction.
+**Where this corpus departs from it, now measured.** The paper's central claim is that the
+association is near zero. It is near zero *on the denominator the paper chose*. The department's
+FY2025 Expanded List publishes one operating-expenditure total against both a weighted and an
+unweighted pupil count, and correlating the Performance Index against the same dollars gives
+**−0.015** on the first and **−0.337** on the second. [verified] Same districts, same year, no
+covariates — only the divisor changes.
+
+"Unadjusted" is therefore true of the paper's model and false of its measure. The stated
+limitation, "no need-adjusted model in this version," understates it: there is a need adjustment,
+inside the independent variable, on one side only, pointing the way that flattens the result. See
+[`metric/expenditure-per-equivalent-pupil`](../corpus/metric/expenditure-per-equivalent-pupil.yml).
+
+**Two of its own conjectures, tested.** The paper hypothesised that its federal-spending result
+was a poverty signal and said it could not test that directly. Holding the economically
+disadvantaged share constant, federal per-pupil falls from −0.558 to **−0.158** — the hypothesis
+was largely right. And the variable it was standing in for is far stronger than anything the
+paper reports: disadvantage against the Performance Index is **−0.846**, 71.6% of the variance.
+[verified]
+
+**One correction of description.** The paper reads state-and-local spending across performance
+quintiles as "moving in the opposite direction, from $12,403 to $13,324." That row is flat within
+$200 across four quintiles and steps $984 at the top. It is a step at the wealth end, not a
+gradient.
 
 **Caveats on using it:**
 

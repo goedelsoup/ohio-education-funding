@@ -49,6 +49,18 @@ description: |
   $15,148, $15,787, $16,103, **$18,990**. [verified] Ohio's highest-poverty fifth of districts
   spends about $3,400 more per headcount pupil than its lowest. Any analysis reporting that
   spending and need are unrelated should be checked for which denominator it used first.
+
+  **The check has now been run, on one numerator against both divisors.** Correlated against the
+  [Performance Index](performance-index.yml), FY2025 operating expenditures give **−0.337** per
+  unweighted pupil and **−0.015** per weighted pupil; this metric's own FY2024 series gives
+  **−0.388**. [verified] Two headcount measures from two publications agree; the weighted one is
+  the outlier. The denominator is not a presentation choice.
+
+  A second, independent series also lands here. The FY2025 Expanded List's headcount median of
+  $16,289 sits 4.1% above this metric's FY2024 Cupp Report median of $15,646 — two publishers,
+  consecutive years, consistent level. [verified] It is the closest thing the corpus has to an
+  external validation of this series, and the first time this metric has been checked against
+  anything but itself.
 properties:
   name: Per-pupil operating expenditure
   unit: dollars-per-pupil

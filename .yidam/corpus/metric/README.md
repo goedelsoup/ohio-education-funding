@@ -68,11 +68,17 @@ is still not measurable — the `deduction` calculator remains a stub. Per-distr
 series over time exist on the Auditor of State dashboard and are not extracted, so every metric
 here is a single cross-section rather than a series. [open]
 
-The two report-card metrics carry **no committed per-district values at all**. Every figure on
-them is quoted from [OCG White Paper 013](../../catalog/ocg-white-paper-013.md), a secondary
-source, and tagged accordingly. Joining the 2024-2025 Performance Index and both ADM columns
-onto [`crates/dispersion/fixtures/cupp-fy24-district-data.csv`](../../../crates/dispersion/fixtures/cupp-fy24-district-data.csv)
-by IRN would make three open questions computable at once: the poverty-outcome relationship the
-federal-spending proxy only gestures at, the spending-outcome correlation on an unweighted
-denominator, and the same association split by guarantee status. It is the cheapest high-value
-extraction available to the corpus. [open]
+That extraction has been done. The `dew-report-card` connector retrieves the three 2024-25
+publications and
+[`crates/dispersion/fixtures/report-card-2425-district-data.csv`](../../../crates/dispersion/fixtures/report-card-2425-district-data.csv)
+holds 607 districts with the Performance Index, both ADM columns, and the expenditure numerator;
+[`crates/dispersion/tests/report_card_2425.rs`](../../../crates/dispersion/tests/report_card_2425.rs)
+pins what it shows. Every figure on both report-card metrics is now computed rather than quoted.
+
+What is still missing is time. Every metric in this class remains a single cross-section, and
+the achievement file's `2023-2024` and `2022-2023` columns are committed to the fixture and read
+by nothing — so whether a district's Index is stable enough for one year to stand for it is
+answerable today and unanswered. Per-district expenditure series over time exist on the Auditor
+of State dashboard and are not extracted. The DEW pupil-weight schedule that produces the
+weighted ADM is not held, so the corpus can measure what the weighting does without being able
+to say what it is. [open]

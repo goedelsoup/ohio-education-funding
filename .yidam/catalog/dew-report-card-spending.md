@@ -26,11 +26,10 @@ for what the difference does to a correlation.
 **Caveats:**
 
 - **Not comparable to headcount per-pupil figures.** For 2024–2025 this file reports a median of
-  $12,856 and a mean of $13,224 across 607 districts. The Cupp Report's FY2024 headcount
-  operating expenditure per pupil has a median of $15,646 across 605 — about 22% higher.
-  Definitional differences (Expenditure Flow Model qualifying expenditures against NCES
-  operating expenditure) account for part of the gap and the weighted denominator for the rest;
-  the split has not been decomposed. [open]
+  $12,856 and a mean of $13,224 across 607 districts. Within the Expanded List, where the same
+  expenditures are divided both ways, the headcount median is $16,289 — the equivalent-pupil
+  figure is **21% lower**, and that gap is the weighting alone, with no definitional difference
+  to confound it. [verified]
 - **The all-funds total is the sum of the two components**, so federal and state-and-local are
   not independent predictors of anything and must not be entered in one model as though they
   were. [verified — the components sum to the total in every published quintile row]
@@ -41,11 +40,12 @@ for what the difference does to a correlation.
   tail is probably exhausted here, but the file does not say so and any use of the federal
   component should. [open]
 
-**Companion file, not yet catalogued.** `FY25_Expanded_List.xlsx` (DEW FY2025 Expenditure
-Expanded List) carries both `Unweighted ADM` and `Weighted ADM` per IRN on separate sheets. It
-is the file that makes the denominator problem above *testable* rather than merely arguable —
-recomputing spending on unweighted ADM is one column swap. It deserves its own catalog entry.
-[open]
+**Companion file.** The [FY2025 Expenditure Expanded List](dew-expenditure-expanded-list.md)
+carries `Unweighted ADM` and `Weighted ADM` per IRN on separate sheets over the same operating
+expenditure total. It is the file that turned the denominator problem above from an argument into
+a measurement: the Performance Index correlates with those expenditures at −0.015 per weighted
+pupil and **−0.337** per unweighted pupil. [verified] Note that its published filename carries
+spaces (`FY25 Expanded List.xlsx`), not the underscores cited in White Paper 013.
 
 ## Used by
 
@@ -54,4 +54,4 @@ recomputing spending on unweighted ADM is one column swap. It deserves its own c
 
 ## Feeds connector
 
-None yet. See [`dew-report-card-achievement`](dew-report-card-achievement.md). [open]
+[`dew-report-card`](../../crates/connect/src/registry.rs), source key `spend-per-pupil-2425`.

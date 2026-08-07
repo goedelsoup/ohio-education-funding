@@ -22,41 +22,46 @@ description: |
   correlated, and quintiled. Any Ohio claim about relative district performance that quotes
   stars is answering a coarser question than it appears to. [verified]
 
-  **Distribution, 607 rated traditional districts, 2024–2025** [verified — as published in
-  [OCG White Paper 013](../../catalog/ocg-white-paper-013.md); the DEW file has not been
-  independently pulled]: minimum 53.1, 25th percentile 81.5, median 88.2, mean 87.7, 75th
-  percentile 95.1, maximum 112.8, standard deviation 10.9.
+  **THE DOMINANT FACT ABOUT THIS MEASURE IS POVERTY.** Across the 606 districts where both are
+  held, the Performance Index correlates with the economically disadvantaged share at
+  **−0.846**, which is 71.6% of the cross-district variance in the Index. [verified — computed;
+  see [`crates/dispersion/tests/report_card_2425.rs`](../../../crates/dispersion/tests/report_card_2425.rs)]
 
-  Set that beside the spending distribution and the asymmetry is the point. Performance has a
-  coefficient of variation of about 0.124; spending per equivalent pupil, about 0.201; operating
-  expenditure per headcount pupil in the corpus's own FY2024 cross-section, 0.202. **Ohio
-  districts differ from one another about 60% more in what they spend than in what they score.**
-  [verified] That is a fact about the two distributions and not about their relationship, and it
-  is the first thing to say before any correlation between them is quoted — a near-zero
-  coefficient between a wide distribution and a narrow one is a weaker statement than it sounds.
+  Nothing else in this corpus comes close to that. It is the first thing to say about any
+  district-level correlate of the Index, because almost every such correlate is partly this
+  variable wearing a different label — including
+  [OCG White Paper 013](../../catalog/ocg-white-paper-013.md)'s strongest reported finding, that
+  federal expenditure per pupil tracks the Index at −0.558. Holding disadvantage constant, that
+  −0.558 falls to **−0.158**. [verified] The paper hypothesised that its federal result was a
+  poverty signal and said it could not test the hypothesis directly. It can be tested directly,
+  it now has been, and the hypothesis is largely right: about seven-tenths of the association was
+  poverty.
 
-  **What is known about its relationships, and how weakly.** The corpus holds no committed
-  Performance Index values. Everything below is quoted from a secondary source:
+  **The measured relationships, all computed rather than quoted** [verified]:
 
-    total expenditure per equivalent pupil     Pearson -0.016   Spearman +0.048
-    same, weighted by unweighted ADM           Pearson -0.149
-    federal expenditure per equivalent pupil   Pearson -0.558   Spearman -0.694
-    state-and-local per equivalent pupil       Pearson +0.086
+      economically disadvantaged share (FY24)         -0.846    rho -0.847
+      ADM weight ratio, weighted/unweighted            -0.745    rho -0.734
+      state revenue per pupil (FY24)                   -0.549    rho -0.521
+      federal expenditure per equivalent pupil (FY25)  -0.558    rho -0.694
+      operating expenditure per UNWEIGHTED pupil FY25  -0.337    rho -0.334
+      operating expenditure per pupil, Cupp FY24       -0.388    rho -0.350
+      assessed valuation per pupil (FY23)              +0.321    rho +0.372
+      total expenditure per EQUIVALENT pupil (FY25)    -0.016    rho +0.048
 
-  The first row is the one that gets quoted and the one this corpus does not accept at face
-  value — see [expenditure per equivalent pupil](expenditure-per-equivalent-pupil.yml) for why
-  the denominator is doing much of the work. The third row is the strongest single relationship
-  in that data and is a poverty signal rather than a spending effect: federal education aid is
-  allocated substantially on census counts of children in low-income families, so
-  federal-dollars-per-pupil is a proxy for disadvantage wearing a spending label. [verified]
+  The last row is the one that gets quoted, and the difference between it and the row above it
+  is a denominator rather than a fact about Ohio. See
+  [expenditure per equivalent pupil](expenditure-per-equivalent-pupil.yml).
 
-  **The corpus can test that proxy directly and has not.** It holds the economically
-  disadvantaged share for 606 districts, keyed by IRN, in
-  [`crates/dispersion/fixtures/cupp-fy24-district-data.csv`](../../../crates/dispersion/fixtures/cupp-fy24-district-data.csv).
-  Joining the Performance Index onto that file by IRN — one column — would replace every quoted
-  figure above with a computed one and would settle the poverty interpretation the secondary
-  source can only assert. This is the cheapest high-value extraction available to the corpus.
-  [open]
+  **A distributional asymmetry to state before any of those coefficients.** Performance has a
+  coefficient of variation of about 0.124; per-pupil spending, on either denominator, about
+  0.202. **Ohio districts differ from one another about 60% more in what they spend than in what
+  they score.** [verified] A near-zero coefficient between a wide distribution and a narrow one
+  is a weaker statement than it sounds.
+
+  **The average student's district scores below the average district.** Unweighted mean 87.7;
+  weighted by enrollment, 85.1. [verified] Ohio's larger districts score lower, which is why the
+  district-weighted and student-weighted views of every relationship here diverge, and why
+  neither can be quoted alone.
 properties:
   name: Performance Index
   unit: index
@@ -75,10 +80,12 @@ properties:
   inputs: |
     Ohio School Report Cards, district-level Achievement download, sheet `Performance_Index`,
     keyed by District IRN — from
-    [dew-report-card-achievement](../../catalog/dew-report-card-achievement.md). No connector
-    fetches it. [open]
+    [dew-report-card-achievement](../../catalog/dew-report-card-achievement.md), retrieved by
+    the `dew-report-card` connector and committed at
+    [`crates/dispersion/fixtures/report-card-2425-district-data.csv`](../../../crates/dispersion/fixtures/report-card-2425-district-data.csv).
   series: |
-    2024-2025, 607 rated traditional districts [verified — as published, secondary]:
+    2024-2025, 607 rated traditional districts [verified — computed from the committed
+    fixture; the same figures appear in OCG White Paper 013 and reproduce exactly]:
 
       minimum   53.1
       p25       81.5
@@ -88,8 +95,26 @@ properties:
       maximum  112.8
       sd        10.9      coefficient of variation ~0.124
 
-    No per-district values are committed. No prior year is held. [open]
+      enrollment-weighted mean  85.1
+
+    Mean by quintile of operating expenditure per UNWEIGHTED pupil, lowest spending to highest:
+
+      92.5   89.6   88.4   86.7   81.4      unweighted district means
+      92.6   88.4   88.6   87.4   72.2      enrollment-weighted
+
+    On the published per-EQUIVALENT-pupil denominator the same table reads 87.1, 87.4, 88.6,
+    88.2, 87.2 — flat. Both are computed from the same 607 districts.
+
+    **Three years are held, and only one is used.** The achievement file carries
+    `Performance Index Score 2023-2024` and `2022-2023` in the same row, and both are committed
+    to the fixture. Nothing in this corpus reads them yet. Whether a district's Index is stable
+    enough across three years for a single-year cross-section to stand in for it is a question
+    the corpus can now answer cheaply and has not. [open]
   caveats: |
+    **It is mostly a poverty measurement.** 71.6% of its cross-district variance is the
+    economically disadvantaged share. Any use of this metric that does not say so is reporting
+    district demographics under an achievement label. [verified]
+
     **One construct.** It summarizes state-test results for tested students. It is not school
     quality, and it is not growth — the Progress (value-added) component is designed to capture
     achievement gain independent of starting level and is a different measure in a different
@@ -98,24 +123,28 @@ properties:
 
     **Level, not gain.** Because it measures attainment rather than growth, it is dominated by
     student composition. Any cross-sectional association between the Index and a resource
-    measure is therefore reading composition unless composition is controlled, and none of the
-    associations recorded above control for it.
+    measure is reading composition unless composition is controlled — and where it has been
+    controlled here, most of the association went with it.
 
     **Population is the rated set, 607 districts.** Not the 606 of the Cupp Report and not the
     609 of the FY2027 model. Community schools, JVSDs, STEM schools, and non-rated entities are
-    out. Joining across these files requires a crosswalk, not an assumption. [verified]
+    out. All 607 match the report card's spending and Expanded List files on IRN with no losses;
+    606 of them match the Cupp Report. [verified]
 
     **Redesign breaks.** Ohio has changed report-card methodology more than once. Comparing the
     Index across a redesign is a definitional break of the kind
-    [`metric/ACTIONS`](ACTIONS.md) requires be recorded rather than smoothed. [open]
+    [`metric/ACTIONS`](ACTIONS.md) requires be recorded rather than smoothed. The three years in
+    the fixture are not established to be on one methodology. [open]
   calculator: |
-    None. This metric is published, not computed — the corpus reads it rather than deriving it.
-    Cross-district distribution statistics over it belong to `dispersion` once values are
-    committed. [open]
+    Published, not computed — the corpus reads this metric rather than deriving it. Distribution
+    and association statistics over it are `dispersion`, which gained `rank_correlation` and
+    `partial_correlation` for this node's sake.
 links:
   - target: ../metric.ont.yml
     relationship: instance-of
   - target: ../doctrine/adequacy.yml
+    relationship: operationalizes
+  - target: ../doctrine/equity.yml
     relationship: operationalizes
   - target: expenditure-per-equivalent-pupil.yml
     relationship: compares-against

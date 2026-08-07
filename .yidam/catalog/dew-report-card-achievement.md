@@ -34,12 +34,19 @@ rather than what it spent, and it is what makes the outcome formulation of
   designed to capture growth independent of starting achievement and is a different file.
 - **Keyed by District IRN**, which is the join key the rest of this corpus already uses.
 
-**Not yet extracted.** No Performance Index values are committed to `crates/` as of this entry.
-Joining the FY2025 Index onto
-[`crates/dispersion/fixtures/cupp-fy24-district-data.csv`](../../crates/dispersion/fixtures/cupp-fy24-district-data.csv)
-by IRN is the single cheapest expansion available to the corpus — it would make the
-spending–outcome and poverty–outcome relationships computable from committed data rather than
-quoted from a secondary source. [open]
+**Extracted.** All 607 Performance Index values, plus the 2023-24 and 2022-23 scores in the same
+row, are committed at
+[`crates/dispersion/fixtures/report-card-2425-district-data.csv`](../../crates/dispersion/fixtures/report-card-2425-district-data.csv).
+The join to the corpus's FY2024 cross-section is clean: 606 of the 607 match the Cupp Report on
+IRN, and all 607 match the report card's spending and Expanded List files.
+
+The first thing it showed: the Index tracks the economically disadvantaged share at **−0.846**,
+71.6% of its cross-district variance. Any district-level correlate of this measure is partly that
+variable in disguise. [verified]
+
+**The two prior years are committed and unread.** Nothing in the corpus yet asks whether a
+district's Index is stable enough across three years for a single-year cross-section to stand in
+for it — a question this file can answer without any further retrieval. [open]
 
 ## Used by
 
@@ -48,5 +55,7 @@ quoted from a secondary source. [open]
 
 ## Feeds connector
 
-None yet. A `dew-report-card` connector does not exist; the nine approved in
-[`decisions/proposals`](../decisions/proposals.yml) are all finance-side. [open]
+[`dew-report-card`](../../crates/connect/src/registry.rs), source key
+`achievement-district-2425` — the tenth connector, approved in
+[`decisions/report-card-connector`](../decisions/report-card-connector.yml) and the first
+retrieving an outcome rather than a dollar.
