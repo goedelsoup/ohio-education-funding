@@ -6,5 +6,6 @@ target/
 # macOS
 .DS_Store
 
-# Downloaded source publications, rebuildable from packages/extract.
+# Downloaded source publications. Refetch with `edfund-connect fetch --all`; the SHA-256 of
+# each is pinned in crates/connect/source-digests.txt, so what was used stays known.
 .cache/

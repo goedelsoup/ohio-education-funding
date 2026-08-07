@@ -80,15 +80,25 @@ properties:
       FY2010  $15,226   +25.4%       [inference]
       FY2012  $14,591   +20.2%       [inference]
       FY2014  $14,173   +16.7%       [inference]
-      FY2016  $14,629   +20.5%       [inference]
+      FY2016  $14,630   +20.5%       [inference]
       FY2018  $15,169   +24.9%       [inference]
       FY2020  $15,747   +29.7%       [inference]
       FY2022  $15,314   +26.1%       [verified]
       FY2022  $14,493   +19.4%       excluding federal relief  [verified]
 
-    Intermediate rows are [inference] on both sides: the nominal figures are chart-label
-    approximations to about $100, and the CPI observations between FY2000 and FY2022 are
-    transcribed rather than checked against BLS. The endpoints are verified on both.
+    Intermediate rows are [inference] on the NOMINAL side only: the figures are chart-label
+    approximations to about $100. The deflator no longer contributes uncertainty — every CPI
+    observation from FY2000 to FY2022 has been checked against the Bureau of Labor Statistics'
+    own published series by the [bls-cpi](../../catalog/bls-cpi-u.md) connector, and
+    `crates/connect/tests/deflator_matches_bls.rs` re-checks all twenty-three on every test run.
+    [verified]
+
+    That check found one error. FY2016 had been transcribed as 241.038 where the published
+    index is 241.018, which moved this row from $14,629 to $14,630 — a difference too small to
+    change any claim here, and exactly the size of error that a plausible-looking series hides.
+    Twenty-two of twenty-three points were typed correctly. The one that was not could only be
+    found by going back to the source, which is the argument for the connector rather than for
+    more careful typing.
 
     TWO FINDINGS THE NOMINAL SERIES CONCEALS. [inference]
 

@@ -1,0 +1,19 @@
+[package]
+name = "connect"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+repository.workspace = true
+description = "Retrieval and extraction: the department's publications into committed fixtures"
+
+[dependencies]
+spreadsheet = { path = "../spreadsheet" }
+deflate = { path = "../deflate" }
+edfund-core = { path = "../edfund-core" }
+
+[[bin]]
+name = "edfund-connect"
+path = "src/main.rs"
+
+[lints]
+workspace = true

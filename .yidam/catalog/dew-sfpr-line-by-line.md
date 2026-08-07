@@ -41,4 +41,4 @@ it moved from FY2018 to FY2022 between the FY2023 and FY2024 editions.
 
 ## Feeds connector
 
-[`dew-foundation`](../../crates/dew-foundation/README.md)
+[`dew-foundation`](../../crates/connect/sources/dew-foundation.md)

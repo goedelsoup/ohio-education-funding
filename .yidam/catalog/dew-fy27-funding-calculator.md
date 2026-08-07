@@ -62,4 +62,4 @@ needing a spreadsheet engine.
 
 ## Feeds connector
 
-[`dew-foundation`](../../crates/dew-foundation/README.md)
+[`dew-foundation`](../../crates/connect/sources/dew-foundation.md)

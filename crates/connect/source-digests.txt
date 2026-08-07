@@ -1,0 +1,7 @@
+# SHA-256 and byte length of the exact published files the committed fixtures were
+# built from. Regenerate with `edfund-connect verify --write`. A changed digest means
+# the publication was revised: rebuild, read the diff, and say so in the commit.
+c939b099e168560facac86c0bd7acf040620bb9e177a67109225ea54c56e8b07  2683417  cpi-u-all-items
+56eb763ab23d2c0a4a1b906370cb5101915af7e049fd337f6e0f1806bd938377  1049576  cupp-fy24
+9a2ed4e4947abf45c923f243f553d8345fdf717a492d1297f56652c0461c42db  2170880  enrollment-fy24
+4d210766941e298aab3119cb59cf89a814052001b5ae89e66d7f9c46a7d804c6  5104408  fy27-calculator

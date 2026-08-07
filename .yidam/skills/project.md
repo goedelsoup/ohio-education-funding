@@ -32,5 +32,6 @@ projection depends on floor status, which is itself a projected quantity.
 
 ## Status
 
-**Stub — not implemented.** Belongs in [`packages/`](../../packages/) rather than `crates/` —
-the mature time-series tooling is Python. Blocked on the historical series.
+**Stub — not implemented.** The earlier reading, that this belonged outside `crates/` because
+the mature time-series tooling is Python, no longer holds: `packages/` has been retired and the
+whole domain computer is Rust. Blocked on the historical series, not on the language.

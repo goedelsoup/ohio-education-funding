@@ -44,5 +44,5 @@ conversion; `pdftotext -layout` reads it cleanly and preserves the column struct
 
 ## Feeds connector
 
-[`dew-foundation`](../../crates/dew-foundation/README.md), and the IRN crosswalk
-[`nces-ccd`](../../crates/nces-ccd/README.md) depends on.
+[`dew-foundation`](../../crates/connect/sources/dew-foundation.md), and the IRN crosswalk
+[`nces-ccd`](../../crates/connect/sources/nces-ccd.md) depends on.
