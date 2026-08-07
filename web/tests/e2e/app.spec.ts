@@ -232,6 +232,26 @@ test.describe("the projection", () => {
     await expect(fan.locator("text.axis-label", { hasText: "not zero" })).toHaveCount(1);
   });
 
+  test("opens on the observed years rather than on the forecast", async ({ page }) => {
+    // A band starting at a point with nothing to its left asks the reader to take that value on
+    // faith and gives them no way to judge the trend it was fitted from.
+    await page.goto("/#scenario");
+    const fan = page.locator('#projection-out [data-chart="fan"] svg');
+    await expect(fan.locator("polyline.fan-observed")).toHaveCount(1);
+    await expect(fan.locator("circle.fan-anchor")).toHaveCount(1);
+    // The axis opens on the first year the department published, not on the first forecast one.
+    await expect(fan.locator("text.axis-label").first()).toHaveText("FY2024");
+    await expect(page.locator("#projection-out .legend")).toContainText("Observed enrollment");
+
+    // Hovering an observed year says it is exact; hovering a projected one gives a range.
+    const tip = page.locator("#tip");
+    await fan.locator("rect.fan-hit").first().hover();
+    await expect(tip).toContainText("FY2024");
+    await expect(tip).toContainText("exact");
+    await fan.locator("rect.fan-hit").last().hover();
+    await expect(tip).toContainText("–");
+  });
+
   test("says it is a forecast and that the card above it is not", async ({ page }) => {
     // Simulation and projection are different epistemic acts and the page must not let them
     // blur. There is deliberately no figure anywhere that adds the two together.

@@ -180,6 +180,15 @@ export interface FanPoint {
  * - The y axis is truncated to the band's own range — a band a tenth of a percent wide would be
  *   invisible against a zero baseline — so both y bounds are labelled to say so outright.
  *
+ * # The seam
+ *
+ * Observed years are drawn **solid and outside the band**, and the band opens from the last of
+ * them. Starting a chart at the forecast leaves the reader nothing to judge the trend against
+ * and asks them to take the first value on faith; drawing the observed run-up inside a
+ * zero-width band would instead imply it was estimated. So the two halves are separate marks —
+ * measurement to the left of the seam, forecast to the right, and a ringed dot on the seam
+ * itself — and the difference is visible without consulting the legend.
+ *
  * Not a dual-axis chart, and there is nothing here that could make one.
  */
 export function fanChart(
@@ -208,21 +217,20 @@ export function fanChart(
     padTop + (1 - (v - min) / (max - min)) * (height - padTop - padBottom);
   const at = (i: number, v: number) => `${x(i).toFixed(1)},${y(v).toFixed(1)}`;
 
-  const band =
-    "M " +
-    points.map((p, i) => at(i, p.high)).join(" L ") +
-    " L " +
-    [...points].reverse().map((p, i) => at(points.length - 1 - i, p.low)).join(" L ") +
-    " Z";
+  // The seam: the last year with a published enrollment behind it. Everything to its left is
+  // measurement, everything to its right is forecast, and the band starts here rather than at
+  // the origin so it visibly emerges from the last thing that was actually observed.
+  const lastObserved = points.reduce((found, p, i) => (p.observed ? i : found), -1);
+  const seam = Math.max(0, lastObserved);
+  const observed = points.slice(0, seam + 1);
+  const projected = points.slice(seam);
 
-  const line = (pick: (p: FanPoint) => number) =>
-    points.map((p, i) => at(i, pick(p))).join(" ");
+  const seg = (slice: FanPoint[], offset: number, pick: (p: FanPoint) => number) =>
+    slice.map((p, i) => at(offset + i, pick(p))).join(" ");
 
-  // The observed anchor, drawn solid and separately: it is exact, and a reader must be able to
-  // see where measurement stops and forecast starts without consulting a legend.
-  const observed = points.filter((p) => p.observed);
-  const anchor = points.findIndex((p) => !p.observed);
-  const seam = anchor > 0 ? anchor - 1 : 0;
+  const upper = projected.map((p, i) => at(seam + i, p.high));
+  const lower = projected.map((p, i) => at(seam + i, p.low)).reverse();
+  const band = `M ${upper.join(" L ")} L ${lower.join(" L ")} Z`;
 
   const last = points[points.length - 1]!;
   // A band that never opens. Not a degenerate chart to hide — for a district the guarantee pays,
@@ -238,13 +246,25 @@ export function fanChart(
     .join("");
 
   return `<svg class="chart" viewBox="0 0 ${width} ${height}" role="img"
-    aria-label="Projected range from ${points[0]!.year} to ${last.year}, ${format(last.low)} to ${format(last.high)}">
-    <path class="fan-band" d="${band}"></path>
-    <polyline class="fan-edge" points="${line((p) => p.high)}"></polyline>
-    <polyline class="fan-edge" points="${line((p) => p.low)}"></polyline>
-    <polyline class="fan-mid" points="${line((p) => p.point)}"></polyline>
+    aria-label="Observed from ${points[0]!.year} to ${points[seam]!.year}, then projected to
+      ${last.year} in a range of ${format(last.low)} to ${format(last.high)}">
+    ${projected.length > 1 ? `<path class="fan-band" d="${band}"></path>` : ""}
     ${
-      observed.length > 0
+      projected.length > 1
+        ? `<polyline class="fan-edge" points="${seg(projected, seam, (p) => p.high)}"></polyline>
+           <polyline class="fan-edge" points="${seg(projected, seam, (p) => p.low)}"></polyline>
+           <polyline class="fan-mid" points="${seg(projected, seam, (p) => p.point)}"></polyline>`
+        : ""
+    }
+    ${
+      // Solid, and outside the band: these years were measured, not estimated. Drawing them
+      // inside a zero-width band would say the opposite.
+      observed.length > 1
+        ? `<polyline class="fan-observed" points="${seg(observed, 0, (p) => p.point)}"></polyline>`
+        : ""
+    }
+    ${
+      lastObserved >= 0
         ? `<circle class="fan-anchor" cx="${x(seam).toFixed(1)}" cy="${y(points[seam]!.point).toFixed(1)}" r="4"></circle>`
         : ""
     }

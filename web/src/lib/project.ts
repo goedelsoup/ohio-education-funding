@@ -287,12 +287,22 @@ export function forecast(
 }
 
 /**
- * The whole path from the last observed year out to `through`.
+ * The whole path: every observed enrollment year, then the forecast out to `through`.
  *
- * The anchor is the simulation itself: at `baseYear` enrollment is published, so the formula runs
- * at the department's own ADM and the answer is exact and bandless. Every year after it is the
- * same FY2027 formula at a *projected* enrollment — the x axis is the enrollment year, not a year
- * of policy. Nothing here forecasts the formula.
+ * # Why the observed years are on it
+ *
+ * A band that begins at a point and opens rightward, with nothing to its left, asks the reader
+ * to take the starting value on faith and gives them no way to judge the trend it was fitted
+ * from. The three observed years are the evidence for the forecast, and they are exact — the
+ * formula is run at published enrolled ADM, so they carry no band at all.
+ *
+ * That makes the seam between measurement and forecast the most important thing on the chart,
+ * and it is drawn as one: solid line and no band to the left of it, dashed line inside a band to
+ * the right. See {@link ../lib/chart.ts | fanChart}.
+ *
+ * Only enrollment varies across the whole path. The formula is the same FY2027 one at every
+ * point, so the x axis is the enrollment year rather than a year of policy — nothing here
+ * forecasts the formula, the appropriation, or valuation.
  */
 export function forecastPath(
   districts: District[],
@@ -304,26 +314,33 @@ export function forecastPath(
   prior: Prior,
   modelMinimumStateShare: number,
 ): EnrollmentEffect[] {
-  let anchorAid = 0;
-  let anchorAdm = 0;
-  let anchorGuarantee = 0;
-  for (const d of districts) {
-    const o = apply(d, policy, d.current_year_adm, modelMinimumStateShare);
-    anchorAid += o.realizedAid;
-    anchorAdm += d.current_year_adm;
-    if (o.onGuarantee) anchorGuarantee++;
-  }
-  const path: EnrollmentEffect[] = [
-    {
-      fiscalYear: baseYear,
-      realizedAid: anchorAid,
-      low: anchorAid,
-      high: anchorAid,
-      adm: anchorAdm,
-      onGuarantee: anchorGuarantee,
+  const path: EnrollmentEffect[] = [];
+
+  const years = districts[0]?.adm_history.length ?? 0;
+  for (let index = 0; index < years; index++) {
+    let aid = 0;
+    let adm = 0;
+    let onGuarantee = 0;
+    for (const d of districts) {
+      const value = d.adm_history[index] ?? 0;
+      const outcome = apply(d, policy, value, modelMinimumStateShare);
+      aid += outcome.realizedAid;
+      adm += value;
+      if (outcome.onGuarantee) onGuarantee++;
+    }
+    path.push({
+      fiscalYear: baseYear - (years - 1) + index,
+      realizedAid: aid,
+      // An observed year has no interval. Not a zero-width one — none: the enrollment it was
+      // computed at is published, so there is nothing to be uncertain about.
+      low: aid,
+      high: aid,
+      adm,
+      onGuarantee,
       observed: true,
-    },
-  ];
+    });
+  }
+
   for (let year = baseYear + 1; year <= through; year++) {
     path.push(
       forecast(
