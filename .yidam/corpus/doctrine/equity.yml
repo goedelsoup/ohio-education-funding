@@ -47,9 +47,23 @@ description: |
   −0.549 correlation is the net of them rather than a measurement of what the formula alone
   does. [inference]
 
-  This is a case where an equity statistic computed on realized funding answers a different
-  question from the same statistic computed on the formula. Distinguishing them requires
-  running the formula without the guarantee, which the corpus can now nearly do. [open]
+  **That run has now been done.** State aid against valuation per pupil correlates at −0.662 on
+  formula alone and −0.605 as realized, so the guarantee gives up about 9% of the formula's
+  equalization. [verified] But the level effect is far larger than the correlation: median
+  guarantee uplift is $0 for the two poorest quartiles and $1,154 per pupil for the wealthiest,
+  which more than doubles what the formula gives that quartile. A component can leave the
+  ranking nearly intact while moving a great deal of money. [inference]
+
+  **AND IT FORCED A CORRECTION TO HOW THIS CLASS MEASURES THINGS.** For *spending*, less
+  dispersion is more equitable — that is the assumption behind the coefficient of variation and
+  the federal range ratio reported above. For *state aid*, the sign flips. Aid is compensatory,
+  so a wide spread means strong targeting and a narrow one means weak targeting.
+
+  Realized aid is more equal than formula aid: CV 0.544 against 0.677, federal range ratio 9.6
+  against 12.3. [verified] Read with the spending habit, that looks like the system becoming
+  fairer. It is the opposite — the guarantee flattening the compensation. Any dispersion
+  statistic in this corpus must therefore state whether its subject is a resource or a
+  compensation, because the direction of "better" is not the same. [inference]
 
   It trades against adequacy in a specific way. Perfect equity is achievable by leveling down —
   every district equally underfunded satisfies equity and fails adequacy. [inference] Ohio has
