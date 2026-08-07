@@ -2,13 +2,21 @@ class: litigation
 label: DeRolph v. State (DeRolph IV, 2002)
 description: |
   The last of the four *DeRolph* decisions, and the one that matters most for understanding
-  where Ohio is now. The Supreme Court of Ohio reaffirmed that the school funding system was
-  unconstitutional and directed the General Assembly to enact a system that comported with
-  Article VI, Section 2. [verified]
+  where Ohio is now.
 
-  What happened next is the essential part. In 2003 the court granted a writ of prohibition
-  barring the trial court from conducting further proceedings in the case, ending the remand.
-  [verified] The declaration of unconstitutionality was never withdrawn, and the system was
+  **What it did is more specific than "reaffirmed."** On 11 December 2002 the Supreme Court of
+  Ohio **vacated *DeRolph III*** — the September 2001 decision that had found the system still
+  unconstitutional but prescribed particular methodological fixes — and reinstated *DeRolph I*
+  and *DeRolph II* as the controlling law of the case. [verified] The effect was to strip out
+  the remedial specifics the court had supplied a year earlier and leave standing the bare
+  declaration that the system is unconstitutional, together with the direction to the General
+  Assembly to enact a compliant one. A reading that treats the four decisions as cumulative
+  gets the operative holding wrong.
+
+  **Then it ended without a compliance finding.** On 16 May 2003 the court granted a writ of
+  prohibition barring the trial court from conducting further proceedings, terminating the
+  remand. [verified] The United States Supreme Court denied certiorari on 20 October 2003.
+  [verified] The declaration of unconstitutionality was never withdrawn and the system was
   never adjudicated compliant. The case simply stopped.
 
   This produces the condition every subsequent regime in this corpus operates under: a standing
@@ -18,8 +26,8 @@ description: |
   [Bridge formula](../funding-regime/bridge-formula.yml) could distribute aid by reference to
   prior-year amounts for a decade, and why the
   [Fair School Funding Plan](../funding-regime/fair-school-funding-plan.yml)'s phase-in depends
-  entirely on legislative willingness. [inference] Whether the current system would satisfy
-  *DeRolph* has not been tested and cannot be, on the existing record. [open]
+  entirely on legislative willingness. Whether the current system would satisfy *DeRolph* has
+  not been tested and, on the existing record, cannot be. [open]
 properties:
   case_name: DeRolph v. State
   citation: 97 Ohio St.3d 434, 2002-Ohio-6750
@@ -27,12 +35,18 @@ properties:
   filed: 1991-12-19
   decided: 2002-12-11
   holding: |
-    Reaffirmed that Ohio's school funding system is unconstitutional under Article VI,
-    Section 2, and directed the General Assembly to enact a compliant system.
+    Vacated DeRolph III (93 Ohio St.3d 309, 6 September 2001) and reinstated DeRolph I and
+    DeRolph II as controlling. The school funding system remains unconstitutional under
+    Article VI, Section 2; the General Assembly is directed to enact a compliant system.
+    [verified]
   remedy: |
-    Directed to the General Assembly. In 2003, in a separate prohibition action, the court
-    barred further trial-court proceedings, terminating the remand without a compliance
-    finding. The prohibition action is not modeled as a separate node yet and should be.
+    Directed to the General Assembly with no specified design and no stated consequence for
+    non-compliance. Enforcement ended 16 May 2003 when the court issued a writ of prohibition
+    barring further trial-court proceedings — without a compliance finding. Certiorari denied
+    by the U.S. Supreme Court 20 October 2003. [verified]
+
+    The 2003 prohibition action is not modeled as a separate node and should be; it is the
+    single most consequential event in the sequence and currently lives only as a property.
     [open]
 links:
   - target: ../litigation.ont.yml
@@ -45,3 +59,5 @@ links:
     relationship: invokes
   - target: ../legislation/hb-1-2009.yml
     relationship: prompts
+  - target: ../../catalog/derolph-litigation-record.md
+    relationship: sourced-from

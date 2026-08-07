@@ -3,42 +3,52 @@ label: EdChoice Constitutional Challenge (Franklin County, 2025)
 description: |
   A challenge to Ohio's EdChoice scholarship programs brought by a coalition of public school
   districts organized as Vouchers Hurt Ohio, filed in Franklin County Common Pleas Court in
-  2022 and decided in the districts' favor in June 2025, holding the program unconstitutional.
-  [verified]
+  2022 and decided in the districts' favor on 24 June 2025 by Judge Jaiza Page, in a 47-page
+  decision holding the program unconstitutional. [verified] Roughly 100 to 200 districts joined
+  as plaintiffs; accounts differ and the exact figure is not settled here. [open] The program at
+  issue was reported at approximately $700 million annually. [inference]
 
-  The grounds distinguish this case sharply from *Zelman v. Simmons-Harris*, in which the
+  **Two grounds, and they are independent.** The court found that using public funds to
+  subsidize tuition at private religious schools violates Article VI, Section 2's bar on any
+  religious or other sect having exclusive right to or control of any part of the school funds;
+  and separately that the expansion of EdChoice undermines the state's duty to maintain a
+  thorough and efficient system, particularly while public schools remain underfunded.
+  [verified] The second ground is what connects this case to *DeRolph* — it is the first time
+  since 2003 that the thorough-and-efficient standard has done work in a decided Ohio case
+  about money. [inference]
+
+  The grounds also distinguish this case sharply from *Zelman v. Simmons-Harris*, in which the
   United States Supreme Court upheld the Cleveland voucher program against a federal
-  Establishment Clause challenge in 2002. [verified] This case is about the *Ohio*
-  constitution: the Article VI, Section 2 duty to secure a thorough and efficient system of
-  common schools, and the same section's bar on any religious or other sect having exclusive
-  right to or control of any part of the school funds. A federal ruling that vouchers do not
-  establish religion says nothing about whether Ohio's own constitution permits them.
-  [inference]
+  Establishment Clause challenge in 2002. [verified] A federal ruling that vouchers do not
+  establish religion says nothing about whether Ohio's own constitution permits them, and the
+  sectarian-funds clause is Ohio text with no federal analogue. [inference]
 
-  The case is a trial-level decision under appeal, so its precedential weight is limited and
-  its outcome unsettled. [inference] It is seeded here because it is the live test of whether
-  the *DeRolph* standard constrains anything in the current system, and because it makes
-  concrete why `litigation` needs to be able to challenge a `program` and not only a
-  `funding-regime`.
+  This is a trial-level decision and the Attorney General moved to appeal, so its precedential
+  weight is limited and its outcome unsettled. [verified] It is seeded and now enriched because
+  it is the live test of whether the *DeRolph* standard constrains anything in the current
+  system.
 
-  Case caption, docket number, the precise grounds relied on, and appellate status all need to
-  be established against the record before anything here is cited. [open]
+  Docket number, the exact case caption, and appellate status remain unestablished. [open]
 properties:
   case_name: |
-    Coalition action brought by Vouchers Hurt Ohio member districts. Exact caption not yet
-    established. [open]
+    Coalition action brought by Vouchers Hurt Ohio member districts against the State of Ohio.
+    Exact caption not yet established. [open]
   citation: |
-    Franklin County Court of Common Pleas. Docket number not yet established. [open]
+    Franklin County Court of Common Pleas; decision of Judge Jaiza Page, 24 June 2025,
+    47 pages. Docket number not yet established. [open]
   court: Franklin County Court of Common Pleas
   filed: 2022-01-04
   decided: 2025-06-24
   holding: |
-    Ohio's EdChoice scholarship program was held unconstitutional. The specific constitutional
-    grounds and the scope of the ruling must be confirmed against the opinion; filing and
-    decision dates are approximate. [open]
+    Ohio's EdChoice scholarship program is unconstitutional on two independent grounds: it
+    directs school funds to religious and sectarian institutions contrary to Article VI,
+    Section 2, and its expansion undermines the state's duty to secure a thorough and efficient
+    system of common schools. [verified] Filing date approximate. [open]
   remedy: |
-    Not established here. Under appeal at the time of seeding, so no relief is in effect.
-    [open]
+    Not established here. Appeal announced by the Ohio Attorney General; no relief in effect at
+    the time of this revision. [verified] Appellate posture must be re-checked before this node
+    is cited — a cached judgment in an active appeal is the specific staleness risk the
+    `ohio-courts` connector is required to flag.
 links:
   - target: ../litigation.ont.yml
     relationship: instance-of
@@ -48,3 +58,5 @@ links:
     relationship: invokes
   - target: ../legislation/ohio-constitution-article-vi-section-2.yml
     relationship: applies
+  - target: ../legislation/hb-33-2023.yml
+    relationship: contests

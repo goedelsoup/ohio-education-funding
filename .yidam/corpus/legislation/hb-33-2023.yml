@@ -1,0 +1,57 @@
+class: legislation
+label: Am. Sub. H.B. 33 (2023) — FY2024-25 Budget
+description: |
+  The FY2024-25 operating budget, and the most consequential single act for the Fair School
+  Funding Plan after the one that created it. Three changes, each of which the corpus needed a
+  node to attach to.
+
+  **It refreshed the cost inputs.** The base cost build-up moved from FY2018 statewide average
+  salaries to FY2022. [verified] This is the only time the reference year has been updated, and
+  it is the proof that the mechanism can work as designed — the base cost statewide average
+  moved from roughly $7,352 in FY2023 to roughly $8,240 in FY2025, and most of that is the
+  input refresh rather than the phase-in. [inference] It is also the benchmark against which
+  [H.B. 96](hb-96-2025.yml)'s decision to hold the year at FY2022 has to be read.
+
+  **It advanced the phase-in** to 50% in FY2024 and 66.67% in FY2025. [inference]
+
+  **It made EdChoice universal.** Eligibility for the expansion scholarship, previously
+  income-limited, was opened to all Ohio students with the award amount scaled by family income
+  relative to the federal poverty level rather than eligibility gated by it. [verified] This is
+  the change that made the scholarship channel large enough to matter in statewide funding
+  arithmetic, and it is the change the [2025 Franklin County
+  decision](../litigation/vouchers-hurt-ohio-2025.yml) found unconstitutional. [inference]
+
+  It also created the [Department of Education and
+  Workforce](../actor/department-of-education-and-workforce.yml), converting the state
+  education agency from a body answering to an independent State Board into a cabinet
+  department answering to the Governor. [verified]
+
+  Appropriation totals, the exact income bands for the scholarship award scale, and the
+  line-item vetoes are not yet recorded. [open]
+properties:
+  designation: Am. Sub. H.B. 33
+  general_assembly: 135th General Assembly
+  signed: 2023-07-04
+  effective: 2023-07-04
+  subject: |
+    Enacted the FY2024-25 operating budget. Updated Fair School Funding Plan cost inputs from
+    FY2018 to FY2022; advanced the formula phase-in to 50% in FY2024 and 66.67% in FY2025;
+    extended EdChoice Expansion eligibility to all students with income-scaled award amounts;
+    replaced the Ohio Department of Education with the cabinet-level Department of Education
+    and Workforce. Signing date to be confirmed against the enrolled act. [open]
+  vetoes: Line-item vetoes exercised; education funding effects not yet assessed. [open]
+links:
+  - target: ../legislation.ont.yml
+    relationship: instance-of
+  - target: hb-110-2021.yml
+    relationship: amends
+  - target: ../funding-regime/fair-school-funding-plan.yml
+    relationship: continues
+  - target: ../parameter/fsfp-phase-in-percentage.yml
+    relationship: sets
+  - target: ../parameter/base-cost-per-pupil.yml
+    relationship: sets
+  - target: ../program/edchoice-expansion.yml
+    relationship: creates
+  - target: ../actor/department-of-education-and-workforce.yml
+    relationship: establishes-agency

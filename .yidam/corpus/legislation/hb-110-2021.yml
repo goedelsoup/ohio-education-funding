@@ -1,23 +1,39 @@
 class: legislation
 label: Am. Sub. H.B. 110 (2021) — FY2022-23 Budget; Fair School Funding Plan
 description: |
-  The FY2022-23 operating budget, which enacted the Fair School Funding Plan — the
-  Cupp-Patterson plan, named for the two legislators who developed it over several years with
-  a working group of school treasurers and superintendents. [verified] It is the first Ohio
-  formula built by costing out inputs at the district level and the first to fund community
-  schools and STEM schools directly from the state rather than by deducting from a resident
-  district's foundation payment. [verified]
+  The FY2022-23 operating budget, which enacted the Fair School Funding Plan. The plan came out
+  of a workgroup of practitioners — school treasurers and superintendents — convened in late
+  2017 by House Speaker Robert Cupp and then-Representative John Patterson, not by executive
+  budget staff. [verified] That origin is unusual enough to be a structural fact about the
+  plan: it was designed by the people who operate district budgets, and it is the only Ohio
+  formula built that way.
 
-  Three structural changes matter most. Base cost is computed per district from actual
-  staffing ratios and regional salary data rather than assigned as a statewide per-pupil
-  figure. Local capacity replaces the charge-off millage as the measure of what a district can
-  raise, and it weights income alongside property valuation rather than using property alone.
-  And students are funded where they are educated, ending the deduct mechanism. [verified]
+  Three departures from everything before it, all confirmed in the department's own methodology
+  documentation. [verified]
 
-  The act specified a six-year phase-in, appropriating roughly one-sixth of the computed
-  formula amount in FY2022 and two-sixths in FY2023. [inference] It could not bind later General
-  Assemblies to continue it, and the phase-in has been re-legislated in each subsequent
-  budget — which is the central question hanging over the plan. [verified]
+  **Funds students where they are educated, not where they live.** The deduction and transfer
+  of funds from resident districts for students attending community schools, STEM schools,
+  scholarship programs, and open enrollment is generally eliminated. This is the mechanism at
+  the centre of a decade of district revenue-loss arguments.
+
+  **Establishes an input-based model informed by professional judgment.** Base cost is built
+  from student-teacher ratios, minimum service levels, and actual costs, producing a unique
+  base cost per pupil for each district and community school in the state.
+
+  **Measures local capacity by property and income together.** The state and local cost
+  methodology uses both assessed property values and resident income to determine the state
+  share — replacing a charge-off that saw only valuation.
+
+  In FY2022 the plan distributed almost $7.5 billion in state foundation funding to 611 school
+  districts, at a phase-in of 16.67% for most components and 0% for Disadvantaged Pupil Impact
+  Aid. [verified] The base cost was priced from FY2018 statewide average salaries. [verified]
+
+  H.B. 583 of the same General Assembly made technical corrections to the formula in June 2022
+  and is incorporated into the FY2022 calculations. [verified] It has no node here yet. [open]
+
+  The act specified a six-year phase-in that no enacting General Assembly could bind its
+  successors to complete, and the plan has been re-legislated in each subsequent budget.
+  [verified]
 properties:
   designation: Am. Sub. H.B. 110
   general_assembly: 134th General Assembly
@@ -25,10 +41,12 @@ properties:
   effective: 2021-07-01
   subject: |
     Enacted the FY2022-23 operating budget and established the Fair School Funding Plan:
-    district-specific base cost derived from staffing and salary inputs, a local capacity
-    measure combining property valuation and resident income, direct state funding of
-    community and STEM schools in place of the resident-district deduction, and a six-year
-    phase-in of the computed amount.
+    district-specific base cost built from staffing ratios and minimum service levels priced at
+    FY2018 statewide average salaries; a local capacity measure combining assessed property
+    valuation with resident income; direct state funding of community and STEM school students
+    in place of the resident-district deduction; categorical weights for special education,
+    economic disadvantage, English learners, gifted, and career-technical; and a six-year
+    phase-in of the computed amount, beginning at 16.67% in FY2022.
   vetoes: Line-item vetoes recorded; education funding effect not yet assessed. [open]
 links:
   - target: ../legislation.ont.yml
@@ -41,3 +59,5 @@ links:
     relationship: sets
   - target: ../doctrine/adequacy.yml
     relationship: operationalizes
+  - target: ../../catalog/dew-sfpr-line-by-line.md
+    relationship: sourced-from

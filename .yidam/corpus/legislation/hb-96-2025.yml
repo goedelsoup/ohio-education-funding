@@ -2,40 +2,55 @@ class: legislation
 label: Am. Sub. H.B. 96 (2025) — FY2026-27 Budget
 description: |
   The FY2026-27 operating budget, and the third consecutive budget to decide what happens to
-  the Fair School Funding Plan's phase-in. [verified] The contested question was not whether
-  to continue the formula but which cost inputs to run it on: the plan's design contemplated
-  refreshing the staffing and salary data that feed base cost, and the act carried forward
-  the earlier input year rather than updating it. [inference]
+  the Fair School Funding Plan's phase-in. Signed 30 June 2025 after 67 line-item vetoes.
+  [verified]
 
-  This distinction is the reason `parameter` is a first-class node in this corpus. Continuing
-  a formula on frozen inputs while advancing its phase-in percentage produces a number that is
-  simultaneously described as full implementation and as a real-terms reduction, and both
-  descriptions are defensible depending on which parameter you hold fixed. Resolving that
-  argument requires the input year and the phase-in percentage to be separately addressable
-  values with their own series — which is exactly what
+  It takes the phase-in to **83.33% in FY2026 and 100% in FY2027** — completing, on paper, the
+  six-year schedule the plan was designed around — while holding the base cost inputs at
+  **FY2022** levels rather than refreshing them. [inference] The Governor's executive proposal
+  had explicitly frozen base cost at FY2022 levels, and the enacted act carried that forward.
+  [inference]
+
+  This is the reason `parameter` is a first-class node in this corpus. A budget that advances
+  the phase-in to 100% while freezing the input year produces a number that is simultaneously
+  describable as full implementation and as a real-terms reduction, and both descriptions are
+  arithmetically correct — they differ in which parameter they hold fixed. Resolving the
+  argument requires the phase-in percentage and the input reference year to be separately
+  addressable values with their own series, which is what
   [`fsfp-phase-in-percentage`](../parameter/fsfp-phase-in-percentage.yml) and
-  [`base-cost-per-pupil`](../parameter/base-cost-per-pupil.yml) are for. [inference]
+  [`fsfp-base-cost-calculation`](../formula-component/fsfp-base-cost-calculation.yml) now are.
 
-  The specific phase-in percentages, the input year carried forward, the appropriation totals,
-  and the line-item vetoes affecting education all need to be filled from the enrolled act and
-  the LSC analysis before any claim here is load-bearing. [open]
+  The precedent for the other choice exists and is recent:
+  [H.B. 33](hb-33-2023.yml) refreshed the inputs from FY2018 to FY2022 two years earlier.
+  [verified] So freezing was a decision against an established practice, not an omission.
+  [inference]
+
+  **Numbers not yet established.** The enacted foundation appropriation totals, and the
+  identity of the vetoed items affecting education. Figures in circulation must be handled
+  carefully: the House-passed Budget in Brief describes bridge-formula funding of $11.24 billion
+  in FY2026 and $11.49 billion in FY2027, and a projection of $17.55 billion in total state and
+  local formula shares for traditional districts in FY2027 — but the first pair belongs to a
+  proposal, not to the enacted act. See the stage caveat in
+  [`lsc-hb96-analysis`](../../catalog/lsc-hb96-analysis.md). [open]
 properties:
   designation: Am. Sub. H.B. 96
   general_assembly: 136th General Assembly
   signed: 2025-06-30
   effective: 2025-06-30
   subject: |
-    Enacted the FY2026-27 operating budget. Continued the Fair School Funding Plan formula
-    while carrying forward prior-year cost inputs rather than refreshing them, and set the
-    phase-in appropriation levels for the biennium. Exact provisions to be confirmed against
-    the enrolled act. [open]
+    Enacted the FY2026-27 operating budget. Continued the Fair School Funding Plan formula at a
+    phase-in of 83.33% in FY2026 and 100% in FY2027 while carrying forward FY2022 base cost
+    inputs rather than refreshing them. [inference — confirm against the enacted act and the
+    LSC Greenbook]
   vetoes: |
-    Line-item vetoes were exercised. Which, if any, affected school funding provisions is
-    not yet established here. [open]
+    67 line items vetoed before signing. [verified] Which of them affected school funding
+    provisions is not yet established. [open]
 links:
   - target: ../legislation.ont.yml
     relationship: instance-of
   - target: hb-110-2021.yml
+    relationship: amends
+  - target: hb-33-2023.yml
     relationship: amends
   - target: ../fiscal-period/fy2026-27.yml
     relationship: appropriates-for
@@ -43,3 +58,5 @@ links:
     relationship: sets
   - target: ../funding-regime/fair-school-funding-plan.yml
     relationship: continues
+  - target: ../../catalog/lsc-hb96-analysis.md
+    relationship: sourced-from

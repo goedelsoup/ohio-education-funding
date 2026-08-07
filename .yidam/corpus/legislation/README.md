@@ -24,11 +24,18 @@ See the class definition: [legislation.ont.yml](../legislation.ont.yml).
 | [hb-66-2005](hb-66-2005.yml) | 2005 | Phased out the tangible personal property tax |
 | [hb-1-2009](hb-1-2009.yml) | 2009 | Enacted the Evidence-Based Model |
 | [hb-110-2021](hb-110-2021.yml) | 2021 | Enacted the Fair School Funding Plan |
-| [hb-96-2025](hb-96-2025.yml) | 2025 | FY2026-27 budget; continued the phase-in on frozen inputs |
+| [hb-33-2023](hb-33-2023.yml) | 2023 | Refreshed cost inputs to FY2022; made EdChoice universal |
+| [hb-96-2025](hb-96-2025.yml) | 2025 | Phase-in to 100%, cost inputs held at FY2022 |
+
+Read the last three in sequence and the argument of the current era is visible: H.B. 110 built
+a formula that prices staffing at a reference year, H.B. 33 proved the reference year can be
+refreshed, and H.B. 96 declined to refresh it while completing the phase-in. Freezing was a
+choice against an established practice, not an oversight.
 
 ## Known gaps
 
-Two enactments are referenced by other nodes but have no node here yet, and are the first
-expansion targets for this class: **Am. Sub. H.B. 153 (2011)**, which repealed the
-Evidence-Based Model and installed the Bridge formula, and **Am. Sub. H.B. 33 (2023)**, which
-made EdChoice eligibility universal and created the Department of Education and Workforce.
+**Am. Sub. H.B. 153 (2011)**, which repealed the Evidence-Based Model and installed the Bridge
+formula, is referenced by other nodes and still has none of its own — the first expansion
+target for this class. **H.B. 583 (2022)** made technical corrections to the Fair School
+Funding Plan formula that are incorporated into the FY2022 calculations and is likewise
+unmodelled.

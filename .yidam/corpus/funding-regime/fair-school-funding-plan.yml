@@ -22,10 +22,17 @@ description: |
   foundation payment, which removes the mechanism at the center of a decade of district
   revenue-loss arguments. [verified]
 
-  The unresolved question is whether it is ever run as designed. It carries a six-year
-  phase-in that no enacting General Assembly could bind its successors to complete, and the
-  cost inputs that make base cost district-specific are only meaningful if they are refreshed.
-  [inference] Both are live in the FY2026-27 biennium. [open]
+  The unresolved question is whether it is ever run as designed — and the answer is now
+  partly in. The phase-in reached 16.67% in FY2022, 33.33% in FY2023, 50% in FY2024, 66.67% in
+  FY2025, and is set at 83.33% in FY2026 and 100% in FY2027. [verified for FY2022; inference
+  thereafter] On the phase-in alone, the plan will have been fully implemented on schedule.
+
+  The cost inputs tell a different story. Base cost was priced from FY2018 salaries for the
+  first two years, refreshed to FY2022 by [H.B. 33](../legislation/hb-33-2023.yml), and held at
+  FY2022 by [H.B. 96](../legislation/hb-96-2025.yml) through FY2027. [inference] By the year the
+  formula reaches 100% of its computed amount, that amount will be priced from data five years
+  old. Both statements — fully phased in, and funded below its own costing — are true, which is
+  why this corpus keeps the two dials as separate nodes. [inference]
 properties:
   name: Fair School Funding Plan
   effective_from: FY2022
