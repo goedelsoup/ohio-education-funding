@@ -223,3 +223,54 @@ test("the feed the site builds from is the one the schema accepted", () => {
   expect(bundle.districts).toHaveLength(609);
   expect(BundleSchema.safeParse(bundle).success).toBe(true);
 });
+
+test("the base cost build-up reproduces the department's aggregate for every district", () => {
+  /*
+   * The claim the card makes, checked against the whole panel rather than the one district a
+   * screenshot would show. These are the only per-district figures on this site that are computed
+   * instead of read, so the reproduction is the licence to display them at all.
+   *
+   * Two dollars, not two cents: twenty-two elements each rounded where the department rounds,
+   * summed. The worst district is off by $1.09 on an aggregate of $257 million. Anything larger
+   * would mean the implementation and the statute had diverged rather than the arithmetic drifting.
+   */
+  const { bundle } = loadFeed();
+  let worst = { irn: "", name: "", residual: 0 };
+  let computedTotal = 0;
+  let publishedTotal = 0;
+
+  for (const d of bundle.districts) {
+    const b = d.base_cost_build_up;
+    const parts =
+      b.teachers + b.student_support + b.district_leadership + b.building_leadership +
+      b.athletic_cocurricular;
+    // The five sub-components have to add to the aggregate the card prints, or the table shows
+    // a total that is not the sum of the rows above it.
+    expect(Math.abs(parts - b.computed_aggregate), `${d.name} parts do not sum`).toBeLessThan(0.01);
+    expect(Math.abs(b.residual - (b.computed_aggregate - b.published_aggregate))).toBeLessThan(1e-6);
+    expect(b.published_aggregate).toBeCloseTo(d.aggregate_base_cost, 2);
+
+    computedTotal += b.computed_aggregate;
+    publishedTotal += b.published_aggregate;
+    if (Math.abs(b.residual) > Math.abs(worst.residual)) {
+      worst = { irn: d.irn, name: d.name, residual: b.residual };
+    }
+  }
+
+  expect(
+    Math.abs(worst.residual),
+    `worst residual $${worst.residual.toFixed(2)} at ${worst.name} (${worst.irn})`,
+  ).toBeLessThan(2);
+  // And the residuals are noise, not a bias: they cancel across the state.
+  expect(Math.abs(computedTotal - publishedTotal) / publishedTotal).toBeLessThan(1e-7);
+});
+
+test("the scenario panel does not carry the build-up", () => {
+  // Twenty-nine numbers per district that `policy.ts` never reads. Leaving them in would add half
+  // a megabyte to the one download that happens in a browser.
+  const { bundle } = loadFeed();
+  const district = bundle.districts[0]!;
+  expect(district).toHaveProperty("base_cost_build_up");
+  const { finances: _f, outcome: _o, base_cost_build_up: _b, ...panelDistrict } = district;
+  expect(Object.keys(panelDistrict)).not.toContain("base_cost_build_up");
+});

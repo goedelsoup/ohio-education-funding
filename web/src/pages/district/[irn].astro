@@ -9,6 +9,7 @@
  */
 import DistrictNav from "../../components/DistrictNav.astro";
 import Base from "../../layouts/Base.astro";
+import { renderBaseCostBuildUp } from "../../lib/basecost.ts";
 import {
   renderAidSource,
   renderDetail,
@@ -47,6 +48,7 @@ const description = district.on_guarantee
 
   <Fragment set:html={renderHeadline(district)} />
   <Fragment set:html={renderAidSource(bundle, district)} />
+  <Fragment set:html={renderBaseCostBuildUp(district)} />
   <Fragment set:html={renderEnrollmentYears(bundle, district, forecastable)} />
   <Fragment set:html={renderPosition(bundle, district, valuations, expenditures)} />
   <Fragment set:html={renderDetail(district)} />

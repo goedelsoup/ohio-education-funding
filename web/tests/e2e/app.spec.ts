@@ -17,6 +17,8 @@ import { join } from "node:path";
 
 import { expect, test, type Page } from "@playwright/test";
 
+import { REQUIRED_CONTRACT } from "../../src/lib/types.ts";
+
 /** Cleveland Municipal. On the guarantee, so the guarantee copy has something to render. */
 const CLEVELAND = "043786";
 /** Northern Local (Perry County). The corpus's property-poor exemplar. */
@@ -126,17 +128,19 @@ test.describe("the document arrives complete", () => {
     const feed = await request.get("/data/bundle.json");
     expect(feed.status()).toBe(200);
     const bundle = await feed.json();
-    expect(bundle.contract_version).toBe("6.0.0");
+    expect(bundle.contract_version).toBe(REQUIRED_CONTRACT);
     expect(bundle.districts).toHaveLength(609);
+    expect(bundle.districts[0]).toHaveProperty("base_cost_build_up");
 
-    // The panel is what the scenario routes fetch: the same districts, without the two blocks the
-    // formula never reads.
+    // The panel is what the scenario routes fetch: the same districts, without the three blocks
+    // the formula never reads.
     const panel = await request.get("/data/panel.json");
     expect(panel.status()).toBe(200);
     const slim = await panel.json();
     expect(slim.districts).toHaveLength(609);
     expect(slim.districts[0]).not.toHaveProperty("finances");
     expect(slim.districts[0]).not.toHaveProperty("outcome");
+    expect(slim.districts[0]).not.toHaveProperty("base_cost_build_up");
     expect(slim.districts[0]).toHaveProperty("base_cost_state_share");
   });
 
@@ -716,5 +720,41 @@ test.describe("presentation", () => {
     await expect(chart).toContainText("no change");
     // Two hues and a neutral midpoint, never a hue at zero.
     await expect(chart.locator(".hist > *")).not.toHaveCount(0);
+  });
+});
+
+test.describe("the base cost build-up", () => {
+  test("shows the statute's twenty-two elements, and reconciles against the department", async ({
+    page,
+  }) => {
+    await page.goto(`/district/${CLEVELAND}`);
+    const card = page.locator(".card", { hasText: "Why base cost is" });
+    await expect(card).toBeVisible();
+
+    // Five sub-components and their elements, plus the aggregate row.
+    for (const code of ["A1", "A4", "B7", "C1", "C7", "D3", "E"]) {
+      await expect(card.locator("tbody")).toContainText(code);
+    }
+    await expect(card.locator("tbody tr").last()).toContainText("Aggregate base cost");
+
+    // The claim, and the reconciliation that licenses it. A card asserting it reproduced the
+    // department without printing the difference would be asking to be believed.
+    await expect(card).toContainText("computed here, not quoted");
+    await expect(card).toContainText("The department publishes its own aggregate");
+  });
+
+  test("the category labels are not clipped by the chart's margin", async ({ page }) => {
+    // "Building leadership and operation" is the longest label on this site and rendered as
+    // "g leadership and operation" against the fixed margin this replaced — which reads as a
+    // rendering fault rather than as truncation, and so gets reported by nobody.
+    await page.goto(`/district/${CLEVELAND}`);
+    const labels = page.locator('[data-chart="base-cost"] .bar-label text');
+    await expect(labels).toHaveCount(5);
+    const chart = page.locator('[data-chart="base-cost"] svg');
+    const box = await chart.boundingBox();
+    for (let i = 0; i < 5; i++) {
+      const label = await labels.nth(i).boundingBox();
+      expect(label!.x, `label ${i} starts left of the chart`).toBeGreaterThanOrEqual(box!.x - 0.5);
+    }
   });
 });

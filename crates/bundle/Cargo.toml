@@ -10,6 +10,7 @@ repository.workspace = true
 deflate = { path = "../deflate" }
 edfund-core = { path = "../edfund-core" }
 dispersion = { path = "../dispersion" }
+foundation = { path = "../foundation" }
 project = { path = "../project" }
 
 [lints]

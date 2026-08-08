@@ -64,7 +64,7 @@ use edfund_core::Dollars;
 /// from FY2022-FY2024 to FY2024-FY2026 — the years the department's `ADM Data` sheet declares.
 /// The values did not change; what they are called did, which is exactly the kind of silent
 /// meaning change the version guard exists for.
-pub const CONTRACT_VERSION: &str = "6.0.0";
+pub const CONTRACT_VERSION: &str = "7.0.0";
 
 /// The outcome side of a district, where the report card covers it.
 ///
@@ -162,6 +162,87 @@ pub struct Deflator {
     pub points: Vec<(u16, f64)>,
 }
 
+/// The base cost build-up for one district, all twenty-two elements of R.C. 3317.011.
+///
+/// # Why the feed carries the parts and not just the total
+///
+/// `base_cost_per_pupil` answers "how much"; this answers "why". Base cost is assembled from
+/// statutory staffing ratios applied to a district's own enrollment, priced at statewide average
+/// salaries — so the number a district argues about is the sum of twenty-two decisions, and the
+/// interface showed only the sum.
+///
+/// # And why it carries the department's figure beside its own
+///
+/// This is computed by `foundation`, not read. That is a claim, so the published aggregate travels
+/// with it and [`BaseCostBuildUp::residual`] is the difference — a dollar or so on figures in the
+/// millions, from twenty-two elements each rounded where the department rounds. Publishing the
+/// residual is the difference between reproducing a number and asserting that you have.
+#[derive(Debug, Clone, Copy, PartialEq, Default)]
+pub struct BaseCostBuildUp {
+    /// A1 — classroom teachers, at the statutory ratio for each grade band.
+    pub classroom_teachers: Dollars,
+    /// A2 — special teachers, at one per 150 pupils.
+    pub special_teachers: Dollars,
+    /// A3 — substitutes.
+    pub substitutes: Dollars,
+    /// A4 — professional development.
+    pub professional_development: Dollars,
+    /// A — teacher base cost, R.C. 3317.011(D).
+    pub teachers: Dollars,
+    /// B1 — guidance counselors.
+    pub counselors: Dollars,
+    /// B2 — librarians and media staff.
+    pub librarians: Dollars,
+    /// B3 — student wellness and success staff.
+    pub wellness: Dollars,
+    /// B4 — academic co-curricular activities.
+    pub academic_cocurricular: Dollars,
+    /// B5 — building safety and security.
+    pub safety: Dollars,
+    /// B6 — supplies and academic content.
+    pub supplies: Dollars,
+    /// B7 — student technology.
+    pub technology: Dollars,
+    /// B — student support base cost, R.C. 3317.011(E).
+    pub student_support: Dollars,
+    /// C1 — superintendent. The one price in the formula that varies with district size.
+    pub superintendent: Dollars,
+    /// C2 — treasurer.
+    pub treasurer: Dollars,
+    /// C3 — other district administrators, priced at 82.8% of the superintendent band.
+    pub other_administrators: Dollars,
+    /// C4 — fiscal support.
+    pub fiscal_support: Dollars,
+    /// C5 — EMIS support.
+    pub emis: Dollars,
+    /// C6 — district leadership support.
+    pub leadership_support: Dollars,
+    /// C7 — information technology centre support.
+    pub itc: Dollars,
+    /// C — district leadership and accountability, R.C. 3317.011(F).
+    pub district_leadership: Dollars,
+    /// D1 — building leadership, priced at 79.38% of the superintendent band.
+    pub building_leadership_staff: Dollars,
+    /// D2 — building leadership support.
+    pub building_support: Dollars,
+    /// D3 — building operation.
+    pub building_operation: Dollars,
+    /// D — building leadership and operation, R.C. 3317.011(G).
+    pub building_leadership: Dollars,
+    /// E — athletic co-curricular activities, R.C. 3317.011(H).
+    pub athletic_cocurricular: Dollars,
+    /// Funded classroom teaching positions, as the department rounds them.
+    pub funded_classroom_teachers: f64,
+    /// Funded special teaching positions.
+    pub funded_special_teachers: f64,
+    /// A + B + C + D + E, as computed here.
+    pub computed_aggregate: Dollars,
+    /// What the department published for the same district.
+    pub published_aggregate: Dollars,
+    /// `computed_aggregate - published_aggregate`. Accumulated rounding across the elements.
+    pub residual: Dollars,
+}
+
 /// One district, as the web layer needs it.
 #[derive(Debug, Clone, PartialEq)]
 pub struct District {
@@ -177,6 +258,8 @@ pub struct District {
     pub base_cost_per_pupil: Dollars,
     /// Aggregate base cost, all five sub-components.
     pub aggregate_base_cost: Dollars,
+    /// How that aggregate is assembled, recomputed here rather than quoted.
+    pub base_cost_build_up: BaseCostBuildUp,
     /// The state's share of base cost alone, before every categorical.
     pub base_cost_state_share: Dollars,
     /// Targeted assistance, special education, DPIA, English learner, gifted, career-technical.
@@ -641,6 +724,51 @@ impl Bundle {
                 "\"aggregate_base_cost\": {}, ",
                 num(d.aggregate_base_cost)
             ));
+            {
+                // Twenty-two elements plus the two funded-position counts and the reconciliation
+                // against the department's own figure. Written longhand for the same reason the
+                // rest of this serializer is: no serde, so no derive.
+                let b = &d.base_cost_build_up;
+                s.push_str("\"base_cost_build_up\": {");
+                for (name, value) in [
+                    ("classroom_teachers", b.classroom_teachers),
+                    ("special_teachers", b.special_teachers),
+                    ("substitutes", b.substitutes),
+                    ("professional_development", b.professional_development),
+                    ("teachers", b.teachers),
+                    ("counselors", b.counselors),
+                    ("librarians", b.librarians),
+                    ("wellness", b.wellness),
+                    ("academic_cocurricular", b.academic_cocurricular),
+                    ("safety", b.safety),
+                    ("supplies", b.supplies),
+                    ("technology", b.technology),
+                    ("student_support", b.student_support),
+                    ("superintendent", b.superintendent),
+                    ("treasurer", b.treasurer),
+                    ("other_administrators", b.other_administrators),
+                    ("fiscal_support", b.fiscal_support),
+                    ("emis", b.emis),
+                    ("leadership_support", b.leadership_support),
+                    ("itc", b.itc),
+                    ("district_leadership", b.district_leadership),
+                    ("building_leadership_staff", b.building_leadership_staff),
+                    ("building_support", b.building_support),
+                    ("building_operation", b.building_operation),
+                    ("building_leadership", b.building_leadership),
+                    ("athletic_cocurricular", b.athletic_cocurricular),
+                    ("computed_aggregate", b.computed_aggregate),
+                    ("published_aggregate", b.published_aggregate),
+                    ("residual", b.residual),
+                ] {
+                    s.push_str(&format!("\"{name}\": {}, ", num(value)));
+                }
+                s.push_str(&format!(
+                    "\"funded_classroom_teachers\": {}, \"funded_special_teachers\": {}}}, ",
+                    num(b.funded_classroom_teachers),
+                    num(b.funded_special_teachers)
+                ));
+            }
             s.push_str(&format!(
                 "\"base_cost_state_share\": {}, ",
                 num(d.base_cost_state_share)
@@ -742,6 +870,14 @@ mod tests {
             current_year_adm: 2_107.80,
             base_cost_per_pupil: 8_100.0,
             aggregate_base_cost: 17_769_861.0,
+            // The serializer writes every element; the values do not matter to what this asserts,
+            // which is that the shape reaches the JSON.
+            base_cost_build_up: BaseCostBuildUp {
+                published_aggregate: 17_769_861.0,
+                computed_aggregate: 17_769_860.5,
+                residual: -0.5,
+                ..BaseCostBuildUp::default()
+            },
             base_cost_state_share: 6_000_000.0,
             categorical_funding: 8_038_562.0,
             formula_aid_per_pupil: 6_400.0,
@@ -937,9 +1073,12 @@ mod tests {
 
     #[test]
     fn the_bundle_declares_its_contract_version() {
+        // Against the constant rather than a literal. A hard-coded version here means a bump has
+        // to be made in two places, and the one that gets forgotten is the test — which then fails
+        // for the right reason at the wrong moment, long after the change that caused it.
         assert!(bundle(vec![], vec![])
             .to_json()
-            .contains("\"contract_version\": \"6.0.0\""));
+            .contains(&format!("\"contract_version\": \"{CONTRACT_VERSION}\"")));
     }
 
     #[test]

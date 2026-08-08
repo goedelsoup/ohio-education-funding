@@ -12,11 +12,12 @@
 use std::collections::HashMap;
 
 use bundle::{
-    Bundle, Checkpoint, Deflator, District, DistrictOutcome, FinanceYear, ForecastCheckpoint,
-    OutcomeStatewide, PolicyShape, Projection, Statewide, CONTRACT_VERSION,
+    BaseCostBuildUp, Bundle, Checkpoint, Deflator, District, DistrictOutcome, FinanceYear,
+    ForecastCheckpoint, OutcomeStatewide, PolicyShape, Projection, Statewide, CONTRACT_VERSION,
 };
 use dispersion::{partial_correlation, wealth_neutrality};
 use edfund_core::FiscalYear;
+use foundation::{aggregate_base_cost, StatewideFactors};
 use project::finances::{finances, for_district, Finances};
 use project::outcomes::{joined, Joined};
 use project::panel::{panel, DistrictRecord, HISTORY_YEARS, MINIMUM_STATE_SHARE, MODEL_YEAR};
@@ -246,6 +247,7 @@ fn to_district(
         name: record.name.clone(),
         adm,
         current_year_adm: record.current_year_adm,
+        base_cost_build_up: build_up(record),
         base_cost_per_pupil: record.base_cost_per_pupil,
         aggregate_base_cost: record.aggregate_base_cost,
         base_cost_state_share: record.base_cost_state_share,
@@ -333,6 +335,59 @@ fn statewide_finances(districts: &[District]) -> Vec<FinanceYear> {
             total
         })
         .collect()
+}
+
+/// Recompute the twenty-two elements behind one district's base cost.
+///
+/// The rest of this feed quotes the department: `project::panel` reads its published model and
+/// passes the figures through. This is the one place that does the arithmetic instead, using the
+/// district's own grade-band enrollment and the FY2027 statewide factor set — and it reconciles
+/// against the published aggregate rather than replacing it, because a computed figure that
+/// quietly disagreed with the department's would be worse than no figure at all.
+///
+/// The reproduction is proved across the whole panel in
+/// `crates/foundation/tests/department_model_fy27.rs`: worst deviation $1.09 on $11.77 billion.
+fn build_up(record: &DistrictRecord) -> BaseCostBuildUp {
+    let computed = aggregate_base_cost(&record.enrollment, &StatewideFactors::fy2027());
+    let (a, b, c, d) = (
+        computed.teacher,
+        computed.student_support,
+        computed.district_leadership,
+        computed.building_leadership,
+    );
+    BaseCostBuildUp {
+        classroom_teachers: a.classroom,
+        special_teachers: a.special,
+        substitutes: a.substitute,
+        professional_development: a.professional_development,
+        teachers: a.total,
+        counselors: b.counselors,
+        librarians: b.librarians,
+        wellness: b.wellness,
+        academic_cocurricular: b.academic_cocurricular,
+        safety: b.safety,
+        supplies: b.supplies,
+        technology: b.technology,
+        student_support: b.total,
+        superintendent: c.superintendent,
+        treasurer: c.treasurer,
+        other_administrators: c.other_administrators,
+        fiscal_support: c.fiscal_support,
+        emis: c.emis,
+        leadership_support: c.leadership_support,
+        itc: c.itc,
+        district_leadership: c.total,
+        building_leadership_staff: d.leadership,
+        building_support: d.support,
+        building_operation: d.operation,
+        building_leadership: d.total,
+        athletic_cocurricular: computed.athletic_cocurricular,
+        funded_classroom_teachers: a.funded_classroom_teachers,
+        funded_special_teachers: a.funded_special_teachers,
+        computed_aggregate: computed.aggregate,
+        published_aggregate: record.aggregate_base_cost,
+        residual: computed.aggregate - record.aggregate_base_cost,
+    }
 }
 
 fn main() {
