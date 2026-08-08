@@ -60,8 +60,19 @@ export const DistrictOutcomeSchema = z
     performance_index_earliest: maybeNum,
     /** Ohio's growth measure, already a three-year average as published. */
     progress_effect_size: maybeNum,
+    /**
+     * The same measure over one year, which the department publishes alongside it.
+     *
+     * Carried so the smoothing is a visible choice. The two agree wherever agreement means
+     * anything: of the 534 districts printing non-zero on both, 44 point opposite ways and none
+     * of those has both magnitudes above 0.05. Every disagreement is a district sitting on zero.
+     */
+    progress_effect_size_one_year: maybeNum,
     per_enrolled_pupil: maybeNum,
     per_equivalent_pupil: maybeNum,
+    /** The federal part of `per_equivalent_pupil`. The two parts add to the whole. */
+    per_equivalent_pupil_federal: maybeNum,
+    per_equivalent_pupil_state_local: maybeNum,
     economically_disadvantaged: maybeNum,
     english_learner: maybeNum,
     students_with_disabilities: maybeNum,
@@ -85,6 +96,25 @@ export const OutcomeStatewideSchema = z
     enrolled_spending_vs_performance: num,
     median_performance_on_guarantee: num,
     median_performance_on_formula: num,
+    /** Federal money as a share of operating spending: the median, the maximum, and the tail. */
+    median_federal_share: num,
+    max_federal_share: num,
+    federal_share_above_tenth: z.number().int().nonnegative(),
+    /** Federal share against attainment, holding poverty constant — and the raw figure beside it. */
+    federal_share_vs_performance: num,
+    federal_share_vs_performance_raw: num,
+    /**
+     * Districts whose two growth measures print non-zero values pointing opposite ways.
+     *
+     * Over `growth_measures_determinate`, not over all districts: a printed `0.00` covers
+     * anything in (-0.005, 0.005) and has no sign to disagree about. Counting those as negative
+     * turns 44 into 76, which is the first number this site computed and nearly published.
+     */
+    growth_measures_disagree: z.number().int().nonnegative(),
+    growth_measures_determinate: z.number().int().nonnegative(),
+    /** Of the disagreements, those where both magnitudes exceed 0.05. It is zero. */
+    growth_measures_disagree_materially: z.number().int().nonnegative(),
+    growth_measure_agreement: num,
   })
   .strict();
 

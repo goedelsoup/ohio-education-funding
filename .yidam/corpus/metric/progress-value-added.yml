@@ -89,6 +89,29 @@ description: |
   standardised gain and correlates at +0.155. The two correlate with each other at +0.917, which
   makes the choice look immaterial. It is not: ranking districts on the composite ranks them
   partly by size. Every figure in this corpus uses the effect size. [verified]
+
+  **THE DEPARTMENT PUBLISHES TWO OF THIS MEASURE, AND THIS CORPUS HAD ONLY EVER USED ONE.**
+  Value-added is reported both as a three-year average — the headline figure, and the one every
+  claim here rests on — and over a single year. The second was extracted into
+  `project::outcomes` from the beginning and reached no consumer until now. [verified]
+
+  They agree wherever agreement carries information. Of the **534 districts printing a non-zero
+  value on both, 44 point opposite ways**, and **not one of those 44 has both magnitudes above
+  0.05**: every disagreement is a district within 0.04 of zero on both measures, which is no
+  measured growth in either direction and a sign that is arbitrary. The correlation is 0.903.
+  [verified — computed in `crates/bundle` from the 2024-25 report card]
+
+  So the smoothing choice is safe for any district with real movement, and the three-year figure
+  remains the right default: a single year of value-added is noisy enough that the department
+  smooths it deliberately. What the choice does decide is the **sign** for districts sitting on
+  zero, and the sign is what gets reported about them. [inference]
+
+  **A counting trap worth recording, because this repository fell into it.** The measure is
+  published to two decimal places, so a printed `0.00` covers anything in (-0.005, 0.005) and has
+  no sign at all. **72 districts print an exact `0.00` on one of the two measures.** A naive
+  `a > 0 != b > 0` reads every one of them as negative and reports **76** disagreements where
+  there are 44 — nearly doubling the finding, and in the direction that makes it sound alarming.
+  The corrected count is taken over determinate pairs only. [verified]
 properties:
   name: Progress (value-added) effect size
   unit: index

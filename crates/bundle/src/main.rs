@@ -214,6 +214,41 @@ fn outcome_statewide(records: &[Joined]) -> Option<OutcomeStatewide> {
     let (weighted_series, weighted_index, _) = aligned(records, weighted, index);
     let (enrolled_series, enrolled_index, _) = aligned(records, enrolled, index);
 
+    // Federal money is allocated largely by poverty, so the raw association with attainment is
+    // mostly the poverty association wearing a different label. Both are reported.
+    let federal = |r: &Joined| {
+        let (part, whole) = (
+            r.outcome.per_equivalent_pupil_federal?,
+            r.outcome.per_equivalent_pupil?,
+        );
+        (whole > 0.0).then_some(part / whole)
+    };
+    let (federal_series, federal_index, federal_poverty) = aligned(records, federal, index);
+    let shares: Vec<f64> = records.iter().filter_map(federal).collect();
+
+    // The two growth measures the department publishes for the same district and year.
+    let one_year = |r: &Joined| r.outcome.progress_effect_size_one_year;
+    let (three, one, _) = aligned(records, growth, one_year);
+
+    // Published to two decimals, so a printed 0.00 is anything in (-0.005, 0.005) and has no sign.
+    // Excluding those is the difference between reporting 44 and reporting 76.
+    const DETERMINATE: f64 = 0.005;
+    const MATERIAL: f64 = 0.05;
+    let pairs: Vec<(f64, f64)> = three.iter().copied().zip(one.iter().copied()).collect();
+    let determinate: Vec<(f64, f64)> = pairs
+        .iter()
+        .copied()
+        .filter(|(a, b)| a.abs() >= DETERMINATE && b.abs() >= DETERMINATE)
+        .collect();
+    let disagree = determinate
+        .iter()
+        .filter(|(a, b)| (*a > 0.0) != (*b > 0.0))
+        .count();
+    let materially = determinate
+        .iter()
+        .filter(|(a, b)| (*a > 0.0) != (*b > 0.0) && a.abs() >= MATERIAL && b.abs() >= MATERIAL)
+        .count();
+
     let median_index = |on: bool| {
         median(
             records
@@ -242,6 +277,19 @@ fn outcome_statewide(records: &[Joined]) -> Option<OutcomeStatewide> {
         enrolled_spending_vs_performance: correlation(&enrolled_series, &enrolled_index),
         median_performance_on_guarantee: median_index(true),
         median_performance_on_formula: median_index(false),
+        median_federal_share: median(shares.clone()),
+        max_federal_share: shares.iter().copied().fold(0.0, f64::max),
+        federal_share_above_tenth: shares.iter().filter(|s| **s > 0.10).count(),
+        federal_share_vs_performance: controlling_for(
+            &federal_series,
+            &federal_index,
+            &federal_poverty,
+        ),
+        federal_share_vs_performance_raw: correlation(&federal_series, &federal_index),
+        growth_measures_disagree: disagree,
+        growth_measures_determinate: determinate.len(),
+        growth_measures_disagree_materially: materially,
+        growth_measure_agreement: correlation(&three, &one),
     })
 }
 
@@ -305,8 +353,11 @@ fn to_district(
             performance_index_prior: joined.outcome.performance_index_prior,
             performance_index_earliest: joined.outcome.performance_index_earliest,
             progress_effect_size: joined.outcome.progress_effect_size,
+            progress_effect_size_one_year: joined.outcome.progress_effect_size_one_year,
             per_enrolled_pupil: joined.outcome.per_enrolled_pupil(),
             per_equivalent_pupil: joined.outcome.per_equivalent_pupil,
+            per_equivalent_pupil_federal: joined.outcome.per_equivalent_pupil_federal,
+            per_equivalent_pupil_state_local: joined.outcome.per_equivalent_pupil_state_local,
             economically_disadvantaged: joined.outcome.economically_disadvantaged,
             english_learner: joined.outcome.english_learner,
             students_with_disabilities: joined.outcome.students_with_disabilities,

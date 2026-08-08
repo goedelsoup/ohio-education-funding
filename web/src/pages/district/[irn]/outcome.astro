@@ -32,7 +32,7 @@ const description =
   <DistrictNav irn={district.irn} current="outcome" />
 
   <Fragment set:html={renderOutcomeContext(bundle, district)} />
-  <Fragment set:html={renderDistrictOutcome(district)} />
+  <Fragment set:html={renderDistrictOutcome(district, bundle.statewide.outcomes)} />
 
   <div class="card">
     <h2>Two mistakes this page is built to prevent</h2>

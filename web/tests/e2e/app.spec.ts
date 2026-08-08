@@ -29,6 +29,8 @@ const ON_FORMULA = "000442";
 const AT_FLOOR = "044016";
 /** Vinton County Local — 18.70 mills voted and charged. The floor never reached it. */
 const BELOW_FLOOR = "050393";
+/** Alexander Local — 29.0% federal, the most exposed district in the state. */
+const MOST_FEDERAL = "045906";
 
 /** Move a lever and wait for the scenario to re-render behind it. */
 async function setGuarantee(page: Page, value: string): Promise<void> {
@@ -939,5 +941,52 @@ test.describe("spending by function", () => {
     // finding about their spending rather than about the file.
     await page.goto("/district/046797/finances");
     await expect(page.getByText("No report-card spending row is published")).toBeVisible();
+  });
+});
+
+test.describe("where the money came from", () => {
+  test("the federal share leads and the dollars name their denominator", async ({ page }) => {
+    /*
+     * The share is the figure that survives being compared between districts, because both its
+     * parts are per need-weighted pupil and the ratio cancels the denominator. The dollars do not,
+     * and the card above this one divides by a headcount — so the basis has to be on the page.
+     */
+    await page.goto(`/district/${MOST_FEDERAL}/finances`);
+    const card = page.locator(".card", { hasText: "Where the money came from" });
+    await expect(card).toContainText("29.0%");
+    await expect(card).toContainText("statewide median 4.2%");
+    await expect(card).toContainText("need-weighted count");
+    await expect(card).toContainText("the two cards do not add");
+  });
+
+  test("the federal correlation is never shown without its controlled twin", async ({ page }) => {
+    // Federal money follows poverty. The raw figure alone would state a confound as a finding.
+    await page.goto(`/district/${MOST_FEDERAL}/finances`);
+    const card = page.locator(".card", { hasText: "Where the money came from" });
+    await expect(card).toContainText("Holding poverty constant");
+    await expect(card).toContainText("Neither figure identifies an effect");
+  });
+
+  test("both growth measures appear, and a district on zero is told so", async ({ page }) => {
+    /*
+     * Bellevue City prints 0.00 over one year. At two decimals that covers anything within half a
+     * hundredth of zero, so it has no direction — and calling it a disagreement is the arithmetic
+     * error that turned 44 into 76.
+     */
+    await page.goto("/district/043596/outcome");
+    const card = page.locator(".card", { hasText: "Outcomes" }).first();
+    await expect(card).toContainText("Progress, three-year average");
+    await expect(card).toContainText("Progress, one year");
+    await expect(card).toContainText("has no direction to read");
+    await expect(card).toContainText("534 districts");
+    await expect(card).not.toContainText("point opposite ways for this district");
+  });
+
+  test("a district whose measures point opposite ways is told to read neither", async ({ page }) => {
+    await page.goto(`/district/${MOST_FEDERAL}/outcome`);
+    const card = page.locator(".card", { hasText: "Outcomes" }).first();
+    await expect(card).toContainText("point opposite ways for this district");
+    await expect(card).toContainText("Read it as neither");
+    await expect(card).toContainText("none of them with both magnitudes above 0.05");
   });
 });

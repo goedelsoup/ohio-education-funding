@@ -534,3 +534,70 @@ test("what one mill raises shares a denominator with the value per pupil beside 
     expect(Math.abs(realPerPupil - expected) / expected).toBeLessThan(1e-5);
   }
 });
+
+test("the federal split adds to the whole, and the share needs no denominator", () => {
+  /*
+   * Both parts are published per need-weighted pupil. The dollars therefore carry a denominator
+   * that has to be named wherever they appear; their ratio does not, which is why the card leads
+   * with the share. This pins both halves of that claim.
+   */
+  const { bundle } = loadFeed();
+  const withSplit = bundle.districts.filter((d) => d.outcome?.per_equivalent_pupil_federal != null);
+  expect(withSplit.length).toBe(606);
+
+  for (const d of withSplit) {
+    const o = d.outcome!;
+    const parts = o.per_equivalent_pupil_federal! + o.per_equivalent_pupil_state_local!;
+    expect(Math.abs(parts - o.per_equivalent_pupil!) / o.per_equivalent_pupil!).toBeLessThan(0.005);
+  }
+
+  const shares = withSplit.map((d) => d.outcome!.per_equivalent_pupil_federal! / d.outcome!.per_equivalent_pupil!);
+  expect(Math.min(...shares)).toBeGreaterThan(0);
+  expect(Math.max(...shares)).toBeCloseTo(bundle.statewide.outcomes!.max_federal_share, 4);
+  expect(shares.filter((s) => s > 0.1).length).toBe(
+    bundle.statewide.outcomes!.federal_share_above_tenth,
+  );
+});
+
+test("the federal correlation is reported raw and controlled, and they differ a lot", () => {
+  /*
+   * Federal money follows poverty, so the raw association with attainment is mostly the poverty
+   * association relabelled. Printing it alone would state a confound as a finding. The test is
+   * that the two are far enough apart for the distinction to be doing work.
+   */
+  const o = loadFeed().bundle.statewide.outcomes!;
+  expect(o.federal_share_vs_performance_raw).toBeLessThan(-0.4);
+  expect(Math.abs(o.federal_share_vs_performance)).toBeLessThan(0.2);
+  expect(Math.abs(o.federal_share_vs_performance_raw)).toBeGreaterThan(
+    Math.abs(o.federal_share_vs_performance) * 3,
+  );
+});
+
+test("growth-measure disagreement is counted over determinate pairs only", () => {
+  /*
+   * The defect this locks out. Value-added is published to two decimals, so a printed 0.00 covers
+   * (-0.005, 0.005) and has no sign. A bare `a > 0 !== b > 0` reads all 72 of those as negative
+   * and reports 76 disagreements where there are 44 — and the first version of this feature did
+   * exactly that.
+   */
+  const { bundle } = loadFeed();
+  const o = bundle.statewide.outcomes!;
+  const pairs = bundle.districts
+    .map((d) => d.outcome)
+    .filter((x) => x?.progress_effect_size != null && x.progress_effect_size_one_year != null)
+    .map((x) => [x!.progress_effect_size!, x!.progress_effect_size_one_year!] as const);
+
+  const naive = pairs.filter(([a, b]) => a > 0 !== b > 0).length;
+  const determinate = pairs.filter(([a, b]) => Math.abs(a) >= 0.005 && Math.abs(b) >= 0.005);
+  const honest = determinate.filter(([a, b]) => a > 0 !== b > 0).length;
+
+  expect(o.growth_measures_determinate).toBe(determinate.length);
+  expect(o.growth_measures_disagree).toBe(honest);
+  expect(naive).toBeGreaterThan(honest);
+
+  // And the finding that makes the count readable: no disagreement survives a real threshold.
+  expect(o.growth_measures_disagree_materially).toBe(0);
+  for (const [a, b] of determinate.filter(([a, b]) => a > 0 !== b > 0)) {
+    expect(Math.min(Math.abs(a), Math.abs(b))).toBeLessThan(0.05);
+  }
+});

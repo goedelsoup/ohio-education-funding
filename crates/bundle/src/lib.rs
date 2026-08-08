@@ -73,7 +73,7 @@ use edfund_core::Dollars;
 /// from FY2022-FY2024 to FY2024-FY2026 — the years the department's `ADM Data` sheet declares.
 /// The values did not change; what they are called did, which is exactly the kind of silent
 /// meaning change the version guard exists for.
-pub const CONTRACT_VERSION: &str = "10.0.0";
+pub const CONTRACT_VERSION: &str = "11.0.0";
 
 /// How close to the floor counts as being on it, in mills.
 ///
@@ -110,16 +110,51 @@ pub struct DistrictOutcome {
     pub performance_index_earliest: Option<f64>,
     /// Value-added effect size — Ohio's growth measure, already a three-year average.
     pub progress_effect_size: Option<f64>,
+    /// The same measure over a single year, which the department also publishes.
+    ///
+    /// Carried so the smoothing is a visible choice rather than an invisible one. This site uses
+    /// the three-year figure everywhere; until now it never said a second figure existed.
+    ///
+    /// The two turn out to agree wherever agreement means anything: of the 534 districts printing
+    /// a non-zero value on both, 44 point opposite ways, and **not one of the 44 has both
+    /// magnitudes above 0.05**. Every disagreement is a district within 0.04 of zero on both
+    /// measures — no measured growth either way, and a sign that is arbitrary. Which is worth
+    /// stating precisely, because the naive test is badly misleading: 72 districts print an exact
+    /// `0.00` on one measure, and a bare `a > 0.0 != b > 0.0` counts every one of those as a
+    /// disagreement and reports 76.
+    pub progress_effect_size_one_year: Option<f64>,
     /// Operating expenditure per enrolled pupil, FY2025.
     pub per_enrolled_pupil: Option<Dollars>,
     /// Operating expenditure per need-weighted pupil, FY2025. The published figure.
     pub per_equivalent_pupil: Option<Dollars>,
+    /// The federal part of [`DistrictOutcome::per_equivalent_pupil`].
+    pub per_equivalent_pupil_federal: Option<Dollars>,
+    /// The state and local part. The two add to the whole for every district that has them.
+    pub per_equivalent_pupil_state_local: Option<Dollars>,
     /// Economically disadvantaged share, 2024-25, top-coded.
     pub economically_disadvantaged: Option<f64>,
     /// English learner share, 2024-25.
     pub english_learner: Option<f64>,
     /// Students with disabilities share, 2024-25.
     pub students_with_disabilities: Option<f64>,
+}
+
+impl DistrictOutcome {
+    /// Federal money as a share of this district's operating spending.
+    ///
+    /// The share rather than the dollars, wherever one number has to stand for this. Both parts
+    /// are published per **need-weighted** pupil, so the dollars carry a denominator that has to
+    /// be named every time it appears; the ratio of two figures on the same denominator does not.
+    /// It is the one spending statistic on this site that can be set beside any other district's
+    /// without asking which pupil count either divides by.
+    #[must_use]
+    pub fn federal_share(&self) -> Option<f64> {
+        let (federal, total) = (
+            self.per_equivalent_pupil_federal?,
+            self.per_equivalent_pupil?,
+        );
+        (total > 0.0).then_some(federal / total)
+    }
 }
 
 /// Statewide relationships between the funding side and the outcome side.
@@ -148,6 +183,36 @@ pub struct OutcomeStatewide {
     pub median_performance_on_guarantee: f64,
     /// Median Performance Index among districts on the formula.
     pub median_performance_on_formula: f64,
+    /// Median federal share of operating spending.
+    pub median_federal_share: f64,
+    /// The highest federal share in the state, and whose it is.
+    pub max_federal_share: f64,
+    /// Districts where more than a tenth of operating spending is federal.
+    pub federal_share_above_tenth: usize,
+    /// Federal share against the Performance Index, holding poverty constant.
+    ///
+    /// Federal education money is allocated substantially by poverty, so the raw association is
+    /// mostly a poverty association read backwards. The controlled figure is the one that says
+    /// anything, and it is reported beside the raw one rather than instead of it.
+    pub federal_share_vs_performance: f64,
+    /// The same, raw.
+    pub federal_share_vs_performance_raw: f64,
+    /// Districts whose two growth measures print non-zero values pointing opposite ways.
+    ///
+    /// Counted only over districts where both measures are determinate. The department publishes
+    /// value-added to two decimals, so a printed `0.00` covers anything in (-0.005, 0.005) and
+    /// has no sign to disagree about; 72 districts are in that position and are excluded rather
+    /// than silently counted as negative.
+    pub growth_measures_disagree: usize,
+    /// Districts where both measures print a non-zero value — the denominator for the above.
+    pub growth_measures_determinate: usize,
+    /// Districts where the two disagree *and* both magnitudes exceed 0.05. It is zero.
+    ///
+    /// The figure that makes the disagreement readable. Every case is a district sitting on zero,
+    /// so the smoothing choice never reverses a district with real measured movement.
+    pub growth_measures_disagree_materially: usize,
+    /// Correlation between the one-year and three-year growth measures.
+    pub growth_measure_agreement: f64,
 }
 
 /// One closed fiscal year of a district's general fund. Every figure is an audited actual.
@@ -937,7 +1002,15 @@ impl Bundle {
                  \"weighted_spending_vs_performance\": {}, \
                  \"enrolled_spending_vs_performance\": {}, \
                  \"median_performance_on_guarantee\": {}, \
-                 \"median_performance_on_formula\": {}}}\n",
+                 \"median_performance_on_formula\": {}, \
+                 \"median_federal_share\": {}, \"max_federal_share\": {}, \
+                 \"federal_share_above_tenth\": {}, \
+                 \"federal_share_vs_performance\": {}, \
+                 \"federal_share_vs_performance_raw\": {}, \
+                 \"growth_measures_disagree\": {}, \
+                 \"growth_measures_determinate\": {}, \
+                 \"growth_measures_disagree_materially\": {}, \
+                 \"growth_measure_agreement\": {}}}\n",
                 o.districts,
                 num(o.poverty_vs_performance),
                 num(o.guarantee_vs_performance),
@@ -947,6 +1020,15 @@ impl Bundle {
                 num(o.enrolled_spending_vs_performance),
                 num(o.median_performance_on_guarantee),
                 num(o.median_performance_on_formula),
+                num(o.median_federal_share),
+                num(o.max_federal_share),
+                o.federal_share_above_tenth,
+                num(o.federal_share_vs_performance),
+                num(o.federal_share_vs_performance_raw),
+                o.growth_measures_disagree,
+                o.growth_measures_determinate,
+                o.growth_measures_disagree_materially,
+                num(o.growth_measure_agreement),
             )),
         }
         s.push_str("  },\n");
@@ -1285,15 +1367,22 @@ impl Bundle {
                     "\"outcome\": {{\"performance_index\": {}, \
                      \"performance_index_prior\": {}, \
                      \"performance_index_earliest\": {}, \
-                     \"progress_effect_size\": {}, \"per_enrolled_pupil\": {}, \
-                     \"per_equivalent_pupil\": {}, \"economically_disadvantaged\": {}, \
+                     \"progress_effect_size\": {}, \
+                     \"progress_effect_size_one_year\": {}, \"per_enrolled_pupil\": {}, \
+                     \"per_equivalent_pupil\": {}, \
+                     \"per_equivalent_pupil_federal\": {}, \
+                     \"per_equivalent_pupil_state_local\": {}, \
+                     \"economically_disadvantaged\": {}, \
                      \"english_learner\": {}, \"students_with_disabilities\": {}}}",
                     opt(o.performance_index),
                     opt(o.performance_index_prior),
                     opt(o.performance_index_earliest),
                     opt(o.progress_effect_size),
+                    opt(o.progress_effect_size_one_year),
                     opt(o.per_enrolled_pupil),
                     opt(o.per_equivalent_pupil),
+                    opt(o.per_equivalent_pupil_federal),
+                    opt(o.per_equivalent_pupil_state_local),
                     opt(o.economically_disadvantaged),
                     opt(o.english_learner),
                     opt(o.students_with_disabilities),
@@ -1410,7 +1499,11 @@ mod tests {
                 performance_index_earliest: Some(88.4),
                 progress_effect_size: Some(0.0),
                 per_enrolled_pupil: Some(14_512.0),
+                progress_effect_size_one_year: Some(0.31),
                 per_equivalent_pupil: Some(11_986.62),
+                // 4.2% federal, the statewide median, and the two parts add to the whole.
+                per_equivalent_pupil_federal: Some(503.44),
+                per_equivalent_pupil_state_local: Some(11_483.18),
                 economically_disadvantaged: Some(38.8),
                 english_learner: Some(0.4),
                 students_with_disabilities: Some(15.2),
@@ -1460,6 +1553,15 @@ mod tests {
                 enrolled_spending_vs_performance: -0.337,
                 median_performance_on_guarantee: 89.9,
                 median_performance_on_formula: 85.6,
+                median_federal_share: 0.042,
+                max_federal_share: 0.29,
+                federal_share_above_tenth: 47,
+                federal_share_vs_performance: -0.11,
+                federal_share_vs_performance_raw: -0.58,
+                growth_measures_disagree: 44,
+                growth_measures_determinate: 534,
+                growth_measures_disagree_materially: 0,
+                growth_measure_agreement: 0.904,
             }),
         }
     }

@@ -17,7 +17,7 @@ import BasisToggle from "../../../components/BasisToggle.astro";
 import DistrictNav from "../../../components/DistrictNav.astro";
 import Base from "../../../layouts/Base.astro";
 import { renderActuals } from "../../../lib/district.ts";
-import { renderSpendingByFunction } from "../../../lib/spending.ts";
+import { renderFederalShare, renderSpendingByFunction } from "../../../lib/spending.ts";
 import { districtPaths, loadFeed } from "../../../lib/feed.ts";
 import { money } from "../../../lib/format.ts";
 import { baseYear } from "../../../lib/real.ts";
@@ -62,6 +62,7 @@ const description = latest
   }
 
   <Fragment set:html={renderSpendingByFunction(district)} />
+  <Fragment set:html={renderFederalShare(district, bundle.statewide.outcomes)} />
 
   <div class="card">
     <h2>What these numbers are not</h2>

@@ -19,7 +19,7 @@ import type { Bar } from "./chart.ts";
 import { barSpec } from "./plot/spec.ts";
 import { renderToString } from "./plot/ssr.ts";
 import { count, escapeHtml, money, pct } from "./format.ts";
-import type { Bundle, District } from "./types.ts";
+import type { Bundle, District, OutcomeStatewide } from "./types.ts";
 
 /** A correlation, signed and to three places. */
 function coefficient(v: number): string {
@@ -225,7 +225,71 @@ export function renderOutcomeContext(bundle: Bundle, district: District): string
 }
 
 /** The outcome block for a single district, for the district view. */
-export function renderDistrictOutcome(district: District): string {
+
+/**
+ * What the two published growth measures say about the same district, and when they disagree.
+ *
+ * # Why this is on the page rather than in a footnote
+ *
+ * The department publishes value-added as a three-year average and over a single year. This site
+ * has used the three-year one everywhere — in the spending-against-growth correlation, in the
+ * outcome route, in the corpus's own claims — without ever saying that a second figure exists.
+ *
+ * The reassuring part is that they agree wherever agreement means anything. Of the 534 districts
+ * printing a non-zero value on both, 44 point opposite ways, and **not one of the 44 has both
+ * magnitudes above 0.05**: every disagreement is a district within 0.04 of zero on both measures,
+ * which is no measured growth either way and a sign that is arbitrary. The smoothing choice never
+ * reverses a district with real movement.
+ *
+ * It still belongs on the page, because the sign is what gets reported. A district printed at
+ * +0.01 and -0.01 has two published answers to "is it adding value", and only one of them appears
+ * anywhere else on this site.
+ *
+ * The count is over determinate pairs only. 72 districts print an exact `0.00` on one measure —
+ * anything in (-0.005, 0.005) — and a bare `a > 0 != b > 0` silently reads every one of those as
+ * negative and reports 76 instead of 44. That was the first number computed here.
+ */
+function growthNote(
+  threeYear: number | null,
+  oneYear: number | null,
+  statewide: OutcomeStatewide | null,
+): string {
+  if (threeYear == null || oneYear == null) return "";
+
+  // Both must print a non-zero value before "opposite" means anything at two decimals.
+  const determinate = Math.abs(threeYear) >= 0.005 && Math.abs(oneYear) >= 0.005;
+  const disagree = determinate && threeYear > 0 !== oneYear > 0;
+  const context = statewide
+    ? `Statewide the two correlate at ${statewide.growth_measure_agreement.toFixed(2)}, and of the
+       ${count(statewide.growth_measures_determinate)} districts printing a non-zero value on
+       both, ${count(statewide.growth_measures_disagree)} point opposite ways — none of them with
+       both magnitudes above 0.05.`
+    : "";
+
+  return `<p class="note">${
+    disagree
+      ? `<strong>The two growth measures point opposite ways for this district.</strong> Over
+         three years its effect size is ${threeYear.toFixed(2)}; over one year it is
+         ${oneYear.toFixed(2)}. Both are published by the department for the same year, and only
+         the three-year figure appears anywhere else on this site. Read it as neither: a district
+         this close to zero on both measures has no growth signal in either direction, and the
+         sign is the arbitrary part. ${context}`
+      : !determinate
+        ? `One of the two growth measures prints ${
+            Math.abs(threeYear) < 0.005 ? "0.00 over three years" : "0.00 over one year"
+          }, which at two decimals covers anything within half a hundredth of zero and has no
+           direction to read. ${context}`
+        : `Both growth measures point the same way here (${threeYear.toFixed(2)} over three years,
+           ${oneYear.toFixed(2)} over one). ${context} This site uses the three-year figure
+           throughout, because a single year of value-added is noisy enough that the department
+           smooths it deliberately.`
+  }</p>`;
+}
+
+export function renderDistrictOutcome(
+  district: District,
+  statewide: OutcomeStatewide | null,
+): string {
   const o = district.outcome;
   if (!o) {
     return `<div class="card">
@@ -252,8 +316,16 @@ export function renderDistrictOutcome(district: District): string {
               }</td></tr>`,
           )
           .join("")}
-        <tr><th>Progress (value-added effect size)</th>
+        <tr><th>Progress, three-year average<div class="n">The department's headline growth
+              measure, and the one every correlation on this site uses.</div></th>
             <td class="tnum">${o.progress_effect_size == null ? "—" : o.progress_effect_size.toFixed(2)}</td></tr>
+        <tr><th>Progress, one year<div class="n">The same measure without the smoothing, also
+              published.</div></th>
+            <td class="tnum">${
+              o.progress_effect_size_one_year == null
+                ? "—"
+                : o.progress_effect_size_one_year.toFixed(2)
+            }</td></tr>
         <tr><th>Operating spending per enrolled pupil</th>
             <td>${money(o.per_enrolled_pupil)}</td></tr>
         <tr><th>Operating spending per need-weighted pupil</th>
@@ -268,6 +340,7 @@ export function renderDistrictOutcome(district: District): string {
       <p class="note">The Performance Index is close to a fixed district trait across these three
         years, which is why a change in funding is unlikely to show up in it. Progress is the
         measure that moves. Both are 2024-25; the spending figures are FY2025.</p>
+      ${growthNote(o.progress_effect_size, o.progress_effect_size_one_year, statewide)}
       <p class="note">The two economically-disadvantaged shares on this page differ: the report
         card's is top-coded by community eligibility, the profile report's
         (${escapeHtml(pct(district.economically_disadvantaged, 1))}) is not.</p>

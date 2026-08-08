@@ -31,7 +31,7 @@ import { count, escapeHtml, money, pct } from "./format.ts";
 import { barSpec } from "./plot/spec.ts";
 import { renderToString } from "./plot/ssr.ts";
 import * as routes from "./routes.ts";
-import type { District, SpendingByFunction } from "./types.ts";
+import type { District, OutcomeStatewide, SpendingByFunction } from "./types.ts";
 
 /** The named functions, largest first, with what each covers. */
 function functions(s: SpendingByFunction): { label: string; value: number; note?: string }[] {
@@ -143,5 +143,108 @@ export function renderSpendingByFunction(d: District): string {
         not the <strong>audited actuals above</strong>, which are general fund totals from this
         district's own five-year forecast filing on a different basis — the two are not
         summable and neither is a check on the other.</p>
+    </div>`;
+}
+
+/**
+ * Where the money came from, in the one proportion that needs no denominator.
+ *
+ * # Why the share and not the dollars
+ *
+ * The report card splits its per-pupil spending figure by the origin of the money, and both parts
+ * are per **need-weighted** pupil — a denominator this site has now been caught mixing up twice.
+ * The ratio of two figures over the same denominator does not carry one. So the share leads, the
+ * dollars follow with the basis named, and nothing here has to be reconciled against the function
+ * breakdown above it, which divides by a headcount.
+ *
+ * # What it is for
+ *
+ * Every other figure on this site describes a decision Ohio made. This one describes exposure to
+ * a decision Ohio does not make. Federal money is a median 4.2% of operating spending and 29.0%
+ * at the top, so the same policy change reaching every district equally would not land equally.
+ *
+ * # And the correlation that has to be shown twice
+ *
+ * Federal education money is allocated substantially by poverty. So the raw association between
+ * federal share and attainment is strongly negative — and says nothing, because it is the poverty
+ * association wearing a different label. Holding poverty constant it nearly vanishes. Reporting
+ * the raw figure alone would state a confound as a finding, which is the error this project keeps
+ * finding in other people's work.
+ */
+export function renderFederalShare(d: District, statewide: OutcomeStatewide | null): string {
+  const o = d.outcome;
+  if (!o || o.per_equivalent_pupil_federal == null || o.per_equivalent_pupil == null) return "";
+  const total = o.per_equivalent_pupil;
+  if (total <= 0) return "";
+
+  const federal = o.per_equivalent_pupil_federal;
+  const stateLocal = o.per_equivalent_pupil_state_local ?? total - federal;
+  const share = federal / total;
+
+  const bars: Bar[] = [
+    {
+      label: "State and local",
+      value: stateLocal,
+      direct: pct(stateLocal / total, 0),
+      hover: `State and local: ${money(stateLocal)} per equivalent pupil, ${pct(stateLocal / total, 1)}`,
+    },
+    {
+      label: "Federal",
+      value: federal,
+      direct: pct(share, 0),
+      hover: `Federal: ${money(federal)} per equivalent pupil, ${pct(share, 1)}`,
+    },
+  ];
+
+  const median = statewide?.median_federal_share ?? 0;
+
+  return `
+    <div class="card">
+      <h2>Where the money came from, FY2025</h2>
+      <div class="chartwrap" data-chart="origin">${renderToString(barSpec(bars))}</div>
+
+      <div class="tiles">
+        <div class="tile"><div class="k">Federal share of operating spending</div>
+          <div class="v">${pct(share, 1)}</div>
+          <div class="n">statewide median ${pct(median, 1)}</div></div>
+        <div class="tile"><div class="k">Federal, per equivalent pupil</div>
+          <div class="v">${money(federal)}</div>
+          <div class="n">need-weighted count</div></div>
+        <div class="tile"><div class="k">State and local</div>
+          <div class="v">${money(stateLocal)}</div>
+          <div class="n">need-weighted count</div></div>
+      </div>
+
+      <p class="note"><strong>${pct(share, 1)} of what this district spends on operations is
+        federal money</strong>${
+          share > median * 1.5
+            ? ` — well above the statewide median of ${pct(median, 1)}.`
+            : share < median * 0.6
+              ? ` — well below the statewide median of ${pct(median, 1)}.`
+              : `, against a statewide median of ${pct(median, 1)}.`
+        } Statewide the figure runs from under a percent to
+        ${statewide ? pct(statewide.max_federal_share, 1) : "29%"}, and
+        ${statewide ? count(statewide.federal_share_above_tenth) : "49"} districts are above a
+        tenth. It is the only figure on this site that measures exposure to a decision made
+        outside Ohio, and the districts most exposed are not the ones with the most money.</p>
+
+      <p class="note">The share is the reliable number here and the dollars are the awkward ones.
+        Both parts are published <strong>per need-weighted pupil</strong> — the department's
+        denominator, not the headcount the function breakdown above uses — so the two cards do not
+        add and their per-pupil figures are not comparable. A ratio taken within one denominator
+        survives that; a subtraction across two does not.</p>
+
+      ${
+        statewide
+          ? `<p class="note">Across the state, federal share and the Performance Index correlate
+             at <strong>${statewide.federal_share_vs_performance_raw.toFixed(3)}</strong>. That
+             number is worth almost nothing on its own: federal education money is allocated
+             substantially by poverty, so it is largely the poverty relationship read backwards.
+             <strong>Holding poverty constant it is
+             ${statewide.federal_share_vs_performance.toFixed(3)}.</strong> Neither figure
+             identifies an effect in either direction, and the gap between them is the whole
+             reason both are printed.</p>`
+          : ""
+      }
     </div>`;
 }

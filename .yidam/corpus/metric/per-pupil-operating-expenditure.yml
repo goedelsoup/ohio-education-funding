@@ -61,6 +61,34 @@ description: |
   consecutive years, consistent level. [verified] It is the closest thing the corpus has to an
   external validation of this series, and the first time this metric has been checked against
   anything but itself.
+
+  **THE REPORT CARD SPLITS THIS FIGURE BY WHERE THE MONEY CAME FROM, AND THE SPLIT WAS NEVER
+  READ.** `exp_per_equivalent_pupil_federal` and its state-and-local twin have been in the
+  committed fixture since the report card was first extracted and reached no consumer. They are
+  complete for all 606 districts and add to the whole to within a rounding. [verified]
+
+  **Federal money is a median 4.21% of a district's operating spending, and 29.04% at the top.**
+  49 districts are above a tenth; Alexander Local in Athens County is the most exposed, at $3,280
+  of $11,294 per equivalent pupil. The floor is 0.7%. [verified — 2024-25 report card, computed
+  in `crates/bundle`]
+
+  This is the only quantity in the corpus that measures exposure to a decision Ohio does not
+  make. Every other figure here describes a choice by the General Assembly, a county auditor or a
+  local electorate; this one describes what happens to a district if a federal appropriation
+  changes, and the answer differs by a factor of forty across the state. [inference]
+
+  **The share, not the dollars, is the portable number.** Both parts are published per
+  need-weighted pupil, the denominator this corpus has repeatedly warned about and this project
+  has twice been caught mixing. A ratio taken inside one denominator carries none; a comparison
+  across two does. Any use of the dollar figures has to name the basis, and they are not additive
+  with the function breakdown, which divides by an unweighted headcount. [verified]
+
+  **And the correlation that must not be reported alone.** Federal share against the Performance
+  Index is **-0.546** raw and **-0.115** holding poverty constant. Federal education money is
+  allocated substantially by poverty, so the raw figure is very largely the poverty relationship
+  read backwards; quoting it without the control would state a confound as a finding, which is
+  the error this corpus most often finds in secondary reporting. Neither figure identifies an
+  effect in either direction. [verified]
 properties:
   name: Per-pupil operating expenditure
   unit: dollars-per-pupil

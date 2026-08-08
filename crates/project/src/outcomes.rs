@@ -59,6 +59,15 @@ pub struct ReportCard {
     pub operating_expenditure: Option<Dollars>,
     /// Operating expenditure per *weighted* pupil — the department's published per-pupil figure.
     pub per_equivalent_pupil: Option<Dollars>,
+    /// The federal part of [`ReportCard::per_equivalent_pupil`].
+    ///
+    /// The report card splits its per-pupil spending figure by the origin of the money, and the
+    /// two parts sum to the whole for all 607 districts carrying it. The federal share runs from
+    /// 0.7% to 29.0%, which makes it the only field here that says how exposed a district is to
+    /// a decision taken outside Ohio.
+    pub per_equivalent_pupil_federal: Option<Dollars>,
+    /// The state and local part. Adds to `per_equivalent_pupil_federal` to give the whole.
+    pub per_equivalent_pupil_state_local: Option<Dollars>,
     /// Economically disadvantaged share, 2024-25. Top-coded; see the module note.
     pub economically_disadvantaged: Option<f64>,
     /// English learner share, 2024-25.
@@ -92,6 +101,8 @@ mod column {
     pub const WEIGHTED_ADM: usize = 6;
     pub const OPERATING_EXPENDITURE: usize = 7;
     pub const PER_EQUIVALENT_PUPIL: usize = 8;
+    pub const PER_EQUIVALENT_PUPIL_FEDERAL: usize = 9;
+    pub const PER_EQUIVALENT_PUPIL_STATE_LOCAL: usize = 10;
     pub const PROGRESS_EFFECT_SIZE: usize = 12;
     pub const PROGRESS_EFFECT_SIZE_ONE_YEAR: usize = 13;
     pub const ECON_DISADVANTAGED: usize = 14;
@@ -141,6 +152,11 @@ pub fn report_cards() -> Vec<ReportCard> {
                 weighted_adm: number(&fields, column::WEIGHTED_ADM),
                 operating_expenditure: number(&fields, column::OPERATING_EXPENDITURE),
                 per_equivalent_pupil: number(&fields, column::PER_EQUIVALENT_PUPIL),
+                per_equivalent_pupil_federal: number(&fields, column::PER_EQUIVALENT_PUPIL_FEDERAL),
+                per_equivalent_pupil_state_local: number(
+                    &fields,
+                    column::PER_EQUIVALENT_PUPIL_STATE_LOCAL,
+                ),
                 economically_disadvantaged: number(&fields, column::ECON_DISADVANTAGED),
                 english_learner: number(&fields, column::ENGLISH_LEARNER),
                 students_with_disabilities: number(&fields, column::STUDENTS_WITH_DISABILITIES),
