@@ -80,6 +80,16 @@ pub const FY27_HEADER: &[&str] = &[
     "service_center_charge",
     "other_adjustments",
     "net_state_funding",
+    "capacity_per_pupil",
+    "state_share_percentage",
+    "valuation_ty25",
+    "valuation_ty24",
+    "valuation_ty23",
+    "agi_ty24",
+    "agi_ty23",
+    "agi_ty22",
+    "tax_returns_ty24",
+    "median_income_ty22",
 ];
 
 /// Column positions in the department's `Base_Cost` sheet, whose header is on the fourth row.
@@ -139,6 +149,41 @@ mod summary_columns {
     pub const NET_STATE_FUNDING: usize = 28;
 }
 
+/// Column positions in `Detail_SFPR`, whose header is on the fourth row.
+///
+/// The sheet the corpus never read. It carries the local capacity measure as the department
+/// computes it — `[b1] Per Pupil Capacity Amount` — for every district including the ones where
+/// the minimum state share binds and recovering it by subtraction is impossible.
+mod detail_columns {
+    pub const IRN: usize = 0;
+    /// `[b1] Per Pupil Capacity Amount` — R.C. 3317.017's blend, published rather than inferred.
+    pub const CAPACITY_PER_PUPIL: usize = 5;
+    /// `[b4] State Share Percentage`.
+    pub const STATE_SHARE: usize = 8;
+}
+
+/// Column positions in the `Valuation & Income` sheet.
+///
+/// The income half of the local capacity measure, which this repository spent several phases
+/// believing it did not hold. Three tax years of assessed valuation and three of federal
+/// adjusted gross income, per district.
+mod valuation_income_columns {
+    pub const IRN: usize = 0;
+    pub const VALUATION_TY25: usize = 3;
+    pub const VALUATION_TY24: usize = 4;
+    pub const VALUATION_TY23: usize = 5;
+    pub const AGI_TY24: usize = 6;
+    pub const AGI_TY23: usize = 7;
+    pub const AGI_TY22: usize = 8;
+}
+
+/// Column positions in `# Tax Returns Projection 27`, whose header is on the second row.
+mod tax_return_columns {
+    pub const IRN: usize = 0;
+    /// The projected count the FY2027 simulation uses.
+    pub const RETURNS_TY24: usize = 18;
+}
+
 /// Column positions in the `ADM Data` sheet.
 ///
 /// # The enrolled-ADM years are labelled twice, and once wrongly
@@ -165,6 +210,14 @@ mod adm_columns {
 mod profile_columns {
     pub const NAME: usize = 0;
     pub const IRN: usize = 1;
+    /// `Ohio Median Income TY22` — the district's median, and the income measure the local
+    /// capacity blend's third term actually uses.
+    ///
+    /// The `millage`-era doc for `local-capacity` describes this term as *federal* median income.
+    /// The data disagrees: taking the Ohio median reproduces the department's published capacity
+    /// under a rate that follows the statutory scale to the decile, and the federal figure the
+    /// profile publishes beside it is an **average** rather than a median in any case.
+    pub const MEDIAN_INCOME: usize = 31;
     pub const ENROLLED_ADM: usize = 4;
     pub const ECON_DISADVANTAGED: usize = 11;
     pub const VALUATION_PER_PUPIL: usize = 21;
@@ -182,11 +235,36 @@ pub fn build_fy27_model(
     summary_rows: &[Vec<String>],
     adm_rows: &[Vec<String>],
     profile_rows: &[Vec<String>],
+    detail_rows: &[Vec<String>],
+    valuation_income_rows: &[Vec<String>],
+    tax_return_rows: &[Vec<String>],
 ) -> Vec<Vec<String>> {
     use base_cost_columns as bc;
 
     let summary: Vec<(&str, &Vec<String>)> = rows_by_key(summary_rows, 0)
         .filter(|(_, row)| !is_statewide_row(row, summary_columns::NAME))
+        .collect();
+
+    // The three sheets the corpus never read, keyed by IRN. Their header rows sit at different
+    // depths — `Detail_SFPR` on the fourth, tax returns on the second, valuation on the first —
+    // so each is skipped to its own data start rather than to a shared one.
+    let detail: HashMap<&str, &Vec<String>> = detail_rows
+        .iter()
+        .skip(4)
+        .filter(|row| !cell(row, detail_columns::IRN).trim().is_empty())
+        .map(|row| (cell(row, detail_columns::IRN).trim(), row))
+        .collect();
+    let valuation_income: HashMap<&str, &Vec<String>> = valuation_income_rows
+        .iter()
+        .skip(1)
+        .filter(|row| !cell(row, valuation_income_columns::IRN).trim().is_empty())
+        .map(|row| (cell(row, valuation_income_columns::IRN).trim(), row))
+        .collect();
+    let tax_returns: HashMap<&str, &Vec<String>> = tax_return_rows
+        .iter()
+        .skip(2)
+        .filter(|row| !cell(row, tax_return_columns::IRN).trim().is_empty())
+        .map(|row| (cell(row, tax_return_columns::IRN).trim(), row))
         .collect();
 
     let valuation: Vec<(&str, &Vec<String>)> = profile_rows
@@ -276,7 +354,51 @@ pub fn build_fy27_model(
                 cell_number(summary_row, summary_columns::NET_STATE_FUNDING),
                 2,
             ),
+            // The department's own local capacity, and the inputs it is built from. Absent for a
+            // district missing from any of the three sheets, which is why every one is written
+            // through `format_value` rather than defaulted to zero: a capacity of nothing and a
+            // capacity nobody published are different claims and the calculators read them so.
+            format_value(
+                detail
+                    .get(irn)
+                    .and_then(|row| cell_number(row, detail_columns::CAPACITY_PER_PUPIL)),
+                4,
+            ),
+            format_value(
+                detail
+                    .get(irn)
+                    .and_then(|row| cell_number(row, detail_columns::STATE_SHARE)),
+                6,
+            ),
         ]);
+
+        let vi = valuation_income.get(irn);
+        for column in [
+            valuation_income_columns::VALUATION_TY25,
+            valuation_income_columns::VALUATION_TY24,
+            valuation_income_columns::VALUATION_TY23,
+            valuation_income_columns::AGI_TY24,
+            valuation_income_columns::AGI_TY23,
+            valuation_income_columns::AGI_TY22,
+        ] {
+            let value = vi.and_then(|row| cell_number(row, column));
+            out.last_mut()
+                .expect("just pushed")
+                .push(format_value(value, 2));
+        }
+        let returns = tax_returns
+            .get(irn)
+            .and_then(|row| cell_number(row, tax_return_columns::RETURNS_TY24));
+        out.last_mut()
+            .expect("just pushed")
+            .push(format_value(returns, 2));
+        let median_income = valuation
+            .iter()
+            .find(|(key, _)| *key == irn)
+            .and_then(|(_, profile)| cell_number(profile, profile_columns::MEDIAN_INCOME));
+        out.last_mut()
+            .expect("just pushed")
+            .push(format_value(median_income, 2));
     }
     out
 }
@@ -1171,6 +1293,9 @@ mod tests {
             &summary_rows(),
             &adm_rows(),
             &profile_rows(),
+            &[],
+            &[],
+            &[],
         )
     }
 
@@ -1263,6 +1388,9 @@ mod tests {
             &summary_rows()[..1],
             &adm_rows(),
             &profile_rows(),
+            &[],
+            &[],
+            &[],
         );
         assert!(rows.is_empty());
     }
@@ -1271,7 +1399,15 @@ mod tests {
     fn skips_a_district_with_no_usable_adm() {
         let mut base = base_cost_rows();
         base[5][7] = "0".into();
-        let rows = build_fy27_model(&base, &summary_rows(), &adm_rows(), &profile_rows());
+        let rows = build_fy27_model(
+            &base,
+            &summary_rows(),
+            &adm_rows(),
+            &profile_rows(),
+            &[],
+            &[],
+            &[],
+        );
         assert_eq!(
             rows.iter().map(|r| r[0].as_str()).collect::<Vec<_>>(),
             ["043786"]
@@ -1282,7 +1418,15 @@ mod tests {
     fn commas_are_stripped_from_district_names() {
         let mut base = base_cost_rows();
         base[5][1] = "Northern Local, Perry".into();
-        let rows = build_fy27_model(&base, &summary_rows(), &adm_rows(), &profile_rows());
+        let rows = build_fy27_model(
+            &base,
+            &summary_rows(),
+            &adm_rows(),
+            &profile_rows(),
+            &[],
+            &[],
+            &[],
+        );
         assert!(!rows[1][1].contains(','));
         assert_eq!(rows[1][1], "Northern Local  Perry");
     }
@@ -1291,7 +1435,15 @@ mod tests {
     fn trailing_whitespace_is_stripped_from_district_names() {
         let mut base = base_cost_rows();
         base[5][1] = "Bellefontaine City ".into();
-        let rows = build_fy27_model(&base, &summary_rows(), &adm_rows(), &profile_rows());
+        let rows = build_fy27_model(
+            &base,
+            &summary_rows(),
+            &adm_rows(),
+            &profile_rows(),
+            &[],
+            &[],
+            &[],
+        );
         assert_eq!(rows[1][1], "Bellefontaine City");
     }
 

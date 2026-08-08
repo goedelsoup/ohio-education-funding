@@ -524,10 +524,12 @@ export function renderChargeOff(d: District, statewide: Statewide): string {
             }</td>
             <td class="n">${
               r.local_capacity == null
-                ? `Not recoverable. The minimum state share binds here, so all that is known is
-                   that capacity exceeds a threshold — and a censored quantity is not a small one.`
-                : `Property wealth blended with two income measures, recovered by subtraction from
-                   base cost.`
+                ? `Not published for this district.`
+                : `Sixty percent of assessed valuation blended with two income measures, as the
+                   department computes it. Published on the calculator's detail sheet rather than
+                   recovered by subtraction — which matters for the
+                   ${count(statewide.at_minimum_state_share)} districts where the minimum state
+                   share binds and the subtraction cannot reach it.`
             }</td></tr>
           <tr><th>Base cost aid, charge-off</th>
             <td class="tnum">${r.aid_charge_off == null ? "—" : money(r.aid_charge_off)}</td>

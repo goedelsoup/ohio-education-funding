@@ -416,3 +416,83 @@ fn the_pandemic_years_are_declared_so_a_reader_cannot_miss_them() {
     assert!(window.contains(&FiscalYear(2024)));
     assert!(!window.contains(&FiscalYear(2025)));
 }
+
+/// Local capacity, published rather than recovered — and the two agree.
+///
+/// [`DistrictRecord::implied_local_capacity_per_pupil`] recovers the measure by subtracting state
+/// aid from base cost. That is exact where it works and impossible where the minimum state share
+/// binds, which is precisely where capacity is highest and the subtraction would understate it.
+/// The corpus returned `None` for those 138 districts rather than a plausible wrong number, and
+/// recorded the gap as the reason `local-capacity` could not be exposed.
+///
+/// It never needed recovering. `Detail_SFPR` carries `[b1] Per Pupil Capacity Amount` for every
+/// district, and this repository did not read that sheet for eleven phases. This test is both the
+/// cross-check — the two methods agree to half a percent where both exist — and the record that
+/// the censored 138 are censored no longer.
+#[test]
+fn the_published_capacity_agrees_with_the_recovered_one_and_covers_the_rest() {
+    let panel = panel();
+
+    let mut both = 0;
+    let mut uncensored = 0;
+    let mut missing = 0;
+    let mut worst = 0.0_f64;
+
+    for record in &panel {
+        match (
+            record.implied_local_capacity_per_pupil(),
+            record.published_capacity_per_pupil,
+        ) {
+            (Some(implied), Some(published)) => {
+                both += 1;
+                worst = worst.max((implied - published).abs() / published);
+            }
+            (None, Some(_)) => uncensored += 1,
+            _ => missing += 1,
+        }
+    }
+
+    assert_eq!(
+        missing, 0,
+        "every district should now carry a capacity figure"
+    );
+    assert!(
+        both > 450,
+        "the subtraction should still work where it worked: {both}"
+    );
+    assert!(
+        uncensored > 100,
+        "and the published figure should cover the districts it could not reach: {uncensored}"
+    );
+    assert!(
+        worst < 0.01,
+        "the two methods disagree by {:.3}% at worst, which is too much to call them the same \
+         quantity",
+        worst * 100.0
+    );
+
+    // The state share the department publishes should reconcile with the one the corpus derives
+    // from base cost, on the districts where both are meaningful.
+    for record in &panel {
+        let (Some(share), Some(capacity)) = (
+            record.published_state_share,
+            record.published_capacity_per_pupil,
+        ) else {
+            continue;
+        };
+        assert!(
+            (0.0..=1.0).contains(&share),
+            "{}: share {share}",
+            record.name
+        );
+        // Capacity plus the state's share of base cost is base cost, by construction.
+        let implied_share = 1.0 - capacity / record.base_cost_per_pupil;
+        if implied_share > project::panel::MINIMUM_STATE_SHARE + 0.01 {
+            assert!(
+                (implied_share - share).abs() < 0.01,
+                "{}: published share {share:.4} against {implied_share:.4} implied by capacity",
+                record.name
+            );
+        }
+    }
+}

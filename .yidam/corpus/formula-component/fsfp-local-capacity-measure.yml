@@ -76,6 +76,46 @@ description: |
   and simultaneously more generous to wealthy districts overall. Those are not in tension —
   the first is about the ordering and the second about the level — but a claim that cites one
   without the other is quoting half the result. [inference]
+
+  **THE MEASURE IS PUBLISHED, AND THIS CORPUS SPENT ELEVEN PHASES RECOVERING IT BY SUBTRACTION.**
+  The FY2027 calculator's `Detail_SFPR` sheet carries `[b1] Per Pupil Capacity Amount` for every
+  district. Nothing here read that sheet. The corpus instead derived capacity as base cost minus
+  the state's share of it, which is exact for 471 districts and impossible for the 138 where the
+  minimum state share binds — and those are precisely the districts where capacity is highest and
+  the subtraction understates it, so they were censored rather than reported wrong. [verified]
+
+  The two agree where both exist, to **0.46% at worst**, which is the retrospective check on the
+  subtraction and the reason to trust the eleven phases of work built on it. The 138 are no longer
+  censored. [verified — `crates/project/tests/finances_and_the_guarantee.rs`]
+
+  **The inputs are held too, and the record here said otherwise.** This node's calculator was
+  described as unimplementable because the repository had no income data at any level. It has: the
+  same workbook carries a `Valuation & Income` sheet with three tax years of assessed valuation
+  and three of federal adjusted gross income per district, and a `# Tax Returns Projection 27`
+  sheet with eight years of return counts. The District Profile Report supplies district median
+  income. Every argument the measure takes is in a cached file. [verified]
+
+  **And the blend reproduces the published figure.** Taking 60% of the lesser of recent and
+  three-year-average valuation, 20% of the same construction on adjusted gross income, and 20% of
+  median income times tax returns, the ratio of the department's published capacity to that
+  unrated blend behaves exactly as a capacity *rate* should:
+
+      income ratio to state median    implied rate
+      0.76                            1.70%
+      0.95                            2.15%
+      1.02                            2.29%
+      1.21                            2.43%
+      1.57                            2.56%
+
+  At a ratio of one the implied rate is 2.25%, which is the statutory scale's value there, and the
+  top decile is **61 of 61 districts within 0.15 points of the 2.5% cap**. [verified] The
+  structure and the sliding scale are both confirmed against the department's own output.
+
+  One correction falls out of it. This node describes the third term as **federal** median income.
+  The reproduction above uses the district's **Ohio** median income, which is what the profile
+  report publishes and what fits; the federal figure published beside it is an *average* rather
+  than a median. Which of the two the statute names should be checked against R.C. 3317.017
+  directly rather than against this corpus's own summary of it. [open]
 properties:
   name: FSFP local capacity measure
   function: |

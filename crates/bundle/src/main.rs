@@ -685,6 +685,12 @@ fn regime_counterfactual(
     let diff = regime_diff::at_fy2027(record, regime_diff::TERMINAL_MILLS);
     let component = diff.components.first()?;
 
+    // `regime-diff` recovers local capacity by subtraction and censors it where the minimum state
+    // share binds — 138 districts. The department publishes the figure for all of them, so the
+    // published one is preferred and the recovered one is the fallback. They agree to 0.46% at
+    // worst across the 471 where both exist; see `crates/project/tests/finances_and_the_guarantee.rs`.
+    let capacity = record.published_capacity_per_pupil.or(component.successor);
+
     // Rate against rate, so no denominator is involved: what the district's own effective Class I
     // rate is, against the uniform rate the charge-off would deem it able to levy.
     let mills_short = taxes
@@ -695,7 +701,7 @@ fn regime_counterfactual(
     Some(RegimeCounterfactual {
         charge_off_mills: regime_diff::TERMINAL_MILLS,
         charge_off_local_share: component.predecessor,
-        local_capacity: component.successor,
+        local_capacity: capacity,
         aid_charge_off: diff.predecessor_total,
         aid_fsfp: diff.successor_total,
         difference: diff.total_difference(),

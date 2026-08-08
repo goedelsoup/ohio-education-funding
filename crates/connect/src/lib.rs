@@ -164,6 +164,9 @@ pub fn rebuild(root: &Path) -> Result<Vec<Rebuilt>, RebuildError> {
         &fy27_book.rows("Summary_SFPR")?,
         &fy27_book.rows("ADM Data")?,
         &profile_rows,
+        &fy27_book.rows("Detail_SFPR")?,
+        &fy27_book.rows("Valuation & Income")?,
+        &fy27_book.rows("# Tax Returns Projection 27")?,
     );
     let extract = fixtures::build_profile_extract(&profile_rows);
 

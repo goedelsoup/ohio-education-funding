@@ -99,6 +99,19 @@ pub struct DistrictRecord {
     pub other_adjustments: Dollars,
     /// `V - Net State Funding` — total state support after transfers.
     pub net_state_funding: Dollars,
+    /// Local capacity per pupil **as the department publishes it**, from `Detail_SFPR`.
+    ///
+    /// [`DistrictRecord::implied_local_capacity_per_pupil`] recovers this by subtracting state
+    /// aid from base cost, which works for 470 districts and is impossible for the rest: where
+    /// the minimum state share binds, the subtraction gives a number smaller than the truth and
+    /// the corpus returns `None` rather than a plausible wrong figure.
+    ///
+    /// It does not have to be recovered. The department computes it and publishes it on a sheet
+    /// this repository did not read for eleven phases, for every district including the ones the
+    /// subtraction censors.
+    pub published_capacity_per_pupil: Option<Dollars>,
+    /// `[b4] State Share Percentage`, likewise published rather than inferred.
+    pub published_state_share: Option<f64>,
     /// Temporary transitional aid guarantee.
     pub guarantee: Dollars,
     /// Enrolled ADM in each of [`HISTORY_YEARS`].
@@ -228,6 +241,10 @@ mod column {
     /// `T - Other Adjustments`, the residual and the only unlabelled line in the report.
     pub const OTHER_ADJUSTMENTS: usize = 25;
     pub const NET_STATE_FUNDING: usize = 26;
+    /// `[b1] Per Pupil Capacity Amount` from `Detail_SFPR` — the department's own local capacity.
+    pub const CAPACITY_PER_PUPIL: usize = 27;
+    /// `[b4] State Share Percentage`.
+    pub const STATE_SHARE_PERCENTAGE: usize = 28;
 }
 
 /// The header this loader expects, so a fixture reshaped without updating [`column`] fails
@@ -237,7 +254,7 @@ adm_kindergarten,adm_grades_1_3,adm_grades_4_8_non_cte,adm_grades_9_12_non_cte,a
 adm_grades_9_12_total,funded_classroom_teachers,funded_special_teachers,teacher_base_cost,\
 aggregate_base_cost,base_cost_per_pupil,temp_transitional_aid_guarantee,enrolled_adm_fy24,\
 enrolled_adm_fy25,enrolled_adm_fy26,assessed_valuation_per_pupil_fy23,core_foundation_funding,\
-base_cost_state_share,total_state_support,total_transfers,service_center_charge,other_adjustments,net_state_funding";
+base_cost_state_share,total_state_support,total_transfers,service_center_charge,other_adjustments,net_state_funding,capacity_per_pupil,state_share_percentage,valuation_ty25,valuation_ty24,valuation_ty23,agi_ty24,agi_ty23,agi_ty22,tax_returns_ty24,median_income_ty22";
 
 /// Every district in the department's FY2027 model.
 ///
@@ -294,6 +311,8 @@ pub fn panel() -> Vec<DistrictRecord> {
                 total_transfers: required(column::TOTAL_TRANSFERS),
                 service_center_charge: required(column::SERVICE_CENTER),
                 other_adjustments: required(column::OTHER_ADJUSTMENTS),
+                published_capacity_per_pupil: number(column::CAPACITY_PER_PUPIL),
+                published_state_share: number(column::STATE_SHARE_PERCENTAGE),
                 net_state_funding: required(column::NET_STATE_FUNDING),
                 guarantee: required(column::GUARANTEE),
                 adm_history: [

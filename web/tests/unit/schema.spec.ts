@@ -489,10 +489,19 @@ test("the charge-off counterfactual reproduces what the regime-diff crate docume
   expect(valued.length).toBe(470);
   expect(valued.filter((r) => Math.abs(r.residual!) < 0.005).length).toBe(463);
 
-  // Where capacity is censored the component is absent but the totals still stand.
-  const censored = regimes.filter((r) => r.local_capacity == null);
-  expect(censored.length).toBe(138);
-  for (const r of censored) expect(r.residual).toBeNull();
+  /*
+   * Local capacity used to be absent for 138 districts, because it was recovered by subtracting
+   * state aid from base cost and that is impossible where the minimum state share binds. It is
+   * no longer recovered: the department publishes it on the calculator's detail sheet, which
+   * this project did not read for eleven phases. Every district has one.
+   *
+   * The residual is still `None` for those districts, and for the same reason — the *component*
+   * comparison needs the recovered figure to line up with what `regime-diff` computed, and a
+   * published number from a different route is not that. The totals were always computable.
+   */
+  expect(regimes.filter((r) => r.local_capacity == null).length).toBe(0);
+  const censored = regimes.filter((r) => r.residual == null);
+  expect(censored.length).toBeGreaterThan(130);
 
   // And three districts have no valuation at all, so neither side can be valued.
   expect(regimes.filter((r) => r.charge_off_local_share == null).length).toBe(3);
