@@ -10,6 +10,7 @@ import Base from "../layouts/Base.astro";
 import { loadCorpus } from "../lib/corpus.ts";
 import { loadFeed } from "../lib/feed.ts";
 import { count, millions, pct } from "../lib/format.ts";
+import { DENOMINATORS } from "../lib/denominators.ts";
 
 const { bundle, verification, forecastable } = loadFeed();
 const corpus = loadCorpus();
@@ -59,6 +60,44 @@ const meta = bundle.projection;
       > it runs again in the browser, against the panel actually served — because that file can be
       replaced without a rebuild, and a check that only ran where the answer was already known
       would be decorative.
+    </p>
+  </div>
+
+  <div class="card">
+    <h2>Six pupil counts, and which one each figure uses</h2>
+    <p class="note">
+      Ohio's sources do not agree on how many children a district has. Not because any of them is
+      wrong — they count different things, for different purposes, in different years. The
+      Department of Taxation counts children who live in the district; the Department of Education
+      counts the ones it teaches, and separately the ones it funds, and separately again a
+      need-weighted count. For Columbus those range from 43,019 to 73,746.
+    </p>
+    <div class="scroll">
+      <table class="prose">
+        <tbody>
+          {
+            Object.values(DENOMINATORS).map((d) => (
+              <tr>
+                <th>{d.label}</th>
+                <td>
+                  <div class="n">{d.source}</div>
+                  {d.note}
+                </td>
+              </tr>
+            ))
+          }
+        </tbody>
+      </table>
+    </div>
+    <p class="note">
+      Two figures divided by different counts cannot be compared, and nothing about them looks
+      wrong when they are: both are numbers, both are per pupil, and both are correct. This site
+      has published that error twice — most recently a district's tax-table valuation per pupil
+      set against a statewide median computed on the education department's count, which was
+      right for most of the state and wrong by a factor of two for the districts a reader is most
+      likely to open. <code>src/lib/denominators.ts</code> now declares the denominator of every
+      per-pupil field in the feed, and a test fails the build if a new one arrives undeclared or
+      if a pair the site renders side by side stops matching.
     </p>
   </div>
 

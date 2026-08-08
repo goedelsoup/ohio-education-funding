@@ -263,6 +263,19 @@ export function renderDistrictScenario(bundle: Panel, levers: Levers, irn: strin
 
   const outcomes = applyAll(bundle.districts, toPolicy(levers), model);
   const t = totals(outcomes);
+
+  // What the settings did to the guarantee population, which the reached/unmoved split does not
+  // say: a formula district can be unmoved because this lever does not touch it, a guarantee
+  // district because nothing can touch it until the formula overtakes its frozen baseline.
+  // `crates/scenario-delta` computes the same three counts and the feed's checkpoints carry them,
+  // so the build has already checked this classification against the Rust before you see it.
+  let liftedOff = 0;
+  let pushedOn = 0;
+  for (const [i, d] of bundle.districts.entries()) {
+    const after = outcomes[i]!;
+    if (d.on_guarantee && !after.onGuarantee) liftedOff++;
+    else if (!d.on_guarantee && after.onGuarantee) pushedOn++;
+  }
   const mine = outcomes.find((o) => o.irn === irn)!;
 
   if (isCurrentLaw(levers, model)) {
@@ -338,6 +351,10 @@ export function renderDistrictScenario(bundle: Panel, levers: Levers, irn: strin
         <tr><th>Up</th><td>${t.gainers}</td></tr>
         <tr><th>Down</th><td>${t.losers}</td></tr>
         <tr><th>Unmoved</th><td>${t.unmoved}</td></tr>
+        <tr><th>Lifted off the guarantee<div class="n">The formula now computes more for them
+          than their FY2020 baseline.</div></th><td>${liftedOff}</td></tr>
+        <tr><th>Pushed onto it<div class="n">The formula now computes less.</div></th>
+          <td>${pushedOn}</td></tr>
         <tr><th>Cost to the state</th><td class="${t.cost > 0 ? "gain" : t.cost < 0 ? "loss" : ""}">${millions(t.cost)}</td></tr>
       </tbody></table></div>
       <p class="note">A change that helps this district is not thereby a good change, and the
@@ -366,6 +383,19 @@ export function renderScenario(bundle: Panel, levers: Levers): string {
 
   const outcomes = applyAll(bundle.districts, toPolicy(levers), model);
   const t = totals(outcomes);
+
+  // What the settings did to the guarantee population, which the reached/unmoved split does not
+  // say: a formula district can be unmoved because this lever does not touch it, a guarantee
+  // district because nothing can touch it until the formula overtakes its frozen baseline.
+  // `crates/scenario-delta` computes the same three counts and the feed's checkpoints carry them,
+  // so the build has already checked this classification against the Rust before you see it.
+  let liftedOff = 0;
+  let pushedOn = 0;
+  for (const [i, d] of bundle.districts.entries()) {
+    const after = outcomes[i]!;
+    if (d.on_guarantee && !after.onGuarantee) liftedOff++;
+    else if (!d.on_guarantee && after.onGuarantee) pushedOn++;
+  }
   const deltas = outcomes
     .filter((o) => Math.abs(o.delta) > 0.5)
     .map((o) => o.deltaPerPupil);

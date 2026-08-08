@@ -73,7 +73,7 @@ use edfund_core::Dollars;
 /// from FY2022-FY2024 to FY2024-FY2026 — the years the department's `ADM Data` sheet declares.
 /// The values did not change; what they are called did, which is exactly the kind of silent
 /// meaning change the version guard exists for.
-pub const CONTRACT_VERSION: &str = "12.0.0";
+pub const CONTRACT_VERSION: &str = "13.0.0";
 
 /// How close to the floor counts as being on it, in mills.
 ///
@@ -766,6 +766,17 @@ pub struct Checkpoint {
     pub unmoved: usize,
     /// Districts on the guarantee under the policy.
     pub on_guarantee: usize,
+    /// Districts the guarantee paid under **both** policies.
+    ///
+    /// Not the same as [`Checkpoint::unmoved`], and the gap between them is informative: a
+    /// formula district can be unmoved because the lever pulled does not touch it, while a
+    /// guarantee district is unmoved because nothing pulled can touch it until the formula
+    /// overtakes its frozen baseline.
+    pub held_throughout: usize,
+    /// Districts the policy lifted off the guarantee onto the formula.
+    pub lifted_off: usize,
+    /// Districts the policy pushed from the formula onto the guarantee.
+    pub pushed_on: usize,
 }
 
 /// A Rust-computed *forecast* the web layer must reproduce before it may draw a band.
@@ -1042,7 +1053,8 @@ impl Bundle {
                  \"guarantee_argument\": {}, \"base_cost_scale\": {}, \
                  \"minimum_state_share\": {}, \"phase_in_base_cost\": {}, \
                  \"phase_in_categorical\": {}}}, \"cost\": {}, \"realized_aid\": {}, \
-                 \"gainers\": {}, \"losers\": {}, \"unmoved\": {}, \"on_guarantee\": {}}}",
+                 \"gainers\": {}, \"losers\": {}, \"unmoved\": {}, \"on_guarantee\": {}, \
+                 \"held_throughout\": {}, \"lifted_off\": {}, \"pushed_on\": {}}}",
                 escape(&c.label),
                 escape(c.policy.guarantee),
                 num(c.policy.guarantee_argument),
@@ -1055,7 +1067,10 @@ impl Bundle {
                 c.gainers,
                 c.losers,
                 c.unmoved,
-                c.on_guarantee
+                c.on_guarantee,
+                c.held_throughout,
+                c.lifted_off,
+                c.pushed_on
             ));
             if i + 1 < self.checkpoints.len() {
                 s.push(',');
@@ -1671,6 +1686,9 @@ mod tests {
             gainers: 0,
             losers: 294,
             unmoved: 315,
+            held_throughout: 294,
+            lifted_off: 0,
+            pushed_on: 0,
             on_guarantee: 0,
         }
     }

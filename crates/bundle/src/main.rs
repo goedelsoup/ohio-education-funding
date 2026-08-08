@@ -26,6 +26,7 @@ use project::panel::{panel, DistrictRecord, HISTORY_YEARS, MINIMUM_STATE_SHARE, 
 use project::policy::{GuaranteeRule, Policy};
 use project::report::{enrollment_growth_prior, forecast, simulate};
 use project::series::{Method, DEFAULT_DAMPING, ONE_SIGMA};
+use scenario_delta::ScenarioDelta;
 
 /// The furthest year the page will offer, ten past the last observation.
 ///
@@ -871,6 +872,13 @@ fn main() {
         .iter()
         .map(|(label, policy, shape)| {
             let effect = simulate(&records, policy);
+            // The same comparison a second time, through `scenario-delta`, which counts what
+            // happens to the *guarantee population* — held throughout, lifted off, pushed on —
+            // and which `simulate` does not. A test asserts the two agree on the counts they
+            // share, so two implementations of one comparison cannot drift apart unnoticed.
+            let reach = ScenarioDelta::between(&records, &Policy::current_law(), policy)
+                .total()
+                .reach;
             Checkpoint {
                 label: (*label).to_string(),
                 policy: *shape,
@@ -879,6 +887,9 @@ fn main() {
                 gainers: effect.gainers(),
                 losers: effect.losers(),
                 unmoved: effect.unmoved(),
+                held_throughout: reach.held_throughout,
+                lifted_off: reach.lifted_off,
+                pushed_on: reach.pushed_on,
                 on_guarantee: effect.policy.on_guarantee,
             }
         })

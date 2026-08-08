@@ -533,6 +533,17 @@ export const CheckpointSchema = z
     losers: z.number().int().nonnegative(),
     unmoved: z.number().int().nonnegative(),
     on_guarantee: z.number().int().nonnegative(),
+    /**
+     * What the policy did to the guarantee population, which `unmoved` does not say.
+     *
+     * A formula district can be unmoved because the lever pulled does not touch it; a guarantee
+     * district is unmoved because nothing pulled can touch it until the formula overtakes its
+     * frozen baseline. These three separate the two cases, and the page must reproduce them —
+     * which means reproducing both runs rather than only the perturbed one.
+     */
+    held_throughout: z.number().int().nonnegative(),
+    lifted_off: z.number().int().nonnegative(),
+    pushed_on: z.number().int().nonnegative(),
   })
   .strict();
 

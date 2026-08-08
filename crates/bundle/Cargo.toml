@@ -13,6 +13,7 @@ dispersion = { path = "../dispersion" }
 foundation = { path = "../foundation" }
 millage = { path = "../millage" }
 regime-diff = { path = "../regime-diff" }
+scenario-delta = { path = "../scenario-delta" }
 project = { path = "../project" }
 
 [lints]

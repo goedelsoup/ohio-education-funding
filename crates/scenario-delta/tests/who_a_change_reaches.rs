@@ -454,3 +454,116 @@ fn a_cut_lets_formula_districts_fall_through_a_floor_the_model_cannot_see() {
         unfloored / all
     );
 }
+
+/// The two implementations of one comparison, held to each other.
+///
+/// `project::report::simulate` and [`ScenarioDelta::between`] both answer "who gains, who loses,
+/// who is untouched" over the same panel and the same policies, by different routes. The bundle
+/// takes the dollar totals from the first and the guarantee-transition counts from the second,
+/// which is only safe if they agree about the districts they both classify.
+///
+/// Nothing forced them to. They were written in different phases for different callers, and the
+/// bundle is the first thing to use both.
+#[test]
+fn scenario_delta_and_simulate_agree_on_who_moved() {
+    use project::policy::{GuaranteeRule, Policy};
+    use project::report::simulate;
+
+    let records = project::panel::panel();
+    let baseline = Policy::current_law();
+
+    let policies = [
+        (
+            "guarantee removed",
+            Policy {
+                guarantee: GuaranteeRule::Removed,
+                ..baseline
+            },
+        ),
+        (
+            "guarantee half phased out",
+            Policy {
+                guarantee: GuaranteeRule::PhasedOut { remaining: 0.5 },
+                ..baseline
+            },
+        ),
+        (
+            "base cost +5%",
+            Policy {
+                base_cost_scale: 1.05,
+                ..baseline
+            },
+        ),
+        (
+            "minimum state share 15%",
+            Policy {
+                minimum_state_share: 0.15,
+                ..baseline
+            },
+        ),
+    ];
+
+    for (label, policy) in policies {
+        let effect = simulate(&records, &policy);
+        let reach = ScenarioDelta::between(&records, &baseline, &policy)
+            .total()
+            .reach;
+
+        assert_eq!(reach.districts, records.len(), "{label}: panel size");
+        assert_eq!(reach.gainers, effect.gainers(), "{label}: gainers");
+        assert_eq!(reach.losers, effect.losers(), "{label}: losers");
+        assert_eq!(reach.unmoved, effect.unmoved(), "{label}: unmoved");
+        assert_eq!(
+            reach.gainers + reach.losers + reach.unmoved,
+            records.len(),
+            "{label}: the three classes must partition the panel"
+        );
+    }
+}
+
+/// Removing the guarantee moves districts off it and puts none on it.
+///
+/// The direction check that makes `lifted_off` and `pushed_on` worth carrying separately: a
+/// policy that abolishes the guarantee cannot push a district onto it, and one that raises base
+/// cost can lift districts off it by overtaking their frozen baseline.
+#[test]
+fn the_guarantee_transitions_run_the_direction_the_policy_implies() {
+    use project::policy::{GuaranteeRule, Policy};
+
+    let records = project::panel::panel();
+    let baseline = Policy::current_law();
+
+    let removed = ScenarioDelta::between(
+        &records,
+        &baseline,
+        &Policy {
+            guarantee: GuaranteeRule::Removed,
+            ..baseline
+        },
+    )
+    .total()
+    .reach;
+    assert_eq!(
+        removed.pushed_on, 0,
+        "abolishing the guarantee cannot push a district onto it"
+    );
+    assert_eq!(
+        removed.held_throughout, 0,
+        "and no district can be held by a guarantee that does not exist"
+    );
+
+    let richer = ScenarioDelta::between(
+        &records,
+        &baseline,
+        &Policy {
+            base_cost_scale: 1.20,
+            ..baseline
+        },
+    )
+    .total()
+    .reach;
+    assert!(
+        richer.lifted_off > 0,
+        "a 20% base cost rise should overtake some frozen baselines"
+    );
+}

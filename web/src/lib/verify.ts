@@ -10,7 +10,7 @@
  * absorb a real disagreement in a lever that only moves a few districts.
  */
 
-import { apply, totals, type GuaranteeRule, type Policy } from "./policy.ts";
+import { apply, totals, type GuaranteeRule, type Policy, currentLaw } from "./policy.ts";
 import { forecast, growthPrior } from "./project.ts";
 import type {
   Panel,
@@ -64,6 +64,23 @@ export function compare(bundle: Panel, checkpoint: Checkpoint): Comparison {
   );
   const t = totals(outcomes);
 
+  // The baseline run, which the page did not previously need. `held_throughout`, `lifted_off`
+  // and `pushed_on` are properties of the *pair* of runs, so reproducing them means computing
+  // current law here rather than reading the feed's `on_guarantee` field — which is the same
+  // thing computed by the Rust, and using it would check the page against itself.
+  const baseline = bundle.districts.map((d) =>
+    apply(d, currentLaw(model), d.current_year_adm, model),
+  );
+  let heldThroughout = 0;
+  let liftedOff = 0;
+  let pushedOn = 0;
+  for (const [i, before] of baseline.entries()) {
+    const after = outcomes[i]!;
+    if (before.onGuarantee && after.onGuarantee) heldThroughout++;
+    else if (before.onGuarantee) liftedOff++;
+    else if (after.onGuarantee) pushedOn++;
+  }
+
   const differences: string[] = [];
   const near = (name: string, ours: number, theirs: number) => {
     if (Math.abs(ours - theirs) > TOLERANCE) {
@@ -80,6 +97,9 @@ export function compare(bundle: Panel, checkpoint: Checkpoint): Comparison {
   same("losers", t.losers, checkpoint.losers);
   same("unmoved", t.unmoved, checkpoint.unmoved);
   same("districts on the guarantee", t.onGuarantee, checkpoint.on_guarantee);
+  same("held throughout", heldThroughout, checkpoint.held_throughout);
+  same("lifted off the guarantee", liftedOff, checkpoint.lifted_off);
+  same("pushed onto the guarantee", pushedOn, checkpoint.pushed_on);
 
   return { label: checkpoint.label, agrees: differences.length === 0, differences };
 }
