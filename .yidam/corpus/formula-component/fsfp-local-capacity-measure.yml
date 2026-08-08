@@ -47,6 +47,35 @@ description: |
 
   Not modeled here yet: how the 40th-highest-district benchmark moves over time, and whether
   it has. It is a single discretionary number that sets the top of the entire scale. [open]
+
+  **AGAINST THE MECHANISM IT REPLACED.** [verified —
+  [`crates/regime-diff`](../../../crates/regime-diff/), the corpus's only aligned component
+  pair, run at FY2027 base cost with only the local share substituted]
+
+  The income terms do what they were built to do, and they do it in **both** directions. Ottawa
+  Hills Local — high income, unremarkable valuation — is charged **69% more** by local capacity
+  than a 23-mill charge-off would ask. Jefferson Township Local — high valuation, low income —
+  is charged **26% less**. The district the charge-off treated as the richer of the two is the
+  one this measure treats as poorer. [verified]
+
+  The half that gets less attention is the second one. Local capacity is usually described as
+  catching wealth the charge-off missed; it also **relieves** districts whose property wealth
+  overstated what their residents could bear, and at FY2027 base cost **193 of 606 districts
+  would have received more under the charge-off** against 413 under this measure. A reform
+  described only as tightening is being described by half. [verified]
+
+  **Across wealth the change of mechanism favours the top.** Mean gain per pupil against the
+  charge-off, by valuation quintile: $154.85, $102.38, $107.60, $193.23, **$873.92**. Every
+  quintile does better, and the wealthiest does best by a factor of five and a half over the
+  poorest. The minimum state share is part of that — the charge-off had no floor and would zero
+  out 81 districts entirely — but not the whole of it: splitting the top quintile by whether the
+  charge-off would have zeroed it leaves both halves gaining about the same, $908.63 against
+  $805.35. [verified]
+
+  So this measure is more discriminating than the charge-off about *which* districts are wealthy
+  and simultaneously more generous to wealthy districts overall. Those are not in tension —
+  the first is about the ordering and the second about the level — but a claim that cites one
+  without the other is quoting half the result. [inference]
 properties:
   name: FSFP local capacity measure
   function: |

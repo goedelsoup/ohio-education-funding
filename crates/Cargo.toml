@@ -12,6 +12,7 @@ members = [
     "connect",
     "project",
     "scenario-delta",
+    "regime-diff",
 ]
 
 [workspace.package]

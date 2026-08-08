@@ -48,10 +48,10 @@ Sorted by: kind, then alphabetically.
 | [`fy2026`](fiscal-period/fy2026.yml) | fiscal-period | Fiscal Year 2026 | 2 | 8 |
 | [`fy2026-27`](fiscal-period/fy2026-27.yml) | fiscal-period | FY2026-27 Biennium | 3 | 6 |
 | [`fy2027`](fiscal-period/fy2027.yml) | fiscal-period | Fiscal Year 2027 | 4 | 2 |
-| [`charge-off-local-share`](formula-component/charge-off-local-share.yml) | formula-component | Charge-Off Local Share | 2 | 5 |
+| [`charge-off-local-share`](formula-component/charge-off-local-share.yml) | formula-component | Charge-Off Local Share | 3 | 6 |
 | [`fsfp-base-cost-calculation`](formula-component/fsfp-base-cost-calculation.yml) | formula-component | FSFP Base Cost Calculation | 3 | 6 |
-| [`fsfp-local-capacity-measure`](formula-component/fsfp-local-capacity-measure.yml) | formula-component | FSFP Local Capacity Measure | 0 | 7 |
-| [`temporary-transitional-aid-guarantee`](formula-component/temporary-transitional-aid-guarantee.yml) | formula-component | Temporary Transitional Aid Guarantee | 10 | 7 |
+| [`fsfp-local-capacity-measure`](formula-component/fsfp-local-capacity-measure.yml) | formula-component | FSFP Local Capacity Measure | 1 | 6 |
+| [`temporary-transitional-aid-guarantee`](formula-component/temporary-transitional-aid-guarantee.yml) | formula-component | Temporary Transitional Aid Guarantee | 10 | 8 |
 | [`bridge-formula`](funding-regime/bridge-formula.yml) | funding-regime | Bridge Formula | 3 | 6 |
 | [`equal-yield-formula`](funding-regime/equal-yield-formula.yml) | funding-regime | Equal Yield Formula | 1 | 2 |
 | [`evidence-based-model`](funding-regime/evidence-based-model.yml) | funding-regime | Evidence-Based Model | 0 | 5 |
@@ -66,7 +66,7 @@ Sorted by: kind, then alphabetically.
 | [`hb-96-2025`](legislation/hb-96-2025.yml) | legislation | Am. Sub. H.B. 96 (2025) — FY2026-27 Budget | 4 | 9 |
 | [`ohio-constitution-article-vi-section-2`](legislation/ohio-constitution-article-vi-section-2.yml) | legislation | Ohio Constitution, Article VI, Section 2 (1851) | 0 | 4 |
 | [`cincinnati-v-walter-1979`](litigation/cincinnati-v-walter-1979.yml) | litigation | Cincinnati City School District Board of Education v. Walter (1979) | 1 | 4 |
-| [`derolph-i-1997`](litigation/derolph-i-1997.yml) | litigation | DeRolph v. State (DeRolph I, 1997) | 2 | 8 |
+| [`derolph-i-1997`](litigation/derolph-i-1997.yml) | litigation | DeRolph v. State (DeRolph I, 1997) | 2 | 10 |
 | [`derolph-iv-2002`](litigation/derolph-iv-2002.yml) | litigation | DeRolph v. State (DeRolph IV, 2002) | 3 | 1 |
 | [`vouchers-hurt-ohio-2025`](litigation/vouchers-hurt-ohio-2025.yml) | litigation | EdChoice Constitutional Challenge (Franklin County, 2025) | 0 | 3 |
 | [`assessed-valuation-per-pupil`](metric/assessed-valuation-per-pupil.yml) | metric | Assessed Valuation Per Pupil | 5 | 3 |
@@ -80,7 +80,7 @@ Sorted by: kind, then alphabetically.
 | [`state-share-percentage`](metric/state-share-percentage.yml) | metric | State Share Percentage | 1 | 3 |
 | [`base-cost-per-pupil`](parameter/base-cost-per-pupil.yml) | parameter | Base Cost Per Pupil | 6 | 10 |
 | [`fsfp-phase-in-percentage`](parameter/fsfp-phase-in-percentage.yml) | parameter | FSFP Phase-In Percentage | 1 | 11 |
-| [`local-share-charge-off-millage`](parameter/local-share-charge-off-millage.yml) | parameter | Local Share Charge-Off Millage | 3 | 1 |
+| [`local-share-charge-off-millage`](parameter/local-share-charge-off-millage.yml) | parameter | Local Share Charge-Off Millage | 6 | 1 |
 | [`twenty-mill-floor`](parameter/twenty-mill-floor.yml) | parameter | Twenty-Mill Floor | 3 | 8 |
 | [`classroom-facilities-assistance`](program/classroom-facilities-assistance.yml) | program | Classroom Facilities Assistance Program | 1 | 1 |
 | [`cleveland-scholarship`](program/cleveland-scholarship.yml) | program | Cleveland Scholarship and Tutoring Program | 1 | 3 |

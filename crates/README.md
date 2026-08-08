@@ -37,6 +37,10 @@ with a recorded reason. See
 - `scenario-delta` — the winners-and-losers table between two runs, with incidence across
   wealth and state share; a total cannot be constructed without the count of districts it
   fails to reach, and both orderings of the table are returned or neither is
+- `regime-diff` — differences two regimes at component level, over the pairs the corpus's
+  `replaces` graph actually aligns rather than a guessed correspondence; it carries the
+  charge-off millage series with its statutory authority, and reports the residual its
+  decomposition cannot explain
 
 A semantic index over `.yidam/corpus/` is not built at genesis — 45 nodes fit in context.
 It is added when the corpus outgrows direct retrieval, which the exemplar-agency expansion
@@ -73,6 +77,7 @@ pre-2007 `.xls` format.
 | [`dispersion`](dispersion/) | calculator | dispersion, correlation, partial, OLS |
 | [`project`](project/) | calculator | projection, policy levers, the district crosswalk |
 | [`scenario-delta`](scenario-delta/) | calculator | delta table, reach, incidence bands |
+| [`regime-diff`](regime-diff/) | calculator | component alignment, charge-off rates, residual |
 | [`bundle`](bundle/) | export | versioned feed and scenario checkpoints for [`web/`](../web/) |
 
 Test counts are not in that table on purpose: they are derivable, they drifted by 41 across
@@ -122,10 +127,11 @@ Fields per crate: name, capability type (connector/calculator/feature-engineerin
 | [`local-capacity`](local-capacity/) | Fair School Funding Plan local capacity and state share, per R.C. 3317.017 | 18 |
 | [`millage`](millage/) | Effective operating millage under H.B. 920 reduction factors, and 20-mill floor status | 13 |
 | [`project`](project/) | Forward projection of funding inputs, and policy simulation over them | 93 |
+| [`regime-diff`](regime-diff/) | Difference two funding regimes at component level, with the residual the decomposition does not explain | 17 |
 | [`scenario-delta`](scenario-delta/) | Winners and losers between two funding runs, with incidence and the off-formula count | 23 |
 | [`spreadsheet`](spreadsheet/) | Read the department's published workbooks with no dependencies | 70 |
 
-11 crates, 449 test functions, no crates.io dependencies. `cargo test` reports a different total: it adds doc-tests and counts each integration binary separately.
+12 crates, 466 test functions, no crates.io dependencies. `cargo test` reports a different total: it adds doc-tests and counts each integration binary separately.
 <!-- /REGEN -->
 
 ## Index status
