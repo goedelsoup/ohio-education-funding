@@ -9,5 +9,8 @@ repository.workspace = true
 [dependencies]
 edfund-core = { path = "../edfund-core" }
 
+[dev-dependencies]
+project = { path = "../project" }
+
 [lints]
 workspace = true

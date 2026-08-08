@@ -112,6 +112,17 @@ pub struct DistrictRecord {
     pub published_capacity_per_pupil: Option<Dollars>,
     /// `[b4] State Share Percentage`, likewise published rather than inferred.
     pub published_state_share: Option<f64>,
+    /// Assessed valuation for the three tax years the capacity measure blends, newest first.
+    pub valuation_three_year: [Dollars; 3],
+    /// Federal adjusted gross income for its three tax years, newest first.
+    pub agi_three_year: [Dollars; 3],
+    /// Tax returns filed in the district, the count the median-income term multiplies.
+    pub tax_returns: Option<f64>,
+    /// The district's median income, the third term of the blend.
+    ///
+    /// The **Ohio** median, which is what the profile report publishes and what reproduces the
+    /// department's own capacity figure. See `formula-component/fsfp-local-capacity-measure`.
+    pub median_income: Option<Dollars>,
     /// Temporary transitional aid guarantee.
     pub guarantee: Dollars,
     /// Enrolled ADM in each of [`HISTORY_YEARS`].
@@ -245,6 +256,14 @@ mod column {
     pub const CAPACITY_PER_PUPIL: usize = 27;
     /// `[b4] State Share Percentage`.
     pub const STATE_SHARE_PERCENTAGE: usize = 28;
+    pub const VALUATION_TY25: usize = 29;
+    pub const VALUATION_TY24: usize = 30;
+    pub const VALUATION_TY23: usize = 31;
+    pub const AGI_TY24: usize = 32;
+    pub const AGI_TY23: usize = 33;
+    pub const AGI_TY22: usize = 34;
+    pub const TAX_RETURNS_TY24: usize = 35;
+    pub const MEDIAN_INCOME_TY22: usize = 36;
 }
 
 /// The header this loader expects, so a fixture reshaped without updating [`column`] fails
@@ -313,6 +332,18 @@ pub fn panel() -> Vec<DistrictRecord> {
                 other_adjustments: required(column::OTHER_ADJUSTMENTS),
                 published_capacity_per_pupil: number(column::CAPACITY_PER_PUPIL),
                 published_state_share: number(column::STATE_SHARE_PERCENTAGE),
+                valuation_three_year: [
+                    required(column::VALUATION_TY25),
+                    required(column::VALUATION_TY24),
+                    required(column::VALUATION_TY23),
+                ],
+                agi_three_year: [
+                    required(column::AGI_TY24),
+                    required(column::AGI_TY23),
+                    required(column::AGI_TY22),
+                ],
+                tax_returns: number(column::TAX_RETURNS_TY24),
+                median_income: number(column::MEDIAN_INCOME_TY22),
                 net_state_funding: required(column::NET_STATE_FUNDING),
                 guarantee: required(column::GUARANTEE),
                 adm_history: [

@@ -1,0 +1,62 @@
+id: payment-reports-connector
+summary: >-
+  A twelfth connector, dew-payment-reports, declared and blocked — the only source that could
+  carry the voucher and community-school deduction, for the era in which one existed.
+context: |
+  The `deduction` calculator has been a stub since genesis and 21 `[open]` claims across four
+  corpus nodes turn on it. The recorded blocker was `dew-foundation`, which is now wired with
+  three sources, and the block did not lift.
+
+  It did not lift because the blocker was wrong about where the deduction is. That has now been
+  established exhaustively rather than inferred:
+
+    Summary_SFPR, 30 columns   The transfer channel is exactly two lines, `S - Educational
+                               Service Center` and `T - Other Adjustments`. Neither is named for
+                               a scholarship or a community school.
+    Detail_SFPR, 58 columns    The full formula decomposition, `[a] Enrolled ADM` through
+                               `[N] Total Formula Funding`. No deduction line.
+    Profile Report, 61 columns None either.
+
+  And the one place a deduction could have been hiding is measured. `T - Other Adjustments` is
+  the only unlabelled line in the report; its negative half is $95.6m across 577 districts, 1.12%
+  of total state support, against Ohio scholarship spending on the order of a billion a year. A
+  deduction channel would have to be ten times the size of the residual it would have to sit in.
+
+  So the deduction is not missing from the current model. It is **absent from it by design**:
+  under the Fair School Funding Plan community and STEM students are funded directly rather than
+  deducted from a resident district. The calculator is right and the corpus's expectation was
+  wrong.
+
+  What is genuinely missing is the era before — the years the deduction governed, roughly FY1998
+  through FY2021. Those amounts live in the department's School Foundation Payment Reports, which
+  are a different artefact from the funding calculator: the calculator models a year, the payment
+  report records what was paid. They are also the only source that could settle whether ECOT
+  recovery money returned to the districts it had been deducted from, which the `deduction` skill
+  names as the sharpest open question in its scope.
+decision: |
+  Declare `dew-payment-reports` as a twelfth connector, with status `Declared` and a recorded
+  blocker, feeding `program`, `education-agency` and `revenue-stream`.
+
+  Declared rather than retrievable, because the reports are posted per fiscal year with no index
+  and no stable path, and the years before roughly 2015 are not on the current host at all. That
+  is a retrieval problem and not a parsing one — the workbooks, where they exist, are the same
+  format the wired connectors already read.
+consequences: |
+  The `deduction` calculator stays a stub, but for a stated reason that is now correct rather
+  than for one that was wrong. Its blocker moves from `dew-foundation` to this connector.
+
+  The `[open]` claim "could a deduction be inside the negative transfers" is **closed** by the
+  measurement above and does not wait on this. What waits on it is narrower and clearly bounded:
+  deduct-era amounts per resident district, and the ECOT recovery question.
+
+  A twelfth connector also means the registry's approval list grows again, which is the third
+  time. The list is derived from these decision records precisely so that growth is deliberate;
+  a connector appearing in the registry without one should keep failing the test that caught this.
+alternatives: |
+  **Leave it undeclared.** Rejected: the corpus's rule is that a gap nobody has written down is
+  indistinguishable from a gap nobody has noticed, and this one is now well enough understood to
+  name. It has a publisher, a scope, and a specific reason it cannot be retrieved.
+
+  **Fold it into `dew-foundation`.** Rejected: that connector retrieves the department's *model*,
+  and the payment reports are a *record*. The corpus keeps that distinction everywhere else and
+  the two would have different blockers, different vintages, and different failure modes.

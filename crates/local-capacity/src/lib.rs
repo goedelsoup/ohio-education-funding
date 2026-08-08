@@ -55,7 +55,21 @@ pub struct CapacityInputs {
     pub agi_recent: Dollars,
     /// Federal adjusted gross income for the three most recent tax years.
     pub agi_three_year: [Dollars; 3],
-    /// District federal median income for the income reference year.
+    /// District median income for the income reference year.
+    ///
+    /// # Which median, and an unresolved discrepancy
+    ///
+    /// The field is named for the **federal** median because that is how this crate's reading of
+    /// R.C. 3317.017 recorded it. The data does not agree. Feeding the district's **Ohio** median
+    /// income — the figure the District Profile Report publishes — reproduces the department's own
+    /// `[b1] Per Pupil Capacity Amount` under a rate that follows the statutory scale to the
+    /// decile; the federal figure published beside it is an *average* rather than a median, so it
+    /// cannot be the term in any case.
+    ///
+    /// The name is left alone rather than changed, because renaming it would assert something
+    /// about the statute that has not been checked against the statute. Settling it needs the text
+    /// of R.C. 3317.017, and `ohio-laws` is a declared connector blocked on the absence of a bulk
+    /// export. Until then the caller decides, and `crates/project` passes the Ohio median.
     pub federal_median_income: Dollars,
     /// Number of tax returns filed in the district for the income reference year.
     pub tax_returns: f64,

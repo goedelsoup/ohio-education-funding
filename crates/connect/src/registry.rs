@@ -327,6 +327,23 @@ pub const CONNECTORS: &[Connector] = &[
         ],
     },
     Connector {
+        key: "dew-payment-reports",
+        publisher: "Ohio Department of Education and Workforce",
+        feeds: &["program", "education-agency", "revenue-stream"],
+        status: Status::Declared {
+            blocked_on: "the deduct-era School Foundation Payment Reports are posted per fiscal \
+                         year with no index and no stable path, and the years before about 2015 \
+                         are not on the current host at all",
+        },
+        note: "The one source that would carry the voucher and community-school deduction per \
+               resident district, for the years it existed. The FY2027 calculator does not: its \
+               transfer channel is a named service-centre charge plus a residual too small to \
+               hide one, and under the Fair School Funding Plan those students are funded \
+               directly rather than deducted. So the deduction is not missing from the current \
+               model — it is absent from it by design, and what is missing is the era before.",
+        sources: &[],
+    },
+    Connector {
         key: "lsc-budget",
         publisher: "Ohio Legislative Service Commission",
         feeds: &["legislation", "fiscal-period", "program", "parameter"],
@@ -439,9 +456,11 @@ mod tests {
     #[test]
     fn every_connector_approved_in_the_ontology_is_present() {
         // The nine from decisions/proposals.yml, plus dew-report-card from
-        // decisions/report-card-connector.yml and dew-five-year-forecast from
-        // decisions/five-year-forecast-connector.yml. A connector dropping out of this list is a
-        // decision, not an oversight, and should fail here first.
+        // decisions/report-card-connector.yml, dew-five-year-forecast from
+        // decisions/five-year-forecast-connector.yml, and dew-payment-reports from
+        // decisions/payment-reports-connector.yml. A connector dropping out of this list is a
+        // decision, not an oversight, and should fail here first — as should one appearing in the
+        // registry without a decision record behind it, which is what caught the twelfth.
         let expected = [
             "dew-foundation",
             "tax-abstract",
@@ -454,6 +473,7 @@ mod tests {
             "bls-cpi",
             "dew-report-card",
             "dew-five-year-forecast",
+            "dew-payment-reports",
         ];
         for key in expected {
             assert!(

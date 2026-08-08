@@ -36,7 +36,8 @@ should be able to settle.
 ## Status
 
 **Stub — not implemented, and now known not to be implementable from this source.** The recorded
-blocker was `dew-foundation`, and that was wrong. That connector is now wired with three sources
+blocker was `dew-foundation`, and that was wrong; it is now **`dew-payment-reports`**, declared in
+`decisions/payment-reports-connector.yml`. That connector is now wired with three sources
 and the block did not lift, because **the FY2027 funding calculator does not carry the deduction
 channel at all**.
 
