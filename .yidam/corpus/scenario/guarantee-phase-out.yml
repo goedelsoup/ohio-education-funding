@@ -71,6 +71,9 @@ description: |
 
   Only **two** districts move onto the guarantee between FY2027 and FY2032 under current law,
   294 to 292 — enrollment decline barely changes the count, because it is already nearly half.
+
+  This scenario generalises [fsfp-input-year-refresh](fsfp-input-year-refresh.yml) from the single
+  district that node refreshes to the whole state.
 properties:
   name: Phasing out the temporary transitional aid guarantee
   question: |
@@ -125,19 +128,34 @@ properties:
     138 districts sit at the minimum state share and their response to a base cost increase
     cannot be computed, because the floor censors the quantity it would be computed from. They
     are held at the floor, which makes the marginal-cost table a lower bound. [inference]
-links: |
-  Perturbs [fsfp-base-cost-calculation](../formula-component/fsfp-base-cost-calculation.yml)
-  and [temporary-transitional-aid-guarantee](../formula-component/temporary-transitional-aid-guarantee.yml),
-  against the [fsfp-phase-in-percentage](../parameter/fsfp-phase-in-percentage.yml) and
-  [base-cost-per-pupil](../parameter/base-cost-per-pupil.yml) parameters.
-
-  Baselines on [fair-school-funding-plan](../funding-regime/fair-school-funding-plan.yml), and
-  the guarantee's own baseline is a year of [bridge-formula](../funding-regime/bridge-formula.yml).
-
-  Horizon over [fy2027](../fiscal-period/fy2027.yml) and [fy2026-27](../fiscal-period/fy2026-27.yml).
-
-  Refines [fsfp-input-year-refresh](fsfp-input-year-refresh.yml), whose single-district refresh
-  this generalises to the whole state. Bears on [equity](../doctrine/equity.yml) and
-  [adequacy](../doctrine/adequacy.yml).
-
-  Evidence: [dew-fy27-funding-calculator](../../catalog/dew-fy27-funding-calculator.md).
+links:
+  - target: ../scenario.ont.yml
+    relationship: instance-of
+  # The two parameters this scenario actually moves, per `perturbations` above: the guarantee
+  # rule is expressed through the phase-in percentage, and base_cost_scale sweeps 1.00 to 1.20.
+  - target: ../parameter/base-cost-per-pupil.yml
+    relationship: perturbs
+  - target: ../parameter/fsfp-phase-in-percentage.yml
+    relationship: perturbs
+  - target: ../formula-component/fsfp-base-cost-calculation.yml
+    relationship: perturbs-within
+  - target: ../formula-component/temporary-transitional-aid-guarantee.yml
+    relationship: perturbs-within
+  - target: ../funding-regime/fair-school-funding-plan.yml
+    relationship: baselines-on
+  # The guarantee's own floor is a Bridge formula year, so the counterfactual is computed against
+  # that regime as well as against the plan that carries it forward.
+  - target: ../funding-regime/bridge-formula.yml
+    relationship: baselines-on
+  - target: ../fiscal-period/fy2027.yml
+    relationship: horizon-over
+  - target: ../fiscal-period/fy2026-27.yml
+    relationship: horizon-over
+  - target: fsfp-input-year-refresh.yml
+    relationship: refines
+  - target: ../doctrine/equity.yml
+    relationship: bears-on
+  - target: ../doctrine/adequacy.yml
+    relationship: bears-on
+  - target: ../../catalog/dew-fy27-funding-calculator.md
+    relationship: sourced-from

@@ -1,0 +1,102 @@
+---
+/**
+ * The corpus, as a front door.
+ *
+ * Everything else on this site is a number. This is what the numbers mean — the regimes, the
+ * statutes, the litigation that found the combination unconstitutional four times, the parameters
+ * a budget sets, and the definitions that decide what a per-pupil figure is per pupil *of*.
+ *
+ * It is generated from `.yidam/corpus/` directly. There is no exported copy to go stale.
+ */
+import Base from "../../layouts/Base.astro";
+import { loadCorpus } from "../../lib/corpus.ts";
+import { count } from "../../lib/format.ts";
+import * as routes from "../../lib/routes.ts";
+
+const corpus = loadCorpus();
+const edges = corpus.nodes.reduce((total, node) => total + node.out.length, 0);
+
+/** The classes a reader most likely wants first, ahead of the alphabetical rest. */
+const LEAD = ["funding-regime", "formula-component", "parameter", "metric", "legislation", "litigation"];
+const ordered = [
+  ...LEAD.map((c) => corpus.byClass.get(c)).filter((c) => c != null),
+  ...corpus.classes.filter((c) => !LEAD.includes(c.className)),
+];
+---
+
+<Base
+  title="The corpus"
+  description={`${corpus.nodes.length} nodes across ${corpus.classes.length} classes covering how Ohio funds its public schools: the formula and its regimes, the property tax base beside it, the litigation, and the programs that route money around the formula.`}
+  section="wiki"
+>
+  <h1>The corpus</h1>
+  <p class="sub">
+    How Ohio funds its public schools: the state foundation formula and its successive regimes, the
+    constrained local property tax base beside it, the litigation that tested the combination
+    against the Ohio Constitution, and the programs that route money around the formula.{" "}
+    {count(corpus.nodes.length)} nodes across {corpus.classes.length} classes, with{" "}
+    {count(edges)} links between them and {corpus.sources.length} sources behind them.
+  </p>
+
+  <div class="card">
+    <h2>What this is, and what it deliberately does not hold</h2>
+    <p class="note">
+      The corpus holds schema, mechanism, legal history, metric definitions, and a curated set of
+      exemplar districts. It does <strong>not</strong> hold the per-district figures — roughly 610
+      agencies across every year with usable data would drown the graph, so those live as committed
+      data files and are reached from here. A node names a series; it does not restate it. The
+      numbers are on <a href="/districts">the district pages</a>.
+    </p>
+    <p class="note">
+      Every substantive claim carries its epistemic status inline:
+      <span class="claim verified">verified</span> against a named source,
+      <span class="claim inference">inference</span> drawn from what is verified, or
+      <span class="claim open">open</span> and not yet established. Those badges are the corpus's
+      own, not this site's editorialising.
+    </p>
+  </div>
+
+  <div class="card">
+    <h2>Classes</h2>
+    <div class="scroll">
+      <table class="prose">
+        <tbody>
+          {
+            ordered.map((c) => (
+              <tr>
+                <th>
+                  <a href={routes.wikiClass(c!.className)}>{c!.label}</a>
+                  <span class="n"> {c!.nodes.length}</span>
+                </th>
+                <td>{c!.description.split("\n").join(" ").slice(0, 180).trim()}…</td>
+              </tr>
+            ))
+          }
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <div class="card">
+    <h2>Sources</h2>
+    <p class="note">
+      Provenance carries more weight here than in most domains. A funding figure is only useful if
+      a reader can tell whether it came from a department payment report, a Legislative Service
+      Commission estimate made before the fiscal year closed, or a district's own five-year
+      forecast — three numbers that describe the same thing and routinely disagree. Every numeric
+      claim in the corpus should reach a <a href="/wiki/source">catalog entry</a> in one hop.
+    </p>
+    <div class="flags">
+      {
+        corpus.sources
+          .filter((s) => s.citedBy.length > 0)
+          .slice(0, 12)
+          .map((s) => (
+            <a class="flag" href={routes.wikiSource(s.slug)}>
+              {s.title}
+            </a>
+          ))
+      }
+    </div>
+  </div>
+</Base>

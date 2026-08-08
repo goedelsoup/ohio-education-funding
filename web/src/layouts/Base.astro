@@ -1,0 +1,95 @@
+---
+/**
+ * The shell every page wears.
+ *
+ * Unlike the document this replaced, it is not inert. The figures are written into the HTML at
+ * build time by `getStaticPaths` and the renderers in `src/lib/`, so a page is complete before
+ * any JavaScript runs and stays complete if none ever does. `src/scripts/site.ts` adds the
+ * hover layer, the theme switch, and the nominal/constant-dollar toggle on top of a page that
+ * already reads correctly without them.
+ */
+import { loadFeed } from "../lib/feed.ts";
+import "../styles/app.css";
+
+interface Props {
+  /** The `<title>`, before the site name is appended. */
+  title: string;
+  /** One sentence. Used for `<meta name="description">` and nothing else. */
+  description: string;
+  /** Which top-level nav entry is the current section, if any. */
+  section?: "statewide" | "districts" | "outcomes" | "scenario" | "wiki" | "method";
+  /** Rendered above the page, before the slot. Used for the district sub-navigation. */
+  wide?: boolean;
+}
+
+const { title, description, section, wide = false } = Astro.props;
+const { bundle, verification, forecastable } = loadFeed();
+
+const NAV = [
+  { key: "statewide", href: "/", label: "Statewide" },
+  { key: "districts", href: "/districts", label: "Districts" },
+  { key: "outcomes", href: "/outcomes", label: "Outcomes" },
+  { key: "scenario", href: "/scenario", label: "Scenario" },
+  { key: "wiki", href: "/wiki", label: "Wiki" },
+  { key: "method", href: "/method", label: "Method" },
+] as const;
+
+const checkpoints = verification.comparisons.length;
+const forecasts = verification.forecasts.length;
+---
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{title} — Ohio school funding</title>
+    <meta name="description" content={description} />
+    <link rel="canonical" href={new URL(Astro.url.pathname, Astro.site ?? "https://schools.ohio.shawneesmart.systems")} />
+  </head>
+  <body>
+    <header class="site">
+      <div class="site-inner">
+        <a class="brand" href="/">Ohio school funding</a>
+        <nav aria-label="Sections">
+          {
+            NAV.map((entry) => (
+              <a href={entry.href} aria-current={entry.key === section ? "page" : undefined}>
+                {entry.label}
+              </a>
+            ))
+          }
+        </nav>
+        <form class="site-search" action="/search" method="get" role="search">
+          <label class="vh" for="q">Search districts and the corpus</label>
+          <input id="q" name="q" type="search" placeholder="District or concept…" autocomplete="off" />
+        </form>
+        <button id="theme" type="button" class="ghost" aria-label="Switch colour theme">◐</button>
+      </div>
+    </header>
+
+    <main class={wide ? "wrap wide" : "wrap"}>
+      <slot />
+    </main>
+
+    <footer class="site">
+      <div class={wide ? "wrap wide" : "wrap"}>
+        <p>
+          {
+            forecastable
+              ? `Formula verified at build against ${checkpoints} reference scenarios and ${forecasts} reference forecasts computed by crates/project.`
+              : `Formula verified at build against ${checkpoints} reference scenarios. The projection check did not pass, so no band is drawn.`
+          }{" "}
+          <a href="/method">How these figures are made</a> · <a href="/data">Download the data</a>
+        </p>
+        <p>{bundle.provenance}</p>
+        <p>Bundle contract {bundle.contract_version}. FY{bundle.fiscal_year} model.</p>
+      </div>
+    </footer>
+
+    <div id="tip" hidden></div>
+    <script>
+      import "../scripts/site.ts";
+    </script>
+  </body>
+</html>

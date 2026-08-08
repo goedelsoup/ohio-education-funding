@@ -6,11 +6,20 @@
  * checkpoints in the feed. See `verify.ts`.
  */
 
-import { bin, divergingHistogram, fanChart, type FanPoint } from "./chart.ts";
+import { bin, type FanPoint } from "./chart.ts";
+import { renderToString } from "./plot/client.ts";
+import { fanSpec, histogramSpec } from "./plot/spec.ts";
 import { count, escapeHtml, millions, money, pct, signedMoney } from "./format.ts";
-import { applyAll, currentLaw, totals, type Outcome, type Policy } from "./policy.ts";
+import {
+  applyAll,
+  currentFormulaAid,
+  currentLaw,
+  totals,
+  type Outcome,
+  type Policy,
+} from "./policy.ts";
 import { forecastPath, growthPrior } from "./project.ts";
-import type { Bundle } from "./types.ts";
+import type { Panel } from "./types.ts";
 
 /**
  * The default horizon, in years past the last observation.
@@ -80,63 +89,6 @@ function isCurrentLaw(levers: Levers, model: number): boolean {
   );
 }
 
-/** The controls. Rendered once; their values are read on every change. */
-export function renderControls(model: number, projection: ProjectionControl): string {
-  const slider = (
-    id: string,
-    label: string,
-    min: number,
-    max: number,
-    step: number,
-    value: number,
-    note: string,
-  ) => `
-    <div class="lever">
-      <label for="${id}">${escapeHtml(label)} <output id="${id}-out"></output></label>
-      <input type="range" id="${id}" min="${min}" max="${max}" step="${step}" value="${value}">
-      <div class="n">${note}</div>
-    </div>`;
-
-  return `
-    <div class="levers">
-      <div class="lever">
-        <label for="lv-guarantee">Temporary transitional aid guarantee</label>
-        <select id="lv-guarantee">
-          <option value="as-enacted">As enacted — hold at FY2020</option>
-          <option value="phase-out">Phase out</option>
-          <option value="rebase">Re-base the FY2020 floor</option>
-          <option value="removed">Remove entirely</option>
-        </select>
-        <div class="n">294 districts are held above what the formula computes for them.</div>
-      </div>
-      ${slider("lv-arg", "Guarantee retained", 0, 1, 0.05, 0.5, "Applies to phase-out and re-base.")}
-      ${slider("lv-base", "Base cost", 0.8, 1.3, 0.01, 1, "A refresh of the FY2022 cost inputs is roughly +3%.")}
-      ${slider("lv-min", "Minimum state share", 0.05, 0.3, 0.01, model, `Current model: ${pct(model, 0)}. The plan was enacted with 5%.`)}
-      ${slider("lv-phase", "Phase-in, base cost", 0, 1, 0.05, 1, "Fraction of computed base cost aid appropriated.")}
-      ${slider("lv-phase-cat", "Phase-in, categoricals", 0, 1, 0.05, 1, "Separate because Ohio's were: DPIA was phased in at 0% while the headline was 16.67%.")}
-      ${
-        projection.available
-          ? slider(
-              "lv-horizon",
-              "Project enrollment to",
-              projection.baseYear,
-              projection.maxYear,
-              1,
-              projection.baseYear + DEFAULT_HORIZON_YEARS,
-              `FY${projection.baseYear} is the last observed year — leave it there for no forecast.`,
-            )
-          : ""
-      }
-    </div>`;
-}
-
-/** What the horizon control needs to know about the feed it is offering years from. */
-export interface ProjectionControl {
-  available: boolean;
-  baseYear: number;
-  maxYear: number;
-}
-
 function affectedTable(outcomes: Outcome[]): string {
   const moved = outcomes
     .filter((o) => Math.abs(o.delta) > 0.5)
@@ -181,7 +133,7 @@ function range(low: number, high: number): string {
  * that adds the two together — a combined number would inherit the forecast's error while
  * wearing the simulation's precision.
  */
-export function renderProjection(bundle: Bundle, levers: Levers): string {
+export function renderProjection(bundle: Panel, levers: Levers): string {
   const meta = bundle.projection;
   if (!meta) return "";
   const model = bundle.statewide.minimum_state_share;
@@ -259,14 +211,14 @@ export function renderProjection(bundle: Bundle, levers: Levers): string {
             FY${seam.fiscalYear}</div></div>
       </div>
 
-      <div class="chartwrap" data-chart="fan">${fanChart(
+      <div class="chartwrap" data-chart="fan">${renderToString(fanSpec(
         points,
         (v) => millions(v).replace("+", ""),
         (p) =>
           p.observed
             ? `FY${p.year}: ${millions(p.point).replace("+", "")} at published enrollment — exact`
             : `FY${p.year}: ${range(p.low, p.high)}, central ${millions(p.point).replace("+", "")}`,
-      )}</div>
+      ))}</div>
       <div class="legend">
         <span><i class="sw solid"></i> Observed enrollment, exact</span>
         <span><i class="sw anchor"></i> Last observed year</span>
@@ -290,8 +242,115 @@ export function renderProjection(bundle: Bundle, levers: Levers): string {
     </div>`;
 }
 
+/**
+ * The same levers, answered for one district.
+ *
+ * # Why this is not just the statewide table filtered to one row
+ *
+ * "What does this do to us" and "who does this reach" are different questions and the second one
+ * is the one a policy argument turns on. A district page that showed only its own delta would let
+ * a reader conclude a change is good because it is good for them, which is precisely the
+ * reasoning the statewide incidence view exists to interrupt. So this card leads with the
+ * district's own figure and then states, in the same card, how many districts move the other way
+ * — and links to the distribution rather than summarising it away.
+ */
+export function renderDistrictScenario(bundle: Panel, levers: Levers, irn: string): string {
+  const model = bundle.statewide.minimum_state_share;
+  const district = bundle.districts.find((d) => d.irn === irn);
+  if (!district) {
+    return `<div class="card err"><p>No district with IRN ${escapeHtml(irn)} is in this feed.</p></div>`;
+  }
+
+  const outcomes = applyAll(bundle.districts, toPolicy(levers), model);
+  const t = totals(outcomes);
+  const mine = outcomes.find((o) => o.irn === irn)!;
+
+  if (isCurrentLaw(levers, model)) {
+    return `<div class="card">
+      <h2>Current law</h2>
+      <p class="note">These are the settings the department's own FY${bundle.fiscal_year} model
+        uses, so nothing moves. ${escapeHtml(district.name)} receives
+        ${money(mine.realizedAid)}${
+          district.on_guarantee
+            ? `, of which ${money(mine.guarantee)} is the guarantee holding it above the
+               ${money(mine.formulaAid)} the formula computes`
+            : `, all of it computed by the formula`
+        }. Move a lever.</p>
+    </div>`;
+  }
+
+  // Where this district's change sits among the districts that moved at all. A rank is the honest
+  // way to say "a lot" or "a little": the same dollar figure is a rounding error in Columbus and
+  // a levy in a district of six hundred.
+  const movers = outcomes
+    .filter((o) => Math.abs(o.delta) > 0.5)
+    .sort((a, b) => b.deltaPerPupil - a.deltaPerPupil);
+  const rank = movers.findIndex((o) => o.irn === irn);
+  const moved = Math.abs(mine.delta) > 0.5;
+
+  return `
+    <div class="tiles">
+      <div class="tile"><div class="k">State aid under this scenario</div>
+        <div class="v">${money(mine.realizedAid)}</div>
+        <div class="n">against ${money(mine.baselineRealizedAid)} under current law</div></div>
+      <div class="tile"><div class="k">Change</div>
+        <div class="v ${mine.delta < 0 ? "loss" : mine.delta > 0 ? "gain" : ""}">${signedMoney(mine.delta)}</div>
+        <div class="n">${signedMoney(mine.deltaPerPupil, 2)} per pupil</div></div>
+      <div class="tile"><div class="k">Where it stands</div>
+        <div class="v">${
+          moved ? `${rank + 1} of ${movers.length}` : "unmoved"
+        }</div>
+        <div class="n">${
+          moved
+            ? `districts that move, ranked from largest gain to largest loss`
+            : `this district's funding does not change under these settings`
+        }</div></div>
+    </div>
+
+    <div class="card">
+      <h2>What moved for this district</h2>
+      <div class="scroll"><table><tbody>
+        <tr><th>Formula aid</th>
+            <td>${money(currentFormulaAid(district))} → ${money(mine.formulaAid)}</td></tr>
+        <tr><th>Guarantee</th>
+            <td>${money(district.guarantee)} → ${money(mine.guarantee)}</td></tr>
+        <tr><th>Total state aid</th>
+            <td>${money(mine.baselineRealizedAid)} → ${money(mine.realizedAid)}</td></tr>
+        <tr><th>On the guarantee</th>
+            <td>${district.on_guarantee ? "yes" : "no"} → ${mine.onGuarantee ? "yes" : "no"}</td></tr>
+      </tbody></table></div>
+      <p class="note">${
+        district.on_guarantee && !mine.onGuarantee
+          ? `<strong>This scenario moves the district onto the formula.</strong> Its aid is now
+             what the formula computes for it rather than what it received in FY2020.`
+          : mine.onGuarantee && !district.on_guarantee
+            ? `<strong>This scenario moves the district onto the guarantee.</strong> The formula
+               now computes less for it than the FY2020 baseline, and the guarantee makes up the
+               difference.`
+            : `The district's relationship to the guarantee is unchanged by these settings.`
+      }</p>
+    </div>
+
+    <div class="card">
+      <h2>And to everyone else</h2>
+      <div class="scroll"><table><tbody>
+        <tr><th>Districts reached</th><td>${t.gainers + t.losers} of ${t.districts}</td></tr>
+        <tr><th>Up</th><td>${t.gainers}</td></tr>
+        <tr><th>Down</th><td>${t.losers}</td></tr>
+        <tr><th>Unmoved</th><td>${t.unmoved}</td></tr>
+        <tr><th>Cost to the state</th><td class="${t.cost > 0 ? "gain" : t.cost < 0 ? "loss" : ""}">${millions(t.cost)}</td></tr>
+      </tbody></table></div>
+      <p class="note">A change that helps this district is not thereby a good change, and the
+        count above is the reason: ${t.losers} district${t.losers === 1 ? "" : "s"} ${
+          t.losers === 1 ? "receives" : "receive"
+        } less under these settings. <a href="/scenario">The distribution across all
+        ${t.districts}</a> — who gains, who loses, and how that falls across property wealth — is
+        the statewide view.</p>
+    </div>`;
+}
+
 /** Run the levers and render the result. */
-export function renderScenario(bundle: Bundle, levers: Levers): string {
+export function renderScenario(bundle: Panel, levers: Levers): string {
   const model = bundle.statewide.minimum_state_share;
   if (isCurrentLaw(levers, model)) {
     return `<div class="card">
@@ -329,10 +388,10 @@ export function renderScenario(bundle: Bundle, levers: Levers): string {
       <h2>How the change is distributed</h2>
       ${
         deltas.length > 0
-          ? `<div class="chartwrap" data-chart="deltas">${divergingHistogram(
+          ? `<div class="chartwrap" data-chart="deltas">${renderToString(histogramSpec(
               bin(deltas, 24),
               (v) => signedMoney(v),
-            )}</div>
+            ))}</div>
         <div class="legend">
           <span><i class="sw loss"></i> Aid falls</span>
           <span><i class="sw gain"></i> Aid rises</span>

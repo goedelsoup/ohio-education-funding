@@ -34,7 +34,8 @@ properties:
     Assembly raises base cost, advances the phase-in, or updates cost inputs; falls or
     stagnates otherwise. Caps and guarantees can detach an agency's payment from the formula
     result entirely.
-  series_path: Not yet populated. [open] Target: crates/ data files fed by `dew-foundation`.
+  series_path: |
+    Not yet populated. [open] Target: crates/ data files fed by `dew-foundation`.
 links:
   - target: ../revenue-stream.ont.yml
     relationship: instance-of

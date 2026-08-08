@@ -59,13 +59,132 @@
 
 body {
   margin: 0;
-  padding: 2rem 1.25rem 4rem;
+  padding: 0 0 4rem;
   background: var(--surface-0);
   color: var(--text-primary);
   font: 15px/1.55 ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
 }
 
-.wrap { max-width: 900px; margin: 0 auto; }
+.wrap { max-width: 900px; margin: 0 auto; padding: 0 1.25rem; }
+/* Wider than the reading measure, for the pages that are a table of 609 rows. */
+.wrap.wide { max-width: 1180px; }
+
+/* Screen-reader-only. Used for the radio inputs behind the basis switch and for form labels
+   whose purpose the adjacent control already makes visually obvious. */
+.vh {
+  position: absolute;
+  width: 1px; height: 1px;
+  padding: 0; margin: -1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+  border: 0;
+}
+
+/* The site chrome. Sticky, because the district sub-navigation below it is how a reader moves
+   between the four views of one district and a long finances table should not strand them. */
+header.site {
+  position: sticky;
+  top: 0;
+  z-index: 5;
+  background: var(--surface-1);
+  border-bottom: 1px solid var(--border);
+  margin-bottom: 1.75rem;
+}
+.site-inner {
+  max-width: 1180px;
+  margin: 0 auto;
+  padding: .6rem 1.25rem;
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+.brand { font-weight: 650; letter-spacing: -0.01em; color: var(--text-primary); text-decoration: none; }
+header.site nav { display: flex; gap: .15rem; flex-wrap: wrap; margin-right: auto; }
+header.site nav a {
+  font-size: .85rem;
+  padding: .3rem .6rem;
+  border-radius: 7px;
+  color: var(--text-secondary);
+  text-decoration: none;
+}
+header.site nav a:hover { background: var(--surface-2); color: var(--text-primary); }
+header.site nav a[aria-current="page"] {
+  background: var(--surface-2);
+  color: var(--text-primary);
+  font-weight: 600;
+}
+.site-search input {
+  width: 15rem;
+  max-width: 40vw;
+  font-size: .85rem;
+  padding: .32rem .6rem;
+  border-radius: 999px;
+}
+.ghost {
+  font: inherit;
+  background: none;
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  color: var(--text-secondary);
+  cursor: pointer;
+  padding: .2rem .5rem;
+  line-height: 1.2;
+}
+
+a { color: var(--series-formula); text-decoration-color: color-mix(in srgb, var(--series-formula) 40%, transparent); }
+a:hover { text-decoration-color: currentColor; }
+
+/* The district sub-navigation: four views of one district. A tab row in appearance, real links
+   in fact, because each one is now its own URL. */
+.subnav { display: flex; gap: .4rem; margin: 0 0 1.1rem; flex-wrap: wrap; }
+.subnav a {
+  font-size: .85rem;
+  padding: .4rem .8rem;
+  border-radius: 7px;
+  border: 1px solid var(--border);
+  background: var(--surface-1);
+  color: var(--text-secondary);
+  text-decoration: none;
+}
+.subnav a[aria-current="page"] {
+  background: var(--surface-2);
+  color: var(--text-primary);
+  border-color: var(--accent-rule);
+  font-weight: 600;
+}
+
+/*
+ * The basis switch, with no script behind it: both panels are in the document and a sibling
+ * selector keyed on the checked radio decides which one is shown. See `BasisToggle.astro`.
+ */
+.basis-panel.real { display: none; }
+.basis-scope input[data-basis="real"]:checked ~ .basis-panel.real { display: block; }
+.basis-scope input[data-basis="real"]:checked ~ .basis-panel.nominal { display: none; }
+.basis-scope .basis label {
+  display: inline-block;
+  margin: 0;
+  font-size: .8rem;
+  padding: .3rem .7rem;
+  border-radius: 999px;
+  border: 1px solid var(--border);
+  background: var(--surface-2);
+  color: var(--text-secondary);
+  cursor: pointer;
+}
+.basis-scope input[data-basis="nominal"]:checked ~ .basis label[data-basis="nominal"],
+.basis-scope input[data-basis="real"]:checked ~ .basis label[data-basis="real"] {
+  background: var(--surface-1);
+  color: var(--text-primary);
+  border-color: var(--accent-rule);
+  font-weight: 600;
+}
+/* Keyboard focus has to be visible on the label, because the input it belongs to is off-screen. */
+.basis-scope input:focus-visible ~ .basis label[data-basis="nominal"],
+.basis-scope input:focus-visible ~ .basis label[data-basis="real"] { outline: 2px solid var(--series-formula); outline-offset: 2px; }
+.basis-scope input[data-basis="nominal"]:focus-visible ~ .basis label[data-basis="real"],
+.basis-scope input[data-basis="real"]:focus-visible ~ .basis label[data-basis="nominal"] { outline: none; }
 h1 { font-size: 1.4rem; margin: 0 0 .3rem; letter-spacing: -0.01em; }
 h2 { font-size: .95rem; margin: 0 0 .8rem; letter-spacing: -0.005em; }
 h3 { font-size: .82rem; margin: 1.4rem 0 .6rem; color: var(--text-secondary); font-weight: 600; }
@@ -143,6 +262,10 @@ output { font-variant-numeric: tabular-nums; color: var(--text-primary); font-we
 tr.current th, tr.current td { color: var(--text-primary); font-weight: 600; }
 
 .scroll { overflow-x: auto; }
+/* A table of sentences rather than of quantities: the numeric right-alignment below is wrong for
+   it, and so is the tabular figure width. */
+table.prose td { text-align: left; font-variant-numeric: normal; }
+table.prose th { width: 32%; }
 table { width: 100%; border-collapse: collapse; font-size: .88rem; }
 th, td { text-align: left; padding: .42rem .5rem; border-bottom: 1px solid var(--border); }
 thead th { color: var(--text-muted); font-size: .76rem; text-transform: uppercase; letter-spacing: .04em; }
@@ -156,20 +279,20 @@ tbody tr:last-child th, tbody tr:last-child td { border-bottom: 0; }
 .marker { position: absolute; top: -3px; width: 3px; height: 14px; border-radius: 2px; background: var(--text-primary); }
 .scale { display: flex; justify-content: space-between; font-size: .74rem; color: var(--text-muted); }
 
-/* Charts. Marks are thin, axes recessive, text wears text tokens rather than series color. */
+/*
+ * Charts. Marks are thin, axes recessive, text wears text tokens rather than series color.
+ *
+ * The marks are drawn by Observable Plot at build time — see `src/lib/plot/` — so every color in
+ * the emitted SVG is a `var(--…)` reference resolved here rather than a baked hex. That is what
+ * lets a static chart follow the theme without being re-rendered. Plot puts each mark's class on
+ * its group, so these rules address `.class > *` where they need the shape itself.
+ */
 .chartwrap { overflow-x: auto; }
-.chart { width: 100%; height: auto; display: block; }
-.bar-fill { fill: var(--series-formula); }
-.bar-label { font-size: 12px; fill: var(--text-secondary); }
-.bar-value { font-size: 12px; fill: var(--text-primary); font-variant-numeric: tabular-nums; }
-.hist { fill: var(--neutral-mark); }
-.hist.gain { fill: var(--series-formula); }
-.hist.loss { fill: var(--series-guarantee); }
+.chart, svg.plot { width: 100%; height: auto; display: block; }
+.bar-value { font-variant-numeric: tabular-nums; }
 .axis { stroke: var(--accent-rule); stroke-width: 1; }
-.zero { stroke: var(--text-muted); stroke-width: 1; stroke-dasharray: 3 3; }
-.axis-label { font-size: 11px; fill: var(--text-muted); }
-.bar-row { cursor: default; }
-.bar-row:hover .bar-fill, .bar-row:hover .hist { filter: brightness(1.12); }
+.bar-fill > *, .hist > * { cursor: default; }
+.bar-fill > *:hover, .hist > *:hover { filter: brightness(1.12); }
 
 /*
  * The fan chart. The band is the subject here, not shading behind a line, so it gets a fill AND
@@ -177,18 +300,12 @@ tbody tr:last-child th, tbody tr:last-child td { border-bottom: 0; }
  * band rather than as the answer with error bars around it. Both bounds are direct-labelled and
  * the point is not — see `fanChart` in chart.ts.
  */
-.fan-band { fill: var(--series-formula); fill-opacity: .16; }
-.fan-edge { fill: none; stroke: var(--series-formula); stroke-width: 2; }
-.fan-mid { fill: none; stroke: var(--series-formula); stroke-width: 2; stroke-dasharray: 5 4; }
-/* Measurement, not estimate: solid, and outside the band. */
-.fan-observed { fill: none; stroke: var(--series-formula); stroke-width: 2; }
-/* The second series, in the contrasting hue of the validated pair. Never a generated colour. */
-.fan-reference { fill: none; stroke: var(--series-guarantee); stroke-width: 2; }
-.fan-bound.reference { fill: var(--series-guarantee); }
-.fan-anchor { fill: var(--surface-1); stroke: var(--series-formula); stroke-width: 2; }
-.fan-bound { font-size: 12px; fill: var(--text-primary); font-variant-numeric: tabular-nums; }
-.fan-hit { fill: transparent; }
-.fan-hit:hover { fill: var(--text-primary); fill-opacity: .05; }
+.fan-edge, .fan-mid, .fan-observed, .fan-reference { stroke-width: 2; }
+.fan-mid { stroke-dasharray: 5 4; }
+.fan-bound { font-variant-numeric: tabular-nums; }
+/* One full-height column per year: the hit target is the strip, not the 2px line inside it. */
+.fan-hit > * { fill: transparent; }
+.fan-hit > *:hover { fill: var(--text-primary); fill-opacity: .05; }
 
 .tile.wide { grid-column: span 2; }
 /* A range is two numbers and has to stay one line's worth of thought, so it sets a shade
@@ -254,5 +371,110 @@ tbody tr:last-child th, tbody tr:last-child td { border-bottom: 0; }
 .levers { display: grid; grid-template-columns: repeat(auto-fit, minmax(230px, 1fr)); gap: .9rem; }
 .lever .n { font-size: .74rem; color: var(--text-muted); margin-top: .25rem; }
 
+/*
+ * The wiki.
+ *
+ * Corpus prose is long-form and argumentative in a way nothing else on this site is, so it gets a
+ * reading measure and real paragraph rhythm rather than the compact card type the data pages use.
+ */
+.crumb { font-size: .8rem; color: var(--text-muted); margin: 0 0 .5rem; }
+.crumb a { color: var(--text-secondary); }
+.prose-body { font-size: .93rem; }
+.prose-body > *:first-child { margin-top: 0; }
+.prose-body > *:last-child { margin-bottom: 0; }
+.prose-body p { margin: 0 0 .95rem; max-width: 68ch; }
+.prose-body li { max-width: 66ch; margin-bottom: .3rem; }
+.prose-body h2, .prose-body h3 { margin: 1.5rem 0 .6rem; }
+.prose-body code {
+  background: var(--surface-2);
+  padding: .08rem .28rem;
+  border-radius: 4px;
+  font-size: .9em;
+  /* The corpus cites code by path — `crates/dispersion/tests/report_card_2425.rs` — which is one
+     unbreakable token wider than a phone. Without this it pushes the whole document sideways. */
+  overflow-wrap: anywhere;
+}
+/* A fenced block scrolls inside itself rather than widening the page. */
+.prose-body pre {
+  overflow-x: auto;
+  background: var(--surface-2);
+  padding: .7rem .85rem;
+  border-radius: 8px;
+  font-size: .85rem;
+}
+.prose-body pre code { background: none; padding: 0; overflow-wrap: normal; }
+.prose-body blockquote {
+  margin: 0 0 .95rem;
+  padding-left: .9rem;
+  border-left: 2px solid var(--border);
+  color: var(--text-secondary);
+}
+.prose-body table { margin-bottom: .95rem; }
+.prose-body td { text-align: left; font-variant-numeric: normal; }
+
+/*
+ * Claim tags. The corpus marks every substantive assertion with its epistemic status, and that
+ * discipline is the reason it is worth reading — so the badge is legible rather than decorative.
+ *
+ * Colour alone never carries the distinction: each badge spells its own status. Verified and open
+ * are the two that matter most to tell apart, and they are also the two furthest apart in weight.
+ */
+.claim {
+  display: inline;
+  font-size: .74em;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: .04em;
+  padding: .05em .4em;
+  border-radius: 4px;
+  border: 1px solid var(--border);
+  background: var(--surface-2);
+  color: var(--text-muted);
+  white-space: nowrap;
+}
+.claim.verified { color: var(--series-formula); border-color: color-mix(in srgb, var(--series-formula) 35%, transparent); }
+.claim.open { color: var(--series-guarantee); border-color: color-mix(in srgb, var(--series-guarantee) 35%, transparent); }
+/* The justification, which is often a sentence. Kept out of the flow of the claim it qualifies
+   and shown on the badge itself, because inline it would dominate the sentence it belongs to. */
+.claim-detail {
+  font-weight: 400;
+  text-transform: none;
+  letter-spacing: 0;
+  color: var(--text-muted);
+  white-space: normal;
+}
+
 footer { color: var(--text-muted); font-size: .78rem; margin-top: 1.5rem; }
 footer p { margin: .35rem 0; }
+footer.site { border-top: 1px solid var(--border); padding-top: 1.1rem; margin-top: 2.5rem; }
+
+/*
+ * The district index. 609 rows is too many to scroll and too few to paginate, so it filters in
+ * the browser — and the filter is progressive: with no script the whole table is present and a
+ * reader uses the browser's own find. Nothing is hidden behind the control that is not in the
+ * document.
+ */
+.filters { display: flex; gap: .6rem; flex-wrap: wrap; align-items: flex-end; margin-bottom: 1rem; }
+.filters .field { display: flex; flex-direction: column; gap: .2rem; }
+.filters label { margin: 0; }
+.filters input, .filters select { width: auto; min-width: 11rem; font-size: .85rem; padding: .35rem .55rem; }
+.filters .count { font-size: .8rem; color: var(--text-muted); padding-bottom: .45rem; }
+#district-table td { text-align: right; }
+#district-table th[scope="row"] { text-align: left; font-weight: 500; }
+#district-table th[scope="row"] a { color: var(--text-primary); text-decoration-color: var(--border); }
+#district-table tr[hidden] { display: none; }
+/* A sort control is a button in a header cell, so it is reachable by keyboard and announces. */
+#district-table thead button {
+  font: inherit;
+  font-size: .76rem;
+  text-transform: uppercase;
+  letter-spacing: .04em;
+  color: var(--text-muted);
+  background: none;
+  border: 0;
+  padding: 0;
+  cursor: pointer;
+}
+#district-table thead button[aria-sort]::after { content: " ↕"; opacity: .45; }
+#district-table thead button[aria-sort="ascending"]::after { content: " ↑"; opacity: 1; }
+#district-table thead button[aria-sort="descending"]::after { content: " ↓"; opacity: 1; }

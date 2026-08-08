@@ -1,0 +1,54 @@
+---
+/**
+ * One box over the districts, the corpus and the sources.
+ *
+ * A route rather than only a header control, so a search can be linked and so the header's box has
+ * somewhere to submit to when scripting is off. With scripting on it filters as you type.
+ */
+import Base from "../layouts/Base.astro";
+import { loadCorpus } from "../lib/corpus.ts";
+import { loadFeed } from "../lib/feed.ts";
+import { count } from "../lib/format.ts";
+
+const { bundle } = loadFeed();
+const corpus = loadCorpus();
+---
+
+<Base
+  title="Search"
+  description="Search Ohio's school districts, the funding corpus, and the sources behind it."
+  section="districts"
+>
+  <h1>Search</h1>
+  <p class="sub">
+    {count(bundle.statewide.districts)} districts, {corpus.nodes.length} corpus nodes and {
+      corpus.sources.length
+    } sources. Type a district name, an IRN, or a concept.
+  </p>
+
+  <div class="card">
+    <form class="filters" id="search-form" role="search" onsubmit="return false">
+      <div class="field">
+        <label for="s-q">Search</label>
+        <input id="s-q" name="q" type="search" autocomplete="off" placeholder="Cleveland, 043786, guarantee, H.B. 920…" />
+      </div>
+      <p class="count" id="s-count" aria-live="polite"></p>
+    </form>
+  </div>
+
+  <div id="search-out"></div>
+
+  <noscript>
+    <div class="card">
+      <p class="note">
+        Searching needs JavaScript. Without it, the lists are still browsable in full:
+        <a href="/districts">every district</a>, <a href="/wiki">the corpus by class</a>, and
+        <a href="/wiki/source">every source</a>.
+      </p>
+    </div>
+  </noscript>
+
+  <script>
+    import "../scripts/search.ts";
+  </script>
+</Base>

@@ -8,6 +8,8 @@
     "build": "astro build",
     "preview": "astro preview",
     "check": "astro check",
+    "schemas": "node scripts/schemas.ts",
+    "corpus:report": "node scripts/corpus-report.ts",
     "test": "pnpm test:unit && pnpm test:e2e",
     "test:unit": "vitest run",
     "test:watch": "vitest",
@@ -15,12 +17,19 @@
   },
   "devDependencies": {
     "@astrojs/check": "^0.9.10",
+    "@astrojs/markdown-remark": "^7.2.2",
+    "@astrojs/sitemap": "^3.7.3",
     "@playwright/test": "^1.62.1",
     "@types/node": "^26.1.2",
     "astro": "^7.2.0",
+    "linkedom": "^0.18.13",
     "typescript": "^6.0.3",
     "vite": "^8.2.1",
-    "vitest": "^4.1.10"
+    "vitest": "^4.1.10",
+    "yaml": "^2.9.0"
   },
-  "packageManager": "pnpm@11.13.1"
+  "packageManager": "pnpm@11.13.1",
+  "dependencies": {
+    "@observablehq/plot": "^0.6.17"
+  }
 }

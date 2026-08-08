@@ -1,0 +1,65 @@
+---
+/**
+ * One catalog entry: a source the corpus cites, and every node that cites it.
+ *
+ * Provenance carries more weight in this domain than in most. A funding figure is only useful if
+ * a reader can tell whether it came from a department payment report, a Legislative Service
+ * Commission estimate made before the fiscal year closed, or a district's own five-year forecast
+ * — three numbers that describe the same thing and routinely disagree.
+ *
+ * The "cited by" list is the half of that a file on disk does not have. It is scraped from the
+ * prose rather than from a `used-by` field, because that is where citations actually live.
+ */
+import Base from "../../../layouts/Base.astro";
+import { loadCorpus } from "../../../lib/corpus.ts";
+import { renderProse } from "../../../lib/prose.ts";
+
+export function getStaticPaths() {
+  return loadCorpus().sources.map((source) => ({
+    params: { slug: source.slug },
+    props: { source },
+  }));
+}
+
+const { source } = Astro.props;
+// Catalog entries link out to the corpus with paths relative to `catalog/`, which sits beside
+// `corpus/` — so a target like `../corpus/metric/performance-index.yml` resolves on the class
+// segment of its own path rather than on any node's class.
+const body = await renderProse(source.body, "");
+---
+
+<Base
+  title={source.title}
+  description={`${source.title} — a source behind the Ohio school funding corpus, cited by ${source.citedBy.length} node${source.citedBy.length === 1 ? "" : "s"}.`}
+  section="wiki"
+>
+  <p class="crumb"><a href="/wiki">The corpus</a> › <a href="/wiki/source">Sources</a></p>
+  <h1>{source.title}</h1>
+  <p class="sub">
+    <code>{source.slug}</code> · cited by {source.citedBy.length} node{
+      source.citedBy.length === 1 ? "" : "s"
+    }
+  </p>
+
+  <div class="card prose-body"><Fragment set:html={body} /></div>
+
+  <div class="card">
+    <h2>Cited by</h2>
+    {
+      source.citedBy.length === 0 ? (
+        <p class="note">
+          No corpus node cites this source yet. The catalog treats that as a gap: an entry nothing
+          reaches is provenance for nothing.
+        </p>
+      ) : (
+        <div class="flags">
+          {source.citedBy.map((node) => (
+            <a class="flag" href={node.href}>
+              {node.label}
+            </a>
+          ))}
+        </div>
+      )
+    }
+  </div>
+</Base>

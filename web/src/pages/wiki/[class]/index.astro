@@ -1,0 +1,134 @@
+---
+/**
+ * One ontology class: the nodes in it, and the schema they are instances of.
+ *
+ * The class page and the class *definition* are the same page on purpose. The corpus's ontology
+ * files say what a kind of thing is, which properties it may carry and which relationships it may
+ * enter into — and that is exactly the context a reader needs while looking at a list of its
+ * instances. Splitting them would make the schema a page nobody arrives at.
+ */
+import Base from "../../../layouts/Base.astro";
+import { loadCorpus } from "../../../lib/corpus.ts";
+import { renderProse } from "../../../lib/prose.ts";
+import * as routes from "../../../lib/routes.ts";
+
+export function getStaticPaths() {
+  return loadCorpus().classes.map((entry) => ({
+    params: { class: entry.className },
+    props: { entry },
+  }));
+}
+
+const { entry } = Astro.props;
+const description = await renderProse(entry.description, entry.className);
+const summary = entry.description.split("\n").join(" ").trim();
+---
+
+<Base
+  title={entry.label}
+  description={summary.slice(0, 200)}
+  section="wiki"
+>
+  <p class="crumb"><a href="/wiki">The corpus</a></p>
+  <h1>{entry.label}</h1>
+  <p class="sub">
+    {entry.nodes.length} node{entry.nodes.length === 1 ? "" : "s"}{
+      entry.foundationalType ? ` · ${entry.foundationalType}` : ""
+    }
+  </p>
+
+  <div class="card prose-body"><Fragment set:html={description} /></div>
+
+  <div class="card">
+    <h2>Nodes</h2>
+    <div class="scroll">
+      <table class="prose">
+        <tbody>
+          {
+            entry.nodes.map((node) => (
+              <tr>
+                <th>
+                  <a href={routes.wikiNode(node.className, node.name)}>{node.label}</a>
+                </th>
+                <td>
+                  {node.description.replace(/\s+/g, " ").replace(/\[[^\]]*\]\([^)]*\)/g, "").slice(0, 150).trim()}…
+                </td>
+              </tr>
+            ))
+          }
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  {
+    entry.properties.length > 0 && (
+      <div class="card">
+        <h2>Properties</h2>
+        <p class="note">What a {entry.label.toLowerCase()} may carry.</p>
+        <div class="scroll">
+          <table class="prose">
+            <thead>
+              <tr>
+                <th>Property</th>
+                <th>Type</th>
+                <th>Meaning</th>
+              </tr>
+            </thead>
+            <tbody>
+              {entry.properties.map((property) => (
+                <tr>
+                  <th>
+                    <code>{property.name}</code>
+                  </th>
+                  <td>{property.type}</td>
+                  <td>{property.description}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    )
+  }
+
+  {
+    entry.edges.length > 0 && (
+      <div class="card">
+        <h2>Relationships</h2>
+        <p class="note">
+          The edges this class may enter into. <em>Out</em> is declared by the node itself; <em>in</em>
+          is declared by the node at the other end.
+        </p>
+        <div class="scroll">
+          <table class="prose">
+            <thead>
+              <tr>
+                <th>Relationship</th>
+                <th>To</th>
+                <th>Meaning</th>
+              </tr>
+            </thead>
+            <tbody>
+              {entry.edges.map((edge) => (
+                <tr>
+                  <th>
+                    <code>{edge.relationship}</code> <span class="n">{edge.direction}</span>
+                  </th>
+                  <td>
+                    {loadCorpus().byClass.has(edge.target) ? (
+                      <a href={routes.wikiClass(edge.target)}>{edge.target}</a>
+                    ) : (
+                      edge.target
+                    )}
+                  </td>
+                  <td>{edge.description}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    )
+  }
+</Base>

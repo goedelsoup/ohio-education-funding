@@ -1,0 +1,239 @@
+---
+/**
+ * Where the figures come from, how they are checked, and what is deliberately not here.
+ *
+ * This site's whole posture is that a reader can check it. That argument previously lived only in
+ * the repository's README files, which is to say it was available to contributors and to nobody
+ * else. It is a page now.
+ */
+import Base from "../layouts/Base.astro";
+import { loadCorpus } from "../lib/corpus.ts";
+import { loadFeed } from "../lib/feed.ts";
+import { count, millions, pct } from "../lib/format.ts";
+
+const { bundle, verification, forecastable } = loadFeed();
+const corpus = loadCorpus();
+const s = bundle.statewide;
+const meta = bundle.projection;
+---
+
+<Base
+  title="Method"
+  description={`How the figures on this site are produced: the department's own FY${bundle.fiscal_year} model, re-run and checked against ${verification.comparisons.length} reference scenarios before the site is allowed to build.`}
+  section="method"
+>
+  <h1>Method</h1>
+  <p class="sub">
+    Where every figure comes from, what checks it passed to get here, and what this site
+    deliberately does not show.
+  </p>
+
+  <div class="card">
+    <h2>The formula is computed twice, on purpose</h2>
+    <p class="note">
+      Ohio's Fair School Funding Plan is implemented in this repository twice: once in Rust, in
+      <code>crates/foundation</code> and <code>crates/project</code>, and once in TypeScript, in
+      <code>src/lib/policy.ts</code>. Two implementations of one formula is normally a bad trade —
+      they drift, and the one nobody runs is the one that is wrong.
+    </p>
+    <p class="note">
+      What makes it acceptable is that <strong>the Rust is authoritative and the TypeScript has to
+      prove it agrees</strong>. The feed carries {verification.comparisons.length} scenarios and {
+        verification.forecasts.length
+      } forecasts computed by the Rust, and the TypeScript must reproduce every one of them —
+      against the real {count(s.districts)}-district panel, to within a dollar across seven
+      billion — before this site is allowed to build. It reproduced all of them for this build.
+    </p>
+    <p class="note">
+      That is not a formality. Wiring the check up found a bug <em>in the Rust</em>: a district
+      pulled below a raised minimum state share was taking the branch meant for districts already
+      on the floor, and having its published share scaled by the ratio of the minimums instead of
+      by the floor itself. It was worth $4.7 million, and 273 Rust tests did not catch it, because
+      the wrong answer is still an increase and still confined to districts below the new floor.
+      The second implementation disagreed, and the disagreement was the signal.
+    </p>
+    <p class="note">
+      The check runs in two places for two different reasons. At <strong>build</strong> it is a
+      gate: it fails the build, so a drifted formula is never published. On <strong
+        ><a href="/scenario">the scenario routes</a></strong
+      > it runs again in the browser, against the panel actually served — because that file can be
+      replaced without a rebuild, and a check that only ran where the answer was already known
+      would be decorative.
+    </p>
+  </div>
+
+  <div class="card">
+    <h2>What is a model, and what is a record</h2>
+    <div class="scroll">
+      <table class="prose">
+        <tbody>
+          <tr>
+            <th>The funding figures</th>
+            <td>
+              A <strong>model</strong>. The department's FY{bundle.fiscal_year} TRAD State
+              Foundation Funding Calculator, re-run here rather than quoted. It is a projection of
+              what districts will be paid, not a record of what they were.
+            </td>
+          </tr>
+          <tr>
+            <th>The five-year forecast figures</th>
+            <td>
+              A <strong>record</strong>. Audited actuals from each district's own filing — money
+              that changed hands. These are the only figures on this site that are not computed,
+              which is why they have <a href="/districts">their own route per district</a> and are
+              never placed as a check on the model. The two are differently constructed and are not
+              comparable line for line.
+            </td>
+          </tr>
+          <tr>
+            <th>The outcome figures</th>
+            <td>
+              A <strong>measurement</strong>, of pupils and not of districts. The 2024-25 Ohio
+              School Report Card. Every association drawn from it is a correlation over {
+                s.outcomes ? count(s.outcomes.districts) : "—"
+              } districts and none of them identifies an effect. <a href="/outcomes">Why that
+              matters here in particular</a>.
+            </td>
+          </tr>
+          <tr>
+            <th>The projection</th>
+            <td>
+              A <strong>forecast</strong>, and the only thing on this site that is. Enrollment is
+              carried forward by a damped trend and the formula is re-run at it; nothing projects
+              the formula, the appropriation, or assessed valuation. Its interval is drawn as the
+              headline rather than as a disclaimer, for reasons below.
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <div class="card">
+    <h2>Why the forecast leads with a range</h2>
+    <p class="note">
+      A forecast rendered as "$7.13B (±3.4%)" is read as $7.13B. The interval becomes a disclaimer
+      the eye skips, which is worse than showing no interval at all, because it lends a forecast
+      the authority of a measurement. So the tile's large number is the <strong>range</strong> and
+      the central estimate is the small line underneath, labelled as one path through the band. In
+      the chart the band is a mark rather than shading, its centre line is dashed, only the two
+      bounds are direct-labelled, and the y axis — truncated, because a band a few percent wide is
+      invisible against a zero baseline — says so on its face.
+    </p>
+    <p class="note">
+      The band is <strong>not</strong> any district's own historical variability; three
+      observations cannot give that. It is the {meta ? meta.prior_source : "cross-sectional spread"}
+      {meta ? `, σ = ${pct(meta.sigma, 2)} a year` : ""}, widened by the square root of the horizon
+      because growth errors compound. Both ends are computed by re-running the whole formula at
+      that enrollment rather than by scaling the middle: the guarantee is a <code>max</code>, and a
+      district can be on formula at one end of the band and on the guarantee at the other.
+    </p>
+    <p class="note">
+      The forecast card is always below the simulation and is never merged with it, and there is
+      deliberately no figure anywhere on this site that adds them together. Re-running the formula
+      with a lever moved is exact; projecting enrollment six years out is not, and a combined
+      number would inherit the second's error while wearing the first's precision.
+    </p>
+  </div>
+
+  <div class="card">
+    <h2>Provenance</h2>
+    <p class="note">{bundle.provenance}</p>
+    <div class="scroll">
+      <table class="prose">
+        <tbody>
+          <tr><th>Bundle contract</th><td>{bundle.contract_version}</td></tr>
+          <tr><th>Districts in the model</th><td>{count(s.districts)}</td></tr>
+          <tr>
+            <th>Reference scenarios reproduced</th>
+            <td>{verification.comparisons.length} of {verification.comparisons.length}</td>
+          </tr>
+          <tr>
+            <th>Reference forecasts reproduced</th>
+            <td>
+              {forecastable
+                ? `${verification.forecasts.length} of ${verification.forecasts.length}`
+                : "check did not pass — no band is drawn on this build"}
+            </td>
+          </tr>
+          <tr><th>Price index</th><td>{bundle.deflator?.label ?? "none"}</td></tr>
+          <tr>
+            <th>Corpus</th>
+            <td>
+              {corpus.nodes.length} nodes, {corpus.classes.length} classes,{" "}
+              {corpus.sources.length} <a href="/wiki/source">sources</a>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+    <p class="note">
+      Every source the corpus draws on is listed at <a href="/wiki/source">/wiki/source</a>, and
+      the feed itself is downloadable at <a href="/data">/data</a>. Thirteen of the retrieved files
+      are pinned by SHA-256 in the repository, so a claim can be traced to a byte-identical copy of
+      the publication it came from.
+    </p>
+  </div>
+
+  <div class="card">
+    <h2>What is not here</h2>
+    <div class="scroll">
+      <table class="prose">
+        <tbody>
+          <tr>
+            <th>Year-over-year funding</th>
+            <td>
+              The department publishes one foundation calculator at a time and replaces rather than
+              archives it, so no FY{bundle.fiscal_year - 1} per-district payment figure exists in
+              this repository to compare against. What the district pages show instead is the FY{
+                bundle.fiscal_year
+              } formula held fixed and run at each of three enrollment years, which isolates the
+              enrollment channel exactly — something two years of published totals could not do,
+              because the formula moved between them too.
+            </td>
+          </tr>
+          <tr>
+            <th>The regime history</th>
+            <td>
+              Walking the numbers from the Foundation Program through to the Fair School Funding
+              Plan needs a historical series the corpus does not yet have. The regimes themselves
+              are documented — <a href="/wiki/funding-regime">five of them</a> — but without
+              per-district figures attached.
+            </td>
+          </tr>
+          <tr>
+            <th>Property values under a scenario</th>
+            <td>
+              Assessed valuation is held fixed in every scenario. Local capacity is 60% valuation,
+              so a proposal that moves property values is out of reach: the corpus has one
+              observation per district and cannot project it.
+            </td>
+          </tr>
+          <tr>
+            <th>Community schools and scholarships</th>
+            <td>
+              The deduction that routes money from a resident district to a community school or a
+              scholarship is not modelled here. The {count(s.districts)} districts in this feed are
+              the traditional districts in the state's own calculator.
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <div class="card">
+    <h2>Checking it yourself</h2>
+    <p class="note">
+      Everything here is reproducible from the repository. The feed is regenerated with one
+      command, the site is built with a second, and continuous integration diffs the committed feed
+      against a fresh one so the two cannot silently disagree.
+    </p>
+    <p class="note">
+      Total state foundation aid in this model is{" "}
+      {millions(s.realized_aid_total).replace("+", "")} across {count(s.districts)} districts, of which {millions(s.guarantee_total).replace("+", "")}
+      {" "}is paid by the guarantee to {s.on_guarantee} districts. If a figure on this site
+      disagrees with the department's own, that is a defect and the repository is where to file it.
+    </p>
+  </div>
+</Base>

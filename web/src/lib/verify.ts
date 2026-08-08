@@ -13,7 +13,7 @@
 import { apply, totals, type GuaranteeRule, type Policy } from "./policy.ts";
 import { forecast, growthPrior } from "./project.ts";
 import type {
-  Bundle,
+  Panel,
   Checkpoint,
   ForecastCheckpoint,
   PolicyShape,
@@ -56,7 +56,7 @@ export function toPolicy(shape: PolicyShape): Policy {
 }
 
 /** Run one checkpoint's policy and compare every reported field. */
-export function compare(bundle: Bundle, checkpoint: Checkpoint): Comparison {
+export function compare(bundle: Panel, checkpoint: Checkpoint): Comparison {
   const model = bundle.statewide.minimum_state_share;
   const policy = toPolicy(checkpoint.policy);
   const outcomes = bundle.districts.map((d) =>
@@ -97,7 +97,7 @@ export const FORECAST_TOLERANCE = 1_000.0;
 
 /** Run one forecast checkpoint's policy and horizon, and compare every reported field. */
 export function compareForecast(
-  bundle: Bundle,
+  bundle: Panel,
   checkpoint: ForecastCheckpoint,
 ): Comparison {
   const meta = bundle.projection;
@@ -150,7 +150,7 @@ export interface Verification {
 }
 
 /** Run every checkpoint, simulation and forecast alike. */
-export function verify(bundle: Bundle): Verification {
+export function verify(bundle: Panel): Verification {
   const comparisons = bundle.checkpoints.map((c) => compare(bundle, c));
   const forecasts = (bundle.projection?.checkpoints ?? []).map((c) =>
     compareForecast(bundle, c),

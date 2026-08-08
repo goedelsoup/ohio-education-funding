@@ -59,7 +59,7 @@ description: |
   Not yet held: audited-statement figures, the scholarship and community-school deduction that a
   district of this size and poverty carries, and any year before FY2024. [open]
 properties:
-  irn: "044909" [verified — report card district files]
+  irn: 044909 [verified — report card district files]
   agency_type: city
   county: Lucas
   fy2025_profile: |

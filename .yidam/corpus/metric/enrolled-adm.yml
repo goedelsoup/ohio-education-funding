@@ -87,6 +87,8 @@ properties:
   calculator: project::series, project::panel
 
 links:
+  - relationship: instance-of
+    target: ../metric.ont.yml
   - relationship: measures
     target: education-agency
     note: All 609 traditional districts in the FY2027 model.

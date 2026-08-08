@@ -1,0 +1,77 @@
+---
+/**
+ * What the district actually received, raised, spent, and holds.
+ *
+ * # Why this is a route and not a card
+ *
+ * Every other figure on this site is a model: what the FY2027 formula says a district is owed,
+ * what it spent per pupil on the department's definitions, what its pupils achieved. These are
+ * audited actuals from the district's own five-year forecast filing — money that changed hands.
+ *
+ * The two are differently constructed, and the type documentation on `District.finances` is
+ * explicit that neither may be rendered as a check on the other. On one long page that separation
+ * was a caption between two cards, which is exactly the kind of boundary a reader scrolls past.
+ * Here it is the URL.
+ */
+import BasisToggle from "../../../components/BasisToggle.astro";
+import DistrictNav from "../../../components/DistrictNav.astro";
+import Base from "../../../layouts/Base.astro";
+import { renderActuals } from "../../../lib/district.ts";
+import { districtPaths, loadFeed } from "../../../lib/feed.ts";
+import { money } from "../../../lib/format.ts";
+import { baseYear } from "../../../lib/real.ts";
+import * as routes from "../../../lib/routes.ts";
+
+export const getStaticPaths = districtPaths;
+
+const { district } = Astro.props;
+const { bundle } = loadFeed();
+const base = bundle.deflator ? baseYear(bundle.deflator) : null;
+
+const latest = district.finances[district.finances.length - 1];
+const description = latest
+  ? `${district.name} held ${money(latest.ending_cash)} in general fund cash at the close of FY${latest.fiscal_year}, from its own five-year forecast filing.`
+  : `No five-year forecast filing was found for ${district.name}.`;
+---
+
+<Base title={`${district.name} — finances`} description={description} section="districts">
+  <h1>{district.name}</h1>
+  <p class="sub">
+    Audited actuals from the district's own five-year forecast filing — the only figures on this
+    site that record money changing hands rather than a formula's output.
+  </p>
+
+  <DistrictNav irn={district.irn} current="finances" />
+
+  {
+    district.finances.length === 0 ? (
+      <div class="card">
+        <h2>No filing found</h2>
+        <p class="note">
+          No five-year forecast filing was matched to this district, so there is nothing here to
+          show. Its funding model is on the <a href={routes.district(district.irn)}>dashboard</a>.
+        </p>
+      </div>
+    ) : (
+      <BasisToggle id="finances-basis" base={base}>
+        <Fragment slot="nominal" set:html={renderActuals(bundle, district, "nominal")} />
+        <Fragment slot="real" set:html={renderActuals(bundle, district, "real")} />
+      </BasisToggle>
+    )
+  }
+
+  <div class="card">
+    <h2>What these numbers are not</h2>
+    <p class="note">
+      They are <strong>not</strong> comparable line for line with the FY{bundle.fiscal_year}{" "}
+      calculator on the <a href={routes.district(district.irn)}>dashboard</a>. State aid here is
+      unrestricted grants-in-aid as the treasurer books it; the calculator's total state support is
+      a different construction, in a different year, on a different basis. Reading one as a check
+      on the other is the mistake this page is kept separate to prevent.
+    </p>
+    <p class="note">
+      General fund only. Capital, food service, and most federal programmes sit in other funds, so
+      the spending here is not the district's total budget.
+    </p>
+  </div>
+</Base>

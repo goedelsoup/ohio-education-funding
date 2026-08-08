@@ -15,7 +15,9 @@
  *    other.
  */
 
-import { barChart, type Bar } from "./chart.ts";
+import type { Bar } from "./chart.ts";
+import { barSpec } from "./plot/spec.ts";
+import { renderToString } from "./plot/ssr.ts";
 import { count, escapeHtml, money, pct } from "./format.ts";
 import type { Bundle, District } from "./types.ts";
 
@@ -89,7 +91,7 @@ export function renderOutcomes(bundle: Bundle): string {
       <h2>Poverty is most of what the Performance Index measures</h2>
       <p class="note">Districts in fifths by economically disadvantaged share, least poor on the
         left. Median Performance Index in each.</p>
-      <div class="chartwrap" data-chart="poverty-quintiles">${barChart(bars, { max: 120 })}</div>
+      <div class="chartwrap" data-chart="poverty-quintiles">${renderToString(barSpec(bars, { max: 120 }))}</div>
       <p class="note">At <strong>${coefficient(o.poverty_vs_performance)}</strong>, economic
         disadvantage explains about ${pct(o.poverty_vs_performance ** 2, 0)} of the variance in
         Ohio's attainment measure. Any other district-level variable correlated with it will
@@ -148,6 +150,77 @@ export function renderOutcomes(bundle: Bundle): string {
       <p class="note">${withoutReportCard} of the ${count(bundle.statewide.districts)} districts
         in the funding model have no report card and are absent from everything above. They are
         the three smallest in Ohio.</p>
+    </div>`;
+}
+
+/**
+ * Where this district's achievement sits once composition is accounted for.
+ *
+ * # Why the raw number is not shown on its own
+ *
+ * A Performance Index is read as a verdict on a district, and at −0.846 against poverty it is
+ * mostly a description of who lives there. The same discipline the statewide view applies to
+ * every correlation applies here to a single figure: it is shown beside the median of the
+ * districts with comparable poverty, so the comparison a reader makes by default is to
+ * like-composed districts rather than to the state.
+ *
+ * The gap that produces is still not an effect. It is what is left after one crude control, over
+ * a hundred-odd districts, in one year — which the copy says outright.
+ *
+ * The difference is signed but deliberately **not coloured**. The gain and loss hues are used on
+ * this site for money, where the direction of "more" is not in dispute. This card states in its
+ * own copy that the figure is neither an effect nor a judgement about the district's schools, and
+ * painting it red would say the opposite, louder. The comparison view holds the same line.
+ */
+export function renderOutcomeContext(bundle: Bundle, district: District): string {
+  const o = district.outcome;
+  // Three districts have no report card and three have no reported poverty share. Either one
+  // makes the comparison undefined, and an omitted card is better than an invented peer group.
+  if (o?.performance_index == null || district.economically_disadvantaged == null) return "";
+
+  const quintiles = povertyQuintiles(bundle.districts);
+  const index = quintiles.findIndex((group) => group.some((d) => d.irn === district.irn));
+  if (index < 0) return "";
+  const peers = quintiles[index]!;
+  const scores = peers.map((d) => d.outcome!.performance_index!).sort((a, b) => a - b);
+  const median = scores[Math.floor(scores.length / 2)] ?? 0;
+  const gap = o.performance_index - median;
+  const povertyRange = peers
+    .map((d) => d.economically_disadvantaged!)
+    .sort((a, b) => a - b);
+  const label = [
+    "least poor fifth",
+    "second-least-poor fifth",
+    "middle fifth",
+    "second-poorest fifth",
+    "poorest fifth",
+  ][index]!;
+
+  return `
+    <div class="card">
+      <h2>Against districts with comparable poverty</h2>
+      <div class="tiles">
+        <div class="tile"><div class="k">This district</div>
+          <div class="v">${o.performance_index.toFixed(1)}</div>
+          <div class="n">Performance Index, 2024-25</div></div>
+        <div class="tile"><div class="k">Median of its poverty fifth</div>
+          <div class="v">${median.toFixed(1)}</div>
+          <div class="n">${count(peers.length)} districts in the ${escapeHtml(label)},
+            ${pct(povertyRange[0]!, 0)}–${pct(povertyRange[povertyRange.length - 1]!, 0)}
+            economically disadvantaged</div></div>
+        <div class="tile"><div class="k">Difference</div>
+          <div class="v">${gap >= 0 ? "+" : "−"}${Math.abs(gap).toFixed(1)}</div>
+          <div class="n">points, against like-composed districts</div></div>
+      </div>
+      <p class="note">Ohio's attainment measure tracks economic disadvantage at
+        <strong>${coefficient(bundle.statewide.outcomes?.poverty_vs_performance ?? 0)}</strong>
+        statewide, so comparing this district to the state median would mostly be comparing its
+        poverty rate to the state's. The middle tile is the comparison worth making, and the
+        difference between them is what is left after one crude control.</p>
+      <p class="note">It is <strong>not</strong> an effect of anything. Districts are not assigned
+        to a poverty fifth at random, the fifths are wide, and a single year of a measure that
+        barely moves cannot separate a school's contribution from its intake. See
+        <a href="/outcomes">what this data can and cannot say</a>.</p>
     </div>`;
 }
 

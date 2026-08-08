@@ -19,7 +19,7 @@
  */
 
 import { apply, type Policy } from "./policy.ts";
-import type { District } from "./types.ts";
+import type { PanelDistrict } from "./types.ts";
 
 /** One observed value in a fiscal year. */
 export interface Observation {
@@ -198,7 +198,7 @@ export function projectSeries(
 }
 
 /** A district's three enrolled-ADM observations, dated. */
-export function observations(d: District, baseYear: number): Observation[] {
+export function observations(d: PanelDistrict, baseYear: number): Observation[] {
   const n = d.adm_history.length;
   return d.adm_history.map((value, i) => ({
     fiscalYear: baseYear - (n - 1) + i,
@@ -213,7 +213,7 @@ export function observations(d: District, baseYear: number): Observation[] {
  * Recomputed here rather than read from the feed's `sigma`: if the two disagree the forecast
  * checkpoints will not reproduce, which is a louder failure than a quietly different band.
  */
-export function growthPrior(districts: District[], z: number): Prior {
+export function growthPrior(districts: PanelDistrict[], z: number): Prior {
   const rates: number[] = [];
   for (const d of districts) {
     const first = d.adm_history[0]!;
@@ -255,7 +255,7 @@ export interface EnrollmentEffect {
  * enrollment, and the aid curve has a kink there that no scaling reproduces.
  */
 export function forecast(
-  districts: District[],
+  districts: PanelDistrict[],
   policy: Policy,
   through: number,
   baseYear: number,
@@ -324,7 +324,7 @@ export function forecast(
  * forecasts the formula, the appropriation, or valuation.
  */
 export function forecastPath(
-  districts: District[],
+  districts: PanelDistrict[],
   policy: Policy,
   through: number,
   baseYear: number,

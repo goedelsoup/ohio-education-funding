@@ -1,0 +1,37 @@
+---
+/**
+ * The four views of one district.
+ *
+ * These were tabs over a single document and are now four URLs, which is the change that made
+ * this buildout worth doing: a school board arguing about its own guarantee can send the page
+ * rather than "open the site and pick us from the dropdown".
+ *
+ * Real links, not buttons — the styling borrows the tab affordance because that is what the
+ * relationship between them is, but every one of them is a document that exists on its own.
+ */
+import * as routes from "../lib/routes.ts";
+
+interface Props {
+  irn: string;
+  current: "dashboard" | "outcome" | "finances" | "scenario";
+}
+
+const { irn, current } = Astro.props;
+
+const VIEWS = [
+  { key: "dashboard", href: routes.district(irn), label: "Dashboard" },
+  { key: "outcome", href: routes.districtOutcome(irn), label: "Outcome" },
+  { key: "finances", href: routes.districtFinances(irn), label: "Finances" },
+  { key: "scenario", href: routes.districtScenario(irn), label: "Scenario" },
+] as const;
+---
+
+<nav class="subnav" aria-label="Views of this district">
+  {
+    VIEWS.map((view) => (
+      <a href={view.href} aria-current={view.key === current ? "page" : undefined}>
+        {view.label}
+      </a>
+    ))
+  }
+</nav>

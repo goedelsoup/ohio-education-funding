@@ -9,11 +9,15 @@
   X-Content-Type-Options: nosniff
   Referrer-Policy: strict-origin-when-cross-origin
   Strict-Transport-Security: max-age=31536000
-  # `style-src` needs 'unsafe-inline' because the renderers emit style *attributes* — the
-  # scenario bar widths in `src/lib/district.ts` and the reset button in `src/pages/index.astro`
-  # — and `style-src` governs those. `script-src` stays strict, which is the half that matters:
-  # the page has no inline script, no event-handler attributes, and fetches nothing off-origin.
-  Content-Security-Policy: default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; connect-src 'self'; object-src 'none'; base-uri 'none'; frame-ancestors 'none'; form-action 'none'
+  # `style-src` needs 'unsafe-inline' for two things, both inside markup this repository generates:
+  # style *attributes* (the stacked bar widths and the percentile marker in `src/lib/district.ts`)
+  # and the scoped `<style>` element Observable Plot writes into every SVG it renders. `script-src`
+  # stays strict, which is the half that matters: no inline script, no event-handler attributes,
+  # and nothing fetched off-origin.
+  #
+  # `form-action 'self'` rather than 'none': the header's search box is a real `<form>` so that it
+  # still works with scripting off, and it submits to `/search`.
+  Content-Security-Policy: default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; connect-src 'self'; object-src 'none'; base-uri 'none'; frame-ancestors 'none'; form-action 'self'
 
 # Vite content-hashes these filenames, so a changed file is a changed URL and the old one can be
 # held forever. The `.js.map` beside the bundle is hashed too, and is deployed on purpose:
@@ -21,12 +25,19 @@
 /_astro/*
   Cache-Control: public, max-age=31536000, immutable
 
-# The feed is *not* hashed — `src/scripts/main.ts` fetches it at a fixed path — so it cannot be
-# immutable. A deploy purges the edge, so 300s bounds only how long a returning browser can hold
-# a superseded feed. If that ever needs to be zero, the fix is a hashed feed path, not a shorter
-# max-age here.
-/data/bundle.json
+# The data files are *not* hashed — they are fetched and linked at fixed paths — so they cannot be
+# immutable. A deploy purges the edge, so 300s bounds only how long a returning browser can hold a
+# superseded copy. If that ever needs to be zero, the fix is a hashed path, not a shorter max-age.
+#
+# `panel.json` matters most of the three: it is what the scenario routes run the formula over, and
+# a stale one against a fresh page is the state the runtime verification gate exists to catch.
+/data/*
   Cache-Control: public, max-age=300, must-revalidate
 
-/index.html
+/search-index.json
+  Cache-Control: public, max-age=300, must-revalidate
+
+# Every page is a document now rather than one shell, and each carries figures baked in at build
+# time. None of them may be held past a deploy.
+/*.html
   Cache-Control: public, max-age=0, must-revalidate

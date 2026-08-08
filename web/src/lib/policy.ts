@@ -14,7 +14,7 @@
  * liability.
  */
 
-import type { District } from "./types.ts";
+import type { PanelDistrict } from "./types.ts";
 
 /** What happens to the temporary transitional aid guarantee. */
 export type GuaranteeRule =
@@ -80,7 +80,7 @@ export function currentLaw(modelMinimumStateShare: number): Policy {
 }
 
 /** Formula aid under current law: base cost share plus every categorical. */
-function currentFormulaAid(d: District): number {
+export function currentFormulaAid(d: PanelDistrict): number {
   return d.base_cost_state_share + d.categorical_funding;
 }
 
@@ -90,7 +90,7 @@ function currentFormulaAid(d: District): number {
  * Summed from the components rather than taken from `realized_aid_per_pupil × adm`, which would
  * lose cents to the round trip and make the identity only approximately the identity.
  */
-export function currentRealizedAid(d: District): number {
+export function currentRealizedAid(d: PanelDistrict): number {
   return currentFormulaAid(d) + d.guarantee;
 }
 
@@ -102,7 +102,7 @@ export function currentRealizedAid(d: District): number {
  * The two are only equal under current law.
  */
 export function apply(
-  d: District,
+  d: PanelDistrict,
   p: Policy,
   currentYearAdm: number,
   modelMinimumStateShare: number,
@@ -180,7 +180,7 @@ export function apply(
 
 /** Apply a policy across the panel at modelled enrollment. */
 export function applyAll(
-  districts: District[],
+  districts: PanelDistrict[],
   p: Policy,
   modelMinimumStateShare: number,
 ): Outcome[] {

@@ -1,0 +1,139 @@
+---
+/**
+ * The levers.
+ *
+ * Server-rendered, unlike everything else on the scenario routes. The controls are the one part
+ * of those pages that does not depend on the browser having reproduced the Rust checkpoints yet,
+ * and putting them in the document means the page has visible structure before the panel has
+ * finished downloading rather than a blank rectangle.
+ *
+ * They are real form controls inside a real `<form>`, so a reader can tab through them and a
+ * screen reader announces them, and their values are read on every `input` event by
+ * `src/scripts/scenario.ts`. With no script they render and do nothing — which is why the page
+ * around them says so rather than pretending otherwise.
+ */
+import { DEFAULT_HORIZON_YEARS } from "../lib/scenario.ts";
+import { pct } from "../lib/format.ts";
+
+interface Props {
+  /** The minimum state share the published model was computed under. */
+  model: number;
+  /** How many districts the guarantee currently holds above the formula. */
+  onGuarantee: number;
+  /** The last observed fiscal year, and the furthest the feed's checkpoints reach. */
+  projection: { available: boolean; baseYear: number; maxYear: number };
+}
+
+const { model, onGuarantee, projection } = Astro.props;
+
+const SLIDERS = [
+  {
+    id: "lv-arg",
+    label: "Guarantee retained",
+    min: 0,
+    max: 1,
+    step: 0.05,
+    value: 0.5,
+    note: "Applies to phase-out and re-base.",
+  },
+  {
+    id: "lv-base",
+    label: "Base cost",
+    min: 0.8,
+    max: 1.3,
+    step: 0.01,
+    value: 1,
+    note: "A refresh of the FY2022 cost inputs is roughly +3%.",
+  },
+  {
+    id: "lv-min",
+    label: "Minimum state share",
+    min: 0.05,
+    max: 0.3,
+    step: 0.01,
+    value: model,
+    note: `Current model: ${pct(model, 0)}. The plan was enacted with 5%.`,
+  },
+  {
+    id: "lv-phase",
+    label: "Phase-in, base cost",
+    min: 0,
+    max: 1,
+    step: 0.05,
+    value: 1,
+    note: "Fraction of computed base cost aid appropriated.",
+  },
+  {
+    id: "lv-phase-cat",
+    label: "Phase-in, categoricals",
+    min: 0,
+    max: 1,
+    step: 0.05,
+    value: 1,
+    note: "Separate because Ohio's were: DPIA was phased in at 0% while the headline was 16.67%.",
+  },
+];
+---
+
+<div class="card">
+  <h2>Levers</h2>
+  <form id="scenario-controls" onsubmit="return false">
+    <div class="levers">
+      <div class="lever">
+        <label for="lv-guarantee">Temporary transitional aid guarantee</label>
+        <select id="lv-guarantee">
+          <option value="as-enacted">As enacted — hold at FY2020</option>
+          <option value="phase-out">Phase out</option>
+          <option value="rebase">Re-base the FY2020 floor</option>
+          <option value="removed">Remove entirely</option>
+        </select>
+        <div class="n">{onGuarantee} districts are held above what the formula computes for them.</div>
+      </div>
+      {
+        SLIDERS.map((slider) => (
+          <div class="lever">
+            <label for={slider.id}>
+              {slider.label} <output id={`${slider.id}-out`} />
+            </label>
+            <input
+              type="range"
+              id={slider.id}
+              min={slider.min}
+              max={slider.max}
+              step={slider.step}
+              value={slider.value}
+            />
+            <div class="n">{slider.note}</div>
+          </div>
+        ))
+      }
+      {
+        /*
+         * The horizon control appears only when a band could be drawn. Offering a year picker
+         * that produces nothing would be worse than not offering one.
+         */
+        projection.available && (
+          <div class="lever">
+            <label for="lv-horizon">
+              Project enrollment to <output id="lv-horizon-out" />
+            </label>
+            <input
+              type="range"
+              id="lv-horizon"
+              min={projection.baseYear}
+              max={projection.maxYear}
+              step={1}
+              value={projection.baseYear + DEFAULT_HORIZON_YEARS}
+            />
+            <div class="n">
+              FY{projection.baseYear} is the last observed year — leave it there for no forecast.
+            </div>
+          </div>
+        )
+      }
+    </div>
+    <p class="note">
+      <button id="scenario-reset" type="button" class="flag">Reset to current law</button>
+    </p>
+  </form>
+</div>

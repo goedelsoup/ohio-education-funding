@@ -1,0 +1,77 @@
+---
+/**
+ * Move a lever, see who it reaches — across all 609 districts.
+ *
+ * The one view that answers the question a policy argument actually turns on. A district page can
+ * say what a change does to that district; only this can say how many districts move the other
+ * way, and how that falls across property wealth.
+ *
+ * Unlike every other page here the figures are computed in the browser, because a lever has a
+ * continuum of positions and a static page per position is not a page. What licenses that is the
+ * verification gate in `src/scripts/scenario.ts`.
+ */
+import ScenarioControls from "../components/ScenarioControls.astro";
+import Base from "../layouts/Base.astro";
+import { loadFeed } from "../lib/feed.ts";
+import { count, millions } from "../lib/format.ts";
+
+const { bundle, forecastable } = loadFeed();
+const s = bundle.statewide;
+const meta = bundle.projection;
+---
+
+<Base
+  title="Scenario"
+  description={`Re-run Ohio's FY${bundle.fiscal_year} school funding formula with the guarantee, base cost, minimum state share and phase-in moved, across all ${s.districts} districts.`}
+  section="scenario"
+>
+  <h1>Scenario</h1>
+  <p class="sub">
+    Move a lever and re-run the department's FY{bundle.fiscal_year} model across all {
+      count(s.districts)
+    } districts. Current law pays {millions(s.realized_aid_total).replace("+", "")}, of which {
+      millions(s.guarantee_total).replace("+", "")
+    } is the guarantee.
+  </p>
+
+  <div id="scenario-root">
+    <ScenarioControls
+      model={s.minimum_state_share}
+      onGuarantee={s.on_guarantee}
+      projection={{
+        available: forecastable && meta != null,
+        baseYear: meta?.base_year ?? 0,
+        maxYear: meta?.horizon ?? 0,
+      }}
+    />
+
+    <noscript>
+      <div class="card err">
+        <h2>This is the one page that needs JavaScript</h2>
+        <p class="note">
+          Every other page on this site carries its figures in the document and reads correctly
+          without any script. This one re-derives Ohio's funding formula over all {
+            count(s.districts)
+          } districts as you move a slider, which is not something a pre-rendered page can do.
+        </p>
+        <p class="note">
+          The underlying data is still available: <a href="/data">the feed and a CSV of the panel</a>,
+          and <a href="/districts">every district's published figures</a>.
+        </p>
+      </div>
+    </noscript>
+
+    <div id="scenario-out"></div>
+    <!--
+      Separate from #scenario-out, and always after it: the simulation is exact and the projection
+      is a forecast. They are gated on separate checks and one can be disabled without the other,
+      and there is deliberately no figure anywhere that adds them together.
+    -->
+    <div id="projection-out"></div>
+    <p class="note" id="scenario-status"></p>
+  </div>
+
+  <script>
+    import "../scripts/scenario.ts";
+  </script>
+</Base>

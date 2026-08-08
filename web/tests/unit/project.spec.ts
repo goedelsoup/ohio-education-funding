@@ -27,7 +27,9 @@ import {
   standardDeviation,
   type Observation,
 } from "../../src/lib/project.ts";
-import { fanChart, type FanPoint } from "../../src/lib/chart.ts";
+import { type FanPoint } from "../../src/lib/chart.ts";
+import { fanSpec } from "../../src/lib/plot/spec.ts";
+import { renderToString } from "../../src/lib/plot/ssr.ts";
 import { compareForecast, isForecastVerified, verify } from "../../src/lib/verify.ts";
 import type { Bundle } from "../../src/lib/types.ts";
 
@@ -265,13 +267,17 @@ test("the fan draws the observed run-up solid and outside the band", () => {
     { year: 2027, point: 99, low: 95, high: 103, observed: false },
     { year: 2028, point: 98, low: 91, high: 105, observed: false },
   ];
-  const svg = fanChart(points, (v) => `$${v.toFixed(0)}`, (p) => `FY${p.year}`);
+  const svg = renderToString(
+    fanSpec(points, (v: number) => `$${v.toFixed(0)}`, (p: FanPoint) => `FY${p.year}`),
+  );
   // One solid polyline over the observed years, one dashed over the projected ones.
   expect(svg).toContain("fan-observed");
   expect(svg).toContain("fan-mid");
-  // The band starts at the seam, not at the origin: three projected vertices, not five.
-  const band = /class="fan-band" d="M ([^"]*)"/.exec(svg)?.[1] ?? "";
-  expect(band.split(" L ").length).toBe(6);
+  // The band starts at the seam, not at the origin: it spans three projected years, so its
+  // outline has six vertices rather than the ten a band opened at the origin would have.
+  const band = /class="fan-band"[^>]*>\s*<path d="([^"]*)"/.exec(svg)?.[1] ?? "";
+  expect(band).not.toBe("");
+  expect(band.split("L").length).toBe(6);
   // The axis opens on the first observed year rather than on the forecast.
   expect(svg).toContain(">FY2024<");
   expect(svg).toContain(">FY2028<");
@@ -285,17 +291,37 @@ test("the fan chart labels both bounds and dashes the centre", () => {
     { year: 2027, point: 99, low: 95, high: 103, observed: false },
     { year: 2028, point: 98, low: 91, high: 105, observed: false },
   ];
-  const svg = fanChart(points, (v) => `$${v.toFixed(0)}`, (p) => `FY${p.year}`);
+  const svg = renderToString(
+    fanSpec(points, (v: number) => `$${v.toFixed(0)}`, (p: FanPoint) => `FY${p.year}`),
+  );
   expect(svg).toContain("fan-band");
   expect(svg).toContain("fan-mid");
   expect(svg).toContain(">$105<");
   expect(svg).toContain(">$91<");
   expect(svg).not.toContain(">$98<");
-  // One hover target per year, and an anchor marking where measurement stops.
-  expect(svg.match(/fan-hit/g)?.length).toBe(3);
+  // One hover target per year, and an anchor marking where measurement stops. Counted by the
+  // tooltips actually attached rather than by the class, which Plot puts on the group once: the
+  // property worth pinning is that every year is pointable, not how the marks are nested.
+  expect(svg.match(/data-hover=/g)?.length).toBe(3);
   expect(svg).toContain("fan-anchor");
 });
 
 test("a fan chart of one point draws nothing rather than a degenerate axis", () => {
-  expect(fanChart([{ year: 2026, point: 1, low: 1, high: 1, observed: true }], String, () => "")).toBe("");
+  const one: FanPoint[] = [{ year: 2026, point: 1, low: 1, high: 1, observed: true }];
+  expect(fanSpec(one, String, () => "")).toBeNull();
+  expect(renderToString(fanSpec(one, String, () => ""))).toBe("");
+});
+
+test("every colour in a rendered chart is a custom property, not a literal", () => {
+  // The rule that keeps build-time SVG theme-aware. A hex code here would look correct to
+  // whoever wrote it — they are on a light page — and would be wrong for every reader on a dark
+  // one, with nothing to re-render it. `ensureThemeable` throws rather than emit one; this pins
+  // that the charts actually shipping satisfy it.
+  const points: FanPoint[] = [
+    { year: 2026, point: 100, low: 100, high: 100, observed: true },
+    { year: 2027, point: 99, low: 95, high: 103, observed: false },
+  ];
+  const svg = renderToString(fanSpec(points, (v: number) => `$${v}`, () => ""));
+  expect(svg).toContain("var(--series-formula)");
+  expect(svg.replace(/<style>[\s\S]*?<\/style>/g, "")).not.toMatch(/#[0-9a-f]{3,8}\b/i);
 });

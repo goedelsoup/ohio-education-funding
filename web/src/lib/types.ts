@@ -1,227 +1,65 @@
 /**
- * The shape of `data/bundle.json`, as `crates/bundle` writes it.
+ * The feed's types, for everything that reads it.
  *
- * The field names are the contract. `CONTRACT_VERSION` in that crate is bumped whenever any of
- * them changes meaning, and {@link REQUIRED_CONTRACT} below is what this page will render.
+ * The shapes themselves are declared once, as zod schemas, in `schema/feed.ts` — so the build can
+ * *parse* the feed rather than cast it, and a Rust field that changes name stops the build instead
+ * of rendering as an em dash on 609 pages.
+ *
+ * This module exists so that the browser never sees any of that. Every re-export below is
+ * `export type`, which TypeScript erases: client code importing `Panel` from here does not pull
+ * zod, or the schemas, or anything else, into the bundle. `REQUIRED_CONTRACT` is the one value,
+ * and it is a string.
+ *
+ * Import types from here. Import schemas from `schema/feed.ts`, and only in build-time code.
  */
 
-/** The bundle contract this page understands. */
+export type {
+  Bundle,
+  Checkpoint,
+  Deflator,
+  District,
+  DistrictOutcome,
+  FinanceYear,
+  ForecastCheckpoint,
+  OutcomeStatewide,
+  PolicyShape,
+  ProjectionMeta,
+  Statewide,
+} from "./schema/feed.ts";
+
+import type { Bundle, District, Statewide } from "./schema/feed.ts";
+
+/**
+ * The bundle contract this site understands.
+ *
+ * `CONTRACT_VERSION` in `crates/bundle` is bumped whenever a field changes meaning. This is what
+ * the build and the scenario routes refuse to proceed past when the two disagree — the deliberate
+ * half of drift detection, where the strictness of the schemas is the accidental half.
+ */
 export const REQUIRED_CONTRACT = "6.0.0";
 
 /**
- * The outcome side of a district, where the report card covers it.
+ * A district with only the fields the funding formula reads.
  *
- * Two spending figures because the choice of divisor is the corpus's central finding about
- * this data: `per_equivalent_pupil` divides by a need-weighted count and is the department's
- * published number, `per_enrolled_pupil` divides by the headcount. Against an outcome that is
- * itself driven by composition, the first is substantially a composition proxy.
+ * # What this type is for
  *
- * `economically_disadvantaged` is the report card's, which is top-coded by community
- * eligibility. The untop-coded share is `District.economically_disadvantaged`.
+ * The scenario routes re-run the formula in the browser, so they need the whole 609-district panel
+ * rather than one district's page. Sending the full feed for that costs 202 KB gzipped, and most
+ * of it — six years of audited finances and a report card per district — is untouched by
+ * `policy.ts` and `project.ts`. Dropping those two fields costs 68 KB instead.
+ *
+ * Making that a *type* rather than a comment is the point. Every function in the formula takes a
+ * `PanelDistrict`, so "does the browser need this field?" is answered by the compiler: reach for
+ * `finances` inside `apply()` and the build fails rather than the slim panel silently arriving
+ * without it.
+ *
+ * A full {@link District} is assignable to this, so the build-time paths that do have the whole
+ * feed pass it unchanged.
  */
-export interface DistrictOutcome {
-  /** Ohio's attainment-level measure, 2024-25. */
-  performance_index: number | null;
-  performance_index_prior: number | null;
-  performance_index_earliest: number | null;
-  /** Ohio's growth measure, already a three-year average as published. */
-  progress_effect_size: number | null;
-  per_enrolled_pupil: number | null;
-  per_equivalent_pupil: number | null;
-  economically_disadvantaged: number | null;
-  english_learner: number | null;
-  students_with_disabilities: number | null;
-}
+export type PanelDistrict = Omit<District, "finances" | "outcome">;
 
-/**
- * Statewide relationships between funding and outcomes.
- *
- * Every field is a correlation and none identifies an effect. The raw and controlled guarantee
- * figures are both present because showing one without the other states a confound as a finding.
- */
-export interface OutcomeStatewide {
-  districts: number;
-  poverty_vs_performance: number;
-  guarantee_vs_performance: number;
-  guarantee_vs_performance_controlled: number;
-  spending_vs_growth_controlled: number;
-  weighted_spending_vs_performance: number;
-  enrolled_spending_vs_performance: number;
-  median_performance_on_guarantee: number;
-  median_performance_on_formula: number;
-}
-
-/** One district, as the feed carries it. */
-export interface District {
-  irn: string;
-  name: string;
-  /** Base cost enrolled ADM: the greater of the three-year average and the current year. */
-  adm: number;
-  /** Current-year enrolled ADM, FY2026. The denominator the state share is paid on. */
-  current_year_adm: number;
-  base_cost_per_pupil: number;
-  aggregate_base_cost: number;
-  /** The state's share of base cost alone, before every categorical. */
-  base_cost_state_share: number;
-  /** Targeted assistance, special education, DPIA, English learner, gifted, career-technical. */
-  categorical_funding: number;
-  formula_aid_per_pupil: number;
-  realized_aid_per_pupil: number;
-  guarantee: number;
-  on_guarantee: boolean;
-  at_millage_floor: boolean;
-  at_minimum_state_share: boolean;
-  valuation_per_pupil: number | null;
-  effective_class1_millage: number | null;
-  operating_expenditure_per_pupil: number | null;
-  economically_disadvantaged: number | null;
-  /** FY2024 to FY2026. FY2026 is partly departmental estimate. */
-  enrollment_change: number | null;
-  /**
-   * Enrolled ADM for FY2024, FY2025, FY2026 — the years `projection.base_year` ends.
-   *
-   * Not nullable: a district without a history cannot be projected, and a page that quietly
-   * dropped it would report a statewide total over a subset of the panel.
-   */
-  adm_history: [number, number, number];
-  /** Achievement, growth, and need. `null` for the three districts with no report card. */
-  outcome: DistrictOutcome | null;
-  /**
-   * Six closed fiscal years of **actuals**, oldest first. Empty where no filing was found.
-   *
-   * The only figures in this feed that are a record rather than a model. They come from the
-   * district's own five-year forecast filing, not from the funding calculator, and the two are
-   * differently constructed — see `.yidam/catalog/dew-five-year-forecast.md`. Never render one
-   * as a check on the other.
-   */
-  finances: FinanceYear[];
-}
-
-/** One closed fiscal year of a district's general fund. Audited actuals. */
-export interface FinanceYear {
-  fiscal_year: number;
-  /** Unrestricted grants-in-aid: state foundation money as the district books it. */
-  state_aid: number;
-  /** Property tax plus income tax — the local levy yield actually collected. */
-  local_tax: number;
-  total_revenue: number;
-  total_expenditure: number;
-  /** Cash balance at 30 June. What the district holds. */
-  ending_cash: number;
-}
-
-/** Statewide aggregates, so a district can be positioned without recomputing. */
-export interface Statewide {
-  districts: number;
-  on_guarantee: number;
-  at_millage_floor: number;
-  at_minimum_state_share: number;
-  median_valuation_per_pupil: number;
-  median_operating_expenditure_per_pupil: number;
-  wealth_neutrality_formula: number;
-  wealth_neutrality_realized: number;
-  guarantee_total: number;
-  realized_aid_total: number;
-  minimum_state_share: number;
-  /** How the funding side relates to the outcome side. `null` if no district joined. */
-  outcomes: OutcomeStatewide | null;
-  /**
-   * Closed fiscal years of actuals, summed over the districts in this feed.
-   *
-   * Summed in Rust so the page and the feed cannot disagree about which districts are in the
-   * total. The panel behind it covers 660 reporting bodies including joint vocational
-   * districts; this is the 609 the feed carries.
-   */
-  finances: FinanceYear[];
-}
-
-/**
- * A price index, so any year of the panel can be restated in another year's dollars.
- *
- * The choice of index is a claim, so the label travels with the numbers: CPI-U is a general
- * consumer index and school costs are majority compensation, for which the Employment Cost Index
- * would be better and has shorter coverage. Any real-dollar figure must name it.
- */
-export interface Deflator {
-  label: string;
-  points: { fiscal_year: number; index: number }[];
-}
-
-/** A policy in the shape the feed serializes it. */
-export interface PolicyShape {
-  guarantee: "as-enacted" | "removed" | "rebase" | "phase-out";
-  guarantee_argument: number;
-  base_cost_scale: number;
-  minimum_state_share: number;
-  phase_in_base_cost: number;
-  phase_in_categorical: number;
-}
-
-/**
- * A Rust-computed result this page must reproduce before it may compute its own.
- *
- * See {@link ../src/verify.ts}. The scenario builder re-derives the funding formula in
- * TypeScript so a slider does not need a round trip; these are what stop that second
- * implementation from drifting away from the first one unnoticed.
- */
-export interface Checkpoint {
-  label: string;
-  policy: PolicyShape;
-  cost: number;
-  realized_aid: number;
-  gainers: number;
-  losers: number;
-  unmoved: number;
-  on_guarantee: number;
-}
-
-/**
- * A Rust-computed forecast this page must reproduce before it may draw a band.
- *
- * The same discipline as {@link Checkpoint}, applied to the harder half. Reproducing a simulation
- * checks one function; reproducing a forecast checks the projection, the prior, how the interval
- * compounds with the horizon, and the decision to re-run the formula at each end of the
- * enrollment band rather than scale the middle.
- */
-export interface ForecastCheckpoint {
-  label: string;
-  policy: PolicyShape;
-  fiscal_year: number;
-  realized_aid: number;
-  low: number;
-  high: number;
-  adm: number;
-  on_guarantee: number;
-}
-
-/** How this feed's forecasts were made, and what their interval rests on. */
-export interface ProjectionMeta {
-  /** The last observed fiscal year. Everything past it is forecast. */
-  base_year: number;
-  /** The furthest year the checkpoints reach, and the furthest this page should offer. */
-  horizon: number;
-  method: "last-observed" | "cagr" | "damped" | "linear";
-  damping: number;
-  /**
-   * Standard deviation of annual enrolled-ADM growth **across districts** — not within one.
-   * Three observations cannot give a district's own variability.
-   */
-  sigma: number;
-  z: number;
-  prior_source: string;
-  checkpoints: ForecastCheckpoint[];
-}
-
-/** The whole feed. */
-export interface Bundle {
-  contract_version: string;
-  provenance: string;
-  fiscal_year: number;
-  statewide: Statewide;
-  checkpoints: Checkpoint[];
-  /** `null` disables the band: this feed cannot be projected. */
-  projection: ProjectionMeta | null;
-  /** `null` means the feed can only be shown in nominal dollars. */
-  deflator: Deflator | null;
-  districts: District[];
+/** The feed with the two heavy per-district blocks removed. Served as `/data/panel.json`. */
+export interface Panel extends Omit<Bundle, "districts" | "statewide"> {
+  districts: PanelDistrict[];
+  statewide: Omit<Statewide, "finances" | "outcomes">;
 }

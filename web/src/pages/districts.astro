@@ -1,0 +1,126 @@
+---
+/**
+ * Every district in the feed, in one table.
+ *
+ * The old page reached a district through a `<select>` of 609 options, which is a control for
+ * choosing something you can already name. This is the other half: a reader who wants the
+ * districts at the 20-mill floor, or the ten worst-hit by enrollment decline, has no district in
+ * mind yet and needs to sort rather than pick.
+ *
+ * The whole table is in the document. Filtering and sorting are enhancements over markup that is
+ * already complete — with no script, every row is present and the browser's own find works.
+ */
+import Base from "../layouts/Base.astro";
+import { loadFeed } from "../lib/feed.ts";
+import { count, money, pct } from "../lib/format.ts";
+import * as routes from "../lib/routes.ts";
+
+const { bundle, alphabetical } = loadFeed();
+const s = bundle.statewide;
+
+/** A cell whose sort key is not what it displays: dollars with separators, blanks, percentages. */
+const sortable = (value: number | null) => (value == null ? "" : String(value));
+---
+
+<Base
+  title="Districts"
+  description={`All ${s.districts} Ohio school districts in the FY${bundle.fiscal_year} funding model, with state aid per pupil, guarantee status, property wealth and enrollment.`}
+  section="districts"
+  wide
+>
+  <h1>Districts</h1>
+  <p class="sub">
+    All {count(s.districts)} districts in the department's FY{bundle.fiscal_year} model.
+    {count(s.on_guarantee)} are held above what the formula computes for them by the guarantee;
+    {count(s.at_millage_floor)} are at the 20-mill floor; {count(s.at_minimum_state_share)} are at
+    the minimum state share.
+  </p>
+
+  <form class="filters" id="district-filters" role="search" onsubmit="return false">
+    <div class="field">
+      <label for="f-name">Name or IRN</label>
+      <input id="f-name" type="search" placeholder="Cleveland, 043786…" autocomplete="off" />
+    </div>
+    <div class="field">
+      <label for="f-status">Funding status</label>
+      <select id="f-status">
+        <option value="">Any</option>
+        <option value="guarantee">On the guarantee</option>
+        <option value="formula">On formula</option>
+        <option value="floor">At the 20-mill floor</option>
+        <option value="minshare">At the minimum state share</option>
+        <option value="shrinking">Enrollment falling</option>
+      </select>
+    </div>
+    <p class="count" id="f-count" aria-live="polite">{count(s.districts)} districts</p>
+  </form>
+
+  <div class="scroll">
+    <table id="district-table">
+      <thead>
+        <tr>
+          <th><button type="button" data-sort="name" aria-sort="ascending">District</button></th>
+          <th><button type="button" data-sort="adm">Enrolled ADM</button></th>
+          <th><button type="button" data-sort="aid">State aid / pupil</button></th>
+          <th><button type="button" data-sort="guarantee">From guarantee</button></th>
+          <th><button type="button" data-sort="valuation">Valuation / pupil</button></th>
+          <th><button type="button" data-sort="poverty">Econ. disadv.</button></th>
+          <th><button type="button" data-sort="enrollment">Enrollment Δ</button></th>
+        </tr>
+      </thead>
+      <tbody>
+        {
+          alphabetical.map((d) => {
+            const guaranteePP = d.realized_aid_per_pupil - d.formula_aid_per_pupil;
+            return (
+              <tr
+                data-name={`${d.name.toLowerCase()} ${d.irn}`}
+                data-guarantee={d.on_guarantee ? "1" : ""}
+                data-floor={d.at_millage_floor ? "1" : ""}
+                data-minshare={d.at_minimum_state_share ? "1" : ""}
+                data-shrinking={d.enrollment_change != null && d.enrollment_change < 0 ? "1" : ""}
+              >
+                <th scope="row" data-sort-value={d.name}>
+                  <a href={routes.district(d.irn)}>{d.name}</a>
+                  <span class="n"> {d.irn}</span>
+                </th>
+                <td data-sort-value={d.adm}>{count(Math.round(d.adm))}</td>
+                <td data-sort-value={d.realized_aid_per_pupil}>
+                  {money(d.realized_aid_per_pupil)}
+                </td>
+                <td data-sort-value={guaranteePP}>
+                  {d.on_guarantee ? money(guaranteePP) : "—"}
+                </td>
+                <td data-sort-value={sortable(d.valuation_per_pupil)}>
+                  {money(d.valuation_per_pupil)}
+                </td>
+                <td
+                  data-sort-value={sortable(d.economically_disadvantaged)}
+                >
+                  {pct(d.economically_disadvantaged, 1)}
+                </td>
+                <td
+                  data-sort-value={sortable(d.enrollment_change)}
+                  class={d.enrollment_change != null && d.enrollment_change < 0 ? "loss" : ""}
+                >
+                  {pct(d.enrollment_change, 1)}
+                </td>
+              </tr>
+            );
+          })
+        }
+      </tbody>
+    </table>
+  </div>
+
+  <p class="note">
+    State aid per pupil is what the district receives; the guarantee column is how much of it the
+    formula did not compute. Enrolled ADM is the base cost count — the greater of the three-year
+    average and the current year. Enrollment change is FY2024 to FY2026, of which FY2026 is partly
+    a departmental estimate. Property valuation is FY2023 and is missing for three districts.
+  </p>
+
+  <script>
+    import "../scripts/districts.ts";
+  </script>
+</Base>

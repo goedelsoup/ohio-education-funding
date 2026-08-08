@@ -1,0 +1,53 @@
+---
+/**
+ * One district's dashboard: what the Fair School Funding Plan computes for it, what it actually
+ * receives, and where the difference comes from.
+ *
+ * Every figure on this page is written at build time. The page carries no feed and fetches
+ * nothing; `getStaticPaths` handed it one district out of 609 and the renderers in
+ * `src/lib/district.ts` turned that into markup. It is complete before any script runs.
+ */
+import DistrictNav from "../../components/DistrictNav.astro";
+import Base from "../../layouts/Base.astro";
+import {
+  renderAidSource,
+  renderDetail,
+  renderEnrollmentYears,
+  renderHeadline,
+  renderPosition,
+} from "../../lib/district.ts";
+import { districtPaths, loadFeed } from "../../lib/feed.ts";
+import { money, pct } from "../../lib/format.ts";
+
+export const getStaticPaths = districtPaths;
+
+const { district } = Astro.props;
+const { bundle, forecastable, valuations, expenditures } = loadFeed();
+
+const guaranteePP = district.realized_aid_per_pupil - district.formula_aid_per_pupil;
+const description = district.on_guarantee
+  ? `${district.name} receives ${money(district.realized_aid_per_pupil)} per pupil in state aid, of which ${money(guaranteePP)} comes from the temporary transitional aid guarantee rather than the formula.`
+  : `${district.name} receives ${money(district.realized_aid_per_pupil)} per pupil in state aid, all of it computed by the formula.`;
+---
+
+<Base title={district.name} description={description} section="districts">
+  <h1>{district.name}</h1>
+  <p class="sub">
+    IRN {district.irn} · {bundle.statewide.districts} districts in the FY{bundle.fiscal_year} model
+    · {district.on_guarantee ? "on the guarantee" : "on formula"}
+    {district.at_millage_floor ? " · at the 20-mill floor" : ""}
+    {
+      district.economically_disadvantaged != null
+        ? ` · ${pct(district.economically_disadvantaged, 1)} economically disadvantaged`
+        : ""
+    }
+  </p>
+
+  <DistrictNav irn={district.irn} current="dashboard" />
+
+  <Fragment set:html={renderHeadline(district)} />
+  <Fragment set:html={renderAidSource(bundle, district)} />
+  <Fragment set:html={renderEnrollmentYears(bundle, district, forecastable)} />
+  <Fragment set:html={renderPosition(bundle, district, valuations, expenditures)} />
+  <Fragment set:html={renderDetail(district)} />
+</Base>

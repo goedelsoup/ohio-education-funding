@@ -36,7 +36,7 @@ description: |
   Not yet held: valuation per pupil, millage, guarantee status, and anything before FY2024.
   [open]
 properties:
-  irn: "045583" [verified — report card district files]
+  irn: 045583 [verified — report card district files]
   agency_type: exempted-village
   county: Wood
   fy2025_profile: |

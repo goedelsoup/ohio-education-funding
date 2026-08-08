@@ -1,0 +1,39 @@
+---
+/**
+ * The nominal / constant-dollar switch, with no script behind it.
+ *
+ * # Why a pair of radios and not a button
+ *
+ * Neither basis is the default truth. Across FY2020–FY2025 CPI-U rose 25.1%, and statewide cash
+ * balances end 9% *above* where they started in nominal dollars and 13% *below* in real ones.
+ * Those two sentences support opposite arguments, so the page shows both and names the index. A
+ * checkbox would make one of them a modification of the other.
+ *
+ * Both panels are rendered at build and one is hidden by a sibling selector keyed on which radio
+ * is checked. That means the switch works with JavaScript off — which matters more here than the
+ * duplicated markup costs, because the whole point of baking the figures into the document was
+ * that the document is complete on its own. The previous implementation re-rendered the card
+ * from a click handler; a reader without JavaScript got the nominal view and a dead button.
+ *
+ * `id` must be unique within the page: it names the radio group and both labels point at it.
+ */
+interface Props {
+  id: string;
+  /** The year real figures are denominated in, for the label. */
+  base: number | null;
+}
+
+const { id, base } = Astro.props;
+---
+
+<div class="basis-scope">
+  <input class="vh" type="radio" name={id} id={`${id}-nominal`} data-basis="nominal" checked />
+  <input class="vh" type="radio" name={id} id={`${id}-real`} data-basis="real" />
+  <div class="basis" role="group" aria-label="Dollar basis">
+    <label for={`${id}-nominal`} data-basis="nominal">Nominal</label>
+    <label for={`${id}-real`} data-basis="real">Constant dollars</label>
+    <span class="n">{base == null ? "no index covers this series" : `FY${base} dollars`}</span>
+  </div>
+  <div class="basis-panel nominal"><slot name="nominal" /></div>
+  <div class="basis-panel real"><slot name="real" /></div>
+</div>

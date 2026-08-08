@@ -1,0 +1,87 @@
+---
+/**
+ * Two districts, side by side.
+ *
+ * The corpus is built on contrast pairs — Northern Local and Upper Arlington are `peer-of` each
+ * other precisely to make the distributional question concrete, and Toledo against Perrysburg is
+ * an entire catalog fact-check. Those arguments are the reason this page exists: a single
+ * district's figures are a fact, and two districts' figures are a claim about the system.
+ *
+ * Rendered in the browser rather than as 185,000 pre-built pairs. The comparison is the one place
+ * on this site where the combinatorics genuinely defeat static generation.
+ */
+import Base from "../layouts/Base.astro";
+import { loadFeed } from "../lib/feed.ts";
+import { count } from "../lib/format.ts";
+
+const { bundle, alphabetical } = loadFeed();
+
+/** The pairs the corpus itself argues from, offered as a way in that is not two dropdowns. */
+const SEEDED = [
+  { a: "049056", b: "044933", why: "The corpus's own contrast pair: property-poor against property-rich." },
+  { a: "044909", b: "045583", why: "The pair behind the department's special-needs spending fact-check." },
+  { a: "043786", b: "043802", why: "Ohio's two largest districts, both on the guarantee." },
+];
+const named = SEEDED.map((pair) => ({
+  ...pair,
+  aName: alphabetical.find((d) => d.irn === pair.a)?.name ?? pair.a,
+  bName: alphabetical.find((d) => d.irn === pair.b)?.name ?? pair.b,
+}));
+---
+
+<Base
+  title="Compare"
+  description={`Put any two of Ohio's ${bundle.statewide.districts} school districts side by side: funding, guarantee status, property wealth, spending and outcomes.`}
+  section="districts"
+>
+  <h1>Compare</h1>
+  <p class="sub">
+    Any two of Ohio's {count(bundle.statewide.districts)} districts, side by side. A single
+    district's figures are a fact; two districts' figures are usually the argument.
+  </p>
+
+  <div class="card">
+    <form class="filters" id="compare-form" onsubmit="return false">
+      <div class="field">
+        <label for="cmp-a">First district</label>
+        <select id="cmp-a">
+          {alphabetical.map((d) => <option value={d.irn}>{d.name}</option>)}
+        </select>
+      </div>
+      <div class="field">
+        <label for="cmp-b">Second district</label>
+        <select id="cmp-b">
+          {alphabetical.map((d) => <option value={d.irn}>{d.name}</option>)}
+        </select>
+      </div>
+    </form>
+    <p class="note">
+      Or start from a pair the corpus already argues from:
+    </p>
+    <div class="flags">
+      {
+        named.map((pair) => (
+          <a class="flag" href={`/compare?a=${pair.a}&b=${pair.b}`} title={pair.why}>
+            {pair.aName} vs {pair.bName}
+          </a>
+        ))
+      }
+    </div>
+  </div>
+
+  <div id="compare-out"></div>
+
+  <noscript>
+    <div class="card err">
+      <p class="note">
+        This page needs JavaScript: the pair is chosen by the reader and there are 185,000 of them,
+        which is more pages than a static site should mint. Every district's own figures are in the
+        document on <a href="/districts">its page</a>, which needs nothing.
+      </p>
+    </div>
+  </noscript>
+
+  <script>
+    import "../scripts/compare.ts";
+  </script>
+</Base>

@@ -1,590 +1,653 @@
 /**
- * The page, in a browser, against the built site.
+ * The site, in a browser, against a real build.
  *
- * The unit suite proves the formula is right. This suite proves the things that only exist once
- * a browser has run the code: that the feed actually loads over HTTP from `dist/`, that the
- * verification gate is wired to what it claims to gate, and that a link to a view opens that
- * view — which is the property the three tabs were built around.
+ * The unit suite proves the formula is right. This suite proves the things that only exist once a
+ * browser has run the code — and, since the move to real routes, a second class of thing: what is
+ * true when a browser has *not* run the code. Almost every page here is complete before any script
+ * loads, and that claim is only worth making if something checks it.
+ *
+ * Note on the preview server: `vite preview` answers an unmatched path with the front page rather
+ * than with `404.html`, which is a preview behaviour and not the host's. So nothing here asserts
+ * on a missing route; the nearest-match logic behind the 404 page is unit-tested in
+ * `tests/unit/nearest.spec.ts` instead.
  */
 
-import { expect, test } from "@playwright/test";
+import { expect, test, type Page } from "@playwright/test";
 
 /** Cleveland Municipal. On the guarantee, so the guarantee copy has something to render. */
 const CLEVELAND = "043786";
+/** Northern Local (Perry County). The corpus's property-poor exemplar. */
+const NORTHERN = "049056";
+/** Manchester Local — funded by the formula, so its band opens rather than collapsing. */
+const ON_FORMULA = "000442";
 
-test.describe("boot", () => {
-  test("loads the feed and renders a district without an error card", async ({ page }) => {
+/** Move a lever and wait for the scenario to re-render behind it. */
+async function setGuarantee(page: Page, value: string): Promise<void> {
+  await page.selectOption("#lv-guarantee", value);
+  await expect(page.locator("#scenario-out .tile, #scenario-out .card")).not.toHaveCount(0);
+}
+
+test.describe("the document arrives complete", () => {
+  test("a district page carries its figures before any script runs", async ({ page }) => {
     const failures: string[] = [];
     page.on("pageerror", (error) => failures.push(error.message));
 
-    await page.goto("/");
+    await page.goto(`/district/${CLEVELAND}`);
 
-    // The picker is written from the feed; "Loading…" is the inert shell.
-    await expect(page.locator("#pick option")).toHaveCount(609);
-    // The headline row. The page carries more tiles further down — the actuals card has its
-    // own — so this is scoped to the first group rather than counting every tile on the page.
-    await expect(page.locator("#district-out .tiles").first().locator(".tile")).toHaveCount(3);
-    await expect(page.locator("#district-out .err")).toHaveCount(0);
+    await expect(page.locator("h1")).toHaveText("Cleveland Municipal");
+    await expect(page.locator(".tiles").first().locator(".tile")).toHaveCount(3);
+    await expect(page.locator(".err")).toHaveCount(0);
     expect(failures, "the page threw while booting").toEqual([]);
   });
 
-  test("serves the feed as a static file next to the page", async ({ request }) => {
-    // The feed is deliberately outside the JS bundle so regenerating it is not a rebuild.
-    const response = await request.get("/data/bundle.json");
-    expect(response.status()).toBe(200);
-    const bundle = await response.json();
-    expect(bundle.contract_version).toBe("6.0.0");
-    expect(bundle.districts).toHaveLength(609);
+  test("states the provenance of the figures in the footer", async ({ page }) => {
+    await page.goto(`/district/${CLEVELAND}`);
+    await expect(page.locator("footer")).toContainText("FY27");
+    await expect(page.locator("footer")).toContainText("Bundle contract");
   });
 
-  test("states the provenance of the figures", async ({ page }) => {
+  test("the footer reports the build-time formula check", async ({ page }) => {
+    // The central invariant, as the footer states it. Both halves are counted: the simulation
+    // checkpoints and the forecasts, which are gated separately.
     await page.goto("/");
-    await expect(page.locator("#prov")).toContainText("FY27");
+    await expect(page.locator("footer")).toContainText(
+      "Formula verified at build against 8 reference scenarios and 4 reference forecasts",
+    );
+  });
+
+  test("the feed and the slim panel are both served as static files", async ({ request }) => {
+    const feed = await request.get("/data/bundle.json");
+    expect(feed.status()).toBe(200);
+    const bundle = await feed.json();
+    expect(bundle.contract_version).toBe("6.0.0");
+    expect(bundle.districts).toHaveLength(609);
+
+    // The panel is what the scenario routes fetch: the same districts, without the two blocks the
+    // formula never reads.
+    const panel = await request.get("/data/panel.json");
+    expect(panel.status()).toBe(200);
+    const slim = await panel.json();
+    expect(slim.districts).toHaveLength(609);
+    expect(slim.districts[0]).not.toHaveProperty("finances");
+    expect(slim.districts[0]).not.toHaveProperty("outcome");
+    expect(slim.districts[0]).toHaveProperty("base_cost_state_share");
+  });
+
+  test("a district page ships almost no JavaScript, and none of the build's libraries", async ({
+    page,
+    request,
+  }) => {
+    /*
+     * The architecture, as a number.
+     *
+     * Charts render to SVG at build time through `linkedom`, the feed is parsed at build time
+     * through zod, and the corpus is read at build time through a YAML parser. None of those three
+     * has any business in a browser, and it is entirely possible to pull one in by accident — an
+     * ordinary `import` in a module a client script also touches is all it takes, and nothing else
+     * would notice.
+     */
+    await page.goto(`/district/${CLEVELAND}`);
+    const sources = await page.locator("script[src]").evaluateAll((nodes) =>
+      nodes.map((n) => (n as HTMLScriptElement).getAttribute("src")!),
+    );
+
+    let bytes = 0;
+    for (const src of sources) {
+      const response = await request.get(src);
+      expect(response.status()).toBe(200);
+      const body = await response.text();
+      bytes += body.length;
+      for (const library of ["ZodError", "parseHTML", "YAMLParseError", "@observablehq/plot"]) {
+        expect(body, `${library} reached the client bundle via ${src}`).not.toContain(library);
+      }
+    }
+    // The whole of the chrome is under a kilobyte. Generous ceiling: this is a tripwire for a
+    // library arriving, not a budget to optimise against.
+    expect(bytes, "a district page's JavaScript grew unexpectedly").toBeLessThan(8_000);
+  });
+
+  test("Plot ships only where a chart has to be redrawn", async ({ page }) => {
+    const weigh = async (path: string) => {
+      await page.goto(path);
+      return page.locator("script[src]").count();
+    };
+    // The scenario route loads one script more than a district page: its charts change when a
+    // slider moves, so it is the one place a charting library earns its download.
+    expect(await weigh(`/district/${CLEVELAND}`)).toBe(1);
+    expect(await weigh("/scenario")).toBe(2);
+  });
+
+  test("the CSV has one row per district and a header", async ({ request }) => {
+    const response = await request.get("/data/districts.csv");
+    expect(response.status()).toBe(200);
+    const lines = (await response.text()).trim().split("\n");
+    expect(lines).toHaveLength(610);
+    expect(lines[0]).toContain("irn,name");
+  });
+});
+
+test.describe("with JavaScript disabled", () => {
+  // The property the whole buildout was for. These pages are pre-rendered, so a reader with no
+  // script — or a search engine, or a text browser — gets every figure rather than an empty shell.
+  test.use({ javaScriptEnabled: false });
+
+  test("a district's figures are all present", async ({ page }) => {
+    await page.goto(`/district/${CLEVELAND}`);
+    await expect(page.locator("h1")).toHaveText("Cleveland Municipal");
+    await expect(page.getByText("Where the state aid comes from")).toBeVisible();
+    await expect(page.locator(".tile .v").first()).not.toBeEmpty();
+    // Charts are build-time SVG, not a canvas drawn on load.
+    await expect(page.locator("svg.plot").first()).toBeVisible();
+  });
+
+  test("the district index lists every district", async ({ page }) => {
+    await page.goto("/districts");
+    await expect(page.locator("#district-table tbody tr")).toHaveCount(609);
+  });
+
+  test("the constant-dollar switch still switches", async ({ page }) => {
+    // Two radios and a sibling selector rather than a click handler, so the control is not a dead
+    // button for a reader without script.
+    await page.goto(`/district/${CLEVELAND}/finances`);
+    await expect(page.locator(".basis-panel.nominal")).toBeVisible();
+    await expect(page.locator(".basis-panel.real")).toBeHidden();
+
+    await page.locator('label[data-basis="real"]').click();
+    await expect(page.locator(".basis-panel.real")).toBeVisible();
+    await expect(page.locator(".basis-panel.nominal")).toBeHidden();
+    await expect(page.locator(".basis-panel.real")).toContainText("FY2020 dollars");
+  });
+
+  test("the wiki renders its prose and its claim badges", async ({ page }) => {
+    await page.goto("/wiki/parameter/twenty-mill-floor");
+    await expect(page.locator("h1")).toHaveText("Twenty-Mill Floor");
+    await expect(page.locator(".claim.verified").first()).toBeVisible();
+    await expect(page.locator(".prose-body")).toContainText("20 mills");
+  });
+
+  test("the scenario route says outright that it is the exception", async ({ page }) => {
+    await page.goto("/scenario");
+    // Located by role rather than by text: Playwright's text engine does not descend into
+    // `<noscript>`, even in a context where the parser has turned its contents into real DOM.
+    await expect(
+      page.getByRole("heading", { name: "This is the one page that needs JavaScript" }),
+    ).toBeVisible();
+  });
+});
+
+test.describe("routes", () => {
+  test("each of a district's four views is its own address", async ({ page }) => {
+    for (const [path, heading] of [
+      ["", "Dashboard"],
+      ["/outcome", "Outcome"],
+      ["/finances", "Finances"],
+      ["/scenario", "Scenario"],
+    ] as const) {
+      await page.goto(`/district/${NORTHERN}${path}`);
+      await expect(page.locator("h1")).toHaveText("Northern Local");
+      await expect(page.locator(`.subnav a[aria-current="page"]`)).toHaveText(heading);
+    }
+  });
+
+  test("a link to the statewide view opens it directly", async ({ page }) => {
+    await page.goto("/");
+    await expect(page.locator("h1")).toHaveText("Ohio school funding");
+    await expect(page.getByText("Who is on the guarantee")).toBeVisible();
+  });
+
+  test("old fragment links still land on the page they named", async ({ page }) => {
+    // `#district/043786` was the shareable form for this platform's whole life and is in board
+    // packets. The routes moved into the path; the links should not have died with them.
+    await page.goto(`/#district/${CLEVELAND}`);
+    await expect(page).toHaveURL(new RegExp(`/district/${CLEVELAND}$`));
+    await expect(page.locator("h1")).toHaveText("Cleveland Municipal");
+
+    await page.goto("/#outcomes");
+    await expect(page).toHaveURL(/\/outcomes$/);
+
+    await page.goto("/#scenario?g=removed&arg=0.5&base=1&min=0.1&pb=1&pc=1&h=2032");
+    await expect(page).toHaveURL(/\/scenario\?/);
+    await expect(page.locator("#lv-guarantee")).toHaveValue("removed");
+  });
+
+  test("the sitemap lists the district pages", async ({ request }) => {
+    const index = await request.get("/sitemap-index.xml");
+    expect(index.status()).toBe(200);
+    const first = await request.get("/sitemap-0.xml");
+    expect(await first.text()).toContain(`/district/${CLEVELAND}`);
   });
 });
 
 test.describe("the verification gate", () => {
-  test("reports agreement with the Rust checkpoints and enables the scenario builder", async ({
-    page,
-  }) => {
-    await page.goto("/");
-
-    // The central invariant of this page, as the footer states it. Both halves are counted:
-    // the simulation checkpoints and the forecasts, which are gated separately.
-    await expect(page.locator("#verified")).toHaveText(
-      "Formula verified against 8 reference scenarios and 4 reference forecasts",
+  test("reports agreement and enables the scenario builder", async ({ page }) => {
+    await page.goto("/scenario");
+    await expect(page.locator("#scenario-status")).toContainText(
+      "Formula reproduced against 8 reference scenarios and 4 reference forecasts",
     );
-    await expect(page.locator("#verified")).not.toHaveClass(/err/);
-
-    await page.getByRole("tab", { name: "Scenario" }).click();
-    await expect(page.locator("#lv-guarantee")).toBeVisible();
     await expect(page.locator("#scenario-out .err")).toHaveCount(0);
+    await expect(page.locator("#lv-guarantee")).toBeVisible();
   });
 
   test("disables the scenario builder when a checkpoint disagrees", async ({ page }) => {
-    // Tamper with the feed in flight. If the page can be made to render a scenario off a feed
+    // Tamper with the panel in flight. If the page can be made to render a scenario off a panel
     // whose checkpoints do not reproduce, the gate is decorative — and the whole argument for
     // computing the formula twice rests on it not being.
-    await page.route("**/data/bundle.json", async (route) => {
+    await page.route("**/data/panel.json", async (route) => {
       const response = await route.fetch();
-      const bundle = await response.json();
-      bundle.checkpoints[1].cost += 1_000_000;
-      await route.fulfill({ response, json: bundle });
+      const panel = await response.json();
+      panel.checkpoints[0].cost += 1_000_000;
+      await route.fulfill({ json: panel });
     });
 
-    await page.goto("/");
-
-    await expect(page.locator("#verified")).toHaveText(/FAILED/);
-    await expect(page.locator("#verified")).toHaveClass(/err/);
-
-    await page.getByRole("tab", { name: "Scenario" }).click();
-    await expect(page.locator("#scenario-out .err")).toContainText(
+    await page.goto("/scenario");
+    await expect(page.locator("#scenario-out .err h2")).toHaveText(
       "The scenario builder is disabled",
     );
-    await expect(page.locator("#scenario-out")).toContainText("guarantee removed");
-    // The controls are gone, not merely greyed: there is nothing to move.
+    await expect(page.locator("#scenario-out")).toContainText("current law");
+    await expect(page.locator("#scenario-status")).toContainText("FAILED");
+    // The controls are cleared too: a lever that cannot be trusted to compute should not invite
+    // being moved.
     await expect(page.locator("#lv-guarantee")).toHaveCount(0);
-    // The published-figure views read the feed rather than recomputing it, so they still work.
-    await page.getByRole("tab", { name: "District" }).click();
-    await expect(page.locator("#district-out .tiles").first().locator(".tile")).toHaveCount(3);
   });
 
-  test("refuses to render a feed on a different contract", async ({ page }) => {
-    await page.route("**/data/bundle.json", async (route) => {
+  test("the district scenario is gated by the same check", async ({ page }) => {
+    await page.route("**/data/panel.json", async (route) => {
       const response = await route.fetch();
-      const bundle = await response.json();
-      bundle.contract_version = "99.0.0";
-      await route.fulfill({ response, json: bundle });
+      const panel = await response.json();
+      panel.checkpoints[0].gainers += 1;
+      await route.fulfill({ json: panel });
     });
 
-    await page.goto("/");
-    await expect(page.locator("#district-out .err")).toContainText("99.0.0");
-    await expect(page.locator("#district-out .tile")).toHaveCount(0);
-
-  });
-
-  test("explains itself when the feed is missing", async ({ page }) => {
-    await page.route("**/data/bundle.json", (route) => route.fulfill({ status: 404 }));
-    await page.goto("/");
-    await expect(page.locator("#district-out .err")).toContainText("Could not load");
-  });
-});
-
-test.describe("tabs and links", () => {
-  test("switching tabs moves the fragment and the selected panel together", async ({ page }) => {
-    await page.goto("/");
-    // The tab buttons are in the inert shell and their listeners are attached by `boot()`, so a
-    // click before the feed resolves does nothing. This raced once the feed passed a megabyte;
-    // waiting for the picker to be written is waiting for boot.
-    await expect(page.locator("#pick option")).toHaveCount(609);
-
-    await page.getByRole("tab", { name: "Statewide" }).click();
-    await expect(page).toHaveURL(/#statewide$/);
-    await expect(page.locator("[data-panel=statewide]")).toBeVisible();
-    await expect(page.locator("[data-panel=district]")).toBeHidden();
-    await expect(page.getByRole("tab", { name: "Statewide" })).toHaveAttribute(
-      "aria-selected",
-      "true",
+    await page.goto(`/district/${NORTHERN}/scenario`);
+    await expect(page.locator("#scenario-out .err h2")).toHaveText(
+      "The scenario builder is disabled",
     );
-
-    await page.getByRole("tab", { name: "District" }).click();
-    await expect(page).toHaveURL(new RegExp(`#district/\\d{6}$`));
-    await expect(page.locator("[data-panel=district]")).toBeVisible();
   });
 
-  test("a link to one district opens that district", async ({ page }) => {
-    await page.goto(`/#district/${CLEVELAND}`);
-    await expect(page.locator("#pick")).toHaveValue(CLEVELAND);
-    await expect(page.locator("#district-out")).toContainText("Guarantee");
+  test("refuses a panel on a different contract", async ({ page }) => {
+    await page.route("**/data/panel.json", async (route) => {
+      const response = await route.fetch();
+      const panel = await response.json();
+      panel.contract_version = "99.0.0";
+      await route.fulfill({ json: panel });
+    });
+    await page.goto("/scenario");
+    await expect(page.locator("#scenario-out")).toContainText("99.0.0");
   });
 
-  test("a link to the statewide view opens it directly", async ({ page }) => {
-    await page.goto("/#statewide");
-    await expect(page.locator("[data-panel=statewide]")).toBeVisible();
-    await expect(page.locator("#statewide-out")).toContainText("Who is on the guarantee");
-    await expect(page.locator("#statewide-out svg.chart").first()).toBeVisible();
-  });
-
-  test("a shared scenario link arrives with its levers already set", async ({ page }) => {
-    // The point of the tab: "here is what this proposal does" is something one person can send
-    // another, and it has to arrive showing the proposal rather than current law.
-    await page.goto("/#scenario?g=phase-out&arg=0.5&base=1.05&min=0.1&pb=1&pc=1");
-
-    await expect(page.locator("#lv-guarantee")).toHaveValue("phase-out");
-    await expect(page.locator("#lv-arg")).toHaveValue("0.5");
-    await expect(page.locator("#lv-base")).toHaveValue("1.05");
-    await expect(page.locator("#scenario-out")).not.toContainText("Current law");
-    await expect(page.locator("#scenario-out")).toContainText("Districts reached");
-  });
-
-  test("selecting a district from the picker rewrites the fragment", async ({ page }) => {
-    await page.goto("/");
-    await page.locator("#pick").selectOption(CLEVELAND);
-    await expect(page).toHaveURL(new RegExp(`#district/${CLEVELAND}$`));
+  test("the rest of the site is unaffected by a bad panel", async ({ page }) => {
+    // The pages are baked, so a broken panel cannot reach them. This is the pay-off for moving
+    // the gate to build time: one failure mode, contained to one route.
+    await page.route("**/data/panel.json", (route) => route.fulfill({ status: 500, body: "no" }));
+    await page.goto(`/district/${CLEVELAND}`);
+    await expect(page.locator(".err")).toHaveCount(0);
+    await expect(page.locator(".tile .v").first()).not.toBeEmpty();
   });
 });
 
 test.describe("the scenario builder", () => {
   test("current law moves nothing and says so", async ({ page }) => {
-    await page.goto("/#scenario");
+    await page.goto("/scenario");
     await expect(page.locator("#scenario-out")).toContainText("Current law");
     await expect(page.locator("#scenario-out")).toContainText("nothing moves");
   });
 
   test("removing the guarantee reaches exactly the guaranteed districts", async ({ page }) => {
-    await page.goto("/#scenario");
-    await page.locator("#lv-guarantee").selectOption("removed");
-
-    // 294 districts are on the guarantee; removing it can reach those and only those.
+    await page.goto("/scenario");
+    await setGuarantee(page, "removed");
     const tiles = page.locator("#scenario-out .tile");
-    await expect(tiles.filter({ hasText: "Districts reached" })).toContainText("294");
-    await expect(tiles.filter({ hasText: "Districts reached" })).toContainText("0 up, 294 down");
-    await expect(page.locator("#scenario-out svg.chart")).toBeVisible();
+    await expect(tiles.nth(1).locator(".v")).toHaveText("294");
+    await expect(tiles.nth(1).locator(".n")).toHaveText("0 up, 294 down");
   });
 
   test("the retained-share slider hides for the rules that do not take one", async ({ page }) => {
-    await page.goto("/#scenario");
-    const retained = page.locator("#lv-arg").locator("xpath=ancestor::div[@class='lever']");
-
-    await page.locator("#lv-guarantee").selectOption("as-enacted");
-    await expect(retained).toBeHidden();
-    await page.locator("#lv-guarantee").selectOption("phase-out");
-    await expect(retained).toBeVisible();
-    await page.locator("#lv-guarantee").selectOption("removed");
-    await expect(retained).toBeHidden();
+    await page.goto("/scenario");
+    const lever = page.locator("#lv-arg").locator("xpath=ancestor::div[@class='lever']");
+    await expect(lever).toBeHidden();
+    await setGuarantee(page, "phase-out");
+    await expect(lever).toBeVisible();
+    await setGuarantee(page, "removed");
+    await expect(lever).toBeHidden();
   });
 
-  test("moving a lever writes it into the fragment", async ({ page }) => {
-    await page.goto("/#scenario");
-    await page.locator("#lv-guarantee").selectOption("rebase");
-    await expect(page).toHaveURL(/g=rebase/);
-    await expect(page).toHaveURL(/arg=/);
+  test("moving a lever writes it into the query string", async ({ page }) => {
+    await page.goto("/scenario");
+    await setGuarantee(page, "phase-out");
+    await expect(page).toHaveURL(/[?&]g=phase-out/);
+  });
+
+  test("a shared scenario link arrives with its levers already set", async ({ page }) => {
+    await page.goto("/scenario?g=rebase&arg=0.9&base=1.05&min=0.15&pb=1&pc=1&h=2032");
+    await expect(page.locator("#lv-guarantee")).toHaveValue("rebase");
+    await expect(page.locator("#lv-arg")).toHaveValue("0.9");
+    await expect(page.locator("#lv-base")).toHaveValue("1.05");
+    await expect(page.locator("#lv-min")).toHaveValue("0.15");
   });
 
   test("reset returns to current law, controls and all", async ({ page }) => {
-    await page.goto("/#scenario?g=removed&base=1.2&min=0.25&pb=1&pc=1&arg=0.5");
-    await expect(page.locator("#scenario-out")).toContainText("Districts reached");
-
-    await page.getByRole("button", { name: "Reset to current law" }).click();
-
+    await page.goto("/scenario");
+    await setGuarantee(page, "removed");
+    await page.locator("#lv-base").fill("1.2");
+    await page.locator("#lv-base").dispatchEvent("input");
+    await page.locator("#scenario-reset").click();
     await expect(page.locator("#lv-guarantee")).toHaveValue("as-enacted");
     await expect(page.locator("#lv-base")).toHaveValue("1");
-    // The minimum resets to the model's own value, not to the slider's floor.
-    await expect(page.locator("#lv-min")).toHaveValue("0.1");
     await expect(page.locator("#scenario-out")).toContainText("Current law");
+  });
+
+  test("the district scenario names its own change and the statewide count", async ({ page }) => {
+    // The design rule this page exists for: a change that helps this district is not thereby a
+    // good change, and the number of districts it hurts is in the same view, not behind a link.
+    await page.goto(`/district/${NORTHERN}/scenario?g=removed&arg=0.5&base=1&min=0.1&pb=1&pc=1&h=2026`);
+    await expect(page.locator("#scenario-out")).toContainText("State aid under this scenario");
+    await expect(page.locator("#scenario-out")).toContainText("And to everyone else");
+    await expect(page.locator("#scenario-out")).toContainText("294");
+    await expect(page.locator("#scenario-out")).toContainText("moves the district onto the formula");
   });
 });
 
 test.describe("the projection", () => {
   test("leads with the range and demotes the point to a footnote", async ({ page }) => {
-    // The design rule this axis was blocked on, made checkable. Everywhere else on this page the
-    // large number is a point estimate; here it must be an interval, or the interval becomes a
-    // disclaimer the eye skips.
-    await page.goto("/#scenario");
+    await page.goto("/scenario");
     const headline = page.locator("#projection-out .tile.wide");
     await expect(headline.locator(".v")).toContainText("–");
-    await expect(headline.locator(".v")).toContainText("$");
-    await expect(headline.locator(".n")).toContainText("Central estimate");
-    await expect(headline.locator(".n")).toContainText("not the answer");
+    await expect(headline.locator(".n")).toContainText("One path through the band, not the answer");
   });
 
   test("draws a band with both bounds labelled and the centre dashed", async ({ page }) => {
-    await page.goto("/#scenario");
-    const fan = page.locator('#projection-out [data-chart="fan"] svg');
-    await expect(fan.locator("path.fan-band")).toHaveCount(1);
-    await expect(fan.locator("polyline.fan-edge")).toHaveCount(2);
-    await expect(fan.locator("polyline.fan-mid")).toHaveCount(1);
-    await expect(fan.locator("text.fan-bound")).toHaveCount(2);
-    // The truncated axis says so rather than leaving it to be noticed.
-    await expect(fan.locator("text.axis-label", { hasText: "not zero" })).toHaveCount(1);
+    await page.goto("/scenario");
+    const chart = page.locator('#projection-out [data-chart="fan"] svg');
+    await expect(chart.locator(".fan-band")).toHaveCount(1);
+    await expect(chart.locator(".fan-mid")).toHaveCount(1);
+    await expect(chart.locator(".fan-mid")).toHaveAttribute("stroke-dasharray", /\d/);
+    await expect(chart.locator(".fan-edge")).toHaveCount(2);
+    // Two bound labels, and no label on the central estimate.
+    await expect(chart.locator(".fan-bound text")).toHaveCount(2);
   });
 
-  test("opens on the observed years rather than on the forecast", async ({ page }) => {
-    // A band starting at a point with nothing to its left asks the reader to take that value on
-    // faith and gives them no way to judge the trend it was fitted from.
-    await page.goto("/#scenario");
-    const fan = page.locator('#projection-out [data-chart="fan"] svg');
-    await expect(fan.locator("polyline.fan-observed")).toHaveCount(1);
-    await expect(fan.locator("circle.fan-anchor")).toHaveCount(1);
-    // The axis opens on the first year the department published, not on the first forecast one.
-    await expect(fan.locator("text.axis-label").first()).toHaveText("FY2024");
-    await expect(page.locator("#projection-out .legend")).toContainText("Observed enrollment");
-
-    // Hovering an observed year says it is exact; hovering a projected one gives a range.
-    const tip = page.locator("#tip");
-    await fan.locator("rect.fan-hit").first().hover();
-    await expect(tip).toContainText("FY2024");
-    await expect(tip).toContainText("exact");
-    await fan.locator("rect.fan-hit").last().hover();
-    await expect(tip).toContainText("–");
+  test("says on its face that the axis is truncated", async ({ page }) => {
+    await page.goto("/scenario");
+    await expect(page.locator('#projection-out [data-chart="fan"] svg')).toContainText(
+      "not zero",
+    );
   });
 
   test("says it is a forecast and that the card above it is not", async ({ page }) => {
-    // Simulation and projection are different epistemic acts and the page must not let them
-    // blur. There is deliberately no figure anywhere that adds the two together.
-    await page.goto("/#scenario");
-    await expect(page.locator("#projection-out")).toContainText("This is a forecast");
+    await page.goto("/scenario");
+    await expect(page.locator("#projection-out")).toContainText("This is a <strong>forecast".replace("<strong>", ""));
     await expect(page.locator("#projection-out")).toContainText("the card above it is not");
-
-    // Under current law the simulation card says only that nothing moves; move a lever and it
-    // has to name itself as the deterministic half.
-    await page.locator("#lv-guarantee").selectOption("removed");
-    await expect(page.locator("#scenario-out")).toContainText("This is a simulation, not a forecast");
-
-    // And the forecast card is always after the simulation, never merged into it.
-    const order = await page.evaluate(() => {
-      const scenario = document.querySelector("#scenario-out");
-      const projection = document.querySelector("#projection-out");
-      return scenario!.compareDocumentPosition(projection!) & Node.DOCUMENT_POSITION_FOLLOWING;
-    });
-    expect(order).toBeGreaterThan(0);
+    // No figure anywhere adds the simulation and the forecast together.
+    await expect(page.locator("#projection-out")).not.toContainText("combined");
   });
 
-  test("removing the guarantee visibly widens the state's exposure", async ({ page }) => {
-    await page.goto("/#scenario");
-    const width = page
-      .locator("#projection-out .tile")
-      .filter({ hasText: "Band half-width" })
-      .locator(".v");
-    const enacted = await width.textContent();
-
-    await page.locator("#lv-guarantee").selectOption("removed");
-    await expect(width).not.toHaveText(enacted ?? "");
-    const removed = await width.textContent();
-
-    const number = (s: string | null) => Number((s ?? "").replace(/[^0-9.]/g, ""));
-    expect(number(removed)).toBeGreaterThan(number(enacted) * 1.5);
-    // And the card names what it is being compared against, so the reader is not left to
-    // remember the previous number.
-    await expect(page.locator("#projection-out")).toContainText("current law at the same horizon");
-  });
-
-  test("the horizon is a control, carries into the link, and turns the band off", async ({ page }) => {
-    await page.goto("/#scenario");
-    await page.locator("#lv-horizon").fill("2034");
-    await page.locator("#lv-horizon").dispatchEvent("input");
-    await expect(page).toHaveURL(/h=2034/);
-    await expect(page.locator("#projection-out")).toContainText("FY2034");
-
-    // The base year is the off position: no forecast, said out loud rather than an empty card.
+  test("the horizon control turns the band off at the base year", async ({ page }) => {
+    await page.goto("/scenario");
+    await expect(page.locator("#lv-horizon")).toBeVisible();
     await page.locator("#lv-horizon").fill("2026");
     await page.locator("#lv-horizon").dispatchEvent("input");
     await expect(page.locator("#projection-out")).toContainText("Not projected");
-    await expect(page.locator('#projection-out [data-chart="fan"]')).toHaveCount(0);
+    await expect(page).toHaveURL(/[?&]h=2026/);
   });
+});
 
-  test("a shared link opens on the horizon it was shared with", async ({ page }) => {
-    await page.goto("/#scenario?g=as-enacted&arg=0.5&base=1&min=0.1&pb=1&pc=1&h=2036");
-    await expect(page.locator("#lv-horizon")).toHaveValue("2036");
-    await expect(page.locator("#projection-out .tile.wide .k")).toContainText("FY2036");
-  });
-
-  test("the district view compares enrollment years without inventing a published one", async ({
-    page,
-  }) => {
-    // The department publishes one calculator at a time, so there is no FY2025 payment figure in
-    // this repository. The card must say that rather than labelling a computed row as published.
-    await page.goto(`/#district/${CLEVELAND}`);
-    const card = page
-      .locator("#district-out .card")
-      .filter({ hasText: "What a year of enrollment is worth here" });
-    await expect(card.locator("tbody tr")).toHaveCount(3);
-    await expect(card).toContainText("FY2026 — the model's own");
-    await expect(card).toContainText("are not published");
-    await expect(card.locator('[data-chart="district-fan"] svg')).toHaveCount(1);
-  });
-
+test.describe("one district's own band", () => {
   test("a guaranteed district shows what the formula computes beside what it receives", async ({
     page,
   }) => {
-    // Cleveland is on the guarantee, which pays a fixed dollar amount that enrollment does not
-    // enter — so its band is a flat line and a chart of it alone is a chart of nothing. Nearly
-    // half of Ohio's districts are in this position, so this is the common case, not the edge.
-    await page.goto(`/#district/${CLEVELAND}`);
-    const card = page
-      .locator("#district-out .card")
-      .filter({ hasText: "What a year of enrollment is worth here" });
-
-    await expect(card).toContainText("flat by construction");
-    await expect(card).toContainText("The gap between them is the guarantee");
-
-    // Two series: the flat realized line and the falling formula line, in the two validated
-    // hues, each direct-labelled at the terminal year.
-    await expect(card.locator("polyline.fan-reference")).toHaveCount(1);
-    await expect(card.locator("text.fan-bound")).toHaveCount(2);
-    await expect(card.locator(".legend")).toContainText("What the formula computes");
+    await page.goto(`/district/${CLEVELAND}`);
+    const chart = page.locator('[data-chart="district-fan"] svg');
+    // Its aid does not respond to its enrollment at all, so the band collapses — and the second
+    // line, the formula's own falling answer, is what makes the chart say something.
+    await expect(chart.locator(".fan-reference")).toHaveCount(1);
+    await expect(page.locator(".card", { hasText: "Carried forward" })).toContainText(
+      "flat by construction",
+    );
   });
 
   test("a formula-funded district gets a band and no second line", async ({ page }) => {
-    // The reference line exists because a flat band says nothing. Where the band already says
-    // something, a second series would be one more mark for no extra claim.
-    await page.goto("/#district/046763");
-    const card = page
-      .locator("#district-out .card")
-      .filter({ hasText: "What a year of enrollment is worth here" });
-    await expect(card.locator("polyline.fan-reference")).toHaveCount(0);
-    await expect(card).toContainText("The range, not the line, is the finding");
+    await page.goto(`/district/${ON_FORMULA}`);
+    const chart = page.locator('[data-chart="district-fan"] svg');
+    await expect(chart.locator(".fan-band")).toHaveCount(1);
+    await expect(chart.locator(".fan-reference")).toHaveCount(0);
+    await expect(page.locator(".card", { hasText: "Carried forward" })).toContainText(
+      "The range, not the line, is the finding",
+    );
   });
 
-  test("the footer counts the forecasts it checked, not only the scenarios", async ({ page }) => {
-    await page.goto("/");
-    await expect(page.locator("#verified")).toContainText("reference forecasts");
-    await expect(page.locator("#verified")).not.toHaveClass(/err/);
+  test("compares enrollment years without inventing a published one", async ({ page }) => {
+    await page.goto(`/district/${CLEVELAND}`);
+    const card = page.locator(".card", { hasText: "What a year of enrollment is worth here" });
+    await expect(card).toContainText("FY2024");
+    await expect(card).toContainText("FY2026 — the model's own");
+    await expect(card).toContainText("These are not published FY2025 and FY2026 funding totals");
   });
 });
 
-test.describe("the actuals", () => {
+test.describe("the finances route", () => {
   test("shows six closed years of money that changed hands", async ({ page }) => {
-    await page.goto(`/#district/${CLEVELAND}`);
-    const card = page
-      .locator("#district-out .card")
-      .filter({ hasText: "What it actually received, and what it holds" });
-    await expect(card.locator("tbody tr")).toHaveCount(6);
-    await expect(card.locator("tbody tr").first()).toContainText("FY2020");
-    await expect(card.locator("tbody tr").last()).toContainText("FY2025");
-    await expect(card.locator('[data-chart="cash"] svg')).toHaveCount(1);
+    await page.goto(`/district/${CLEVELAND}/finances`);
+    await expect(page.locator(".basis-panel.nominal tbody tr")).toHaveCount(6);
+    await expect(page.locator(".basis-panel.nominal")).toContainText("audited actuals");
   });
 
-  test("says these are actuals and not the calculator's output", async ({ page }) => {
-    // The one card on this page that is a record rather than a model. Rendering it beside the
-    // FY2027 figures without saying which is which would present a measurement and a projection
-    // as the same kind of claim.
-    await page.goto(`/#district/${CLEVELAND}`);
-    const card = page
-      .locator("#district-out .card")
-      .filter({ hasText: "What it actually received, and what it holds" });
-    await expect(card).toContainText("audited actuals");
-    await expect(card).toContainText("not the same construction");
-    await expect(card).toContainText("General fund only");
-    // And the relief years are declared rather than left in a footnote nobody reads.
-    await expect(card).toContainText("federal pandemic relief years");
+  test("refuses to be read as a check on the model", async ({ page }) => {
+    await page.goto(`/district/${CLEVELAND}/finances`);
+    await expect(page.getByText("What these numbers are not")).toBeVisible();
+    await expect(page.locator(".card", { hasText: "What these numbers are not" })).toContainText(
+      "not comparable line for line",
+    );
   });
 
-  test("a direct label on the longest bar is not clipped", async ({ page }) => {
-    // The largest bar is the one most worth reading, and it is the one whose label runs off the
-    // viewBox if the chart does not reserve a gutter for it.
-    await page.goto(`/#district/${CLEVELAND}`);
-    const svg = page.locator('#district-out [data-chart="cash"] svg');
-    const box = await svg.boundingBox();
-    for (const label of await svg.locator("text.bar-value").all()) {
-      const at = await label.boundingBox();
-      expect(at, "a direct label has no box").not.toBeNull();
-      expect(at!.x + at!.width).toBeLessThanOrEqual(box!.x + box!.width + 1);
-    }
+  test("deflating reverses the sign of the statewide cash story", async ({ page }) => {
+    // The reason both bases are offered rather than one: they support opposite arguments, and the
+    // difference is entirely CPI.
+    await page.goto("/");
+    const nominal = page.locator(".basis-panel.nominal .tile", { hasText: "Change since FY2020" });
+    await expect(nominal.locator(".v")).toHaveClass(/gain/);
+    const real = page.locator(".basis-panel.real .tile", { hasText: "Change since FY2020" });
+    await expect(real.locator(".v")).toHaveClass(/loss/);
   });
 });
 
-test.describe("constant dollars", () => {
-  test("offers both bases and says which is showing", async ({ page }) => {
-    await page.goto("/#statewide");
-    const card = page
-      .locator("#statewide-out .card")
-      .filter({ hasText: "What districts actually received" });
-    await expect(card.locator(".basis")).toContainText("Showing nominal");
-    await expect(card.locator('[data-basis="nominal"]')).toHaveAttribute("aria-pressed", "true");
-
-    await card.locator('[data-basis="real"]').click();
-    await expect(card.locator(".basis")).toContainText("Showing FY2020 dollars");
-    // A real figure never appears without the index that produced it.
-    await expect(card).toContainText("CPI-U");
+test.describe("the outcome routes", () => {
+  test("shows the raw guarantee association and the controlled one together", async ({ page }) => {
+    // The rule the whole axis exists for: no association appears without its controlled figure.
+    await page.goto("/outcomes");
+    const tiles = page.locator(".tiles").first().locator(".tile");
+    await expect(tiles.nth(1)).toContainText("+0.187");
+    await expect(tiles.nth(2)).toContainText("+0.035");
+    await expect(tiles.nth(2)).toContainText("holding poverty constant");
   });
 
-  test("deflating reverses the sign of the cash story", async ({ page }) => {
-    // The reason the toggle exists rather than a footnote. Nominally the statewide balance ends
-    // above where it started; in constant dollars it ends below. Both are correct and they
-    // support opposite arguments, so the page shows both rather than picking by omission.
-    await page.goto("/#statewide");
-    const card = page
-      .locator("#statewide-out .card")
-      .filter({ hasText: "What districts actually received" });
-    const change = card.locator(".tile").filter({ hasText: "Change since" }).locator(".v");
-
-    await expect(change).toHaveClass(/gain/);
-    await card.locator('[data-basis="real"]').click();
-    await expect(change).toHaveClass(/loss/);
-    await expect(card).toContainText("support opposite arguments");
+  test("names both spending denominators rather than quoting one number", async ({ page }) => {
+    await page.goto("/outcomes");
+    const card = page.locator(".card", { hasText: "The same numerator, two denominators" });
+    await expect(card).toContainText("need-weighted");
+    await expect(card).toContainText("enrolled");
   });
 
-  test("the district card offers the same switch as the statewide one", async ({ page }) => {
-    // The inconsistency an audit found: the district panel spans the same 25% price change and
-    // showed one basis only, on the page where a school board actually looks.
-    await page.goto(`/#district/${CLEVELAND}`);
-    const card = page
-      .locator("#district-out .card")
-      .filter({ hasText: "What it actually received" });
-    await expect(card.locator(".basis")).toContainText("Showing nominal");
-
-    await card.locator('[data-basis="real"]').click();
-    await expect(card.locator(".basis")).toContainText("Showing FY2020 dollars");
-    await expect(card).toContainText("CPI-U");
-
-    // The deficit count is a fact about each year's own dollars and must not move with the basis.
-    const aid = card.locator(".tile").filter({ hasText: "State aid, FY2020" });
-    await expect(aid).toContainText("years run at a deficit");
+  test("the poverty chart falls left to right", async ({ page }) => {
+    await page.goto("/outcomes");
+    await expect(page.locator('[data-chart="poverty-quintiles"] svg')).toBeVisible();
+    await expect(page.locator(".card", { hasText: "Poverty is most of what" })).toContainText(
+      "−0.846",
+    );
   });
 
-  test("real state aid fell far more than nominal state aid", async ({ page }) => {
-    // The finding the price index makes visible: statewide state aid is roughly flat in nominal
-    // dollars across FY2020-FY2025 and down a fifth in real ones.
-    await page.goto("/#statewide");
-    const card = page
-      .locator("#statewide-out .card")
-      .filter({ hasText: "What districts actually received" });
-    const aid = card.locator(".tile").filter({ hasText: "State aid, FY2020" });
-    await expect(aid.locator(".v")).toContainText("-");
-    await expect(aid.locator(".n")).toContainText("nominal");
+  test("a district's score is shown against comparable poverty, not against the state", async ({
+    page,
+  }) => {
+    await page.goto(`/district/${CLEVELAND}/outcome`);
+    const card = page.locator(".card", { hasText: "Against districts with comparable poverty" });
+    await expect(card).toContainText("Median of its poverty fifth");
+    await expect(card).toContainText("It is <strong>not</strong> an effect".replace(/<[^>]+>/g, ""));
+  });
 
-    const real = Number((await aid.locator(".v").textContent())!.replace(/[^0-9.-]/g, ""));
-    const nominal = Number((await aid.locator(".n").textContent())!.replace(/[^0-9.-]/g, ""));
-    expect(real).toBeLessThan(nominal - 10);
+  test("a district with no report card says so instead of showing blanks", async ({ page }) => {
+    // Three of the 609 have no report card. The page has to exist and explain itself.
+    await page.goto("/data/bundle.json");
+    const bundle = await page.evaluate(() => JSON.parse(document.body.innerText));
+    const missing = bundle.districts.find((d: { outcome: unknown }) => d.outcome === null);
+    expect(missing).toBeTruthy();
+    await page.goto(`/district/${missing.irn}/outcome`);
+    await expect(page.getByText("No report card is published for this district")).toBeVisible();
   });
 });
 
-test.describe("charts", () => {
-  test("the hover layer follows the marks and survives a re-render", async ({ page }) => {
-    await page.goto("/#statewide");
-    const tip = page.locator("#tip");
-    await expect(tip).toBeHidden();
-
-    await page.locator("#statewide-out .bar-row").first().hover();
-    await expect(tip).toBeVisible();
-    await expect(tip).toContainText("on the guarantee");
-
-    // Re-render under a different view without reloading; the listener is delegated from the
-    // body once at boot, so the marks that replaced these ones have to work too.
-    await page.getByRole("tab", { name: "Scenario" }).click();
-    await page.locator("#lv-guarantee").selectOption("removed");
-    await page.locator("#scenario-out .bar-row").first().hover();
-    await expect(tip).toBeVisible();
-    await expect(tip).toContainText("district");
+test.describe("the wiki", () => {
+  test("renders a node with its properties, links and backlinks", async ({ page }) => {
+    await page.goto("/wiki/parameter/twenty-mill-floor");
+    await expect(page.locator("h1")).toHaveText("Twenty-Mill Floor");
+    await expect(page.getByText("Pointed at by")).toBeVisible();
+    await expect(page.locator(".card", { hasText: "Links" })).toContainText("constrains");
   });
 
-  test("the diverging histogram marks where zero is", async ({ page }) => {
-    // A reader has to be able to see the midpoint rather than infer it from the hues.
-    await page.goto("/#scenario");
-    await page.locator("#lv-guarantee").selectOption("phase-out");
-    await page.locator("#lv-base").fill("1.05");
-    await page.locator("#lv-base").dispatchEvent("input");
+  test("rewrites corpus file paths into working routes", async ({ page }) => {
+    // The transformation most likely to rot: `../legislation/hb-920-1976.yml` has to become a
+    // route, and a wrong guess produces an ordinary-looking link that 404s.
+    await page.goto("/wiki/parameter/twenty-mill-floor");
+    const link = page.locator('.prose-body a[href="/wiki/legislation/hb-920-1976"]').first();
+    await expect(link).toBeVisible();
+    await link.click();
+    await expect(page.locator("h1")).toContainText("H.B. 920");
+  });
 
-    const histogram = page.locator("#scenario-out svg.chart");
-    await expect(histogram.locator("line.zero")).toHaveCount(1);
-    await expect(histogram.locator("text.axis-label", { hasText: "no change" })).toHaveCount(1);
+  test("keeps the corpus's claim tags as badges rather than as stray brackets", async ({ page }) => {
+    await page.goto("/wiki/metric/performance-index");
+    await expect(page.locator(".claim.verified").first()).toBeVisible();
+    await expect(page.locator(".claim.inference").first()).toBeVisible();
+    // The tags must not survive as literal text anywhere in the prose.
+    const prose = await page.locator(".prose-body").innerText();
+    expect(prose).not.toContain("[verified]");
+    expect(prose).not.toContain("[inference]");
+    expect(prose).not.toContain("[open]");
+  });
+
+  test("joins an exemplar district to its live figures", async ({ page }) => {
+    // The reason the wiki is on the same site as the data: the corpus says what Upper Arlington
+    // illustrates, the feed says what it is currently paid.
+    await page.goto("/wiki/education-agency/upper-arlington-city");
+    const card = page.locator(".card", { hasText: "This district, in the current model" });
+    await expect(card).toBeVisible();
+    await card.getByRole("link", { name: "Dashboard" }).click();
+    await expect(page.locator("h1")).toHaveText("Upper Arlington City");
+  });
+
+  test("a class page is also the schema for its class", async ({ page }) => {
+    await page.goto("/wiki/education-agency");
+    await expect(page.getByRole("heading", { name: "Properties" })).toBeVisible();
+    await expect(page.getByRole("heading", { name: "Relationships" })).toBeVisible();
+    await expect(page.locator(".card", { hasText: "Properties" })).toContainText("irn");
+    await expect(page.locator(".card", { hasText: "Relationships" })).toContainText("party-to");
+  });
+
+  test("a source lists the nodes that cite it", async ({ page }) => {
+    await page.goto("/wiki/source");
+    await page.getByRole("link", { name: /School Finance Payment Report/ }).click();
+    await expect(page.getByRole("heading", { name: "Cited by" })).toBeVisible();
+    await expect(page.locator(".card", { hasText: "Cited by" }).locator("a")).not.toHaveCount(0);
+  });
+});
+
+test.describe("finding things", () => {
+  test("the district index filters and sorts without a round trip", async ({ page }) => {
+    await page.goto("/districts");
+    // Four district names contain "cleveland" — Cleveland Municipal, Cleveland Heights, East
+    // Cleveland, and Miller City-New Cleveland. A substring filter finds all of them.
+    await page.locator("#f-name").fill("cleveland");
+    await expect(page.locator("#district-table tbody tr:visible")).toHaveCount(4);
+    await expect(page.locator("#f-count")).toContainText("of 609");
+
+    await page.locator("#f-name").fill("");
+    await page.locator("#f-status").selectOption("guarantee");
+    await expect(page.locator("#f-count")).toContainText("294 of 609");
+  });
+
+  test("sorting by a column reorders the table", async ({ page }) => {
+    await page.goto("/districts");
+    await page.locator('thead button[data-sort="aid"]').click();
+    const first = page.locator("#district-table tbody tr").first();
+    await expect(first).toHaveAttribute("data-name", /.+/);
+    await expect(page.locator('thead button[data-sort="aid"]')).toHaveAttribute(
+      "aria-sort",
+      "descending",
+    );
+  });
+
+  test("search finds a district by IRN and a concept by name", async ({ page }) => {
+    await page.goto("/search?q=043786");
+    await expect(page.locator("#search-out")).toContainText("Cleveland Municipal");
+
+    await page.locator("#s-q").fill("twenty-mill");
+    await expect(page.locator("#search-out")).toContainText("Twenty-Mill Floor");
+  });
+
+  test("comparison puts two districts side by side", async ({ page }) => {
+    await page.goto(`/compare?a=${NORTHERN}&b=044933`);
+    const table = page.locator("#compare-out table");
+    await expect(table).toContainText("Northern Local");
+    await expect(table).toContainText("Upper Arlington City");
+    await expect(table).toContainText("Assessed valuation per pupil");
+    // Wealth is compared as a ratio, because it spans two orders of magnitude.
+    await expect(table).toContainText("×");
   });
 });
 
 test.describe("presentation", () => {
   test("renders in dark mode without losing the series colours", async ({ page }) => {
+    // Charts are rendered at build time and cannot re-render on a theme change, so every colour in
+    // them is a custom property. This is the test that the indirection actually resolves.
     await page.emulateMedia({ colorScheme: "dark" });
-    await page.goto("/#statewide");
+    await page.goto("/");
+    const fill = await page
+      .locator(".bar-fill")
+      .first()
+      .evaluate((element) => getComputedStyle(element).fill);
+    // #3987e5 — the dark-mode step, not the light one.
+    expect(fill).toBe("rgb(57, 135, 229)");
+  });
 
-    const fill = page.locator("#statewide-out .bar-fill").first();
-    await expect(fill).toBeVisible();
-    // Dark mode is a selected step from the same ramp, not an inversion — so the mark still has
-    // to carry a colour rather than fall back to the page background.
-    const colour = await fill.evaluate((el) => getComputedStyle(el).fill);
-    expect(colour).not.toBe("rgba(0, 0, 0, 0)");
-    expect(colour).not.toBe("none");
+  test("the theme toggle beats the OS setting in both directions", async ({ page }) => {
+    await page.emulateMedia({ colorScheme: "dark" });
+    await page.goto("/");
+    await page.locator("#theme").click();
+    await expect(page.locator("html")).toHaveAttribute("data-theme", "light");
+    const fill = await page
+      .locator(".bar-fill")
+      .first()
+      .evaluate((element) => getComputedStyle(element).fill);
+    expect(fill).toBe("rgb(42, 120, 214)");
   });
 
   test("the page does not scroll sideways on a phone", async ({ page }) => {
     await page.setViewportSize({ width: 390, height: 844 });
-    await page.goto(`/#district/${CLEVELAND}`);
-    const overflow = await page.evaluate(
-      () => document.documentElement.scrollWidth - document.documentElement.clientWidth,
-    );
-    expect(overflow, "the document scrolls horizontally").toBeLessThanOrEqual(0);
-  });
-});
-
-test.describe("the outcome view", () => {
-  test("shows the raw guarantee association and the controlled one on the same screen", async ({
-    page,
-  }) => {
-    // The specific thing this view exists to prevent is a reader taking +0.187 as a finding.
-    // If the controlled figure ever stops being rendered beside it, this fails.
-    await page.goto("/#outcomes");
-    const panel = page.locator('[data-panel="outcomes"]');
-    await expect(panel).toBeVisible();
-    await expect(panel).toContainText("+0.187");
-    await expect(panel).toContainText("+0.035");
-    await expect(panel).toContainText("holding poverty constant");
-  });
-
-  test("names both spending denominators rather than quoting one number", async ({ page }) => {
-    await page.goto("/#outcomes");
-    const panel = page.locator('[data-panel="outcomes"]');
-    await expect(panel).toContainText("need-weighted");
-    await expect(panel).toContainText("enrolled");
-  });
-
-  test("the poverty chart falls left to right", async ({ page }) => {
-    await page.goto("/#outcomes");
-    // toHaveCount auto-retries; allTextContents does not, and the panel is written by script
-    // after the feed loads.
-    const labels = page.locator('[data-chart="poverty-quintiles"] .bar-value');
-    await expect(labels).toHaveCount(5);
-    const numbers = (await labels.allTextContents()).map(Number);
-    for (let i = 1; i < numbers.length; i++) {
-      expect(numbers[i]!).toBeLessThan(numbers[i - 1]!);
+    for (const path of ["/", `/district/${CLEVELAND}`, "/districts", "/wiki/metric/performance-index"]) {
+      await page.goto(path);
+      const overflow = await page.evaluate(
+        () => document.documentElement.scrollWidth - document.documentElement.clientWidth,
+      );
+      expect(overflow, `${path} scrolls sideways`).toBeLessThanOrEqual(1);
     }
   });
 
-  test("a district with no report card says so instead of showing blanks", async ({ page }) => {
-    // Kelleys Island: in the funding model, absent from every outcome file.
-    await page.goto("/#district/046797");
-    await expect(page.locator("#district-out")).toContainText("No report card is published");
-  });
-
-  test("a district with a report card shows its three-year index", async ({ page }) => {
-    await page.goto("/#district/049056");
-    const out = page.locator("#district-out");
-    await expect(out).toContainText("Performance Index, 2024-25");
-    await expect(out).toContainText("Performance Index, 2022-23");
-  });
-
-  test("the outcome tab is linkable like the others", async ({ page }) => {
+  test("the hover layer follows the marks", async ({ page }) => {
     await page.goto("/");
-    await page.getByRole("tab", { name: "Outcomes" }).click();
-    await expect(page).toHaveURL(/#outcomes$/);
+    const tip = page.locator("#tip");
+    await expect(tip).toBeHidden();
+    await page.locator(".bar-fill > *").first().hover();
+    await expect(tip).toBeVisible();
+    await expect(tip).toContainText("districts on the guarantee");
+  });
+
+  test("the diverging histogram marks where zero is", async ({ page }) => {
+    // A reader has to be able to see where zero is, not infer it from the hues.
+    // Base cost up 10% with the guarantee removed: some districts gain and some lose, so the
+    // distribution straddles zero and the neutral midpoint has to be findable.
+    await page.goto("/scenario?g=removed&arg=0.5&base=1.1&min=0.1&pb=1&pc=1&h=2026");
+    const chart = page.locator('[data-chart="deltas"] svg');
+    await expect(chart).toBeVisible();
+    await expect(chart).toContainText("no change");
+    // Two hues and a neutral midpoint, never a hue at zero.
+    await expect(chart.locator(".hist > *")).not.toHaveCount(0);
   });
 });

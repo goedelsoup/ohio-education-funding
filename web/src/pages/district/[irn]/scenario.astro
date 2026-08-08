@@ -1,0 +1,92 @@
+---
+/**
+ * The same levers, answered for one district.
+ *
+ * This is the page a school board sends. It leads with what a proposed change does to them — and
+ * then, in the same view and not behind a link, how many districts it moves the other way. A
+ * scenario page that showed only the local number would let a reader conclude a change is good
+ * because it is good for them, and the statewide count is the correction.
+ *
+ * Computed in the browser for the same reason `/scenario` is, and gated by the same reproduction
+ * of the Rust checkpoints. It needs the whole panel even though it reports one district: the
+ * checkpoints are statewide totals, and a gate that could not check them would not be a gate.
+ */
+import DistrictNav from "../../../components/DistrictNav.astro";
+import ScenarioControls from "../../../components/ScenarioControls.astro";
+import Base from "../../../layouts/Base.astro";
+import { districtPaths, loadFeed } from "../../../lib/feed.ts";
+import { money } from "../../../lib/format.ts";
+import { currentRealizedAid } from "../../../lib/policy.ts";
+
+export const getStaticPaths = districtPaths;
+
+const { district } = Astro.props;
+// No `forecastable` here on purpose: this view holds enrollment at the published year and never
+// draws a band, so the projection gate has nothing to gate. The forecast lives on `/scenario`.
+const { bundle } = loadFeed();
+const s = bundle.statewide;
+const meta = bundle.projection;
+---
+
+<Base
+  title={`${district.name} — scenario`}
+  description={`What a change to the guarantee, base cost, minimum state share or phase-in would do to ${district.name}, and how many of Ohio's ${s.districts} districts it moves the other way.`}
+  section="districts"
+>
+  <h1>{district.name}</h1>
+  <p class="sub">
+    What a different decision would do here. Under current law this district receives {
+      /*
+       * Summed from the components rather than `realized_aid_per_pupil × current_year_adm`. The
+       * per-pupil figure is published on base cost enrolled ADM — the greater of the three-year
+       * average and the current year — so multiplying it by the current year's count is not a
+       * rounding difference but a different quantity, and it disagreed with the tile below by
+       * $193,000 before this was fixed.
+       */
+      money(currentRealizedAid(district))
+    }{" "}
+    {district.on_guarantee ? "and is held there by the guarantee." : "and is funded by the formula."}
+  </p>
+
+  <DistrictNav irn={district.irn} current="scenario" />
+
+  <div id="scenario-root" data-irn={district.irn}>
+    <ScenarioControls
+      model={s.minimum_state_share}
+      onGuarantee={s.on_guarantee}
+      projection={{ available: false, baseYear: meta?.base_year ?? 0, maxYear: meta?.horizon ?? 0 }}
+    />
+
+    <noscript>
+      <div class="card err">
+        <h2>This is the one view that needs JavaScript</h2>
+        <p class="note">
+          The other three views of this district — its <a href={`/district/${district.irn}`}
+            >dashboard</a
+          >, <a href={`/district/${district.irn}/outcome`}>outcome</a> and <a
+            href={`/district/${district.irn}/finances`}>finances</a
+          > — carry every figure in the document and read correctly without any script. This one
+          re-derives the funding formula as you move a slider.
+        </p>
+      </div>
+    </noscript>
+
+    <div id="scenario-out"></div>
+    <p class="note" id="scenario-status"></p>
+  </div>
+
+  <div class="card">
+    <h2>What this does not move</h2>
+    <p class="note">
+      Assessed valuation is held fixed, because the corpus has one observation per district and
+      cannot project it. Local capacity is 60% valuation, so a scenario in which property values
+      move is out of reach here. Enrollment is held at published FY{meta?.base_year ?? ""} — the
+      enrollment forecast lives on <a href="/scenario">the statewide scenario</a>, where the band
+      is the subject and is drawn as one.
+    </p>
+  </div>
+
+  <script>
+    import "../../../scripts/scenario.ts";
+  </script>
+</Base>

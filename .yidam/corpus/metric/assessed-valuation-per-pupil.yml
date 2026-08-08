@@ -60,7 +60,8 @@ properties:
     ignores resident income entirely. Tangible personal property was part of the base before
     the H.B. 66 phase-out, so the series has a definitional break in the late 2000s that will
     look like a valuation collapse in industrial districts if not handled. [verified]
-  calculator: Not yet implemented. [open] Target: a helper within `local-capacity`.
+  calculator: |
+    Not yet implemented. [open] Target: a helper within `local-capacity`.
 links:
   - target: enrolled-adm.yml
     relationship: derived-from

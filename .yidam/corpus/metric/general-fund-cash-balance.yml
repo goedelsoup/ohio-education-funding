@@ -73,6 +73,8 @@ properties:
   calculator: project::finances
 
 links:
+  - relationship: instance-of
+    target: ../metric.ont.yml
   - relationship: measures
     target: education-agency
     note: |

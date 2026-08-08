@@ -28,7 +28,6 @@ with a recorded reason. See
   parameter set; this is the simulation engine the `scenario` class binds to
 - `local-capacity` — state share index and local wealth measures
 - `millage` — effective millage under HB 920 reduction factors, including the 20-mill floor
-- `deduction` — community school and scholarship deductions against a resident district
 - `dispersion` — equity statistics across agencies, operationalizing the `doctrine` nodes
 - `deflate` — nominal-to-real normalization, without which a corpus spanning 1851 to the
   present cannot compare any two numbers honestly
@@ -41,6 +40,15 @@ with a recorded reason. See
   `replaces` graph actually aligns rather than a guessed correspondence; it carries the
   charge-off millage series with its statutory authority, and reports the residual its
   decomposition cannot explain
+
+**`deduction` is declared and not built.** It listed here as though it existed for long enough
+that the web layer's "what is not modelled" note was written from this file rather than from the
+workspace. There is a [skill describing what it would compute](../.yidam/skills/deduction.md) —
+the amount and student count leaving a resident district through each `program`, and critically
+the mechanism switch the Fair School Funding Plan made, after which community and STEM students
+are funded directly rather than deducted. What is missing is the per-agency participation series
+it would read. Until that exists, the 609 districts every calculator here covers are the
+traditional districts in the department's own model, and the voucher channel is outside all of it.
 
 A semantic index over `.yidam/corpus/` is not built at genesis — 45 nodes fit in context.
 It is added when the corpus outgrows direct retrieval, which the exemplar-agency expansion

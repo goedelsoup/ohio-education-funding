@@ -1,0 +1,82 @@
+---
+/**
+ * What one district's pupils achieve — and what that does and does not say about its funding.
+ *
+ * This exists as its own route rather than as a card on the dashboard because of what happens
+ * when it is not separated: a Performance Index sitting three inches under a state aid figure
+ * gets read as the return on it. The two are on different pages, and this one leads with the
+ * comparison that makes the number interpretable rather than with the number.
+ */
+import DistrictNav from "../../../components/DistrictNav.astro";
+import Base from "../../../layouts/Base.astro";
+import { districtPaths, loadFeed } from "../../../lib/feed.ts";
+import { renderDistrictOutcome, renderOutcomeContext } from "../../../lib/outcomes.ts";
+import * as routes from "../../../lib/routes.ts";
+
+export const getStaticPaths = districtPaths;
+
+const { district } = Astro.props;
+const { bundle } = loadFeed();
+const o = district.outcome;
+
+const description =
+  o?.performance_index == null
+    ? `No report card is published for ${district.name}.`
+    : `${district.name} scores ${o.performance_index.toFixed(1)} on Ohio's Performance Index for 2024-25, shown against districts with comparable poverty rather than against the state.`;
+---
+
+<Base title={`${district.name} — outcome`} description={description} section="districts">
+  <h1>{district.name}</h1>
+  <p class="sub">What its pupils achieve, and how little of it the funding side explains.</p>
+
+  <DistrictNav irn={district.irn} current="outcome" />
+
+  <Fragment set:html={renderOutcomeContext(bundle, district)} />
+  <Fragment set:html={renderDistrictOutcome(district)} />
+
+  <div class="card">
+    <h2>Two mistakes this page is built to prevent</h2>
+    <div class="scroll">
+      <table class="prose">
+        <tbody>
+          <tr>
+            <th>Reading a correlation with poverty as a correlation with something else</th>
+            <td>
+              Economic disadvantage explains Ohio's attainment measure at {
+                bundle.statewide.outcomes
+                  ? bundle.statewide.outcomes.poverty_vs_performance.toFixed(3)
+                  : "—"
+              }. Most other district-level variables are that one in disguise — including, sharply,
+              guarantee status. <a href="/outcomes">Every association statewide, with its
+              controlled figure beside it</a>.
+            </td>
+          </tr>
+          <tr>
+            <th>Quoting a per-pupil number without its denominator</th>
+            <td>
+              The two spending figures above share a numerator. The department's divides by a
+              need-weighted count; the other divides by headcount. Against an outcome that is
+              itself composition-driven, the first is substantially a composition proxy — statewide
+              the same numerator gives {
+                bundle.statewide.outcomes
+                  ? bundle.statewide.outcomes.weighted_spending_vs_performance.toFixed(3)
+                  : "—"
+              } one way and {
+                bundle.statewide.outcomes
+                  ? bundle.statewide.outcomes.enrolled_spending_vs_performance.toFixed(3)
+                  : "—"
+              } the other.
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+    <p class="note">
+      Nothing on this page is causal, and nothing on it is a judgement about this district's
+      schools. What it funds is on the <a href={routes.district(district.irn)}>dashboard</a>; what
+      it actually collected and spent is in its <a href={routes.districtFinances(district.irn)}
+        >finances</a
+      >.
+    </p>
+  </div>
+</Base>

@@ -80,6 +80,12 @@ jobs:
       - name: unit
         run: pnpm test:unit
 
+      # Explicit, though `test:e2e` builds too. The build is where the formula is checked against
+      # the Rust checkpoints and where the corpus is parsed, so a failure in either should read as
+      # a build failure rather than as a browser that never got a server to talk to.
+      - name: build
+        run: pnpm build
+
       - name: Install the browser
         run: pnpm exec playwright install --with-deps chromium
 

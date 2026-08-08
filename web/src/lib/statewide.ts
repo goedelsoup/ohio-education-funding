@@ -1,8 +1,11 @@
 /** The statewide view: the three structural facts, and the one chart that shows the first. */
 
-import { barChart, type Bar } from "./chart.ts";
-import { count, millions, money, pct } from "./format.ts";
+import type { Bar } from "./chart.ts";
+import { barSpec } from "./plot/spec.ts";
+import { renderToString } from "./plot/ssr.ts";
+import { count, escapeHtml, millions, money, pct } from "./format.ts";
 import { realChange, series, type Basis } from "./real.ts";
+import * as routes from "./routes.ts";
 import type { Bundle, District } from "./types.ts";
 
 /**
@@ -45,15 +48,7 @@ export function renderStatewideFinances(bundle: Bundle, basis: Basis): string {
 
   return `
     <div class="card">
-      <h2>What districts actually received, spent, and hold</h2>
-      <div class="basis" role="group" aria-label="Dollar basis">
-        <button data-basis="nominal" class="${basis === "nominal" ? "active" : ""}"
-                aria-pressed="${basis === "nominal"}">Nominal</button>
-        <button data-basis="real" class="${basis === "real" ? "active" : ""}"
-                aria-pressed="${basis === "real"}">Constant dollars</button>
-        <span class="n">Showing ${label}</span>
-      </div>
-
+      <h2>What districts actually received, spent, and hold — ${escapeHtml(label)}</h2>
       <div class="tiles">
         <div class="tile"><div class="k">Cash held, FY${latest.fiscal_year}</div>
           <div class="v">${millions(latest.ending_cash).replace("+", "")}</div>
@@ -73,7 +68,7 @@ export function renderStatewideFinances(bundle: Bundle, basis: Basis): string {
           <div class="n">real; ${pct(nominalAid, 1)} nominal</div></div>
       </div>
 
-      <div class="chartwrap" data-chart="statewide-cash">${barChart(bars)}</div>
+      <div class="chartwrap" data-chart="statewide-cash">${renderToString(barSpec(bars))}</div>
       <p class="note">General fund cash held at 30 June, summed over the
         ${count(bundle.statewide.districts)} districts in this feed.
         ${
@@ -123,8 +118,14 @@ export function guaranteeRateByQuintile(districts: District[]): Bar[] {
   });
 }
 
-/** Render the statewide view. */
-export function renderStatewide(bundle: Bundle, basis: Basis = "nominal"): string {
+/**
+ * The three structural facts, and the one chart that shows the first.
+ *
+ * Separate from {@link renderStatewideFinances} because that card is rendered twice — once per
+ * dollar basis — and this one is not: nothing in it is a dollar series that a price index could
+ * restate.
+ */
+export function renderStatewideStructure(bundle: Bundle): string {
   const s = bundle.statewide;
   const bars = guaranteeRateByQuintile(bundle.districts);
 
@@ -147,7 +148,7 @@ export function renderStatewide(bundle: Bundle, basis: Basis = "nominal"): strin
       <p class="note">Districts grouped into fifths by assessed valuation per pupil, poorest on
         the left. The guarantee was written as transitional relief for districts losing
         students; the pattern it actually produces is a wealth gradient.</p>
-      <div class="chartwrap" data-chart="quintiles">${barChart(bars, { max: 1 })}</div>
+      <div class="chartwrap" data-chart="quintiles">${renderToString(barSpec(bars, { max: 1 }))}</div>
       <p class="note">Median valuation per pupil statewide is
         ${money(s.median_valuation_per_pupil)}.</p>
     </div>
@@ -171,7 +172,7 @@ export function renderStatewide(bundle: Bundle, basis: Basis = "nominal"): strin
     <div class="card">
       <h2>Two floors</h2>
       <div class="scroll"><table><tbody>
-        <tr><th>At the 20-mill floor</th>
+        <tr><th>At the <a href="${routes.parameter("twenty-mill-floor")}">20-mill floor</a></th>
             <td>${s.at_millage_floor} districts (${pct(s.at_millage_floor / s.districts, 0)})</td></tr>
         <tr><th>At the minimum state share of ${pct(s.minimum_state_share, 0)}</th>
             <td>${s.at_minimum_state_share} districts (${pct(s.at_minimum_state_share / s.districts, 0)})</td></tr>
@@ -183,9 +184,8 @@ export function renderStatewide(bundle: Bundle, basis: Basis = "nominal"): strin
         Ohio for which that is true. At the <strong>minimum state share</strong>, the entire
         local capacity measure determines nothing: those districts receive a flat percentage of
         base cost however wealthy they are. That minimum is
-        ${pct(s.minimum_state_share, 0)} in this model, not the 5% the Fair School Funding Plan
-        was enacted with — each biennial budget sets it.</p>
-    </div>
-
-    ${renderStatewideFinances(bundle, basis)}`;
+        ${pct(s.minimum_state_share, 0)} in this model, not the 5% the
+        <a href="${routes.wikiNode("funding-regime", "fair-school-funding-plan")}">Fair School
+        Funding Plan</a> was enacted with — each biennial budget sets it.</p>
+    </div>`;
 }

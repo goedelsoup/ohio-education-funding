@@ -1,0 +1,62 @@
+---
+/**
+ * Every source the corpus draws on, and how heavily each is used.
+ *
+ * Sorted by citation count rather than alphabetically, because the question a reader has here is
+ * "what is this built on" and the answer is the top of that list. Uncited entries are kept and
+ * marked — the catalog treats an entry nothing reaches as a gap, not as clutter.
+ */
+import Base from "../../../layouts/Base.astro";
+import { loadCorpus } from "../../../lib/corpus.ts";
+import * as routes from "../../../lib/routes.ts";
+
+const { sources } = loadCorpus();
+const ranked = [...sources].sort(
+  (a, b) => b.citedBy.length - a.citedBy.length || a.title.localeCompare(b.title),
+);
+const uncited = ranked.filter((s) => s.citedBy.length === 0).length;
+---
+
+<Base
+  title="Sources"
+  description={`The ${sources.length} sources behind the Ohio school funding corpus — department publications, Legislative Service Commission analyses, district filings, and the litigation record.`}
+  section="wiki"
+>
+  <p class="crumb"><a href="/wiki">The corpus</a></p>
+  <h1>Sources</h1>
+  <p class="sub">
+    {sources.length} entries. Every numeric claim in the corpus should reach one of these in a
+    single hop{uncited > 0 ? `; ${uncited} are not yet cited by any node` : ""}.
+  </p>
+
+  <div class="card">
+    <div class="scroll">
+      <table class="prose">
+        <thead>
+          <tr>
+            <th>Source</th>
+            <th>Cited by</th>
+          </tr>
+        </thead>
+        <tbody>
+          {
+            ranked.map((source) => (
+              <tr>
+                <th>
+                  <a href={routes.wikiSource(source.slug)}>{source.title}</a>
+                </th>
+                <td>
+                  {source.citedBy.length === 0 ? (
+                    <span class="n">not yet cited</span>
+                  ) : (
+                    `${source.citedBy.length} node${source.citedBy.length === 1 ? "" : "s"}`
+                  )}
+                </td>
+              </tr>
+            ))
+          }
+        </tbody>
+      </table>
+    </div>
+  </div>
+</Base>

@@ -1,0 +1,189 @@
+---
+/**
+ * One corpus node.
+ *
+ * The description, its properties, what it points at, and — the part a file on disk cannot give
+ * you — what points back at it. A corpus is a graph, and the backlink list is the half of each
+ * edge that is invisible while authoring.
+ *
+ * Where a node names a district this repository holds live figures for, the two are joined: the
+ * corpus says what the district illustrates, the district page says what it is currently paid.
+ * That join is the reason the wiki is on the same site as the data rather than beside it.
+ */
+import Base from "../../../layouts/Base.astro";
+import { loadCorpus } from "../../../lib/corpus.ts";
+import { loadFeed } from "../../../lib/feed.ts";
+import { money } from "../../../lib/format.ts";
+import { renderProse, renderPropertyValue } from "../../../lib/prose.ts";
+import * as routes from "../../../lib/routes.ts";
+
+export function getStaticPaths() {
+  return loadCorpus().nodes.map((node) => ({
+    params: { class: node.className, node: node.name },
+    props: { node },
+  }));
+}
+
+const { node } = Astro.props;
+const corpus = loadCorpus();
+const entry = corpus.byClass.get(node.className);
+const description = await renderProse(node.description, node.className);
+const findings = node.findings ? await renderProse(node.findings, node.className) : null;
+
+/**
+ * The live district behind an exemplar node, where there is one.
+ *
+ * Five of the seven `education-agency` nodes carry an IRN that is in the feed. The IRN is written
+ * with its claim tag attached — `044933 [verified — …]` — so it is pulled out by pattern rather
+ * than read as a field.
+ */
+const { byIrn } = loadFeed();
+const irn = node.properties.find((p) => p.name === "irn")?.value.match(/\b(\d{6})\b/)?.[1];
+const district = irn ? byIrn.get(irn) : undefined;
+
+const stated = node.out.filter((edge) => edge.stated);
+const mentions = node.out.filter((edge) => !edge.stated);
+const summary = node.description.replace(/\s+/g, " ").replace(/\[[^\]]*\]\([^)]*\)/g, "").trim();
+---
+
+<Base title={node.label} description={summary.slice(0, 200)} section="wiki">
+  <p class="crumb">
+    <a href="/wiki">The corpus</a> ›{" "}
+    <a href={routes.wikiClass(node.className)}>{entry?.label ?? node.className}</a>
+  </p>
+  <h1>{node.label}</h1>
+  <p class="sub">
+    <code>{node.id}</code>
+    {node.in.length > 0 ? ` · ${node.in.length} node${node.in.length === 1 ? "" : "s"} point here` : ""}
+  </p>
+
+  {
+    district && (
+      <div class="card">
+        <h2>This district, in the current model</h2>
+        <p class="note">
+          The corpus says what {district.name} illustrates. The FY{loadFeed().bundle.fiscal_year}
+          {" "}model says what it is paid: {money(district.realized_aid_per_pupil)} per pupil,
+          {district.on_guarantee ? " held there by the guarantee." : " all of it from the formula."}
+        </p>
+        <div class="flags">
+          <a class="flag" href={routes.district(district.irn)}>Dashboard</a>
+          <a class="flag" href={routes.districtOutcome(district.irn)}>Outcome</a>
+          <a class="flag" href={routes.districtFinances(district.irn)}>Finances</a>
+          <a class="flag" href={routes.districtScenario(district.irn)}>Scenario</a>
+        </div>
+      </div>
+    )
+  }
+
+  <div class="card prose-body"><Fragment set:html={description} /></div>
+
+  {
+    findings && (
+      <div class="card prose-body">
+        <h2>Findings</h2>
+        <Fragment set:html={findings} />
+      </div>
+    )
+  }
+
+  {
+    node.properties.length > 0 && (
+      <div class="card">
+        <h2>Properties</h2>
+        <div class="scroll">
+          <table class="prose">
+            <tbody>
+              {node.properties.map((property) => (
+                <tr>
+                  <th>
+                    <code>{property.name}</code>
+                  </th>
+                  <td set:html={renderPropertyValue(property.value, node.className)} />
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    )
+  }
+
+  <div class="card">
+    <h2>Links</h2>
+    {
+      node.proseLinks && (
+        <p class="note">
+          This node writes its links as a paragraph rather than as the structured list every other
+          node uses, so they carry no relationship names. They are recovered from the prose below
+          and are listed as mentions.
+        </p>
+      )
+    }
+    {
+      stated.length > 0 && (
+        <div class="scroll">
+          <table class="prose">
+            <tbody>
+              {stated.map((edge) => (
+                <tr>
+                  <th>
+                    <code>{edge.relationship ?? "links to"}</code>
+                  </th>
+                  <td>
+                    <a href={edge.href}>{edge.label}</a>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      )
+    }
+    {
+      mentions.length > 0 && (
+        <>
+          <h3>Also mentions</h3>
+          <div class="flags">
+            {mentions.map((edge) => (
+              <a class="flag" href={edge.href}>
+                {edge.label}
+              </a>
+            ))}
+          </div>
+        </>
+      )
+    }
+    {
+      node.in.length > 0 && (
+        <>
+          <h3>Pointed at by</h3>
+          <div class="scroll">
+            <table class="prose">
+              <tbody>
+                {node.in.map((edge) => (
+                  <tr>
+                    <th>
+                      <a href={edge.href}>{edge.label}</a>
+                    </th>
+                    <td>
+                      {edge.relationship ? <code>{edge.relationship}</code> : <span class="n">mentions</span>}
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </>
+      )
+    }
+    {
+      node.out.length === 0 && node.in.length === 0 && (
+        <p class="note">
+          Nothing links to or from this node. The corpus treats that as a gap rather than a fact
+          about the node.
+        </p>
+      )
+    }
+  </div>
+</Base>

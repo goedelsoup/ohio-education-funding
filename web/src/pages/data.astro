@@ -1,0 +1,109 @@
+---
+/**
+ * The data, for people who want the table rather than the page.
+ *
+ * Journalists and legislative staff do not want 609 web pages; they want the panel in something
+ * that opens in a spreadsheet. Publishing it is nearly free — the feed is already a static file —
+ * and withholding it while claiming the figures are checkable would be a contradiction.
+ */
+import Base from "../layouts/Base.astro";
+import { loadFeed } from "../lib/feed.ts";
+import { count } from "../lib/format.ts";
+
+const { bundle, verification } = loadFeed();
+const s = bundle.statewide;
+---
+
+<Base
+  title="Data"
+  description="Download the Ohio school funding panel: the full feed as JSON, the formula inputs alone, and the district table as CSV."
+  section="method"
+>
+  <h1>Data</h1>
+  <p class="sub">
+    Everything this site renders, in the form it renders it from. No registration, no API key,
+    static files.
+  </p>
+
+  <div class="card">
+    <h2>Downloads</h2>
+    <div class="scroll">
+      <table class="prose">
+        <tbody>
+          <tr>
+            <th><a href="/data/districts.csv">districts.csv</a></th>
+            <td>
+              One row per district — {count(s.districts)} rows. Funding, wealth, enrollment,
+              outcomes and the latest closed year of actuals. The file to open in a spreadsheet.
+            </td>
+          </tr>
+          <tr>
+            <th><a href="/data/bundle.json">bundle.json</a></th>
+            <td>
+              The complete feed, exactly as <code>crates/bundle</code> writes it and as this site
+              is built from: districts, statewide aggregates, six years of audited finances per
+              district, report card outcomes, the price index, and the reference checkpoints.
+            </td>
+          </tr>
+          <tr>
+            <th><a href="/data/panel.json">panel.json</a></th>
+            <td>
+              The same feed with the finances and report-card blocks removed — the formula inputs
+              alone. This is what the scenario routes fetch, and it is a third the size.
+            </td>
+          </tr>
+          <tr>
+            <th><a href="/search-index.json">search-index.json</a></th>
+            <td>Every page on this site, with its title and kind. What the search box reads.</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <div class="card">
+    <h2>The checkpoints</h2>
+    <p class="note">
+      The feed carries {verification.comparisons.length} scenarios computed by
+      <code>crates/project</code>, and this site will not build unless its own implementation
+      reproduces every one. They are in <code>bundle.json</code> under <code>checkpoints</code>, and
+      they are the most useful thing in the file for anyone checking the arithmetic: each is a
+      complete policy, its statewide cost, and the counts of districts that gain, lose and do not
+      move. <a href="/method">What that check is for</a>.
+    </p>
+    <div class="scroll">
+      <table>
+        <thead>
+          <tr><th>Scenario</th><th>Cost</th><th>Up</th><th>Down</th><th>Unmoved</th></tr>
+        </thead>
+        <tbody>
+          {
+            bundle.checkpoints.map((checkpoint) => (
+              <tr>
+                <th>{checkpoint.label}</th>
+                <td class="tnum">
+                  {(checkpoint.realized_aid / 1e9).toFixed(3)}B
+                </td>
+                <td class="tnum">{checkpoint.gainers}</td>
+                <td class="tnum">{checkpoint.losers}</td>
+                <td class="tnum">{checkpoint.unmoved}</td>
+              </tr>
+            ))
+          }
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <div class="card">
+    <h2>Terms</h2>
+    <p class="note">
+      The underlying figures are public records published by the Ohio Department of Education and
+      Workforce and the Ohio Department of Taxation; this site's contribution is the joining, the
+      re-computation and the checking, and none of that is proprietary. Use it. If you publish a
+      figure from here, say which fiscal year and which basis it is on — the same figure in nominal
+      and constant dollars supports opposite arguments, and this site shows both for that reason.
+    </p>
+    <p class="note">{bundle.provenance}</p>
+  </div>
+</Base>

@@ -1,0 +1,52 @@
+---
+/**
+ * Not found — which, on a site of ~2,500 pages keyed by six-digit IRN, is mostly a typo.
+ *
+ * So this page does not stop at saying so. It reads the path it was reached by, and if it looks
+ * like a district route it offers the districts whose IRN or name is closest. A dead end here is
+ * a reader who had the right district and the wrong digit.
+ */
+import Base from "../layouts/Base.astro";
+import { loadFeed } from "../lib/feed.ts";
+import { count } from "../lib/format.ts";
+
+const { bundle } = loadFeed();
+---
+
+<Base
+  title="Not found"
+  description="No page at that address. Districts are keyed by six-digit IRN."
+>
+  <h1>No page at that address</h1>
+  <p class="sub">
+    This site has one page per district, keyed by the six-digit IRN —{" "}
+    {count(bundle.statewide.districts)} of them — plus the corpus. If you typed an IRN, one digit is the usual cause.
+  </p>
+
+  <div class="card" id="suggest" hidden>
+    <h2>Did you mean one of these?</h2>
+    <div class="flags" id="suggest-list"></div>
+  </div>
+
+  <div class="card">
+    <h2>Where to go instead</h2>
+    <div class="scroll">
+      <table>
+        <tbody>
+          <tr><th><a href="/districts">The district index</a></th>
+              <td>All {count(bundle.statewide.districts)}, sortable and filterable.</td></tr>
+          <tr><th><a href="/">Statewide</a></th>
+              <td>The guarantee, wealth neutrality, and the two floors.</td></tr>
+          <tr><th><a href="/wiki">The corpus</a></th>
+              <td>Regimes, statutes, litigation, parameters, and what each measure means.</td></tr>
+          <tr><th><a href="/method">Method</a></th>
+              <td>Where the figures come from and what is deliberately not built.</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <script>
+    import "../scripts/notfound.ts";
+  </script>
+</Base>
