@@ -64,14 +64,46 @@ return the shell, and its bundle exposes only contact and party endpoints — no
 API. This is the same blocker class as `ofcc-projects`: records behind an application with no
 bulk export.
 
+**The two authenticated applications are `scholarship.ode.state.oh.us` (Scholarship Dashboard)
+and `paymentdetail.ode.state.oh.us` (Payment Detail).** Both answer 200 and both serve a login.
+These are a **different host** from `education.ohio.gov` and its `public.` and `reports.`
+subdomains, and the first pass at this question did not reach them — recorded so the gap is not
+mistaken for coverage. They are where the per-district scholarship figures most likely live, and
+neither is retrievable without credentials.
+
+**The department's own annual report points at the missing file, and the link is dead.** The
+[2025 Scholarship Annual Report](https://education.ohio.gov/getattachment/About/Annual-Reports/2025-Scholarship-Annual-Report.pdf.aspx?lang=en-US)
+*is* retrievable and readable, and carries statewide and program-level aggregates — Jon Peterson
+alone reached 494 districts, over 80% of Ohio's, in 2024-25. For anything per-district it says a
+breakdown "is available here" and links to:
+
+    reports.education.ohio.gov/report/nonpublic-data-jon-peterson-special-needs-report      404
+    reports.education.ohio.gov/report/nonpublic-data-historical-ed-choice-designated-list   404
+
+The application's root answers 200; those two routes do not exist server-side. So the absence is
+not an artifact of searching badly: a per-district route was published, is cited in a current
+departmental document, and has been withdrawn.
+
+**What is actually missing is the scholarship side, not the community school side.** Under the
+Fair School Funding Plan community and STEM students are funded directly, so for them there is
+no deduct to find and never will be. EdChoice, Jon Peterson, and Autism are what these dead
+links covered, and they are the whole of the gap.
+
 **The community schools payment-report page does not exist.** The sibling URL to
 `Traditional-School-Districts` returns 404, and the department's CMS serves a catch-all listing
 for most other finance paths.
 
 ### What would unblock it
 
-A per-resident-district deduction or scholarship-payment file. The most likely remaining homes
-are the department's own SFPR payment reports, which are not published as files, and a public
-records request. Neither is a URL.
+A per-resident-district **scholarship-payment** file. Every remaining candidate needs something
+other than a fetch:
+
+- **Credentials** for `scholarship.ode.state.oh.us` or `paymentdetail.ode.state.oh.us`.
+- **A public records request**, for the SFPR payment reports, which are not published as files.
+- **Asking the department to restore the withdrawn route**, which is the cheapest of the three
+  and the only one with evidence the file once existed in public form.
+
+None of them is a URL, which is a different kind of blocker from the six recorded against the
+connectors. A phase cannot clear it, and a phase that tries will repeat the searches above.
 
 Implementation lands in `crates/deduction/`.
