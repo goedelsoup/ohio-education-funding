@@ -32,9 +32,9 @@ const NOTABLE = ["043802", "043786", "044909", "049056", "044933", "045583"]
   <h1>Ohio school funding</h1>
   <p class="sub">
     What the Fair School Funding Plan computes for a district, what it actually receives, and what
-    a different decision would do. Figures are the Department of Education and Workforce's own FY{
-      bundle.fiscal_year
-    } model, re-run here rather than quoted.
+    a different decision would do. The FY{bundle.fiscal_year} figures are the Department of
+    Education and Workforce's own model, shown as it publishes them; what a different decision
+    would produce is computed here, and checked before it is shown.
   </p>
 
   <Fragment set:html={renderStatewideStructure(bundle)} />
@@ -83,9 +83,9 @@ const NOTABLE = ["043802", "043786", "044909", "049056", "044933", "045583"]
       </table>
     </div>
     <p class="note">
-      The formula is re-derived here rather than quoted, and it is checked against
-      <code>crates/project</code> before this site is allowed to build: every reference scenario
-      has to reproduce to within a dollar across seven billion, or there is no deploy.{" "}
+      Every counterfactual on this site is computed rather than quoted, and checked against
+      <code>crates/project</code> before the site is allowed to build: each reference scenario has
+      to reproduce to within a dollar across seven billion, or there is no deploy.{" "}
       <a href="/method">How that works</a>.
     </p>
   </div>

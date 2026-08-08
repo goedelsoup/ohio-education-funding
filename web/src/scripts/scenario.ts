@@ -320,3 +320,15 @@ fetch(PANEL)
       </div>`;
     }
   });
+
+/*
+ * Keep Enter from reloading the page.
+ *
+ * This was `onsubmit="return false"` on the form itself, which `script-src 'self'` blocks — an
+ * inline event handler is inline script. The violation only appears where the CSP is actually
+ * applied, which is the deployed site and never `vite preview`, so it shipped. See the built-output
+ * check in `tests/e2e/`.
+ */
+document
+  .querySelector<HTMLFormElement>("#scenario-controls")
+  ?.addEventListener("submit", (event) => event.preventDefault());

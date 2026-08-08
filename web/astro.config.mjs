@@ -26,9 +26,6 @@ export default defineConfig({
   // the correct behaviour for a preview.
   site: "https://schools.ohio.shawneesmart.systems",
   output: "static",
-  // `dist/district/043786.html` rather than `dist/district/043786/index.html`. Keeps the deploy a
-  // flat readable tree, and means every route in `src/lib/routes.ts` has no trailing slash.
-  build: { format: "file" },
   integrations: [
     sitemap({
       // The 404 is reachable only by failing to reach something else, and the search index is a
@@ -36,10 +33,32 @@ export default defineConfig({
       filter: (page) => !page.includes("/404") && !page.includes("search-index"),
     }),
   ],
+  build: {
+    // `dist/district/043786.html` rather than `dist/district/043786/index.html`. Keeps the deploy
+    // a flat readable tree, and means every route in `src/lib/routes.ts` has no trailing slash.
+    format: "file",
+    /*
+     * Never inline a script, however small.
+     *
+     * Astro's default is to inline a bundled `<script>` when the output is small enough that a
+     * request costs more than the bytes. That is the right trade almost everywhere and the wrong
+     * one here: this site is served under `script-src 'self'`, which permits no inline script at
+     * all, so an inlined bundle is a script the browser refuses to run.
+     *
+     * It is invisible in development and in `vite preview`, both of which apply no headers, and it
+     * only bites the three pages whose scripts happened to be under the threshold — the 404
+     * suggestions, the district filter, and search. All three shipped dead. See the built-output
+     * check in `tests/e2e/`, which now fails on any inline script rather than waiting for someone
+     * to open the deployed site.
+     */
+    inlineStylesheets: "never",
+  },
   vite: {
     build: {
       // The formula lives in this bundle and gets read by people checking the arithmetic.
       sourcemap: true,
+      // Emit every script as a file. Pairs with the CSP note above.
+      assetsInlineLimit: 0,
     },
   },
 });

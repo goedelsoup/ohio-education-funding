@@ -12,6 +12,9 @@
  * `tests/unit/nearest.spec.ts` instead.
  */
 
+import { readFileSync, readdirSync } from "node:fs";
+import { join } from "node:path";
+
 import { expect, test, type Page } from "@playwright/test";
 
 /** Cleveland Municipal. On the guarantee, so the guarantee copy has something to render. */
@@ -26,6 +29,70 @@ async function setGuarantee(page: Page, value: string): Promise<void> {
   await page.selectOption("#lv-guarantee", value);
   await expect(page.locator("#scenario-out .tile, #scenario-out .card")).not.toHaveCount(0);
 }
+
+test.describe("the content security policy", () => {
+  /*
+   * # Why this reads files instead of driving a browser
+   *
+   * `vite preview` serves `dist/` with no headers at all, so the CSP that the host applies is
+   * absent for the entire suite. Everything else here could pass while the deployed site refuses
+   * to run its own scripts — and that is not hypothetical: `onsubmit="return false"` shipped on
+   * four pages and was found by opening the live site, after the tests were green.
+   *
+   * `script-src 'self'` permits no inline script of any kind, and an `on*` attribute is inline
+   * script. So rather than test the browser, this tests the artefact: whatever the headers do, the
+   * output must contain nothing the strict directive would reject.
+   */
+  const DIST = join(import.meta.dirname, "../../dist");
+
+  const html = (dir: string): string[] =>
+    readdirSync(dir, { withFileTypes: true }).flatMap((entry) =>
+      entry.isDirectory()
+        ? html(join(dir, entry.name))
+        : entry.name.endsWith(".html")
+          ? [join(dir, entry.name)]
+          : [],
+    );
+
+  test("no page carries an inline event handler", () => {
+    // `onsubmit`, `onclick`, and friends. Excludes SVG's `on` in other positions by requiring the
+    // attribute form exactly.
+    const offenders: string[] = [];
+    for (const file of html(DIST)) {
+      const found = readFileSync(file, "utf8").match(/\son[a-z]+\s*=\s*["']/gi);
+      if (found) offenders.push(`${file.slice(DIST.length + 1)}: ${[...new Set(found)].join(", ")}`);
+    }
+    expect(offenders.slice(0, 10)).toEqual([]);
+  });
+
+  test("no page carries an inline script block", () => {
+    // Astro bundles every `<script>` to a hashed file under `_astro/`, so any `<script>` left with
+    // a body is either a mistake or a deliberate exception that the CSP has not been told about.
+    const offenders: string[] = [];
+    for (const file of html(DIST)) {
+      const body = readFileSync(file, "utf8");
+      for (const match of body.matchAll(/<script(?![^>]*\bsrc=)[^>]*>([\s\S]*?)<\/script>/gi)) {
+        if ((match[1] ?? "").trim() !== "") offenders.push(file.slice(DIST.length + 1));
+      }
+    }
+    expect([...new Set(offenders)].slice(0, 10)).toEqual([]);
+  });
+
+  test("nothing is fetched from another origin", () => {
+    // `default-src 'self'` and `connect-src 'self'`. A CDN font or script would be invisible in
+    // preview and dead in production.
+    const offenders: string[] = [];
+    for (const file of html(DIST)) {
+      const found = readFileSync(file, "utf8").match(
+        /(?:src|href)\s*=\s*["'](?:https?:)?\/\/(?!schools\.ohio\.shawneesmart\.systems)[^"']+/gi,
+      );
+      // Links in prose are fine; only fetched subresources matter, which are src= or a stylesheet.
+      const fetched = (found ?? []).filter((m) => /^src/i.test(m) || /stylesheet/i.test(m));
+      if (fetched.length > 0) offenders.push(`${file.slice(DIST.length + 1)}: ${fetched[0]}`);
+    }
+    expect(offenders.slice(0, 10)).toEqual([]);
+  });
+});
 
 test.describe("the document arrives complete", () => {
   test("a district page carries its figures before any script runs", async ({ page }) => {
