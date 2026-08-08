@@ -67,6 +67,8 @@ links:
     relationship: composed-of
   - target: ../formula-component/fsfp-local-capacity-measure.yml
     relationship: composed-of
+  - target: ../formula-component/temporary-transitional-aid-guarantee.yml
+    relationship: composed-of
   - target: ../fiscal-period/fy2026-27.yml
     relationship: active-during
   - target: ../doctrine/adequacy.yml

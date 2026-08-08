@@ -16,8 +16,39 @@ description: |
 
   The mechanism is also blind to income. Assessed valuation alone treats a district with
   expensive housing and modest household earnings as wealthy, and asks its residents to pay
-  accordingly. [inference] Replacing that assumption is the specific thing
+  accordingly. Replacing that assumption is the specific thing
   [`fsfp-local-capacity-measure`](fsfp-local-capacity-measure.yml) was built to do.
+
+  **THE BLINDNESS IS NOW MEASURED, AND IT RUNS BOTH WAYS.** [verified —
+  [`crates/regime-diff`](../../../crates/regime-diff/), holding the Fair School Funding Plan's
+  own FY2027 base cost fixed and substituting only the local share mechanism]
+
+      Ottawa Hills Local     valuation/pupil  $176,195   (below the state's 40th percentile)
+        23-mill charge-off      $4,052.49/pupil
+        FSFP local capacity     $6,845.07/pupil          +69%
+        base cost aid            $4,312.93 -> $1,520.35
+
+      Jefferson Township Local  valuation/pupil  $513,389
+        23-mill charge-off     $11,807.96/pupil
+        FSFP local capacity     $8,714.77/pupil          -26%
+        base cost aid            $2,032.54 -> $5,125.73
+
+  Ottawa Hills is a high-income district of unremarkable assessed valuation, and a property-only
+  measure sees an ordinary district. Jefferson Township is the reverse. **The mechanism the
+  charge-off treated as the richer of the two is the one local capacity treats as poorer**, and
+  that disagreement is the substance of the reform rather than an artifact of two districts.
+  [verified]
+
+  Statewide the change of mechanism is not one-sided: at FY2027 base cost, **413 of 606
+  districts do better under local capacity and 193 would have done better under the
+  charge-off.** [verified]
+
+  **AND THE CHARGE-OFF HAD NO FLOOR.** A minimum state share is a Fair School Funding Plan
+  invention; the charge-off simply truncated at zero. **81 of 606 districts** would have a
+  23-mill charge-off exceeding their entire FY2027 computed base cost and would receive no base
+  cost aid at all. Ohio's answer at the time was the charge-off supplement — gap aid — which
+  reimbursed phantom revenue at about $73.5 million across 145 districts in FY2008, rather than
+  a floor. [verified]
 properties:
   name: Charge-off local share
   function: |
@@ -26,9 +57,13 @@ properties:
     Charge-off millage is a statutory rate applied uniformly statewide, distinct from the
     district's own effective operating millage.
   statutory_basis: |
-    R.C. 3317 (foundation program chapter), specific section varying by biennium. Exact
-    citations per regime not yet established. [open]
-  calculator: millage (supplies effective millage inputs); not yet independently implemented
+    R.C. 3317.022, with the rate set by biennial session law. The 1991-1997 progression is
+    recited with its Ohio Laws citations at DeRolph I, paragraph 97. Ohio Laws' online version
+    archive for the section begins at 1 July 2014, after the mechanism was retired, so the
+    operative text for the charge-off era is not retrievable from `codes.ohio.gov`.
+  calculator: |
+    regime-diff (computes the local share and differences it against FSFP local capacity);
+    millage supplies effective millage inputs.
 links:
   - target: ../formula-component.ont.yml
     relationship: instance-of
@@ -38,3 +73,7 @@ links:
     relationship: distributes
   - target: ../parameter/twenty-mill-floor.yml
     relationship: interacts-with
+  - target: ../../catalog/lsc-school-funding-complete-resource.md
+    relationship: sourced-from
+  - target: ../litigation/derolph-i-1997.yml
+    relationship: sourced-from

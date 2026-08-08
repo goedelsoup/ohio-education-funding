@@ -34,6 +34,11 @@ clarification and the prohibition inside the relevant nodes.
 - [`litigation/derolph-iv-2002`](../corpus/litigation/derolph-iv-2002.yml)
 - [`education-agency/northern-local-perry`](../corpus/education-agency/northern-local-perry.yml)
 - [`doctrine/adequacy`](../corpus/doctrine/adequacy.yml)
+- [`parameter/local-share-charge-off-millage`](../corpus/parameter/local-share-charge-off-millage.yml)
+  — *DeRolph I* ¶97 is the source for the charge-off rate progression and its Ohio Laws
+  citations, which is the one place this corpus uses the opinions as a **statutory** record
+  rather than a judicial one. Ohio Laws' online archive for R.C. 3317.022 starts in 2014, after
+  the mechanism was retired, so the opinion is the accessible text.
 
 ## Feeds connector
 
