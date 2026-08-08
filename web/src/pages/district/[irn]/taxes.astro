@@ -65,11 +65,16 @@ const description = latest
             <div class="v">{latest.class1_rate.toFixed(2)}</div>
             <div class="n">
               {
-                district.at_millage_floor
-                  ? "at the 20-mill floor — reduction factors have stopped"
-                  : district.near_millage_floor
-                    ? "above the floor by a fraction of a mill"
-                    : "above the floor — reduction factors are operative"
+                /* Below, at, near, above — four positions, because twenty-one districts charge
+                   less than twenty mills and calling them "at the floor" reads as a rate they
+                   are held to rather than one they never reached. */
+                latest.class1_rate < 19.995
+                  ? "below 20 mills — reduction factors have never operated"
+                  : district.at_millage_floor
+                    ? "at the 20-mill floor — reduction factors have stopped"
+                    : district.near_millage_floor
+                      ? "above the floor by a fraction of a mill"
+                      : "above the floor — reduction factors are operative"
               }
             </div>
           </div>

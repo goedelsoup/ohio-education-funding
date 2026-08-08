@@ -36,7 +36,13 @@ const description = district.on_guarantee
   <p class="sub">
     IRN {district.irn} · {bundle.statewide.districts} districts in the FY{bundle.fiscal_year} model
     · {district.on_guarantee ? "on the guarantee" : "on formula"}
-    {district.at_millage_floor ? " · at the 20-mill floor" : ""}
+    {
+      district.at_millage_floor
+        ? (district.millage?.observed_rate ?? 20) < 19.995
+          ? " · below 20 mills"
+          : " · at the 20-mill floor"
+        : ""
+    }
     {
       district.economically_disadvantaged != null
         ? ` · ${pct(district.economically_disadvantaged, 1)} economically disadvantaged`
