@@ -151,9 +151,17 @@ export function renderTaxChange(d: District, statewide: TaxStatewide): string {
              <a href="${routes.parameter("twenty-mill-floor")}">20-mill floor</a>, so H.B. 920's
              reduction factors are fully operative.</strong> Its Class I effective rate moved
              ${rateMoved >= 0 ? "+" : "−"}${Math.abs(rateMoved).toFixed(4)} mills against a
-             ${pct(valueGrowth, 2)} change in value: the factors roll the rate back as valuation
-             rises, so revenue from existing levies stays roughly flat in nominal terms and the
-             district has to return to voters to keep pace.`
+             ${pct(valueGrowth, 2)} change in value.
+             ${
+               rateMoved < -0.0005
+                 ? `That is the factors doing what they were written to do: as valuation rises they
+                    roll the rate back, so revenue from existing levies stays roughly flat in
+                    nominal terms and the district has to return to voters to keep pace.`
+                 : `The factors reduce the rate on <em>existing</em> levies against
+                    <em>existing</em> property, and neither newly voted millage nor new
+                    construction is subject to them — so a rate that holds or rises above the floor
+                    means one of those outweighed the reduction, not that the reduction stopped.`
+             }`
       }</p>
 
       <p class="note">Statewide the split is stark. Of the
