@@ -14,7 +14,7 @@ use std::collections::HashMap;
 use bundle::{
     BaseCostBuildUp, Bundle, Checkpoint, Deflator, District, DistrictOutcome, FinanceYear,
     ForecastCheckpoint, MillageAnalysis, OutcomeStatewide, PolicyShape, Projection,
-    PropertyTaxYear, SpendingByFunction, Statewide, CONTRACT_VERSION,
+    PropertyTaxYear, RegimeCounterfactual, SpendingByFunction, Statewide, CONTRACT_VERSION,
 };
 use dispersion::{partial_correlation, wealth_neutrality};
 use edfund_core::{AgencyType, FiscalYear};
@@ -276,6 +276,7 @@ fn to_district(
         effective_class1_millage: profile.and_then(|line| parse(line, 6)),
         voted_operating_millage: profile.and_then(|line| parse(line, 5)),
         millage: millage_analysis(taxes, profile.and_then(|line| parse(line, 5))),
+        regime: regime_counterfactual(record, taxes),
         operating_expenditure_per_pupil: profile.and_then(|line| parse(line, 7)),
         economically_disadvantaged: profile.and_then(|line| parse(line, 3)),
         enrollment_change: {
@@ -454,6 +455,7 @@ fn property_taxes() -> HashMap<String, Vec<PropertyTaxYear>> {
                 real_property_taxes_charged: n("real_property_taxes_charged"),
                 public_utility_taxes_charged: n("public_utility_taxes_charged"),
                 value_per_pupil: n("value_per_pupil"),
+                adm: n("adm"),
             });
     }
     for years in out.values_mut() {
@@ -522,6 +524,50 @@ fn millage_analysis(
         } else {
             0.0
         },
+    })
+}
+
+/// The mechanism the Fair School Funding Plan replaced, run at current inputs.
+///
+/// [`regime_diff::at_fy2027`] holds the plan's own base cost fixed and substitutes the local
+/// share: the charge-off's flat statutory millage against valuation, in place of the local
+/// capacity measure. Everything but `mills_short_of_charge_off` comes straight from the crate.
+///
+/// # Which valuation per pupil, and why it has to be the department of education's
+///
+/// The charge-off was subtracted from a district's computed cost, and that cost is expressed per
+/// pupil on the funding formula's enrolled ADM. Table SD-1 publishes the *same* taxable valuation
+/// over a different pupil count — its own, which includes children the district does not teach —
+/// and the two differ by a factor of 2.2 in Youngstown. Using SD-1's figure here would subtract a
+/// local share computed on one denominator from a cost computed on another, and would change the
+/// answer for hundreds of districts. So the counterfactual runs on the profile report's basis and
+/// only the phantom-revenue comparison, which is rate against rate, touches SD-1.
+fn regime_counterfactual(
+    record: &DistrictRecord,
+    taxes: Option<&Vec<PropertyTaxYear>>,
+) -> Option<RegimeCounterfactual> {
+    let diff = regime_diff::at_fy2027(record, regime_diff::TERMINAL_MILLS);
+    let component = diff.components.first()?;
+
+    // Rate against rate, so no denominator is involved: what the district's own effective Class I
+    // rate is, against the uniform rate the charge-off would deem it able to levy.
+    let mills_short = taxes
+        .and_then(|years| years.last())
+        .map(|y| regime_diff::TERMINAL_MILLS - y.class1_rate)
+        .filter(|short| *short > 0.0005);
+
+    Some(RegimeCounterfactual {
+        charge_off_mills: regime_diff::TERMINAL_MILLS,
+        charge_off_local_share: component.predecessor,
+        local_capacity: component.successor,
+        aid_charge_off: diff.predecessor_total,
+        aid_fsfp: diff.successor_total,
+        difference: diff.total_difference(),
+        residual: diff.residual(),
+        exceeds_base_cost: component
+            .predecessor
+            .is_some_and(|local| local > record.base_cost_per_pupil),
+        mills_short_of_charge_off: mills_short,
     })
 }
 
@@ -634,6 +680,32 @@ fn main() {
         median_yield_per_mill: median(yields.clone()),
         min_yield_per_mill: yields.iter().copied().fold(f64::INFINITY, f64::min),
         max_yield_per_mill: yields.iter().copied().fold(f64::NEG_INFINITY, f64::max),
+        // On Table SD-1's own denominator, so a district's SD-1 figure is positioned against a
+        // median computed the same way. The profile report's median is a different quantity.
+        median_sd1_value_per_pupil: median(
+            districts
+                .iter()
+                .filter_map(|d| d.property_tax.last().map(|y| y.value_per_pupil))
+                .filter(|v| *v > 0.0)
+                .collect(),
+        ),
+        below_charge_off_rate: districts
+            .iter()
+            .filter(|d| {
+                d.regime
+                    .is_some_and(|r| r.mills_short_of_charge_off.is_some())
+            })
+            .count(),
+        charge_off_exceeds_base_cost: districts
+            .iter()
+            .filter(|d| d.regime.is_some_and(|r| r.exceeds_base_cost))
+            .count(),
+        median_regime_difference: median(
+            districts
+                .iter()
+                .filter_map(|d| d.regime.and_then(|r| r.difference))
+                .collect(),
+        ),
         at_minimum_state_share: districts
             .iter()
             .filter(|d| d.at_minimum_state_share)

@@ -429,6 +429,89 @@ test("the millage block is the crate's output, not a copy of a published column"
   }
 });
 
+test("the two departments publish the same valuation over different pupil counts", () => {
+  /*
+   * The finding, as an invariant. Multiply the District Profile Report's valuation per pupil by
+   * its enrolled ADM and Table SD-1's total taxable value comes back exactly — the numerators are
+   * identical. The denominators are not, and the gap is charter, voucher and open-enrolment-out
+   * students, so it is widest in the big-city districts where valuation per pupil does the most
+   * work in the aid formula.
+   *
+   * The test exists because the page prints one of the two figures and it must not be positioned
+   * against the other's statewide median, which is what it did until this was found.
+   */
+  const { bundle } = loadFeed();
+
+  let compared = 0;
+  let diverged = 0;
+  for (const d of bundle.districts) {
+    const ty2023 = d.property_tax[0];
+    // Enrolled ADM FY2024, which is what the profile's valuation per pupil divides by — not
+    // `d.adm`, the funded base cost count, which is a third number and reproduces nothing.
+    const enrolled = d.adm_history[0];
+    if (!ty2023 || d.valuation_per_pupil == null || enrolled <= 0) continue;
+    compared++;
+
+    // Same numerator, to a tenth of a percent — the profile's per-pupil times the profile's ADM.
+    const fromProfile = d.valuation_per_pupil * enrolled;
+    expect(Math.abs(fromProfile - ty2023.total_value) / ty2023.total_value).toBeLessThan(0.001);
+
+    if (Math.abs(ty2023.adm / enrolled - 1) > 0.05) diverged++;
+  }
+
+  expect(compared).toBeGreaterThan(590);
+  expect(diverged).toBeGreaterThan(200);
+
+  // Columbus is the case that makes it concrete: same dollars, 1.7x the pupils.
+  const columbus = bundle.districts.find((d) => d.irn === "043802")!;
+  const sd1 = columbus.property_tax[columbus.property_tax.length - 1]!;
+  expect(sd1.adm / columbus.adm_history[0]).toBeGreaterThan(1.6);
+  expect(sd1.value_per_pupil).toBeLessThan(columbus.valuation_per_pupil! * 0.7);
+});
+
+test("the charge-off counterfactual reproduces what the regime-diff crate documents", () => {
+  /*
+   * Three figures the crate's own doc comments state, recomputed from the feed. If the bundle
+   * wired the crate up wrongly — passed the wrong valuation, or the wrong rate — these move.
+   */
+  const { bundle } = loadFeed();
+  const regimes = bundle.districts.map((d) => d.regime).filter((r) => r != null);
+  expect(regimes.length).toBe(609);
+
+  // Every one runs at the terminal rate, not one of the earlier ones in the series.
+  for (const r of regimes) expect(r.charge_off_mills).toBe(23);
+
+  // "81 districts are in that position at 23 mills against FY2027 base cost."
+  expect(regimes.filter((r) => r.exceeds_base_cost).length).toBe(81);
+
+  // "exactly zero for 463 of the 470 districts where both sides can be valued."
+  const valued = regimes.filter((r) => r.residual != null);
+  expect(valued.length).toBe(470);
+  expect(valued.filter((r) => Math.abs(r.residual!) < 0.005).length).toBe(463);
+
+  // Where capacity is censored the component is absent but the totals still stand.
+  const censored = regimes.filter((r) => r.local_capacity == null);
+  expect(censored.length).toBe(138);
+  for (const r of censored) expect(r.residual).toBeNull();
+
+  // And three districts have no valuation at all, so neither side can be valued.
+  expect(regimes.filter((r) => r.charge_off_local_share == null).length).toBe(3);
+});
+
+test("the counterfactual is computed on the formula's denominator, not the tax table's", () => {
+  /*
+   * The charge-off is subtracted from base cost per pupil, so its local share has to be per the
+   * same pupil. Using Table SD-1's valuation per pupil would understate the deemed share for
+   * every district whose taxation count is larger — and there are hundreds — so this pins which
+   * of the two the deemed share was built from.
+   */
+  const { bundle } = loadFeed();
+  for (const d of bundle.districts) {
+    if (!d.regime?.charge_off_local_share || d.valuation_per_pupil == null) continue;
+    expect(d.regime.charge_off_local_share).toBeCloseTo((d.valuation_per_pupil * 23) / 1000, 2);
+  }
+});
+
 test("what one mill raises shares a denominator with the value per pupil beside it", () => {
   /*
    * Both figures appear in the same card. Dividing them by different pupil counts is the error

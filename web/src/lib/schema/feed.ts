@@ -194,6 +194,52 @@ export const PropertyTaxYearSchema = z
     real_property_taxes_charged: num,
     public_utility_taxes_charged: num,
     value_per_pupil: num,
+    /**
+     * The pupil count Table SD-1 divides by, which is not the funding formula's.
+     *
+     * The two departments publish the same taxable valuation — multiply the profile report's
+     * `assessed_valuation_per_pupil` by its enrolled ADM and `total_value` comes back to 1.000
+     * for all 606 districts. The pupil counts differ: Columbus is 43,019 to the Department of
+     * Education and 71,947 here, Youngstown 4,322 against 9,655. Taxation counts children
+     * residing in the district; Education counts the ones it teaches, and the gap is charter,
+     * voucher and open-enrolment-out students.
+     */
+    adm: num,
+  })
+  .strict();
+
+/**
+ * What the mechanism the Fair School Funding Plan replaced would charge this district today.
+ *
+ * `regime-diff` holds the plan's own base cost fixed and swaps the local share for the
+ * charge-off: a flat statutory millage, uniform statewide, against assessed valuation. A
+ * counterfactual at current inputs, not a reconstruction of any year the charge-off governed.
+ *
+ * It belongs beside the property tax because it *was* a property tax calculation, and because
+ * its documented failure is a millage fact: the rate was uniform while H.B. 920 made effective
+ * rates anything but, so a district whose own rate had fallen below it was charged for revenue
+ * it could not collect.
+ */
+export const RegimeCounterfactualSchema = z
+  .object({
+    /** The statutory rate the counterfactual runs at — the charge-off's terminal 23 mills. */
+    charge_off_mills: num,
+    /** Deemed local share per pupil: the rate against valuation. */
+    charge_off_local_share: maybeNum,
+    /** Local capacity per pupil as the plan measures it. `null` where the minimum share binds. */
+    local_capacity: maybeNum,
+    /** Base cost aid per pupil under the charge-off, floored at zero — it had no minimum. */
+    aid_charge_off: maybeNum,
+    /** Base cost aid per pupil as the plan computes it. */
+    aid_fsfp: maybeNum,
+    /** Plan minus charge-off. Positive means the district gained by the change. */
+    difference: maybeNum,
+    /** What the one aligned component fails to explain. Zero is the expected answer. */
+    residual: maybeNum,
+    /** Whether the charge-off would run past the whole base cost it is subtracted from. */
+    exceeds_base_cost: z.boolean(),
+    /** Effective Class I mills short of the rate it would be charged at. The phantom revenue. */
+    mills_short_of_charge_off: maybeNum,
   })
   .strict();
 
@@ -296,6 +342,8 @@ export const DistrictSchema = z
     voted_operating_millage: maybeNum,
     /** The calculator run against this district. `null` without two tax years. */
     millage: MillageAnalysisSchema.nullable(),
+    /** What the replaced mechanism would charge. `null` without a valuation. */
+    regime: RegimeCounterfactualSchema.nullable(),
     operating_expenditure_per_pupil: maybeNum,
     economically_disadvantaged: maybeNum,
     /** FY2024 to FY2026. FY2026 is partly departmental estimate. */
@@ -338,6 +386,14 @@ export const StatewideSchema = z
     median_yield_per_mill: num,
     min_yield_per_mill: num,
     max_yield_per_mill: num,
+    /** Median taxable value per pupil on Table SD-1's denominator, not the profile report's. */
+    median_sd1_value_per_pupil: num,
+    /** Districts whose effective rate is below the rate the charge-off would deem them able. */
+    below_charge_off_rate: z.number().int().nonnegative(),
+    /** Districts the charge-off would leave with no base cost aid at all. */
+    charge_off_exceeds_base_cost: z.number().int().nonnegative(),
+    /** Median change in base cost aid per pupil, charge-off to plan. */
+    median_regime_difference: num,
     at_minimum_state_share: z.number().int().nonnegative(),
     median_valuation_per_pupil: num,
     median_operating_expenditure_per_pupil: num,
@@ -468,6 +524,7 @@ export type FinanceYear = z.infer<typeof FinanceYearSchema>;
 export type BaseCostBuildUp = z.infer<typeof BaseCostBuildUpSchema>;
 export type PropertyTaxYear = z.infer<typeof PropertyTaxYearSchema>;
 export type MillageAnalysis = z.infer<typeof MillageAnalysisSchema>;
+export type RegimeCounterfactual = z.infer<typeof RegimeCounterfactualSchema>;
 export type SpendingByFunction = z.infer<typeof SpendingByFunctionSchema>;
 export type District = z.infer<typeof DistrictSchema>;
 export type Statewide = z.infer<typeof StatewideSchema>;

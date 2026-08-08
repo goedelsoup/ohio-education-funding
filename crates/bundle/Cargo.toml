@@ -12,6 +12,7 @@ edfund-core = { path = "../edfund-core" }
 dispersion = { path = "../dispersion" }
 foundation = { path = "../foundation" }
 millage = { path = "../millage" }
+regime-diff = { path = "../regime-diff" }
 project = { path = "../project" }
 
 [lints]

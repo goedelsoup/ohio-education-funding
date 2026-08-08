@@ -19,10 +19,11 @@
  * effective rate back as valuation rises, holding revenue from existing levies roughly flat in
  * nominal terms — but they cannot roll a rate below twenty mills. So a reappraisal does opposite
  * things on either side of that floor, and a single year cannot show it. With TY2023 and TY2024
- * the mechanism is countable: at the time of writing, 304 of the 439 districts above the floor
- * saw their effective rate fall against 4 of the 170 at it, and 98.7% of every rate reduction in
- * Ohio happened above it. Those figures are computed in `feed.ts` rather than written into the
- * copy, because they appear on 609 pages and a regenerated feed would otherwise leave them wrong.
+ * the mechanism is countable: at the time of writing, 301 of the 416 districts that *began*
+ * above the floor saw their effective rate fall, against 7 of the 193 that began at it, and 97.7%
+ * of every rate reduction in Ohio happened above it. Those figures are computed in `feed.ts`
+ * rather than written into the copy, because they appear on 609 pages and a regenerated feed
+ * would otherwise leave them wrong — as it left this comment wrong until the split was corrected.
  */
 
 import type { Bar } from "./chart.ts";
@@ -386,6 +387,219 @@ export function renderMillage(d: District, statewide: Statewide): string {
         times, which is the inequality
         <a href="${routes.parameter("state-share-percentage")}">the state share</a> exists to
         offset.</p>
+    </div>`;
+}
+
+/**
+ * The two pupil counts, where they differ enough to matter.
+ *
+ * # The finding this exists to state
+ *
+ * Both departments publish a taxable valuation per pupil for every district, and they are not the
+ * same number. The numerators are identical to the dollar — multiply the District Profile Report's
+ * figure by its enrolled ADM and Table SD-1's `total_value` comes back to 1.000 for all 606
+ * districts carrying both. Only the denominator differs, and it differs by a factor of 2.2 in
+ * Youngstown, 1.9 in Dayton and 1.7 in Columbus.
+ *
+ * Taxation divides by the children who live in the district. Education divides by the ones it
+ * teaches. The gap is charter, voucher and open-enrolment-out students, so it is widest in exactly
+ * the districts where valuation per pupil does the most work in the aid formula — and the formula
+ * reads Education's.
+ *
+ * The card only renders where the two are more than 5% apart, because for most districts they are
+ * within a rounding of each other and a reader does not need the caution.
+ */
+export function renderDenominators(d: District): string {
+  const latest = d.property_tax[d.property_tax.length - 1];
+  // `adm_history[0]` is enrolled ADM FY2024 — the count the profile report's valuation per pupil
+  // divides by, verified by multiplying back to SD-1's total value for all 606 districts. Not
+  // `d.adm`, which is the base cost ADM and is a third number again.
+  const enrolled = d.adm_history[0];
+  if (!latest || latest.adm <= 0 || enrolled <= 0 || d.valuation_per_pupil == null) return "";
+
+  const ratio = latest.value_per_pupil / d.valuation_per_pupil;
+  if (Math.abs(ratio - 1) < 0.05) return "";
+
+  const wider = latest.adm > enrolled;
+
+  return `
+    <div class="card">
+      <h2>Two pupil counts, and why this page shows one of them</h2>
+      <div class="scroll"><table>
+        <thead><tr><th>Published by</th><th class="tnum">Pupils</th>
+          <th class="tnum">Value per pupil</th><th>Used for</th></tr></thead>
+        <tbody>
+          <tr class="current">
+            <th>Taxation, Table SD-1</th>
+            <td class="tnum">${count(Math.round(latest.adm))}</td>
+            <td class="tnum">${money(latest.value_per_pupil)}</td>
+            <td class="n">Everything on this page.</td>
+          </tr>
+          <tr>
+            <th>Education, District Profile Report</th>
+            <td class="tnum">${count(Math.round(enrolled))}</td>
+            <td class="tnum">${money(d.valuation_per_pupil)}</td>
+            <td class="n">Enrolled ADM, FY2024. The funding formula's wealth measure, and every
+              other page here.</td>
+          </tr>
+          <tr>
+            <th>Education, base cost ADM</th>
+            <td class="tnum">${count(Math.round(d.adm))}</td>
+            <td class="tnum n">—</td>
+            <td class="n">A third count. What base cost per pupil divides by — funded rather than
+              enrolled, so it is ${pct(Math.abs(d.adm / enrolled - 1), 1)} from the row above.</td>
+          </tr>
+        </tbody>
+      </table></div>
+      <p class="note"><strong>The valuations are the same to the dollar. The pupil counts are
+        not.</strong> Taxation divides by the children who live in this district; Education
+        divides by the ones it teaches. The difference is students attending community schools,
+        using vouchers, or open-enrolled elsewhere — the district's property base still stands
+        behind them, and the two agencies disagree about whether they belong in the denominator.
+        Here that makes the same district look
+        ${pct(Math.abs(ratio - 1), 0)} ${ratio > 1 ? "wealthier" : "poorer"} per pupil depending
+        on which table you read.</p>
+      <p class="note">The formula reads Education's, so that is the figure driving this district's
+        state share and the one on its
+        <a href="${routes.district(d.irn)}">dashboard</a>. Neither is wrong; they answer different
+        questions, and the only error available is to compare one against the other's statewide
+        median. ${
+          wider
+            ? `Because Taxation's count here is the larger one, this page's figures are the more
+               conservative reading of this district's wealth.`
+            : `Because Taxation's count here is the smaller one, this page reads this district as
+               wealthier per pupil than the formula does.`
+        } The statewide median beside the figure above is computed on this table's basis, for
+        that reason.</p>
+    </div>`;
+}
+
+/**
+ * What the mechanism the Fair School Funding Plan replaced would charge this district.
+ *
+ * # Why a counterfactual belongs on a property tax page
+ *
+ * The charge-off was a property tax calculation. For roughly three decades Ohio decided how much
+ * of a district's cost the district should bear by multiplying a statutory millage — uniform
+ * statewide, 23 mills by the end — against its assessed valuation, and subtracting the product
+ * from the computed cost. Everything the rest of this page establishes about millage bears
+ * directly on it.
+ *
+ * # And the failure the page can now count
+ *
+ * A uniform assumed rate only works if districts can levy at it. H.B. 920 guarantees they cannot:
+ * effective rates fall as valuation rises, and a district whose own rate had dropped below the
+ * charge-off rate was charged for revenue it had no way to collect. Ohio patched this with the
+ * charge-off supplement — gap aid, $73.5m across 145 districts in FY2008 — rather than fixing it.
+ * Against TY2024 rates, **half the state** is below the terminal charge-off rate.
+ */
+export function renderChargeOff(d: District, statewide: Statewide): string {
+  const r = d.regime;
+  if (!r || r.charge_off_local_share == null) return "";
+
+  const short = r.mills_short_of_charge_off;
+  const rate = d.millage?.observed_rate;
+
+  return `
+    <div class="card">
+      <h2>What the mechanism this replaced would charge</h2>
+      <p class="note">Before the Fair School Funding Plan, a district's own share of its cost was
+        a flat <strong>${r.charge_off_mills.toFixed(0)} mills</strong> against its valuation —
+        the same rate for every district in Ohio, whatever it could actually levy. Holding this
+        district's base cost fixed and substituting that mechanism for the plan's local capacity
+        measure:</p>
+
+      <div class="scroll"><table>
+        <thead><tr><th></th><th class="tnum">Per pupil</th><th>How it is arrived at</th></tr></thead>
+        <tbody>
+          <tr><th>Deemed local share, charge-off</th>
+            <td class="tnum">${money(r.charge_off_local_share)}</td>
+            <td class="n">${r.charge_off_mills.toFixed(0)} mills against
+              ${money(d.valuation_per_pupil ?? 0)} of valuation per pupil — the Department of
+              Education's figure, on the funding formula's pupil count, because that is the
+              denominator the base cost it is subtracted from is expressed in.</td></tr>
+          <tr><th>Local capacity, the plan</th>
+            <td class="tnum">${
+              r.local_capacity == null ? "—" : money(r.local_capacity)
+            }</td>
+            <td class="n">${
+              r.local_capacity == null
+                ? `Not recoverable. The minimum state share binds here, so all that is known is
+                   that capacity exceeds a threshold — and a censored quantity is not a small one.`
+                : `Property wealth blended with two income measures, recovered by subtraction from
+                   base cost.`
+            }</td></tr>
+          <tr><th>Base cost aid, charge-off</th>
+            <td class="tnum">${r.aid_charge_off == null ? "—" : money(r.aid_charge_off)}</td>
+            <td class="n">${
+              r.exceeds_base_cost
+                ? `Nothing. The deemed share runs past the whole base cost, and the charge-off had
+                   no minimum state share to stop at.`
+                : `Base cost less the deemed local share, floored at zero.`
+            }</td></tr>
+          <tr class="current"><th>Base cost aid, the plan</th>
+            <td class="tnum">${r.aid_fsfp == null ? "—" : money(r.aid_fsfp)}</td>
+            <td class="n">What this district actually receives toward base cost.</td></tr>
+          <tr><th>Difference</th>
+            <td class="tnum">${
+              r.difference == null
+                ? "—"
+                : `${r.difference >= 0 ? "+" : "−"}${money(Math.abs(r.difference))}`
+            }</td>
+            <td class="n">Plan minus charge-off. The statewide median is
+              ${money(statewide.median_regime_difference)}.</td></tr>
+        </tbody>
+      </table></div>
+
+      ${
+        short != null && rate != null
+          ? `<p class="note"><strong>This district would be charged for revenue it could not
+             raise.</strong> The charge-off assumes ${r.charge_off_mills.toFixed(0)} mills; this
+             district's effective Class I rate is ${rate.toFixed(2)}, which is
+             ${short.toFixed(2)} mills short. That gap is the phantom revenue the mechanism became
+             known for, and it is not a district-level failing — H.B. 920 produces it
+             automatically, by rolling effective rates down as valuation rises while the statutory
+             rate stood still. ${count(statewide.below_charge_off_rate)} of
+             ${count(statewide.districts)} districts are below the rate today. Ohio's answer was a
+             supplement rather than a floor: gap aid, $73.5m across 145 districts in FY2008.</p>`
+          : `<p class="note">This district's effective Class I rate is at or above the
+             ${r.charge_off_mills.toFixed(0)} mills the charge-off assumes, so it is one of the
+             ${count(statewide.districts - statewide.below_charge_off_rate)} that could actually
+             levy what the mechanism deemed it able to. The other
+             ${count(statewide.below_charge_off_rate)} could not.</p>`
+      }
+
+      <p class="note"><strong>What this comparison is, and three things it is not.</strong> It is
+        a counterfactual at FY2027 inputs — the plan's own computed base cost held fixed, with only
+        the local share mechanism swapped. It is <em>not</em> a reconstruction of any year the
+        charge-off governed: those need the era's formula amount, cost-of-doing-business factor and
+        DPIA, none of which this project holds. It is <em>not</em> a full regime diff — base cost,
+        the guarantee and every categorical have no declared predecessor, so one row of the
+        calculation is all that is comparable. And the charge-off's base narrowed over its life
+        from total taxable value to an H.B. 920-adjusted recognised valuation, which this project
+        does not hold; every figure here is on the earlier, wider base and therefore overstates
+        what the charge-off would have taken.</p>
+
+      <p class="note">One seam inside the arithmetic, stated rather than smoothed over. The deemed
+        local share is per <strong>enrolled</strong> ADM, because that is what the published
+        valuation per pupil divides by; the base cost it is subtracted from is per
+        <strong>funded</strong> base cost ADM. Those two counts differ by
+        ${pct(Math.abs(d.adm / (d.adm_history[0] || d.adm) - 1), 1)} for this district and by a
+        median of 1.6% statewide. The subtraction is the one <code>regime-diff</code> performs and
+        the one the mechanism's own description implies, and it is not exact.</p>
+
+      ${
+        r.residual == null
+          ? `<p class="note">The residual is unreportable here, because the local capacity side is
+             censored. The totals still differ and the cause is not attributable to a component —
+             which is the honest state of the comparison rather than a gap in it.</p>`
+          : Math.abs(r.residual) < 0.005
+            ? ""
+            : `<p class="note">The decomposition leaves ${money(Math.abs(r.residual))} per pupil
+               unexplained. Holding base cost fixed means the local share is the only thing that
+               can differ, so a residual means the deemed share ran past the cost it was subtracted
+               from and the floor at zero absorbed the rest. Seven districts are in this position.</p>`
+      }
     </div>`;
 }
 

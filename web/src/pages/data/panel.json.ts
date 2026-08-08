@@ -40,6 +40,7 @@ export const GET: APIRoute = () => {
         property_tax: _p,
         spending_by_function: _s,
         millage: _m,
+        regime: _r,
         ...district
       }) => district,
     ),

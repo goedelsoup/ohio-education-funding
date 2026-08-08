@@ -217,5 +217,15 @@ export function renderStatewideStructure(bundle: Bundle, tax: TaxStatewide): str
         ${money(s.median_yield_per_mill)}. Comparing two districts' tax rates without that number
         compares effort to capacity. Each district's own figures are on its
         <a href="/districts">property tax page</a>, from the Department of Taxation's Table SD-1.</p>
+      <p class="note"><strong>The mechanism this one replaced would charge half the state for
+        revenue it cannot raise.</strong> Before the Fair School Funding Plan a district's own
+        share was a flat 23 mills against its valuation, uniform statewide — and H.B. 920
+        guarantees districts cannot all levy at one rate.
+        ${count(s.below_charge_off_rate)} of ${count(s.districts)} have an effective Class I rate
+        below 23 mills today, and ${count(s.charge_off_exceeds_base_cost)} have valuation high
+        enough that the charge-off would take their whole base cost and leave nothing, having no
+        minimum state share to stop at. Ohio's answer was a supplement rather than a fix. Against
+        that counterfactual the median district is
+        ${money(s.median_regime_difference)} per pupil better off under the plan.</p>
     </div>`;
 }

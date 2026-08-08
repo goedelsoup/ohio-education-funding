@@ -343,7 +343,7 @@ fn bundle_status(root: &Path) -> String {
          | Reference checkpoints | {checkpoints} |\n\
          | Reference forecasts | {forecasts} |\n\
          | Size | {} KB |\n\
-         | Deployment target | none chosen; static hosting is the presumption |\n\n\
+         | Deployment target | Cloudflare Pages, static, with a CSP in `web/public/_headers` |\n\n\
          Regenerate with `cargo run --manifest-path crates/Cargo.toml -p bundle > \
          web/public/data/bundle.json`. CI fails if the committed feed and a fresh one differ.\n",
         feed.len() / 1024

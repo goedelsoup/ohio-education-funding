@@ -14,6 +14,8 @@ import { districtPaths, loadFeed } from "../../../lib/feed.ts";
 import { money, pct } from "../../../lib/format.ts";
 import * as routes from "../../../lib/routes.ts";
 import {
+  renderChargeOff,
+  renderDenominators,
   renderMillage,
   renderTaxAgainstSpending,
   renderTaxBase,
@@ -57,7 +59,10 @@ const description = latest
             <div class="k">Taxable value per pupil</div>
             <div class="v">{money(latest.value_per_pupil)}</div>
             <div class="n">
-              statewide median {money(bundle.statewide.median_valuation_per_pupil)}
+              {/* SD-1's median, not the profile report's — the two divide by different pupil
+                  counts and this tile used to compare across them. */}
+              statewide median {money(bundle.statewide.median_sd1_value_per_pupil)}, on this
+              table's pupil count
             </div>
           </div>
           <div class="tile">
@@ -89,6 +94,11 @@ const description = latest
         <Fragment set:html={renderMillage(district, bundle.statewide)} />
         <Fragment set:html={renderTaxBase(district)} />
         <Fragment set:html={renderTaxAgainstSpending(district, tax)} />
+        {/* The denominator card first: the charge-off below it is computed on the funding
+            formula's pupil count rather than this table's, and a reader meeting two different
+            valuations per pupil needs the reason before the second one, not after. */}
+        <Fragment set:html={renderDenominators(district)} />
+        <Fragment set:html={renderChargeOff(district, bundle.statewide)} />
 
         <div class="card">
           <h2>Where these figures come from, and what they are not</h2>

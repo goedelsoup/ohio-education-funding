@@ -73,7 +73,7 @@ use edfund_core::Dollars;
 /// from FY2022-FY2024 to FY2024-FY2026 — the years the department's `ADM Data` sheet declares.
 /// The values did not change; what they are called did, which is exactly the kind of silent
 /// meaning change the version guard exists for.
-pub const CONTRACT_VERSION: &str = "9.0.0";
+pub const CONTRACT_VERSION: &str = "10.0.0";
 
 /// How close to the floor counts as being on it, in mills.
 ///
@@ -312,8 +312,23 @@ pub struct PropertyTaxYear {
     pub real_property_taxes_charged: Dollars,
     /// Public utility tax charged.
     pub public_utility_taxes_charged: Dollars,
-    /// Total value over the tax year's ADM.
+    /// Total value over [`PropertyTaxYear::adm`].
     pub value_per_pupil: Dollars,
+    /// The pupil count Table SD-1 divides by, which is **not** the funding formula's.
+    ///
+    /// Carried explicitly because the two departments publish the same numerator over different
+    /// denominators and the difference is large. Multiply the District Profile Report's
+    /// `assessed_valuation_per_pupil` by its enrolled ADM and you recover this table's
+    /// `total_value` to 1.000 for all 606 districts carrying both — the taxable valuations are
+    /// identical to the dollar. The pupil counts are not: Columbus is 43,019 to the Department of
+    /// Education and 71,947 here, Youngstown 4,322 against 9,655.
+    ///
+    /// Taxation counts children residing in the district; Education's enrolled ADM counts the
+    /// ones the district teaches. The gap is charter, voucher and open-enrolment-out students, so
+    /// it is widest in exactly the districts where valuation per pupil does the most work in the
+    /// aid formula. A page that prints one figure against the other's median is comparing two
+    /// quantities that share a name and nothing else.
+    pub adm: f64,
 }
 
 /// Where a district's operating money went in FY2025, per pupil, by function.
@@ -395,6 +410,55 @@ pub struct MillageAnalysis {
     pub yield_per_mill_per_pupil: Dollars,
 }
 
+/// What the mechanism the Fair School Funding Plan replaced would charge this district today.
+///
+/// [`regime_diff::at_fy2027`], which holds the plan's own computed base cost fixed and swaps only
+/// the local share: instead of the local capacity measure, the charge-off's flat statutory
+/// millage against assessed valuation. It is a counterfactual at current inputs, **not** a
+/// reconstruction of any year the charge-off governed — those need the era's formula amount,
+/// cost-of-doing-business factor and DPIA, none of which this corpus holds.
+///
+/// # Why this belongs beside the property tax
+///
+/// The charge-off *was* a millage calculation: a rate the legislature set, multiplied by a
+/// district's valuation, subtracted from its cost. Its documented failure is that the rate was
+/// uniform while H.B. 920 made effective rates anything but, so a district whose own rate had
+/// fallen below the charge-off rate was charged for revenue it could not collect. The corpus has
+/// asserted that since it was written. With Table SD-1 it is countable, and it is not a fringe
+/// case: half the state is below the terminal rate.
+#[derive(Debug, Clone, Copy, PartialEq)]
+pub struct RegimeCounterfactual {
+    /// The statutory rate the counterfactual runs at — [`regime_diff::TERMINAL_MILLS`].
+    pub charge_off_mills: f64,
+    /// Deemed local share per pupil under the charge-off: the rate against valuation.
+    pub charge_off_local_share: Option<Dollars>,
+    /// Local capacity per pupil as the plan measures it, recovered by subtraction.
+    ///
+    /// `None` where the minimum state share binds and all that is knowable is that capacity
+    /// exceeds a threshold. Not zero: a censored quantity is not a small one, and substituting
+    /// zero would invert the comparison for the districts where it is most interesting.
+    pub local_capacity: Option<Dollars>,
+    /// Base cost aid per pupil under the charge-off, floored at zero — it had no minimum share.
+    pub aid_charge_off: Option<Dollars>,
+    /// Base cost aid per pupil as the plan computes it.
+    pub aid_fsfp: Option<Dollars>,
+    /// Plan minus charge-off, per pupil. Positive means the district gained by the change.
+    pub difference: Option<Dollars>,
+    /// What the one aligned component fails to explain. Zero is the expected answer.
+    pub residual: Option<Dollars>,
+    /// Whether the charge-off would have run past the whole base cost it was subtracted from.
+    ///
+    /// The charge-off had no minimum state share — that is the plan's invention — so these
+    /// districts would receive nothing at all. Ohio's answer was a supplement rather than a
+    /// floor, and neither this crate nor `regime-diff` models it.
+    pub exceeds_base_cost: bool,
+    /// Effective Class I mills short of the charge-off rate, where the district is short.
+    ///
+    /// The phantom revenue mechanism, per district. `None` where the district's own effective
+    /// rate is at or above the rate it would be charged at.
+    pub mills_short_of_charge_off: Option<f64>,
+}
+
 /// One district, as the web layer needs it.
 #[derive(Debug, Clone, PartialEq)]
 pub struct District {
@@ -440,6 +504,8 @@ pub struct District {
     pub voted_operating_millage: Option<f64>,
     /// H.B. 920 run against this district, rather than described. `None` without two tax years.
     pub millage: Option<MillageAnalysis>,
+    /// What the mechanism the plan replaced would charge this district. `None` without valuation.
+    pub regime: Option<RegimeCounterfactual>,
     /// Total operating expenditure per pupil, FY2024.
     pub operating_expenditure_per_pupil: Option<Dollars>,
     /// Share of students economically disadvantaged, FY2024, as a fraction.
@@ -554,6 +620,21 @@ pub struct Statewide {
     pub min_yield_per_mill: Dollars,
     /// The highest.
     pub max_yield_per_mill: Dollars,
+    /// Median taxable value per pupil **on Table SD-1's denominator**.
+    ///
+    /// Separate from [`Statewide::median_valuation_per_pupil`], which is on the District Profile
+    /// Report's enrolled ADM. The two numerators are identical to the dollar and the two pupil
+    /// counts are not, so a district's SD-1 figure has to be positioned against this median and
+    /// not against the other one. See [`PropertyTaxYear::adm`].
+    pub median_sd1_value_per_pupil: Dollars,
+    /// Districts whose effective Class I rate is below the charge-off rate they would be
+    /// charged at — the phantom revenue the mechanism was replaced for producing.
+    pub below_charge_off_rate: usize,
+    /// Districts the charge-off would leave with no base cost aid at all, having no minimum
+    /// state share to stop at.
+    pub charge_off_exceeds_base_cost: usize,
+    /// Median change in base cost aid per pupil from the charge-off to the plan.
+    pub median_regime_difference: Dollars,
     /// Districts whose base cost aid is set by the minimum state share.
     pub at_minimum_state_share: usize,
     /// Median assessed valuation per pupil.
@@ -791,8 +872,19 @@ impl Bundle {
             ("median_yield_per_mill", w.median_yield_per_mill),
             ("min_yield_per_mill", w.min_yield_per_mill),
             ("max_yield_per_mill", w.max_yield_per_mill),
+            ("median_sd1_value_per_pupil", w.median_sd1_value_per_pupil),
+            ("median_regime_difference", w.median_regime_difference),
         ] {
             s.push_str(&format!("    \"{key}\": {},\n", num(value)));
+        }
+        for (key, value) in [
+            ("below_charge_off_rate", w.below_charge_off_rate),
+            (
+                "charge_off_exceeds_base_cost",
+                w.charge_off_exceeds_base_cost,
+            ),
+        ] {
+            s.push_str(&format!("    \"{key}\": {value},\n"));
         }
         s.push_str(&format!(
             "    \"at_minimum_state_share\": {},\n",
@@ -1004,6 +1096,7 @@ impl Bundle {
                             y.public_utility_taxes_charged,
                         ),
                         ("value_per_pupil", y.value_per_pupil),
+                        ("adm", y.adm),
                     ] {
                         s.push_str(&format!("\"{name}\": {}, ", num(value)));
                     }
@@ -1144,6 +1237,30 @@ impl Bundle {
                     s.push_str("}, ");
                 }
             }
+            s.push_str("\"regime\": ");
+            match &d.regime {
+                None => s.push_str("null, "),
+                Some(r) => {
+                    s.push('{');
+                    s.push_str(&format!(
+                        "\"charge_off_mills\": {}, ",
+                        num(r.charge_off_mills)
+                    ));
+                    for (key, value) in [
+                        ("charge_off_local_share", r.charge_off_local_share),
+                        ("local_capacity", r.local_capacity),
+                        ("aid_charge_off", r.aid_charge_off),
+                        ("aid_fsfp", r.aid_fsfp),
+                        ("difference", r.difference),
+                        ("residual", r.residual),
+                        ("mills_short_of_charge_off", r.mills_short_of_charge_off),
+                    ] {
+                        s.push_str(&format!("\"{key}\": {}, ", opt(value)));
+                    }
+                    s.push_str(&format!("\"exceeds_base_cost\": {}", r.exceeds_base_cost));
+                    s.push_str("}, ");
+                }
+            }
             s.push_str(&format!(
                 "\"operating_expenditure_per_pupil\": {}, ",
                 opt(d.operating_expenditure_per_pupil)
@@ -1262,6 +1379,19 @@ mod tests {
                 cumulative_reduction: Some(0.4269),
                 yield_per_mill_per_pupil: 227.35,
             }),
+            // 23 mills against $279,983 of valuation is $6,440 — more than half of what the
+            // charge-off would have deemed Northern Local able to raise toward its own cost.
+            regime: Some(RegimeCounterfactual {
+                charge_off_mills: 23.0,
+                charge_off_local_share: Some(6_439.61),
+                local_capacity: Some(5_263.44),
+                aid_charge_off: Some(1_660.39),
+                aid_fsfp: Some(2_836.56),
+                difference: Some(1_176.17),
+                residual: Some(0.0),
+                exceeds_base_cost: false,
+                mills_short_of_charge_off: Some(2.9846),
+            }),
             operating_expenditure_per_pupil: Some(11_986.62),
             economically_disadvantaged: Some(0.3881),
             enrollment_change: Some(-0.03),
@@ -1300,6 +1430,10 @@ mod tests {
             median_yield_per_mill: 0.0,
             min_yield_per_mill: 0.0,
             max_yield_per_mill: 0.0,
+            median_sd1_value_per_pupil: 0.0,
+            below_charge_off_rate: 0,
+            charge_off_exceeds_base_cost: 0,
+            median_regime_difference: 0.0,
             at_minimum_state_share: 0,
             median_valuation_per_pupil: 0.0,
             median_operating_expenditure_per_pupil: 0.0,

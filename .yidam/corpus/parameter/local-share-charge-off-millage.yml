@@ -58,6 +58,28 @@ description: |
   across 145 districts in FY2008**. [verified — LSC] A mechanism requiring a supplement for a
   quarter of the state is the argument for replacing it.
 
+  **THE PHANTOM REVENUE IS NOW COUNTED, AND IT IS NOT A MINORITY CASE.** This node has asserted
+  since genesis that a district whose effective rate has fallen below the charge-off rate is
+  charged for revenue it cannot collect. Table SD-1's TY2024 effective Class I rates make it a
+  count: **309 of 609 districts — half the state — charge less than the 23 mills the mechanism
+  would deem them able to levy.** [verified — computed in `crates/bundle` from
+  `regime-diff::TERMINAL_MILLS` against TY2024 Table SD-1]
+
+  The FY2008 comparison is the one worth holding beside it. Gap aid then covered 145 districts
+  at $73.5 million. Sixteen years of reduction factors later the same rate against the same kind
+  of base would reach twice as many districts, because that is what H.B. 920 does with time:
+  every year of valuation growth above the floor moves another district further below any fixed
+  assumed rate. The mechanism did not fail once; it was failing progressively, and the
+  supplement's cost was a lagging measure of it. [inference]
+
+  A further **81 districts have valuation high enough that 23 mills would exceed their entire
+  base cost**, leaving them no state aid at all — the charge-off had no minimum state share, which
+  is a Fair School Funding Plan invention. [verified] Against the counterfactual the median
+  district is $289 per pupil better off under the plan. [verified]
+
+  Both figures are on the DeRolph-era base and therefore overstate the charge-off, per the
+  caveat above.
+
   **Joint vocational school districts were charged off at 0.5 mills**, not the district rate.
   [verified — LSC] This is the one place the "uniform statewide" description is false, and a
   comparison run over JVSDs at the district rate is wrong by a factor of forty-six.

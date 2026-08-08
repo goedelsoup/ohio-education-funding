@@ -24,6 +24,37 @@ description: |
   differ, and for districts with substantial community school or scholarship participation they
   differ materially. [verified] Which denominator is used changes the answer.
 
+  **How much it changes the answer, measured.** Two arms of the state publish this metric for
+  every district and they do not agree. The Department of Taxation's Table SD-1 and the
+  Department of Education's District Profile Report carry **identical numerators** — multiply the
+  profile's valuation per pupil by its enrolled ADM and SD-1's total taxable value comes back to
+  1.000 for all 606 districts carrying both, so the two agencies value the same property at the
+  same dollar. [verified] They divide it by different pupil counts:
+
+      district        Education (enrolled ADM)   Taxation (SD-1)    ratio
+      Columbus City   43,019                     73,746             1.71
+      Youngstown      4,322                      9,655              2.23
+      Dayton City     11,744                     22,628             1.93
+
+  Taxation counts the children who live in the district; Education counts the ones it teaches.
+  The gap is community school, scholarship and open-enrolment-out students — so it is widest in
+  exactly the districts where this metric does the most work in the aid formula, and it runs the
+  same direction every time: the urban districts with the largest scholarship populations look
+  **poorer** on Taxation's count and **wealthier** on Education's. Youngstown is $78,146 per pupil
+  by one table and $172,999 by the other. [verified — TY2023]
+
+  Only 78 of 606 districts have the two within 2% of each other. The statewide medians are close
+  ($251,661 against $248,097, a 1.4% difference) because the divergence is concentrated rather
+  than general, which makes it more dangerous and not less: a page comparing one table's district
+  figure against the other's median looks right for most of the state and is wrong by a factor of
+  two for the districts a reader is most likely to look up. This site did exactly that until the
+  divergence was measured. [verified]
+
+  **There is a third count.** Base cost ADM — funded rather than enrolled — is what base cost per
+  pupil divides by, and it differs from enrolled ADM by a median of 1.6% and by 27% at the
+  extreme. Any per-pupil subtraction that takes a local share from a cost is crossing that seam.
+  [verified]
+
   **Statewide distribution, FY2023, 606 traditional districts** [verified]: 5th percentile
   $129,894, median $248,097, 95th percentile $465,615. A district at the top of the range has
   about 3.6 times the taxable base per student of one at the bottom.

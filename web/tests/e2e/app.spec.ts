@@ -835,6 +835,64 @@ test.describe("the property tax route", () => {
     expect(Math.abs(observed - predicted - residual)).toBeLessThan(0.001);
   });
 
+  test("the charge-off counterfactual is labelled as one and names what it cannot reach", async ({
+    page,
+  }) => {
+    /*
+     * The only counterfactual on the site, so the framing carries more weight than the numbers.
+     * Columbus is the useful case: 23 mills against its valuation exceeds its whole base cost,
+     * so the charge-off would leave it nothing — the plan's minimum state share is what does not
+     * exist in the earlier mechanism.
+     */
+    await page.goto("/district/043802/taxes");
+    const card = page.locator(".card", { hasText: "What the mechanism this replaced" });
+    await expect(card).toContainText("23 mills");
+    await expect(card).toContainText("no minimum state share to stop at");
+    await expect(card).toContainText("counterfactual at FY2027 inputs");
+    await expect(card).toContainText("not a reconstruction of any year the charge-off governed");
+    await expect(card).toContainText("one row of the calculation");
+    await expect(card).toContainText("overstates");
+  });
+
+  test("a district below the charge-off rate is told it would be charged for phantom revenue", async ({
+    page,
+  }) => {
+    // Vinton County charges 18.70 mills against a mechanism that assumes 23 — the failure the
+    // charge-off was replaced for, and half the state is in the same position.
+    await page.goto(`/district/${BELOW_FLOOR}/taxes`);
+    const card = page.locator(".card", { hasText: "What the mechanism this replaced" });
+    await expect(card).toContainText("would be charged for revenue it could not raise");
+    await expect(card).toContainText("4.30 mills short");
+    await expect(card).toContainText("gap aid");
+  });
+
+  test("a district whose two pupil counts diverge is shown both", async ({ page }) => {
+    /*
+     * The defect this catches is the one the site shipped: printing Table SD-1's valuation per
+     * pupil against a statewide median computed on the profile report's denominator. The card
+     * only appears where the two are more than 5% apart, and Columbus is 1.7x.
+     */
+    await page.goto("/district/043802/taxes");
+    const card = page.locator(".card", { hasText: "Two pupil counts" });
+    await expect(card).toContainText("The valuations are the same to the dollar");
+    await expect(card).toContainText("73,746");
+    await expect(card).toContainText("43,019");
+    await expect(card).toContainText("Education, base cost ADM");
+
+    // And the tile above compares against a median on the same basis as the figure it shows.
+    await expect(page.locator(".tile", { hasText: "Taxable value per pupil" })).toContainText(
+      "on this table's pupil count",
+    );
+  });
+
+  test("a district whose pupil counts agree is not shown the caution", async ({ page }) => {
+    // Under 5% apart, so the card would be noise rather than a caution. Only 78 of 609 districts
+    // are within 2%; Bexley City is one, and most of the state is not — which is the finding.
+    await page.goto("/district/043620/taxes");
+    await expect(page.locator("h1")).toHaveText("Bexley City");
+    await expect(page.locator(".card", { hasText: "Two pupil counts" })).toHaveCount(0);
+  });
+
   test("a district above the floor is told they are operative", async ({ page }) => {
     await page.goto("/district/044933/taxes");
     const change = page.locator(".card", { hasText: "TY2023 to TY2024" });
