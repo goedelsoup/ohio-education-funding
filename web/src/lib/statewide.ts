@@ -7,7 +7,7 @@ import { count, escapeHtml, millions, money, pct } from "./format.ts";
 import { realChange, series, type Basis } from "./real.ts";
 import * as routes from "./routes.ts";
 import type { TaxStatewide } from "./feed.ts";
-import type { Bundle, District } from "./types.ts";
+import type { Bundle, District, National } from "./types.ts";
 
 /**
  * The financial actuals, statewide, in both bases.
@@ -227,5 +227,135 @@ export function renderStatewideStructure(bundle: Bundle, tax: TaxStatewide): str
         minimum state share to stop at. Ohio's answer was a supplement rather than a fix. Against
         that counterfactual the median district is
         ${money(s.median_regime_difference)} per pupil better off under the plan.</p>
+    </div>`;
+}
+
+/**
+ * Where Ohio sits among the states.
+ *
+ * # The claim this finally tests
+ *
+ * *DeRolph* held that Ohio relied too heavily on local property tax. Every other figure on this
+ * site is Ohio describing itself, so that holding could be restated and never checked — "too
+ * heavily" is a comparison, and there was nothing to compare against. The Census Bureau's Annual
+ * Survey of School System Finances is the third source and the first federal one, covering every
+ * school system in the country on one set of definitions.
+ *
+ * The answer is that Ohio is unusual, and specifically in the way *DeRolph* said. It spends about
+ * the national average per pupil and takes an exactly average share from Washington. What is
+ * distinctive is who pays the rest.
+ *
+ * # Why the property tax rank is over 39 states and the others are over 51
+ *
+ * Twelve states fund schools through a parent city or county rather than through a district that
+ * levies for itself. The survey attributes their property tax to the parent, so Massachusetts and
+ * Virginia — which lean on property tax about as hard as anywhere — report zero. Local revenue
+ * includes the parent appropriation and is comparable either way. Ranking all 51 on property tax
+ * would have produced a confident and wrong answer, and nearly did.
+ */
+export function renderNational(national: National | null): string {
+  if (!national) return "";
+
+  const ohio = national.states.find((s) => s.name === "Ohio");
+  if (!ohio) return "";
+
+  const share = (part: number) => part / ohio.total_revenue;
+  const perPupil = ohio.current_spending * 1_000 / ohio.enrollment;
+
+  // Ordered by local share so Ohio's position is visible rather than asserted, and trimmed to the
+  // extremes plus Ohio: fifty-one bars is a table, not a chart.
+  const ranked = [...national.states].sort((a, b) => b.local_revenue / b.total_revenue - a.local_revenue / a.total_revenue);
+  const shown = [...ranked.slice(0, 6), ...(ranked.slice(0, 6).some((s) => s.name === "Ohio") ? [] : [ohio])];
+
+  const bars: Bar[] = shown.map((s) => ({
+    label: s.name === "Ohio" ? "Ohio" : s.name,
+    value: (s.local_revenue / s.total_revenue) * 100,
+    direct: pct(s.local_revenue / s.total_revenue, 0),
+    hover: `${s.name}: ${pct(s.local_revenue / s.total_revenue, 1)} local, ${pct(s.state_revenue / s.total_revenue, 1)} state`,
+    current: s.name === "Ohio",
+  }));
+
+  const rows: [string, string, string, string][] = [
+    [
+      "Local share of school revenue",
+      pct(share(ohio.local_revenue), 1),
+      `${national.ohio_local_rank} of ${national.states.length}`,
+      pct(national.national_local_share, 1),
+    ],
+    [
+      "State share",
+      pct(share(ohio.state_revenue), 1),
+      `${national.ohio_state_rank} of ${national.states.length}`,
+      pct(national.national_state_share, 1),
+    ],
+    [
+      "Federal share",
+      pct(share(ohio.federal_revenue), 1),
+      "—",
+      pct(
+        national.states.reduce((a, s) => a + s.federal_revenue, 0) /
+          national.states.reduce((a, s) => a + s.total_revenue, 0),
+        1,
+      ),
+    ],
+    [
+      "Current spending per pupil",
+      money(perPupil),
+      `${national.ohio_spending_rank} of ${national.states.length}`,
+      money(national.national_spending_per_pupil),
+    ],
+  ];
+
+  return `
+    <div class="card">
+      <h2>Whether Ohio is unusual</h2>
+      <p class="note">Everything else on this site is Ohio describing itself. This is the Census
+        Bureau counting every school system in the country on one set of definitions, for
+        FY${national.fiscal_year} — the only figures here that can say whether what Ohio does is
+        normal.</p>
+
+      <div class="scroll"><table>
+        <thead><tr><th></th><th class="tnum">Ohio</th><th>Rank</th>
+          <th class="tnum">National</th></tr></thead>
+        <tbody>${rows
+          .map(
+            ([label, value, rank, natl], i) => `<tr${i < 2 ? ' class="current"' : ""}>
+              <th>${escapeHtml(label)}</th>
+              <td class="tnum">${value}</td><td class="n">${rank}</td>
+              <td class="tnum n">${natl}</td>
+            </tr>`,
+          )
+          .join("")}</tbody>
+      </table></div>
+
+      <div class="chartwrap" data-chart="local-share">${renderToString(barSpec(bars))}</div>
+
+      <p class="note"><strong>Ohio spends about what the country spends and raises it differently.
+        </strong> Current spending per pupil is ${money(perPupil)} against a national
+        ${money(national.national_spending_per_pupil)}, and the federal share is within a point of
+        the national figure. What is distinctive is the split between the other two: Ohio is
+        <strong>${national.ohio_local_rank}th highest of ${national.states.length}</strong> on the
+        local share of school revenue and
+        <strong>${national.ohio_state_rank}th</strong> on the state share — only
+        ${count(national.states.length - national.ohio_state_rank)} states put in less. That is the
+        <a href="${routes.wikiNode("litigation", "derolph-i-1997")}">DeRolph</a> holding, stated as
+        a comparison for the first time on this site.</p>
+
+      <p class="note">Among the ${count(national.independent_states)} states whose districts levy
+        their own tax rather than being funded by a city or county, Ohio's property tax share of
+        school revenue ranks <strong>${national.ohio_property_tax_rank}</strong>. That comparison
+        excludes twelve states on purpose: where districts are dependent agencies the survey
+        attributes the tax to the parent government, so Massachusetts and Virginia report
+        <em>zero</em> school property tax while raising billions from it. Ranking all fifty-one
+        would put two of the most property-tax-dependent states at the bottom.</p>
+
+      <p class="note">FY${national.fiscal_year} is the peak year of federal pandemic relief, so
+        the federal share here is inflated and the state and local shares are correspondingly
+        deflated. That runs <em>against</em> this finding rather than for it — in an ordinary year
+        Ohio's local share would be higher. It is also why the ${pct(share(ohio.federal_revenue), 1)}
+        federal share of <em>revenue</em> on this row is not the
+        <a href="/districts">4.2% federal share of operating spending</a> the report card gives for
+        FY2025: different year, different denominator, and the difference between them is the
+        relief cliff.</p>
     </div>`;
 }

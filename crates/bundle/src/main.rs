@@ -13,8 +13,9 @@ use std::collections::HashMap;
 
 use bundle::{
     BaseCostBuildUp, Bundle, Checkpoint, Deflator, District, DistrictOutcome, FinanceYear,
-    ForecastCheckpoint, MillageAnalysis, OutcomeStatewide, PolicyShape, Projection,
-    PropertyTaxYear, RegimeCounterfactual, SpendingByFunction, Statewide, CONTRACT_VERSION,
+    ForecastCheckpoint, MillageAnalysis, National, OutcomeStatewide, PolicyShape, Projection,
+    PropertyTaxYear, RegimeCounterfactual, SpendingByFunction, StateFinance, Statewide,
+    CONTRACT_VERSION,
 };
 use dispersion::{partial_correlation, wealth_neutrality};
 use edfund_core::{AgencyType, FiscalYear};
@@ -43,6 +44,11 @@ const SD1: &str = include_str!("../../dispersion/fixtures/sd1-district-taxes.csv
 
 /// The report card's FY2025 operating spending, broken into functions, per pupil.
 const FUNCTIONS: &str = include_str!("../../dispersion/fixtures/expenditure-functions-fy25.csv");
+
+/// The Census Bureau's Annual Survey of School System Finances, aggregated to states.
+///
+/// The only federal source in the feed, and the only one that can say whether Ohio is unusual.
+const F33: &str = include_str!("../../dispersion/fixtures/census-f33-states.csv");
 
 fn field(line: &str, index: usize) -> Option<&str> {
     line.split(',').nth(index).map(str::trim)
@@ -194,6 +200,84 @@ fn aligned(
         control.push(c);
     }
     (xs, ys, control)
+}
+
+/// Where Ohio sits among the states, from the Census survey.
+///
+/// # Why the property tax rank is taken over a subset and the others are not
+///
+/// Twelve states fund schools through a parent city or county rather than through a district that
+/// levies for itself, so the survey attributes their property tax to the parent and reports the
+/// district's own as zero. Ranking all fifty-one on property tax share would put Massachusetts and
+/// Virginia at the bottom of a measure they are near the top of. Local revenue includes the parent
+/// appropriation and is comparable either way, so that rank is over everyone and the property tax
+/// rank is over the thirty-nine that report one.
+fn national() -> Option<National> {
+    let head = header(F33);
+    let states: Vec<StateFinance> = F33
+        .lines()
+        .skip(1)
+        .filter(|line| !line.trim().is_empty())
+        .map(|line| {
+            let p: Vec<&str> = line.split(',').collect();
+            let n = |name: &str| number(&head, &p, name);
+            StateFinance {
+                fips: at(&head, &p, "fips").to_string(),
+                name: at(&head, &p, "state").to_string(),
+                systems: n("systems") as usize,
+                enrollment: n("enrollment"),
+                total_revenue: n("total_revenue"),
+                federal_revenue: n("federal_revenue"),
+                state_revenue: n("state_revenue"),
+                local_revenue: n("local_revenue"),
+                property_tax_revenue: n("property_tax_revenue"),
+                parent_government_revenue: n("parent_government_revenue"),
+                current_spending: n("current_spending"),
+            }
+        })
+        .collect();
+
+    if states.len() < 50 {
+        return None;
+    }
+
+    let rank_of = |key: &dyn Fn(&StateFinance) -> f64, pool: &[&StateFinance]| -> usize {
+        let ohio = pool
+            .iter()
+            .find(|s| s.name == "Ohio")
+            .map_or(0.0, |s| key(s));
+        pool.iter().filter(|s| key(s) > ohio).count() + 1
+    };
+
+    let all: Vec<&StateFinance> = states.iter().collect();
+    let independent: Vec<&StateFinance> =
+        states.iter().filter(|s| s.fiscally_independent()).collect();
+
+    let total = |pick: &dyn Fn(&StateFinance) -> f64| states.iter().map(pick).sum::<f64>();
+    let revenue = total(&|s| s.total_revenue);
+
+    Some(National {
+        fiscal_year: 2022,
+        ohio_local_rank: rank_of(&StateFinance::local_share, &all),
+        ohio_state_rank: rank_of(&StateFinance::state_share, &all),
+        ohio_spending_rank: rank_of(&StateFinance::spending_per_pupil, &all),
+        ohio_property_tax_rank: rank_of(
+            &|s: &StateFinance| {
+                if s.total_revenue > 0.0 {
+                    s.property_tax_revenue / s.total_revenue
+                } else {
+                    0.0
+                }
+            },
+            &independent,
+        ),
+        independent_states: independent.len(),
+        national_local_share: total(&|s| s.local_revenue) / revenue,
+        national_state_share: total(&|s| s.state_revenue) / revenue,
+        national_spending_per_pupil: total(&|s| s.current_spending) * 1_000.0
+            / total(&|s| s.enrollment),
+        states,
+    })
 }
 
 /// The statewide outcome block, or `None` if nothing joined.
@@ -836,6 +920,7 @@ fn main() {
     };
 
     let bundle = Bundle {
+        national: national(),
         contract_version: CONTRACT_VERSION.to_string(),
         provenance: "Ohio DEW FY27 TRAD State Foundation Funding Calculator (a projection, not \
                      an actual) joined with the FY2024 District Profile Report. Base cost, \

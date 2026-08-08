@@ -31,6 +31,35 @@ description: |
   A clarification followed on 25 April 1997: local property taxes could supplement but not
   primarily fund schools, and school borrowing was permitted through 23 March 1998. [verified]
 
+  **THE RELIANCE FINDING IS NOW TESTABLE AGAINST THE OTHER FORTY-NINE STATES, AND IT HOLDS.**
+  The court found that reliance on local property tax produced disparities the state's
+  equalization did not correct. Every source this corpus held until now describes Ohio alone, so
+  the finding could be restated indefinitely and never checked — "too heavily" is a comparison,
+  and there was nothing to compare against. The Census Bureau's
+  [Annual Survey of School System Finances](../../catalog/census-f33-school-system-finances.md)
+  counts every school system in the country on one set of definitions.
+
+  In FY2022 Ohio raised **51.8% of school revenue locally against a national 43.4% — seventh
+  highest of fifty-one** — and took **34.4% from the state against a national 43.4%,
+  forty-fifth of fifty-one.** Only six states contribute a smaller share. [verified — computed
+  in `crates/bundle`; see `crates/dispersion/tests/census_f33_states.rs`]
+
+  What makes this a finding about structure rather than about money is the two figures that are
+  *not* unusual. Ohio's current spending per pupil is $14,923 against a national $15,801 —
+  twenty-fourth of fifty-one, unremarkable — and its federal share is within a point of the
+  national figure. Ohio spends roughly what the country spends on schools. The distinctive thing
+  is who pays, which is the distinction the court drew in 1997 and the one the clarification a
+  month later sharpened into "supplement but not primarily fund". [inference]
+
+  The survey year understates this rather than overstating it. FY2022 is the peak of federal
+  pandemic relief, so the federal share is inflated and the state and local shares are both
+  deflated; in an ordinary year Ohio's local share would be higher. [verified]
+
+  **What this does not establish.** That the reliance causes the disparities, which is a separate
+  claim the court supported on a trial record this corpus does not hold; and that twenty-eight
+  years of remedy have or have not moved the position, which needs the survey across years and
+  the layout is not stable enough to assume. [open]
+
   The remedy was the weak point, and it is why *DeRolph* produced four decisions rather than
   one. The court declared the system unconstitutional and directed the General Assembly to fix
   it, without specifying what a compliant system would contain or what would follow if none

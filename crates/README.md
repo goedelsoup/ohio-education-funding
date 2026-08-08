@@ -15,10 +15,12 @@ it.
 
 **Connectors** adapt the primary publishers of Ohio funding data. All nine approved at genesis
 now live in one crate, [`connect`](connect/), as a registry whose status is checked by a test
-rather than asserted in a README. Four are wired — `dew-foundation`, `dew-report-card`,
-`dew-five-year-forecast` and `bls-cpi` — plus `tax-abstract`, which was declared for twelve
-phases behind a blocker that turned out to be wrong. One is retrievable and six are declared
-with a recorded reason. See
+rather than asserted in a README. Six are wired — `dew-foundation`, `dew-report-card`,
+`dew-five-year-forecast` and `bls-cpi`, plus `tax-abstract`, which was declared for twelve
+phases behind a blocker that turned out to be wrong, and `census-f33`, whose blocker was
+likewise stale: the legacy workbook reader it was waiting for had been in the tree for phases.
+Five are declared with a recorded reason, and every one of those five is blocked on a PDF or on
+the absence of a bulk export rather than on anything this repository can build. See
 [`connect/README.md`](connect/README.md) for the table and
 [`connect/sources/`](connect/sources/) for what each is for.
 
@@ -129,7 +131,7 @@ Fields per crate: name, capability type (connector/calculator/feature-engineerin
 | [`bundle`](bundle/) | Export a versioned JSON feed of the corpus's district-level findings for the web layer | 24 |
 | [`connect`](connect/) | Retrieval and extraction: the department's publications into committed fixtures | 84 |
 | [`deflate`](deflate/) | Convert nominal Ohio school finance figures to constant dollars, fiscal-year aligned | 11 |
-| [`dispersion`](dispersion/) | School finance equity statistics: dispersion and wealth neutrality across agencies | 70 |
+| [`dispersion`](dispersion/) | School finance equity statistics: dispersion and wealth neutrality across agencies | 76 |
 | [`edfund-core`](edfund-core/) | Shared domain types for the Ohio education funding computer | 7 |
 | [`foundation`](foundation/) | Fair School Funding Plan base cost build-up, per R.C. 3317.011 | 45 |
 | [`local-capacity`](local-capacity/) | Fair School Funding Plan local capacity and state share, per R.C. 3317.017 | 18 |
@@ -139,7 +141,7 @@ Fields per crate: name, capability type (connector/calculator/feature-engineerin
 | [`scenario-delta`](scenario-delta/) | Winners and losers between two funding runs, with incidence and the off-formula count | 23 |
 | [`spreadsheet`](spreadsheet/) | Read the department's published workbooks with no dependencies | 70 |
 
-12 crates, 481 test functions, no crates.io dependencies. `cargo test` reports a different total: it adds doc-tests and counts each integration binary separately.
+12 crates, 487 test functions, no crates.io dependencies. `cargo test` reports a different total: it adds doc-tests and counts each integration binary separately.
 <!-- /REGEN -->
 
 ## Index status

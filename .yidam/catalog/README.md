@@ -24,6 +24,7 @@ Sorted by: type, then slug.
 |---|---|--:|
 | [`auditor-longitudinal-school-finance`](auditor-longitudinal-school-finance.md) | Longitudinal School Finance Study — Ohio Auditor of State | 1 |
 | [`bls-cpi-u`](bls-cpi-u.md) | CPI-U all items — the Bureau of Labor Statistics flat file | 3 |
+| [`census-f33-school-system-finances`](census-f33-school-system-finances.md) | Annual Survey of School System Finances (F-33) | 1 |
 | [`cupp-district-profile-report`](cupp-district-profile-report.md) | District Profile Report — the "Cupp Report" | 2 |
 | [`derolph-litigation-record`](derolph-litigation-record.md) | DeRolph Litigation Record | 2 |
 | [`dew-expenditure-expanded-list`](dew-expenditure-expanded-list.md) | FY2025 Expenditure Expanded List | 1 |
@@ -44,7 +45,7 @@ Sorted by: type, then slug.
 | [`ocg-white-paper-013`](ocg-white-paper-013.md) | OCG White Paper No. 013 — Does Per-Pupil Spending Track Academic Performance? | 4 |
 | [`ode-idea-part-b-allocations`](ode-idea-part-b-allocations.md) | IDEA Part B Allocations to Districts | 0 |
 
-21 entries, 2 not yet cited by any corpus node. 13 retrieved files are pinned by SHA-256 in [`crates/connect/source-digests.txt`](../../crates/connect/source-digests.txt).
+22 entries, 2 not yet cited by any corpus node. 14 retrieved files are pinned by SHA-256 in [`crates/connect/source-digests.txt`](../../crates/connect/source-digests.txt).
 <!-- /REGEN -->
 
 ## Adding a source

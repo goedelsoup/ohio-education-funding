@@ -990,3 +990,48 @@ test.describe("where the money came from", () => {
     await expect(card).toContainText("none of them with both magnitudes above 0.05");
   });
 });
+
+test.describe("whether Ohio is unusual", () => {
+  test("the front page ranks Ohio against the other states", async ({ page }) => {
+    /*
+     * The only comparative claim on the site, and the only federal source behind it. Everything
+     * else here is Ohio describing itself, which cannot answer a question of the form "too
+     * heavily" — the form the DeRolph holding takes.
+     */
+    await page.goto("/");
+    const card = page.locator(".card", { hasText: "Whether Ohio is unusual" });
+    await expect(card).toContainText("Local share of school revenue");
+    await expect(card).toContainText("7 of 51");
+    await expect(card).toContainText("45 of 51");
+    await expect(card).toContainText("DeRolph");
+  });
+
+  test("the property tax rank names the states it excludes and why", async ({ page }) => {
+    /*
+     * Nine states report zero school property tax and levy plenty of it — their districts are
+     * agencies of a city or county, so the survey attributes the tax to the parent. Ranking all
+     * fifty-one would put Massachusetts and Virginia at the bottom of a measure they are near the
+     * top of, and the first version of this extractor did exactly that.
+     */
+    await page.goto("/");
+    const card = page.locator(".card", { hasText: "Whether Ohio is unusual" });
+    await expect(card).toContainText("39 states whose districts levy their own tax");
+    await expect(card).toContainText("Massachusetts and Virginia report");
+    await expect(card).toContainText("excludes twelve states on purpose");
+  });
+
+  test("the relief year is named as cutting against the finding", async ({ page }) => {
+    await page.goto("/");
+    const card = page.locator(".card", { hasText: "Whether Ohio is unusual" });
+    await expect(card).toContainText("peak year of federal pandemic relief");
+    await expect(card).toContainText("against this finding rather than for it");
+  });
+
+  test("the Census comparison stays out of the scenario panel", async ({ request }) => {
+    // 51 states is small, but the formula never reads it and the panel is a formula input.
+    const panel = await (await request.get("/data/panel.json")).json();
+    expect(panel).not.toHaveProperty("national");
+    const feed = await (await request.get("/data/bundle.json")).json();
+    expect(feed.national.states).toHaveLength(51);
+  });
+});

@@ -377,19 +377,23 @@ pub const CONNECTORS: &[Connector] = &[
         key: "census-f33",
         publisher: "U.S. Census Bureau",
         feeds: &["metric", "education-agency"],
-        status: Status::Retrievable,
+        status: Status::Wired,
         note: "Comparability in two directions: whether Ohio is unusual, and an independent \
-               check on department figures computed on different definitions.",
+               check on department figures computed on different definitions. The first is \
+               wired and settles the DeRolph claim comparatively; the second needs an \
+               NCESID-to-IRN crosswalk this repository does not hold.",
         sources: &[Source {
             key: "f33-fy2022",
             url: "https://www2.census.gov/programs-surveys/school-finances/tables/2022/\
                   secondary-education-finance/elsec22t.xls",
             filename: "elsec22t.xls",
             format: Format::LegacyXls,
-            catalog: None,
-            fixture: None,
-            note: "One year per file, and the layout is not stable across years — a parser \
-                   here has to be per-era, which is why this is not yet wired.",
+            catalog: Some("census-f33-school-system-finances"),
+            fixture: Some("crates/dispersion/fixtures/census-f33-states.csv"),
+            note: "One year per file and the layout is not stable across years, so the column \
+                   map is per-era. The fixture is the state aggregate rather than the panel: \
+                   14,106 school systems reduce to 51 rows, and the per-district join needs an \
+                   NCESID-to-IRN crosswalk that is not held here.",
         }],
     },
     Connector {

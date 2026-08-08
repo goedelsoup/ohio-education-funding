@@ -1341,3 +1341,197 @@ mod tests {
         let _ = fs::remove_dir_all(&dir);
     }
 }
+
+/// Where the Census F-33 state comparison is written, relative to the root.
+pub const F33_FIXTURE: &str = "crates/dispersion/fixtures/census-f33-states.csv";
+
+/// Header of the state comparison: one row per state, plus the District of Columbia.
+///
+/// Fifty-one rows out of fourteen thousand. The survey covers every school system in the United
+/// States and the corpus needs exactly one thing from it that nothing else can supply — where
+/// Ohio sits among the states — so the fixture is the aggregate rather than the panel.
+pub const F33_HEADER: &[&str] = &[
+    "fips",
+    "state",
+    "systems",
+    "enrollment",
+    "total_revenue",
+    "federal_revenue",
+    "state_revenue",
+    "local_revenue",
+    "property_tax_revenue",
+    "parent_government_revenue",
+    "current_spending",
+];
+
+/// Column positions in the Census `elsec22t` sheet.
+///
+/// # `STATE` is not a FIPS code
+///
+/// Column 0 is the Census Bureau's own state ordering and column 4 is FIPS. They agree for the
+/// early states and diverge after: filtering on `STATE == "39"` returns Pennsylvania, whose FIPS
+/// is 42, while Ohio's FIPS 39 is Census 36. Both columns are two-digit, zero-padded, and
+/// numeric, so the mistake produces a full and entirely wrong answer.
+mod f33 {
+    pub const FIPS: usize = 4;
+    pub const SCHOOL_LEVEL: usize = 9;
+    pub const ENROLLMENT: usize = 12;
+    pub const TOTAL_REVENUE: usize = 13;
+    pub const FEDERAL_REVENUE: usize = 14;
+    pub const STATE_REVENUE: usize = 19;
+    pub const LOCAL_REVENUE: usize = 24;
+    /// Local revenue from property tax specifically.
+    ///
+    /// Zero for nine states, and not because they levy none — see [`super::build_f33_states`].
+    pub const PROPERTY_TAX: usize = 26;
+    /// Appropriations from a parent city or county, where the district is not fiscally
+    /// independent. The counterpart to [`PROPERTY_TAX`] and the reason it cannot be ranked alone.
+    pub const PARENT_GOVERNMENT: usize = 27;
+    pub const CURRENT_SPENDING: usize = 33;
+}
+
+/// FIPS code to state name. The survey carries codes only.
+const STATE_NAMES: &[(&str, &str)] = &[
+    ("01", "Alabama"),
+    ("02", "Alaska"),
+    ("04", "Arizona"),
+    ("05", "Arkansas"),
+    ("06", "California"),
+    ("08", "Colorado"),
+    ("09", "Connecticut"),
+    ("10", "Delaware"),
+    ("11", "District of Columbia"),
+    ("12", "Florida"),
+    ("13", "Georgia"),
+    ("15", "Hawaii"),
+    ("16", "Idaho"),
+    ("17", "Illinois"),
+    ("18", "Indiana"),
+    ("19", "Iowa"),
+    ("20", "Kansas"),
+    ("21", "Kentucky"),
+    ("22", "Louisiana"),
+    ("23", "Maine"),
+    ("24", "Maryland"),
+    ("25", "Massachusetts"),
+    ("26", "Michigan"),
+    ("27", "Minnesota"),
+    ("28", "Mississippi"),
+    ("29", "Missouri"),
+    ("30", "Montana"),
+    ("31", "Nebraska"),
+    ("32", "Nevada"),
+    ("33", "New Hampshire"),
+    ("34", "New Jersey"),
+    ("35", "New Mexico"),
+    ("36", "New York"),
+    ("37", "North Carolina"),
+    ("38", "North Dakota"),
+    ("39", "Ohio"),
+    ("40", "Oklahoma"),
+    ("41", "Oregon"),
+    ("42", "Pennsylvania"),
+    ("44", "Rhode Island"),
+    ("45", "South Carolina"),
+    ("46", "South Dakota"),
+    ("47", "Tennessee"),
+    ("48", "Texas"),
+    ("49", "Utah"),
+    ("50", "Vermont"),
+    ("51", "Virginia"),
+    ("53", "Washington"),
+    ("54", "West Virginia"),
+    ("55", "Wisconsin"),
+    ("56", "Wyoming"),
+];
+
+/// Aggregate the Census F-33 district panel to one row per state.
+///
+/// # Which systems are counted, and why the rule is enrollment rather than school level
+///
+/// The survey covers 14,106 school systems at six school levels: elementary-only, secondary-only,
+/// unified, vocational and special, nonoperating, and education service agencies. States organise
+/// differently — Ohio has 609 unified districts and no elementary-only ones, Illinois has
+/// hundreds of both — so any rule stated in terms of school level would count different things in
+/// different states, which is precisely what an interstate comparison must not do.
+///
+/// The rule here is **enrolment above zero**. It admits every system that teaches somebody and
+/// excludes the two that would double count: 691 education service agencies, which report revenue
+/// received *from* the districts they serve, and 121 nonoperating systems, which levy tax and pay
+/// tuition elsewhere. Ohio's own ESCs are in the first group, and the corpus already knows that
+/// channel — it is the `total_transfers` line that had to be ruled out as the voucher deduction.
+///
+/// # Property tax cannot be ranked across states, and local revenue can
+///
+/// Nine states — Alaska, Connecticut, the District of Columbia, Maryland, Massachusetts, North
+/// Carolina, Rhode Island, Tennessee and Virginia — report **zero** school property tax revenue
+/// while raising billions locally. They levy plenty; their school districts are dependent
+/// agencies of a city or county, so the tax belongs to the parent government and reaches the
+/// district as an appropriation. Virginia's parent contributions are 94% of its local school
+/// revenue, the District of Columbia's 99%.
+///
+/// So `property_tax_revenue / total_revenue` is not a national ranking: it silently compares
+/// states that report their own levy against states structurally unable to. Massachusetts funds
+/// schools from property tax about as heavily as anywhere and scores zero.
+///
+/// `local_revenue` is the aggregate that survives the difference, because parent contributions
+/// are inside it. Rank on that. `parent_government_revenue` travels beside the property tax
+/// column so a consumer can see which structure a state has rather than having to know.
+///
+/// # Dollars are thousands, and enrolment is not
+///
+/// Every money column in the F-33 is reported in thousands of dollars. The fixture keeps the
+/// survey's own unit rather than converting, so a reader comparing it against the published
+/// tables is comparing like with like; consumers multiply. Enrolment is a headcount.
+#[must_use]
+pub fn build_f33_states(rows: &[Vec<String>]) -> Vec<Vec<String>> {
+    let number = |row: &[String], index: usize| -> f64 {
+        row.get(index)
+            .and_then(|v| v.trim().parse::<f64>().ok())
+            .unwrap_or(0.0)
+    };
+
+    let mut totals: std::collections::BTreeMap<String, [f64; 8]> =
+        std::collections::BTreeMap::new();
+    let mut systems: std::collections::BTreeMap<String, usize> = std::collections::BTreeMap::new();
+
+    for row in rows.iter().skip(1) {
+        let enrolled = number(row, f33::ENROLLMENT);
+        if enrolled <= 0.0 {
+            continue;
+        }
+        let Some(fips) = row.get(f33::FIPS).map(|s| s.trim().to_string()) else {
+            continue;
+        };
+        // A school level the survey does not use would mean the layout has moved under us.
+        debug_assert!(matches!(
+            row.get(f33::SCHOOL_LEVEL).map(String::as_str),
+            Some("01" | "02" | "03" | "05" | "06" | "07")
+        ));
+
+        *systems.entry(fips.clone()).or_default() += 1;
+        let entry = totals.entry(fips).or_insert([0.0; 8]);
+        entry[0] += enrolled;
+        entry[1] += number(row, f33::TOTAL_REVENUE);
+        entry[2] += number(row, f33::FEDERAL_REVENUE);
+        entry[3] += number(row, f33::STATE_REVENUE);
+        entry[4] += number(row, f33::LOCAL_REVENUE);
+        entry[5] += number(row, f33::PROPERTY_TAX);
+        entry[6] += number(row, f33::PARENT_GOVERNMENT);
+        entry[7] += number(row, f33::CURRENT_SPENDING);
+    }
+
+    totals
+        .into_iter()
+        .filter_map(|(fips, totals)| {
+            // A FIPS code with no name is a territory. The survey carries Puerto Rico and the
+            // outlying areas in some years and they are not states, so they are dropped rather
+            // than ranked against them.
+            let name = STATE_NAMES.iter().find(|(code, _)| *code == fips)?.1;
+            let count = systems.get(&fips).copied().unwrap_or(0);
+            let mut row = vec![fips, name.to_string(), count.to_string()];
+            row.extend(totals.iter().map(|value| format_value(Some(*value), 0)));
+            Some(row)
+        })
+        .collect()
+}

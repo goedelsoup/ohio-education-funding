@@ -399,6 +399,51 @@ export const DistrictSchema = z
   })
   .strict();
 
+/**
+ * One state's school finance, from the Census Bureau's Annual Survey of School System Finances.
+ *
+ * Money is in **thousands of dollars**, as the survey reports it. Enrolment is a headcount.
+ */
+export const StateFinanceSchema = z
+  .object({
+    fips: z.string().regex(/^\d{2}$/),
+    name: z.string(),
+    systems: z.number().int().positive(),
+    enrollment: num,
+    total_revenue: num,
+    federal_revenue: num,
+    state_revenue: num,
+    local_revenue: num,
+    /** Zero for the twelve states whose districts are funded by a parent government. */
+    property_tax_revenue: num,
+    parent_government_revenue: num,
+    current_spending: num,
+  })
+  .strict();
+
+/**
+ * Where Ohio sits among the states — the only federal source in this feed.
+ *
+ * Every other figure here is Ohio describing itself, which means the corpus could restate the
+ * *DeRolph* claim about over-reliance on local property tax and never test it. "Too heavily"
+ * needs something to compare against.
+ */
+export const NationalSchema = z
+  .object({
+    fiscal_year: z.number().int(),
+    states: z.array(StateFinanceSchema).length(51),
+    ohio_local_rank: z.number().int().positive(),
+    ohio_state_rank: z.number().int().positive(),
+    ohio_spending_rank: z.number().int().positive(),
+    /** Over `independent_states`, not over all 51 — see `StateFinanceSchema.property_tax_revenue`. */
+    ohio_property_tax_rank: z.number().int().positive(),
+    independent_states: z.number().int().positive(),
+    national_local_share: num,
+    national_state_share: num,
+    national_spending_per_pupil: num,
+  })
+  .strict();
+
 /** Statewide aggregates, so a district can be positioned without recomputing. */
 export const StatewideSchema = z
   .object({
@@ -544,6 +589,8 @@ export const BundleSchema = z
     projection: ProjectionMetaSchema.nullable(),
     /** `null` means the feed can only be shown in nominal dollars. */
     deflator: DeflatorSchema.nullable(),
+    /** Where Ohio sits among the states. `null` if the Census fixture is absent. */
+    national: NationalSchema.nullable(),
     districts: z.array(DistrictSchema).min(1),
   })
   .strict();
@@ -558,6 +605,8 @@ export type RegimeCounterfactual = z.infer<typeof RegimeCounterfactualSchema>;
 export type SpendingByFunction = z.infer<typeof SpendingByFunctionSchema>;
 export type District = z.infer<typeof DistrictSchema>;
 export type Statewide = z.infer<typeof StatewideSchema>;
+export type StateFinance = z.infer<typeof StateFinanceSchema>;
+export type National = z.infer<typeof NationalSchema>;
 export type Deflator = z.infer<typeof DeflatorSchema>;
 export type PolicyShape = z.infer<typeof PolicyShapeSchema>;
 export type Checkpoint = z.infer<typeof CheckpointSchema>;

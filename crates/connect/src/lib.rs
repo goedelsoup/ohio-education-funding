@@ -337,6 +337,31 @@ pub fn rebuild(root: &Path) -> Result<Vec<Rebuilt>, RebuildError> {
         },
     });
 
+    // Census F-33. Skipped rather than fatal when the workbook is not cached: it is the one
+    // source in the registry that nothing else depends on, so an absent copy should cost the
+    // interstate comparison and nothing else.
+    let f33 = source("f33-fy2022").expect("registered").1;
+    out.push(match open_workbook(root, f33) {
+        Ok(book) => match book.rows("elsec22t") {
+            Ok(rows) => Rebuilt::Written {
+                path: fixtures::F33_FIXTURE.to_string(),
+                rows: fixtures::write_csv(
+                    &root.join(fixtures::F33_FIXTURE),
+                    fixtures::F33_HEADER,
+                    &fixtures::build_f33_states(&rows),
+                )?,
+            },
+            Err(cause) => Rebuilt::Skipped {
+                path: fixtures::F33_FIXTURE.to_string(),
+                reason: cause.to_string(),
+            },
+        },
+        Err(cause) => Rebuilt::Skipped {
+            path: fixtures::F33_FIXTURE.to_string(),
+            reason: cause.to_string(),
+        },
+    });
+
     Ok(out)
 }
 

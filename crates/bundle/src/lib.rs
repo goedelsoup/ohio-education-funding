@@ -73,7 +73,7 @@ use edfund_core::Dollars;
 /// from FY2022-FY2024 to FY2024-FY2026 — the years the department's `ADM Data` sheet declares.
 /// The values did not change; what they are called did, which is exactly the kind of silent
 /// meaning change the version guard exists for.
-pub const CONTRACT_VERSION: &str = "11.0.0";
+pub const CONTRACT_VERSION: &str = "12.0.0";
 
 /// How close to the floor counts as being on it, in mills.
 ///
@@ -840,6 +840,8 @@ pub struct Bundle {
     pub projection: Option<Projection>,
     /// The price index. `None` means the feed can only be shown in nominal dollars.
     pub deflator: Option<Deflator>,
+    /// Where Ohio sits among the states. `None` if the Census fixture is absent.
+    pub national: Option<National>,
     /// Per-district records.
     pub districts: Vec<District>,
 }
@@ -1126,6 +1128,57 @@ impl Bundle {
                     .collect::<Vec<_>>()
                     .join(", ")
             )),
+        }
+
+        match &self.national {
+            None => s.push_str("  \"national\": null,\n"),
+            Some(n) => {
+                s.push_str(&format!(
+                    "  \"national\": {{\"fiscal_year\": {}, \"ohio_local_rank\": {}, \
+                     \"ohio_state_rank\": {}, \"ohio_spending_rank\": {}, \
+                     \"ohio_property_tax_rank\": {}, \"independent_states\": {}, \
+                     \"national_local_share\": {}, \"national_state_share\": {}, \
+                     \"national_spending_per_pupil\": {}, \"states\": [",
+                    n.fiscal_year,
+                    n.ohio_local_rank,
+                    n.ohio_state_rank,
+                    n.ohio_spending_rank,
+                    n.ohio_property_tax_rank,
+                    n.independent_states,
+                    num(n.national_local_share),
+                    num(n.national_state_share),
+                    num(n.national_spending_per_pupil),
+                ));
+                s.push_str(
+                    &n.states
+                        .iter()
+                        .map(|state| {
+                            let mut row = format!(
+                                "{{\"fips\": \"{}\", \"name\": \"{}\", \"systems\": {}",
+                                escape(&state.fips),
+                                escape(&state.name),
+                                state.systems
+                            );
+                            for (key, value) in [
+                                ("enrollment", state.enrollment),
+                                ("total_revenue", state.total_revenue),
+                                ("federal_revenue", state.federal_revenue),
+                                ("state_revenue", state.state_revenue),
+                                ("local_revenue", state.local_revenue),
+                                ("property_tax_revenue", state.property_tax_revenue),
+                                ("parent_government_revenue", state.parent_government_revenue),
+                                ("current_spending", state.current_spending),
+                            ] {
+                                row.push_str(&format!(", \"{key}\": {}", num(value)));
+                            }
+                            row.push('}');
+                            row
+                        })
+                        .collect::<Vec<_>>()
+                        .join(", "),
+                );
+                s.push_str("]},\n");
+            }
         }
 
         s.push_str("  \"districts\": [\n");
@@ -1575,6 +1628,7 @@ mod tests {
             checkpoints,
             projection: None,
             deflator: None,
+            national: None,
             districts,
         }
     }
@@ -1917,4 +1971,121 @@ mod tests {
             assert!(json.contains(field), "{field} missing from the feed");
         }
     }
+}
+
+/// One state's school finance, from the Census Bureau's Annual Survey of School System Finances.
+///
+/// A third source, and a federal one. Everything else in this feed comes from Ohio describing
+/// itself; the corpus has been able to say what Ohio does and never whether it is unusual.
+#[derive(Debug, Clone, PartialEq)]
+pub struct StateFinance {
+    /// Two-digit FIPS.
+    pub fips: String,
+    /// State name, or the District of Columbia.
+    pub name: String,
+    /// School systems with enrolment.
+    pub systems: usize,
+    /// Fall enrolment, a headcount.
+    pub enrollment: f64,
+    /// Total revenue, in thousands of dollars as the survey reports it.
+    pub total_revenue: Dollars,
+    /// Federal revenue, thousands.
+    pub federal_revenue: Dollars,
+    /// State revenue, thousands.
+    pub state_revenue: Dollars,
+    /// Local revenue, thousands. Includes parent-government appropriations.
+    pub local_revenue: Dollars,
+    /// Local revenue from the district's own property tax, thousands. Zero where districts are
+    /// dependent; see [`StateFinance::fiscally_independent`].
+    pub property_tax_revenue: Dollars,
+    /// Appropriations from a parent city or county, thousands.
+    pub parent_government_revenue: Dollars,
+    /// Current spending, thousands.
+    pub current_spending: Dollars,
+}
+
+impl StateFinance {
+    /// Whether this state's school districts levy their own tax rather than being funded by a
+    /// parent government.
+    ///
+    /// The distinction that makes a property tax comparison possible or impossible. Twelve states
+    /// fund schools mostly through a city or county appropriation, so the survey attributes the
+    /// tax to the parent and reports the district's own property tax as zero. Massachusetts and
+    /// Virginia raise as much from property tax as anywhere and score nothing.
+    #[must_use]
+    pub fn fiscally_independent(&self) -> bool {
+        self.parent_government_revenue < self.local_revenue * 0.10
+    }
+
+    /// Local revenue as a share of total. Comparable across both district structures.
+    #[must_use]
+    pub fn local_share(&self) -> f64 {
+        if self.total_revenue > 0.0 {
+            self.local_revenue / self.total_revenue
+        } else {
+            0.0
+        }
+    }
+
+    /// State revenue as a share of total.
+    #[must_use]
+    pub fn state_share(&self) -> f64 {
+        if self.total_revenue > 0.0 {
+            self.state_revenue / self.total_revenue
+        } else {
+            0.0
+        }
+    }
+
+    /// Current spending per pupil, in dollars. The survey reports thousands.
+    #[must_use]
+    pub fn spending_per_pupil(&self) -> f64 {
+        if self.enrollment > 0.0 {
+            self.current_spending * 1_000.0 / self.enrollment
+        } else {
+            0.0
+        }
+    }
+}
+
+/// Where Ohio sits among the states, and the figures that put it there.
+///
+/// # What this settles that nothing else in the corpus could
+///
+/// The *DeRolph* holding was that Ohio relied too heavily on local property tax. Every figure the
+/// corpus has held until now describes Ohio alone, so the claim could be restated and never
+/// tested — "too heavily" needs a comparison, and there was nothing to compare against.
+///
+/// There is now. Ohio raises **51.8% of school revenue locally against a national 43.4%, seventh
+/// highest of fifty-one**, and takes **34.4% from the state against a national 43.4%, forty-fifth
+/// of fifty-one**. It spends about the national average per pupil and is exactly average on
+/// federal money. The distinctive thing about Ohio is not how much its schools cost but who pays.
+///
+/// # The year, and why it flatters nothing
+///
+/// FY2022 is the peak of federal pandemic relief, so the federal share is inflated and the local
+/// and state shares are correspondingly deflated. That runs against the finding rather than for
+/// it: in an ordinary year Ohio's local share would be higher, not lower.
+#[derive(Debug, Clone, PartialEq)]
+pub struct National {
+    /// The survey year, as a fiscal year.
+    pub fiscal_year: u16,
+    /// Every state and the District of Columbia, alphabetically.
+    pub states: Vec<StateFinance>,
+    /// Ohio's rank on local share, 1 being the highest, out of all 51.
+    pub ohio_local_rank: usize,
+    /// Ohio's rank on state share, 1 being the highest.
+    pub ohio_state_rank: usize,
+    /// Ohio's rank on current spending per pupil.
+    pub ohio_spending_rank: usize,
+    /// Ohio's rank on property tax share, among fiscally independent states only.
+    pub ohio_property_tax_rank: usize,
+    /// How many states that comparison is over.
+    pub independent_states: usize,
+    /// National local share of school revenue.
+    pub national_local_share: f64,
+    /// National state share.
+    pub national_state_share: f64,
+    /// National current spending per pupil.
+    pub national_spending_per_pupil: f64,
 }

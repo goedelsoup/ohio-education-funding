@@ -31,6 +31,7 @@ export const GET: APIRoute = () => {
     statewide,
     checkpoints: bundle.checkpoints,
     projection: bundle.projection,
+    // The Census comparison is not a formula input, so it stays out of the browser's copy.
     deflator: bundle.deflator,
     districts: bundle.districts.map(
       ({

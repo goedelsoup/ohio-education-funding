@@ -17,6 +17,8 @@ export type {
   BaseCostBuildUp,
   Bundle,
   MillageAnalysis,
+  National,
+  StateFinance,
   RegimeCounterfactual,
   PropertyTaxYear,
   SpendingByFunction,
@@ -41,7 +43,7 @@ import type { Bundle, District, Statewide } from "./schema/feed.ts";
  * the build and the scenario routes refuse to proceed past when the two disagree — the deliberate
  * half of drift detection, where the strictness of the schemas is the accidental half.
  */
-export const REQUIRED_CONTRACT = "11.0.0";
+export const REQUIRED_CONTRACT = "12.0.0";
 
 /**
  * A district with only the fields the funding formula reads.
@@ -87,7 +89,7 @@ export type PanelDistrict = Omit<
 >;
 
 /** The feed with the two heavy per-district blocks removed. Served as `/data/panel.json`. */
-export interface Panel extends Omit<Bundle, "districts" | "statewide"> {
+export interface Panel extends Omit<Bundle, "districts" | "statewide" | "national"> {
   districts: PanelDistrict[];
   statewide: Omit<Statewide, "finances" | "outcomes">;
 }
