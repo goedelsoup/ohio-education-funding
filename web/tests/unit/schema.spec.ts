@@ -341,9 +341,44 @@ test("the statewide tax facts the pages print are derived, and reproduce the Rus
 
   // The floor mechanism, as a count. Reductions concentrate above the floor because that is the
   // only place reduction factors can still operate.
+  //
+  // Stated as a pair of rates rather than a ratio of counts. The two groups are not the same size
+  // and their sizes move whenever the classification is refined, so a bare "one count exceeds the
+  // other times fifty" quietly encodes the group sizes it was written against — which is how this
+  // assertion came to fail on a change that made the underlying contrast stronger, not weaker.
   expect(tax.districts.atFloor + tax.districts.aboveFloor).toBe(609);
-  expect(tax.rateFell.aboveFloor).toBeGreaterThan(tax.rateFell.atFloor * 50);
+  const fellAbove = tax.rateFell.aboveFloor / tax.districts.aboveFloor;
+  const fellAt = tax.rateFell.atFloor / tax.districts.atFloor;
+  expect(fellAbove).toBeGreaterThan(0.6);
+  expect(fellAt).toBeLessThan(0.06);
+  expect(fellAbove).toBeGreaterThan(fellAt * 10);
   expect(tax.reductionsAboveFloor).toBeGreaterThan(0.95);
+});
+
+test("the floor split is taken at the start of the interval, not the end", () => {
+  /*
+   * The category must not be decided by the outcome it is used to measure.
+   *
+   * `District.at_millage_floor` reports where a district stands in the latest tax year, which is
+   * what its own page should say. Using it to split "whose rate fell between the two years" lets
+   * a district that fell *to* the floor be counted as an at-floor district with a falling rate —
+   * and 29 districts did exactly that. The contamination is large enough to matter: it moves the
+   * at-floor fall rate from 3.6% to 20.5% and drops the headline from 97.7% to 88.3%.
+   */
+  const { bundle, tax } = loadFeed();
+
+  const contaminated = { atFloor: 0, aboveFloor: 0 };
+  for (const d of bundle.districts) {
+    const [before, after] = [d.property_tax[0], d.property_tax[d.property_tax.length - 1]];
+    if (!before || !after || d.property_tax.length < 2) continue;
+    if (after.class1_rate - before.class1_rate >= -0.0005) continue;
+    if (d.at_millage_floor) contaminated.atFloor++;
+    else contaminated.aboveFloor++;
+  }
+
+  expect(contaminated.atFloor).toBeGreaterThan(tax.rateFell.atFloor * 4);
+  expect(tax.rateFell.atFloor).toBeLessThan(10);
+  expect(tax.districts.atFloor).toBeGreaterThan(bundle.statewide.at_millage_floor);
 });
 
 test("neither new block reaches the scenario panel", () => {
@@ -351,15 +386,68 @@ test("neither new block reaches the scenario panel", () => {
   const district = bundle.districts[0]!;
   expect(district).toHaveProperty("property_tax");
   expect(district).toHaveProperty("spending_by_function");
+  expect(district).toHaveProperty("millage");
   const {
     finances: _f,
     outcome: _o,
     base_cost_build_up: _b,
     property_tax: _p,
     spending_by_function: _s,
+    millage: _m,
     ...panelDistrict
   } = district;
-  for (const dropped of ["property_tax", "spending_by_function"]) {
+  for (const dropped of ["property_tax", "spending_by_function", "millage"]) {
     expect(Object.keys(panelDistrict)).not.toContain(dropped);
+  }
+});
+
+test("the millage block is the crate's output, not a copy of a published column", () => {
+  /*
+   * Three properties that hold only if the numbers were computed. A block quietly reverted to
+   * echoing Table SD-1 would still typecheck and still render; each of these would break.
+   */
+  const { bundle } = loadFeed();
+  const blocks = bundle.districts.filter((d) => d.millage != null);
+  expect(blocks.length).toBe(609);
+
+  for (const d of blocks) {
+    const m = d.millage!;
+    const [before, after] = [d.property_tax[0]!, d.property_tax[d.property_tax.length - 1]!];
+
+    // It reads the tax years it claims to.
+    expect(m.tax_year).toBe(after.tax_year);
+    expect(m.prior_rate).toBeCloseTo(before.class1_rate, 6);
+    expect(m.observed_rate).toBeCloseTo(after.class1_rate, 6);
+
+    // The residual is a derived quantity, so it has to close.
+    expect(m.observed_rate - m.predicted_rate).toBeCloseTo(m.residual, 6);
+
+    // The prediction obeys the statute: never above the prior rate, never below the floor unless
+    // the prior rate already was.
+    expect(m.predicted_rate).toBeLessThanOrEqual(m.prior_rate + 1e-9);
+    if (m.prior_rate > 20) expect(m.predicted_rate).toBeGreaterThanOrEqual(20 - 1e-9);
+  }
+});
+
+test("what one mill raises shares a denominator with the value per pupil beside it", () => {
+  /*
+   * Both figures appear in the same card. Dividing them by different pupil counts is the error
+   * this project keeps finding in other people's tables, and the card would give no sign of it.
+   */
+  const { bundle } = loadFeed();
+  for (const d of bundle.districts) {
+    const m = d.millage;
+    const y = d.property_tax[d.property_tax.length - 1];
+    if (!m || !y || y.value_per_pupil <= 0) continue;
+
+    // yield-per-mill × 1000 is the real property base per pupil, which must be the published
+    // total per pupil less the public utility share of it.
+    const realPerPupil = m.yield_per_mill_per_pupil * 1000;
+    const expected =
+      y.value_per_pupil * ((y.class1_value + y.class2_value) / y.total_value);
+    // Relative, not absolute: both operands are serialized to four decimals, so on a base of a
+    // few hundred thousand per pupil the last place is worth a few cents. A different pupil count
+    // would be wrong by percent, not by parts per million.
+    expect(Math.abs(realPerPupil - expected) / expected).toBeLessThan(1e-5);
   }
 });

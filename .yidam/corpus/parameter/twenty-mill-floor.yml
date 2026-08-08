@@ -18,6 +18,26 @@ description: |
   [inference] Any credible simulation of a property tax change has to determine floor status
   per district first, because the same change produces opposite effects on the two groups.
 
+  **How much the reduction factors have actually taken: the median district has lost 42.4% of
+  the millage its voters approved.** The median voted current operating rate is 42.32 mills
+  against a median effective Class 1 rate of 23.40, and the largest reduction in the state is
+  74.7%. [verified — FY2024 District Profile Report, `current_operating_millage_ty23` against
+  `effective_class1_millage_ty23`] This is the magnitude of the mechanism the floor bounds, and
+  it went unstated here for as long as it did because the voted-millage column was present in
+  the fixture and never parsed. Note the figure is the median of the per-district ratio, not one
+  minus the ratio of the two medians, which is a different and meaningless quantity.
+
+  **A defect in the corpus's own calculator, found by running it against the tables.**
+  `crates/millage` implemented the floor as a clamp: any district whose reduced rate fell below
+  20 mills was raised to 20 only if its voted rate was at least 20, and otherwise took the
+  reduced rate unchanged. That reduced the six sub-twenty-mill districts as if the floor did not
+  concern them — a district voting 19 mills came out at 9.5 on a doubling of valuation. R.C.
+  319.301(D) states the floor as a guarantee of what twenty mills would raise, so a district
+  already below twenty is under the guarantee before any reduction and none applies. The
+  published data settles it: all six report voted and effective rates equal to four decimals.
+  [verified] Fixed, with `crates/millage/tests/against_published_tables.rs` holding the crate to
+  1,218 published district-years.
+
   **How many districts sit at the floor: 170 of 606, or 28.1%, in TY2023.** [verified —
   computed from the FY2024 District Profile Report; see
   [`crates/dispersion`](../../../crates/dispersion/tests/cupp_fy24.rs)] A further 63 sit within
@@ -40,11 +60,47 @@ description: |
 
   The other fourteen voted between 23 and 48 mills and still report effective Class 1 rates
   between 19.72 and 19.994 — just below the floor. [verified] Nothing in the corpus's current
-  account of R.C. 319.301 explains this. Candidate explanations not yet tested: the floor may
-  be applied to a combined or differently-scoped millage base than the Class 1 figure reported
-  here, or certain levy types (emergency and other fixed-sum levies) may be excluded from the
-  floor computation while being counted in current operating millage. [open] The fourteen are
-  pinned by a regression test so a future refinement has something concrete to explain.
+  account of R.C. 319.301 explains this. Two candidate explanations were offered when this was
+  first recorded; Table SD-1 now lets one of them be tested, and it fails.
+
+  **The combined-base hypothesis is disconfirmed.** If the floor were applied to a combined
+  Class 1 and Class 2 base rather than to Class 1 alone, the value-weighted real property rate
+  for these districts would pin at 20 mills. It does not: across the fourteen it runs from
+  19.719 to 21.562, and only two land within a hundredth of 20. Statewide the same measure puts
+  76 of 609 districts at 20.00 against 155 on the Class 1 rate, so the Class 1 figure is the one
+  the floor governs. [verified — TY2024 Table SD-1] The remaining candidate — that emergency and
+  other fixed-sum levies are counted in voted operating millage but excluded from the floor
+  computation — is untested. [open]
+
+  Twelve of the fourteen sit within 0.12 mills of the floor and eleven within 0.05, which is
+  more consistent with rounding inside the reduction-factor computation than with a different
+  base. [inference] Bradford Exempted Village, at 19.7247, is the one that a rounding account
+  would not cover.
+
+  **The count is 21, not 20, on the later table.** Table SD-1's TY2024 figures add Kelleys
+  Island Local, which the District Profile Report omits entirely: 10.15 effective Class 1 mills
+  against $21.2m of taxable value per pupil, the highest in the state by a factor of seven. It
+  is the clearest instance of the six-district pattern — one mill raises $21,025 per pupil
+  there, so twenty would be an absurdity — and it is invisible to the profile report the corpus
+  had been counting from. [verified]
+
+  **What two tax years establish that one could not.** Of the 416 districts that began TY2023
+  above the floor, 301 saw their effective Class 1 rate fall by TY2024; of the 193 that began at
+  it, 7 did. 97.7% of every effective-rate reduction in Ohio happens above the floor. [verified
+  — computed in `crates/bundle` from TY2023 and TY2024 Table SD-1]
+
+  The split must be taken at the *start* of the interval. Classifying by the end year lets a
+  district that fell *to* the floor be counted as a floor district with a falling rate, which
+  puts the outcome being measured inside the category doing the measuring; it moves the at-floor
+  fall rate from 3.6% to 20.5% and the headline from 97.7% to 88.3%. [verified]
+
+  **And a caution against the regime language above.** 54 districts sit above the floor by less
+  than a twentieth of a mill, and 82 crossed 20.0000 in one direction or the other between the
+  two tax years — 61 of those by under five hundredths of a mill. For roughly an eighth of the
+  state the binary is settled in the fourth decimal place and is likely to read the other way
+  next year. [verified] The regime switch is real and the boundary is sharp in the statute; the
+  *assignment* of districts to sides is not stable, and a simulation that treats floor status as
+  a fixed district attribute will be wrong about that eighth. [inference]
 properties:
   name: Twenty-mill floor
   unit: mills

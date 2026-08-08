@@ -81,9 +81,18 @@ export interface Feed {
  * more than they spend" and the answer is three.
  */
 export interface TaxStatewide {
-  /** Districts whose effective Class I rate fell between the two tax years, by floor status. */
+  /**
+   * Districts whose effective Class I rate fell between the two tax years, by floor status.
+   *
+   * Split by where the district stood at the **start** of the interval, which is not the same as
+   * `District.at_millage_floor` — that reports where it stands now. The distinction is not
+   * pedantic. Classifying by the end year lets a district that *fell to* the floor be counted as
+   * an at-floor district whose rate fell, which is the outcome being measured leaking into the
+   * category doing the measuring. It cost this statistic a third of its contrast: 20.5% of
+   * at-floor districts appeared to have falling rates, against 3.6% under the honest split.
+   */
   rateFell: { atFloor: number; aboveFloor: number };
-  /** How many districts are on each side of the floor, among those with two tax years. */
+  /** How many districts began TY2023 on each side of the floor. */
   districts: { atFloor: number; aboveFloor: number };
   /** Share of all effective-rate reductions that happen above the floor. */
   reductionsAboveFloor: number;
@@ -91,6 +100,16 @@ export interface TaxStatewide {
   medianChargeShare: number;
   /** Districts charged more in real property tax than they spend on operations. */
   chargedMoreThanSpent: { name: string; share: number }[];
+  /** Above the floor by less than a twentieth of a mill — where the binary stops informing. */
+  nearFloor: number;
+  /**
+   * Districts whose rate crossed 20.0000 between the two tax years, either way.
+   *
+   * The counterweight to presenting floor status as structural. It is the single most consequential
+   * fact about a district's local revenue and, for an eighth of the state, it is also a fact that
+   * changed last year and may change back.
+   */
+  crossedTheFloor: number;
 }
 
 let cached: Feed | null = null;
@@ -223,14 +242,29 @@ function taxStatewide(districts: District[]): TaxStatewide {
   const rateFell = { atFloor: 0, aboveFloor: 0 };
   const counted = { atFloor: 0, aboveFloor: 0 };
   const shares: { name: string; share: number }[] = [];
+  let nearFloor = 0;
+  let crossedTheFloor = 0;
+
+  // The floor the Rust side classifies against, restated once rather than at each comparison.
+  const FLOOR = 20;
 
   for (const d of districts) {
+    if (d.near_millage_floor) nearFloor++;
+
     const [before, after] = [d.property_tax[0], d.property_tax[d.property_tax.length - 1]];
     if (before && after && d.property_tax.length >= 2) {
+      // Strictly above on one side and at-or-below on the other. Both ends use the same
+      // comparison, so a district resting exactly on 20.0000 in both years is not a crossing.
+      if (before.class1_rate > FLOOR !== after.class1_rate > FLOOR) crossedTheFloor++;
+
       // A hundredth of a mill, which is the precision Table SD-1 publishes to. Anything smaller
       // is the same rate written twice.
       const fell = after.class1_rate - before.class1_rate < -0.0005;
-      if (d.at_millage_floor) {
+
+      // Where the district stood when the interval opened — see `rateFell`. The tolerance is the
+      // Rust side's `FLOOR_TOLERANCE`, applied to the same statutory floor.
+      const beganAtFloor = before.class1_rate <= FLOOR + 0.005;
+      if (beganAtFloor) {
         counted.atFloor++;
         if (fell) rateFell.atFloor++;
       } else {
@@ -259,6 +293,8 @@ function taxStatewide(districts: District[]): TaxStatewide {
     chargedMoreThanSpent: shares
       .filter((s) => s.share > 1)
       .sort((a, b) => b.share - a.share),
+    nearFloor,
+    crossedTheFloor,
   };
 }
 

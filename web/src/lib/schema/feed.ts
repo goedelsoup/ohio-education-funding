@@ -198,6 +198,39 @@ export const PropertyTaxYearSchema = z
   .strict();
 
 /**
+ * H.B. 920 run against one district by the `millage` crate, rather than described.
+ *
+ * Every other property-tax figure in the feed is a published column copied across. These are
+ * computed, which is why they can say three things no published column states: how much of the
+ * voted rate the reduction factors have taken, what those factors alone predict for the current
+ * tax year, and how far the charged rate departs from that prediction.
+ *
+ * The residual is the field worth reading. Reduction factors reach neither new construction nor
+ * newly voted millage — the statute exempts both — so the gap between predicted and observed is
+ * not error. It is the millage the factors do not touch, and its sign says which kind.
+ */
+export const MillageAnalysisSchema = z
+  .object({
+    /** The tax year `observed_rate` and `predicted_rate` describe. */
+    tax_year: z.number().int(),
+    /** Effective Class I rate the prior year — the base the prediction runs from. */
+    prior_rate: num,
+    /** Effective Class I rate this year, as Table SD-1 publishes it. */
+    observed_rate: num,
+    /** What reduction factors alone predict, held at the statutory floor. */
+    predicted_rate: num,
+    /** `observed_rate - predicted_rate`, in mills. What the factors cannot account for. */
+    residual: num,
+    /** Whether the floor is what stopped the reduction. */
+    at_floor: z.boolean(),
+    /** Fraction of the voted rate H.B. 920 has taken. `null` without a profile row. */
+    cumulative_reduction: maybeNum,
+    /** What one mill raises per pupil — over SD-1's own ADM, matching `value_per_pupil`. */
+    yield_per_mill_per_pupil: num,
+  })
+  .strict();
+
+/**
  * Where a district's operating money went in FY2025, per pupil, by function.
  *
  * The report card's spending file — a different source and basis from the audited actuals in
@@ -252,10 +285,17 @@ export const DistrictSchema = z
     realized_aid_per_pupil: num,
     guarantee: num,
     on_guarantee: z.boolean(),
+    /** At or below the statutory floor, so reduction factors have stopped operating. */
     at_millage_floor: z.boolean(),
+    /** Above it by less than a twentieth of a mill, where the binary stops meaning anything. */
+    near_millage_floor: z.boolean(),
     at_minimum_state_share: z.boolean(),
     valuation_per_pupil: maybeNum,
     effective_class1_millage: maybeNum,
+    /** The rate voters approved, which is not the rate anyone pays. */
+    voted_operating_millage: maybeNum,
+    /** The calculator run against this district. `null` without two tax years. */
+    millage: MillageAnalysisSchema.nullable(),
     operating_expenditure_per_pupil: maybeNum,
     economically_disadvantaged: maybeNum,
     /** FY2024 to FY2026. FY2026 is partly departmental estimate. */
@@ -287,6 +327,17 @@ export const StatewideSchema = z
     districts: z.number().int().positive(),
     on_guarantee: z.number().int().nonnegative(),
     at_millage_floor: z.number().int().nonnegative(),
+    near_millage_floor: z.number().int().nonnegative(),
+    /** The rate voters approved, statewide median. */
+    median_voted_millage: num,
+    /** The rate anyone pays, statewide median. The gap between the two is H.B. 920. */
+    median_effective_millage: num,
+    /** Median of the per-district ratio — deliberately not one minus the ratio of the medians. */
+    median_millage_reduction: num,
+    /** What one mill raises per pupil: the median and the two ends of the range. */
+    median_yield_per_mill: num,
+    min_yield_per_mill: num,
+    max_yield_per_mill: num,
     at_minimum_state_share: z.number().int().nonnegative(),
     median_valuation_per_pupil: num,
     median_operating_expenditure_per_pupil: num,
@@ -416,6 +467,7 @@ export type OutcomeStatewide = z.infer<typeof OutcomeStatewideSchema>;
 export type FinanceYear = z.infer<typeof FinanceYearSchema>;
 export type BaseCostBuildUp = z.infer<typeof BaseCostBuildUpSchema>;
 export type PropertyTaxYear = z.infer<typeof PropertyTaxYearSchema>;
+export type MillageAnalysis = z.infer<typeof MillageAnalysisSchema>;
 export type SpendingByFunction = z.infer<typeof SpendingByFunctionSchema>;
 export type District = z.infer<typeof DistrictSchema>;
 export type Statewide = z.infer<typeof StatewideSchema>;

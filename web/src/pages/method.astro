@@ -117,6 +117,20 @@ const meta = bundle.projection;
             </td>
           </tr>
           <tr>
+            <th>The H.B. 920 figures</th>
+            <td>
+              <strong>Computed</strong> — the one block on the property tax page that is. The
+              predicted rate, the residual against it, and what one mill raises come from{" "}
+              <code>crates/millage</code> applied to the two tax years, not from any published
+              column. Running it against the tables found a defect in each direction: the crate
+              reduced rates below the twenty-mill floor for the six districts that never voted
+              twenty mills, and this site reported those districts as being <em>above</em> the
+              floor with reduction factors operative. Both are fixed, and{" "}
+              <code>crates/millage/tests/against_published_tables.rs</code> now holds the
+              calculator to 1,218 published district-years.
+            </td>
+          </tr>
+          <tr>
             <th>The projection</th>
             <td>
               A <strong>forecast</strong>, and the only thing on this site that is. Enrollment is

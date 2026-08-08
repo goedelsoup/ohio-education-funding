@@ -16,6 +16,7 @@
 export type {
   BaseCostBuildUp,
   Bundle,
+  MillageAnalysis,
   PropertyTaxYear,
   SpendingByFunction,
   Checkpoint,
@@ -39,7 +40,7 @@ import type { Bundle, District, Statewide } from "./schema/feed.ts";
  * the build and the scenario routes refuse to proceed past when the two disagree — the deliberate
  * half of drift detection, where the strictness of the schemas is the accidental half.
  */
-export const REQUIRED_CONTRACT = "8.0.0";
+export const REQUIRED_CONTRACT = "9.0.0";
 
 /**
  * A district with only the fields the funding formula reads.
@@ -55,9 +56,15 @@ export const REQUIRED_CONTRACT = "8.0.0";
  * numbers per district, half a megabyte across the panel, and the formula reads none of them. It
  * explains a figure the scenario routes only ever consume as a total.
  *
- * `property_tax` and `spending_by_function` go the same way. Neither is an input to the funding
- * formula — one is the local tax base the state charges against, the other is what a district did
- * with the money afterwards — so the compiler keeps both out of the browser's copy.
+ * `property_tax`, `spending_by_function` and `millage` go the same way. None is an input to the
+ * funding formula — one is the local tax base the state charges against, one is what a district
+ * did with the money afterwards, and the third is a reading of H.B. 920 that the scenario builder
+ * deliberately does not model — so the compiler keeps all three out of the browser's copy.
+ *
+ * The scenario holds valuation fixed, and `millage` is the reason it must: reduction factors make
+ * a district's response to a reappraisal depend on which side of the floor it is on, and the feed
+ * has two observations per district. Shipping the block would invite a slider that cannot honestly
+ * exist yet.
  *
  * Making that a *type* rather than a comment is the point. Every function in the formula takes a
  * `PanelDistrict`, so "does the browser need this field?" is answered by the compiler: reach for
@@ -69,7 +76,12 @@ export const REQUIRED_CONTRACT = "8.0.0";
  */
 export type PanelDistrict = Omit<
   District,
-  "finances" | "outcome" | "base_cost_build_up" | "property_tax" | "spending_by_function"
+  | "finances"
+  | "outcome"
+  | "base_cost_build_up"
+  | "property_tax"
+  | "spending_by_function"
+  | "millage"
 >;
 
 /** The feed with the two heavy per-district blocks removed. Served as `/data/panel.json`. */

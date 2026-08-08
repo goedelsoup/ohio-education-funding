@@ -25,6 +25,10 @@ const CLEVELAND = "043786";
 const NORTHERN = "049056";
 /** Manchester Local — funded by the formula, so its band opens rather than collapsing. */
 const ON_FORMULA = "000442";
+/** Fremont City — 20.0000 mills in both tax years, so the floor holds still under it. */
+const AT_FLOOR = "044016";
+/** Vinton County Local — 18.70 mills voted and charged. The floor never reached it. */
+const BELOW_FLOOR = "050393";
 
 /** Move a lever and wait for the scenario to re-render behind it. */
 async function setGuarantee(page: Page, value: string): Promise<void> {
@@ -761,15 +765,74 @@ test.describe("the base cost build-up", () => {
 
 test.describe("the property tax route", () => {
   test("a district at the floor is told the reduction factors have stopped", async ({ page }) => {
-    // Northern Local sits at twenty mills, so H.B. 920 has nothing left to roll back and a
-    // reappraisal reaches its revenue directly. That is the whole point of carrying two tax years.
-    await page.goto(`/district/${NORTHERN}/taxes`);
-    await expect(page.locator("h1")).toHaveText("Northern Local");
+    // Fremont City charges 20.0000 mills in both tax years, so H.B. 920 has nothing left to roll
+    // back and a reappraisal reaches its revenue directly. That is the point of carrying two.
+    await page.goto(`/district/${AT_FLOOR}/taxes`);
+    await expect(page.locator("h1")).toHaveText("Fremont City");
     await expect(page.locator(`.subnav a[aria-current="page"]`)).toHaveText("Property tax");
     const change = page.locator(".card", { hasText: "TY2023 to TY2024" });
     await expect(change).toContainText("at the");
     await expect(change).toContainText("reduction factors have stopped operating");
     await expect(change).toContainText("A reappraisal is a revenue event here");
+  });
+
+  test("a district a hundredth of a mill above the floor is not told the factors are operative", async ({
+    page,
+  }) => {
+    /*
+     * Northern Local is 20.0154 mills — one of the 82 districts that crossed 20.0000 between the
+     * two tax years. Both of the copy's original branches were wrong for it: "reduction factors
+     * have stopped" overstates, and "fully operative" is absurd for a rate a hundredth of a mill
+     * clear of the floor. The third branch exists because this district does.
+     */
+    await page.goto(`/district/${NORTHERN}/taxes`);
+    const change = page.locator(".card", { hasText: "TY2023 to TY2024" });
+    await expect(change).toContainText("above the");
+    await expect(change).toContainText("close enough that the distinction carries little meaning");
+    await expect(change).not.toContainText("fully operative");
+    await expect(change).not.toContainText("have stopped operating");
+  });
+
+  test("a district under twenty mills is not told it is above the floor", async ({ page }) => {
+    /*
+     * The bug contract 9.0.0 exists for. Vinton County charges 18.70 mills, and comparing that to
+     * a literal 20.0 for equality put it on the wrong side of the floor entirely — reported as
+     * having reduction factors operative when it has never been subject to one.
+     */
+    await page.goto(`/district/${BELOW_FLOOR}/taxes`);
+    const change = page.locator(".card", { hasText: "TY2023 to TY2024" });
+    await expect(change).toContainText("charges less than twenty mills");
+    await expect(change).toContainText("never have");
+    await expect(change).not.toContainText("reduction factors are fully operative");
+
+    // And the millage card says the same thing from the other direction: nothing was taken.
+    const millage = page.locator(".card", { hasText: "What voters approved" });
+    await expect(millage).toContainText("18.70");
+    await expect(millage).toContainText("Reduction factors have taken nothing");
+  });
+
+  test("the millage card shows the calculator's prediction and names the residual", async ({
+    page,
+  }) => {
+    /*
+     * The distinguishing feature of this card is that its numbers are computed rather than
+     * copied. Columbus voted 79.68 mills and charges 25.97 — a figure no published column states,
+     * because it takes both departments' tables to produce it.
+     */
+    await page.goto(`/district/${CLEVELAND}/taxes`);
+    const millage = page.locator(".card", { hasText: "What voters approved" });
+    await expect(millage).toContainText("Voted current operating millage");
+    await expect(millage).toContainText("Taken by reduction factors");
+    await expect(millage).toContainText("What the factors alone predict");
+    await expect(millage).toContainText("Residual");
+    await expect(millage).toContainText("What one mill raises here");
+
+    // The three-row prediction has to close: observed minus predicted is the residual shown.
+    const rows = millage.locator("tbody tr");
+    const cell = async (i: number) =>
+      Number((await rows.nth(i).locator("td").first().innerText()).replace(/[^0-9.-]/g, ""));
+    const [predicted, observed, residual] = [await cell(1), await cell(2), await cell(3)];
+    expect(Math.abs(observed - predicted - residual)).toBeLessThan(0.001);
   });
 
   test("a district above the floor is told they are operative", async ({ page }) => {

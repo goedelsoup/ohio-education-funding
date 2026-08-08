@@ -13,7 +13,12 @@ import Base from "../../../layouts/Base.astro";
 import { districtPaths, loadFeed } from "../../../lib/feed.ts";
 import { money, pct } from "../../../lib/format.ts";
 import * as routes from "../../../lib/routes.ts";
-import { renderTaxAgainstSpending, renderTaxBase, renderTaxChange } from "../../../lib/tax.ts";
+import {
+  renderMillage,
+  renderTaxAgainstSpending,
+  renderTaxBase,
+  renderTaxChange,
+} from "../../../lib/tax.ts";
 
 export const getStaticPaths = districtPaths;
 
@@ -59,9 +64,13 @@ const description = latest
             <div class="k">Effective Class I millage</div>
             <div class="v">{latest.class1_rate.toFixed(2)}</div>
             <div class="n">
-              {district.at_millage_floor
-                ? "at the 20-mill floor — reduction factors have stopped"
-                : "above the floor — reduction factors are operative"}
+              {
+                district.at_millage_floor
+                  ? "at the 20-mill floor — reduction factors have stopped"
+                  : district.near_millage_floor
+                    ? "above the floor by a fraction of a mill"
+                    : "above the floor — reduction factors are operative"
+              }
             </div>
           </div>
           <div class="tile">
@@ -72,6 +81,7 @@ const description = latest
         </div>
 
         <Fragment set:html={renderTaxChange(district, tax)} />
+        <Fragment set:html={renderMillage(district, bundle.statewide)} />
         <Fragment set:html={renderTaxBase(district)} />
         <Fragment set:html={renderTaxAgainstSpending(district, tax)} />
 

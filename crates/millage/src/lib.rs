@@ -137,8 +137,17 @@ pub fn effective_millage(
             status: FloorStatus::NotApplicable,
         }),
         Some(floor) => {
-            let binds = unfloored < floor && voted >= floor;
-            let effective = if binds { floor } else { unfloored };
+            // R.C. 319.301(D) states the floor as a guarantee rather than a clamp: the reduction
+            // may not carry the charge below what twenty mills would raise. A district whose
+            // voted rate is already at or under twenty is below that guarantee before any
+            // reduction, so none applies — and Ohio has six such districts, each of which
+            // publishes a voted and an effective rate that are the same number to four decimals.
+            // Reducing them would invent a decline the Department of Taxation does not report.
+            let effective = if voted <= floor {
+                voted
+            } else {
+                unfloored.max(floor)
+            };
             let status = if effective <= floor {
                 FloorStatus::AtFloor
             } else {
@@ -220,6 +229,47 @@ mod tests {
         for y in &yields {
             assert!((y - yields[0]).abs() < 1e-6, "yields drifted: {yields:?}");
         }
+    }
+
+    /// The floor is a guarantee, not a clamp, and the difference shows only below it.
+    ///
+    /// This computed `binds = unfloored < floor && voted >= floor` and then took `unfloored`
+    /// whenever the floor did not bind — so a district voting nineteen mills had its rate reduced
+    /// like any other, to 9.5 mills on a doubling. R.C. 319.301(D) does not work that way: the
+    /// reduction may not carry the charge below what twenty mills would raise, and a district
+    /// charging under twenty is already there, so nothing is reduced.
+    ///
+    /// Ohio has six such districts and every one publishes an effective rate equal to its voted
+    /// rate. `tests/against_published_tables.rs` holds the crate to them.
+    #[test]
+    fn a_district_that_never_voted_twenty_mills_is_never_reduced() {
+        for voted in [18.7, 19.0, 19.6, 19.71] {
+            for growth in [1.0, 1.5, 3.0] {
+                let m =
+                    effective_millage(voted, 1_000_000.0, 1_000_000.0 * growth, AgencyType::City)
+                        .unwrap();
+                assert!(
+                    (m.effective - voted).abs() < 1e-9,
+                    "{voted} mills at {growth}x valuation became {}",
+                    m.effective
+                );
+                assert!(m.reduction_factor.abs() < 1e-9);
+                assert_eq!(m.status, FloorStatus::AtFloor);
+            }
+        }
+    }
+
+    /// The boundary between the two branches: exactly at the floor, nothing is reduced either.
+    #[test]
+    fn exactly_twenty_voted_mills_is_the_boundary_and_is_not_reduced() {
+        let m = effective_millage(20.0, 1_000_000.0, 2_000_000.0, AgencyType::City).unwrap();
+        assert!((m.effective - 20.0).abs() < 1e-9);
+        assert_eq!(m.status, FloorStatus::AtFloor);
+
+        // A hair above, and the reduction is capped by the floor rather than skipped.
+        let above = effective_millage(20.01, 1_000_000.0, 2_000_000.0, AgencyType::City).unwrap();
+        assert!((above.effective - 20.0).abs() < 1e-9);
+        assert!(above.reduction_factor > 0.0);
     }
 
     #[test]

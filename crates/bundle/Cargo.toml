@@ -11,6 +11,7 @@ deflate = { path = "../deflate" }
 edfund-core = { path = "../edfund-core" }
 dispersion = { path = "../dispersion" }
 foundation = { path = "../foundation" }
+millage = { path = "../millage" }
 project = { path = "../project" }
 
 [lints]

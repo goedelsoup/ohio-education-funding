@@ -13,11 +13,11 @@ use std::collections::HashMap;
 
 use bundle::{
     BaseCostBuildUp, Bundle, Checkpoint, Deflator, District, DistrictOutcome, FinanceYear,
-    ForecastCheckpoint, OutcomeStatewide, PolicyShape, Projection, PropertyTaxYear,
-    SpendingByFunction, Statewide, CONTRACT_VERSION,
+    ForecastCheckpoint, MillageAnalysis, OutcomeStatewide, PolicyShape, Projection,
+    PropertyTaxYear, SpendingByFunction, Statewide, CONTRACT_VERSION,
 };
 use dispersion::{partial_correlation, wealth_neutrality};
-use edfund_core::FiscalYear;
+use edfund_core::{AgencyType, FiscalYear};
 use foundation::{aggregate_base_cost, StatewideFactors};
 use project::finances::{finances, for_district, Finances};
 use project::outcomes::{joined, Joined};
@@ -274,6 +274,8 @@ fn to_district(
             .valuation_per_pupil
             .or_else(|| profile.and_then(|line| parse(line, 4))),
         effective_class1_millage: profile.and_then(|line| parse(line, 6)),
+        voted_operating_millage: profile.and_then(|line| parse(line, 5)),
+        millage: millage_analysis(taxes, profile.and_then(|line| parse(line, 5))),
         operating_expenditure_per_pupil: profile.and_then(|line| parse(line, 7)),
         economically_disadvantaged: profile.and_then(|line| parse(line, 3)),
         enrollment_change: {
@@ -460,6 +462,69 @@ fn property_taxes() -> HashMap<String, Vec<PropertyTaxYear>> {
     out
 }
 
+/// Run H.B. 920 against a district, instead of describing it.
+///
+/// The [`millage`] crate has been in the workspace since the corpus first asserted that the
+/// twenty-mill floor is a regime switch rather than a threshold. Nothing called it. This does.
+///
+/// # Why the prediction runs from last year's effective rate, not from voted millage
+///
+/// [`millage::effective_millage`] takes the rate *before* this round of reduction. Across a
+/// levy's whole life that is the voted rate against the valuation when it passed — but each
+/// district's levies passed in different years against different bases, and Table SD-1 does not
+/// publish carryover valuation. Year over year the recursion is exact and needs neither: the
+/// prior effective rate already embeds every reduction before it, so scaling it by the change in
+/// Class I value gives what the factors alone would produce this year.
+///
+/// The gap between that and the observed rate is the point of the exercise. Reduction factors
+/// reach neither new construction nor newly voted millage, so the residual is what they did not
+/// touch — and its sign says which.
+fn millage_analysis(
+    years: Option<&Vec<PropertyTaxYear>>,
+    voted: Option<f64>,
+) -> Option<MillageAnalysis> {
+    let years = years?;
+    let (before, after) = (years.first()?, years.last()?);
+    if years.len() < 2 || before.class1_value <= 0.0 || after.class1_value <= 0.0 {
+        return None;
+    }
+
+    let result = millage::effective_millage(
+        before.class1_rate,
+        before.class1_value,
+        after.class1_value,
+        AgencyType::City,
+    )
+    .ok()?;
+
+    Some(MillageAnalysis {
+        tax_year: after.tax_year,
+        prior_rate: before.class1_rate,
+        observed_rate: after.class1_rate,
+        predicted_rate: result.effective,
+        residual: after.class1_rate - result.effective,
+        at_floor: result.status.valuation_growth_reaches_revenue(),
+        // Against the voted rate the profile publishes, which is a TY2023 figure — so this is
+        // the reduction as of that year, not as of `after`. Stated rather than interpolated.
+        cumulative_reduction: voted
+            .filter(|v| *v > 0.0)
+            .map(|v| 1.0 - (before.class1_rate / v)),
+        // One mill against the real property base, per pupil: the local half of the formula
+        // reduced to the number that makes its inequality legible.
+        //
+        // Over Table SD-1's own ADM, recovered from the two figures it publishes, rather than
+        // over the formula's base cost ADM. The card puts this beside `value_per_pupil` from the
+        // same row, and two per-pupil figures side by side have to share a denominator or the
+        // reader is silently comparing a tax-year headcount to a funding-year weighted one.
+        yield_per_mill_per_pupil: if after.value_per_pupil > 0.0 && after.total_value > 0.0 {
+            let adm = after.total_value / after.value_per_pupil;
+            millage::yield_of(1.0, after.class1_value + after.class2_value) / adm
+        } else {
+            0.0
+        },
+    })
+}
+
 /// FY2025 operating spending by function, per pupil, keyed by IRN.
 fn spending_by_function() -> HashMap<String, SpendingByFunction> {
     let head = header(FUNCTIONS);
@@ -536,10 +601,39 @@ fn main() {
     let formula: Vec<f64> = paired.iter().map(|t| t.1).collect();
     let realized: Vec<f64> = paired.iter().map(|t| t.2).collect();
 
+    // Districts with no SD-1 row have no yield to report; a zero would drag the minimum to it.
+    let yields: Vec<f64> = districts
+        .iter()
+        .filter_map(|d| d.millage.map(|m| m.yield_per_mill_per_pupil))
+        .filter(|y| *y > 0.0)
+        .collect();
+
     let statewide = Statewide {
         districts: districts.len(),
         on_guarantee: districts.iter().filter(|d| d.on_guarantee()).count(),
         at_millage_floor: districts.iter().filter(|d| d.at_millage_floor()).count(),
+        near_millage_floor: districts.iter().filter(|d| d.near_millage_floor()).count(),
+        median_voted_millage: median(
+            districts
+                .iter()
+                .filter_map(|d| d.voted_operating_millage)
+                .collect(),
+        ),
+        median_effective_millage: median(
+            districts
+                .iter()
+                .filter_map(|d| d.effective_class1_millage)
+                .collect(),
+        ),
+        median_millage_reduction: median(
+            districts
+                .iter()
+                .filter_map(|d| d.millage.and_then(|m| m.cumulative_reduction))
+                .collect(),
+        ),
+        median_yield_per_mill: median(yields.clone()),
+        min_yield_per_mill: yields.iter().copied().fold(f64::INFINITY, f64::min),
+        max_yield_per_mill: yields.iter().copied().fold(f64::NEG_INFINITY, f64::max),
         at_minimum_state_share: districts
             .iter()
             .filter(|d| d.at_minimum_state_share)

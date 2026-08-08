@@ -37,6 +37,15 @@ use edfund_core::Dollars;
 
 /// The bundle schema version. Bump on any change to field names, units, or semantics.
 ///
+/// `9.0.0` wired the [`millage`] crate in. Breaking because [`District::at_millage_floor`]
+/// changes answer for 21 districts: it compared the effective Class I rate to a literal `20.0`,
+/// so a district charging *less* than twenty mills was reported as being above the floor with
+/// reduction factors operative, which is the opposite of its position. The feed also gains
+/// [`District::voted_operating_millage`] — a column that was in the profile CSV from the start
+/// and never parsed — and the [`MillageAnalysis`] block computed from it.
+///
+/// `7.0.0` and `8.0.0` added the base cost build-up, Table SD-1 and spending by function.
+///
 /// `6.0.0` added the price index and the statewide financial aggregates. Breaking because the
 /// feed now carries figures a consumer can deflate, and a page that shows the FY2020-FY2025
 /// panel in nominal dollars is not merely imprecise — across a span in which CPI-U rose 25.1%,
@@ -64,7 +73,20 @@ use edfund_core::Dollars;
 /// from FY2022-FY2024 to FY2024-FY2026 — the years the department's `ADM Data` sheet declares.
 /// The values did not change; what they are called did, which is exactly the kind of silent
 /// meaning change the version guard exists for.
-pub const CONTRACT_VERSION: &str = "8.0.0";
+pub const CONTRACT_VERSION: &str = "9.0.0";
+
+/// How close to the floor counts as being on it, in mills.
+///
+/// Half a hundredth of a mill: Table SD-1 publishes effective rates to four decimals, and a
+/// floored rate arrives as `20.0000` in 135 districts and within this band in 20 more. The
+/// tolerance is a rounding allowance, not a judgement — 54 further districts sit between
+/// `20.005` and `20.05`, close enough that the distinction carries no meaning for a reader but
+/// far enough that calling them floored would be an invention rather than a rounding.
+/// [`Statewide::near_millage_floor`] counts them instead of hiding them.
+const FLOOR_TOLERANCE: f64 = 0.005;
+
+/// The width of the band [`Statewide::near_millage_floor`] counts, in mills above the floor.
+const NEAR_FLOOR_BAND: f64 = 0.05;
 
 /// The outcome side of a district, where the report card covers it.
 ///
@@ -333,6 +355,46 @@ pub struct SpendingByFunction {
     pub food_service: Dollars,
 }
 
+/// H.B. 920 applied to one district, using the [`millage`] crate rather than restating it.
+///
+/// # Why this is computed and not quoted
+///
+/// Every other property-tax figure in the feed is a published number copied across. These are
+/// the [`millage`] calculator run against two tax years of Table SD-1, which lets the page say
+/// three things no published column states: how much of the voted rate the reduction factors
+/// have removed, what the factors alone predict for the current year, and how far the observed
+/// rate departs from that prediction.
+///
+/// # The residual is the interesting field
+///
+/// Reduction factors apply to *existing* levies on *existing* property. New construction and
+/// newly voted millage are exempt from them by statute. So the gap between the predicted rate
+/// and the observed one is not error — it is precisely the millage the factors do not reach,
+/// and its sign says which way. Positive means new levies or new construction outran the
+/// reduction; negative means levies expired faster than the factors alone would explain.
+#[derive(Debug, Clone, Copy, PartialEq)]
+pub struct MillageAnalysis {
+    /// The tax year the observed and predicted rates describe.
+    pub tax_year: u16,
+    /// Effective Class I rate the prior tax year, the base the prediction runs from.
+    pub prior_rate: f64,
+    /// Effective Class I rate this tax year, as Table SD-1 publishes it.
+    pub observed_rate: f64,
+    /// What reduction factors alone predict: the prior rate scaled by the change in Class I
+    /// value, held at the statutory floor. [`millage::effective_millage`].
+    pub predicted_rate: f64,
+    /// `observed_rate - predicted_rate`, in mills. What the factors cannot account for.
+    pub residual: f64,
+    /// Whether the floor is what stopped the reduction, per [`millage::FloorStatus`].
+    pub at_floor: bool,
+    /// Fraction of the voted rate H.B. 920 has removed, cumulatively, since each levy passed.
+    /// `None` where the profile CSV carries no voted millage.
+    pub cumulative_reduction: Option<f64>,
+    /// What one mill raises per pupil against this district's real property base.
+    /// [`millage::yield_of`] at one mill, over ADM. The local half of the formula in one number.
+    pub yield_per_mill_per_pupil: Dollars,
+}
+
 /// One district, as the web layer needs it.
 #[derive(Debug, Clone, PartialEq)]
 pub struct District {
@@ -370,6 +432,14 @@ pub struct District {
     pub valuation_per_pupil: Option<Dollars>,
     /// Effective Class 1 operating millage, TY2023.
     pub effective_class1_millage: Option<f64>,
+    /// Voted current operating millage, TY2023 — the gross rate before reduction factors.
+    ///
+    /// The rate the district's voters actually approved, which is not the rate anyone pays. It
+    /// sat in column 6 of the profile CSV from the first import and was never parsed, which is
+    /// why the site could describe H.B. 920 but never say how much of it a district had lost.
+    pub voted_operating_millage: Option<f64>,
+    /// H.B. 920 run against this district, rather than described. `None` without two tax years.
+    pub millage: Option<MillageAnalysis>,
     /// Total operating expenditure per pupil, FY2024.
     pub operating_expenditure_per_pupil: Option<Dollars>,
     /// Share of students economically disadvantaged, FY2024, as a fraction.
@@ -398,11 +468,50 @@ impl District {
         self.guarantee > 0.0
     }
 
-    /// Whether the district sits at the 20-mill floor, where valuation growth reaches revenue.
+    /// Whether reduction factors have stopped operating on this district, so that valuation
+    /// growth reaches its revenue.
+    ///
+    /// # Why this is `<=` and not `== 20.0`
+    ///
+    /// This compared the effective rate to a literal `20.0` within half a hundredth of a mill,
+    /// which got 21 districts backwards. Six of them — Vinton County at 18.70 mills, Chesapeake
+    /// Union and Highland at 19.00, Oak Hill Union and Scioto Valley at 19.60, Northwest at
+    /// 19.71 — never voted twenty mills of current operating levy, so there is no reduction for
+    /// the factors to make and their voted and effective rates are identical to four decimals.
+    /// The other fifteen were reduced to just under twenty. All of them were reported as being
+    /// *above* the floor with reduction factors operative, which is the reverse of their
+    /// position. [`millage::FloorStatus`] answers it correctly: at or below the floor, the
+    /// factors have stopped.
+    ///
+    /// The floor read from [`millage::floor_for`] rather than written here, so that the two
+    /// statutory values — twenty mills, and two for a joint vocational district — stay in the
+    /// crate that cites the statute. This feed carries traditional districts only.
     #[must_use]
     pub fn at_millage_floor(&self) -> bool {
-        self.effective_class1_millage
-            .is_some_and(|m| (m - 20.0).abs() < 0.005)
+        let floor = millage::floor_for(edfund_core::AgencyType::City).unwrap_or(20.0);
+        self.millage
+            .map(|m| m.observed_rate)
+            .or(self.effective_class1_millage)
+            .is_some_and(|m| m <= floor + FLOOR_TOLERANCE)
+    }
+
+    /// Above the floor, but by less than [`NEAR_FLOOR_BAND`] — where the binary stops meaning
+    /// anything.
+    ///
+    /// The site calls floor status the highest-leverage single fact about a district's local
+    /// revenue, and for most districts it is. For these it is a coin toss decided in the fourth
+    /// decimal place, and 75 districts crossed `20.0000` in one direction or the other between
+    /// TY2023 and TY2024. Counting them is the honest alternative to widening the tolerance
+    /// until they fall on the side that looks tidier.
+    #[must_use]
+    pub fn near_millage_floor(&self) -> bool {
+        let floor = millage::floor_for(edfund_core::AgencyType::City).unwrap_or(20.0);
+        !self.at_millage_floor()
+            && self
+                .millage
+                .map(|m| m.observed_rate)
+                .or(self.effective_class1_millage)
+                .is_some_and(|m| m <= floor + NEAR_FLOOR_BAND)
     }
 
     /// The FY2020 baseline the guarantee holds this district at, recoverable only when it is
@@ -422,6 +531,29 @@ pub struct Statewide {
     pub on_guarantee: usize,
     /// Districts at the 20-mill floor.
     pub at_millage_floor: usize,
+    /// Districts above the floor by less than a twentieth of a mill; see
+    /// [`District::near_millage_floor`].
+    pub near_millage_floor: usize,
+    /// Median voted current operating millage — the rate voters approved.
+    pub median_voted_millage: f64,
+    /// Median effective Class I rate — the rate anyone pays. The gap is H.B. 920.
+    pub median_effective_millage: f64,
+    /// Median share of its voted rate a district has lost to reduction factors.
+    ///
+    /// Not `1 - median_effective / median_voted`. That is the ratio of medians, which is a
+    /// different district's arithmetic in the numerator and the denominator and answers no
+    /// question anyone asked. This is the median of the per-district ratio.
+    pub median_millage_reduction: f64,
+    /// What one mill raises per pupil, statewide median.
+    ///
+    /// The local half of the formula reduced to one number. A mill is the same rate everywhere
+    /// and raises hundreds of times as much in one district as in another, which is why
+    /// comparing two districts' millage without it compares effort to capacity.
+    pub median_yield_per_mill: Dollars,
+    /// The lowest yield per mill per pupil in the state.
+    pub min_yield_per_mill: Dollars,
+    /// The highest.
+    pub max_yield_per_mill: Dollars,
     /// Districts whose base cost aid is set by the minimum state share.
     pub at_minimum_state_share: usize,
     /// Median assessed valuation per pupil.
@@ -639,6 +771,29 @@ impl Bundle {
             "    \"at_millage_floor\": {},\n",
             w.at_millage_floor
         ));
+        s.push_str(&format!(
+            "    \"near_millage_floor\": {},\n",
+            w.near_millage_floor
+        ));
+        s.push_str(&format!(
+            "    \"median_voted_millage\": {},\n",
+            num(w.median_voted_millage)
+        ));
+        s.push_str(&format!(
+            "    \"median_effective_millage\": {},\n",
+            num(w.median_effective_millage)
+        ));
+        s.push_str(&format!(
+            "    \"median_millage_reduction\": {},\n",
+            num(w.median_millage_reduction)
+        ));
+        for (key, value) in [
+            ("median_yield_per_mill", w.median_yield_per_mill),
+            ("min_yield_per_mill", w.min_yield_per_mill),
+            ("max_yield_per_mill", w.max_yield_per_mill),
+        ] {
+            s.push_str(&format!("    \"{key}\": {},\n", num(value)));
+        }
         s.push_str(&format!(
             "    \"at_minimum_state_share\": {},\n",
             w.at_minimum_state_share
@@ -947,6 +1102,10 @@ impl Bundle {
             s.push_str(&format!("\"on_guarantee\": {}, ", d.on_guarantee()));
             s.push_str(&format!("\"at_millage_floor\": {}, ", d.at_millage_floor()));
             s.push_str(&format!(
+                "\"near_millage_floor\": {}, ",
+                d.near_millage_floor()
+            ));
+            s.push_str(&format!(
                 "\"at_minimum_state_share\": {}, ",
                 d.at_minimum_state_share
             ));
@@ -958,6 +1117,33 @@ impl Bundle {
                 "\"effective_class1_millage\": {}, ",
                 opt(d.effective_class1_millage)
             ));
+            s.push_str(&format!(
+                "\"voted_operating_millage\": {}, ",
+                opt(d.voted_operating_millage)
+            ));
+            s.push_str("\"millage\": ");
+            match &d.millage {
+                None => s.push_str("null, "),
+                Some(m) => {
+                    s.push('{');
+                    s.push_str(&format!("\"tax_year\": {}, ", m.tax_year));
+                    for (key, value) in [
+                        ("prior_rate", m.prior_rate),
+                        ("observed_rate", m.observed_rate),
+                        ("predicted_rate", m.predicted_rate),
+                        ("residual", m.residual),
+                        ("yield_per_mill_per_pupil", m.yield_per_mill_per_pupil),
+                    ] {
+                        s.push_str(&format!("\"{key}\": {}, ", num(value)));
+                    }
+                    s.push_str(&format!("\"at_floor\": {}, ", m.at_floor));
+                    s.push_str(&format!(
+                        "\"cumulative_reduction\": {}",
+                        opt(m.cumulative_reduction)
+                    ));
+                    s.push_str("}, ");
+                }
+            }
             s.push_str(&format!(
                 "\"operating_expenditure_per_pupil\": {}, ",
                 opt(d.operating_expenditure_per_pupil)
@@ -1062,6 +1248,20 @@ mod tests {
             at_minimum_state_share: false,
             valuation_per_pupil: Some(279_983.24),
             effective_class1_millage: Some(20.0),
+            voted_operating_millage: Some(34.9),
+            // Northern Local is one of the 75 districts that crossed 20.0000 between the two tax
+            // years, which makes it the right fixture: it is at the floor on the profile's TY2023
+            // figure and a hundredth of a mill above it on SD-1's TY2024 one.
+            millage: Some(MillageAnalysis {
+                tax_year: 2024,
+                prior_rate: 20.0,
+                observed_rate: 20.0154,
+                predicted_rate: 20.0,
+                residual: 0.0154,
+                at_floor: true,
+                cumulative_reduction: Some(0.4269),
+                yield_per_mill_per_pupil: 227.35,
+            }),
             operating_expenditure_per_pupil: Some(11_986.62),
             economically_disadvantaged: Some(0.3881),
             enrollment_change: Some(-0.03),
@@ -1093,6 +1293,13 @@ mod tests {
             districts: 1,
             on_guarantee: 0,
             at_millage_floor: 1,
+            near_millage_floor: 0,
+            median_voted_millage: 0.0,
+            median_effective_millage: 0.0,
+            median_millage_reduction: 0.0,
+            median_yield_per_mill: 0.0,
+            min_yield_per_mill: 0.0,
+            max_yield_per_mill: 0.0,
             at_minimum_state_share: 0,
             median_valuation_per_pupil: 0.0,
             median_operating_expenditure_per_pupil: 0.0,
@@ -1183,19 +1390,90 @@ mod tests {
         assert!(!sample().on_guarantee());
     }
 
+    /// A district with no SD-1 block falls back to the profile's effective rate.
+    fn without_sd1(effective: Option<f64>) -> District {
+        District {
+            millage: None,
+            property_tax: Vec::new(),
+            effective_class1_millage: effective,
+            ..sample()
+        }
+    }
+
     #[test]
     fn exactly_twenty_mills_counts_as_the_floor() {
-        assert!(sample().at_millage_floor());
-        let above = District {
-            effective_class1_millage: Some(37.09),
+        assert!(without_sd1(Some(20.0)).at_millage_floor());
+        assert!(!without_sd1(Some(37.09)).at_millage_floor());
+        assert!(!without_sd1(None).at_millage_floor());
+    }
+
+    /// The bug this contract version exists for. Six districts never voted twenty mills of
+    /// current operating levy, so reduction factors have nothing to reduce; comparing their rate
+    /// to a literal `20.0` for equality reported them as being above the floor with the factors
+    /// operative, which is the reverse of their position.
+    #[test]
+    fn a_rate_below_twenty_mills_is_at_the_floor_not_above_it() {
+        // Vinton County Local: 18.70 voted, 18.70 effective, reduction factor zero.
+        let vinton = without_sd1(Some(18.7));
+        assert!(
+            vinton.at_millage_floor(),
+            "a district charging 18.70 mills cannot be above a twenty-mill floor"
+        );
+        assert!(
+            !vinton.near_millage_floor(),
+            "it is at the floor, not near it"
+        );
+    }
+
+    /// The floor is the crate's, not a number written here — so a change to the statute is a
+    /// change in one place.
+    #[test]
+    fn the_floor_comes_from_the_millage_crate() {
+        let floor = millage::floor_for(edfund_core::AgencyType::City).expect("a school district");
+        assert!(without_sd1(Some(floor)).at_millage_floor());
+        assert!(!without_sd1(Some(floor + 1.0)).at_millage_floor());
+        assert_eq!(
+            millage::floor_for(edfund_core::AgencyType::JointVocational),
+            Some(2.0),
+            "the JVSD floor differs, which is why this is not a literal"
+        );
+    }
+
+    /// Where the binary stops carrying information. The fixture is Northern Local, which sits at
+    /// the floor on the profile's TY2023 rate and 0.0154 mills above it on SD-1's TY2024 one.
+    #[test]
+    fn a_hundredth_of_a_mill_above_the_floor_is_counted_as_near_it() {
+        let northern = sample();
+        assert!(!northern.at_millage_floor());
+        assert!(northern.near_millage_floor());
+
+        let clearly_above = District {
+            millage: Some(MillageAnalysis {
+                observed_rate: 24.71,
+                ..northern.millage.expect("the fixture has one")
+            }),
             ..sample()
         };
-        assert!(!above.at_millage_floor());
-        let none = District {
-            effective_class1_millage: None,
+        assert!(!clearly_above.at_millage_floor());
+        assert!(!clearly_above.near_millage_floor());
+    }
+
+    /// SD-1 is the later observation and two departments disagree about 75 districts, so the
+    /// classification has to say which one it is using.
+    #[test]
+    fn sd1_outranks_the_profile_where_both_have_a_rate() {
+        let conflicting = District {
+            effective_class1_millage: Some(20.0),
+            millage: Some(MillageAnalysis {
+                observed_rate: 25.31,
+                ..sample().millage.expect("the fixture has one")
+            }),
             ..sample()
         };
-        assert!(!none.at_millage_floor());
+        assert!(
+            !conflicting.at_millage_floor(),
+            "the profile says floor and SD-1 says 25.31 mills; SD-1 is the later observation"
+        );
     }
 
     #[test]

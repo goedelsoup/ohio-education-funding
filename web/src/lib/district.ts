@@ -355,8 +355,12 @@ export function renderAidSource(bundle: Bundle, d: District): string {
   const flags: string[] = [
     d.on_guarantee ? "Funded by the guarantee, not the formula" : "On formula",
   ];
-  if (d.at_millage_floor) flags.push("At the 20-mill floor");
+  if (d.at_millage_floor) flags.push("At or below the 20-mill floor");
+  else if (d.near_millage_floor) flags.push("Within a twentieth of a mill of the floor");
   if (d.at_minimum_state_share) flags.push("At the minimum state share");
+  if (d.millage?.cumulative_reduction != null && d.millage.cumulative_reduction > 0.005) {
+    flags.push(`${pct(d.millage.cumulative_reduction, 0)} of voted millage reduced away`);
+  }
   if (d.enrollment_change != null && d.enrollment_change < 0) {
     flags.push(`Enrollment down ${pct(-d.enrollment_change)} FY2024→FY2026`);
   }

@@ -173,8 +173,11 @@ export function renderStatewideStructure(bundle: Bundle, tax: TaxStatewide): str
     <div class="card">
       <h2>Two floors</h2>
       <div class="scroll"><table><tbody>
-        <tr><th>At the <a href="${routes.parameter("twenty-mill-floor")}">20-mill floor</a></th>
+        <tr><th>At or below the
+            <a href="${routes.parameter("twenty-mill-floor")}">20-mill floor</a></th>
             <td>${s.at_millage_floor} districts (${pct(s.at_millage_floor / s.districts, 0)})</td></tr>
+        <tr><th>Above it by under a twentieth of a mill</th>
+            <td>${s.near_millage_floor} districts (${pct(s.near_millage_floor / s.districts, 0)})</td></tr>
         <tr><th>At the minimum state share of ${pct(s.minimum_state_share, 0)}</th>
             <td>${s.at_minimum_state_share} districts (${pct(s.at_minimum_state_share / s.districts, 0)})</td></tr>
         <tr><th>Median operating expenditure per pupil</th>
@@ -190,16 +193,29 @@ export function renderStatewideStructure(bundle: Bundle, tax: TaxStatewide): str
         Funding Plan</a> was enacted with — each biennial budget sets it.</p>
       <p class="note"><strong>The millage floor is visible in the tax record, not only in the
         statute.</strong> Across TY2023 and TY2024,
-        ${count(tax.rateFell.aboveFloor)} of the ${count(tax.districts.aboveFloor)} districts above
-        the floor saw their effective Class I rate fall as reduction factors rolled it back; of the
-        ${count(tax.districts.atFloor)} at the floor, ${count(tax.rateFell.atFloor)} did.
+        ${count(tax.rateFell.aboveFloor)} of the ${count(tax.districts.aboveFloor)} districts that
+        began above the floor saw their effective Class I rate fall as reduction factors rolled it
+        back; of the ${count(tax.districts.atFloor)} that began at it,
+        ${count(tax.rateFell.atFloor)} did.
         ${pct(tax.reductionsAboveFloor, 1)} of every effective-rate reduction in Ohio happens above
         the floor, which is what it means to say reduction factors stop there — and why a
         reappraisal reaches one district's revenue and not another's.</p>
+      <p class="note"><strong>And the size of it: the median district has lost
+        ${pct(s.median_millage_reduction, 0)} of the millage its voters approved.</strong> The
+        median voted current operating rate is
+        ${s.median_voted_millage.toFixed(2)} mills; the median rate anyone pays is
+        ${s.median_effective_millage.toFixed(2)}. Nobody decided that. It is reduction factors
+        applied a hundredth of a mill at a time across the life of every levy, which is why a
+        district can pass a levy, watch its tax base grow, and still return to the ballot.</p>
       <p class="note">Real property tax charged for current expenses is a median
         <strong>${pct(tax.medianChargeShare, 0)}</strong> of what a district spends on operations,
         and ${count(tax.chargedMoreThanSpent.length)} districts are charged more than they spend.
-        Each district's own figures are on its
+        A mill is the same rate everywhere and raises
+        <strong>${money(s.min_yield_per_mill)} per pupil</strong> in the district where it raises
+        least and <strong>${money(s.max_yield_per_mill)}</strong> where it raises most — a factor
+        of ${Math.round(s.max_yield_per_mill / s.min_yield_per_mill)}, against a median of
+        ${money(s.median_yield_per_mill)}. Comparing two districts' tax rates without that number
+        compares effort to capacity. Each district's own figures are on its
         <a href="/districts">property tax page</a>, from the Department of Taxation's Table SD-1.</p>
     </div>`;
 }

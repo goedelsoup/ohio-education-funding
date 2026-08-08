@@ -48,6 +48,13 @@ const ROWS: Row[] = [
     href: routes.metric("assessed-valuation-per-pupil"),
   },
   {
+    // Beside the effective rate rather than instead of it: the two are only interesting as a
+    // pair, and the gap between them is what H.B. 920 has taken.
+    label: "Voted operating millage",
+    pick: (d) => d.voted_operating_millage,
+    format: (v) => (v == null ? "—" : v.toFixed(2)),
+  },
+  {
     label: "Effective Class 1 millage",
     pick: (d) => d.effective_class1_millage,
     format: (v) => (v == null ? "—" : v.toFixed(2)),
@@ -65,7 +72,8 @@ const ROWS: Row[] = [
 
 const FLAGS: { label: string; pick: (d: PanelDistrict) => boolean }[] = [
   { label: "On the guarantee", pick: (d) => d.on_guarantee },
-  { label: "At the 20-mill floor", pick: (d) => d.at_millage_floor },
+  { label: "At or below the 20-mill floor", pick: (d) => d.at_millage_floor },
+  { label: "Within a twentieth of a mill of it", pick: (d) => d.near_millage_floor },
   { label: "At the minimum state share", pick: (d) => d.at_minimum_state_share },
 ];
 
