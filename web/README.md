@@ -3,7 +3,7 @@
 The interface layer. School boards, journalists, legislative staff, and parents will not be
 running a Rust CLI, so this was in scope from the outset.
 
-Roughly 2,500 pages, all of them static files:
+Roughly 3,150 pages, all of them static files:
 
 | Route | What it answers |
 |---|---|
@@ -11,7 +11,8 @@ Roughly 2,500 pages, all of them static files:
 | `/districts` | All 609, sortable and filterable. |
 | `/district/{irn}` | What the Fair School Funding Plan computes for one district, what it actually receives, and where the difference comes from. |
 | `/district/{irn}/outcome` | What its pupils achieve — against districts with comparable poverty, never against the state. |
-| `/district/{irn}/finances` | What it actually collected and spent. The only figures here that are a record rather than a model. |
+| `/district/{irn}/finances` | What it actually collected and spent, and what it spent it on by function. |
+| `/district/{irn}/taxes` | What property here is worth by class, what is charged on it, and which side of the 20-mill floor that puts the district on. |
 | `/district/{irn}/scenario` | What a proposed change does to this district, and how many districts it moves the other way. |
 | `/outcomes` | Statewide: how little of attainment the funding side explains. |
 | `/scenario` | Move a lever and see who it reaches, across all 609, in the browser. |
@@ -156,6 +157,35 @@ and the residuals cancel to nothing statewide. Proved over the whole panel in
 
 `PanelDistrict` omits the build-up, so the twenty-nine numbers per district it adds to the feed
 never reach the one download that happens in a browser.
+
+### The local half, and where the money goes
+
+Two committed datasets reached no reader for a long time, and both are now in the feed.
+
+**Table SD-1** is the Ohio Department of Taxation's per-district table: taxable value split into
+the classes that are reduced separately, the tax charged on each, and effective millage — for
+**two tax years**. Two, because H.B. 920 is a mechanism that only exists as a change. Its reduction
+factors roll an effective rate back as valuation rises and cannot roll it below twenty mills, so a
+reappraisal does opposite things either side of that floor. With TY2023 and TY2024 that is
+countable rather than assertable: **304 of the 439 districts above the floor saw their effective
+Class I rate fall, against 4 of the 170 at it**, and 98.7% of every rate reduction in Ohio happens
+above the floor.
+
+It is also the only place two arms of the state describe the same district independently. Taxation
+and Education agree: SD-1's effective Class I rate matches the District Profile Report's for all
+606 districts carrying both, to 0.01 mills, and a unit test holds them to it.
+
+**Spending by function** is the report card's FY2025 operating expenditure split eleven ways. It
+sits on the finances route beside the audited actuals and is deliberately *not* merged with them:
+different source, different basis, per-pupil against totals, and not summable. The denominator
+warning appears here for the third time — these divide by unweighted ADM, and the department's own
+headline figure does not.
+
+Every statewide figure either of those views prints — the median charge share, the count of
+districts charged more than they spend, the floor split — is **derived in `feed.ts` at build**
+rather than written into the copy. That is not fastidiousness: the first draft said two districts
+are charged more than they spend, and the answer is three. The third is Mayfield City, whose 103%
+the Rust suite already shows is about seven points of levy timing rather than tax burden.
 
 ### The corpus
 
@@ -433,11 +463,11 @@ Fields: bundle contract version, feed list, last export timestamp, node counts p
 -->
 | Field | Value |
 |---|---|
-| Contract version | `7.0.0` |
+| Contract version | `8.0.0` |
 | Districts in the feed | 609 |
 | Reference checkpoints | 8 |
 | Reference forecasts | 4 |
-| Size | 1691 KB |
+| Size | 2557 KB |
 | Deployment target | none chosen; static hosting is the presumption |
 
 Regenerate with `cargo run --manifest-path crates/Cargo.toml -p bundle > web/public/data/bundle.json`. CI fails if the committed feed and a fresh one differ.

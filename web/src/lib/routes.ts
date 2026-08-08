@@ -14,6 +14,7 @@ export const district = (irn: string): string => `/district/${irn}`;
 export const districtOutcome = (irn: string): string => `/district/${irn}/outcome`;
 export const districtScenario = (irn: string): string => `/district/${irn}/scenario`;
 export const districtFinances = (irn: string): string => `/district/${irn}/finances`;
+export const districtTaxes = (irn: string): string => `/district/${irn}/taxes`;
 
 /** A corpus node, by its class and file stem. */
 export const wikiNode = (className: string, node: string): string =>

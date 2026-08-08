@@ -13,7 +13,7 @@ import * as routes from "../lib/routes.ts";
 
 interface Props {
   irn: string;
-  current: "dashboard" | "outcome" | "finances" | "scenario";
+  current: "dashboard" | "outcome" | "finances" | "taxes" | "scenario";
 }
 
 const { irn, current } = Astro.props;
@@ -22,6 +22,7 @@ const VIEWS = [
   { key: "dashboard", href: routes.district(irn), label: "Dashboard" },
   { key: "outcome", href: routes.districtOutcome(irn), label: "Outcome" },
   { key: "finances", href: routes.districtFinances(irn), label: "Finances" },
+  { key: "taxes", href: routes.districtTaxes(irn), label: "Property tax" },
   { key: "scenario", href: routes.districtScenario(irn), label: "Scenario" },
 ] as const;
 ---

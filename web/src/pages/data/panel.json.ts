@@ -33,7 +33,14 @@ export const GET: APIRoute = () => {
     projection: bundle.projection,
     deflator: bundle.deflator,
     districts: bundle.districts.map(
-      ({ finances: _f, outcome: _o, base_cost_build_up: _b, ...district }) => district,
+      ({
+        finances: _f,
+        outcome: _o,
+        base_cost_build_up: _b,
+        property_tax: _p,
+        spending_by_function: _s,
+        ...district
+      }) => district,
     ),
   };
 

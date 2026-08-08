@@ -64,7 +64,7 @@ use edfund_core::Dollars;
 /// from FY2022-FY2024 to FY2024-FY2026 — the years the department's `ADM Data` sheet declares.
 /// The values did not change; what they are called did, which is exactly the kind of silent
 /// meaning change the version guard exists for.
-pub const CONTRACT_VERSION: &str = "7.0.0";
+pub const CONTRACT_VERSION: &str = "8.0.0";
 
 /// The outcome side of a district, where the report card covers it.
 ///
@@ -243,6 +243,96 @@ pub struct BaseCostBuildUp {
     pub residual: Dollars,
 }
 
+/// One tax year of a district's property tax base and the tax charged on it.
+///
+/// From Table SD-1, the Department of Taxation's own per-district table — a different department
+/// from the one that publishes the funding model, which is what makes it worth carrying: the
+/// state's two halves describe the same district and are not obliged to agree. Where they overlap
+/// they do, to 0.01 mills across all 606 districts that appear in both.
+///
+/// Two years are carried rather than one because the mechanism this data exists to show only
+/// exists as a change. H.B. 920's reduction factors roll an effective rate back as valuation
+/// rises, and cannot roll it below twenty mills — so what a reappraisal does to a district's
+/// revenue depends entirely on which side of that floor it sits, and a single year cannot show it.
+#[derive(Debug, Clone, Copy, PartialEq, Default)]
+pub struct PropertyTaxYear {
+    /// Tax year. Offset from the fiscal year, and collected across the following calendar year.
+    pub tax_year: u16,
+    /// Class I: residential and agricultural, which carry their own reduction factor.
+    pub class1_value: Dollars,
+    /// Class II: everything else real — commercial, industrial, mineral, railroad.
+    pub class2_value: Dollars,
+    /// Public utility tangible property, which is neither class and is not reduced.
+    pub public_utility_value: Dollars,
+    /// Class I + Class II + public utility.
+    pub total_value: Dollars,
+    /// Agricultural value, inside Class I.
+    pub agricultural_value: Dollars,
+    /// Residential value, inside Class I. Seven-tenths of the state's base.
+    pub residential_value: Dollars,
+    /// Commercial value, inside Class II.
+    pub commercial_value: Dollars,
+    /// Industrial value, inside Class II.
+    pub industrial_value: Dollars,
+    /// Mineral value, inside Class II.
+    pub mineral_value: Dollars,
+    /// Railroad value, inside Class II.
+    pub railroad_value: Dollars,
+    /// Effective Class I operating millage, after reduction factors.
+    pub class1_rate: f64,
+    /// Effective Class II operating millage.
+    pub class2_rate: f64,
+    /// Class I tax charged for current expenses.
+    pub class1_taxes_charged: Dollars,
+    /// Class II tax charged for current expenses.
+    pub class2_taxes_charged: Dollars,
+    /// Real property tax charged, both classes, excluding joint vocational operating levies.
+    pub real_property_taxes_charged: Dollars,
+    /// Public utility tax charged.
+    pub public_utility_taxes_charged: Dollars,
+    /// Total value over the tax year's ADM.
+    pub value_per_pupil: Dollars,
+}
+
+/// Where a district's operating money went in FY2025, per pupil, by function.
+///
+/// The report card's spending file, and therefore **not** the audited actuals in
+/// [`District::finances`]: a different source, a different basis, and a per-pupil figure rather
+/// than a total. The two answer "what did it spend it on" and "what changed hands", and this feed
+/// keeps them apart because a reader who added them would be double-counting.
+///
+/// `classroom_instruction` and `nonclassroom` are the department's own two roll-ups and partition
+/// operating spending exactly; the named functions below sit inside one or the other.
+#[derive(Debug, Clone, Copy, PartialEq, Default)]
+pub struct SpendingByFunction {
+    /// Unweighted ADM, FY2025 — the headcount denominator, not the need-weighted one.
+    pub adm: f64,
+    /// Total operating expenditure per pupil, FY2025.
+    pub operating_per_pupil: Dollars,
+    /// Classroom instruction, the department's roll-up.
+    pub classroom_instruction: Dollars,
+    /// Everything else, the department's other roll-up.
+    pub nonclassroom: Dollars,
+    /// Instruction.
+    pub instruction: Dollars,
+    /// Pupil support.
+    pub pupil_support: Dollars,
+    /// Instructional staff support.
+    pub instructional_staff_support: Dollars,
+    /// General administration.
+    pub general_admin: Dollars,
+    /// School administration.
+    pub school_admin: Dollars,
+    /// Operations and maintenance.
+    pub operations_maintenance: Dollars,
+    /// Pupil transportation.
+    pub pupil_transportation: Dollars,
+    /// Other support services.
+    pub other_support: Dollars,
+    /// Food service.
+    pub food_service: Dollars,
+}
+
 /// One district, as the web layer needs it.
 #[derive(Debug, Clone, PartialEq)]
 pub struct District {
@@ -260,6 +350,10 @@ pub struct District {
     pub aggregate_base_cost: Dollars,
     /// How that aggregate is assembled, recomputed here rather than quoted.
     pub base_cost_build_up: BaseCostBuildUp,
+    /// Property tax base and charge, TY2023 and TY2024. Empty where the district is absent.
+    pub property_tax: Vec<PropertyTaxYear>,
+    /// Operating spending by function, FY2025. `None` for the two districts without a row.
+    pub spending_by_function: Option<SpendingByFunction>,
     /// The state's share of base cost alone, before every categorical.
     pub base_cost_state_share: Dollars,
     /// Targeted assistance, special education, DPIA, English learner, gifted, career-technical.
@@ -725,6 +819,70 @@ impl Bundle {
                 num(d.aggregate_base_cost)
             ));
             {
+                // Two tax years of the Department of Taxation's own table, written as an array so
+                // the change between them — which is the whole reason two are carried — is a
+                // thing the page can iterate rather than two parallel field sets.
+                s.push_str("\"property_tax\": [");
+                for (j, y) in d.property_tax.iter().enumerate() {
+                    if j > 0 {
+                        s.push_str(", ");
+                    }
+                    s.push_str(&format!("{{\"tax_year\": {}, ", y.tax_year));
+                    for (name, value) in [
+                        ("class1_value", y.class1_value),
+                        ("class2_value", y.class2_value),
+                        ("public_utility_value", y.public_utility_value),
+                        ("total_value", y.total_value),
+                        ("agricultural_value", y.agricultural_value),
+                        ("residential_value", y.residential_value),
+                        ("commercial_value", y.commercial_value),
+                        ("industrial_value", y.industrial_value),
+                        ("mineral_value", y.mineral_value),
+                        ("railroad_value", y.railroad_value),
+                        ("class1_rate", y.class1_rate),
+                        ("class2_rate", y.class2_rate),
+                        ("class1_taxes_charged", y.class1_taxes_charged),
+                        ("class2_taxes_charged", y.class2_taxes_charged),
+                        ("real_property_taxes_charged", y.real_property_taxes_charged),
+                        (
+                            "public_utility_taxes_charged",
+                            y.public_utility_taxes_charged,
+                        ),
+                        ("value_per_pupil", y.value_per_pupil),
+                    ] {
+                        s.push_str(&format!("\"{name}\": {}, ", num(value)));
+                    }
+                    s.truncate(s.trim_end_matches(' ').trim_end_matches(',').len());
+                    s.push('}');
+                }
+                s.push_str("], ");
+            }
+            match &d.spending_by_function {
+                None => s.push_str("\"spending_by_function\": null, "),
+                Some(f) => {
+                    s.push_str("\"spending_by_function\": {");
+                    for (name, value) in [
+                        ("adm", f.adm),
+                        ("operating_per_pupil", f.operating_per_pupil),
+                        ("classroom_instruction", f.classroom_instruction),
+                        ("nonclassroom", f.nonclassroom),
+                        ("instruction", f.instruction),
+                        ("pupil_support", f.pupil_support),
+                        ("instructional_staff_support", f.instructional_staff_support),
+                        ("general_admin", f.general_admin),
+                        ("school_admin", f.school_admin),
+                        ("operations_maintenance", f.operations_maintenance),
+                        ("pupil_transportation", f.pupil_transportation),
+                        ("other_support", f.other_support),
+                        ("food_service", f.food_service),
+                    ] {
+                        s.push_str(&format!("\"{name}\": {}, ", num(value)));
+                    }
+                    s.truncate(s.trim_end_matches(' ').trim_end_matches(',').len());
+                    s.push_str("}, ");
+                }
+            }
+            {
                 // Twenty-two elements plus the two funded-position counts and the reconciliation
                 // against the department's own figure. Written longhand for the same reason the
                 // rest of this serializer is: no serde, so no derive.
@@ -878,6 +1036,24 @@ mod tests {
                 residual: -0.5,
                 ..BaseCostBuildUp::default()
             },
+            // Two tax years, because the serializer writes an array and a single-element one
+            // would not exercise the separator between them.
+            property_tax: vec![
+                PropertyTaxYear {
+                    tax_year: 2023,
+                    class1_rate: 20.0,
+                    ..PropertyTaxYear::default()
+                },
+                PropertyTaxYear {
+                    tax_year: 2024,
+                    class1_rate: 20.0154,
+                    ..PropertyTaxYear::default()
+                },
+            ],
+            spending_by_function: Some(SpendingByFunction {
+                operating_per_pupil: 14_027.17,
+                ..SpendingByFunction::default()
+            }),
             base_cost_state_share: 6_000_000.0,
             categorical_funding: 8_038_562.0,
             formula_aid_per_pupil: 6_400.0,
@@ -1069,6 +1245,33 @@ mod tests {
     fn serialization_is_deterministic() {
         let b = bundle(vec![sample(), sample()], vec![checkpoint()]);
         assert_eq!(b.to_json(), b.to_json());
+    }
+
+    #[test]
+    fn the_property_tax_years_survive_serialization_in_order() {
+        // The page reads the pair as a change, so a reversed or collapsed array would invert every
+        // direction it reports rather than failing visibly.
+        let json = bundle(vec![sample()], vec![]).to_json();
+        let start = json
+            .find("\"property_tax\": [")
+            .expect("the array is written");
+        // Bounded by the array's own close rather than a byte count: one year's block runs to
+        // several hundred characters, and a short slice would only ever find the first.
+        let end = start + json[start..].find(']').expect("the array closes");
+        let block = &json[start..end];
+        let first = block.find("\"tax_year\": 2023").expect("the earlier year");
+        let second = block.find("\"tax_year\": 2024").expect("the later year");
+        assert!(first < second, "tax years are not oldest first: {block}");
+    }
+
+    #[test]
+    fn a_district_without_a_spending_row_serializes_as_null() {
+        // Two of the 609 have none. Writing zeros would be a claim about their spending rather
+        // than about the file, and the page needs to be able to tell the difference.
+        let mut district = sample();
+        district.spending_by_function = None;
+        let json = bundle(vec![district], vec![]).to_json();
+        assert!(json.contains("\"spending_by_function\": null"), "{json}");
     }
 
     #[test]

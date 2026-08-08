@@ -156,6 +156,76 @@ export const BaseCostBuildUpSchema = z
   })
   .strict();
 
+/**
+ * One tax year of a district's property tax base and the charge on it, from Table SD-1.
+ *
+ * The Department of Taxation's table, not the Department of Education's — the local half of the
+ * formula measured by the other half of the state. Where the two overlap they agree: SD-1's
+ * effective Class I rate matches the District Profile Report's for all 606 districts carrying
+ * both, to 0.01 mills.
+ *
+ * Two years are carried because the mechanism only exists as a change. H.B. 920's reduction
+ * factors roll an effective rate back as valuation rises and cannot roll it below twenty mills,
+ * so what a reappraisal does to a district depends on which side of that floor it is on — and one
+ * year cannot show that.
+ */
+export const PropertyTaxYearSchema = z
+  .object({
+    tax_year: z.number().int(),
+    /** Class I: residential and agricultural, which carry their own reduction factor. */
+    class1_value: num,
+    /** Class II: commercial, industrial, mineral, railroad. */
+    class2_value: num,
+    /** Public utility tangible property — neither class, and not reduced. */
+    public_utility_value: num,
+    total_value: num,
+    agricultural_value: num,
+    residential_value: num,
+    commercial_value: num,
+    industrial_value: num,
+    mineral_value: num,
+    railroad_value: num,
+    /** Effective Class I operating millage, after reduction factors. */
+    class1_rate: num,
+    class2_rate: num,
+    class1_taxes_charged: num,
+    class2_taxes_charged: num,
+    /** Both classes, excluding joint vocational operating levies. */
+    real_property_taxes_charged: num,
+    public_utility_taxes_charged: num,
+    value_per_pupil: num,
+  })
+  .strict();
+
+/**
+ * Where a district's operating money went in FY2025, per pupil, by function.
+ *
+ * The report card's spending file — a different source and basis from the audited actuals in
+ * `finances`, and a per-pupil figure rather than a total. The two answer different questions and
+ * adding them would double-count, which is why they are separate blocks and separate cards.
+ *
+ * `classroom_instruction` and `nonclassroom` are the department's own roll-ups and partition
+ * operating spending exactly; the named functions sit inside one or the other.
+ */
+export const SpendingByFunctionSchema = z
+  .object({
+    /** Unweighted ADM — the headcount denominator, not the need-weighted one. */
+    adm: num,
+    operating_per_pupil: num,
+    classroom_instruction: num,
+    nonclassroom: num,
+    instruction: num,
+    pupil_support: num,
+    instructional_staff_support: num,
+    general_admin: num,
+    school_admin: num,
+    operations_maintenance: num,
+    pupil_transportation: num,
+    other_support: num,
+    food_service: num,
+  })
+  .strict();
+
 /** One district, as the feed carries it. */
 export const DistrictSchema = z
   .object({
@@ -170,6 +240,10 @@ export const DistrictSchema = z
     aggregate_base_cost: num,
     /** How that aggregate is assembled — the one thing here that is computed, not quoted. */
     base_cost_build_up: BaseCostBuildUpSchema,
+    /** TY2023 and TY2024, oldest first. Empty where the district is absent from SD-1. */
+    property_tax: z.array(PropertyTaxYearSchema),
+    /** `null` for the two districts with no report-card spending row. */
+    spending_by_function: SpendingByFunctionSchema.nullable(),
     /** The state's share of base cost alone, before every categorical. */
     base_cost_state_share: num,
     /** Targeted assistance, special education, DPIA, English learner, gifted, career-technical. */
@@ -341,6 +415,8 @@ export type DistrictOutcome = z.infer<typeof DistrictOutcomeSchema>;
 export type OutcomeStatewide = z.infer<typeof OutcomeStatewideSchema>;
 export type FinanceYear = z.infer<typeof FinanceYearSchema>;
 export type BaseCostBuildUp = z.infer<typeof BaseCostBuildUpSchema>;
+export type PropertyTaxYear = z.infer<typeof PropertyTaxYearSchema>;
+export type SpendingByFunction = z.infer<typeof SpendingByFunctionSchema>;
 export type District = z.infer<typeof DistrictSchema>;
 export type Statewide = z.infer<typeof StatewideSchema>;
 export type Deflator = z.infer<typeof DeflatorSchema>;

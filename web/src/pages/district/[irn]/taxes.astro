@@ -1,0 +1,104 @@
+---
+/**
+ * The local half of the formula, for one district.
+ *
+ * Local capacity is 60% assessed valuation and sets the state's residual share, so property is
+ * most of what decides a district's funding — and the site represented all of it with a single
+ * number. This is Table SD-1, from the Department of Taxation rather than the Department of
+ * Education: two tax years, the base broken into the classes that are reduced separately, and
+ * what H.B. 920 did to the rate in between.
+ */
+import DistrictNav from "../../../components/DistrictNav.astro";
+import Base from "../../../layouts/Base.astro";
+import { districtPaths, loadFeed } from "../../../lib/feed.ts";
+import { money, pct } from "../../../lib/format.ts";
+import * as routes from "../../../lib/routes.ts";
+import { renderTaxAgainstSpending, renderTaxBase, renderTaxChange } from "../../../lib/tax.ts";
+
+export const getStaticPaths = districtPaths;
+
+const { district } = Astro.props;
+const { bundle, tax } = loadFeed();
+const latest = district.property_tax[district.property_tax.length - 1];
+
+const description = latest
+  ? `${district.name} has ${money(latest.total_value)} of taxable property, ${money(latest.value_per_pupil)} per pupil, charged at ${latest.class1_rate.toFixed(2)} effective Class I mills in TY${latest.tax_year}.`
+  : `No Table SD-1 row is published for ${district.name}.`;
+---
+
+<Base title={`${district.name} — property tax`} description={description} section="districts">
+  <h1>{district.name}</h1>
+  <p class="sub">
+    What property here is worth, what is charged on it, and which side of the 20-mill floor the
+    district is on — which decides whether a reappraisal reaches its revenue at all.
+  </p>
+
+  <DistrictNav irn={district.irn} current="taxes" />
+
+  {
+    !latest ? (
+      <div class="card">
+        <h2>Not in Table SD-1</h2>
+        <p class="note">
+          No row is published for this district in the Department of Taxation's per-district table,
+          so its tax base cannot be shown here. Its funding model is on the{" "}
+          <a href={routes.district(district.irn)}>dashboard</a>.
+        </p>
+      </div>
+    ) : (
+      <>
+        <div class="tiles">
+          <div class="tile">
+            <div class="k">Taxable value per pupil</div>
+            <div class="v">{money(latest.value_per_pupil)}</div>
+            <div class="n">
+              statewide median {money(bundle.statewide.median_valuation_per_pupil)}
+            </div>
+          </div>
+          <div class="tile">
+            <div class="k">Effective Class I millage</div>
+            <div class="v">{latest.class1_rate.toFixed(2)}</div>
+            <div class="n">
+              {district.at_millage_floor
+                ? "at the 20-mill floor — reduction factors have stopped"
+                : "above the floor — reduction factors are operative"}
+            </div>
+          </div>
+          <div class="tile">
+            <div class="k">Real property tax charged</div>
+            <div class="v">{money(latest.real_property_taxes_charged)}</div>
+            <div class="n">TY{latest.tax_year}, current expenses</div>
+          </div>
+        </div>
+
+        <Fragment set:html={renderTaxChange(district, tax)} />
+        <Fragment set:html={renderTaxBase(district)} />
+        <Fragment set:html={renderTaxAgainstSpending(district, tax)} />
+
+        <div class="card">
+          <h2>Where these figures come from, and what they are not</h2>
+          <p class="note">
+            Table SD-1, published by the <strong>Ohio Department of Taxation</strong> — a different
+            department from the one that publishes the funding model every other page here reads.
+            Where the two overlap they agree: this district's effective Class I rate matches the
+            Department of Education's District Profile Report to 0.01 mills, as it does for all 606
+            districts carrying both.
+          </p>
+          <p class="note">
+            These are <strong>current expense</strong> levies only. Bond and permanent-improvement
+            millage is excluded, and so are joint vocational operating levies, which are charged on
+            the same property by a different taxing authority. The {
+              pct(latest.public_utility_value / latest.total_value, 1)
+            } of this district's base that is public utility tangible property is neither Class I
+            nor Class II and is not subject to reduction factors at all.
+          </p>
+          <p class="note">
+            Nothing here is a projection. Valuation moves on a county reappraisal cycle rather than
+            smoothly, which is why <a href="/scenario">the scenario builder</a> holds it fixed: the
+            corpus has two observations per district and cannot forecast a step function.
+          </p>
+        </div>
+      </>
+    )
+  }
+</Base>

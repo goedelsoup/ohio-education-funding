@@ -13,7 +13,8 @@ use std::collections::HashMap;
 
 use bundle::{
     BaseCostBuildUp, Bundle, Checkpoint, Deflator, District, DistrictOutcome, FinanceYear,
-    ForecastCheckpoint, OutcomeStatewide, PolicyShape, Projection, Statewide, CONTRACT_VERSION,
+    ForecastCheckpoint, OutcomeStatewide, PolicyShape, Projection, PropertyTaxYear,
+    SpendingByFunction, Statewide, CONTRACT_VERSION,
 };
 use dispersion::{partial_correlation, wealth_neutrality};
 use edfund_core::FiscalYear;
@@ -33,6 +34,15 @@ const HORIZON: FiscalYear = FiscalYear(2036);
 
 /// The FY2024 District Profile Report: millage, expenditure, demographics.
 const PROFILE: &str = include_str!("../../dispersion/fixtures/cupp-fy24-district-data.csv");
+
+/// Table SD-1: taxable value by class and taxes charged, one row per district per tax year.
+///
+/// The Department of Taxation's table rather than the Department of Education's — the local half
+/// of the funding formula, from the half of the state that measures it.
+const SD1: &str = include_str!("../../dispersion/fixtures/sd1-district-taxes.csv");
+
+/// The report card's FY2025 operating spending, broken into functions, per pupil.
+const FUNCTIONS: &str = include_str!("../../dispersion/fixtures/expenditure-functions-fy25.csv");
 
 fn field(line: &str, index: usize) -> Option<&str> {
     line.split(',').nth(index).map(str::trim)
@@ -240,6 +250,8 @@ fn to_district(
     profile: Option<&&str>,
     outcome: Option<&Joined>,
     money: Option<&Finances>,
+    taxes: Option<&Vec<PropertyTaxYear>>,
+    functions: Option<&SpendingByFunction>,
 ) -> District {
     let adm = record.base_cost_adm();
     District {
@@ -248,6 +260,8 @@ fn to_district(
         adm,
         current_year_adm: record.current_year_adm,
         base_cost_build_up: build_up(record),
+        property_tax: taxes.cloned().unwrap_or_default(),
+        spending_by_function: functions.copied(),
         base_cost_per_pupil: record.base_cost_per_pupil,
         aggregate_base_cost: record.aggregate_base_cost,
         base_cost_state_share: record.base_cost_state_share,
@@ -390,6 +404,94 @@ fn build_up(record: &DistrictRecord) -> BaseCostBuildUp {
     }
 }
 
+/// Column positions, resolved from the header so a reordered fixture fails loudly.
+fn header(csv: &str) -> Vec<&str> {
+    csv.lines().next().unwrap_or_default().split(',').collect()
+}
+
+fn at<'a>(head: &[&str], parts: &[&'a str], name: &str) -> &'a str {
+    let index = head
+        .iter()
+        .position(|c| *c == name)
+        .unwrap_or_else(|| panic!("{name} is not a column of the fixture"));
+    parts.get(index).copied().unwrap_or_default()
+}
+
+fn number(head: &[&str], parts: &[&str], name: &str) -> f64 {
+    at(head, parts, name).trim().parse().unwrap_or(0.0)
+}
+
+/// Both tax years of SD-1 for every district, keyed by IRN and ordered oldest first.
+///
+/// Ordered because the page reads it as a change rather than as two independent years, and a
+/// reversed pair would silently invert every direction it reports.
+fn property_taxes() -> HashMap<String, Vec<PropertyTaxYear>> {
+    let head = header(SD1);
+    let mut out: HashMap<String, Vec<PropertyTaxYear>> = HashMap::new();
+    for line in SD1.lines().skip(1).filter(|l| !l.trim().is_empty()) {
+        let p: Vec<&str> = line.split(',').collect();
+        let n = |name: &str| number(&head, &p, name);
+        out.entry(at(&head, &p, "irn").to_string())
+            .or_default()
+            .push(PropertyTaxYear {
+                tax_year: n("tax_year") as u16,
+                class1_value: n("class1_value"),
+                class2_value: n("class2_value"),
+                public_utility_value: n("public_utility_value"),
+                total_value: n("total_value"),
+                agricultural_value: n("agricultural_value"),
+                residential_value: n("residential_value"),
+                commercial_value: n("commercial_value"),
+                industrial_value: n("industrial_value"),
+                mineral_value: n("mineral_value"),
+                railroad_value: n("railroad_value"),
+                class1_rate: n("class1_rate"),
+                class2_rate: n("class2_rate"),
+                class1_taxes_charged: n("class1_taxes_charged"),
+                class2_taxes_charged: n("class2_taxes_charged"),
+                real_property_taxes_charged: n("real_property_taxes_charged"),
+                public_utility_taxes_charged: n("public_utility_taxes_charged"),
+                value_per_pupil: n("value_per_pupil"),
+            });
+    }
+    for years in out.values_mut() {
+        years.sort_by_key(|y| y.tax_year);
+    }
+    out
+}
+
+/// FY2025 operating spending by function, per pupil, keyed by IRN.
+fn spending_by_function() -> HashMap<String, SpendingByFunction> {
+    let head = header(FUNCTIONS);
+    FUNCTIONS
+        .lines()
+        .skip(1)
+        .filter(|l| !l.trim().is_empty())
+        .map(|line| {
+            let p: Vec<&str> = line.split(',').collect();
+            let n = |name: &str| number(&head, &p, name);
+            (
+                at(&head, &p, "irn").to_string(),
+                SpendingByFunction {
+                    adm: n("unweighted_adm_fy25"),
+                    operating_per_pupil: n("operating_expenditure_per_pupil_fy25"),
+                    classroom_instruction: n("classroom_instruction_per_pupil"),
+                    nonclassroom: n("nonclassroom_per_pupil"),
+                    instruction: n("instruction_per_pupil"),
+                    pupil_support: n("pupil_support_per_pupil"),
+                    instructional_staff_support: n("instructional_staff_support_per_pupil"),
+                    general_admin: n("general_admin_per_pupil"),
+                    school_admin: n("school_admin_per_pupil"),
+                    operations_maintenance: n("operations_maintenance_per_pupil"),
+                    pupil_transportation: n("pupil_transportation_per_pupil"),
+                    other_support: n("other_support_per_pupil"),
+                    food_service: n("food_service_per_pupil"),
+                },
+            )
+        })
+        .collect()
+}
+
 fn main() {
     // Profile columns: 3 economically disadvantaged, 4 valuation/pupil, 6 effective class 1
     // millage, 7 operating expenditure per pupil.
@@ -404,6 +506,8 @@ fn main() {
     let outcomes = joined();
     let money = finances();
     let cpi = deflate::CpiSeries::cpi_u_june();
+    let taxes = property_taxes();
+    let functions = spending_by_function();
     let districts: Vec<District> = records
         .iter()
         .map(|record| {
@@ -412,6 +516,8 @@ fn main() {
                 profile.get(record.irn.as_str()),
                 outcomes.iter().find(|j| j.funding.irn == record.irn),
                 for_district(&money, &record.irn),
+                taxes.get(&record.irn),
+                functions.get(&record.irn),
             )
         })
         .collect();

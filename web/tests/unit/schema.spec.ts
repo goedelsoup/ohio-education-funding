@@ -274,3 +274,92 @@ test("the scenario panel does not carry the build-up", () => {
   const { finances: _f, outcome: _o, base_cost_build_up: _b, ...panelDistrict } = district;
   expect(Object.keys(panelDistrict)).not.toContain("base_cost_build_up");
 });
+
+test("both tax years are present, ordered, and their classes partition the base", () => {
+  // Ordered because the page reads the pair as a change; reversed, every direction it reports
+  // would invert silently. Partitioned because a base whose parts do not sum to its whole invites
+  // shares that do not add to one.
+  const { bundle } = loadFeed();
+  for (const d of bundle.districts) {
+    expect(d.property_tax.map((y) => y.tax_year), d.name).toEqual([2023, 2024]);
+    for (const y of d.property_tax) {
+      expect(Math.abs(y.class1_value + y.class2_value + y.public_utility_value - y.total_value))
+        .toBeLessThan(1);
+      expect(Math.abs(y.agricultural_value + y.residential_value - y.class1_value)).toBeLessThan(1);
+    }
+  }
+});
+
+test("SD-1's effective rate agrees with the profile report's", () => {
+  // Two departments describing the same district. They are not obliged to agree, and the taxes
+  // page tells readers they do — so it is checked rather than asserted.
+  const { bundle } = loadFeed();
+  let compared = 0;
+  for (const d of bundle.districts) {
+    const ty2023 = d.property_tax.find((y) => y.tax_year === 2023);
+    if (!ty2023 || d.effective_class1_millage == null) continue;
+    compared++;
+    expect(Math.abs(ty2023.class1_rate - d.effective_class1_millage), d.name).toBeLessThan(0.01);
+  }
+  expect(compared).toBe(606);
+});
+
+test("the department's two spending roll-ups partition operating expenditure", () => {
+  const { bundle } = loadFeed();
+  let covered = 0;
+  for (const d of bundle.districts) {
+    const s = d.spending_by_function;
+    if (!s) continue;
+    covered++;
+    // A cent, not nothing: the department publishes each roll-up rounded to cents independently,
+    // so the pair can land a cent either side of the total it partitions. 92 districts do. The
+    // Rust suite allows the same slack for the same reason.
+    expect(Math.abs(s.classroom_instruction + s.nonclassroom - s.operating_per_pupil), d.name)
+      .toBeLessThan(0.011);
+  }
+  // Two districts have no report-card spending row, and the page says so rather than showing zero.
+  expect(covered).toBe(607);
+});
+
+test("the statewide tax facts the pages print are derived, and reproduce the Rust suite", () => {
+  /*
+   * These appear on 609 pages each. Hard-coding them is how a regenerated feed leaves a page
+   * quietly wrong — which nearly happened here: the first draft of the copy said two districts are
+   * charged more than they spend, and the answer is three.
+   *
+   * The median and the fiftieth-ranked district are the figures Policy Matters Ohio published and
+   * `crates/dispersion/tests/sd1_district_taxes.rs` reproduces; matching them from the feed means
+   * the web layer and the Rust agree about the same quantity.
+   */
+  const { tax } = loadFeed();
+  expect(tax.medianChargeShare).toBeCloseTo(0.36, 2);
+  expect(tax.chargedMoreThanSpent.map((d) => d.name)).toEqual([
+    "Danbury Local",
+    "Put-In-Bay Local",
+    "Mayfield City",
+  ]);
+
+  // The floor mechanism, as a count. Reductions concentrate above the floor because that is the
+  // only place reduction factors can still operate.
+  expect(tax.districts.atFloor + tax.districts.aboveFloor).toBe(609);
+  expect(tax.rateFell.aboveFloor).toBeGreaterThan(tax.rateFell.atFloor * 50);
+  expect(tax.reductionsAboveFloor).toBeGreaterThan(0.95);
+});
+
+test("neither new block reaches the scenario panel", () => {
+  const { bundle } = loadFeed();
+  const district = bundle.districts[0]!;
+  expect(district).toHaveProperty("property_tax");
+  expect(district).toHaveProperty("spending_by_function");
+  const {
+    finances: _f,
+    outcome: _o,
+    base_cost_build_up: _b,
+    property_tax: _p,
+    spending_by_function: _s,
+    ...panelDistrict
+  } = district;
+  for (const dropped of ["property_tax", "spending_by_function"]) {
+    expect(Object.keys(panelDistrict)).not.toContain(dropped);
+  }
+});

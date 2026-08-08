@@ -69,6 +69,28 @@ export interface Feed {
   valuations: number[];
   /** Ascending, nulls dropped. */
   expenditures: number[];
+  /** Statewide facts about the property tax base, derived once from the panel. */
+  tax: TaxStatewide;
+}
+
+/**
+ * The property-tax findings the district pages state, computed rather than written down.
+ *
+ * Every one of these appears on 609 pages. Hard-coding them means a regenerated feed can leave
+ * them silently wrong — which nearly happened: the first draft said "two districts are charged
+ * more than they spend" and the answer is three.
+ */
+export interface TaxStatewide {
+  /** Districts whose effective Class I rate fell between the two tax years, by floor status. */
+  rateFell: { atFloor: number; aboveFloor: number };
+  /** How many districts are on each side of the floor, among those with two tax years. */
+  districts: { atFloor: number; aboveFloor: number };
+  /** Share of all effective-rate reductions that happen above the floor. */
+  reductionsAboveFloor: number;
+  /** Median real property charge as a share of operating spending. */
+  medianChargeShare: number;
+  /** Districts charged more in real property tax than they spend on operations. */
+  chargedMoreThanSpent: { name: string; share: number }[];
 }
 
 let cached: Feed | null = null;
@@ -169,6 +191,8 @@ export function loadFeed(): Feed {
     );
   }
 
+  const tax = taxStatewide(bundle.districts);
+
   const number = (pick: (d: District) => number | null) =>
     bundle.districts
       .map(pick)
@@ -183,8 +207,59 @@ export function loadFeed(): Feed {
     alphabetical: [...bundle.districts].sort((a, b) => a.name.localeCompare(b.name)),
     valuations: number((d) => d.valuation_per_pupil),
     expenditures: number((d) => d.operating_expenditure_per_pupil),
+    tax,
   };
   return cached;
+}
+
+/**
+ * The statewide property-tax picture, from the two tax years the feed carries.
+ *
+ * H.B. 920's reduction factors roll an effective rate back as valuation rises and cannot roll it
+ * below twenty mills, so the floor decides whether a reappraisal reaches a district's revenue.
+ * That is a claim about a mechanism, and with two tax years it is a countable fact instead.
+ */
+function taxStatewide(districts: District[]): TaxStatewide {
+  const rateFell = { atFloor: 0, aboveFloor: 0 };
+  const counted = { atFloor: 0, aboveFloor: 0 };
+  const shares: { name: string; share: number }[] = [];
+
+  for (const d of districts) {
+    const [before, after] = [d.property_tax[0], d.property_tax[d.property_tax.length - 1]];
+    if (before && after && d.property_tax.length >= 2) {
+      // A hundredth of a mill, which is the precision Table SD-1 publishes to. Anything smaller
+      // is the same rate written twice.
+      const fell = after.class1_rate - before.class1_rate < -0.0005;
+      if (d.at_millage_floor) {
+        counted.atFloor++;
+        if (fell) rateFell.atFloor++;
+      } else {
+        counted.aboveFloor++;
+        if (fell) rateFell.aboveFloor++;
+      }
+    }
+
+    const spending = d.spending_by_function;
+    if (after && spending && spending.adm > 0) {
+      const operating = spending.operating_per_pupil * spending.adm;
+      if (operating > 0) {
+        shares.push({ name: d.name, share: after.real_property_taxes_charged / operating });
+      }
+    }
+  }
+
+  const sorted = shares.map((s) => s.share).sort((a, b) => a - b);
+  const reductions = rateFell.atFloor + rateFell.aboveFloor;
+
+  return {
+    rateFell,
+    districts: counted,
+    reductionsAboveFloor: reductions === 0 ? 0 : rateFell.aboveFloor / reductions,
+    medianChargeShare: sorted[Math.floor(sorted.length / 2)] ?? 0,
+    chargedMoreThanSpent: shares
+      .filter((s) => s.share > 1)
+      .sort((a, b) => b.share - a.share),
+  };
 }
 
 /**

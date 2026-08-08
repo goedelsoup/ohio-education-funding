@@ -39,6 +39,7 @@ const PAGES = new Set<string>([
     routes.district(d.irn),
     routes.districtOutcome(d.irn),
     routes.districtFinances(d.irn),
+    routes.districtTaxes(d.irn),
     routes.districtScenario(d.irn),
   ]),
   ...corpus.classes.map((c) => routes.wikiClass(c.className)),
@@ -137,9 +138,10 @@ test("the metric routes the district pages link to are real nodes", () => {
 test("every district in the feed has all four of its views", () => {
   // The route table above is generated from the feed, so this checks the thing that route table
   // asserts: that `getStaticPaths` covers the whole panel and not a filtered subset of it.
-  expect(PAGES.size).toBeGreaterThanOrEqual(bundle.districts.length * 4);
+  expect(PAGES.size).toBeGreaterThanOrEqual(bundle.districts.length * 5);
   for (const irn of ["043786", "049056", "044933"]) {
     expect(PAGES.has(routes.district(irn))).toBe(true);
     expect(PAGES.has(routes.districtScenario(irn))).toBe(true);
+    expect(PAGES.has(routes.districtTaxes(irn))).toBe(true);
   }
 });

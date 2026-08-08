@@ -6,6 +6,7 @@ import { renderToString } from "./plot/ssr.ts";
 import { count, escapeHtml, millions, money, pct } from "./format.ts";
 import { realChange, series, type Basis } from "./real.ts";
 import * as routes from "./routes.ts";
+import type { TaxStatewide } from "./feed.ts";
 import type { Bundle, District } from "./types.ts";
 
 /**
@@ -125,7 +126,7 @@ export function guaranteeRateByQuintile(districts: District[]): Bar[] {
  * dollar basis — and this one is not: nothing in it is a dollar series that a price index could
  * restate.
  */
-export function renderStatewideStructure(bundle: Bundle): string {
+export function renderStatewideStructure(bundle: Bundle, tax: TaxStatewide): string {
   const s = bundle.statewide;
   const bars = guaranteeRateByQuintile(bundle.districts);
 
@@ -187,5 +188,18 @@ export function renderStatewideStructure(bundle: Bundle): string {
         ${pct(s.minimum_state_share, 0)} in this model, not the 5% the
         <a href="${routes.wikiNode("funding-regime", "fair-school-funding-plan")}">Fair School
         Funding Plan</a> was enacted with — each biennial budget sets it.</p>
+      <p class="note"><strong>The millage floor is visible in the tax record, not only in the
+        statute.</strong> Across TY2023 and TY2024,
+        ${count(tax.rateFell.aboveFloor)} of the ${count(tax.districts.aboveFloor)} districts above
+        the floor saw their effective Class I rate fall as reduction factors rolled it back; of the
+        ${count(tax.districts.atFloor)} at the floor, ${count(tax.rateFell.atFloor)} did.
+        ${pct(tax.reductionsAboveFloor, 1)} of every effective-rate reduction in Ohio happens above
+        the floor, which is what it means to say reduction factors stop there — and why a
+        reappraisal reaches one district's revenue and not another's.</p>
+      <p class="note">Real property tax charged for current expenses is a median
+        <strong>${pct(tax.medianChargeShare, 0)}</strong> of what a district spends on operations,
+        and ${count(tax.chargedMoreThanSpent.length)} districts are charged more than they spend.
+        Each district's own figures are on its
+        <a href="/districts">property tax page</a>, from the Department of Taxation's Table SD-1.</p>
     </div>`;
 }

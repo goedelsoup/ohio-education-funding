@@ -758,3 +758,65 @@ test.describe("the base cost build-up", () => {
     }
   });
 });
+
+test.describe("the property tax route", () => {
+  test("a district at the floor is told the reduction factors have stopped", async ({ page }) => {
+    // Northern Local sits at twenty mills, so H.B. 920 has nothing left to roll back and a
+    // reappraisal reaches its revenue directly. That is the whole point of carrying two tax years.
+    await page.goto(`/district/${NORTHERN}/taxes`);
+    await expect(page.locator("h1")).toHaveText("Northern Local");
+    await expect(page.locator(`.subnav a[aria-current="page"]`)).toHaveText("Property tax");
+    const change = page.locator(".card", { hasText: "TY2023 to TY2024" });
+    await expect(change).toContainText("at the");
+    await expect(change).toContainText("reduction factors have stopped operating");
+    await expect(change).toContainText("A reappraisal is a revenue event here");
+  });
+
+  test("a district above the floor is told they are operative", async ({ page }) => {
+    await page.goto("/district/044933/taxes");
+    const change = page.locator(".card", { hasText: "TY2023 to TY2024" });
+    await expect(change).toContainText("above the");
+    await expect(change).toContainText("reduction factors are fully operative");
+  });
+
+  test("the base is broken into the classes that are reduced separately", async ({ page }) => {
+    await page.goto(`/district/${NORTHERN}/taxes`);
+    const base = page.locator(".card", { hasText: "What the tax base is made of" });
+    for (const label of ["Residential", "Agricultural", "Commercial", "Public utility"]) {
+      await expect(base.locator('[data-chart="tax-base"]')).toContainText(label);
+    }
+  });
+
+  test("names the department it came from, which is not the usual one", async ({ page }) => {
+    // Every other page reads the Department of Education. This one reads Taxation, and says so —
+    // along with the fact that where the two overlap they agree.
+    await page.goto(`/district/${NORTHERN}/taxes`);
+    const source = page.locator(".card", { hasText: "Where these figures come from" });
+    await expect(source).toContainText("Ohio Department of Taxation");
+    await expect(source).toContainText("to 0.01 mills");
+  });
+});
+
+test.describe("spending by function", () => {
+  test("splits operating spending and keeps it apart from the audited actuals", async ({ page }) => {
+    await page.goto(`/district/${CLEVELAND}/finances`);
+    const card = page.locator(".card", { hasText: "Where the money went" });
+    await expect(card).toBeVisible();
+    for (const fn of ["Instruction", "Pupil transportation", "General administration"]) {
+      await expect(card.locator("tbody")).toContainText(fn);
+    }
+    // The department's two roll-ups, which partition the total exactly.
+    await expect(card.locator("tbody")).toContainText("Classroom instruction");
+    await expect(card.locator("tbody")).toContainText("Everything else");
+    // And the separation this page exists to preserve.
+    await expect(card).toContainText("not the audited actuals above");
+    await expect(card).toContainText("unweighted ADM");
+  });
+
+  test("a district with no report-card row says so rather than showing zero", async ({ page }) => {
+    // Two of the 609 have no spending row. Rendering them as $0 across every function would be a
+    // finding about their spending rather than about the file.
+    await page.goto("/district/046797/finances");
+    await expect(page.getByText("No report-card spending row is published")).toBeVisible();
+  });
+});
