@@ -98,6 +98,21 @@ export const OntologyEdgeSchema = z
   })
   .strict();
 
+/**
+ * Whether a class's declared `edges:` are the permitted set or an illustrative one.
+ *
+ * The corpus behaves as though they are illustrative and always has: 46 of the 90 relationships in
+ * use are undeclared, almost all of them single-use precise verbs — `recovered-funds-from`,
+ * `retreats-from`, `reframes` — that say something a generic edge would lose. That was previously
+ * unstated, so a validator had no way to tell a deliberate coinage from a typo and every one of
+ * them produced a warning.
+ *
+ * Stating it turns the check into something useful in both directions. `characteristic` means the
+ * list documents what the class is defined by, and an undeclared relationship is fine.
+ * `exhaustive` means the vocabulary is closed and anything outside it is an error.
+ */
+export const EdgePolicySchema = z.enum(["characteristic", "exhaustive"]);
+
 /** One ontology class — the schema the corpus writes for itself. */
 export const OntologyClassSchema = z
   .object({
@@ -109,9 +124,24 @@ export const OntologyClassSchema = z
       .strict()
       .optional(),
     properties: z.array(OntologyPropertySchema).default([]),
+    /**
+     * Required, and with no default on purpose. A class that has not said which it means is a
+     * class nobody has decided about, and defaulting would let that go unnoticed forever.
+     */
+    edge_policy: EdgePolicySchema,
     edges: z.array(OntologyEdgeSchema).default([]),
   })
   .strict();
+
+/**
+ * A per-node observation snapshot rather than a schema property.
+ *
+ * `fy2024_profile`, `fy2021_idea_part_b`, `fy2027_scale` — a year's figures pasted onto the node
+ * they describe. They recur, so they are not typos, but declaring them would mean editing an
+ * ontology every fiscal year to permit next year's. The year in the name is what makes them
+ * self-describing, and it is what this matches on.
+ */
+export const OBSERVATION_PROPERTY = /^fy\d{4}(_\d{2})?_[a-z0-9_]+$/;
 
 export type NodeFile = z.infer<typeof NodeSchema>;
 export type OntologyFile = z.infer<typeof OntologyClassSchema>;

@@ -141,16 +141,26 @@ classes, plus the cross-file checks a per-file schema cannot make: that every no
 of a class that exists, that every link target resolves to something, and that every target is a
 shape this site can turn into a URL.
 
-The line between an error and a warning is drawn on measurement, not taste. **94% of properties**
-and only **68% of relationships** are declared in their class's own ontology. The property
-vocabulary is effectively closed; the relationship vocabulary plainly is not — ninety-odd distinct
-relationships, most used once, describing genuinely different connections. Enforcing the ontology's
-list would reject a third of the corpus's edges. So structure is an error and vocabulary is a
-warning: 93 of them, listed by `pnpm corpus:report`.
+The line between an error and a warning was drawn on measurement, not taste — and measuring it
+answered a question the corpus had never stated. **94% of properties** were declared in their
+class's own ontology; only **68% of relationships** were. The property vocabulary is effectively
+closed. The relationship vocabulary plainly is not: 90 distinct relationships against 65 declared,
+and the undeclared 46 are almost all single-use precise verbs — `recovered-funds-from`,
+`retreats-from`, `reframes` — that say something a generic edge would lose.
 
-That asymmetry is worth a decision at some point. If the relationship vocabulary is meant to be
-open, the `edges:` in an ontology file are documentation rather than a constraint, and it would be
-worth saying so there.
+So each class now says which it means. `edge_policy: characteristic`, which all 13 currently are,
+means `edges:` documents what the class is *defined by* rather than bounding what may be said about
+it. `exhaustive` closes the vocabulary and makes anything outside it an error. It is required with
+no default, so a class nobody has decided about cannot pass silently.
+
+The property warnings turned out to be nine names that split cleanly: four genuine omissions from
+the ontologies — `boundary_note`, `series`, `results`, `procedural_history` — now declared, and
+five year-stamped observation snapshots like `fy2024_profile`, which recur but would mean editing
+an ontology every fiscal year to permit next year's, and are allowed by naming convention instead.
+
+`pnpm corpus:report` now reports **0 errors and 0 warnings**. That is the point of having stated
+the policy: the next undeclared property name is a typo or a decision, rather than one of 93 lines
+nobody reads.
 
 ### And in the editor, which is where it actually helps
 

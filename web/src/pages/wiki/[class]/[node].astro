@@ -112,15 +112,6 @@ const summary = node.description.replace(/\s+/g, " ").replace(/\[[^\]]*\]\([^)]*
   <div class="card">
     <h2>Links</h2>
     {
-      node.proseLinks && (
-        <p class="note">
-          This node writes its links as a paragraph rather than as the structured list every other
-          node uses, so they carry no relationship names. They are recovered from the prose below
-          and are listed as mentions.
-        </p>
-      )
-    }
-    {
       stated.length > 0 && (
         <div class="scroll">
           <table class="prose">

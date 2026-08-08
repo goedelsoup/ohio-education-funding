@@ -81,9 +81,28 @@ fn toml_field(text: &str, key: &str) -> Option<String> {
         .filter(|value| !value.is_empty())
 }
 
-/// Count markdown links pointing out of a file.
-fn outgoing_links(text: &str) -> usize {
-    text.match_indices("](").count()
+/// How many *other corpus nodes* this node's text references.
+///
+/// The exact mirror of the inbound count in [`corpus_index`], and deliberately so. This used to be
+/// `text.match_indices("](").count()` — every markdown link in the file, which is a different
+/// quantity in three ways at once: it counted prose citations only and never the structured
+/// `links:` list, it counted links to the catalog and to `crates/` as though they were edges, and
+/// it counted the same target twice if a node mentioned it twice.
+///
+/// The effect was that the column measured how *chatty* a node's prose was rather than what it
+/// pointed at. Converting `scenario/guarantee-phase-out` from a prose links block to a structured
+/// one moved its edges out of the text and its reported out-degree fell from 15 to 4: the node
+/// became correct and the number got worse, which is the signature of a metric measuring the
+/// wrong thing.
+///
+/// Matching on `<slug>.yml` catches both forms, because a structured `target:` and a markdown link
+/// both contain the filename. Verified free of suffix collisions across all 62 slugs — no node's
+/// filename ends with another's.
+fn outgoing_links(text: &str, slugs: &[&str], self_slug: &str) -> usize {
+    slugs
+        .iter()
+        .filter(|slug| **slug != self_slug && text.contains(&format!("{slug}.yml")))
+        .count()
 }
 
 fn read(root: &Path, relative: &str) -> String {
@@ -136,13 +155,15 @@ fn corpus_index(root: &Path) -> String {
         inbound.insert(slug.as_str(), count);
     }
 
+    let slugs: Vec<&str> = nodes.iter().map(|(_, slug, _, _)| slug.as_str()).collect();
+
     let mut out = String::from("| Node | Class | Label | Out | In |\n|---|---|---|--:|--:|\n");
     for (class, slug, relative, text) in &nodes {
         let label = field(text, "label").unwrap_or_else(|| slug.clone());
         let path = relative.trim_start_matches(".yidam/corpus/");
         out.push_str(&format!(
             "| [`{slug}`]({path}) | {class} | {label} | {} | {} |\n",
-            outgoing_links(text),
+            outgoing_links(text, &slugs, slug),
             inbound.get(slug.as_str()).copied().unwrap_or(0)
         ));
     }
@@ -477,6 +498,56 @@ mod tests {
     #[test]
     fn an_unknown_block_is_an_error_rather_than_a_silent_skip() {
         assert!(generate("yidam invented-command", &repository_root()).is_none());
+    }
+
+    #[test]
+    fn every_edge_is_counted_once_from_each_end() {
+        // Out and In are the same relation read in opposite directions, so their totals have to
+        // agree. That is worth asserting because they were computed by unrelated code for a long
+        // time: Out counted markdown links in the prose and In counted nodes mentioning a slug,
+        // and nothing would have told anyone the column headings implied a symmetry the numbers
+        // did not have.
+        let root = repository_root();
+        let nodes = corpus_nodes(&root);
+        let slugs: Vec<&str> = nodes.iter().map(|(_, slug, _, _)| slug.as_str()).collect();
+
+        let out: usize = nodes
+            .iter()
+            .map(|(_, slug, _, text)| outgoing_links(text, &slugs, slug))
+            .sum();
+        let inbound: usize = slugs
+            .iter()
+            .map(|slug| {
+                let needle = format!("{slug}.yml");
+                nodes
+                    .iter()
+                    .filter(|(_, other, _, text)| other != slug && text.contains(&needle))
+                    .count()
+            })
+            .sum();
+
+        assert_eq!(out, inbound, "the graph's two directions disagree");
+        assert!(
+            out > 0,
+            "no edges found at all, which means the match is broken"
+        );
+    }
+
+    #[test]
+    fn a_structured_link_counts_as_much_as_a_prose_one() {
+        // The defect this replaced. A node that declares its edges in `links:` and a node that
+        // writes the same edges as sentences have the same out-degree; the old counter saw only
+        // the second, so moving a node from prose to structure made its number fall.
+        let slugs = ["adequacy", "equity"];
+        let structured =
+            "links:\n  - target: ../doctrine/adequacy.yml\n    relationship: bears-on\n";
+        let prose = "Bears on [adequacy](../doctrine/adequacy.yml).\n";
+        assert_eq!(outgoing_links(structured, &slugs, "x"), 1);
+        assert_eq!(outgoing_links(prose, &slugs, "x"), 1);
+
+        // And a target named twice is one edge, not two.
+        let twice = "[adequacy](../doctrine/adequacy.yml) and again ../doctrine/adequacy.yml";
+        assert_eq!(outgoing_links(twice, &slugs, "x"), 1);
     }
 
     #[test]

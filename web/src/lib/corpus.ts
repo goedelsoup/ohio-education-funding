@@ -15,12 +15,16 @@
  *
  * # Two things the corpus does that a naive reader would get wrong
  *
- * **Links are not all in `links:`.** One node — `scenario/guarantee-phase-out` — writes its
- * outgoing links as a prose paragraph rather than the structured list every other node uses. It
- * is valid YAML, so nothing complains, and a graph built only from `links:` silently loses all
- * fifteen of its edges. Worse, the same is true in miniature everywhere: node descriptions are
- * dense with inline markdown links that no structured field records. So the graph here is built
- * from both, and {@link Edge.stated} says which kind each edge is.
+ * **Links are not all in `links:`.** Node descriptions are dense with inline markdown links that
+ * no structured field records, two nodes carry a `findings:` block, and property values contain
+ * them too. A graph built from `links:` alone loses most of the corpus's cross-referencing, so
+ * this reads all four places and {@link Edge.stated} says which kind each edge is.
+ *
+ * One node used to write its entire `links:` block as a prose paragraph — valid YAML, so nothing
+ * complained, and its fifteen edges were invisible to every consumer including its own
+ * `instance-of`. It is structured now and `schema/corpus.ts` rejects the shape, but the parsing
+ * here stays tolerant of it: the reader's job is to get far enough to report what is wrong, and
+ * the schema's job is to stop the build.
  *
  * **Claims carry their epistemic status inline.** `[verified]`, `[inference]` and `[open]` are a
  * corpus-wide convention, sometimes with a justification attached — `[verified — computed; see
@@ -38,6 +42,7 @@ import * as routes from "./routes.ts";
 import {
   diagnose,
   NodeSchema,
+  OBSERVATION_PROPERTY,
   OntologyClassSchema,
   type Diagnostic,
 } from "./schema/corpus.ts";
@@ -99,13 +104,6 @@ export interface Node {
   out: Edge[];
   /** Populated after every node is read. */
   in: { id: string; label: string; href: string; relationship?: string; stated: boolean }[];
-  /**
-   * True where the node wrote `links:` as prose rather than as a list.
-   *
-   * Surfaced rather than smoothed over: the page says so, because a reader comparing this node to
-   * any other will notice it has no relationship names and should know why.
-   */
-  proseLinks: boolean;
 }
 
 /** One ontology class: what a kind of node is, and what may be said about it. */
@@ -114,6 +112,11 @@ export interface OntologyClass {
   label: string;
   description: string;
   foundationalType: string | null;
+  /**
+   * Whether {@link edges} is the permitted set or an illustrative one. Declared per class in the
+   * ontology file; see `EdgePolicySchema`.
+   */
+  edgePolicy: "characteristic" | "exhaustive";
   properties: { name: string; type: string; description: string }[];
   edges: { relationship: string; target: string; direction: string; description: string }[];
   nodes: Node[];
@@ -341,7 +344,6 @@ function readNode(className: string, file: string, report: Diagnostic[]): Node {
     findings: parsed.findings == null ? null : String(parsed.findings),
     out: [...stated, ...inline],
     in: [],
-    proseLinks: typeof rawLinks === "string",
   };
 }
 
@@ -366,6 +368,7 @@ function readClass(file: string, report: Diagnostic[]): Omit<OntologyClass, "nod
     className: String(parsed.class ?? file.replace(/\.ont\.yml$/, "")),
     label: String(parsed.label ?? ""),
     description: String(parsed.description ?? ""),
+    edgePolicy: parsed.edge_policy === "exhaustive" ? "exhaustive" : "characteristic",
     foundationalType: foundational?.type
       ? `${foundational.type}${foundational.ontology ? ` (${foundational.ontology})` : ""}`
       : null,
@@ -461,23 +464,38 @@ function validate(
       // `instance-of` and `sourced-from` are corpus-wide conventions rather than per-class edges,
       // so no ontology declares them and complaining about them would be noise on every node.
       const universal = edge.relationship === "instance-of" || edge.relationship === "sourced-from";
-      if (edge.relationship && !universal && !declaredEdges.has(edge.relationship)) {
+      if (
+        edge.relationship &&
+        !universal &&
+        !declaredEdges.has(edge.relationship) &&
+        // Only for classes that have declared their vocabulary closed. The rest say outright that
+        // `edges:` documents what they are defined by rather than bounding what may be said.
+        ontology.edgePolicy === "exhaustive"
+      ) {
         report.push({
           file,
-          severity: "warning",
-          message: `relationship "${edge.relationship}" is not declared by ${node.className}.ont.yml`,
+          severity: "error",
+          message:
+            `relationship "${edge.relationship}" is not declared by ${node.className}.ont.yml, ` +
+            `which sets edge_policy: exhaustive`,
         });
       }
     }
 
+    /*
+     * Properties are the other way round from relationships, and the numbers say so: 94% were
+     * declared, and the handful that were not turned out to be four genuine omissions in the
+     * ontologies plus five year-stamped observation snapshots. The omissions are declared now, so
+     * this check is expected to be silent — which is what makes it worth keeping. An undeclared
+     * property name is a typo or a decision, not background noise.
+     */
     for (const property of node.properties) {
-      if (!declaredProps.has(property.name)) {
-        report.push({
-          file,
-          severity: "warning",
-          message: `property "${property.name}" is not declared by ${node.className}.ont.yml`,
-        });
-      }
+      if (declaredProps.has(property.name) || OBSERVATION_PROPERTY.test(property.name)) continue;
+      report.push({
+        file,
+        severity: "warning",
+        message: `property "${property.name}" is not declared by ${node.className}.ont.yml`,
+      });
     }
   }
 }

@@ -41,7 +41,7 @@ with a recorded reason. See
   charge-off millage series with its statutory authority, and reports the residual its
   decomposition cannot explain
 
-**`deduction` is declared and not built.** It listed here as though it existed for long enough
+**`deduction` is declared and not built.** It was listed here as though it existed for long enough
 that the web layer's "what is not modelled" note was written from this file rather than from the
 workspace. There is a [skill describing what it would compute](../.yidam/skills/deduction.md) —
 the amount and student count leaving a resident district through each `program`, and critically
@@ -127,7 +127,7 @@ Fields per crate: name, capability type (connector/calculator/feature-engineerin
 | Crate | Description | `#[test]` fns |
 |---|---|--:|
 | [`bundle`](bundle/) | Export a versioned JSON feed of the corpus's district-level findings for the web layer | 18 |
-| [`connect`](connect/) | Retrieval and extraction: the department's publications into committed fixtures | 82 |
+| [`connect`](connect/) | Retrieval and extraction: the department's publications into committed fixtures | 84 |
 | [`deflate`](deflate/) | Convert nominal Ohio school finance figures to constant dollars, fiscal-year aligned | 11 |
 | [`dispersion`](dispersion/) | School finance equity statistics: dispersion and wealth neutrality across agencies | 70 |
 | [`edfund-core`](edfund-core/) | Shared domain types for the Ohio education funding computer | 7 |
@@ -139,7 +139,7 @@ Fields per crate: name, capability type (connector/calculator/feature-engineerin
 | [`scenario-delta`](scenario-delta/) | Winners and losers between two funding runs, with incidence and the off-formula count | 23 |
 | [`spreadsheet`](spreadsheet/) | Read the department's published workbooks with no dependencies | 70 |
 
-12 crates, 466 test functions, no crates.io dependencies. `cargo test` reports a different total: it adds doc-tests and counts each integration binary separately.
+12 crates, 468 test functions, no crates.io dependencies. `cargo test` reports a different total: it adds doc-tests and counts each integration binary separately.
 <!-- /REGEN -->
 
 ## Index status

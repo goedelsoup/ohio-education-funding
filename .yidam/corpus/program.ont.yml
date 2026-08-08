@@ -27,6 +27,16 @@ properties:
   - name: appropriation_line
     type: string
     description: Budget line item identifier
+# `edges:` below names the relationships this class is *defined by* — the ones a reader needs to
+# understand what it connects to. It is not the permitted set. Measured across the corpus, 46 of
+# the 90 relationships in use are undeclared, and almost all of them are single-use precise verbs
+# (`recovered-funds-from`, `retreats-from`, `reframes`) that say something a generic edge would
+# lose. Closing the vocabulary would either reject a third of the graph's edges or bloat every
+# ontology with declarations that each describe one link.
+#
+# Set this to `exhaustive` on a class whose vocabulary is deliberately closed, and the validator
+# will reject anything undeclared on it instead of reporting it.
+edge_policy: characteristic
 edges:
   - relationship: diverts-from
     target: education-agency

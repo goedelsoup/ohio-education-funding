@@ -15,7 +15,11 @@ import YAML from "yaml";
 
 import { loadCorpus, resolveTarget } from "../../src/lib/corpus.ts";
 import { loadFeed } from "../../src/lib/feed.ts";
-import { NodeSchema, OntologyClassSchema } from "../../src/lib/schema/corpus.ts";
+import {
+  NodeSchema,
+  OBSERVATION_PROPERTY,
+  OntologyClassSchema,
+} from "../../src/lib/schema/corpus.ts";
 import { BundleSchema } from "../../src/lib/schema/feed.ts";
 
 const raw: unknown = JSON.parse(
@@ -126,6 +130,54 @@ test("every corpus file on disk parses and validates individually", () => {
     if (!parsed.success) failures.push(`${entry.className}.ont: ${parsed.error.issues[0]?.message}`);
   }
   expect(failures).toEqual([]);
+});
+
+test("every class states whether its edge vocabulary is open", () => {
+  // Required with no default, so a class nobody has decided about cannot pass silently. All 13
+  // currently say `characteristic`, which is what the corpus has always done and never said.
+  const corpus = loadCorpus();
+  for (const entry of corpus.classes) {
+    expect(["characteristic", "exhaustive"]).toContain(entry.edgePolicy);
+  }
+  expect(corpus.classes).toHaveLength(13);
+});
+
+test("an ontology missing edge_policy is rejected", () => {
+  const withoutPolicy = {
+    class: "metric",
+    label: "Metric",
+    description: "A measure.",
+    properties: [],
+    edges: [],
+  };
+  expect(OntologyClassSchema.safeParse(withoutPolicy).success).toBe(false);
+  expect(
+    OntologyClassSchema.safeParse({ ...withoutPolicy, edge_policy: "characteristic" }).success,
+  ).toBe(true);
+  // And it is an enum, so a typo is not quietly treated as "open".
+  expect(OntologyClassSchema.safeParse({ ...withoutPolicy, edge_policy: "open" }).success).toBe(
+    false,
+  );
+});
+
+test("the corpus is clean under the policy it declares", () => {
+  // The point of stating the policy: what is left is signal. 46 undeclared relationships were
+  // noise against an unstated assumption; the four undeclared properties were real omissions and
+  // are now declared. Zero of either should remain.
+  const diagnostics = loadCorpus().diagnostics;
+  expect(diagnostics.map((d) => `${d.severity} ${d.file}: ${d.message}`)).toEqual([]);
+});
+
+test("a year-stamped observation is allowed where a bare property name would not be", () => {
+  // `fy2024_profile` recurs across agency nodes and is a snapshot rather than a schema property.
+  // Declaring it would mean editing an ontology every fiscal year to permit next year's.
+  expect(OBSERVATION_PROPERTY.test("fy2024_profile")).toBe(true);
+  expect(OBSERVATION_PROPERTY.test("fy2021_idea_part_b")).toBe(true);
+  expect(OBSERVATION_PROPERTY.test("fy2026_27_appropriation")).toBe(true);
+  // Not a licence for anything unrecognised.
+  expect(OBSERVATION_PROPERTY.test("profile")).toBe(false);
+  expect(OBSERVATION_PROPERTY.test("fy_profile")).toBe(false);
+  expect(OBSERVATION_PROPERTY.test("notes")).toBe(false);
 });
 
 test("a bare class name resolves to that class's page", () => {

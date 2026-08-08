@@ -59,6 +59,13 @@
         "additionalProperties": false
       }
     },
+    "edge_policy": {
+      "type": "string",
+      "enum": [
+        "characteristic",
+        "exhaustive"
+      ]
+    },
     "edges": {
       "default": [],
       "type": "array",
@@ -98,7 +105,8 @@
   "required": [
     "class",
     "label",
-    "description"
+    "description",
+    "edge_policy"
   ],
   "additionalProperties": false
 }
