@@ -88,8 +88,11 @@ pub const FY27_HEADER: &[&str] = &[
     "agi_ty24",
     "agi_ty23",
     "agi_ty22",
-    "tax_returns_ty24",
-    "median_income_ty22",
+    "tax_returns",
+    "federal_median_income",
+    "statewide_median_income",
+    "benchmark_ratio",
+    "capacity_rate",
 ];
 
 /// Column positions in the department's `Base_Cost` sheet, whose header is on the fourth row.
@@ -162,26 +165,39 @@ mod detail_columns {
     pub const STATE_SHARE: usize = 8;
 }
 
-/// Column positions in the `Valuation & Income` sheet.
+/// Column positions in the `Local_Capacity` sheet, whose header is on the second row.
 ///
-/// The income half of the local capacity measure, which this repository spent several phases
-/// believing it did not hold. Three tax years of assessed valuation and three of federal
-/// adjusted gross income, per district.
-mod valuation_income_columns {
+/// The whole of R.C. 3317.017 worked step by step, with the statute's own labels — `[V1]`, `[I1]`,
+/// `[C1]` through `[C7]`. Reading the `Valuation & Income` sheet instead and inferring the rest
+/// produced a capacity 4.4% light, and every inferred input turned out to be the wrong one:
+///
+/// - The third term is **federal** median income, not the Ohio median the profile report
+///   publishes. For Columbus that is $46,395 against $31,555.
+/// - It carries an adjustment factor, as does the tax-return count, and both are applied before
+///   the blend. Columbus's adjusted return count is 272,169 against a raw 142,349.
+/// - The statewide figure the ratio divides by is the **federal** statewide median, $54,546.64,
+///   not the median of district medians.
+/// - The benchmark is published per row rather than needing reconstruction: 1.46504.
+mod capacity_columns {
     pub const IRN: usize = 0;
+    /// `[V2] TY25 Total Valuation` and the two years behind it.
     pub const VALUATION_TY25: usize = 3;
     pub const VALUATION_TY24: usize = 4;
     pub const VALUATION_TY23: usize = 5;
-    pub const AGI_TY24: usize = 6;
-    pub const AGI_TY23: usize = 7;
-    pub const AGI_TY22: usize = 8;
-}
-
-/// Column positions in `# Tax Returns Projection 27`, whose header is on the second row.
-mod tax_return_columns {
-    pub const IRN: usize = 0;
-    /// The projected count the FY2027 simulation uses.
-    pub const RETURNS_TY24: usize = 18;
+    /// `[I2]`/`[I3]` carry an adjustment factor; `[I4]` is raw.
+    pub const AGI_TY24: usize = 7;
+    pub const AGI_TY23: usize = 8;
+    pub const AGI_TY22: usize = 9;
+    /// `[I5] TY23 Federal Median Income with ADJ Factor`.
+    pub const FEDERAL_MEDIAN_INCOME: usize = 11;
+    /// `[I6] TY23 Number of State Tax Returns with ADJ Factor`.
+    pub const TAX_RETURNS: usize = 12;
+    /// `[I7] TY23 Statewide Federal Median Income`.
+    pub const STATEWIDE_MEDIAN_INCOME: usize = 13;
+    /// `[C5] Ratio Calculated in C4 for the 40th Highest District` — the benchmark, published.
+    pub const BENCHMARK_RATIO: usize = 19;
+    /// `[C6] Local Capacity Percentage`.
+    pub const CAPACITY_RATE: usize = 20;
 }
 
 /// Column positions in the `ADM Data` sheet.
@@ -210,14 +226,6 @@ mod adm_columns {
 mod profile_columns {
     pub const NAME: usize = 0;
     pub const IRN: usize = 1;
-    /// `Ohio Median Income TY22` — the district's median, and the income measure the local
-    /// capacity blend's third term actually uses.
-    ///
-    /// The `millage`-era doc for `local-capacity` describes this term as *federal* median income.
-    /// The data disagrees: taking the Ohio median reproduces the department's published capacity
-    /// under a rate that follows the statutory scale to the decile, and the federal figure the
-    /// profile publishes beside it is an **average** rather than a median in any case.
-    pub const MEDIAN_INCOME: usize = 31;
     pub const ENROLLED_ADM: usize = 4;
     pub const ECON_DISADVANTAGED: usize = 11;
     pub const VALUATION_PER_PUPIL: usize = 21;
@@ -236,8 +244,7 @@ pub fn build_fy27_model(
     adm_rows: &[Vec<String>],
     profile_rows: &[Vec<String>],
     detail_rows: &[Vec<String>],
-    valuation_income_rows: &[Vec<String>],
-    tax_return_rows: &[Vec<String>],
+    capacity_rows: &[Vec<String>],
 ) -> Vec<Vec<String>> {
     use base_cost_columns as bc;
 
@@ -254,17 +261,11 @@ pub fn build_fy27_model(
         .filter(|row| !cell(row, detail_columns::IRN).trim().is_empty())
         .map(|row| (cell(row, detail_columns::IRN).trim(), row))
         .collect();
-    let valuation_income: HashMap<&str, &Vec<String>> = valuation_income_rows
-        .iter()
-        .skip(1)
-        .filter(|row| !cell(row, valuation_income_columns::IRN).trim().is_empty())
-        .map(|row| (cell(row, valuation_income_columns::IRN).trim(), row))
-        .collect();
-    let tax_returns: HashMap<&str, &Vec<String>> = tax_return_rows
+    let capacity: HashMap<&str, &Vec<String>> = capacity_rows
         .iter()
         .skip(2)
-        .filter(|row| !cell(row, tax_return_columns::IRN).trim().is_empty())
-        .map(|row| (cell(row, tax_return_columns::IRN).trim(), row))
+        .filter(|row| !cell(row, capacity_columns::IRN).trim().is_empty())
+        .map(|row| (cell(row, capacity_columns::IRN).trim(), row))
         .collect();
 
     let valuation: Vec<(&str, &Vec<String>)> = profile_rows
@@ -372,33 +373,25 @@ pub fn build_fy27_model(
             ),
         ]);
 
-        let vi = valuation_income.get(irn);
-        for column in [
-            valuation_income_columns::VALUATION_TY25,
-            valuation_income_columns::VALUATION_TY24,
-            valuation_income_columns::VALUATION_TY23,
-            valuation_income_columns::AGI_TY24,
-            valuation_income_columns::AGI_TY23,
-            valuation_income_columns::AGI_TY22,
+        let cap = capacity.get(irn);
+        for (column, places) in [
+            (capacity_columns::VALUATION_TY25, 2),
+            (capacity_columns::VALUATION_TY24, 2),
+            (capacity_columns::VALUATION_TY23, 2),
+            (capacity_columns::AGI_TY24, 2),
+            (capacity_columns::AGI_TY23, 2),
+            (capacity_columns::AGI_TY22, 2),
+            (capacity_columns::TAX_RETURNS, 4),
+            (capacity_columns::FEDERAL_MEDIAN_INCOME, 4),
+            (capacity_columns::STATEWIDE_MEDIAN_INCOME, 4),
+            (capacity_columns::BENCHMARK_RATIO, 8),
+            (capacity_columns::CAPACITY_RATE, 10),
         ] {
-            let value = vi.and_then(|row| cell_number(row, column));
+            let value = cap.and_then(|row| cell_number(row, column));
             out.last_mut()
                 .expect("just pushed")
-                .push(format_value(value, 2));
+                .push(format_value(value, places));
         }
-        let returns = tax_returns
-            .get(irn)
-            .and_then(|row| cell_number(row, tax_return_columns::RETURNS_TY24));
-        out.last_mut()
-            .expect("just pushed")
-            .push(format_value(returns, 2));
-        let median_income = valuation
-            .iter()
-            .find(|(key, _)| *key == irn)
-            .and_then(|(_, profile)| cell_number(profile, profile_columns::MEDIAN_INCOME));
-        out.last_mut()
-            .expect("just pushed")
-            .push(format_value(median_income, 2));
     }
     out
 }
@@ -1295,7 +1288,6 @@ mod tests {
             &profile_rows(),
             &[],
             &[],
-            &[],
         )
     }
 
@@ -1390,7 +1382,6 @@ mod tests {
             &profile_rows(),
             &[],
             &[],
-            &[],
         );
         assert!(rows.is_empty());
     }
@@ -1404,7 +1395,6 @@ mod tests {
             &summary_rows(),
             &adm_rows(),
             &profile_rows(),
-            &[],
             &[],
             &[],
         );
@@ -1425,7 +1415,6 @@ mod tests {
             &profile_rows(),
             &[],
             &[],
-            &[],
         );
         assert!(!rows[1][1].contains(','));
         assert_eq!(rows[1][1], "Northern Local  Perry");
@@ -1440,7 +1429,6 @@ mod tests {
             &summary_rows(),
             &adm_rows(),
             &profile_rows(),
-            &[],
             &[],
             &[],
         );

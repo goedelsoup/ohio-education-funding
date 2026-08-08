@@ -118,11 +118,25 @@ pub struct DistrictRecord {
     pub agi_three_year: [Dollars; 3],
     /// Tax returns filed in the district, the count the median-income term multiplies.
     pub tax_returns: Option<f64>,
-    /// The district's median income, the third term of the blend.
+    /// `[I5] TY23 Federal Median Income with ADJ Factor` — the blend's third term.
     ///
-    /// The **Ohio** median, which is what the profile report publishes and what reproduces the
-    /// department's own capacity figure. See `formula-component/fsfp-local-capacity-measure`.
+    /// **Federal**, and adjusted. An earlier pass here inferred the term from the profile report's
+    /// Ohio median income, because the `Local_Capacity` sheet that states all of this had not been
+    /// opened. That fits approximately — well enough to look right — and is the wrong measure:
+    /// Columbus's federal median is $46,395 against an Ohio median of $31,555.
     pub median_income: Option<Dollars>,
+    /// `[I7] TY23 Statewide Federal Median Income` — the denominator of the income ratio.
+    ///
+    /// $54,546.64, published on the sheet rather than derivable. The median of district medians
+    /// is $41,502 and is a different quantity.
+    pub statewide_median_income: Option<Dollars>,
+    /// `[C5]` — the income ratio of the 40th highest district, which tops out the sliding scale.
+    ///
+    /// Published rather than reconstructed. Reconstructing it from the panel gave 1.4151 against
+    /// a published 1.46504, and it is a discretionary number rather than a derived one.
+    pub benchmark_ratio: Option<f64>,
+    /// `[C6] Local Capacity Percentage` — the rate, as the department computes it.
+    pub published_capacity_rate: Option<f64>,
     /// Temporary transitional aid guarantee.
     pub guarantee: Dollars,
     /// Enrolled ADM in each of [`HISTORY_YEARS`].
@@ -262,8 +276,11 @@ mod column {
     pub const AGI_TY24: usize = 32;
     pub const AGI_TY23: usize = 33;
     pub const AGI_TY22: usize = 34;
-    pub const TAX_RETURNS_TY24: usize = 35;
-    pub const MEDIAN_INCOME_TY22: usize = 36;
+    pub const TAX_RETURNS: usize = 35;
+    pub const FEDERAL_MEDIAN_INCOME: usize = 36;
+    pub const STATEWIDE_MEDIAN_INCOME: usize = 37;
+    pub const BENCHMARK_RATIO: usize = 38;
+    pub const PUBLISHED_CAPACITY_RATE: usize = 39;
 }
 
 /// The header this loader expects, so a fixture reshaped without updating [`column`] fails
@@ -273,7 +290,7 @@ adm_kindergarten,adm_grades_1_3,adm_grades_4_8_non_cte,adm_grades_9_12_non_cte,a
 adm_grades_9_12_total,funded_classroom_teachers,funded_special_teachers,teacher_base_cost,\
 aggregate_base_cost,base_cost_per_pupil,temp_transitional_aid_guarantee,enrolled_adm_fy24,\
 enrolled_adm_fy25,enrolled_adm_fy26,assessed_valuation_per_pupil_fy23,core_foundation_funding,\
-base_cost_state_share,total_state_support,total_transfers,service_center_charge,other_adjustments,net_state_funding,capacity_per_pupil,state_share_percentage,valuation_ty25,valuation_ty24,valuation_ty23,agi_ty24,agi_ty23,agi_ty22,tax_returns_ty24,median_income_ty22";
+base_cost_state_share,total_state_support,total_transfers,service_center_charge,other_adjustments,net_state_funding,capacity_per_pupil,state_share_percentage,valuation_ty25,valuation_ty24,valuation_ty23,agi_ty24,agi_ty23,agi_ty22,tax_returns,federal_median_income,statewide_median_income,benchmark_ratio,capacity_rate";
 
 /// Every district in the department's FY2027 model.
 ///
@@ -342,8 +359,11 @@ pub fn panel() -> Vec<DistrictRecord> {
                     required(column::AGI_TY23),
                     required(column::AGI_TY22),
                 ],
-                tax_returns: number(column::TAX_RETURNS_TY24),
-                median_income: number(column::MEDIAN_INCOME_TY22),
+                tax_returns: number(column::TAX_RETURNS),
+                median_income: number(column::FEDERAL_MEDIAN_INCOME),
+                statewide_median_income: number(column::STATEWIDE_MEDIAN_INCOME),
+                benchmark_ratio: number(column::BENCHMARK_RATIO),
+                published_capacity_rate: number(column::PUBLISHED_CAPACITY_RATE),
                 net_state_funding: required(column::NET_STATE_FUNDING),
                 guarantee: required(column::GUARANTEE),
                 adm_history: [

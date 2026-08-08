@@ -55,21 +55,16 @@ pub struct CapacityInputs {
     pub agi_recent: Dollars,
     /// Federal adjusted gross income for the three most recent tax years.
     pub agi_three_year: [Dollars; 3],
-    /// District median income for the income reference year.
+    /// District federal median income for the income reference year, **with the department's
+    /// adjustment factor already applied**.
     ///
-    /// # Which median, and an unresolved discrepancy
-    ///
-    /// The field is named for the **federal** median because that is how this crate's reading of
-    /// R.C. 3317.017 recorded it. The data does not agree. Feeding the district's **Ohio** median
-    /// income — the figure the District Profile Report publishes — reproduces the department's own
-    /// `[b1] Per Pupil Capacity Amount` under a rate that follows the statutory scale to the
-    /// decile; the federal figure published beside it is an *average* rather than a median, so it
-    /// cannot be the term in any case.
-    ///
-    /// The name is left alone rather than changed, because renaming it would assert something
-    /// about the statute that has not been checked against the statute. Settling it needs the text
-    /// of R.C. 3317.017, and `ohio-laws` is a declared connector blocked on the absence of a bulk
-    /// export. Until then the caller decides, and `crates/project` passes the Ohio median.
+    /// The workbook's `[I5] TY23 Federal Median Income with ADJ Factor`. Federal, as the name has
+    /// always said: an earlier pass here doubted that, on the strength of the district's Ohio
+    /// median income fitting the published capacity to within a few percent. It fits because the
+    /// two are correlated, not because it is the term — Columbus's federal median is $46,395
+    /// against an Ohio median of $31,555, and substituting one for the other leaves the whole
+    /// blend about 4% light. Fed the real figure, this crate reproduces the department's own
+    /// capacity for all 609 districts exactly.
     pub federal_median_income: Dollars,
     /// Number of tax returns filed in the district for the income reference year.
     pub tax_returns: f64,

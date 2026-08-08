@@ -89,33 +89,41 @@ description: |
   censored. [verified — `crates/project/tests/finances_and_the_guarantee.rs`]
 
   **The inputs are held too, and the record here said otherwise.** This node's calculator was
-  described as unimplementable because the repository had no income data at any level. It has: the
-  same workbook carries a `Valuation & Income` sheet with three tax years of assessed valuation
-  and three of federal adjusted gross income per district, and a `# Tax Returns Projection 27`
-  sheet with eight years of return counts. The District Profile Report supplies district median
-  income. Every argument the measure takes is in a cached file. [verified]
+  described as unimplementable because the repository had no income data at any level. It has, on
+  a sheet named `Local_Capacity` that works the entire statute step by step under its own labels —
+  `[V1]` and `[I1]` through `[C7]` — including the two figures that are choices rather than
+  derivations: the statewide federal median income and the benchmark ratio of the 40th highest
+  district. Every argument the measure takes is in a cached file, and has been since the first
+  import. [verified]
 
-  **And the blend reproduces the published figure.** Taking 60% of the lesser of recent and
-  three-year-average valuation, 20% of the same construction on adjusted gross income, and 20% of
-  median income times tax returns, the ratio of the department's published capacity to that
-  unrated blend behaves exactly as a capacity *rate* should:
+  **AND THE CALCULATOR REPRODUCES THE DEPARTMENT'S FIGURE EXACTLY — 609 OF 609 DISTRICTS, TO
+  WITHIN A HUNDREDTH OF A PERCENT, ON BOTH THE CAPACITY AND THE RATE.** [verified —
+  `crates/local-capacity/tests/against_the_departments_own_capacity.rs`] `crates/local-capacity`
+  was written from the statute and had never been run against anything. It is right.
 
-      income ratio to state median    implied rate
-      0.76                            1.70%
-      0.95                            2.15%
-      1.02                            2.29%
-      1.21                            2.43%
-      1.57                            2.56%
+  **How this was got wrong first, because the route matters more than the result.** An earlier
+  pass reconstructed the inputs from the workbook's `Valuation & Income` sheet and inferred the
+  rest, producing a capacity 4.4% light with a residual that correlated with none of the three
+  terms — a near-uniform scale error, which is the signature of a shared input rather than a
+  structural mistake. Chasing it turned up a sheet named `Local_Capacity` that works the entire
+  statute step by step, with its own labels, `[V1]` and `[I1]` through `[C7]`.
 
-  At a ratio of one the implied rate is 2.25%, which is the statutory scale's value there, and the
-  top decile is **61 of 61 districts within 0.15 points of the 2.5% cap**. [verified] The
-  structure and the sliding scale are both confirmed against the department's own output.
+  Every inferred input was the wrong one:
 
-  One correction falls out of it. This node describes the third term as **federal** median income.
-  The reproduction above uses the district's **Ohio** median income, which is what the profile
-  report publishes and what fits; the federal figure published beside it is an *average* rather
-  than a median. Which of the two the statute names should be checked against R.C. 3317.017
-  directly rather than against this corpus's own summary of it. [open]
+      term                        inferred              published            (Columbus)
+      median income               Ohio median 31,555    federal 46,395       [I5], adjusted
+      tax returns                 142,349               272,169              [I6], adjusted
+      statewide median income     41,502                54,546.64            [I7], federal
+      benchmark ratio             1.4151 reconstructed  1.46504              [C5], published
+
+  On the published inputs the residual is zero. **The 4.4% gap was not a finding about Ohio; it
+  was the cost of not opening a sheet.** [verified]
+
+  That also retracts a claim this node briefly carried. It said the third term is the district's
+  **Ohio** median income, on the evidence that substituting it fits to a few percent. It does fit,
+  because the two measures are correlated — and it is the wrong measure. The term is federal
+  median income with the department's adjustment factor, exactly as the crate always said, and
+  the earlier claim was marked verified on evidence that could not support it. [verified]
 properties:
   name: FSFP local capacity measure
   function: |

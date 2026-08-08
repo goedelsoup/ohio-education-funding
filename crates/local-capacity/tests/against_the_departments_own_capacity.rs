@@ -14,30 +14,15 @@
 use local_capacity::{local_capacity, CapacityInputs};
 use project::panel::{panel, DistrictRecord};
 
-/// The statewide median of district median incomes, and the benchmark ratio the scale tops out at.
+/// The statute's arguments, every one of them read rather than reconstructed.
 ///
-/// The benchmark is the **40th highest district** on the income ratio, per R.C. 3317.017. It is
-/// one discretionary number that sets the top of the entire scale, and the crate takes it as an
-/// argument rather than deriving it precisely because it is a choice rather than a fact.
-fn scale(records: &[DistrictRecord]) -> (f64, f64) {
-    let mut incomes: Vec<f64> = records
-        .iter()
-        .filter_map(|r| r.median_income)
-        .filter(|v| *v > 0.0)
-        .collect();
-    incomes.sort_by(|a, b| a.partial_cmp(b).unwrap());
-    let statewide_median = incomes[incomes.len() / 2];
-
-    let mut ratios: Vec<f64> = incomes.iter().map(|i| i / statewide_median).collect();
-    ratios.sort_by(|a, b| b.partial_cmp(a).unwrap());
-    (statewide_median, ratios[39])
-}
-
-fn inputs(
-    record: &DistrictRecord,
-    statewide_median: f64,
-    benchmark: f64,
-) -> Option<CapacityInputs> {
+/// Both the statewide median income and the benchmark ratio are published on the
+/// `Local_Capacity` sheet. Deriving them instead — the median of district medians, the 40th
+/// highest reconstructed ratio — gives 41,502 and 1.4151 against a published 54,546.64 and
+/// 1.46504, and leaves the whole calculation about 4% light. The benchmark in particular is a
+/// *discretionary* number that sets the top of the scale; there is no reason a reconstruction
+/// should recover it, and it did not.
+fn inputs(record: &DistrictRecord) -> Option<CapacityInputs> {
     Some(CapacityInputs {
         valuation_recent: record.valuation_three_year[0],
         valuation_three_year: record.valuation_three_year,
@@ -45,41 +30,30 @@ fn inputs(
         agi_three_year: record.agi_three_year,
         federal_median_income: record.median_income?,
         tax_returns: record.tax_returns?,
-        statewide_median_income: statewide_median,
-        benchmark_ratio: benchmark,
+        statewide_median_income: record.statewide_median_income?,
+        benchmark_ratio: record.benchmark_ratio?,
         base_cost_enrolled_adm: record.base_cost_adm(),
     })
 }
 
-/// The calculator reproduces the department's published capacity for the great majority of
-/// districts, and the residual is a rate difference rather than a structural one.
+/// The calculator reproduces the department's published capacity exactly, for every district.
 ///
-/// Exact agreement is not the standard and could not be: the benchmark ratio is a discretionary
-/// input this test reconstructs from the panel rather than reads, and the department's own
-/// valuation and income vintages may differ by a year from the columns the workbook exposes. What
-/// the test holds is that the blend is the right blend — that the disagreement is a scale factor
-/// near one and not a different formula.
+/// Exact is the right standard here and it is met: 609 of 609 on both the per-pupil amount and
+/// the rate, to within a hundredth of a percent, which is the workbook's own rounding.
 ///
-/// **The measured fit, at the time of writing.** Computed over published: median 0.968, quartiles
-/// 0.957 and 0.990, with 480 of 606 districts inside five percent and 594 inside ten. The
-/// calculator therefore runs about **three percent light, systematically** — a bias rather than
-/// noise, and a bias is informative: it points at an input vintage or at the reconstructed
-/// benchmark rather than at the formula. Whichever it is, the structure and the sliding scale
-/// are confirmed and the remaining question is which year of valuation and income the department
-/// fed in. That is recorded as open on the corpus node rather than tuned away here, because
-/// fitting a constant until the residual vanished would destroy the evidence that anything is
-/// still unexplained.
+/// An earlier version of this test allowed a 5% band, because the first attempt reconstructed the
+/// statewide median income and the benchmark ratio instead of reading them and came out 4.4%
+/// light. The band was not tolerance for a hard problem; it was tolerance for four wrong inputs.
+/// Reading them makes the residual vanish, and a test that had kept the band would have gone on
+/// passing while concealing that.
 #[test]
 fn the_statutory_blend_reproduces_the_departments_capacity() {
     let records = panel();
-    let (statewide_median, benchmark) = scale(&records);
 
     let mut ratios: Vec<f64> = Vec::new();
     for record in &records {
-        let (Some(published), Some(input)) = (
-            record.published_capacity_per_pupil,
-            inputs(record, statewide_median, benchmark),
-        ) else {
+        let (Some(published), Some(input)) = (record.published_capacity_per_pupil, inputs(record))
+        else {
             continue;
         };
         if published <= 0.0 {
@@ -126,12 +100,15 @@ fn the_statutory_blend_reproduces_the_departments_capacity() {
 #[test]
 fn the_capacity_rate_rises_with_income_and_stops_at_two_and_a_half_percent() {
     let records = panel();
-    let (statewide_median, benchmark) = scale(&records);
+    let benchmark = records
+        .iter()
+        .find_map(|r| r.benchmark_ratio)
+        .expect("the sheet publishes it");
 
     let mut by_income: Vec<(f64, f64)> = records
         .iter()
         .filter_map(|r| {
-            let input = inputs(r, statewide_median, benchmark)?;
+            let input = inputs(r)?;
             let result = local_capacity(&input).ok()?;
             Some((result.income_ratio, result.capacity_rate))
         })
