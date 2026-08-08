@@ -134,6 +134,29 @@ apart. The contract version catches deliberate breaks; strictness catches accide
 The Rust is still authoritative. This proves the *shape* agrees; the checkpoints prove the
 *arithmetic* does, and CI diffs the committed feed against a freshly generated one.
 
+### One thing here is computed, and it is the base cost
+
+Everything per-district on this site is the department's published model passed through — except
+base cost. R.C. 3317.011 assembles it from statutory staffing ratios applied to a district's own
+grade-band enrollment, priced at statewide average salaries, and
+[`crates/foundation`](../crates/foundation/) runs that statute: twenty-two elements in five
+sub-components, all of them in the feed and all of them on the district page.
+
+That is worth doing because "base cost per pupil" is the figure every Ohio funding argument turns
+on, and as a single number there is nothing in it to agree or disagree with. Broken up it becomes a
+series of decisions — a teacher for every 23 pupils in grades 1–3, a superintendent priced on a ramp
+between $80,000 and $160,000, building operation at a flat rate per pupil — which is what a school
+board is actually arguing about.
+
+The claim is reconciled rather than asserted. The department publishes its own aggregate for every
+district; the card prints it alongside and states the difference. Worst across all 609 is **$1.09**
+on figures in the millions, from twenty-two elements each rounded where the department rounds them,
+and the residuals cancel to nothing statewide. Proved over the whole panel in
+[`crates/foundation/tests/department_model_fy27.rs`](../crates/foundation/tests/department_model_fy27.rs).
+
+`PanelDistrict` omits the build-up, so the twenty-nine numbers per district it adds to the feed
+never reach the one download that happens in a browser.
+
 ### The corpus
 
 [`src/lib/schema/corpus.ts`](src/lib/schema/corpus.ts) does the same for nodes and ontology
@@ -410,11 +433,11 @@ Fields: bundle contract version, feed list, last export timestamp, node counts p
 -->
 | Field | Value |
 |---|---|
-| Contract version | `6.0.0` |
+| Contract version | `7.0.0` |
 | Districts in the feed | 609 |
 | Reference checkpoints | 8 |
 | Reference forecasts | 4 |
-| Size | 1111 KB |
+| Size | 1691 KB |
 | Deployment target | none chosen; static hosting is the presumption |
 
 Regenerate with `cargo run --manifest-path crates/Cargo.toml -p bundle > web/public/data/bundle.json`. CI fails if the committed feed and a fresh one differ.

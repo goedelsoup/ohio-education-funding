@@ -473,7 +473,16 @@ mod tests {
     #[test]
     fn the_bundle_status_reads_the_feed_rather_than_describing_it() {
         let status = bundle_status(&repository_root());
-        assert!(status.contains("`6.0.0`"), "{status}");
+        // Against the version *in the feed*, which is the property the name claims: the block
+        // reports what it read rather than what someone typed. A literal here turns every contract
+        // bump into an unrelated failure and teaches whoever hits it to edit the assertion.
+        let feed = read(&repository_root(), "web/public/data/bundle.json");
+        let declared = feed
+            .split("\"contract_version\": \"")
+            .nth(1)
+            .and_then(|rest| rest.split('"').next())
+            .expect("the feed declares a contract version");
+        assert!(status.contains(&format!("`{declared}`")), "{status}");
         assert!(
             status.contains("| Districts in the feed | 609 |"),
             "{status}"

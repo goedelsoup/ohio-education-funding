@@ -70,9 +70,11 @@ const meta = bundle.projection;
           <tr>
             <th>The funding figures</th>
             <td>
-              A <strong>model</strong>. The department's FY{bundle.fiscal_year} TRAD State
-              Foundation Funding Calculator, re-run here rather than quoted. It is a projection of
-              what districts will be paid, not a record of what they were.
+              A <strong>model</strong>, and the department's rather than this repository's. The
+              per-district figures are read from its FY{bundle.fiscal_year} TRAD State Foundation
+              Funding Calculator, not recomputed — with one exception, below. What gets recomputed
+              here is what a <em>different</em> decision would produce. It is a projection of what
+              districts will be paid, not a record of what they were.
             </td>
           </tr>
           <tr>
@@ -107,6 +109,33 @@ const meta = bundle.projection;
         </tbody>
       </table>
     </div>
+  </div>
+
+  <div class="card">
+    <h2>The one thing here that is computed</h2>
+    <p class="note">
+      Base cost is the exception to the row above. It is not a rate the state sets: R.C. 3317.011
+      assembles it for each district from statutory staffing ratios applied to that district's own
+      grade-band enrollment, priced at statewide average salaries — twenty-two elements in five
+      sub-components. <code>crates/foundation</code> runs that statute, and every district page
+      shows the result rather than the total.
+    </p>
+    <p class="note">
+      Which is a claim, so it is reconciled rather than asserted. The department publishes its own
+      aggregate for every district; the build-up is shown beside it with the difference stated. The
+      worst of the {count(s.districts)} is <strong>$1.09</strong> on figures in the millions, and
+      the residuals cancel to nothing statewide — twenty-two elements each rounded at the point the
+      department rounds them. The reproduction is checked across the whole panel in
+      <code>crates/foundation</code>'s tests before this site is allowed to build.
+    </p>
+    <p class="note">
+      This is the lever the <a href="/wiki/scenario/fsfp-input-year-refresh">cost input refresh</a>
+      question turns on: the ratios and the ADM definitions are fixed in statute, and the prices are
+      a reference year the General Assembly chooses. H.B. 110 priced FY2022 from FY2018 salaries,
+      H.B. 33 refreshed the inputs to FY2022, and H.B. 96 held them there through FY{
+        bundle.fiscal_year
+      }.
+    </p>
   </div>
 
   <div class="card">

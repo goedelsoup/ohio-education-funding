@@ -14,6 +14,7 @@
  */
 
 export type {
+  BaseCostBuildUp,
   Bundle,
   Checkpoint,
   Deflator,
@@ -36,7 +37,7 @@ import type { Bundle, District, Statewide } from "./schema/feed.ts";
  * the build and the scenario routes refuse to proceed past when the two disagree — the deliberate
  * half of drift detection, where the strictness of the schemas is the accidental half.
  */
-export const REQUIRED_CONTRACT = "6.0.0";
+export const REQUIRED_CONTRACT = "7.0.0";
 
 /**
  * A district with only the fields the funding formula reads.
@@ -46,7 +47,11 @@ export const REQUIRED_CONTRACT = "6.0.0";
  * The scenario routes re-run the formula in the browser, so they need the whole 609-district panel
  * rather than one district's page. Sending the full feed for that costs 202 KB gzipped, and most
  * of it — six years of audited finances and a report card per district — is untouched by
- * `policy.ts` and `project.ts`. Dropping those two fields costs 68 KB instead.
+ * `policy.ts` and `project.ts`. Dropping those blocks costs 68 KB instead.
+ *
+ * `base_cost_build_up` is dropped for the same reason and is the largest of the three: twenty-nine
+ * numbers per district, half a megabyte across the panel, and the formula reads none of them. It
+ * explains a figure the scenario routes only ever consume as a total.
  *
  * Making that a *type* rather than a comment is the point. Every function in the formula takes a
  * `PanelDistrict`, so "does the browser need this field?" is answered by the compiler: reach for
@@ -56,7 +61,10 @@ export const REQUIRED_CONTRACT = "6.0.0";
  * A full {@link District} is assignable to this, so the build-time paths that do have the whole
  * feed pass it unchanged.
  */
-export type PanelDistrict = Omit<District, "finances" | "outcome">;
+export type PanelDistrict = Omit<
+  District,
+  "finances" | "outcome" | "base_cost_build_up"
+>;
 
 /** The feed with the two heavy per-district blocks removed. Served as `/data/panel.json`. */
 export interface Panel extends Omit<Bundle, "districts" | "statewide"> {

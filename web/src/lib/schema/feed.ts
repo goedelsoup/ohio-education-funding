@@ -103,6 +103,59 @@ export const FinanceYearSchema = z
   })
   .strict();
 
+/**
+ * The base cost build-up: all twenty-two elements of R.C. 3317.011, for one district.
+ *
+ * The only figures in this feed that this repository *computes* rather than reads. Everything else
+ * per-district is the department's published model passed through; these come from
+ * `crates/foundation` running the statutory staffing ratios against the district's own grade-band
+ * enrollment, priced at the FY2027 statewide factor set.
+ *
+ * `published_aggregate` and `residual` travel with them on purpose. Claiming to reproduce a number
+ * is worth nothing without showing the difference, and the difference here is about a dollar on
+ * figures in the millions — twenty-two elements each rounded where the department rounds.
+ */
+export const BaseCostBuildUpSchema = z
+  .object({
+    // A — teacher base cost, R.C. 3317.011(D).
+    classroom_teachers: num,
+    special_teachers: num,
+    substitutes: num,
+    professional_development: num,
+    teachers: num,
+    // B — student support, R.C. 3317.011(E).
+    counselors: num,
+    librarians: num,
+    wellness: num,
+    academic_cocurricular: num,
+    safety: num,
+    supplies: num,
+    technology: num,
+    student_support: num,
+    // C — district leadership and accountability, R.C. 3317.011(F).
+    superintendent: num,
+    treasurer: num,
+    other_administrators: num,
+    fiscal_support: num,
+    emis: num,
+    leadership_support: num,
+    itc: num,
+    district_leadership: num,
+    // D — building leadership and operation, R.C. 3317.011(G).
+    building_leadership_staff: num,
+    building_support: num,
+    building_operation: num,
+    building_leadership: num,
+    // E — athletics, R.C. 3317.011(H).
+    athletic_cocurricular: num,
+    funded_classroom_teachers: num,
+    funded_special_teachers: num,
+    computed_aggregate: num,
+    published_aggregate: num,
+    residual: num,
+  })
+  .strict();
+
 /** One district, as the feed carries it. */
 export const DistrictSchema = z
   .object({
@@ -115,6 +168,8 @@ export const DistrictSchema = z
     current_year_adm: num,
     base_cost_per_pupil: num,
     aggregate_base_cost: num,
+    /** How that aggregate is assembled — the one thing here that is computed, not quoted. */
+    base_cost_build_up: BaseCostBuildUpSchema,
     /** The state's share of base cost alone, before every categorical. */
     base_cost_state_share: num,
     /** Targeted assistance, special education, DPIA, English learner, gifted, career-technical. */
@@ -285,6 +340,7 @@ export const BundleSchema = z
 export type DistrictOutcome = z.infer<typeof DistrictOutcomeSchema>;
 export type OutcomeStatewide = z.infer<typeof OutcomeStatewideSchema>;
 export type FinanceYear = z.infer<typeof FinanceYearSchema>;
+export type BaseCostBuildUp = z.infer<typeof BaseCostBuildUpSchema>;
 export type District = z.infer<typeof DistrictSchema>;
 export type Statewide = z.infer<typeof StatewideSchema>;
 export type Deflator = z.infer<typeof DeflatorSchema>;

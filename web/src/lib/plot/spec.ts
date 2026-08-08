@@ -67,12 +67,19 @@ export function barSpec(bars: Bar[], options: { max?: number } = {}): Spec {
   const max = options.max ?? Math.max(...bars.map((b) => Math.abs(b.value)), 1);
   const labelled = bars.filter((b) => b.direct != null);
   const longest = Math.max(0, ...bars.map((b) => b.direct?.length ?? 0));
+  // Sized to the longest category name, as the right gutter is sized to the longest direct label.
+  // This was a fixed 160, which silently clipped anything longer — "Building leadership and
+  // operation" rendered as "g leadership and operation", which reads as a rendering fault rather
+  // than a truncation and is exactly the kind of thing nobody reports.
+  const longestLabel = Math.max(0, ...bars.map((b) => b.label.length));
 
   return {
     options: {
       width: WIDTH,
+      // Bounded below so short-label charts keep their existing proportions, and above so a very
+      // long name costs the bars width rather than running off the plot.
       height: bars.length * rowHeight,
-      marginLeft: 160,
+      marginLeft: Math.max(120, Math.min(260, Math.round(longestLabel * 7.1) + 14)),
       // Room at the right for the longest direct label actually present. Without it the largest
       // bar's value runs off the viewBox and is clipped — and it is the one most worth reading.
       marginRight: longest > 0 ? 16 + longest * 7.2 : 20,

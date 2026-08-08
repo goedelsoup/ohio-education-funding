@@ -12,7 +12,12 @@
  * `tests/unit/nearest.spec.ts` instead.
  */
 
+import { readFileSync, readdirSync } from "node:fs";
+import { join } from "node:path";
+
 import { expect, test, type Page } from "@playwright/test";
+
+import { REQUIRED_CONTRACT } from "../../src/lib/types.ts";
 
 /** Cleveland Municipal. On the guarantee, so the guarantee copy has something to render. */
 const CLEVELAND = "043786";
@@ -26,6 +31,70 @@ async function setGuarantee(page: Page, value: string): Promise<void> {
   await page.selectOption("#lv-guarantee", value);
   await expect(page.locator("#scenario-out .tile, #scenario-out .card")).not.toHaveCount(0);
 }
+
+test.describe("the content security policy", () => {
+  /*
+   * # Why this reads files instead of driving a browser
+   *
+   * `vite preview` serves `dist/` with no headers at all, so the CSP that the host applies is
+   * absent for the entire suite. Everything else here could pass while the deployed site refuses
+   * to run its own scripts — and that is not hypothetical: `onsubmit="return false"` shipped on
+   * four pages and was found by opening the live site, after the tests were green.
+   *
+   * `script-src 'self'` permits no inline script of any kind, and an `on*` attribute is inline
+   * script. So rather than test the browser, this tests the artefact: whatever the headers do, the
+   * output must contain nothing the strict directive would reject.
+   */
+  const DIST = join(import.meta.dirname, "../../dist");
+
+  const html = (dir: string): string[] =>
+    readdirSync(dir, { withFileTypes: true }).flatMap((entry) =>
+      entry.isDirectory()
+        ? html(join(dir, entry.name))
+        : entry.name.endsWith(".html")
+          ? [join(dir, entry.name)]
+          : [],
+    );
+
+  test("no page carries an inline event handler", () => {
+    // `onsubmit`, `onclick`, and friends. Excludes SVG's `on` in other positions by requiring the
+    // attribute form exactly.
+    const offenders: string[] = [];
+    for (const file of html(DIST)) {
+      const found = readFileSync(file, "utf8").match(/\son[a-z]+\s*=\s*["']/gi);
+      if (found) offenders.push(`${file.slice(DIST.length + 1)}: ${[...new Set(found)].join(", ")}`);
+    }
+    expect(offenders.slice(0, 10)).toEqual([]);
+  });
+
+  test("no page carries an inline script block", () => {
+    // Astro bundles every `<script>` to a hashed file under `_astro/`, so any `<script>` left with
+    // a body is either a mistake or a deliberate exception that the CSP has not been told about.
+    const offenders: string[] = [];
+    for (const file of html(DIST)) {
+      const body = readFileSync(file, "utf8");
+      for (const match of body.matchAll(/<script(?![^>]*\bsrc=)[^>]*>([\s\S]*?)<\/script>/gi)) {
+        if ((match[1] ?? "").trim() !== "") offenders.push(file.slice(DIST.length + 1));
+      }
+    }
+    expect([...new Set(offenders)].slice(0, 10)).toEqual([]);
+  });
+
+  test("nothing is fetched from another origin", () => {
+    // `default-src 'self'` and `connect-src 'self'`. A CDN font or script would be invisible in
+    // preview and dead in production.
+    const offenders: string[] = [];
+    for (const file of html(DIST)) {
+      const found = readFileSync(file, "utf8").match(
+        /(?:src|href)\s*=\s*["'](?:https?:)?\/\/(?!schools\.ohio\.shawneesmart\.systems)[^"']+/gi,
+      );
+      // Links in prose are fine; only fetched subresources matter, which are src= or a stylesheet.
+      const fetched = (found ?? []).filter((m) => /^src/i.test(m) || /stylesheet/i.test(m));
+      if (fetched.length > 0) offenders.push(`${file.slice(DIST.length + 1)}: ${fetched[0]}`);
+    }
+    expect(offenders.slice(0, 10)).toEqual([]);
+  });
+});
 
 test.describe("the document arrives complete", () => {
   test("a district page carries its figures before any script runs", async ({ page }) => {
@@ -59,17 +128,19 @@ test.describe("the document arrives complete", () => {
     const feed = await request.get("/data/bundle.json");
     expect(feed.status()).toBe(200);
     const bundle = await feed.json();
-    expect(bundle.contract_version).toBe("6.0.0");
+    expect(bundle.contract_version).toBe(REQUIRED_CONTRACT);
     expect(bundle.districts).toHaveLength(609);
+    expect(bundle.districts[0]).toHaveProperty("base_cost_build_up");
 
-    // The panel is what the scenario routes fetch: the same districts, without the two blocks the
-    // formula never reads.
+    // The panel is what the scenario routes fetch: the same districts, without the three blocks
+    // the formula never reads.
     const panel = await request.get("/data/panel.json");
     expect(panel.status()).toBe(200);
     const slim = await panel.json();
     expect(slim.districts).toHaveLength(609);
     expect(slim.districts[0]).not.toHaveProperty("finances");
     expect(slim.districts[0]).not.toHaveProperty("outcome");
+    expect(slim.districts[0]).not.toHaveProperty("base_cost_build_up");
     expect(slim.districts[0]).toHaveProperty("base_cost_state_share");
   });
 
@@ -649,5 +720,41 @@ test.describe("presentation", () => {
     await expect(chart).toContainText("no change");
     // Two hues and a neutral midpoint, never a hue at zero.
     await expect(chart.locator(".hist > *")).not.toHaveCount(0);
+  });
+});
+
+test.describe("the base cost build-up", () => {
+  test("shows the statute's twenty-two elements, and reconciles against the department", async ({
+    page,
+  }) => {
+    await page.goto(`/district/${CLEVELAND}`);
+    const card = page.locator(".card", { hasText: "Why base cost is" });
+    await expect(card).toBeVisible();
+
+    // Five sub-components and their elements, plus the aggregate row.
+    for (const code of ["A1", "A4", "B7", "C1", "C7", "D3", "E"]) {
+      await expect(card.locator("tbody")).toContainText(code);
+    }
+    await expect(card.locator("tbody tr").last()).toContainText("Aggregate base cost");
+
+    // The claim, and the reconciliation that licenses it. A card asserting it reproduced the
+    // department without printing the difference would be asking to be believed.
+    await expect(card).toContainText("computed here, not quoted");
+    await expect(card).toContainText("The department publishes its own aggregate");
+  });
+
+  test("the category labels are not clipped by the chart's margin", async ({ page }) => {
+    // "Building leadership and operation" is the longest label on this site and rendered as
+    // "g leadership and operation" against the fixed margin this replaced — which reads as a
+    // rendering fault rather than as truncation, and so gets reported by nobody.
+    await page.goto(`/district/${CLEVELAND}`);
+    const labels = page.locator('[data-chart="base-cost"] .bar-label text');
+    await expect(labels).toHaveCount(5);
+    const chart = page.locator('[data-chart="base-cost"] svg');
+    const box = await chart.boundingBox();
+    for (let i = 0; i < 5; i++) {
+      const label = await labels.nth(i).boundingBox();
+      expect(label!.x, `label ${i} starts left of the chart`).toBeGreaterThanOrEqual(box!.x - 0.5);
+    }
   });
 });

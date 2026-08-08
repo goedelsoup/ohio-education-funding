@@ -6,6 +6,13 @@
 # and the two-space indent under each path is load-bearing.
 
 /*
+  # Every route on this site is extensionless — `build.format: "file"` emits
+  # `district/043786.html` and Pages serves it at `/district/043786`. `_headers` matches the
+  # *request* path, so a `/*.html` rule matches nothing at all; the previous one silently did,
+  # and a deploy left stale HTML at the edge pointing at asset hashes the next deploy had purged.
+  # The document rule therefore lives here, on the pattern that actually matches, and the two
+  # blocks below override it for the paths that may be cached.
+  Cache-Control: public, max-age=0, must-revalidate
   X-Content-Type-Options: nosniff
   Referrer-Policy: strict-origin-when-cross-origin
   Strict-Transport-Security: max-age=31536000
@@ -36,8 +43,3 @@
 
 /search-index.json
   Cache-Control: public, max-age=300, must-revalidate
-
-# Every page is a document now rather than one shell, and each carries figures baked in at build
-# time. None of them may be held past a deploy.
-/*.html
-  Cache-Control: public, max-age=0, must-revalidate

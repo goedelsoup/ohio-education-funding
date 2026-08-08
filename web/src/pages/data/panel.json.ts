@@ -32,7 +32,9 @@ export const GET: APIRoute = () => {
     checkpoints: bundle.checkpoints,
     projection: bundle.projection,
     deflator: bundle.deflator,
-    districts: bundle.districts.map(({ finances: _f, outcome: _o, ...district }) => district),
+    districts: bundle.districts.map(
+      ({ finances: _f, outcome: _o, base_cost_build_up: _b, ...district }) => district,
+    ),
   };
 
   return new Response(JSON.stringify(panel), {
