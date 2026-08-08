@@ -35,9 +35,36 @@ should be able to settle.
 
 ## Status
 
-**Stub — not implemented.** The recorded blocker was `dew-foundation`, and that was wrong.
-That connector is now wired with three sources and the block did not lift, because **the FY2027
-funding calculator does not carry the deduction channel at all**.
+**Stub — not implemented, and now known not to be implementable from this source.** The recorded
+blocker was `dew-foundation`, and that was wrong. That connector is now wired with three sources
+and the block did not lift, because **the FY2027 funding calculator does not carry the deduction
+channel at all**.
+
+That was an inference from the columns the corpus had extracted. It has since been checked
+against every column the workbook has, and it holds in the strongest form available:
+
+- **`Summary_SFPR`, thirty columns.** The transfer channel is exactly two lines, `S - Educational
+  Service Center` and `T - Other Adjustments`, summing to `U - Total Transfers`. Neither is named
+  for a scholarship or a community school.
+- **`Detail_SFPR`, fifty-eight columns.** The full formula decomposition, `[a] Enrolled ADM`
+  through `[N] Total Formula Funding`. No deduction line.
+- **The District Profile Report, sixty-one columns.** None either.
+
+And the one place a deduction could still have been sitting is now measured rather than argued
+about. `T - Other Adjustments` is the report's only unlabelled line; its negative half totals
+**$95.6 million across 577 districts, 1.12% of total state support.** Ohio's scholarship programs
+run on the order of a billion dollars a year. A deduction channel would have to be roughly ten
+times the size of the entire residual it would have to hide in.
+
+The `[open]` question "could a deduction be inside the negative transfers" is therefore
+**closed**, and closed for the reason the mechanism note above predicts: under the Fair School
+Funding Plan community and STEM students are funded directly, so there is no deduction to carry.
+`crates/project/tests/the_voucher_channel_is_absent.rs` holds the bound.
+
+**What remains open is the pre-FSFP era**, which is a different question and a different source.
+Deduct-era amounts per resident district — and whether ECOT recovery money returned to the
+districts it was deducted from — need the department's historical payment reports, which are not
+the FY2027 calculator and are not held here. That is a retrieval problem.
 
 ### What was searched, and what was found
 

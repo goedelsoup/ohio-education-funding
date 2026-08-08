@@ -77,6 +77,8 @@ pub const FY27_HEADER: &[&str] = &[
     "base_cost_state_share",
     "total_state_support",
     "total_transfers",
+    "service_center_charge",
+    "other_adjustments",
     "net_state_funding",
 ];
 
@@ -124,6 +126,15 @@ mod summary_columns {
     /// Fair School Funding Plan community and STEM students are funded directly rather than
     /// deducted, and these lines are small and are something else.
     pub const TOTAL_TRANSFERS: usize = 27;
+    /// `S - Educational Service Center` — the service-centre charge alone.
+    ///
+    /// Separated from [`TOTAL_TRANSFERS`] so the corpus can bound the one place a voucher or
+    /// community-school deduction could still be hiding. The calculator has no line named for
+    /// either; the whole transfer channel is this column plus [`OTHER_ADJUSTMENTS`], and only
+    /// the second is unlabelled.
+    pub const SERVICE_CENTER: usize = 25;
+    /// `T - Other Adjustments` — the residual, and the entire remaining hiding place.
+    pub const OTHER_ADJUSTMENTS: usize = 26;
     /// `V - Net State Funding (R + U)` — total state support after transfers.
     pub const NET_STATE_FUNDING: usize = 28;
 }
@@ -251,6 +262,14 @@ pub fn build_fy27_model(
             ),
             format_value(
                 Some(cell_number(summary_row, summary_columns::TOTAL_TRANSFERS).unwrap_or(0.0)),
+                2,
+            ),
+            format_value(
+                Some(cell_number(summary_row, summary_columns::SERVICE_CENTER).unwrap_or(0.0)),
+                2,
+            ),
+            format_value(
+                Some(cell_number(summary_row, summary_columns::OTHER_ADJUSTMENTS).unwrap_or(0.0)),
                 2,
             ),
             format_value(

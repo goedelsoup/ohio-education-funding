@@ -86,9 +86,13 @@ fn what_is_inside_the_negative_transfers_is_not_settled_by_this_workbook() {
     // negative half, and the magnitudes leave room: Shawnee Local's transfers are 44% of its
     // total state support, which is a great deal of service centre.
     //
-    // This is recorded as an open question rather than closed by inference. Settling it needs
-    // the department's own deduction reporting, which is what the `deduction` calculator is
-    // blocked on and what a search of both public hosts did not find.
+    // This was recorded as an open question rather than closed by inference, and it stayed open
+    // for as long as `total_transfers` was all the corpus carried — the total mixes the service
+    // centre charge with the residual, so its size says nothing about either.
+    //
+    // **It is now closed**, by splitting the two. See
+    // `the_unlabelled_residual_is_too_small_to_hide_a_deduction` below. This test is kept because
+    // the bound it states is still true and still the reason the question was worth asking.
     let panel = panel();
     let large = panel
         .iter()
@@ -137,4 +141,72 @@ fn the_report_pays_more_than_the_guarantee_holds_a_district_at() {
         "only {wider} of {} districts are paid more than their formula-plus-guarantee base",
         panel.len()
     );
+}
+
+/// The question, closed — by magnitude rather than by inference.
+///
+/// The tests above rule the transfer *line* out as a deduction channel because it runs in both
+/// directions, and then deliberately leave open whether a deduction could sit inside its negative
+/// half. That was the honest state of it while `total_transfers` was all the corpus carried,
+/// because the total mixes two things.
+///
+/// The FY2027 report separates them: `S - Educational Service Center` and `T - Other Adjustments`.
+/// S is negative for 606 of 609 districts and positive for none, which is a charge behaving like
+/// a charge. T is the report's only unlabelled line and therefore the entire remaining hiding
+/// place — and it is far too small to be one. Ohio's scholarship programs run on the order of a
+/// billion dollars a year against a residual whose negative half is $95.6m.
+///
+/// No line in the calculator is named for a scholarship or a community school, in either the
+/// thirty-column summary or the fifty-eight-column detail. This is the arithmetic saying the same
+/// thing.
+#[test]
+fn the_unlabelled_residual_is_too_small_to_hide_a_deduction() {
+    let panel = panel();
+
+    let service_centre: Vec<f64> = panel.iter().map(|r| r.service_center_charge).collect();
+    assert_eq!(
+        service_centre.iter().filter(|v| **v > 0.0).count(),
+        0,
+        "the service centre line should never pay a district; it is a charge"
+    );
+    assert!(
+        service_centre.iter().filter(|v| **v < 0.0).count() > 600,
+        "and nearly every district should carry one"
+    );
+
+    // The residual, on its own, in the only direction a deduction could run.
+    let hiding_place: f64 = panel
+        .iter()
+        .map(|r| r.other_adjustments)
+        .filter(|v| *v < 0.0)
+        .sum::<f64>()
+        .abs();
+    let support: f64 = panel.iter().map(|r| r.total_state_support).sum();
+
+    assert!(
+        hiding_place / support < 0.02,
+        "the unlabelled residual is {:.2}% of total state support; above two percent it would \
+         be worth reopening the question",
+        hiding_place / support * 100.0
+    );
+
+    // Ohio scholarship spending is around a billion a year. Whatever the exact figure, a channel
+    // carrying it could not fit inside a residual an order of magnitude smaller.
+    const SCHOLARSHIP_ORDER_OF_MAGNITUDE: f64 = 1_000_000_000.0;
+    assert!(
+        hiding_place * 5.0 < SCHOLARSHIP_ORDER_OF_MAGNITUDE,
+        "the residual is {hiding_place:.0}, which is not small enough against scholarship \
+         spending for this argument to hold"
+    );
+
+    // And the two components still reconcile to the total the report publishes.
+    for record in &panel {
+        let parts = record.service_center_charge + record.other_adjustments;
+        assert!(
+            (parts - record.total_transfers).abs() < 1.0,
+            "{}: S + T is {parts} against a published total of {}",
+            record.name,
+            record.total_transfers
+        );
+    }
 }

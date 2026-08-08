@@ -25,8 +25,19 @@ description: |
 properties:
   name: EdChoice Expansion Scholarship
   mechanism: |
-    Deduction from resident district under the original design; direct appropriation in whole
-    or part under the Fair School Funding Plan. The current mechanism must be confirmed. [open]
+    Deduction from resident district under the original design; **not a deduction under the Fair
+    School Funding Plan.** [verified] Confirmed negatively and exhaustively against the FY2027
+    calculator: the payment report's transfer channel is two named lines, `S - Educational
+    Service Center` and `T - Other Adjustments`, and neither the thirty-column summary nor the
+    fifty-eight-column detail carries a line named for a scholarship or a community school. The
+    one unlabelled line is too small to be one — its negative half is $95.6m across 577
+    districts, 1.12% of total state support, against scholarship spending on the order of a
+    billion a year. See `crates/project/tests/the_voucher_channel_is_absent.rs`.
+
+    What this establishes is that a resident district's foundation payment is not reduced for a
+    scholarship student. That the money instead reaches the program by direct appropriation is
+    the natural reading and is not established here — the appropriation would sit in the budget
+    act rather than in the funding calculator, and `lsc-budget` is blocked. [open]
   eligibility: |
     Originally income-limited. Am. Sub. H.B. 33 (2023) made all Ohio students eligible, with
     award amount scaled by family income relative to the federal poverty level rather than

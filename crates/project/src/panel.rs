@@ -81,6 +81,22 @@ pub struct DistrictRecord {
     /// larger. Carried so that claim is checkable rather than asserted — see
     /// [`crate::finances`] and the `deduction` skill for what is still missing.
     pub total_transfers: Dollars,
+    /// `S - Educational Service Center` alone — negative for 606 of 609 districts and never
+    /// positive, which is what a charge looks like rather than a channel.
+    pub service_center_charge: Dollars,
+    /// `T - Other Adjustments` alone — the report's only unlabelled line, and therefore the whole
+    /// of the space in which a voucher or community-school deduction could still be sitting.
+    ///
+    /// It cannot be sitting there, and this field is what settles it. The negative half totals
+    /// $95.6m across 577 districts — 1.12% of total state support — against Ohio scholarship
+    /// spending on the order of a billion a year. A deduction channel would have to be ten times
+    /// the size of the entire residual it would have to hide in.
+    ///
+    /// The question was open since genesis and was previously answered by direction: transfers
+    /// run both ways, so the *line* is not a deduction. That left "a deduction could be inside
+    /// its negative half" unresolved, because `total_transfers` mixes the service-centre charge
+    /// with the residual. Splitting them measures the residual on its own.
+    pub other_adjustments: Dollars,
     /// `V - Net State Funding` — total state support after transfers.
     pub net_state_funding: Dollars,
     /// Temporary transitional aid guarantee.
@@ -207,7 +223,11 @@ mod column {
     pub const BASE_COST_STATE_SHARE: usize = 21;
     pub const TOTAL_STATE_SUPPORT: usize = 22;
     pub const TOTAL_TRANSFERS: usize = 23;
-    pub const NET_STATE_FUNDING: usize = 24;
+    /// `S - Educational Service Center`, split out of the transfer total.
+    pub const SERVICE_CENTER: usize = 24;
+    /// `T - Other Adjustments`, the residual and the only unlabelled line in the report.
+    pub const OTHER_ADJUSTMENTS: usize = 25;
+    pub const NET_STATE_FUNDING: usize = 26;
 }
 
 /// The header this loader expects, so a fixture reshaped without updating [`column`] fails
@@ -217,7 +237,7 @@ adm_kindergarten,adm_grades_1_3,adm_grades_4_8_non_cte,adm_grades_9_12_non_cte,a
 adm_grades_9_12_total,funded_classroom_teachers,funded_special_teachers,teacher_base_cost,\
 aggregate_base_cost,base_cost_per_pupil,temp_transitional_aid_guarantee,enrolled_adm_fy24,\
 enrolled_adm_fy25,enrolled_adm_fy26,assessed_valuation_per_pupil_fy23,core_foundation_funding,\
-base_cost_state_share,total_state_support,total_transfers,net_state_funding";
+base_cost_state_share,total_state_support,total_transfers,service_center_charge,other_adjustments,net_state_funding";
 
 /// Every district in the department's FY2027 model.
 ///
@@ -272,6 +292,8 @@ pub fn panel() -> Vec<DistrictRecord> {
                 core_foundation_funding: required(column::CORE_FOUNDATION),
                 total_state_support: required(column::TOTAL_STATE_SUPPORT),
                 total_transfers: required(column::TOTAL_TRANSFERS),
+                service_center_charge: required(column::SERVICE_CENTER),
+                other_adjustments: required(column::OTHER_ADJUSTMENTS),
                 net_state_funding: required(column::NET_STATE_FUNDING),
                 guarantee: required(column::GUARANTEE),
                 adm_history: [
