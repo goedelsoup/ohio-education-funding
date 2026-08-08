@@ -9,3 +9,8 @@ target/
 # Downloaded source publications. Refetch with `edfund-connect fetch --all`; the SHA-256 of
 # each is pinned in crates/connect/source-digests.txt, so what was used stays known.
 .cache/
+
+# Wrangler's local scratch, written into the repository root by any `pages deploy`. It holds no
+# credentials — those live in ~/Library/Preferences/.wrangler — but it does hold the account id
+# and the account's display name, and it is machine state rather than anything about the model.
+.wrangler/
