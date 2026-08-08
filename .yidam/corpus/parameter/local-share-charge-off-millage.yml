@@ -18,18 +18,71 @@ description: |
   Plan](../funding-regime/fair-school-funding-plan.yml) replaced the charge-off with a local
   capacity measure. [verified] The node remains because it governs every state aid figure from
   FY1992 through FY2021, and because the historical series is required for any
-  [`regime-diff`](../formula-component/fsfp-local-capacity-measure.yml) between the two
-  approaches.
+  [`regime-diff`](../../skills/regime-diff.md) between the two approaches.
+
+  **THE SERIES IS NOW SOURCED.** This node carried "not yet populated" from genesis and warned
+  that the values had to come from statute rather than recollection. They do, and the mechanism
+  is less static than "roughly 20 to 23 mills" suggested:
+
+      rate        when                                    authority
+      20 mills    in force when DeRolph was filed, 1991   144 Ohio Laws, Part III, 3987, 4122
+      20.5 mills  raised during the litigation            Am.Sub.H.B. 152, Sec. 36.12,
+                                                            145 Ohio Laws, Part III, 4432-4433
+      23 mills    in force at DeRolph I, March 1997       R.C. 3317.022
+      23 mills    FY2008                                  LSC, School Funding Complete Resource
+
+  [verified — [DeRolph I](../litigation/derolph-i-1997.yml) at ¶97 recites the progression with
+  its session-law citations; the [LSC Complete
+  Resource](../../catalog/lsc-school-funding-complete-resource.md) gives the rate and base still
+  operative in FY2008. Carried in
+  [`crates/regime-diff`](../../../crates/regime-diff/src/charge_off.rs).]
+
+  **THE BASE CHANGED WHILE THE RATE STOOD STILL, AND THAT IS THE EASIEST THING HERE TO GET
+  WRONG.** DeRolph I describes the charge-off as *total taxable value* times a percentage. By
+  FY2008 the Legislative Service Commission describes the same 23 mills applied to **recognized
+  valuation** — an H.B. 920-adjusted figure deliberately lower than total taxable value wherever
+  reduction factors bind. [verified]
+
+  So a district's charge-off could fall with no change to the rate, and two accurate statements
+  that "the charge-off was 23 mills" can describe materially different local shares. Any series
+  of charge-off amounts must carry the base alongside the rate. This corpus holds total taxable
+  valuation and **not** recognized valuation, so every charge-off figure it computes is on the
+  DeRolph-era base and overstates the local share of any district whose recognition was reduced.
+  Closing that needs `tax-abstract`, which is declared and blocked.
+
+  **What the rate was doing to the system.** At 23 mills against a statewide operating rate of
+  32.9 mills in TY2006, the base cost formula equalized about **69.9%** of local operating
+  revenue; a higher rate equalizes more and a lower rate less. [verified — LSC] And the phantom
+  revenue the mechanism generated was large enough to need its own program: the **charge-off
+  supplement**, known as gap aid, reimbursed the difference and cost about **$73.5 million
+  across 145 districts in FY2008**. [verified — LSC] A mechanism requiring a supplement for a
+  quarter of the state is the argument for replacing it.
+
+  **Joint vocational school districts were charged off at 0.5 mills**, not the district rate.
+  [verified — LSC] This is the one place the "uniform statewide" description is false, and a
+  comparison run over JVSDs at the district rate is wrong by a factor of forty-six.
+
+  **STILL OPEN.** The Evidence-Based Model years and the Bridge formula decade are not
+  established. Secondary reporting gives 22 mills for FY2010-11 under the Evidence-Based Model
+  and 20 mills applied to total valuation later, and neither is sourced well enough to commit
+  here. [open] The corpus deliberately holds three of the four eras rather than a complete
+  series with one guessed entry.
 properties:
   name: Local share charge-off millage
   unit: mills
   series: |
-    Not yet populated. [open] Ohio's charge-off rate moved between roughly 20 and 23 mills
-    across the foundation formula era, changing by biennium, but the year-by-year series and
-    the exact values must be taken from statute rather than from recollection. Source:
-    `ohio-laws` for statutory text, `lsc-budget` for the operative rate used in each
-    biennium's simulations.
-  statutory_basis: R.C. 3317, section varying by biennium. Exact citations not established. [open]
+    20 mills (1991, at DeRolph filing) -> 20.5 mills (Am.Sub.H.B. 152) -> 23 mills (by 1997,
+    R.C. 3317.022) -> 23 mills on recognized valuation (FY2008). Evidence-Based Model and Bridge
+    formula era rates are [open]. JVSDs: 0.5 mills throughout the observed range.
+
+    The base matters as much as the rate: total taxable value in the DeRolph era, recognized
+    valuation by FY2008. See the description.
+  statutory_basis: |
+    R.C. 3317.022, with the rate set by biennial session law. Ohio Laws citations for the
+    1991-1997 progression are recited at DeRolph I, paragraph 97. Ohio Laws' online version
+    archive for R.C. 3317.022 begins at 1 July 2014, after the mechanism was already retired, so
+    the operative text for the charge-off era is not retrievable from `codes.ohio.gov` and must
+    come from the opinions or from session law.
   simulation_key: charge_off_millage
   sensitivity: |
     Raising the charge-off rate shifts cost from the state to districts, and shifts it most to
@@ -38,6 +91,11 @@ properties:
     increase falls entirely on districts that cannot levy it, making the parameter regressive
     in exactly the range where it appears otherwise. [inference] This nonlinearity is why the
     parameter cannot be evaluated without per-district floor status.
+
+    Measured at FY2027 base cost: **81 of 606 districts** would have a 23-mill charge-off
+    exceeding their entire computed base cost, and so would receive no base cost aid at all. The
+    charge-off had no minimum state share — that is a Fair School Funding Plan invention — so
+    the mechanism simply truncated at zero. [verified — `crates/regime-diff`]
 links:
   - target: ../parameter.ont.yml
     relationship: instance-of
@@ -45,3 +103,9 @@ links:
     relationship: assumes-yield-from
   - target: twenty-mill-floor.yml
     relationship: bounded-by
+  - target: ../formula-component/charge-off-local-share.yml
+    relationship: governs
+  - target: ../litigation/derolph-i-1997.yml
+    relationship: sourced-from
+  - target: ../../catalog/lsc-school-funding-complete-resource.md
+    relationship: sourced-from
