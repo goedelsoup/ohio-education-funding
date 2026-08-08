@@ -68,9 +68,57 @@ src/scripts/main.ts     the client entry — routing, wiring, the verification g
 src/lib/*.ts            the formula, the views, the charts, the formatting
 src/styles/app.css
 public/data/bundle.json the feed, copied verbatim into dist/
+public/_headers         cache and security headers, read by the host, not served
 tests/unit/             the formula, over the committed feed
 tests/e2e/              the page, in Chromium, against a real build
 ```
+
+## Deploying
+
+The site is served at **<https://schools.ohio.shawneesmart.systems>** from Cloudflare Pages,
+project `ohio-education-funding`. There is no deploy job: publishing is a thing someone does on
+purpose, because the feed is regenerated on purpose.
+
+From the repository root:
+
+```
+pnpm --dir web test                       # both suites; the gate is unchanged
+pnpm --dir web build
+pnpm dlx wrangler@latest pages deploy web/dist \
+  --project-name ohio-education-funding --branch main
+```
+
+Two things about that third line are easy to get wrong and quiet when you do. `--dir` steers
+which package pnpm runs, not where `dlx` resolves paths, so the directory argument is `web/dist`
+and not `dist` — passed the latter from the root, wrangler goes looking at the repository root
+and exits `ENOENT`. And `--branch main` is not decoration: on direct upload wrangler labels the
+deployment with whatever branch is checked out, and only the production branch reaches the
+production URL. Deploy from a `phase/*` branch without it and the upload succeeds, wrangler
+prints a URL, and the live site does not change — you have published a preview.
+
+No Rust toolchain is needed at the far end. `public/data/bundle.json` is committed and CI diffs
+it against `cargo run -p bundle`, so a build of `src/` alone produces the whole deployable tree.
+Publishing a feed change is therefore the `cargo run` redirect from [Running it](#running-it)
+followed by exactly the three commands above.
+
+DNS is split, and knowing which half is which saves an hour when something breaks.
+`shawneesmart.systems` is authoritative on **Route 53**, and stays there — it carries the mail
+records. The only thing Cloudflare owns is one `CNAME` at `schools.ohio` pointing to
+`ohio-education-funding.pages.dev`, plus the certificate it issues for that hostname. Cloudflare
+Pages custom domains work against external DNS this way on the free plan; a Workers deployment
+would not, because a Workers custom domain requires the whole zone to live on Cloudflare.
+
+The order that setup happens in matters and is not recoverable in the moment: the hostname must
+be registered on the Pages project **before** the `CNAME` exists in Route 53. Reversed, the
+record resolves to a Pages edge that has never heard of the hostname and answers 522 until the
+association catches up.
+
+[`public/_headers`](public/) is the deploy's one piece of configuration, and Astro copies it into
+`dist/` like any other public asset — Pages reads it from the deploy root rather than serving it.
+It pins `_astro/*` for a year, which is safe because Vite content-hashes those names, and
+deliberately does not pin `data/bundle.json`, which has a fixed path and so would go stale
+behind a superseded feed. Its CSP allows inline *style attributes* because the renderers emit
+them for bar widths; `script-src` stays strict, which is the half that matters.
 
 ## On dependencies
 

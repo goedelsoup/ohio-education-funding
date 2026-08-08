@@ -1,0 +1,32 @@
+# Response headers for the static host. Astro copies `public/` into `dist/` verbatim, and
+# Cloudflare Pages reads this file from the deploy root rather than serving it.
+#
+# Two rules about the syntax that are easy to get wrong: matches are cumulative rather than
+# first-wins, so the `/*` block below applies to everything and the specific blocks add to it;
+# and the two-space indent under each path is load-bearing.
+
+/*
+  X-Content-Type-Options: nosniff
+  Referrer-Policy: strict-origin-when-cross-origin
+  Strict-Transport-Security: max-age=31536000
+  # `style-src` needs 'unsafe-inline' because the renderers emit style *attributes* — the
+  # scenario bar widths in `src/lib/district.ts` and the reset button in `src/pages/index.astro`
+  # — and `style-src` governs those. `script-src` stays strict, which is the half that matters:
+  # the page has no inline script, no event-handler attributes, and fetches nothing off-origin.
+  Content-Security-Policy: default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; connect-src 'self'; object-src 'none'; base-uri 'none'; frame-ancestors 'none'; form-action 'none'
+
+# Vite content-hashes these filenames, so a changed file is a changed URL and the old one can be
+# held forever. The `.js.map` beside the bundle is hashed too, and is deployed on purpose:
+# `astro.config.mjs` turns sourcemaps on so the arithmetic stays readable in the browser.
+/_astro/*
+  Cache-Control: public, max-age=31536000, immutable
+
+# The feed is *not* hashed — `src/scripts/main.ts` fetches it at a fixed path — so it cannot be
+# immutable. A deploy purges the edge, so 300s bounds only how long a returning browser can hold
+# a superseded feed. If that ever needs to be zero, the fix is a hashed feed path, not a shorter
+# max-age here.
+/data/bundle.json
+  Cache-Control: public, max-age=300, must-revalidate
+
+/index.html
+  Cache-Control: public, max-age=0, must-revalidate
