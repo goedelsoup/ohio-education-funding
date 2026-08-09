@@ -40,9 +40,13 @@ properties:
 
     Reported in [R] Total State Support and not in [N], so no guarantee holds it.
   statutory_basis: |
-    R.C. 3317.0213. The flat amount, the halving and the proration are transcribed from the FY2027
-    calculator and reproduced from it; whether the $4,000 and the half are statutory or budgetary
-    is [open].
+    R.C. 3317.0213, read. **Codified.** Division (A) states the formula as "($4,000 X the number of
+    students who are preschool children with disabilities) + …", and every weighted term carries an
+    explicit "X 0.50". Both the flat grant and the halving are the General Assembly's — which is
+    what makes this the one component where the wealthiest district and the poorest are funded
+    identically for most of what they receive, by design rather than by accident. The **proration**
+    is not in the section and is not statutory; see [appropriation proration
+    factor](../parameter/appropriation-proration-factor.yml). [verified — `ohio-laws`]
   calculator: |
     Not a standalone crate. Carried in `crates/project::panel::PreschoolSpecialEducation` and
     reproduced for all 609 districts in

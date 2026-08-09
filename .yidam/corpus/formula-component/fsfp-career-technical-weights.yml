@@ -63,9 +63,11 @@ properties:
     Total = the five plus associated services. Reconciles to the department's published
     `[G] Career-Technical` to the cent for all 609 districts.
   statutory_basis: |
-    R.C. 3317.014. Weights, the associated-services weight and the career-technical base cost are
-    transcribed from the FY2027 calculator and confirmed against the department's own per-category
-    amounts. The statutory basis for a separate base cost has not been read here. [open]
+    R.C. 3317.014, read. **Codified.** The five multiples are in division (A) to four decimals and
+    match the corpus exactly; the separate base cost is statutory too — the section multiplies each
+    category by "the statewide average career-technical base cost per pupil for that fiscal year",
+    so it is a distinct quantity by legislative construction rather than a departmental convenience.
+    [verified — `ohio-laws`]
   calculator: |
     Not a standalone crate. Reproduced for all 609 districts in
     `crates/project/tests/the_remaining_categoricals.rs`; carried in

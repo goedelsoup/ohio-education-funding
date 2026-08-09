@@ -578,6 +578,24 @@ In the case of a scholarship distributed to a student's school district of atten
 (I) For fiscal years 2026 and 2027, a school district shall spend the funds it receives under division (A)(5) of this section only for services for English learners.
 (J) For each fiscal year, a school district shall spend the funds it receives under division (A)(6) of this section only for the identification of gifted students, gifted coordinator services, and gifted intervention specialist services. For each fiscal year, if the department determines that a district is not in compliance with this division, it shall reduce the district's payments for that fiscal year under this chapter by an amount equal to the amount paid to the district for that fiscal year under division (A)(6) of this section that was not spent in accordance with this division. The department shall reduce the payment within ninety days of data finalization.
 
+§ 3317.051
+title: Calculation of gifted funding units.
+effective: September 30, 2025
+legislation: House Bill 96 - 136th General Assembly
+--
+(A) The department of education and workforce shall compute and pay to a school district funds based on units for services to students identified as gifted under Chapter 3324. of the Revised Code as prescribed by this section.
+(B) The department shall allocate gifted units for a school district as follows:
+(1) For fiscal years 2026 and 2027:
+(a) One gifted coordinator unit shall be allocated for every 3,300 students in a district's enrolled ADM, with a minimum of 0.5 units and a maximum of 8 units allocated for the district.
+(b) One kindergarten through eighth grade gifted intervention specialist unit shall be allocated for every 140 gifted students enrolled in grades kindergarten through eight in the district, as certified under division (B)(22) of section 3317.03 of the Revised Code, with a minimum of 0.3 units allocated for the district.
+(c) One ninth through twelfth grade gifted intervention specialist unit shall be allocated for every 140 gifted students enrolled in grades nine through twelve in the district, as certified under division (B)(22) of section 3317.03 of the Revised Code, with a minimum of 0.3 units allocated for the district.
+(2) For fiscal year 2028 and each fiscal year thereafter, in the manner prescribed by the general assembly.
+(C) The department shall pay an amount to a school district for gifted units as follows:
+(1) For fiscal years 2026 and 2027, an amount equal to the following sum:
+($85,776 X the number of units allocated to a school district under division (B)(1)(a) of this section X the district's state share percentage) + ($89,378 X the number of units allocated to a school district under division (B)(1)(b) of this section X the district's state share percentage) + ($80,974 X the number of units allocated to a school district under division (B)(1)(c) of this section X the district's state share percentage)
+(2) For fiscal year 2028 and each fiscal year thereafter, an amount calculated in a manner determined by the general assembly.
+(D) A school district may assign gifted unit funding that it receives under division (C) of this section to another school district, an educational service center, a community school, or a STEM school as part of an arrangement to provide services to the district.
+
 § 3317.0212
 title: Transportation payment.
 effective: September 30, 2025

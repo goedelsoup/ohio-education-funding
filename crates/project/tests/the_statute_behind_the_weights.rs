@@ -79,11 +79,11 @@ fn multiples(body: &str) -> Vec<f64> {
     out
 }
 
-/// The extract is what it claims to be: fourteen sections, each with a date and an act.
+/// The extract is what it claims to be: fifteen sections, each with a date and an act.
 #[test]
 fn every_cited_section_is_present_and_dated() {
     let count = STATUTE.lines().filter(|l| l.starts_with("§ ")).count();
-    assert_eq!(count, 14);
+    assert_eq!(count, 15);
     for number in [
         "3317.02",
         "3317.011",
@@ -93,6 +93,7 @@ fn every_cited_section_is_present_and_dated() {
         "3317.017",
         "3317.019",
         "3317.022",
+        "3317.051",
         "3317.0212",
         "3317.0213",
         "3317.0217",
@@ -350,5 +351,118 @@ fn local_capacity_takes_the_lesser_of_two_valuations() {
         body.contains("fiscal years 2026 and 2027"),
         "the section is written biennium by biennium, which is why a parameter series needs one \
          reading per budget"
+    );
+}
+
+// -------------------------------------------------------------------------------------------
+// The audit: what kind of thing each parameter is
+// -------------------------------------------------------------------------------------------
+
+/// **Ohio's funding parameters are not one kind of thing, and the corpus presented them as one.**
+///
+/// An audit pass over every `[open]` claim in the corpus turned up nine on `statutory_basis`
+/// fields, all of the form "transcribed from the calculator; the correspondence with statute has
+/// not been read." Reading the statute does not just confirm or deny them. It sorts them into four
+/// kinds with quite different durability, and the distinction is invisible in the calculator
+/// because a spreadsheet renders all four as a number in a cell:
+///
+/// | kind | where the value lives | what changes it |
+/// |---|---|---|
+/// | **legislated** | in the section, to four decimals | an act |
+/// | **delegated** | statute names the department | a departmental decision |
+/// | **measured** | statute specifies a computation over reported data | districts' own behaviour |
+/// | **uncodified** | nowhere in the Revised Code | the biennial budget, and it lapses |
+///
+/// This test pins one example of each so the taxonomy cannot quietly collapse back into a list of
+/// numbers.
+#[test]
+fn the_four_kinds_of_parameter_are_distinguishable_in_the_statute() {
+    // LEGISLATED. The preschool flat grant and the halving of its weighted half, both in the
+    // section, both to the digit. Four of the nine open items closed this way.
+    let preschool = section("3317.0213").body;
+    assert!(preschool.contains("$4,000 X the number of students who are preschool children"));
+    assert!(
+        preschool.contains("X 0.50"),
+        "the halving is statutory, not departmental"
+    );
+
+    // Targeted assistance's coefficient and its size brackets, likewise.
+    let targeted = section("3317.0217").body;
+    assert!(targeted.contains("X 0.008"));
+    assert!(targeted.contains("greater than or equal to 200"));
+
+    // Gifted: the two per-pupil amounts sit in the omnibus section, the three unit prices in a
+    // section it reaches by cross-reference. Both legislated; neither where the node looked.
+    assert!(section("3317.022")
+        .body
+        .contains("$24 X the district's enrolled ADM"));
+    let units = section("3317.051").body;
+    for price in ["$85,776", "$89,378", "$80,974"] {
+        assert!(units.contains(price), "gifted unit price {price}");
+    }
+
+    // MEASURED. Transportation's two rates are not chosen at all — they are trimmed means of what
+    // districts reported spending last year, with the ten highest and ten lowest dropped. The
+    // section contains no dollar figure whatever.
+    let transport = section("3317.0212").body;
+    assert!(transport.contains("statewide transportation cost per student"));
+    assert!(transport.contains(
+        "dividing the district's total costs for school bus service in the previous fiscal year"
+    ));
+    assert!(transport.contains("ten districts with the highest"));
+    assert!(
+        !transport.contains('$'),
+        "if a rate ever appears here, transportation has changed kind"
+    );
+
+    // UNCODIFIED. Four supplements the department pays and the Revised Code does not mention.
+    for absent in [
+        "base funding supplement",
+        "enrollment growth supplement",
+        "performance supplement",
+        "transition supplement",
+    ] {
+        assert!(
+            !section("3317.022").body.to_lowercase().contains(absent),
+            "{absent} should not be in the codified formula"
+        );
+    }
+}
+
+/// **$214.8m is paid under provisions that are not in the Revised Code**, and that is a fact about
+/// durability rather than about legality.
+///
+/// The base funding supplement, the enrolment growth supplement, the performance supplement and
+/// the formula transition supplement together are larger than the entire English learner and
+/// career-technical programmes combined. None of them appears in R.C. 3317.022, the section that
+/// assembles core foundation funding, nor anywhere else in the chapter this corpus cites. They are
+/// in the budget act's temporary law — H.B. 96 of the 136th General Assembly — which `codes.ohio.gov`
+/// does not carry, and which expires with the biennium unless re-enacted.
+///
+/// Nothing improper follows. Ohio funds a great deal this way. What follows is that a reader who
+/// takes these for permanent programme funding is wrong about them in a way no figure on the
+/// department's sheet would reveal, and the corpus was presenting them beside base cost as though
+/// they were the same kind of commitment.
+#[test]
+fn the_uncodified_supplements_are_larger_than_two_codified_programmes_together() {
+    let panel = project::panel::panel();
+    let total = |f: fn(&project::panel::DistrictRecord) -> f64| panel.iter().map(f).sum::<f64>();
+
+    let uncodified = total(|r| r.supplements.base_funding)
+        + total(|r| r.supplements.growth)
+        + total(|r| r.performance.amount)
+        + total(|r| r.transition.transition_supplement);
+    let codified = total(|r| r.english_learners.total()) + total(|r| r.career_technical.total());
+
+    assert!(
+        (uncodified / 1e6 - 214.8).abs() < 1.0,
+        "uncodified supplements ${:.1}m",
+        uncodified / 1e6
+    );
+    assert!(
+        uncodified > codified,
+        "${:.1}m uncodified against ${:.1}m of English learner and career-technical funding",
+        uncodified / 1e6,
+        codified / 1e6
     );
 }

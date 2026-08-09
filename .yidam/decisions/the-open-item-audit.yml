@@ -1,0 +1,96 @@
+id: the-open-item-audit
+summary: >-
+  A sweep of all 152 `[open]` claims in the corpus. Nine `statutory_basis` items resolved; the
+  central finding is that Ohio's funding parameters are four different kinds of thing and the
+  corpus was presenting them as one.
+context: |
+  Four consecutive phases had the same shape: a recorded claim turned out to be wrong, and the
+  correction was one `curl` away. Four stale blockers and five wrong claims, all found by opening a
+  file the corpus had already catalogued.
+
+  That pattern says something uncomfortable about the `[open]` markers themselves. They were being
+  read as a map of what is unknown. They are a record of what somebody did not get to, written at a
+  moment, and never revisited. Some describe problems that are already solved; some describe the
+  wrong problem.
+
+  So: enumerate every one and classify it, rather than continuing to pick items off by intuition.
+decision: |
+  Sweep all `[open]` claims mechanically — by node, by field — and classify each as answerable from
+  data on disk, answerable from a source now wired, genuinely blocked, or misdescribed.
+
+  Prioritise the `statutory_basis` cluster, because `ohio-laws` had just been wired and every one of
+  those items was of the form "transcribed from the calculator; the correspondence with statute has
+  not been read."
+consequences: |
+  **152 claims, across 12 node classes.** The distribution is itself informative:
+
+      description      63     prose claims, mostly genuine open questions
+      series           10     parameter histories; nearly all need `lsc-budget`
+      series_path       8     unpopulated agency data paths
+      established       7     agency metadata
+      statutory_basis   9     -> 3 after this pass
+      typology          6
+      vetoes            6
+
+  **The `statutory_basis` cluster is now six, and the six are not what they were.** Four closed
+  outright, and the interesting part is that reading the statute did not simply confirm or deny the
+  transcriptions. It **sorted them into four kinds of parameter with different durability**, a
+  distinction invisible in the calculator because a spreadsheet renders all four as a number in a
+  cell:
+
+    - **Legislated** — written in the section to four decimals. The fourteen multiples, DPIA's $422,
+      preschool's $4,000 and its `X 0.50`, targeted assistance's 0.008 and its 200/400 brackets,
+      gifted's $24, $2.50 and the three unit prices. Changed only by an act.
+    - **Delegated** — statute names the department. DPIA's 65/35 blend, which appears in no section:
+      R.C. 3317.03(B)(21) makes the count one of students "economically disadvantaged, as defined by
+      the department". Changed by a departmental decision.
+    - **Measured** — statute specifies a computation over reported data. Transportation's two rates
+      are **trimmed means of what districts themselves spent last year**, the ten highest and ten
+      lowest excluded; R.C. 3317.0212 contains no dollar figure at all. The 40th-highest-district
+      benchmark in local capacity is an order statistic. Changed by districts' own behaviour, with
+      nobody deciding and no bill required.
+    - **Uncodified** — nowhere in the Revised Code. The base funding supplement, the enrolment
+      growth supplement, the performance supplement and the formula transition supplement. Changed
+      by the biennial budget, and gone if it is not re-enacted.
+
+  **$214.8m is paid under provisions that are not in the Revised Code** — those four supplements
+  together, more than English learner and career-technical funding combined. Nothing improper
+  follows; Ohio funds a great deal this way. What follows is that a reader who takes them for
+  permanent programme funding is wrong in a way no figure on the department's report would reveal,
+  and this corpus was listing them beside base cost as though they were the same kind of promise.
+
+  **A second wrong citation.** `fsfp-gifted-units` cited R.C. 3317.053, which does not exist —
+  gifted units are R.C. 3317.051. That is two of nine `statutory_basis` fields pointing at sections
+  that are not there, after the DPIA node's R.C. 3317.029. Both were plausible-looking numbers in
+  the right chapter, which is exactly why nothing caught them: a citation is only checkable against
+  the thing it cites.
+
+  **And one of my own notes was wrong the same way.** The registry described R.C. 3317.019 as
+  "gifted units and their prices". It is *Temporary transitional aid*. The note was written from the
+  corpus's own citation rather than from the section, which is the identical failure being audited.
+
+  **What did not move.** The 63 `description` claims are mostly genuine — questions about intent,
+  about incidence, about why a threshold sits where it does. The 10 `series` items need `lsc-budget`
+  and stay blocked. The `series_path`, `established`, `typology` and `vetoes` clusters are agency and
+  legislation metadata that was never populated; they are honest emptiness rather than open
+  questions, and a future pass should probably distinguish "unknown" from "unentered" in the
+  notation rather than marking both `[open]`.
+alternatives: |
+  **Keep picking items off by intuition.** It had been working — four phases, four finds. Rejected
+  because the hit rate was evidence that intuition was sampling from a badly-mapped space, not that
+  it was good at choosing. A sweep says how much is left and of what kind; picking cannot.
+
+  **Close every `[open]` that the statute touches, and stop there.** Rejected. Four of the nine
+  closed cleanly and the other five were more interesting *as* corrections than they would have been
+  as closures: "transportation's rates are measured, not chosen" is a better fact than
+  "transportation's rates match statute", and it would have been lost by treating the audit as a
+  checklist.
+
+  **Introduce the four-kind taxonomy as an ontology change** — a `kind` field on `parameter`.
+  Deferred, not rejected. It is the right shape and it would touch every parameter node; doing it in
+  the same pass that discovered the distinction would mean committing to a classification derived
+  from nine examples. Recorded here so the next pass can decide on more.
+
+  **Change the notation to separate "unknown" from "unentered".** Also deferred, and for the same
+  reason — it is a change to how the whole corpus is written, and this pass found the need rather
+  than the design.

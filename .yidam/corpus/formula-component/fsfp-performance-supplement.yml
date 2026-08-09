@@ -63,9 +63,18 @@ properties:
     Paid on `[a] Enrolled ADM`, the same count four of the six categoricals use. Reported in
     [R] Total State Support and not in [N] Total Formula Funding, so no guarantee holds it.
   statutory_basis: |
-    Not located in R.C. 3317. The department computes it on its own sheet and reports it as line
-    [O]; the authorising section and whether the $13 and the three routes are statutory or set in
-    the budget bill are [open].
+    Not in R.C. 3317. The department computes it on its own sheet and reports it as line [O]; the
+    $13 and the three routes are transcribed from there.
+    **Confirmed uncodified.** The statute audit searched R.C. 3317.022 — the section that assembles
+    core foundation funding — and every other section this corpus cites. It is in none of them.
+    The authority is the budget act's temporary law, H.B. 96 of the 136th General Assembly, which
+    `codes.ohio.gov` does not carry and which lapses with the biennium unless re-enacted.
+
+    That is a statement about **durability**, not about legality; Ohio funds a great deal this way.
+    It means this payment has no permanent statutory home, unlike base cost or the categorical
+    weights beside it on the same report. Reading the enacted bill text is `lsc-budget`, still
+    blocked on PDFs. [verified that it is absent from the Revised Code; the bill section is [open]]
+
   calculator: |
     Not a standalone crate. Carried in `crates/project::panel::PerformanceSupplement` and
     reproduced for all 609 districts in
