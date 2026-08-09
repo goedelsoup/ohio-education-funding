@@ -32,7 +32,22 @@ description: |
   The progress routes are what hold the gradient to 2.3 rather than whatever it would otherwise be.
   [inference on the mechanism, [verified] on the measurement]
 
-  **STILL OPEN.** Whether the supplement is large enough to matter distributionally. $55.7m against
+  **ANSWERED: THE GRADIENT IS REAL AND THE SIZE IS NOT.** This node asked whether the supplement
+  is large enough to matter distributionally. Both halves of the answer are needed and they point
+  opposite ways.
+
+  The gradient is there and it runs against the grain: **$55.92 per pupil to the least
+  disadvantaged fifth of districts against $22.06 to the most**, monotone across all five
+  quintiles, a factor of 2.5. But the supplement is **0.77% of realized state aid**, it reaches at
+  most **7.0%** of any one district's aid, and the ninetieth-percentile district gets 2.8%. A
+  mechanism pointed the wrong way and turned down almost to nothing. [verified —
+  `crates/project/tests/questions_the_corpus_left_open.rs`]
+
+  Recorded precisely because it reads as either alarming or trivial depending on which of the two
+  numbers is quoted alone. The reason to keep watching it is that the gradient is a property of
+  the design and the size is a property of one appropriation.
+
+  ~~**STILL OPEN.** Whether the supplement is large enough to matter distributionally.~~ $55.7m against
   $7.28bn of state aid is 0.8%, so a district's whole supplement is smaller than the noise in most
   other lines — and a regressive 0.8% inside a progressive $7.28bn is a different object from a
   regressive program. The corpus can measure the gradient and has not measured whether it moves
