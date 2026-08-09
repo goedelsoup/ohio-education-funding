@@ -168,6 +168,10 @@ pub fn rebuild(root: &Path) -> Result<Vec<Rebuilt>, RebuildError> {
         capacity_rows: &fy27_book.rows("Local_Capacity")?,
         special_education_rows: &fy27_book.rows("Special Edu")?,
         dpia_rows: &fy27_book.rows("DPIA")?,
+        cte_rows: &fy27_book.rows("CTE")?,
+        el_rows: &fy27_book.rows("EL")?,
+        gifted_rows: &fy27_book.rows("Gifted")?,
+        targeted_assistance_rows: &fy27_book.rows("Targeted_Assistance")?,
     });
     let extract = fixtures::build_profile_extract(&profile_rows);
 

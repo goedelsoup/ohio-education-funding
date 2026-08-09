@@ -116,6 +116,51 @@ pub const FY27_HEADER: &[&str] = &[
     "dpia_weighted_adm",
     "dpia_percentage",
     "dpia_index",
+    "cte_fte_cat1",
+    "cte_fte_cat2",
+    "cte_fte_cat3",
+    "cte_fte_cat4",
+    "cte_fte_cat5",
+    "cte_aid_cat1",
+    "cte_aid_cat2",
+    "cte_aid_cat3",
+    "cte_aid_cat4",
+    "cte_aid_cat5",
+    "cte_associated_services",
+    "el_adm_cat1",
+    "el_adm_cat2",
+    "el_adm_cat3",
+    "el_aid_cat1",
+    "el_aid_cat2",
+    "el_aid_cat3",
+    "gifted_adm_k6",
+    "gifted_fte_k8",
+    "gifted_fte_9_12",
+    "gifted_identification",
+    "gifted_referral",
+    "gifted_professional_development",
+    "gifted_coordinator_units",
+    "gifted_coordinator_aid",
+    "gifted_specialist_k8_units",
+    "gifted_specialist_k8_aid",
+    "gifted_specialist_9_12_units",
+    "gifted_specialist_9_12_aid",
+    "ta_open_enrollment_in",
+    "ta_open_enrollment_out",
+    "ta_fy19_wealth_index",
+    "ta_fy19_enrolled_adm",
+    "ta_fy19_total_adm",
+    "ta_property_valuation",
+    "ta_federal_gross_income",
+    "ta_weighted_wealth",
+    "ta_capacity_index",
+    "ta_capacity_amount",
+    "ta_wealth_per_pupil",
+    "ta_wealth_index",
+    "ta_wealth_amount",
+    "ta_supplemental",
+    "ta_supplement_eligible",
+    "categorical_enrolled_adm",
 ];
 
 /// Column positions in the department's `Base_Cost` sheet, whose header is on the fourth row.
@@ -257,6 +302,172 @@ pub const DPIA_STATEWIDE_PERCENTAGE: f64 = 0.533_380_310_606_710_3;
 /// and the corpus has no node for them.
 pub const SPECIAL_EDUCATION_WEIGHTS: [f64; 6] = [0.2435, 0.6179, 1.4845, 1.9812, 2.6830, 3.9554];
 
+/// The five career-technical weights and the associated-services weight applied to their sum.
+pub const CTE_WEIGHTS: [f64; 5] = [0.6230, 0.5905, 0.2154, 0.1830, 0.1570];
+/// Associated services, weighted against total CTE FTE rather than any one category.
+pub const CTE_ASSOCIATED_WEIGHT: f64 = 0.0294;
+/// `Detailed SFPR!L12` — the career-technical base cost per pupil the five weights multiply.
+pub const CTE_BASE_COST_PER_PUPIL: f64 = 9855.62;
+
+/// The three English learner weights, in the order the sheet gives them.
+pub const ENGLISH_LEARNER_WEIGHTS: [f64; 3] = [0.2104, 0.1577, 0.1053];
+/// `Base_Cost!E3` — the statewide average base cost per pupil the EL weights multiply.
+pub const AVERAGE_BASE_COST_PER_PUPIL: f64 = 8241.61;
+
+/// The gifted program's five prices and three unit divisors, as the sheet's formulas state them.
+pub const GIFTED_IDENTIFICATION_PER_PUPIL: f64 = 24.0;
+/// Against enrolled ADM rather than the K-6 count identification uses.
+pub const GIFTED_REFERRAL_PER_PUPIL: f64 = 2.50;
+/// One coordinator unit per this many enrolled pupils, floored at 0.5 units and capped at 8.
+pub const GIFTED_COORDINATOR_DIVISOR: f64 = 3300.0;
+/// Floored at 0.5 units and capped at 8, so the smallest and largest districts both bind.
+pub const GIFTED_COORDINATOR_UNIT_FLOOR: f64 = 0.5;
+/// The upper bound on coordinator units, reached at 26,400 enrolled pupils.
+pub const GIFTED_COORDINATOR_UNIT_CAP: f64 = 8.0;
+/// What one coordinator unit is worth before the state share.
+pub const GIFTED_COORDINATOR_UNIT_PRICE: f64 = 85_776.0;
+/// One intervention specialist unit per this many identified gifted pupils, floored at 0.3.
+pub const GIFTED_SPECIALIST_DIVISOR: f64 = 140.0;
+/// The minimum units a district draws in each band, however few gifted pupils it identifies.
+pub const GIFTED_SPECIALIST_UNIT_FLOOR: f64 = 0.3;
+/// The two bands are priced differently, K-8 above 9-12.
+pub const GIFTED_SPECIALIST_K8_UNIT_PRICE: f64 = 89_378.0;
+/// The 9-12 unit is priced $8,404 below the K-8 one.
+pub const GIFTED_SPECIALIST_9_12_UNIT_PRICE: f64 = 80_974.0;
+
+/// Targeted assistance's statewide constants and coefficients.
+///
+/// `MEDIAN_WEIGHTED_WEALTH` is computed by the sheet itself as the median of the district column;
+/// the per-pupil median is stated. The sheet also publishes both **excluding North Bass and Middle
+/// Bass**, at $362,326,436.80 and $253,337.38 — and neither formula references them. The exclusion
+/// is displayed and unused.
+pub const TA_MEDIAN_WEIGHTED_WEALTH: f64 = 392_151_306.632_980_76;
+/// The median district's weighted wealth per resident pupil, which `[E]` indexes against.
+pub const TA_MEDIAN_WEALTH_PER_PUPIL: f64 = 276_708.97;
+/// Property valuation against federal adjusted gross income, in the blend that makes `[A]`.
+pub const TA_WEALTH_BLEND: (f64, f64) = (0.6, 0.4);
+/// The capacity tier pays this share of the shortfall below the median district's total wealth.
+pub const TA_CAPACITY_RATE: f64 = 0.008;
+/// Below this ADM the capacity tier pays nothing; between here and `TA_CAPACITY_RAMP_START` it
+/// pays `TA_CAPACITY_SMALL_SHARE`; from there to `TA_CAPACITY_FULL_AT` the share ramps to one.
+pub const TA_CAPACITY_MINIMUM_ADM: f64 = 200.0;
+/// Between here and `TA_CAPACITY_FULL_AT` the share ramps linearly from 5% to 100%.
+pub const TA_CAPACITY_RAMP_START: f64 = 400.0;
+/// At and above this ADM the capacity tier is paid in full.
+pub const TA_CAPACITY_FULL_AT: f64 = 600.0;
+/// What a district between the minimum and the ramp receives of the capacity tier.
+pub const TA_CAPACITY_SMALL_SHARE: f64 = 0.05;
+/// The wealth tier's two coefficients. The second is 0.8 times the first, which is why the tier
+/// cuts off at a wealth index of 0.8: that is exactly where the bracket reaches zero.
+pub const TA_WEALTH_RATE: f64 = 0.014;
+/// Applied to the district's own wealth per pupil; exactly 0.8 times `TA_WEALTH_RATE`.
+pub const TA_WEALTH_OFFSET_RATE: f64 = 0.0112;
+/// Below this wealth index the tier pays nothing, because the bracket has gone negative.
+pub const TA_WEALTH_INDEX_FLOOR: f64 = 0.8;
+
+/// Column positions in the `CTE` sheet, whose header is on the fourth row.
+///
+/// Five weighted categories and an associated-services weight applied to the sum. Mechanically the
+/// same shape as special education — weight times count times a base cost times the state share —
+/// with one difference that matters: **CTE is weighted against its own base cost per pupil**,
+/// $9,855.62, where every other weighted categorical uses the general $8,241.61. A career-technical
+/// pupil starts from a base 20% higher before any weight is applied.
+mod cte_columns {
+    pub const IRN: usize = 0;
+    /// Five FTE counts, Category 1 through 5, then the five aid amounts they produce.
+    pub const FIRST_FTE: usize = 4;
+    pub const FIRST_AID: usize = 9;
+    /// Associated services, the sum of all five FTE at a sixth weight.
+    pub const ASSOCIATED_SERVICES: usize = 16;
+}
+
+/// Column positions in the `EL` sheet, whose header is on the fourth row.
+///
+/// Three categories, and the weights run **downward** — 0.2104, 0.1577, 0.1053. Category 1 is the
+/// most recently arrived learner and is funded at twice Category 3, so the program pays most in a
+/// pupil's first year and tapers. Every other weighted categorical in the plan runs the other way.
+mod el_columns {
+    pub const IRN: usize = 0;
+    pub const FIRST_ADM: usize = 4;
+    pub const FIRST_AID: usize = 8;
+}
+
+/// Column positions in the `Gifted` sheet, whose header is on the fifth row.
+///
+/// The one categorical that is not a weight times a count. Two per-pupil amounts — $24 against
+/// K-6 enrolment for identification, $2.50 against all enrolment for referral — plus three kinds of
+/// **unit**, each a headcount entitlement priced at a salary-like figure.
+///
+/// The units carry floors and a cap, and they are the whole of the policy:
+///
+/// - a coordinator unit per 3,300 pupils, **floored at 0.5 and capped at 8**;
+/// - an intervention specialist unit per 140 identified gifted pupils in K-8, floored at 0.3;
+/// - the same per 140 in grades 9-12, floored at 0.3, priced lower.
+///
+/// A district with no identified gifted pupils at all still draws 0.5 + 0.3 + 0.3 units, so gifted
+/// funding has a floor no other categorical has. The cap binds from 26,400 pupils upward.
+mod gifted_columns {
+    pub const IRN: usize = 0;
+    /// `[a1] Enrollment K-6`, the base for identification.
+    pub const ADM_K6: usize = 4;
+    /// `[F1] Identification` and `[F2] Referral`, both already net of the state share.
+    pub const IDENTIFICATION: usize = 6;
+    pub const REFERRAL: usize = 7;
+    /// `[f1]`/`[f2]` — identified gifted FTE by grade band.
+    pub const FTE_K8: usize = 8;
+    pub const FTE_9_12: usize = 9;
+    /// `[F3] Professional Development`, a hard-coded column rather than a computed one.
+    pub const PROFESSIONAL_DEVELOPMENT: usize = 11;
+    /// Units then dollars, for each of the three unit kinds.
+    pub const COORDINATOR_UNITS: usize = 12;
+    pub const COORDINATOR_AID: usize = 13;
+    pub const SPECIALIST_K8_UNITS: usize = 14;
+    pub const SPECIALIST_K8_AID: usize = 15;
+    pub const SPECIALIST_9_12_UNITS: usize = 16;
+    pub const SPECIALIST_9_12_AID: usize = 17;
+}
+
+/// Column positions in the `Targeted_Assistance` sheet, whose header is on the fifth row.
+///
+/// The largest categorical at $1.36bn, and the only one that is an **equalisation** rather than a
+/// payment for a category of pupil. It has two additive tiers, and they measure different things:
+///
+/// - `[C]` the **capacity amount** — 0.8% of however far the district's *total* weighted wealth
+///   falls below the statewide median district's, phased by size;
+/// - `[F]` the **wealth amount** — a rate against weighted wealth *per resident pupil*.
+///
+/// Two features of the sheet's own formulas are invisible in any published total. First, the
+/// capacity tier has a **size cliff**: a district under 200 ADM receives none of it, one between
+/// 200 and 400 receives 5%, and the fraction ramps linearly to 100% only between 400 and 600.
+/// Second, the wealth tier divides by *resident* ADM — enrolled less those open-enrolling in, plus
+/// those open-enrolling out — and then multiplies by *enrolled* ADM. Two different pupil counts,
+/// one line apart in the same formula.
+mod targeted_assistance_columns {
+    pub const IRN: usize = 0;
+    /// `[a1]`/`[a2]` — open enrolment in and out, which turn enrolled ADM into resident ADM.
+    pub const OPEN_ENROLLMENT_IN: usize = 4;
+    pub const OPEN_ENROLLMENT_OUT: usize = 5;
+    /// `[b]`/`[c]`/`[d]` — the FY2019 figures the supplemental tier's eligibility test uses.
+    pub const FY19_WEALTH_INDEX: usize = 6;
+    pub const FY19_ENROLLED_ADM: usize = 7;
+    pub const FY19_TOTAL_ADM: usize = 8;
+    /// `[A1]`/`[A2]` — property valuation and federal adjusted gross income, blended 60/40.
+    pub const PROPERTY_VALUATION: usize = 9;
+    pub const FEDERAL_GROSS_INCOME: usize = 10;
+    /// `[A] District Weighted Wealth`.
+    pub const WEIGHTED_WEALTH: usize = 11;
+    /// `[B]`/`[C]` — the capacity tier.
+    pub const CAPACITY_INDEX: usize = 12;
+    pub const CAPACITY_AMOUNT: usize = 13;
+    /// `[D]`/`[E]`/`[F]` — the wealth tier.
+    pub const WEALTH_PER_PUPIL: usize = 14;
+    pub const WEALTH_INDEX: usize = 15;
+    pub const WEALTH_AMOUNT: usize = 16;
+    /// `[H]`/`[I]` — the supplemental tier's eligibility flag and its amount.
+    pub const SUPPLEMENT_ELIGIBLE: usize = 18;
+    pub const SUPPLEMENTAL: usize = 19;
+}
+
 /// Column positions in the `Local_Capacity` sheet, whose header is on the second row.
 ///
 /// The whole of R.C. 3317.017 worked step by step, with the statute's own labels — `[V1]`, `[I1]`,
@@ -307,7 +518,18 @@ mod capacity_columns {
 /// labels, so every enrollment-trend figure in the corpus was named for the wrong pair of
 /// years — and the later two of the three are themselves partly departmental estimate rather
 /// than actual, which a label reading "FY2022 to FY2024" conceals entirely.
+/// # And a seventh pupil count, which is the one the categoricals are paid on
+///
+/// `[a] Enrolled ADM` sits at column 3 of this sheet and is **not** `[b3] FY26 Enrolled ADM` at
+/// column 28. For Akron they are 18,892.45 and 18,842.45 — fifty pupils apart. The four
+/// categorical sheets all look up column 3; base cost averages columns 26 through 28.
+///
+/// So a district's aid is computed against one enrolled ADM for its base cost and a different one
+/// for its targeted assistance, gifted, career-technical and English learner amounts, and no
+/// published figure names either. This corpus carries both rather than picking.
 mod adm_columns {
+    /// `[a] Enrolled ADM` — the count the four categorical sheets are paid on.
+    pub const CATEGORICAL_ENROLLED_ADM: usize = 3;
     pub const BUILDINGS_FY25: usize = 25;
     pub const ADM_FY24: usize = 26;
     pub const ADM_FY25: usize = 27;
@@ -334,7 +556,9 @@ mod profile_columns {
 /// same type, so transposing two is silent and produces a fixture of plausible wrong numbers. The
 /// sheets grew from four to eight as the calculator was taken apart, and at eight it stopped being
 /// safe to pass them by position.
-#[derive(Clone, Copy)]
+/// `Default` gives every sheet as empty, which is what a test exercising one of them wants; the
+/// production call site in [`crate::rebuild`] names all twelve.
+#[derive(Clone, Copy, Default)]
 pub struct Fy27Sheets<'a> {
     /// `Base_Cost` — the statutory build-up's inputs.
     pub base_cost_rows: &'a [Vec<String>],
@@ -352,6 +576,30 @@ pub struct Fy27Sheets<'a> {
     pub special_education_rows: &'a [Vec<String>],
     /// `DPIA` — the blend and the squared index.
     pub dpia_rows: &'a [Vec<String>],
+    /// `CTE` — five weighted categories against a career-technical base cost.
+    pub cte_rows: &'a [Vec<String>],
+    /// `EL` — three weighted categories, descending.
+    pub el_rows: &'a [Vec<String>],
+    /// `Gifted` — two per-pupil amounts and three kinds of unit.
+    pub gifted_rows: &'a [Vec<String>],
+    /// `Targeted_Assistance` — the two-tier equalisation.
+    pub targeted_assistance_rows: &'a [Vec<String>],
+}
+
+/// Index a worksheet by IRN, taking every row whose key column holds one.
+///
+/// **Not** by skipping a fixed number of header rows. The department puts each categorical sheet's
+/// header at whatever depth that sheet's statewide constants needed — the fourth row for `CTE` and
+/// `EL`, the fifth for `Gifted` and `Targeted_Assistance` — and leaves blank rows above it, which
+/// the workbook reader drops. Counting rows therefore means counting the blanks correctly too, and
+/// the first attempt here was off by one on three of the four sheets. It lost exactly the first
+/// district, alphabetically, and left the rest right: the fixture gained one row of empty
+/// categorical columns out of 609 and nothing else looked wrong.
+///
+/// Matching on the key instead makes the header depth irrelevant. A header row's key cell says
+/// `District IRN`, which is not a district key, so it filters itself out.
+fn rows_by_irn(rows: &[Vec<String>], irn_column: usize) -> HashMap<&str, &Vec<String>> {
+    rows_by_key(rows, irn_column).collect()
 }
 
 /// Join the department's FY2027 base cost and summary sheets with profile-report valuation.
@@ -366,6 +614,10 @@ pub fn build_fy27_model(sheets: &Fy27Sheets<'_>) -> Vec<Vec<String>> {
         capacity_rows,
         special_education_rows,
         dpia_rows,
+        cte_rows,
+        el_rows,
+        gifted_rows,
+        targeted_assistance_rows,
     } = *sheets;
     use base_cost_columns as bc;
 
@@ -400,6 +652,13 @@ pub fn build_fy27_model(sheets: &Fy27Sheets<'_>) -> Vec<Vec<String>> {
         .filter(|row| !cell(row, capacity_columns::IRN).trim().is_empty())
         .map(|row| (cell(row, capacity_columns::IRN).trim(), row))
         .collect();
+    // The four remaining categorical sheets. Their headers sit at two depths: `CTE` and `EL` on the
+    // fourth row, `Gifted` and `Targeted_Assistance` on the fifth.
+    let cte: HashMap<&str, &Vec<String>> = rows_by_irn(cte_rows, cte_columns::IRN);
+    let el: HashMap<&str, &Vec<String>> = rows_by_irn(el_rows, el_columns::IRN);
+    let gifted: HashMap<&str, &Vec<String>> = rows_by_irn(gifted_rows, gifted_columns::IRN);
+    let targeted: HashMap<&str, &Vec<String>> =
+        rows_by_irn(targeted_assistance_rows, targeted_assistance_columns::IRN);
 
     let valuation: Vec<(&str, &Vec<String>)> = profile_rows
         .iter()
@@ -502,7 +761,10 @@ pub fn build_fy27_model(sheets: &Fy27Sheets<'_>) -> Vec<Vec<String>> {
                 detail
                     .get(irn)
                     .and_then(|row| cell_number(row, detail_columns::STATE_SHARE)),
-                6,
+                // Ten places rather than six. The state share multiplies four of the six
+                // categoricals, so rounding it costs a dollar or so per district on each — small,
+                // and enough to stop a reproduction test from being exact.
+                10,
             ),
         ]);
 
@@ -569,6 +831,88 @@ pub fn build_fy27_model(sheets: &Fy27Sheets<'_>) -> Vec<Vec<String>> {
                 .expect("just pushed")
                 .push(format_value(value, places));
         }
+
+        let cte_row = cte.get(irn);
+        let mut columns: Vec<(usize, usize)> = (0..5)
+            .map(|k| (cte_columns::FIRST_FTE + k, 9))
+            .chain((0..5).map(|k| (cte_columns::FIRST_AID + k, 2)))
+            .collect();
+        columns.push((cte_columns::ASSOCIATED_SERVICES, 2));
+        for (column, places) in columns {
+            let value = cte_row.and_then(|row| cell_number(row, column));
+            out.last_mut()
+                .expect("just pushed")
+                .push(format_value(value, places));
+        }
+
+        let el_row = el.get(irn);
+        for (column, places) in (0..3)
+            .map(|k| (el_columns::FIRST_ADM + k, 9))
+            .chain((0..3).map(|k| (el_columns::FIRST_AID + k, 2)))
+        {
+            let value = el_row.and_then(|row| cell_number(row, column));
+            out.last_mut()
+                .expect("just pushed")
+                .push(format_value(value, places));
+        }
+
+        let gifted_row = gifted.get(irn);
+        for (column, places) in [
+            (gifted_columns::ADM_K6, 9),
+            (gifted_columns::FTE_K8, 9),
+            (gifted_columns::FTE_9_12, 9),
+            (gifted_columns::IDENTIFICATION, 2),
+            (gifted_columns::REFERRAL, 2),
+            (gifted_columns::PROFESSIONAL_DEVELOPMENT, 2),
+            (gifted_columns::COORDINATOR_UNITS, 8),
+            (gifted_columns::COORDINATOR_AID, 2),
+            (gifted_columns::SPECIALIST_K8_UNITS, 8),
+            (gifted_columns::SPECIALIST_K8_AID, 2),
+            (gifted_columns::SPECIALIST_9_12_UNITS, 8),
+            (gifted_columns::SPECIALIST_9_12_AID, 2),
+        ] {
+            let value = gifted_row.and_then(|row| cell_number(row, column));
+            out.last_mut()
+                .expect("just pushed")
+                .push(format_value(value, places));
+        }
+
+        let ta_row = targeted.get(irn);
+        for (column, places) in [
+            (targeted_assistance_columns::OPEN_ENROLLMENT_IN, 9),
+            (targeted_assistance_columns::OPEN_ENROLLMENT_OUT, 9),
+            (targeted_assistance_columns::FY19_WEALTH_INDEX, 9),
+            (targeted_assistance_columns::FY19_ENROLLED_ADM, 4),
+            (targeted_assistance_columns::FY19_TOTAL_ADM, 4),
+            (targeted_assistance_columns::PROPERTY_VALUATION, 2),
+            (targeted_assistance_columns::FEDERAL_GROSS_INCOME, 4),
+            (targeted_assistance_columns::WEIGHTED_WEALTH, 4),
+            (targeted_assistance_columns::CAPACITY_INDEX, 8),
+            (targeted_assistance_columns::CAPACITY_AMOUNT, 2),
+            (targeted_assistance_columns::WEALTH_PER_PUPIL, 2),
+            (targeted_assistance_columns::WEALTH_INDEX, 8),
+            (targeted_assistance_columns::WEALTH_AMOUNT, 2),
+            (targeted_assistance_columns::SUPPLEMENTAL, 2),
+        ] {
+            let value = ta_row.and_then(|row| cell_number(row, column));
+            out.last_mut()
+                .expect("just pushed")
+                .push(format_value(value, places));
+        }
+        // The eligibility flag is the sheet's one non-numeric answer, and the department spells its
+        // negative `N0` with a zero. Carried as one or nothing rather than as either spelling.
+        let eligible = ta_row
+            .map(|row| cell(row, targeted_assistance_columns::SUPPLEMENT_ELIGIBLE).trim())
+            .is_some_and(|flag| flag.eq_ignore_ascii_case("yes"));
+        out.last_mut()
+            .expect("just pushed")
+            .push(if eligible { "1" } else { "0" }.to_string());
+        // The pupil count all four of those sheets are actually paid on, which is none of the three
+        // years base cost averages. Carried last so the header stays append-only.
+        out.last_mut().expect("just pushed").push(format_value(
+            adm_year(adm_columns::CATEGORICAL_ENROLLED_ADM),
+            9,
+        ));
     }
     out
 }
@@ -1463,10 +1807,7 @@ mod tests {
             summary_rows: &summary_rows(),
             adm_rows: &adm_rows(),
             profile_rows: &profile_rows(),
-            detail_rows: &[],
-            capacity_rows: &[],
-            special_education_rows: &[],
-            dpia_rows: &[],
+            ..Default::default()
         })
     }
 
@@ -1559,10 +1900,7 @@ mod tests {
             summary_rows: &summary_rows()[..1],
             adm_rows: &adm_rows(),
             profile_rows: &profile_rows(),
-            detail_rows: &[],
-            capacity_rows: &[],
-            special_education_rows: &[],
-            dpia_rows: &[],
+            ..Default::default()
         });
         assert!(rows.is_empty());
     }
@@ -1576,10 +1914,7 @@ mod tests {
             summary_rows: &summary_rows(),
             adm_rows: &adm_rows(),
             profile_rows: &profile_rows(),
-            detail_rows: &[],
-            capacity_rows: &[],
-            special_education_rows: &[],
-            dpia_rows: &[],
+            ..Default::default()
         });
         assert_eq!(
             rows.iter().map(|r| r[0].as_str()).collect::<Vec<_>>(),
@@ -1596,10 +1931,7 @@ mod tests {
             summary_rows: &summary_rows(),
             adm_rows: &adm_rows(),
             profile_rows: &profile_rows(),
-            detail_rows: &[],
-            capacity_rows: &[],
-            special_education_rows: &[],
-            dpia_rows: &[],
+            ..Default::default()
         });
         assert!(!rows[1][1].contains(','));
         assert_eq!(rows[1][1], "Northern Local  Perry");
@@ -1614,10 +1946,7 @@ mod tests {
             summary_rows: &summary_rows(),
             adm_rows: &adm_rows(),
             profile_rows: &profile_rows(),
-            detail_rows: &[],
-            capacity_rows: &[],
-            special_education_rows: &[],
-            dpia_rows: &[],
+            ..Default::default()
         });
         assert_eq!(rows[1][1], "Bellefontaine City");
     }
