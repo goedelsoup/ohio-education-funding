@@ -17,11 +17,16 @@ misdescribed: *DeRolph IV* did not simply reaffirm the earlier holdings — it *
 *DeRolph III* and reinstated *DeRolph I* and *II* as controlling law. Any account that treats
 the four decisions as cumulative is wrong about what the operative holding is.
 
-**Access constraints.** Opinions are freely available with WebCite citations. The Bricker
-chronology is a law-firm publication — reliable on procedure, but a secondary source, and
-claims drawn from it are tagged accordingly rather than as verified primary text. The LSC
-Members Brief PDF is served from a host whose TLS chain does not validate through standard
-fetching; retrieve it by other means or cite the opinions directly.
+**Access constraints.** The four opinions are freely available with WebCite citations, and are no
+longer only available: all four are retrieved, digest-pinned in the manifest, and committed as a
+text extract. The Bricker chronology is a law-firm publication — reliable on procedure, but a
+secondary source, and claims drawn from it are tagged accordingly rather than as verified primary
+text. The LSC Members Brief PDF is served from a host whose TLS chain does not validate through
+standard fetching; retrieve it by other means or cite the opinions directly.
+
+Trial-level rulings are a different matter and are **not** reachable from this source: a common
+pleas decision is not in the supreme court's archive, which is why the 2025 EdChoice ruling stays
+sourced to reporting.
 
 **Caveat.** Counts of "how many DeRolph rulings" differ across sources — four Supreme Court
 decisions plus a 1997 clarification and the 2003 prohibition action, which some summaries
@@ -30,6 +35,8 @@ clarification and the prohibition inside the relevant nodes.
 
 ## Used by
 
+- [`crates/regime-diff/fixtures/derolph-opinions.txt`](../../crates/regime-diff/fixtures/derolph-opinions.txt)
+  — the committed extract of all four opinions, one record per case.
 - [`litigation/derolph-i-1997`](../corpus/litigation/derolph-i-1997.yml)
 - [`litigation/derolph-iv-2002`](../corpus/litigation/derolph-iv-2002.yml)
 - [`education-agency/northern-local-perry`](../corpus/education-agency/northern-local-perry.yml)

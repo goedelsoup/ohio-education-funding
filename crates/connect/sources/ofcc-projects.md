@@ -34,7 +34,21 @@ at property-poor districts requires those districts to pass a levy.
 **Declared.** Approved in [decisions/proposals.yml](../../../.yidam/decisions/proposals.yml);
 no endpoint wired.
 
-Project records sit behind a search form with no bulk export. The capital channel therefore
-remains invisible in every per-pupil figure this repository computes, which is worth stating
-plainly rather than leaving as an unremarked absence: capital was part of the *DeRolph* remedy,
-and an operating-only view of Ohio school funding understates what the state did about it.
+The blocker recorded here for twelve phases — *"project records sit behind a search form with no
+bulk export"* — was a guess, and it was wrong about the first obstacle.
+
+**The blocker is now precise, and it is partly a choice.** `ofcc.ohio.gov` returns 404 to this
+project's contactable user-agent and 200 to a browser string. The data is served; the agent is
+filtered. Sending a browser string would work, and [`cache`](../src/cache.rs) already states the
+position on that — impersonating one *"would be discourteous besides"*. The filter is more likely
+an undiscriminating CDN default than a considered exclusion of researchers, but guessing at intent
+is not a reason to route around it.
+
+Behind the filter the project portfolios are interactive maps rather than files, so a bulk export
+would still have to be reverse-engineered out of a map service. The honest next step is to ask the
+commission, not to change the agent string.
+
+The capital channel therefore remains invisible in every per-pupil figure this repository
+computes, which is worth stating plainly rather than leaving as an unremarked absence: capital was
+part of the *DeRolph* remedy, and an operating-only view of Ohio school funding understates what
+the state did about it.

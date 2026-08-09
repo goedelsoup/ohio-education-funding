@@ -576,23 +576,7 @@ pub const CONNECTORS: &[Connector] = &[
                          indexed but post-date the deduction entirely",
         },
         note: "The one source that would carry the voucher and community-school deduction per \
-               resident district, for the years it existed. The FY2027 calculator does not: its \
-               transfer channel is a named service-centre charge plus a residual too small to \
-               hide one, and under the Fair School Funding Plan those students are funded \
-               directly rather than deducted. So the deduction is not missing from the current \
-               model — it is absent from it by design, and what is missing is the era before.\n\
-               \n\
-               **The recorded blocker was wrong in both directions.** \"No index and no stable \
-               path\" is stale: `education.ohio.gov` now lists 38 direct `.xlsx` payment reports \
-               for FY2026 and FY2027 at fixed URLs. And \"the years before about 2015 are not on \
-               the current host\" is wrong in kind — the department publishes *Foundation Legacy \
-               Payment Reports (1999-2021)*, covering the whole deduct era, on its reports \
-               portal. That portal gates on `sessionStorage.claims` and needs an OH|ID account.\n\
-               \n\
-               So the era this connector exists for is retrievable-in-principle and behind a \
-               login, which is a different problem from an absent index and is not one to route \
-               around. The open era is wide open and is the era where the deduction does not \
-               exist.",
+               resident district, for the years it existed.",
         sources: &[],
     },
     Connector {
@@ -685,7 +669,9 @@ pub const CONNECTORS: &[Connector] = &[
                 format: Format::Pdf,
                 catalog: Some("derolph-litigation-record"),
                 fixture: Some(crate::fixtures::OPINIONS_FIXTURE),
-                note: "DeRolph I, 1997. The opinion the corpus's charge-off rate series is built from — paragraph 97 recites the whole progression with its session-law citations, and names the base as total taxable value.",
+                note: "The opinion the corpus's charge-off rate series is built from. \
+                       Paragraph 97 recites the whole progression with its session-law \
+                       citations, and names the base as total taxable value.",
             },
             Source {
                 key: "derolph-ii",
@@ -695,7 +681,8 @@ pub const CONNECTORS: &[Connector] = &[
                 format: Format::Pdf,
                 catalog: Some("derolph-litigation-record"),
                 fixture: Some(crate::fixtures::OPINIONS_FIXTURE),
-                note: "DeRolph II, 2000.",
+                note: "The second of the four, holding the system still unconstitutional \
+                       after the General Assembly's first response.",
             },
             Source {
                 key: "derolph-iii",
@@ -705,7 +692,7 @@ pub const CONNECTORS: &[Connector] = &[
                 format: Format::Pdf,
                 catalog: Some("derolph-litigation-record"),
                 fixture: Some(crate::fixtures::OPINIONS_FIXTURE),
-                note: "DeRolph III, 2001, at 93 Ohio St.3d 309. The WebCite is 2001-Ohio-1343; \
+                note: "The WebCite is 2001-Ohio-1343; \
                        this entry first carried 2001-Ohio-114, which is a workers' compensation \
                        appeal. A citation guessed from a plausible number rather than read off \
                        the document — the same failure this connector was wired to make \
@@ -720,7 +707,8 @@ pub const CONNECTORS: &[Connector] = &[
                 format: Format::Pdf,
                 catalog: Some("derolph-litigation-record"),
                 fixture: Some(crate::fixtures::OPINIONS_FIXTURE),
-                note: "DeRolph IV, 2002. The last word, and the one that ended judicial supervision without a remedy.",
+                note: "The last word, and the one that ended judicial supervision without \
+                       a remedy.",
             },
         ],
     },
@@ -734,20 +722,7 @@ pub const CONNECTORS: &[Connector] = &[
                          by interactive maps rather than served as files",
         },
         note: "The only source for the capital channel, which is invisible in every operating \
-               per-pupil figure and was itself part of the DeRolph remedy.\n\
-               \n\
-               **The blocker is now precise, and it is partly a choice.** `ofcc.ohio.gov` returns \
-               404 to this project's contactable user-agent and 200 to a browser string. The data \
-               is served; the agent is filtered. Sending a browser string would work, and \
-               [`cache`](../src/cache.rs) already states the position on that — impersonating one \
-               \"would be discourteous besides\". The filter is more likely an undiscriminating \
-               CDN default than a considered exclusion of researchers, but guessing at intent is \
-               not a reason to route around it.\n\
-               \n\
-               Behind the filter the project portfolios are interactive maps rather than files, \
-               so a bulk export would still have to be reverse-engineered out of a map service. \
-               The honest next step here is to ask the commission, not to change the agent \
-               string.",
+               per-pupil figure and was itself part of the DeRolph remedy.",
         sources: &[],
     },
     Connector {
