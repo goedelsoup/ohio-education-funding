@@ -14,14 +14,15 @@ use std::collections::HashMap;
 use bundle::{
     BaseCostBuildUp, Bundle, CareerTechnical, Categoricals, Checkpoint, Deflator, District,
     DistrictOutcome, Dpia, EnglishLearners, FinanceYear, ForecastCheckpoint, Gifted,
-    MillageAnalysis, National, OutcomeStatewide, PolicyShape, Projection, PropertyTaxYear,
-    RegimeCounterfactual, SpecialEducation, SpendingByFunction, StateFinance, Statewide,
-    TargetedAssistance, CONTRACT_VERSION,
+    HouseDistrictMember, HouseDistrictShare, MillageAnalysis, National, OutcomeStatewide,
+    PolicyShape, Projection, PropertyTaxYear, RegimeCounterfactual, SpecialEducation,
+    SpendingByFunction, StateFinance, Statewide, TargetedAssistance, CONTRACT_VERSION,
 };
 use dispersion::{partial_correlation, wealth_neutrality};
 use edfund_core::{AgencyType, FiscalYear};
 use foundation::{aggregate_base_cost, StatewideFactors};
 use project::finances::{finances, for_district, Finances};
+use project::house_district::{house_districts, overlaps};
 use project::outcomes::{joined, Joined};
 use project::panel::{panel, DistrictRecord, HISTORY_YEARS, MINIMUM_STATE_SHARE, MODEL_YEAR};
 use project::policy::{GuaranteeRule, Policy};
@@ -379,6 +380,40 @@ fn outcome_statewide(records: &[Joined]) -> Option<OutcomeStatewide> {
     })
 }
 
+/// The 99 House districts, apportioned, in the bundle's own shape.
+///
+/// `project::house_district` does the arithmetic and the verification; this only restates it for
+/// the feed, so that the reconciliation test lives beside the apportionment rather than here.
+fn house_district_block(records: &[DistrictRecord]) -> Vec<bundle::HouseDistrict> {
+    house_districts(records)
+        .into_iter()
+        .map(|h| bundle::HouseDistrict {
+            number: h.number,
+            adm: h.adm,
+            realized_aid: h.realized_aid,
+            base_cost_state_share: h.base_cost_state_share,
+            categorical_funding: h.categorical_funding,
+            guarantee: h.guarantee,
+            districts_on_guarantee: h.districts_on_guarantee,
+            districts_at_minimum_state_share: h.districts_at_minimum_state_share,
+            districts_wholly_inside: h.districts_wholly_inside,
+            members: h
+                .members
+                .into_iter()
+                .map(|m| HouseDistrictMember {
+                    irn: m.irn,
+                    name: m.name,
+                    share: m.share,
+                    share_of_house_district: m.share_of_house_district,
+                    adm: m.adm,
+                    realized_aid: m.realized_aid,
+                    wholly_inside: m.wholly_inside,
+                })
+                .collect(),
+        })
+        .collect()
+}
+
 fn to_district(
     record: &DistrictRecord,
     profile: Option<&&str>,
@@ -386,12 +421,14 @@ fn to_district(
     money: Option<&Finances>,
     taxes: Option<&Vec<PropertyTaxYear>>,
     functions: Option<&SpendingByFunction>,
+    house_districts: &[HouseDistrictShare],
 ) -> District {
     let adm = record.base_cost_adm();
     District {
         irn: record.irn.clone(),
         name: record.name.clone(),
         county: record.county.clone(),
+        house_districts: house_districts.to_vec(),
         adm,
         current_year_adm: record.current_year_adm,
         base_cost_build_up: build_up(record),
@@ -819,6 +856,27 @@ fn main() {
     let cpi = deflate::CpiSeries::cpi_u_june();
     let taxes = property_taxes();
     let functions = spending_by_function();
+
+    // Which House districts each district lies in, keyed by IRN. Built once: the crosswalk is a
+    // 1,085-row fixture and reading it per district would parse it 609 times.
+    let mut shares: HashMap<String, Vec<HouseDistrictShare>> = HashMap::new();
+    for overlap in overlaps() {
+        shares
+            .entry(overlap.irn.clone())
+            .or_default()
+            .push(HouseDistrictShare {
+                number: overlap.house_district.clone(),
+                share: overlap.share,
+            });
+    }
+    for list in shares.values_mut() {
+        list.sort_by(|a, b| {
+            b.share
+                .partial_cmp(&a.share)
+                .unwrap_or(std::cmp::Ordering::Equal)
+        });
+    }
+
     let districts: Vec<District> = records
         .iter()
         .map(|record| {
@@ -829,6 +887,7 @@ fn main() {
                 for_district(&money, &record.irn),
                 taxes.get(&record.irn),
                 functions.get(&record.irn),
+                shares.get(&record.irn).map_or(&[][..], Vec::as_slice),
             )
         })
         .collect();
@@ -1000,6 +1059,7 @@ fn main() {
 
     let bundle = Bundle {
         national: national(),
+        house_districts: house_district_block(&records),
         contract_version: CONTRACT_VERSION.to_string(),
         provenance: "Ohio DEW FY27 TRAD State Foundation Funding Calculator (a projection, not \
                      an actual) joined with the FY2024 District Profile Report. Base cost, \

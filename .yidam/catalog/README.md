@@ -24,6 +24,7 @@ Sorted by: type, then slug.
 |---|---|--:|
 | [`auditor-longitudinal-school-finance`](auditor-longitudinal-school-finance.md) | Longitudinal School Finance Study — Ohio Auditor of State | 1 |
 | [`bls-cpi-u`](bls-cpi-u.md) | CPI-U all items — the Bureau of Labor Statistics flat file | 3 |
+| [`census-block-geography`](census-block-geography.md) | Census block geography: school districts, legislative districts, and population | 1 |
 | [`census-f33-school-system-finances`](census-f33-school-system-finances.md) | Annual Survey of School System Finances (F-33) | 1 |
 | [`cupp-district-profile-report`](cupp-district-profile-report.md) | District Profile Report — the "Cupp Report" | 2 |
 | [`derolph-litigation-record`](derolph-litigation-record.md) | DeRolph Litigation Record | 2 |
@@ -41,11 +42,12 @@ Sorted by: type, then slug.
 | [`fordham-base-cost-critique`](fordham-base-cost-critique.md) | Fordham Institute — Ohio Base Cost Model Commentary | 2 |
 | [`lsc-hb96-analysis`](lsc-hb96-analysis.md) | LSC Budget Analysis — H.B. 96 (FY2026-27) | 2 |
 | [`lsc-school-funding-complete-resource`](lsc-school-funding-complete-resource.md) | LSC School Funding Complete Resource | 2 |
+| [`nces-ccd-lea-directory`](nces-ccd-lea-directory.md) | Common Core of Data: local education agency directory | 1 |
 | [`ocg-fact-check-021`](ocg-fact-check-021.md) | OCG Ground Truth Fact-Check RL-2026-021 — Toledo–Perrysburg Special-Needs Spending | 3 |
 | [`ocg-white-paper-013`](ocg-white-paper-013.md) | OCG White Paper No. 013 — Does Per-Pupil Spending Track Academic Performance? | 4 |
 | [`ode-idea-part-b-allocations`](ode-idea-part-b-allocations.md) | IDEA Part B Allocations to Districts | 0 |
 
-22 entries, 2 not yet cited by any corpus node. 14 retrieved files are pinned by SHA-256 in [`crates/connect/source-digests.txt`](../../crates/connect/source-digests.txt).
+24 entries, 2 not yet cited by any corpus node. 18 retrieved files are pinned by SHA-256 in [`crates/connect/source-digests.txt`](../../crates/connect/source-digests.txt).
 <!-- /REGEN -->
 
 ## Adding a source

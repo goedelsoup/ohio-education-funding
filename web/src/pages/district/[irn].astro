@@ -38,6 +38,15 @@ const description = district.on_guarantee
   <h1>{district.name}</h1>
   <p class="sub">
     IRN {district.irn} · <a href={routes.county(slugify(district.county))}>{district.county} County</a>
+    {/* Every House district this district lies in, largest share first. Linked individually
+        rather than counted: the reverse question — who represents these schools — is the one a
+        reader arriving from a legislative page is asking, and 28 of Ohio's districts share a name
+        so the seat number is often the clearer handle. */}
+    · House {district.house_districts.map((h, i) => (
+      <Fragment>
+        {i > 0 ? ", " : ""}<a href={routes.houseDistrict(h.number)}>{Number(h.number)}</a>
+      </Fragment>
+    ))}
     · {bundle.statewide.districts} districts in the FY{bundle.fiscal_year} model
     · {district.on_guarantee ? "on the guarantee" : "on formula"}
     {

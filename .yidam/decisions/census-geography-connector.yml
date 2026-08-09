@@ -1,0 +1,75 @@
+id: census-geography-connector
+summary: >-
+  A thirteenth connector, census-geography, wired — the block-level files that let school districts
+  be placed inside legislative districts, and the NCES directory that finally joins Census school
+  district codes to Ohio IRNs.
+context: |
+  The site can group districts by county because the department attributes each district to exactly
+  one, and the corpus inherits that attribution. Legislative districts have no such attribution and
+  cannot: **339 of Ohio's 609 school districts have population in two or more of the 99 House
+  districts**, and Columbus has population in eleven. Nothing in Ohio's funding system uses a
+  legislative district as a unit of account, so nobody publishes the mapping.
+
+  It is nevertheless derivable, entirely from files other people publish:
+
+    Census 2020 block assignment       block -> unified school district, 276,428 Ohio blocks
+    Census 2024 SLD block equivalency  block -> House district, current map
+    Census 2020 PL 94-171              block -> population, and population 18 and over
+    NCES CCD LEA directory             Census school district code -> Ohio IRN
+
+  **The vintage of the second file is the whole reason it is a separate source.** The block
+  assignment archive ships its own `SLDL` file, which is the obvious thing to reach for and is the
+  2020-cycle map. 66.3% of Ohio's blocks changed House district between that map and the one now in
+  use. A page built on the convenient file would have been wrong for two-thirds of the state while
+  looking entirely plausible.
+
+  The fourth file closes something older. `census-f33` has carried "the per-district join needs an
+  NCESID-to-IRN crosswalk this repository does not hold" since it was wired, and `nces-ccd` has been
+  `Declared` since genesis. The CCD directory's `ST_LEAID` column is the IRN behind an `OH-` prefix,
+  and all 609 panel districts join through it with no losses. The crosswalk was one column in a file
+  the corpus had already named.
+decision: |
+  Declare `census-geography` as a thirteenth connector, status `Wired`, feeding `education-agency`
+  and `actor`, with three sources: the 2020 block assignment file, the 2024 state legislative block
+  equivalency file, and the 2020 PL 94-171 redistricting file.
+
+  Move `nces-ccd` from `Declared` to `Wired` and give it the LEA directory as a source. Its recorded
+  blocker was about deriving an **identifier-change series** across decades, which remains unbuilt;
+  a single year of the directory was never blocked and was never tried.
+
+  Apportion by **under-18 population** rather than total population. Total population would weight a
+  House district of retirees the same as one of young families, and the quantity being divided is
+  school funding. Under-18 is still a proxy — it counts children in community schools, private
+  schools and none — and the page says so.
+consequences: |
+  The site gains 99 House district pages carrying figures **no one else publishes, including the
+  department**. That is a different kind of number from everything else here, which is either the
+  department's own or a reproduction of it, and it is labelled as such on every page that shows one.
+
+  One property is exact and is the only accuracy claim made: each school district's shares sum to
+  one, so the 99 House districts sum to the statewide total to the cent. Asserted in
+  `project::house_district` and again over the rendered page.
+
+  Two staleness risks the corpus now owns. The apportionment uses **2020** population against a
+  **FY2027** model, so a district that has grown or emptied since the census is weighted as it was.
+  And Ohio redistricts; the crosswalk is pinned to the 2024 map and will need regenerating when that
+  changes, which the fixture's header assertion will not catch because the header will not change.
+
+  The NCESID-to-IRN crosswalk being solved also unblocks the **per-district** F-33 join, which
+  `census-f33` records as its own remaining gap. That is not done here and is now a retrieval task
+  rather than an identifier one.
+alternatives: |
+  **Assign each school district to one House district.** Rejected: it is what the county pages do
+  and it works there because the department's attribution is total. Here it would state something
+  false about 339 of 609 districts, and the failure would be invisible — a page saying "Columbus
+  City is in House District 26" looks exactly like a page saying something true.
+
+  **Publish membership without apportioned totals.** Considered seriously, and it is the honest
+  minimum: list which districts overlap a seat and stop. Rejected because a member asking what a
+  funding change does to their district needs a magnitude, and refusing to estimate one does not
+  stop the question being asked — it moves the estimate somewhere with no methodology attached.
+  The apportionment is published with its weights, its vintage and its caveats stated.
+
+  **Weight by enrolled ADM instead of population.** Rejected: ADM is known per district, which is
+  the thing being split, not per block. Any block-level pupil count would itself be an
+  apportionment, so this would add a step without adding information.

@@ -1,0 +1,84 @@
+---
+/**
+ * Ohio's 99 House districts, with school funding apportioned across them.
+ *
+ * Ordered by apportioned state aid, because the question a legislative view is for is scale: how
+ * much of Ohio's school money flows through the districts a given member represents.
+ */
+import Base from "../layouts/Base.astro";
+import { loadFeed } from "../lib/feed.ts";
+import { count, money, pct } from "../lib/format.ts";
+import * as routes from "../lib/routes.ts";
+
+const { bundle } = loadFeed();
+const ranked = [...bundle.house_districts].sort((a, b) => b.realized_aid - a.realized_aid);
+const total = ranked.reduce((a, h) => a + h.realized_aid, 0);
+const split = bundle.districts.filter((d) => d.house_districts.length > 1).length;
+const widest = [...bundle.districts].sort(
+  (a, b) => b.house_districts.length - a.house_districts.length,
+)[0]!;
+---
+
+<Base
+  title="House districts"
+  description={`Ohio's 99 House districts, with school funding apportioned across them from census blocks — an estimate, since no House district is a unit of account in Ohio's funding system.`}
+  section="house"
+  wide
+>
+  <h1>House districts</h1>
+  <p class="sub">
+    Ohio's {count(ranked.length)} House districts, ordered by the state aid flowing through the
+    schools in each. {count(split)} of {count(bundle.districts.length)} school districts straddle
+    two or more of them; {widest.name} spans {count(widest.house_districts.length)}.
+  </p>
+
+  <div class="card">
+    <h2>These figures are estimates, and nobody publishes them</h2>
+    <p class="note">
+      The department computes funding <strong>per school district</strong> and stops. No House
+      district is a unit of account anywhere in Ohio's funding system, and most school districts
+      cross House district lines — so every figure on these pages is <em>derived</em>, by splitting
+      each school district across the House districts it overlaps in proportion to
+      <strong>under-18 population from the 2020 census</strong>.
+    </p>
+    <p class="note">
+      One thing about them is exact: each school district's shares sum to one, so these 99 rows add
+      to {money(total)}, the statewide total, to the cent. Everything else is an estimate. Use them
+      for scale and comparison; for what a district is actually entitled to, go to that district's
+      own page, where the figure is the department's.
+    </p>
+    <p class="note">
+      Two caveats worth carrying. Under-18 population is a proxy for pupils — it counts children in
+      community schools, private schools and none. And it is a 2020 count applied to a FY{bundle.fiscal_year}
+      model, so a House district that has grown or emptied since the census is weighted as it was.
+    </p>
+  </div>
+
+  <div class="card">
+    <div class="scroll"><table>
+      <thead><tr>
+        <th>District</th><th class="tnum">State aid</th><th class="tnum">Share of Ohio</th>
+        <th class="tnum">Pupils</th><th class="tnum">Guarantee</th>
+        <th class="tnum">Schools</th><th class="tnum">Whole</th>
+      </tr></thead>
+      <tbody>
+        {ranked.map((h) => (
+          <tr>
+            <th><a href={routes.houseDistrict(h.number)}>House {Number(h.number)}</a></th>
+            <td class="tnum">{money(h.realized_aid)}</td>
+            <td class="tnum n">{pct(h.realized_aid / total, 2)}</td>
+            <td class="tnum">{count(Math.round(h.adm))}</td>
+            <td class="tnum">{h.guarantee <= 0 ? "—" : money(h.guarantee)}</td>
+            <td class="tnum">{count(h.members.length)}</td>
+            <td class="tnum n">{count(h.districts_wholly_inside)}</td>
+          </tr>
+        ))}
+      </tbody>
+    </table></div>
+    <p class="note">
+      "Schools" counts the school districts with population in the House district, including
+      slivers; "whole" counts those lying entirely inside it. A House district where the two are
+      equal contains its schools completely, and a member there speaks for every pupil in them.
+    </p>
+  </div>
+</Base>

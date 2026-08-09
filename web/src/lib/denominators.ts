@@ -161,6 +161,15 @@ export const FIELD_DENOMINATORS: Record<string, DenominatorKey | null> = {
   "districts[].gifted.fte_k8": null,
   "districts[].gifted.fte_9_12": null,
 
+  // Apportioned pupil counts. Counts rather than quantities over one — and estimates, unlike
+  // every other count in this table, because a House district is not a unit of account in Ohio's
+  // funding system and its pupils have been derived by splitting school districts across census
+  // blocks. Nothing on the site divides by one of these, and nothing should: a per-pupil figure
+  // over an apportioned denominator would carry the apportionment's error into a ratio that looks
+  // like the department's.
+  "house_districts[].adm": null,
+  "house_districts[].members[].adm": null,
+
   // Dimensionless: a change, and correlations whose parts each cancel their own denominator.
   "districts[].enrollment_change": null,
   "statewide.outcomes.enrolled_spending_vs_performance": null,

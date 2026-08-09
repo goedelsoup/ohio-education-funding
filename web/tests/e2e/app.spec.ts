@@ -1271,3 +1271,65 @@ test.describe("counties", () => {
   });
 });
 
+test.describe("house districts", () => {
+  test("the index says plainly that its figures are estimates", async ({ page }) => {
+    /*
+     * The constraint the whole feature rests on. No House district is a unit of account in Ohio's
+     * funding system, so every figure here is derived by splitting school districts across census
+     * blocks. A page that shows "$43,707,982" without saying so is passing off a derivation as a
+     * published fact, and the precision makes it worse rather than better.
+     */
+    await page.goto("/house");
+    await expect(page.locator("h1")).toHaveText("House districts");
+    await expect(page.locator(".card").first()).toContainText(
+      "These figures are estimates, and nobody publishes them",
+    );
+    await expect(page.locator(".card").first()).toContainText("under-18 population");
+    await expect(page.locator(".card").first()).toContainText("2020 census");
+  });
+
+  test("all ninety-nine seats are listed and reachable", async ({ page }) => {
+    await page.goto("/house");
+    await expect(page.locator('a[href^="/house/"]')).toHaveCount(99);
+  });
+
+  test("a seat page distinguishes the two shares it prints side by side", async ({ page }) => {
+    /*
+     * "Of the district" and "of this seat" answer opposite questions, and a swap would be
+     * invisible: 100% in the wrong column reads as "the member speaks for all of it" when it means
+     * "this seat is entirely that district".
+     */
+    await page.goto("/house/054");
+    const members = page.locator('.card[data-part="members"]');
+    await expect(members).toContainText("Of the district");
+    await expect(members).toContainText("Of this seat");
+    await expect(members).toContainText("answer opposite questions");
+  });
+
+  test("a district page links every seat it lies in", async ({ page }) => {
+    // Columbus spans eleven. The reverse direction is the one a reader arriving from a legislative
+    // page is asking about, so it has to be complete rather than a count.
+    await page.goto("/district/043802");
+    const sub = page.locator("p.sub").first();
+    await expect(sub.locator('a[href^="/house/"]')).toHaveCount(11);
+  });
+
+  test("the seat totals a reader can add up reconcile to the statewide figure", async ({
+    page,
+  }) => {
+    // The one accuracy claim the apportionment makes, checked as rendered rather than as data:
+    // the index states the statewide total, and it must be the sum of the rows above it.
+    await page.goto("/house");
+    const cells = await page.locator("tbody tr td:nth-child(2)").allTextContents();
+    const rows = cells.map((t) => Number(t.replace(/[$,]/g, ""))).filter(Number.isFinite);
+    expect(rows).toHaveLength(99);
+    const summed = rows.reduce((a, b) => a + b, 0);
+    const stated = await page.locator(".card").first().textContent();
+    const match = stated?.match(/these 99 rows add\s+to \$([\d,]+)/);
+    expect(match, "the index states the statewide total").not.toBeNull();
+    const declared = Number(match![1]!.replace(/,/g, ""));
+    // Each row is rendered to the dollar, so ninety-nine roundings can drift by that much.
+    expect(Math.abs(summed - declared)).toBeLessThan(100);
+  });
+});
+

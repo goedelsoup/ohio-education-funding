@@ -329,7 +329,16 @@ fn bundle_status(root: &Path) -> String {
         .find_map(|line| line.trim().strip_prefix("\"contract_version\": "))
         .map(|value| value.trim_matches(|c| c == '"' || c == ',').to_string())
         .unwrap_or_else(|| "unknown".into());
-    let districts = feed.matches("\"irn\": ").count();
+    // Counted by a field only a full district record carries. `"irn": ` was the discriminator
+    // until the feed gained House districts, whose member rows carry an IRN too: the count went
+    // from 609 to 1,694 without anything else changing. A key that is unique today is a
+    // discriminator only until the next block is added, and "count the occurrences of a common
+    // field name" has now failed here twice for the same reason.
+    //
+    // `"adm_history": ` is a district's three-year enrolment series. It is a poor thing to search
+    // for and a good thing to count: nothing else in the feed has one, and if something ever does
+    // it will be another per-district block rather than a nested row.
+    let districts = feed.matches("\"adm_history\": ").count();
     // Each kind is counted by a field only that kind carries, rather than by subtracting one
     // count from another. `label` was the discriminator once and stopped being unique the moment
     // the deflator acquired one — a subtraction is only as stable as every other user of the

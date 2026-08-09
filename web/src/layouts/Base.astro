@@ -17,7 +17,15 @@ interface Props {
   /** One sentence. Used for `<meta name="description">` and nothing else. */
   description: string;
   /** Which top-level nav entry is the current section, if any. */
-  section?: "statewide" | "districts" | "counties" | "outcomes" | "scenario" | "wiki" | "method";
+  section?:
+    | "statewide"
+    | "districts"
+    | "counties"
+    | "house"
+    | "outcomes"
+    | "scenario"
+    | "wiki"
+    | "method";
   /** Rendered above the page, before the slot. Used for the district sub-navigation. */
   wide?: boolean;
 }
@@ -29,6 +37,7 @@ const NAV = [
   { key: "statewide", href: "/", label: "Statewide" },
   { key: "districts", href: "/districts", label: "Districts" },
   { key: "counties", href: "/counties", label: "Counties" },
+  { key: "house", href: "/house", label: "House" },
   { key: "outcomes", href: "/outcomes", label: "Outcomes" },
   { key: "scenario", href: "/scenario", label: "Scenario" },
   { key: "wiki", href: "/wiki", label: "Wiki" },

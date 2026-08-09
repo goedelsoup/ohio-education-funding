@@ -350,6 +350,16 @@ export const DistrictSchema = z
      * `/county/…` compares districts rather than reporting county totals.
      */
     county: z.string().min(1),
+    /**
+     * The Ohio House districts this district lies in, largest share first.
+     *
+     * Usually one — 270 of 609 districts sit inside a single House district — and up to eleven,
+     * which is Columbus. Derived from census blocks rather than published; see the feed's
+     * top-level `house_districts` for what that supports.
+     */
+    house_districts: z.array(
+      z.object({ number: z.string().min(1), share: num }).strict(),
+    ),
     /** Base cost enrolled ADM: the greater of the three-year average and the current year. */
     adm: num,
     /** Current-year enrolled ADM, FY2026. The denominator the state share is paid on. */
@@ -632,6 +642,49 @@ export const StatewideSchema = z
  * consumer index and school costs are majority compensation, for which the Employment Cost Index
  * would be better and has shorter coverage. Any real-dollar figure must name it.
  */
+/**
+ * One of Ohio's 99 House districts, with school funding apportioned across it.
+ *
+ * # These are estimates and nothing publishes them
+ *
+ * The department computes funding per school district and stops. No House district is a unit of
+ * account anywhere in Ohio's funding system, and 339 of 609 school districts straddle two or more
+ * of them — so a House district figure has to be derived, by splitting each school district across
+ * the House districts it overlaps in proportion to under-18 population from the 2020 census.
+ *
+ * The one guarantee is that the split is exact in aggregate: every school district's shares sum to
+ * one, so the 99 House districts sum to the statewide total to the cent. Everything else is an
+ * estimate, and any page showing one says so.
+ */
+export const HouseDistrictSchema = z
+  .object({
+    number: z.string().min(1),
+    adm: num,
+    realized_aid: num,
+    base_cost_state_share: num,
+    categorical_funding: num,
+    guarantee: num,
+    districts_on_guarantee: z.number().int().nonnegative(),
+    districts_at_minimum_state_share: z.number().int().nonnegative(),
+    districts_wholly_inside: z.number().int().nonnegative(),
+    members: z.array(
+      z
+        .object({
+          irn: z.string().min(1),
+          name: z.string().min(1),
+          /** How much of the *school district* is here. */
+          share: num,
+          /** How much of *this House district's* pupils that school district provides. */
+          share_of_house_district: num,
+          adm: num,
+          realized_aid: num,
+          wholly_inside: z.boolean(),
+        })
+        .strict(),
+    ),
+  })
+  .strict();
+
 export const DeflatorSchema = z
   .object({
     label: z.string().min(1),
@@ -737,6 +790,7 @@ export const BundleSchema = z
     deflator: DeflatorSchema.nullable(),
     /** Where Ohio sits among the states. `null` if the Census fixture is absent. */
     national: NationalSchema.nullable(),
+    house_districts: z.array(HouseDistrictSchema),
     districts: z.array(DistrictSchema).min(1),
   })
   .strict();

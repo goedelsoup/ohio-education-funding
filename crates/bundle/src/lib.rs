@@ -73,7 +73,7 @@ use edfund_core::Dollars;
 /// from FY2022-FY2024 to FY2024-FY2026 — the years the department's `ADM Data` sheet declares.
 /// The values did not change; what they are called did, which is exactly the kind of silent
 /// meaning change the version guard exists for.
-pub const CONTRACT_VERSION: &str = "18.0.0";
+pub const CONTRACT_VERSION: &str = "19.0.0";
 
 /// How close to the floor counts as being on it, in mills.
 ///
@@ -637,6 +637,71 @@ pub struct Categoricals {
     pub career_technical: Dollars,
 }
 
+/// One school district's presence in one Ohio House district.
+#[derive(Debug, Clone, PartialEq)]
+pub struct HouseDistrictMember {
+    /// The school district, by IRN.
+    pub irn: String,
+    /// Its name, carried so a page need not join back to the district array.
+    pub name: String,
+    /// How much of the *school district* lies in this House district.
+    pub share: f64,
+    /// How much of this *House district's* apportioned pupils this school district provides.
+    pub share_of_house_district: f64,
+    /// Apportioned pupils and aid for this pair. An estimate; see [`HouseDistrict`].
+    pub adm: f64,
+    /// Apportioned state aid as the district receives it.
+    pub realized_aid: Dollars,
+    /// Whether the school district lies entirely inside this House district.
+    pub wholly_inside: bool,
+}
+
+/// One of Ohio's 99 House districts, with the school funding apportioned to it.
+///
+/// # These figures are estimates, and nothing in Ohio's system publishes them
+///
+/// The department computes funding per school district and stops. No House district is a unit of
+/// account anywhere in the funding system, and 339 of 609 school districts straddle two or more of
+/// them — so a House district total has to be *derived*, by splitting each school district's
+/// figures across the House districts it overlaps in proportion to under-18 population from the
+/// 2020 census.
+///
+/// The one guarantee is that the split is exact in aggregate: each school district's shares sum to
+/// one, so the 99 House districts sum to the statewide total to the cent. Everything else about a
+/// House district figure is an estimate, and any page showing one has to say so.
+#[derive(Debug, Clone, PartialEq)]
+pub struct HouseDistrict {
+    /// `001` through `099`.
+    pub number: String,
+    /// The school districts in it, largest contributor first.
+    pub members: Vec<HouseDistrictMember>,
+    /// Apportioned enrolled ADM.
+    pub adm: f64,
+    /// Apportioned state aid as districts receive it, guarantee included.
+    pub realized_aid: Dollars,
+    /// Apportioned state share of base cost.
+    pub base_cost_state_share: Dollars,
+    /// Apportioned categorical funding — the other half of formula aid.
+    pub categorical_funding: Dollars,
+    /// Apportioned guarantee: what the formula does not justify, in this member's schools.
+    pub guarantee: Dollars,
+    /// Districts overlapping this House district that are on the guarantee.
+    pub districts_on_guarantee: usize,
+    /// And those at the minimum state share.
+    pub districts_at_minimum_state_share: usize,
+    /// Of the districts here, those that lie entirely inside this House district.
+    pub districts_wholly_inside: usize,
+}
+
+/// Which House districts a school district lies in, and how much of it is in each.
+#[derive(Debug, Clone, PartialEq)]
+pub struct HouseDistrictShare {
+    /// `001` through `099`.
+    pub number: String,
+    /// How much of the school district lies in that House district.
+    pub share: f64,
+}
+
 /// One district, as the web layer needs it.
 #[derive(Debug, Clone, PartialEq)]
 pub struct District {
@@ -644,6 +709,11 @@ pub struct District {
     pub irn: String,
     /// District name as published.
     pub name: String,
+    /// The Ohio House districts this district lies in, largest share first.
+    ///
+    /// Usually one — 270 of 609 districts sit inside a single House district — and up to eleven.
+    /// Derived from census blocks; see [`HouseDistrict`] for what that does and does not support.
+    pub house_districts: Vec<HouseDistrictShare>,
     /// The county the department attributes the district to.
     ///
     /// One county per district, which is the department's own simplification: school district
@@ -1013,6 +1083,8 @@ pub struct Bundle {
     pub deflator: Option<Deflator>,
     /// Where Ohio sits among the states. `None` if the Census fixture is absent.
     pub national: Option<National>,
+    /// Ohio's 99 House districts, with school funding apportioned across them.
+    pub house_districts: Vec<HouseDistrict>,
     /// Per-district records.
     pub districts: Vec<District>,
 }
@@ -1036,6 +1108,24 @@ fn escape(s: &str) -> String {
 fn num(v: f64) -> String {
     if v.is_finite() {
         format!("{v:.4}")
+            .trim_end_matches('0')
+            .trim_end_matches('.')
+            .to_string()
+    } else {
+        "null".into()
+    }
+}
+
+/// A fraction, to eight places.
+///
+/// [`num`] rounds to four, which is right for dollars and wrong for a share of one: a district
+/// contributing 0.00060997 of a House district would be stored as 0.0006, and the shares of a
+/// district split many ways would no longer sum to one in the feed even though they do in the
+/// arithmetic that produced them. Eight places keeps the published figures self-consistent, so a
+/// consumer adding them up gets the same answer this repository does.
+fn share(v: f64) -> String {
+    if v.is_finite() {
+        format!("{v:.8}")
             .trim_end_matches('0')
             .trim_end_matches('.')
             .to_string()
@@ -1396,6 +1486,53 @@ impl Bundle {
             }
         }
 
+        // The 99 House districts. Written before the district array because a reader scanning the
+        // feed meets the derived aggregate before the exact per-district figures it came from, and
+        // the block's own `basis` field is where the estimate is labelled as one.
+        s.push_str("  \"house_districts\": [\n");
+        for (i, h) in self.house_districts.iter().enumerate() {
+            s.push_str(&format!("    {{\"number\": \"{}\", ", escape(&h.number)));
+            for (key, value) in [
+                ("adm", h.adm),
+                ("realized_aid", h.realized_aid),
+                ("base_cost_state_share", h.base_cost_state_share),
+                ("categorical_funding", h.categorical_funding),
+                ("guarantee", h.guarantee),
+            ] {
+                s.push_str(&format!("\"{key}\": {}, ", num(value)));
+            }
+            s.push_str(&format!(
+                "\"districts_on_guarantee\": {}, \"districts_at_minimum_state_share\": {}, \
+                 \"districts_wholly_inside\": {}, \"members\": [",
+                h.districts_on_guarantee,
+                h.districts_at_minimum_state_share,
+                h.districts_wholly_inside
+            ));
+            for (k, m) in h.members.iter().enumerate() {
+                if k > 0 {
+                    s.push_str(", ");
+                }
+                s.push_str(&format!(
+                    "{{\"irn\": \"{}\", \"name\": \"{}\", \"share\": {}, \
+                     \"share_of_house_district\": {}, \"adm\": {}, \"realized_aid\": {}, \
+                     \"wholly_inside\": {}}}",
+                    escape(&m.irn),
+                    escape(&m.name),
+                    share(m.share),
+                    share(m.share_of_house_district),
+                    num(m.adm),
+                    num(m.realized_aid),
+                    m.wholly_inside
+                ));
+            }
+            s.push_str("]}");
+            if i + 1 < self.house_districts.len() {
+                s.push(',');
+            }
+            s.push('\n');
+        }
+        s.push_str("  ],\n");
+
         s.push_str("  \"districts\": [\n");
 
         for (i, d) in self.districts.iter().enumerate() {
@@ -1403,6 +1540,18 @@ impl Bundle {
             s.push_str(&format!("\"irn\": \"{}\", ", escape(&d.irn)));
             s.push_str(&format!("\"name\": \"{}\", ", escape(&d.name)));
             s.push_str(&format!("\"county\": \"{}\", ", escape(&d.county)));
+            s.push_str("\"house_districts\": [");
+            for (i, h) in d.house_districts.iter().enumerate() {
+                if i > 0 {
+                    s.push_str(", ");
+                }
+                s.push_str(&format!(
+                    "{{\"number\": \"{}\", \"share\": {}}}",
+                    escape(&h.number),
+                    share(h.share)
+                ));
+            }
+            s.push_str("], ");
             s.push_str(&format!("\"adm\": {}, ", num(d.adm)));
             s.push_str(&format!(
                 "\"current_year_adm\": {}, ",
@@ -1793,6 +1942,18 @@ mod tests {
             irn: "049056".into(),
             name: "Northern Local".into(),
             county: "Perry".into(),
+            // Two House districts, unevenly split, so the serializer's array separator is
+            // exercised and a district that straddles a boundary is the case under test.
+            house_districts: vec![
+                HouseDistrictShare {
+                    number: "094".into(),
+                    share: 0.7312,
+                },
+                HouseDistrictShare {
+                    number: "072".into(),
+                    share: 0.2688,
+                },
+            ],
             adm: 2_193.81,
             current_year_adm: 2_107.80,
             base_cost_per_pupil: 8_100.0,
@@ -2003,6 +2164,26 @@ mod tests {
 
     fn bundle(districts: Vec<District>, checkpoints: Vec<Checkpoint>) -> Bundle {
         Bundle {
+            house_districts: vec![HouseDistrict {
+                number: "094".into(),
+                adm: 1_604.1,
+                realized_aid: 10_265_000.0,
+                base_cost_state_share: 6_100_000.0,
+                categorical_funding: 4_165_000.0,
+                guarantee: 0.0,
+                districts_on_guarantee: 0,
+                districts_at_minimum_state_share: 1,
+                districts_wholly_inside: 0,
+                members: vec![HouseDistrictMember {
+                    irn: "049056".into(),
+                    name: "Northern Local".into(),
+                    share: 0.7312,
+                    share_of_house_district: 1.0,
+                    adm: 1_604.1,
+                    realized_aid: 10_265_000.0,
+                    wholly_inside: false,
+                }],
+            }],
             contract_version: CONTRACT_VERSION.into(),
             provenance: "test".into(),
             fiscal_year: 2027,

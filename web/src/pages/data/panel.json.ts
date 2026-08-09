@@ -48,6 +48,7 @@ export const GET: APIRoute = () => {
         dpia: _d,
         targeted_assistance: _ta,
         gifted: _g,
+        house_districts: _hd,
         ...district
       }) => district,
     ),

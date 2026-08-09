@@ -14,6 +14,36 @@ description: |
   choosing not to continue it, and the Fair School Funding Plan's phase-in has been
   re-legislated in each of three consecutive budgets rather than guaranteed by the enactment
   that created it. [inference]
+
+  **THE MEMBER'S OWN UNIT DOES NOT EXIST IN THE FUNDING SYSTEM.** A House member votes on a
+  formula whose every output is computed per school district, and Ohio publishes no figure for
+  what a House district's schools receive — not because it is withheld but because no part of the
+  system has ever needed the number. [verified]
+
+  The reason is structural rather than administrative: school districts and House districts do not
+  nest. **339 of Ohio's 609 school districts have population in two or more of the 99 House
+  districts**, and Columbus City has population in eleven. [verified — computed from Census block
+  geography] County can be an attribution, because the department assigns each district exactly
+  one; a legislative district cannot be, because most districts genuinely lie in several.
+
+  So the corpus now derives it, by joining Ohio's 276,428 census blocks to their school district
+  and their House district and apportioning each district's funding by under-18 population.
+  [verified — [Census block geography](../../catalog/census-block-geography.md), joined to the
+  funding model through the [NCES CCD directory](../../catalog/nces-ccd-lea-directory.md), carried
+  in `crates/project/src/house_district.rs`]
+
+  Every figure that produces is an **estimate**, and the corpus holds it as one. The single exact
+  property is conservation: each school district's shares sum to one, so the 99 House districts sum
+  to the statewide total to the cent. [verified] What the estimate supports is scale and
+  comparison — how much of Ohio's school money runs through the schools a member represents, and
+  how many of those districts are on the guarantee. What it cannot support is any statement about a
+  district's entitlement, which is exact and belongs to the district. [verified]
+
+  One asymmetry is worth stating on this node rather than on the pages. **The body that sets the
+  formula is districted on population and the formula pays on pupils**, and those two are not
+  distributed alike: Ohio is 22.0% under 18 statewide and that share varies widely between seats.
+  A House district is by construction equal to its neighbours in people and unequal in children.
+  [inference]
 properties:
   name: Ohio General Assembly
   institution_type: legislature
@@ -29,6 +59,10 @@ properties:
 links:
   - target: ../actor.ont.yml
     relationship: instance-of
+  - target: ../../catalog/census-block-geography.md
+    relationship: sourced-from
+  - target: ../../catalog/nces-ccd-lea-directory.md
+    relationship: sourced-from
   - target: ../legislation/hb-920-1976.yml
     relationship: enacts
   - target: ../legislation/hb-66-2005.yml

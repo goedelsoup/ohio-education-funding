@@ -66,6 +66,9 @@ pub enum Format {
     Html,
     /// A PDF. No parser here.
     Pdf,
+    /// A zip of delimited text. The Census and NCES geography files come this way, and each
+    /// archive holds several files of which this repository reads one or two.
+    Zip,
 }
 
 /// One retrievable publication.
@@ -397,8 +400,9 @@ pub const CONNECTORS: &[Connector] = &[
         status: Status::Wired,
         note: "Comparability in two directions: whether Ohio is unusual, and an independent \
                check on department figures computed on different definitions. The first is \
-               wired and settles the DeRolph claim comparatively; the second needs an \
-               NCESID-to-IRN crosswalk this repository does not hold.",
+               wired and settles the DeRolph claim comparatively; the second needs the \
+               per-district file, since the NCESID-to-IRN crosswalk it was waiting on is now \
+               held by `nces-ccd`.",
         sources: &[Source {
             key: "f33-fy2022",
             url: "https://www2.census.gov/programs-surveys/school-finances/tables/2022/\
@@ -409,22 +413,90 @@ pub const CONNECTORS: &[Connector] = &[
             fixture: Some("crates/dispersion/fixtures/census-f33-states.csv"),
             note: "One year per file and the layout is not stable across years, so the column \
                    map is per-era. The fixture is the state aggregate rather than the panel: \
-                   14,106 school systems reduce to 51 rows, and the per-district join needs an \
-                   NCESID-to-IRN crosswalk that is not held here.",
+                   14,106 school systems reduce to 51 rows. The per-district join was recorded \
+                   as blocked on an NCESID-to-IRN crosswalk; that crosswalk now exists in \
+                   `nces-ccd`, so what remains is retrieving the per-system file.",
         }],
     },
     Connector {
         key: "nces-ccd",
         publisher: "National Center for Education Statistics",
         feeds: &["education-agency"],
-        status: Status::Declared {
-            blocked_on: "agency files are per-year zips whose column sets change; the \
-                         identifier-change series that justifies the connector is not published \
-                         directly and must be derived",
-        },
+        status: Status::Wired,
         note: "A corpus spanning 1851 to the present is a panel whose members change, and a \
-               long series assembled without accounting for consolidation is silently wrong.",
-        sources: &[],
+               long series assembled without accounting for consolidation is silently wrong. \
+               That series is still not built: agency files are per-year zips whose column sets \
+               change, and the identifier-change history has to be derived rather than read. \
+               But a single year of the directory was never blocked by any of that, and it \
+               carries the one column two other connectors were waiting on.",
+        sources: &[Source {
+            key: "ccd-lea-directory-2223",
+            url: "https://nces.ed.gov/ccd/data/zip/ccd_lea_029_2223_w_1a_083023.zip",
+            filename: "ccd-lea-directory-2223.zip",
+            format: Format::Zip,
+            catalog: Some("nces-ccd-lea-directory"),
+            fixture: Some("crates/project/fixtures/house-district-crosswalk.csv"),
+            note: "`ST_LEAID` is the Ohio IRN behind an `OH-` prefix, and `LEAID` is the NCES \
+                   agency identifier whose last five digits are the Census school district code. \
+                   All 609 districts in the funding panel join through it. This is the \
+                   NCESID-to-IRN crosswalk `census-f33` records as missing and \
+                   `census-geography` needs; it feeds no fixture of its own because it is \
+                   consumed while building one belonging to `census-geography`.",
+        }],
+    },
+    Connector {
+        key: "census-geography",
+        publisher: "U.S. Census Bureau",
+        feeds: &["education-agency", "actor"],
+        status: Status::Wired,
+        note: "Ohio's funding system has no legislative district in it, so the mapping from \
+               school districts to House districts does not exist and has to be built from \
+               census blocks. 339 of 609 districts straddle two or more seats, which is why it \
+               cannot be an attribution the way county is. See \
+               .yidam/decisions/census-geography-connector.yml.",
+        sources: &[
+            Source {
+                key: "baf-2020-oh",
+                url: "https://www2.census.gov/geo/docs/maps-data/data/baf2020/\
+                      BlockAssign_ST39_OH.zip",
+                filename: "BlockAssign_ST39_OH.zip",
+                format: Format::Zip,
+                catalog: Some("census-block-geography"),
+                fixture: Some("crates/project/fixtures/house-district-crosswalk.csv"),
+                note: "`SDUNI` gives the unified school district for each of Ohio's 276,428 \
+                       census blocks. The archive also carries an `SLDL` file and it is the \
+                       WRONG one to use: it is the 2020-cycle map, and 66.3% of Ohio's blocks \
+                       have changed House district since. Take the House district from \
+                       `sldl24-bef` instead.",
+            },
+            Source {
+                key: "sldl24-bef",
+                url: "https://www2.census.gov/programs-surveys/decennial/rdo/mapping-files/2025/\
+                      2024-state-legislative-bef/sldl24.zip",
+                filename: "sldl24.zip",
+                format: Format::Zip,
+                catalog: Some("census-block-geography"),
+                fixture: Some("crates/project/fixtures/house-district-crosswalk.csv"),
+                note: "The 2024 lower-chamber map, which is the one now in use. Ohio is one of \
+                       eight states with changes to both chambers in that cycle. Pinned to a \
+                       vintage: when Ohio redistricts again this file changes and the crosswalk \
+                       must be regenerated, which no header assertion will catch because the \
+                       header will not change.",
+            },
+            Source {
+                key: "pl94-171-2020-oh",
+                url: "https://www2.census.gov/programs-surveys/decennial/2020/data/\
+                      01-Redistricting_File--PL_94-171/Ohio/oh2020.pl.zip",
+                filename: "oh2020.pl.zip",
+                format: Format::Zip,
+                catalog: Some("census-block-geography"),
+                fixture: Some("crates/project/fixtures/house-district-crosswalk.csv"),
+                note: "Block population, and population 18 and over. The difference is the \
+                       apportionment weight: 2,591,886 Ohioans under 18, 22.0% of the state. \
+                       Total population would weight a seat full of retirees like one full of \
+                       families, against a quantity that is school funding.",
+            },
+        ],
     },
 ];
 
@@ -458,7 +530,8 @@ mod tests {
         // The nine from decisions/proposals.yml, plus dew-report-card from
         // decisions/report-card-connector.yml, dew-five-year-forecast from
         // decisions/five-year-forecast-connector.yml, and dew-payment-reports from
-        // decisions/payment-reports-connector.yml. A connector dropping out of this list is a
+        // decisions/payment-reports-connector.yml, and census-geography from
+        // decisions/census-geography-connector.yml. A connector dropping out of this list is a
         // decision, not an oversight, and should fail here first — as should one appearing in the
         // registry without a decision record behind it, which is what caught the twelfth.
         let expected = [
@@ -474,6 +547,7 @@ mod tests {
             "dew-report-card",
             "dew-five-year-forecast",
             "dew-payment-reports",
+            "census-geography",
         ];
         for key in expected {
             assert!(

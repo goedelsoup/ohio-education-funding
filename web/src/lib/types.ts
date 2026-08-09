@@ -43,7 +43,7 @@ import type { Bundle, District, Statewide } from "./schema/feed.ts";
  * the build and the scenario routes refuse to proceed past when the two disagree — the deliberate
  * half of drift detection, where the strictness of the schemas is the accidental half.
  */
-export const REQUIRED_CONTRACT = "18.0.0";
+export const REQUIRED_CONTRACT = "19.0.0";
 
 /**
  * A district with only the fields the funding formula reads.
@@ -63,6 +63,10 @@ export const REQUIRED_CONTRACT = "18.0.0";
  * funding formula — one is the local tax base the state charges against, one is what a district
  * did with the money afterwards, and the third is a reading of H.B. 920 that the scenario builder
  * deliberately does not model — so the compiler keeps all three out of the browser's copy.
+ *
+ * `house_districts` goes out for the same reason and one more: it is a *derived* estimate, and the
+ * scenario builder re-runs the formula per district from exact figures. A browser holding an
+ * apportionment it has no use for is an invitation to compute something with it.
  *
  * The six categorical decompositions go out too, and they are the largest addition the feed has
  * taken: forty-one numbers per district across special education, career-technical, English
@@ -93,6 +97,7 @@ export type PanelDistrict = Omit<
   | "spending_by_function"
   | "millage"
   | "regime"
+  | "house_districts"
   | "special_education"
   | "career_technical"
   | "english_learners"
@@ -102,7 +107,8 @@ export type PanelDistrict = Omit<
 >;
 
 /** The feed with the two heavy per-district blocks removed. Served as `/data/panel.json`. */
-export interface Panel extends Omit<Bundle, "districts" | "statewide" | "national"> {
+export interface Panel
+  extends Omit<Bundle, "districts" | "statewide" | "national" | "house_districts"> {
   districts: PanelDistrict[];
   statewide: Omit<Statewide, "finances" | "outcomes">;
 }
