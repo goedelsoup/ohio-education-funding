@@ -371,6 +371,99 @@ export const DistrictSchema = z
       })
       .strict(),
     /**
+     * Career-technical's five categories, plus associated services at a sixth weight.
+     *
+     * Weighted against a **career-technical** base cost of $9,855.62 rather than the $8,241.61
+     * every other weighted categorical uses, so a CTE weight and a special education weight are
+     * not on the same scale.
+     */
+    career_technical: z
+      .object({
+        fte: z.tuple([num, num, num, num, num]),
+        aid: z.tuple([num, num, num, num, num]),
+        associated_services: num,
+      })
+      .strict(),
+    /**
+     * English learners' three categories, whose weights **descend** — 0.2104, 0.1577, 0.1053.
+     *
+     * Category 1 is the most recently arrived learner and is funded at twice Category 3, so the
+     * program tapers as need persists. Every other weighted categorical runs the other way.
+     */
+    english_learners: z
+      .object({
+        adm: z.tuple([num, num, num]),
+        aid: z.tuple([num, num, num]),
+      })
+      .strict(),
+    /**
+     * DPIA: a blend of two poverty counts, and an index that is **squared**.
+     *
+     * Aid scales with the square of relative poverty, so a district at twice the state's rate
+     * scores four times the index rather than twice.
+     */
+    dpia: z
+      .object({
+        economically_disadvantaged_adm: num,
+        directly_certified_adm: num,
+        weighted_adm: num,
+        percentage: num,
+        index: num,
+      })
+      .strict(),
+    /**
+     * Targeted assistance: two tiers that measure different things and add.
+     *
+     * The capacity tier pays 0.8% of the shortfall below the median district's *total* weighted
+     * wealth, phased by district size. The wealth tier is a rate against wealth per **resident**
+     * pupil, paid on **enrolled** pupils — two counts, one line apart in the same formula.
+     */
+    targeted_assistance: z
+      .object({
+        property_valuation: num,
+        federal_gross_income: num,
+        weighted_wealth: num,
+        capacity_index: num,
+        capacity_amount: num,
+        wealth_per_pupil: num,
+        wealth_index: num,
+        wealth_amount: num,
+        resident_adm: num,
+        supplement_eligible: z.boolean(),
+      })
+      .strict(),
+    /**
+     * Gifted: two per-pupil amounts and three kinds of unit, with floors and a cap.
+     *
+     * A unit is a headcount entitlement priced like a salary. Coordinator units are floored at 0.5
+     * and capped at 8; specialist units are floored at 0.3 in each band. So a district that
+     * identifies no gifted pupils still draws $93,993 before its state share — gifted is the one
+     * categorical with a floor rather than a proportion.
+     */
+    gifted: z
+      .object({
+        identification: num,
+        referral: num,
+        fte_k8: num,
+        fte_9_12: num,
+        coordinator_units: num,
+        coordinator_aid: num,
+        specialist_k8_units: num,
+        specialist_k8_aid: num,
+        specialist_9_12_units: num,
+        specialist_9_12_aid: num,
+        entirely_on_the_floor: z.boolean(),
+      })
+      .strict(),
+    /**
+     * `[a] Enrolled ADM` — the pupil count four of the six categoricals are paid on.
+     *
+     * Not `adm`, which averages three years, and not `current_year_adm`. It equals the latter in
+     * 608 of 609 districts and differs in Akron by fifty pupils, so anything computed per pupil
+     * from a categorical amount belongs over this one.
+     */
+    categorical_adm: num,
+    /**
      * The same total, as its six parts.
      *
      * It was a residual for eight phases — core foundation funding less the state share of base

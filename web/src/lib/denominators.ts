@@ -57,6 +57,18 @@ export const DENOMINATORS = {
     note: "Children resident in the district, including those attending community schools or using scholarships. 71,947 for Columbus against Education's 43,019.",
     field: "districts[].property_tax[].adm",
   },
+  "categorical-enrolled-adm": {
+    label: "Enrolled ADM, `[a]`",
+    source: "Department of Education, FY2027 calculator, `ADM Data` column 3",
+    note: "The count targeted assistance, gifted, career-technical and English learners are paid on. Equal to `[b3] FY26 Enrolled ADM` in 608 of 609 districts and fifty pupils apart in Akron — one number entered twice and corrected once.",
+    field: "districts[].categorical_adm",
+  },
+  "ta-resident-adm": {
+    label: "Resident ADM",
+    source: "Department of Education, FY2027 calculator, `Targeted_Assistance`",
+    note: "Enrolled ADM less pupils open-enrolling in, plus those open-enrolling out. Targeted assistance measures wealth per resident pupil and then pays on the enrolled count — two denominators, one line apart in the same formula.",
+    field: "districts[].targeted_assistance.resident_adm",
+  },
   "census-fall-enrollment": {
     label: "Fall enrolment",
     source: "U.S. Census Bureau, F-33",
@@ -126,6 +138,29 @@ export const FIELD_DENOMINATORS: Record<string, DenominatorKey | null> = {
   // which is the only per-pupil quantity in the calculation and is not district-specific.
   "districts[].special_education.adm": null,
 
+  // Targeted assistance's own two counts, and the one quantity it expresses per pupil.
+  //
+  // `wealth_per_pupil` is the case this registry exists for. It is weighted wealth over *resident*
+  // ADM, and it sits on the page beside a district's valuation per pupil, which is over enrolled
+  // ADM FY2024, and beside its wealth *amount*, which was paid on the enrolled count. Three
+  // adjacent figures, three denominators, and only the middle one's name admits to having one.
+  "districts[].targeted_assistance.wealth_per_pupil": "ta-resident-adm",
+  "districts[].targeted_assistance.resident_adm": null,
+  "districts[].categorical_adm": null,
+
+  // DPIA's counts. `percentage` is the blended count over enrolled ADM and `index` is that over
+  // the statewide share and squared — both dimensionless, because the denominator cancels.
+  "districts[].dpia.economically_disadvantaged_adm": null,
+  "districts[].dpia.directly_certified_adm": null,
+  "districts[].dpia.weighted_adm": null,
+
+  // Category counts for the three remaining weighted programs. Counts, not quantities over one,
+  // and the aid beside each is a dollar total per category rather than a per-pupil figure.
+  "districts[].english_learners.adm": null,
+  "districts[].career_technical.fte": null,
+  "districts[].gifted.fte_k8": null,
+  "districts[].gifted.fte_9_12": null,
+
   // Dimensionless: a change, and correlations whose parts each cancel their own denominator.
   "districts[].enrollment_change": null,
   "statewide.outcomes.enrolled_spending_vs_performance": null,
@@ -160,4 +195,21 @@ export const RENDERED_PAIRS: [string, string][] = [
   ["districts[].millage.yield_per_mill_per_pupil", "statewide.median_yield_per_mill"],
   ["districts[].millage.yield_per_mill_per_pupil", "statewide.min_yield_per_mill"],
   ["districts[].millage.yield_per_mill_per_pupil", "statewide.max_yield_per_mill"],
+];
+
+/**
+ * Per-pupil figures the site renders on the same card but must **not** be compared.
+ *
+ * {@link RENDERED_PAIRS} asserts that two figures shown together share a denominator. This is the
+ * other half: pairs that are legitimately on different counts and appear near each other anyway,
+ * recorded so that "these are adjacent and different" is a decision rather than an oversight.
+ *
+ * The targeted assistance card is the live case. It shows weighted wealth per *resident* pupil two
+ * rows above an amount paid on *enrolled* pupils, because that is what the department's formula
+ * does — the card's job is to make the discrepancy visible, not to resolve it. Every entry here
+ * must be labelled on the page with the count it uses.
+ */
+export const DELIBERATELY_UNCOMPARABLE: [string, string][] = [
+  ["districts[].targeted_assistance.wealth_per_pupil", "districts[].valuation_per_pupil"],
+  ["districts[].targeted_assistance.resident_adm", "districts[].categorical_adm"],
 ];

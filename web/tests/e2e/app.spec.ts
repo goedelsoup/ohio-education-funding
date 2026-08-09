@@ -1098,9 +1098,97 @@ test.describe("the categorical half", () => {
     await expect(card).toContainText("Category 6");
     await expect(card).toContainText("a range of sixteen");
 
-    // The six rows plus the total must reconcile on both shares.
-    const rows = card.locator("tbody th").filter({ hasText: /^Category \d$/ });
+    // Scoped to special education's own table. The card now carries three tables with rows
+    // labelled `Category N` — special education's six, career-technical's five and English
+    // learners' three — and an unscoped count picked up all thirteen.
+    const rows = card
+      .locator('table[data-program="special-education"] tbody th')
+      .filter({ hasText: /^Category \d$/ });
     await expect(rows).toHaveCount(6);
+  });
+
+  test("targeted assistance shows both tiers and names the two pupil counts", async ({ page }) => {
+    /*
+     * The largest categorical in Ohio, and the one whose total says least. `[G]` is `[C] + [F]`
+     * and the addends measure different things — the size of the tax base against its size per
+     * pupil — so a district can draw either, both or neither.
+     *
+     * The card must also say which pupil count each step uses. The wealth tier divides by resident
+     * ADM and pays on enrolled ADM, one line apart in the department's own formula, and a page
+     * that prints a per-pupil figure without saying which is the exact error this site shipped
+     * twice before `denominators.ts` existed.
+     */
+    await page.goto("/district/043786");
+    const card = page.locator(".card", { hasText: "The categorical half" });
+    const table = card.locator('table[data-program="targeted-assistance"]');
+    await expect(table).toBeVisible();
+    await expect(table).toContainText("Weighted wealth");
+    await expect(table).toContainText("Capacity index");
+    await expect(table).toContainText("Wealth per resident pupil");
+    await expect(table).toContainText("resident pupils");
+    await expect(table).toContainText("enrolled");
+  });
+
+  test("DPIA says its index is squared and shows what that costs or earns", async ({ page }) => {
+    /*
+     * The squaring is the program. A district at twice the state's poverty rate scores four times
+     * the index, and $525m distributed on a convex curve concentrates far more sharply than a
+     * per-pupil rate would. Nothing in a DPIA total shows it, so the card states both the index
+     * and what a linear one would have been.
+     */
+    await page.goto("/district/043786");
+    const table = page.locator('table[data-program="dpia"]');
+    await expect(table).toBeVisible();
+    await expect(table).toContainText("Blended count");
+    await expect(table).toContainText("squared");
+    await expect(page.locator(".card", { hasText: "The categorical half" })).toContainText(
+      "DPIA is convex",
+    );
+  });
+
+  test("gifted shows units against what the district earned, so a floor is visible", async ({
+    page,
+  }) => {
+    /*
+     * Gifted is the one categorical with a floor rather than a proportion: 0.5 coordinator units
+     * and 0.3 of each specialist unit regardless of how few gifted pupils a district identifies.
+     * 370 districts sit on the coordinator floor. The card prints units awarded beside units
+     * earned, which is the only way a reader can see that the money is a minimum.
+     */
+    await page.goto("/district/043786");
+    const table = page.locator('table[data-program="gifted"]');
+    await expect(table).toBeVisible();
+    await expect(table).toContainText("Identification");
+    await expect(table).toContainText("Coordinator");
+    await expect(table).toContainText("Earned");
+    // Cleveland is at the eight-coordinator cap, which binds from 26,400 pupils upward.
+    await expect(table).toContainText("8.0000");
+  });
+
+  test("career-technical names the base cost its weights multiply", async ({ page }) => {
+    /*
+     * CTE weights multiply a career-technical base cost of $9,855.62, not the $8,241.61 the rest
+     * of the plan uses. A table of Ohio's weights read as one scale understates this program by a
+     * fifth, so the card says both figures rather than the weights alone.
+     */
+    await page.goto("/district/043786");
+    const card = page.locator(".card", { hasText: "The categorical half" });
+    await expect(card.locator('table[data-program="career-technical"]')).toBeVisible();
+    await expect(card).toContainText("$9,856");
+    await expect(card).toContainText("not the $8,242");
+  });
+
+  test("English learners says its weights descend", async ({ page }) => {
+    /*
+     * 0.2104, 0.1577, 0.1053 — Category 1 is the most recently arrived learner and is funded at
+     * twice Category 3. Every other weighted categorical in the plan runs the other way, so a
+     * reader assuming "more need, more money" has this one backwards.
+     */
+    await page.goto("/district/043786");
+    const card = page.locator(".card", { hasText: "The categorical half" });
+    await expect(card.locator('table[data-program="english-learners"]')).toBeVisible();
+    await expect(card).toContainText("0.2104");
+    await expect(card).toContainText("descend");
   });
 
   test("a district getting no targeted assistance is told why", async ({ page }) => {

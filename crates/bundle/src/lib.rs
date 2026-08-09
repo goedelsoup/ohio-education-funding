@@ -73,7 +73,7 @@ use edfund_core::Dollars;
 /// from FY2022-FY2024 to FY2024-FY2026 — the years the department's `ADM Data` sheet declares.
 /// The values did not change; what they are called did, which is exactly the kind of silent
 /// meaning change the version guard exists for.
-pub const CONTRACT_VERSION: &str = "16.0.0";
+pub const CONTRACT_VERSION: &str = "17.0.0";
 
 /// How close to the floor counts as being on it, in mills.
 ///
@@ -533,6 +533,93 @@ pub struct SpecialEducation {
     pub aid: [Dollars; 6],
 }
 
+/// Disadvantaged Pupil Impact Aid, for one district: a blend of two counts and a squared index.
+#[derive(Debug, Clone, Copy, PartialEq, Default)]
+pub struct Dpia {
+    /// FY2025 economically disadvantaged ADM, weighted 65%.
+    pub economically_disadvantaged_adm: f64,
+    /// FY2026 directly certified ADM, weighted 35%. Consistently the smaller of the two.
+    pub directly_certified_adm: f64,
+    /// The blend of the two.
+    pub weighted_adm: f64,
+    /// That blend as a share of enrolled ADM.
+    pub percentage: f64,
+    /// The share indexed against the statewide 0.5334, **squared**.
+    pub index: f64,
+}
+
+/// Targeted assistance, for one district: two tiers that measure different things and add.
+#[derive(Debug, Clone, Copy, PartialEq, Default)]
+pub struct TargetedAssistance {
+    /// Assessed valuation and federal adjusted gross income, the 60/40 halves of weighted wealth.
+    pub property_valuation: Dollars,
+    /// Federal adjusted gross income, the 40% half.
+    pub federal_gross_income: Dollars,
+    /// The blend of the two.
+    pub weighted_wealth: Dollars,
+    /// The median district's total wealth over this district's.
+    pub capacity_index: f64,
+    /// 0.8% of the shortfall below that median, phased by district size.
+    pub capacity_amount: Dollars,
+    /// Weighted wealth per **resident** pupil — enrolled, less open-enrolling in, plus out.
+    pub wealth_per_pupil: Dollars,
+    /// The median per pupil over this district's, so poorer scores higher.
+    pub wealth_index: f64,
+    /// A rate against wealth per pupil, paid on **enrolled** pupils. Zero below an index of 0.8.
+    pub wealth_amount: Dollars,
+    /// The count the wealth tier measures against, which is not the one it pays on.
+    pub resident_adm: f64,
+    /// Whether the district qualifies for the supplemental tier, which pays nothing.
+    pub supplement_eligible: bool,
+}
+
+/// Career-technical education's five categories, plus associated services.
+#[derive(Debug, Clone, Copy, PartialEq, Default)]
+pub struct CareerTechnical {
+    /// FTE in each category, 1 through 5.
+    pub fte: [f64; 5],
+    /// The aid each produces, after the district's state share.
+    pub aid: [Dollars; 5],
+    /// A sixth weight against the sum of all five FTE.
+    pub associated_services: Dollars,
+}
+
+/// English learners' three categories, whose weights descend rather than ascend.
+#[derive(Debug, Clone, Copy, PartialEq, Default)]
+pub struct EnglishLearners {
+    /// ADM in each category, 1 through 3.
+    pub adm: [f64; 3],
+    /// The aid each produces, after the district's state share.
+    pub aid: [Dollars; 3],
+}
+
+/// Gifted: two per-pupil amounts and three kinds of unit, with floors and a cap.
+#[derive(Debug, Clone, Copy, PartialEq, Default)]
+pub struct Gifted {
+    /// $24 per K-6 pupil, after the state share.
+    pub identification: Dollars,
+    /// $2.50 per enrolled pupil, after the state share.
+    pub referral: Dollars,
+    /// Identified gifted FTE, which drive the specialist units.
+    pub fte_k8: f64,
+    /// Identified gifted FTE in grades 9-12.
+    pub fte_9_12: f64,
+    /// Units then dollars, for each of the three unit kinds.
+    pub coordinator_units: f64,
+    /// What the coordinator units pay.
+    pub coordinator_aid: Dollars,
+    /// Intervention specialist units for K-8, floored at 0.3.
+    pub specialist_k8_units: f64,
+    /// What those units pay.
+    pub specialist_k8_aid: Dollars,
+    /// Intervention specialist units for 9-12, floored at 0.3 and priced lower.
+    pub specialist_9_12_units: f64,
+    /// What those units pay.
+    pub specialist_9_12_aid: Dollars,
+    /// Whether every unit this district draws is a floor rather than an earned entitlement.
+    pub entirely_on_the_floor: bool,
+}
+
 /// The six categorical programs, per district.
 #[derive(Debug, Clone, Copy, PartialEq, Default)]
 pub struct Categoricals {
@@ -580,6 +667,29 @@ pub struct District {
     /// The weights span a factor of sixteen and the money runs against them — Category 6 is 15%
     /// of pupils and 48% of the program, Category 2 the reverse.
     pub special_education: SpecialEducation,
+    /// The other five, each decomposed to the mechanism that produces it.
+    ///
+    /// Reading these apart is the point. The six programs answer different questions and move for
+    /// opposite reasons — targeted assistance rises as a district gets poorer in *property*, DPIA
+    /// as its *pupils* get poorer, gifted barely moves at all because it is mostly a staffing
+    /// floor. A page that shows six dollar amounts still cannot say which of those a district's
+    /// money is.
+    pub dpia: Dpia,
+    /// The largest, and the only equalisation among the six.
+    pub targeted_assistance: TargetedAssistance,
+    /// Five weights against a career-technical base cost, plus associated services.
+    pub career_technical: CareerTechnical,
+    /// Three weights that descend rather than ascend.
+    pub english_learners: EnglishLearners,
+    /// Two per-pupil amounts and three kinds of unit, with floors no other categorical has.
+    pub gifted: Gifted,
+    /// `[a] Enrolled ADM` — the pupil count four of the six categoricals are paid on.
+    ///
+    /// Not [`District::adm`], which averages three years, and not [`District::current_year_adm`],
+    /// which is `[b3] FY26 Enrolled ADM`. It equals the latter in 608 of 609 districts and differs
+    /// in Akron by fifty pupils. Carried so a per-pupil figure computed here uses the denominator
+    /// the department paid on.
+    pub categorical_adm: f64,
     /// The same, as its six parts.
     ///
     /// The total was a residual for eight phases — core foundation funding less the state share of
@@ -941,6 +1051,42 @@ fn finance_year(y: &FinanceYear) -> String {
         num(y.total_expenditure),
         num(y.ending_cash)
     )
+}
+
+/// `"<name>": {"<first>": [...], "<second>": [...], …}` — two parallel arrays and any scalars.
+///
+/// Closed here rather than by the caller. The first version left it open so that callers with a
+/// trailing field could add one before the brace, and three of the five call sites then forgot to
+/// close it — which nested `career_technical` inside `special_education` and made `dpia` a child
+/// of `english_learners`. An object that is only valid if the caller remembers something is a
+/// worse interface than one that takes the something.
+fn array_pair(
+    name: &str,
+    first: &str,
+    a: &[f64],
+    second: &str,
+    b: &[f64],
+    extra: &[(&str, f64)],
+) -> String {
+    let list = |xs: &[f64]| xs.iter().map(|x| num(*x)).collect::<Vec<_>>().join(", ");
+    let mut body = format!("\"{first}\": [{}], \"{second}\": [{}]", list(a), list(b));
+    for (key, value) in extra {
+        body.push_str(&format!(", \"{key}\": {}", num(*value)));
+    }
+    format!("\"{name}\": {{{body}}}")
+}
+
+/// `"<name>": {"k": v, …}` — an object of numeric fields and any boolean flags. Also closed.
+fn fields(name: &str, entries: &[(&str, f64)], flags: &[(&str, bool)]) -> String {
+    let mut body = entries
+        .iter()
+        .map(|(key, value)| format!("\"{key}\": {}", num(*value)))
+        .collect::<Vec<_>>()
+        .join(", ");
+    for (key, value) in flags {
+        body.push_str(&format!(", \"{key}\": {value}"));
+    }
+    format!("\"{name}\": {{{body}}}")
 }
 
 fn opt(v: Option<f64>) -> String {
@@ -1381,72 +1527,113 @@ impl Bundle {
                 "\"categorical_funding\": {}, ",
                 num(d.categorical_funding)
             ));
-            s.push_str("\"special_education\": {\"adm\": [");
-            for k in 0..6 {
-                if k > 0 {
-                    s.push_str(", ");
-                }
-                s.push_str(&num(d.special_education.adm[k]));
-            }
-            s.push_str("], \"aid\": [");
-            for k in 0..6 {
-                if k > 0 {
-                    s.push_str(", ");
-                }
-                s.push_str(&num(d.special_education.aid[k]));
-            }
-            s.push_str("]}, ");
-            s.push_str("\"categoricals\": {");
-            for (n, (key, value)) in [
-                ("targeted_assistance", d.categoricals.targeted_assistance),
-                ("special_education", d.categoricals.special_education),
-                ("dpia", d.categoricals.dpia),
-                ("english_learners", d.categoricals.english_learners),
-                ("gifted", d.categoricals.gifted),
-                ("career_technical", d.categoricals.career_technical),
-            ]
-            .iter()
-            .enumerate()
-            {
-                if n > 0 {
-                    s.push_str(", ");
-                }
-                s.push_str(&format!("\"{key}\": {}", num(*value)));
-            }
-            s.push_str("}, ");
-            s.push_str("\"special_education\": {\"adm\": [");
-            for k in 0..6 {
-                if k > 0 {
-                    s.push_str(", ");
-                }
-                s.push_str(&num(d.special_education.adm[k]));
-            }
-            s.push_str("], \"aid\": [");
-            for k in 0..6 {
-                if k > 0 {
-                    s.push_str(", ");
-                }
-                s.push_str(&num(d.special_education.aid[k]));
-            }
-            s.push_str("]}, ");
-            s.push_str("\"categoricals\": {");
-            for (i, (key, value)) in [
-                ("targeted_assistance", d.categoricals.targeted_assistance),
-                ("special_education", d.categoricals.special_education),
-                ("dpia", d.categoricals.dpia),
-                ("english_learners", d.categoricals.english_learners),
-                ("gifted", d.categoricals.gifted),
-                ("career_technical", d.categoricals.career_technical),
-            ]
-            .iter()
-            .enumerate()
-            {
-                if i > 0 {
-                    s.push_str(", ");
-                }
-                s.push_str(&format!("\"{key}\": {}", num(*value)));
-            }
-            s.push_str("}, ");
+            // Special education, then the other five, then the six totals. Emitted once — this
+            // block and the categoricals beside it were pasted twice, so every district in the
+            // shipped feed carried both keys twice. JSON takes the last, so nothing was wrong on
+            // the page and about 120KB of the payload was a copy of itself.
+            s.push_str(&array_pair(
+                "special_education",
+                "adm",
+                &d.special_education.adm,
+                "aid",
+                &d.special_education.aid,
+                &[],
+            ));
+            s.push_str(", ");
+            s.push_str(&array_pair(
+                "career_technical",
+                "fte",
+                &d.career_technical.fte,
+                "aid",
+                &d.career_technical.aid,
+                &[(
+                    "associated_services",
+                    d.career_technical.associated_services,
+                )],
+            ));
+            s.push_str(", ");
+            s.push_str(&array_pair(
+                "english_learners",
+                "adm",
+                &d.english_learners.adm,
+                "aid",
+                &d.english_learners.aid,
+                &[],
+            ));
+            s.push_str(", ");
+            s.push_str(&fields(
+                "dpia",
+                &[
+                    (
+                        "economically_disadvantaged_adm",
+                        d.dpia.economically_disadvantaged_adm,
+                    ),
+                    ("directly_certified_adm", d.dpia.directly_certified_adm),
+                    ("weighted_adm", d.dpia.weighted_adm),
+                    ("percentage", d.dpia.percentage),
+                    ("index", d.dpia.index),
+                ],
+                &[],
+            ));
+            s.push_str(", ");
+            s.push_str(&fields(
+                "targeted_assistance",
+                &[
+                    (
+                        "property_valuation",
+                        d.targeted_assistance.property_valuation,
+                    ),
+                    (
+                        "federal_gross_income",
+                        d.targeted_assistance.federal_gross_income,
+                    ),
+                    ("weighted_wealth", d.targeted_assistance.weighted_wealth),
+                    ("capacity_index", d.targeted_assistance.capacity_index),
+                    ("capacity_amount", d.targeted_assistance.capacity_amount),
+                    ("wealth_per_pupil", d.targeted_assistance.wealth_per_pupil),
+                    ("wealth_index", d.targeted_assistance.wealth_index),
+                    ("wealth_amount", d.targeted_assistance.wealth_amount),
+                    ("resident_adm", d.targeted_assistance.resident_adm),
+                ],
+                &[(
+                    "supplement_eligible",
+                    d.targeted_assistance.supplement_eligible,
+                )],
+            ));
+            s.push_str(", ");
+            s.push_str(&fields(
+                "gifted",
+                &[
+                    ("identification", d.gifted.identification),
+                    ("referral", d.gifted.referral),
+                    ("fte_k8", d.gifted.fte_k8),
+                    ("fte_9_12", d.gifted.fte_9_12),
+                    ("coordinator_units", d.gifted.coordinator_units),
+                    ("coordinator_aid", d.gifted.coordinator_aid),
+                    ("specialist_k8_units", d.gifted.specialist_k8_units),
+                    ("specialist_k8_aid", d.gifted.specialist_k8_aid),
+                    ("specialist_9_12_units", d.gifted.specialist_9_12_units),
+                    ("specialist_9_12_aid", d.gifted.specialist_9_12_aid),
+                ],
+                &[("entirely_on_the_floor", d.gifted.entirely_on_the_floor)],
+            ));
+            s.push_str(&format!(
+                ", \"categorical_adm\": {}, ",
+                num(d.categorical_adm)
+            ));
+            s.push_str(&fields(
+                "categoricals",
+                &[
+                    ("targeted_assistance", d.categoricals.targeted_assistance),
+                    ("special_education", d.categoricals.special_education),
+                    ("dpia", d.categoricals.dpia),
+                    ("english_learners", d.categoricals.english_learners),
+                    ("gifted", d.categoricals.gifted),
+                    ("career_technical", d.categoricals.career_technical),
+                ],
+                &[],
+            ));
+            s.push_str(", ");
             s.push_str(&format!(
                 "\"formula_aid_per_pupil\": {}, ",
                 num(d.formula_aid_per_pupil)
@@ -1634,6 +1821,51 @@ mod tests {
                 adm: [10.9, 105.2, 6.0, 1.0, 10.8, 7.1],
                 aid: [21_000.0, 320_000.0, 44_000.0, 9_800.0, 143_000.0, 138_000.0],
             },
+            // Each of the five decompositions, with distinguishable values in every slot: the
+            // serializer writes arrays and nested objects, and a fixture of zeroes would let a
+            // transposed pair through.
+            dpia: Dpia {
+                economically_disadvantaged_adm: 1_050.25,
+                directly_certified_adm: 640.5,
+                weighted_adm: 906.84,
+                percentage: 0.4302,
+                index: 0.6504,
+            },
+            targeted_assistance: TargetedAssistance {
+                property_valuation: 210_000_000.0,
+                federal_gross_income: 190_000_000.0,
+                weighted_wealth: 202_000_000.0,
+                capacity_index: 1.9413,
+                capacity_amount: 1_520_000.0,
+                wealth_per_pupil: 95_800.25,
+                wealth_index: 2.8884,
+                wealth_amount: 1_580_000.0,
+                resident_adm: 2_108.5,
+                supplement_eligible: true,
+            },
+            career_technical: CareerTechnical {
+                fte: [40.5, 22.25, 8.0, 4.5, 1.25],
+                aid: [180_000.0, 78_000.0, 10_000.0, 4_800.0, 1_100.0],
+                associated_services: 26_100.0,
+            },
+            english_learners: EnglishLearners {
+                adm: [6.5, 3.25, 1.5],
+                aid: [7_800.0, 2_900.0, 1_300.0],
+            },
+            gifted: Gifted {
+                identification: 24_500.0,
+                referral: 4_200.0,
+                fte_k8: 61.0,
+                fte_9_12: 28.5,
+                coordinator_units: 0.6387,
+                coordinator_aid: 41_100.0,
+                specialist_k8_units: 0.4357,
+                specialist_k8_aid: 29_200.0,
+                specialist_9_12_units: 0.3,
+                specialist_9_12_aid: 18_200.0,
+                entirely_on_the_floor: false,
+            },
+            categorical_adm: 2_107.80,
             categoricals: Categoricals {
                 targeted_assistance: 3_100_000.0,
                 special_education: 2_100_000.0,
@@ -1951,6 +2183,60 @@ mod tests {
         assert!(
             !json.contains("\"valuation_per_pupil\": 0"),
             "a missing value must not be indistinguishable from zero"
+        );
+    }
+
+    /// No key appears twice inside one district object.
+    ///
+    /// `special_education` and `categoricals` were each emitted twice per district for several
+    /// contract versions. Nothing was visibly wrong — JSON takes the last occurrence, and both
+    /// copies were identical — so about 120KB of every 3.4MB feed was a copy of itself and no test
+    /// noticed. Duplicate keys are also the shape a genuine bug takes when two branches both write
+    /// a field and only one is right.
+    #[test]
+    fn a_district_object_repeats_no_key() {
+        let json = bundle(vec![sample()], vec![checkpoint()]).to_json();
+        let start = json.find("\"districts\": [").expect("a districts array");
+        let district = &json[start..];
+
+        // Scan the first district object only, tracking brace depth so nested objects do not end
+        // it early. Keys at depth one are the district's own.
+        let mut depth = 0_i32;
+        let mut seen: Vec<&str> = Vec::new();
+        let bytes = district.as_bytes();
+        let mut i = district.find('{').expect("an object");
+        while i < bytes.len() {
+            match bytes[i] {
+                b'{' => depth += 1,
+                b'}' => {
+                    depth -= 1;
+                    if depth == 0 {
+                        break;
+                    }
+                }
+                b'"' if depth == 1 => {
+                    let rest = &district[i + 1..];
+                    if let Some(end) = rest.find('"') {
+                        let key = &rest[..end];
+                        // A key is followed by a colon; a string *value* is not.
+                        if district[i + 1 + end + 1..].starts_with(':') {
+                            assert!(
+                                !seen.contains(&key),
+                                "the district object emits \"{key}\" twice"
+                            );
+                            seen.push(key);
+                        }
+                        i += end + 1;
+                    }
+                }
+                _ => {}
+            }
+            i += 1;
+        }
+        assert!(
+            seen.len() > 20,
+            "expected to have walked a full district, saw {} keys: {seen:?}",
+            seen.len()
         );
     }
 

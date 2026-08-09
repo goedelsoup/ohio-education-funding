@@ -12,10 +12,11 @@
 use std::collections::HashMap;
 
 use bundle::{
-    BaseCostBuildUp, Bundle, Categoricals, Checkpoint, Deflator, District, DistrictOutcome,
-    FinanceYear, ForecastCheckpoint, MillageAnalysis, National, OutcomeStatewide, PolicyShape,
-    Projection, PropertyTaxYear, RegimeCounterfactual, SpecialEducation, SpendingByFunction,
-    StateFinance, Statewide, CONTRACT_VERSION,
+    BaseCostBuildUp, Bundle, CareerTechnical, Categoricals, Checkpoint, Deflator, District,
+    DistrictOutcome, Dpia, EnglishLearners, FinanceYear, ForecastCheckpoint, Gifted,
+    MillageAnalysis, National, OutcomeStatewide, PolicyShape, Projection, PropertyTaxYear,
+    RegimeCounterfactual, SpecialEducation, SpendingByFunction, StateFinance, Statewide,
+    TargetedAssistance, CONTRACT_VERSION,
 };
 use dispersion::{partial_correlation, wealth_neutrality};
 use edfund_core::{AgencyType, FiscalYear};
@@ -403,6 +404,50 @@ fn to_district(
             adm: record.special_education.adm,
             aid: record.special_education.aid,
         },
+        dpia: Dpia {
+            economically_disadvantaged_adm: record.dpia.economically_disadvantaged_adm,
+            directly_certified_adm: record.dpia.directly_certified_adm,
+            weighted_adm: record.dpia.weighted_adm,
+            percentage: record.dpia.percentage,
+            index: record.dpia.index,
+        },
+        targeted_assistance: TargetedAssistance {
+            property_valuation: record.targeted_assistance.property_valuation,
+            federal_gross_income: record.targeted_assistance.federal_gross_income,
+            weighted_wealth: record.targeted_assistance.weighted_wealth,
+            capacity_index: record.targeted_assistance.capacity_index,
+            capacity_amount: record.targeted_assistance.capacity_amount,
+            wealth_per_pupil: record.targeted_assistance.wealth_per_pupil,
+            wealth_index: record.targeted_assistance.wealth_index,
+            wealth_amount: record.targeted_assistance.wealth_amount,
+            resident_adm: record
+                .targeted_assistance
+                .resident_adm(record.categorical_enrolled_adm),
+            supplement_eligible: record.targeted_assistance.supplement_eligible,
+        },
+        career_technical: CareerTechnical {
+            fte: record.career_technical.fte,
+            aid: record.career_technical.aid,
+            associated_services: record.career_technical.associated_services,
+        },
+        english_learners: EnglishLearners {
+            adm: record.english_learners.adm,
+            aid: record.english_learners.aid,
+        },
+        gifted: Gifted {
+            identification: record.gifted.identification,
+            referral: record.gifted.referral,
+            fte_k8: record.gifted.fte_k8,
+            fte_9_12: record.gifted.fte_9_12,
+            coordinator_units: record.gifted.coordinator_units,
+            coordinator_aid: record.gifted.coordinator_aid,
+            specialist_k8_units: record.gifted.specialist_k8_units,
+            specialist_k8_aid: record.gifted.specialist_k8_aid,
+            specialist_9_12_units: record.gifted.specialist_9_12_units,
+            specialist_9_12_aid: record.gifted.specialist_9_12_aid,
+            entirely_on_the_floor: record.gifted.entirely_on_the_floor(),
+        },
+        categorical_adm: record.categorical_enrolled_adm,
         categoricals: Categoricals {
             targeted_assistance: record.categoricals.targeted_assistance,
             special_education: record.categoricals.special_education,

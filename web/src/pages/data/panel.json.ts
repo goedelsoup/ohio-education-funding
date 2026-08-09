@@ -42,6 +42,12 @@ export const GET: APIRoute = () => {
         spending_by_function: _s,
         millage: _m,
         regime: _r,
+        special_education: _se,
+        career_technical: _ct,
+        english_learners: _el,
+        dpia: _d,
+        targeted_assistance: _ta,
+        gifted: _g,
         ...district
       }) => district,
     ),

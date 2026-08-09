@@ -536,6 +536,11 @@ export function renderCategoricals(d: District, statewide: Statewide): string {
         }</p>
 
       ${renderSpecialEducation(d)}
+      ${renderTargetedAssistance(d)}
+      ${renderDpia(d)}
+      ${renderGifted(d)}
+      ${renderCareerTechnical(d)}
+      ${renderEnglishLearners(d)}
 
       <p class="note">These six were one number on this page until recently — a residual, computed
         as core foundation funding less the state share of base cost. The residual is exact and it
@@ -577,7 +582,7 @@ function renderSpecialEducation(d: District): string {
 
   return `
     <h3>Special education, by category</h3>
-    <div class="scroll"><table>
+    <div class="scroll"><table data-program="special-education">
       <thead><tr><th>Category</th><th class="tnum">Weight</th><th class="tnum">Pupils</th>
         <th class="tnum">Aid</th><th class="tnum">Share of pupils</th>
         <th class="tnum">Share of aid</th></tr></thead>
@@ -610,4 +615,376 @@ function renderSpecialEducation(d: District): string {
              education aid from ${pct(biggest.adm / pupils, 0)} of its special education pupils.`
           : ""
       }</p>`;
+}
+
+/**
+ * Targeted assistance, inside the categorical card.
+ *
+ * # Two tiers that measure different things
+ *
+ * The largest categorical in Ohio at $1.36bn, and the only one that is an equalisation rather than
+ * a payment for a category of pupil. `[G]` is `[C] + [F]` and the addends do not answer the same
+ * question:
+ *
+ * - the **capacity tier** is 0.8% of however far the district's *total* weighted wealth falls
+ *   below the median district's, so it is about the size of the tax base full stop;
+ * - the **wealth tier** is a rate against weighted wealth *per resident pupil*, cutting off where
+ *   that reaches 1.25 times the state median.
+ *
+ * Statewide the split is 24% capacity and 76% wealth, but for a district it can be either, both or
+ * neither — 299 draw the first, 438 the second, 135 nothing at all.
+ *
+ * # And two pupil counts, one line apart
+ *
+ * The wealth tier divides by **resident** ADM to measure and multiplies by **enrolled** ADM to pay.
+ * Where a district has heavy inbound open enrolment those differ, and the card says so rather than
+ * printing a per-pupil figure over whichever one came to hand.
+ */
+function renderTargetedAssistance(d: District): string {
+  const t = d.targeted_assistance;
+  const total = d.categoricals.targeted_assistance;
+  if (t.weighted_wealth <= 0) return "";
+
+  // The statewide medians the two indices divide by, as `crates/project::panel` holds them.
+  const medianWealth = 392_151_306.63;
+  const medianPerPupil = 276_708.97;
+  const enrolled = d.categorical_adm;
+  const openEnrollmentGap = enrolled - t.resident_adm;
+
+  const shortfall = medianWealth - t.weighted_wealth;
+  const sizeShare =
+    enrolled > 600 ? 1 : enrolled > 400 ? (0.95 * (enrolled - 400)) / 200 + 0.05 : enrolled >= 200 ? 0.05 : 0;
+
+  return `
+    <h3>Targeted assistance, in its two tiers</h3>
+    <div class="scroll"><table data-program="targeted-assistance">
+      <thead><tr><th>Step</th><th class="tnum">Value</th><th>What it is</th></tr></thead>
+      <tbody>
+        <tr><th>Assessed valuation</th><td class="tnum">${money(t.property_valuation)}</td>
+          <td class="n">Weighted 60% in the wealth measure.</td></tr>
+        <tr><th>Federal adjusted gross income</th><td class="tnum">${money(t.federal_gross_income)}</td>
+          <td class="n">The other 40%. Wealth here is property <em>and</em> income.</td></tr>
+        <tr class="current"><th>Weighted wealth</th><td class="tnum">${money(t.weighted_wealth)}</td>
+          <td class="n">The blend of the two.</td></tr>
+        <tr><th>Capacity index</th><td class="tnum">${t.capacity_index.toFixed(4)}</td>
+          <td class="n">The median district's total wealth over this one's. Above 1 is poorer.</td></tr>
+        <tr${t.capacity_amount <= 0 ? ' class="n"' : ""}><th>Capacity amount</th>
+          <td class="tnum">${t.capacity_amount <= 0 ? "—" : money(t.capacity_amount)}</td>
+          <td class="n">${
+            shortfall <= 0
+              ? "Its wealth is above the median district's, so this tier pays nothing."
+              : sizeShare <= 0
+                ? `Below 200 pupils. The tier pays nothing at this size however far below the
+                   median the district's wealth falls.`
+                : `0.8% of the ${money(shortfall)} shortfall${
+                    sizeShare < 1 ? `, at ${pct(sizeShare, 0)} for a district of this size` : ""
+                  }.`
+          }</td></tr>
+        <tr><th>Wealth per resident pupil</th><td class="tnum">${money(t.wealth_per_pupil)}</td>
+          <td class="n">Weighted wealth over ${count(Math.round(t.resident_adm))} resident pupils${
+            Math.abs(openEnrollmentGap) > 1
+              ? ` — ${count(Math.round(Math.abs(openEnrollmentGap)))} ${
+                  openEnrollmentGap > 0 ? "fewer" : "more"
+                } than it enrols`
+              : ""
+          }.</td></tr>
+        <tr><th>Wealth index</th><td class="tnum">${t.wealth_index.toFixed(4)}</td>
+          <td class="n">${money(medianPerPupil)} over that. Below 0.8 the tier pays nothing.</td></tr>
+        <tr${t.wealth_amount <= 0 ? ' class="n"' : ""}><th>Wealth amount</th>
+          <td class="tnum">${t.wealth_amount <= 0 ? "—" : money(t.wealth_amount)}</td>
+          <td class="n">${
+            t.wealth_amount <= 0
+              ? "Its wealth per pupil is above 1.25 times the state median."
+              : `Paid on its ${count(Math.round(enrolled))} <em>enrolled</em> pupils, not the
+                 resident count the rate was measured against.`
+          }</td></tr>
+        <tr class="current"><th>Targeted assistance</th><td class="tnum">${money(total)}</td>
+          <td class="n">The two tiers, added.</td></tr>
+      </tbody>
+    </table></div>
+    <p class="note">${
+      total <= 0
+        ? `This district draws neither tier. 135 are in the same position, and it is not a
+           statement about their pupils — targeted assistance measures the tax base.`
+        : t.capacity_amount > 0 && t.wealth_amount > 0
+          ? `Both tiers pay here, ${pct(t.capacity_amount / total, 0)} capacity and
+             ${pct(t.wealth_amount / total, 0)} wealth. Statewide the split is 24% and 76%.`
+          : t.capacity_amount > 0
+            ? `Only the capacity tier pays here. 299 districts draw it and 438 draw the other, so
+               which one a district is on says something the total does not.`
+            : `Only the wealth tier pays here. Its total wealth is above the median district's,
+               which is what the capacity tier measures, but it is spread across enough pupils to
+               qualify on the per-pupil one.`
+    }${
+      t.supplement_eligible
+        ? ` It also qualifies for <strong>supplemental targeted assistance</strong> — a test for
+           districts that were poor in FY2019 and have since lost more than an eighth of their
+           pupils. 36 districts qualify. The program pays every one of them nothing.`
+        : ""
+    }</p>`;
+}
+
+/**
+ * Disadvantaged Pupil Impact Aid, inside the categorical card.
+ *
+ * # The index is squared, and that is the whole character of the program
+ *
+ * DPIA blends two poverty counts, expresses the blend as a share of enrolment, and indexes that
+ * share against the statewide 0.5334 — **squared**. Aid scales with the square of relative
+ * poverty, so a district at twice the state's rate scores four times the index rather than twice.
+ *
+ * The two counts also disagree. Direct certification is administrative and finds a median 61% of
+ * what the economically disadvantaged count does, so putting 35% of the weight on it lowers the
+ * funded count almost everywhere. In three districts it runs the other way.
+ */
+function renderDpia(d: District): string {
+  const p = d.dpia;
+  const total = d.categoricals.dpia;
+  if (p.weighted_adm <= 0) return "";
+
+  const statewideShare = 0.5334;
+  const linear = p.percentage / statewideShare;
+  const certificationRatio =
+    p.economically_disadvantaged_adm > 0
+      ? p.directly_certified_adm / p.economically_disadvantaged_adm
+      : 0;
+
+  return `
+    <h3>Disadvantaged Pupil Impact Aid, step by step</h3>
+    <div class="scroll"><table data-program="dpia">
+      <thead><tr><th>Step</th><th class="tnum">Value</th><th>What it is</th></tr></thead>
+      <tbody>
+        <tr><th>Economically disadvantaged ADM</th>
+          <td class="tnum">${count(Math.round(p.economically_disadvantaged_adm))}</td>
+          <td class="n">FY2025. Weighted 65%.</td></tr>
+        <tr><th>Directly certified ADM</th>
+          <td class="tnum">${count(Math.round(p.directly_certified_adm))}</td>
+          <td class="n">FY2026, weighted 35% — an administrative count, ${
+            certificationRatio > 0
+              ? `${pct(certificationRatio, 0)} of the disadvantaged one here`
+              : "smaller almost everywhere"
+          }.</td></tr>
+        <tr class="current"><th>Blended count</th>
+          <td class="tnum">${count(Math.round(p.weighted_adm))}</td>
+          <td class="n">The 65/35 mix. This is the number the money is paid on.</td></tr>
+        <tr><th>As a share of enrolment</th><td class="tnum">${pct(p.percentage, 2)}</td>
+          <td class="n">Against a statewide ${pct(statewideShare, 2)}.</td></tr>
+        <tr class="current"><th>Index</th><td class="tnum">${p.index.toFixed(4)}</td>
+          <td class="n">That share over the state's, <strong>squared</strong> — ${linear.toFixed(
+            4,
+          )} before squaring.</td></tr>
+        <tr class="current"><th>Disadvantaged Pupil Impact Aid</th>
+          <td class="tnum">${money(total)}</td>
+          <td class="n">$422 per weighted pupil, scaled by the index.</td></tr>
+      </tbody>
+    </table></div>
+    <p class="note">The squaring is the program. A district at <strong>twice</strong> the state's
+      poverty rate scores <strong>four times</strong> the index, not twice — so DPIA is convex, and
+      $525m distributed on a curve like that concentrates far more sharply than a per-pupil rate
+      would. ${
+        p.index > 1
+          ? `This district is above the state's rate, so the squaring works in its favour: its
+             index is ${p.index.toFixed(2)} where a linear one would be ${linear.toFixed(2)}.`
+          : `This district is below the state's rate, so the squaring works against it: its index
+             is ${p.index.toFixed(2)} where a linear one would be ${linear.toFixed(2)}.`
+      }</p>`;
+}
+
+/**
+ * Gifted, inside the categorical card.
+ *
+ * # The only categorical that buys staff rather than pupils
+ *
+ * Two per-pupil amounts and three kinds of **unit**, where a unit is a headcount entitlement priced
+ * like a salary. 87% of the $54m program is unit funding.
+ *
+ * The units are clamped, and the clamps are the policy. Coordinator units are enrolment over 3,300,
+ * floored at 0.5 and capped at 8; specialist units are identified gifted FTE over 140 in each band,
+ * floored at 0.3. So a district identifying no gifted pupils still draws $93,993 before its state
+ * share — gifted is the one categorical with a floor rather than a proportion. 370 districts sit on
+ * the coordinator floor and three on the cap.
+ */
+function renderGifted(d: District): string {
+  const g = d.gifted;
+  const total = d.categoricals.gifted;
+  if (total <= 0) return "";
+
+  const units = [
+    ["Coordinator", g.coordinator_units, g.coordinator_aid, 85_776, d.categorical_adm / 3300, 0.5, "one per 3,300 pupils, floored at 0.5 and capped at 8"],
+    ["Intervention specialist, K-8", g.specialist_k8_units, g.specialist_k8_aid, 89_378, g.fte_k8 / 140, 0.3, "one per 140 identified gifted pupils, floored at 0.3"],
+    ["Intervention specialist, 9-12", g.specialist_9_12_units, g.specialist_9_12_aid, 80_974, g.fte_9_12 / 140, 0.3, "the same, priced $8,404 lower"],
+  ] as const;
+
+  // Whether a unit is floored is decided by what the district *earned* against the floor, not by
+  // comparing the awarded figure to the earned one. The feed rounds units to four places, so an
+  // earned 5.31419 is published as an awarded 5.3142 and a naive `awarded > earned` reads that
+  // rounding as a floor — which is what this card said about Cleveland's 9-12 specialists on the
+  // first pass, while missing that its coordinators are at the cap.
+  const floored = units.filter(([, , , , earned, floor]) => earned < floor - 1e-9);
+  const atTheCap = g.coordinator_units >= 8 - 1e-9;
+  const unitTotal = g.coordinator_aid + g.specialist_k8_aid + g.specialist_9_12_aid;
+
+  return `
+    <h3>Gifted: two payments and three kinds of unit</h3>
+    <div class="scroll"><table data-program="gifted">
+      <thead><tr><th>Component</th><th class="tnum">Units</th><th class="tnum">Earned</th>
+        <th class="tnum">Amount</th><th>What it is</th></tr></thead>
+      <tbody>
+        <tr><th>Identification</th><td class="tnum n">—</td><td class="tnum n">—</td>
+          <td class="tnum">${money(g.identification)}</td>
+          <td class="n">$24 per K-6 pupil, after the state share.</td></tr>
+        <tr><th>Referral</th><td class="tnum n">—</td><td class="tnum n">—</td>
+          <td class="tnum">${money(g.referral)}</td>
+          <td class="n">$2.50 per enrolled pupil — a different denominator, one line away.</td></tr>
+        ${units
+          .map(
+            ([label, awarded, aid, price, earned, floor, note]) => `<tr${
+              earned < floor - 1e-9 || awarded < earned - 1e-9 ? ' class="current"' : ""
+            }>
+              <th>${escapeHtml(label)}</th>
+              <td class="tnum">${awarded.toFixed(4)}</td>
+              <td class="tnum n">${earned.toFixed(4)}</td>
+              <td class="tnum">${money(aid)}</td>
+              <td class="n">${money(price)} each — ${escapeHtml(note)}.</td>
+            </tr>`,
+          )
+          .join("")}
+        <tr class="current"><th>Gifted</th><td class="tnum n">—</td><td class="tnum n">—</td>
+          <td class="tnum">${money(total)}</td>
+          <td class="n">${pct(unitTotal / total, 0)} of it is units.</td></tr>
+      </tbody>
+    </table></div>
+    <p class="note">${
+      floored.length > 0
+        ? `<strong>${
+            floored.length === 3
+              ? "Every one of this district's three unit entitlements is"
+              : floored.length === 1
+                ? "One of this district's three unit entitlements is"
+                : `${floored.length} of this district's three unit entitlements are`
+          } a floor rather than an earned amount</strong> — its own counts would buy less. That is
+           deliberate: units buy people, and half a coordinator is already the smallest thing a
+           small district can be funded for. It also means this part of its gifted money does not
+           move when its gifted enrolment does.`
+        : atTheCap
+          ? `This district is at the <strong>eight-coordinator cap</strong>. Its enrolment earns
+             ${(d.categorical_adm / 3300).toFixed(2)} units and it is paid for eight, so unlike
+             most of Ohio its coordinator line is a ceiling rather than a floor. Three districts
+             are in that position.`
+          : `Every unit here is earned rather than floored or capped.`
+    } Statewide, 370 districts sit on the half-coordinator floor — three-fifths of Ohio — so for
+      most of the state the coordinator line is a minimum rather than a measurement.</p>`;
+}
+
+/**
+ * Career-technical education, inside the categorical card.
+ *
+ * # The same shape as special education, against a base cost 20% higher
+ *
+ * Five weights times five FTE counts times a base cost times the state share. The difference is the
+ * base: CTE is weighted against a **career-technical** base cost per pupil of $9,855.62, where
+ * special education and English learners use the statewide average $8,241.61.
+ *
+ * So a CTE weight and a special education weight are not on the same scale, and a table that lists
+ * Ohio's weights together — which is the natural thing to build — understates career-technical by a
+ * fifth before any pupil is counted.
+ */
+function renderCareerTechnical(d: District): string {
+  const c = d.career_technical;
+  const total = d.categoricals.career_technical;
+  if (total <= 0) return "";
+
+  // As `crates/project::panel::CTE_WEIGHTS` holds them, and as the department's own per-category
+  // amounts reproduce to the cent.
+  const weights = [0.623, 0.5905, 0.2154, 0.183, 0.157];
+  const baseCost = 9855.62;
+
+  const rows = weights
+    .map((weight, k) => ({ category: k + 1, weight, fte: c.fte[k]!, aid: c.aid[k]! }))
+    .filter((r) => r.fte > 0 || r.aid > 0);
+  if (rows.length === 0) return "";
+  const fte = rows.reduce((a, r) => a + r.fte, 0);
+
+  return `
+    <h3>Career-technical education, by category</h3>
+    <div class="scroll"><table data-program="career-technical">
+      <thead><tr><th>Category</th><th class="tnum">Weight</th><th class="tnum">FTE</th>
+        <th class="tnum">Aid</th></tr></thead>
+      <tbody>
+        ${rows
+          .map(
+            (r) => `<tr>
+              <th>Category ${r.category}</th>
+              <td class="tnum">${r.weight.toFixed(4)}</td>
+              <td class="tnum">${r.fte.toFixed(2)}</td>
+              <td class="tnum">${money(r.aid)}</td>
+            </tr>`,
+          )
+          .join("")}
+        <tr><th>Associated services</th><td class="tnum">0.0294</td>
+          <td class="tnum n">${fte.toFixed(2)}</td>
+          <td class="tnum">${money(c.associated_services)}</td></tr>
+        <tr class="current"><th>Career-technical education</th><td class="tnum n">—</td>
+          <td class="tnum">${fte.toFixed(2)}</td><td class="tnum">${money(total)}</td></tr>
+      </tbody>
+    </table></div>
+    <p class="note">These weights multiply a <strong>career-technical</strong> base cost of
+      ${money(baseCost)} per pupil, not the ${money(8241.61)} the rest of the plan uses — 20%
+      higher before any weight is applied. A Category 1 CTE pupil generates
+      ${money(0.623 * baseCost)} where the same weight against the general base would give
+      ${money(0.623 * 8241.61)}. Ohio's weights are not a single scale, and reading them as one
+      understates this program by a fifth.</p>`;
+}
+
+/**
+ * English learners, inside the categorical card.
+ *
+ * # The weights descend, which is the opposite of everywhere else
+ *
+ * 0.2104, 0.1577, 0.1053 — Category 1 is funded at twice Category 3, and Category 1 is the most
+ * recently arrived learner. The program pays most in a pupil's first year and tapers over the next
+ * two, so a district whose English learners are settling in sees this money fall while they are
+ * still learning English.
+ *
+ * Every other weighted categorical in the plan runs the other way: special education's weights
+ * ascend from 0.2435 to 3.9554 as need deepens. A reader who assumes Ohio's weights mean "more
+ * need, more money" has it backwards here.
+ */
+function renderEnglishLearners(d: District): string {
+  const e = d.english_learners;
+  const total = d.categoricals.english_learners;
+  if (total <= 0) return "";
+
+  const weights = [0.2104, 0.1577, 0.1053];
+  const rows = weights
+    .map((weight, k) => ({ category: k + 1, weight, adm: e.adm[k]!, aid: e.aid[k]! }))
+    .filter((r) => r.adm > 0 || r.aid > 0);
+  if (rows.length === 0) return "";
+  const learners = rows.reduce((a, r) => a + r.adm, 0);
+
+  return `
+    <h3>English learners, by category</h3>
+    <div class="scroll"><table data-program="english-learners">
+      <thead><tr><th>Category</th><th class="tnum">Weight</th><th class="tnum">Pupils</th>
+        <th class="tnum">Aid</th></tr></thead>
+      <tbody>
+        ${rows
+          .map(
+            (r) => `<tr>
+              <th>Category ${r.category}</th>
+              <td class="tnum">${r.weight.toFixed(4)}</td>
+              <td class="tnum">${r.adm.toFixed(2)}</td>
+              <td class="tnum">${money(r.aid)}</td>
+            </tr>`,
+          )
+          .join("")}
+        <tr class="current"><th>English learners</th><td class="tnum n">—</td>
+          <td class="tnum">${learners.toFixed(2)}</td><td class="tnum">${money(total)}</td></tr>
+      </tbody>
+    </table></div>
+    <p class="note">The weights <strong>descend</strong>. Category 1 is the most recently arrived
+      learner and is funded at twice Category 3, so this program pays most in a pupil's first year
+      and least in their third — it tapers as need persists rather than deepening with it. Every
+      other weighted categorical in the plan runs the other way. English learner funding reaches
+      505 of Ohio's 609 districts, and 38 of them hold 80% of the $36m.</p>`;
 }

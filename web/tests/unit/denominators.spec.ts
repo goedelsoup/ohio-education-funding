@@ -35,7 +35,14 @@ function denominatorBearingPaths(): string[] {
       // `per_enrolled_pupil` and `per_equivalent_pupil` — the two fields whose denominators
       // differ from each other, which is the pair the guard most needs to see. `adm` is bounded
       // so that `general_admin` and `school_admin` do not come along.
-      if (/pupil|per_mill|(^|_)adm($|_)|enroll/i.test(key)) found.add(here);
+      //
+      // `fte` is here because the department counts pupils that way in three of the six
+      // categoricals — career-technical FTE and identified gifted FTE are pupil counts under
+      // another name, and a guard that only recognises `adm` would let a per-FTE figure onto a
+      // page next to a per-ADM one without asking. It is bounded the same way `adm` is, so the
+      // teacher counts in the base cost build-up are out of scope: those are staff, not pupils,
+      // and nothing on the site divides by them.
+      if (/pupil|per_mill|(^|_)(adm|fte)($|_)|enroll/i.test(key)) found.add(here);
       walk(child, here);
     }
   };
