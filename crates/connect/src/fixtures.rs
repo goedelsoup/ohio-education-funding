@@ -111,6 +111,11 @@ pub const FY27_HEADER: &[&str] = &[
     "sped_aid_cat4",
     "sped_aid_cat5",
     "sped_aid_cat6",
+    "dpia_econ_disadvantaged_adm",
+    "dpia_directly_certified_adm",
+    "dpia_weighted_adm",
+    "dpia_percentage",
+    "dpia_index",
 ];
 
 /// Column positions in the department's `Base_Cost` sheet, whose header is on the fourth row.
@@ -209,6 +214,41 @@ mod special_education_columns {
     pub const FIRST_AID: usize = 10;
 }
 
+/// Column positions in the `DPIA` sheet, whose header is on the third row.
+///
+/// Disadvantaged Pupil Impact Aid, $525m, and the only categorical whose mechanism is neither a
+/// weight times a count nor an equalisation off wealth. It is a **blend of two poverty counts**
+/// scaled by an **index** of the district's poverty against the state's:
+///
+/// - `d1` weights the FY2025 economically disadvantaged ADM at 65% and the FY2026 directly
+///   certified ADM at 35%. Two measures of the same thing that disagree — direct certification
+///   is administrative and captures fewer children than the disadvantaged count does.
+/// - `d2` is that blended count as a share of enrolled ADM.
+/// - `d3` indexes `d2` against the statewide figure of 0.5334, so a district at the state average
+///   scores one and the aid scales from there.
+///
+/// The per-pupil amount is $422. Nothing about that reaches a page showing one DPIA total.
+mod dpia_columns {
+    pub const IRN: usize = 0;
+    /// `d1a` FY2025 economically disadvantaged ADM.
+    pub const ECON_DISADVANTAGED_ADM: usize = 4;
+    /// `d1b` FY2026 directly certified ADM.
+    pub const DIRECTLY_CERTIFIED_ADM: usize = 5;
+    /// `d1` the 65/35 blend of the two.
+    pub const WEIGHTED_ADM: usize = 6;
+    /// `d2` the blend as a share of enrolled ADM.
+    pub const PERCENTAGE: usize = 7;
+    /// `d3` that share indexed against the statewide one.
+    pub const INDEX: usize = 8;
+}
+
+/// The DPIA blend weights and per-pupil amount, as the workbook states them.
+pub const DPIA_BLEND: (f64, f64) = (0.65, 0.35);
+/// The amount each weighted disadvantaged pupil generates.
+pub const DPIA_PER_PUPIL: f64 = 422.0;
+/// The statewide economically disadvantaged percentage `d3` indexes against.
+pub const DPIA_STATEWIDE_PERCENTAGE: f64 = 0.533_380_310_606_710_3;
+
 /// The statutory weight on each special education category, as the workbook states them.
 ///
 /// Multiplied by the statewide average base cost per pupil to give the per-pupil amount, then by
@@ -288,17 +328,45 @@ mod profile_columns {
     pub const LOCAL_REVENUE: usize = 49;
 }
 
+/// The worksheets [`build_fy27_model`] reads, named rather than positional.
+///
+/// Eight `&[Vec<String>]` arguments in a row is a mistake waiting to be made: every one has the
+/// same type, so transposing two is silent and produces a fixture of plausible wrong numbers. The
+/// sheets grew from four to eight as the calculator was taken apart, and at eight it stopped being
+/// safe to pass them by position.
+#[derive(Clone, Copy)]
+pub struct Fy27Sheets<'a> {
+    /// `Base_Cost` — the statutory build-up's inputs.
+    pub base_cost_rows: &'a [Vec<String>],
+    /// `Summary_SFPR` — the payment report's headline lines.
+    pub summary_rows: &'a [Vec<String>],
+    /// `ADM Data` — the three enrolled-ADM years.
+    pub adm_rows: &'a [Vec<String>],
+    /// The District Profile Report's `District Data`, a different workbook.
+    pub profile_rows: &'a [Vec<String>],
+    /// `Detail_SFPR` — the six categoricals and the published capacity.
+    pub detail_rows: &'a [Vec<String>],
+    /// `Local_Capacity` — R.C. 3317.017 worked step by step.
+    pub capacity_rows: &'a [Vec<String>],
+    /// `Special Edu` — six weighted categories.
+    pub special_education_rows: &'a [Vec<String>],
+    /// `DPIA` — the blend and the squared index.
+    pub dpia_rows: &'a [Vec<String>],
+}
+
 /// Join the department's FY2027 base cost and summary sheets with profile-report valuation.
 #[must_use]
-pub fn build_fy27_model(
-    base_cost_rows: &[Vec<String>],
-    summary_rows: &[Vec<String>],
-    adm_rows: &[Vec<String>],
-    profile_rows: &[Vec<String>],
-    detail_rows: &[Vec<String>],
-    capacity_rows: &[Vec<String>],
-    special_education_rows: &[Vec<String>],
-) -> Vec<Vec<String>> {
+pub fn build_fy27_model(sheets: &Fy27Sheets<'_>) -> Vec<Vec<String>> {
+    let Fy27Sheets {
+        base_cost_rows,
+        summary_rows,
+        adm_rows,
+        profile_rows,
+        detail_rows,
+        capacity_rows,
+        special_education_rows,
+        dpia_rows,
+    } = *sheets;
     use base_cost_columns as bc;
 
     let summary: Vec<(&str, &Vec<String>)> = rows_by_key(summary_rows, 0)
@@ -319,6 +387,12 @@ pub fn build_fy27_model(
         .skip(3)
         .filter(|row| !cell(row, special_education_columns::IRN).trim().is_empty())
         .map(|row| (cell(row, special_education_columns::IRN).trim(), row))
+        .collect();
+    let dpia: HashMap<&str, &Vec<String>> = dpia_rows
+        .iter()
+        .skip(3)
+        .filter(|row| !cell(row, dpia_columns::IRN).trim().is_empty())
+        .map(|row| (cell(row, dpia_columns::IRN).trim(), row))
         .collect();
     let capacity: HashMap<&str, &Vec<String>> = capacity_rows
         .iter()
@@ -480,6 +554,20 @@ pub fn build_fy27_model(
             out.last_mut()
                 .expect("just pushed")
                 .push(format_value(value, 2));
+        }
+
+        let dpia_row = dpia.get(irn);
+        for (column, places) in [
+            (dpia_columns::ECON_DISADVANTAGED_ADM, 4),
+            (dpia_columns::DIRECTLY_CERTIFIED_ADM, 4),
+            (dpia_columns::WEIGHTED_ADM, 4),
+            (dpia_columns::PERCENTAGE, 8),
+            (dpia_columns::INDEX, 8),
+        ] {
+            let value = dpia_row.and_then(|row| cell_number(row, column));
+            out.last_mut()
+                .expect("just pushed")
+                .push(format_value(value, places));
         }
     }
     out
@@ -1370,15 +1458,16 @@ mod tests {
     }
 
     fn model() -> Vec<Vec<String>> {
-        build_fy27_model(
-            &base_cost_rows(),
-            &summary_rows(),
-            &adm_rows(),
-            &profile_rows(),
-            &[],
-            &[],
-            &[],
-        )
+        build_fy27_model(&Fy27Sheets {
+            base_cost_rows: &base_cost_rows(),
+            summary_rows: &summary_rows(),
+            adm_rows: &adm_rows(),
+            profile_rows: &profile_rows(),
+            detail_rows: &[],
+            capacity_rows: &[],
+            special_education_rows: &[],
+            dpia_rows: &[],
+        })
     }
 
     fn field<'a>(rows: &'a [Vec<String>], irn: &str, column: &str) -> &'a str {
@@ -1465,15 +1554,16 @@ mod tests {
 
     #[test]
     fn skips_a_district_missing_from_the_summary_sheet() {
-        let rows = build_fy27_model(
-            &base_cost_rows(),
-            &summary_rows()[..1],
-            &adm_rows(),
-            &profile_rows(),
-            &[],
-            &[],
-            &[],
-        );
+        let rows = build_fy27_model(&Fy27Sheets {
+            base_cost_rows: &base_cost_rows(),
+            summary_rows: &summary_rows()[..1],
+            adm_rows: &adm_rows(),
+            profile_rows: &profile_rows(),
+            detail_rows: &[],
+            capacity_rows: &[],
+            special_education_rows: &[],
+            dpia_rows: &[],
+        });
         assert!(rows.is_empty());
     }
 
@@ -1481,15 +1571,16 @@ mod tests {
     fn skips_a_district_with_no_usable_adm() {
         let mut base = base_cost_rows();
         base[5][7] = "0".into();
-        let rows = build_fy27_model(
-            &base,
-            &summary_rows(),
-            &adm_rows(),
-            &profile_rows(),
-            &[],
-            &[],
-            &[],
-        );
+        let rows = build_fy27_model(&Fy27Sheets {
+            base_cost_rows: &base,
+            summary_rows: &summary_rows(),
+            adm_rows: &adm_rows(),
+            profile_rows: &profile_rows(),
+            detail_rows: &[],
+            capacity_rows: &[],
+            special_education_rows: &[],
+            dpia_rows: &[],
+        });
         assert_eq!(
             rows.iter().map(|r| r[0].as_str()).collect::<Vec<_>>(),
             ["043786"]
@@ -1500,15 +1591,16 @@ mod tests {
     fn commas_are_stripped_from_district_names() {
         let mut base = base_cost_rows();
         base[5][1] = "Northern Local, Perry".into();
-        let rows = build_fy27_model(
-            &base,
-            &summary_rows(),
-            &adm_rows(),
-            &profile_rows(),
-            &[],
-            &[],
-            &[],
-        );
+        let rows = build_fy27_model(&Fy27Sheets {
+            base_cost_rows: &base,
+            summary_rows: &summary_rows(),
+            adm_rows: &adm_rows(),
+            profile_rows: &profile_rows(),
+            detail_rows: &[],
+            capacity_rows: &[],
+            special_education_rows: &[],
+            dpia_rows: &[],
+        });
         assert!(!rows[1][1].contains(','));
         assert_eq!(rows[1][1], "Northern Local  Perry");
     }
@@ -1517,15 +1609,16 @@ mod tests {
     fn trailing_whitespace_is_stripped_from_district_names() {
         let mut base = base_cost_rows();
         base[5][1] = "Bellefontaine City ".into();
-        let rows = build_fy27_model(
-            &base,
-            &summary_rows(),
-            &adm_rows(),
-            &profile_rows(),
-            &[],
-            &[],
-            &[],
-        );
+        let rows = build_fy27_model(&Fy27Sheets {
+            base_cost_rows: &base,
+            summary_rows: &summary_rows(),
+            adm_rows: &adm_rows(),
+            profile_rows: &profile_rows(),
+            detail_rows: &[],
+            capacity_rows: &[],
+            special_education_rows: &[],
+            dpia_rows: &[],
+        });
         assert_eq!(rows[1][1], "Bellefontaine City");
     }
 

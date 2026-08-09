@@ -159,15 +159,16 @@ pub fn rebuild(root: &Path) -> Result<Vec<Rebuilt>, RebuildError> {
     let profile_book = open_workbook(root, profile)?;
     let profile_rows = profile_book.rows("District Data")?;
 
-    let model = fixtures::build_fy27_model(
-        &fy27_book.rows("Base_Cost")?,
-        &fy27_book.rows("Summary_SFPR")?,
-        &fy27_book.rows("ADM Data")?,
-        &profile_rows,
-        &fy27_book.rows("Detail_SFPR")?,
-        &fy27_book.rows("Local_Capacity")?,
-        &fy27_book.rows("Special Edu")?,
-    );
+    let model = fixtures::build_fy27_model(&fixtures::Fy27Sheets {
+        base_cost_rows: &fy27_book.rows("Base_Cost")?,
+        summary_rows: &fy27_book.rows("Summary_SFPR")?,
+        adm_rows: &fy27_book.rows("ADM Data")?,
+        profile_rows: &profile_rows,
+        detail_rows: &fy27_book.rows("Detail_SFPR")?,
+        capacity_rows: &fy27_book.rows("Local_Capacity")?,
+        special_education_rows: &fy27_book.rows("Special Edu")?,
+        dpia_rows: &fy27_book.rows("DPIA")?,
+    });
     let extract = fixtures::build_profile_extract(&profile_rows);
 
     let mut out = vec![

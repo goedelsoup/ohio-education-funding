@@ -38,6 +38,45 @@ pub const HISTORY_YEARS: [FiscalYear; 3] = [FiscalYear(2024), FiscalYear(2025), 
 /// 138 of 609 districts sit exactly on it.
 pub const MINIMUM_STATE_SHARE: f64 = local_capacity::MINIMUM_STATE_SHARE_FY2027;
 
+/// Disadvantaged Pupil Impact Aid, for one district.
+///
+/// # The mechanism is a blend and a squared index
+///
+/// DPIA is $525m and is neither a weight times a count, like special education, nor an
+/// equalisation off wealth, like targeted assistance. It works in three steps:
+///
+/// 1. **Blend two poverty counts.** 65% of the FY2025 economically disadvantaged ADM plus 35% of
+///    the FY2026 directly certified ADM. The two disagree substantially — direct certification is
+///    administrative and finds a **median 61%** of what the disadvantaged count does, and fewer
+///    than half of them in 146 districts — so the 35% weight pulls the funded count below the
+///    disadvantaged count everywhere.
+/// 2. **Express it as a share** of the district's enrolled ADM.
+/// 3. **Index that share against the state's**, 0.5334 — and *square it*.
+///
+/// The squaring is the whole character of the program and nothing in a DPIA total shows it. Aid
+/// scales with the **square** of relative poverty, so a district at twice the state's rate scores
+/// four times the index rather than twice. Verified for all 609 districts.
+#[derive(Debug, Clone, Copy, PartialEq, Default)]
+pub struct Dpia {
+    /// `d1a` — FY2025 economically disadvantaged ADM.
+    pub economically_disadvantaged_adm: Adm,
+    /// `d1b` — FY2026 directly certified ADM. Consistently the smaller of the two.
+    pub directly_certified_adm: Adm,
+    /// `d1` — the 65/35 blend.
+    pub weighted_adm: Adm,
+    /// `d2` — the blend as a share of enrolled ADM.
+    pub percentage: f64,
+    /// `d3` — `(d2 / 0.5334)²`.
+    pub index: f64,
+}
+
+/// The DPIA blend weights, per-pupil amount, and the statewide share `d3` indexes against.
+pub const DPIA_BLEND: (f64, f64) = (0.65, 0.35);
+/// What each weighted disadvantaged pupil generates.
+pub const DPIA_PER_PUPIL: Dollars = 422.0;
+/// The statewide economically disadvantaged percentage.
+pub const DPIA_STATEWIDE_PERCENTAGE: f64 = 0.533_380_310_606_710_3;
+
 /// Ohio's six special education categories, for one district.
 ///
 /// # The weights are the policy
@@ -236,6 +275,8 @@ pub struct DistrictRecord {
     pub categoricals: Categoricals,
     /// The second-largest categorical, decomposed into the six weighted categories.
     pub special_education: SpecialEducation,
+    /// The third-largest, and the one whose mechanism is neither a weight nor an equalisation.
+    pub dpia: Dpia,
     /// Temporary transitional aid guarantee.
     pub guarantee: Dollars,
     /// Enrolled ADM in each of [`HISTORY_YEARS`].
@@ -389,6 +430,11 @@ mod column {
     /// Six special education ADM counts, then the six aid amounts they produce.
     pub const SPED_FIRST_ADM: usize = 46;
     pub const SPED_FIRST_AID: usize = 52;
+    pub const DPIA_ECON_DISADVANTAGED_ADM: usize = 58;
+    pub const DPIA_DIRECTLY_CERTIFIED_ADM: usize = 59;
+    pub const DPIA_WEIGHTED_ADM: usize = 60;
+    pub const DPIA_PERCENTAGE: usize = 61;
+    pub const DPIA_INDEX: usize = 62;
 }
 
 /// The header this loader expects, so a fixture reshaped without updating [`column`] fails
@@ -398,7 +444,7 @@ adm_kindergarten,adm_grades_1_3,adm_grades_4_8_non_cte,adm_grades_9_12_non_cte,a
 adm_grades_9_12_total,funded_classroom_teachers,funded_special_teachers,teacher_base_cost,\
 aggregate_base_cost,base_cost_per_pupil,temp_transitional_aid_guarantee,enrolled_adm_fy24,\
 enrolled_adm_fy25,enrolled_adm_fy26,assessed_valuation_per_pupil_fy23,core_foundation_funding,\
-base_cost_state_share,total_state_support,total_transfers,service_center_charge,other_adjustments,net_state_funding,capacity_per_pupil,state_share_percentage,valuation_ty25,valuation_ty24,valuation_ty23,agi_ty24,agi_ty23,agi_ty22,tax_returns,federal_median_income,statewide_median_income,benchmark_ratio,capacity_rate,targeted_assistance,special_education,dpia,english_learners,gifted,career_technical,sped_adm_cat1,sped_adm_cat2,sped_adm_cat3,sped_adm_cat4,sped_adm_cat5,sped_adm_cat6,sped_aid_cat1,sped_aid_cat2,sped_aid_cat3,sped_aid_cat4,sped_aid_cat5,sped_aid_cat6";
+base_cost_state_share,total_state_support,total_transfers,service_center_charge,other_adjustments,net_state_funding,capacity_per_pupil,state_share_percentage,valuation_ty25,valuation_ty24,valuation_ty23,agi_ty24,agi_ty23,agi_ty22,tax_returns,federal_median_income,statewide_median_income,benchmark_ratio,capacity_rate,targeted_assistance,special_education,dpia,english_learners,gifted,career_technical,sped_adm_cat1,sped_adm_cat2,sped_adm_cat3,sped_adm_cat4,sped_adm_cat5,sped_adm_cat6,sped_aid_cat1,sped_aid_cat2,sped_aid_cat3,sped_aid_cat4,sped_aid_cat5,sped_aid_cat6,dpia_econ_disadvantaged_adm,dpia_directly_certified_adm,dpia_weighted_adm,dpia_percentage,dpia_index";
 
 /// Every district in the department's FY2027 model.
 ///
@@ -479,6 +525,13 @@ pub fn panel() -> Vec<DistrictRecord> {
                     english_learners: required(column::ENGLISH_LEARNERS),
                     gifted: required(column::GIFTED),
                     career_technical: required(column::CATEGORICAL_CTE),
+                },
+                dpia: Dpia {
+                    economically_disadvantaged_adm: required(column::DPIA_ECON_DISADVANTAGED_ADM),
+                    directly_certified_adm: required(column::DPIA_DIRECTLY_CERTIFIED_ADM),
+                    weighted_adm: required(column::DPIA_WEIGHTED_ADM),
+                    percentage: required(column::DPIA_PERCENTAGE),
+                    index: required(column::DPIA_INDEX),
                 },
                 special_education: SpecialEducation {
                     adm: std::array::from_fn(|k| required(column::SPED_FIRST_ADM + k)),

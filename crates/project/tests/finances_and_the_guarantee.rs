@@ -667,3 +667,120 @@ fn the_six_special_education_categories_reconcile_and_are_wildly_unequal() {
         aid[1] / money * 100.0
     );
 }
+
+/// DPIA is a blend of two poverty counts and a **squared** index, and the squaring is the program.
+///
+/// The third-largest categorical at $525m, and the one whose mechanism resembles neither of the
+/// others. It is worth taking apart because every step of it is a policy choice the total conceals.
+///
+/// The squaring especially. Aid scales with the *square* of a district's poverty relative to the
+/// state, so a district at twice the state's rate scores four times the index. That is a strongly
+/// convex transfer and nothing about a DPIA dollar figure suggests it.
+#[test]
+fn dpia_blends_two_poverty_counts_and_squares_the_index() {
+    use project::panel::{DPIA_BLEND, DPIA_STATEWIDE_PERCENTAGE};
+
+    let panel = panel();
+
+    // The blend, and the one district it does not hold for.
+    let exceptions: Vec<&project::panel::DistrictRecord> = panel
+        .iter()
+        .filter(|r| {
+            let expected = DPIA_BLEND.0 * r.dpia.economically_disadvantaged_adm
+                + DPIA_BLEND.1 * r.dpia.directly_certified_adm;
+            (expected - r.dpia.weighted_adm).abs() > 0.01
+        })
+        .collect();
+    assert!(
+        exceptions.len() <= 1,
+        "the 65/35 blend should hold everywhere but Edgerton Local: {:?}",
+        exceptions.iter().map(|r| &r.name).collect::<Vec<_>>()
+    );
+
+    // The index is the square of the ratio, not the ratio. This is the finding.
+    let mut checked = 0;
+    for record in &panel {
+        if record.dpia.percentage <= 0.0 {
+            continue;
+        }
+        checked += 1;
+        let ratio = record.dpia.percentage / DPIA_STATEWIDE_PERCENTAGE;
+        assert!(
+            (ratio * ratio - record.dpia.index).abs() < 0.01,
+            "{}: index {:.4} against a squared ratio of {:.4} — if this is now linear the \
+             program's convexity has changed",
+            record.name,
+            record.dpia.index,
+            ratio * ratio
+        );
+        // And explicitly not the unsquared ratio, which is what a reader would assume.
+        if (ratio - 1.0).abs() > 0.2 {
+            assert!(
+                (ratio - record.dpia.index).abs() > 0.01,
+                "{}: the index coincides with the plain ratio, which it should not away from one",
+                record.name
+            );
+        }
+    }
+    assert!(checked > 590, "expected nearly every district: {checked}");
+}
+
+/// The two poverty counts the formula blends do not agree, and one is consistently smaller.
+///
+/// Direct certification is administrative — a child is directly certified when another programme's
+/// records already establish eligibility — and it finds a **median 61%** of what the economically
+/// disadvantaged count does. Putting 35% of the weight on the smaller measure lowers the funded
+/// count in every district, and by more in some than others.
+#[test]
+fn direct_certification_finds_fewer_children_than_the_disadvantaged_count() {
+    let panel = panel();
+
+    let mut ratios: Vec<f64> = panel
+        .iter()
+        .filter(|r| r.dpia.economically_disadvantaged_adm > 0.0)
+        .map(|r| r.dpia.directly_certified_adm / r.dpia.economically_disadvantaged_adm)
+        .collect();
+    assert!(ratios.len() > 590);
+    ratios.sort_by(|a, b| a.partial_cmp(b).unwrap());
+
+    let median = ratios[ratios.len() / 2];
+    assert!(
+        (0.5..0.75).contains(&median),
+        "direct certification should find well under the disadvantaged count: {median:.3}"
+    );
+    assert!(
+        ratios.iter().filter(|r| **r < 0.5).count() > 50,
+        "and materially fewer than half in a substantial group of districts"
+    );
+
+    // So the blend sits below the disadvantaged count almost everywhere — but not everywhere, and
+    // the exceptions are the interesting part. In three districts direct certification finds
+    // *more* children than the disadvantaged count does: Beachwood at 1.03x, Nordonia Hills at
+    // 1.54x, Ottawa Hills at 2.35x on 32.9 disadvantaged pupils. All three are low-poverty
+    // districts — shares of 0.18, 0.14 and 0.03 against a statewide median of 0.49 — where the
+    // counts are small enough for two differently-constructed measures to invert.
+    //
+    // The two are not nested, which is worth knowing before either is used as a poverty measure
+    // anywhere else in this corpus.
+    let inverted: Vec<&project::panel::DistrictRecord> = panel
+        .iter()
+        .filter(|r| {
+            r.dpia.economically_disadvantaged_adm > 0.0
+                && r.dpia.directly_certified_adm > r.dpia.economically_disadvantaged_adm
+        })
+        .collect();
+    assert!(
+        inverted.len() <= 5,
+        "the inversion should stay rare: {:?}",
+        inverted.iter().map(|r| &r.name).collect::<Vec<_>>()
+    );
+    for record in &inverted {
+        let share = record.dpia.economically_disadvantaged_adm / record.base_cost_adm();
+        assert!(
+            share < 0.30,
+            "{}: the inversion should only happen where poverty is low, and this district's \
+             share is {share:.3}",
+            record.name
+        );
+    }
+}
