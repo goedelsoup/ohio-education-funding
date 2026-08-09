@@ -53,6 +53,25 @@ pub enum ValuationBase {
     Recognized,
 }
 
+/// Which document a rate and its base were read out of.
+///
+/// Carried as a field rather than inferred from [`ChargeOffRate::authority`], because tests need
+/// to separate the rates that can be checked against the committed DeRolph extract from the one
+/// that cannot, and a substring search for `"LSC"` over a prose citation is not that test. It
+/// silently reclassifies a rate when the string is reworded, and silently matches nothing when a
+/// rate from a third source is added — of which there will be several, since the series is
+/// deliberately incomplete.
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum SourcedTo {
+    /// DeRolph I ¶97, which recites the progression with its session-law citations.
+    ///
+    /// Every rate marked this way is quoted verbatim in
+    /// [the committed extract](../../regime-diff/fixtures/derolph-opinions.txt).
+    DeRolphI,
+    /// The Legislative Service Commission's *School Funding Complete Resource* (November 2008).
+    Lsc,
+}
+
 /// One statutory charge-off rate, with the authority that set it.
 #[derive(Debug, Clone, Copy, PartialEq)]
 pub struct ChargeOffRate {
@@ -64,6 +83,8 @@ pub struct ChargeOffRate {
     pub authority: &'static str,
     /// What the rate multiplies.
     pub base: ValuationBase,
+    /// The document this entry was transcribed from.
+    pub sourced_to: SourcedTo,
 }
 
 impl ChargeOffRate {
@@ -89,24 +110,28 @@ pub const RATES: &[ChargeOffRate] = &[
         effective: "in force when DeRolph was filed in 1991",
         authority: "144 Ohio Laws, Part III, 3987, 4122",
         base: ValuationBase::TotalTaxable,
+        sourced_to: SourcedTo::DeRolphI,
     },
     ChargeOffRate {
         mills: 20.5,
         effective: "raised during the pendency of DeRolph",
         authority: "Am.Sub.H.B. No. 152, Section 36.12, 145 Ohio Laws, Part III, 4432-4433",
         base: ValuationBase::TotalTaxable,
+        sourced_to: SourcedTo::DeRolphI,
     },
     ChargeOffRate {
         mills: 23.0,
         effective: "in force at DeRolph I, decided March 1997",
         authority: "R.C. 3317.022, as recited at DeRolph I ¶97",
         base: ValuationBase::TotalTaxable,
+        sourced_to: SourcedTo::DeRolphI,
     },
     ChargeOffRate {
         mills: 23.0,
         effective: "FY2008, the last year the corpus has a described base for",
         authority: "LSC, School Funding Complete Resource (November 2008), Charge-off Rate",
         base: ValuationBase::Recognized,
+        sourced_to: SourcedTo::Lsc,
     },
 ];
 

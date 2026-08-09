@@ -12,6 +12,8 @@
 //! archive because it is not the supreme court's — and it is why this connector is wired for the
 //! four DeRolph opinions and not for the case the corpus most recently added a node for.
 
+use regime_diff::charge_off::SourcedTo;
+
 const OPINIONS: &str = include_str!("../fixtures/derolph-opinions.txt");
 
 fn opinion(key: &str) -> &'static str {
@@ -106,10 +108,21 @@ fn every_charge_off_authority_is_quoted_from_the_opinion() {
     assert!(d1.contains("total taxable value is multiplied by .023"));
 
     // And the authorities the corpus carries, verbatim.
-    for rate in regime_diff::RATES {
-        if rate.authority.contains("LSC") {
-            continue; // FY2008, which comes from the Complete Resource rather than the opinion.
-        }
+    //
+    // Partitioned on `sourced_to` rather than on a substring of `authority`. The rates that came
+    // out of this opinion are a fact about where they were read, not about whether their citation
+    // happens to spell "LSC"; searching the prose would quietly exempt a reworded entry and
+    // quietly assert an Evidence-Based Model citation against a 1997 opinion when the series is
+    // extended, which the series' own doc comment says it will be.
+    let from_opinion: Vec<_> = regime_diff::RATES
+        .iter()
+        .filter(|r| r.sourced_to == SourcedTo::DeRolphI)
+        .collect();
+    assert!(
+        !from_opinion.is_empty(),
+        "no rate claims to come from DeRolph I, so this test checks nothing"
+    );
+    for rate in from_opinion {
         let cited = rate
             .authority
             .split(", as recited")
@@ -141,13 +154,21 @@ fn the_opinion_names_the_base_the_corpus_assigned_to_those_years() {
     ));
     assert!(d1.contains("defining “total taxable value”"));
 
+    // The expected count is derived from the filter rather than written as 3: a hardcoded length
+    // turns "a rate was added to the series" into a mismatch that names neither the rate nor the
+    // reason. What is being asserted is that *every* rate read out of this opinion carries the
+    // base the opinion defines, however many of them there come to be.
     use regime_diff::charge_off::ValuationBase;
     let derolph_era: Vec<ValuationBase> = regime_diff::RATES
         .iter()
-        .filter(|r| !r.authority.contains("LSC"))
+        .filter(|r| r.sourced_to == SourcedTo::DeRolphI)
         .map(|r| r.base)
         .collect();
-    assert_eq!(derolph_era, vec![ValuationBase::TotalTaxable; 3]);
+    assert!(!derolph_era.is_empty(), "no rate comes from DeRolph I");
+    assert_eq!(
+        derolph_era,
+        vec![ValuationBase::TotalTaxable; derolph_era.len()]
+    );
 }
 
 /// The opinion also states the mechanism the corpus reproduces, which is worth pinning.
