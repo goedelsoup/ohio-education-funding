@@ -43,7 +43,7 @@ import type { Bundle, District, Statewide } from "./schema/feed.ts";
  * the build and the scenario routes refuse to proceed past when the two disagree — the deliberate
  * half of drift detection, where the strictness of the schemas is the accidental half.
  */
-export const REQUIRED_CONTRACT = "19.0.0";
+export const REQUIRED_CONTRACT = "20.0.0";
 
 /**
  * A district with only the fields the funding formula reads.
@@ -63,6 +63,10 @@ export const REQUIRED_CONTRACT = "19.0.0";
  * funding formula — one is the local tax base the state charges against, one is what a district
  * did with the money afterwards, and the third is a reading of H.B. 920 that the scenario builder
  * deliberately does not model — so the compiler keeps all three out of the browser's copy.
+ *
+ * `supplements` goes out too: the performance supplement and the two enrolment supplements sit
+ * outside foundation funding, and the scenario builder models the formula. A lever that changed
+ * them would be changing something the formula does not compute.
  *
  * `house_districts` goes out for the same reason and one more: it is a *derived* estimate, and the
  * scenario builder re-runs the formula per district from exact figures. A browser holding an
@@ -98,6 +102,7 @@ export type PanelDistrict = Omit<
   | "millage"
   | "regime"
   | "house_districts"
+  | "supplements"
   | "special_education"
   | "career_technical"
   | "english_learners"

@@ -73,7 +73,7 @@ use edfund_core::Dollars;
 /// from FY2022-FY2024 to FY2024-FY2026 — the years the department's `ADM Data` sheet declares.
 /// The values did not change; what they are called did, which is exactly the kind of silent
 /// meaning change the version guard exists for.
-pub const CONTRACT_VERSION: &str = "19.0.0";
+pub const CONTRACT_VERSION: &str = "20.0.0";
 
 /// How close to the floor counts as being on it, in mills.
 ///
@@ -702,6 +702,33 @@ pub struct HouseDistrictShare {
     pub share: f64,
 }
 
+/// The payments outside foundation funding, for one district.
+///
+/// `[H] Foundation Funding` is base cost plus the six categoricals, and the guarantee holds a
+/// district at it. These sit in `[R] Total State Support` instead, so nothing cushions a fall in
+/// either: a district that drops a star, or slips below 3% growth, loses the money outright.
+#[derive(Debug, Clone, Copy, PartialEq, Default)]
+pub struct Supplements {
+    /// The overall star rating and the progress component rating. `None` where unrated.
+    pub stars: Option<f64>,
+    /// The progress component rating, which the payment uses when it is the higher of the two.
+    pub progress: Option<f64>,
+    /// Whether any of the three routes qualified the district, and what it was paid.
+    pub performance_eligible: bool,
+    /// $13 a pupil times the greater of the two ratings.
+    pub performance: Dollars,
+    /// $40 a pupil, every district, no test.
+    pub base_funding: Dollars,
+    /// The three-year enrolment change the 3% growth test is applied to.
+    pub enrollment_change: f64,
+    /// Whether the three-year change cleared 3%.
+    pub growth_eligible: bool,
+    /// $250 on every pupil, for a district that cleared 3%.
+    pub growth: Dollars,
+    /// What clearing it would have paid a district that did not. `None` where it did.
+    pub growth_forgone: Option<Dollars>,
+}
+
 /// One district, as the web layer needs it.
 #[derive(Debug, Clone, PartialEq)]
 pub struct District {
@@ -709,6 +736,8 @@ pub struct District {
     pub irn: String,
     /// District name as published.
     pub name: String,
+    /// The performance supplement and the two enrolment supplements, outside the formula.
+    pub supplements: Supplements,
     /// The Ohio House districts this district lies in, largest share first.
     ///
     /// Usually one — 270 of 609 districts sit inside a single House district — and up to eleven.
@@ -1540,6 +1569,26 @@ impl Bundle {
             s.push_str(&format!("\"irn\": \"{}\", ", escape(&d.irn)));
             s.push_str(&format!("\"name\": \"{}\", ", escape(&d.name)));
             s.push_str(&format!("\"county\": \"{}\", ", escape(&d.county)));
+            s.push_str(&fields(
+                "supplements",
+                &[
+                    ("performance", d.supplements.performance),
+                    ("base_funding", d.supplements.base_funding),
+                    ("growth", d.supplements.growth),
+                    ("enrollment_change", d.supplements.enrollment_change),
+                ],
+                &[
+                    ("performance_eligible", d.supplements.performance_eligible),
+                    ("growth_eligible", d.supplements.growth_eligible),
+                ],
+            ));
+            s.truncate(s.len() - 1);
+            s.push_str(&format!(
+                ", \"stars\": {}, \"progress\": {}, \"growth_forgone\": {}}}, ",
+                opt(d.supplements.stars),
+                opt(d.supplements.progress),
+                opt(d.supplements.growth_forgone)
+            ));
             s.push_str("\"house_districts\": [");
             for (i, h) in d.house_districts.iter().enumerate() {
                 if i > 0 {
@@ -1942,6 +1991,17 @@ mod tests {
             irn: "049056".into(),
             name: "Northern Local".into(),
             county: "Perry".into(),
+            supplements: Supplements {
+                stars: Some(4.0),
+                progress: Some(3.0),
+                performance_eligible: true,
+                performance: 70_236.0,
+                base_funding: 84_312.0,
+                enrollment_change: -0.0412,
+                growth_eligible: false,
+                growth: 0.0,
+                growth_forgone: Some(527_000.0),
+            },
             // Two House districts, unevenly split, so the serializer's array separator is
             // exercised and a district that straddles a boundary is the case under test.
             house_districts: vec![

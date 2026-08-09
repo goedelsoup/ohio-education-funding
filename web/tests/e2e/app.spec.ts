@@ -1377,3 +1377,62 @@ test.describe("house districts", () => {
   });
 });
 
+test.describe("outside the formula", () => {
+  test("the card says plainly that the guarantee does not hold these", async ({ page }) => {
+    /*
+     * The structural point. Everything above this card is `[H] Foundation Funding`, which the
+     * guarantee protects; these sit in `[R] Total State Support` and nothing cushions a fall in
+     * them. A district that drops a star loses the money outright.
+     */
+    await page.goto("/district/043786");
+    const card = page.locator('.card[data-part="supplements"]');
+    await expect(card).toContainText("Outside the formula");
+    await expect(card).toContainText("the guarantee does not hold a district at them");
+    await expect(card).toContainText("Base funding supplement");
+    await expect(card).toContainText("$40 a pupil");
+  });
+
+  test("the performance supplement names the rating it was paid on", async ({ page }) => {
+    // Cleveland is rated 2.5 stars and has a 4.0 progress rating, and is paid on the greater of
+    // the two — the progress route working exactly as designed for a high-poverty district.
+    await page.goto("/district/043786");
+    const card = page.locator('.card[data-part="supplements"]');
+    await expect(card).toContainText("the greater of its");
+    await expect(card).toContainText("progress rating");
+  });
+
+  test("the page states the gradient rather than only the district's own figure", async ({
+    page,
+  }) => {
+    /*
+     * The finding has to appear on every district's page, not only where it flatters. A component
+     * distributed inversely to need is a fact about the program, and a reader looking at a
+     * well-funded district should meet it there too.
+     */
+    await page.goto("/district/043786");
+    const card = page.locator('.card[data-part="supplements"]');
+    await expect(card).toContainText("$54.74");
+    await expect(card).toContainText("$23.31");
+    await expect(card).toContainText("track intake");
+  });
+
+  test("a district just below the growth cliff is told what it forwent", async ({ page }) => {
+    /*
+     * The only honest way to show a cliff. New Lexington grew 2.9502% against the 3% required and
+     * the supplement pays on the whole roll, so missing by three hundredths of a percentage point
+     * cost it $430,477.
+     */
+    const feed = await (await page.request.get("/data/bundle.json")).json();
+    const near = feed.districts.find(
+      (d: { supplements: { growth_eligible: boolean; enrollment_change: number } }) =>
+        !d.supplements.growth_eligible && d.supplements.enrollment_change > 0.029,
+    );
+    expect(near, "a district just below the 3% threshold").toBeTruthy();
+
+    await page.goto(`/district/${near.irn}`);
+    const card = page.locator('.card[data-part="supplements"]');
+    await expect(card).toContainText("just under the growth cliff");
+    await expect(card).toContainText("pays on the whole roll rather than on the pupils gained");
+  });
+});
+

@@ -17,6 +17,7 @@ import {
   renderHeadline,
   renderCategoricals,
   renderPosition,
+  renderSupplements,
 } from "../../lib/district.ts";
 import { slugify } from "../../lib/county.ts";
 import { districtPaths, loadFeed } from "../../lib/feed.ts";
@@ -70,6 +71,8 @@ const description = district.on_guarantee
   <Fragment set:html={renderBaseCostBuildUp(district)} />
   {/* The other half of formula aid, decomposed the same way and for the same reason. */}
   <Fragment set:html={renderCategoricals(district, bundle.statewide)} />
+  {/* Everything above is foundation funding, which the guarantee holds. This is not. */}
+  <Fragment set:html={renderSupplements(district)} />
   <Fragment set:html={renderEnrollmentYears(bundle, district, forecastable)} />
   <Fragment set:html={renderPosition(bundle, district, valuations, expenditures)} />
   <Fragment set:html={renderDetail(district)} />

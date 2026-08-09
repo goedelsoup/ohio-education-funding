@@ -170,6 +170,13 @@ export const FIELD_DENOMINATORS: Record<string, DenominatorKey | null> = {
   "house_districts[].adm": null,
   "house_districts[].members[].adm": null,
 
+  // The three-year enrolment change the growth supplement's 3% cliff is tested against.
+  // Dimensionless: both ends are the same count in different years, so the denominator cancels.
+  // It is not the same measure as `enrollment_change`, which is the one-year FY25-to-FY26 change
+  // the projection is fitted from — two fields, both a fraction, both named for a change, and
+  // three years apart in what they compare.
+  "districts[].supplements.enrollment_change": null,
+
   // Dimensionless: a change, and correlations whose parts each cancel their own denominator.
   "districts[].enrollment_change": null,
   "statewide.outcomes.enrolled_spending_vs_performance": null,

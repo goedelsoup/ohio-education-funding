@@ -351,6 +351,32 @@ export const DistrictSchema = z
      */
     county: z.string().min(1),
     /**
+     * The payments outside foundation funding: the performance supplement and the two enrolment
+     * supplements.
+     *
+     * `[H] Foundation Funding` is base cost plus the six categoricals, and the guarantee holds a
+     * district at it. These sit in `[R] Total State Support` instead, so nothing cushions a fall
+     * in either — a district that drops a star, or slips below 3% growth, loses the money.
+     */
+    supplements: z
+      .object({
+        /** $13 a pupil times the greater of the two ratings, for districts clearing any of three routes. */
+        performance: num,
+        performance_eligible: z.boolean(),
+        stars: maybeNum,
+        progress: maybeNum,
+        /** $40 a pupil, every district, no test. */
+        base_funding: num,
+        /** The three-year enrolment change the 3% test is applied to. */
+        enrollment_change: num,
+        growth_eligible: z.boolean(),
+        /** $250 on every pupil — not the pupils gained — for a district that cleared 3%. */
+        growth: num,
+        /** What clearing it would have paid a district that did not. `null` where it did. */
+        growth_forgone: maybeNum,
+      })
+      .strict(),
+    /**
      * The Ohio House districts this district lies in, largest share first.
      *
      * Usually one — 270 of 609 districts sit inside a single House district — and up to eleven,

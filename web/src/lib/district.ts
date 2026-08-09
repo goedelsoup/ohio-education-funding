@@ -993,3 +993,92 @@ function renderEnglishLearners(d: District): string {
       other weighted categorical in the plan runs the other way. English learner funding reaches
       505 of Ohio's 609 districts, and 38 of them hold 80% of the $36m.</p>`;
 }
+
+/**
+ * What a district receives outside the formula, and what it is not held at.
+ *
+ * # Two payments that behave unlike anything in the formula
+ *
+ * `[H] Foundation Funding` is base cost plus six categoricals, and the guarantee holds a district
+ * at it. These sit in `[R] Total State Support` instead. Nothing cushions a fall in either — drop
+ * a star, or slip below 3% growth, and the money is simply gone next year.
+ *
+ * The **performance supplement** is the only place Ohio's funding formula pays on a measured
+ * outcome rather than an input, and it runs the opposite way to the rest of the formula: by
+ * poverty quintile the mean payment falls from $54.74 per pupil to $23.31. The card says so on
+ * every district's page rather than only on the ones where it looks generous.
+ *
+ * The **growth supplement** is a cliff. 3% three-year growth pays $250 on every pupil, not on the
+ * pupils gained, so what the threshold costs a district has nothing to do with how close it came.
+ * For a district just below, the card prints the amount forgone, which is the only honest way to
+ * show a cliff.
+ */
+export function renderSupplements(d: District): string {
+  const s = d.supplements;
+  const total = s.performance + s.base_funding + s.growth;
+  if (total <= 0) return "";
+
+  const rating = s.stars != null && s.progress != null ? Math.max(s.stars, s.progress) : null;
+  const perPupil = d.categorical_adm > 0 ? s.performance / d.categorical_adm : 0;
+  const nearTheCliff = !s.growth_eligible && s.enrollment_change > 0.02;
+
+  return `
+    <div class="card" data-part="supplements">
+      <h2>Outside the formula</h2>
+      <p class="note">These are paid on top of formula aid and the guarantee does not hold a
+        district at them. Everything above this card is <strong>foundation funding</strong>, which
+        is protected; this is not.</p>
+
+      <div class="scroll"><table data-program="supplements">
+        <thead><tr><th>Payment</th><th class="tnum">Amount</th><th>How it is decided</th></tr></thead>
+        <tbody>
+          <tr><th>Base funding supplement</th><td class="tnum">${money(s.base_funding)}</td>
+            <td class="n">$40 a pupil. Every district, no test of any kind.</td></tr>
+          <tr${s.performance <= 0 ? ' class="n"' : ""}><th>Performance supplement</th>
+            <td class="tnum">${s.performance <= 0 ? "—" : money(s.performance)}</td>
+            <td class="n">${
+              s.performance_eligible && rating != null
+                ? `$13 a pupil per rating point, on ${rating.toFixed(1)} — the greater of its
+                   ${s.stars?.toFixed(1) ?? "—"}-star overall rating and its
+                   ${s.progress?.toFixed(1) ?? "—"} progress rating. ${money(perPupil)} a pupil.`
+                : `This district qualifies on none of the three routes: an overall rating above 3.5
+                   stars, a progress rating of 3 or more, or a progress rating higher than the year
+                   before.`
+            }</td></tr>
+          <tr${s.growth <= 0 ? ' class="n"' : ""}><th>Enrollment growth supplement</th>
+            <td class="tnum">${s.growth <= 0 ? "—" : money(s.growth)}</td>
+            <td class="n">${
+              s.growth_eligible
+                ? `$250 on <em>every</em> pupil — not the pupils gained — because its enrolment rose
+                   ${pct(s.enrollment_change, 2)} over three years, clearing the 3% threshold.`
+                : s.enrollment_change > 0
+                  ? `Its enrolment rose ${pct(s.enrollment_change, 2)} over three years, short of
+                     the 3% this requires.`
+                  : `Its enrolment fell ${pct(Math.abs(s.enrollment_change), 2)} over three years.
+                     This pays only for growth.`
+            }</td></tr>
+          <tr class="current"><th>Outside the formula</th><td class="tnum">${money(total)}</td>
+            <td class="n">Not held by the guarantee.</td></tr>
+        </tbody>
+      </table></div>
+
+      ${
+        nearTheCliff && s.growth_forgone != null
+          ? `<p class="note"><strong>This district is just under the growth cliff.</strong> It grew
+             ${pct(s.enrollment_change, 2)} against the 3% required —
+             ${pct(0.03 - s.enrollment_change, 2)} short — and the supplement pays on the whole
+             roll rather than on the pupils gained, so clearing it would have been worth
+             <strong>${money(s.growth_forgone)}</strong>. What the threshold costs a district has
+             nothing to do with how close it came.</p>`
+          : ""
+      }
+
+      <p class="note">The performance supplement is the only part of Ohio's school funding paid on
+        a <em>measured outcome</em> rather than on pupils, categories or a tax base — and it runs
+        against the grain of everything else in the formula. Sorted by poverty, the mean payment
+        per pupil falls from <strong>$54.74</strong> in the least-poor fifth of districts to
+        <strong>$23.31</strong> in the poorest, and the share qualifying falls from 91% to 49%.
+        Ohio's attainment measures track intake, so a program keyed to them follows intake whatever
+        its intent — which explains the gradient without removing it.</p>
+    </div>`;
+}
