@@ -140,8 +140,17 @@ export function apply(
   }
   baseCostAid *= p.phaseInBaseCost;
 
-  const formulaAid =
-    baseCostAid + d.categorical_funding * p.phaseInCategorical * admRatio;
+  // The categoricals priced in the statewide average base cost move with it. Special education,
+  // English learners and career-technical are each `weight × $8,241.61 × count × state share`, so
+  // a lever that raises base cost per pupil raises them mechanically. The department's own
+  // simulator holds them fixed — correctly, for a tool that changes one district at a time — and
+  // this site does not, because a policy lever here moves all 609 at once. Mirrors
+  // `project::policy::apply`; the reference checkpoints are what keep the two honest.
+  const denominated = d.base_cost_denominated_categoricals;
+  const categoricals =
+    d.categorical_funding - denominated + denominated * p.baseCostScale;
+
+  const formulaAid = baseCostAid + categoricals * p.phaseInCategorical * admRatio;
 
   const baseline = d.on_guarantee ? currentRealizedAid(d) : 0;
   let heldAt: number;

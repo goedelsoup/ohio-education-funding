@@ -10,31 +10,37 @@
 //! caveat on this repository, where `crates/project::policy` changes every district at once — and
 //! the corpus had not recorded it anywhere.
 //!
-//! # The exposure is concentrated in one lever and is about a quarter
+//! # The exposure was a quarter of the lever, and it is now mostly closed
 //!
 //! `Policy::base_cost_scale` expresses an input-year refresh: cost inputs restated from FY2018 to
-//! FY2022 prices raised statewide base cost by about 3.1%. The model scales aggregate base cost and
-//! stops.
+//! FY2022 prices raised statewide base cost by about 3.1%. The model used to scale aggregate base
+//! cost and stop.
 //!
 //! But **$858m of categorical funding is denominated in the statewide average base cost per
 //! pupil** — special education, English learners, career-technical and the weighted half of
 //! preschool special education are all `weight x $8,241.61 x count x state share`. If base cost per
-//! pupil rises, that figure rises with it, and every one of those programs rises too. The scenario
-//! holds them fixed.
+//! pupil rises, that figure rises with it, and every one of those programs rises too.
 //!
-//! So a 3.1% refresh as this site models it moves $113.0m, and in reality would move about $26.6m
-//! more — **24% more than the site shows**, or 25% counting gifted's salary-denominated units,
-//! which would also move on a cost refresh though less directly.
+//! **The decision was taken: the site models Ohio rather than mirroring the department's tool.**
+//! `base_cost_scale` now moves the denominated categoricals, and the divergence from the
+//! department's simulator is deliberate and stated on the page. See
+//! `.yidam/decisions/scenario-models-ohio.yml`.
 //!
-//! # Why this is recorded rather than fixed
+//! # What this file measures now
 //!
-//! Fixing it means the scenario diverges from the department's own tool, and every checkpoint in
-//! the feed was computed against the current behaviour. That is a decision about what the site is
-//! *for* — reproducing the department's simulation, or modelling Ohio — and it is not one to make
-//! silently inside a test file. See `.yidam/corpus/scenario/ACTIONS.md`.
+//! Not an omission — a boundary. Three things are still held fixed and each for a different
+//! reason, and the point of keeping this file is that the reasons are not interchangeable:
 //!
-//! What this file does is make the size of the omission a checked number rather than an
-//! impression, so the decision can be taken on the figure.
+//!   - **$45.7m of preschool special education** is denominated the same way and is *outside*
+//!     `[H] Foundation Funding`, so it is outside `categorical_funding` and outside everything the
+//!     scenario computes. Not held fixed by choice; simply not modelled.
+//!   - **$54.4m of gifted** is exposed through salary prices rather than through base cost.
+//!     Scaling it by this factor would be an assumption dressed as an identity.
+//!   - **DPIA and targeted assistance**, $1.89bn, genuinely do largely cancel, because they are
+//!     indices whose numerator and denominator move together.
+//!
+//! So $812m of the recorded $858m now moves, and the 5% that does not is a program the scenario
+//! has never reached rather than a constant it declines to recompute.
 
 use project::panel::{self, DistrictRecord};
 
@@ -61,12 +67,43 @@ fn the_frozen_statewide_constants_are_named_and_their_exposure_measured() {
         "expected the base-cost-denominated categoricals to be around $858m, got {denominated:.0}"
     );
 
-    // The exposure: what a refresh moves in the model against what it would also move in fact.
+    // The exposure: what a refresh moves on top of base cost, as a fraction of base cost aid.
     let exposure = denominated / base_cost_share;
     assert!(
         (0.20..0.30).contains(&exposure),
-        "a base cost refresh understates itself by {exposure:.3}; the recorded figure is 0.24 and \
-         a materially different one means the mix has shifted and the caveat needs rewriting"
+        "a base cost refresh moves {exposure:.3} on top of itself; the recorded figure is 0.24 and \
+         a materially different one means the mix has shifted and the note needs rewriting"
+    );
+
+    // **And the scenario now moves it.** The part inside `[H] Foundation Funding` is what
+    // `Policy::base_cost_scale` reaches: $812m of the $858m, or 95%.
+    let reachable: f64 = panel
+        .iter()
+        .map(DistrictRecord::base_cost_denominated_categoricals)
+        .sum();
+    assert!(
+        (reachable / 1e6 - 812.5).abs() < 1.0,
+        "reachable ${:.1}m",
+        reachable / 1e6
+    );
+    assert!(
+        reachable / denominated > 0.94,
+        "the scenario should reach the great majority of the exposure, not {:.3}",
+        reachable / denominated
+    );
+
+    // The residue is preschool special education's weighted half, and it is unreached because it
+    // sits outside foundation funding rather than because a constant is being held still.
+    let unreached = denominated - reachable;
+    assert!(
+        (unreached / 1e6 - 45.7).abs() < 1.0,
+        "unreached ${:.1}m",
+        unreached / 1e6
+    );
+    let categoricals: f64 = panel.iter().map(DistrictRecord::categorical_funding).sum();
+    assert!(
+        reachable < categoricals && unreached > 0.0,
+        "the reachable part is inside categorical funding and the residue is not"
     );
 
     // The statewide poverty share DPIA indexes against, and the median wealth targeted assistance

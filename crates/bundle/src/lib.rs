@@ -73,7 +73,7 @@ use edfund_core::Dollars;
 /// from FY2022-FY2024 to FY2024-FY2026 — the years the department's `ADM Data` sheet declares.
 /// The values did not change; what they are called did, which is exactly the kind of silent
 /// meaning change the version guard exists for.
-pub const CONTRACT_VERSION: &str = "26.0.0";
+pub const CONTRACT_VERSION: &str = "27.0.0";
 
 /// How close to the floor counts as being on it, in mills.
 ///
@@ -913,6 +913,14 @@ pub struct District {
     pub base_cost_state_share: Dollars,
     /// Targeted assistance, special education, DPIA, English learner, gifted, career-technical.
     pub categorical_funding: Dollars,
+    /// The part of `categorical_funding` priced in the statewide average base cost per pupil.
+    ///
+    /// Special education, English learners and career-technical, which are each
+    /// `weight x $8,241.61 x count x state share`. A base cost lever moves these too, so the
+    /// scenario needs them separated. Emitted rather than re-derived in the browser so that
+    /// *which* programs count is decided once, in `project::panel`, and the two implementations
+    /// of `apply` cannot disagree about it.
+    pub base_cost_denominated_categoricals: Dollars,
     /// Special education's six weighted categories: ADM then aid, Category 1 through 6.
     ///
     /// The weights span a factor of sixteen and the money runs against them — Category 6 is 15%
@@ -1980,8 +1988,9 @@ impl Bundle {
                 num(d.base_cost_state_share)
             ));
             s.push_str(&format!(
-                "\"categorical_funding\": {}, ",
-                num(d.categorical_funding)
+                "\"categorical_funding\": {}, \"base_cost_denominated_categoricals\": {}, ",
+                num(d.categorical_funding),
+                num(d.base_cost_denominated_categoricals)
             ));
             // Special education, then the other five, then the six totals. Emitted once — this
             // block and the categoricals beside it were pasted twice, so every district in the
@@ -2349,6 +2358,9 @@ mod tests {
             }),
             base_cost_state_share: 6_000_000.0,
             categorical_funding: 8_038_562.0,
+            // Special education, English learners and career-technical of the above — the part a
+            // base cost lever moves along with base cost.
+            base_cost_denominated_categoricals: 2_370_119.0,
             special_education: SpecialEducation {
                 adm: [10.9, 105.2, 6.0, 1.0, 10.8, 7.1],
                 aid: [21_000.0, 320_000.0, 44_000.0, 9_800.0, 143_000.0, 138_000.0],

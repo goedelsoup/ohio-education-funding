@@ -1652,14 +1652,37 @@ test.describe("what the scenario holds fixed", () => {
     expect(order).toBe("before");
   });
 
-  test("the size of the omission is stated, not just its existence", async ({ page }) => {
-    // A caveat without a magnitude is unfalsifiable and unactionable. $858.2m of categoricals are
-    // denominated in the average base cost per pupil, so a refresh understates itself by 24%.
+  test("the divergence from the department's tool is stated, with its size", async ({ page }) => {
+    /*
+     * This used to assert that the page named an omission — $858.2m of categoricals denominated in
+     * the average base cost per pupil, making a refresh understate itself by 24%. The omission was
+     * closed: `base_cost_scale` now moves the $812.5m of it that sits inside foundation funding,
+     * and the page's job changed from confessing a gap to declaring a deliberate divergence from
+     * the department's own simulator. A caveat without a magnitude is unfalsifiable; so is a
+     * divergence, and both numbers are asserted here.
+     */
     await page.goto("/scenario");
     const caveat = page.locator('.card[data-part="held-fixed"]');
-    await expect(caveat).toContainText("$858.2M");
-    await expect(caveat).toContainText("24% larger");
-    await expect(caveat).toContainText("largely cancel");
+    await expect(caveat).toContainText("diverges from the department's on purpose");
+    await expect(caveat).toContainText("$812.5M");
+    await expect(caveat).toContainText("$25.2M");
+    await expect(caveat).toContainText("genuinely cancel");
+  });
+
+  test("the three things still held fixed are given three different reasons", async ({ page }) => {
+    /*
+     * The point of the rewrite. "Held fixed" was one bucket and is now three, and they are not
+     * interchangeable: an index that really does cancel, a price that would move by its own amount
+     * rather than this one, and a program that sits outside the page entirely. Collapsing them
+     * back into a single hedge would lose the only part a reader can act on.
+     */
+    await page.goto("/scenario");
+    const caveat = page.locator('.card[data-part="held-fixed"]');
+    await expect(caveat).toContainText("three different reasons");
+    await expect(caveat).toContainText("$1.89B");
+    await expect(caveat).toContainText("guess wearing the shape of an identity");
+    await expect(caveat).toContainText("$45.7M");
+    await expect(caveat).toContainText("outside foundation funding");
   });
 });
 
