@@ -2790,3 +2790,6 @@ pub fn extract_school_funding(text: &str) -> Option<String> {
         .unwrap_or(rest.len());
     Some(rest[..end].trim().to_string())
 }
+
+/// Where the department's redbook extract is written, relative to the repository root.
+pub const REDBOOK_FIXTURE: &str = "crates/project/fixtures/dew-redbook.txt";

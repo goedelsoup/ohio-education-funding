@@ -11,6 +11,11 @@ description: |
   expressing that the two did not agree. It moves when the legislature changes the line item or
   when the counts change, and for no other reason. [verified]
 
+  **AND IT IS A CONDITION ON AN APPROPRIATION, NOT A FORMULA IN STATUTE.** R.C. 3317.0213 does not
+  mention proration; the redbook does — "If necessary, DEW must prorate the payments so as not to
+  exceed the amount appropriated for each year." That is why the search of the Revised Code for
+  "proration" found it only in the calculator's labels and not in the sections. [verified]
+
   **THE PUBLISHED AMOUNT IS NOT WHAT THE DISTRICT IS OWED.** That is the whole reason this needs a
   node. Under a proration the department's figure is what was available, divided — and the shortfall
   cannot be recovered from it. A reader shown $1.2m has no way to know the formula computed $1.31m,
@@ -68,9 +73,47 @@ description: |
   the funded-but-zero program lines this corpus already holds — supplemental targeted assistance
   and gifted professional development. [inference]
 
-  **STILL OPEN.** When each factor was last set, and against which appropriation. Only the
-  preschool one publishes a limit at all, and none publishes a history. Answering it needs the
-  budget bill's line items, which is `lsc-budget` — a connector still blocked on PDFs. [open]
+  **WHICH BUDGET LINE GOVERNS IS NOW ANSWERED, AND THE ANSWER EXPLAINS THE ANOMALY.** This node
+  said the question needed the budget bill's line items, "which is `lsc-budget` — a connector
+  still blocked on PDFs." It is not blocked; a PDF is a container. The department's redbook names
+  every appropriation line item and breaks each into earmarks with amounts.
+
+      transportation                    GRF ALI 200502  Pupil Transportation
+      special education transportation  GRF ALI 200502  (the same line)
+      preschool special education       GRF ALI 200540  Special Education Enhancements
+
+  **AND PRESCHOOL SPECIAL EDUCATION IS THE *REMAINDER* OF ITS LINE ITEM.** ALI 200540 funds five
+  earmarked purposes first — special education at DD boards and institutions, parent mentoring,
+  school psychology interns, vocational rehabilitation, secondary transition — and preschool
+  special education takes what is left:
+
+      ALI 200540 earmark                                FY2025 est.   FY2026 intro   FY2027 intro
+      Special education at DD boards and institutions   $38,500,000    $33,945,594    $33,945,594
+      Parent mentoring programs                          $1,350,000     $1,350,000     $1,350,000
+      School psychology interns                          $3,000,000     $3,000,000     $3,000,000
+      Vocational rehabilitation services                 $6,500,000             $0             $0
+      Secondary transition services                      $2,000,000     $1,000,000     $1,000,000
+      Remainder — preschool special education          $147,500,000   $153,976,832   $153,976,832
+
+  A residual claimant is the thing that absorbs a shortfall by construction. That is *why* this
+  program prorates and the others mostly do not, and nothing on the department's sheet says it —
+  the sheet shows a factor and a limit. [verified — `lsc-budget`, as introduced]
+
+  **AND THE LIMIT THE CALCULATOR PRINTS IS LAST YEAR'S.** The $147,500,000 stated beside the
+  0.96854448 factor is the **FY2025 estimate**. FY2026 and FY2027 are both $153,976,832. So the
+  factor and the limit beside it are carried over together from the prior biennium, and on the
+  year being modelled the program at $148,408,184 is **$5.6m under** its appropriation rather than
+  $908,184 over it — meaning no proration would arise at all.
+
+  This node guessed "a factor calibrated against an earlier ADM vintage and never recalibrated"
+  and hedged that "a recalibration before payment is expected and this may never reach a
+  district." The appropriation column is why. The guess was adjacent and the mechanism is sharper:
+  it is not a stale *count*, it is a stale *appropriation*. [verified]
+
+  **STILL OPEN.** Whether the enacted appropriation held at $153,976,832 — LSC publishes redbooks
+  only for the introduced bill, so these are the executive proposal and the enacted amounts need
+  the appropriations document, which is not wired. And no factor publishes a history, so "when
+  each was last set" is answered for preschool and open for the other two. [open]
 
   ~~Also open: whether prorations apply anywhere inside `[H] Foundation Funding`.~~ Answered above,
   from the workbook's own labels: none do, and the pattern is real rather than an artefact of three
