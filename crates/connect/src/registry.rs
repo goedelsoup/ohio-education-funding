@@ -139,7 +139,9 @@ pub const OHIO_LAWS_SECTIONS: &[Source] = &[
         format: Format::Html,
         catalog: Some("ohio-revised-code"),
         fixture: Some(crate::fixtures::STATUTE_FIXTURE),
-        note: "R.C. 3317.019. Gifted units and their prices.",
+        note: "R.C. 3317.019. Temporary transitional aid — the guarantee. Labelled \"gifted units \
+               and their prices\" when this list was first written, from the corpus's own citation \
+               rather than from the section; gifted units are R.C. 3317.051.",
     },
     Source {
         key: "rc-3317-022",
@@ -149,6 +151,16 @@ pub const OHIO_LAWS_SECTIONS: &[Source] = &[
         catalog: Some("ohio-revised-code"),
         fixture: Some(crate::fixtures::STATUTE_FIXTURE),
         note: "R.C. 3317.022. Core foundation funding: the section that assembles every component, and where disadvantaged pupil impact aid actually lives.",
+    },
+    Source {
+        key: "rc-3317-051",
+        url: "https://codes.ohio.gov/ohio-revised-code/section-3317.051",
+        filename: "rc-3317-051.html",
+        format: Format::Html,
+        catalog: Some("ohio-revised-code"),
+        fixture: Some(crate::fixtures::STATUTE_FIXTURE),
+        note: "R.C. 3317.051. Gifted unit funding and the three salary prices the units are \
+               bought at, which R.C. 3317.022 reaches by cross-reference.",
     },
     Source {
         key: "rc-3317-0212",

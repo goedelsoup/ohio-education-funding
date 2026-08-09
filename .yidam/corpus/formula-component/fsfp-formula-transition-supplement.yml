@@ -54,9 +54,20 @@ properties:
     Included in [N] Total Formula Funding, so it is inside the formula rather than beside it —
     unlike the performance supplement and preschool special education, which sit in [R].
   statutory_basis: |
-    Not located. The department computes it on `Detail_SFPR` and reports it as line [K]; which
-    section of R.C. 3317 authorises it, and whether `[L1]` is defined there or set administratively,
-    is [open].
+    Not in R.C. 3317. The department computes it on `Detail_SFPR` and reports it as line [K].
+    **Confirmed uncodified.** The statute audit searched R.C. 3317.022 — the section that assembles
+    core foundation funding — and every other section this corpus cites. It is in none of them.
+    The authority is the budget act's temporary law, H.B. 96 of the 136th General Assembly, which
+    `codes.ohio.gov` does not carry and which lapses with the biennium unless re-enacted.
+
+    That is a statement about **durability**, not about legality; Ohio funds a great deal this way.
+    It means this payment has no permanent statutory home, unlike base cost or the categorical
+    weights beside it on the same report. Reading the enacted bill text is `lsc-budget`, still
+    blocked on PDFs. [verified that it is absent from the Revised Code; the bill section is [open]]
+
+    `[L1]` is likewise absent from the Revised Code, so it is defined in the same temporary law or
+    administratively. Either way it is not a permanent-law quantity, which is worth knowing about a
+    figure that decides a $63.6m payment. [open]
   calculator: |
     Not a standalone crate. Carried in `crates/project::panel::Transition` and reproduced for all
     609 districts in `crates/project/tests/the_supplements_outside_the_formula.rs`.

@@ -105,9 +105,12 @@ properties:
     per pupil $276,708.97. Both computed over all districts; the sheet publishes an
     island-excluded pair beside them that no formula references. [verified]
   statutory_basis: |
-    R.C. 3317.0217. The two-tier structure, the size brackets and the coefficient pair are stated
-    in the department's FY2027 calculator formulas and reproduced from them; the statute has not
-    been read line by line against this and the correspondence is [open].
+    R.C. 3317.0217, read. **Codified.** The capacity tier's coefficient appears as "(The median
+    weighted wealth of all school districts in this state for that fiscal year X 0.008) - (the
+    district's weighted wealth for that fiscal year X 0.008)", and the size brackets are statutory
+    as well — "greater than or equal to 200 but less than or equal to 400" and the rest. The
+    two-tier structure the corpus recovered from the sheet is the structure the section describes.
+    [verified — `ohio-laws`]
   calculator: |
     Not a standalone crate. Verified against the department's published per-district amounts in
     `crates/project/tests/the_remaining_categoricals.rs`, which reproduces both tiers and the

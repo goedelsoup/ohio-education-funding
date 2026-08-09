@@ -75,9 +75,26 @@ properties:
     The school bus line is ROUNDDOWN to a tenth of a dollar, which no other line in the calculator
     is.
   statutory_basis: |
-    R.C. 3317.0212 for the main formula. The rider weights, the two rates, the 50% floor, both
-    supplements and the guarantee are transcribed from the FY2027 calculator's own formulas and
-    reproduced from them; the correspondence with statute has not been read line by line. [open]
+    R.C. 3317.0212, read — and it changes what kind of parameter the two rates are.
+
+    **The section contains no dollar figure at all.** $1,337.175 per rider and $6.867 per mile are
+    not chosen; they are **measured**. Division (C) directs the department to compute the statewide
+    transportation cost per student by "dividing the district's total costs for school bus service
+    in the previous fiscal year by its qualifying ridership in the previous fiscal year", then
+    excluding "the ten districts with the highest transportation costs per student and the ten
+    districts with the lowest". Division (D) does the same per mile. They are **trimmed means of
+    what districts themselves reported spending last year**. [verified — `ohio-laws`]
+
+    That makes them a fourth kind of parameter in this corpus, beside the legislated, the delegated
+    and the uncodified: a rate that moves when districts' own behaviour moves, with no one deciding
+    it and no bill required. It also means the rates are endogenous — a year in which districts
+    spend more on buses raises the rate they are paid at, and the trim is the only thing bounding
+    that.
+
+    The efficiency supplement's shape **is** statutory: division (F) states the 1.5 index threshold
+    and the 0.15 multiplier the corpus carries. [verified] The 50% floor is in the section too.
+    Whether the rider weights and the guarantee are statutory has not been separated out here.
+    [open]
   calculator: |
     Not a standalone crate. Carried in `crates/project::panel::Transportation` and reproduced for
     all 609 districts in `crates/project/tests/transportation.rs`, including both supplements, the
