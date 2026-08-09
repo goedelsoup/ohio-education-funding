@@ -14,3 +14,7 @@ target/
 # credentials — those live in ~/Library/Preferences/.wrangler — but it does hold the account id
 # and the account's display name, and it is machine state rather than anything about the model.
 .wrangler/
+
+# Astro writes generated types beside whatever directory it is invoked from. `web/.gitignore`
+# covers the intended location; this covers an invocation from the repository root.
+.astro/

@@ -25,6 +25,12 @@
 
 ## Gaps
 
+- ~~**The categoricals have no node.**~~ **CLOSED** — six nodes written, listed in the README
+  with the four shapes they fall into. What follows is the record of why it took eight phases and
+  what the modelling question turned out to be, kept because the reasoning outlived the gap.
+
+  The original entry:
+
 - **The categoricals have no node.** This class holds base cost, local capacity, the charge-off
   it replaced, and the guarantee. It does not hold the six categorical programs — targeted
   assistance, special education, DPIA, English learners, gifted, career-technical — which

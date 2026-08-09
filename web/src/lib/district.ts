@@ -479,13 +479,16 @@ export function renderCategoricals(d: District, statewide: Statewide): string {
   const total = d.categorical_funding;
   if (total <= 0) return "";
 
+  // Each program links to the corpus node describing its mechanism. The six were one residual
+  // until recently and had nothing to link to; now each is a `formula-component` in its own right,
+  // and the link out from a figure to what the figure *means* is the reason the wiki exists.
   const parts = [
-    ["Targeted assistance", c.targeted_assistance, "Equalisation for low-valuation districts. Zero once a district has enough."],
-    ["Special education", c.special_education, "Six weighted categories of disability."],
-    ["Disadvantaged Pupil Impact Aid", c.dpia, "Driven by the economically disadvantaged count."],
-    ["Career-technical education", c.career_technical, ""],
-    ["Gifted", c.gifted, "Identification and service."],
-    ["English learners", c.english_learners, "Three weights by time in the country."],
+    ["Targeted assistance", c.targeted_assistance, "Equalisation for low-valuation districts. Zero once a district has enough.", "fsfp-targeted-assistance"],
+    ["Special education", c.special_education, "Six weighted categories of disability, spanning a factor of sixteen.", "fsfp-special-education-weights"],
+    ["Disadvantaged Pupil Impact Aid", c.dpia, "Two poverty counts blended, indexed on the state's, and squared.", "fsfp-disadvantaged-pupil-impact-aid"],
+    ["Career-technical education", c.career_technical, "Five weights against a base cost 20% above the one the rest of the plan uses.", "fsfp-career-technical-weights"],
+    ["Gifted", c.gifted, "Mostly staffing units, with a floor 370 districts sit on.", "fsfp-gifted-units"],
+    ["English learners", c.english_learners, "Three weights that descend, unlike every other categorical.", "fsfp-english-learner-weights"],
   ] as const;
 
   const bars: Bar[] = parts
@@ -509,8 +512,10 @@ export function renderCategoricals(d: District, statewide: Statewide): string {
         <tbody>
           ${parts
             .map(
-              ([label, value, note]) => `<tr${value <= 0 ? ' class="n"' : ""}>
-                <th>${escapeHtml(label)}${note ? `<div class="n">${escapeHtml(note)}</div>` : ""}</th>
+              ([label, value, note, node]) => `<tr${value <= 0 ? ' class="n"' : ""}>
+                <th><a href="${routes.wikiNode("formula-component", node)}">${escapeHtml(
+                  label,
+                )}</a>${note ? `<div class="n">${escapeHtml(note)}</div>` : ""}</th>
                 <td class="tnum">${value <= 0 ? "—" : money(value)}</td>
                 <td class="tnum n">${value <= 0 ? "" : pct(value / total, 1)}</td>
               </tr>`,

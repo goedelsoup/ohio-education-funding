@@ -1,0 +1,90 @@
+class: formula-component
+label: FSFP Gifted Identification and Units
+description: |
+  **$54m**, and the only one of the six that buys **staff** rather than pupils. Two per-pupil
+  amounts and three kinds of *unit*, where a unit is a headcount entitlement priced at a
+  salary-like figure. **87% of the program is unit funding.** [verified]
+
+  **THE PARAMETERS ARE PRICES, NOT RATES, AND THAT PUTS THIS COMPONENT IN A DIFFERENT FAMILY.**
+  $85,776 a coordinator unit, $89,378 a K-8 intervention specialist, $80,974 a 9-12 one. Those are
+  salary assumptions, so they belong with the staffing costs inside the [base cost
+  build-up](fsfp-base-cost-calculation.yml) and will move when those are refreshed — not with the
+  weights, which are dimensionless multipliers of a base cost. Nothing else among the six behaves
+  that way, and a "categoricals" node treating all six parameters alike would have made this
+  program's sensitivity to a salary refresh invisible. [inference]
+
+  **THE UNITS ARE CLAMPED AND THE CLAMPS ARE THE POLICY.**
+
+  - a coordinator unit per **3,300** enrolled pupils, **floored at 0.5 and capped at 8**;
+  - an intervention specialist unit per **140** identified gifted pupils in K-8, **floored at 0.3**;
+  - the same per 140 in grades 9-12, floored at 0.3, priced $8,404 lower.
+
+  **A district that identifies no gifted pupils at all still draws 0.5 + 0.3 + 0.3 units — $93,993
+  before its state share.** Gifted is the one categorical with a floor rather than a proportion.
+  [verified]
+
+  That is defensible and it is invisible. Units buy people, and half a coordinator is already the
+  smallest thing a small district can be funded for. But **370 districts sit on the coordinator
+  floor — three-fifths of Ohio** — so for most of the state that line is a minimum rather than a
+  measurement, and a district's gifted total looks like a payment for gifted pupils while being
+  substantially a payment for existing. **88 districts draw every one of their three unit
+  entitlements at the floor.** [verified]
+
+  **THE CAP BINDS TOO, AT THE OTHER END.** Eight coordinator units is reached at 26,400 enrolled
+  pupils, and **three districts are there**. Columbus and Cleveland are funded for eight
+  coordinators however many pupils they have; Cleveland's enrolment earns 9.33. A floor and a cap
+  on the same line means the middle of the distribution is the only place the ratio actually
+  operates. [verified]
+
+  **TWO DENOMINATORS, ONE LINE APART.** Identification is $24 per **K-6** pupil; referral is $2.50
+  per **enrolled** pupil. Adjacent rows in the same sheet, different bases, and neither name says
+  so. [verified]
+
+  **PROFESSIONAL DEVELOPMENT IS A HARD-CODED ZERO.** `[F3]` is carried by the sheet as a value
+  rather than a formula and is zero for every district. Like [targeted
+  assistance](fsfp-targeted-assistance.yml)'s supplemental tier, it is a funded line at zero rather
+  than an absent one — the column exists, the arithmetic sums it, and a future biennium can fill it
+  without changing anything else. [verified]
+
+  **STILL OPEN.** What identification requires. The units scale off *identified* gifted FTE, so a
+  district's gifted funding depends on how many children it identifies, which is a district
+  practice as much as a pupil population. Whether identification rates vary systematically with
+  district wealth is exactly the kind of question this decomposition makes askable and the corpus
+  has not asked. [open]
+properties:
+  name: Gifted identification and units
+  function: |
+    F1 Identification  = K-6 enrolled ADM x $24.00 x state share percentage
+    F2 Referral        = enrolled ADM     x $2.50  x state share percentage
+    F3 Professional development = carried as a value; zero for every district
+
+    coordinator units  = clamp(enrolled ADM / 3300, 0.5, 8)
+    specialist K-8     = max(gifted K-8 FTE / 140, 0.3)
+    specialist 9-12    = max(gifted 9-12 FTE / 140, 0.3)
+
+    F3a coordinator    = coordinator units x $85,776 x state share
+    F3b specialist K-8 = specialist K-8 units x $89,378 x state share
+    F3c specialist 912 = specialist 9-12 units x $80,974 x state share
+
+    F Unit Funding     = F3a + F3b + F3c
+    F Gifted           = F1 + F2 + F3 + Unit Funding
+
+    Reconciles to the department's published `[F] Gifted` to the cent for all 609 districts.
+  statutory_basis: |
+    R.C. 3317.053. The unit ratios, the floors, the cap and the three prices are transcribed from
+    the FY2027 calculator's own formulas and reproduced against its published amounts; whether the
+    floors and the cap are statutory or set in the budget bill is [open], and it matters because
+    the two change on different cycles.
+  calculator: |
+    Not a standalone crate. Reproduced for all 609 districts in
+    `crates/project/tests/the_remaining_categoricals.rs`, including the floors and the cap;
+    carried in `crates/project::panel::Gifted`.
+links:
+  - target: ../formula-component.ont.yml
+    relationship: instance-of
+  - target: ../revenue-stream/state-foundation-aid.yml
+    relationship: distributes
+  - target: fsfp-base-cost-calculation.yml
+    relationship: shares-price-basis-with
+  - target: ../../catalog/dew-fy27-funding-calculator.md
+    relationship: sourced-from

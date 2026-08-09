@@ -1191,6 +1191,50 @@ test.describe("the categorical half", () => {
     await expect(card).toContainText("descend");
   });
 
+  test("each of the six programs links to the corpus node describing its mechanism", async ({
+    page,
+  }) => {
+    /*
+     * The six were a single residual for eight phases and had nothing to link to. Now each is a
+     * `formula-component` in its own right, and a glossary nobody arrives at from the number they
+     * were reading is a document museum — so the link out from the figure is the point.
+     */
+    await page.goto("/district/043786");
+    const card = page.locator(".card", { hasText: "The categorical half" });
+    const links = card.locator('a[href^="/wiki/formula-component/fsfp-"]');
+    await expect(links).toHaveCount(6);
+    for (const node of [
+      "fsfp-targeted-assistance",
+      "fsfp-special-education-weights",
+      "fsfp-disadvantaged-pupil-impact-aid",
+      "fsfp-career-technical-weights",
+      "fsfp-gifted-units",
+      "fsfp-english-learner-weights",
+    ]) {
+      await expect(card.locator(`a[href="/wiki/formula-component/${node}"]`)).toHaveCount(1);
+    }
+  });
+
+  test("the targeted assistance node says it is an equalisation, not a categorical", async ({
+    page,
+  }) => {
+    // The modelling decision the six nodes exist to record. Targeted assistance pays for the
+    // absence of a tax base, which is what local capacity measures; the other five pay for a kind
+    // of pupil. A single "categoricals" node would have said none of that.
+    await page.goto("/wiki/formula-component/fsfp-targeted-assistance");
+    await expect(page.locator("h1")).toContainText("Targeted Assistance");
+    const body = page.locator("main");
+    await expect(body).toContainText("does not belong with them");
+    await expect(body).toContainText("SIZE CLIFF");
+    await expect(body).toContainText("PAYS THEM NOTHING");
+    // And it points at local capacity, which is the placement decision itself: both measure the
+    // tax base, and the edge is what stops a reader filing this with the weighted programs.
+    const capacity = page.locator(
+      'main a[href="/wiki/formula-component/fsfp-local-capacity-measure"]',
+    );
+    expect(await capacity.count()).toBeGreaterThan(0);
+  });
+
   test("a district getting no targeted assistance is told why", async ({ page }) => {
     /*
      * The reason the sum misleads rather than merely omitting. Targeted assistance is the largest

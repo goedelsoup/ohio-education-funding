@@ -1,0 +1,66 @@
+class: formula-component
+label: FSFP English Learner Weights
+description: |
+  **$36m**, the smallest of the six, and the only weighted categorical in the plan whose weights
+  run **downward**. [verified]
+
+  **THE WEIGHTS DESCEND: 0.2104, 0.1577, 0.1053.** Category 1 is the most recently arrived learner
+  and is funded at almost exactly **twice** Category 3. So the program pays most in a pupil's first
+  year and least in their third — it tapers as need persists rather than deepening with it.
+  [verified]
+
+  Every other weighted categorical runs the other way: [special
+  education](fsfp-special-education-weights.yml) ascends from 0.2435 to 3.9554 as need deepens. A
+  reader who assumes Ohio's weights mean "more need, more money" has this one backwards, and the
+  assumption is reasonable everywhere else in the formula. Established from what districts are
+  actually paid per pupil in each category rather than from the transcribed weights. [verified]
+
+  Whether the taper is a judgement that acquisition costs most at the start or an incentive to
+  reclassify is not established here. It is the kind of question the corpus should be able to put
+  to the enacting analysis. [open]
+
+  **NEAR-UNIVERSAL AND ALMOST ENTIRELY CONCENTRATED, WHICH THE TOTAL HIDES IN BOTH DIRECTIONS.**
+  **505 of 609 districts have at least one English learner** — this is not a big-city program by
+  reach. But the median receiving district's entire allocation is about **$6,300**, roughly a
+  fifteenth of one teacher, while **38 districts hold 80% of the money** and the largest five hold
+  a third. [verified]
+
+  So "almost every district receives English learner funding" and "English learner funding goes to
+  a few dozen districts" are both true of the same $36m, and a reader given only the total will
+  pick whichever they already believed. That is the general argument for decomposing the
+  categorical lump, stated by the smallest program in it. [inference]
+
+  **THE COUNTS ARE FROZEN AT FY2021**, as with [career-technical](fsfp-career-technical-weights.yml)
+  — `Category 1 EL ADM-FY21`. For a program whose whole structure is about how recently a pupil
+  arrived, funding on a count six years old is a stranger fact than it is for CTE: the FY2021
+  Category 1 learners are not the FY2027 Category 1 learners. [verified, and its intent is [open]]
+properties:
+  name: English learner weights
+  function: |
+    For each category k in 1..3:
+      aid_k = ADM_k x weight_k x statewide average base cost per pupil x state share percentage
+
+    weights = [0.2104, 0.1577, 0.1053]   -- descending; Category 1 is the newest arrival
+    statewide average base cost per pupil, FY2027 = $8,241.61
+
+    Total = the three. Reconciles to the department's published `[E] English Learner` to the cent
+    for all 609 districts. Counts are FY2021.
+  statutory_basis: |
+    R.C. 3317.016. The three categories are defined by time in a United States school; the weights
+    are transcribed from the FY2027 calculator and confirmed against the department's own
+    per-category amounts.
+  calculator: |
+    Not a standalone crate. Reproduced for all 609 districts in
+    `crates/project/tests/the_remaining_categoricals.rs`; carried in
+    `crates/project::panel::EnglishLearners`.
+links:
+  - target: ../formula-component.ont.yml
+    relationship: instance-of
+  - target: ../revenue-stream/state-foundation-aid.yml
+    relationship: distributes
+  - target: fsfp-special-education-weights.yml
+    relationship: shares-mechanism-with
+  - target: ../parameter/base-cost-per-pupil.yml
+    relationship: governed-by
+  - target: ../../catalog/dew-fy27-funding-calculator.md
+    relationship: sourced-from

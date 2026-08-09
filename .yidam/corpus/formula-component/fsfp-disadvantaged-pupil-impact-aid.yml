@@ -1,0 +1,68 @@
+class: formula-component
+label: FSFP Disadvantaged Pupil Impact Aid
+description: |
+  **$525m**, and the only one of the six whose mechanism is neither a weight times a count nor an
+  equalisation off wealth. DPIA blends two poverty counts, expresses the blend as a share of
+  enrolment, indexes that share against the state's — and **squares it**. [verified]
+
+  **THE SQUARING IS THE WHOLE CHARACTER OF THE PROGRAM AND NOTHING IN A DPIA TOTAL SHOWS IT.** Aid
+  scales with the **square** of relative poverty, so a district at twice the state's rate scores
+  four times the index rather than twice. $525m distributed on a convex curve concentrates far more
+  sharply than a per-pupil rate would, and the convexity is a policy choice as substantial as the
+  amount. Verified for all 609 districts, in both directions: away from an index of one, the plain
+  ratio and the published figure diverge. [verified]
+
+  **THE TWO POVERTY COUNTS ARE NOT NESTED.** `d1` is 65% of the FY2025 economically disadvantaged
+  ADM plus 35% of the FY2026 directly certified ADM. The second is administrative — a child is
+  directly certified through participation in another benefit program — and it finds a **median
+  61%** of what the disadvantaged count does, **fewer than half in 146 districts**. Putting 35% of
+  the weight on the smaller measure lowers the funded count almost everywhere. [verified]
+
+  Almost. **Three districts have more directly certified children than economically disadvantaged
+  ones** — Beachwood 1.03x, Nordonia Hills 1.54x, Ottawa Hills 2.35x on 32.9 disadvantaged pupils.
+  All three have poverty shares of 0.03 to 0.18 against a statewide median of 0.49. Small counts,
+  where two differently-built measures can invert. Recorded because the corpus briefly asserted the
+  blend could not exceed its larger input, which is false, and because either count is a tempting
+  poverty proxy elsewhere. [verified]
+
+  **AND ONE DISTRICT DOES NOT FOLLOW THE RULE.** Edgerton Local's published blend is 342.38 against
+  352.03 computed from the stated 65/35 weights. Recorded and not explained. One district in 609 is
+  the size of a data correction rather than a mechanism, but it is not zero and it is not
+  understood. [open]
+
+  **WHAT THE STATEWIDE SHARE IS.** `d3` divides by 0.533380310606710 — the statewide economically
+  disadvantaged percentage. That figure is a single number setting the whole scale, and whether it
+  is recomputed each biennium or carried forward is not established. [open]
+
+  **THE POVERTY MEASURE IS TOP-CODED AND THIS COMPONENT IS NOT.** The report card's economically
+  disadvantaged share saturates at 100% under community eligibility, which is why 100 districts
+  print exactly that. The count DPIA uses is an ADM rather than a share and does not saturate the
+  same way — so the two poverty figures a district page can show are different measures, and the
+  corpus holds both. [verified]
+properties:
+  name: Disadvantaged Pupil Impact Aid
+  function: |
+    d1a  FY2025 economically disadvantaged ADM
+    d1b  FY2026 directly certified ADM
+    d1   = 0.65 x d1a + 0.35 x d1b
+    d2   = d1 / enrolled ADM
+    d3   = (d2 / 0.533380310606710) ^ 2          <- squared, for all 609 districts
+
+    Aid = d1 x $422 x d3, in effect: the department publishes the total, and the per-pupil amount
+    of $422 against the weighted count scaled by the index reproduces it.
+  statutory_basis: |
+    R.C. 3317.029. The blend weights, the per-pupil amount and the statewide share are transcribed
+    from the FY2027 calculator; the squaring is visible in the workbook's own formula and has not
+    been located in statute here. [open]
+  calculator: |
+    Not a standalone crate. Reproduced for all 609 districts in
+    `crates/project/tests/finances_and_the_guarantee.rs`; carried in `crates/project::panel::Dpia`.
+links:
+  - target: ../formula-component.ont.yml
+    relationship: instance-of
+  - target: ../revenue-stream/state-foundation-aid.yml
+    relationship: distributes
+  - target: ../doctrine/adequacy.yml
+    relationship: operationalizes
+  - target: ../../catalog/dew-fy27-funding-calculator.md
+    relationship: sourced-from

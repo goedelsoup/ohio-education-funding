@@ -1,0 +1,128 @@
+class: formula-component
+label: FSFP Targeted Assistance
+description: |
+  The largest of the six categoricals at **$1.36bn**, and the one that does not belong with them.
+  Special education, DPIA, gifted, career-technical and English learners each pay for a *kind of
+  pupil*. Targeted assistance pays for the *absence of a tax base*, which is what
+  [local capacity](fsfp-local-capacity-measure.yml) also measures. It is an equalisation wearing a
+  categorical's label, and reading it as a categorical is the first mistake available. [verified]
+
+  The evidence that it behaves like one and not the other: it **falls to exactly zero for 135 of
+  609 districts**, which no payment for pupils ever does. Columbus receives none of it. [verified]
+
+  **TWO TIERS THAT MEASURE DIFFERENT THINGS AND ADD.** `[G] = [C] + [F]`, and the addends do not
+  answer the same question:
+
+  - `[C]` the **capacity amount** is 0.8% of however far the district's *total* weighted wealth
+    falls below the statewide median district's. It is about the size of the tax base, full stop —
+    so a small district with a small base scores well on it regardless of how few pupils that base
+    serves.
+  - `[F]` the **wealth amount** is a rate against weighted wealth *per resident pupil*, cutting off
+    where that reaches 1.25 times the state median.
+
+  Statewide the split is **24% capacity and 76% wealth**, and per district it can be either, both,
+  or neither: 299 draw the first, 438 the second, 135 nothing. Which tier a district is on is a
+  statement about it that the total conceals. [verified]
+
+  **THE CAPACITY TIER HAS A SIZE CLIFF.** Because that tier measures total wealth rather than
+  wealth per pupil, a very small district would otherwise draw equalisation designed for one
+  twenty times its size. The department's guard is a step function rather than a per-pupil measure:
+  a district **below 200 ADM receives none of the tier**, one from 200 to 400 receives **5%** of
+  it, and the fraction ramps linearly to 100% only between 400 and 600. [verified]
+
+  It binds for five districts today, and that is not why it matters. A threshold written into the
+  formula is a standing property of the formula; the number of districts on the wrong side of it is
+  a fact about this year's enrolment. Sixty-eight districts sit between 200 and 600 pupils, on the
+  shelf or the ramp, and a shrinking district crosses these boundaries in the direction that costs
+  it money. [inference]
+
+  **THE WEALTH TIER'S 0.8 CUTOFF IS NOT A POLICY THRESHOLD.** The tier is
+  `(median_per_pupil x 0.014 - district_per_pupil x 0.0112) x ADM`, gated by
+  `IF(index < 0.8, 0, ...)`. And 0.0112 is **exactly** 0.8 x 0.014, so the bracket reaches zero at
+  precisely the index the gate cuts off at. The `IF` is not choosing where to stop paying; it is
+  stopping the formula from charging wealthy districts. [verified]
+
+  That is worth knowing before anyone treats 0.8 as a dial. Moving it without moving the
+  coefficient pair either opens a discontinuity or starts paying negative aid. [inference]
+
+  **TWO PUPIL COUNTS, ONE LINE APART.** `[D]` divides weighted wealth by **resident** ADM —
+  enrolled, less those open-enrolling in, plus those open-enrolling out. `[F]` then multiplies the
+  resulting rate by **enrolled** ADM. Both are defensible alone: wealth per pupil should arguably
+  be measured against the pupils a district's own taxpayers are responsible for, and aid should
+  arguably be paid on the pupils it teaches. Together they mean a district with heavy inbound open
+  enrolment is measured as wealthier per pupil than it is and then paid on the larger count. The
+  measurement and the payment disagree about who the district's pupils are. [verified]
+
+  **A SUPPLEMENTAL TIER THAT QUALIFIES DISTRICTS AND PAYS THEM NOTHING.** `[I] Supplemental
+  Targeted Assistance` is **zero for every district** in the FY2027 model. Its eligibility test
+  still runs and still qualifies **36 districts**: `[H]` is `YES` where a district's FY2019 wealth
+  index exceeded 1.6 **and** its FY2019 enrolled ADM was below 88% of its total ADM — a district
+  that was poor and had already lost more than an eighth of its pupils to open enrolment and
+  community schools. [verified]
+
+  So the state maintains a test for a distress condition, identifies the districts meeting it, and
+  attaches no money. Recorded here as a **live zero rather than an absence**: a future biennium can
+  fund the line without changing anything else, and a corpus that treated it as missing would not
+  notice when it did. [verified]
+
+  **WHERE IT BELONGS IN THIS ONTOLOGY.** Beside [local capacity](fsfp-local-capacity-measure.yml),
+  not beside the weighted categoricals. Both blend assessed valuation with federal adjusted gross
+  income — **60/40 here** against local capacity's 60/20/20 — and both are about the tax base
+  rather than the pupil. The two blends being different weights on overlapping inputs, inside one
+  formula, for two purposes, is exactly the kind of thing a single "categoricals" node would have
+  hidden. [verified]
+
+  **STILL OPEN.** What this component replaces. The charge-off era had its own equalisation and its
+  own supplement for districts the charge-off overcharged — gap aid, $73.5m across 145 districts in
+  FY2008 — and whether targeted assistance is the successor to that, to something else, or to
+  nothing is not established here. The `replaces` edge is deliberately absent rather than guessed.
+  [open]
+
+  Also open: whether the statewide medians are recomputed each year, and how far they move. Both
+  are single numbers that set the whole scale, and the sheet publishes a second pair **excluding
+  North Bass and Middle Bass** which no formula references. The exclusion is displayed and unused,
+  which suggests it was considered. [open]
+properties:
+  name: Targeted assistance
+  function: |
+    A  District Weighted Wealth  = 0.6 x assessed valuation + 0.4 x federal adjusted gross income
+    B  Capacity Index            = statewide median weighted wealth / A
+    C  Capacity Amount           = if A >= median then 0
+                                   else size_share(ADM) x 0.008 x (median - A)
+       size_share(ADM)           = 0            if ADM <  200
+                                   0.05         if 200 <= ADM <= 400
+                                   0.95 x (ADM-400)/200 + 0.05   if 400 < ADM < 600
+                                   1            if ADM >= 600
+    D  Weighted Wealth Per Pupil = A / (enrolled ADM - open enrolment in + open enrolment out)
+    E  Wealth Index              = statewide median wealth per pupil / D
+    F  Wealth Amount             = if E < 0.8 then 0
+                                   else (median_per_pupil x 0.014 - D x 0.0112) x enrolled ADM
+    G  Targeted Assistance       = C + F
+    H  Supplement Eligibility    = FY19 wealth index > 1.6 and FY19 enrolled < 0.88 x FY19 total
+    I  Supplemental              = zero for all 609 districts in FY2027
+
+    Statewide constants, FY2027: median weighted wealth $392,151,306.63; median weighted wealth
+    per pupil $276,708.97. Both computed over all districts; the sheet publishes an
+    island-excluded pair beside them that no formula references. [verified]
+  statutory_basis: |
+    R.C. 3317.0217. The two-tier structure, the size brackets and the coefficient pair are stated
+    in the department's FY2027 calculator formulas and reproduced from them; the statute has not
+    been read line by line against this and the correspondence is [open].
+  calculator: |
+    Not a standalone crate. Verified against the department's published per-district amounts in
+    `crates/project/tests/the_remaining_categoricals.rs`, which reproduces both tiers and the
+    eligibility test for all 609 districts; the decomposition is carried in
+    `crates/project::panel::TargetedAssistance`.
+links:
+  - target: ../formula-component.ont.yml
+    relationship: instance-of
+  - target: ../revenue-stream/state-foundation-aid.yml
+    relationship: distributes
+  - target: ../doctrine/equity.yml
+    relationship: operationalizes
+  - target: fsfp-local-capacity-measure.yml
+    relationship: shares-wealth-measure-with
+  - target: ../metric/assessed-valuation-per-pupil.yml
+    relationship: consumes
+  - target: ../../catalog/dew-fy27-funding-calculator.md
+    relationship: sourced-from

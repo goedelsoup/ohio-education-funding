@@ -69,6 +69,18 @@ links:
     relationship: composed-of
   - target: ../formula-component/temporary-transitional-aid-guarantee.yml
     relationship: composed-of
+  - target: ../formula-component/fsfp-targeted-assistance.yml
+    relationship: composed-of
+  - target: ../formula-component/fsfp-special-education-weights.yml
+    relationship: composed-of
+  - target: ../formula-component/fsfp-disadvantaged-pupil-impact-aid.yml
+    relationship: composed-of
+  - target: ../formula-component/fsfp-career-technical-weights.yml
+    relationship: composed-of
+  - target: ../formula-component/fsfp-english-learner-weights.yml
+    relationship: composed-of
+  - target: ../formula-component/fsfp-gifted-units.yml
+    relationship: composed-of
   - target: ../fiscal-period/fy2026-27.yml
     relationship: active-during
   - target: ../doctrine/adequacy.yml
