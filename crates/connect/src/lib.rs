@@ -41,6 +41,7 @@ pub mod index;
 pub mod registry;
 pub mod sha256;
 
+use std::collections::{BTreeMap, BTreeSet};
 use std::path::Path;
 
 use cache::FetchError;
@@ -534,6 +535,28 @@ pub fn rebuild(root: &Path) -> Result<Vec<Rebuilt>, RebuildError> {
         },
     });
 
+    // School districts across legislative seats. The last extraction because it is the only one
+    // that depends on another fixture's contents rather than only on a cached publication: the
+    // panel it apportions is the FY2027 model's 609 districts.
+    let panel: BTreeSet<String> = model
+        .iter()
+        .filter_map(|row| row.first().cloned())
+        .collect();
+    out.push(match legislative_crosswalk(root, &panel) {
+        Ok(rows) => Rebuilt::Written {
+            path: fixtures::CROSSWALK_FIXTURE.to_string(),
+            rows: fixtures::write_csv(
+                &root.join(fixtures::CROSSWALK_FIXTURE),
+                fixtures::CROSSWALK_HEADER,
+                &rows,
+            )?,
+        },
+        Err(reason) => Rebuilt::Skipped {
+            path: fixtures::CROSSWALK_FIXTURE.to_string(),
+            reason,
+        },
+    });
+
     Ok(out)
 }
 
@@ -562,6 +585,53 @@ fn zip_member(root: &Path, source: &Source, suffix: &str) -> Result<String, Stri
     archive
         .read_to_string(name)
         .map_err(|cause| format!("{}: {cause}", source.key))
+}
+
+/// Block populations from the PL 94-171 release: block code to total and under-18 count.
+///
+/// The three members are read and dropped one at a time. Uncompressed they are 174, 154 and 157
+/// megabytes, and holding all three as strings to join them would cost half a gigabyte for a
+/// result that is two integers per block.
+fn block_population(root: &Path, source: &Source) -> Result<BTreeMap<String, (i64, i64)>, String> {
+    let blocks = fixtures::pl_blocks(&zip_member(root, source, "geo2020.pl")?);
+    let people = fixtures::pl_counts(&zip_member(root, source, "000012020.pl")?);
+    let adults = fixtures::pl_counts(&zip_member(root, source, "000022020.pl")?);
+    Ok(blocks
+        .into_iter()
+        .map(|(record, block)| {
+            let total = people.get(&record).copied().unwrap_or(0);
+            // Under 18 is the residual: the release publishes the total and the 18-and-over
+            // count, and never the children directly.
+            let children = total - adults.get(&record).copied().unwrap_or(0);
+            (block, (total, children))
+        })
+        .collect())
+}
+
+/// The legislative-district crosswalk, from four census archives and the CCD directory.
+///
+/// `panel` is the funding model's IRNs, which is why this runs after the FY2027 model rather than
+/// beside the other archive extractions: the crosswalk apportions that model across seats, and a
+/// school district the model does not carry has nothing to apportion.
+fn legislative_crosswalk(
+    root: &Path,
+    panel: &BTreeSet<String>,
+) -> Result<Vec<Vec<String>>, String> {
+    let blocks = source("baf-2020-oh").expect("registered").1;
+    let house = source("sldl24-bef").expect("registered").1;
+    let senate = source("sldu24-bef").expect("registered").1;
+    let census = source("pl94-171-2020-oh").expect("registered").1;
+    let directory = source("ccd-lea-directory-2223").expect("registered").1;
+
+    let population = block_population(root, census)?;
+    fixtures::build_legislative_crosswalk(&fixtures::Crosswalk {
+        population: &population,
+        school_districts: &zip_member(root, blocks, "_SDUNI.txt")?,
+        house: &zip_member(root, house, "39_OH_SLDL24.txt")?,
+        senate: &zip_member(root, senate, "39_OH_SLDU24.txt")?,
+        directory: &zip_member(root, directory, ".csv")?,
+        panel,
+    })
 }
 
 /// The per-district F-33 panel, from the survey archive and the directory that keys it to IRN.
