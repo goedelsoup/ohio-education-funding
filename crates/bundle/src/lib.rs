@@ -73,7 +73,7 @@ use edfund_core::Dollars;
 /// from FY2022-FY2024 to FY2024-FY2026 — the years the department's `ADM Data` sheet declares.
 /// The values did not change; what they are called did, which is exactly the kind of silent
 /// meaning change the version guard exists for.
-pub const CONTRACT_VERSION: &str = "17.0.0";
+pub const CONTRACT_VERSION: &str = "18.0.0";
 
 /// How close to the floor counts as being on it, in mills.
 ///
@@ -644,6 +644,12 @@ pub struct District {
     pub irn: String,
     /// District name as published.
     pub name: String,
+    /// The county the department attributes the district to.
+    ///
+    /// One county per district, which is the department's own simplification: school district
+    /// boundaries cross county lines freely and the calculator picks one anyway. Good enough to
+    /// group peers by, and not good enough to sum into a figure called the county's.
+    pub county: String,
     /// Base cost enrolled ADM — the greater of the three-year average and the current year.
     pub adm: f64,
     /// Current-year enrolled ADM, FY2026. The denominator the state share is paid on.
@@ -1396,6 +1402,7 @@ impl Bundle {
             s.push_str("    {");
             s.push_str(&format!("\"irn\": \"{}\", ", escape(&d.irn)));
             s.push_str(&format!("\"name\": \"{}\", ", escape(&d.name)));
+            s.push_str(&format!("\"county\": \"{}\", ", escape(&d.county)));
             s.push_str(&format!("\"adm\": {}, ", num(d.adm)));
             s.push_str(&format!(
                 "\"current_year_adm\": {}, ",
@@ -1785,6 +1792,7 @@ mod tests {
         District {
             irn: "049056".into(),
             name: "Northern Local".into(),
+            county: "Perry".into(),
             adm: 2_193.81,
             current_year_adm: 2_107.80,
             base_cost_per_pupil: 8_100.0,

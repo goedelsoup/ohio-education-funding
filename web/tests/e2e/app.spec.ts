@@ -1204,3 +1204,70 @@ test.describe("the categorical half", () => {
     await expect(card).toContainText("Disadvantaged Pupil Impact Aid");
   });
 });
+
+test.describe("counties", () => {
+  test("the index ranks counties by the disparity inside them", async ({ page }) => {
+    /*
+     * The ordering is the argument. Alphabetical would make this a directory; ordered by how far
+     * apart the richest and poorest district in each county are, it puts the finding first.
+     */
+    await page.goto("/counties");
+    await expect(page.locator("h1")).toHaveText("Counties");
+
+    const ratios = await page
+      .locator("tbody tr td:nth-child(4)")
+      .allTextContents();
+    const numeric = ratios
+      .map((t) => Number.parseFloat(t.replace("×", "")))
+      .filter((n) => Number.isFinite(n));
+    expect(numeric.length).toBeGreaterThan(80);
+    for (let i = 1; i < numeric.length; i += 1) {
+      expect(numeric[i]!).toBeLessThanOrEqual(numeric[i - 1]!);
+    }
+  });
+
+  test("a county page names its widest pair and links both districts", async ({ page }) => {
+    await page.goto("/county/cuyahoga");
+    await expect(page.locator("h1")).toHaveText("Cuyahoga County");
+    const spread = page.locator('.card[data-part="spread"]');
+    await expect(spread).toContainText("Orange City");
+    await expect(spread).toContainText("Maple Heights City");
+    await expect(spread).toContainText("times");
+    // Both extremes must be reachable, since the point of the page is to send a reader onward.
+    await expect(spread.locator('a[href^="/district/"]')).toHaveCount(2);
+  });
+
+  test("a county page says its pupil total is a sum of districts, not the county's children", async ({
+    page,
+  }) => {
+    /*
+     * The honesty constraint the whole feature rests on. Ohio school district boundaries cross
+     * county lines, so a county page that reports a total without saying what it is a total *of*
+     * is making a geographic claim the data does not support.
+     */
+    await page.goto("/county/cuyahoga");
+    await expect(page.locator('.card[data-part="roster"]')).toContainText(
+      "a sum of these districts rather than a count of the county's children",
+    );
+  });
+
+  test("a single-district county says there is nothing to compare", async ({ page }) => {
+    // Rather than printing a ratio of 1.0, which would read as "no disparity here" — a different
+    // claim from "this county has one district".
+    await page.goto("/counties");
+    const row = page.locator("tbody tr").filter({ hasText: "a single district" }).first();
+    await expect(row).toBeVisible();
+    const href = await row.locator("a").first().getAttribute("href");
+    await page.goto(href!);
+    await expect(page.locator('.card[data-part="spread"]')).toContainText(
+      "no internal disparity to measure",
+    );
+  });
+
+  test("every district page's county is reachable from the counties index", async ({ page }) => {
+    // The link direction that matters: a reader arrives at a district and wants its neighbours.
+    await page.goto("/counties");
+    await expect(page.locator('a[href^="/county/"]')).toHaveCount(88);
+  });
+});
+

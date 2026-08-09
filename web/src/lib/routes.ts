@@ -16,6 +16,15 @@ export const districtScenario = (irn: string): string => `/district/${irn}/scena
 export const districtFinances = (irn: string): string => `/district/${irn}/finances`;
 export const districtTaxes = (irn: string): string => `/district/${irn}/taxes`;
 
+/**
+ * A county, by its slug.
+ *
+ * Counties are a peer group rather than a boundary here — the department attributes each district
+ * to one county and school district lines cross county lines freely — so the route is
+ * `/county/…` singular, naming the page's subject rather than claiming an aggregate.
+ */
+export const county = (slug: string): string => `/county/${slug}`;
+
 /** A corpus node, by its class and file stem. */
 export const wikiNode = (className: string, node: string): string =>
   `/wiki/${className}/${node}`;

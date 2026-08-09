@@ -391,6 +391,7 @@ fn to_district(
     District {
         irn: record.irn.clone(),
         name: record.name.clone(),
+        county: record.county.clone(),
         adm,
         current_year_adm: record.current_year_adm,
         base_cost_build_up: build_up(record),

@@ -593,6 +593,19 @@ pub struct DistrictRecord {
     /// this one. Reproducing any of them from `current_year_adm` gets an answer that is close, and
     /// wrong, which is the failure mode that is hardest to notice.
     pub categorical_enrolled_adm: Adm,
+    /// The county the department attributes the district to, from `Base_Cost`.
+    ///
+    /// One county per district, which is a **simplification the department makes and this corpus
+    /// inherits**. School district boundaries follow historical township and municipal lines and
+    /// cross county lines freely; the calculator picks one anyway, presumably the seat of the
+    /// district's administrative office. So a county grouping built on this is the department's
+    /// own attribution rather than a geographic fact, and a district's pupils and valuation are
+    /// not all inside the county named here.
+    ///
+    /// That is acceptable for comparison — the question "how does my district compare with its
+    /// neighbours" wants a peer group, not a polygon — and it is not acceptable for anything that
+    /// sums to a county total and calls it the county's. The site does the former.
+    pub county: String,
     /// Temporary transitional aid guarantee.
     pub guarantee: Dollars,
     /// Enrolled ADM in each of [`HISTORY_YEARS`].
@@ -787,6 +800,7 @@ mod column {
     pub const TA_SUPPLEMENT_ELIGIBLE: usize = 106;
     /// `[a] Enrolled ADM` — the count the four categorical sheets are paid on.
     pub const CATEGORICAL_ENROLLED_ADM: usize = 107;
+    pub const COUNTY: usize = 108;
 }
 
 /// The header this loader expects, so a fixture reshaped without updating [`column`] fails
@@ -806,7 +820,7 @@ gifted_specialist_k8_units,gifted_specialist_k8_aid,gifted_specialist_9_12_units
 gifted_specialist_9_12_aid,ta_open_enrollment_in,ta_open_enrollment_out,ta_fy19_wealth_index,\
 ta_fy19_enrolled_adm,ta_fy19_total_adm,ta_property_valuation,ta_federal_gross_income,\
 ta_weighted_wealth,ta_capacity_index,ta_capacity_amount,ta_wealth_per_pupil,ta_wealth_index,\
-ta_wealth_amount,ta_supplemental,ta_supplement_eligible,categorical_enrolled_adm";
+ta_wealth_amount,ta_supplemental,ta_supplement_eligible,categorical_enrolled_adm,county";
 
 /// Every district in the department's FY2027 model.
 ///
@@ -940,6 +954,7 @@ pub fn panel() -> Vec<DistrictRecord> {
                     specialist_9_12_aid: required(column::GIFTED_SPECIALIST_9_12_AID),
                 },
                 categorical_enrolled_adm: required(column::CATEGORICAL_ENROLLED_ADM),
+                county: fields.get(column::COUNTY).unwrap_or(&"").to_string(),
                 net_state_funding: required(column::NET_STATE_FUNDING),
                 guarantee: required(column::GUARANTEE),
                 adm_history: [

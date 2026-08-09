@@ -18,6 +18,7 @@ import { expect, test } from "vitest";
 
 import { loadCorpus, resolveTarget } from "../../src/lib/corpus.ts";
 import { loadFeed } from "../../src/lib/feed.ts";
+import { counties } from "../../src/lib/county.ts";
 import * as routes from "../../src/lib/routes.ts";
 
 const corpus = loadCorpus();
@@ -35,6 +36,8 @@ const PAGES = new Set<string>([
   "/data",
   "/wiki",
   "/wiki/source",
+  "/counties",
+  ...counties(bundle.districts).map((c) => routes.county(c.slug)),
   ...bundle.districts.flatMap((d) => [
     routes.district(d.irn),
     routes.districtOutcome(d.irn),

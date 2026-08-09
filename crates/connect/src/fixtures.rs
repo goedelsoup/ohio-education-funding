@@ -161,12 +161,15 @@ pub const FY27_HEADER: &[&str] = &[
     "ta_supplemental",
     "ta_supplement_eligible",
     "categorical_enrolled_adm",
+    "county",
 ];
 
 /// Column positions in the department's `Base_Cost` sheet, whose header is on the fourth row.
 /// Named here rather than inline so a layout change is one edit.
 mod base_cost_columns {
     pub const NAME: usize = 1;
+    /// `County Names`. Every categorical sheet carries it too, and they agree.
+    pub const COUNTY: usize = 2;
     pub const BUILDINGS: usize = 3;
     pub const ADM: usize = 7;
     pub const KINDERGARTEN: usize = 8;
@@ -913,6 +916,12 @@ pub fn build_fy27_model(sheets: &Fy27Sheets<'_>) -> Vec<Vec<String>> {
             adm_year(adm_columns::CATEGORICAL_ENROLLED_ADM),
             9,
         ));
+        // The county, from the same sheet the district's identity comes from. Ohio's 88 counties
+        // are the unit almost every reader already has a mental model of, and until now the only
+        // grouping the site offered was the whole state.
+        out.last_mut()
+            .expect("just pushed")
+            .push(clean_name(cell(row, base_cost_columns::COUNTY)));
     }
     out
 }

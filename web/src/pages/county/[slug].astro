@@ -1,0 +1,45 @@
+---
+/**
+ * One county: the districts the department groups there, and how far apart they are.
+ *
+ * Built at build time, one page per county, because the set is 88 and fixed. Everything on the
+ * page is markup before any script runs, like every other page here.
+ */
+import Base from "../../layouts/Base.astro";
+import { counties, medianRealizedAid, renderCounty } from "../../lib/county.ts";
+import { loadFeed } from "../../lib/feed.ts";
+import { count, money } from "../../lib/format.ts";
+
+export async function getStaticPaths() {
+  const { bundle } = loadFeed();
+  return counties(bundle.districts).map((county) => ({
+    params: { slug: county.slug },
+    props: { county },
+  }));
+}
+
+const { county } = Astro.props;
+const { bundle } = loadFeed();
+const medianAid = medianRealizedAid(bundle.districts);
+
+const description =
+  county.valuationRatio == null
+    ? `${county.name} County's school district in Ohio's FY${bundle.fiscal_year} funding model.`
+    : `The ${county.districts.length} school districts the department places in ${county.name} County, Ohio, compared: property wealth per pupil, state aid, and a ${county.valuationRatio.toFixed(1)}× gap between the richest and poorest.`;
+---
+
+<Base title={`${county.name} County`} description={description} section="counties" wide>
+  <h1>{county.name} County</h1>
+  <p class="sub">
+    {count(county.districts.length)} district{county.districts.length === 1 ? "" : "s"} ·
+    {" "}{count(Math.round(county.adm))} pupils
+    {county.onGuarantee > 0 ? ` · ${count(county.onGuarantee)} on the guarantee` : ""}
+    {county.atMillageFloor > 0 ? ` · ${count(county.atMillageFloor)} at the 20-mill floor` : ""}
+    {county.valuationRatio != null ? ` · richest ${county.valuationRatio.toFixed(1)}× the poorest` : ""}
+  </p>
+
+  <p class="note"><a href="/counties">All {count(88)} counties</a>, ordered by that ratio. The
+    median Ohio district receives {money(medianAid)} per pupil in state aid.</p>
+
+  <Fragment set:html={renderCounty(county, bundle.statewide, medianAid)} />
+</Base>

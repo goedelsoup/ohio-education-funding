@@ -18,7 +18,9 @@ import {
   renderCategoricals,
   renderPosition,
 } from "../../lib/district.ts";
+import { slugify } from "../../lib/county.ts";
 import { districtPaths, loadFeed } from "../../lib/feed.ts";
+import * as routes from "../../lib/routes.ts";
 import { money, pct } from "../../lib/format.ts";
 
 export const getStaticPaths = districtPaths;
@@ -35,7 +37,8 @@ const description = district.on_guarantee
 <Base title={district.name} description={description} section="districts">
   <h1>{district.name}</h1>
   <p class="sub">
-    IRN {district.irn} · {bundle.statewide.districts} districts in the FY{bundle.fiscal_year} model
+    IRN {district.irn} · <a href={routes.county(slugify(district.county))}>{district.county} County</a>
+    · {bundle.statewide.districts} districts in the FY{bundle.fiscal_year} model
     · {district.on_guarantee ? "on the guarantee" : "on formula"}
     {
       district.at_millage_floor

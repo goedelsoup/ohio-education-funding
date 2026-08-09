@@ -341,6 +341,15 @@ export const DistrictSchema = z
     /** Six digits, always. 28 of the 609 *names* are shared, so this is the only safe key. */
     irn: z.string().regex(/^\d{6}$/, "an IRN is six digits"),
     name: z.string().min(1),
+    /**
+     * The county the department attributes the district to.
+     *
+     * One county per district — the department's own simplification, since school district
+     * boundaries cross county lines freely and the calculator picks one anyway. Good enough to
+     * group peers by, and not good enough to sum into a figure called the county's, which is why
+     * `/county/…` compares districts rather than reporting county totals.
+     */
+    county: z.string().min(1),
     /** Base cost enrolled ADM: the greater of the three-year average and the current year. */
     adm: num,
     /** Current-year enrolled ADM, FY2026. The denominator the state share is paid on. */

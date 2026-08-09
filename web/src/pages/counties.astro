@@ -1,0 +1,69 @@
+---
+/**
+ * Ohio's 88 counties, ranked by the disparity inside them.
+ *
+ * The ordering is the argument. An alphabetical list of counties is a directory; a list ordered by
+ * how far apart the richest and poorest district in each one are is a finding, and it puts the
+ * places where two neighbouring districts stand on wildly different tax bases at the top where a
+ * reader will meet them.
+ */
+import Base from "../layouts/Base.astro";
+import { counties } from "../lib/county.ts";
+import { loadFeed } from "../lib/feed.ts";
+import { count, money } from "../lib/format.ts";
+import * as routes from "../lib/routes.ts";
+
+const { bundle } = loadFeed();
+const all = counties(bundle.districts);
+const ranked = [...all].sort((a, b) => (b.valuationRatio ?? 0) - (a.valuationRatio ?? 0));
+const widest = ranked[0]!;
+const measurable = all.filter((c) => c.valuationRatio != null);
+---
+
+<Base
+  title="Counties"
+  description={`Ohio's ${all.length} counties, ranked by how far apart the richest and poorest school district in each one is on property wealth per pupil.`}
+  section="counties"
+  wide
+>
+  <h1>Counties</h1>
+  <p class="sub">
+    Ohio's {count(all.length)} counties, ordered by the gap between the richest and poorest school
+    district inside each one. {widest.name} is the widest at{" "}
+    {widest.valuationRatio!.toFixed(1)}&times;, and {count(measurable.filter((c) => c.valuationRatio! >= 3).length)}{" "}
+    counties have districts three or more times apart on the tax base each pupil stands on.
+  </p>
+
+  <div class="card">
+    <p class="note">
+      A county here is a <strong>peer group, not a boundary</strong>. The department attributes each
+      district to exactly one county; Ohio school district lines follow historical township lines
+      and cross county lines freely. So these pages compare districts the department groups
+      together, and none of them reports a figure as the county's own.
+    </p>
+  </div>
+
+  <div class="card">
+    <div class="scroll"><table>
+      <thead><tr>
+        <th>County</th><th class="tnum">Districts</th><th class="tnum">Pupils</th>
+        <th class="tnum">Richest &divide; poorest</th><th>Widest pair</th>
+      </tr></thead>
+      <tbody>
+        {ranked.map((c) => (
+          <tr>
+            <th><a href={routes.county(c.slug)}>{c.name}</a></th>
+            <td class="tnum">{count(c.districts.length)}</td>
+            <td class="tnum">{count(Math.round(c.adm))}</td>
+            <td class="tnum">{c.valuationRatio == null ? "—" : `${c.valuationRatio.toFixed(1)}×`}</td>
+            <td class="n">
+              {c.richest && c.poorest
+                ? `${c.richest.name} ${money(c.richest.valuation_per_pupil!)} · ${c.poorest.name} ${money(c.poorest.valuation_per_pupil!)}`
+                : "a single district — no internal spread to measure"}
+            </td>
+          </tr>
+        ))}
+      </tbody>
+    </table></div>
+  </div>
+</Base>
