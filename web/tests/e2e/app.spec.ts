@@ -1502,3 +1502,43 @@ test.describe("outside the formula", () => {
   });
 });
 
+test.describe("the hold-harmless machinery", () => {
+  test("the guarantee's open-enrolment clawback is shown as a deduction", async ({ page }) => {
+    /*
+     * The guarantee is not "hold the district at its old amount". A guaranteed district losing
+     * open-enrolment FTE beyond a threshold has its guarantee cut at the full statewide average
+     * base cost per pupil — more than the state was paying for those pupils. Columbus lost 106.2
+     * FTE and had $674,561 taken off.
+     */
+    await page.goto("/district/043802");
+    const table = page.locator('table[data-program="hold-harmless"]');
+    await expect(table).toBeVisible();
+    await expect(table).toContainText("FY2021 funding base");
+    await expect(table).toContainText("Open-enrolment clawback");
+    await expect(page.locator("main")).toContainText("not at this district's share of it");
+  });
+
+  test("the second hold-harmless is named as a second one", async ({ page }) => {
+    // The formula transition supplement holds a district at a larger FY2021 base that includes
+    // transportation, and reaches 17 districts the guarantee does not.
+    await page.goto("/district/043802");
+    const main = page.locator("main");
+    await expect(main).toContainText("Formula transition supplement");
+    await expect(main).toContainText("three");
+    await expect(main).toContainText("anchored to");
+  });
+
+  test("a district touched by neither shows no hold-harmless table", async ({ page }) => {
+    // The block renders only what applies, so a district on formula with no clawback and no
+    // supplement gets nothing rather than a table of dashes.
+    const feed = await (await page.request.get("/data/bundle.json")).json();
+    const clean = feed.districts.find(
+      (d: { transition: { open_enrollment_adjustment: number; transition_supplement: number } }) =>
+        d.transition.open_enrollment_adjustment === 0 && d.transition.transition_supplement === 0,
+    );
+    expect(clean, "a district touched by neither mechanism").toBeTruthy();
+    await page.goto(`/district/${clean.irn}`);
+    await expect(page.locator('table[data-program="hold-harmless"]')).toHaveCount(0);
+  });
+});
+

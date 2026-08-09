@@ -73,7 +73,7 @@ use edfund_core::Dollars;
 /// from FY2022-FY2024 to FY2024-FY2026 — the years the department's `ADM Data` sheet declares.
 /// The values did not change; what they are called did, which is exactly the kind of silent
 /// meaning change the version guard exists for.
-pub const CONTRACT_VERSION: &str = "22.0.0";
+pub const CONTRACT_VERSION: &str = "23.0.0";
 
 /// How close to the floor counts as being on it, in mills.
 ///
@@ -801,6 +801,30 @@ pub struct PreschoolSpecialEducation {
     pub unprorated: Dollars,
 }
 
+/// The guarantee's machinery, and the second hold-harmless stacked on it.
+///
+/// The guarantee is not "hold the district at its old amount": it is the FY2021 funding base less
+/// an **open-enrolment clawback** less foundation funding. And a *second* hold-harmless sits above
+/// it against a larger FY2021 base, one that includes transportation — reaching 17 districts the
+/// guarantee does not.
+#[derive(Debug, Clone, Copy, PartialEq, Default)]
+pub struct Transition {
+    /// The FY2021 amount the guarantee compares foundation funding against.
+    pub funding_base: Dollars,
+    /// Open enrolment FTE, last year and this.
+    pub open_enrollment_prior: f64,
+    /// This year.
+    pub open_enrollment_current: f64,
+    /// How much of a loss is absorbed before the clawback applies, and what it costs beyond it.
+    pub open_enrollment_threshold: f64,
+    /// What the loss beyond it costs the guarantee.
+    pub open_enrollment_adjustment: Dollars,
+    /// A FY2021 base that includes transportation, and the supplement it produces.
+    pub fy21_funding_base: Dollars,
+    /// What that larger base holds the district at.
+    pub transition_supplement: Dollars,
+}
+
 /// One district, as the web layer needs it.
 #[derive(Debug, Clone, PartialEq)]
 pub struct District {
@@ -814,6 +838,8 @@ pub struct District {
     pub transportation: Transportation,
     /// Preschool special education, the last line in the same gap.
     pub preschool_special_education: PreschoolSpecialEducation,
+    /// The guarantee's machinery, and the transition supplement stacked on it.
+    pub transition: Transition,
     /// The Ohio House districts this district lies in, largest share first.
     ///
     /// Usually one — 270 of 609 districts sit inside a single House district — and up to eleven.
@@ -1665,6 +1691,29 @@ impl Bundle {
                 opt(d.supplements.progress),
                 opt(d.supplements.growth_forgone)
             ));
+            s.push_str(&fields(
+                "transition",
+                &[
+                    ("funding_base", d.transition.funding_base),
+                    ("open_enrollment_prior", d.transition.open_enrollment_prior),
+                    (
+                        "open_enrollment_current",
+                        d.transition.open_enrollment_current,
+                    ),
+                    (
+                        "open_enrollment_threshold",
+                        d.transition.open_enrollment_threshold,
+                    ),
+                    (
+                        "open_enrollment_adjustment",
+                        d.transition.open_enrollment_adjustment,
+                    ),
+                    ("fy21_funding_base", d.transition.fy21_funding_base),
+                    ("transition_supplement", d.transition.transition_supplement),
+                ],
+                &[],
+            ));
+            s.push_str(", ");
             s.push_str(&array_pair(
                 "preschool_special_education",
                 "adm",
@@ -2115,6 +2164,15 @@ mod tests {
             irn: "049056".into(),
             name: "Northern Local".into(),
             county: "Perry".into(),
+            transition: Transition {
+                funding_base: 12_400_000.0,
+                open_enrollment_prior: 214.5,
+                open_enrollment_current: 96.4,
+                open_enrollment_threshold: 21.45,
+                open_enrollment_adjustment: 800_412.0,
+                fy21_funding_base: 13_100_000.0,
+                transition_supplement: 41_900.0,
+            },
             preschool_special_education: PreschoolSpecialEducation {
                 adm: [6.4, 15.2, 1.0, 0.0, 0.0, 1.0],
                 aid: [31_800.0, 78_100.0, 5_900.0, 0.0, 0.0, 8_400.0],

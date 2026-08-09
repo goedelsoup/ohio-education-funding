@@ -393,7 +393,90 @@ export function renderAidSource(bundle: Bundle, d: District): string {
       <div class="flags">${flags
         .map((f) => `<span class="flag">${escapeHtml(f)}</span>`)
         .join("")}</div>
+      ${renderHoldHarmless(d)}
     </div>`;
+}
+
+/**
+ * What the guarantee actually is, where a district is touched by it.
+ *
+ * # It is not "hold the district at its old amount"
+ *
+ * Two things sit inside the figure the bar above calls "guarantee", and neither is visible in it:
+ *
+ * - an **open-enrolment clawback**. A guaranteed district whose open enrolment FTE has fallen by
+ *   more than `max(10% of last year, 20 FTE)` has its guarantee reduced by the **statewide average
+ *   base cost per pupil** for every FTE beyond that — $8,241.61 each, at full value rather than the
+ *   district's state share. 43 districts, $5.1m withheld.
+ * - a **second hold-harmless** above the first. The formula transition supplement holds a district
+ *   at a larger FY2021 base, one that includes transportation, and reaches 144 districts of which
+ *   17 draw nothing from the guarantee.
+ *
+ * With transportation's own guarantee that is three mechanisms anchored to FY2021, on three
+ * different bases. This block renders only the parts that apply, so a district touched by none of
+ * them shows nothing.
+ */
+function renderHoldHarmless(d: District): string {
+  const t = d.transition;
+  const clawback = t.open_enrollment_adjustment > 0;
+  const supplement = t.transition_supplement > 0;
+  if (!clawback && !supplement) return "";
+
+  const lost = t.open_enrollment_prior - t.open_enrollment_current;
+  const beyond = Math.max(lost - t.open_enrollment_threshold, 0);
+
+  return `
+    <div class="scroll"><table data-program="hold-harmless">
+      <thead><tr><th>Step</th><th class="tnum">Value</th><th>What it is</th></tr></thead>
+      <tbody>
+        <tr><th>FY2021 funding base</th><td class="tnum">${money(t.funding_base)}</td>
+          <td class="n">What the guarantee compares formula funding against.</td></tr>
+        ${
+          clawback
+            ? `<tr class="current"><th>Open-enrolment clawback</th>
+                <td class="tnum">&minus;${money(t.open_enrollment_adjustment)}</td>
+                <td class="n">Its open enrolment fell ${lost.toFixed(1)} FTE against a threshold of
+                  ${t.open_enrollment_threshold.toFixed(1)}, and the guarantee is cut by
+                  ${money(8241.61)} — the statewide average base cost per pupil — for each of the
+                  ${beyond.toFixed(1)} FTE beyond it.</td></tr>`
+            : ""
+        }
+        <tr><th>Guarantee</th><td class="tnum">${
+          d.guarantee <= 0 ? "—" : money(d.guarantee)
+        }</td>
+          <td class="n">${
+            d.guarantee > 0
+              ? "The base, less the clawback, less what the formula computes."
+              : "The formula reaches its FY2021 base, so this pays nothing."
+          }</td></tr>
+        ${
+          supplement
+            ? `<tr class="current"><th>Formula transition supplement</th>
+                <td class="tnum">${money(t.transition_supplement)}</td>
+                <td class="n">A <em>second</em> hold-harmless, against a larger FY2021 base of
+                  ${money(t.fy21_funding_base)} that includes transportation.</td></tr>`
+            : ""
+        }
+      </tbody>
+    </table></div>
+    ${
+      clawback
+        ? `<p class="note"><strong>The clawback is charged at the full per-pupil base cost, not at
+           this district's share of it.</strong> The state was paying its
+           <em>share</em> of ${money(8241.61)} for each of those pupils — for a district at the 10%
+           minimum that is about ${money(824)} — and the guarantee falls by the whole
+           ${money(8241.61)} when they leave. Whether that is a deliberate incentive or an artefact of reaching for a
+           convenient statewide figure is not established here.</p>`
+        : ""
+    }
+    ${
+      supplement
+        ? `<p class="note">Ohio has <strong>three</strong> hold-harmless mechanisms anchored to
+           FY2021, on three different bases: the guarantee above, this supplement, and a separate
+           one inside transportation. They hold overlapping but different sets of districts —
+           17 draw this supplement while drawing nothing from the guarantee.</p>`
+        : ""
+    }`;
 }
 
 /**

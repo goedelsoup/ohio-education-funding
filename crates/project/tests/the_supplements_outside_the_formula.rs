@@ -19,7 +19,8 @@
 use project::panel::{
     self, DistrictRecord, PerformanceSupplement, Supplements, AVERAGE_BASE_COST_PER_PUPIL,
     BASE_FUNDING_SUPPLEMENT_PER_PUPIL, ENROLLMENT_GROWTH_SUPPLEMENT_PER_PUPIL,
-    ENROLLMENT_GROWTH_THRESHOLD, PERFORMANCE_SUPPLEMENT_PER_POINT, PREK_SPED_APPROPRIATION,
+    ENROLLMENT_GROWTH_THRESHOLD, OPEN_ENROLLMENT_CLAWBACK_PER_FTE, OPEN_ENROLLMENT_THRESHOLD_FLOOR,
+    OPEN_ENROLLMENT_THRESHOLD_FRACTION, PERFORMANCE_SUPPLEMENT_PER_POINT, PREK_SPED_APPROPRIATION,
     PREK_SPED_FLAT_PER_PUPIL, PREK_SPED_PRORATION, PREK_SPED_WEIGHT_FRACTION,
     SPECIAL_EDUCATION_WEIGHTS,
 };
@@ -642,5 +643,201 @@ fn nothing_material_is_left_unexplained_outside_foundation_funding() {
         share < 1.02,
         "{share:.4} — more has been attributed than sits outside the formula, which means \
          something here is also inside it"
+    );
+}
+
+// ---------------------------------------------------------------------------------------------
+// The guarantee's machinery, and the residual it turned out to be
+// ---------------------------------------------------------------------------------------------
+
+/// The $63.6m residual has a name: `[K] Formula Transition Supplement`.
+///
+/// It is a **second** hold-harmless stacked on the guarantee, against a larger base:
+/// `max(FY21 funding base − (foundation funding + guarantee + supplemental targeted assistance +
+/// transportation), 0)`.
+///
+/// The `[H2]` base the guarantee compares against covers foundation funding. This `[L1]` base
+/// covers foundation funding *plus transportation*, so a district whose transportation has fallen
+/// can draw this while drawing nothing from the guarantee — and **17 of the 144 districts on it
+/// are not on the guarantee at all**.
+#[test]
+fn the_transition_supplement_is_a_second_hold_harmless_on_a_larger_base() {
+    let panel = panel::panel();
+    let mut drawing = 0;
+    let mut without_the_guarantee = 0;
+
+    for record in &panel {
+        let t = &record.transition;
+        let computed = t.fy21_funding_base
+            - (record.core_foundation_funding
+                + record.guarantee
+                + record.categoricals.targeted_assistance * 0.0
+                + record.transportation.total);
+        // Supplemental targeted assistance is zero for every district, so it drops out of the
+        // reproduction — but it is in the department's formula and is named here so that a future
+        // biennium funding it does not silently break this.
+        let expected = computed.max(0.0);
+        assert!(
+            (expected - t.transition_supplement).abs() < 0.05,
+            "{}: computed {expected:.2} against published {:.2}",
+            record.name,
+            t.transition_supplement
+        );
+        if t.transition_supplement > 0.0 {
+            drawing += 1;
+            if record.guarantee <= 0.0 {
+                without_the_guarantee += 1;
+            }
+        }
+    }
+
+    assert!(
+        (100..200).contains(&drawing),
+        "{drawing} districts draw the transition supplement"
+    );
+    assert!(
+        without_the_guarantee > 0,
+        "the supplement should reach districts the guarantee does not; it reaches \
+         {without_the_guarantee}"
+    );
+}
+
+/// The guarantee has an open-enrolment clawback, and the corpus did not know.
+///
+/// `[I]` is not "hold the district at its old amount". It is `funding base − open enrolment
+/// adjustment − foundation funding`, and the middle term reduces the guarantee of a district whose
+/// open enrolment FTE has fallen by more than `max(10% of last year, 20 FTE)`.
+///
+/// **The rate is the full statewide average base cost per pupil, $8,241.61 — not the district's
+/// state share of it.** A district at the 10% minimum share was receiving about $824 of state
+/// money for that pupil and loses ten times as much guarantee when the pupil leaves.
+#[test]
+fn the_guarantee_is_clawed_back_for_lost_open_enrolment_at_the_full_per_pupil_rate() {
+    let panel = panel::panel();
+    let mut clawed = 0;
+    let mut withheld = 0.0;
+
+    for record in &panel {
+        let t = &record.transition;
+        let threshold = (t.open_enrollment_prior * OPEN_ENROLLMENT_THRESHOLD_FRACTION)
+            .max(OPEN_ENROLLMENT_THRESHOLD_FLOOR);
+        assert!(
+            (threshold - t.open_enrollment_threshold).abs() < 0.02,
+            "{}: threshold computed {threshold:.2} against published {:.2}",
+            record.name,
+            t.open_enrollment_threshold
+        );
+
+        let expected = if t.open_enrollment_lost() >= t.open_enrollment_threshold {
+            t.clawed_back_fte() * OPEN_ENROLLMENT_CLAWBACK_PER_FTE
+        } else {
+            0.0
+        };
+        assert!(
+            (expected - t.open_enrollment_adjustment).abs() < 0.05,
+            "{}: clawback computed {expected:.2} against published {:.2}",
+            record.name,
+            t.open_enrollment_adjustment
+        );
+
+        if t.open_enrollment_adjustment > 0.0 {
+            clawed += 1;
+            withheld += t.open_enrollment_adjustment;
+        }
+    }
+
+    assert!(
+        (20..80).contains(&clawed),
+        "{clawed} districts are clawed back"
+    );
+    assert!(
+        withheld > 4e6,
+        "the clawback withholds {withheld:.0}, which is smaller than recorded"
+    );
+}
+
+/// And the guarantee itself reproduces once the clawback is in the formula.
+///
+/// This is the check the corpus could not have made before: its guarantee node described a
+/// hold-harmless with no clawback in it, and a reproduction from that description would have been
+/// wrong for 43 districts and right for the rest — the failure mode that looks like rounding.
+#[test]
+fn the_guarantee_reproduces_only_with_the_clawback_in_it() {
+    let panel = panel::panel();
+    let mut wrong_without_it = 0;
+
+    for record in &panel {
+        let t = &record.transition;
+        let base = t.funding_base;
+        let with_clawback = if base > record.core_foundation_funding {
+            (base - t.open_enrollment_adjustment - record.core_foundation_funding).max(0.0)
+        } else {
+            0.0
+        };
+        assert!(
+            (with_clawback - record.guarantee).abs() < 0.05,
+            "{}: computed {with_clawback:.2} against published {:.2}",
+            record.name,
+            record.guarantee
+        );
+
+        let naive = (base - record.core_foundation_funding).max(0.0);
+        if (naive - record.guarantee).abs() > 1.0 {
+            wrong_without_it += 1;
+        }
+    }
+
+    assert!(
+        wrong_without_it > 20,
+        "a guarantee described without the clawback is wrong for {wrong_without_it} districts — \
+         few enough to look like rounding, which is why it went unnoticed"
+    );
+}
+
+/// Three mechanisms anchored to FY2021, on three different bases, holding three different sets.
+///
+/// The corpus has one node for a "temporary transitional aid guarantee". There are three:
+///
+/// - `[I]` holds a district at its FY2021 **funding base**, less the open-enrolment clawback;
+/// - `[K]` holds it at a FY2021 base that **includes transportation**;
+/// - transportation's own `[F]` holds it at FY2021 **transportation funding** alone.
+///
+/// They reach overlapping but different districts, which is what makes them three mechanisms
+/// rather than one applied three times.
+#[test]
+fn three_separate_mechanisms_are_anchored_to_fiscal_2021() {
+    let panel = panel::panel();
+    let on =
+        |pick: fn(&panel::DistrictRecord) -> f64| panel.iter().filter(|r| pick(r) > 0.0).count();
+    let formula = on(|r| r.guarantee);
+    let transition = on(|r| r.transition.transition_supplement);
+    let transport = on(|r| r.transportation.guarantee);
+
+    assert!(formula > 250 && transition > 100 && transport > 20);
+
+    // No two of them hold the same set, and none is a subset of another.
+    let only_transition = panel
+        .iter()
+        .filter(|r| r.transition.transition_supplement > 0.0 && r.guarantee <= 0.0)
+        .count();
+    let only_transport = panel
+        .iter()
+        .filter(|r| r.transportation.guarantee > 0.0 && r.guarantee <= 0.0)
+        .count();
+    assert!(
+        only_transition > 0 && only_transport > 0,
+        "{only_transition} draw the transition supplement without the guarantee and \
+         {only_transport} draw transportation's without it; if either were zero the mechanisms \
+         could be nested rather than distinct"
+    );
+
+    // And the FY2021 bases differ, which is why they can.
+    let differing = panel
+        .iter()
+        .filter(|r| (r.transition.fy21_funding_base - r.transition.funding_base).abs() > 1.0)
+        .count();
+    assert!(
+        differing > panel.len() / 2,
+        "only {differing} districts have different FY2021 bases for the two hold-harmlesses"
     );
 }

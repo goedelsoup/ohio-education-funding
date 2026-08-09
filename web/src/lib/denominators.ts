@@ -181,6 +181,15 @@ export const FIELD_DENOMINATORS: Record<string, DenominatorKey | null> = {
   // three years apart in what they compare.
   "districts[].supplements.enrollment_change": null,
 
+  // The guarantee's open-enrolment clawback. `prior` and `current` are FTE counts and the
+  // threshold is measured in the same FTE, so none is a quantity over a pupil count. The
+  // adjustment is dollars — and dollars per *lost* FTE, which is not a denominator anything else
+  // on the site divides by and must never be shown as a per-pupil figure beside one that is.
+  "districts[].transition.open_enrollment_prior": null,
+  "districts[].transition.open_enrollment_current": null,
+  "districts[].transition.open_enrollment_threshold": null,
+  "districts[].transition.open_enrollment_adjustment": null,
+
   // Dimensionless: a change, and correlations whose parts each cancel their own denominator.
   "districts[].enrollment_change": null,
   "statewide.outcomes.enrolled_spending_vs_performance": null,

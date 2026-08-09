@@ -866,6 +866,86 @@ impl PreschoolSpecialEducation {
     }
 }
 
+/// The guarantee's own machinery, and the second hold-harmless stacked on top of it.
+///
+/// # The guarantee is not "hold the district at its old amount"
+///
+/// `[I] Temporary Transitional Aid Guarantee` is `funding base − open enrolment adjustment −
+/// foundation funding`, floored at zero — and the middle term is a **clawback** the corpus did not
+/// know about.
+///
+/// A guaranteed district whose open enrolment FTE has fallen by more than `max(10% of last year,
+/// 20 FTE)` has its guarantee reduced by the **statewide average base cost per pupil** for every
+/// FTE beyond that threshold. **43 districts, $5.1m withheld.** Columbus lost 106.2 FTE against a
+/// threshold of 24.3 and had $674,561 cut; Cuyahoga Falls lost 118.1 and had $640,025 cut.
+///
+/// The rate is the striking part. It is $8,241.61 — the **full** average base cost per pupil, not
+/// the district's state share of it. A district at the 10% minimum state share was receiving about
+/// $824 of state money for that pupil and loses ten times as much guarantee when the pupil goes.
+/// Whether that is intended as a strong incentive or is an artefact of using a convenient
+/// statewide figure is not established. [open]
+///
+/// # And there is a third FY2021 anchor
+///
+/// `[K] Formula Transition Supplement` is a **second** hold-harmless on top of the first, against a
+/// larger base: `max(FY21 funding base − (foundation funding + guarantee + supplemental targeted
+/// assistance + transportation), 0)`. $63.6m to 144 districts — **17 of which are not on the
+/// guarantee at all**, so this reaches districts the guarantee does not.
+///
+/// With transportation's own guarantee that makes three mechanisms anchored to FY2021, on three
+/// different bases, each holding a different set of districts. The corpus has one node for them.
+#[derive(Debug, Clone, Copy, PartialEq, Default)]
+pub struct Transition {
+    /// `[H2]` — the FY2021 amount the guarantee compares foundation funding against.
+    pub funding_base: Dollars,
+    /// `[H3]` — the DPIA part of that base, which the phase-in dials separately.
+    pub funding_base_econ_dis: Dollars,
+    /// `[h1]`/`[h2]` — open enrolment FTE, last year and this.
+    pub open_enrollment_prior: f64,
+    /// This year.
+    pub open_enrollment_current: f64,
+    /// `[I2]` — how much of a loss the district may absorb before the clawback applies.
+    pub open_enrollment_threshold: f64,
+    /// `[I1]` — what the loss beyond that threshold costs its guarantee.
+    pub open_enrollment_adjustment: Dollars,
+    /// `[L1]` — a FY2021 base that includes transportation, unlike `[H2]`.
+    pub fy21_funding_base: Dollars,
+    /// `[K]` — the second hold-harmless, against that larger base.
+    pub transition_supplement: Dollars,
+}
+
+/// Charged per open enrolment FTE lost beyond the threshold: the full statewide average base cost
+/// per pupil, not the district's state share of it.
+pub const OPEN_ENROLLMENT_CLAWBACK_PER_FTE: Dollars = 8241.61;
+/// The threshold is the greater of a tenth of last year's FTE and this floor.
+pub const OPEN_ENROLLMENT_THRESHOLD_FRACTION: f64 = 0.1;
+/// The floor on it, so a small district is not clawed back over a handful of FTE.
+pub const OPEN_ENROLLMENT_THRESHOLD_FLOOR: f64 = 20.0;
+
+impl Transition {
+    /// Open enrolment FTE lost since last year. Negative where the district gained.
+    #[must_use]
+    pub fn open_enrollment_lost(&self) -> f64 {
+        self.open_enrollment_prior - self.open_enrollment_current
+    }
+
+    /// The loss beyond what the threshold absorbs, which is what the clawback is charged on.
+    #[must_use]
+    pub fn clawed_back_fte(&self) -> f64 {
+        (self.open_enrollment_lost() - self.open_enrollment_threshold).max(0.0)
+    }
+
+    /// What the guarantee would have been without the clawback.
+    ///
+    /// `None` where no clawback applied. The difference is the point: a district's guarantee is
+    /// reported as one number and is two, and only one of them is about its funding.
+    #[must_use]
+    pub fn guarantee_before_clawback(&self, guarantee: Dollars) -> Option<Dollars> {
+        (self.open_enrollment_adjustment > 0.0 && guarantee > 0.0)
+            .then_some(guarantee + self.open_enrollment_adjustment)
+    }
+}
+
 /// One district as the department modelled it.
 #[derive(Debug, Clone, PartialEq)]
 pub struct DistrictRecord {
@@ -998,6 +1078,8 @@ pub struct DistrictRecord {
     pub transportation: Transportation,
     /// Preschool special education: a flat $4,000 a pupil plus the weights at half.
     pub preschool_special_education: PreschoolSpecialEducation,
+    /// The guarantee's machinery, and the transition supplement stacked on it.
+    pub transition: Transition,
     /// The county the department attributes the district to, from `Base_Cost`.
     ///
     /// One county per district, which is a **simplification the department makes and this corpus
@@ -1219,10 +1301,19 @@ mod column {
     /// Transportation: eleven inputs then nine payments, in sheet order.
     pub const TRANS_FIRST_INPUT: usize = 119;
     pub const TRANS_FIRST_PAYMENT: usize = 132;
+    /// The guarantee's machinery, emitted before the preschool block.
+    pub const FUNDING_BASE: usize = 141;
+    pub const FUNDING_BASE_ECON_DIS: usize = 142;
+    pub const OPEN_ENROLLMENT_PRIOR: usize = 143;
+    pub const OPEN_ENROLLMENT_CURRENT: usize = 144;
+    pub const OPEN_ENROLLMENT_THRESHOLD: usize = 145;
+    pub const OPEN_ENROLLMENT_ADJUSTMENT: usize = 146;
+    pub const FY21_FUNDING_BASE: usize = 147;
+    pub const FORMULA_TRANSITION_SUPPLEMENT: usize = 148;
     /// Preschool special education: six counts, six amounts, and their total.
-    pub const PREK_FIRST_ADM: usize = 141;
-    pub const PREK_FIRST_AID: usize = 147;
-    pub const PREK_TOTAL: usize = 153;
+    pub const PREK_FIRST_ADM: usize = 149;
+    pub const PREK_FIRST_AID: usize = 155;
+    pub const PREK_TOTAL: usize = 161;
 }
 
 /// The header this loader expects, so a fixture reshaped without updating [`column`] fails
@@ -1251,6 +1342,9 @@ trans_mass_transit_riders,trans_other_riders,trans_bus_miles,trans_assigned_buse
 trans_rider_capacity_target,trans_efficiency_index,trans_district_density,trans_square_miles,trans_reported_sped_cost,trans_school_bus,\
 trans_mass_transit,trans_other,trans_efficiency,trans_density,trans_fy21_base,trans_guarantee,\
 trans_total,trans_special_education,\
+funding_base,funding_base_econ_dis,open_enrollment_fte_prior,open_enrollment_fte_current,\
+open_enrollment_threshold,open_enrollment_adjustment,fy21_funding_base,\
+formula_transition_supplement,\
 prek_sped_adm_cat1,prek_sped_adm_cat2,prek_sped_adm_cat3,prek_sped_adm_cat4,prek_sped_adm_cat5,\
 prek_sped_adm_cat6,prek_sped_aid_cat1,prek_sped_aid_cat2,prek_sped_aid_cat3,prek_sped_aid_cat4,\
 prek_sped_aid_cat5,prek_sped_aid_cat6,prek_sped_total";
@@ -1423,6 +1517,16 @@ pub fn panel() -> Vec<DistrictRecord> {
                         special_education: pay(8),
                     }
                 },
+                transition: Transition {
+                    funding_base: required(column::FUNDING_BASE),
+                    funding_base_econ_dis: required(column::FUNDING_BASE_ECON_DIS),
+                    open_enrollment_prior: required(column::OPEN_ENROLLMENT_PRIOR),
+                    open_enrollment_current: required(column::OPEN_ENROLLMENT_CURRENT),
+                    open_enrollment_threshold: required(column::OPEN_ENROLLMENT_THRESHOLD),
+                    open_enrollment_adjustment: required(column::OPEN_ENROLLMENT_ADJUSTMENT),
+                    fy21_funding_base: required(column::FY21_FUNDING_BASE),
+                    transition_supplement: required(column::FORMULA_TRANSITION_SUPPLEMENT),
+                },
                 preschool_special_education: PreschoolSpecialEducation {
                     adm: std::array::from_fn(|k| required(column::PREK_FIRST_ADM + k)),
                     aid: std::array::from_fn(|k| required(column::PREK_FIRST_AID + k)),
@@ -1452,6 +1556,107 @@ pub fn panel() -> Vec<DistrictRecord> {
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    /// Every block of the fixture lands in the columns the header names.
+    ///
+    /// The header assertion in [`panel`] catches a *renamed* column and the row-length check in
+    /// `connect` catches a *missing* one. Neither catches the two disagreeing about **order**,
+    /// which is what happened when the transition block was emitted before the preschool block and
+    /// listed after it: every value in both blocks was in the wrong field, the row length was
+    /// right, the header was right, and the fixture parsed.
+    ///
+    /// A magnitude check per block is the cheap guard. Each of these is a statewide total that
+    /// could not plausibly be produced by a neighbouring column, so a shifted block fails here
+    /// rather than in whichever test happens to touch it first.
+    #[test]
+    fn each_block_of_the_fixture_lands_in_its_own_columns() {
+        let panel = panel();
+        let total = |pick: fn(&DistrictRecord) -> f64| panel.iter().map(pick).sum::<f64>();
+
+        for (label, got, low, high) in [
+            (
+                "base cost state share",
+                total(|r| r.base_cost_state_share),
+                3.0e9,
+                4.5e9,
+            ),
+            (
+                "targeted assistance",
+                total(|r| r.categoricals.targeted_assistance),
+                1.2e9,
+                1.5e9,
+            ),
+            (
+                "special education",
+                total(|r| r.special_education.total()),
+                0.6e9,
+                0.8e9,
+            ),
+            ("DPIA", total(|r| r.categoricals.dpia), 0.4e9, 0.6e9),
+            ("gifted", total(|r| r.gifted.total()), 40e6, 70e6),
+            (
+                "career-technical",
+                total(|r| r.career_technical.total()),
+                40e6,
+                70e6,
+            ),
+            (
+                "English learners",
+                total(|r| r.english_learners.total()),
+                25e6,
+                50e6,
+            ),
+            (
+                "transportation",
+                total(|r| r.transportation.total),
+                0.6e9,
+                0.8e9,
+            ),
+            (
+                "special education transport",
+                total(|r| r.transportation.special_education),
+                150e6,
+                220e6,
+            ),
+            (
+                "preschool special education",
+                total(|r| r.preschool_special_education.total),
+                130e6,
+                170e6,
+            ),
+            (
+                "performance supplement",
+                total(|r| r.performance.amount),
+                45e6,
+                70e6,
+            ),
+            (
+                "base supplement",
+                total(|r| r.supplements.base_funding),
+                45e6,
+                70e6,
+            ),
+            (
+                "growth supplement",
+                total(|r| r.supplements.growth),
+                25e6,
+                55e6,
+            ),
+            (
+                "transition supplement",
+                total(|r| r.transition.transition_supplement),
+                50e6,
+                80e6,
+            ),
+            ("guarantee", total(|r| r.guarantee), 0.7e9, 1.1e9),
+        ] {
+            assert!(
+                got > low && got < high,
+                "{label} totals {got:.0}, outside the band this block should produce — most \
+                 likely the fixture's columns and its header disagree about order"
+            );
+        }
+    }
 
     #[test]
     fn loads_every_district_in_the_model() {

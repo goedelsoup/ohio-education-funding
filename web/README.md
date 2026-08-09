@@ -463,11 +463,11 @@ Fields: bundle contract version, feed list, last export timestamp, node counts p
 -->
 | Field | Value |
 |---|---|
-| Contract version | `22.0.0` |
+| Contract version | `23.0.0` |
 | Districts in the feed | 609 |
 | Reference checkpoints | 8 |
 | Reference forecasts | 4 |
-| Size | 4611 KB |
+| Size | 4756 KB |
 | Deployment target | Cloudflare Pages, static, with a CSP in `web/public/_headers` |
 
 Regenerate with `cargo run --manifest-path crates/Cargo.toml -p bundle > web/public/data/bundle.json`. CI fails if the committed feed and a fresh one differ.

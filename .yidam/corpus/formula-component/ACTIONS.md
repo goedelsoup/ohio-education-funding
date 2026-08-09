@@ -119,6 +119,30 @@
     year and a different base, holding 38 districts. Whether these are two instances of one
     mechanism or two mechanisms sharing a name is the same modelling question the categoricals
     posed, and it should be answered before either node is edited. [open]
+
+    **THERE ARE THREE, NOT TWO, AND THE EXISTING NODE DESCRIBES ITS OWN MECHANISM INCOMPLETELY.**
+    Reading `Detail_SFPR`'s formulas closed the last $63.6m of the gap and turned up two things
+    the node does not have:
+
+    1. **`[K] Formula Transition Supplement`** is a second hold-harmless stacked on the first,
+       against a *larger* FY2021 base — `[L1]`, which includes transportation where `[H2]` does
+       not. $63.6m to **144 districts, 17 of which draw nothing from the guarantee**. That is the
+       whole of the residual, so nothing material is left unnamed between `[H]` and `[R]`.
+    2. **The guarantee has an open-enrolment clawback.** `[I]` is `funding base − [I1] − foundation
+       funding`, and `[I1]` reduces the guarantee of a district whose open enrolment FTE fell by
+       more than `max(10% of last year, 20 FTE)` — at **$8,241.61 an FTE**, the statewide average
+       base cost per pupil, at full value rather than the district's state share. 43 districts,
+       $5.1m withheld; Columbus lost 106.2 FTE and $674,561.
+
+    The second is the one that matters for the node. A guarantee described without the clawback
+    reproduces correctly for 566 districts and wrongly for 43 — few enough to read as rounding,
+    which is why it survived this long. [verified —
+    `crates/project/tests/the_supplements_outside_the_formula.rs`]
+
+    So the answer to the modelling question is **three nodes**, on the same grounds as the six
+    categoricals: three different FY2021 bases, three different sets of districts, and none nested
+    in another. And the existing node needs the clawback written into it before anything else is
+    built on it.
   - **Proration as a parameter class.** The corpus holds rates, weights, prices, thresholds and
     blends. A proration is none of those: it is an appropriation divided by an entitlement, so it
     is a fact about a budget rather than about a formula, and it moves for reasons nothing else in

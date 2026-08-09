@@ -428,6 +428,18 @@ fn to_district(
         irn: record.irn.clone(),
         name: record.name.clone(),
         county: record.county.clone(),
+        transition: {
+            let t = &record.transition;
+            bundle::Transition {
+                funding_base: t.funding_base,
+                open_enrollment_prior: t.open_enrollment_prior,
+                open_enrollment_current: t.open_enrollment_current,
+                open_enrollment_threshold: t.open_enrollment_threshold,
+                open_enrollment_adjustment: t.open_enrollment_adjustment,
+                fy21_funding_base: t.fy21_funding_base,
+                transition_supplement: t.transition_supplement,
+            }
+        },
         preschool_special_education: {
             let p = &record.preschool_special_education;
             bundle::PreschoolSpecialEducation {

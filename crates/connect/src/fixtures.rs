@@ -194,6 +194,17 @@ pub const FY27_HEADER: &[&str] = &[
     "trans_guarantee",
     "trans_total",
     "trans_special_education",
+    // Order matters and is not checked by the length assertion: these eight are emitted before
+    // the preschool block, and listing them after it put every value in the wrong column while
+    // the row length stayed right.
+    "funding_base",
+    "funding_base_econ_dis",
+    "open_enrollment_fte_prior",
+    "open_enrollment_fte_current",
+    "open_enrollment_threshold",
+    "open_enrollment_adjustment",
+    "fy21_funding_base",
+    "formula_transition_supplement",
     "prek_sped_adm_cat1",
     "prek_sped_adm_cat2",
     "prek_sped_adm_cat3",
@@ -291,6 +302,33 @@ mod detail_columns {
     pub const ENGLISH_LEARNERS: usize = 13;
     pub const GIFTED: usize = 14;
     pub const CAREER_TECHNICAL: usize = 15;
+
+    // The guarantee's own machinery, and the third FY2021 anchor beside it.
+    //
+    // `[I] Temporary Transitional Aid Guarantee` is not simply "hold the district at its old
+    // amount". It is `funding base - open enrolment adjustment - foundation funding`, and the
+    // middle term is a **clawback**: a guaranteed district whose open enrolment FTE has fallen by
+    // more than `max(10% of last year, 20 FTE)` has its guarantee reduced by the statewide average
+    // base cost per pupil for every FTE beyond that threshold. 43 districts, $5.1m withheld.
+    //
+    // `[K] Formula Transition Supplement` is a *second* hold-harmless on top of the first, against
+    // a different and larger base: `max(FY21 funding base - (foundation funding + guarantee +
+    // supplemental targeted assistance + transportation), 0)`. $63.6m to 144 districts, of which
+    // 17 are not on the guarantee at all.
+    /// `[H2] Funding Base` — the FY2021 amount the guarantee compares against.
+    pub const FUNDING_BASE: usize = 17;
+    /// `[H3]` — the DPIA part of it, which the phase-in dials separately.
+    pub const FUNDING_BASE_ECON_DIS: usize = 18;
+    /// `[h1]`/`[h2]` — open enrolment FTE, last year and this.
+    pub const OPEN_ENROLLMENT_PRIOR: usize = 21;
+    pub const OPEN_ENROLLMENT_CURRENT: usize = 22;
+    /// `[I2]`/`[I1]` — the threshold a loss must exceed, and what it costs beyond it.
+    pub const OPEN_ENROLLMENT_THRESHOLD: usize = 23;
+    pub const OPEN_ENROLLMENT_ADJUSTMENT: usize = 24;
+    /// `[L1]` — a FY2021 base that includes transportation, unlike `[H2]`.
+    pub const FY21_FUNDING_BASE: usize = 28;
+    /// `[K]` — what that base holds the district at.
+    pub const FORMULA_TRANSITION_SUPPLEMENT: usize = 29;
 }
 
 /// Column positions in the `Special Edu` sheet, whose header is on the third row.
@@ -464,6 +502,17 @@ pub const PREK_SPED_WEIGHT_FRACTION: f64 = 0.5;
 pub const PREK_SPED_PRORATION: f64 = 0.968_544_48;
 /// The limit the factor was calibrated against, and which the program now exceeds.
 pub const PREK_SPED_APPROPRIATION: f64 = 147_500_000.0;
+
+/// A guaranteed district losing open enrolment FTE beyond the threshold is charged this per FTE.
+///
+/// It is the statewide **average base cost per pupil**, at full value — not the district's state
+/// share of it. So the guarantee falls by more per departing pupil than the state was paying for
+/// that pupil.
+pub const OPEN_ENROLLMENT_CLAWBACK_PER_FTE: f64 = 8241.61;
+/// The loss a district may absorb before the clawback applies: the greater of these two.
+pub const OPEN_ENROLLMENT_THRESHOLD_FRACTION: f64 = 0.1;
+/// The floor on that threshold, so a small district is not clawed back on a handful of FTE.
+pub const OPEN_ENROLLMENT_THRESHOLD_FLOOR: f64 = 20.0;
 
 /// Column positions in the `CTE` sheet, whose header is on the fourth row.
 ///
@@ -1258,6 +1307,23 @@ pub fn build_fy27_model(sheets: &Fy27Sheets<'_>) -> Vec<Vec<String>> {
             (tc::SPECIAL_EDUCATION, 2),
         ] {
             let value = trans.and_then(|row| cell_number(row, column));
+            out.last_mut()
+                .expect("just pushed")
+                .push(format_value(value, places));
+        }
+
+        // The guarantee's machinery and the transition supplement, from the same detail sheet.
+        for (column, places) in [
+            (detail_columns::FUNDING_BASE, 2),
+            (detail_columns::FUNDING_BASE_ECON_DIS, 2),
+            (detail_columns::OPEN_ENROLLMENT_PRIOR, 6),
+            (detail_columns::OPEN_ENROLLMENT_CURRENT, 6),
+            (detail_columns::OPEN_ENROLLMENT_THRESHOLD, 2),
+            (detail_columns::OPEN_ENROLLMENT_ADJUSTMENT, 2),
+            (detail_columns::FY21_FUNDING_BASE, 2),
+            (detail_columns::FORMULA_TRANSITION_SUPPLEMENT, 2),
+        ] {
+            let value = detail.get(irn).and_then(|row| cell_number(row, column));
             out.last_mut()
                 .expect("just pushed")
                 .push(format_value(value, places));

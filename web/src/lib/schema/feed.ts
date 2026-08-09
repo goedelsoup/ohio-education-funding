@@ -377,6 +377,26 @@ export const DistrictSchema = z
       })
       .strict(),
     /**
+     * The guarantee's machinery, and the second hold-harmless stacked on it.
+     *
+     * The guarantee is the FY2021 funding base less an **open-enrolment clawback** less foundation
+     * funding — the clawback charges the full statewide average base cost per pupil for every FTE
+     * lost beyond a threshold, and reaches 43 districts. Above it sits a second hold-harmless
+     * against a larger FY2021 base that includes transportation, reaching 144 districts of which
+     * 17 are not on the guarantee at all.
+     */
+    transition: z
+      .object({
+        funding_base: num,
+        open_enrollment_prior: num,
+        open_enrollment_current: num,
+        open_enrollment_threshold: num,
+        open_enrollment_adjustment: num,
+        fy21_funding_base: num,
+        transition_supplement: num,
+      })
+      .strict(),
+    /**
      * Preschool special education: a flat $4,000 a pupil plus the six weights at half, prorated.
      *
      * The flat component is 69% of the program and is not reduced by the state share, so for most
