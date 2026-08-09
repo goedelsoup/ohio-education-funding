@@ -25,10 +25,24 @@ description: |
   blend could not exceed its larger input, which is false, and because either count is a tempting
   poverty proxy elsewhere. [verified]
 
-  **AND ONE DISTRICT DOES NOT FOLLOW THE RULE.** Edgerton Local's published blend is 342.38 against
-  352.03 computed from the stated 65/35 weights. Recorded and not explained. One district in 609 is
-  the size of a data correction rather than a mechanism, but it is not zero and it is not
-  understood. [open]
+  **AND ONE DISTRICT DOES NOT FOLLOW THE RULE — BECAUSE A RULE THIS NODE DID NOT HOLD OVERRODE
+  IT.** Edgerton Local's published blend is 342.38 against 352.03 computed from the stated 65/35
+  weights. This node called it "the size of a data correction rather than a mechanism". It is a
+  mechanism: **the weighted ADM is capped at the district's own enrolled ADM.** Edgerton's enrolled
+  ADM is 342.3818, and the published figure is that number rounded to the two decimals the column
+  carries. The blend would have given it more disadvantaged pupils than pupils.
+
+  Three independent selections over the panel return the same single district, which is what makes
+  this an identification rather than a coincidence: the only district whose blend exceeds its
+  enrolment, the only one whose weighted ADM equals its enrolment, and the only one at a
+  disadvantaged percentage of ~100%. [verified —
+  `crates/project/tests/questions_the_corpus_left_open.rs`]
+
+  **The cause sits upstream of the cap and is still open.** Edgerton's economically disadvantaged
+  ADM is **1.45 times its enrolled ADM** — 497.21 in a district of 342.38. A district cannot have
+  more disadvantaged pupils than pupils, so the input is on a different basis than enrolment or it
+  is wrong. The cap is what stops that becoming a nonsensical index, and it does real work for
+  exactly one district in 609. What the department's ED count is counting there is [open].
 
   **WHAT THE STATEWIDE SHARE IS.** `d3` divides by 0.533380310606710 — the statewide economically
   disadvantaged percentage. That figure is a single number setting the whole scale, and whether it

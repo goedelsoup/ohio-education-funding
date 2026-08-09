@@ -26,8 +26,13 @@ description: |
   [guarantee](temporary-transitional-aid-guarantee.yml) pays a district whose enrolment has
   **fallen**; this pays one whose enrolment has **risen**. The same formula cushions movement in
   both directions, which means it responds to enrolment change considerably less than its
-  per-pupil construction suggests. Whether any district draws both is worth checking rather than
-  assuming — the guarantee tracks aid rather than enrolment, and property wealth predicts it three
+  per-pupil construction suggests. **And "whether any district draws both" carried a premise that
+  was itself wrong: the base funding supplement has no eligibility test at all.** All 609 districts
+  draw it; the growth supplement reaches 43, so the growth districts are a strict subset and "both"
+  is a consequence rather than a coincidence. The two share a sheet and nothing else — $56.1m
+  spread flat across everyone against $39.4m concentrated on 43 districts behind a 3% cliff, which
+  is $92k a district against $916k. [verified —
+  `crates/project/tests/questions_the_corpus_left_open.rs`] The guarantee comparison below stands — the guarantee tracks aid rather than enrolment, and property wealth predicts it three
   times more strongly than decline does. [verified]
 
   **STILL OPEN.** Why 3% and why three years. Both are single numbers with a cliff behind them and

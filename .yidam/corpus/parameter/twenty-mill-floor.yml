@@ -68,9 +68,21 @@ description: |
   for these districts would pin at 20 mills. It does not: across the fourteen it runs from
   19.719 to 21.562, and only two land within a hundredth of 20. Statewide the same measure puts
   76 of 609 districts at 20.00 against 155 on the Class 1 rate, so the Class 1 figure is the one
-  the floor governs. [verified — TY2024 Table SD-1] The remaining candidate — that emergency and
-  other fixed-sum levies are counted in voted operating millage but excluded from the floor
-  computation — is untested. [open]
+  the floor governs. [verified — TY2024 Table SD-1]
+
+  **The remaining candidate is now tested, and it is not needed to explain the pattern.** If
+  emergency and other fixed-sum levies were generally counted in voted operating millage but
+  excluded from the floor computation, districts at the floor would sit at 20 *plus* their
+  fixed-sum mills and very few would land on 20 exactly. **155 of 611 land on 20.0000 within a
+  hundredth of a mill**, and among districts within three mills of the floor the median excess
+  over it is 0.0008. For a quarter of the state the floor binds exactly and nothing rides on top.
+  [verified — `crates/project/tests/questions_the_corpus_left_open.rs`]
+
+  **68 districts between 20.005 and 20.5 mills remain unexplained by this data.** They are
+  consistent with fixed-sum levies riding on top and equally with districts a little above the
+  floor that the factors have not finished reducing. Separating the two needs levy-type data —
+  which levies are emergency, which are fixed-sum — and neither Table SD-1 nor the profile report
+  carries it. So the candidate is disconfirmed as a general rule and open for those 68. [open]
 
   Twelve of the fourteen sit within 0.12 mills of the floor and eleven within 0.05, which is
   more consistent with rounding inside the reduction-factor computation than with a different
