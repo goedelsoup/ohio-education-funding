@@ -29,10 +29,24 @@ description: |
   against a CTE weight as though they were on one scale is out by a fifth before any pupil is
   counted. [verified]
 
-  **WHAT THE CATEGORIES ARE IS NOT ESTABLISHED HERE.** This node holds the weights and their
-  arithmetic; the clinical definitions that place a child in Category 1 rather than Category 6 are
-  in rule rather than in the calculator, and the corpus has not read them. Until it does, nothing
-  here can say whether the sixteen-fold range tracks a sixteen-fold difference in cost. [open]
+  **THE CATEGORIES ARE NAMED, AND THE WEIGHTS MATCH THE LAW EXACTLY.** This node held the weights
+  and their arithmetic and said the clinical definitions "are in rule rather than in the
+  calculator, and the corpus has not read them." They are in **statute**, not rule, and reading
+  them was one `curl` away: R.C. 3317.013 lists the six categories in the same order as the
+  multiples, cross-referencing Chapter 3323 for each term. Category 1 is a speech and language
+  disability; Category 2 gathers specific learning disability, developmental disability and
+  delay, other health impairment-minor, and preschool developmental delay; the higher categories
+  run through the multiple-disability and low-incidence conditions. The ordering the corpus
+  inferred from the money is the ordering the General Assembly wrote. [verified — `ohio-laws`]
+
+  **And all six multiples match the statute to the last digit** — 0.2435, 0.6179, 1.4845, 1.9812,
+  2.6830, 3.9554. That is a genuinely new kind of check: every prior verification confirmed the
+  department agreed with *itself*, and a spreadsheet can be internally perfect and still not be
+  the law. [verified — `crates/project/tests/the_statute_behind_the_weights.rs`]
+
+  **Still open: whether the sixteen-fold range tracks a sixteen-fold difference in cost.** Naming
+  the categories settles what is being ordered and not what it costs, and no source the corpus
+  holds prices a category. [open]
 
   Nor is the relationship to the federal IDEA Part B allocation established. Ohio receives a
   federal grant for the same children and the corpus holds the allocations

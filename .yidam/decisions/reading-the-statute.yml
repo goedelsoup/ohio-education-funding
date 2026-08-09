@@ -1,0 +1,108 @@
+id: reading-the-statute
+summary: >-
+  `ohio-laws` wired for the current text of fourteen sections. Every weight in the corpus now has
+  an independent check against the law, and four open questions were answered by reading it.
+context: |
+  `ohio-laws` had been `Declared` since genesis, blocked on "codes.ohio.gov serves HTML with no
+  bulk export; section history is rendered rather than published as data." Its connector note
+  called it "the connector whose absence is most visible in the corpus itself", because most
+  `statutory_basis` fields were `[open]` and waiting on it.
+
+  Both clauses of the blocker are true. The first is a statement about the absence of a
+  *convenience*, and it was read for the life of the corpus as a statement about the absence of the
+  *data*. The Revised Code is **server-rendered**: a plain `curl` returns the operative text, the
+  effective date, and the act that last amended the section.
+
+  This is the third stale blocker this repository has found by opening a file instead of reading
+  its own note about the file — after the NCES crosswalk that had been "blocked since genesis" and
+  turned out to be one column in a catalogued directory, and `tax-abstract`, whose blocker outlived
+  the block in the other direction. The pattern is worth naming: **a recorded blocker is a claim
+  with a date on it, and this corpus has been treating them as facts.**
+decision: |
+  Wire `ohio-laws` for the **current text of named sections** and nothing more.
+
+  Fourteen sources, one per section, chosen as exactly the sections some node's `statutory_basis`
+  points at. Named rather than crawled: a crawl of Chapter 3317 would pull three hundred sections
+  the corpus has no use for and would churn the digest manifest on every unrelated amendment.
+
+  Add `connect::html` — a text extractor, not an HTML parser, because nothing here wants a tree.
+  It drops `<script>` and `<style>` with their contents, treats block tags as line breaks and
+  **inline tags as transparent**, and resolves the entities the site emits. The inline distinction
+  is not cosmetic: a cross-reference is `section <a>3317.011</a> of the Revised Code`, and breaking
+  on every tag splits one citation across three lines and makes it unsearchable.
+
+  Commit the extract as a record-oriented text fixture rather than CSV. Statutes are full of
+  commas and `write_csv` does not quote.
+
+  **Do not** attempt a parameter series. The version archive is rendered per version rather than
+  published as data, and it begins at 1 July 2014 — after the charge-off was already gone. The
+  corpus takes the current text and its effective date and says so.
+consequences: |
+  **Every weight in the formula now has an independent check.** All fourteen multiples match the
+  statute to the last digit: six special education, three English learner, five career-technical.
+
+  That is a different check from the one already passing, and the difference matters. The weights
+  were transcribed from the department's spreadsheet and confirmed by reproducing the department's
+  own published amounts — which establishes that the department is **self-consistent**. A
+  spreadsheet can be internally perfect and not be the law. Nothing in this repository could tell
+  the difference until now.
+
+  **Four open questions answered, because the statute publishes reasons and the calculator
+  publishes quantities:**
+
+    - the **special education categories** are named in R.C. 3317.013, in weight order, by
+      cross-reference to Chapter 3323. The node said they were "in rule rather than in the
+      calculator"; they are in statute;
+    - the **English learner taper** is keyed to time enrolled in United States schools and to
+      attaining a proficient score — a schedule rather than a discretion, which is evidence
+      against the reclassification-incentive reading and not proof of anything;
+    - the **career-technical categories** are programme areas, not severities, so the drop from
+      0.5905 to 0.2154 is a gap between kinds of programme rather than grades of one;
+    - the **squaring** in the disadvantaged-pupil index is R.C. 3317.02(I)(1)(a), which the DPIA
+      node had recorded as "not located in statute here".
+
+  **One citation was simply wrong.** The DPIA node cited R.C. 3317.029. There is no such section;
+  the programme is R.C. 3317.022(A)(4).
+
+  **And one thing turned out not to be law at all.** DPIA's 65/35 blend of economically
+  disadvantaged and directly certified ADM appears in no section. R.C. 3317.03(B)(21) delegates the
+  definition to the department, constrained only by "a student shall not be categorically excluded
+  ... based on anything other than family income." So the $422, the squaring and the statewide
+  denominator are legislated to the digit and the blend is changeable without a bill — a
+  distinction of durability the node had been presenting as uniform.
+
+  **A correction to work committed hours earlier.** The twenty-mill floor's last untested candidate
+  — that fixed-sum levies sit outside the reduction — had been tested against Table SD-1 that
+  morning and called "disconfirmed as a general rule" on the strength of 155 districts landing on
+  exactly 20.0000. R.C. 319.301(A)(1) says the reductions "do not apply to ... taxes levied at
+  whatever rate is required to produce a specified amount of tax money, including a tax levied
+  under section 5705.199" — the emergency levy section. The exclusion is explicit law. The data
+  showed only that it is not what puts those 155 districts on the floor. **An absence of an effect
+  in one group is not an absence of the mechanism**, and the correction is recorded rather than
+  quietly swapped because the wrong reading was the more natural one.
+
+  Also: R.C. 319.301 never says "twenty mills". It says **two per cent of the taxable value**, with
+  two-tenths of one per cent for joint vocational districts. The corpus's figures are right and the
+  name is a colloquialism a reader will not find in the statute.
+
+  **A vintage risk that is new in kind.** R.C. 319.301 is effective 20 March 2026 under two bills
+  of the 136th General Assembly — Ohio changed its property tax reduction law weeks ago. The other
+  thirteen sections read 30 September 2025, H.B. 96. A budget rewrites these at the same URLs, and
+  the weight-verification test is what turns a silent divergence into a failing build.
+alternatives: |
+  **Crawl Chapter 3317.** Rejected: three hundred sections the corpus has no use for, a digest
+  manifest that churns on every unrelated amendment, and no way to tell which sections anything
+  depends on. The named list is self-documenting — it is the corpus's own citations.
+
+  **Use a third-party mirror with an API.** Rejected. The General Assembly's own site is the
+  primary source; a mirror adds a party between the corpus and the law, and the thing being
+  verified is precisely fidelity to the law.
+
+  **Write a real HTML parser.** Rejected as more than the task needs. A statute's meaning is in its
+  own numbering — `(A)`, `(1)`, `(a)` — which is text and survives tag-stripping. A tree would buy
+  nothing and would be a much larger surface to keep correct.
+
+  **Build the version series anyway, by fetching each rendered version page.** Not rejected on
+  principle, but it would not deliver what the corpus wants from it. The archive starts in 2014 and
+  every genuinely open series question here — the charge-off rate era, when each proration factor
+  was last set — is older than that. It stays with `lsc-budget`.

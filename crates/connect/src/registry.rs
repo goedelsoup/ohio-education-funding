@@ -71,6 +71,141 @@ pub enum Format {
     Zip,
 }
 
+/// The Revised Code sections the corpus cites, one source each.
+///
+/// Named rather than crawled. A crawler over Chapter 3317 would pull three hundred sections the
+/// corpus has no use for and would make the digest manifest churn on every unrelated amendment;
+/// this list is exactly what some node's `statutory_basis` points at, and it grows when a node
+/// starts pointing somewhere new.
+pub const OHIO_LAWS_SECTIONS: &[Source] = &[
+    Source {
+        key: "rc-3317-02",
+        url: "https://codes.ohio.gov/ohio-revised-code/section-3317.02",
+        filename: "rc-3317-02.html",
+        format: Format::Html,
+        catalog: Some("ohio-revised-code"),
+        fixture: Some(crate::fixtures::STATUTE_FIXTURE),
+        note: "R.C. 3317.02. Definitions, including the economically disadvantaged index and its squaring — which the DPIA node recorded as not located in statute.",
+    },
+    Source {
+        key: "rc-3317-011",
+        url: "https://codes.ohio.gov/ohio-revised-code/section-3317.011",
+        filename: "rc-3317-011.html",
+        format: Format::Html,
+        catalog: Some("ohio-revised-code"),
+        fixture: Some(crate::fixtures::STATUTE_FIXTURE),
+        note: "R.C. 3317.011. Base cost and its components, the most-cited section in the corpus.",
+    },
+    Source {
+        key: "rc-3317-013",
+        url: "https://codes.ohio.gov/ohio-revised-code/section-3317.013",
+        filename: "rc-3317-013.html",
+        format: Format::Html,
+        catalog: Some("ohio-revised-code"),
+        fixture: Some(crate::fixtures::STATUTE_FIXTURE),
+        note: "R.C. 3317.013. Special education weights, and the clinical categories the corpus could not name.",
+    },
+    Source {
+        key: "rc-3317-014",
+        url: "https://codes.ohio.gov/ohio-revised-code/section-3317.014",
+        filename: "rc-3317-014.html",
+        format: Format::Html,
+        catalog: Some("ohio-revised-code"),
+        fixture: Some(crate::fixtures::STATUTE_FIXTURE),
+        note: "R.C. 3317.014. Career-technical weights, and the programme categories behind their ordering.",
+    },
+    Source {
+        key: "rc-3317-016",
+        url: "https://codes.ohio.gov/ohio-revised-code/section-3317.016",
+        filename: "rc-3317-016.html",
+        format: Format::Html,
+        catalog: Some("ohio-revised-code"),
+        fixture: Some(crate::fixtures::STATUTE_FIXTURE),
+        note: "R.C. 3317.016. English learner weights, and the rule the taper actually expresses.",
+    },
+    Source {
+        key: "rc-3317-017",
+        url: "https://codes.ohio.gov/ohio-revised-code/section-3317.017",
+        filename: "rc-3317-017.html",
+        format: Format::Html,
+        catalog: Some("ohio-revised-code"),
+        fixture: Some(crate::fixtures::STATUTE_FIXTURE),
+        note: "R.C. 3317.017. Local capacity and the state share percentage.",
+    },
+    Source {
+        key: "rc-3317-019",
+        url: "https://codes.ohio.gov/ohio-revised-code/section-3317.019",
+        filename: "rc-3317-019.html",
+        format: Format::Html,
+        catalog: Some("ohio-revised-code"),
+        fixture: Some(crate::fixtures::STATUTE_FIXTURE),
+        note: "R.C. 3317.019. Gifted units and their prices.",
+    },
+    Source {
+        key: "rc-3317-022",
+        url: "https://codes.ohio.gov/ohio-revised-code/section-3317.022",
+        filename: "rc-3317-022.html",
+        format: Format::Html,
+        catalog: Some("ohio-revised-code"),
+        fixture: Some(crate::fixtures::STATUTE_FIXTURE),
+        note: "R.C. 3317.022. Core foundation funding: the section that assembles every component, and where disadvantaged pupil impact aid actually lives.",
+    },
+    Source {
+        key: "rc-3317-0212",
+        url: "https://codes.ohio.gov/ohio-revised-code/section-3317.0212",
+        filename: "rc-3317-0212.html",
+        format: Format::Html,
+        catalog: Some("ohio-revised-code"),
+        fixture: Some(crate::fixtures::STATUTE_FIXTURE),
+        note: "R.C. 3317.0212. Transportation.",
+    },
+    Source {
+        key: "rc-3317-0213",
+        url: "https://codes.ohio.gov/ohio-revised-code/section-3317.0213",
+        filename: "rc-3317-0213.html",
+        format: Format::Html,
+        catalog: Some("ohio-revised-code"),
+        fixture: Some(crate::fixtures::STATUTE_FIXTURE),
+        note: "R.C. 3317.0213. Preschool special education.",
+    },
+    Source {
+        key: "rc-3317-0217",
+        url: "https://codes.ohio.gov/ohio-revised-code/section-3317.0217",
+        filename: "rc-3317-0217.html",
+        format: Format::Html,
+        catalog: Some("ohio-revised-code"),
+        fixture: Some(crate::fixtures::STATUTE_FIXTURE),
+        note: "R.C. 3317.0217. The temporary transitional aid guarantee.",
+    },
+    Source {
+        key: "rc-3317-03",
+        url: "https://codes.ohio.gov/ohio-revised-code/section-3317.03",
+        filename: "rc-3317-03.html",
+        format: Format::Html,
+        catalog: Some("ohio-revised-code"),
+        fixture: Some(crate::fixtures::STATUTE_FIXTURE),
+        note: "R.C. 3317.03. What each reported count means, including the economically disadvantaged certification the department is left to define.",
+    },
+    Source {
+        key: "rc-319-301",
+        url: "https://codes.ohio.gov/ohio-revised-code/section-319.301",
+        filename: "rc-319-301.html",
+        format: Format::Html,
+        catalog: Some("ohio-revised-code"),
+        fixture: Some(crate::fixtures::STATUTE_FIXTURE),
+        note: "R.C. 319.301. H.B. 920 tax reduction factors and the twenty-mill floor.",
+    },
+    Source {
+        key: "rc-5705-391",
+        url: "https://codes.ohio.gov/ohio-revised-code/section-5705.391",
+        filename: "rc-5705-391.html",
+        format: Format::Html,
+        catalog: Some("ohio-revised-code"),
+        fixture: Some(crate::fixtures::STATUTE_FIXTURE),
+        note: "R.C. 5705.391. The five-year forecast requirement.",
+    },
+];
+
 /// One retrievable publication.
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub struct Source {
@@ -388,13 +523,15 @@ pub const CONNECTORS: &[Connector] = &[
         key: "ohio-laws",
         publisher: "Ohio General Assembly",
         feeds: &["legislation", "parameter", "formula-component"],
-        status: Status::Declared {
-            blocked_on: "codes.ohio.gov serves HTML with no bulk export; section history is \
-                         rendered rather than published as data",
-        },
-        note: "Most `statutory_basis` fields in the corpus are `[open]` and waiting on exactly \
-               this.",
-        sources: &[],
+        status: Status::Wired,
+        note: "Most `statutory_basis` fields in the corpus were `[open]` and waiting on exactly \
+               this. The recorded blocker — \"serves HTML with no bulk export\" — was a statement \
+               about the absence of a convenience, and was read as one about the absence of the \
+               data. Every section below is server-rendered: the text is in the response body. \
+               What remains genuinely unavailable as data is *section history*, which the site \
+               renders per version; the corpus takes the current text and its effective date and \
+               does not attempt a series.",
+        sources: OHIO_LAWS_SECTIONS,
     },
     Connector {
         key: "ohio-courts",

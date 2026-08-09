@@ -70,19 +70,29 @@ description: |
   76 of 609 districts at 20.00 against 155 on the Class 1 rate, so the Class 1 figure is the one
   the floor governs. [verified — TY2024 Table SD-1]
 
-  **The remaining candidate is now tested, and it is not needed to explain the pattern.** If
-  emergency and other fixed-sum levies were generally counted in voted operating millage but
-  excluded from the floor computation, districts at the floor would sit at 20 *plus* their
-  fixed-sum mills and very few would land on 20 exactly. **155 of 611 land on 20.0000 within a
-  hundredth of a mill**, and among districts within three mills of the floor the median excess
-  over it is 0.0008. For a quarter of the state the floor binds exactly and nothing rides on top.
-  [verified — `crates/project/tests/questions_the_corpus_left_open.rs`]
+  **THE REMAINING CANDIDATE IS CONFIRMED, IN THE STATUTE ITSELF.** R.C. 319.301(A)(1): the
+  reductions "do not apply to ... taxes levied at whatever rate is required to produce a specified
+  amount of tax money, including a tax levied under section 5705.199 or 5748.09 of the Revised
+  Code, or an amount to pay debt charges." R.C. 5705.199 is the emergency levy section. Fixed-sum
+  levies are exempt from reduction as a matter of law. [verified — `ohio-laws`,
+  `crates/project/tests/the_statute_behind_the_weights.rs`]
 
-  **68 districts between 20.005 and 20.5 mills remain unexplained by this data.** They are
-  consistent with fixed-sum levies riding on top and equally with districts a little above the
-  floor that the factors have not finished reducing. Separating the two needs levy-type data —
-  which levies are emergency, which are fixed-sum — and neither Table SD-1 nor the profile report
-  carries it. So the candidate is disconfirmed as a general rule and open for those 68. [open]
+  **And this node briefly said the opposite, from data alone.** Table SD-1 shows **155 of 611
+  districts on 20.0000 within a hundredth of a mill**, with a median excess of 0.0008 among those
+  near the floor, and that was read as disconfirming the candidate. It does not. It shows only
+  that the exclusion is not what puts *those* districts where they are — they carry no fixed-sum
+  levies in their Class I current-expense rate. The 68 districts between 20.005 and 20.5 are where
+  the mechanism would show, and attributing specific districts still needs levy-type data neither
+  Table SD-1 nor the profile report carries. [verified, and the attribution is [open]]
+
+  An absence of an effect in one group is not an absence of the mechanism, and the correction is
+  recorded rather than quietly replaced because the wrong reading was the more natural one.
+
+  **AND THE FLOOR IS NOT WRITTEN IN MILLS.** R.C. 319.301 never says "twenty mills". It says **two
+  per cent of the taxable value** of the class, and **two-tenths of one per cent** for joint
+  vocational districts. Those are the 20 and 2 mills this node carries, so the figures are right —
+  but the name is a colloquialism for a percentage, and a reader searching the statute for the
+  phrase will not find it. [verified]
 
   Twelve of the fourteen sit within 0.12 mills of the floor and eleven within 0.05, which is
   more consistent with rounding inside the reduction-factor computation than with a different

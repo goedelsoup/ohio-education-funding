@@ -36,6 +36,7 @@ pub mod conventions;
 pub mod cpi;
 pub mod fixtures;
 pub mod forecast;
+pub mod html;
 pub mod index;
 pub mod registry;
 pub mod sha256;
@@ -357,6 +358,34 @@ pub fn rebuild(root: &Path) -> Result<Vec<Rebuilt>, RebuildError> {
             path: fixtures::SD1_FIXTURE.to_string(),
             reason: cause.to_string(),
         },
+    });
+
+    // The Revised Code. Skipped rather than fatal when a section is not cached, for the same
+    // reason as F-33 below: it feeds prose and verification, and an absent copy should cost those
+    // rather than the whole rebuild.
+    let statutes: Vec<fixtures::StatuteSection> = registry::OHIO_LAWS_SECTIONS
+        .iter()
+        .filter_map(|source| {
+            let path = cache::cached_path(root, source);
+            let page = std::fs::read_to_string(path).ok()?;
+            // The key is `rc-3317-013`; the section it cites is `3317.013`.
+            let section = source.key.trim_start_matches("rc-").replacen('-', ".", 1);
+            fixtures::parse_statute(&section, &page)
+        })
+        .collect();
+    out.push(if statutes.is_empty() {
+        Rebuilt::Skipped {
+            path: fixtures::STATUTE_FIXTURE.to_string(),
+            reason: "no Revised Code sections cached".to_string(),
+        }
+    } else {
+        Rebuilt::Written {
+            path: fixtures::STATUTE_FIXTURE.to_string(),
+            rows: fixtures::write_text(
+                &root.join(fixtures::STATUTE_FIXTURE),
+                &fixtures::build_statute_text(&statutes),
+            )?,
+        }
     });
 
     // Census F-33. Skipped rather than fatal when the workbook is not cached: it is the one
