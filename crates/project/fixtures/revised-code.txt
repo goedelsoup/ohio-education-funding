@@ -1,11 +1,11 @@
-# Ohio Revised Code, the sections this corpus cites.
-# Regenerate with `edfund-connect rebuild`. One record per section; records begin with
-# a section mark at the start of a line, which the statute's own text never does.
+# Ohio Revised Code, the sections this corpus cites. One record per section.
+# Regenerate with `edfund-connect rebuild`. Records begin with `=== ` at the
+# start of a line, which no record's own text does.
 
-§ 3317.02
+=== 3317.02
 title: Definitions.
-effective: September 30, 2025
-legislation: House Bill 96 - 136th General Assembly
+date: September 30, 2025
+source: House Bill 96 - 136th General Assembly
 --
 As used in this chapter:
 (A) "Alternative school" has the same meaning as in section 3313.974 of the Revised Code.
@@ -146,10 +146,10 @@ As used in this chapter:
 (3) The student's parent is an employee of the school.
 (4) Some other qualification not based on the income of the student's family or the student's athletic or academic ability and for which all students in the school may qualify.
 
-§ 3317.011
+=== 3317.011
 title: City, local, and exempted village school district base cost.
-effective: September 30, 2025
-legislation: House Bill 96 - 136th General Assembly
+date: September 30, 2025
+source: House Bill 96 - 136th General Assembly
 --
 This section shall apply only for fiscal years 2026 and 2027.
 (A) As used in this section:
@@ -291,10 +291,10 @@ The district's base cost enrolled ADM for that fiscal year X [(the number determ
 (3) Compute the district's athletic co-curricular activities base cost in accordance with the following formula:
 (The amount determined under division (H)(1) of this section / the sum determined under division (H)(2) of this section) X the district's base cost enrolled ADM for the fiscal year for which the funds for athletic co-curricular activities are computed
 
-§ 3317.013
+=== 3317.013
 title: Special education program multiples.
-effective: April 6, 2023
-legislation: House Bill 554 - 134th General Assembly
+date: April 6, 2023
+source: House Bill 554 - 134th General Assembly
 --
 The multiples for the following categories of special education programs, as these programs are defined for purposes of Chapter 3323. of the Revised Code, are as follows:
 (A) A multiple of 0.2435 for students whose primary or only identified disability is a speech and language disability, as this term is defined pursuant to Chapter 3323. of the Revised Code;
@@ -304,10 +304,10 @@ The multiples for the following categories of special education programs, as the
 (E) A multiple of 2.6830 for students identified as orthopedically disabled or as having multiple disabilities, as these terms are defined pursuant to Chapter 3323. of the Revised Code;
 (F) A multiple of 3.9554 for students identified as autistic, having traumatic brain injuries, or as both visually and hearing impaired, as these terms are defined pursuant to Chapter 3323. of the Revised Code.
 
-§ 3317.014
+=== 3317.014
 title: Career-tech education program funding.
-effective: September 30, 2025
-legislation: House Bill 96 - 136th General Assembly
+date: September 30, 2025
+source: House Bill 96 - 136th General Assembly
 --
 (A) The multiples for the following categories of career-technical education programs approved by the department of education and workforce under section 3317.161 of the Revised Code shall be as follows:
 (1) A multiple of 0.6230 for students enrolled in career-technical education workforce development programs in agricultural and environmental systems, construction technologies, engineering and science technologies, finance, health science, information technology, and manufacturing technologies, each of which shall be defined by the department in consultation with the governor's office of workforce transformation;
@@ -360,10 +360,10 @@ The department may deny payment of funds calculated under division (D) of this s
 The lead district that receives funds under division (E) of this section shall report on the use of those funds to the department in a manner prescribed by the department.
 The department may deny payment under this division to any district or school that the department determines is using funds paid under this division for other purposes.
 
-§ 3317.016
+=== 3317.016
 title: Amounts for English learners.
-effective: September 30, 2025
-legislation: House Bill 96 - 136th General Assembly
+date: September 30, 2025
+source: House Bill 96 - 136th General Assembly
 --
 As used in this section, "English learner" has the same meaning as in section 3301.0731 of the Revised Code.
 The multiples for English learners shall be as follows:
@@ -371,10 +371,10 @@ The multiples for English learners shall be as follows:
 (B) A multiple of 0.1577 for each student who, for fiscal years 2026 and 2027 has been identified as an English learner following the state's standardized identification process and enrolled in schools in the United States for more than 180 school days until the student achieves a proficient score on the spring administration of the state's English language proficiency assessments prescribed by division (C)(3) of section 3301.0711 of the Revised Code or who, for fiscal year 2028 and each fiscal year thereafter, satisfies criteria specified by the general assembly for purposes of this division.
 (C) A multiple of 0.1053 for each student who, for fiscal years 2026 and 2027, achieves a score of proficient on the spring administration of the state's English language proficiency assessments prescribed by division (C)(3) of section 3301.0711 of the Revised Code for the two school years following the school year in which the student achieved that level of achievement or who, for fiscal year 2028 and each fiscal year thereafter, satisfies criteria specified by the general assembly for purposes of this division.
 
-§ 3317.017
+=== 3317.017
 title: City, local, and exempted village school district per-pupil local capacity amount.
-effective: September 30, 2025
-legislation: House Bill 96 - 136th General Assembly
+date: September 30, 2025
+source: House Bill 96 - 136th General Assembly
 --
 This section shall apply only for fiscal years 2026 and 2027.
 (A) The department of education and workforce shall compute a city, local, or exempted village school district's per-pupil local capacity amount for a fiscal year as follows:
@@ -410,10 +410,10 @@ This section shall apply only for fiscal years 2026 and 2027.
 (the district's base cost per pupil amount for that fiscal year - the district's per pupil local capacity amount for that fiscal year)/(the district's base cost per pupil amount for that fiscal year).
 If the result is less than 0.10, the state share percentage shall be 0.10.
 
-§ 3317.019
+=== 3317.019
 title: Temporary transitional aid.
-effective: September 30, 2025
-legislation: House Bill 96 - 136th General Assembly
+date: September 30, 2025
+source: House Bill 96 - 136th General Assembly
 --
 (A)(1) Subject to division (C) of this section, for fiscal years 2026 and 2027, the department of education and workforce shall pay temporary transitional aid to each city, local, and exempted village school district according to the following formula:
 (The district's funding base, as that term is defined in section 3317.02 of the Revised Code) - (the district's payment under section 3317.022 of the Revised Code)
@@ -429,10 +429,10 @@ If the computation made under division (A)(2) of this section results in a negat
 The statewide average base cost per pupil X [(the positive difference between the number of the district's students counted under division (A)(1)(b) of section 3317.03 of the Revised Code for that fiscal year and the number of the district's students counted under that division for the previous fiscal year) - the district's decrease threshold for that fiscal year]
 At no time, however, shall the amount paid to a district under division (A) of this section be less than zero.
 
-§ 3317.022
+=== 3317.022
 title: Formulas for state operating funds to school districts, schools, and scholarships.
-effective: September 30, 2025
-legislation: House Bill 96 - 136th General Assembly
+date: September 30, 2025
+source: House Bill 96 - 136th General Assembly
 --
 The department of education and workforce shall compute and distribute state core foundation funding to each eligible funding unit that is a city, local, or exempted village school district, the community and STEM school unit, the educational choice scholarship unit, the pilot project scholarship unit, the autism scholarship unit, and the Jon Peterson special needs scholarship unit for the fiscal year, using the information obtained under section 3317.021 of the Revised Code in the calendar year in which the fiscal year begins in accordance with the following:
 For fiscal years 2026 and 2027, for a funding unit that is a city, local, or exempted village school district:
@@ -578,10 +578,10 @@ In the case of a scholarship distributed to a student's school district of atten
 (I) For fiscal years 2026 and 2027, a school district shall spend the funds it receives under division (A)(5) of this section only for services for English learners.
 (J) For each fiscal year, a school district shall spend the funds it receives under division (A)(6) of this section only for the identification of gifted students, gifted coordinator services, and gifted intervention specialist services. For each fiscal year, if the department determines that a district is not in compliance with this division, it shall reduce the district's payments for that fiscal year under this chapter by an amount equal to the amount paid to the district for that fiscal year under division (A)(6) of this section that was not spent in accordance with this division. The department shall reduce the payment within ninety days of data finalization.
 
-§ 3317.051
+=== 3317.051
 title: Calculation of gifted funding units.
-effective: September 30, 2025
-legislation: House Bill 96 - 136th General Assembly
+date: September 30, 2025
+source: House Bill 96 - 136th General Assembly
 --
 (A) The department of education and workforce shall compute and pay to a school district funds based on units for services to students identified as gifted under Chapter 3324. of the Revised Code as prescribed by this section.
 (B) The department shall allocate gifted units for a school district as follows:
@@ -596,10 +596,10 @@ legislation: House Bill 96 - 136th General Assembly
 (2) For fiscal year 2028 and each fiscal year thereafter, an amount calculated in a manner determined by the general assembly.
 (D) A school district may assign gifted unit funding that it receives under division (C) of this section to another school district, an educational service center, a community school, or a STEM school as part of an arrangement to provide services to the district.
 
-§ 3317.0212
+=== 3317.0212
 title: Transportation payment.
-effective: September 30, 2025
-legislation: House Bill 96 - 136th General Assembly
+date: September 30, 2025
+source: House Bill 96 - 136th General Assembly
 --
 (A) As used in this section:
 (1) For fiscal years 2026 and 2027, "assigned bus" means a school bus used to transport qualifying riders.
@@ -671,10 +671,10 @@ The community school, however, is not required to use the same method to transpo
 As used in this division, "entitled to attend school" means entitled to attend school under section 3313.64 or 3313.65 of the Revised Code.
 (2) A community school shall be paid under division (I)(2) of this section only for students who are eligible as specified in section 3327.01 of the Revised Code and division (C)(1) of section 3314.091 of the Revised Code, and whose transportation to and from school is actually provided, who actually utilized transportation arranged, or for whom a payment in lieu of transportation is made by the community school's governing authority. To qualify for the payments, the community school shall report to the department, in the form and manner required by the department, data on the number of students transported or whose transportation is arranged, the number of miles traveled, cost to transport, and any other information requested by the department.
 
-§ 3317.0213
+=== 3317.0213
 title: Additional state aid for preschool special education children.
-effective: September 30, 2025
-legislation: House Bill 96 - 136th General Assembly
+date: September 30, 2025
+source: House Bill 96 - 136th General Assembly
 --
 (A) The department of education and workforce shall compute and pay in accordance with this section additional state aid for preschool children with disabilities to each city, local, and exempted village school district and to each institution, as defined in section 3323.091 of the Revised Code. Funding shall be provided for children who are not enrolled in kindergarten and who are under age six on the thirtieth day of September of the academic year, or on the first day of August of the academic year if the school district in which the child is enrolled has adopted a resolution under division (A)(3) of section 3321.01 of the Revised Code, but not less than age three on the first day of December of the academic year.
 For fiscal years 2026 and 2027, the additional state aid shall be calculated under the following formula:
@@ -691,10 +691,10 @@ As used in division (A) of this section, the state share percentage of a student
 (B) If an educational service center is providing services to students who are preschool children with disabilities under agreement with the city, local, or exempted village school district in which the students are entitled to attend school, that district may authorize the department to transfer funds computed under this section to the service center providing those services.
 (C) If a county DD board is providing services to students who are preschool children with disabilities under agreement with the city, local, or exempted village school district in which the students are entitled to attend school, the department shall deduct from the district's payment computed under division (A) of this section the total amount of those funds that are attributable to the students served by the county DD board and pay that amount to that board.
 
-§ 3317.0217
+=== 3317.0217
 title: Targeted assistance funding.
-effective: September 30, 2025
-legislation: House Bill 96 - 136th General Assembly
+date: September 30, 2025
+source: House Bill 96 - 136th General Assembly
 --
 This section shall apply only for fiscal years 2026 and 2027.
 Payment of the amount calculated for a school district under this section shall be made under division (A) of section 3317.022 of the Revised Code.
@@ -726,10 +726,10 @@ The district's weighted wealth for that fiscal year calculated under division (B
 (b) If the district's wealth index computed under division (C)(3) of this section for that fiscal year is greater than or equal to 0.8, the district's wealth amount for that fiscal year shall be calculated in accordance with the following formula:
 [(The median weighted wealth per pupil of all school districts in this state for that fiscal year X 0.014) - (the district's weighted wealth per pupil for that fiscal year X 0.0112)] X the district's enrolled ADM for that fiscal year
 
-§ 3317.03
+=== 3317.03
 title: Report of average daily membership figures and additional data.
-effective: October 3, 2023
-legislation: House Bill 33 - 135th General Assembly
+date: October 3, 2023
+source: House Bill 33 - 135th General Assembly
 --
 (A) The superintendent of each city, local, and exempted village school district shall report to the department of education and workforce as of the last day of October, March, and June of each year the enrollment of students receiving services from schools under the superintendent's supervision, and the numbers of other students entitled to attend school in the district under section 3313.64 or 3313.65 of the Revised Code the superintendent is required to report under this section, so that the department can calculate the district's enrolled ADM, formula ADM, total ADM, category one through five career-technical education ADM, category one through three English learner ADM, category one through six special education ADM, transportation ADM, and, for purposes of provisions of law outside of Chapter 3317. of the Revised Code, average daily membership.
 (1) The enrollment reported by the superintendent during the reporting period shall consist of the number of students in grades kindergarten through twelve receiving any educational services from the district, except that the following categories of students shall not be included in the determination:
@@ -844,10 +844,10 @@ The enrolled ADM, formula ADM, total ADM, category one through five career-techn
 (J) The superintendent of each cooperative education school district shall certify to the director of education and workforce, in a manner prescribed by the department, the applicable enrollments for all students in the cooperative education district, also indicating the city, local, or exempted village district where each pupil is entitled to attend school under section 3313.64 or 3313.65 of the Revised Code.
 (K) If the director of education and workforce determines that a component of the enrollment certified or reported by a district superintendent, or other reporting entity, is not correct, the director of education and workforce may order that the district's enrolled ADM, formula ADM, or both be adjusted in the amount of the error.
 
-§ 319.301
+=== 319.301
 title: Determining and certifying tax reduction percentage for carryover property.
-effective: March 20, 2026
-legislation: House Bill 186 (GA 136), House Bill 129 (GA 136)
+date: March 20, 2026
+source: House Bill 186 (GA 136), House Bill 129 (GA 136)
 --
 (A) The reductions required by division (D) of this section do not apply to any of the following:
 (1) Taxes levied at whatever rate is required to produce a specified amount of tax money, including a tax levied under section 5705.199 or 5748.09 of the Revised Code, or an amount to pay debt charges;
@@ -883,10 +883,10 @@ A percentage or a tax reduction factor determined or computed by the commissione
 (I) In making the determinations under division (D)(1) of this section, the tax commissioner shall take account of changes in the taxable value of carryover property resulting from complaints filed under section 5715.19 of the Revised Code for determinations made for the tax year in which such changes are reported to the commissioner. Such changes shall be reported to the commissioner on the first abstract of real property filed with the commissioner under section 5715.23 of the Revised Code following the date on which the complaint is finally determined by the board of revision or by a court or other authority with jurisdiction on appeal. The tax commissioner shall account for such changes in making the determinations only for the tax year in which the change in valuation is reported. Such a valuation change shall not be used to recompute the percentages determined under division (D)(1) of this section for any prior tax year.
 The Legislative Service Commission presents the text of this section as a composite of the section as amended by multiple acts of the General Assembly. This presentation recognizes the principle stated in R.C. 1.52(B) that amendments are to be harmonized if reasonably capable of simultaneous operation.
 
-§ 5705.391
+=== 5705.391
 title: Board of education revenues and expenditures report.
-effective: September 30, 2025
-legislation: House Bill 96 - 136th General Assembly
+date: September 30, 2025
+source: House Bill 96 - 136th General Assembly
 --
 (A) Not later than the thirty-first day of August of each fiscal year, each school district board of education shall submit to the department of education and workforce appropriations, revenue, and fund balance assumptions contained in the budget adopted by the board for that fiscal year and projections of expenditures, revenues, and fund balance for the three succeeding fiscal years.
 Not later than the last day of February of each fiscal year, each school district board of education shall submit updated appropriations, revenue, and fund balance information for the budget adopted for the fiscal year and updated projections of expenditures, revenues, and fund balance for the three succeeding fiscal years.

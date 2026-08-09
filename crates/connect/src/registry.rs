@@ -21,7 +21,16 @@
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum Status {
     /// Retrieved, parsed, and feeding a fixture that a test in this workspace reads.
-    Wired,
+    Wired {
+        /// What the connector still cannot reach, when it is wired for only part of what its
+        /// `feeds` claim.
+        ///
+        /// `None` is the ordinary case. `Some` exists because a connector can be genuinely wired
+        /// and genuinely incomplete at once — `ohio-courts` retrieves the four DeRolph opinions
+        /// and cannot retrieve a common pleas ruling, and a bare `Wired` would leave that second
+        /// half recorded only in prose that no test reads.
+        still_blocked: Option<&'static str>,
+    },
     /// Retrieved and parsed, but nothing downstream consumes it yet.
     Parsed,
     /// A URL is known and the bytes can be fetched; no parser exists.
@@ -38,7 +47,7 @@ impl Status {
     #[must_use]
     pub const fn label(self) -> &'static str {
         match self {
-            Self::Wired => "wired",
+            Self::Wired { .. } => "wired",
             Self::Parsed => "parsed",
             Self::Retrievable => "retrievable",
             Self::Declared { .. } => "declared",
@@ -48,7 +57,13 @@ impl Status {
     /// Whether the connector can produce structured records rather than only bytes.
     #[must_use]
     pub const fn has_parser(self) -> bool {
-        matches!(self, Self::Wired | Self::Parsed)
+        matches!(self, Self::Wired { .. } | Self::Parsed)
+    }
+
+    /// Whether the connector feeds a fixture, whatever else it still cannot reach.
+    #[must_use]
+    pub const fn is_wired(self) -> bool {
+        matches!(self, Self::Wired { .. })
     }
 }
 
@@ -80,6 +95,7 @@ pub enum Format {
 pub const OHIO_LAWS_SECTIONS: &[Source] = &[
     Source {
         key: "rc-3317-02",
+        title: None,
         url: "https://codes.ohio.gov/ohio-revised-code/section-3317.02",
         filename: "rc-3317-02.html",
         format: Format::Html,
@@ -89,6 +105,7 @@ pub const OHIO_LAWS_SECTIONS: &[Source] = &[
     },
     Source {
         key: "rc-3317-011",
+        title: None,
         url: "https://codes.ohio.gov/ohio-revised-code/section-3317.011",
         filename: "rc-3317-011.html",
         format: Format::Html,
@@ -98,6 +115,7 @@ pub const OHIO_LAWS_SECTIONS: &[Source] = &[
     },
     Source {
         key: "rc-3317-013",
+        title: None,
         url: "https://codes.ohio.gov/ohio-revised-code/section-3317.013",
         filename: "rc-3317-013.html",
         format: Format::Html,
@@ -107,6 +125,7 @@ pub const OHIO_LAWS_SECTIONS: &[Source] = &[
     },
     Source {
         key: "rc-3317-014",
+        title: None,
         url: "https://codes.ohio.gov/ohio-revised-code/section-3317.014",
         filename: "rc-3317-014.html",
         format: Format::Html,
@@ -116,6 +135,7 @@ pub const OHIO_LAWS_SECTIONS: &[Source] = &[
     },
     Source {
         key: "rc-3317-016",
+        title: None,
         url: "https://codes.ohio.gov/ohio-revised-code/section-3317.016",
         filename: "rc-3317-016.html",
         format: Format::Html,
@@ -125,6 +145,7 @@ pub const OHIO_LAWS_SECTIONS: &[Source] = &[
     },
     Source {
         key: "rc-3317-017",
+        title: None,
         url: "https://codes.ohio.gov/ohio-revised-code/section-3317.017",
         filename: "rc-3317-017.html",
         format: Format::Html,
@@ -134,6 +155,7 @@ pub const OHIO_LAWS_SECTIONS: &[Source] = &[
     },
     Source {
         key: "rc-3317-019",
+        title: None,
         url: "https://codes.ohio.gov/ohio-revised-code/section-3317.019",
         filename: "rc-3317-019.html",
         format: Format::Html,
@@ -145,6 +167,7 @@ pub const OHIO_LAWS_SECTIONS: &[Source] = &[
     },
     Source {
         key: "rc-3317-022",
+        title: None,
         url: "https://codes.ohio.gov/ohio-revised-code/section-3317.022",
         filename: "rc-3317-022.html",
         format: Format::Html,
@@ -154,6 +177,7 @@ pub const OHIO_LAWS_SECTIONS: &[Source] = &[
     },
     Source {
         key: "rc-3317-051",
+        title: None,
         url: "https://codes.ohio.gov/ohio-revised-code/section-3317.051",
         filename: "rc-3317-051.html",
         format: Format::Html,
@@ -164,6 +188,7 @@ pub const OHIO_LAWS_SECTIONS: &[Source] = &[
     },
     Source {
         key: "rc-3317-0212",
+        title: None,
         url: "https://codes.ohio.gov/ohio-revised-code/section-3317.0212",
         filename: "rc-3317-0212.html",
         format: Format::Html,
@@ -173,6 +198,7 @@ pub const OHIO_LAWS_SECTIONS: &[Source] = &[
     },
     Source {
         key: "rc-3317-0213",
+        title: None,
         url: "https://codes.ohio.gov/ohio-revised-code/section-3317.0213",
         filename: "rc-3317-0213.html",
         format: Format::Html,
@@ -182,6 +208,7 @@ pub const OHIO_LAWS_SECTIONS: &[Source] = &[
     },
     Source {
         key: "rc-3317-0217",
+        title: None,
         url: "https://codes.ohio.gov/ohio-revised-code/section-3317.0217",
         filename: "rc-3317-0217.html",
         format: Format::Html,
@@ -191,6 +218,7 @@ pub const OHIO_LAWS_SECTIONS: &[Source] = &[
     },
     Source {
         key: "rc-3317-03",
+        title: None,
         url: "https://codes.ohio.gov/ohio-revised-code/section-3317.03",
         filename: "rc-3317-03.html",
         format: Format::Html,
@@ -200,6 +228,7 @@ pub const OHIO_LAWS_SECTIONS: &[Source] = &[
     },
     Source {
         key: "rc-319-301",
+        title: None,
         url: "https://codes.ohio.gov/ohio-revised-code/section-319.301",
         filename: "rc-319-301.html",
         format: Format::Html,
@@ -209,6 +238,7 @@ pub const OHIO_LAWS_SECTIONS: &[Source] = &[
     },
     Source {
         key: "rc-5705-391",
+        title: None,
         url: "https://codes.ohio.gov/ohio-revised-code/section-5705.391",
         filename: "rc-5705-391.html",
         format: Format::Html,
@@ -223,6 +253,15 @@ pub const OHIO_LAWS_SECTIONS: &[Source] = &[
 pub struct Source {
     /// Stable key, used on the command line and in the digest manifest.
     pub key: &'static str,
+    /// What to call the source in a fixture built from it, when a fixture names it at all.
+    ///
+    /// Only sources whose records carry a title need one; `None` everywhere else. It exists
+    /// because the DeRolph records took their title from the first sentence of [`Self::note`],
+    /// which made a prose comment load-bearing input to committed data — rewording the note
+    /// silently rewrote the fixture, and splitting the sentence on `.` cut
+    /// `93 Ohio St.3d 309` down to `93 Ohio St`. A title a fixture prints is data, so it is
+    /// declared rather than parsed out of a comment.
+    pub title: Option<&'static str>,
     /// Where to fetch it.
     pub url: &'static str,
     /// What to call it in the cache.
@@ -267,12 +306,15 @@ pub const CONNECTORS: &[Connector] = &[
         key: "dew-foundation",
         publisher: "Ohio Department of Education and Workforce",
         feeds: &["education-agency", "revenue-stream", "metric", "program"],
-        status: Status::Wired,
+        status: Status::Wired {
+            still_blocked: None,
+        },
         note: "The spine of the numeric corpus: nearly every per-agency state aid figure \
                originates here.",
         sources: &[
             Source {
                 key: "fy27-calculator",
+                title: None,
                 url: "https://education.ohio.gov/getattachment/Topics/Finance-and-Funding/\
                       School-Payment-Reports/State-Funding-For-Schools/Traditional-School-Districts/\
                       FY27-TRAD-State-Foundation-Funding-Calculator_12-16-2025_lock-1.xlsx.aspx\
@@ -286,6 +328,7 @@ pub const CONNECTORS: &[Connector] = &[
             },
             Source {
                 key: "cupp-fy24",
+                title: None,
                 url: "https://education.ohio.gov/getattachment/Topics/Finance-and-Funding/\
                       School-Payment-Reports/District-Profile-Reports/FY2024-District-Profile-Report/\
                       FY24-District-Profile-Report-Final-12-12-2024.xlsx.aspx?lang=en-US",
@@ -297,6 +340,7 @@ pub const CONNECTORS: &[Connector] = &[
             },
             Source {
                 key: "enrollment-fy24",
+                title: None,
                 url: "https://education.ohio.gov/getattachment/Topics/Data/\
                       Frequently-Requested-Data/Enrollment-Data/oct_hdcnt_fy24.xls.aspx?lang=en-US",
                 filename: "oct_hdcnt_fy24.xls",
@@ -313,12 +357,15 @@ pub const CONNECTORS: &[Connector] = &[
         key: "dew-report-card",
         publisher: "Ohio Department of Education and Workforce",
         feeds: &["metric", "education-agency"],
-        status: Status::Wired,
+        status: Status::Wired {
+            still_blocked: None,
+        },
         note: "The only publisher of an Ohio district outcome measure, and — in the Expanded \
                List — of one expenditure numerator against two different pupil denominators.",
         sources: &[
             Source {
                 key: "achievement-district-2425",
+                title: None,
                 url: "https://reportcardstorage.education.ohio.gov/data-download-2025/\
                       24-25_Achievement_District.xlsx?sv=2020-08-04&ss=b&srt=sco&sp=rlx\
                       &se=2031-07-28T05:10:18Z&st=2021-07-27T21:10:18Z&spr=https\
@@ -332,6 +379,7 @@ pub const CONNECTORS: &[Connector] = &[
             },
             Source {
                 key: "spend-per-pupil-2425",
+                title: None,
                 url: "https://reportcardstorage.education.ohio.gov/data-download-2025/\
                       2425_DISTRICT_SPEND_PER_PUPIL.xlsx?sv=2020-08-04&ss=b&srt=sco&sp=rlx\
                       &se=2031-07-28T05:10:18Z&st=2021-07-27T21:10:18Z&spr=https\
@@ -346,6 +394,7 @@ pub const CONNECTORS: &[Connector] = &[
             },
             Source {
                 key: "va-district-details-2425",
+                title: None,
                 url: "https://reportcardstorage.education.ohio.gov/data-download-2025/\
                       2425_VA_DIST_DETAILS.xlsx?sv=2020-08-04&ss=b&srt=sco&sp=rlx\
                       &se=2031-07-28T05:10:18Z&st=2021-07-27T21:10:18Z&spr=https\
@@ -359,6 +408,7 @@ pub const CONNECTORS: &[Connector] = &[
             },
             Source {
                 key: "district-details-2425",
+                title: None,
                 url: "https://reportcardstorage.education.ohio.gov/data-download-2025/\
                       2025_District_Details.xlsx?sv=2020-08-04&ss=b&srt=sco&sp=rlx\
                       &se=2031-07-28T05:10:18Z&st=2021-07-27T21:10:18Z&spr=https\
@@ -374,6 +424,7 @@ pub const CONNECTORS: &[Connector] = &[
             },
             Source {
                 key: "expanded-list-fy25",
+                title: None,
                 url: "https://reportcardstorage.education.ohio.gov/data-download-2025/\
                       FY25%20Expanded%20List.xlsx?sv=2020-08-04&ss=b&srt=sco&sp=rlx\
                       &se=2031-07-28T05:10:18Z&st=2021-07-27T21:10:18Z&spr=https\
@@ -392,11 +443,14 @@ pub const CONNECTORS: &[Connector] = &[
         key: "bls-cpi",
         publisher: "U.S. Bureau of Labor Statistics",
         feeds: &["metric", "fiscal-period"],
-        status: Status::Wired,
+        status: Status::Wired {
+            still_blocked: None,
+        },
         note: "The smallest connector and the one without which nothing else here is honest: \
                H.B. 920 is only visible as a decline once a series is deflated.",
         sources: &[Source {
             key: "cpi-u-all-items",
+            title: None,
             url: "https://download.bls.gov/pub/time.series/cu/cu.data.1.AllItems",
             filename: "cu.data.1.AllItems.tsv",
             format: Format::Tsv,
@@ -410,12 +464,15 @@ pub const CONNECTORS: &[Connector] = &[
         key: "dew-five-year-forecast",
         publisher: "Ohio Department of Education and Workforce",
         feeds: &["education-agency", "revenue-stream", "metric", "fiscal-period"],
-        status: Status::Wired,
+        status: Status::Wired {
+            still_blocked: None,
+        },
         note: "The only per-district record here of money that changed hands rather than money \
                a formula computed — and the only one carrying what a district holds.",
         sources: &[
             Source {
                 key: "five-year-forecast-fy23",
+                title: None,
                 url: "https://public.education.ohio.gov/School%20District%20Five-year%20Forecasts/\
                       FY23_5YR_Forecast_Required_Spring%20Update%20Submissions.txt",
                 filename: "five-year-forecast-fy23.txt",
@@ -428,6 +485,7 @@ pub const CONNECTORS: &[Connector] = &[
             },
             Source {
                 key: "five-year-forecast-fy26",
+                title: None,
                 url: "https://public.education.ohio.gov/School%20District%20Five-year%20Forecasts/\
                       FY26_Financial_Forecast_Required_Spring_Update_Submissions.txt",
                 filename: "five-year-forecast-fy26.txt",
@@ -444,12 +502,15 @@ pub const CONNECTORS: &[Connector] = &[
         key: "tax-abstract",
         publisher: "Ohio Department of Taxation",
         feeds: &["revenue-stream", "parameter", "metric"],
-        status: Status::Wired,
+        status: Status::Wired {
+            still_blocked: None,
+        },
         note: "Without this the local half of Ohio school funding is invisible, and the local \
                half is where the disparities live.",
         sources: &[
             Source {
                 key: "sd1-ty2021",
+                title: None,
                 url: "https://dam.assets.ohio.gov/raw/upload/tax.ohio.gov/tax_analysis/\
                       tax_data_series/school_district_data/sd1/SD1CY21.xlsx",
                 filename: "sd1-ty2021.xlsx",
@@ -463,6 +524,7 @@ pub const CONNECTORS: &[Connector] = &[
             },
             Source {
                 key: "sd1-ty2022",
+                title: None,
                 url: "https://dam.assets.ohio.gov/raw/upload/tax.ohio.gov/tax_analysis/\
                       tax_data_series/school_district_data/sd1/SD1CY22.xlsx",
                 filename: "sd1-ty2022.xlsx",
@@ -475,6 +537,7 @@ pub const CONNECTORS: &[Connector] = &[
             },
             Source {
                 key: "sd1-ty2023",
+                title: None,
                 url: "https://dam.assets.ohio.gov/raw/upload/tax.ohio.gov/tax_analysis/\
                       tax_data_series/school_district_data/sd1/SD1CY23.xlsx",
                 filename: "sd1-ty2023.xlsx",
@@ -489,6 +552,7 @@ pub const CONNECTORS: &[Connector] = &[
             },
             Source {
                 key: "sd1-ty2024",
+                title: None,
                 url: "https://dam.assets.ohio.gov/raw/upload/tax.ohio.gov/tax_analysis/\
                       tax_data_series/school_district_data/sd1/SD1CY24.xlsx",
                 filename: "sd1-ty2024.xlsx",
@@ -512,30 +576,16 @@ pub const CONNECTORS: &[Connector] = &[
                          indexed but post-date the deduction entirely",
         },
         note: "The one source that would carry the voucher and community-school deduction per \
-               resident district, for the years it existed. The FY2027 calculator does not: its \
-               transfer channel is a named service-centre charge plus a residual too small to \
-               hide one, and under the Fair School Funding Plan those students are funded \
-               directly rather than deducted. So the deduction is not missing from the current \
-               model — it is absent from it by design, and what is missing is the era before.\n\
-               \n\
-               **The recorded blocker was wrong in both directions.** \"No index and no stable \
-               path\" is stale: `education.ohio.gov` now lists 38 direct `.xlsx` payment reports \
-               for FY2026 and FY2027 at fixed URLs. And \"the years before about 2015 are not on \
-               the current host\" is wrong in kind — the department publishes *Foundation Legacy \
-               Payment Reports (1999-2021)*, covering the whole deduct era, on its reports \
-               portal. That portal gates on `sessionStorage.claims` and needs an OH|ID account.\n\
-               \n\
-               So the era this connector exists for is retrievable-in-principle and behind a \
-               login, which is a different problem from an absent index and is not one to route \
-               around. The open era is wide open and is the era where the deduction does not \
-               exist.",
+               resident district, for the years it existed.",
         sources: &[],
     },
     Connector {
         key: "lsc-budget",
         publisher: "Ohio Legislative Service Commission",
         feeds: &["legislation", "fiscal-period", "program", "parameter"],
-        status: Status::Wired,
+        status: Status::Wired {
+            still_blocked: None,
+        },
         note: "The only continuous appropriation-line series across the whole period, and the \
                primary source for the pre-2000 record. Wired for **one document**: the final \
                analysis of the current budget act, which is where every provision the Revised \
@@ -548,6 +598,7 @@ pub const CONNECTORS: &[Connector] = &[
         sources: &[
         Source {
             key: "hb96-edu-redbook",
+            title: None,
             url: "https://www.lsc.ohio.gov/assets/legislation/136/hb96/in/files/\
                   hb96-edu-redbook-as-introduced-136th-general-assembly.pdf",
             filename: "hb96-edu-redbook.pdf",
@@ -563,6 +614,7 @@ pub const CONNECTORS: &[Connector] = &[
         },
         Source {
             key: "hb96-final-analysis",
+            title: None,
             url: "https://www.lsc.ohio.gov/assets/legislation/136/hb96/en0/files/\
                   hb96-bill-analysis-as-enacted-136th-general-assembly.pdf",
             filename: "hb96-final-analysis.pdf",
@@ -581,7 +633,9 @@ pub const CONNECTORS: &[Connector] = &[
         key: "ohio-laws",
         publisher: "Ohio General Assembly",
         feeds: &["legislation", "parameter", "formula-component"],
-        status: Status::Wired,
+        status: Status::Wired {
+            still_blocked: None,
+        },
         note: "Most `statutory_basis` fields in the corpus were `[open]` and waiting on exactly \
                this. The recorded blocker — \"serves HTML with no bulk export\" — was a statement \
                about the absence of a convenience, and was read as one about the absence of the \
@@ -595,42 +649,50 @@ pub const CONNECTORS: &[Connector] = &[
         key: "ohio-courts",
         publisher: "Supreme Court of Ohio",
         feeds: &["litigation"],
-        status: Status::Wired,
+        status: Status::Wired {
+            still_blocked: Some(
+                "trial-level rulings such as the 2025 EdChoice decision are not in the supreme \
+                 court archive at all, and `citing_cases` needs a citator rather than a document",
+            ),
+        },
         note: "Wired for the four DeRolph opinions, which is what the corpus actually cites. The \
-               recorded blocker had two clauses and they are not equally true. \"Opinions are \
-               PDFs\" was never a blocker once `Format::Pdf` had a reader; all four retrieve. \
-               \"Trial-level rulings such as the 2025 EdChoice decision are not in the supreme \
-               court archive at all\" is correct and unfixable from here — a common pleas ruling \
-               is not in the supreme court's archive because it is not the supreme court's. That \
-               half stands, and so does `citing_cases`, which needs a citator rather than a \
-               document.",
+               recorded blocker had two clauses and they are not equally true: \"opinions are \
+               PDFs\" stopped being one the moment `Format::Pdf` had a reader, and the other half \
+               is unfixable from here and is now carried in `still_blocked` rather than in this \
+               sentence.",
         sources: &[
             Source {
                 key: "derolph-i",
+                title: Some("DeRolph I, 78 Ohio St.3d 193 (1997)"),
                 url: "https://www.supremecourt.ohio.gov/rod/docs/pdf/0/1997/1997-ohio-84.pdf",
                 filename: "derolph-i.pdf",
                 format: Format::Pdf,
                 catalog: Some("derolph-litigation-record"),
                 fixture: Some(crate::fixtures::OPINIONS_FIXTURE),
-                note: "DeRolph I, 1997. The opinion the corpus's charge-off rate series is built from — paragraph 97 recites the whole progression with its session-law citations, and names the base as total taxable value.",
+                note: "The opinion the corpus's charge-off rate series is built from. \
+                       Paragraph 97 recites the whole progression with its session-law \
+                       citations, and names the base as total taxable value.",
             },
             Source {
                 key: "derolph-ii",
+                title: Some("DeRolph II, 89 Ohio St.3d 1 (2000)"),
                 url: "https://www.supremecourt.ohio.gov/rod/docs/pdf/0/2000/2000-ohio-437.pdf",
                 filename: "derolph-ii.pdf",
                 format: Format::Pdf,
                 catalog: Some("derolph-litigation-record"),
                 fixture: Some(crate::fixtures::OPINIONS_FIXTURE),
-                note: "DeRolph II, 2000.",
+                note: "The second of the four, holding the system still unconstitutional \
+                       after the General Assembly's first response.",
             },
             Source {
                 key: "derolph-iii",
+                title: Some("DeRolph III, 93 Ohio St.3d 309 (2001)"),
                 url: "https://www.supremecourt.ohio.gov/rod/docs/pdf/0/2001/2001-ohio-1343.pdf",
                 filename: "derolph-iii.pdf",
                 format: Format::Pdf,
                 catalog: Some("derolph-litigation-record"),
                 fixture: Some(crate::fixtures::OPINIONS_FIXTURE),
-                note: "DeRolph III, 2001, at 93 Ohio St.3d 309. The WebCite is 2001-Ohio-1343; \
+                note: "The WebCite is 2001-Ohio-1343; \
                        this entry first carried 2001-Ohio-114, which is a workers' compensation \
                        appeal. A citation guessed from a plausible number rather than read off \
                        the document — the same failure this connector was wired to make \
@@ -639,12 +701,14 @@ pub const CONNECTORS: &[Connector] = &[
             },
             Source {
                 key: "derolph-iv",
+                title: Some("DeRolph IV, 97 Ohio St.3d 434 (2002)"),
                 url: "https://www.supremecourt.ohio.gov/rod/docs/pdf/0/2002/2002-ohio-6750.pdf",
                 filename: "derolph-iv.pdf",
                 format: Format::Pdf,
                 catalog: Some("derolph-litigation-record"),
                 fixture: Some(crate::fixtures::OPINIONS_FIXTURE),
-                note: "DeRolph IV, 2002. The last word, and the one that ended judicial supervision without a remedy.",
+                note: "The last word, and the one that ended judicial supervision without \
+                       a remedy.",
             },
         ],
     },
@@ -658,27 +722,16 @@ pub const CONNECTORS: &[Connector] = &[
                          by interactive maps rather than served as files",
         },
         note: "The only source for the capital channel, which is invisible in every operating \
-               per-pupil figure and was itself part of the DeRolph remedy.\n\
-               \n\
-               **The blocker is now precise, and it is partly a choice.** `ofcc.ohio.gov` returns \
-               404 to this project's contactable user-agent and 200 to a browser string. The data \
-               is served; the agent is filtered. Sending a browser string would work, and \
-               [`cache`](../src/cache.rs) already states the position on that — impersonating one \
-               \"would be discourteous besides\". The filter is more likely an undiscriminating \
-               CDN default than a considered exclusion of researchers, but guessing at intent is \
-               not a reason to route around it.\n\
-               \n\
-               Behind the filter the project portfolios are interactive maps rather than files, \
-               so a bulk export would still have to be reverse-engineered out of a map service. \
-               The honest next step here is to ask the commission, not to change the agent \
-               string.",
+               per-pupil figure and was itself part of the DeRolph remedy.",
         sources: &[],
     },
     Connector {
         key: "census-f33",
         publisher: "U.S. Census Bureau",
         feeds: &["metric", "education-agency"],
-        status: Status::Wired,
+        status: Status::Wired {
+            still_blocked: None,
+        },
         note: "Comparability in two directions: whether Ohio is unusual, and an independent \
                check on department figures computed on different definitions. The first is \
                wired and settles the DeRolph claim comparatively; the second needs the \
@@ -686,6 +739,7 @@ pub const CONNECTORS: &[Connector] = &[
                held by `nces-ccd`.",
         sources: &[Source {
             key: "f33-fy2022",
+            title: None,
             url: "https://www2.census.gov/programs-surveys/school-finances/tables/2022/\
                   secondary-education-finance/elsec22t.xls",
             filename: "elsec22t.xls",
@@ -700,6 +754,7 @@ pub const CONNECTORS: &[Connector] = &[
         },
         Source {
             key: "sdf22-districts",
+            title: None,
             url: "https://nces.ed.gov/ccd/data/zip/sdf22_1a.zip",
             filename: "sdf22_1a.zip",
             format: Format::Zip,
@@ -718,7 +773,9 @@ pub const CONNECTORS: &[Connector] = &[
         key: "nces-ccd",
         publisher: "National Center for Education Statistics",
         feeds: &["education-agency"],
-        status: Status::Wired,
+        status: Status::Wired {
+            still_blocked: None,
+        },
         note: "A corpus spanning 1851 to the present is a panel whose members change, and a \
                long series assembled without accounting for consolidation is silently wrong. \
                That series is still not built: agency files are per-year zips whose column sets \
@@ -727,6 +784,7 @@ pub const CONNECTORS: &[Connector] = &[
                carries the one column two other connectors were waiting on.",
         sources: &[Source {
             key: "ccd-lea-directory-2223",
+            title: None,
             url: "https://nces.ed.gov/ccd/data/zip/ccd_lea_029_2223_w_1a_083023.zip",
             filename: "ccd-lea-directory-2223.zip",
             format: Format::Zip,
@@ -744,7 +802,9 @@ pub const CONNECTORS: &[Connector] = &[
         key: "census-geography",
         publisher: "U.S. Census Bureau",
         feeds: &["education-agency", "actor"],
-        status: Status::Wired,
+        status: Status::Wired {
+            still_blocked: None,
+        },
         note: "Ohio's funding system has no legislative district in it, so the mapping from \
                school districts to House districts does not exist and has to be built from \
                census blocks. 339 of 609 districts straddle two or more seats, which is why it \
@@ -753,6 +813,7 @@ pub const CONNECTORS: &[Connector] = &[
         sources: &[
             Source {
                 key: "baf-2020-oh",
+                title: None,
                 url: "https://www2.census.gov/geo/docs/maps-data/data/baf2020/\
                       BlockAssign_ST39_OH.zip",
                 filename: "BlockAssign_ST39_OH.zip",
@@ -767,6 +828,7 @@ pub const CONNECTORS: &[Connector] = &[
             },
             Source {
                 key: "sldl24-bef",
+                title: None,
                 url: "https://www2.census.gov/programs-surveys/decennial/rdo/mapping-files/2025/\
                       2024-state-legislative-bef/sldl24.zip",
                 filename: "sldl24.zip",
@@ -781,6 +843,7 @@ pub const CONNECTORS: &[Connector] = &[
             },
             Source {
                 key: "sldu24-bef",
+                title: None,
                 url: "https://www2.census.gov/programs-surveys/decennial/rdo/mapping-files/2025/\
                       2024-state-legislative-bef/sldu24.zip",
                 filename: "sldu24.zip",
@@ -796,6 +859,7 @@ pub const CONNECTORS: &[Connector] = &[
             },
             Source {
                 key: "pl94-171-2020-oh",
+                title: None,
                 url: "https://www2.census.gov/programs-surveys/decennial/2020/data/\
                       01-Redistricting_File--PL_94-171/Ohio/oh2020.pl.zip",
                 filename: "oh2020.pl.zip",
@@ -906,15 +970,25 @@ mod tests {
     }
 
     #[test]
-    fn a_declared_connector_says_what_blocks_it() {
+    fn a_connector_that_is_blocked_says_what_blocks_it() {
+        // Both halves of the claim, not just the declared one. A connector wired for part of what
+        // it feeds records the rest in `still_blocked`, and that string is held to the same
+        // standard as a declared connector's — the whole point of the field is that a surviving
+        // blocker stays machine-readable instead of decaying into prose.
         for connector in CONNECTORS {
-            if let Status::Declared { blocked_on } = connector.status {
-                assert!(
-                    blocked_on.len() > 20,
-                    "{} is declared without a reason",
-                    connector.key
-                );
-            }
+            let (kind, reason) = match connector.status {
+                Status::Declared { blocked_on } => ("declared", Some(blocked_on)),
+                Status::Wired { still_blocked } => ("wired", still_blocked),
+                _ => continue,
+            };
+            let Some(reason) = reason else {
+                continue;
+            };
+            assert!(
+                reason.len() > 20,
+                "{} is {kind} without a reason",
+                connector.key
+            );
         }
     }
 
@@ -966,7 +1040,7 @@ mod tests {
     #[test]
     fn a_wired_connector_feeds_at_least_one_fixture() {
         for connector in CONNECTORS {
-            if connector.status == Status::Wired {
+            if connector.status.is_wired() {
                 assert!(
                     connector.sources.iter().any(|s| s.fixture.is_some()),
                     "{} claims wired but feeds nothing",

@@ -12,16 +12,18 @@
 //! archive because it is not the supreme court's — and it is why this connector is wired for the
 //! four DeRolph opinions and not for the case the corpus most recently added a node for.
 
+use regime_diff::charge_off::SourcedTo;
+
 const OPINIONS: &str = include_str!("../fixtures/derolph-opinions.txt");
 
 fn opinion(key: &str) -> &'static str {
-    let marker = format!("\n§ {key}\n");
+    let marker = format!("\n=== {key}\n");
     let start = OPINIONS
         .find(&marker)
         .unwrap_or_else(|| panic!("{key} is not in the committed extract"))
         + marker.len();
     let rest = &OPINIONS[start..];
-    let end = rest.find("\n§ ").unwrap_or(rest.len());
+    let end = rest.find("\n=== ").unwrap_or(rest.len());
     &rest[..end]
 }
 
@@ -44,7 +46,7 @@ fn flat(key: &str) -> String {
 /// Official Reports it was cited to, both of which the archive prints on the first line.
 #[test]
 fn each_opinion_is_the_case_it_is_cited_as() {
-    let count = OPINIONS.lines().filter(|l| l.starts_with("§ ")).count();
+    let count = OPINIONS.lines().filter(|l| l.starts_with("=== ")).count();
     assert_eq!(count, 4);
 
     let expected = [
@@ -54,6 +56,17 @@ fn each_opinion_is_the_case_it_is_cited_as() {
         ("derolph-iv", "97 Ohio St.3d 434", "2002-Ohio-6750"),
     ];
     for (key, reporter, webcite) in expected {
+        // The record's own title, which the extract declares rather than deriving from a comment.
+        // It carried `DeRolph III, 2001, at 93 Ohio St` when it was cut out of the first sentence
+        // of a prose note, so the reporter citation is checked here too.
+        let record = opinion(key);
+        assert!(
+            record
+                .lines()
+                .any(|l| l.starts_with("title: ") && l.contains(reporter)),
+            "{key} is titled without its reporter citation: {:?}",
+            record.lines().next().unwrap_or_default()
+        );
         let body = flat(key);
         assert!(
             body.contains(&format!("Ohio Official Reports at {reporter}")),
@@ -95,10 +108,21 @@ fn every_charge_off_authority_is_quoted_from_the_opinion() {
     assert!(d1.contains("total taxable value is multiplied by .023"));
 
     // And the authorities the corpus carries, verbatim.
-    for rate in regime_diff::RATES {
-        if rate.authority.contains("LSC") {
-            continue; // FY2008, which comes from the Complete Resource rather than the opinion.
-        }
+    //
+    // Partitioned on `sourced_to` rather than on a substring of `authority`. The rates that came
+    // out of this opinion are a fact about where they were read, not about whether their citation
+    // happens to spell "LSC"; searching the prose would quietly exempt a reworded entry and
+    // quietly assert an Evidence-Based Model citation against a 1997 opinion when the series is
+    // extended, which the series' own doc comment says it will be.
+    let from_opinion: Vec<_> = regime_diff::RATES
+        .iter()
+        .filter(|r| r.sourced_to == SourcedTo::DeRolphI)
+        .collect();
+    assert!(
+        !from_opinion.is_empty(),
+        "no rate claims to come from DeRolph I, so this test checks nothing"
+    );
+    for rate in from_opinion {
         let cited = rate
             .authority
             .split(", as recited")
@@ -130,13 +154,21 @@ fn the_opinion_names_the_base_the_corpus_assigned_to_those_years() {
     ));
     assert!(d1.contains("defining “total taxable value”"));
 
+    // The expected count is derived from the filter rather than written as 3: a hardcoded length
+    // turns "a rate was added to the series" into a mismatch that names neither the rate nor the
+    // reason. What is being asserted is that *every* rate read out of this opinion carries the
+    // base the opinion defines, however many of them there come to be.
     use regime_diff::charge_off::ValuationBase;
     let derolph_era: Vec<ValuationBase> = regime_diff::RATES
         .iter()
-        .filter(|r| !r.authority.contains("LSC"))
+        .filter(|r| r.sourced_to == SourcedTo::DeRolphI)
         .map(|r| r.base)
         .collect();
-    assert_eq!(derolph_era, vec![ValuationBase::TotalTaxable; 3]);
+    assert!(!derolph_era.is_empty(), "no rate comes from DeRolph I");
+    assert_eq!(
+        derolph_era,
+        vec![ValuationBase::TotalTaxable; derolph_era.len()]
+    );
 }
 
 /// The opinion also states the mechanism the corpus reproduces, which is worth pinning.

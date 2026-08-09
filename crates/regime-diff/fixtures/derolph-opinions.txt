@@ -1,11 +1,11 @@
-# Ohio Revised Code, the sections this corpus cites.
-# Regenerate with `edfund-connect rebuild`. One record per section; records begin with
-# a section mark at the start of a line, which the statute's own text never does.
+# DeRolph v. State, the four opinions this corpus cites. One record per case.
+# Regenerate with `edfund-connect rebuild`. Records begin with `=== ` at the
+# start of a line, which no record's own text does.
 
-§ derolph-i
-title: DeRolph I, 1997
-effective: 
-legislation: https://www.supremecourt.ohio.gov/rod/docs/pdf/0/1997/1997-ohio-84.pdf
+=== derolph-i
+title: DeRolph I, 78 Ohio St.3d 193 (1997)
+date: March 24, 1997
+source: https://www.supremecourt.ohio.gov/rod/docs/pdf/0/1997/1997-ohio-84.pdf
 --
 [This opinion has been published in Ohio Official Reports at 78 Ohio St.3d 193.]
 
@@ -4864,10 +4864,10 @@ opinion.
 
                                        129
 
-§ derolph-ii
-title: DeRolph II, 2000
-effective: 
-legislation: https://www.supremecourt.ohio.gov/rod/docs/pdf/0/2000/2000-ohio-437.pdf
+=== derolph-ii
+title: DeRolph II, 89 Ohio St.3d 1 (2000)
+date: May 11, 2000
+source: https://www.supremecourt.ohio.gov/rod/docs/pdf/0/2000/2000-ohio-437.pdf
 --
 [This opinion has been published in Ohio Official Reports at 89 Ohio St.3d 1.]
 
@@ -7929,10 +7929,10 @@ of government, we invite a lessening of public trust in the court as an institut
 
                                          82
 
-§ derolph-iii
-title: DeRolph III, 2001, at 93 Ohio St
-effective: 
-legislation: https://www.supremecourt.ohio.gov/rod/docs/pdf/0/2001/2001-ohio-1343.pdf
+=== derolph-iii
+title: DeRolph III, 93 Ohio St.3d 309 (2001)
+date: September 6, 2001
+source: https://www.supremecourt.ohio.gov/rod/docs/pdf/0/2001/2001-ohio-1343.pdf
 --
 [This decision has been published in Ohio Official Reports at 93 Ohio St.3d 309.]
 
@@ -12001,10 +12001,10 @@ appellants.
 
                                         107
 
-§ derolph-iv
-title: DeRolph IV, 2002
-effective: 
-legislation: https://www.supremecourt.ohio.gov/rod/docs/pdf/0/2002/2002-ohio-6750.pdf
+=== derolph-iv
+title: DeRolph IV, 97 Ohio St.3d 434 (2002)
+date: December 11, 2002
+source: https://www.supremecourt.ohio.gov/rod/docs/pdf/0/2002/2002-ohio-6750.pdf
 --
 [This opinion has been published in Ohio Official Reports at 97 Ohio St.3d 434.]
 
