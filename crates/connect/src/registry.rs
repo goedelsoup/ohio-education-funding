@@ -101,7 +101,8 @@ pub const OHIO_LAWS_SECTIONS: &[Source] = &[
         format: Format::Html,
         catalog: Some("ohio-revised-code"),
         fixture: Some(crate::fixtures::STATUTE_FIXTURE),
-        note: "R.C. 3317.02. Definitions, including the economically disadvantaged index and its squaring — which the DPIA node recorded as not located in statute.",
+        note: "R.C. 3317.02. Definitions, including the economically disadvantaged index and its \
+               squaring — which the DPIA node recorded as not located in statute.",
     },
     Source {
         key: "rc-3317-011",
@@ -121,7 +122,8 @@ pub const OHIO_LAWS_SECTIONS: &[Source] = &[
         format: Format::Html,
         catalog: Some("ohio-revised-code"),
         fixture: Some(crate::fixtures::STATUTE_FIXTURE),
-        note: "R.C. 3317.013. Special education weights, and the clinical categories the corpus could not name.",
+        note: "R.C. 3317.013. Special education weights, and the clinical categories the corpus \
+               could not name.",
     },
     Source {
         key: "rc-3317-014",
@@ -131,7 +133,8 @@ pub const OHIO_LAWS_SECTIONS: &[Source] = &[
         format: Format::Html,
         catalog: Some("ohio-revised-code"),
         fixture: Some(crate::fixtures::STATUTE_FIXTURE),
-        note: "R.C. 3317.014. Career-technical weights, and the programme categories behind their ordering.",
+        note: "R.C. 3317.014. Career-technical weights, and the programme categories behind their \
+               ordering.",
     },
     Source {
         key: "rc-3317-016",
@@ -173,7 +176,9 @@ pub const OHIO_LAWS_SECTIONS: &[Source] = &[
         format: Format::Html,
         catalog: Some("ohio-revised-code"),
         fixture: Some(crate::fixtures::STATUTE_FIXTURE),
-        note: "R.C. 3317.022. Core foundation funding: the section that assembles every component, and where disadvantaged pupil impact aid actually lives.",
+        note:
+            "R.C. 3317.022. Core foundation funding: the section that assembles every component, \
+               and where disadvantaged pupil impact aid actually lives.",
     },
     Source {
         key: "rc-3317-051",
@@ -224,7 +229,8 @@ pub const OHIO_LAWS_SECTIONS: &[Source] = &[
         format: Format::Html,
         catalog: Some("ohio-revised-code"),
         fixture: Some(crate::fixtures::STATUTE_FIXTURE),
-        note: "R.C. 3317.03. What each reported count means, including the economically disadvantaged certification the department is left to define.",
+        note: "R.C. 3317.03. What each reported count means, including the economically \
+               disadvantaged certification the department is left to define.",
     },
     Source {
         key: "rc-319-301",
@@ -316,7 +322,8 @@ pub const CONNECTORS: &[Connector] = &[
                 key: "fy27-calculator",
                 title: None,
                 url: "https://education.ohio.gov/getattachment/Topics/Finance-and-Funding/\
-                      School-Payment-Reports/State-Funding-For-Schools/Traditional-School-Districts/\
+                      School-Payment-Reports/State-Funding-For-Schools/\
+                      Traditional-School-Districts/\
                       FY27-TRAD-State-Foundation-Funding-Calculator_12-16-2025_lock-1.xlsx.aspx\
                       ?lang=en-US",
                 filename: "fy27-calculator.xlsx",
@@ -330,7 +337,8 @@ pub const CONNECTORS: &[Connector] = &[
                 key: "cupp-fy24",
                 title: None,
                 url: "https://education.ohio.gov/getattachment/Topics/Finance-and-Funding/\
-                      School-Payment-Reports/District-Profile-Reports/FY2024-District-Profile-Report/\
+                      School-Payment-Reports/District-Profile-Reports/\
+                      FY2024-District-Profile-Report/\
                       FY24-District-Profile-Report-Final-12-12-2024.xlsx.aspx?lang=en-US",
                 filename: "cupp-fy24.xlsx",
                 format: Format::Xlsx,
@@ -584,17 +592,15 @@ pub const CONNECTORS: &[Connector] = &[
         publisher: "Ohio Legislative Service Commission",
         feeds: &["legislation", "fiscal-period", "program", "parameter"],
         status: Status::Wired {
-            still_blocked: None,
+            still_blocked: Some(
+                "wired for one document, the final analysis of the current budget act; the \
+                 redbooks, the Catalog of Budget Line Items and the per-district simulations are \
+                 unretrieved, so the continuous appropriation-line series and the pre-2000 record \
+                 are not built",
+            ),
         },
         note: "The only continuous appropriation-line series across the whole period, and the \
-               primary source for the pre-2000 record. Wired for **one document**: the final \
-               analysis of the current budget act, which is where every provision the Revised \
-               Code does not contain actually lives. The redbooks, the Catalog of Budget Line \
-               Items and the per-district simulations remain unretrieved, so the appropriation \
-               series this connector exists for is still ahead.\n\
-               \n\
-               The recorded blocker said these are PDFs, which is true and was treated as the \
-               end of the matter. A PDF is a container; `Format::Pdf` now has a reader.",
+               primary source for the pre-2000 record.",
         sources: &[
         Source {
             key: "hb96-edu-redbook",

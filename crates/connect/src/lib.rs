@@ -363,23 +363,34 @@ pub fn rebuild(root: &Path) -> Result<Vec<Rebuilt>, RebuildError> {
     // The Revised Code. Skipped rather than fatal when a section is not cached, for the same
     // reason as F-33 below: it feeds prose and verification, and an absent copy should cost those
     // rather than the whole rebuild.
-    let statutes: Vec<fixtures::Record> = registry::OHIO_LAWS_SECTIONS
+    //
+    // Skipped as a whole, though — all fifteen sections or none, for the reason the opinions are
+    // all four or none. "Skip the fixture when a section is missing" and "write the sections that
+    // happened to be there" are different behaviours, and this collected into a `Vec` and guarded
+    // on `is_empty`, which is the second one: fourteen cached sections rewrote the committed
+    // extract as a fourteen-section file and reported it as a success. A statute the corpus cites
+    // that is silently absent from the extract is worse than an extract that is not there, because
+    // the first looks like an answer.
+    let statutes: Result<Vec<fixtures::Record>, String> = registry::OHIO_LAWS_SECTIONS
         .iter()
-        .filter_map(|source| {
-            let path = cache::cached_path(root, source);
-            let page = std::fs::read_to_string(path).ok()?;
+        .map(|source| {
+            let page = cache::read_cached(root, source).map_err(|cause| cause.to_string())?;
+            let page = String::from_utf8_lossy(&page);
             // The key is `rc-3317-013`; the section it cites is `3317.013`.
             let section = source.key.trim_start_matches("rc-").replacen('-', ".", 1);
-            fixtures::parse_statute(&section, &page)
+            // `None` means neither landmark was found, which says the page is no longer the page
+            // the parser was written against — a different failure from an absent file, and one
+            // worth naming rather than counting.
+            fixtures::parse_statute(&section, &page).ok_or_else(|| {
+                format!(
+                    "{section} did not parse; {} is no longer the page it was",
+                    source.url
+                )
+            })
         })
         .collect();
-    out.push(if statutes.is_empty() {
-        Rebuilt::Skipped {
-            path: fixtures::STATUTE_FIXTURE.to_string(),
-            reason: "no Revised Code sections cached".to_string(),
-        }
-    } else {
-        Rebuilt::Written {
+    out.push(match statutes {
+        Ok(statutes) => Rebuilt::Written {
             path: fixtures::STATUTE_FIXTURE.to_string(),
             rows: fixtures::write_text(
                 &root.join(fixtures::STATUTE_FIXTURE),
@@ -388,7 +399,11 @@ pub fn rebuild(root: &Path) -> Result<Vec<Rebuilt>, RebuildError> {
                     &statutes,
                 ),
             )?,
-        }
+        },
+        Err(reason) => Rebuilt::Skipped {
+            path: fixtures::STATUTE_FIXTURE.to_string(),
+            reason,
+        },
     });
 
     // The enacted budget act. Skipped rather than fatal on two counts: the PDF may not be cached,

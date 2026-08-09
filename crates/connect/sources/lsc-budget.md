@@ -33,10 +33,20 @@ same quantity and routinely disagree; the corpus keeps both and names which is w
 
 ## Status
 
-**Declared.** Approved in [decisions/proposals.yml](../../../.yidam/decisions/proposals.yml);
-no endpoint wired.
+**Wired**, for **one document**: the final analysis of the current budget act, which is where
+every provision the Revised Code does not contain actually lives.
 
-Redbooks and the Catalog of Budget Line Items are PDFs, and the per-district simulations are
-workbooks posted per bill with no index. The simulations are the valuable part and the most
-tractable: they are spreadsheets, and [`spreadsheet`](../../spreadsheet/) already reads that
-format. What is missing is a way to enumerate them.
+The recorded blocker said these are PDFs. That is true, and was treated as the end of the matter;
+a PDF is a container, and `Format::Pdf` now has a reader.
+
+**What is still ahead is the reason this connector exists.** The redbooks, the Catalog of Budget
+Line Items and the per-district simulations remain unretrieved, so the continuous
+appropriation-line series is not built and the pre-2000 record is not here. That is recorded in
+the registry as `still_blocked` rather than left to this paragraph, so `edfund-connect list` does
+not read as though the appropriation series were served.
+
+The obstacles differ by document. Redbooks and the Catalog are PDFs, now tractable in principle.
+The per-district simulations are workbooks posted per bill with no index — the valuable part and
+the most tractable in format, since they are spreadsheets and
+[`spreadsheet`](../../spreadsheet/) already reads that format. What is missing there is a way to
+enumerate them. Much of the pre-2000 material is scanned PDF, which is a different problem again.
