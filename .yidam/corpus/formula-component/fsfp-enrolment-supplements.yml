@@ -1,0 +1,63 @@
+class: formula-component
+label: FSFP Base and Enrollment Growth Supplements
+description: |
+  Two payments that share a sheet and nothing else. Lines `[L]` and `[M]`, both inside `[N] Total
+  Formula Funding`. [verified]
+
+  **The base funding supplement** is $40 for every pupil in every district, $56.1m statewide, with
+  no test of any kind. It is the simplest line in the whole calculation and the only one with no
+  conditionality whatever.
+
+  **The enrollment growth supplement** is $250 a pupil for a district whose enrolment rose at least
+  **3%** over three years — and it pays on **every** pupil, not on the pupils gained. $39.4m to 43
+  districts, against a median district that **shrank 4.8%**. [verified]
+
+  **PAYING ON THE WHOLE ROLL TURNS THE THRESHOLD INTO A CLIFF.** What clearing 3% is worth has
+  nothing to do with how close a district came: it is $250 times the district's size. New Lexington
+  grew **2.9502%** and drew nothing; three hundredths of a percentage point further and it would
+  have received **$430,477**. Two other districts sit between 2.7% and 3%. [verified —
+  `crates/project/tests/the_supplements_outside_the_formula.rs`]
+
+  The cliff sits in a thin part of the distribution, which is where a cliff does its most arbitrary
+  work: Ohio's median district is shrinking, so the districts near the threshold are few and their
+  neighbours on either side are otherwise alike. [inference]
+
+  **AND IT POINTS THE OPPOSITE WAY TO THE GUARANTEE.** The
+  [guarantee](temporary-transitional-aid-guarantee.yml) pays a district whose enrolment has
+  **fallen**; this pays one whose enrolment has **risen**. The same formula cushions movement in
+  both directions, which means it responds to enrolment change considerably less than its
+  per-pupil construction suggests. Whether any district draws both is worth checking rather than
+  assuming — the guarantee tracks aid rather than enrolment, and property wealth predicts it three
+  times more strongly than decline does. [verified]
+
+  **STILL OPEN.** Why 3% and why three years. Both are single numbers with a cliff behind them and
+  neither is explained in the calculator. [open]
+properties:
+  name: Base and enrollment growth supplements
+  function: |
+    [L] Base funding supplement = enrolled ADM x $40                     (every district)
+    M1  Enrolment change        = (FY26 enrolled ADM - FY23 enrolled ADM) / FY23
+    M2  Eligibility             = M1 >= 3%
+    [M] Growth supplement       = if eligible then enrolled ADM x $250 else 0
+
+    Both paid on `[a] Enrolled ADM`. FY2023 enrolled ADM is a fourth ADM year, held nowhere else
+    in this corpus.
+  statutory_basis: |
+    Not located in R.C. 3317. Reported as lines [L] and [M]; the $40, the $250 and the 3% threshold
+    are transcribed from the calculator and their authority is [open].
+  calculator: |
+    Not a standalone crate. Carried in `crates/project::panel::Supplements` and reproduced for all
+    609 districts in `crates/project/tests/the_supplements_outside_the_formula.rs`.
+  fy2027_scale: |
+    Base supplement $56.1m to all 609 districts; growth supplement $39.4m to 43. [verified]
+links:
+  - target: ../formula-component.ont.yml
+    relationship: instance-of
+  - target: ../revenue-stream/state-foundation-aid.yml
+    relationship: distributes
+  - target: temporary-transitional-aid-guarantee.yml
+    relationship: mirrors
+  - target: ../metric/enrolled-adm.yml
+    relationship: consumes
+  - target: ../../catalog/dew-fy27-funding-calculator.md
+    relationship: sourced-from

@@ -1,0 +1,72 @@
+class: formula-component
+label: FSFP Performance Supplement
+description: |
+  **The only place Ohio's school funding formula pays on a measured outcome.** $55.7m to 427
+  districts, line `[O]`, outside `[H] Foundation Funding` and therefore outside the
+  [guarantee](temporary-transitional-aid-guarantee.yml)'s protection. [verified]
+
+  Every other component in this class pays for an *input* — a pupil, a category of need, a tax
+  base. This pays for a **rating**: $13 a pupil times the greater of the district's overall star
+  rating and its progress component rating, so the amount runs from $32.50 to $65.00 per pupil.
+
+  **Three routes qualify a district and only one is about being good:**
+
+      an overall rating above 3.5 stars        288 districts
+      a progress rating of 3 or more           120 more, whatever the overall rating
+      a progress rating higher than last year   18 more, whatever the level
+
+  The two progress routes exist to blunt the obvious objection to outcome-based funding — that it
+  pays for intake. They carry a fifth of the recipients. [verified]
+
+  **AND IT IS DISTRIBUTED INVERSELY TO NEED.** By economically disadvantaged quintile, the mean
+  supplement per pupil runs **$54.74, $43.24, $36.21, $30.03, $23.31** from least-poor to poorest,
+  monotonically, and the share of districts qualifying runs **91% to 49%**. The least-poor
+  districts receive **2.3 times per pupil** what the poorest do. [verified —
+  `crates/project/tests/the_supplements_outside_the_formula.rs`]
+
+  This wants stating precisely rather than as an accusation. Ohio's attainment measures track
+  composition — this corpus established that spending per *weighted* pupil against performance is
+  substantially a composition proxy — so any program keyed to them follows composition whatever its
+  intent. That explains the gradient; it does not remove it. **$55.7m of a formula built to
+  equalise flows against the grain of everything else in it**, and no published figure says so.
+  The progress routes are what hold the gradient to 2.3 rather than whatever it would otherwise be.
+  [inference on the mechanism, [verified] on the measurement]
+
+  **STILL OPEN.** Whether the supplement is large enough to matter distributionally. $55.7m against
+  $7.28bn of state aid is 0.8%, so a district's whole supplement is smaller than the noise in most
+  other lines — and a regressive 0.8% inside a progressive $7.28bn is a different object from a
+  regressive program. The corpus can measure the gradient and has not measured whether it moves
+  any district's position. [open]
+properties:
+  name: Performance supplement
+  function: |
+    Q4 Eligibility = "Yes" if  O1 overall stars > 3.5
+                     or        O2 progress rating >= 3
+                     or        O2 > O3 (progress higher than the year before)
+    O  Supplement  = if eligible then max(O1, O2) x $13 x enrolled ADM else 0
+
+    Paid on `[a] Enrolled ADM`, the same count four of the six categoricals use. Reported in
+    [R] Total State Support and not in [N] Total Formula Funding, so no guarantee holds it.
+  statutory_basis: |
+    Not located in R.C. 3317. The department computes it on its own sheet and reports it as line
+    [O]; the authorising section and whether the $13 and the three routes are statutory or set in
+    the budget bill are [open].
+  calculator: |
+    Not a standalone crate. Carried in `crates/project::panel::PerformanceSupplement` and
+    reproduced for all 609 districts in
+    `crates/project/tests/the_supplements_outside_the_formula.rs`.
+  fy2027_scale: |
+    $55.7m to 427 of 609 districts, $32.50 to $65.00 per pupil. [verified]
+links:
+  - target: ../formula-component.ont.yml
+    relationship: instance-of
+  - target: ../revenue-stream/state-foundation-aid.yml
+    relationship: distributes
+  - target: ../metric/performance-index.yml
+    relationship: consumes
+  - target: ../metric/progress-value-added.yml
+    relationship: consumes
+  - target: ../doctrine/equity.yml
+    relationship: tensions-with
+  - target: ../../catalog/dew-fy27-funding-calculator.md
+    relationship: sourced-from

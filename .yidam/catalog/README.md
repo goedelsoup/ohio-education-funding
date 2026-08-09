@@ -30,7 +30,7 @@ Sorted by: type, then slug.
 | [`derolph-litigation-record`](derolph-litigation-record.md) | DeRolph Litigation Record | 2 |
 | [`dew-expenditure-expanded-list`](dew-expenditure-expanded-list.md) | FY2025 Expenditure Expanded List | 1 |
 | [`dew-five-year-forecast`](dew-five-year-forecast.md) | Five-year forecast filings — the department's republished submissions | 2 |
-| [`dew-fy27-funding-calculator`](dew-fy27-funding-calculator.md) | FY27 TRAD State Foundation Funding Calculator | 9 |
+| [`dew-fy27-funding-calculator`](dew-fy27-funding-calculator.md) | FY27 TRAD State Foundation Funding Calculator | 15 |
 | [`dew-mr81-enrollment-archive`](dew-mr81-enrollment-archive.md) | MR-81 October enrollment reports, 1998–2014 | 1 |
 | [`dew-october-enrollment`](dew-october-enrollment.md) | October headcount by grade | 2 |
 | [`dew-report-card-achievement`](dew-report-card-achievement.md) | Ohio School Report Cards — District Achievement Download | 1 |

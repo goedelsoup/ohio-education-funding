@@ -81,6 +81,16 @@ links:
     relationship: composed-of
   - target: ../formula-component/fsfp-gifted-units.yml
     relationship: composed-of
+  - target: ../formula-component/fsfp-transportation.yml
+    relationship: composed-of
+  - target: ../formula-component/fsfp-preschool-special-education.yml
+    relationship: composed-of
+  - target: ../formula-component/fsfp-performance-supplement.yml
+    relationship: composed-of
+  - target: ../formula-component/fsfp-enrolment-supplements.yml
+    relationship: composed-of
+  - target: ../formula-component/fsfp-formula-transition-supplement.yml
+    relationship: composed-of
   - target: ../fiscal-period/fy2026-27.yml
     relationship: active-during
   - target: ../doctrine/adequacy.yml

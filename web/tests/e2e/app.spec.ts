@@ -1528,6 +1528,54 @@ test.describe("the hold-harmless machinery", () => {
     await expect(main).toContainText("anchored to");
   });
 
+  test("every component on a district page reaches the node describing it", async ({ page }) => {
+    /*
+     * The whole point of the wiki: a glossary nobody arrives at from the number they were reading
+     * is a document museum. Every line of Ohio's formula now has a node, and every figure on the
+     * dashboard links to its own.
+     */
+    await page.goto("/district/043802");
+    const links = page.locator('main a[href^="/wiki/formula-component/fsfp-"]');
+    const hrefs = await links.evaluateAll((els) =>
+      [...new Set(els.map((e) => (e as HTMLAnchorElement).getAttribute("href")))].sort(),
+    );
+    for (const node of [
+      "fsfp-targeted-assistance",
+      "fsfp-special-education-weights",
+      "fsfp-disadvantaged-pupil-impact-aid",
+      "fsfp-career-technical-weights",
+      "fsfp-english-learner-weights",
+      "fsfp-gifted-units",
+      "fsfp-transportation",
+      "fsfp-preschool-special-education",
+      "fsfp-performance-supplement",
+      "fsfp-enrolment-supplements",
+      "fsfp-formula-transition-supplement",
+    ]) {
+      expect(hrefs, node).toContain(`/wiki/formula-component/${node}`);
+    }
+  });
+
+  test("the guarantee node records the clawback it used to omit", async ({ page }) => {
+    // The correction that matters most: the node described a hold-harmless with no clawback in it,
+    // which reproduces correctly for 566 districts and wrongly for 43.
+    await page.goto("/wiki/formula-component/temporary-transitional-aid-guarantee");
+    const body = page.locator("main");
+    await expect(body).toContainText("NOT WHAT THIS NODE SAID");
+    await expect(body).toContainText("Open Enrolment Adjustment");
+    await expect(body).toContainText("566 districts and wrongly for 43");
+  });
+
+  test("the proration parameter names all three and which one publishes its limit", async ({
+    page,
+  }) => {
+    await page.goto("/wiki/parameter/appropriation-proration-factor");
+    const body = page.locator("main");
+    await expect(body).toContainText("not a rate, a weight, a price or a threshold");
+    await expect(body).toContainText("147,500,000");
+    await expect(body).toContainText("A PRORATION OF 1.0 IS NOT AN ABSENCE");
+  });
+
   test("a district touched by neither shows no hold-harmless table", async ({ page }) => {
     // The block renders only what applies, so a district on formula with no clawback and no
     // supplement gets nothing rather than a table of dashes.

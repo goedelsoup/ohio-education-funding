@@ -25,6 +25,11 @@ See the class definition: [formula-component.ont.yml](../formula-component.ont.y
 | [fsfp-career-technical-weights](fsfp-career-technical-weights.yml) | Fair School Funding Plan | Five weights on a career-technical base cost, plus associated services |
 | [fsfp-english-learner-weights](fsfp-english-learner-weights.yml) | Fair School Funding Plan | Three descending weights by time in the country |
 | [fsfp-gifted-units](fsfp-gifted-units.yml) | Fair School Funding Plan | Two per-pupil amounts and three kinds of clamped staffing unit |
+| [fsfp-transportation](fsfp-transportation.yml) | Fair School Funding Plan | Two competing rate bases, two supplements, and its own guarantee |
+| [fsfp-preschool-special-education](fsfp-preschool-special-education.yml) | Fair School Funding Plan | A flat $4,000 a pupil plus the six weights at half, prorated |
+| [fsfp-performance-supplement](fsfp-performance-supplement.yml) | Fair School Funding Plan | The only payment gated on a measured outcome |
+| [fsfp-enrolment-supplements](fsfp-enrolment-supplements.yml) | Fair School Funding Plan | $40 for every pupil, and $250 for a district that grew 3% |
+| [fsfp-formula-transition-supplement](fsfp-formula-transition-supplement.yml) | Fair School Funding Plan | A second hold-harmless, on a FY2021 base that includes transportation |
 
 **The six categoricals are one class of node and four kinds of mechanism.** They were a single
 residual for eight phases — core foundation funding less the state share of base cost, exact and
@@ -45,6 +50,13 @@ not beside the weights: both blend valuation with federal adjusted gross income,
 weights, and both are about the tax base rather than the pupil. And **gifted's parameters are
 salary prices**, which move with the base cost build-up's staffing refresh rather than with any
 weight.
+
+**And Ohio holds districts harmless against FY2021 in three separate places.** The guarantee
+compares foundation funding against `[H2] Funding Base`. The formula transition supplement compares
+*everything the formula pays* against a larger `[L1] FY21 Funding Base`. Transportation holds its
+own against FY2021 transportation funding alone. Three bases, three sets of districts — 294, 144
+and 38 — and none nested in another: 17 districts draw the supplement while drawing nothing from
+the guarantee.
 
 The guarantee is the component to read last and think about first. In FY2027 it governs the
 funding of 48.3% of Ohio districts, and its incidence rises with property wealth — so it

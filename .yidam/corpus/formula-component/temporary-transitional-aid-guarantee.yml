@@ -12,6 +12,42 @@ description: |
   above what a meaningful base cost increase would give it, so this is not a rounding buffer
   catching a few edge cases; for half the state it is the operative funding mechanism.
 
+  **THE MECHANISM IS NOT WHAT THIS NODE SAID, AND THE DIFFERENCE IS A CLAWBACK.** This node
+  described a hold-harmless: computed funding below a baseline, pay the difference. The
+  department's own formula is
+
+      [I] = max( [H2] Funding Base  -  [I1] Open Enrolment Adjustment  -  [H] Foundation Funding,
+                 0 )
+
+  and `[I1]` is a **reduction for lost open enrolment**. A guaranteed district whose open enrolment
+  FTE has fallen by more than `max(10% of last year, 20 FTE)` has its guarantee cut by **$8,241.61
+  for every FTE beyond that threshold** — the statewide average base cost per pupil. **43 districts,
+  $5.1m withheld.** Columbus lost 106.2 FTE against a threshold of 24.3 and had **$674,561** taken
+  off; Cuyahoga Falls lost 118.1 and had $640,025. [verified —
+  `crates/project/tests/the_supplements_outside_the_formula.rs`, reproducing `[I]` for all 609]
+
+  **The rate is charged at full value, not at the district's state share.** The state was paying
+  its *share* of $8,241.61 for those pupils — about $824 for a district at the 10% minimum state
+  share — and the guarantee falls by the whole of it when they leave. Whether that is a deliberate
+  incentive against shedding open enrolment or an artefact of reaching for a convenient statewide
+  figure is not established. [open]
+
+  **How this survived.** A guarantee described without the clawback reproduces correctly for 566
+  districts and wrongly for 43 — few enough to read as rounding rather than as a missing term, and
+  this corpus built twelve phases on top of the incomplete description. Every distributional claim
+  below is unaffected, because those were computed from the department's published `[I]` rather
+  than from this node's account of how `[I]` is made. The claim that was wrong was the account.
+  [verified]
+
+  **THE BASELINE IS ESTABLISHED, AND THIS NODE RECORDED IT AS OPEN.** `[H2] Funding Base` is the
+  column, published per district on `Detail_SFPR`. It carries no year label there; this corpus has
+  described it as FY2020, the year Ohio froze funding under the Bridge formula, and that remains
+  the reading. It is **not** the same as `[L1] FY21 Funding Base` on the same sheet, which is
+  explicitly labelled and is generally larger — the base for the [formula transition
+  supplement](fsfp-formula-transition-supplement.yml) rather than for this. The two differ for
+  more than half of districts and `[L1]` is smaller for seven, so neither is derivable from the
+  other. [verified]
+
   **Who is on it, and why.** Both candidate explanations point the same way and one dominates
   clearly. [verified — computed from the department's FY27 model; see
   [`crates/foundation/tests/department_model_fy27.rs`](../../../crates/foundation/tests/department_model_fy27.rs)]
@@ -234,22 +270,36 @@ description: |
 properties:
   name: Temporary transitional aid guarantee
   function: |
-    If the district's computed formula funding falls below a prior-year baseline, pay the
-    difference. Reported as line [I] of the Summary School Finance Payment Report, separate from
-    core foundation funding [H], and included in total formula funding [N].
+    [I2] Decrease Threshold      = max(prior-year open enrolment FTE x 0.1, 20)
+    [I1] Open Enrolment Adjust.  = if (prior FTE - current FTE) >= [I2]
+                                   then 8241.61 x ((prior - current) - [I2]) else 0
+    [I] Guarantee                = if [H2] > [H] and ([H2] - [I1] - [H]) > 0
+                                   then [H2] - [I1] - [H] else 0
+
+    $8,241.61 is the statewide average base cost per pupil, applied at full value rather than at
+    the district's state share of it.
+
+    Reported as line [I] of the Summary School Finance Payment Report, separate from core
+    foundation funding [H], and included in total formula funding [N].
 
     Because it is a difference rather than a rate, any increase in computed funding reduces the
-    guarantee one-for-one until the guarantee reaches zero and the district returns to formula.
+    guarantee one-for-one until it reaches zero and the district returns to formula. The clawback
+    works the same way from the other side: losing open enrolment reduces the guarantee without
+    reducing anything the formula computes.
   statutory_basis: R.C. 3317.019. [verified]
   calculator: |
-    Not implemented. The absorption effect is computed directly in
-    crates/foundation/tests/department_model_fy27.rs; a general implementation belongs in the
-    `foundation` crate once the baseline derivation is established. [open]
+    Not a standalone crate, and no longer blocked on the baseline. `[H2]` and the clawback's inputs
+    are carried in `crates/project::panel::Transition`, and `[I]` is reproduced for all 609
+    districts in `crates/project/tests/the_supplements_outside_the_formula.rs`. The absorption
+    effect is computed in `crates/foundation/tests/department_model_fy27.rs`. A general
+    implementation in the `foundation` crate is now writable. [open]
   fy2027_scale: |
     294 of 609 districts (48.3%); 54.1% of base cost enrolled ADM; $878,974,300 total.
     Guarantee amounts: median $1,946,072, p25 $924,177, p75 $3,684,989, max $25,894,168
     (Columbus City). [verified]
 links:
+  - target: fsfp-formula-transition-supplement.yml
+    relationship: stacked-under
   - target: ../metric/general-fund-cash-balance.yml
     relationship: measured-against
   - target: ../formula-component.ont.yml

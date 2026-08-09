@@ -451,7 +451,10 @@ function renderHoldHarmless(d: District): string {
           }</td></tr>
         ${
           supplement
-            ? `<tr class="current"><th>Formula transition supplement</th>
+            ? `<tr class="current"><th><a href="${routes.wikiNode(
+                "formula-component",
+                "fsfp-formula-transition-supplement",
+              )}">Formula transition supplement</a></th>
                 <td class="tnum">${money(t.transition_supplement)}</td>
                 <td class="n">A <em>second</em> hold-harmless, against a larger FY2021 base of
                   ${money(t.fy21_funding_base)} that includes transportation.</td></tr>`
@@ -1115,9 +1118,15 @@ export function renderSupplements(d: District): string {
       <div class="scroll"><table data-program="supplements">
         <thead><tr><th>Payment</th><th class="tnum">Amount</th><th>How it is decided</th></tr></thead>
         <tbody>
-          <tr><th>Base funding supplement</th><td class="tnum">${money(s.base_funding)}</td>
+          <tr><th><a href="${routes.wikiNode(
+            "formula-component",
+            "fsfp-enrolment-supplements",
+          )}">Base funding supplement</a></th><td class="tnum">${money(s.base_funding)}</td>
             <td class="n">$40 a pupil. Every district, no test of any kind.</td></tr>
-          <tr${s.performance <= 0 ? ' class="n"' : ""}><th>Performance supplement</th>
+          <tr${s.performance <= 0 ? ' class="n"' : ""}><th><a href="${routes.wikiNode(
+            "formula-component",
+            "fsfp-performance-supplement",
+          )}">Performance supplement</a></th>
             <td class="tnum">${s.performance <= 0 ? "—" : money(s.performance)}</td>
             <td class="n">${
               s.performance_eligible && rating != null
@@ -1128,7 +1137,10 @@ export function renderSupplements(d: District): string {
                    stars, a progress rating of 3 or more, or a progress rating higher than the year
                    before.`
             }</td></tr>
-          <tr${s.growth <= 0 ? ' class="n"' : ""}><th>Enrollment growth supplement</th>
+          <tr${s.growth <= 0 ? ' class="n"' : ""}><th><a href="${routes.wikiNode(
+            "formula-component",
+            "fsfp-enrolment-supplements",
+          )}">Enrollment growth supplement</a></th>
             <td class="tnum">${s.growth <= 0 ? "—" : money(s.growth)}</td>
             <td class="n">${
               s.growth_eligible
@@ -1195,7 +1207,10 @@ function renderTransportation(d: District): string {
   const shortfall = t.special_education_unprorated - t.special_education;
 
   return `
-    <h3>Transportation</h3>
+    <h3><a href="${routes.wikiNode(
+      "formula-component",
+      "fsfp-transportation",
+    )}">Transportation</a></h3>
     <div class="scroll"><table data-program="transportation">
       <thead><tr><th>Step</th><th class="tnum">Value</th><th>What it is</th></tr></thead>
       <tbody>
@@ -1305,7 +1320,10 @@ function renderPreschoolSpecialEducation(d: District): string {
   const shortfall = p.unprorated - p.total;
 
   return `
-    <h3>Preschool special education</h3>
+    <h3><a href="${routes.wikiNode(
+      "formula-component",
+      "fsfp-preschool-special-education",
+    )}">Preschool special education</a></h3>
     <div class="scroll"><table data-program="preschool">
       <thead><tr><th>Category</th><th class="tnum">Weight, halved</th><th class="tnum">Pupils</th>
         <th class="tnum">Aid</th></tr></thead>

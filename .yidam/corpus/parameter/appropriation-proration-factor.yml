@@ -1,0 +1,84 @@
+class: parameter
+label: Appropriation Proration Factor
+description: |
+  A number below one that every district's payment under a program is multiplied by, because the
+  appropriation did not cover what the formula computed. It is **not a rate, a weight, a price or
+  a threshold** — the four kinds of parameter this corpus already held — and it belongs to a
+  different world from all of them.
+
+  A rate is a policy choice about how much to pay per unit. A proration is **an appropriation
+  divided by an entitlement**: a fact about a budget, arriving after the formula has run,
+  expressing that the two did not agree. It moves when the legislature changes the line item or
+  when the counts change, and for no other reason. [verified]
+
+  **THE PUBLISHED AMOUNT IS NOT WHAT THE DISTRICT IS OWED.** That is the whole reason this needs a
+  node. Under a proration the department's figure is what was available, divided — and the shortfall
+  cannot be recovered from it. A reader shown $1.2m has no way to know the formula computed $1.31m,
+  and nothing in the payment report says so. [verified]
+
+  **THREE ARE KNOWN AND ONLY ONE PUBLISHES ITS APPROPRIATION.**
+
+      program                                    factor        appropriation stated?
+      special education transportation           0.91746       no
+      preschool special education                0.96854448    yes — $147,500,000
+      transportation, general                    1.0           no
+
+  The preschool sheet is what makes the class describable. It carries the **appropriation limit in
+  a cell beside the factor**, which is the only place in the FY2027 calculator that shows a
+  proration's two halves at once. Without it the factor is an unexplained multiplier; with it the
+  arithmetic is legible. [verified]
+
+  **AND IT SHOWS WHY A NODE HOLDING ONLY THE FACTOR WOULD BE USELESS.** At the stated 0.96854448
+  the preschool program totals **$148,408,184 against its own $147,500,000 limit — $908,184 over**.
+  A third cell on the same sheet states $146,708,228.07, matching neither. The likeliest reading is
+  a factor calibrated against an earlier ADM vintage and never recalibrated after the counts were
+  refreshed. [verified — `crates/project/tests/the_supplements_outside_the_formula.rs`]
+
+  The FY2027 calculator is a projection published before the fiscal year, so a recalibration before
+  payment is expected and this may never reach a district. But a parameter that has silently
+  stopped satisfying its own constraint is exactly what a three-property node catches and a
+  one-property node cannot, and that is the argument for the class. [inference]
+
+  **A PRORATION OF 1.0 IS NOT AN ABSENCE.** Transportation's general factor is one this year. The
+  cell exists, the multiplication happens, and the dial has evidently been turned before or it
+  would not be there. Recorded as a live parameter at its neutral value, on the same grounds as
+  the funded-but-zero program lines this corpus already holds — supplemental targeted assistance
+  and gifted professional development. [inference]
+
+  **STILL OPEN.** When each factor was last set, and against which appropriation. Only the
+  preschool one publishes a limit at all, and none publishes a history. Answering it needs the
+  budget bill's line items, which is `lsc-budget` — a connector still blocked on PDFs. [open]
+
+  Also open: whether prorations apply anywhere inside `[H] Foundation Funding`. All three known are
+  in `[R]` and outside the formula, which would mean the state prorates what it pays *around*
+  schooling and not what it computes *for* it. That is a striking pattern if true and an artefact
+  of small numbers if not — three is not enough to say. [open]
+properties:
+  name: Appropriation proration factor
+  unit: fraction of the computed entitlement
+  series: |
+    FY2027: special education transportation 0.91746; preschool special education 0.96854448
+    against a stated appropriation of $147,500,000; transportation general 1.0. Earlier years are
+    [open] — the calculator publishes one year and no history.
+  statutory_basis: |
+    Set by the appropriation rather than by R.C. 3317. Which budget line governs each, and whether
+    the department's discretion in setting the factor is bounded, is [open].
+  simulation_key: proration_factor
+  sensitivity: |
+    Linear and universal within a program: every district's amount moves in exact proportion, so a
+    proration changes the level and nothing about the distribution. That makes it the one parameter
+    here with no incidence to model — and the one most likely to be omitted from a simulation for
+    exactly that reason, which would overstate every district's payment by the same fraction.
+
+    A node for this class wants **three** properties and not one: the factor, the appropriation it
+    was set against, and the entitlement it was divided into. Holding only the factor cannot detect
+    that the preschool one has stopped fitting.
+links:
+  - target: ../parameter.ont.yml
+    relationship: instance-of
+  - target: ../formula-component/fsfp-transportation.yml
+    relationship: governs
+  - target: ../actor/ohio-general-assembly.yml
+    relationship: set-by
+  - target: ../../catalog/dew-fy27-funding-calculator.md
+    relationship: sourced-from

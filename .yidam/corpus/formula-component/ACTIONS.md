@@ -112,7 +112,8 @@
   Funding` and `[R] Total State Support` is named**, leaving a $63.6m residual with no component
   behind it yet. [verified]
 
-  Two of those want corpus nodes of their own, and neither has one yet:
+  ~~Two of those want corpus nodes of their own, and neither has one yet:~~ **BOTH WRITTEN**,
+  along with nodes for every component named above. The reasoning that produced them:
 
   - **A second temporary transitional aid guarantee.** `formula-component` holds one node by that
     name, for the guarantee on foundation funding. Transportation has another, on a different base

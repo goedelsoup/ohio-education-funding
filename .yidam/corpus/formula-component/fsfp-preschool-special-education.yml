@@ -1,0 +1,65 @@
+class: formula-component
+label: FSFP Preschool Special Education
+description: |
+  **$148m**, line `[P]`, and the one component that combines a flat grant with a weight. Each
+  category pays `(ADM x $4,000) + (ADM x weight x average base cost x state share x 0.5)`, all of
+  it prorated. [verified]
+
+  **THE FLAT $4,000 IS 69% OF THE PROGRAM AND THE STATE SHARE DOES NOT TOUCH IT.** Only the
+  weighted half is reduced by a district's wealth. So this is the one component in Ohio's school
+  funding where the wealthiest district and the poorest are funded **identically** for most of what
+  they receive. Whether that is deliberate levelling or an artefact of bolting a flat grant onto a
+  weighted formula is not established. [open]
+
+  **THE SAME SIX WEIGHTS BEHAVE COMPLETELY DIFFERENTLY HERE.** [School-age special
+  education](fsfp-special-education-weights.yml) is steeply top-heavy: Category 6 is 15% of the
+  pupils and 48% of the money. Halved and sitting on a flat $4,000, the identical weight vector
+  produces near parity — 5,761 Category 6 pupils draw $52.9m against 10,842 Category 2 pupils
+  drawing $50.6m. [verified]
+
+  That is the sharpest available argument for decomposing components rather than tabulating
+  parameters. A table of Ohio's special education weights describes neither program, because what
+  the weights do depends entirely on what sits beside them. [inference]
+
+  **AND ITS PRORATION HAS STOPPED FITTING.** This sheet carries its **appropriation limit** — 
+  $147,500,000 — in a cell beside the factor, which is the only place in the calculator that shows
+  a proration's two halves at once. At the stated 0.96854448 the program totals **$148,408,184**,
+  $908,184 over. A third cell states $146,708,228.07, matching neither. See [appropriation
+  proration factor](../parameter/appropriation-proration-factor.yml). [verified]
+properties:
+  name: Preschool special education
+  function: |
+    For each category k in 1..6:
+      aid_k = ( (ADM_k x $4,000)
+                + (ADM_k x weight_k x average base cost per pupil x state share x 0.5) )
+              x proration
+
+    weights = the six school-age weights, [0.2435, 0.6179, 1.4845, 1.9812, 2.6830, 3.9554]
+    average base cost per pupil, FY2027 = $8,241.61
+    proration = 0.96854448, against a stated appropriation of $147,500,000
+
+    Reported in [R] Total State Support and not in [N], so no guarantee holds it.
+  statutory_basis: |
+    R.C. 3317.0213. The flat amount, the halving and the proration are transcribed from the FY2027
+    calculator and reproduced from it; whether the $4,000 and the half are statutory or budgetary
+    is [open].
+  calculator: |
+    Not a standalone crate. Carried in `crates/project::panel::PreschoolSpecialEducation` and
+    reproduced for all 609 districts in
+    `crates/project/tests/the_supplements_outside_the_formula.rs`.
+  fy2027_scale: |
+    $148.4m across 26,501 preschool pupils in 606 districts; the flat component is $102.7m of it.
+    [verified]
+links:
+  - target: ../formula-component.ont.yml
+    relationship: instance-of
+  - target: ../revenue-stream/state-foundation-aid.yml
+    relationship: distributes
+  - target: fsfp-special-education-weights.yml
+    relationship: shares-weights-with
+  - target: ../parameter/appropriation-proration-factor.yml
+    relationship: governed-by
+  - target: ../parameter/base-cost-per-pupil.yml
+    relationship: governed-by
+  - target: ../../catalog/dew-fy27-funding-calculator.md
+    relationship: sourced-from
