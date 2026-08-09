@@ -64,6 +64,22 @@ pub struct Policy {
     /// to FY2022 prices raised statewide base cost by about 3.1%; that is `1.031` here rather
     /// than a re-derivation, because the department's own funded position counts are better
     /// than any reconstruction of them.
+    ///
+    /// # It moves the categoricals priced in base cost, and this is a choice
+    ///
+    /// Special education, English learners and career-technical are each `weight x $8,241.61 x
+    /// count x state share`, where the multiplicand is the statewide average base cost per pupil.
+    /// This lever moves them too — $812m of exposure, about 22% on top of what base cost alone
+    /// does. See [`DistrictRecord::base_cost_denominated_categoricals`].
+    ///
+    /// The department's own simulator does **not** do this. Its sheet says so: "the statewide
+    /// average values … are NOT recalculated based on the data changes specific to your district."
+    /// That is the right behaviour for a tool where a user changes one district and everything
+    /// else stays put. It is the wrong behaviour here, where a policy lever moves all 609 at once
+    /// and the statewide average is precisely what would move first.
+    ///
+    /// So this site diverges from the department's tool deliberately, and says so on the page.
+    /// Recorded at `.yidam/decisions/scenario-models-ohio.yml`.
     pub base_cost_scale: f64,
     /// The minimum state share of base cost.
     ///
@@ -225,8 +241,22 @@ pub fn apply(record: &DistrictRecord, policy: &Policy, current_year_adm: f64) ->
         record.base_cost_state_share * adm_ratio + increase_per_pupil * current_year_adm
     } * policy.phase_in_base_cost;
 
-    let formula_aid =
-        base_cost_aid + record.categorical_funding() * policy.phase_in_categorical * adm_ratio;
+    // Categoricals, with the base-cost-denominated ones moved by the same factor as base cost.
+    //
+    // Special education, English learners and career-technical are each `weight x $8,241.61 x
+    // count x state share`, and that multiplicand is the statewide average base cost per pupil.
+    // Scaling base cost without scaling them describes a world where the department raised the
+    // average and then declined to use it in three formulas that are written in terms of it.
+    //
+    // This is a deliberate divergence from the department's own simulator, which holds every
+    // statewide constant fixed because it is built for changing one district at a time. See
+    // `.yidam/decisions/scenario-models-ohio.yml`. The lever's meaning is now "the statewide
+    // average base cost per pupil moved by this factor", and everything priced in it follows.
+    let denominated = record.base_cost_denominated_categoricals();
+    let categoricals =
+        (record.categorical_funding() - denominated) + denominated * policy.base_cost_scale;
+
+    let formula_aid = base_cost_aid + categoricals * policy.phase_in_categorical * adm_ratio;
 
     let baseline = record.guarantee_baseline().unwrap_or(0.0);
     let held_at = match policy.guarantee {
@@ -391,21 +421,45 @@ mod tests {
         );
         let gained = outcome.formula_aid - record.core_foundation_funding;
         let per_pupil_increase = record.base_cost_per_pupil * (scale - 1.0);
+        // The lever now moves two things, and the test separates them rather than summing to a
+        // single number that could be right for the wrong reasons. Base cost aid still passes
+        // through dollar for dollar per pupil; on top of that, the three categoricals priced in
+        // the statewide average base cost move by the same factor.
+        let from_base_cost = per_pupil_increase * record.current_year_adm;
+        let from_categoricals = record.base_cost_denominated_categoricals() * (scale - 1.0);
+        assert!(from_categoricals > 0.0, "the fixture district has none");
         assert!(
-            (gained - per_pupil_increase * record.current_year_adm).abs() < 0.02,
-            "{} got {gained:.2}",
-            record.name
+            (gained - from_base_cost - from_categoricals).abs() < 0.02,
+            "{} got {gained:.2}, expected {:.2} + {from_categoricals:.2}",
+            record.name,
+            from_base_cost
         );
 
-        // And it is more than a proportional share of the increase, which is the mistake this
-        // guards against. The gap is the whole local share: a district getting 20% of its base
-        // cost from the state collects five times what proportional scaling would give it, and
-        // one already getting 70% collects only about half as much again.
+        // And the base cost part is more than a proportional share of the increase, which is the
+        // mistake this guards against. The gap is the whole local share: a district getting 20% of
+        // its base cost from the state collects five times what proportional scaling would give
+        // it, and one already getting 70% collects only about half as much again.
+        //
+        // Against `from_base_cost`, not `gained`. The identity is a fact about the residual the
+        // state pays, and the categorical term is not part of that residual — it is a separate
+        // program that happens to be priced in the same number. Testing the sum against it passed
+        // only while the categoricals did not move.
         let proportional = record.base_cost_state_share * (scale - 1.0);
-        assert!(gained > proportional, "{gained:.0} vs {proportional:.0}");
         assert!(
-            (gained / proportional - 1.0 / record.state_share_fraction()).abs() < 0.05,
+            from_base_cost > proportional,
+            "{from_base_cost:.0} vs {proportional:.0}"
+        );
+        assert!(
+            (from_base_cost / proportional - 1.0 / record.state_share_fraction()).abs() < 0.05,
             "the ratio should be the reciprocal of the state share fraction"
+        );
+
+        // The categorical term scales with the base cost factor and with nothing else — in
+        // particular it is not touched by the state share, because the published amounts already
+        // have the district's share inside them.
+        assert!(
+            (from_categoricals / record.base_cost_denominated_categoricals() - (scale - 1.0)).abs()
+                < 1e-9
         );
     }
 

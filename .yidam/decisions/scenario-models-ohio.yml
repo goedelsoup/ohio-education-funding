@@ -1,0 +1,111 @@
+id: scenario-models-ohio
+summary: >-
+  The scenario models Ohio rather than mirroring the department's simulator. `base_cost_scale` now
+  moves the $812m of categorical funding priced in the statewide average base cost per pupil.
+context: |
+  Ohio's FY2027 calculator carries a note on its own simulation sheet:
+
+  > Note: The statewide average values (such as economically disadvantaged percentage, median
+  > weighted wealth per-pupil or federal median income) are NOT recalculated based on the data
+  > changes specific to your district.
+
+  That is correct behaviour for the tool it describes. A user changes one district's inputs and
+  asks what happens to that district; the statewide average would move by a rounding error, and
+  recomputing it would obscure the answer rather than improve it.
+
+  It is not correct behaviour here. `crates/project::policy` moves **all 609 districts at once**,
+  and under a change of that kind the statewide average is the first thing that would move — it is
+  an average *of* the thing being changed.
+
+  The exposure is concentrated and was measured before the decision was taken. **$858m of
+  categorical funding is denominated in the statewide average base cost per pupil**: special
+  education, English learners, career-technical and the weighted half of preschool special
+  education are each `weight x $8,241.61 x count x state share`. A 3.1% input-year refresh moved
+  $113.0m in the model and would have moved about $26.6m more in fact — a quarter again.
+
+  The two largest categoricals are *not* exposed, and that is a property of the mechanisms rather
+  than a convenience. DPIA divides a district's poverty share by the state's; targeted assistance
+  divides by a median. Under a change that moves everything, numerator and denominator move
+  together and largely cancel. Those two are $1.89bn — larger than the exposed programs — which is
+  why the exposure is a quarter and not three quarters.
+decision: |
+  **Model Ohio.** `Policy::base_cost_scale` scales the base-cost-denominated categoricals along
+  with base cost, and the site diverges from the department's simulator deliberately and says so
+  on the page.
+
+  Scale exactly the three programs inside `[H] Foundation Funding` that are priced in the
+  statewide average: special education, English learners, career-technical — $812.5m, exposed via
+  `DistrictRecord::base_cost_denominated_categoricals`.
+
+  Do **not** scale gifted. Its $54.4m is mostly unit funding at stated salary prices — $85,776 a
+  coordinator, $89,378 and $80,974 for the two specialist bands. A cost-input refresh would raise
+  those in reality, but by their own amount and not by this factor; nothing in the calculator links
+  them. Scaling them here would be an assumption wearing the shape of an identity.
+
+  Emit the figure as a bundle field rather than re-deriving it in TypeScript, so that *which*
+  programs count is decided once, in `project::panel`, and the two implementations of `apply`
+  cannot disagree about it.
+consequences: |
+  **Every reference checkpoint was recomputed, and the TypeScript `apply()` reproduces them.**
+  That is what the checkpoints exist for: a divergence between the Rust model and the browser's
+  reimplementation is exactly the failure this change could have introduced silently.
+
+  What a $465.0m computed refresh does, before and after:
+
+      computed base cost increase       465.0     465.0
+      categorical increase                  -      32.1
+      less ADM denominator mismatch      -7.6      -7.6
+      less minimum state share          -118.7   -118.7
+      less guarantee absorption         -141.6   -150.2
+      delivered                          197.1     220.6
+      share of what it computes           42%       44%
+
+  The floor line is unchanged at $118.7m, which is the check that the decomposition is separated
+  correctly. `who_a_change_reaches.rs` briefly netted the categorical increase against it and still
+  summed to the right total while reporting a floor $32m too small.
+
+  **41 districts are lifted off the guarantee rather than 38**, and a refresh reaches 356 rather
+  than 353. A bigger increase reaches further, which is the mechanism by which any increase reaches
+  a held district at all.
+
+  **The incidence across state share stopped being monotone.** The fourth band now collects
+  slightly more per pupil than the fifth ($324.06 against $318.42), where the fifth was previously
+  highest. Base cost aid rises with the state share because the state pays the residual; the
+  categorical term does not, because it is paid on a district's own special education, English
+  learner and career-technical counts and those do not sort by state share. One lever, two
+  mechanisms, two orderings.
+
+  **A page that confessed a gap now declares a divergence**, which is a different kind of claim and
+  a heavier one. It is stated above the controls rather than below the results, and it names the
+  department's note it is departing from.
+
+  **$45.7m remains unreached and is not held fixed.** Preschool special education's weighted half
+  is denominated identically but sits outside `[H] Foundation Funding`, so it is outside
+  `categorical_funding` and outside everything the scenario computes. Recording it as "held fixed"
+  would misdescribe it: the scenario has never modelled the program at all.
+alternatives: |
+  **Mirror the department's tool exactly.** The status quo, and it has a real argument: a reader
+  can check this site against the department's simulator, and a number that reproduces an official
+  one is worth more than a number that is merely more nearly right. Rejected because the two tools
+  answer different questions. The department's changes one district; every lever here changes all
+  609, and holding the statewide average fixed under a statewide change describes a world where the
+  department raised the average and then declined to use it in three formulas written in terms of
+  it. Reproducibility against the official tool is preserved where it is meaningful — current law
+  is still exactly the department's published dollars, to the cent.
+
+  **Scale gifted too, for completeness.** Rejected. It would add about $1.7m to a 3.1% refresh and
+  would substitute a guess for a gap. The distinction between a quantity denominated in base cost
+  and one priced in a salary that happens to move for related reasons is exactly what the separate
+  `formula-component` nodes were split to preserve, and collapsing it for tidiness would undo that.
+
+  **Make it a lever the reader can toggle.** Considered. Rejected because it offers a choice that
+  is not the reader's to make: one of the two behaviours is a better description of Ohio and the
+  other is an artifact of a tool built for a different question. A site that cannot say which of
+  its own two answers is right has moved the work onto the reader.
+
+  **Recompute the poverty share and the wealth median too.** Not rejected, unbuilt, and much
+  harder. Those are indices whose effects largely cancel, so the payoff is small; and recomputing
+  them properly means recomputing DPIA's statewide share and targeted assistance's median from
+  perturbed district data, which is a different order of change from multiplying by a factor. If it
+  is ever done, the measurement in `what_a_scenario_holds_fixed.rs` is where the case for it would
+  have to be made.

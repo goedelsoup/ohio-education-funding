@@ -61,9 +61,12 @@ fn a_perturbation_to_the_formula_moves_a_held_district_by_zero() {
         .filter(|d| d.standing.off_formula())
         .collect();
 
+    // 253, against 256 before `base_cost_scale` was made to move the categoricals priced in base
+    // cost. A larger increase lifts three more districts off the guarantee, which is the whole
+    // mechanism by which an increase reaches held districts at all.
     assert_eq!(
         held.len(),
-        256,
+        253,
         "districts held on the guarantee throughout"
     );
     for district in &held {
@@ -111,20 +114,20 @@ fn a_base_cost_increase_does_not_reach_two_in_five_districts() {
 
     assert_eq!(total.reach.districts, 609);
     assert_eq!(total.reach.losers, 0, "raising base cost cannot cut anyone");
-    assert_eq!(total.reach.gainers, 353);
-    assert_eq!(total.reach.unmoved, 256);
+    assert_eq!(total.reach.gainers, 356);
+    assert_eq!(total.reach.unmoved, 253);
     // `unmoved` and `held_throughout` are the same set here, which is worth pinning because they
     // are different quantities and only coincide when the guarantee is the sole obstruction.
     assert_eq!(total.reach.unmoved, total.reach.held_throughout);
     assert!(
-        (total.reaches() - 0.580).abs() < 0.005,
+        (total.reaches() - 0.585).abs() < 0.005,
         "reaches {:.3}",
         total.reaches()
     );
     // 38 districts are lifted off the guarantee by an increase this size and become formula
     // districts. That is the mechanism by which a large enough increase eventually shrinks the
     // guarantee population, and at this size it is 38 of 294.
-    assert_eq!(total.reach.lifted_off, 38);
+    assert_eq!(total.reach.lifted_off, 41);
     assert_eq!(total.reach.pushed_on, 0);
 }
 
@@ -152,7 +155,12 @@ fn the_two_orderings_of_a_base_cost_increase_have_nothing_in_common() {
     };
     assert_eq!(overlap(10), 0);
     assert_eq!(overlap(50), 0);
-    assert_eq!(overlap(100), 0, "the top hundreds are disjoint");
+    // Ten, where this was zero before the lever began moving the categoricals priced in base
+    // cost. The disagreement is a shade weaker and the reason is legible: the categorical term
+    // is proportional to a district's own special education, English learner and career-technical
+    // counts, which correlate with size differently than base cost does, so a few large districts
+    // now reach the per-pupil table too. The claim in the test's name still holds at fifty.
+    assert_eq!(overlap(100), 10, "the top hundreds are nearly disjoint");
 
     // The two ends of the same policy: the largest dollar mover is a large suburban district, and
     // the hardest-hit per pupil is the smallest district in Ohio at 3.5 pupils.
@@ -160,7 +168,13 @@ fn the_two_orderings_of_a_base_cost_increase_have_nothing_in_common() {
     let hardest = ordering.by_per_pupil[0];
     assert_ne!(biggest.irn, hardest.irn);
     assert!(biggest.adm > 20_000.0 && hardest.adm < 10.0);
-    assert!(hardest.per_pupil() > biggest.per_pupil() * 4.0);
+    // Pinned rather than bounded. The ratio is 4.05 and the old assertion was `> 4.0`, which a
+    // further change could walk under without anything noticing.
+    assert!(
+        (hardest.per_pupil() / biggest.per_pupil() - 4.05).abs() < 0.05,
+        "ratio {:.3}",
+        hardest.per_pupil() / biggest.per_pupil()
+    );
 }
 
 /// The disagreement is a property of the lever, not a law. Removing the guarantee produces two
@@ -198,20 +212,20 @@ fn a_base_cost_increase_reaches_poor_districts_and_not_wealthy_ones() {
 
     let per_pupil: Vec<f64> = incidence.strata.iter().map(|s| s.per_pupil()).collect();
     assert!(
-        (per_pupil[0] - 305.63).abs() < 1.0,
+        (per_pupil[0] - 352.58).abs() < 1.0,
         "Q1 {:.2}",
         per_pupil[0]
     );
-    assert!((per_pupil[4] - 20.81).abs() < 1.0, "Q5 {:.2}", per_pupil[4]);
+    assert!((per_pupil[4] - 23.10).abs() < 1.0, "Q5 {:.2}", per_pupil[4]);
     assert!(
-        (incidence.gradient().expect("Q1 gets money") - 0.068).abs() < 0.005,
-        "the wealthiest quintile receives 6.8% per pupil of what the poorest does"
+        (incidence.gradient().expect("Q1 gets money") - 0.066).abs() < 0.005,
+        "the wealthiest quintile receives 6.6% per pupil of what the poorest does"
     );
 
     // The mechanism, visible in the same table: the guarantee removes wealthy districts from the
     // formula's reach almost entirely, and touches the poorest quintile hardly at all.
     let held: Vec<usize> = incidence.strata.iter().map(|s| s.held_throughout).collect();
-    assert_eq!(held, vec![10, 31, 39, 88, 88]);
+    assert_eq!(held, vec![10, 29, 39, 88, 87]);
     assert!(
         held[4] > held[0] * 8,
         "guarantee dependence rises steeply with wealth"
@@ -281,9 +295,23 @@ fn the_lowest_state_share_band_is_exactly_the_districts_on_the_floor() {
     assert_eq!(counts.iter().sum::<usize>(), districts.len());
 
     // And the incidence across it is the sharpest gradient in this file: a district at the floor
-    // collects $9.35 per pupil from an increase that pays a high-state-share district $273.50.
-    assert!((floor.per_pupil() - 9.35).abs() < 0.5);
-    assert!((incidence.strata[4].per_pupil() - 273.50).abs() < 1.0);
+    // collects $11.25 per pupil from an increase that pays a high-state-share district $318.42.
+    assert!((floor.per_pupil() - 11.25).abs() < 0.5);
+    assert!((incidence.strata[4].per_pupil() - 318.42).abs() < 1.0);
+
+    // **And the top band is no longer the top of the gradient**, which it was until the lever
+    // began moving the categoricals priced in base cost. The fourth band now collects slightly
+    // more per pupil than the fifth. Base cost aid rises monotonically with the state share
+    // because the state pays the residual; the categorical term does not, because it is paid on a
+    // district's own special education, English learner and career-technical counts and those do
+    // not sort by state share. Two mechanisms in one lever, pulling on different orderings.
+    assert!(
+        incidence.strata[3].per_pupil() > incidence.strata[4].per_pupil(),
+        "Q4 {:.2} against Q5 {:.2}",
+        incidence.strata[3].per_pupil(),
+        incidence.strata[4].per_pupil()
+    );
+    assert!((incidence.strata[3].per_pupil() - 324.06).abs() < 1.0);
 }
 
 /// Where a computed base cost increase goes, and the two mechanisms between "computed" and
@@ -328,6 +356,25 @@ fn less_than_half_of_a_computed_base_cost_increase_is_delivered_as_aid() {
         .dollars;
 
     assert!((computed / 1e6 - 465.0).abs() < 0.1);
+
+    // **The refresh computes more than base cost.** Special education, English learners and
+    // career-technical are priced in the statewide average base cost per pupil, so a refresh
+    // raises them by the same factor — $32.1M on top of the $465.0M. Carried as its own line
+    // rather than folded into the deductions below: netting it against the floor's withholding
+    // is what this test did when the lever first started moving it, and the floor line came out
+    // $32M too small while still summing to the right total.
+    let categorical: f64 = districts
+        .iter()
+        .map(project::panel::DistrictRecord::base_cost_denominated_categoricals)
+        .sum::<f64>()
+        * bump;
+    assert!(
+        (categorical / 1e6 - 32.1).abs() < 0.5,
+        "categorical increase ${:.1}M",
+        categorical / 1e6
+    );
+    let computed_total = computed + categorical;
+
     // Base cost is computed on a three-year average ADM and the state share is paid on the
     // current year, so a shrinking state does not collect the whole aggregate increase.
     assert!(
@@ -335,24 +382,37 @@ fn less_than_half_of_a_computed_base_cost_increase_is_delivered_as_aid() {
         "ADM denominator mismatch ${:.1}M",
         (computed - full_pass) / 1e6
     );
+    // Unchanged at $118.7M, which is the check that the line above is separated correctly: the
+    // floor withholds a share of base cost and has no view of the categoricals.
     assert!(
-        ((full_pass - formula) / 1e6 - 118.7).abs() < 1.0,
+        ((full_pass + categorical - formula) / 1e6 - 118.7).abs() < 1.0,
         "the minimum state share withholds ${:.1}M",
-        (full_pass - formula) / 1e6
+        (full_pass + categorical - formula) / 1e6
     );
     assert!(
-        ((formula - delivered) / 1e6 - 141.6).abs() < 1.0,
+        ((formula - delivered) / 1e6 - 150.2).abs() < 1.0,
         "the guarantee absorbs ${:.1}M",
         (formula - delivered) / 1e6
     );
     assert!(
-        (delivered / 1e6 - 197.1).abs() < 1.0,
+        (delivered / 1e6 - 220.6).abs() < 1.0,
         "delivered ${:.1}M",
         delivered / 1e6
     );
+    // The four lines close on the total, which is what makes this a decomposition rather than
+    // four separately plausible numbers.
     assert!(
-        (delivered / computed - 0.424).abs() < 0.005,
-        "42% of a computed base cost increase becomes state aid"
+        (computed_total
+            - (computed - full_pass)
+            - (full_pass + categorical - formula)
+            - (formula - delivered)
+            - delivered)
+            .abs()
+            < 1.0
+    );
+    assert!(
+        (delivered / computed_total - 0.444).abs() < 0.005,
+        "44% of what a refresh computes becomes state aid"
     );
 }
 

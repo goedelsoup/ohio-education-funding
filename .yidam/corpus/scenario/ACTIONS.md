@@ -65,11 +65,28 @@
   untouched. That the split falls this way is a consequence of the four mechanism shapes the
   `formula-component` nodes were separated to preserve.
 
-  **This is recorded rather than fixed, deliberately.** Making `base_cost_scale` also scale the
-  denominated categoricals would diverge from the department's own tool, and every checkpoint in
-  the feed was computed against the current behaviour. That is a decision about what this site is
-  *for* — reproducing the department's simulation, or modelling Ohio — and it wants a decision
-  record, not a quiet commit. [open]
+  ~~**This is recorded rather than fixed, deliberately.**~~ **Decided: the site models Ohio.**
+  `Policy::base_cost_scale` now scales the denominated categoricals as well as base cost, which is
+  a deliberate divergence from the department's own simulator — correctly so, because that tool is
+  built for changing one district at a time and this one moves all 609 at once. Recorded at
+  [`decisions/scenario-models-ohio`](../../decisions/scenario-models-ohio.yml); every checkpoint in
+  the feed was recomputed and the TypeScript `apply()` reproduces them, which is what the
+  checkpoints are for.
 
-  Until then the `/scenario` page states the omission and its size.
+  **What moved, beyond the arithmetic.** A refresh now delivers **$220.6m** of the $497.1m it
+  computes, against $197.1m before — 44% rather than 42%. It lifts **41** districts off the
+  guarantee rather than 38, and reaches 356 rather than 353. And the incidence across state share
+  stopped being monotone: the fourth band now collects slightly more per pupil than the fifth,
+  because base cost aid rises with the state share while the categorical term is paid on a
+  district's own special education, English learner and career-technical counts, which do not sort
+  that way. Two mechanisms in one lever. [verified —
+  `crates/scenario-delta/tests/who_a_change_reaches.rs`]
+
+  **Three things are still held fixed, and the reasons are not interchangeable.** DPIA and
+  targeted assistance ($1.89bn) are indices that genuinely cancel. Gifted ($54.4m) is priced in
+  stated salaries, so scaling it by this factor would be an assumption dressed as an identity.
+  Preschool special education's weighted half ($45.7m) is denominated identically but sits outside
+  `[H] Foundation Funding`, so it is outside everything the scenario computes — not held fixed
+  within the model but absent from it. The `/scenario` page gives all three separately rather than
+  as one hedge. [verified]
 

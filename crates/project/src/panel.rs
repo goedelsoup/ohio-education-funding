@@ -1148,6 +1148,40 @@ impl DistrictRecord {
         (self.core_foundation_funding - self.base_cost_state_share).max(0.0)
     }
 
+    /// The part of [`Self::categorical_funding`] priced in the statewide average base cost.
+    ///
+    /// Special education, English learners and career-technical are each
+    /// `weight x $8,241.61 x count x state share`, where the multiplicand is
+    /// [`AVERAGE_BASE_COST_PER_PUPIL`] — one number the department computes over every district.
+    /// **So a change in base cost per pupil moves these mechanically**, and a scenario that scales
+    /// base cost and leaves them alone is not describing anything Ohio would do.
+    ///
+    /// # What is deliberately not in here
+    ///
+    /// **DPIA and targeted assistance**, which are the two largest categoricals at $1.89bn
+    /// together. They are *index*-driven: a district's poverty share over the state's, its wealth
+    /// over a median. Under a change that moves every district, numerator and denominator move
+    /// together and the effect largely cancels. That is why the exposure is a quarter of base cost
+    /// rather than three quarters, and it is a real property of the mechanisms rather than a
+    /// simplification.
+    ///
+    /// **Gifted**, whose $54.4m is mostly unit funding at stated salary prices — $85,776 for a
+    /// coordinator, $89,378 and $80,974 for the two specialist bands. A cost-input refresh that
+    /// raised teacher salaries would raise these too, but by their own amount and not by this
+    /// factor: nothing in the calculator links them. Scaling them here would be an assumption
+    /// wearing the same clothes as an identity.
+    ///
+    /// **Preschool special education's weighted half**, $45.7m, which *is* denominated the same
+    /// way — but sits outside `[H] Foundation Funding` and so outside
+    /// [`Self::categorical_funding`] entirely. The scenario has never modelled it. It is the
+    /// difference between the $858m the corpus recorded as exposed and the $812m reachable here.
+    #[must_use]
+    pub fn base_cost_denominated_categoricals(&self) -> Dollars {
+        self.special_education.total()
+            + self.english_learners.total()
+            + self.career_technical.total()
+    }
+
     /// The state's share of base cost, as a fraction of base cost per pupil.
     ///
     /// Per pupil on both sides, with the department's denominators: the share amount is on

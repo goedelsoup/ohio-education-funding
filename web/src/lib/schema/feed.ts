@@ -516,6 +516,15 @@ export const DistrictSchema = z
     /** Targeted assistance, special education, DPIA, English learner, gifted, career-technical. */
     categorical_funding: num,
     /**
+     * The part of `categorical_funding` priced in the statewide average base cost per pupil.
+     *
+     * Special education, English learners and career-technical — each `weight × $8,241.61 ×
+     * count × state share`. A base cost lever moves these too, and `apply()` scales them. Sent
+     * from the bundle rather than re-derived here so the Rust and TypeScript implementations
+     * cannot disagree about which programs count.
+     */
+    base_cost_denominated_categoricals: num,
+    /**
      * Special education's six weighted categories: ADM and the aid each produces.
      *
      * The weights span a factor of sixteen — 0.2435 for Category 1 against 3.9554 for Category 6

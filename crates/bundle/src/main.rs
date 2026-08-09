@@ -533,6 +533,7 @@ fn to_district(record: &DistrictRecord, joins: &Joins<'_>) -> District {
         aggregate_base_cost: record.aggregate_base_cost,
         base_cost_state_share: record.base_cost_state_share,
         categorical_funding: record.categorical_funding(),
+        base_cost_denominated_categoricals: record.base_cost_denominated_categoricals(),
         special_education: SpecialEducation {
             adm: record.special_education.adm,
             aid: record.special_education.aid,
