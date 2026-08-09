@@ -23,10 +23,10 @@
 //! account for. The skill's rule is that a large residual means the mapping is wrong and the
 //! result should not be trusted.
 //!
-//! On the run below it comes out **exactly zero for 463 of the 470 districts where both sides
+//! On the run below it comes out **exactly zero for 465 of the 470 districts where both sides
 //! can be valued**, and that is a check on the substitution rather than a finding about the
 //! regimes. Holding base cost fixed means the local share is the only thing that *can* differ,
-//! so a nonzero residual would mean the arithmetic had gone wrong. It did not. The seven
+//! so a nonzero residual would mean the arithmetic had gone wrong. It did not. The five
 //! exceptions are districts where the charge-off ran past the base cost it was subtracted from,
 //! and the residual is exactly that truncation.
 //!
@@ -44,15 +44,29 @@
 //! agency and one fiscal period" — and it is emphatically *not* a reconstruction of any year the
 //! charge-off actually governed. Those years need the era's formula amount, cost-of-doing-
 //! business factor, and DPIA, none of which this corpus holds.
+//!
+//! # The base, which this crate had wrong for fourteen phases
+//!
+//! The charge-off was applied to **recognized valuation**, not to total taxable value, and this
+//! crate computed on the latter because it had recorded a wrong definition of the former. See
+//! [`recognized_valuation`]. Correcting it moves findings and not only figures: the median
+//! district goes from $289 per pupil better off under the plan to $45 *worse*, and "every wealth
+//! quintile gains under the plan" — which the corpus published — becomes true of the top quintile
+//! only. [`ChargeOffBase`] is a required argument so that no caller can take the old base by
+//! omission again.
 
 #![forbid(unsafe_code)]
 
 pub mod charge_off;
+pub mod recognized_valuation;
+
+use std::collections::HashMap;
 
 use edfund_core::Dollars;
 use project::panel::DistrictRecord;
 
 pub use charge_off::{local_share_per_pupil, ChargeOffRate, RATES, TERMINAL_MILLS};
+pub use recognized_valuation::{recognize, PhaseIn, Recognition};
 
 /// Two components the corpus's `replaces` graph declares comparable.
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -183,6 +197,35 @@ impl RegimeDiff {
     }
 }
 
+/// Which valuation the charge-off is applied to.
+///
+/// A parameter rather than a default, because the corpus got this wrong once by not having to
+/// choose. Every call site now states which base it means, and the two are far apart: recognized
+/// valuation is 8.2% below total taxable value statewide in TY2024, and 13% below for the 184
+/// districts whose county reappraised that year.
+#[derive(Debug, Clone, Copy)]
+pub enum ChargeOffBase<'a> {
+    /// Total taxable value — the base DeRolph I describes, and the one this corpus computed on
+    /// for its first fourteen phases.
+    TotalTaxable,
+    /// Recognized valuation — the base the mechanism actually used by FY2008, keyed by IRN.
+    ///
+    /// A district absent from the map keeps its full valuation, which is the conservative
+    /// direction: it charges the district more, not less.
+    Recognized(&'a HashMap<String, Recognition>),
+}
+
+impl ChargeOffBase<'_> {
+    /// The share of a district's valuation the charge-off reaches.
+    #[must_use]
+    pub fn ratio_for(&self, irn: &str) -> f64 {
+        match self {
+            Self::TotalTaxable => 1.0,
+            Self::Recognized(map) => map.get(irn).map_or(1.0, Recognition::ratio),
+        }
+    }
+}
+
 /// Difference the charge-off against FSFP local capacity for one district, at FY2027 inputs.
 ///
 /// The Fair School Funding Plan's own computed base cost is held fixed and only the local share
@@ -191,19 +234,26 @@ impl RegimeDiff {
 /// # What each side does at its extremes
 ///
 /// The charge-off had **no minimum state share** — that is an FSFP invention — so a district
-/// whose deemed local share exceeded its cost received nothing, and 81 districts are in that
-/// position at 23 mills against FY2027 base cost. Ohio's answer was the charge-off supplement
-/// rather than a floor, and this crate does not model it. The FSFP side does have a floor, and
-/// where it binds the local capacity measure is censored: all that is recoverable is that
-/// capacity exceeds a threshold. So the component row goes absent for those districts while the
-/// totals stay computable, and the difference is visible with its cause unattributable. That is
-/// the honest state of the comparison and [`RegimeDiff::residual`] reports it as `None`.
+/// whose deemed local share exceeded its cost received nothing. Ohio's answer was the charge-off
+/// supplement rather than a floor, and this crate does not model it. The FSFP side does have a
+/// floor, and where it binds the local capacity measure is censored: all that is recoverable is
+/// that capacity exceeds a threshold. So the component row goes absent for those districts while
+/// the totals stay computable, and the difference is visible with its cause unattributable. That
+/// is the honest state of the comparison and [`RegimeDiff::residual`] reports it as `None`.
+///
+/// # Why the base arrives as a ratio
+///
+/// `valuation_per_pupil` is the profile report's FY2023 assessed valuation; recognized valuation
+/// is reconstructed from Table SD-1's TY2024 total taxable value. Those are different vintages on
+/// different denominators, so the recognized *level* cannot be substituted for the profile
+/// report's. The recognized *share* can, and that is what [`ChargeOffBase::ratio_for`] returns.
 #[must_use]
-pub fn at_fy2027(record: &DistrictRecord, mills: f64) -> RegimeDiff {
+pub fn at_fy2027(record: &DistrictRecord, mills: f64, base: ChargeOffBase<'_>) -> RegimeDiff {
     let successor = record.implied_local_capacity_per_pupil();
+    let recognized_share = base.ratio_for(&record.irn);
     let predecessor = record
         .valuation_per_pupil
-        .map(|valuation| charge_off::local_share_per_pupil(valuation, mills));
+        .map(|valuation| charge_off::local_share_per_pupil(valuation * recognized_share, mills));
 
     // Base cost aid per pupil as the department computes it, on its own denominator.
     let successor_total = (record.current_year_adm > 0.0)
@@ -226,10 +276,14 @@ pub fn at_fy2027(record: &DistrictRecord, mills: f64) -> RegimeDiff {
 
 /// Run [`at_fy2027`] across a panel.
 #[must_use]
-pub fn panel_at_fy2027(panel: &[DistrictRecord], mills: f64) -> Vec<RegimeDiff> {
+pub fn panel_at_fy2027(
+    panel: &[DistrictRecord],
+    mills: f64,
+    base: ChargeOffBase<'_>,
+) -> Vec<RegimeDiff> {
     panel
         .iter()
-        .map(|record| at_fy2027(record, mills))
+        .map(|record| at_fy2027(record, mills, base))
         .collect()
 }
 

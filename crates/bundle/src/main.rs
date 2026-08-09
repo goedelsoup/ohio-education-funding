@@ -431,6 +431,11 @@ struct Joins<'a> {
     functions: Option<&'a SpendingByFunction>,
     house_districts: &'a [HouseDistrictShare],
     national: Option<&'a dispersion::national_peers::NationalPosition>,
+    /// Recognized valuation for every district at TY2024, keyed by IRN.
+    ///
+    /// Shared across the whole panel rather than looked up per district, because it is parsed once
+    /// from the committed abstract and every row needs it.
+    recognized: &'a HashMap<String, regime_diff::Recognition>,
 }
 
 fn to_district(record: &DistrictRecord, joins: &Joins<'_>) -> District {
@@ -442,6 +447,7 @@ fn to_district(record: &DistrictRecord, joins: &Joins<'_>) -> District {
         functions,
         house_districts,
         national,
+        recognized,
     } = *joins;
     let adm = record.base_cost_adm();
     District {
@@ -593,7 +599,7 @@ fn to_district(record: &DistrictRecord, joins: &Joins<'_>) -> District {
         effective_class1_millage: profile.and_then(|line| parse(line, 6)),
         voted_operating_millage: profile.and_then(|line| parse(line, 5)),
         millage: millage_analysis(taxes, profile.and_then(|line| parse(line, 5))),
-        regime: regime_counterfactual(record, taxes),
+        regime: regime_counterfactual(record, taxes, recognized),
         operating_expenditure_per_pupil: profile.and_then(|line| parse(line, 7)),
         economically_disadvantaged: profile.and_then(|line| parse(line, 3)),
         enrollment_change: {
@@ -744,10 +750,11 @@ fn number(head: &[&str], parts: &[&str], name: &str) -> f64 {
     at(head, parts, name).trim().parse().unwrap_or(0.0)
 }
 
-/// Both tax years of SD-1 for every district, keyed by IRN and ordered oldest first.
+/// Every tax year of SD-1 for a district, keyed by IRN and ordered oldest first.
 ///
-/// Ordered because the page reads it as a change rather than as two independent years, and a
-/// reversed pair would silently invert every direction it reports.
+/// Ordered because the page reads it as a change rather than as independent years, and a
+/// reversed sequence would silently invert every direction it reports. Consumers that want a
+/// change should take the **last two**, not the ends — see [`millage_analysis`].
 fn property_taxes() -> HashMap<String, Vec<PropertyTaxYear>> {
     let head = header(SD1);
     let mut out: HashMap<String, Vec<PropertyTaxYear>> = HashMap::new();
@@ -801,13 +808,30 @@ fn property_taxes() -> HashMap<String, Vec<PropertyTaxYear>> {
 /// The gap between that and the observed rate is the point of the exercise. Reduction factors
 /// reach neither new construction nor newly voted millage, so the residual is what they did not
 /// touch — and its sign says which.
+///
+/// # The last two years, not the first and last
+///
+/// "Year over year the recursion is exact" is a claim about *consecutive* years, and it is the
+/// only reason this can skip carryover valuation. SD-1 carried two tax years when this was
+/// written, so `first()` and `last()` were consecutive and the distinction did not exist. It
+/// carries four now — added for `regime_diff::recognized_valuation` — and `first()` would quietly
+/// become TY2021, turning a one-year recursion into a three-year one that spans a reappraisal.
+/// The rate would still be a rate and the page would still render; it would simply be wrong.
 fn millage_analysis(
     years: Option<&Vec<PropertyTaxYear>>,
     voted: Option<f64>,
 ) -> Option<MillageAnalysis> {
     let years = years?;
-    let (before, after) = (years.first()?, years.last()?);
-    if years.len() < 2 || before.class1_value <= 0.0 || after.class1_value <= 0.0 {
+    let [before, after] = match years.as_slice() {
+        [.., before, after] => [before, after],
+        _ => return None,
+    };
+    debug_assert_eq!(
+        after.tax_year,
+        before.tax_year + 1,
+        "the recursion is only exact between consecutive years"
+    );
+    if before.class1_value <= 0.0 || after.class1_value <= 0.0 {
         return None;
     }
 
@@ -862,12 +886,24 @@ fn millage_analysis(
 /// local share computed on one denominator from a cost computed on another, and would change the
 /// answer for hundreds of districts. So the counterfactual runs on the profile report's basis and
 /// only the phantom-revenue comparison, which is rate against rate, touches SD-1.
+///
+/// # And it runs on recognized valuation, which is a correction
+///
+/// The charge-off was applied to recognized valuation — total taxable value with a reappraisal's
+/// inflationary increase phased in over three years. This corpus recorded a wrong definition of
+/// that term and so computed on the full value, overstating the charge-off by a median $493 per
+/// pupil. `recognized_share` carries the per-district ratio and `overstated_by` carries what the
+/// old base was adding, because the page should be able to show the correction rather than only
+/// its result.
 fn regime_counterfactual(
     record: &DistrictRecord,
     taxes: Option<&Vec<PropertyTaxYear>>,
+    recognized: &HashMap<String, regime_diff::Recognition>,
 ) -> Option<RegimeCounterfactual> {
-    let diff = regime_diff::at_fy2027(record, regime_diff::TERMINAL_MILLS);
+    let base = regime_diff::ChargeOffBase::Recognized(recognized);
+    let diff = regime_diff::at_fy2027(record, regime_diff::TERMINAL_MILLS, base);
     let component = diff.components.first()?;
+    let recognized_share = base.ratio_for(&record.irn);
 
     // `regime-diff` recovers local capacity by subtraction and censors it where the minimum state
     // share binds — 138 districts. The department publishes the figure for all of them, so the
@@ -894,6 +930,13 @@ fn regime_counterfactual(
             .predecessor
             .is_some_and(|local| local > record.base_cost_per_pupil),
         mills_short_of_charge_off: mills_short,
+        recognized_share,
+        reappraisal_year: regime_diff::recognized_valuation::cycle_for(&record.county)
+            .map_or(0, |c| c.tax_year),
+        // What the discarded base was adding, in the same per-pupil unit as the rest of the row.
+        overstated_by: record.valuation_per_pupil.map(|valuation| {
+            valuation * (1.0 - recognized_share) * regime_diff::TERMINAL_MILLS / 1_000.0
+        }),
     })
 }
 
@@ -968,6 +1011,10 @@ fn main() {
 
     let (national_positions, _national_medians) = dispersion::national_peers::positions();
 
+    // Recognized valuation at TY2024, parsed once for the whole panel. The charge-off
+    // counterfactual runs on this rather than on total taxable value; see `regime_counterfactual`.
+    let recognized = regime_diff::recognized_valuation::from_abstract(2024);
+
     let districts: Vec<District> = records
         .iter()
         .map(|record| {
@@ -981,6 +1028,7 @@ fn main() {
                     functions: functions.get(&record.irn),
                     house_districts: shares.get(&record.irn).map_or(&[][..], Vec::as_slice),
                     national: national_positions.get(&record.irn),
+                    recognized: &recognized,
                 },
             )
         })

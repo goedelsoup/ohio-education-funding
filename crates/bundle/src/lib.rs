@@ -73,7 +73,7 @@ use edfund_core::Dollars;
 /// from FY2022-FY2024 to FY2024-FY2026 — the years the department's `ADM Data` sheet declares.
 /// The values did not change; what they are called did, which is exactly the kind of silent
 /// meaning change the version guard exists for.
-pub const CONTRACT_VERSION: &str = "25.0.0";
+pub const CONTRACT_VERSION: &str = "26.0.0";
 
 /// How close to the floor counts as being on it, in mills.
 ///
@@ -522,6 +522,21 @@ pub struct RegimeCounterfactual {
     /// The phantom revenue mechanism, per district. `None` where the district's own effective
     /// rate is at or above the rate it would be charged at.
     pub mills_short_of_charge_off: Option<f64>,
+    /// The share of taxable value the charge-off reaches, after the reappraisal phase-in.
+    ///
+    /// One where the district's county has finished phasing in a revaluation, below one where it
+    /// has not. This is what makes the counterfactual run on **recognized valuation** rather than
+    /// on total taxable value, which is what the corpus wrongly used until it read the mechanism's
+    /// actual definition. See `regime_diff::recognized_valuation`.
+    pub recognized_share: f64,
+    /// The tax year the district's county last reappraised or updated.
+    pub reappraisal_year: u16,
+    /// How much less the charge-off is on recognized valuation than on total taxable value.
+    ///
+    /// Zero for a district past its phase-in. The point of publishing it is that its size is
+    /// decided by the county's place on the Department of Taxation's calendar and by nothing
+    /// about the district itself.
+    pub overstated_by: Option<Dollars>,
 }
 
 /// Special education's six categories for one district: pupils and the aid they generate.
@@ -2138,6 +2153,11 @@ impl Bundle {
                         "\"charge_off_mills\": {}, ",
                         num(r.charge_off_mills)
                     ));
+                    s.push_str(&format!(
+                        "\"recognized_share\": {}, \"reappraisal_year\": {}, ",
+                        share(r.recognized_share),
+                        r.reappraisal_year
+                    ));
                     for (key, value) in [
                         ("charge_off_local_share", r.charge_off_local_share),
                         ("local_capacity", r.local_capacity),
@@ -2146,6 +2166,7 @@ impl Bundle {
                         ("difference", r.difference),
                         ("residual", r.residual),
                         ("mills_short_of_charge_off", r.mills_short_of_charge_off),
+                        ("overstated_by", r.overstated_by),
                     ] {
                         s.push_str(&format!("\"{key}\": {}, ", opt(value)));
                     }
@@ -2417,6 +2438,14 @@ mod tests {
                 residual: Some(0.0),
                 exceeds_base_cost: false,
                 mills_short_of_charge_off: Some(2.9846),
+                // Perry County reappraised in TY2023, so a third of that revaluation is still
+                // deferred and the charge-off reaches 92.0% of the district's taxable value —
+                // $517 per pupil it is therefore not asked for. The real figures for the real
+                // district, so this fixture cannot drift into describing a place that does not
+                // exist.
+                recognized_share: 0.91965761,
+                reappraisal_year: 2023,
+                overstated_by: Some(517.374),
             }),
             operating_expenditure_per_pupil: Some(11_986.62),
             economically_disadvantaged: Some(0.3881),

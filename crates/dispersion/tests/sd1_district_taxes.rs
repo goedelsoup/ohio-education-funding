@@ -90,13 +90,21 @@ fn total(tax_year: &str, column: usize) -> f64 {
         .sum()
 }
 
+/// Four tax years, balanced — every district present in each.
+///
+/// The window is TY2021 through TY2024 and its width is not arbitrary. Ohio's counties reappraise
+/// or update on a staggered three-year cycle, so TY2022–TY2024 holds exactly one valuation event
+/// per county and TY2021 makes the earliest of those a change rather than a level. A missing year
+/// would leave some county's event unmeasurable — see `regime_diff::recognized_valuation`.
 #[test]
-fn the_fixture_carries_every_district_in_both_tax_years() {
-    assert_eq!(SD1.lines().count() - 1, 611 * 2);
-    for tax_year in ["2023", "2024"] {
+fn the_fixture_carries_every_district_in_all_four_tax_years() {
+    const YEARS: [&str; 4] = ["2021", "2022", "2023", "2024"];
+    assert_eq!(SD1.lines().count() - 1, 611 * YEARS.len());
+    for tax_year in YEARS {
         assert_eq!(
             rows(SD1).filter(|p| p[sd1::TAX_YEAR] == tax_year).count(),
-            611
+            611,
+            "tax year {tax_year}"
         );
     }
 }

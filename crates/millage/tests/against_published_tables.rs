@@ -239,6 +239,11 @@ fn districts_that_never_voted_twenty_mills_are_not_pushed_up_to_it() {
 /// construction nor newly voted millage, so a prediction built only from them should undershoot
 /// far more often than it overshoots. It does: across the districts whose rate moved at all, the
 /// observed rate is at or above the prediction roughly nine times in ten.
+///
+/// It now runs over **every consecutive pair** in the fixture rather than one. That is three pairs
+/// per district instead of one, and it is a materially stronger claim than the original: TY2022,
+/// TY2023 and TY2024 each fall in a different third of Ohio's staggered reappraisal cycle, so the
+/// law is being checked in years when a district's valuation jumped and in years when it did not.
 #[test]
 fn reduction_factors_alone_predict_a_rate_no_higher_than_the_one_charged() {
     let rows = tax_rows();
@@ -251,35 +256,38 @@ fn reduction_factors_alone_predict_a_rate_no_higher_than_the_one_charged() {
     let (mut over, mut under, mut exact) = (0_usize, 0_usize, 0_usize);
 
     for years in by_irn.values() {
-        let [before, after] = years.as_slice() else {
-            continue;
-        };
-        if before.class1_value <= 0.0 || after.class1_value <= 0.0 {
-            continue;
-        }
-        let predicted = effective_millage(
-            before.class1_rate,
-            before.class1_value,
-            after.class1_value,
-            AgencyType::City,
-        )
-        .expect("positive valuations")
-        .effective;
+        // Every consecutive pair, not the ends. SD-1 carried two tax years when this was written
+        // and now carries four, so `[before, after]` silently stopped matching anything at all —
+        // the loop ran zero times and only the count assertion below noticed.
+        for pair in years.windows(2) {
+            let [before, after] = pair else { continue };
+            if before.class1_value <= 0.0 || after.class1_value <= 0.0 {
+                continue;
+            }
+            let predicted = effective_millage(
+                before.class1_rate,
+                before.class1_value,
+                after.class1_value,
+                AgencyType::City,
+            )
+            .expect("positive valuations")
+            .effective;
 
-        let residual = after.class1_rate - predicted;
-        if residual > 0.01 {
-            under += 1;
-        } else if residual < -0.01 {
-            over += 1;
-        } else {
-            exact += 1;
+            let residual = after.class1_rate - predicted;
+            if residual > 0.01 {
+                under += 1;
+            } else if residual < -0.01 {
+                over += 1;
+            } else {
+                exact += 1;
+            }
         }
     }
 
     let total = over + under + exact;
     assert!(
-        total >= 600,
-        "expected two years for every district: {total}"
+        total >= 600 * 3,
+        "expected three consecutive pairs for every district: {total}"
     );
     assert!(
         under + exact >= total * 9 / 10,

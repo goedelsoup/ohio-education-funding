@@ -13,7 +13,7 @@
  * all 606 districts carrying both, to 0.01 mills. That is worth stating on the page, because a
  * reader has no other way to know the two halves of the state are consistent here.
  *
- * # And why two tax years rather than one
+ * # And why more than one tax year
  *
  * H.B. 920 is a mechanism that only exists as a change. Its reduction factors roll a district's
  * effective rate back as valuation rises, holding revenue from existing levies roughly flat in
@@ -24,6 +24,15 @@
  * of every rate reduction in Ohio happened above it. Those figures are computed in `feed.ts`
  * rather than written into the copy, because they appear on 609 pages and a regenerated feed
  * would otherwise leave them wrong — as it left this comment wrong until the split was corrected.
+ *
+ * # The feed carries four tax years, and this page reads the last two
+ *
+ * TY2021 through TY2024, because `regime_diff::recognized_valuation` needs a window wide enough
+ * to contain one reappraisal per county and a quiet year either side of it. Nothing on this page
+ * wants that width: every comparison here is one year against the next, and taking the ends
+ * instead of the last two would restate a one-year fact as a three-year one that spans a
+ * revaluation. Every reader of `property_tax` in this module and in `feed.ts` therefore slices
+ * `-2`, and the same trap was live in four other places when the years were added.
  */
 
 import type { Bar } from "./chart.ts";
@@ -104,7 +113,14 @@ export function renderTaxBase(d: District): string {
  */
 export function renderTaxChange(d: District, statewide: TaxStatewide): string {
   if (d.property_tax.length < 2) return "";
-  const [before, after] = [d.property_tax[0]!, d.property_tax[d.property_tax.length - 1]!];
+  // The last two years, not the ends. This card is about one year-over-year change — H.B. 920's
+  // reduction factors recompute annually, and the card's own heading names the interval. The feed
+  // grew from two tax years to four so that recognised valuation could be reconstructed, and
+  // reading the ends would silently restate a one-year fact as a three-year one.
+  const [before, after] = d.property_tax.slice(-2) as [
+    (typeof d.property_tax)[number],
+    (typeof d.property_tax)[number],
+  ];
 
   const rateMoved = after.class1_rate - before.class1_rate;
   const atFloor = d.at_millage_floor;
@@ -570,16 +586,38 @@ export function renderChargeOff(d: District, statewide: Statewide): string {
              ${count(statewide.below_charge_off_rate)} could not.</p>`
       }
 
-      <p class="note"><strong>What this comparison is, and three things it is not.</strong> It is
+      <p class="note"><strong>What this comparison is, and two things it is not.</strong> It is
         a counterfactual at FY2027 inputs — the plan's own computed base cost held fixed, with only
         the local share mechanism swapped. It is <em>not</em> a reconstruction of any year the
         charge-off governed: those need the era's formula amount, cost-of-doing-business factor and
         DPIA, none of which this project holds. It is <em>not</em> a full regime diff — base cost,
         the guarantee and every categorical have no declared predecessor, so one row of the
-        calculation is all that is comparable. And the charge-off's base narrowed over its life
-        from total taxable value to an H.B. 920-adjusted recognised valuation, which this project
-        does not hold; every figure here is on the earlier, wider base and therefore overstates
-        what the charge-off would have taken.</p>
+        calculation is all that is comparable.</p>
+
+      <p class="note"><strong>A correction, because this page said something wrong.</strong> It
+        described recognised valuation as an H.B. 920 adjustment that this project did not hold,
+        and warned that every figure was on a wider base. The first half was wrong: recognised
+        valuation is not an H.B. 920 adjustment at all. It phases a reappraisal's inflationary
+        increase into the charge-off base over three years — two thirds deferred in the
+        revaluation year, one third the year after, nothing by the third. Which districts it
+        favours is decided by the Department of Taxation's staggered county calendar, not by any
+        district's tax history.
+        ${
+          r.recognized_share >= 0.9995
+            ? `${d.county} County last revalued in ${r.reappraisal_year}, so this district's
+               phase-in is complete and the charge-off above reaches its full taxable value.`
+            : `${d.county} County revalued in ${r.reappraisal_year}, so
+               ${pct(1 - r.recognized_share, 1)} of this district's taxable value is still
+               deferred${
+                 r.overstated_by == null
+                   ? ""
+                   : ` — worth ${money(r.overstated_by)} per pupil of charge-off it is not
+                       being asked for`
+               }.`
+        }
+        Statewide the deferral is 8.2% of taxable value in TY2024 and $793m of charge-off, and
+        correcting it moved findings as well as figures: the median district goes from $289 per
+        pupil better off under the plan to $45 worse.</p>
 
       <p class="note">One seam inside the arithmetic, stated rather than smoothed over. The deemed
         local share is per <strong>enrolled</strong> ADM, because that is what the published
@@ -599,7 +637,7 @@ export function renderChargeOff(d: District, statewide: Statewide): string {
             : `<p class="note">The decomposition leaves ${money(Math.abs(r.residual))} per pupil
                unexplained. Holding base cost fixed means the local share is the only thing that
                can differ, so a residual means the deemed share ran past the cost it was subtracted
-               from and the floor at zero absorbed the rest. Seven districts are in this position.</p>`
+               from and the floor at zero absorbed the rest. Five districts are in this position.</p>`
       }
     </div>`;
 }

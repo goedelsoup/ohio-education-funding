@@ -853,7 +853,14 @@ test.describe("the property tax route", () => {
     await expect(card).toContainText("counterfactual at FY2027 inputs");
     await expect(card).toContainText("not a reconstruction of any year the charge-off governed");
     await expect(card).toContainText("one row of the calculation");
-    await expect(card).toContainText("overstates");
+    // The correction: the page used to say recognised valuation was an H.B. 920 adjustment this
+    // project did not hold, and that every figure therefore overstated the charge-off. It is
+    // neither — it is a reappraisal phase-in, and it is now computed. Asserting the corrected
+    // wording rather than deleting the check, so the page cannot regress to the old claim.
+    await expect(card).toContainText("because this page said something wrong");
+    await expect(card).toContainText("is not an H.B. 920 adjustment");
+    await expect(card).toContainText("staggered county calendar");
+    await expect(card).toContainText("Franklin County revalued in 2023");
   });
 
   test("a district below the charge-off rate is told it would be charged for phantom revenue", async ({

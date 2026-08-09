@@ -251,7 +251,11 @@ function taxStatewide(districts: District[]): TaxStatewide {
   for (const d of districts) {
     if (d.near_millage_floor) nearFloor++;
 
-    const [before, after] = [d.property_tax[0], d.property_tax[d.property_tax.length - 1]];
+    // The last two years, not the ends. The statement this derives — "across TY2023 and TY2024,
+    // this many districts saw their rate fall" — is about one interval, and the feed carries four
+    // tax years so that recognized valuation can be reconstructed. Reading the ends would silently
+    // widen it to TY2021–TY2024 and span a reappraisal.
+    const [before, after] = d.property_tax.slice(-2);
     if (before && after && d.property_tax.length >= 2) {
       // Strictly above on one side and at-or-below on the other. Both ends use the same
       // comparison, so a district resting exactly on 20.0000 in both years is not a crossing.

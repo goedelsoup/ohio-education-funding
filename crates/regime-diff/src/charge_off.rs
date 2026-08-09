@@ -15,18 +15,18 @@
 //! [`DeRolph I`](https://www.supremecourt.ohio.gov/rod/docs/pdf/0/1997/1997-ohio-84.pdf) at ¶97
 //! describes the charge-off as *total taxable value* times a percentage. By FY2008 the
 //! Legislative Service Commission describes the same 23 mills applied to **recognized
-//! valuation** — an H.B. 920-adjusted figure that is deliberately lower than total taxable value
-//! for districts whose reduction factors have bitten.
+//! valuation**.
 //!
 //! So a district's charge-off could fall with no change to the rate, and two accurate statements
 //! of "the charge-off was 23 mills" can describe materially different local shares. That
 //! distinction is why [`ValuationBase`] is carried on every rate rather than left to prose.
 //!
-//! **This corpus holds total taxable valuation and not recognized valuation.** Every figure
-//! computed here is therefore on the DeRolph-era base, and overstates the local share of any
-//! district whose recognized valuation was reduced. Getting past it needs the `tax-abstract`
-//! connector — which is **wired**, and turns out not to carry it: Table SD-1 publishes total
-//! taxable value, not the H.B. 920-adjusted recognized figure. The blocker outlived the block.
+//! **What recognized valuation is was recorded wrongly here for fourteen phases**, and the
+//! correction is in [`recognized_valuation`](crate::recognized_valuation). It is not an H.B. 920
+//! adjustment and has nothing to do with which districts' reduction factors have bitten; it is a
+//! three-year phase-in of the valuation growth a reappraisal or update produces. The corpus is now
+//! able to compute it — 8.2% of statewide taxable value in TY2024, $793m of charge-off at 23 mills
+//! — and [`crate::ChargeOffBase`] is how a caller says which base it wants.
 //!
 //! # Why the mechanism was thought to be wrong
 //!
@@ -45,7 +45,11 @@ use edfund_core::Dollars;
 pub enum ValuationBase {
     /// Total taxable value of real and tangible personal property, per R.C. 3317.02(D).
     TotalTaxable,
-    /// Valuation after H.B. 920 recognition adjustments — lower wherever reduction factors bind.
+    /// Valuation with a reappraisal's inflationary increase phased in over three years.
+    ///
+    /// Lower than total taxable value for a district whose county has revalued in the last two
+    /// years, and equal to it otherwise. See [`recognized_valuation`](crate::recognized_valuation)
+    /// — including for what this doc comment used to say, which was a different mechanism.
     Recognized,
 }
 
@@ -155,7 +159,7 @@ mod tests {
         assert_eq!(
             RATES[RATES.len() - 1].base,
             ValuationBase::Recognized,
-            "the last described base is the H.B. 920-adjusted one"
+            "the last described base is the reappraisal-phased one"
         );
     }
 
