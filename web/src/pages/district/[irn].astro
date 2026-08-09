@@ -17,6 +17,7 @@ import {
   renderHeadline,
   renderCategoricals,
   renderPosition,
+  renderNationalPosition,
   renderSupplements,
 } from "../../lib/district.ts";
 import { slugify } from "../../lib/county.ts";
@@ -91,5 +92,7 @@ const description = district.on_guarantee
   <Fragment set:html={renderSupplements(district)} />
   <Fragment set:html={renderEnrollmentYears(bundle, district, forecastable)} />
   <Fragment set:html={renderPosition(bundle, district, valuations, expenditures)} />
+  {/* Ohio describing itself cannot say whether Ohio is unusual. This is the one card that can. */}
+  <Fragment set:html={renderNationalPosition(district)} />
   <Fragment set:html={renderDetail(district)} />
 </Base>

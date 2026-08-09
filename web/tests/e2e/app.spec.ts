@@ -1656,3 +1656,52 @@ test.describe("what the scenario holds fixed", () => {
   });
 });
 
+test.describe("against america", () => {
+  test("a district is placed in the national distribution, not the Ohio one", async ({ page }) => {
+    /*
+     * The comparison every other page here cannot make. Ohio describing itself can say what Ohio
+     * does and not whether it is unusual, and 10,382 districts on the Census Bureau's definitions
+     * is the only thing in this feed that is not Ohio describing itself.
+     */
+    await page.goto("/district/043786");
+    const card = page.locator('.card[data-part="national"]');
+    await expect(card).toContainText("Against America");
+    await expect(card).toContainText("10,382 school districts in every state");
+    await expect(card).toContainText("Local share of revenue");
+    await expect(card).toContainText("percentile");
+  });
+
+  test("the year and the denominator are stated, because neither matches the page", async ({
+    page,
+  }) => {
+    // FY2022 against the model's FY2027, on federal fall membership rather than Ohio's ADM. This
+    // card sits three below one showing operating expenditure per pupil on a different count in a
+    // different year, which is the exact shape of the error `denominators.ts` exists for.
+    await page.goto("/district/043786");
+    const card = page.locator('.card[data-part="national"]');
+    await expect(card).toContainText("These are not the figures above");
+    await expect(card).toContainText("FY2022");
+    await expect(card).toContainText("federal fall membership");
+  });
+
+  test("a high-local-share district is told it is in the national top fifth", async ({ page }) => {
+    // Orange City raises 85% of its money locally, the 99th percentile nationally — against
+    // Cleveland at 38% and the 51st, which is the contrast the card exists to make possible.
+    await page.goto("/district/044933");
+    const card = page.locator('.card[data-part="national"]');
+    await expect(card).toContainText("national top fifth");
+  });
+
+  test("the one district outside the comparable set says so rather than showing a rank", async ({
+    page,
+  }) => {
+    const feed = await (await page.request.get("/data/bundle.json")).json();
+    const outside = feed.districts.find((d: { national: unknown }) => d.national === null);
+    expect(outside, "one Ohio K-8 district is outside the comparable set").toBeTruthy();
+    await page.goto(`/district/${outside.irn}`);
+    await expect(page.locator('.card[data-part="national"]')).toContainText(
+      "not in the national comparison",
+    );
+  });
+});
+

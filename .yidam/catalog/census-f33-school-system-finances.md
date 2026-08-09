@@ -69,3 +69,34 @@ and local shares correspondingly deflated. Every finding above therefore underst
 reliance rather than overstating it, which is the safe direction, but a series across years would
 need the relief years marked. One year per file and the layout is not stable across them, so the
 column map is per-era.
+
+## The per-district view, and the filter it needed
+
+**Update.** The corpus now holds this survey per district as well as per state, from
+`sdf22_1a.zip` — NCES publishing the same collection keyed on `LEAID` rather than the Bureau's
+`IDCENSUS`. That key is what made the join possible: `LEAID` reaches Ohio's IRN through the [CCD
+directory](nces-ccd-lea-directory.md), and all 609 districts in the funding panel come through with
+no losses.
+
+**The comparison set is not every agency, and getting that wrong is easy.** The survey's unit is a
+local education agency, and 357 of Ohio's 968 rows are community schools, joint vocational
+districts and educational service centres. A community school raises almost no local tax by
+construction, so leaving them in drags the distribution somewhere no traditional district lives —
+the first attempt here put Ohio's 200 smallest agencies at an **8% local share**, which is a true
+fact about charter finance and a useless one about school districts.
+
+The filter is the survey's own: `AGCHRT != 1` and `SCHLEV == 03`, leaving **10,382 unified,
+non-charter districts nationally**. It costs one Ohio district, a K-8 agency carried without a
+national position rather than given an invented one.
+
+**The two files agree, which is the check that the filter is right.** This catalog entry records
+Ohio at **51.8%** local share from the Bureau's state-level table. The district file, filtered and
+re-aggregated, gives **51.7%** — two independently assembled sources within a tenth of a point. A
+filter that admitted Ohio's community schools would not reproduce it.
+
+**And the district view says something the state view cannot.** Ohio's *median district* sits at
+the **66th national percentile** on local share, and its quarter-poorest at the national median.
+The shift between the Ohio and national views is largest in the *middle* of the distribution and
+smallest at the tails — the opposite of the intuition that a national comparison mainly relocates
+extremes.
+

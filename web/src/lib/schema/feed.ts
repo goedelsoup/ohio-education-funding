@@ -377,6 +377,29 @@ export const DistrictSchema = z
       })
       .strict(),
     /**
+     * Where this district sits among America's, on federal definitions.
+     *
+     * Every other figure in this feed is Ohio describing itself, which cannot say whether Ohio is
+     * unusual. This is 10,382 comparable school districts in every state on the Census Bureau's
+     * own definitions.
+     *
+     * Three caveats. The year is **FY2022** against the model's FY2027. The denominator is the
+     * **federal** fall membership, not Ohio's ADM — never show a per-pupil figure from here beside
+     * one from the funding model without saying so. And the comparison set excludes charter
+     * agencies and non-unified districts; `null` for the one Ohio K-8 district it leaves out.
+     */
+    national: z
+      .object({
+        local_share: num,
+        local_share_percentile: num,
+        revenue_per_pupil: num,
+        revenue_per_pupil_percentile: num,
+        spending_per_pupil: num,
+        spending_per_pupil_percentile: num,
+      })
+      .strict()
+      .nullable(),
+    /**
      * The guarantee's machinery, and the second hold-harmless stacked on it.
      *
      * The guarantee is the FY2021 funding base less an **open-enrolment clawback** less foundation

@@ -31,6 +31,8 @@
 
 #![forbid(unsafe_code)]
 
+pub mod national_peers;
+
 use edfund_core::Dollars;
 
 /// The equity statistics of one distribution.

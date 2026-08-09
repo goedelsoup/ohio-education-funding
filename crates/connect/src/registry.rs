@@ -413,9 +413,24 @@ pub const CONNECTORS: &[Connector] = &[
             fixture: Some("crates/dispersion/fixtures/census-f33-states.csv"),
             note: "One year per file and the layout is not stable across years, so the column \
                    map is per-era. The fixture is the state aggregate rather than the panel: \
-                   14,106 school systems reduce to 51 rows. The per-district join was recorded \
-                   as blocked on an NCESID-to-IRN crosswalk; that crosswalk now exists in \
-                   `nces-ccd`, so what remains is retrieving the per-system file.",
+                   14,106 school systems reduce to 51 rows. The per-district view is now held \
+                   too, from NCES's own keying of the same survey — see `sdf22-districts` \
+                   below, which reproduces this file's Ohio local share to a tenth of a point.",
+        },
+        Source {
+            key: "sdf22-districts",
+            url: "https://nces.ed.gov/ccd/data/zip/sdf22_1a.zip",
+            filename: "sdf22_1a.zip",
+            format: Format::Zip,
+            catalog: Some("census-f33-school-system-finances"),
+            fixture: Some("crates/dispersion/fixtures/f33-districts-fy2022.csv"),
+            note: "The same survey NCES publishes keyed on `LEAID` rather than the Bureau's \
+                   `IDCENSUS`, which is what makes the per-district join possible at all. \
+                   Tab-delimited, 354 columns, 19,572 agencies. The fixture keeps the 10,382 \
+                   that are comparable — `AGCHRT != 1` and `SCHLEV == 03`, so no charter \
+                   agencies and no non-unified districts — plus every Ohio agency. Leaving \
+                   charters in put Ohio's 200 smallest agencies at an 8% local share, which is \
+                   a fact about charter finance and not about school districts.",
         }],
     },
     Connector {

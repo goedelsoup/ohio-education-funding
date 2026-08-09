@@ -69,6 +69,12 @@ export const DENOMINATORS = {
     note: "Enrolled ADM less pupils open-enrolling in, plus those open-enrolling out. Targeted assistance measures wealth per resident pupil and then pays on the enrolled count — two denominators, one line apart in the same formula.",
     field: "districts[].targeted_assistance.resident_adm",
   },
+  "f33-fall-membership": {
+    label: "Fall membership, `V33`",
+    source: "NCES, School District Finance Survey (F-33), FY2022",
+    note: "The federal count for a single district, five years before the model it sits beside. Not Ohio's enrolled ADM and not the report card's headcount — and the only denominator here that is not Ohio's own.",
+    field: "districts[].national.revenue_per_pupil",
+  },
   "census-fall-enrollment": {
     label: "Fall enrolment",
     source: "U.S. Census Bureau, F-33",
@@ -122,6 +128,22 @@ export const FIELD_DENOMINATORS: Record<string, DenominatorKey | null> = {
   // The Census comparison, on the federal survey's count.
   "national.national_spending_per_pupil": "census-fall-enrollment",
 
+  // The per-district national comparison, on the survey's own count for that district.
+  //
+  // This is the denominator the site is most likely to get wrong next, because the figures look
+  // exactly like the ones above them on the same page and are not on the same count, the same
+  // definitions, or the same year. `operating_expenditure_per_pupil` is FY2024 on enrolled ADM
+  // FY2024; `spending_per_pupil` here is FY2022 on federal fall membership. They are not
+  // comparable and the card says so.
+  "districts[].national.revenue_per_pupil": "f33-fall-membership",
+  "districts[].national.spending_per_pupil": "f33-fall-membership",
+
+  // The percentiles are dimensionless — a rank. `local_share` and its percentile are too, and are
+  // deliberately absent: the walk does not consider them denominator-bearing, and declaring a
+  // field it cannot see makes the table a claim about the feed that has stopped being checkable.
+  "districts[].national.revenue_per_pupil_percentile": null,
+  "districts[].national.spending_per_pupil_percentile": null,
+
   // Pupil counts themselves, not quantities over one.
   "districts[].adm": null,
   "districts[].current_year_adm": null,
@@ -173,6 +195,8 @@ export const FIELD_DENOMINATORS: Record<string, DenominatorKey | null> = {
   // like the department's.
   "house_districts[].adm": null,
   "house_districts[].members[].adm": null,
+  "senate_districts[].adm": null,
+  "senate_districts[].members[].adm": null,
 
   // The three-year enrolment change the growth supplement's 3% cliff is tested against.
   // Dimensionless: both ends are the same count in different years, so the denominator cancels.

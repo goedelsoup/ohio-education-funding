@@ -417,20 +417,45 @@ fn house_district_block(
         .collect()
 }
 
-fn to_district(
-    record: &DistrictRecord,
-    profile: Option<&&str>,
-    outcome: Option<&Joined>,
-    money: Option<&Finances>,
-    taxes: Option<&Vec<PropertyTaxYear>>,
-    functions: Option<&SpendingByFunction>,
-    house_districts: &[HouseDistrictShare],
-) -> District {
+/// Everything joined onto one district, named rather than positional.
+///
+/// Seven optional references in a row is the mistake the `Fy27Sheets` struct was introduced to
+/// prevent on the connector side, arriving here from the other direction: most of these are
+/// `Option<&…>` of different types, so a transposition is a compile error more often than not —
+/// but `taxes` and `functions` are both `Option<&…>` over collections and would swap silently.
+struct Joins<'a> {
+    profile: Option<&'a &'a str>,
+    outcome: Option<&'a Joined>,
+    money: Option<&'a Finances>,
+    taxes: Option<&'a Vec<PropertyTaxYear>>,
+    functions: Option<&'a SpendingByFunction>,
+    house_districts: &'a [HouseDistrictShare],
+    national: Option<&'a dispersion::national_peers::NationalPosition>,
+}
+
+fn to_district(record: &DistrictRecord, joins: &Joins<'_>) -> District {
+    let Joins {
+        profile,
+        outcome,
+        money,
+        taxes,
+        functions,
+        house_districts,
+        national,
+    } = *joins;
     let adm = record.base_cost_adm();
     District {
         irn: record.irn.clone(),
         name: record.name.clone(),
         county: record.county.clone(),
+        national: national.map(|n| bundle::NationalPosition {
+            local_share: n.local_share,
+            local_share_percentile: n.local_share_percentile,
+            revenue_per_pupil: n.revenue_per_pupil,
+            revenue_per_pupil_percentile: n.revenue_per_pupil_percentile,
+            spending_per_pupil: n.spending_per_pupil,
+            spending_per_pupil_percentile: n.spending_per_pupil_percentile,
+        }),
         transition: {
             let t = &record.transition;
             bundle::Transition {
@@ -941,17 +966,22 @@ fn main() {
         });
     }
 
+    let (national_positions, _national_medians) = dispersion::national_peers::positions();
+
     let districts: Vec<District> = records
         .iter()
         .map(|record| {
             to_district(
                 record,
-                profile.get(record.irn.as_str()),
-                outcomes.iter().find(|j| j.funding.irn == record.irn),
-                for_district(&money, &record.irn),
-                taxes.get(&record.irn),
-                functions.get(&record.irn),
-                shares.get(&record.irn).map_or(&[][..], Vec::as_slice),
+                &Joins {
+                    profile: profile.get(record.irn.as_str()),
+                    outcome: outcomes.iter().find(|j| j.funding.irn == record.irn),
+                    money: for_district(&money, &record.irn),
+                    taxes: taxes.get(&record.irn),
+                    functions: functions.get(&record.irn),
+                    house_districts: shares.get(&record.irn).map_or(&[][..], Vec::as_slice),
+                    national: national_positions.get(&record.irn),
+                },
             )
         })
         .collect();

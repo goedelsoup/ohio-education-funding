@@ -1360,3 +1360,103 @@ function renderPreschoolSpecialEducation(d: District): string {
       the fiscal year, so the factor is presumably recalibrated before payment; as published, the
       factor, the limit and the total do not agree.</p>`;
 }
+
+/**
+ * Where this district sits among America's, on federal definitions.
+ *
+ * # The comparison every other page on this site cannot make
+ *
+ * Ohio describing itself cannot say whether Ohio is unusual, and every other figure here is Ohio
+ * describing itself. This is 10,382 comparable school districts in every state, reported on the
+ * Census Bureau's definitions rather than on each state's.
+ *
+ * It also relocates districts, and mostly the ordinary ones. Ohio's *median* district sits at the
+ * 66th national percentile on local share; its quarter-poorest sits at the national median. The
+ * tails roughly agree between the two views and the middle does not — the opposite of the
+ * intuition that a national comparison mainly moves the extremes.
+ *
+ * # Why the figures are not the ones above them on the page
+ *
+ * FY2022 against the model's FY2027, and federal fall membership against Ohio's ADM. The card says
+ * so rather than letting a reader compare a number here with one three cards up, which is exactly
+ * the error `denominators.ts` exists because this site shipped twice.
+ */
+export function renderNationalPosition(d: District): string {
+  const n = d.national;
+  if (!n) {
+    return `
+      <div class="card" data-part="national">
+        <h2>Against America</h2>
+        <p class="note">This district is not in the national comparison. The Census survey's
+          comparable set is unified elementary-and-secondary districts, and this is one of Ohio's
+          few K-8 districts — its spending per pupil is not comparable with a district that also
+          runs a high school. It is carried without a national position rather than given an
+          invented one.</p>
+      </div>`;
+  }
+
+  const rank = (p: number) => `${ordinal(Math.max(1, Math.round(p * 100)))} percentile`;
+  const rows: [string, string, number, string][] = [
+    [
+      "Local share of revenue",
+      pct(n.local_share, 1),
+      n.local_share_percentile,
+      "What DeRolph is a claim about: how much of this district's money its own community raises.",
+    ],
+    [
+      "Revenue per pupil",
+      money(n.revenue_per_pupil),
+      n.revenue_per_pupil_percentile,
+      "All sources, on the federal count.",
+    ],
+    [
+      "Current spending per pupil",
+      n.spending_per_pupil <= 0 ? "—" : money(n.spending_per_pupil),
+      n.spending_per_pupil_percentile,
+      "What it spent, as the Bureau defines spending.",
+    ],
+  ];
+
+  return `
+    <div class="card" data-part="national">
+      <h2>Against America</h2>
+      <div class="scroll"><table data-program="national">
+        <thead><tr><th>Measure</th><th class="tnum">This district</th>
+          <th class="tnum">Nationally</th><th>What it is</th></tr></thead>
+        <tbody>
+          ${rows
+            .map(
+              ([label, value, percentile, note]) => `<tr>
+                <th>${escapeHtml(label)}</th>
+                <td class="tnum">${value}</td>
+                <td class="tnum">${percentile <= 0 ? "—" : rank(percentile)}</td>
+                <td class="n">${escapeHtml(note)}</td>
+              </tr>`,
+            )
+            .join("")}
+        </tbody>
+      </table></div>
+      <p class="note">Against <strong>10,382 school districts in every state</strong>, on the
+        Census Bureau's own definitions rather than on each state's. Every other figure on this
+        site is Ohio describing itself, which can say what Ohio does and not whether it is
+        unusual.${
+          n.local_share_percentile > 0.8
+            ? ` This district is in the <strong>national top fifth</strong> for local reliance —
+               ${pct(n.local_share, 0)} of its money is raised locally.`
+            : n.local_share_percentile < 0.3
+              ? ` Despite Ohio's reputation, this district is in the <strong>bottom third</strong>
+                 nationally for local reliance: most of its money comes from the state.`
+              : ""
+        }</p>
+      <p class="note">An ordinary Ohio district is well above the national middle, and the shift is
+        largest for ordinary districts rather than extreme ones. Ohio's median district sits at the
+        <strong>66th</strong> national percentile on local share; its quarter-poorest sits at the
+        national median.</p>
+      <p class="note"><strong>These are not the figures above.</strong> They are
+        <strong>FY2022</strong> against the model's FY2027, and they divide by the federal fall
+        membership rather than by Ohio's enrolled ADM. A revenue-per-pupil figure here and a
+        spending-per-pupil figure elsewhere on this page are different quantities over different
+        counts in different years, and subtracting one from the other would mean nothing.</p>
+    </div>`;
+}
+

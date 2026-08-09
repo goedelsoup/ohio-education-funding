@@ -73,7 +73,7 @@ use edfund_core::Dollars;
 /// from FY2022-FY2024 to FY2024-FY2026 — the years the department's `ADM Data` sheet declares.
 /// The values did not change; what they are called did, which is exactly the kind of silent
 /// meaning change the version guard exists for.
-pub const CONTRACT_VERSION: &str = "24.0.0";
+pub const CONTRACT_VERSION: &str = "25.0.0";
 
 /// How close to the floor counts as being on it, in mills.
 ///
@@ -825,6 +825,32 @@ pub struct Transition {
     pub transition_supplement: Dollars,
 }
 
+/// Where a district sits among America's, on federal definitions.
+///
+/// Ohio describing itself cannot say whether Ohio is unusual, and every other source in this feed
+/// is Ohio describing itself. This is the exception: 10,382 comparable school districts in every
+/// state, reported on the Census Bureau's own definitions.
+///
+/// Three caveats travel with it. The year is **FY2022** against the model's FY2027. The
+/// denominator is the **federal** fall membership, not Ohio's ADM. And the comparison set excludes
+/// charter agencies and non-unified districts, because a community school's finances are not a
+/// school district's — leaving them in put Ohio's smallest agencies at an 8% local share.
+#[derive(Debug, Clone, Copy, PartialEq, Default)]
+pub struct NationalPosition {
+    /// Local revenue as a share of total, and where that sits among all comparable districts.
+    pub local_share: f64,
+    /// Where that share sits among all comparable districts.
+    pub local_share_percentile: f64,
+    /// Total revenue per pupil on the federal count, and its percentile.
+    pub revenue_per_pupil: f64,
+    /// Where that sits.
+    pub revenue_per_pupil_percentile: f64,
+    /// Current spending per pupil, and its percentile. Zero where unreported.
+    pub spending_per_pupil: f64,
+    /// And that.
+    pub spending_per_pupil_percentile: f64,
+}
+
 /// One district, as the web layer needs it.
 #[derive(Debug, Clone, PartialEq)]
 pub struct District {
@@ -832,6 +858,9 @@ pub struct District {
     pub irn: String,
     /// District name as published.
     pub name: String,
+    /// Where this district sits among America's. `None` for the one K-8 district the comparison
+    /// set excludes, which is carried without a position rather than given an invented one.
+    pub national: Option<NationalPosition>,
     /// The performance supplement and the two enrolment supplements, outside the formula.
     pub supplements: Supplements,
     /// Transportation, the largest thing outside it.
@@ -1701,6 +1730,30 @@ impl Bundle {
                 opt(d.supplements.progress),
                 opt(d.supplements.growth_forgone)
             ));
+            match &d.national {
+                None => s.push_str("\"national\": null, "),
+                Some(n) => {
+                    s.push_str(&fields(
+                        "national",
+                        &[
+                            ("local_share", n.local_share),
+                            ("local_share_percentile", n.local_share_percentile),
+                            ("revenue_per_pupil", n.revenue_per_pupil),
+                            (
+                                "revenue_per_pupil_percentile",
+                                n.revenue_per_pupil_percentile,
+                            ),
+                            ("spending_per_pupil", n.spending_per_pupil),
+                            (
+                                "spending_per_pupil_percentile",
+                                n.spending_per_pupil_percentile,
+                            ),
+                        ],
+                        &[],
+                    ));
+                    s.push_str(", ");
+                }
+            }
             s.push_str(&fields(
                 "transition",
                 &[
@@ -2174,6 +2227,14 @@ mod tests {
             irn: "049056".into(),
             name: "Northern Local".into(),
             county: "Perry".into(),
+            national: Some(NationalPosition {
+                local_share: 0.4123,
+                local_share_percentile: 0.6104,
+                revenue_per_pupil: 16_402.0,
+                revenue_per_pupil_percentile: 0.5512,
+                spending_per_pupil: 15_118.0,
+                spending_per_pupil_percentile: 0.5308,
+            }),
             transition: Transition {
                 funding_base: 12_400_000.0,
                 open_enrollment_prior: 214.5,
