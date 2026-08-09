@@ -162,6 +162,16 @@ pub const FY27_HEADER: &[&str] = &[
     "ta_supplement_eligible",
     "categorical_enrolled_adm",
     "county",
+    "performance_stars",
+    "performance_progress",
+    "performance_progress_prior",
+    "performance_eligible",
+    "performance_supplement",
+    "base_funding_supplement",
+    "enrolled_adm_fy23",
+    "enrollment_change_three_year",
+    "growth_supplement_eligible",
+    "enrollment_growth_supplement",
 ];
 
 /// Column positions in the department's `Base_Cost` sheet, whose header is on the fourth row.
@@ -368,6 +378,20 @@ pub const TA_WEALTH_OFFSET_RATE: f64 = 0.0112;
 /// Below this wealth index the tier pays nothing, because the bracket has gone negative.
 pub const TA_WEALTH_INDEX_FLOOR: f64 = 0.8;
 
+/// The performance supplement's rate, per pupil per rating point.
+pub const PERFORMANCE_SUPPLEMENT_PER_POINT: f64 = 13.0;
+/// A district qualifies on any of three routes: stars above this, progress at or above
+/// [`PERFORMANCE_PROGRESS_THRESHOLD`], or progress higher than the year before.
+pub const PERFORMANCE_STAR_THRESHOLD: f64 = 3.5;
+/// The progress-component route, which does not require the overall rating to be good at all.
+pub const PERFORMANCE_PROGRESS_THRESHOLD: f64 = 3.0;
+/// The unconditional supplement, per pupil, every district.
+pub const BASE_FUNDING_SUPPLEMENT_PER_PUPIL: f64 = 40.0;
+/// The growth supplement's rate and the three-year growth a district must reach to draw it.
+pub const ENROLLMENT_GROWTH_SUPPLEMENT_PER_PUPIL: f64 = 250.0;
+/// Three per cent over three years. A cliff, not a slope: below it the district draws nothing.
+pub const ENROLLMENT_GROWTH_THRESHOLD: f64 = 0.03;
+
 /// Column positions in the `CTE` sheet, whose header is on the fourth row.
 ///
 /// Five weighted categories and an associated-services weight applied to the sum. Mechanically the
@@ -469,6 +493,48 @@ mod targeted_assistance_columns {
     /// `[H]`/`[I]` — the supplemental tier's eligibility flag and its amount.
     pub const SUPPLEMENT_ELIGIBLE: usize = 18;
     pub const SUPPLEMENTAL: usize = 19;
+}
+
+/// Column positions in the `Performance Supplement` sheet, whose header is on the third row.
+///
+/// **The only place Ohio's funding formula pays on measured outcomes.** $55.7m, and it is outside
+/// foundation funding — it sits in `[R] Total State Support` and not in `[H]`, so the guarantee
+/// does not hold a district at it and this corpus carried it as part of an unexplained remainder.
+///
+/// Three ways to qualify, and the amount scales with the rating rather than being flat: $13 per
+/// pupil times the **greater** of the overall star rating and the progress component rating. So a
+/// five-star district receives $65 a pupil and a qualifying 2.5-star district $32.50.
+mod performance_columns {
+    pub const IRN: usize = 0;
+    /// `O1 Overall Performance Rating Stars` — 0 to 5 in half steps. One district reads `N/A`.
+    pub const STARS: usize = 4;
+    /// `O2`/`O3` — the progress component rating for 2023-24 and the year before it.
+    pub const PROGRESS: usize = 5;
+    pub const PROGRESS_PRIOR: usize = 6;
+    /// `Q4. Overall Eligibility` — `Yes` on any of the three routes.
+    pub const ELIGIBLE: usize = 7;
+    pub const AMOUNT: usize = 8;
+}
+
+/// Column positions in the `Base_Enrollment Growth` sheet, whose header is on the fourth row.
+///
+/// Two payments that share a sheet and nothing else. The **base funding supplement** is $40 for
+/// every pupil in every district, unconditional, $56.1m. The **enrollment growth supplement** is
+/// $250 a pupil for districts whose enrolment rose at least 3% over three years — and it pays on
+/// *every* pupil, not the new ones, so it is a cliff rather than a slope.
+///
+/// Worth reading beside the guarantee, which pays districts for enrolment they have **lost**. The
+/// same formula pays a premium in both directions and the two have never been looked at together.
+mod growth_columns {
+    pub const IRN: usize = 0;
+    /// `L Base Funding Supplement` — $40 times enrolled ADM, for everyone.
+    pub const BASE_SUPPLEMENT: usize = 4;
+    /// `M1B FY23 Enrolled ADM` — a fourth ADM year, which the panel did not hold.
+    pub const ADM_FY23: usize = 6;
+    /// `M1` — the three-year change, against which `M2` tests 3%.
+    pub const CHANGE: usize = 7;
+    pub const ELIGIBLE: usize = 8;
+    pub const AMOUNT: usize = 9;
 }
 
 /// Column positions in the `Local_Capacity` sheet, whose header is on the second row.
@@ -587,6 +653,10 @@ pub struct Fy27Sheets<'a> {
     pub gifted_rows: &'a [Vec<String>],
     /// `Targeted_Assistance` — the two-tier equalisation.
     pub targeted_assistance_rows: &'a [Vec<String>],
+    /// `Performance Supplement` — the one payment gated on measured outcomes.
+    pub performance_rows: &'a [Vec<String>],
+    /// `Base_Enrollment Growth` — $40 for every pupil, and $250 for a district that grew.
+    pub growth_rows: &'a [Vec<String>],
 }
 
 /// Index a worksheet by IRN, taking every row whose key column holds one.
@@ -621,6 +691,8 @@ pub fn build_fy27_model(sheets: &Fy27Sheets<'_>) -> Vec<Vec<String>> {
         el_rows,
         gifted_rows,
         targeted_assistance_rows,
+        performance_rows,
+        growth_rows,
     } = *sheets;
     use base_cost_columns as bc;
 
@@ -662,6 +734,10 @@ pub fn build_fy27_model(sheets: &Fy27Sheets<'_>) -> Vec<Vec<String>> {
     let gifted: HashMap<&str, &Vec<String>> = rows_by_irn(gifted_rows, gifted_columns::IRN);
     let targeted: HashMap<&str, &Vec<String>> =
         rows_by_irn(targeted_assistance_rows, targeted_assistance_columns::IRN);
+    // The two supplements outside foundation funding.
+    let performance: HashMap<&str, &Vec<String>> =
+        rows_by_irn(performance_rows, performance_columns::IRN);
+    let growth: HashMap<&str, &Vec<String>> = rows_by_irn(growth_rows, growth_columns::IRN);
 
     let valuation: Vec<(&str, &Vec<String>)> = profile_rows
         .iter()
@@ -922,6 +998,54 @@ pub fn build_fy27_model(sheets: &Fy27Sheets<'_>) -> Vec<Vec<String>> {
         out.last_mut()
             .expect("just pushed")
             .push(clean_name(cell(row, base_cost_columns::COUNTY)));
+
+        // The performance supplement. The star rating reads `N/A` for one district, which
+        // `cell_number` returns as `None` and `format_value` writes as empty — the right answer,
+        // since a district with no rating did not score zero.
+        let perf = performance.get(irn);
+        for (column, places) in [
+            (performance_columns::STARS, 2),
+            (performance_columns::PROGRESS, 2),
+            (performance_columns::PROGRESS_PRIOR, 2),
+        ] {
+            let value = perf.and_then(|row| cell_number(row, column));
+            out.last_mut()
+                .expect("just pushed")
+                .push(format_value(value, places));
+        }
+        let performance_eligible = perf
+            .map(|row| cell(row, performance_columns::ELIGIBLE).trim())
+            .is_some_and(|flag| flag.eq_ignore_ascii_case("yes"));
+        out.last_mut()
+            .expect("just pushed")
+            .push(if performance_eligible { "1" } else { "0" }.to_string());
+        let value = perf.and_then(|row| cell_number(row, performance_columns::AMOUNT));
+        out.last_mut()
+            .expect("just pushed")
+            .push(format_value(value, 2));
+
+        // The base funding supplement and the enrollment growth supplement.
+        let grow = growth.get(irn);
+        for (column, places) in [
+            (growth_columns::BASE_SUPPLEMENT, 2),
+            (growth_columns::ADM_FY23, 6),
+            (growth_columns::CHANGE, 9),
+        ] {
+            let value = grow.and_then(|row| cell_number(row, column));
+            out.last_mut()
+                .expect("just pushed")
+                .push(format_value(value, places));
+        }
+        let growth_eligible = grow
+            .map(|row| cell(row, growth_columns::ELIGIBLE).trim())
+            .is_some_and(|flag| flag.eq_ignore_ascii_case("yes"));
+        out.last_mut()
+            .expect("just pushed")
+            .push(if growth_eligible { "1" } else { "0" }.to_string());
+        let value = grow.and_then(|row| cell_number(row, growth_columns::AMOUNT));
+        out.last_mut()
+            .expect("just pushed")
+            .push(format_value(value, 2));
     }
     out
 }

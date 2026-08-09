@@ -469,6 +469,147 @@ impl TargetedAssistance {
     }
 }
 
+/// The performance supplement, for one district.
+///
+/// # The only place Ohio's funding formula pays on measured outcomes
+///
+/// $55.7m, and structurally unlike everything else here: every other component pays for inputs — a
+/// pupil, a category, a tax base — and this pays for a **rating**. It sits outside foundation
+/// funding, in `[R] Total State Support`, so the guarantee does not hold a district at it.
+///
+/// Three routes qualify a district, and only one of them is about being good:
+///
+/// - an overall rating above 3.5 stars — 288 districts;
+/// - a progress component rating of 3 or more — a further 120, whatever their overall rating;
+/// - a progress rating higher than the year before — a further 18, whatever the level.
+///
+/// The amount then scales with the **greater** of the overall and progress ratings, at $13 a pupil
+/// a point. So the payment runs from $32.50 to $65.00 per pupil, and a district that qualifies by
+/// improving from a low base is paid on that low base.
+///
+/// # It runs the opposite way to the rest of the formula
+///
+/// Sorted by economically disadvantaged share, mean supplement per pupil runs **$54.74, $43.24,
+/// $36.21, $30.03, $23.31** from the least-poor quintile to the poorest, and the share of
+/// districts qualifying runs 91% to 49%. The least-poor districts receive **2.3 times** per pupil
+/// what the poorest do.
+///
+/// That is worth stating precisely rather than as an accusation. Ohio's attainment measures track
+/// composition — this corpus has already established that spending per *weighted* pupil against
+/// performance is substantially a composition proxy — so a program keyed to them will follow
+/// composition whatever its intent. The finding is not that the department is paying wealthy
+/// districts on purpose; it is that a $55.7m component of a formula built to equalise is
+/// distributed inversely to need, and no published figure says so.
+#[derive(Debug, Clone, Copy, PartialEq, Default)]
+pub struct PerformanceSupplement {
+    /// `O1` — the overall rating, 0 to 5 in half steps. `None` for the one district rated `N/A`.
+    pub stars: Option<f64>,
+    /// `O2`/`O3` — the progress component rating, and the year before it.
+    pub progress: Option<f64>,
+    /// The year before, which the third qualifying route compares against.
+    pub progress_prior: Option<f64>,
+    /// `Q4` — whether any of the three routes qualified it.
+    pub eligible: bool,
+    /// `O` — the amount.
+    pub amount: Dollars,
+}
+
+/// Per pupil, per rating point.
+pub const PERFORMANCE_SUPPLEMENT_PER_POINT: Dollars = 13.0;
+/// Above this overall rating a district qualifies outright.
+pub const PERFORMANCE_STAR_THRESHOLD: f64 = 3.5;
+/// At or above this progress rating it qualifies whatever its overall rating.
+pub const PERFORMANCE_PROGRESS_THRESHOLD: f64 = 3.0;
+
+impl PerformanceSupplement {
+    /// The rating the payment is computed on: the greater of the two, where both exist.
+    #[must_use]
+    pub fn paid_rating(&self) -> Option<f64> {
+        match (self.stars, self.progress) {
+            (Some(a), Some(b)) => Some(a.max(b)),
+            (Some(a), None) => Some(a),
+            (None, Some(b)) => Some(b),
+            (None, None) => None,
+        }
+    }
+
+    /// Which of the three routes qualified the district, for a page that wants to say.
+    ///
+    /// Ordered as the workbook's nested `IF` evaluates them, so a district meeting two is
+    /// attributed to the first — which is what the department's own sheet does.
+    #[must_use]
+    pub fn route(&self) -> Option<&'static str> {
+        if !self.eligible {
+            return None;
+        }
+        if self.stars.is_some_and(|s| s > PERFORMANCE_STAR_THRESHOLD) {
+            Some("an overall rating above 3.5 stars")
+        } else if self
+            .progress
+            .is_some_and(|p| p >= PERFORMANCE_PROGRESS_THRESHOLD)
+        {
+            Some("a progress rating of 3 or more")
+        } else {
+            Some("a progress rating higher than the year before")
+        }
+    }
+}
+
+/// The two supplements on the `Base_Enrollment Growth` sheet, for one district.
+///
+/// # One is unconditional and one is a cliff
+///
+/// The **base funding supplement** is $40 for every pupil in every district, $56.1m statewide, with
+/// no test of any kind. It is the simplest line in the whole calculation.
+///
+/// The **enrollment growth supplement** is $250 a pupil for a district whose enrolment rose at
+/// least **3%** over three years — and it pays on *every* pupil, not on the pupils gained. 43
+/// districts draw it, $39.4m between them, against a median district that **shrank 4.8%**.
+///
+/// Paying on the whole roll rather than the increment turns the threshold into a cliff with real
+/// money on it. New Lexington grew **2.9502%** and drew nothing; three hundredths of a percentage
+/// point further and it would have received **$430,477**. Two other districts sit between 2.7%
+/// and 3%.
+///
+/// # And it points the opposite way to the guarantee
+///
+/// The guarantee holds a district at a historical amount when its enrolment *falls*; this pays a
+/// premium when it *rises*. The same formula cushions movement in both directions, which is
+/// defensible per district and means the formula responds to enrolment change less than its
+/// per-pupil construction suggests.
+#[derive(Debug, Clone, Copy, PartialEq, Default)]
+pub struct Supplements {
+    /// `L` — $40 a pupil, unconditional.
+    pub base_funding: Dollars,
+    /// `M1a`/`M1B` — the two ends of the three-year comparison. FY2023 is a fourth ADM year the
+    /// panel does not otherwise hold.
+    pub adm_fy23: Adm,
+    /// `M1` — the three-year change as a fraction.
+    pub enrollment_change: f64,
+    /// `M2`/`M` — whether it cleared 3%, and what that paid.
+    pub growth_eligible: bool,
+    /// What clearing it paid: $250 on every pupil, not on the pupils gained.
+    pub growth: Dollars,
+}
+
+/// Per pupil, every district, no test.
+pub const BASE_FUNDING_SUPPLEMENT_PER_PUPIL: Dollars = 40.0;
+/// Per pupil — on the whole roll, not the increment — for a district clearing the threshold.
+pub const ENROLLMENT_GROWTH_SUPPLEMENT_PER_PUPIL: Dollars = 250.0;
+/// Three per cent over three years, as a cliff.
+pub const ENROLLMENT_GROWTH_THRESHOLD: f64 = 0.03;
+
+impl Supplements {
+    /// What clearing the threshold would have paid a district that did not.
+    ///
+    /// `None` where the district did clear it. The point of the figure is the cliff: for a
+    /// district just below, this is the cost of three hundredths of a percentage point.
+    #[must_use]
+    pub fn forgone(&self, enrolled_adm: Adm) -> Option<Dollars> {
+        (!self.growth_eligible).then_some(enrolled_adm * ENROLLMENT_GROWTH_SUPPLEMENT_PER_PUPIL)
+    }
+}
+
 /// One district as the department modelled it.
 #[derive(Debug, Clone, PartialEq)]
 pub struct DistrictRecord {
@@ -593,6 +734,10 @@ pub struct DistrictRecord {
     /// this one. Reproducing any of them from `current_year_adm` gets an answer that is close, and
     /// wrong, which is the failure mode that is hardest to notice.
     pub categorical_enrolled_adm: Adm,
+    /// The performance supplement, and the ratings that gate it.
+    pub performance: PerformanceSupplement,
+    /// The base funding supplement and the enrollment growth supplement.
+    pub supplements: Supplements,
     /// The county the department attributes the district to, from `Base_Cost`.
     ///
     /// One county per district, which is a **simplification the department makes and this corpus
@@ -801,6 +946,16 @@ mod column {
     /// `[a] Enrolled ADM` — the count the four categorical sheets are paid on.
     pub const CATEGORICAL_ENROLLED_ADM: usize = 107;
     pub const COUNTY: usize = 108;
+    pub const PERFORMANCE_STARS: usize = 109;
+    pub const PERFORMANCE_PROGRESS: usize = 110;
+    pub const PERFORMANCE_PROGRESS_PRIOR: usize = 111;
+    pub const PERFORMANCE_ELIGIBLE: usize = 112;
+    pub const PERFORMANCE_SUPPLEMENT: usize = 113;
+    pub const BASE_FUNDING_SUPPLEMENT: usize = 114;
+    pub const ADM_FY23: usize = 115;
+    pub const ENROLLMENT_CHANGE_THREE_YEAR: usize = 116;
+    pub const GROWTH_SUPPLEMENT_ELIGIBLE: usize = 117;
+    pub const ENROLLMENT_GROWTH_SUPPLEMENT: usize = 118;
 }
 
 /// The header this loader expects, so a fixture reshaped without updating [`column`] fails
@@ -820,7 +975,10 @@ gifted_specialist_k8_units,gifted_specialist_k8_aid,gifted_specialist_9_12_units
 gifted_specialist_9_12_aid,ta_open_enrollment_in,ta_open_enrollment_out,ta_fy19_wealth_index,\
 ta_fy19_enrolled_adm,ta_fy19_total_adm,ta_property_valuation,ta_federal_gross_income,\
 ta_weighted_wealth,ta_capacity_index,ta_capacity_amount,ta_wealth_per_pupil,ta_wealth_index,\
-ta_wealth_amount,ta_supplemental,ta_supplement_eligible,categorical_enrolled_adm,county";
+ta_wealth_amount,ta_supplemental,ta_supplement_eligible,categorical_enrolled_adm,county,\
+performance_stars,performance_progress,performance_progress_prior,performance_eligible,\
+performance_supplement,base_funding_supplement,enrolled_adm_fy23,enrollment_change_three_year,\
+growth_supplement_eligible,enrollment_growth_supplement";
 
 /// Every district in the department's FY2027 model.
 ///
@@ -955,6 +1113,20 @@ pub fn panel() -> Vec<DistrictRecord> {
                 },
                 categorical_enrolled_adm: required(column::CATEGORICAL_ENROLLED_ADM),
                 county: fields.get(column::COUNTY).unwrap_or(&"").to_string(),
+                performance: PerformanceSupplement {
+                    stars: number(column::PERFORMANCE_STARS),
+                    progress: number(column::PERFORMANCE_PROGRESS),
+                    progress_prior: number(column::PERFORMANCE_PROGRESS_PRIOR),
+                    eligible: required(column::PERFORMANCE_ELIGIBLE) > 0.5,
+                    amount: required(column::PERFORMANCE_SUPPLEMENT),
+                },
+                supplements: Supplements {
+                    base_funding: required(column::BASE_FUNDING_SUPPLEMENT),
+                    adm_fy23: required(column::ADM_FY23),
+                    enrollment_change: required(column::ENROLLMENT_CHANGE_THREE_YEAR),
+                    growth_eligible: required(column::GROWTH_SUPPLEMENT_ELIGIBLE) > 0.5,
+                    growth: required(column::ENROLLMENT_GROWTH_SUPPLEMENT),
+                },
                 net_state_funding: required(column::NET_STATE_FUNDING),
                 guarantee: required(column::GUARANTEE),
                 adm_history: [
