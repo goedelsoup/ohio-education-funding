@@ -45,8 +45,42 @@ description: |
   from published aid by subtraction: all that can be said is that it exceeds 90% of base cost.
   [verified]
 
-  Not modeled here yet: how the 40th-highest-district benchmark moves over time, and whether
-  it has. It is a single discretionary number that sets the top of the entire scale. [open]
+  **THE 40TH-HIGHEST BENCHMARK IS NOT A DISCRETIONARY NUMBER, AND THIS NODE CALLED IT ONE.** It
+  recorded the benchmark as "a single discretionary number that sets the top of the entire scale"
+  and asked how it moves over time. R.C. 3317.017(A)(4)(c)–(d) settles both halves, and the
+  answer changes the question: the statute writes a **rank**, not a value. Districts are ranked by
+  the ratio of their federal median income to the statewide median, and the district with the
+  **fortieth highest ratio** is the point at which the capacity percentage caps at 0.025.
+
+  So nobody sets it. Its value moves every year because the ranking is recomputed from incomes
+  that move, and no budget bill has to touch it for the top of the scale to shift. That is a
+  different kind of parameter from a rate or a threshold — it is a **statutory order statistic** —
+  and it is the second time this corpus has found a class of parameter it had no shape for, after
+  the [appropriation proration factor](../parameter/appropriation-proration-factor.yml).
+  [verified — `ohio-laws`]
+
+  Why the fortieth, out of 609, is not stated in the section. [open] And how far the value has
+  moved between biennia is still unmeasured here, because the corpus holds one year of the
+  calculator — but it is now a question about a distribution rather than about a decision. [open]
+
+  **THE VALUATION THE MEASURE USES IS THE LESSER OF TWO, AND THE RULE IS ONE-SIDED.** R.C.
+  3317.017(A)(1)(a) takes the minimum of a district's three-year average valuation and its most
+  recent taxable value; the income side takes the same shape. Under rising valuations the average
+  is lower, so the district is charged on a lagged figure; under falling valuations the recent
+  year is lower and the fall passes straight through. **602 of 609 districts are on the lagged
+  branch and 7 on the immediate one** — the seven whose valuation fell, none by more than 1.15%.
+
+  The rule therefore never charges a district on the higher of its two measures. That makes it a
+  floor on the state's share wearing the clothes of a smoothing device, and the asymmetry is
+  invisible in any one district's figures. [verified —
+  `crates/local-capacity/tests/against_the_departments_own_capacity.rs`]
+
+  **And it is the charge-off's instinct in a new device.** The mechanism this replaced also
+  lagged revaluation, through [recognized
+  valuation](../parameter/local-share-charge-off-millage.yml) — a three-year phase-in of the
+  inflationary increase. Two regimes, the same judgement that a reappraisal should not reach state
+  aid all at once, and two different implementations. A reader told only that the plan "uses a
+  three-year average" would not see that it is the successor to something. [verified]
 
   **AGAINST THE MECHANISM IT REPLACED.** [verified —
   [`crates/regime-diff`](../../../crates/regime-diff/), the corpus's only aligned component
