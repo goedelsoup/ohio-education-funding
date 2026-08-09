@@ -610,6 +610,189 @@ impl Supplements {
     }
 }
 
+/// Transportation, for one district — the largest thing outside foundation funding.
+///
+/// # $726m, plus $183m of special education transportation, and none of it in the formula
+///
+/// Transportation alone is larger than special education — the **second-largest single program in
+/// Ohio's school funding**, after targeted assistance — and with special education transportation
+/// beside it the pair exceeds DPIA, gifted, career-technical and English learners combined. The
+/// corpus carried both inside an unexplained remainder. Nothing about the mechanism resembles the
+/// formula.
+///
+/// **Two competing bases and the district gets the greater.** Per weighted rider at $1,337.175, or
+/// per bus mile at $6.867 across a 180-day year. **350 of 611 districts are paid on the mile
+/// base**, so the choice flips for more than half the state — a district's transportation aid can
+/// be a function of its geography rather than its ridership, and which one is not visible in the
+/// amount.
+///
+/// **Non-public riders count double.** Weighted ridership is `public + 2 x non-public + 1.5 x
+/// community or STEM`. A district transporting a private-school child is funded at twice the rate
+/// of its own pupil. Non-public riders are 4.5% of riders and 8.5% of weighted ridership.
+///
+/// **The state minimum share is 50%.** Against the formula's 10%, and **440 of 611 districts sit
+/// on it** — 72%, against 23% on the formula's floor. For most of the state, local capacity does
+/// not determine transportation aid at all. That is the single largest difference between how
+/// Ohio equalises instruction and how it equalises getting to it.
+///
+/// **Two supplements pulling opposite ways.** The efficiency supplement pays up to 15% more for
+/// filling buses — riders per bus over a capacity target, ramping from an index of 1.0 to 1.5. The
+/// density supplement pays sparse districts, `(28 - riders per square mile) / 100` times the mile
+/// base times 0.55. One rewards concentration and the other compensates for its absence, and 388
+/// districts draw the second while 406 draw the first.
+///
+/// **And its own guarantee.** `[F]` holds 38 districts at their FY2021 transportation funding,
+/// $24.8m. This is a **second** transitional guarantee, separate from the one on foundation
+/// funding, and the corpus has a node for only one of them.
+///
+/// # The proration factor is the finding a dollar total cannot carry
+///
+/// Special education transportation is multiplied by **0.91746**. A proration factor below one
+/// means the appropriation did not cover the computed entitlement and every district's amount was
+/// scaled down to fit — so the published figure is not what the formula says a district is owed,
+/// it is what was available divided among them. Nothing else in this corpus has a parameter of
+/// that kind, and it cannot be recovered from the amount.
+#[derive(Debug, Clone, Copy, PartialEq, Default)]
+pub struct Transportation {
+    /// `[a1]`/`[a2]`/`[a3]` — riders by the kind of school they attend.
+    pub public_riders: f64,
+    /// Weighted double.
+    pub nonpublic_riders: f64,
+    /// Weighted one and a half.
+    pub community_riders: f64,
+    /// `[b]` — the three at 1, 2 and 1.5.
+    pub weighted_riders: f64,
+    /// `[c]`/`[d]` — paid at 35% and 50% of the rider rate.
+    pub mass_transit_riders: f64,
+    /// Type 5 and 6 vehicles.
+    pub other_riders: f64,
+    /// `[e]` through `[h]` — the mile base and the two supplements' inputs.
+    pub bus_miles: f64,
+    /// Type 1 and 2 buses, which the efficiency index divides riders by.
+    pub assigned_buses: f64,
+    /// What the efficiency index measures riders per bus against.
+    pub rider_capacity_target: f64,
+    /// `[D2]`/`[E2]` — the published indices the two supplements are computed from, each rounded
+    /// to four places by the sheet before use.
+    pub efficiency_index: f64,
+    /// Riders per square mile, which the density supplement pays against.
+    pub district_density: f64,
+    /// The area the density supplement spreads riders over.
+    pub square_miles: f64,
+    /// `[j]` — reported cost, before proration.
+    pub reported_sped_cost: Dollars,
+    /// `[A]` through `[E]` — the payments.
+    pub school_bus: Dollars,
+    /// Mass transit riders at 35% of the rider rate.
+    pub mass_transit: Dollars,
+    /// Other vehicle types at 50%.
+    pub other: Dollars,
+    /// Up to 15% more for filling buses.
+    pub efficiency: Dollars,
+    /// And a payment for not being able to.
+    pub density: Dollars,
+    /// `[F1]`/`[F]` — the FY2021 base and the guarantee it produces.
+    pub fy21_base: Dollars,
+    /// A second transitional guarantee, holding 38 districts at their FY2021 amount.
+    pub guarantee: Dollars,
+    /// `[G]`/`[J]` — the total, and special education transportation beside it.
+    pub total: Dollars,
+    /// Prorated at 0.91746, because the appropriation did not cover the entitlement.
+    pub special_education: Dollars,
+}
+
+/// Per weighted rider, and per bus mile across a school year.
+pub const TRANSPORT_PER_RIDER: Dollars = 1337.175;
+/// The mile base, which more than half the state is actually paid on.
+pub const TRANSPORT_PER_MILE: Dollars = 6.867;
+/// A school year, as the mile base counts it.
+pub const TRANSPORT_SCHOOL_DAYS: f64 = 180.0;
+/// Non-public riders count double; community and STEM school riders one and a half times.
+pub const TRANSPORT_NONPUBLIC_WEIGHT: f64 = 2.0;
+/// Community and STEM school riders.
+pub const TRANSPORT_COMMUNITY_WEIGHT: f64 = 1.5;
+/// Mass transit and other vehicle types, as fractions of the rider rate.
+pub const TRANSPORT_MASS_TRANSIT_RATE: f64 = 0.35;
+/// Other vehicle types, type 5 and 6.
+pub const TRANSPORT_OTHER_RATE: f64 = 0.50;
+/// Fifty per cent, against the formula's ten.
+pub const TRANSPORT_MINIMUM_STATE_SHARE: f64 = 0.5;
+/// The efficiency supplement's ceiling and the index band it ramps across.
+pub const TRANSPORT_EFFICIENCY_CEILING: f64 = 0.15;
+/// Below the lower bound nothing; across the band it ramps to the ceiling.
+pub const TRANSPORT_EFFICIENCY_BAND: (f64, f64) = (1.0, 1.5);
+/// The density supplement's pivot and rate.
+pub const TRANSPORT_DENSITY_PIVOT: f64 = 28.0;
+/// What fraction of the mile base the density supplement pays.
+pub const TRANSPORT_DENSITY_RATE: f64 = 0.55;
+/// What the appropriation could actually cover of the special education entitlement.
+pub const TRANSPORT_SPED_PRORATION: f64 = 0.917_459_740_976_215;
+
+impl Transportation {
+    /// All riders on type 1 and 2 buses, unweighted.
+    #[must_use]
+    pub fn riders(&self) -> f64 {
+        self.public_riders + self.nonpublic_riders + self.community_riders
+    }
+
+    /// `[A1]` — what the rider base would pay before the state share.
+    #[must_use]
+    pub fn per_rider_base(&self) -> Dollars {
+        self.weighted_riders * TRANSPORT_PER_RIDER
+    }
+
+    /// `[A2]` — what the mile base would pay before the state share.
+    #[must_use]
+    pub fn per_mile_base(&self) -> Dollars {
+        self.bus_miles * TRANSPORT_PER_MILE * TRANSPORT_SCHOOL_DAYS
+    }
+
+    /// Whether the mile base is the one this district is actually paid on.
+    ///
+    /// True for more than half the state, and invisible in the amount. A district paid on miles
+    /// gains nothing from carrying more children on the same routes; one paid on riders gains
+    /// nothing from covering more ground.
+    #[must_use]
+    pub fn paid_on_miles(&self) -> bool {
+        self.per_mile_base() > self.per_rider_base()
+    }
+
+    /// `[E2]` recomputed from the counts, for checking the published figure against its inputs.
+    #[must_use]
+    pub fn density_from_inputs(&self) -> f64 {
+        if self.square_miles > 0.0 {
+            self.riders() / self.square_miles
+        } else {
+            0.0
+        }
+    }
+
+    /// `[D2]` recomputed the same way, through the sheet's own intermediate rounding.
+    #[must_use]
+    pub fn efficiency_index_from_inputs(&self) -> f64 {
+        if self.assigned_buses <= 0.0 || self.rider_capacity_target <= 0.0 {
+            return 0.0;
+        }
+        let per_bus = (self.riders() / self.assigned_buses * 10_000.0).round() / 10_000.0;
+        (per_bus / self.rider_capacity_target * 10_000.0).round() / 10_000.0
+    }
+
+    /// The five payments, summed — which is the total before proration.
+    #[must_use]
+    pub fn before_proration(&self) -> Dollars {
+        self.school_bus + self.mass_transit + self.other + self.efficiency + self.density
+    }
+
+    /// What special education transportation would have been had the appropriation covered it.
+    ///
+    /// The published figure is the prorated one. This is the entitlement it was scaled down from,
+    /// and the difference is what the line was short.
+    #[must_use]
+    pub fn special_education_unprorated(&self) -> Dollars {
+        self.special_education / TRANSPORT_SPED_PRORATION
+    }
+}
+
 /// One district as the department modelled it.
 #[derive(Debug, Clone, PartialEq)]
 pub struct DistrictRecord {
@@ -738,6 +921,8 @@ pub struct DistrictRecord {
     pub performance: PerformanceSupplement,
     /// The base funding supplement and the enrollment growth supplement.
     pub supplements: Supplements,
+    /// Transportation, and special education transportation beside it.
+    pub transportation: Transportation,
     /// The county the department attributes the district to, from `Base_Cost`.
     ///
     /// One county per district, which is a **simplification the department makes and this corpus
@@ -956,6 +1141,9 @@ mod column {
     pub const ENROLLMENT_CHANGE_THREE_YEAR: usize = 116;
     pub const GROWTH_SUPPLEMENT_ELIGIBLE: usize = 117;
     pub const ENROLLMENT_GROWTH_SUPPLEMENT: usize = 118;
+    /// Transportation: eleven inputs then nine payments, in sheet order.
+    pub const TRANS_FIRST_INPUT: usize = 119;
+    pub const TRANS_FIRST_PAYMENT: usize = 132;
 }
 
 /// The header this loader expects, so a fixture reshaped without updating [`column`] fails
@@ -978,7 +1166,12 @@ ta_weighted_wealth,ta_capacity_index,ta_capacity_amount,ta_wealth_per_pupil,ta_w
 ta_wealth_amount,ta_supplemental,ta_supplement_eligible,categorical_enrolled_adm,county,\
 performance_stars,performance_progress,performance_progress_prior,performance_eligible,\
 performance_supplement,base_funding_supplement,enrolled_adm_fy23,enrollment_change_three_year,\
-growth_supplement_eligible,enrollment_growth_supplement";
+growth_supplement_eligible,enrollment_growth_supplement,\
+trans_public_riders,trans_nonpublic_riders,trans_community_riders,trans_weighted_riders,\
+trans_mass_transit_riders,trans_other_riders,trans_bus_miles,trans_assigned_buses,\
+trans_rider_capacity_target,trans_efficiency_index,trans_district_density,trans_square_miles,trans_reported_sped_cost,trans_school_bus,\
+trans_mass_transit,trans_other,trans_efficiency,trans_density,trans_fy21_base,trans_guarantee,\
+trans_total,trans_special_education";
 
 /// Every district in the department's FY2027 model.
 ///
@@ -1119,6 +1312,34 @@ pub fn panel() -> Vec<DistrictRecord> {
                     progress_prior: number(column::PERFORMANCE_PROGRESS_PRIOR),
                     eligible: required(column::PERFORMANCE_ELIGIBLE) > 0.5,
                     amount: required(column::PERFORMANCE_SUPPLEMENT),
+                },
+                transportation: {
+                    let input = |k: usize| required(column::TRANS_FIRST_INPUT + k);
+                    let pay = |k: usize| required(column::TRANS_FIRST_PAYMENT + k);
+                    Transportation {
+                        public_riders: input(0),
+                        nonpublic_riders: input(1),
+                        community_riders: input(2),
+                        weighted_riders: input(3),
+                        mass_transit_riders: input(4),
+                        other_riders: input(5),
+                        bus_miles: input(6),
+                        assigned_buses: input(7),
+                        rider_capacity_target: input(8),
+                        efficiency_index: input(9),
+                        district_density: input(10),
+                        square_miles: input(11),
+                        reported_sped_cost: input(12),
+                        school_bus: pay(0),
+                        mass_transit: pay(1),
+                        other: pay(2),
+                        efficiency: pay(3),
+                        density: pay(4),
+                        fy21_base: pay(5),
+                        guarantee: pay(6),
+                        total: pay(7),
+                        special_education: pay(8),
+                    }
                 },
                 supplements: Supplements {
                     base_funding: required(column::BASE_FUNDING_SUPPLEMENT),

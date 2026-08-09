@@ -50,6 +50,7 @@ export const GET: APIRoute = () => {
         gifted: _g,
         house_districts: _hd,
         supplements: _sup,
+        transportation: _tr,
         ...district
       }) => district,
     ),

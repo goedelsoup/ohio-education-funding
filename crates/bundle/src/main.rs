@@ -428,6 +428,34 @@ fn to_district(
         irn: record.irn.clone(),
         name: record.name.clone(),
         county: record.county.clone(),
+        transportation: {
+            let t = &record.transportation;
+            bundle::Transportation {
+                public_riders: t.public_riders,
+                nonpublic_riders: t.nonpublic_riders,
+                community_riders: t.community_riders,
+                weighted_riders: t.weighted_riders,
+                per_rider_base: t.per_rider_base(),
+                per_mile_base: t.per_mile_base(),
+                paid_on_miles: t.paid_on_miles(),
+                effective_state_share: record
+                    .published_state_share
+                    .unwrap_or(0.0)
+                    .max(project::panel::TRANSPORT_MINIMUM_STATE_SHARE),
+                school_bus: t.school_bus,
+                mass_transit: t.mass_transit,
+                other: t.other,
+                efficiency: t.efficiency,
+                density: t.density,
+                efficiency_index: t.efficiency_index,
+                district_density: t.district_density,
+                fy21_base: t.fy21_base,
+                guarantee: t.guarantee,
+                total: t.total,
+                special_education: t.special_education,
+                special_education_unprorated: t.special_education_unprorated(),
+            }
+        },
         supplements: bundle::Supplements {
             stars: record.performance.stars,
             progress: record.performance.progress,

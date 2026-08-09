@@ -73,7 +73,7 @@ use edfund_core::Dollars;
 /// from FY2022-FY2024 to FY2024-FY2026 — the years the department's `ADM Data` sheet declares.
 /// The values did not change; what they are called did, which is exactly the kind of silent
 /// meaning change the version guard exists for.
-pub const CONTRACT_VERSION: &str = "20.0.0";
+pub const CONTRACT_VERSION: &str = "21.0.0";
 
 /// How close to the floor counts as being on it, in mills.
 ///
@@ -729,6 +729,58 @@ pub struct Supplements {
     pub growth_forgone: Option<Dollars>,
 }
 
+/// Transportation, for one district — the largest thing outside foundation funding.
+///
+/// $726m, plus $183m of special education transportation. Transportation alone is larger than
+/// special education, making it the second-largest single program in Ohio's school funding after
+/// targeted assistance, and it shares almost nothing with the formula: two competing rate bases
+/// with the district paid the greater, a 50% state minimum share against the formula's 10%, two
+/// supplements that reward opposite things, its own guarantee on a FY2021 base, and a proration
+/// factor on the special education line meaning the appropriation did not cover the entitlement.
+#[derive(Debug, Clone, Copy, PartialEq, Default)]
+pub struct Transportation {
+    /// Riders by the kind of school they attend. Non-public count double, community 1.5 times.
+    pub public_riders: f64,
+    /// Weighted double.
+    pub nonpublic_riders: f64,
+    /// Weighted one and a half.
+    pub community_riders: f64,
+    /// The three, weighted.
+    pub weighted_riders: f64,
+    /// What each of the two competing bases would pay before the state share.
+    pub per_rider_base: Dollars,
+    /// The other one.
+    pub per_mile_base: Dollars,
+    /// Whether the mile base is the one this district is actually paid on.
+    pub paid_on_miles: bool,
+    /// The state share actually applied, after the 50% floor.
+    pub effective_state_share: f64,
+    /// The five payments.
+    pub school_bus: Dollars,
+    /// Mass transit riders at 35% of the rider rate.
+    pub mass_transit: Dollars,
+    /// Other vehicle types at 50%.
+    pub other: Dollars,
+    /// Up to 15% more for filling buses.
+    pub efficiency: Dollars,
+    /// And a payment for not being able to.
+    pub density: Dollars,
+    /// Riders per bus over a capacity target.
+    pub efficiency_index: f64,
+    /// Riders per square mile.
+    pub district_density: f64,
+    /// A second transitional guarantee, on a FY2021 base.
+    pub fy21_base: Dollars,
+    /// What that base holds the district at.
+    pub guarantee: Dollars,
+    /// The total, and special education transportation beside it.
+    pub total: Dollars,
+    /// Prorated at 0.91746.
+    pub special_education: Dollars,
+    /// What it would have been without the proration.
+    pub special_education_unprorated: Dollars,
+}
+
 /// One district, as the web layer needs it.
 #[derive(Debug, Clone, PartialEq)]
 pub struct District {
@@ -738,6 +790,8 @@ pub struct District {
     pub name: String,
     /// The performance supplement and the two enrolment supplements, outside the formula.
     pub supplements: Supplements,
+    /// Transportation, the largest thing outside it.
+    pub transportation: Transportation,
     /// The Ohio House districts this district lies in, largest share first.
     ///
     /// Usually one — 270 of 609 districts sit inside a single House district — and up to eleven.
@@ -1589,6 +1643,38 @@ impl Bundle {
                 opt(d.supplements.progress),
                 opt(d.supplements.growth_forgone)
             ));
+            s.push_str(&fields(
+                "transportation",
+                &[
+                    ("public_riders", d.transportation.public_riders),
+                    ("nonpublic_riders", d.transportation.nonpublic_riders),
+                    ("community_riders", d.transportation.community_riders),
+                    ("weighted_riders", d.transportation.weighted_riders),
+                    ("per_rider_base", d.transportation.per_rider_base),
+                    ("per_mile_base", d.transportation.per_mile_base),
+                    (
+                        "effective_state_share",
+                        d.transportation.effective_state_share,
+                    ),
+                    ("school_bus", d.transportation.school_bus),
+                    ("mass_transit", d.transportation.mass_transit),
+                    ("other", d.transportation.other),
+                    ("efficiency", d.transportation.efficiency),
+                    ("density", d.transportation.density),
+                    ("efficiency_index", d.transportation.efficiency_index),
+                    ("district_density", d.transportation.district_density),
+                    ("fy21_base", d.transportation.fy21_base),
+                    ("guarantee", d.transportation.guarantee),
+                    ("total", d.transportation.total),
+                    ("special_education", d.transportation.special_education),
+                    (
+                        "special_education_unprorated",
+                        d.transportation.special_education_unprorated,
+                    ),
+                ],
+                &[("paid_on_miles", d.transportation.paid_on_miles)],
+            ));
+            s.push_str(", ");
             s.push_str("\"house_districts\": [");
             for (i, h) in d.house_districts.iter().enumerate() {
                 if i > 0 {
@@ -1991,6 +2077,28 @@ mod tests {
             irn: "049056".into(),
             name: "Northern Local".into(),
             county: "Perry".into(),
+            transportation: Transportation {
+                public_riders: 812.0,
+                nonpublic_riders: 41.0,
+                community_riders: 18.0,
+                weighted_riders: 921.0,
+                per_rider_base: 1_231_538.0,
+                per_mile_base: 1_402_119.0,
+                paid_on_miles: true,
+                effective_state_share: 0.5,
+                school_bus: 701_059.5,
+                mass_transit: 0.0,
+                other: 4_812.0,
+                efficiency: 62_190.0,
+                density: 91_411.0,
+                efficiency_index: 1.2044,
+                district_density: 11.7,
+                fy21_base: 812_004.0,
+                guarantee: 0.0,
+                total: 859_472.5,
+                special_education: 118_204.0,
+                special_education_unprorated: 128_838.0,
+            },
             supplements: Supplements {
                 stars: Some(4.0),
                 progress: Some(3.0),

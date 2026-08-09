@@ -377,6 +377,45 @@ export const DistrictSchema = z
       })
       .strict(),
     /**
+     * Transportation, the largest thing outside foundation funding.
+     *
+     * $726m, plus $183m of special education transportation — transportation alone is larger than
+     * special education, making it the second-largest single program in Ohio's school funding.
+     * Two competing rate bases with the district paid the greater, a 50% state minimum share
+     * against the formula's 10%, two supplements rewarding opposite things, its own guarantee, and
+     * a proration factor meaning the appropriation did not cover the special education line.
+     */
+    transportation: z
+      .object({
+        public_riders: num,
+        /** Weighted double. */
+        nonpublic_riders: num,
+        /** Weighted one and a half. */
+        community_riders: num,
+        weighted_riders: num,
+        /** The two competing bases. The district is paid the greater, and which one is invisible. */
+        per_rider_base: num,
+        per_mile_base: num,
+        paid_on_miles: z.boolean(),
+        /** The state share after the 50% floor, which binds for most of the state. */
+        effective_state_share: num,
+        school_bus: num,
+        mass_transit: num,
+        other: num,
+        efficiency: num,
+        density: num,
+        efficiency_index: num,
+        district_density: num,
+        /** A second transitional guarantee, on a FY2021 base. */
+        fy21_base: num,
+        guarantee: num,
+        total: num,
+        special_education: num,
+        /** What the special education line would have been without the proration. */
+        special_education_unprorated: num,
+      })
+      .strict(),
+    /**
      * The Ohio House districts this district lies in, largest share first.
      *
      * Usually one — 270 of 609 districts sit inside a single House district — and up to eleven,

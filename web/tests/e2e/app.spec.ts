@@ -1416,6 +1416,42 @@ test.describe("outside the formula", () => {
     await expect(card).toContainText("track intake");
   });
 
+  test("transportation names which of the two bases the district is paid on", async ({ page }) => {
+    /*
+     * The `MAX` flips for more than half the state and is invisible in the amount. A district paid
+     * on miles gains nothing from carrying more children on the same routes; one paid on riders
+     * gains nothing from covering more ground. The card says which.
+     */
+    await page.goto("/district/000442");
+    const table = page.locator('table[data-program="transportation"]');
+    await expect(table).toBeVisible();
+    await expect(table).toContainText("Per-rider base");
+    await expect(table).toContainText("Per-mile base");
+    await expect(table).toContainText("The greater of the two");
+  });
+
+  test("the proration is shown as a shortfall, not as a rate", async ({ page }) => {
+    /*
+     * A factor below one means the appropriation did not cover the computed entitlement. The
+     * published amount is therefore not what the district was owed, and the only way to show that
+     * is to print both figures and the difference.
+     */
+    await page.goto("/district/000442");
+    const card = page.locator('.card[data-part="supplements"]');
+    await expect(card).toContainText("That last factor is not a rate");
+    await expect(card).toContainText("short");
+    await expect(card).toContainText("what there was to divide");
+  });
+
+  test("the 50% transportation floor is stated against the formula's 10%", async ({ page }) => {
+    // The largest single difference between how Ohio equalises instruction and how it equalises
+    // getting to it, and it exists only in a spreadsheet.
+    await page.goto("/district/000442");
+    const card = page.locator('.card[data-part="supplements"]');
+    await expect(card).toContainText("50%");
+    await expect(card).toContainText("against the formula's 10%");
+  });
+
   test("a district just below the growth cliff is told what it forwent", async ({ page }) => {
     /*
      * The only honest way to show a cliff. New Lexington grew 2.9502% against the 3% required and

@@ -174,6 +174,7 @@ pub fn rebuild(root: &Path) -> Result<Vec<Rebuilt>, RebuildError> {
         targeted_assistance_rows: &fy27_book.rows("Targeted_Assistance")?,
         performance_rows: &fy27_book.rows("Performance Supplement")?,
         growth_rows: &fy27_book.rows("Base_Enrollment Growth")?,
+        transportation_rows: &fy27_book.rows("Transportation")?,
     });
     let extract = fixtures::build_profile_extract(&profile_rows);
 

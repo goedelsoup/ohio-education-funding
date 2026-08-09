@@ -93,6 +93,34 @@
   Carried in `crates/project::panel` and verified in
   `crates/project/tests/the_remaining_categoricals.rs`.
 
+- ~~**Three sheets outside foundation funding are cached and unread.**~~ **CLOSED** — all three
+  read and reproduced. What they turned out to hold:
+
+  - the **performance supplement** is $55.7m, not the small line its absence suggested, and it is
+    distributed **inversely to need**: $54.74 a pupil in the least-poor fifth of districts against
+    $23.31 in the poorest;
+  - the **enrollment growth supplement** is a **cliff** — $250 on every pupil at 3% three-year
+    growth, and New Lexington missed it by three hundredths of a percentage point and $430,477;
+  - **transportation** is $726m, larger than special education, making it the second-largest
+    single program in Ohio's school funding. It has **two competing rate bases**, a **50% state
+    minimum share** against the formula's 10%, two supplements rewarding opposite things, **its own
+    guarantee** on a FY2021 base, and a **proration factor of 0.91746** on its special education
+    line — the first parameter in this corpus that encodes a shortfall rather than a rate.
+
+  Two of those want corpus nodes of their own, and neither has one yet:
+
+  - **A second temporary transitional aid guarantee.** `formula-component` holds one node by that
+    name, for the guarantee on foundation funding. Transportation has another, on a different base
+    year and a different base, holding 38 districts. Whether these are two instances of one
+    mechanism or two mechanisms sharing a name is the same modelling question the categoricals
+    posed, and it should be answered before either node is edited. [open]
+  - **Proration as a parameter class.** The corpus holds rates, weights, prices, thresholds and
+    blends. A proration is none of those: it is an appropriation divided by an entitlement, so it
+    is a fact about a budget rather than about a formula, and it moves for reasons nothing else in
+    `parameter/` moves for. It also cannot be recovered from a published amount. [open]
+
+  The original entry:
+
 - **Three sheets outside foundation funding are cached and unread.** The corpus already names the
   gap between `[H] Foundation Funding` and `[R] Total State Support` — transportation, preschool
   special education, special education transportation, the performance supplement — and carries

@@ -1073,6 +1073,8 @@ export function renderSupplements(d: District): string {
           : ""
       }
 
+      ${renderTransportation(d)}
+
       <p class="note">The performance supplement is the only part of Ohio's school funding paid on
         a <em>measured outcome</em> rather than on pupils, categories or a tax base — and it runs
         against the grain of everything else in the formula. Sorted by poverty, the mean payment
@@ -1081,4 +1083,112 @@ export function renderSupplements(d: District): string {
         Ohio's attainment measures track intake, so a program keyed to them follows intake whatever
         its intent — which explains the gradient without removing it.</p>
     </div>`;
+}
+
+/**
+ * Transportation, inside the card for what sits outside the formula.
+ *
+ * # The second-largest program in Ohio's school funding, and it looks like nothing else
+ *
+ * $726m plus $183m of special education transportation — more than special education itself. Four
+ * things here have no counterpart in the formula, and the card shows each as a step rather than
+ * folding them into a total:
+ *
+ * - **two competing bases**, per weighted rider and per bus mile, with the district paid the
+ *   greater. Which one wins flips for more than half the state and is invisible in the amount;
+ * - **a 50% state minimum share**, five times the formula's, on which most districts sit;
+ * - **two supplements pulling opposite ways** — one for filling buses, one for having few children
+ *   per square mile;
+ * - **a proration factor** on the special education line, which means the published figure is not
+ *   what the district was owed but what there was to divide.
+ */
+function renderTransportation(d: District): string {
+  const t = d.transportation;
+  if (t.total <= 0) return "";
+
+  const chosen = t.paid_on_miles ? t.per_mile_base : t.per_rider_base;
+  const other = t.paid_on_miles ? t.per_rider_base : t.per_mile_base;
+  const shortfall = t.special_education_unprorated - t.special_education;
+
+  return `
+    <h3>Transportation</h3>
+    <div class="scroll"><table data-program="transportation">
+      <thead><tr><th>Step</th><th class="tnum">Value</th><th>What it is</th></tr></thead>
+      <tbody>
+        <tr><th>Weighted riders</th><td class="tnum">${count(Math.round(t.weighted_riders))}</td>
+          <td class="n">${count(Math.round(t.public_riders))} public${
+            t.nonpublic_riders > 0
+              ? `, ${count(Math.round(t.nonpublic_riders))} non-public counted <strong>twice</strong>`
+              : ""
+          }${
+            t.community_riders > 0
+              ? `, ${count(Math.round(t.community_riders))} community or STEM counted 1.5 times`
+              : ""
+          }.</td></tr>
+        <tr${t.paid_on_miles ? ' class="n"' : ' class="current"'}><th>Per-rider base</th>
+          <td class="tnum">${money(t.per_rider_base)}</td>
+          <td class="n">$1,337.18 a weighted rider.</td></tr>
+        <tr${t.paid_on_miles ? ' class="current"' : ' class="n"'}><th>Per-mile base</th>
+          <td class="tnum">${money(t.per_mile_base)}</td>
+          <td class="n">$6.867 a bus mile across a 180-day year.</td></tr>
+        <tr><th>School bus payment</th><td class="tnum">${money(t.school_bus)}</td>
+          <td class="n">The greater of the two — <strong>${
+            t.paid_on_miles ? "miles" : "riders"
+          }</strong>, here — at a state share of ${pct(t.effective_state_share, 1)}.</td></tr>
+        ${
+          t.mass_transit > 0 || t.other > 0
+            ? `<tr><th>Other vehicle types</th>
+                <td class="tnum">${money(t.mass_transit + t.other)}</td>
+                <td class="n">Mass transit at 35% of the rider rate, other types at 50%.</td></tr>`
+            : ""
+        }
+        <tr${t.efficiency <= 0 ? ' class="n"' : ""}><th>Efficiency supplement</th>
+          <td class="tnum">${t.efficiency <= 0 ? "—" : money(t.efficiency)}</td>
+          <td class="n">${
+            t.efficiency > 0
+              ? `Up to 15% more for filling buses. Its index is ${t.efficiency_index.toFixed(4)}${
+                  t.efficiency_index >= 1.5 ? ", at the ceiling" : ""
+                }.`
+              : `Its riders-per-bus index of ${t.efficiency_index.toFixed(
+                  4,
+                )} is below the 1.0 this starts at.`
+          }</td></tr>
+        <tr${t.density <= 0 ? ' class="n"' : ""}><th>Density supplement</th>
+          <td class="tnum">${t.density <= 0 ? "—" : money(t.density)}</td>
+          <td class="n">${
+            t.density > 0
+              ? `Paid for sparseness: ${t.district_density.toFixed(1)} riders a square mile against
+                 the 28 this counts down from.`
+              : `At ${t.district_density.toFixed(1)} riders a square mile it is above the
+                 28 threshold, so this pays nothing.`
+          }</td></tr>
+        ${
+          t.guarantee > 0
+            ? `<tr class="current"><th>Transportation guarantee</th>
+                <td class="tnum">${money(t.guarantee)}</td>
+                <td class="n">Held at its FY2021 transportation funding of ${money(
+                  t.fy21_base,
+                )}, because the computed amount fell below it. A <em>second</em> guarantee,
+                separate from the one on formula aid.</td></tr>`
+            : ""
+        }
+        <tr class="current"><th>Transportation</th><td class="tnum">${money(t.total)}</td>
+          <td class="n">The payments and supplements, added.</td></tr>
+        <tr><th>Special education transportation</th>
+          <td class="tnum">${money(t.special_education)}</td>
+          <td class="n">Its reported cost at the same state share — then multiplied by
+            <strong>0.91746</strong>.</td></tr>
+      </tbody>
+    </table></div>
+    <p class="note"><strong>That last factor is not a rate.</strong> A proration below one means
+      the appropriation did not cover what the formula computed, so every district's special
+      education transportation was scaled down to fit. This district was computed
+      ${money(t.special_education_unprorated)} and paid ${money(t.special_education)} —
+      <strong>${money(shortfall)} short</strong>. The published figure is not what it was owed; it
+      is what there was to divide.</p>
+    <p class="note">Two things here have no counterpart in the formula. The state share floor is
+      <strong>50%</strong> against the formula's 10%, so for most of Ohio local capacity does not
+      determine transportation aid at all — the state equalises getting to school far harder than
+      it equalises what happens there. And the two supplements reward opposite things: one pays for
+      filling buses, the other for having too few children per square mile to fill them.</p>`;
 }
