@@ -10,7 +10,7 @@
 //! the department reposts a corrected file, the change shows up as changed numbers in a review
 //! rather than as a silently different answer.
 
-use std::collections::HashMap;
+use std::collections::{BTreeMap, BTreeSet, HashMap};
 use std::fs;
 use std::io;
 use std::path::Path;
@@ -2639,6 +2639,185 @@ pub fn build_f33_states(rows: &[Vec<String>]) -> Vec<Vec<String>> {
         .collect()
 }
 
+/// Where the per-district F-33 extract is written, relative to the repository root.
+pub const F33_DISTRICTS_FIXTURE: &str = "crates/dispersion/fixtures/f33-districts-fy2022.csv";
+
+/// Columns of the per-district F-33 fixture.
+pub const F33_DISTRICTS_HEADER: &[&str] = &[
+    "leaid",
+    "irn",
+    "state",
+    "comparable",
+    "enrollment",
+    "total_revenue",
+    "federal_revenue",
+    "state_revenue",
+    "local_revenue",
+    "property_tax",
+    "current_spending",
+];
+
+/// Split one line of a delimited file, honouring double-quoted fields.
+///
+/// The CCD directory quotes any agency name containing a comma, and `LEA_NAME` sits at column 4
+/// — ahead of the two columns this reads. Splitting on the delimiter alone gives the right answer
+/// for the 2022-23 file, because no quoted comma happens to fall before column 8; that is luck
+/// rather than a property of the format, and the kind that fails silently the year an agency is
+/// renamed to "Dayton, City of".
+fn delimited_fields(line: &str, delimiter: char) -> Vec<String> {
+    let mut out = Vec::new();
+    let mut field = String::new();
+    let mut quoted = false;
+    let mut chars = line.chars().peekable();
+    while let Some(c) = chars.next() {
+        match c {
+            // An escaped quote inside a quoted field is written as two quotes.
+            '"' if quoted && chars.peek() == Some(&'"') => {
+                field.push('"');
+                chars.next();
+            }
+            '"' => quoted = !quoted,
+            c if c == delimiter && !quoted => out.push(core::mem::take(&mut field)),
+            c => field.push(c),
+        }
+    }
+    out.push(field);
+    out
+}
+
+/// Find a column by name, so a layout change is an error rather than a silent misread.
+///
+/// The survey's columns are located by header rather than by position, unlike
+/// [`build_f33_states`]. Both files are published once a year and neither promises a stable
+/// layout — `census-f33`'s own note records that the column map is per-era — and a header lookup
+/// turns next year's reshuffle into a named failure instead of a fixture full of the wrong
+/// numbers.
+fn column(header: &[String], name: &str, file: &str) -> Result<usize, String> {
+    header
+        .iter()
+        .position(|h| h.trim() == name)
+        .ok_or_else(|| format!("{file} has no {name} column; its layout has moved"))
+}
+
+/// The per-district F-33 panel: one row per agency the national comparison can use.
+///
+/// # Why two files
+///
+/// The Bureau keys the F-33 on `IDCENSUS` and Ohio keys everything on IRN, and the corpus
+/// recorded that join as unavailable for as long as `census-f33` has been wired. It was not:
+/// NCES publishes the same survey keyed on `LEAID`, and the CCD directory carries `ST_LEAID`,
+/// which for Ohio is `OH-` followed by the IRN. `survey` is NCES's `sdf22_1a.txt` and
+/// `directory` is the CCD LEA file; neither alone is enough.
+///
+/// # What is kept
+///
+/// **Comparable** is the survey's own distinction: `AGCHRT != 1` — no associated charter schools
+/// — and `SCHLEV == 03`, a unified elementary-and-secondary agency. Every Ohio agency is kept
+/// whether or not it is comparable, flagged in the `comparable` column, because the corpus needs
+/// figures for all 968 of them and a national position for only the 611 that have one. Leaving
+/// charters in the distribution put Ohio's 200 smallest agencies at an 8% local share, which is a
+/// fact about charter finance and not about school districts — see
+/// [`dispersion::national_peers`](../../dispersion/src/national_peers.rs).
+///
+/// A row also needs **enrolment and total revenue above zero**. The survey reports `-1` and `-2`
+/// for missing and not-applicable, and 190 agencies carry those in every money column; admitting
+/// them would put a district with no reported revenue at a 0% local share, at the bottom of a
+/// distribution it is simply absent from. `T06` and `TCURELSC` are blanked rather than dropped
+/// when negative, because a district that reports no property tax is usually fiscally dependent
+/// rather than untaxed, which is a distinction the consumer draws.
+///
+/// Money is in thousands of dollars, as the survey publishes it and as
+/// [`build_f33_states`] keeps it.
+///
+/// # Errors
+///
+/// Returns the missing column's name if either file's layout has moved.
+pub fn build_f33_districts(survey: &str, directory: &str) -> Result<Vec<Vec<String>>, String> {
+    const DIRECTORY: &str = "the CCD LEA directory";
+    const SURVEY: &str = "the F-33 district survey";
+
+    let mut rows = directory.lines();
+    let head = delimited_fields(rows.next().unwrap_or_default(), ',');
+    let (key, st_leaid) = (
+        column(&head, "LEAID", DIRECTORY)?,
+        column(&head, "ST_LEAID", DIRECTORY)?,
+    );
+    let mut irn_of: BTreeMap<String, String> = BTreeMap::new();
+    for line in rows {
+        if line.trim().is_empty() {
+            continue;
+        }
+        let f = delimited_fields(line, ',');
+        if let (Some(leaid), Some(irn)) = (f.get(key), f.get(st_leaid)) {
+            irn_of.insert(leaid.trim().to_string(), irn.trim().to_string());
+        }
+    }
+
+    let mut rows = survey.lines();
+    let head = delimited_fields(rows.next().unwrap_or_default(), '\t');
+    let at = |name: &str| column(&head, name, SURVEY);
+    let (leaid, state, charter, level) =
+        (at("LEAID")?, at("STABBR")?, at("AGCHRT")?, at("SCHLEV")?);
+    let enrolment = at("V33")?;
+    let revenue = [
+        at("TOTALREV")?,
+        at("TFEDREV")?,
+        at("TSTREV")?,
+        at("TLOCREV")?,
+    ];
+    let (property_tax, spending) = (at("T06")?, at("TCURELSC")?);
+
+    let mut out = Vec::new();
+    for line in rows {
+        if line.trim().is_empty() {
+            continue;
+        }
+        let f = delimited_fields(line, '\t');
+        let field = |i: usize| f.get(i).map(|v| v.trim()).unwrap_or_default();
+        let number = |i: usize| field(i).parse::<i64>().ok();
+
+        let state = field(state).to_string();
+        let comparable = field(charter) != "1" && field(level) == "03";
+        if !comparable && state != "OH" {
+            continue;
+        }
+        // Missing data is coded negative, not blank, so an unreported agency would otherwise
+        // enter the distribution as a real zero.
+        if number(enrolment).unwrap_or(-1) <= 0 || number(revenue[0]).unwrap_or(-1) <= 0 {
+            continue;
+        }
+
+        let key = field(leaid).to_string();
+        let irn = if state == "OH" {
+            irn_of
+                .get(&key)
+                .map(|v| v.strip_prefix("OH-").unwrap_or(v).to_string())
+                .unwrap_or_default()
+        } else {
+            String::new()
+        };
+        // Reported as-is; blanked only where the survey's negative codes mean "not reported".
+        let plain = |i: usize| number(i).map(|v| v.to_string()).unwrap_or_default();
+        let unreported_is_blank = |i: usize| match number(i) {
+            Some(v) if v >= 0 => v.to_string(),
+            _ => String::new(),
+        };
+
+        let mut row = vec![
+            key,
+            irn,
+            state,
+            if comparable { "1" } else { "0" }.to_string(),
+            plain(enrolment),
+        ];
+        row.extend(revenue.iter().map(|i| plain(*i)));
+        row.push(unreported_is_blank(property_tax));
+        row.push(unreported_is_blank(spending));
+        out.push(row);
+    }
+    Ok(out)
+}
+
 // -------------------------------------------------------------------------------------------
 // Ohio Revised Code
 // -------------------------------------------------------------------------------------------
@@ -2831,6 +3010,248 @@ pub const REDBOOK_FIXTURE: &str = "crates/project/fixtures/dew-redbook.txt";
 
 /// Where the court opinion extract is written, relative to the repository root.
 pub const OPINIONS_FIXTURE: &str = "crates/regime-diff/fixtures/derolph-opinions.txt";
+
+/// Where the legislative-district crosswalk is written, relative to the repository root.
+pub const CROSSWALK_FIXTURE: &str = "crates/project/fixtures/legislative-district-crosswalk.csv";
+
+/// Columns of the legislative-district crosswalk.
+pub const CROSSWALK_HEADER: &[&str] = &[
+    "chamber",
+    "irn",
+    "district",
+    "population",
+    "population_under_18",
+    "share",
+];
+
+/// `LOGRECNO` to block code, for the block records of a PL 94-171 geoheader.
+///
+/// The geoheader carries every summary level in one file — state, county, tract, block — and
+/// only summary level `750` is a block. `LOGRECNO` is the join key the table files use; the
+/// geoheader is the only place it can be turned back into a geography.
+#[must_use]
+pub fn pl_blocks(geo: &str) -> BTreeMap<String, String> {
+    const SUMMARY_LEVEL: usize = 2;
+    const LOGRECNO: usize = 7;
+    const GEOCODE: usize = 9;
+    const BLOCK: &str = "750";
+
+    geo.lines()
+        .filter_map(|line| {
+            let f: Vec<&str> = line.split('|').collect();
+            (f.get(SUMMARY_LEVEL) == Some(&BLOCK))
+                .then(|| Some((f.get(LOGRECNO)?.to_string(), f.get(GEOCODE)?.to_string())))
+                .flatten()
+        })
+        .collect()
+}
+
+/// `LOGRECNO` to the first count in a PL 94-171 table file.
+///
+/// The first data column of file 1 is `P0010001`, the total population; of file 2, `P0030001`,
+/// the population 18 and over. Nothing here needs any of the other 140-odd columns, and reading
+/// only the first keeps a 150 MB file from being parsed into anything larger than a count.
+#[must_use]
+pub fn pl_counts(table: &str) -> BTreeMap<String, i64> {
+    const LOGRECNO: usize = 4;
+    const FIRST_COUNT: usize = 5;
+
+    table
+        .lines()
+        .filter_map(|line| {
+            let f: Vec<&str> = line.split('|').collect();
+            Some((
+                f.get(LOGRECNO)?.to_string(),
+                f.get(FIRST_COUNT)?.parse::<i64>().ok()?,
+            ))
+        })
+        .collect()
+}
+
+/// Everything the crosswalk is assembled from.
+#[derive(Debug, Clone, Copy)]
+pub struct Crosswalk<'a> {
+    /// Block code to its 2020 total and under-18 population.
+    pub population: &'a BTreeMap<String, (i64, i64)>,
+    /// The `BlockAssign` unified school district file: block to five-digit district code.
+    pub school_districts: &'a str,
+    /// The 2024 lower-chamber block equivalency file.
+    pub house: &'a str,
+    /// And the upper chamber's.
+    pub senate: &'a str,
+    /// The CCD LEA directory, which carries the district code to IRN join.
+    pub directory: &'a str,
+    /// The funding panel's IRNs. A district outside it is not carried — see
+    /// [`build_legislative_crosswalk`].
+    pub panel: &'a BTreeSet<String>,
+}
+
+/// Apportion each school district's pupils across the legislative seats that contain them.
+///
+/// # Why this has to be built from blocks
+///
+/// Ohio's funding system contains no legislative district, so the mapping does not exist to be
+/// downloaded. The census block is the only geography both a school district and a House seat are
+/// built out of, and 339 of the 609 districts straddle two or more seats — so a seat cannot be an
+/// attribution the way a county can, and the crosswalk carries a share rather than an assignment.
+///
+/// # The weight is children, not people
+///
+/// A seat's share of a district is its share of the district's **under-18 population**, not of its
+/// total. A district's pupils are what is being apportioned, and Ohio's under-18 share varies
+/// enough between blocks that the choice moves the answer. Shares sum to one per district and
+/// chamber, which is what lets
+/// [`project::legislative_district`](../../project/src/legislative_district.rs) apportion a
+/// statewide total across seats without losing or inventing a dollar.
+///
+/// # What is left out
+///
+/// A block with no population contributes nothing and is not carried; 53 such rows would
+/// otherwise appear with a share of zero. Districts outside the funding panel are dropped
+/// entirely — the two Lake Erie island districts, Middle Bass and North Bass, are in the CCD
+/// directory and in the census, and are not in the model this crosswalk exists to apportion.
+///
+/// # Errors
+///
+/// Returns the missing column's name if the CCD directory's layout has moved.
+pub fn build_legislative_crosswalk(sources: &Crosswalk<'_>) -> Result<Vec<Vec<String>>, String> {
+    let mut rows = sources.directory.lines();
+    let head = delimited_fields(rows.next().unwrap_or_default(), ',');
+    let (key, st_leaid) = (
+        column(&head, "LEAID", "the CCD LEA directory")?,
+        column(&head, "ST_LEAID", "the CCD LEA directory")?,
+    );
+    // The census keys school districts by a five-digit local code; the CCD's LEAID is the state
+    // FIPS followed by that code, and its ST_LEAID is `OH-` followed by the IRN.
+    let mut irn_of: BTreeMap<String, String> = BTreeMap::new();
+    for line in rows {
+        let f = delimited_fields(line, ',');
+        let (Some(leaid), Some(irn)) = (f.get(key), f.get(st_leaid)) else {
+            continue;
+        };
+        if let Some(local) = leaid.trim().strip_prefix("39") {
+            irn_of.insert(
+                local.to_string(),
+                irn.trim()
+                    .strip_prefix("OH-")
+                    .unwrap_or(irn.trim())
+                    .to_string(),
+            );
+        }
+    }
+
+    // `BLOCKID|DISTRICT`, against the equivalency files' `GEOID,SLDLST`.
+    let assignment = |text: &str, delimiter: char| -> BTreeMap<String, String> {
+        text.lines()
+            .skip(1)
+            .filter_map(|line| {
+                let (block, district) = line.trim_end().split_once(delimiter)?;
+                Some((block.to_string(), district.to_string()))
+            })
+            .collect()
+    };
+    let in_district = assignment(sources.school_districts, '|');
+    let chambers = [
+        ("house", assignment(sources.house, ',')),
+        ("senate", assignment(sources.senate, ',')),
+    ];
+
+    let mut totals: BTreeMap<(&str, String, String), (i64, i64)> = BTreeMap::new();
+    for (block, (people, children)) in sources.population {
+        if *people == 0 {
+            continue;
+        }
+        let Some(irn) = in_district.get(block).and_then(|code| irn_of.get(code)) else {
+            continue;
+        };
+        if !sources.panel.contains(irn) {
+            continue;
+        }
+        for (chamber, blocks) in &chambers {
+            let Some(seat) = blocks.get(block) else {
+                continue;
+            };
+            let entry = totals
+                .entry((chamber, irn.clone(), seat.clone()))
+                .or_insert((0, 0));
+            entry.0 += people;
+            entry.1 += children;
+        }
+    }
+
+    let mut pupils: BTreeMap<(&str, &String), i64> = BTreeMap::new();
+    for ((chamber, irn, _), (_, children)) in &totals {
+        *pupils.entry((chamber, irn)).or_insert(0) += children;
+    }
+
+    // `BTreeMap` orders by key, and the key is (chamber, IRN, seat) — but "house" sorts before
+    // "senate" only by luck of the alphabet, so the chamber order is made explicit.
+    let mut out: Vec<(usize, Vec<String>)> = totals
+        .iter()
+        .map(|((chamber, irn, seat), (people, children))| {
+            let of_district = pupils.get(&(chamber, irn)).copied().unwrap_or(0);
+            let share = if of_district > 0 {
+                #[allow(clippy::cast_precision_loss)]
+                let value = *children as f64 / of_district as f64;
+                value
+            } else {
+                0.0
+            };
+            (
+                usize::from(*chamber == "senate"),
+                vec![
+                    (*chamber).to_string(),
+                    irn.clone(),
+                    seat.clone(),
+                    people.to_string(),
+                    children.to_string(),
+                    format_value(Some(share), 8),
+                ],
+            )
+        })
+        .collect();
+    out.sort_by(|a, b| a.0.cmp(&b.0));
+    Ok(out.into_iter().map(|(_, row)| row).collect())
+}
+
+/// Every fixture [`crate::rebuild`] writes.
+///
+/// The list exists so that "a source declares a fixture" and "something regenerates it" can be
+/// checked against each other without a populated cache, which CI does not have. It caught the
+/// F-33 district panel: 754 KB committed, read by a calculator, declared by a `Source`, and
+/// produced by nothing — the digest manifest could not see it, because a digest pins the input
+/// and says nothing about whether the derivation from it still exists.
+pub const REBUILT: &[&str] = &[
+    FY27_FIXTURE,
+    PROFILE_FIXTURE,
+    GRADE_BANDS_FIXTURE,
+    REPORT_CARD_FIXTURE,
+    FUNCTIONS_FIXTURE,
+    FINANCE_FIXTURE,
+    SD1_FIXTURE,
+    CPI_FIXTURE,
+    F33_FIXTURE,
+    F33_DISTRICTS_FIXTURE,
+    CROSSWALK_FIXTURE,
+    STATUTE_FIXTURE,
+    ENACTED_FIXTURE,
+    REDBOOK_FIXTURE,
+    OPINIONS_FIXTURE,
+];
+
+/// Fixtures a [`crate::registry::Source`] declares that [`crate::rebuild`] does not produce.
+///
+/// **An entry here is a debt with a name on it, not a category of fixture.** The pairing is the
+/// path and what would have to be written to retire it.
+///
+/// The list is empty, and the two entries it held are the reason it exists: the F-33 district
+/// panel and the legislative-district crosswalk were both committed, both read by a calculator,
+/// both declared by a `Source`, and both produced by nothing. Neither was discoverable — a digest
+/// pins the bytes that went in and cannot notice that the derivation from them was never written.
+///
+/// The test holds this list to both directions — an unlisted gap fails, and so does an entry that
+/// has quietly been fixed — so it cannot grow silently or rot after the work is done.
+pub const NOT_REGENERATED: &[(&str, &str)] = &[];
 
 /// The date an opinion was decided, read off the document.
 ///

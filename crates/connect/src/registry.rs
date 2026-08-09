@@ -101,7 +101,8 @@ pub const OHIO_LAWS_SECTIONS: &[Source] = &[
         format: Format::Html,
         catalog: Some("ohio-revised-code"),
         fixture: Some(crate::fixtures::STATUTE_FIXTURE),
-        note: "R.C. 3317.02. Definitions, including the economically disadvantaged index and its squaring — which the DPIA node recorded as not located in statute.",
+        note: "R.C. 3317.02. Definitions, including the economically disadvantaged index and its \
+               squaring — which the DPIA node recorded as not located in statute.",
     },
     Source {
         key: "rc-3317-011",
@@ -121,7 +122,8 @@ pub const OHIO_LAWS_SECTIONS: &[Source] = &[
         format: Format::Html,
         catalog: Some("ohio-revised-code"),
         fixture: Some(crate::fixtures::STATUTE_FIXTURE),
-        note: "R.C. 3317.013. Special education weights, and the clinical categories the corpus could not name.",
+        note: "R.C. 3317.013. Special education weights, and the clinical categories the corpus \
+               could not name.",
     },
     Source {
         key: "rc-3317-014",
@@ -131,7 +133,8 @@ pub const OHIO_LAWS_SECTIONS: &[Source] = &[
         format: Format::Html,
         catalog: Some("ohio-revised-code"),
         fixture: Some(crate::fixtures::STATUTE_FIXTURE),
-        note: "R.C. 3317.014. Career-technical weights, and the programme categories behind their ordering.",
+        note: "R.C. 3317.014. Career-technical weights, and the programme categories behind their \
+               ordering.",
     },
     Source {
         key: "rc-3317-016",
@@ -173,7 +176,9 @@ pub const OHIO_LAWS_SECTIONS: &[Source] = &[
         format: Format::Html,
         catalog: Some("ohio-revised-code"),
         fixture: Some(crate::fixtures::STATUTE_FIXTURE),
-        note: "R.C. 3317.022. Core foundation funding: the section that assembles every component, and where disadvantaged pupil impact aid actually lives.",
+        note:
+            "R.C. 3317.022. Core foundation funding: the section that assembles every component, \
+               and where disadvantaged pupil impact aid actually lives.",
     },
     Source {
         key: "rc-3317-051",
@@ -224,7 +229,8 @@ pub const OHIO_LAWS_SECTIONS: &[Source] = &[
         format: Format::Html,
         catalog: Some("ohio-revised-code"),
         fixture: Some(crate::fixtures::STATUTE_FIXTURE),
-        note: "R.C. 3317.03. What each reported count means, including the economically disadvantaged certification the department is left to define.",
+        note: "R.C. 3317.03. What each reported count means, including the economically \
+               disadvantaged certification the department is left to define.",
     },
     Source {
         key: "rc-319-301",
@@ -316,7 +322,8 @@ pub const CONNECTORS: &[Connector] = &[
                 key: "fy27-calculator",
                 title: None,
                 url: "https://education.ohio.gov/getattachment/Topics/Finance-and-Funding/\
-                      School-Payment-Reports/State-Funding-For-Schools/Traditional-School-Districts/\
+                      School-Payment-Reports/State-Funding-For-Schools/\
+                      Traditional-School-Districts/\
                       FY27-TRAD-State-Foundation-Funding-Calculator_12-16-2025_lock-1.xlsx.aspx\
                       ?lang=en-US",
                 filename: "fy27-calculator.xlsx",
@@ -330,7 +337,8 @@ pub const CONNECTORS: &[Connector] = &[
                 key: "cupp-fy24",
                 title: None,
                 url: "https://education.ohio.gov/getattachment/Topics/Finance-and-Funding/\
-                      School-Payment-Reports/District-Profile-Reports/FY2024-District-Profile-Report/\
+                      School-Payment-Reports/District-Profile-Reports/\
+                      FY2024-District-Profile-Report/\
                       FY24-District-Profile-Report-Final-12-12-2024.xlsx.aspx?lang=en-US",
                 filename: "cupp-fy24.xlsx",
                 format: Format::Xlsx,
@@ -584,17 +592,15 @@ pub const CONNECTORS: &[Connector] = &[
         publisher: "Ohio Legislative Service Commission",
         feeds: &["legislation", "fiscal-period", "program", "parameter"],
         status: Status::Wired {
-            still_blocked: None,
+            still_blocked: Some(
+                "wired for one document, the final analysis of the current budget act; the \
+                 redbooks, the Catalog of Budget Line Items and the per-district simulations are \
+                 unretrieved, so the continuous appropriation-line series and the pre-2000 record \
+                 are not built",
+            ),
         },
         note: "The only continuous appropriation-line series across the whole period, and the \
-               primary source for the pre-2000 record. Wired for **one document**: the final \
-               analysis of the current budget act, which is where every provision the Revised \
-               Code does not contain actually lives. The redbooks, the Catalog of Budget Line \
-               Items and the per-district simulations remain unretrieved, so the appropriation \
-               series this connector exists for is still ahead.\n\
-               \n\
-               The recorded blocker said these are PDFs, which is true and was treated as the \
-               end of the matter. A PDF is a container; `Format::Pdf` now has a reader.",
+               primary source for the pre-2000 record.",
         sources: &[
         Source {
             key: "hb96-edu-redbook",
@@ -733,10 +739,9 @@ pub const CONNECTORS: &[Connector] = &[
             still_blocked: None,
         },
         note: "Comparability in two directions: whether Ohio is unusual, and an independent \
-               check on department figures computed on different definitions. The first is \
-               wired and settles the DeRolph claim comparatively; the second needs the \
-               per-district file, since the NCESID-to-IRN crosswalk it was waiting on is now \
-               held by `nces-ccd`.",
+               check on department figures computed on different definitions. Both are now \
+               held — the state aggregate and, through NCES's keying of the same survey, the \
+               per-district panel.",
         sources: &[Source {
             key: "f33-fy2022",
             title: None,
@@ -774,14 +779,16 @@ pub const CONNECTORS: &[Connector] = &[
         publisher: "National Center for Education Statistics",
         feeds: &["education-agency"],
         status: Status::Wired {
-            still_blocked: None,
+            still_blocked: Some(
+                "wired for a single year of the LEA directory; the consolidation-aware long \
+                 series is not built, because agency files are per-year zips whose column sets \
+                 change and the identifier-change history has to be derived rather than read",
+            ),
         },
         note: "A corpus spanning 1851 to the present is a panel whose members change, and a \
                long series assembled without accounting for consolidation is silently wrong. \
-               That series is still not built: agency files are per-year zips whose column sets \
-               change, and the identifier-change history has to be derived rather than read. \
-               But a single year of the directory was never blocked by any of that, and it \
-               carries the one column two other connectors were waiting on.",
+               A single year of the directory was never blocked by that, and it carries the one \
+               column two other connectors were waiting on.",
         sources: &[Source {
             key: "ccd-lea-directory-2223",
             title: None,
@@ -988,6 +995,55 @@ mod tests {
                 reason.len() > 20,
                 "{} is {kind} without a reason",
                 connector.key
+            );
+        }
+    }
+
+    #[test]
+    fn every_fixture_a_source_declares_is_regenerated_or_says_why_not() {
+        // The other half of provenance. The catalog test below asks whether a fixture can be
+        // traced back to a catalogued publication; this asks whether it can be *rebuilt* from
+        // one. Those are different questions, and the F-33 district panel answered the first and
+        // not the second for as long as it existed: 754 KB committed, read by
+        // `dispersion::national_peers`, declared here, and produced by nothing. A digest pins the
+        // bytes that went in and cannot notice that the derivation from them was never written.
+        //
+        // Static rather than a rebuild, because CI has no `.cache/` and running the real thing
+        // would write into the working tree.
+        use crate::fixtures::{NOT_REGENERATED, REBUILT};
+
+        for (_, source) in sources() {
+            let Some(fixture) = source.fixture else {
+                continue;
+            };
+            if REBUILT.contains(&fixture) {
+                continue;
+            }
+            let excused = NOT_REGENERATED.iter().find(|(path, _)| *path == fixture);
+            let (_, why) = excused.unwrap_or_else(|| {
+                panic!(
+                    "{} declares {fixture}, which nothing in `rebuild` produces. Write the \
+                     extractor, or record the gap in `fixtures::NOT_REGENERATED` with what it \
+                     would take to close it.",
+                    source.key
+                )
+            });
+            assert!(
+                why.len() > 30,
+                "{fixture} is excused from rebuilding without saying what is missing"
+            );
+        }
+
+        // And the excuse list cannot outlive the work. An entry that has since been given an
+        // extractor has to leave, or the next reader is told a gap exists that does not.
+        for (path, _) in NOT_REGENERATED {
+            assert!(
+                !REBUILT.contains(path),
+                "{path} is in NOT_REGENERATED but `rebuild` produces it — delete the entry"
+            );
+            assert!(
+                sources().any(|(_, s)| s.fixture == Some(*path)),
+                "{path} is in NOT_REGENERATED but no source declares it"
             );
         }
     }

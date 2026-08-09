@@ -41,6 +41,7 @@ pub mod index;
 pub mod registry;
 pub mod sha256;
 
+use std::collections::{BTreeMap, BTreeSet};
 use std::path::Path;
 
 use cache::FetchError;
@@ -363,23 +364,34 @@ pub fn rebuild(root: &Path) -> Result<Vec<Rebuilt>, RebuildError> {
     // The Revised Code. Skipped rather than fatal when a section is not cached, for the same
     // reason as F-33 below: it feeds prose and verification, and an absent copy should cost those
     // rather than the whole rebuild.
-    let statutes: Vec<fixtures::Record> = registry::OHIO_LAWS_SECTIONS
+    //
+    // Skipped as a whole, though — all fifteen sections or none, for the reason the opinions are
+    // all four or none. "Skip the fixture when a section is missing" and "write the sections that
+    // happened to be there" are different behaviours, and this collected into a `Vec` and guarded
+    // on `is_empty`, which is the second one: fourteen cached sections rewrote the committed
+    // extract as a fourteen-section file and reported it as a success. A statute the corpus cites
+    // that is silently absent from the extract is worse than an extract that is not there, because
+    // the first looks like an answer.
+    let statutes: Result<Vec<fixtures::Record>, String> = registry::OHIO_LAWS_SECTIONS
         .iter()
-        .filter_map(|source| {
-            let path = cache::cached_path(root, source);
-            let page = std::fs::read_to_string(path).ok()?;
+        .map(|source| {
+            let page = cache::read_cached(root, source).map_err(|cause| cause.to_string())?;
+            let page = String::from_utf8_lossy(&page);
             // The key is `rc-3317-013`; the section it cites is `3317.013`.
             let section = source.key.trim_start_matches("rc-").replacen('-', ".", 1);
-            fixtures::parse_statute(&section, &page)
+            // `None` means neither landmark was found, which says the page is no longer the page
+            // the parser was written against — a different failure from an absent file, and one
+            // worth naming rather than counting.
+            fixtures::parse_statute(&section, &page).ok_or_else(|| {
+                format!(
+                    "{section} did not parse; {} is no longer the page it was",
+                    source.url
+                )
+            })
         })
         .collect();
-    out.push(if statutes.is_empty() {
-        Rebuilt::Skipped {
-            path: fixtures::STATUTE_FIXTURE.to_string(),
-            reason: "no Revised Code sections cached".to_string(),
-        }
-    } else {
-        Rebuilt::Written {
+    out.push(match statutes {
+        Ok(statutes) => Rebuilt::Written {
             path: fixtures::STATUTE_FIXTURE.to_string(),
             rows: fixtures::write_text(
                 &root.join(fixtures::STATUTE_FIXTURE),
@@ -388,7 +400,11 @@ pub fn rebuild(root: &Path) -> Result<Vec<Rebuilt>, RebuildError> {
                     &statutes,
                 ),
             )?,
-        }
+        },
+        Err(reason) => Rebuilt::Skipped {
+            path: fixtures::STATUTE_FIXTURE.to_string(),
+            reason,
+        },
     });
 
     // The enacted budget act. Skipped rather than fatal on two counts: the PDF may not be cached,
@@ -500,7 +516,132 @@ pub fn rebuild(root: &Path) -> Result<Vec<Rebuilt>, RebuildError> {
         },
     });
 
+    // The same survey per district, which needs two archives: NCES's keying of the F-33, and the
+    // CCD directory that carries the `LEAID`-to-IRN join. Committed since the national comparison
+    // was built and produced by nothing until now — the registry declared the fixture, the digest
+    // manifest pinned its sources, and the derivation between them lived only in prose.
+    out.push(match f33_districts(root) {
+        Ok(rows) => Rebuilt::Written {
+            path: fixtures::F33_DISTRICTS_FIXTURE.to_string(),
+            rows: fixtures::write_csv(
+                &root.join(fixtures::F33_DISTRICTS_FIXTURE),
+                fixtures::F33_DISTRICTS_HEADER,
+                &rows,
+            )?,
+        },
+        Err(reason) => Rebuilt::Skipped {
+            path: fixtures::F33_DISTRICTS_FIXTURE.to_string(),
+            reason,
+        },
+    });
+
+    // School districts across legislative seats. The last extraction because it is the only one
+    // that depends on another fixture's contents rather than only on a cached publication: the
+    // panel it apportions is the FY2027 model's 609 districts.
+    let panel: BTreeSet<String> = model
+        .iter()
+        .filter_map(|row| row.first().cloned())
+        .collect();
+    out.push(match legislative_crosswalk(root, &panel) {
+        Ok(rows) => Rebuilt::Written {
+            path: fixtures::CROSSWALK_FIXTURE.to_string(),
+            rows: fixtures::write_csv(
+                &root.join(fixtures::CROSSWALK_FIXTURE),
+                fixtures::CROSSWALK_HEADER,
+                &rows,
+            )?,
+        },
+        Err(reason) => Rebuilt::Skipped {
+            path: fixtures::CROSSWALK_FIXTURE.to_string(),
+            reason,
+        },
+    });
+
     Ok(out)
+}
+
+/// Read the sole member of a cached zip whose name ends in `suffix`.
+///
+/// By suffix rather than by name: the CCD archive holds the same directory as both `.csv` and
+/// `.sas7bdat`, and its filename carries a release date (`ccd_lea_029_2223_w_1a_083023.csv`) that
+/// changes when the file is reposted.
+fn zip_member(root: &Path, source: &Source, suffix: &str) -> Result<String, String> {
+    let bytes = cache::read_cached(root, source).map_err(|cause| cause.to_string())?;
+    let archive = spreadsheet::zip::Archive::open(bytes)
+        .map_err(|cause| format!("{}: {cause}", source.key))?;
+    let named: Vec<&str> = archive
+        .entries()
+        .iter()
+        .map(|e| e.name.as_str())
+        .filter(|name| name.ends_with(suffix))
+        .collect();
+    let [name] = named[..] else {
+        return Err(format!(
+            "{} holds {} members ending in {suffix}, expected exactly one",
+            source.key,
+            named.len()
+        ));
+    };
+    archive
+        .read_to_string(name)
+        .map_err(|cause| format!("{}: {cause}", source.key))
+}
+
+/// Block populations from the PL 94-171 release: block code to total and under-18 count.
+///
+/// The three members are read and dropped one at a time. Uncompressed they are 174, 154 and 157
+/// megabytes, and holding all three as strings to join them would cost half a gigabyte for a
+/// result that is two integers per block.
+fn block_population(root: &Path, source: &Source) -> Result<BTreeMap<String, (i64, i64)>, String> {
+    let blocks = fixtures::pl_blocks(&zip_member(root, source, "geo2020.pl")?);
+    let people = fixtures::pl_counts(&zip_member(root, source, "000012020.pl")?);
+    let adults = fixtures::pl_counts(&zip_member(root, source, "000022020.pl")?);
+    Ok(blocks
+        .into_iter()
+        .map(|(record, block)| {
+            let total = people.get(&record).copied().unwrap_or(0);
+            // Under 18 is the residual: the release publishes the total and the 18-and-over
+            // count, and never the children directly.
+            let children = total - adults.get(&record).copied().unwrap_or(0);
+            (block, (total, children))
+        })
+        .collect())
+}
+
+/// The legislative-district crosswalk, from four census archives and the CCD directory.
+///
+/// `panel` is the funding model's IRNs, which is why this runs after the FY2027 model rather than
+/// beside the other archive extractions: the crosswalk apportions that model across seats, and a
+/// school district the model does not carry has nothing to apportion.
+fn legislative_crosswalk(
+    root: &Path,
+    panel: &BTreeSet<String>,
+) -> Result<Vec<Vec<String>>, String> {
+    let blocks = source("baf-2020-oh").expect("registered").1;
+    let house = source("sldl24-bef").expect("registered").1;
+    let senate = source("sldu24-bef").expect("registered").1;
+    let census = source("pl94-171-2020-oh").expect("registered").1;
+    let directory = source("ccd-lea-directory-2223").expect("registered").1;
+
+    let population = block_population(root, census)?;
+    fixtures::build_legislative_crosswalk(&fixtures::Crosswalk {
+        population: &population,
+        school_districts: &zip_member(root, blocks, "_SDUNI.txt")?,
+        house: &zip_member(root, house, "39_OH_SLDL24.txt")?,
+        senate: &zip_member(root, senate, "39_OH_SLDU24.txt")?,
+        directory: &zip_member(root, directory, ".csv")?,
+        panel,
+    })
+}
+
+/// The per-district F-33 panel, from the survey archive and the directory that keys it to IRN.
+fn f33_districts(root: &Path) -> Result<Vec<Vec<String>>, String> {
+    let survey = source("sdf22-districts").expect("registered").1;
+    let directory = source("ccd-lea-directory-2223").expect("registered").1;
+    fixtures::build_f33_districts(
+        &zip_member(root, survey, ".txt")?,
+        &zip_member(root, directory, ".csv")?,
+    )
 }
 
 /// Read the one worksheet whose name begins with `prefix`.
