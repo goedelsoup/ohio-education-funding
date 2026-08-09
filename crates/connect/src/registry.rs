@@ -100,7 +100,7 @@ pub const OHIO_LAWS_SECTIONS: &[Source] = &[
         filename: "rc-3317-02.html",
         format: Format::Html,
         catalog: Some("ohio-revised-code"),
-        fixture: Some(crate::fixtures::STATUTE_FIXTURE),
+        fixtures: &[crate::fixtures::STATUTE_FIXTURE],
         note: "R.C. 3317.02. Definitions, including the economically disadvantaged index and its \
                squaring — which the DPIA node recorded as not located in statute.",
     },
@@ -111,7 +111,7 @@ pub const OHIO_LAWS_SECTIONS: &[Source] = &[
         filename: "rc-3317-011.html",
         format: Format::Html,
         catalog: Some("ohio-revised-code"),
-        fixture: Some(crate::fixtures::STATUTE_FIXTURE),
+        fixtures: &[crate::fixtures::STATUTE_FIXTURE],
         note: "R.C. 3317.011. Base cost and its components, the most-cited section in the corpus.",
     },
     Source {
@@ -121,7 +121,7 @@ pub const OHIO_LAWS_SECTIONS: &[Source] = &[
         filename: "rc-3317-013.html",
         format: Format::Html,
         catalog: Some("ohio-revised-code"),
-        fixture: Some(crate::fixtures::STATUTE_FIXTURE),
+        fixtures: &[crate::fixtures::STATUTE_FIXTURE],
         note: "R.C. 3317.013. Special education weights, and the clinical categories the corpus \
                could not name.",
     },
@@ -132,7 +132,7 @@ pub const OHIO_LAWS_SECTIONS: &[Source] = &[
         filename: "rc-3317-014.html",
         format: Format::Html,
         catalog: Some("ohio-revised-code"),
-        fixture: Some(crate::fixtures::STATUTE_FIXTURE),
+        fixtures: &[crate::fixtures::STATUTE_FIXTURE],
         note: "R.C. 3317.014. Career-technical weights, and the programme categories behind their \
                ordering.",
     },
@@ -143,7 +143,7 @@ pub const OHIO_LAWS_SECTIONS: &[Source] = &[
         filename: "rc-3317-016.html",
         format: Format::Html,
         catalog: Some("ohio-revised-code"),
-        fixture: Some(crate::fixtures::STATUTE_FIXTURE),
+        fixtures: &[crate::fixtures::STATUTE_FIXTURE],
         note: "R.C. 3317.016. English learner weights, and the rule the taper actually expresses.",
     },
     Source {
@@ -153,7 +153,7 @@ pub const OHIO_LAWS_SECTIONS: &[Source] = &[
         filename: "rc-3317-017.html",
         format: Format::Html,
         catalog: Some("ohio-revised-code"),
-        fixture: Some(crate::fixtures::STATUTE_FIXTURE),
+        fixtures: &[crate::fixtures::STATUTE_FIXTURE],
         note: "R.C. 3317.017. Local capacity and the state share percentage.",
     },
     Source {
@@ -163,7 +163,7 @@ pub const OHIO_LAWS_SECTIONS: &[Source] = &[
         filename: "rc-3317-019.html",
         format: Format::Html,
         catalog: Some("ohio-revised-code"),
-        fixture: Some(crate::fixtures::STATUTE_FIXTURE),
+        fixtures: &[crate::fixtures::STATUTE_FIXTURE],
         note: "R.C. 3317.019. Temporary transitional aid — the guarantee. Labelled \"gifted units \
                and their prices\" when this list was first written, from the corpus's own citation \
                rather than from the section; gifted units are R.C. 3317.051.",
@@ -175,7 +175,7 @@ pub const OHIO_LAWS_SECTIONS: &[Source] = &[
         filename: "rc-3317-022.html",
         format: Format::Html,
         catalog: Some("ohio-revised-code"),
-        fixture: Some(crate::fixtures::STATUTE_FIXTURE),
+        fixtures: &[crate::fixtures::STATUTE_FIXTURE],
         note:
             "R.C. 3317.022. Core foundation funding: the section that assembles every component, \
                and where disadvantaged pupil impact aid actually lives.",
@@ -187,7 +187,7 @@ pub const OHIO_LAWS_SECTIONS: &[Source] = &[
         filename: "rc-3317-051.html",
         format: Format::Html,
         catalog: Some("ohio-revised-code"),
-        fixture: Some(crate::fixtures::STATUTE_FIXTURE),
+        fixtures: &[crate::fixtures::STATUTE_FIXTURE],
         note: "R.C. 3317.051. Gifted unit funding and the three salary prices the units are \
                bought at, which R.C. 3317.022 reaches by cross-reference.",
     },
@@ -198,7 +198,7 @@ pub const OHIO_LAWS_SECTIONS: &[Source] = &[
         filename: "rc-3317-0212.html",
         format: Format::Html,
         catalog: Some("ohio-revised-code"),
-        fixture: Some(crate::fixtures::STATUTE_FIXTURE),
+        fixtures: &[crate::fixtures::STATUTE_FIXTURE],
         note: "R.C. 3317.0212. Transportation.",
     },
     Source {
@@ -208,7 +208,7 @@ pub const OHIO_LAWS_SECTIONS: &[Source] = &[
         filename: "rc-3317-0213.html",
         format: Format::Html,
         catalog: Some("ohio-revised-code"),
-        fixture: Some(crate::fixtures::STATUTE_FIXTURE),
+        fixtures: &[crate::fixtures::STATUTE_FIXTURE],
         note: "R.C. 3317.0213. Preschool special education.",
     },
     Source {
@@ -218,7 +218,7 @@ pub const OHIO_LAWS_SECTIONS: &[Source] = &[
         filename: "rc-3317-0217.html",
         format: Format::Html,
         catalog: Some("ohio-revised-code"),
-        fixture: Some(crate::fixtures::STATUTE_FIXTURE),
+        fixtures: &[crate::fixtures::STATUTE_FIXTURE],
         note: "R.C. 3317.0217. The temporary transitional aid guarantee.",
     },
     Source {
@@ -228,7 +228,7 @@ pub const OHIO_LAWS_SECTIONS: &[Source] = &[
         filename: "rc-3317-03.html",
         format: Format::Html,
         catalog: Some("ohio-revised-code"),
-        fixture: Some(crate::fixtures::STATUTE_FIXTURE),
+        fixtures: &[crate::fixtures::STATUTE_FIXTURE],
         note: "R.C. 3317.03. What each reported count means, including the economically \
                disadvantaged certification the department is left to define.",
     },
@@ -239,7 +239,7 @@ pub const OHIO_LAWS_SECTIONS: &[Source] = &[
         filename: "rc-319-301.html",
         format: Format::Html,
         catalog: Some("ohio-revised-code"),
-        fixture: Some(crate::fixtures::STATUTE_FIXTURE),
+        fixtures: &[crate::fixtures::STATUTE_FIXTURE],
         note: "R.C. 319.301. H.B. 920 tax reduction factors and the twenty-mill floor.",
     },
     Source {
@@ -249,7 +249,7 @@ pub const OHIO_LAWS_SECTIONS: &[Source] = &[
         filename: "rc-5705-391.html",
         format: Format::Html,
         catalog: Some("ohio-revised-code"),
-        fixture: Some(crate::fixtures::STATUTE_FIXTURE),
+        fixtures: &[crate::fixtures::STATUTE_FIXTURE],
         note: "R.C. 5705.391. The five-year forecast requirement.",
     },
 ];
@@ -280,11 +280,19 @@ pub struct Source {
     /// Provenance attaches to the artifact, not to the connector: `dew-foundation` retrieves
     /// three publications with three different sets of caveats.
     pub catalog: Option<&'static str>,
-    /// Repository-relative path of the committed fixture built from this source, if any.
+    /// Repository-relative paths of the committed fixtures built from this source.
     ///
-    /// Making the source-to-fixture mapping explicit is what lets a test insist that anything
-    /// a calculator reads can be traced back to a catalogued publication.
-    pub fixture: Option<&'static str>,
+    /// Making the source-to-fixture mapping explicit is what lets a test insist that anything a
+    /// calculator reads can be traced back to a catalogued publication.
+    ///
+    /// A list rather than an `Option`, because a publication can feed more than one fixture and
+    /// three of them do: `cupp-fy24`'s district data goes into the FY2027 model, its own extract
+    /// and the grade bands; `expanded-list-fy25` has a sheet each for the report card and the
+    /// expenditure functions; `ccd-lea-directory-2223` supplies the IRN join to both the F-33
+    /// district panel and the legislative crosswalk. While this held one path each of those
+    /// declared whichever fixture was written first, and the rest of what they feed was not
+    /// recorded anywhere — `expenditure-functions-fy25.csv` had no declared source at all.
+    pub fixtures: &'static [&'static str],
     /// What it is and what to watch out for.
     pub note: &'static str,
 }
@@ -329,7 +337,7 @@ pub const CONNECTORS: &[Connector] = &[
                 filename: "fy27-calculator.xlsx",
                 format: Format::Xlsx,
                 catalog: Some("dew-fy27-funding-calculator"),
-                fixture: Some(crate::fixtures::FY27_FIXTURE),
+                fixtures: &[crate::fixtures::FY27_FIXTURE],
                 note: "The department's own FY2027 model. A projection, not an actual. Read \
                        through its cached formula results.",
             },
@@ -343,7 +351,11 @@ pub const CONNECTORS: &[Connector] = &[
                 filename: "cupp-fy24.xlsx",
                 format: Format::Xlsx,
                 catalog: Some("cupp-district-profile-report"),
-                fixture: Some(crate::fixtures::PROFILE_FIXTURE),
+                fixtures: &[
+                    crate::fixtures::FY27_FIXTURE,
+                    crate::fixtures::PROFILE_FIXTURE,
+                    crate::fixtures::GRADE_BANDS_FIXTURE,
+                ],
                 note: "60 variables per district. Fiscal and tax years are mixed within a row.",
             },
             Source {
@@ -354,7 +366,7 @@ pub const CONNECTORS: &[Connector] = &[
                 filename: "oct_hdcnt_fy24.xls",
                 format: Format::LegacyXls,
                 catalog: Some("dew-october-enrollment"),
-                fixture: Some("crates/foundation/fixtures/fy24-district-grade-bands.csv"),
+                fixtures: &[crate::fixtures::GRADE_BANDS_FIXTURE],
                 note: "October headcount by individual grade. Still published in the pre-2007 \
                        format, which `spreadsheet` now reads natively; district data is on the \
                        third of seven sheets.",
@@ -381,7 +393,7 @@ pub const CONNECTORS: &[Connector] = &[
                 filename: "achievement-district-2425.xlsx",
                 format: Format::Xlsx,
                 catalog: Some("dew-report-card-achievement"),
-                fixture: Some(crate::fixtures::REPORT_CARD_FIXTURE),
+                fixtures: &[crate::fixtures::REPORT_CARD_FIXTURE],
                 note: "Performance Index for 607 rated traditional districts, with the two \
                        prior years in the same row.",
             },
@@ -395,7 +407,7 @@ pub const CONNECTORS: &[Connector] = &[
                 filename: "district-spend-per-pupil-2425.xlsx",
                 format: Format::Xlsx,
                 catalog: Some("dew-report-card-spending"),
-                fixture: Some(crate::fixtures::REPORT_CARD_FIXTURE),
+                fixtures: &[crate::fixtures::REPORT_CARD_FIXTURE],
                 note: "Expenditure per EQUIVALENT pupil. The denominator is weighted for \
                        disadvantage, so this is not a headcount average and is about 21% \
                        lower than one.",
@@ -410,7 +422,7 @@ pub const CONNECTORS: &[Connector] = &[
                 filename: "va-district-details-2425.xlsx",
                 format: Format::Xlsx,
                 catalog: Some("dew-report-card-value-added"),
-                fixture: Some(crate::fixtures::REPORT_CARD_FIXTURE),
+                fixtures: &[crate::fixtures::REPORT_CARD_FIXTURE],
                 note: "The Progress component — growth rather than attainment. Use the effect \
                        size, not the composite index: the composite scales with student count.",
             },
@@ -424,7 +436,7 @@ pub const CONNECTORS: &[Connector] = &[
                 filename: "district-details-2425.xlsx",
                 format: Format::Xlsx,
                 catalog: Some("dew-report-card-district-details"),
-                fixture: Some(crate::fixtures::REPORT_CARD_FIXTURE),
+                fixtures: &[crate::fixtures::REPORT_CARD_FIXTURE],
                 note: "Subgroup enrollment shares in long form, one row per district per \
                        student group. The need covariates, same year as the outcomes. Its \
                        economic-disadvantage share is top-coded by community eligibility and \
@@ -440,7 +452,10 @@ pub const CONNECTORS: &[Connector] = &[
                 filename: "fy25-expanded-list.xlsx",
                 format: Format::Xlsx,
                 catalog: Some("dew-expenditure-expanded-list"),
-                fixture: Some(crate::fixtures::REPORT_CARD_FIXTURE),
+                fixtures: &[
+                    crate::fixtures::REPORT_CARD_FIXTURE,
+                    crate::fixtures::FUNCTIONS_FIXTURE,
+                ],
                 note: "One operating-expenditure numerator on two sheets, divided by weighted \
                        ADM on one and unweighted ADM on the other. Covers community schools, \
                        JVSDs, STEM and eschools too; filter on org type.",
@@ -463,7 +478,7 @@ pub const CONNECTORS: &[Connector] = &[
             filename: "cu.data.1.AllItems.tsv",
             format: Format::Tsv,
             catalog: Some("bls-cpi-u"),
-            fixture: Some(crate::fixtures::CPI_FIXTURE),
+            fixtures: &[crate::fixtures::CPI_FIXTURE],
             note: "Every CPI series in one flat file. CUUR0000SA0 period M06 is the June \
                    all-items index this workspace deflates with.",
         }],
@@ -486,7 +501,7 @@ pub const CONNECTORS: &[Connector] = &[
                 filename: "five-year-forecast-fy23.txt",
                 format: Format::Tsv,
                 catalog: Some("dew-five-year-forecast"),
-                fixture: Some(crate::fixtures::FINANCE_FIXTURE),
+                fixtures: &[crate::fixtures::FINANCE_FIXTURE],
                 note: "Actuals for FY2020, FY2021 and FY2022. FY2020 is the year the temporary \
                        transitional aid guarantee holds districts at, which this corpus has \
                        until now only been able to infer.",
@@ -499,7 +514,7 @@ pub const CONNECTORS: &[Connector] = &[
                 filename: "five-year-forecast-fy26.txt",
                 format: Format::Tsv,
                 catalog: Some("dew-five-year-forecast"),
-                fixture: Some(crate::fixtures::FINANCE_FIXTURE),
+                fixtures: &[crate::fixtures::FINANCE_FIXTURE],
                 note: "Actuals for FY2023, FY2024 and FY2025. Picks up exactly where the FY2023 \
                        filing's actuals stop, and the two must agree about the cash balance at \
                        the instant they meet.",
@@ -524,7 +539,7 @@ pub const CONNECTORS: &[Connector] = &[
                 filename: "sd1-ty2021.xlsx",
                 format: Format::Xlsx,
                 catalog: Some("dot-sd1-school-district-taxes"),
-                fixture: Some(crate::fixtures::SD1_FIXTURE),
+                fixtures: &[crate::fixtures::SD1_FIXTURE],
                 note: "The oldest of the four. Two tax years give a level and a change; four give \
                        each district a reappraisal and two quiet years to measure it against, \
                        which is what makes recognized valuation reconstructible. See \
@@ -538,7 +553,7 @@ pub const CONNECTORS: &[Connector] = &[
                 filename: "sd1-ty2022.xlsx",
                 format: Format::Xlsx,
                 catalog: Some("dot-sd1-school-district-taxes"),
-                fixture: Some(crate::fixtures::SD1_FIXTURE),
+                fixtures: &[crate::fixtures::SD1_FIXTURE],
                 note: "Ohio's counties reappraise or update on a staggered three-year cycle, so \
                        TY2022 through TY2024 contains exactly one valuation event for every one \
                        of the 88. This year completes that window.",
@@ -551,7 +566,7 @@ pub const CONNECTORS: &[Connector] = &[
                 filename: "sd1-ty2023.xlsx",
                 format: Format::Xlsx,
                 catalog: Some("dot-sd1-school-district-taxes"),
-                fixture: Some(crate::fixtures::SD1_FIXTURE),
+                fixtures: &[crate::fixtures::SD1_FIXTURE],
                 note: "Carried so that a change in taxes charged can be separated from the level. \
                        Its worksheets are named `ExJVS` and `SD1DATWK23`, against `ExJVS24` and \
                        `SD1DAT24` a year later — the layout drift this connector was blocked on, \
@@ -566,7 +581,7 @@ pub const CONNECTORS: &[Connector] = &[
                 filename: "sd1-ty2024.xlsx",
                 format: Format::Xlsx,
                 catalog: Some("dot-sd1-school-district-taxes"),
-                fixture: Some(crate::fixtures::SD1_FIXTURE),
+                fixtures: &[crate::fixtures::SD1_FIXTURE],
                 note: "Taxable value by class and real property taxes charged for current \
                        expenses, per district, from the DTE-13/DTE-14 abstracts. Taxes charged \
                        is a levy, not a receipt, and it is gross of the rollback, owner-\
@@ -610,7 +625,7 @@ pub const CONNECTORS: &[Connector] = &[
             filename: "hb96-edu-redbook.pdf",
             format: Format::Pdf,
             catalog: Some("lsc-dew-redbook"),
-            fixture: Some(crate::fixtures::REDBOOK_FIXTURE),
+            fixtures: &[crate::fixtures::REDBOOK_FIXTURE],
             note: "The department's appropriation line items, with each ALI's earmarks and their \
                    amounts. This is what answers \"which budget line governs\" for a program that \
                    prorates. **As introduced** — LSC publishes redbooks only for the introduced \
@@ -626,7 +641,7 @@ pub const CONNECTORS: &[Connector] = &[
             filename: "hb96-final-analysis.pdf",
             format: Format::Pdf,
             catalog: Some("lsc-hb96-analysis"),
-            fixture: Some(crate::fixtures::ENACTED_FIXTURE),
+            fixtures: &[crate::fixtures::ENACTED_FIXTURE],
             note: "**As enacted**, and the distinction is not pedantic. The as-passed-by-the-House \
                    analysis sits at a sibling URL and gives the base funding supplement as $20 and \
                    $30 and the enrolment growth supplement as a tiered schedule — neither of which \
@@ -674,7 +689,7 @@ pub const CONNECTORS: &[Connector] = &[
                 filename: "derolph-i.pdf",
                 format: Format::Pdf,
                 catalog: Some("derolph-litigation-record"),
-                fixture: Some(crate::fixtures::OPINIONS_FIXTURE),
+                fixtures: &[crate::fixtures::OPINIONS_FIXTURE],
                 note: "The opinion the corpus's charge-off rate series is built from. \
                        Paragraph 97 recites the whole progression with its session-law \
                        citations, and names the base as total taxable value.",
@@ -686,7 +701,7 @@ pub const CONNECTORS: &[Connector] = &[
                 filename: "derolph-ii.pdf",
                 format: Format::Pdf,
                 catalog: Some("derolph-litigation-record"),
-                fixture: Some(crate::fixtures::OPINIONS_FIXTURE),
+                fixtures: &[crate::fixtures::OPINIONS_FIXTURE],
                 note: "The second of the four, holding the system still unconstitutional \
                        after the General Assembly's first response.",
             },
@@ -697,7 +712,7 @@ pub const CONNECTORS: &[Connector] = &[
                 filename: "derolph-iii.pdf",
                 format: Format::Pdf,
                 catalog: Some("derolph-litigation-record"),
-                fixture: Some(crate::fixtures::OPINIONS_FIXTURE),
+                fixtures: &[crate::fixtures::OPINIONS_FIXTURE],
                 note: "The WebCite is 2001-Ohio-1343; \
                        this entry first carried 2001-Ohio-114, which is a workers' compensation \
                        appeal. A citation guessed from a plausible number rather than read off \
@@ -712,7 +727,7 @@ pub const CONNECTORS: &[Connector] = &[
                 filename: "derolph-iv.pdf",
                 format: Format::Pdf,
                 catalog: Some("derolph-litigation-record"),
-                fixture: Some(crate::fixtures::OPINIONS_FIXTURE),
+                fixtures: &[crate::fixtures::OPINIONS_FIXTURE],
                 note: "The last word, and the one that ended judicial supervision without \
                        a remedy.",
             },
@@ -750,7 +765,7 @@ pub const CONNECTORS: &[Connector] = &[
             filename: "elsec22t.xls",
             format: Format::LegacyXls,
             catalog: Some("census-f33-school-system-finances"),
-            fixture: Some("crates/dispersion/fixtures/census-f33-states.csv"),
+            fixtures: &[crate::fixtures::F33_FIXTURE],
             note: "One year per file and the layout is not stable across years, so the column \
                    map is per-era. The fixture is the state aggregate rather than the panel: \
                    14,106 school systems reduce to 51 rows. The per-district view is now held \
@@ -764,7 +779,7 @@ pub const CONNECTORS: &[Connector] = &[
             filename: "sdf22_1a.zip",
             format: Format::Zip,
             catalog: Some("census-f33-school-system-finances"),
-            fixture: Some("crates/dispersion/fixtures/f33-districts-fy2022.csv"),
+            fixtures: &[crate::fixtures::F33_DISTRICTS_FIXTURE],
             note: "The same survey NCES publishes keyed on `LEAID` rather than the Bureau's \
                    `IDCENSUS`, which is what makes the per-district join possible at all. \
                    Tab-delimited, 354 columns, 19,572 agencies. The fixture keeps the 10,382 \
@@ -796,7 +811,10 @@ pub const CONNECTORS: &[Connector] = &[
             filename: "ccd-lea-directory-2223.zip",
             format: Format::Zip,
             catalog: Some("nces-ccd-lea-directory"),
-            fixture: Some("crates/project/fixtures/legislative-district-crosswalk.csv"),
+            fixtures: &[
+                    crate::fixtures::F33_DISTRICTS_FIXTURE,
+                    crate::fixtures::CROSSWALK_FIXTURE,
+                ],
             note: "`ST_LEAID` is the Ohio IRN behind an `OH-` prefix, and `LEAID` is the NCES \
                    agency identifier whose last five digits are the Census school district code. \
                    All 609 districts in the funding panel join through it. This is the \
@@ -826,7 +844,7 @@ pub const CONNECTORS: &[Connector] = &[
                 filename: "BlockAssign_ST39_OH.zip",
                 format: Format::Zip,
                 catalog: Some("census-block-geography"),
-                fixture: Some("crates/project/fixtures/legislative-district-crosswalk.csv"),
+                fixtures: &[crate::fixtures::CROSSWALK_FIXTURE],
                 note: "`SDUNI` gives the unified school district for each of Ohio's 276,428 \
                        census blocks. The archive also carries an `SLDL` file and it is the \
                        WRONG one to use: it is the 2020-cycle map, and 66.3% of Ohio's blocks \
@@ -841,7 +859,7 @@ pub const CONNECTORS: &[Connector] = &[
                 filename: "sldl24.zip",
                 format: Format::Zip,
                 catalog: Some("census-block-geography"),
-                fixture: Some("crates/project/fixtures/legislative-district-crosswalk.csv"),
+                fixtures: &[crate::fixtures::CROSSWALK_FIXTURE],
                 note: "The 2024 lower-chamber map, which is the one now in use. Ohio is one of \
                        eight states with changes to both chambers in that cycle. Pinned to a \
                        vintage: when Ohio redistricts again this file changes and the crosswalk \
@@ -856,7 +874,7 @@ pub const CONNECTORS: &[Connector] = &[
                 filename: "sldu24.zip",
                 format: Format::Zip,
                 catalog: Some("census-block-geography"),
-                fixture: Some("crates/project/fixtures/legislative-district-crosswalk.csv"),
+                fixtures: &[crate::fixtures::CROSSWALK_FIXTURE],
                 note: "The 2024 upper-chamber map. Ohio's constitution requires each Senate \
                        district to be exactly three whole House districts, and the block data \
                        confirms it with no exceptions — so this could have been derived from \
@@ -872,7 +890,7 @@ pub const CONNECTORS: &[Connector] = &[
                 filename: "oh2020.pl.zip",
                 format: Format::Zip,
                 catalog: Some("census-block-geography"),
-                fixture: Some("crates/project/fixtures/legislative-district-crosswalk.csv"),
+                fixtures: &[crate::fixtures::CROSSWALK_FIXTURE],
                 note: "Block population, and population 18 and over. The difference is the \
                        apportionment weight: 2,591,886 Ohioans under 18, 22.0% of the state. \
                        Total population would weight a seat full of retirees like one full of \
@@ -1013,24 +1031,38 @@ mod tests {
         use crate::fixtures::{NOT_REGENERATED, REBUILT};
 
         for (_, source) in sources() {
-            let Some(fixture) = source.fixture else {
-                continue;
-            };
-            if REBUILT.contains(&fixture) {
-                continue;
+            for fixture in source.fixtures {
+                if REBUILT.contains(fixture) {
+                    continue;
+                }
+                let excused = NOT_REGENERATED.iter().find(|(path, _)| path == fixture);
+                let (_, why) = excused.unwrap_or_else(|| {
+                    panic!(
+                        "{} declares {fixture}, which nothing in `rebuild` produces. Write the \
+                         extractor, or record the gap in `fixtures::NOT_REGENERATED` with what it \
+                         would take to close it.",
+                        source.key
+                    )
+                });
+                assert!(
+                    why.len() > 30,
+                    "{fixture} is excused from rebuilding without saying what is missing"
+                );
             }
-            let excused = NOT_REGENERATED.iter().find(|(path, _)| *path == fixture);
-            let (_, why) = excused.unwrap_or_else(|| {
-                panic!(
-                    "{} declares {fixture}, which nothing in `rebuild` produces. Write the \
-                     extractor, or record the gap in `fixtures::NOT_REGENERATED` with what it \
-                     would take to close it.",
-                    source.key
-                )
-            });
+        }
+
+        // And the other direction, which is where `expenditure-functions-fy25.csv` hid. It was
+        // rebuilt on every run from a sheet of `expanded-list-fy25`, and no source said so,
+        // because `fixture` held one path and that source's other sheet had already claimed it.
+        // A fixture nobody declares has no catalog anchor and no digest behind it — the provenance
+        // rule simply does not reach it, and the test that enforces the rule walks sources, so it
+        // does not reach it either.
+        for fixture in REBUILT {
             assert!(
-                why.len() > 30,
-                "{fixture} is excused from rebuilding without saying what is missing"
+                sources().any(|(_, s)| s.fixtures.contains(fixture)),
+                "`rebuild` writes {fixture} but no source declares it, so nothing ties it to a \
+                 catalogued publication. Add it to the `fixtures` of whichever source it is \
+                 built from."
             );
         }
 
@@ -1042,7 +1074,7 @@ mod tests {
                 "{path} is in NOT_REGENERATED but `rebuild` produces it — delete the entry"
             );
             assert!(
-                sources().any(|(_, s)| s.fixture == Some(*path)),
+                sources().any(|(_, s)| s.fixtures.contains(path)),
                 "{path} is in NOT_REGENERATED but no source declares it"
             );
         }
@@ -1069,14 +1101,16 @@ mod tests {
         // the failure mode this prevents.
         let root = crate::cache::repository_root();
         for (connector, artifact) in sources() {
-            let Some(fixture) = artifact.fixture else {
+            for fixture in artifact.fixtures {
+                assert!(
+                    root.join(fixture).exists(),
+                    "{} names a fixture that is not committed: {fixture}",
+                    artifact.key
+                );
+            }
+            let Some(fixture) = artifact.fixtures.first() else {
                 continue;
             };
-            assert!(
-                root.join(fixture).exists(),
-                "{} names a fixture that is not committed: {fixture}",
-                artifact.key
-            );
             let catalog = artifact.catalog.unwrap_or_else(|| {
                 panic!(
                     "{} ({}) feeds {fixture} with no catalog anchor",
@@ -1098,7 +1132,7 @@ mod tests {
         for connector in CONNECTORS {
             if connector.status.is_wired() {
                 assert!(
-                    connector.sources.iter().any(|s| s.fixture.is_some()),
+                    connector.sources.iter().any(|s| !s.fixtures.is_empty()),
                     "{} claims wired but feeds nothing",
                     connector.key
                 );
