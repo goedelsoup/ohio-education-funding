@@ -194,6 +194,19 @@ pub const FY27_HEADER: &[&str] = &[
     "trans_guarantee",
     "trans_total",
     "trans_special_education",
+    "prek_sped_adm_cat1",
+    "prek_sped_adm_cat2",
+    "prek_sped_adm_cat3",
+    "prek_sped_adm_cat4",
+    "prek_sped_adm_cat5",
+    "prek_sped_adm_cat6",
+    "prek_sped_aid_cat1",
+    "prek_sped_aid_cat2",
+    "prek_sped_aid_cat3",
+    "prek_sped_aid_cat4",
+    "prek_sped_aid_cat5",
+    "prek_sped_aid_cat6",
+    "prek_sped_total",
 ];
 
 /// Column positions in the department's `Base_Cost` sheet, whose header is on the fourth row.
@@ -443,6 +456,15 @@ pub const TRANSPORT_SPED_PRORATION: f64 = 0.917_459_740_976_215;
 /// The general proration factor, which is one this year and is a dial that has been used.
 pub const TRANSPORT_PRORATION: f64 = 1.0;
 
+/// Preschool special education pays this flat, per pupil, whatever the category.
+pub const PREK_SPED_FLAT_PER_PUPIL: f64 = 4000.0;
+/// And the school-age weights at half, against the statewide average base cost per pupil.
+pub const PREK_SPED_WEIGHT_FRACTION: f64 = 0.5;
+/// The stated proration factor, and the appropriation it was set against.
+pub const PREK_SPED_PRORATION: f64 = 0.968_544_48;
+/// The limit the factor was calibrated against, and which the program now exceeds.
+pub const PREK_SPED_APPROPRIATION: f64 = 147_500_000.0;
+
 /// Column positions in the `CTE` sheet, whose header is on the fourth row.
 ///
 /// Five weighted categories and an associated-services weight applied to the sum. Mechanically the
@@ -652,6 +674,42 @@ mod transportation_columns {
     pub const SPECIAL_EDUCATION: usize = 30;
 }
 
+/// Column positions in the `PSS_pec_Ed` sheet, whose header is on the fifth row.
+///
+/// Preschool special education, **$148m**, and the last line in the gap between `[H] Foundation
+/// Funding` and `[R] Total State Support`.
+///
+/// # A flat amount and a half-weight, which nothing else in the formula combines
+///
+/// Each category pays `(ADM x $4,000) + (ADM x weight x average base cost x state share x 0.5)`,
+/// and the whole is multiplied by a proration factor. So a preschool pupil generates a **flat
+/// $4,000 regardless of category** — 69% of the program — plus a weighted amount at **half** the
+/// school-age rate. The weights are the same six.
+///
+/// The state share applies only to the weighted half. The $4,000 is paid in full to every
+/// district, which makes this the one component where the wealthiest district and the poorest are
+/// funded identically for most of what they receive.
+///
+/// # The proration no longer fits the appropriation it was set against
+///
+/// The sheet carries its own **appropriation limit of $147,500,000** in a cell beside the factor,
+/// which is what makes this program the clearest statement in the workbook of what a proration is:
+/// a budget divided by an entitlement. At the stated factor of 0.96854448 the program totals
+/// **$148,396,721** — **$896,721 over the limit**. The factor that would reach it is 0.96269183.
+///
+/// A third cell on the same sheet states a total of $146,708,228.07, which matches neither the
+/// column above it nor the cap. Most likely the factor was calibrated against an earlier ADM
+/// vintage and the counts were refreshed without recalibrating. This is a projection published
+/// before the fiscal year, not an actual, so a later recalibration is expected — but as published
+/// the three figures are mutually inconsistent, and that is worth recording rather than smoothing.
+mod prek_sped_columns {
+    pub const IRN: usize = 0;
+    /// Six ADM counts, Category 1 through 6, then the six amounts they produce.
+    pub const FIRST_ADM: usize = 3;
+    pub const FIRST_AID: usize = 10;
+    pub const TOTAL: usize = 16;
+}
+
 /// Column positions in the `Local_Capacity` sheet, whose header is on the second row.
 ///
 /// The whole of R.C. 3317.017 worked step by step, with the statute's own labels — `[V1]`, `[I1]`,
@@ -774,6 +832,8 @@ pub struct Fy27Sheets<'a> {
     pub growth_rows: &'a [Vec<String>],
     /// `Transportation` — two rate bases, two supplements, and a second guarantee.
     pub transportation_rows: &'a [Vec<String>],
+    /// `PSS_pec_Ed` — preschool special education, a flat amount plus a half-weight.
+    pub prek_sped_rows: &'a [Vec<String>],
 }
 
 /// Index a worksheet by IRN, taking every row whose key column holds one.
@@ -811,6 +871,7 @@ pub fn build_fy27_model(sheets: &Fy27Sheets<'_>) -> Vec<Vec<String>> {
         performance_rows,
         growth_rows,
         transportation_rows,
+        prek_sped_rows,
     } = *sheets;
     use base_cost_columns as bc;
 
@@ -858,6 +919,8 @@ pub fn build_fy27_model(sheets: &Fy27Sheets<'_>) -> Vec<Vec<String>> {
     let growth: HashMap<&str, &Vec<String>> = rows_by_irn(growth_rows, growth_columns::IRN);
     let transportation: HashMap<&str, &Vec<String>> =
         rows_by_irn(transportation_rows, transportation_columns::IRN);
+    let prek_sped: HashMap<&str, &Vec<String>> =
+        rows_by_irn(prek_sped_rows, prek_sped_columns::IRN);
 
     let valuation: Vec<(&str, &Vec<String>)> = profile_rows
         .iter()
@@ -1195,6 +1258,19 @@ pub fn build_fy27_model(sheets: &Fy27Sheets<'_>) -> Vec<Vec<String>> {
             (tc::SPECIAL_EDUCATION, 2),
         ] {
             let value = trans.and_then(|row| cell_number(row, column));
+            out.last_mut()
+                .expect("just pushed")
+                .push(format_value(value, places));
+        }
+
+        // Preschool special education: six counts, six amounts, and the total they sum to.
+        let prek = prek_sped.get(irn);
+        for (column, places) in (0..6)
+            .map(|k| (prek_sped_columns::FIRST_ADM + k, 6))
+            .chain((0..6).map(|k| (prek_sped_columns::FIRST_AID + k, 2)))
+            .chain(std::iter::once((prek_sped_columns::TOTAL, 2)))
+        {
+            let value = prek.and_then(|row| cell_number(row, column));
             out.last_mut()
                 .expect("just pushed")
                 .push(format_value(value, places));

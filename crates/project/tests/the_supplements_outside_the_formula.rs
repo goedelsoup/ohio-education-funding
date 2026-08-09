@@ -17,9 +17,11 @@
 //! reason it matters that they are outside the formula rather than a taxonomic one.
 
 use project::panel::{
-    self, DistrictRecord, PerformanceSupplement, Supplements, BASE_FUNDING_SUPPLEMENT_PER_PUPIL,
-    ENROLLMENT_GROWTH_SUPPLEMENT_PER_PUPIL, ENROLLMENT_GROWTH_THRESHOLD,
-    PERFORMANCE_SUPPLEMENT_PER_POINT,
+    self, DistrictRecord, PerformanceSupplement, Supplements, AVERAGE_BASE_COST_PER_PUPIL,
+    BASE_FUNDING_SUPPLEMENT_PER_PUPIL, ENROLLMENT_GROWTH_SUPPLEMENT_PER_PUPIL,
+    ENROLLMENT_GROWTH_THRESHOLD, PERFORMANCE_SUPPLEMENT_PER_POINT, PREK_SPED_APPROPRIATION,
+    PREK_SPED_FLAT_PER_PUPIL, PREK_SPED_PRORATION, PREK_SPED_WEIGHT_FRACTION,
+    SPECIAL_EDUCATION_WEIGHTS,
 };
 
 /// Dollar amounts are stored to the cent, so half a cent of rounding is admissible and nothing is.
@@ -437,5 +439,208 @@ fn the_supplement_structs_are_populated_rather_than_defaulted() {
             .count()
             < 5,
         "only the one district rated N/A should be missing a star rating"
+    );
+}
+
+// ---------------------------------------------------------------------------------------------
+// Preschool special education
+// ---------------------------------------------------------------------------------------------
+
+/// A flat amount and a half-weight, which nothing else in the formula combines.
+///
+/// `(ADM x $4,000) + (ADM x weight x average base cost x state share x 0.5)`, prorated. The flat
+/// part is 69% of the program and is **not** reduced by the state share, so for most of what this
+/// pays the wealthiest district and the poorest are funded identically.
+#[test]
+fn preschool_special_education_is_a_flat_grant_plus_half_a_weight() {
+    let panel = panel::panel();
+    let mut checked = 0;
+
+    for record in &panel {
+        let Some(share) = record.published_state_share else {
+            continue;
+        };
+        let p = &record.preschool_special_education;
+        for (k, weight) in SPECIAL_EDUCATION_WEIGHTS.iter().enumerate() {
+            let flat = p.adm[k] * PREK_SPED_FLAT_PER_PUPIL;
+            let weighted =
+                p.adm[k] * weight * AVERAGE_BASE_COST_PER_PUPIL * share * PREK_SPED_WEIGHT_FRACTION;
+            let expected = (flat + weighted) * PREK_SPED_PRORATION;
+            assert!(
+                close(expected, p.aid[k]),
+                "{}: preschool category {} computed {expected:.2} against published {:.2}",
+                record.name,
+                k + 1,
+                p.aid[k]
+            );
+        }
+        assert!(
+            (p.aid.iter().sum::<f64>() - p.total).abs() < 0.04,
+            "{}: the six sum to {:.2} against published total {:.2}",
+            record.name,
+            p.aid.iter().sum::<f64>(),
+            p.total
+        );
+        checked += 1;
+    }
+    assert!(checked > 600, "expected the whole panel: {checked}");
+
+    // The flat component dominates, and it is the part the state share does not touch.
+    let flat: f64 = panel
+        .iter()
+        .map(|r| r.preschool_special_education.flat_component())
+        .sum();
+    let total: f64 = panel
+        .iter()
+        .map(|r| r.preschool_special_education.total)
+        .sum();
+    assert!(
+        flat / total > 0.6,
+        "the flat component is {:.3} of the program",
+        flat / total
+    );
+}
+
+/// Halving the weights against a flat floor compresses the program almost to parity.
+///
+/// School-age special education is famously top-heavy: Category 6 is 15% of the pupils and 48% of
+/// the money. Here the same six weights apply at half, on top of a $4,000 flat amount that is the
+/// same for every category — and the result is nearly flat. Category 6's 5,761 pupils draw about
+/// what Category 2's 10,842 do.
+///
+/// So the same weight vector produces a steeply graduated program in one place and an almost
+/// undifferentiated one in another, purely because of what sits beside it. A table of Ohio's
+/// special education weights describes neither on its own.
+#[test]
+fn the_same_weights_are_nearly_flat_here_and_steeply_graduated_at_school_age() {
+    let panel = panel::panel();
+    let share_of = |pick: fn(&panel::PreschoolSpecialEducation, usize) -> f64, k: usize| {
+        let part: f64 = panel
+            .iter()
+            .map(|r| pick(&r.preschool_special_education, k))
+            .sum();
+        let all: f64 = (0..6)
+            .map(|j| {
+                panel
+                    .iter()
+                    .map(|r| pick(&r.preschool_special_education, j))
+                    .sum::<f64>()
+            })
+            .sum();
+        part / all
+    };
+    let money_six = share_of(|p, k| p.aid[k], 5);
+    let pupils_six = share_of(|p, k| p.adm[k], 5);
+
+    // At school age, Category 6 is roughly three times its pupil share in money. Here it is close
+    // to one, which is the compression the flat grant and the halved weight produce together.
+    let concentration = money_six / pupils_six;
+    assert!(
+        concentration < 2.0,
+        "Category 6 takes {money_six:.3} of the money on {pupils_six:.3} of the pupils, a \
+         concentration of {concentration:.2} — the flat grant should be flattening this"
+    );
+
+    let school_age_money: f64 = panel
+        .iter()
+        .map(|r| r.special_education.aid[5])
+        .sum::<f64>()
+        / panel
+            .iter()
+            .map(|r| r.special_education.total())
+            .sum::<f64>();
+    let school_age_pupils: f64 = panel
+        .iter()
+        .map(|r| r.special_education.adm[5])
+        .sum::<f64>()
+        / panel
+            .iter()
+            .map(|r| r.special_education.total_adm())
+            .sum::<f64>();
+    assert!(
+        school_age_money / school_age_pupils > concentration * 1.4,
+        "school age concentrates at {:.2} against preschool's {concentration:.2}; the same \
+         weights should behave very differently in the two programs",
+        school_age_money / school_age_pupils
+    );
+}
+
+/// The proration no longer fits the appropriation it was set against.
+///
+/// This sheet is the clearest statement in the workbook of what a proration is, because it carries
+/// the **appropriation limit** in a cell beside the factor: a budget divided by an entitlement.
+///
+/// And the division has stopped working. At the stated 0.96854448 the program totals $148,408,184
+/// against a $147,500,000 limit — **$908,184 over**. A third cell on the same sheet states
+/// $146,708,228.07, which matches neither.
+///
+/// The likeliest reading is that the factor was calibrated against an earlier ADM vintage and the
+/// counts were refreshed without recalibrating. This is a projection published before the fiscal
+/// year, so a recalibration before payment is expected. The point of asserting it is that the
+/// corpus should notice when a published workbook is internally inconsistent, rather than
+/// reproducing the inconsistency silently and calling it verified.
+#[test]
+fn the_preschool_proration_no_longer_brings_the_program_within_its_appropriation() {
+    let panel = panel::panel();
+    let total: f64 = panel
+        .iter()
+        .map(|r| r.preschool_special_education.total)
+        .sum();
+    let entitlement: f64 = panel
+        .iter()
+        .map(|r| r.preschool_special_education.unprorated())
+        .sum();
+
+    assert!(
+        total > PREK_SPED_APPROPRIATION,
+        "the program totals {total:.2} against an appropriation of {PREK_SPED_APPROPRIATION:.2}; \
+         if this has stopped being true the department has recalibrated and the node describing \
+         it needs revisiting"
+    );
+    let over = total - PREK_SPED_APPROPRIATION;
+    assert!(
+        (500_000.0..2_000_000.0).contains(&over),
+        "over the appropriation by {over:.2}, which is a different size from what was recorded"
+    );
+
+    // The factor that would have fitted, which is what a recalibration would produce.
+    let fitting = PREK_SPED_APPROPRIATION / entitlement;
+    assert!(
+        fitting < PREK_SPED_PRORATION,
+        "a fitting factor of {fitting:.8} should be below the stated {PREK_SPED_PRORATION:.8}"
+    );
+}
+
+/// With this read, the gap between foundation funding and total state support is accounted for.
+#[test]
+fn nothing_material_is_left_unexplained_outside_foundation_funding() {
+    let panel = panel::panel();
+    let outside: f64 = panel
+        .iter()
+        .map(|r| r.total_state_support - r.realized_aid())
+        .sum();
+    let explained: f64 = panel
+        .iter()
+        .map(|r| {
+            r.transportation.total
+                + r.transportation.special_education
+                + r.preschool_special_education.total
+                + r.performance.amount
+                + r.supplements.base_funding
+                + r.supplements.growth
+        })
+        .sum();
+
+    let share = explained / outside;
+    assert!(
+        share > 0.95,
+        "{share:.4} of what sits outside foundation funding is now named; the remainder is \
+         {:.0} and has no component behind it yet",
+        outside - explained
+    );
+    assert!(
+        share < 1.02,
+        "{share:.4} — more has been attributed than sits outside the formula, which means \
+         something here is also inside it"
     );
 }

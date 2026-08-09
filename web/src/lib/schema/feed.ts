@@ -377,6 +377,25 @@ export const DistrictSchema = z
       })
       .strict(),
     /**
+     * Preschool special education: a flat $4,000 a pupil plus the six weights at half, prorated.
+     *
+     * The flat component is 69% of the program and is not reduced by the state share, so for most
+     * of what this pays the wealthiest district and the poorest are funded identically. And the
+     * proration no longer fits: the sheet carries a $147.5m appropriation limit beside the factor,
+     * and at the stated factor the program totals $148.4m.
+     */
+    preschool_special_education: z
+      .object({
+        adm: z.tuple([num, num, num, num, num, num]),
+        aid: z.tuple([num, num, num, num, num, num]),
+        total: num,
+        /** What the flat $4,000 component alone is worth. */
+        flat_component: num,
+        /** What the program would pay without the proration. */
+        unprorated: num,
+      })
+      .strict(),
+    /**
      * Transportation, the largest thing outside foundation funding.
      *
      * $726m, plus $183m of special education transportation — transportation alone is larger than

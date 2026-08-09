@@ -107,6 +107,11 @@
     guarantee** on a FY2021 base, and a **proration factor of 0.91746** on its special education
     line — the first parameter in this corpus that encodes a shortfall rather than a rate.
 
+  A fourth line, **preschool special education**, is now read too: $148m, a flat $4,000 a pupil
+  plus the six school-age weights at half. With it, **95.00% of what sits between `[H] Foundation
+  Funding` and `[R] Total State Support` is named**, leaving a $63.6m residual with no component
+  behind it yet. [verified]
+
   Two of those want corpus nodes of their own, and neither has one yet:
 
   - **A second temporary transitional aid guarantee.** `formula-component` holds one node by that
@@ -118,6 +123,25 @@
     blends. A proration is none of those: it is an appropriation divided by an entitlement, so it
     is a fact about a budget rather than about a formula, and it moves for reasons nothing else in
     `parameter/` moves for. It also cannot be recovered from a published amount. [open]
+
+    **Preschool special education settles what the class would hold.** Its sheet carries the
+    **appropriation limit** — $147,500,000 — in a cell beside the factor, which is the only place
+    in the calculator that shows a proration's two halves at once. A proration node therefore wants
+    three properties and not one: the factor, the appropriation it was set against, and the
+    entitlement it was divided into.
+
+    It also shows why the class matters. **At the stated factor of 0.96854448 the program totals
+    $148,408,184 — $908,184 over its own limit.** A third cell states $146,708,228.07, matching
+    neither. The likeliest reading is a factor calibrated against an earlier ADM vintage and never
+    recalibrated after the counts were refreshed; the calculator is a projection published before
+    the fiscal year, so recalibration before payment is expected. But a parameter that has silently
+    stopped satisfying its own constraint is exactly what a node with all three properties would
+    catch and a node with only the factor would not. [verified —
+    `crates/project/tests/the_supplements_outside_the_formula.rs`]
+
+    Three prorations are now known: transportation's special education line at 0.91746,
+    transportation's general factor at 1.0, and this one. Only this one publishes its
+    appropriation.
 
   The original entry:
 

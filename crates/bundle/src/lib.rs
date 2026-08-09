@@ -73,7 +73,7 @@ use edfund_core::Dollars;
 /// from FY2022-FY2024 to FY2024-FY2026 — the years the department's `ADM Data` sheet declares.
 /// The values did not change; what they are called did, which is exactly the kind of silent
 /// meaning change the version guard exists for.
-pub const CONTRACT_VERSION: &str = "21.0.0";
+pub const CONTRACT_VERSION: &str = "22.0.0";
 
 /// How close to the floor counts as being on it, in mills.
 ///
@@ -781,6 +781,26 @@ pub struct Transportation {
     pub special_education_unprorated: Dollars,
 }
 
+/// Preschool special education, for one district.
+///
+/// A flat $4,000 a pupil whatever the category — 69% of the program, and not reduced by the state
+/// share — plus the six school-age weights at half, all prorated. The proration is the point: the
+/// sheet carries its appropriation limit beside the factor, and at the stated factor the program
+/// runs $908,184 over it.
+#[derive(Debug, Clone, Copy, PartialEq, Default)]
+pub struct PreschoolSpecialEducation {
+    /// ADM in each category, 1 through 6.
+    pub adm: [f64; 6],
+    /// The aid each produces.
+    pub aid: [Dollars; 6],
+    /// The six, summed.
+    pub total: Dollars,
+    /// What the flat $4,000 component alone is worth.
+    pub flat_component: Dollars,
+    /// What the program would pay without the proration.
+    pub unprorated: Dollars,
+}
+
 /// One district, as the web layer needs it.
 #[derive(Debug, Clone, PartialEq)]
 pub struct District {
@@ -792,6 +812,8 @@ pub struct District {
     pub supplements: Supplements,
     /// Transportation, the largest thing outside it.
     pub transportation: Transportation,
+    /// Preschool special education, the last line in the same gap.
+    pub preschool_special_education: PreschoolSpecialEducation,
     /// The Ohio House districts this district lies in, largest share first.
     ///
     /// Usually one — 270 of 609 districts sit inside a single House district — and up to eleven.
@@ -1643,6 +1665,22 @@ impl Bundle {
                 opt(d.supplements.progress),
                 opt(d.supplements.growth_forgone)
             ));
+            s.push_str(&array_pair(
+                "preschool_special_education",
+                "adm",
+                &d.preschool_special_education.adm,
+                "aid",
+                &d.preschool_special_education.aid,
+                &[
+                    ("total", d.preschool_special_education.total),
+                    (
+                        "flat_component",
+                        d.preschool_special_education.flat_component,
+                    ),
+                    ("unprorated", d.preschool_special_education.unprorated),
+                ],
+            ));
+            s.push_str(", ");
             s.push_str(&fields(
                 "transportation",
                 &[
@@ -2077,6 +2115,13 @@ mod tests {
             irn: "049056".into(),
             name: "Northern Local".into(),
             county: "Perry".into(),
+            preschool_special_education: PreschoolSpecialEducation {
+                adm: [6.4, 15.2, 1.0, 0.0, 0.0, 1.0],
+                aid: [31_800.0, 78_100.0, 5_900.0, 0.0, 0.0, 8_400.0],
+                total: 124_200.0,
+                flat_component: 90_900.0,
+                unprorated: 128_236.0,
+            },
             transportation: Transportation {
                 public_riders: 812.0,
                 nonpublic_riders: 41.0,

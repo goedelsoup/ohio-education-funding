@@ -1452,6 +1452,36 @@ test.describe("outside the formula", () => {
     await expect(card).toContainText("against the formula's 10%");
   });
 
+  test("preschool special education names the flat grant the state share does not touch", async ({
+    page,
+  }) => {
+    /*
+     * The one payment in Ohio's school funding a district's wealth does not reduce: a flat $4,000
+     * a pupil whatever the category, 69% of the program. It is also what flattens the same six
+     * weights that make school-age special education steeply top-heavy.
+     */
+    await page.goto("/district/000442");
+    const card = page.locator('.card[data-part="supplements"]');
+    await expect(card.locator('table[data-program="preschool"]')).toBeVisible();
+    await expect(card).toContainText("flat $4,000");
+    await expect(card).toContainText("the state share does not reduce");
+    await expect(card).toContainText("Weight, halved");
+  });
+
+  test("the page says the preschool program is over its own appropriation", async ({ page }) => {
+    /*
+     * The sheet is the only place in the calculator that shows what a proration is, because the
+     * appropriation limit sits in a cell beside the factor — and at the stated factor the program
+     * exceeds it by $908,184. Reproducing that silently and calling it verified would be the wrong
+     * answer; the page states the inconsistency and what it most likely is.
+     */
+    await page.goto("/district/000442");
+    const card = page.locator('.card[data-part="supplements"]');
+    await expect(card).toContainText("over its appropriation");
+    await expect(card).toContainText("$147,500,000");
+    await expect(card).toContainText("do not agree");
+  });
+
   test("a district just below the growth cliff is told what it forwent", async ({ page }) => {
     /*
      * The only honest way to show a cliff. New Lexington grew 2.9502% against the 3% required and

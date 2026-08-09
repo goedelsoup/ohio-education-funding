@@ -157,6 +157,10 @@ export const FIELD_DENOMINATORS: Record<string, DenominatorKey | null> = {
   // Category counts for the three remaining weighted programs. Counts, not quantities over one,
   // and the aid beside each is a dollar total per category rather than a per-pupil figure.
   "districts[].english_learners.adm": null,
+  // Preschool pupils by category. Counts, not quantities over one — and a different population
+  // from every other ADM here: these children are not in the enrolled ADM the formula funds, which
+  // is why the program sits outside it.
+  "districts[].preschool_special_education.adm": null,
   "districts[].career_technical.fte": null,
   "districts[].gifted.fte_k8": null,
   "districts[].gifted.fte_9_12": null,

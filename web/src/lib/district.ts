@@ -1074,6 +1074,7 @@ export function renderSupplements(d: District): string {
       }
 
       ${renderTransportation(d)}
+      ${renderPreschoolSpecialEducation(d)}
 
       <p class="note">The performance supplement is the only part of Ohio's school funding paid on
         a <em>measured outcome</em> rather than on pupils, categories or a tax base — and it runs
@@ -1191,4 +1192,70 @@ function renderTransportation(d: District): string {
       determine transportation aid at all — the state equalises getting to school far harder than
       it equalises what happens there. And the two supplements reward opposite things: one pays for
       filling buses, the other for having too few children per square mile to fill them.</p>`;
+}
+
+/**
+ * Preschool special education, inside the card for what sits outside the formula.
+ *
+ * # A flat grant and a half-weight, and the proration that no longer fits
+ *
+ * $148m. Each category pays a flat $4,000 a pupil — 69% of the program, and **not** reduced by the
+ * state share — plus the six school-age weights at half. So this is the one component where the
+ * wealthiest district and the poorest are funded identically for most of what they receive, and
+ * the one where the same weight vector that makes school-age special education steeply
+ * top-heavy produces something close to flat.
+ *
+ * The card leads with the proration because this sheet is the only place in the workbook that
+ * shows what a proration *is*: the appropriation limit sits in a cell beside the factor. At the
+ * stated factor the program runs $908,184 over that limit, which the card says plainly.
+ */
+function renderPreschoolSpecialEducation(d: District): string {
+  const p = d.preschool_special_education;
+  if (p.total <= 0) return "";
+
+  const weights = [0.2435, 0.6179, 1.4845, 1.9812, 2.683, 3.9554];
+  const rows = weights
+    .map((weight, k) => ({ category: k + 1, weight, adm: p.adm[k]!, aid: p.aid[k]! }))
+    .filter((r) => r.adm > 0 || r.aid > 0);
+  if (rows.length === 0) return "";
+  const pupils = rows.reduce((a, r) => a + r.adm, 0);
+  const shortfall = p.unprorated - p.total;
+
+  return `
+    <h3>Preschool special education</h3>
+    <div class="scroll"><table data-program="preschool">
+      <thead><tr><th>Category</th><th class="tnum">Weight, halved</th><th class="tnum">Pupils</th>
+        <th class="tnum">Aid</th></tr></thead>
+      <tbody>
+        ${rows
+          .map(
+            (r) => `<tr>
+              <th>Category ${r.category}</th>
+              <td class="tnum">${(r.weight / 2).toFixed(4)}</td>
+              <td class="tnum">${r.adm.toFixed(2)}</td>
+              <td class="tnum">${money(r.aid)}</td>
+            </tr>`,
+          )
+          .join("")}
+        <tr class="current"><th>Preschool special education</th><td class="tnum n">—</td>
+          <td class="tnum">${pupils.toFixed(2)}</td><td class="tnum">${money(p.total)}</td></tr>
+      </tbody>
+    </table></div>
+    <p class="note">Each pupil generates a <strong>flat ${money(4000)}</strong> whatever their
+      category, plus the school-age weight at <strong>half</strong> against the average base cost.
+      Here the flat part is ${money(p.flat_component)} — ${pct(p.flat_component / p.total, 0)} of
+      the total — and it is the one payment in Ohio's school funding the state share does not
+      reduce. For most of what this program pays, the wealthiest district and the poorest are
+      funded identically.</p>
+    <p class="note">That also flattens the weights. The same six make school-age special education
+      steeply top-heavy — Category 6 is 15% of the pupils and 48% of the money — and here, halved
+      and sitting on a flat ${money(4000)}, they produce something close to parity.</p>
+    <p class="note"><strong>And this program is over its appropriation.</strong> Its sheet is the
+      one place in the calculator that shows what a proration is, because it carries the
+      appropriation limit in a cell beside the factor: ${money(147_500_000)}. At the stated factor
+      of 0.96854448 the program totals <strong>${money(148_408_184)}</strong> statewide —
+      ${money(908_184)} over. This district was computed ${money(p.unprorated)} and paid
+      ${money(p.total)}, ${money(shortfall)} short. The calculator is a projection published before
+      the fiscal year, so the factor is presumably recalibrated before payment; as published, the
+      factor, the limit and the total do not agree.</p>`;
 }

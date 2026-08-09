@@ -793,6 +793,79 @@ impl Transportation {
     }
 }
 
+/// Preschool special education, for one district — the last line outside foundation funding.
+///
+/// # A flat amount and a half-weight, which nothing else in the formula combines
+///
+/// $148m. Each category pays `(ADM x $4,000) + (ADM x weight x average base cost x state share x
+/// 0.5)`, and the whole is prorated. So a preschool pupil generates a **flat $4,000 whatever their
+/// category** — 69% of the program — plus a weighted amount at **half** the school-age rate,
+/// against the same six weights.
+///
+/// **The state share applies only to the weighted half.** The $4,000 is paid in full to every
+/// district, which makes this the one component in Ohio's school funding where the wealthiest
+/// district and the poorest are funded identically for most of what they receive. Whether that is
+/// deliberate levelling or an artefact of bolting a flat grant onto a weighted formula is not
+/// established here. [open]
+///
+/// Halving the weights also compresses the program relative to the school-age one: Category 6 is
+/// 3.9554 there and effectively 1.9777 here, so the range between the highest and lowest category
+/// narrows — and against a $4,000 flat floor it narrows much further. 5,761 Category 6 pupils draw
+/// $52.9m and 10,842 Category 2 pupils draw $50.6m, which is far closer to parity than school-age
+/// special education's 15%-of-pupils-48%-of-money.
+///
+/// # The proration no longer fits the appropriation it was set against
+///
+/// The sheet carries its **appropriation limit of $147,500,000** in a cell beside the factor,
+/// which makes this the clearest statement in the whole workbook of what a proration is: a budget
+/// divided by an entitlement. At the stated factor of 0.96854448 the program totals
+/// **$148,408,184** — **$908,184 over the limit**. The factor that would reach it is 0.96261747.
+///
+/// A third cell on the same sheet states $146,708,228.07, matching neither the column above it nor
+/// the cap. The likeliest reading is that the factor was calibrated against an earlier ADM vintage
+/// and the counts were refreshed without recalibrating it. This is a projection published before
+/// the fiscal year rather than an actual, so recalibration before payment is expected — but as
+/// published the three figures are mutually inconsistent, and that is worth recording rather than
+/// smoothing over.
+#[derive(Debug, Clone, Copy, PartialEq, Default)]
+pub struct PreschoolSpecialEducation {
+    /// ADM in each category, 1 through 6 — the same categories as school age.
+    pub adm: [Adm; 6],
+    /// The aid each produces: the flat amount plus the half-weight, prorated.
+    pub aid: [Dollars; 6],
+    /// The six, as the sheet totals them.
+    pub total: Dollars,
+}
+
+/// Paid per preschool pupil whatever their category, and not reduced by the state share.
+pub const PREK_SPED_FLAT_PER_PUPIL: Dollars = 4000.0;
+/// The school-age weights apply at half here.
+pub const PREK_SPED_WEIGHT_FRACTION: f64 = 0.5;
+/// The stated factor, and the appropriation it was calibrated against.
+pub const PREK_SPED_PRORATION: f64 = 0.968_544_48;
+/// A limit the program now exceeds by $908,184.
+pub const PREK_SPED_APPROPRIATION: Dollars = 147_500_000.0;
+
+impl PreschoolSpecialEducation {
+    /// Pupils across all six categories.
+    #[must_use]
+    pub fn total_adm(&self) -> Adm {
+        self.adm.iter().sum()
+    }
+
+    /// What the flat component alone is worth, after proration. Most of the program.
+    #[must_use]
+    pub fn flat_component(&self) -> Dollars {
+        self.total_adm() * PREK_SPED_FLAT_PER_PUPIL * PREK_SPED_PRORATION
+    }
+
+    /// What the program would have paid had the appropriation covered it.
+    #[must_use]
+    pub fn unprorated(&self) -> Dollars {
+        self.total / PREK_SPED_PRORATION
+    }
+}
+
 /// One district as the department modelled it.
 #[derive(Debug, Clone, PartialEq)]
 pub struct DistrictRecord {
@@ -923,6 +996,8 @@ pub struct DistrictRecord {
     pub supplements: Supplements,
     /// Transportation, and special education transportation beside it.
     pub transportation: Transportation,
+    /// Preschool special education: a flat $4,000 a pupil plus the weights at half.
+    pub preschool_special_education: PreschoolSpecialEducation,
     /// The county the department attributes the district to, from `Base_Cost`.
     ///
     /// One county per district, which is a **simplification the department makes and this corpus
@@ -1144,6 +1219,10 @@ mod column {
     /// Transportation: eleven inputs then nine payments, in sheet order.
     pub const TRANS_FIRST_INPUT: usize = 119;
     pub const TRANS_FIRST_PAYMENT: usize = 132;
+    /// Preschool special education: six counts, six amounts, and their total.
+    pub const PREK_FIRST_ADM: usize = 141;
+    pub const PREK_FIRST_AID: usize = 147;
+    pub const PREK_TOTAL: usize = 153;
 }
 
 /// The header this loader expects, so a fixture reshaped without updating [`column`] fails
@@ -1171,7 +1250,10 @@ trans_public_riders,trans_nonpublic_riders,trans_community_riders,trans_weighted
 trans_mass_transit_riders,trans_other_riders,trans_bus_miles,trans_assigned_buses,\
 trans_rider_capacity_target,trans_efficiency_index,trans_district_density,trans_square_miles,trans_reported_sped_cost,trans_school_bus,\
 trans_mass_transit,trans_other,trans_efficiency,trans_density,trans_fy21_base,trans_guarantee,\
-trans_total,trans_special_education";
+trans_total,trans_special_education,\
+prek_sped_adm_cat1,prek_sped_adm_cat2,prek_sped_adm_cat3,prek_sped_adm_cat4,prek_sped_adm_cat5,\
+prek_sped_adm_cat6,prek_sped_aid_cat1,prek_sped_aid_cat2,prek_sped_aid_cat3,prek_sped_aid_cat4,\
+prek_sped_aid_cat5,prek_sped_aid_cat6,prek_sped_total";
 
 /// Every district in the department's FY2027 model.
 ///
@@ -1340,6 +1422,11 @@ pub fn panel() -> Vec<DistrictRecord> {
                         total: pay(7),
                         special_education: pay(8),
                     }
+                },
+                preschool_special_education: PreschoolSpecialEducation {
+                    adm: std::array::from_fn(|k| required(column::PREK_FIRST_ADM + k)),
+                    aid: std::array::from_fn(|k| required(column::PREK_FIRST_AID + k)),
+                    total: required(column::PREK_TOTAL),
                 },
                 supplements: Supplements {
                     base_funding: required(column::BASE_FUNDING_SUPPLEMENT),

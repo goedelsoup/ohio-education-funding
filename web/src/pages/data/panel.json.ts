@@ -51,6 +51,7 @@ export const GET: APIRoute = () => {
         house_districts: _hd,
         supplements: _sup,
         transportation: _tr,
+        preschool_special_education: _pk,
         ...district
       }) => district,
     ),

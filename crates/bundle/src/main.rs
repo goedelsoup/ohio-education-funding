@@ -428,6 +428,16 @@ fn to_district(
         irn: record.irn.clone(),
         name: record.name.clone(),
         county: record.county.clone(),
+        preschool_special_education: {
+            let p = &record.preschool_special_education;
+            bundle::PreschoolSpecialEducation {
+                adm: p.adm,
+                aid: p.aid,
+                total: p.total,
+                flat_component: p.flat_component(),
+                unprorated: p.unprorated(),
+            }
+        },
         transportation: {
             let t = &record.transportation;
             bundle::Transportation {
