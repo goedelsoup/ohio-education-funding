@@ -37,20 +37,65 @@ description: |
   operative in FY2008. Carried in
   [`crates/regime-diff`](../../../crates/regime-diff/src/charge_off.rs).]
 
-  **THE BASE CHANGED WHILE THE RATE STOOD STILL, AND THAT IS THE EASIEST THING HERE TO GET
-  WRONG.** DeRolph I describes the charge-off as *total taxable value* times a percentage. By
-  FY2008 the Legislative Service Commission describes the same 23 mills applied to **recognized
-  valuation** — an H.B. 920-adjusted figure deliberately lower than total taxable value wherever
-  reduction factors bind. [verified]
+  **THE BASE CHANGED WHILE THE RATE STOOD STILL, AND THIS NODE DESCRIBED THE NEW BASE WRONGLY
+  FOR ITS WHOLE LIFE.** DeRolph I describes the charge-off as *total taxable value* times a
+  percentage. By FY2008 the Legislative Service Commission describes the same 23 mills applied to
+  **recognized valuation**. [verified]
 
-  So a district's charge-off could fall with no change to the rate, and two accurate statements
-  that "the charge-off was 23 mills" can describe materially different local shares. Any series
-  of charge-off amounts must carry the base alongside the rate. This corpus holds total taxable
-  valuation and **not** recognized valuation, so every charge-off figure it computes is on the
-  DeRolph-era base and overstates the local share of any district whose recognition was reduced.
-  Closing that needs recognized valuation, which `tax-abstract` was expected to supply. That
-  connector is now **wired** and does not carry it — Table SD-1 publishes total taxable value
-  only — so the gap is real and the recorded reason for it was stale. [verified]
+  What this node said recognized valuation *is* — "an H.B. 920-adjusted figure deliberately lower
+  than total taxable value wherever reduction factors bind" — was wrong, and wrong in a way that
+  named the wrong districts. LSC defines it arithmetically:
+
+  > valuation used in calculating a district's local share of the base cost "recognizes" the
+  > district's inflationary increase in carryover real property (property that was taxed in the
+  > year before) in the reappraisal or update year evenly over three-years instead of all at once.
+
+      recognized, reappraisal or update year = actual - 2/3 x inflationary increase
+      recognized, second year                = actual - 1/3 x inflationary increase
+      recognized, third year                 = actual
+
+  It is a **three-year phase-in of reappraisal growth**. H.B. 920 holds a district's revenue flat
+  by cutting the rate; recognized valuation holds its state aid flat by deferring the base. Two
+  mechanisms answering the same event from opposite ends of the same multiplication — and LSC
+  discusses them under one heading, "Provisions that Soften the Effect of H.B. 920 Tax Reduction
+  Factors", which is the likeliest way the conflation happened. [verified — [LSC Complete
+  Resource](../../catalog/lsc-school-funding-complete-resource.md), pp. 19 and 82]
+
+  **The correction changes which districts are affected, not only by how much.** Under the old
+  reading the districts overcharged were those with long-bitten reduction factors: a wealth and
+  tax-history story. Under the real rule they are the ones whose county reappraised recently.
+  Those sets are close to unrelated, and the second is an administrative accident.
+
+  **AND IT IS NOW COMPUTED RATHER THAN MISSING.** The recorded blocker said `tax-abstract` was
+  expected to supply recognized valuation and did not. Both halves of that were beside the point:
+  the figure is not published per district by anyone, and it does not need to be. The rule is
+  arithmetic, and Ohio's staggered county calendar supplies the identification —
+
+    - the Department of Taxation publishes each county's reappraisal and update year, and every
+      one of the 88 has exactly one valuation event in TY2022–TY2024;
+    - Table SD-1, extended from two tax years to four, then gives each district one event year
+      and two quiet ones, so its own ordinary growth measures what the reappraisal added.
+
+  The separation is not marginal: the median county's real property rose **28.6%** in its event
+  year against **1.5%** in its quiet ones, and all 88 counties' largest jump falls in the year the
+  calendar says. [verified — `crates/regime-diff/src/recognized_valuation.rs` and
+  `tests/recognized_valuation_against_the_abstract.rs`]
+
+  At TY2024 recognized valuation is **8.20% below total taxable value statewide — $34.5bn, or
+  $793m of charge-off at 23 mills**. It falls entirely by calendar: 12.97% of value for the 184
+  districts whose county revalued in TY2024, 7.04% for the 304 in TY2023, and nothing for the 123
+  in TY2022. [verified]
+
+  **This is a high point of the cycle and the node should not be read as if it were a constant.**
+  LSC put the long-run effect nearer $125m a year, about 2% of valuation; TY2024 is four times
+  that because Ohio's 2023–24 revaluations were four times the size LSC's own worked example
+  assumes. What is not cyclical is the direction — total taxable value always overstates the
+  charge-off. [verified, and the long-run figure is LSC's]
+
+  **One component is still not modelled.** LSC records an **exempt property adjustment** to
+  recognized valuation for about 13 districts holding large state-owned exempt property — $836.4m
+  in FY2008, $19.2m of local share. It needs the department's own list of those districts. About
+  0.3% of statewide valuation, and absent. [open]
 
   **What the rate was doing to the system.** At 23 mills against a statewide operating rate of
   32.9 mills in TY2006, the base cost formula equalized about **69.9%** of local operating
@@ -74,13 +119,27 @@ description: |
   assumed rate. The mechanism did not fail once; it was failing progressively, and the
   supplement's cost was a lagging measure of it. [inference]
 
-  A further **81 districts have valuation high enough that 23 mills would exceed their entire
+  A further **65 districts have valuation high enough that 23 mills would exceed their entire
   base cost**, leaving them no state aid at all — the charge-off had no minimum state share, which
-  is a Fair School Funding Plan invention. [verified] Against the counterfactual the median
-  district is $289 per pupil better off under the plan. [verified]
+  is a Fair School Funding Plan invention. [verified]
 
-  Both figures are on the DeRolph-era base and therefore overstate the charge-off, per the
-  caveat above.
+  **AND THE HEADLINE COMPARISON REVERSED WHEN THE BASE WAS CORRECTED.** This node recorded that
+  "against the counterfactual the median district is $289 per pupil better off under the plan."
+  On recognized valuation the median district is **$45 per pupil worse off**, and **316 districts
+  would have done better under the charge-off against 290 under the plan** — where the corpus
+  previously published 193 against 413. The zeroed count above was 81 on the old base.
+
+  The incidence claim moved further than the level did. The corpus published that *every* wealth
+  quintile does better under the plan, most of all the richest. Only the top quintile still gains:
+  the bottom four lose by $118 to $365 per pupil, and the poorer the quintile the less it loses.
+  The *shape* survives — the plan is genuinely more generous to property-rich districts than the
+  charge-off was — but "every quintile gains" was an artifact of charging every district about 8%
+  too much on the counterfactual side. [verified —
+  `crates/regime-diff/tests/the_charge_off_against_local_capacity.rs`]
+
+  A correction of this size from a definition is the argument for the node carrying the base
+  beside the rate, which it did, and for it being right about what the base *is*, which it was
+  not.
 
   **Joint vocational school districts were charged off at 0.5 mills**, not the district rate.
   [verified — LSC] This is the one place the "uniform statewide" description is false, and a
@@ -100,7 +159,9 @@ properties:
     formula era rates are [open]. JVSDs: 0.5 mills throughout the observed range.
 
     The base matters as much as the rate: total taxable value in the DeRolph era, recognized
-    valuation by FY2008. See the description.
+    valuation by FY2008 — the latter being total taxable value with a reappraisal's inflationary
+    increase phased in over three years, **not** an H.B. 920 adjustment, which is what this node
+    said until it was checked against LSC. See the description.
   statutory_basis: |
     R.C. 3317.022, with the rate set by biennial session law. Ohio Laws citations for the
     1991-1997 progression are recited at DeRolph I, paragraph 97. Ohio Laws' online version
@@ -116,10 +177,13 @@ properties:
     in exactly the range where it appears otherwise. [inference] This nonlinearity is why the
     parameter cannot be evaluated without per-district floor status.
 
-    Measured at FY2027 base cost: **81 of 606 districts** would have a 23-mill charge-off
-    exceeding their entire computed base cost, and so would receive no base cost aid at all. The
-    charge-off had no minimum state share — that is a Fair School Funding Plan invention — so
-    the mechanism simply truncated at zero. [verified — `crates/regime-diff`]
+    Measured at FY2027 base cost on recognized valuation: **65 of 606 districts** would have a
+    23-mill charge-off exceeding their entire computed base cost, and so would receive no base
+    cost aid at all. The charge-off had no minimum state share — that is a Fair School Funding
+    Plan invention — so the mechanism simply truncated at zero. [verified — `crates/regime-diff`]
+
+    The same count on total taxable value is 81, which is the measure of how much a wrong
+    valuation base moves a distributional result: a fifth of this finding was the base.
 links:
   - target: ../parameter.ont.yml
     relationship: instance-of
@@ -132,4 +196,8 @@ links:
   - target: ../litigation/derolph-i-1997.yml
     relationship: sourced-from
   - target: ../../catalog/lsc-school-funding-complete-resource.md
+    relationship: sourced-from
+  - target: ../../catalog/dot-reappraisal-calendar.md
+    relationship: sourced-from
+  - target: ../../catalog/dot-sd1-school-district-taxes.md
     relationship: sourced-from

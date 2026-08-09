@@ -275,13 +275,18 @@ test("the scenario panel does not carry the build-up", () => {
   expect(Object.keys(panelDistrict)).not.toContain("base_cost_build_up");
 });
 
-test("both tax years are present, ordered, and their classes partition the base", () => {
-  // Ordered because the page reads the pair as a change; reversed, every direction it reports
+test("all four tax years are present, ordered, and their classes partition the base", () => {
+  // Ordered because the page reads the series as a change; reversed, every direction it reports
   // would invert silently. Partitioned because a base whose parts do not sum to its whole invites
   // shares that do not add to one.
+  //
+  // Four years, not two. The window exists so that recognized valuation can be reconstructed:
+  // every Ohio county reappraises or updates once in TY2022-TY2024, and TY2021 makes the earliest
+  // of those a change rather than a level. Anything reading this as a pair must take the LAST
+  // two — see the millage tests below, which is where taking the ends went wrong.
   const { bundle } = loadFeed();
   for (const d of bundle.districts) {
-    expect(d.property_tax.map((y) => y.tax_year), d.name).toEqual([2023, 2024]);
+    expect(d.property_tax.map((y) => y.tax_year), d.name).toEqual([2021, 2022, 2023, 2024]);
     for (const y of d.property_tax) {
       expect(Math.abs(y.class1_value + y.class2_value + y.public_utility_value - y.total_value))
         .toBeLessThan(1);
@@ -369,7 +374,8 @@ test("the floor split is taken at the start of the interval, not the end", () =>
 
   const contaminated = { atFloor: 0, aboveFloor: 0 };
   for (const d of bundle.districts) {
-    const [before, after] = [d.property_tax[0], d.property_tax[d.property_tax.length - 1]];
+    // The last two, not the ends: the H.B. 920 recursion is only exact between consecutive years.
+    const [before, after] = d.property_tax.slice(-2);
     if (!before || !after || d.property_tax.length < 2) continue;
     if (after.class1_rate - before.class1_rate >= -0.0005) continue;
     if (d.at_millage_floor) contaminated.atFloor++;
@@ -412,7 +418,10 @@ test("the millage block is the crate's output, not a copy of a published column"
 
   for (const d of blocks) {
     const m = d.millage!;
-    const [before, after] = [d.property_tax[0]!, d.property_tax[d.property_tax.length - 1]!];
+    const [before, after] = d.property_tax.slice(-2) as [
+      (typeof d.property_tax)[number],
+      (typeof d.property_tax)[number],
+    ];
 
     // It reads the tax years it claims to.
     expect(m.tax_year).toBe(after.tax_year);
@@ -445,7 +454,7 @@ test("the two departments publish the same valuation over different pupil counts
   let compared = 0;
   let diverged = 0;
   for (const d of bundle.districts) {
-    const ty2023 = d.property_tax[0];
+    const ty2023 = d.property_tax.find((y) => y.tax_year === 2023);
     // Enrolled ADM FY2024, which is what the profile's valuation per pupil divides by — not
     // `d.adm`, the funded base cost count, which is a third number and reproduces nothing.
     const enrolled = d.adm_history[0];
@@ -481,13 +490,27 @@ test("the charge-off counterfactual reproduces what the regime-diff crate docume
   // Every one runs at the terminal rate, not one of the earlier ones in the series.
   for (const r of regimes) expect(r.charge_off_mills).toBe(23);
 
-  // "81 districts are in that position at 23 mills against FY2027 base cost."
-  expect(regimes.filter((r) => r.exceeds_base_cost).length).toBe(81);
+  // "65 districts are in that position at 23 mills against FY2027 base cost." It was 81 while the
+  // counterfactual ran on total taxable value; the charge-off is smaller on recognized valuation,
+  // so it runs past base cost in sixteen fewer places.
+  expect(regimes.filter((r) => r.exceeds_base_cost).length).toBe(65);
 
-  // "exactly zero for 463 of the 470 districts where both sides can be valued."
+  // "exactly zero for 465 of the 470 districts where both sides can be valued."
   const valued = regimes.filter((r) => r.residual != null);
   expect(valued.length).toBe(470);
-  expect(valued.filter((r) => Math.abs(r.residual!) < 0.005).length).toBe(463);
+  expect(valued.filter((r) => Math.abs(r.residual!) < 0.005).length).toBe(465);
+
+  // The base is recognized valuation for every district, and the phase-in is a real split rather
+  // than a field that is always one: three cohorts, on the county reappraisal calendar.
+  const years = new Set(regimes.map((r) => r.reappraisal_year));
+  expect([...years].sort()).toEqual([2022, 2023, 2024]);
+  expect(regimes.filter((r) => r.recognized_share < 0.9995).length).toBeGreaterThan(400);
+  for (const r of regimes) {
+    expect(r.recognized_share).toBeLessThanOrEqual(1);
+    expect(r.recognized_share).toBeGreaterThan(0.5);
+    // Nothing is deferred once the phase-in has finished, and something is before then.
+    if (r.reappraisal_year === 2022) expect(r.recognized_share).toBe(1);
+  }
 
   /*
    * Local capacity used to be absent for 138 districts, because it was recovered by subtracting
@@ -517,7 +540,12 @@ test("the counterfactual is computed on the formula's denominator, not the tax t
   const { bundle } = loadFeed();
   for (const d of bundle.districts) {
     if (!d.regime?.charge_off_local_share || d.valuation_per_pupil == null) continue;
-    expect(d.regime.charge_off_local_share).toBeCloseTo((d.valuation_per_pupil * 23) / 1000, 2);
+    // Times the recognized share, because the charge-off applied to recognized valuation and not
+    // to the full taxable value. Dropping that factor is the error this whole phase corrected, so
+    // it is pinned here as an identity rather than left to the prose.
+    const expected =
+      (d.valuation_per_pupil * d.regime.recognized_share * 23) / 1000;
+    expect(d.regime.charge_off_local_share).toBeCloseTo(expected, 2);
   }
 });
 

@@ -270,6 +270,18 @@ export const RegimeCounterfactualSchema = z
     exceeds_base_cost: z.boolean(),
     /** Effective Class I mills short of the rate it would be charged at. The phantom revenue. */
     mills_short_of_charge_off: maybeNum,
+    /**
+     * Share of taxable value the charge-off reaches, after the reappraisal phase-in.
+     *
+     * The charge-off applied to **recognized valuation**, not to total taxable value: a
+     * revaluation's inflationary increase is phased in over three years. One where the phase-in
+     * has finished, below one where it has not.
+     */
+    recognized_share: num,
+    /** Tax year the district's county last reappraised or updated. */
+    reappraisal_year: num,
+    /** Per pupil the charge-off would be overstated by if run on total taxable value. */
+    overstated_by: maybeNum,
   })
   .strict();
 

@@ -35,12 +35,20 @@
 //! approximately right across a whole cycle.
 //!
 //! [`series::Method::Assumed`] therefore exists: a caller may supply a rate, and it is recorded
-//! as the caller's assumption rather than as something fitted. Getting past that needs the
-//! `tax-abstract` connector — which is **wired**, and does not carry it. Table SD-1 publishes total
-//! taxable value and not the H.B. 920-adjusted recognized valuation, so this gap survived the
-//! connector that was supposed to close it.
-//! Since local capacity is 60% valuation, every projection of the *local* side of Ohio school
-//! funding is currently an assumption wearing a number.
+//! as the caller's assumption rather than as something fitted. Since local capacity is 60%
+//! valuation, every projection of the *local* side of Ohio school funding is currently an
+//! assumption wearing a number.
+//!
+//! **That is now a choice rather than a limit, and the paragraph above used to claim otherwise.**
+//! It said the gap survived `tax-abstract` because Table SD-1 publishes total taxable value and
+//! not recognized valuation. Two things changed. The abstract carries **four** tax years now, not
+//! one, so there is a series where there was a point. And `regime_diff::recognized_valuation`
+//! holds the Department of Taxation's county reappraisal calendar — which is precisely the thing
+//! that makes a stepped series projectable, because it says *when* the next step lands rather
+//! than smoothing it away.
+//!
+//! Nothing here projects valuation yet. The point of correcting the note is that the reason
+//! recorded for not doing it is no longer the reason.
 //!
 //! Enrollment is better but not good: three observations per district, and the last of them,
 //! FY2026, is partly a departmental estimate because the calculator is published before that

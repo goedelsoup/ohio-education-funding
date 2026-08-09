@@ -1,7 +1,7 @@
 # Table SD-1 — School district taxable value and taxes charged
 
-**Source.** Ohio Department of Taxation, Tax Analysis Division. `SD1CY24.xlsx` (dated 3 April
-2026) and `SD1CY23.xlsx`, from the Tax Data Series.
+**Source.** Ohio Department of Taxation, Tax Analysis Division. `SD1CY21.xlsx` through
+`SD1CY24.xlsx` (the last dated 3 April 2026), from the Tax Data Series.
 **Type.** Primary source — compiled from the DTE-13 and DTE-14 abstracts county auditors file
 with the department.
 **Location.** `tax.ohio.gov`, Researcher → Tax Analysis → Tax Data Series → Property Tax.
@@ -14,6 +14,21 @@ average value per pupil, and the fiscal-year ADM the per-pupil figure divides by
 This is the local half of the funding picture, and until it was retrieved the corpus had no
 per-district measure of it except the one-year millage and valuation columns of the
 [District Profile Report](cupp-district-profile-report.md).
+
+**Why four tax years and not two.** Two give a level and a change, which is what the tax page
+reads. The fourth year is here for a different reason: Ohio's counties reappraise or update on a
+staggered three-year cycle, so **TY2022–TY2024 contains exactly one valuation event for every one
+of the 88 counties**, and TY2021 makes the earliest of those a change rather than a level. That
+window is what lets each district's reappraisal be measured against its own quiet years, which is
+how [recognized valuation](dot-reappraisal-calendar.md) is reconstructed without a source that
+publishes it. The separation is stark — a median 28.6% jump in the event year against 1.5%
+otherwise.
+
+**A trap the extra years set, recorded because it caught four callers.** With two tax years,
+`first()` and `last()` are adjacent, so every consumer that wanted a year-over-year change took
+the ends. With four they are three years apart and span a reappraisal. Nothing failed loudly:
+a rate is still a rate and a page still renders. Anything reading this fixture as a change must
+take the **last two**.
 
 **Two worksheets per workbook, differing in one thing.** `SD1DAT…` counts the joint vocational
 school district's operating levy in the taxes charged; `ExJVS…` removes it. 501 of 611 districts

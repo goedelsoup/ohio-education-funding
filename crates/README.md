@@ -137,11 +137,11 @@ Fields per crate: name, capability type (connector/calculator/feature-engineerin
 | [`local-capacity`](local-capacity/) | Fair School Funding Plan local capacity and state share, per R.C. 3317.017 | 20 |
 | [`millage`](millage/) | Effective operating millage under H.B. 920 reduction factors, and 20-mill floor status | 19 |
 | [`project`](project/) | Forward projection of funding inputs, and policy simulation over them | 151 |
-| [`regime-diff`](regime-diff/) | Difference two funding regimes at component level, with the residual the decomposition does not explain | 17 |
+| [`regime-diff`](regime-diff/) | Difference two funding regimes at component level, with the residual the decomposition does not explain | 32 |
 | [`scenario-delta`](scenario-delta/) | Winners and losers between two funding runs, with incidence and the off-formula count | 25 |
 | [`spreadsheet`](spreadsheet/) | Read the department's published workbooks with no dependencies | 70 |
 
-12 crates, 556 test functions, no crates.io dependencies. `cargo test` reports a different total: it adds doc-tests and counts each integration binary separately.
+12 crates, 571 test functions, no crates.io dependencies. `cargo test` reports a different total: it adds doc-tests and counts each integration binary separately.
 <!-- /REGEN -->
 
 ## Index status

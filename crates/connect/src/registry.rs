@@ -302,6 +302,31 @@ pub const CONNECTORS: &[Connector] = &[
                half is where the disparities live.",
         sources: &[
             Source {
+                key: "sd1-ty2021",
+                url: "https://dam.assets.ohio.gov/raw/upload/tax.ohio.gov/tax_analysis/\
+                      tax_data_series/school_district_data/sd1/SD1CY21.xlsx",
+                filename: "sd1-ty2021.xlsx",
+                format: Format::Xlsx,
+                catalog: Some("dot-sd1-school-district-taxes"),
+                fixture: Some(crate::fixtures::SD1_FIXTURE),
+                note: "The oldest of the four. Two tax years give a level and a change; four give \
+                       each district a reappraisal and two quiet years to measure it against, \
+                       which is what makes recognized valuation reconstructible. See \
+                       `regime_diff::recognized_valuation`.",
+            },
+            Source {
+                key: "sd1-ty2022",
+                url: "https://dam.assets.ohio.gov/raw/upload/tax.ohio.gov/tax_analysis/\
+                      tax_data_series/school_district_data/sd1/SD1CY22.xlsx",
+                filename: "sd1-ty2022.xlsx",
+                format: Format::Xlsx,
+                catalog: Some("dot-sd1-school-district-taxes"),
+                fixture: Some(crate::fixtures::SD1_FIXTURE),
+                note: "Ohio's counties reappraise or update on a staggered three-year cycle, so \
+                       TY2022 through TY2024 contains exactly one valuation event for every one \
+                       of the 88. This year completes that window.",
+            },
+            Source {
                 key: "sd1-ty2023",
                 url: "https://dam.assets.ohio.gov/raw/upload/tax.ohio.gov/tax_analysis/\
                       tax_data_series/school_district_data/sd1/SD1CY23.xlsx",
@@ -309,10 +334,11 @@ pub const CONNECTORS: &[Connector] = &[
                 format: Format::Xlsx,
                 catalog: Some("dot-sd1-school-district-taxes"),
                 fixture: Some(crate::fixtures::SD1_FIXTURE),
-                note: "The prior tax year, carried so that a change in taxes charged can be \
-                       separated from the level. Its worksheets are named `ExJVS` and \
-                       `SD1DATWK23`, against `ExJVS24` and `SD1DAT24` a year later — the \
-                       layout drift this connector was blocked on, now handled by prefix.",
+                note: "Carried so that a change in taxes charged can be separated from the level. \
+                       Its worksheets are named `ExJVS` and `SD1DATWK23`, against `ExJVS24` and \
+                       `SD1DAT24` a year later — the layout drift this connector was blocked on, \
+                       now handled by prefix. TY2021 and TY2022 use `SD1DATWK21`/`SD1DATWK22` and \
+                       a bare `ExJVS`, which the same prefixes already reach.",
             },
             Source {
                 key: "sd1-ty2024",

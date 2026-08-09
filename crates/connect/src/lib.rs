@@ -312,18 +312,28 @@ pub fn rebuild(root: &Path) -> Result<Vec<Rebuilt>, RebuildError> {
         },
     });
 
-    // The local side: taxable value by class and real property taxes charged, two tax years.
-    // Both are needed for the same reason the forecast filings both are — one year gives a
-    // level, and the question this table exists to answer is about a change.
-    let abstracts: Result<Vec<_>, RebuildError> = [(2023, "sd1-ty2023"), (2024, "sd1-ty2024")]
-        .into_iter()
-        .map(|(tax_year, key)| {
-            let book = open_workbook(root, source(key).expect("registered").1)?;
-            let excluding = sheet_by_prefix(&book, "ExJVS")?;
-            let including = sheet_by_prefix(&book, "SD1DAT")?;
-            Ok((tax_year, excluding, including))
-        })
-        .collect();
+    // The local side: taxable value by class and real property taxes charged, four tax years.
+    //
+    // Two would give a level and a change, which is what the tax page reads. Four are here for a
+    // different reason: Ohio's 88 counties reappraise or update on a staggered three-year cycle,
+    // so TY2022 through TY2024 contains exactly one valuation event per county — and TY2021 makes
+    // the earliest of those a change rather than a level. That window is what lets each district's
+    // reappraisal be measured against its own quiet years instead of a statewide average. See
+    // `regime_diff::recognized_valuation`.
+    let abstracts: Result<Vec<_>, RebuildError> = [
+        (2021, "sd1-ty2021"),
+        (2022, "sd1-ty2022"),
+        (2023, "sd1-ty2023"),
+        (2024, "sd1-ty2024"),
+    ]
+    .into_iter()
+    .map(|(tax_year, key)| {
+        let book = open_workbook(root, source(key).expect("registered").1)?;
+        let excluding = sheet_by_prefix(&book, "ExJVS")?;
+        let including = sheet_by_prefix(&book, "SD1DAT")?;
+        Ok((tax_year, excluding, including))
+    })
+    .collect();
     out.push(match abstracts {
         Ok(abstracts) => {
             let years: Vec<fixtures::Sd1Year<'_>> = abstracts

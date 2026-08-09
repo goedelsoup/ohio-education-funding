@@ -1,0 +1,106 @@
+id: recognized-valuation
+summary: >-
+  The corpus had recognized valuation wrong. It is a three-year phase-in of reappraisal growth, not
+  an H.B. 920 adjustment, and correcting it reversed the site's headline regime comparison.
+context: |
+  `crates/regime-diff` ran the charge-off counterfactual against **total taxable value** and
+  carried a caveat saying so: the charge-off's real base was recognized valuation, "an H.B. 920-
+  adjusted figure deliberately lower than total taxable value wherever reduction factors bind",
+  which the corpus did not hold. The recorded blocker was that `tax-abstract` had been expected to
+  supply it and turned out not to.
+
+  Both parts were wrong, and the definition was the more serious of the two.
+
+  **Recognized valuation is not an H.B. 920 adjustment.** The Legislative Service Commission
+  defines it arithmetically: valuation "recognizes" a district's inflationary increase in carryover
+  real property evenly over three years instead of all at once — two thirds deferred in the
+  reappraisal or update year, one third the year after, nothing by the third. H.B. 920 holds
+  revenue flat by cutting the rate; recognized valuation holds state aid flat by deferring the
+  base. LSC discusses them under one heading — "Provisions that Soften the Effect of H.B. 920 Tax
+  Reduction Factors" — which is the likeliest way the conflation happened.
+
+  **The error named the wrong districts, not just the wrong amount.** Under the recorded reading
+  the overcharged districts were those with long-bitten reduction factors: a wealth-and-tax-history
+  story. Under the real rule they are the ones whose county reappraised recently. Those sets are
+  close to unrelated.
+
+  **And the figure was never going to arrive by retrieval.** Nobody publishes recognized valuation
+  per district; it was an internal step in a formula retired in 2021. Waiting for a connector to
+  carry it would have waited forever.
+decision: |
+  Reconstruct recognized valuation rather than retrieve it, from three things the corpus can hold:
+
+    - the **rule**, transcribed from LSC with its worked example reproduced as a test;
+    - the Department of Taxation's **county reappraisal calendar**, carried as constants in
+      `regime_diff::recognized_valuation::CYCLE` and catalogued;
+    - **Table SD-1 extended from two tax years to four**, TY2021–TY2024.
+
+  Estimate each district's inflationary increase as its event-year growth in excess of its own
+  ordinary growth, measured from its two non-event years. Per district, not against a statewide
+  average, because a growing suburb and a shrinking rural district have different ordinary rates.
+
+  Make the valuation base a **required argument** to `at_fy2027` rather than a default.
+  `ChargeOffBase::{TotalTaxable, Recognized}` forces every call site to say which it means, which
+  is the mechanical guard against the class of error that produced this decision: the corpus got
+  the base wrong by never having to choose one.
+
+  Carry the correction across sources as a **ratio**, not a level. The profile report's FY2023
+  assessed valuation per pupil and SD-1's TY2024 total taxable value are different vintages on
+  different denominators; the recognized *share* transplants soundly where a dollar figure would
+  not.
+consequences: |
+  **The site's headline regime comparison reversed.** The corpus published that the median district
+  is $289 per pupil better off under the Fair School Funding Plan than under the charge-off. On the
+  corrected base it is **$45 per pupil worse off**, and 316 districts would have done better under
+  the charge-off against 290 under the plan — where the published figures were 193 against 413.
+
+  The incidence claim moved further. The corpus published that **every** wealth quintile does
+  better under the plan, most of all the richest. Only the top quintile still gains; the bottom
+  four lose by $118 to $365 per pupil. The *shape* survives — the plan is genuinely more generous
+  to property-rich districts — but "every quintile gains" was an artifact of overstating the
+  charge-off by about 8% for everyone.
+
+  Statewide the deferral is **8.20% of taxable value at TY2024, $34.5bn, $793m of charge-off at 23
+  mills**, and it falls entirely by calendar: 12.97% for the 184 districts whose county revalued in
+  TY2024, 7.04% for the 304 in TY2023, nothing for the 123 in TY2022. Two districts identical in
+  wealth, effort and need are charged a tenth differently because of which year their county
+  auditor was scheduled.
+
+  **TY2024 is a high point of the cycle and the pages say so.** LSC put the long-run effect nearer
+  2% of valuation and $125m a year. This cycle's revaluations were roughly twice the size LSC's own
+  worked example assumes, so the correction is larger now than it would be in an ordinary year. The
+  direction is not cyclical: total taxable value always overstates the charge-off.
+
+  **Four tax years broke four things that assumed two**, none of which would have failed loudly.
+  `millage_analysis` in the bundle, the statewide `rateFell` derivation in `feed.ts`, the tax
+  change card in `tax.ts`, and a crate test each took `first()` and `last()` of the series. With
+  two years those are adjacent; with four they span a reappraisal, and every one would have gone on
+  rendering a plausible number. Each now slices the last two and says why. The crate test was worse
+  than wrong — its `[before, after]` pattern stopped matching at all, so it silently exercised
+  nothing until a count assertion caught it.
+alternatives: |
+  **Keep the caveat and change nothing.** Rejected once the definition turned out to be wrong: a
+  caveat that misdescribes its own subject is worse than no caveat, because it tells a reader the
+  error is somewhere it is not. This was the status quo for fourteen phases.
+
+  **Wait for a source that publishes recognized valuation per district.** Rejected because there is
+  no such source. It was a working step inside a retired formula, and the years it governed are in
+  ODE payment reports that `dew-payment-reports` records as unindexed and partly missing. The
+  reconstruction needs no retrieval at all beyond one more year of a table already wired.
+
+  **Estimate the inflationary increase against a statewide background rate** instead of each
+  district's own. Rejected: per-district background growth has a median of 0.96% and a
+  10th-to-90th range of 0.12% to 3.28%, so a single rate would misattribute a fast-growing
+  district's new construction to its reappraisal. The staggered calendar makes the per-district
+  control free, which is the argument for the four-year window over a three-year one.
+
+  **Apply the phase-in to total value rather than to real property alone.** Rejected as simply not
+  the rule — LSC's increase is in *carryover real property*, and public utility tangible personal
+  property does not reappraise on the county cycle. The deferral is computed on real property and
+  subtracted from total value, which is what the mechanism does.
+
+  **Model the exempt property adjustment too.** Not rejected, unbuilt. LSC records a separate
+  adjustment for about 13 districts with large state-owned exempt property — $836.4m in FY2008,
+  $19.2m of local share, roughly 0.3% of statewide valuation. It needs the department's list of
+  those districts, which the corpus does not hold, and it is recorded as `[open]` on the parameter
+  node rather than approximated.

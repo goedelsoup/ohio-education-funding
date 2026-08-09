@@ -38,6 +38,7 @@ Sorted by: type, then slug.
 | [`dew-report-card-spending`](dew-report-card-spending.md) | Ohio School Report Cards — District Spending Per Pupil | 1 |
 | [`dew-report-card-value-added`](dew-report-card-value-added.md) | Ohio School Report Cards — District Value-Added Details | 1 |
 | [`dew-sfpr-line-by-line`](dew-sfpr-line-by-line.md) | School Finance Payment Report — Line by Line Explanation | 6 |
+| [`dot-reappraisal-calendar`](dot-reappraisal-calendar.md) | Ohio's sexennial reappraisal and triennial update calendar | 0 |
 | [`dot-sd1-school-district-taxes`](dot-sd1-school-district-taxes.md) | Table SD-1 — School district taxable value and taxes charged | 0 |
 | [`fordham-base-cost-critique`](fordham-base-cost-critique.md) | Fordham Institute — Ohio Base Cost Model Commentary | 2 |
 | [`lsc-hb96-analysis`](lsc-hb96-analysis.md) | LSC Budget Analysis — H.B. 96 (FY2026-27) | 2 |
@@ -47,7 +48,7 @@ Sorted by: type, then slug.
 | [`ocg-white-paper-013`](ocg-white-paper-013.md) | OCG White Paper No. 013 — Does Per-Pupil Spending Track Academic Performance? | 4 |
 | [`ode-idea-part-b-allocations`](ode-idea-part-b-allocations.md) | IDEA Part B Allocations to Districts | 1 |
 
-24 entries, 1 not yet cited by any corpus node. 20 retrieved files are pinned by SHA-256 in [`crates/connect/source-digests.txt`](../../crates/connect/source-digests.txt).
+25 entries, 2 not yet cited by any corpus node. 22 retrieved files are pinned by SHA-256 in [`crates/connect/source-digests.txt`](../../crates/connect/source-digests.txt).
 <!-- /REGEN -->
 
 ## Adding a source
