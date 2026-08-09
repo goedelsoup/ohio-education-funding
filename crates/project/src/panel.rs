@@ -38,6 +38,44 @@ pub const HISTORY_YEARS: [FiscalYear; 3] = [FiscalYear(2024), FiscalYear(2025), 
 /// 138 of 609 districts sit exactly on it.
 pub const MINIMUM_STATE_SHARE: f64 = local_capacity::MINIMUM_STATE_SHARE_FY2027;
 
+/// Ohio's six special education categories, for one district.
+///
+/// # The weights are the policy
+///
+/// Category 1 is weighted 0.2435 and Category 6 is weighted 3.9554 — a range of sixteen. Each
+/// weight multiplies the statewide average base cost per pupil, so a Category 6 pupil is funded at
+/// nearly four times what a pupil with no disability generates and a Category 1 pupil at a
+/// quarter of it.
+///
+/// The distribution is not what the weights alone suggest. **Category 6 is 15% of the pupils and
+/// 48% of the money**; Category 2 is 65% of the pupils and 34%. Between them those two are 82% of
+/// a $722m program, and they are opposite shapes — many pupils at a low weight against few at a
+/// very high one. Category 4 is 1,060 pupils statewide and $5.7m.
+#[derive(Debug, Clone, Copy, PartialEq, Default)]
+pub struct SpecialEducation {
+    /// ADM in each category, 1 through 6.
+    pub adm: [Adm; 6],
+    /// The aid each category produces, after the district's state share percentage.
+    pub aid: [Dollars; 6],
+}
+
+/// The statutory weight on each category, as the FY2027 workbook states them.
+pub const SPECIAL_EDUCATION_WEIGHTS: [f64; 6] = [0.2435, 0.6179, 1.4845, 1.9812, 2.6830, 3.9554];
+
+impl SpecialEducation {
+    /// The six aid amounts, summed. Equal to [`Categoricals::special_education`].
+    #[must_use]
+    pub fn total(&self) -> Dollars {
+        self.aid.iter().sum()
+    }
+
+    /// Pupils across all six categories.
+    #[must_use]
+    pub fn total_adm(&self) -> Adm {
+        self.adm.iter().sum()
+    }
+}
+
 /// The six categorical programs, per district, as `Detail_SFPR` publishes them.
 ///
 /// # Why this is six numbers and not one
@@ -196,6 +234,8 @@ pub struct DistrictRecord {
     pub published_capacity_rate: Option<f64>,
     /// The six categorical programs, each read rather than inferred as a lump.
     pub categoricals: Categoricals,
+    /// The second-largest categorical, decomposed into the six weighted categories.
+    pub special_education: SpecialEducation,
     /// Temporary transitional aid guarantee.
     pub guarantee: Dollars,
     /// Enrolled ADM in each of [`HISTORY_YEARS`].
@@ -346,6 +386,9 @@ mod column {
     pub const ENGLISH_LEARNERS: usize = 43;
     pub const GIFTED: usize = 44;
     pub const CATEGORICAL_CTE: usize = 45;
+    /// Six special education ADM counts, then the six aid amounts they produce.
+    pub const SPED_FIRST_ADM: usize = 46;
+    pub const SPED_FIRST_AID: usize = 52;
 }
 
 /// The header this loader expects, so a fixture reshaped without updating [`column`] fails
@@ -355,7 +398,7 @@ adm_kindergarten,adm_grades_1_3,adm_grades_4_8_non_cte,adm_grades_9_12_non_cte,a
 adm_grades_9_12_total,funded_classroom_teachers,funded_special_teachers,teacher_base_cost,\
 aggregate_base_cost,base_cost_per_pupil,temp_transitional_aid_guarantee,enrolled_adm_fy24,\
 enrolled_adm_fy25,enrolled_adm_fy26,assessed_valuation_per_pupil_fy23,core_foundation_funding,\
-base_cost_state_share,total_state_support,total_transfers,service_center_charge,other_adjustments,net_state_funding,capacity_per_pupil,state_share_percentage,valuation_ty25,valuation_ty24,valuation_ty23,agi_ty24,agi_ty23,agi_ty22,tax_returns,federal_median_income,statewide_median_income,benchmark_ratio,capacity_rate,targeted_assistance,special_education,dpia,english_learners,gifted,career_technical";
+base_cost_state_share,total_state_support,total_transfers,service_center_charge,other_adjustments,net_state_funding,capacity_per_pupil,state_share_percentage,valuation_ty25,valuation_ty24,valuation_ty23,agi_ty24,agi_ty23,agi_ty22,tax_returns,federal_median_income,statewide_median_income,benchmark_ratio,capacity_rate,targeted_assistance,special_education,dpia,english_learners,gifted,career_technical,sped_adm_cat1,sped_adm_cat2,sped_adm_cat3,sped_adm_cat4,sped_adm_cat5,sped_adm_cat6,sped_aid_cat1,sped_aid_cat2,sped_aid_cat3,sped_aid_cat4,sped_aid_cat5,sped_aid_cat6";
 
 /// Every district in the department's FY2027 model.
 ///
@@ -436,6 +479,10 @@ pub fn panel() -> Vec<DistrictRecord> {
                     english_learners: required(column::ENGLISH_LEARNERS),
                     gifted: required(column::GIFTED),
                     career_technical: required(column::CATEGORICAL_CTE),
+                },
+                special_education: SpecialEducation {
+                    adm: std::array::from_fn(|k| required(column::SPED_FIRST_ADM + k)),
+                    aid: std::array::from_fn(|k| required(column::SPED_FIRST_AID + k)),
                 },
                 net_state_funding: required(column::NET_STATE_FUNDING),
                 guarantee: required(column::GUARANTEE),

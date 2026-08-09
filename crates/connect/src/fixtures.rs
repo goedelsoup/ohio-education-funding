@@ -99,6 +99,18 @@ pub const FY27_HEADER: &[&str] = &[
     "english_learners",
     "gifted",
     "career_technical",
+    "sped_adm_cat1",
+    "sped_adm_cat2",
+    "sped_adm_cat3",
+    "sped_adm_cat4",
+    "sped_adm_cat5",
+    "sped_adm_cat6",
+    "sped_aid_cat1",
+    "sped_aid_cat2",
+    "sped_aid_cat3",
+    "sped_aid_cat4",
+    "sped_aid_cat5",
+    "sped_aid_cat6",
 ];
 
 /// Column positions in the department's `Base_Cost` sheet, whose header is on the fourth row.
@@ -183,6 +195,28 @@ mod detail_columns {
     pub const CAREER_TECHNICAL: usize = 15;
 }
 
+/// Column positions in the `Special Edu` sheet, whose header is on the third row.
+///
+/// The second-largest categorical, $722m, and the first of the six to be decomposed. Ohio funds
+/// special education in six weighted categories, and the weights are the whole of the policy:
+/// 0.2435 for Category 1 against 3.9554 for Category 6, a range of sixteen. A Category 6 pupil is
+/// funded at nearly four times the base cost of a pupil with no disability, and a Category 1 pupil
+/// at a quarter of it. The categorical total says none of that.
+mod special_education_columns {
+    pub const IRN: usize = 0;
+    /// Six ADM counts, Category 1 through 6, then the six aid amounts they produce.
+    pub const FIRST_ADM: usize = 4;
+    pub const FIRST_AID: usize = 10;
+}
+
+/// The statutory weight on each special education category, as the workbook states them.
+///
+/// Multiplied by the statewide average base cost per pupil to give the per-pupil amount, then by
+/// the district's ADM in that category and its state share percentage. Held here rather than in a
+/// calculator because they are parameters: they are set in statute and changed by budget bills,
+/// and the corpus has no node for them.
+pub const SPECIAL_EDUCATION_WEIGHTS: [f64; 6] = [0.2435, 0.6179, 1.4845, 1.9812, 2.6830, 3.9554];
+
 /// Column positions in the `Local_Capacity` sheet, whose header is on the second row.
 ///
 /// The whole of R.C. 3317.017 worked step by step, with the statute's own labels — `[V1]`, `[I1]`,
@@ -263,6 +297,7 @@ pub fn build_fy27_model(
     profile_rows: &[Vec<String>],
     detail_rows: &[Vec<String>],
     capacity_rows: &[Vec<String>],
+    special_education_rows: &[Vec<String>],
 ) -> Vec<Vec<String>> {
     use base_cost_columns as bc;
 
@@ -278,6 +313,12 @@ pub fn build_fy27_model(
         .skip(4)
         .filter(|row| !cell(row, detail_columns::IRN).trim().is_empty())
         .map(|row| (cell(row, detail_columns::IRN).trim(), row))
+        .collect();
+    let special_education: HashMap<&str, &Vec<String>> = special_education_rows
+        .iter()
+        .skip(3)
+        .filter(|row| !cell(row, special_education_columns::IRN).trim().is_empty())
+        .map(|row| (cell(row, special_education_columns::IRN).trim(), row))
         .collect();
     let capacity: HashMap<&str, &Vec<String>> = capacity_rows
         .iter()
@@ -420,6 +461,22 @@ pub fn build_fy27_model(
             detail_columns::CAREER_TECHNICAL,
         ] {
             let value = detail.get(irn).and_then(|row| cell_number(row, column));
+            out.last_mut()
+                .expect("just pushed")
+                .push(format_value(value, 2));
+        }
+
+        let sped = special_education.get(irn);
+        for offset in 0..6 {
+            let value = sped
+                .and_then(|row| cell_number(row, special_education_columns::FIRST_ADM + offset));
+            out.last_mut()
+                .expect("just pushed")
+                .push(format_value(value, 4));
+        }
+        for offset in 0..6 {
+            let value = sped
+                .and_then(|row| cell_number(row, special_education_columns::FIRST_AID + offset));
             out.last_mut()
                 .expect("just pushed")
                 .push(format_value(value, 2));
@@ -1320,6 +1377,7 @@ mod tests {
             &profile_rows(),
             &[],
             &[],
+            &[],
         )
     }
 
@@ -1414,6 +1472,7 @@ mod tests {
             &profile_rows(),
             &[],
             &[],
+            &[],
         );
         assert!(rows.is_empty());
     }
@@ -1427,6 +1486,7 @@ mod tests {
             &summary_rows(),
             &adm_rows(),
             &profile_rows(),
+            &[],
             &[],
             &[],
         );
@@ -1447,6 +1507,7 @@ mod tests {
             &profile_rows(),
             &[],
             &[],
+            &[],
         );
         assert!(!rows[1][1].contains(','));
         assert_eq!(rows[1][1], "Northern Local  Perry");
@@ -1461,6 +1522,7 @@ mod tests {
             &summary_rows(),
             &adm_rows(),
             &profile_rows(),
+            &[],
             &[],
             &[],
         );

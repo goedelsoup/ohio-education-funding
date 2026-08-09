@@ -581,3 +581,89 @@ fn the_largest_categorical_is_zero_for_a_fifth_of_the_state() {
         );
     }
 }
+
+/// Special education, decomposed into the six weighted categories that produce it.
+///
+/// The second-largest categorical at $722m, and the first of the six programs to be taken apart.
+/// The six aid amounts reconcile to the total exactly — to the cent for all 609 districts — which
+/// is the check that reading the per-category sheet has not changed anything.
+///
+/// What the decomposition is *for* is that the six are not proportional to each other in any
+/// useful way. Category 6 carries 15% of the pupils and 48% of the money at a weight of 3.9554;
+/// Category 2 carries 65% of the pupils and 34% at a weight of 0.6179. Two categories of opposite
+/// shape are 82% of the program, and the categorical total shows neither.
+#[test]
+fn the_six_special_education_categories_reconcile_and_are_wildly_unequal() {
+    use project::panel::SPECIAL_EDUCATION_WEIGHTS;
+
+    let panel = panel();
+
+    for record in &panel {
+        let difference =
+            (record.special_education.total() - record.categoricals.special_education).abs();
+        assert!(
+            difference < 0.01,
+            "{}: the six categories sum to {:.2} against a published {:.2}",
+            record.name,
+            record.special_education.total(),
+            record.categoricals.special_education
+        );
+    }
+
+    // The weights this repository holds, checked against the aid the department computed with
+    // them. Asserting that the constants rise would be a tautology — they are constants — so the
+    // check is that they *produce* the published amounts: category aid divided by category ADM
+    // and by the district's state share should recover the weight times average base cost.
+    //
+    // Done as a ratio between two categories so the average base cost cancels and no denominator
+    // has to be assumed.
+    let mut observed: Vec<f64> = Vec::new();
+    for record in &panel {
+        let (six, two) = (5_usize, 1_usize);
+        if record.special_education.adm[six] < 50.0 || record.special_education.adm[two] < 50.0 {
+            continue;
+        }
+        let per_pupil =
+            |k: usize| record.special_education.aid[k] / record.special_education.adm[k];
+        if per_pupil(two) > 0.0 {
+            observed.push(per_pupil(six) / per_pupil(two));
+        }
+    }
+    assert!(
+        observed.len() > 100,
+        "expected a usable sample: {}",
+        observed.len()
+    );
+    observed.sort_by(|a, b| a.partial_cmp(b).unwrap());
+    let median_ratio = observed[observed.len() / 2];
+    let expected_ratio = SPECIAL_EDUCATION_WEIGHTS[5] / SPECIAL_EDUCATION_WEIGHTS[1];
+    assert!(
+        (median_ratio - expected_ratio).abs() / expected_ratio < 0.01,
+        "the weights this repository holds imply a Category 6 to Category 2 ratio of \
+         {expected_ratio:.4}; the department's own amounts give {median_ratio:.4}"
+    );
+
+    // And the money is concentrated where the pupils are not.
+    let mut adm = [0.0_f64; 6];
+    let mut aid = [0.0_f64; 6];
+    for record in &panel {
+        for k in 0..6 {
+            adm[k] += record.special_education.adm[k];
+            aid[k] += record.special_education.aid[k];
+        }
+    }
+    let (pupils, money) = (adm.iter().sum::<f64>(), aid.iter().sum::<f64>());
+    assert!(
+        adm[5] / pupils < 0.25 && aid[5] / money > 0.40,
+        "Category 6 should be a small share of pupils and a large share of money: {:.1}% and \
+         {:.1}%",
+        adm[5] / pupils * 100.0,
+        aid[5] / money * 100.0
+    );
+    assert!(
+        adm[1] / pupils > 0.5 && aid[1] / money < 0.40,
+        "and Category 2 the reverse: {:.1}% and {:.1}%",
+        adm[1] / pupils * 100.0,
+        aid[1] / money * 100.0
+    );
+}
