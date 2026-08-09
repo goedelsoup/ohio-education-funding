@@ -414,6 +414,21 @@ pub fn rebuild(root: &Path) -> Result<Vec<Rebuilt>, RebuildError> {
         },
     );
 
+    // The department's redbook. Committed whole rather than sliced: unlike the final analysis,
+    // which legislates on everything from Medicaid to liquor permits, a redbook is about one
+    // agency and there is nothing in it to cut away.
+    let redbook = source("hb96-edu-redbook").expect("registered").1;
+    out.push(match cache::pdf_text(root, redbook) {
+        Ok(text) => Rebuilt::Written {
+            path: fixtures::REDBOOK_FIXTURE.to_string(),
+            rows: fixtures::write_text(&root.join(fixtures::REDBOOK_FIXTURE), text.trim())?,
+        },
+        Err(cause) => Rebuilt::Skipped {
+            path: fixtures::REDBOOK_FIXTURE.to_string(),
+            reason: cause.to_string(),
+        },
+    });
+
     // Census F-33. Skipped rather than fatal when the workbook is not cached: it is the one
     // source in the registry that nothing else depends on, so an absent copy should cost the
     // interstate comparison and nothing else.

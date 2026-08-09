@@ -533,7 +533,23 @@ pub const CONNECTORS: &[Connector] = &[
                \n\
                The recorded blocker said these are PDFs, which is true and was treated as the \
                end of the matter. A PDF is a container; `Format::Pdf` now has a reader.",
-        sources: &[Source {
+        sources: &[
+        Source {
+            key: "hb96-edu-redbook",
+            url: "https://www.lsc.ohio.gov/assets/legislation/136/hb96/in/files/\
+                  hb96-edu-redbook-as-introduced-136th-general-assembly.pdf",
+            filename: "hb96-edu-redbook.pdf",
+            format: Format::Pdf,
+            catalog: Some("lsc-dew-redbook"),
+            fixture: Some(crate::fixtures::REDBOOK_FIXTURE),
+            note: "The department's appropriation line items, with each ALI's earmarks and their \
+                   amounts. This is what answers \"which budget line governs\" for a program that \
+                   prorates. **As introduced** — LSC publishes redbooks only for the introduced \
+                   bill — so the line item *numbers* are the enacted ones and the *amounts* are \
+                   the executive proposal. The distinction is stated wherever a figure from here \
+                   is quoted.",
+        },
+        Source {
             key: "hb96-final-analysis",
             url: "https://www.lsc.ohio.gov/assets/legislation/136/hb96/en0/files/\
                   hb96-bill-analysis-as-enacted-136th-general-assembly.pdf",
@@ -546,7 +562,8 @@ pub const CONNECTORS: &[Connector] = &[
                    $30 and the enrolment growth supplement as a tiered schedule — neither of which \
                    became law. Reading the convenient version would have contradicted the \
                    department's own payments and looked like a finding.",
-        }],
+        },
+        ],
     },
     Connector {
         key: "ohio-laws",
