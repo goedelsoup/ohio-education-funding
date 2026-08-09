@@ -73,7 +73,7 @@ use edfund_core::Dollars;
 /// from FY2022-FY2024 to FY2024-FY2026 — the years the department's `ADM Data` sheet declares.
 /// The values did not change; what they are called did, which is exactly the kind of silent
 /// meaning change the version guard exists for.
-pub const CONTRACT_VERSION: &str = "15.0.0";
+pub const CONTRACT_VERSION: &str = "16.0.0";
 
 /// How close to the floor counts as being on it, in mills.
 ///
@@ -524,6 +524,15 @@ pub struct RegimeCounterfactual {
     pub mills_short_of_charge_off: Option<f64>,
 }
 
+/// Special education's six categories for one district: pupils and the aid they generate.
+#[derive(Debug, Clone, Copy, PartialEq, Default)]
+pub struct SpecialEducation {
+    /// ADM in each category, 1 through 6.
+    pub adm: [f64; 6],
+    /// The aid each produces, after the district's state share.
+    pub aid: [Dollars; 6],
+}
+
 /// The six categorical programs, per district.
 #[derive(Debug, Clone, Copy, PartialEq, Default)]
 pub struct Categoricals {
@@ -566,6 +575,11 @@ pub struct District {
     pub base_cost_state_share: Dollars,
     /// Targeted assistance, special education, DPIA, English learner, gifted, career-technical.
     pub categorical_funding: Dollars,
+    /// Special education's six weighted categories: ADM then aid, Category 1 through 6.
+    ///
+    /// The weights span a factor of sixteen and the money runs against them — Category 6 is 15%
+    /// of pupils and 48% of the program, Category 2 the reverse.
+    pub special_education: SpecialEducation,
     /// The same, as its six parts.
     ///
     /// The total was a residual for eight phases — core foundation funding less the state share of
@@ -1367,6 +1381,21 @@ impl Bundle {
                 "\"categorical_funding\": {}, ",
                 num(d.categorical_funding)
             ));
+            s.push_str("\"special_education\": {\"adm\": [");
+            for k in 0..6 {
+                if k > 0 {
+                    s.push_str(", ");
+                }
+                s.push_str(&num(d.special_education.adm[k]));
+            }
+            s.push_str("], \"aid\": [");
+            for k in 0..6 {
+                if k > 0 {
+                    s.push_str(", ");
+                }
+                s.push_str(&num(d.special_education.aid[k]));
+            }
+            s.push_str("]}, ");
             s.push_str("\"categoricals\": {");
             for (n, (key, value)) in [
                 ("targeted_assistance", d.categoricals.targeted_assistance),
@@ -1385,6 +1414,21 @@ impl Bundle {
                 s.push_str(&format!("\"{key}\": {}", num(*value)));
             }
             s.push_str("}, ");
+            s.push_str("\"special_education\": {\"adm\": [");
+            for k in 0..6 {
+                if k > 0 {
+                    s.push_str(", ");
+                }
+                s.push_str(&num(d.special_education.adm[k]));
+            }
+            s.push_str("], \"aid\": [");
+            for k in 0..6 {
+                if k > 0 {
+                    s.push_str(", ");
+                }
+                s.push_str(&num(d.special_education.aid[k]));
+            }
+            s.push_str("]}, ");
             s.push_str("\"categoricals\": {");
             for (i, (key, value)) in [
                 ("targeted_assistance", d.categoricals.targeted_assistance),
@@ -1586,6 +1630,10 @@ mod tests {
             }),
             base_cost_state_share: 6_000_000.0,
             categorical_funding: 8_038_562.0,
+            special_education: SpecialEducation {
+                adm: [10.9, 105.2, 6.0, 1.0, 10.8, 7.1],
+                aid: [21_000.0, 320_000.0, 44_000.0, 9_800.0, 143_000.0, 138_000.0],
+            },
             categoricals: Categoricals {
                 targeted_assistance: 3_100_000.0,
                 special_education: 2_100_000.0,

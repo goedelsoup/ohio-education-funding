@@ -14,8 +14,8 @@ use std::collections::HashMap;
 use bundle::{
     BaseCostBuildUp, Bundle, Categoricals, Checkpoint, Deflator, District, DistrictOutcome,
     FinanceYear, ForecastCheckpoint, MillageAnalysis, National, OutcomeStatewide, PolicyShape,
-    Projection, PropertyTaxYear, RegimeCounterfactual, SpendingByFunction, StateFinance, Statewide,
-    CONTRACT_VERSION,
+    Projection, PropertyTaxYear, RegimeCounterfactual, SpecialEducation, SpendingByFunction,
+    StateFinance, Statewide, CONTRACT_VERSION,
 };
 use dispersion::{partial_correlation, wealth_neutrality};
 use edfund_core::{AgencyType, FiscalYear};
@@ -399,6 +399,10 @@ fn to_district(
         aggregate_base_cost: record.aggregate_base_cost,
         base_cost_state_share: record.base_cost_state_share,
         categorical_funding: record.categorical_funding(),
+        special_education: SpecialEducation {
+            adm: record.special_education.adm,
+            aid: record.special_education.aid,
+        },
         categoricals: Categoricals {
             targeted_assistance: record.categoricals.targeted_assistance,
             special_education: record.categoricals.special_education,

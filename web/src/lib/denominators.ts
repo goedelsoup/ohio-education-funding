@@ -120,6 +120,11 @@ export const FIELD_DENOMINATORS: Record<string, DenominatorKey | null> = {
 
   // Pupil counts as a series rather than a scalar.
   "districts[].adm_history": null,
+  // Six special education ADM counts. Counts, not quantities over one — and the aid beside them
+  // is a dollar total per category rather than a per-pupil figure, so neither carries a
+  // denominator. The weights that connect them multiply a statewide average base cost per pupil,
+  // which is the only per-pupil quantity in the calculation and is not district-specific.
+  "districts[].special_education.adm": null,
 
   // Dimensionless: a change, and correlations whose parts each cancel their own denominator.
   "districts[].enrollment_change": null,

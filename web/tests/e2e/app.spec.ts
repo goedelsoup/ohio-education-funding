@@ -1084,6 +1084,25 @@ test.describe("the categorical half", () => {
     await expect(card).toContainText("Total categorical funding");
   });
 
+  test("special education is broken into its six weighted categories", async ({ page }) => {
+    /*
+     * The second level. The weights span a factor of sixteen and the money runs against them —
+     * Columbus's Category 6 is 20% of its special education pupils and 55% of the aid. A total
+     * cannot say that, and the total is what this page showed until now.
+     */
+    await page.goto("/district/043802");
+    const card = page.locator(".card", { hasText: "The categorical half" });
+    await expect(card).toContainText("Special education, by category");
+    await expect(card).toContainText("3.9554");
+    await expect(card).toContainText("0.2435");
+    await expect(card).toContainText("Category 6");
+    await expect(card).toContainText("a range of sixteen");
+
+    // The six rows plus the total must reconcile on both shares.
+    const rows = card.locator("tbody th").filter({ hasText: /^Category \d$/ });
+    await expect(rows).toHaveCount(6);
+  });
+
   test("a district getting no targeted assistance is told why", async ({ page }) => {
     /*
      * The reason the sum misleads rather than merely omitting. Targeted assistance is the largest

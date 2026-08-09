@@ -358,6 +358,19 @@ export const DistrictSchema = z
     /** Targeted assistance, special education, DPIA, English learner, gifted, career-technical. */
     categorical_funding: num,
     /**
+     * Special education's six weighted categories: ADM and the aid each produces.
+     *
+     * The weights span a factor of sixteen — 0.2435 for Category 1 against 3.9554 for Category 6
+     * — and the money runs against them. Category 6 is 15% of pupils statewide and 48% of the
+     * program; Category 2 is 65% of pupils and 34%.
+     */
+    special_education: z
+      .object({
+        adm: z.tuple([num, num, num, num, num, num]),
+        aid: z.tuple([num, num, num, num, num, num]),
+      })
+      .strict(),
+    /**
      * The same total, as its six parts.
      *
      * It was a residual for eight phases — core foundation funding less the state share of base
