@@ -736,13 +736,17 @@ pub const CONNECTORS: &[Connector] = &[
         publisher: "U.S. Census Bureau",
         feeds: &["metric", "education-agency"],
         status: Status::Wired {
-            still_blocked: None,
+            still_blocked: Some(
+                "`crates/dispersion/fixtures/f33-districts-fy2022.csv` is committed and read by \
+                 `dispersion::national_peers`, but `rebuild` does not produce it — there is no \
+                 extractor for `sdf22_1a.zip`, so the one fixture here that a calculator depends \
+                 on cannot be regenerated from its pinned source",
+            ),
         },
         note: "Comparability in two directions: whether Ohio is unusual, and an independent \
-               check on department figures computed on different definitions. The first is \
-               wired and settles the DeRolph claim comparatively; the second needs the \
-               per-district file, since the NCESID-to-IRN crosswalk it was waiting on is now \
-               held by `nces-ccd`.",
+               check on department figures computed on different definitions. Both are now \
+               held — the state aggregate and, through NCES's keying of the same survey, the \
+               per-district panel.",
         sources: &[Source {
             key: "f33-fy2022",
             title: None,
@@ -780,14 +784,16 @@ pub const CONNECTORS: &[Connector] = &[
         publisher: "National Center for Education Statistics",
         feeds: &["education-agency"],
         status: Status::Wired {
-            still_blocked: None,
+            still_blocked: Some(
+                "wired for a single year of the LEA directory; the consolidation-aware long \
+                 series is not built, because agency files are per-year zips whose column sets \
+                 change and the identifier-change history has to be derived rather than read",
+            ),
         },
         note: "A corpus spanning 1851 to the present is a panel whose members change, and a \
                long series assembled without accounting for consolidation is silently wrong. \
-               That series is still not built: agency files are per-year zips whose column sets \
-               change, and the identifier-change history has to be derived rather than read. \
-               But a single year of the directory was never blocked by any of that, and it \
-               carries the one column two other connectors were waiting on.",
+               A single year of the directory was never blocked by that, and it carries the one \
+               column two other connectors were waiting on.",
         sources: &[Source {
             key: "ccd-lea-directory-2223",
             title: None,
