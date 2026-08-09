@@ -2639,6 +2639,185 @@ pub fn build_f33_states(rows: &[Vec<String>]) -> Vec<Vec<String>> {
         .collect()
 }
 
+/// Where the per-district F-33 extract is written, relative to the repository root.
+pub const F33_DISTRICTS_FIXTURE: &str = "crates/dispersion/fixtures/f33-districts-fy2022.csv";
+
+/// Columns of the per-district F-33 fixture.
+pub const F33_DISTRICTS_HEADER: &[&str] = &[
+    "leaid",
+    "irn",
+    "state",
+    "comparable",
+    "enrollment",
+    "total_revenue",
+    "federal_revenue",
+    "state_revenue",
+    "local_revenue",
+    "property_tax",
+    "current_spending",
+];
+
+/// Split one line of a delimited file, honouring double-quoted fields.
+///
+/// The CCD directory quotes any agency name containing a comma, and `LEA_NAME` sits at column 4
+/// — ahead of the two columns this reads. Splitting on the delimiter alone gives the right answer
+/// for the 2022-23 file, because no quoted comma happens to fall before column 8; that is luck
+/// rather than a property of the format, and the kind that fails silently the year an agency is
+/// renamed to "Dayton, City of".
+fn delimited_fields(line: &str, delimiter: char) -> Vec<String> {
+    let mut out = Vec::new();
+    let mut field = String::new();
+    let mut quoted = false;
+    let mut chars = line.chars().peekable();
+    while let Some(c) = chars.next() {
+        match c {
+            // An escaped quote inside a quoted field is written as two quotes.
+            '"' if quoted && chars.peek() == Some(&'"') => {
+                field.push('"');
+                chars.next();
+            }
+            '"' => quoted = !quoted,
+            c if c == delimiter && !quoted => out.push(core::mem::take(&mut field)),
+            c => field.push(c),
+        }
+    }
+    out.push(field);
+    out
+}
+
+/// Find a column by name, so a layout change is an error rather than a silent misread.
+///
+/// The survey's columns are located by header rather than by position, unlike
+/// [`build_f33_states`]. Both files are published once a year and neither promises a stable
+/// layout — `census-f33`'s own note records that the column map is per-era — and a header lookup
+/// turns next year's reshuffle into a named failure instead of a fixture full of the wrong
+/// numbers.
+fn column(header: &[String], name: &str, file: &str) -> Result<usize, String> {
+    header
+        .iter()
+        .position(|h| h.trim() == name)
+        .ok_or_else(|| format!("{file} has no {name} column; its layout has moved"))
+}
+
+/// The per-district F-33 panel: one row per agency the national comparison can use.
+///
+/// # Why two files
+///
+/// The Bureau keys the F-33 on `IDCENSUS` and Ohio keys everything on IRN, and the corpus
+/// recorded that join as unavailable for as long as `census-f33` has been wired. It was not:
+/// NCES publishes the same survey keyed on `LEAID`, and the CCD directory carries `ST_LEAID`,
+/// which for Ohio is `OH-` followed by the IRN. `survey` is NCES's `sdf22_1a.txt` and
+/// `directory` is the CCD LEA file; neither alone is enough.
+///
+/// # What is kept
+///
+/// **Comparable** is the survey's own distinction: `AGCHRT != 1` — no associated charter schools
+/// — and `SCHLEV == 03`, a unified elementary-and-secondary agency. Every Ohio agency is kept
+/// whether or not it is comparable, flagged in the `comparable` column, because the corpus needs
+/// figures for all 968 of them and a national position for only the 611 that have one. Leaving
+/// charters in the distribution put Ohio's 200 smallest agencies at an 8% local share, which is a
+/// fact about charter finance and not about school districts — see
+/// [`dispersion::national_peers`](../../dispersion/src/national_peers.rs).
+///
+/// A row also needs **enrolment and total revenue above zero**. The survey reports `-1` and `-2`
+/// for missing and not-applicable, and 190 agencies carry those in every money column; admitting
+/// them would put a district with no reported revenue at a 0% local share, at the bottom of a
+/// distribution it is simply absent from. `T06` and `TCURELSC` are blanked rather than dropped
+/// when negative, because a district that reports no property tax is usually fiscally dependent
+/// rather than untaxed, which is a distinction the consumer draws.
+///
+/// Money is in thousands of dollars, as the survey publishes it and as
+/// [`build_f33_states`] keeps it.
+///
+/// # Errors
+///
+/// Returns the missing column's name if either file's layout has moved.
+pub fn build_f33_districts(survey: &str, directory: &str) -> Result<Vec<Vec<String>>, String> {
+    const DIRECTORY: &str = "the CCD LEA directory";
+    const SURVEY: &str = "the F-33 district survey";
+
+    let mut rows = directory.lines();
+    let head = delimited_fields(rows.next().unwrap_or_default(), ',');
+    let (key, st_leaid) = (
+        column(&head, "LEAID", DIRECTORY)?,
+        column(&head, "ST_LEAID", DIRECTORY)?,
+    );
+    let mut irn_of: std::collections::BTreeMap<String, String> = std::collections::BTreeMap::new();
+    for line in rows {
+        if line.trim().is_empty() {
+            continue;
+        }
+        let f = delimited_fields(line, ',');
+        if let (Some(leaid), Some(irn)) = (f.get(key), f.get(st_leaid)) {
+            irn_of.insert(leaid.trim().to_string(), irn.trim().to_string());
+        }
+    }
+
+    let mut rows = survey.lines();
+    let head = delimited_fields(rows.next().unwrap_or_default(), '\t');
+    let at = |name: &str| column(&head, name, SURVEY);
+    let (leaid, state, charter, level) =
+        (at("LEAID")?, at("STABBR")?, at("AGCHRT")?, at("SCHLEV")?);
+    let enrolment = at("V33")?;
+    let revenue = [
+        at("TOTALREV")?,
+        at("TFEDREV")?,
+        at("TSTREV")?,
+        at("TLOCREV")?,
+    ];
+    let (property_tax, spending) = (at("T06")?, at("TCURELSC")?);
+
+    let mut out = Vec::new();
+    for line in rows {
+        if line.trim().is_empty() {
+            continue;
+        }
+        let f = delimited_fields(line, '\t');
+        let field = |i: usize| f.get(i).map(|v| v.trim()).unwrap_or_default();
+        let number = |i: usize| field(i).parse::<i64>().ok();
+
+        let state = field(state).to_string();
+        let comparable = field(charter) != "1" && field(level) == "03";
+        if !comparable && state != "OH" {
+            continue;
+        }
+        // Missing data is coded negative, not blank, so an unreported agency would otherwise
+        // enter the distribution as a real zero.
+        if number(enrolment).unwrap_or(-1) <= 0 || number(revenue[0]).unwrap_or(-1) <= 0 {
+            continue;
+        }
+
+        let key = field(leaid).to_string();
+        let irn = if state == "OH" {
+            irn_of
+                .get(&key)
+                .map(|v| v.strip_prefix("OH-").unwrap_or(v).to_string())
+                .unwrap_or_default()
+        } else {
+            String::new()
+        };
+        // Reported as-is; blanked only where the survey's negative codes mean "not reported".
+        let plain = |i: usize| number(i).map(|v| v.to_string()).unwrap_or_default();
+        let unreported_is_blank = |i: usize| match number(i) {
+            Some(v) if v >= 0 => v.to_string(),
+            _ => String::new(),
+        };
+
+        let mut row = vec![
+            key,
+            irn,
+            state,
+            if comparable { "1" } else { "0" }.to_string(),
+            plain(enrolment),
+        ];
+        row.extend(revenue.iter().map(|i| plain(*i)));
+        row.push(unreported_is_blank(property_tax));
+        row.push(unreported_is_blank(spending));
+        out.push(row);
+    }
+    Ok(out)
+}
+
 // -------------------------------------------------------------------------------------------
 // Ohio Revised Code
 // -------------------------------------------------------------------------------------------
@@ -2831,6 +3010,45 @@ pub const REDBOOK_FIXTURE: &str = "crates/project/fixtures/dew-redbook.txt";
 
 /// Where the court opinion extract is written, relative to the repository root.
 pub const OPINIONS_FIXTURE: &str = "crates/regime-diff/fixtures/derolph-opinions.txt";
+
+/// Every fixture [`crate::rebuild`] writes.
+///
+/// The list exists so that "a source declares a fixture" and "something regenerates it" can be
+/// checked against each other without a populated cache, which CI does not have. It caught the
+/// F-33 district panel: 754 KB committed, read by a calculator, declared by a `Source`, and
+/// produced by nothing — the digest manifest could not see it, because a digest pins the input
+/// and says nothing about whether the derivation from it still exists.
+pub const REBUILT: &[&str] = &[
+    FY27_FIXTURE,
+    PROFILE_FIXTURE,
+    GRADE_BANDS_FIXTURE,
+    REPORT_CARD_FIXTURE,
+    FUNCTIONS_FIXTURE,
+    FINANCE_FIXTURE,
+    SD1_FIXTURE,
+    CPI_FIXTURE,
+    F33_FIXTURE,
+    F33_DISTRICTS_FIXTURE,
+    STATUTE_FIXTURE,
+    ENACTED_FIXTURE,
+    REDBOOK_FIXTURE,
+    OPINIONS_FIXTURE,
+];
+
+/// Fixtures a [`crate::registry::Source`] declares that [`crate::rebuild`] does not produce.
+///
+/// **An entry here is a debt with a name on it, not a category of fixture.** The pairing is the
+/// path and what would have to be written to retire it. Two fixtures were in this position when
+/// the check was added and only one still is: the F-33 district panel now has an extractor.
+///
+/// The test holds this list to both directions — an unlisted gap fails, and so does an entry that
+/// has quietly been fixed — so the list cannot grow silently or rot after the work is done.
+pub const NOT_REGENERATED: &[(&str, &str)] = &[(
+    "crates/project/fixtures/legislative-district-crosswalk.csv",
+    "the block-level join from census blocks to House and Senate districts, over four archives \
+     (the 2020 block assignment file, both 2024 legislative block-equivalency files, and PL 94-171 \
+     population), has no extractor; the committed file was built outside the rebuild path",
+)];
 
 /// The date an opinion was decided, read off the document.
 ///

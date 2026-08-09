@@ -736,12 +736,7 @@ pub const CONNECTORS: &[Connector] = &[
         publisher: "U.S. Census Bureau",
         feeds: &["metric", "education-agency"],
         status: Status::Wired {
-            still_blocked: Some(
-                "`crates/dispersion/fixtures/f33-districts-fy2022.csv` is committed and read by \
-                 `dispersion::national_peers`, but `rebuild` does not produce it — there is no \
-                 extractor for `sdf22_1a.zip`, so the one fixture here that a calculator depends \
-                 on cannot be regenerated from its pinned source",
-            ),
+            still_blocked: None,
         },
         note: "Comparability in two directions: whether Ohio is unusual, and an independent \
                check on department figures computed on different definitions. Both are now \
@@ -1000,6 +995,55 @@ mod tests {
                 reason.len() > 20,
                 "{} is {kind} without a reason",
                 connector.key
+            );
+        }
+    }
+
+    #[test]
+    fn every_fixture_a_source_declares_is_regenerated_or_says_why_not() {
+        // The other half of provenance. The catalog test below asks whether a fixture can be
+        // traced back to a catalogued publication; this asks whether it can be *rebuilt* from
+        // one. Those are different questions, and the F-33 district panel answered the first and
+        // not the second for as long as it existed: 754 KB committed, read by
+        // `dispersion::national_peers`, declared here, and produced by nothing. A digest pins the
+        // bytes that went in and cannot notice that the derivation from them was never written.
+        //
+        // Static rather than a rebuild, because CI has no `.cache/` and running the real thing
+        // would write into the working tree.
+        use crate::fixtures::{NOT_REGENERATED, REBUILT};
+
+        for (_, source) in sources() {
+            let Some(fixture) = source.fixture else {
+                continue;
+            };
+            if REBUILT.contains(&fixture) {
+                continue;
+            }
+            let excused = NOT_REGENERATED.iter().find(|(path, _)| *path == fixture);
+            let (_, why) = excused.unwrap_or_else(|| {
+                panic!(
+                    "{} declares {fixture}, which nothing in `rebuild` produces. Write the \
+                     extractor, or record the gap in `fixtures::NOT_REGENERATED` with what it \
+                     would take to close it.",
+                    source.key
+                )
+            });
+            assert!(
+                why.len() > 30,
+                "{fixture} is excused from rebuilding without saying what is missing"
+            );
+        }
+
+        // And the excuse list cannot outlive the work. An entry that has since been given an
+        // extractor has to leave, or the next reader is told a gap exists that does not.
+        for (path, _) in NOT_REGENERATED {
+            assert!(
+                !REBUILT.contains(path),
+                "{path} is in NOT_REGENERATED but `rebuild` produces it — delete the entry"
+            );
+            assert!(
+                sources().any(|(_, s)| s.fixture == Some(*path)),
+                "{path} is in NOT_REGENERATED but no source declares it"
             );
         }
     }

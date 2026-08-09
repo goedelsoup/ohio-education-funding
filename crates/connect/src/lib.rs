@@ -515,7 +515,63 @@ pub fn rebuild(root: &Path) -> Result<Vec<Rebuilt>, RebuildError> {
         },
     });
 
+    // The same survey per district, which needs two archives: NCES's keying of the F-33, and the
+    // CCD directory that carries the `LEAID`-to-IRN join. Committed since the national comparison
+    // was built and produced by nothing until now — the registry declared the fixture, the digest
+    // manifest pinned its sources, and the derivation between them lived only in prose.
+    out.push(match f33_districts(root) {
+        Ok(rows) => Rebuilt::Written {
+            path: fixtures::F33_DISTRICTS_FIXTURE.to_string(),
+            rows: fixtures::write_csv(
+                &root.join(fixtures::F33_DISTRICTS_FIXTURE),
+                fixtures::F33_DISTRICTS_HEADER,
+                &rows,
+            )?,
+        },
+        Err(reason) => Rebuilt::Skipped {
+            path: fixtures::F33_DISTRICTS_FIXTURE.to_string(),
+            reason,
+        },
+    });
+
     Ok(out)
+}
+
+/// Read the sole member of a cached zip whose name ends in `suffix`.
+///
+/// By suffix rather than by name: the CCD archive holds the same directory as both `.csv` and
+/// `.sas7bdat`, and its filename carries a release date (`ccd_lea_029_2223_w_1a_083023.csv`) that
+/// changes when the file is reposted.
+fn zip_member(root: &Path, source: &Source, suffix: &str) -> Result<String, String> {
+    let bytes = cache::read_cached(root, source).map_err(|cause| cause.to_string())?;
+    let archive = spreadsheet::zip::Archive::open(bytes)
+        .map_err(|cause| format!("{}: {cause}", source.key))?;
+    let named: Vec<&str> = archive
+        .entries()
+        .iter()
+        .map(|e| e.name.as_str())
+        .filter(|name| name.ends_with(suffix))
+        .collect();
+    let [name] = named[..] else {
+        return Err(format!(
+            "{} holds {} members ending in {suffix}, expected exactly one",
+            source.key,
+            named.len()
+        ));
+    };
+    archive
+        .read_to_string(name)
+        .map_err(|cause| format!("{}: {cause}", source.key))
+}
+
+/// The per-district F-33 panel, from the survey archive and the directory that keys it to IRN.
+fn f33_districts(root: &Path) -> Result<Vec<Vec<String>>, String> {
+    let survey = source("sdf22-districts").expect("registered").1;
+    let directory = source("ccd-lea-directory-2223").expect("registered").1;
+    fixtures::build_f33_districts(
+        &zip_member(root, survey, ".txt")?,
+        &zip_member(root, directory, ".csv")?,
+    )
 }
 
 /// Read the one worksheet whose name begins with `prefix`.
