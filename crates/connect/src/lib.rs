@@ -429,6 +429,38 @@ pub fn rebuild(root: &Path) -> Result<Vec<Rebuilt>, RebuildError> {
         },
     });
 
+    // The DeRolph opinions. One record per case, same shape as the statute extract, so the two
+    // sources a legal claim can rest on read alike.
+    let opinions: Vec<fixtures::StatuteSection> = registry::connector("ohio-courts")
+        .expect("registered")
+        .sources
+        .iter()
+        .filter_map(|src| {
+            let text = cache::pdf_text(root, src).ok()?;
+            Some(fixtures::StatuteSection {
+                section: src.key.to_string(),
+                title: src.note.split('.').next().unwrap_or(src.key).to_string(),
+                effective: String::new(),
+                legislation: src.url.to_string(),
+                body: text.trim().to_string(),
+            })
+        })
+        .collect();
+    out.push(if opinions.is_empty() {
+        Rebuilt::Skipped {
+            path: fixtures::OPINIONS_FIXTURE.to_string(),
+            reason: "no opinions cached, or pdftotext unavailable".to_string(),
+        }
+    } else {
+        Rebuilt::Written {
+            path: fixtures::OPINIONS_FIXTURE.to_string(),
+            rows: fixtures::write_text(
+                &root.join(fixtures::OPINIONS_FIXTURE),
+                &fixtures::build_statute_text(&opinions),
+            )?,
+        }
+    });
+
     // Census F-33. Skipped rather than fatal when the workbook is not cached: it is the one
     // source in the registry that nothing else depends on, so an absent copy should cost the
     // interstate comparison and nothing else.

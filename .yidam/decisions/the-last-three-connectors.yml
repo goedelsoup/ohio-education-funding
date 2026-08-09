@@ -1,0 +1,94 @@
+id: the-last-three-connectors
+summary: >-
+  An attempt on each of the three remaining connectors. `ohio-courts` wired; `dew-payment-reports`
+  and `ofcc-projects` stay declared, with blockers that are now accurate and are not the ones
+  recorded.
+context: |
+  Five connectors had been unblocked in as many phases, every one by opening a file the corpus had
+  already catalogued. Three remained, and after the last round none of the three had an obviously
+  stale reason. This is the attempt on all three, made together so the result is a statement about
+  what is left rather than another single find.
+decision: |
+  Probe each properly — not the path the blocker names, but whatever path exists — then wire what
+  is retrievable and rewrite what is not.
+
+  Wire `ohio-courts` for the four DeRolph opinions. Leave the other two declared, and replace both
+  blockers with what actually happens.
+consequences: |
+  **`ohio-courts`: wired, and it makes a load-bearing citation checkable.**
+
+  The blocker had two clauses of very different quality. "Opinions are PDFs" stopped being a
+  blocker the moment `Format::Pdf` had a reader — all four DeRolph opinions retrieve on a plain
+  request. "Trial-level rulings such as the 2025 EdChoice decision are not in the supreme court
+  archive at all" is correct and unfixable from here: a common pleas ruling is not in the supreme
+  court's archive because it is not the supreme court's.
+
+  What wiring it bought is specific. `regime_diff::RATES` carries the charge-off progression — 20
+  mills, 20.5, 23 — with a session-law citation on each, sourced to DeRolph I ¶97. Until now that
+  was a claim about a document nothing here held. Every authority string is verbatim from the
+  opinion, and so is the base: "the charge-off is the **total taxable value** of real and tangible
+  personal property in the district times a certain percentage." The DeRolph-era half of the
+  valuation-base distinction — the half the corpus got right — is now sourced to the document that
+  drew it.
+
+  **And I wired the wrong case, then caught it.** `derolph-iii` first pointed at 2001-Ohio-114,
+  which is *State ex rel. Smith v. Industrial Commission*, a workers' compensation appeal. The
+  WebCite was guessed from a plausible pattern rather than read off the document; it retrieved a
+  real PDF from the real archive and would have passed any check that did not ask what the file
+  was. The correct citation is 2001-Ohio-1343, 93 Ohio St.3d 309. The test now matches each opinion
+  against its reporter volume and page, which the archive prints on the first line.
+
+  That is the sixth wrong citation this corpus has produced, and the second I produced myself while
+  building the thing that catches them.
+
+  **`dew-payment-reports`: still declared, and the blocker was wrong in both directions.**
+
+  "No index and no stable path" is stale — the department lists **38 direct `.xlsx` payment
+  reports** for FY2026 and FY2027 at fixed URLs. "The years before about 2015 are not on the
+  current host at all" is wrong in kind: the department publishes *Foundation Legacy Payment
+  Reports (1999–2021)*, covering the entire deduct era, on its reports portal. The portal gates on
+  `sessionStorage.claims` and requires an OH|ID account.
+
+  So the era this connector exists for is retrievable in principle and behind a login, which is a
+  different problem from an absent index and not one to route around. The era that is wide open is
+  the era in which the deduction does not exist. Recorded rather than wired, because 38 monthly
+  payment files whose analytical value needs an FY2026 calculator the corpus does not hold is
+  effort spent ahead of a use.
+
+  **`ofcc-projects`: still declared, and partly by choice.**
+
+  `ofcc.ohio.gov` returns **404 to this project's contactable user-agent and 200 to a browser
+  string**. The data is served; the agent is filtered. Sending a browser string would work, and
+  `cache` already states the position — impersonating one "would be discourteous besides". The
+  filter is more likely an undiscriminating CDN default than a considered exclusion of researchers,
+  but guessing at intent is not a licence to route around it.
+
+  Behind the filter the project portfolios are interactive maps rather than files, so even with
+  access a bulk export would have to be reverse-engineered out of a map service. The honest next
+  step is to ask the commission.
+
+  **Eleven connectors wired, two declared.** Both remaining blockers are now things a person could
+  act on — get an OH|ID account, or write to the commission — rather than descriptions of a file
+  format.
+alternatives: |
+  **Send a browser user-agent to OFCC.** It works. Rejected on the ground the repository already
+  committed to for the Bureau of Labor Statistics, where the same question arose and was answered
+  the other way round: BLS refuses an agent with no contact, and `cache` reads the contact from the
+  environment rather than impersonating a browser. Having taken that position when it cost nothing,
+  abandoning it when it costs something would make it decoration.
+
+  **Create an OH|ID account and wire the legacy reports.** Not rejected on principle — the account
+  is free and the reports are public records. Rejected for now because a credentialled connector is
+  a different kind of thing from the twelve here: it cannot be refreshed by anyone who clones the
+  repository, and the digest manifest's promise that a fixture can be regenerated from its source
+  would quietly stop holding. If the deduct era becomes the subject rather than context, it is
+  worth doing deliberately, with the credential requirement stated in the connector.
+
+  **Wire the 38 open payment reports anyway.** Rejected as building ahead of a use. Their value is
+  a comparison between what the department projected before a year and what it paid during it, and
+  that needs the matching year's calculator. The corpus holds FY2027's calculator and FY2026's
+  completed payments — the wrong pair.
+
+  **Reverse-engineer the OFCC map service.** Deferred and not attempted. It would mean inferring an
+  endpoint from a page this project cannot fetch without changing how it identifies itself, which
+  puts it behind the same decision as above.
