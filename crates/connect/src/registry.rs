@@ -507,16 +507,28 @@ pub const CONNECTORS: &[Connector] = &[
         publisher: "Ohio Department of Education and Workforce",
         feeds: &["program", "education-agency", "revenue-stream"],
         status: Status::Declared {
-            blocked_on: "the deduct-era School Foundation Payment Reports are posted per fiscal \
-                         year with no index and no stable path, and the years before about 2015 \
-                         are not on the current host at all",
+            blocked_on: "the deduct-era reports (1999-2021) are behind OH|ID authentication on \
+                         the department's reports portal; the current-era ones are open and \
+                         indexed but post-date the deduction entirely",
         },
         note: "The one source that would carry the voucher and community-school deduction per \
                resident district, for the years it existed. The FY2027 calculator does not: its \
                transfer channel is a named service-centre charge plus a residual too small to \
                hide one, and under the Fair School Funding Plan those students are funded \
                directly rather than deducted. So the deduction is not missing from the current \
-               model — it is absent from it by design, and what is missing is the era before.",
+               model — it is absent from it by design, and what is missing is the era before.\n\
+               \n\
+               **The recorded blocker was wrong in both directions.** \"No index and no stable \
+               path\" is stale: `education.ohio.gov` now lists 38 direct `.xlsx` payment reports \
+               for FY2026 and FY2027 at fixed URLs. And \"the years before about 2015 are not on \
+               the current host\" is wrong in kind — the department publishes *Foundation Legacy \
+               Payment Reports (1999-2021)*, covering the whole deduct era, on its reports \
+               portal. That portal gates on `sessionStorage.claims` and needs an OH|ID account.\n\
+               \n\
+               So the era this connector exists for is retrievable-in-principle and behind a \
+               login, which is a different problem from an absent index and is not one to route \
+               around. The open era is wide open and is the era where the deduction does not \
+               exist.",
         sources: &[],
     },
     Connector {
@@ -583,23 +595,83 @@ pub const CONNECTORS: &[Connector] = &[
         key: "ohio-courts",
         publisher: "Supreme Court of Ohio",
         feeds: &["litigation"],
-        status: Status::Declared {
-            blocked_on: "opinions are PDFs, and trial-level rulings such as the 2025 EdChoice \
-                         decision are not in the supreme court archive at all",
-        },
-        note: "`citing_cases` is what would make the precedent chain traversable rather than \
-               hand-maintained.",
-        sources: &[],
+        status: Status::Wired,
+        note: "Wired for the four DeRolph opinions, which is what the corpus actually cites. The \
+               recorded blocker had two clauses and they are not equally true. \"Opinions are \
+               PDFs\" was never a blocker once `Format::Pdf` had a reader; all four retrieve. \
+               \"Trial-level rulings such as the 2025 EdChoice decision are not in the supreme \
+               court archive at all\" is correct and unfixable from here — a common pleas ruling \
+               is not in the supreme court's archive because it is not the supreme court's. That \
+               half stands, and so does `citing_cases`, which needs a citator rather than a \
+               document.",
+        sources: &[
+            Source {
+                key: "derolph-i",
+                url: "https://www.supremecourt.ohio.gov/rod/docs/pdf/0/1997/1997-ohio-84.pdf",
+                filename: "derolph-i.pdf",
+                format: Format::Pdf,
+                catalog: Some("derolph-litigation-record"),
+                fixture: Some(crate::fixtures::OPINIONS_FIXTURE),
+                note: "DeRolph I, 1997. The opinion the corpus's charge-off rate series is built from — paragraph 97 recites the whole progression with its session-law citations, and names the base as total taxable value.",
+            },
+            Source {
+                key: "derolph-ii",
+                url: "https://www.supremecourt.ohio.gov/rod/docs/pdf/0/2000/2000-ohio-437.pdf",
+                filename: "derolph-ii.pdf",
+                format: Format::Pdf,
+                catalog: Some("derolph-litigation-record"),
+                fixture: Some(crate::fixtures::OPINIONS_FIXTURE),
+                note: "DeRolph II, 2000.",
+            },
+            Source {
+                key: "derolph-iii",
+                url: "https://www.supremecourt.ohio.gov/rod/docs/pdf/0/2001/2001-ohio-1343.pdf",
+                filename: "derolph-iii.pdf",
+                format: Format::Pdf,
+                catalog: Some("derolph-litigation-record"),
+                fixture: Some(crate::fixtures::OPINIONS_FIXTURE),
+                note: "DeRolph III, 2001, at 93 Ohio St.3d 309. The WebCite is 2001-Ohio-1343; \
+                       this entry first carried 2001-Ohio-114, which is a workers' compensation \
+                       appeal. A citation guessed from a plausible number rather than read off \
+                       the document — the same failure this connector was wired to make \
+                       checkable, committed while wiring it, and caught by a test that reads what \
+                       the file actually says.",
+            },
+            Source {
+                key: "derolph-iv",
+                url: "https://www.supremecourt.ohio.gov/rod/docs/pdf/0/2002/2002-ohio-6750.pdf",
+                filename: "derolph-iv.pdf",
+                format: Format::Pdf,
+                catalog: Some("derolph-litigation-record"),
+                fixture: Some(crate::fixtures::OPINIONS_FIXTURE),
+                note: "DeRolph IV, 2002. The last word, and the one that ended judicial supervision without a remedy.",
+            },
+        ],
     },
     Connector {
         key: "ofcc-projects",
         publisher: "Ohio Facilities Construction Commission",
         feeds: &["program", "education-agency"],
         status: Status::Declared {
-            blocked_on: "project records are behind a search form with no bulk export",
+            blocked_on: "the site refuses a self-identifying agent — 404 to this project's \
+                         user-agent, 200 to a browser string — and its project data is rendered \
+                         by interactive maps rather than served as files",
         },
         note: "The only source for the capital channel, which is invisible in every operating \
-               per-pupil figure and was itself part of the DeRolph remedy.",
+               per-pupil figure and was itself part of the DeRolph remedy.\n\
+               \n\
+               **The blocker is now precise, and it is partly a choice.** `ofcc.ohio.gov` returns \
+               404 to this project's contactable user-agent and 200 to a browser string. The data \
+               is served; the agent is filtered. Sending a browser string would work, and \
+               [`cache`](../src/cache.rs) already states the position on that — impersonating one \
+               \"would be discourteous besides\". The filter is more likely an undiscriminating \
+               CDN default than a considered exclusion of researchers, but guessing at intent is \
+               not a reason to route around it.\n\
+               \n\
+               Behind the filter the project portfolios are interactive maps rather than files, \
+               so a bulk export would still have to be reverse-engineered out of a map service. \
+               The honest next step here is to ask the commission, not to change the agent \
+               string.",
         sources: &[],
     },
     Connector {

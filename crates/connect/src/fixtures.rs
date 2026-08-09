@@ -2793,3 +2793,6 @@ pub fn extract_school_funding(text: &str) -> Option<String> {
 
 /// Where the department's redbook extract is written, relative to the repository root.
 pub const REDBOOK_FIXTURE: &str = "crates/project/fixtures/dew-redbook.txt";
+
+/// Where the court opinion extract is written, relative to the repository root.
+pub const OPINIONS_FIXTURE: &str = "crates/regime-diff/fixtures/derolph-opinions.txt";
