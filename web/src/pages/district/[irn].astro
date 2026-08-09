@@ -29,6 +29,17 @@ export const getStaticPaths = districtPaths;
 const { district } = Astro.props;
 const { bundle, forecastable, valuations, expenditures } = loadFeed();
 
+/*
+ * The Senate seats this district lies in, derived from the seat rosters rather than carried
+ * per district. The feed already lists every seat's members, so a second per-district array would
+ * be the same information twice — and the House one only exists because the scenario builder's
+ * type excludes it and something had to be excluded.
+ */
+const senateSeats = bundle.senate_districts
+  .filter((seat) => seat.members.some((m) => m.irn === district.irn))
+  .map((seat) => seat.number)
+  .sort();
+
 const guaranteePP = district.realized_aid_per_pupil - district.formula_aid_per_pupil;
 const description = district.on_guarantee
   ? `${district.name} receives ${money(district.realized_aid_per_pupil)} per pupil in state aid, of which ${money(guaranteePP)} comes from the temporary transitional aid guarantee rather than the formula.`
@@ -43,6 +54,11 @@ const description = district.on_guarantee
         rather than counted: the reverse question — who represents these schools — is the one a
         reader arriving from a legislative page is asking, and 28 of Ohio's districts share a name
         so the seat number is often the clearer handle. */}
+    · {senateSeats.length === 1 ? "Senate" : "Senate"} {senateSeats.map((n, i) => (
+      <Fragment>
+        {i > 0 ? ", " : ""}<a href={routes.senateDistrict(n)}>{Number(n)}</a>
+      </Fragment>
+    ))}
     · House {district.house_districts.map((h, i) => (
       <Fragment>
         {i > 0 ? ", " : ""}<a href={routes.houseDistrict(h.number)}>{Number(h.number)}</a>

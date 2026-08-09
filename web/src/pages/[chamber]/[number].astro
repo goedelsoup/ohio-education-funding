@@ -1,6 +1,6 @@
 ---
 /**
- * One Ohio House district: the school districts in it, and the funding apportioned to it.
+ * One Ohio legislative seat: the school districts in it, and the funding apportioned to it.
  *
  * The members table carries two shares that answer opposite questions — how much of the school
  * district is here, and how much of here is that school district. Showing one without the other is
@@ -13,26 +13,34 @@ import * as routes from "../../lib/routes.ts";
 
 export async function getStaticPaths() {
   const { bundle } = loadFeed();
-  return bundle.house_districts.map((house) => ({
-    params: { number: house.number },
-    props: { house },
-  }));
+  return [
+    ...bundle.house_districts.map((house) => ({
+      params: { chamber: "house", number: house.number },
+      props: { house, chamber: "house" as const },
+    })),
+    ...bundle.senate_districts.map((house) => ({
+      params: { chamber: "senate", number: house.number },
+      props: { house, chamber: "senate" as const },
+    })),
+  ];
 }
 
-const { house } = Astro.props;
+const { house, chamber } = Astro.props;
 const { bundle } = loadFeed();
-const statewideAid = bundle.house_districts.reduce((a, h) => a + h.realized_aid, 0);
+const seats = chamber === "house" ? bundle.house_districts : bundle.senate_districts;
+const label = chamber === "house" ? "House" : "Senate";
+const statewideAid = seats.reduce((a, h) => a + h.realized_aid, 0);
 const number = Number(house.number);
 const partial = house.members.length - house.districts_wholly_inside;
 ---
 
 <Base
-  title={`House District ${number}`}
-  description={`Ohio House District ${number}: the ${house.members.length} school districts in it and an estimated ${money(house.realized_aid)} of state aid apportioned from census blocks.`}
-  section="house"
+  title={`${label} District ${number}`}
+  description={`Ohio ${label} District ${number}: the ${house.members.length} school districts in it and an estimated ${money(house.realized_aid)} of state aid apportioned from census blocks.`}
+  section={chamber}
   wide
 >
-  <h1>House District {number}</h1>
+  <h1>{label} District {number}</h1>
   <p class="sub">
     {count(house.members.length)} school district{house.members.length === 1 ? "" : "s"}
     {house.districts_wholly_inside > 0 ? `, ${count(house.districts_wholly_inside)} of them wholly inside` : ""}
@@ -40,8 +48,11 @@ const partial = house.members.length - house.districts_wholly_inside;
     {house.districts_on_guarantee > 0 ? ` · ${count(house.districts_on_guarantee)} on the guarantee` : ""}
   </p>
 
-  <p class="note"><a href="/house">All 99 House districts</a>. Every figure here is apportioned
-    from census blocks and is an estimate — see the note on that page.</p>
+  <p class="note"><a href={`/${chamber}`}>All {seats.length} {label} districts</a>. Every figure
+    here is apportioned from census blocks and is an estimate — see the note on that page.
+    {chamber === "senate"
+      ? " Senate seats are three times larger than House seats, so more of their schools lie wholly inside them and the estimate is correspondingly tighter."
+      : ""}</p>
 
   <div class="card" data-part="apportioned">
     <h2>Apportioned funding</h2>
@@ -92,7 +103,7 @@ const partial = house.members.length - house.districts_wholly_inside;
       district's pupils that school district provides.
       {partial > 0
         ? partial === house.members.length
-          ? ` Every district here also lies in other House districts, so all of these pupils and all of this money are counted here only in part.`
+          ? ` Every district here also lies in other ${label} districts, so all of these pupils and all of this money are counted here only in part.`
           : ` ${count(partial)} of these ${count(house.members.length)} districts also ${partial === 1 ? "lies" : "lie"} in other House districts, so ${partial === 1 ? "its" : "their"} pupils and money are counted here only in part.`
         : " Every district here lies wholly inside this House district, which is unusual."}
     </p>

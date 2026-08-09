@@ -40,6 +40,8 @@ const PAGES = new Set<string>([
   ...counties(bundle.districts).map((c) => routes.county(c.slug)),
   "/house",
   ...bundle.house_districts.map((h) => routes.houseDistrict(h.number)),
+  "/senate",
+  ...bundle.senate_districts.map((h) => routes.senateDistrict(h.number)),
   ...bundle.districts.flatMap((d) => [
     routes.district(d.irn),
     routes.districtOutcome(d.irn),

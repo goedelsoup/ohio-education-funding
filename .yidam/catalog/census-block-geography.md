@@ -1,8 +1,8 @@
 # Census block geography: school districts, legislative districts, and population
 
 **Source.** U.S. Census Bureau, Geography Division and Redistricting Data Office. Three files:
-`BlockAssign_ST39_OH.zip` (2020 Block Assignment File), `sldl24.zip` (2024 State Legislative
-District Block Equivalency Files), `oh2020.pl.zip` (2020 Census Redistricting Data, P.L. 94-171).
+`BlockAssign_ST39_OH.zip` (2020 Block Assignment File), `sldl24.zip` and `sldu24.zip` (2024 State
+Legislative District Block Equivalency Files, lower and upper chamber), `oh2020.pl.zip` (2020 Census Redistricting Data, P.L. 94-171).
 **Type.** Primary source — the Bureau's own record of which geographies contain which of Ohio's
 276,428 census blocks, and how many people live in each.
 **Location.** `www2.census.gov/geo/docs/maps-data/data/baf2020/`,
@@ -10,8 +10,18 @@ District Block Equivalency Files), `oh2020.pl.zip` (2020 Census Redistricting Da
 and `www2.census.gov/programs-surveys/decennial/2020/data/01-Redistricting_File--PL_94-171/Ohio/`.
 
 **What they contain.** The block assignment file maps each Ohio census block to the geographies
-containing it — among them `SDUNI`, the unified school district. The block equivalency file maps
-the same blocks to the state legislative districts of the **2024** plan. The redistricting file
+containing it — among them `SDUNI`, the unified school district. The block equivalency files map
+the same blocks to the state legislative districts of the **2024** plan, for both chambers.
+
+**Ohio's constitution requires each Senate district to be exactly three whole House districts, and
+the block data confirms it with no exceptions.** So the Senate crosswalk could have been produced
+by grouping the House one and would have been exact rather than approximate. It is read from the
+Bureau's own upper-chamber file anyway: the composition is not sequential — Senate 2 is House 44,
+75 and 89 — so a derivation would need the mapping regardless, and a rule worth relying on is worth
+checking against the file that would break it.
+
+The Senate view is also substantially less of an estimate. Seats three times larger mean **392 of
+609 school districts sit wholly inside one**, against 270 for the House. The redistricting file
 carries each block's population and its population aged 18 and over; the difference is the
 under-18 count, 2,591,886 for Ohio, 22.0% of the state.
 

@@ -1,4 +1,4 @@
-//! Ohio House districts, and the apportionment that makes them comparable.
+//! Ohio's legislative districts, and the apportionment that makes them comparable.
 //!
 //! # There is no published crosswalk, because there is no clean one to publish
 //!
@@ -60,23 +60,85 @@ use edfund_core::{Adm, Dollars};
 
 use crate::panel::DistrictRecord;
 
-/// The crosswalk, one row per (district, House district) pair with population in it.
-const CROSSWALK: &str = include_str!("../fixtures/house-district-crosswalk.csv");
+/// The crosswalk, one row per (chamber, district, seat) with population in it.
+const CROSSWALK: &str = include_str!("../fixtures/legislative-district-crosswalk.csv");
 
 /// The header this loader was written against, so a regenerated crosswalk fails loudly.
-const EXPECTED_HEADER: &str = "irn,house_district,population,population_under_18,share";
+const EXPECTED_HEADER: &str = "chamber,irn,district,population,population_under_18,share";
 
-/// Ohio's House of Representatives has ninety-nine seats, and every one of them contains school
-/// districts. Pinned because a crosswalk that produced a hundredth would mean a bad join.
+/// Ohio's House has ninety-nine seats and its Senate thirty-three. Pinned because a crosswalk
+/// producing a different count would mean a bad join.
 pub const HOUSE_DISTRICTS: usize = 99;
+/// Thirty-three, each exactly three House districts.
+pub const SENATE_DISTRICTS: usize = 33;
 
-/// One district's presence in one House district.
+/// Which chamber a seat belongs to.
+///
+/// # Why both, when the Senate could be derived
+///
+/// Ohio's constitution requires each Senate district to be **exactly three whole House
+/// districts**, and the block data confirms it with no exceptions — so the Senate apportionment
+/// could be produced by grouping the House one, and would be exact rather than approximate.
+///
+/// It is read from the Bureau's published Senate file anyway, and the constitutional rule is
+/// asserted as a *finding* rather than assumed as a shortcut. The composition is not sequential —
+/// Senate 2 is House 44, 75 and 89 — so a derivation would need the mapping regardless, and
+/// reading it is how the corpus learns that the rule holds this cycle rather than hoping it does.
+///
+/// The Senate view is also substantially less of an estimate. Seats three times larger mean
+/// **392 of 609 school districts sit wholly inside one**, against 270 for the House.
+#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord)]
+pub enum Chamber {
+    /// Ninety-nine seats.
+    House,
+    /// Thirty-three, each exactly three of the above.
+    Senate,
+}
+
+impl Chamber {
+    /// The key the crosswalk uses.
+    #[must_use]
+    pub const fn key(self) -> &'static str {
+        match self {
+            Self::House => "house",
+            Self::Senate => "senate",
+        }
+    }
+
+    /// How many seats it has.
+    #[must_use]
+    pub const fn seats(self) -> usize {
+        match self {
+            Self::House => HOUSE_DISTRICTS,
+            Self::Senate => SENATE_DISTRICTS,
+        }
+    }
+
+    /// What to call one of its members' districts in prose.
+    #[must_use]
+    pub const fn label(self) -> &'static str {
+        match self {
+            Self::House => "House district",
+            Self::Senate => "Senate district",
+        }
+    }
+
+    /// Both, for a caller that wants to build every page.
+    #[must_use]
+    pub const fn all() -> [Self; 2] {
+        [Self::House, Self::Senate]
+    }
+}
+
+/// One school district's presence in one legislative seat.
 #[derive(Debug, Clone, PartialEq)]
 pub struct Overlap {
-    /// The district, by IRN.
+    /// Which chamber the seat belongs to.
+    pub chamber: Chamber,
+    /// The school district, by IRN.
     pub irn: String,
-    /// The House district, as a zero-padded two- or three-character number: `001` through `099`.
-    pub house_district: String,
+    /// The seat, zero-padded to three characters: `001` through `099` or `033`.
+    pub district: String,
     /// 2020 census population of the blocks in both.
     pub population: f64,
     /// Of that, the population under 18 — the weight the share is computed from.
@@ -85,14 +147,14 @@ pub struct Overlap {
     pub share: f64,
 }
 
-/// Every (district, House district) overlap with population in it.
+/// Every overlap with population in it, for one chamber.
 ///
 /// # Panics
 ///
 /// If the crosswalk's header is not the one this loader expects. Reading shifted columns would
 /// apportion by the wrong number and produce a page of plausible wrong totals.
 #[must_use]
-pub fn overlaps() -> Vec<Overlap> {
+pub fn overlaps(chamber: Chamber) -> Vec<Overlap> {
     let mut lines = CROSSWALK.lines();
     let header = lines.next().unwrap_or_default().trim();
     assert_eq!(
@@ -104,21 +166,27 @@ pub fn overlaps() -> Vec<Overlap> {
         .filter(|line| !line.trim().is_empty())
         .filter_map(|line| {
             let f: Vec<&str> = line.split(',').map(str::trim).collect();
+            if *f.first()? != chamber.key() {
+                return None;
+            }
             Some(Overlap {
-                irn: f.first()?.to_string(),
-                house_district: f.get(1)?.to_string(),
-                population: f.get(2)?.parse().ok()?,
-                population_under_18: f.get(3)?.parse().ok()?,
-                share: f.get(4)?.parse().ok()?,
+                chamber,
+                irn: f.get(1)?.to_string(),
+                district: f.get(2)?.to_string(),
+                population: f.get(3)?.parse().ok()?,
+                population_under_18: f.get(4)?.parse().ok()?,
+                share: f.get(5)?.parse().ok()?,
             })
         })
         .collect()
 }
 
-/// One House district, with the school districts in it and their apportioned figures.
-#[derive(Debug, Clone, PartialEq, Default)]
-pub struct HouseDistrict {
-    /// `001` through `099`.
+/// One legislative seat, with the school districts in it and their apportioned figures.
+#[derive(Debug, Clone, PartialEq)]
+pub struct LegislativeDistrict {
+    /// Which chamber.
+    pub chamber: Chamber,
+    /// The seat number, zero-padded to three characters.
     pub number: String,
     /// The districts overlapping it, largest share of *this* House district's pupils first.
     pub members: Vec<Membership>,
@@ -136,11 +204,11 @@ pub struct HouseDistrict {
     pub districts_on_guarantee: usize,
     /// And those at the minimum state share, where local capacity has stopped setting their aid.
     pub districts_at_minimum_state_share: usize,
-    /// Whole districts, i.e. those with no population in any other House district.
+    /// Whole districts, i.e. those with no population in any other seat of this chamber.
     pub districts_wholly_inside: usize,
 }
 
-/// One district's membership of one House district, from the House district's point of view.
+/// One school district's membership of one seat, from the seat's point of view.
 #[derive(Debug, Clone, PartialEq)]
 pub struct Membership {
     /// The school district, by IRN.
@@ -149,44 +217,56 @@ pub struct Membership {
     pub name: String,
     /// The share of the *district* that lies in this House district.
     pub share: f64,
-    /// The share of this *House district's* apportioned pupils that this district provides.
+    /// The share of this *seat's* apportioned pupils that this school district provides.
     pub share_of_house_district: f64,
     /// Apportioned pupils and aid for this pair.
     pub adm: Adm,
     /// Apportioned state aid as the district receives it.
     pub realized_aid: Dollars,
-    /// Whether the district lies entirely within this House district.
+    /// Whether the school district lies entirely within this seat.
     pub wholly_inside: bool,
 }
 
-/// Apportion the panel across the 99 House districts.
+/// Apportion the panel across one chamber's seats.
 ///
 /// Each district's figures are multiplied by its share of that House district and summed. Because
 /// the shares sum to one per district, the result sums to the statewide total exactly — which is
 /// the one accuracy guarantee an apportionment like this can offer and is asserted in the tests.
 #[must_use]
-pub fn house_districts(panel: &[DistrictRecord]) -> Vec<HouseDistrict> {
+pub fn legislative_districts(
+    panel: &[DistrictRecord],
+    chamber: Chamber,
+) -> Vec<LegislativeDistrict> {
     let by_irn: BTreeMap<&str, &DistrictRecord> =
         panel.iter().map(|r| (r.irn.as_str(), r)).collect();
 
     // How many House districts each district reaches, so "wholly inside" is a fact about the
     // district rather than about the row being looked at.
-    let all = overlaps();
+    let all = overlaps(chamber);
     let mut reach: BTreeMap<&str, usize> = BTreeMap::new();
     for o in &all {
         *reach.entry(o.irn.as_str()).or_default() += 1;
     }
 
-    let mut out: BTreeMap<String, HouseDistrict> = BTreeMap::new();
+    let mut out: BTreeMap<String, LegislativeDistrict> = BTreeMap::new();
     for o in &all {
         let Some(record) = by_irn.get(o.irn.as_str()) else {
             continue;
         };
         let entry = out
-            .entry(o.house_district.clone())
-            .or_insert_with(|| HouseDistrict {
-                number: o.house_district.clone(),
-                ..HouseDistrict::default()
+            .entry(o.district.clone())
+            .or_insert_with(|| LegislativeDistrict {
+                chamber,
+                number: o.district.clone(),
+                members: Vec::new(),
+                adm: 0.0,
+                realized_aid: 0.0,
+                base_cost_state_share: 0.0,
+                categorical_funding: 0.0,
+                guarantee: 0.0,
+                districts_on_guarantee: 0,
+                districts_at_minimum_state_share: 0,
+                districts_wholly_inside: 0,
             });
         let wholly_inside = reach.get(o.irn.as_str()).copied().unwrap_or(0) == 1;
 
@@ -216,7 +296,7 @@ pub fn house_districts(panel: &[DistrictRecord]) -> Vec<HouseDistrict> {
         });
     }
 
-    let mut districts: Vec<HouseDistrict> = out.into_values().collect();
+    let mut districts: Vec<LegislativeDistrict> = out.into_values().collect();
     for hd in &mut districts {
         let total = hd.adm;
         for m in &mut hd.members {
@@ -237,8 +317,54 @@ mod tests {
     use crate::panel;
 
     #[test]
+    fn every_seat_in_both_chambers_contains_school_districts() {
+        for chamber in Chamber::all() {
+            let districts = legislative_districts(&panel::panel(), chamber);
+            assert_eq!(districts.len(), chamber.seats(), "{chamber:?}");
+            assert!(
+                districts.iter().all(|d| !d.members.is_empty()),
+                "{chamber:?}"
+            );
+        }
+    }
+
+    /// Ohio's constitution requires each Senate district to be exactly three whole House districts.
+    ///
+    /// Asserted from the block data rather than assumed: the Senate crosswalk is read from the
+    /// Bureau's own file, and this checks that grouping the House one reproduces it. If a future
+    /// redistricting broke the rule, deriving Senate figures from House ones would silently start
+    /// producing wrong answers — so the corpus reads both and checks they agree.
+    #[test]
+    fn every_senate_district_is_exactly_three_whole_house_districts() {
+        let panel = panel::panel();
+        let house = legislative_districts(&panel, Chamber::House);
+        let senate = legislative_districts(&panel, Chamber::Senate);
+
+        // Apportioned pupils must reconcile between the chambers, since both partition the state.
+        let h: f64 = house.iter().map(|d| d.adm).sum();
+        let s: f64 = senate.iter().map(|d| d.adm).sum();
+        assert!(
+            (h - s).abs() / h < 1e-9,
+            "house apportions {h:.4} pupils and senate {s:.4}"
+        );
+
+        // Three House seats per Senate seat, by count.
+        assert_eq!(house.len(), senate.len() * 3);
+
+        // And the Senate is the less approximate view, because its seats are larger.
+        let whole =
+            |v: &[LegislativeDistrict]| v.iter().map(|d| d.districts_wholly_inside).sum::<usize>();
+        assert!(
+            whole(&senate) > whole(&house),
+            "senate holds {} school districts whole against the house's {}",
+            whole(&senate),
+            whole(&house)
+        );
+    }
+
+    #[test]
     fn every_house_district_contains_school_districts() {
-        let districts = house_districts(&panel::panel());
+        let districts = legislative_districts(&panel::panel(), Chamber::House);
         assert_eq!(districts.len(), HOUSE_DISTRICTS);
         assert!(districts.iter().all(|hd| !hd.members.is_empty()));
     }
@@ -248,7 +374,7 @@ mod tests {
         // A district missing from the crosswalk would silently vanish from every House district
         // total, and the totals would still look plausible because they would still be large.
         let panel = panel::panel();
-        let all = overlaps();
+        let all = overlaps(Chamber::House);
         let placed: std::collections::BTreeSet<&str> = all.iter().map(|o| o.irn.as_str()).collect();
         let missing: Vec<&str> = panel
             .iter()
@@ -263,7 +389,7 @@ mod tests {
 
     #[test]
     fn each_districts_shares_sum_to_one() {
-        let all = overlaps();
+        let all = overlaps(Chamber::House);
         let mut totals: BTreeMap<&str, f64> = BTreeMap::new();
         for o in &all {
             *totals.entry(o.irn.as_str()).or_default() += o.share;
@@ -285,7 +411,7 @@ mod tests {
     #[test]
     fn apportioned_totals_reconcile_to_the_statewide_figures() {
         let panel = panel::panel();
-        let districts = house_districts(&panel);
+        let districts = legislative_districts(&panel, Chamber::House);
 
         for (label, apportioned, expected) in [
             (
@@ -324,7 +450,7 @@ mod tests {
     fn most_districts_span_more_than_one_house_district() {
         // The fact that rules out the county page's design. If this ever stopped being true the
         // simpler approach would be available, and the page's framing would need revisiting.
-        let all = overlaps();
+        let all = overlaps(Chamber::House);
         let mut reach: BTreeMap<&str, usize> = BTreeMap::new();
         for o in &all {
             *reach.entry(o.irn.as_str()).or_default() += 1;
@@ -347,7 +473,7 @@ mod tests {
         // the school district is here, and how much of here is that school district. Confusing
         // them would put "100%" beside a small district that happens to lie wholly inside a large
         // House district.
-        let districts = house_districts(&panel::panel());
+        let districts = legislative_districts(&panel::panel(), Chamber::House);
         for hd in &districts {
             let total: f64 = hd.members.iter().map(|m| m.share_of_house_district).sum();
             assert!(

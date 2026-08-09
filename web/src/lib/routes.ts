@@ -32,6 +32,10 @@ export const county = (slug: string): string => `/county/${slug}`;
  * make `/house/24` and `/house/024` two paths for one district on a static host.
  */
 export const houseDistrict = (number: string): string => `/house/${number}`;
+/** And the Senate, on the same shape. */
+export const senateDistrict = (number: string): string => `/senate/${number}`;
+/** Either chamber's index. */
+export const chamberIndex = (chamber: "house" | "senate"): string => `/${chamber}`;
 
 /** A corpus node, by its class and file stem. */
 export const wikiNode = (className: string, node: string): string =>

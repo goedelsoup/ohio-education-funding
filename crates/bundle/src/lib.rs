@@ -73,7 +73,7 @@ use edfund_core::Dollars;
 /// from FY2022-FY2024 to FY2024-FY2026 — the years the department's `ADM Data` sheet declares.
 /// The values did not change; what they are called did, which is exactly the kind of silent
 /// meaning change the version guard exists for.
-pub const CONTRACT_VERSION: &str = "23.0.0";
+pub const CONTRACT_VERSION: &str = "24.0.0";
 
 /// How close to the floor counts as being on it, in mills.
 ///
@@ -1216,6 +1216,11 @@ pub struct Bundle {
     pub national: Option<National>,
     /// Ohio's 99 House districts, with school funding apportioned across them.
     pub house_districts: Vec<HouseDistrict>,
+    /// And its 33 Senate districts, each exactly three House districts.
+    ///
+    /// A less approximate view than the House one: seats three times larger mean 392 of 609
+    /// school districts sit wholly inside a single Senate district, against 270 for the House.
+    pub senate_districts: Vec<HouseDistrict>,
     /// Per-district records.
     pub districts: Vec<District>,
 }
@@ -1617,52 +1622,57 @@ impl Bundle {
             }
         }
 
-        // The 99 House districts. Written before the district array because a reader scanning the
+        // The two chambers. Written before the district array because a reader scanning the
         // feed meets the derived aggregate before the exact per-district figures it came from, and
         // the block's own `basis` field is where the estimate is labelled as one.
-        s.push_str("  \"house_districts\": [\n");
-        for (i, h) in self.house_districts.iter().enumerate() {
-            s.push_str(&format!("    {{\"number\": \"{}\", ", escape(&h.number)));
-            for (key, value) in [
-                ("adm", h.adm),
-                ("realized_aid", h.realized_aid),
-                ("base_cost_state_share", h.base_cost_state_share),
-                ("categorical_funding", h.categorical_funding),
-                ("guarantee", h.guarantee),
-            ] {
-                s.push_str(&format!("\"{key}\": {}, ", num(value)));
-            }
-            s.push_str(&format!(
-                "\"districts_on_guarantee\": {}, \"districts_at_minimum_state_share\": {}, \
-                 \"districts_wholly_inside\": {}, \"members\": [",
-                h.districts_on_guarantee,
-                h.districts_at_minimum_state_share,
-                h.districts_wholly_inside
-            ));
-            for (k, m) in h.members.iter().enumerate() {
-                if k > 0 {
-                    s.push_str(", ");
+        for (key, seats) in [
+            ("house_districts", &self.house_districts),
+            ("senate_districts", &self.senate_districts),
+        ] {
+            s.push_str(&format!("  \"{key}\": [\n"));
+            for (i, h) in seats.iter().enumerate() {
+                s.push_str(&format!("    {{\"number\": \"{}\", ", escape(&h.number)));
+                for (key, value) in [
+                    ("adm", h.adm),
+                    ("realized_aid", h.realized_aid),
+                    ("base_cost_state_share", h.base_cost_state_share),
+                    ("categorical_funding", h.categorical_funding),
+                    ("guarantee", h.guarantee),
+                ] {
+                    s.push_str(&format!("\"{key}\": {}, ", num(value)));
                 }
                 s.push_str(&format!(
-                    "{{\"irn\": \"{}\", \"name\": \"{}\", \"share\": {}, \
+                    "\"districts_on_guarantee\": {}, \"districts_at_minimum_state_share\": {}, \
+                 \"districts_wholly_inside\": {}, \"members\": [",
+                    h.districts_on_guarantee,
+                    h.districts_at_minimum_state_share,
+                    h.districts_wholly_inside
+                ));
+                for (k, m) in h.members.iter().enumerate() {
+                    if k > 0 {
+                        s.push_str(", ");
+                    }
+                    s.push_str(&format!(
+                        "{{\"irn\": \"{}\", \"name\": \"{}\", \"share\": {}, \
                      \"share_of_house_district\": {}, \"adm\": {}, \"realized_aid\": {}, \
                      \"wholly_inside\": {}}}",
-                    escape(&m.irn),
-                    escape(&m.name),
-                    share(m.share),
-                    share(m.share_of_house_district),
-                    num(m.adm),
-                    num(m.realized_aid),
-                    m.wholly_inside
-                ));
+                        escape(&m.irn),
+                        escape(&m.name),
+                        share(m.share),
+                        share(m.share_of_house_district),
+                        num(m.adm),
+                        num(m.realized_aid),
+                        m.wholly_inside
+                    ));
+                }
+                s.push_str("]}");
+                if i + 1 < seats.len() {
+                    s.push(',');
+                }
+                s.push('\n');
             }
-            s.push_str("]}");
-            if i + 1 < self.house_districts.len() {
-                s.push(',');
-            }
-            s.push('\n');
+            s.push_str("  ],\n");
         }
-        s.push_str("  ],\n");
 
         s.push_str("  \"districts\": [\n");
 
@@ -2435,6 +2445,26 @@ mod tests {
 
     fn bundle(districts: Vec<District>, checkpoints: Vec<Checkpoint>) -> Bundle {
         Bundle {
+            senate_districts: vec![HouseDistrict {
+                number: "031".into(),
+                adm: 4_812.3,
+                realized_aid: 30_795_000.0,
+                base_cost_state_share: 18_300_000.0,
+                categorical_funding: 12_495_000.0,
+                guarantee: 0.0,
+                districts_on_guarantee: 1,
+                districts_at_minimum_state_share: 2,
+                districts_wholly_inside: 1,
+                members: vec![HouseDistrictMember {
+                    irn: "049056".into(),
+                    name: "Northern Local".into(),
+                    share: 1.0,
+                    share_of_house_district: 1.0,
+                    adm: 4_812.3,
+                    realized_aid: 30_795_000.0,
+                    wholly_inside: true,
+                }],
+            }],
             house_districts: vec![HouseDistrict {
                 number: "094".into(),
                 adm: 1_604.1,

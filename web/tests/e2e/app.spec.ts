@@ -1315,6 +1315,39 @@ test.describe("counties", () => {
   });
 });
 
+test.describe("senate districts", () => {
+  test("all thirty-three seats are listed and the page says it is the tighter view", async ({
+    page,
+  }) => {
+    /*
+     * Senate seats are three times larger than House seats, so 392 of 609 school districts lie
+     * wholly inside one against 270 for the House. Two pages built from one template are not
+     * equally reliable, and the page says which is which rather than leaving a reader to infer it.
+     */
+    await page.goto("/senate");
+    await expect(page.locator("h1")).toHaveText("Senate districts");
+    await expect(page.locator('a[href^="/senate/"]')).toHaveCount(33);
+    await expect(page.locator(".card").first()).toContainText("less approximate");
+  });
+
+  test("the two chambers apportion the same total", async ({ page }) => {
+    // Both partition the state, so the rows on each index must add to the same figure. If they
+    // did not, one of the two crosswalks would be losing districts.
+    const feed = await (await page.request.get("/data/bundle.json")).json();
+    const sum = (xs: { realized_aid: number }[]) => xs.reduce((a, x) => a + x.realized_aid, 0);
+    expect(Math.abs(sum(feed.house_districts) - sum(feed.senate_districts))).toBeLessThan(1);
+    expect(feed.senate_districts).toHaveLength(33);
+  });
+
+  test("a district page links both chambers", async ({ page }) => {
+    // Columbus spans eleven House seats and four Senate seats.
+    await page.goto("/district/043802");
+    const sub = page.locator("p.sub").first();
+    await expect(sub.locator('a[href^="/house/"]')).toHaveCount(11);
+    await expect(sub.locator('a[href^="/senate/"]')).toHaveCount(4);
+  });
+});
+
 test.describe("house districts", () => {
   test("the index says plainly that its figures are estimates", async ({ page }) => {
     /*
@@ -1369,7 +1402,7 @@ test.describe("house districts", () => {
     expect(rows).toHaveLength(99);
     const summed = rows.reduce((a, b) => a + b, 0);
     const stated = await page.locator(".card").first().textContent();
-    const match = stated?.match(/these 99 rows add\s+to \$([\d,]+)/);
+    const match = stated?.match(/these\s+99\s+rows\s+add\s+to\s+\$([\d,]+)/);
     expect(match, "the index states the statewide total").not.toBeNull();
     const declared = Number(match![1]!.replace(/,/g, ""));
     // Each row is rendered to the dollar, so ninety-nine roundings can drift by that much.

@@ -22,7 +22,7 @@ use dispersion::{partial_correlation, wealth_neutrality};
 use edfund_core::{AgencyType, FiscalYear};
 use foundation::{aggregate_base_cost, StatewideFactors};
 use project::finances::{finances, for_district, Finances};
-use project::house_district::{house_districts, overlaps};
+use project::legislative_district::{legislative_districts, overlaps, Chamber};
 use project::outcomes::{joined, Joined};
 use project::panel::{panel, DistrictRecord, HISTORY_YEARS, MINIMUM_STATE_SHARE, MODEL_YEAR};
 use project::policy::{GuaranteeRule, Policy};
@@ -384,8 +384,11 @@ fn outcome_statewide(records: &[Joined]) -> Option<OutcomeStatewide> {
 ///
 /// `project::house_district` does the arithmetic and the verification; this only restates it for
 /// the feed, so that the reconciliation test lives beside the apportionment rather than here.
-fn house_district_block(records: &[DistrictRecord]) -> Vec<bundle::HouseDistrict> {
-    house_districts(records)
+fn house_district_block(
+    records: &[DistrictRecord],
+    chamber: Chamber,
+) -> Vec<bundle::HouseDistrict> {
+    legislative_districts(records, chamber)
         .into_iter()
         .map(|h| bundle::HouseDistrict {
             number: h.number,
@@ -921,12 +924,12 @@ fn main() {
     // Which House districts each district lies in, keyed by IRN. Built once: the crosswalk is a
     // 1,085-row fixture and reading it per district would parse it 609 times.
     let mut shares: HashMap<String, Vec<HouseDistrictShare>> = HashMap::new();
-    for overlap in overlaps() {
+    for overlap in overlaps(Chamber::House) {
         shares
             .entry(overlap.irn.clone())
             .or_default()
             .push(HouseDistrictShare {
-                number: overlap.house_district.clone(),
+                number: overlap.district.clone(),
                 share: overlap.share,
             });
     }
@@ -1120,7 +1123,8 @@ fn main() {
 
     let bundle = Bundle {
         national: national(),
-        house_districts: house_district_block(&records),
+        house_districts: house_district_block(&records, Chamber::House),
+        senate_districts: house_district_block(&records, Chamber::Senate),
         contract_version: CONTRACT_VERSION.to_string(),
         provenance: "Ohio DEW FY27 TRAD State Foundation Funding Calculator (a projection, not \
                      an actual) joined with the FY2024 District Profile Report. Base cost, \

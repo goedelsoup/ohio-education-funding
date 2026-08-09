@@ -435,7 +435,7 @@ pub const CONNECTORS: &[Connector] = &[
             filename: "ccd-lea-directory-2223.zip",
             format: Format::Zip,
             catalog: Some("nces-ccd-lea-directory"),
-            fixture: Some("crates/project/fixtures/house-district-crosswalk.csv"),
+            fixture: Some("crates/project/fixtures/legislative-district-crosswalk.csv"),
             note: "`ST_LEAID` is the Ohio IRN behind an `OH-` prefix, and `LEAID` is the NCES \
                    agency identifier whose last five digits are the Census school district code. \
                    All 609 districts in the funding panel join through it. This is the \
@@ -462,7 +462,7 @@ pub const CONNECTORS: &[Connector] = &[
                 filename: "BlockAssign_ST39_OH.zip",
                 format: Format::Zip,
                 catalog: Some("census-block-geography"),
-                fixture: Some("crates/project/fixtures/house-district-crosswalk.csv"),
+                fixture: Some("crates/project/fixtures/legislative-district-crosswalk.csv"),
                 note: "`SDUNI` gives the unified school district for each of Ohio's 276,428 \
                        census blocks. The archive also carries an `SLDL` file and it is the \
                        WRONG one to use: it is the 2020-cycle map, and 66.3% of Ohio's blocks \
@@ -476,12 +476,27 @@ pub const CONNECTORS: &[Connector] = &[
                 filename: "sldl24.zip",
                 format: Format::Zip,
                 catalog: Some("census-block-geography"),
-                fixture: Some("crates/project/fixtures/house-district-crosswalk.csv"),
+                fixture: Some("crates/project/fixtures/legislative-district-crosswalk.csv"),
                 note: "The 2024 lower-chamber map, which is the one now in use. Ohio is one of \
                        eight states with changes to both chambers in that cycle. Pinned to a \
                        vintage: when Ohio redistricts again this file changes and the crosswalk \
                        must be regenerated, which no header assertion will catch because the \
                        header will not change.",
+            },
+            Source {
+                key: "sldu24-bef",
+                url: "https://www2.census.gov/programs-surveys/decennial/rdo/mapping-files/2025/\
+                      2024-state-legislative-bef/sldu24.zip",
+                filename: "sldu24.zip",
+                format: Format::Zip,
+                catalog: Some("census-block-geography"),
+                fixture: Some("crates/project/fixtures/legislative-district-crosswalk.csv"),
+                note: "The 2024 upper-chamber map. Ohio's constitution requires each Senate \
+                       district to be exactly three whole House districts, and the block data \
+                       confirms it with no exceptions — so this could have been derived from \
+                       `sldl24-bef` by grouping. It is read instead, because the composition is \
+                       not sequential (Senate 2 is House 44, 75 and 89) and because a rule worth \
+                       relying on is worth checking against the file that would break it.",
             },
             Source {
                 key: "pl94-171-2020-oh",
@@ -490,7 +505,7 @@ pub const CONNECTORS: &[Connector] = &[
                 filename: "oh2020.pl.zip",
                 format: Format::Zip,
                 catalog: Some("census-block-geography"),
-                fixture: Some("crates/project/fixtures/house-district-crosswalk.csv"),
+                fixture: Some("crates/project/fixtures/legislative-district-crosswalk.csv"),
                 note: "Block population, and population 18 and over. The difference is the \
                        apportionment weight: 2,591,886 Ohioans under 18, 22.0% of the state. \
                        Total population would weight a seat full of retirees like one full of \

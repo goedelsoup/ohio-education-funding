@@ -895,6 +895,8 @@ export const BundleSchema = z
     /** Where Ohio sits among the states. `null` if the Census fixture is absent. */
     national: NationalSchema.nullable(),
     house_districts: z.array(HouseDistrictSchema),
+    /** The same for the Senate: 33 seats, each exactly three House districts. */
+    senate_districts: z.array(HouseDistrictSchema),
     districts: z.array(DistrictSchema).min(1),
   })
   .strict();

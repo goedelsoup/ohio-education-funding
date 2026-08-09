@@ -1,0 +1,102 @@
+---
+/**
+ * One chamber's seats, with school funding apportioned across them.
+ *
+ * Two pages from one template — `/house` and `/senate` — because the mechanics are identical and
+ * only the seat count and the degree of approximation differ. Senate seats are three times larger,
+ * so 392 of 609 school districts sit wholly inside one against 270 for the House, which makes the
+ * Senate view materially less of an estimate. The page says so rather than leaving a reader to
+ * infer that two pages built the same way are equally reliable.
+ */
+import Base from "../layouts/Base.astro";
+import { loadFeed } from "../lib/feed.ts";
+import { count, money, pct } from "../lib/format.ts";
+import * as routes from "../lib/routes.ts";
+
+export function getStaticPaths() {
+  return [{ params: { chamber: "house" } }, { params: { chamber: "senate" } }];
+}
+
+const chamber = Astro.params.chamber as "house" | "senate";
+const { bundle } = loadFeed();
+const seats = chamber === "house" ? bundle.house_districts : bundle.senate_districts;
+const label = chamber === "house" ? "House" : "Senate";
+const other = chamber === "house" ? "senate" : "house";
+
+const ranked = [...seats].sort((a, b) => b.realized_aid - a.realized_aid);
+const total = ranked.reduce((a, h) => a + h.realized_aid, 0);
+const whole = seats.reduce((a, h) => a + h.districts_wholly_inside, 0);
+const houseWhole = bundle.house_districts.reduce((a, h) => a + h.districts_wholly_inside, 0);
+const senateWhole = bundle.senate_districts.reduce((a, h) => a + h.districts_wholly_inside, 0);
+---
+
+<Base
+  title={`${label} districts`}
+  description={`Ohio's ${seats.length} ${label} districts, with school funding apportioned across them from census blocks — an estimate, since no legislative district is a unit of account in Ohio's funding system.`}
+  section={chamber}
+  wide
+>
+  <h1>{label} districts</h1>
+  <p class="sub">
+    Ohio's {count(seats.length)} {label} districts, ordered by the state aid flowing through the
+    schools in each. {count(whole)} of {count(bundle.districts.length)} school districts lie wholly
+    inside one; the rest straddle a boundary. <a href={routes.chamberIndex(other)}>
+      {other === "house" ? "House" : "Senate"} districts</a> are the other view.
+  </p>
+
+  <div class="card">
+    <h2>These figures are estimates, and nobody publishes them</h2>
+    <p class="note">
+      The department computes funding <strong>per school district</strong> and stops. No
+      legislative district is a unit of account anywhere in Ohio's funding system, and most school
+      districts cross seat boundaries — so every figure on these pages is <em>derived</em>, by
+      splitting each school district across the seats it overlaps in proportion to
+      <strong>under-18 population from the 2020 census</strong>.
+    </p>
+    <p class="note">
+      One thing about them is exact: each school district's shares sum to one, so these {
+        count(seats.length)
+      } rows add to {money(total)}, the statewide total, to the cent.
+      {chamber === "senate"
+        ? `And the Senate view is the less approximate of the two: its seats are three times larger,
+           so ${senateWhole} school districts sit wholly inside one against ${houseWhole} for the
+           House.`
+        : `The Senate view is less approximate — ${senateWhole} school districts sit wholly inside a
+           Senate seat against ${houseWhole} here — because its seats are three times larger.`}
+    </p>
+    <p class="note">
+      Two caveats worth carrying. Under-18 population is a proxy for pupils — it counts children in
+      community schools, private schools and none. And it is a 2020 count applied to a
+      FY{bundle.fiscal_year} model, so a seat that has grown or emptied since the census is
+      weighted as it was.
+    </p>
+  </div>
+
+  <div class="card">
+    <div class="scroll"><table>
+      <thead><tr>
+        <th>District</th><th class="tnum">State aid</th><th class="tnum">Share of Ohio</th>
+        <th class="tnum">Pupils</th><th class="tnum">Guarantee</th>
+        <th class="tnum">Schools</th><th class="tnum">Whole</th>
+      </tr></thead>
+      <tbody>
+        {ranked.map((h) => (
+          <tr>
+            <th><a href={`/${chamber}/${h.number}`}>{label} {Number(h.number)}</a></th>
+            <td class="tnum">{money(h.realized_aid)}</td>
+            <td class="tnum n">{pct(h.realized_aid / total, 2)}</td>
+            <td class="tnum">{count(Math.round(h.adm))}</td>
+            <td class="tnum">{h.guarantee <= 0 ? "—" : money(h.guarantee)}</td>
+            <td class="tnum">{count(h.members.length)}</td>
+            <td class="tnum n">{count(h.districts_wholly_inside)}</td>
+          </tr>
+        ))}
+      </tbody>
+    </table></div>
+    <p class="note">
+      "Schools" counts the school districts with population in the seat, including slivers; "whole"
+      counts those lying entirely inside it. A seat where the two are equal contains its schools
+      completely, and a member there speaks for every pupil in them.
+    </p>
+  </div>
+</Base>

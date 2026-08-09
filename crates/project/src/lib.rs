@@ -50,7 +50,7 @@
 
 pub mod crosswalk;
 pub mod finances;
-pub mod house_district;
+pub mod legislative_district;
 pub mod outcomes;
 pub mod panel;
 pub mod policy;
