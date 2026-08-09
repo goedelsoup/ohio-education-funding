@@ -21,7 +21,16 @@
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum Status {
     /// Retrieved, parsed, and feeding a fixture that a test in this workspace reads.
-    Wired,
+    Wired {
+        /// What the connector still cannot reach, when it is wired for only part of what its
+        /// `feeds` claim.
+        ///
+        /// `None` is the ordinary case. `Some` exists because a connector can be genuinely wired
+        /// and genuinely incomplete at once — `ohio-courts` retrieves the four DeRolph opinions
+        /// and cannot retrieve a common pleas ruling, and a bare `Wired` would leave that second
+        /// half recorded only in prose that no test reads.
+        still_blocked: Option<&'static str>,
+    },
     /// Retrieved and parsed, but nothing downstream consumes it yet.
     Parsed,
     /// A URL is known and the bytes can be fetched; no parser exists.
@@ -38,7 +47,7 @@ impl Status {
     #[must_use]
     pub const fn label(self) -> &'static str {
         match self {
-            Self::Wired => "wired",
+            Self::Wired { .. } => "wired",
             Self::Parsed => "parsed",
             Self::Retrievable => "retrievable",
             Self::Declared { .. } => "declared",
@@ -48,7 +57,13 @@ impl Status {
     /// Whether the connector can produce structured records rather than only bytes.
     #[must_use]
     pub const fn has_parser(self) -> bool {
-        matches!(self, Self::Wired | Self::Parsed)
+        matches!(self, Self::Wired { .. } | Self::Parsed)
+    }
+
+    /// Whether the connector feeds a fixture, whatever else it still cannot reach.
+    #[must_use]
+    pub const fn is_wired(self) -> bool {
+        matches!(self, Self::Wired { .. })
     }
 }
 
@@ -267,7 +282,9 @@ pub const CONNECTORS: &[Connector] = &[
         key: "dew-foundation",
         publisher: "Ohio Department of Education and Workforce",
         feeds: &["education-agency", "revenue-stream", "metric", "program"],
-        status: Status::Wired,
+        status: Status::Wired {
+            still_blocked: None,
+        },
         note: "The spine of the numeric corpus: nearly every per-agency state aid figure \
                originates here.",
         sources: &[
@@ -313,7 +330,9 @@ pub const CONNECTORS: &[Connector] = &[
         key: "dew-report-card",
         publisher: "Ohio Department of Education and Workforce",
         feeds: &["metric", "education-agency"],
-        status: Status::Wired,
+        status: Status::Wired {
+            still_blocked: None,
+        },
         note: "The only publisher of an Ohio district outcome measure, and — in the Expanded \
                List — of one expenditure numerator against two different pupil denominators.",
         sources: &[
@@ -392,7 +411,9 @@ pub const CONNECTORS: &[Connector] = &[
         key: "bls-cpi",
         publisher: "U.S. Bureau of Labor Statistics",
         feeds: &["metric", "fiscal-period"],
-        status: Status::Wired,
+        status: Status::Wired {
+            still_blocked: None,
+        },
         note: "The smallest connector and the one without which nothing else here is honest: \
                H.B. 920 is only visible as a decline once a series is deflated.",
         sources: &[Source {
@@ -410,7 +431,9 @@ pub const CONNECTORS: &[Connector] = &[
         key: "dew-five-year-forecast",
         publisher: "Ohio Department of Education and Workforce",
         feeds: &["education-agency", "revenue-stream", "metric", "fiscal-period"],
-        status: Status::Wired,
+        status: Status::Wired {
+            still_blocked: None,
+        },
         note: "The only per-district record here of money that changed hands rather than money \
                a formula computed — and the only one carrying what a district holds.",
         sources: &[
@@ -444,7 +467,9 @@ pub const CONNECTORS: &[Connector] = &[
         key: "tax-abstract",
         publisher: "Ohio Department of Taxation",
         feeds: &["revenue-stream", "parameter", "metric"],
-        status: Status::Wired,
+        status: Status::Wired {
+            still_blocked: None,
+        },
         note: "Without this the local half of Ohio school funding is invisible, and the local \
                half is where the disparities live.",
         sources: &[
@@ -535,7 +560,9 @@ pub const CONNECTORS: &[Connector] = &[
         key: "lsc-budget",
         publisher: "Ohio Legislative Service Commission",
         feeds: &["legislation", "fiscal-period", "program", "parameter"],
-        status: Status::Wired,
+        status: Status::Wired {
+            still_blocked: None,
+        },
         note: "The only continuous appropriation-line series across the whole period, and the \
                primary source for the pre-2000 record. Wired for **one document**: the final \
                analysis of the current budget act, which is where every provision the Revised \
@@ -581,7 +608,9 @@ pub const CONNECTORS: &[Connector] = &[
         key: "ohio-laws",
         publisher: "Ohio General Assembly",
         feeds: &["legislation", "parameter", "formula-component"],
-        status: Status::Wired,
+        status: Status::Wired {
+            still_blocked: None,
+        },
         note: "Most `statutory_basis` fields in the corpus were `[open]` and waiting on exactly \
                this. The recorded blocker — \"serves HTML with no bulk export\" — was a statement \
                about the absence of a convenience, and was read as one about the absence of the \
@@ -595,15 +624,17 @@ pub const CONNECTORS: &[Connector] = &[
         key: "ohio-courts",
         publisher: "Supreme Court of Ohio",
         feeds: &["litigation"],
-        status: Status::Wired,
+        status: Status::Wired {
+            still_blocked: Some(
+                "trial-level rulings such as the 2025 EdChoice decision are not in the supreme \
+                 court archive at all, and `citing_cases` needs a citator rather than a document",
+            ),
+        },
         note: "Wired for the four DeRolph opinions, which is what the corpus actually cites. The \
-               recorded blocker had two clauses and they are not equally true. \"Opinions are \
-               PDFs\" was never a blocker once `Format::Pdf` had a reader; all four retrieve. \
-               \"Trial-level rulings such as the 2025 EdChoice decision are not in the supreme \
-               court archive at all\" is correct and unfixable from here — a common pleas ruling \
-               is not in the supreme court's archive because it is not the supreme court's. That \
-               half stands, and so does `citing_cases`, which needs a citator rather than a \
-               document.",
+               recorded blocker had two clauses and they are not equally true: \"opinions are \
+               PDFs\" stopped being one the moment `Format::Pdf` had a reader, and the other half \
+               is unfixable from here and is now carried in `still_blocked` rather than in this \
+               sentence.",
         sources: &[
             Source {
                 key: "derolph-i",
@@ -678,7 +709,9 @@ pub const CONNECTORS: &[Connector] = &[
         key: "census-f33",
         publisher: "U.S. Census Bureau",
         feeds: &["metric", "education-agency"],
-        status: Status::Wired,
+        status: Status::Wired {
+            still_blocked: None,
+        },
         note: "Comparability in two directions: whether Ohio is unusual, and an independent \
                check on department figures computed on different definitions. The first is \
                wired and settles the DeRolph claim comparatively; the second needs the \
@@ -718,7 +751,9 @@ pub const CONNECTORS: &[Connector] = &[
         key: "nces-ccd",
         publisher: "National Center for Education Statistics",
         feeds: &["education-agency"],
-        status: Status::Wired,
+        status: Status::Wired {
+            still_blocked: None,
+        },
         note: "A corpus spanning 1851 to the present is a panel whose members change, and a \
                long series assembled without accounting for consolidation is silently wrong. \
                That series is still not built: agency files are per-year zips whose column sets \
@@ -744,7 +779,9 @@ pub const CONNECTORS: &[Connector] = &[
         key: "census-geography",
         publisher: "U.S. Census Bureau",
         feeds: &["education-agency", "actor"],
-        status: Status::Wired,
+        status: Status::Wired {
+            still_blocked: None,
+        },
         note: "Ohio's funding system has no legislative district in it, so the mapping from \
                school districts to House districts does not exist and has to be built from \
                census blocks. 339 of 609 districts straddle two or more seats, which is why it \
@@ -906,15 +943,25 @@ mod tests {
     }
 
     #[test]
-    fn a_declared_connector_says_what_blocks_it() {
+    fn a_connector_that_is_blocked_says_what_blocks_it() {
+        // Both halves of the claim, not just the declared one. A connector wired for part of what
+        // it feeds records the rest in `still_blocked`, and that string is held to the same
+        // standard as a declared connector's — the whole point of the field is that a surviving
+        // blocker stays machine-readable instead of decaying into prose.
         for connector in CONNECTORS {
-            if let Status::Declared { blocked_on } = connector.status {
-                assert!(
-                    blocked_on.len() > 20,
-                    "{} is declared without a reason",
-                    connector.key
-                );
-            }
+            let (kind, reason) = match connector.status {
+                Status::Declared { blocked_on } => ("declared", Some(blocked_on)),
+                Status::Wired { still_blocked } => ("wired", still_blocked),
+                _ => continue,
+            };
+            let Some(reason) = reason else {
+                continue;
+            };
+            assert!(
+                reason.len() > 20,
+                "{} is {kind} without a reason",
+                connector.key
+            );
         }
     }
 
@@ -966,7 +1013,7 @@ mod tests {
     #[test]
     fn a_wired_connector_feeds_at_least_one_fixture() {
         for connector in CONNECTORS {
-            if connector.status == Status::Wired {
+            if connector.status.is_wired() {
                 assert!(
                     connector.sources.iter().any(|s| s.fixture.is_some()),
                     "{} claims wired but feeds nothing",

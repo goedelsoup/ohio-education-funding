@@ -104,8 +104,14 @@ fn list() -> Result<(), String> {
                 source.key, source.format, source.filename
             );
         }
-        if let Status::Declared { blocked_on } = connector.status {
-            println!("    blocked on: {blocked_on}");
+        match connector.status {
+            Status::Declared { blocked_on } => println!("    blocked on: {blocked_on}"),
+            // A connector can feed a fixture and still not reach everything its feeds claim.
+            // Printing only the declared case would let `wired` overstate what is served.
+            Status::Wired {
+                still_blocked: Some(reason),
+            } => println!("    still blocked on: {reason}"),
+            _ => {}
         }
     }
     Ok(())

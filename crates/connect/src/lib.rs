@@ -535,7 +535,7 @@ mod tests {
         let manifest = std::fs::read_to_string(root.join(cache::MANIFEST)).unwrap_or_default();
         let pinned = cache::parse_manifest(&manifest);
         for connector in CONNECTORS {
-            if connector.status != Status::Wired {
+            if !connector.status.is_wired() {
                 continue;
             }
             for source in connector.sources {
