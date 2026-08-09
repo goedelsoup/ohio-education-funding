@@ -45,8 +45,35 @@ description: |
   exactly one district in 609. What the department's ED count is counting there is [open].
 
   **WHAT THE STATEWIDE SHARE IS.** `d3` divides by 0.533380310606710 — the statewide economically
-  disadvantaged percentage. That figure is a single number setting the whole scale, and whether it
-  is recomputed each biennium or carried forward is not established. [open]
+  disadvantaged percentage. R.C. 3317.02(I)(1)(a)(i) defines it as a **computation, not a
+  constant**: the statewide ADM it divides by is the sum of enrolled ADM for all city, local and
+  exempted village districts, statewide community school enrolment, and statewide STEM school
+  enrolment. So it is recomputed rather than carried forward, and its value moves when any of
+  those three move. [verified — `ohio-laws`] How far it has moved between biennia is still
+  unrecorded here, because the corpus holds one year of the calculator. [open]
+
+  **AND THE CITATION ON THIS NODE WAS WRONG.** It cited R.C. 3317.029. **There is no such
+  section.** Disadvantaged pupil impact aid is R.C. 3317.022(A)(4), inside the section that
+  assembles core foundation funding, and the $422 per pupil is statutory there. [verified]
+
+  **THE SQUARING IS IN STATUTE AFTER ALL.** This node recorded that it "is visible in the
+  workbook's own formula and has not been located in statute here." It is at R.C.
+  3317.02(I)(1)(a), which defines the index as **the square of the quotient** of the district's
+  percentage over the statewide one. Not a departmental elaboration — the General Assembly's own
+  construction. [verified]
+
+  **BUT THE 65/35 BLEND IS NOT IN THE LAW AT ALL.** Neither R.C. 3317.022 nor R.C. 3317.03
+  contains the phrase "directly certified", and neither states a blend. R.C. 3317.03(B)(21) makes
+  the count one of students "economically disadvantaged, **as defined by the department**", with a
+  single constraint on the delegation: "A student shall not be categorically excluded from the
+  number reported under division (B)(21) of this section based on anything other than family
+  income."
+
+  So this component mixes two very different kinds of parameter and the node should not present
+  them alike. The $422, the squaring and the statewide denominator are legislated. **The 65/35
+  weights are a departmental choice inside a delegation**, changeable without a bill, and the only
+  legislative check on them is a floor on breadth rather than a formula. [verified —
+  `crates/project/tests/the_statute_behind_the_weights.rs`]
 
   **THE POVERTY MEASURE IS TOP-CODED AND THIS COMPONENT IS NOT.** The report card's economically
   disadvantaged share saturates at 100% under community eligibility, which is why 100 districts
@@ -65,9 +92,14 @@ properties:
     Aid = d1 x $422 x d3, in effect: the department publishes the total, and the per-pupil amount
     of $422 against the weighted count scaled by the index reproduces it.
   statutory_basis: |
-    R.C. 3317.029. The blend weights, the per-pupil amount and the statewide share are transcribed
-    from the FY2027 calculator; the squaring is visible in the workbook's own formula and has not
-    been located in statute here. [open]
+    R.C. 3317.022(A)(4) for the programme and the $422; R.C. 3317.02(I)(1) for the index and its
+    squaring; R.C. 3317.03(B)(21) for the count. This node previously cited R.C. 3317.029, which
+    does not exist. [verified — `ohio-laws`]
+
+    The 65/35 blend of economically disadvantaged and directly certified ADM appears in **no**
+    section: it is the department exercising the delegation in R.C. 3317.03(B)(21) to define who
+    is economically disadvantaged. Recorded as departmental rather than statutory, which is a
+    different durability from the rest of the component.
   calculator: |
     Not a standalone crate. Reproduced for all 609 districts in
     `crates/project/tests/finances_and_the_guarantee.rs`; carried in `crates/project::panel::Dpia`.

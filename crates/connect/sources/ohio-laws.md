@@ -30,12 +30,24 @@ walking the amendment history of a section rather than reading any single bill.
 
 ## Status
 
-**Declared.** Approved in [decisions/proposals.yml](../../../.yidam/decisions/proposals.yml);
-no endpoint wired.
+**Wired**, for the current text of fourteen named sections. See
+[`catalog/ohio-revised-code`](../../../.yidam/catalog/ohio-revised-code.md) and
+[`decisions/reading-the-statute`](../../../.yidam/decisions/reading-the-statute.yml).
 
-`codes.ohio.gov` serves HTML with no bulk export, and section history is rendered rather than
-published as data. This is the connector whose absence is most visible in the corpus itself:
-most `statutory_basis` fields on
-[`parameter`](../../../.yidam/corpus/parameter/) and
-[`formula-component`](../../../.yidam/corpus/formula-component/) nodes are still `[open]`, and
-they are waiting on exactly this.
+The recorded blocker was: "`codes.ohio.gov` serves HTML with no bulk export, and section history
+is rendered rather than published as data." **Both clauses are true and the first was read as
+though it meant the text was unreachable.** It is server-rendered — `curl` returns the operative
+text in the response body — and `connect::html` turns it into prose. The absence of a bulk export
+means the sections are named in the registry rather than crawled, which is a better fit anyway:
+the list is exactly what some node's `statutory_basis` points at.
+
+The second clause still stands, and it is the reason the interface above is only partly built.
+`fetch_sections` and `code_history` need the version archive, which the site renders per version
+and does not publish as data; the archive also begins at 1 July 2014, so it could not carry the
+charge-off era even if it were machine-readable. What is wired is the current text and its
+effective date, which is what a `statutory_basis` field needs and is not what a parameter *series*
+needs.
+
+`fetch_bill` and `fetch_vetoes` remain unbuilt. Veto messages in particular are still a real gap:
+an enrolled bill is not what became law where a provision was vetoed, and education provisions
+have been vetoed repeatedly.

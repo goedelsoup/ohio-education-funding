@@ -313,13 +313,22 @@ fn the_dpia_blend_is_capped_at_a_districts_own_enrolment() {
 /// distribution has its median at 0.0008. So for a quarter of the state the floor binds exactly
 /// and nothing rides on top of it.
 ///
-/// # What this does not settle, stated rather than glossed
+/// # A correction: "disconfirmed as a general rule" was too strong
 ///
-/// 68 districts sit between 20.005 and 20.5 mills. Those are consistent with fixed-sum levies on
-/// top *and* with districts genuinely a little above the floor that the factors have not finished
-/// reducing. Separating the two needs levy-type data — which levies are emergency, which are
-/// fixed-sum — and neither Table SD-1 nor the profile report carries it. So the candidate is
-/// disconfirmed as a general rule and remains open for those 68.
+/// This test originally concluded from the 155 exact landings that the candidate was disconfirmed
+/// as a general rule. Reading R.C. 319.301 the same day showed the exclusion is explicit law:
+/// division (A)(1) says the reductions "do not apply to ... taxes levied at whatever rate is
+/// required to produce a specified amount of tax money, including a tax levied under section
+/// 5705.199" — the emergency levy section. See `the_statute_behind_the_weights.rs`.
+///
+/// What this data shows is narrower than what was concluded from it. The exclusion does not
+/// explain the 155 districts sitting exactly on the floor, because those districts evidently carry
+/// no fixed-sum levies in their Class I current-expense rate. It remains the natural explanation
+/// for the 68 between 20.005 and 20.5, and attributing specific districts still needs levy-type
+/// data that neither Table SD-1 nor the profile report carries.
+///
+/// The mistake worth naming: an absence of an effect in one group is not an absence of the
+/// mechanism.
 #[test]
 fn the_floor_binds_exactly_for_a_quarter_of_the_state() {
     let mut lines = SD1.lines();

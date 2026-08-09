@@ -2638,3 +2638,114 @@ pub fn build_f33_states(rows: &[Vec<String>]) -> Vec<Vec<String>> {
         })
         .collect()
 }
+
+// -------------------------------------------------------------------------------------------
+// Ohio Revised Code
+// -------------------------------------------------------------------------------------------
+
+/// Where the statute extract is written, relative to the repository root.
+pub const STATUTE_FIXTURE: &str = "crates/project/fixtures/revised-code.txt";
+
+/// One section of the Revised Code, as `codes.ohio.gov` renders it.
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct StatuteSection {
+    /// Section number, as cited: `3317.013`.
+    pub section: String,
+    /// The section's own heading.
+    pub title: String,
+    /// The date the current text took effect.
+    pub effective: String,
+    /// The act that produced it.
+    pub legislation: String,
+    /// The operative text, one paragraph per line.
+    pub body: String,
+}
+
+/// Pull one section out of a fetched page.
+///
+/// # Why the body is bounded by two landmarks rather than by a selector
+///
+/// The page is a site around a statute: navigation above, a version picker and footer below. The
+/// operative text begins after the authenticated-PDF link and ends at the version list. Both are
+/// stable strings the page prints for every section, and keying on them survives a restyling in a
+/// way that keying on a class name would not.
+///
+/// Returns `None` when neither landmark is found, which is the signal that the page is no longer
+/// the page this was written against — better than committing a fixture full of navigation.
+#[must_use]
+pub fn parse_statute(section: &str, page: &str) -> Option<StatuteSection> {
+    let text = crate::html::to_text(page);
+    let after = |label: &str| -> String {
+        text.lines()
+            .skip_while(|l| l.trim() != label)
+            .nth(1)
+            .unwrap_or_default()
+            .trim()
+            .to_string()
+    };
+
+    // "Section 3317.013 | Special education multiples." — the heading, not the <title>.
+    let heading = format!("Section {section} |");
+    let title = text
+        .lines()
+        .find(|l| l.starts_with(&heading))
+        .map(|l| l[heading.len()..].trim().to_string())
+        .unwrap_or_default();
+
+    const BODY_STARTS: &str = "Download Authenticated PDF";
+    let start = text.find(BODY_STARTS)? + BODY_STARTS.len();
+    let rest = &text[start..];
+    // The version picker follows the operative text on every section that has one.
+    let end = ["Available Versions of this Section", "Last updated"]
+        .iter()
+        .filter_map(|marker| rest.find(marker))
+        .min()
+        .unwrap_or(rest.len());
+
+    let body = rest[..end].trim().to_string();
+    if body.is_empty() {
+        return None;
+    }
+    Some(StatuteSection {
+        section: section.to_string(),
+        title,
+        effective: after("Effective:"),
+        legislation: after("Latest Legislation:"),
+        body,
+    })
+}
+
+/// Render the sections as the committed fixture.
+///
+/// A record format rather than CSV, because a statute is full of commas and [`write_csv`] does
+/// not quote. Records begin with `§ ` at the start of a line, which nothing in the Revised Code's
+/// own text does, so the file parses by splitting on that and stays readable in a diff.
+#[must_use]
+pub fn build_statute_text(sections: &[StatuteSection]) -> String {
+    let mut out = String::with_capacity(sections.iter().map(|s| s.body.len() + 256).sum());
+    out.push_str(
+        "# Ohio Revised Code, the sections this corpus cites.\n\
+         # Regenerate with `edfund-connect rebuild`. One record per section; records begin with\n\
+         # a section mark at the start of a line, which the statute's own text never does.\n",
+    );
+    for s in sections {
+        out.push_str(&format!(
+            "\n§ {}\ntitle: {}\neffective: {}\nlegislation: {}\n--\n{}\n",
+            s.section, s.title, s.effective, s.legislation, s.body
+        ));
+    }
+    out
+}
+
+/// Write a text fixture, creating its directory.
+///
+/// # Errors
+///
+/// Returns the underlying [`io::Error`] if the file cannot be written.
+pub fn write_text(path: &Path, contents: &str) -> io::Result<usize> {
+    if let Some(parent) = path.parent() {
+        fs::create_dir_all(parent)?;
+    }
+    fs::write(path, contents)?;
+    Ok(contents.lines().filter(|l| l.starts_with("§ ")).count())
+}
