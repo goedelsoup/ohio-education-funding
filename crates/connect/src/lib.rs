@@ -363,7 +363,7 @@ pub fn rebuild(root: &Path) -> Result<Vec<Rebuilt>, RebuildError> {
     // The Revised Code. Skipped rather than fatal when a section is not cached, for the same
     // reason as F-33 below: it feeds prose and verification, and an absent copy should cost those
     // rather than the whole rebuild.
-    let statutes: Vec<fixtures::StatuteSection> = registry::OHIO_LAWS_SECTIONS
+    let statutes: Vec<fixtures::Record> = registry::OHIO_LAWS_SECTIONS
         .iter()
         .filter_map(|source| {
             let path = cache::cached_path(root, source);
@@ -383,7 +383,10 @@ pub fn rebuild(root: &Path) -> Result<Vec<Rebuilt>, RebuildError> {
             path: fixtures::STATUTE_FIXTURE.to_string(),
             rows: fixtures::write_text(
                 &root.join(fixtures::STATUTE_FIXTURE),
-                &fixtures::build_statute_text(&statutes),
+                &fixtures::build_records(
+                    "Ohio Revised Code, the sections this corpus cites. One record per section.",
+                    &statutes,
+                ),
             )?,
         }
     });
@@ -431,34 +434,45 @@ pub fn rebuild(root: &Path) -> Result<Vec<Rebuilt>, RebuildError> {
 
     // The DeRolph opinions. One record per case, same shape as the statute extract, so the two
     // sources a legal claim can rest on read alike.
-    let opinions: Vec<fixtures::StatuteSection> = registry::connector("ohio-courts")
-        .expect("registered")
-        .sources
-        .iter()
-        .filter_map(|src| {
-            let text = cache::pdf_text(root, src).ok()?;
-            Some(fixtures::StatuteSection {
-                section: src.key.to_string(),
-                title: src.note.split('.').next().unwrap_or(src.key).to_string(),
-                effective: String::new(),
-                legislation: src.url.to_string(),
-                body: text.trim().to_string(),
+    //
+    // All four or none, which is why this collects into a `Result` rather than filtering the
+    // failures out. A cache holding three of the opinions would otherwise write a fixture about
+    // the cases that happened to be retrievable and report it as a success — the hazard the
+    // finance panel refuses above, and no better for a litigation record: a reader who finds
+    // DeRolph II absent cannot tell whether the case did not exist or the PDF did not download.
+    // Skipping the whole fixture leaves the last good one committed and says why.
+    let opinions: Result<Vec<fixtures::Record>, cache::FetchError> =
+        registry::connector("ohio-courts")
+            .expect("registered")
+            .sources
+            .iter()
+            .map(|src| {
+                let text = cache::pdf_text(root, src)?;
+                let body = text.trim().to_string();
+                Ok(fixtures::Record {
+                    id: src.key.to_string(),
+                    title: src.title.unwrap_or(src.key).to_string(),
+                    date: fixtures::decided_on(&body),
+                    source: src.url.to_string(),
+                    body,
+                })
             })
-        })
-        .collect();
-    out.push(if opinions.is_empty() {
-        Rebuilt::Skipped {
-            path: fixtures::OPINIONS_FIXTURE.to_string(),
-            reason: "no opinions cached, or pdftotext unavailable".to_string(),
-        }
-    } else {
-        Rebuilt::Written {
+            .collect();
+    out.push(match opinions {
+        Ok(opinions) => Rebuilt::Written {
             path: fixtures::OPINIONS_FIXTURE.to_string(),
             rows: fixtures::write_text(
                 &root.join(fixtures::OPINIONS_FIXTURE),
-                &fixtures::build_statute_text(&opinions),
+                &fixtures::build_records(
+                    "DeRolph v. State, the four opinions this corpus cites. One record per case.",
+                    &opinions,
+                ),
             )?,
-        }
+        },
+        Err(cause) => Rebuilt::Skipped {
+            path: fixtures::OPINIONS_FIXTURE.to_string(),
+            reason: cause.to_string(),
+        },
     });
 
     // Census F-33. Skipped rather than fatal when the workbook is not cached: it is the one

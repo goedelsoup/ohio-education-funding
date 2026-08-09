@@ -15,13 +15,13 @@
 const OPINIONS: &str = include_str!("../fixtures/derolph-opinions.txt");
 
 fn opinion(key: &str) -> &'static str {
-    let marker = format!("\n§ {key}\n");
+    let marker = format!("\n=== {key}\n");
     let start = OPINIONS
         .find(&marker)
         .unwrap_or_else(|| panic!("{key} is not in the committed extract"))
         + marker.len();
     let rest = &OPINIONS[start..];
-    let end = rest.find("\n§ ").unwrap_or(rest.len());
+    let end = rest.find("\n=== ").unwrap_or(rest.len());
     &rest[..end]
 }
 
@@ -44,7 +44,7 @@ fn flat(key: &str) -> String {
 /// Official Reports it was cited to, both of which the archive prints on the first line.
 #[test]
 fn each_opinion_is_the_case_it_is_cited_as() {
-    let count = OPINIONS.lines().filter(|l| l.starts_with("§ ")).count();
+    let count = OPINIONS.lines().filter(|l| l.starts_with("=== ")).count();
     assert_eq!(count, 4);
 
     let expected = [
@@ -54,6 +54,17 @@ fn each_opinion_is_the_case_it_is_cited_as() {
         ("derolph-iv", "97 Ohio St.3d 434", "2002-Ohio-6750"),
     ];
     for (key, reporter, webcite) in expected {
+        // The record's own title, which the extract declares rather than deriving from a comment.
+        // It carried `DeRolph III, 2001, at 93 Ohio St` when it was cut out of the first sentence
+        // of a prose note, so the reporter citation is checked here too.
+        let record = opinion(key);
+        assert!(
+            record
+                .lines()
+                .any(|l| l.starts_with("title: ") && l.contains(reporter)),
+            "{key} is titled without its reporter citation: {:?}",
+            record.lines().next().unwrap_or_default()
+        );
         let body = flat(key);
         assert!(
             body.contains(&format!("Ohio Official Reports at {reporter}")),

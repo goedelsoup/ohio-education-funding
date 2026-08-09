@@ -2646,17 +2646,26 @@ pub fn build_f33_states(rows: &[Vec<String>]) -> Vec<Vec<String>> {
 /// Where the statute extract is written, relative to the repository root.
 pub const STATUTE_FIXTURE: &str = "crates/project/fixtures/revised-code.txt";
 
-/// One section of the Revised Code, as `codes.ohio.gov` renders it.
+/// One record of a committed document extract: a statute section, or a court opinion.
+///
+/// # Why one type rather than two
+///
+/// A legal claim in this corpus rests on either a statute or an opinion, and both should read
+/// alike and parse alike. The fields are therefore named for what every document has rather than
+/// for what a statute has: this type began as a statute-only record and was reused for the
+/// DeRolph opinions with `section` holding `derolph-i`, `legislation` holding a PDF URL, and
+/// `effective` forced empty — three fields whose documented meaning the values contradicted, in
+/// a file whose purpose is to make citations checkable.
 #[derive(Debug, Clone, PartialEq, Eq)]
-pub struct StatuteSection {
-    /// Section number, as cited: `3317.013`.
-    pub section: String,
-    /// The section's own heading.
+pub struct Record {
+    /// What the record is cited as: `3317.013`, or `derolph-i`.
+    pub id: String,
+    /// The document's own heading, or the case as it is cited.
     pub title: String,
-    /// The date the current text took effect.
-    pub effective: String,
-    /// The act that produced it.
-    pub legislation: String,
+    /// The date the document speaks from: a statute's effective date, an opinion's decision date.
+    pub date: String,
+    /// Where it came from: the act that produced a section, or the URL a PDF was retrieved from.
+    pub source: String,
     /// The operative text, one paragraph per line.
     pub body: String,
 }
@@ -2673,7 +2682,7 @@ pub struct StatuteSection {
 /// Returns `None` when neither landmark is found, which is the signal that the page is no longer
 /// the page this was written against — better than committing a fixture full of navigation.
 #[must_use]
-pub fn parse_statute(section: &str, page: &str) -> Option<StatuteSection> {
+pub fn parse_statute(section: &str, page: &str) -> Option<Record> {
     let text = crate::html::to_text(page);
     let after = |label: &str| -> String {
         text.lines()
@@ -2706,32 +2715,58 @@ pub fn parse_statute(section: &str, page: &str) -> Option<StatuteSection> {
     if body.is_empty() {
         return None;
     }
-    Some(StatuteSection {
-        section: section.to_string(),
+    Some(Record {
+        id: section.to_string(),
         title,
-        effective: after("Effective:"),
-        legislation: after("Latest Legislation:"),
+        date: after("Effective:"),
+        source: after("Latest Legislation:"),
         body,
     })
 }
 
-/// Render the sections as the committed fixture.
+/// The marker that begins every record, at the start of a line.
 ///
-/// A record format rather than CSV, because a statute is full of commas and [`write_csv`] does
-/// not quote. Records begin with `§ ` at the start of a line, which nothing in the Revised Code's
-/// own text does, so the file parses by splitting on that and stays readable in a diff.
+/// This was `§ `, justified on the grounds that the Revised Code's own text never prints a
+/// section mark at column 0. True of statutes, and false of the opinions the same format now
+/// carries: DeRolph I quotes `Art. I, § 2` and an out-of-state `M.S.A. §`, and a repost of a PDF
+/// or a different `pdftotext` line-breaking would only have to reflow one of them to column 0 to
+/// truncate a record and add a phantom one. A marker no legal text has occasion to print is
+/// cheaper than an argument about which line breaks are possible — and [`build_records`] checks
+/// rather than assuming.
+pub const RECORD_MARKER: &str = "=== ";
+
+/// Render records as a committed fixture.
+///
+/// A record format rather than CSV, because legal text is full of commas and [`write_csv`] does
+/// not quote. `caption` describes what the file holds; the rest of the header is fixed, because
+/// the regeneration command and the record marker are properties of the format rather than of
+/// the document. The caption is a parameter because reusing the statute builder for the opinions
+/// stamped `# Ohio Revised Code, the sections this corpus cites.` over four Supreme Court of Ohio
+/// opinions, and a file that misdescribes itself in its first line is a poor foundation for one
+/// whose purpose is provenance.
+///
+/// # Panics
+///
+/// If any record's body contains a line beginning with [`RECORD_MARKER`], which would split that
+/// record in two for every reader. Failing the rebuild is the point: the alternative is a
+/// committed fixture that is silently wrong about how many documents it holds.
 #[must_use]
-pub fn build_statute_text(sections: &[StatuteSection]) -> String {
-    let mut out = String::with_capacity(sections.iter().map(|s| s.body.len() + 256).sum());
-    out.push_str(
-        "# Ohio Revised Code, the sections this corpus cites.\n\
-         # Regenerate with `edfund-connect rebuild`. One record per section; records begin with\n\
-         # a section mark at the start of a line, which the statute's own text never does.\n",
-    );
-    for s in sections {
+pub fn build_records(caption: &str, records: &[Record]) -> String {
+    let mut out = String::with_capacity(records.iter().map(|r| r.body.len() + 256).sum());
+    out.push_str(&format!(
+        "# {caption}\n\
+         # Regenerate with `edfund-connect rebuild`. Records begin with `{RECORD_MARKER}` at the\n\
+         # start of a line, which no record's own text does.\n"
+    ));
+    for r in records {
+        assert!(
+            !r.body.lines().any(|l| l.starts_with(RECORD_MARKER)),
+            "{}: a body line begins with {RECORD_MARKER:?} and would split the record",
+            r.id
+        );
         out.push_str(&format!(
-            "\n§ {}\ntitle: {}\neffective: {}\nlegislation: {}\n--\n{}\n",
-            s.section, s.title, s.effective, s.legislation, s.body
+            "\n{RECORD_MARKER}{}\ntitle: {}\ndate: {}\nsource: {}\n--\n{}\n",
+            r.id, r.title, r.date, r.source, r.body
         ));
     }
     out
@@ -2796,3 +2831,29 @@ pub const REDBOOK_FIXTURE: &str = "crates/project/fixtures/dew-redbook.txt";
 
 /// Where the court opinion extract is written, relative to the repository root.
 pub const OPINIONS_FIXTURE: &str = "crates/regime-diff/fixtures/derolph-opinions.txt";
+
+/// The date an opinion was decided, read off the document.
+///
+/// The archive prints a parenthetical on the first page — `(No. 95-2066--Submitted September 10,
+/// 1996--Decided March 24, 1997.)` — with the dash rendering as `--` in the 1997 PDF and as an em
+/// dash in the later three. Only the text after `Decided ` is wanted, so the dash never has to be
+/// matched.
+///
+/// Returns an empty string if the parenthetical is absent, which is the honest answer: a
+/// [`Record`] whose date could not be read should say nothing rather than guess. It is worth
+/// reading at all because the previous extract discarded the one date these documents actually
+/// print and wrote an empty field in its place.
+#[must_use]
+pub fn decided_on(body: &str) -> String {
+    const MARKER: &str = "Decided ";
+    let Some(start) = body.find(MARKER) else {
+        return String::new();
+    };
+    let rest = &body[start + MARKER.len()..];
+    // `March 24, 1997.)` — the date ends at the sentence stop that closes the parenthetical.
+    let end = rest
+        .find(".)")
+        .or_else(|| rest.find('\n'))
+        .unwrap_or(rest.len());
+    rest[..end].trim().to_string()
+}

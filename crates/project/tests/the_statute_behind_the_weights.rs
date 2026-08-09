@@ -35,13 +35,13 @@ struct Section<'a> {
 }
 
 fn section(number: &str) -> Section<'_> {
-    let marker = format!("\n§ {number}\n");
+    let marker = format!("\n=== {number}\n");
     let start = STATUTE
         .find(&marker)
         .unwrap_or_else(|| panic!("{number} is not in the committed extract"))
         + marker.len();
     let rest = &STATUTE[start..];
-    let end = rest.find("\n§ ").unwrap_or(rest.len());
+    let end = rest.find("\n=== ").unwrap_or(rest.len());
     let record = &rest[..end];
     let field = |name: &str| {
         record
@@ -54,10 +54,12 @@ fn section(number: &str) -> Section<'_> {
         .find("\n--\n")
         .map_or("", |i| &record[i + 4..])
         .trim();
+    // The extract's field labels are generic — it holds opinions as well as statutes — and are
+    // read back into the names this test's subject actually uses.
     Section {
         title: field("title:"),
-        effective: field("effective:"),
-        legislation: field("legislation:"),
+        effective: field("date:"),
+        legislation: field("source:"),
         body,
     }
 }
@@ -82,7 +84,7 @@ fn multiples(body: &str) -> Vec<f64> {
 /// The extract is what it claims to be: fifteen sections, each with a date and an act.
 #[test]
 fn every_cited_section_is_present_and_dated() {
-    let count = STATUTE.lines().filter(|l| l.starts_with("§ ")).count();
+    let count = STATUTE.lines().filter(|l| l.starts_with("=== ")).count();
     assert_eq!(count, 15);
     for number in [
         "3317.02",
