@@ -159,7 +159,7 @@ pub fn overlaps(chamber: Chamber) -> Vec<Overlap> {
     let header = lines.next().unwrap_or_default().trim();
     assert_eq!(
         header, EXPECTED_HEADER,
-        "the House district crosswalk header changed; update project::house_district"
+        "the legislative district crosswalk header changed; update project::legislative_district"
     );
 
     lines

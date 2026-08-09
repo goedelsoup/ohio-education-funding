@@ -20,10 +20,11 @@ Bureau's own upper-chamber file anyway: the composition is not sequential — Se
 75 and 89 — so a derivation would need the mapping regardless, and a rule worth relying on is worth
 checking against the file that would break it.
 
+The redistricting file carries each block's population and its population aged 18 and over; the
+difference is the under-18 count, 2,591,886 for Ohio, 22.0% of the state.
+
 The Senate view is also substantially less of an estimate. Seats three times larger mean **392 of
-609 school districts sit wholly inside one**, against 270 for the House. The redistricting file
-carries each block's population and its population aged 18 and over; the difference is the
-under-18 count, 2,591,886 for Ohio, 22.0% of the state.
+609 school districts sit wholly inside one**, against 270 for the House.
 
 **Why this is here.** Ohio's school funding system contains no legislative district. The department
 computes funding per school district and stops, so there is no published mapping from school
@@ -45,10 +46,11 @@ reconciling. Hence the separate 2024 source, which exists because Ohio is one of
 changes to both chambers in that cycle.
 
 **What the corpus does with them.** Joins all three on the block identifier, aggregates to
-`(school district, House district)` pairs, and expresses each pair as a share of the school
-district's under-18 population. That is
-[`crates/project/fixtures/house-district-crosswalk.csv`](../../crates/project/fixtures/house-district-crosswalk.csv),
-1,085 rows covering all 609 districts in the funding panel with no losses.
+`(chamber, school district, seat)` triples, and expresses each as a share of the school district's
+under-18 population. That is
+[`crates/project/fixtures/legislative-district-crosswalk.csv`](../../crates/project/fixtures/legislative-district-crosswalk.csv),
+1,947 rows — 1,085 House and 862 Senate — covering all 609 districts in the funding panel with no
+losses in either chamber.
 
 The join to Ohio's own identifiers runs through the [NCES Common Core of
 Data](nces-ccd-lea-directory.md) directory, whose `ST_LEAID` column is the IRN.
@@ -57,10 +59,10 @@ Data](nces-ccd-lea-directory.md) directory, whose `ST_LEAID` column is the IRN.
 Every apportioned figure is an estimate: the weight is under-18 population, which is a proxy for
 pupils and counts children in community schools, private schools and none; and it is a **2020**
 count applied to a **FY2027** model, so a district that has grown or emptied since is weighted as
-it was. The one exact property is conservation — each district's shares sum to one, so the 99
-House districts sum to the statewide total to the cent.
+it was. The one exact property is conservation — each district's shares sum to one, so each chamber's
+seats sum to the statewide total to the cent, and the two chambers to each other.
 
 **Vintage risk the header assertion cannot catch.** The crosswalk is pinned to the 2024 map. When
 Ohio redistricts again the file at the same URL changes and the fixture becomes silently stale: the
-column names do not move, so `project::house_district`'s header check will pass. The digest manifest
+column names do not move, so `project::legislative_district`'s header check will pass. The digest manifest
 is what detects it.

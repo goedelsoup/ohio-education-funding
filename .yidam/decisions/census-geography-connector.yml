@@ -48,7 +48,7 @@ consequences: |
 
   One property is exact and is the only accuracy claim made: each school district's shares sum to
   one, so the 99 House districts sum to the statewide total to the cent. Asserted in
-  `project::house_district` and again over the rendered page.
+  `project::legislative_district` and again over the rendered page.
 
   Two staleness risks the corpus now owns. The apportionment uses **2020** population against a
   **FY2027** model, so a district that has grown or emptied since the census is weighted as it was.
@@ -73,3 +73,20 @@ alternatives: |
   **Weight by enrolled ADM instead of population.** Rejected: ADM is known per district, which is
   the thing being split, not per block. Any block-level pupil count would itself be an
   apportionment, so this would add a step without adding information.
+amendment: |
+  **The Senate followed, and the decision extends to it unchanged.** `sldu24.zip` is a fourth
+  source under the same connector, and the crosswalk now carries a `chamber` column: 1,085 House
+  rows and 862 Senate rows over the same 609 districts.
+
+  One thing the Senate added that the House could not. Ohio's constitution requires each Senate
+  district to be **exactly three whole House districts**, and the block data confirms it with no
+  exceptions — so the Senate crosswalk was derivable from the House one, exactly rather than
+  approximately. It is read from the Bureau's own file anyway, on two grounds: the composition is
+  not sequential, so a derivation needs the mapping regardless, and a rule worth relying on is
+  worth checking against the file that would break it if a future redistricting did.
+
+  The Senate view is also **less of an estimate**, which the alternatives above did not anticipate.
+  Seats three times larger mean 392 of 609 school districts lie wholly inside one against 270 for
+  the House. That does not change the decision to apportion, but it does mean the two chambers'
+  pages carry different amounts of derivation and each says which.
+

@@ -382,7 +382,7 @@ fn outcome_statewide(records: &[Joined]) -> Option<OutcomeStatewide> {
 
 /// The 99 House districts, apportioned, in the bundle's own shape.
 ///
-/// `project::house_district` does the arithmetic and the verification; this only restates it for
+/// `project::legislative_district` does the arithmetic and the verification; this only restates it for
 /// the feed, so that the reconciliation test lives beside the apportionment rather than here.
 fn house_district_block(
     records: &[DistrictRecord],
