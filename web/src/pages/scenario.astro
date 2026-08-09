@@ -14,6 +14,7 @@ import ScenarioControls from "../components/ScenarioControls.astro";
 import Base from "../layouts/Base.astro";
 import { loadFeed } from "../lib/feed.ts";
 import { count, millions } from "../lib/format.ts";
+import * as routes from "../lib/routes.ts";
 
 const { bundle, forecastable } = loadFeed();
 const s = bundle.statewide;
@@ -33,6 +34,38 @@ const meta = bundle.projection;
       millions(s.guarantee_total).replace("+", "")
     } is the guarantee.
   </p>
+
+  {/*
+    What every lever here holds fixed. Placed above the controls rather than below the results,
+    because it is a limit on what the reader is about to do and not a footnote on what they got.
+  */}
+  <div class="card" data-part="held-fixed">
+    <h2>What these levers hold fixed</h2>
+    <p class="note">
+      Ohio's formula contains statewide constants — the average base cost per pupil, the statewide
+      poverty share, the median weighted wealth — that are computed once over all districts. The
+      department's own calculator warns that they are
+      <strong>not recalculated</strong> when a district's data changes. That caveat is larger here,
+      because these levers change every district at once.
+    </p>
+    <p class="note">
+      It matters most for the <strong>cost input refresh</strong>. That lever scales base cost and
+      stops — but <strong>{millions(858_200_000).replace("+", "")}</strong> of categorical funding
+      is denominated in the average base cost per pupil: special education, English learners,
+      career-technical and the weighted half of preschool special education are each a weight times
+      that figure. If base cost per pupil rises, they rise with it, and this model does not move
+      them. A 3.1% refresh shown here as {millions(113_000_000).replace("+", "")} would in fact be
+      about <strong>24% larger</strong>.
+    </p>
+    <p class="note">
+      The two biggest categoricals are unaffected, which is why the gap is a quarter and not more:
+      <a href={routes.wikiNode("formula-component", "fsfp-disadvantaged-pupil-impact-aid")}>DPIA</a>
+      and
+      <a href={routes.wikiNode("formula-component", "fsfp-targeted-assistance")}>targeted assistance</a>
+      divide a district's figure by a statewide one, so under a change that moves everything the
+      numerator and denominator move together and largely cancel.
+    </p>
+  </div>
 
   <div id="scenario-root">
     <ScenarioControls

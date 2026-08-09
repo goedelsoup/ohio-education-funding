@@ -39,6 +39,29 @@ description: |
   stopped satisfying its own constraint is exactly what a three-property node catches and a
   one-property node cannot, and that is the argument for the class. [inference]
 
+  **NO PRORATION APPLIES INSIDE `[H] FOUNDATION FUNDING`, AND THE WORKBOOK IS EXPLICIT ABOUT IT.**
+  The open question this node was written with is answered. Searching every label in the FY2027
+  calculator for "proration" or "phase-in" separates the two cleanly: inside foundation funding the
+  labels are all **phase-in** — `[Ac] Base Cost Phase In` through `[Hc] Foundation Phase In`, and
+  `[H] Foundation Funding Phase-in 100%`. The word "proration" appears only on transportation,
+  special education transportation and preschool special education. [verified]
+
+  The distinction is not lexical. A **phase-in** is a policy ramp written into the enactment: the
+  Fair School Funding Plan was legislated to reach its computed amount over six years, and FY2027
+  is the terminal year at 100%. A **proration** is a budget falling short of a formula that has
+  already run. One is a plan; the other is an outcome. Ohio prorates what it pays *around*
+  schooling and phases in what it computes *for* it.
+
+  And the department says so itself, in two notes on its own sheets:
+
+  > Note: Special Education Transportation is being prorated in this simulation.
+
+  > Note: Transportation and Preschool Special Education may be subject to proration in actual
+  > FY27 payments.
+
+  [verified] The second is what settles the entry below: the department names transportation's
+  general factor as a live dial, not a dormant one.
+
   **A PRORATION OF 1.0 IS NOT AN ABSENCE.** Transportation's general factor is one this year. The
   cell exists, the multiplication happens, and the dial has evidently been turned before or it
   would not be there. Recorded as a live parameter at its neutral value, on the same grounds as
@@ -49,10 +72,9 @@ description: |
   preschool one publishes a limit at all, and none publishes a history. Answering it needs the
   budget bill's line items, which is `lsc-budget` — a connector still blocked on PDFs. [open]
 
-  Also open: whether prorations apply anywhere inside `[H] Foundation Funding`. All three known are
-  in `[R]` and outside the formula, which would mean the state prorates what it pays *around*
-  schooling and not what it computes *for* it. That is a striking pattern if true and an artefact
-  of small numbers if not — three is not enough to say. [open]
+  ~~Also open: whether prorations apply anywhere inside `[H] Foundation Funding`.~~ Answered above,
+  from the workbook's own labels: none do, and the pattern is real rather than an artefact of three
+  observations.
 properties:
   name: Appropriation proration factor
   unit: fraction of the computed entitlement

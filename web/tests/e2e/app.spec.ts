@@ -1590,3 +1590,36 @@ test.describe("the hold-harmless machinery", () => {
   });
 });
 
+test.describe("what the scenario holds fixed", () => {
+  test("the caveat is above the controls, not below the results", async ({ page }) => {
+    /*
+     * It is a limit on what the reader is about to do, not a footnote on what they got. The
+     * department's own calculator warns that its statewide constants are not recalculated when a
+     * district's data changes; that caveat is larger here, where every lever moves every district.
+     */
+    await page.goto("/scenario");
+    const caveat = page.locator('.card[data-part="held-fixed"]');
+    await expect(caveat).toContainText("What these levers hold fixed");
+    await expect(caveat).toContainText("not recalculated");
+
+    // Above the controls in document order.
+    const order = await page.evaluate(() => {
+      const c = document.querySelector('[data-part="held-fixed"]');
+      const controls = document.querySelector("#scenario-root");
+      if (!c || !controls) return null;
+      return c.compareDocumentPosition(controls) & Node.DOCUMENT_POSITION_FOLLOWING ? "before" : "after";
+    });
+    expect(order).toBe("before");
+  });
+
+  test("the size of the omission is stated, not just its existence", async ({ page }) => {
+    // A caveat without a magnitude is unfalsifiable and unactionable. $858.2m of categoricals are
+    // denominated in the average base cost per pupil, so a refresh understates itself by 24%.
+    await page.goto("/scenario");
+    const caveat = page.locator('.card[data-part="held-fixed"]');
+    await expect(caveat).toContainText("$858.2M");
+    await expect(caveat).toContainText("24% larger");
+    await expect(caveat).toContainText("largely cancel");
+  });
+});
+
