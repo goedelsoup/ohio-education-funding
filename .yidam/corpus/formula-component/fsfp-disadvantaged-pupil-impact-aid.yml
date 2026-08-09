@@ -38,11 +38,26 @@ description: |
   disadvantaged percentage of ~100%. [verified —
   `crates/project/tests/questions_the_corpus_left_open.rs`]
 
-  **The cause sits upstream of the cap and is still open.** Edgerton's economically disadvantaged
-  ADM is **1.45 times its enrolled ADM** — 497.21 in a district of 342.38. A district cannot have
-  more disadvantaged pupils than pupils, so the input is on a different basis than enrolment or it
-  is wrong. The cap is what stops that becoming a nonsensical index, and it does real work for
-  exactly one district in 609. What the department's ED count is counting there is [open].
+  **AND THE CAUSE IS NOW KNOWN: A PRIOR-YEAR COUNT AGAINST A COLLAPSED ENROLMENT.** This node
+  said Edgerton's count "is on a different basis than enrolment or it is wrong". It is on a
+  different basis, the act names which, and nothing is wrong with it.
+
+  The blend's first term is the **FY2025** count. Edgerton's enrolment fell from **504.48 in
+  FY2025 to 342.38 in FY2026** — a third of the district in one year. Its count of 497.21 is
+  **98.6% of the enrolment it was measured against** and 145% of the one it is applied to.
+
+  The three districts whose count most exceeds current enrolment make the point better than any
+  argument:
+
+      district                 ED/FY2025   current/FY2025   ED/current
+      Edgerton Local             0.9856        0.6787          1.4522
+      Garfield Heights City      0.9878        0.8634          1.1441
+      Clearview Local            0.9857        0.9042          1.0901
+
+  All three sit at 98.6% against the year the act measures in. What separates them is entirely
+  how much they shrank. A ratio that is identical in three unrelated districts is not a data error
+  in any of them — the dispersion is in the denominator. [verified —
+  `crates/project/tests/what_the_act_says_and_the_code_does_not.rs`]
 
   **WHAT THE STATEWIDE SHARE IS.** `d3` divides by 0.533380310606710 — the statewide economically
   disadvantaged percentage. R.C. 3317.02(I)(1)(a)(i) defines it as a **computation, not a
@@ -62,18 +77,27 @@ description: |
   percentage over the statewide one. Not a departmental elaboration — the General Assembly's own
   construction. [verified]
 
-  **BUT THE 65/35 BLEND IS NOT IN THE LAW AT ALL.** Neither R.C. 3317.022 nor R.C. 3317.03
-  contains the phrase "directly certified", and neither states a blend. R.C. 3317.03(B)(21) makes
-  the count one of students "economically disadvantaged, **as defined by the department**", with a
-  single constraint on the delegation: "A student shall not be categorically excluded from the
-  number reported under division (B)(21) of this section based on anything other than family
-  income."
+  ~~**BUT THE 65/35 BLEND IS NOT IN THE LAW AT ALL.**~~ **IT IS — IN THE ACT, NOT THE CODE.**
+  This node said the blend was "a departmental choice inside a delegation, changeable without a
+  bill". That was wrong, and wrong by concluding *not in law* from *not in the Revised Code*. The
+  Revised Code is not all of the law. H.B. 96 of the 136th General Assembly sets it in a table:
 
-  So this component mixes two very different kinds of parameter and the node should not present
-  them alike. The $422, the squaring and the statewide denominator are legislated. **The 65/35
-  weights are a departmental choice inside a delegation**, changeable without a bill, and the only
-  legislative check on them is a floor on breadth rather than a formula. [verified —
-  `crates/project/tests/the_statute_behind_the_weights.rs`]
+      economically disadvantaged student ADM        FY2026    FY2027
+      FY2025 students                                 75%       65%
+      students certified as categorically eligible    25%       35%
+
+  So the blend is **uncodified statutory law** — the same category as the four supplements —
+  changeable by the next budget and not by the department. [verified — `lsc-budget`,
+  `crates/project/tests/what_the_act_says_and_the_code_does_not.rs`]
+
+  **What *is* delegated is narrower and more interesting.** R.C. 3317.03(B)(21) hands the
+  department the **definition** of "economically disadvantaged", constrained only by "a student
+  shall not be categorically excluded … based on anything other than family income." The act then
+  sets **weights** on two counts whose definitions it does not control. Two levels, and this node
+  had collapsed them into one. [verified]
+
+  And the act names the **vintage**, which nothing else did: the first term is the **FY2025**
+  count. That is what explains Edgerton, below.
 
   **THE POVERTY MEASURE IS TOP-CODED AND THIS COMPONENT IS NOT.** The report card's economically
   disadvantaged share saturates at 100% under community eligibility, which is why 100 districts

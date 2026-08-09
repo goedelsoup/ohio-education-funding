@@ -388,6 +388,32 @@ pub fn rebuild(root: &Path) -> Result<Vec<Rebuilt>, RebuildError> {
         }
     });
 
+    // The enacted budget act. Skipped rather than fatal on two counts: the PDF may not be cached,
+    // and `pdftotext` may not be installed — see `cache::pdf_text` for why that is a weaker
+    // guarantee than the one `curl` gets. Either way the committed extract stands and the rebuild
+    // says what it did not do.
+    let enacted = source("hb96-final-analysis").expect("registered").1;
+    out.push(
+        match cache::pdf_text(root, enacted)
+            .map_err(RebuildError::from)
+            .and_then(|text| {
+                fixtures::extract_school_funding(&text).ok_or_else(|| {
+                    RebuildError::Io(std::io::Error::other(
+                        "the final analysis no longer contains its school funding heading",
+                    ))
+                })
+            }) {
+            Ok(text) => Rebuilt::Written {
+                path: fixtures::ENACTED_FIXTURE.to_string(),
+                rows: fixtures::write_text(&root.join(fixtures::ENACTED_FIXTURE), &text)?,
+            },
+            Err(cause) => Rebuilt::Skipped {
+                path: fixtures::ENACTED_FIXTURE.to_string(),
+                reason: cause.to_string(),
+            },
+        },
+    );
+
     // Census F-33. Skipped rather than fatal when the workbook is not cached: it is the one
     // source in the registry that nothing else depends on, so an absent copy should cost the
     // interstate comparison and nothing else.
