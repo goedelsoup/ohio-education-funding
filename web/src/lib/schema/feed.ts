@@ -357,6 +357,24 @@ export const DistrictSchema = z
     base_cost_state_share: num,
     /** Targeted assistance, special education, DPIA, English learner, gifted, career-technical. */
     categorical_funding: num,
+    /**
+     * The same total, as its six parts.
+     *
+     * It was a residual for eight phases — core foundation funding less the state share of base
+     * cost, exact and uninterrogable. The six behave nothing alike: targeted assistance is
+     * equalisation and is zero for 135 districts; DPIA tracks poverty. A page showing the sum
+     * cannot say which kind of money a district is getting.
+     */
+    categoricals: z
+      .object({
+        targeted_assistance: num,
+        special_education: num,
+        dpia: num,
+        english_learners: num,
+        gifted: num,
+        career_technical: num,
+      })
+      .strict(),
     formula_aid_per_pupil: num,
     realized_aid_per_pupil: num,
     guarantee: num,
@@ -469,6 +487,8 @@ export const StatewideSchema = z
     charge_off_exceeds_base_cost: z.number().int().nonnegative(),
     /** Median change in base cost aid per pupil, charge-off to plan. */
     median_regime_difference: num,
+    /** Districts receiving nothing from targeted assistance — it is equalisation and switches off. */
+    districts_without_targeted_assistance: z.number().int().nonnegative(),
     at_minimum_state_share: z.number().int().nonnegative(),
     median_valuation_per_pupil: num,
     median_operating_expenditure_per_pupil: num,

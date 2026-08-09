@@ -93,6 +93,12 @@ pub const FY27_HEADER: &[&str] = &[
     "statewide_median_income",
     "benchmark_ratio",
     "capacity_rate",
+    "targeted_assistance",
+    "special_education",
+    "dpia",
+    "english_learners",
+    "gifted",
+    "career_technical",
 ];
 
 /// Column positions in the department's `Base_Cost` sheet, whose header is on the fourth row.
@@ -163,6 +169,18 @@ mod detail_columns {
     pub const CAPACITY_PER_PUPIL: usize = 5;
     /// `[b4] State Share Percentage`.
     pub const STATE_SHARE: usize = 8;
+    /// `[B]` through `[G]` — the six categorical programs, each computed per district.
+    ///
+    /// The corpus has carried their sum as one number since genesis, inferred as core foundation
+    /// funding less the state share of base cost. The inference is exact — `[A]` plus these six is
+    /// `[H] Foundation Funding` to the cent — but it produces a lump, and the lump is 43% of
+    /// formula aid against a base cost half this project decomposed into 22 statutory elements.
+    pub const TARGETED_ASSISTANCE: usize = 10;
+    pub const SPECIAL_EDUCATION: usize = 11;
+    pub const DPIA: usize = 12;
+    pub const ENGLISH_LEARNERS: usize = 13;
+    pub const GIFTED: usize = 14;
+    pub const CAREER_TECHNICAL: usize = 15;
 }
 
 /// Column positions in the `Local_Capacity` sheet, whose header is on the second row.
@@ -391,6 +409,20 @@ pub fn build_fy27_model(
             out.last_mut()
                 .expect("just pushed")
                 .push(format_value(value, places));
+        }
+
+        for column in [
+            detail_columns::TARGETED_ASSISTANCE,
+            detail_columns::SPECIAL_EDUCATION,
+            detail_columns::DPIA,
+            detail_columns::ENGLISH_LEARNERS,
+            detail_columns::GIFTED,
+            detail_columns::CAREER_TECHNICAL,
+        ] {
+            let value = detail.get(irn).and_then(|row| cell_number(row, column));
+            out.last_mut()
+                .expect("just pushed")
+                .push(format_value(value, 2));
         }
     }
     out

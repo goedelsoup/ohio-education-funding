@@ -17,7 +17,8 @@ import { apply, currentLaw } from "./policy.ts";
 import { forecastPath, growthPrior, observations } from "./project.ts";
 import { realChange, series, type Basis } from "./real.ts";
 import * as routes from "./routes.ts";
-import type { Bundle, District } from "./types.ts";
+import type { Bar } from "./chart.ts";
+import type { Bundle, District, Statewide } from "./types.ts";
 
 function strip(
   label: string,
@@ -438,7 +439,8 @@ export function renderDetail(d: District): string {
         <tr><th>Base cost per pupil</th><td>${money(d.base_cost_per_pupil, 2)}</td></tr>
         <tr><th>Aggregate base cost</th><td>${money(d.aggregate_base_cost)}</td></tr>
         <tr><th>State share of base cost</th><td>${money(d.base_cost_state_share)}</td></tr>
-        <tr><th>Categorical funding</th><td>${money(d.categorical_funding)}</td></tr>
+        <tr><th>Categorical funding<div class="n">Six programs; the split is below.</div></th>
+            <td>${money(d.categorical_funding)}</td></tr>
         <tr><th>Formula aid per pupil</th><td>${money(formulaPP, 2)}</td></tr>
         <tr><th>Guarantee per pupil</th><td>${money(guaranteePP, 2)}</td></tr>
         <tr><th>Guarantee, total</th><td>${money(d.guarantee)}</td></tr>
@@ -453,5 +455,90 @@ export function renderDetail(d: District): string {
       </tbody></table></div>
       <p class="note">FY2026 enrolled ADM is partly a departmental estimate: the calculator is
         published before that fiscal year closes.</p>
+    </div>`;
+}
+
+/**
+ * The categorical half of formula aid, as its six programs.
+ *
+ * # Why one number was not enough
+ *
+ * The corpus carried this as a residual for eight phases: core foundation funding less the state
+ * share of base cost. That is exact — it reconciles to the cent for all 609 districts — and it is
+ * a number a reader can do nothing with. It is also **43% of formula aid**, against a base cost
+ * half this project decomposed into the twenty-two elements of R.C. 3317.011 long ago.
+ *
+ * The six do not behave alike, and that is the reason the sum misleads rather than merely
+ * omitting. **Targeted assistance is equalisation** — it is the largest program in the state at
+ * $1.36bn and it falls to exactly zero for 135 districts, because they have too much valuation to
+ * qualify. **DPIA is poverty-driven.** A district whose categorical total rose could be poorer or
+ * could be less wealthy, and the total cannot tell you which.
+ */
+export function renderCategoricals(d: District, statewide: Statewide): string {
+  const c = d.categoricals;
+  const total = d.categorical_funding;
+  if (total <= 0) return "";
+
+  const parts = [
+    ["Targeted assistance", c.targeted_assistance, "Equalisation for low-valuation districts. Zero once a district has enough."],
+    ["Special education", c.special_education, "Six weighted categories of disability."],
+    ["Disadvantaged Pupil Impact Aid", c.dpia, "Driven by the economically disadvantaged count."],
+    ["Career-technical education", c.career_technical, ""],
+    ["Gifted", c.gifted, "Identification and service."],
+    ["English learners", c.english_learners, "Three weights by time in the country."],
+  ] as const;
+
+  const bars: Bar[] = parts
+    .filter(([, value]) => value > 0)
+    .map(([label, value]) => ({
+      label,
+      value,
+      direct: pct(value / total, 0),
+      hover: `${label}: ${money(value)}, ${pct(value / total, 1)} of this district's categoricals`,
+    }));
+
+  const share = total / (total + d.base_cost_state_share);
+
+  return `
+    <div class="card">
+      <h2>The categorical half, in its six parts</h2>
+      <div class="chartwrap" data-chart="categoricals">${renderToString(barSpec(bars))}</div>
+
+      <div class="scroll"><table>
+        <thead><tr><th>Program</th><th class="tnum">Amount</th><th class="tnum">Share</th></tr></thead>
+        <tbody>
+          ${parts
+            .map(
+              ([label, value, note]) => `<tr${value <= 0 ? ' class="n"' : ""}>
+                <th>${escapeHtml(label)}${note ? `<div class="n">${escapeHtml(note)}</div>` : ""}</th>
+                <td class="tnum">${value <= 0 ? "—" : money(value)}</td>
+                <td class="tnum n">${value <= 0 ? "" : pct(value / total, 1)}</td>
+              </tr>`,
+            )
+            .join("")}
+          <tr class="current"><th>Total categorical funding</th>
+            <td class="tnum">${money(total)}</td><td class="tnum">100.0%</td></tr>
+        </tbody>
+      </table></div>
+
+      <p class="note">${pct(share, 0)} of this district's formula aid is categorical rather than
+        base cost — ${money(total)} against ${money(d.base_cost_state_share)}. ${
+          c.targeted_assistance <= 0
+            ? `<strong>It receives no targeted assistance.</strong> That is the largest categorical
+               program in Ohio and it is equalisation: it goes to districts whose valuation per
+               pupil is low enough to qualify, and this district's is not. ${count(
+                 statewide.districts_without_targeted_assistance,
+               )} districts are in the same position, and their categorical money is made of
+               something else entirely.`
+            : `Its largest single program is
+               ${escapeHtml([...parts].sort((a, b) => b[1] - a[1])[0]![0])} at
+               ${money([...parts].sort((a, b) => b[1] - a[1])[0]![1])}.`
+        }</p>
+
+      <p class="note">These six were one number on this page until recently — a residual, computed
+        as core foundation funding less the state share of base cost. The residual is exact and it
+        cannot be interrogated, which matters because the programs move for opposite reasons:
+        targeted assistance rises as a district gets poorer in <em>property</em>, DPIA as its
+        pupils get poorer. A total that adds them describes neither.</p>
     </div>`;
 }

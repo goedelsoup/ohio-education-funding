@@ -496,3 +496,88 @@ fn the_published_capacity_agrees_with_the_recovered_one_and_covers_the_rest() {
         }
     }
 }
+
+/// The categorical lump, decomposed — and the six reconcile to it exactly.
+///
+/// `categorical_funding` has been a residual since genesis: core foundation funding less the state
+/// share of base cost. The residual is right, and it is 43% of formula aid expressed as a number
+/// with no parts. `Detail_SFPR` publishes the six programs that make it up, and this is the check
+/// that reading them has not changed the total.
+///
+/// The reason to care is that the six behave nothing alike. Targeted assistance is equalisation
+/// and switches off entirely once a district has enough valuation; DPIA tracks poverty. Adding
+/// them produces a figure that rises for opposite reasons in different districts.
+#[test]
+fn the_six_categoricals_reconcile_to_the_residual_they_replace() {
+    let panel = panel();
+
+    for record in &panel {
+        let difference = (record.categoricals.total() - record.categorical_funding()).abs();
+        assert!(
+            difference < 1.0,
+            "{}: the six sum to {:.2} against a residual of {:.2}",
+            record.name,
+            record.categoricals.total(),
+            record.categorical_funding()
+        );
+    }
+
+    // And with the state share of base cost they are the whole of core foundation funding, which
+    // is what makes the decomposition complete rather than merely consistent.
+    for record in &panel {
+        let assembled = record.base_cost_state_share + record.categoricals.total();
+        assert!(
+            (assembled - record.core_foundation_funding).abs() < 1.0,
+            "{}: [A] plus the six is {assembled:.2} against [H] {:.2}",
+            record.name,
+            record.core_foundation_funding
+        );
+    }
+}
+
+/// Targeted assistance is equalisation, and equalisation switches off.
+///
+/// The single clearest reason the lump misleads. 135 of 609 districts receive **nothing** from the
+/// largest categorical program in the state, because it is a wealth-equalising transfer and they
+/// have too much valuation to qualify. Their categorical total is made of something else entirely,
+/// and a page reporting one number cannot say so.
+#[test]
+fn the_largest_categorical_is_zero_for_a_fifth_of_the_state() {
+    let panel = panel();
+
+    let none: Vec<&project::panel::DistrictRecord> = panel
+        .iter()
+        .filter(|r| r.categoricals.targeted_assistance <= 0.0)
+        .collect();
+    assert!(
+        none.len() > 100,
+        "expected targeted assistance to switch off for a substantial group: {}",
+        none.len()
+    );
+
+    // They are the wealthy ones, which is what makes it equalisation rather than an accident.
+    let median_valuation = |group: &[&project::panel::DistrictRecord]| {
+        let mut v: Vec<f64> = group.iter().filter_map(|r| r.valuation_per_pupil).collect();
+        v.sort_by(|a, b| a.partial_cmp(b).unwrap());
+        v[v.len() / 2]
+    };
+    let receiving: Vec<&project::panel::DistrictRecord> = panel
+        .iter()
+        .filter(|r| r.categoricals.targeted_assistance > 0.0)
+        .collect();
+    assert!(
+        median_valuation(&none) > median_valuation(&receiving) * 1.5,
+        "districts getting none should be markedly wealthier: {:.0} against {:.0}",
+        median_valuation(&none),
+        median_valuation(&receiving)
+    );
+
+    // And every one of them still receives categorical money, from the other five.
+    for record in &none {
+        assert!(
+            record.categoricals.total() > 0.0,
+            "{}: no targeted assistance and no other categorical either",
+            record.name
+        );
+    }
+}

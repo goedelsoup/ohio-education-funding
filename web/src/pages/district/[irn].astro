@@ -15,6 +15,7 @@ import {
   renderDetail,
   renderEnrollmentYears,
   renderHeadline,
+  renderCategoricals,
   renderPosition,
 } from "../../lib/district.ts";
 import { districtPaths, loadFeed } from "../../lib/feed.ts";
@@ -55,6 +56,8 @@ const description = district.on_guarantee
   <Fragment set:html={renderHeadline(district)} />
   <Fragment set:html={renderAidSource(bundle, district)} />
   <Fragment set:html={renderBaseCostBuildUp(district)} />
+  {/* The other half of formula aid, decomposed the same way and for the same reason. */}
+  <Fragment set:html={renderCategoricals(district, bundle.statewide)} />
   <Fragment set:html={renderEnrollmentYears(bundle, district, forecastable)} />
   <Fragment set:html={renderPosition(bundle, district, valuations, expenditures)} />
   <Fragment set:html={renderDetail(district)} />

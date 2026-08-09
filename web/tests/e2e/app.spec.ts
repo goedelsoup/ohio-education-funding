@@ -1062,3 +1062,38 @@ test.describe("the local capacity measure", () => {
     await expect(card).toContainText("reproduces it");
   });
 });
+
+test.describe("the categorical half", () => {
+  test("the lump is shown as six programs that reconcile to it", async ({ page }) => {
+    /*
+     * Categorical funding was a residual for eight phases — core foundation less the state share
+     * of base cost. Exact, and 43% of formula aid expressed as a number with no parts.
+     */
+    await page.goto("/district/043802");
+    const card = page.locator(".card", { hasText: "The categorical half" });
+    for (const program of [
+      "Targeted assistance",
+      "Special education",
+      "Disadvantaged Pupil Impact Aid",
+      "Career-technical education",
+      "Gifted",
+      "English learners",
+    ]) {
+      await expect(card).toContainText(program);
+    }
+    await expect(card).toContainText("Total categorical funding");
+  });
+
+  test("a district getting no targeted assistance is told why", async ({ page }) => {
+    /*
+     * The reason the sum misleads rather than merely omitting. Targeted assistance is the largest
+     * categorical in Ohio and it is equalisation: Columbus qualifies for none of it, and 77% of
+     * its categorical money is DPIA instead. One number cannot distinguish those.
+     */
+    await page.goto("/district/043802");
+    const card = page.locator(".card", { hasText: "The categorical half" });
+    await expect(card).toContainText("It receives no targeted assistance");
+    await expect(card).toContainText("135 districts are in the same position");
+    await expect(card).toContainText("Disadvantaged Pupil Impact Aid");
+  });
+});

@@ -73,7 +73,7 @@ use edfund_core::Dollars;
 /// from FY2022-FY2024 to FY2024-FY2026 — the years the department's `ADM Data` sheet declares.
 /// The values did not change; what they are called did, which is exactly the kind of silent
 /// meaning change the version guard exists for.
-pub const CONTRACT_VERSION: &str = "14.0.0";
+pub const CONTRACT_VERSION: &str = "15.0.0";
 
 /// How close to the floor counts as being on it, in mills.
 ///
@@ -524,6 +524,23 @@ pub struct RegimeCounterfactual {
     pub mills_short_of_charge_off: Option<f64>,
 }
 
+/// The six categorical programs, per district.
+#[derive(Debug, Clone, Copy, PartialEq, Default)]
+pub struct Categoricals {
+    /// Equalisation for low-valuation districts. Zero for 135 of 609.
+    pub targeted_assistance: Dollars,
+    /// Six weighted categories of disability.
+    pub special_education: Dollars,
+    /// Disadvantaged Pupil Impact Aid, driven by the economically disadvantaged count.
+    pub dpia: Dollars,
+    /// Three weights by time in the country.
+    pub english_learners: Dollars,
+    /// Identification and service.
+    pub gifted: Dollars,
+    /// Career-technical education weights.
+    pub career_technical: Dollars,
+}
+
 /// One district, as the web layer needs it.
 #[derive(Debug, Clone, PartialEq)]
 pub struct District {
@@ -549,6 +566,13 @@ pub struct District {
     pub base_cost_state_share: Dollars,
     /// Targeted assistance, special education, DPIA, English learner, gifted, career-technical.
     pub categorical_funding: Dollars,
+    /// The same, as its six parts.
+    ///
+    /// The total was a residual for eight phases — core foundation funding less the state share of
+    /// base cost, which is exact and uninterrogable. It is 43% of formula aid, and the six behave
+    /// nothing alike: targeted assistance is equalisation and is zero for 135 districts, DPIA
+    /// tracks poverty. A page showing the sum cannot say which a district's money is.
+    pub categoricals: Categoricals,
     /// State aid per pupil as the formula computes it, before the guarantee.
     pub formula_aid_per_pupil: Dollars,
     /// State aid per pupil as the district receives it.
@@ -700,6 +724,12 @@ pub struct Statewide {
     pub charge_off_exceeds_base_cost: usize,
     /// Median change in base cost aid per pupil from the charge-off to the plan.
     pub median_regime_difference: Dollars,
+    /// Districts receiving nothing from targeted assistance, the largest categorical program.
+    ///
+    /// It is equalisation: it switches off once a district has enough valuation per pupil. That
+    /// the largest single program in the state reaches only four districts in five is invisible
+    /// while the six categoricals are reported as one number.
+    pub districts_without_targeted_assistance: usize,
     /// Districts whose base cost aid is set by the minimum state share.
     pub at_minimum_state_share: usize,
     /// Median assessed valuation per pupil.
@@ -956,6 +986,10 @@ impl Bundle {
             s.push_str(&format!("    \"{key}\": {},\n", num(value)));
         }
         for (key, value) in [
+            (
+                "districts_without_targeted_assistance",
+                w.districts_without_targeted_assistance,
+            ),
             ("below_charge_off_rate", w.below_charge_off_rate),
             (
                 "charge_off_exceeds_base_cost",
@@ -1333,6 +1367,42 @@ impl Bundle {
                 "\"categorical_funding\": {}, ",
                 num(d.categorical_funding)
             ));
+            s.push_str("\"categoricals\": {");
+            for (n, (key, value)) in [
+                ("targeted_assistance", d.categoricals.targeted_assistance),
+                ("special_education", d.categoricals.special_education),
+                ("dpia", d.categoricals.dpia),
+                ("english_learners", d.categoricals.english_learners),
+                ("gifted", d.categoricals.gifted),
+                ("career_technical", d.categoricals.career_technical),
+            ]
+            .iter()
+            .enumerate()
+            {
+                if n > 0 {
+                    s.push_str(", ");
+                }
+                s.push_str(&format!("\"{key}\": {}", num(*value)));
+            }
+            s.push_str("}, ");
+            s.push_str("\"categoricals\": {");
+            for (i, (key, value)) in [
+                ("targeted_assistance", d.categoricals.targeted_assistance),
+                ("special_education", d.categoricals.special_education),
+                ("dpia", d.categoricals.dpia),
+                ("english_learners", d.categoricals.english_learners),
+                ("gifted", d.categoricals.gifted),
+                ("career_technical", d.categoricals.career_technical),
+            ]
+            .iter()
+            .enumerate()
+            {
+                if i > 0 {
+                    s.push_str(", ");
+                }
+                s.push_str(&format!("\"{key}\": {}", num(*value)));
+            }
+            s.push_str("}, ");
             s.push_str(&format!(
                 "\"formula_aid_per_pupil\": {}, ",
                 num(d.formula_aid_per_pupil)
@@ -1516,6 +1586,14 @@ mod tests {
             }),
             base_cost_state_share: 6_000_000.0,
             categorical_funding: 8_038_562.0,
+            categoricals: Categoricals {
+                targeted_assistance: 3_100_000.0,
+                special_education: 2_100_000.0,
+                dpia: 2_300_000.0,
+                english_learners: 12_000.0,
+                gifted: 226_562.0,
+                career_technical: 300_000.0,
+            },
             formula_aid_per_pupil: 6_400.0,
             realized_aid_per_pupil: 6_400.0,
             guarantee: 0.0,
@@ -1592,6 +1670,7 @@ mod tests {
             min_yield_per_mill: 0.0,
             max_yield_per_mill: 0.0,
             median_sd1_value_per_pupil: 0.0,
+            districts_without_targeted_assistance: 135,
             below_charge_off_rate: 0,
             charge_off_exceeds_base_cost: 0,
             median_regime_difference: 0.0,

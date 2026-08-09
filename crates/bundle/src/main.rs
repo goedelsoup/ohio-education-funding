@@ -12,9 +12,9 @@
 use std::collections::HashMap;
 
 use bundle::{
-    BaseCostBuildUp, Bundle, Checkpoint, Deflator, District, DistrictOutcome, FinanceYear,
-    ForecastCheckpoint, MillageAnalysis, National, OutcomeStatewide, PolicyShape, Projection,
-    PropertyTaxYear, RegimeCounterfactual, SpendingByFunction, StateFinance, Statewide,
+    BaseCostBuildUp, Bundle, Categoricals, Checkpoint, Deflator, District, DistrictOutcome,
+    FinanceYear, ForecastCheckpoint, MillageAnalysis, National, OutcomeStatewide, PolicyShape,
+    Projection, PropertyTaxYear, RegimeCounterfactual, SpendingByFunction, StateFinance, Statewide,
     CONTRACT_VERSION,
 };
 use dispersion::{partial_correlation, wealth_neutrality};
@@ -399,6 +399,14 @@ fn to_district(
         aggregate_base_cost: record.aggregate_base_cost,
         base_cost_state_share: record.base_cost_state_share,
         categorical_funding: record.categorical_funding(),
+        categoricals: Categoricals {
+            targeted_assistance: record.categoricals.targeted_assistance,
+            special_education: record.categoricals.special_education,
+            dpia: record.categoricals.dpia,
+            english_learners: record.categoricals.english_learners,
+            gifted: record.categoricals.gifted,
+            career_technical: record.categoricals.career_technical,
+        },
         formula_aid_per_pupil: record.core_foundation_funding / adm,
         realized_aid_per_pupil: record.realized_aid() / adm,
         guarantee: record.guarantee,
@@ -848,6 +856,10 @@ fn main() {
                 .filter_map(|d| d.regime.and_then(|r| r.difference))
                 .collect(),
         ),
+        districts_without_targeted_assistance: districts
+            .iter()
+            .filter(|d| d.categoricals.targeted_assistance <= 0.0)
+            .count(),
         at_minimum_state_share: districts
             .iter()
             .filter(|d| d.at_minimum_state_share)

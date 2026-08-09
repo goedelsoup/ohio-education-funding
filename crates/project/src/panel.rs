@@ -38,6 +38,63 @@ pub const HISTORY_YEARS: [FiscalYear; 3] = [FiscalYear(2024), FiscalYear(2025), 
 /// 138 of 609 districts sit exactly on it.
 pub const MINIMUM_STATE_SHARE: f64 = local_capacity::MINIMUM_STATE_SHARE_FY2027;
 
+/// The six categorical programs, per district, as `Detail_SFPR` publishes them.
+///
+/// # Why this is six numbers and not one
+///
+/// [`DistrictRecord::categorical_funding`] infers the total as core foundation funding less the
+/// state share of base cost. That inference is exact — `[A]` plus these six is `[H] Foundation
+/// Funding` to the cent — and it produces a quantity no reader can interrogate. The total is
+/// **$2.76bn, 43% of formula aid**, against a base cost half this project decomposed into the 22
+/// elements of R.C. 3317.011 eight phases ago. For the median district, 42% of its formula aid
+/// was a single unexplained number.
+///
+/// The six do not behave alike, which is why the lump misleads. Targeted assistance is
+/// equalisation and falls to zero once a district has enough valuation — Columbus receives none.
+/// DPIA is poverty-driven and is Columbus's largest categorical at $40m. A total that adds them
+/// describes neither.
+#[derive(Debug, Clone, Copy, PartialEq, Default)]
+pub struct Categoricals {
+    /// `[B]` — equalisation for low-valuation districts.
+    pub targeted_assistance: Dollars,
+    /// `[C]` — special education weights.
+    pub special_education: Dollars,
+    /// `[D]` — Disadvantaged Pupil Impact Aid.
+    pub dpia: Dollars,
+    /// `[E]` — English learner weights.
+    pub english_learners: Dollars,
+    /// `[F]` — gifted identification and service.
+    pub gifted: Dollars,
+    /// `[G]` — career-technical education weights.
+    pub career_technical: Dollars,
+}
+
+impl Categoricals {
+    /// The six, summed. Equal to [`DistrictRecord::categorical_funding`] by construction.
+    #[must_use]
+    pub fn total(&self) -> Dollars {
+        self.targeted_assistance
+            + self.special_education
+            + self.dpia
+            + self.english_learners
+            + self.gifted
+            + self.career_technical
+    }
+
+    /// The programs in statewide-size order, with the labels a page should use.
+    #[must_use]
+    pub fn named(&self) -> [(&'static str, Dollars); 6] {
+        [
+            ("Targeted assistance", self.targeted_assistance),
+            ("Special education", self.special_education),
+            ("Disadvantaged Pupil Impact Aid", self.dpia),
+            ("Career-technical education", self.career_technical),
+            ("Gifted", self.gifted),
+            ("English learners", self.english_learners),
+        ]
+    }
+}
+
 /// One district as the department modelled it.
 #[derive(Debug, Clone, PartialEq)]
 pub struct DistrictRecord {
@@ -137,6 +194,8 @@ pub struct DistrictRecord {
     pub benchmark_ratio: Option<f64>,
     /// `[C6] Local Capacity Percentage` — the rate, as the department computes it.
     pub published_capacity_rate: Option<f64>,
+    /// The six categorical programs, each read rather than inferred as a lump.
+    pub categoricals: Categoricals,
     /// Temporary transitional aid guarantee.
     pub guarantee: Dollars,
     /// Enrolled ADM in each of [`HISTORY_YEARS`].
@@ -281,6 +340,12 @@ mod column {
     pub const STATEWIDE_MEDIAN_INCOME: usize = 37;
     pub const BENCHMARK_RATIO: usize = 38;
     pub const PUBLISHED_CAPACITY_RATE: usize = 39;
+    pub const TARGETED_ASSISTANCE: usize = 40;
+    pub const SPECIAL_EDUCATION: usize = 41;
+    pub const DPIA: usize = 42;
+    pub const ENGLISH_LEARNERS: usize = 43;
+    pub const GIFTED: usize = 44;
+    pub const CATEGORICAL_CTE: usize = 45;
 }
 
 /// The header this loader expects, so a fixture reshaped without updating [`column`] fails
@@ -290,7 +355,7 @@ adm_kindergarten,adm_grades_1_3,adm_grades_4_8_non_cte,adm_grades_9_12_non_cte,a
 adm_grades_9_12_total,funded_classroom_teachers,funded_special_teachers,teacher_base_cost,\
 aggregate_base_cost,base_cost_per_pupil,temp_transitional_aid_guarantee,enrolled_adm_fy24,\
 enrolled_adm_fy25,enrolled_adm_fy26,assessed_valuation_per_pupil_fy23,core_foundation_funding,\
-base_cost_state_share,total_state_support,total_transfers,service_center_charge,other_adjustments,net_state_funding,capacity_per_pupil,state_share_percentage,valuation_ty25,valuation_ty24,valuation_ty23,agi_ty24,agi_ty23,agi_ty22,tax_returns,federal_median_income,statewide_median_income,benchmark_ratio,capacity_rate";
+base_cost_state_share,total_state_support,total_transfers,service_center_charge,other_adjustments,net_state_funding,capacity_per_pupil,state_share_percentage,valuation_ty25,valuation_ty24,valuation_ty23,agi_ty24,agi_ty23,agi_ty22,tax_returns,federal_median_income,statewide_median_income,benchmark_ratio,capacity_rate,targeted_assistance,special_education,dpia,english_learners,gifted,career_technical";
 
 /// Every district in the department's FY2027 model.
 ///
@@ -364,6 +429,14 @@ pub fn panel() -> Vec<DistrictRecord> {
                 statewide_median_income: number(column::STATEWIDE_MEDIAN_INCOME),
                 benchmark_ratio: number(column::BENCHMARK_RATIO),
                 published_capacity_rate: number(column::PUBLISHED_CAPACITY_RATE),
+                categoricals: Categoricals {
+                    targeted_assistance: required(column::TARGETED_ASSISTANCE),
+                    special_education: required(column::SPECIAL_EDUCATION),
+                    dpia: required(column::DPIA),
+                    english_learners: required(column::ENGLISH_LEARNERS),
+                    gifted: required(column::GIFTED),
+                    career_technical: required(column::CATEGORICAL_CTE),
+                },
                 net_state_funding: required(column::NET_STATE_FUNDING),
                 guarantee: required(column::GUARANTEE),
                 adm_history: [
