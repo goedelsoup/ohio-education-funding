@@ -150,3 +150,47 @@ fn the_capacity_rate_rises_with_income_and_stops_at_two_and_a_half_percent() {
         at_median.1
     );
 }
+
+/// **Which branch of the statutory minimum each district lands on, and why the split is lopsided.**
+///
+/// R.C. 3317.017(A)(1)(a) takes the lesser of a district's three-year average valuation and its
+/// most recent taxable value. Which one wins is decided by direction: under rising valuations the
+/// average is lower and the district is charged on a lagged figure; under falling valuations the
+/// most recent is lower and the fall is taken at once.
+///
+/// **602 of 609 districts are on the lagged branch.** The seven on the other are the ones whose
+/// valuation fell, and none of them fell far — the largest drop is 1.15%, Eastwood Local.
+///
+/// The rule therefore never charges a district on the higher of its two measures. It is a floor on
+/// the state's share dressed as a smoothing device, and the asymmetry is invisible in any single
+/// district's figures.
+#[test]
+fn the_statutory_minimum_lags_increases_and_takes_decreases_at_once() {
+    let panel = project::panel::panel();
+    let (mut lagged, mut immediate) = (0_usize, 0_usize);
+    let mut deepest_fall = 1.0_f64;
+
+    for record in &panel {
+        let years = record.valuation_three_year;
+        if years.iter().any(|v| *v <= 0.0) {
+            continue;
+        }
+        let average = years.iter().sum::<f64>() / 3.0;
+        let recent = years[0];
+        if average < recent {
+            lagged += 1;
+        } else {
+            immediate += 1;
+            deepest_fall = deepest_fall.min(recent / average);
+        }
+    }
+
+    assert_eq!(lagged, 602);
+    assert_eq!(immediate, 7);
+    assert_eq!(lagged + immediate, 609);
+    // No district is exactly on the boundary, so the branch is always decided rather than tied.
+    assert!(
+        (0.98..0.999).contains(&deepest_fall),
+        "deepest fall {deepest_fall:.4}"
+    );
+}

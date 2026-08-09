@@ -160,6 +160,38 @@ pub const MINIMUM_STATE_SHARE_FY2022: f64 = 0.05;
 /// The minimum state share for FY2026 and FY2027, per the department's own model.
 pub const MINIMUM_STATE_SHARE_FY2027: f64 = 0.10;
 
+/// The lesser of a district's most recent year and its three-year average.
+///
+/// **R.C. 3317.017(A)(1)(a)**: "Determine the minimum of the district's three-year average
+/// valuation for the fiscal year for which the calculation is made and the district's taxable
+/// value for the most recent tax year for which data is available." The income side of the blend
+/// takes the same shape.
+///
+/// This was inferred from the department's `Local_Capacity` sheet and carried without a citation
+/// until `ohio-laws` was wired. It is the statute, and the statute is worth reading for the
+/// asymmetry the arithmetic hides.
+///
+/// # It is a one-sided smoother, and which side depends on the direction
+///
+/// Under **rising** valuations the three-year average is the lower of the two, so the district is
+/// charged on a lagged figure and the state pays more for as long as the lag runs. Under
+/// **falling** valuations the most recent year is lower, so the fall is taken immediately and the
+/// state pays more at once. The rule never charges a district on the higher of the two measures,
+/// which makes it a floor on the state's share rather than a smoother in the usual sense: it
+/// dampens increases and passes decreases straight through.
+///
+/// In the FY2027 model the split is **602 districts on the lagged branch and 7 on the immediate
+/// one** — the seven whose valuation actually fell. See
+/// `tests/against_the_departments_own_capacity.rs`.
+///
+/// # And the Fair School Funding Plan is doing what the charge-off did, by another device
+///
+/// The mechanism this replaced lagged reappraisal growth too, through
+/// [recognized valuation](../../regime-diff/src/recognized_valuation.rs) — a three-year phase-in
+/// of the inflationary increase. Two regimes, the same instinct about revaluation shocks, and two
+/// different devices: the charge-off phased the increase in, the plan takes the minimum of an
+/// average and the current. Worth holding beside each other, because a reader told only that the
+/// plan "uses a three-year average" would not see that it is the successor to something.
 fn lesser_of_recent_and_average(recent: f64, three_year: [f64; 3]) -> f64 {
     let average = three_year.iter().sum::<f64>() / 3.0;
     recent.min(average)
