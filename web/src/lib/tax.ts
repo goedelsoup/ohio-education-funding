@@ -525,11 +525,10 @@ export function renderChargeOff(d: District, statewide: Statewide): string {
             <td class="n">${
               r.local_capacity == null
                 ? `Not published for this district.`
-                : `Sixty percent of assessed valuation blended with two income measures, as the
-                   department computes it. Published on the calculator's detail sheet rather than
-                   recovered by subtraction — which matters for the
-                   ${count(statewide.at_minimum_state_share)} districts where the minimum state
-                   share binds and the subtraction cannot reach it.`
+                : `Sixty percent of assessed valuation blended with two income measures, scaled by
+                   a rate that rises with income. This is the department's published figure, and
+                   <a href="/method">this project's own run of R.C. 3317.017 reproduces it
+                   exactly</a> — for all 609 districts, to within a hundredth of a percent.`
             }</td></tr>
           <tr><th>Base cost aid, charge-off</th>
             <td class="tnum">${r.aid_charge_off == null ? "—" : money(r.aid_charge_off)}</td>

@@ -1035,3 +1035,30 @@ test.describe("whether Ohio is unusual", () => {
     expect(feed.national.states).toHaveLength(51);
   });
 });
+
+test.describe("the local capacity measure", () => {
+  test("the method page credits it as computed and verified exactly", async ({ page }) => {
+    /*
+     * The strongest verification claim this project can make — a statutory formula reproduced
+     * against the department's own answer for every district — and it sat in a test file, invisible
+     * to any reader, for three commits.
+     */
+    await page.goto("/method");
+    const row = page.locator("tr", { hasText: "The local capacity measure" }).first();
+    await expect(row).toContainText("all 609 districts");
+    await expect(row).toContainText("hundredth of a percent");
+    // And the route it was got wrong by, which is the part worth keeping.
+    await expect(row).toContainText("4.4% light");
+  });
+
+  test("a district at the minimum state share still shows a capacity figure", async ({ page }) => {
+    // These 138 were censored until the published figure was found: recovering capacity by
+    // subtracting aid from base cost cannot reach a district whose share is set by the floor.
+    // Bay Village is at the minimum state share, so the subtraction genuinely could not reach it.
+    await page.goto("/district/043547/taxes");
+    const card = page.locator(".card", { hasText: "What the mechanism this replaced" });
+    await expect(card).toContainText("Local capacity, the plan");
+    await expect(card).not.toContainText("Not recoverable");
+    await expect(card).toContainText("reproduces it");
+  });
+});

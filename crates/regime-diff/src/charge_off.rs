@@ -25,7 +25,8 @@
 //! **This corpus holds total taxable valuation and not recognized valuation.** Every figure
 //! computed here is therefore on the DeRolph-era base, and overstates the local share of any
 //! district whose recognized valuation was reduced. Getting past it needs the `tax-abstract`
-//! connector, which is declared and blocked.
+//! connector — which is **wired**, and turns out not to carry it: Table SD-1 publishes total
+//! taxable value, not the H.B. 920-adjusted recognized figure. The blocker outlived the block.
 //!
 //! # Why the mechanism was thought to be wrong
 //!

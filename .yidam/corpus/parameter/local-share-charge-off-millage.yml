@@ -48,7 +48,9 @@ description: |
   of charge-off amounts must carry the base alongside the rate. This corpus holds total taxable
   valuation and **not** recognized valuation, so every charge-off figure it computes is on the
   DeRolph-era base and overstates the local share of any district whose recognition was reduced.
-  Closing that needs `tax-abstract`, which is declared and blocked.
+  Closing that needs recognized valuation, which `tax-abstract` was expected to supply. That
+  connector is now **wired** and does not carry it — Table SD-1 publishes total taxable value
+  only — so the gap is real and the recorded reason for it was stale. [verified]
 
   **What the rate was doing to the system.** At 23 mills against a statewide operating rate of
   32.9 mills in TY2006, the base cost formula equalized about **69.9%** of local operating
