@@ -41,9 +41,17 @@ consequences: |
     - **Legislated** — written in the section to four decimals. The fourteen multiples, DPIA's $422,
       preschool's $4,000 and its `X 0.50`, targeted assistance's 0.008 and its 200/400 brackets,
       gifted's $24, $2.50 and the three unit prices. Changed only by an act.
-    - **Delegated** — statute names the department. DPIA's 65/35 blend, which appears in no section:
-      R.C. 3317.03(B)(21) makes the count one of students "economically disadvantaged, as defined by
-      the department". Changed by a departmental decision.
+    - **Delegated** — statute names the department. R.C. 3317.03(B)(21) hands it the *definition*
+      of "economically disadvantaged", constrained only by "shall not be categorically excluded …
+      based on anything other than family income". Changed by a departmental decision.
+
+      **This slot originally held DPIA's 65/35 blend, and that was wrong.** The audit concluded
+      *not in law* from *not in the Revised Code* — the same move it was auditing — and the blend
+      turns out to be set on the face of H.B. 96, in a table. It is uncodified statutory, not
+      delegated. Corrected in the phase that wired `lsc-budget`, and left visible here because a
+      taxonomy that quietly reassigns its own examples is worth less than one that shows where it
+      was wrong. The distinction the correction produced is sharper than the original: the act sets
+      **weights** on counts whose **definitions** it does not control.
     - **Measured** — statute specifies a computation over reported data. Transportation's two rates
       are **trimmed means of what districts themselves spent last year**, the ten highest and ten
       lowest excluded; R.C. 3317.0212 contains no dollar figure at all. The 40th-highest-district
@@ -68,6 +76,14 @@ consequences: |
   **And one of my own notes was wrong the same way.** The registry described R.C. 3317.019 as
   "gifted units and their prices". It is *Temporary transitional aid*. The note was written from the
   corpus's own citation rather than from the section, which is the identical failure being audited.
+
+  **A caution the audit earned the hard way.** "Not in the Revised Code" and "not in law" are
+  different claims, and this pass conflated them for the DPIA blend, for the four supplements, and
+  in the framing of the whole `uncodified` category. The supplements' classification survives —
+  they really are temporary law that lapses — but the reasoning that produced it was "absent from
+  the sections we fetched", which would have been equally satisfied by a provision sitting in a
+  section nobody thought to look at. The check that settles it is reading the enacted act, and
+  until `lsc-budget` was wired the audit could not do that.
 
   **What did not move.** The 63 `description` claims are mostly genuine — questions about intent,
   about incidence, about why a threshold sits where it does. The 10 `series` items need `lsc-budget`

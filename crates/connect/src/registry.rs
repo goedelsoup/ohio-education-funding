@@ -523,13 +523,30 @@ pub const CONNECTORS: &[Connector] = &[
         key: "lsc-budget",
         publisher: "Ohio Legislative Service Commission",
         feeds: &["legislation", "fiscal-period", "program", "parameter"],
-        status: Status::Declared {
-            blocked_on: "redbooks and the Catalog of Budget Line Items are PDFs; the \
-                         per-district simulations are workbooks posted per bill with no index",
-        },
+        status: Status::Wired,
         note: "The only continuous appropriation-line series across the whole period, and the \
-               primary source for the pre-2000 record.",
-        sources: &[],
+               primary source for the pre-2000 record. Wired for **one document**: the final \
+               analysis of the current budget act, which is where every provision the Revised \
+               Code does not contain actually lives. The redbooks, the Catalog of Budget Line \
+               Items and the per-district simulations remain unretrieved, so the appropriation \
+               series this connector exists for is still ahead.\n\
+               \n\
+               The recorded blocker said these are PDFs, which is true and was treated as the \
+               end of the matter. A PDF is a container; `Format::Pdf` now has a reader.",
+        sources: &[Source {
+            key: "hb96-final-analysis",
+            url: "https://www.lsc.ohio.gov/assets/legislation/136/hb96/en0/files/\
+                  hb96-bill-analysis-as-enacted-136th-general-assembly.pdf",
+            filename: "hb96-final-analysis.pdf",
+            format: Format::Pdf,
+            catalog: Some("lsc-hb96-analysis"),
+            fixture: Some(crate::fixtures::ENACTED_FIXTURE),
+            note: "**As enacted**, and the distinction is not pedantic. The as-passed-by-the-House \
+                   analysis sits at a sibling URL and gives the base funding supplement as $20 and \
+                   $30 and the enrolment growth supplement as a tiered schedule — neither of which \
+                   became law. Reading the convenient version would have contradicted the \
+                   department's own payments and looked like a finding.",
+        }],
     },
     Connector {
         key: "ohio-laws",

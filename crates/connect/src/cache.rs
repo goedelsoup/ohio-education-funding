@@ -305,6 +305,58 @@ pub fn check_against(manifest: &[Digest], computed: &Digest) -> Result<(), Fetch
     })
 }
 
+/// Extract the text layer of a cached PDF.
+///
+/// # Why this shells out, and why it is a weaker argument than the one for `curl`
+///
+/// The module header justifies delegating retrieval to `curl` on the grounds that it ships with
+/// macOS, Windows and every Linux distribution, so a checkout years hence still builds and only
+/// the *refresh* path needs the outside world.
+///
+/// **`pdftotext` does not ship with macOS or Windows.** The second half of the argument still
+/// holds — the extract is committed, so nothing but a refresh needs poppler — but the first half
+/// does not, and pretending otherwise would be the kind of quiet overclaim this repository keeps
+/// finding in its own notes. A caller without poppler gets [`FetchError::NotCached`]-shaped
+/// behaviour: the rebuild reports the fixture skipped and says why, rather than failing.
+///
+/// The alternative is a PDF text extractor in pure std. It is genuinely feasible here —
+/// `spreadsheet` already carries a DEFLATE decoder, which is the hard half — and it is a
+/// disproportionate amount of surface for one document. If the redbook series is ever wired, that
+/// calculation changes and this should be revisited.
+///
+/// # Errors
+///
+/// Returns [`FetchError::NotCached`] if the file is absent, or an I/O error carrying `pdftotext`'s
+/// own message if it is not installed or cannot read the file.
+pub fn pdf_text(root: &Path, source: &Source) -> Result<String, FetchError> {
+    let path = cached_path(root, source);
+    if !path.exists() {
+        return Err(FetchError::NotCached {
+            key: source.key.to_string(),
+            path,
+        });
+    }
+    let output = Command::new("pdftotext")
+        .arg("-layout")
+        .arg(&path)
+        .arg("-")
+        .output()
+        .map_err(|cause| {
+            FetchError::Io(io::Error::new(
+                cause.kind(),
+                format!("pdftotext is required to read {}: {cause}", source.key),
+            ))
+        })?;
+    if !output.status.success() {
+        return Err(FetchError::Io(io::Error::other(format!(
+            "pdftotext failed on {}: {}",
+            source.key,
+            String::from_utf8_lossy(&output.stderr).trim()
+        ))));
+    }
+    Ok(String::from_utf8_lossy(&output.stdout).into_owned())
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
