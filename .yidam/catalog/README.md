@@ -28,6 +28,7 @@ Sorted by: type, then slug.
 | [`census-f33-school-system-finances`](census-f33-school-system-finances.md) | Annual Survey of School System Finances (F-33) | 3 |
 | [`cupp-district-profile-report`](cupp-district-profile-report.md) | District Profile Report — the "Cupp Report" | 2 |
 | [`derolph-litigation-record`](derolph-litigation-record.md) | DeRolph Litigation Record | 5 |
+| [`dew-academic-distress-commission`](dew-academic-distress-commission.md) | Academic Distress Commission — the department's commission page | 3 |
 | [`dew-expenditure-expanded-list`](dew-expenditure-expanded-list.md) | FY2025 Expenditure Expanded List | 1 |
 | [`dew-five-year-forecast`](dew-five-year-forecast.md) | Five-year forecast filings — the department's republished submissions | 3 |
 | [`dew-fy27-funding-calculator`](dew-fy27-funding-calculator.md) | FY27 TRAD State Foundation Funding Calculator | 15 |
@@ -51,7 +52,7 @@ Sorted by: type, then slug.
 | [`ohio-essa-state-plan`](ohio-essa-state-plan.md) | Ohio's Consolidated State Plan under ESSA, and the April 2026 School Improvement amendment | 5 |
 | [`ohio-revised-code`](ohio-revised-code.md) | Ohio Revised Code — the sections this corpus cites | 4 |
 
-28 entries, 0 not yet cited by any corpus node. 76 retrieved files are pinned by SHA-256 in [`crates/connect/source-digests.txt`](../../crates/connect/source-digests.txt).
+29 entries, 0 not yet cited by any corpus node. 76 retrieved files are pinned by SHA-256 in [`crates/connect/source-digests.txt`](../../crates/connect/source-digests.txt).
 <!-- /REGEN -->
 
 ## Adding a source

@@ -66,8 +66,12 @@ properties:
   established: Not yet established. [unentered]
   roles: |
     Cleveland Scholarship resident district since the mid-1990s [verified]. Subject to state
-    academic distress intervention for part of the period [verified — dates not yet
-    established]. High-poverty urban district throughout [verified].
+    academic distress intervention **under the former R.C. 3302.10**, the pre-2015 regime — not
+    the current one, whose three districts are East Cleveland, Lorain and Youngstown [inference —
+    Cleveland is absent from the department's
+    [commission page](../../catalog/dew-academic-distress-commission.md)]. Dates not established
+    [open]. Fifteen of its buildings are currently CSI, two ATSI and four TSI [verified —
+    `dispersion::identified`]. High-poverty urban district throughout [verified].
   series_path: |
     Per-agency series are held by IRN across four committed fixtures, not one path: [verified]
       crates/foundation/fixtures/fy27-department-model.csv    FY2027 formula run, 609 districts

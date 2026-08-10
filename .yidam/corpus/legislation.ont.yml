@@ -29,6 +29,14 @@ properties:
   - name: vetoes
     type: text
     description: Line-item vetoes affecting education funding, where relevant
+  - name: accountability_effect
+    type: text
+    description: >-
+      What the enactment did to the accountability regime, as distinct from the funding system.
+      Declared because an Ohio budget act carries both in one instrument — H.B. 33 refreshed the
+      Fair School Funding Plan's cost inputs and dissolved Lorain's academic distress commission —
+      and a class that could record only the funding half would make the other invisible on the
+      node where a reader would look for it.
 # `edges:` below names the relationships this class is *defined by* — the ones a reader needs to
 # understand what it connects to. It is not the permitted set. Measured across the corpus, 46 of
 # the 90 relationships in use are undeclared, and almost all of them are single-use precise verbs
