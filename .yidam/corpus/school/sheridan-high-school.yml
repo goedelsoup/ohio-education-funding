@@ -1,0 +1,59 @@
+class: school
+label: Sheridan High School
+description: |
+  The building Ohio's constitutional litigation is named after. Nathan DeRolph was a student here
+  when the [Ohio Coalition for Equity and Adequacy](../litigation/derolph-i-1997.yml) filed on his
+  behalf in Perry County on 19 December 1991. [verified]
+
+  **It is the first school node in this corpus, and it is here because it closes a loop.** The
+  corpus has held [Northern Local](../education-agency/northern-local-perry.yml) as an exemplar
+  since genesis — the DeRolph origin district, rural and property-poor — and could not name the
+  building. The funding side never needed to. The accountability side works at this grain, and the
+  first thing it makes sayable is what happened to the school the case was brought for.
+
+  **Thirty-four years later it is a four-star building with a Performance Index of 89.9**, against
+  a state where the highest exemplar here reaches 105.9 and the lowest 36.8. [verified —
+  `report-card-2425-buildings.csv`] It is neither failing nor comfortable, which is a more useful
+  fact than either would have been.
+
+  **And a quarter of its students are chronically absent** — 25.9% in 2024-25, against 2.5% at
+  [Barrington Road](barrington-road-elementary.yml) in Upper Arlington. [verified] Chronic
+  absenteeism is not decoration here: under Ohio's ESSA plan it is the criterion that decides CSI
+  identification for buildings with fewer than three rated components. Sheridan has enough rated
+  components that the overall rating governs instead, so the figure carries no consequence for
+  this building and would for a smaller one. Whether the rate reflects poverty, distance, or
+  something the corpus cannot see is not established. [open]
+
+  What this node cannot say is whether Sheridan has ever been identified under ESSA. The corpus
+  holds no CSI, TSI or ATSI list. [open]
+properties:
+  building_irn: 034363 [verified]
+  district: Northern Local School District (Perry County), IRN 049056. [verified]
+  grades: Not entered; the report card files carry no grade span. [unentered]
+  enrollment: 685 in 2024-25, on the report card's building count. [verified]
+  performance: |
+    Performance Index 89.9 in 2024-25, 91.5 in 2023-24, 89.2 in 2022-23; four stars on the
+    achievement component. [verified] Flat across the three years the distress trigger reads,
+    and well clear of it.
+
+    The **overall** rating — the number R.C. 3302.10 and CSI identification actually use — is not
+    in either published building file. What is held is the achievement component, which is an
+    input to it. [unentered]
+  chronic_absenteeism: 25.9% in 2024-25. [verified]
+  roles: |
+    DeRolph plaintiff's school, 1991. [verified] Title I served status and any federal
+    identification are not held. [unentered]
+  series_path: crates/dispersion/fixtures/report-card-2425-buildings.csv, keyed by building IRN 034363. [verified]
+links:
+  - target: ../school.ont.yml
+    relationship: instance-of
+  - target: ../education-agency/northern-local-perry.yml
+    relationship: operated-by
+  - target: ../litigation/derolph-i-1997.yml
+    relationship: origin-of
+  - target: ../metric/performance-index.yml
+    relationship: rated-on
+  - target: barrington-road-elementary.yml
+    relationship: contrasts-with
+  - target: ../../catalog/dew-report-card-achievement.md
+    relationship: sourced-from

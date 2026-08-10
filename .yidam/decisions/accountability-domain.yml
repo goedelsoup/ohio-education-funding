@@ -59,14 +59,17 @@ decision: |
   is how this corpus already handles property-poor, 20-mill-floor, guarantee district and DeRolph
   plaintiff — recorded in `roles` with the periods each applied.
 consequences: |
-  **`school` is approved and not built in this pass, and that is a delivery statement rather than
-  a hedge.** The precedent is decision `proposals`, which approved nine connectors and nine
-  calculators and said plainly that "approval defines the target, not the delivery." A `school`
-  instance needs building-level data and this repository has none: every committed fixture is
-  agency-level, and the one source with site detail — MR-81 — aggregates to sponsor in the
-  extractor. The class ships when the building-level report card files are wired, and not before,
-  because an ontology class with an empty directory is the aspirational-list pattern this
-  repository has already been caught in once, in `agents/`.
+  **`school` was approved and deferred in this pass, and shipped in the next one.** The reason for
+  deferring was that a `school` instance needs building-level data and every committed fixture was
+  agency-level. That held for about an hour: the report card storage serves
+  `24-25_Achievement_Building.xlsx` and `2025_Building_Details.xlsx` under the same shared token as
+  the district files already wired, and probing for them took one command. The class now has three
+  exemplars and 3,318 buildings behind them.
+
+  Recorded rather than tidied away, because the deferral was reasoning from "this repository has
+  no building data" to "building data is not available", which is the same move the audit of open
+  claims caught four times over. A gap in the corpus is not evidence of a gap in the world, and
+  the cost of checking was one probe.
 
   **Four statute sections retrieved and pinned**: R.C. 3302.01 definitions, 3302.03 report cards,
   3302.10 academic distress commissions, 3302.12 building-level intervention. The corpus can now

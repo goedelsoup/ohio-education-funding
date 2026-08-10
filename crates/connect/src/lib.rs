@@ -241,6 +241,40 @@ pub fn rebuild(root: &Path) -> Result<Vec<Rebuilt>, RebuildError> {
         )?,
     });
 
+    // The same report card at building grain. A separate fixture rather than more columns,
+    // because it is a different unit: the funding formula pays agencies and the accountability
+    // system identifies schools, and one file cannot be keyed on both.
+    let building_achievement = source("achievement-building-2425").expect("registered").1;
+    let building_details = source("building-details-2425").expect("registered").1;
+    out.push(
+        match (|| -> Result<Vec<Vec<String>>, String> {
+            let achievement =
+                open_workbook(root, building_achievement).map_err(|e| e.to_string())?;
+            let details = open_workbook(root, building_details).map_err(|e| e.to_string())?;
+            fixtures::build_buildings(
+                &achievement
+                    .rows("Performance_Index")
+                    .map_err(|e| e.to_string())?,
+                &details
+                    .rows("Building_Details")
+                    .map_err(|e| e.to_string())?,
+            )
+        })() {
+            Ok(rows) => Rebuilt::Written {
+                path: fixtures::BUILDING_FIXTURE.to_string(),
+                rows: fixtures::write_csv(
+                    &root.join(fixtures::BUILDING_FIXTURE),
+                    fixtures::BUILDING_HEADER,
+                    &rows,
+                )?,
+            },
+            Err(reason) => Rebuilt::Skipped {
+                path: fixtures::BUILDING_FIXTURE.to_string(),
+                reason,
+            },
+        },
+    );
+
     // The fifth fixture, and the one that until now needed LibreOffice. The department still
     // publishes October headcount in the pre-2007 format; `spreadsheet` reads it natively.
     let enrollment = source("enrollment-fy24").expect("registered").1;

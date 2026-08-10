@@ -1,0 +1,72 @@
+class: school
+label: School Building
+foundational_type:
+  ontology: ufo
+  type: kind
+description: |
+  A single school building. A Kind, because it has identity of its own and persists through
+  changes in who attends it, what it is called, and which district operates it.
+
+  **It exists because the accountability system does not work at the grain the funding system
+  does.** Ohio pays education agencies and identifies schools. ESSA selects the lowest-performing
+  5% of Title I *buildings*; R.C. 3302.12 attaches its intervention to a *building*; and the
+  chronic absenteeism criterion that decides CSI for schools with fewer than three rated
+  components is a building measure. Rolling any of that up to the district records a consequence
+  and discards the object that triggered it.
+
+  **The corpus holds exemplars, not the panel.** There are 3,318 rated buildings in Ohio and they
+  live in [`report-card-2425-buildings.csv`](../../crates/dispersion/fixtures/report-card-2425-buildings.csv).
+  What belongs here is the handful chosen to span the distinctions that matter — the same rule the
+  [education-agency](education-agency.ont.yml) class follows, and for the same reason.
+
+  **Accountability status is a Role, not a property of the building.** CSI, TSI and ATSI are things
+  a school *is identified as* for a period, contingently, and they belong in `roles` with the years
+  each applied — exactly as property-poor and guarantee district do one level up.
+properties:
+  - name: building_irn
+    type: string
+    description: The building's own IRN, which is not the district's
+  - name: district
+    type: string
+    description: Operating district and its IRN
+  - name: grades
+    type: string
+    description: The grade span the building serves
+  - name: enrollment
+    type: string
+    description: Building enrollment, on the report card's count, with the year
+  - name: performance
+    type: text
+    description: >-
+      Performance Index and component ratings, with the years. Three consecutive years is the
+      span both the CSI escalation and the academic distress trigger read.
+  - name: chronic_absenteeism
+    type: string
+    description: >-
+      The rate, with the year. A CSI criterion in its own right for buildings with fewer than
+      three rated components, not a descriptive statistic.
+  - name: roles
+    type: text
+    description: >-
+      Contingent identifications and the periods they applied — CSI, TSI, ATSI, Title I served.
+  - name: series_path
+    type: string
+    description: Path under crates/ to the committed building series
+edge_policy: characteristic
+edges:
+  - relationship: operated-by
+    target: education-agency
+    direction: out
+    description: The district that operates the building
+  - relationship: identified-under
+    target: accountability-regime
+    direction: out
+    description: A regime that has identified this building for support or improvement
+  - relationship: subject-to
+    target: intervention
+    direction: out
+    description: An intervention imposed on the building
+  - relationship: rated-on
+    target: metric
+    direction: out
+    description: A measure the building is rated on

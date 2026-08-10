@@ -1,0 +1,58 @@
+class: school
+label: Anton Grdina
+description: |
+  What the bottom of Ohio's distribution looks like at building grain, in the district that has
+  been under an [academic distress commission](../intervention/academic-distress-commission.yml).
+
+  **A Performance Index of 36.8, and three consecutive years below 40** — 36.8, 39.1, 38.9.
+  [verified — `report-card-2425-buildings.csv`] One star on the achievement component. The
+  three-year span is not incidental: it is the span R.C. 3302.10 reads for a district and the span
+  after which an ATSI building escalates to CSI.
+
+  **Two-thirds of its students are chronically absent.** 66.7% in 2024-25, against 25.9% at
+  [Sheridan](sheridan-high-school.yml) and 2.5% at
+  [Barrington Road](barrington-road-elementary.yml). [verified] A 64-point spread between two
+  buildings in the same state, measured the same way in the same year.
+
+  That figure bears on whether achievement measures are measuring the school. A Performance Index
+  is computed over tests that should have been taken, and Ohio's plan states that a school earns
+  zero points for every test not taken — so a building where two in three students are chronically
+  absent is being scored partly on attendance through a measure that is nominally about learning.
+  [inference] The corpus cannot separate the two effects and should not pretend the index is
+  clean. [open]
+
+  **The intervention connection is real and not yet traceable.** Cleveland Municipal is recorded
+  as having been subject to state academic distress intervention "for part of the period", with
+  dates not established. [verified] Whether this building was open, and how it performed, during
+  the commission's tenure is exactly the question the accountability expansion exists to answer
+  and cannot yet, because the corpus holds no commission timeline. [open]
+properties:
+  building_irn: 000828 [verified]
+  district: Cleveland Municipal School District, IRN 043786. [verified]
+  grades: Not entered; the report card files carry no grade span. [unentered]
+  enrollment: 314 in 2024-25. [verified]
+  performance: |
+    Performance Index 36.8 in 2024-25, 39.1 in 2023-24, 38.9 in 2022-23; one star on the
+    achievement component. [verified] Three consecutive years at roughly a third of the scale's
+    maximum, and no trend in either direction.
+
+    The overall rating that R.C. 3302.10 and CSI identification key on is not published in either
+    building file. [unentered]
+  chronic_absenteeism: 66.7% in 2024-25. [verified]
+  roles: |
+    Not held. Whether this building has been identified as CSI, TSI or ATSI is unknown to the
+    corpus, which holds no identification list. [open]
+  series_path: crates/dispersion/fixtures/report-card-2425-buildings.csv, keyed by building IRN 000828. [verified]
+links:
+  - target: ../school.ont.yml
+    relationship: instance-of
+  - target: ../education-agency/cleveland-municipal.yml
+    relationship: operated-by
+  - target: ../intervention/academic-distress-commission.yml
+    relationship: in-district-subject-to
+  - target: ../metric/performance-index.yml
+    relationship: rated-on
+  - target: ../doctrine/adequacy.yml
+    relationship: bears-on
+  - target: ../../catalog/dew-report-card-achievement.md
+    relationship: sourced-from

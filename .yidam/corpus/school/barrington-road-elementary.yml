@@ -1,0 +1,49 @@
+class: school
+label: Barrington Road Elementary School
+description: |
+  The contrast case, chosen the way [Upper Arlington](../education-agency/upper-arlington-city.yml)
+  was chosen one level up: to sit at the other end of every axis the corpus cares about.
+
+  **Five stars, a Performance Index of 105.9, and 2.5% chronic absenteeism.** [verified —
+  `report-card-2425-buildings.csv`] Against [Anton Grdina](anton-grdina.yml) in Cleveland: 69
+  points of Performance Index and 64 points of chronic absenteeism, in the same state, the same
+  year, on the same instruments.
+
+  **Its district is the corpus's high-wealth exemplar**, and the accountability data now lets the
+  wealth finding and the outcome finding be read on the same object rather than as two separate
+  claims about Ohio. What the pair does *not* establish is that the funding difference caused the
+  outcome difference — the corpus already records that state aid correlates with poverty more
+  tightly than with property wealth, and that spending rises at both ends of the wealth
+  distribution. A two-building contrast is an illustration, not an estimate. [inference]
+
+  Stability is the other thing worth noting: 105.9, 106.2, 104.9 across three years. The buildings
+  at both ends of this distribution are flat. Whatever moves Ohio's outcomes is not moving these.
+  [inference]
+properties:
+  building_irn: 001644 [verified]
+  district: Upper Arlington City School District, IRN 044933. [verified]
+  grades: Not entered; the report card files carry no grade span. [unentered]
+  enrollment: 801 in 2024-25. [verified]
+  performance: |
+    Performance Index 105.9 in 2024-25, 106.2 in 2023-24, 104.9 in 2022-23; five stars on the
+    achievement component. [verified] The overall rating is not published at building grain.
+    [unentered]
+  chronic_absenteeism: 2.5% in 2024-25. [verified]
+  roles: |
+    Not Title I served, on the ordinary reading of a district at Upper Arlington's wealth — which
+    would place it outside the CSI-eligible population entirely, since CSI selects among Title I
+    served schools. Not verified here. [open]
+  series_path: crates/dispersion/fixtures/report-card-2425-buildings.csv, keyed by building IRN 001644. [verified]
+links:
+  - target: ../school.ont.yml
+    relationship: instance-of
+  - target: ../education-agency/upper-arlington-city.yml
+    relationship: operated-by
+  - target: ../metric/performance-index.yml
+    relationship: rated-on
+  - target: anton-grdina.yml
+    relationship: contrasts-with
+  - target: ../doctrine/equity.yml
+    relationship: bears-on
+  - target: ../../catalog/dew-report-card-achievement.md
+    relationship: sourced-from
