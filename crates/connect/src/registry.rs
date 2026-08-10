@@ -252,6 +252,42 @@ pub const OHIO_LAWS_SECTIONS: &[Source] = &[
         fixtures: &[crate::fixtures::STATUTE_FIXTURE],
         note: "R.C. 5705.391. The five-year forecast requirement.",
     },
+    Source {
+        key: "rc-5753-02",
+        title: None,
+        url: "https://codes.ohio.gov/ohio-revised-code/section-5753.02",
+        filename: "rc-5753-02.html",
+        format: Format::Html,
+        catalog: Some("ohio-revised-code"),
+        fixtures: &[crate::fixtures::STATUTE_FIXTURE],
+        note: "R.C. 5753.02. The thirty-three per cent tax on gross casino revenue, which is the \
+               thing the school distribution is a share of.",
+    },
+    Source {
+        key: "rc-5753-03",
+        title: None,
+        url: "https://codes.ohio.gov/ohio-revised-code/section-5753.03",
+        filename: "rc-5753-03.html",
+        format: Format::Html,
+        catalog: Some("ohio-revised-code"),
+        fixtures: &[crate::fixtures::STATUTE_FIXTURE],
+        note: "R.C. 5753.03. The eleven funds the casino tax is split into, and the quarterly \
+               transfer of thirty-four per cent to the county student fund. This is where it \
+               becomes visible that the school share never passes through the department's \
+               budget.",
+    },
+    Source {
+        key: "rc-5753-11",
+        title: None,
+        url: "https://codes.ohio.gov/ohio-revised-code/section-5753.11",
+        filename: "rc-5753-11.html",
+        format: Format::Html,
+        catalog: Some("ohio-revised-code"),
+        fixtures: &[crate::fixtures::STATUTE_FIXTURE],
+        note: "R.C. 5753.11. The student population count the distribution is apportioned on — a \
+               fifth pupil denominator, on two October and May count dates, including community \
+               and STEM schools and double-counting JVSD dual enrolment on purpose.",
+    },
 ];
 
 /// One retrievable publication.

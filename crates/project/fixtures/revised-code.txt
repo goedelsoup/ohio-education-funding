@@ -896,3 +896,70 @@ A district notified under this section shall take immediate steps to eliminate a
 (B) The state board of education, in accordance with sections 3319.31 and 3319.311 of the Revised Code, may limit, suspend, or revoke a license as defined under section 3319.31 of the Revised Code that has been issued to any school employee found to have willfully contributed erroneous, inaccurate, or incomplete data required for the submission of the current budget information and three-year projection required by this section.
 (C) Beginning with submissions required for fiscal year 2026 and for each fiscal year in which a submission is required under this section thereafter, the department and the auditor shall label the projections regarding property tax allocation in the projection as " state reimbursement for property tax credits.
 (D) A school district may submit to the county budget commission the most recent projection prepared pursuant to this section with its tax budget as required by section 5705.28 of the Revised Code or other information as allowed by section 5705.281 of the Revised Code.
+
+=== 5753.02
+title: Tax levied on casino revenue.
+date: September 10, 2010
+source: House Bill 519 - 128th General Assembly
+--
+For the purpose of funding the needs of cities, counties, public school districts, law enforcement, and the horse racing industry; funding efforts to alleviate problem gambling and substance abuse; defraying Ohio casino control commission operating costs; and defraying the costs of administering the tax, a tax is levied on the gross casino revenue received by a casino operator of a casino facility at the rate of thirty-three per cent of the casino operator's gross casino revenue at the casino facility. The tax is in addition to any other taxes or fees imposed under the Revised Code or other law and for which the casino operator is liable under Section 6(C)(2) of Article XV, Ohio Constitution.
+
+=== 5753.03
+title: Funds created.
+date: March 23, 2022
+source: House Bill 29 - 134th General Assembly
+--
+(A) For the purpose of receiving and distributing, and accounting for, revenue received from the tax levied by section 5753.02 of the Revised Code, the following funds are created in the state treasury:
+(1) The casino tax revenue fund;
+(2) The gross casino revenue county fund;
+(3) The gross casino revenue county student fund;
+(4) The gross casino revenue host city fund;
+(5) The Ohio state racing commission fund;
+(6) The Ohio law enforcement training fund;
+(7) The problem casino gambling and addictions fund;
+(8) The casino control commission fund;
+(9) The casino tax administration fund;
+(10) The peace officer training academy fund;
+(11) The criminal justice services casino tax revenue fund.
+(B) All moneys collected from the tax levied under section 5753.02 of the Revised Code shall be deposited into the casino tax revenue fund.
+(C) From the casino tax revenue fund the director of budget and management shall transfer as needed to the tax refund fund amounts equal to the refunds certified by the tax commissioner under section 5753.06 of the Revised Code and attributable to the tax levied under section 5753.02 of the Revised Code.
+(D) After making any transfers required by division (C) of this section, but not later than the fifteenth day of the month following the end of each calendar quarter, the director of budget and management shall transfer amounts to each fund as follows:
+(1) Fifty-one per cent to the gross casino revenue county fund to make payments as required by Section 6(C)(3)(a) of Article XV, Ohio Constitution;
+(2) Thirty-four per cent to the gross casino revenue county student fund to make payments as required by Section 6(C)(3)(b) of Article XV, Ohio Constitution and as provided in section 5753.11 of the Revised Code;
+(3) Five per cent to the gross casino revenue host city fund for the benefit of the cities in which casino facilities are located;
+(4) Three per cent to the Ohio state racing commission fund to support the efforts and activities of the Ohio state racing commission to promote horse racing in this state at which the pari-mutuel system of wagering is conducted;
+(5) Two per cent to the Ohio law enforcement training fund to support law enforcement functions in the state;
+(6) Two per cent to the problem casino gambling and addictions fund to support efforts of the department of mental health and addiction services to alleviate problem gambling and substance abuse and related research in the state under section 5119.47 of the Revised Code;
+(7) Three per cent to the casino control commission fund to support the operations of the Ohio casino control commission and to defray the cost of administering the tax levied under section 5753.02 of the Revised Code.
+Payments under divisions (D)(1) and (3) of this section shall be made by the end of the month following the end of the quarterly period. The tax commissioner shall make the data available to the director of budget and management for this purpose.
+Money in the Ohio state racing commission fund shall be distributed at the discretion of the Ohio state racing commission for the purpose stated in division (D)(4) of this section by the end of the month following the end of the quarterly period. The commission may retain up to ten per cent of the amount transferred to the fund under division (D)(4) of this section for operating expenses necessary for the administration of the fund.
+Payments from the gross casino revenue county student fund as required under section 5753.11 of the Revised Code shall be made by the last day of January and by the last day of August of each year, beginning in 2013. The tax commissioner shall make the data available to the director of budget and management for this purpose.
+Of the money credited to the Ohio law enforcement training fund, the director of budget and management shall distribute eighty-five per cent of the money to the police officer training academy fund for the purpose of supporting the law enforcement training efforts of the Ohio peace officer training academy and fifteen per cent of the money to the criminal justice services casino tax revenue fund for the purpose of supporting the law enforcement training efforts of the division of criminal justice services.
+(E)(1) The tax commissioner shall serve as an agent of the counties of this state only for the purposes of this division and solely to make payments directly to municipal corporations and school districts, as applicable, on the counties' behalf.
+(2) On or before the last day of the month following the end of each calendar quarter, the tax commissioner shall provide for payment from the funds referenced in divisions (D)(1) and (3) of this section to each county and municipal corporation as prescribed in those divisions.
+(3) On or before the last day of January and the last day of August each year, the commissioner shall provide for payments from the fund referenced in division (D)(2) of this section to each school district as prescribed in that division.
+(F) The director of budget and management shall transfer one per cent of the money credited to the casino control commission fund to the casino tax administration fund. The tax commissioner shall use the casino tax administration fund to defray the costs incurred in administering the tax levied under section 5753.02 of the Revised Code.
+(G) All investment earnings of the gross casino revenue county student fund shall be credited to the fund.
+
+=== 5753.11
+title: Calculating student populations.
+date: October 3, 2023
+source: House Bill 33 - 135th General Assembly
+--
+(A) As used in this section:
+(1) "Public school district" means any city, local, exempted village, or joint vocational school district, community school established under Chapter 3314. of the Revised Code, STEM school established under Chapter 3326. of the Revised Code, or college-preparatory boarding school established under Chapter 3328. of the Revised Code. "Public school district" does not include any STEM school operated under section 3326.51 of the Revised Code.
+(2) "Student population" means the number of students residing in a county who are enrolled in a public school district in grades kindergarten through twelve and the total number of preschool children with disabilities on the following dates:
+(a) For the January distribution, the Friday of the first full school week in October;
+(b) For the August distribution, the Friday of the first full school week in May.
+(B) For the purpose of calculating student population, each public school district shall, twice annually, report to the department of education and workforce the students enrolled in the district on the days specified in division (A)(2) of this section. A student shall be considered to be enrolled in a public school district if the student is participating in education programs of the public school district and the public school district has not:
+(1) Received documentation from a parent terminating enrollment of the student;
+(2) Been provided documentation of a student's enrollment in another public or private school; or
+(3) Ceased to offer education to the student.
+If more than one public school district reports a student as enrolled, the department shall use procedures adopted by the department for the reconciliation of enrollment to determine the district of enrollment for purposes of this section. In the case of the dual enrollment of a student in a joint vocational school district and another public school district, the student shall be included in the enrollments for both schools. If the valid school district or enrollment cannot be determined in time for the certification, the count of these students shall be divided equally between the reporting districts.
+(C) The department of education and workforce shall certify to the department of taxation the student population for each county and the student population for each public school district located in whole or in part in the county on or before the thirtieth day of December, for the January distribution and on or before the thirtieth day of July, for the August distribution. A student shall be included in the school district enrollment for a county only if a student resides in that county. The location of each community school shall be the enrollment area required to be defined by the community school and its sponsor in accordance with division (A)(19) of section 3314.03 of the Revised Code, the location of each STEM school shall be any county in which its enrolled students reside, and the location of the college-preparatory boarding schools shall be the territory of the school district in which the college-preparatory school is located or the territory of any city, exempted village, or local school district that has agreed to be a participating district under section 3328.04 of the Revised Code.
+The student population count certified by the department of education and workforce to the department of taxation is final and shall not be adjusted by future updates to the counts.
+(D) Not later than the thirty-first day of January and the thirty-first day of August of each year, the tax commissioner shall distribute funds in the gross casino revenue county student fund to public school districts. The commissioner shall calculate the amount of funds to distribute to each public school district as follows:
+(1) The commissioner shall calculate the proportional share of the funds attributable to each county by dividing the total student population certified for each county by the sum of the total student population certified in all counties statewide.
+(2) The commissioner shall multiply the amount in division (D)(1) of this section by the total amount of funds in the gross casino revenue county student fund to obtain the share of funds for each county.
+(3) The commissioner shall multiply the amount in division (D)(2) of this section by the quotient of the student population certified for each individual district located in the county divided by the sum of the student population certified for all public school districts located in the county.
+The commissioner shall distribute to each public school district the amount so calculated for each district.

@@ -21,6 +21,7 @@ See the class definition: [legislation.ont.yml](../legislation.ont.yml).
 |------|------|-------------|
 | [ohio-constitution-article-vi-section-2](ohio-constitution-article-vi-section-2.yml) | 1851 | Imposed the thorough-and-efficient duty |
 | [hb-920-1976](hb-920-1976.yml) | 1976 | Froze the dollar yield of voted millage against inflation |
+| [hb-94-2001](hb-94-2001.yml) | 2001 | Rebuilt the formula after DeRolph II; parity aid, gap aid, six special education weights |
 | [hb-66-2005](hb-66-2005.yml) | 2005 | Phased out the tangible personal property tax |
 | [hb-1-2009](hb-1-2009.yml) | 2009 | Enacted the Evidence-Based Model |
 | [hb-153-2011](hb-153-2011.yml) | 2011 | Repealed the EBM; installed the Bridge formula |
@@ -38,5 +39,14 @@ choice against an established practice, not an oversight.
 **H.B. 583 (2022)** made technical corrections to the Fair School Funding Plan formula that are
 incorporated into the FY2022 calculations, and is unmodelled. Beyond it, the class thins out
 badly before 2005: the enactments that built and repeatedly amended the foundation base cost
-formula between 1976 and 2005 are represented only by H.B. 920 itself, so the corpus can say
-what that regime did but not which General Assembly did which part of it. [open]
+formula between 1976 and 2005 are represented by H.B. 920 and now
+[H.B. 94](hb-94-2001.yml), so the corpus can say what that regime did but still not which
+General Assembly did most of it. [open]
+
+**And the pre-2005 nodes cannot be sourced the way the later ones are.** `ohio-laws` serves the
+Revised Code as it stands today, which is the wrong document for an act from 2001. Every section
+H.B. 94 is cited by has since been repealed or reused — R.C. 3317.012 now reads "joint vocational
+school district base cost", R.C. 3317.0217 now reads "targeted assistance funding" — so following
+a contemporary citation to the current code silently lands on a different programme. Nodes for
+this era rest on secondary recitation until the session laws are retrievable, which is the same
+gap that keeps `lsc-budget` from carrying the pre-2000 record. [open]
