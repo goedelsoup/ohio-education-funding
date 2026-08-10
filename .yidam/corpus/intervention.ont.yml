@@ -1,0 +1,66 @@
+class: intervention
+label: State Intervention
+foundational_type:
+  ontology: ufo
+  type: event
+description: |
+  What the state does to an education agency or a school building that its accountability system
+  has identified as failing. An Event because it begins on a trigger, unfolds over an interval
+  with named actors and powers, and ends on an exit condition or on abolition.
+
+  It is a class rather than a property because an intervention has substance of its own that
+  belongs to neither endpoint: the statutory authority that permits it, the numeric trigger that
+  compels it, the powers it transfers and from whom, and the criteria for its ending. Ohio's
+  academic distress commission transfers the power to create the district's budget from an
+  elected board to an appointee paid by the department — a fact about the intervention, not about
+  the district.
+
+  Interventions are kept apart from `program` because a program moves money to a recipient under
+  an eligibility rule, and an intervention moves *authority* away from one on a performance
+  trigger. The two are opposite in direction and in what they carry.
+properties:
+  - name: name
+    type: string
+    description: What the intervention is called in statute or in the state plan
+  - name: authority
+    type: string
+    description: Revised Code section, federal provision, or plan section that establishes it
+  - name: trigger
+    type: text
+    description: The condition that begins it, stated as the measure and the threshold
+  - name: unit
+    type: string
+    description: education-agency | school — what the intervention attaches to
+  - name: powers
+    type: text
+    description: What the intervention may do, and which of those powers are fiscal
+  - name: exit
+    type: text
+    description: The condition that ends it, and who determines that it has been met
+  - name: fiscal_effect
+    type: text
+    description: >-
+      What it does to money — who controls the budget, which funds it gates, what it costs and
+      who pays. Empty where an intervention is purely instructional.
+edge_policy: characteristic
+edges:
+  - relationship: authorized-by
+    target: legislation
+    direction: out
+    description: The enactment or plan provision that establishes the intervention
+  - relationship: triggered-by
+    target: metric
+    direction: out
+    description: The measure whose value compels the intervention
+  - relationship: imposed-on
+    target: education-agency
+    direction: out
+    description: An agency subject to the intervention
+  - relationship: imposed-by
+    target: actor
+    direction: out
+    description: The body that establishes or conducts it
+  - relationship: belongs-to
+    target: accountability-regime
+    direction: out
+    description: The regime whose consequence ladder this intervention sits on

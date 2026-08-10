@@ -1,0 +1,112 @@
+id: accountability-domain
+summary: >-
+  Accountability admitted as a second domain beside funding — a fifth scoping axis the genesis
+  dialogue never put. Three new classes approved: school, accountability-regime, intervention.
+  Ohio's academic distress commission is the anchor, because it is a state seizure of the
+  district's budget on academic grounds.
+context: |
+  Decision `ontology` put four scoping questions and every one of them was about money: class
+  list, time span, funding channels, prediction. Accountability was not excluded — it was never
+  asked about. The user has since said the omission was deliberate at the time, to get funding
+  right first, and that it excluded goals they hold.
+
+  The immediate occasion was Ohio's April 2026 ESSA amendment request, catalogued in
+  `ohio-essa-state-plan`. Reviewing it found two provisions that are funding facts — the state
+  proposing annual approval of federal expenditure for persistently identified schools — and
+  three that the corpus could not express at all.
+
+  **Reading the state statute changed the weight of the question.** ESSA identification carries
+  almost no money in Ohio. R.C. 3302.10 does. The department "shall establish an academic distress
+  commission" for any district with three consecutive years at an overall grade of F or under two
+  stars; the commission appoints a chief executive officer **paid by the department rather than by
+  the district**; and among the CEO's enumerated powers is "(j) Creating a budget for the
+  district", alongside contracting, staffing, class sizes and curriculum. The CEO also holds sole
+  authority to disburse an innovation fund appropriated by the General Assembly. [verified]
+
+  That is not accountability adjacent to funding. It is a mechanism by which a district's fiscal
+  autonomy is transferred to a state appointee, triggered by a number the corpus already models
+  from the other side — the same Ohio School Report Card overall rating that pays the
+  [FSFP performance supplement](../corpus/formula-component/fsfp-performance-supplement.yml).
+decision: |
+  Admit accountability as a domain of the corpus rather than as context around funding, and record
+  the four choices the user made when asked:
+
+  **Goals — all four taken**, which is the same pattern as the genesis dialogue, where the maximum
+  option was chosen on every axis: what happens to districts that fail; whether funding buys
+  outcomes; where sanction and payment use the same number; and the whole accountability domain
+  rather than a slice of it.
+
+  **Boundary — both regimes, state first.** Ohio's report card system and academic distress
+  commissions before federal ESSA, on the grounds that the state regime is where the money is and
+  is enacted law rather than a plan amendment awaiting federal approval.
+
+  **Grain — a full building-level `school` class.** ESSA identification and R.C. 3302.12 both
+  attach to a building, and rolling them up to the agency would model the consequence while
+  discarding the unit that triggers it.
+
+  **Three new classes**, taking the ontology from thirteen to sixteen:
+
+    school                  the building. A Kind, below education-agency, holding the unit that
+                            identification and R.C. 3302.12 intervention attach to.
+    accountability-regime   a named era of measurement and consequence — the Ohio report card
+                            system, NCLB, ESSA. Deliberately parallel to `funding-regime`, so the
+                            two histories can be read against each other on one time axis.
+    intervention            what the state does when a district or building fails: an academic
+                            distress commission, a more rigorous intervention, a closure. Carries
+                            its own statutory authority, trigger, powers, duration and exit.
+
+  Status itself is **not** a new class. CSI, ATSI and academic-distress are contingent Roles, which
+  is how this corpus already handles property-poor, 20-mill-floor, guarantee district and DeRolph
+  plaintiff — recorded in `roles` with the periods each applied.
+consequences: |
+  **`school` is approved and not built in this pass, and that is a delivery statement rather than
+  a hedge.** The precedent is decision `proposals`, which approved nine connectors and nine
+  calculators and said plainly that "approval defines the target, not the delivery." A `school`
+  instance needs building-level data and this repository has none: every committed fixture is
+  agency-level, and the one source with site detail — MR-81 — aggregates to sponsor in the
+  extractor. The class ships when the building-level report card files are wired, and not before,
+  because an ontology class with an empty directory is the aspirational-list pattern this
+  repository has already been caught in once, in `agents/`.
+
+  **Four statute sections retrieved and pinned**: R.C. 3302.01 definitions, 3302.03 report cards,
+  3302.10 academic distress commissions, 3302.12 building-level intervention. The corpus can now
+  cite the accountability chapter the way it cites Chapter 3317.
+
+  **The double duty is now expressible, and it is the finding the expansion exists to hold.** One
+  number — the Ohio School Report Card overall rating — determines a payment under the Fair School
+  Funding Plan and a sanction under R.C. 3302.10. Before this decision the corpus modelled the
+  payment and had no way to say the other half. It is not obvious that a measure should do both:
+  a rating that pays a supplement rewards performance at the margin, and the same rating three
+  years running removes the board's control of its own budget.
+
+  **What this costs.** The corpus stops being a funding corpus. Every traversal that was "district
+  in a fiscal period" acquires a second unit and a second time grain — the report card runs on
+  school years and the formula on fiscal years — and the classes that were defined against money
+  now have neighbours that are not about money at all. That is the price of the goals the user
+  named, and it is being paid deliberately.
+alternatives: |
+  **Keep accountability as catalog context only.** This was the recommendation after reviewing the
+  ESSA amendment: one catalog entry and a paragraph on the two federal revenue-stream nodes,
+  arguing that a full accountability layer was scope creep against a funding corpus. Rejected by
+  the user, and the state statute is why the recommendation was wrong. The review reached it by
+  reading a federal plan whose fiscal content is thin, without having read R.C. 3302.10, where a
+  state appointee writes the district's budget. A recommendation to exclude a domain should not
+  have been made before reading that domain's enabling statute.
+
+  **Federal ESSA only.** Rejected. Bounded and already catalogued, but its fiscal content is
+  expenditure-plan approval and little else, and it would have modelled the smaller half.
+
+  **Roll identification up to the education-agency and skip a building class.** Rejected. It keeps
+  one grain and one time axis, and it would record that a district has four identified schools
+  while making the identified school itself unrepresentable — which loses the object the whole
+  mechanism acts on.
+
+  **Model status as an `accountability-status` Relator class.** Rejected in favour of roles, which
+  the education-agency class already documents as the right home for contingent labels. A new
+  class would duplicate machinery that exists and would make the corpus's own convention
+  inconsistent for no gain.
+
+  **Treat outcomes as the expansion.** Rejected as already half-done rather than as wrong:
+  `performance-index` and `progress-value-added` are corpus metrics, `dew-report-card` is wired
+  with five sources, and `dispersion` already correlates spending against performance. The gap was
+  never measurement. It was status and consequence.

@@ -82,6 +82,14 @@ properties:
   fy2027_scale: |
     $55.7m to 427 of 609 districts, $32.50 to $65.00 per pupil. [verified]
 links:
+  - target: ../intervention/academic-distress-commission.yml
+    relationship: shares-trigger-with
+    note: >-
+      The Ohio School Report Card overall rating this supplement pays on is the rating R.C.
+      3302.10 reads three consecutive years of before the department must establish a commission.
+      One measure, a payment and a sanction.
+  - target: ../accountability-regime/ohio-report-card.yml
+    relationship: rated-by
   - target: ../formula-component.ont.yml
     relationship: instance-of
   - target: ../revenue-stream/state-foundation-aid.yml

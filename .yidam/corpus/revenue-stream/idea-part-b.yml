@@ -85,6 +85,8 @@ links:
     relationship: parallels
   - target: ../education-agency/eastland-fairfield-ctc.yml
     relationship: excludes
+  - target: ../accountability-regime/essa.yml
+    relationship: conditioned-by
   - target: ../doctrine/adequacy.yml
     relationship: bears-on
   - target: ../../catalog/ode-idea-part-b-allocations.md
