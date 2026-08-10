@@ -1,0 +1,76 @@
+class: revenue-stream
+label: IDEA Part B
+description: |
+  Federal special education money, on a federal formula, routinely conflated with Ohio's six
+  special education weights — and the conflation matters because the two count different children
+  and are computed different ways. [verified]
+
+  **Ohio's weights are a multiplier on a state-defined category; IDEA Part B is a block
+  allocation.** [Special education weights](../formula-component/fsfp-special-education-weights.yml)
+  attach a multiple to a pupil in one of six clinical categories and run through the state share.
+  IDEA Part B allocates to a district on a base amount plus population and poverty factors — not
+  on its count of children with disabilities at all, beyond a frozen base from 1999. A district
+  that identifies more students receives no more Part B money for them. [verified]
+
+  That is the single most useful fact in this node. It means federal special education funding
+  does **not** respond to a district's special education population, and any analysis that reads
+  the two channels as a combined per-disabled-pupil figure is combining a rate with a lump sum.
+
+  **The proportionate share is a real deduction.** Part B requires a district to spend a
+  proportionate share of its allocation on children with disabilities enrolled by their parents in
+  non-public schools within its boundaries — money the district administers and does not control.
+  The FY2021 allocation file carries it as its own column beside the district's own count.
+  [verified — [`ode-idea-part-b-allocations`](../../catalog/ode-idea-part-b-allocations.md)]
+
+  **The receiving-entity list is not the district list.** The FY2021 file lists 979 entities:
+  traditional districts, community schools, and county boards of developmental disabilities.
+  **Joint vocational school districts do not appear at all**, because federal special education
+  money reaches career-technical students through their member districts — so a statewide roll-up
+  built from this file silently omits career-technical provision, and the omission is undetectable
+  from the file itself. That is how
+  [Eastland-Fairfield](../education-agency/eastland-fairfield-ctc.yml) was confirmed as
+  structurally different rather than merely missing. [verified]
+
+  **Congress has never funded it at the promised level.** The 1975 Act contemplated a federal
+  contribution of up to 40% of the excess cost of educating a child with a disability; the actual
+  figure has run far below that for the whole life of the statute, which is why the shortfall is a
+  standing item in every state's budget politics. The Ohio-specific number is not established
+  here. [open]
+
+  The allocation tables are catalogued and have never been retrieved: they are one PDF per fiscal
+  year, and `pdftotext -layout` reads them cleanly, so this is extraction work rather than a
+  blocker. [verified]
+properties:
+  name: Individuals with Disabilities Education Act, Part B — Grants to States
+  level: federal
+  legal_basis: |
+    Individuals with Disabilities Education Act, Part B, Section 611; 20 U.S.C. 1411. Allocated to
+    states, sub-allocated by the state education agency to local educational agencies. [verified]
+  restriction: |
+    Restricted to excess costs of special education and related services, with maintenance-of-effort
+    and supplement-not-supplant conditions: a district may not reduce its own special education
+    spending because Part B money arrived. Includes a mandatory proportionate share for
+    parentally-placed non-public students. [verified]
+  growth_behavior: |
+    Base amount frozen at each district's FY1999 allocation, with growth distributed on general
+    population and poverty rather than on disability counts. [verified] The practical effect is
+    that the channel drifts away from the distribution of need over time, and a district whose
+    identified population has grown since 1999 is funded on a twenty-five-year-old base.
+    [inference]
+  series_path: |
+    Not yet populated. [unentered] Target: `crates/` data from
+    [`ode-idea-part-b-allocations`](../../catalog/ode-idea-part-b-allocations.md), which is
+    catalogued with a known reader and no connector.
+links:
+  - target: ../revenue-stream.ont.yml
+    relationship: instance-of
+  - target: ../formula-component/fsfp-special-education-weights.yml
+    relationship: parallels
+  - target: ../formula-component/fsfp-preschool-special-education.yml
+    relationship: parallels
+  - target: ../education-agency/eastland-fairfield-ctc.yml
+    relationship: excludes
+  - target: ../doctrine/adequacy.yml
+    relationship: bears-on
+  - target: ../../catalog/ode-idea-part-b-allocations.md
+    relationship: sourced-from

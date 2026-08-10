@@ -54,6 +54,35 @@ description: |
   which more than doubles what the formula gives that quartile. A component can leave the
   ranking nearly intact while moving a great deal of money. [inference]
 
+  **HOW MUCH OF THE LOCAL GAP EACH LEVEL OF GOVERNMENT CLOSES, IN DOLLARS.** Everything above is
+  a correlation, which says whether targeting exists and not how much of the disparity it removes.
+  Quartiling the 611 comparable Ohio districts by local revenue per pupil in FY2022 and reading
+  the other two levels against it: [verified —
+  `dispersion::national_peers::ohio_by_local_wealth`, pinned by test]
+
+      quartile   local/pupil   state/pupil   federal/pupil
+      Q1 poorest      $4,342        $8,970          $2,738
+      Q2              $6,678        $7,199          $2,231
+      Q3              $8,541        $6,232          $2,181
+      Q4 richest     $13,932        $4,522          $1,825
+
+  The local gap is **$9,590 per pupil**. State equalization closes **$4,448 of it — 46%** — and
+  the [federal channel](../revenue-stream/esser.yml) closes **$913, or 9.5%**. **$4,229 per pupil
+  of the gap survives both.** [verified]
+
+  Two things follow that the correlations did not give. Federal money in Ohio is compensatory,
+  monotonically across all four quartiles, which the corpus had never checked and could have
+  assumed either way — Title I runs on a poverty count and IDEA Part B does not, so the aggregate
+  behaviour was not derivable from the parts. And the state's contribution is not close to full
+  equalization on any reading: nearly half of what the local base opens, the state closes, and
+  the rest stands.
+
+  **The year flatters both numbers.** FY2022 is the peak of
+  [ESSER](../revenue-stream/esser.yml), so the federal offset here is the largest that will ever
+  be measured, and those funds expired in September 2024. It is also the year in which state and
+  local shares are both deflated by the inflated federal one. The honest reading is that this
+  table is an upper bound on how equalized Ohio is, not an estimate of it. [inference]
+
   **AND IT FORCED A CORRECTION TO HOW THIS CLASS MEASURES THINGS.** For *spending*, less
   dispersion is more equitable — that is the assumption behind the coefficient of variation and
   the federal range ratio reported above. For *state aid*, the sign flips. Aid is compensatory,
@@ -129,3 +158,7 @@ links:
     relationship: grounded-in
   - target: ../litigation/cincinnati-v-walter-1979.yml
     relationship: invoked-by
+  - target: ../revenue-stream/esser.yml
+    relationship: measured-against
+  - target: ../revenue-stream/title-i.yml
+    relationship: measured-against
