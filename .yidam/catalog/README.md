@@ -41,16 +41,16 @@ Sorted by: type, then slug.
 | [`dot-reappraisal-calendar`](dot-reappraisal-calendar.md) | Ohio's sexennial reappraisal and triennial update calendar | 1 |
 | [`dot-sd1-school-district-taxes`](dot-sd1-school-district-taxes.md) | Table SD-1 — School district taxable value and taxes charged | 1 |
 | [`fordham-base-cost-critique`](fordham-base-cost-critique.md) | Fordham Institute — Ohio Base Cost Model Commentary | 2 |
-| [`lsc-dew-redbook`](lsc-dew-redbook.md) | LSC Redbook — Ohio Department of Education and Workforce | 0 |
-| [`lsc-hb96-analysis`](lsc-hb96-analysis.md) | LSC Budget Analysis — H.B. 96 (FY2026-27) | 2 |
+| [`lsc-dew-redbook`](lsc-dew-redbook.md) | LSC Redbook — Ohio Department of Education and Workforce | 1 |
+| [`lsc-hb96-analysis`](lsc-hb96-analysis.md) | LSC Budget Analysis — H.B. 96 (FY2026-27) | 3 |
 | [`lsc-school-funding-complete-resource`](lsc-school-funding-complete-resource.md) | LSC School Funding Complete Resource | 2 |
 | [`nces-ccd-lea-directory`](nces-ccd-lea-directory.md) | Common Core of Data: local education agency directory | 1 |
 | [`ocg-fact-check-021`](ocg-fact-check-021.md) | OCG Ground Truth Fact-Check RL-2026-021 — Toledo–Perrysburg Special-Needs Spending | 3 |
 | [`ocg-white-paper-013`](ocg-white-paper-013.md) | OCG White Paper No. 013 — Does Per-Pupil Spending Track Academic Performance? | 4 |
 | [`ode-idea-part-b-allocations`](ode-idea-part-b-allocations.md) | IDEA Part B Allocations to Districts | 2 |
-| [`ohio-revised-code`](ohio-revised-code.md) | Ohio Revised Code — the sections this corpus cites | 1 |
+| [`ohio-revised-code`](ohio-revised-code.md) | Ohio Revised Code — the sections this corpus cites | 2 |
 
-27 entries, 1 not yet cited by any corpus node. 66 retrieved files are pinned by SHA-256 in [`crates/connect/source-digests.txt`](../../crates/connect/source-digests.txt).
+27 entries, 0 not yet cited by any corpus node. 67 retrieved files are pinned by SHA-256 in [`crates/connect/source-digests.txt`](../../crates/connect/source-digests.txt).
 <!-- /REGEN -->
 
 ## Adding a source

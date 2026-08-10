@@ -37,7 +37,11 @@ properties:
     on existing real property. Exceptions: new construction, newly voted millage, inside
     (unvoted) millage, and districts at the 20-mill floor, whose revenue rises with valuation.
   series_path: |
-    Not yet populated. [unentered] Target: crates/ data files fed by `tax-abstract`.
+    crates/dispersion/fixtures/sd1-district-taxes.csv — taxable value by class and real property
+    taxes charged, TY2021 through TY2024, from Table SD-1. [verified] The longer view is the local
+    column of crates/dispersion/fixtures/f33-ohio-panel.csv, FY2012-FY2022 on the Census
+    Bureau's definitions rather than the Department of Taxation's; the two are not the same
+    measure and must not be spliced.
 links:
   - target: ../revenue-stream.ont.yml
     relationship: instance-of

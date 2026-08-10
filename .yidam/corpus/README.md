@@ -77,34 +77,32 @@ Fields: count per claim tag across every node; then the unresolved marks by the 
 -->
 | Tag | Count | What it records |
 |---|--:|---|
-| `[verified]` | 475 | supported by a committed primary source |
-| `[inference]` | 179 | drawn from verified facts, not witnessed |
-| `[open]` | 141 | a live question — unknown, contested, or being worked |
-| `[unentered]` | 30 | a knowable value nobody has typed in yet |
+| `[verified]` | 492 | supported by a committed primary source |
+| `[inference]` | 181 | drawn from verified facts, not witnessed |
+| `[open]` | 143 | a live question — unknown, contested, or being worked |
+| `[unentered]` | 21 | a knowable value nobody has typed in yet |
 
-171 unresolved marks in total, 141 of them live questions and 30 of them empty fields. Before the two were distinguished the corpus reported the sum as its count of what it does not know, which overstated it by 17%.
+164 unresolved marks in total, 143 of them live questions and 21 of them empty fields. Before the two were distinguished the corpus reported the sum as its count of what it does not know, which overstated it by 12%.
 
 | Field | `[open]` | `[unentered]` |
 |---|--:|--:|
-| `description` | 75 | 1 |
-| `series_path` | 0 | 12 |
+| `description` | 77 | 1 |
 | `series` | 10 | 0 |
-| `vetoes` | 7 | 0 |
+| `vetoes` | 7 | 1 |
 | `established` | 0 | 7 |
 | `typology` | 1 | 5 |
 | `statutory_basis` | 6 | 0 |
+| `series_path` | 0 | 5 |
 | `findings` | 4 | 0 |
 | `eligibility` | 3 | 0 |
 | `definition` | 3 | 0 |
 | `contested` | 3 | 0 |
 | `caveats` | 3 | 0 |
 | `boundary_note` | 3 | 0 |
-| `appropriation_line` | 0 | 3 |
 | `amount` | 3 | 0 |
 | `subject` | 2 | 0 |
 | `roles` | 2 | 0 |
 | `legal_basis` | 2 | 0 |
-| `irn` | 0 | 2 |
 | `holding` | 2 | 0 |
 | `confidence` | 2 | 0 |
 | `calculator` | 2 | 0 |
@@ -113,9 +111,11 @@ Fields: count per claim tag across every node; then the unresolved marks by the 
 | `remedy` | 1 | 0 |
 | `mechanism` | 1 | 0 |
 | `kind` | 1 | 0 |
+| `irn` | 0 | 1 |
 | `context` | 1 | 0 |
 | `citation` | 1 | 0 |
 | `case_name` | 1 | 0 |
+| `appropriation_line` | 0 | 1 |
 <!-- /REGEN -->
 
 ## Node index
@@ -130,9 +130,9 @@ Sorted by: kind, then alphabetically.
 |---|---|---|--:|--:|
 | [`department-of-education-and-workforce`](actor/department-of-education-and-workforce.yml) | actor | Department of Education and Workforce | 3 | 1 |
 | [`ohio-department-of-education`](actor/ohio-department-of-education.yml) | actor | Ohio Department of Education (superseded) | 2 | 2 |
-| [`ohio-general-assembly`](actor/ohio-general-assembly.yml) | actor | Ohio General Assembly | 6 | 4 |
+| [`ohio-general-assembly`](actor/ohio-general-assembly.yml) | actor | Ohio General Assembly | 6 | 5 |
 | [`supreme-court-of-ohio`](actor/supreme-court-of-ohio.yml) | actor | Supreme Court of Ohio | 3 | 5 |
-| [`adequacy`](doctrine/adequacy.yml) | doctrine | Adequacy | 8 | 23 |
+| [`adequacy`](doctrine/adequacy.yml) | doctrine | Adequacy | 8 | 24 |
 | [`equity`](doctrine/equity.yml) | doctrine | Equity | 9 | 25 |
 | [`thorough-and-efficient`](doctrine/thorough-and-efficient.yml) | doctrine | Thorough and Efficient | 5 | 11 |
 | [`cleveland-municipal`](education-agency/cleveland-municipal.yml) | education-agency | Cleveland Municipal School District | 3 | 5 |
@@ -142,7 +142,7 @@ Sorted by: kind, then alphabetically.
 | [`perrysburg-exempted-village`](education-agency/perrysburg-exempted-village.yml) | education-agency | Perrysburg Exempted Village School District | 4 | 1 |
 | [`toledo-city`](education-agency/toledo-city.yml) | education-agency | Toledo City School District | 3 | 2 |
 | [`upper-arlington-city`](education-agency/upper-arlington-city.yml) | education-agency | Upper Arlington City School District | 3 | 5 |
-| [`fy2022`](fiscal-period/fy2022.yml) | fiscal-period | Fiscal Year 2022 | 3 | 2 |
+| [`fy2022`](fiscal-period/fy2022.yml) | fiscal-period | Fiscal Year 2022 | 3 | 3 |
 | [`fy2022-23`](fiscal-period/fy2022-23.yml) | fiscal-period | FY2022-23 Biennium | 4 | 2 |
 | [`fy2024-25`](fiscal-period/fy2024-25.yml) | fiscal-period | FY2024-25 Biennium | 5 | 3 |
 | [`fy2026`](fiscal-period/fy2026.yml) | fiscal-period | Fiscal Year 2026 | 3 | 8 |
@@ -166,15 +166,16 @@ Sorted by: kind, then alphabetically.
 | [`bridge-formula`](funding-regime/bridge-formula.yml) | funding-regime | Bridge Formula | 6 | 6 |
 | [`equal-yield-formula`](funding-regime/equal-yield-formula.yml) | funding-regime | Equal Yield Formula | 3 | 2 |
 | [`evidence-based-model`](funding-regime/evidence-based-model.yml) | funding-regime | Evidence-Based Model | 3 | 6 |
-| [`fair-school-funding-plan`](funding-regime/fair-school-funding-plan.yml) | funding-regime | Fair School Funding Plan | 21 | 18 |
+| [`fair-school-funding-plan`](funding-regime/fair-school-funding-plan.yml) | funding-regime | Fair School Funding Plan | 21 | 19 |
 | [`foundation-base-cost-formula`](funding-regime/foundation-base-cost-formula.yml) | funding-regime | Foundation Base Cost Formula | 5 | 7 |
 | [`hb-1-2009`](legislation/hb-1-2009.yml) | legislation | Am. Sub. H.B. 1 (2009) — FY2010-11 Budget; Evidence-Based Model | 2 | 3 |
-| [`hb-110-2021`](legislation/hb-110-2021.yml) | legislation | Am. Sub. H.B. 110 (2021) — FY2022-23 Budget; Fair School Funding Plan | 4 | 6 |
+| [`hb-110-2021`](legislation/hb-110-2021.yml) | legislation | Am. Sub. H.B. 110 (2021) — FY2022-23 Budget; Fair School Funding Plan | 5 | 7 |
 | [`hb-153-2011`](legislation/hb-153-2011.yml) | legislation | Am. Sub. H.B. 153 (2011) — FY2012-13 Budget; Bridge Formula | 6 | 1 |
-| [`hb-33-2023`](legislation/hb-33-2023.yml) | legislation | Am. Sub. H.B. 33 (2023) — FY2024-25 Budget | 8 | 6 |
+| [`hb-33-2023`](legislation/hb-33-2023.yml) | legislation | Am. Sub. H.B. 33 (2023) — FY2024-25 Budget | 8 | 7 |
+| [`hb-583-2022`](legislation/hb-583-2022.yml) | legislation | Sub. H.B. 583 (2022) — corrective and technical changes to the Fair School Funding Plan | 5 | 1 |
 | [`hb-66-2005`](legislation/hb-66-2005.yml) | legislation | Am. Sub. H.B. 66 (2005) — FY2006-07 Budget; Tangible Personal Property Tax Phase-Out | 2 | 4 |
 | [`hb-920-1976`](legislation/hb-920-1976.yml) | legislation | Am. Sub. H.B. 920 (1976) — Tax Reduction Factors | 4 | 12 |
-| [`hb-94-2001`](legislation/hb-94-2001.yml) | legislation | Am. Sub. H.B. 94 (2001) — FY2002-03 Budget; the post-DeRolph II formula | 9 | 1 |
+| [`hb-94-2001`](legislation/hb-94-2001.yml) | legislation | Am. Sub. H.B. 94 (2001) — FY2002-03 Budget; the post-DeRolph II formula | 9 | 2 |
 | [`hb-96-2025`](legislation/hb-96-2025.yml) | legislation | Am. Sub. H.B. 96 (2025) — FY2026-27 Budget | 6 | 9 |
 | [`ohio-constitution-article-vi-section-2`](legislation/ohio-constitution-article-vi-section-2.yml) | legislation | Ohio Constitution, Article VI, Section 2 (1851) | 2 | 5 |
 | [`cincinnati-v-walter-1979`](litigation/cincinnati-v-walter-1979.yml) | litigation | Cincinnati City School District Board of Education v. Walter (1979) | 5 | 4 |
@@ -200,17 +201,18 @@ Sorted by: kind, then alphabetically.
 | [`classroom-facilities-assistance`](program/classroom-facilities-assistance.yml) | program | Classroom Facilities Assistance Program | 3 | 2 |
 | [`cleveland-scholarship`](program/cleveland-scholarship.yml) | program | Cleveland Scholarship and Tutoring Program | 3 | 3 |
 | [`edchoice-expansion`](program/edchoice-expansion.yml) | program | EdChoice Expansion Scholarship | 4 | 4 |
-| [`casino-tax-distribution`](revenue-stream/casino-tax-distribution.yml) | revenue-stream | Casino Tax — County Student Fund | 5 | 0 |
+| [`casino-tax-distribution`](revenue-stream/casino-tax-distribution.yml) | revenue-stream | Casino Tax — County Student Fund | 6 | 1 |
 | [`esser`](revenue-stream/esser.yml) | revenue-stream | ESSER — Elementary and Secondary School Emergency Relief | 4 | 1 |
 | [`idea-part-b`](revenue-stream/idea-part-b.yml) | revenue-stream | IDEA Part B | 4 | 1 |
 | [`local-property-tax`](revenue-stream/local-property-tax.yml) | revenue-stream | Local Property Tax | 6 | 8 |
-| [`state-foundation-aid`](revenue-stream/state-foundation-aid.yml) | revenue-stream | State Foundation Aid | 5 | 15 |
+| [`lottery-profits`](revenue-stream/lottery-profits.yml) | revenue-stream | Lottery Profits Education Fund | 4 | 1 |
+| [`state-foundation-aid`](revenue-stream/state-foundation-aid.yml) | revenue-stream | State Foundation Aid | 5 | 16 |
 | [`title-i`](revenue-stream/title-i.yml) | revenue-stream | Title I, Part A | 3 | 2 |
 | [`tpp-replacement-payments`](revenue-stream/tpp-replacement-payments.yml) | revenue-stream | Tangible Personal Property Tax Replacement Payments | 3 | 3 |
 | [`fsfp-input-year-refresh`](scenario/fsfp-input-year-refresh.yml) | scenario | FSFP Cost Input Refresh vs. Freeze | 9 | 4 |
 | [`guarantee-phase-out`](scenario/guarantee-phase-out.yml) | scenario | Phasing Out the Temporary Transitional Aid Guarantee | 11 | 2 |
 
-81 nodes across 13 classes. **1 have nothing pointing at them**, which the corpus rules treat as a gap rather than a fact about the node.
+83 nodes across 13 classes. **0 have nothing pointing at them**, which the corpus rules treat as a gap rather than a fact about the node.
 <!-- /REGEN -->
 
 ## Semantic index status
@@ -220,5 +222,5 @@ Regenerated by: `yidam index-status`
 Fields: total nodes indexed, embedding model, index freshness (last indexed commit vs HEAD),
         stale node count.
 -->
-No semantic index is built. The corpus is 81 nodes and fits in context; an index is added when direct retrieval stops working, which has not happened.
+No semantic index is built. The corpus is 83 nodes and fits in context; an index is added when direct retrieval stops working, which has not happened.
 <!-- /REGEN -->

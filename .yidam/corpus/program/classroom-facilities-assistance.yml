@@ -32,7 +32,11 @@ properties:
   amount: |
     Not yet populated. [open] State share is a percentage of assessed project cost varying by
     district wealth ranking.
-  appropriation_line: Capital appropriations, separate from the operating budget; the specific line not yet entered. [unentered]
+  appropriation_line: |
+    Capital appropriations, separate from the operating budget and therefore absent from the
+    Department of Education and Workforce redbook this corpus holds — that document covers the
+    operating budget only. [verified] The specific line is in the capital appropriations act,
+    which no connector retrieves. [unentered]
 links:
   - target: ../program.ont.yml
     relationship: instance-of

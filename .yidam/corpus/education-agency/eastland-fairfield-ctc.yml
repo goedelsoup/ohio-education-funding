@@ -31,8 +31,11 @@ description: |
   IRN, member district list, enrollment, and funding series remain unpopulated. [open]
 properties:
   irn: |
-    Not yet entered. [unentered] Absent from the FY2021 IDEA Part B allocation list; a JVSD IRN
-    must come from the department's educational directory or an `nces-ccd` crosswalk instead.
+    051003 [verified — `crates/dispersion/fixtures/mr81-sponsor-panel.csv`, where it reports as
+    "Eastland-Fairfield Career/Tech Jt Voc SD" in October 2001]. Absent from the FY2021 IDEA Part
+    B allocation list, because federal special education money reaches career-technical students
+    through their member districts rather than through the JVSD — which is why this took a
+    child-nutrition return to establish.
   agency_type: joint-vocational
   county: Franklin and Fairfield
   typology: |
@@ -42,7 +45,12 @@ properties:
   roles: |
     Career-technical provider to member districts [verified]. Subject to the 2-mill JVSD
     reduction-factor floor rather than the 20-mill floor [verified].
-  series_path: Not yet populated. [unentered]
+  series_path: |
+    Per-agency series are held by IRN across four committed fixtures, not one path: [verified]
+      crates/foundation/fixtures/fy27-department-model.csv    FY2027 formula run, 609 districts
+      crates/project/fixtures/district-finances.csv           FY2020-FY2024 actuals and balances
+      crates/dispersion/fixtures/f33-ohio-panel.csv           FY2012-FY2022 revenue, federal basis
+      crates/dispersion/fixtures/mr81-sponsor-panel.csv       2001-2011 free and reduced lunch
 links:
   - target: ../education-agency.ont.yml
     relationship: instance-of

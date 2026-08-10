@@ -35,7 +35,11 @@ properties:
     stagnates otherwise. Caps and guarantees can detach an agency's payment from the formula
     result entirely.
   series_path: |
-    Not yet populated. [unentered] Target: crates/ data files fed by `dew-foundation`.
+    crates/foundation/fixtures/fy27-department-model.csv for the FY2027 formula run, and
+    crates/project/fixtures/district-finances.csv for FY2020-FY2024 as districts reported
+    receiving it. [verified] crates/dispersion/fixtures/f33-ohio-panel.csv carries the state
+    column FY2012-FY2022 on federal definitions, which is the only decade-length view and is not
+    the department's own accounting.
 links:
   - target: ../revenue-stream.ont.yml
     relationship: instance-of

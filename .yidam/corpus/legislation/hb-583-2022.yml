@@ -1,0 +1,50 @@
+class: legislation
+label: Sub. H.B. 583 (2022) — corrective and technical changes to the Fair School Funding Plan
+description: |
+  The third of the three acts that make up the Fair School Funding Plan as it actually operates,
+  and the one nobody cites.
+
+  LSC's own account of where the current system comes from names exactly three documents: the
+  final analysis for [H.B. 110](hb-110-2021.yml), "which enacted the system"; the final analysis
+  for **H.B. 583 of the 134th General Assembly, "which made a number of corrective and technical
+  changes to it"**; and the final analysis for [H.B. 33](hb-33-2023.yml), "which extended the
+  system to the FY2025-FY2026 biennium." [verified —
+  [the enacted H.B. 96 analysis](../../../crates/project/fixtures/enacted-school-funding.txt)]
+
+  **Why a node for a technical corrections act.** Because its corrections are already inside every
+  FY2022 figure this corpus holds, and were before it had a name here. The
+  [FY2022 payment report](../fiscal-period/fy2022.yml) is H.B. 110 as corrected by this act, not
+  H.B. 110 as passed. Anyone reconciling a FY2022 per-district amount against the text of H.B. 110
+  alone is reconciling against a formula that was never run.
+
+  That is the same failure the corpus recorded for [H.B. 94](hb-94-2001.yml), from the other
+  direction: there, a citation resolves to a section that has since been repurposed; here, an act
+  that everybody cites was amended by one that almost nobody does.
+
+  **What it changed is not held.** LSC published a final analysis for it and `lsc-budget`
+  retrieves one document — the final analysis of the *current* budget act. This one is a separate
+  PDF that no connector fetches, so the corpus can say that corrections were made, that they are
+  operative, and that they are technical on LSC's characterisation, and cannot say which
+  provisions moved. [open] Until that is retrieved, any claim that a specific FY2022 mechanism
+  came from H.B. 110 rather than from this act is unverified. [open]
+properties:
+  designation: Sub. H.B. 583
+  general_assembly: 134th General Assembly
+  signed: 2022-06-24
+  effective: 2022-09-23
+  subject: |
+    Made corrective and technical changes to the Fair School Funding Plan enacted by Am. Sub.
+    H.B. 110, incorporated into the FY2022 calculations. [verified — characterised this way by
+    LSC in the H.B. 96 final analysis; the act's own final analysis is not held]
+  vetoes: Not assessed. [unentered]
+links:
+  - target: ../legislation.ont.yml
+    relationship: instance-of
+  - target: hb-110-2021.yml
+    relationship: amends
+  - target: ../funding-regime/fair-school-funding-plan.yml
+    relationship: corrects
+  - target: ../fiscal-period/fy2022.yml
+    relationship: governs
+  - target: ../../catalog/lsc-hb96-analysis.md
+    relationship: sourced-from
