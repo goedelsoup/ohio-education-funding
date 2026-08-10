@@ -24,8 +24,27 @@ description: |
   this building and would for a smaller one. Whether the rate reflects poverty, distance, or
   something the corpus cannot see is not established. [open]
 
-  What this node cannot say is whether Sheridan has ever been identified under ESSA. The corpus
-  holds no CSI, TSI or ATSI list. [open]
+  **AND IT IS A COMPREHENSIVE SUPPORT AND IMPROVEMENT SCHOOL.** This node said one commit ago
+  that the corpus could not tell whether Sheridan had ever been identified, because it held no
+  list. It holds the list now. Sheridan is on it: **ATSI 2022, escalated to CSI 2025**. [verified —
+  `dispersion::identified`, pinned by test]
+
+  The building Ohio's constitutional litigation is named for is federally identified as one of the
+  state's schools needing comprehensive support, thirty-four years after the case was filed on
+  behalf of a student who attended it.
+
+  **The route matters and is easy to lose.** Sheridan did not arrive here by performing in the
+  lowest 5% — a four-star building with a Performance Index of 89.9 plainly did not. It was
+  identified as ATSI in 2022, meaning **one or more student subgroups** performed at or below the
+  CSI identification threshold, and it did not exit within three years. Ohio's plan escalates such
+  schools to CSI automatically. Forty-two of the 231 CSI schools arrived this way. [verified]
+
+  So the whole-school numbers on this node and its accountability status are not in tension: they
+  are measuring different things. A building can be comfortably mid-distribution overall and carry
+  a subgroup that is not, and the federal system is built to surface exactly that. Which subgroup
+  is not published on the CSI list — it appears on the ATSI list, which carries subgroup columns,
+  and Sheridan's 2022 ATSI row is not in the current file because the department republishes each
+  list in place rather than archiving cycles. [open]
 properties:
   building_irn: 034363 [verified]
   district: Northern Local School District (Perry County), IRN 049056. [verified]
@@ -41,8 +60,9 @@ properties:
     input to it. [unentered]
   chronic_absenteeism: 25.9% in 2024-25. [verified]
   roles: |
-    DeRolph plaintiff's school, 1991. [verified] Title I served status and any federal
-    identification are not held. [unentered]
+    DeRolph plaintiff's school, 1991. [verified] **ATSI 2022; CSI 2025**, the latter by escalation
+    after failing to exit ATSI within three years. [verified — `dispersion::identified`] Title I
+    served status is not published on these lists and is not held. [unentered]
   series_path: crates/dispersion/fixtures/report-card-2425-buildings.csv, keyed by building IRN 034363. [verified]
 links:
   - target: ../school.ont.yml

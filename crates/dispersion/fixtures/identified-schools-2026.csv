@@ -1,0 +1,409 @@
+status,building_irn,building_name,lea_irn,lea_name,school_type,subgroups,year_identified,open_closed,cycle,school_year
+atsi,000236,Ohio Connections Academy; Inc,000236,Ohio Connections Academy; Inc,Community School,Economic Disadvantage,,,Year 1,2025
+atsi,000470,Independence Elementary School,044222,Lima City,Traditional School,Students with Disabilities;White Non-Hispanic,,,Year 1,2025
+atsi,000519,Whiteoak Junior High School,047613,Bright Local,Traditional School,Students with Disabilities,,,Year 1,2025
+atsi,000546,Winterfield Venture Academy,000546,Winterfield Venture Academy,Community School,Multiracial,,,Year 1,2025
+atsi,001339,Austintown Middle School,048298,Austintown Local Schools,Traditional School,Students with Disabilities,,,Year 1,2025
+atsi,001396,Avondale Elementary School,043802,Columbus City Schools District,Traditional School,Economic Disadvantage,,,Year 1,2025
+atsi,001537,Barber Community Learning Center,043489,Akron City,Traditional School,Students with Disabilities,,,Year 1,2025
+atsi,002048,Beechwood Elementary School,045070,Whitehall City,Traditional School,Students with Disabilities,,,Year 1,2025
+atsi,003301,Bowsher High School,044909,Toledo City,Traditional School,Multiracial,,,Year 1,2025
+atsi,003905,Brown Middle School,044685,Ravenna City,Traditional School,Hispanic,,,Year 1,2025
+atsi,004135,Buckeye Middle School,043802,Columbus City Schools District,Traditional School,English Learner,,,Year 1,2025
+atsi,004341,Burroughs Elementary School,043802,Columbus City Schools District,Traditional School,Students with Disabilities,,,Year 1,2025
+atsi,004739,Streetsboro Elementary School,049239,Streetsboro City,Traditional School,Students with Disabilities,,,Year 1,2025
+atsi,005157,Chestnut Elementary School,044628,Painesville City Local,Traditional School,Students with Disabilities,,,Year 1,2025
+atsi,006239,Cheviot School,043752,Cincinnati Public Schools,Traditional School,Students with Disabilities,,,Year 1,2025
+atsi,006338,Circleville Middle School,043760,Circleville City,Traditional School,Multiracial,,,Year 1,2025
+atsi,007799,Crissey Elementary School,048223,Springfield Local,Traditional School,Students with Disabilities,,,Year 1,2025
+atsi,008185,Daw Elementary School,045039,Wellsville Local,Traditional School,Multiracial,,,Year 1,2025
+atsi,008298,Lima Senior High School,044222,Lima City,Traditional School,Multiracial;White Non-Hispanic,,,Year 1,2025
+atsi,008508,West Muskingum Elementary School,048884,West Muskingum Local,Traditional School,Students with Disabilities,,,Year 1,2025
+atsi,008649,Dorr Street Elementary School,048223,Springfield Local,Traditional School,Black Non-Hispanic;Students with Disabilities,,,Year 1,2025
+atsi,008698,Frederick Douglass School,043752,Cincinnati Public Schools,Traditional School,Black Non-Hispanic;Students with Disabilities,,,Year 1,2025
+atsi,008912,Duxberry Park Alternative Elementary School,043802,Columbus City Schools District,Traditional School,Economic Disadvantage,,,Year 1,2025
+atsi,009001,East Columbus Elementary School,043802,Columbus City Schools District,Traditional School,Black Non-Hispanic,,,Year 1,2025
+atsi,009031,J.F. Kennedy School,044305,Maple Heights City,Traditional School,Economic Disadvantage;Students with Disabilities,,,Year 1,2025
+atsi,009200,James N. Gamble Montessori High School,043752,Cincinnati Public Schools,Traditional School,English Learner,,,Year 1,2025
+atsi,009221,Toni Wofford Morrison ES,044263,Lorain City,Traditional School,Hispanic,,,Year 1,2025
+atsi,009224,Madison Park Elementary,048694,Trotwood-Madison City,Traditional School,Economic Disadvantage;Multiracial,,,Year 1,2025
+atsi,009340,Mt. Pleasant Elementary School,044206,Lancaster City,Traditional School,Students with Disabilities,,,Year 1,2025
+atsi,009571,Eastern High School,048512,Eastern Local,Traditional School,Students with Disabilities,,,Year 1,2025
+atsi,009589,Eastern High School,049122,Eastern Local School District,Traditional School,Students with Disabilities,,,Year 1,2025
+atsi,009647,Eastmont Elementary School,043844,Dayton City,Traditional School,Students with Disabilities,,,Year 1,2025
+atsi,010413,Elmwood Elementary School,044040,Garfield Heights City Schools,Traditional School,Students with Disabilities,,,Year 1,2025
+atsi,010454,Ely Elementary School,043943,Elyria City Schools,Traditional School,Black Non-Hispanic;Students with Disabilities,,,Year 1,2025
+atsi,010811,Ruskin Elementary School,043844,Dayton City,Traditional School,Students with Disabilities;White Non-Hispanic,,,Year 1,2025
+atsi,011518,Superior Intermediate School,043513,Ashtabula Area City,Traditional School,English Learner,,,Year 1,2025
+atsi,011732,Bucyrus Elementary School,043687,Bucyrus City,Traditional School,Students with Disabilities,,,Year 1,2025
+atsi,012963,Garfield Elementary School,044263,Lorain City,Traditional School,Hispanic,,,Year 1,2025
+atsi,013170,The Brilliance School,013170,The Brilliance School,Community School,Black Non-Hispanic;Economic Disadvantage,,,Year 1,2025
+atsi,013599,Glendale-Feilbach Elementary School,044909,Toledo City,Traditional School,Students with Disabilities,,,Year 1,2025
+atsi,013755,Trimble High School,045922,Trimble Local,Traditional School,Students with Disabilities,,,Year 1,2025
+atsi,013995,NORTHRIDGE MIDDLE SCHOOL,048736,Northridge Local,Traditional School,Hispanic,,,Year 1,2025
+atsi,015206,Harding Elementary School,045161,Youngstown City,Traditional School,Black Non-Hispanic;Students with Disabilities,,,Year 1,2025
+atsi,015610,Hatton Community Learning Center,043489,Akron City,Traditional School,Students with Disabilities,,,Year 1,2025
+atsi,015734,Southview Middle School,044263,Lorain City,Traditional School,Multiracial,,,Year 1,2025
+atsi,016253,David Hill Community Learning Center,043489,Akron City,Traditional School,Students with Disabilities,,,Year 1,2025
+atsi,016584,West Carrollton Intermediate School,045054,West Carrollton City,Traditional School,Students with Disabilities,,,Year 1,2025
+atsi,016805,Volney Rogers Elementary at McGuffey,045161,Youngstown City,Traditional School,Multiracial;Students with Disabilities,,,Year 1,2025
+atsi,016840,Horace Mann Elementary School,043844,Dayton City,Traditional School,Students with Disabilities,,,Year 1,2025
+atsi,017137,Huntington Elementary School,049502,Huntington Local,Traditional School,Students with Disabilities,,,Year 1,2025
+atsi,017251,Hyre Community Learning Center,043489,Akron City,Traditional School,Hispanic,,,Year 1,2025
+atsi,017307,East Franklin Elementary School,044800,South-Western City,Traditional School,Hispanic,,,Year 1,2025
+atsi,017459,Innes Community Learning Center,043489,Akron City,Traditional School,Black Non-Hispanic;White Non-Hispanic,,,Year 1,2025
+atsi,019156,Quaker Preparatory Academy,044487,New Philadelphia City,Community School,White Non-Hispanic,,,Year 1,2025
+atsi,019190,The Bridgeport School DIstrict - Middle School,045237,Bridgeport Exempted Village,Traditional School,Students with Disabilities,,,Year 1,2025
+atsi,019380,Lacroft Elementary School,043919,East Liverpool City,Traditional School,Students with Disabilities,,,Year 1,2025
+atsi,019602,Community STE(A)M Academy - Xenia,019602,Community STE(A)M Academy - Xenia,Traditional School,White Non-Hispanic,,,Year 1,2025
+atsi,019940,Finneytown Elementary,047332,Finneytown Local,Traditional School,Students with Disabilities,,,Year 1,2025
+atsi,020112,SWL Digital Academy,048041,Southwest Licking Local,Traditional School,White Non-Hispanic,,,Year 1,2025
+atsi,020388,Liberty High School,050195,Liberty Local,Traditional School,Hispanic,,,Year 1,2025
+atsi,020453,Jackson Middle School,044156,Jackson City,Traditional School,Students with Disabilities,,,Year 1,2025
+atsi,020974,Lincoln Park Elementary School,043802,Columbus City Schools District,Traditional School,Black Non-Hispanic,,,Year 1,2025
+atsi,021188,Lockland Junior Senior High School,044230,Lockland Local,Traditional School,White Non-Hispanic,,,Year 1,2025
+atsi,021683,Lowellville High School,048330,Lowellville Local,Traditional School,Students with Disabilities,,,Year 1,2025
+atsi,022970,Marshall STEMM Academy,044909,Toledo City,Traditional School,White Non-Hispanic,,,Year 1,2025
+atsi,023036,Martins Ferry High School,044347,Martins Ferry City,Traditional School,Students with Disabilities,,,Year 1,2025
+atsi,023358,Maysville High School,048850,Maysville Local,Traditional School,Multiracial,,,Year 1,2025
+atsi,023705,Horace Mann Elementary School,044198,Lakewood City,Traditional School,Students with Disabilities,,,Year 1,2025
+atsi,024067,Medina Middle School,043802,Columbus City Schools District,Traditional School,Multiracial,,,Year 1,2025
+atsi,024117,Meigs High School,048520,Meigs Local,Traditional School,White Non-Hispanic,,,Year 1,2025
+atsi,024562,Middletown High School,044404,Middletown City,Traditional School,Multiracial,,,Year 1,2025
+atsi,024851,Miller High School,049064,Southern Local,Traditional School,Students with Disabilities,,,Year 1,2025
+atsi,024927,Ethel M. Taylor Academy,043752,Cincinnati Public Schools,Traditional School,Black Non-Hispanic,,,Year 1,2025
+atsi,027102,Newton D Baker School,043786,Cleveland Municipal,Traditional School,Students with Disabilities,,,Year 1,2025
+atsi,027680,Northland High School,043802,Columbus City Schools District,Traditional School,Hispanic,,,Year 1,2025
+atsi,028795,Wright Brothers Middle School,043844,Dayton City,Traditional School,Multiracial;White Non-Hispanic,,,Year 1,2025
+atsi,029470,Wayne Trace High School,049031,Wayne Trace Local,Traditional School,Students with Disabilities,,,Year 1,2025
+atsi,030635,Powers Elementary School,045195,Amherst Exempted Village,Traditional School,Students with Disabilities,,,Year 1,2025
+atsi,030783,Eastern Heights Elementary School,043943,Elyria City Schools,Traditional School,Black Non-Hispanic;Students with Disabilities,,,Year 1,2025
+atsi,031617,Ridge-Brook Elementary School,044636,Parma City,Traditional School,Students with Disabilities,,,Year 1,2025
+atsi,032482,Spring Hill Elementary,050062,Springfield Local,Traditional School,Students with Disabilities;White Non-Hispanic,,,Year 1,2025
+atsi,033134,South Avondale School,043752,Cincinnati Public Schools,Traditional School,Students with Disabilities,,,Year 1,2025
+atsi,033563,Sandy Valley High School,049940,Sandy Valley Local,Traditional School,Students with Disabilities,,,Year 1,2025
+atsi,035105,Mt Healthy Junior High School,044412,Mt Healthy City,Traditional School,Students with Disabilities,,,Year 1,2025
+atsi,036061,Bogan Elementary,046151,Talawanda City,Traditional School,Students with Disabilities,,,Year 1,2025
+atsi,036350,Elida Elementary,045773,Elida Local,Traditional School,Students with Disabilities,,,Year 1,2025
+atsi,037143,Thoreau Park Elementary School,044636,Parma City,Traditional School,Students with Disabilities,,,Year 1,2025
+atsi,037366,Girard Intermediate Middle School,044065,Girard City School District,Traditional School,Students with Disabilities,,,Year 1,2025
+atsi,037390,Toronto Jr. / Sr. High School,044917,Toronto City,Traditional School,Students with Disabilities,,,Year 1,2025
+atsi,038117,Harold Schnell Elementary School,045054,West Carrollton City,Traditional School,Students with Disabilities,,,Year 1,2025
+atsi,038398,Tri-County North Middle School,091397,Tri-County North Local,Traditional School,Students with Disabilities,,,Year 1,2025
+atsi,038646,West Franklin Elementary School,044800,South-Western City,Traditional School,White Non-Hispanic,,,Year 1,2025
+atsi,038885,West Union Elementary School,061903,Adams County Ohio Valley Local,Traditional School,Students with Disabilities,,,Year 1,2025
+atsi,039214,Buckeye Local Junior High,047787,Buckeye Local,Traditional School,Students with Disabilities,,,Year 1,2025
+atsi,039891,Waverly Elementary School,043786,Cleveland Municipal,Traditional School,Hispanic,,,Year 1,2025
+atsi,040121,Kiser Elementary School,043844,Dayton City,Traditional School,Students with Disabilities,,,Year 1,2025
+atsi,040147,Hillsboro Primary School,044123,Hillsboro City,Traditional School,Students with Disabilities,,,Year 1,2025
+atsi,040436,Chaney Middle,045161,Youngstown City,Traditional School,Students with Disabilities,,,Year 1,2025
+atsi,040964,Whetstone High School,043802,Columbus City Schools District,Traditional School,Asian or Pacific Islander,,,Year 1,2025
+atsi,041137,Whittier Elementary School,044909,Toledo City,Traditional School,Students with Disabilities;White Non-Hispanic,,,Year 1,2025
+atsi,041368,William Henry Harrison High School,047381,Southwest Local,Traditional School,Students with Disabilities,,,Year 1,2025
+atsi,042036,Woodmore Elementary School,049577,Woodmore Local,Traditional School,Students with Disabilities,,,Year 1,2025
+atsi,062232,Maysville Middle School,048850,Maysville Local,Traditional School,Students with Disabilities,,,Year 1,2025
+atsi,062331,Franklin Junior High School,044008,Franklin City,Traditional School,Multiracial,,,Year 1,2025
+atsi,064048,Jefferson Middle School,043885,Delphos City,Traditional School,Students with Disabilities,,,Year 1,2025
+atsi,064303,Maplewood Elementary School,045799,Shawnee Local,Traditional School,Students with Disabilities,,,Year 1,2025
+atsi,118844,Euclid Schools Early Learning Village,043950,Euclid City,Traditional School,Black Non-Hispanic;Economic Disadvantage,,,Year 1,2025
+atsi,120261,Northwest Middle School,049635,Northwest Local,Traditional School,Students with Disabilities,,,Year 1,2025
+atsi,124867,East Clinton Junior High School,046409,East Clinton Local,Traditional School,Students with Disabilities,,,Year 1,2025
+atsi,125781,Portsmouth West Middle School,049650,Washington-Nile Local,Traditional School,Students with Disabilities,,,Year 1,2025
+atsi,132258,Union Local Middle School,046011,Union Local,Traditional School,Students with Disabilities,,,Year 1,2025
+atsi,132266,Union Local Elementary School,046011,Union Local,Traditional School,Students with Disabilities,,,Year 1,2025
+atsi,132951,Constellation Schools: Lorain Community Elementary,132951,Constellation Schools: Lorain Community Elementary,Community School,Economic Disadvantage,,,Year 1,2025
+atsi,133587,Summit Academy Akron Elementary School,133587,Summit Academy Akron Elementary School,Community School,White Non-Hispanic,,,Year 1,2025
+atsi,145391,Alliance Middle School,043497,Alliance City,Traditional School,Multiracial,,,Year 1,2025
+atsi,146050,Heritage Elementary School,044222,Lima City,Traditional School,Students with Disabilities,,,Year 1,2025
+atsi,147538,Aiken New Tech High School,043752,Cincinnati Public Schools,Traditional School,White Non-Hispanic,,,Year 1,2025
+csi,000131,Glass City Academy,000131,Glass City Academy,Dropout Recovery School,,2018,Open,Year 1,2025
+csi,000241,Quaker Digital Academy,000241,Quaker Digital Academy,Dropout Recovery School,,2018,Open,Year 1,2025
+csi,000282,Greater Ohio Virtual School,000282,Greater Ohio Virtual School,Dropout Recovery School,,2018,Open,Year 1,2025
+csi,000297,Summit Academy Community School - Dayton,000297,Summit Academy Community School - Dayton,Community School,,2025,Closed,Year 1,2025
+csi,000300,Summit Academy Secondary - Canton,000300,Summit Academy Secondary - Canton,Community School,,2018,Open,Year 1,2025
+csi,000303,Summit Academy Secondary - Youngstown,000303,Summit Academy Secondary - Youngstown,Community School,,2018,Open,Year 1,2025
+csi,000321,Constellation Schools: Old Brooklyn Community Middle,000321,Constellation Schools: Old Brooklyn Community Middle,Community School,,ATSI 2022 ; CSI 2025,Open,Year 1,2025
+csi,000349,Upper Scioto Valley Middle School,047522,Upper Scioto Valley Local,Traditional School,,ATSI 2022 ; CSI 2025,Open,Year 1,2025
+csi,000352,William McKinley Elementary School,044339,Marion City,Traditional School,,ATSI 2022 ; CSI 2025,Open,Year 1,2025
+csi,000363,Akron Alternative Academy,043489,Akron City,Traditional School,,2018,Open,Year 1,2025
+csi,000417,Buckeye On-Line School for Success,000417,Buckeye On-Line School for Success,Community School,,2018,Open,Year 1,2025
+csi,000435,Eastgate Elementary School,043802,Columbus City Schools District,Traditional School,,2025,Open,Year 1,2025
+csi,000513,Columbus Scioto 6-12,043802,Columbus City Schools District,Traditional School,,2025,Open,Year 1,2025
+csi,000525,Canton Harbor High School,000525,Canton Harbor High School,Dropout Recovery School,,2018,Open,Year 1,2025
+csi,000527,Cleveland Academy for Scholarship Technology and Leadership,000527,Cleveland Academy for Scholarship Technology and Leadership,Dropout Recovery School,,2018,Open,Year 1,2025
+csi,000556,A+ Arts Academy,000556,A+ Arts Academy,Community School,,2025,Open,Year 1,2025
+csi,000557,Columbus Arts & Technology Academy,000557,Columbus Arts & Technology Academy,Community School,,2025,Open,Year 1,2025
+csi,000616,Summit Academy Alternative LearnersWarren Middle & Secondary,000616,Summit Academy Alternative LearnersWarren Middle & Secondary,Community School,,2018,Open,Year 1,2025
+csi,000621,Summit Academy Dayton,000621,Summit Academy Dayton,Community School,,2018,Open,Year 1,2025
+csi,000634,Summit Academy Secondary School - Middletown,000634,Summit Academy Secondary School - Middletown,Community School,,2018,Open,Year 1,2025
+csi,000640,Rittman Academy,000640,Rittman Academy,Dropout Recovery School,,2018,Open,Year 1,2025
+csi,000664,Capital City Career Prep High School,000664,Capital City Career Prep High School,Dropout Recovery School,,2018,Open,Year 1,2025
+csi,000679,Oakstone Community School,000679,Oakstone Community School,Community School,,2018,Open,Year 1,2025
+csi,000725,Zenith Academy,000725,Zenith Academy,Community School,,2018,Open,Year 1,2025
+csi,000770,Maritime Academy of Toledo; The,000770,Maritime Academy of Toledo; The,Community School,,2018,Open,Year 1,2025
+csi,000804,Horizon Science Academy-Cincinnati,000804,Horizon Science Academy-Cincinnati,Community School,,2025,Open,Year 1,2025
+csi,000813,Gem City Career Prep High School,000813,Gem City Career Prep High School,Dropout Recovery School,,2018,Open,Year 1,2025
+csi,000855,Stambaugh Charter Academy,000855,Stambaugh Charter Academy,Community School,,ATSI 2022 ; CSI 2025,Open,Year 1,2025
+csi,000912,Early College Academy,000912,Early College Academy,Dropout Recovery School,,2018,Open,Year 1,2025
+csi,000936,Promise Academy,000936,Promise Academy,Dropout Recovery School,,2018,Open,Year 1,2025
+csi,002303,Belmont High School,043844,Dayton City,Traditional School,,2018,Open,Year 1,2025
+csi,003137,Bolton,043786,Cleveland Municipal,Traditional School,,2025,Open,Year 1,2025
+csi,005637,Alfred Benesch,043786,Cleveland Municipal,Traditional School,,2025,Open,Year 1,2025
+csi,005660,Lima North Middle School,044222,Lima City,Traditional School,,2018,Open,Year 1,2025
+csi,005926,Charles L Warstler Elementary School,049932,Plain Local,Traditional School,,ATSI 2022 ; CSI 2025,Open,Year 1,2025
+csi,006841,Thurgood Marshall High School,043844,Dayton City,Traditional School,,2018,Open,Year 1,2025
+csi,006940,Collinwood High School,043786,Cleveland Municipal,Traditional School,,2018,Open,Year 1,2025
+csi,007617,Crestline High School,045344,Crestline Exempted Village,Traditional School,,ATSI 2022 ; CSI 2025,Open,Year 1,2025
+csi,007999,Charles School at Ohio Dominican University,007999,Charles School at Ohio Dominican University,Community School,,2018,Open,Year 1,2025
+csi,008000,Lorain Preparatory Academy,008000,Lorain Preparatory Academy,Community School,,2018,Open,Year 1,2025
+csi,008037,Starling PK-8,043802,Columbus City Schools District,Traditional School,,2025,Open,Year 1,2025
+csi,008063,Cascade Career Prep High School,008063,Cascade Career Prep High School,Dropout Recovery School,,2018,Open,Year 1,2025
+csi,008282,North Woods Career Prep High School,008282,North Woods Career Prep High School,Dropout Recovery School,,2018,Open,Year 1,2025
+csi,008283,Dayton Business Technology High School,008283,Dayton Business Technology High School,Dropout Recovery School,,2018,Open,Year 1,2025
+csi,008289,Eagle Learning Center,008289,Eagle Learning Center,Dropout Recovery School,,2018,Open,Year 1,2025
+csi,008821,Dunbar Early College High School,043844,Dayton City,Traditional School,,2018,Open,Year 1,2025
+csi,008847,Philo Junior High School,048843,Franklin Local,Traditional School,,ATSI 2022 ; CSI 2025,Open,Year 1,2025
+csi,008933,Rosa Parks Elementary School,044404,Middletown City,Traditional School,,2025,Open,Year 1,2025
+csi,009043,East Knox Junior/Senior High School,047845,East Knox Local,Traditional School,,ATSI 2022 ; CSI 2025,Open,Year 1,2025
+csi,009555,East Technical High School,043786,Cleveland Municipal,Traditional School,,2018,Open,Year 1,2025
+csi,009971,Ashland County Community Academy,009971,Ashland County Community Academy,Dropout Recovery School,,2018,Open,Year 1,2025
+csi,009996,Mahoning Valley Community School,009996,Mahoning Valley Community School,Dropout Recovery School,,2018,Open,Year 1,2025
+csi,010033,Edison Elementary School,043844,Dayton City,Traditional School,,2025,Open,Year 1,2025
+csi,010462,Elyria High School,043943,Elyria City Schools,Traditional School,,ATSI 2022 ; CSI 2025,Open,Year 1,2025
+csi,010836,Gallia Academy Middle School,044032,Gallipolis City,Traditional School,,ATSI 2022 ; CSI 2025,Open,Year 1,2025
+csi,011189,Fairmoor Elementary School,043802,Columbus City Schools District,Traditional School,,ATSI 2022 ; CSI 2025,Open,Year 1,2025
+csi,011262,Fairview Elementary School,043844,Dayton City,Traditional School,,2025,Open,Year 1,2025
+csi,011439,Renaissance Academy dba Bessie Sherrod Price Preparatory Aca,011439,Renaissance Academy dba Bessie Sherrod Price Preparatory Aca,Community School,,2025,Open,Year 1,2025
+csi,011923,Northeast Ohio College Preparatory School,043786,Cleveland Municipal,Community School,,2022,Open,Year 1,2025
+csi,012033,Foxfire Intermediate School,048850,Maysville Local,Community School,,2022,Open,Year 1,2025
+csi,012036,Regent High School,012036,Regent High School,Dropout Recovery School,,2018,Open,Year 1,2025
+csi,012037,Mason Run High School,012037,Mason Run High School,Dropout Recovery School,,2018,Open,Year 1,2025
+csi,012038,Old Brook High School,012038,Old Brook High School,Dropout Recovery School,,2018,Open,Year 1,2025
+csi,012040,Road to Success Academy,012040,Road to Success Academy,Dropout Recovery School,,2018,Open,Year 1,2025
+csi,012041,Central High School,012041,Central High School,Dropout Recovery School,,2018,Open,Year 1,2025
+csi,012042,Southern Cleveland Drop Back Indba Innovative Career Academy,012042,Southern Cleveland Drop Back Indba Innovative Career Academy,Dropout Recovery School,,2025,Open,Year 1,2025
+csi,012043,West Cleveland Drop Back In dba Frederick Douglass High Scho,012043,West Cleveland Drop Back In dba Frederick Douglass High Scho,Dropout Recovery School,,2018,Open,Year 1,2025
+csi,012044,Capital High School,012044,Capital High School,Dropout Recovery School,,2018,Open,Year 1,2025
+csi,012054,North Central Academy,012054,North Central Academy,Dropout Recovery School,,2025,Closed,Year 1,2025
+csi,012335,New Beginnings,044263,Lorain City,Traditional School,,2018,Open,Year 1,2025
+csi,012369,Hamilton Elementary School,043943,Elyria City Schools,Traditional School,,2025,Open,Year 1,2025
+csi,012528,The Academy for Urban Scholars,012528,The Academy for Urban Scholars,Dropout Recovery School,,2018,Open,Year 1,2025
+csi,012529,Focus North High School,012529,Focus North High School,Dropout Recovery School,,2018,Open,Year 1,2025
+csi,012799,Gallia Academy High School,044032,Gallipolis City,Traditional School,,ATSI 2022 ; CSI 2025,Open,Year 1,2025
+csi,012867,Townsend Community School,012867,Townsend Community School,Dropout Recovery School,,2018,Open,Year 1,2025
+csi,012922,Garfield Elementary School,044909,Toledo City,Traditional School,,ATSI 2022 ; CSI 2025,Open,Year 1,2025
+csi,013128,Garfield Community Learning Center,043489,Akron City,Traditional School,,2018,Open,Year 1,2025
+csi,013249,Academy for Urban Scholars Youngstown,013249,Academy for Urban Scholars Youngstown,Dropout Recovery School,,2018,Open,Year 1,2025
+csi,013322,Westbrooke Village,048694,Trotwood-Madison City,Traditional School,,2022,Open,Year 1,2025
+csi,013409,Gibbs Elementary School,043711,Canton City,Traditional School,,2025,Open,Year 1,2025
+csi,013680,Glenville High School,043786,Cleveland Municipal,Traditional School,,2018,Open,Year 1,2025
+csi,013930,Global Impact STEM Academy,013930,Global Impact STEM Academy,STEM,,ATSI 2022 ; CSI 2025,Open,Year 1,2025
+csi,013962,Liberty Preparatory School,013962,Liberty Preparatory School,Dropout Recovery School,,2018,Open,Year 1,2025
+csi,014067,Ohio Construction Academy,014067,Ohio Construction Academy,Dropout Recovery School,,2018,Open,Year 1,2025
+csi,014187,East Academy,014187,East Academy,Community School,,2022,Open,Year 1,2025
+csi,014830,Utica Shale Academy of Ohio,014830,Utica Shale Academy of Ohio,Dropout Recovery School,,2025,Open,Year 1,2025
+csi,014919,John F Kennedy High School,043786,Cleveland Municipal,Traditional School,,2018,Open,Year 1,2025
+csi,014927,Steel Academy,014927,Steel Academy,Dropout Recovery School,,2018,Open,Year 1,2025
+csi,014936,Leverette Elementary School,044909,Toledo City,Traditional School,,2025,Open,Year 1,2025
+csi,015123,Harter Elementary School,043711,Canton City,Traditional School,,2018,Open,Year 1,2025
+csi,015237,Flex High School,015237,Flex High School,Dropout Recovery School,,2018,Open,Year 1,2025
+csi,015261,Citizens Academy Southeast,043786,Cleveland Municipal,Community School,,2025,Open,Year 1,2025
+csi,015709,Beacon Academy,015709,Beacon Academy,Community School,,2022,Open,Year 1,2025
+csi,015714,Dayton Athletic Vocational Academy,015714,Dayton Athletic Vocational Academy,Dropout Recovery School,,2018,Open,Year 1,2025
+csi,016429,Lincoln West School of Science & Health,043786,Cleveland Municipal,Traditional School,,2025,Open,Year 1,2025
+csi,016672,Miami School,044107,Hamilton City,Traditional School,,2022,Open,Year 1,2025
+csi,016733,Mt. Healthy South Elementary School,044412,Mt Healthy City,Traditional School,,2025,Open,Year 1,2025
+csi,016804,Wilson Alternative School,045161,Youngstown City,Traditional School,,2018,Open,Year 1,2025
+csi,016849,Liberty High School,016849,Liberty High School,Dropout Recovery School,,2018,Open,Year 1,2025
+csi,016885,John Adams College & Career Academy,043786,Cleveland Municipal,Traditional School,,2018,Open,Year 1,2025
+csi,017233,Great River Connections Academy,017233,Great River Connections Academy,Community School,,2022,Open,Year 1,2025
+csi,017275,AchievePoint Career Academy - Cincinnati,017275,AchievePoint Career Academy - Cincinnati,Dropout Recovery School,,2022,Open,Year 1,2025
+csi,017308,Columbus Africentric Early College Middle School,043802,Columbus City Schools District,Traditional School,,ATSI 2022 ; CSI 2025,Open,Year 1,2025
+csi,017325,NCS Digital,044453,Newark City,Traditional School,,ATSI 2022 ; CSI 2025,Open,Year 1,2025
+csi,017377,Princeton Innovation Center,044677,Princeton City,Traditional School,,ATSI 2022 ; CSI 2025,Open,Year 1,2025
+csi,017497,Cypress High School,017497,Cypress High School,Dropout Recovery School,,2022,Open,Year 1,2025
+csi,017509,Hawthorne Elementary School,044263,Lorain City,Traditional School,,ATSI 2022 ; CSI 2025,Open,Year 1,2025
+csi,017643,Ohio Digital Learning School,017643,Ohio Digital Learning School,Dropout Recovery School,,2022,Open,Year 1,2025
+csi,017756,Jackson High School,044156,Jackson City,Traditional School,,ATSI 2022 ; CSI 2025,Open,Year 1,2025
+csi,018150,Jefferson Jr./Sr. High School,048686,Jefferson Township Local,Traditional School,,2018,Open,Year 1,2025
+csi,018671,Kemp Elementary School,043844,Dayton City,Traditional School,,2025,Open,Year 1,2025
+csi,019152,Buckeye Community School,019152,Buckeye Community School,Dropout Recovery School,,2022,Open,Year 1,2025
+csi,019192,Dr. O dell Owens Center for Learning,043752,Cincinnati Public Schools,Traditional School,,2022,Open,Year 1,2025
+csi,019197,Flex High School Cleveland,019197,Flex High School Cleveland,Dropout Recovery School,,2022,Open,Year 1,2025
+csi,019201,Franklinton Prep High School,019201,Franklinton Prep High School,Dropout Recovery School,,2022,Open,Year 1,2025
+csi,019220,North Shore High School,019220,North Shore High School,Dropout Recovery School,,2022,Open,Year 1,2025
+csi,019266,Mound Street Academy,043844,Dayton City,Traditional School,,2022,Open,Year 1,2025
+csi,019364,River Valley High School,065680,Gallia County Local,Traditional School,,ATSI 2022 ; CSI 2025,Open,Year 1,2025
+csi,019426,Dayton Career Tech High School dba Riverscape Career Tech,019426,Dayton Career Tech High School dba Riverscape Career Tech,Dropout Recovery School,,2022,Open,Year 1,2025
+csi,019427,Akron Career Tech High School,019427,Akron Career Tech High School,Dropout Recovery School,,2022,Open,Year 1,2025
+csi,019441,Buckeye Community School - London,019441,Buckeye Community School - London,Dropout Recovery School,,2022,Open,Year 1,2025
+csi,019442,Buckeye Community School - Marion,019442,Buckeye Community School - Marion,Dropout Recovery School,,2022,Open,Year 1,2025
+csi,019622,Toledo Public Schools Virtual Academy,044909,Toledo City,Traditional School,,2022,Open,Year 1,2025
+csi,019655,Hilliard Online Academy,047019,Hilliard City,Traditional School,,2022,Open,Year 1,2025
+csi,019664,Cleveland Metro Remote School K-12,043786,Cleveland Municipal,Traditional School,,2022,Open,Year 1,2025
+csi,019677,RAM Nation Virtual Academy,048694,Trotwood-Madison City,Traditional School,,2025,Open,Year 1,2025
+csi,019682,Euclid Virtual Learning Academy,043950,Euclid City,Traditional School,,2025,Open,Year 1,2025
+csi,019722,Warrior Academy,048751,Huber Heights City,Traditional School,,2025,Open,Year 1,2025
+csi,019732,Jacket Virtual Academy,044784,Sidney City,Traditional School,,2025,Closed,Year 1,2025
+csi,019734,John J. Gilligan Digital Academy,043752,Cincinnati Public Schools,Traditional School,,2022,Open,Year 1,2025
+csi,019761,Springfield City Online,044818,Springfield City School District,Traditional School,,ATSI 2022 ; CSI 2025,Open,Year 1,2025
+csi,019796,Excel Academy,043562,Bedford City,Traditional School,,2025,Open,Year 1,2025
+csi,019829,Teays Valley Digital Academy,049098,Teays Valley Local,Traditional School,,2025,Open,Year 1,2025
+csi,019839,Franklin School of Opportunity Online,044198,Lakewood City,Traditional School,,2022,Open,Year 1,2025
+csi,020078,Gateway Online Academy of Ohio,020078,Gateway Online Academy of Ohio,Dropout Recovery School,,2025,Open,Year 1,2025
+csi,020115,Leggett Community Learning Center,043489,Akron City,Traditional School,,ATSI 2022 ; CSI 2025,Open,Year 1,2025
+csi,020186,Lorain Preparatory High School,020186,Lorain Preparatory High School,Community School,,2025,Open,Year 1,2025
+csi,020245,Columbus Online Academy,043802,Columbus City Schools District,Traditional School,,2025,Open,Year 1,2025
+csi,020293,Engage High School,020293,Engage High School,Dropout Recovery School,,2025,Open,Year 1,2025
+csi,020726,ChallengeU Ohio Community School,020726,ChallengeU Ohio Community School,Dropout Recovery School,,2025,Open,Year 1,2025
+csi,020728,Mosaic Classical Academy,020728,Mosaic Classical Academy,Community School,,2025,Open,Year 1,2025
+csi,020754,Buckeye Community School - Fremont,020754,Buckeye Community School - Fremont,Dropout Recovery School,,2025,Open,Year 1,2025
+csi,020755,Pathfinder Career Academy of Ohio,020755,Pathfinder Career Academy of Ohio,Community School,,2025,Open,Year 1,2025
+csi,020811,Southern Ohio Career Academy,020811,Southern Ohio Career Academy,Dropout Recovery School,,2025,Open,Year 1,2025
+csi,021030,Linden-McKinley STEM Academy,043802,Columbus City Schools District,Traditional School,,2018,Open,Year 1,2025
+csi,021147,Livingston Elementary School,043802,Columbus City Schools District,Traditional School,,2025,Open,Year 1,2025
+csi,021442,Legacy Academy of Excellence Mansfield,021442,Legacy Academy of Excellence Mansfield,Community School,,2025,Open,Year 1,2025
+csi,021445,Steel City High School,021445,Steel City High School,Dropout Recovery School,,2025,Open,Year 1,2025
+csi,021456,Ginn-Thompson School for Girls,021456,Ginn-Thompson School for Girls,Community School,,2025,Open,Year 1,2025
+csi,021509,Career Prep Virtual High School. Inc.,021509,Career Prep Virtual High School. Inc.,Dropout Recovery School,,2025,Inactive,Year 1,2025
+csi,021513,Buckeye Community School - Springfield,021513,Buckeye Community School - Springfield,Dropout Recovery School,,2025,Open,Year 1,2025
+csi,021659,Stevan Dohanos Elementary School,044263,Lorain City,Traditional School,,2025,Open,Year 1,2025
+csi,022301,Mansfield Middle School,044297,Mansfield City,Traditional School,,2025,Open,Year 1,2025
+csi,022855,Marion-Franklin High School,043802,Columbus City Schools District,Traditional School,,2018,Open,Year 1,2025
+csi,023135,Mason Community Learning Center,043489,Akron City,Traditional School,,2025,Open,Year 1,2025
+csi,023259,Max S Hayes High School,043786,Cleveland Municipal,Traditional School,,2018,Open,Year 1,2025
+csi,023291,Westfield/Robinson Achievement,044909,Toledo City,Traditional School,,2025,Open,Year 1,2025
+csi,023549,Mcgregor Elementary School,048231,Washington Local,Traditional School,,ATSI 2022 ; CSI 2025,Open,Year 1,2025
+csi,023978,Valerie Elementary School,043844,Dayton City,Traditional School,,2025,Open,Year 1,2025
+csi,023986,Meadowdale High School,043844,Dayton City,Traditional School,,2018,Open,Year 1,2025
+csi,025874,The School of One,043786,Cleveland Municipal,Traditional School,,2018,Open,Year 1,2025
+csi,025940,Mt. Washington School,043752,Cincinnati Public Schools,Traditional School,,2025,Open,Year 1,2025
+csi,026443,Nathan Hale School,043786,Cleveland Municipal,Traditional School,,2025,Open,Year 1,2025
+csi,026575,Nelsonville-York Junior High School,044446,Nelsonville-York City,Traditional School,,ATSI 2022 ; CSI 2025,Open,Year 1,2025
+csi,028290,Oakland Park Alternative Elementary,043802,Columbus City Schools District,Traditional School,,2025,Open,Year 1,2025
+csi,028829,The Sandusky Intermediate School,044743,Sandusky City,Traditional School,,ATSI 2022 ; CSI 2025,Open,Year 1,2025
+csi,029447,Paulding Middle School,045575,Paulding Exempted Village,Traditional School,,ATSI 2022 ; CSI 2025,Open,Year 1,2025
+csi,029801,Pfeiffer Elementary School,043489,Akron City,Traditional School,,2025,Open,Year 1,2025
+csi,030288,Pleasant Hill Academy,043752,Cincinnati Public Schools,Traditional School,,2025,Open,Year 1,2025
+csi,031138,East High School,045161,Youngstown City,Traditional School,,2018,Open,Year 1,2025
+csi,031815,Ripley-Union-Lewis-Huntington Senior High School,046078,Ripley-Union-Lewis-Huntington Local,Traditional School,,ATSI 2022 ; CSI 2025,Open,Year 1,2025
+csi,031880,River View High School,046482,River View Local,Traditional School,,ATSI 2022 ; CSI 2025,Open,Year 1,2025
+csi,032276,Rogers High School,044909,Toledo City,Traditional School,,2018,Open,Year 1,2025
+csi,032441,Martin Luther King Academy for Boys Elementary School,044909,Toledo City,Traditional School,,2025,Open,Year 1,2025
+csi,032540,Roosevelt Middle School,044818,Springfield City School District,Traditional School,,ATSI 2022 ; CSI 2025,Open,Year 1,2025
+csi,034363,Sheridan High School,049056,Northern Local,Traditional School,,ATSI 2022 ; CSI 2025,Open,Year 1,2025
+csi,035063,South High School,043802,Columbus City Schools District,Traditional School,,2018,Open,Year 1,2025
+csi,035428,Springcreek Primary Elementary School,044644,Piqua City,Traditional School,,ATSI 2022 ; CSI 2025,Open,Year 1,2025
+csi,035865,Start High School,044909,Toledo City,Traditional School,,2018,Open,Year 1,2025
+csi,037101,Natividad Pagan International Newcomers Academy,043786,Cleveland Municipal,Traditional School,,2025,Open,Year 1,2025
+csi,037234,Chillicothe Intermediate School,043745,Chillicothe City,Traditional School,,ATSI 2022 ; CSI 2025,Open,Year 1,2025
+csi,038257,Edwin Joel Brown Middle School,043844,Dayton City,Traditional School,,2025,Open,Year 1,2025
+csi,038851,West Park Elementary School,044685,Ravenna City,Traditional School,,2018,Open,Year 1,2025
+csi,038893,West Union High School,061903,Adams County Ohio Valley Local,Traditional School,,ATSI 2022 ; CSI 2025,Open,Year 1,2025
+csi,038950,Waite High School,044909,Toledo City,Traditional School,,2018,Open,Year 1,2025
+csi,039180,Warder Park-Wayne Elementary School,044818,Springfield City School District,Traditional School,,2025,Open,Year 1,2025
+csi,040527,West High School,043802,Columbus City Schools District,Traditional School,,2018,Open,Year 1,2025
+csi,040634,Bellefontaine Intermediate School,043588,Bellefontaine City,Traditional School,,ATSI 2022 ; CSI 2025,Open,Year 1,2025
+csi,040782,Westmoor Middle School,043802,Columbus City Schools District,Traditional School,,ATSI 2022 ; CSI 2025,Open,Year 1,2025
+csi,041921,Wogaman Middle School,043844,Dayton City,Traditional School,,2018,Open,Year 1,2025
+csi,042150,Woodward High School,044909,Toledo City,Traditional School,,2018,Open,Year 1,2025
+csi,062786,Bundy Elementary School,045021,Wellston City,Traditional School,,2018,Open,Year 1,2025
+csi,064188,Teays Valley East Middle School,049098,Teays Valley Local,Traditional School,,ATSI 2022 ; CSI 2025,Open,Year 1,2025
+csi,067728,Briggs High School,043802,Columbus City Schools District,Traditional School,,2018,Open,Year 1,2025
+csi,070078,Mifflin Alternative Middle School,043802,Columbus City Schools District,Traditional School,,2025,Open,Year 1,2025
+csi,091389,Federal Hocking Middle School,045914,Federal Hocking Local,Traditional School,,ATSI 2022 ; CSI 2025,Open,Year 1,2025
+csi,111526,Vinton County Middle School,050393,Vinton County Local,Traditional School,,ATSI 2022 ; CSI 2025,Open,Year 1,2025
+csi,123547,Adena Middle School,049494,Adena Local,Traditional School,,ATSI 2022 ; CSI 2025,Open,Year 1,2025
+csi,132795,Cliff Park High School,132795,Cliff Park High School,Dropout Recovery School,,2018,Open,Year 1,2025
+csi,132803,Marshall High School,132803,Marshall High School,Dropout Recovery School,,2018,Open,Year 1,2025
+csi,132944,Miami Valley Academies,132944,Miami Valley Academies,Community School,,2025,Open,Year 1,2025
+csi,132985,YB Columbus Community School,132985,YB Columbus Community School,Dropout Recovery School,,2018,Open,Year 1,2025
+csi,133322,Summit Academy Community School Alternative Learners-Lorain,133322,Summit Academy Community School Alternative Learners-Lorain,Community School,,2022,Open,Year 1,2025
+csi,133348,Richard Allen Preparatory,133348,Richard Allen Preparatory,Community School,,ATSI 2022 ; CSI 2025,Open,Year 1,2025
+csi,133421,Graham School; The,133421,Graham School; The,Community School,,2025,Open,Year 1,2025
+csi,133488,River Gate High School,133488,River Gate High School,Dropout Recovery School,,2018,Open,Year 1,2025
+csi,133835,Invictus High School,133835,Invictus High School,Dropout Recovery School,,2018,Open,Year 1,2025
+csi,133868,Towpath Trail High School,133868,Towpath Trail High School,Dropout Recovery School,,2018,Open,Year 1,2025
+csi,134098,Constellation Schools: Old Brooklyn Community Elementary,134098,Constellation Schools: Old Brooklyn Community Elementary,Community School,,2022,Open,Year 1,2025
+csi,134122,Autism Model School,134122,Autism Model School,Community School,,2018,Open,Year 1,2025
+csi,140152,Choices Alternative School,043711,Canton City,Traditional School,,2018,Open,Year 1,2025
+csi,140350,Portsmouth Elementary,044669,Portsmouth City,Traditional School,,ATSI 2022 ; CSI 2025,Open,Year 1,2025
+csi,142398,Virtual High School,043752,Cincinnati Public Schools,Traditional School,,2018,Open,Year 1,2025
+csi,142901,Stark High School,142901,Stark High School,Dropout Recovery School,,2018,Open,Year 1,2025
+csi,142919,Black River Career Prep High School,142919,Black River Career Prep High School,Dropout Recovery School,,2018,Open,Year 1,2025
+csi,142927,Focus Learning Academy of Southwestern Columbus,142927,Focus Learning Academy of Southwestern Columbus,Dropout Recovery School,,2018,Open,Year 1,2025
+csi,142935,Focus Learning Academy of Southeastern Columbus,142935,Focus Learning Academy of Southeastern Columbus,Dropout Recovery School,,2018,Open,Year 1,2025
+csi,142950,Ohio Virtual Academy,142950,Ohio Virtual Academy,Community School,,2025,Open,Year 1,2025
+csi,142968,Hope Academy Northcoast Campus,142968,Hope Academy Northcoast Campus,Community School,,ATSI 2022 ; CSI 2025,Open,Year 1,2025
+csi,143305,TRECA Digital Academy,143305,TRECA Digital Academy,Dropout Recovery School,,2018,Open,Year 1,2025
+csi,143396,Alternative Education Academy,143396,Alternative Education Academy,Community School,,2018,Open,Year 1,2025
+csi,145557,Western Hills University High School,043752,Cincinnati Public Schools,Traditional School,,2018,Open,Year 1,2025
+csi,147231,Schnee Learning Center,147231,Schnee Learning Center,Dropout Recovery School,,2018,Open,Year 1,2025
+csi,148981,Tomorrow Center,148981,Tomorrow Center,Dropout Recovery School,,2018,Open,Year 1,2025
+csi,148999,The Unlimited Classroom dba Valley Virtual Remote Learning A,148999,The Unlimited Classroom dba Valley Virtual Remote Learning A,Dropout Recovery School,,2018,Open,Year 1,2025
+csi,149047,GOAL Digital Academy,149047,GOAL Digital Academy,Dropout Recovery School,,2018,Open,Year 1,2025
+csi,149088,Fairborn Digital Academy,149088,Fairborn Digital Academy,Dropout Recovery School,,2018,Open,Year 1,2025
+csi,149302,Skyway Career Prep High School,149302,Skyway Career Prep High School,Dropout Recovery School,,2018,Open,Year 1,2025
+csi,151175,West Central Learning Academy II,151175,West Central Learning Academy II,Dropout Recovery School,,2018,Open,Year 1,2025
+csi,151183,Lake Erie International High School,151183,Lake Erie International High School,Dropout Recovery School,,2018,Open,Year 1,2025
+csi,151209,Randall Park High School,151209,Randall Park High School,Dropout Recovery School,,2018,Open,Year 1,2025
+tsi,000224,Adlai Stevenson School,043786,Cleveland Municipal,Traditional School,Black Non-Hispanic;Economic Disadvantage,,,Year 1,2025
+tsi,000270,Main Street School,044560,Norwalk City,Traditional School,Students with Disabilities,,,Year 1,2025
+tsi,000402,Findlay Digital Academy,000402,Findlay Digital Academy,Dropout Recovery School,White Non-Hispanic,,,Year 1,2025
+tsi,000841,Longfellow Middle School,044263,Lorain City,Traditional School,Economic Disadvantage;White Non-Hispanic,,,Year 1,2025
+tsi,000968,Arlington Elementary School,044909,Toledo City,Traditional School,Black Non-Hispanic,,,Year 1,2025
+tsi,001123,Lakeside High School,043513,Ashtabula Area City,Traditional School,English Learner;Hispanic,,,Year 1,2025
+tsi,001883,Beallsville High School,048652,Switzerland of Ohio Local,Traditional School,Economic Disadvantage,,,Year 1,2025
+tsi,007278,Continental Local High School,049320,Continental Local,Traditional School,Students with Disabilities,,,Year 1,2025
+tsi,008309,Lorain High School,044263,Lorain City,Traditional School,White Non-Hispanic,,,Year 1,2025
+tsi,008342,Pike-Delta-York High School,047084,Pike-Delta-York Local,Traditional School,Students with Disabilities,,,Year 1,2025
+tsi,008722,Dover High School,043893,Dover City,Traditional School,English Learner,,,Year 1,2025
+tsi,009498,East Community Learning Center,043489,Akron City,Traditional School,White Non-Hispanic,,,Year 1,2025
+tsi,009953,Sullivant Avenue Community School,009953,Sullivant Avenue Community School,Community School,Hispanic,,,Year 1,2025
+tsi,011532,National Inventors Hall of Fame School; Center for STEM,043489,Akron City,Traditional School,Students with Disabilities,,,Year 1,2025
+tsi,011708,South Gallia Middle School,065680,Gallia County Local,Traditional School,White Non-Hispanic,,,Year 1,2025
+tsi,011868,North College Hill Middle School,044511,North College Hill City,Traditional School,Black Non-Hispanic;Economic Disadvantage,,,Year 1,2025
+tsi,012328,Franklin Heights High School,044800,South-Western City,Traditional School,White Non-Hispanic,,,Year 1,2025
+tsi,013124,Massillon Intermediate School,044354,Massillon City,Traditional School,Students with Disabilities,,,Year 1,2025
+tsi,013144,Garfield Heights Middle School,044040,Garfield Heights City Schools,Traditional School,Economic Disadvantage;Multiracial,,,Year 1,2025
+tsi,013254,Akron Preparatory School,013254,Akron Preparatory School,Community School,Black Non-Hispanic;Economic Disadvantage,,,Year 1,2025
+tsi,015297,Marietta Elementary School,044321,Marietta City,Traditional School,Students with Disabilities,,,Year 1,2025
+tsi,015529,Hartwell School,043752,Cincinnati Public Schools,Traditional School,Students with Disabilities,,,Year 1,2025
+tsi,017897,Jasper Elementary School,049130,Scioto Valley Local,Traditional School,White Non-Hispanic,,,Year 1,2025
+tsi,018895,Kenwood Elementary,044818,Springfield City School District,Traditional School,Multiracial,,,Year 1,2025
+tsi,019657,Transitions Academy,047365,Northwest Local,Traditional School,Economic Disadvantage,,,Year 1,2025
+tsi,019803,APS Online,043489,Akron City,Traditional School,Economic Disadvantage,,,Year 1,2025
+tsi,021097,Litchfield Community Learning Center,043489,Akron City,Traditional School,Students with Disabilities,,,Year 1,2025
+tsi,021232,Carrollton Middle School,045278,Carrollton Exempted Village,Traditional School,Students with Disabilities,,,Year 1,2025
+tsi,021279,Lomond Elementary School,044750,Shaker Heights City,Traditional School,Students with Disabilities,,,Year 1,2025
+tsi,021386,Longfellow Elementary School,044909,Toledo City,Traditional School,Economic Disadvantage,,,Year 1,2025
+tsi,022244,Mccormick Middle School,045658,Wellington Exempted Village,Traditional School,Students with Disabilities,,,Year 1,2025
+tsi,022293,Maize Road Elementary School,043802,Columbus City Schools District,Traditional School,English Learner,,,Year 1,2025
+tsi,022574,Maple Leaf Elementary School,044040,Garfield Heights City Schools,Traditional School,Students with Disabilities,,,Year 1,2025
+tsi,025742,Riverdale Elementary School,047514,Riverdale Local,Traditional School,Students with Disabilities,,,Year 1,2025
+tsi,025866,Western Brown High School,046060,Western Brown Local,Traditional School,Students with Disabilities,,,Year 1,2025
+tsi,026906,New Philadelphia High School,044487,New Philadelphia City,Traditional School,English Learner,,,Year 1,2025
+tsi,027425,Waverly Junior High School,049148,Waverly City,Traditional School,Students with Disabilities,,,Year 1,2025
+tsi,027433,North Elementary School,043919,East Liverpool City,Traditional School,Students with Disabilities;White Non-Hispanic,,,Year 1,2025
+tsi,029371,Stephanie Tubbs Jones,043786,Cleveland Municipal,Traditional School,Economic Disadvantage,,,Year 1,2025
+tsi,029702,Perry High School,049924,Perry Local,Traditional School,Students with Disabilities,,,Year 1,2025
+tsi,031757,Fostoria Elementary School,043992,Fostoria City,Traditional School,Students with Disabilities,,,Year 1,2025
+tsi,032060,Robert H Jamison School,043786,Cleveland Municipal,Traditional School,Economic Disadvantage,,,Year 1,2025
+tsi,032581,Zanesville Middle School,045179,Zanesville City,Traditional School,Students with Disabilities,,,Year 1,2025
+tsi,033431,Salem Junior High School,044735,Salem City,Traditional School,White Non-Hispanic,,,Year 1,2025
+tsi,033704,Schaefer Middle School,044818,Springfield City School District,Traditional School,Economic Disadvantage,,,Year 1,2025
+tsi,039628,Washington Middle School,045013,Washington Court House City,Traditional School,Students with Disabilities,,,Year 1,2025
+tsi,040576,Lima West Middle School,044222,Lima City,Traditional School,Black Non-Hispanic,,,Year 1,2025
+tsi,040865,Westwood School,043752,Cincinnati Public Schools,Traditional School,Multiracial,,,Year 1,2025
+tsi,042499,Yorktown Middle School,043802,Columbus City Schools District,Traditional School,Black Non-Hispanic,,,Year 1,2025
+tsi,042762,Roberts Middle School,043836,Cuyahoga Falls City School District,Traditional School,Asian or Pacific Islander,,,Year 1,2025
+tsi,043364,Boardman Center Intermediate School,048306,Boardman Local,Traditional School,Students with Disabilities,,,Year 1,2025
+tsi,062760,Luis Munoz Marin School,043786,Cleveland Municipal,Traditional School,Hispanic,,,Year 1,2025
+tsi,066738,Baldwin Road Junior High School,047001,Reynoldsburg City,Traditional School,Students with Disabilities,,,Year 1,2025
+tsi,099648,McVay Elementary School,045047,Westerville City,Traditional School,Students with Disabilities,,,Year 1,2025
+tsi,117382,Edgewood Middle School,046094,Edgewood City School District,Traditional School,Students with Disabilities,,,Year 1,2025
+tsi,123828,Lakota Ridge Junior School,046110,Lakota Local,Traditional School,Students with Disabilities,,,Year 1,2025
+tsi,124727,Gibsonburg Middle School,045385,Gibsonburg Exempted Village,Traditional School,Economic Disadvantage,,,Year 1,2025
+tsi,133603,Roosevelt Elementary School,043844,Dayton City,Traditional School,Economic Disadvantage,,,Year 1,2025
+tsi,145581,Academy for Multilingual Immersion Studies,043752,Cincinnati Public Schools,Traditional School,English Learner,,,Year 1,2025
+tsi,145870,Struthers Elementary School,044859,Struthers City,Traditional School,Students with Disabilities,,,Year 1,2025

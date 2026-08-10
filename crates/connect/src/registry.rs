@@ -1279,6 +1279,63 @@ pub const CONNECTORS: &[Connector] = &[
             },
         ],
     },
+    Connector {
+        key: "dew-school-improvement",
+        publisher: "Ohio Department of Education and Workforce, School and District Improvement",
+        feeds: &["school", "education-agency", "accountability-regime"],
+        status: Status::Wired {
+            still_blocked: Some(
+                "wired for the current identification lists only. The department republishes each \
+                 list in place under a dated filename rather than archiving prior cycles, so \
+                 there is no history here: a school that exited before this file was written is \
+                 indistinguishable from one never identified",
+            ),
+        },
+        note: "Who is actually in the accountability system. The corpus modelled the regime, the \
+               trigger and the intervention before it could name a single identified school.",
+        sources: &[
+            Source {
+                key: "csi-identified-2026",
+                title: None,
+                url: "https://education.ohio.gov/getattachment/Topics/School-and-District-Improvement/\
+                      Identification-and-Requirements/\
+                      CSI-Identified-Schools-updated-5-1-26.xlsx.aspx?lang=en-US",
+                filename: "csi-identified-2026.xlsx",
+                format: Format::Xlsx,
+                catalog: Some("ohio-essa-state-plan"),
+                fixtures: &[crate::fixtures::IDENTIFIED_FIXTURE],
+                note: "Comprehensive Support and Improvement. The lowest-performing Title I served \
+                       schools, high schools under a 67% federal graduation rate, and buildings \
+                       that have not exited ATSI in three years. Updated 1 May 2026.",
+            },
+            Source {
+                key: "tsi-identified-2026",
+                title: None,
+                url: "https://education.ohio.gov/getattachment/Topics/School-and-District-Improvement/\
+                      Identification-and-Requirements/\
+                      TSI-Identified-Schools-updated-1-7-26.xlsx.aspx?lang=en-US",
+                filename: "tsi-identified-2026.xlsx",
+                format: Format::Xlsx,
+                catalog: Some("ohio-essa-state-plan"),
+                fixtures: &[crate::fixtures::IDENTIFIED_FIXTURE],
+                note: "Targeted Support and Improvement — a subgroup consistently in the bottom 2% \
+                       of its own rank order. Updated 7 January 2026.",
+            },
+            Source {
+                key: "atsi-identified-2026",
+                title: None,
+                url: "https://education.ohio.gov/getattachment/Topics/School-and-District-Improvement/\
+                      Identification-and-Requirements/\
+                      ATSI-Identified-Schools-updated-1-7-26.xlsx.aspx?lang=en-US",
+                filename: "atsi-identified-2026.xlsx",
+                format: Format::Xlsx,
+                catalog: Some("ohio-essa-state-plan"),
+                fixtures: &[crate::fixtures::IDENTIFIED_FIXTURE],
+                note: "Additional Targeted Support and Improvement — a subgroup at or below the CSI \
+                       identification threshold score. Updated 7 January 2026.",
+            },
+        ],
+    },
 ];
 
 /// Look up a connector by key.
@@ -1330,6 +1387,7 @@ mod tests {
             "dew-payment-reports",
             "census-geography",
             "dew-child-nutrition",
+            "dew-school-improvement",
         ];
         for key in expected {
             assert!(

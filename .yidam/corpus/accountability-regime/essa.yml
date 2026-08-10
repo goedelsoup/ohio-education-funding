@@ -32,6 +32,12 @@ description: |
   is the channel the [`deduction`](../../skills/deduction.md) stub records as unmodellable — so
   the corpus can name the pathway and cannot yet follow the money along it. [inference]
 
+  **Who is in it, as of the current lists:** 231 CSI, 117 ATSI, 60 TSI. [verified —
+  `dispersion::identified`] Forty-two of the CSI schools arrived by escalation, having been ATSI
+  and failed to exit within three years, which makes the subgroup route a sixth of the whole-school
+  tier rather than an edge case. Some carry identifications from 2018, against exit criteria that
+  allow three years.
+
   The intervention ladder itself has no node. It is sixteen items ranging from revised improvement
   plans to closure, and modelling it needs the `intervention` class instantiated per rung rather
   than once. [open]
