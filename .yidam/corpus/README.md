@@ -77,16 +77,16 @@ Fields: count per claim tag across every node; then the unresolved marks by the 
 -->
 | Tag | Count | What it records |
 |---|--:|---|
-| `[verified]` | 534 | supported by a committed primary source |
-| `[inference]` | 190 | drawn from verified facts, not witnessed |
-| `[open]` | 157 | a live question — unknown, contested, or being worked |
+| `[verified]` | 535 | supported by a committed primary source |
+| `[inference]` | 193 | drawn from verified facts, not witnessed |
+| `[open]` | 164 | a live question — unknown, contested, or being worked |
 | `[unentered]` | 34 | a knowable value nobody has typed in yet |
 
-191 unresolved marks in total, 157 of them live questions and 34 of them empty fields. Before the two were distinguished the corpus reported the sum as its count of what it does not know, which overstated it by 17%.
+198 unresolved marks in total, 164 of them live questions and 34 of them empty fields. Before the two were distinguished the corpus reported the sum as its count of what it does not know, which overstated it by 17%.
 
 | Field | `[open]` | `[unentered]` |
 |---|--:|--:|
-| `description` | 88 | 3 |
+| `description` | 92 | 3 |
 | `series` | 10 | 0 |
 | `vetoes` | 7 | 1 |
 | `established` | 0 | 7 |
@@ -107,16 +107,18 @@ Fields: count per claim tag across every node; then the unresolved marks by the 
 | `subject` | 2 | 0 |
 | `legal_basis` | 2 | 0 |
 | `holding` | 2 | 0 |
+| `exit` | 1 | 1 |
 | `effective` | 0 | 2 |
 | `confidence` | 2 | 0 |
 | `calculator` | 2 | 0 |
+| `trigger` | 1 | 0 |
 | `sensitivity` | 1 | 0 |
 | `remedy` | 1 | 0 |
 | `mechanism` | 1 | 0 |
 | `measure` | 0 | 1 |
 | `kind` | 1 | 0 |
 | `irn` | 0 | 1 |
-| `exit` | 0 | 1 |
+| `fiscal_effect` | 1 | 0 |
 | `context` | 1 | 0 |
 | `citation` | 1 | 0 |
 | `case_name` | 1 | 0 |
@@ -133,9 +135,9 @@ Sorted by: kind, then alphabetically.
 -->
 | Node | Class | Label | Out | In |
 |---|---|---|--:|--:|
-| [`essa`](accountability-regime/essa.yml) | accountability-regime | Every Student Succeeds Act | 4 | 3 |
+| [`essa`](accountability-regime/essa.yml) | accountability-regime | Every Student Succeeds Act | 6 | 6 |
 | [`ohio-report-card`](accountability-regime/ohio-report-card.yml) | accountability-regime | Ohio School Report Card | 7 | 2 |
-| [`department-of-education-and-workforce`](actor/department-of-education-and-workforce.yml) | actor | Department of Education and Workforce | 3 | 4 |
+| [`department-of-education-and-workforce`](actor/department-of-education-and-workforce.yml) | actor | Department of Education and Workforce | 3 | 6 |
 | [`ohio-department-of-education`](actor/ohio-department-of-education.yml) | actor | Ohio Department of Education (superseded) | 2 | 2 |
 | [`ohio-general-assembly`](actor/ohio-general-assembly.yml) | actor | Ohio General Assembly | 6 | 5 |
 | [`supreme-court-of-ohio`](actor/supreme-court-of-ohio.yml) | actor | Supreme Court of Ohio | 3 | 5 |
@@ -175,7 +177,9 @@ Sorted by: kind, then alphabetically.
 | [`evidence-based-model`](funding-regime/evidence-based-model.yml) | funding-regime | Evidence-Based Model | 3 | 6 |
 | [`fair-school-funding-plan`](funding-regime/fair-school-funding-plan.yml) | funding-regime | Fair School Funding Plan | 21 | 20 |
 | [`foundation-base-cost-formula`](funding-regime/foundation-base-cost-formula.yml) | funding-regime | Foundation Base Cost Formula | 5 | 7 |
-| [`academic-distress-commission`](intervention/academic-distress-commission.yml) | intervention | Academic Distress Commission | 4 | 3 |
+| [`academic-distress-commission`](intervention/academic-distress-commission.yml) | intervention | Academic Distress Commission | 4 | 4 |
+| [`lea-level-action`](intervention/lea-level-action.yml) | intervention | Additional Optional Action (LEA level) | 4 | 2 |
+| [`more-rigorous-interventions`](intervention/more-rigorous-interventions.yml) | intervention | More Rigorous Interventions (CSI) | 5 | 2 |
 | [`hb-1-2009`](legislation/hb-1-2009.yml) | legislation | Am. Sub. H.B. 1 (2009) — FY2010-11 Budget; Evidence-Based Model | 2 | 3 |
 | [`hb-110-2021`](legislation/hb-110-2021.yml) | legislation | Am. Sub. H.B. 110 (2021) — FY2022-23 Budget; Fair School Funding Plan | 5 | 7 |
 | [`hb-153-2011`](legislation/hb-153-2011.yml) | legislation | Am. Sub. H.B. 153 (2011) — FY2012-13 Budget; Bridge Formula | 6 | 1 |
@@ -211,19 +215,19 @@ Sorted by: kind, then alphabetically.
 | [`edchoice-expansion`](program/edchoice-expansion.yml) | program | EdChoice Expansion Scholarship | 4 | 4 |
 | [`casino-tax-distribution`](revenue-stream/casino-tax-distribution.yml) | revenue-stream | Casino Tax — County Student Fund | 6 | 1 |
 | [`esser`](revenue-stream/esser.yml) | revenue-stream | ESSER — Elementary and Secondary School Emergency Relief | 4 | 1 |
-| [`idea-part-b`](revenue-stream/idea-part-b.yml) | revenue-stream | IDEA Part B | 5 | 2 |
+| [`idea-part-b`](revenue-stream/idea-part-b.yml) | revenue-stream | IDEA Part B | 5 | 3 |
 | [`local-property-tax`](revenue-stream/local-property-tax.yml) | revenue-stream | Local Property Tax | 6 | 8 |
 | [`lottery-profits`](revenue-stream/lottery-profits.yml) | revenue-stream | Lottery Profits Education Fund | 4 | 1 |
 | [`state-foundation-aid`](revenue-stream/state-foundation-aid.yml) | revenue-stream | State Foundation Aid | 5 | 16 |
-| [`title-i`](revenue-stream/title-i.yml) | revenue-stream | Title I, Part A | 4 | 3 |
+| [`title-i`](revenue-stream/title-i.yml) | revenue-stream | Title I, Part A | 4 | 5 |
 | [`tpp-replacement-payments`](revenue-stream/tpp-replacement-payments.yml) | revenue-stream | Tangible Personal Property Tax Replacement Payments | 3 | 3 |
 | [`fsfp-input-year-refresh`](scenario/fsfp-input-year-refresh.yml) | scenario | FSFP Cost Input Refresh vs. Freeze | 9 | 4 |
 | [`guarantee-phase-out`](scenario/guarantee-phase-out.yml) | scenario | Phasing Out the Temporary Transitional Aid Guarantee | 11 | 2 |
 | [`anton-grdina`](school/anton-grdina.yml) | school | Anton Grdina | 6 | 1 |
 | [`barrington-road-elementary`](school/barrington-road-elementary.yml) | school | Barrington Road Elementary School | 4 | 2 |
-| [`sheridan-high-school`](school/sheridan-high-school.yml) | school | Sheridan High School | 4 | 1 |
+| [`sheridan-high-school`](school/sheridan-high-school.yml) | school | Sheridan High School | 6 | 1 |
 
-89 nodes across 16 classes. **0 have nothing pointing at them**, which the corpus rules treat as a gap rather than a fact about the node.
+91 nodes across 16 classes. **0 have nothing pointing at them**, which the corpus rules treat as a gap rather than a fact about the node.
 <!-- /REGEN -->
 
 ## Semantic index status
@@ -233,5 +237,5 @@ Regenerated by: `yidam index-status`
 Fields: total nodes indexed, embedding model, index freshness (last indexed commit vs HEAD),
         stale node count.
 -->
-No semantic index is built. The corpus is 89 nodes and fits in context; an index is added when direct retrieval stops working, which has not happened.
+No semantic index is built. The corpus is 91 nodes and fits in context; an index is added when direct retrieval stops working, which has not happened.
 <!-- /REGEN -->

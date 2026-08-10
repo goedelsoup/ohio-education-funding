@@ -71,6 +71,14 @@ links:
     relationship: operated-by
   - target: ../litigation/derolph-i-1997.yml
     relationship: origin-of
+  - target: ../accountability-regime/essa.yml
+    relationship: identified-under
+  - target: ../intervention/more-rigorous-interventions.yml
+    relationship: exposed-to
+    note: >-
+      Identified CSI in 2025 by escalation. The ladder applies to a CSI school that has not met
+      exit criteria within three years, so 2028 is the earliest it could reach this building —
+      and whether it ever has is unpublished.
   - target: ../metric/performance-index.yml
     relationship: rated-on
   - target: barrington-road-elementary.yml
