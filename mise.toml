@@ -25,6 +25,36 @@ monorepo_root = true
 [settings]
 experimental = true
 
+# Where the Rust toolchain lives, stated because leaving it unstated is not the
+# no-op it looks like.
+#
+# mise's rust backend exports `CARGO_HOME` and `RUSTUP_HOME` for every task it
+# runs. With `rust.cargo_home` and `rust.rustup_home` unset it renders them as
+# the literal string `undefined` resolved against this file's directory — so
+# every task ran with
+#
+#   CARGO_HOME=<repo>/undefined
+#   RUSTUP_HOME=<repo>/undefined
+#
+# There is no toolchain there, so `mise exec -- cargo` fails with "couldn't exec
+# process" and the gate looks like a missing-cargo problem. Put the host's cargo
+# on `PATH` to work around that and it gets worse quietly: rustup reads those
+# same two variables, decides it has an empty installation, and provisions a
+# fresh 1.4 GB toolchain into `<repo>/undefined/` — an untracked, ungitignored
+# directory inside the working tree, one `git add -A` away from being committed.
+#
+# Pointing both at the host's real homes is what makes `mise run //:ci` work
+# with no `PATH` preamble, and is why `undefined/` cannot come back.
+[env]
+CARGO_HOME = "{{env.HOME}}/.cargo"
+RUSTUP_HOME = "{{env.HOME}}/.rustup"
+# And the rustup shims, which mise does not add itself: its `rust` install for
+# 1.97.0 *is* a symlink to `~/.cargo/bin`, so the `<install>/bin` it would put on
+# PATH resolves to `~/.cargo/bin/bin` and does not exist. `RUSTUP_TOOLCHAIN` is
+# still exported from the `[tools]` pin below, so the shim found here selects
+# 1.97.0 and the pin keeps meaning what it says.
+_.path = ["{{env.HOME}}/.cargo/bin"]
+
 [monorepo]
 config_roots = ["crates", "web"]
 
