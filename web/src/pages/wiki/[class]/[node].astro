@@ -14,7 +14,7 @@ import Base from "../../../layouts/Base.astro";
 import { loadCorpus } from "../../../lib/corpus.ts";
 import { loadFeed } from "../../../lib/feed.ts";
 import { money } from "../../../lib/format.ts";
-import { renderProse, renderPropertyValue } from "../../../lib/prose.ts";
+import { renderProse, renderPropertyValue, summarize } from "../../../lib/prose.ts";
 import * as routes from "../../../lib/routes.ts";
 
 export function getStaticPaths() {
@@ -43,10 +43,21 @@ const district = irn ? byIrn.get(irn) : undefined;
 
 const stated = node.out.filter((edge) => edge.stated);
 const mentions = node.out.filter((edge) => !edge.stated);
-const summary = node.description.replace(/\s+/g, " ").replace(/\[[^\]]*\]\([^)]*\)/g, "").trim();
+
+/*
+ * Why a node is in the corpus at all, held apart from what the node says about Ohio.
+ *
+ * This used to be a clause in the middle of the first sentence — "A high-wealth suburban district
+ * in Franklin County, adjacent to Columbus, seeded as the contrast case against …" — so a reader
+ * who came to find out what the district is met an editorial note about why it had been entered.
+ * It is genuine provenance and worth keeping; it is just not body copy, and the class index that
+ * summarised that sentence inherited the problem.
+ */
+const seeded = node.properties.find((p) => p.name === "seeded_because");
+const properties = node.properties.filter((p) => p.name !== "seeded_because");
 ---
 
-<Base title={node.label} description={summary.slice(0, 200)} section="wiki">
+<Base title={node.label} description={summarize(node.description, 200)} section="wiki">
   <p class="crumb">
     <a href="/wiki">The corpus</a> ›{" "}
     <a href={routes.wikiClass(node.className)}>{entry?.label ?? node.className}</a>
@@ -88,13 +99,13 @@ const summary = node.description.replace(/\s+/g, " ").replace(/\[[^\]]*\]\([^)]*
   }
 
   {
-    node.properties.length > 0 && (
+    properties.length > 0 && (
       <div class="card">
         <h2>Properties</h2>
         <div class="scroll">
           <table class="prose">
             <tbody>
-              {node.properties.map((property) => (
+              {properties.map((property) => (
                 <tr>
                   <th>
                     <code>{property.name}</code>
@@ -177,4 +188,17 @@ const summary = node.description.replace(/\s+/g, " ").replace(/\[[^\]]*\]\([^)]*
       )
     }
   </div>
+
+  {
+    seeded && (
+      <div class="card apparatus">
+        <h2>Why this node is here</h2>
+        <p class="note">
+          A note from the corpus about itself rather than about Ohio, kept because provenance
+          includes why something was written down.
+        </p>
+        <p set:html={renderPropertyValue(seeded.value, node.className)} />
+      </div>
+    )
+  }
 </Base>

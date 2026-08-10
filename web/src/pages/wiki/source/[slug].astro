@@ -11,7 +11,7 @@
  * prose rather than from a `used-by` field, because that is where citations actually live.
  */
 import Base from "../../../layouts/Base.astro";
-import { loadCorpus } from "../../../lib/corpus.ts";
+import { FROM_CATALOG, loadCorpus } from "../../../lib/corpus.ts";
 import { renderProse } from "../../../lib/prose.ts";
 
 export function getStaticPaths() {
@@ -24,8 +24,10 @@ export function getStaticPaths() {
 const { source } = Astro.props;
 // Catalog entries link out to the corpus with paths relative to `catalog/`, which sits beside
 // `corpus/` — so a target like `../corpus/metric/performance-index.yml` resolves on the class
-// segment of its own path rather than on any node's class.
-const body = await renderProse(source.body, "");
+// segment of its own path rather than on any node's class. FROM_CATALOG says that explicitly:
+// this used to be the empty string, which built `/wiki//twenty-mill-floor` — resolved, so nothing
+// flagged it, and a 404 — the moment an entry wrote a bare sibling reference.
+const body = await renderProse(source.body, FROM_CATALOG);
 ---
 
 <Base

@@ -4,14 +4,7 @@ description: |
   July 1, 2025 through June 30, 2026 — the first year of the
   [FY2026-27 biennium](fy2026-27.yml). [verified]
 
-  It is seeded as a fiscal-year node rather than being folded into the biennium because the
-  parameters that determine what a district receives are set per year and differ between the
-  two years of the biennium. The [phase-in percentage](../parameter/fsfp-phase-in-percentage.yml)
-  in particular advances annually inside a biennially-negotiated act, so a district's FY2026
-  and FY2027 amounts are different numbers produced by the same enactment. [inference] A corpus
-  that recorded only the biennium could not express that.
-
-  FY2026 is also the reference year for the scenario seeded in this corpus and the natural
+  FY2026 is also the reference year for this corpus's scenario and the natural
   baseline for any current-policy comparison, because it is the first period in which enacted
   H.B. 96 provisions are in force. [inference]
 
@@ -19,6 +12,13 @@ description: |
   department after the year closes; until then any figure attributed to FY2026 is an estimate
   and must be tagged as one. [open]
 properties:
+  seeded_because: |
+    A fiscal-year node rather than part of the biennium, because the parameters that determine
+    what a district receives are set per year and differ between the biennium's two years. The
+    [phase-in percentage](../parameter/fsfp-phase-in-percentage.yml) in particular advances
+    annually inside a biennially-negotiated act, so a district's FY2026 and FY2027 amounts are
+    different numbers produced by the same enactment. [inference] A corpus that recorded only the
+    biennium could not express that.
   label: FY2026
   kind: fiscal-year
   start: 2025-07-01

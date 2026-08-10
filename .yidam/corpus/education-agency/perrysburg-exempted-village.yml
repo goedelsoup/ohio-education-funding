@@ -1,8 +1,7 @@
 class: education-agency
 label: Perrysburg Exempted Village School District
 description: |
-  The corpus's first exempted village district, closing one of the two agency-type gaps this
-  class recorded at genesis, and the suburban counterpart to
+  An exempted village district, and the suburban counterpart to
   [Toledo](toledo-city.yml) eleven miles away across the Maumee. [verified]
 
   It is a better contrast case than [Upper Arlington](upper-arlington-city.yml) for one specific
@@ -36,6 +35,9 @@ description: |
   Not yet held: valuation per pupil, millage, guarantee status, and anything before FY2024.
   [open]
 properties:
+  seeded_because: |
+    The corpus's first exempted village district, closing one of the two agency-type gaps this
+    class recorded at genesis. [verified]
   irn: 045583 [verified — report card district files]
   agency_type: exempted-village
   county: Wood

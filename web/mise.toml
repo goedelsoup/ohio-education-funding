@@ -3,12 +3,13 @@
 # `mise run //web:<task>`, or run bare names from inside this directory.
 
 [tasks.gate]
-description = "Everything the web job in CI runs: check, unit, build, e2e."
+description = "Everything the web job in CI runs: check, unit, build, dist links, e2e."
 run = [
   "mise run install",
   "mise run check",
   "mise run test-unit",
   "mise run build",
+  "mise run check-dist",
   "mise run test-e2e",
 ]
 
@@ -34,6 +35,13 @@ description = "Build the static site."
 # is parsed and validated, so a corpus authoring defect surfaces here rather than
 # as a page that comes out wrong days later.
 run = "pnpm build"
+
+[tasks.check-dist]
+description = "Fail if the built site carries a relative href a static host cannot serve."
+# After `build`, never in the unit suite: that runs first, so it would be reading the previous
+# commit's `dist/`. See the header of scripts/check-dist-links.ts for why this asks a question the
+# route-table test structurally cannot.
+run = "pnpm check:dist"
 
 [tasks.test-e2e]
 description = "The site in Chromium, a third of it with JavaScript disabled."

@@ -14,14 +14,15 @@ description: |
   It did not clear the Ohio constitutional path. *Zelman* answered a federal question; whether
   Article VI, Section 2's bar on sectarian control of school funds permits the arrangement is a
   separate question raised in the [2025 EdChoice
-  challenge](../litigation/vouchers-hurt-ohio-2025.yml). [inference] The Cleveland program is
-  seeded here as the origin point of the scholarship channel and the reference against which the
-  statewide programs' scale should be read: it was designed as a targeted intervention in one
-  distressed district, and what grew from it was universal eligibility statewide. [inference]
+  challenge](../litigation/vouchers-hurt-ohio-2025.yml). [inference]
 
   Per-student amounts, participation counts, and the mechanism by which the program is charged
   against Cleveland's funding are not yet recorded. [open]
 properties:
+  seeded_because: |
+    The origin point of the scholarship channel, and the reference against which the statewide
+    programs' scale should be read: it was designed as a targeted intervention in one distressed
+    district, and what grew from it was universal eligibility statewide. [inference]
   name: Cleveland Scholarship and Tutoring Program
   mechanism: deduction
   eligibility: |

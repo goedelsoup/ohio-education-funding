@@ -2,10 +2,7 @@ class: education-agency
 label: Cleveland Municipal School District
 description: |
   Ohio's largest urban district by enrollment for most of the period this corpus covers, and
-  the district where the state's voucher channel began. [verified] It is seeded because it sits
-  at the intersection of three mechanisms that operate on no other agency in the same
-  combination: high poverty, a large but declining industrial and commercial tax base, and a
-  district-specific scholarship program predating every statewide one.
+  the district where the state's voucher channel began. [verified]
 
   Urban districts complicate the property-wealth story that Northern Local and Upper Arlington
   tell cleanly. Cleveland's assessed valuation is large in absolute terms, so a wealth measure
@@ -24,7 +21,7 @@ description: |
   First hard numbers: IRN 043786, with 8,027 public school students with disabilities in FY2021
   — more than seven times Upper Arlington's count — and an IDEA Part B allocation of
   $12,818,292.57, plus 609 non-public students and a $903,930.07 proportionate share.
-  [verified] The non-public count is the largest of the three traditional districts seeded here
+  [verified] The non-public count is the largest of the corpus's three traditional districts
   and is a direct consequence of the
   [Cleveland Scholarship](../program/cleveland-scholarship.yml) having operated in this district
   for three decades. [inference]
@@ -47,6 +44,10 @@ description: |
 
   Scholarship dollar amounts and the state funding series by year remain unpopulated. [open]
 properties:
+  seeded_because: |
+    It sits at the intersection of three mechanisms that operate on no other agency in the same
+    combination: high poverty, a large but declining industrial and commercial tax base, and a
+    district-specific scholarship program predating every statewide one.
   irn: 043786 [verified — FY2021 IDEA Part B allocation list]
   agency_type: city
   county: Cuyahoga

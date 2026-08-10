@@ -434,6 +434,10 @@ tbody tr:last-child th, tbody tr:last-child td { border-bottom: 0; }
 }
 .claim.verified { color: var(--series-formula); border-color: color-mix(in srgb, var(--series-formula) 35%, transparent); }
 .claim.open { color: var(--series-guarantee); border-color: color-mix(in srgb, var(--series-guarantee) 35%, transparent); }
+/* The fourth mark, and deliberately not on the same scale as the other three. `unentered` says a
+   field is empty, not that a claim is weak — so it is dashed and unsaturated rather than placed
+   somewhere on the verified-to-open axis, where it would read as "worse than open". */
+.claim.unentered { border-style: dashed; color: var(--text-muted); background: none; }
 /* The justification, which is often a sentence. Kept out of the flow of the claim it qualifies
    and shown on the badge itself, because inline it would dominate the sentence it belongs to. */
 .claim-detail {
@@ -443,6 +447,22 @@ tbody tr:last-child th, tbody tr:last-child td { border-bottom: 0; }
   color: var(--text-muted);
   white-space: normal;
 }
+
+/*
+ * The corpus talking about itself rather than about Ohio — why a node was entered at all.
+ *
+ * Subordinated rather than hidden. It is real provenance and a reader auditing the corpus wants
+ * it; a reader looking up a district does not, and for a long time got it in the middle of the
+ * first sentence of every exemplar. Muted, smaller, and last on the page is enough to say which
+ * kind of reader it is for without making anyone hunt for it.
+ */
+.card.apparatus {
+  border-style: dashed;
+  background: none;
+  color: var(--text-secondary);
+  font-size: .88rem;
+}
+.card.apparatus h2 { font-size: .95rem; color: var(--text-muted); }
 
 footer { color: var(--text-muted); font-size: .78rem; margin-top: 1.5rem; }
 footer p { margin: .35rem 0; }

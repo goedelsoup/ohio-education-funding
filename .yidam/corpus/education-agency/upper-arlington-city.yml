@@ -1,9 +1,8 @@
 class: education-agency
 label: Upper Arlington City School District
 description: |
-  A high-wealth suburban district in Franklin County, adjacent to Columbus, seeded as the
-  contrast case against [Northern Local](northern-local-perry.yml). Its role in this corpus is
-  to make the distributional question concrete: two districts, the same constitutional
+  A high-wealth suburban district in Franklin County, adjacent to Columbus, and the contrast case
+  against [Northern Local](northern-local-perry.yml): two districts, the same constitutional
   entitlement, and revenue structures that have almost nothing in common. [inference]
 
   A district at this end of the distribution experiences every mechanism in this corpus
@@ -32,8 +31,6 @@ description: |
   funding that a wealthy suburb does not. [inference] Wealth buys autonomy from the state
   formula more reliably than it buys the highest per-pupil spending.
 
-  Seeded as an exemplar, not as an accusation: nothing in this node asserts that the district
-  did anything other than pass levies its residents supported.
   First hard numbers: IRN 044933, with 1,121 public school students with disabilities in FY2021
   and an IDEA Part B allocation of $1,490,233.42, plus 68 non-public students and an $85,227.82
   proportionate share. [verified] The non-public figure is worth noting on its own — a
@@ -41,6 +38,10 @@ description: |
   exactly the setting in which the scholarship channel operates differently than it does in
   [Northern Local](northern-local-perry.yml). [inference]
 properties:
+  seeded_because: |
+    The contrast case against [Northern Local](northern-local-perry.yml), to make the
+    distributional question concrete. Seeded as an exemplar, not as an accusation: nothing in this
+    node asserts that the district did anything other than pass levies its residents supported.
   irn: 044933 [verified — FY2021 IDEA Part B allocation list]
   agency_type: city
   county: Franklin

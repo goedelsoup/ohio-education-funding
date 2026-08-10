@@ -143,6 +143,22 @@ export const OntologyClassSchema = z
  */
 export const OBSERVATION_PROPERTY = /^fy\d{4}(_\d{2})?_[a-z0-9_]+$/;
 
+/**
+ * Properties any class may carry, whatever its own ontology declares.
+ *
+ * `seeded_because` says why a node is in the corpus at all — "the anchor case for the
+ * property-poor end of Ohio's distribution", "JVSDs are funded on rules that differ from
+ * traditional districts". That is a fact about the corpus rather than about Ohio, and it used to
+ * be written into the middle of the first sentence of a description, so a reader arriving to find
+ * out what a district *is* met an editorial note about why it had been entered. It reads as
+ * apparatus because it is apparatus, and the node page renders it apart from the body copy.
+ *
+ * Universal rather than declared per class for the same reason `instance-of` and `sourced-from`
+ * are: it applies to every class, so declaring it in all sixteen ontologies would be sixteen
+ * copies of one decision, and a seventeenth class would silently not have it.
+ */
+export const UNIVERSAL_PROPERTIES = new Set(["seeded_because"]);
+
 export type NodeFile = z.infer<typeof NodeSchema>;
 export type OntologyFile = z.infer<typeof OntologyClassSchema>;
 
