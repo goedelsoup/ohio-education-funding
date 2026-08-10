@@ -8,19 +8,30 @@ Ohio school funding is a domain where almost every question is a traversal: a do
 implies a formula component, which implies a parameter, which implies a bill, which implies
 a fiscal period. The agents below are named for the traversals that recur.
 
-- **formula-analyst** — takes a dollar figure for one agency-year and walks it back through
-  the formula components and parameter values that produced it, naming each step
-- **statute-tracer** — takes a bill and enumerates the regimes it established, the parameters
-  it set, the programs it created, and the revenue streams it constrained
-- **agency-profiler** — assembles the funding history of a single education agency across
-  every regime it lived through, in both nominal and real dollars
-- **scenario-runner** — perturbs one or more parameters, invokes the simulator, and commits
-  the resulting per-agency deltas as a `scenario` node with its provenance
-- **series-extractor** — pulls structured numeric series out of DEW, Department of Taxation,
-  and LSC publications into committed data files, and reconciles them against the catalog
+- **[formula-analyst](formula-analyst.md)** — takes a dollar figure for one agency-year and walks
+  it back through the formula components and parameter values that produced it, naming each step
+- **[statute-tracer](statute-tracer.md)** — takes a bill and enumerates the regimes it
+  established, the parameters it set, the programs it created, and the revenue streams it
+  constrained
+- **[agency-profiler](agency-profiler.md)** — assembles the funding history of a single education
+  agency across every regime it lived through, in both nominal and real dollars
+- **[scenario-runner](scenario-runner.md)** — perturbs one or more parameters, invokes the
+  simulator, and commits the resulting per-agency deltas as a `scenario` node with its provenance
+- **[series-extractor](series-extractor.md)** — pulls structured numeric series out of DEW,
+  Department of Taxation, and LSC publications into committed data files, and reconciles them
+  against the catalog
 
-These are the agents the domain implies; definition files are written when a phase first
-needs one, not preemptively.
+They were described here for fifteen phases before any of them existed, under a registry table
+that generated itself empty every time and never once complained — which is what an aspirational
+list looks like from the inside.
+
+**Most of each definition is what not to do.** The traversals are not hard; the domain is full of
+numbers that are confidently wrong. A suppressed `<10` summed as zero, a `State of Ohio` row that
+survives a digit filter, a per-pupil figure whose denominator is not the one the comparison needs,
+a nominal series read across an inflationary decade, a guaranteed district decomposed into formula
+components that did not determine its payment. Every prohibition in these files is a mistake this
+repository has actually made and recorded, and they are written down here because an agent that
+knows the traversal and not the traps produces plausible output.
 
 ## Registry
 
@@ -30,4 +41,9 @@ Fields per agent: filename, name, description, skills it invokes, model preferen
 -->
 | Agent | Description |
 |---|---|
+| [`agency-profiler`](agency-profiler.md) | Assemble one education agency's funding history across every regime it lived through, in both nominal and real dollars |
+| [`formula-analyst`](formula-analyst.md) | Walk one agency-year dollar figure back through the formula components and parameter values that produced it, naming each step |
+| [`scenario-runner`](scenario-runner.md) | Perturb a parameter set, invoke the simulator, and commit the per-agency deltas as a scenario node with its provenance |
+| [`series-extractor`](series-extractor.md) | Pull structured numeric series out of department, taxation and LSC publications into committed fixtures, and reconcile them against the catalog |
+| [`statute-tracer`](statute-tracer.md) | Take a bill and enumerate the regimes it established, the parameters it set, the programs it created, and the revenue streams it constrained |
 <!-- /REGEN -->

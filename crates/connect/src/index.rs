@@ -12,10 +12,19 @@
 //!
 //! # What is not generated, and why
 //!
-//! Two of the seven blocks described things that do not exist: a semantic index over the corpus
-//! (never built — the corpus fits in context) and a deployment (no target chosen). Those are
-//! replaced with a sentence saying so. Generating a plausible-looking status for a system that
-//! is not there would be worse than the empty block was.
+//! One block describes a thing that does not exist: a semantic index over the corpus, never built
+//! because the corpus fits in context. It is replaced with a sentence saying so. Generating a
+//! plausible-looking status for a system that is not there would be worse than the empty block
+//! was — but the sentence still counts the corpus, because a status that is a string literal
+//! regenerates to itself and can therefore be wrong forever. It was, by sixteen nodes.
+//!
+//! # Prose is where this drifts now
+//!
+//! The blocks are safe and the paragraphs beside them are not. `crates/connect/README.md` carried
+//! a hand-written connector table claiming nine connectors and three wired while the registry held
+//! thirteen and eleven; `crates/README.md` described the same nine in prose. Neither was reachable
+//! by the guard, because the guard reads markers. The table is now a `connector-registry` block,
+//! generated from [`crate::registry::CONNECTORS`] itself.
 
 use std::collections::BTreeMap;
 use std::fs;
@@ -58,6 +67,7 @@ impl From<io::Error> for IndexError {
 /// A README carrying at least one block.
 pub const DOCUMENTS: &[&str] = &[
     "crates/README.md",
+    "crates/connect/README.md",
     "web/README.md",
     "agents/README.md",
     ".yidam/corpus/README.md",
@@ -322,6 +332,214 @@ fn markdown_index(root: &Path, directory: &str, heading: &str) -> String {
     out
 }
 
+/// The connector table, from [`crate::registry::CONNECTORS`] rather than from memory.
+///
+/// This block exists because the hand-written table it replaced said nine connectors, three of
+/// them wired, at a point when the registry held thirteen and eleven. It had gone stale in every
+/// direction at once: `census-f33` was described as having no parser while feeding a 10,739-row
+/// panel, and `lsc-budget`, `ohio-laws` and `ohio-courts` were all listed `declared` after the
+/// phases that wired them. Nothing caught it, because the guard that keeps generated blocks
+/// current does not reach prose, and this was prose.
+///
+/// Every cell is a field. Nothing here is parsed out of a `note`: that is the mistake the
+/// DeRolph titles made, where rewording a comment silently rewrote committed data. The notes stay
+/// in the registry and the long form stays in `sources/`, both linked, neither transcribed.
+fn connector_registry(root: &Path) -> String {
+    use crate::registry::{Status, CONNECTORS};
+
+    let mut out = String::from("| Connector | Status | Sources | Feeds |\n|---|---|--:|---|\n");
+    let mut undocumented = Vec::new();
+    for connector in CONNECTORS {
+        let key = connector.key;
+        // Linked only when the long form is actually there. Ten of the thirteen have one — the
+        // three added after the original stubs never did — and a link to a file that does not
+        // exist would be a worse claim than no link.
+        let long_form = format!("crates/connect/sources/{key}.md");
+        let name = if root.join(&long_form).exists() {
+            format!("[`{key}`](sources/{key}.md)")
+        } else {
+            undocumented.push(key);
+            format!("`{key}`")
+        };
+        let status = match connector.status {
+            Status::Wired {
+                still_blocked: None,
+            } => "**wired**".to_string(),
+            Status::Wired { .. } => "**wired**, in part".to_string(),
+            other => other.label().to_string(),
+        };
+        out.push_str(&format!(
+            "| {name} | {status} | {} | {} |\n",
+            connector.sources.len(),
+            connector.feeds.join(", ")
+        ));
+    }
+
+    let wired = CONNECTORS.iter().filter(|c| c.status.is_wired()).count();
+    let partial = CONNECTORS
+        .iter()
+        .filter(|c| {
+            matches!(
+                c.status,
+                Status::Wired {
+                    still_blocked: Some(_)
+                }
+            )
+        })
+        .count();
+    let sources: usize = CONNECTORS.iter().map(|c| c.sources.len()).sum();
+    out.push_str(&format!(
+        "\n{} connectors, {sources} sources between them. {wired} are wired and {} are not; \
+         {partial} of the wired ones reach only part of what they feed, and say so below.\n",
+        CONNECTORS.len(),
+        CONNECTORS.len() - wired,
+    ));
+
+    // Verbatim, because these strings are the thing a test checks for existence and length. A
+    // summary of a blocker is how the last four stale ones survived being read.
+    out.push_str("\n**What is blocked, in the registry's own words.**\n\n");
+    for connector in CONNECTORS {
+        let (kind, reason) = match connector.status {
+            Status::Declared { blocked_on } => ("blocked on", blocked_on),
+            Status::Wired {
+                still_blocked: Some(reason),
+            } => ("still blocked on", reason),
+            _ => continue,
+        };
+        out.push_str(&format!("- `{}` — {kind}: {reason}\n", connector.key));
+    }
+
+    if !undocumented.is_empty() {
+        out.push_str(&format!(
+            "\n{} of them have no long form in [`sources/`](sources/): {}. Those are the \
+             connectors added after the original nine stubs, whose prose was never written — the \
+             decision record is the only account of why each exists.\n",
+            undocumented.len(),
+            undocumented
+                .iter()
+                .map(|key| format!("`{key}`"))
+                .collect::<Vec<_>>()
+                .join(", ")
+        ));
+    }
+    out
+}
+
+/// Every claim tag in the corpus, counted, and the unresolved ones by the field they sit in.
+///
+/// The audit in [`decisions/the-open-item-audit.yml`](../../../.yidam/decisions/) enumerated 152
+/// `[open]` claims by hand and its most useful output was the distribution, not the resolutions:
+/// it showed that four of the largest clusters were not open questions at all but metadata nobody
+/// had typed in. A hand count answers that once. This answers it every time, which matters
+/// because the number went to 164 in the phases after the audit and nothing said so.
+///
+/// Field attribution is by position rather than by parsing YAML: a tag belongs to the last
+/// top-level key seen, or to the last two-space key if that top-level key was `properties`. That
+/// is exactly the granularity the audit reported in, and it needs no parser in a crate that has
+/// deliberately avoided acquiring one.
+fn claim_audit(root: &Path) -> String {
+    const TAGS: [&str; 4] = ["[verified]", "[inference]", "[open]", "[unentered]"];
+    let nodes = corpus_nodes(root);
+
+    let mut totals: BTreeMap<&str, usize> = TAGS.iter().map(|tag| (*tag, 0)).collect();
+    // Only the unresolved tags get a field breakdown; `[verified]` by field says nothing.
+    let mut unresolved: BTreeMap<(String, &str), usize> = BTreeMap::new();
+
+    for (_, _, _, text) in &nodes {
+        let mut top = String::new();
+        let mut field = String::new();
+        for line in text.lines() {
+            if let Some(key) = line.split_once(':').map(|(key, _)| key) {
+                if !key.is_empty() && !key.starts_with(char::is_whitespace) && !key.contains(' ') {
+                    top = key.to_string();
+                    field.clone_from(&top);
+                } else if top == "properties"
+                    && line.starts_with("  ")
+                    && !line.starts_with("   ")
+                    && !key.trim().contains(' ')
+                {
+                    field = key.trim().to_string();
+                }
+            }
+            for tag in TAGS {
+                let hits = line.matches(tag).count();
+                if hits == 0 {
+                    continue;
+                }
+                *totals.get_mut(tag).expect("tag is in the map") += hits;
+                if tag != "[verified]" && tag != "[inference]" {
+                    *unresolved.entry((field.clone(), tag)).or_default() += hits;
+                }
+            }
+        }
+    }
+
+    let mut out = String::from("| Tag | Count | What it records |\n|---|--:|---|\n");
+    for (tag, meaning) in [
+        ("[verified]", "supported by a committed primary source"),
+        ("[inference]", "drawn from verified facts, not witnessed"),
+        (
+            "[open]",
+            "a live question — unknown, contested, or being worked",
+        ),
+        ("[unentered]", "a knowable value nobody has typed in yet"),
+    ] {
+        out.push_str(&format!("| `{tag}` | {} | {meaning} |\n", totals[tag]));
+    }
+
+    let open = totals["[open]"];
+    let unentered = totals["[unentered]"];
+    out.push_str(&format!(
+        "\n{} unresolved marks in total, {open} of them live questions and {unentered} of them \
+         empty fields. Before the two were distinguished the corpus reported the sum as its \
+         count of what it does not know, which overstated it by {}%.\n",
+        open + unentered,
+        if open + unentered == 0 {
+            0
+        } else {
+            unentered * 100 / (open + unentered)
+        }
+    ));
+
+    out.push_str("\n| Field | `[open]` | `[unentered]` |\n|---|--:|--:|\n");
+    let fields: std::collections::BTreeSet<&String> =
+        unresolved.keys().map(|(field, _)| field).collect();
+    let mut rows: Vec<(usize, usize, &String)> = fields
+        .into_iter()
+        .map(|field| {
+            (
+                unresolved
+                    .get(&(field.clone(), "[open]"))
+                    .copied()
+                    .unwrap_or(0),
+                unresolved
+                    .get(&(field.clone(), "[unentered]"))
+                    .copied()
+                    .unwrap_or(0),
+                field,
+            )
+        })
+        .collect();
+    rows.sort_by(|a, b| (b.0 + b.1, b.2).cmp(&(a.0 + a.1, a.2)));
+    for (open, unentered, field) in rows {
+        out.push_str(&format!("| `{field}` | {open} | {unentered} |\n"));
+    }
+    out
+}
+
+/// Why there is no semantic index, and how much corpus there is to not index.
+///
+/// The node count used to be the literal `58` returned from this function, which is how it came
+/// to sit nine lines below a generated block reading 74 and survive every CI run: regenerating a
+/// constant produces no diff. A status block that cannot go stale is one that measures something.
+fn index_status(root: &Path) -> String {
+    format!(
+        "No semantic index is built. The corpus is {} nodes and fits in context; an index is \
+         added when direct retrieval stops working, which has not happened.\n",
+        corpus_nodes(root).len()
+    )
+}
+
 fn bundle_status(root: &Path) -> String {
     let feed = read(root, "web/public/data/bundle.json");
     let version = feed
@@ -368,12 +586,11 @@ fn generate(command: &str, root: &Path) -> Option<String> {
         "yidam skills-index" => markdown_index(root, ".yidam/skills", "Skill"),
         "yidam agents-index" => markdown_index(root, "agents", "Agent"),
         "yidam bundle-status" => bundle_status(root),
-        // Both describe systems this repository does not have. Saying so beats an empty block
-        // and beats a fabricated status.
-        "yidam index-status" => "No semantic index is built. The corpus is 58 nodes and fits in \
-             context; an index is added when direct retrieval stops working, which has not \
-             happened.\n"
-            .to_string(),
+        "yidam connector-registry" => connector_registry(root),
+        "yidam claim-audit" => claim_audit(root),
+        // Describes a system this repository does not have. Saying so beats an empty block and
+        // beats a fabricated status — but the sentence still has to count what it counts.
+        "yidam index-status" => index_status(root),
         _ => return None,
     })
 }
@@ -385,6 +602,27 @@ fn generate(command: &str, root: &Path) -> Option<String> {
 /// Returns [`IndexError::UnknownBlock`] if a document names a generator that does not exist —
 /// a new block is then a deliberate act rather than something that silently stays empty.
 pub fn regenerate(root: &Path) -> Result<Vec<String>, IndexError> {
+    rewrite(root, true)
+}
+
+/// Which documents carry a stale block, without touching any of them.
+///
+/// The form a gate wants. Regenerating and then asking `git diff --quiet` — which is what
+/// `.github/workflows/ci.yml` does — cannot distinguish a stale block from an unrelated
+/// uncommitted edit in the same file, so it reports a false failure against any dirty working
+/// tree. CI never met that case because CI checks out clean; a person running the same check
+/// locally meets it immediately, and a gate that cries wolf on every edit is a gate that gets
+/// ignored.
+///
+/// # Errors
+///
+/// As [`regenerate`].
+pub fn stale(root: &Path) -> Result<Vec<String>, IndexError> {
+    rewrite(root, false)
+}
+
+/// Render every block; write when asked. Returns the documents whose content would change.
+fn rewrite(root: &Path, write: bool) -> Result<Vec<String>, IndexError> {
     let mut changed = Vec::new();
     for document in DOCUMENTS {
         let path = root.join(document);
@@ -421,7 +659,9 @@ pub fn regenerate(root: &Path) -> Result<Vec<String>, IndexError> {
         out.push_str(rest);
 
         if out != original {
-            fs::write(&path, out)?;
+            if write {
+                fs::write(&path, out)?;
+            }
             changed.push((*document).to_string());
         }
     }
@@ -514,6 +754,112 @@ mod tests {
     }
 
     #[test]
+    fn the_index_status_counts_the_corpus_rather_than_remembering_it() {
+        // The defect: this sentence was a literal, so it regenerated to itself and rendered nine
+        // lines below a computed block that disagreed with it. Asserting against the same node
+        // walk the corpus index uses is the only version of this test that can fail when it
+        // should — a literal here would restore exactly what went wrong.
+        let root = repository_root();
+        let nodes = corpus_nodes(&root).len();
+        assert!(
+            index_status(&root).contains(&format!("is {nodes} nodes")),
+            "the status and the corpus disagree"
+        );
+        assert!(
+            corpus_index(&root).contains(&format!("\n{nodes} nodes across")),
+            "the two blocks in .yidam/corpus/README.md count differently"
+        );
+    }
+
+    #[test]
+    fn the_claim_audit_counts_every_tag_the_corpus_actually_carries() {
+        let root = repository_root();
+        let audit = claim_audit(&root);
+        let nodes = corpus_nodes(&root);
+        for tag in ["[verified]", "[inference]", "[open]", "[unentered]"] {
+            let actual: usize = nodes
+                .iter()
+                .map(|(_, _, _, text)| text.matches(tag).count())
+                .sum();
+            assert!(
+                audit.contains(&format!("| `{tag}` | {actual} |")),
+                "{tag} is reported as something other than {actual}"
+            );
+        }
+    }
+
+    #[test]
+    fn the_two_kinds_of_unresolved_mark_are_reported_apart() {
+        // The whole point of the notation. A single total is what the audit had, and it read as
+        // 152 open questions when a seventh of them were empty fields nobody had typed into.
+        let audit = claim_audit(&repository_root());
+        assert!(audit.contains("| `[open]` |"), "{audit}");
+        assert!(audit.contains("| `[unentered]` |"), "{audit}");
+        assert!(
+            audit.contains("| Field | `[open]` | `[unentered]` |"),
+            "{audit}"
+        );
+    }
+
+    #[test]
+    fn a_tag_is_attributed_to_the_field_it_sits_in() {
+        // Attribution is positional, so the case that would break it silently is a property whose
+        // value runs over several lines: the tag lands on a continuation line, not on the `key:`.
+        let root = repository_root();
+        let audit = claim_audit(&root);
+        // `established` is a one-line property and `typology` a block scalar; both must appear.
+        for field in ["established", "typology", "series_path", "description"] {
+            assert!(
+                audit.contains(&format!("| `{field}` |")),
+                "{field} is not attributed at all"
+            );
+        }
+    }
+
+    #[test]
+    fn the_connector_table_reports_every_connector_and_its_real_status() {
+        let table = connector_registry(&repository_root());
+        for connector in crate::registry::CONNECTORS {
+            assert!(
+                table.contains(&format!("`{}`", connector.key)),
+                "{} is missing from the table",
+                connector.key
+            );
+        }
+        let wired = crate::registry::CONNECTORS
+            .iter()
+            .filter(|c| c.status.is_wired())
+            .count();
+        assert!(
+            table.contains(&format!("{wired} are wired")),
+            "the count and the registry disagree: {table}"
+        );
+    }
+
+    #[test]
+    fn every_blocker_reaches_the_page_verbatim() {
+        // A blocker that is summarised is a blocker nobody rechecks. Four of them sat stale for
+        // twelve phases behind prose that read plausibly, so the string a test guards for length
+        // is the string the reader gets.
+        use crate::registry::Status;
+        let table = connector_registry(&repository_root());
+        for connector in crate::registry::CONNECTORS {
+            let reason = match connector.status {
+                Status::Declared { blocked_on } => blocked_on,
+                Status::Wired {
+                    still_blocked: Some(reason),
+                } => reason,
+                _ => continue,
+            };
+            assert!(
+                table.contains(reason),
+                "{}'s blocker is not on the page",
+                connector.key
+            );
+        }
+    }
+
+    #[test]
     fn an_unknown_block_is_an_error_rather_than_a_silent_skip() {
         assert!(generate("yidam invented-command", &repository_root()).is_none());
     }
@@ -566,6 +912,32 @@ mod tests {
         // And a target named twice is one edge, not two.
         let twice = "[adequacy](../doctrine/adequacy.yml) and again ../doctrine/adequacy.yml";
         assert_eq!(outgoing_links(twice, &slugs, "x"), 1);
+    }
+
+    #[test]
+    fn checking_reports_what_regenerating_would_change_and_writes_nothing() {
+        // The two paths share one renderer, so what this really guards is that `--check` cannot
+        // acquire a side effect: the gate runs it against a dirty tree, and a check that writes
+        // would quietly stage work nobody asked for.
+        let root = repository_root();
+        regenerate(&root).expect("generators exist");
+        let before: Vec<String> = DOCUMENTS
+            .iter()
+            .map(|document| std::fs::read_to_string(root.join(document)).unwrap_or_default())
+            .collect();
+
+        assert!(
+            stale(&root).expect("generators exist").is_empty(),
+            "check disagrees with a regeneration that just ran"
+        );
+
+        for (document, original) in DOCUMENTS.iter().zip(before) {
+            assert_eq!(
+                std::fs::read_to_string(root.join(document)).unwrap_or_default(),
+                original,
+                "{document} was written by a check"
+            );
+        }
     }
 
     #[test]

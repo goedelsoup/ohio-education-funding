@@ -42,16 +42,16 @@ description: |
 
   Peak enrollment and per-district deduction impact remain unpopulated. [open]
 properties:
-  irn: Not yet established. [open]
+  irn: Not yet established. [unentered]
   agency_type: community
   county: Statewide (chartered in Franklin County)
   typology: Not applicable; e-school.
-  established: Opened 2000; closed January 2018. Exact dates not yet established. [open]
+  established: Opened 2000; closed January 2018. Exact dates not yet established. [unentered]
   roles: |
     Statewide e-school [verified]. Subject to attendance-based funding recovery, FY2016 and
     FY2017 [verified — amounts not yet established]. Deduct-funded from resident districts
     throughout its operation [verified].
-  series_path: Not yet populated. [open]
+  series_path: Not yet populated. [unentered]
 links:
   - target: ../education-agency.ont.yml
     relationship: instance-of

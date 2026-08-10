@@ -28,7 +28,7 @@ properties:
     Students residing in the Cleveland City School District, subject to income-based priority
     in awarding. Established mid-1990s; exact enacting act and year not yet established. [open]
   amount: Not yet populated. [open]
-  appropriation_line: Not yet established. [open]
+  appropriation_line: Not yet established. [unentered]
 links:
   - target: ../program.ont.yml
     relationship: instance-of

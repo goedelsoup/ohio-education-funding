@@ -1,0 +1,103 @@
+id: the-four-kinds-of-parameter
+summary: >-
+  The taxonomy `the-open-item-audit` deferred is now a `kind` field on `parameter`, and applying it
+  to five parameters found three things nine examples had not: a parameter that changes kind at a
+  regime boundary, one the taxonomy cannot classify, and a fifth mode.
+context: |
+  Decision `the-open-item-audit` produced a four-kind taxonomy of Ohio funding parameters —
+  legislated, delegated, measured, uncodified — and explicitly declined to build it into the
+  ontology:
+
+    > Introduce the four-kind taxonomy as an ontology change — a `kind` field on `parameter`.
+    > Deferred, not rejected. It is the right shape and it would touch every parameter node; doing
+    > it in the same pass that discovered the distinction would mean committing to a classification
+    > derived from nine examples.
+
+  It also deferred a second notation change, separating "unknown" from "unentered" in the `[open]`
+  marker, "for the same reason — it is a change to how the whole corpus is written, and this pass
+  found the need rather than the design."
+
+  Both deferrals were correct and both were about to be forgotten. Neither had a marker anywhere in
+  the corpus; they existed only inside the `alternatives` block of one decision file, which is the
+  least-read field of the least-read class of document in the repository.
+
+  The nine original examples were all weights and prices inside a single regime in a single
+  biennium. The five `parameter` nodes are a different sample: one spans seventy years, one was
+  retired by a regime change, one is set by an appropriation rather than by any formula.
+decision: |
+  Add `kind` to `parameter.ont.yml` as a `text` property, not an enum, and classify all five nodes.
+
+  Add `[unentered]` to the corpus's claim vocabulary as a **narrowing of `[open]`** documented in
+  `.yidam/corpus/README.md` rather than as a fourth confidence level in the prelude. The prelude's
+  three tags grade how well a claim is supported; this one says whether there is a claim at all,
+  which is a different axis and not the vendored prelude's business.
+
+  Count both, in a generated `claim-audit` block, so the inventory the audit produced by hand is
+  produced by `edfund-connect index` from now on.
+consequences: |
+  **Text, not an enum, and the first node classified is why.** `base-cost-per-pupil` was legislated
+  before the Fair School Funding Plan — $5,283.00 in FY2006, a figure in an act — and is *measured*
+  under it: R.C. 3317.011 states no base cost, it states a build-up from reported teacher salary
+  and insurance inputs, and $8,241.61 falls out. **The kind is a property of a parameter in a
+  regime, not of a parameter.** An enum would have forced a choice between two correct answers.
+
+  This also sharpens what the cost-input-refresh scenario is. The lever is which reference year is
+  read; the thing it moves is a measurement. Read as legislated, the refresh looks like a policy
+  that sets a number, when it is a policy that chooses a measurement.
+
+  **One parameter the taxonomy cannot classify, and saying so is the useful output.**
+  `appropriation-proration-factor` is certainly uncodified — no section of R.C. 3317 sets it. It is
+  either *measured* (the appropriation divided by the entitlement, nobody deciding) or *delegated*
+  (the department choosing the factor, or which entitlements a line is prorated against), and the
+  calculator cannot tell them apart: a factor being computable does not establish it was computed.
+  The node had this as a vague `[open]`; the taxonomy turns it into a specific question with a
+  named source, the appropriation act's language, which is an `lsc-budget` retrieval rather than a
+  `dew-foundation` one.
+
+  **A fifth mode, found on the first parameter with a long span.**
+  `local-share-charge-off-millage` is legislated — R.C. 3317.022, moved three times by act between
+  1991 and 1997. But from FY2002 through FY2007 the General Assembly could not have changed it:
+  [DeRolph III](../corpus/litigation/derolph-iii-2001.yml) ¶62 held it at 23 mills "irrespective of
+  the language of R.C. 3317.012(D)(4) suggesting such a methodology". The taxonomy asks what would
+  have to happen for a value to change, and for six years the answer was a change in the law of the
+  case. Not added as a category — one instance does not earn one — but recorded, because a taxonomy
+  built from one biennium meeting a seventy-year parameter and finding a hole on the first attempt
+  is the kind of thing that should be written down before the second attempt.
+
+  **The notation split, measured.** 153 unresolved marks: 128 live questions and 25 empty fields.
+  The retagged clusters are `series_path` (8), `established` (7), `typology` (5),
+  `appropriation_line` (3) and `irn` (2) — every one a value that exists in a source nobody has
+  opened, not a question anybody has to think about.
+
+  `vetoes` (6) was on the audit's empty-field list and **stayed `[open]`**. Its text reads
+  "line-item vetoes exercised; education funding effects not yet assessed", and assessing an effect
+  is analysis. A distinction that inflates itself is not worth having.
+
+  Two fields split across both columns, which is the sign the line is drawn somewhere real rather
+  than per-field: Eastland-Fairfield's `typology` is genuinely open — JVSDs sit outside the
+  department's typology entirely and how they should be grouped for peer comparison is unresolved —
+  while its five neighbours are missing a code that exists and is published.
+alternatives: |
+  **An enum for `kind`, validated by the schema.** Rejected on the first node classified, as above.
+  The regime-boundary case is not an edge case in a corpus whose stated span is 1851 to the present;
+  it is the normal case for any parameter that outlives a regime, and there are more of those coming
+  than there are parameters currently in the corpus.
+
+  **Add `[unentered]` to the prelude's claim tags.** Rejected. `.vendor/prelude/` is vendored from
+  upstream and a local edit would either be lost on the next sync or fork the vocabulary every
+  yidam repository shares. The tag is also genuinely domain-shaped: it exists because *this* corpus
+  deliberately holds exemplar nodes with metadata fields that bulk extraction never filled. A
+  consumer that knows only the three prelude tags reads `[unentered]` as an unfilled field and
+  loses nothing, which is the property that makes a local narrowing safe.
+
+  **Retag the `vetoes` cluster too, and match the audit's classification.** Rejected. The audit
+  grouped by "was this field ever populated" and the distinction being drawn is "does closing it
+  require thought". Those agree on four clusters and disagree on this one, and following the audit
+  where it was reasoning about a different question would have put six analysis tasks in the
+  typing column.
+
+  **Do the classification and skip the generated count.** Rejected, and this is the part with the
+  most leverage. The audit's own finding was that the `[open]` markers "are a record of what
+  somebody did not get to, written at a moment, and never revisited." A classification committed
+  once has exactly that property. The count is now derived on every `edfund-connect index` run, so
+  the next drift is a diff rather than a discovery.

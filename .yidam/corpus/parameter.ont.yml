@@ -18,6 +18,20 @@ properties:
   - name: unit
     type: string
     description: dollars-per-pupil | ratio | mills | percent | count
+  - name: kind
+    type: text
+    description: >-
+      What sort of thing sets this value, and therefore what would have to happen for it to
+      change: legislated | delegated | measured | uncodified. Ohio's funding parameters are four
+      different kinds of thing and a spreadsheet renders all four as a number in a cell, which is
+      how they came to be listed side by side as though they were the same promise. Legislated —
+      written in the section, changed only by an act. Delegated — statute names the department and
+      the department decides, within whatever constraint the section imposes. Measured — statute
+      specifies a computation over reported data, so the value moves when districts' own behaviour
+      moves and nobody decides. Uncodified — nowhere in the Revised Code, set by the biennial
+      budget, and gone if it is not re-enacted. Text rather than an enum because a parameter that
+      outlives a regime can change kind at the boundary, and because "not in the Revised Code" and
+      "not in law" are different claims that this taxonomy has already conflated once.
   - name: series
     type: text
     description: Value per fiscal period, with the enactment that set each value

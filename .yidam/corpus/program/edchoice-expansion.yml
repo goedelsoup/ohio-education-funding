@@ -43,7 +43,7 @@ properties:
     award amount scaled by family income relative to the federal poverty level rather than
     eligibility restricted by it. [verified] Exact bands not yet established. [open]
   amount: Not yet populated. [open] Varies by grade band and family income.
-  appropriation_line: Not yet established. [open]
+  appropriation_line: Not yet established. [unentered]
 links:
   - target: ../program.ont.yml
     relationship: instance-of

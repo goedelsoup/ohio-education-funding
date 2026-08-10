@@ -58,12 +58,12 @@ properties:
     total revenue per pupil $20,018.15. [verified — FY2024 District Profile Report]
   typology: |
     Suburban, very low poverty, high median income. Exact department typology code not yet
-    established. [open]
-  established: Not yet established. [open]
+    entered. [unentered]
+  established: Not yet established. [unentered]
   roles: |
     Property-rich throughout the period covered [inference]. Above the 20-mill floor
     [inference — requires confirmation from tax-abstract]. Low state share [inference].
-  series_path: Not yet populated. [open]
+  series_path: Not yet populated. [unentered]
 links:
   - target: ../education-agency.ont.yml
     relationship: instance-of

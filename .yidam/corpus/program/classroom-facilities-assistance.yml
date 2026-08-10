@@ -32,7 +32,7 @@ properties:
   amount: |
     Not yet populated. [open] State share is a percentage of assessed project cost varying by
     district wealth ranking.
-  appropriation_line: Capital appropriations, separate from the operating budget. [open]
+  appropriation_line: Capital appropriations, separate from the operating budget; the specific line not yet entered. [unentered]
 links:
   - target: ../program.ont.yml
     relationship: instance-of

@@ -125,11 +125,8 @@ jobs:
             exit 1
           fi
 
+      # `--check` rather than regenerate-then-`git diff`. The diff form works here, because a
+      # checkout is clean, and fails against any dirty tree — so the same command could not be
+      # used by the local gate that actually runs, and the two would drift.
       - name: The README indexes
-        run: |
-          cargo run --manifest-path crates/Cargo.toml -p connect --bin edfund-connect -- index
-          if ! git diff --quiet; then
-            echo "::error::A REGEN block is stale. Regenerate: edfund-connect index"
-            git diff --stat
-            exit 1
-          fi
+        run: cargo run --manifest-path crates/Cargo.toml -p connect --bin edfund-connect -- index --check

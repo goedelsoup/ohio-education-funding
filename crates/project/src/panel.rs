@@ -806,7 +806,7 @@ impl Transportation {
 /// district, which makes this the one component in Ohio's school funding where the wealthiest
 /// district and the poorest are funded identically for most of what they receive. Whether that is
 /// deliberate levelling or an artefact of bolting a flat grant onto a weighted formula is not
-/// established here. [open]
+/// established here. `[open]`
 ///
 /// Halving the weights also compresses the program relative to the school-age one: Category 6 is
 /// 3.9554 there and effectively 1.9777 here, so the range between the highest and lowest category
@@ -883,7 +883,7 @@ impl PreschoolSpecialEducation {
 /// the district's state share of it. A district at the 10% minimum state share was receiving about
 /// $824 of state money for that pupil and loses ten times as much guarantee when the pupil goes.
 /// Whether that is intended as a strong incentive or is an artefact of using a convenient
-/// statewide figure is not established. [open]
+/// statewide figure is not established. `[open]`
 ///
 /// # And there is a third FY2021 anchor
 ///
