@@ -494,11 +494,7 @@ fn claim_audit(root: &Path) -> String {
          empty fields. Before the two were distinguished the corpus reported the sum as its \
          count of what it does not know, which overstated it by {}%.\n",
         open + unentered,
-        if open + unentered == 0 {
-            0
-        } else {
-            unentered * 100 / (open + unentered)
-        }
+        (unentered * 100).checked_div(open + unentered).unwrap_or(0)
     ));
 
     out.push_str("\n| Field | `[open]` | `[unentered]` |\n|---|--:|--:|\n");

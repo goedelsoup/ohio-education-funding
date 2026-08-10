@@ -3376,7 +3376,7 @@ pub fn build_legislative_crosswalk(sources: &Crosswalk<'_>) -> Result<Vec<Vec<St
             )
         })
         .collect();
-    out.sort_by(|a, b| a.0.cmp(&b.0));
+    out.sort_by_key(|a| a.0);
     Ok(out.into_iter().map(|(_, row)| row).collect())
 }
 

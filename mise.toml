@@ -29,14 +29,24 @@ experimental = true
 config_roots = ["crates", "web"]
 
 [tools]
-# Pinned rather than "latest" so the gate is reproducible. 1.82 is the floor the
-# workspace actually requires — `Option::is_none_or`, used in `connect` and
-# `spreadsheet`, stabilized there — and is the version every check in this repo
-# has been verified against. mise installs Rust through rustup with its own
-# profile and does not read a `rust-toolchain.toml` component list, so rustfmt
-# and clippy are requested here or a clean install omits them and the lint task
-# fails with "no such command".
-rust = { version = "1.82.0", components = "rustfmt,clippy" }
+# Pinned rather than "latest" so the gate is reproducible, and pinned to *this*
+# version because `.github/workflows/ci.yml` has nothing to select a toolchain
+# with: there is no `rust-toolchain.toml`, so its `rustup show` step is a no-op
+# that leaves the runner's current stable active. This pin is therefore a mirror
+# of the runner rather than a floor. When GitHub's image moves to a newer stable,
+# clippy gains lints and CI can go red with no commit behind it — and this line is
+# what has to move for a local run to reproduce the failure. That is exactly how
+# it went red at 1.97 while the local gate sat green on 1.82.
+#
+# The workspace's real floor is lower — `Option::is_none_or` (1.82) in `connect`
+# and `spreadsheet`, `u16::is_multiple_of` (1.87) in `edfund-core` — but nothing
+# enforces it, so treat this as the only version any check has been verified
+# against.
+#
+# mise installs Rust through rustup with its own profile and does not read a
+# `rust-toolchain.toml` component list, so rustfmt and clippy are requested here
+# or a clean install omits them and the lint task fails with "no such command".
+rust = { version = "1.97.0", components = "rustfmt,clippy" }
 # Both named in `.github/workflows/ci.yml`; kept identical so a green local gate
 # means something about the remote one.
 node = "24"

@@ -412,8 +412,17 @@ pub fn least_squares(
         for r in 0..p {
             if r != column && normal[r][column] != 0.0 {
                 let factor = normal[r][column];
-                for c in 0..(p * 2) {
-                    normal[r][c] -= factor * normal[column][c];
+                // `r != column`, so the eliminated row and the pivot row are distinct and can
+                // be borrowed at the same time.
+                let (target, pivot_row) = if r < column {
+                    let (head, tail) = normal.split_at_mut(column);
+                    (&mut head[r], &tail[0])
+                } else {
+                    let (head, tail) = normal.split_at_mut(r);
+                    (&mut tail[0], &head[column])
+                };
+                for (cell, pivot) in target.iter_mut().zip(pivot_row.iter()) {
+                    *cell -= factor * pivot;
                 }
             }
         }
@@ -486,7 +495,7 @@ mod tests {
     fn a_single_predictor_standardises_to_its_correlation() {
         let x = vec![1.0, 3.0, 2.0, 7.0, 5.0, 4.0, 9.0];
         let y = vec![2.0, 2.5, 4.0, 6.0, 5.5, 3.0, 8.0];
-        let fit = least_squares(&[x.clone()], &y).unwrap();
+        let fit = least_squares(std::slice::from_ref(&x), &y).unwrap();
         let r = wealth_neutrality(&x, &y).unwrap().correlation;
         assert!((fit.standardized[0] - r).abs() < 1e-9);
         assert!((fit.r_squared - r * r).abs() < 1e-9);
