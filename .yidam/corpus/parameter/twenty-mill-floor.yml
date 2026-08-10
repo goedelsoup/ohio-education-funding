@@ -126,6 +126,11 @@ description: |
 properties:
   name: Twenty-mill floor
   unit: mills
+  kind: |
+    Legislated. R.C. 319.301 states 20 mills, and 2 mills for joint vocational school districts,
+    on the face of the section. [verified] It is the purest case of the category in this corpus:
+    one number, in permanent law, unmoved since 1976 — which is also what makes it the parameter
+    most often mistaken for a fact about the world rather than a choice that could be revisited.
   series: |
     20 mills for city, local, and exempted village school districts; 2 mills for joint
     vocational school districts. In force continuously since Am. Sub. H.B. 920 (1976).

@@ -28,6 +28,26 @@ description: |
 properties:
   name: Base cost per pupil
   unit: dollars-per-pupil
+  kind: |
+    **It changed kind at the regime boundary, and this is the parameter that shows the taxonomy
+    is not a property of a name.**
+
+    Legislated before the Fair School Funding Plan: a dollar figure set by act — $5,283.00 in
+    FY2006, $5,403.00 in FY2007 — that a reader could look up and a legislator could amend.
+    [inference]
+
+    Measured under the plan. R.C. 3317.011 does not state a base cost; it specifies a build-up
+    from reported inputs — classroom teacher salary at a reference year, average insurance cost,
+    staffing ratios — and the statewide average per pupil is what falls out. [verified] The
+    $8,241.61 in the department's FY2027 model is an output, not a setting. Nobody chose it, and
+    no act would have to change for it to move; what moves it is the cost inputs' reference year,
+    which is itself a legislated choice one level up.
+
+    That two-level structure is the substance of the
+    [cost input refresh scenario](../scenario/fsfp-input-year-refresh.yml): the lever is which
+    year is read, and the thing it moves is a measured quantity. Reading this parameter as
+    legislated — as its pre-2021 series invites — makes the refresh look like a policy that sets
+    a number, when it is a policy that chooses a measurement.
   series: |
     FY2006  $5,283.00  statutory base cost, foundation formula    [inference]
     FY2007  $5,403.00  statutory base cost, foundation formula    [inference]

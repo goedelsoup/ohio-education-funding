@@ -55,8 +55,8 @@ properties:
   agency_type: local
   county: Perry
   typology: |
-    Rural, high poverty. Exact department typology code not yet established. [open]
-  established: Not yet established. [open]
+    Rural, high poverty. Exact department typology code not yet entered. [unentered]
+  established: Not yet established. [unentered]
   fy2021_idea_part_b: |
     Public school students with disabilities: 298. Non-public: fewer than 10 (suppressed).
     Allocation: $483,451.88. Proportionate share: $11,095.62. [verified]
@@ -72,7 +72,7 @@ properties:
     DeRolph plaintiff district (1991-2003) [verified]. Property-poor throughout the period
     covered [inference]. 20-mill floor status by fiscal period not yet determined and is a
     priority: it determines whether reappraisal reaches the district's revenue at all. [open]
-  series_path: Not yet populated. [open]
+  series_path: Not yet populated. [unentered]
 links:
   - target: ../education-agency.ont.yml
     relationship: instance-of

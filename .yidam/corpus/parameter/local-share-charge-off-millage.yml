@@ -169,6 +169,22 @@ description: |
   series with one guessed entry.
 properties:
   name: Local share charge-off millage
+  kind: |
+    **Legislated — and for six years enjoined, which the four-kind taxonomy did not anticipate.**
+
+    The rate sits on the face of R.C. 3317.022 and moved three times by act between 1991 and
+    1997. [verified] That is legislated in the ordinary sense.
+
+    But from FY2002 through FY2007 the General Assembly could not have changed it if it wanted
+    to: [DeRolph III](../litigation/derolph-iii-2001.yml) at ¶62 ordered the rate held at 23
+    mills, "irrespective of the language of R.C. 3317.012(D)(4) suggesting such a methodology" —
+    a court overriding a statutory method. [verified] The taxonomy asks what would have to happen
+    for a value to change; for those six years the answer was neither an act nor a departmental
+    decision nor a district's behaviour, but a change in the law of the case.
+
+    The category is not worth adding for one instance. It is worth recording that the four kinds
+    were derived from one regime's parameters in one biennium, and that a parameter with a
+    seventy-year span found a fifth mode on the first attempt to classify it.
   unit: mills
   series: |
     20 mills (1991, at DeRolph filing) -> 20.5 mills (Am.Sub.H.B. 152) -> 23 mills (by 1997,

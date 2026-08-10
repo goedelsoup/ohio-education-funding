@@ -37,7 +37,7 @@ properties:
     on existing real property. Exceptions: new construction, newly voted millage, inside
     (unvoted) millage, and districts at the 20-mill floor, whose revenue rises with valuation.
   series_path: |
-    Not yet populated. [open] Target: crates/ data files fed by `tax-abstract`.
+    Not yet populated. [unentered] Target: crates/ data files fed by `tax-abstract`.
 links:
   - target: ../revenue-stream.ont.yml
     relationship: instance-of

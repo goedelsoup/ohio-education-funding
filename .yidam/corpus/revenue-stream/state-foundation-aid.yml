@@ -35,7 +35,7 @@ properties:
     stagnates otherwise. Caps and guarantees can detach an agency's payment from the formula
     result entirely.
   series_path: |
-    Not yet populated. [open] Target: crates/ data files fed by `dew-foundation`.
+    Not yet populated. [unentered] Target: crates/ data files fed by `dew-foundation`.
 links:
   - target: ../revenue-stream.ont.yml
     relationship: instance-of

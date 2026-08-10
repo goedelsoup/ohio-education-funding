@@ -27,6 +27,12 @@ description: |
 properties:
   name: FSFP phase-in percentage
   unit: percent
+  kind: |
+    Uncodified. The percentages live in the uncodified sections of each biennial act — H.B. 110,
+    H.B. 33, H.B. 96 — and not in R.C. 3317. [verified] The consequence is the one the category
+    exists to make visible: there is no default. If a biennium passes without re-enacting a
+    percentage, the phase-in has no value rather than reverting to its last one, and the schedule
+    that runs 16.67% to 100% across six years is six separate decisions rather than one.
   series: |
     FY2022  16.67%  Am. Sub. H.B. 110 (134th GA)  [verified — department payment report]
                     Applied to base cost, targeted assistance, special education, English

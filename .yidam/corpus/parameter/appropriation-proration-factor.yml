@@ -121,6 +121,22 @@ description: |
 properties:
   name: Appropriation proration factor
   unit: fraction of the computed entitlement
+  kind: |
+    **Uncodified, and the taxonomy cannot decide whether it is also delegated — which is a
+    sharper statement of this node's open question than the node had.**
+
+    Uncodified is certain: no section of R.C. 3317 sets a proration factor, and the value exists
+    because an appropriation was smaller than the entitlement computed against it. [verified]
+
+    What is not certain is who holds the pen. If the factor is arithmetic — the line divided by
+    the demand — then it is *measured*, and nobody decides it. If the department has any latitude
+    in setting it, or in choosing which entitlements a line is prorated against, then it is
+    *delegated*, and the choice is reviewable. The FY2027 preschool factor of 0.96854448 against
+    a stated $147,500,000 appropriation is precise enough to look arithmetic, but a factor being
+    computable does not establish that it was computed rather than set. [open]
+
+    Deciding this needs the appropriation act's language, not the calculator's output, which is a
+    `lsc-budget` question rather than a `dew-foundation` one.
   series: |
     FY2027: special education transportation 0.91746; preschool special education 0.96854448
     against a stated appropriation of $147,500,000; transportation general 1.0. Earlier years are

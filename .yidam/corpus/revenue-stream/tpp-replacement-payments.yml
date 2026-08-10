@@ -33,7 +33,7 @@ properties:
     business activity it replaced, so a district that adds industrial capacity gains no
     replacement revenue from it.
   series_path: |
-    Not yet populated. [open] Target: crates/ data files fed by `dew-foundation` and
+    Not yet populated. [unentered] Target: crates/ data files fed by `dew-foundation` and
     `lsc-budget`.
 links:
   - target: ../revenue-stream.ont.yml

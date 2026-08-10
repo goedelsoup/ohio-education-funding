@@ -425,6 +425,108 @@ fn connector_registry(root: &Path) -> String {
     out
 }
 
+/// Every claim tag in the corpus, counted, and the unresolved ones by the field they sit in.
+///
+/// The audit in [`decisions/the-open-item-audit.yml`](../../../.yidam/decisions/) enumerated 152
+/// `[open]` claims by hand and its most useful output was the distribution, not the resolutions:
+/// it showed that four of the largest clusters were not open questions at all but metadata nobody
+/// had typed in. A hand count answers that once. This answers it every time, which matters
+/// because the number went to 164 in the phases after the audit and nothing said so.
+///
+/// Field attribution is by position rather than by parsing YAML: a tag belongs to the last
+/// top-level key seen, or to the last two-space key if that top-level key was `properties`. That
+/// is exactly the granularity the audit reported in, and it needs no parser in a crate that has
+/// deliberately avoided acquiring one.
+fn claim_audit(root: &Path) -> String {
+    const TAGS: [&str; 4] = ["[verified]", "[inference]", "[open]", "[unentered]"];
+    let nodes = corpus_nodes(root);
+
+    let mut totals: BTreeMap<&str, usize> = TAGS.iter().map(|tag| (*tag, 0)).collect();
+    // Only the unresolved tags get a field breakdown; `[verified]` by field says nothing.
+    let mut unresolved: BTreeMap<(String, &str), usize> = BTreeMap::new();
+
+    for (_, _, _, text) in &nodes {
+        let mut top = String::new();
+        let mut field = String::new();
+        for line in text.lines() {
+            if let Some(key) = line.split_once(':').map(|(key, _)| key) {
+                if !key.is_empty() && !key.starts_with(char::is_whitespace) && !key.contains(' ') {
+                    top = key.to_string();
+                    field.clone_from(&top);
+                } else if top == "properties"
+                    && line.starts_with("  ")
+                    && !line.starts_with("   ")
+                    && !key.trim().contains(' ')
+                {
+                    field = key.trim().to_string();
+                }
+            }
+            for tag in TAGS {
+                let hits = line.matches(tag).count();
+                if hits == 0 {
+                    continue;
+                }
+                *totals.get_mut(tag).expect("tag is in the map") += hits;
+                if tag != "[verified]" && tag != "[inference]" {
+                    *unresolved.entry((field.clone(), tag)).or_default() += hits;
+                }
+            }
+        }
+    }
+
+    let mut out = String::from("| Tag | Count | What it records |\n|---|--:|---|\n");
+    for (tag, meaning) in [
+        ("[verified]", "supported by a committed primary source"),
+        ("[inference]", "drawn from verified facts, not witnessed"),
+        (
+            "[open]",
+            "a live question — unknown, contested, or being worked",
+        ),
+        ("[unentered]", "a knowable value nobody has typed in yet"),
+    ] {
+        out.push_str(&format!("| `{tag}` | {} | {meaning} |\n", totals[tag]));
+    }
+
+    let open = totals["[open]"];
+    let unentered = totals["[unentered]"];
+    out.push_str(&format!(
+        "\n{} unresolved marks in total, {open} of them live questions and {unentered} of them \
+         empty fields. Before the two were distinguished the corpus reported the sum as its \
+         count of what it does not know, which overstated it by {}%.\n",
+        open + unentered,
+        if open + unentered == 0 {
+            0
+        } else {
+            unentered * 100 / (open + unentered)
+        }
+    ));
+
+    out.push_str("\n| Field | `[open]` | `[unentered]` |\n|---|--:|--:|\n");
+    let fields: std::collections::BTreeSet<&String> =
+        unresolved.keys().map(|(field, _)| field).collect();
+    let mut rows: Vec<(usize, usize, &String)> = fields
+        .into_iter()
+        .map(|field| {
+            (
+                unresolved
+                    .get(&(field.clone(), "[open]"))
+                    .copied()
+                    .unwrap_or(0),
+                unresolved
+                    .get(&(field.clone(), "[unentered]"))
+                    .copied()
+                    .unwrap_or(0),
+                field,
+            )
+        })
+        .collect();
+    rows.sort_by(|a, b| (b.0 + b.1, b.2).cmp(&(a.0 + a.1, a.2)));
+    for (open, unentered, field) in rows {
+        out.push_str(&format!("| `{field}` | {open} | {unentered} |\n"));
+    }
+    out
+}
+
 /// Why there is no semantic index, and how much corpus there is to not index.
 ///
 /// The node count used to be the literal `58` returned from this function, which is how it came
@@ -485,6 +587,7 @@ fn generate(command: &str, root: &Path) -> Option<String> {
         "yidam agents-index" => markdown_index(root, "agents", "Agent"),
         "yidam bundle-status" => bundle_status(root),
         "yidam connector-registry" => connector_registry(root),
+        "yidam claim-audit" => claim_audit(root),
         // Describes a system this repository does not have. Saying so beats an empty block and
         // beats a fabricated status — but the sentence still has to count what it counts.
         "yidam index-status" => index_status(root),
@@ -643,6 +746,51 @@ mod tests {
             corpus_index(&root).contains(&format!("\n{nodes} nodes across")),
             "the two blocks in .yidam/corpus/README.md count differently"
         );
+    }
+
+    #[test]
+    fn the_claim_audit_counts_every_tag_the_corpus_actually_carries() {
+        let root = repository_root();
+        let audit = claim_audit(&root);
+        let nodes = corpus_nodes(&root);
+        for tag in ["[verified]", "[inference]", "[open]", "[unentered]"] {
+            let actual: usize = nodes
+                .iter()
+                .map(|(_, _, _, text)| text.matches(tag).count())
+                .sum();
+            assert!(
+                audit.contains(&format!("| `{tag}` | {actual} |")),
+                "{tag} is reported as something other than {actual}"
+            );
+        }
+    }
+
+    #[test]
+    fn the_two_kinds_of_unresolved_mark_are_reported_apart() {
+        // The whole point of the notation. A single total is what the audit had, and it read as
+        // 152 open questions when a seventh of them were empty fields nobody had typed into.
+        let audit = claim_audit(&repository_root());
+        assert!(audit.contains("| `[open]` |"), "{audit}");
+        assert!(audit.contains("| `[unentered]` |"), "{audit}");
+        assert!(
+            audit.contains("| Field | `[open]` | `[unentered]` |"),
+            "{audit}"
+        );
+    }
+
+    #[test]
+    fn a_tag_is_attributed_to_the_field_it_sits_in() {
+        // Attribution is positional, so the case that would break it silently is a property whose
+        // value runs over several lines: the tag lands on a continuation line, not on the `key:`.
+        let root = repository_root();
+        let audit = claim_audit(&root);
+        // `established` is a one-line property and `typology` a block scalar; both must appear.
+        for field in ["established", "typology", "series_path", "description"] {
+            assert!(
+                audit.contains(&format!("| `{field}` |")),
+                "{field} is not attributed at all"
+            );
+        }
     }
 
     #[test]

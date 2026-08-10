@@ -31,18 +31,18 @@ description: |
   IRN, member district list, enrollment, and funding series remain unpopulated. [open]
 properties:
   irn: |
-    Not yet established. [open] Absent from the FY2021 IDEA Part B allocation list; a JVSD IRN
+    Not yet entered. [unentered] Absent from the FY2021 IDEA Part B allocation list; a JVSD IRN
     must come from the department's educational directory or an `nces-ccd` crosswalk instead.
   agency_type: joint-vocational
   county: Franklin and Fairfield
   typology: |
     Not applicable in the standard department typology, which classifies traditional districts.
     How JVSDs are grouped for peer comparison is unresolved. [open]
-  established: Not yet established. [open]
+  established: Not yet established. [unentered]
   roles: |
     Career-technical provider to member districts [verified]. Subject to the 2-mill JVSD
     reduction-factor floor rather than the 20-mill floor [verified].
-  series_path: Not yet populated. [open]
+  series_path: Not yet populated. [unentered]
 links:
   - target: ../education-agency.ont.yml
     relationship: instance-of

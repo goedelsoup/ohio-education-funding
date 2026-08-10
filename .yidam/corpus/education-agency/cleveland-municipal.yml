@@ -62,13 +62,13 @@ properties:
     State revenue per pupil $10,026.96 (38.41% of total); local $8,204.61 (31.43%);
     total revenue per pupil $26,106.19. [verified — FY2024 District Profile Report]
   typology: |
-    Urban, very high poverty. Exact department typology code not yet established. [open]
-  established: Not yet established. [open]
+    Urban, very high poverty. Exact department typology code not yet entered. [unentered]
+  established: Not yet established. [unentered]
   roles: |
     Cleveland Scholarship resident district since the mid-1990s [verified]. Subject to state
     academic distress intervention for part of the period [verified — dates not yet
     established]. High-poverty urban district throughout [verified].
-  series_path: Not yet populated. [open]
+  series_path: Not yet populated. [unentered]
 links:
   - target: ../education-agency.ont.yml
     relationship: instance-of
