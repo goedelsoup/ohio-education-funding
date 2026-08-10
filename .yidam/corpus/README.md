@@ -77,16 +77,16 @@ Fields: count per claim tag across every node; then the unresolved marks by the 
 -->
 | Tag | Count | What it records |
 |---|--:|---|
-| `[verified]` | 536 | supported by a committed primary source |
-| `[inference]` | 195 | drawn from verified facts, not witnessed |
-| `[open]` | 165 | a live question — unknown, contested, or being worked |
-| `[unentered]` | 34 | a knowable value nobody has typed in yet |
+| `[verified]` | 543 | supported by a committed primary source |
+| `[inference]` | 202 | drawn from verified facts, not witnessed |
+| `[open]` | 169 | a live question — unknown, contested, or being worked |
+| `[unentered]` | 38 | a knowable value nobody has typed in yet |
 
-199 unresolved marks in total, 165 of them live questions and 34 of them empty fields. Before the two were distinguished the corpus reported the sum as its count of what it does not know, which overstated it by 17%.
+207 unresolved marks in total, 169 of them live questions and 38 of them empty fields. Before the two were distinguished the corpus reported the sum as its count of what it does not know, which overstated it by 18%.
 
 | Field | `[open]` | `[unentered]` |
 |---|--:|--:|
-| `description` | 92 | 3 |
+| `description` | 96 | 3 |
 | `series` | 10 | 0 |
 | `vetoes` | 7 | 1 |
 | `established` | 0 | 7 |
@@ -95,6 +95,7 @@ Fields: count per claim tag across every node; then the unresolved marks by the 
 | `series_path` | 0 | 5 |
 | `roles` | 4 | 1 |
 | `findings` | 4 | 0 |
+| `appropriating_bill` | 0 | 4 |
 | `restriction` | 3 | 0 |
 | `performance` | 0 | 3 |
 | `grades` | 0 | 3 |
@@ -142,7 +143,7 @@ Sorted by: kind, then alphabetically.
 | [`ohio-general-assembly`](actor/ohio-general-assembly.yml) | actor | Ohio General Assembly | 6 | 5 |
 | [`supreme-court-of-ohio`](actor/supreme-court-of-ohio.yml) | actor | Supreme Court of Ohio | 3 | 5 |
 | [`adequacy`](doctrine/adequacy.yml) | doctrine | Adequacy | 8 | 25 |
-| [`equity`](doctrine/equity.yml) | doctrine | Equity | 9 | 26 |
+| [`equity`](doctrine/equity.yml) | doctrine | Equity | 9 | 31 |
 | [`thorough-and-efficient`](doctrine/thorough-and-efficient.yml) | doctrine | Thorough and Efficient | 5 | 11 |
 | [`cleveland-municipal`](education-agency/cleveland-municipal.yml) | education-agency | Cleveland Municipal School District | 3 | 7 |
 | [`eastland-fairfield-ctc`](education-agency/eastland-fairfield-ctc.yml) | education-agency | Eastland-Fairfield Career and Technical Schools | 3 | 2 |
@@ -151,8 +152,13 @@ Sorted by: kind, then alphabetically.
 | [`perrysburg-exempted-village`](education-agency/perrysburg-exempted-village.yml) | education-agency | Perrysburg Exempted Village School District | 4 | 1 |
 | [`toledo-city`](education-agency/toledo-city.yml) | education-agency | Toledo City School District | 3 | 2 |
 | [`upper-arlington-city`](education-agency/upper-arlington-city.yml) | education-agency | Upper Arlington City School District | 3 | 6 |
+| [`fy2012-13`](fiscal-period/fy2012-13.yml) | fiscal-period | FY2012-2013 Biennium | 3 | 2 |
+| [`fy2014-15`](fiscal-period/fy2014-15.yml) | fiscal-period | FY2014-2015 Biennium | 3 | 1 |
+| [`fy2016-17`](fiscal-period/fy2016-17.yml) | fiscal-period | FY2016-2017 Biennium | 3 | 1 |
+| [`fy2018-19`](fiscal-period/fy2018-19.yml) | fiscal-period | FY2018-2019 Biennium | 3 | 1 |
+| [`fy2020-21`](fiscal-period/fy2020-21.yml) | fiscal-period | FY2020-2021 Biennium | 3 | 2 |
 | [`fy2022`](fiscal-period/fy2022.yml) | fiscal-period | Fiscal Year 2022 | 3 | 3 |
-| [`fy2022-23`](fiscal-period/fy2022-23.yml) | fiscal-period | FY2022-23 Biennium | 4 | 2 |
+| [`fy2022-23`](fiscal-period/fy2022-23.yml) | fiscal-period | FY2022-23 Biennium | 5 | 2 |
 | [`fy2024-25`](fiscal-period/fy2024-25.yml) | fiscal-period | FY2024-25 Biennium | 5 | 3 |
 | [`fy2026`](fiscal-period/fy2026.yml) | fiscal-period | Fiscal Year 2026 | 3 | 8 |
 | [`fy2026-27`](fiscal-period/fy2026-27.yml) | fiscal-period | FY2026-27 Biennium | 4 | 6 |
@@ -172,7 +178,7 @@ Sorted by: kind, then alphabetically.
 | [`fsfp-targeted-assistance`](formula-component/fsfp-targeted-assistance.yml) | formula-component | FSFP Targeted Assistance | 4 | 4 |
 | [`fsfp-transportation`](formula-component/fsfp-transportation.yml) | formula-component | FSFP Transportation | 6 | 3 |
 | [`temporary-transitional-aid-guarantee`](formula-component/temporary-transitional-aid-guarantee.yml) | formula-component | Temporary Transitional Aid Guarantee | 8 | 12 |
-| [`bridge-formula`](funding-regime/bridge-formula.yml) | funding-regime | Bridge Formula | 6 | 6 |
+| [`bridge-formula`](funding-regime/bridge-formula.yml) | funding-regime | Bridge Formula | 8 | 11 |
 | [`equal-yield-formula`](funding-regime/equal-yield-formula.yml) | funding-regime | Equal Yield Formula | 3 | 2 |
 | [`evidence-based-model`](funding-regime/evidence-based-model.yml) | funding-regime | Evidence-Based Model | 3 | 6 |
 | [`fair-school-funding-plan`](funding-regime/fair-school-funding-plan.yml) | funding-regime | Fair School Funding Plan | 21 | 20 |
@@ -182,7 +188,7 @@ Sorted by: kind, then alphabetically.
 | [`more-rigorous-interventions`](intervention/more-rigorous-interventions.yml) | intervention | More Rigorous Interventions (CSI) | 5 | 2 |
 | [`hb-1-2009`](legislation/hb-1-2009.yml) | legislation | Am. Sub. H.B. 1 (2009) — FY2010-11 Budget; Evidence-Based Model | 2 | 3 |
 | [`hb-110-2021`](legislation/hb-110-2021.yml) | legislation | Am. Sub. H.B. 110 (2021) — FY2022-23 Budget; Fair School Funding Plan | 5 | 8 |
-| [`hb-153-2011`](legislation/hb-153-2011.yml) | legislation | Am. Sub. H.B. 153 (2011) — FY2012-13 Budget; Bridge Formula | 6 | 1 |
+| [`hb-153-2011`](legislation/hb-153-2011.yml) | legislation | Am. Sub. H.B. 153 (2011) — FY2012-13 Budget; Bridge Formula | 6 | 2 |
 | [`hb-33-2023`](legislation/hb-33-2023.yml) | legislation | Am. Sub. H.B. 33 (2023) — FY2024-25 Budget | 8 | 8 |
 | [`hb-583-2022`](legislation/hb-583-2022.yml) | legislation | Sub. H.B. 583 (2022) — corrective and technical changes to the Fair School Funding Plan | 5 | 1 |
 | [`hb-66-2005`](legislation/hb-66-2005.yml) | legislation | Am. Sub. H.B. 66 (2005) — FY2006-07 Budget; Tangible Personal Property Tax Phase-Out | 2 | 4 |
@@ -227,7 +233,7 @@ Sorted by: kind, then alphabetically.
 | [`barrington-road-elementary`](school/barrington-road-elementary.yml) | school | Barrington Road Elementary School | 4 | 2 |
 | [`sheridan-high-school`](school/sheridan-high-school.yml) | school | Sheridan High School | 6 | 1 |
 
-91 nodes across 16 classes. **0 have nothing pointing at them**, which the corpus rules treat as a gap rather than a fact about the node.
+96 nodes across 16 classes. **0 have nothing pointing at them**, which the corpus rules treat as a gap rather than a fact about the node.
 <!-- /REGEN -->
 
 ## Semantic index status
@@ -237,5 +243,5 @@ Regenerated by: `yidam index-status`
 Fields: total nodes indexed, embedding model, index freshness (last indexed commit vs HEAD),
         stale node count.
 -->
-No semantic index is built. The corpus is 91 nodes and fits in context; an index is added when direct retrieval stops working, which has not happened.
+No semantic index is built. The corpus is 96 nodes and fits in context; an index is added when direct retrieval stops working, which has not happened.
 <!-- /REGEN -->

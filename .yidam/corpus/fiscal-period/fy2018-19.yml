@@ -1,0 +1,45 @@
+class: fiscal-period
+label: FY2018-2019 Biennium
+description: |
+  A biennium of the [Bridge formula](../funding-regime/bridge-formula.yml) era, created so that
+  the decade of per-district finance this corpus now holds has somewhere in the graph to land.
+  Before this backfill nothing before FY2022 was addressable and a query about FY2018 had nowhere
+  to go.
+
+  The local gap passes $8,000 per pupil. The state's share of closing it is unchanged from FY2012.
+
+  **What is measured**, over comparable districts, on federal definitions: [verified —
+  `dispersion::ohio_panel`, pinned by test]
+
+      FY2018   local 54.05%   state 39.62%   federal 6.33%   gap $7,558   residual $3,661
+      FY2019   local 54.46%   state 38.89%   federal 6.65%   gap $8,444   residual $4,305
+
+  These are Census Bureau figures rather than the department's, which is the point of holding
+  them: Ohio replaced its funding regime twice inside this decade and renamed most of its own
+  categories doing it, so a series from Ohio's own reporting would measure the reporting.
+  [inference]
+
+  **This node is thin on purpose.** It carries what the panel measures and the regime in force,
+  and not a narrative of the biennium. The appropriating act, the enacted changes and the
+  per-district figures the department published are `lsc-budget` work, which is wired for one
+  document. [open]
+properties:
+  label: FY2018-2019
+  kind: biennium
+  start: 2017-07-01
+  end: 2019-06-30
+  appropriating_bill: Not established. [unentered] Needs `lsc-budget`.
+  context: |
+    Bridge formula era. Revenue shares and the quartile equalization measure above are from the
+    Census F-33 as NCES publishes it, comparable districts only. [verified]
+links:
+  - target: ../fiscal-period.ont.yml
+    relationship: instance-of
+  - target: fy2016-17.yml
+    relationship: follows
+  - target: ../funding-regime/bridge-formula.yml
+    relationship: governed-by
+  - target: ../doctrine/equity.yml
+    relationship: measured-by
+  - target: ../../catalog/census-f33-school-system-finances.md
+    relationship: sourced-from

@@ -1,0 +1,45 @@
+class: fiscal-period
+label: FY2020-2021 Biennium
+description: |
+  A biennium of the [Bridge formula](../funding-regime/bridge-formula.yml) era, created so that
+  the decade of per-district finance this corpus now holds has somewhere in the graph to land.
+  Before this backfill nothing before FY2022 was addressable and a query about FY2020 had nowhere
+  to go.
+
+  **The two frozen years, and FY2020 is the one that never went away.** The Fair School Funding Plan's guarantee is anchored to FY2020 and has never been re-based, so 48.3% of districts are still funded at this biennium's level in FY2027.
+
+  **What is measured**, over comparable districts, on federal definitions: [verified —
+  `dispersion::ohio_panel`, pinned by test]
+
+      FY2020   local 55.36%   state 38.04%   federal 6.60%   gap $9,262   residual $4,744
+      FY2021   local 54.04%   state 37.06%   federal 8.90%   gap $9,384   residual $5,031
+
+  These are Census Bureau figures rather than the department's, which is the point of holding
+  them: Ohio replaced its funding regime twice inside this decade and renamed most of its own
+  categories doing it, so a series from Ohio's own reporting would measure the reporting.
+  [inference]
+
+  **This node is thin on purpose.** It carries what the panel measures and the regime in force,
+  and not a narrative of the biennium. The appropriating act, the enacted changes and the
+  per-district figures the department published are `lsc-budget` work, which is wired for one
+  document. [open]
+properties:
+  label: FY2020-2021
+  kind: biennium
+  start: 2019-07-01
+  end: 2021-06-30
+  appropriating_bill: Not established. [unentered] Needs `lsc-budget`. The funding levels for both years were frozen rather than recomputed. [verified — see the Bridge formula node]
+  context: |
+    Bridge formula era. Revenue shares and the quartile equalization measure above are from the
+    Census F-33 as NCES publishes it, comparable districts only. [verified]
+links:
+  - target: ../fiscal-period.ont.yml
+    relationship: instance-of
+  - target: fy2018-19.yml
+    relationship: follows
+  - target: ../funding-regime/bridge-formula.yml
+    relationship: governed-by
+  - target: ../doctrine/equity.yml
+    relationship: measured-by
+  - target: ../../catalog/census-f33-school-system-finances.md
+    relationship: sourced-from

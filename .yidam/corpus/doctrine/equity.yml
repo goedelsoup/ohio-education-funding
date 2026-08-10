@@ -91,11 +91,46 @@ description: |
   [DeRolph I](../litigation/derolph-i-1997.yml)]
 
   That bears on equity in a way the correlations cannot show. Targeting is a property of how a
-  fixed pot is distributed; this is the pot. A formula can hold its −0.605 correlation with
-  valuation, keep closing 46% of the local gap, and still leave districts more exposed to their
-  own tax base each year, because the share it is doing that work over is shrinking. Whether the
-  distributional measures above have themselves moved across the decade is computable from the
-  same panel and is not computed here. [open]
+  fixed pot is distributed; this is the pot.
+
+  **AND THE DISTRIBUTIONAL MEASURE HAS NOW BEEN RUN ACROSS THE DECADE. THE RATE HOLDS AND THE GAP
+  GROWS.** This node carried that as an open question — computable from the same panel and not
+  computed. It is computed. [verified — `dispersion::ohio_panel::equalization_by_year`, pinned by
+  test]
+
+      FY      local gap    state closes    federal    residual
+      2012       $5,727           42.4%      10.2%      $2,713
+      2013       $6,030           44.3%       4.6%      $3,084
+      2015       $6,599           40.0%       6.4%      $3,537
+      2016       $6,768           44.0%       6.5%      $3,352
+      2017       $7,041           45.8%       5.8%      $3,408
+      2018       $7,558           46.5%       5.1%      $3,661
+      2019       $8,444           44.3%       4.7%      $4,305
+      2020       $9,262           43.8%       5.0%      $4,744
+      2021       $9,384           41.1%       5.3%      $5,031
+      2022       $9,590           46.4%       9.5%      $4,229
+
+  **The state's share of the gap it closes does not move**: 42.4% at the start, 46.4% at the end,
+  and never outside 40.0-46.5% in between. There is no trend, and the absence of one is the
+  finding rather than a null result.
+
+  **The gap grows by two thirds** — $5,727 to $9,590 per pupil — so a constant rate leaves a
+  growing remainder. **The residual, what neither level closes, grows 56%** to $4,229 per pupil.
+
+  Ohio's formula is doing the same proportional job against a larger problem. Both readings that
+  were available before this run are wrong: equalization has not decayed, and it has not held.
+  The rate held and the outcome worsened, because the rate was never the thing districts
+  experience. A district experiences the residual. [inference]
+
+  This also reconciles with the falling state share above, which looks like a contradiction and is
+  not. The state's share of *total revenue* fell 7.6 points while its share of *gap-closing* held,
+  which is possible precisely because state aid is targeted: a smaller pot distributed more
+  steeply can close the same proportion of a wider gap. What it cannot do is close a growing
+  absolute distance. [inference]
+
+  **Both endpoints flatter the federal column** — FY2012 carries the ARRA tail and FY2022 is the
+  ESSER peak, each roughly double the ordinary ~5%. Read the middle years for federal and the
+  whole window for state. [verified]
 
   **AND IT FORCED A CORRECTION TO HOW THIS CLASS MEASURES THINGS.** For *spending*, less
   dispersion is more equitable — that is the assumption behind the coefficient of variation and
