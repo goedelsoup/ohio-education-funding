@@ -1,0 +1,113 @@
+class: litigation
+label: DeRolph v. State (DeRolph II, 2000)
+description: |
+  The decision that said what "thorough and efficient" *means*, and the reason the phrase is
+  operable in this corpus rather than merely quoted.
+
+  On 11 May 2000 the Supreme Court of Ohio affirmed the parts of the trial court's judgment
+  consistent with its opinion: the General Assembly's response to
+  [DeRolph I](derolph-i-1997.yml) — H.B. 412, H.B. 650, H.B. 283, S.B. 55 — had not produced a
+  compliant system. [verified] The court declined to appoint a special master, kept continuing
+  jurisdiction, and continued the matter to 15 June 2001. [verified]
+
+  **The syllabus is the durable part.** Paragraph 3 supplies the operational test that
+  [DeRolph I](derolph-i-1997.yml) had left as a standard without content:
+
+  > A thorough system means that each and every school district has enough funds to operate. An
+  > efficient system means one in which each and every school district in the state has an ample
+  > number of teachers, sound buildings that are in compliance with state building and fire
+  > codes, and equipment sufficient for all students to be afforded an educational opportunity.
+
+  [verified] Two things follow that matter for everything downstream. The test is **distributive
+  and universal** — "each and every school district" — so a statewide average cannot satisfy it
+  and a system is judged by its worst-served district rather than its mean. And it is stated in
+  *inputs* — teachers, buildings, equipment — not in outcomes, which is why
+  [adequacy](../doctrine/adequacy.yml) in Ohio is costed from a resource specification rather
+  than inferred from test results. The first two syllabus paragraphs approve and follow
+  *Miller v. Korns* (1923), 107 Ohio St. 287, making the state-wide rather than local character
+  of the duty a holding of seventy-seven years' standing rather than a 1997 innovation.
+  [verified]
+
+  **The seven areas the court flagged are a checklist this corpus can still run.** Paragraph 139
+  named what warranted further attention, and the striking thing reading them now is how many
+  are unresolved rather than superseded: [verified]
+
+  1. Continued reliance on local property tax was not addressed, and H.B. 283's inventory tax
+     phase-out might deepen it — the same substitution problem the corpus records under
+     [TPP replacement payments](../revenue-stream/tpp-replacement-payments.yml).
+  2. The basic aid formula "has structural deficiencies and may not in fact reflect the amount
+     required per pupil"; the phase-in of the basic aid amount should be reconsidered. The
+     [Fair School Funding Plan](../funding-regime/fair-school-funding-plan.yml) is phased in
+     too, twenty-five years later, and its
+     [phase-in percentage](../parameter/fsfp-phase-in-percentage.yml) is still a budget lever.
+  3. Facilities funding, and the requirement that districts pass a levy to qualify for state
+     assistance — the local-share condition in
+     [classroom facilities assistance](../program/classroom-facilities-assistance.yml).
+  4. The School Solvency Assistance Fund should be reserved for extreme emergencies.
+  5. Unfunded mandates in H.B. 412 and S.B. 55 must be funded.
+  6. **Phantom revenue "has not been eliminated and may increase."** This is the court naming
+     the interaction the corpus models as
+     [charge-off local share](../formula-component/charge-off-local-share.yml) against
+     [H.B. 920](../legislation/hb-920-1976.yml): a district charged for revenue its reduction
+     factors prevent it from raising.
+  7. Statewide academic guidelines.
+
+  **Why this node exists at all.** [DeRolph IV](derolph-iv-2002.yml) vacated *DeRolph III* and
+  reinstated *DeRolph I and II* as the controlling law of the case, so this decision — not the
+  more specific one that followed it — is half of the standing judgment against Ohio's funding
+  system. [verified] A corpus that held I and IV but not II could state the holding and not the
+  test, and the test is what a claim about adequacy has to be measured against.
+
+  Whether Ohio's current system satisfies paragraph 3 of this syllabus has never been
+  adjudicated, and the four decisions ended without a compliance finding. [open]
+properties:
+  case_name: DeRolph v. State
+  citation: 89 Ohio St.3d 1, 2000-Ohio-437
+  court: Supreme Court of Ohio
+  filed: 1991-12-19
+  decided: 2000-05-11
+  holding: |
+    The school funding system enacted in response to DeRolph I still fails the Thorough and
+    Efficient Clause of Article VI, Section 2. A thorough system is one in which each and every
+    district has enough funds to operate; an efficient system is one in which each and every
+    district has an ample number of teachers, sound buildings compliant with state building and
+    fire codes, and equipment sufficient for all students. Miller v. Korns (1923), 107 Ohio St.
+    287, approved and followed. Authored by Resnick, J.; Douglas, F.E. Sweeney and Pfeifer, JJ.,
+    concurring; Moyer, C.J., Cook and Lundberg Stratton, JJ., dissenting. [verified]
+  remedy: |
+    Those portions of the trial court's decision consistent with the opinion affirmed. The court
+    declined to appoint a special master to oversee the state's further efforts, maintained
+    continuing jurisdiction, and continued the matter to 15 June 2001 for a briefing schedule.
+    No deadline for compliance and no stated consequence for its absence. [verified]
+
+    The continuation to June 2001 is what produced DeRolph III three months later, and DeRolph
+    III is what DeRolph IV vacated. [verified]
+  procedural_history: |
+    1997-03-24  DeRolph I; effect stayed twelve months, cause remanded with jurisdiction retained
+    1997-04-25  On clarification: local property tax may be part of a plan but not its primary
+                  means; parties may present evidence on the enacted remedy and appeal directly
+    1998-08-24  Trial court hearing on the General Assembly's response opens
+    1998-09-03  Hearing concludes
+    1999-02-26  Trial court holds the state failed its burden of proof; 263 pages, reported at
+                  98 Ohio Misc.2d 1
+    1999-11-16  Submitted on the defendants' appeal, No. 99-570
+    2000-05-11  DeRolph II
+links:
+  - target: ../litigation.ont.yml
+    relationship: instance-of
+  - target: ../actor/supreme-court-of-ohio.yml
+    relationship: decided-by
+  - target: derolph-i-1997.yml
+    relationship: cites
+  - target: ../funding-regime/foundation-base-cost-formula.yml
+    relationship: challenges
+  - target: ../doctrine/thorough-and-efficient.yml
+    relationship: invokes
+  - target: ../doctrine/adequacy.yml
+    relationship: invokes
+  - target: ../formula-component/charge-off-local-share.yml
+    relationship: identifies-defect-in
+  - target: ../education-agency/northern-local-perry.yml
+    relationship: has-party
+  - target: ../../catalog/derolph-litigation-record.md
+    relationship: sourced-from

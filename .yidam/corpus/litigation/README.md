@@ -24,13 +24,20 @@ See the class definition: [litigation.ont.yml](../litigation.ont.yml).
 |------|---------|--------|
 | [cincinnati-v-walter-1979](cincinnati-v-walter-1979.yml) | 1979 | System upheld, 4-3 |
 | [derolph-i-1997](derolph-i-1997.yml) | 1997 | System unconstitutional, 4-3 |
-| [derolph-iv-2002](derolph-iv-2002.yml) | 2002 | Unconstitutionality reaffirmed; remand later ended |
+| [derolph-ii-2000](derolph-ii-2000.yml) | 2000 | Response still non-compliant; the thorough-and-efficient test defined |
+| [derolph-iii-2001](derolph-iii-2001.yml) | 2001 | H.B. 94 constitutional as modified — vacated in 2002 |
+| [derolph-iv-2002](derolph-iv-2002.yml) | 2002 | DeRolph III vacated, I and II reinstated; remand later ended |
 | [vouchers-hurt-ohio-2025](vouchers-hurt-ohio-2025.yml) | 2025 | EdChoice held unconstitutional at trial level |
+
+**Read the four in order or not at all.** The sequence is not cumulative: III found the enacted
+plan constitutional subject to four ordered fixes, and IV vacated III outright. The standing
+judgment is I and II, which declare the system unconstitutional and define the test, without any
+of III's specifics about how to satisfy it.
 
 ## Known gaps
 
-*DeRolph II* (2000) and *DeRolph III* (2001) have no nodes yet, and the 2003 prohibition
-action that ended the remand is described inside `derolph-iv-2002` rather than modeled
-separately. *Zelman v. Simmons-Harris* (U.S. 2002), which upheld the Cleveland voucher program
-against a federal Establishment Clause challenge, belongs here too — the Ohio constitutional
-question the 2025 case raises is distinct from the federal one Zelman settled. [open]
+The 2003 prohibition action that ended the remand is described inside `derolph-iv-2002` rather
+than modeled separately. *Zelman v. Simmons-Harris* (U.S. 2002), which upheld the Cleveland
+voucher program against a federal Establishment Clause challenge, belongs here too — the Ohio
+constitutional question the 2025 case raises is distinct from the federal one Zelman settled.
+[open]

@@ -27,7 +27,7 @@ Sorted by: type, then slug.
 | [`census-block-geography`](census-block-geography.md) | Census block geography: school districts, legislative districts, and population | 1 |
 | [`census-f33-school-system-finances`](census-f33-school-system-finances.md) | Annual Survey of School System Finances (F-33) | 1 |
 | [`cupp-district-profile-report`](cupp-district-profile-report.md) | District Profile Report — the "Cupp Report" | 2 |
-| [`derolph-litigation-record`](derolph-litigation-record.md) | DeRolph Litigation Record | 2 |
+| [`derolph-litigation-record`](derolph-litigation-record.md) | DeRolph Litigation Record | 4 |
 | [`dew-expenditure-expanded-list`](dew-expenditure-expanded-list.md) | FY2025 Expenditure Expanded List | 1 |
 | [`dew-five-year-forecast`](dew-five-year-forecast.md) | Five-year forecast filings — the department's republished submissions | 2 |
 | [`dew-fy27-funding-calculator`](dew-fy27-funding-calculator.md) | FY27 TRAD State Foundation Funding Calculator | 15 |

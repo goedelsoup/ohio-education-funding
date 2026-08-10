@@ -29,6 +29,7 @@ description: |
       20.5 mills  raised during the litigation            Am.Sub.H.B. 152, Sec. 36.12,
                                                             145 Ohio Laws, Part III, 4432-4433
       23 mills    in force at DeRolph I, March 1997       R.C. 3317.022
+      23 mills    FY2002-FY2007, by court order           DeRolph III, 93 Ohio St.3d 309, para 62
       23 mills    FY2008                                  LSC, School Funding Complete Resource
 
   [verified — [DeRolph I](../litigation/derolph-i-1997.yml) at ¶97 recites the progression with
@@ -36,6 +37,22 @@ description: |
   Resource](../../catalog/lsc-school-funding-complete-resource.md) gives the rate and base still
   operative in FY2008. Carried in
   [`crates/regime-diff`](../../../crates/regime-diff/src/charge_off.rs).]
+
+  **THE RATE STOPPED MOVING BECAUSE A COURT STOPPED IT.** Three changes in six years, then
+  nothing for the remaining life of the mechanism, is a shape that reads as a policy nobody
+  revisited. It is not. [DeRolph III](../litigation/derolph-iii-2001.yml) ordered, at ¶62, that
+  "in determining future biennial budgets through fiscal year 2007, the rate of millage charged
+  off as the local share of base cost funding under divisions (A)(1) and (2) of R.C. 3317.022
+  may not be changed from twenty-three mills, irrespective of the language of R.C.
+  3317.012(D)(4) suggesting such a methodology." [verified] For six of the years this parameter
+  was flat, the General Assembly was enjoined from moving it.
+
+  The injunction was itself vacated fifteen months later by
+  [DeRolph IV](../litigation/derolph-iv-2002.yml), which erased *DeRolph III* entirely.
+  [verified] So the rate held at 23 mills through FY2021 under a court order that had ceased to
+  exist by the end of 2002 — the constraint outlived its authority, and no bill restored the
+  methodology R.C. 3317.012(D)(4) had provided for. Why the General Assembly never returned to
+  it is not established here. [open]
 
   **THE BASE CHANGED WHILE THE RATE STOOD STILL, AND THIS NODE DESCRIBED THE NEW BASE WRONGLY
   FOR ITS WHOLE LIFE.** DeRolph I describes the charge-off as *total taxable value* times a
@@ -195,6 +212,8 @@ links:
     relationship: governs
   - target: ../litigation/derolph-i-1997.yml
     relationship: sourced-from
+  - target: ../litigation/derolph-iii-2001.yml
+    relationship: constrained-by
   - target: ../../catalog/lsc-school-funding-complete-resource.md
     relationship: sourced-from
   - target: ../../catalog/dot-reappraisal-calendar.md

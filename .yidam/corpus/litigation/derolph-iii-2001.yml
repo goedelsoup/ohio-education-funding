@@ -1,0 +1,116 @@
+class: litigation
+label: DeRolph v. State (DeRolph III, 2001)
+description: |
+  The only one of the four decisions in which the Supreme Court of Ohio told the General
+  Assembly what to change, arithmetically — and the only one that was later erased.
+
+  On 6 September 2001, exercising the continuing jurisdiction it had kept in
+  [DeRolph II](derolph-ii-2000.yml), the court held 4-3 that the plan enacted by Am.Sub.H.B. 94
+  would meet the test created in *DeRolph I* and *II* **with modifications**, ordered those
+  modifications, and then declined to retain jurisdiction. [verified] Fifteen months later
+  [DeRolph IV](derolph-iv-2002.yml) vacated it. [verified]
+
+  **What it ordered.** Four changes, all to the base cost build-up or its local counterpart:
+  [verified]
+
+  - **The model district panel.** H.B. 94 derived base cost from 127 "model" districts, reached
+    by taking the 170 top-performing districts and screening out those in the top and bottom
+    five percent by income and property wealth, then re-admitting some that missed the standard
+    through a rounding rule. The court ordered the wealth screens removed and the rounding
+    dropped: the panel must be *all* districts actually meeting twenty of twenty-seven
+    performance standards, and no others.
+  - **No echo-effect adjustment.** H.B. 94 took the lower of inflation-adjusted FY1996 spending
+    or actual FY1999 spending, on the theory that model districts had overspent at the base
+    level. The court found the adjustment unsupported by the evidence and barred its use to
+    lower the base cost figure.
+  - **Parity aid fully funded by 1 July 2003** — the start of FY2004, two years earlier than the
+    FY2006 the act provided for.
+  - **The charge-off rate frozen at 23 mills.** "In determining future biennial budgets through
+    fiscal year 2007, the rate of millage charged off as the local share of base cost funding
+    under divisions (A)(1) and (2) of R.C. 3317.022 may not be changed from twenty-three mills,
+    irrespective of the language of R.C. 3317.012(D)(4) suggesting such a methodology."
+
+  That last order is the one with consequences this corpus can still see. The
+  [local share charge-off millage](../parameter/local-share-charge-off-millage.yml) moved three
+  times between 1991 and 1997 and then stood at 23 mills for the rest of its life. It was not
+  legislative inertia: for six of those years a court had forbidden the General Assembly to
+  change it. [verified] A parameter series read without this decision looks like a policy that
+  stopped being revisited; it was a policy that had been enjoined.
+
+  **The retroactivity is unusual and worth naming.** The court set no deadline for calculating
+  and distributing the revised amounts, but required the new calculations to apply retroactive
+  to 1 July 2001 and to the subsequent years designated in R.C. 3317.012 — a remedy reaching
+  backwards into a fiscal year already begun. [verified]
+
+  **And then it let go.** "Because we have no reason to doubt defendants' good faith, we have
+  concluded that there is no reason to retain jurisdiction of the matter before us. If the order
+  receives less than full compliance, interested parties have remedies available to them."
+  [verified] Ten years of retained jurisdiction ended in that sentence, and the enforcement
+  mechanism became a new action by whoever cared to bring one.
+
+  **Why it is in the corpus despite being vacated.** *DeRolph IV* stripped these specifics out
+  and reinstated the bare declaration of *DeRolph I* and *II*, so nothing here is operative law.
+  [verified] It is here because it is the only judicial statement of what a *compliant* Ohio
+  formula would contain — a costed, mechanical specification of adequacy against which the
+  [Evidence-Based Model](../funding-regime/evidence-based-model.yml) and the
+  [Fair School Funding Plan](../funding-regime/fair-school-funding-plan.yml) can each be read.
+  Both later regimes build base cost from a resource specification rather than from a residual,
+  which is the direction this decision pushed; whether either would satisfy the panel rule it
+  ordered has not been tested. [open]
+
+  H.B. 94 (2001) has no [legislation](../legislation/) node, and it is the act this decision is
+  about. Adding one would give the FY2002-07 base cost series — $4,814 per student in FY2002
+  rising to $5,527 in FY2007 under R.C. 3317.012(A)(1) — a place to live. [open]
+properties:
+  case_name: DeRolph v. State
+  citation: 93 Ohio St.3d 309, 2001-Ohio-1343
+  court: Supreme Court of Ohio
+  filed: 1991-12-19
+  decided: 2001-09-06
+  holding: |
+    The school-funding formula adopted by the General Assembly in Am.Sub.H.B. 94, as modified by
+    the court's order, meets the test for constitutionality created in DeRolph I and DeRolph II.
+    Decided 4-3 on the exercise of continuing jurisdiction; Moyer, C.J., writing, with Douglas,
+    Pfeifer and Lundberg Stratton, JJ., concurring; Resnick, F.E. Sweeney and Cook, JJ.,
+    dissenting separately. [verified]
+
+    Vacated in its entirety by DeRolph IV, 97 Ohio St.3d 434, on 11 December 2002. Nothing in it
+    is operative law. [verified]
+  remedy: |
+    Four ordered modifications, effective 1 July 2001 and retroactive to that date:
+
+      1. Base cost model panel — all districts meeting 20 of 27 performance standards, without
+         the top- and bottom-five-percent wealth screens and without the rounding re-admission
+      2. No "echo effect" adjustment: the lower of inflation-adjusted FY1996 or actual FY1999
+         spending may not be used to reduce the base cost amount
+      3. Parity aid fully funded no later than 1 July 2003, rather than FY2006
+      4. Charge-off millage under R.C. 3317.022(A)(1) and (2) held at 23 mills through FY2007
+
+    Jurisdiction expressly not retained. Compliance left to "remedies available" to interested
+    parties, which is to say to a fresh action. [verified]
+  procedural_history: |
+    2000-05-11  DeRolph II; continuing jurisdiction retained, matter continued to 15 June 2001
+    2001-06-20  Submitted, No. 99-570, on the exercise of continuing jurisdiction
+    2001-09-06  DeRolph III
+    2002-12-11  Vacated by DeRolph IV; DeRolph I and II reinstated as controlling
+links:
+  - target: ../litigation.ont.yml
+    relationship: instance-of
+  - target: ../actor/supreme-court-of-ohio.yml
+    relationship: decided-by
+  - target: derolph-ii-2000.yml
+    relationship: cites
+  - target: derolph-i-1997.yml
+    relationship: cites
+  - target: ../funding-regime/foundation-base-cost-formula.yml
+    relationship: challenges
+  - target: ../doctrine/adequacy.yml
+    relationship: invokes
+  - target: ../doctrine/thorough-and-efficient.yml
+    relationship: invokes
+  - target: ../parameter/local-share-charge-off-millage.yml
+    relationship: constrains
+  - target: ../actor/ohio-general-assembly.yml
+    relationship: orders
+  - target: ../../catalog/derolph-litigation-record.md
+    relationship: sourced-from

@@ -101,5 +101,7 @@ links:
     relationship: invokes
   - target: ../education-agency/northern-local-perry.yml
     relationship: has-party
+  - target: derolph-ii-2000.yml
+    relationship: continued-in
   - target: ../../catalog/derolph-litigation-record.md
     relationship: sourced-from

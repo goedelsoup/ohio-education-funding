@@ -5,9 +5,10 @@ description: |
   where Ohio is now.
 
   **What it did is more specific than "reaffirmed."** On 11 December 2002 the Supreme Court of
-  Ohio **vacated *DeRolph III*** — the September 2001 decision that had found the system still
-  unconstitutional but prescribed particular methodological fixes — and reinstated *DeRolph I*
-  and *DeRolph II* as the controlling law of the case. [verified] The effect was to strip out
+  Ohio **vacated *[DeRolph III](derolph-iii-2001.yml)*** — the September 2001 decision that had
+  found the plan constitutional *subject to* four prescribed methodological fixes — and
+  reinstated *[DeRolph I](derolph-i-1997.yml)* and *[DeRolph II](derolph-ii-2000.yml)* as the
+  controlling law of the case. [verified] The effect was to strip out
   the remedial specifics the court had supplied a year earlier and leave standing the bare
   declaration that the system is unconstitutional, together with the direction to the General
   Assembly to enact a compliant one. A reading that treats the four decisions as cumulative
@@ -55,6 +56,10 @@ links:
     relationship: decided-by
   - target: derolph-i-1997.yml
     relationship: cites
+  - target: derolph-ii-2000.yml
+    relationship: reinstates
+  - target: derolph-iii-2001.yml
+    relationship: vacates
   - target: ../funding-regime/foundation-base-cost-formula.yml
     relationship: challenges
   - target: ../doctrine/thorough-and-efficient.yml
