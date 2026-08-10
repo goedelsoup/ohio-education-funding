@@ -39,8 +39,14 @@ rung. The rungs share a trigger, an authority, a unit and an actor and the state
 more" from a menu rather than applying them in order — sixteen nodes would have repeated four
 identical fields to vary a sentence. The enumeration lives in `powers`.
 
-**No district series.** Which districts have been under a commission and when is not held; the
-corpus names Cleveland's in passing and nothing else. [open]
+**The commission districts are now held**, from the department's own page: East Cleveland
+(released), Lorain (dissolved by H.B. 33 in 2023) and Youngstown (continuing). All three had
+revised improvement plans approved on 3 December 2021. What is still missing is when each was
+*established* — the page gives endings and not beginnings — and the linked improvement plans,
+which are the only place the benchmarks a commission imposed could be learned. [open]
+
+**Cleveland is not among the three**, and its intervention was under the former R.C. 3302.10.
+Ohio has had two commission regimes and the corpus previously ran them together. [inference]
 
 **H.B. 70 (2015) has no node, and the blocker is now named rather than assumed.** The act that
 produced the current academic distress commission is not retrievable by anything this repository

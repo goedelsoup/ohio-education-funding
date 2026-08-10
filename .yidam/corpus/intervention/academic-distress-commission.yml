@@ -42,12 +42,37 @@ description: |
   accumulating toward the loss of its budget authority. Whether any district has been in both
   positions at once is not established here and is checkable. [open]
 
-  **What is not established.** Which districts have been subject to a commission and when — the
-  corpus names Cleveland's in passing on
-  [its own node](../education-agency/cleveland-municipal.yml) and holds no series. [open] Whether
-  the commissions changed outcomes, which is the question the whole apparatus rests on and which
-  Ohio's own record is contested about. [open] And the exit criteria, which are in later divisions
-  of the section this node has not transcribed. [unentered]
+  **WHO HAS ACTUALLY BEEN UNDER ONE.** Three districts, on the department's own page: [verified —
+  [`dew-academic-distress-commission`](../../catalog/dew-academic-distress-commission.md), read
+  10 August 2026]
+
+      East Cleveland City Schools   released; a Notice of Release is published
+      Lorain City School District   dissolved by H.B. 33, signed 4 July 2023
+      Youngstown City Schools       continuing; annual reports through 2024-25 and a plan extension
+
+  All three were under oversight when a 2021 change in state law required an academic improvement
+  plan running three school years with annual benchmarks; revised plans were approved for all
+  three on 3 December 2021. [verified]
+
+  **Two acts already in this corpus turn out to have accountability effects it did not record.**
+  [H.B. 33](../legislation/hb-33-2023.yml) is modelled here for refreshing the cost inputs to
+  FY2022 and making EdChoice universal; it also dissolved Lorain's commission.
+  [H.B. 110](../legislation/hb-110-2021.yml) is modelled as the Fair School Funding Plan act, and
+  the 2021 improvement-plan requirement dates to the same session. A budget bill in Ohio carries
+  the funding formula and the accountability regime in the same instrument, which is an argument
+  for holding both domains that only became visible once both were held. [inference]
+
+  **And Cleveland is not one of the three.** Its
+  [node](../education-agency/cleveland-municipal.yml) records "state academic distress intervention
+  for part of the period" without saying which regime. It was the *former* R.C. 3302.10 — the
+  pre-2015 arrangement the current section refers to when it speaks of a commission "still in
+  existence on October 15, 2015". [inference] Reading the current three as the complete history
+  would put Cleveland in the wrong regime and lose the fact that Ohio has had two.
+
+  **What is still not established.** When each commission was established — the department's page
+  gives the 2021 plan requirement and the 2023 dissolution and no start dates. [open] Whether any
+  commission changed outcomes, which is what the apparatus rests on. [open] And the exit criteria,
+  in later divisions of the section this node has not transcribed. [unentered]
 properties:
   name: Academic distress commission
   authority: R.C. 3302.10, effective 3 October 2023 in its current form. [verified]

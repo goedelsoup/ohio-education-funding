@@ -29,9 +29,15 @@ escalation read.
 
 **The identification lists are now held** — 231 CSI, 117 ATSI, 60 TSI, in
 [`identified-schools-2026.csv`](../../../crates/dispersion/fixtures/identified-schools-2026.csv).
-Sheridan is CSI by escalation from ATSI; Anton Grdina and Barrington Road are on no list. What is
-*not* held is a Title I service flag, without which an absence cannot be read: CSI selects among
-Title I served schools, so a building can perform badly and never appear. [open]
+Sheridan is CSI by escalation from ATSI; Anton Grdina and Barrington Road are on no list.
+
+**The Title I service flag was looked for and not found, and the search is worth recording so it
+is not repeated.** CSI selects among Title I served schools, so without the flag an absence from
+the list cannot be read. The NCES CCD school directory (`ccd_sch_029`) carries 65 columns and none
+of them is Title I. The CCD file that would (`ccd_sch_052`) is over 138 MB and did not download to
+a readable archive in two attempts. Ohio's own Title I Part A page links no served-schools list.
+[verified — probed 10 August 2026] Until one of those routes opens, "not on the CSI list" means
+exactly that and nothing more. [open]
 
 **And the lists have no history.** The department republishes each in place under a dated filename
 rather than archiving cycles, so a school that exited before this file was written looks like one

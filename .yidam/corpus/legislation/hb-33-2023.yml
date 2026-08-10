@@ -40,6 +40,12 @@ properties:
     replaced the Ohio Department of Education with the cabinet-level Department of Education
     and Workforce. Signing date to be confirmed against the enrolled act. [open]
   vetoes: Line-item vetoes exercised; education funding effects not yet assessed. [open]
+  accountability_effect: |
+    Dissolved the academic distress commission for Lorain City School District. [verified —
+    [the department's commission page](../../catalog/dew-academic-distress-commission.md)] Not a
+    funding provision, and recorded here because an Ohio budget act carries the funding formula
+    and the accountability regime in one instrument — a property the corpus could not see until it
+    held both domains.
 links:
   - target: ../legislation.ont.yml
     relationship: instance-of
