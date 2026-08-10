@@ -1,0 +1,65 @@
+class: accountability-regime
+label: Ohio School Report Card
+description: |
+  Ohio's own system for rating schools and districts, and the substrate every other accountability
+  mechanism in the state runs on. The federal regime identifies schools by rank-ordering this
+  rating; the state's [academic distress commission](../intervention/academic-distress-commission.yml)
+  is triggered by three consecutive years of it; and the
+  [FSFP performance supplement](../formula-component/fsfp-performance-supplement.yml) pays on it.
+
+  **One number, three consequences.** That is the fact this class exists to make sayable. R.C.
+  3302.03 produces an overall rating; R.C. 3302.10 turns three bad ones into the loss of a
+  district's budget authority; the Fair School Funding Plan turns a good one into money. A corpus
+  that models only the third describes a payment and misses that the same measure carries a
+  sanction an order of magnitude larger in consequence. [inference]
+
+  **The scale changed in 2022-23, from letter grades to stars**, and both survive in current
+  statute: R.C. 3302.10 states its trigger as an overall grade of "F" under division (C)(3) *or*
+  an overall performance rating of less than two stars under division (D)(3). [verified] A series
+  that crosses that boundary is comparing two scales, and the statute itself carries both because
+  the transition is not finished in law.
+
+  **The department must publish preliminary data before the report card itself.** R.C. 3302.03
+  requires preliminary report card data to districts not later than the thirty-first of July each
+  year. [verified]
+
+  What the components are, how the overall rating is computed from them, and how the star
+  thresholds are set are in the section and not yet transcribed here. [unentered] Whether the
+  2022-23 change of scale moved any district across the distress trigger is not established and
+  is exactly the kind of question the two-regime model exists to ask. [open]
+properties:
+  name: Ohio School Report Card
+  level: state
+  authority: R.C. 3302.03, with definitions at R.C. 3302.01 and building-level consequence at R.C. 3302.12. [verified]
+  measure: |
+    An overall rating for each district and school building. Expressed as a letter grade under
+    division (C)(3) and as a star rating under division (D)(3); the star scale replaced letter
+    grades for the 2022-23 report cards and both remain in the section. [verified] Components
+    include achievement, progress, gap closing, graduation, early literacy and chronic
+    absenteeism; the corpus holds [performance index](../metric/performance-index.yml) and
+    [progress](../metric/progress-value-added.yml) as metrics and not the others. [unentered]
+  identification: |
+    The rating is not itself an identification. It is the input two identification systems consume:
+    federal CSI, TSI and ATSI selection rank-orders it, and R.C. 3302.10 reads three consecutive
+    years of it. [verified]
+  effective: |
+    In its current form from the 2022-23 report cards, when star ratings replaced letter grades.
+    Ohio has published report cards in some form since well before that; the earlier eras are not
+    modelled here. [unentered]
+links:
+  - target: ../accountability-regime.ont.yml
+    relationship: instance-of
+  - target: ../actor/department-of-education-and-workforce.yml
+    relationship: administered-by
+  - target: ../metric/performance-index.yml
+    relationship: measures
+  - target: ../metric/progress-value-added.yml
+    relationship: measures
+  - target: ../funding-regime/fair-school-funding-plan.yml
+    relationship: runs-alongside
+  - target: essa.yml
+    relationship: supplies-measure-to
+  - target: ../intervention/academic-distress-commission.yml
+    relationship: triggers
+  - target: ../../catalog/ohio-revised-code.md
+    relationship: sourced-from

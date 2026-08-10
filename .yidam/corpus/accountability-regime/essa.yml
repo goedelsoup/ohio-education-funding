@@ -1,0 +1,68 @@
+class: accountability-regime
+label: Every Student Succeeds Act
+description: |
+  The federal regime, which in Ohio identifies schools using
+  [the state's own rating](ohio-report-card.yml) rather than a federal measure — so the two
+  regimes are not independent, and a change to Ohio's report card propagates into federal
+  identification without any federal act.
+
+  **Identification is building-level**, which is the grain this corpus does not otherwise carry:
+
+  - **CSI** — the lowest-performing 5% of Title I served schools on the overall rating; for
+    schools with fewer than three rated components, the lowest 5% by chronic absenteeism; high
+    schools with a federal graduation rate at or below 67%; and schools that have not exited ATSI
+    within three years. Identified every three years, next in 2027-28.
+  - **TSI** — a subgroup consistently in the bottom 2% of its subgroup rank order, with a
+    2.5-star-or-lower subgroup rating.
+  - **ATSI** — a subgroup at or below the CSI identification threshold score.
+
+  [verified as a statement of Ohio's plan as it stands to be amended —
+  [`ohio-essa-state-plan`](../../catalog/ohio-essa-state-plan.md)]
+
+  **Its fiscal content is thin and real.** Identification carries no formula money. What it
+  carries, under the April 2026 amendment, is the department's proposed annual approval of
+  expenditure of all federal funds — Title IA, IDEA, and 1003 School Improvement — for schools
+  that miss exit criteria, and approval of district expenditure plans across Titles I through IV
+  and IDEA. [verified as proposed] Whether the amendment has been approved is not established.
+  [open]
+
+  **Three of the proposed interventions move a building out of the district sector**: conversion
+  to a charter school operated by an approved school management organization, merger with a school
+  operated by one, and closure. Those are funding events in the community-school channel, which
+  is the channel the [`deduction`](../../skills/deduction.md) stub records as unmodellable — so
+  the corpus can name the pathway and cannot yet follow the money along it. [inference]
+
+  The intervention ladder itself has no node. It is sixteen items ranging from revised improvement
+  plans to closure, and modelling it needs the `intervention` class instantiated per rung rather
+  than once. [open]
+properties:
+  name: Every Student Succeeds Act
+  level: federal
+  authority: |
+    Elementary and Secondary Education Act as reauthorized by ESSA, 20 U.S.C. 6301 et seq.,
+    operated in Ohio through the state's approved Consolidated State Plan. [verified]
+  measure: |
+    Ohio's own School Report Card overall rating, rank-ordered — not a federal measure. Plus
+    chronic absenteeism for schools with fewer than three rated components, and the four-year
+    adjusted cohort graduation rate. [verified]
+  identification: |
+    CSI at the lowest 5% of Title I served schools and "at least" that, the amendment adding an
+    explicit permission to identify beyond the threshold; TSI at the bottom 2% of a subgroup rank
+    order; ATSI at or below the CSI threshold score. Building-level. CSI and ATSI every three
+    years, TSI annually. [verified as proposed]
+  effective: |
+    ESSA replaced No Child Left Behind for accountability purposes from the 2017-18 school year.
+    NCLB has no node here. [unentered]
+links:
+  - target: ../accountability-regime.ont.yml
+    relationship: instance-of
+  - target: ohio-report-card.yml
+    relationship: identifies-using
+  - target: ../revenue-stream/title-i.yml
+    relationship: conditions
+  - target: ../revenue-stream/idea-part-b.yml
+    relationship: conditions
+  - target: ../actor/department-of-education-and-workforce.yml
+    relationship: administered-by
+  - target: ../../catalog/ohio-essa-state-plan.md
+    relationship: sourced-from

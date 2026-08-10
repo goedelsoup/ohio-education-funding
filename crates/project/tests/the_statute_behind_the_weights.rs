@@ -105,6 +105,10 @@ const CITED: &[&str] = &[
     // The casino tax and the school share of it. Not part of the formula — which is the finding
     // the `casino-tax-distribution` node rests on — but cited by it, and the extract holds what
     // the corpus cites.
+    "3302.01",
+    "3302.03",
+    "3302.10",
+    "3302.12",
     "3770.06",
     "5753.02",
     "5753.03",

@@ -133,13 +133,18 @@ test("every corpus file on disk parses and validates individually", () => {
 });
 
 test("every class states whether its edge vocabulary is open", () => {
-  // Required with no default, so a class nobody has decided about cannot pass silently. All 13
-  // currently say `characteristic`, which is what the corpus has always done and never said.
+  // Required with no default, so a class nobody has decided about cannot pass silently. All of
+  // them currently say `characteristic`, which is what the corpus has always done and never said.
   const corpus = loadCorpus();
   for (const entry of corpus.classes) {
     expect(["characteristic", "exhaustive"]).toContain(entry.edgePolicy);
   }
-  expect(corpus.classes).toHaveLength(13);
+  // A deliberate tripwire rather than a derived count: adding a class changes what the corpus is
+  // about, and this is the assertion that makes it impossible to do quietly. Thirteen at genesis;
+  // fifteen since `accountability-regime` and `intervention` were admitted by decision
+  // `accountability-domain`. Update it only alongside a decision record — `school` is approved
+  // there and not yet built, so the next legitimate value is sixteen.
+  expect(corpus.classes).toHaveLength(15);
 });
 
 test("an ontology missing edge_policy is rejected", () => {

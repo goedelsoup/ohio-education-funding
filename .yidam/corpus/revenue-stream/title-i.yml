@@ -69,6 +69,8 @@ properties:
 links:
   - target: ../revenue-stream.ont.yml
     relationship: instance-of
+  - target: ../accountability-regime/essa.yml
+    relationship: conditioned-by
   - target: ../doctrine/equity.yml
     relationship: bears-on
   - target: ../formula-component/fsfp-disadvantaged-pupil-impact-aid.yml

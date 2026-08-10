@@ -1,0 +1,60 @@
+class: accountability-regime
+label: Accountability Regime
+foundational_type:
+  ontology: ufo
+  type: event
+description: |
+  A named era of measuring schools and attaching consequences to the measurement — Ohio's report
+  card system, No Child Left Behind, the Every Student Succeeds Act. An Event for the same reason
+  `funding-regime` is: it holds over an interval, is established and superseded by enactments, and
+  its boundaries are what make two figures comparable or not.
+
+  **Deliberately parallel to [funding-regime](funding-regime.ont.yml).** Ohio has been changing how
+  it pays schools and how it judges them on overlapping but non-coincident schedules, and the two
+  histories are usually told separately. Modelling them as sibling classes on one time axis is
+  what lets a reader ask whether a district was being judged by one system while funded by
+  another — which, through the whole Fair School Funding Plan phase-in, it was.
+
+  A regime is distinct from the [interventions](intervention.ont.yml) on its ladder: the regime
+  says what is measured and who is identified, the intervention says what then happens.
+properties:
+  - name: name
+    type: string
+    description: The regime's common name
+  - name: level
+    type: string
+    description: state | federal
+  - name: authority
+    type: string
+    description: The statute or federal act establishing it
+  - name: measure
+    type: text
+    description: What is measured, on what scale, and at what unit
+  - name: identification
+    type: text
+    description: How schools or districts are selected for consequence, including thresholds
+  - name: effective
+    type: text
+    description: The period it governs, and what it superseded
+edge_policy: characteristic
+edges:
+  - relationship: established-by
+    target: legislation
+    direction: out
+    description: The enactment that created the regime
+  - relationship: measures
+    target: metric
+    direction: out
+    description: A measure the regime rates schools on
+  - relationship: replaces
+    target: accountability-regime
+    direction: out
+    description: The regime this one superseded
+  - relationship: administered-by
+    target: actor
+    direction: out
+    description: The body that operates it
+  - relationship: runs-alongside
+    target: funding-regime
+    direction: out
+    description: A funding regime in force over an overlapping period

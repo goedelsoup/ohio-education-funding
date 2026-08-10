@@ -253,6 +253,54 @@ pub const OHIO_LAWS_SECTIONS: &[Source] = &[
         note: "R.C. 5705.391. The five-year forecast requirement.",
     },
     Source {
+        key: "rc-3302-01",
+        title: None,
+        url: "https://codes.ohio.gov/ohio-revised-code/section-3302.01",
+        filename: "rc-3302-01.html",
+        format: Format::Html,
+        catalog: Some("ohio-revised-code"),
+        fixtures: &[crate::fixtures::STATUTE_FIXTURE],
+        note: "R.C. 3302.01. Definitions for the accountability chapter, including \"school building\" \
+               and the performance ratings the rest of Chapter 3302 keys on.",
+    },
+    Source {
+        key: "rc-3302-03",
+        title: None,
+        url: "https://codes.ohio.gov/ohio-revised-code/section-3302.03",
+        filename: "rc-3302-03.html",
+        format: Format::Html,
+        catalog: Some("ohio-revised-code"),
+        fixtures: &[crate::fixtures::STATUTE_FIXTURE],
+        note: "R.C. 3302.03. Report cards. The source of the overall rating that pays the FSFP performance \
+               supplement and triggers academic distress, which is the same number doing \
+               two jobs.",
+    },
+    Source {
+        key: "rc-3302-10",
+        title: None,
+        url: "https://codes.ohio.gov/ohio-revised-code/section-3302.10",
+        filename: "rc-3302-10.html",
+        format: Format::Html,
+        catalog: Some("ohio-revised-code"),
+        fixtures: &[crate::fixtures::STATUTE_FIXTURE],
+        note: "R.C. 3302.10. Academic distress commissions. The trigger — three consecutive years at an \
+               overall F or under two stars — and the chief executive officer's powers, which \
+               include creating the district's budget. State seizure of fiscal control, on \
+               academic grounds.",
+    },
+    Source {
+        key: "rc-3302-12",
+        title: None,
+        url: "https://codes.ohio.gov/ohio-revised-code/section-3302.12",
+        filename: "rc-3302-12.html",
+        format: Format::Html,
+        catalog: Some("ohio-revised-code"),
+        fixtures: &[crate::fixtures::STATUTE_FIXTURE],
+        note: "R.C. 3302.12. Building-level intervention for a school ranked by performance. The section \
+               that makes the school rather than the district the unit, which is why the \
+               corpus needs a building class.",
+    },
+    Source {
         key: "rc-3770-06",
         title: None,
         url: "https://codes.ohio.gov/ohio-revised-code/section-3770.06",

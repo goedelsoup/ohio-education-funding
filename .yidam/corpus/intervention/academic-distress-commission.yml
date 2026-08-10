@@ -1,0 +1,91 @@
+class: intervention
+label: Academic Distress Commission
+description: |
+  The point at which Ohio's accountability system stops advising and takes the district's budget.
+
+  **The trigger is a report card rating, three years running.** R.C. 3302.10(A) says the department
+  "shall establish an academic distress commission" — shall, not may — for any district that has
+  for three consecutive years received an overall grade of "F" under R.C. 3302.03(C)(3), or an
+  overall performance rating of **less than two stars** under R.C. 3302.03(D)(3). [verified]
+
+  **The commission is majority state-appointed.** Five members: three by the director of education
+  and workforce, one by the president of the district board, one by the mayor. Appointments within
+  thirty days of notice; the director designates the chairperson from among the director's own
+  three. [verified] An elected board retains one seat on the body that supersedes it.
+
+  **And the chief executive officer is paid by the department.** Within sixty days the commission
+  appoints a CEO for the district, "who shall be paid by the department of education and
+  workforce". [verified] The person exercising the district's authority is not on the district's
+  payroll.
+
+  **THE POWERS ARE FISCAL, AND THIS IS WHY THE INTERVENTION BELONGS IN A FUNDING CORPUS.** The
+  CEO's enumerated powers under division (D) include defining employee responsibilities, setting
+  compensation, allocating teacher class loads, conducting evaluations, making reductions in
+  staff, setting the calendar, contracting for services, modifying board policy, establishing
+  grade configurations, determining curriculum, setting class sizes — and **"(j) Creating a budget
+  for the district."** [verified]
+
+  The elected board continues to exist and continues to levy. What it no longer does is decide how
+  the money is spent. Every mechanism this corpus models — the base cost build-up, the local share,
+  the guarantee, the supplements — computes an amount that arrives at a district whose spending
+  decisions have been transferred to a state appointee. [inference]
+
+  There is also a fund of its own: the CEO "shall establish a separate fund to support innovative
+  education programs", holds **sole authority to disburse** from it until the district exits, and
+  every disbursement must support the approved improvement plan. Moneys appropriated by the
+  General Assembly for that purpose go into it. [verified]
+
+  **The same number pays and takes.** The overall rating under R.C. 3302.03 that sets this trigger
+  is the rating the
+  [FSFP performance supplement](../formula-component/fsfp-performance-supplement.yml) pays on. A
+  district can be receiving a supplement calculated from its rating in the years that rating is
+  accumulating toward the loss of its budget authority. Whether any district has been in both
+  positions at once is not established here and is checkable. [open]
+
+  **What is not established.** Which districts have been subject to a commission and when — the
+  corpus names Cleveland's in passing on
+  [its own node](../education-agency/cleveland-municipal.yml) and holds no series. [open] Whether
+  the commissions changed outcomes, which is the question the whole apparatus rests on and which
+  Ohio's own record is contested about. [open] And the exit criteria, which are in later divisions
+  of the section this node has not transcribed. [unentered]
+properties:
+  name: Academic distress commission
+  authority: R.C. 3302.10, effective 3 October 2023 in its current form. [verified]
+  trigger: |
+    Three consecutive years of an overall grade of "F" under R.C. 3302.03(C)(3), or an overall
+    performance rating of less than two stars under R.C. 3302.03(D)(3). Also applies where a
+    commission established under the former section survived to 15 October 2015 and had by then
+    existed for at least four years, in which case the old commission is abolished and a new one
+    appointed. [verified]
+  unit: education-agency
+  powers: |
+    Exercised by a chief executive officer appointed by the commission and paid by the department.
+    Employee responsibilities and job descriptions; compensation; teacher class loads; evaluations;
+    staff reductions under R.C. 3319.17, 3319.171 and 3319.172; the school calendar; **creating a
+    budget for the district**; contracting for services; modifying board policies and procedures;
+    grade configurations; curriculum; instructional materials and assessments; class sizes; staff
+    professional development. [verified]
+
+    Any previously appointed improvement coordinator under R.C. 3302.04(A) is terminated.
+    [verified]
+  exit: |
+    Not transcribed here; the section's later divisions carry it. [unentered]
+  fiscal_effect: |
+    Transfers the power to create the district's budget from the elected board to a state-appointed
+    chief executive officer whose salary the department pays. [verified] Establishes a separate
+    innovation fund the CEO alone may disburse, holding any moneys the General Assembly
+    appropriates for the purpose. [verified] Does not alter what the funding formula computes for
+    the district — only who decides how it is spent. [inference]
+links:
+  - target: ../intervention.ont.yml
+    relationship: instance-of
+  - target: ../actor/department-of-education-and-workforce.yml
+    relationship: imposed-by
+  - target: ../metric/performance-index.yml
+    relationship: triggered-by
+  - target: ../formula-component/fsfp-performance-supplement.yml
+    relationship: shares-trigger-with
+  - target: ../education-agency/cleveland-municipal.yml
+    relationship: imposed-on
+  - target: ../../catalog/ohio-revised-code.md
+    relationship: sourced-from
