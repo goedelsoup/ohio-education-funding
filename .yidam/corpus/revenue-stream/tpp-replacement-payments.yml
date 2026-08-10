@@ -33,8 +33,11 @@ properties:
     business activity it replaced, so a district that adds industrial capacity gains no
     replacement revenue from it.
   series_path: |
-    Not yet populated. [unentered] Target: crates/ data files fed by `dew-foundation` and
-    `lsc-budget`.
+    Not yet populated, and it is the one stream here whose series genuinely does not exist in what
+    is held. [unentered] The replacement payments are a line inside state aid rather than a
+    reported category, so they are not separable from the state column of
+    crates/dispersion/fixtures/f33-ohio-panel.csv nor identified in the FY2027 model. The
+    phase-down schedule is an appropriation history, which makes this an `lsc-budget` target.
 links:
   - target: ../revenue-stream.ont.yml
     relationship: instance-of

@@ -70,10 +70,12 @@ properties:
     September 2024. Zero thereafter. Any series carrying this channel must mark the boundary rather
     than reporting a decline. [verified]
   series_path: |
-    Not yet populated as an ESSER-specific series. [unentered] The aggregate federal channel per
-    district is in
-    [`f33-districts-fy2022.csv`](../../../crates/dispersion/fixtures/f33-districts-fy2022.csv) for
-    FY2022 only; ESSER is not broken out of it.
+    No ESSER-specific series exists and none is extractable from what is held: the federal
+    channel is reported as one figure. What can be seen is its shape —
+    crates/dispersion/fixtures/f33-ohio-panel.csv carries federal revenue per district for
+    FY2012-FY2022, in which the ESSER rise from 6.60% of Ohio school revenue in FY2020 to 14.02%
+    in FY2022 is legible as an aggregate. [verified] Separating ESSER from Title I and IDEA
+    inside that figure needs the allocation files, which no connector retrieves. [unentered]
 links:
   - target: ../revenue-stream.ont.yml
     relationship: instance-of

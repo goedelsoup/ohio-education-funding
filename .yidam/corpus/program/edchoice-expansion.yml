@@ -43,7 +43,18 @@ properties:
     award amount scaled by family income relative to the federal poverty level rather than
     eligibility restricted by it. [verified] Exact bands not yet established. [open]
   amount: Not yet populated. [open] Varies by grade band and family income.
-  appropriation_line: Not yet established. [unentered]
+  appropriation_line: |
+    **No line of its own — it is paid from the foundation aid appropriation.** Five line items
+    "are used to collectively support state foundation aid payments for all public school students
+    in the state **and scholarship payments for students enrolled in state scholarship
+    programs**": GRF ALI 200550 Foundation Funding, GRF ALI 200502 Pupil Transportation, Fund 5VS0
+    ALI 200604, Fund 5YO0 ALI 200491, and Lottery Fund 7017 ALI 200612. [verified — LSC redbook,
+    `crates/project/fixtures/dew-redbook.txt`]
+
+    That is a finding rather than a citation. The scholarship channel does not appear as a
+    separate appropriation, so the budget document a reader would consult to size it shows it
+    merged with the formula it diverts from — which is part of why this channel is as hard to see
+    as the corpus keeps recording it to be.
 links:
   - target: ../program.ont.yml
     relationship: instance-of

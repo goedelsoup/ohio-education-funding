@@ -51,7 +51,12 @@ properties:
     Statewide e-school [verified]. Subject to attendance-based funding recovery, FY2016 and
     FY2017 [verified — amounts not yet established]. Deduct-funded from resident districts
     throughout its operation [verified].
-  series_path: Not yet populated. [unentered]
+  series_path: |
+    Per-agency series are held by IRN across four committed fixtures, not one path: [verified]
+      crates/foundation/fixtures/fy27-department-model.csv    FY2027 formula run, 609 districts
+      crates/project/fixtures/district-finances.csv           FY2020-FY2024 actuals and balances
+      crates/dispersion/fixtures/f33-ohio-panel.csv           FY2012-FY2022 revenue, federal basis
+      crates/dispersion/fixtures/mr81-sponsor-panel.csv       2001-2011 free and reduced lunch
 links:
   - target: ../education-agency.ont.yml
     relationship: instance-of

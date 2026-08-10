@@ -21,6 +21,7 @@ See the class definition: [revenue-stream.ont.yml](../revenue-stream.ont.yml).
 | [state-foundation-aid](state-foundation-aid.yml) | state | Re-appropriated each biennium |
 | [tpp-replacement-payments](tpp-replacement-payments.yml) | state | Phase-down schedule revised repeatedly |
 | [casino-tax-distribution](casino-tax-distribution.yml) | state | Constitutionally earmarked; never touches the formula or the department's budget |
+| [lottery-profits](lottery-profits.yml) | state | Constitutionally earmarked, and appropriated *into* foundation aid rather than onto it |
 | [title-i](title-i.yml) | federal | Appropriated annually; allocated on a poverty count Ohio does not use |
 | [idea-part-b](idea-part-b.yml) | federal | Base frozen at FY1999; does not respond to disability counts |
 | [esser](esser.yml) | federal | Bounded, in three tranches, expired September 2024 |
@@ -38,19 +39,19 @@ closes 9.5% of the local gap against state equalization's 46%. The figures are o
 
 ## Known gaps
 
-**The state lottery has no node, and it is the sharper version of the question the casino node
-raises.** Ohio Constitution Article XV Section 6(A) — three paragraphs above the casino provision,
-in the section this class now cites — requires the entire net proceeds of the lottery to be "used
-solely for the support of elementary, secondary, vocational, and special education programs **as
-determined in appropriations made by the General Assembly**." That final clause is the hinge of
-every earmark-substitution argument in Ohio school finance, and the lottery is the instance voters
-are most likely to believe is additive. [open]
+**The two earmarks now answer the substitution question differently, and the difference is the
+mechanism.** For the [lottery](lottery-profits.yml) it is settled as far as a budget document can
+settle it: LSC states that profits are "combined with the GRF to provide foundation funding to
+schools", and Fund 7017 sits inside the foundation aid appropriation table at $1.34 billion of an
+$11.15 billion total. The money is one of the buckets foundation aid is paid from, not an
+addition to it. [verified]
 
-**Neither earmark can be shown additive or substitutive from statute.** No section of law reduces
-foundation aid by what a district receives from either channel; whether the General Assembly set
-aid lower because the channels exist is a counterfactual about appropriations, answerable only
-from the appropriation history. That is `lsc-budget` work and is the same blocker as the pre-2000
-record. [open]
+For the [casino distribution](casino-tax-distribution.yml) there is no equivalent evidence and
+cannot be, because the money never passes through an appropriation to the department — it runs
+from the Tax Commissioner to county funds to districts, and no budget table exists in which it
+could be shown netting against anything. [inference] The remaining question for both is the
+counterfactual the critique actually asserts: whether aid would have been set higher without the
+earmark. No appropriation record answers that. [open]
 
 None of the three federal nodes carries a per-district series. Title I and ESSER allocations are
 not retrieved by any connector; IDEA Part B is

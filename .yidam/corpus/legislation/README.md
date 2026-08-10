@@ -36,8 +36,9 @@ choice against an established practice, not an oversight.
 
 ## Known gaps
 
-**H.B. 583 (2022)** made technical corrections to the Fair School Funding Plan formula that are
-incorporated into the FY2022 calculations, and is unmodelled. Beyond it, the class thins out
+**[H.B. 583](hb-583-2022.yml) now has a node**, though what it changed does not: LSC's final
+analysis for it is a separate document `lsc-budget` does not retrieve, so the corpus can say the
+corrections are operative and not which provisions moved. [open] Beyond it, the class thins out
 badly before 2005: the enactments that built and repeatedly amended the foundation base cost
 formula between 1976 and 2005 are represented by H.B. 920 and now
 [H.B. 94](hb-94-2001.yml), so the corpus can say what that regime did but still not which

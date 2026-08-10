@@ -253,6 +253,19 @@ pub const OHIO_LAWS_SECTIONS: &[Source] = &[
         note: "R.C. 5705.391. The five-year forecast requirement.",
     },
     Source {
+        key: "rc-3770-06",
+        title: None,
+        url: "https://codes.ohio.gov/ohio-revised-code/section-3770.06",
+        filename: "rc-3770-06.html",
+        format: Format::Html,
+        catalog: Some("ohio-revised-code"),
+        fixtures: &[crate::fixtures::STATUTE_FIXTURE],
+        note: "R.C. 3770.06. The state lottery funds, including the lottery profits education \
+               fund the 1987 constitutional amendment earmarks. The fund the corpus needed to \
+               name in order to say that lottery profits are combined with the GRF to pay \
+               foundation aid rather than added to it.",
+    },
+    Source {
         key: "rc-5753-02",
         title: None,
         url: "https://codes.ohio.gov/ohio-revised-code/section-5753.02",

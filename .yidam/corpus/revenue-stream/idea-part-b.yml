@@ -58,9 +58,11 @@ properties:
     identified population has grown since 1999 is funded on a twenty-five-year-old base.
     [inference]
   series_path: |
-    Not yet populated. [unentered] Target: `crates/` data from
-    [`ode-idea-part-b-allocations`](../../catalog/ode-idea-part-b-allocations.md), which is
-    catalogued with a known reader and no connector.
+    No IDEA-specific series. [unentered] Target remains
+    [`ode-idea-part-b-allocations`](../../catalog/ode-idea-part-b-allocations.md) — catalogued,
+    with a known reader (`pdftotext -layout`) and no connector. IDEA is inside the undifferentiated
+    federal column of crates/dispersion/fixtures/f33-ohio-panel.csv and cannot be separated from
+    it.
 links:
   - target: ../revenue-stream.ont.yml
     relationship: instance-of

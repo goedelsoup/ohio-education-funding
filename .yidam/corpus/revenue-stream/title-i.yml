@@ -49,7 +49,9 @@ properties:
     economy and with the decennial census, so the channel is neither guaranteed nor formula-driven
     in the way state foundation aid is. [inference]
   series_path: |
-    Not yet populated. [unentered] Target: no connector retrieves Title I allocations.
+    No Title I-specific series, and no connector retrieves the allocations. [unentered] Title I
+    is the largest component of the federal column in
+    crates/dispersion/fixtures/f33-ohio-panel.csv, FY2012-FY2022, and is not separable from it.
 links:
   - target: ../revenue-stream.ont.yml
     relationship: instance-of
