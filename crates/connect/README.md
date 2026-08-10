@@ -45,8 +45,9 @@ Fields per connector: key, status, source count, corpus classes fed; then every 
 | [`census-f33`](sources/census-f33.md) | **wired** | 11 | metric, education-agency |
 | [`nces-ccd`](sources/nces-ccd.md) | **wired**, in part | 1 | education-agency |
 | `census-geography` | **wired** | 4 | education-agency, actor |
+| `dew-child-nutrition` | **wired**, in part | 11 | education-agency, metric, formula-component |
 
-13 connectors, 55 sources between them. 11 are wired and 2 are not; 3 of the wired ones reach only part of what they feed, and say so below.
+14 connectors, 66 sources between them. 12 are wired and 2 are not; 4 of the wired ones reach only part of what they feed, and say so below.
 
 **What is blocked, in the registry's own words.**
 
@@ -55,8 +56,9 @@ Fields per connector: key, status, source count, corpus classes fed; then every 
 - `ohio-courts` — still blocked on: trial-level rulings such as the 2025 EdChoice decision are not in the supreme court archive at all, and `citing_cases` needs a citator rather than a document
 - `ofcc-projects` — blocked on: the site refuses a self-identifying agent — 404 to this project's user-agent, 200 to a browser string — and its project data is rendered by interactive maps rather than served as files
 - `nces-ccd` — still blocked on: wired for a single year of the LEA directory; the consolidation-aware long series is not built, because agency files are per-year zips whose column sets change and the identifier-change history has to be derived rather than read
+- `dew-child-nutrition` — still blocked on: wired for the eleven sponsor-centric years, 2001 through 2011. The 1998-2000 files are a different, school-centric column set whose unquoted district names shift three rows past the last column; from 2012 the report splits into Traditional, Provision 2 and Community Eligibility streams, and the Traditional file excludes the highest-poverty sponsors by design
 
-3 of them have no long form in [`sources/`](sources/): `dew-report-card`, `dew-five-year-forecast`, `census-geography`. Those are the connectors added after the original nine stubs, whose prose was never written — the decision record is the only account of why each exists.
+4 of them have no long form in [`sources/`](sources/): `dew-report-card`, `dew-five-year-forecast`, `census-geography`, `dew-child-nutrition`. Those are the connectors added after the original nine stubs, whose prose was never written — the decision record is the only account of why each exists.
 <!-- /REGEN -->
 
 A `declared` connector says **what blocks it** — that string is a field on the record, and a

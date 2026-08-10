@@ -31,6 +31,7 @@
 
 #![forbid(unsafe_code)]
 
+pub mod mr81;
 pub mod national_peers;
 pub mod ohio_panel;
 

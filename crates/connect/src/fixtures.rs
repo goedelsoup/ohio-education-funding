@@ -1690,6 +1690,16 @@ pub fn write_csv(path: &Path, header: &[&str], rows: &[Vec<String>]) -> io::Resu
     out.push_str(&header.join(","));
     out.push('\n');
     for row in rows {
+        // This writer does not quote, and every consumer of these fixtures splits on the comma.
+        // A field carrying one shifts that row's remaining columns and nothing downstream can
+        // tell — the MR-81 panel shipped 99 such rows on its first build, because Ohio has
+        // sponsors called "Holy Trinity, Swanton Ele Sch" and "Edge Academy, The". Failing here
+        // is the only place the problem is visible; by the time a calculator reads the file, the
+        // corruption looks like data.
+        assert!(
+            !row.iter().any(|field| field.contains(',')),
+            "a field contains a comma and this writer does not quote: {row:?}"
+        );
         out.push_str(&row.join(","));
         out.push('\n');
     }
@@ -3389,6 +3399,7 @@ pub const REBUILT: &[&str] = &[
     F33_FIXTURE,
     F33_DISTRICTS_FIXTURE,
     F33_OHIO_PANEL_FIXTURE,
+    MR81_FIXTURE,
     CROSSWALK_FIXTURE,
     STATUTE_FIXTURE,
     ENACTED_FIXTURE,
@@ -3434,4 +3445,178 @@ pub fn decided_on(body: &str) -> String {
         .or_else(|| rest.find('\n'))
         .unwrap_or(rest.len());
     rest[..end].trim().to_string()
+}
+
+// -------------------------------------------------------------------------------------------
+// MR-81 child nutrition
+// -------------------------------------------------------------------------------------------
+
+/// Where the MR-81 sponsor panel is written, relative to the repository root.
+pub const MR81_FIXTURE: &str = "crates/dispersion/fixtures/mr81-sponsor-panel.csv";
+
+/// Columns of the MR-81 sponsor panel.
+pub const MR81_HEADER: &[&str] = &[
+    "fiscal_year",
+    "sponsor_irn",
+    "sponsor_name",
+    "county",
+    "sponsor_type",
+    "sites",
+    "enrollment",
+    "enrollment_basis",
+    "free_lunch",
+    "reduced_lunch",
+];
+
+/// One sponsor's running totals while its school sites are being summed.
+#[derive(Debug, Default)]
+struct SponsorTotal {
+    name: String,
+    county: String,
+    kind: String,
+    sites: usize,
+    enrollment: i64,
+    free: i64,
+    reduced: i64,
+}
+
+/// One year of the MR-81 report, paired with the October it counts.
+#[derive(Debug, Clone, Copy)]
+pub struct Mr81Year<'a> {
+    /// The October the report counts.
+    pub year: u16,
+    /// The delimited file's text.
+    pub report: &'a str,
+}
+
+/// Sponsors across every October of MR-81 this repository holds, aggregated from school sites.
+///
+/// # What this is, and what the catalog said it was
+///
+/// MR-81 is the Office for Child Nutrition's free and reduced-price lunch report, one row per
+/// school site grouped by sponsor. It is not an enrollment archive; it carries an enrollment
+/// column because a lunch claim needs a denominator. Its value here is the **free and
+/// reduced-price counts**, which are the closest available long series of the measure Ohio's
+/// disadvantaged pupil funding is paid on — R.C. 3317.03(B)(21) hands the definition of
+/// "economically disadvantaged" to the department, and free-lunch eligibility has been the
+/// department's operative test.
+///
+/// # The rename in 2010 is a definitional change and is carried on the row
+///
+/// Through FY2009 the column is `AdmCount`. From FY2010 it is `CECount`, and the report's own
+/// header defines CE as the *"highest daily number of students with access to the program"* —
+/// not average daily membership and not the same quantity. Both are emitted, with
+/// `enrollment_basis` saying which, so a consumer that splices them does so knowingly. A reader
+/// resolving columns by position would not have noticed.
+///
+/// # Sponsors are not districts
+///
+/// `SponsorType` is carried rather than filtered on. "Public" includes county boards of
+/// developmental disabilities and community schools alongside traditional districts, and the
+/// report also covers non-public schools, residential child care institutions and camps.
+/// Deciding which sponsors are districts needs a join this function does not have; emitting the
+/// type lets the consumer draw the line and lets a test count what was drawn.
+///
+/// # Errors
+///
+/// Returns the missing column's name if any year's layout has moved.
+pub fn build_mr81(years: &[Mr81Year<'_>]) -> Result<Vec<Vec<String>>, String> {
+    // Sponsor totals, keyed so the output is stable without a sort: year then IRN.
+    let mut totals: BTreeMap<(u16, String), SponsorTotal> = BTreeMap::new();
+    let mut basis: BTreeMap<u16, &'static str> = BTreeMap::new();
+
+    for year in years {
+        let label = format!("the MR-81 report for October {}", year.year);
+        let mut lines = year.report.lines();
+        let header_line = lines.next().unwrap_or_default();
+        // 2001 is comma-delimited and every later year is tab. Sniffed rather than tabulated,
+        // because the delimiter is visible in the file and a table is another thing to maintain.
+        let delimiter = if header_line.contains('\t') {
+            '\t'
+        } else {
+            ','
+        };
+        let head = delimited_fields(header_line, delimiter);
+        let at = |name: &str| column(&head, name, &label);
+
+        let (county, irn, name, kind) = (
+            at("County")?,
+            at("SponsorIRN")?,
+            at("SponsorName")?,
+            at("SponsorType")?,
+        );
+        let free = at("FreeLunchApps")?;
+        let reduced = at("RedLunchApps")?;
+        // The rename is the whole reason this is resolved by name and recorded on the row.
+        let (enrolment, which) = match at("AdmCount") {
+            Ok(i) => (i, "adm"),
+            Err(_) => (at("CECount")?, "ce"),
+        };
+        basis.insert(year.year, which);
+
+        let mut sites = 0usize;
+        for line in lines {
+            if line.trim().is_empty() {
+                continue;
+            }
+            let f = delimited_fields(line, delimiter);
+            let field = |i: usize| f.get(i).map(|v| v.trim()).unwrap_or_default();
+            let number = |i: usize| field(i).parse::<i64>().unwrap_or(0);
+
+            // Zero-padded to six, because the years disagree: FY2004 writes `00043786` and
+            // FY2005 writes `43786` for Cleveland. Joining the panel to itself across years — or
+            // to anything else in this repository, which uses the padded form — silently matches
+            // nothing for whichever half is written the other way.
+            let key = field(irn).trim_start_matches('0').to_string();
+            if key.is_empty() {
+                continue;
+            }
+            let key = format!("{key:0>6}");
+            // `write_csv` does not quote and every consumer splits on the comma, so a sponsor
+            // called "Edge Academy, The" would shift its own row's remaining columns. Ninety-nine
+            // rows were written that way before the writer learned to refuse them. Substituted
+            // rather than dropped, because the name is how a reader recognises the sponsor and
+            // the IRN beside it is the key anything joins on.
+            let text = |i: usize| field(i).replace(',', ";");
+            let entry = totals
+                .entry((year.year, key))
+                .or_insert_with(|| SponsorTotal {
+                    name: text(name),
+                    county: text(county),
+                    kind: text(kind),
+                    ..SponsorTotal::default()
+                });
+            entry.sites += 1;
+            entry.enrollment += number(enrolment);
+            entry.free += number(free);
+            entry.reduced += number(reduced);
+            sites += 1;
+        }
+
+        if sites < 2000 {
+            return Err(format!(
+                "October {} yielded {sites} sites; the report has never carried fewer than 3,000, \
+                 so the delimiter or the layout is wrong",
+                year.year
+            ));
+        }
+    }
+
+    Ok(totals
+        .into_iter()
+        .map(|((year, irn), t)| {
+            vec![
+                year.to_string(),
+                irn,
+                t.name,
+                t.county,
+                t.kind,
+                t.sites.to_string(),
+                t.enrollment.to_string(),
+                (*basis.get(&year).unwrap_or(&"adm")).to_string(),
+                t.free.to_string(),
+                t.reduced.to_string(),
+            ]
+        })
+        .collect())
 }

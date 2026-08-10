@@ -1,4 +1,33 @@
 class: formula-component
+findings: |
+  **THE COUNT THIS IS PAID ON HAS A ELEVEN-YEAR HISTORY, AND IT NEARLY DOUBLED.** R.C.
+  3317.03(B)(21) hands the *definition* of "economically disadvantaged" to the department,
+  constrained only by "shall not be categorically excluded … based on anything other than family
+  income" — and the department's operative test has been free and reduced-price lunch
+  eligibility. The Office for Child Nutrition published that count every October, and over Public
+  sponsors it runs: [verified — `dispersion::mr81`, pinned by test]
+
+      2001  27.7%      2005  29.9%      2009  42.6%
+      2002  31.2%      2006  36.7%      2010  44.9%   (denominator redefined)
+      2003  33.0%      2007  36.5%      2011  46.3%
+      2004  33.7%      2008  39.5%
+
+  **18.6 points in eleven years**, most of it before the 2008 recession rather than after. What
+  the state pays per disadvantaged pupil is legislated — $422 — and *how many* pupils qualify is
+  delegated and has been rising steeply. A weight on a count whose definition one party sets and
+  whose size neither controls is a different fiscal instrument from a weight on a fixed
+  population, and the corpus had no way to see that before this series.
+
+  Three cautions travel with it. The denominator is renamed and redefined in 2010, `AdmCount` to
+  `CECount`, so the last two points are not on the same base as the first nine. Sponsors are not
+  districts — "Public" includes community schools and county boards of developmental disabilities.
+  And the series stops in 2011, because from 2012 the report's Traditional file excludes
+  Community Eligibility sponsors, which are precisely the highest-poverty districts. [verified]
+
+  Whether the department's current economically-disadvantaged count still tracks free-lunch
+  eligibility, after Community Eligibility made universal free meals available to whole districts,
+  is not established here and is the question that decides whether this series connects to the
+  present. [open]
 label: FSFP Disadvantaged Pupil Impact Aid
 description: |
   **$525m**, and the only one of the six whose mechanism is neither a weight times a count nor an
