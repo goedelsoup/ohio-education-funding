@@ -13,16 +13,20 @@ mechanism, and exemplars rather than bulk facts, so the per-agency-year numbers 
 files and are queried through this layer. A corpus node cites a series; it does not restate
 it.
 
-**Connectors** adapt the primary publishers of Ohio funding data. All nine approved at genesis
-now live in one crate, [`connect`](connect/), as a registry whose status is checked by a test
-rather than asserted in a README. Six are wired — `dew-foundation`, `dew-report-card`,
-`dew-five-year-forecast` and `bls-cpi`, plus `tax-abstract`, which was declared for twelve
-phases behind a blocker that turned out to be wrong, and `census-f33`, whose blocker was
-likewise stale: the legacy workbook reader it was waiting for had been in the tree for phases.
-Five are declared with a recorded reason, and every one of those five is blocked on a PDF or on
-the absence of a bulk export rather than on anything this repository can build. See
-[`connect/README.md`](connect/README.md) for the table and
-[`connect/sources/`](connect/sources/) for what each is for.
+**Connectors** adapt the primary publishers of Ohio funding data. All of them live in one crate,
+[`connect`](connect/), as a registry whose status is checked by a test rather than asserted in a
+README — and the table is now generated from that registry, because this paragraph is where the
+count last went stale. Nine were approved at genesis and four since; most are wired, two are not,
+and three more are wired for only part of what they feed and say so in a field rather than in
+prose. The counts, the blockers and the gaps are in
+[`connect/README.md`](connect/README.md); [`connect/sources/`](connect/sources/) says what each
+one is for.
+
+The two that are blocked are worth naming here, because they bound what the rest of this
+workspace can compute. `dew-payment-reports` would carry the voucher and community-school
+deduction per resident district, and sits behind the department's authenticated reports portal;
+`ofcc-projects` is the whole capital channel, and its publisher serves interactive maps to a
+browser and a 404 to anything that identifies itself.
 
 **Calculators** are pure, deterministic, and the reason parameters are first-class nodes:
 
@@ -52,16 +56,18 @@ are funded directly rather than deducted. What is missing is the per-agency part
 it would read. Until that exists, the 609 districts every calculator here covers are the
 traditional districts in the department's own model, and the voucher channel is outside all of it.
 
-A semantic index over `.yidam/corpus/` is not built at genesis — 45 nodes fit in context.
-It is added when the corpus outgrows direct retrieval, which the exemplar-agency expansion
-will force before anything else does.
+A semantic index over `.yidam/corpus/` is not built: the corpus still fits in context. It is
+added when direct retrieval stops working, which the exemplar-agency expansion will force before
+anything else does. The node count lives in the generated block at the bottom of this file rather
+than in this sentence, where it was wrong by twenty-nine.
 
 ## Workspace
 
 The Rust workspace root is [`Cargo.toml`](Cargo.toml) in this directory, so all Rust lives
 under `crates/` and the repository root stays free of build configuration. Every directory here
 is now a real crate; the nine connector stubs were folded into [`connect`](connect/) and their
-prose kept at [`connect/sources/`](connect/sources/).
+prose kept at [`connect/sources/`](connect/sources/), where the four connectors approved since
+have not yet joined them.
 
 **No external dependencies.** Every crate is pure `std` — including the XLSX reader, which
 means a zip reader, a DEFLATE decompressor, and an XML parser written here rather than pulled
@@ -71,9 +77,11 @@ dependency resolution succeeding first; and it means the *refresh* path keeps wo
 which matters more — an extraction pipeline that will not run is a corpus that cannot be
 updated.
 
-Two system binaries are used, both named where they are used and neither needed to build or
-compute: **curl** for HTTPS, and **LibreOffice** for the one source still published in the
-pre-2007 `.xls` format.
+One system binary is used, named where it is used and not needed to build or compute: **curl**,
+for HTTPS. TLS is the one thing in this pipeline that should not be hand-written next to a
+DEFLATE decoder. LibreOffice was the second until [`spreadsheet`](spreadsheet/) learned to read
+the pre-2007 `.xls` format natively, so `rebuild` now regenerates every committed fixture from a
+checkout with no external converter.
 
 | Crate | Kind | Status |
 |---|---|---|
@@ -81,7 +89,7 @@ pre-2007 `.xls` format.
 | [`spreadsheet`](spreadsheet/) | reader | inflate, zip, XML, XLSX — no dependencies |
 | [`connect`](connect/) | connectors | registry, cache, digests, fixture builders |
 | [`deflate`](deflate/) | calculator | implemented; series verified against BLS |
-| [`local-capacity`](local-capacity/) | calculator | FSFP side implemented; charge-off side not |
+| [`local-capacity`](local-capacity/) | calculator | the FSFP capacity measure; the charge-off it replaced is in [`regime-diff`](regime-diff/) |
 | [`foundation`](foundation/) | calculator | full base cost build-up; verified to the cent |
 | [`millage`](millage/) | calculator | implemented; verified on 606 real districts |
 | [`dispersion`](dispersion/) | calculator | dispersion, correlation, partial, OLS |
@@ -129,7 +137,7 @@ Fields per crate: name, capability type (connector/calculator/feature-engineerin
 | Crate | Description | `#[test]` fns |
 |---|---|--:|
 | [`bundle`](bundle/) | Export a versioned JSON feed of the corpus's district-level findings for the web layer | 25 |
-| [`connect`](connect/) | Retrieval and extraction: the department's publications into committed fixtures | 94 |
+| [`connect`](connect/) | Retrieval and extraction: the department's publications into committed fixtures | 97 |
 | [`deflate`](deflate/) | Convert nominal Ohio school finance figures to constant dollars, fiscal-year aligned | 11 |
 | [`dispersion`](dispersion/) | School finance equity statistics: dispersion and wealth neutrality across agencies | 82 |
 | [`edfund-core`](edfund-core/) | Shared domain types for the Ohio education funding computer | 7 |
@@ -141,7 +149,7 @@ Fields per crate: name, capability type (connector/calculator/feature-engineerin
 | [`scenario-delta`](scenario-delta/) | Winners and losers between two funding runs, with incidence and the off-formula count | 25 |
 | [`spreadsheet`](spreadsheet/) | Read the department's published workbooks with no dependencies | 70 |
 
-12 crates, 611 test functions, no crates.io dependencies. `cargo test` reports a different total: it adds doc-tests and counts each integration binary separately.
+12 crates, 614 test functions, no crates.io dependencies. `cargo test` reports a different total: it adds doc-tests and counts each integration binary separately.
 <!-- /REGEN -->
 
 ## Index status
@@ -151,5 +159,5 @@ Regenerated by: `yidam index-status`
 Fields: index backend, embedding model, indexed node count, freshness (HEAD vs last
         indexed commit), stale node count, retrieval latency (p50/p95 last benchmark).
 -->
-No semantic index is built. The corpus is 58 nodes and fits in context; an index is added when direct retrieval stops working, which has not happened.
+No semantic index is built. The corpus is 74 nodes and fits in context; an index is added when direct retrieval stops working, which has not happened.
 <!-- /REGEN -->

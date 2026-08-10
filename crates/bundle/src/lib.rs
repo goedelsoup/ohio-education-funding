@@ -1033,7 +1033,7 @@ impl District {
             .is_some_and(|m| m <= floor + FLOOR_TOLERANCE)
     }
 
-    /// Above the floor, but by less than [`NEAR_FLOOR_BAND`] — where the binary stops meaning
+    /// Above the floor, but by less than `NEAR_FLOOR_BAND` — where the binary stops meaning
     /// anything.
     ///
     /// The site calls floor status the highest-leverage single fact about a district's local

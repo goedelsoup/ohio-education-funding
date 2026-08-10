@@ -12,10 +12,19 @@
 //!
 //! # What is not generated, and why
 //!
-//! Two of the seven blocks described things that do not exist: a semantic index over the corpus
-//! (never built — the corpus fits in context) and a deployment (no target chosen). Those are
-//! replaced with a sentence saying so. Generating a plausible-looking status for a system that
-//! is not there would be worse than the empty block was.
+//! One block describes a thing that does not exist: a semantic index over the corpus, never built
+//! because the corpus fits in context. It is replaced with a sentence saying so. Generating a
+//! plausible-looking status for a system that is not there would be worse than the empty block
+//! was — but the sentence still counts the corpus, because a status that is a string literal
+//! regenerates to itself and can therefore be wrong forever. It was, by sixteen nodes.
+//!
+//! # Prose is where this drifts now
+//!
+//! The blocks are safe and the paragraphs beside them are not. `crates/connect/README.md` carried
+//! a hand-written connector table claiming nine connectors and three wired while the registry held
+//! thirteen and eleven; `crates/README.md` described the same nine in prose. Neither was reachable
+//! by the guard, because the guard reads markers. The table is now a `connector-registry` block,
+//! generated from [`crate::registry::CONNECTORS`] itself.
 
 use std::collections::BTreeMap;
 use std::fs;
@@ -58,6 +67,7 @@ impl From<io::Error> for IndexError {
 /// A README carrying at least one block.
 pub const DOCUMENTS: &[&str] = &[
     "crates/README.md",
+    "crates/connect/README.md",
     "web/README.md",
     "agents/README.md",
     ".yidam/corpus/README.md",
@@ -322,6 +332,112 @@ fn markdown_index(root: &Path, directory: &str, heading: &str) -> String {
     out
 }
 
+/// The connector table, from [`crate::registry::CONNECTORS`] rather than from memory.
+///
+/// This block exists because the hand-written table it replaced said nine connectors, three of
+/// them wired, at a point when the registry held thirteen and eleven. It had gone stale in every
+/// direction at once: `census-f33` was described as having no parser while feeding a 10,739-row
+/// panel, and `lsc-budget`, `ohio-laws` and `ohio-courts` were all listed `declared` after the
+/// phases that wired them. Nothing caught it, because the guard that keeps generated blocks
+/// current does not reach prose, and this was prose.
+///
+/// Every cell is a field. Nothing here is parsed out of a `note`: that is the mistake the
+/// DeRolph titles made, where rewording a comment silently rewrote committed data. The notes stay
+/// in the registry and the long form stays in `sources/`, both linked, neither transcribed.
+fn connector_registry(root: &Path) -> String {
+    use crate::registry::{Status, CONNECTORS};
+
+    let mut out = String::from("| Connector | Status | Sources | Feeds |\n|---|---|--:|---|\n");
+    let mut undocumented = Vec::new();
+    for connector in CONNECTORS {
+        let key = connector.key;
+        // Linked only when the long form is actually there. Ten of the thirteen have one — the
+        // three added after the original stubs never did — and a link to a file that does not
+        // exist would be a worse claim than no link.
+        let long_form = format!("crates/connect/sources/{key}.md");
+        let name = if root.join(&long_form).exists() {
+            format!("[`{key}`](sources/{key}.md)")
+        } else {
+            undocumented.push(key);
+            format!("`{key}`")
+        };
+        let status = match connector.status {
+            Status::Wired {
+                still_blocked: None,
+            } => "**wired**".to_string(),
+            Status::Wired { .. } => "**wired**, in part".to_string(),
+            other => other.label().to_string(),
+        };
+        out.push_str(&format!(
+            "| {name} | {status} | {} | {} |\n",
+            connector.sources.len(),
+            connector.feeds.join(", ")
+        ));
+    }
+
+    let wired = CONNECTORS.iter().filter(|c| c.status.is_wired()).count();
+    let partial = CONNECTORS
+        .iter()
+        .filter(|c| {
+            matches!(
+                c.status,
+                Status::Wired {
+                    still_blocked: Some(_)
+                }
+            )
+        })
+        .count();
+    let sources: usize = CONNECTORS.iter().map(|c| c.sources.len()).sum();
+    out.push_str(&format!(
+        "\n{} connectors, {sources} sources between them. {wired} are wired and {} are not; \
+         {partial} of the wired ones reach only part of what they feed, and say so below.\n",
+        CONNECTORS.len(),
+        CONNECTORS.len() - wired,
+    ));
+
+    // Verbatim, because these strings are the thing a test checks for existence and length. A
+    // summary of a blocker is how the last four stale ones survived being read.
+    out.push_str("\n**What is blocked, in the registry's own words.**\n\n");
+    for connector in CONNECTORS {
+        let (kind, reason) = match connector.status {
+            Status::Declared { blocked_on } => ("blocked on", blocked_on),
+            Status::Wired {
+                still_blocked: Some(reason),
+            } => ("still blocked on", reason),
+            _ => continue,
+        };
+        out.push_str(&format!("- `{}` — {kind}: {reason}\n", connector.key));
+    }
+
+    if !undocumented.is_empty() {
+        out.push_str(&format!(
+            "\n{} of them have no long form in [`sources/`](sources/): {}. Those are the \
+             connectors added after the original nine stubs, whose prose was never written — the \
+             decision record is the only account of why each exists.\n",
+            undocumented.len(),
+            undocumented
+                .iter()
+                .map(|key| format!("`{key}`"))
+                .collect::<Vec<_>>()
+                .join(", ")
+        ));
+    }
+    out
+}
+
+/// Why there is no semantic index, and how much corpus there is to not index.
+///
+/// The node count used to be the literal `58` returned from this function, which is how it came
+/// to sit nine lines below a generated block reading 74 and survive every CI run: regenerating a
+/// constant produces no diff. A status block that cannot go stale is one that measures something.
+fn index_status(root: &Path) -> String {
+    format!(
+        "No semantic index is built. The corpus is {} nodes and fits in context; an index is \
+         added when direct retrieval stops working, which has not happened.\n",
+        corpus_nodes(root).len()
+    )
+}
+
 fn bundle_status(root: &Path) -> String {
     let feed = read(root, "web/public/data/bundle.json");
     let version = feed
@@ -368,12 +484,10 @@ fn generate(command: &str, root: &Path) -> Option<String> {
         "yidam skills-index" => markdown_index(root, ".yidam/skills", "Skill"),
         "yidam agents-index" => markdown_index(root, "agents", "Agent"),
         "yidam bundle-status" => bundle_status(root),
-        // Both describe systems this repository does not have. Saying so beats an empty block
-        // and beats a fabricated status.
-        "yidam index-status" => "No semantic index is built. The corpus is 58 nodes and fits in \
-             context; an index is added when direct retrieval stops working, which has not \
-             happened.\n"
-            .to_string(),
+        "yidam connector-registry" => connector_registry(root),
+        // Describes a system this repository does not have. Saying so beats an empty block and
+        // beats a fabricated status — but the sentence still has to count what it counts.
+        "yidam index-status" => index_status(root),
         _ => return None,
     })
 }
@@ -511,6 +625,67 @@ mod tests {
     fn a_status_for_a_system_that_does_not_exist_says_so() {
         let text = generate("yidam index-status", &repository_root()).unwrap();
         assert!(text.contains("No semantic index is built"));
+    }
+
+    #[test]
+    fn the_index_status_counts_the_corpus_rather_than_remembering_it() {
+        // The defect: this sentence was a literal, so it regenerated to itself and rendered nine
+        // lines below a computed block that disagreed with it. Asserting against the same node
+        // walk the corpus index uses is the only version of this test that can fail when it
+        // should — a literal here would restore exactly what went wrong.
+        let root = repository_root();
+        let nodes = corpus_nodes(&root).len();
+        assert!(
+            index_status(&root).contains(&format!("is {nodes} nodes")),
+            "the status and the corpus disagree"
+        );
+        assert!(
+            corpus_index(&root).contains(&format!("\n{nodes} nodes across")),
+            "the two blocks in .yidam/corpus/README.md count differently"
+        );
+    }
+
+    #[test]
+    fn the_connector_table_reports_every_connector_and_its_real_status() {
+        let table = connector_registry(&repository_root());
+        for connector in crate::registry::CONNECTORS {
+            assert!(
+                table.contains(&format!("`{}`", connector.key)),
+                "{} is missing from the table",
+                connector.key
+            );
+        }
+        let wired = crate::registry::CONNECTORS
+            .iter()
+            .filter(|c| c.status.is_wired())
+            .count();
+        assert!(
+            table.contains(&format!("{wired} are wired")),
+            "the count and the registry disagree: {table}"
+        );
+    }
+
+    #[test]
+    fn every_blocker_reaches_the_page_verbatim() {
+        // A blocker that is summarised is a blocker nobody rechecks. Four of them sat stale for
+        // twelve phases behind prose that read plausibly, so the string a test guards for length
+        // is the string the reader gets.
+        use crate::registry::Status;
+        let table = connector_registry(&repository_root());
+        for connector in crate::registry::CONNECTORS {
+            let reason = match connector.status {
+                Status::Declared { blocked_on } => blocked_on,
+                Status::Wired {
+                    still_blocked: Some(reason),
+                } => reason,
+                _ => continue,
+            };
+            assert!(
+                table.contains(reason),
+                "{}'s blocker is not on the page",
+                connector.key
+            );
+        }
     }
 
     #[test]
