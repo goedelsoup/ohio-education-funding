@@ -86,6 +86,13 @@ jobs:
       - name: build
         run: pnpm build
 
+      # Asks of the built HTML what the route-table test structurally cannot ask of the route
+      # table: is there an anchor here a static host cannot serve? Forty relative hrefs shipped
+      # while that suite was green. Must follow `build` — scanning a stale `dist/` reports on the
+      # previous commit.
+      - name: dist links
+        run: pnpm check:dist
+
       - name: Install the browser
         run: pnpm exec playwright install --with-deps chromium
 
