@@ -33,7 +33,7 @@ Fields per connector: key, status, source count, corpus classes fed; then every 
 | Connector | Status | Sources | Feeds |
 |---|---|--:|---|
 | [`dew-foundation`](sources/dew-foundation.md) | **wired** | 3 | education-agency, revenue-stream, metric, program |
-| `dew-report-card` | **wired** | 5 | metric, education-agency |
+| `dew-report-card` | **wired** | 7 | metric, education-agency |
 | [`bls-cpi`](sources/bls-cpi.md) | **wired** | 1 | metric, fiscal-period |
 | `dew-five-year-forecast` | **wired** | 2 | education-agency, revenue-stream, metric, fiscal-period |
 | [`tax-abstract`](sources/tax-abstract.md) | **wired** | 4 | revenue-stream, parameter, metric |
@@ -47,7 +47,7 @@ Fields per connector: key, status, source count, corpus classes fed; then every 
 | `census-geography` | **wired** | 4 | education-agency, actor |
 | `dew-child-nutrition` | **wired**, in part | 11 | education-agency, metric, formula-component |
 
-14 connectors, 71 sources between them. 12 are wired and 2 are not; 4 of the wired ones reach only part of what they feed, and say so below.
+14 connectors, 73 sources between them. 12 are wired and 2 are not; 4 of the wired ones reach only part of what they feed, and say so below.
 
 **What is blocked, in the registry's own words.**
 

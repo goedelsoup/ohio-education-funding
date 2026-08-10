@@ -1,8 +1,10 @@
 # SHA-256 and byte length of the exact published files the committed fixtures were
 # built from. Regenerate with `edfund-connect verify --write`. A changed digest means
 # the publication was revised: rebuild, read the diff, and say so in the commit.
+6cd3a25c20359e94530aabbfd79e773da464a20cefb1182df614130472fdaa45  1512845  achievement-building-2425
 6191a1f038f9464d9bb8e45bc35e252cdf2a374c33126918088c6537912c4482  386169  achievement-district-2425
 c2b0b18a5a5230572e7ca9a73ca3a0bcbab6e2ffb83505230f614cc23641c1c5  4306406  baf-2020-oh
+1f85a8de6fc51487e411d7d2261daf1c7b792b678e1f931d4b798d14b2d92e94  1864978  building-details-2425
 3f417db2c5f362504e6c1ce35d92ebae7b53373fb9a1dc2057eebb1941ff38fd  2693547  ccd-lea-directory-2223
 c939b099e168560facac86c0bd7acf040620bb9e177a67109225ea54c56e8b07  2683417  cpi-u-all-items
 56eb763ab23d2c0a4a1b906370cb5101915af7e049fd337f6e0f1806bd938377  1049576  cupp-fy24

@@ -540,6 +540,36 @@ pub const CONNECTORS: &[Connector] = &[
                        is NOT the Cupp Report's measure.",
             },
             Source {
+                key: "achievement-building-2425",
+                title: None,
+                url: "https://reportcardstorage.education.ohio.gov/data-download-2025/\
+                      24-25_Achievement_Building.xlsx?sv=2020-08-04&ss=b&srt=sco&sp=rlx\
+                      &se=2031-07-28T05:10:18Z&st=2021-07-27T21:10:18Z&spr=https\
+                      &sig=nPOvW%2Br2caitHi%2F8WhYwU7xqalHo0dFrudeJq%2B%2Bmyuo%3D",
+                filename: "achievement-building-2425.xlsx",
+                format: Format::Xlsx,
+                catalog: Some("dew-report-card-achievement"),
+                fixtures: &[crate::fixtures::BUILDING_FIXTURE],
+                note: "The same achievement file at building grain. ESSA identifies schools, not \
+                       districts, and R.C. 3302.12 attaches its intervention to a building — so \
+                       this is the file the accountability half of the corpus needs and the \
+                       district one cannot substitute for.",
+            },
+            Source {
+                key: "building-details-2425",
+                title: None,
+                url: "https://reportcardstorage.education.ohio.gov/data-download-2025/\
+                      2025_Building_Details.xlsx?sv=2020-08-04&ss=b&srt=sco&sp=rlx\
+                      &se=2031-07-28T05:10:18Z&st=2021-07-27T21:10:18Z&spr=https\
+                      &sig=nPOvW%2Br2caitHi%2F8WhYwU7xqalHo0dFrudeJq%2B%2Bmyuo%3D",
+                filename: "building-details-2425.xlsx",
+                format: Format::Xlsx,
+                catalog: Some("dew-report-card-district-details"),
+                fixtures: &[crate::fixtures::BUILDING_FIXTURE],
+                note: "Building enrolment, subgroup shares and the district each building belongs \
+                       to — the join that makes a school node reachable from its agency.",
+            },
+            Source {
                 key: "expanded-list-fy25",
                 title: None,
                 url: "https://reportcardstorage.education.ohio.gov/data-download-2025/\
