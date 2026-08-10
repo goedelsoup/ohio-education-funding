@@ -59,7 +59,7 @@ impl FiscalYear {
     /// Ohio biennia begin in odd-numbered fiscal years: FY2022-23, FY2024-25, FY2026-27.
     #[must_use]
     pub const fn biennium_start(self) -> FiscalYear {
-        if self.0 % 2 == 0 {
+        if self.0.is_multiple_of(2) {
             self
         } else {
             FiscalYear(self.0 - 1)

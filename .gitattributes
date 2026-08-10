@@ -1,0 +1,20 @@
+# What GitHub counts as this repository's source, and what it collapses in a diff.
+#
+# `.yidam` is the knowledge base the computer is written around — the corpus, the
+# catalog, the decisions, and under `.vendor` the yidam framework itself. It is
+# several hundred committed files and all of it is prose. Left unmarked it
+# outweighs everything else and the language bar reads as Markdown, which
+# describes the repository as a document rather than as the funding calculator the
+# crates and the site actually make it.
+#
+# `linguist-vendored` excludes a path from the language statistics and collapses it
+# by default in a pull request diff. It does not affect the build, and nothing in
+# `crates` or `web` reads these files at compile time — the corpus is linked from
+# rustdoc by relative path and parsed by the site at build time from its committed
+# form, both of which are unchanged by an attribute.
+.yidam/** linguist-vendored
+
+# Redundant under the line above, which already matches it, but `.vendor` is the
+# one part of `.yidam` that is genuinely someone else's work rather than this
+# project's own, and naming it is the point.
+.yidam/.vendor/** linguist-vendored

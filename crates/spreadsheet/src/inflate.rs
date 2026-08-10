@@ -289,15 +289,17 @@ impl Huffman {
             if len as u32 > FAST_BITS {
                 continue;
             }
-            let mut next = code;
-            for &symbol in &symbols[offsets[len]..offsets[len] + counts[len] as usize] {
+            // Successive symbols of a given length take successive codes, so the code for each
+            // is `code` plus its offset into the run.
+            for (next, &symbol) in
+                (code..).zip(&symbols[offsets[len]..offsets[len] + counts[len] as usize])
+            {
                 let entry = ((len as u16) << 12) | symbol;
                 let mut index = reverse_bits(next, len as u32) as usize;
                 while index < (1 << FAST_BITS) {
                     fast[index] = entry;
                     index += 1 << len;
                 }
-                next += 1;
             }
         }
 

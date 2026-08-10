@@ -13,7 +13,7 @@ use crate::biff::{BiffError, Workbook as LegacyWorkbook};
 use crate::xlsx::{Workbook as ModernWorkbook, XlsxError};
 
 /// The two magic numbers worth recognising.
-const ZIP: [u8; 2] = [b'P', b'K'];
+const ZIP: [u8; 2] = *b"PK";
 const OLE2: [u8; 8] = [0xD0, 0xCF, 0x11, 0xE0, 0xA1, 0xB1, 0x1A, 0xE1];
 
 /// A workbook that could not be opened.
