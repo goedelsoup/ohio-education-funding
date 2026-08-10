@@ -4,20 +4,24 @@ Domain-specific skills available to agents in this repository. Generic skills in
 from yidam live in [`.vendor/prelude/skills/`](../.vendor/prelude/skills/); skills that
 require knowledge of this domain's corpus or toolkit live here.
 
-The repeatable procedures this domain implies:
+**Two kinds live here.** A *calculator* skill describes one crate: what it computes, what it
+reads, what it returns. A *procedure* skill composes several of them into a repeatable traversal,
+and is mostly about the order and the refusals — the calculators are correct in isolation and the
+mistakes happen between them.
 
-- **formula-walk** — decomposes one agency-year funding figure into the components and
-  parameter values that produced it
-- **parameter-history** — assembles the value series for a parameter across fiscal periods
-  and names the bill that set each value
-- **scenario-run** — perturbs a parameter set, invokes the simulator, and writes the result
-  as a `scenario` node with inputs, deltas, and provenance
-- **real-dollar** — normalizes a nominal series so figures from different fiscal periods can
-  be compared; mandatory before any cross-era claim
-- **provenance-trace** — follows a numeric claim from a corpus node back to its catalog entry
-  and the underlying publication
+The five procedures:
 
-Skills are written when a phase makes the procedure concrete, not preemptively.
+- **[formula-walk](formula-walk.md)** — decomposes one agency-year figure into the components and
+  parameter values that produced it, reconciling to the published total before attributing
+  anything
+- **[parameter-history](parameter-history.md)** — assembles a parameter's value series and names
+  the authority behind each value, having first established what kind of thing sets it
+- **[scenario-run](scenario-run.md)** — perturbs a parameter set, runs baseline against perturbed,
+  and writes the result as a `scenario` node with its reach and incidence
+- **[real-dollar](real-dollar.md)** — normalizes a nominal series; mandatory before any cross-era
+  claim, because H.B. 920 shows the opposite of its effect in nominal terms
+- **[provenance-trace](provenance-trace.md)** — follows a numeric claim from a node to its catalog
+  entry, the published file, and the digest pinning the bytes it was read from
 
 ## Registry
 
@@ -30,12 +34,17 @@ Fields per skill: filename, name, description, agents that invoke it.
 | [`deduction`](deduction.md) | Compute community school and scholarship diversions against a resident district by program and fiscal year |
 | [`deflate`](deflate.md) | Convert a nominal dollar series to constant dollars using a fiscal-year-aligned index; required before any cross-period comparison in this corpus |
 | [`dispersion`](dispersion.md) | Compute equity statistics across Ohio education agencies for a fiscal period — coefficient of variation, McLoone and Verstegen indices, federal range ratio, wealth neutrality |
+| [`formula-walk`](formula-walk.md) | Decompose one agency-year funding figure into the components and parameter values that produced it, reconciling to the published total before attributing anything |
 | [`foundation`](foundation.md) | Re-run a named Ohio funding regime for a fiscal period against a parameter set, returning per-agency aid broken out by component |
 | [`local-capacity`](local-capacity.md) | Compute an agency's local wealth position and state share under either the charge-off mechanism or the FSFP capacity measure |
 | [`millage`](millage.md) | Compute effective operating millage under HB 920 reduction factors and determine 20-mill floor status for an agency and tax year |
+| [`parameter-history`](parameter-history.md) | Assemble a parameter's value series across fiscal periods, naming the enactment behind each value and the kind of thing that sets it |
 | [`project`](project.md) | Forward-project per-agency enrollment, assessed valuation, and revenue series with uncertainty intervals, as inputs to scenario runs |
+| [`provenance-trace`](provenance-trace.md) | Follow a numeric claim from a corpus node back to its catalog entry, the published file, and the digest that pins the bytes it was read from |
+| [`real-dollar`](real-dollar.md) | Normalize a nominal Ohio funding series to constant dollars before any cross-period comparison; mandatory, not optional |
 | [`regime-diff`](regime-diff.md) | Difference two funding regimes at component level for the same agency-year, attributing the change to specific mechanisms rather than reporting a net total |
 | [`scenario-delta`](scenario-delta.md) | Produce the per-agency winners-and-losers table between a baseline run and a perturbed run, with incidence across wealth and state share |
+| [`scenario-run`](scenario-run.md) | Perturb a parameter set, run baseline against perturbed, and commit the result as a scenario node with its reach, incidence, and provenance |
 <!-- /REGEN -->
 
 ## Inherited from prelude
