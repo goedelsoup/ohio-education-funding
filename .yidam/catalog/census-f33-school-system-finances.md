@@ -59,16 +59,25 @@ in different states. It admits everything that teaches somebody and excludes the
 that would double count: 691 education service agencies, whose revenue arrives *from* the
 districts they serve, and 121 nonoperating systems, which levy tax and pay tuition elsewhere.
 
-**The per-district panel is not extracted.** The survey identifies districts by NCESID and this
-corpus keys on IRN, and no crosswalk between them is held here. That blocks the second use the
-connector was declared for — an independent federal check on the department's own per-district
-figures — and it is a retrieval problem rather than a parsing one.
-
 **FY2022 is the peak of federal pandemic relief.** The federal share is inflated and the state
 and local shares correspondingly deflated. Every finding above therefore understates Ohio's local
-reliance rather than overstating it, which is the safe direction, but a series across years would
-need the relief years marked. One year per file and the layout is not stable across them, so the
-column map is per-era.
+reliance rather than overstating it, which is the safe direction.
+
+**And the series across years now exists, with the relief years marked.** Ten years of the survey
+are held for Ohio — FY2012, FY2013 and FY2015 through FY2022 — in
+[`f33-ohio-panel.csv`](../../crates/dispersion/fixtures/f33-ohio-panel.csv), read by
+`dispersion::ohio_panel`. Two federal spikes fall inside the window and both must be marked
+before any point is compared to any other: the ARRA tail, which puts FY2012 at an 8.95% federal
+share against FY2013's 5.25%, and ESSER, which puts FY2022 at 14.02%.
+
+**FY2014 is missing from the archive.** `sdf14_1a.zip`, `sdf141a.zip`, `sdf14_2a.zip` and
+`sdf14_1a_rev.zip` all return 404 while FY2013 and FY2015 answer under two of those patterns. Nine
+intervals across ten years and one of them is two years wide. Nothing interpolates it.
+
+**The layout is per-era and only the names survive.** The three eras carry **256, 260 and 354
+columns**, and the archive member is `sdf121a.txt` in one year and `Sdf16_1a.txt` in another — so
+the reader resolves every column by header and matches the member by extension. A positional map
+written against FY2022 would read the wrong field in FY2012 and report it as a number.
 
 ## The per-district view, and the filter it needed
 

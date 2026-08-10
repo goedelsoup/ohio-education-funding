@@ -83,6 +83,20 @@ description: |
   local shares are both deflated by the inflated federal one. The honest reading is that this
   table is an upper bound on how equalized Ohio is, not an estimate of it. [inference]
 
+  **AND THE LEVEL THE STATE EQUALIZES FROM HAS BEEN FALLING FOR A DECADE.** The quartile table is
+  one year. Across the ten years the survey covers, the state's share of Ohio school revenue falls
+  in nine of them — 41.9% in FY2012 to 34.3% in FY2022, or three points between the two federally
+  ordinary years FY2013 and FY2019 — while the local share rises. [verified —
+  `dispersion::ohio_panel`, pinned by test; the full series is on
+  [DeRolph I](../litigation/derolph-i-1997.yml)]
+
+  That bears on equity in a way the correlations cannot show. Targeting is a property of how a
+  fixed pot is distributed; this is the pot. A formula can hold its −0.605 correlation with
+  valuation, keep closing 46% of the local gap, and still leave districts more exposed to their
+  own tax base each year, because the share it is doing that work over is shrinking. Whether the
+  distributional measures above have themselves moved across the decade is computable from the
+  same panel and is not computed here. [open]
+
   **AND IT FORCED A CORRECTION TO HOW THIS CLASS MEASURES THINGS.** For *spending*, less
   dispersion is more equitable — that is the assumption behind the coefficient of variation and
   the federal range ratio reported above. For *state aid*, the sign flips. Aid is compensatory,

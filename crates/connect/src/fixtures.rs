@@ -2699,6 +2699,32 @@ fn column(header: &[String], name: &str, file: &str) -> Result<usize, String> {
         .ok_or_else(|| format!("{file} has no {name} column; its layout has moved"))
 }
 
+/// `LEAID` to Ohio IRN, from the CCD LEA directory.
+///
+/// Shared by the national cross-section and the Ohio panel so the join cannot be written twice
+/// and drift — the failure the F-33 district panel and the legislative crosswalk both had, where
+/// a derivation existed only as prose in two places that could not check each other.
+fn ccd_irn_map(directory: &str) -> Result<BTreeMap<String, String>, String> {
+    const DIRECTORY: &str = "the CCD LEA directory";
+    let mut rows = directory.lines();
+    let head = delimited_fields(rows.next().unwrap_or_default(), ',');
+    let (key, st_leaid) = (
+        column(&head, "LEAID", DIRECTORY)?,
+        column(&head, "ST_LEAID", DIRECTORY)?,
+    );
+    let mut irn_of = BTreeMap::new();
+    for line in rows {
+        if line.trim().is_empty() {
+            continue;
+        }
+        let f = delimited_fields(line, ',');
+        if let (Some(leaid), Some(irn)) = (f.get(key), f.get(st_leaid)) {
+            irn_of.insert(leaid.trim().to_string(), irn.trim().to_string());
+        }
+    }
+    Ok(irn_of)
+}
+
 /// The per-district F-33 panel: one row per agency the national comparison can use.
 ///
 /// # Why two files
@@ -2733,25 +2759,8 @@ fn column(header: &[String], name: &str, file: &str) -> Result<usize, String> {
 ///
 /// Returns the missing column's name if either file's layout has moved.
 pub fn build_f33_districts(survey: &str, directory: &str) -> Result<Vec<Vec<String>>, String> {
-    const DIRECTORY: &str = "the CCD LEA directory";
     const SURVEY: &str = "the F-33 district survey";
-
-    let mut rows = directory.lines();
-    let head = delimited_fields(rows.next().unwrap_or_default(), ',');
-    let (key, st_leaid) = (
-        column(&head, "LEAID", DIRECTORY)?,
-        column(&head, "ST_LEAID", DIRECTORY)?,
-    );
-    let mut irn_of: BTreeMap<String, String> = BTreeMap::new();
-    for line in rows {
-        if line.trim().is_empty() {
-            continue;
-        }
-        let f = delimited_fields(line, ',');
-        if let (Some(leaid), Some(irn)) = (f.get(key), f.get(st_leaid)) {
-            irn_of.insert(leaid.trim().to_string(), irn.trim().to_string());
-        }
-    }
+    let irn_of = ccd_irn_map(directory)?;
 
     let mut rows = survey.lines();
     let head = delimited_fields(rows.next().unwrap_or_default(), '\t');
@@ -2814,6 +2823,153 @@ pub fn build_f33_districts(survey: &str, directory: &str) -> Result<Vec<Vec<Stri
         row.push(unreported_is_blank(property_tax));
         row.push(unreported_is_blank(spending));
         out.push(row);
+    }
+    Ok(out)
+}
+
+/// Where the multi-year Ohio F-33 panel is written, relative to the repository root.
+pub const F33_OHIO_PANEL_FIXTURE: &str = "crates/dispersion/fixtures/f33-ohio-panel.csv";
+
+/// Columns of the Ohio panel. `fiscal_year` leads because the file's whole purpose is the series.
+pub const F33_OHIO_PANEL_HEADER: &[&str] = &[
+    "fiscal_year",
+    "leaid",
+    "irn",
+    "comparable",
+    "enrollment",
+    "total_revenue",
+    "federal_revenue",
+    "state_revenue",
+    "local_revenue",
+    "property_tax",
+    "current_spending",
+];
+
+/// One year of the survey, paired with the fiscal year it reports.
+#[derive(Debug, Clone, Copy)]
+pub struct PanelYear<'a> {
+    /// The fiscal year the file reports, which is not derivable from the file itself.
+    pub fiscal_year: u16,
+    /// The survey member's text.
+    pub survey: &'a str,
+}
+
+/// Ohio across every year of the survey this repository holds.
+///
+/// # Why a second F-33 fixture rather than more rows in the first
+///
+/// The two answer different questions and need different populations. The national cross-section
+/// exists to place one Ohio district among America's — 16,872 agencies, one year — and is the
+/// only way to say whether Ohio is unusual. This panel exists to say how Ohio *changed*, which
+/// needs many years and only Ohio. Putting ten years of the national file in one fixture would
+/// commit roughly 7 MB to answer a question that needs 968 rows a year.
+///
+/// # The layout genuinely is per-era, and only the column names survive
+///
+/// The three eras this reads across carry **256, 260 and 354 columns**, the archive member is
+/// `sdf121a.txt` in one year and `Sdf16_1a.txt` in another, and the file is tab-delimited
+/// throughout. Every column this needs is present in all of them under the same name, which is
+/// the entire reason every column is resolved by header: a positional map written against FY2022 would
+/// read the wrong field in FY2012 and report it as a number rather than as an error.
+///
+/// # What is kept, and the one difference from the cross-section
+///
+/// The same comparability flag and the same non-negative enrolment and revenue test, so a figure
+/// here and a figure there mean the same thing. The difference is that **every Ohio agency is
+/// kept whatever its flag** — as in the cross-section — but nothing outside Ohio is, and the year
+/// is carried on the row rather than in the filename.
+///
+/// # The join is to one directory, and that is a real limitation
+///
+/// `LEAID` to IRN comes from the FY2022-23 CCD directory, because that is the directory this
+/// repository holds. An agency that existed in FY2012 and had closed or merged by FY2023 is in
+/// the survey and not in the directory, so it keeps its `LEAID` and gets an empty `irn`. That is
+/// the consolidation problem `nces-ccd` was approved to solve and has not, recorded on the rows
+/// it affects rather than in prose: count the blank IRNs per year and the panel tells you how
+/// much of Ohio's agency population it cannot name.
+///
+/// # Errors
+///
+/// Returns the missing column's name if any year's layout has moved.
+pub fn build_f33_ohio_panel(
+    years: &[PanelYear<'_>],
+    directory: &str,
+) -> Result<Vec<Vec<String>>, String> {
+    let irn_of = ccd_irn_map(directory)?;
+    let mut out = Vec::new();
+
+    for year in years {
+        let label = format!("the F-33 district survey for FY{}", year.fiscal_year);
+        let mut rows = year.survey.lines();
+        let head = delimited_fields(rows.next().unwrap_or_default(), '\t');
+        let at = |name: &str| column(&head, name, &label);
+        let (leaid, state, charter, level) =
+            (at("LEAID")?, at("STABBR")?, at("AGCHRT")?, at("SCHLEV")?);
+        let enrolment = at("V33")?;
+        let revenue = [
+            at("TOTALREV")?,
+            at("TFEDREV")?,
+            at("TSTREV")?,
+            at("TLOCREV")?,
+        ];
+        let (property_tax, spending) = (at("T06")?, at("TCURELSC")?);
+
+        let mut kept = 0usize;
+        for line in rows {
+            if line.trim().is_empty() {
+                continue;
+            }
+            let f = delimited_fields(line, '\t');
+            let field = |i: usize| f.get(i).map(|v| v.trim()).unwrap_or_default();
+            let number = |i: usize| field(i).parse::<i64>().ok();
+
+            if field(state) != "OH" {
+                continue;
+            }
+            if number(enrolment).unwrap_or(-1) <= 0 || number(revenue[0]).unwrap_or(-1) <= 0 {
+                continue;
+            }
+
+            let key = field(leaid).to_string();
+            let irn = irn_of
+                .get(&key)
+                .map(|v| v.strip_prefix("OH-").unwrap_or(v).to_string())
+                .unwrap_or_default();
+            let plain = |i: usize| number(i).map(|v| v.to_string()).unwrap_or_default();
+            let unreported_is_blank = |i: usize| match number(i) {
+                Some(v) if v >= 0 => v.to_string(),
+                _ => String::new(),
+            };
+
+            let mut row = vec![
+                year.fiscal_year.to_string(),
+                key,
+                irn,
+                if field(charter) != "1" && field(level) == "03" {
+                    "1"
+                } else {
+                    "0"
+                }
+                .to_string(),
+                plain(enrolment),
+            ];
+            row.extend(revenue.iter().map(|i| plain(*i)));
+            row.push(unreported_is_blank(property_tax));
+            row.push(unreported_is_blank(spending));
+            out.push(row);
+            kept += 1;
+        }
+
+        // A year that contributes nothing is a layout that parsed but matched no Ohio row, which
+        // reads as a shorter series rather than as a failure. Ohio has never had fewer than 900
+        // reporting agencies in any year the survey covers.
+        if kept < 500 {
+            return Err(format!(
+                "FY{} yielded {kept} Ohio agencies; the survey has never had fewer than 900, so \
+                 the state filter or the file is wrong",
+                year.fiscal_year
+            ));
+        }
     }
     Ok(out)
 }
@@ -3232,6 +3388,7 @@ pub const REBUILT: &[&str] = &[
     CPI_FIXTURE,
     F33_FIXTURE,
     F33_DISTRICTS_FIXTURE,
+    F33_OHIO_PANEL_FIXTURE,
     CROSSWALK_FIXTURE,
     STATUTE_FIXTURE,
     ENACTED_FIXTURE,

@@ -535,6 +535,24 @@ pub fn rebuild(root: &Path) -> Result<Vec<Rebuilt>, RebuildError> {
         },
     });
 
+    // The same survey again, Ohio only, across every year the archive publishes. The national
+    // file answers whether Ohio is unusual; this one answers how Ohio changed, and the two need
+    // different populations rather than different filters over one fixture.
+    out.push(match f33_ohio_panel(root) {
+        Ok(rows) => Rebuilt::Written {
+            path: fixtures::F33_OHIO_PANEL_FIXTURE.to_string(),
+            rows: fixtures::write_csv(
+                &root.join(fixtures::F33_OHIO_PANEL_FIXTURE),
+                fixtures::F33_OHIO_PANEL_HEADER,
+                &rows,
+            )?,
+        },
+        Err(reason) => Rebuilt::Skipped {
+            path: fixtures::F33_OHIO_PANEL_FIXTURE.to_string(),
+            reason,
+        },
+    });
+
     // School districts across legislative seats. The last extraction because it is the only one
     // that depends on another fixture's contents rather than only on a cached publication: the
     // panel it apportions is the FY2027 model's 609 districts.
@@ -642,6 +660,47 @@ fn f33_districts(root: &Path) -> Result<Vec<Vec<String>>, String> {
         &zip_member(root, survey, ".txt")?,
         &zip_member(root, directory, ".csv")?,
     )
+}
+
+/// Every year of the survey this repository holds, oldest first.
+///
+/// FY2014 is absent. It is not a naming problem: `sdf14_1a.zip`, `sdf141a.zip`, `sdf14_2a.zip`
+/// and `sdf14_1a_rev.zip` all 404 while FY2013 and FY2015 answer under two of those patterns.
+/// The gap is recorded here rather than papered over by interpolation, because a panel with a
+/// silently missing year reads as a series and is not one.
+const F33_PANEL_YEARS: &[(u16, &str)] = &[
+    (2012, "sdf12-districts"),
+    (2013, "sdf13-districts"),
+    (2015, "sdf15-districts"),
+    (2016, "sdf16-districts"),
+    (2017, "sdf17-districts"),
+    (2018, "sdf18-districts"),
+    (2019, "sdf19-districts"),
+    (2020, "sdf20-districts"),
+    (2021, "sdf21-districts"),
+    (2022, "sdf22-districts"),
+];
+
+/// Ohio across every year of the survey, from ten archives and one directory.
+fn f33_ohio_panel(root: &Path) -> Result<Vec<Vec<String>>, String> {
+    let directory = source("ccd-lea-directory-2223").expect("registered").1;
+    let directory = zip_member(root, directory, ".csv")?;
+
+    // Read every archive first: the member text has to outlive the borrow the builder takes, and
+    // 30 MB of survey held at once is cheaper than a builder that takes a closure.
+    let mut surveys = Vec::new();
+    for (fiscal_year, key) in F33_PANEL_YEARS {
+        let survey = source(key).expect("registered").1;
+        surveys.push((*fiscal_year, zip_member(root, survey, ".txt")?));
+    }
+    let years: Vec<fixtures::PanelYear<'_>> = surveys
+        .iter()
+        .map(|(fiscal_year, survey)| fixtures::PanelYear {
+            fiscal_year: *fiscal_year,
+            survey,
+        })
+        .collect();
+    fixtures::build_f33_ohio_panel(&years, &directory)
 }
 
 /// Read the one worksheet whose name begins with `prefix`.

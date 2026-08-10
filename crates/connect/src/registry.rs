@@ -809,13 +809,115 @@ pub const CONNECTORS: &[Connector] = &[
                    below, which reproduces this file's Ohio local share to a tenth of a point.",
         },
         Source {
+            key: "sdf12-districts",
+            title: None,
+            url: "https://nces.ed.gov/ccd/data/zip/sdf121a.zip",
+            filename: "sdf121a.zip",
+            format: Format::Zip,
+            catalog: Some("census-f33-school-system-finances"),
+            fixtures: &[crate::fixtures::F33_OHIO_PANEL_FIXTURE],
+            note: "The school finance survey for FY2012. One of the ten years behind the Ohio \
+                   panel; FY2014 is absent from the archive under every naming the others use.",
+        },
+        Source {
+            key: "sdf13-districts",
+            title: None,
+            url: "https://nces.ed.gov/ccd/data/zip/sdf13_1a.zip",
+            filename: "sdf13_1a.zip",
+            format: Format::Zip,
+            catalog: Some("census-f33-school-system-finances"),
+            fixtures: &[crate::fixtures::F33_OHIO_PANEL_FIXTURE],
+            note: "The school finance survey for FY2013. One of the ten years behind the Ohio \
+                   panel; FY2014 is absent from the archive under every naming the others use.",
+        },
+        Source {
+            key: "sdf15-districts",
+            title: None,
+            url: "https://nces.ed.gov/ccd/data/zip/sdf15_1a.zip",
+            filename: "sdf15_1a.zip",
+            format: Format::Zip,
+            catalog: Some("census-f33-school-system-finances"),
+            fixtures: &[crate::fixtures::F33_OHIO_PANEL_FIXTURE],
+            note: "The school finance survey for FY2015. One of the ten years behind the Ohio \
+                   panel; FY2014 is absent from the archive under every naming the others use.",
+        },
+        Source {
+            key: "sdf16-districts",
+            title: None,
+            url: "https://nces.ed.gov/ccd/data/zip/sdf16_1a.zip",
+            filename: "sdf16_1a.zip",
+            format: Format::Zip,
+            catalog: Some("census-f33-school-system-finances"),
+            fixtures: &[crate::fixtures::F33_OHIO_PANEL_FIXTURE],
+            note: "The school finance survey for FY2016. One of the ten years behind the Ohio \
+                   panel; FY2014 is absent from the archive under every naming the others use.",
+        },
+        Source {
+            key: "sdf17-districts",
+            title: None,
+            url: "https://nces.ed.gov/ccd/data/zip/sdf17_1a.zip",
+            filename: "sdf17_1a.zip",
+            format: Format::Zip,
+            catalog: Some("census-f33-school-system-finances"),
+            fixtures: &[crate::fixtures::F33_OHIO_PANEL_FIXTURE],
+            note: "The school finance survey for FY2017. One of the ten years behind the Ohio \
+                   panel; FY2014 is absent from the archive under every naming the others use.",
+        },
+        Source {
+            key: "sdf18-districts",
+            title: None,
+            url: "https://nces.ed.gov/ccd/data/zip/sdf18_1a.zip",
+            filename: "sdf18_1a.zip",
+            format: Format::Zip,
+            catalog: Some("census-f33-school-system-finances"),
+            fixtures: &[crate::fixtures::F33_OHIO_PANEL_FIXTURE],
+            note: "The school finance survey for FY2018. One of the ten years behind the Ohio \
+                   panel; FY2014 is absent from the archive under every naming the others use.",
+        },
+        Source {
+            key: "sdf19-districts",
+            title: None,
+            url: "https://nces.ed.gov/ccd/data/zip/sdf19_1a.zip",
+            filename: "sdf19_1a.zip",
+            format: Format::Zip,
+            catalog: Some("census-f33-school-system-finances"),
+            fixtures: &[crate::fixtures::F33_OHIO_PANEL_FIXTURE],
+            note: "The school finance survey for FY2019. One of the ten years behind the Ohio \
+                   panel; FY2014 is absent from the archive under every naming the others use.",
+        },
+        Source {
+            key: "sdf20-districts",
+            title: None,
+            url: "https://nces.ed.gov/ccd/data/zip/sdf20_1a.zip",
+            filename: "sdf20_1a.zip",
+            format: Format::Zip,
+            catalog: Some("census-f33-school-system-finances"),
+            fixtures: &[crate::fixtures::F33_OHIO_PANEL_FIXTURE],
+            note: "The school finance survey for FY2020. One of the ten years behind the Ohio \
+                   panel; FY2014 is absent from the archive under every naming the others use.",
+        },
+        Source {
+            key: "sdf21-districts",
+            title: None,
+            url: "https://nces.ed.gov/ccd/data/zip/sdf21_1a.zip",
+            filename: "sdf21_1a.zip",
+            format: Format::Zip,
+            catalog: Some("census-f33-school-system-finances"),
+            fixtures: &[crate::fixtures::F33_OHIO_PANEL_FIXTURE],
+            note: "The school finance survey for FY2021. One of the ten years behind the Ohio \
+                   panel; FY2014 is absent from the archive under every naming the others use.",
+        },
+        Source {
             key: "sdf22-districts",
             title: None,
             url: "https://nces.ed.gov/ccd/data/zip/sdf22_1a.zip",
             filename: "sdf22_1a.zip",
             format: Format::Zip,
             catalog: Some("census-f33-school-system-finances"),
-            fixtures: &[crate::fixtures::F33_DISTRICTS_FIXTURE],
+            fixtures: &[
+                crate::fixtures::F33_DISTRICTS_FIXTURE,
+                crate::fixtures::F33_OHIO_PANEL_FIXTURE,
+            ],
             note: "The same survey NCES publishes keyed on `LEAID` rather than the Bureau's \
                    `IDCENSUS`, which is what makes the per-district join possible at all. \
                    Tab-delimited, 354 columns, 19,572 agencies. The fixture keeps the 10,382 \
@@ -848,9 +950,10 @@ pub const CONNECTORS: &[Connector] = &[
             format: Format::Zip,
             catalog: Some("nces-ccd-lea-directory"),
             fixtures: &[
-                    crate::fixtures::F33_DISTRICTS_FIXTURE,
-                    crate::fixtures::CROSSWALK_FIXTURE,
-                ],
+                crate::fixtures::F33_DISTRICTS_FIXTURE,
+                crate::fixtures::CROSSWALK_FIXTURE,
+                crate::fixtures::F33_OHIO_PANEL_FIXTURE,
+            ],
             note: "`ST_LEAID` is the Ohio IRN behind an `OH-` prefix, and `LEAID` is the NCES \
                    agency identifier whose last five digits are the Census school district code. \
                    All 609 districts in the funding panel join through it. This is the \
