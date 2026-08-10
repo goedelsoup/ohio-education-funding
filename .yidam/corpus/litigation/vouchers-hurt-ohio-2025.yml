@@ -24,12 +24,13 @@ description: |
   sectarian-funds clause is Ohio text with no federal analogue. [inference]
 
   This is a trial-level decision and the Attorney General moved to appeal, so its precedential
-  weight is limited and its outcome unsettled. [verified] It is seeded and now enriched because
-  it is the live test of whether the *DeRolph* standard constrains anything in the current
-  system.
+  weight is limited and its outcome unsettled. [verified]
 
   Docket number, the exact case caption, and appellate status remain unestablished. [open]
 properties:
+  seeded_because: |
+    It is the live test of whether the *DeRolph* standard constrains anything in the current
+    system.
   case_name: |
     Coalition action brought by Vouchers Hurt Ohio member districts against the State of Ohio.
     Exact caption not yet established. [open]

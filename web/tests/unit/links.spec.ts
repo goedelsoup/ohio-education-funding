@@ -16,7 +16,7 @@
 
 import { expect, test } from "vitest";
 
-import { loadCorpus, resolveTarget } from "../../src/lib/corpus.ts";
+import { FROM_CATALOG, loadCorpus, resolveTarget } from "../../src/lib/corpus.ts";
 import { loadFeed } from "../../src/lib/feed.ts";
 import { counties } from "../../src/lib/county.ts";
 import * as routes from "../../src/lib/routes.ts";
@@ -68,6 +68,28 @@ const known = (href: string) => {
   return PAGES.has(path!) || ASSETS.has(path!);
 };
 
+/**
+ * A link is off the site only if `resolveTarget` decided so, never because it looks that way.
+ *
+ * `internal(href)` on its own is the hole both tests below used to have. An unresolvable target
+ * comes back with `href` set to the raw relative path — `../../skills/deduction.md` — which is not
+ * site-absolute, so `if (!internal(href)) continue` filed it under "external, none of our
+ * business" and skipped it. That is precisely the set the tests exist to catch, and 40 of them
+ * shipped with both tests green.
+ */
+const placed = (target: string, fromClass: string, where: string, broken: string[]): boolean => {
+  const { href, resolved } = resolveTarget(target, fromClass);
+  if (!resolved) {
+    broken.push(`${where} → ${target} (no rule places this shape)`);
+    return false;
+  }
+  if (internal(href) && !known(href)) {
+    broken.push(`${where} → ${target} → ${href} (no such page)`);
+    return false;
+  }
+  return true;
+};
+
 test("every corpus edge points at a page or off the site entirely", () => {
   const broken: string[] = [];
   for (const node of corpus.nodes) {
@@ -81,16 +103,58 @@ test("every corpus edge points at a page or off the site entirely", () => {
 
 test("every inline link in corpus prose resolves", () => {
   const broken: string[] = [];
+  // `linkText`, not `description`: the corpus writes links in property values and `findings:`
+  // blocks too, and those were only ever checked by accident, back when the two fields were one.
   for (const node of corpus.nodes) {
-    for (const match of node.description.matchAll(/\]\(([^)\s]+)\)/g)) {
+    for (const match of node.linkText.matchAll(/\]\(([^)\s]+)\)/g)) {
       const target = match[1]!;
-      if (/^(https?:|mailto:|#)/.test(target)) continue;
-      const { href } = resolveTarget(target, node.className);
-      if (!internal(href)) continue;
-      if (!known(href)) broken.push(`${node.id} → ${target} → ${href}`);
+      if (/^(https?:|mailto:|#|\/)/.test(target)) continue;
+      placed(target, node.className, node.id, broken);
     }
   }
   expect(broken, "inline corpus links that resolve to nothing").toEqual([]);
+});
+
+test("every inline link in a catalog entry resolves", () => {
+  // Catalog entries are the largest single writer of link targets and use shapes no node writes:
+  // a bare sibling `ocg-white-paper-013.md`, and `../corpus/metric/` for a whole class. Nineteen
+  // of the first and four of the second were emitted as raw relative hrefs.
+  const broken: string[] = [];
+  for (const source of corpus.sources) {
+    for (const match of source.body.matchAll(/\]\(([^)\s]+)\)/g)) {
+      const target = match[1]!;
+      if (/^(https?:|mailto:|#|\/)/.test(target)) continue;
+      placed(target, FROM_CATALOG, `catalog/${source.slug}`, broken);
+    }
+  }
+  expect(broken, "catalog links that resolve to nothing").toEqual([]);
+});
+
+test("resolveTarget refuses a shape it cannot place rather than guessing", () => {
+  // The negative side of the gate. Without these, "every target resolves" is satisfiable by a
+  // resolver that returns `resolved: true` for anything.
+  expect(resolveTarget("../../../etc/passwd", "metric").resolved).toBe(false);
+  expect(resolveTarget("Some Prose Sentence.pdf", "metric").resolved).toBe(false);
+
+  // A bare `name.yml` needs a class to be a sibling of, and a catalog entry has none. Left
+  // unrefused this built `/wiki//twenty-mill-floor`, which is `resolved` and still a 404.
+  expect(resolveTarget("twenty-mill-floor.yml", FROM_CATALOG).resolved).toBe(false);
+  expect(resolveTarget("twenty-mill-floor.yml", "parameter")).toMatchObject({
+    href: "/wiki/parameter/twenty-mill-floor",
+    resolved: true,
+  });
+
+  // A bare `*.md` means different things from the two places it is written, and both are real.
+  expect(resolveTarget("ocg-white-paper-013.md", FROM_CATALOG).href).toBe(
+    "/wiki/source/ocg-white-paper-013",
+  );
+  expect(resolveTarget("ACTIONS.md", "metric").href).toMatch(
+    /^https:\/\/github\.com\/.*\/\.yidam\/corpus\/metric\/ACTIONS\.md$/,
+  );
+  expect(resolveTarget("../../skills/deduction.md", "metric").href).toMatch(
+    /^https:\/\/github\.com\/.*\/\.yidam\/skills\/deduction\.md$/,
+  );
+  expect(resolveTarget("../corpus/metric/", FROM_CATALOG).href).toBe("/wiki/metric");
 });
 
 test("citations are counted from both the forms the corpus writes them in", () => {

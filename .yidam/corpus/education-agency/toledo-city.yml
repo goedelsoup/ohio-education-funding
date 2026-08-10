@@ -1,11 +1,9 @@
 class: education-agency
 label: Toledo City School District
 description: |
-  Ohio's fourth-largest district and the corpus's second urban exemplar, seeded because a
-  circulating claim about its special-education spending made it the subject of a published
-  fact-check and because the pair it forms with
-  [Perrysburg](perrysburg-exempted-village.yml) — eleven miles apart, one urban and one
-  exempted village — is a sharper contrast than any this corpus previously held. [verified]
+  Ohio's fourth-largest district, and one half of a pair with
+  [Perrysburg](perrysburg-exempted-village.yml) — eleven miles apart, one urban and one exempted
+  village. [verified]
 
   **FY2025 in one line:** 21,160 pupils, $440.2 million of operating expenditure, **$20,805 per
   headcount pupil**, a Performance Index of 60.4, and a Progress effect size of −0.02.
@@ -59,6 +57,11 @@ description: |
   Not yet held: audited-statement figures, the scholarship and community-school deduction that a
   district of this size and poverty carries, and any year before FY2024. [open]
 properties:
+  seeded_because: |
+    The corpus's second urban exemplar. A circulating claim about its special-education spending
+    made it the subject of a published fact-check, and the pair it forms with
+    [Perrysburg](perrysburg-exempted-village.yml) is a sharper contrast than any this corpus
+    previously held. [verified]
   irn: 044909 [verified — report card district files]
   agency_type: city
   county: Lucas

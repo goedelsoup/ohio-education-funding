@@ -11,6 +11,7 @@
 import Base from "../../layouts/Base.astro";
 import { loadCorpus } from "../../lib/corpus.ts";
 import { count } from "../../lib/format.ts";
+import { summarize } from "../../lib/prose.ts";
 import * as routes from "../../lib/routes.ts";
 
 const corpus = loadCorpus();
@@ -18,10 +19,30 @@ const edges = corpus.nodes.reduce((total, node) => total + node.out.length, 0);
 
 /** The classes a reader most likely wants first, ahead of the alphabetical rest. */
 const LEAD = ["funding-regime", "formula-component", "parameter", "metric", "legislation", "litigation"];
-const ordered = [
-  ...LEAD.map((c) => corpus.byClass.get(c)).filter((c) => c != null),
-  ...corpus.classes.filter((c) => !LEAD.includes(c.className)),
-];
+
+/*
+ * The tail excludes the classes the head actually emitted, not the names LEAD happens to hold.
+ *
+ * Those are the same set until a LEAD name stops resolving, and then they are not: the head drops
+ * it because `byClass` returns nothing, and a tail filtered on `LEAD.includes` drops it too, so
+ * renaming a class in `.yidam/corpus/` deleted it from the corpus's front door with no build
+ * error and no diagnostic — while the subtitle a few lines below went on counting it.
+ */
+const head = LEAD.map((name) => corpus.byClass.get(name)).filter((entry) => entry != null);
+const shown = new Set(head.map((entry) => entry.className));
+const ordered = [...head, ...corpus.classes.filter((entry) => !shown.has(entry.className))];
+
+/*
+ * The sources worth naming on a front door are the ones the corpus leans on hardest, which is not
+ * the order `loadCorpus` returns them in — that one is alphabetical, so an unlabelled `slice(12)`
+ * showed `auditor-…`, `bls-…`, `census-…` and hid seventeen entries behind no visible cut. The
+ * sources index says as much in its own header: the question a reader has here is what this is
+ * built on, and the answer is the top of the citation list.
+ */
+const cited = corpus.sources.filter((source) => source.citedBy.length > 0);
+const leading = [...cited]
+  .sort((a, b) => b.citedBy.length - a.citedBy.length || a.title.localeCompare(b.title))
+  .slice(0, 12);
 ---
 
 <Base
@@ -51,8 +72,11 @@ const ordered = [
       Every substantive claim carries its epistemic status inline:
       <span class="claim verified">verified</span> against a named source,
       <span class="claim inference">inference</span> drawn from what is verified, or
-      <span class="claim open">open</span> and not yet established. Those badges are the corpus's
-      own, not this site's editorialising.
+      <span class="claim open">open</span> — a question asked and not yet answered. A fourth mark,
+      <span class="claim unentered">unentered</span>, is not a fourth level of confidence: it says
+      a field has nothing in it yet, where <span class="claim open">open</span> says the corpus
+      has taken a position on how much it does not know. Those badges are the corpus's own, not
+      this site's editorialising.
     </p>
   </div>
 
@@ -68,7 +92,7 @@ const ordered = [
                   <a href={routes.wikiClass(c!.className)}>{c!.label}</a>
                   <span class="n"> {c!.nodes.length}</span>
                 </th>
-                <td>{c!.description.split("\n").join(" ").slice(0, 180).trim()}…</td>
+                <td>{summarize(c!.description, 180)}</td>
               </tr>
             ))
           }
@@ -88,15 +112,16 @@ const ordered = [
     </p>
     <div class="flags">
       {
-        corpus.sources
-          .filter((s) => s.citedBy.length > 0)
-          .slice(0, 12)
-          .map((s) => (
-            <a class="flag" href={routes.wikiSource(s.slug)}>
-              {s.title}
-            </a>
-          ))
+        leading.map((s) => (
+          <a class="flag" href={routes.wikiSource(s.slug)}>
+            {s.title}
+          </a>
+        ))
       }
     </div>
+    <p class="note">
+      The {leading.length} most-cited of {cited.length} sources the corpus reaches.{" "}
+      <a href="/wiki/source">All {corpus.sources.length}</a>, ranked by how often they are cited.
+    </p>
   </div>
 </Base>

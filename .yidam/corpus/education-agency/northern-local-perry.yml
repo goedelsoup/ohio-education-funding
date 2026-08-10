@@ -3,8 +3,7 @@ label: Northern Local School District (Perry County)
 description: |
   A rural district in Perry County, in Ohio's Appalachian southeast, and the origin of
   *DeRolph v. State*: the named plaintiff was a student at Sheridan High School in this
-  district. [verified] It is seeded as the anchor case for the property-poor end of Ohio's
-  distribution.
+  district. [verified]
 
   The district is the concrete instance of the mechanism this corpus is built to explain. Low
   assessed valuation per pupil means local millage produces little revenue; under
@@ -47,6 +46,8 @@ description: |
   outcome it spends $11,987 per pupil, the lowest of the three exemplars and roughly $3,700
   below the statewide median. [verified, inference for the interpretation]
 properties:
+  seeded_because: |
+    The anchor case for the property-poor end of Ohio's distribution.
   irn: |
     049056 [verified — appears as "Northern Local" in the FY2021 IDEA Part B allocation list].
     Distinct from Hardin Northern Local (047498). County attribution to Perry is [inference]:

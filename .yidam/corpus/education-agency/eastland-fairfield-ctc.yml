@@ -2,8 +2,7 @@ class: education-agency
 label: Eastland-Fairfield Career and Technical Schools
 description: |
   A joint vocational school district serving member districts across Franklin and Fairfield
-  counties, seeded because JVSDs are funded on rules that differ from traditional districts in
-  ways easy to overlook and consequential to get wrong. [inference]
+  counties.
 
   A JVSD has no residents of its own in the ordinary sense. It levies property tax across the
   combined territory of its member districts and enrolls their students part-time or
@@ -30,6 +29,9 @@ description: |
 
   IRN, member district list, enrollment, and funding series remain unpopulated. [open]
 properties:
+  seeded_because: |
+    JVSDs are funded on rules that differ from traditional districts in ways easy to overlook and
+    consequential to get wrong. [inference]
   irn: |
     051003 [verified — `crates/dispersion/fixtures/mr81-sponsor-panel.csv`, where it reports as
     "Eastland-Fairfield Career/Tech Jt Voc SD" in October 2001]. Absent from the FY2021 IDEA Part

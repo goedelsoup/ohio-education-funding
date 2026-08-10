@@ -5,7 +5,7 @@
  *
  * Every number on this site comes through `crates/bundle`, because numbers are computed and Rust
  * is authoritative for the computation. The corpus is not computed. It is a document graph —
- * 62 nodes, 13 ontology classes and 21 catalog sources — and putting a Rust export crate between
+ * 96 nodes, 16 ontology classes and 29 catalog sources — and putting a Rust export crate between
  * the YAML and the page would add a second serialization to keep in sync without anything
  * deciding what is true along the way. So this reads the source of truth, and there is no
  * committed intermediate that can go stale.
@@ -16,9 +16,15 @@
  * # Two things the corpus does that a naive reader would get wrong
  *
  * **Links are not all in `links:`.** Node descriptions are dense with inline markdown links that
- * no structured field records, two nodes carry a `findings:` block, and property values contain
+ * no structured field records, three nodes carry a `findings:` block, and property values contain
  * them too. A graph built from `links:` alone loses most of the corpus's cross-referencing, so
  * this reads all four places and {@link Edge.stated} says which kind each edge is.
+ *
+ * Those four places are concatenated into {@link Node.linkText}, which exists *only* to be
+ * scanned. It is deliberately not {@link Node.description}: the two were once the same field, and
+ * the result was that every node page printed its description twice and then rendered its raw
+ * property values — `partially-implemented`, `FY2022` — as body copy above the table that already
+ * showed them. What a page displays and what a link scanner reads are different questions.
  *
  * One node used to write its entire `links:` block as a prose paragraph — valid YAML, so nothing
  * complained, and its fifteen edges were invisible to every consumer including its own
@@ -26,10 +32,11 @@
  * here stays tolerant of it: the reader's job is to get far enough to report what is wrong, and
  * the schema's job is to stop the build.
  *
- * **Claims carry their epistemic status inline.** `[verified]`, `[inference]` and `[open]` are a
- * corpus-wide convention, sometimes with a justification attached — `[verified — computed; see
- * …]`. They are the corpus's central discipline and rendering them as stray brackets would throw
- * away the thing that makes it trustworthy, so they become badges.
+ * **Claims carry their epistemic status inline.** `[verified]`, `[inference]`, `[open]` and
+ * `[unentered]` are a corpus-wide convention, usually with a qualifier attached — `[verified —
+ * computed; see …]`, `[inference, Fordham]`, `[verified as proposed]`. They are the corpus's
+ * central discipline and rendering them as stray brackets would throw away the thing that makes
+ * it trustworthy, so they become badges. See `prose.ts` for the forms they are written in.
  */
 
 import { readFileSync, readdirSync } from "node:fs";
@@ -44,6 +51,7 @@ import {
   NodeSchema,
   OBSERVATION_PROPERTY,
   OntologyClassSchema,
+  UNIVERSAL_PROPERTIES,
   type Diagnostic,
 } from "./schema/corpus.ts";
 
@@ -60,6 +68,17 @@ const CATALOG = join(YIDAM, "catalog");
 
 /** Where a link that leaves the corpus points. The repository, on GitHub. */
 const REPO = "https://github.com/goedelsoup/ohio-education-funding/blob/main";
+
+/**
+ * The `.yidam/` subtrees this site does not publish.
+ *
+ * `corpus/` and `catalog/` become pages here; these are working documents for whoever is authoring
+ * the corpus — skill definitions, decision records — and 13 links point into them from prose that
+ * does become a page. They are real documents, so the honest resolution is GitHub rather than a
+ * refusal; what is not honest is `/wiki/decisions/report-card-connector`, which is what
+ * `decisions/…` produced for as long as nothing distinguished a subtree from an ontology class.
+ */
+const UNPUBLISHED = ["skills", "decisions", "sangha", "schemas"];
 
 /** One property of a node: a name, and prose that usually carries a claim tag. */
 export interface Property {
@@ -95,10 +114,18 @@ export interface Node {
   /** File stem. */
   name: string;
   label: string;
-  /** Markdown. Rendered by {@link renderProse}. */
+  /** Markdown, and *only* the description. Rendered by {@link renderProse}. */
   description: string;
+  /**
+   * Every place this node writes a link, concatenated — for scanning, never for display.
+   *
+   * The description, the `links:` block when a node wrote it as a paragraph, `findings:`, and
+   * each property value. Consumers that want to know what a node references read this; consumers
+   * that want to show a reader something read {@link description}.
+   */
+  linkText: string;
   properties: Property[];
-  /** Findings, on the two nodes that carry them. Markdown, like the description. */
+  /** Findings, on the three nodes that carry them. Markdown, like the description. */
   findings: string | null;
   /** Edges this node declares plus the ones it only mentions. */
   out: Edge[];
@@ -153,24 +180,49 @@ let cached: Corpus | null = null;
  *
  * The corpus links by relative file path — `../parameter/twenty-mill-floor.yml` — because it is
  * authored as files and those links have to work in an editor. On the web they have to become
- * routes. Six shapes occur, in these proportions:
+ * routes. Ten shapes occur, and this table is the closed enumeration of them:
  *
- * | Shape | Count | Becomes |
- * |---|--:|---|
- * | `../class/name.yml` | 181 | the node's page |
- * | `../class.ont.yml` | 60 | the class page |
- * | `name.yml` | 45 | a sibling node in the same class |
- * | `../../catalog/name.md` | 28 | the source's page |
- * | `class` (bare) | 4 | the class page |
- * | `../../../crates/…` | — | the repository, on GitHub |
+ * | Shape | Written by | Becomes |
+ * |---|---|---|
+ * | `../class/name.yml` | nodes | the node's page |
+ * | `../corpus/class/name.yml` | catalog entries | the node's page |
+ * | `../class.ont.yml` | nodes | the class page |
+ * | `name.yml` | nodes | a sibling node in the same class |
+ * | `../../catalog/name.md` | nodes | the source's page |
+ * | `name.md` | catalog entries | a sibling catalog entry |
+ * | `../corpus/class/` | catalog entries | the class page |
+ * | `class` (bare) | nodes, in the ontology's own style | the class page |
+ * | `../../../crates/…` | nodes | the repository, on GitHub |
+ * | `../../skills/name.md`, `../decisions/name.yml` | nodes, catalog entries | the repository |
+ * | `ACTIONS.md` | nodes | the repository, on GitHub |
  *
- * The bare form is the odd one and was found by a link that pointed nowhere: two `metric` nodes
- * write their `links:` in the *ontology's* vocabulary, where `target:` names a class rather than a
- * file. Left unhandled it emitted a relative `href` — `<a href="education-agency">` — which
- * resolves against the current page and 404s, while looking in the markup exactly like a working
- * link. `resolved` is false for anything this cannot place, and the link checker fails on it
- * rather than letting it ship.
+ * The last two rows are the ones worth explaining. {@link UNPUBLISHED} and the per-class
+ * `ACTIONS.md` files are in-repository documents that this site deliberately never publishes —
+ * `loadCorpus` reads only `*.yml` under `corpus/` — so they cannot become a page here. Sending
+ * them to GitHub is the honest resolution: the document exists, it is just not part of the wiki.
+ *
+ * # Why the table has to stay complete
+ *
+ * `resolved` is false for anything this cannot place, and {@link checkTargets} turns that into a
+ * build error. That gate was written before the table was, and for a long time nothing read the
+ * flag — so four of the shapes above went unhandled and 40 raw relative `href`s shipped, each one
+ * looking in the markup exactly like a working link and each one a 404. A reader who trusts this
+ * table to be exhaustive is making the same assumption the gate makes; both have to be true.
  */
+
+/**
+ * Passed as `fromClass` when the prose being rendered is a catalog entry rather than a node.
+ *
+ * Catalog entries live in `.yidam/catalog/`, beside `corpus/` rather than inside a class
+ * directory, so "the class this link is relative to" has no answer for them. This used to be the
+ * empty string, which silently built `/wiki//twenty-mill-floor` — a double slash that resolves to
+ * nothing on a static host — the moment a catalog entry wrote a bare sibling reference. Naming it
+ * lets the sibling branches tell the two contexts apart and refuse the one that makes no sense.
+ *
+ * Safe as a sentinel because no ontology class is called `catalog`, and none can be: the loader
+ * takes class names from `*.ont.yml` files under `corpus/`.
+ */
+export const FROM_CATALOG = "catalog";
 export interface ResolvedTarget {
   href: string;
   /** `<class>/<name>` when the target is a corpus node; null for classes, sources and code. */
@@ -186,9 +238,22 @@ export function resolveTarget(target: string, fromClass: string): ResolvedTarget
   const escaped = clean.match(/^(?:\.\.\/)+((?:crates|docs|agents)\/.*)$/);
   if (escaped) return { href: `${REPO}/${escaped[1]}`, id: null, resolved: true };
 
+  // `../../skills/deduction.md`, `../decisions/report-card-connector.yml` — a document in a
+  // `.yidam/` subtree this site does not publish. Must precede the `class/name.yml` branch, which
+  // would otherwise read `decisions` as an ontology class and emit `/wiki/decisions/…`: resolved,
+  // site-absolute, and a 404 on every one of the seven catalog entries that link there.
+  const unpublished = clean.match(new RegExp(`(?:^|/)(${UNPUBLISHED.join("|")})/(.+)$`));
+  if (unpublished) {
+    return { href: `${REPO}/.yidam/${unpublished[1]}/${unpublished[2]}`, id: null, resolved: true };
+  }
+
   // `../../catalog/ocg-white-paper-013.md`
   const source = clean.match(/(?:^|\/)catalog\/([^/]+)\.md$/);
   if (source) return { href: routes.wikiSource(source[1]!), id: null, resolved: true };
+
+  // `../corpus/metric/` — a catalog entry naming a whole class by its directory.
+  const directory = clean.match(/(?:^|\/)corpus\/([a-z0-9-]+)\/$/);
+  if (directory) return { href: routes.wikiClass(directory[1]!), id: null, resolved: true };
 
   // `../metric.ont.yml` — the class, whose page is also its index.
   const ontology = clean.match(/([^/]+)\.ont\.yml$/);
@@ -201,11 +266,26 @@ export function resolveTarget(target: string, fromClass: string): ResolvedTarget
     return { href: routes.wikiNode(other[1]!, other[2]!), id, resolved: true };
   }
 
-  // `northern-local-perry.yml` — a sibling, so the same class.
+  // `northern-local-perry.yml` — a sibling node, so the same class. Refused from a catalog entry,
+  // which has no class for the sibling to be in; see {@link FROM_CATALOG}.
   const sibling = clean.match(/^([^/]+)\.yml$/);
-  if (sibling) {
+  if (sibling && fromClass !== FROM_CATALOG && fromClass !== "") {
     const id = `${fromClass}/${sibling[1]}`;
     return { href: routes.wikiNode(fromClass, sibling[1]!), id, resolved: true };
+  }
+
+  // A bare `*.md`, which means one of two unrelated things depending on where it was written.
+  // From a catalog entry it is another catalog entry, and 19 of them cite each other this way.
+  // From a node it is a file sitting in that node's own class directory, which is `ACTIONS.md` or
+  // `README.md` — repository documents, never pages here.
+  const markdown = clean.match(/^([^/]+)\.md$/);
+  if (markdown) {
+    if (fromClass === FROM_CATALOG) {
+      return { href: routes.wikiSource(markdown[1]!), id: null, resolved: true };
+    }
+    if (fromClass !== "") {
+      return { href: `${REPO}/.yidam/corpus/${fromClass}/${markdown[1]}.md`, id: null, resolved: true };
+    }
   }
 
   // `education-agency` — a bare class name, in the ontology's own style. Whether that class
@@ -320,14 +400,14 @@ function readNode(className: string, file: string, report: Diagnostic[]): Node {
    * or a backlink list coming up empty for a node that plainly referenced something.
    */
   const declared = new Set(stated.map((edge) => edge.id ?? edge.href));
-  const prose = [
+  const linkText = [
     description,
     typeof rawLinks === "string" ? rawLinks : "",
     parsed.findings == null ? "" : String(parsed.findings),
     ...properties.map((property) => property.value),
   ].join("\n\n");
   const seen = new Set(declared);
-  const inline = mentioned(prose, className).filter((edge) => {
+  const inline = mentioned(linkText, className).filter((edge) => {
     const key = edge.id ?? edge.href;
     if (seen.has(key)) return false;
     seen.add(key);
@@ -339,7 +419,8 @@ function readNode(className: string, file: string, report: Diagnostic[]): Node {
     className,
     name,
     label: String(parsed.label ?? name),
-    description: prose ? `${description}\n\n${prose}` : description,
+    description,
+    linkText,
     properties,
     findings: parsed.findings == null ? null : String(parsed.findings),
     out: [...stated, ...inline],
@@ -490,7 +571,13 @@ function validate(
      * property name is a typo or a decision, not background noise.
      */
     for (const property of node.properties) {
-      if (declaredProps.has(property.name) || OBSERVATION_PROPERTY.test(property.name)) continue;
+      if (
+        declaredProps.has(property.name) ||
+        OBSERVATION_PROPERTY.test(property.name) ||
+        UNIVERSAL_PROPERTIES.has(property.name)
+      ) {
+        continue;
+      }
       report.push({
         file,
         severity: "warning",
@@ -498,6 +585,57 @@ function validate(
       });
     }
   }
+}
+
+/**
+ * Every inline link target in the corpus is a shape {@link resolveTarget} recognises.
+ *
+ * # Why this is an error rather than a warning
+ *
+ * `ResolvedTarget.resolved` was documented from the start as the guard that stops an unplaceable
+ * link from shipping, and for a long time nothing read it. `prose.ts` used `.href` unconditionally,
+ * so an unrecognised shape became a raw relative `href` — `<a href="ocg-white-paper-013.md">` on a
+ * page at `/wiki/source/…`, which resolves to `/wiki/source/ocg-white-paper-013.md` and 404s while
+ * the target page sits one character away. 40 of those were live, and the unit test that exists to
+ * catch exactly this skipped them, because a raw relative href is not site-absolute and the test
+ * read "not site-absolute" as "external, therefore none of our business".
+ *
+ * A link that looks right and goes nowhere is invisible to the author, survives review, and is
+ * found by a reader clicking it. That is the same argument the four checks in {@link validate}
+ * make, so this is the same severity.
+ *
+ * # Why it scans prose rather than edges
+ *
+ * {@link mentioned} drops any target it cannot place — it keeps nodes and sources and nothing
+ * else — so by the time a link is an {@link Edge} the unresolvable ones are already gone. The
+ * shapes have to be checked where they are written.
+ */
+function checkTargets(
+  nodes: Node[],
+  classes: Omit<OntologyClass, "nodes">[],
+  sources: Source[],
+  report: Diagnostic[],
+): void {
+  const scan = (text: string, fromClass: string, file: string) => {
+    for (const match of text.matchAll(/\]\(([^)\s]+)\)/g)) {
+      const target = match[1]!;
+      if (/^(https?:|mailto:|#|\/)/.test(target)) continue;
+      if (resolveTarget(target, fromClass).resolved) continue;
+      report.push({
+        file,
+        severity: "error",
+        message:
+          `link target "${target}" is not a shape this site can turn into a URL. ` +
+          `The shapes that are are listed above resolveTarget in src/lib/corpus.ts.`,
+      });
+    }
+  };
+
+  for (const node of nodes) scan(node.linkText, node.className, `.yidam/corpus/${node.id}.yml`);
+  for (const entry of classes) {
+    scan(entry.description, entry.className, `.yidam/corpus/${entry.className}.ont.yml`);
+  }
+  for (const source of sources) scan(source.body, FROM_CATALOG, `.yidam/catalog/${source.slug}.md`);
 }
 
 /** Read, link, and index the corpus. Memoized — the wiki pages number in the hundreds. */
@@ -561,6 +699,10 @@ export function loadCorpus(): Corpus {
         .map(readSource)
     : [];
   const bySlug = new Map(sources.map((s) => [s.slug, s]));
+
+  // After the sources are read, because catalog entries are the largest single writer of link
+  // targets and half the shapes only they use.
+  checkTargets(nodes, classes, sources, report);
 
   // Which nodes cite which source. Taken from the edge list, which by now holds both the
   // structured `sourced-from` links and the citations written inline in prose — this corpus uses
