@@ -1,0 +1,86 @@
+id: child-nutrition-connector
+summary: >-
+  A fourteenth connector, dew-child-nutrition, wired for eleven Octobers — and the source it
+  retrieves is not the source the catalog said it was for fifteen phases.
+context: |
+  Stream D of the working audit is historical depth: the corpus declares 1851-to-present and every
+  committed fixture began at FY2020. Two routes were tractable. The first, extending `census-f33`
+  backwards, was taken in the preceding phase and produced ten years of per-district finance. This
+  is the second.
+
+  The MR-81 archive had a catalog entry describing "October enrollment by district, as reported on
+  the MR-81 form", seventeen consecutive years of it, recorded as *retrievable, unparsed* and
+  explicitly deferred: "taking it up properly is a phase of its own."
+
+  Opening a file made that a different phase. MR-81 is the **Office for Child Nutrition's free and
+  reduced-price lunch report** — one row per school site, grouped by sponsor, carrying an
+  enrollment column because a lunch claim needs a denominator. The entry had been written from a
+  directory listing.
+decision: |
+  Add `dew-child-nutrition` as a connector in its own right rather than folding it into
+  `dew-foundation`. Different publisher unit, different purpose, and a wholly different set of
+  failure modes: `dew-foundation` retrieves the department's funding model, and this retrieves a
+  meal-program administrative return that happens to be the longest poverty series Ohio has.
+
+  Wire the **sponsor-centric era, 2001 through 2011** — eleven consecutive Octobers behind one
+  column map. Record the other two eras as blockers on the connector rather than half-extracting
+  them.
+
+  Rewrite the catalog entry from the files before building anything against it.
+consequences: |
+  **The series.** Free and reduced-price applications as a share of the meal-program denominator,
+  over Public sponsors, rises from **27.7% in 2001 to 46.3% in 2011** — 18.6 points in eleven
+  years. That is the closest available long run of the measure Ohio's disadvantaged pupil funding
+  is actually paid on, since R.C. 3317.03(B)(21) hands the definition of "economically
+  disadvantaged" to the department and free-lunch eligibility has been its operative test.
+
+  **Three breaks, all carried rather than smoothed.** The denominator is renamed `AdmCount` to
+  `CECount` in 2010 and redefined with it — CE is "the highest daily number of students with
+  access to the program", which is neither ADM nor what preceded it — so `enrollment_basis` is a
+  column. Sponsors are not districts: "Public" includes county boards of developmental
+  disabilities and community schools, and the sponsor count rising from 730 to 944 is mostly
+  community schools opening. And IRNs are zero-padded in some years and not others, which would
+  have made the panel fail to join to itself.
+
+  **Two published defects, found by a plausibility check rather than by reading.** FY2005 gives
+  Wilson Elementary School an `AdmCount` of 342,332, putting Portsmouth City at 344,048 students
+  across nine sites. FY2001 leaks what look like identifiers into the count column for three
+  residential and juvenile sponsors. The extractor transcribes both, because an extractor that
+  repairs its source is worse than one that ships a visible error, and `implausible_sponsors`
+  names them so an aggregate can exclude them by name. Only the Portsmouth row is Public and only
+  it ever reached the poverty series.
+
+  **And this phase introduced a defect of its own, which is why the writer changed.** The first
+  build shipped 99 corrupted rows: `write_csv` does not quote, every consumer splits on the comma,
+  and Ohio has sponsors called "Holy Trinity, Swanton Ele Sch" and "Edge Academy, The". `write_csv`
+  now refuses any field containing the delimiter, so the next fixture to try this fails the
+  rebuild instead of shipping shifted columns that look like data. That guard protects all
+  fifteen fixtures, not only this one.
+
+  **What stays blocked, with the reason on the record.** The 1998-2000 files are a different,
+  school-centric column set whose unquoted district names push three rows past the last column, so
+  the era needs a last-field rule rather than an index. And from 2012 the report splits into
+  Traditional, Provision 2 and Community Eligibility streams — the Traditional file states that it
+  "Excludes Provision 2 and Community Eligibility Option (CEO) sponsors", which are the
+  highest-poverty districts and a growing share of them. A series continued from Traditional alone
+  would fall, and the fall would be adoption rather than poverty.
+alternatives: |
+  **Fold it into `dew-foundation`.** Rejected for the reason `payment-reports-connector` gave for
+  the same question: that connector retrieves the department's *model*, and this is an
+  administrative *return* from a different office, with different vintages and different failure
+  modes.
+
+  **Extract all seventeen years.** Rejected as scoped, not as wrong. The 1998-2000 map is genuinely
+  a second reader and the 2012-2014 era needs three streams joined; doing either badly produces a
+  series that looks continuous and is not. Eleven unbroken years with two named gaps is worth more
+  than seventeen with a silent discontinuity in the middle.
+
+  **Treat it as the enrollment archive the catalog described and fix the projection prior.** This
+  was the stated plan and it does not survive the correction. CE and ADM are different quantities,
+  the meal-program denominator excludes sponsors that do not participate, and a variability
+  estimate drawn from it and applied to an ADM projection would be an inference resting on a
+  source that was never measuring the thing. The projection prior stays as it is.
+
+  **Repair the two published defects in the extractor.** Rejected. The digest manifest pins what
+  the department published; a fixture that silently disagrees with it breaks the one property that
+  makes the whole retrieval layer checkable.

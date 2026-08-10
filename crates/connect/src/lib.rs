@@ -553,6 +553,22 @@ pub fn rebuild(root: &Path) -> Result<Vec<Rebuilt>, RebuildError> {
         },
     });
 
+    // Eleven Octobers of the child nutrition report, aggregated from school sites to sponsors.
+    out.push(match mr81_panel(root) {
+        Ok(rows) => Rebuilt::Written {
+            path: fixtures::MR81_FIXTURE.to_string(),
+            rows: fixtures::write_csv(
+                &root.join(fixtures::MR81_FIXTURE),
+                fixtures::MR81_HEADER,
+                &rows,
+            )?,
+        },
+        Err(reason) => Rebuilt::Skipped {
+            path: fixtures::MR81_FIXTURE.to_string(),
+            reason,
+        },
+    });
+
     // School districts across legislative seats. The last extraction because it is the only one
     // that depends on another fixture's contents rather than only on a cached publication: the
     // panel it apportions is the FY2027 model's 609 districts.
@@ -701,6 +717,31 @@ fn f33_ohio_panel(root: &Path) -> Result<Vec<Vec<String>>, String> {
         })
         .collect();
     fixtures::build_f33_ohio_panel(&years, &directory)
+}
+
+/// Every October of MR-81 this repository reads: the sponsor-centric era, unbroken.
+const MR81_YEARS: &[u16] = &[
+    2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010, 2011,
+];
+
+/// The MR-81 sponsor panel, from eleven delimited reports.
+fn mr81_panel(root: &Path) -> Result<Vec<Vec<String>>, String> {
+    let mut reports = Vec::new();
+    for year in MR81_YEARS {
+        let source = source(&format!("mr81-{year}")).expect("registered").1;
+        let bytes = cache::read_cached(root, source).map_err(|e| e.to_string())?;
+        // Latin-1: the reports carry the occasional non-UTF-8 byte in a sponsor name, and a
+        // lossy UTF-8 read would put a replacement character into committed data.
+        reports.push((*year, bytes.iter().map(|b| *b as char).collect::<String>()));
+    }
+    let years: Vec<fixtures::Mr81Year<'_>> = reports
+        .iter()
+        .map(|(year, report)| fixtures::Mr81Year {
+            year: *year,
+            report,
+        })
+        .collect();
+    fixtures::build_mr81(&years)
 }
 
 /// Read the one worksheet whose name begins with `prefix`.

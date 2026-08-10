@@ -1037,6 +1037,157 @@ pub const CONNECTORS: &[Connector] = &[
             },
         ],
     },
+    Connector {
+        key: "dew-child-nutrition",
+        publisher: "Ohio Department of Education and Workforce, Office for Child Nutrition",
+        feeds: &["education-agency", "metric", "formula-component"],
+        status: Status::Wired {
+            still_blocked: Some(
+                "wired for the eleven sponsor-centric years, 2001 through 2011. The 1998-2000 \
+                 files are a different, school-centric column set whose unquoted district names \
+                 shift three rows past the last column; from 2012 the report splits into \
+                 Traditional, Provision 2 and Community Eligibility streams, and the Traditional \
+                 file excludes the highest-poverty sponsors by design",
+            ),
+        },
+        note: "The only long series of the count Ohio's disadvantaged pupil funding is actually \
+               paid on. Not an enrollment archive, which is what the catalog said it was for \
+               fifteen phases.",
+        sources: &[
+            Source {
+                key: "mr81-2001",
+                title: None,
+                url: "https://public.education.ohio.gov/MR81/MR81_October_2001/MR81-Oct2001-Delimited.txt",
+                filename: "mr81-2001.txt",
+                format: Format::Tsv,
+                catalog: Some("dew-mr81-enrollment-archive"),
+                fixtures: &[crate::fixtures::MR81_FIXTURE],
+                note: "October 2001. Published filename is `MR81-Oct2001-Delimited.txt`; the naming is \
+                       inconsistent to the point of needing a per-year table, and 2011's is \
+                       misspelled.",
+            },
+            Source {
+                key: "mr81-2002",
+                title: None,
+                url: "https://public.education.ohio.gov/MR81/MR81_October_2002/MR81-Oct2002-TabDelimited.txt",
+                filename: "mr81-2002.txt",
+                format: Format::Tsv,
+                catalog: Some("dew-mr81-enrollment-archive"),
+                fixtures: &[crate::fixtures::MR81_FIXTURE],
+                note: "October 2002. Published filename is `MR81-Oct2002-TabDelimited.txt`; the naming is \
+                       inconsistent to the point of needing a per-year table, and 2011's is \
+                       misspelled.",
+            },
+            Source {
+                key: "mr81-2003",
+                title: None,
+                url: "https://public.education.ohio.gov/MR81/MR81_October_2003/MR81__Oct_2003_Delimited.txt",
+                filename: "mr81-2003.txt",
+                format: Format::Tsv,
+                catalog: Some("dew-mr81-enrollment-archive"),
+                fixtures: &[crate::fixtures::MR81_FIXTURE],
+                note: "October 2003. Published filename is `MR81__Oct_2003_Delimited.txt`; the naming is \
+                       inconsistent to the point of needing a per-year table, and 2011's is \
+                       misspelled.",
+            },
+            Source {
+                key: "mr81-2004",
+                title: None,
+                url: "https://public.education.ohio.gov/MR81/MR81_October_2004/MR81_Oct_2004_delimited.txt",
+                filename: "mr81-2004.txt",
+                format: Format::Tsv,
+                catalog: Some("dew-mr81-enrollment-archive"),
+                fixtures: &[crate::fixtures::MR81_FIXTURE],
+                note: "October 2004. Published filename is `MR81_Oct_2004_delimited.txt`; the naming is \
+                       inconsistent to the point of needing a per-year table, and 2011's is \
+                       misspelled.",
+            },
+            Source {
+                key: "mr81-2005",
+                title: None,
+                url: "https://public.education.ohio.gov/MR81/MR81_October_2005/MR81_Oct_2005_Delimited.txt",
+                filename: "mr81-2005.txt",
+                format: Format::Tsv,
+                catalog: Some("dew-mr81-enrollment-archive"),
+                fixtures: &[crate::fixtures::MR81_FIXTURE],
+                note: "October 2005. Published filename is `MR81_Oct_2005_Delimited.txt`; the naming is \
+                       inconsistent to the point of needing a per-year table, and 2011's is \
+                       misspelled.",
+            },
+            Source {
+                key: "mr81-2006",
+                title: None,
+                url: "https://public.education.ohio.gov/MR81/MR81_October_2006/MR81_October2006_delimited.txt",
+                filename: "mr81-2006.txt",
+                format: Format::Tsv,
+                catalog: Some("dew-mr81-enrollment-archive"),
+                fixtures: &[crate::fixtures::MR81_FIXTURE],
+                note: "October 2006. Published filename is `MR81_October2006_delimited.txt`; the naming is \
+                       inconsistent to the point of needing a per-year table, and 2011's is \
+                       misspelled.",
+            },
+            Source {
+                key: "mr81-2007",
+                title: None,
+                url: "https://public.education.ohio.gov/MR81/MR81_October_2007/MR81_Oct_2007_Delimited.txt",
+                filename: "mr81-2007.txt",
+                format: Format::Tsv,
+                catalog: Some("dew-mr81-enrollment-archive"),
+                fixtures: &[crate::fixtures::MR81_FIXTURE],
+                note: "October 2007. Published filename is `MR81_Oct_2007_Delimited.txt`; the naming is \
+                       inconsistent to the point of needing a per-year table, and 2011's is \
+                       misspelled.",
+            },
+            Source {
+                key: "mr81-2008",
+                title: None,
+                url: "https://public.education.ohio.gov/MR81/MR81_October_2008/MR81_October_2008_Delimited-rev2.txt",
+                filename: "mr81-2008.txt",
+                format: Format::Tsv,
+                catalog: Some("dew-mr81-enrollment-archive"),
+                fixtures: &[crate::fixtures::MR81_FIXTURE],
+                note: "October 2008. Published filename is `MR81_October_2008_Delimited-rev2.txt`; the naming is \
+                       inconsistent to the point of needing a per-year table, and 2011's is \
+                       misspelled.",
+            },
+            Source {
+                key: "mr81-2009",
+                title: None,
+                url: "https://public.education.ohio.gov/MR81/MR81_October_2009/MR81_October_2009_Delimited-rev.txt",
+                filename: "mr81-2009.txt",
+                format: Format::Tsv,
+                catalog: Some("dew-mr81-enrollment-archive"),
+                fixtures: &[crate::fixtures::MR81_FIXTURE],
+                note: "October 2009. Published filename is `MR81_October_2009_Delimited-rev.txt`; the naming is \
+                       inconsistent to the point of needing a per-year table, and 2011's is \
+                       misspelled.",
+            },
+            Source {
+                key: "mr81-2010",
+                title: None,
+                url: "https://public.education.ohio.gov/MR81/MR81_October_2010/MR81_Oct_2010_delimited%20Revised%200911.txt",
+                filename: "mr81-2010.txt",
+                format: Format::Tsv,
+                catalog: Some("dew-mr81-enrollment-archive"),
+                fixtures: &[crate::fixtures::MR81_FIXTURE],
+                note: "October 2010. Published filename is `MR81_Oct_2010_delimited Revised 0911.txt`; the naming is \
+                       inconsistent to the point of needing a per-year table, and 2011's is \
+                       misspelled.",
+            },
+            Source {
+                key: "mr81-2011",
+                title: None,
+                url: "https://public.education.ohio.gov/MR81/MR81_October_2011/MR8_Oct_2011_Delimited.txt",
+                filename: "mr81-2011.txt",
+                format: Format::Tsv,
+                catalog: Some("dew-mr81-enrollment-archive"),
+                fixtures: &[crate::fixtures::MR81_FIXTURE],
+                note: "October 2011. Published filename is `MR8_Oct_2011_Delimited.txt`; the naming is \
+                       inconsistent to the point of needing a per-year table, and 2011's is \
+                       misspelled.",
+            },
+        ],
+    },
 ];
 
 /// Look up a connector by key.
@@ -1087,6 +1238,7 @@ mod tests {
             "dew-five-year-forecast",
             "dew-payment-reports",
             "census-geography",
+            "dew-child-nutrition",
         ];
         for key in expected {
             assert!(
