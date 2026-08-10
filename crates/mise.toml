@@ -1,0 +1,55 @@
+# The Rust workspace subproject. Tasks run with this directory as cwd, so cargo
+# finds Cargo.toml without `--manifest-path`. Address from the repository root as
+# `mise run //crates:<task>`, or run bare names from inside this directory.
+
+[tasks.gate]
+description = "Everything the crates job in CI runs: fmt, clippy, test, doc."
+run = [
+  "mise run fmt-check",
+  "mise run lint",
+  "mise run test",
+  "mise run doc",
+]
+
+[tasks.fmt]
+description = "Auto-format."
+run = "cargo fmt"
+
+[tasks.fmt-check]
+description = "Fail on unformatted code."
+run = "cargo fmt -- --check"
+
+[tasks.lint]
+description = "Clippy with warnings as errors."
+run = "cargo clippy --all-targets -- -D warnings"
+
+[tasks.test]
+description = "Run the test suite."
+run = "cargo test"
+
+[tasks.doc]
+description = "Build the docs, treating warnings as errors."
+# Load-bearing rather than decorative: the intra-doc links are how a reader gets
+# from a calculator to the corpus node that says what it is for. This gate has
+# broken silently twice — most recently on two `[open]` claim tags that rustdoc
+# read as links to an item named `open`.
+run = "cargo doc --no-deps --workspace"
+env = { RUSTDOCFLAGS = "-D warnings" }
+
+[tasks.index]
+description = "Regenerate the REGEN blocks the READMEs carry."
+run = "cargo run --quiet -p connect --bin edfund-connect -- index"
+
+[tasks.bundle]
+description = "Regenerate the web feed from the corpus."
+run = "cargo run --quiet -p bundle > ../web/public/data/bundle.json"
+
+[tasks.connectors]
+description = "What is retrievable, and how far each connector got."
+run = "cargo run --quiet -p connect --bin edfund-connect -- list"
+
+[tasks.verify]
+description = "Check cached sources against the committed digests."
+# Not part of the gate on purpose: it reads `.cache/`, which CI does not have,
+# and a publisher's outage must not be able to turn the build red.
+run = "cargo run --quiet -p connect --bin edfund-connect -- verify"

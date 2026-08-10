@@ -602,6 +602,27 @@ fn generate(command: &str, root: &Path) -> Option<String> {
 /// Returns [`IndexError::UnknownBlock`] if a document names a generator that does not exist —
 /// a new block is then a deliberate act rather than something that silently stays empty.
 pub fn regenerate(root: &Path) -> Result<Vec<String>, IndexError> {
+    rewrite(root, true)
+}
+
+/// Which documents carry a stale block, without touching any of them.
+///
+/// The form a gate wants. Regenerating and then asking `git diff --quiet` — which is what
+/// `.github/workflows/ci.yml` does — cannot distinguish a stale block from an unrelated
+/// uncommitted edit in the same file, so it reports a false failure against any dirty working
+/// tree. CI never met that case because CI checks out clean; a person running the same check
+/// locally meets it immediately, and a gate that cries wolf on every edit is a gate that gets
+/// ignored.
+///
+/// # Errors
+///
+/// As [`regenerate`].
+pub fn stale(root: &Path) -> Result<Vec<String>, IndexError> {
+    rewrite(root, false)
+}
+
+/// Render every block; write when asked. Returns the documents whose content would change.
+fn rewrite(root: &Path, write: bool) -> Result<Vec<String>, IndexError> {
     let mut changed = Vec::new();
     for document in DOCUMENTS {
         let path = root.join(document);
@@ -638,7 +659,9 @@ pub fn regenerate(root: &Path) -> Result<Vec<String>, IndexError> {
         out.push_str(rest);
 
         if out != original {
-            fs::write(&path, out)?;
+            if write {
+                fs::write(&path, out)?;
+            }
             changed.push((*document).to_string());
         }
     }
@@ -889,6 +912,32 @@ mod tests {
         // And a target named twice is one edge, not two.
         let twice = "[adequacy](../doctrine/adequacy.yml) and again ../doctrine/adequacy.yml";
         assert_eq!(outgoing_links(twice, &slugs, "x"), 1);
+    }
+
+    #[test]
+    fn checking_reports_what_regenerating_would_change_and_writes_nothing() {
+        // The two paths share one renderer, so what this really guards is that `--check` cannot
+        // acquire a side effect: the gate runs it against a dirty tree, and a check that writes
+        // would quietly stage work nobody asked for.
+        let root = repository_root();
+        regenerate(&root).expect("generators exist");
+        let before: Vec<String> = DOCUMENTS
+            .iter()
+            .map(|document| std::fs::read_to_string(root.join(document)).unwrap_or_default())
+            .collect();
+
+        assert!(
+            stale(&root).expect("generators exist").is_empty(),
+            "check disagrees with a regeneration that just ran"
+        );
+
+        for (document, original) in DOCUMENTS.iter().zip(before) {
+            assert_eq!(
+                std::fs::read_to_string(root.join(document)).unwrap_or_default(),
+                original,
+                "{document} was written by a check"
+            );
+        }
     }
 
     #[test]

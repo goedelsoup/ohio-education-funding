@@ -1,0 +1,51 @@
+# The Astro site subproject. Tasks run with this directory as cwd, so pnpm finds
+# package.json without `--dir`. Address from the repository root as
+# `mise run //web:<task>`, or run bare names from inside this directory.
+
+[tasks.gate]
+description = "Everything the web job in CI runs: check, unit, build, e2e."
+run = [
+  "mise run install",
+  "mise run check",
+  "mise run test-unit",
+  "mise run build",
+  "mise run test-e2e",
+]
+
+[tasks.install]
+description = "Install dependencies exactly as locked."
+run = "pnpm install --frozen-lockfile"
+
+[tasks.dev]
+description = "Serve the site with hot reload."
+run = "pnpm dev"
+
+[tasks.check]
+description = "Type-check the Astro and TypeScript sources."
+run = "pnpm check"
+
+[tasks.test-unit]
+description = "The formula, the projection, the link graph, the 404 matcher."
+run = "pnpm test:unit"
+
+[tasks.build]
+description = "Build the static site."
+# Where the formula is checked against the Rust checkpoints and where the corpus
+# is parsed and validated, so a corpus authoring defect surfaces here rather than
+# as a page that comes out wrong days later.
+run = "pnpm build"
+
+[tasks.test-e2e]
+description = "The site in Chromium, a third of it with JavaScript disabled."
+# The class of bug unit tests structurally cannot catch: the verification gate
+# held shut on every tab except the one it exists for, and only a real browser
+# found it. Needs `pnpm exec playwright install chromium` once.
+run = "pnpm test:e2e"
+
+[tasks.schemas]
+description = "Emit the JSON Schema the editor's YAML language server reads."
+run = "pnpm schemas"
+
+[tasks.corpus-report]
+description = "Report on the corpus as the web layer sees it."
+run = "pnpm corpus:report"

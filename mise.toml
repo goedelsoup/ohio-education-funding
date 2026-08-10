@@ -1,0 +1,84 @@
+# mise — host toolchains and the task runner. https://mise.jdx.dev
+#
+# `mise install` provisions the toolchains. `mise run //:ci` runs everything
+# `.github/workflows/ci.yml` runs; `mise tasks --all` lists every task.
+#
+# # Why this exists
+#
+# There is no git remote, so that workflow file has never executed once. Its own
+# header says the gates "existed and passed for fourteen phases, and nothing ran
+# them except a person remembering to" — which was still true after it was
+# written, because a workflow with nowhere to push is a workflow that does not
+# run. `cargo doc -D warnings` was red for at least two phases and nothing said
+# so.
+#
+# The workflow stays, unchanged, so it works the day a remote is added. This
+# file is the thing that runs today, and it runs the same nine gates in the same
+# order.
+
+# Monorepo task mode. Each directory in `config_roots` holding a `mise.toml` is a
+# subproject addressable from here as `//<path>:<task>` — `mise run //crates:test`.
+# Subproject tasks run with their own directory as cwd, which is what lets them
+# call bare `cargo` and `pnpm` with no `--manifest-path` or `--dir`.
+monorepo_root = true
+
+[settings]
+experimental = true
+
+[monorepo]
+config_roots = ["crates", "web"]
+
+[tools]
+# Pinned rather than "latest" so the gate is reproducible. 1.82 is the floor the
+# workspace actually requires — `Option::is_none_or`, used in `connect` and
+# `spreadsheet`, stabilized there — and is the version every check in this repo
+# has been verified against. mise installs Rust through rustup with its own
+# profile and does not read a `rust-toolchain.toml` component list, so rustfmt
+# and clippy are requested here or a clean install omits them and the lint task
+# fails with "no such command".
+rust = { version = "1.82.0", components = "rustfmt,clippy" }
+# Both named in `.github/workflows/ci.yml`; kept identical so a green local gate
+# means something about the remote one.
+node = "24"
+pnpm = "11"
+
+# --- Root tasks (`//:<task>`) ------------------------------------------------
+#
+# NB: a root task must not share a name with a subproject task fanned out via
+# `//...:<task>`, because `//...` matches the root too and the task would recurse.
+
+[tasks.ci]
+description = "Everything CI runs: the crate gate, the web gate, and the generated-file check."
+run = [
+  "mise run //crates:gate",
+  "mise run //web:gate",
+  "mise run //:generated",
+]
+
+[tasks.generated]
+description = "Fail if the committed feed or any REGEN block is stale."
+# Both artifacts are committed and both are easy to forget. If either drifts the
+# repository is describing itself wrongly and nothing else would notice — which
+# is exactly what happened to the connector table and the corpus node count.
+run = '''
+set -e
+cargo run --quiet --manifest-path crates/Cargo.toml -p bundle > /tmp/edfund-bundle.json
+if ! diff -q /tmp/edfund-bundle.json web/public/data/bundle.json > /dev/null; then
+  echo "error: web/public/data/bundle.json is stale." >&2
+  echo "  regenerate: cargo run --manifest-path crates/Cargo.toml -p bundle > web/public/data/bundle.json" >&2
+  diff /tmp/edfund-bundle.json web/public/data/bundle.json | head -40 >&2
+  exit 1
+fi
+cargo run --quiet --manifest-path crates/Cargo.toml -p connect --bin edfund-connect -- index --check
+echo "the feed and every REGEN block are current"
+'''
+
+[tasks.deploy]
+description = "Publish web/dist to Cloudflare Pages. Builds first; --branch main is not optional."
+# `--dir` steers which package pnpm runs, not where dlx resolves paths, so the
+# directory argument is `web/dist` and not `dist`. And on direct upload wrangler
+# labels the deployment with whatever branch is checked out: deploy from a
+# `phase/*` branch without `--branch main` and the upload succeeds, wrangler
+# prints a URL, and the live site does not change.
+depends = ["//web:build"]
+run = "pnpm dlx wrangler@latest pages deploy web/dist --project-name ohio-education-funding --branch main"

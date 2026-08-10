@@ -64,8 +64,12 @@ than in this sentence, where it was wrong by twenty-nine.
 ## Workspace
 
 The Rust workspace root is [`Cargo.toml`](Cargo.toml) in this directory, so all Rust lives
-under `crates/` and the repository root stays free of build configuration. Every directory here
-is now a real crate; the nine connector stubs were folded into [`connect`](connect/) and their
+under `crates/` and no build configuration sits at the repository root. What does sit there is
+[`mise.toml`](../mise.toml), which is a task runner rather than a build system: it addresses this
+directory as the `//crates` subproject and shells out to the `cargo` that lives here.
+
+Every directory here is now a real crate; the nine connector stubs were folded into
+[`connect`](connect/) and their
 prose kept at [`connect/sources/`](connect/sources/), where the four connectors approved since
 have not yet joined them.
 
@@ -109,9 +113,18 @@ Those three are the crates with binaries; the calculators are libraries.
 Run the gate from this directory:
 
 ```
+mise run gate          # fmt-check, lint, test, doc — or `mise run //crates:gate` from the root
+```
+
+which is these four, and the fourth is not optional. The doc links are how a reader gets from a
+calculator to the corpus node that says what it is for, and `cargo doc` has now gone red silently
+twice:
+
+```
 cargo fmt -- --check
 cargo clippy --all-targets -- -D warnings
 cargo test
+RUSTDOCFLAGS="-D warnings" cargo doc --no-deps --workspace
 ```
 
 ### On floating point
@@ -137,7 +150,7 @@ Fields per crate: name, capability type (connector/calculator/feature-engineerin
 | Crate | Description | `#[test]` fns |
 |---|---|--:|
 | [`bundle`](bundle/) | Export a versioned JSON feed of the corpus's district-level findings for the web layer | 25 |
-| [`connect`](connect/) | Retrieval and extraction: the department's publications into committed fixtures | 100 |
+| [`connect`](connect/) | Retrieval and extraction: the department's publications into committed fixtures | 101 |
 | [`deflate`](deflate/) | Convert nominal Ohio school finance figures to constant dollars, fiscal-year aligned | 11 |
 | [`dispersion`](dispersion/) | School finance equity statistics: dispersion and wealth neutrality across agencies | 82 |
 | [`edfund-core`](edfund-core/) | Shared domain types for the Ohio education funding computer | 7 |
@@ -149,7 +162,7 @@ Fields per crate: name, capability type (connector/calculator/feature-engineerin
 | [`scenario-delta`](scenario-delta/) | Winners and losers between two funding runs, with incidence and the off-formula count | 25 |
 | [`spreadsheet`](spreadsheet/) | Read the department's published workbooks with no dependencies | 70 |
 
-12 crates, 617 test functions, no crates.io dependencies. `cargo test` reports a different total: it adds doc-tests and counts each integration binary separately.
+12 crates, 618 test functions, no crates.io dependencies. `cargo test` reports a different total: it adds doc-tests and counts each integration binary separately.
 <!-- /REGEN -->
 
 ## Index status

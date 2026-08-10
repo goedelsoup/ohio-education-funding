@@ -23,7 +23,8 @@ COMMANDS:
     rebuild               regenerate the committed fixtures from cached sources
     verify [--write]      check cached sources against the committed digest manifest
     cpi                   check the deflator series against the Bureau's published file
-    index                 regenerate the REGEN blocks in the repository's READMEs
+    index [--check]       regenerate the REGEN blocks in the repository's READMEs;
+                          --check reports staleness without writing, and exits non-zero
     sheets <source>       list a cached workbook's sheets, for inspecting a new layout
     head <source> <sheet> [n]
                           print the first n rows of a sheet, cell by cell, with column
@@ -32,6 +33,7 @@ COMMANDS:
 OPTIONS:
     --repo <path>         repository root (default: the one this binary was built in)
     --refresh             on fetch, re-download even if cached
+    --check               on index, report rather than write
 ";
 
 fn main() -> ExitCode {
@@ -39,6 +41,7 @@ fn main() -> ExitCode {
     let root = take_option(&mut args, "--repo").map_or_else(cache::repository_root, PathBuf::from);
     let refresh = take_flag(&mut args, "--refresh");
     let write = take_flag(&mut args, "--write");
+    let check = take_flag(&mut args, "--check");
 
     let result = match args.first().map(String::as_str) {
         Some("list") => list(),
@@ -46,7 +49,7 @@ fn main() -> ExitCode {
         Some("rebuild") => run_rebuild(&root),
         Some("verify") => verify(&root, write),
         Some("cpi") => check_cpi(&root),
-        Some("index") => regenerate_index(&root),
+        Some("index") => regenerate_index(&root, check),
         Some("sheets") => sheets(&root, args.get(1).map(String::as_str)),
         Some("head") => head(
             &root,
@@ -195,14 +198,31 @@ fn verify(root: &std::path::Path, write: bool) -> Result<(), String> {
 }
 
 /// Regenerate every `REGEN` block from the repository itself.
-fn regenerate_index(root: &std::path::Path) -> Result<(), String> {
-    let changed = connect::index::regenerate(root).map_err(|e| e.to_string())?;
-    if changed.is_empty() {
-        println!("every block is already current");
+fn regenerate_index(root: &std::path::Path, check: bool) -> Result<(), String> {
+    // `--check` reports without writing, and is the form a gate should use. The obvious
+    // alternative — regenerate, then `git diff --quiet` — cannot tell a stale block from an
+    // uncommitted edit somewhere else in the same file, so it fails on any dirty tree and teaches
+    // whoever hits it to ignore the gate. CI never noticed because CI checks out clean.
+    let stale = if check {
+        connect::index::stale(root).map_err(|e| e.to_string())?
     } else {
-        for document in changed {
-            println!("rewrote {document}");
+        connect::index::regenerate(root).map_err(|e| e.to_string())?
+    };
+    if stale.is_empty() {
+        println!("every block is already current");
+        return Ok(());
+    }
+    if check {
+        for document in &stale {
+            println!("stale: {document}");
         }
+        return Err(format!(
+            "{} document(s) carry a stale REGEN block. Regenerate: edfund-connect index",
+            stale.len()
+        ));
+    }
+    for document in stale {
+        println!("rewrote {document}");
     }
     Ok(())
 }
