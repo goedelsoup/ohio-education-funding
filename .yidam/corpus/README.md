@@ -77,16 +77,16 @@ Fields: count per claim tag across every node; then the unresolved marks by the 
 -->
 | Tag | Count | What it records |
 |---|--:|---|
-| `[verified]` | 473 | supported by a committed primary source |
-| `[inference]` | 178 | drawn from verified facts, not witnessed |
-| `[open]` | 138 | a live question — unknown, contested, or being worked |
+| `[verified]` | 474 | supported by a committed primary source |
+| `[inference]` | 179 | drawn from verified facts, not witnessed |
+| `[open]` | 140 | a live question — unknown, contested, or being worked |
 | `[unentered]` | 30 | a knowable value nobody has typed in yet |
 
-168 unresolved marks in total, 138 of them live questions and 30 of them empty fields. Before the two were distinguished the corpus reported the sum as its count of what it does not know, which overstated it by 17%.
+170 unresolved marks in total, 140 of them live questions and 30 of them empty fields. Before the two were distinguished the corpus reported the sum as its count of what it does not know, which overstated it by 17%.
 
 | Field | `[open]` | `[unentered]` |
 |---|--:|--:|
-| `description` | 73 | 1 |
+| `description` | 75 | 1 |
 | `series_path` | 0 | 12 |
 | `series` | 10 | 0 |
 | `vetoes` | 7 | 0 |
@@ -133,7 +133,7 @@ Sorted by: kind, then alphabetically.
 | [`ohio-general-assembly`](actor/ohio-general-assembly.yml) | actor | Ohio General Assembly | 6 | 4 |
 | [`supreme-court-of-ohio`](actor/supreme-court-of-ohio.yml) | actor | Supreme Court of Ohio | 3 | 5 |
 | [`adequacy`](doctrine/adequacy.yml) | doctrine | Adequacy | 8 | 23 |
-| [`equity`](doctrine/equity.yml) | doctrine | Equity | 8 | 25 |
+| [`equity`](doctrine/equity.yml) | doctrine | Equity | 9 | 25 |
 | [`thorough-and-efficient`](doctrine/thorough-and-efficient.yml) | doctrine | Thorough and Efficient | 5 | 11 |
 | [`cleveland-municipal`](education-agency/cleveland-municipal.yml) | education-agency | Cleveland Municipal School District | 3 | 5 |
 | [`eastland-fairfield-ctc`](education-agency/eastland-fairfield-ctc.yml) | education-agency | Eastland-Fairfield Career and Technical Schools | 3 | 2 |
@@ -178,7 +178,7 @@ Sorted by: kind, then alphabetically.
 | [`hb-96-2025`](legislation/hb-96-2025.yml) | legislation | Am. Sub. H.B. 96 (2025) — FY2026-27 Budget | 6 | 9 |
 | [`ohio-constitution-article-vi-section-2`](legislation/ohio-constitution-article-vi-section-2.yml) | legislation | Ohio Constitution, Article VI, Section 2 (1851) | 2 | 5 |
 | [`cincinnati-v-walter-1979`](litigation/cincinnati-v-walter-1979.yml) | litigation | Cincinnati City School District Board of Education v. Walter (1979) | 5 | 4 |
-| [`derolph-i-1997`](litigation/derolph-i-1997.yml) | litigation | DeRolph v. State (DeRolph I, 1997) | 6 | 12 |
+| [`derolph-i-1997`](litigation/derolph-i-1997.yml) | litigation | DeRolph v. State (DeRolph I, 1997) | 6 | 13 |
 | [`derolph-ii-2000`](litigation/derolph-ii-2000.yml) | litigation | DeRolph v. State (DeRolph II, 2000) | 13 | 4 |
 | [`derolph-iii-2001`](litigation/derolph-iii-2001.yml) | litigation | DeRolph v. State (DeRolph III, 2001) | 12 | 3 |
 | [`derolph-iv-2002`](litigation/derolph-iv-2002.yml) | litigation | DeRolph v. State (DeRolph IV, 2002) | 10 | 5 |

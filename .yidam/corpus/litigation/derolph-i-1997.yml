@@ -55,10 +55,41 @@ description: |
   pandemic relief, so the federal share is inflated and the state and local shares are both
   deflated; in an ordinary year Ohio's local share would be higher. [verified]
 
-  **What this does not establish.** That the reliance causes the disparities, which is a separate
-  claim the court supported on a trial record this corpus does not hold; and that twenty-eight
-  years of remedy have or have not moved the position, which needs the survey across years and
-  the layout is not stable enough to assume. [open]
+  **AND THE SURVEY ACROSS YEARS NOW EXISTS. THE POSITION MOVED, AND IT MOVED THE WRONG WAY.**
+  This node recorded that whether the remedy period had shifted Ohio's reliance "needs the survey
+  across years and the layout is not stable enough to assume". The layout is not stable — the
+  three eras carry 256, 260 and 354 columns — but the *column names* are, so ten years of it read
+  cleanly. Over comparable districts: [verified — `dispersion::ohio_panel`, pinned by test]
+
+      FY2012  local 49.17%  state 41.88%  federal  8.95%
+      FY2013  local 52.83%  state 41.92%  federal  5.25%
+      FY2015  local 50.19%  state 42.94%  federal  6.87%
+      FY2016  local 52.84%  state 40.05%  federal  7.11%
+      FY2017  local 53.40%  state 39.77%  federal  6.83%
+      FY2018  local 54.05%  state 39.62%  federal  6.33%
+      FY2019  local 54.46%  state 38.89%  federal  6.65%
+      FY2020  local 55.36%  state 38.04%  federal  6.60%
+      FY2021  local 54.04%  state 37.06%  federal  8.90%
+      FY2022  local 51.73%  state 34.25%  federal 14.02%
+
+  **The state share falls in nine years out of ten**, from 41.9% to 34.3%. Read between the two
+  federally ordinary years, FY2013 and FY2019, it falls three points while the local share rises
+  1.6. Read endpoint to endpoint it falls 7.6, though both endpoints are distorted — FY2012 still
+  carries the ARRA tail and FY2022 is the ESSER peak, and a large federal share deflates the two
+  domestic ones arithmetically. Either reading gives the same direction. [verified]
+
+  Ohio's answer to *DeRolph* was to reduce the state's share of school revenue. That is not a
+  claim about intent, and no single act did it; it is what the arithmetic of a formula phased in
+  against a local base growing faster produces. But the specific thing the court found
+  unconstitutional in 1997 — reliance on local property tax — is measurably greater now than when
+  the case ended. [inference]
+
+  **What this still does not establish.** That the reliance causes the disparities, which is a
+  separate claim the court supported on a trial record this corpus does not hold. [open] And the
+  series starts in FY2012, ten years after *DeRolph IV* and fifteen after this decision, so it
+  describes the aftermath rather than the remedy period itself. Whether the position also worsened
+  between 1997 and 2012 is not answerable from this archive: NCES publishes no F-33 before FY2012
+  under any naming its later years use. [open]
 
   The remedy was the weak point, and it is why *DeRolph* produced four decisions rather than
   one. The court declared the system unconstitutional and directed the General Assembly to fix

@@ -32,6 +32,7 @@
 #![forbid(unsafe_code)]
 
 pub mod national_peers;
+pub mod ohio_panel;
 
 use edfund_core::Dollars;
 
