@@ -275,6 +275,43 @@ pub fn rebuild(root: &Path) -> Result<Vec<Rebuilt>, RebuildError> {
         },
     );
 
+    // Who is actually in the accountability system. Three lists, one fixture, because a
+    // building's status is the union of what it appears on and the interesting rows are the ones
+    // on more than one.
+    out.push(
+        match (|| -> Result<Vec<Vec<String>>, String> {
+            let mut books = Vec::new();
+            for status in ["csi", "tsi", "atsi"] {
+                let entry = source(&format!("{status}-identified-2026"))
+                    .expect("registered")
+                    .1;
+                books.push((
+                    status,
+                    open_workbook(root, entry)
+                        .map_err(|e| e.to_string())?
+                        .rows("Sheet1")
+                        .map_err(|e| e.to_string())?,
+                ));
+            }
+            let lists: Vec<(&str, &[Vec<String>])> =
+                books.iter().map(|(s, r)| (*s, r.as_slice())).collect();
+            fixtures::build_identified(&lists)
+        })() {
+            Ok(rows) => Rebuilt::Written {
+                path: fixtures::IDENTIFIED_FIXTURE.to_string(),
+                rows: fixtures::write_csv(
+                    &root.join(fixtures::IDENTIFIED_FIXTURE),
+                    fixtures::IDENTIFIED_HEADER,
+                    &rows,
+                )?,
+            },
+            Err(reason) => Rebuilt::Skipped {
+                path: fixtures::IDENTIFIED_FIXTURE.to_string(),
+                reason,
+            },
+        },
+    );
+
     // The fifth fixture, and the one that until now needed LibreOffice. The department still
     // publishes October headcount in the pre-2007 format; `spreadsheet` reads it natively.
     let enrollment = source("enrollment-fy24").expect("registered").1;

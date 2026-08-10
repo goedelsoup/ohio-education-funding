@@ -27,9 +27,16 @@ escalation read.
 
 ## What is not held, and it is the important part
 
-**No identification list.** The corpus cannot say whether any of these buildings has been
-identified as CSI, TSI or ATSI. Everything about the accountability *system* is modelled and
-nothing about who is actually in it. [open]
+**The identification lists are now held** — 231 CSI, 117 ATSI, 60 TSI, in
+[`identified-schools-2026.csv`](../../../crates/dispersion/fixtures/identified-schools-2026.csv).
+Sheridan is CSI by escalation from ATSI; Anton Grdina and Barrington Road are on no list. What is
+*not* held is a Title I service flag, without which an absence cannot be read: CSI selects among
+Title I served schools, so a building can perform badly and never appear. [open]
+
+**And the lists have no history.** The department republishes each in place under a dated filename
+rather than archiving cycles, so a school that exited before this file was written looks like one
+never identified. Some CSI rows still carry a 2018 identification against exit criteria that allow
+three years. [verified]
 
 **No overall rating.** R.C. 3302.10 and CSI both key on the report card's *overall* rating, and
 neither published building file carries it — `Achievement_Building` gives the achievement

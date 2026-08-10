@@ -21,6 +21,24 @@ description: |
   [inference] The corpus cannot separate the two effects and should not pretend the index is
   clean. [open]
 
+  **AND IT IS ON NONE OF THE THREE IDENTIFICATION LISTS.** Not CSI, not TSI, not ATSI. [verified —
+  `dispersion::identified`, pinned by test] The corpus's worst-performing exemplar building, at a
+  third of the Performance Index scale with two in three students chronically absent, is outside
+  the federal accountability system entirely — while [Sheridan](sheridan-high-school.yml), a
+  four-star building, is inside it.
+
+  **That is not obviously a defect, and the corpus cannot tell.** CSI selects among **Title I
+  served** schools, and neither the identification lists nor any fixture here carries a Title I
+  service flag. So the absence has at least three readings — the building is not Title I served;
+  it is served but was not in the bottom 5% of that population in the 2025 cycle; or it was
+  identified in an earlier cycle and exited. Nothing held distinguishes them, and the department
+  republishes each list in place rather than archiving cycles, so the history that would settle it
+  does not exist here. [open]
+
+  What can be said is narrower and still worth saying: **a reader who treats the CSI list as "the
+  failing schools" will not find this building on it.** Cleveland has fifteen CSI buildings and
+  this is not one of them.
+
   **The intervention connection is real and not yet traceable.** Cleveland Municipal is recorded
   as having been subject to state academic distress intervention "for part of the period", with
   dates not established. [verified] Whether this building was open, and how it performed, during
@@ -40,8 +58,8 @@ properties:
     building file. [unentered]
   chronic_absenteeism: 66.7% in 2024-25. [verified]
   roles: |
-    Not held. Whether this building has been identified as CSI, TSI or ATSI is unknown to the
-    corpus, which holds no identification list. [open]
+    **On none of the three lists.** [verified — `dispersion::identified`, pinned by test] See the
+    description: absence is not evidence of not failing.
   series_path: crates/dispersion/fixtures/report-card-2425-buildings.csv, keyed by building IRN 000828. [verified]
 links:
   - target: ../school.ont.yml
