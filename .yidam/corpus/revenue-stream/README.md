@@ -20,9 +20,28 @@ See the class definition: [revenue-stream.ont.yml](../revenue-stream.ont.yml).
 | [local-property-tax](local-property-tax.yml) | local | Frozen against inflation by H.B. 920 reduction factors |
 | [state-foundation-aid](state-foundation-aid.yml) | state | Re-appropriated each biennium |
 | [tpp-replacement-payments](tpp-replacement-payments.yml) | state | Phase-down schedule revised repeatedly |
+| [title-i](title-i.yml) | federal | Appropriated annually; allocated on a poverty count Ohio does not use |
+| [idea-part-b](idea-part-b.yml) | federal | Base frozen at FY1999; does not respond to disability counts |
+| [esser](esser.yml) | federal | Bounded, in three tranches, expired September 2024 |
 
-## Known gap
+**The three federal nodes exist to be subtracted.** Ohio's federal share is unremarkable — 13.87%
+against a national 13.24% in FY2022, 25th of 51 — and that is the point of holding them. The
+distinctive thing about Ohio is the split between local and state, and a channel that behaves
+normally is a constant that cannot explain it. Naming the constant is what lets the rest of the
+position be read as structure rather than as an artefact of the year.
 
-Federal streams — Title I, IDEA Part B, and the ESSER funds that flowed from FY2020 through
-FY2024 — have no nodes yet. ESSER in particular matters: it was large, temporary, and its
-expiration is a live fiscal cliff for high-poverty districts. [open]
+Federal money in Ohio *is* compensatory, monotonically across the wealth distribution, and it
+closes 9.5% of the local gap against state equalization's 46%. The figures are on
+[`equity`](../doctrine/equity.yml) and pinned by a test in
+[`dispersion`](../../../crates/dispersion/src/national_peers.rs).
+
+## Known gaps
+
+Casino revenue distribution, approved in the ontology as an example of one stream substituting for
+another, has no node. [open]
+
+None of the three federal nodes carries a per-district series. Title I and ESSER allocations are
+not retrieved by any connector; IDEA Part B is
+[catalogued](../../catalog/ode-idea-part-b-allocations.md) with a known reader and no connector,
+which makes it extraction work rather than a blocker. The aggregate federal channel per district
+is available for FY2022 only, from the Census F-33. [unentered]

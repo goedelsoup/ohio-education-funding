@@ -185,6 +185,77 @@ pub struct NationalMedians {
     pub spending_per_pupil: f64,
 }
 
+/// One quartile of Ohio districts, ordered by how much local revenue they raise per pupil.
+#[derive(Debug, Clone, Copy, PartialEq, Default)]
+pub struct WealthQuartile {
+    /// How many districts fall in this quartile.
+    pub districts: usize,
+    /// Mean local revenue per pupil — the variable the quartiles are cut on.
+    pub local_per_pupil: f64,
+    /// Mean state revenue per pupil.
+    pub state_per_pupil: f64,
+    /// Mean federal revenue per pupil.
+    pub federal_per_pupil: f64,
+}
+
+/// How far each higher level of government closes the gap the local one opens.
+///
+/// # Why this belongs in the corpus rather than in a chart
+///
+/// Ohio's distinctive feature is not how much it spends but who pays: 51.8% local against a
+/// national 43.4%. That is a statement about the state. It says nothing about whether the
+/// resulting disparity is corrected, and "the state equalizes" is the claim every defence of the
+/// formula rests on.
+///
+/// Quartiling the 611 comparable districts on local revenue per pupil and reading the other two
+/// levels against it turns the claim into a number. **State aid closes just under half the local
+/// gap and federal aid closes a tenth of it**, which is a different and more useful thing to know
+/// than either "the formula equalizes" or "the formula fails".
+///
+/// The federal column also answers a question the corpus has left `[open]` in prose: federal money
+/// is compensatory in Ohio, monotonically so across all four quartiles. It is simply small.
+///
+/// # The year flatters it
+///
+/// FY2022 is the peak of ESSER. The federal offset computed here is the **largest it has ever
+/// been**, and the funds behind it expired in September 2024 — so this is an upper bound on a
+/// channel that has since shrunk, not a steady state. Any use of it must say so.
+#[must_use]
+pub fn ohio_by_local_wealth() -> [WealthQuartile; 4] {
+    let panel = national_panel();
+    let mut ohio: Vec<&NationalDistrict> = panel
+        .iter()
+        .filter(|d| d.state == "OH" && d.comparable && d.enrollment > 0.0)
+        .collect();
+    ohio.sort_by(|a, b| {
+        (a.local_revenue / a.enrollment)
+            .partial_cmp(&(b.local_revenue / b.enrollment))
+            .unwrap_or(std::cmp::Ordering::Equal)
+    });
+
+    let n = ohio.len();
+    let mut out = [WealthQuartile::default(); 4];
+    for (i, district) in ohio.iter().enumerate() {
+        // Cut by position rather than by a value threshold: the quartiles have to partition the
+        // panel exactly, and a threshold cut ties districts on the boundary into whichever side a
+        // comparison happens to land.
+        let q = ((i * 4) / n).min(3);
+        out[q].districts += 1;
+        out[q].local_per_pupil += district.local_revenue / district.enrollment;
+        out[q].state_per_pupil += district.state_revenue / district.enrollment;
+        out[q].federal_per_pupil += district.federal_revenue / district.enrollment;
+    }
+    for quartile in &mut out {
+        if quartile.districts > 0 {
+            let count = quartile.districts as f64;
+            quartile.local_per_pupil /= count;
+            quartile.state_per_pupil /= count;
+            quartile.federal_per_pupil /= count;
+        }
+    }
+    out
+}
+
 fn percentile_of(sorted: &[f64], value: f64) -> f64 {
     if sorted.is_empty() {
         return 0.0;
@@ -414,6 +485,85 @@ mod tests {
             (share - 0.518).abs() < 0.005,
             "the district file gives Ohio a {share:.4} local share against the 0.518 the \
              state-level table gives; the two should agree"
+        );
+    }
+
+    /// The figures the corpus quotes, pinned so a source revision fails here rather than passing
+    /// silently into a node.
+    #[test]
+    fn the_wealth_quartiles_are_the_ones_the_equity_node_carries() {
+        let q = ohio_by_local_wealth();
+        assert_eq!(
+            q.iter().map(|x| x.districts).sum::<usize>(),
+            611,
+            "the comparable Ohio panel changed size"
+        );
+
+        for (i, (local, state, federal)) in [
+            (4342.0, 8970.0, 2738.0),
+            (6678.0, 7199.0, 2231.0),
+            (8541.0, 6232.0, 2181.0),
+            (13932.0, 4522.0, 1825.0),
+        ]
+        .iter()
+        .enumerate()
+        {
+            assert!(
+                (q[i].local_per_pupil - local).abs() < 1.0,
+                "Q{} local is {:.0}, not {local:.0}",
+                i + 1,
+                q[i].local_per_pupil
+            );
+            assert!(
+                (q[i].state_per_pupil - state).abs() < 1.0,
+                "Q{} state is {:.0}, not {state:.0}",
+                i + 1,
+                q[i].state_per_pupil
+            );
+            assert!(
+                (q[i].federal_per_pupil - federal).abs() < 1.0,
+                "Q{} federal is {:.0}, not {federal:.0}",
+                i + 1,
+                q[i].federal_per_pupil
+            );
+        }
+    }
+
+    /// The claim itself, stated as an inequality rather than as four numbers.
+    ///
+    /// Pinning the figures catches a source revision. This catches a *reversal* — the case where
+    /// the numbers all move and the finding the corpus rests on quietly stops being true.
+    #[test]
+    fn both_higher_levels_are_compensatory_and_neither_closes_the_gap() {
+        let q = ohio_by_local_wealth();
+
+        for i in 1..4 {
+            assert!(
+                q[i].local_per_pupil > q[i - 1].local_per_pupil,
+                "the quartiles are not ordered on the variable they are cut by"
+            );
+            assert!(
+                q[i].state_per_pupil < q[i - 1].state_per_pupil,
+                "state aid is not monotonically compensatory at Q{}",
+                i + 1
+            );
+            assert!(
+                q[i].federal_per_pupil < q[i - 1].federal_per_pupil,
+                "federal aid is not monotonically compensatory at Q{}",
+                i + 1
+            );
+        }
+
+        let gap = q[3].local_per_pupil - q[0].local_per_pupil;
+        let state = q[0].state_per_pupil - q[3].state_per_pupil;
+        let federal = q[0].federal_per_pupil - q[3].federal_per_pupil;
+        assert!(
+            state + federal < gap,
+            "the two together now close the whole local gap, which would reverse the finding"
+        );
+        assert!(
+            state > federal * 4.0,
+            "state equalization is no longer the dominant offset"
         );
     }
 }

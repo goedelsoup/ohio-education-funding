@@ -1,0 +1,91 @@
+class: revenue-stream
+label: ESSER — Elementary and Secondary School Emergency Relief
+description: |
+  A federal channel that was large, restricted, temporary, and is now gone — and which inflates
+  every FY2020 through FY2024 figure in this corpus in a way that is invisible unless it is named.
+
+  **Three acts, one fund.** ESSER I under the CARES Act (March 2020), ESSER II under CRRSA
+  (December 2020), and ESSER III under the American Rescue Plan (March 2021), each larger than the
+  last. Distributed to districts **in proportion to their Title I Part A shares**, which means it
+  arrived on a poverty formula and was therefore concentrated in exactly the districts Ohio's own
+  system leaves most dependent on a weak local base. [verified]
+
+  **It expired.** The last obligation deadline fell in September 2024. A district that used ESSER
+  for recurring costs — staff, programmes, interventions — faced the loss of that money with no
+  state channel replacing it. This is the fiscal cliff that runs underneath every FY2025 and
+  FY2026 forecast in
+  [`district-finances.csv`](../../../crates/project/fixtures/district-finances.csv), and the
+  corpus could not express it until now. [verified]
+
+  **THE SIZE OF IT, AND WHY EVERY CROSS-YEAR COMPARISON IN THIS CORPUS TOUCHES IT.**
+
+  FY2022 is the peak. In that year Ohio districts took **13.87% of school revenue from federal
+  sources against a national 13.24%** — $2,466 per pupil against $2,493 — which places Ohio 25th
+  of 51 and, unusually for this corpus, entirely unremarkable. [verified —
+  `crates/dispersion/src/national_peers.rs`]
+
+  The unremarkable federal share is what makes the rest of Ohio's position remarkable. Ohio is
+  seventh of fifty-one on local share and forty-fifth on state share; it is ordinary on federal
+  share and ordinary on spending per pupil. The distinctive thing is the split between the two
+  domestic levels, and the federal channel is a constant that does not explain it.
+  [inference]
+
+  **Federal money is compensatory in Ohio, monotonically, and it is small.** Quartiling the 611
+  comparable districts by local revenue per pupil in FY2022: [verified —
+  `dispersion::national_peers::ohio_by_local_wealth`, pinned by test]
+
+      quartile   local/pupil   state/pupil   federal/pupil
+      Q1 poorest      $4,342        $8,970          $2,738
+      Q2              $6,678        $7,199          $2,231
+      Q3              $8,541        $6,232          $2,181
+      Q4 richest     $13,932        $4,522          $1,825
+
+  The local gap between the top and bottom quartile is **$9,590 per pupil**. State equalization
+  closes **$4,448 of it, 46%**. The federal channel closes **$913, or 9.5%**. Together they leave
+  **$4,229 per pupil** of the local gap standing. [verified]
+
+  **And FY2022 is the most favourable year that will ever be measured for this**, because the
+  federal column is at its ESSER peak. The offset shown here is an upper bound on a channel that
+  has since contracted to its pre-pandemic level. Whatever the answer to "does the system
+  equalize", it is worse than these figures after September 2024. [inference]
+
+  What this does not establish: how the cliff actually landed. Whether districts spent ESSER on
+  recurring or one-time costs, and which ones are now cutting, needs the FY2025 and FY2026
+  five-year forecasts read against the ESSER allocations — both of which exist, and neither of
+  which is joined here. [open]
+properties:
+  name: Elementary and Secondary School Emergency Relief Fund
+  level: federal
+  legal_basis: |
+    CARES Act (Pub. L. 116-136) Section 18003; CRRSA Act (Pub. L. 116-260) Section 313; American
+    Rescue Plan Act (Pub. L. 117-2) Section 2001. Distributed to states, sub-allocated to districts
+    in proportion to Title I Part A shares. [verified]
+  restriction: |
+    Restricted to costs of responding to COVID-19, defined broadly enough to cover staffing,
+    facilities, technology and learning recovery. ARP ESSER additionally required 20% to be spent
+    on addressing lost instructional time. [verified] Time-limited rather than purpose-limited in
+    practice, which is what made it dangerous to build recurring costs on. [inference]
+  growth_behavior: |
+    Not a growing stream but a bounded one, in three tranches, with obligation deadlines running to
+    September 2024. Zero thereafter. Any series carrying this channel must mark the boundary rather
+    than reporting a decline. [verified]
+  series_path: |
+    Not yet populated as an ESSER-specific series. [unentered] The aggregate federal channel per
+    district is in
+    [`f33-districts-fy2022.csv`](../../../crates/dispersion/fixtures/f33-districts-fy2022.csv) for
+    FY2022 only; ESSER is not broken out of it.
+links:
+  - target: ../revenue-stream.ont.yml
+    relationship: instance-of
+  - target: title-i.yml
+    relationship: allocated-in-proportion-to
+  - target: ../doctrine/equity.yml
+    relationship: bears-on
+  - target: ../fiscal-period/fy2022.yml
+    relationship: peaks-in
+  - target: ../metric/general-fund-cash-balance.yml
+    relationship: bears-on
+  - target: ../../catalog/census-f33-school-system-finances.md
+    relationship: sourced-from
+  - target: ../../catalog/dew-five-year-forecast.md
+    relationship: sourced-from

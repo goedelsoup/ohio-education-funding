@@ -1,0 +1,63 @@
+class: revenue-stream
+label: Title I, Part A
+description: |
+  The largest federal channel into Ohio schools, and the one most often mistaken for part of the
+  state formula. Title I of the Elementary and Secondary Education Act sends compensatory money to
+  districts on a poverty count, outside Ohio's foundation formula and outside every figure the
+  [`foundation`](../../../crates/foundation/) calculator produces. [verified]
+
+  **It is allocated on a different poverty measure than Ohio's.** Title I formulas run on Census
+  Bureau small-area income and poverty estimates of children aged 5–17 in families below the
+  poverty line. Ohio's
+  [disadvantaged pupil impact aid](../formula-component/fsfp-disadvantaged-pupil-impact-aid.yml)
+  runs on the department's "economically disadvantaged" count, whose *definition* R.C.
+  3317.03(B)(21) delegates to the department, constrained only by "shall not be categorically
+  excluded … based on anything other than family income". [verified] Two compensatory channels,
+  two poverty definitions, and no reason for them to identify the same children. How far the two
+  counts diverge for a given district is not established here and is the question that would make
+  this node useful for anything beyond bookkeeping. [open]
+
+  **Four sub-formulas, not one**, and they behave differently: Basic Grants, Concentration
+  Grants, Targeted Grants and Education Finance Incentive Grants. The last is the one that reaches
+  back into state policy — it weights allocations by a state's own equity and effort, so Ohio's
+  local-reliance position affects what Ohio receives. Whether that has been material for Ohio is
+  not established. [open]
+
+  **What the corpus can currently say about the size of the channel** comes from the Census F-33
+  rather than from any Title I file: Ohio districts received $2,466 per pupil in *all* federal
+  revenue in FY2022, against a national $2,493, which is 13.87% of Ohio school revenue and ranks
+  Ohio 25th of 51. [verified — `crates/dispersion/src/national_peers.rs`] Title I is the largest
+  component of that but the F-33 does not decompose it, so this node cannot yet state a Title I
+  figure for Ohio or for any district. [unentered]
+properties:
+  name: Title I, Part A — Improving Basic Programs Operated by Local Educational Agencies
+  level: federal
+  legal_basis: |
+    Elementary and Secondary Education Act of 1965, Title I Part A, as reauthorized by the Every
+    Student Succeeds Act; 20 U.S.C. 6301 et seq. Allocated by the U.S. Department of Education to
+    states, and sub-allocated by the state education agency to districts. [verified]
+  restriction: |
+    Restricted, and supplementary by statute: Title I funds must supplement and not supplant state
+    and local funds. A district cannot lawfully reduce its own effort because Title I arrived,
+    which is the provision that keeps this channel from being absorbed the way an unrestricted
+    grant would be. [verified]
+
+    The practical force of that rule in Ohio, where the state share is 34.4% and the local share
+    is constrained by H.B. 920, is not assessed here. [open]
+  growth_behavior: |
+    Appropriated annually by Congress and distributed on poverty counts that move with the
+    economy and with the decennial census, so the channel is neither guaranteed nor formula-driven
+    in the way state foundation aid is. [inference]
+  series_path: |
+    Not yet populated. [unentered] Target: no connector retrieves Title I allocations.
+links:
+  - target: ../revenue-stream.ont.yml
+    relationship: instance-of
+  - target: ../doctrine/equity.yml
+    relationship: bears-on
+  - target: ../formula-component/fsfp-disadvantaged-pupil-impact-aid.yml
+    relationship: parallels
+  - target: ../metric/enrolled-adm.yml
+    relationship: measured-against
+  - target: ../../catalog/census-f33-school-system-finances.md
+    relationship: sourced-from
