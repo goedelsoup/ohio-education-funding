@@ -141,6 +141,109 @@ pub fn revenue_mix_by_year() -> BTreeMap<u16, RevenueMix> {
     out
 }
 
+/// How much of the local gap each level of government closed, in one year.
+#[derive(Debug, Clone, Copy, PartialEq, Default)]
+pub struct Equalization {
+    /// Comparable districts the quartiles are cut over.
+    pub districts: usize,
+    /// Mean local revenue per pupil in the poorest quartile.
+    pub poorest_local: f64,
+    /// And in the richest.
+    pub richest_local: f64,
+    /// The gap between them, which is what the other levels are measured against.
+    pub gap: f64,
+    /// Dollars per pupil of that gap closed by state aid.
+    pub state_closes: f64,
+    /// And by federal aid.
+    pub federal_closes: f64,
+}
+
+impl Equalization {
+    /// What neither level closes — the part a district actually experiences.
+    #[must_use]
+    pub fn residual(&self) -> f64 {
+        self.gap - self.state_closes - self.federal_closes
+    }
+
+    /// State aid's share of the gap, as a fraction.
+    #[must_use]
+    pub fn state_share(&self) -> f64 {
+        if self.gap > 0.0 {
+            self.state_closes / self.gap
+        } else {
+            0.0
+        }
+    }
+}
+
+/// The quartile equalization measure, for every year in the panel.
+///
+/// # The question this answers, and the one it does not
+///
+/// [`crate::national_peers::ohio_by_local_wealth`] computes this for FY2022 alone, and the corpus
+/// recorded that state aid closes 46% of the local gap and federal aid 9.5%. A single year cannot
+/// say whether that is Ohio getting better or worse at equalizing, and `doctrine/equity` carried
+/// the question as open.
+///
+/// It answers it in a way neither "better" nor "worse" captures. **The rate holds and the gap
+/// grows.** The state's share of the gap it closes stays in a narrow band across ten years while
+/// the gap itself grows by two thirds, so the residual — the part no level closes — grows with it.
+/// A formula doing the same proportional job against a larger problem leaves districts further
+/// apart every year, and the percentage is the thing that looks stable.
+///
+/// # Both endpoints flatter the federal column
+///
+/// FY2012 still carries the ARRA tail and FY2022 is the ESSER peak, so the federal contribution
+/// is roughly double its ordinary size at each end of the window. Read the middle years for the
+/// federal figure and the whole window for the state one.
+#[must_use]
+pub fn equalization_by_year() -> BTreeMap<u16, Equalization> {
+    let mut by_year: BTreeMap<u16, Vec<(f64, f64, f64)>> = BTreeMap::new();
+    for row in panel()
+        .iter()
+        .filter(|r| r.comparable && r.enrollment > 0.0)
+    {
+        by_year.entry(row.fiscal_year).or_default().push((
+            row.local_revenue / row.enrollment,
+            row.state_revenue / row.enrollment,
+            row.federal_revenue / row.enrollment,
+        ));
+    }
+
+    let mut out = BTreeMap::new();
+    for (year, mut rows) in by_year {
+        rows.sort_by(|a, b| a.0.partial_cmp(&b.0).unwrap_or(std::cmp::Ordering::Equal));
+        let n = rows.len();
+        if n < 4 {
+            continue;
+        }
+        // Cut by position, as the single-year measure does, so the two are comparable.
+        let mut sums = [[0.0f64; 3]; 4];
+        let mut counts = [0usize; 4];
+        for (i, (local, state, federal)) in rows.iter().enumerate() {
+            let q = ((i * 4) / n).min(3);
+            sums[q][0] += local;
+            sums[q][1] += state;
+            sums[q][2] += federal;
+            counts[q] += 1;
+        }
+        let mean = |q: usize, k: usize| sums[q][k] / counts[q] as f64;
+        let (poorest_local, richest_local) = (mean(0, 0), mean(3, 0));
+        out.insert(
+            year,
+            Equalization {
+                districts: n,
+                poorest_local,
+                richest_local,
+                gap: richest_local - poorest_local,
+                state_closes: mean(0, 1) - mean(3, 1),
+                federal_closes: mean(0, 2) - mean(3, 2),
+            },
+        );
+    }
+    out
+}
+
 /// Agencies per year the FY2022-23 directory cannot name, which is the consolidation history.
 #[must_use]
 pub fn unnamed_agencies() -> BTreeMap<u16, usize> {
@@ -223,6 +326,64 @@ mod tests {
         assert!(
             mix[&2022].federal > mix[&2019].federal * 1.8,
             "the ESSER peak is not visible against the pre-pandemic baseline"
+        );
+    }
+
+    /// The finding: the rate holds, the gap grows, and the residual grows with it.
+    #[test]
+    fn the_equalization_rate_holds_while_the_gap_it_closes_grows() {
+        let by_year = equalization_by_year();
+        let (first, last) = (by_year[&2012], by_year[&2022]);
+
+        // The gap grew by two thirds.
+        assert!(
+            last.gap > first.gap * 1.5,
+            "the local gap went from {:.0} to {:.0}, which is not the growth recorded",
+            first.gap,
+            last.gap
+        );
+
+        // And the state's share of it did not move much in either direction. Asserted as a band
+        // rather than a trend, because there is no trend — that is the finding.
+        for (year, e) in &by_year {
+            assert!(
+                e.state_share() > 0.38 && e.state_share() < 0.49,
+                "FY{year} state share is {:.3}, outside the band the corpus records",
+                e.state_share()
+            );
+        }
+
+        // So the part nobody closes grows with the gap.
+        assert!(
+            last.residual() > first.residual() * 1.4,
+            "the residual went from {:.0} to {:.0}",
+            first.residual(),
+            last.residual()
+        );
+    }
+
+    /// The single-year measure and the panel measure agree where they overlap.
+    ///
+    /// `national_peers::ohio_by_local_wealth` computes FY2022 from the national district file and
+    /// this computes it from the Ohio panel — different fixtures, different builders, same
+    /// quartile rule. If they disagreed, one of the two figures the corpus publishes would be
+    /// wrong and nothing else would say so.
+    #[test]
+    fn the_panel_reproduces_the_single_year_equalization_measure() {
+        let panel_2022 = equalization_by_year()[&2022];
+        let quartiles = crate::national_peers::ohio_by_local_wealth();
+        let gap = quartiles[3].local_per_pupil - quartiles[0].local_per_pupil;
+        let state = quartiles[0].state_per_pupil - quartiles[3].state_per_pupil;
+
+        assert!(
+            (panel_2022.gap - gap).abs() < 1.0,
+            "gap: panel {:.0}, cross-section {gap:.0}",
+            panel_2022.gap
+        );
+        assert!(
+            (panel_2022.state_closes - state).abs() < 1.0,
+            "state: panel {:.0}, cross-section {state:.0}",
+            panel_2022.state_closes
         );
     }
 

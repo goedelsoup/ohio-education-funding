@@ -1,0 +1,45 @@
+class: fiscal-period
+label: FY2016-2017 Biennium
+description: |
+  A biennium of the [Bridge formula](../funding-regime/bridge-formula.yml) era, created so that
+  the decade of per-district finance this corpus now holds has somewhere in the graph to land.
+  Before this backfill nothing before FY2022 was addressable and a query about FY2016 had nowhere
+  to go.
+
+  The state share falls below 40% for the first time in the series, at 39.77% in FY2017.
+
+  **What is measured**, over comparable districts, on federal definitions: [verified —
+  `dispersion::ohio_panel`, pinned by test]
+
+      FY2016   local 52.84%   state 40.05%   federal 7.11%   gap $6,768   residual $3,352
+      FY2017   local 53.40%   state 39.77%   federal 6.83%   gap $7,041   residual $3,408
+
+  These are Census Bureau figures rather than the department's, which is the point of holding
+  them: Ohio replaced its funding regime twice inside this decade and renamed most of its own
+  categories doing it, so a series from Ohio's own reporting would measure the reporting.
+  [inference]
+
+  **This node is thin on purpose.** It carries what the panel measures and the regime in force,
+  and not a narrative of the biennium. The appropriating act, the enacted changes and the
+  per-district figures the department published are `lsc-budget` work, which is wired for one
+  document. [open]
+properties:
+  label: FY2016-2017
+  kind: biennium
+  start: 2015-07-01
+  end: 2017-06-30
+  appropriating_bill: Not established. [unentered] Needs `lsc-budget`.
+  context: |
+    Bridge formula era. Revenue shares and the quartile equalization measure above are from the
+    Census F-33 as NCES publishes it, comparable districts only. [verified]
+links:
+  - target: ../fiscal-period.ont.yml
+    relationship: instance-of
+  - target: fy2014-15.yml
+    relationship: follows
+  - target: ../funding-regime/bridge-formula.yml
+    relationship: governed-by
+  - target: ../doctrine/equity.yml
+    relationship: measured-by
+  - target: ../../catalog/census-f33-school-system-finances.md
+    relationship: sourced-from

@@ -27,6 +27,8 @@ properties:
 links:
   - target: ../fiscal-period.ont.yml
     relationship: instance-of
+  - target: fy2020-21.yml
+    relationship: follows
   - target: ../funding-regime/fair-school-funding-plan.yml
     relationship: governed-by
   - target: ../legislation/hb-110-2021.yml

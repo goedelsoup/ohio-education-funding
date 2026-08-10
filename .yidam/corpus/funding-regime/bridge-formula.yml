@@ -73,6 +73,13 @@ properties:
     regime nodes, or whether the caps-and-guarantees mechanism is the real continuity, is
     unresolved. [open]
 links:
+  - target: ../fiscal-period/fy2012-13.yml
+    relationship: opened-in
+  - target: ../fiscal-period/fy2020-21.yml
+    relationship: closed-in
+    note: >-
+      And did not stop mattering there: the Fair School Funding Plan's guarantee is anchored
+      to FY2020 and has never been re-based.
   - target: ../funding-regime.ont.yml
     relationship: instance-of
   - target: evidence-based-model.yml

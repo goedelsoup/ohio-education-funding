@@ -39,6 +39,21 @@ all. Between them they mark the range within which any claim has to be located.
 
 ## Known gap
 
-Nothing before FY2022 is addressable. The Bridge formula decade and the DeRolph era have no
-periods at all, so a query about FY2012 or FY1997 has nowhere to land. Backfilling biennia to at
-least FY2010-11 remains the cheapest high-value expansion in the corpus. [open]
+**The Bridge formula decade is now addressable.** FY2012-13 through FY2020-21 exist as biennia,
+each carrying the revenue shares and quartile equalization measure the F-33 panel supplies for its
+years. That was called the cheapest high-value expansion in the corpus and it was, though the
+value only appeared once there was a decade of per-district finance for the periods to hold.
+
+They are deliberately thin. Each carries what is measured and the regime in force, and not a
+narrative — the appropriating acts, the enacted changes and the department's own per-district
+figures are `lsc-budget` work, and only FY2012-13's act is held. [open]
+
+**FY2014 is absent from the F-33 archive**, so FY2014-15 is half-measured and nothing
+interpolates the missing year. [verified]
+
+## Known gap
+
+**Nothing before FY2012.** The DeRolph era, the Evidence-Based Model biennium and everything back
+to 1851 still have no periods, so a query about FY1997 has nowhere to land. The obstacle is no
+longer the corpus's shape but its sources: NCES publishes no F-33 before FY2012 under any naming
+its later years use, and the pre-2000 record is the same `lsc-budget` blocker. [open]
