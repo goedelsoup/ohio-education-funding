@@ -1,0 +1,65 @@
+class: intervention
+label: Additional Optional Action (LEA level)
+description: |
+  The section that used to say "Not applicable."
+
+  ESSA asks each state to describe what it will do about a district with a significant number or
+  percentage of persistently identified schools. Ohio's approved plan answered **"Not applicable."**
+  The April 2026 amendment strikes that and lists six actions. [verified as a statement of what the
+  amendment proposes; approval is not established] [open]
+
+  **The unit is the district, which is what makes it a funding matter.** Everything else in the
+  federal ladder acts on a building. This acts on the LEA, and its last item is Department approval
+  of the district's expenditure plans for federal funds across Title I A, Title II, Title III,
+  Title IV and IDEA — a broader list than the school-level equivalent, which names Title IA, IDEA
+  and School Improvement funds. [verified as proposed]
+
+  **Read beside the state's own regime, the two are strikingly different in reach.** An
+  [academic distress commission](academic-distress-commission.yml) under R.C. 3302.10 hands a
+  state-appointed chief executive the power to create the district's budget outright. This gives
+  the Department approval over the federal portion of it. One is Ohio law and takes fiscal control;
+  the other is a federal plan provision and conditions a subset of the money. A reader who knows
+  only the federal system would substantially understate what Ohio can do to a district.
+  [inference]
+
+  What counts as "a significant number or percentage" is not defined in the amendment. [open]
+properties:
+  name: Additional optional action for LEAs with persistently identified schools
+  authority: |
+    Ohio's Consolidated State Plan under ESSA, section A.4.vii.f, as it stands to be amended in
+    April 2026. [verified as proposed]
+  trigger: |
+    An LEA with a significant number or percentage of schools consistently identified for
+    comprehensive or targeted support, or implementing targeted support plans. The threshold is not
+    defined. [verified as proposed] [open]
+  unit: education-agency
+  powers: |
+    Six, at the state's option:
+
+      1  assign a case manager to the LEA
+      2  require contracting with an approved vendor
+      3  require Department-approved professional learning in ELA and mathematics
+      4  require Department-approved screening assessments
+      5  require Department-approved high-quality instructional materials
+      6  require Department approval of expenditure plans for federal funds — Title I A,
+         Title II, Title III, Title IV and IDEA
+
+    [verified as proposed]
+  exit: Not stated. [open]
+  fiscal_effect: |
+    Department approval of the district's federal expenditure plans across five programmes.
+    [verified as proposed] No effect on state formula money, and no transfer of budget authority —
+    which is the whole distance between this and an academic distress commission. [inference]
+links:
+  - target: ../intervention.ont.yml
+    relationship: instance-of
+  - target: ../accountability-regime/essa.yml
+    relationship: belongs-to
+  - target: ../actor/department-of-education-and-workforce.yml
+    relationship: imposed-by
+  - target: academic-distress-commission.yml
+    relationship: contrasts-with
+  - target: ../revenue-stream/title-i.yml
+    relationship: gates
+  - target: ../../catalog/ohio-essa-state-plan.md
+    relationship: sourced-from

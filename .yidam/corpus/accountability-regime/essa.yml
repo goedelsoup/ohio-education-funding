@@ -64,6 +64,10 @@ links:
     relationship: instance-of
   - target: ohio-report-card.yml
     relationship: identifies-using
+  - target: ../intervention/more-rigorous-interventions.yml
+    relationship: escalates-to
+  - target: ../intervention/lea-level-action.yml
+    relationship: escalates-to
   - target: ../revenue-stream/title-i.yml
     relationship: conditions
   - target: ../revenue-stream/idea-part-b.yml

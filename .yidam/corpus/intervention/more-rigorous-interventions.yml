@@ -1,0 +1,92 @@
+class: intervention
+label: More Rigorous Interventions (CSI)
+description: |
+  What Ohio proposes to do to a Comprehensive Support and Improvement school that has not met the
+  exit criteria within three years. Sixteen items, and the last one is closing it.
+
+  **Modelled as one node rather than sixteen, deliberately.** The rungs share a trigger, an
+  authority, a unit and an actor; they differ only in what they do, and the state requires "one or
+  more" from the menu rather than applying them in sequence. Sixteen nodes would repeat four
+  identical fields to vary a sentence — the same duplication objected to when accountability status
+  was considered as a class instead of a role.
+
+  **The ladder is new.** Ohio's approved plan carried a stub here; the April 2026 amendment
+  supplies the entire menu, along with a section that changed from "Not applicable" to a
+  district-level regime — see [LEA-level action](lea-level-action.yml). [verified as a statement of
+  what the amendment proposes; approval by the U.S. Department of Education is not established]
+  [open]
+
+  **Three of the sixteen end the school as a district building**: conversion to a charter school
+  replicating a high-performing school operated by a Department-approved school management
+  organization; merger with a school operated by one; and closure. A fourth contracts out its
+  operation. These are transfers into the community-school sector, and the corpus can name the
+  pathway and cannot follow the money along it, because the
+  [`deduction`](../../skills/deduction.md) calculator is a stub. [inference]
+
+  **And one is fiscal in the ordinary sense.** Item 10 is annual Department approval of expenditure
+  of all federal funds, "including but not limited to Title IA, IDEA, Noncompetitive School
+  Improvement Funds (1003)" — a state gate on federal money, conditioned on academic performance.
+  It is recorded on both [Title I](../revenue-stream/title-i.yml) and
+  [IDEA Part B](../revenue-stream/idea-part-b.yml). [verified as proposed]
+
+  **How many schools this could reach is knowable and not known.** 231 buildings are currently CSI
+  and some carry identifications from 2018 — seven years against exit criteria that allow three.
+  [verified] Whether any has been subjected to a rung of this ladder is not published in anything
+  the corpus holds. [open]
+properties:
+  name: More rigorous interventions
+  authority: |
+    Ohio's Consolidated State Plan under ESSA, section A.4.vii.c, as it stands to be amended in
+    April 2026. Federal basis at ESEA section 1111(d)(3)(A)(i)(I). [verified as proposed]
+  trigger: |
+    Identification as a CSI school, and failure to meet the state's exit criteria within three
+    years. [verified as proposed] The exit criteria themselves require two consecutive years of
+    improvement above the cut score that led to identification.
+  unit: school
+  powers: |
+    One or more of sixteen, at the state's requirement. In the amendment's order:
+
+      1   revise the improvement plan to Level 1 evidence strategies only
+      2   require improvement goals focused on literacy and mathematics
+      3   require partnership with a State Support Team or approved vendor
+      4   Department-approved instructional materials and professional development
+      5   Department-approved screening assessments
+      6   comprehensive academic review by the Department or an approved vendor
+      7   instructional coaches with Department-approved training and tools
+      8   enhanced monitoring, which may include monthly meetings
+      9   comprehensive school redesign by an approved evidence-based provider
+      10  annual Department approval of expenditure of all federal funds
+      11  reopening under new leadership with authority to replace staff
+      12  assignment of a case manager
+      13  conversion to a charter school under an approved management organization
+      14  merger with a higher-performing school under such an organization
+      15  contracting out operation of all or part of the school
+      16  closure
+
+    [verified as proposed] Items 11 and 13 through 16 change who operates the building; item 10
+    changes who approves its spending; the remainder are instructional.
+  exit: |
+    Not stated for the interventions themselves. The underlying CSI exit criteria require two
+    consecutive years of performance above the lowest 5% and above the school's own identification
+    cut score. [verified as proposed]
+  fiscal_effect: |
+    Item 10 gates federal money: annual Department approval of expenditure of all federal funds,
+    Title IA and IDEA named. [verified as proposed]
+
+    Items 13 through 16 are structural rather than budgetary and are the larger fiscal event —
+    a building converted to a charter, merged under a management organization, contracted out or
+    closed moves its students, and therefore its funding, out of the district sector. The corpus
+    cannot quantify that. [open]
+links:
+  - target: ../intervention.ont.yml
+    relationship: instance-of
+  - target: ../accountability-regime/essa.yml
+    relationship: belongs-to
+  - target: ../actor/department-of-education-and-workforce.yml
+    relationship: imposed-by
+  - target: ../revenue-stream/title-i.yml
+    relationship: gates
+  - target: ../revenue-stream/idea-part-b.yml
+    relationship: gates
+  - target: ../../catalog/ohio-essa-state-plan.md
+    relationship: sourced-from
