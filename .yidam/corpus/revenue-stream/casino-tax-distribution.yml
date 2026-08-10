@@ -1,0 +1,112 @@
+class: revenue-stream
+label: Casino Tax — County Student Fund
+description: |
+  Money that reaches every Ohio school district, is constitutionally restricted to education, and
+  appears nowhere in the foundation formula, the department's budget, or any figure in this
+  corpus.
+
+  **The channel.** A 33% tax on gross casino revenue from the four casinos authorized in 2009
+  (Cincinnati, Cleveland, Toledo, and Franklin County). [verified — R.C. 5753.02] **34% of that
+  tax** goes to the gross casino revenue county student fund, transferred quarterly, and is
+  distributed among all eighty-eight counties in proportion to their public school district
+  student populations — then within each county among the districts, in proportion to each
+  district's students resident in that county. [verified — Ohio Constitution Article XV
+  Section 6(C)(3)(b); R.C. 5753.03(D)(2)] Districts are paid twice a year and **"shall determine
+  how [their] distributions are appropriated, but all distributions shall only be used to support
+  primary and secondary education."** [verified — Art. XV §6(C)(3)(b)]
+
+  **A FIFTH PUPIL DENOMINATOR, AND THE ONLY ONE THAT DOUBLE-COUNTS ON PURPOSE.** R.C. 5753.11
+  defines "student population" as students residing in a county enrolled in a public school
+  district in grades K-12, plus preschool children with disabilities, counted on the **Friday of
+  the first full school week in October** for the January distribution and **in May** for the
+  August one. [verified] That is not enrolled ADM, not formula ADM, not the report card's
+  unweighted count, and not the F-33's fall membership — the four this corpus already has to keep
+  apart, and which `web/src/lib/denominators.ts` exists because the site conflated twice.
+
+  Two properties make it stranger than a fifth count would otherwise be:
+
+  - **"Public school district" here includes community schools, STEM schools, JVSDs and
+    college-preparatory boarding schools.** [verified — R.C. 5753.11(A)(1)] Community schools
+    receive this money directly, which is the *opposite* of how they were funded before the Fair
+    School Funding Plan, when their students were deducted from a resident district. And JVSDs are
+    included, where [IDEA Part B](idea-part-b.yml) excludes them entirely — two federal-and-state
+    channels drawing the boundary of "district" in opposite places.
+  - **A student dual-enrolled in a JVSD and another district is counted in both.** [verified —
+    R.C. 5753.11(B)] Where the district of enrollment cannot be determined in time, the count is
+    split equally between the reporting districts. The denominator is deliberately not a partition
+    of Ohio's students, so a per-pupil figure from it is not comparable to one from any other
+    source here.
+
+  **WHY IT IS INVISIBLE IN EVERYTHING THIS CORPUS HOLDS.** The distribution runs from the Tax
+  Commissioner through county funds to districts. It is not an appropriation to the Department of
+  Education and Workforce, so it is absent from the department's budget, absent from the School
+  Finance Payment Report, and absent from every fixture built from either. The only casino money
+  in the [LSC redbook](../../../crates/project/fixtures/dew-redbook.txt) is the **casino operator
+  settlement fund** — a different pot entirely, which supported preschool slots through an
+  interagency transfer from FY2017 to FY2023. [verified] A reader searching the department's
+  budget for casino money finds that and concludes, wrongly, that they have found the channel.
+
+  **The substitution question, which is what the ontology actually wanted this node for.** The
+  genesis decision `proposals` named "casino revenue offsets" as an example of one stream
+  substituting for another — that is why `substitutes-for` exists as an edge at all.
+  **No offset is visible in what this corpus holds.** None of the
+  fifteen R.C. 3317 sections committed to
+  [`revised-code.txt`](../../../crates/project/fixtures/revised-code.txt) mentions the casino
+  distribution, and neither the constitution nor R.C. 5753 provides for reducing state aid by the
+  amount a district receives. [verified, as far as those sections go]
+
+  That is not the same as establishing that the money is additive. The substitution critique of
+  earmarked gambling revenue is about the *appropriation*, not the statute: whether the General
+  Assembly set foundation aid lower than it otherwise would have because this channel exists is a
+  counterfactual about budget-making that no section of law will answer. Settling it needs the
+  appropriation history, which is `lsc-budget` work. [open]
+
+  **And the sharper case is in the same constitutional section and has no node.** Article XV
+  Section 6(A) — three paragraphs above the casino provision — requires the entire net proceeds of
+  the state lottery to be "used solely for the support of elementary, secondary, vocational, and
+  special education programs as determined in appropriations made by the General Assembly."
+  [verified] The lottery is Ohio's canonical instance of an education earmark that voters read as
+  additive, and the "as determined in appropriations" clause is precisely the hinge the casino
+  question turns on. It is a gap in this class. [open]
+properties:
+  name: Gross casino revenue county student fund
+  level: state
+  legal_basis: |
+    Ohio Constitution, Article XV, Section 6(C)(3)(b), ratified November 2009; R.C. 5753.02 levying
+    the tax, R.C. 5753.03(D)(2) creating and funding the county student fund, and R.C. 5753.11
+    defining the student population it is apportioned on. [verified]
+
+    The constitutional text is quoted here rather than committed as a fixture: the `ohio-laws`
+    parser keys on the "Download Authenticated PDF" landmark, which the Revised Code pages carry
+    and the Ohio Constitution pages do not. The three statutory sections are committed and
+    digest-pinned; the constitution is not. [open]
+  restriction: |
+    Constitutionally restricted to the support of primary and secondary education, and otherwise
+    unrestricted: the district decides how to appropriate it. That combination is unusual here —
+    most restricted money in this corpus is restricted to a programme, and this is restricted only
+    to a purpose broad enough to cover almost any school expenditure. [verified]
+  growth_behavior: |
+    Tracks gross casino revenue, which is neither appropriated nor formula-driven and moves with
+    gambling activity. A district's share moves with its own student count relative to its county's
+    and its county's relative to the state's, so a district can receive less in a year the tax
+    yields more. [inference]
+  series_path: |
+    Not yet populated. [unentered] Distributions are published by the Department of Taxation
+    rather than by the department of education, and no connector retrieves them.
+links:
+  - target: ../revenue-stream.ont.yml
+    relationship: instance-of
+  - target: state-foundation-aid.yml
+    relationship: substitutes-for
+    note: >-
+      Declared because the ontology names this the example of substitution and because the
+      question is live, not because an offset has been demonstrated. See the description; the
+      statutory answer is that no offset exists and the appropriation answer is open.
+  - target: ../metric/enrolled-adm.yml
+    relationship: measured-against
+  - target: ../legislation/ohio-constitution-article-vi-section-2.yml
+    relationship: constrained-by
+  - target: ../actor/ohio-general-assembly.yml
+    relationship: appropriated-by
+  - target: ../../catalog/ohio-revised-code.md
+    relationship: sourced-from

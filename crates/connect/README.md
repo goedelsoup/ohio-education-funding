@@ -39,14 +39,14 @@ Fields per connector: key, status, source count, corpus classes fed; then every 
 | [`tax-abstract`](sources/tax-abstract.md) | **wired** | 4 | revenue-stream, parameter, metric |
 | [`dew-payment-reports`](sources/dew-payment-reports.md) | declared | 0 | program, education-agency, revenue-stream |
 | [`lsc-budget`](sources/lsc-budget.md) | **wired**, in part | 2 | legislation, fiscal-period, program, parameter |
-| [`ohio-laws`](sources/ohio-laws.md) | **wired** | 15 | legislation, parameter, formula-component |
+| [`ohio-laws`](sources/ohio-laws.md) | **wired** | 18 | legislation, parameter, formula-component |
 | [`ohio-courts`](sources/ohio-courts.md) | **wired**, in part | 4 | litigation |
 | [`ofcc-projects`](sources/ofcc-projects.md) | declared | 0 | program, education-agency |
 | [`census-f33`](sources/census-f33.md) | **wired** | 2 | metric, education-agency |
 | [`nces-ccd`](sources/nces-ccd.md) | **wired**, in part | 1 | education-agency |
 | `census-geography` | **wired** | 4 | education-agency, actor |
 
-13 connectors, 43 sources between them. 11 are wired and 2 are not; 3 of the wired ones reach only part of what they feed, and say so below.
+13 connectors, 46 sources between them. 11 are wired and 2 are not; 3 of the wired ones reach only part of what they feed, and say so below.
 
 **What is blocked, in the registry's own words.**
 

@@ -58,9 +58,13 @@ description: |
   which is the direction this decision pushed; whether either would satisfy the panel rule it
   ordered has not been tested. [open]
 
-  H.B. 94 (2001) has no [legislation](../legislation/) node, and it is the act this decision is
-  about. Adding one would give the FY2002-07 base cost series — $4,814 per student in FY2002
-  rising to $5,527 in FY2007 under R.C. 3317.012(A)(1) — a place to live. [open]
+  The act this decision is about now has a node:
+  [H.B. 94](../legislation/hb-94-2001.yml), holding the FY2002-07 base cost series and the four
+  mechanisms the modifications above operate on. Writing it turned up something that bears
+  directly on reading this opinion: **every section cited here has since been repealed or
+  reused.** R.C. 3317.012 is now joint vocational district base cost, R.C. 3317.0217 is now
+  targeted assistance, and R.C. 3317.0216 is gone. A reader following ¶64's citation for parity
+  aid lands on a different programme with no notice that the number changed hands. [verified]
 properties:
   case_name: DeRolph v. State
   citation: 93 Ohio St.3d 309, 2001-Ohio-1343

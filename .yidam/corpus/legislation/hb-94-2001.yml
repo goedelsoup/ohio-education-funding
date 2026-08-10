@@ -1,0 +1,111 @@
+class: legislation
+label: Am. Sub. H.B. 94 (2001) — FY2002-03 Budget; the post-DeRolph II formula
+description: |
+  The General Assembly's answer to [DeRolph II](../litigation/derolph-ii-2000.yml), and the only
+  Ohio school funding act a court has ever examined provision by provision and found
+  constitutional — conditionally, briefly, and in a decision that was then erased.
+
+  **What it built.** H.B. 94 recalculated the cost of an adequate education as **$4,814 per
+  student in FY2002**, rising 2.8% a year to **$5,527 by FY2007**, and — answering DeRolph II's
+  sharpest criticism — funded that amount **in full immediately, with no phase-in**. [verified —
+  [DeRolph III](../litigation/derolph-iii-2001.yml) ¶16] DeRolph II had found the state "funding
+  below the level that the General Assembly deemed to be the base amount for an adequate
+  education", which is a specific and damning finding: the state had named its own adequacy
+  figure and then not paid it.
+
+  The base cost came from an **unweighted average over 127 "model" districts** — the 170 districts
+  that met at least 20 of 27 performance standards in FY1999, less those in the top and bottom 5%
+  by income and property wealth. [verified — ¶17] The formula was
+  `ADM × base cost × cost-of-doing-business − 0.023 × valuation`. [verified — ¶18]
+
+  **Four mechanisms it introduced or restructured**, three of which the corpus already models
+  under later names:
+
+  - **Six special education weights.** [verified — ¶22] Ohio's six clinical categories, which
+    [the FSFP node](../formula-component/fsfp-special-education-weights.yml) still carries, date
+    from this act. It also added catastrophic-cost thresholds — $30,000 in category six, $25,000
+    in categories two through five — above which the state funds all of half the excess plus its
+    share of the other half. [verified — ¶22]
+  - **Gap aid**, extended to transportation as well as base cost, special and vocational
+    education, explicitly to address **phantom revenue**: the state contributes more where the tax
+    base does not grow with the base cost amount. [verified — ¶19] This is the corpus's
+    [charge-off](../formula-component/charge-off-local-share.yml) problem, named and partially
+    compensated by the legislature seventeen years before the charge-off was retired.
+  - **A three-mill cap** on what a district must raise locally toward special education,
+    vocational education and transportation. [verified — ¶20]
+  - **Parity aid.** Poor districts received the difference between what 9.5 mills raises for them
+    and what it raises at the eightieth percentile of income-adjusted wealth. Estimated at $100m
+    in FY2002 and $500m a year fully phased in by FY2006 — which
+    [DeRolph III](../litigation/derolph-iii-2001.yml) accelerated to FY2004. [verified — ¶23]
+
+  **And a stabilizer, which is the provision the court later overrode.** R.C. 3317.012(D)(4)
+  required the state share percentage of base cost and parity aid not to vary by more than 2.5%
+  from the preceding update year, and directed the General Assembly to bring it back within range
+  "by any means it determines to be necessary". [verified — ¶25] One available means was moving
+  the charge-off millage. DeRolph III ¶62 forbade exactly that, holding the rate at 23 mills
+  through FY2007 "irrespective of the language of R.C. 3317.012(D)(4) suggesting such a
+  methodology". [verified] The court was not freezing a number in the abstract; it was closing the
+  adjustment mechanism the act had built.
+
+  **ITS OWN CITATIONS NO LONGER RESOLVE, AND THEY RESOLVE TO SOMETHING PLAUSIBLE.** This is the
+  reason the act is worth a node rather than a footnote. Every section DeRolph III cites has since
+  been repealed or reused: [verified — fetched 2026-08-09]
+
+      section          in H.B. 94 (2001)        on codes.ohio.gov today
+      R.C. 3317.012    the base cost formula    "Joint vocational school district base cost"
+      R.C. 3317.0217   parity aid               "Targeted assistance funding"
+      R.C. 3317.0216   gap aid                  gone; the URL redirects
+
+  A reader following DeRolph III's citation for parity aid lands on
+  [targeted assistance](../formula-component/fsfp-targeted-assistance.yml) — a different program,
+  in the same chapter, doing something recognisably similar, with no notice that the number
+  changed hands. That is the failure mode this corpus has already recorded twice for citations
+  that pointed at sections which did not exist; a citation that points at a section which exists
+  and has been repurposed is worse, because nothing looks wrong.
+
+  It follows that **H.B. 94 cannot be sourced from the current Revised Code at all.**
+  `ohio-laws` serves the text in force, so the act survives here only through DeRolph III's
+  recitation of it, which is a court's account rather than the enacted text. Retrieving the act
+  itself needs the session laws — the same gap that keeps `lsc-budget` from carrying the pre-2000
+  record. [open]
+
+  **What became of it.** DeRolph III held the plan constitutional subject to four modifications.
+  Fifteen months later [DeRolph IV](../litigation/derolph-iv-2002.yml) vacated DeRolph III
+  entirely, which left H.B. 94 in force and unadjudicated, and left the declaration of
+  unconstitutionality from DeRolph I and II standing over it. [verified] Whether the four
+  modifications were ever implemented, once the order requiring them ceased to exist, is not
+  established here and is the obvious question. [open]
+properties:
+  designation: Am. Sub. H.B. 94
+  general_assembly: 124th General Assembly
+  signed: 2001-06-30
+  effective: 2001-07-01
+  subject: |
+    Enacted the FY2002-03 operating budget and rebuilt the foundation formula in response to
+    DeRolph II: base cost of $4,814 per pupil in FY2002 funded without a phase-in, derived from
+    127 model districts; six special education weights with catastrophic-cost thresholds; gap aid
+    extended to transportation; a three-mill cap on the local share of categorical costs; and
+    parity aid equalizing 9.5 mills of discretionary capacity to the eightieth percentile of
+    income-adjusted wealth. [verified — DeRolph III at paragraphs 16 through 25]
+  vetoes: Line-item vetoes not yet assessed for education funding effect. [open]
+links:
+  - target: ../legislation.ont.yml
+    relationship: instance-of
+  - target: ../litigation/derolph-ii-2000.yml
+    relationship: responds-to
+  - target: ../litigation/derolph-iii-2001.yml
+    relationship: reviewed-by
+  - target: ../funding-regime/foundation-base-cost-formula.yml
+    relationship: amends
+  - target: ../parameter/base-cost-per-pupil.yml
+    relationship: sets
+  - target: ../parameter/local-share-charge-off-millage.yml
+    relationship: sets
+  - target: ../formula-component/fsfp-special-education-weights.yml
+    relationship: originates
+  - target: ../formula-component/charge-off-local-share.yml
+    relationship: compensates-for
+  - target: ../formula-component/fsfp-targeted-assistance.yml
+    relationship: shares-citation-with
+  - target: ../../catalog/derolph-litigation-record.md
+    relationship: sourced-from

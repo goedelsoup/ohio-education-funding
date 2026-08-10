@@ -81,28 +81,47 @@ fn multiples(body: &str) -> Vec<f64> {
     out
 }
 
-/// The extract is what it claims to be: fifteen sections, each with a date and an act.
+/// Every section the corpus cites, and the only ones the extract should hold.
+///
+/// One list rather than a list and a count. It was both, and adding the three casino sections
+/// failed on the count with no indication of which section was unexpected — the count is
+/// derivable from the list and a second statement of it is a second thing to forget.
+const CITED: &[&str] = &[
+    "3317.02",
+    "3317.011",
+    "3317.013",
+    "3317.014",
+    "3317.016",
+    "3317.017",
+    "3317.019",
+    "3317.022",
+    "3317.051",
+    "3317.0212",
+    "3317.0213",
+    "3317.0217",
+    "3317.03",
+    "319.301",
+    "5705.391",
+    // The casino tax and the school share of it. Not part of the formula — which is the finding
+    // the `casino-tax-distribution` node rests on — but cited by it, and the extract holds what
+    // the corpus cites.
+    "5753.02",
+    "5753.03",
+    "5753.11",
+];
+
+/// The extract is what it claims to be: every cited section, each with a date and an act.
 #[test]
 fn every_cited_section_is_present_and_dated() {
     let count = STATUTE.lines().filter(|l| l.starts_with("=== ")).count();
-    assert_eq!(count, 15);
-    for number in [
-        "3317.02",
-        "3317.011",
-        "3317.013",
-        "3317.014",
-        "3317.016",
-        "3317.017",
-        "3317.019",
-        "3317.022",
-        "3317.051",
-        "3317.0212",
-        "3317.0213",
-        "3317.0217",
-        "3317.03",
-        "319.301",
-        "5705.391",
-    ] {
+    assert_eq!(
+        count,
+        CITED.len(),
+        "the extract holds {count} sections and {} are cited; a section was added to \
+         OHIO_LAWS_SECTIONS without being added here, or the reverse",
+        CITED.len()
+    );
+    for number in CITED {
         let s = section(number);
         assert!(!s.title.is_empty(), "{number} has no title");
         assert!(!s.effective.is_empty(), "{number} has no effective date");
