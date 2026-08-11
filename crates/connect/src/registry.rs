@@ -900,6 +900,42 @@ pub const CONNECTORS: &[Connector] = &[
                    below, which reproduces this file's Ohio local share to a tenth of a point.",
         },
         Source {
+            key: "sdf09-districts",
+            title: None,
+            url: "https://nces.ed.gov/ccd/data/zip/sdf091a_txt.zip",
+            filename: "sdf09-districts.zip",
+            format: Format::Zip,
+            catalog: Some("census-f33-school-system-finances"),
+            fixtures: &[crate::fixtures::F33_OHIO_PANEL_FIXTURE],
+            note: "The school finance survey for FY2009. Published under a `_txt` suffix the \
+                   FY2012-FY2022 files do not use, which is why the panel began at FY2012 and \
+                   opened one year inside the FY2010-FY2014 real trough rather than before it.",
+        },
+        Source {
+            key: "sdf10-districts",
+            title: None,
+            url: "https://nces.ed.gov/ccd/data/zip/sdf101a_txt.zip",
+            filename: "sdf10-districts.zip",
+            format: Format::Zip,
+            catalog: Some("census-f33-school-system-finances"),
+            fixtures: &[crate::fixtures::F33_OHIO_PANEL_FIXTURE],
+            note: "The school finance survey for FY2010. Published under a `_txt` suffix the \
+                   FY2012-FY2022 files do not use, which is why the panel began at FY2012 and \
+                   opened one year inside the FY2010-FY2014 real trough rather than before it.",
+        },
+        Source {
+            key: "sdf11-districts",
+            title: None,
+            url: "https://nces.ed.gov/ccd/data/zip/sdf11_1a_txt.zip",
+            filename: "sdf11-districts.zip",
+            format: Format::Zip,
+            catalog: Some("census-f33-school-system-finances"),
+            fixtures: &[crate::fixtures::F33_OHIO_PANEL_FIXTURE],
+            note: "The school finance survey for FY2011. Published under a `_txt` suffix the \
+                   FY2012-FY2022 files do not use, which is why the panel began at FY2012 and \
+                   opened one year inside the FY2010-FY2014 real trough rather than before it.",
+        },
+        Source {
             key: "sdf12-districts",
             title: None,
             url: "https://nces.ed.gov/ccd/data/zip/sdf121a.zip",

@@ -756,6 +756,9 @@ fn f33_districts(root: &Path) -> Result<Vec<Vec<String>>, String> {
 /// The gap is recorded here rather than papered over by interpolation, because a panel with a
 /// silently missing year reads as a series and is not one.
 const F33_PANEL_YEARS: &[(u16, &str)] = &[
+    (2009, "sdf09-districts"),
+    (2010, "sdf10-districts"),
+    (2011, "sdf11-districts"),
     (2012, "sdf12-districts"),
     (2013, "sdf13-districts"),
     (2015, "sdf15-districts"),

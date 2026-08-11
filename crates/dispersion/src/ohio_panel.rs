@@ -262,11 +262,11 @@ mod tests {
     use super::*;
 
     #[test]
-    fn the_panel_holds_ten_years_and_names_the_one_it_does_not() {
+    fn the_panel_holds_thirteen_years_and_names_the_one_it_does_not() {
         let years: Vec<u16> = revenue_mix_by_year().keys().copied().collect();
         assert_eq!(
             years,
-            vec![2012, 2013, 2015, 2016, 2017, 2018, 2019, 2020, 2021, 2022],
+            vec![2009, 2010, 2011, 2012, 2013, 2015, 2016, 2017, 2018, 2019, 2020, 2021, 2022],
             "FY2014 is absent from the archive and nothing should have invented it"
         );
     }
@@ -288,19 +288,39 @@ mod tests {
         assert_eq!(fy2022.districts, 611, "the comparable panel changed size");
     }
 
-    /// The finding: the state share fell for a decade while the local share rose.
+    /// The finding: the state share fell across the window while the local share rose — and it
+    /// fell by half again as much as the FY2012 start suggested.
+    ///
+    /// # Where the window starts changes the size of the finding
+    ///
+    /// This panel opened at FY2012 until the FY2009-FY2011 archives were added, and FY2012 is
+    /// already three years into the decline. From FY2012 the state share falls 7.7 points; from
+    /// FY2009 it falls **11.7**, from 45.9% to 34.2%. Both are correct about their own window,
+    /// which is the periodic point `metric/per-pupil-operating-expenditure` records: an endpoint
+    /// pair reports the window it was given and says nothing about the window it was not.
     #[test]
-    fn the_state_share_falls_across_the_decade_and_the_local_share_rises() {
+    fn the_state_share_falls_across_the_window_and_the_local_share_rises() {
         let mix = revenue_mix_by_year();
-        let (first, last) = (mix[&2012], mix[&2022]);
+        let (opening, first, last) = (mix[&2009], mix[&2012], mix[&2022]);
 
         assert!(
             first.state - last.state > 0.05,
-            "the state share fell {:.1} points, not the 7-plus the corpus records",
+            "the state share fell {:.1} points from FY2012",
             100.0 * (first.state - last.state)
         );
+        // The three added years carry four of the eleven-and-a-half points.
+        let full = opening.state - last.state;
         assert!(
-            last.local > first.local,
+            (full - 0.117).abs() < 0.005,
+            "from FY2009 the state share fell {:.1} points",
+            100.0 * full
+        );
+        assert!(
+            full > (first.state - last.state) * 1.4,
+            "opening at FY2012 understates the decline by less than the corpus records"
+        );
+        assert!(
+            last.local > first.local && last.local > opening.local,
             "the local share no longer rises across the window"
         );
         // Not monotonic and should not be asserted as such: FY2015 interrupts the fall, and
@@ -308,7 +328,7 @@ mod tests {
         // domestic ones. A test claiming monotonicity would be pinning a stronger fact than the
         // data supports.
         assert!(
-            mix.values().all(|m| m.state < 0.45 && m.state > 0.30),
+            mix.values().all(|m| m.state < 0.47 && m.state > 0.30),
             "a year's state share left the range the series has ever occupied"
         );
     }
@@ -321,6 +341,18 @@ mod tests {
         assert!(
             mix[&2012].federal - mix[&2013].federal > 0.02,
             "the ARRA drop between FY2012 and FY2013 is not in the panel"
+        );
+        // With FY2009-FY2011 added the whole ARRA arc is visible rather than only its tail:
+        // 6.7% federal in FY2009, 11.0% at the FY2011 peak, 5.2% by FY2013. The rise and the
+        // fall are both larger than the tail the panel used to open on.
+        assert!(
+            mix[&2011].federal > mix[&2009].federal * 1.5,
+            "the ARRA build-up is not in the panel"
+        );
+        assert!(
+            mix[&2011].federal - mix[&2013].federal > 0.05,
+            "the full ARRA withdrawal is {:.3}",
+            mix[&2011].federal - mix[&2013].federal
         );
         // And ESSER, four times the size of what it replaced at its peak.
         assert!(
@@ -345,7 +377,7 @@ mod tests {
 
         // And the state's share of it did not move much in either direction. Asserted as a band
         // rather than a trend, because there is no trend — that is the finding.
-        for (year, e) in &by_year {
+        for (year, e) in by_year.iter().filter(|(y, _)| **y >= 2012) {
             assert!(
                 e.state_share() > 0.38 && e.state_share() < 0.49,
                 "FY{year} state share is {:.3}, outside the band the corpus records",
@@ -360,6 +392,43 @@ mod tests {
             first.residual(),
             last.residual()
         );
+    }
+
+    /// **What the three added archives found: during ARRA the state closed a third of the local
+    /// gap, not the ~45% it closes in every other year on record.**
+    ///
+    /// FY2010 and FY2011 sit at 0.349 and 0.330 while federal gap-closing roughly doubles to
+    /// 0.122 and 0.128. FY2009, before the money arrived, is an ordinary 0.472. The panel used to
+    /// open at FY2012 and could not see this at all.
+    ///
+    /// Read with care about direction. This is a share of a gap, not a dollar amount, and the gap
+    /// itself moves; the state can close a smaller fraction while spending more. What it does
+    /// establish is that the two levels moved in opposite directions exactly when the stimulus
+    /// landed and again when it left, which is the substitution question the corpus has recorded
+    /// as open for the [`crate`]-level equalization series. It does not establish that ARRA
+    /// displaced state money — that needs the appropriation series, which is not held here.
+    #[test]
+    fn the_stimulus_years_are_the_only_ones_where_the_state_closes_a_third() {
+        let by_year = equalization_by_year();
+        for year in [2010u16, 2011] {
+            let e = by_year[&year];
+            assert!(
+                e.state_share() < 0.36,
+                "FY{year} state share is {:.3}, not the third the archives show",
+                e.state_share()
+            );
+            assert!(
+                e.federal_closes / e.gap > 0.11,
+                "FY{year} federal share of the gap is {:.3}",
+                e.federal_closes / e.gap
+            );
+        }
+        // FY2009 brackets them from before, FY2013 from after; both are ordinary.
+        for year in [2009u16, 2013] {
+            let e = by_year[&year];
+            assert!(e.state_share() > 0.44, "FY{year} is {:.3}", e.state_share());
+            assert!(e.federal_closes / e.gap < 0.07);
+        }
     }
 
     /// The single-year measure and the panel measure agree where they overlap.
