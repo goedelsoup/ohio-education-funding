@@ -900,6 +900,19 @@ pub const CONNECTORS: &[Connector] = &[
                    below, which reproduces this file's Ohio local share to a tenth of a point.",
         },
         Source {
+            key: "f33-fy2024",
+            title: None,
+            url: "https://www2.census.gov/programs-surveys/school-finances/tables/2024/\
+                  secondary-education-finance/elsec24t.xlsx",
+            filename: "elsec24t.xlsx",
+            format: Format::Xlsx,
+            catalog: Some("census-f33-school-system-finances"),
+            fixtures: &[crate::fixtures::F33_FY2024_FIXTURE],
+            note: "The FY2024 survey, and the year OCG White Paper 015 quotes for its \
+                   cross-state table. Published as .xlsx where FY2022 is .xls, and one column \
+                   shorter — IDCENSUS is gone, which shifts every later index by one.",
+        },
+        Source {
             key: "sdf09-districts",
             title: None,
             url: "https://nces.ed.gov/ccd/data/zip/sdf091a_txt.zip",

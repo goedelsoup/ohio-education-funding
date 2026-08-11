@@ -2477,32 +2477,6 @@ pub const F33_HEADER: &[&str] = &[
     "current_spending",
 ];
 
-/// Column positions in the Census `elsec22t` sheet.
-///
-/// # `STATE` is not a FIPS code
-///
-/// Column 0 is the Census Bureau's own state ordering and column 4 is FIPS. They agree for the
-/// early states and diverge after: filtering on `STATE == "39"` returns Pennsylvania, whose FIPS
-/// is 42, while Ohio's FIPS 39 is Census 36. Both columns are two-digit, zero-padded, and
-/// numeric, so the mistake produces a full and entirely wrong answer.
-mod f33 {
-    pub const FIPS: usize = 4;
-    pub const SCHOOL_LEVEL: usize = 9;
-    pub const ENROLLMENT: usize = 12;
-    pub const TOTAL_REVENUE: usize = 13;
-    pub const FEDERAL_REVENUE: usize = 14;
-    pub const STATE_REVENUE: usize = 19;
-    pub const LOCAL_REVENUE: usize = 24;
-    /// Local revenue from property tax specifically.
-    ///
-    /// Zero for nine states, and not because they levy none — see [`super::build_f33_states`].
-    pub const PROPERTY_TAX: usize = 26;
-    /// Appropriations from a parent city or county, where the district is not fiscally
-    /// independent. The counterpart to [`PROPERTY_TAX`] and the reason it cannot be ranked alone.
-    pub const PARENT_GOVERNMENT: usize = 27;
-    pub const CURRENT_SPENDING: usize = 33;
-}
-
 /// FIPS code to state name. The survey carries codes only.
 const STATE_NAMES: &[(&str, &str)] = &[
     ("01", "Alabama"),
@@ -2596,8 +2570,37 @@ const STATE_NAMES: &[(&str, &str)] = &[
 /// Every money column in the F-33 is reported in thousands of dollars. The fixture keeps the
 /// survey's own unit rather than converting, so a reader comparing it against the published
 /// tables is comparing like with like; consumers multiply. Enrolment is a headcount.
-#[must_use]
-pub fn build_f33_states(rows: &[Vec<String>]) -> Vec<Vec<String>> {
+///
+/// # Read by header, because the layout moved once already
+///
+/// This builder used a fixed column map, which was accurate for FY2022 and silently wrong for
+/// FY2024: the Bureau dropped the `IDCENSUS` column, shifting every index after it by one. Every
+/// name the builder wants still exists and still means the same thing, so positional indices
+/// would have produced a complete, plausible, entirely wrong fixture — state codes read as unit
+/// types, revenue read as enrolment. Names are looked up per file instead.
+///
+/// Note that these are the Bureau's `elsec` tables, whose names differ from the NCES `sdf`
+/// school-district files the Ohio panel reads: property tax is `LOCRPROP` here and `T06` there.
+///
+/// # Errors
+///
+/// Returns a message naming the missing column if the layout moves again.
+pub fn build_f33_states(rows: &[Vec<String>], label: &str) -> Result<Vec<Vec<String>>, String> {
+    let head = rows.first().cloned().unwrap_or_default();
+    let at = |name: &str| column(&head, name, label);
+    let fips = at("FIPST")?;
+    let school_level = at("SCHLEV")?;
+    let enrolment = at("ENROLL")?;
+    let spending = at("TCURSPND")?;
+    let columns = [
+        at("TOTALREV")?,
+        at("TFEDREV")?,
+        at("TSTREV")?,
+        at("TLOCREV")?,
+        at("LOCRPROP")?,
+        at("LOCRPAR")?,
+    ];
+
     let number = |row: &[String], index: usize| -> f64 {
         row.get(index)
             .and_then(|v| v.trim().parse::<f64>().ok())
@@ -2609,32 +2612,29 @@ pub fn build_f33_states(rows: &[Vec<String>]) -> Vec<Vec<String>> {
     let mut systems: std::collections::BTreeMap<String, usize> = std::collections::BTreeMap::new();
 
     for row in rows.iter().skip(1) {
-        let enrolled = number(row, f33::ENROLLMENT);
+        let enrolled = number(row, enrolment);
         if enrolled <= 0.0 {
             continue;
         }
-        let Some(fips) = row.get(f33::FIPS).map(|s| s.trim().to_string()) else {
+        let Some(code) = row.get(fips).map(|s| s.trim().to_string()) else {
             continue;
         };
         // A school level the survey does not use would mean the layout has moved under us.
         debug_assert!(matches!(
-            row.get(f33::SCHOOL_LEVEL).map(String::as_str),
+            row.get(school_level).map(String::as_str),
             Some("01" | "02" | "03" | "05" | "06" | "07")
         ));
 
-        *systems.entry(fips.clone()).or_default() += 1;
-        let entry = totals.entry(fips).or_insert([0.0; 8]);
+        *systems.entry(code.clone()).or_default() += 1;
+        let entry = totals.entry(code).or_insert([0.0; 8]);
         entry[0] += enrolled;
-        entry[1] += number(row, f33::TOTAL_REVENUE);
-        entry[2] += number(row, f33::FEDERAL_REVENUE);
-        entry[3] += number(row, f33::STATE_REVENUE);
-        entry[4] += number(row, f33::LOCAL_REVENUE);
-        entry[5] += number(row, f33::PROPERTY_TAX);
-        entry[6] += number(row, f33::PARENT_GOVERNMENT);
-        entry[7] += number(row, f33::CURRENT_SPENDING);
+        for (slot, index) in columns.iter().enumerate() {
+            entry[slot + 1] += number(row, *index);
+        }
+        entry[7] += number(row, spending);
     }
 
-    totals
+    Ok(totals
         .into_iter()
         .filter_map(|(fips, totals)| {
             // A FIPS code with no name is a territory. The survey carries Puerto Rico and the
@@ -2646,8 +2646,16 @@ pub fn build_f33_states(rows: &[Vec<String>]) -> Vec<Vec<String>> {
             row.extend(totals.iter().map(|value| format_value(Some(*value), 0)));
             Some(row)
         })
-        .collect()
+        .collect())
 }
+
+/// Where the FY2024 state cross-section is written, relative to the repository root.
+///
+/// A second fixture rather than a year column on the first, because the FY2022 file is what the
+/// corpus's published interstate figures were computed from and a test pins them. Two years side
+/// by side is also the only way to see that the Bureau's own per-pupil figures are not
+/// reconstructible from these files — see the WP015 catalog entry.
+pub const F33_FY2024_FIXTURE: &str = "crates/dispersion/fixtures/census-f33-states-fy2024.csv";
 
 /// Where the per-district F-33 extract is written, relative to the repository root.
 pub const F33_DISTRICTS_FIXTURE: &str = "crates/dispersion/fixtures/f33-districts-fy2022.csv";
@@ -3397,6 +3405,7 @@ pub const REBUILT: &[&str] = &[
     SD1_FIXTURE,
     CPI_FIXTURE,
     F33_FIXTURE,
+    F33_FY2024_FIXTURE,
     F33_DISTRICTS_FIXTURE,
     F33_OHIO_PANEL_FIXTURE,
     MR81_FIXTURE,

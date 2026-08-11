@@ -86,6 +86,8 @@ pub enum RebuildError {
     Forecast(forecast::ForecastError),
     /// A fixture could not be written.
     Io(std::io::Error),
+    /// A published layout moved and a named column is gone.
+    Layout(String),
 }
 
 impl core::fmt::Display for RebuildError {
@@ -95,6 +97,7 @@ impl core::fmt::Display for RebuildError {
             Self::Workbook(cause) => write!(f, "{cause}"),
             Self::Forecast(cause) => write!(f, "{cause}"),
             Self::Io(cause) => write!(f, "{cause}"),
+            Self::Layout(cause) => f.write_str(cause),
         }
     }
 }
@@ -573,7 +576,8 @@ pub fn rebuild(root: &Path) -> Result<Vec<Rebuilt>, RebuildError> {
                 rows: fixtures::write_csv(
                     &root.join(fixtures::F33_FIXTURE),
                     fixtures::F33_HEADER,
-                    &fixtures::build_f33_states(&rows),
+                    &fixtures::build_f33_states(&rows, "the FY2022 F-33 state table")
+                        .map_err(RebuildError::Layout)?,
                 )?,
             },
             Err(cause) => Rebuilt::Skipped {
@@ -583,6 +587,31 @@ pub fn rebuild(root: &Path) -> Result<Vec<Rebuilt>, RebuildError> {
         },
         Err(cause) => Rebuilt::Skipped {
             path: fixtures::F33_FIXTURE.to_string(),
+            reason: cause.to_string(),
+        },
+    });
+
+    // The same table two years later, which is the year White Paper 015 quotes. Kept as its own
+    // fixture: FY2022 is what the corpus's published interstate figures were computed from.
+    let f33_2024 = source("f33-fy2024").expect("registered").1;
+    out.push(match open_workbook(root, f33_2024) {
+        Ok(book) => match book.rows("elsec24t") {
+            Ok(rows) => Rebuilt::Written {
+                path: fixtures::F33_FY2024_FIXTURE.to_string(),
+                rows: fixtures::write_csv(
+                    &root.join(fixtures::F33_FY2024_FIXTURE),
+                    fixtures::F33_HEADER,
+                    &fixtures::build_f33_states(&rows, "the FY2024 F-33 state table")
+                        .map_err(RebuildError::Layout)?,
+                )?,
+            },
+            Err(cause) => Rebuilt::Skipped {
+                path: fixtures::F33_FY2024_FIXTURE.to_string(),
+                reason: cause.to_string(),
+            },
+        },
+        Err(cause) => Rebuilt::Skipped {
+            path: fixtures::F33_FY2024_FIXTURE.to_string(),
             reason: cause.to_string(),
         },
     });
