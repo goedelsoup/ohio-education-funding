@@ -1,0 +1,115 @@
+class: model-policy
+label: Parental Choice Scholarship Program Act (Universal Eligibility)
+description: |
+  ALEC's template voucher statute, in the variant that makes every school-age student eligible.
+  Finalized January 1, 2005 and amended January 16, 2016. It is not law in Ohio or anywhere else;
+  it is a draft written to be introduced. [verified]
+
+  It is in this corpus for one reason, and it is not that it is influential. **Its funding
+  mechanism is a specific, checkable claim, and this corpus has already established Ohio's
+  answer to the same question.** The model directs that "the funds needed for a scholarship shall
+  be subtracted from the state school aid payable to the student's resident school district", and
+  that "any aid the school district would have received for the student in excess of the funds
+  needed for a scholarship will be kept by the state". [verified — ALEC model text]
+
+  Set that against Ohio. Under the original EdChoice design a scholarship was funded by deducting
+  from the resident district's foundation payment, which is the model's shape. [verified] Under
+  the [Fair School Funding Plan](../funding-regime/fair-school-funding-plan.yml) it is **not** a
+  deduction — confirmed negatively and exhaustively against the FY2027 calculator, where the
+  payment report's transfer channel is two named lines and neither carries a scholarship,
+  pinned in `crates/project/tests/the_voucher_channel_is_absent.rs`. [verified]
+
+  So the relationship between this text and Ohio's enacted arrangement runs in two directions at
+  once, and that is the substance worth recording: Ohio's **eligibility** design converged on the
+  model — [H.B. 33](../legislation/hb-33-2023.yml) made every student eligible in 2023 — while
+  Ohio's **funding mechanism** diverged from it in the opposite direction over the same years.
+  A reader who assumed a state with universal eligibility had also adopted the model's deduct
+  would be wrong about Ohio, and wrong in the way that matters most to a district's balance sheet.
+  [inference]
+
+  Two provisions have no established Ohio counterpart. The state keeping the difference between
+  what a district would have received and what the scholarship costs is not a mechanism this
+  corpus has looked for in Ohio law; and the award is set from **state and local** per-pupil
+  support, where Ohio's charge-off arithmetic treats the local share as a district obligation
+  rather than as a portable amount. Both are open questions rather than absences. [open]
+
+  One variant of this act is a closer match to Ohio than the text on this node. ALEC publishes
+  three — universal eligibility (this one), means-tested eligibility, and **universal eligibility
+  with a means-tested scholarship amount** — and the third's title describes H.B. 33's expansion
+  exactly: every student eligible, the award scaled by family income. Its text has not been
+  retrieved, so whether its provisions track Ohio's more closely than this one's do is
+  unestablished, and it is the first thing to read if this line of work continues. [open]
+
+  **Nothing here says Ohio adopted this text.** See `adoption_evidence`.
+properties:
+  publisher: |
+    American Legislative Exchange Council, a membership organization of more than 2,000 state
+    legislators advancing "limited government, free markets, and federalism", which publishes
+    model bills for introduction by its members. An advocacy publisher, and its model policies
+    are advocacy instruments. [verified]
+  version: |
+    Finalized January 1, 2005; amended January 16, 2016. [verified] One of three variants ALEC
+    publishes of this act; the description says which of them corresponds to Ohio's enacted design
+    and why that matters.
+  eligibility: |
+    "Any elementary or secondary student who was eligible to attend a public school in [state] in
+    the preceding semester or is starting school in [state] for the first time" — drafted to
+    include kindergarteners and new residents rather than only students leaving a public school.
+    [verified — ALEC model text]
+  award_basis: |
+    The lesser of the participating school's annual cost per pupil "including both operational and
+    capital facility costs", or "the dollar amount the resident school district would have
+    received to serve and educate the eligible student from state and local sources had the
+    student enrolled there". Participating schools may charge tuition above the award.
+    [verified — ALEC model text]
+  district_funding_effect: |
+    **A deduction, with the state keeping the remainder.** "The funds needed for a scholarship
+    shall be subtracted from the state school aid payable to the student's resident school
+    district. Any aid the school district would have received for the student in excess of the
+    funds needed for a scholarship will be kept by the state."
+    [verified — ALEC model text]
+
+    Ohio's post-FSFP arrangement is not this. See the description, and
+    [edchoice-expansion](../program/edchoice-expansion.yml) for the negative confirmation and the
+    test that pins it.
+  private_school_regulation: |
+    The model imposes annual testing — state achievement tests or nationally recognized
+    norm-referenced tests in math and language arts, results to parents and the state, public
+    reporting from year three — plus criminal background checks, health and safety compliance,
+    nondiscrimination under 42 U.S.C. 1981, and a surety bond or demonstration of financial
+    viability for schools receiving $50,000 or more. It then forbids anything further, in terms:
+    "The Department or any other state agency may not in any way regulate the educational
+    program" of a participating school. [verified — ALEC model text]
+  adoption_evidence: |
+    **Nothing.** No source retrieved for this corpus connects this text to any Ohio bill. The
+    resemblance recorded on this node is a resemblance between two published documents, which is
+    the only thing two published documents can establish on their own.
+
+    Settling it would take sponsor testimony, committee records, or a textual diff of the model
+    against the enacted section — the last being what [`regime-diff`](../../../crates/regime-diff/)
+    already does for successive Ohio statutes. Until one of those is in hand the field stays
+    unresolved here, as it does on every node in this class, by design rather than by neglect.
+    [open]
+links:
+  - target: ../model-policy.ont.yml
+    relationship: instance-of
+  - target: ../program/edchoice-expansion.yml
+    relationship: parallels
+    note: >-
+      Universal eligibility, and the pre-FSFP deduct. A resemblance in design only — see
+      `adoption_evidence`, which connects this text to no Ohio bill.
+  - target: ../program/edchoice-expansion.yml
+    relationship: departs-from
+    note: >-
+      The model deducts the award from the resident district and lets the state keep the
+      remainder. Ohio's post-FSFP arrangement does neither, which is verified negatively against
+      the FY2027 calculator.
+  - target: ../legislation/hb-33-2023.yml
+    relationship: parallels
+    note: The enactment that made every Ohio student eligible, which is this variant's defining feature.
+  - target: ../doctrine/thorough-and-efficient.yml
+    relationship: contested-under
+  - target: ../../catalog/alec-parental-choice-scholarship-act.md
+    relationship: sourced-from
+  - target: ../../catalog/alec-state-education-freedom-index.md
+    relationship: sourced-from

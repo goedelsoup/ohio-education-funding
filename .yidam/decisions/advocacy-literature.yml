@@ -1,0 +1,133 @@
+id: advocacy-literature
+summary: >-
+  The school choice advocacy literature admitted, on the narrowest footing that keeps it
+  honest. One new class, `model-policy`, holding two ALEC model bills; four catalog records;
+  no corpus node for any advocacy organization; `adoption_evidence` mandatory and `[open]`
+  throughout. Heritage gets records and no instance, because it publishes no model bills.
+context: |
+  The question put was whether this repository had integrated any of the ALEC or Heritage
+  Foundation literature that pushed for school choice. It had not — no mention of either
+  organization anywhere, the apparent hits being school names in the report-card fixtures,
+  Hamilton County in the DeRolph record, and Ohio's own EdChoice program rather than EdChoice
+  the organization.
+
+  The gap was not accidental, and two structural facts explain it. The
+  [actor](../corpus/actor.ont.yml) class enumerates `institution_type` as
+  `legislature | court | executive-agency | commission | legislative-agency` and describes an
+  actor as an institution that enacts law, decides cases, administers programs, or publishes the
+  data this corpus is grounded in — an advocacy organization does none of those four. And
+  [legislation](../corpus/legislation.ont.yml) means *enacted*: bill designation, numbered General
+  Assembly, signing date, effective date, line-item vetoes. A model bill has none of those. So
+  neither the organizations nor their model statutes had anywhere to land.
+
+  One precedent already existed and turned out to decide most of the design.
+  [`fordham-base-cost-critique`](../catalog/fordham-base-cost-critique.md) is a
+  school-choice-aligned organization's policy critique, held as a catalog record with its
+  alignment stated in the record — "Fordham is a school-choice-aligned organization and its
+  critique of the base cost model should be read knowing that" — cited from two corpus nodes,
+  with no node of its own, no connector, and no digest. That is a working answer to most of this
+  question, arrived at before the question was asked.
+
+  The retrieval constraint shaped the rest. Four documents were read in full before anything was
+  written, because a corpus whose value is one-hop traceability cannot absorb a summary of a
+  document nobody opened. ALEC's *Parental Choice Scholarship Program Act (Universal Eligibility)*
+  and *Education Savings Account Act* came back as full provision text. ALEC's *Index of State
+  Education Freedom* (2025) and Heritage's *Education Freedom Report Card* (2023) came back as
+  static PDFs and were read directly. Heritage's prose reports and its interactive report card
+  return HTTP 403 to anything identifying itself as a program — the same failure mode as one of
+  the two already-blocked connectors — so the report card's category *weights* are unretrieved and
+  recorded as `[open]` rather than guessed.
+decision: |
+  **One new class: `model-policy`.** A template statute published by a national organization for
+  adoption by state legislatures, and not law anywhere. A UFO Kind, on the same reasoning
+  `legislation` is one: identity fixed at the version the publisher finalized, amendment producing
+  a new dated version. Seven properties, of which `district_funding_effect` and
+  `adoption_evidence` carry the weight.
+
+  **Two instances, both ALEC model bills.** `parental-choice-scholarship-act` and
+  `education-savings-account-act`.
+
+  **Four catalog records**, each stating its publisher's alignment in the record, on Fordham's
+  footing — freely available, retrieved by hand, versioned by publication date, no connector, no
+  digest.
+
+  **No corpus node for any advocacy organization.** The publisher is a property here and a named
+  alignment in the catalog record. Fordham is the precedent and it is a good one.
+
+  **`adoption_evidence` is a mandatory field, `[open]` on every node in the class.** No source
+  retrieved connects either text to any Ohio bill. Reporting on the Ohio proposal that most
+  resembles the ESA model — H.B. 11 of the 135th General Assembly, the "Backpack Bill", which did
+  not pass and is therefore not a corpus node — describes it as modeled on seven other states'
+  enacted programs and does not name ALEC.
+
+  **The admission test for a node, stated in the class README.** Not influence, which this
+  repository cannot measure. A model policy earns a node when it states a mechanism Ohio's enacted
+  arrangement can be checked against. Both instances qualify on the same field, and it is the
+  field that makes this more than a bibliography: each specifies that the award is subtracted from
+  the resident district's state aid, and this corpus has already established — negatively,
+  exhaustively, against the department's own FY2027 calculator, pinned in
+  `crates/project/tests/the_voucher_channel_is_absent.rs` — that Ohio's post-FSFP scholarship
+  channel does not work that way. Ohio's eligibility design converged on the model while its
+  funding mechanism diverged from it, and both halves are verified on both sides.
+
+  **Edge verbs chosen to survive the provenance being open.** `parallels` and `departs-from`, never
+  `template-for` or `adopted-as`. A relationship that would become false if `adoption_evidence` is
+  never filled is a relationship asserting more than is known.
+alternatives: |
+  **Widen `actor` to admit advocacy organizations.** Rejected. It looked smallest — one enum value
+  — but the class description would have had to be rewritten too, since an advocacy organization
+  does not enact, decide, administer, or publish the data this corpus rests on. The cost is worse
+  than the edit: government actors are authorities whose publications are primary sources, and
+  merging the two makes the graph unable to distinguish "the department says X" from "an advocacy
+  group says X" at the class level. In a corpus whose README opens on provenance weight, that is
+  the wrong thing to lose.
+
+  **A second new class for advocacy organizations.** Rejected as redundant once Fordham's
+  precedent was read properly. An organization's position in this graph *is* the publisher of a
+  source, which a catalog record already encodes.
+
+  **Put the model bills in `legislation` with an `enacted: false` property.** Rejected outright.
+  It inverts the class's meaning to accommodate two documents and invites exactly the error the
+  separation prevents — a reader taking a template for a statute.
+
+  **Catalog records only, no class at all.** The genuinely smallest option, and rejected because
+  it cannot express the finding. The deduct comparison is a mechanism claim linking a model
+  provision to a verified Ohio fact, and a catalog record has nowhere to put an edge.
+
+  **Omit `adoption_evidence` when the answer is nothing.** Rejected. A class that could record a
+  resemblance but had nowhere to record the absence of provenance would read as an accusation.
+consequences: |
+  The corpus can now hold the advocacy literature without importing its positions, and the
+  strongest thing it gained is a falsifiable comparison rather than a reading list: the model
+  bills specify a deduct from the resident district, Ohio's original EdChoice did that, and Ohio's
+  post-FSFP arrangement verifiably does not.
+
+  **A pre-existing contradiction in `program/edchoice-expansion` surfaced and was resolved.** Its
+  description called the FSFP mechanism question "the highest-priority factual gap in this node"
+  and marked it `[open]`, while its own `mechanism` property recorded the answer as `[verified]`
+  with a test pinning it. The property was right and the description was stale. Two new nodes were
+  about to be built on the verified side of a claim the same node called open, which is how the
+  contradiction was noticed at all.
+
+  **The class starts with a known asymmetry that is not an omission.** Heritage publishes no model
+  bills, so its literature is catalog records cited from the Ohio nodes they bear on and has no
+  instance in the class.
+
+  **Two things are now on the record about what advocacy scorecards measure**, both verbatim from
+  the documents. ALEC's index has no spending category at all — its 100 points score program
+  availability, nothing else. Heritage's return-on-investment category, where Ohio ranks 47th,
+  treats lower per-pupil spending as better, in its own words to another state: "Iowa can improve
+  its ROI ranking by lowering per-pupil spending". Ohio's 47th is therefore substantially a
+  statement that Ohio spends a lot, not an efficiency finding, and a reader taking the four
+  category ranks as four independent assessments would have that one backwards. Heritage's
+  per-pupil denominator also includes capital expenditure and debt interest, which every per-pupil
+  operating figure in this repository excludes by declared scope, so the two are not substitutable.
+
+  **Highest-value next read, recorded as a gap.** ALEC publishes a third variant, *Parental Choice
+  Scholarship Program Act (Universal Eligibility, Means-Tested Scholarship Amount)*, whose title
+  describes Ohio's enacted EdChoice expansion exactly. Its text is unretrieved. [open]
+
+  **The one method that could move `adoption_evidence`** is a textual diff of a model against the
+  enacted Ohio section, which [`regime-diff`](../../crates/regime-diff/) already does for
+  successive Ohio statutes. Nothing points it at a model bill yet, and until something does, the
+  field stays open rather than being filled by inference.

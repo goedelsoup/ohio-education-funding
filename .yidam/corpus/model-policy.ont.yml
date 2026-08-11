@@ -1,0 +1,95 @@
+class: model-policy
+label: Model Policy
+foundational_type:
+  ontology: ufo
+  type: kind
+description: |
+  A template statute published by a national organization for adoption by state legislatures,
+  and not itself law anywhere. It is a Kind for the same reason [legislation](legislation.ont.yml)
+  is: a model bill's identity is fixed at the version its publisher finalized, and an amendment
+  produces a new dated version rather than changing what the old one said.
+
+  It is deliberately not the `legislation` class. That class means *enacted* — it carries a bill
+  designation, a numbered General Assembly, a signing date, an effective date, and line-item
+  vetoes. A model policy has none of those and never will. Holding both in one class would let a
+  reader take a template for a statute, which is the specific error this class exists to prevent.
+
+  **What a node of this class may and may not claim.** It may state what the model text
+  specifies, because the text is published and quotable. It may state where Ohio's enacted
+  arrangement matches or departs from it, because both sides are documented and the departure is
+  checkable. It may not state that Ohio adopted it. Establishing that needs sponsor testimony,
+  committee records, or drafting history against the enacted section, none of which is in this
+  repository — so `adoption_evidence` exists to hold that answer and is `[open]` on every node
+  in the class. A class that could record a resemblance but had nowhere to record the absence of
+  provenance would read as an accusation.
+
+  **Why the publisher is a property and not an actor node.** The
+  [actor](actor.ont.yml) class covers institutions that enact law, decide cases, administer
+  programs, or publish the data this corpus is grounded in. An advocacy organization does none
+  of those. Its position in this graph is the publisher of a source, which is what a catalog
+  record already encodes — the treatment
+  [`fordham-base-cost-critique`](../catalog/fordham-base-cost-critique.md) has had since it was
+  first cited, with its alignment stated in the record and no corpus node of its own.
+properties:
+  - name: publisher
+    type: string
+    description: The organization that issued it, and its stated policy alignment
+  - name: version
+    type: string
+    description: The date the publisher finalized the text, and any amendment dates
+  - name: eligibility
+    type: text
+    description: Which students the model text makes eligible
+  - name: award_basis
+    type: text
+    description: How the model sets the amount that follows a student
+  - name: district_funding_effect
+    type: text
+    description: >-
+      What the model does to the resident district's funding — whether the award is deducted from
+      the district, who keeps any remainder, and whether the student stays in the district's
+      count. Declared because it is the field on which a model bill and Ohio's enacted
+      arrangement can actually be compared: this corpus has established Ohio's answer against
+      the department's own calculator, so a claim here is falsifiable rather than atmospheric.
+  - name: private_school_regulation
+    type: text
+    description: What the model requires of, or forbids regulators from imposing on, participating schools
+  - name: adoption_evidence
+    type: text
+    description: >-
+      What is established about whether any Ohio instrument was drawn from this text. `[open]`
+      throughout the class; see the class description for why the field is mandatory rather than
+      omitted when the answer is nothing.
+# `edges:` below names the relationships this class is *defined by* — the ones a reader needs to
+# understand what it connects to. It is not the permitted set. Measured across the corpus, 46 of
+# the 90 relationships in use are undeclared, and almost all of them are single-use precise verbs
+# (`recovered-funds-from`, `retreats-from`, `reframes`) that say something a generic edge would
+# lose. Closing the vocabulary would either reject a third of the graph's edges or bloat every
+# ontology with declarations that each describe one link.
+#
+# Set this to `exhaustive` on a class whose vocabulary is deliberately closed, and the validator
+# will reject anything undeclared on it instead of reporting it.
+edge_policy: characteristic
+edges:
+  - relationship: parallels
+    target: program
+    direction: out
+    description: >-
+      An Ohio program whose design the model text resembles. `parallels` and not `template-for`
+      or `adopted-as`: the verb has to survive `adoption_evidence` being `[open]`, and a
+      resemblance between two published texts is all that is established.
+  - relationship: parallels
+    target: legislation
+    direction: out
+    description: An Ohio enactment whose provisions the model text resembles, on the same reading as above
+  - relationship: departs-from
+    target: program
+    direction: out
+    description: >-
+      An Ohio program that works differently from what the model specifies. The counterpart to
+      `parallels` and the more informative of the two here, because Ohio's funding mechanism
+      diverged from the model's while its eligibility design converged on it.
+  - relationship: contested-under
+    target: doctrine
+    direction: out
+    description: A normative principle the model text's design is argued against or defended on

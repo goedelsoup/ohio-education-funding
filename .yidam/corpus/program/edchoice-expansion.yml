@@ -11,9 +11,10 @@ description: |
   original EdChoice design, a scholarship was funded by deducting from the resident district's
   foundation payment — the district lost the student and the money, and if the student had
   never attended the district, the district lost money for a student it had never educated.
-  That last case is the core of the districts' complaint. [verified] Whether and to what extent
-  the Fair School Funding Plan's direct-funding approach changed this for the expansion program
-  is not yet established here and is the highest-priority factual gap in this node. [open]
+  That last case is the core of the districts' complaint. [verified] Under the Fair School Funding
+  Plan it is **not** a deduction — established negatively and exhaustively against the FY2027
+  calculator, and pinned by a test. See `mechanism` below, which is where the confirmation and its
+  remaining open edge live. [verified]
 
   The program was held unconstitutional by a Franklin County trial court in
   [June 2025](../litigation/vouchers-hurt-ohio-2025.yml), on Ohio constitutional grounds
@@ -22,6 +23,20 @@ description: |
   Award amounts by income band, participation counts by resident district, and total
   appropriation by fiscal period are all required before this node supports any quantitative
   claim. [open]
+
+  **Two advocacy scorecards rank Ohio on this program, and neither measures what this corpus
+  measures.** ALEC's [Index of State Education Freedom](../../catalog/alec-state-education-freedom-index.md)
+  puts Ohio 10th of 50 at 63.79 points, grade B+, on programs in law as of June 1, 2024; the
+  Heritage Foundation's [Education Freedom Report Card](../../catalog/heritage-education-freedom-report-card.md)
+  put Ohio 12th of 51 on education choice and 29th overall in its 2023 edition. [verified] Both
+  are published by organizations that advocate for the channel they score, and neither rank is
+  evidence about adequacy — ALEC's index has no spending category at all, and Heritage's
+  return-on-investment category, where Ohio ranks 47th, treats lower per-pupil spending as better
+  in terms. What the two establish jointly is that this channel is large and lightly conditioned
+  by the standards of its own advocates. That is a fact about the channel, not about whether
+  Ohio's districts are adequately funded, and the ranks are two editions two years apart across
+  the universal expansion — so they are not a series and differencing them would invent one.
+  [inference]
 properties:
   name: EdChoice Expansion Scholarship
   mechanism: |
@@ -64,3 +79,7 @@ links:
     relationship: diverts-from
   - target: ../doctrine/thorough-and-efficient.yml
     relationship: contested-under
+  - target: ../../catalog/alec-state-education-freedom-index.md
+    relationship: sourced-from
+  - target: ../../catalog/heritage-education-freedom-report-card.md
+    relationship: sourced-from

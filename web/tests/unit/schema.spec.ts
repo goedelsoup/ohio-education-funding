@@ -142,9 +142,11 @@ test("every class states whether its edge vocabulary is open", () => {
   // A deliberate tripwire rather than a derived count: adding a class changes what the corpus is
   // about, and this is the assertion that makes it impossible to do quietly. Thirteen at genesis;
   // fifteen when `accountability-regime` and `intervention` were admitted, sixteen since `school`
-  // joined them — all three by decision `accountability-domain`. Update it only alongside a
-  // decision record.
-  expect(corpus.classes).toHaveLength(16);
+  // joined them — all three by decision `accountability-domain`. Seventeen since `model-policy`,
+  // by decision `advocacy-literature`, which admitted the school choice advocacy literature and
+  // is the one class here holding documents that are not law and not Ohio's. Update it only
+  // alongside a decision record.
+  expect(corpus.classes).toHaveLength(17);
 });
 
 test("an ontology missing edge_policy is rejected", () => {

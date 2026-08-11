@@ -1,0 +1,107 @@
+class: model-policy
+label: Education Savings Account Act
+description: |
+  ALEC's template education savings account statute, adopted July 20, 2017 and amended
+  September 9, 2017 by its Education and Workforce Development Task Force. The successor design to
+  the [voucher model](parental-choice-scholarship-act.yml): the money goes to an account the
+  parent spends across a list of approved uses rather than to a school as tuition. Not law in
+  Ohio. [verified]
+
+  **The provision worth having on the record is the one about enrollment counts.** The model
+  subtracts the award "from the state school aid payable to the student's resident school
+  district" — and then provides that the participating student "shall be counted in the enrollment
+  figures for his or her resident school district". [verified — ALEC model text]
+
+  Those two clauses together describe a district that keeps the student in its count while losing
+  the money attached to them. That is close to the mechanism Ohio districts identify as the core
+  of their complaint about the original EdChoice design, where a district could lose funding for a
+  student it had never educated — and in the model it is deliberate drafting rather than an
+  artifact. What the model gains by it is a denominator that does not collapse when participation
+  rises; what a district loses by it is the thing the districts sued over. [inference]
+
+  Ohio has no enacted ESA of this kind, which bounds what this node can be for. The nearest Ohio
+  instrument is the "Backpack Bill" — H.B. 11 of the 135th General Assembly, a universal education
+  savings account proposal that was introduced and did not pass, and which is therefore not a
+  corpus node, because [`legislation`](../legislation.ont.yml) means enacted. Its sponsors
+  described it as modeled on programs in Arizona, Florida, Nevada, Tennessee, Mississippi, North
+  Carolina and West Virginia. No source retrieved here names ALEC or this text in connection with
+  it. [verified — as an absence in the sources retrieved]
+
+  So this node's use is comparative and prospective rather than explanatory: it records what the
+  design Ohio did not enact would have done to a district's funding and count, so that a future
+  Ohio ESA proposal can be read against a written baseline instead of against an impression. The
+  allowable-expense list is the part a funding model would have to absorb — twelve categories
+  ending in "any other valid educational expenses approved by the Department", which is an
+  open-ended commitment that no per-pupil figure in this repository could size. [inference]
+properties:
+  publisher: |
+    American Legislative Exchange Council, Education and Workforce Development Task Force. An
+    advocacy publisher; see [the voucher act node](parental-choice-scholarship-act.yml) for the
+    same note in full. [verified]
+  version: |
+    Final model policy adopted July 20, 2017; amended September 9, 2017. [verified]
+  eligibility: |
+    "Any student who is a legal resident of [state]" and otherwise eligible for public enrollment.
+    The model's own commentary offers narrower alternatives — students with disabilities,
+    income-qualified families, military dependents, foster youth, siblings of prior recipients —
+    so universality is the default rather than the only drafting on offer.
+    [verified — ALEC model text]
+  award_basis: |
+    "The dollar amount the resident school district would have received to serve and educate the
+    eligible student from state and local sources." The model provides 100% of that amount; its
+    commentary notes Nevada's enacted variant paying 100% for special-needs and
+    free-and-reduced-lunch students and 90% for everyone else. [verified — ALEC model text]
+
+    Note what the denominator includes: **state and local**. Ohio's charge-off arithmetic treats
+    the local share as a district obligation measured against its own valuation, not as an amount
+    that travels with a student, so importing this award basis into Ohio would require deciding
+    something Ohio's formula currently does not express. [inference]
+  district_funding_effect: |
+    **A deduction that leaves the student in the count.** The award is "subtracted from the state
+    school aid payable to the student's resident school district", while the participating student
+    "shall be counted in the enrollment figures for his or her resident school district".
+    [verified — ALEC model text]
+
+    Whether the second clause is intended to protect the district's other enrollment-driven
+    funding or to keep the state's own aggregate stable is not stated in the text.
+    [open]
+  private_school_regulation: |
+    Annual testing — state assessments or "nationally norm-referenced tests that measure learning
+    gains in math and language arts" — with results reported annually disaggregated by grade,
+    gender, family income and race, public reporting from year three, and a required annual
+    parental satisfaction survey. Administration sits with "the Department of Public Instruction or
+    an organization chosen by the state", which may contract private financial firms to run the
+    accounts. [verified — ALEC model text]
+
+    Lighter on the provider than the voucher model, because an ESA's regulated party is the
+    account rather than the school.
+  adoption_evidence: |
+    **Nothing, and here the absence is sharper than on the voucher node**, because the Ohio
+    proposal this text most resembles was searched for directly. Reporting on H.B. 11 of the 135th
+    General Assembly describes it as based on other states' enacted programs and does not name
+    ALEC or this model. That is an absence in the sources retrieved, not a demonstration that no
+    connection exists. [open]
+links:
+  - target: ../model-policy.ont.yml
+    relationship: instance-of
+  - target: parental-choice-scholarship-act.yml
+    relationship: succeeds
+    note: >-
+      The later design from the same publisher — account-based rather than tuition-based, and
+      universal by default rather than by variant.
+  - target: ../program/edchoice-expansion.yml
+    relationship: departs-from
+    note: >-
+      Ohio's enacted scholarship channel is a voucher, not an account, and does not deduct from
+      the resident district under the Fair School Funding Plan.
+  - target: ../metric/enrolled-adm.yml
+    relationship: bears-on
+    note: >-
+      The model keeps a participating student in the resident district's enrollment figures while
+      subtracting the award, which is a claim about the count this metric defines.
+  - target: ../doctrine/thorough-and-efficient.yml
+    relationship: contested-under
+  - target: ../../catalog/alec-education-savings-account-act.md
+    relationship: sourced-from
+  - target: ../../catalog/alec-state-education-freedom-index.md
+    relationship: sourced-from
