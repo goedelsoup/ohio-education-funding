@@ -784,3 +784,100 @@ fn direct_certification_finds_fewer_children_than_the_disadvantaged_count() {
         );
     }
 }
+
+/// The window OCG White Paper 015 could not reach, and it points the other way.
+///
+/// That paper's all-funds series ends at FY2022 and its Future Research asks for an extension.
+/// This panel is FY2020-FY2025 of what districts actually booked. Over it, unrestricted state
+/// aid rose nominally in aggregate and fell by roughly a fifth in real terms, and seven
+/// districts in ten lost real ground.
+///
+/// Under the paper's own "real reduction" standard, applied to state aid over the most recent
+/// six observed years rather than endpoint-to-endpoint across two decades, the answer flips.
+/// Both readings are correct; they are different windows on one record, which is the point.
+#[test]
+fn real_state_aid_fell_by_about_a_fifth_over_the_recent_window() {
+    let cpi = deflate::CpiSeries::cpi_u_june();
+    let money = finances();
+    let (first, last) = (FiscalYear(2020), FiscalYear(2025));
+
+    let mut nominal_total = (0.0, 0.0);
+    let mut changes = Vec::new();
+    for district in &money {
+        let (Some(a), Some(b)) = (district.year(first), district.year(last)) else {
+            continue;
+        };
+        if a.unrestricted_aid <= 0.0 {
+            continue;
+        }
+        nominal_total.0 += a.unrestricted_aid;
+        nominal_total.1 += b.unrestricted_aid;
+        changes.push(
+            district
+                .real_change(&cpi, |y| y.unrestricted_aid)
+                .expect("covered")
+                .expect("positive base"),
+        );
+    }
+
+    // Nominally flat in aggregate: a reader looking only at the total sees no story.
+    let nominal_growth = nominal_total.1 / nominal_total.0 - 1.0;
+    assert!(
+        nominal_growth > 0.0 && nominal_growth < 0.05,
+        "aggregate nominal change is {nominal_growth:.3}"
+    );
+
+    // In real terms it is a fifth lower.
+    let rebased = cpi
+        .convert(nominal_total.0, first, last)
+        .expect("both years in the index")
+        .value;
+    let real_growth = nominal_total.1 / rebased - 1.0;
+    assert!(
+        (real_growth - -0.193).abs() < 0.01,
+        "aggregate real change is {real_growth:.3}"
+    );
+
+    // And it is not one large district carrying it.
+    let losing = changes.iter().filter(|c| **c < 0.0).count();
+    let share = losing as f64 / changes.len() as f64;
+    assert!(
+        (share - 0.702).abs() < 0.02,
+        "{losing} of {} districts lost real ground, a share of {share:.3}",
+        changes.len()
+    );
+    let typical = median(changes.clone());
+    assert!(
+        (typical - -0.114).abs() < 0.015,
+        "the median district's real state aid changed {typical:.3}"
+    );
+}
+
+/// What districts spend held up in real terms while what the state sent them did not — so the
+/// difference was made locally, which is the mechanism behind recurring levy activity.
+#[test]
+fn spending_held_its_real_value_over_the_window_and_state_aid_did_not() {
+    let cpi = deflate::CpiSeries::cpi_u_june();
+    let money = finances();
+    let change = |pick: fn(&project::finances::YearRecord) -> f64| {
+        median(
+            money
+                .iter()
+                .filter_map(|d| d.real_change(&cpi, pick).ok().flatten())
+                .collect(),
+        )
+    };
+    let aid = change(|y| y.unrestricted_aid);
+    let spending = change(|y| y.total_expenditure);
+    let property = change(|y| y.property_tax);
+
+    assert!(aid < -0.05, "median real state aid change is {aid:.3}");
+    assert!(
+        spending > 0.0,
+        "median real spending change is {spending:.3}"
+    );
+    assert!(
+        property > aid + 0.08,
+        "property {property:.3} against aid {aid:.3}"
+    );
+}
