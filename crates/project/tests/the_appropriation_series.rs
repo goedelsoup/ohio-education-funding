@@ -19,6 +19,7 @@ struct Line {
     fiscal_year: u16,
     kind: String,
     source: String,
+    documents: usize,
     line_item: String,
     amount: f64,
 }
@@ -28,7 +29,8 @@ fn series() -> Vec<Line> {
     let header = lines.next().expect("the fixture has a header");
     assert_eq!(
         header,
-        "general_assembly,bill,fiscal_year,kind,source,fund_group,fund,line_item,title,amount",
+        "general_assembly,bill,fiscal_year,kind,source,documents,fund_group,fund,line_item,\
+         title,amount",
         "the fixture's columns changed and this reader did not"
     );
     lines
@@ -40,7 +42,8 @@ fn series() -> Vec<Line> {
                 fiscal_year: field[2].parse().expect("fiscal year"),
                 kind: field[3].to_string(),
                 source: field[4].to_string(),
-                line_item: field[7].to_string(),
+                documents: field[5].parse().expect("documents"),
+                line_item: field[8].to_string(),
                 // The title may itself contain a comma, so the amount is taken from the end
                 // rather than by index.
                 amount: field[field.len() - 1].parse().expect("amount"),
@@ -50,36 +53,42 @@ fn series() -> Vec<Line> {
 }
 
 #[test]
-fn documents_that_overlap_agree_to_the_cent() {
-    // The check the whole fixture rests on. Nothing here trusts the parser; it trusts that four
-    // independently laid-out workbooks cannot agree by accident.
-    use std::collections::HashMap;
-    let mut claims: HashMap<(u16, String, String), Vec<(String, f64)>> = HashMap::new();
-    for line in series() {
-        claims
-            .entry((line.fiscal_year, line.kind.clone(), line.line_item.clone()))
-            .or_default()
-            .push((line.source.clone(), line.amount));
-    }
-
-    let overlapping: Vec<_> = claims.iter().filter(|(_, v)| v.len() > 1).collect();
+fn most_of_the_series_is_corroborated_by_a_second_document() {
+    // The property the fixture rests on, now asserted at build time rather than here: agreement
+    // between documents is checked in `fixtures::reconcile`, which refuses to write a fixture
+    // where two of them disagree. What survives into the fixture is the count, and this is the
+    // guard that the overlap has not quietly vanished — a series where every figure came from
+    // exactly one document would still parse, still sum, and have lost its whole cross-check.
+    let lines = series();
+    let corroborated = lines.iter().filter(|line| line.documents > 1).count();
     assert!(
-        overlapping.len() > 500,
-        "only {} claims are corroborated by a second document; the series has lost its \
-         cross-check",
-        overlapping.len()
+        corroborated > 900,
+        "only {corroborated} of {} claims are corroborated by a second document",
+        lines.len()
     );
+    assert!(
+        lines.iter().all(|line| line.documents >= 1),
+        "a claim reports being in no document at all"
+    );
+}
 
-    for ((year, kind, item), reports) in overlapping {
-        let first = reports[0].1;
-        for (source, amount) in reports {
-            assert!(
-                (amount - first).abs() < 0.005,
-                "FY{year} {kind} for line item {item} is {amount} in {source} and {first} in \
-                 {}; two documents disagree about the same figure",
-                reports[0].0
-            );
-        }
+#[test]
+fn one_row_per_claim_so_the_series_can_be_summed() {
+    // The defect this deduplication exists for. Two documents legitimately report the same
+    // enacted figure, so the raw extract counted every appropriation twice: `200550 Foundation
+    // Funding` came out at $17.5 billion against a true $8.7 billion, on a departmental budget of
+    // $15.3 billion. Exactly double is the error most likely to pass a sanity check.
+    use std::collections::HashSet;
+    let mut seen = HashSet::new();
+    for line in series() {
+        assert!(
+            seen.insert((line.fiscal_year, line.kind.clone(), line.line_item.clone())),
+            "FY{} {} for line item {} appears more than once; summing this series would \
+             double-count it",
+            line.fiscal_year,
+            line.kind,
+            line.line_item
+        );
     }
 }
 
@@ -156,6 +165,52 @@ fn foundation_funding_is_the_largest_line_in_every_year_it_appears() {
             "in FY{year} the largest enacted line in the {ga}th General Assembly's act is {} at \
              {}, not Foundation Funding",
             items[0].0, items[0].1
+        );
+    }
+}
+
+#[test]
+fn the_series_reconciles_with_the_greenbook_it_came_from_to_within_a_quarter_percent() {
+    /*
+     * The check against something outside the extraction. LSC's FY2026-27 greenbook prints a
+     * fund-group table in its own "Quick look" section: $14,881,272,733 for FY2026 and
+     * $15,300,066,884 for FY2027, as the department's total budget. Summing the enacted lines
+     * here should land on that, and it lands near it.
+     *
+     * **The property tax reimbursement lines have to come out first**, and that is the
+     * greenbook's own doing rather than an adjustment invented to make the numbers meet: it
+     * states that those items "are included in the State Revenue Distributions (RDF) section of
+     * the budget", so they are numbered `200xxx` and are not part of the department's total.
+     * `200903` alone is $1.3 billion, so the difference is not subtle.
+     *
+     * **What is left over is stated rather than tuned away.** After removing them the sum is
+     * short by $12.15 million in FY2026 and $31.15 million in FY2027 — 0.08% and 0.20%, and
+     * unexplained. It would be easy to find some combination of line items that closes the
+     * gap exactly; that would be fitting the answer, and the residual would stop being visible
+     * the moment it changed. The tolerance is deliberately loose enough to hold the current
+     * residual and tight enough that a column mix-up could not hide inside it.
+     */
+    const RDF: [&str; 2] = ["200903", "200417"];
+    for (year, published) in [(2026u16, 14_881_272_733.0f64), (2027, 15_300_066_884.0)] {
+        let total: f64 = series()
+            .iter()
+            .filter(|line| {
+                line.kind == "enacted"
+                    && line.fiscal_year == year
+                    && !RDF.contains(&line.line_item.as_str())
+            })
+            .map(|line| line.amount)
+            .sum();
+        let residual = published - total;
+        assert!(
+            residual.abs() / published < 0.0025,
+            "FY{year} sums to {total} against the greenbook's {published}, a residual of \
+             {residual} — more than a quarter of a percent, so something has moved"
+        );
+        assert!(
+            residual > 0.0,
+            "FY{year} now sums above the greenbook's own total, which the residual has never \
+             done; a line item is being counted that the department's total excludes"
         );
     }
 }

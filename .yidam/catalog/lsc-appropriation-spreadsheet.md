@@ -49,10 +49,21 @@ enacted for that biennium nowhere at all. Both variants are held here for that r
 
 ## Verification
 
-Sixteen documents across eight bienniums overlap heavily: a fiscal year is reported by up to four
-of them, as an enacted amount in the act that made it and as a prior-year actual in later ones.
-943 claims are corroborated by at least a second document and **none of them disagree** —
-`crates/project/tests/the_appropriation_series.rs` asserts it on every run.
+**Against each other.** Sixteen documents across eight bienniums overlap heavily: a fiscal year is
+reported by up to four of them, as an enacted amount in the act that made it and as a prior-year
+actual in later ones. Over 900 claims are corroborated by at least a second document and **none of
+them disagree**. That is asserted where the fixture is built, which then writes one row per claim
+with a `documents` count — because the raw extract, summed the obvious way, counts every
+appropriation twice.
+
+**Against the publisher's own total.** The FY2026-27 greenbook prints a fund-group table:
+$14,881,272,733 for FY2026 and $15,300,066,884 for FY2027. Summing the enacted lines here, less
+the property tax reimbursement items — which the greenbook itself says sit in the State Revenue
+Distributions section rather than the department's budget — lands $12.15 million short in FY2026
+and $31.15 million short in FY2027, 0.08% and 0.20%. **That residual is unexplained and is left
+stated rather than tuned away.** Some combination of line items would close it exactly; choosing
+one to make the numbers meet would be fitting the answer, and the residual would stop being
+visible the moment it changed.
 
 ## Retrieval
 

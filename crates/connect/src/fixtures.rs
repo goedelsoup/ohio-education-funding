@@ -3891,6 +3891,7 @@ pub const APPROPRIATION_HEADER: &[&str] = &[
     "fiscal_year",
     "kind",
     "source",
+    "documents",
     "fund_group",
     "fund",
     "line_item",
@@ -4123,6 +4124,79 @@ pub fn build_appropriations(books: &[AppropriationBook<'_>]) -> Result<Vec<Vec<S
     }
     if out.is_empty() {
         return Err("no appropriation lines were extracted from any workbook".to_string());
+    }
+    reconcile(out)
+}
+
+/// Collapse the sixteen documents into one row per claim, refusing if any two disagree.
+///
+/// # Why the fixture is deduplicated rather than left as it was read
+///
+/// The documents overlap heavily and that is the source of confidence here: a fiscal year is
+/// reported as an enacted amount by the act that made it and as a prior-year actual by the next
+/// act's workbook, across layouts that share no conventions. Agreement across those is worth more
+/// than any check this crate could write.
+///
+/// It is also, left alone, a way to be confidently wrong. Summing the raw extract to get "what
+/// Ohio appropriated for schools in FY2027" counts every figure twice, because two documents
+/// report it — which is how `200550 Foundation Funding` first came out at $17.5 billion against a
+/// true $8.7 billion, on a total budget of $15.3 billion. A number that is exactly double is the
+/// kind that survives a sanity check.
+///
+/// So agreement is asserted here, at build time, and the fixture carries one row per claim with
+/// `documents` recording how many said it. Provenance is kept: `source` names the document the
+/// figure was taken from, preferring the act whose own biennium the year falls in.
+fn reconcile(rows: Vec<Vec<String>>) -> Result<Vec<Vec<String>>, String> {
+    use std::collections::BTreeMap;
+    // (fiscal_year, kind, line_item) -> the rows claiming it.
+    let mut claims: BTreeMap<(String, String, String), Vec<Vec<String>>> = BTreeMap::new();
+    for row in rows {
+        claims
+            .entry((row[2].clone(), row[3].clone(), row[7].clone()))
+            .or_default()
+            .push(row);
+    }
+
+    let mut out = Vec::with_capacity(claims.len());
+    for ((year, kind, item), reports) in claims {
+        let first: f64 = reports[0][9].parse().map_err(|_| {
+            format!(
+                "FY{year} {kind} {item}: {:?} is not a number",
+                reports[0][9]
+            )
+        })?;
+        for report in &reports {
+            let amount: f64 = report[9]
+                .parse()
+                .map_err(|_| format!("FY{year} {kind} {item}: {:?} is not a number", report[9]))?;
+            if (amount - first).abs() >= 0.005 {
+                return Err(format!(
+                    "FY{year} {kind} for line item {item} is {} in {} and {} in {}; two \
+                     documents disagree about the same figure",
+                    report[9], report[4], reports[0][9], reports[0][4]
+                ));
+            }
+        }
+        // The act whose own biennium the year falls in is the one that decided it; anything else
+        // is reporting it second-hand. `general_assembly` and the year are both on the row.
+        let ga_of = |row: &Vec<String>| -> u16 { row[0].parse().unwrap_or(0) };
+        let year_number: u16 = year.parse().unwrap_or(0);
+        let own = |row: &Vec<String>| -> bool {
+            // The Nth General Assembly appropriates for the biennium starting FY(2N + 1754):
+            // the 136th for FY2026-27, the 129th for FY2012-13. Derived rather than tabled so it
+            // cannot fall out of step with the table in `rebuild`.
+            let first_year = 2 * ga_of(row) + 1754;
+            year_number == first_year || year_number == first_year + 1
+        };
+        let chosen = reports
+            .iter()
+            .find(|row| own(row) && row[4].ends_with("-enacted"))
+            .or_else(|| reports.iter().find(|row| own(row)))
+            .unwrap_or(&reports[0]);
+
+        let mut row = chosen.clone();
+        row.insert(5, reports.len().to_string());
+        out.push(row);
     }
     out.sort();
     Ok(out)
