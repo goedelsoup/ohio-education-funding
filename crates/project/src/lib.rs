@@ -56,6 +56,7 @@
 
 #![forbid(unsafe_code)]
 
+pub mod appropriations;
 pub mod crosswalk;
 pub mod finances;
 pub mod legislative_district;
