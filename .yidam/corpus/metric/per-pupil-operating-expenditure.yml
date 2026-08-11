@@ -28,6 +28,24 @@ description: |
   instruction +25.7%, support +28.2%, other +11.4%. [verified] Support grew fastest, but only
   slightly, and from a smaller base.
 
+  **AND THE DISAGREEMENT ABOUT THIS SERIES IS PERIODIC, NOT ONLY DEFINITIONAL.**
+  [OCG White Paper 015](../../catalog/ocg-white-paper-015.md) makes the best available case that
+  Ohio's funding argument is a quarrel about definitions: it names seven standards for
+  "defunding" and answers each. Its per-pupil and real-reduction rows both read **No — up
+  ~25-26% real**, which is correct endpoint to endpoint and is this metric's own headline figure.
+
+  It is still not the whole answer, because every standard in that table is applied FY2000 to
+  FY2022. Deflated year by year this series falls about 7% between FY2010 and FY2014 and does not
+  regain its FY2010 level until FY2018. A speaker who says Ohio defunded its schools and is
+  thinking of those years is describing something that happened, under the paper's own real and
+  per-pupil standards, and no choice among its seven definitions surfaces it. [inference]
+
+  So the rule this metric adds to the deflation rule: **name the window as well as the index.**
+  An endpoint pair cannot see an interior reversal, and this series contains three. Two speakers
+  can select different windows on one record and both be correct, which is a second and
+  independent reason the public argument does not resolve. See
+  [`skills/deflate`](../../skills/deflate.md).
+
   **This metric is not the state's business and that is the point.** A district's operating
   expenditure reflects local revenue, levy history, and local choice as much as state aid.
   Regressing it against [valuation per pupil](assessed-valuation-per-pupil.yml) is the
@@ -158,6 +176,11 @@ properties:
 
     TWO FINDINGS THE NOMINAL SERIES CONCEALS. [inference]
 
+    Both are now pinned in
+    [`crates/deflate/tests/ohio_epp_real_series.rs`](../../../crates/deflate/tests/ohio_epp_real_series.rs)
+    rather than left as prose, including a check that perturbs both trough endpoints by the full
+    chart-label uncertainty in the direction that would erase the decline and finds it intact.
+
     Real per-pupil spending did not grow steadily — it fell. From FY2010 to FY2014 it dropped
     from $15,226 to $14,173, a real decline of about 7%, leaving FY2014 statistically
     indistinguishable from FY2006's $14,166. Eight years of no real gain. That trough sits
@@ -209,4 +232,6 @@ links:
   - target: ../parameter/base-cost-per-pupil.yml
     relationship: compares-against
   - target: ../../catalog/auditor-longitudinal-school-finance.md
+    relationship: sourced-from
+  - target: ../../catalog/ocg-white-paper-015.md
     relationship: sourced-from

@@ -26,12 +26,22 @@ decline. The entire disparity story is a real-terms story.
 Treat any cross-period claim in this repository that has not passed through this calculator as
 unverified.
 
-## Two decisions the caller must make
+## Three decisions the caller must make
 
 **Which index.** CPI-U measures general prices; school costs are majority compensation, for
 which the Employment Cost Index is the better deflator but has shorter coverage. Neither is
 correct in all cases. The output names the index used, and a figure quoted without it is
 incomplete.
+
+**Which window.** An endpoint pair cannot see an interior reversal, and reporting one as though
+it characterised the series is the most common way a correctly deflated figure still misleads.
+Ohio's per-pupil operating expenditure rises 26% in real terms from FY2000 to FY2022 and falls
+about 7% from FY2010 to FY2014 — both computed by this calculator, both true. Two speakers
+choosing different windows on one record can contradict each other without either being wrong.
+Where a series is available annually, return the shape and not only the endpoints; where only
+endpoints exist, say so. See
+[`metric/per-pupil-operating-expenditure`](../corpus/metric/per-pupil-operating-expenditure.yml)
+and [`crates/deflate/tests/ohio_epp_real_series.rs`](../../crates/deflate/tests/ohio_epp_real_series.rs).
 
 **Fiscal year alignment.** Ohio fiscal years run July through June. A calendar-year index
 applied to a fiscal-year figure introduces a systematic half-year offset that compounds across

@@ -142,6 +142,20 @@ description: |
   improvement, which the habit from spending analysis would invite, gets the direction exactly
   backwards. See [equity](../doctrine/equity.yml).
 
+  **IT GROWS AS THE PHASE-IN COMPLETES, WHICH IS THE OPPOSITE OF WHAT THE NAME IMPLIES.**
+  [OCG White Paper 015](../../catalog/ocg-white-paper-015.md) reports the FY2024 position — the
+  phased-in amount about $741.8 million below what the formula calculated, with 180 districts
+  drawing about $181.2 million in guarantee support — and treats the phase-in gap as the
+  "unfunded statutory formula" standard for defunding. Set the FY2027 figures beside it:
+
+      FY2024    180 districts     $181.2 million     [verified — as published, secondary]
+      FY2027    294 districts     $879.0 million     [verified — department FY2027 model]
+
+  Roughly fivefold in dollars, arriving *at* the terminal year, the year the formula reaches
+  100%. The phase-in gap closes and the guarantee does not; the mechanism that carries districts
+  to full funding is the hold-harmless rather than the formula. Any account that treats FY2027 as
+  the year the question resolves has the direction backwards. [inference]
+
   **THE BASELINE IS FY2020, AND IT HAS NOT BEEN RE-BASED.** [verified — FY2026 payment report
   line-by-line explanation] The guarantee "ensures that districts do not receive less in FY 2026
   than what they received in **FY 2020**," measured against Base State Funding.
@@ -224,6 +238,14 @@ description: |
   to a fixed historical year does not expire; it is escaped, district by district, only as the
   formula grows past a level set in 2020. On the FY2027 evidence, for half of these districts
   that is not close. [inference]
+
+  **AND IT IS A NOMINAL FLOOR, SO IT ERODES WITHOUT ANYONE DECIDING TO CUT IT.** Over the
+  observed FY2020-FY2025 span, the median guaranteed district's real unrestricted state aid fell,
+  and it fell further than the median on-formula district's. [verified — see
+  [`crates/project/tests/finances_and_the_guarantee.rs`](../../../crates/project/tests/finances_and_the_guarantee.rs)]
+  A guarantee written in dollars and anchored to a fixed year loses purchasing power every year
+  by construction, and nothing in the formula records that it happened. "Held harmless" is true
+  in nominal terms and false in real ones. [inference]
 
   Still open: whether the statute or subsequent budget acts contemplate re-basing, and what the
   FY2020 figure itself was composed of — the Bridge formula distributed largely by reference to
@@ -313,4 +335,6 @@ links:
   - target: ../fiscal-period/fy2027.yml
     relationship: measured-in
   - target: ../../catalog/dew-fy27-funding-calculator.md
+    relationship: sourced-from
+  - target: ../../catalog/ocg-white-paper-015.md
     relationship: sourced-from
