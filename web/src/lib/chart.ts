@@ -47,6 +47,15 @@ export interface FanPoint {
   reference?: number;
 }
 
+/** One year of a two-series time series. */
+export interface SeriesPoint {
+  year: number;
+  /** The first series. `null` is a year the source does not publish — see {@link seriesSpec}. */
+  a: number | null;
+  /** The second, in the same units. There is no third and no second axis. */
+  b: number | null;
+}
+
 /**
  * Bin a set of values into `n` equal-width bins spanning their range.
  *

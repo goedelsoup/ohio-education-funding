@@ -1,5 +1,5 @@
 /**
- * The three chart forms, as Observable Plot specifications.
+ * The four chart forms, as Observable Plot specifications.
  *
  * # Why the spec is separate from the rendering
  *
@@ -25,7 +25,7 @@
 import * as Plot from "@observablehq/plot";
 
 import { escapeHtml } from "../format.ts";
-import type { Bar, Bin, FanPoint } from "../chart.ts";
+import type { Bar, Bin, FanPoint, SeriesPoint } from "../chart.ts";
 import { INK, SERIES } from "./tokens.ts";
 
 /** A chart, and the tooltip text for the marks a reader can point at. */
@@ -399,6 +399,135 @@ export function fanSpec(
     },
     hovers: {
       selector: ".fan-hit > *",
+      text: points.map((p) => escapeHtml(hover(p))),
+    },
+  };
+}
+
+/**
+ * Two quantities in the same units, over years.
+ *
+ * The fourth form, and the one the historical view needed: a fan chart draws an interval and a
+ * bar chart draws categories, and neither says what a pair of series did across fourteen years.
+ *
+ * The rules it inherits, and the two it adds:
+ *
+ * - **Two series, and there cannot be a third.** The categorical palette is a validated pair and
+ *   nothing here generates beyond it. A page needing a third quantity puts it in the table
+ *   underneath, which is what the table is for.
+ * - **One axis.** Both series are in the same units by construction — the caller passes shares or
+ *   dollars, never one of each — so there is no second scale to mislead with.
+ * - **A missing year is a break, not a bridge.** FY2014 is absent from the Census archive, and a
+ *   line drawn straight through it would assert a measurement nobody made. Plot breaks a line at
+ *   a null, and passing `null` rather than omitting the year is what keeps the gap on the x axis
+ *   where a reader can see it.
+ * - The axis is truncated to the data's own range and says so, as the fan chart does, because a
+ *   share moving from 46% to 34% is invisible against a zero baseline.
+ */
+export function seriesSpec(
+  points: SeriesPoint[],
+  labels: { a: string; b: string },
+  format: (v: number) => string,
+  hover: (p: SeriesPoint) => string,
+): Spec | null {
+  // One point is not a series, exactly as in `fanSpec`.
+  if (points.length < 2) return null;
+  const values = points.flatMap((p) => [p.a, p.b]).filter((v): v is number => v != null);
+  if (values.length === 0) return null;
+
+  let min = Math.min(...values);
+  let max = Math.max(...values);
+  const pad = (max - min) * 0.12 || Math.abs(max) * 0.02 || 1;
+  min -= pad;
+  max += pad;
+
+  const first = points[0]!;
+  const last = points[points.length - 1]!;
+  // The direct label goes on the last year that has a value, which is not necessarily the last
+  // year: a series ending in a gap would otherwise be labelled at a point it does not occupy.
+  const endOf = (key: "a" | "b") => [...points].reverse().find((p) => p[key] != null);
+  const endA = endOf("a");
+  const endB = endOf("b");
+
+  const line = (key: "a" | "b", stroke: string, className: string) =>
+    Plot.line(points, {
+      x: "year",
+      y: key,
+      stroke,
+      strokeWidth: 2,
+      // Plot breaks a line at a non-finite y of its own accord, which is why the missing year
+      // reaches here as a point with a null value rather than as an absent point.
+      className,
+    });
+
+  const endLabel = (point: SeriesPoint | undefined, key: "a" | "b", stroke: string) =>
+    point
+      ? [
+          Plot.text([point], {
+            x: point.year,
+            y: point[key] ?? 0,
+            dx: 8,
+            text: () => `${key === "a" ? labels.a : labels.b} ${format(point[key] ?? 0)}`,
+            textAnchor: "start",
+            fill: stroke,
+            className: "series-end",
+          }),
+        ]
+      : [];
+
+  return {
+    options: {
+      width: WIDTH,
+      height: 220,
+      marginTop: 14,
+      marginBottom: 26,
+      marginLeft: 0,
+      // Room for the longer of the two direct labels, which carry the series identity.
+      marginRight: 32 + Math.max(labels.a.length, labels.b.length) * 7.2,
+      x: { axis: null, domain: [first.year, last.year] },
+      y: { axis: null, domain: [min, max] },
+      marks: [
+        line("a", SERIES.formula, "series-a"),
+        line("b", SERIES.guarantee, "series-b"),
+        ...endLabel(endA, "a", SERIES.formula),
+        ...endLabel(endB, "b", SERIES.guarantee),
+        Plot.ruleY([min], { stroke: INK.rule, className: "axis" }),
+        Plot.text([first.year], {
+          frameAnchor: "bottom-left",
+          dy: 18,
+          text: (v: number) => `FY${v}`,
+          textAnchor: "start",
+          fill: INK.muted,
+          fontSize: 11,
+        }),
+        Plot.text([0], {
+          frameAnchor: "bottom",
+          dy: 18,
+          text: () => `axis starts at ${format(min)}, not zero`,
+          fill: INK.muted,
+          fontSize: 11,
+        }),
+        Plot.text([last.year], {
+          frameAnchor: "bottom-right",
+          dy: 18,
+          text: (v: number) => `FY${v}`,
+          textAnchor: "end",
+          fill: INK.muted,
+          fontSize: 11,
+        }),
+        // One full-height column per year, above every mark, as the fan chart does.
+        Plot.rect(points, {
+          x1: (p: SeriesPoint) => p.year - 0.5,
+          x2: (p: SeriesPoint) => p.year + 0.5,
+          y1: min,
+          y2: max,
+          fill: "transparent",
+          className: "series-hit",
+        }),
+      ],
+    },
+    hovers: {
+      selector: ".series-hit > *",
       text: points.map((p) => escapeHtml(hover(p))),
     },
   };

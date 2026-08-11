@@ -15,6 +15,7 @@ Roughly 3,150 pages, all of them static files:
 | `/district/{irn}/taxes` | What property here is worth by class, what is charged on it, and which side of the 20-mill floor that puts the district on. |
 | `/district/{irn}/scenario` | What a proposed change does to this district, and how many districts it moves the other way. |
 | `/outcomes` | Statewide: how little of attainment the funding side explains. |
+| `/history` | FY2009–FY2022 on the federal survey: where the money came from, and whom it reached. The only route that reaches before FY2020. |
 | `/scenario` | Move a lever and see who it reaches, across all 609, in the browser. |
 | `/compare` | Two districts side by side. |
 | `/wiki` | The corpus — regimes, statutes, litigation, parameters, metric definitions — rendered from `.yidam/` directly. |
@@ -441,8 +442,15 @@ tests/e2e/            the site in Chromium, a third of it with JavaScript disabl
 ## What is not built
 
 The **regime view** — walking the numbers from the Foundation Program to the Fair School Funding
-Plan — which needs a historical series the corpus does not have. The regimes are documented in the
-wiki; the per-district figures behind them are not.
+Plan — in the formula's own terms. That still needs a per-district historical series this
+repository does not have.
+
+What `/history` gives instead is the same span measured from outside: the Census Bureau's survey
+of every comparable Ohio school system, FY2009 through FY2022, which spans the Bridge Formula and
+the Fair School Funding Plan and says what happened to the revenue mix and the equity gap across
+both. It is not the formula and it does not reconcile with it — a different population on a
+different pupil count — and the page says so before it says anything else. The route exists
+separately from the statewide view for that reason.
 
 **Year-over-year funding.** The district view compares the FY2027 formula run at each of three
 enrollment years, which isolates the enrollment channel exactly. It is not a comparison of
@@ -463,11 +471,11 @@ Fields: bundle contract version, feed list, last export timestamp, node counts p
 -->
 | Field | Value |
 |---|---|
-| Contract version | `27.0.0` |
+| Contract version | `28.0.0` |
 | Districts in the feed | 609 |
 | Reference checkpoints | 8 |
 | Reference forecasts | 4 |
-| Size | 5756 KB |
+| Size | 5760 KB |
 | Deployment target | Cloudflare Pages, static, with a CSP in `web/public/_headers` |
 
 Regenerate with `cargo run --manifest-path crates/Cargo.toml -p bundle > web/public/data/bundle.json`. CI fails if the committed feed and a fresh one differ.

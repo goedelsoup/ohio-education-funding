@@ -24,9 +24,24 @@ export function indexFor(deflator: Deflator, fiscalYear: number): number | null 
   return deflator.points.find((p) => p.fiscal_year === fiscalYear)?.index ?? null;
 }
 
-/** The year a real-terms view is denominated in: the earliest the index covers. */
-export function baseYear(deflator: Deflator): number | null {
-  return deflator.points[0]?.fiscal_year ?? null;
+/**
+ * The year a real-terms view is denominated in: the earliest year of the series being restated.
+ *
+ * # Why this takes the series and not just the index
+ *
+ * It used to return the first point of the index, full stop, which was the same answer for as
+ * long as the index covered exactly one panel. Extending the deflator back to FY2009 for the
+ * historical view moved it — and every district's finances page silently began denominating its
+ * FY2020–FY2025 figures in FY2009 dollars, because a wider index is not a claim about what any
+ * particular card is showing.
+ *
+ * The base year is a property of the series, so it is computed from the series. A caller with no
+ * series to pass has nothing to denominate.
+ */
+export function baseYear(deflator: Deflator, years?: number[]): number | null {
+  const covered = deflator.points.map((p) => p.fiscal_year);
+  const candidates = years == null ? covered : years.filter((y) => covered.includes(y));
+  return candidates.length === 0 ? null : Math.min(...candidates);
 }
 
 /**
@@ -100,7 +115,10 @@ export function series(
   if (basis === "nominal" || deflator == null) {
     return { years, converted: false, base: null };
   }
-  const base = baseYear(deflator);
+  const base = baseYear(
+    deflator,
+    years.map((year) => year.fiscal_year),
+  );
   if (base == null) return { years, converted: false, base: null };
   const restated = years.map((year) => yearIn(deflator, year, base));
   if (restated.some((year) => year == null)) {

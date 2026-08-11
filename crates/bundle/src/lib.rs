@@ -37,6 +37,14 @@ use edfund_core::Dollars;
 
 /// The bundle schema version. Bump on any change to field names, units, or semantics.
 ///
+/// `28.0.0` added the historical axis: a `history` array carrying the Census Bureau's survey of
+/// Ohio school systems for FY2009 through FY2022, and a `deflator` extended to cover it. Breaking
+/// rather than additive because it changes what the feed *is*. Every other figure here is the Fair
+/// School Funding Plan computing one year for the 609 traditional districts; these are roughly 950
+/// agencies a year measured by somebody else on a different enrollment count, and the two do not
+/// reconcile. A consumer that rendered them on one axis without saying which was which would be
+/// making the mistake the block exists to let it avoid.
+///
 /// `9.0.0` wired the [`millage`] crate in. Breaking because [`District::at_millage_floor`]
 /// changes answer for 21 districts: it compared the effective Class I rate to a literal `20.0`,
 /// so a district charging *less* than twenty mills was reported as being above the floor with
@@ -73,7 +81,7 @@ use edfund_core::Dollars;
 /// from FY2022-FY2024 to FY2024-FY2026 — the years the department's `ADM Data` sheet declares.
 /// The values did not change; what they are called did, which is exactly the kind of silent
 /// meaning change the version guard exists for.
-pub const CONTRACT_VERSION: &str = "27.0.0";
+pub const CONTRACT_VERSION: &str = "28.0.0";
 
 /// How close to the floor counts as being on it, in mills.
 ///
@@ -1266,6 +1274,11 @@ pub struct Bundle {
     pub deflator: Option<Deflator>,
     /// Where Ohio sits among the states. `None` if the Census fixture is absent.
     pub national: Option<National>,
+    /// The Census survey year by year, oldest first. Empty if the panel is absent.
+    ///
+    /// The only part of the feed that reaches before FY2020, and the only part measured on
+    /// something other than the department's own formula. See [`HistoryYear`].
+    pub history: Vec<HistoryYear>,
     /// Ohio's 99 House districts, with school funding apportioned across them.
     pub house_districts: Vec<HouseDistrict>,
     /// And its 33 Senate districts, each exactly three House districts.
@@ -1673,6 +1686,34 @@ impl Bundle {
                 s.push_str("]},\n");
             }
         }
+
+        // One line per year, oldest first, because the thing a reader is looking for here is the
+        // shape across years rather than any single one.
+        s.push_str("  \"history\": [\n");
+        for (i, h) in self.history.iter().enumerate() {
+            s.push_str(&format!(
+                "    {{\"fiscal_year\": {}, \"districts\": {}",
+                h.fiscal_year, h.districts
+            ));
+            for (key, value) in [
+                ("local_share", h.local_share),
+                ("state_share", h.state_share),
+                ("federal_share", h.federal_share),
+                ("poorest_local_per_pupil", h.poorest_local_per_pupil),
+                ("richest_local_per_pupil", h.richest_local_per_pupil),
+                ("gap_per_pupil", h.gap_per_pupil),
+                ("state_closes_per_pupil", h.state_closes_per_pupil),
+                ("federal_closes_per_pupil", h.federal_closes_per_pupil),
+            ] {
+                s.push_str(&format!(", \"{key}\": {}", num(value)));
+            }
+            s.push('}');
+            if i + 1 < self.history.len() {
+                s.push(',');
+            }
+            s.push('\n');
+        }
+        s.push_str("  ],\n");
 
         // The two chambers. Written before the district array because a reader scanning the
         // feed meets the derived aggregate before the exact per-district figures it came from, and
@@ -2595,6 +2636,7 @@ mod tests {
             projection: None,
             deflator: None,
             national: None,
+            history: Vec::new(),
             districts,
         }
     }
@@ -2994,6 +3036,60 @@ mod tests {
             assert!(json.contains(field), "{field} missing from the feed");
         }
     }
+
+    #[test]
+    fn an_absent_history_is_an_empty_array_rather_than_a_missing_key() {
+        // A consumer that reads `history` and finds nothing there should get a series of length
+        // zero and render the rest of the page, not a `undefined.map` two components later.
+        assert!(bundle(vec![sample()], vec![])
+            .to_json()
+            .contains("\"history\": [\n  ],"));
+    }
+
+    #[test]
+    fn every_history_year_carries_both_halves_of_what_the_page_draws() {
+        let mut feed = bundle(vec![sample()], vec![]);
+        feed.history = vec![HistoryYear {
+            fiscal_year: 2009,
+            districts: 612,
+            local_share: 0.4801,
+            state_share: 0.4302,
+            federal_share: 0.0897,
+            poorest_local_per_pupil: 4_012.0,
+            richest_local_per_pupil: 9_988.0,
+            gap_per_pupil: 5_976.0,
+            state_closes_per_pupil: 2_760.0,
+            federal_closes_per_pupil: 570.0,
+        }];
+        let json = feed.to_json();
+        // The mix and the equalization measure are two findings joined on the year, and a page
+        // drawing one without the other would report where the money came from while saying
+        // nothing about whom it reached.
+        for field in [
+            "\"fiscal_year\": 2009",
+            "\"districts\": 612",
+            "\"local_share\": 0.4801",
+            "\"gap_per_pupil\": 5976",
+            "\"state_closes_per_pupil\": 2760",
+            "\"federal_closes_per_pupil\": 570",
+        ] {
+            assert!(json.contains(field), "{field} missing: {json}");
+        }
+    }
+
+    #[test]
+    fn the_residual_is_what_no_level_of_government_closes() {
+        // The number the series exists to show. State aid's *share* of the gap holds steady
+        // across the panel while the gap grows, so the part nobody closes grows with it — and a
+        // page that showed only the percentage would report that as stability.
+        let year = HistoryYear {
+            gap_per_pupil: 5_976.0,
+            state_closes_per_pupil: 2_760.0,
+            federal_closes_per_pupil: 570.0,
+            ..HistoryYear::default()
+        };
+        assert!((year.residual_per_pupil() - 2_646.0).abs() < 1e-9);
+    }
 }
 
 /// One state's school finance, from the Census Bureau's Annual Survey of School System Finances.
@@ -3111,4 +3207,60 @@ pub struct National {
     pub national_state_share: f64,
     /// National current spending per pupil.
     pub national_spending_per_pupil: f64,
+}
+
+/// One year of the Census survey, as the historical view needs it.
+///
+/// # Why this grain and not the formula's
+///
+/// Everything else in this feed is the Fair School Funding Plan computing FY2027 for 609
+/// traditional districts. This is the only block that reaches back, and it reaches back on a
+/// different measurement entirely: the Census Bureau's survey of what school systems actually
+/// took in, which covers roughly 950 Ohio agencies a year including community schools and
+/// educational service centers, on the Bureau's own enrollment count rather than ADM.
+///
+/// The two do not reconcile and are not meant to. A funding formula figure and a revenue survey
+/// figure for the same district in the same year routinely disagree, which is exactly why the
+/// [catalog](../../.yidam/catalog/census-f33-school-system-finances.md) exists.
+///
+/// # Comparable only
+///
+/// Every share and every quartile here is computed over the agencies the survey marks comparable
+/// — roughly two-thirds of the rows — because that is the population the corpus's existing
+/// single-year figures were computed over. A series whose first point is not comparable to the
+/// number already on the page is worse than no series.
+#[derive(Debug, Clone, Copy, PartialEq, Default)]
+pub struct HistoryYear {
+    /// The survey year, as a fiscal year.
+    pub fiscal_year: u16,
+    /// Comparable agencies the year is computed over.
+    pub districts: usize,
+    /// Local revenue as a share of total.
+    pub local_share: f64,
+    /// State revenue as a share of total.
+    pub state_share: f64,
+    /// Federal revenue as a share of total.
+    pub federal_share: f64,
+    /// Mean local revenue per pupil in the poorest quartile of districts.
+    pub poorest_local_per_pupil: f64,
+    /// And in the richest.
+    pub richest_local_per_pupil: f64,
+    /// The gap between them, which is what the other levels are measured against.
+    ///
+    /// Named for its denominator, as every per-pupil field in the feed is. `gap` alone would
+    /// have escaped the web layer's denominator guard, which reads field names — and this whole
+    /// block divides by a pupil count that is not the one any other figure on the site uses.
+    pub gap_per_pupil: f64,
+    /// Dollars per pupil of that gap closed by state aid.
+    pub state_closes_per_pupil: f64,
+    /// And by federal aid.
+    pub federal_closes_per_pupil: f64,
+}
+
+impl HistoryYear {
+    /// What neither level closes — the part a district actually experiences.
+    #[must_use]
+    pub fn residual_per_pupil(&self) -> f64 {
+        self.gap_per_pupil - self.state_closes_per_pupil - self.federal_closes_per_pupil
+    }
 }
