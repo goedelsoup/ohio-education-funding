@@ -56,6 +56,14 @@ redbook wired here is *as introduced*, so its amounts are the executive proposal
 claim resting on it says so. A greenbook for H.B. 96 sits at a sibling URL to the redbook already
 in the registry.
 
+**Two variants per biennium, and only one of them carries the enacted figure.** This was
+established by wiring all eight workbooks and reading the result: the
+`with-actual-expenditures-and-adjusted-appropriations` variant is revised after the biennium
+closes and *replaces* the enacted column with actuals, so the 132nd's workbook states the enacted
+FY2018-19 appropriation nowhere. Both variants are needed — sixteen workbooks, not eight — and a
+fiscal year does not identify a column: three of them carry more than one column naming the same
+year, and the extractor has to refuse on that rather than emit all of them.
+
 From the **129th onward the line-item detail is also a workbook** — `budget-in-detail` through the
 132nd, `appropriation-spreadsheet` from the 133rd — including a variant with **actual expenditures
 and adjusted appropriations** beside the enacted amounts, in columns

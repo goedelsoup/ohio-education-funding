@@ -91,6 +91,41 @@ consequences: |
   not hold, which is the failure mode
   [`hb-70`](../corpus/intervention/academic-distress-commission.yml) was recorded as unreachable
   to avoid. They are filled when the source they rest on is committed and digest-pinned.
+amendment: |
+  **The workbook era was attempted and reverted, and the attempt is why this section exists.**
+
+  All eight workbooks were wired, a header-driven extractor written, and 3,950 rows produced
+  before the output was read. It was wrong in two ways that a row count does not show, and both
+  are properties of the source rather than of the parser.
+
+  **The variant that carries actuals does not carry the enacted appropriation.** LSC publishes
+  each biennium's line-item detail more than once: a plain `as-enrolled` workbook at enactment,
+  and a `with-actual-expenditures-and-adjusted-appropriations` workbook revised afterwards. The
+  second **supersedes** the enacted column for any year that has since closed — so the 132nd's
+  workbook, which was the obvious one to take because it carries actuals, labels FY2018 `Actual`
+  and FY2019 `Adjusted Approp.` and states the enacted FY2018-19 appropriation nowhere at all.
+  The extraction produced **zero appropriation rows for that biennium** and did not fail. Getting
+  both claims means retrieving both variants, sixteen workbooks rather than eight, and keeping
+  which document each figure came from.
+
+  **A fiscal year does not identify a column.** Several workbooks carry more than one column
+  naming the same year — fund-specific splits, and variance columns beside the totals. The 129th
+  has two columns headed FY2012, one of them zero throughout; the 133rd has three naming FY2019,
+  which for `200550 Foundation Funding` read $6,970,372,221.42, $167,292,415.57 and $0.02. Keyed
+  on `(year, kind)` those collapse into three rows that disagree, with nothing in the fixture to
+  say which is the appropriation. The parser has to key on the column and **refuse on a
+  collision** rather than emit all of them.
+
+  And the inference rule this record proposed — a bare `FY 2026` column is an appropriation if the
+  year is in the biennium — is wrong for exactly the workbooks that need it. In the with-actuals
+  variant a bare column for a closed biennium year is spending, not appropriation, so the 129th's
+  FY2012 and FY2013 were labelled `appropriation` when they are neither enacted nor, in one of
+  the two columns, anything at all.
+
+  Nothing was committed. The alternative — ship it and caveat it — was refused on the grounds this
+  repository keeps arriving at: a misdated or mislabelled figure is not a parse failure, produces
+  a plausible number, and nothing downstream would catch it. The next attempt takes both variants
+  per biennium and treats a repeated year as an error.
 alternatives: |
   **Start the extraction in this phase.** Rejected on scope rather than on doubt. Thirteen
   documents across two formats and three PDF layout eras, a fixture, a reconciliation against each
