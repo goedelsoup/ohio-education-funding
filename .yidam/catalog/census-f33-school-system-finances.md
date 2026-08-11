@@ -109,3 +109,24 @@ The shift between the Ohio and national views is largest in the *middle* of the 
 smallest at the tails — the opposite of the intuition that a national comparison mainly relocates
 extremes.
 
+## The three archives that were not where the others are
+
+The Ohio panel opened at FY2012 for a year and a half because `sdf10_1a.zip`, `sdf101a.zip` and
+their obvious variants all 404. FY2009 through FY2011 are published under a **`_txt` suffix** the
+FY2012-FY2022 files do not use — `sdf091a_txt.zip`, `sdf101a_txt.zip`, `sdf11_1a_txt.zip` — and
+answer 200. All three carry the same 256 tab-delimited columns and the same names the builder
+already looks up by header, so nothing but the registry entries had to change. [verified]
+
+That mattered more than a tidier series. FY2012 is **three years inside** the FY2010-FY2014 real
+spending trough, so the panel had been unable to see the thing it was best placed to measure, and
+two findings were sitting behind a filename:
+
+- The state share of district revenue falls **11.7 points** from FY2009 (45.9%) to FY2022
+  (34.2%). From FY2012 it falls 7.7. Both are correct about their own window.
+- FY2010 and FY2011 are the only years on record where state aid closes about a **third** of the
+  local revenue gap rather than its usual ~45%, while federal gap-closing roughly doubles. FY2009
+  brackets them from before at 47.2% and FY2013 from after at 44.3%.
+
+**FY2014 is genuinely absent**, not misnamed: `sdf14_1a.zip`, `sdf141a.zip`, `sdf14_2a.zip`,
+`sdf14_1a_rev.zip` and the `_txt` forms all 404 while FY2013 and FY2015 answer under two of those
+patterns. The panel states the gap rather than interpolating across it. [open]

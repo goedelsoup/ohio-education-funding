@@ -195,7 +195,45 @@ properties:
     years apart. The FY2020 nominal input is a chart approximation, so the gap should be
     confirmed against exact figures — but it exceeds the approximation error. [open]
 
-    Per-district series are available from the Auditor's dashboard and are not yet extracted.
+    **THE TROUGH HAS NOW BEEN LOCATED DISTRICT BY DISTRICT**, not from the Auditor's dashboard
+    but from the federal survey underneath it: the Census F-33 district panel, extended back to
+    FY2009 by three NCES archives published under a `_txt` suffix the FY2012-FY2022 files do not
+    use. The panel had opened at FY2012, three years inside the decline. [verified — see
+    [`crates/dispersion/tests/f33_ohio_panel_trough.rs`](../../../crates/dispersion/tests/f33_ohio_panel_trough.rs)]
+
+    IT WAS BROAD. Of 607 comparable districts, **490 — 81% — spent less per pupil in real terms
+    in FY2013 than in FY2010.** Median change -5.6%, first quartile -9.2%. This was not a handful
+    of districts cut hard enough to move a statewide average; four in five actually spent less.
+
+    AND NOTHING ABOUT A DISTRICT PREDICTS HOW FAR IT FELL. The obvious hypothesis — a contraction
+    coinciding with the withdrawal of federal stimulus, inside the Bridge formula decade, should
+    land hardest on districts most dependent on state aid — is not supported. Against the depth
+    of the fall:
+
+      FY2010 state share of revenue      +0.029
+      FY2010 federal share of revenue    +0.029
+      FY2010 local share of revenue      -0.032
+      economically disadvantaged share   -0.033   [later vintage, directional]
+      assessed valuation per pupil       +0.033   [later vintage, directional]
+      log enrollment                     -0.186
+      FY2010 spending per pupil          -0.176
+
+    Only size and prior level register at all, both weakly and the second partly mechanical. The
+    deepest decile is real — 60 districts averaging -17.6% — but carries 11.8% of pupils, so it
+    is a tail rather than the story. [verified]
+
+    A SECOND SOURCE CONFIRMS THE SHAPE. Enrollment-weighted, the F-33 panel falls **6.8%** from
+    FY2010 to FY2013 against the Auditor's **6.9%** from FY2010 to FY2014 — different survey,
+    different entity set, levels about $1,500 apart, same decline. [verified] The two series are
+    not interchangeable and should never be quoted as one; that they agree on the shape is what
+    licenses reading them together.
+
+    FY2014 is absent from the NCES archive under every naming the surrounding years use, so the
+    district measurement stops at FY2013 and understates the trough — the Auditor's series is
+    still falling between FY2012 and FY2014. [open]
+
+    Per-district series also exist on the Auditor's own dashboard, on the same entity basis as
+    the statewide series here, and remain unextracted. They would settle the last of it. [open]
     [open]
   caveats: |
     Entity scope is wider than the 611 districts receiving foundation funding: it includes

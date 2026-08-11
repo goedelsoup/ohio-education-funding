@@ -65,6 +65,20 @@ FY2027 formula produces a median 67.8% of that baseline. The paper's Future Rese
 Full phase-in does not put districts on the formula; it leaves half the state on a hold-harmless
 anchored to a year the formula was not run.
 
+## The trough, now located district by district
+
+The paper's per-pupil-reduction row reads **No** for FY2000-FY2022. Over FY2010-FY2013 the
+district panel shows **81% of Ohio's comparable districts spending less per pupil in real terms**,
+median -5.6%. [verified] It was not a few districts moving an average, and nothing about a
+district — its state, federal or local revenue share, its later poverty or property wealth —
+predicts how far it fell. A general contraction, not a targeted one.
+
+Extending the same panel back to FY2009 also enlarges the paper's Section 4 finding on its own
+terms. The state share of district revenue falls **11.7 points** from FY2009 to FY2022 on the
+F-33 comparable-district basis, against the 6.2 points the paper reports for FY2000-FY2022 on the
+wider all-funds basis. Different universes, not directly comparable — but the direction is the
+paper's and the recent decline is steeper than a two-decade endpoint pair conveys. [verified]
+
 ## The window it could not reach, and it points the other way
 
 The all-funds series ends at FY2022 and Future Research asks for an extension. This corpus holds
