@@ -1,0 +1,113 @@
+id: the-greenbook-series
+summary: >-
+  An attempt on `lsc-budget`'s recorded blocker, which was wrong in three ways. LSC publishes an
+  education budget analysis for every main operating budget from the 124th General Assembly to the
+  136th, as enrolled, at a stable URL — and for the 129th onward as a spreadsheet rather than a
+  PDF. The blocker is replaced with what is actually in the way; the extraction is a separate
+  piece of work and is scoped here rather than started.
+context: |
+  `lsc-budget` was named in roughly twenty-one places across the corpus, more than any other
+  blocker: the appropriation history behind the casino earmark, the proration factor's own
+  history, EdChoice's appropriation, the four uncodified supplements' statutory home, the
+  tangible-personal-property phase-down schedule, four `fiscal-period` nodes that do not know
+  which act appropriated their biennium, and the pre-2000 record. It was the highest-fan-out
+  unresolved thing in the repository.
+
+  Its `still_blocked` string read: "wired for one document, the final analysis of the current
+  budget act; the redbooks, the Catalog of Budget Line Items and the per-district simulations are
+  unretrieved, so the continuous appropriation-line series and the pre-2000 record are not built."
+
+  That string had never been tested. `tax-abstract` is the precedent — it sat `declared` for
+  twelve phases behind a blocker nobody had attempted, and the real obstacle turned out to be
+  something else entirely. The same test applies here: probe whatever path exists, not the one
+  the blocker names.
+decision: |
+  Probe LSC properly, record what is there, and rewrite the blocker to describe the actual
+  obstacle. Do not begin the extraction in the same breath — it is a phase of its own, and the
+  value of this one is that the next person starts from a true description.
+
+  **The blocker was wrong in three ways.**
+
+  *It undercounted what is already wired.* Two documents are in the registry, not one: the
+  H.B. 96 final analysis and the H.B. 96 redbook. The redbook was added phases ago and the
+  sentence was never updated. Nothing caught it, because the test on `still_blocked` checks that
+  the string exists and is long enough to mean something, not that it is true.
+
+  *It treated retrieval as the obstacle.* LSC publishes an education budget analysis for every
+  main operating budget from the **124th General Assembly through the 136th** — thirteen
+  consecutive bienniums, FY2002-03 through FY2026-27 — at
+  `/assets/legislation/{ga}/{bill}/{stage}/files/{bill}-edu-greenbook-as-{enrolled,enacted}-...pdf`.
+  All thirteen download on a plain request from a self-identifying agent. The index that lists
+  them is `/budget/{ga}/main-operating-budget`, and `/budget/appropriation-biennium-reference-list`
+  maps every General Assembly to its operating biennium.
+
+  *And it named the wrong document.* The redbook is LSC's analysis of the bill **as introduced**,
+  so its amounts are the executive proposal — a distinction the registry note states carefully and
+  the corpus repeats wherever it quotes a figure. The **greenbook** is the same analysis **as
+  enrolled**, so its amounts are enacted. One exists for H.B. 96, at a sibling URL to the redbook
+  already in the registry. This is the second time a convenient version has been sitting one path
+  segment away from the correct one; the first was the as-passed-by-the-House analysis, caught
+  because its numbers contradicted the department's payments.
+consequences: |
+  **The appropriation-line series is reachable, and in two formats rather than one.**
+
+  From the 129th General Assembly onward LSC also publishes the line-item detail as a workbook,
+  under two names for the same artifact: `budget-in-detail` for the 129th through 132nd and
+  `appropriation-spreadsheet` from the 133rd. Both come in a variant carrying **actual
+  expenditures and adjusted appropriations** beside the enacted amounts. The columns are
+  `Budget | Fund Group | Fund | ALI | ALI Name | FY ...`, every agency in one sheet, which
+  [`spreadsheet`](../../crates/spreadsheet/) already reads natively.
+
+  So the series splits at the 129th:
+
+  - **129th-136th, FY2012-FY2027.** Workbooks. Native reader, no PDF text extraction, and both
+    appropriations and actuals from the publisher rather than derived.
+  - **124th-128th, FY2002-FY2011.** Greenbook PDFs only. Every one parses — 63 to 153 distinct
+    appropriation line items each — but by column position rather than by token order, because
+    `pdftotext -layout` leaves an unfunded year as an empty column and the `% Change` column
+    prints `N/A`, so counting tokens left to right silently shifts a row's years. That is the
+    whole difficulty, and it is a known one.
+
+  **The pre-2000 record is partly reachable, which the blocker denied outright.** The 124th's
+  greenbook carries FY1999 and FY2000 actuals in its line-item table. It is also the only
+  contemporaneous account this repository can reach of **H.B. 94 of the 124th General Assembly** —
+  the post-*DeRolph II* formula act that *DeRolph III* was about, and a
+  [corpus node](../corpus/legislation/hb-94-2001.yml) whose description says the act "survives
+  here only through DeRolph III's recitation of it, which is a court's account rather than the
+  enacted text." An LSC analysis of the enrolled act is not the session law, and it is not a
+  court's summary of it either.
+
+  **What stays blocked, and it is now a narrower claim.** Before FY1999 there is nothing here: the
+  greenbook series begins at the 124th and its earliest actuals are FY1999, so the pre-2000 record
+  in the sense the corpus means it — the Foundation Program era, *DeRolph I*, the equal yield
+  formula — still needs the session laws. The Catalog of Budget Line Items and the per-district
+  simulations were named in the old blocker and are not addressed here; the Catalog has an index
+  page at `/budget/catalog-of-budget-line-items` and was not opened.
+
+  **Four `fiscal-period` nodes can be answered once this is wired and not before.** FY2014-15,
+  FY2016-17, FY2018-19 and FY2020-21 carry `appropriating_bill` as `[unentered]` with "Needs
+  `lsc-budget`". The acts are named on the index pages retrieved here — H.B. 59, H.B. 64, H.B. 49
+  and H.B. 166 — but writing them in now would be a claim resting on a page this repository does
+  not hold, which is the failure mode
+  [`hb-70`](../corpus/intervention/academic-distress-commission.yml) was recorded as unreachable
+  to avoid. They are filled when the source they rest on is committed and digest-pinned.
+alternatives: |
+  **Start the extraction in this phase.** Rejected on scope rather than on doubt. Thirteen
+  documents across two formats and three PDF layout eras, a fixture, a reconciliation against each
+  document's own published fund-group totals, a catalog record, and four corpus fields is a phase;
+  beginning it inside the phase that discovered it would have produced a half-wired registry and a
+  blocker that was accurate about nothing again.
+
+  **Wire only the workbook era, 129th-136th.** It is eight of thirteen bienniums, it needs no PDF
+  work at all, and it would have been a clean, quick result. Rejected because it stops exactly
+  where the interesting part starts: FY2002-FY2011 covers the post-*DeRolph* settlement, the
+  Evidence-Based Model, the tangible-personal-property phase-out and the Bridge Formula, and those
+  are the years the corpus documents in prose and cannot price.
+
+  **Take the amounts by token order rather than by column position.** Simpler, and wrong in a way
+  that would not show: a row whose FY2001 column is blank and whose `% Change` column reads `N/A`
+  yields the same token count as a fully populated row with different years, so the error is a
+  silently misdated figure rather than a parse failure. Rejected before it was written, on the
+  strength of the three conventions in
+  [`conventions.rs`](../../crates/connect/src/conventions.rs), all three of which are this same
+  shape.

@@ -735,14 +735,20 @@ pub const CONNECTORS: &[Connector] = &[
         feeds: &["legislation", "fiscal-period", "program", "parameter"],
         status: Status::Wired {
             still_blocked: Some(
-                "wired for one document, the final analysis of the current budget act; the \
-                 redbooks, the Catalog of Budget Line Items and the per-district simulations are \
-                 unretrieved, so the continuous appropriation-line series and the pre-2000 record \
-                 are not built",
+                "wired for the current biennium only, and for the bill as introduced as well as \
+                 as enacted. The appropriation-line series is retrievable and unretrieved: LSC \
+                 publishes an education budget analysis for every main operating budget from the \
+                 124th General Assembly to the 136th, as enrolled, and from the 129th onward also \
+                 as a workbook carrying actual expenditures beside the enacted amounts. What is \
+                 genuinely absent is anything before FY1999, which the earliest of those reaches \
+                 only as an actual — the Foundation Program era still needs the session laws. The \
+                 Catalog of Budget Line Items and the per-district simulations have an index page \
+                 each and have not been opened",
             ),
         },
         note: "The only continuous appropriation-line series across the whole period, and the \
-               primary source for the pre-2000 record.",
+               primary source for the pre-2000 record. What is wired is the current biennium; \
+               see the decision record `the-greenbook-series` for what the rest of it costs.",
         sources: &[
         Source {
             key: "hb96-edu-redbook",
