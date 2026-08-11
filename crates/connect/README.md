@@ -38,7 +38,7 @@ Fields per connector: key, status, source count, corpus classes fed; then every 
 | `dew-five-year-forecast` | **wired** | 2 | education-agency, revenue-stream, metric, fiscal-period |
 | [`tax-abstract`](sources/tax-abstract.md) | **wired** | 4 | revenue-stream, parameter, metric |
 | [`dew-payment-reports`](sources/dew-payment-reports.md) | declared | 0 | program, education-agency, revenue-stream |
-| [`lsc-budget`](sources/lsc-budget.md) | **wired**, in part | 2 | legislation, fiscal-period, program, parameter |
+| [`lsc-budget`](sources/lsc-budget.md) | **wired**, in part | 18 | legislation, fiscal-period, program, parameter |
 | [`ohio-laws`](sources/ohio-laws.md) | **wired** | 23 | legislation, parameter, formula-component |
 | [`ohio-courts`](sources/ohio-courts.md) | **wired**, in part | 4 | litigation |
 | [`ofcc-projects`](sources/ofcc-projects.md) | declared | 0 | program, education-agency |
@@ -48,12 +48,12 @@ Fields per connector: key, status, source count, corpus classes fed; then every 
 | `dew-child-nutrition` | **wired**, in part | 11 | education-agency, metric, formula-component |
 | `dew-school-improvement` | **wired**, in part | 3 | school, education-agency, accountability-regime |
 
-15 connectors, 80 sources between them. 13 are wired and 2 are not; 5 of the wired ones reach only part of what they feed, and say so below.
+15 connectors, 96 sources between them. 13 are wired and 2 are not; 5 of the wired ones reach only part of what they feed, and say so below.
 
 **What is blocked, in the registry's own words.**
 
 - `dew-payment-reports` — blocked on: the deduct-era reports (1999-2021) are behind OH|ID authentication on the department's reports portal; the current-era ones are open and indexed but post-date the deduction entirely
-- `lsc-budget` — still blocked on: wired for the current biennium only, and for the bill as introduced as well as as enacted. The appropriation-line series is retrievable and unretrieved: LSC publishes an education budget analysis for every main operating budget from the 124th General Assembly to the 136th, as enrolled, and from the 129th onward also as a workbook carrying actual expenditures beside the enacted amounts. What is genuinely absent is anything before FY1999, which the earliest of those reaches only as an actual — the Foundation Program era still needs the session laws. The Catalog of Budget Line Items and the per-district simulations have an index page each and have not been opened
+- `lsc-budget` — still blocked on: wired for the appropriation-line series from the 129th General Assembly onward — FY2012 through FY2027, both variants of each biennium's workbook. The five bienniums before that, back to the 124th, exist only as greenbook PDFs whose tables must be read by column position rather than token order, and are unextracted. FY2012-13 has no enacted figure at all: LSC serves that biennium's two variants as the same file. Before FY1999 there is nothing — the Foundation Program era still needs the session laws. The Catalog of Budget Line Items and the per-district simulations have an index page each and have not been opened
 - `ohio-courts` — still blocked on: trial-level rulings such as the 2025 EdChoice decision are not in the supreme court archive at all, and `citing_cases` needs a citator rather than a document
 - `ofcc-projects` — blocked on: the site refuses a self-identifying agent — 404 to this project's user-agent, 200 to a browser string — and its project data is rendered by interactive maps rather than served as files
 - `nces-ccd` — still blocked on: wired for a single year of the LEA directory; the consolidation-aware long series is not built, because agency files are per-year zips whose column sets change and the identifier-change history has to be derived rather than read

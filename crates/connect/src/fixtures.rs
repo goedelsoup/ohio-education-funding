@@ -3416,6 +3416,7 @@ pub const REBUILT: &[&str] = &[
     ENACTED_FIXTURE,
     REDBOOK_FIXTURE,
     OPINIONS_FIXTURE,
+    APPROPRIATION_FIXTURE,
 ];
 
 /// Fixtures a [`crate::registry::Source`] declares that [`crate::rebuild`] does not produce.
@@ -3875,6 +3876,253 @@ pub fn build_identified(lists: &[(&str, &[Vec<String>])]) -> Result<Vec<Vec<Stri
                 opt(school_year),
             ]);
         }
+    }
+    out.sort();
+    Ok(out)
+}
+
+/// The appropriation-line series: every Department of Education line item, by fiscal year.
+pub const APPROPRIATION_FIXTURE: &str = "crates/project/fixtures/appropriation-lines.csv";
+
+/// Columns of the appropriation series.
+pub const APPROPRIATION_HEADER: &[&str] = &[
+    "general_assembly",
+    "bill",
+    "fiscal_year",
+    "kind",
+    "source",
+    "fund_group",
+    "fund",
+    "line_item",
+    "title",
+    "amount",
+];
+
+/// One budget workbook, with the biennium it appropriates for.
+#[derive(Debug, Clone, Copy)]
+pub struct AppropriationBook<'a> {
+    /// The General Assembly that enacted it.
+    pub general_assembly: u16,
+    /// The bill, as the registry keys it — `hb96`.
+    pub bill: &'a str,
+    /// The registry key of the document, which is the provenance of every figure from it.
+    pub source: &'a str,
+    /// Which of the two documents this is: `enacted` or `actuals`.
+    ///
+    /// It decides what an unlabelled column means, and nothing else does. The `actuals` workbook
+    /// heads its prior years and its closed biennium year alike with a bare `FY 2014`, and marks
+    /// only the year still open as `Adj. Appr.`; the `enacted` one labels every biennium column
+    /// with the stage it belongs to and leaves only genuine prior years bare.
+    pub variant: &'a str,
+    /// The first fiscal year of the biennium this act appropriates for.
+    pub first_year: u16,
+    /// The workbook's first sheet, as rows.
+    pub rows: &'a [Vec<String>],
+}
+
+/// What a column of amounts is a claim about, or why it is not one.
+///
+/// # Why this is a whitelist and not a set of exclusions
+///
+/// The first attempt classified a column by looking for `Actual` or `Approp` in its label and
+/// treating everything else as an amount for the year it named. That silently swept in `$ Change`
+/// and `% Change` — so `200550 Foundation Funding` in FY2019 arrived three times, as
+/// $6,970,372,221.42, $167,292,415.57 and $0.02, with nothing to say which was the appropriation.
+///
+/// The `as enacted` workbooks make the point sharper still: they carry the bill's entire path,
+/// with an amount per fiscal year for *introduced*, each chamber's substitute, each committee
+/// report, conference, and finally as enacted. Every one of those is a real dollar figure for a
+/// real fiscal year, and all but the last are proposals that never became law. A classifier that
+/// recognises what it wants and refuses the rest is the only shape that survives this source.
+fn amount_kind(label: &str) -> Option<&'static str> {
+    // Collapse the newlines LSC wraps its headers on, and the year, leaving the kind.
+    let stripped: String = label
+        .chars()
+        .map(|c| if c.is_control() { ' ' } else { c })
+        .collect();
+    let mut without_year = String::new();
+    let chars: Vec<char> = stripped.chars().collect();
+    let mut index = 0;
+    while index < chars.len() {
+        let is_year = index + 4 <= chars.len()
+            && chars[index..index + 4].iter().all(char::is_ascii_digit)
+            && matches!(
+                chars[index..index + 2].iter().collect::<String>().as_str(),
+                "19" | "20"
+            );
+        if is_year {
+            index += 4;
+        } else {
+            without_year.push(chars[index]);
+            index += 1;
+        }
+    }
+    let key = without_year
+        .to_uppercase()
+        .replace("FY", " ")
+        .replace(['.', ',', '/'], " ");
+    let key = key.split_whitespace().collect::<Vec<_>>().join(" ");
+
+    // Order matters: "ADJUSTED APPROPRIATIONS AS OF 9 30 22" must not fall through to the plain
+    // appropriation arm, and "AS ENACTED AFTER GOVERNOR'S VETOES" is still the enacted figure.
+    if key.is_empty() {
+        // A bare `FY 2024` column. Always a closed prior year in this series — but the caller
+        // checks that against the biennium rather than trusting it here.
+        Some("bare")
+    } else if key.starts_with("ADJ") {
+        Some("adjusted")
+    } else if key.contains("ACTUAL") {
+        Some("actual")
+    } else if key.contains("ENACTED") || key == "APPROPRIATION" {
+        Some("enacted")
+    } else {
+        // Introduced, OBM Estimate, House Substitute, Senate Reported, Conference Report, and
+        // both change columns. Real figures, and none of them law.
+        None
+    }
+}
+
+/// The first four-digit fiscal year named in a header cell.
+fn header_year(label: &str) -> Option<u16> {
+    let chars: Vec<char> = label.chars().collect();
+    for window in chars.windows(4) {
+        if window.iter().all(char::is_ascii_digit) {
+            let year: u16 = window.iter().collect::<String>().parse().ok()?;
+            if (1990..=2100).contains(&year) {
+                return Some(year);
+            }
+        }
+    }
+    None
+}
+
+/// Locate a column whose header matches any of `names`, ignoring case, spacing and punctuation.
+fn column_named(header: &[String], names: &[&str]) -> Option<usize> {
+    let normalize = |text: &str| -> String {
+        text.chars()
+            .filter(char::is_ascii_alphanumeric)
+            .collect::<String>()
+            .to_uppercase()
+    };
+    header
+        .iter()
+        .position(|cell| names.iter().any(|name| normalize(cell) == normalize(name)))
+}
+
+/// Build the appropriation-line series from LSC's budget workbooks.
+///
+/// # Errors
+///
+/// Returns an error naming the workbook and the column when a header cannot be mapped, when a
+/// bare year column falls inside the biennium — where it could be either the enacted amount or a
+/// revised one and the label does not say — or when two accepted columns in one document claim
+/// the same fiscal year and kind. Each of those is a figure this series would otherwise carry
+/// under a label it cannot support.
+pub fn build_appropriations(books: &[AppropriationBook<'_>]) -> Result<Vec<Vec<String>>, String> {
+    let mut out = Vec::new();
+    for book in books {
+        let label = format!("{} ({})", book.bill, book.source);
+        let header_index = book
+            .rows
+            .iter()
+            .take(8)
+            .position(|row| column_named(row, &["ALI"]).is_some())
+            .ok_or_else(|| format!("{label}: no header row carrying an `ALI` column"))?;
+        let header = &book.rows[header_index];
+
+        let ali =
+            column_named(header, &["ALI"]).ok_or_else(|| format!("{label}: no `ALI` column"))?;
+        let title = column_named(header, &["ALI Title", "ALIName", "Title"])
+            .ok_or_else(|| format!("{label}: no line-item title column"))?;
+        let fund_group = column_named(header, &["Fund Group", "FundGroup"]);
+        let fund = column_named(header, &["Fund", "Fund Number"]);
+
+        let mut columns: Vec<(usize, u16, &'static str)> = Vec::new();
+        let mut seen: Vec<(u16, &'static str)> = Vec::new();
+        for (index, cell) in header.iter().enumerate() {
+            let Some(year) = header_year(cell) else {
+                continue;
+            };
+            let Some(kind) = amount_kind(cell) else {
+                continue;
+            };
+            let kind = if kind == "bare" {
+                // In the revised workbook an unlabelled column is spending: that document exists
+                // to report what was spent, it marks the year still open as `Adj. Appr.`, and
+                // where a biennium year is genuinely an appropriation — the current biennium, in
+                // the 136th — it says `Appropriation` on the column. In the enacted workbook a
+                // bare column is only ever a prior year, because every biennium column there
+                // carries the legislative stage it belongs to.
+                if book.variant == "actuals" || year < book.first_year {
+                    "actual"
+                } else {
+                    return Err(format!(
+                        "{label}: column {index} is headed `{}`, which names a biennium year with \
+                         no word saying whether it is the enacted amount or a later revision",
+                        cell.trim()
+                    ));
+                }
+            } else {
+                kind
+            };
+            if seen.contains(&(year, kind)) {
+                return Err(format!(
+                    "{label}: two columns claim FY{year} {kind}; the second is `{}`",
+                    cell.trim()
+                ));
+            }
+            seen.push((year, kind));
+            columns.push((index, year, kind));
+        }
+        if columns.is_empty() {
+            return Err(format!("{label}: no column header names a fiscal year"));
+        }
+
+        for row in book.rows.iter().skip(header_index + 1) {
+            let Some(line_item) = row.get(ali).map(|cell| cell.trim()) else {
+                continue;
+            };
+            // Line items are numbered by agency and 200 is the Department of Education's.
+            // Filtering on the number rather than an agency column is deliberate: three of the
+            // sixteen carry no agency column, and two that do spell the agency differently.
+            if line_item.len() != 6
+                || !line_item.starts_with("200")
+                || !line_item.chars().all(|c| c.is_ascii_digit())
+            {
+                continue;
+            }
+            let name = row.get(title).map(|cell| cell.trim()).unwrap_or_default();
+            let at = |column: Option<usize>| -> String {
+                column
+                    .and_then(|index| row.get(index))
+                    .map(|cell| cell.trim())
+                    .unwrap_or_default()
+                    .to_string()
+            };
+            for (index, year, kind) in &columns {
+                let Some(raw) = row.get(*index).map(|cell| cell.trim()) else {
+                    continue;
+                };
+                let Some(amount) = crate::conventions::number(raw) else {
+                    continue;
+                };
+                out.push(vec![
+                    book.general_assembly.to_string(),
+                    book.bill.to_string(),
+                    year.to_string(),
+                    (*kind).to_string(),
+                    book.source.to_string(),
+                    at(fund_group),
+                    at(fund),
+                    line_item.to_string(),
+                    name.to_string(),
+                    format!("{amount:.2}"),
+                ]);
+            }
+        }
+    }
+    if out.is_empty() {
+        return Err("no appropriation lines were extracted from any workbook".to_string());
     }
     out.sort();
     Ok(out)
