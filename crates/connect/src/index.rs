@@ -66,6 +66,7 @@ impl From<io::Error> for IndexError {
 
 /// A README carrying at least one block.
 pub const DOCUMENTS: &[&str] = &[
+    "README.md",
     "crates/README.md",
     "crates/connect/README.md",
     "web/README.md",
@@ -117,6 +118,23 @@ fn outgoing_links(text: &str, slugs: &[&str], self_slug: &str) -> usize {
 
 fn read(root: &Path, relative: &str) -> String {
     fs::read_to_string(root.join(relative)).unwrap_or_default()
+}
+
+/// How many records a directory holds: every file with `extension`, less any `README`.
+///
+/// The index is not one of the things it indexes, and every directory here keeps its own.
+fn records(root: &Path, directory: &str, extension: &str) -> usize {
+    let Ok(entries) = fs::read_dir(root.join(directory)) else {
+        return 0;
+    };
+    entries
+        .flatten()
+        .filter(|entry| {
+            let path = entry.path();
+            path.extension().is_some_and(|e| e == extension)
+                && path.file_stem().is_some_and(|stem| stem != "README")
+        })
+        .count()
 }
 
 /// Every corpus node, as `(class, slug, path, text)`.
@@ -238,7 +256,20 @@ fn catalog_audit(root: &Path) -> String {
     out
 }
 
-fn crates_index(root: &Path) -> String {
+/// The test attribute, counted only where it stands alone on a line.
+///
+/// It used to be counted as a substring anywhere in a `.rs` file, which is a close enough proxy
+/// for `cargo test` right up until the counter's own source discusses what it counts. Three of
+/// `connect`'s reported tests were this comment, the line below it, and the table heading — and
+/// the fourth arrived the moment a doc comment was written above this function. A counter that
+/// counts its own description is the same defect as a status that is a string literal: it cannot
+/// be wrong in a way that shows.
+fn is_test_attribute(line: &str) -> bool {
+    line.trim() == "#[test]"
+}
+
+/// Every crate in the workspace, as `(name, description, test count)`.
+fn crate_rows(root: &Path) -> Vec<(String, String, usize)> {
     let mut rows: Vec<(String, String, usize)> = Vec::new();
     if let Ok(dirs) = fs::read_dir(root.join("crates")) {
         for dir in dirs.flatten() {
@@ -249,14 +280,14 @@ fn crates_index(root: &Path) -> String {
             let name = dir.file_name().to_string_lossy().into_owned();
             let text = fs::read_to_string(&manifest).unwrap_or_default();
             let description = toml_field(&text, "description").unwrap_or_default();
-            // Counting `#[test]` and `#[tokio::test]`-style attributes across the crate is a
-            // close enough proxy for `cargo test`, and unlike that it needs no build.
+            // A close enough proxy for `cargo test`, and unlike that it needs no build.
             let mut tests = 0;
             for entry in walk(&dir.path()) {
                 if entry.extension().is_some_and(|e| e == "rs") {
                     tests += fs::read_to_string(&entry)
                         .unwrap_or_default()
-                        .matches("#[test]")
+                        .lines()
+                        .filter(|line| is_test_attribute(line))
                         .count();
                 }
             }
@@ -264,7 +295,11 @@ fn crates_index(root: &Path) -> String {
         }
     }
     rows.sort();
+    rows
+}
 
+fn crates_index(root: &Path) -> String {
+    let rows = crate_rows(root);
     let total: usize = rows.iter().map(|(_, _, tests)| tests).sum();
     let mut out = String::from("| Crate | Description | `#[test]` fns |\n|---|---|--:|\n");
     for (name, description, tests) in &rows {
@@ -330,6 +365,96 @@ fn markdown_index(root: &Path, directory: &str, heading: &str) -> String {
         out.push_str(&format!("| [`{slug}`]({slug}.md) | {description} |\n"));
     }
     out
+}
+
+/// The root README's inventory of what is in the repository.
+///
+/// The last table anywhere here that was written by hand, and by the time it was read back every
+/// number in it had drifted: 76 nodes against 98, 13 classes against 17, 27 catalog records
+/// against 34, 617 test functions against 659. That is the identical failure the connector table
+/// and the crate test counts had, and it outlived both fixes for a structural reason — the guard
+/// reads markers, and this document had none. Adding one is the whole repair.
+///
+/// The prose in the right-hand column is qualitative and stays a literal. The counts are not, and
+/// none of them is.
+fn repository_overview(root: &Path) -> String {
+    let nodes = corpus_nodes(root);
+    let classes = nodes
+        .iter()
+        .map(|(class, _, _, _)| class)
+        .collect::<std::collections::BTreeSet<_>>()
+        .len();
+    let crates = crate_rows(root);
+    let tests: usize = crates.iter().map(|(_, _, tests)| tests).sum();
+
+    format!(
+        "| Directory | What it holds |\n|---|---|\n\
+         | [`.yidam/corpus/`](.yidam/corpus/) | The knowledge graph: {} nodes across {classes} \
+         classes — regimes, components, parameters, litigation, doctrine, exemplar districts |\n\
+         | [`.yidam/catalog/`](.yidam/catalog/) | {} source records. Every numeric claim in the \
+         corpus should reach one in a single hop |\n\
+         | [`.yidam/decisions/`](.yidam/decisions/) | {} records of why the repository is shaped \
+         the way it is, including the ones that turned out wrong |\n\
+         | [`crates/`](crates/) | The domain computer: {} Rust crates, {tests} test functions, no \
+         crates.io dependencies |\n\
+         | [`web/`](web/) | The site — a page per district, statewide views, and a scenario \
+         runner, all static |\n\
+         | [`agents/`](agents/), [`.yidam/skills/`](.yidam/skills/) | {} traversals and {} \
+         procedures this domain keeps needing |\n",
+        nodes.len(),
+        records(root, ".yidam/catalog", "md"),
+        records(root, ".yidam/decisions", "yml"),
+        crates.len(),
+        records(root, "agents", "md"),
+        records(root, ".yidam/skills", "md"),
+    )
+}
+
+/// How much is retrievable, in one sentence, for a reader who will not open the registry.
+///
+/// The two blocked connectors used to be *described* here rather than named, in prose that would
+/// have gone on reading correctly if a third were blocked and silently wrongly if one were freed.
+/// They are named from the registry now, so the sentence cannot outlive the fact.
+fn retrieval_status(root: &Path) -> String {
+    use crate::registry::CONNECTORS;
+
+    let wired = CONNECTORS.iter().filter(|c| c.status.is_wired()).count();
+    let blocked: Vec<String> = CONNECTORS
+        .iter()
+        .filter(|c| !c.status.is_wired())
+        .map(|c| format!("`{}`", c.key))
+        .collect();
+    let pinned = crate::cache::parse_manifest(&read(root, crate::cache::MANIFEST)).len();
+
+    format!(
+        "{} connectors, {wired} wired, and {pinned} published files pinned by SHA-256. The {} \
+         that {} not — {} — {} blocked on something this repository cannot build, and {} which, \
+         in a field a test checks: \
+         [the table](crates/connect/README.md) is generated from the registry rather than \
+         written by hand.\n",
+        CONNECTORS.len(),
+        blocked.len(),
+        if blocked.len() == 1 { "is" } else { "are" },
+        blocked.join(" and "),
+        if blocked.len() == 1 { "is" } else { "are" },
+        if blocked.len() == 1 {
+            "says"
+        } else {
+            "each says"
+        },
+    )
+}
+
+/// The four claim tags and their counts, without the field breakdown the corpus README carries.
+///
+/// Shares its counter with [`claim_audit`] rather than repeating the loop, because two counts of
+/// the same thing in two documents is how the corpus came to report four different totals at once.
+fn claim_totals(root: &Path) -> String {
+    let totals = claim_tag_totals(root);
+    format!(
+        "{} `[verified]`, {} `[inference]`, {} `[open]`, {} `[unentered]`.\n",
+        totals["[verified]"], totals["[inference]"], totals["[open]"], totals["[unentered]"]
+    )
 }
 
 /// The connector table, from [`crate::registry::CONNECTORS`] rather than from memory.
@@ -437,11 +562,27 @@ fn connector_registry(root: &Path) -> String {
 /// top-level key seen, or to the last two-space key if that top-level key was `properties`. That
 /// is exactly the granularity the audit reported in, and it needs no parser in a crate that has
 /// deliberately avoided acquiring one.
-fn claim_audit(root: &Path) -> String {
-    const TAGS: [&str; 4] = ["[verified]", "[inference]", "[open]", "[unentered]"];
-    let nodes = corpus_nodes(root);
+/// The four tags a corpus claim can carry.
+const TAGS: [&str; 4] = ["[verified]", "[inference]", "[open]", "[unentered]"];
 
+/// Every claim tag in the corpus, counted, with no attention to where each one sits.
+///
+/// The one counter. [`claim_audit`] renders it with a field breakdown and [`claim_totals`]
+/// renders it bare; neither counts for itself, so the root README and the corpus README cannot
+/// disagree about how much this repository knows.
+fn claim_tag_totals(root: &Path) -> BTreeMap<&'static str, usize> {
     let mut totals: BTreeMap<&str, usize> = TAGS.iter().map(|tag| (*tag, 0)).collect();
+    for (_, _, _, text) in corpus_nodes(root) {
+        for tag in TAGS {
+            *totals.get_mut(tag).expect("tag is in the map") += text.matches(tag).count();
+        }
+    }
+    totals
+}
+
+fn claim_audit(root: &Path) -> String {
+    let nodes = corpus_nodes(root);
+    let totals = claim_tag_totals(root);
     // Only the unresolved tags get a field breakdown; `[verified]` by field says nothing.
     let mut unresolved: BTreeMap<(String, &str), usize> = BTreeMap::new();
 
@@ -463,13 +604,10 @@ fn claim_audit(root: &Path) -> String {
             }
             for tag in TAGS {
                 let hits = line.matches(tag).count();
-                if hits == 0 {
+                if hits == 0 || tag == "[verified]" || tag == "[inference]" {
                     continue;
                 }
-                *totals.get_mut(tag).expect("tag is in the map") += hits;
-                if tag != "[verified]" && tag != "[inference]" {
-                    *unresolved.entry((field.clone(), tag)).or_default() += hits;
-                }
+                *unresolved.entry((field.clone(), tag)).or_default() += hits;
             }
         }
     }
@@ -584,6 +722,9 @@ fn generate(command: &str, root: &Path) -> Option<String> {
         "yidam bundle-status" => bundle_status(root),
         "yidam connector-registry" => connector_registry(root),
         "yidam claim-audit" => claim_audit(root),
+        "yidam repository-overview" => repository_overview(root),
+        "yidam retrieval-status" => retrieval_status(root),
+        "yidam claim-totals" => claim_totals(root),
         // Describes a system this repository does not have. Saying so beats an empty block and
         // beats a fabricated status — but the sentence still has to count what it counts.
         "yidam index-status" => index_status(root),
@@ -810,6 +951,93 @@ mod tests {
                 "{field} is not attributed at all"
             );
         }
+    }
+
+    #[test]
+    fn the_root_readme_counts_the_directories_it_describes() {
+        // The block that exists because this table was the last hand-written one, and by the time
+        // anyone read it back it was wrong about nodes, classes, catalog records and tests at
+        // once. Every assertion here is against the filesystem, so the table cannot drift from it.
+        let root = repository_root();
+        let overview = repository_overview(&root);
+        let nodes = corpus_nodes(&root);
+        let classes = nodes
+            .iter()
+            .map(|(class, _, _, _)| class)
+            .collect::<std::collections::BTreeSet<_>>()
+            .len();
+        assert!(
+            overview.contains(&format!("{} nodes across {classes} classes", nodes.len())),
+            "{overview}"
+        );
+        assert!(
+            overview.contains(&format!(
+                "{} source records",
+                records(&root, ".yidam/catalog", "md")
+            )),
+            "{overview}"
+        );
+        assert!(
+            overview.contains(&format!("{} Rust crates", crate_rows(&root).len())),
+            "{overview}"
+        );
+    }
+
+    #[test]
+    fn the_root_readme_and_the_corpus_readme_agree_about_what_is_known() {
+        // Two documents reporting the same four counts is exactly the arrangement that let the
+        // corpus publish four different totals at once. They share a counter; this is the test
+        // that says so, and it fails if either grows its own.
+        let root = repository_root();
+        let totals = claim_totals(&root);
+        let audit = claim_audit(&root);
+        for tag in TAGS {
+            let count = claim_tag_totals(&root)[tag];
+            assert!(
+                totals.contains(&format!("{count} `{tag}`")),
+                "the root README reports {tag} as something other than {count}"
+            );
+            assert!(
+                audit.contains(&format!("| `{tag}` | {count} |")),
+                "the corpus README reports {tag} as something other than {count}"
+            );
+        }
+    }
+
+    #[test]
+    fn the_retrieval_sentence_names_the_blocked_connectors_rather_than_describing_them() {
+        // It used to describe them — "an authenticated portal, and a publisher that serves
+        // interactive maps" — which reads correctly whether or not those are still the two, and
+        // would have gone on reading correctly if one were freed.
+        let root = repository_root();
+        let sentence = retrieval_status(&root);
+        for connector in crate::registry::CONNECTORS {
+            let named = sentence.contains(&format!("`{}`", connector.key));
+            assert_eq!(
+                named,
+                !connector.status.is_wired(),
+                "{} is {}named in the root README's retrieval sentence",
+                connector.key,
+                if named { "" } else { "not " }
+            );
+        }
+    }
+
+    #[test]
+    fn the_test_counter_does_not_count_itself_talking_about_tests() {
+        // The defect this function was extracted to fix. Counting the attribute as a substring
+        // made `connect` report three tests it did not have — a comment, a string literal and a
+        // table heading, all in the counter's own source — and adding a doc comment above the
+        // counter added a fourth.
+        assert!(is_test_attribute("#[test]"));
+        assert!(is_test_attribute("    #[test]"));
+        assert!(!is_test_attribute(
+            "/// Counting `#[test]` attributes across the crate"
+        ));
+        assert!(!is_test_attribute("        .matches(\"#[test]\")"));
+        assert!(!is_test_attribute(
+            "| Crate | Description | `#[test]` fns |"
+        ));
     }
 
     #[test]

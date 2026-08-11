@@ -1,0 +1,77 @@
+---
+/**
+ * The long view, and the only route on this site that reaches before FY2020.
+ *
+ * It is deliberately not folded into the statewide page. Everything there is the Fair School
+ * Funding Plan computing one year for 609 traditional districts; everything here is the Census
+ * Bureau surveying roughly 950 Ohio systems a year on its own definitions. The two do not
+ * reconcile, and a reader who met them in one card would subtract one from the other.
+ *
+ * The dollar figures carry the same nominal / constant-dollar switch as every other financial
+ * view, and they need it more: CPI-U rose 37% across this panel, so the nominal and real
+ * statements about the equity gap are different claims.
+ */
+import BasisToggle from "../components/BasisToggle.astro";
+import Base from "../layouts/Base.astro";
+import { loadFeed } from "../lib/feed.ts";
+import {
+  renderAbsent,
+  renderEqualization,
+  renderProvenance,
+  renderRevenueMix,
+} from "../lib/history.ts";
+import { baseYear } from "../lib/real.ts";
+
+const { bundle } = loadFeed();
+const history = bundle.history;
+const base = bundle.deflator
+  ? baseYear(
+      bundle.deflator,
+      history.map((y) => y.fiscal_year),
+    )
+  : null;
+
+const first = history[0];
+const last = history[history.length - 1];
+---
+
+<Base
+  title="History"
+  description={
+    first && last
+      ? `Ohio's state share of school revenue fell from ${(first.state_share * 100).toFixed(1)}% in FY${first.fiscal_year} to ${(last.state_share * 100).toFixed(1)}% in FY${last.fiscal_year}, on the Census Bureau's survey of every comparable school system in the state.`
+      : "This feed carries no historical panel."
+  }
+  section="history"
+>
+  <h1>The long view</h1>
+  <p class="sub">
+    {
+      first && last
+        ? `What Ohio's schools took in and from whom, FY${first.fiscal_year} through FY${last.fiscal_year}, measured by the federal government rather than by the state. The only figures on this site that reach before FY2020.`
+        : "This feed carries no historical panel."
+    }
+  </p>
+
+  {
+    history.length === 0 ? (
+      <Fragment set:html={renderAbsent()} />
+    ) : (
+      <>
+        <Fragment set:html={renderProvenance(bundle)} />
+        <Fragment set:html={renderRevenueMix(history)} />
+
+        <BasisToggle id="history-basis" base={base}>
+          <Fragment
+            slot="nominal"
+            set:html={renderEqualization(history, bundle.deflator, base, "nominal")}
+          />
+          <Fragment
+            slot="real"
+            set:html={renderEqualization(history, bundle.deflator, base, "real")}
+          />
+        </BasisToggle>
+      </>
+    )
+  }
+</Base>

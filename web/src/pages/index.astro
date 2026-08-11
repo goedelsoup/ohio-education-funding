@@ -20,7 +20,14 @@ import {
 
 const { bundle, alphabetical, tax } = loadFeed();
 const s = bundle.statewide;
-const base = bundle.deflator ? baseYear(bundle.deflator) : null;
+// The years this page actually restates — the statewide financial panel, not everything the
+// index reaches. The deflator now covers the historical route's FY2009 onward as well.
+const base = bundle.deflator
+  ? baseYear(
+      bundle.deflator,
+      s.finances.map((y) => y.fiscal_year),
+    )
+  : null;
 
 /** The districts a reader is most likely to be looking for, as a way in that is not a table. */
 const NOTABLE = ["043802", "043786", "044909", "049056", "044933", "045583"]

@@ -27,7 +27,14 @@ export const getStaticPaths = districtPaths;
 
 const { district } = Astro.props;
 const { bundle } = loadFeed();
-const base = bundle.deflator ? baseYear(bundle.deflator) : null;
+// This district's own filed years. The index reaches back to FY2009 for the historical route,
+// which is not a statement about what this card is denominating.
+const base = bundle.deflator
+  ? baseYear(
+      bundle.deflator,
+      district.finances.map((y) => y.fiscal_year),
+    )
+  : null;
 
 const latest = district.finances[district.finances.length - 1];
 const description = latest

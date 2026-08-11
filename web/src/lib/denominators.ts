@@ -81,6 +81,12 @@ export const DENOMINATORS = {
     note: "The federal survey's own count, on its own definitions, for every state.",
     field: "national.states[].enrollment",
   },
+  "f33-panel-membership": {
+    label: "Fall membership, `V33`, per year",
+    source: "U.S. Census Bureau / NCES, School District Finance Survey (F-33), FY2009-FY2022",
+    note: "The same measure as `f33-fall-membership` and a different population: every comparable Ohio system in each year of the panel rather than one district in FY2022, so about 950 agencies including community schools and educational service centres. Nothing on the history route may be compared to a figure from the formula side, which counts 609 traditional districts on ADM.",
+    field: "history[].poorest_local_per_pupil",
+  },
 } as const;
 
 export type DenominatorKey = keyof typeof DENOMINATORS;
@@ -137,6 +143,19 @@ export const FIELD_DENOMINATORS: Record<string, DenominatorKey | null> = {
   // comparable and the card says so.
   "districts[].national.revenue_per_pupil": "f33-fall-membership",
   "districts[].national.spending_per_pupil": "f33-fall-membership",
+
+  // The historical panel, on the survey's count for each of its years.
+  //
+  // Three of these were called `gap`, `state_closes` and `federal_closes` when they were written,
+  // and the walk did not see them: they are dollars per pupil whose names did not say so. That is
+  // this registry's failure mode rather than an exception to it, so the fields were renamed in the
+  // Rust instead of exempted here. A per-pupil quantity that hides its denominator in a field
+  // name is precisely the thing that shipped twice.
+  "history[].poorest_local_per_pupil": "f33-panel-membership",
+  "history[].richest_local_per_pupil": "f33-panel-membership",
+  "history[].gap_per_pupil": "f33-panel-membership",
+  "history[].state_closes_per_pupil": "f33-panel-membership",
+  "history[].federal_closes_per_pupil": "f33-panel-membership",
 
   // The percentiles are dimensionless — a rank. `local_share` and its percentile are too, and are
   // deliberately absent: the walk does not consider them denominator-bearing, and declaring a
@@ -265,4 +284,9 @@ export const RENDERED_PAIRS: [string, string][] = [
 export const DELIBERATELY_UNCOMPARABLE: [string, string][] = [
   ["districts[].targeted_assistance.wealth_per_pupil", "districts[].valuation_per_pupil"],
   ["districts[].targeted_assistance.resident_adm", "districts[].categorical_adm"],
+  // The history route and the formula side. Not adjacent on any card — they are on separate
+  // routes precisely so they cannot be — but recorded because the temptation to put the local
+  // revenue gap beside a district's valuation per pupil will arrive, and they are a different
+  // population, a different count, and a decade apart.
+  ["history[].poorest_local_per_pupil", "districts[].valuation_per_pupil"],
 ];

@@ -924,6 +924,32 @@ export const ProjectionMetaSchema = z
   })
   .strict();
 
+/**
+ * One year of the Census Bureau's survey of Ohio school systems.
+ *
+ * The only part of the feed that reaches before FY2020, and the only part not measured by the
+ * department's own formula. Roughly 950 agencies a year rather than 609 districts, on the
+ * Bureau's enrollment count rather than ADM, and every figure here computed over the subset the
+ * survey marks comparable. It does not reconcile with the FY2027 model and is not meant to.
+ */
+export const HistoryYearSchema = z
+  .object({
+    fiscal_year: z.number().int(),
+    districts: z.number().int().positive(),
+    /** Shares of total revenue. They sum to 1 up to rounding. */
+    local_share: num,
+    state_share: num,
+    federal_share: num,
+    /** Mean local revenue per pupil, poorest and richest quartile of districts. */
+    poorest_local_per_pupil: num,
+    richest_local_per_pupil: num,
+    /** The gap between them, and how much of it each level of government closes. */
+    gap_per_pupil: num,
+    state_closes_per_pupil: num,
+    federal_closes_per_pupil: num,
+  })
+  .strict();
+
 /** The whole feed. */
 export const BundleSchema = z
   .object({
@@ -938,6 +964,8 @@ export const BundleSchema = z
     deflator: DeflatorSchema.nullable(),
     /** Where Ohio sits among the states. `null` if the Census fixture is absent. */
     national: NationalSchema.nullable(),
+    /** The survey year by year, oldest first. Empty if the panel is absent. */
+    history: z.array(HistoryYearSchema),
     house_districts: z.array(HouseDistrictSchema),
     /** The same for the Senate: 33 seats, each exactly three House districts. */
     senate_districts: z.array(HouseDistrictSchema),
@@ -957,6 +985,7 @@ export type District = z.infer<typeof DistrictSchema>;
 export type Statewide = z.infer<typeof StatewideSchema>;
 export type StateFinance = z.infer<typeof StateFinanceSchema>;
 export type National = z.infer<typeof NationalSchema>;
+export type HistoryYear = z.infer<typeof HistoryYearSchema>;
 export type Deflator = z.infer<typeof DeflatorSchema>;
 export type PolicyShape = z.infer<typeof PolicyShapeSchema>;
 export type Checkpoint = z.infer<typeof CheckpointSchema>;

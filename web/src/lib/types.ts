@@ -18,6 +18,7 @@ export type {
   Bundle,
   MillageAnalysis,
   National,
+  HistoryYear,
   StateFinance,
   RegimeCounterfactual,
   PropertyTaxYear,
@@ -43,7 +44,7 @@ import type { Bundle, District, Statewide } from "./schema/feed.ts";
  * the build and the scenario routes refuse to proceed past when the two disagree — the deliberate
  * half of drift detection, where the strictness of the schemas is the accidental half.
  */
-export const REQUIRED_CONTRACT = "27.0.0";
+export const REQUIRED_CONTRACT = "28.0.0";
 
 /**
  * A district with only the fields the funding formula reads.
@@ -115,9 +116,18 @@ export type PanelDistrict = Omit<
   | "gifted"
 >;
 
-/** The feed with the two heavy per-district blocks removed. Served as `/data/panel.json`. */
+/**
+ * The feed with the two heavy per-district blocks removed. Served as `/data/panel.json`.
+ *
+ * `history` is omitted for the same reason `national` is: the scenario builder re-runs the FY2027
+ * formula over the 609 traditional districts, and the Census survey of a different population in
+ * a different decade is not one of its inputs. It stays in the full feed and on its own route.
+ */
 export interface Panel
-  extends Omit<Bundle, "districts" | "statewide" | "national" | "house_districts" | "senate_districts"> {
+  extends Omit<
+    Bundle,
+    "districts" | "statewide" | "national" | "history" | "house_districts" | "senate_districts"
+  > {
   districts: PanelDistrict[];
   statewide: Omit<Statewide, "finances" | "outcomes">;
 }

@@ -13,11 +13,12 @@ use std::collections::HashMap;
 
 use bundle::{
     BaseCostBuildUp, Bundle, CareerTechnical, Categoricals, Checkpoint, Deflator, District,
-    DistrictOutcome, Dpia, EnglishLearners, FinanceYear, ForecastCheckpoint, Gifted,
+    DistrictOutcome, Dpia, EnglishLearners, FinanceYear, ForecastCheckpoint, Gifted, HistoryYear,
     HouseDistrictMember, HouseDistrictShare, MillageAnalysis, National, OutcomeStatewide,
     PolicyShape, Projection, PropertyTaxYear, RegimeCounterfactual, SpecialEducation,
     SpendingByFunction, StateFinance, Statewide, TargetedAssistance, CONTRACT_VERSION,
 };
+use dispersion::ohio_panel::{equalization_by_year, revenue_mix_by_year};
 use dispersion::{partial_correlation, wealth_neutrality};
 use edfund_core::{AgencyType, FiscalYear};
 use foundation::{aggregate_base_cost, StatewideFactors};
@@ -641,6 +642,52 @@ fn to_district(record: &DistrictRecord, joins: &Joins<'_>) -> District {
     }
 }
 
+/// The Census survey, year by year, as the historical view needs it.
+///
+/// Two measures joined on the year, both already computed and tested in
+/// [`dispersion::ohio_panel`]: where a year's money came from, and how much of the gap between
+/// the poorest and richest quartiles of districts each level of government closed.
+///
+/// The panel is the only thing in this feed that reaches before FY2020, and it has been sitting
+/// in the workspace unexported — computed over by two Rust modules and a test, and invisible to
+/// every reader who was not running `cargo`. That is the gap this closes.
+///
+/// FY2014 is absent because it is absent from the Bureau's archive under every naming the other
+/// years use, so the series has a hole in it rather than an interpolation across it.
+fn history() -> Vec<HistoryYear> {
+    let equalization = equalization_by_year();
+    revenue_mix_by_year()
+        .into_iter()
+        .map(|(fiscal_year, mix)| {
+            // Every year in the mix has an equalization figure — both are computed over the same
+            // comparable rows — but defaulting rather than unwrapping keeps a future year with
+            // too few districts to quartile from taking the whole feed down.
+            let gap = equalization.get(&fiscal_year).copied().unwrap_or_default();
+            HistoryYear {
+                fiscal_year,
+                districts: mix.districts,
+                local_share: mix.local,
+                state_share: mix.state,
+                federal_share: mix.federal,
+                poorest_local_per_pupil: gap.poorest_local,
+                richest_local_per_pupil: gap.richest_local,
+                gap_per_pupil: gap.gap,
+                state_closes_per_pupil: gap.state_closes,
+                federal_closes_per_pupil: gap.federal_closes,
+            }
+        })
+        .collect()
+}
+
+/// Every year either axis of the feed carries, oldest first.
+fn deflator_years(districts: &[District], history: &[HistoryYear]) -> Vec<u16> {
+    let mut years = covered_years(districts);
+    years.extend(history.iter().map(|year| year.fiscal_year));
+    years.sort_unstable();
+    years.dedup();
+    years
+}
+
 /// Fiscal years the financial panel covers, oldest first.
 fn covered_years(districts: &[District]) -> Vec<u16> {
     let mut years: Vec<u16> = districts
@@ -1200,8 +1247,11 @@ fn main() {
             .collect(),
     };
 
+    let history = history();
+
     let bundle = Bundle {
         national: national(),
+        history: history.clone(),
         house_districts: house_district_block(&records, Chamber::House),
         senate_districts: house_district_block(&records, Chamber::Senate),
         contract_version: CONTRACT_VERSION.to_string(),
@@ -1219,7 +1269,12 @@ fn main() {
         projection: Some(projection),
         deflator: Some(Deflator {
             label: cpi.label().to_string(),
-            points: covered_years(&districts)
+            // The union of both axes rather than the financial panel alone. The history block
+            // spans FY2009-FY2022 and CPI-U rose 37% across it, so a page showing that gap in
+            // nominal dollars would report a widening that is partly just money getting smaller.
+            // A deflator that covers only part of what the feed carries is the failure mode where
+            // the page silently falls back to nominal for the years it cannot convert.
+            points: deflator_years(&districts, &history)
                 .into_iter()
                 .filter_map(|year| cpi.point(FiscalYear(year)).map(|point| (year, point.index)))
                 .collect(),
