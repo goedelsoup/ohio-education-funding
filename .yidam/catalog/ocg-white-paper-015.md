@@ -115,12 +115,33 @@ FY2022 transition without marking it shows foundation payments rising for reason
 the formula. The paper's own comparisons are post-FSFP on both sides and clean; a reader spanning
 FY2000–FY2025 will not necessarily be.
 
-## What this corpus cannot check
+## Section 9, now half-checked
 
-Roughly a third of the paper is outside the corpus's coverage and is recorded as unverified
-rather than accepted: the Census F-33 cross-state table (Section 9 — the `census-f33` connector
-is `Retrievable` with no parser), NAEP (Section 8), the FY2014–FY2025 scholarship payment series
-(Section 6), and the LSC appropriation history.
+The FY2024 F-33 survey is held and the cross-state table splits in two. [verified — see
+[`crates/dispersion/tests/census_f33_fy2024.rs`](../../crates/dispersion/tests/census_f33_fy2024.rs)]
+
+**The revenue mix reproduces, and it is the part the argument rests on.** Ohio's shares come out
+state 35.1% / local 53.3% / federal 11.6% against the published 34.6 / 53.6 / 11.8; Indiana and
+Kentucky land within half a point on every line. Ohio's local reliance sits more than nine points
+above the national figure and above all three of its western and southern neighbours. The
+paper's Section 9 claim is confirmed.
+
+**The per-pupil dollars do not reproduce, and the corpus cannot say why.** Aggregating the
+individual-unit file gives Ohio $16,610 against a published $17,257, and the errors scatter
+rather than shift: Indiana +0.5%, Kentucky +1.1%, Pennsylvania +3.2%, Ohio −3.7%, Michigan
+−9.8%. A uniform bias would point at a spending definition or a unit filter and could be
+corrected; a state-specific one cannot be from these rows. The Bureau publishes its state
+per-pupil figures from summary tables built on something the unit file does not carry.
+
+That is recorded as a limit on this corpus, **not** as an error in the paper, which quotes a
+published Census figure correctly. It does mean nobody should rebuild a state per-pupil
+comparison from the unit file and expect the published numbers. [open]
+
+## What this corpus still cannot check
+
+NAEP (Section 8), the FY2014–FY2025 scholarship payment series (Section 6), and the LSC
+appropriation history remain outside the corpus's coverage and are recorded as unverified rather
+than accepted.
 
 ## Used by
 

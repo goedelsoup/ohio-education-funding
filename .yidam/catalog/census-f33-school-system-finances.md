@@ -130,3 +130,24 @@ two findings were sitting behind a filename:
 **FY2014 is genuinely absent**, not misnamed: `sdf14_1a.zip`, `sdf141a.zip`, `sdf14_2a.zip`,
 `sdf14_1a_rev.zip` and the `_txt` forms all 404 while FY2013 and FY2015 answer under two of those
 patterns. The panel states the gap rather than interpolating across it. [open]
+
+## The FY2024 file is a different shape at the same URL
+
+`elsec24t.xlsx` — `.xlsx` where FY2022 is `.xls` — drops the `IDCENSUS` column, which shifts
+every later index by one. Every column the corpus wants still exists and still means the same
+thing, so a positional read would have produced a complete, plausible, entirely wrong extract:
+state codes read as unit types, revenue read as enrolment. `build_f33_states` was positional and
+is now header-driven; it reproduces the FY2022 fixture byte for byte, which is the check that the
+change was safe. [verified]
+
+Two naming traps worth stating, because both have cost time here:
+
+- These are the Bureau's `elsec` tables. The NCES `sdf` school-district files the Ohio panel reads
+  are a different product with different names — property tax is `LOCRPROP` here and `T06` there.
+- FY2023 and FY2024 exist only as `.xlsx`; the `.xls` URLs time out rather than 404, which reads
+  as a network problem rather than a missing file.
+
+**And the published state per-pupil figures are not reconstructible from the unit rows.** Summing
+`TCURSPND` over `ENROLL` gives errors that scatter by state — Indiana +0.5%, Ohio −3.7%, Michigan
+−9.8% against the FY2024 published table — under every spending definition and unit filter tried.
+The revenue *shares* reproduce within a point. Use this file for mix, not for level. [open]
