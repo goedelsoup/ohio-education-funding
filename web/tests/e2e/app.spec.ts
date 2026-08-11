@@ -222,6 +222,35 @@ test.describe("with JavaScript disabled", () => {
     await expect(page.locator("#district-table tbody tr")).toHaveCount(609);
   });
 
+  test("the section menus still open, and their links still go somewhere", async ({ page }) => {
+    // The reason they are `<details>` rather than a scripted menu. Four of the ten sections are
+    // only reachable through one of these, so a menu that needs script to open would put a
+    // quarter of the site behind JavaScript on a site whose whole point is that nothing is.
+    await page.goto("/");
+    const places = page.locator("header.site nav details.menu").filter({ hasText: "Places" });
+    await expect(places.locator("a")).toHaveCount(5);
+    await expect(places.locator('a[href="/counties"]')).toBeHidden();
+
+    await places.locator("summary").click();
+    await expect(places.locator('a[href="/counties"]')).toBeVisible();
+    await places.locator('a[href="/counties"]').click();
+    await expect(page).toHaveURL(/\/counties$/);
+    await expect(page.locator("h1")).toBeVisible();
+  });
+
+  test("the group holding the current page is marked, and the page itself is marked inside it", async ({
+    page,
+  }) => {
+    // Two different claims: `page` on the link a reader is on, `true` on the group containing it.
+    // Marking the summary as the current *page* would tell a screen reader the reader is on a
+    // thing that is not a destination.
+    await page.goto("/history");
+    const findings = page.locator("header.site nav details.menu").filter({ hasText: "Findings" });
+    await expect(findings.locator("summary")).toHaveAttribute("aria-current", "true");
+    await findings.locator("summary").click();
+    await expect(findings.locator('a[href="/history"]')).toHaveAttribute("aria-current", "page");
+  });
+
   test("the constant-dollar switch still switches", async ({ page }) => {
     // Two radios and a sibling selector rather than a click handler, so the control is not a dead
     // button for a reader without script.
@@ -292,6 +321,54 @@ test.describe("routes", () => {
     expect(index.status()).toBe(200);
     const first = await request.get("/sitemap-0.xml");
     expect(await first.text()).toContain(`/district/${CLEVELAND}`);
+  });
+
+  test("every section in the navigation resolves to a page", async ({ page }) => {
+    // Grouping moved four entries behind a disclosure and admitted two pages that had never been
+    // in the bar at all. A menu item pointing at a route the build does not emit looks exactly
+    // like one that works, right up until someone opens it.
+    await page.goto("/");
+    const hrefs = await page
+      .locator("header.site nav a")
+      .evaluateAll((nodes) => nodes.map((n) => (n as HTMLAnchorElement).getAttribute("href")!));
+    // Two flat entries and ten inside the three groups. An exact count rather than a floor, so
+    // that dropping an entry fails here and adding one is an acknowledged change.
+    expect(hrefs).toHaveLength(12);
+    for (const href of hrefs) {
+      await page.goto(href);
+      await expect(page.locator("h1"), `${href} has no heading`).toBeVisible();
+    }
+  });
+});
+
+test.describe("the section menus", () => {
+  test("opening one closes the other, and Escape closes it", async ({ page }) => {
+    // Purely the enhancement half — the menus open without any of this, which the JavaScript
+    // disabled suite asserts. What is checked here is that the script does not make it worse.
+    await page.goto("/");
+    const places = page.locator("header.site nav details.menu").filter({ hasText: "Places" });
+    const reference = page.locator("header.site nav details.menu").filter({ hasText: "Reference" });
+
+    await places.locator("summary").click();
+    await expect(places).toHaveAttribute("open", "");
+
+    await reference.locator("summary").click();
+    await expect(reference).toHaveAttribute("open", "");
+    await expect(places).not.toHaveAttribute("open", "");
+
+    await page.keyboard.press("Escape");
+    await expect(reference).not.toHaveAttribute("open", "");
+    // Focus returns to the summary rather than to the top of the document.
+    await expect(reference.locator("summary")).toBeFocused();
+  });
+
+  test("a click outside closes an open menu", async ({ page }) => {
+    await page.goto("/");
+    const places = page.locator("header.site nav details.menu").filter({ hasText: "Places" });
+    await places.locator("summary").click();
+    await expect(places).toHaveAttribute("open", "");
+    await page.locator("h1").click();
+    await expect(places).not.toHaveAttribute("open", "");
   });
 });
 

@@ -2,8 +2,9 @@
  * The chrome, on every page.
  *
  * Deliberately small, and deliberately not load-bearing. Every figure is in the HTML before this
- * runs; what this adds is the hover layer and the theme switch. A reader with JavaScript off
- * loses two tooltips and keeps every number.
+ * runs; what this adds is the hover layer, the theme switch, and the closing half of the section
+ * menus. A reader with JavaScript off loses two tooltips, keeps every number, and keeps a
+ * navigation that opens.
  *
  * The nominal/constant-dollar toggle is *not* here. It is two radio inputs and a sibling
  * selector in `app.css`, so it works with nothing running — see `BasisToggle.astro`.
@@ -40,6 +41,53 @@ if (location.pathname === "/" && location.hash.length > 1) {
   // `/` is in the table so a `#statewide` link is recognised rather than falling through, but
   // redirecting the front page to itself would be a loop.
   if (target && target !== location.pathname) location.replace(target);
+}
+
+/**
+ * The section menus, which already work.
+ *
+ * They are `<details>` elements, so they open and close on their own with nothing running. What
+ * a browser will not do unaided is close one when another opens, when Escape is pressed, or when
+ * the reader clicks elsewhere — three behaviours a menu is expected to have and none of which it
+ * is broken without. A reader with this script off gets two menus open at once.
+ */
+const menus = [...document.querySelectorAll<HTMLDetailsElement>("header.site nav details.menu")];
+
+const closeMenus = (except?: HTMLDetailsElement) => {
+  for (const menu of menus) if (menu !== except) menu.open = false;
+};
+
+for (const menu of menus) {
+  // `toggle` rather than `click`: it fires for the keyboard and for a programmatic change too,
+  // and `click` on a summary fires before the element has actually opened.
+  menu.addEventListener("toggle", () => {
+    if (menu.open) closeMenus(menu);
+  });
+}
+
+if (menus.length > 0) {
+  document.addEventListener("keydown", (event) => {
+    if (event.key !== "Escape") return;
+    const open = menus.find((menu) => menu.open);
+    if (!open) return;
+    open.open = false;
+    // Focus goes back to the control that opened it, or the reader is left at the top of the
+    // document having done nothing but press a key.
+    open.querySelector("summary")?.focus();
+  });
+
+  document.addEventListener("click", (event) => {
+    const target = event.target;
+    if (target instanceof Node && menus.some((menu) => menu.contains(target))) return;
+    closeMenus();
+  });
+
+  // Tabbing out of a menu closes it, which is what a sighted keyboard reader expects to see.
+  document.addEventListener("focusin", (event) => {
+    const target = event.target;
+    if (target instanceof Node && menus.some((menu) => menu.contains(target))) return;
+    closeMenus();
+  });
 }
 
 /**

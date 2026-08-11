@@ -25,6 +25,15 @@ Every one of them is a real URL. `#district/043786` used to be the shareable for
 redirects, but the address is `/district/043786` now, and it is a document rather than an
 instruction to a router.
 
+The bar carries five entries rather than twelve: `Statewide` and `Scenario` flat, and **Places**,
+**Findings** and **Reference** as `<details>` disclosures. Native ones, because a third of the
+end-to-end suite runs with JavaScript disabled and ten of the twelve destinations are inside a
+group — a scripted menu would put most of the site behind a script on a site whose whole claim is
+that none of it is. `site.ts` adds the closing half: one menu closes another, Escape closes the
+open one, a click outside closes it. Without it a reader gets two menus open at once, which is
+untidy and never broken. Grouping also made room for `/compare` and `/data`, which were reachable
+only from the footer.
+
 ## Running it
 
 ```

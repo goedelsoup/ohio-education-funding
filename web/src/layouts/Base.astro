@@ -23,11 +23,13 @@ interface Props {
     | "counties"
     | "house"
     | "senate"
+    | "compare"
     | "outcomes"
     | "history"
     | "scenario"
     | "wiki"
-    | "method";
+    | "method"
+    | "data";
   /** Rendered above the page, before the slot. Used for the district sub-navigation. */
   wide?: boolean;
 }
@@ -35,17 +37,54 @@ interface Props {
 const { title, description, section, wide = false } = Astro.props;
 const { bundle, verification, forecastable } = loadFeed();
 
+/**
+ * The sections, two of them flat and three of them grouped.
+ *
+ * # Why anything is grouped
+ *
+ * Ten entries wrapped to a second row on a laptop and read as a list rather than as a structure.
+ * Grouping is not only decluttering, though: `/compare` and `/data` are real pages that were
+ * reachable from the footer or from nothing, because a flat bar had no room to admit them.
+ *
+ * # Why `<details>` and not a menu
+ *
+ * A third of the end-to-end suite runs with JavaScript disabled, and this repository has already
+ * decided once that a control which dies without script is worse than no control — see
+ * `BasisToggle.astro`. A native disclosure needs nothing running: it opens on click, on Enter and
+ * on Space, and screen readers announce its state without being told to.
+ *
+ * The cost is that two menus can sit open at once, because closing a sibling needs a script.
+ * `site.ts` closes them when one opens, and on Escape and on a click outside — and a reader
+ * without it gets two open menus rather than a menu that does not open.
+ */
 const NAV = [
   { key: "statewide", href: "/", label: "Statewide" },
-  { key: "districts", href: "/districts", label: "Districts" },
-  { key: "counties", href: "/counties", label: "Counties" },
-  { key: "house", href: "/house", label: "House" },
-  { key: "senate", href: "/senate", label: "Senate" },
-  { key: "outcomes", href: "/outcomes", label: "Outcomes" },
-  { key: "history", href: "/history", label: "History" },
+  {
+    label: "Places",
+    children: [
+      { key: "districts", href: "/districts", label: "All 609 districts" },
+      { key: "counties", href: "/counties", label: "Counties" },
+      { key: "house", href: "/house", label: "House" },
+      { key: "senate", href: "/senate", label: "Senate" },
+      { key: "compare", href: "/compare", label: "Compare two" },
+    ],
+  },
+  {
+    label: "Findings",
+    children: [
+      { key: "outcomes", href: "/outcomes", label: "Outcomes" },
+      { key: "history", href: "/history", label: "History" },
+    ],
+  },
   { key: "scenario", href: "/scenario", label: "Scenario" },
-  { key: "wiki", href: "/wiki", label: "Wiki" },
-  { key: "method", href: "/method", label: "Method" },
+  {
+    label: "Reference",
+    children: [
+      { key: "wiki", href: "/wiki", label: "Wiki" },
+      { key: "method", href: "/method", label: "Method" },
+      { key: "data", href: "/data", label: "Downloads" },
+    ],
+  },
 ] as const;
 
 const checkpoints = verification.comparisons.length;
@@ -67,11 +106,35 @@ const forecasts = verification.forecasts.length;
         <a class="brand" href="/">Ohio school funding</a>
         <nav aria-label="Sections">
           {
-            NAV.map((entry) => (
-              <a href={entry.href} aria-current={entry.key === section ? "page" : undefined}>
-                {entry.label}
-              </a>
-            ))
+            NAV.map((entry) =>
+              "children" in entry ? (
+                <details class="menu">
+                  {/* `true` rather than `page`: the group contains the current page, it is not
+                      the current page. The distinction is what a screen reader reads out. */}
+                  <summary
+                    aria-current={
+                      entry.children.some((child) => child.key === section) ? "true" : undefined
+                    }
+                  >
+                    {entry.label}
+                  </summary>
+                  <div class="menu-panel">
+                    {entry.children.map((child) => (
+                      <a
+                        href={child.href}
+                        aria-current={child.key === section ? "page" : undefined}
+                      >
+                        {child.label}
+                      </a>
+                    ))}
+                  </div>
+                </details>
+              ) : (
+                <a href={entry.href} aria-current={entry.key === section ? "page" : undefined}>
+                  {entry.label}
+                </a>
+              ),
+            )
           }
         </nav>
         <form class="site-search" action="/search" method="get" role="search">
