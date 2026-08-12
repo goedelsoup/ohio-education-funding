@@ -42,7 +42,22 @@ const SERIES: &str = include_str!("../fixtures/appropriation-lines.csv");
 /// and are carried in the State Revenue Distributions section rather than in the department's.
 /// They are excluded from every total here and available through [`reimbursements`] for anyone
 /// asking about them specifically, because they are a large and real flow to districts.
-pub const TAX_REIMBURSEMENT: [&str; 2] = ["200903", "200417"];
+///
+/// # Why there are six and not two
+///
+/// This list was first written from the FY2026-27 greenbook, where the class has exactly two
+/// members, and it was wrong for every year before FY2018. The same reimbursements ran under
+/// `200900`, `200901` and `200909` from FY2002 to FY2017, and `200901 Property Tax Allocation -
+/// Education` alone was $1.14 billion in FY2014 — so a department total that excluded the modern
+/// numbers and not the old ones was inflated by roughly $1.65 billion at the start of the window
+/// and not at the end.
+///
+/// The cost of that was a headline with the wrong sign: the department's appropriation appeared
+/// to fall in real terms across FY2014-FY2026 and does not. A rule derived from one end of a
+/// series and applied to the whole of it is the hazard here, and it is not the first time in this
+/// connector's work.
+pub const TAX_REIMBURSEMENT: [&str; 6] =
+    ["200417", "200900", "200901", "200902", "200903", "200909"];
 
 /// One appropriation line in one fiscal year.
 #[derive(Debug, Clone, PartialEq)]

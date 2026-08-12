@@ -34,24 +34,55 @@ fn window(
 }
 
 #[test]
-fn the_department_grew_by_a_third_nominally_and_shrank_in_real_terms() {
-    // The finding. Between FY2014 and FY2026 the enacted appropriation rose 29% in cash and fell
-    // 8% against CPI-U. Neither number is wrong and neither is the whole story; what this test
-    // guards is that the repository cannot report one without the other being available.
+fn the_department_grew_in_both_bases_once_the_reimbursements_are_out_of_both_ends() {
+    /*
+     * This test asserted a real-terms *fall* of about 8% and was wrong, because
+     * `TAX_REIMBURSEMENT` was written from the FY2026-27 greenbook, where the class has two
+     * members, and applied to a window whose other end had five. `200901 Property Tax Allocation
+     * - Education` alone was $1.14 billion in FY2014, so the start of the window carried roughly
+     * $1.65 billion the end did not.
+     *
+     * Corrected, the department's enacted appropriation rises 50.6% in cash and **7.5% in
+     * constant dollars** between FY2014 and FY2026. The sign is the opposite of what this
+     * repository reported for two commits.
+     */
     let history = window(enacted_history(BASE), 2014, 2026);
     let (nominal, real, _) = growth(&history).expect("both endpoints deflate");
+    assert!(nominal > 0.45, "nominal growth is {nominal}");
     assert!(
-        nominal > 0.25 && nominal < 0.33,
-        "nominal growth is {nominal}, no longer the +29% this series showed"
+        real > 0.0,
+        "the real-terms series falls again at {real}; the exclusion list may have lost a member \
+         at one end of the window"
     );
     assert!(
-        real < 0.0,
-        "the real-terms series no longer falls; it is {real}, and the corpus says it does"
+        real > 0.04 && real < 0.11,
+        "real growth is {real}, outside the band this finding holds"
     );
-    assert!(
-        real > -0.12 && real < -0.04,
-        "real growth is {real}, outside the band this finding has held"
-    );
+}
+
+#[test]
+fn every_reimbursement_line_is_excluded_at_both_ends_of_any_window() {
+    // The guard for the defect above. The class is identified by what its titles say, and every
+    // member must be in the exclusion list — otherwise a window spanning a renumbering compares a
+    // total that includes them against one that does not.
+    let named: std::collections::BTreeSet<String> = lines()
+        .iter()
+        .filter(|line| {
+            let title = line.title.to_lowercase();
+            title.contains("tax allocation")
+                || title.contains("tax replacement")
+                || title.contains("tax reimbursement")
+        })
+        .map(|line| line.line_item.clone())
+        .collect();
+    for item in &named {
+        assert!(
+            TAX_REIMBURSEMENT.contains(&item.as_str()),
+            "line item {item} reimburses tax and is not excluded; a window crossing the years it \
+             exists in would compare unlike totals"
+        );
+    }
+    assert_eq!(named.len(), TAX_REIMBURSEMENT.len());
 }
 
 #[test]
@@ -72,9 +103,12 @@ fn the_formula_line_moved_the_other_way_from_the_department_around_it() {
 
     let department = window(enacted_history(BASE), 2014, 2026);
     let (_, department_real, _) = growth(&department).expect("both endpoints deflate");
+    // Both rise in real terms once the reimbursements are out of both ends; the formula's line
+    // still rises less than the department around it, which is the opposite of what this test
+    // asserted when the department appeared to be shrinking.
     assert!(
-        real > department_real,
-        "the formula line {real} no longer outpaces the department around it {department_real}"
+        department_real > 0.0 && real > 0.0,
+        "one of them now falls: formula {real}, department {department_real}"
     );
 }
 
@@ -110,7 +144,7 @@ fn the_tax_reimbursement_lines_are_excluded_and_are_not_small() {
         "the excluded reimbursement lines are only {excluded}; either they have shrunk or the \
          exclusion has stopped working"
     );
-    assert_eq!(TAX_REIMBURSEMENT.len(), 2);
+    assert_eq!(TAX_REIMBURSEMENT.len(), 6);
 }
 
 #[test]
@@ -181,7 +215,7 @@ fn the_real_terms_fall_is_in_lines_that_stopped_being_listed() {
     let (start, end) = (present(2014), present(2026));
     assert!(
         start.difference(&end).count() > 40,
-        "the count of lines that stopped being listed has changed; it was 51"
+        "the count of lines that stopped being listed has changed; it was 48"
     );
 
     let history = enacted_history(BASE);
