@@ -70,17 +70,22 @@ and adjusted appropriations** beside the enacted amounts, in columns
 `Budget | Fund Group | Fund | ALI | ALI Name | FY ...`. [`spreadsheet`](../../spreadsheet/) reads
 that natively, so two thirds of the series needs no text extraction at all.
 
-The remaining five bienniums (124th-128th, FY2002-FY2011) are greenbook PDFs, and they are
-measured but unextracted. Column position rather than token order is necessary and not sufficient:
-positions must be taken per *page*, because `pdftotext -layout` lays each one out independently,
-and they cannot be taken from the table header, because the header labels are narrower than the
-columns of figures beneath them. Assigning each amount to its nearest header label leaves the
-125th and 128th clean and misdates rows in the 124th (6) and the 127th (16).
+The earlier bienniums are **greenbook PDFs and are extracted**, back to the 124th — FY1999
+through FY2011. Column position rather than token order was necessary and not sufficient:
+positions have to be taken per *page*, because `pdftotext -layout` lays each one out
+independently, and they cannot be taken from the table header, because the header labels sit
+narrower than the columns of figures beneath them. Nearest-label assignment misdates 6 rows in the
+124th and 16 in the 127th.
 
-The next attempt should calibrate the columns from the amounts themselves — they are right-aligned,
-so they cluster — and use the header only for which years those clusters are, refusing any page
-where the two counts disagree. The 126th has no line-item detail table at all and will need a
-different reader or will stay absent.
+What works is calibrating the columns from the figures — they are right-aligned, so their end
+positions cluster, and the cluster count is the column count — and using the header only for
+*which years* those columns are. Any page where the two counts disagree is refused. That places
+2,185 figures across four documents with no row ever claiming a column twice.
+
+**The 126th has no line-item detail table at all**, so FY2006-07 has no enacted figure. That
+matters beyond the gap: the formula's own appropriation line is `200501 Base Cost Funding` through
+FY2005 and `200550 Foundation Funding` from FY2008, and the renumbering happened inside the one
+biennium this series cannot see.
 
 ### What is still blocked
 

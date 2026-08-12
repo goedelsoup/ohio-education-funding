@@ -15,12 +15,30 @@ fn deflated(history: Vec<project::appropriations::Year>) -> Vec<project::appropr
     history.into_iter().filter(|y| y.real.is_some()).collect()
 }
 
+/// A named window of the series.
+///
+/// Every growth figure here states the years it is over, rather than taking the first and last of
+/// whatever the series happens to hold. That was how these tests were written when the series
+/// began at FY2014, and extending it back to FY2002 silently changed what they measured: the
+/// formula line grows 3.9% in real terms over FY2014-FY2026 and falls 3.8% over FY2008-FY2026,
+/// and both are true.
+fn window(
+    history: Vec<project::appropriations::Year>,
+    from: u16,
+    to: u16,
+) -> Vec<project::appropriations::Year> {
+    deflated(history)
+        .into_iter()
+        .filter(|y| y.fiscal_year >= from && y.fiscal_year <= to)
+        .collect()
+}
+
 #[test]
 fn the_department_grew_by_a_third_nominally_and_shrank_in_real_terms() {
     // The finding. Between FY2014 and FY2026 the enacted appropriation rose 29% in cash and fell
     // 8% against CPI-U. Neither number is wrong and neither is the whole story; what this test
     // guards is that the repository cannot report one without the other being available.
-    let history = deflated(enacted_history(BASE));
+    let history = window(enacted_history(BASE), 2014, 2026);
     let (nominal, real, _) = growth(&history).expect("both endpoints deflate");
     assert!(
         nominal > 0.25 && nominal < 0.33,
@@ -41,7 +59,7 @@ fn the_formula_line_moved_the_other_way_from_the_department_around_it() {
     // Foundation Funding is the formula itself, and it is the one large line that gained ground:
     // +3.9% real while the department it sits in lost 7.9%. Whatever else the Fair School Funding
     // Plan did, it did not come out of a growing budget — it came out of a shrinking one.
-    let foundation = deflated(line_history("200550", BASE));
+    let foundation = window(line_history("200550", BASE), 2014, 2026);
     let (nominal, real, _) = growth(&foundation).expect("both endpoints deflate");
     assert!(
         nominal > 0.40,
@@ -52,7 +70,7 @@ fn the_formula_line_moved_the_other_way_from_the_department_around_it() {
         "Foundation Funding no longer grows in real terms; it is {real}"
     );
 
-    let department = deflated(enacted_history(BASE));
+    let department = window(enacted_history(BASE), 2014, 2026);
     let (_, department_real, _) = growth(&department).expect("both endpoints deflate");
     assert!(
         real > department_real,
@@ -93,4 +111,28 @@ fn the_tax_reimbursement_lines_are_excluded_and_are_not_small() {
          exclusion has stopped working"
     );
     assert_eq!(TAX_REIMBURSEMENT.len(), 2);
+}
+
+#[test]
+fn the_long_view_says_something_different_from_the_short_one() {
+    // What the extension back to FY2002 bought, and the reason every figure here names its years.
+    // Over FY2014-FY2026 the formula's line gains 3.9% in real terms; over FY2008-FY2026 — the
+    // whole span the same line item exists for — it loses ground. The Fair School Funding Plan
+    // recovered something that had been given up earlier, which is a different claim from growth.
+    let short = window(line_history("200550", BASE), 2014, 2026);
+    let long = window(line_history("200550", BASE), 2008, 2026);
+    let (_, short_real, _) = growth(&short).expect("both endpoints deflate");
+    let (_, long_real, _) = growth(&long).expect("both endpoints deflate");
+    assert!(
+        short_real > 0.0,
+        "the short window no longer gains: {short_real}"
+    );
+    assert!(
+        long_real < 0.0,
+        "the long window no longer loses: {long_real}"
+    );
+    assert!(
+        long[0].fiscal_year == 2008,
+        "200550 now reaches before FY2008 and this window has changed meaning"
+    );
 }

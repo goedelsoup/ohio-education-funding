@@ -631,7 +631,43 @@ pub fn rebuild(root: &Path) -> Result<Vec<Rebuilt>, RebuildError> {
                     },
                 )
                 .collect();
-            match fixtures::build_appropriations(&views) {
+            // The greenbook PDFs of the 124th-128th, which reach back to FY1999 and have no
+            // later document to be checked against — the eras meet at FY2011 and do not overlap.
+            // Skipped rather than fatal when a PDF is uncached or `pdftotext` is absent, on the
+            // same footing as every other PDF here.
+            const GREENBOOKS: &[(&str, u16, u16)] = &[
+                ("hb94", 124, 2002),
+                ("hb95", 125, 2004),
+                ("hb119", 127, 2008),
+                ("hb1", 128, 2010),
+            ];
+            let texts: Vec<(u16, &str, String, u16, String)> = GREENBOOKS
+                .iter()
+                .filter_map(|(bill, ga, first_year)| {
+                    let key = format!("{bill}-greenbook");
+                    let src = source(&key)?.1;
+                    let text = cache::pdf_text(root, src).ok()?;
+                    Some((*ga, *bill, key, *first_year, text))
+                })
+                .collect();
+            let greenbooks: Vec<fixtures::Greenbook<'_>> = texts
+                .iter()
+                .map(|(ga, bill, key, first_year, text)| fixtures::Greenbook {
+                    general_assembly: *ga,
+                    bill,
+                    source: key,
+                    first_year: *first_year,
+                    text,
+                })
+                .collect();
+
+            let combined = fixtures::build_appropriations(&views).and_then(|mut rows| {
+                if !greenbooks.is_empty() {
+                    rows.extend(fixtures::build_greenbook_appropriations(&greenbooks)?);
+                }
+                fixtures::reconcile(rows)
+            });
+            match combined {
                 Ok(rows) => Rebuilt::Written {
                     path: fixtures::APPROPRIATION_FIXTURE.to_string(),
                     rows: fixtures::write_csv(
