@@ -19,6 +19,22 @@ description: |
   low local capacity receives a larger share of its cost from the state. [verified] This means
   that a uniform cut to foundation aid is not uniform in effect: it falls hardest on the
   districts for whom it is the largest revenue share. [inference]
+
+  **The appropriation behind it grew and the department around it did not.** Across FY2014 to
+  FY2026 the appropriation line that carries the formula — ALI 200550, Foundation Funding — rose
+  45.6% in cash and 3.9% against CPI-U, while the Department of Education's whole enacted
+  appropriation rose 29.1% in cash and **fell 7.9%** in constant dollars. [verified — the
+  appropriation series, `lsc-appropriation-spreadsheet`] So the Fair School Funding Plan was not
+  paid for out of a growing budget; it gained on everything else inside a shrinking one.
+
+  That is a statement about appropriations rather than payments, and the two are different
+  claims: an appropriation is a ceiling the General Assembly sets, and at least one line in this
+  chapter prorates because it is a residual claimant. What a district actually received is the
+  department's own report. [verified]
+
+  Whether the real-terms fall in the surrounding budget is concentrated anywhere in particular —
+  which categorical lines absorbed it, and whether any of them is one districts depend on — is
+  not established here and is answerable from the same series. [open]
 properties:
   name: State foundation aid
   level: state
@@ -39,7 +55,10 @@ properties:
     crates/project/fixtures/district-finances.csv for FY2020-FY2024 as districts reported
     receiving it. [verified] crates/dispersion/fixtures/f33-ohio-panel.csv carries the state
     column FY2012-FY2022 on federal definitions, which is the only decade-length view and is not
-    the department's own accounting.
+    the department's own accounting. crates/project/fixtures/appropriation-lines.csv carries
+    what the General Assembly appropriated rather than what was paid — every line item in the
+    chapter, enacted, actual and adjusted, FY2010-FY2027, from LSC's own workbooks.
+    [verified] `project::appropriations` restates it in constant dollars.
 links:
   - target: ../revenue-stream.ont.yml
     relationship: instance-of

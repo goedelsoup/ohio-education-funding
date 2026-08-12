@@ -24,6 +24,8 @@ description: |
   and not a narrative of the biennium. The appropriating act, the enacted changes and the
   per-district figures the department published are `lsc-budget` work, which now carries the appropriation series from FY2012 and is wired for one
   document. [open]
+  **The appropriating act set the department's own budget at $11.52 billion in FY2014 and $12.01 billion in FY2015.** That is what was appropriated to the Department of Education across every line in its chapter, less the property tax reimbursement items that are numbered as the department's and are carried in the State Revenue Distributions section instead. [verified — the appropriation series, `lsc-appropriation-spreadsheet`] It is a ceiling rather than a payment; what districts received is `dew-foundation`.
+
 properties:
   label: FY2014-2015
   kind: biennium
