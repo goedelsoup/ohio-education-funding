@@ -565,6 +565,32 @@ fn connector_registry(root: &Path) -> String {
 /// The four tags a corpus claim can carry.
 const TAGS: [&str; 4] = ["[verified]", "[inference]", "[open]", "[unentered]"];
 
+/// Count one tag in a body of text, in both the forms the corpus writes it.
+///
+/// # The 83 claims this used to miss
+///
+/// A tag may carry its reason — `[verified — the corpus holds this act]` — and 83 of them do.
+/// Matching the literal `[verified]` sees none of those, so the generated blocks reported 559
+/// verified claims against 642 actually written, understating what the corpus can support by 13%.
+///
+/// That is the third counter in this crate to count something other than what its name says: the
+/// connector table claimed nine connectors against thirteen, and the test counter counted its own
+/// description. The shape is always the same — a substring match standing in for a structure — and
+/// the fix is always to look at what follows.
+///
+/// A tag ends at `]` or continues into ` — reason`. Requiring one of those after the name is what
+/// keeps `[open]` from also matching a hypothetical `[opening]`.
+fn count_tag(text: &str, tag: &str) -> usize {
+    let name = tag.trim_start_matches('[').trim_end_matches(']');
+    let open = format!("[{name}");
+    text.match_indices(&open)
+        .filter(|(index, _)| {
+            let rest = &text[index + open.len()..];
+            rest.starts_with(']') || rest.starts_with(' ')
+        })
+        .count()
+}
+
 /// Every claim tag in the corpus, counted, with no attention to where each one sits.
 ///
 /// The one counter. [`claim_audit`] renders it with a field breakdown and [`claim_totals`]
@@ -574,7 +600,7 @@ fn claim_tag_totals(root: &Path) -> BTreeMap<&'static str, usize> {
     let mut totals: BTreeMap<&str, usize> = TAGS.iter().map(|tag| (*tag, 0)).collect();
     for (_, _, _, text) in corpus_nodes(root) {
         for tag in TAGS {
-            *totals.get_mut(tag).expect("tag is in the map") += text.matches(tag).count();
+            *totals.get_mut(tag).expect("tag is in the map") += count_tag(&text, tag);
         }
     }
     totals
@@ -603,7 +629,7 @@ fn claim_audit(root: &Path) -> String {
                 }
             }
             for tag in TAGS {
-                let hits = line.matches(tag).count();
+                let hits = count_tag(line, tag);
                 if hits == 0 || tag == "[verified]" || tag == "[inference]" {
                     continue;
                 }
@@ -913,16 +939,35 @@ mod tests {
         let root = repository_root();
         let audit = claim_audit(&root);
         let nodes = corpus_nodes(&root);
-        for tag in ["[verified]", "[inference]", "[open]", "[unentered]"] {
+        for tag in TAGS {
             let actual: usize = nodes
                 .iter()
-                .map(|(_, _, _, text)| text.matches(tag).count())
+                .map(|(_, _, _, text)| count_tag(text, tag))
                 .sum();
             assert!(
                 audit.contains(&format!("| `{tag}` | {actual} |")),
                 "{tag} is reported as something other than {actual}"
             );
         }
+    }
+
+    #[test]
+    fn a_tag_carrying_its_reason_is_still_counted() {
+        // The defect: 83 claims were written `[verified — because]` and the counter matched the
+        // literal `[verified]`, so none of them existed as far as the generated blocks were
+        // concerned. Both forms are one claim each.
+        assert_eq!(count_tag("a [verified] b", "[verified]"), 1);
+        assert_eq!(
+            count_tag("a [verified — the corpus holds it] b", "[verified]"),
+            1
+        );
+        assert_eq!(
+            count_tag("[open] and [open — pending a source]", "[open]"),
+            2
+        );
+        // And the check that the reason form does not swallow a longer word.
+        assert_eq!(count_tag("[opening remarks]", "[open]"), 0);
+        assert_eq!(count_tag("[verifiedish]", "[verified]"), 0);
     }
 
     #[test]
