@@ -33,20 +33,55 @@ same quantity and routinely disagree; the corpus keeps both and names which is w
 
 ## Status
 
-**Wired**, for **one document**: the final analysis of the current budget act, which is where
-every provision the Revised Code does not contain actually lives.
+**Wired**, for the **current biennium**: the H.B. 96 final analysis, which is where every
+provision the Revised Code does not contain actually lives, and the H.B. 96 redbook, which is the
+bill **as introduced**.
 
-The recorded blocker said these are PDFs. That is true, and was treated as the end of the matter;
-a PDF is a container, and `Format::Pdf` now has a reader.
+The recorded blocker said the rest are PDFs. That is true, and was treated as the end of the
+matter; a PDF is a container, and `Format::Pdf` now has a reader. It also said the redbooks were
+unretrieved while one sat in the registry, and that the pre-2000 record was out of reach. All
+three claims were replaced after somebody looked — see
+[`the-greenbook-series`](../../../.yidam/decisions/the-greenbook-series.yml).
 
-**What is still ahead is the reason this connector exists.** The redbooks, the Catalog of Budget
-Line Items and the per-district simulations remain unretrieved, so the continuous
-appropriation-line series is not built and the pre-2000 record is not here. That is recorded in
-the registry as `still_blocked` rather than left to this paragraph, so `edfund-connect list` does
-not read as though the appropriation series were served.
+### What is actually there
 
-The obstacles differ by document. Redbooks and the Catalog are PDFs, now tractable in principle.
-The per-district simulations are workbooks posted per bill with no index — the valuable part and
-the most tractable in format, since they are spreadsheets and
-[`spreadsheet`](../../spreadsheet/) already reads that format. What is missing there is a way to
-enumerate them. Much of the pre-2000 material is scanned PDF, which is a different problem again.
+LSC publishes an education budget analysis for **every main operating budget from the 124th
+General Assembly to the 136th** — thirteen consecutive bienniums, FY2002-03 through FY2026-27 —
+indexed at `/budget/{ga}/main-operating-budget`, with
+`/budget/appropriation-biennium-reference-list` mapping each General Assembly to its biennium.
+All thirteen retrieve on a plain request.
+
+They are **greenbooks**, published *as enrolled*. That is the distinction that matters: the
+redbook wired here is *as introduced*, so its amounts are the executive proposal, and every corpus
+claim resting on it says so. A greenbook for H.B. 96 sits at a sibling URL to the redbook already
+in the registry.
+
+**Two variants per biennium, and only one of them carries the enacted figure.** This was
+established by wiring all eight workbooks and reading the result: the
+`with-actual-expenditures-and-adjusted-appropriations` variant is revised after the biennium
+closes and *replaces* the enacted column with actuals, so the 132nd's workbook states the enacted
+FY2018-19 appropriation nowhere. Both variants are needed — sixteen workbooks, not eight — and a
+fiscal year does not identify a column: three of them carry more than one column naming the same
+year, and the extractor has to refuse on that rather than emit all of them.
+
+From the **129th onward the line-item detail is also a workbook** — `budget-in-detail` through the
+132nd, `appropriation-spreadsheet` from the 133rd — including a variant with **actual expenditures
+and adjusted appropriations** beside the enacted amounts, in columns
+`Budget | Fund Group | Fund | ALI | ALI Name | FY ...`. [`spreadsheet`](../../spreadsheet/) reads
+that natively, so two thirds of the series needs no text extraction at all.
+
+The remaining five bienniums (124th-128th, FY2002-FY2011) are greenbook PDFs. Every one parses —
+63 to 153 distinct appropriation line items each — **by column position, not by token order**.
+`pdftotext -layout` leaves an unfunded year as an empty column and prints `N/A` in `% Change`, so
+counting dollar tokens left to right silently shifts a row's fiscal years. A misdated appropriation
+is not a parse failure and nothing downstream would catch it.
+
+### What is still blocked
+
+Anything **before FY1999**. The greenbook series begins at the 124th and its earliest column is
+FY1999 actuals, so the Foundation Program era, *DeRolph I* and the equal yield formula still need
+the session laws.
+
+The **Catalog of Budget Line Items** and the **per-district simulations** each have an index page —
+`/budget/catalog-of-budget-line-items` and the per-bill document lists — and neither has been
+opened.

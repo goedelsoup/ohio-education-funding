@@ -565,6 +565,93 @@ pub fn rebuild(root: &Path) -> Result<Vec<Rebuilt>, RebuildError> {
         },
     });
 
+    // The appropriation-line series: eight bienniums, two documents each.
+    //
+    // Both variants, because neither carries both claims. The `as enacted` workbook states what
+    // the General Assembly passed and is never revised; the `with actual expenditures` one is
+    // revised after the biennium closes and replaces the enacted column with what was spent. A
+    // single-variant attempt produced zero appropriations for the 132nd and did not fail.
+    //
+    // All sixteen or none, as with the DeRolph opinions: a series that reads as continuous and
+    // quietly omits the biennium whose workbook did not download is worse than no series, because
+    // a gap in the record and a gap in the cache look identical from the fixture.
+    const BIENNIA: &[(&str, u16, u16)] = &[
+        ("hb153", 129, 2012),
+        ("hb59", 130, 2014),
+        ("hb64", 131, 2016),
+        ("hb49", 132, 2018),
+        ("hb166", 133, 2020),
+        ("hb110", 134, 2022),
+        ("hb33", 135, 2024),
+        ("hb96", 136, 2026),
+    ];
+    type Book = (
+        u16,
+        &'static str,
+        String,
+        &'static str,
+        u16,
+        Vec<Vec<String>>,
+    );
+    let books: Result<Vec<Book>, RebuildError> = BIENNIA
+        .iter()
+        .flat_map(|(bill, ga, first_year)| {
+            ["enacted", "actuals"]
+                .into_iter()
+                .map(move |variant| (bill, ga, first_year, variant))
+        })
+        .map(|(bill, ga, first_year, variant)| {
+            let key = format!("{bill}-{variant}");
+            let src = source(&key)
+                .ok_or_else(|| RebuildError::Layout(format!("{key} is not registered")))?
+                .1;
+            let book = open_workbook(root, src)?;
+            // The first sheet: the name differs in every one of the sixteen — `HB96`,
+            // `FY21Update`, `August 2014 Update` — and the detail is always on the first.
+            let sheet = book
+                .sheet_names()
+                .first()
+                .ok_or_else(|| RebuildError::Layout(format!("{key}: workbook has no sheets")))?
+                .to_string();
+            Ok((*ga, *bill, key, variant, *first_year, book.rows(&sheet)?))
+        })
+        .collect();
+    out.push(match books {
+        Ok(books) => {
+            let views: Vec<fixtures::AppropriationBook<'_>> = books
+                .iter()
+                .map(
+                    |(ga, bill, key, variant, first_year, rows)| fixtures::AppropriationBook {
+                        general_assembly: *ga,
+                        bill,
+                        source: key,
+                        variant,
+                        first_year: *first_year,
+                        rows,
+                    },
+                )
+                .collect();
+            match fixtures::build_appropriations(&views) {
+                Ok(rows) => Rebuilt::Written {
+                    path: fixtures::APPROPRIATION_FIXTURE.to_string(),
+                    rows: fixtures::write_csv(
+                        &root.join(fixtures::APPROPRIATION_FIXTURE),
+                        fixtures::APPROPRIATION_HEADER,
+                        &rows,
+                    )?,
+                },
+                Err(cause) => Rebuilt::Skipped {
+                    path: fixtures::APPROPRIATION_FIXTURE.to_string(),
+                    reason: cause,
+                },
+            }
+        }
+        Err(cause) => Rebuilt::Skipped {
+            path: fixtures::APPROPRIATION_FIXTURE.to_string(),
+            reason: cause.to_string(),
+        },
+    });
+
     // Census F-33. Skipped rather than fatal when the workbook is not cached: it is the one
     // source in the registry that nothing else depends on, so an absent copy should cost the
     // interstate comparison and nothing else.

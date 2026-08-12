@@ -21,7 +21,7 @@ description: |
 
   **This node is thin on purpose.** It carries what the panel measures and the regime in force,
   and not a narrative of the biennium. The appropriating act, the enacted changes and the
-  per-district figures the department published are `lsc-budget` work, which is wired for one
+  per-district figures the department published are `lsc-budget` work, which now carries the appropriation series from FY2012 and is wired for one
   document. [open]
 properties:
   label: FY2012-2013

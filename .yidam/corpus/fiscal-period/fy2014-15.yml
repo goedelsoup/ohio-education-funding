@@ -22,14 +22,16 @@ description: |
 
   **This node is thin on purpose.** It carries what the panel measures and the regime in force,
   and not a narrative of the biennium. The appropriating act, the enacted changes and the
-  per-district figures the department published are `lsc-budget` work, which is wired for one
+  per-district figures the department published are `lsc-budget` work, which now carries the appropriation series from FY2012 and is wired for one
   document. [open]
+  **The appropriating act set the department's own budget at $11.52 billion in FY2014 and $12.01 billion in FY2015.** That is what was appropriated to the Department of Education across every line in its chapter, less the property tax reimbursement items that are numbered as the department's and are carried in the State Revenue Distributions section instead. [verified — the appropriation series, `lsc-appropriation-spreadsheet`] It is a ceiling rather than a payment; what districts received is `dew-foundation`.
+
 properties:
   label: FY2014-2015
   kind: biennium
   start: 2013-07-01
   end: 2015-06-30
-  appropriating_bill: Not established. [unentered] The appropriating act for this biennium is not held; identifying it needs `lsc-budget`, which retrieves one document.
+  appropriating_bill: Am. Sub. H.B. 59 (130th General Assembly). [verified — LSC publishes the biennium's appropriation detail under this bill; see the catalog record `lsc-appropriation-spreadsheet`. The `Am. Sub.` designation is the greenbook's, which is not held here.]
   context: |
     Bridge formula era. Revenue shares and the quartile equalization measure above are from the
     Census F-33 as NCES publishes it, comparable districts only. [verified]

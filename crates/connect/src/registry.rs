@@ -735,14 +735,19 @@ pub const CONNECTORS: &[Connector] = &[
         feeds: &["legislation", "fiscal-period", "program", "parameter"],
         status: Status::Wired {
             still_blocked: Some(
-                "wired for one document, the final analysis of the current budget act; the \
-                 redbooks, the Catalog of Budget Line Items and the per-district simulations are \
-                 unretrieved, so the continuous appropriation-line series and the pre-2000 record \
-                 are not built",
+                "wired for the appropriation-line series from the 129th General Assembly \
+                 onward — FY2012 through FY2027, both variants of each biennium's workbook. The \
+                 five bienniums before that, back to the 124th, exist only as greenbook PDFs \
+                 whose tables must be read by column position rather than token order, and are \
+                 unextracted. FY2012-13 has no enacted figure at all: LSC serves that biennium's \
+                 two variants as the same file. Before FY1999 there is nothing — the Foundation \
+                 Program era still needs the session laws. The Catalog of Budget Line Items and \
+                 the per-district simulations have an index page each and have not been opened",
             ),
         },
         note: "The only continuous appropriation-line series across the whole period, and the \
-               primary source for the pre-2000 record.",
+               primary source for the pre-2000 record. What is wired is the current biennium; \
+               see the decision record `the-greenbook-series` for what the rest of it costs.",
         sources: &[
         Source {
             key: "hb96-edu-redbook",
@@ -774,6 +779,182 @@ pub const CONNECTORS: &[Connector] = &[
                    $30 and the enrolment growth supplement as a tiered schedule — neither of which \
                    became law. Reading the convenient version would have contradicted the \
                    department's own payments and looked like a finding.",
+        },
+        Source {
+            key: "hb153-enacted",
+            title: None,
+            url: "https://www.lsc.ohio.gov/assets/legislation/129/hb153/en/files/\
+                  hb153-budget-in-detail-as-enrolled-129th-general-assembly-10075143.xlsx",
+            filename: "hb153-enacted.xls",
+            format: Format::LegacyXls,
+            catalog: Some("lsc-appropriation-spreadsheet"),
+            fixtures: &[crate::fixtures::APPROPRIATION_FIXTURE],
+            note: "FY2012-FY2013. The bill's whole path — introduced, each chamber's substitute, conference, and as enacted. Only the enacted columns are extracted; the rest are the legislative history and are left in the source.",
+        },
+        Source {
+            key: "hb59-enacted",
+            title: None,
+            url: "https://www.lsc.ohio.gov/assets/legislation/130/hb59/en/files/\
+                  hb59-budget-in-detail-as-enrolled-130th-general-assembly-10075125.xlsx",
+            filename: "hb59-enacted.xlsx",
+            format: Format::Xlsx,
+            catalog: Some("lsc-appropriation-spreadsheet"),
+            fixtures: &[crate::fixtures::APPROPRIATION_FIXTURE],
+            note: "FY2014-FY2015. The bill's whole path — introduced, each chamber's substitute, conference, and as enacted. Only the enacted columns are extracted; the rest are the legislative history and are left in the source.",
+        },
+        Source {
+            key: "hb64-enacted",
+            title: None,
+            url: "https://www.lsc.ohio.gov/assets/legislation/131/hb64/en/files/\
+                  hb64-budget-in-detail-as-enrolled-131st-general-assembly-10075109.xlsx",
+            filename: "hb64-enacted.xlsx",
+            format: Format::Xlsx,
+            catalog: Some("lsc-appropriation-spreadsheet"),
+            fixtures: &[crate::fixtures::APPROPRIATION_FIXTURE],
+            note: "FY2016-FY2017. The bill's whole path — introduced, each chamber's substitute, conference, and as enacted. Only the enacted columns are extracted; the rest are the legislative history and are left in the source.",
+        },
+        Source {
+            key: "hb49-enacted",
+            title: None,
+            url: "https://www.lsc.ohio.gov/assets/legislation/132/hb49/en/files/\
+                  hb49-budget-in-detail-as-enrolled-132nd-general-assembly-10075086.xlsx",
+            filename: "hb49-enacted.xlsx",
+            format: Format::Xlsx,
+            catalog: Some("lsc-appropriation-spreadsheet"),
+            fixtures: &[crate::fixtures::APPROPRIATION_FIXTURE],
+            note: "FY2018-FY2019. The bill's whole path — introduced, each chamber's substitute, conference, and as enacted. Only the enacted columns are extracted; the rest are the legislative history and are left in the source.",
+        },
+        Source {
+            key: "hb166-enacted",
+            title: None,
+            url: "https://www.lsc.ohio.gov/assets/legislation/133/hb166/en/files/\
+                  hb166-appropriation-spreadsheet-as-enrolled-133rd-general-assembly-10067299.xlsx",
+            filename: "hb166-enacted.xlsx",
+            format: Format::Xlsx,
+            catalog: Some("lsc-appropriation-spreadsheet"),
+            fixtures: &[crate::fixtures::APPROPRIATION_FIXTURE],
+            note: "FY2020-FY2021. The bill's whole path — introduced, each chamber's substitute, conference, and as enacted. Only the enacted columns are extracted; the rest are the legislative history and are left in the source.",
+        },
+        Source {
+            key: "hb110-enacted",
+            title: None,
+            url: "https://www.lsc.ohio.gov/assets/legislation/134/hb110/en/files/\
+                  hb110-appropriation-spreadsheet-as-enrolled-134th-general-assembly-10067504.xlsx",
+            filename: "hb110-enacted.xlsx",
+            format: Format::Xlsx,
+            catalog: Some("lsc-appropriation-spreadsheet"),
+            fixtures: &[crate::fixtures::APPROPRIATION_FIXTURE],
+            note: "FY2022-FY2023. The bill's whole path — introduced, each chamber's substitute, conference, and as enacted. Only the enacted columns are extracted; the rest are the legislative history and are left in the source.",
+        },
+        Source {
+            key: "hb33-enacted",
+            title: None,
+            url: "https://www.lsc.ohio.gov/assets/legislation/135/hb33/en0/files/\
+                  hb33-appropriation-spreadsheet-as-enacted-135th-general-assembly-10077370.xlsx",
+            filename: "hb33-enacted.xlsx",
+            format: Format::Xlsx,
+            catalog: Some("lsc-appropriation-spreadsheet"),
+            fixtures: &[crate::fixtures::APPROPRIATION_FIXTURE],
+            note: "FY2024-FY2025. The bill's whole path — introduced, each chamber's substitute, conference, and as enacted. Only the enacted columns are extracted; the rest are the legislative history and are left in the source.",
+        },
+        Source {
+            key: "hb96-enacted",
+            title: None,
+            url: "https://www.lsc.ohio.gov/assets/legislation/136/hb96/en0/files/\
+                  hb96-appropriation-spreadsheet-as-enacted-136th-general-assembly-10080152.xlsx",
+            filename: "hb96-enacted.xlsx",
+            format: Format::Xlsx,
+            catalog: Some("lsc-appropriation-spreadsheet"),
+            fixtures: &[crate::fixtures::APPROPRIATION_FIXTURE],
+            note: "FY2026-FY2027. The bill's whole path — introduced, each chamber's substitute, conference, and as enacted. Only the enacted columns are extracted; the rest are the legislative history and are left in the source.",
+        },
+        Source {
+            key: "hb153-actuals",
+            title: None,
+            url: "https://www.lsc.ohio.gov/assets/legislation/129/hb153/en/files/\
+                  hb153-budget-in-detail-with-actual-expenditures-and-adjusted-appropriations-as-enrolled-129th-general-assembly-10075145.xlsx",
+            filename: "hb153-actuals.xls",
+            format: Format::LegacyXls,
+            catalog: Some("lsc-appropriation-spreadsheet"),
+            fixtures: &[crate::fixtures::APPROPRIATION_FIXTURE],
+            note: "FY2012-FY2013. Revised after the biennium closed, so it carries actual expenditures and adjusted appropriations and no longer states what was enacted. That is why both variants are held.",
+        },
+        Source {
+            key: "hb59-actuals",
+            title: None,
+            url: "https://www.lsc.ohio.gov/assets/legislation/130/hb59/en/files/\
+                  hb59-budget-in-detail-with-actual-expenditures-and-adjusted-appropriations-as-enrolled-130th-general-assembly-10075127.xlsx",
+            filename: "hb59-actuals.xlsx",
+            format: Format::Xlsx,
+            catalog: Some("lsc-appropriation-spreadsheet"),
+            fixtures: &[crate::fixtures::APPROPRIATION_FIXTURE],
+            note: "FY2014-FY2015. Revised after the biennium closed, so it carries actual expenditures and adjusted appropriations and no longer states what was enacted. That is why both variants are held.",
+        },
+        Source {
+            key: "hb64-actuals",
+            title: None,
+            url: "https://www.lsc.ohio.gov/assets/legislation/131/hb64/en/files/\
+                  hb64-budget-in-detail-with-actual-expenditures-and-adjusted-appropriations-as-enrolled-131st-general-assembly-10075111.xlsx",
+            filename: "hb64-actuals.xlsx",
+            format: Format::Xlsx,
+            catalog: Some("lsc-appropriation-spreadsheet"),
+            fixtures: &[crate::fixtures::APPROPRIATION_FIXTURE],
+            note: "FY2016-FY2017. Revised after the biennium closed, so it carries actual expenditures and adjusted appropriations and no longer states what was enacted. That is why both variants are held.",
+        },
+        Source {
+            key: "hb49-actuals",
+            title: None,
+            url: "https://www.lsc.ohio.gov/assets/legislation/132/hb49/en/files/\
+                  hb49-budget-in-detail-with-actual-expenditures-and-adjusted-appropriations-as-enrolled-132nd-general-assembly-10075088.xlsx",
+            filename: "hb49-actuals.xlsx",
+            format: Format::Xlsx,
+            catalog: Some("lsc-appropriation-spreadsheet"),
+            fixtures: &[crate::fixtures::APPROPRIATION_FIXTURE],
+            note: "FY2018-FY2019. Revised after the biennium closed, so it carries actual expenditures and adjusted appropriations and no longer states what was enacted. That is why both variants are held.",
+        },
+        Source {
+            key: "hb166-actuals",
+            title: None,
+            url: "https://www.lsc.ohio.gov/assets/legislation/133/hb166/en/files/\
+                  hb166-appropriation-spreadsheet-with-actual-expenditures-and-adjusted-appropriations-as-enrolled-133rd-general-assembly-10067303.xlsx",
+            filename: "hb166-actuals.xlsx",
+            format: Format::Xlsx,
+            catalog: Some("lsc-appropriation-spreadsheet"),
+            fixtures: &[crate::fixtures::APPROPRIATION_FIXTURE],
+            note: "FY2020-FY2021. Revised after the biennium closed, so it carries actual expenditures and adjusted appropriations and no longer states what was enacted. That is why both variants are held.",
+        },
+        Source {
+            key: "hb110-actuals",
+            title: None,
+            url: "https://www.lsc.ohio.gov/assets/legislation/134/hb110/en/files/\
+                  hb110-appropriation-spreadsheet-with-actual-expenditures-and-adjusted-appropriations-as-enrolled-134th-general-assembly-10067509.xlsx",
+            filename: "hb110-actuals.xlsx",
+            format: Format::Xlsx,
+            catalog: Some("lsc-appropriation-spreadsheet"),
+            fixtures: &[crate::fixtures::APPROPRIATION_FIXTURE],
+            note: "FY2022-FY2023. Revised after the biennium closed, so it carries actual expenditures and adjusted appropriations and no longer states what was enacted. That is why both variants are held.",
+        },
+        Source {
+            key: "hb33-actuals",
+            title: None,
+            url: "https://www.lsc.ohio.gov/assets/legislation/135/hb33/en0/files/\
+                  hb33-appropriation-spreadsheet-with-actual-expenditures-and-adjusted-appropriations-as-enacted-135th-general-assembly-10077872.xlsx",
+            filename: "hb33-actuals.xlsx",
+            format: Format::Xlsx,
+            catalog: Some("lsc-appropriation-spreadsheet"),
+            fixtures: &[crate::fixtures::APPROPRIATION_FIXTURE],
+            note: "FY2024-FY2025. Revised after the biennium closed, so it carries actual expenditures and adjusted appropriations and no longer states what was enacted. That is why both variants are held.",
+        },
+        Source {
+            key: "hb96-actuals",
+            title: None,
+            url: "https://www.lsc.ohio.gov/assets/legislation/136/hb96/en0/files/\
+                  hb96-appropriation-spreadsheet-with-actual-expenditures-as-enacted-136th-general-assembly-10080216.xlsx",
+            filename: "hb96-actuals.xlsx",
+            format: Format::Xlsx,
+            catalog: Some("lsc-appropriation-spreadsheet"),
+            fixtures: &[crate::fixtures::APPROPRIATION_FIXTURE],
+            note: "FY2026-FY2027. Revised after the biennium closed, so it carries actual expenditures and adjusted appropriations and no longer states what was enacted. That is why both variants are held.",
         },
         ],
     },

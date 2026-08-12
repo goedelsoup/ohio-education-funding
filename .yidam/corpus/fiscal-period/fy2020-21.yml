@@ -21,14 +21,16 @@ description: |
 
   **This node is thin on purpose.** It carries what the panel measures and the regime in force,
   and not a narrative of the biennium. The appropriating act, the enacted changes and the
-  per-district figures the department published are `lsc-budget` work, which is wired for one
+  per-district figures the department published are `lsc-budget` work, which now carries the appropriation series from FY2012 and is wired for one
   document. [open]
+  **The appropriating act set the department's own budget at $11.88 billion in FY2020 and $12.10 billion in FY2021.** That is what was appropriated to the Department of Education across every line in its chapter, less the property tax reimbursement items that are numbered as the department's and are carried in the State Revenue Distributions section instead. [verified — the appropriation series, `lsc-appropriation-spreadsheet`] It is a ceiling rather than a payment; what districts received is `dew-foundation`.
+
 properties:
   label: FY2020-2021
   kind: biennium
   start: 2019-07-01
   end: 2021-06-30
-  appropriating_bill: Not established. [unentered] Needs `lsc-budget`. The funding levels for both years were frozen rather than recomputed. [verified — see the Bridge formula node]
+  appropriating_bill: H.B. 166 (133rd General Assembly). [verified — LSC publishes the biennium's appropriation detail under this bill; see the catalog record `lsc-appropriation-spreadsheet`.] The funding levels for both years were frozen rather than recomputed. [verified — see the Bridge formula node]
   context: |
     Bridge formula era. Revenue shares and the quartile equalization measure above are from the
     Census F-33 as NCES publishes it, comparable districts only. [verified]
