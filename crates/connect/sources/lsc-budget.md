@@ -70,11 +70,17 @@ and adjusted appropriations** beside the enacted amounts, in columns
 `Budget | Fund Group | Fund | ALI | ALI Name | FY ...`. [`spreadsheet`](../../spreadsheet/) reads
 that natively, so two thirds of the series needs no text extraction at all.
 
-The remaining five bienniums (124th-128th, FY2002-FY2011) are greenbook PDFs. Every one parses —
-63 to 153 distinct appropriation line items each — **by column position, not by token order**.
-`pdftotext -layout` leaves an unfunded year as an empty column and prints `N/A` in `% Change`, so
-counting dollar tokens left to right silently shifts a row's fiscal years. A misdated appropriation
-is not a parse failure and nothing downstream would catch it.
+The remaining five bienniums (124th-128th, FY2002-FY2011) are greenbook PDFs, and they are
+measured but unextracted. Column position rather than token order is necessary and not sufficient:
+positions must be taken per *page*, because `pdftotext -layout` lays each one out independently,
+and they cannot be taken from the table header, because the header labels are narrower than the
+columns of figures beneath them. Assigning each amount to its nearest header label leaves the
+125th and 128th clean and misdates rows in the 124th (6) and the 127th (16).
+
+The next attempt should calibrate the columns from the amounts themselves — they are right-aligned,
+so they cluster — and use the header only for which years those clusters are, refusing any page
+where the two counts disagree. The 126th has no line-item detail table at all and will need a
+different reader or will stay absent.
 
 ### What is still blocked
 
