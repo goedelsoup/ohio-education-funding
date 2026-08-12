@@ -136,3 +136,66 @@ fn the_long_view_says_something_different_from_the_short_one() {
         "200550 now reaches before FY2008 and this window has changed meaning"
     );
 }
+
+#[test]
+fn the_real_terms_fall_is_in_lines_that_stopped_being_listed() {
+    /*
+     * The question `state-foundation-aid` carried open: which categorical lines absorbed the
+     * department's 7.9% real-terms fall between FY2014 and FY2026.
+     *
+     * **None of them did.** Of the 61 lines appropriated in both years, the gains outweigh the
+     * losses — roughly $1.08 billion gained against $0.55 billion lost, in FY2026 dollars. The
+     * fall is not in surviving lines shrinking. It is in the department going from **112 lines to
+     * 80**: 51 that existed in FY2014 do not exist in FY2026, and only 19 new ones appeared.
+     *
+     * **And this series cannot say whether that is a cut or a consolidation.** A line ceasing to
+     * be listed may have been abolished or folded into another, and the two largest gains here —
+     * `200550` and `200612`, both Foundation Funding - All Students, up about $320 million and
+     * $350 million real — are exactly what a consolidation into the formula would look like.
+     * Distinguishing them needs the acts' own language, which is the analysis half of
+     * `lsc-budget` and is not held.
+     */
+    use project::appropriations::{changes, enacted_history, lines, TAX_REIMBURSEMENT};
+    use std::collections::BTreeSet;
+
+    let moved = changes(BASE, 2014, 2026);
+    let lost: f64 = moved.iter().map(|c| c.shift()).filter(|s| *s < 0.0).sum();
+    let gained: f64 = moved.iter().map(|c| c.shift()).filter(|s| *s > 0.0).sum();
+    assert!(
+        gained > lost.abs(),
+        "surviving lines now lose more than they gain ({gained} against {lost}); the fall has \
+         moved into them and the finding beside this test is stale"
+    );
+
+    let present = |year: u16| -> BTreeSet<String> {
+        lines()
+            .iter()
+            .filter(|l| {
+                l.kind == "enacted"
+                    && l.fiscal_year == year
+                    && !TAX_REIMBURSEMENT.contains(&l.line_item.as_str())
+            })
+            .map(|l| l.line_item.clone())
+            .collect()
+    };
+    let (start, end) = (present(2014), present(2026));
+    assert!(
+        start.difference(&end).count() > 40,
+        "the count of lines that stopped being listed has changed; it was 51"
+    );
+
+    let history = enacted_history(BASE);
+    let count = |year: u16| {
+        history
+            .iter()
+            .find(|y| y.fiscal_year == year)
+            .expect("year")
+            .items
+    };
+    assert!(
+        count(2014) > count(2026) + 25,
+        "the department no longer has far fewer appropriation lines than it did: {} against {}",
+        count(2026),
+        count(2014)
+    );
+}

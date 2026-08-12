@@ -32,9 +32,29 @@ description: |
   chapter prorates because it is a residual claimant. What a district actually received is the
   department's own report. [verified]
 
-  Whether the real-terms fall in the surrounding budget is concentrated anywhere in particular —
-  which categorical lines absorbed it, and whether any of them is one districts depend on — is
-  not established here and is answerable from the same series. [open]
+  **No categorical line absorbed it.** Of the 61 lines appropriated in both FY2014 and FY2026,
+  the gains outweigh the losses — roughly $1.08 billion against $0.55 billion in FY2026 dollars.
+  The department's real-terms fall is not surviving lines shrinking; it is the department going
+  from **112 appropriation lines to 80**. 51 that existed in FY2014 do not exist in FY2026, and
+  19 new ones appeared. [verified — the appropriation series]
+
+  Whether that is abolition or consolidation this series cannot say, and the distinction is the
+  whole meaning of it. A line ceasing to be listed may have been folded into another, and the two
+  largest real gains in the window are the two Foundation Funding lines — which is exactly what
+  consolidation into the formula would look like. Settling it needs the acts' own language rather
+  than their appropriation tables. [open]
+
+  One thing the composition does say plainly: the largest real-terms falls among surviving lines
+  are federal pass-throughs — Title I, IDEA, Improving Teacher Quality, the child nutrition
+  programmes. That is a federal story arriving in a state budget document, not a decision of the
+  General Assembly's. [verified — the appropriation series]
+
+  **The formula's line changed its number.** It is `200501 Base Cost Funding` through FY2005 and
+  `200550 Foundation Funding` from FY2008, retitled `Foundation Funding - All Students` at FY2022.
+  The renumbering happened inside FY2006-07 — the one biennium whose greenbook has no line-item
+  table — so the series can say the number changed and not in which act. [verified — the
+  appropriation series] Anything tracing `200550` backwards stops at FY2008 and should not
+  conclude the formula did.
 properties:
   name: State foundation aid
   level: state
@@ -57,8 +77,10 @@ properties:
     column FY2012-FY2022 on federal definitions, which is the only decade-length view and is not
     the department's own accounting. crates/project/fixtures/appropriation-lines.csv carries
     what the General Assembly appropriated rather than what was paid — every line item in the
-    chapter, enacted, actual and adjusted, FY2010-FY2027, from LSC's own workbooks.
-    [verified] `project::appropriations` restates it in constant dollars.
+    chapter, enacted, actual and adjusted, **FY1999 through FY2027**, from LSC's greenbooks for
+    the earlier bienniums and its workbooks for the later ones. [verified] FY2006-07 and FY2012-13
+    carry no enacted figure, each for a reason of the publisher's. [verified]
+    `project::appropriations` restates it in constant dollars.
 links:
   - target: ../revenue-stream.ont.yml
     relationship: instance-of
