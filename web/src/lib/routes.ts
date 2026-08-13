@@ -37,6 +37,56 @@ export const senateDistrict = (number: string): string => `/senate/${number}`;
 /** Either chamber's index. */
 export const chamberIndex = (chamber: "house" | "senate"): string => `/${chamber}`;
 
+/**
+ * The path a built page is *served* at, from the path it was written to.
+ *
+ * `build.format` is `"file"`, so Astro writes `/district/043786` to `district/043786.html` — and
+ * during the build `Astro.url.pathname` reports the second of those, because that is the file being
+ * produced. Anything a page says about its own address therefore has to be put back: the canonical
+ * link and `og:url` both name a URL a reader can visit, and `…/043786.html` is not one.
+ *
+ * This is not hypothetical tidying. The canonical link shipped as `…/district/043786.html` while
+ * `sitemap-0.xml` listed `…/district/043786`, which is one page telling a crawler two different
+ * things about which of its two addresses is the real one.
+ */
+export function canonicalPath(pathname: string): string {
+  // `/index.html` is the site root, not a page called "index" — and it is the only page whose
+  // served path is shorter than its name rather than the same minus an extension.
+  if (pathname === "/index.html" || pathname === "/index") return "/";
+  const stripped = pathname.endsWith(".html") ? pathname.slice(0, -".html".length) : pathname;
+  // A trailing slash 404s on the static host, so it is never correct to leave one on.
+  return stripped.length > 1 && stripped.endsWith("/") ? stripped.slice(0, -1) : stripped;
+}
+
+/**
+ * The preview cards, which are routes like any other.
+ *
+ * Under `/og/` and mirroring the page routes below them, so the card for `/county/allen` is at
+ * `/og/county/allen.png` and neither can be renamed without the other being obviously wrong.
+ *
+ * A district has five pages and one card. `/district/X/finances` and `/district/X/taxes` are the
+ * same district and the preview says so; what distinguishes them in a feed is `og:title`, which
+ * carries the page's own title. Rendering five near-identical images per district would be 3,045
+ * of them rather than 609, for a difference no reader would see.
+ */
+export const og = {
+  /** Any page that has not been given a card of its own. */
+  default: (): string => "/og/default.png",
+  district: (irn: string): string => `/og/district/${irn}.png`,
+  county: (slug: string): string => `/og/county/${slug}.png`,
+  chamberDistrict: (chamber: "house" | "senate", number: string): string =>
+    `/og/${chamber}/${number}.png`,
+  wikiClass: (className: string): string => `/og/wiki/${className}.png`,
+  /**
+   * A node's card — and a source's, since `source` is the fourteenth pseudo-class here exactly as
+   * it is in the page routes above.
+   */
+  wikiNode: (className: string, node: string): string => `/og/wiki/${className}/${node}.png`,
+  wikiSource: (slug: string): string => `/og/wiki/source/${slug}.png`,
+  /** A top-level page — `/`, `/method`, `/data` — keyed by the slug in `src/lib/og/pages.ts`. */
+  page: (slug: string): string => `/og/page/${slug}.png`,
+} as const;
+
 /** A corpus node, by its class and file stem. */
 export const wikiNode = (className: string, node: string): string =>
   `/wiki/${className}/${node}`;

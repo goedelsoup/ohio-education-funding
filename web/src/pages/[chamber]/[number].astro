@@ -37,6 +37,8 @@ const partial = house.members.length - house.districts_wholly_inside;
 <Base
   title={`${label} District ${number}`}
   description={`Ohio ${label} District ${number}: the ${house.members.length} school districts in it and an estimated ${money(house.realized_aid)} of state aid apportioned from census blocks.`}
+  image={routes.og.chamberDistrict(chamber, house.number)}
+  imageAlt={`Ohio ${label} District ${number}: the school districts in it and the state aid apportioned to them`}
   section={chamber}
   wide
 >

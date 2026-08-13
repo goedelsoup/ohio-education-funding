@@ -9,13 +9,25 @@
  * already reads correctly without them.
  */
 import { loadFeed } from "../lib/feed.ts";
+import { canonicalPath, og } from "../lib/routes.ts";
+import { HEIGHT, WIDTH } from "../lib/og/card.ts";
 import "../styles/app.css";
 
 interface Props {
   /** The `<title>`, before the site name is appended. */
   title: string;
-  /** One sentence. Used for `<meta name="description">` and nothing else. */
+  /** One sentence. Used for `<meta name="description">` and for the preview card's caption. */
   description: string;
+  /**
+   * The preview card for this page, from the `og` table in `src/lib/routes.ts`.
+   *
+   * Omitting it is not an error — the page previews as the site. That is the right default for
+   * `/search` and `/404`, which are not about anything, and it means a route added later gets a
+   * usable preview rather than none while nobody notices.
+   */
+  image?: string;
+  /** What the card shows, for a reader who cannot see it. Falls back to the description. */
+  imageAlt?: string;
   /** Which top-level nav entry is the current section, if any. */
   section?:
     | "statewide"
@@ -34,8 +46,29 @@ interface Props {
   wide?: boolean;
 }
 
-const { title, description, section, wide = false } = Astro.props;
+const {
+  title,
+  description,
+  section,
+  wide = false,
+  image = og.default(),
+  imageAlt,
+} = Astro.props;
 const { bundle, verification, forecastable } = loadFeed();
+
+/**
+ * This page's address, as a reader would type it.
+ *
+ * `Astro.url.pathname` reports the *file* being written — `build.format` is `"file"`, so that is
+ * `/district/043786.html` — and both the canonical link and `og:url` have to name a URL that
+ * resolves. They are computed from one value here so they cannot disagree, which they previously
+ * could not have done only because there was one of them.
+ */
+const site = Astro.site ?? new URL("https://schools.ohio.shawneesmart.systems");
+const canonical = new URL(canonicalPath(Astro.url.pathname), site);
+const cardUrl = new URL(image, site);
+/** `og:title` is read without the tab strip around it, so it carries the site name too. */
+const socialTitle = `${title} — Ohio school funding`;
 
 /**
  * The sections, two of them flat and three of them grouped.
@@ -98,7 +131,41 @@ const forecasts = verification.forecasts.length;
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>{title} — Ohio school funding</title>
     <meta name="description" content={description} />
-    <link rel="canonical" href={new URL(Astro.url.pathname, Astro.site ?? "https://schools.ohio.shawneesmart.systems")} />
+    <link rel="canonical" href={canonical} />
+
+    {/* The mark. SVG for browsers, 32px PNG for the unfurlers that will not take one, 180px for
+        iOS. All three are the same drawing — see `src/lib/og/mark.ts`. */}
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+    <link rel="icon" href="/icon-32.png" type="image/png" sizes="32x32" />
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+
+    {/*
+      What a link to this page looks like when it is pasted somewhere.
+
+      Open Graph is read by Slack, Discord, Facebook, LinkedIn, Bluesky and — since it stopped
+      reading its own — X. The three `twitter:` tags below are not redundant with it: X takes
+      `og:*` for the content but needs `twitter:card` to render the large form at all, and the two
+      it is paired with here are what other consumers of the Twitter vocabulary expect beside it.
+
+      Absolute URLs throughout, and not because the specification is fussy about it. A relative
+      `og:image` is resolved by a crawler against nothing, so it fails on the machines that read it
+      and works in every browser anyone would test it in.
+    */}
+    <meta property="og:site_name" content="Ohio school funding" />
+    <meta property="og:type" content="website" />
+    <meta property="og:locale" content="en_US" />
+    <meta property="og:title" content={socialTitle} />
+    <meta property="og:description" content={description} />
+    <meta property="og:url" content={canonical} />
+    <meta property="og:image" content={cardUrl} />
+    <meta property="og:image:type" content="image/png" />
+    <meta property="og:image:width" content={String(WIDTH)} />
+    <meta property="og:image:height" content={String(HEIGHT)} />
+    <meta property="og:image:alt" content={imageAlt ?? description} />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content={socialTitle} />
+    <meta name="twitter:description" content={description} />
+    <meta name="twitter:image" content={cardUrl} />
   </head>
   <body>
     <header class="site">

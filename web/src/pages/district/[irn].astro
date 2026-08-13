@@ -47,7 +47,13 @@ const description = district.on_guarantee
   : `${district.name} receives ${money(district.realized_aid_per_pupil)} per pupil in state aid, all of it computed by the formula.`;
 ---
 
-<Base title={district.name} description={description} section="districts">
+<Base
+  title={district.name}
+  description={description}
+  image={routes.og.district(district.irn)}
+  imageAlt={`${district.name}: state aid per pupil, and how much of it comes from the guarantee`}
+  section="districts"
+>
   <h1>{district.name}</h1>
   <p class="sub">
     IRN {district.irn} · <a href={routes.county(slugify(district.county))}>{district.county} County</a>

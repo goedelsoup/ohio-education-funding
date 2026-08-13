@@ -25,6 +25,8 @@ const sortable = (value: number | null) => (value == null ? "" : String(value));
 <Base
   title="Districts"
   description={`All ${s.districts} Ohio school districts in the FY${bundle.fiscal_year} funding model, with state aid per pupil, guarantee status, property wealth and enrollment.`}
+  image={routes.og.page("districts")}
+  imageAlt="Every Ohio school district, with how many are funded by the guarantee"
   section="districts"
   wide
 >

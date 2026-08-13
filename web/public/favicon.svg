@@ -1,0 +1,32 @@
+<!--
+  The site mark: two bars, in the two series colours this platform allows.
+
+  It is the picture the front page opens with, formula aid beside guarantee aid, drawn small enough
+  to survive 16 pixels. Anything with more in it than two rectangles reads as a smudge in a browser
+  tab, and that is the size which decides whether a mark is worth having.
+
+  The colours are the series custom properties in src/styles/app.css, written here as literals for
+  the same reason src/lib/og/palette.ts writes them as literals: this file is served straight to a
+  browser tab and read by rasterize() in src/lib/og/render.ts, and neither has the stylesheet.
+
+  (Those property names cannot be written out in this comment. XML forbids a double hyphen inside
+  one, which is a rule this file has already broken once and which fails the build rather than the
+  render, so it is at least loud about it.)
+
+  The prefers-color-scheme block is a light touch on the surface only, so the mark holds its
+  identity in a dark tab strip without becoming a second logo. resvg does not evaluate media
+  queries, so the PNG routes rasterize the light face. That is correct for both of them: an
+  apple-touch icon sits on a home screen whose background the site does not control.
+-->
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-label="Ohio school funding">
+  <style>
+    @media (prefers-color-scheme: dark) {
+      .surface { fill: #1a1a19; }
+      .formula { fill: #3987e5; }
+      .guarantee { fill: #d95926; }
+    }
+  </style>
+  <rect class="surface" width="64" height="64" rx="12" fill="#fcfcfb" />
+  <rect class="formula" x="14" y="16" width="14" height="34" rx="3" fill="#2a78d6" />
+  <rect class="guarantee" x="36" y="32" width="14" height="18" rx="3" fill="#eb6834" />
+</svg>

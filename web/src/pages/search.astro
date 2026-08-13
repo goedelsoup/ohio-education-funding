@@ -9,6 +9,7 @@ import Base from "../layouts/Base.astro";
 import { loadCorpus } from "../lib/corpus.ts";
 import { loadFeed } from "../lib/feed.ts";
 import { count } from "../lib/format.ts";
+import * as routes from "../lib/routes.ts";
 
 const { bundle } = loadFeed();
 const corpus = loadCorpus();
@@ -17,6 +18,8 @@ const corpus = loadCorpus();
 <Base
   title="Search"
   description="Search Ohio's school districts, the funding corpus, and the sources behind it."
+  image={routes.og.page("search")}
+  imageAlt="Search Ohio's school districts and the funding corpus"
   section="districts"
 >
   <h1>Search</h1>

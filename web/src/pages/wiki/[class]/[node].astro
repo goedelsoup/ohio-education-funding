@@ -57,7 +57,13 @@ const seeded = node.properties.find((p) => p.name === "seeded_because");
 const properties = node.properties.filter((p) => p.name !== "seeded_because");
 ---
 
-<Base title={node.label} description={summarize(node.description, 200)} section="wiki">
+<Base
+  title={node.label}
+  description={summarize(node.description, 200)}
+  image={routes.og.wikiNode(node.className, node.name)}
+  imageAlt={`${node.label}, a node in the Ohio school funding corpus`}
+  section="wiki"
+>
   <p class="crumb">
     <a href="/wiki">The corpus</a> ›{" "}
     <a href={routes.wikiClass(node.className)}>{entry?.label ?? node.className}</a>
