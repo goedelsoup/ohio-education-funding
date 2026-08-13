@@ -40,7 +40,7 @@ Fields per connector: key, status, source count, corpus classes fed; then every 
 | [`dew-payment-reports`](sources/dew-payment-reports.md) | declared | 0 | program, education-agency, revenue-stream |
 | `dew-scholarship-reports` | **wired**, in part | 1 | program |
 | `lsc-catalog` | **wired**, in part | 18 | fiscal-period, program, legislation, parameter |
-| [`lsc-budget`](sources/lsc-budget.md) | **wired**, in part | 22 | legislation, fiscal-period, program, parameter |
+| [`lsc-budget`](sources/lsc-budget.md) | **wired**, in part | 23 | legislation, fiscal-period, program, parameter |
 | [`ohio-laws`](sources/ohio-laws.md) | **wired** | 31 | legislation, parameter, formula-component |
 | [`ohio-courts`](sources/ohio-courts.md) | **wired**, in part | 4 | litigation |
 | [`ofcc-projects`](sources/ofcc-projects.md) | declared | 0 | program, education-agency |
@@ -50,13 +50,13 @@ Fields per connector: key, status, source count, corpus classes fed; then every 
 | `dew-child-nutrition` | **wired**, in part | 11 | education-agency, metric, formula-component |
 | `dew-school-improvement` | **wired**, in part | 3 | school, education-agency, accountability-regime |
 
-17 connectors, 127 sources between them. 15 are wired and 2 are not; 7 of the wired ones reach only part of what they feed, and say so below.
+17 connectors, 128 sources between them. 15 are wired and 2 are not; 7 of the wired ones reach only part of what they feed, and say so below.
 
 **What is blocked, in the registry's own words.**
 
 - `dew-payment-reports` — blocked on: the deduct-era reports (1999-2021) are behind OH|ID authentication on the department's reports portal; the current-era ones are open and indexed but post-date the deduction entirely
 - `dew-scholarship-reports` — still blocked on: wired for the statewide and program-level aggregates, which is what the department publishes openly. Per-district participation is a different file and is not here: the annual report cites two routes for it and both 404, so the breakdown was published, is still referenced by a current departmental document, and has been withdrawn. See `dew-payment-reports` for the deduct-era half of the same gap
-- `lsc-catalog` — still blocked on: wired for the education volume of every edition that has one — 2006 and 2008 through 2025, nineteen documents. 2007 has no edition and is a genuine 404. The Catalog is a standing reference restated each edition rather than a record of what one act appropriated, so it does not replace `lsc-budget`'s greenbooks and is not a substitute for the session laws before FY2002
+- `lsc-catalog` — still blocked on: wired for the education volume of every edition that has one — 2006 and 2008 through 2025, eighteen distinct documents — the 2012 URL serves the 2011 file byte for byte, and 2007 has no edition at all. The Catalog is a standing reference restated each edition rather than a record of what one act appropriated, so it does not replace `lsc-budget`'s greenbooks and is not a substitute for the session laws before FY2002
 - `lsc-budget` — still blocked on: wired for the appropriation-line series FY1999 through FY2027, from the 124th General Assembly's greenbook to the 136th's workbooks. The two bienniums the greenbook route cannot reach — FY2006-07, whose greenbook has no line-item table, and FY2012-13, whose workbook variants LSC serves as one file — are both carried by the Catalog of Budget Line Items, which was probed and is not blocked, and is now extracted: eighteen distinct editions, 2006 and 2008 through 2025 less the 2012 URL, which serves the 2011 document byte for byte. See the `lsc-catalog` connector and `the-catalog-of-budget-line-items`. Before FY1999 there is still nothing — the Foundation Program era, DeRolph I and the equal yield formula need the session laws, and the Catalog's earliest edition reaches FY2002. The per-district simulations named in earlier versions of this string are not LSC's and have been removed from it
 - `ohio-courts` — still blocked on: trial-level rulings such as the 2025 EdChoice decision are not in the supreme court archive at all, and `citing_cases` needs a citator rather than a document
 - `ofcc-projects` — blocked on: the site refuses a self-identifying agent — 404 to this project's user-agent, 200 to a browser string — and its project data is rendered by interactive maps rather than served as files

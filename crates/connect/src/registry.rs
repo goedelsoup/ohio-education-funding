@@ -866,7 +866,8 @@ pub const CONNECTORS: &[Connector] = &[
         status: Status::Wired {
             still_blocked: Some(
                 "wired for the education volume of every edition that has one — 2006 and 2008 \
-                 through 2025, nineteen documents. 2007 has no edition and is a genuine 404. The \
+                 through 2025, eighteen distinct documents — the 2012 URL serves the 2011 file byte for \
+                 byte, and 2007 has no edition at all. The \
                  Catalog is a standing reference restated each edition rather than a record of \
                  what one act appropriated, so it does not replace `lsc-budget`'s greenbooks and \
                  is not a substitute for the session laws before FY2002",
@@ -1173,7 +1174,23 @@ pub const CONNECTORS: &[Connector] = &[
                    prorates. **As introduced** — LSC publishes redbooks only for the introduced \
                    bill — so the line item *numbers* are the enacted ones and the *amounts* are \
                    the executive proposal. The distinction is stated wherever a figure from here \
-                   is quoted.",
+                   is quoted, and `hb96-edu-greenbook` is now beside it with the enacted ones.",
+        },
+        Source {
+            key: "hb96-edu-greenbook",
+            title: None,
+            url: "https://www.lsc.ohio.gov/assets/legislation/136/hb96/en0/files/\
+                  hb96-edu-greenbook-as-enacted-136th-general-assembly.pdf",
+            filename: "hb96-edu-greenbook.pdf",
+            format: Format::Pdf,
+            catalog: Some("lsc-dew-redbook"),
+            fixtures: &[crate::fixtures::GREENBOOK_FIXTURE],
+            note: "The same analysis **as enacted**, which the redbook beside it is not. Same \
+                   structure, same earmark tables, and the columns are headed `Appropriation` \
+                   where the redbook's are headed `Introduced` — so this is what settles whether \
+                   a proposed amount survived the legislature. `the-greenbook-series` recorded \
+                   that this document existed at a sibling URL to the redbook and it went \
+                   unwired for four phases while the corpus quoted the executive proposal.",
         },
         Source {
             key: "hb96-final-analysis",
