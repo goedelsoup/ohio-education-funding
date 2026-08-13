@@ -1,4 +1,2087 @@
 general_assembly,bill,fiscal_year,kind,source,documents,fund_group,fund,line_item,title,amount
+124,hb94,1999,actual,hb94-greenbook,1,,006,200689,Hazardous Waste Removal,1443401.00
+124,hb94,1999,actual,hb94-greenbook,1,,017,200612,Base Cost Funding,666093028.00
+124,hb94,1999,actual,hb94-greenbook,1,,017,200670,School Foundation-Basic Allowance,0.00
+124,hb94,1999,actual,hb94-greenbook,1,,017,200671,Special Education,0.00
+124,hb94,1999,actual,hb94-greenbook,1,,017,200672,Vocational Education,0.00
+124,hb94,1999,actual,hb94-greenbook,1,,017,200682,Lease Rental Payments Reimbursemen,32780000.00
+124,hb94,1999,actual,hb94-greenbook,1,,017,200694,Bus Purchase One-Time Supplement,7438958.00
+124,hb94,1999,actual,hb94-greenbook,1,,018,200649,Disability Access Project,0.00
+124,hb94,1999,actual,hb94-greenbook,1,,018,200669,Judgment Loan,0.00
+124,hb94,1999,actual,hb94-greenbook,1,,020,200620,Vocational School Building Assistance,3199035.00
+124,hb94,1999,actual,hb94-greenbook,1,,138,200606,Information Technology,3690021.00
+124,hb94,1999,actual,hb94-greenbook,1,,309,200601,Educationally Disadvantaged,10292033.00
+124,hb94,1999,actual,hb94-greenbook,1,,366,200604,Adult Basic Education,14042937.00
+124,hb94,1999,actual,hb94-greenbook,1,,367,200607,School Food Services,8542551.00
+124,hb94,1999,actual,hb94-greenbook,1,,368,200614,Veterans' Training,581395.00
+124,hb94,1999,actual,hb94-greenbook,1,,369,200616,Vocational Education,4903904.00
+124,hb94,1999,actual,hb94-greenbook,1,,370,200624,Education of Exceptional Children,11272070.00
+124,hb94,1999,actual,hb94-greenbook,1,,371,200631,EEO Title IV,492337.00
+124,hb94,1999,actual,hb94-greenbook,1,,374,200647,ESEA Consolidated Grants,95444.00
+124,hb94,1999,actual,hb94-greenbook,1,,375,200652,Tech Assistance Education Mobility,0.00
+124,hb94,1999,actual,hb94-greenbook,1,,376,200653,Job Training Partnership Act,3104937.00
+124,hb94,1999,actual,hb94-greenbook,1,,377,200657,Sex Equity,0.00
+124,hb94,1999,actual,hb94-greenbook,1,,378,200660,Math/Science Technology Investments,12770717.00
+124,hb94,1999,actual,hb94-greenbook,1,,3C5,200661,Federal Dependent Care Programs,4812611.00
+124,hb94,1999,actual,hb94-greenbook,1,,3D1,200664,Drug Free Schools,16606288.00
+124,hb94,1999,actual,hb94-greenbook,1,,3D2,200667,Honors Scholarship Program,1606090.00
+124,hb94,1999,actual,hb94-greenbook,1,,3E2,200668,AIDS Education Project,512294.00
+124,hb94,1999,actual,hb94-greenbook,1,,3H9,200605,Head Start Collaboration Project,204732.00
+124,hb94,1999,actual,hb94-greenbook,1,,3L6,200617,Federal School Lunch,142992604.00
+124,hb94,1999,actual,hb94-greenbook,1,,3L7,200618,Federal School Breakfast,29217174.00
+124,hb94,1999,actual,hb94-greenbook,1,,3L8,200619,Child and Adult Care Programs,45126533.00
+124,hb94,1999,actual,hb94-greenbook,1,,3L9,200621,Vocational Education Basic Grants,41727897.00
+124,hb94,1999,actual,hb94-greenbook,1,,3M0,200623,ESEA Title I,297852913.00
+124,hb94,1999,actual,hb94-greenbook,1,,3M1,200678,ESEA Innovative Education,12202996.00
+124,hb94,1999,actual,hb94-greenbook,1,,3M2,200680,Individuals with Disabilities Education A,111641545.00
+124,hb94,1999,actual,hb94-greenbook,1,,3N7,200627,School-To-Work,17825677.00
+124,hb94,1999,actual,hb94-greenbook,1,,3P9,200686,SRRC/FRC Evaluation Project,24783.00
+124,hb94,1999,actual,hb94-greenbook,1,,3R3,200654,Goals 2000,22112344.00
+124,hb94,1999,actual,hb94-greenbook,1,,3S2,200641,Tech Literacy Transfer,16694500.00
+124,hb94,1999,actual,hb94-greenbook,1,,3S7,200673,Child Care School Age,5652619.00
+124,hb94,1999,actual,hb94-greenbook,1,,3T4,200613,Public Charter Schools,807411.00
+124,hb94,1999,actual,hb94-greenbook,1,,3T5,200625,Coordinated School Health,160383.00
+124,hb94,1999,actual,hb94-greenbook,1,,452,200638,Miscellaneous Revenue,1066221.00
+124,hb94,1999,actual,hb94-greenbook,1,,454,200610,Guidance & Testing,460194.00
+124,hb94,1999,actual,hb94-greenbook,1,,455,200608,Commodity Foods,5746921.00
+124,hb94,1999,actual,hb94-greenbook,1,,4D1,200602,Ohio Prevention/Education Resource C,0.00
+124,hb94,1999,actual,hb94-greenbook,1,,4L2,200681,Teacher Certification and Licensure,3101769.00
+124,hb94,1999,actual,hb94-greenbook,1,,4M4,200637,Emergency Services Telecommunicatio,231419.00
+124,hb94,1999,actual,hb94-greenbook,1,,4N5,200639,Impact II,0.00
+124,hb94,1999,actual,hb94-greenbook,1,,4P1,200629,Adult Literacy Education,0.00
+124,hb94,1999,actual,hb94-greenbook,1,,4R7,200695,Indirect Cost Recovery,2174147.00
+124,hb94,1999,actual,hb94-greenbook,1,,4V7,200633,Interagency Vocational Support,595332.00
+124,hb94,1999,actual,hb94-greenbook,1,,4Y5,200697,Supplemental School Assistance,0.00
+124,hb94,1999,actual,hb94-greenbook,1,,4Z5,200663,School District Stored Natural Gas Rei,0.00
+124,hb94,1999,actual,hb94-greenbook,1,,596,200656,Ohio Career Information System,412100.00
+124,hb94,1999,actual,hb94-greenbook,1,,598,200659,Auxiliary Services Mobile Unit,895157.00
+124,hb94,1999,actual,hb94-greenbook,1,,5F8,200645,Textbooks/Instructional Materials,25000000.00
+124,hb94,1999,actual,hb94-greenbook,1,,5H3,200687,School District Solvency Assistance,12063000.00
+124,hb94,1999,actual,hb94-greenbook,1,,GRF,200100,Personal Services,11001037.00
+124,hb94,1999,actual,hb94-greenbook,1,,GRF,200200,Maintenance,4188278.00
+124,hb94,1999,actual,hb94-greenbook,1,,GRF,200300,Equipment,553616.00
+124,hb94,1999,actual,hb94-greenbook,1,,GRF,200320,Maintenance and Equipment,0.00
+124,hb94,1999,actual,hb94-greenbook,1,,GRF,200406,Head Start,92845074.00
+124,hb94,1999,actual,hb94-greenbook,1,,GRF,200408,Public Preschool,17743923.00
+124,hb94,1999,actual,hb94-greenbook,1,,GRF,200410,Professional Development,27259072.00
+124,hb94,1999,actual,hb94-greenbook,1,,GRF,200411,Family and Children First,10370527.00
+124,hb94,1999,actual,hb94-greenbook,1,,GRF,200412,Driver Education Administration,176845.00
+124,hb94,1999,actual,hb94-greenbook,1,,GRF,200413,Lease Rental Payments,0.00
+124,hb94,1999,actual,hb94-greenbook,1,,GRF,200414,Vocational Rehabilitation,0.00
+124,hb94,1999,actual,hb94-greenbook,1,,GRF,200415,Consumer Education,504278.00
+124,hb94,1999,actual,hb94-greenbook,1,,GRF,200416,Vocational Education Match,2570425.00
+124,hb94,1999,actual,hb94-greenbook,1,,GRF,200417,Professional Development,436.00
+124,hb94,1999,actual,hb94-greenbook,1,,GRF,200420,Technical Systems Development,0.00
+124,hb94,1999,actual,hb94-greenbook,1,,GRF,200421,Alternative Education Programs,0.00
+124,hb94,1999,actual,hb94-greenbook,1,,GRF,200422,School Management Assistance,1009209.00
+124,hb94,1999,actual,hb94-greenbook,1,,GRF,200423,Teacher Recruitment,0.00
+124,hb94,1999,actual,hb94-greenbook,1,,GRF,200424,Policy Analysis,417312.00
+124,hb94,1999,actual,hb94-greenbook,1,,GRF,200425,Tech Prep Administration,0.00
+124,hb94,1999,actual,hb94-greenbook,1,,GRF,200426,Ohio Educational Computer Network,21562402.00
+124,hb94,1999,actual,hb94-greenbook,1,,GRF,200429,Local Professional Development Block,0.00
+124,hb94,1999,actual,hb94-greenbook,1,,GRF,200431,School Improvement Models,11066804.00
+124,hb94,1999,actual,hb94-greenbook,1,,GRF,200432,School Conflict Management,394431.00
+124,hb94,1999,actual,hb94-greenbook,1,,GRF,200437,Student Proficiency,10461338.00
+124,hb94,1999,actual,hb94-greenbook,1,,GRF,200441,American Sign Language,281657.00
+124,hb94,1999,actual,hb94-greenbook,1,,GRF,200442,Child Care Licensing,1511264.00
+124,hb94,1999,actual,hb94-greenbook,1,,GRF,200443,DeRolph Litigation Expenses,1311730.00
+124,hb94,1999,actual,hb94-greenbook,1,,GRF,200445,OhioReads Administration/Volunteer S,0.00
+124,hb94,1999,actual,hb94-greenbook,1,,GRF,200446,Management Information System,11922195.00
+124,hb94,1999,actual,hb94-greenbook,1,,GRF,200447,GED Testing/Adult High School,1427707.00
+124,hb94,1999,actual,hb94-greenbook,1,,GRF,200450,Summer Institute for Reading Interventi,0.00
+124,hb94,1999,actual,hb94-greenbook,1,,GRF,200455,Community Schools,2300000.00
+124,hb94,1999,actual,hb94-greenbook,1,,GRF,200500,School Finance Equity,67854112.00
+124,hb94,1999,actual,hb94-greenbook,1,,GRF,200501,Base Cost Funding,3035363396.00
+124,hb94,1999,actual,hb94-greenbook,1,,GRF,200502,Pupil Transportation,225814316.00
+124,hb94,1999,actual,hb94-greenbook,1,,GRF,200503,Bus Purchase Allowance,31762132.00
+124,hb94,1999,actual,hb94-greenbook,1,,GRF,200504,Special Education,8816421.00
+124,hb94,1999,actual,hb94-greenbook,1,,GRF,200505,School Lunch Match,8642209.00
+124,hb94,1999,actual,hb94-greenbook,1,,GRF,200507,Vocational Education,2047762.00
+124,hb94,1999,actual,hb94-greenbook,1,,GRF,200509,Adult Literacy Education,8970230.00
+124,hb94,1999,actual,hb94-greenbook,1,,GRF,200511,Auxiliary Services,101532774.00
+124,hb94,1999,actual,hb94-greenbook,1,,GRF,200512,Driver Education,6464450.00
+124,hb94,1999,actual,hb94-greenbook,1,,GRF,200514,Post-Secondary/Adult Career-Technic,20937141.00
+124,hb94,1999,actual,hb94-greenbook,1,,GRF,200519,Pilot Scholarship Program,1346893.00
+124,hb94,1999,actual,hb94-greenbook,1,,GRF,200520,Disadvantaged Pupil Impact Aid,369053622.00
+124,hb94,1999,actual,hb94-greenbook,1,,GRF,200521,Gifted Pupil Program,34912236.00
+124,hb94,1999,actual,hb94-greenbook,1,,GRF,200524,Educational Excellence and Competenc,9168000.00
+124,hb94,1999,actual,hb94-greenbook,1,,GRF,200525,Parity Aid,0.00
+124,hb94,1999,actual,hb94-greenbook,1,,GRF,200526,Vocational Education Equipment Repla,4770394.00
+124,hb94,1999,actual,hb94-greenbook,1,,GRF,200528,Education Mobility Assistance,0.00
+124,hb94,1999,actual,hb94-greenbook,1,,GRF,200532,Nonpublic Administration Cost Reimbur,44413619.00
+124,hb94,1999,actual,hb94-greenbook,1,,GRF,200533,School-Age Child Care,1103112.00
+124,hb94,1999,actual,hb94-greenbook,1,,GRF,200534,Desegregation Cost,47903061.00
+124,hb94,1999,actual,hb94-greenbook,1,,GRF,200538,Discovery Project Match,0.00
+124,hb94,1999,actual,hb94-greenbook,1,,GRF,200539,Educational Technology,0.00
+124,hb94,1999,actual,hb94-greenbook,1,,GRF,200540,Special Education Enhancements,131826304.00
+124,hb94,1999,actual,hb94-greenbook,1,,GRF,200541,Peer Review,269736.00
+124,hb94,1999,actual,hb94-greenbook,1,,GRF,200542,National Board Certification,690000.00
+124,hb94,1999,actual,hb94-greenbook,1,,GRF,200543,Entry Year Programs,323781.00
+124,hb94,1999,actual,hb94-greenbook,1,,GRF,200544,Individual Career Plan and Passport,856347.00
+124,hb94,1999,actual,hb94-greenbook,1,,GRF,200545,Career-Technical Education Enhancem,187724836.00
+124,hb94,1999,actual,hb94-greenbook,1,,GRF,200546,Charge-Off Supplement,7303168.00
+124,hb94,1999,actual,hb94-greenbook,1,,GRF,200547,Power Equalization,10738996.00
+124,hb94,1999,actual,hb94-greenbook,1,,GRF,200548,Teacher Recruitment Pilots,0.00
+124,hb94,1999,actual,hb94-greenbook,1,,GRF,200551,Reading Improvement,1766265.00
+124,hb94,1999,actual,hb94-greenbook,1,,GRF,200552,County MR/DD Boards Vehicle Purcha,194492.00
+124,hb94,1999,actual,hb94-greenbook,1,,GRF,200553,County MR/DD Boards Transportation,8955905.00
+124,hb94,1999,actual,hb94-greenbook,1,,GRF,200557,JOGS One Time Supplement,0.00
+124,hb94,1999,actual,hb94-greenbook,1,,GRF,200558,Emergency Loan Interest Subsidy,8490374.00
+124,hb94,1999,actual,hb94-greenbook,1,,GRF,200560,Interactive Communication Information,0.00
+124,hb94,1999,actual,hb94-greenbook,1,,GRF,200565,Amer-I-Can Onetime Supplement,0.00
+124,hb94,1999,actual,hb94-greenbook,1,,GRF,200566,OhioReads Grants,0.00
+124,hb94,1999,actual,hb94-greenbook,1,,GRF,200568,Adolescent Pregnancy Program,0.00
+124,hb94,1999,actual,hb94-greenbook,1,,GRF,200570,School Improvement Incentive Grants,0.00
+124,hb94,1999,actual,hb94-greenbook,1,,GRF,200572,Teacher Incentive Grants,0.00
+124,hb94,1999,actual,hb94-greenbook,1,,GRF,200573,Character Education,0.00
+124,hb94,1999,actual,hb94-greenbook,1,,GRF,200574,Substance Abuse Prevention,0.00
+124,hb94,1999,actual,hb94-greenbook,1,,GRF,200577,Preschool Special Education,2204723.00
+124,hb94,1999,actual,hb94-greenbook,1,,GRF,200580,Bethel School Clean-Up,0.00
+124,hb94,1999,actual,hb94-greenbook,1,,GRF,200589,Special Education Aides,1635155.00
+124,hb94,1999,actual,hb94-greenbook,1,,GRF,200901,Property Tax Allocation,591033893.00
+124,hb94,1999,actual,hb94-greenbook,1,,GRF,200906,Tangible Tax Exemption-Education,65047249.00
+124,hb94,2000,actual,hb94-greenbook,1,,006,200689,Hazardous Waste Removal,0.00
+124,hb94,2000,actual,hb94-greenbook,1,,017,200612,Base Cost Funding,656247000.00
+124,hb94,2000,actual,hb94-greenbook,1,,017,200670,School Foundation-Basic Allowance,0.00
+124,hb94,2000,actual,hb94-greenbook,1,,017,200671,Special Education,0.00
+124,hb94,2000,actual,hb94-greenbook,1,,017,200672,Vocational Education,0.00
+124,hb94,2000,actual,hb94-greenbook,1,,017,200682,Lease Rental Payments Reimbursemen,0.00
+124,hb94,2000,actual,hb94-greenbook,1,,017,200694,Bus Purchase One-Time Supplement,1659086.00
+124,hb94,2000,actual,hb94-greenbook,1,,018,200649,Disability Access Project,0.00
+124,hb94,2000,actual,hb94-greenbook,1,,018,200669,Judgment Loan,0.00
+124,hb94,2000,actual,hb94-greenbook,1,,020,200620,Vocational School Building Assistance,0.00
+124,hb94,2000,actual,hb94-greenbook,1,,138,200606,Information Technology,4034664.00
+124,hb94,2000,actual,hb94-greenbook,1,,309,200601,Educationally Disadvantaged,13262734.00
+124,hb94,2000,actual,hb94-greenbook,1,,366,200604,Adult Basic Education,14039231.00
+124,hb94,2000,actual,hb94-greenbook,1,,367,200607,School Food Services,8947635.00
+124,hb94,2000,actual,hb94-greenbook,1,,368,200614,Veterans' Training,519898.00
+124,hb94,2000,actual,hb94-greenbook,1,,369,200616,Vocational Education,7333663.00
+124,hb94,2000,actual,hb94-greenbook,1,,370,200624,Education of Exceptional Children,2818327.00
+124,hb94,2000,actual,hb94-greenbook,1,,371,200631,EEO Title IV,765252.00
+124,hb94,2000,actual,hb94-greenbook,1,,374,200647,ESEA Consolidated Grants,43264.00
+124,hb94,2000,actual,hb94-greenbook,1,,376,200653,Job Training Partnership Act,3498129.00
+124,hb94,2000,actual,hb94-greenbook,1,,378,200660,Math/Science Technology Investments,12219294.00
+124,hb94,2000,actual,hb94-greenbook,1,,3C5,200661,Federal Dependent Care Programs,15284515.00
+124,hb94,2000,actual,hb94-greenbook,1,,3D1,200664,Drug Free Schools,14167939.00
+124,hb94,2000,actual,hb94-greenbook,1,,3D2,200667,Honors Scholarship Program,1814470.00
+124,hb94,2000,actual,hb94-greenbook,1,,3E2,200668,AIDS Education Project,63790.00
+124,hb94,2000,actual,hb94-greenbook,1,,3H9,200605,Head Start Collaboration Project,294069.00
+124,hb94,2000,actual,hb94-greenbook,1,,3L6,200617,Federal School Lunch,158064573.00
+124,hb94,2000,actual,hb94-greenbook,1,,3L7,200618,Federal School Breakfast,32191459.00
+124,hb94,2000,actual,hb94-greenbook,1,,3L8,200619,Child and Adult Care Programs,48460017.00
+124,hb94,2000,actual,hb94-greenbook,1,,3L9,200621,Vocational Education Basic Grants,42836699.00
+124,hb94,2000,actual,hb94-greenbook,1,,3M0,200623,ESEA Title I,281047582.00
+124,hb94,2000,actual,hb94-greenbook,1,,3M1,200678,ESEA Innovative Education,45021139.00
+124,hb94,2000,actual,hb94-greenbook,1,,3M2,200680,Individuals with Disabilities Education A,125688156.00
+124,hb94,2000,actual,hb94-greenbook,1,,3N7,200627,School-To-Work,10869247.00
+124,hb94,2000,actual,hb94-greenbook,1,,3P9,200686,SRRC/FRC Evaluation Project,0.00
+124,hb94,2000,actual,hb94-greenbook,1,,3R3,200654,Goals 2000,22473365.00
+124,hb94,2000,actual,hb94-greenbook,1,,3S2,200641,Tech Literacy Transfer,14633000.00
+124,hb94,2000,actual,hb94-greenbook,1,,3S7,200673,Child Care School Age,97892.00
+124,hb94,2000,actual,hb94-greenbook,1,,3T4,200613,Public Charter Schools,2295355.00
+124,hb94,2000,actual,hb94-greenbook,1,,3T5,200625,Coordinated School Health,382516.00
+124,hb94,2000,actual,hb94-greenbook,1,,3U2,200662,Teacher Quality Enhancement Grants,638186.00
+124,hb94,2000,actual,hb94-greenbook,1,,3U3,200665,Reading Excellence Grant Program,2171491.00
+124,hb94,2000,actual,hb94-greenbook,1,,3U6,200675,Provision 2 & 3 Grant,12187.00
+124,hb94,2000,actual,hb94-greenbook,1,,452,200638,Miscellaneous Revenue,203480.00
+124,hb94,2000,actual,hb94-greenbook,1,,454,200610,Guidance & Testing,580727.00
+124,hb94,2000,actual,hb94-greenbook,1,,455,200608,Commodity Foods,7673075.00
+124,hb94,2000,actual,hb94-greenbook,1,,4D1,200602,Ohio Prevention/Education Resource C,592440.00
+124,hb94,2000,actual,hb94-greenbook,1,,4L2,200681,Teacher Certification and Licensure,3377937.00
+124,hb94,2000,actual,hb94-greenbook,1,,4M4,200637,Emergency Services Telecommunicatio,161195.00
+124,hb94,2000,actual,hb94-greenbook,1,,4N5,200639,Impact II,0.00
+124,hb94,2000,actual,hb94-greenbook,1,,4R7,200695,Indirect Cost Recovery,2560515.00
+124,hb94,2000,actual,hb94-greenbook,1,,4V7,200633,Interagency Vocational Support,642612.00
+124,hb94,2000,actual,hb94-greenbook,1,,4Y5,200697,Supplemental School Assistance,0.00
+124,hb94,2000,actual,hb94-greenbook,1,,596,200656,Ohio Career Information System,520759.00
+124,hb94,2000,actual,hb94-greenbook,1,,598,200659,Auxiliary Services Mobile Unit,1396664.00
+124,hb94,2000,actual,hb94-greenbook,1,,5B1,200651,Child Nutrition Services,11108.00
+124,hb94,2000,actual,hb94-greenbook,1,,5F8,200645,Textbooks/Instructional Materials,0.00
+124,hb94,2000,actual,hb94-greenbook,1,,5H3,200687,School District Solvency Assistance,8657000.00
+124,hb94,2000,actual,hb94-greenbook,1,,620,200615,Educational Grants,1110019.00
+124,hb94,2000,actual,hb94-greenbook,1,,GRF,200100,Personal Services,11781860.00
+124,hb94,2000,actual,hb94-greenbook,1,,GRF,200200,Maintenance,384050.00
+124,hb94,2000,actual,hb94-greenbook,1,,GRF,200300,Equipment,74582.00
+124,hb94,2000,actual,hb94-greenbook,1,,GRF,200320,Maintenance and Equipment,4422558.00
+124,hb94,2000,actual,hb94-greenbook,1,,GRF,200406,Head Start,96818680.00
+124,hb94,2000,actual,hb94-greenbook,1,,GRF,200408,Public Preschool,19145553.00
+124,hb94,2000,actual,hb94-greenbook,1,,GRF,200410,Professional Development,30119793.00
+124,hb94,2000,actual,hb94-greenbook,1,,GRF,200411,Family and Children First,10600591.00
+124,hb94,2000,actual,hb94-greenbook,1,,GRF,200412,Driver Education Administration,919.00
+124,hb94,2000,actual,hb94-greenbook,1,,GRF,200415,Consumer Education,79663.00
+124,hb94,2000,actual,hb94-greenbook,1,,GRF,200416,Vocational Education Match,2362272.00
+124,hb94,2000,actual,hb94-greenbook,1,,GRF,200417,Professional Development,0.00
+124,hb94,2000,actual,hb94-greenbook,1,,GRF,200420,Technical Systems Development,1751412.00
+124,hb94,2000,actual,hb94-greenbook,1,,GRF,200421,Alternative Education Programs,0.00
+124,hb94,2000,actual,hb94-greenbook,1,,GRF,200422,School Management Assistance,1114865.00
+124,hb94,2000,actual,hb94-greenbook,1,,GRF,200423,Teacher Recruitment,0.00
+124,hb94,2000,actual,hb94-greenbook,1,,GRF,200424,Policy Analysis,494104.00
+124,hb94,2000,actual,hb94-greenbook,1,,GRF,200425,Tech Prep Administration,0.00
+124,hb94,2000,actual,hb94-greenbook,1,,GRF,200426,Ohio Educational Computer Network,24584939.00
+124,hb94,2000,actual,hb94-greenbook,1,,GRF,200429,Local Professional Development Block,0.00
+124,hb94,2000,actual,hb94-greenbook,1,,GRF,200431,School Improvement Models,24838650.00
+124,hb94,2000,actual,hb94-greenbook,1,,GRF,200432,School Conflict Management,500172.00
+124,hb94,2000,actual,hb94-greenbook,1,,GRF,200437,Student Proficiency,12387999.00
+124,hb94,2000,actual,hb94-greenbook,1,,GRF,200441,American Sign Language,221299.00
+124,hb94,2000,actual,hb94-greenbook,1,,GRF,200442,Child Care Licensing,1467703.00
+124,hb94,2000,actual,hb94-greenbook,1,,GRF,200443,DeRolph Litigation Expenses,300000.00
+124,hb94,2000,actual,hb94-greenbook,1,,GRF,200445,OhioReads Administration/Volunteer S,3755709.00
+124,hb94,2000,actual,hb94-greenbook,1,,GRF,200446,Management Information System,13460017.00
+124,hb94,2000,actual,hb94-greenbook,1,,GRF,200447,GED Testing/Adult High School,1117066.00
+124,hb94,2000,actual,hb94-greenbook,1,,GRF,200450,Summer Institute for Reading Interventi,688048.00
+124,hb94,2000,actual,hb94-greenbook,1,,GRF,200455,Community Schools,1654046.00
+124,hb94,2000,actual,hb94-greenbook,1,,GRF,200500,School Finance Equity,47323630.00
+124,hb94,2000,actual,hb94-greenbook,1,,GRF,200501,Base Cost Funding,3458196651.00
+124,hb94,2000,actual,hb94-greenbook,1,,GRF,200502,Pupil Transportation,274110665.00
+124,hb94,2000,actual,hb94-greenbook,1,,GRF,200503,Bus Purchase Allowance,33761278.00
+124,hb94,2000,actual,hb94-greenbook,1,,GRF,200504,Special Education,0.00
+124,hb94,2000,actual,hb94-greenbook,1,,GRF,200505,School Lunch Match,9991216.00
+124,hb94,2000,actual,hb94-greenbook,1,,GRF,200507,Vocational Education,0.00
+124,hb94,2000,actual,hb94-greenbook,1,,GRF,200509,Adult Literacy Education,8817898.00
+124,hb94,2000,actual,hb94-greenbook,1,,GRF,200511,Auxiliary Services,110135741.00
+124,hb94,2000,actual,hb94-greenbook,1,,GRF,200512,Driver Education,361552.00
+124,hb94,2000,actual,hb94-greenbook,1,,GRF,200513,Summer Intervention,15445934.00
+124,hb94,2000,actual,hb94-greenbook,1,,GRF,200514,Post-Secondary/Adult Career-Technic,22668510.00
+124,hb94,2000,actual,hb94-greenbook,1,,GRF,200519,Pilot Scholarship Program,0.00
+124,hb94,2000,actual,hb94-greenbook,1,,GRF,200520,Disadvantaged Pupil Impact Aid,367072979.00
+124,hb94,2000,actual,hb94-greenbook,1,,GRF,200521,Gifted Pupil Program,39529962.00
+124,hb94,2000,actual,hb94-greenbook,1,,GRF,200524,Educational Excellence and Competenc,12987333.00
+124,hb94,2000,actual,hb94-greenbook,1,,GRF,200526,Vocational Education Equipment Repla,148009.00
+124,hb94,2000,actual,hb94-greenbook,1,,GRF,200532,Nonpublic Administration Cost Reimbur,48059452.00
+124,hb94,2000,actual,hb94-greenbook,1,,GRF,200533,School-Age Child Care,961769.00
+124,hb94,2000,actual,hb94-greenbook,1,,GRF,200534,Desegregation Cost,9162951.00
+124,hb94,2000,actual,hb94-greenbook,1,,GRF,200538,Discovery Project Match,0.00
+124,hb94,2000,actual,hb94-greenbook,1,,GRF,200540,Special Education Enhancements,127087994.00
+124,hb94,2000,actual,hb94-greenbook,1,,GRF,200541,Peer Review,0.00
+124,hb94,2000,actual,hb94-greenbook,1,,GRF,200542,National Board Certification,0.00
+124,hb94,2000,actual,hb94-greenbook,1,,GRF,200543,Entry Year Programs,0.00
+124,hb94,2000,actual,hb94-greenbook,1,,GRF,200544,Individual Career Plan and Passport,0.00
+124,hb94,2000,actual,hb94-greenbook,1,,GRF,200545,Career-Technical Education Enhancem,34168790.00
+124,hb94,2000,actual,hb94-greenbook,1,,GRF,200546,Charge-Off Supplement,7416349.00
+124,hb94,2000,actual,hb94-greenbook,1,,GRF,200547,Power Equalization,21830412.00
+124,hb94,2000,actual,hb94-greenbook,1,,GRF,200551,Reading Improvement,1520867.00
+124,hb94,2000,actual,hb94-greenbook,1,,GRF,200552,County MR/DD Boards Vehicle Purcha,1697525.00
+124,hb94,2000,actual,hb94-greenbook,1,,GRF,200553,County MR/DD Boards Transportation,7746790.00
+124,hb94,2000,actual,hb94-greenbook,1,,GRF,200558,Emergency Loan Interest Subsidy,7123596.00
+124,hb94,2000,actual,hb94-greenbook,1,,GRF,200560,Interactive Communication Information,0.00
+124,hb94,2000,actual,hb94-greenbook,1,,GRF,200566,OhioReads Grants,24970547.00
+124,hb94,2000,actual,hb94-greenbook,1,,GRF,200568,Adolescent Pregnancy Program,0.00
+124,hb94,2000,actual,hb94-greenbook,1,,GRF,200570,School Improvement Incentive Grants,9729800.00
+124,hb94,2000,actual,hb94-greenbook,1,,GRF,200572,Teacher Incentive Grants,111000.00
+124,hb94,2000,actual,hb94-greenbook,1,,GRF,200573,Character Education,1000000.00
+124,hb94,2000,actual,hb94-greenbook,1,,GRF,200574,Substance Abuse Prevention,2112000.00
+124,hb94,2000,actual,hb94-greenbook,1,,GRF,200577,Preschool Special Education,0.00
+124,hb94,2000,actual,hb94-greenbook,1,,GRF,200580,Bethel School Clean-Up,350000.00
+124,hb94,2000,actual,hb94-greenbook,1,,GRF,200589,Special Education Aides,0.00
+124,hb94,2000,actual,hb94-greenbook,1,,GRF,200901,Property Tax Allocation,622326432.00
+124,hb94,2000,actual,hb94-greenbook,1,,GRF,200906,Tangible Tax Exemption-Education,65068924.00
+124,hb94,2001,actual,hb94-greenbook,2,,017,200612,Base Cost Funding,628967000.00
+124,hb94,2001,actual,hb94-greenbook,2,,017,200682,Lease Rental Payments Reimbursemen,59486000.00
+124,hb94,2001,actual,hb94-greenbook,2,,017,200694,Bus Purchase One-Time Supplement,110536.00
+124,hb94,2001,actual,hb94-greenbook,2,,020,200620,Vocational School Building Assistance,1650000.00
+124,hb94,2001,actual,hb94-greenbook,2,,138,200606,Information Technology,3580430.00
+124,hb94,2001,actual,hb94-greenbook,2,,309,200601,Educationally Disadvantaged,11764820.00
+124,hb94,2001,actual,hb94-greenbook,2,,366,200604,Adult Basic Education,17188596.00
+124,hb94,2001,actual,hb94-greenbook,2,,367,200607,School Food Services,8744567.00
+124,hb94,2001,actual,hb94-greenbook,2,,368,200614,Veterans' Training,506460.00
+124,hb94,2001,actual,hb94-greenbook,2,,369,200616,Vocational Education,7352141.00
+124,hb94,2001,actual,hb94-greenbook,2,,370,200624,Education of Exceptional Children,1202380.00
+124,hb94,2001,actual,hb94-greenbook,2,,371,200631,EEO Title IV,988258.00
+124,hb94,2001,actual,hb94-greenbook,2,,374,200647,ESEA Consolidated Grants,71196.00
+124,hb94,2001,actual,hb94-greenbook,2,,376,200653,Job Training Partnership Act,1343617.00
+124,hb94,2001,actual,hb94-greenbook,2,,378,200660,Math/Science Technology Investments,14943819.00
+124,hb94,2001,actual,hb94-greenbook,2,,3C5,200661,Federal Dependent Care Programs,18588983.00
+124,hb94,2001,actual,hb94-greenbook,2,,3D1,200664,Drug Free Schools,13737056.00
+124,hb94,2001,actual,hb94-greenbook,2,,3D2,200667,Honors Scholarship Program,1296610.00
+124,hb94,2001,actual,hb94-greenbook,2,,3H9,200605,Head Start Collaboration Project,243635.00
+124,hb94,2001,actual,hb94-greenbook,2,,3L6,200617,Federal School Lunch,158544020.00
+124,hb94,2001,actual,hb94-greenbook,2,,3L7,200618,Federal School Breakfast,33846571.00
+124,hb94,2001,actual,hb94-greenbook,2,,3L8,200619,Child and Adult Care Programs,48803838.00
+124,hb94,2001,actual,hb94-greenbook,2,,3L9,200621,Vocational Education Basic Grants,43123892.00
+124,hb94,2001,actual,hb94-greenbook,2,,3M0,200623,ESEA Title I,323682944.00
+124,hb94,2001,actual,hb94-greenbook,2,,3M1,200678,ESEA Innovative Education,13675128.00
+124,hb94,2001,actual,hb94-greenbook,2,,3M2,200680,Individuals with Disabilities Education A,158263935.00
+124,hb94,2001,actual,hb94-greenbook,2,,3N7,200627,School-To-Work,5596364.00
+124,hb94,2001,actual,hb94-greenbook,2,,3R3,200654,Goals 2000,21447976.00
+124,hb94,2001,actual,hb94-greenbook,2,,3S2,200641,Tech Literacy Transfer,13320001.00
+124,hb94,2001,actual,hb94-greenbook,2,,3T4,200613,Public Charter Schools,3581161.00
+124,hb94,2001,actual,hb94-greenbook,2,,3T5,200625,Coordinated School Health,11249.00
+124,hb94,2001,actual,hb94-greenbook,2,,3T6,200611,Class Size Reduction,47245533.00
+124,hb94,2001,actual,hb94-greenbook,2,,3U2,200662,Teacher Quality Enhancement Grants,885552.00
+124,hb94,2001,actual,hb94-greenbook,2,,3U3,200665,Reading Excellence Grant Program,11587216.00
+124,hb94,2001,actual,hb94-greenbook,2,,3U6,200675,Provision 2 & 3 Grant,195724.00
+124,hb94,2001,actual,hb94-greenbook,2,,452,200638,Miscellaneous Revenue,362265.00
+124,hb94,2001,actual,hb94-greenbook,2,,454,200610,Guidance & Testing,434712.00
+124,hb94,2001,actual,hb94-greenbook,2,,455,200608,Commodity Foods,8408290.00
+124,hb94,2001,actual,hb94-greenbook,2,,4D1,200602,Ohio Prevention/Education Resource C,128418.00
+124,hb94,2001,actual,hb94-greenbook,2,,4L2,200681,Teacher Certification and Licensure,4399677.00
+124,hb94,2001,actual,hb94-greenbook,2,,4M4,200637,Emergency Services Telecommunicatio,20366.00
+124,hb94,2001,actual,hb94-greenbook,2,,4R7,200695,Indirect Cost Recovery,2622415.00
+124,hb94,2001,actual,hb94-greenbook,2,,4V7,200633,Interagency Vocational Support,445158.00
+124,hb94,2001,actual,hb94-greenbook,2,,596,200656,Ohio Career Information System,415970.00
+124,hb94,2001,actual,hb94-greenbook,2,,598,200659,Auxiliary Services Mobile Unit,1493484.00
+124,hb94,2001,actual,hb94-greenbook,2,,5B1,200651,Child Nutrition Services,51067.00
+124,hb94,2001,actual,hb94-greenbook,2,,5H3,200687,School District Solvency Assistance,3846000.00
+124,hb94,2001,actual,hb94-greenbook,2,,620,200615,Educational Grants,682011.00
+124,hb94,2001,actual,hb94-greenbook,2,,GRF,200100,Personal Services,12074656.00
+124,hb94,2001,actual,hb94-greenbook,2,,GRF,200320,Maintenance and Equipment,8994194.00
+124,hb94,2001,actual,hb94-greenbook,2,,GRF,200406,Head Start,100707798.00
+124,hb94,2001,actual,hb94-greenbook,2,,GRF,200408,Public Preschool,19421348.00
+124,hb94,2001,actual,hb94-greenbook,2,,GRF,200410,Professional Development,28399477.00
+124,hb94,2001,actual,hb94-greenbook,2,,GRF,200411,Family and Children First,10436510.00
+124,hb94,2001,actual,hb94-greenbook,2,,GRF,200416,Vocational Education Match,2222334.00
+124,hb94,2001,actual,hb94-greenbook,2,,GRF,200420,Technical Systems Development,6318470.00
+124,hb94,2001,actual,hb94-greenbook,2,,GRF,200421,Alternative Education Programs,19820361.00
+124,hb94,2001,actual,hb94-greenbook,2,,GRF,200422,School Management Assistance,979884.00
+124,hb94,2001,actual,hb94-greenbook,2,,GRF,200424,Policy Analysis,578388.00
+124,hb94,2001,actual,hb94-greenbook,2,,GRF,200425,Tech Prep Administration,2173151.00
+124,hb94,2001,actual,hb94-greenbook,2,,GRF,200426,Ohio Educational Computer Network,37900112.00
+124,hb94,2001,actual,hb94-greenbook,2,,GRF,200427,Academic Standards,620821.00
+124,hb94,2001,actual,hb94-greenbook,2,,GRF,200431,School Improvement Models,28409374.00
+124,hb94,2001,actual,hb94-greenbook,2,,GRF,200432,School Conflict Management,573083.00
+124,hb94,2001,actual,hb94-greenbook,2,,GRF,200437,Student Proficiency,14294054.00
+124,hb94,2001,actual,hb94-greenbook,2,,GRF,200441,American Sign Language,148387.00
+124,hb94,2001,actual,hb94-greenbook,2,,GRF,200442,Child Care Licensing,1459886.00
+124,hb94,2001,actual,hb94-greenbook,2,,GRF,200445,OhioReads Administration/Volunteer S,4146708.00
+124,hb94,2001,actual,hb94-greenbook,2,,GRF,200446,Management Information System,14396653.00
+124,hb94,2001,actual,hb94-greenbook,2,,GRF,200447,GED Testing/Adult High School,1289211.00
+124,hb94,2001,actual,hb94-greenbook,2,,GRF,200450,Summer Institute for Reading Interventi,627702.00
+124,hb94,2001,actual,hb94-greenbook,2,,GRF,200455,Community Schools,2336946.00
+124,hb94,2001,actual,hb94-greenbook,2,,GRF,200500,School Finance Equity,33407695.00
+124,hb94,2001,actual,hb94-greenbook,2,,GRF,200501,Base Cost Funding,3804827428.00
+124,hb94,2001,actual,hb94-greenbook,2,,GRF,200502,Pupil Transportation,310276105.00
+124,hb94,2001,actual,hb94-greenbook,2,,GRF,200503,Bus Purchase Allowance,38614950.00
+124,hb94,2001,actual,hb94-greenbook,2,,GRF,200505,School Lunch Match,9623241.00
+124,hb94,2001,actual,hb94-greenbook,2,,GRF,200509,Adult Literacy Education,10019630.00
+124,hb94,2001,actual,hb94-greenbook,2,,GRF,200511,Auxiliary Services,117725453.00
+124,hb94,2001,actual,hb94-greenbook,2,,GRF,200513,Summer Intervention,28999995.00
+124,hb94,2001,actual,hb94-greenbook,2,,GRF,200514,Post-Secondary/Adult Career-Technic,22349060.00
+124,hb94,2001,actual,hb94-greenbook,2,,GRF,200520,Disadvantaged Pupil Impact Aid,340906643.00
+124,hb94,2001,actual,hb94-greenbook,2,,GRF,200521,Gifted Pupil Program,43315449.00
+124,hb94,2001,actual,hb94-greenbook,2,,GRF,200524,Educational Excellence and Competenc,11730966.00
+124,hb94,2001,actual,hb94-greenbook,2,,GRF,200532,Nonpublic Administration Cost Reimbur,51327971.00
+124,hb94,2001,actual,hb94-greenbook,2,,GRF,200533,School-Age Child Care,1400849.00
+124,hb94,2001,actual,hb94-greenbook,2,,GRF,200534,Desegregation Cost,7095107.00
+124,hb94,2001,actual,hb94-greenbook,2,,GRF,200540,Special Education Enhancements,132556391.00
+124,hb94,2001,actual,hb94-greenbook,2,,GRF,200545,Career-Technical Education Enhancem,29326745.00
+124,hb94,2001,actual,hb94-greenbook,2,,GRF,200546,Charge-Off Supplement,12735476.00
+124,hb94,2001,actual,hb94-greenbook,2,,GRF,200547,Power Equalization,32039506.00
+124,hb94,2001,actual,hb94-greenbook,2,,GRF,200551,Reading Improvement,1699175.00
+124,hb94,2001,actual,hb94-greenbook,2,,GRF,200552,County MR/DD Boards Vehicle Purcha,1522916.00
+124,hb94,2001,actual,hb94-greenbook,2,,GRF,200553,County MR/DD Boards Transportation,8114355.00
+124,hb94,2001,actual,hb94-greenbook,2,,GRF,200558,Emergency Loan Interest Subsidy,5367627.00
+124,hb94,2001,actual,hb94-greenbook,2,,GRF,200566,OhioReads Grants,25062720.00
+124,hb94,2001,actual,hb94-greenbook,2,,GRF,200570,School Improvement Incentive Grants,10025000.00
+124,hb94,2001,actual,hb94-greenbook,2,,GRF,200572,Teacher Incentive Grants,624500.00
+124,hb94,2001,actual,hb94-greenbook,2,,GRF,200573,Character Education,1100000.00
+124,hb94,2001,actual,hb94-greenbook,2,,GRF,200574,Substance Abuse Prevention,2570000.00
+124,hb94,2001,actual,hb94-greenbook,2,,GRF,200901,Property Tax Allocation,661412414.00
+124,hb94,2001,actual,hb94-greenbook,2,,GRF,200906,Tangible Tax Exemption-Education,66208453.00
+124,hb94,2002,enacted,hb94-greenbook,1,,006,200689,Hazardous Waste Removal,0.00
+124,hb94,2002,enacted,hb94-greenbook,1,,017,200612,Base Cost Funding,604000000.00
+124,hb94,2002,enacted,hb94-greenbook,1,,017,200670,School Foundation-Basic Allowance,0.00
+124,hb94,2002,enacted,hb94-greenbook,1,,017,200671,Special Education,0.00
+124,hb94,2002,enacted,hb94-greenbook,1,,017,200672,Vocational Education,0.00
+124,hb94,2002,enacted,hb94-greenbook,1,,017,200682,Lease Rental Payments Reimbursemen,29722100.00
+124,hb94,2002,enacted,hb94-greenbook,1,,017,200694,Bus Purchase One-Time Supplement,0.00
+124,hb94,2002,enacted,hb94-greenbook,1,,018,200649,Disability Access Project,0.00
+124,hb94,2002,enacted,hb94-greenbook,1,,018,200669,Judgment Loan,0.00
+124,hb94,2002,enacted,hb94-greenbook,1,,020,200620,Vocational School Building Assistance,0.00
+124,hb94,2002,enacted,hb94-greenbook,1,,053,200900,School District Property Tax Replacem,102000000.00
+124,hb94,2002,enacted,hb94-greenbook,1,,138,200606,Information Technology,6629469.00
+124,hb94,2002,enacted,hb94-greenbook,1,,309,200601,Educationally Disadvantaged,20759222.00
+124,hb94,2002,enacted,hb94-greenbook,1,,366,200604,Adult Basic Education,17527286.00
+124,hb94,2002,enacted,hb94-greenbook,1,,367,200607,School Food Services,10089884.00
+124,hb94,2002,enacted,hb94-greenbook,1,,368,200614,Veterans' Training,648514.00
+124,hb94,2002,enacted,hb94-greenbook,1,,369,200616,Vocational Education,8000000.00
+124,hb94,2002,enacted,hb94-greenbook,1,,370,200624,Education of Exceptional Children,1364246.00
+124,hb94,2002,enacted,hb94-greenbook,1,,371,200631,EEO Title IV,1155361.00
+124,hb94,2002,enacted,hb94-greenbook,1,,374,200647,ESEA Consolidated Grants,110094.00
+124,hb94,2002,enacted,hb94-greenbook,1,,376,200653,Job Training Partnership Act,0.00
+124,hb94,2002,enacted,hb94-greenbook,1,,378,200660,Math/Science Technology Investments,12696055.00
+124,hb94,2002,enacted,hb94-greenbook,1,,3C5,200661,Federal Dependent Care Programs,18189907.00
+124,hb94,2002,enacted,hb94-greenbook,1,,3D1,200664,Drug Free Schools,20621375.00
+124,hb94,2002,enacted,hb94-greenbook,1,,3D2,200667,Honors Scholarship Program,2454688.00
+124,hb94,2002,enacted,hb94-greenbook,1,,3E2,200668,AIDS Education Project,0.00
+124,hb94,2002,enacted,hb94-greenbook,1,,3H9,200605,Head Start Collaboration Project,250000.00
+124,hb94,2002,enacted,hb94-greenbook,1,,3L6,200617,Federal School Lunch,175274000.00
+124,hb94,2002,enacted,hb94-greenbook,1,,3L7,200618,Federal School Breakfast,45746000.00
+124,hb94,2002,enacted,hb94-greenbook,1,,3L8,200619,Child and Adult Care Programs,60257639.00
+124,hb94,2002,enacted,hb94-greenbook,1,,3L9,200621,Vocational Education Basic Grants,43613582.00
+124,hb94,2002,enacted,hb94-greenbook,1,,3M0,200623,ESEA Title I,320505063.00
+124,hb94,2002,enacted,hb94-greenbook,1,,3M1,200678,ESEA Innovative Education,13595978.00
+124,hb94,2002,enacted,hb94-greenbook,1,,3M2,200680,Individuals with Disabilities Education A,186000000.00
+124,hb94,2002,enacted,hb94-greenbook,1,,3N7,200627,School-To-Work,0.00
+124,hb94,2002,enacted,hb94-greenbook,1,,3P9,200686,SRRC/FRC Evaluation Project,0.00
+124,hb94,2002,enacted,hb94-greenbook,1,,3R3,200654,Goals 2000,0.00
+124,hb94,2002,enacted,hb94-greenbook,1,,3S2,200641,Tech Literacy Transfer,15183430.00
+124,hb94,2002,enacted,hb94-greenbook,1,,3S7,200673,Child Care School Age,0.00
+124,hb94,2002,enacted,hb94-greenbook,1,,3T4,200613,Public Charter Schools,4887260.00
+124,hb94,2002,enacted,hb94-greenbook,1,,3T5,200625,Coordinated School Health,0.00
+124,hb94,2002,enacted,hb94-greenbook,1,,3T6,200611,Class Size Reduction,63000000.00
+124,hb94,2002,enacted,hb94-greenbook,1,,3U2,200662,Teacher Quality Enhancement Grants,1300501.00
+124,hb94,2002,enacted,hb94-greenbook,1,,3U3,200665,Reading Excellence Grant Program,10018756.00
+124,hb94,2002,enacted,hb94-greenbook,1,,3U6,200675,Provision 2 & 3 Grant,191050.00
+124,hb94,2002,enacted,hb94-greenbook,1,,452,200638,Miscellaneous Revenue,1045000.00
+124,hb94,2002,enacted,hb94-greenbook,1,,454,200610,Guidance & Testing,940636.00
+124,hb94,2002,enacted,hb94-greenbook,1,,455,200608,Commodity Foods,10000000.00
+124,hb94,2002,enacted,hb94-greenbook,1,,4D1,200602,Ohio Prevention/Education Resource C,345000.00
+124,hb94,2002,enacted,hb94-greenbook,1,,4L2,200681,Teacher Certification and Licensure,4684143.00
+124,hb94,2002,enacted,hb94-greenbook,1,,4M4,200637,Emergency Services Telecommunicatio,0.00
+124,hb94,2002,enacted,hb94-greenbook,1,,4N5,200639,Impact II,0.00
+124,hb94,2002,enacted,hb94-greenbook,1,,4R7,200695,Indirect Cost Recovery,3942779.00
+124,hb94,2002,enacted,hb94-greenbook,1,,4V7,200633,Interagency Vocational Support,695197.00
+124,hb94,2002,enacted,hb94-greenbook,1,,4Y5,200697,Supplemental School Assistance,0.00
+124,hb94,2002,enacted,hb94-greenbook,1,,596,200656,Ohio Career Information System,743217.00
+124,hb94,2002,enacted,hb94-greenbook,1,,598,200659,Auxiliary Services Mobile Unit,1328910.00
+124,hb94,2002,enacted,hb94-greenbook,1,,5B1,200651,Child Nutrition Services,0.00
+124,hb94,2002,enacted,hb94-greenbook,1,,5F8,200645,Textbooks/Instructional Materials,0.00
+124,hb94,2002,enacted,hb94-greenbook,1,,5H3,200687,School District Solvency Assistance,24000000.00
+124,hb94,2002,enacted,hb94-greenbook,1,,620,200615,Educational Grants,1525000.00
+124,hb94,2002,enacted,hb94-greenbook,1,,GRF,200100,Personal Services,11819828.00
+124,hb94,2002,enacted,hb94-greenbook,1,,GRF,200200,Maintenance,0.00
+124,hb94,2002,enacted,hb94-greenbook,1,,GRF,200300,Equipment,0.00
+124,hb94,2002,enacted,hb94-greenbook,1,,GRF,200320,Maintenance and Equipment,5052866.00
+124,hb94,2002,enacted,hb94-greenbook,1,,GRF,200406,Head Start,98843825.00
+124,hb94,2002,enacted,hb94-greenbook,1,,GRF,200408,Public Preschool,19506206.00
+124,hb94,2002,enacted,hb94-greenbook,1,,GRF,200410,Professional Development,23463829.00
+124,hb94,2002,enacted,hb94-greenbook,1,,GRF,200411,Family and Children First,3550000.00
+124,hb94,2002,enacted,hb94-greenbook,1,,GRF,200412,Driver Education Administration,0.00
+124,hb94,2002,enacted,hb94-greenbook,1,,GRF,200415,Consumer Education,0.00
+124,hb94,2002,enacted,hb94-greenbook,1,,GRF,200416,Vocational Education Match,2381738.00
+124,hb94,2002,enacted,hb94-greenbook,1,,GRF,200417,Professional Development,0.00
+124,hb94,2002,enacted,hb94-greenbook,1,,GRF,200420,Technical Systems Development,6000000.00
+124,hb94,2002,enacted,hb94-greenbook,1,,GRF,200421,Alternative Education Programs,18000000.00
+124,hb94,2002,enacted,hb94-greenbook,1,,GRF,200422,School Management Assistance,2185675.00
+124,hb94,2002,enacted,hb94-greenbook,1,,GRF,200423,Teacher Recruitment,0.00
+124,hb94,2002,enacted,hb94-greenbook,1,,GRF,200424,Policy Analysis,642756.00
+124,hb94,2002,enacted,hb94-greenbook,1,,GRF,200425,Tech Prep Administration,2431012.00
+124,hb94,2002,enacted,hb94-greenbook,1,,GRF,200426,Ohio Educational Computer Network,39871927.00
+124,hb94,2002,enacted,hb94-greenbook,1,,GRF,200427,Academic Standards,8474999.00
+124,hb94,2002,enacted,hb94-greenbook,1,,GRF,200429,Local Professional Development Block,0.00
+124,hb94,2002,enacted,hb94-greenbook,1,,GRF,200431,School Improvement Models,15850000.00
+124,hb94,2002,enacted,hb94-greenbook,1,,GRF,200432,School Conflict Management,626496.00
+124,hb94,2002,enacted,hb94-greenbook,1,,GRF,200433,Reading/Writing Improvement,18962948.00
+124,hb94,2002,enacted,hb94-greenbook,1,,GRF,200437,Student Proficiency,23692045.00
+124,hb94,2002,enacted,hb94-greenbook,1,,GRF,200438,Safe Schools,2050000.00
+124,hb94,2002,enacted,hb94-greenbook,1,,GRF,200441,American Sign Language,232073.00
+124,hb94,2002,enacted,hb94-greenbook,1,,GRF,200442,Child Care Licensing,1517751.00
+124,hb94,2002,enacted,hb94-greenbook,1,,GRF,200443,DeRolph Litigation Expenses,0.00
+124,hb94,2002,enacted,hb94-greenbook,1,,GRF,200444,Professional Recruitment,1917000.00
+124,hb94,2002,enacted,hb94-greenbook,1,,GRF,200445,OhioReads Administration/Volunteer S,5485440.00
+124,hb94,2002,enacted,hb94-greenbook,1,,GRF,200446,Management Information System,16479636.00
+124,hb94,2002,enacted,hb94-greenbook,1,,GRF,200447,GED Testing/Adult High School,2038678.00
+124,hb94,2002,enacted,hb94-greenbook,1,,GRF,200450,Summer Institute for Reading Interventi,0.00
+124,hb94,2002,enacted,hb94-greenbook,1,,GRF,200455,Community Schools,4728935.00
+124,hb94,2002,enacted,hb94-greenbook,1,,GRF,200500,School Finance Equity,23560125.00
+124,hb94,2002,enacted,hb94-greenbook,1,,GRF,200501,Base Cost Funding,4273654781.00
+124,hb94,2002,enacted,hb94-greenbook,1,,GRF,200502,Pupil Transportation,334183786.00
+124,hb94,2002,enacted,hb94-greenbook,1,,GRF,200503,Bus Purchase Allowance,36735279.00
+124,hb94,2002,enacted,hb94-greenbook,1,,GRF,200504,Special Education,0.00
+124,hb94,2002,enacted,hb94-greenbook,1,,GRF,200505,School Lunch Match,9639000.00
+124,hb94,2002,enacted,hb94-greenbook,1,,GRF,200507,Vocational Education,0.00
+124,hb94,2002,enacted,hb94-greenbook,1,,GRF,200509,Adult Literacy Education,8628000.00
+124,hb94,2002,enacted,hb94-greenbook,1,,GRF,200511,Auxiliary Services,122782475.00
+124,hb94,2002,enacted,hb94-greenbook,1,,GRF,200512,Driver Education,0.00
+124,hb94,2002,enacted,hb94-greenbook,1,,GRF,200513,Summer Intervention,31900000.00
+124,hb94,2002,enacted,hb94-greenbook,1,,GRF,200514,Post-Secondary/Adult Career-Technic,23240243.00
+124,hb94,2002,enacted,hb94-greenbook,1,,GRF,200519,Pilot Scholarship Program,0.00
+124,hb94,2002,enacted,hb94-greenbook,1,,GRF,200520,Disadvantaged Pupil Impact Aid,360149743.00
+124,hb94,2002,enacted,hb94-greenbook,1,,GRF,200521,Gifted Pupil Program,45930131.00
+124,hb94,2002,enacted,hb94-greenbook,1,,GRF,200524,Educational Excellence and Competenc,0.00
+124,hb94,2002,enacted,hb94-greenbook,1,,GRF,200525,Parity Aid,99813832.00
+124,hb94,2002,enacted,hb94-greenbook,1,,GRF,200526,Vocational Education Equipment Repla,0.00
+124,hb94,2002,enacted,hb94-greenbook,1,,GRF,200532,Nonpublic Administration Cost Reimbur,53533703.00
+124,hb94,2002,enacted,hb94-greenbook,1,,GRF,200533,School-Age Child Care,0.00
+124,hb94,2002,enacted,hb94-greenbook,1,,GRF,200534,Desegregation Cost,500000.00
+124,hb94,2002,enacted,hb94-greenbook,1,,GRF,200538,Discovery Project Match,0.00
+124,hb94,2002,enacted,hb94-greenbook,1,,GRF,200540,Special Education Enhancements,139006701.00
+124,hb94,2002,enacted,hb94-greenbook,1,,GRF,200541,Peer Review,0.00
+124,hb94,2002,enacted,hb94-greenbook,1,,GRF,200542,National Board Certification,0.00
+124,hb94,2002,enacted,hb94-greenbook,1,,GRF,200543,Entry Year Programs,0.00
+124,hb94,2002,enacted,hb94-greenbook,1,,GRF,200544,Individual Career Plan and Passport,0.00
+124,hb94,2002,enacted,hb94-greenbook,1,,GRF,200545,Career-Technical Education Enhancem,21673574.00
+124,hb94,2002,enacted,hb94-greenbook,1,,GRF,200546,Charge-Off Supplement,39191433.00
+124,hb94,2002,enacted,hb94-greenbook,1,,GRF,200547,Power Equalization,0.00
+124,hb94,2002,enacted,hb94-greenbook,1,,GRF,200551,Reading Improvement,0.00
+124,hb94,2002,enacted,hb94-greenbook,1,,GRF,200552,County MR/DD Boards Vehicle Purcha,1666204.00
+124,hb94,2002,enacted,hb94-greenbook,1,,GRF,200553,County MR/DD Boards Transportation,9575910.00
+124,hb94,2002,enacted,hb94-greenbook,1,,GRF,200558,Emergency Loan Interest Subsidy,4500000.00
+124,hb94,2002,enacted,hb94-greenbook,1,,GRF,200560,Interactive Communication Information,0.00
+124,hb94,2002,enacted,hb94-greenbook,1,,GRF,200566,OhioReads Grants,27148000.00
+124,hb94,2002,enacted,hb94-greenbook,1,,GRF,200568,Adolescent Pregnancy Program,0.00
+124,hb94,2002,enacted,hb94-greenbook,1,,GRF,200570,School Improvement Incentive Grants,837500.00
+124,hb94,2002,enacted,hb94-greenbook,1,,GRF,200572,Teacher Incentive Grants,0.00
+124,hb94,2002,enacted,hb94-greenbook,1,,GRF,200573,Character Education,0.00
+124,hb94,2002,enacted,hb94-greenbook,1,,GRF,200574,Substance Abuse Prevention,1948200.00
+124,hb94,2002,enacted,hb94-greenbook,1,,GRF,200577,Preschool Special Education,0.00
+124,hb94,2002,enacted,hb94-greenbook,1,,GRF,200580,Bethel School Clean-Up,65000.00
+124,hb94,2002,enacted,hb94-greenbook,1,,GRF,200589,Special Education Aides,0.00
+124,hb94,2002,enacted,hb94-greenbook,1,,GRF,200901,Property Tax Allocation,707700000.00
+124,hb94,2002,enacted,hb94-greenbook,1,,GRF,200906,Tangible Tax Exemption-Education,73500000.00
+124,hb94,2003,enacted,hb94-greenbook,1,,006,200689,Hazardous Waste Removal,0.00
+124,hb94,2003,enacted,hb94-greenbook,1,,017,200612,Base Cost Funding,596000000.00
+124,hb94,2003,enacted,hb94-greenbook,1,,017,200670,School Foundation-Basic Allowance,0.00
+124,hb94,2003,enacted,hb94-greenbook,1,,017,200671,Special Education,0.00
+124,hb94,2003,enacted,hb94-greenbook,1,,017,200672,Vocational Education,0.00
+124,hb94,2003,enacted,hb94-greenbook,1,,017,200682,Lease Rental Payments Reimbursemen,25722600.00
+124,hb94,2003,enacted,hb94-greenbook,1,,017,200694,Bus Purchase One-Time Supplement,0.00
+124,hb94,2003,enacted,hb94-greenbook,1,,018,200649,Disability Access Project,0.00
+124,hb94,2003,enacted,hb94-greenbook,1,,018,200669,Judgment Loan,0.00
+124,hb94,2003,enacted,hb94-greenbook,1,,020,200620,Vocational School Building Assistance,0.00
+124,hb94,2003,enacted,hb94-greenbook,1,,053,200900,School District Property Tax Replacem,115911593.00
+124,hb94,2003,enacted,hb94-greenbook,1,,138,200606,Information Technology,6761034.00
+124,hb94,2003,enacted,hb94-greenbook,1,,309,200601,Educationally Disadvantaged,21425345.00
+124,hb94,2003,enacted,hb94-greenbook,1,,366,200604,Adult Basic Education,18140740.00
+124,hb94,2003,enacted,hb94-greenbook,1,,367,200607,School Food Services,10408199.00
+124,hb94,2003,enacted,hb94-greenbook,1,,368,200614,Veterans' Training,671212.00
+124,hb94,2003,enacted,hb94-greenbook,1,,369,200616,Vocational Education,8000000.00
+124,hb94,2003,enacted,hb94-greenbook,1,,370,200624,Education of Exceptional Children,1410908.00
+124,hb94,2003,enacted,hb94-greenbook,1,,371,200631,EEO Title IV,1213894.00
+124,hb94,2003,enacted,hb94-greenbook,1,,374,200647,ESEA Consolidated Grants,110094.00
+124,hb94,2003,enacted,hb94-greenbook,1,,376,200653,Job Training Partnership Act,0.00
+124,hb94,2003,enacted,hb94-greenbook,1,,378,200660,Math/Science Technology Investments,13036530.00
+124,hb94,2003,enacted,hb94-greenbook,1,,3C5,200661,Federal Dependent Care Programs,18233488.00
+124,hb94,2003,enacted,hb94-greenbook,1,,3D1,200664,Drug Free Schools,20660570.00
+124,hb94,2003,enacted,hb94-greenbook,1,,3D2,200667,Honors Scholarship Program,2540602.00
+124,hb94,2003,enacted,hb94-greenbook,1,,3E2,200668,AIDS Education Project,0.00
+124,hb94,2003,enacted,hb94-greenbook,1,,3H9,200605,Head Start Collaboration Project,250000.00
+124,hb94,2003,enacted,hb94-greenbook,1,,3L6,200617,Federal School Lunch,180181672.00
+124,hb94,2003,enacted,hb94-greenbook,1,,3L7,200618,Federal School Breakfast,47026888.00
+124,hb94,2003,enacted,hb94-greenbook,1,,3L8,200619,Child and Adult Care Programs,61966125.00
+124,hb94,2003,enacted,hb94-greenbook,1,,3L9,200621,Vocational Education Basic Grants,45142330.00
+124,hb94,2003,enacted,hb94-greenbook,1,,3M0,200623,ESEA Title I,330172277.00
+124,hb94,2003,enacted,hb94-greenbook,1,,3M1,200678,ESEA Innovative Education,14059555.00
+124,hb94,2003,enacted,hb94-greenbook,1,,3M2,200680,Individuals with Disabilities Education A,206000000.00
+124,hb94,2003,enacted,hb94-greenbook,1,,3N7,200627,School-To-Work,0.00
+124,hb94,2003,enacted,hb94-greenbook,1,,3P9,200686,SRRC/FRC Evaluation Project,0.00
+124,hb94,2003,enacted,hb94-greenbook,1,,3R3,200654,Goals 2000,0.00
+124,hb94,2003,enacted,hb94-greenbook,1,,3S2,200641,Tech Literacy Transfer,15183430.00
+124,hb94,2003,enacted,hb94-greenbook,1,,3S7,200673,Child Care School Age,0.00
+124,hb94,2003,enacted,hb94-greenbook,1,,3T4,200613,Public Charter Schools,5055185.00
+124,hb94,2003,enacted,hb94-greenbook,1,,3T5,200625,Coordinated School Health,0.00
+124,hb94,2003,enacted,hb94-greenbook,1,,3T6,200611,Class Size Reduction,65000000.00
+124,hb94,2003,enacted,hb94-greenbook,1,,3U2,200662,Teacher Quality Enhancement Grants,1352000.00
+124,hb94,2003,enacted,hb94-greenbook,1,,3U3,200665,Reading Excellence Grant Program,0.00
+124,hb94,2003,enacted,hb94-greenbook,1,,3U6,200675,Provision 2 & 3 Grant,0.00
+124,hb94,2003,enacted,hb94-greenbook,1,,452,200638,Miscellaneous Revenue,1045000.00
+124,hb94,2003,enacted,hb94-greenbook,1,,454,200610,Guidance & Testing,956761.00
+124,hb94,2003,enacted,hb94-greenbook,1,,455,200608,Commodity Foods,11000000.00
+124,hb94,2003,enacted,hb94-greenbook,1,,4D1,200602,Ohio Prevention/Education Resource C,345000.00
+124,hb94,2003,enacted,hb94-greenbook,1,,4L2,200681,Teacher Certification and Licensure,4856290.00
+124,hb94,2003,enacted,hb94-greenbook,1,,4M4,200637,Emergency Services Telecommunicatio,0.00
+124,hb94,2003,enacted,hb94-greenbook,1,,4N5,200639,Impact II,0.00
+124,hb94,2003,enacted,hb94-greenbook,1,,4R7,200695,Indirect Cost Recovery,4168947.00
+124,hb94,2003,enacted,hb94-greenbook,1,,4V7,200633,Interagency Vocational Support,731674.00
+124,hb94,2003,enacted,hb94-greenbook,1,,4Y5,200697,Supplemental School Assistance,0.00
+124,hb94,2003,enacted,hb94-greenbook,1,,596,200656,Ohio Career Information System,769230.00
+124,hb94,2003,enacted,hb94-greenbook,1,,598,200659,Auxiliary Services Mobile Unit,1328910.00
+124,hb94,2003,enacted,hb94-greenbook,1,,5B1,200651,Child Nutrition Services,0.00
+124,hb94,2003,enacted,hb94-greenbook,1,,5F8,200645,Textbooks/Instructional Materials,0.00
+124,hb94,2003,enacted,hb94-greenbook,1,,5H3,200687,School District Solvency Assistance,24000000.00
+124,hb94,2003,enacted,hb94-greenbook,1,,620,200615,Educational Grants,1525000.00
+124,hb94,2003,enacted,hb94-greenbook,1,,GRF,200100,Personal Services,12113828.00
+124,hb94,2003,enacted,hb94-greenbook,1,,GRF,200200,Maintenance,0.00
+124,hb94,2003,enacted,hb94-greenbook,1,,GRF,200300,Equipment,0.00
+124,hb94,2003,enacted,hb94-greenbook,1,,GRF,200320,Maintenance and Equipment,5185051.00
+124,hb94,2003,enacted,hb94-greenbook,1,,GRF,200406,Head Start,98843825.00
+124,hb94,2003,enacted,hb94-greenbook,1,,GRF,200408,Public Preschool,19506206.00
+124,hb94,2003,enacted,hb94-greenbook,1,,GRF,200410,Professional Development,34810579.00
+124,hb94,2003,enacted,hb94-greenbook,1,,GRF,200411,Family and Children First,3550000.00
+124,hb94,2003,enacted,hb94-greenbook,1,,GRF,200412,Driver Education Administration,0.00
+124,hb94,2003,enacted,hb94-greenbook,1,,GRF,200415,Consumer Education,0.00
+124,hb94,2003,enacted,hb94-greenbook,1,,GRF,200416,Vocational Education Match,2381738.00
+124,hb94,2003,enacted,hb94-greenbook,1,,GRF,200417,Professional Development,0.00
+124,hb94,2003,enacted,hb94-greenbook,1,,GRF,200420,Technical Systems Development,6500000.00
+124,hb94,2003,enacted,hb94-greenbook,1,,GRF,200421,Alternative Education Programs,18000000.00
+124,hb94,2003,enacted,hb94-greenbook,1,,GRF,200422,School Management Assistance,1971219.00
+124,hb94,2003,enacted,hb94-greenbook,1,,GRF,200423,Teacher Recruitment,0.00
+124,hb94,2003,enacted,hb94-greenbook,1,,GRF,200424,Policy Analysis,674894.00
+124,hb94,2003,enacted,hb94-greenbook,1,,GRF,200425,Tech Prep Administration,2431012.00
+124,hb94,2003,enacted,hb94-greenbook,1,,GRF,200426,Ohio Educational Computer Network,39871927.00
+124,hb94,2003,enacted,hb94-greenbook,1,,GRF,200427,Academic Standards,8862500.00
+124,hb94,2003,enacted,hb94-greenbook,1,,GRF,200429,Local Professional Development Block,0.00
+124,hb94,2003,enacted,hb94-greenbook,1,,GRF,200431,School Improvement Models,14625000.00
+124,hb94,2003,enacted,hb94-greenbook,1,,GRF,200432,School Conflict Management,657821.00
+124,hb94,2003,enacted,hb94-greenbook,1,,GRF,200433,Reading/Writing Improvement,19276694.00
+124,hb94,2003,enacted,hb94-greenbook,1,,GRF,200437,Student Proficiency,25942045.00
+124,hb94,2003,enacted,hb94-greenbook,1,,GRF,200438,Safe Schools,2050000.00
+124,hb94,2003,enacted,hb94-greenbook,1,,GRF,200441,American Sign Language,236715.00
+124,hb94,2003,enacted,hb94-greenbook,1,,GRF,200442,Child Care Licensing,1548107.00
+124,hb94,2003,enacted,hb94-greenbook,1,,GRF,200443,DeRolph Litigation Expenses,0.00
+124,hb94,2003,enacted,hb94-greenbook,1,,GRF,200444,Professional Recruitment,1705800.00
+124,hb94,2003,enacted,hb94-greenbook,1,,GRF,200445,OhioReads Administration/Volunteer S,5485440.00
+124,hb94,2003,enacted,hb94-greenbook,1,,GRF,200446,Management Information System,17573430.00
+124,hb94,2003,enacted,hb94-greenbook,1,,GRF,200447,GED Testing/Adult High School,2079451.00
+124,hb94,2003,enacted,hb94-greenbook,1,,GRF,200450,Summer Institute for Reading Interventi,0.00
+124,hb94,2003,enacted,hb94-greenbook,1,,GRF,200455,Community Schools,4824517.00
+124,hb94,2003,enacted,hb94-greenbook,1,,GRF,200500,School Finance Equity,19975864.00
+124,hb94,2003,enacted,hb94-greenbook,1,,GRF,200501,Base Cost Funding,4441014505.00
+124,hb94,2003,enacted,hb94-greenbook,1,,GRF,200502,Pupil Transportation,377305465.00
+124,hb94,2003,enacted,hb94-greenbook,1,,GRF,200503,Bus Purchase Allowance,36799984.00
+124,hb94,2003,enacted,hb94-greenbook,1,,GRF,200504,Special Education,0.00
+124,hb94,2003,enacted,hb94-greenbook,1,,GRF,200505,School Lunch Match,9831780.00
+124,hb94,2003,enacted,hb94-greenbook,1,,GRF,200507,Vocational Education,0.00
+124,hb94,2003,enacted,hb94-greenbook,1,,GRF,200509,Adult Literacy Education,8628000.00
+124,hb94,2003,enacted,hb94-greenbook,1,,GRF,200511,Auxiliary Services,127650709.00
+124,hb94,2003,enacted,hb94-greenbook,1,,GRF,200512,Driver Education,0.00
+124,hb94,2003,enacted,hb94-greenbook,1,,GRF,200513,Summer Intervention,38280000.00
+124,hb94,2003,enacted,hb94-greenbook,1,,GRF,200514,Post-Secondary/Adult Career-Technic,23240243.00
+124,hb94,2003,enacted,hb94-greenbook,1,,GRF,200519,Pilot Scholarship Program,0.00
+124,hb94,2003,enacted,hb94-greenbook,1,,GRF,200520,Disadvantaged Pupil Impact Aid,360149743.00
+124,hb94,2003,enacted,hb94-greenbook,1,,GRF,200521,Gifted Pupil Program,47983321.00
+124,hb94,2003,enacted,hb94-greenbook,1,,GRF,200524,Educational Excellence and Competenc,0.00
+124,hb94,2003,enacted,hb94-greenbook,1,,GRF,200525,Parity Aid,210305911.00
+124,hb94,2003,enacted,hb94-greenbook,1,,GRF,200526,Vocational Education Equipment Repla,0.00
+124,hb94,2003,enacted,hb94-greenbook,1,,GRF,200532,Nonpublic Administration Cost Reimbur,55675051.00
+124,hb94,2003,enacted,hb94-greenbook,1,,GRF,200533,School-Age Child Care,0.00
+124,hb94,2003,enacted,hb94-greenbook,1,,GRF,200534,Desegregation Cost,500000.00
+124,hb94,2003,enacted,hb94-greenbook,1,,GRF,200538,Discovery Project Match,0.00
+124,hb94,2003,enacted,hb94-greenbook,1,,GRF,200540,Special Education Enhancements,141950428.00
+124,hb94,2003,enacted,hb94-greenbook,1,,GRF,200541,Peer Review,0.00
+124,hb94,2003,enacted,hb94-greenbook,1,,GRF,200542,National Board Certification,0.00
+124,hb94,2003,enacted,hb94-greenbook,1,,GRF,200543,Entry Year Programs,0.00
+124,hb94,2003,enacted,hb94-greenbook,1,,GRF,200544,Individual Career Plan and Passport,0.00
+124,hb94,2003,enacted,hb94-greenbook,1,,GRF,200545,Career-Technical Education Enhancem,22406349.00
+124,hb94,2003,enacted,hb94-greenbook,1,,GRF,200546,Charge-Off Supplement,28684104.00
+124,hb94,2003,enacted,hb94-greenbook,1,,GRF,200547,Power Equalization,0.00
+124,hb94,2003,enacted,hb94-greenbook,1,,GRF,200551,Reading Improvement,0.00
+124,hb94,2003,enacted,hb94-greenbook,1,,GRF,200552,County MR/DD Boards Vehicle Purcha,1666204.00
+124,hb94,2003,enacted,hb94-greenbook,1,,GRF,200553,County MR/DD Boards Transportation,9575910.00
+124,hb94,2003,enacted,hb94-greenbook,1,,GRF,200558,Emergency Loan Interest Subsidy,3300000.00
+124,hb94,2003,enacted,hb94-greenbook,1,,GRF,200560,Interactive Communication Information,0.00
+124,hb94,2003,enacted,hb94-greenbook,1,,GRF,200566,OhioReads Grants,27148000.00
+124,hb94,2003,enacted,hb94-greenbook,1,,GRF,200568,Adolescent Pregnancy Program,0.00
+124,hb94,2003,enacted,hb94-greenbook,1,,GRF,200570,School Improvement Incentive Grants,987500.00
+124,hb94,2003,enacted,hb94-greenbook,1,,GRF,200572,Teacher Incentive Grants,0.00
+124,hb94,2003,enacted,hb94-greenbook,1,,GRF,200573,Character Education,0.00
+124,hb94,2003,enacted,hb94-greenbook,1,,GRF,200574,Substance Abuse Prevention,1948200.00
+124,hb94,2003,enacted,hb94-greenbook,1,,GRF,200577,Preschool Special Education,0.00
+124,hb94,2003,enacted,hb94-greenbook,1,,GRF,200580,Bethel School Clean-Up,65000.00
+124,hb94,2003,enacted,hb94-greenbook,1,,GRF,200589,Special Education Aides,0.00
+124,hb94,2003,enacted,hb94-greenbook,1,,GRF,200901,Property Tax Allocation,743000000.00
+124,hb94,2003,enacted,hb94-greenbook,1,,GRF,200906,Tangible Tax Exemption-Education,75700000.00
+125,hb95,2002,actual,hb95-greenbook,1,,017,200612,Base Cost Funding,604000000.00
+125,hb95,2002,actual,hb95-greenbook,1,,017,200682,Lease Rental Payments Reimburseme,29722100.00
+125,hb95,2002,actual,hb95-greenbook,1,,020,200620,Vocational School Building Assistance,1207564.00
+125,hb95,2002,actual,hb95-greenbook,1,,053,200900,School District Property Tax Replacem,99000108.00
+125,hb95,2002,actual,hb95-greenbook,1,,138,200606,Computer Services,4975341.00
+125,hb95,2002,actual,hb95-greenbook,1,,309,200601,Educationally Disadvantaged,18449596.00
+125,hb95,2002,actual,hb95-greenbook,1,,366,200604,Adult Basic Education,17432788.00
+125,hb95,2002,actual,hb95-greenbook,1,,367,200607,School Food Services,10581675.00
+125,hb95,2002,actual,hb95-greenbook,1,,368,200614,Veterans' Training,576478.00
+125,hb95,2002,actual,hb95-greenbook,1,,369,200616,Career-Technical Education Federal En,4112166.00
+125,hb95,2002,actual,hb95-greenbook,1,,370,200624,Education of Exceptional Children,1171454.00
+125,hb95,2002,actual,hb95-greenbook,1,,371,200631,EEO Title IV,981137.00
+125,hb95,2002,actual,hb95-greenbook,1,,374,200647,Troops to Teachers,86096.00
+125,hb95,2002,actual,hb95-greenbook,1,,378,200660,Math/Science Technology Investments,13196410.00
+125,hb95,2002,actual,hb95-greenbook,1,,3C5,200661,Early Childhood Education,17954770.00
+125,hb95,2002,actual,hb95-greenbook,1,,3D1,200664,Drug Free Schools,12490673.00
+125,hb95,2002,actual,hb95-greenbook,1,,3D2,200667,Honors Scholarship Program,1673000.00
+125,hb95,2002,actual,hb95-greenbook,1,,3H9,200605,Head Start Collaboration Project,238056.00
+125,hb95,2002,actual,hb95-greenbook,1,,3L6,200617,Federal School Lunch,169651990.00
+125,hb95,2002,actual,hb95-greenbook,1,,3L7,200618,Federal School Breakfast,36523743.00
+125,hb95,2002,actual,hb95-greenbook,1,,3L8,200619,Child/Adult Food Programs,52840562.00
+125,hb95,2002,actual,hb95-greenbook,1,,3L9,200621,Career-Technical Education Basic Gra,43522748.00
+125,hb95,2002,actual,hb95-greenbook,1,,3M0,200623,ESEA Title 1A,285941101.00
+125,hb95,2002,actual,hb95-greenbook,1,,3M1,200678,Innovative Education,13516811.00
+125,hb95,2002,actual,hb95-greenbook,1,,3M2,200680,Individuals with Disabilities Education A,176829543.00
+125,hb95,2002,actual,hb95-greenbook,1,,3N7,200627,School-To-Work,1261383.00
+125,hb95,2002,actual,hb95-greenbook,1,,3R3,200654,Goals 2000,6006502.00
+125,hb95,2002,actual,hb95-greenbook,1,,3S2,200641,Education Technology,17902804.00
+125,hb95,2002,actual,hb95-greenbook,1,,3T4,200613,Public Charter Schools,15928769.00
+125,hb95,2002,actual,hb95-greenbook,1,,3T6,200611,Class Size Reduction,60849889.00
+125,hb95,2002,actual,hb95-greenbook,1,,3U2,200662,Teacher Quality Enhancement Grants,814332.00
+125,hb95,2002,actual,hb95-greenbook,1,,3U3,200665,Reading Excellence Grant Program,13347010.00
+125,hb95,2002,actual,hb95-greenbook,1,,3U6,200675,Provision 2 & 3 Grant,93160.00
+125,hb95,2002,actual,hb95-greenbook,1,,452,200638,Miscellaneous Revenue,294508.00
+125,hb95,2002,actual,hb95-greenbook,1,,454,200610,Guidance & Testing,481341.00
+125,hb95,2002,actual,hb95-greenbook,1,,455,200608,Commodity Foods,9646991.00
+125,hb95,2002,actual,hb95-greenbook,1,,4D1,200602,Ohio Prevention/Education Resource C,370082.00
+125,hb95,2002,actual,hb95-greenbook,1,,4L2,200681,Teacher Certification and Licensure,4000236.00
+125,hb95,2002,actual,hb95-greenbook,1,,4R7,200695,Indirect Cost Recovery,3525941.00
+125,hb95,2002,actual,hb95-greenbook,1,,4V7,200633,Interagency Support,472554.00
+125,hb95,2002,actual,hb95-greenbook,1,,596,200656,Ohio Career Information System,434661.00
+125,hb95,2002,actual,hb95-greenbook,1,,598,200659,Auxiliary Services Reimbursement,1144208.00
+125,hb95,2002,actual,hb95-greenbook,1,,5B1,200651,Child Nutrition Services,197303.00
+125,hb95,2002,actual,hb95-greenbook,1,,5H3,200687,School District Solvency Assistance,1989988.00
+125,hb95,2002,actual,hb95-greenbook,1,,620,200615,Educational Grants,486255.00
+125,hb95,2002,actual,hb95-greenbook,1,,GRF,200100,Personal Services,10531142.00
+125,hb95,2002,actual,hb95-greenbook,1,,GRF,200320,Maintenance and Equipment,4367532.00
+125,hb95,2002,actual,hb95-greenbook,1,,GRF,200406,Head Start,90945956.00
+125,hb95,2002,actual,hb95-greenbook,1,,GRF,200408,Public Preschool,19645352.00
+125,hb95,2002,actual,hb95-greenbook,1,,GRF,200410,Professional Development,20318867.00
+125,hb95,2002,actual,hb95-greenbook,1,,GRF,200411,Family and Children First,3610414.00
+125,hb95,2002,actual,hb95-greenbook,1,,GRF,200416,Career-Technical Education Match,2514676.00
+125,hb95,2002,actual,hb95-greenbook,1,,GRF,200420,Technical Systems Development,5444897.00
+125,hb95,2002,actual,hb95-greenbook,1,,GRF,200421,Alternative Education Programs,17916669.00
+125,hb95,2002,actual,hb95-greenbook,1,,GRF,200422,School Management Assistance,1357008.00
+125,hb95,2002,actual,hb95-greenbook,1,,GRF,200424,Policy Analysis,626310.00
+125,hb95,2002,actual,hb95-greenbook,1,,GRF,200425,Tech Prep Consortia Support,2544635.00
+125,hb95,2002,actual,hb95-greenbook,1,,GRF,200426,Ohio Educational Computer Network,36570537.00
+125,hb95,2002,actual,hb95-greenbook,1,,GRF,200427,Academic Standards,5585331.00
+125,hb95,2002,actual,hb95-greenbook,1,,GRF,200431,School Improvement Initiatives,11633254.00
+125,hb95,2002,actual,hb95-greenbook,1,,GRF,200432,School Conflict Management,650112.00
+125,hb95,2002,actual,hb95-greenbook,1,,GRF,200433,Reading/Writing/Math Improvement,17752384.00
+125,hb95,2002,actual,hb95-greenbook,1,,GRF,200437,Student Assessment,20537754.00
+125,hb95,2002,actual,hb95-greenbook,1,,GRF,200438,Safe Schools,2047833.00
+125,hb95,2002,actual,hb95-greenbook,1,,GRF,200441,American Sign Language,305781.00
+125,hb95,2002,actual,hb95-greenbook,1,,GRF,200442,Child Care Licensing,1455487.00
+125,hb95,2002,actual,hb95-greenbook,1,,GRF,200444,Professional Recruitment,1201899.00
+125,hb95,2002,actual,hb95-greenbook,1,,GRF,200445,OhioReads Admin/Volunteer Support,5070365.00
+125,hb95,2002,actual,hb95-greenbook,1,,GRF,200446,Education Management Information Sy,14106466.00
+125,hb95,2002,actual,hb95-greenbook,1,,GRF,200447,GED Testing/Adult High School,2093048.00
+125,hb95,2002,actual,hb95-greenbook,1,,GRF,200455,Community Schools,3879159.00
+125,hb95,2002,actual,hb95-greenbook,1,,GRF,200500,School Finance Equity,22649115.00
+125,hb95,2002,actual,hb95-greenbook,1,,GRF,200501,Base Cost Funding,4275243309.00
+125,hb95,2002,actual,hb95-greenbook,1,,GRF,200502,Pupil Transportation,334065252.00
+125,hb95,2002,actual,hb95-greenbook,1,,GRF,200503,Bus Purchase Allowance,34790655.00
+125,hb95,2002,actual,hb95-greenbook,1,,GRF,200505,School Lunch Match,8929403.00
+125,hb95,2002,actual,hb95-greenbook,1,,GRF,200509,Adult Literacy Education,8739607.00
+125,hb95,2002,actual,hb95-greenbook,1,,GRF,200511,Auxiliary Services,122606208.00
+125,hb95,2002,actual,hb95-greenbook,1,,GRF,200513,Student Intervention Services,5685846.00
+125,hb95,2002,actual,hb95-greenbook,1,,GRF,200514,Postsecondary Adult Career-Technical,23958167.00
+125,hb95,2002,actual,hb95-greenbook,1,,GRF,200520,Disadvantaged Pupil Impact Aid,345638782.00
+125,hb95,2002,actual,hb95-greenbook,1,,GRF,200521,Gifted Pupil Program,44553303.00
+125,hb95,2002,actual,hb95-greenbook,1,,GRF,200525,Parity Aid,97467789.00
+125,hb95,2002,actual,hb95-greenbook,1,,GRF,200532,Nonpublic Administrative Cost Reimbur,53520200.00
+125,hb95,2002,actual,hb95-greenbook,1,,GRF,200533,School-Age Child Care,102087.00
+125,hb95,2002,actual,hb95-greenbook,1,,GRF,200534,Desegregation Costs,32925509.00
+125,hb95,2002,actual,hb95-greenbook,1,,GRF,200540,Special Education Enhancements,133528920.00
+125,hb95,2002,actual,hb95-greenbook,1,,GRF,200545,Career-Technical Education Enhancem,23662201.00
+125,hb95,2002,actual,hb95-greenbook,1,,GRF,200546,Charge-Off Supplement,39306115.00
+125,hb95,2002,actual,hb95-greenbook,1,,GRF,200547,Power Equalization,52495.00
+125,hb95,2002,actual,hb95-greenbook,1,,GRF,200552,County MR/DD Boards Vehicle Purcha,1410153.00
+125,hb95,2002,actual,hb95-greenbook,1,,GRF,200553,County MR/DD Boards Transportation,8623588.00
+125,hb95,2002,actual,hb95-greenbook,1,,GRF,200558,Emergency Loan Interest Subsidy,4156147.00
+125,hb95,2002,actual,hb95-greenbook,1,,GRF,200566,OhioReads Grants,27140498.00
+125,hb95,2002,actual,hb95-greenbook,1,,GRF,200570,School Improvement Incentive Grants,837500.00
+125,hb95,2002,actual,hb95-greenbook,1,,GRF,200572,Teacher Incentive Grants,265500.00
+125,hb95,2002,actual,hb95-greenbook,1,,GRF,200574,Substance Abuse Prevention,1962800.00
+125,hb95,2002,actual,hb95-greenbook,1,,GRF,200580,Bethel School Clean-Up,65000.00
+125,hb95,2002,actual,hb95-greenbook,1,,GRF,200901,Property Tax Allocation,705731854.00
+125,hb95,2002,actual,hb95-greenbook,1,,GRF,200906,Tangible Tax Exemption-Education,66925963.00
+125,hb95,2003,actual,hb95-greenbook,1,,017,200612,Base Cost Funding,637000000.00
+125,hb95,2003,actual,hb95-greenbook,1,,017,200682,Lease Rental Payments Reimburseme,35722600.00
+125,hb95,2003,actual,hb95-greenbook,1,,017,200694,Bus Purchase One-Time Supplement,0.00
+125,hb95,2003,actual,hb95-greenbook,1,,020,200620,Vocational School Building Assistance,800000.00
+125,hb95,2003,actual,hb95-greenbook,1,,053,200900,School District Property Tax Replacem,106853446.00
+125,hb95,2003,actual,hb95-greenbook,1,,138,200606,Computer Services,6053815.00
+125,hb95,2003,actual,hb95-greenbook,1,,309,200601,Educationally Disadvantaged,18270274.00
+125,hb95,2003,actual,hb95-greenbook,1,,366,200604,Adult Basic Education,20499344.00
+125,hb95,2003,actual,hb95-greenbook,1,,367,200607,School Food Services,8704579.00
+125,hb95,2003,actual,hb95-greenbook,1,,368,200614,Veterans' Training,558716.00
+125,hb95,2003,actual,hb95-greenbook,1,,369,200616,Career-Technical Education Federal En,8390141.00
+125,hb95,2003,actual,hb95-greenbook,1,,370,200624,Education of Exceptional Children,2164775.00
+125,hb95,2003,actual,hb95-greenbook,1,,371,200631,EEO Title IV,495745.00
+125,hb95,2003,actual,hb95-greenbook,1,,374,200647,Troops to Teachers,71746.00
+125,hb95,2003,actual,hb95-greenbook,1,,376,200653,Job Training Partnership Act,0.00
+125,hb95,2003,actual,hb95-greenbook,1,,378,200660,Math/Science Technology Investments,3970420.00
+125,hb95,2003,actual,hb95-greenbook,1,,3C5,200661,Early Childhood Education,20835677.00
+125,hb95,2003,actual,hb95-greenbook,1,,3D1,200664,Drug Free Schools,13294978.00
+125,hb95,2003,actual,hb95-greenbook,1,,3D2,200667,Honors Scholarship Program,1570008.00
+125,hb95,2003,actual,hb95-greenbook,1,,3H9,200605,Head Start Collaboration Project,94073.00
+125,hb95,2003,actual,hb95-greenbook,1,,3L6,200617,Federal School Lunch,178548675.00
+125,hb95,2003,actual,hb95-greenbook,1,,3L7,200618,Federal School Breakfast,38709804.00
+125,hb95,2003,actual,hb95-greenbook,1,,3L8,200619,Child/Adult Food Programs,57921272.00
+125,hb95,2003,actual,hb95-greenbook,1,,3L9,200621,Career-Technical Education Basic Gra,48268600.00
+125,hb95,2003,actual,hb95-greenbook,1,,3M0,200623,ESEA Title 1A,321638342.00
+125,hb95,2003,actual,hb95-greenbook,1,,3M1,200678,Innovative Education,14054445.00
+125,hb95,2003,actual,hb95-greenbook,1,,3M2,200680,Individuals with Disabilities Education A,226640545.00
+125,hb95,2003,actual,hb95-greenbook,1,,3N7,200627,School-To-Work,494652.00
+125,hb95,2003,actual,hb95-greenbook,1,,3R3,200654,Goals 2000,896815.00
+125,hb95,2003,actual,hb95-greenbook,1,,3S2,200641,Education Technology,6664124.00
+125,hb95,2003,actual,hb95-greenbook,1,,3T4,200613,Public Charter Schools,13605505.00
+125,hb95,2003,actual,hb95-greenbook,1,,3T5,200625,Coordinated School Health,0.00
+125,hb95,2003,actual,hb95-greenbook,1,,3T6,200611,Class Size Reduction,11178929.00
+125,hb95,2003,actual,hb95-greenbook,1,,3U2,200662,Teacher Quality Enhancement Grants,351518.00
+125,hb95,2003,actual,hb95-greenbook,1,,3U3,200665,Reading Excellence Grant Program,2414940.00
+125,hb95,2003,actual,hb95-greenbook,1,,3U6,200675,Provision 2 & 3 Grant,0.00
+125,hb95,2003,actual,hb95-greenbook,1,,3X5,200684,School Renovation/IDEA,12061228.00
+125,hb95,2003,actual,hb95-greenbook,1,,3Y2,200688,21st Century Community Learning Ctr,7217553.00
+125,hb95,2003,actual,hb95-greenbook,1,,3Y4,200632,Reading First,165177.00
+125,hb95,2003,actual,hb95-greenbook,1,,3Y5,200634,Community Service Grants,305458.00
+125,hb95,2003,actual,hb95-greenbook,1,,3Y6,200635,Improving Teacher Quality,70742971.00
+125,hb95,2003,actual,hb95-greenbook,1,,3Y7,200689,English Language Acquisition,2433854.00
+125,hb95,2003,actual,hb95-greenbook,1,,3Y8,200639,Rural and Low Income,1129979.00
+125,hb95,2003,actual,hb95-greenbook,1,,3Z2,200690,State Assessments,10698229.00
+125,hb95,2003,actual,hb95-greenbook,1,,452,200638,Miscellaneous Revenue,387027.00
+125,hb95,2003,actual,hb95-greenbook,1,,454,200610,Guidance & Testing,192794.00
+125,hb95,2003,actual,hb95-greenbook,1,,455,200608,Commodity Foods,12777743.00
+125,hb95,2003,actual,hb95-greenbook,1,,4D1,200602,Ohio Prevention/Education Resource C,827500.00
+125,hb95,2003,actual,hb95-greenbook,1,,4L2,200681,Teacher Certification and Licensure,3973112.00
+125,hb95,2003,actual,hb95-greenbook,1,,4M4,200637,Emergency Services Telecommunicati,0.00
+125,hb95,2003,actual,hb95-greenbook,1,,4R7,200695,Indirect Cost Recovery,4025064.00
+125,hb95,2003,actual,hb95-greenbook,1,,4V7,200633,Interagency Support,258576.00
+125,hb95,2003,actual,hb95-greenbook,1,,596,200656,Ohio Career Information System,438323.00
+125,hb95,2003,actual,hb95-greenbook,1,,598,200659,Auxiliary Services Reimbursement,1227792.00
+125,hb95,2003,actual,hb95-greenbook,1,,5B1,200651,Child Nutrition Services,142171.00
+125,hb95,2003,actual,hb95-greenbook,1,,5H3,200687,School District Solvency Assistance,8742000.00
+125,hb95,2003,actual,hb95-greenbook,1,,5U2,200685,National Education Statistics,78619.00
+125,hb95,2003,actual,hb95-greenbook,1,,5W2,200663,Head Start Plus/Head Start,0.00
+125,hb95,2003,actual,hb95-greenbook,1,,620,200615,Educational Grants,855577.00
+125,hb95,2003,actual,hb95-greenbook,1,,GRF,200100,Personal Services,10142648.00
+125,hb95,2003,actual,hb95-greenbook,1,,GRF,200320,Maintenance and Equipment,3797203.00
+125,hb95,2003,actual,hb95-greenbook,1,,GRF,200406,Head Start,88128462.00
+125,hb95,2003,actual,hb95-greenbook,1,,GRF,200408,Public Preschool,18988832.00
+125,hb95,2003,actual,hb95-greenbook,1,,GRF,200410,Professional Development,22899551.00
+125,hb95,2003,actual,hb95-greenbook,1,,GRF,200411,Family and Children First,3337000.00
+125,hb95,2003,actual,hb95-greenbook,1,,GRF,200416,Career-Technical Education Match,2320440.00
+125,hb95,2003,actual,hb95-greenbook,1,,GRF,200420,Technical Systems Development,4777259.00
+125,hb95,2003,actual,hb95-greenbook,1,,GRF,200421,Alternative Education Programs,15463104.00
+125,hb95,2003,actual,hb95-greenbook,1,,GRF,200422,School Management Assistance,1488696.00
+125,hb95,2003,actual,hb95-greenbook,1,,GRF,200424,Policy Analysis,534757.00
+125,hb95,2003,actual,hb95-greenbook,1,,GRF,200425,Tech Prep Consortia Support,1928060.00
+125,hb95,2003,actual,hb95-greenbook,1,,GRF,200426,Ohio Educational Computer Network,33225168.00
+125,hb95,2003,actual,hb95-greenbook,1,,GRF,200427,Academic Standards,6117709.00
+125,hb95,2003,actual,hb95-greenbook,1,,GRF,200431,School Improvement Initiatives,9100175.00
+125,hb95,2003,actual,hb95-greenbook,1,,GRF,200432,School Conflict Management,556006.00
+125,hb95,2003,actual,hb95-greenbook,1,,GRF,200433,Reading/Writing/Math Improvement,17694082.00
+125,hb95,2003,actual,hb95-greenbook,1,,GRF,200437,Student Assessment,26640902.00
+125,hb95,2003,actual,hb95-greenbook,1,,GRF,200438,Safe Schools,1292483.00
+125,hb95,2003,actual,hb95-greenbook,1,,GRF,200439,Accountability/Report Cards,0.00
+125,hb95,2003,actual,hb95-greenbook,1,,GRF,200441,American Sign Language,112768.00
+125,hb95,2003,actual,hb95-greenbook,1,,GRF,200442,Child Care Licensing,1141777.00
+125,hb95,2003,actual,hb95-greenbook,1,,GRF,200444,Professional Recruitment,1036990.00
+125,hb95,2003,actual,hb95-greenbook,1,,GRF,200445,OhioReads Admin/Volunteer Support,4830977.00
+125,hb95,2003,actual,hb95-greenbook,1,,GRF,200446,Education Management Information Sy,14490683.00
+125,hb95,2003,actual,hb95-greenbook,1,,GRF,200447,GED Testing/Adult High School,1483570.00
+125,hb95,2003,actual,hb95-greenbook,1,,GRF,200448,Educator Preparation,0.00
+125,hb95,2003,actual,hb95-greenbook,1,,GRF,200449,Head Start/Head Start Plus Start Up,0.00
+125,hb95,2003,actual,hb95-greenbook,1,,GRF,200450,Summer Institute for Reading Interventi,0.00
+125,hb95,2003,actual,hb95-greenbook,1,,GRF,200452,Teaching Success Comm Initiatives,0.00
+125,hb95,2003,actual,hb95-greenbook,1,,GRF,200455,Community Schools,3866793.00
+125,hb95,2003,actual,hb95-greenbook,1,,GRF,200500,School Finance Equity,18924026.00
+125,hb95,2003,actual,hb95-greenbook,1,,GRF,200501,Base Cost Funding,4376553639.00
+125,hb95,2003,actual,hb95-greenbook,1,,GRF,200502,Pupil Transportation,367530294.00
+125,hb95,2003,actual,hb95-greenbook,1,,GRF,200503,Bus Purchase Allowance,33855064.00
+125,hb95,2003,actual,hb95-greenbook,1,,GRF,200505,School Lunch Match,9101127.00
+125,hb95,2003,actual,hb95-greenbook,1,,GRF,200509,Adult Literacy Education,8805234.00
+125,hb95,2003,actual,hb95-greenbook,1,,GRF,200510,County Commissioners Reimbursemen,1029995.00
+125,hb95,2003,actual,hb95-greenbook,1,,GRF,200511,Auxiliary Services,123058286.00
+125,hb95,2003,actual,hb95-greenbook,1,,GRF,200513,Student Intervention Services,38021766.00
+125,hb95,2003,actual,hb95-greenbook,1,,GRF,200514,Postsecondary Adult Career-Technical,21200354.00
+125,hb95,2003,actual,hb95-greenbook,1,,GRF,200520,Disadvantaged Pupil Impact Aid,320722966.00
+125,hb95,2003,actual,hb95-greenbook,1,,GRF,200521,Gifted Pupil Program,45089424.00
+125,hb95,2003,actual,hb95-greenbook,1,,GRF,200524,Educational Excellence and Competen,0.00
+125,hb95,2003,actual,hb95-greenbook,1,,GRF,200525,Parity Aid,201492689.00
+125,hb95,2003,actual,hb95-greenbook,1,,GRF,200532,Nonpublic Administrative Cost Reimbur,55561342.00
+125,hb95,2003,actual,hb95-greenbook,1,,GRF,200533,School-Age Child Care,0.00
+125,hb95,2003,actual,hb95-greenbook,1,,GRF,200534,Desegregation Costs,458.00
+125,hb95,2003,actual,hb95-greenbook,1,,GRF,200540,Special Education Enhancements,130906483.00
+125,hb95,2003,actual,hb95-greenbook,1,,GRF,200545,Career-Technical Education Enhancem,21006699.00
+125,hb95,2003,actual,hb95-greenbook,1,,GRF,200546,Charge-Off Supplement,36494973.00
+125,hb95,2003,actual,hb95-greenbook,1,,GRF,200547,Power Equalization,0.00
+125,hb95,2003,actual,hb95-greenbook,1,,GRF,200551,Reading Improvement,0.00
+125,hb95,2003,actual,hb95-greenbook,1,,GRF,200552,County MR/DD Boards Vehicle Purcha,1148261.00
+125,hb95,2003,actual,hb95-greenbook,1,,GRF,200553,County MR/DD Boards Transportation,8849536.00
+125,hb95,2003,actual,hb95-greenbook,1,,GRF,200558,Emergency Loan Interest Subsidy,3304902.00
+125,hb95,2003,actual,hb95-greenbook,1,,GRF,200566,OhioReads Grants,26476783.00
+125,hb95,2003,actual,hb95-greenbook,1,,GRF,200570,School Improvement Incentive Grants,836202.00
+125,hb95,2003,actual,hb95-greenbook,1,,GRF,200572,Teacher Incentive Grants,0.00
+125,hb95,2003,actual,hb95-greenbook,1,,GRF,200573,Character Education,0.00
+125,hb95,2003,actual,hb95-greenbook,1,,GRF,200574,Substance Abuse Prevention,1618147.00
+125,hb95,2003,actual,hb95-greenbook,1,,GRF,200578,Safe and Supportive Schools,0.00
+125,hb95,2003,actual,hb95-greenbook,1,,GRF,200580,Bethel School Clean-Up,65000.00
+125,hb95,2003,actual,hb95-greenbook,1,,GRF,200901,Property Tax Allocation,736647353.00
+125,hb95,2003,actual,hb95-greenbook,1,,GRF,200906,Tangible Tax Exemption-Education,67610856.00
+125,hb95,2004,enacted,hb95-greenbook,1,,017,200612,Base Cost Funding,606123500.00
+125,hb95,2004,enacted,hb95-greenbook,1,,017,200682,Lease Rental Payments Reimburseme,31776500.00
+125,hb95,2004,enacted,hb95-greenbook,1,,017,200694,Bus Purchase One-Time Supplement,0.00
+125,hb95,2004,enacted,hb95-greenbook,1,,020,200620,Vocational School Building Assistance,0.00
+125,hb95,2004,enacted,hb95-greenbook,1,,053,200900,School District Property Tax Replacem,115911593.00
+125,hb95,2004,enacted,hb95-greenbook,1,,138,200606,Computer Services,7404690.00
+125,hb95,2004,enacted,hb95-greenbook,1,,309,200601,Educationally Disadvantaged,22148769.00
+125,hb95,2004,enacted,hb95-greenbook,1,,366,200604,Adult Basic Education,21369906.00
+125,hb95,2004,enacted,hb95-greenbook,1,,367,200607,School Food Services,10767759.00
+125,hb95,2004,enacted,hb95-greenbook,1,,368,200614,Veterans' Training,626630.00
+125,hb95,2004,enacted,hb95-greenbook,1,,369,200616,Career-Technical Education Federal En,8165672.00
+125,hb95,2004,enacted,hb95-greenbook,1,,370,200624,Education of Exceptional Children,1933910.00
+125,hb95,2004,enacted,hb95-greenbook,1,,371,200631,EEO Title IV,0.00
+125,hb95,2004,enacted,hb95-greenbook,1,,374,200647,Troops to Teachers,2618076.00
+125,hb95,2004,enacted,hb95-greenbook,1,,376,200653,Job Training Partnership Act,0.00
+125,hb95,2004,enacted,hb95-greenbook,1,,378,200660,Math/Science Technology Investments,0.00
+125,hb95,2004,enacted,hb95-greenbook,1,,3C5,200661,Early Childhood Education,21508746.00
+125,hb95,2004,enacted,hb95-greenbook,1,,3D1,200664,Drug Free Schools,13169757.00
+125,hb95,2004,enacted,hb95-greenbook,1,,3D2,200667,Honors Scholarship Program,1786500.00
+125,hb95,2004,enacted,hb95-greenbook,1,,3H9,200605,Head Start Collaboration Project,275000.00
+125,hb95,2004,enacted,hb95-greenbook,1,,3L6,200617,Federal School Lunch,185948186.00
+125,hb95,2004,enacted,hb95-greenbook,1,,3L7,200618,Federal School Breakfast,48227431.00
+125,hb95,2004,enacted,hb95-greenbook,1,,3L8,200619,Child/Adult Food Programs,63577244.00
+125,hb95,2004,enacted,hb95-greenbook,1,,3L9,200621,Career-Technical Education Basic Gra,48029701.00
+125,hb95,2004,enacted,hb95-greenbook,1,,3M0,200623,ESEA Title 1A,356458504.00
+125,hb95,2004,enacted,hb95-greenbook,1,,3M1,200678,Innovative Education,15041997.00
+125,hb95,2004,enacted,hb95-greenbook,1,,3M2,200680,Individuals with Disabilities Education A,288468284.00
+125,hb95,2004,enacted,hb95-greenbook,1,,3N7,200627,School-To-Work,0.00
+125,hb95,2004,enacted,hb95-greenbook,1,,3R3,200654,Goals 2000,0.00
+125,hb95,2004,enacted,hb95-greenbook,1,,3S2,200641,Education Technology,19682057.00
+125,hb95,2004,enacted,hb95-greenbook,1,,3T4,200613,Public Charter Schools,23287500.00
+125,hb95,2004,enacted,hb95-greenbook,1,,3T5,200625,Coordinated School Health,0.00
+125,hb95,2004,enacted,hb95-greenbook,1,,3T6,200611,Class Size Reduction,0.00
+125,hb95,2004,enacted,hb95-greenbook,1,,3U2,200662,Teacher Quality Enhancement Grants,1285452.00
+125,hb95,2004,enacted,hb95-greenbook,1,,3U3,200665,Reading Excellence Grant Program,0.00
+125,hb95,2004,enacted,hb95-greenbook,1,,3U6,200675,Provision 2 & 3 Grant,0.00
+125,hb95,2004,enacted,hb95-greenbook,1,,3X5,200684,School Renovation/IDEA,0.00
+125,hb95,2004,enacted,hb95-greenbook,1,,3Y2,200688,21st Century Community Learning Ctr,17138239.00
+125,hb95,2004,enacted,hb95-greenbook,1,,3Y4,200632,Reading First,29881256.00
+125,hb95,2004,enacted,hb95-greenbook,1,,3Y5,200634,Community Service Grants,1637148.00
+125,hb95,2004,enacted,hb95-greenbook,1,,3Y6,200635,Improving Teacher Quality,103686420.00
+125,hb95,2004,enacted,hb95-greenbook,1,,3Y7,200689,English Language Acquisition,4872334.00
+125,hb95,2004,enacted,hb95-greenbook,1,,3Y8,200639,Rural and Low Income,1473148.00
+125,hb95,2004,enacted,hb95-greenbook,1,,3Z2,200690,State Assessments,11894315.00
+125,hb95,2004,enacted,hb95-greenbook,1,,3Z3,200645,Consolidated USDE Administration,8700000.00
+125,hb95,2004,enacted,hb95-greenbook,1,,452,200638,Miscellaneous Revenue,500000.00
+125,hb95,2004,enacted,hb95-greenbook,1,,454,200610,Guidance & Testing,956761.00
+125,hb95,2004,enacted,hb95-greenbook,1,,455,200608,Commodity Foods,11308000.00
+125,hb95,2004,enacted,hb95-greenbook,1,,4D1,200602,Ohio Prevention/Education Resource C,347000.00
+125,hb95,2004,enacted,hb95-greenbook,1,,4L2,200681,Teacher Certification and Licensure,5038017.00
+125,hb95,2004,enacted,hb95-greenbook,1,,4M4,200637,Emergency Services Telecommunicati,0.00
+125,hb95,2004,enacted,hb95-greenbook,1,,4R7,200695,Indirect Cost Recovery,5002500.00
+125,hb95,2004,enacted,hb95-greenbook,1,,4V7,200633,Interagency Support,800000.00
+125,hb95,2004,enacted,hb95-greenbook,1,,596,200656,Ohio Career Information System,516694.00
+125,hb95,2004,enacted,hb95-greenbook,1,,598,200659,Auxiliary Services Reimbursement,1328910.00
+125,hb95,2004,enacted,hb95-greenbook,1,,5B1,200651,Child Nutrition Services,800000.00
+125,hb95,2004,enacted,hb95-greenbook,1,,5H3,200687,School District Solvency Assistance,18000000.00
+125,hb95,2004,enacted,hb95-greenbook,1,,5U2,200685,National Education Statistics,200000.00
+125,hb95,2004,enacted,hb95-greenbook,1,,5W2,200663,Head Start Plus/Head Start,57170000.00
+125,hb95,2004,enacted,hb95-greenbook,1,,620,200615,Educational Grants,1000000.00
+125,hb95,2004,enacted,hb95-greenbook,1,,GRF,200100,Personal Services,12211314.00
+125,hb95,2004,enacted,hb95-greenbook,1,,GRF,200320,Maintenance and Equipment,5066249.00
+125,hb95,2004,enacted,hb95-greenbook,1,,GRF,200406,Head Start,0.00
+125,hb95,2004,enacted,hb95-greenbook,1,,GRF,200408,Public Preschool,19018551.00
+125,hb95,2004,enacted,hb95-greenbook,1,,GRF,200410,Professional Development,29490073.00
+125,hb95,2004,enacted,hb95-greenbook,1,,GRF,200411,Family and Children First,3324750.00
+125,hb95,2004,enacted,hb95-greenbook,1,,GRF,200416,Career-Technical Education Match,0.00
+125,hb95,2004,enacted,hb95-greenbook,1,,GRF,200420,Technical Systems Development,5703750.00
+125,hb95,2004,enacted,hb95-greenbook,1,,GRF,200421,Alternative Education Programs,16135547.00
+125,hb95,2004,enacted,hb95-greenbook,1,,GRF,200422,School Management Assistance,1778000.00
+125,hb95,2004,enacted,hb95-greenbook,1,,GRF,200424,Policy Analysis,592220.00
+125,hb95,2004,enacted,hb95-greenbook,1,,GRF,200425,Tech Prep Consortia Support,2133213.00
+125,hb95,2004,enacted,hb95-greenbook,1,,GRF,200426,Ohio Educational Computer Network,34331741.00
+125,hb95,2004,enacted,hb95-greenbook,1,,GRF,200427,Academic Standards,9000592.00
+125,hb95,2004,enacted,hb95-greenbook,1,,GRF,200431,School Improvement Initiatives,10905625.00
+125,hb95,2004,enacted,hb95-greenbook,1,,GRF,200432,School Conflict Management,0.00
+125,hb95,2004,enacted,hb95-greenbook,1,,GRF,200433,Reading/Writing/Math Improvement,20488264.00
+125,hb95,2004,enacted,hb95-greenbook,1,,GRF,200437,Student Assessment,41353391.00
+125,hb95,2004,enacted,hb95-greenbook,1,,GRF,200438,Safe Schools,0.00
+125,hb95,2004,enacted,hb95-greenbook,1,,GRF,200439,Accountability/Report Cards,4087500.00
+125,hb95,2004,enacted,hb95-greenbook,1,,GRF,200441,American Sign Language,207717.00
+125,hb95,2004,enacted,hb95-greenbook,1,,GRF,200442,Child Care Licensing,1385633.00
+125,hb95,2004,enacted,hb95-greenbook,1,,GRF,200444,Professional Recruitment,0.00
+125,hb95,2004,enacted,hb95-greenbook,1,,GRF,200445,OhioReads Admin/Volunteer Support,4500000.00
+125,hb95,2004,enacted,hb95-greenbook,1,,GRF,200446,Education Management Information Sy,16928969.00
+125,hb95,2004,enacted,hb95-greenbook,1,,GRF,200447,GED Testing/Adult High School,1829106.00
+125,hb95,2004,enacted,hb95-greenbook,1,,GRF,200448,Educator Preparation,24375.00
+125,hb95,2004,enacted,hb95-greenbook,1,,GRF,200449,Head Start/Head Start Plus Start Up,11000000.00
+125,hb95,2004,enacted,hb95-greenbook,1,,GRF,200450,Summer Institute for Reading Interventi,0.00
+125,hb95,2004,enacted,hb95-greenbook,1,,GRF,200452,Teaching Success Comm Initiatives,1650000.00
+125,hb95,2004,enacted,hb95-greenbook,1,,GRF,200455,Community Schools,4231842.00
+125,hb95,2004,enacted,hb95-greenbook,1,,GRF,200500,School Finance Equity,14039495.00
+125,hb95,2004,enacted,hb95-greenbook,1,,GRF,200501,Base Cost Funding,4391033023.00
+125,hb95,2004,enacted,hb95-greenbook,1,,GRF,200502,Pupil Transportation,394950126.00
+125,hb95,2004,enacted,hb95-greenbook,1,,GRF,200503,Bus Purchase Allowance,17199960.00
+125,hb95,2004,enacted,hb95-greenbook,1,,GRF,200505,School Lunch Match,8998025.00
+125,hb95,2004,enacted,hb95-greenbook,1,,GRF,200509,Adult Literacy Education,8774250.00
+125,hb95,2004,enacted,hb95-greenbook,1,,GRF,200510,County Commissioners Reimbursemen,0.00
+125,hb95,2004,enacted,hb95-greenbook,1,,GRF,200511,Auxiliary Services,127903356.00
+125,hb95,2004,enacted,hb95-greenbook,1,,GRF,200513,Student Intervention Services,38890815.00
+125,hb95,2004,enacted,hb95-greenbook,1,,GRF,200514,Postsecondary Adult Career-Technical,19919464.00
+125,hb95,2004,enacted,hb95-greenbook,1,,GRF,200520,Disadvantaged Pupil Impact Aid,371766738.00
+125,hb95,2004,enacted,hb95-greenbook,1,,GRF,200521,Gifted Pupil Program,48201031.00
+125,hb95,2004,enacted,hb95-greenbook,1,,GRF,200524,Educational Excellence and Competen,0.00
+125,hb95,2004,enacted,hb95-greenbook,1,,GRF,200525,Parity Aid,320677373.00
+125,hb95,2004,enacted,hb95-greenbook,1,,GRF,200532,Nonpublic Administrative Cost Reimbur,55803103.00
+125,hb95,2004,enacted,hb95-greenbook,1,,GRF,200533,School-Age Child Care,0.00
+125,hb95,2004,enacted,hb95-greenbook,1,,GRF,200534,Desegregation Costs,0.00
+125,hb95,2004,enacted,hb95-greenbook,1,,GRF,200540,Special Education Enhancements,137214484.00
+125,hb95,2004,enacted,hb95-greenbook,1,,GRF,200545,Career-Technical Education Enhancem,14572907.00
+125,hb95,2004,enacted,hb95-greenbook,1,,GRF,200546,Charge-Off Supplement,48478418.00
+125,hb95,2004,enacted,hb95-greenbook,1,,GRF,200547,Power Equalization,0.00
+125,hb95,2004,enacted,hb95-greenbook,1,,GRF,200551,Reading Improvement,0.00
+125,hb95,2004,enacted,hb95-greenbook,1,,GRF,200552,County MR/DD Boards Vehicle Purcha,0.00
+125,hb95,2004,enacted,hb95-greenbook,1,,GRF,200553,County MR/DD Boards Transportation,0.00
+125,hb95,2004,enacted,hb95-greenbook,1,,GRF,200558,Emergency Loan Interest Subsidy,3022500.00
+125,hb95,2004,enacted,hb95-greenbook,1,,GRF,200566,OhioReads Grants,12874777.00
+125,hb95,2004,enacted,hb95-greenbook,1,,GRF,200570,School Improvement Incentive Grants,0.00
+125,hb95,2004,enacted,hb95-greenbook,1,,GRF,200572,Teacher Incentive Grants,0.00
+125,hb95,2004,enacted,hb95-greenbook,1,,GRF,200573,Character Education,0.00
+125,hb95,2004,enacted,hb95-greenbook,1,,GRF,200574,Substance Abuse Prevention,0.00
+125,hb95,2004,enacted,hb95-greenbook,1,,GRF,200578,Safe and Supportive Schools,3576348.00
+125,hb95,2004,enacted,hb95-greenbook,1,,GRF,200580,Bethel School Clean-Up,0.00
+125,hb95,2004,enacted,hb95-greenbook,1,,GRF,200901,Property Tax Allocation,783350000.00
+125,hb95,2004,enacted,hb95-greenbook,1,,GRF,200906,Tangible Tax Exemption-Education,70710000.00
+125,hb95,2005,enacted,hb95-greenbook,1,,017,200612,Base Cost Funding,606195300.00
+125,hb95,2005,enacted,hb95-greenbook,1,,017,200682,Lease Rental Payments Reimburseme,31704700.00
+125,hb95,2005,enacted,hb95-greenbook,1,,017,200694,Bus Purchase One-Time Supplement,0.00
+125,hb95,2005,enacted,hb95-greenbook,1,,020,200620,Vocational School Building Assistance,0.00
+125,hb95,2005,enacted,hb95-greenbook,1,,053,200900,School District Property Tax Replacem,115911593.00
+125,hb95,2005,enacted,hb95-greenbook,1,,138,200606,Computer Services,7635949.00
+125,hb95,2005,enacted,hb95-greenbook,1,,309,200601,Educationally Disadvantaged,22899001.00
+125,hb95,2005,enacted,hb95-greenbook,1,,366,200604,Adult Basic Education,22223820.00
+125,hb95,2005,enacted,hb95-greenbook,1,,367,200607,School Food Services,11144631.00
+125,hb95,2005,enacted,hb95-greenbook,1,,368,200614,Veterans' Training,655587.00
+125,hb95,2005,enacted,hb95-greenbook,1,,369,200616,Career-Technical Education Federal En,8165672.00
+125,hb95,2005,enacted,hb95-greenbook,1,,370,200624,Education of Exceptional Children,1933910.00
+125,hb95,2005,enacted,hb95-greenbook,1,,371,200631,EEO Title IV,0.00
+125,hb95,2005,enacted,hb95-greenbook,1,,374,200647,Troops to Teachers,2622370.00
+125,hb95,2005,enacted,hb95-greenbook,1,,376,200653,Job Training Partnership Act,0.00
+125,hb95,2005,enacted,hb95-greenbook,1,,378,200660,Math/Science Technology Investments,0.00
+125,hb95,2005,enacted,hb95-greenbook,1,,3C5,200661,Early Childhood Education,21508746.00
+125,hb95,2005,enacted,hb95-greenbook,1,,3D1,200664,Drug Free Schools,13347966.00
+125,hb95,2005,enacted,hb95-greenbook,1,,3D2,200667,Honors Scholarship Program,1786500.00
+125,hb95,2005,enacted,hb95-greenbook,1,,3H9,200605,Head Start Collaboration Project,275000.00
+125,hb95,2005,enacted,hb95-greenbook,1,,3L6,200617,Federal School Lunch,191898528.00
+125,hb95,2005,enacted,hb95-greenbook,1,,3L7,200618,Federal School Breakfast,49524254.00
+125,hb95,2005,enacted,hb95-greenbook,1,,3L8,200619,Child/Adult Food Programs,65293830.00
+125,hb95,2005,enacted,hb95-greenbook,1,,3L9,200621,Career-Technical Education Basic Gra,48029701.00
+125,hb95,2005,enacted,hb95-greenbook,1,,3M0,200623,ESEA Title 1A,384975184.00
+125,hb95,2005,enacted,hb95-greenbook,1,,3M1,200678,Innovative Education,16094937.00
+125,hb95,2005,enacted,hb95-greenbook,1,,3M2,200680,Individuals with Disabilities Education A,331392575.00
+125,hb95,2005,enacted,hb95-greenbook,1,,3N7,200627,School-To-Work,0.00
+125,hb95,2005,enacted,hb95-greenbook,1,,3R3,200654,Goals 2000,0.00
+125,hb95,2005,enacted,hb95-greenbook,1,,3S2,200641,Education Technology,20469339.00
+125,hb95,2005,enacted,hb95-greenbook,1,,3T4,200613,Public Charter Schools,26187113.00
+125,hb95,2005,enacted,hb95-greenbook,1,,3T5,200625,Coordinated School Health,0.00
+125,hb95,2005,enacted,hb95-greenbook,1,,3T6,200611,Class Size Reduction,0.00
+125,hb95,2005,enacted,hb95-greenbook,1,,3U2,200662,Teacher Quality Enhancement Grants,0.00
+125,hb95,2005,enacted,hb95-greenbook,1,,3U3,200665,Reading Excellence Grant Program,0.00
+125,hb95,2005,enacted,hb95-greenbook,1,,3U6,200675,Provision 2 & 3 Grant,0.00
+125,hb95,2005,enacted,hb95-greenbook,1,,3X5,200684,School Renovation/IDEA,0.00
+125,hb95,2005,enacted,hb95-greenbook,1,,3Y2,200688,21st Century Community Learning Ctr,18500000.00
+125,hb95,2005,enacted,hb95-greenbook,1,,3Y4,200632,Reading First,33168194.00
+125,hb95,2005,enacted,hb95-greenbook,1,,3Y5,200634,Community Service Grants,0.00
+125,hb95,2005,enacted,hb95-greenbook,1,,3Y6,200635,Improving Teacher Quality,104100000.00
+125,hb95,2005,enacted,hb95-greenbook,1,,3Y7,200689,English Language Acquisition,5505737.00
+125,hb95,2005,enacted,hb95-greenbook,1,,3Y8,200639,Rural and Low Income,1500000.00
+125,hb95,2005,enacted,hb95-greenbook,1,,3Z2,200690,State Assessments,12489031.00
+125,hb95,2005,enacted,hb95-greenbook,1,,3Z3,200645,Consolidated USDE Administration,9200000.00
+125,hb95,2005,enacted,hb95-greenbook,1,,452,200638,Miscellaneous Revenue,500000.00
+125,hb95,2005,enacted,hb95-greenbook,1,,454,200610,Guidance & Testing,956761.00
+125,hb95,2005,enacted,hb95-greenbook,1,,455,200608,Commodity Foods,11624624.00
+125,hb95,2005,enacted,hb95-greenbook,1,,4D1,200602,Ohio Prevention/Education Resource C,347000.00
+125,hb95,2005,enacted,hb95-greenbook,1,,4L2,200681,Teacher Certification and Licensure,5236517.00
+125,hb95,2005,enacted,hb95-greenbook,1,,4M4,200637,Emergency Services Telecommunicati,0.00
+125,hb95,2005,enacted,hb95-greenbook,1,,4R7,200695,Indirect Cost Recovery,5250400.00
+125,hb95,2005,enacted,hb95-greenbook,1,,4V7,200633,Interagency Support,800000.00
+125,hb95,2005,enacted,hb95-greenbook,1,,596,200656,Ohio Career Information System,529761.00
+125,hb95,2005,enacted,hb95-greenbook,1,,598,200659,Auxiliary Services Reimbursement,1328910.00
+125,hb95,2005,enacted,hb95-greenbook,1,,5B1,200651,Child Nutrition Services,800000.00
+125,hb95,2005,enacted,hb95-greenbook,1,,5H3,200687,School District Solvency Assistance,18000000.00
+125,hb95,2005,enacted,hb95-greenbook,1,,5U2,200685,National Education Statistics,200000.00
+125,hb95,2005,enacted,hb95-greenbook,1,,5W2,200663,Head Start Plus/Head Start,108184000.00
+125,hb95,2005,enacted,hb95-greenbook,1,,620,200615,Educational Grants,1000000.00
+125,hb95,2005,enacted,hb95-greenbook,1,,GRF,200100,Personal Services,12211314.00
+125,hb95,2005,enacted,hb95-greenbook,1,,GRF,200320,Maintenance and Equipment,5066249.00
+125,hb95,2005,enacted,hb95-greenbook,1,,GRF,200406,Head Start,0.00
+125,hb95,2005,enacted,hb95-greenbook,1,,GRF,200408,Public Preschool,19018551.00
+125,hb95,2005,enacted,hb95-greenbook,1,,GRF,200410,Professional Development,29765073.00
+125,hb95,2005,enacted,hb95-greenbook,1,,GRF,200411,Family and Children First,3324750.00
+125,hb95,2005,enacted,hb95-greenbook,1,,GRF,200416,Career-Technical Education Match,0.00
+125,hb95,2005,enacted,hb95-greenbook,1,,GRF,200420,Technical Systems Development,5703750.00
+125,hb95,2005,enacted,hb95-greenbook,1,,GRF,200421,Alternative Education Programs,16135547.00
+125,hb95,2005,enacted,hb95-greenbook,1,,GRF,200422,School Management Assistance,1778000.00
+125,hb95,2005,enacted,hb95-greenbook,1,,GRF,200424,Policy Analysis,592220.00
+125,hb95,2005,enacted,hb95-greenbook,1,,GRF,200425,Tech Prep Consortia Support,2133213.00
+125,hb95,2005,enacted,hb95-greenbook,1,,GRF,200426,Ohio Educational Computer Network,34331741.00
+125,hb95,2005,enacted,hb95-greenbook,1,,GRF,200427,Academic Standards,9000592.00
+125,hb95,2005,enacted,hb95-greenbook,1,,GRF,200431,School Improvement Initiatives,10905625.00
+125,hb95,2005,enacted,hb95-greenbook,1,,GRF,200432,School Conflict Management,0.00
+125,hb95,2005,enacted,hb95-greenbook,1,,GRF,200433,Reading/Writing/Math Improvement,20488264.00
+125,hb95,2005,enacted,hb95-greenbook,1,,GRF,200437,Student Assessment,45953391.00
+125,hb95,2005,enacted,hb95-greenbook,1,,GRF,200438,Safe Schools,0.00
+125,hb95,2005,enacted,hb95-greenbook,1,,GRF,200439,Accountability/Report Cards,4087500.00
+125,hb95,2005,enacted,hb95-greenbook,1,,GRF,200441,American Sign Language,207717.00
+125,hb95,2005,enacted,hb95-greenbook,1,,GRF,200442,Child Care Licensing,1385633.00
+125,hb95,2005,enacted,hb95-greenbook,1,,GRF,200444,Professional Recruitment,0.00
+125,hb95,2005,enacted,hb95-greenbook,1,,GRF,200445,OhioReads Admin/Volunteer Support,4500000.00
+125,hb95,2005,enacted,hb95-greenbook,1,,GRF,200446,Education Management Information Sy,16928969.00
+125,hb95,2005,enacted,hb95-greenbook,1,,GRF,200447,GED Testing/Adult High School,1829106.00
+125,hb95,2005,enacted,hb95-greenbook,1,,GRF,200448,Educator Preparation,24375.00
+125,hb95,2005,enacted,hb95-greenbook,1,,GRF,200449,Head Start/Head Start Plus Start Up,5000000.00
+125,hb95,2005,enacted,hb95-greenbook,1,,GRF,200450,Summer Institute for Reading Interventi,0.00
+125,hb95,2005,enacted,hb95-greenbook,1,,GRF,200452,Teaching Success Comm Initiatives,1650000.00
+125,hb95,2005,enacted,hb95-greenbook,1,,GRF,200455,Community Schools,4231842.00
+125,hb95,2005,enacted,hb95-greenbook,1,,GRF,200500,School Finance Equity,7819443.00
+125,hb95,2005,enacted,hb95-greenbook,1,,GRF,200501,Base Cost Funding,4409958425.00
+125,hb95,2005,enacted,hb95-greenbook,1,,GRF,200502,Pupil Transportation,404245812.00
+125,hb95,2005,enacted,hb95-greenbook,1,,GRF,200503,Bus Purchase Allowance,17199960.00
+125,hb95,2005,enacted,hb95-greenbook,1,,GRF,200505,School Lunch Match,8998025.00
+125,hb95,2005,enacted,hb95-greenbook,1,,GRF,200509,Adult Literacy Education,8774250.00
+125,hb95,2005,enacted,hb95-greenbook,1,,GRF,200510,County Commissioners Reimbursemen,0.00
+125,hb95,2005,enacted,hb95-greenbook,1,,GRF,200511,Auxiliary Services,127903356.00
+125,hb95,2005,enacted,hb95-greenbook,1,,GRF,200513,Student Intervention Services,41090815.00
+125,hb95,2005,enacted,hb95-greenbook,1,,GRF,200514,Postsecondary Adult Career-Technical,19919464.00
+125,hb95,2005,enacted,hb95-greenbook,1,,GRF,200520,Disadvantaged Pupil Impact Aid,373266738.00
+125,hb95,2005,enacted,hb95-greenbook,1,,GRF,200521,Gifted Pupil Program,48201031.00
+125,hb95,2005,enacted,hb95-greenbook,1,,GRF,200524,Educational Excellence and Competen,0.00
+125,hb95,2005,enacted,hb95-greenbook,1,,GRF,200525,Parity Aid,426951154.00
+125,hb95,2005,enacted,hb95-greenbook,1,,GRF,200532,Nonpublic Administrative Cost Reimbur,55803103.00
+125,hb95,2005,enacted,hb95-greenbook,1,,GRF,200533,School-Age Child Care,0.00
+125,hb95,2005,enacted,hb95-greenbook,1,,GRF,200534,Desegregation Costs,0.00
+125,hb95,2005,enacted,hb95-greenbook,1,,GRF,200540,Special Education Enhancements,139536046.00
+125,hb95,2005,enacted,hb95-greenbook,1,,GRF,200545,Career-Technical Education Enhancem,14572907.00
+125,hb95,2005,enacted,hb95-greenbook,1,,GRF,200546,Charge-Off Supplement,48478418.00
+125,hb95,2005,enacted,hb95-greenbook,1,,GRF,200547,Power Equalization,0.00
+125,hb95,2005,enacted,hb95-greenbook,1,,GRF,200551,Reading Improvement,0.00
+125,hb95,2005,enacted,hb95-greenbook,1,,GRF,200552,County MR/DD Boards Vehicle Purcha,0.00
+125,hb95,2005,enacted,hb95-greenbook,1,,GRF,200553,County MR/DD Boards Transportation,0.00
+125,hb95,2005,enacted,hb95-greenbook,1,,GRF,200558,Emergency Loan Interest Subsidy,2300000.00
+125,hb95,2005,enacted,hb95-greenbook,1,,GRF,200566,OhioReads Grants,12832272.00
+125,hb95,2005,enacted,hb95-greenbook,1,,GRF,200570,School Improvement Incentive Grants,0.00
+125,hb95,2005,enacted,hb95-greenbook,1,,GRF,200572,Teacher Incentive Grants,0.00
+125,hb95,2005,enacted,hb95-greenbook,1,,GRF,200573,Character Education,0.00
+125,hb95,2005,enacted,hb95-greenbook,1,,GRF,200574,Substance Abuse Prevention,0.00
+125,hb95,2005,enacted,hb95-greenbook,1,,GRF,200578,Safe and Supportive Schools,3576348.00
+125,hb95,2005,enacted,hb95-greenbook,1,,GRF,200580,Bethel School Clean-Up,0.00
+125,hb95,2005,enacted,hb95-greenbook,1,,GRF,200901,Property Tax Allocation,822360000.00
+125,hb95,2005,enacted,hb95-greenbook,1,,GRF,200906,Tangible Tax Exemption-Education,67710000.00
+127,hb119,2005,actual,hb119-greenbook,1,,017,200612,Foundation Funding,606195300.00
+127,hb119,2005,actual,hb119-greenbook,1,,017,200682,Lease Rental Payment Reimbursement,31704700.00
+127,hb119,2005,actual,hb119-greenbook,1,,020,200620,Vocational School Building Assistance,1000000.00
+127,hb119,2005,actual,hb119-greenbook,1,,053,200900,School District Property Tax Replacement -,116520891.00
+127,hb119,2005,actual,hb119-greenbook,1,,138,200606,Computer Services - Operational Support,6870046.00
+127,hb119,2005,actual,hb119-greenbook,1,,309,200601,Educationally Disadvantaged Programs,14584260.00
+127,hb119,2005,actual,hb119-greenbook,1,,366,200604,Adult Basic Education,17902665.00
+127,hb119,2005,actual,hb119-greenbook,1,,367,200607,School Food Services,10278498.00
+127,hb119,2005,actual,hb119-greenbook,1,,368,200614,Veterans' Training,540319.00
+127,hb119,2005,actual,hb119-greenbook,1,,369,200616,Career-Technical Education Federal,5264265.00
+127,hb119,2005,actual,hb119-greenbook,1,,370,200624,Education of Exceptional Children,1195146.00
+127,hb119,2005,actual,hb119-greenbook,1,,371,200631,Immigrant Education Opportunities,243593.00
+127,hb119,2005,actual,hb119-greenbook,1,,374,200647,Troops to Teachers,617999.00
+127,hb119,2005,actual,hb119-greenbook,1,,378,200660,Learn and Serve,956667.00
+127,hb119,2005,actual,hb119-greenbook,1,,3C5,200661,Early Childhood Education,21828553.00
+127,hb119,2005,actual,hb119-greenbook,1,,3D1,200664,Drug Free Schools,12379067.00
+127,hb119,2005,actual,hb119-greenbook,1,,3D2,200667,Honors Scholarship Program,4037228.00
+127,hb119,2005,actual,hb119-greenbook,1,,3H9,200605,Head Start Collaboration Project,411989.00
+127,hb119,2005,actual,hb119-greenbook,1,,3L6,200617,Federal School Lunch,209742574.00
+127,hb119,2005,actual,hb119-greenbook,1,,3L7,200618,Federal School Breakfast,51607275.00
+127,hb119,2005,actual,hb119-greenbook,1,,3L8,200619,Child/Adult Food Programs,61587360.00
+127,hb119,2005,actual,hb119-greenbook,1,,3L9,200621,Career-Technical Education Basic Grant,47286257.00
+127,hb119,2005,actual,hb119-greenbook,1,,3M0,200623,ESEA Title 1A,384512879.00
+127,hb119,2005,actual,hb119-greenbook,1,,3M1,200678,Innovative Education,13277731.00
+127,hb119,2005,actual,hb119-greenbook,1,,3M2,200680,Individuals with Disabilities Education Act,411527679.00
+127,hb119,2005,actual,hb119-greenbook,1,,3R3,200654,Goals 2000,1547.00
+127,hb119,2005,actual,hb119-greenbook,1,,3S2,200641,Education Technology,20231594.00
+127,hb119,2005,actual,hb119-greenbook,1,,3T4,200613,Public Charter Schools,20885506.00
+127,hb119,2005,actual,hb119-greenbook,1,,3T6,200611,Class Size Reduction,244133.00
+127,hb119,2005,actual,hb119-greenbook,1,,3U2,200662,Teacher Quality Enhancement Grants,595527.00
+127,hb119,2005,actual,hb119-greenbook,1,,3U3,200665,Reading Excellence Grant Program,163877.00
+127,hb119,2005,actual,hb119-greenbook,1,,3X5,200684,School Renovation/IDEA,4912434.00
+127,hb119,2005,actual,hb119-greenbook,1,,3Y2,200688,21st Century Community Learning Centers,29098903.00
+127,hb119,2005,actual,hb119-greenbook,1,,3Y4,200632,Reading First,31762814.00
+127,hb119,2005,actual,hb119-greenbook,1,,3Y5,200634,Community Service Grants,571271.00
+127,hb119,2005,actual,hb119-greenbook,1,,3Y6,200635,Improving Teacher Quality,103715394.00
+127,hb119,2005,actual,hb119-greenbook,1,,3Y7,200689,English Language Acquisition,7042883.00
+127,hb119,2005,actual,hb119-greenbook,1,,3Y8,200639,Rural and Low Income Technical Assistance,1481025.00
+127,hb119,2005,actual,hb119-greenbook,1,,3Z2,200690,State Assessments,18050518.00
+127,hb119,2005,actual,hb119-greenbook,1,,3Z3,200645,Consolidated Federal Grant Administration,7598876.00
+127,hb119,2005,actual,hb119-greenbook,1,,452,200638,Miscellaneous Educational Services,265537.00
+127,hb119,2005,actual,hb119-greenbook,1,,454,200610,Guidance & Testing,281199.00
+127,hb119,2005,actual,hb119-greenbook,1,,455,200608,Commodity Foods,16656368.00
+127,hb119,2005,actual,hb119-greenbook,1,,4D1,200602,Ohio Prevention/Education Resource Center,957900.00
+127,hb119,2005,actual,hb119-greenbook,1,,4L2,200681,Teacher Certification and Licensure,4370211.00
+127,hb119,2005,actual,hb119-greenbook,1,,4R7,200695,Indirect Operational Support,4911291.00
+127,hb119,2005,actual,hb119-greenbook,1,,4V7,200633,Interagency Operational Support,185201.00
+127,hb119,2005,actual,hb119-greenbook,1,,596,200656,Ohio Career Information System,466871.00
+127,hb119,2005,actual,hb119-greenbook,1,,598,200659,Auxiliary Services Reimbursement,1095470.00
+127,hb119,2005,actual,hb119-greenbook,1,,5BB,200696,State Action for Education Leadership,474876.00
+127,hb119,2005,actual,hb119-greenbook,1,,5H3,200687,School District Solvency Assistance,16066628.00
+127,hb119,2005,actual,hb119-greenbook,1,,5U2,200685,National Education Statistics,156983.00
+127,hb119,2005,actual,hb119-greenbook,1,,5W2,200663,Early Learning Initiative,44151453.00
+127,hb119,2005,actual,hb119-greenbook,1,,620,200615,Educational Improvement Grants,284195.00
+127,hb119,2005,actual,hb119-greenbook,1,,GRF,200100,Personal Services,11174342.00
+127,hb119,2005,actual,hb119-greenbook,1,,GRF,200320,Maintenance and Equipment,4523134.00
+127,hb119,2005,actual,hb119-greenbook,1,,GRF,200408,Early Childhood Education,18582811.00
+127,hb119,2005,actual,hb119-greenbook,1,,GRF,200410,Educator Training,27577601.00
+127,hb119,2005,actual,hb119-greenbook,1,,GRF,200411,Family and Children First,3125265.00
+127,hb119,2005,actual,hb119-greenbook,1,,GRF,200420,Computer/Application/Network Development,4418075.00
+127,hb119,2005,actual,hb119-greenbook,1,,GRF,200421,Alternative Education Programs,15136156.00
+127,hb119,2005,actual,hb119-greenbook,1,,GRF,200422,School Management Assistance,1623648.00
+127,hb119,2005,actual,hb119-greenbook,1,,GRF,200424,Policy Analysis,487926.00
+127,hb119,2005,actual,hb119-greenbook,1,,GRF,200425,Tech Prep Consortia Support,2076080.00
+127,hb119,2005,actual,hb119-greenbook,1,,GRF,200426,Ohio Educational Computer Network,31303989.00
+127,hb119,2005,actual,hb119-greenbook,1,,GRF,200427,Academic Standards,8211391.00
+127,hb119,2005,actual,hb119-greenbook,1,,GRF,200431,School Improvement Initiatives,9916955.00
+127,hb119,2005,actual,hb119-greenbook,1,,GRF,200433,Literacy Improvement - Professional,17869347.00
+127,hb119,2005,actual,hb119-greenbook,1,,GRF,200437,Student Assessment,31643452.00
+127,hb119,2005,actual,hb119-greenbook,1,,GRF,200439,Accountability/Report Cards,2012954.00
+127,hb119,2005,actual,hb119-greenbook,1,,GRF,200441,American Sign Language,195254.00
+127,hb119,2005,actual,hb119-greenbook,1,,GRF,200442,Child Care Licensing,1538618.00
+127,hb119,2005,actual,hb119-greenbook,1,,GRF,200445,OhioReads Volunteer Support,3510566.00
+127,hb119,2005,actual,hb119-greenbook,1,,GRF,200446,Education Management Information System,15198026.00
+127,hb119,2005,actual,hb119-greenbook,1,,GRF,200447,GED Testing,1486406.00
+127,hb119,2005,actual,hb119-greenbook,1,,GRF,200448,Educator Preparation,20915.00
+127,hb119,2005,actual,hb119-greenbook,1,,GRF,200449,Head Start/Head Start Plus Start Up,4479487.00
+127,hb119,2005,actual,hb119-greenbook,1,,GRF,200452,Teaching Success Commission Initiatives,530687.00
+127,hb119,2005,actual,hb119-greenbook,1,,GRF,200455,Community Schools,3940532.00
+127,hb119,2005,actual,hb119-greenbook,1,,GRF,200500,School Finance Equity,7105137.00
+127,hb119,2005,actual,hb119-greenbook,1,,GRF,200501,Base Cost Funding,4588586501.00
+127,hb119,2005,actual,hb119-greenbook,1,,GRF,200502,Pupil Transportation,404301894.00
+127,hb119,2005,actual,hb119-greenbook,1,,GRF,200503,Bus Purchase Allowance,17048756.00
+127,hb119,2005,actual,hb119-greenbook,1,,GRF,200505,School Lunch Match,8990480.00
+127,hb119,2005,actual,hb119-greenbook,1,,GRF,200509,Adult Literacy Education,8496363.00
+127,hb119,2005,actual,hb119-greenbook,1,,GRF,200511,Auxiliary Services,127854857.00
+127,hb119,2005,actual,hb119-greenbook,1,,GRF,200513,Student Intervention Services,38874974.00
+127,hb119,2005,actual,hb119-greenbook,1,,GRF,200514,Postsecondary Adult Career-Technical,19819126.00
+127,hb119,2005,actual,hb119-greenbook,1,,GRF,200520,Disadvantaged Pupil Impact Aid,348588897.00
+127,hb119,2005,actual,hb119-greenbook,1,,GRF,200521,Gifted Pupil Program,47266441.00
+127,hb119,2005,actual,hb119-greenbook,1,,GRF,200525,Parity Aid,427388580.00
+127,hb119,2005,actual,hb119-greenbook,1,,GRF,200532,Nonpublic Administrative Cost Reimbursement,54063375.00
+127,hb119,2005,actual,hb119-greenbook,1,,GRF,200540,Special Education Enhancements,129477586.00
+127,hb119,2005,actual,hb119-greenbook,1,,GRF,200545,Career-Technical Education Enhancements,12849685.00
+127,hb119,2005,actual,hb119-greenbook,1,,GRF,200546,Charge-Off Supplement,59199463.00
+127,hb119,2005,actual,hb119-greenbook,1,,GRF,200552,County MR/DD Boards Vehicle Purchases,576696.00
+127,hb119,2005,actual,hb119-greenbook,1,,GRF,200558,Emergency Loan Interest Subsidy,2001804.00
+127,hb119,2005,actual,hb119-greenbook,1,,GRF,200566,Literacy Improvement - Classroom Grants,10462342.00
+127,hb119,2005,actual,hb119-greenbook,1,,GRF,200578,Violence Prevention and School Safety,3359886.00
+127,hb119,2005,actual,hb119-greenbook,1,,GRF,200901,Property Tax Allocation - Education,828384762.00
+127,hb119,2005,actual,hb119-greenbook,1,,GRF,200906,Tangible Tax Exemption-Education,54088685.00
+127,hb119,2006,actual,hb119-greenbook,1,,017,200612,Foundation Funding,606208300.00
+127,hb119,2006,actual,hb119-greenbook,1,,017,200682,Lease Rental Payment Reimbursement,31691700.00
+127,hb119,2006,actual,hb119-greenbook,1,,047,200909,School District Property Tax Replacement -,67143154.00
+127,hb119,2006,actual,hb119-greenbook,1,,053,200900,School District Property Tax Replacement -,125978243.00
+127,hb119,2006,actual,hb119-greenbook,1,,138,200606,Computer Services - Operational Support,5344347.00
+127,hb119,2006,actual,hb119-greenbook,1,,309,200601,Educationally Disadvantaged Programs,17427258.00
+127,hb119,2006,actual,hb119-greenbook,1,,366,200604,Adult Basic Education,19422071.00
+127,hb119,2006,actual,hb119-greenbook,1,,367,200607,School Food Services,11327403.00
+127,hb119,2006,actual,hb119-greenbook,1,,368,200614,Veterans' Training,473220.00
+127,hb119,2006,actual,hb119-greenbook,1,,369,200616,Career-Technical Education Federal,5138035.00
+127,hb119,2006,actual,hb119-greenbook,1,,370,200624,Education of Exceptional Children,2531091.00
+127,hb119,2006,actual,hb119-greenbook,1,,371,200631,Immigrant Education Opportunities,150600.00
+127,hb119,2006,actual,hb119-greenbook,1,,374,200647,Troops to Teachers,729412.00
+127,hb119,2006,actual,hb119-greenbook,1,,378,200660,Learn and Serve,1156939.00
+127,hb119,2006,actual,hb119-greenbook,1,,3AF,200603,Schools Medicaid Administrative Claims,158138.00
+127,hb119,2006,actual,hb119-greenbook,1,,3BK,200628,Longitudinal Data Systems,28437.00
+127,hb119,2006,actual,hb119-greenbook,1,,3C5,200661,Early Childhood Education,20878918.00
+127,hb119,2006,actual,hb119-greenbook,1,,3D1,200664,Drug Free Schools,11780533.00
+127,hb119,2006,actual,hb119-greenbook,1,,3D2,200667,Honors Scholarship Program,4380731.00
+127,hb119,2006,actual,hb119-greenbook,1,,3H9,200605,Head Start Collaboration Project,215260.00
+127,hb119,2006,actual,hb119-greenbook,1,,3L6,200617,Federal School Lunch,213082902.00
+127,hb119,2006,actual,hb119-greenbook,1,,3L7,200618,Federal School Breakfast,54584745.00
+127,hb119,2006,actual,hb119-greenbook,1,,3L8,200619,Child/Adult Food Programs,64679007.00
+127,hb119,2006,actual,hb119-greenbook,1,,3L9,200621,Career-Technical Education Basic Grant,48299233.00
+127,hb119,2006,actual,hb119-greenbook,1,,3M0,200623,ESEA Title 1A,396584110.00
+127,hb119,2006,actual,hb119-greenbook,1,,3M1,200678,Innovative Education,7089449.00
+127,hb119,2006,actual,hb119-greenbook,1,,3M2,200680,Individuals with Disabilities Education Act,487004020.00
+127,hb119,2006,actual,hb119-greenbook,1,,3S2,200641,Education Technology,17839465.00
+127,hb119,2006,actual,hb119-greenbook,1,,3T4,200613,Public Charter Schools,21450613.00
+127,hb119,2006,actual,hb119-greenbook,1,,3U2,200662,Teacher Quality Enhancement Grants,748843.00
+127,hb119,2006,actual,hb119-greenbook,1,,3X5,200684,School Renovation/IDEA,723700.00
+127,hb119,2006,actual,hb119-greenbook,1,,3Y2,200688,21st Century Community Learning Centers,30657423.00
+127,hb119,2006,actual,hb119-greenbook,1,,3Y4,200632,Reading First,46375143.00
+127,hb119,2006,actual,hb119-greenbook,1,,3Y5,200634,Community Service Grants,307092.00
+127,hb119,2006,actual,hb119-greenbook,1,,3Y6,200635,Improving Teacher Quality,106161716.00
+127,hb119,2006,actual,hb119-greenbook,1,,3Y7,200689,English Language Acquisition,7035380.00
+127,hb119,2006,actual,hb119-greenbook,1,,3Y8,200639,Rural and Low Income Technical Assistance,1132432.00
+127,hb119,2006,actual,hb119-greenbook,1,,3Z2,200690,State Assessments,8539937.00
+127,hb119,2006,actual,hb119-greenbook,1,,3Z3,200645,Consolidated Federal Grant Administration,6393174.00
+127,hb119,2006,actual,hb119-greenbook,1,,452,200638,Miscellaneous Educational Services,216526.00
+127,hb119,2006,actual,hb119-greenbook,1,,454,200610,Guidance & Testing,595473.00
+127,hb119,2006,actual,hb119-greenbook,1,,455,200608,Commodity Foods,16809035.00
+127,hb119,2006,actual,hb119-greenbook,1,,4L2,200681,Teacher Certification and Licensure,6206888.00
+127,hb119,2006,actual,hb119-greenbook,1,,4R7,200695,Indirect Operational Support,4959055.00
+127,hb119,2006,actual,hb119-greenbook,1,,4V7,200633,Interagency Operational Support,648381.00
+127,hb119,2006,actual,hb119-greenbook,1,,596,200656,Ohio Career Information System,423879.00
+127,hb119,2006,actual,hb119-greenbook,1,,598,200659,Auxiliary Services Reimbursement,1012663.00
+127,hb119,2006,actual,hb119-greenbook,1,,5BB,200696,State Action for Education Leadership,1225110.00
+127,hb119,2006,actual,hb119-greenbook,1,,5H3,200687,School District Solvency Assistance,41000.00
+127,hb119,2006,actual,hb119-greenbook,1,,5U2,200685,National Education Statistics,162488.00
+127,hb119,2006,actual,hb119-greenbook,1,,5W2,200663,Early Learning Initiative,12729277.00
+127,hb119,2006,actual,hb119-greenbook,1,,620,200615,Educational Improvement Grants,1286579.00
+127,hb119,2006,actual,hb119-greenbook,1,,GRF,200100,Personal Services,9678768.00
+127,hb119,2006,actual,hb119-greenbook,1,,GRF,200320,Maintenance and Equipment,3935861.00
+127,hb119,2006,actual,hb119-greenbook,1,,GRF,200408,Early Childhood Education,19016393.00
+127,hb119,2006,actual,hb119-greenbook,1,,GRF,200410,Educator Training,19282518.00
+127,hb119,2006,actual,hb119-greenbook,1,,GRF,200416,Career-Technical Education Match,2224310.00
+127,hb119,2006,actual,hb119-greenbook,1,,GRF,200420,Computer/Application/Network Development,4170217.00
+127,hb119,2006,actual,hb119-greenbook,1,,GRF,200421,Alternative Education Programs,13344758.00
+127,hb119,2006,actual,hb119-greenbook,1,,GRF,200422,School Management Assistance,2593664.00
+127,hb119,2006,actual,hb119-greenbook,1,,GRF,200424,Policy Analysis,542419.00
+127,hb119,2006,actual,hb119-greenbook,1,,GRF,200425,Tech Prep Consortia Support,2054233.00
+127,hb119,2006,actual,hb119-greenbook,1,,GRF,200426,Ohio Educational Computer Network,30447712.00
+127,hb119,2006,actual,hb119-greenbook,1,,GRF,200427,Academic Standards,9701756.00
+127,hb119,2006,actual,hb119-greenbook,1,,GRF,200431,School Improvement Initiatives,19302814.00
+127,hb119,2006,actual,hb119-greenbook,1,,GRF,200433,Literacy Improvement - Professional,10015502.00
+127,hb119,2006,actual,hb119-greenbook,1,,GRF,200437,Student Assessment,59230269.00
+127,hb119,2006,actual,hb119-greenbook,1,,GRF,200439,Accountability/Report Cards,3451843.00
+127,hb119,2006,actual,hb119-greenbook,1,,GRF,200442,Child Care Licensing,879057.00
+127,hb119,2006,actual,hb119-greenbook,1,,GRF,200445,OhioReads Volunteer Support,3708350.00
+127,hb119,2006,actual,hb119-greenbook,1,,GRF,200446,Education Management Information System,15563949.00
+127,hb119,2006,actual,hb119-greenbook,1,,GRF,200447,GED Testing,1828631.00
+127,hb119,2006,actual,hb119-greenbook,1,,GRF,200448,Educator Preparation,1235276.00
+127,hb119,2006,actual,hb119-greenbook,1,,GRF,200452,Teaching Success Commission Initiatives,34057.00
+127,hb119,2006,actual,hb119-greenbook,1,,GRF,200455,Community Schools,1488757.00
+127,hb119,2006,actual,hb119-greenbook,1,,GRF,200501,Base Cost Funding,23550182.00
+127,hb119,2006,actual,hb119-greenbook,1,,GRF,200502,Pupil Transportation,412170713.00
+127,hb119,2006,actual,hb119-greenbook,1,,GRF,200503,Bus Purchase Allowance,14400931.00
+127,hb119,2006,actual,hb119-greenbook,1,,GRF,200505,School Lunch Match,8986466.00
+127,hb119,2006,actual,hb119-greenbook,1,,GRF,200509,Adult Literacy Education,8437205.00
+127,hb119,2006,actual,hb119-greenbook,1,,GRF,200511,Auxiliary Services,127733752.00
+127,hb119,2006,actual,hb119-greenbook,1,,GRF,200513,Student Intervention Services,7377644.00
+127,hb119,2006,actual,hb119-greenbook,1,,GRF,200514,Postsecondary Adult Career-Technical,19608189.00
+127,hb119,2006,actual,hb119-greenbook,1,,GRF,200520,Disadvantaged Pupil Impact Aid,818730.00
+127,hb119,2006,actual,hb119-greenbook,1,,GRF,200521,Gifted Pupil Program,47239110.00
+127,hb119,2006,actual,hb119-greenbook,1,,GRF,200532,Nonpublic Administrative Cost Reimbursement,56716592.00
+127,hb119,2006,actual,hb119-greenbook,1,,GRF,200540,Special Education Enhancements,129035206.00
+127,hb119,2006,actual,hb119-greenbook,1,,GRF,200545,Career-Technical Education Enhancements,10276506.00
+127,hb119,2006,actual,hb119-greenbook,1,,GRF,200550,Foundation Funding,5500523243.00
+127,hb119,2006,actual,hb119-greenbook,1,,GRF,200552,County MR/DD Boards Vehicle Purchases,473500.00
+127,hb119,2006,actual,hb119-greenbook,1,,GRF,200558,Emergency Loan Interest Subsidy,1265594.00
+127,hb119,2006,actual,hb119-greenbook,1,,GRF,200566,Literacy Improvement - Classroom Grants,12345523.00
+127,hb119,2006,actual,hb119-greenbook,1,,GRF,200578,Violence Prevention and School Safety,1060932.00
+127,hb119,2006,actual,hb119-greenbook,1,,GRF,200901,Property Tax Allocation - Education,796169148.00
+127,hb119,2006,actual,hb119-greenbook,1,,GRF,200906,Tangible Tax Exemption-Education,43270947.00
+127,hb119,2007,actual,hb119-greenbook,1,,017,200612,Foundation Funding,606296800.00
+127,hb119,2007,actual,hb119-greenbook,1,,017,200682,Lease Rental Payment Reimbursement,31603200.00
+127,hb119,2007,actual,hb119-greenbook,1,,020,200620,Vocational School Building Assistance,0.00
+127,hb119,2007,actual,hb119-greenbook,1,,047,200909,School District Property Tax Replacement -,420000000.00
+127,hb119,2007,actual,hb119-greenbook,1,,053,200900,School District Property Tax Replacement -,101647522.00
+127,hb119,2007,actual,hb119-greenbook,1,,138,200606,Computer Services - Operational Support,7600091.00
+127,hb119,2007,actual,hb119-greenbook,1,,309,200601,Educationally Disadvantaged Programs,20865560.00
+127,hb119,2007,actual,hb119-greenbook,1,,366,200604,Adult Basic Education,18500001.00
+127,hb119,2007,actual,hb119-greenbook,1,,367,200607,School Food Services,11666732.00
+127,hb119,2007,actual,hb119-greenbook,1,,368,200614,Veterans' Training,691130.00
+127,hb119,2007,actual,hb119-greenbook,1,,369,200616,Career-Technical Education Federal,4895420.00
+127,hb119,2007,actual,hb119-greenbook,1,,370,200624,Education of Exceptional Children,3237762.00
+127,hb119,2007,actual,hb119-greenbook,1,,371,200631,Immigrant Education Opportunities,181500.00
+127,hb119,2007,actual,hb119-greenbook,1,,374,200647,Troops to Teachers,763950.00
+127,hb119,2007,actual,hb119-greenbook,1,,378,200660,Learn and Serve,1200000.00
+127,hb119,2007,actual,hb119-greenbook,1,,3AF,200603,Schools Medicaid Administrative Claims,900000.00
+127,hb119,2007,actual,hb119-greenbook,1,,3BK,200628,Longitudinal Data Systems,2788680.00
+127,hb119,2007,actual,hb119-greenbook,1,,3BV,200636,Character Education,488565.00
+127,hb119,2007,actual,hb119-greenbook,1,,3C5,200661,Early Childhood Education,18989779.00
+127,hb119,2007,actual,hb119-greenbook,1,,3CF,200644,Foreign Language Assistance,100000.00
+127,hb119,2007,actual,hb119-greenbook,1,,3CG,200646,Teacher Incentive Fund,5510860.00
+127,hb119,2007,actual,hb119-greenbook,1,,3D1,200664,Drug Free Schools,13347966.00
+127,hb119,2007,actual,hb119-greenbook,1,,3D2,200667,Honors Scholarship Program,5833965.00
+127,hb119,2007,actual,hb119-greenbook,1,,3H9,200605,Head Start Collaboration Project,275000.00
+127,hb119,2007,actual,hb119-greenbook,1,,3L6,200617,Federal School Lunch,227583653.00
+127,hb119,2007,actual,hb119-greenbook,1,,3L7,200618,Federal School Breakfast,58405608.00
+127,hb119,2007,actual,hb119-greenbook,1,,3L8,200619,Child/Adult Food Programs,67915843.00
+127,hb119,2007,actual,hb119-greenbook,1,,3L9,200621,Career-Technical Education Basic Grant,48029701.00
+127,hb119,2007,actual,hb119-greenbook,1,,3M0,200623,ESEA Title 1A,410000000.00
+127,hb119,2007,actual,hb119-greenbook,1,,3M1,200678,Innovative Education,11800001.00
+127,hb119,2007,actual,hb119-greenbook,1,,3M2,200680,Individuals with Disabilities Education Act,491894073.00
+127,hb119,2007,actual,hb119-greenbook,1,,3R3,200654,Goals 2000,0.00
+127,hb119,2007,actual,hb119-greenbook,1,,3S2,200641,Education Technology,15800000.00
+127,hb119,2007,actual,hb119-greenbook,1,,3T4,200613,Public Charter Schools,13498476.00
+127,hb119,2007,actual,hb119-greenbook,1,,3T6,200611,Class Size Reduction,0.00
+127,hb119,2007,actual,hb119-greenbook,1,,3U2,200662,Teacher Quality Enhancement Grants,795280.00
+127,hb119,2007,actual,hb119-greenbook,1,,3U3,200665,Reading Excellence Grant Program,0.00
+127,hb119,2007,actual,hb119-greenbook,1,,3X5,200684,School Renovation/IDEA,1460663.00
+127,hb119,2007,actual,hb119-greenbook,1,,3Y2,200688,21st Century Community Learning Centers,30681554.00
+127,hb119,2007,actual,hb119-greenbook,1,,3Y4,200632,Reading First,31215798.00
+127,hb119,2007,actual,hb119-greenbook,1,,3Y5,200634,Community Service Grants,0.00
+127,hb119,2007,actual,hb119-greenbook,1,,3Y6,200635,Improving Teacher Quality,104484000.00
+127,hb119,2007,actual,hb119-greenbook,1,,3Y7,200689,English Language Acquisition,7000114.00
+127,hb119,2007,actual,hb119-greenbook,1,,3Y8,200639,Rural and Low Income Technical Assistance,1300000.00
+127,hb119,2007,actual,hb119-greenbook,1,,3Z2,200690,State Assessments,12883799.00
+127,hb119,2007,actual,hb119-greenbook,1,,3Z3,200645,Consolidated Federal Grant Administration,6867070.00
+127,hb119,2007,actual,hb119-greenbook,1,,452,200638,Miscellaneous Educational Services,266650.00
+127,hb119,2007,actual,hb119-greenbook,1,,454,200610,Guidance & Testing,300000.00
+127,hb119,2007,actual,hb119-greenbook,1,,455,200608,Commodity Foods,24000000.00
+127,hb119,2007,actual,hb119-greenbook,1,,4D1,200602,Ohio Prevention/Education Resource Center,832000.00
+127,hb119,2007,actual,hb119-greenbook,1,,4L2,200681,Teacher Certification and Licensure,6323832.00
+127,hb119,2007,actual,hb119-greenbook,1,,4R7,200695,Indirect Operational Support,5449747.00
+127,hb119,2007,actual,hb119-greenbook,1,,4V7,200633,Interagency Operational Support,926250.00
+127,hb119,2007,actual,hb119-greenbook,1,,596,200656,Ohio Career Information System,448822.00
+127,hb119,2007,actual,hb119-greenbook,1,,598,200659,Auxiliary Services Reimbursement,1328910.00
+127,hb119,2007,actual,hb119-greenbook,1,,5BB,200696,State Action for Education Leadership,1199999.00
+127,hb119,2007,actual,hb119-greenbook,1,,5BJ,200626,Half-Mill Maintenance Equalization,10700000.00
+127,hb119,2007,actual,hb119-greenbook,1,,5H3,200687,School District Solvency Assistance,18000000.00
+127,hb119,2007,actual,hb119-greenbook,1,,5U2,200685,National Education Statistics,300000.00
+127,hb119,2007,actual,hb119-greenbook,1,,5W2,200663,Early Learning Initiative,8200000.00
+127,hb119,2007,actual,hb119-greenbook,1,,620,200615,Educational Improvement Grants,2980500.00
+127,hb119,2007,actual,hb119-greenbook,1,,GRF,200100,Personal Services,10880655.00
+127,hb119,2007,actual,hb119-greenbook,1,,GRF,200320,Maintenance and Equipment,4344235.00
+127,hb119,2007,actual,hb119-greenbook,1,,GRF,200408,Early Childhood Education,19002195.00
+127,hb119,2007,actual,hb119-greenbook,1,,GRF,200410,Educator Training,19802057.00
+127,hb119,2007,actual,hb119-greenbook,1,,GRF,200411,Family and Children First,0.00
+127,hb119,2007,actual,hb119-greenbook,1,,GRF,200416,Career-Technical Education Match,2233195.00
+127,hb119,2007,actual,hb119-greenbook,1,,GRF,200420,Computer/Application/Network Development,5361525.00
+127,hb119,2007,actual,hb119-greenbook,1,,GRF,200421,Alternative Education Programs,14032666.00
+127,hb119,2007,actual,hb119-greenbook,1,,GRF,200422,School Management Assistance,2710572.00
+127,hb119,2007,actual,hb119-greenbook,1,,GRF,200424,Policy Analysis,556687.00
+127,hb119,2007,actual,hb119-greenbook,1,,GRF,200425,Tech Prep Consortia Support,2069217.00
+127,hb119,2007,actual,hb119-greenbook,1,,GRF,200426,Ohio Educational Computer Network,30446197.00
+127,hb119,2007,actual,hb119-greenbook,1,,GRF,200427,Academic Standards,11679181.00
+127,hb119,2007,actual,hb119-greenbook,1,,GRF,200431,School Improvement Initiatives,23842828.00
+127,hb119,2007,actual,hb119-greenbook,1,,GRF,200433,Literacy Improvement - Professional,16165000.00
+127,hb119,2007,actual,hb119-greenbook,1,,GRF,200437,Student Assessment,60011936.00
+127,hb119,2007,actual,hb119-greenbook,1,,GRF,200439,Accountability/Report Cards,7457290.00
+127,hb119,2007,actual,hb119-greenbook,1,,GRF,200441,American Sign Language,0.00
+127,hb119,2007,actual,hb119-greenbook,1,,GRF,200442,Child Care Licensing,1302495.00
+127,hb119,2007,actual,hb119-greenbook,1,,GRF,200445,OhioReads Volunteer Support,3905000.00
+127,hb119,2007,actual,hb119-greenbook,1,,GRF,200446,Education Management Information System,15674805.00
+127,hb119,2007,actual,hb119-greenbook,1,,GRF,200447,GED Testing,1544360.00
+127,hb119,2007,actual,hb119-greenbook,1,,GRF,200448,Educator Preparation,1651000.00
+127,hb119,2007,actual,hb119-greenbook,1,,GRF,200449,Head Start/Head Start Plus Start Up,0.00
+127,hb119,2007,actual,hb119-greenbook,1,,GRF,200452,Teaching Success Commission Initiatives,0.00
+127,hb119,2007,actual,hb119-greenbook,1,,GRF,200455,Community Schools,2942095.00
+127,hb119,2007,actual,hb119-greenbook,1,,GRF,200500,School Finance Equity,0.00
+127,hb119,2007,actual,hb119-greenbook,1,,GRF,200501,Base Cost Funding,0.00
+127,hb119,2007,actual,hb119-greenbook,1,,GRF,200502,Pupil Transportation,420577343.00
+127,hb119,2007,actual,hb119-greenbook,1,,GRF,200503,Bus Purchase Allowance,14000000.00
+127,hb119,2007,actual,hb119-greenbook,1,,GRF,200505,School Lunch Match,8998025.00
+127,hb119,2007,actual,hb119-greenbook,1,,GRF,200509,Adult Literacy Education,8669738.00
+127,hb119,2007,actual,hb119-greenbook,1,,GRF,200511,Auxiliary Services,127903356.00
+127,hb119,2007,actual,hb119-greenbook,1,,GRF,200513,Student Intervention Services,0.00
+127,hb119,2007,actual,hb119-greenbook,1,,GRF,200514,Postsecondary Adult Career-Technical,19481875.00
+127,hb119,2007,actual,hb119-greenbook,1,,GRF,200520,Disadvantaged Pupil Impact Aid,0.00
+127,hb119,2007,actual,hb119-greenbook,1,,GRF,200521,Gifted Pupil Program,47157293.00
+127,hb119,2007,actual,hb119-greenbook,1,,GRF,200525,Parity Aid,0.00
+127,hb119,2007,actual,hb119-greenbook,1,,GRF,200532,Nonpublic Administrative Cost Reimbursement,58068463.00
+127,hb119,2007,actual,hb119-greenbook,1,,GRF,200536,Ohio Core Support,30000000.00
+127,hb119,2007,actual,hb119-greenbook,1,,GRF,200540,Special Education Enhancements,135430126.00
+127,hb119,2007,actual,hb119-greenbook,1,,GRF,200545,Career-Technical Education Enhancements,9225569.00
+127,hb119,2007,actual,hb119-greenbook,1,,GRF,200546,Charge-Off Supplement,0.00
+127,hb119,2007,actual,hb119-greenbook,1,,GRF,200550,Foundation Funding,5708762766.00
+127,hb119,2007,actual,hb119-greenbook,1,,GRF,200552,County MR/DD Boards Vehicle Purchases,0.00
+127,hb119,2007,actual,hb119-greenbook,1,,GRF,200558,Emergency Loan Interest Subsidy,651404.00
+127,hb119,2007,actual,hb119-greenbook,1,,GRF,200566,Literacy Improvement - Classroom Grants,12062336.00
+127,hb119,2007,actual,hb119-greenbook,1,,GRF,200578,Violence Prevention and School Safety,1218555.00
+127,hb119,2007,actual,hb119-greenbook,1,,GRF,200901,Property Tax Allocation - Education,766632774.00
+127,hb119,2007,actual,hb119-greenbook,1,,GRF,200906,Tangible Tax Exemption-Education,32122865.00
+127,hb119,2008,enacted,hb119-greenbook,1,,017,200612,Foundation Funding,666198000.00
+127,hb119,2008,enacted,hb119-greenbook,1,,017,200682,Lease Rental Payment Reimbursement,22702000.00
+127,hb119,2008,enacted,hb119-greenbook,1,,020,200620,Vocational School Building Assistance,0.00
+127,hb119,2008,enacted,hb119-greenbook,1,,047,200909,School District Property Tax Replacement -,611596856.00
+127,hb119,2008,enacted,hb119-greenbook,1,,053,200900,School District Property Tax Replacement -,91123523.00
+127,hb119,2008,enacted,hb119-greenbook,1,,138,200606,Computer Services - Operational Support,7600091.00
+127,hb119,2008,enacted,hb119-greenbook,1,,309,200601,Educationally Disadvantaged Programs,12750000.00
+127,hb119,2008,enacted,hb119-greenbook,1,,366,200604,Adult Basic Education,19425000.00
+127,hb119,2008,enacted,hb119-greenbook,1,,367,200607,School Food Services,5849748.00
+127,hb119,2008,enacted,hb119-greenbook,1,,368,200614,Veterans' Training,710373.00
+127,hb119,2008,enacted,hb119-greenbook,1,,369,200616,Career-Technical Education Federal,5000000.00
+127,hb119,2008,enacted,hb119-greenbook,1,,370,200624,Education of Exceptional Children,1811520.00
+127,hb119,2008,enacted,hb119-greenbook,1,,371,200631,Immigrant Education Opportunities,0.00
+127,hb119,2008,enacted,hb119-greenbook,1,,374,200647,Troops to Teachers,100000.00
+127,hb119,2008,enacted,hb119-greenbook,1,,378,200660,Learn and Serve,1561954.00
+127,hb119,2008,enacted,hb119-greenbook,1,,3AF,200603,Schools Medicaid Administrative Claims,486000.00
+127,hb119,2008,enacted,hb119-greenbook,1,,3BK,200628,Longitudinal Data Systems,1795570.00
+127,hb119,2008,enacted,hb119-greenbook,1,,3BV,200636,Character Education,700000.00
+127,hb119,2008,enacted,hb119-greenbook,1,,3C5,200661,Early Childhood Education,18989779.00
+127,hb119,2008,enacted,hb119-greenbook,1,,3CF,200644,Foreign Language Assistance,85000.00
+127,hb119,2008,enacted,hb119-greenbook,1,,3CG,200646,Teacher Incentive Fund,6552263.00
+127,hb119,2008,enacted,hb119-greenbook,1,,3D1,200664,Drug Free Schools,13347966.00
+127,hb119,2008,enacted,hb119-greenbook,1,,3D2,200667,Honors Scholarship Program,6573968.00
+127,hb119,2008,enacted,hb119-greenbook,1,,3H9,200605,Head Start Collaboration Project,275000.00
+127,hb119,2008,enacted,hb119-greenbook,1,,3L6,200617,Federal School Lunch,244714211.00
+127,hb119,2008,enacted,hb119-greenbook,1,,3L7,200618,Federal School Breakfast,63927606.00
+127,hb119,2008,enacted,hb119-greenbook,1,,3L8,200619,Child/Adult Food Programs,69280946.00
+127,hb119,2008,enacted,hb119-greenbook,1,,3L9,200621,Career-Technical Education Basic Grant,48029701.00
+127,hb119,2008,enacted,hb119-greenbook,1,,3M0,200623,ESEA Title 1A,415000000.00
+127,hb119,2008,enacted,hb119-greenbook,1,,3M1,200678,Innovative Education,5369100.00
+127,hb119,2008,enacted,hb119-greenbook,1,,3M2,200680,Individuals with Disabilities Education Act,500000000.00
+127,hb119,2008,enacted,hb119-greenbook,1,,3R3,200654,Goals 2000,0.00
+127,hb119,2008,enacted,hb119-greenbook,1,,3S2,200641,Education Technology,10000000.00
+127,hb119,2008,enacted,hb119-greenbook,1,,3T4,200613,Public Charter Schools,13850827.00
+127,hb119,2008,enacted,hb119-greenbook,1,,3T6,200611,Class Size Reduction,0.00
+127,hb119,2008,enacted,hb119-greenbook,1,,3U2,200662,Teacher Quality Enhancement Grants,0.00
+127,hb119,2008,enacted,hb119-greenbook,1,,3U3,200665,Reading Excellence Grant Program,0.00
+127,hb119,2008,enacted,hb119-greenbook,1,,3X5,200684,School Renovation/IDEA,0.00
+127,hb119,2008,enacted,hb119-greenbook,1,,3Y2,200688,21st Century Community Learning Centers,30681554.00
+127,hb119,2008,enacted,hb119-greenbook,1,,3Y4,200632,Reading First,35215798.00
+127,hb119,2008,enacted,hb119-greenbook,1,,3Y5,200634,Community Service Grants,0.00
+127,hb119,2008,enacted,hb119-greenbook,1,,3Y6,200635,Improving Teacher Quality,102692685.00
+127,hb119,2008,enacted,hb119-greenbook,1,,3Y7,200689,English Language Acquisition,8000000.00
+127,hb119,2008,enacted,hb119-greenbook,1,,3Y8,200639,Rural and Low Income Technical Assistance,1500000.00
+127,hb119,2008,enacted,hb119-greenbook,1,,3Z2,200690,State Assessments,12883799.00
+127,hb119,2008,enacted,hb119-greenbook,1,,3Z3,200645,Consolidated Federal Grant Administration,8500000.00
+127,hb119,2008,enacted,hb119-greenbook,1,,452,200638,Miscellaneous Educational Services,273166.00
+127,hb119,2008,enacted,hb119-greenbook,1,,454,200610,Guidance & Testing,400000.00
+127,hb119,2008,enacted,hb119-greenbook,1,,455,200608,Commodity Foods,24000000.00
+127,hb119,2008,enacted,hb119-greenbook,1,,4D1,200602,Ohio Prevention/Education Resource Center,832000.00
+127,hb119,2008,enacted,hb119-greenbook,1,,4L2,200681,Teacher Certification and Licensure,5966032.00
+127,hb119,2008,enacted,hb119-greenbook,1,,4R7,200695,Indirect Operational Support,5449748.00
+127,hb119,2008,enacted,hb119-greenbook,1,,4V7,200633,Interagency Operational Support,392100.00
+127,hb119,2008,enacted,hb119-greenbook,1,,596,200656,Ohio Career Information System,529761.00
+127,hb119,2008,enacted,hb119-greenbook,1,,598,200659,Auxiliary Services Reimbursement,1328910.00
+127,hb119,2008,enacted,hb119-greenbook,1,,5BB,200696,State Action for Education Leadership,1250000.00
+127,hb119,2008,enacted,hb119-greenbook,1,,5BJ,200626,Half-Mill Maintenance Equalization,10700000.00
+127,hb119,2008,enacted,hb119-greenbook,1,,5H3,200687,School District Solvency Assistance,18000000.00
+127,hb119,2008,enacted,hb119-greenbook,1,,5U2,200685,National Education Statistics,300000.00
+127,hb119,2008,enacted,hb119-greenbook,1,,5W2,200663,Early Learning Initiative,2200000.00
+127,hb119,2008,enacted,hb119-greenbook,1,,620,200615,Educational Improvement Grants,3000000.00
+127,hb119,2008,enacted,hb119-greenbook,1,,GRF,200100,Personal Services,11533494.00
+127,hb119,2008,enacted,hb119-greenbook,1,,GRF,200320,Maintenance and Equipment,4549479.00
+127,hb119,2008,enacted,hb119-greenbook,1,,GRF,200408,Early Childhood Education,31002195.00
+127,hb119,2008,enacted,hb119-greenbook,1,,GRF,200410,Educator Training,19628817.00
+127,hb119,2008,enacted,hb119-greenbook,1,,GRF,200411,Family and Children First,0.00
+127,hb119,2008,enacted,hb119-greenbook,1,,GRF,200416,Career-Technical Education Match,2233195.00
+127,hb119,2008,enacted,hb119-greenbook,1,,GRF,200420,Computer/Application/Network Development,5536362.00
+127,hb119,2008,enacted,hb119-greenbook,1,,GRF,200421,Alternative Education Programs,14910665.00
+127,hb119,2008,enacted,hb119-greenbook,1,,GRF,200422,School Management Assistance,3360572.00
+127,hb119,2008,enacted,hb119-greenbook,1,,GRF,200424,Policy Analysis,556687.00
+127,hb119,2008,enacted,hb119-greenbook,1,,GRF,200425,Tech Prep Consortia Support,2069217.00
+127,hb119,2008,enacted,hb119-greenbook,1,,GRF,200426,Ohio Educational Computer Network,30446197.00
+127,hb119,2008,enacted,hb119-greenbook,1,,GRF,200427,Academic Standards,7197730.00
+127,hb119,2008,enacted,hb119-greenbook,1,,GRF,200431,School Improvement Initiatives,21589235.00
+127,hb119,2008,enacted,hb119-greenbook,1,,GRF,200433,Literacy Improvement - Professional,15515000.00
+127,hb119,2008,enacted,hb119-greenbook,1,,GRF,200437,Student Assessment,77150819.00
+127,hb119,2008,enacted,hb119-greenbook,1,,GRF,200439,Accountability/Report Cards,7096040.00
+127,hb119,2008,enacted,hb119-greenbook,1,,GRF,200441,American Sign Language,0.00
+127,hb119,2008,enacted,hb119-greenbook,1,,GRF,200442,Child Care Licensing,1302495.00
+127,hb119,2008,enacted,hb119-greenbook,1,,GRF,200445,OhioReads Volunteer Support,0.00
+127,hb119,2008,enacted,hb119-greenbook,1,,GRF,200446,Education Management Information System,16110510.00
+127,hb119,2008,enacted,hb119-greenbook,1,,GRF,200447,GED Testing,1544360.00
+127,hb119,2008,enacted,hb119-greenbook,1,,GRF,200448,Educator Preparation,1301000.00
+127,hb119,2008,enacted,hb119-greenbook,1,,GRF,200449,Head Start/Head Start Plus Start Up,0.00
+127,hb119,2008,enacted,hb119-greenbook,1,,GRF,200452,Teaching Success Commission Initiatives,0.00
+127,hb119,2008,enacted,hb119-greenbook,1,,GRF,200455,Community Schools,1533661.00
+127,hb119,2008,enacted,hb119-greenbook,1,,GRF,200457,Stem Initiatives,10000000.00
+127,hb119,2008,enacted,hb119-greenbook,1,,GRF,200500,School Finance Equity,0.00
+127,hb119,2008,enacted,hb119-greenbook,1,,GRF,200501,Base Cost Funding,0.00
+127,hb119,2008,enacted,hb119-greenbook,1,,GRF,200502,Pupil Transportation,424783117.00
+127,hb119,2008,enacted,hb119-greenbook,1,,GRF,200503,Bus Purchase Allowance,14000000.00
+127,hb119,2008,enacted,hb119-greenbook,1,,GRF,200505,School Lunch Match,8998025.00
+127,hb119,2008,enacted,hb119-greenbook,1,,GRF,200509,Adult Literacy Education,8669738.00
+127,hb119,2008,enacted,hb119-greenbook,1,,GRF,200511,Auxiliary Services,131740457.00
+127,hb119,2008,enacted,hb119-greenbook,1,,GRF,200513,Student Intervention Services,0.00
+127,hb119,2008,enacted,hb119-greenbook,1,,GRF,200514,Postsecondary Adult Career-Technical,19481875.00
+127,hb119,2008,enacted,hb119-greenbook,1,,GRF,200520,Disadvantaged Pupil Impact Aid,0.00
+127,hb119,2008,enacted,hb119-greenbook,1,,GRF,200521,Gifted Pupil Program,47608030.00
+127,hb119,2008,enacted,hb119-greenbook,1,,GRF,200525,Parity Aid,0.00
+127,hb119,2008,enacted,hb119-greenbook,1,,GRF,200532,Nonpublic Administrative Cost Reimbursement,59810517.00
+127,hb119,2008,enacted,hb119-greenbook,1,,GRF,200536,Ohio Core Support,7700000.00
+127,hb119,2008,enacted,hb119-greenbook,1,,GRF,200540,Special Education Enhancements,138869945.00
+127,hb119,2008,enacted,hb119-greenbook,1,,GRF,200545,Career-Technical Education Enhancements,9298651.00
+127,hb119,2008,enacted,hb119-greenbook,1,,GRF,200546,Charge-Off Supplement,0.00
+127,hb119,2008,enacted,hb119-greenbook,1,,GRF,200550,Foundation Funding,5761699328.00
+127,hb119,2008,enacted,hb119-greenbook,1,,GRF,200552,County MR/DD Boards Vehicle Purchases,0.00
+127,hb119,2008,enacted,hb119-greenbook,1,,GRF,200558,Emergency Loan Interest Subsidy,0.00
+127,hb119,2008,enacted,hb119-greenbook,1,,GRF,200566,Literacy Improvement - Classroom Grants,12062336.00
+127,hb119,2008,enacted,hb119-greenbook,1,,GRF,200578,Violence Prevention and School Safety,1218555.00
+127,hb119,2008,enacted,hb119-greenbook,1,,GRF,200901,Property Tax Allocation - Education,794583404.00
+127,hb119,2008,enacted,hb119-greenbook,1,,GRF,200906,Tangible Tax Exemption-Education,21415244.00
+127,hb119,2009,enacted,hb119-greenbook,1,,017,200612,Foundation Funding,667900000.00
+127,hb119,2009,enacted,hb119-greenbook,1,,017,200682,Lease Rental Payment Reimbursement,0.00
+127,hb119,2009,enacted,hb119-greenbook,1,,020,200620,Vocational School Building Assistance,0.00
+127,hb119,2009,enacted,hb119-greenbook,1,,047,200909,School District Property Tax Replacement -,763316819.00
+127,hb119,2009,enacted,hb119-greenbook,1,,053,200900,School District Property Tax Replacement -,91123523.00
+127,hb119,2009,enacted,hb119-greenbook,1,,138,200606,Computer Services - Operational Support,7600091.00
+127,hb119,2009,enacted,hb119-greenbook,1,,309,200601,Educationally Disadvantaged Programs,8750000.00
+127,hb119,2009,enacted,hb119-greenbook,1,,366,200604,Adult Basic Education,20396250.00
+127,hb119,2009,enacted,hb119-greenbook,1,,367,200607,School Food Services,6088737.00
+127,hb119,2009,enacted,hb119-greenbook,1,,368,200614,Veterans' Training,745892.00
+127,hb119,2009,enacted,hb119-greenbook,1,,369,200616,Career-Technical Education Federal,5000000.00
+127,hb119,2009,enacted,hb119-greenbook,1,,370,200624,Education of Exceptional Children,575454.00
+127,hb119,2009,enacted,hb119-greenbook,1,,371,200631,Immigrant Education Opportunities,0.00
+127,hb119,2009,enacted,hb119-greenbook,1,,374,200647,Troops to Teachers,100000.00
+127,hb119,2009,enacted,hb119-greenbook,1,,378,200660,Learn and Serve,1561954.00
+127,hb119,2009,enacted,hb119-greenbook,1,,3AF,200603,Schools Medicaid Administrative Claims,639000.00
+127,hb119,2009,enacted,hb119-greenbook,1,,3BK,200628,Longitudinal Data Systems,307050.00
+127,hb119,2009,enacted,hb119-greenbook,1,,3BV,200636,Character Education,700000.00
+127,hb119,2009,enacted,hb119-greenbook,1,,3C5,200661,Early Childhood Education,18989779.00
+127,hb119,2009,enacted,hb119-greenbook,1,,3CF,200644,Foreign Language Assistance,285000.00
+127,hb119,2009,enacted,hb119-greenbook,1,,3CG,200646,Teacher Incentive Fund,3994338.00
+127,hb119,2009,enacted,hb119-greenbook,1,,3D1,200664,Drug Free Schools,13347966.00
+127,hb119,2009,enacted,hb119-greenbook,1,,3D2,200667,Honors Scholarship Program,6665000.00
+127,hb119,2009,enacted,hb119-greenbook,1,,3H9,200605,Head Start Collaboration Project,275000.00
+127,hb119,2009,enacted,hb119-greenbook,1,,3L6,200617,Federal School Lunch,249903970.00
+127,hb119,2009,enacted,hb119-greenbook,1,,3L7,200618,Federal School Breakfast,69041814.00
+127,hb119,2009,enacted,hb119-greenbook,1,,3L8,200619,Child/Adult Food Programs,70691653.00
+127,hb119,2009,enacted,hb119-greenbook,1,,3L9,200621,Career-Technical Education Basic Grant,48029701.00
+127,hb119,2009,enacted,hb119-greenbook,1,,3M0,200623,ESEA Title 1A,420000000.00
+127,hb119,2009,enacted,hb119-greenbook,1,,3M1,200678,Innovative Education,5363706.00
+127,hb119,2009,enacted,hb119-greenbook,1,,3M2,200680,Individuals with Disabilities Education Act,405000000.00
+127,hb119,2009,enacted,hb119-greenbook,1,,3R3,200654,Goals 2000,0.00
+127,hb119,2009,enacted,hb119-greenbook,1,,3S2,200641,Education Technology,5000000.00
+127,hb119,2009,enacted,hb119-greenbook,1,,3T4,200613,Public Charter Schools,14212922.00
+127,hb119,2009,enacted,hb119-greenbook,1,,3T6,200611,Class Size Reduction,0.00
+127,hb119,2009,enacted,hb119-greenbook,1,,3U2,200662,Teacher Quality Enhancement Grants,0.00
+127,hb119,2009,enacted,hb119-greenbook,1,,3U3,200665,Reading Excellence Grant Program,0.00
+127,hb119,2009,enacted,hb119-greenbook,1,,3X5,200684,School Renovation/IDEA,0.00
+127,hb119,2009,enacted,hb119-greenbook,1,,3Y2,200688,21st Century Community Learning Centers,30681554.00
+127,hb119,2009,enacted,hb119-greenbook,1,,3Y4,200632,Reading First,31215798.00
+127,hb119,2009,enacted,hb119-greenbook,1,,3Y5,200634,Community Service Grants,0.00
+127,hb119,2009,enacted,hb119-greenbook,1,,3Y6,200635,Improving Teacher Quality,102698246.00
+127,hb119,2009,enacted,hb119-greenbook,1,,3Y7,200689,English Language Acquisition,8000000.00
+127,hb119,2009,enacted,hb119-greenbook,1,,3Y8,200639,Rural and Low Income Technical Assistance,1500000.00
+127,hb119,2009,enacted,hb119-greenbook,1,,3Z2,200690,State Assessments,12883799.00
+127,hb119,2009,enacted,hb119-greenbook,1,,3Z3,200645,Consolidated Federal Grant Administration,8500000.00
+127,hb119,2009,enacted,hb119-greenbook,1,,452,200638,Miscellaneous Educational Services,279992.00
+127,hb119,2009,enacted,hb119-greenbook,1,,454,200610,Guidance & Testing,400000.00
+127,hb119,2009,enacted,hb119-greenbook,1,,455,200608,Commodity Foods,24000000.00
+127,hb119,2009,enacted,hb119-greenbook,1,,4D1,200602,Ohio Prevention/Education Resource Center,832000.00
+127,hb119,2009,enacted,hb119-greenbook,1,,4L2,200681,Teacher Certification and Licensure,6323994.00
+127,hb119,2009,enacted,hb119-greenbook,1,,4R7,200695,Indirect Operational Support,5810464.00
+127,hb119,2009,enacted,hb119-greenbook,1,,4V7,200633,Interagency Operational Support,376423.00
+127,hb119,2009,enacted,hb119-greenbook,1,,596,200656,Ohio Career Information System,529761.00
+127,hb119,2009,enacted,hb119-greenbook,1,,598,200659,Auxiliary Services Reimbursement,1328910.00
+127,hb119,2009,enacted,hb119-greenbook,1,,5BB,200696,State Action for Education Leadership,1250000.00
+127,hb119,2009,enacted,hb119-greenbook,1,,5BJ,200626,Half-Mill Maintenance Equalization,10700000.00
+127,hb119,2009,enacted,hb119-greenbook,1,,5H3,200687,School District Solvency Assistance,18000000.00
+127,hb119,2009,enacted,hb119-greenbook,1,,5U2,200685,National Education Statistics,300000.00
+127,hb119,2009,enacted,hb119-greenbook,1,,5W2,200663,Early Learning Initiative,2200000.00
+127,hb119,2009,enacted,hb119-greenbook,1,,620,200615,Educational Improvement Grants,3000000.00
+127,hb119,2009,enacted,hb119-greenbook,1,,GRF,200100,Personal Services,12110169.00
+127,hb119,2009,enacted,hb119-greenbook,1,,GRF,200320,Maintenance and Equipment,4778203.00
+127,hb119,2009,enacted,hb119-greenbook,1,,GRF,200408,Early Childhood Education,36502195.00
+127,hb119,2009,enacted,hb119-greenbook,1,,GRF,200410,Educator Training,20628817.00
+127,hb119,2009,enacted,hb119-greenbook,1,,GRF,200411,Family and Children First,0.00
+127,hb119,2009,enacted,hb119-greenbook,1,,GRF,200416,Career-Technical Education Match,2233195.00
+127,hb119,2009,enacted,hb119-greenbook,1,,GRF,200420,Computer/Application/Network Development,5793700.00
+127,hb119,2009,enacted,hb119-greenbook,1,,GRF,200421,Alternative Education Programs,13110665.00
+127,hb119,2009,enacted,hb119-greenbook,1,,GRF,200422,School Management Assistance,3375572.00
+127,hb119,2009,enacted,hb119-greenbook,1,,GRF,200424,Policy Analysis,556687.00
+127,hb119,2009,enacted,hb119-greenbook,1,,GRF,200425,Tech Prep Consortia Support,2069217.00
+127,hb119,2009,enacted,hb119-greenbook,1,,GRF,200426,Ohio Educational Computer Network,30446197.00
+127,hb119,2009,enacted,hb119-greenbook,1,,GRF,200427,Academic Standards,7197730.00
+127,hb119,2009,enacted,hb119-greenbook,1,,GRF,200431,School Improvement Initiatives,21924235.00
+127,hb119,2009,enacted,hb119-greenbook,1,,GRF,200433,Literacy Improvement - Professional,15515000.00
+127,hb119,2009,enacted,hb119-greenbook,1,,GRF,200437,Student Assessment,76187144.00
+127,hb119,2009,enacted,hb119-greenbook,1,,GRF,200439,Accountability/Report Cards,8223540.00
+127,hb119,2009,enacted,hb119-greenbook,1,,GRF,200441,American Sign Language,0.00
+127,hb119,2009,enacted,hb119-greenbook,1,,GRF,200442,Child Care Licensing,1302495.00
+127,hb119,2009,enacted,hb119-greenbook,1,,GRF,200445,OhioReads Volunteer Support,0.00
+127,hb119,2009,enacted,hb119-greenbook,1,,GRF,200446,Education Management Information System,16586082.00
+127,hb119,2009,enacted,hb119-greenbook,1,,GRF,200447,GED Testing,1544360.00
+127,hb119,2009,enacted,hb119-greenbook,1,,GRF,200448,Educator Preparation,1301000.00
+127,hb119,2009,enacted,hb119-greenbook,1,,GRF,200449,Head Start/Head Start Plus Start Up,0.00
+127,hb119,2009,enacted,hb119-greenbook,1,,GRF,200452,Teaching Success Commission Initiatives,0.00
+127,hb119,2009,enacted,hb119-greenbook,1,,GRF,200455,Community Schools,1533661.00
+127,hb119,2009,enacted,hb119-greenbook,1,,GRF,200457,Stem Initiatives,10000000.00
+127,hb119,2009,enacted,hb119-greenbook,1,,GRF,200500,School Finance Equity,0.00
+127,hb119,2009,enacted,hb119-greenbook,1,,GRF,200501,Base Cost Funding,0.00
+127,hb119,2009,enacted,hb119-greenbook,1,,GRF,200502,Pupil Transportation,429030948.00
+127,hb119,2009,enacted,hb119-greenbook,1,,GRF,200503,Bus Purchase Allowance,14000000.00
+127,hb119,2009,enacted,hb119-greenbook,1,,GRF,200505,School Lunch Match,8998025.00
+127,hb119,2009,enacted,hb119-greenbook,1,,GRF,200509,Adult Literacy Education,8669738.00
+127,hb119,2009,enacted,hb119-greenbook,1,,GRF,200511,Auxiliary Services,135692670.00
+127,hb119,2009,enacted,hb119-greenbook,1,,GRF,200513,Student Intervention Services,0.00
+127,hb119,2009,enacted,hb119-greenbook,1,,GRF,200514,Postsecondary Adult Career-Technical,19481875.00
+127,hb119,2009,enacted,hb119-greenbook,1,,GRF,200520,Disadvantaged Pupil Impact Aid,0.00
+127,hb119,2009,enacted,hb119-greenbook,1,,GRF,200521,Gifted Pupil Program,48008613.00
+127,hb119,2009,enacted,hb119-greenbook,1,,GRF,200525,Parity Aid,0.00
+127,hb119,2009,enacted,hb119-greenbook,1,,GRF,200532,Nonpublic Administrative Cost Reimbursement,61604832.00
+127,hb119,2009,enacted,hb119-greenbook,1,,GRF,200536,Ohio Core Support,15125000.00
+127,hb119,2009,enacted,hb119-greenbook,1,,GRF,200540,Special Education Enhancements,140006839.00
+127,hb119,2009,enacted,hb119-greenbook,1,,GRF,200545,Career-Technical Education Enhancements,9373926.00
+127,hb119,2009,enacted,hb119-greenbook,1,,GRF,200546,Charge-Off Supplement,0.00
+127,hb119,2009,enacted,hb119-greenbook,1,,GRF,200550,Foundation Funding,6034943246.00
+127,hb119,2009,enacted,hb119-greenbook,1,,GRF,200552,County MR/DD Boards Vehicle Purchases,0.00
+127,hb119,2009,enacted,hb119-greenbook,1,,GRF,200558,Emergency Loan Interest Subsidy,0.00
+127,hb119,2009,enacted,hb119-greenbook,1,,GRF,200566,Literacy Improvement - Classroom Grants,12062336.00
+127,hb119,2009,enacted,hb119-greenbook,1,,GRF,200578,Violence Prevention and School Safety,1218555.00
+127,hb119,2009,enacted,hb119-greenbook,1,,GRF,200901,Property Tax Allocation - Education,850868654.00
+127,hb119,2009,enacted,hb119-greenbook,1,,GRF,200906,Tangible Tax Exemption-Education,10707622.00
+128,hb1,2008,actual,hb1-greenbook,1,,1380,200606,Computer Services - Operational Support,6014921.00
+128,hb1,2008,actual,hb1-greenbook,1,,3090,200601,Educationally Disadvantaged Programs,7113727.00
+128,hb1,2008,actual,hb1-greenbook,1,,3660,200604,Adult Basic Education,17718504.00
+128,hb1,2008,actual,hb1-greenbook,1,,3670,200607,School Food Services,4773354.00
+128,hb1,2008,actual,hb1-greenbook,1,,3680,200614,Veterans' Training,575736.00
+128,hb1,2008,actual,hb1-greenbook,1,,3690,200616,Career-Technical Education Federal,4256622.00
+128,hb1,2008,actual,hb1-greenbook,1,,3700,200624,Education of Exceptional Children,3223785.00
+128,hb1,2008,actual,hb1-greenbook,1,,3740,200647,Troops to Teachers,64989.00
+128,hb1,2008,actual,hb1-greenbook,1,,3780,200660,Learn and Serve,590893.00
+128,hb1,2008,actual,hb1-greenbook,1,,3AF0,200603,Schools Medicaid Administrative Claims,406992.00
+128,hb1,2008,actual,hb1-greenbook,1,,3AN0,200671,School Improvement Grants,0.00
+128,hb1,2008,actual,hb1-greenbook,1,,3AX0,200698,Improving Health and Educational Outcomes,0.00
+128,hb1,2008,actual,hb1-greenbook,1,,3BK0,200628,Longitudinal Data Systems,2215850.00
+128,hb1,2008,actual,hb1-greenbook,1,,3BV0,200636,Character Education,623690.00
+128,hb1,2008,actual,hb1-greenbook,1,,3C50,200661,Early Childhood Education,15527118.00
+128,hb1,2008,actual,hb1-greenbook,1,,3CF0,200644,Foreign Language Assistance,45715.00
+128,hb1,2008,actual,hb1-greenbook,1,,3CG0,200646,Teacher Incentive Fund,2690248.00
+128,hb1,2008,actual,hb1-greenbook,1,,3D10,200664,Drug Free Schools,8891238.00
+128,hb1,2008,actual,hb1-greenbook,1,,3D20,200667,Honors Scholarship Program,6536976.00
+128,hb1,2008,actual,hb1-greenbook,1,,3DJ0,200699,IDEA Part B -Federal Stimulus,0.00
+128,hb1,2008,actual,hb1-greenbook,1,,3DK0,200642,Title IA - Federal Stimulus,0.00
+128,hb1,2008,actual,hb1-greenbook,1,,3DL0,200650,IDEA Preschool - Federal Stimulus,0.00
+128,hb1,2008,actual,hb1-greenbook,1,,3DM0,200651,Title IID Technology -- Federal Stimulus,0.00
+128,hb1,2008,actual,hb1-greenbook,1,,3DP0,200652,Title I School Improvement - Federal Stimulus,0.00
+128,hb1,2008,actual,hb1-greenbook,1,,3H90,200605,Head Start Collaboration Project,204356.00
+128,hb1,2008,actual,hb1-greenbook,1,,3L60,200617,Federal School Lunch,273778314.00
+128,hb1,2008,actual,hb1-greenbook,1,,3L70,200618,Federal School Breakfast,75154805.00
+128,hb1,2008,actual,hb1-greenbook,1,,3L80,200619,Child/Adult Food Programs,77927338.00
+128,hb1,2008,actual,hb1-greenbook,1,,3L90,200621,Career-Technical Education Basic Grant,44653541.00
+128,hb1,2008,actual,hb1-greenbook,1,,3M00,200623,ESEA Title 1A,412094549.00
+128,hb1,2008,actual,hb1-greenbook,1,,3M10,200678,Innovative Education,4058134.00
+128,hb1,2008,actual,hb1-greenbook,1,,3M20,200680,Individuals with Disabilities Education Act,491536833.00
+128,hb1,2008,actual,hb1-greenbook,1,,3S20,200641,Education Technology,8698894.00
+128,hb1,2008,actual,hb1-greenbook,1,,3T40,200613,Public Charter Schools,13720602.00
+128,hb1,2008,actual,hb1-greenbook,1,,3Y20,200688,21st Century Community Learning Centers,25997234.00
+128,hb1,2008,actual,hb1-greenbook,1,,3Y40,200632,Reading First,19976156.00
+128,hb1,2008,actual,hb1-greenbook,1,,3Y60,200635,Improving Teacher Quality,93926689.00
+128,hb1,2008,actual,hb1-greenbook,1,,3Y70,200689,English Language Acquisition,6744789.00
+128,hb1,2008,actual,hb1-greenbook,1,,3Y80,200639,Rural and Low Income Technical Assistance,1498581.00
+128,hb1,2008,actual,hb1-greenbook,1,,3Z20,200690,State Assessments,11208740.00
+128,hb1,2008,actual,hb1-greenbook,1,,3Z30,200645,Consolidated Federal Grant Administration,8842418.00
+128,hb1,2008,actual,hb1-greenbook,1,,3Z70,200697,General Supervisory Enhancement Grant,0.00
+128,hb1,2008,actual,hb1-greenbook,1,,4520,200638,Miscellaneous Educational Services,122830.00
+128,hb1,2008,actual,hb1-greenbook,1,,4540,200610,Guidance and Testing,388015.00
+128,hb1,2008,actual,hb1-greenbook,1,,4550,200608,Commodity Foods,17953139.00
+128,hb1,2008,actual,hb1-greenbook,1,,4D10,200602,Ohio Prevention/Education Resource Center,191108.00
+128,hb1,2008,actual,hb1-greenbook,1,,4L20,200681,Teacher Certification and Licensure,5378295.00
+128,hb1,2008,actual,hb1-greenbook,1,,4R70,200695,Indirect Operational Support,5252847.00
+128,hb1,2008,actual,hb1-greenbook,1,,4V70,200633,Interagency Operational Support,1725065.00
+128,hb1,2008,actual,hb1-greenbook,1,,5960,200656,Ohio Career Information System,186240.00
+128,hb1,2008,actual,hb1-greenbook,1,,5980,200659,Auxiliary Services Reimbursement,1375001.00
+128,hb1,2008,actual,hb1-greenbook,1,,5BB0,200696,State Action for Education Leadership,960564.00
+128,hb1,2008,actual,hb1-greenbook,1,,5BJ0,200626,Half-Mill Maintenance Equalization,15221933.00
+128,hb1,2008,actual,hb1-greenbook,1,,5H30,200687,School District Solvency Assistance,10380000.00
+128,hb1,2008,actual,hb1-greenbook,1,,5U20,200685,National Education Statistics,137073.00
+128,hb1,2008,actual,hb1-greenbook,1,,5W20,200663,Early Learning Initiative,1223295.00
+128,hb1,2008,actual,hb1-greenbook,1,,5X90,200911,NGA STEM,94950.00
+128,hb1,2008,actual,hb1-greenbook,1,,6200,200615,Educational Improvement Grants,1737240.00
+128,hb1,2008,actual,hb1-greenbook,1,,6210,200910,Preschool Foreign Language,218106.00
+128,hb1,2008,actual,hb1-greenbook,1,,7017,200612,Foundation Funding,666198000.00
+128,hb1,2008,actual,hb1-greenbook,1,,7017,200682,Lease Rental Payment Reimbursement,22702000.00
+128,hb1,2008,actual,hb1-greenbook,1,,7047,200909,School District Property Tax Replacement -,620818733.00
+128,hb1,2008,actual,hb1-greenbook,1,,7053,200900,School District Property Tax Replacement -,85486475.00
+128,hb1,2008,actual,hb1-greenbook,1,,GRF,200100,Personal Services,10965857.00
+128,hb1,2008,actual,hb1-greenbook,1,,GRF,200320,Maintenance and Equipment,3249029.00
+128,hb1,2008,actual,hb1-greenbook,1,,GRF,200408,Early Childhood Education,26300099.00
+128,hb1,2008,actual,hb1-greenbook,1,,GRF,200410,Educator Training,17480059.00
+128,hb1,2008,actual,hb1-greenbook,1,,GRF,200416,Career-Technical Education Match,2222373.00
+128,hb1,2008,actual,hb1-greenbook,1,,GRF,200420,Computer/Application/Network Development,5469042.00
+128,hb1,2008,actual,hb1-greenbook,1,,GRF,200421,Alternative Education Programs,14202349.00
+128,hb1,2008,actual,hb1-greenbook,1,,GRF,200422,School Management Assistance,2835048.00
+128,hb1,2008,actual,hb1-greenbook,1,,GRF,200424,Policy Analysis,553530.00
+128,hb1,2008,actual,hb1-greenbook,1,,GRF,200425,Tech Prep Consortia Support,1877773.00
+128,hb1,2008,actual,hb1-greenbook,1,,GRF,200426,Ohio Educational Computer Network,29522184.00
+128,hb1,2008,actual,hb1-greenbook,1,,GRF,200427,Academic Standards,6631605.00
+128,hb1,2008,actual,hb1-greenbook,1,,GRF,200431,School Improvement Initiatives,22117158.00
+128,hb1,2008,actual,hb1-greenbook,1,,GRF,200433,Literacy Improvement - Professional,8887598.00
+128,hb1,2008,actual,hb1-greenbook,1,,GRF,200437,Student Assessment,77355688.00
+128,hb1,2008,actual,hb1-greenbook,1,,GRF,200439,Accountability/Report Cards,5961160.00
+128,hb1,2008,actual,hb1-greenbook,1,,GRF,200442,Child Care Licensing,1206189.00
+128,hb1,2008,actual,hb1-greenbook,1,,GRF,200445,OhioReads Volunteer Support,200.00
+128,hb1,2008,actual,hb1-greenbook,1,,GRF,200446,Education Management Information System,15596195.00
+128,hb1,2008,actual,hb1-greenbook,1,,GRF,200447,GED Testing,1705269.00
+128,hb1,2008,actual,hb1-greenbook,1,,GRF,200448,Educator Preparation,1134104.00
+128,hb1,2008,actual,hb1-greenbook,1,,GRF,200455,Community Schools,1294728.00
+128,hb1,2008,actual,hb1-greenbook,1,,GRF,200457,STEM Initiatives,7030632.00
+128,hb1,2008,actual,hb1-greenbook,1,,GRF,200458,School Employees Health Care Board,0.00
+128,hb1,2008,actual,hb1-greenbook,1,,GRF,200502,Pupil Transportation,424762211.00
+128,hb1,2008,actual,hb1-greenbook,1,,GRF,200503,Bus Purchase Allowance,8976862.00
+128,hb1,2008,actual,hb1-greenbook,1,,GRF,200505,School Lunch Match,8721172.00
+128,hb1,2008,actual,hb1-greenbook,1,,GRF,200509,Adult Literacy Education,8438881.00
+128,hb1,2008,actual,hb1-greenbook,1,,GRF,200511,Auxiliary Services,131763597.00
+128,hb1,2008,actual,hb1-greenbook,1,,GRF,200514,Postsecondary Adult Career-Technical,17854650.00
+128,hb1,2008,actual,hb1-greenbook,1,,GRF,200521,Gifted Pupil Program,46923339.00
+128,hb1,2008,actual,hb1-greenbook,1,,GRF,200532,Nonpublic Administrative Cost,59787682.00
+128,hb1,2008,actual,hb1-greenbook,1,,GRF,200536,Ohio Core Support,20368588.00
+128,hb1,2008,actual,hb1-greenbook,1,,GRF,200540,Special Education Enhancements,135221043.00
+128,hb1,2008,actual,hb1-greenbook,1,,GRF,200545,Career-Technical Education Enhancements,9428283.00
+128,hb1,2008,actual,hb1-greenbook,1,,GRF,200550,Foundation Funding,5628394728.00
+128,hb1,2008,actual,hb1-greenbook,1,,GRF,200551,Foundation Funding - Federal Stimulus,0.00
+128,hb1,2008,actual,hb1-greenbook,1,,GRF,200566,Literacy Improvement - Classroom Grants,8139406.00
+128,hb1,2008,actual,hb1-greenbook,1,,GRF,200578,Violence Prevention and School Safety,876749.00
+128,hb1,2008,actual,hb1-greenbook,1,,GRF,200901,Property Tax Allocation - Education,858073763.00
+128,hb1,2008,actual,hb1-greenbook,1,,GRF,200906,Tangible Tax Exemption-Education,21635474.00
+128,hb1,2009,actual,hb1-greenbook,1,,1380,200606,Computer Services - Operational Support,5582830.00
+128,hb1,2009,actual,hb1-greenbook,1,,3090,200601,Educationally Disadvantaged Programs,7119477.00
+128,hb1,2009,actual,hb1-greenbook,1,,3660,200604,Adult Basic Education,4694159.00
+128,hb1,2009,actual,hb1-greenbook,1,,3670,200607,School Food Services,4722250.00
+128,hb1,2009,actual,hb1-greenbook,1,,3680,200614,Veterans' Training,616346.00
+128,hb1,2009,actual,hb1-greenbook,1,,3690,200616,Career-Technical Education Federal,4661376.00
+128,hb1,2009,actual,hb1-greenbook,1,,3700,200624,Education of Exceptional Children,2192326.00
+128,hb1,2009,actual,hb1-greenbook,1,,3740,200647,Troops to Teachers,57943.00
+128,hb1,2009,actual,hb1-greenbook,1,,3780,200660,Learn and Serve,612694.00
+128,hb1,2009,actual,hb1-greenbook,1,,3AF0,200603,Schools Medicaid Administrative Claims,91371.00
+128,hb1,2009,actual,hb1-greenbook,1,,3AN0,200671,School Improvement Grants,10373787.00
+128,hb1,2009,actual,hb1-greenbook,1,,3AX0,200698,Improving Health and Educational Outcomes,388596.00
+128,hb1,2009,actual,hb1-greenbook,1,,3BK0,200628,Longitudinal Data Systems,2074761.00
+128,hb1,2009,actual,hb1-greenbook,1,,3BV0,200636,Character Education,662857.00
+128,hb1,2009,actual,hb1-greenbook,1,,3C50,200661,Early Childhood Education,15415301.00
+128,hb1,2009,actual,hb1-greenbook,1,,3CF0,200644,Foreign Language Assistance,297374.00
+128,hb1,2009,actual,hb1-greenbook,1,,3CG0,200646,Teacher Incentive Fund,5081699.00
+128,hb1,2009,actual,hb1-greenbook,1,,3D10,200664,Drug Free Schools,8580824.00
+128,hb1,2009,actual,hb1-greenbook,1,,3D20,200667,Honors Scholarship Program,9888317.00
+128,hb1,2009,actual,hb1-greenbook,1,,3DJ0,200699,IDEA Part B -Federal Stimulus,0.00
+128,hb1,2009,actual,hb1-greenbook,1,,3DK0,200642,Title IA - Federal Stimulus,0.00
+128,hb1,2009,actual,hb1-greenbook,1,,3DL0,200650,IDEA Preschool - Federal Stimulus,0.00
+128,hb1,2009,actual,hb1-greenbook,1,,3DM0,200651,Title IID Technology -- Federal Stimulus,0.00
+128,hb1,2009,actual,hb1-greenbook,1,,3DP0,200652,Title I School Improvement - Federal Stimulus,0.00
+128,hb1,2009,actual,hb1-greenbook,1,,3H90,200605,Head Start Collaboration Project,232072.00
+128,hb1,2009,actual,hb1-greenbook,1,,3L60,200617,Federal School Lunch,276022492.00
+128,hb1,2009,actual,hb1-greenbook,1,,3L70,200618,Federal School Breakfast,76789187.00
+128,hb1,2009,actual,hb1-greenbook,1,,3L80,200619,Child/Adult Food Programs,84018974.00
+128,hb1,2009,actual,hb1-greenbook,1,,3L90,200621,Career-Technical Education Basic Grant,45264626.00
+128,hb1,2009,actual,hb1-greenbook,1,,3M00,200623,ESEA Title 1A,499453152.00
+128,hb1,2009,actual,hb1-greenbook,1,,3M10,200678,Innovative Education,2909514.00
+128,hb1,2009,actual,hb1-greenbook,1,,3M20,200680,Individuals with Disabilities Education Act,438442256.00
+128,hb1,2009,actual,hb1-greenbook,1,,3S20,200641,Education Technology,9686363.00
+128,hb1,2009,actual,hb1-greenbook,1,,3T40,200613,Public Charter Schools,11710711.00
+128,hb1,2009,actual,hb1-greenbook,1,,3Y20,200688,21st Century Community Learning Centers,25250285.00
+128,hb1,2009,actual,hb1-greenbook,1,,3Y40,200632,Reading First,15191897.00
+128,hb1,2009,actual,hb1-greenbook,1,,3Y60,200635,Improving Teacher Quality,103111518.00
+128,hb1,2009,actual,hb1-greenbook,1,,3Y70,200689,English Language Acquisition,7347373.00
+128,hb1,2009,actual,hb1-greenbook,1,,3Y80,200639,Rural and Low Income Technical Assistance,1776783.00
+128,hb1,2009,actual,hb1-greenbook,1,,3Z20,200690,State Assessments,13905904.00
+128,hb1,2009,actual,hb1-greenbook,1,,3Z30,200645,Consolidated Federal Grant Administration,7791964.00
+128,hb1,2009,actual,hb1-greenbook,1,,3Z70,200697,General Supervisory Enhancement Grant,1360905.00
+128,hb1,2009,actual,hb1-greenbook,1,,4520,200638,Miscellaneous Educational Services,104576.00
+128,hb1,2009,actual,hb1-greenbook,1,,4540,200610,Guidance and Testing,384797.00
+128,hb1,2009,actual,hb1-greenbook,1,,4550,200608,Commodity Foods,18520174.00
+128,hb1,2009,actual,hb1-greenbook,1,,4D10,200602,Ohio Prevention/Education Resource Center,0.00
+128,hb1,2009,actual,hb1-greenbook,1,,4L20,200681,Teacher Certification and Licensure,5218590.00
+128,hb1,2009,actual,hb1-greenbook,1,,4R70,200695,Indirect Operational Support,5438725.00
+128,hb1,2009,actual,hb1-greenbook,1,,4V70,200633,Interagency Operational Support,1101332.00
+128,hb1,2009,actual,hb1-greenbook,1,,5960,200656,Ohio Career Information System,265295.00
+128,hb1,2009,actual,hb1-greenbook,1,,5980,200659,Auxiliary Services Reimbursement,714607.00
+128,hb1,2009,actual,hb1-greenbook,1,,5BB0,200696,State Action for Education Leadership,1797212.00
+128,hb1,2009,actual,hb1-greenbook,1,,5BJ0,200626,Half-Mill Maintenance Equalization,16267684.00
+128,hb1,2009,actual,hb1-greenbook,1,,5H30,200687,School District Solvency Assistance,4500000.00
+128,hb1,2009,actual,hb1-greenbook,1,,5U20,200685,National Education Statistics,82497.00
+128,hb1,2009,actual,hb1-greenbook,1,,5W20,200663,Early Learning Initiative,1867769.00
+128,hb1,2009,actual,hb1-greenbook,1,,5X90,200911,NGA STEM,212671.00
+128,hb1,2009,actual,hb1-greenbook,1,,6200,200615,Educational Improvement Grants,654234.00
+128,hb1,2009,actual,hb1-greenbook,1,,6210,200910,Preschool Foreign Language,0.00
+128,hb1,2009,actual,hb1-greenbook,1,,7017,200612,Foundation Funding,707900000.00
+128,hb1,2009,actual,hb1-greenbook,1,,7017,200682,Lease Rental Payment Reimbursement,0.00
+128,hb1,2009,actual,hb1-greenbook,1,,7047,200909,School District Property Tax Replacement -,799471496.00
+128,hb1,2009,actual,hb1-greenbook,1,,7053,200900,School District Property Tax Replacement -,82309041.00
+128,hb1,2009,actual,hb1-greenbook,1,,GRF,200100,Personal Services,10534214.00
+128,hb1,2009,actual,hb1-greenbook,1,,GRF,200320,Maintenance and Equipment,3471237.00
+128,hb1,2009,actual,hb1-greenbook,1,,GRF,200408,Early Childhood Education,34173592.00
+128,hb1,2009,actual,hb1-greenbook,1,,GRF,200410,Educator Training,16253236.00
+128,hb1,2009,actual,hb1-greenbook,1,,GRF,200416,Career-Technical Education Match,2217140.00
+128,hb1,2009,actual,hb1-greenbook,1,,GRF,200420,Computer/Application/Network Development,5092315.00
+128,hb1,2009,actual,hb1-greenbook,1,,GRF,200421,Alternative Education Programs,12312959.00
+128,hb1,2009,actual,hb1-greenbook,1,,GRF,200422,School Management Assistance,3095007.00
+128,hb1,2009,actual,hb1-greenbook,1,,GRF,200424,Policy Analysis,493260.00
+128,hb1,2009,actual,hb1-greenbook,1,,GRF,200425,Tech Prep Consortia Support,2022218.00
+128,hb1,2009,actual,hb1-greenbook,1,,GRF,200426,Ohio Educational Computer Network,24919178.00
+128,hb1,2009,actual,hb1-greenbook,1,,GRF,200427,Academic Standards,6100307.00
+128,hb1,2009,actual,hb1-greenbook,1,,GRF,200431,School Improvement Initiatives,17790643.00
+128,hb1,2009,actual,hb1-greenbook,1,,GRF,200433,Literacy Improvement - Professional,16720499.00
+128,hb1,2009,actual,hb1-greenbook,1,,GRF,200437,Student Assessment,77330444.00
+128,hb1,2009,actual,hb1-greenbook,1,,GRF,200439,Accountability/Report Cards,7139477.00
+128,hb1,2009,actual,hb1-greenbook,1,,GRF,200442,Child Care Licensing,1145435.00
+128,hb1,2009,actual,hb1-greenbook,1,,GRF,200445,OhioReads Volunteer Support,0.00
+128,hb1,2009,actual,hb1-greenbook,1,,GRF,200446,Education Management Information System,13949854.00
+128,hb1,2009,actual,hb1-greenbook,1,,GRF,200447,GED Testing,1383216.00
+128,hb1,2009,actual,hb1-greenbook,1,,GRF,200448,Educator Preparation,635705.00
+128,hb1,2009,actual,hb1-greenbook,1,,GRF,200455,Community Schools,1249339.00
+128,hb1,2009,actual,hb1-greenbook,1,,GRF,200457,STEM Initiatives,7376963.00
+128,hb1,2009,actual,hb1-greenbook,1,,GRF,200458,School Employees Health Care Board,0.00
+128,hb1,2009,actual,hb1-greenbook,1,,GRF,200502,Pupil Transportation,428938762.00
+128,hb1,2009,actual,hb1-greenbook,1,,GRF,200503,Bus Purchase Allowance,17748875.00
+128,hb1,2009,actual,hb1-greenbook,1,,GRF,200505,School Lunch Match,8560740.00
+128,hb1,2009,actual,hb1-greenbook,1,,GRF,200509,Adult Literacy Education,7976658.00
+128,hb1,2009,actual,hb1-greenbook,1,,GRF,200511,Auxiliary Services,128800394.00
+128,hb1,2009,actual,hb1-greenbook,1,,GRF,200514,Postsecondary Adult Career-Technical,10660968.00
+128,hb1,2009,actual,hb1-greenbook,1,,GRF,200521,Gifted Pupil Program,47198690.00
+128,hb1,2009,actual,hb1-greenbook,1,,GRF,200532,Nonpublic Administrative Cost,58699256.00
+128,hb1,2009,actual,hb1-greenbook,1,,GRF,200536,Ohio Core Support,12844907.00
+128,hb1,2009,actual,hb1-greenbook,1,,GRF,200540,Special Education Enhancements,133667082.00
+128,hb1,2009,actual,hb1-greenbook,1,,GRF,200545,Career-Technical Education Enhancements,8494826.00
+128,hb1,2009,actual,hb1-greenbook,1,,GRF,200550,Foundation Funding,5793031904.00
+128,hb1,2009,actual,hb1-greenbook,1,,GRF,200551,Foundation Funding - Federal Stimulus,0.00
+128,hb1,2009,actual,hb1-greenbook,1,,GRF,200566,Literacy Improvement - Classroom Grants,10811766.00
+128,hb1,2009,actual,hb1-greenbook,1,,GRF,200578,Violence Prevention and School Safety,1192421.00
+128,hb1,2009,actual,hb1-greenbook,1,,GRF,200901,Property Tax Allocation - Education,939469238.00
+128,hb1,2009,actual,hb1-greenbook,1,,GRF,200906,Tangible Tax Exemption-Education,10817736.00
+128,hb1,2010,enacted,hb1-greenbook,1,,1380,200606,Computer Services - Operational Support,7600091.00
+128,hb1,2010,enacted,hb1-greenbook,1,,3090,200601,Educationally Disadvantaged Programs,8405512.00
+128,hb1,2010,enacted,hb1-greenbook,1,,3660,200604,Adult Basic Education,0.00
+128,hb1,2010,enacted,hb1-greenbook,1,,3670,200607,School Food Services,6324707.00
+128,hb1,2010,enacted,hb1-greenbook,1,,3680,200614,Veterans' Training,778349.00
+128,hb1,2010,enacted,hb1-greenbook,1,,3690,200616,Career-Technical Education Federal,5000000.00
+128,hb1,2010,enacted,hb1-greenbook,1,,3700,200624,Education of Exceptional Children,2664000.00
+128,hb1,2010,enacted,hb1-greenbook,1,,3740,200647,Troops to Teachers,100000.00
+128,hb1,2010,enacted,hb1-greenbook,1,,3780,200660,Learn and Serve,619211.00
+128,hb1,2010,enacted,hb1-greenbook,1,,3AF0,200603,Schools Medicaid Administrative Claims,639000.00
+128,hb1,2010,enacted,hb1-greenbook,1,,3AN0,200671,School Improvement Grants,17909676.00
+128,hb1,2010,enacted,hb1-greenbook,1,,3AX0,200698,Improving Health and Educational Outcomes,630954.00
+128,hb1,2010,enacted,hb1-greenbook,1,,3BK0,200628,Longitudinal Data Systems,100000.00
+128,hb1,2010,enacted,hb1-greenbook,1,,3BV0,200636,Character Education,700000.00
+128,hb1,2010,enacted,hb1-greenbook,1,,3C50,200661,Early Childhood Education,14189711.00
+128,hb1,2010,enacted,hb1-greenbook,1,,3CF0,200644,Foreign Language Assistance,25000.00
+128,hb1,2010,enacted,hb1-greenbook,1,,3CG0,200646,Teacher Incentive Fund,3007975.00
+128,hb1,2010,enacted,hb1-greenbook,1,,3D10,200664,Drug Free Schools,13347966.00
+128,hb1,2010,enacted,hb1-greenbook,1,,3D20,200667,Honors Scholarship Program,6990000.00
+128,hb1,2010,enacted,hb1-greenbook,1,,3DJ0,200699,IDEA Part B -Federal Stimulus,218868026.00
+128,hb1,2010,enacted,hb1-greenbook,1,,3DK0,200642,Title IA - Federal Stimulus,186336737.00
+128,hb1,2010,enacted,hb1-greenbook,1,,3DL0,200650,IDEA Preschool - Federal Stimulus,6679679.00
+128,hb1,2010,enacted,hb1-greenbook,1,,3DM0,200651,Title IID Technology -- Federal Stimulus,11951000.00
+128,hb1,2010,enacted,hb1-greenbook,1,,3DP0,200652,Title I School Improvement - Federal Stimulus,54221000.00
+128,hb1,2010,enacted,hb1-greenbook,1,,3H90,200605,Head Start Collaboration Project,225000.00
+128,hb1,2010,enacted,hb1-greenbook,1,,3L60,200617,Federal School Lunch,295421000.00
+128,hb1,2010,enacted,hb1-greenbook,1,,3L70,200618,Federal School Breakfast,80850000.00
+128,hb1,2010,enacted,hb1-greenbook,1,,3L80,200619,Child/Adult Food Programs,89250000.00
+128,hb1,2010,enacted,hb1-greenbook,1,,3L90,200621,Career-Technical Education Basic Grant,48029701.00
+128,hb1,2010,enacted,hb1-greenbook,1,,3M00,200623,ESEA Title 1A,530000000.00
+128,hb1,2010,enacted,hb1-greenbook,1,,3M10,200678,Innovative Education,1000000.00
+128,hb1,2010,enacted,hb1-greenbook,1,,3M20,200680,Individuals with Disabilities Education Act,413391594.00
+128,hb1,2010,enacted,hb1-greenbook,1,,3S20,200641,Education Technology,9487397.00
+128,hb1,2010,enacted,hb1-greenbook,1,,3T40,200613,Public Charter Schools,14275618.00
+128,hb1,2010,enacted,hb1-greenbook,1,,3Y20,200688,21st Century Community Learning Centers,36000000.00
+128,hb1,2010,enacted,hb1-greenbook,1,,3Y40,200632,Reading First,27366373.00
+128,hb1,2010,enacted,hb1-greenbook,1,,3Y60,200635,Improving Teacher Quality,101778397.00
+128,hb1,2010,enacted,hb1-greenbook,1,,3Y70,200689,English Language Acquisition,8142299.00
+128,hb1,2010,enacted,hb1-greenbook,1,,3Y80,200639,Rural and Low Income Technical Assistance,1500000.00
+128,hb1,2010,enacted,hb1-greenbook,1,,3Z20,200690,State Assessments,12923799.00
+128,hb1,2010,enacted,hb1-greenbook,1,,3Z30,200645,Consolidated Federal Grant Administration,8499279.00
+128,hb1,2010,enacted,hb1-greenbook,1,,3Z70,200697,General Supervisory Enhancement Grant,887319.00
+128,hb1,2010,enacted,hb1-greenbook,1,,4520,200638,Miscellaneous Educational Services,275000.00
+128,hb1,2010,enacted,hb1-greenbook,1,,4540,200610,Guidance and Testing,450000.00
+128,hb1,2010,enacted,hb1-greenbook,1,,4550,200608,Commodity Foods,24000000.00
+128,hb1,2010,enacted,hb1-greenbook,1,,4D10,200602,Ohio Prevention/Education Resource Center,0.00
+128,hb1,2010,enacted,hb1-greenbook,1,,4L20,200681,Teacher Certification and Licensure,8013206.00
+128,hb1,2010,enacted,hb1-greenbook,1,,4R70,200695,Indirect Operational Support,6050000.00
+128,hb1,2010,enacted,hb1-greenbook,1,,4V70,200633,Interagency Operational Support,1111838.00
+128,hb1,2010,enacted,hb1-greenbook,1,,5960,200656,Ohio Career Information System,529761.00
+128,hb1,2010,enacted,hb1-greenbook,1,,5980,200659,Auxiliary Services Reimbursement,1328910.00
+128,hb1,2010,enacted,hb1-greenbook,1,,5BB0,200696,State Action for Education Leadership,1250000.00
+128,hb1,2010,enacted,hb1-greenbook,1,,5BJ0,200626,Half-Mill Maintenance Equalization,16100000.00
+128,hb1,2010,enacted,hb1-greenbook,1,,5H30,200687,School District Solvency Assistance,18000000.00
+128,hb1,2010,enacted,hb1-greenbook,1,,5U20,200685,National Education Statistics,300000.00
+128,hb1,2010,enacted,hb1-greenbook,1,,5W20,200663,Early Learning Initiative,2200000.00
+128,hb1,2010,enacted,hb1-greenbook,1,,5X90,200911,NGA STEM,100000.00
+128,hb1,2010,enacted,hb1-greenbook,1,,6200,200615,Educational Improvement Grants,3000000.00
+128,hb1,2010,enacted,hb1-greenbook,1,,6210,200910,Preschool Foreign Language,0.00
+128,hb1,2010,enacted,hb1-greenbook,1,,7017,200612,Foundation Funding,990236905.00
+128,hb1,2010,enacted,hb1-greenbook,1,,7017,200682,Lease Rental Payment Reimbursement,0.00
+128,hb1,2010,enacted,hb1-greenbook,1,,7047,200909,School District Property Tax Replacement -,1150207366.00
+128,hb1,2010,enacted,hb1-greenbook,1,,7053,200900,School District Property Tax Replacement -,91123523.00
+128,hb1,2010,enacted,hb1-greenbook,1,,GRF,200100,Personal Services,10490789.00
+128,hb1,2010,enacted,hb1-greenbook,1,,GRF,200320,Maintenance and Equipment,3110071.00
+128,hb1,2010,enacted,hb1-greenbook,1,,GRF,200408,Early Childhood Education,23268341.00
+128,hb1,2010,enacted,hb1-greenbook,1,,GRF,200410,Educator Training,0.00
+128,hb1,2010,enacted,hb1-greenbook,1,,GRF,200416,Career-Technical Education Match,2233195.00
+128,hb1,2010,enacted,hb1-greenbook,1,,GRF,200420,Computer/Application/Network Development,4880871.00
+128,hb1,2010,enacted,hb1-greenbook,1,,GRF,200421,Alternative Education Programs,7814479.00
+128,hb1,2010,enacted,hb1-greenbook,1,,GRF,200422,School Management Assistance,1950521.00
+128,hb1,2010,enacted,hb1-greenbook,1,,GRF,200424,Policy Analysis,356311.00
+128,hb1,2010,enacted,hb1-greenbook,1,,GRF,200425,Tech Prep Consortia Support,1243943.00
+128,hb1,2010,enacted,hb1-greenbook,1,,GRF,200426,Ohio Educational Computer Network,20156602.00
+128,hb1,2010,enacted,hb1-greenbook,1,,GRF,200427,Academic Standards,5300074.00
+128,hb1,2010,enacted,hb1-greenbook,1,,GRF,200431,School Improvement Initiatives,7294175.00
+128,hb1,2010,enacted,hb1-greenbook,1,,GRF,200433,Literacy Improvement - Professional,0.00
+128,hb1,2010,enacted,hb1-greenbook,1,,GRF,200437,Student Assessment,55954648.00
+128,hb1,2010,enacted,hb1-greenbook,1,,GRF,200439,Accountability/Report Cards,3804673.00
+128,hb1,2010,enacted,hb1-greenbook,1,,GRF,200442,Child Care Licensing,865590.00
+128,hb1,2010,enacted,hb1-greenbook,1,,GRF,200445,OhioReads Volunteer Support,0.00
+128,hb1,2010,enacted,hb1-greenbook,1,,GRF,200446,Education Management Information System,13199152.00
+128,hb1,2010,enacted,hb1-greenbook,1,,GRF,200447,GED Testing,975536.00
+128,hb1,2010,enacted,hb1-greenbook,1,,GRF,200448,Educator Preparation,1310750.00
+128,hb1,2010,enacted,hb1-greenbook,1,,GRF,200455,Community Schools,1000000.00
+128,hb1,2010,enacted,hb1-greenbook,1,,GRF,200457,STEM Initiatives,5000000.00
+128,hb1,2010,enacted,hb1-greenbook,1,,GRF,200458,School Employees Health Care Board,800000.00
+128,hb1,2010,enacted,hb1-greenbook,1,,GRF,200502,Pupil Transportation,448022619.00
+128,hb1,2010,enacted,hb1-greenbook,1,,GRF,200503,Bus Purchase Allowance,0.00
+128,hb1,2010,enacted,hb1-greenbook,1,,GRF,200505,School Lunch Match,9100000.00
+128,hb1,2010,enacted,hb1-greenbook,1,,GRF,200509,Adult Literacy Education,0.00
+128,hb1,2010,enacted,hb1-greenbook,1,,GRF,200511,Auxiliary Services,111979388.00
+128,hb1,2010,enacted,hb1-greenbook,1,,GRF,200514,Postsecondary Adult Career-Technical,0.00
+128,hb1,2010,enacted,hb1-greenbook,1,,GRF,200521,Gifted Pupil Program,0.00
+128,hb1,2010,enacted,hb1-greenbook,1,,GRF,200532,Nonpublic Administrative Cost,50838939.00
+128,hb1,2010,enacted,hb1-greenbook,1,,GRF,200536,Ohio Core Support,0.00
+128,hb1,2010,enacted,hb1-greenbook,1,,GRF,200540,Special Education Enhancements,134150233.00
+128,hb1,2010,enacted,hb1-greenbook,1,,GRF,200545,Career-Technical Education Enhancements,7752662.00
+128,hb1,2010,enacted,hb1-greenbook,1,,GRF,200550,Foundation Funding,5130669418.00
+128,hb1,2010,enacted,hb1-greenbook,1,,GRF,200551,Foundation Funding - Federal Stimulus,387583913.00
+128,hb1,2010,enacted,hb1-greenbook,1,,GRF,200566,Literacy Improvement - Classroom Grants,0.00
+128,hb1,2010,enacted,hb1-greenbook,1,,GRF,200578,Violence Prevention and School Safety,200000.00
+128,hb1,2010,enacted,hb1-greenbook,1,,GRF,200901,Property Tax Allocation - Education,1053262363.00
+128,hb1,2010,enacted,hb1-greenbook,1,,GRF,200906,Tangible Tax Exemption-Education,0.00
+128,hb1,2011,enacted,hb1-greenbook,1,,1380,200606,Computer Services - Operational Support,7600091.00
+128,hb1,2011,enacted,hb1-greenbook,1,,3090,200601,Educationally Disadvantaged Programs,8405512.00
+128,hb1,2011,enacted,hb1-greenbook,1,,3660,200604,Adult Basic Education,0.00
+128,hb1,2011,enacted,hb1-greenbook,1,,3670,200607,School Food Services,6577695.00
+128,hb1,2011,enacted,hb1-greenbook,1,,3680,200614,Veterans' Training,793846.00
+128,hb1,2011,enacted,hb1-greenbook,1,,3690,200616,Career-Technical Education Federal,5000000.00
+128,hb1,2011,enacted,hb1-greenbook,1,,3700,200624,Education of Exceptional Children,2755000.00
+128,hb1,2011,enacted,hb1-greenbook,1,,3740,200647,Troops to Teachers,100000.00
+128,hb1,2011,enacted,hb1-greenbook,1,,3780,200660,Learn and Serve,619211.00
+128,hb1,2011,enacted,hb1-greenbook,1,,3AF0,200603,Schools Medicaid Administrative Claims,639000.00
+128,hb1,2011,enacted,hb1-greenbook,1,,3AN0,200671,School Improvement Grants,17936675.00
+128,hb1,2011,enacted,hb1-greenbook,1,,3AX0,200698,Improving Health and Educational Outcomes,630954.00
+128,hb1,2011,enacted,hb1-greenbook,1,,3BK0,200628,Longitudinal Data Systems,0.00
+128,hb1,2011,enacted,hb1-greenbook,1,,3BV0,200636,Character Education,0.00
+128,hb1,2011,enacted,hb1-greenbook,1,,3C50,200661,Early Childhood Education,14554749.00
+128,hb1,2011,enacted,hb1-greenbook,1,,3CF0,200644,Foreign Language Assistance,0.00
+128,hb1,2011,enacted,hb1-greenbook,1,,3CG0,200646,Teacher Incentive Fund,1157834.00
+128,hb1,2011,enacted,hb1-greenbook,1,,3D10,200664,Drug Free Schools,13347966.00
+128,hb1,2011,enacted,hb1-greenbook,1,,3D20,200667,Honors Scholarship Program,6985000.00
+128,hb1,2011,enacted,hb1-greenbook,1,,3DJ0,200699,IDEA Part B -Federal Stimulus,218868026.00
+128,hb1,2011,enacted,hb1-greenbook,1,,3DK0,200642,Title IA - Federal Stimulus,186336737.00
+128,hb1,2011,enacted,hb1-greenbook,1,,3DL0,200650,IDEA Preschool - Federal Stimulus,6679679.00
+128,hb1,2011,enacted,hb1-greenbook,1,,3DM0,200651,Title IID Technology -- Federal Stimulus,11951000.00
+128,hb1,2011,enacted,hb1-greenbook,1,,3DP0,200652,Title I School Improvement - Federal Stimulus,54221000.00
+128,hb1,2011,enacted,hb1-greenbook,1,,3H90,200605,Head Start Collaboration Project,225000.00
+128,hb1,2011,enacted,hb1-greenbook,1,,3L60,200617,Federal School Lunch,310150675.00
+128,hb1,2011,enacted,hb1-greenbook,1,,3L70,200618,Federal School Breakfast,84892500.00
+128,hb1,2011,enacted,hb1-greenbook,1,,3L80,200619,Child/Adult Food Programs,93712500.00
+128,hb1,2011,enacted,hb1-greenbook,1,,3L90,200621,Career-Technical Education Basic Grant,48029701.00
+128,hb1,2011,enacted,hb1-greenbook,1,,3M00,200623,ESEA Title 1A,530010000.00
+128,hb1,2011,enacted,hb1-greenbook,1,,3M10,200678,Innovative Education,0.00
+128,hb1,2011,enacted,hb1-greenbook,1,,3M20,200680,Individuals with Disabilities Education Act,421241163.00
+128,hb1,2011,enacted,hb1-greenbook,1,,3S20,200641,Education Technology,9487397.00
+128,hb1,2011,enacted,hb1-greenbook,1,,3T40,200613,Public Charter Schools,14291353.00
+128,hb1,2011,enacted,hb1-greenbook,1,,3Y20,200688,21st Century Community Learning Centers,36000000.00
+128,hb1,2011,enacted,hb1-greenbook,1,,3Y40,200632,Reading First,24455172.00
+128,hb1,2011,enacted,hb1-greenbook,1,,3Y60,200635,Improving Teacher Quality,101778400.00
+128,hb1,2011,enacted,hb1-greenbook,1,,3Y70,200689,English Language Acquisition,8142299.00
+128,hb1,2011,enacted,hb1-greenbook,1,,3Y80,200639,Rural and Low Income Technical Assistance,1500000.00
+128,hb1,2011,enacted,hb1-greenbook,1,,3Z20,200690,State Assessments,12923799.00
+128,hb1,2011,enacted,hb1-greenbook,1,,3Z30,200645,Consolidated Federal Grant Administration,8499280.00
+128,hb1,2011,enacted,hb1-greenbook,1,,3Z70,200697,General Supervisory Enhancement Grant,0.00
+128,hb1,2011,enacted,hb1-greenbook,1,,4520,200638,Miscellaneous Educational Services,275000.00
+128,hb1,2011,enacted,hb1-greenbook,1,,4540,200610,Guidance and Testing,450000.00
+128,hb1,2011,enacted,hb1-greenbook,1,,4550,200608,Commodity Foods,24000000.00
+128,hb1,2011,enacted,hb1-greenbook,1,,4D10,200602,Ohio Prevention/Education Resource Center,0.00
+128,hb1,2011,enacted,hb1-greenbook,1,,4L20,200681,Teacher Certification and Licensure,8147756.00
+128,hb1,2011,enacted,hb1-greenbook,1,,4R70,200695,Indirect Operational Support,6250000.00
+128,hb1,2011,enacted,hb1-greenbook,1,,4V70,200633,Interagency Operational Support,1117725.00
+128,hb1,2011,enacted,hb1-greenbook,1,,5960,200656,Ohio Career Information System,529761.00
+128,hb1,2011,enacted,hb1-greenbook,1,,5980,200659,Auxiliary Services Reimbursement,1328910.00
+128,hb1,2011,enacted,hb1-greenbook,1,,5BB0,200696,State Action for Education Leadership,600000.00
+128,hb1,2011,enacted,hb1-greenbook,1,,5BJ0,200626,Half-Mill Maintenance Equalization,16600000.00
+128,hb1,2011,enacted,hb1-greenbook,1,,5H30,200687,School District Solvency Assistance,18000000.00
+128,hb1,2011,enacted,hb1-greenbook,1,,5U20,200685,National Education Statistics,300000.00
+128,hb1,2011,enacted,hb1-greenbook,1,,5W20,200663,Early Learning Initiative,2200000.00
+128,hb1,2011,enacted,hb1-greenbook,1,,5X90,200911,NGA STEM,0.00
+128,hb1,2011,enacted,hb1-greenbook,1,,6200,200615,Educational Improvement Grants,3000000.00
+128,hb1,2011,enacted,hb1-greenbook,1,,6210,200910,Preschool Foreign Language,0.00
+128,hb1,2011,enacted,hb1-greenbook,1,,7017,200612,Foundation Funding,1277271428.00
+128,hb1,2011,enacted,hb1-greenbook,1,,7017,200682,Lease Rental Payment Reimbursement,0.00
+128,hb1,2011,enacted,hb1-greenbook,1,,7047,200909,School District Property Tax Replacement -,1150207366.00
+128,hb1,2011,enacted,hb1-greenbook,1,,7053,200900,School District Property Tax Replacement -,91123523.00
+128,hb1,2011,enacted,hb1-greenbook,1,,GRF,200100,Personal Services,10723972.00
+128,hb1,2011,enacted,hb1-greenbook,1,,GRF,200320,Maintenance and Equipment,3144897.00
+128,hb1,2011,enacted,hb1-greenbook,1,,GRF,200408,Early Childhood Education,23268341.00
+128,hb1,2011,enacted,hb1-greenbook,1,,GRF,200410,Educator Training,0.00
+128,hb1,2011,enacted,hb1-greenbook,1,,GRF,200416,Career-Technical Education Match,2233195.00
+128,hb1,2011,enacted,hb1-greenbook,1,,GRF,200420,Computer/Application/Network Development,4880871.00
+128,hb1,2011,enacted,hb1-greenbook,1,,GRF,200421,Alternative Education Programs,7918749.00
+128,hb1,2011,enacted,hb1-greenbook,1,,GRF,200422,School Management Assistance,3230469.00
+128,hb1,2011,enacted,hb1-greenbook,1,,GRF,200424,Policy Analysis,361065.00
+128,hb1,2011,enacted,hb1-greenbook,1,,GRF,200425,Tech Prep Consortia Support,1260542.00
+128,hb1,2011,enacted,hb1-greenbook,1,,GRF,200426,Ohio Educational Computer Network,20425556.00
+128,hb1,2011,enacted,hb1-greenbook,1,,GRF,200427,Academic Standards,5300074.00
+128,hb1,2011,enacted,hb1-greenbook,1,,GRF,200431,School Improvement Initiatives,7391503.00
+128,hb1,2011,enacted,hb1-greenbook,1,,GRF,200433,Literacy Improvement - Professional,0.00
+128,hb1,2011,enacted,hb1-greenbook,1,,GRF,200437,Student Assessment,56703265.00
+128,hb1,2011,enacted,hb1-greenbook,1,,GRF,200439,Accountability/Report Cards,3804673.00
+128,hb1,2011,enacted,hb1-greenbook,1,,GRF,200442,Child Care Licensing,877140.00
+128,hb1,2011,enacted,hb1-greenbook,1,,GRF,200445,OhioReads Volunteer Support,0.00
+128,hb1,2011,enacted,hb1-greenbook,1,,GRF,200446,Education Management Information System,11934284.00
+128,hb1,2011,enacted,hb1-greenbook,1,,GRF,200447,GED Testing,988553.00
+128,hb1,2011,enacted,hb1-greenbook,1,,GRF,200448,Educator Preparation,1328240.00
+128,hb1,2011,enacted,hb1-greenbook,1,,GRF,200455,Community Schools,1000000.00
+128,hb1,2011,enacted,hb1-greenbook,1,,GRF,200457,STEM Initiatives,5000000.00
+128,hb1,2011,enacted,hb1-greenbook,1,,GRF,200458,School Employees Health Care Board,800000.00
+128,hb1,2011,enacted,hb1-greenbook,1,,GRF,200502,Pupil Transportation,462822619.00
+128,hb1,2011,enacted,hb1-greenbook,1,,GRF,200503,Bus Purchase Allowance,0.00
+128,hb1,2011,enacted,hb1-greenbook,1,,GRF,200505,School Lunch Match,9100000.00
+128,hb1,2011,enacted,hb1-greenbook,1,,GRF,200509,Adult Literacy Education,0.00
+128,hb1,2011,enacted,hb1-greenbook,1,,GRF,200511,Auxiliary Services,111979388.00
+128,hb1,2011,enacted,hb1-greenbook,1,,GRF,200514,Postsecondary Adult Career-Technical,0.00
+128,hb1,2011,enacted,hb1-greenbook,1,,GRF,200521,Gifted Pupil Program,0.00
+128,hb1,2011,enacted,hb1-greenbook,1,,GRF,200532,Nonpublic Administrative Cost,50838939.00
+128,hb1,2011,enacted,hb1-greenbook,1,,GRF,200536,Ohio Core Support,0.00
+128,hb1,2011,enacted,hb1-greenbook,1,,GRF,200540,Special Education Enhancements,135820668.00
+128,hb1,2011,enacted,hb1-greenbook,1,,GRF,200545,Career-Technical Education Enhancements,7802699.00
+128,hb1,2011,enacted,hb1-greenbook,1,,GRF,200550,Foundation Funding,4746289372.00
+128,hb1,2011,enacted,hb1-greenbook,1,,GRF,200551,Foundation Funding - Federal Stimulus,457449362.00
+128,hb1,2011,enacted,hb1-greenbook,1,,GRF,200566,Literacy Improvement - Classroom Grants,0.00
+128,hb1,2011,enacted,hb1-greenbook,1,,GRF,200578,Violence Prevention and School Safety,200000.00
+128,hb1,2011,enacted,hb1-greenbook,1,,GRF,200901,Property Tax Allocation - Education,1020655157.00
+128,hb1,2011,enacted,hb1-greenbook,1,,GRF,200906,Tangible Tax Exemption-Education,0.00
 129,hb153,2010,actual,hb153-enacted,2,GRF,GRF,200100,Personal Services,9874736.76
 129,hb153,2010,actual,hb153-enacted,2,GRF,GRF,200320,Maintenance and Equipment,3643153.58
 129,hb153,2010,actual,hb153-enacted,2,GRF,GRF,200408,Early Childhood Education,24117882.04

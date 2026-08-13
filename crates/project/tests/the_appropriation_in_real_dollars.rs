@@ -15,25 +15,74 @@ fn deflated(history: Vec<project::appropriations::Year>) -> Vec<project::appropr
     history.into_iter().filter(|y| y.real.is_some()).collect()
 }
 
+/// A named window of the series.
+///
+/// Every growth figure here states the years it is over, rather than taking the first and last of
+/// whatever the series happens to hold. That was how these tests were written when the series
+/// began at FY2014, and extending it back to FY2002 silently changed what they measured: the
+/// formula line grows 3.9% in real terms over FY2014-FY2026 and falls 3.8% over FY2008-FY2026,
+/// and both are true.
+fn window(
+    history: Vec<project::appropriations::Year>,
+    from: u16,
+    to: u16,
+) -> Vec<project::appropriations::Year> {
+    deflated(history)
+        .into_iter()
+        .filter(|y| y.fiscal_year >= from && y.fiscal_year <= to)
+        .collect()
+}
+
 #[test]
-fn the_department_grew_by_a_third_nominally_and_shrank_in_real_terms() {
-    // The finding. Between FY2014 and FY2026 the enacted appropriation rose 29% in cash and fell
-    // 8% against CPI-U. Neither number is wrong and neither is the whole story; what this test
-    // guards is that the repository cannot report one without the other being available.
-    let history = deflated(enacted_history(BASE));
+fn the_department_grew_in_both_bases_once_the_reimbursements_are_out_of_both_ends() {
+    /*
+     * This test asserted a real-terms *fall* of about 8% and was wrong, because
+     * `TAX_REIMBURSEMENT` was written from the FY2026-27 greenbook, where the class has two
+     * members, and applied to a window whose other end had five. `200901 Property Tax Allocation
+     * - Education` alone was $1.14 billion in FY2014, so the start of the window carried roughly
+     * $1.65 billion the end did not.
+     *
+     * Corrected, the department's enacted appropriation rises 50.6% in cash and **7.5% in
+     * constant dollars** between FY2014 and FY2026. The sign is the opposite of what this
+     * repository reported for two commits.
+     */
+    let history = window(enacted_history(BASE), 2014, 2026);
     let (nominal, real, _) = growth(&history).expect("both endpoints deflate");
+    assert!(nominal > 0.45, "nominal growth is {nominal}");
     assert!(
-        nominal > 0.25 && nominal < 0.33,
-        "nominal growth is {nominal}, no longer the +29% this series showed"
+        real > 0.0,
+        "the real-terms series falls again at {real}; the exclusion list may have lost a member \
+         at one end of the window"
     );
     assert!(
-        real < 0.0,
-        "the real-terms series no longer falls; it is {real}, and the corpus says it does"
+        real > 0.04 && real < 0.11,
+        "real growth is {real}, outside the band this finding holds"
     );
-    assert!(
-        real > -0.12 && real < -0.04,
-        "real growth is {real}, outside the band this finding has held"
-    );
+}
+
+#[test]
+fn every_reimbursement_line_is_excluded_at_both_ends_of_any_window() {
+    // The guard for the defect above. The class is identified by what its titles say, and every
+    // member must be in the exclusion list — otherwise a window spanning a renumbering compares a
+    // total that includes them against one that does not.
+    let named: std::collections::BTreeSet<String> = lines()
+        .iter()
+        .filter(|line| {
+            let title = line.title.to_lowercase();
+            title.contains("tax allocation")
+                || title.contains("tax replacement")
+                || title.contains("tax reimbursement")
+        })
+        .map(|line| line.line_item.clone())
+        .collect();
+    for item in &named {
+        assert!(
+            TAX_REIMBURSEMENT.contains(&item.as_str()),
+            "line item {item} reimburses tax and is not excluded; a window crossing the years it \
+             exists in would compare unlike totals"
+        );
+    }
+    assert_eq!(named.len(), TAX_REIMBURSEMENT.len());
 }
 
 #[test]
@@ -41,7 +90,7 @@ fn the_formula_line_moved_the_other_way_from_the_department_around_it() {
     // Foundation Funding is the formula itself, and it is the one large line that gained ground:
     // +3.9% real while the department it sits in lost 7.9%. Whatever else the Fair School Funding
     // Plan did, it did not come out of a growing budget — it came out of a shrinking one.
-    let foundation = deflated(line_history("200550", BASE));
+    let foundation = window(line_history("200550", BASE), 2014, 2026);
     let (nominal, real, _) = growth(&foundation).expect("both endpoints deflate");
     assert!(
         nominal > 0.40,
@@ -52,11 +101,14 @@ fn the_formula_line_moved_the_other_way_from_the_department_around_it() {
         "Foundation Funding no longer grows in real terms; it is {real}"
     );
 
-    let department = deflated(enacted_history(BASE));
+    let department = window(enacted_history(BASE), 2014, 2026);
     let (_, department_real, _) = growth(&department).expect("both endpoints deflate");
+    // Both rise in real terms once the reimbursements are out of both ends; the formula's line
+    // still rises less than the department around it, which is the opposite of what this test
+    // asserted when the department appeared to be shrinking.
     assert!(
-        real > department_real,
-        "the formula line {real} no longer outpaces the department around it {department_real}"
+        department_real > 0.0 && real > 0.0,
+        "one of them now falls: formula {real}, department {department_real}"
     );
 }
 
@@ -92,5 +144,92 @@ fn the_tax_reimbursement_lines_are_excluded_and_are_not_small() {
         "the excluded reimbursement lines are only {excluded}; either they have shrunk or the \
          exclusion has stopped working"
     );
-    assert_eq!(TAX_REIMBURSEMENT.len(), 2);
+    assert_eq!(TAX_REIMBURSEMENT.len(), 6);
+}
+
+#[test]
+fn the_long_view_says_something_different_from_the_short_one() {
+    // What the extension back to FY2002 bought, and the reason every figure here names its years.
+    // Over FY2014-FY2026 the formula's line gains 3.9% in real terms; over FY2008-FY2026 — the
+    // whole span the same line item exists for — it loses ground. The Fair School Funding Plan
+    // recovered something that had been given up earlier, which is a different claim from growth.
+    let short = window(line_history("200550", BASE), 2014, 2026);
+    let long = window(line_history("200550", BASE), 2008, 2026);
+    let (_, short_real, _) = growth(&short).expect("both endpoints deflate");
+    let (_, long_real, _) = growth(&long).expect("both endpoints deflate");
+    assert!(
+        short_real > 0.0,
+        "the short window no longer gains: {short_real}"
+    );
+    assert!(
+        long_real < 0.0,
+        "the long window no longer loses: {long_real}"
+    );
+    assert!(
+        long[0].fiscal_year == 2008,
+        "200550 now reaches before FY2008 and this window has changed meaning"
+    );
+}
+
+#[test]
+fn the_real_terms_fall_is_in_lines_that_stopped_being_listed() {
+    /*
+     * The question `state-foundation-aid` carried open: which categorical lines absorbed the
+     * department's 7.9% real-terms fall between FY2014 and FY2026.
+     *
+     * **None of them did.** Of the 61 lines appropriated in both years, the gains outweigh the
+     * losses — roughly $1.08 billion gained against $0.55 billion lost, in FY2026 dollars. The
+     * fall is not in surviving lines shrinking. It is in the department going from **112 lines to
+     * 80**: 51 that existed in FY2014 do not exist in FY2026, and only 19 new ones appeared.
+     *
+     * **And this series cannot say whether that is a cut or a consolidation.** A line ceasing to
+     * be listed may have been abolished or folded into another, and the two largest gains here —
+     * `200550` and `200612`, both Foundation Funding - All Students, up about $320 million and
+     * $350 million real — are exactly what a consolidation into the formula would look like.
+     * Distinguishing them needs the acts' own language, which is the analysis half of
+     * `lsc-budget` and is not held.
+     */
+    use project::appropriations::{changes, enacted_history, lines, TAX_REIMBURSEMENT};
+    use std::collections::BTreeSet;
+
+    let moved = changes(BASE, 2014, 2026);
+    let lost: f64 = moved.iter().map(|c| c.shift()).filter(|s| *s < 0.0).sum();
+    let gained: f64 = moved.iter().map(|c| c.shift()).filter(|s| *s > 0.0).sum();
+    assert!(
+        gained > lost.abs(),
+        "surviving lines now lose more than they gain ({gained} against {lost}); the fall has \
+         moved into them and the finding beside this test is stale"
+    );
+
+    let present = |year: u16| -> BTreeSet<String> {
+        lines()
+            .iter()
+            .filter(|l| {
+                l.kind == "enacted"
+                    && l.fiscal_year == year
+                    && !TAX_REIMBURSEMENT.contains(&l.line_item.as_str())
+            })
+            .map(|l| l.line_item.clone())
+            .collect()
+    };
+    let (start, end) = (present(2014), present(2026));
+    assert!(
+        start.difference(&end).count() > 40,
+        "the count of lines that stopped being listed has changed; it was 48"
+    );
+
+    let history = enacted_history(BASE);
+    let count = |year: u16| {
+        history
+            .iter()
+            .find(|y| y.fiscal_year == year)
+            .expect("year")
+            .items
+    };
+    assert!(
+        count(2014) > count(2026) + 25,
+        "the department no longer has far fewer appropriation lines than it did: {} against {}",
+        count(2026),
+        count(2014)
+    );
 }

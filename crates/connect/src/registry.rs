@@ -735,14 +735,14 @@ pub const CONNECTORS: &[Connector] = &[
         feeds: &["legislation", "fiscal-period", "program", "parameter"],
         status: Status::Wired {
             still_blocked: Some(
-                "wired for the appropriation-line series from the 129th General Assembly \
-                 onward — FY2012 through FY2027, both variants of each biennium's workbook. The \
-                 five bienniums before that, back to the 124th, exist only as greenbook PDFs \
-                 whose tables must be read by column position rather than token order, and are \
-                 unextracted. FY2012-13 has no enacted figure at all: LSC serves that biennium's \
-                 two variants as the same file. Before FY1999 there is nothing — the Foundation \
-                 Program era still needs the session laws. The Catalog of Budget Line Items and \
-                 the per-district simulations have an index page each and have not been opened",
+                "wired for the appropriation-line series FY1999 through FY2027, from the \
+                 124th General Assembly's greenbook to the 136th's workbooks. Two bienniums are \
+                 missing an enacted figure and neither is retrievable: FY2006-07, because the \
+                 126th's greenbook has no line-item table at all, and FY2012-13, because LSC \
+                 serves that biennium's two workbook variants as the same file. Before FY1999 \
+                 there is nothing — the Foundation Program era, DeRolph I and the equal yield \
+                 formula still need the session laws. The Catalog of Budget Line Items and the \
+                 per-district simulations have an index page each and have not been opened",
             ),
         },
         note: "The only continuous appropriation-line series across the whole period, and the \
@@ -955,6 +955,58 @@ pub const CONNECTORS: &[Connector] = &[
             catalog: Some("lsc-appropriation-spreadsheet"),
             fixtures: &[crate::fixtures::APPROPRIATION_FIXTURE],
             note: "FY2026-FY2027. Revised after the biennium closed, so it carries actual expenditures and adjusted appropriations and no longer states what was enacted. That is why both variants are held.",
+        },
+        Source {
+            key: "hb94-greenbook",
+            title: None,
+            url: "https://www.lsc.ohio.gov/assets/legislation/124/hb94/en/files/\
+                  hb94-edu-greenbook-as-enrolled-124th-general-assembly.pdf",
+            filename: "hb94-greenbook.pdf",
+            format: Format::Pdf,
+            catalog: Some("lsc-dew-redbook"),
+            fixtures: &[crate::fixtures::APPROPRIATION_FIXTURE],
+            note: "FY2002-FY2003 as enrolled, with the three preceding years as actuals. \
+                   Read by clustering the right edges of the figures, because the table's own \
+                   header labels sit narrower than the columns beneath them.",
+        },
+        Source {
+            key: "hb95-greenbook",
+            title: None,
+            url: "https://www.lsc.ohio.gov/assets/legislation/125/hb95/en/files/\
+                  hb95-edu-greenbook-as-enrolled-125th-general-assembly.pdf",
+            filename: "hb95-greenbook.pdf",
+            format: Format::Pdf,
+            catalog: Some("lsc-dew-redbook"),
+            fixtures: &[crate::fixtures::APPROPRIATION_FIXTURE],
+            note: "FY2004-FY2005 as enrolled, with the three preceding years as actuals. \
+                   Read by clustering the right edges of the figures, because the table's own \
+                   header labels sit narrower than the columns beneath them.",
+        },
+        Source {
+            key: "hb119-greenbook",
+            title: None,
+            url: "https://www.lsc.ohio.gov/assets/legislation/127/hb119/en/files/\
+                  hb119-edu-greenbook-as-enrolled-127th-general-assembly.pdf",
+            filename: "hb119-greenbook.pdf",
+            format: Format::Pdf,
+            catalog: Some("lsc-dew-redbook"),
+            fixtures: &[crate::fixtures::APPROPRIATION_FIXTURE],
+            note: "FY2008-FY2009 as enrolled, with the three preceding years as actuals. \
+                   Read by clustering the right edges of the figures, because the table's own \
+                   header labels sit narrower than the columns beneath them.",
+        },
+        Source {
+            key: "hb1-greenbook",
+            title: None,
+            url: "https://www.lsc.ohio.gov/assets/legislation/128/hb1/en/files/\
+                  hb1-edu-greenbook-as-enrolled-128th-general-assembly.pdf",
+            filename: "hb1-greenbook.pdf",
+            format: Format::Pdf,
+            catalog: Some("lsc-dew-redbook"),
+            fixtures: &[crate::fixtures::APPROPRIATION_FIXTURE],
+            note: "FY2010-FY2011 as enrolled, with the three preceding years as actuals. \
+                   Read by clustering the right edges of the figures, because the table's own \
+                   header labels sit narrower than the columns beneath them.",
         },
         ],
     },

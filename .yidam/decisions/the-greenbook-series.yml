@@ -126,6 +126,36 @@ amendment: |
   repository keeps arriving at: a misdated or mislabelled figure is not a parse failure, produces
   a plausible number, and nothing downstream would catch it. The next attempt takes both variants
   per biennium and treats a repeated year as an error.
+  **The PDF era was measured, and the approach this record proposed for it does not work.**
+
+  "Read the tables by column position rather than token order" was right about the hazard and
+  wrong about the method. The obvious source of column positions is the table header, and the
+  header is not where the data is.
+
+  Each detail table repeats per page, and `pdftotext -layout` lays every page out independently:
+  across the 124th's six pages the same five columns sit at character 60/75/91/107/137 on one and
+  64/82/100/119/148 on another, so positions must be read per page rather than per document. That
+  part works. What does not is that the header *labels* are narrower than the columns of figures
+  beneath them. In the 127th the labels land at 67, 81 and 91 while the amounts they head are
+  spread far wider, and an amount assigned to its nearest label goes to the wrong year.
+
+  Measured, with per-page positions and nearest-label assignment: the 125th and the 128th parse
+  with **no** ambiguous rows, the 124th has 6 and the 127th has 16 — rows where two amounts claim
+  one column, which means at least one of them is misdated. That is 22 rows out of 494, and the
+  reason it cannot simply be tolerated is that a misdated appropriation is a plausible number in
+  the wrong year rather than a parse failure.
+
+  **The 126th has no line-item detail table at all.** Five markers in the other four documents,
+  none in that one; its appropriations appear only in the narrower per-category tables. FY2006-07
+  will need a different reader or will stay absent.
+
+  What the next attempt should do instead of reading the header: **calibrate the columns from the
+  amounts**. Within one page the figures are right-aligned, so their positions cluster tightly,
+  and the number of clusters is the number of columns. Order the clusters left to right and map
+  them onto the years the header names, in order — using the header for *which years* and the data
+  for *where they are*, which is the division of labour each is actually reliable for. A page
+  whose cluster count and year count disagree is a page to refuse rather than to guess at.
+
 alternatives: |
   **Start the extraction in this phase.** Rejected on scope rather than on doubt. Thirteen
   documents across two formats and three PDF layout eras, a fixture, a reconciliation against each

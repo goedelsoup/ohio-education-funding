@@ -4125,10 +4125,14 @@ pub fn build_appropriations(books: &[AppropriationBook<'_>]) -> Result<Vec<Vec<S
     if out.is_empty() {
         return Err("no appropriation lines were extracted from any workbook".to_string());
     }
-    reconcile(out)
+    Ok(out)
 }
 
-/// Collapse the sixteen documents into one row per claim, refusing if any two disagree.
+/// Collapse every document into one row per claim, refusing if any two disagree.
+///
+/// # Errors
+///
+/// Returns an error naming the claim when two documents give it different amounts.
 ///
 /// # Why the fixture is deduplicated rather than left as it was read
 ///
@@ -4146,7 +4150,7 @@ pub fn build_appropriations(books: &[AppropriationBook<'_>]) -> Result<Vec<Vec<S
 /// So agreement is asserted here, at build time, and the fixture carries one row per claim with
 /// `documents` recording how many said it. Provenance is kept: `source` names the document the
 /// figure was taken from, preferring the act whose own biennium the year falls in.
-fn reconcile(rows: Vec<Vec<String>>) -> Result<Vec<Vec<String>>, String> {
+pub fn reconcile(rows: Vec<Vec<String>>) -> Result<Vec<Vec<String>>, String> {
     use std::collections::BTreeMap;
     // (fiscal_year, kind, line_item) -> the rows claiming it.
     let mut claims: BTreeMap<(String, String, String), Vec<Vec<String>>> = BTreeMap::new();
@@ -4199,5 +4203,257 @@ fn reconcile(rows: Vec<Vec<String>>) -> Result<Vec<Vec<String>>, String> {
         out.push(row);
     }
     out.sort();
+    Ok(out)
+}
+
+/// One greenbook, with the biennium it appropriates for.
+#[derive(Debug, Clone, Copy)]
+pub struct Greenbook<'a> {
+    /// The General Assembly that enacted it.
+    pub general_assembly: u16,
+    /// The bill, as the registry keys it.
+    pub bill: &'a str,
+    /// The registry key of the document.
+    pub source: &'a str,
+    /// The first fiscal year of the biennium it appropriates for.
+    pub first_year: u16,
+    /// `pdftotext -layout` output.
+    pub text: &'a str,
+}
+
+/// The heading above each page of the line-item table.
+const DETAIL_MARKER: &str = "Line Item Detail by Agency";
+
+/// How far apart two right edges may be and still be the same column.
+///
+/// Amounts are right-aligned, so within a column their ends land within a character or two of
+/// each other, while the gap between columns is a dozen or more. Four is comfortably inside that
+/// margin in both directions.
+const COLUMN_GAP: usize = 4;
+
+/// The fiscal years a page's header names, left to right.
+fn header_years(above: &str, below: &str) -> Vec<u16> {
+    let mut found: Vec<(usize, u16)> = Vec::new();
+    for line in [above, below] {
+        let bytes: Vec<char> = line.chars().collect();
+        let mut index = 0;
+        while index + 3 <= bytes.len() {
+            // `FY 1999` or `FY1999`. The bare years in a `2001 to 2002:` span label are
+            // deliberately not matched: they are the `% Change` column's caption, not a column.
+            if bytes[index] == 'F' && bytes.get(index + 1) == Some(&'Y') {
+                let mut cursor = index + 2;
+                if bytes.get(cursor) == Some(&' ') {
+                    cursor += 1;
+                }
+                if cursor + 4 <= bytes.len()
+                    && bytes[cursor..cursor + 4].iter().all(char::is_ascii_digit)
+                {
+                    if let Ok(year) = bytes[cursor..cursor + 4].iter().collect::<String>().parse() {
+                        if (1990..=2100).contains(&year) && !found.iter().any(|(_, y)| *y == year) {
+                            found.push((index, year));
+                        }
+                    }
+                }
+            }
+            index += 1;
+        }
+    }
+    found.sort_unstable();
+    found.into_iter().map(|(_, year)| year).collect()
+}
+
+/// The end position of every dollar amount on a line, with its value.
+fn amounts(line: &str) -> Vec<(usize, f64)> {
+    let chars: Vec<char> = line.chars().collect();
+    let mut out = Vec::new();
+    let mut index = 0;
+    while index < chars.len() {
+        if chars[index] != '$' {
+            index += 1;
+            continue;
+        }
+        let mut cursor = index + 1;
+        while chars.get(cursor) == Some(&' ') {
+            cursor += 1;
+        }
+        let start = cursor;
+        while cursor < chars.len() && (chars[cursor].is_ascii_digit() || chars[cursor] == ',') {
+            cursor += 1;
+        }
+        if cursor > start {
+            let digits: String = chars[start..cursor].iter().filter(|c| **c != ',').collect();
+            if let Ok(value) = digits.parse::<f64>() {
+                out.push((cursor, value));
+            }
+        }
+        index = cursor.max(index + 1);
+    }
+    out
+}
+
+/// Group right edges into columns.
+fn columns(mut ends: Vec<usize>) -> Vec<usize> {
+    ends.sort_unstable();
+    let mut centres = Vec::new();
+    let mut group: Vec<usize> = Vec::new();
+    for end in ends {
+        if group.last().is_some_and(|last| end - last > COLUMN_GAP) {
+            centres.push(group[group.len() / 2]);
+            group.clear();
+        }
+        group.push(end);
+    }
+    if !group.is_empty() {
+        centres.push(group[group.len() / 2]);
+    }
+    centres
+}
+
+/// Whether a line is a line-item row, and its fund, item and title if so.
+fn detail_row(line: &str) -> Option<(String, String, String)> {
+    let trimmed = line.trim_start();
+    let mut parts = trimmed.split_whitespace();
+    let fund = parts.next()?.to_string();
+    if fund.len() < 3 || fund.len() > 4 || !fund.chars().all(|c| c.is_ascii_alphanumeric()) {
+        return None;
+    }
+    let raw = parts.next()?;
+    let item: String = raw.chars().filter(char::is_ascii_digit).collect();
+    if item.len() != 6
+        || !item.starts_with("200")
+        || raw.trim_matches(['-'; 1].as_slice()).len() < 6
+    {
+        return None;
+    }
+    // The title runs to the first run of two spaces, which is where the figures begin.
+    let after = trimmed.split_once(raw)?.1;
+    let title = after
+        .split("  ")
+        .find(|piece| !piece.trim().is_empty())
+        .unwrap_or_default()
+        .trim()
+        .to_string();
+    Some((fund, item, title))
+}
+
+/// Build appropriation lines from the greenbook PDFs of the 124th to 128th General Assemblies.
+///
+/// # Why the columns are calibrated from the figures and not from the header
+///
+/// The obvious source of column positions is the table header, and the header is not where the
+/// data is. Two things had to be measured before this worked. Each table repeats per page and
+/// `pdftotext -layout` lays every page out independently, so the same five columns sit at
+/// character 60/75/91/107/137 on one page of the 124th and 64/82/100/119/148 on another. And the
+/// header *labels* are narrower than the columns of figures beneath them: in the 127th they land
+/// at 67, 81 and 91 while the amounts spread far wider, so assigning an amount to its nearest
+/// label misdates 16 rows there and 6 in the 124th.
+///
+/// So the header is used for **which years**, in order, and the figures for **where the columns
+/// are**: amounts are right-aligned, so their end positions cluster, and the number of clusters is
+/// the number of columns. Across the four documents this assigns 2,185 figures with no row ever
+/// claiming one column twice.
+///
+/// # Errors
+///
+/// Returns an error naming the page when its cluster count and year count disagree, or when a row
+/// puts two amounts in one column. Either means the layout is not the one measured, and a misdated
+/// appropriation is a plausible figure in the wrong year rather than a parse failure — these years
+/// have no later document to be reconciled against, so refusing is the only guard available.
+pub fn build_greenbook_appropriations(books: &[Greenbook<'_>]) -> Result<Vec<Vec<String>>, String> {
+    let mut out = Vec::new();
+    for book in books {
+        let lines: Vec<&str> = book.text.lines().collect();
+        let marks: Vec<usize> = lines
+            .iter()
+            .enumerate()
+            .filter(|(_, line)| line.contains(DETAIL_MARKER))
+            .map(|(index, _)| index)
+            .collect();
+        if marks.is_empty() {
+            return Err(format!(
+                "{}: no `{DETAIL_MARKER}` page; this document keeps its appropriations only in \
+                 per-category tables",
+                book.source
+            ));
+        }
+
+        for (position, start) in marks.iter().enumerate() {
+            let end = marks.get(position + 1).copied().unwrap_or(lines.len());
+            let years = header_years(
+                start.checked_sub(1).map(|i| lines[i]).unwrap_or_default(),
+                lines.get(start + 1).copied().unwrap_or_default(),
+            );
+            if years.is_empty() {
+                continue;
+            }
+            let rows: Vec<&str> = lines[*start..end]
+                .iter()
+                .copied()
+                .filter(|line| detail_row(line).is_some())
+                .collect();
+            if rows.is_empty() {
+                continue;
+            }
+            let centres = columns(
+                rows.iter()
+                    .flat_map(|line| amounts(line))
+                    .map(|(end, _)| end)
+                    .collect(),
+            );
+            if centres.len() != years.len() {
+                return Err(format!(
+                    "{}: the page at line {start} has {} columns of figures and names {} years",
+                    book.source,
+                    centres.len(),
+                    years.len()
+                ));
+            }
+
+            for line in rows {
+                let Some((fund, item, title)) = detail_row(line) else {
+                    continue;
+                };
+                let mut claimed: Vec<usize> = Vec::new();
+                for (position, value) in amounts(line) {
+                    let column = centres
+                        .iter()
+                        .enumerate()
+                        .min_by_key(|(_, centre)| centre.abs_diff(position))
+                        .map(|(index, _)| index)
+                        .unwrap_or_default();
+                    if claimed.contains(&column) {
+                        return Err(format!(
+                            "{}: line item {item} puts two figures in the FY{} column",
+                            book.source, years[column]
+                        ));
+                    }
+                    claimed.push(column);
+                    // The last two columns are the biennium this act appropriates for; everything
+                    // to their left is a closed year, reported as spent.
+                    let year = years[column];
+                    let kind = if year >= book.first_year {
+                        "enacted"
+                    } else {
+                        "actual"
+                    };
+                    out.push(vec![
+                        book.general_assembly.to_string(),
+                        book.bill.to_string(),
+                        year.to_string(),
+                        kind.to_string(),
+                        book.source.to_string(),
+                        String::new(),
+                        fund.clone(),
+                        item.clone(),
+                        title.clone(),
+                        format!("{value:.2}"),
+                    ]);
+                }
+            }
+        }
+    }
+    if out.is_empty() {
+        return Err("no appropriation lines were extracted from any greenbook".to_string());
+    }
     Ok(out)
 }
