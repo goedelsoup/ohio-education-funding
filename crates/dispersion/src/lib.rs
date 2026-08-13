@@ -32,6 +32,7 @@
 #![forbid(unsafe_code)]
 
 pub mod identified;
+pub mod lea_directory;
 pub mod mr81;
 pub mod national_peers;
 pub mod ohio_panel;

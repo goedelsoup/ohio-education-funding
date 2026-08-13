@@ -45,12 +45,12 @@ Fields per connector: key, status, source count, corpus classes fed; then every 
 | [`ohio-courts`](sources/ohio-courts.md) | **wired**, in part | 4 | litigation |
 | [`ofcc-projects`](sources/ofcc-projects.md) | declared | 0 | program, education-agency |
 | [`census-f33`](sources/census-f33.md) | **wired** | 15 | metric, education-agency |
-| [`nces-ccd`](sources/nces-ccd.md) | **wired**, in part | 1 | education-agency |
+| [`nces-ccd`](sources/nces-ccd.md) | **wired**, in part | 16 | education-agency |
 | `census-geography` | **wired** | 4 | education-agency, actor |
 | `dew-child-nutrition` | **wired**, in part | 23 | education-agency, metric, formula-component |
 | `dew-school-improvement` | **wired**, in part | 3 | school, education-agency, accountability-regime |
 
-17 connectors, 140 sources between them. 15 are wired and 2 are not; 7 of the wired ones reach only part of what they feed, and say so below.
+17 connectors, 155 sources between them. 15 are wired and 2 are not; 7 of the wired ones reach only part of what they feed, and say so below.
 
 **What is blocked, in the registry's own words.**
 
@@ -60,7 +60,7 @@ Fields per connector: key, status, source count, corpus classes fed; then every 
 - `lsc-budget` — still blocked on: wired for the appropriation-line series FY1999 through FY2027, from the 124th General Assembly's greenbook to the 136th's workbooks. The two bienniums the greenbook route cannot reach — FY2006-07, whose greenbook has no line-item table, and FY2012-13, whose workbook variants LSC serves as one file — are both carried by the Catalog of Budget Line Items, which was probed and is not blocked, and is now extracted: eighteen distinct editions, 2006 and 2008 through 2025 less the 2012 URL, which serves the 2011 document byte for byte. See the `lsc-catalog` connector and `the-catalog-of-budget-line-items`. Before FY1999 there is still nothing — the Foundation Program era, DeRolph I and the equal yield formula need the session laws, and the Catalog's earliest edition reaches FY2002. The per-district simulations named in earlier versions of this string are not LSC's and have been removed from it
 - `ohio-courts` — still blocked on: trial-level rulings such as the 2025 EdChoice decision are not in the supreme court archive at all, and `citing_cases` needs a citator rather than a document
 - `ofcc-projects` — blocked on: the site refuses a self-identifying agent — 404 to this project's user-agent, 200 to a browser string — and its project data is rendered by interactive maps rather than served as files
-- `nces-ccd` — still blocked on: wired for a single year of the LEA directory; the consolidation-aware long series is not built, because agency files are per-year zips whose column sets change and the identifier-change history has to be derived rather than read
+- `nces-ccd` — still blocked on: wired for the sixteen school years the F-33 panel needs, 2008-09 through 2023-24, which is the whole delimited era. The fourteen years before it are retrievable and fixed-width with the column positions moving in seven of them, so reaching 1994-95 is a second reader. And the identifier-change history is still not derivable from this source: Ohio has never once used the operational status code that marks a consolidation
 - `dew-child-nutrition` — still blocked on: wired for every October the archive holds, 1998 through 2014, across all three of the streams the report splits into from 2012. Three things it still cannot reach: October 2014 is where the directory stops, nine years short of the corpus's FY2024 observations; the three split Octobers have a band and not a poverty share, because community-eligibility sponsors collect no applications at all; and the 1998-2000 files state no sponsor type, so some thirty-five sponsors a year predate the FY2001 file they borrow one from and stay untyped
 - `dew-school-improvement` — still blocked on: wired for the current identification lists only. The department republishes each list in place under a dated filename rather than archiving prior cycles, so there is no history here: a school that exited before this file was written is indistinguishable from one never identified
 

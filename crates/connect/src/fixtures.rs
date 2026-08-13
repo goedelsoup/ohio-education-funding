@@ -2717,6 +2717,21 @@ fn column(header: &[String], name: &str, file: &str) -> Result<usize, String> {
         .ok_or_else(|| format!("{file} has no {name} column; its layout has moved"))
 }
 
+/// Agency identifier and school year to Ohio IRN, from the rows [`build_ccd_directory`] wrote.
+///
+/// Keyed on the year as well as the agency, which is the whole reason the directory is held for
+/// sixteen years rather than one. Asking the 2022-23 file for a district that closed in 2015 gets
+/// nothing back, and the panel then carried an empty identifier for 124 agencies in FY2012 and
+/// described the count as a consolidation history. See `dispersion::lea_directory`.
+fn directory_irn_map(rows: &[Vec<String>]) -> BTreeMap<(u16, String), String> {
+    rows.iter()
+        .filter_map(|row| {
+            let opens = row.first()?.parse().ok()?;
+            Some(((opens, row.get(1)?.clone()), row.get(2)?.clone()))
+        })
+        .collect()
+}
+
 /// `LEAID` to Ohio IRN, from the CCD LEA directory.
 ///
 /// Shared by the national cross-section and the Ohio panel so the join cannot be written twice
@@ -2911,9 +2926,9 @@ pub struct PanelYear<'a> {
 /// Returns the missing column's name if any year's layout has moved.
 pub fn build_f33_ohio_panel(
     years: &[PanelYear<'_>],
-    directory: &str,
+    directory: &[Vec<String>],
 ) -> Result<Vec<Vec<String>>, String> {
-    let irn_of = ccd_irn_map(directory)?;
+    let irn_of = directory_irn_map(directory);
     let mut out = Vec::new();
 
     for year in years {
@@ -2949,9 +2964,19 @@ pub fn build_f33_ohio_panel(
             }
 
             let key = field(leaid).to_string();
+            // The survey's fiscal year and the directory's school year name the same year: FY2012
+            // finance sits beside the 2011-12 directory. Resolved against that year where it is
+            // held and against the nearest later one otherwise, so an agency is named by a file
+            // written while it existed rather than by one written a decade after it closed.
             let irn = irn_of
-                .get(&key)
-                .map(|v| v.strip_prefix("OH-").unwrap_or(v).to_string())
+                .get(&(year.fiscal_year.saturating_sub(1), key.clone()))
+                .or_else(|| {
+                    irn_of
+                        .range((year.fiscal_year.saturating_sub(1), key.clone())..)
+                        .find(|((_, leaid), _)| *leaid == key)
+                        .map(|(_, irn)| irn)
+                })
+                .cloned()
                 .unwrap_or_default();
             let plain = |i: usize| number(i).map(|v| v.to_string()).unwrap_or_default();
             let unreported_is_blank = |i: usize| match number(i) {
@@ -3412,6 +3437,7 @@ pub const REBUILT: &[&str] = &[
     F33_DISTRICTS_FIXTURE,
     F33_OHIO_PANEL_FIXTURE,
     MR81_FIXTURE,
+    CCD_DIRECTORY_FIXTURE,
     BUILDING_FIXTURE,
     IDENTIFIED_FIXTURE,
     CROSSWALK_FIXTURE,
@@ -3464,6 +3490,169 @@ pub fn decided_on(body: &str) -> String {
         .or_else(|| rest.find('\n'))
         .unwrap_or(rest.len());
     rest[..end].trim().to_string()
+}
+
+// -------------------------------------------------------------------------------------------
+// CCD LEA directory, longitudinal
+// -------------------------------------------------------------------------------------------
+
+/// Where the Ohio slice of the CCD agency directory is written, relative to the repository root.
+pub const CCD_DIRECTORY_FIXTURE: &str = "crates/dispersion/fixtures/ccd-lea-directory.csv";
+
+/// Columns of the directory panel.
+pub const CCD_DIRECTORY_HEADER: &[&str] = &[
+    "school_year",
+    "leaid",
+    "irn",
+    "name",
+    "agency_type",
+    "status",
+];
+
+/// One published year of the LEA universe directory.
+#[derive(Debug, Clone, Copy)]
+pub struct DirectoryYear<'a> {
+    /// The school year it describes, as the calendar year it begins in: 2008 for 2008-09.
+    pub opens: u16,
+    /// The delimited file's text.
+    pub text: &'a str,
+}
+
+/// Column names that mean the same thing in different years, most recent naming first.
+///
+/// Resolved by trying each in turn rather than by a per-year table. The year suffix is the reason:
+/// 2008-09 calls it `STID08` and 2009-10 calls it `STID09`, so a table would carry one row per
+/// year to say one thing. A list of aliases says the same thing once and fails loudly if a year
+/// uses none of them.
+const CCD_ALIASES: [(&str, &[&str]); 5] = [
+    ("the agency identifier", &["LEAID"]),
+    (
+        "the state's own identifier",
+        &["ST_LEAID", "STID", "STID09", "STID08", "STID07"],
+    ),
+    (
+        "the agency name",
+        &["LEA_NAME", "NAME", "NAME09", "NAME08", "NAME07"],
+    ),
+    (
+        "the agency type",
+        &["LEA_TYPE", "TYPE", "TYPE09", "TYPE08", "TYPE07"],
+    ),
+    (
+        "the operational status",
+        &["SY_STATUS", "BOUND", "BOUND09", "BOUND08", "BOUND07"],
+    ),
+];
+
+/// Ohio's FIPS state code, which is how a row is selected.
+const OHIO_FIPS: &str = "39";
+
+/// Every Ohio agency in every published year of the directory this repository holds.
+///
+/// # Why more than one year of a directory is worth holding
+///
+/// One year answers "what is this agency's Ohio number". Sixteen answer "when did this agency
+/// exist", which is a different question and the one a panel spanning years actually asks.
+/// [`crate::fixtures::F33_OHIO_PANEL_FIXTURE`] resolved every identifier through the 2022-23 file
+/// alone, so an agency that closed before 2023 had no Ohio number at all — 124 of them in FY2012 —
+/// and the module reading it described that count as the consolidation history. It is not. Of the
+/// 341 agencies that leave this window, **327 are community schools**, nine are service centres,
+/// and five are regular districts.
+///
+/// # What the status column can and cannot say
+///
+/// The CCD vocabulary has eight operational-status codes and exactly one of them marks a
+/// consolidation: code 5, *"significant change in geographic boundaries or instructional
+/// responsibility"*. **Ohio has never used it** — zero occurrences in every Ohio agency-year this
+/// reader covers. What Ohio files instead, for all 341 departures without exception, is code 2:
+/// *"closed with no effect on another agency's boundaries"*.
+///
+/// That is not silence. It is the negation of the thing, filed about three districts whose
+/// territory demonstrably went to a neighbour. So the code is carried verbatim and nothing here
+/// reads a reason out of it. See `dispersion::lea_directory`.
+///
+/// # Ohio is selected on `FIPST` and never on `LSTATE`
+///
+/// They disagree. LEAID 3901497, Urban Pathways of Youngstown, is filed under `FIPST=39` with
+/// `LSTATE=PA` in 2012-13 and 2013-14 — a mailing address, not a jurisdiction. Earlier years have
+/// the mirror-image defect, filing an Arizona agency as `LSTATE=OH`. The FIPS code is part of the
+/// agency identifier's first two digits and cannot drift from it.
+///
+/// # Errors
+///
+/// Returns a description if a year uses none of the names a field is known by, or if a year's
+/// Ohio row count is outside the band the survey has ever produced.
+pub fn build_ccd_directory(years: &[DirectoryYear<'_>]) -> Result<Vec<Vec<String>>, String> {
+    let mut out = Vec::new();
+    for year in years {
+        let label = format!(
+            "the CCD LEA directory for {}-{:02}",
+            year.opens,
+            (year.opens + 1) % 100
+        );
+        let mut lines = year.text.lines();
+        let header_line = lines.next().unwrap_or_default();
+        let delimiter = if header_line.contains('\t') {
+            '\t'
+        } else {
+            ','
+        };
+        let head = delimited_fields(header_line, delimiter);
+
+        let mut at = [0usize; CCD_ALIASES.len()];
+        for (i, (what, names)) in CCD_ALIASES.iter().enumerate() {
+            at[i] = names
+                .iter()
+                .find_map(|name| column(&head, name, &label).ok())
+                .ok_or_else(|| {
+                    format!("{label} names {what} none of {names:?}; its layout has moved")
+                })?;
+        }
+        let fips = column(&head, "FIPST", &label)?;
+
+        let mut kept = 0usize;
+        for line in lines {
+            if line.trim().is_empty() {
+                continue;
+            }
+            let f = delimited_fields(line, delimiter);
+            let field = |i: usize| f.get(i).map(|v| v.trim()).unwrap_or_default();
+            if field(fips).trim_start_matches('0') != OHIO_FIPS {
+                continue;
+            }
+            // The prefix appears in 2016-17 and the digits either side of it are the same six.
+            // Stripped here so the panel joins to itself across the change, and so it joins to
+            // every other fixture in this repository, which write the bare IRN.
+            let irn = field(at[1]).trim_start_matches("OH-");
+            if irn.len() != 6 || !irn.chars().all(|c| c.is_ascii_digit()) {
+                return Err(format!(
+                    "{label} gives agency {} the state identifier {irn:?}, which is not a \
+                     six-digit IRN",
+                    field(at[0])
+                ));
+            }
+            out.push(vec![
+                year.opens.to_string(),
+                field(at[0]).to_string(),
+                irn.to_string(),
+                clean_name(field(at[2])),
+                field(at[3]).to_string(),
+                field(at[4]).to_string(),
+            ]);
+            kept += 1;
+        }
+
+        // Ohio has run between one thousand and twelve hundred agencies in every year of this
+        // window. A count outside that is a state filter that matched the wrong column, which is
+        // the failure `LSTATE` would have produced silently.
+        if !(900..=1400).contains(&kept) {
+            return Err(format!(
+                "{label} yielded {kept} Ohio agencies, which is outside anything the directory \
+                 has published"
+            ));
+        }
+    }
+    Ok(out)
 }
 
 // -------------------------------------------------------------------------------------------

@@ -1736,17 +1736,171 @@ pub const CONNECTORS: &[Connector] = &[
         feeds: &["education-agency"],
         status: Status::Wired {
             still_blocked: Some(
-                "wired for a single year of the LEA directory; the consolidation-aware long \
-                 series is not built, because agency files are per-year zips whose column sets \
-                 change and the identifier-change history has to be derived rather than read",
+                "wired for the sixteen school years the F-33 panel needs, 2008-09 through \
+                 2023-24, which is the whole delimited era. The fourteen years before it are \
+                 retrievable and fixed-width with the column positions moving in seven of them, \
+                 so reaching 1994-95 is a second reader. And the identifier-change history is \
+                 still not derivable from this source: Ohio has never once used the operational \
+                 status code that marks a consolidation",
             ),
         },
         note: "A corpus spanning 1851 to the present is a panel whose members change, and a \
                long series assembled without accounting for consolidation is silently wrong. \
-               A single year of the directory was never blocked by that, and it carries the one \
-               column two other connectors were waiting on.",
-        sources: &[Source {
-            key: "ccd-lea-directory-2223",
+               What the directory settles is which agencies existed when, and what it refuses to \
+               settle is why any of them stopped.",
+        sources: &[
+            Source {
+                key: "ccd-lea-directory-0809",
+                title: None,
+                url: "https://nces.ed.gov/ccd/data/zip/ag081a_txt.zip",
+                filename: "ccd-lea-directory-0809.zip",
+                format: Format::Zip,
+                catalog: Some("nces-ccd-lea-directory"),
+                fixtures: &[crate::fixtures::CCD_DIRECTORY_FIXTURE],
+                note: "School year 2008-09. Tab-delimited with a header, and the columns carry a year suffix: `STID08`, `BOUND08`, `TYPE08`. This is also the one year with no charter column at all, which is why agency type rather than a charter flag is what this reader keys on.",
+            },
+            Source {
+                key: "ccd-lea-directory-0910",
+                title: None,
+                url: "https://nces.ed.gov/ccd/data/zip/ag092a_txt.zip",
+                filename: "ccd-lea-directory-0910.zip",
+                format: Format::Zip,
+                catalog: Some("nces-ccd-lea-directory"),
+                fixtures: &[crate::fixtures::CCD_DIRECTORY_FIXTURE],
+                note: "School year 2009-10. The second revision. `ag091a_txt.zip` is the first and differs from it in 42 rows nationally, none of them Ohio's.",
+            },
+            Source {
+                key: "ccd-lea-directory-1011",
+                title: None,
+                url: "https://nces.ed.gov/ccd/data/zip/ag102a_txt.zip",
+                filename: "ccd-lea-directory-1011.zip",
+                format: Format::Zip,
+                catalog: Some("nces-ccd-lea-directory"),
+                fixtures: &[crate::fixtures::CCD_DIRECTORY_FIXTURE],
+                note: "School year 2010-11. The second revision again, and the year the column names lose their suffix: `STID` and `BOUND` from here to 2013-14.",
+            },
+            Source {
+                key: "ccd-lea-directory-1112",
+                title: None,
+                url: "https://nces.ed.gov/ccd/data/zip/ag111a_txt.zip",
+                filename: "ccd-lea-directory-1112.zip",
+                format: Format::Zip,
+                catalog: Some("nces-ccd-lea-directory"),
+                fixtures: &[crate::fixtures::CCD_DIRECTORY_FIXTURE],
+                note: "School year 2011-12. The archive is named `ag111a_txt` and the file inside it is `ag111a_supp.txt`, which is the naming the next two years use in the URL as well.",
+            },
+            Source {
+                key: "ccd-lea-directory-1213",
+                title: None,
+                url: "https://nces.ed.gov/ccd/data/zip/ag121a_supp_txt.zip",
+                filename: "ccd-lea-directory-1213.zip",
+                format: Format::Zip,
+                catalog: Some("nces-ccd-lea-directory"),
+                fixtures: &[crate::fixtures::CCD_DIRECTORY_FIXTURE],
+                note: "School year 2012-13. The year `LSTATE` stops agreeing with `FIPST`: LEAID 3901497, Urban Pathways of Youngstown, is filed with `FIPST=39` and `LSTATE=PA`. Ohio is selected on `FIPST` throughout for that reason.",
+            },
+            Source {
+                key: "ccd-lea-directory-1314",
+                title: None,
+                url: "https://nces.ed.gov/ccd/data/zip/ag131a_supp_txt.zip",
+                filename: "ccd-lea-directory-1314.zip",
+                format: Format::Zip,
+                catalog: Some("nces-ccd-lea-directory"),
+                fixtures: &[crate::fixtures::CCD_DIRECTORY_FIXTURE],
+                note: "School year 2013-14. The last year of the tab-delimited era.",
+            },
+            Source {
+                key: "ccd-lea-directory-1415",
+                title: None,
+                url: "https://nces.ed.gov/ccd/data/zip/ccd_lea_029_1415_w_0216161ar_txt.zip",
+                filename: "ccd-lea-directory-1415.zip",
+                format: Format::Zip,
+                catalog: Some("nces-ccd-lea-directory"),
+                fixtures: &[crate::fixtures::CCD_DIRECTORY_FIXTURE],
+                note: "School year 2014-15. The revision, not the original. `..._0216161a_txt.zip` is superseded and NCES's own file index no longer lists it; the two differ in exactly two columns, which spell state names out rather than abbreviating them. Still tab-delimited, and the state identifier column is renamed `ST_LEAID` here while its contents stay bare digits.",
+            },
+            Source {
+                key: "ccd-lea-directory-1516",
+                title: None,
+                url: "https://nces.ed.gov/ccd/data/zip/ccd_lea_029_1516_w_1a_011717_csv.zip",
+                filename: "ccd-lea-directory-1516.zip",
+                format: Format::Zip,
+                catalog: Some("nces-ccd-lea-directory"),
+                fixtures: &[crate::fixtures::CCD_DIRECTORY_FIXTURE],
+                note: "School year 2015-16. The first comma-delimited year, and the last one whose `ST_LEAID` is a bare IRN.",
+            },
+            Source {
+                key: "ccd-lea-directory-1617",
+                title: None,
+                url: "https://nces.ed.gov/ccd/data/zip/ccd_lea_029_1617_w_1a_11212017_csv.zip",
+                filename: "ccd-lea-directory-1617.zip",
+                format: Format::Zip,
+                catalog: Some("nces-ccd-lea-directory"),
+                fixtures: &[crate::fixtures::CCD_DIRECTORY_FIXTURE],
+                note: "School year 2016-17. The year the `OH-` prefix appears on `ST_LEAID`. The combined `..._11212017.zip` holds the same CSV byte for byte alongside a SAS file; this is the smaller archive of the two and NCES's index lists it.",
+            },
+            Source {
+                key: "ccd-lea-directory-1718",
+                title: None,
+                url: "https://nces.ed.gov/ccd/data/zip/ccd_lea_029_1718_w_1a_083118.zip",
+                filename: "ccd-lea-directory-1718.zip",
+                format: Format::Zip,
+                catalog: Some("nces-ccd-lea-directory"),
+                fixtures: &[crate::fixtures::CCD_DIRECTORY_FIXTURE],
+                note: "School year 2017-18. Carries the CSV beside a `.sas7bdat` of the same directory, which is why the member is chosen by suffix rather than by name.",
+            },
+            Source {
+                key: "ccd-lea-directory-1819",
+                title: None,
+                url: "https://nces.ed.gov/ccd/data/zip/ccd_lea_029_1819_l_1a_091019.zip",
+                filename: "ccd-lea-directory-1819.zip",
+                format: Format::Zip,
+                catalog: Some("nces-ccd-lea-directory"),
+                fixtures: &[crate::fixtures::CCD_DIRECTORY_FIXTURE],
+                note: "School year 2018-19. The final release. The preliminary `..._0a_04082019_csv.zip` is a different file and NCES's index no longer lists it; for Ohio they carry the same 1,074 agencies with the same statuses. Note the URL says `_l_` and the CSV inside says `_w_`.",
+            },
+            Source {
+                key: "ccd-lea-directory-1920",
+                title: None,
+                url: "https://nces.ed.gov/ccd/data/zip/ccd_lea_029_1920_w_1a_082120.zip",
+                filename: "ccd-lea-directory-1920.zip",
+                format: Format::Zip,
+                catalog: Some("nces-ccd-lea-directory"),
+                fixtures: &[crate::fixtures::CCD_DIRECTORY_FIXTURE],
+                note: "School year 2019-20. From here the header is 58 columns in a fixed order and does not move again.",
+            },
+            Source {
+                key: "ccd-lea-directory-2021",
+                title: None,
+                url: "https://nces.ed.gov/ccd/data/zip/ccd_lea_029_2021_w_1a_080621.zip",
+                filename: "ccd-lea-directory-2021.zip",
+                format: Format::Zip,
+                catalog: Some("nces-ccd-lea-directory"),
+                fixtures: &[crate::fixtures::CCD_DIRECTORY_FIXTURE],
+                note: "School year 2020-21. Not UTF-8: a cp1252 en dash sits in an Arkansas agency's name. Every file here is read Latin-1 byte for byte, because a lossy read would put a replacement character into committed data.",
+            },
+            Source {
+                key: "ccd-lea-directory-2122",
+                title: None,
+                url: "https://nces.ed.gov/ccd/data/zip/ccd_lea_029_2122_w_1a_071722.zip",
+                filename: "ccd-lea-directory-2122.zip",
+                format: Format::Zip,
+                catalog: Some("nces-ccd-lea-directory"),
+                fixtures: &[crate::fixtures::CCD_DIRECTORY_FIXTURE],
+                note: "School year 2021-22. One Ohio agency closes this year, which is the fewest in the window.",
+            },
+            Source {
+                key: "ccd-lea-directory-2324",
+                title: None,
+                url: "https://nces.ed.gov/ccd/data/zip/ccd_lea_029_2324_w_1a_073124.zip",
+                filename: "ccd-lea-directory-2324.zip",
+                format: Format::Zip,
+                catalog: Some("nces-ccd-lea-directory"),
+                fixtures: &[crate::fixtures::CCD_DIRECTORY_FIXTURE],
+                note: "School year 2023-24. The latest published, and the year the departure count returns to twelve.",
+            },
+            Source {
+                key: "ccd-lea-directory-2223",
             title: None,
             url: "https://nces.ed.gov/ccd/data/zip/ccd_lea_029_2223_w_1a_083023.zip",
             filename: "ccd-lea-directory-2223.zip",
@@ -1756,14 +1910,17 @@ pub const CONNECTORS: &[Connector] = &[
                 crate::fixtures::F33_DISTRICTS_FIXTURE,
                 crate::fixtures::CROSSWALK_FIXTURE,
                 crate::fixtures::F33_OHIO_PANEL_FIXTURE,
+                crate::fixtures::CCD_DIRECTORY_FIXTURE,
             ],
             note: "`ST_LEAID` is the Ohio IRN behind an `OH-` prefix, and `LEAID` is the NCES \
                    agency identifier whose last five digits are the Census school district code. \
                    All 609 districts in the funding panel join through it. This is the \
                    NCESID-to-IRN crosswalk `census-f33` records as missing and \
-                   `census-geography` needs; it feeds no fixture of its own because it is \
-                   consumed while building one belonging to `census-geography`.",
-        }],
+                   `census-geography` needs. School year 2022-23, and the year every other \
+                   fixture here resolves an IRN through — which is what made it worth asking \
+                   what the other fifteen years say.",
+            },
+        ],
     },
     Connector {
         key: "census-geography",

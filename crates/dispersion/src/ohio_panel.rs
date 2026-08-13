@@ -28,10 +28,17 @@
 //! **The denominator is the Bureau's** — `V33`, fall membership — and not Ohio's enrolled ADM. A
 //! per-pupil figure from this module must never be shown beside one from the funding model.
 //!
-//! **The panel's membership is only as good as one directory.** `LEAID` resolves to an IRN
-//! through the FY2022-23 CCD file, so an agency that closed before FY2023 has no IRN here. That
-//! is not a defect to hide — [`unnamed_agencies`] reports it per year, and the count going from
-//! 124 in FY2012 to 0 in FY2022 *is* the consolidation history, measured.
+//! **The panel's membership changes, and naming it took sixteen directories.** `LEAID` resolves
+//! to an IRN through the CCD directory *for the panel's own year*, so an agency that closed in
+//! FY2015 is named by the file written in FY2015. [`unnamed_agencies`] is now zero everywhere and
+//! is kept as the assertion that it stays so.
+//!
+//! It used to resolve through the FY2022-23 file alone, and 124 FY2012 agencies had no IRN. This
+//! docstring called that count "the consolidation history, measured". It was not: 121 of the 124
+//! are community schools. Ohio's traditional districts barely move across this window — 612
+//! comparable agencies in FY2009 against 611 in FY2022 — and the whole district-consolidation
+//! history in it is **three districts**. See [`crate::lea_directory`], which names them, and
+//! which also records that no rule over the federal directory can say why any of them went.
 
 use std::collections::BTreeMap;
 
@@ -244,7 +251,12 @@ pub fn equalization_by_year() -> BTreeMap<u16, Equalization> {
     out
 }
 
-/// Agencies per year the FY2022-23 directory cannot name, which is the consolidation history.
+/// Agencies per year no directory names, which should be none.
+///
+/// Kept after the thing it measured went to zero, because zero is the claim. The extractor
+/// resolves each agency against the directory for its own year and falls forward to the nearest
+/// later one; a non-zero count here means an agency reported finance in a year no directory
+/// carries it, which is a hole in the retrieval rather than a fact about Ohio.
 #[must_use]
 pub fn unnamed_agencies() -> BTreeMap<u16, usize> {
     let mut out = BTreeMap::new();
@@ -456,22 +468,39 @@ mod tests {
         );
     }
 
-    /// The join loss is real, decays with recency, and is reported rather than hidden.
+    /// Every agency in every year is named, which took sixteen directories rather than one.
+    ///
+    /// This test used to assert the opposite: that FY2012 carried more than a hundred unnamed
+    /// agencies and that the count shrank towards FY2022. Both were true and the reading laid
+    /// over them was not — the shrinking count was community schools closing, and the panel was
+    /// asking a 2023 file about agencies that had gone in 2015.
     #[test]
-    fn the_directory_names_less_of_the_panel_the_further_back_it_reaches() {
-        let unnamed = unnamed_agencies();
-        assert_eq!(
-            unnamed[&2022], 0,
-            "the directory is the FY2022-23 one and should name every FY2022 agency"
-        );
-        assert!(
-            unnamed[&2012] > 100,
-            "FY2012 should carry the consolidation gap; it has {}",
-            unnamed[&2012]
-        );
-        assert!(
-            unnamed[&2012] > unnamed[&2017] && unnamed[&2017] > unnamed[&2021],
-            "the gap should shrink towards the directory's own year"
-        );
+    fn the_directory_names_every_agency_in_every_year() {
+        for (year, unnamed) in unnamed_agencies() {
+            assert_eq!(
+                unnamed, 0,
+                "FY{year} has {unnamed} agencies no directory year names"
+            );
+        }
+    }
+
+    /// And the identifiers it resolves are the contemporaneous ones, not the survivors'.
+    #[test]
+    fn an_agency_that_closed_is_named_by_a_file_written_while_it_existed() {
+        // Ledgemont Local left the directory after 2016-17 and is absent from the 2022-23 file
+        // this panel used to resolve every row through. Its finance rows carry its IRN because
+        // the panel now asks the year's own directory.
+        let ledgemont: Vec<PanelRow> = panel()
+            .into_iter()
+            .filter(|r| r.leaid == "3904720")
+            .collect();
+        assert!(!ledgemont.is_empty(), "Ledgemont Local is not in the panel");
+        for row in &ledgemont {
+            assert_eq!(
+                row.irn, "047209",
+                "FY{} names Ledgemont {:?}",
+                row.fiscal_year, row.irn
+            );
+        }
     }
 }
