@@ -3182,6 +3182,9 @@ pub fn extract_school_funding(text: &str) -> Option<String> {
 /// Where the department's redbook extract is written, relative to the repository root.
 pub const REDBOOK_FIXTURE: &str = "crates/project/fixtures/dew-redbook.txt";
 
+/// The same analysis as enacted. See [`REDBOOK_FIXTURE`], which is the introduced one.
+pub const GREENBOOK_FIXTURE: &str = "crates/project/fixtures/dew-greenbook.txt";
+
 /// Where the court opinion extract is written, relative to the repository root.
 pub const OPINIONS_FIXTURE: &str = "crates/regime-diff/fixtures/derolph-opinions.txt";
 
@@ -3415,6 +3418,7 @@ pub const REBUILT: &[&str] = &[
     STATUTE_FIXTURE,
     ENACTED_FIXTURE,
     REDBOOK_FIXTURE,
+    GREENBOOK_FIXTURE,
     OPINIONS_FIXTURE,
     APPROPRIATION_FIXTURE,
     SCHOLARSHIP_FIXTURE,

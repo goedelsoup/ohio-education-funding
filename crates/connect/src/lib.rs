@@ -510,6 +510,20 @@ pub fn rebuild(root: &Path) -> Result<Vec<Rebuilt>, RebuildError> {
     // The department's redbook. Committed whole rather than sliced: unlike the final analysis,
     // which legislates on everything from Medicaid to liquor permits, a redbook is about one
     // agency and there is nothing in it to cut away.
+    // The greenbook, which is the redbook as enacted. Committed whole for the same reason the
+    // redbook is: it is about one agency and there is nothing in it to cut away.
+    let greenbook = source("hb96-edu-greenbook").expect("registered").1;
+    out.push(match cache::pdf_text(root, greenbook) {
+        Ok(text) => Rebuilt::Written {
+            path: fixtures::GREENBOOK_FIXTURE.to_string(),
+            rows: fixtures::write_text(&root.join(fixtures::GREENBOOK_FIXTURE), text.trim())?,
+        },
+        Err(cause) => Rebuilt::Skipped {
+            path: fixtures::GREENBOOK_FIXTURE.to_string(),
+            reason: cause.to_string(),
+        },
+    });
+
     let redbook = source("hb96-edu-redbook").expect("registered").1;
     out.push(match cache::pdf_text(root, redbook) {
         Ok(text) => Rebuilt::Written {
