@@ -20,6 +20,7 @@ import {
   renderProvenance,
   renderRevenueMix,
 } from "../lib/history.ts";
+import { renderAppropriations } from "../lib/appropriations.ts";
 import { renderMealProgram } from "../lib/mealProgram.ts";
 import { baseYear } from "../lib/real.ts";
 import * as routes from "../lib/routes.ts";
@@ -27,6 +28,7 @@ import * as routes from "../lib/routes.ts";
 const { bundle } = loadFeed();
 const history = bundle.history;
 const meal = bundle.meal_program;
+const appropriations = bundle.appropriations;
 const base = bundle.deflator
   ? baseYear(
       bundle.deflator,
@@ -44,7 +46,25 @@ const last = history[history.length - 1];
  * year and be true. MR-81 starts in FY2001 and the Census panel in FY2009; taking the minimum
  * means the claim stays right if either series is extended or absent.
  */
-const earliest = Math.min(...[first?.fiscal_year, meal[0]?.fiscal_year].filter((y) => y != null));
+const earliest = Math.min(
+  ...[first?.fiscal_year, meal[0]?.fiscal_year, appropriations[0]?.fiscal_year].filter(
+    (y) => y != null,
+  ),
+);
+
+/**
+ * The base year for the appropriation card, computed over its own span rather than the panel's.
+ *
+ * `baseYear` picks the most recent year the index covers across the years it is given, and the
+ * appropriation series runs four years past the Census panel. Passing the panel's years would
+ * restate a twenty-six-year series into a base chosen for a fourteen-year one.
+ */
+const appropriationBase = bundle.deflator
+  ? baseYear(
+      bundle.deflator,
+      appropriations.map((y) => y.fiscal_year),
+    )
+  : null;
 ---
 
 <Base
@@ -91,4 +111,21 @@ const earliest = Math.min(...[first?.fiscal_year, meal[0]?.fiscal_year].filter((
 
   {/* Outside the `history.length` gate: a different source, absent for its own reasons. */}
   <Fragment set:html={renderMealProgram(meal)} />
+
+  {/*
+    The plain toggle, not a real-first variant. `BasisToggle` states that neither basis is the
+    default truth and is built symmetric on purpose; making this the one card that opens in
+    constant dollars would be the editorial claim the component declines to make. The card's own
+    prose carries the point instead.
+  */}
+  <BasisToggle id="appropriation-basis" base={appropriationBase}>
+    <Fragment
+      slot="nominal"
+      set:html={renderAppropriations(appropriations, bundle.deflator, appropriationBase, "nominal")}
+    />
+    <Fragment
+      slot="real"
+      set:html={renderAppropriations(appropriations, bundle.deflator, appropriationBase, "real")}
+    />
+  </BasisToggle>
 </Base>

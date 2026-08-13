@@ -983,6 +983,32 @@ export const MealProgramYearSchema = z
   })
   .strict();
 
+/**
+ * One fiscal year of what the General Assembly appropriated to the department.
+ *
+ * An **input** to the funding system, where every other block here is an output of it. It is what
+ * was set aside, not what any district received: an appropriation is a ceiling, and the formula's
+ * proration factor exists because at least one line has been a residual claimant. Differencing
+ * this against a payment produces a number that means nothing.
+ *
+ * `source` names which publication answers for the year — `workbook` for the greenbooks and
+ * budget workbooks, `catalog` for the four years only the Catalog of Budget Line Items reaches
+ * (FY2006-07 and FY2012-13). Where both speak they agree to the cent, so this is not a confidence
+ * signal; it is so a reader can see that four years rest on a different document.
+ */
+export const AppropriationYearSchema = z
+  .object({
+    fiscal_year: z.number().int(),
+    /** Everything the department was appropriated, excluding the property tax reimbursements. */
+    enacted: num,
+    /** The formula's own lines: GRF 200550 (200501 before FY2006) and Lottery 200612. */
+    foundation_funding: num,
+    /** How many line items the total is over. */
+    items: z.number().int().positive(),
+    source: z.enum(["workbook", "catalog"]),
+  })
+  .strict();
+
 /** The whole feed. */
 export const BundleSchema = z
   .object({
@@ -999,6 +1025,8 @@ export const BundleSchema = z
     national: NationalSchema.nullable(),
     /** The survey year by year, oldest first. Empty if the panel is absent. */
     history: z.array(HistoryYearSchema),
+    /** What the General Assembly appropriated, by fiscal year, oldest first. Empty if absent. */
+    appropriations: z.array(AppropriationYearSchema),
     /** The meal-program poverty share by October, oldest first. Empty if absent. */
     meal_program: z.array(MealProgramYearSchema),
     house_districts: z.array(HouseDistrictSchema),
@@ -1022,6 +1050,7 @@ export type StateFinance = z.infer<typeof StateFinanceSchema>;
 export type National = z.infer<typeof NationalSchema>;
 export type HistoryYear = z.infer<typeof HistoryYearSchema>;
 export type MealProgramYear = z.infer<typeof MealProgramYearSchema>;
+export type AppropriationYear = z.infer<typeof AppropriationYearSchema>;
 export type Deflator = z.infer<typeof DeflatorSchema>;
 export type PolicyShape = z.infer<typeof PolicyShapeSchema>;
 export type Checkpoint = z.infer<typeof CheckpointSchema>;
