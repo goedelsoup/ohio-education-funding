@@ -31,10 +31,18 @@ decision: |
   involved, so the policy that keeps `ofcc-projects` declared is not in play here.
 
   It is published **per agency**, one PDF each, and the education volume is what this repository
-  wants: `{year}-catalog-of-budget-line-items-edu.pdf`. Nineteen editions exist — **2006, and 2008
-  through 2025**. Only 2007 is absent, and it is a genuine 404 rather than a naming variant: the
-  site soft-404s with a 10,835-byte HTML body under a `200`, and every edition claimed here was
-  confirmed by content type and by reading its first page, not by status code.
+  wants: `{year}-catalog-of-budget-line-items-edu.pdf`. Editions run **2006, and 2008 through
+  2025**. 2007 is absent and is a genuine 404: the site soft-404s with a 10,835-byte HTML body
+  under a `200`, and every edition claimed here was confirmed by content type and by reading its
+  first page, not by status code.
+
+  **Amended after extraction: there are eighteen distinct editions, not nineteen.** This record
+  originally said nineteen. The 2012 URL resolves and returns a PDF, and the extraction phase found
+  it is the 2011 edition *byte for byte* — same SHA-256, same length. Confirming existence by
+  content type was not enough; only a digest catches a document served twice under two names. It is
+  the same pathology `the-greenbook-series` found in the workbooks, and wiring both would have put
+  every FY2012 and FY2013 enacted appropriation in the fixture twice under two vintages that are
+  one document.
 
   **It answers both bienniums the greenbook route cannot.** Each entry carries four years of
   actuals and two of appropriation in one labelled table, so the coverage overlaps heavily:

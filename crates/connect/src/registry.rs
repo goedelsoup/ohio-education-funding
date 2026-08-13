@@ -860,6 +860,283 @@ pub const CONNECTORS: &[Connector] = &[
         }],
     },
     Connector {
+        key: "lsc-catalog",
+        publisher: "Ohio Legislative Service Commission",
+        feeds: &["fiscal-period", "program", "legislation", "parameter"],
+        status: Status::Wired {
+            still_blocked: Some(
+                "wired for the education volume of every edition that has one — 2006 and 2008 \
+                 through 2025, nineteen documents. 2007 has no edition and is a genuine 404. The \
+                 Catalog is a standing reference restated each edition rather than a record of \
+                 what one act appropriated, so it does not replace `lsc-budget`'s greenbooks and \
+                 is not a substitute for the session laws before FY2002",
+            ),
+        },
+        note: "One entry per appropriation line item: four years of actuals, two of \
+               appropriation, the act that established it, and what it pays for. The only source \
+               here that carries the enacted appropriation and the actual expenditure in adjacent \
+               labelled columns — the defect that reverted the workbook attempt.",
+        sources: &[
+        Source {
+            key: "cbli-edu-2006",
+            title: None,
+            url: "https://www.lsc.ohio.gov/assets/organizations/legislative-service-commission/\
+                  files/2006-catalog-of-budget-line-items-edu.pdf",
+            filename: "cbli-edu-2006.pdf",
+            format: Format::Pdf,
+            catalog: Some("lsc-catalog-of-budget-line-items"),
+            fixtures: &[
+                crate::fixtures::CATALOG_FIXTURE,
+                crate::fixtures::CATALOG_BASIS_FIXTURE,
+            ],
+            note: "The 2006 edition of the education volume.",
+        },
+        Source {
+            key: "cbli-edu-2008",
+            title: None,
+            url: "https://www.lsc.ohio.gov/assets/organizations/legislative-service-commission/\
+                  files/2008-catalog-of-budget-line-items-edu.pdf",
+            filename: "cbli-edu-2008.pdf",
+            format: Format::Pdf,
+            catalog: Some("lsc-catalog-of-budget-line-items"),
+            fixtures: &[
+                crate::fixtures::CATALOG_FIXTURE,
+                crate::fixtures::CATALOG_BASIS_FIXTURE,
+            ],
+            note: "The 2008 edition of the education volume.",
+        },
+        Source {
+            key: "cbli-edu-2009",
+            title: None,
+            url: "https://www.lsc.ohio.gov/assets/organizations/legislative-service-commission/\
+                  files/2009-catalog-of-budget-line-items-edu.pdf",
+            filename: "cbli-edu-2009.pdf",
+            format: Format::Pdf,
+            catalog: Some("lsc-catalog-of-budget-line-items"),
+            fixtures: &[
+                crate::fixtures::CATALOG_FIXTURE,
+                crate::fixtures::CATALOG_BASIS_FIXTURE,
+            ],
+            note: "The 2009 edition of the education volume.",
+        },
+        Source {
+            key: "cbli-edu-2010",
+            title: None,
+            url: "https://www.lsc.ohio.gov/assets/organizations/legislative-service-commission/\
+                  files/2010-catalog-of-budget-line-items-edu.pdf",
+            filename: "cbli-edu-2010.pdf",
+            format: Format::Pdf,
+            catalog: Some("lsc-catalog-of-budget-line-items"),
+            fixtures: &[
+                crate::fixtures::CATALOG_FIXTURE,
+                crate::fixtures::CATALOG_BASIS_FIXTURE,
+            ],
+            note: "The 2010 edition of the education volume.",
+        },
+        Source {
+            key: "cbli-edu-2011",
+            title: None,
+            url: "https://www.lsc.ohio.gov/assets/organizations/legislative-service-commission/\
+                  files/2011-catalog-of-budget-line-items-edu.pdf",
+            filename: "cbli-edu-2011.pdf",
+            format: Format::Pdf,
+            catalog: Some("lsc-catalog-of-budget-line-items"),
+            fixtures: &[
+                crate::fixtures::CATALOG_FIXTURE,
+                crate::fixtures::CATALOG_BASIS_FIXTURE,
+            ],
+            note: "The 2011 edition. There is no 2012 edition: that URL resolves and returns a PDF, \
+                   and it is this file byte for byte — same SHA-256, same length. It is left out \
+                   rather than wired, because a second copy under a later name would put an FY2012 \
+                   enacted appropriation in the fixture twice under two vintages, and vintage is \
+                   the column this extract exists to keep. Verified by digest, not by status \
+                   code, which is how it was missed the first time.",
+        },
+        Source {
+            key: "cbli-edu-2013",
+            title: None,
+            url: "https://www.lsc.ohio.gov/assets/organizations/legislative-service-commission/\
+                  files/2013-catalog-of-budget-line-items-edu.pdf",
+            filename: "cbli-edu-2013.pdf",
+            format: Format::Pdf,
+            catalog: Some("lsc-catalog-of-budget-line-items"),
+            fixtures: &[
+                crate::fixtures::CATALOG_FIXTURE,
+                crate::fixtures::CATALOG_BASIS_FIXTURE,
+            ],
+            note: "The 2013 edition of the education volume.",
+        },
+        Source {
+            key: "cbli-edu-2014",
+            title: None,
+            url: "https://www.lsc.ohio.gov/assets/organizations/legislative-service-commission/\
+                  files/2014-catalog-of-budget-line-items-edu.pdf",
+            filename: "cbli-edu-2014.pdf",
+            format: Format::Pdf,
+            catalog: Some("lsc-catalog-of-budget-line-items"),
+            fixtures: &[
+                crate::fixtures::CATALOG_FIXTURE,
+                crate::fixtures::CATALOG_BASIS_FIXTURE,
+            ],
+            note: "The 2014 edition of the education volume.",
+        },
+        Source {
+            key: "cbli-edu-2015",
+            title: None,
+            url: "https://www.lsc.ohio.gov/assets/organizations/legislative-service-commission/\
+                  files/2015-catalog-of-budget-line-items-edu.pdf",
+            filename: "cbli-edu-2015.pdf",
+            format: Format::Pdf,
+            catalog: Some("lsc-catalog-of-budget-line-items"),
+            fixtures: &[
+                crate::fixtures::CATALOG_FIXTURE,
+                crate::fixtures::CATALOG_BASIS_FIXTURE,
+            ],
+            note: "The 2015 edition of the education volume.",
+        },
+        Source {
+            key: "cbli-edu-2016",
+            title: None,
+            url: "https://www.lsc.ohio.gov/assets/organizations/legislative-service-commission/\
+                  files/2016-catalog-of-budget-line-items-edu.pdf",
+            filename: "cbli-edu-2016.pdf",
+            format: Format::Pdf,
+            catalog: Some("lsc-catalog-of-budget-line-items"),
+            fixtures: &[
+                crate::fixtures::CATALOG_FIXTURE,
+                crate::fixtures::CATALOG_BASIS_FIXTURE,
+            ],
+            note: "The 2016 edition of the education volume.",
+        },
+        Source {
+            key: "cbli-edu-2017",
+            title: None,
+            url: "https://www.lsc.ohio.gov/assets/organizations/legislative-service-commission/\
+                  files/2017-catalog-of-budget-line-items-edu.pdf",
+            filename: "cbli-edu-2017.pdf",
+            format: Format::Pdf,
+            catalog: Some("lsc-catalog-of-budget-line-items"),
+            fixtures: &[
+                crate::fixtures::CATALOG_FIXTURE,
+                crate::fixtures::CATALOG_BASIS_FIXTURE,
+            ],
+            note: "The 2017 edition of the education volume.",
+        },
+        Source {
+            key: "cbli-edu-2018",
+            title: None,
+            url: "https://www.lsc.ohio.gov/assets/organizations/legislative-service-commission/\
+                  files/2018-catalog-of-budget-line-items-edu.pdf",
+            filename: "cbli-edu-2018.pdf",
+            format: Format::Pdf,
+            catalog: Some("lsc-catalog-of-budget-line-items"),
+            fixtures: &[
+                crate::fixtures::CATALOG_FIXTURE,
+                crate::fixtures::CATALOG_BASIS_FIXTURE,
+            ],
+            note: "The 2018 edition of the education volume.",
+        },
+        Source {
+            key: "cbli-edu-2019",
+            title: None,
+            url: "https://www.lsc.ohio.gov/assets/organizations/legislative-service-commission/\
+                  files/2019-catalog-of-budget-line-items-edu.pdf",
+            filename: "cbli-edu-2019.pdf",
+            format: Format::Pdf,
+            catalog: Some("lsc-catalog-of-budget-line-items"),
+            fixtures: &[
+                crate::fixtures::CATALOG_FIXTURE,
+                crate::fixtures::CATALOG_BASIS_FIXTURE,
+            ],
+            note: "The 2019 edition of the education volume.",
+        },
+        Source {
+            key: "cbli-edu-2020",
+            title: None,
+            url: "https://www.lsc.ohio.gov/assets/organizations/legislative-service-commission/\
+                  files/2020-catalog-of-budget-line-items-edu.pdf",
+            filename: "cbli-edu-2020.pdf",
+            format: Format::Pdf,
+            catalog: Some("lsc-catalog-of-budget-line-items"),
+            fixtures: &[
+                crate::fixtures::CATALOG_FIXTURE,
+                crate::fixtures::CATALOG_BASIS_FIXTURE,
+            ],
+            note: "The 2020 edition of the education volume.",
+        },
+        Source {
+            key: "cbli-edu-2021",
+            title: None,
+            url: "https://www.lsc.ohio.gov/assets/organizations/legislative-service-commission/\
+                  files/2021-catalog-of-budget-line-items-edu.pdf",
+            filename: "cbli-edu-2021.pdf",
+            format: Format::Pdf,
+            catalog: Some("lsc-catalog-of-budget-line-items"),
+            fixtures: &[
+                crate::fixtures::CATALOG_FIXTURE,
+                crate::fixtures::CATALOG_BASIS_FIXTURE,
+            ],
+            note: "The 2021 edition of the education volume.",
+        },
+        Source {
+            key: "cbli-edu-2022",
+            title: None,
+            url: "https://www.lsc.ohio.gov/assets/organizations/legislative-service-commission/\
+                  files/2022-catalog-of-budget-line-items-edu.pdf",
+            filename: "cbli-edu-2022.pdf",
+            format: Format::Pdf,
+            catalog: Some("lsc-catalog-of-budget-line-items"),
+            fixtures: &[
+                crate::fixtures::CATALOG_FIXTURE,
+                crate::fixtures::CATALOG_BASIS_FIXTURE,
+            ],
+            note: "The 2022 edition of the education volume.",
+        },
+        Source {
+            key: "cbli-edu-2023",
+            title: None,
+            url: "https://www.lsc.ohio.gov/assets/organizations/legislative-service-commission/\
+                  files/2023-catalog-of-budget-line-items-edu.pdf",
+            filename: "cbli-edu-2023.pdf",
+            format: Format::Pdf,
+            catalog: Some("lsc-catalog-of-budget-line-items"),
+            fixtures: &[
+                crate::fixtures::CATALOG_FIXTURE,
+                crate::fixtures::CATALOG_BASIS_FIXTURE,
+            ],
+            note: "The 2023 edition of the education volume.",
+        },
+        Source {
+            key: "cbli-edu-2024",
+            title: None,
+            url: "https://www.lsc.ohio.gov/assets/organizations/legislative-service-commission/\
+                  files/2024-catalog-of-budget-line-items-edu.pdf",
+            filename: "cbli-edu-2024.pdf",
+            format: Format::Pdf,
+            catalog: Some("lsc-catalog-of-budget-line-items"),
+            fixtures: &[
+                crate::fixtures::CATALOG_FIXTURE,
+                crate::fixtures::CATALOG_BASIS_FIXTURE,
+            ],
+            note: "The 2024 edition of the education volume.",
+        },
+        Source {
+            key: "cbli-edu-2025",
+            title: None,
+            url: "https://www.lsc.ohio.gov/assets/organizations/legislative-service-commission/\
+                  files/2025-catalog-of-budget-line-items-edu.pdf",
+            filename: "cbli-edu-2025.pdf",
+            format: Format::Pdf,
+            catalog: Some("lsc-catalog-of-budget-line-items"),
+            fixtures: &[
+                crate::fixtures::CATALOG_FIXTURE,
+                crate::fixtures::CATALOG_BASIS_FIXTURE,
+            ],
+            note: "The 2025 edition of the education volume.",
+        },
+        ],
+    },
+    Connector {
         key: "lsc-budget",
         publisher: "Ohio Legislative Service Commission",
         feeds: &["legislation", "fiscal-period", "program", "parameter"],
@@ -870,10 +1147,9 @@ pub const CONNECTORS: &[Connector] = &[
                  the greenbook route cannot reach — FY2006-07, whose greenbook has no line-item \
                  table, and FY2012-13, whose workbook variants LSC serves as one file — are both \
                  carried by the Catalog of Budget Line Items, which was probed and is not \
-                 blocked: nineteen editions, 2006 and 2008 through 2025, published per agency, \
-                 every one downloading to a self-identifying agent. What remains is extraction, \
-                 not retrieval, and it is scoped in the decision record `the-catalog-of-budget- \
-                 line-items`. Before FY1999 there is still nothing — the Foundation Program era, \
+                 blocked, and is now extracted: eighteen distinct editions, 2006 and 2008 \
+                 through 2025 less the 2012 URL, which serves the 2011 document byte for byte. \
+                 See the `lsc-catalog` connector and `the-catalog-of-budget-line-items`. Before FY1999 there is still nothing — the Foundation Program era, \
                  DeRolph I and the equal yield formula need the session laws, and the Catalog's \
                  earliest edition reaches FY2002. The per-district simulations named in earlier \
                  versions of this string are not LSC's and have been removed from it",
@@ -1805,6 +2081,7 @@ mod tests {
             "dew-child-nutrition",
             "dew-school-improvement",
             "dew-scholarship-reports",
+            "lsc-catalog",
         ];
         for key in expected {
             assert!(

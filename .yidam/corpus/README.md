@@ -79,10 +79,10 @@ Fields: count per claim tag across every node; then the unresolved marks by the 
 |---|--:|---|
 | `[verified]` | 802 | supported by a committed primary source |
 | `[inference]` | 229 | drawn from verified facts, not witnessed |
-| `[open]` | 188 | a live question — unknown, contested, or being worked |
+| `[open]` | 189 | a live question — unknown, contested, or being worked |
 | `[unentered]` | 34 | a knowable value nobody has typed in yet |
 
-222 unresolved marks in total, 188 of them live questions and 34 of them empty fields. Before the two were distinguished the corpus reported the sum as its count of what it does not know, which overstated it by 15%.
+223 unresolved marks in total, 189 of them live questions and 34 of them empty fields. Before the two were distinguished the corpus reported the sum as its count of what it does not know, which overstated it by 15%.
 
 | Field | `[open]` | `[unentered]` |
 |---|--:|--:|
@@ -125,6 +125,7 @@ Fields: count per claim tag across every node; then the unresolved marks by the 
 | `context` | 1 | 0 |
 | `citation` | 1 | 0 |
 | `case_name` | 1 | 0 |
+| `appropriating_bill` | 1 | 0 |
 <!-- /REGEN -->
 
 ## Node index
