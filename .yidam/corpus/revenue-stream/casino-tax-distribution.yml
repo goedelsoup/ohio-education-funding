@@ -58,8 +58,39 @@ description: |
   That is not the same as establishing that the money is additive. The substitution critique of
   earmarked gambling revenue is about the *appropriation*, not the statute: whether the General
   Assembly set foundation aid lower than it otherwise would have because this channel exists is a
-  counterfactual about budget-making that no section of law will answer. Settling it needs the
-  appropriation history, which is `lsc-budget` work. [open]
+  counterfactual about budget-making that no section of law will answer.
+
+  **THE APPROPRIATION HISTORY IS NOW HELD AND IT DOES NOT SETTLE IT. THAT IS THE FINDING.** This
+  node said settling the question needed the appropriation history, "which is `lsc-budget` work" —
+  a sentence that reads as a task waiting to be done. The work is done: the enacted foundation aid
+  appropriation is continuous from FY2002 to FY2027. It cannot answer this, and now that is
+  measured rather than promised.
+
+  In constant FY2025 dollars the foundation funding appropriation moves by a **median of $236
+  million a year**, mean $349 million, across a range from $11 million to $1.51 billion. A
+  substitution smaller than that ordinary movement is arithmetically inside it — not hard to see,
+  but indistinguishable from the year's other reasons for moving. And nothing happens at the
+  onset: FY2012 moves +$183 million and FY2013 −$101 million, the seventh smallest of the
+  twenty-four annual movements in the series. [verified — the appropriation series and the
+  deflator, pinned in `crates/project/tests/what_the_series_cannot_settle.rs`]
+
+  **AND THE REASON THE LOTTERY IS DIFFERENT IS NOT THAT IT IS BIGGER. IT IS THAT IT HAS A LINE.**
+  This is the thing the two channels together establish, and neither shows alone. The lottery's
+  substitution was visible in a $97.6 million movement — *smaller* than the median annual
+  variation in the total — because Fund 7017 is **itemized inside the appropriation table**, so
+  the figure can be read rather than inferred from a total. Casino money never enters the table at
+  all, so the only available test is inference from the total, and the total's ordinary noise is
+  more than twice the size of the movement that was legible in the lottery's case.
+
+  Substitution is detectable when an earmark has an appropriation line and undetectable when it
+  does not, and the threshold has almost nothing to do with how much money is involved. [inference]
+
+  **What would settle it.** Not more of this series. Either the casino distribution's own size, to
+  establish whether the channel is even of a magnitude the total could register — and the two
+  publishers of it, `tax.ohio.gov` and `casinocontrol.ohio.gov`, both return 404 at their document
+  root to a self-identifying agent, the same signature `ofcc-projects` is declared on — or a source
+  about budget-making rather than budgets: committee testimony, fiscal notes, the analyses behind a
+  foundation aid target. [open]
 
   **And the sharper case is three paragraphs above, in the same constitutional section.** Article
   XV Section 6(A) earmarks the state lottery's net proceeds for education "as determined in
