@@ -156,6 +156,16 @@ amendment: |
   for *where they are*, which is the division of labour each is actually reliable for. A page
   whose cluster count and year count disagree is a page to refuse rather than to guess at.
 
+  **This record's own closing sentence was the next thing found wrong.** It left the Catalog of
+  Budget Line Items and the per-district simulations unaddressed and said so plainly, which was
+  honest — and then that sentence sat in `still_blocked` through two further phases, exactly as
+  the string it replaced had. [`the-catalog-of-budget-line-items`](the-catalog-of-budget-line-items.yml)
+  opened both. The Catalog is not blocked and covers **both** bienniums this record calls
+  unretrievable, FY2006-07 and FY2012-13, from a document that prints actuals and appropriations
+  in adjacent labelled columns — which is the defect the workbook attempt above was reverted for.
+  The per-district simulations are not LSC's publication at all. Neither finding changes the PDF
+  and workbook analysis here; both narrow what it is needed for.
+
 alternatives: |
   **Start the extraction in this phase.** Rejected on scope rather than on doubt. Thirteen
   documents across two formats and three PDF layout eras, a fixture, a reconciliation against each
