@@ -961,6 +961,15 @@ export const HistoryYearSchema = z
  * A share, not a count and not a dollar. Nothing here may be compared to the formula side, which
  * counts 609 traditional districts on ADM; `sponsors` here includes community schools and county
  * boards of developmental disabilities.
+ *
+ * # Why `share` is nullable
+ *
+ * From FY2012 the department publishes MR-81 as three files, and only one of them still counts
+ * applications. Community-eligibility sponsors collect none at all — every child eats free — so
+ * their approval columns are zero by construction, and adding the three streams gives a share that
+ * falls thirteen points in three years for a reason that is not poverty. Those Octobers carry
+ * `floor` and `ceiling` and no share. `streams` says which kind of year a row is, and it is the
+ * field to branch on rather than the year.
  */
 export const MealProgramYearSchema = z
   .object({
@@ -974,10 +983,30 @@ export const MealProgramYearSchema = z
      * its guard walks field names, and `share` is not one it recognises.
      */
     enrollment: num,
-    /** Approvals, summed over those sponsors. */
+    /** Approvals, summed over those sponsors. Short by the community stream from FY2012. */
     approved: num,
-    /** `approved` over `enrollment`. */
-    share: num,
+    /**
+     * Directly certified children under community eligibility, and zero before FY2012.
+     *
+     * Not an approval. Direct certification reaches families already on SNAP, TANF, foster care or
+     * a homeless roll; an application reaches anyone under the income line who files one.
+     */
+    identified: num,
+    /** `approved` over `enrollment`, and `null` for the Octobers published as three files. */
+    share: num.nullable(),
+    /** The lowest share the source supports: approvals plus directly certified children. */
+    floor: num,
+    /** The highest: what every sponsor may claim for, capped at enrollment school by school. */
+    ceiling: num,
+    /**
+     * The share of the October's enrollment under sponsors that collect no applications.
+     *
+     * Zero through FY2011 and a sixth by FY2014. The size of the hole in `approved`, and it grows
+     * because community eligibility is open to schools whose poverty is already high.
+     */
+    without_applications: num,
+    /** How many files the October was published as. One through FY2011, three from FY2012. */
+    streams: z.number().int().positive(),
     /** Which denominator that is. Not inferred from the year — see above. */
     basis: z.enum(["adm", "ce"]),
   })

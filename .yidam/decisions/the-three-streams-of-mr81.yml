@@ -1,0 +1,126 @@
+id: the-three-streams-of-mr81
+summary: >-
+  MR-81 extended to every October the archive holds, 1998 through 2014 — and the extension found
+  that FY2001 had been misread since the connector was built, and that the split the connector was
+  blocked on is not a joining problem but a measurement one.
+context: |
+  [`child-nutrition-connector`](child-nutrition-connector.yml) wired eleven Octobers and named two
+  blockers, both of them scope decisions rather than obstacles: the 1998-2000 files were "a
+  different, school-centric column set whose unquoted district names push three rows past the last
+  column", and from 2012 "the Traditional file excludes Community Eligibility sponsors, which are
+  the highest-poverty districts". Its own alternatives section recorded the choice: *"Eleven
+  unbroken years with two named gaps is worth more than seventeen with a silent discontinuity in
+  the middle."*
+
+  That was right, and it deferred the question rather than answering it. This phase takes both
+  ends.
+
+  Neither blocker survived contact with the files, and one of them was never true.
+
+  **The early files are fixed-width.** Every row is exactly 170 bytes, in all three years, with the
+  thirteen separators at identical offsets. The comma inside `Graham School, The` shifts nothing,
+  because nothing splits on it. The blocker described a defect of the reader that would have been
+  written, not of the file.
+
+  **The late files are joinable and should not be joined.** All three streams carry the same
+  columns and the same identifiers; concatenating them is a morning's work. What that produces is
+  a poverty share falling from 46.3% to 33.3% in three years, because community-eligibility
+  schools feed every child and collect no applications at all, so their approval columns are zero
+  by construction. The blocker anticipated the Traditional-only version of this trap. The
+  all-three version has the same shape and is easier to fall into, because it *looks* complete.
+decision: |
+  Wire all twenty-one published files: 1998-2000 by offset, 2001-2014 delimited, and 2013's
+  community stream from the printed report, which is the only form it was posted in.
+
+  Carry `stream` on every row, and carry `identified` and `claimable` beside the approvals. Emit
+  `Unknown` for the three Octobers that state no sponsor type, and resolve it from FY2001 in the
+  consumer rather than writing an inference into the fixture.
+
+  **Publish no share for FY2012-FY2014.** `PovertyYear::share` and the feed's `meal_program.share`
+  become optional and are `None` there. Those years carry a floor and a ceiling instead, and the
+  chart on `/history` stops at FY2011 while the table runs to FY2014.
+
+  **Check every row against the percentage printed beside it**, in every year, and fail the
+  rebuild rather than the review.
+consequences: |
+  **FY2001 was wrong, and everything downstream of it was.** The file is the only comma-delimited
+  one in the series and nine of its rows carry a comma inside a school name. Read positionally,
+  two Cleveland City SD rows put the site identifiers `00026450` and `00093153` in the enrollment
+  column — 119,603 pupils added to a district of 73,562. Statewide public enrollment read 1,921,522
+  against a true 1,802,937, and the poverty share read **27.7% where the file says 29.5%**.
+
+  It survived four phases because every check it had to pass, it passed. The row count was right.
+  The sponsor count was right. The share was a plausible number in a rising series. And
+  `implausible_sponsors`, the filter built for exactly this class of defect, missed it: 192,147
+  across 118 sites is 1,628 a site, well under a threshold set to catch 342,332 in one.
+
+  The repair anchors the row's nine trailing fields from the right and finds the sponsor type in
+  what remains, from a four-word vocabulary no school name collides with. After it, free and
+  reduced approvals match the department's printed report **exactly for all 1,227 sponsor blocks**;
+  twelve sponsors differ on ADM by sixty-eight pupils between them, which is the two publications
+  disagreeing rather than the parser.
+
+  **Three of the four "published defects" were ours.** `implausible_sponsors` named four
+  sponsor-years and the decision record above described three of them as the department leaking
+  identifiers into the count column for residential and juvenile sponsors. They were the same
+  comma shift. One published defect remains — Portsmouth City's 342,332 in FY2005 — and it is
+  genuinely in the file, because it reproduces the percentage printed beside it.
+
+  **A second corpus figure was wrong in the other direction.** The DPIA node's series gave 2005 as
+  29.9%. That is the share *including* the Portsmouth defect: the node quoted the number the code
+  refuses. Corrected to 35.7%.
+
+  **The guard that would have caught both.** Every delimited row prints free-and-reduced as a
+  share of enrollment beside the counts, so the columns can be checked against each other. Applied
+  across the series it finds nine violations, all of them in FY2001, and none in the other twenty
+  files. Rows reporting no applications at all are exempt — and the exemption is the finding, not
+  a loophole, because those are exactly the community-eligibility rows whose printed percentage is
+  a claiming rate rather than a measurement.
+
+  **The series now runs 1998-2011 on applications and stops.** 28.9% to 46.3%, seventeen points in
+  fourteen years, with the denominator redefined once at 2010 and drawn as two lines. Three more
+  Octobers exist and carry a band instead: for FY2014, **43.7% to 48.4%**. The floor adds the
+  directly certified children to the approvals; the ceiling is what those schools may claim for,
+  the directly certified count times USDA's 1.6, capped at enrollment school by school. The band
+  brackets FY2011's 46.3%, so what the source will not settle is not the level but the direction.
+
+  **And the size of what left the measure is now a number.** Enrollment under a sponsor that
+  collects no applications: 7.0% in FY2012, 9.9% in FY2013, **16.6% in FY2014**. Community
+  eligibility is open to schools whose poverty is already high, so the population leaving is not a
+  random sample of the one that stays — which is why the naive series falls rather than merely
+  becoming noisier.
+
+  **What is still not here.** The archive stops at October 2014, nine years before the corpus's
+  FY2024 observations, and nothing in this directory fills the gap. The 1998-2000 files borrow
+  their sponsor types from FY2001 and some thirty-five sponsors a year predate it, so they are
+  excluded rather than typed. Contract `32.0.0`.
+alternatives: |
+  **Append the Traditional file and note the caveat.** Rejected, and it is what the blocker was
+  written to prevent. A footnote under a falling line does not stop the line from being read.
+
+  **Append all three streams' approvals.** Rejected for a stronger reason. It looks like the
+  careful version of the previous option — every sponsor is present, nothing is excluded — and it
+  is worse, because the caveat is no longer visibly needed. The resulting FY2014 share is 33.3%,
+  thirteen points below FY2011, and nothing about the row set says why.
+
+  **Publish the floor as the series, with the ceiling in a note.** Rejected. The floor is a real
+  quantity and it is not this quantity: direct certification reaches families already on SNAP,
+  TANF, foster care or a homeless roll, and an application reaches anyone under the income line
+  who files one. Drawing the floor asserts poverty fell after 2011. Drawing the ceiling asserts it
+  rose. Drawing their midpoint asserts a precision neither supports. The chart draws none of them.
+
+  **Resolve the 1998-2000 sponsor types from the whole panel rather than from FY2001.** Rejected
+  for twenty sponsors. It would reach 1,113 of 1,132 rather than 1,094, at the cost of inheriting
+  an answer from up to fourteen years later for an IRN that may have been reused — and five IRNs
+  in the panel *are* typed two ways across the window. FY2001 is adjacent, contemporaneous, and
+  numbers districts the same way.
+
+  **Write the resolved type into the fixture.** Rejected. The files state no type; writing one
+  into the committed CSV would make an inference indistinguishable from a reading at the point
+  where every consumer meets it. `Unknown` is what the file says, and the resolution is code with
+  a test on it.
+
+  **Repair the FY2001 file rather than the reader.** Never on the table, for the reason the
+  previous record gave about the published defects: the digest manifest pins what the department
+  published. What changed is the reader, and the department's bytes are byte-identical to what was
+  cached before.

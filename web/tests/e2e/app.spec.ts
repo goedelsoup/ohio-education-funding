@@ -1916,7 +1916,7 @@ test.describe("against america", () => {
 
 
 test.describe("the count the poverty weight is paid on", () => {
-  test("the eleven-year series is on the page, which is the point of exporting it", async ({
+  test("the seventeen-year series is on the page, which is the point of exporting it", async ({
     page,
   }) => {
     // It was computed in `crates/dispersion`, tested there, and reachable by nobody who was not
@@ -1924,8 +1924,8 @@ test.describe("the count the poverty weight is paid on", () => {
     await page.goto("/history");
     const card = page.locator(".card", { hasText: "What the poverty weight is counted on" });
     await expect(card).toBeVisible();
-    await expect(card).toContainText("FY2001");
-    await expect(card).toContainText("FY2011");
+    await expect(card).toContainText("FY1998");
+    await expect(card).toContainText("FY2014");
   });
 
   test("the break in the denominator is stated where the chart is, not in a footnote", async ({
@@ -1949,9 +1949,27 @@ test.describe("the count the poverty weight is paid on", () => {
     await page.goto("/history");
     const card = page.locator(".card", { hasText: "What the poverty weight is counted on" });
     const rows = card.locator("tbody tr");
-    await expect(rows).toHaveCount(11);
+    await expect(rows).toHaveCount(17);
     await expect(rows.first()).toContainText("AdmCount");
     await expect(rows.last()).toContainText("CECount");
+  });
+
+  test("the years published as three files carry a range where a share would be", async ({
+    page,
+  }) => {
+    /*
+     * The finding this extension exists for. From FY2012 only one of the three files still
+     * counts applications, so the table has to print a band rather than a figure — and the page
+     * has to say that the figure a reader could compute instead would read as poverty
+     * collapsing.
+     */
+    await page.goto("/history");
+    const card = page.locator(".card", { hasText: "What the poverty weight is counted on" });
+    const rows = card.locator("tbody tr");
+    await expect(rows.last()).toContainText("three files");
+    await expect(rows.last()).toContainText("–");
+    await expect(card).toContainText("poverty collapsing");
+    await expect(card).toContainText("collect no forms at all");
   });
 
   test("the population is named as sponsors rather than districts", async ({ page }) => {

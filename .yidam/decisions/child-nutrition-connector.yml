@@ -50,6 +50,15 @@ consequences: |
   names them so an aggregate can exclude them by name. Only the Portsmouth row is Public and only
   it ever reached the poverty series.
 
+  > **CORRECTED by [`the-three-streams-of-mr81`](the-three-streams-of-mr81.yml).** The second of
+  > those is not a published defect. FY2001 is the only comma-delimited file in the series and
+  > nine of its rows carry a comma inside a school name; read positionally, those rows put site
+  > IRNs in the enrollment column. Three of them happened to be residential and juvenile sponsors,
+  > which is why they read as a pattern in the source. Two more were Cleveland City SD, Public,
+  > and **did** reach the poverty series — 192,147 pupils against a true 73,562, holding the
+  > FY2001 share at 27.7% where the file says 29.5%. `implausible_sponsors` missed them because
+  > 192,147 across 118 sites is 1,628 a site. Only the Portsmouth row was ever the department's.
+
   **And this phase introduced a defect of its own, which is why the writer changed.** The first
   build shipped 99 corrupted rows: `write_csv` does not quote, every consumer splits on the comma,
   and Ohio has sponsors called "Holy Trinity, Swanton Ele Sch" and "Edge Academy, The". `write_csv`
@@ -64,6 +73,13 @@ consequences: |
   "Excludes Provision 2 and Community Eligibility Option (CEO) sponsors", which are the
   highest-poverty districts and a growing share of them. A series continued from Traditional alone
   would fall, and the fall would be adoption rather than poverty.
+
+  > **RESOLVED by [`the-three-streams-of-mr81`](the-three-streams-of-mr81.yml).** The first
+  > blocker was never real: those files are fixed-width, 170 bytes to the row with the separators
+  > at identical offsets, so nothing splits on the comma and nothing shifts. The second was, and
+  > the extension answers it by refusing to publish a share for FY2012-FY2014 — community
+  > eligibility collects no applications at all, so the years carry a band and the chart stops at
+  > FY2011.
 alternatives: |
   **Fold it into `dew-foundation`.** Rejected for the reason `payment-reports-connector` gave for
   the same question: that connector retrieves the department's *model*, and this is an

@@ -1092,29 +1092,162 @@ fn f33_ohio_panel(root: &Path) -> Result<Vec<Vec<String>>, String> {
     fixtures::build_f33_ohio_panel(&years, &directory)
 }
 
-/// Every October of MR-81 this repository reads: the sponsor-centric era, unbroken.
-const MR81_YEARS: &[u16] = &[
-    2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010, 2011,
+/// Every MR-81 file this repository reads: seventeen Octobers in twenty-one publications.
+///
+/// The table is per file rather than per year because from FY2012 a year is not one file. Three
+/// eras: FY1998-FY2000 one row per school, FY2001-FY2011 one row per site in one file, and
+/// FY2012-FY2014 one row per site in three files that count differently. The one entry that is
+/// not delimited at all is FY2013's community stream, which the department posted only as the
+/// printed report.
+const MR81_FILES: &[(u16, fixtures::Stream, fixtures::Mr81Layout)] = &[
+    (
+        1998,
+        fixtures::Stream::Single,
+        fixtures::Mr81Layout::SchoolCentric,
+    ),
+    (
+        1999,
+        fixtures::Stream::Single,
+        fixtures::Mr81Layout::SchoolCentric,
+    ),
+    (
+        2000,
+        fixtures::Stream::Single,
+        fixtures::Mr81Layout::SchoolCentric,
+    ),
+    (
+        2001,
+        fixtures::Stream::Single,
+        fixtures::Mr81Layout::Delimited,
+    ),
+    (
+        2002,
+        fixtures::Stream::Single,
+        fixtures::Mr81Layout::Delimited,
+    ),
+    (
+        2003,
+        fixtures::Stream::Single,
+        fixtures::Mr81Layout::Delimited,
+    ),
+    (
+        2004,
+        fixtures::Stream::Single,
+        fixtures::Mr81Layout::Delimited,
+    ),
+    (
+        2005,
+        fixtures::Stream::Single,
+        fixtures::Mr81Layout::Delimited,
+    ),
+    (
+        2006,
+        fixtures::Stream::Single,
+        fixtures::Mr81Layout::Delimited,
+    ),
+    (
+        2007,
+        fixtures::Stream::Single,
+        fixtures::Mr81Layout::Delimited,
+    ),
+    (
+        2008,
+        fixtures::Stream::Single,
+        fixtures::Mr81Layout::Delimited,
+    ),
+    (
+        2009,
+        fixtures::Stream::Single,
+        fixtures::Mr81Layout::Delimited,
+    ),
+    (
+        2010,
+        fixtures::Stream::Single,
+        fixtures::Mr81Layout::Delimited,
+    ),
+    (
+        2011,
+        fixtures::Stream::Single,
+        fixtures::Mr81Layout::Delimited,
+    ),
+    (
+        2012,
+        fixtures::Stream::Traditional,
+        fixtures::Mr81Layout::Delimited,
+    ),
+    (
+        2012,
+        fixtures::Stream::Provision2,
+        fixtures::Mr81Layout::Delimited,
+    ),
+    (
+        2012,
+        fixtures::Stream::Community,
+        fixtures::Mr81Layout::Delimited,
+    ),
+    (
+        2013,
+        fixtures::Stream::Traditional,
+        fixtures::Mr81Layout::Delimited,
+    ),
+    (
+        2013,
+        fixtures::Stream::Provision2,
+        fixtures::Mr81Layout::Delimited,
+    ),
+    (
+        2013,
+        fixtures::Stream::Community,
+        fixtures::Mr81Layout::Printed,
+    ),
+    (
+        2014,
+        fixtures::Stream::Traditional,
+        fixtures::Mr81Layout::Delimited,
+    ),
+    (
+        2014,
+        fixtures::Stream::Provision2,
+        fixtures::Mr81Layout::Delimited,
+    ),
+    (
+        2014,
+        fixtures::Stream::Community,
+        fixtures::Mr81Layout::Delimited,
+    ),
 ];
 
-/// The MR-81 sponsor panel, from eleven delimited reports.
+/// The source key a file is registered under: bare year while the report was one file, and
+/// year-and-stream once it stopped being.
+fn mr81_key(year: u16, stream: fixtures::Stream) -> String {
+    match stream {
+        fixtures::Stream::Single => format!("mr81-{year}"),
+        other => format!("mr81-{year}-{}", other.label()),
+    }
+}
+
+/// The MR-81 sponsor panel, from every published file.
 fn mr81_panel(root: &Path) -> Result<Vec<Vec<String>>, String> {
-    let mut reports = Vec::new();
-    for year in MR81_YEARS {
-        let source = source(&format!("mr81-{year}")).expect("registered").1;
+    let mut texts = Vec::new();
+    for (year, stream, _) in MR81_FILES {
+        let key = mr81_key(*year, *stream);
+        let source = source(&key).expect("registered").1;
         let bytes = cache::read_cached(root, source).map_err(|e| e.to_string())?;
         // Latin-1: the reports carry the occasional non-UTF-8 byte in a sponsor name, and a
         // lossy UTF-8 read would put a replacement character into committed data.
-        reports.push((*year, bytes.iter().map(|b| *b as char).collect::<String>()));
+        texts.push(bytes.iter().map(|b| *b as char).collect::<String>());
     }
-    let years: Vec<fixtures::Mr81Year<'_>> = reports
+    let reports: Vec<fixtures::Mr81Report<'_>> = MR81_FILES
         .iter()
-        .map(|(year, report)| fixtures::Mr81Year {
+        .zip(&texts)
+        .map(|((year, stream, layout), text)| fixtures::Mr81Report {
             year: *year,
-            report,
+            stream: *stream,
+            layout: *layout,
+            text,
         })
         .collect();
-    fixtures::build_mr81(&years)
+    fixtures::build_mr81(&reports)
 }
 
 /// Read the one worksheet whose name begins with `prefix`.

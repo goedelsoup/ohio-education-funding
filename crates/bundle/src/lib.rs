@@ -37,6 +37,21 @@ use edfund_core::Dollars;
 
 /// The bundle schema version. Bump on any change to field names, units, or semantics.
 ///
+/// `32.0.0` reworked `meal_program`. It now runs FY1998 through FY2014 rather than FY2001 through
+/// FY2011, and `share` became **nullable**. Breaking in the strongest sense available here: a
+/// consumer that reads the block the way `29.0.0` published it will find a null where it expects a
+/// number, which is the intent. From FY2012 the report is published as three files — Traditional,
+/// Provision 2 and Community Eligibility — and only the first still counts applications. Adding
+/// them gives a share that falls thirteen points in three years because the poorest sponsors
+/// stopped collecting forms, so those Octobers carry `floor` and `ceiling` and no share at all.
+/// `streams` says which kind of year a row is.
+///
+/// The same revision corrects FY2001. The file is the only comma-delimited one in the series, nine
+/// of its rows carry a comma inside a school name, and read positionally two of them put a site
+/// IRN in Cleveland City's enrollment column — 192,147 pupils against its real 73,562. Every
+/// figure `29.0.0` and later published for FY2001 was computed on that: the share was 27.7% and is
+/// 29.5%.
+///
 /// `31.0.0` added `appropriation_lines`: the department's line items with the act that created
 /// each, from the Catalog's `originally established by` clause. Additive in shape and breaking in
 /// meaning, because it changes what a consumer can say about the budget — not how much it is but
@@ -103,7 +118,7 @@ use edfund_core::Dollars;
 /// from FY2022-FY2024 to FY2024-FY2026 — the years the department's `ADM Data` sheet declares.
 /// The values did not change; what they are called did, which is exactly the kind of silent
 /// meaning change the version guard exists for.
-pub const CONTRACT_VERSION: &str = "31.0.0";
+pub const CONTRACT_VERSION: &str = "32.0.0";
 
 /// How close to the floor counts as being on it, in mills.
 ///
@@ -1753,17 +1768,26 @@ impl Bundle {
 
         // `basis` is written on every row rather than only where it changes, because a consumer
         // reading one row must be able to tell what its share divides by without scanning for the
-        // last row that said so.
+        // last row that said so. `streams` is written on every row for the stronger version of the
+        // same reason: from FY2012 `share` is null, and a consumer meeting that has to be able to
+        // tell a year with no single answer from a year whose figure went missing.
         s.push_str("  \"meal_program\": [\n");
         for (i, m) in self.meal_program.iter().enumerate() {
             s.push_str(&format!(
                 "    {{\"fiscal_year\": {}, \"sponsors\": {}, \"enrollment\": {}, \
-                 \"approved\": {}, \"share\": {}, \"basis\": \"{}\"}}",
+                 \"approved\": {}, \"identified\": {}, \"share\": {}, \"floor\": {}, \
+                 \"ceiling\": {}, \"without_applications\": {}, \"streams\": {}, \
+                 \"basis\": \"{}\"}}",
                 m.fiscal_year,
                 m.sponsors,
                 num(m.enrollment),
                 num(m.approved),
-                num(m.share),
+                num(m.identified),
+                m.share.map_or_else(|| "null".to_string(), num),
+                num(m.floor),
+                num(m.ceiling),
+                num(m.without_applications),
+                m.streams,
                 escape(&m.basis)
             ));
             if i + 1 < self.meal_program.len() {
@@ -2781,15 +2805,21 @@ mod tests {
                     source: "workbook".into(),
                 },
             ],
-            // Two rows spanning the basis change, so anything serializing this fixture has to
-            // carry both names rather than one.
+            // Three rows spanning both breaks: the basis change, so anything serializing this
+            // fixture has to carry both names rather than one, and the split into three files,
+            // so it has to carry a row whose share is absent rather than zero.
             meal_program: vec![
                 MealProgramYear {
                     fiscal_year: 2009,
                     sponsors: 812,
                     enrollment: 1_000_000.0,
                     approved: 412_000.0,
-                    share: 0.412,
+                    identified: 0.0,
+                    share: Some(0.412),
+                    floor: 0.412,
+                    ceiling: 0.412,
+                    without_applications: 0.0,
+                    streams: 1,
                     basis: "adm".into(),
                 },
                 MealProgramYear {
@@ -2797,7 +2827,25 @@ mod tests {
                     sponsors: 844,
                     enrollment: 1_000_000.0,
                     approved: 437_000.0,
-                    share: 0.437,
+                    identified: 0.0,
+                    share: Some(0.437),
+                    floor: 0.437,
+                    ceiling: 0.437,
+                    without_applications: 0.0,
+                    streams: 1,
+                    basis: "ce".into(),
+                },
+                MealProgramYear {
+                    fiscal_year: 2014,
+                    sponsors: 901,
+                    enrollment: 1_000_000.0,
+                    approved: 333_000.0,
+                    identified: 105_000.0,
+                    share: None,
+                    floor: 0.438,
+                    ceiling: 0.484,
+                    without_applications: 0.166,
+                    streams: 3,
                     basis: "ce".into(),
                 },
             ],
@@ -3082,13 +3130,27 @@ mod tests {
         // rather than ship a share nothing can verify.
         assert!(
             json.contains(
-                "\"enrollment\": 1000000, \"approved\": 412000, \"share\": 0.412, \"basis\": \"adm\""
+                "\"enrollment\": 1000000, \"approved\": 412000, \"identified\": 0, \
+                 \"share\": 0.412, \"floor\": 0.412, \"ceiling\": 0.412, \
+                 \"without_applications\": 0, \"streams\": 1, \"basis\": \"adm\""
             ),
             "{json}"
         );
         assert!(
             json.contains(
-                "\"enrollment\": 1000000, \"approved\": 437000, \"share\": 0.437, \"basis\": \"ce\""
+                "\"enrollment\": 1000000, \"approved\": 437000, \"identified\": 0, \
+                 \"share\": 0.437, \"floor\": 0.437, \"ceiling\": 0.437, \
+                 \"without_applications\": 0, \"streams\": 1, \"basis\": \"ce\""
+            ),
+            "{json}"
+        );
+        // And the split year writes a null rather than a number, beside a band that is not
+        // degenerate. A serializer that wrote `0` here would publish a poverty rate of nothing.
+        assert!(
+            json.contains(
+                "\"approved\": 333000, \"identified\": 105000, \"share\": null, \
+                 \"floor\": 0.438, \"ceiling\": 0.484, \"without_applications\": 0.166, \
+                 \"streams\": 3, \"basis\": \"ce\""
             ),
             "{json}"
         );
@@ -3566,8 +3628,8 @@ pub struct AppropriationLine {
 /// a count of *applications approved* for free or reduced-price lunch, over the denominator a
 /// lunch claim is filed against. It is here because R.C. 3317.03(B)(21) hands the definition of
 /// "economically disadvantaged" to the department, free-lunch eligibility has been the
-/// department's operative test, and this is the longest run of that test available — eleven years
-/// where the rest of the feed has six.
+/// department's operative test, and this is the longest run of that test available — seventeen
+/// years where the rest of the feed has six.
 ///
 /// [Disadvantaged pupil impact aid](../../.yidam/corpus/formula-component/fsfp-disadvantaged-pupil-impact-aid.yml)
 /// is paid on that count, so this is the closest thing the feed carries to a history of what the
@@ -3605,9 +3667,47 @@ pub struct MealProgramYear {
     /// divides by. See `web/src/lib/denominators.ts`.
     pub enrollment: f64,
     /// Free and reduced-price applications approved, summed over those sponsors.
+    ///
+    /// From FY2012 this is short by every child in a community-eligibility school, because those
+    /// sponsors collect no applications. See [`Self::streams`].
     pub approved: f64,
-    /// [`Self::approved`] over [`Self::enrollment`], which is the figure worth reading.
-    pub share: f64,
+    /// Directly certified children in community-eligibility schools. Zero before FY2012.
+    ///
+    /// Not an approval and not comparable to one. Direct certification reaches families already on
+    /// SNAP, TANF, foster care or a homeless roll; an application reaches anyone under the income
+    /// line who files. The programme's own reckoning of the gap is the 1.6 multiplier behind
+    /// [`Self::ceiling`].
+    pub identified: f64,
+    /// [`Self::approved`] over [`Self::enrollment`], which is the figure worth reading — while the
+    /// report is one file.
+    ///
+    /// `None` from FY2012, and that is the finding rather than a gap. Three publications counting
+    /// three different things do not add up to a share, so those years carry
+    /// [`Self::floor`] and [`Self::ceiling`] instead and nothing writes a number between them.
+    pub share: Option<f64>,
+    /// The lowest share the source supports: approvals plus directly certified children.
+    ///
+    /// Equal to [`Self::share`] while the report is one file.
+    pub floor: f64,
+    /// The highest: what every sponsor may claim for, which under community eligibility is the
+    /// directly certified count times 1.6, capped at enrollment school by school.
+    ///
+    /// Equal to [`Self::share`] while the report is one file.
+    pub ceiling: f64,
+    /// The share of the October's enrollment under sponsors that collect no applications.
+    ///
+    /// Zero through FY2011 and a sixth by FY2014. This is the size of the hole in
+    /// [`Self::approved`], and it grows because community eligibility is open to schools whose
+    /// poverty is already high — the population leaving the applications-based count is not a
+    /// random sample of it.
+    pub without_applications: f64,
+    /// How many files the October was published as: one through FY2011, three from FY2012.
+    ///
+    /// The field a consumer has to read before drawing a line. From FY2012 the report splits into
+    /// Traditional, Provision 2 and Community Eligibility, and only the first still counts
+    /// applications — so a series that joins across this reads the poorest sponsors leaving the
+    /// form as poverty falling.
+    pub streams: usize,
     /// Which denominator that is: `adm` through FY2009, `ce` from FY2010.
     ///
     /// The definition changes mid-series. `CECount` is "the highest daily number of students with
