@@ -2017,3 +2017,49 @@ test.describe("what the legislature set aside", () => {
     await expect(card).not.toContainText("per-pupil");
   });
 });
+
+test.describe("what the budget is made of", () => {
+  test("the lines behind the totals are on the page", async ({ page }) => {
+    // Extracted with the Catalog and reachable by no reader until now — the same gap this site
+    // has closed for the Census panel, MR-81 and the appropriation series.
+    await page.goto("/history");
+    const card = page.locator('.card[data-part="line-origins"]');
+    await expect(card).toBeVisible();
+    await expect(card).toContainText("What the budget is made of");
+    await expect(card.locator("tbody tr").first()).toBeVisible();
+  });
+
+  test("the oldest line is named with the act that created it", async ({ page }) => {
+    /*
+     * The finding. A budget line still being funded that predates DeRolph says something about
+     * how budgets are made that no total does, and it is only sayable because the Catalog prints
+     * an establishing act for each line.
+     */
+    await page.goto("/history");
+    const card = page.locator('.card[data-part="line-origins"]');
+    await expect(card).toContainText("oldest line still being funded");
+    await expect(card).toContainText("G.A.");
+    await expect(card).toContainText("DeRolph");
+  });
+
+  test("lines with no establishing act say so instead of rendering blank", async ({ page }) => {
+    // A blank cell reads as an extraction that failed. "Not stated" reads as the document
+    // declining to say, which is what happened — and the card explains why it is not filled in.
+    await page.goto("/history");
+    const card = page.locator('.card[data-part="line-origins"]');
+    await expect(card).toContainText("not stated");
+    await expect(card).toContainText("name no establishing act");
+  });
+
+  test("the discontinued label is not presented as abolition", async ({ page }) => {
+    /*
+     * `state-foundation-aid` holds the open question of whether the department's disappearing
+     * lines were abolished or folded into others. This card carries the publisher's flag and must
+     * not let a reader mistake it for the answer.
+     */
+    await page.goto("/history");
+    const card = page.locator('.card[data-part="line-origins"]');
+    await expect(card).toContainText("not a finding about");
+    await expect(card).toContainText("open question this cannot settle");
+  });
+});
