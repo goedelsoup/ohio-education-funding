@@ -11,6 +11,7 @@ import { loadCorpus } from "../lib/corpus.ts";
 import { loadFeed } from "../lib/feed.ts";
 import { count, millions, pct } from "../lib/format.ts";
 import { DENOMINATORS } from "../lib/denominators.ts";
+import * as routes from "../lib/routes.ts";
 
 const { bundle, verification, forecastable } = loadFeed();
 const corpus = loadCorpus();
@@ -21,6 +22,8 @@ const meta = bundle.projection;
 <Base
   title="Method"
   description={`How the figures on this site are produced: the department's own FY${bundle.fiscal_year} model, re-run and checked against ${verification.comparisons.length} reference scenarios before the site is allowed to build.`}
+  image={routes.og.page("method")}
+  imageAlt="How these figures are made, and the checkpoints they must reproduce before the site builds"
   section="method"
 >
   <h1>Method</h1>

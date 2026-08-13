@@ -42,7 +42,13 @@ const description = latest
   : `No five-year forecast filing was found for ${district.name}.`;
 ---
 
-<Base title={`${district.name} — finances`} description={description} section="districts">
+<Base
+  title={`${district.name} — finances`}
+  description={description}
+  image={routes.og.district(district.irn)}
+  imageAlt={`${district.name}: state aid per pupil, and how much of it comes from the guarantee`}
+  section="districts"
+>
   <h1>{district.name}</h1>
   <p class="sub">
     Audited actuals from the district's own five-year forecast filing — the only figures on this

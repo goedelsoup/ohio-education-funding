@@ -13,6 +13,7 @@
 import Base from "../layouts/Base.astro";
 import { loadFeed } from "../lib/feed.ts";
 import { count } from "../lib/format.ts";
+import * as routes from "../lib/routes.ts";
 
 const { bundle, alphabetical } = loadFeed();
 
@@ -32,6 +33,8 @@ const named = SEEDED.map((pair) => ({
 <Base
   title="Compare"
   description={`Put any two of Ohio's ${bundle.statewide.districts} school districts side by side: funding, guarantee status, property wealth, spending and outcomes.`}
+  image={routes.og.page("compare")}
+  imageAlt="Any two Ohio school districts, side by side"
   section="compare"
 >
   <h1>Compare</h1>

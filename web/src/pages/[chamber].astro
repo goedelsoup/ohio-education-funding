@@ -33,6 +33,8 @@ const senateWhole = bundle.senate_districts.reduce((a, h) => a + h.districts_who
 <Base
   title={`${label} districts`}
   description={`Ohio's ${seats.length} ${label} districts, with school funding apportioned across them from census blocks — an estimate, since no legislative district is a unit of account in Ohio's funding system.`}
+  image={routes.og.page(chamber)}
+  imageAlt={`Ohio's ${seats.length} ${label} districts, with school funding apportioned across them`}
   section={chamber}
   wide
 >

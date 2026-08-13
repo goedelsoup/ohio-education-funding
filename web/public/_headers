@@ -43,3 +43,21 @@
 
 /search-index.json
   Cache-Control: public, max-age=300, must-revalidate
+
+# The preview cards, and the two icons rasterized from the same mark. Not content-hashed — the
+# `og:image` in each document names a fixed path — so the same rule as `/data/*` applies and
+# `immutable` is not available. An hour rather than five minutes because the audience is different:
+# these are fetched by unfurlers and crawlers re-checking a link that was shared once, not by a
+# page recomputing the formula, and a card that is an hour stale is a card, while a stale
+# `panel.json` is a wrong number.
+/og/*
+  Cache-Control: public, max-age=3600, must-revalidate
+
+/favicon.svg
+  Cache-Control: public, max-age=3600, must-revalidate
+
+/icon-32.png
+  Cache-Control: public, max-age=3600, must-revalidate
+
+/apple-touch-icon.png
+  Cache-Control: public, max-age=3600, must-revalidate

@@ -9,6 +9,7 @@
 import Base from "../layouts/Base.astro";
 import { loadFeed } from "../lib/feed.ts";
 import { renderOutcomes } from "../lib/outcomes.ts";
+import * as routes from "../lib/routes.ts";
 
 const { bundle } = loadFeed();
 const o = bundle.statewide.outcomes;
@@ -21,6 +22,8 @@ const o = bundle.statewide.outcomes;
       ? `Economic disadvantage explains Ohio's attainment measure at ${o.poverty_vs_performance.toFixed(3)}. Every other district-level association is shown against that, with its controlled figure beside it.`
       : "This feed carries no outcome data."
   }
+  image={routes.og.page("outcomes")}
+  imageAlt="Ohio school funding set against the report-card measures"
   section="outcomes"
 >
   <h1>Outcomes</h1>

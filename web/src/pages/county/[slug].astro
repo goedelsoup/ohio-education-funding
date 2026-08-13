@@ -9,6 +9,7 @@ import Base from "../../layouts/Base.astro";
 import { counties, medianRealizedAid, renderCounty } from "../../lib/county.ts";
 import { loadFeed } from "../../lib/feed.ts";
 import { count, money } from "../../lib/format.ts";
+import * as routes from "../../lib/routes.ts";
 
 export async function getStaticPaths() {
   const { bundle } = loadFeed();
@@ -28,7 +29,14 @@ const description =
     : `The ${county.districts.length} school districts the department places in ${county.name} County, Ohio, compared: property wealth per pupil, state aid, and a ${county.valuationRatio.toFixed(1)}× gap between the richest and poorest.`;
 ---
 
-<Base title={`${county.name} County`} description={description} section="counties" wide>
+<Base
+  title={`${county.name} County`}
+  description={description}
+  image={routes.og.county(county.slug)}
+  imageAlt={`${county.name} County: the property wealth gap between its richest and poorest school district`}
+  section="counties"
+  wide
+>
   <h1>{county.name} County</h1>
   <p class="sub">
     {count(county.districts.length)} district{county.districts.length === 1 ? "" : "s"} ·

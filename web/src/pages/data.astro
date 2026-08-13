@@ -9,6 +9,7 @@
 import Base from "../layouts/Base.astro";
 import { loadFeed } from "../lib/feed.ts";
 import { count } from "../lib/format.ts";
+import * as routes from "../lib/routes.ts";
 
 const { bundle, verification } = loadFeed();
 const s = bundle.statewide;
@@ -17,6 +18,8 @@ const s = bundle.statewide;
 <Base
   title="Data"
   description="Download the Ohio school funding panel: the full feed as JSON, the formula inputs alone, and the district table as CSV."
+  image={routes.og.page("data")}
+  imageAlt="The Ohio school funding panel, as JSON and CSV"
   section="data"
 >
   <h1>Data</h1>

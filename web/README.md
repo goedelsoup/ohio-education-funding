@@ -255,6 +255,42 @@ inherits normally, which is what makes this possible; `ensureThemeable` fails th
 literal colour ever slips through, because the resulting bug is invisible to whoever writes it —
 they are looking at light mode, where the literal is very nearly right.
 
+## Preview cards are the same idea, rasterized
+
+A link to any page here unfurls with a card carrying that page's own figures: a district's aid per
+pupil and how much of it is guarantee money, a county's internal wealth gap, a corpus node's
+definition. [`src/lib/og/`](src/lib/og/) lays each one out with `satori` and rasterizes it with
+`resvg`, and the endpoints under [`src/pages/og/`](src/pages/og/) emit **995 PNGs** — one per
+district, county, legislative seat, ontology class, corpus node and catalog source, plus the
+fourteen written ones in [`pages.ts`](src/lib/og/pages.ts).
+
+A district's five routes share one card. What separates them in a feed is `og:title`, which carries
+each page's own title, so five renderings per district would be 3,045 images for a difference no
+reader would see.
+
+**This is the one surface where a literal colour is correct**, which makes it the exact inverse of
+the rule above. A chart is SVG in a document and defers its colours to the reader's theme; a card
+is a PNG handed to Slack, with no cascade behind it and no way to re-render. So
+[`palette.ts`](src/lib/og/palette.ts) writes the light-mode values out, and `tests/unit/og.spec.ts`
+parses the `:root` block of `app.css` and fails if the two have drifted. A card must never be
+routed through `renderToString`, which would reject it.
+
+Two things to know before touching the renderer:
+
+- **`loadSystemFonts: false` is load-bearing.** resvg builds a font database per instance, and by
+  default that means scanning every font on the machine. Measured on this card: 121 ms with the
+  default, 9 ms without — across ~1,000 cards, two minutes against nine seconds. It is free because
+  satori embeds glyph outlines, so no `<text>` reaches resvg at all.
+- **The card has one layout and takes no layout argument.** It is read at 400 pixels wide, in a
+  feed, by someone who has not decided to look at it. The variable worth spending is which figure,
+  not where it sits.
+
+The layout also fixes what the canonical link had been claiming. `build.format` is `"file"`, so
+`Astro.url.pathname` is the *output file* — the site shipped `<link rel="canonical">` pointing at
+`/district/043786.html` while the sitemap beside it listed `/district/043786`. `canonicalPath` in
+[`routes.ts`](src/lib/routes.ts) puts the served path back, both tags are built from it, and an
+artefact test now holds the two files to the same set of addresses.
+
 ## Design notes
 
 Two series appear anywhere here — formula aid and guarantee, reused as gain and loss — in the
@@ -391,7 +427,9 @@ live site does not change — you have published a preview.
 in that order. The old shortcut of regenerating `public/data/bundle.json` alone no longer updates
 what a reader sees, because the figures are in the HTML.
 
-`dist/` is about 35 MB across ~2,550 files, well inside Cloudflare Pages' 20,000-file limit.
+`dist/` is about 131 MB across ~4,450 files, well inside Cloudflare Pages' 20,000-file limit. A
+third of that weight is the 995 preview cards under `og/`, which is the price of a shared link
+carrying the district's own figures; the file count is what to watch, and it has room.
 
 DNS is split, and knowing which half is which saves an hour when something breaks.
 `shawneesmart.systems` is authoritative on **Route 53**, and stays there — it carries the mail
@@ -423,6 +461,12 @@ cannot be hand-rolled. A real browser, which is what caught the verification-gat
 processor, for a corpus that is markdown. And Observable Plot, which is a chart grammar rather than
 a chart library and would be several thousand lines to reproduce badly.
 
+`satori` and `@resvg/resvg-js` joined them for the preview cards. Neither is hand-rollable at any
+sensible cost — one is a flexbox implementation, the other an SVG rasterizer — and both run only
+during the build. `@fontsource/inter` is there because a card is rasterized on a build server,
+which has no "system UI sans" to resolve; it brings the SIL licence with it, which committing a
+`.ttf` would not.
+
 Every dependency here is a `devDependency` **except** `@observablehq/plot`, and it is code-split so
 it ships only on the two scenario routes. The deployed artifact is still inert files with nothing
 running behind them, so the exposure is build-time only: if the tree rots, the site that is already
@@ -440,9 +484,12 @@ src/lib/schema/       what a feed and a corpus file are allowed to be; the only 
 src/lib/prose.ts      corpus markdown: link rewriting and claim badges
 scripts/              schema emission and the corpus report; run by pnpm, not by the build
 src/lib/plot/         chart specifications, and the two renderers that share them
+src/lib/og/           preview cards: the palette, the layout, and the rasterizer
+src/pages/og/         one endpoint per card family; 995 PNGs, none of them in the sitemap
 src/lib/*.ts          the formula, the views, the formatting
 src/scripts/          the client entries; small, and never load-bearing
 public/data/          the feed, copied verbatim into dist/
+public/favicon.svg    the site mark; the two icon routes rasterize this one file
 public/_headers       cache and security headers, read by the host
 tests/unit/           the formula, the projection, the link graph, the 404 matcher
 tests/e2e/            the site in Chromium, a third of it with JavaScript disabled

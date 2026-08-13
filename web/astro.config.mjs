@@ -30,7 +30,17 @@ export default defineConfig({
     sitemap({
       // The 404 is reachable only by failing to reach something else, and the search index is a
       // data file that happens to live in `pages/`. Neither belongs in a sitemap.
-      filter: (page) => !page.includes("/404") && !page.includes("search-index"),
+      //
+      // Nor do the preview cards. `/og/*` is roughly a thousand PNGs that exist to be fetched by
+      // an unfurler when someone shares the page they belong to — they are an attribute of a
+      // document rather than documents, and listing them would treble the sitemap with images no
+      // reader can navigate to. The two icon routes are excluded for the same reason.
+      filter: (page) =>
+        !page.includes("/404") &&
+        !page.includes("search-index") &&
+        !page.includes("/og/") &&
+        !page.endsWith("apple-touch-icon.png") &&
+        !page.endsWith("icon-32.png"),
     }),
   ],
   build: {
