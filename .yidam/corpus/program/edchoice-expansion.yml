@@ -50,9 +50,18 @@ properties:
     billion a year. See `crates/project/tests/the_voucher_channel_is_absent.rs`.
 
     What this establishes is that a resident district's foundation payment is not reduced for a
-    scholarship student. That the money instead reaches the program by direct appropriation is
-    the natural reading and is not established here — the appropriation would sit in the budget
-    act rather than in the funding calculator, and `lsc-budget` is blocked. [open]
+    scholarship student. **What happens instead is now established too, and from the same section
+    that computes the formula rather than from the appropriation side.** R.C. 3317.022 directs the
+    department to compute and distribute state core foundation funding to six *funding units* —
+    districts, the community and STEM school unit, and four scholarship units, of which one is the
+    **educational choice scholarship unit**. Division (E) distributes the scholarship to the parent
+    "from the funds paid to the educational choice scholarship unit under this section", in monthly
+    partial payments. [verified — R.C. 3317.022]
+
+    So the earlier `[open]` here — "direct appropriation is the natural reading and is not
+    established" — is closed, and closed differently from how it was framed. The mechanism is not
+    a separate appropriation at all; it is a parallel funding unit inside the foundation
+    computation. [verified]
   eligibility: |
     Originally income-limited. Am. Sub. H.B. 33 (2023) made all Ohio students eligible, with
     award amount scaled by family income relative to the federal poverty level rather than

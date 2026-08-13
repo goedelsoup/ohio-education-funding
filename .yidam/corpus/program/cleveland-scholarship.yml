@@ -16,19 +16,42 @@ description: |
   separate question raised in the [2025 EdChoice
   challenge](../litigation/vouchers-hurt-ohio-2025.yml). [inference]
 
-  Per-student amounts, participation counts, and the mechanism by which the program is charged
-  against Cleveland's funding are not yet recorded. [open]
+  **It is not charged against Cleveland's funding, and the assertion that it was is corrected
+  here.** This node carried `mechanism: deduction` flatly from its seeding. Under the Fair School
+  Funding Plan the programme is the **pilot project scholarship unit**, one of six funding units
+  R.C. 3317.022 pays directly. [verified] The old value was a reasonable reading of the
+  programme's deduct-era history and wrong about the law in force.
 properties:
   seeded_because: |
     The origin point of the scholarship channel, and the reference against which the statewide
     programs' scale should be read: it was designed as a targeted intervention in one distressed
     district, and what grew from it was universal eligibility statewide. [inference]
   name: Cleveland Scholarship and Tutoring Program
-  mechanism: deduction
+  mechanism: |
+    **Direct payment as the pilot project scholarship unit. Not a deduction.** [verified —
+    R.C. 3317.022, R.C. 3313.975]
+
+    The statute never names Cleveland. R.C. 3313.975(A) has the director implement the programme in
+    "any school districts that are or have ever been under federal court order requiring
+    supervision and operation" — a definition by history rather than by name, which is why the
+    programme survives as a single-district one without saying so. [verified]
+
+    The deduct-era mechanism is a separate question and needs `dew-payment-reports`. [open]
   eligibility: |
-    Students residing in the Cleveland City School District, subject to income-based priority
-    in awarding. Established mid-1990s; exact enacting act and year not yet established. [open]
-  amount: Not yet populated. [open]
+    Students residing in the Cleveland Metropolitan School District — reached in statute through
+    the federal-court-supervision definition in R.C. 3313.975(A) rather than by name — subject to
+    income-based priority in awarding. Created in 1995 as a pilot initiative; authorised under
+    R.C. 3313.974 through 3313.979. [verified — R.C. 3313.975; 2025 Scholarship Annual Report]
+  amount: |
+    **FY2025: 8,345 students, $55,155,295.70, average award as published $6,836.35.** [verified —
+    2025 Scholarship Annual Report] Expenditure over participation is $6,609.38; the same
+    unexplained gap the other programmes show, recorded on
+    [`edchoice-scholarship`](edchoice-scholarship.yml). [open]
+
+    Statutory bound: the lesser of the alternative school's net tuition charges, or **$5,500** for
+    grades K-8 and **$7,500** for 9-12, with those amounts rising by the same percentage as the
+    statewide average base cost per pupil. [verified — R.C. 3317.022(A)(11)] The department reports
+    FY2025 maxima of $6,166 and $8,408, which are the indexed values. [verified]
   appropriation_line: |
     **No line of its own — it is paid from the foundation aid appropriation.** Five line items
     "are used to collectively support state foundation aid payments for all public school students

@@ -578,6 +578,236 @@ In the case of a scholarship distributed to a student's school district of atten
 (I) For fiscal years 2026 and 2027, a school district shall spend the funds it receives under division (A)(5) of this section only for services for English learners.
 (J) For each fiscal year, a school district shall spend the funds it receives under division (A)(6) of this section only for the identification of gifted students, gifted coordinator services, and gifted intervention specialist services. For each fiscal year, if the department determines that a district is not in compliance with this division, it shall reduce the district's payments for that fiscal year under this chapter by an amount equal to the amount paid to the district for that fiscal year under division (A)(6) of this section that was not spent in accordance with this division. The department shall reduce the payment within ninety days of data finalization.
 
+=== 3310.01
+title: Definitions for the educational choice scholarship pilot program.
+date: October 3, 2023
+source: House Bill 33 - 135th General Assembly
+--
+As used in sections 3310.01 to 3310.17 of the Revised Code:
+(A) "Chartered nonpublic school" means a nonpublic school that holds a valid charter issued by the director of education and workforce under section 3301.16 of the Revised Code and meets the standards established for such schools in rules adopted by the director.
+(B) An "eligible student" is a student who satisfies the conditions specified in section 3310.03 or 3310.032 of the Revised Code.
+(C) "Parent" has the same meaning as in section 3313.98 of the Revised Code.
+(D) "Resident district" means the school district in which a student is entitled to attend school under section 3313.64 or 3313.65 of the Revised Code.
+(E) "School year" has the same meaning as in section 3313.62 of the Revised Code.
+
+=== 3310.03
+title: Eligibility of students to participate in program.
+date: October 3, 2023
+source: House Bill 33 - 135th General Assembly
+--
+For the 2021-2022 school year and each school year thereafter, subject to division (G) of this section, a student is an "eligible student" for purposes of the educational choice scholarship pilot program if the student's resident district is not a school district in which the pilot project scholarship program is operating under sections 3313.974 to 3313.979 of the Revised Code, the student satisfies one of the conditions in division (A), (B), or (C) of this section, and the student maintains eligibility to receive a scholarship under division (D) of this section.
+However, any student who received a scholarship for the 2020-2021 school year under this section, as it existed prior to March 2, 2021, shall continue to receive that scholarship until the student completes grade twelve, as long as the student maintains eligibility to receive a scholarship under division (D) of this section.
+(A)(1) A student is eligible for a scholarship if the student is enrolled in a school building operated by the student's resident district and to which both of the following apply:
+(a) The building was ranked in the lowest twenty per cent of all buildings operated by city, local, and exempted village school districts according to performance index score as determined by the department of education and workforce, as follows:
+(i) For a scholarship sought for the 2021-2022 or 2022-2023 school year, the building was ranked in the lowest twenty per cent of buildings for each of the 2017-2018 and 2018-2019 school years.
+(ii) For a scholarship sought for the 2023-2024 school year, the building was ranked in the lowest twenty per cent of buildings for each of the 2018-2019 and 2021-2022 school years.
+(iii) For a scholarship sought for the 2024-2025 school year, the building was ranked in the lowest twenty per cent of buildings for each of the 2021-2022 and 2022-2023 school years.
+(iv) For a scholarship sought for the 2025-2026 school year or any school year thereafter, the building was ranked in the lowest twenty per cent of buildings for at least two of the three most recent consecutive rankings issued prior to the first day of July of the school year for which a scholarship is sought.
+(b) The building is operated by a school district in which, for the three consecutive school years prior to the school year for which a scholarship is sought, an average of twenty per cent or more of the students entitled to attend school in the district, under section 3313.64 or 3313.65 of the Revised Code, were qualified to be included in the formula to distribute funds under Title I of the "Elementary and Secondary Education Act of 1965," 20 U.S.C. 6301 et seq.
+When ranking school buildings under division (A)(1) of this section, the department shall not include buildings operated by a school district in which the pilot project scholarship program is operating in accordance with sections 3313.974 to 3313.979 of the Revised Code.
+(2) A student is eligible for a scholarship if the student will be enrolling in any of grades kindergarten through twelve in this state for the first time in the school year for which a scholarship is sought, will be at least five years of age, as defined in section 3321.01 of the Revised Code, by the first day of January of the school year for which a scholarship is sought, and otherwise would be assigned under section 3319.01 of the Revised Code in the school year for which a scholarship is sought, to a school building described in division (A)(1) of this section.
+(3) A student is eligible for a scholarship if the student is enrolled in a community school established under Chapter 3314. of the Revised Code but otherwise would be assigned under section 3319.01 of the Revised Code to a building described in division (A)(1) of this section.
+(4) A student is eligible for a scholarship if the student is enrolled in a school building operated by the student's resident district or in a community school established under Chapter 3314. of the Revised Code and otherwise would be assigned under section 3319.01 of the Revised Code to a school building described in division (A)(1) of this section in the school year for which the scholarship is sought.
+(5) A student is eligible for a scholarship if the student was enrolled in a public or nonpublic school or was homeschooled in the prior school year and completed any of grades eight through eleven in that school year and otherwise would be assigned under section 3319.01 of the Revised Code to a school building described in division (A)(1) of this section in the school year for which the scholarship is sought.
+(B) A student is eligible for a scholarship if the student is enrolled in a nonpublic school at the time the school is granted a charter by the director of education and workforce under section 3301.16 of the Revised Code and the student meets the standards of division (B) of section 3310.031 of the Revised Code.
+(C) A student is eligible for a scholarship if the student's resident district is subject to section 3302.10 of the Revised Code and the student either:
+(1) Is enrolled in a school building operated by the resident district or in a community school established under Chapter 3314. of the Revised Code;
+(2) Will be both enrolling in any of grades kindergarten through twelve in this state for the first time and at least five years of age by the first day of January of the school year for which a scholarship is sought.
+(D) A student who receives a scholarship under the educational choice scholarship pilot program remains an eligible student and may continue to receive scholarships in subsequent school years until the student completes grade twelve, so long as all of the following apply:
+(1) The student's resident district remains the same, or the student transfers to a new resident district and otherwise would be assigned in the new resident district to a school building described in division (A)(1) or (C) of this section.
+(2) The student takes each assessment prescribed for the student's grade level under section 3301.0710, 3301.0712, or 3313.619 of the Revised Code while enrolled in a chartered nonpublic school, unless one of the following applies to the student:
+(a) The student is excused from taking that assessment under federal law, the student's individualized education program, or division (C)(1)(c)(i) of section 3301.0711 of the Revised Code.
+(b) The student is enrolled in a chartered nonpublic school that meets the conditions specified in division (K)(2) or (L)(4) of section 3301.0711 of the Revised Code.
+(c) The student is enrolled in any of grades three to eight and takes an alternative standardized assessment under division (K)(1) of section 3301.0711 of the Revised Code.
+(d) The student is excused from taking the assessment prescribed under division (B)(1) of section 3301.0712 of the Revised Code pursuant to division (C)(1)(c)(ii) of section 3301.0711 of the Revised Code.
+(3) In each school year that the student is enrolled in a chartered nonpublic school, the student is absent from school for not more than twenty days that the school is open for instruction, not including excused absences.
+(E)(1) The department shall cease awarding first-time scholarships pursuant to divisions (A)(1) to (5) of this section with respect to a school building that, in the most recent ratings of school buildings under section 3302.03 of the Revised Code prior to the first day of July of the school year, ceases to meet the criteria in division (A)(1) of this section.
+(2) The department shall cease awarding first-time scholarships pursuant to division (C) of this section with respect to a school district subject to section 3302.10 of the Revised Code when the academic distress commission established for the district ceases to exist.
+(3) However, students who have received scholarships in the prior school year remain eligible students pursuant to division (D) of this section.
+(F) The department shall adopt rules defining excused absences for purposes of division (D)(3) of this section.
+(G) Notwithstanding anything to the contrary in this section or section 3310.031 of the Revised Code, a student shall not be required to be enrolled or enrolling in a school building operated by the student's resident district or a community school in order to be eligible for a scholarship, as follows:
+(1) For a scholarship sought for the 2021-2022 school year, a student entering any of grades kindergarten through two;
+(2) For a scholarship sought for the 2022-2023 school year, a student entering any of grades kindergarten through four;
+(3) For a scholarship sought for the 2023-2024 school year, a student entering any of grades kindergarten through six;
+(4) For a scholarship sought for the 2024-2025 school year, a student entering any of grades kindergarten through eight;
+(5) For a scholarship sought for the 2025-2026 school year, and each school year thereafter, a student entering any of grades kindergarten through twelve.
+(H) Except as provided for in section 3310.13 of the Revised Code and in division (C)(2) of section 3365.07 of the Revised Code, the department shall not require the parent of a student who applies for or receives a scholarship under this section or section 3310.033, 3310.034, or 3310.035 of the Revised Code to complete any kind of income verification regarding the student's family income.
+
+=== 3310.032
+title: Expansion of educational choice scholarship pilot program; income-based eligibility.
+date: October 3, 2023
+source: House Bill 33 - 135th General Assembly
+--
+(A) A student is an "eligible student" for purposes of the expansion of the educational choice scholarship pilot program under this section if the student's resident district is not a school district in which the pilot project scholarship program is operating under sections 3313.974 to 3313.979 of the Revised Code and the student is entering any of grades kindergarten through twelve in the school year for which a scholarship is sought. A student's parent or guardian may certify income eligibility to the department of education and workforce by submitting, in a manner determined by the department, an affidavit affirming the student's family income meets the requirement, proof of income eligibility under another state or federal program, or other evidence determined appropriate by the department. Any individual who is not required to file a tax return under section 5747.02 of the Revised Code shall not be required to certify income eligibility under this section.
+(B) In each fiscal year for which the general assembly appropriates funds for purposes of this section, the department of education and workforce shall pay scholarships to attend chartered nonpublic schools in accordance with section 3317.022 of the Revised Code. The number of scholarships awarded under this section shall not exceed the number that can be funded for that school year as authorized by the general assembly.
+(C) Scholarships under this section shall be awarded as follows:
+(1) For the 2013-2014 school year, to eligible students who are entering kindergarten in that school year for the first time;
+(2) For each subsequent school year through the 2019-2020 school year, scholarships shall be awarded to eligible students in the next grade level above the highest grade level awarded in the preceding school year, in addition to the grade levels for which students received scholarships in the preceding school year;
+(3) Beginning with the 2020-2021 school year, to eligible students who are entering any of grades kindergarten through twelve in that school year for the first time.
+(D) A student who receives a scholarship under this section remains an eligible student and may continue to receive scholarships under this section in subsequent school years until the student completes grade twelve, so long as the student satisfies the conditions specified in divisions (D)(2) and (3) of section 3310.03 of the Revised Code.
+Once a scholarship is awarded under this section, the student shall remain eligible for that scholarship for the current school year and subsequent school years even if the student's family income rises above the amount specified in division (A) of this section, provided the student remains enrolled in a chartered nonpublic school.
+
+=== 3310.08
+title: Educational choice scholarship amount calculation.
+date: October 3, 2023
+source: House Bill 33 - 135th General Assembly
+--
+(A) As used in this section:
+(1) "Constant multiplier" means 0.50.
+(2) "Base amount" means the maximum educational choice scholarship amount for the student's grade level under division (A)(10)(a)(ii)(I) of section 3317.022 of the Revised Code for the fiscal year.
+(3) "Federal poverty level multiplier" means a percentage equal to the student's family income percentage of the federal poverty guidelines for the fiscal year.
+(4) "Federal poverty guidelines" has the same meaning as in section 5101.46 of the Revised Code.
+(5) "Power equation" means the following formula:
+The federal poverty level multiplier X ln(constant multiplier)
+(6) "Minimum amount" means an amount equal to the student's base amount multiplied by ten per cent.
+(B) The department of education and workforce shall determine the educational choice scholarship amount for a student described in division (A)(10)(a)(ii)(II) of section 3317.022 of the Revised Code for a fiscal year, as follows:
+(1) For a student with a family adjusted gross income, as defined in section 5747.01 of the Revised Code, at or below four hundred fifty per cent of the federal poverty guidelines for the fiscal year, the base amount;
+(2) For a student with a family adjusted gross income, as defined in section 5747.01 of the Revised Code, above four hundred fifty per cent of the federal poverty guidelines, an amount calculated according to the following formula:
+The base amount X (1 / the constant multiplier)^4.5 X e^power equation
+If the amount calculated for a student under division (B)(2) of this division is less than the minimum amount, the student's scholarship amount shall be the minimum amount.
+(C) For the purposes of calculating a scholarship amount for a student under this section, the department shall require a student's parent to submit documentation regarding the student's family income. The department shall use the documentation submitted for the first school year that the student has a scholarship amount calculated under this section to calculate the amount for that school year and each subsequent school year, unless, for a subsequent school year, the parent requests the department recalculate the student's scholarship amount based on updated documentation.
+A parent shall submit documentation, or a request for a recalculation, to the department in a form and manner prescribed by the department.
+
+=== 3310.41
+title: Autism scholarship program.
+date: September 30, 2025
+source: House Bill 96 - 136th General Assembly
+--
+(A) As used in this section:
+(1) "Alternative public provider" means either of the following providers that agrees to enroll a child in the provider's special education program to implement the child's individualized education program or an education plan developed by the school district under division (L) of this section and to which the child's parent owes fees for the services provided to the child:
+(a) A school district that is not the school district in which the child is entitled to attend school;
+(b) A public entity other than a school district.
+(2) "Eligible applicant" means any of the following:
+(a) Either of the natural or adoptive parents of a qualified special education child, except as otherwise specified in this division.
+When the marriage of the natural or adoptive parents of the child has been terminated by a divorce, dissolution of marriage, or annulment, or when the natural or adoptive parents of the child are living separate and apart under a legal separation decree, and a court has issued an order allocating the parental rights and responsibilities with respect to the child, "eligible applicant" means the residential parent as designated by the court. If the court issues a shared parenting decree, "eligible applicant" means either parent. "Eligible applicant" does not mean a parent whose custodial rights have been terminated.
+(b) The custodian of a qualified special education child, when a court has granted temporary, legal, or permanent custody of the child to an individual other than either of the natural or adoptive parents of the child or to a government agency;
+(c) The guardian of a qualified special education child, when a court has appointed a guardian for the child;
+(d) The grandparent of a qualified special education child, when the grandparent is the child's attorney in fact under a power of attorney executed under sections 3109.51 to 3109.62 of the Revised Code or when the grandparent has executed a caretaker authorization affidavit under sections 3109.65 to 3109.73 of the Revised Code;
+(e) The surrogate parent appointed for a qualified special education child pursuant to division (B) of section 3323.05 and section 3323.051 of the Revised Code;
+(f) A qualified special education child, if the child does not have a custodian or guardian and the child is at least eighteen years of age and less than twenty-two years of age.
+(3) "Entitled to attend school" means entitled to attend school in a school district under section 3313.64 or 3313.65 of the Revised Code.
+(4) "Formula ADM" has the same meaning as in section 3317.02 of the Revised Code.
+(5) "Preschool child with a disability" and "individualized education program" have the same meanings as in section 3323.01 of the Revised Code.
+(6) "Qualified special education child" is a child who is at least three years of age and less than twenty-two years of age and who either was enrolled in the school district in which the child is entitled to attend school in any grade from preschool through twelve in the school year prior to the year in which a scholarship under this section is sought for the child or is eligible to enter school in any grade preschool through twelve or is less than twenty-two years of age in the school district in which the child is entitled to attend school in the school year in which a scholarship under this section is sought for the child and for whom any of the following conditions apply:
+(a) The school district in which the child is entitled to attend school has identified the child as autistic. A child who has been identified as having a "pervasive developmental disorder - not otherwise specified (PPD-NOS)" shall be considered to be an autistic child for purposes of this section.
+(b) The school district in which the child is entitled to attend school has developed an individualized education program under Chapter 3323. of the Revised Code for the child that includes services related to autism.
+(c) The child has been diagnosed as autistic by a physician or psychologist.
+(d) All of the following apply:
+(i) The child is enrolled in a chartered or nonchartered nonpublic school, is home educated in accordance with section 3321.042 of the Revised Code, or is a student older than compulsory school age and less than twenty-two years of age and received a home education in accordance with section 3321.042 of the Revised Code and has not received a diploma under section 3313.6110 of the Revised Code.
+(ii) The child has an individualized education program developed under Chapter 3323. of the Revised Code that includes services related to autism.
+(iii) The child is still eligible to receive transition services under the child's individualized education program.
+(7) "Registered private provider" means a nonpublic school or other nonpublic entity that has been approved by the department of education and workforce to participate in the program established under this section.
+(8) "Special education program" means a school or facility that provides special education and related services to children with disabilities.
+(B) There is hereby established the autism scholarship program. Under the program, the department shall pay a scholarship under section 3317.022 of the Revised Code to an eligible applicant upon application of that eligible applicant pursuant to procedures and deadlines established by rule of the department. Each scholarship shall be used only to pay tuition for the child on whose behalf the scholarship is awarded to attend a special education program or programs that implements the child's individualized education program or education plan and that is operated by an alternative public provider or by a registered private provider, and to pay for other services agreed to by the provider and the eligible applicant that are not included in the individualized education program or education plan but are associated with educating the child. Upon agreement with the eligible applicant, the alternative public provider or the registered private provider may modify the services provided to the child. The purpose of the scholarship is to permit the eligible applicant the choice to send the child to a special education program or programs, instead of the one operated by or for the school district in which the child is entitled to attend school, to receive the services prescribed in the child's individualized education program or education plan once the individualized education program or education plan is finalized and any other services agreed to by the provider and the eligible applicant. The services provided under the scholarship shall include an educational component or services designed to assist the child to benefit from the child's education.
+At the discretion of the eligible applicant, multiple alternative public providers or registered private providers may be contracted to provide services to implement an individualized education program or education plan as the eligible applicant and providers determine are necessary and associated with educating the qualified special education child. A qualified special education child shall not be limited to receiving services from a single provider for any services as identified in the individualized education program or education plan, including a single type of service.
+(C) Services, including intervention services, educational services, academic services, tutoring services, aide services, and other related special education services, provided through the program established under this section may be provided virtually by any of the following:
+(1) An educational aide or assistant who holds a valid permit issued under section 3319.088 of the Revised Code;
+(2) An instructional assistant who holds a valid permit issued under section 3310.43 of the Revised Code;
+(3) A qualified, credentialed provider in accordance with standards established by the department;
+(4) A teacher or substitute teacher licensed by the state board of education.
+(D) A scholarship under this section shall not be awarded to an eligible applicant while the child's individualized education program is being developed by the school district in which the child is entitled to attend school, or while any administrative or judicial mediation or proceedings with respect to the content of the child's individualized education program are pending. A scholarship under this section shall not be used for a child to attend a public special education program that operates under a contract, compact, or other bilateral agreement between the school district in which the child is entitled to attend school and another school district or other public provider, or for a child to attend a community school established under Chapter 3314. of the Revised Code. However, nothing in this section or in any rule adopted by the department shall prohibit an eligible applicant whose child attends a public special education program under a contract, compact, or other bilateral agreement, or an eligible applicant whose child attends a community school, from applying for and accepting a scholarship under this section so that the eligible applicant may withdraw the child from that program or community school and use the scholarship for the child to attend a special education program for which the eligible applicant is required to pay for services for the child.
+(E) Except for development of the child's individualized education program or education plan, the school district in which a qualified special education child is entitled to attend school and the child's school district of residence, as defined in section 3323.01 of the Revised Code, if different, are not obligated to provide the child with a free appropriate public education under Chapter 3323. of the Revised Code for as long as the child continues to attend the special education program operated by either an alternative public provider or a registered private provider for which a scholarship is awarded under the autism scholarship program. If at any time, the eligible applicant for the child decides no longer to accept scholarship payments and enrolls the child in the special education program of the school district in which the child is entitled to attend school, that district shall provide the child with a free appropriate public education under Chapter 3323. of the Revised Code.
+(F) A child attending a special education program with a scholarship under this section shall continue to be entitled to transportation to and from that program in the manner prescribed by law.
+(G) As prescribed in division (A)(2)(h) of section 3317.03 of the Revised Code, a child who is not a preschool child with a disability for whom a scholarship is awarded under this section shall be counted in the formula ADM of the district in which the child is entitled to attend school and not in the formula ADM of any other school district.
+(H) A scholarship shall not be paid under section 3317.022 of the Revised Code to an eligible applicant for payment of tuition owed to a nonpublic entity unless that entity is a registered private provider. The department shall approve entities that meet the standards established by rule of the department for the program established under this section.
+(I) The department shall adopt rules under Chapter 119. of the Revised Code prescribing procedures necessary to implement this section, including, but not limited to, procedures and deadlines for eligible applicants to apply for scholarships, standards for registered private providers, and procedures for approval of entities as registered private providers.
+The rules also shall specify that intervention services, including virtual services, under the autism scholarship program may be provided by a qualified, credentialed provider, including an educator or substitute teacher licensed by the state board of education, and shall additionally include, but not be limited to, all of the following:
+(1) A behavior analyst certified by a nationally recognized organization that certifies behavior analysts;
+(2) A psychologist licensed to practice in this state under Chapter 4732. of the Revised Code;
+(3) An independent school psychologist or school psychologist licensed to practice in this state under Chapter 4732. of the Revised Code;
+(4) Any person employed by a licensed psychologist, licensed independent school psychologist, or licensed school psychologist, while carrying out specific tasks, under the licensee's supervision, as an extension of the licensee's legal and ethical authority as specified under Chapter 4732. of the Revised Code who is ascribed as "psychology trainee," "psychology assistant," "psychology intern," or other appropriate term that clearly implies their supervised or training status;
+(5) Unlicensed persons holding a doctoral degree in psychology or special education from a program approved by the department;
+(6) A "registered behavior technician" as described under rule 5123-9-41 of the Administrative Code working under the supervision and following the intervention plan of a certified Ohio behavior analyst or a behavior analyst certified by a nationally recognized organization that certifies behavior analysts;
+(7) A "certified Ohio behavior analyst" under Chapter 4783. of the Revised Code;
+(8) An occupational therapist or physical therapist licensed to practice in this state under Chapter 4755. of the Revised Code;
+(9) A speech-language pathologist licensed to practice in this state under Chapter 4753. of the Revised Code;
+(10) An intervention specialist who holds a valid license issued by the state board;
+(11) A literacy intervention specialist certified through pathways recognized by the Ohio dyslexia committee established by section 3323.25 of the Revised Code. To the extent that certification for any of the following positions is approved by the Ohio dyslexia committee under section 3323.25 of the Revised Code, literary intervention specialists may include:
+(a) A structured literacy dyslexia interventionist;
+(b) A structured literacy dyslexia specialist;
+(c) A certified academic language practitioner;
+(d) A certified academic language therapist.
+(12) An educational aide or assistant with a valid permit issued under section 3319.088 of the Revised Code;
+(13) An instructional assistant with a valid permit issued in accordance with section 3310.43 of the Revised Code;
+(14) Any other qualified individual as determined by the department.
+Supervision of a qualified, credentialed provider may be conducted virtually.
+(J) For billing purposes under the autism scholarship program, services provided by a teacher or substitute teacher licensed by the state board of education shall be classified as academic services and shall not be classified as aide services. The department shall use this differentiation to simplify monthly audit procedures.
+(K) The department shall provide reasonable notice to all eligible applicants receiving a scholarship under the autism scholarship program, alternative public providers, and registered private providers of any amendment to a rule governing, or change in the administration of, the autism scholarship program.
+(L) If a child qualifies for the autism scholarship program pursuant to a diagnosis under division (A)(6)(c) of this section and does not have an individualized education program that includes services related to autism, the school district in which the child is entitled to attend school shall develop an education plan for the child.
+(M) Not later than the thirtieth day of June each year, each alternative public provider and registered private provider enrolling students receiving autism scholarships shall submit to the department, in a form and manner prescribed by the department, the tuition rates charged by the provider for the following school year.
+(N) The department shall not require an eligible applicant who applies for or receives a scholarship under this section to complete any kind of income verification regarding the student's family income.
+(O) The department shall maintain a list of each registered private provider and the location of that provider on its publicly accessible web site.
+
+=== 3310.51
+title: Definitions for the Jon Peterson special needs scholarship program.
+date: September 30, 2025
+source: House Bill 96 - 136th General Assembly
+--
+As used in sections 3310.51 to 3310.64 of the Revised Code:
+(A) "Alternative public provider" means either of the following providers that agrees to enroll a child in the provider's special education program to implement the child's individualized education program and to which the eligible applicant owes fees for the services provided to the child:
+(1) A school district that is not the school district in which the child is entitled to attend school or the child's school district of residence, if different;
+(2) A public entity other than a school district.
+(B) "Child with a disability" and "individualized education program" have the same meanings as in section 3323.01 of the Revised Code.
+(C) "Eligible applicant" means any of the following:
+(1) Either of the natural or adoptive parents of a qualified special education child, except as otherwise specified in this division. When the marriage of the natural or adoptive parents of the student has been terminated by a divorce, dissolution of marriage, or annulment, or when the natural or adoptive parents of the student are living separate and apart under a legal separation decree, and a court has issued an order allocating the parental rights and responsibilities with respect to the child, "eligible applicant" means the residential parent as designated by the court. If the court issues a shared parenting decree, "eligible applicant" means either parent. "Eligible applicant" does not mean a parent whose custodial rights have been terminated.
+(2) The custodian of a qualified special education child, when a court has granted temporary, legal, or permanent custody of the child to an individual other than either of the natural or adoptive parents of the child or to a government agency;
+(3) The guardian of a qualified special education child, when a court has appointed a guardian for the child;
+(4) The grandparent of a qualified special education child, when the grandparent is the child's attorney in fact under a power of attorney executed under sections 3109.51 to 3109.62 of the Revised Code or when the grandparent has executed a caretaker authorization affidavit under sections 3109.65 to 3109.73 of the Revised Code;
+(5) The surrogate parent appointed for a qualified special education child pursuant to division (B) of section 3323.05 and section 3323.051 of the Revised Code;
+(6) A qualified special education child, if the child does not have a custodian or guardian and the child is at least eighteen years of age and less than twenty-two years of age.
+(D) "Entitled to attend school" means entitled to attend school in a school district under sections 3313.64 and 3313.65 of the Revised Code.
+(E) "Formula ADM" has the same meaning as in section 3317.02 of the Revised Code.
+(F) "Qualified special education child" is a child for whom all of the following conditions apply:
+(1) The child is at least three years of age and less than twenty-two years of age.
+(2) The school district in which the child is entitled to attend school, or the child's school district of residence if different, has identified the child as a child with a disability.
+(3) The school district in which the child is entitled to attend school, or the child's school district of residence if different, has developed an individualized education program under Chapter 3323. of the Revised Code for the child.
+(4) The child meets one of the following conditions:
+(a) Was enrolled in the schools of the school district in which the child is entitled to attend school in any grade from preschool through twelve in the school year prior to the school year in which a scholarship is sought for the child;
+(b) Is eligible to enter school in any grade preschool through twelve in the school district in which the child is entitled to attend school in the school year in which a scholarship is sought for the child;
+(c) All of the following apply:
+(i) The child is at least eighteen years of age and less than twenty-two years of age.
+(ii) The child is enrolled in a chartered or nonchartered nonpublic school, is home educated in accordance with section 3321.042 of the Revised Code, or is a student older than compulsory school age and less than twenty-two years of age and received a home education in accordance with section 3321.042 of the Revised Code and has not received a diploma under section 3313.6110 of the Revised Code.
+(iii) The child is still eligible to receive transition services under the child's individualized education program.
+(5) The department of education and workforce has not approved a scholarship for the child under the educational choice scholarship pilot program, under sections 3310.01 to 3310.17 of the Revised Code, the autism scholarship program, under section 3310.41 of the Revised Code, or the pilot project scholarship program, under sections 3313.974 to 3313.979 of the Revised Code for the same school year in which a scholarship under the Jon Peterson special needs scholarship program is sought.
+(6) The child and the child's parents are in compliance with the state compulsory attendance law under Chapter 3321. of the Revised Code.
+(G) "Registered private provider" means a nonpublic school or other nonpublic entity that has been registered by the superintendent of public instruction under section 3310.58 of the Revised Code prior to October 3, 2023, or the department of education and workforce on or after that date.
+(H) "Scholarship" means a scholarship awarded under the Jon Peterson special needs scholarship program pursuant to sections 3310.51 to 3310.64 of the Revised Code.
+(I) "School district of residence" has the same meaning as in section 3323.01 of the Revised Code. A community school established under Chapter 3314. of the Revised Code is not a "school district of residence" for purposes of sections 3310.51 to 3310.64 of the Revised Code.
+(J) "School year" has the same meaning as in section 3313.62 of the Revised Code.
+(K) "Special education program" means a school or facility that provides special education and related services to children with disabilities.
+
+=== 3310.52
+title: Jon Peterson special needs scholarship program.
+date: September 30, 2025
+source: House Bill 96 - 136th General Assembly
+--
+(A) The Jon Peterson special needs scholarship program is hereby established. Under the program, beginning with the 2012-2013 school year, subject to division (B) of this section, the department of education and workforce annually shall pay a scholarship under section 3317.022 of the Revised Code to an eligible applicant for services provided by an alternative public provider or a registered private provider for a qualified special education child. The scholarship shall be used only to pay all or part of the fees for the child to attend the special education program or programs operated by the alternative public provider or registered private provider to implement the child's individualized education program or programs, in lieu of the child's attending the special education program operated by the school district in which the child is entitled to attend school, and other services agreed to by the provider and eligible applicant that are not included in the individualized education program but are associated with educating the child.
+At the discretion of an eligible applicant, multiple alternative public providers or registered private providers may be contracted to provide services to implement the individualized education program as the eligible applicant and providers determine are necessary and associated with educating the qualified special education child. A qualified special education child is not limited to receiving services from a single provider for any services as identified in the individualized education program, including a single type of service.
+Beginning in the 2014-2015 school year, if the child is receiving special education services for a disability specified in division (A) of section 3317.013 of the Revised Code, the scholarship shall be used only to pay for related services that are included in the child's individualized education program. Upon agreement with the eligible applicant, the alternative public provider or registered private provider may modify the services provided to the child.
+Services, including intervention services, educational services, academic services, tutoring services, aide services, and other related special education services, provided through the program established under this section may be provided virtually by any of the following:
+(1) An educational aide or assistant who holds a valid permit issued under section 3319.088 of the Revised Code;
+(2) An instructional assistant who holds a valid permit issued under section 3310.43 of the Revised Code;
+(3) A qualified, credentialed provider in accordance with standards established by the department;
+(4) A teacher or substitute teacher licensed by the state board of education.
+(B) The number of scholarships awarded under the program in any fiscal year shall not exceed five per cent of the total number of students residing in the state identified as children with disabilities during the previous fiscal year.
+(C) The department shall pay a scholarship under section 3317.022 of the Revised Code to the eligible applicant, unless the eligible applicant authorizes a direct payment to the child's provider, upon application in the manner prescribed by the department. However, the department shall not adopt specific dates for application deadlines for scholarships under the program.
+(D) The department shall not require an eligible applicant who applies for or receives a scholarship under this section to complete any kind of income verification regarding the student's family income.
+
+=== 3313.975
+title: Pilot project scholarship program.
+date: October 3, 2023
+source: House Bill 33 - 135th General Assembly
+--
+As used in this section and in sections 3313.976 to 3313.979 of the Revised Code, "the pilot project school district" or "the district" means any school district included in the pilot project scholarship program pursuant to this section.
+(A) The director of education and workforce shall implement the pilot project scholarship program and shall include in such program any school districts that are or have ever been under federal court order requiring supervision and operational management of the district by the state superintendent or director. The program shall provide for a number of students residing in any such district to receive scholarships to attend alternative schools, and for an equal number of students to receive tutorial assistance grants while attending public school in any such district.
+(B) The director shall establish an application process and deadline for accepting applications from students residing in the district to participate in the scholarship program. In the initial year of the program students may only use a scholarship to attend school in grades kindergarten through third.
+The director shall award as many scholarships and tutorial assistance grants as can be funded given the amount appropriated for the program.
+(C)(1) The pilot project program shall continue in effect each year that the general assembly has appropriated sufficient money to fund scholarships and tutorial assistance grants. In each year the program continues, new students may receive scholarships in grades kindergarten to twelve. A student who has received a scholarship may continue to receive one until the student has completed grade twelve.
+(2) If the general assembly discontinues the scholarship program, all students who are attending an alternative school under the pilot project shall be entitled to continued admittance to that specific school through all grades that are provided in such school, under the same conditions as when they were participating in the pilot project. The director shall continue to make scholarship payments in accordance with section 3317.022 of the Revised Code for students who remain enrolled in an alternative school under this provision in any year that funds have been appropriated for this purpose.
+If funds are not appropriated, the tuition charged to the parents of a student who remains enrolled in an alternative school under this provision shall not be increased beyond the amount equal to the amount of the scholarship plus any additional amount charged that student's parent in the most recent year of attendance as a participant in the pilot project, except that tuition for all the students enrolled in such school may be increased by the same percentage.
+(D) Notwithstanding sections 124.39 and 3311.83 of the Revised Code, if the pilot project school district experiences a decrease in enrollment due to participation in a state-sponsored scholarship program pursuant to sections 3313.974 to 3313.979 of the Revised Code, the district board of education may enter into an agreement with any teacher it employs to provide to that teacher severance pay or early retirement incentives, or both, if the teacher agrees to terminate the employment contract with the district board, provided any collective bargaining agreement in force pursuant to Chapter 4117. of the Revised Code does not prohibit such an agreement for termination of a teacher's employment contract.
+(E) Except as provided for in division (C)(2) of section 3365.07 of the Revised Code, the director shall not require the parent of a student who applies for or receives a scholarship under the pilot project program to complete any kind of income verification regarding the student's family income.
+
 === 3317.051
 title: Calculation of gifted funding units.
 date: September 30, 2025

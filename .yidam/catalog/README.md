@@ -41,6 +41,7 @@ Sorted by: type, then slug.
 | [`dew-report-card-district-details`](dew-report-card-district-details.md) | Ohio School Report Cards — District Details | 1 |
 | [`dew-report-card-spending`](dew-report-card-spending.md) | Ohio School Report Cards — District Spending Per Pupil | 1 |
 | [`dew-report-card-value-added`](dew-report-card-value-added.md) | Ohio School Report Cards — District Value-Added Details | 1 |
+| [`dew-scholarship-annual-report`](dew-scholarship-annual-report.md) | Scholarship Annual Report — the department's own account of the channel | 0 |
 | [`dew-sfpr-line-by-line`](dew-sfpr-line-by-line.md) | School Finance Payment Report — Line by Line Explanation | 6 |
 | [`dot-reappraisal-calendar`](dot-reappraisal-calendar.md) | Ohio's sexennial reappraisal and triennial update calendar | 1 |
 | [`dot-sd1-school-district-taxes`](dot-sd1-school-district-taxes.md) | Table SD-1 — School district taxable value and taxes charged | 1 |
@@ -58,7 +59,7 @@ Sorted by: type, then slug.
 | [`ohio-essa-state-plan`](ohio-essa-state-plan.md) | Ohio's Consolidated State Plan under ESSA, and the April 2026 School Improvement amendment | 5 |
 | [`ohio-revised-code`](ohio-revised-code.md) | Ohio Revised Code — the sections this corpus cites | 4 |
 
-35 entries, 1 not yet cited by any corpus node. 100 retrieved files are pinned by SHA-256 in [`crates/connect/source-digests.txt`](../../crates/connect/source-digests.txt).
+36 entries, 2 not yet cited by any corpus node. 109 retrieved files are pinned by SHA-256 in [`crates/connect/source-digests.txt`](../../crates/connect/source-digests.txt).
 <!-- /REGEN -->
 
 ## Adding a source

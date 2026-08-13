@@ -113,6 +113,17 @@ const CITED: &[&str] = &[
     "5753.02",
     "5753.03",
     "5753.11",
+    // The scholarship chapter, and the pilot project sections that sit outside it. Cited by the
+    // five `program` nodes for what each programme is, who qualifies, and what bounds the award —
+    // and, jointly with 3317.022 above, for the mechanism: none of these uses the word "deduct".
+    "3310.01",
+    "3310.03",
+    "3310.032",
+    "3310.08",
+    "3310.41",
+    "3310.51",
+    "3310.52",
+    "3313.975",
 ];
 
 /// The extract is what it claims to be: every cited section, each with a date and an act.
