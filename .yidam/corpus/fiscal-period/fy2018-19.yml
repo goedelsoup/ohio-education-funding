@@ -30,7 +30,18 @@ properties:
   kind: biennium
   start: 2017-07-01
   end: 2019-06-30
-  appropriating_bill: Am. Sub. H.B. 49 (132nd General Assembly). [verified — LSC publishes the biennium's appropriation detail under this bill; see the catalog record `lsc-appropriation-spreadsheet`. The `Am. Sub.` designation is the greenbook's, which is not held here.]
+  appropriating_bill: |
+    Am. Sub. H.B. 49 (132nd General Assembly). [verified — the 2017 edition of the Catalog of
+    [Budget Line Items](../../catalog/lsc-catalog-of-budget-line-items.md),
+    `crates/project/fixtures/catalog-line-item-basis.tsv`, which names the
+    authorising act on every line item it carries]
+
+    **The `Am. Sub.` designation is not confirmed and may not belong here.** The Catalog cites
+    this act on 165 line items and prints it bare — `H.B. 49 of the 132nd G.A.` — every time. That
+    is not evidence the designation is wrong: LSC uses `Am. Sub.` for the 129th through 131st
+    General Assemblies and drops it from the 132nd onward, across H.B. 49, H.B. 166, H.B. 110 and
+    H.B. 33 alike, which reads as a change of house style rather than a fact about four bills.
+    Recorded as unresolved rather than corrected in either direction. [open]
   context: |
     Bridge formula era. Revenue shares and the quartile equalization measure above are from the
     Census F-33 as NCES publishes it, comparable districts only. [verified]

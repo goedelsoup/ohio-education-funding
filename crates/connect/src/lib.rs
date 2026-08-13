@@ -522,6 +522,105 @@ pub fn rebuild(root: &Path) -> Result<Vec<Rebuilt>, RebuildError> {
         },
     });
 
+    // The Catalog of Budget Line Items, nineteen editions of the education volume.
+    //
+    // Every edition, not the newest, and the edition is a column rather than a detail. Each one
+    // restates six fiscal years, so the same year appears in up to four editions — and they do not
+    // always agree, because an actual is revised and an appropriation is superseded. Keeping the
+    // vintage is what lets a later reader ask which of two figures a claim rested on, which is
+    // exactly what the workbook attempt could not answer and was reverted for.
+    //
+    // Editions are independent: one that fails to parse is skipped and named, and the rest still
+    // build. A missing edition is a visible hole in a column; a silently short fixture is not.
+    let mut catalog_rows: Vec<Vec<String>> = Vec::new();
+    let mut basis_rows: Vec<Vec<String>> = Vec::new();
+    let mut catalog_failed: Vec<String> = Vec::new();
+    let mut catalog_refused: Vec<String> = Vec::new();
+    for src in registry::connector("lsc-catalog")
+        .expect("registered")
+        .sources
+    {
+        let edition = src.key.rsplit('-').next().unwrap_or_default().to_string();
+        match cache::pdf_text(root, src)
+            .map_err(|cause| cause.to_string())
+            .and_then(|text| fixtures::catalog_items(&text))
+        {
+            Ok((items, refused)) => {
+                for why in refused {
+                    catalog_refused.push(format!("{edition}: {why}"));
+                }
+                for item in items {
+                    basis_rows.push(vec![
+                        edition.clone(),
+                        item.fund.clone(),
+                        item.ali.clone(),
+                        item.name.clone(),
+                        item.legal_basis.clone(),
+                    ]);
+                    for (year, kind, amount) in item.years {
+                        catalog_rows.push(vec![
+                            edition.clone(),
+                            item.fund.clone(),
+                            item.ali.clone(),
+                            item.name.clone(),
+                            year.to_string(),
+                            kind,
+                            amount.map_or(String::new(), |v| format!("{v:.0}")),
+                        ]);
+                    }
+                }
+            }
+            Err(cause) => catalog_failed.push(format!("{edition} ({cause})")),
+        }
+    }
+    if catalog_rows.is_empty() {
+        out.push(Rebuilt::Skipped {
+            path: fixtures::CATALOG_FIXTURE.to_string(),
+            reason: format!("no edition parsed: {}", catalog_failed.join("; ")),
+        });
+    } else {
+        // Refusals are printed rather than counted. A run that silently dropped a line item would
+        // report a row count that looks like success.
+        for why in &catalog_refused {
+            eprintln!("catalog: refused {why}");
+        }
+        for why in &catalog_failed {
+            eprintln!("catalog: no rows from edition {why}");
+        }
+        out.push(Rebuilt::Written {
+            path: fixtures::CATALOG_FIXTURE.to_string(),
+            rows: fixtures::write_csv(
+                &root.join(fixtures::CATALOG_FIXTURE),
+                &[
+                    "edition",
+                    "fund",
+                    "ali",
+                    "name",
+                    "fiscal_year",
+                    "kind",
+                    "amount",
+                ],
+                &catalog_rows,
+            )?,
+        });
+        // Tab-separated, not comma. A legal basis routinely reads "ORC 3301.0710, 3301.0711, and
+        // 3301.27; Section 206.09.15 of Am. Sub. H.B. 66 of the 126th G.A." — commas are part of
+        // the citation, and `write_csv` deliberately does not quote. Stripping them would damage
+        // the one field this fixture exists to carry.
+        let basis = basis_rows
+            .iter()
+            .map(|row| row.join("\t"))
+            .collect::<Vec<_>>()
+            .join("\n");
+        out.push(Rebuilt::Written {
+            path: fixtures::CATALOG_BASIS_FIXTURE.to_string(),
+            rows: fixtures::write_text(
+                &root.join(fixtures::CATALOG_BASIS_FIXTURE),
+                &format!("edition\tfund\tali\tname\tlegal_basis\n{basis}"),
+            )?,
+        });
+    }
+
     // The scholarship annual report, sliced rather than committed whole. Unlike the redbook it is
     // mostly provider lists — the pages that matter are five programme summaries, and the figures
     // in them are the only published sizing of this channel.

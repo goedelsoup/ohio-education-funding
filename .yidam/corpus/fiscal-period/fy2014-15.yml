@@ -31,7 +31,15 @@ properties:
   kind: biennium
   start: 2013-07-01
   end: 2015-06-30
-  appropriating_bill: Am. Sub. H.B. 59 (130th General Assembly). [verified — LSC publishes the biennium's appropriation detail under this bill; see the catalog record `lsc-appropriation-spreadsheet`. The `Am. Sub.` designation is the greenbook's, which is not held here.]
+  appropriating_bill: |
+    Am. Sub. H.B. 59 (130th General Assembly). [verified — the 2013 edition of the Catalog of
+    [Budget Line Items](../../catalog/lsc-catalog-of-budget-line-items.md),
+    `crates/project/fixtures/catalog-line-item-basis.tsv`, which names the
+    authorising act on every line item it carries]
+
+    The `Am. Sub.` designation is now checkable and holds: the 2013 edition of the Catalog of
+    Budget Line Items prints `Am. Sub. H.B. 59 of the 130th G.A.` on 173 of the 203 line items
+    citing the act.
   context: |
     Bridge formula era. Revenue shares and the quartile equalization measure above are from the
     Census F-33 as NCES publishes it, comparable districts only. [verified]
