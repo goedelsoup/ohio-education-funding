@@ -37,6 +37,14 @@ use edfund_core::Dollars;
 
 /// The bundle schema version. Bump on any change to field names, units, or semantics.
 ///
+/// `29.0.0` added `meal_program`: the free and reduced-price lunch share for FY2001 through
+/// FY2011, from the Office for Child Nutrition's MR-81. Additive in shape and breaking in
+/// meaning, on the same reasoning as `28.0.0` — this is now the third population and the third
+/// enrollment count in one feed, and it is the only one whose denominator changes *inside* its
+/// own series, at FY2010. Every row carries [`MealProgramYear::basis`] so a consumer cannot plot
+/// the series as continuous without having been told it is not. It carries no dollars and is
+/// absent from the deflator by design.
+///
 /// `28.0.0` added the historical axis: a `history` array carrying the Census Bureau's survey of
 /// Ohio school systems for FY2009 through FY2022, and a `deflator` extended to cover it. Breaking
 /// rather than additive because it changes what the feed *is*. Every other figure here is the Fair
@@ -81,7 +89,7 @@ use edfund_core::Dollars;
 /// from FY2022-FY2024 to FY2024-FY2026 — the years the department's `ADM Data` sheet declares.
 /// The values did not change; what they are called did, which is exactly the kind of silent
 /// meaning change the version guard exists for.
-pub const CONTRACT_VERSION: &str = "28.0.0";
+pub const CONTRACT_VERSION: &str = "29.0.0";
 
 /// How close to the floor counts as being on it, in mills.
 ///
@@ -1279,6 +1287,11 @@ pub struct Bundle {
     /// The only part of the feed that reaches before FY2020, and the only part measured on
     /// something other than the department's own formula. See [`HistoryYear`].
     pub history: Vec<HistoryYear>,
+    /// The meal-program poverty share, October by October, oldest first. Empty if absent.
+    ///
+    /// Reaches back further than [`Self::history`] — FY2001 against FY2009 — and on a third
+    /// measurement again. See [`MealProgramYear`].
+    pub meal_program: Vec<MealProgramYear>,
     /// Ohio's 99 House districts, with school funding apportioned across them.
     pub house_districts: Vec<HouseDistrict>,
     /// And its 33 Senate districts, each exactly three House districts.
@@ -1709,6 +1722,28 @@ impl Bundle {
             }
             s.push('}');
             if i + 1 < self.history.len() {
+                s.push(',');
+            }
+            s.push('\n');
+        }
+        s.push_str("  ],\n");
+
+        // `basis` is written on every row rather than only where it changes, because a consumer
+        // reading one row must be able to tell what its share divides by without scanning for the
+        // last row that said so.
+        s.push_str("  \"meal_program\": [\n");
+        for (i, m) in self.meal_program.iter().enumerate() {
+            s.push_str(&format!(
+                "    {{\"fiscal_year\": {}, \"sponsors\": {}, \"enrollment\": {}, \
+                 \"approved\": {}, \"share\": {}, \"basis\": \"{}\"}}",
+                m.fiscal_year,
+                m.sponsors,
+                num(m.enrollment),
+                num(m.approved),
+                num(m.share),
+                escape(&m.basis)
+            ));
+            if i + 1 < self.meal_program.len() {
                 s.push(',');
             }
             s.push('\n');
@@ -2637,6 +2672,26 @@ mod tests {
             deflator: None,
             national: None,
             history: Vec::new(),
+            // Two rows spanning the basis change, so anything serializing this fixture has to
+            // carry both names rather than one.
+            meal_program: vec![
+                MealProgramYear {
+                    fiscal_year: 2009,
+                    sponsors: 812,
+                    enrollment: 1_000_000.0,
+                    approved: 412_000.0,
+                    share: 0.412,
+                    basis: "adm".into(),
+                },
+                MealProgramYear {
+                    fiscal_year: 2010,
+                    sponsors: 844,
+                    enrollment: 1_000_000.0,
+                    approved: 437_000.0,
+                    share: 0.437,
+                    basis: "ce".into(),
+                },
+            ],
             districts,
         }
     }
@@ -2905,6 +2960,49 @@ mod tests {
         district.spending_by_function = None;
         let json = bundle(vec![district], vec![]).to_json();
         assert!(json.contains("\"spending_by_function\": null"), "{json}");
+    }
+
+    #[test]
+    fn every_meal_program_row_names_the_count_it_divides_by() {
+        // The denominator changes inside this series, at FY2010. A row that does not carry its
+        // own basis is a row a consumer will plot against the one before it, and the whole reason
+        // the block is safe to publish is that it refuses to let that happen silently.
+        let json = bundle(vec![], vec![]).to_json();
+        // The counts are asserted with the share so the row stays self-checking: 412000/1000000
+        // is 0.412, and a serializer that dropped a field or transposed two would fail here
+        // rather than ship a share nothing can verify.
+        assert!(
+            json.contains(
+                "\"enrollment\": 1000000, \"approved\": 412000, \"share\": 0.412, \"basis\": \"adm\""
+            ),
+            "{json}"
+        );
+        assert!(
+            json.contains(
+                "\"enrollment\": 1000000, \"approved\": 437000, \"share\": 0.437, \"basis\": \"ce\""
+            ),
+            "{json}"
+        );
+    }
+
+    #[test]
+    fn the_meal_program_block_carries_no_dollars() {
+        // A share is dimensionless and needs no deflator. If a dollar field ever lands here it
+        // will need one, and the deflator does not reach FY2001 — so the failure would be a
+        // nominal figure silently presented across a span in which prices rose by half.
+        let json = bundle(vec![], vec![]).to_json();
+        let block = json
+            .split("\"meal_program\": [")
+            .nth(1)
+            .and_then(|rest| rest.split("],").next())
+            .unwrap_or_default();
+        for money in ["_per_pupil", "dollars", "amount", "total"] {
+            assert!(
+                !block.contains(money),
+                "meal_program grew a `{money}` field; give it a denominator in \
+                 web/src/lib/denominators.ts and a deflator that reaches FY2001, or drop it"
+            );
+        }
     }
 
     #[test]
@@ -3263,4 +3361,64 @@ impl HistoryYear {
     pub fn residual_per_pupil(&self) -> f64 {
         self.gap_per_pupil - self.state_closes_per_pupil - self.federal_closes_per_pupil
     }
+}
+
+/// One October of the free and reduced-price lunch report, as a share.
+///
+/// # What this measures, and what it does not
+///
+/// Not enrollment and not poverty. MR-81 is the Office for Child Nutrition's meal-program report:
+/// a count of *applications approved* for free or reduced-price lunch, over the denominator a
+/// lunch claim is filed against. It is here because R.C. 3317.03(B)(21) hands the definition of
+/// "economically disadvantaged" to the department, free-lunch eligibility has been the
+/// department's operative test, and this is the longest run of that test available — eleven years
+/// where the rest of the feed has six.
+///
+/// [Disadvantaged pupil impact aid](../../.yidam/corpus/formula-component/fsfp-disadvantaged-pupil-impact-aid.yml)
+/// is paid on that count, so this is the closest thing the feed carries to a history of what the
+/// formula's poverty weight is computed on.
+///
+/// # Why there are no dollars here
+///
+/// Deliberately. A share is dimensionless, so this block needs no deflator and cannot be shown in
+/// real terms — which is the point: the underlying counts are on a denominator no other figure in
+/// this feed uses, and a dollar figure computed on it would be one division away from being
+/// compared to a formula-side number. See [`Self::basis`] for the second reason.
+///
+/// # Sponsors are not districts
+///
+/// [`Self::sponsors`] counts *public sponsors*, which includes county boards of developmental
+/// disabilities and community schools alongside traditional districts. The count rising across
+/// the window is mostly community schools opening, not districts appearing, and it is carried
+/// here so that a reader watching the share move can see the population move underneath it.
+#[derive(Debug, Clone, PartialEq, Default)]
+pub struct MealProgramYear {
+    /// The October counted, as a fiscal year.
+    pub fiscal_year: u16,
+    /// Public sponsors the year is computed over, after excluding published corruption.
+    ///
+    /// The FY2005 file gives one elementary school an enrollment of 342,332. It is excluded by
+    /// name upstream rather than repaired, so this count is one lower that year than the file
+    /// implies.
+    pub sponsors: usize,
+    /// The denominator in force that year, summed over those sponsors.
+    ///
+    /// Carried rather than implied. Two reasons, and the second is the load-bearing one: a share
+    /// on its own cannot be checked, and the web layer's denominator guard walks *field names* —
+    /// so a block whose only fields are `share` and `sponsors` is invisible to it. `enrollment`
+    /// is a name that guard recognises, which is what forces this block to declare what it
+    /// divides by. See `web/src/lib/denominators.ts`.
+    pub enrollment: f64,
+    /// Free and reduced-price applications approved, summed over those sponsors.
+    pub approved: f64,
+    /// [`Self::approved`] over [`Self::enrollment`], which is the figure worth reading.
+    pub share: f64,
+    /// Which denominator that is: `adm` through FY2009, `ce` from FY2010.
+    ///
+    /// The definition changes mid-series. `CECount` is "the highest daily number of students with
+    /// access to the program", which is neither ADM nor the count that preceded it, so the share
+    /// is not continuous across FY2009/FY2010 and nothing here splices it. A consumer that plots
+    /// this as one line without breaking it at the basis change is making the error this field
+    /// exists to prevent.
+    pub basis: String,
 }

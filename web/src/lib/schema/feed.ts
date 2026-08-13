@@ -950,6 +950,39 @@ export const HistoryYearSchema = z
   })
   .strict();
 
+/**
+ * One October of the free and reduced-price lunch report, MR-81.
+ *
+ * The third population and the third enrollment count in this feed, and the only series whose
+ * denominator changes inside itself — `adm` through FY2009, `ce` from FY2010. `basis` is required
+ * on every row rather than inferred from the year, because a consumer that has to know the
+ * cutover to read a row is a consumer that will get it wrong once.
+ *
+ * A share, not a count and not a dollar. Nothing here may be compared to the formula side, which
+ * counts 609 traditional districts on ADM; `sponsors` here includes community schools and county
+ * boards of developmental disabilities.
+ */
+export const MealProgramYearSchema = z
+  .object({
+    fiscal_year: z.number().int(),
+    /** Public sponsors the year is computed over, after excluding published corruption. */
+    sponsors: z.number().int().positive(),
+    /**
+     * The denominator, summed over those sponsors.
+     *
+     * Present so the share can be checked and so `denominators.ts` can see this block at all —
+     * its guard walks field names, and `share` is not one it recognises.
+     */
+    enrollment: num,
+    /** Approvals, summed over those sponsors. */
+    approved: num,
+    /** `approved` over `enrollment`. */
+    share: num,
+    /** Which denominator that is. Not inferred from the year — see above. */
+    basis: z.enum(["adm", "ce"]),
+  })
+  .strict();
+
 /** The whole feed. */
 export const BundleSchema = z
   .object({
@@ -966,6 +999,8 @@ export const BundleSchema = z
     national: NationalSchema.nullable(),
     /** The survey year by year, oldest first. Empty if the panel is absent. */
     history: z.array(HistoryYearSchema),
+    /** The meal-program poverty share by October, oldest first. Empty if absent. */
+    meal_program: z.array(MealProgramYearSchema),
     house_districts: z.array(HouseDistrictSchema),
     /** The same for the Senate: 33 seats, each exactly three House districts. */
     senate_districts: z.array(HouseDistrictSchema),
@@ -986,6 +1021,7 @@ export type Statewide = z.infer<typeof StatewideSchema>;
 export type StateFinance = z.infer<typeof StateFinanceSchema>;
 export type National = z.infer<typeof NationalSchema>;
 export type HistoryYear = z.infer<typeof HistoryYearSchema>;
+export type MealProgramYear = z.infer<typeof MealProgramYearSchema>;
 export type Deflator = z.infer<typeof DeflatorSchema>;
 export type PolicyShape = z.infer<typeof PolicyShapeSchema>;
 export type Checkpoint = z.infer<typeof CheckpointSchema>;

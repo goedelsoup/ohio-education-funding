@@ -14,10 +14,12 @@ use std::collections::HashMap;
 use bundle::{
     BaseCostBuildUp, Bundle, CareerTechnical, Categoricals, Checkpoint, Deflator, District,
     DistrictOutcome, Dpia, EnglishLearners, FinanceYear, ForecastCheckpoint, Gifted, HistoryYear,
-    HouseDistrictMember, HouseDistrictShare, MillageAnalysis, National, OutcomeStatewide,
-    PolicyShape, Projection, PropertyTaxYear, RegimeCounterfactual, SpecialEducation,
-    SpendingByFunction, StateFinance, Statewide, TargetedAssistance, CONTRACT_VERSION,
+    HouseDistrictMember, HouseDistrictShare, MealProgramYear, MillageAnalysis, National,
+    OutcomeStatewide, PolicyShape, Projection, PropertyTaxYear, RegimeCounterfactual,
+    SpecialEducation, SpendingByFunction, StateFinance, Statewide, TargetedAssistance,
+    CONTRACT_VERSION,
 };
+use dispersion::mr81::poverty_share_by_year;
 use dispersion::ohio_panel::{equalization_by_year, revenue_mix_by_year};
 use dispersion::{partial_correlation, wealth_neutrality};
 use edfund_core::{AgencyType, FiscalYear};
@@ -679,6 +681,33 @@ fn history() -> Vec<HistoryYear> {
         .collect()
 }
 
+/// The meal-program poverty share, year by year.
+///
+/// Computed and tested in [`dispersion::mr81`], which excludes non-public sponsors and the
+/// sponsor-years whose published enrollment cannot be right. Like [`history`], this has been
+/// sitting in the workspace computed and unread — the difference is that it reaches back to
+/// FY2001, eight years before anything else in this feed.
+///
+/// Deliberately not passed to [`deflator_years`]: every field here is a count or a share, so
+/// there is nothing to deflate, and adding FY2001-FY2008 to the deflator would extend a price
+/// index across years no dollar figure in the feed covers.
+fn meal_program() -> Vec<MealProgramYear> {
+    poverty_share_by_year()
+        .into_iter()
+        .map(|(fiscal_year, year)| MealProgramYear {
+            fiscal_year,
+            sponsors: year.sponsors,
+            enrollment: year.enrollment,
+            approved: year.approved,
+            share: year.share,
+            // The upstream type carries the basis as a bool because it only has two states. The
+            // feed writes the name, because a consumer reading `"basis": false` would have to
+            // come back here to learn which count that was.
+            basis: if year.basis_is_ce { "ce" } else { "adm" }.to_string(),
+        })
+        .collect()
+}
+
 /// Every year either axis of the feed carries, oldest first.
 fn deflator_years(districts: &[District], history: &[HistoryYear]) -> Vec<u16> {
     let mut years = covered_years(districts);
@@ -1252,6 +1281,7 @@ fn main() {
     let bundle = Bundle {
         national: national(),
         history: history.clone(),
+        meal_program: meal_program(),
         house_districts: house_district_block(&records, Chamber::House),
         senate_districts: house_district_block(&records, Chamber::Senate),
         contract_version: CONTRACT_VERSION.to_string(),

@@ -117,6 +117,10 @@ pub fn implausible_sponsors() -> Vec<Sponsor> {
 pub struct PovertyYear {
     /// Public sponsors counted.
     pub sponsors: usize,
+    /// The denominator, summed over those sponsors.
+    pub enrollment: f64,
+    /// Free and reduced approvals, summed over those sponsors.
+    pub approved: f64,
     /// Free and reduced as a share of enrollment.
     pub share: f64,
     /// Whether the denominator that year is `adm` or `ce`.
@@ -148,6 +152,8 @@ pub fn poverty_share_by_year() -> BTreeMap<u16, PovertyYear> {
                 year,
                 PovertyYear {
                     sponsors,
+                    enrollment,
+                    approved: poor,
                     share: if enrollment > 0.0 {
                         poor / enrollment
                     } else {

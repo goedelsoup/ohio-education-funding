@@ -1,0 +1,113 @@
+id: the-catalog-of-budget-line-items
+summary: >-
+  An attempt on the two items `lsc-budget`'s blocker carried unexamined. The Catalog of Budget Line
+  Items is not blocked — nineteen editions, per agency, all downloading to a self-identifying agent
+  — and it carries both bienniums the greenbook route was recorded as unable to reach. The
+  per-district simulations are not LSC's publication and the blocker should never have named them.
+  The extraction is scoped here rather than started, on the same grounds as its predecessor.
+context: |
+  [`the-greenbook-series`](the-greenbook-series.yml) rewrote `lsc-budget`'s blocker to describe the
+  real obstacle and closed with two items it explicitly did not address:
+
+  > The Catalog of Budget Line Items and the per-district simulations were named in the old blocker
+  > and are not addressed here; the Catalog has an index page at `/budget/catalog-of-budget-line-items`
+  > and was not opened.
+
+  That sentence then survived into the rewritten string and sat there through the workbook attempt
+  and the PDF-era measurement. It is the same shape as the string it replaced: a claim about what
+  is in the way, written by someone who had not tried.
+
+  The precedent is by now this repository's most reliable finding. `tax-abstract` sat `declared`
+  for twelve phases behind a blocker nobody had attempted. `lsc-budget` was wrong in three ways.
+  Both were found the same way — probe whatever path exists, not the one the blocker names.
+decision: |
+  Probe both, record what is there, rewrite the blocker again. Do not begin the extraction.
+
+  **The Catalog is not blocked, and it is a better source than the workbooks.**
+
+  The index is at `/budget/catalog-of-budget-line-items` and returns 200 to
+  `ohio-education-funding-corpus/0.1 (research)` — the agent string
+  [`cache.rs`](../../crates/connect/src/cache.rs) actually sends. No browser impersonation is
+  involved, so the policy that keeps `ofcc-projects` declared is not in play here.
+
+  It is published **per agency**, one PDF each, and the education volume is what this repository
+  wants: `{year}-catalog-of-budget-line-items-edu.pdf`. Nineteen editions exist — **2006, and 2008
+  through 2025**. Only 2007 is absent, and it is a genuine 404 rather than a naming variant: the
+  site soft-404s with a 10,835-byte HTML body under a `200`, and every edition claimed here was
+  confirmed by content type and by reading its first page, not by status code.
+
+  **It answers both bienniums the greenbook route cannot.** Each entry carries four years of
+  actuals and two of appropriation in one labelled table, so the coverage overlaps heavily:
+
+  - The **2009** edition carries FY2006 through FY2011, which is the FY2006-07 biennium the 126th's
+    greenbook has no line-item table for.
+  - The **2013** edition carries FY2010 through FY2015, which is the FY2012-13 biennium whose two
+    workbook variants LSC serves as one file.
+  - The **2006** edition reaches back to **FY2002**, one biennium short of the greenbook's FY1999
+    floor rather than past it.
+
+  **And it fixes the defect that reverted the workbook attempt.** That attempt failed because the
+  variant carrying actuals *supersedes* the enacted column — the 132nd's workbook labels FY2018
+  `Actual` and FY2019 `Adjusted Approp.` and states the enacted FY2018-19 appropriation nowhere, so
+  the extraction produced zero appropriation rows for that biennium and did not fail. The Catalog
+  prints both, in adjacent columns, each under its own heading. The claim "enacted appropriation"
+  and the claim "what was actually spent" come from one document and are distinguishable in it.
+
+  It also carries two fields no other source here has:
+
+  - **Legal Basis**, naming the current section *and* the originating act — `Section 265.10 of
+    H.B. 96 of the 136th G.A. (originally established by H.B. 487 of the 129th G.A.)`.
+  - **Purpose**, in prose, including where a line item moved. Line 200408 Early Childhood Education
+    records its transfer to the Department of Children and Youth and which act authorised it.
+
+  **The per-district simulations are not LSC's.** LSC's school funding page is
+  `/publications/school-funding-resources`. It carries explanatory briefs — Base Cost Model,
+  Targeted Assistance, Pupil Transportation Formula, Formula Funding Phase-in and Guarantees,
+  School Choice Programs, Joint Vocational School District Funding — in sets dated Nov 2024,
+  Jan 2023 and Feb 2021, plus "School Funding Complete Resource" editions for 2019, 2017, 2015,
+  2011, and an "Illustration of School Funding in Ohio" for Nov 2008. No simulations. The word
+  does not appear on that page, on Budget Central, on the Catalog index, or on the 136th's main
+  operating budget page. Per-district simulations are the department's, and `dew-foundation` is
+  where they belong. The phrase is removed from the blocker rather than carried forward as a
+  fourth thing nobody has looked at.
+consequences: |
+  **`lsc-budget`'s blocker is now about extraction rather than retrieval.** Everything the corpus
+  wants from LSC is reachable. What is not done is reading it, and that is a phase.
+
+  **The four `fiscal-period` nodes are answerable from a better source than the index pages.**
+  FY2014-15, FY2016-17, FY2018-19 and FY2020-21 carry `appropriating_bill` as `[unentered]` with
+  "Needs `lsc-budget`". `the-greenbook-series` declined to fill them from the index pages that name
+  the acts, because that would be a claim resting on a page this repository does not hold. The
+  Catalog's Legal Basis line is a per-line-item statement of the same fact in a document that can
+  be committed and digest-pinned, which is the standard those nodes were held to.
+
+  **The pre-2000 record is unchanged and the claim is now exact.** The Catalog's earliest edition
+  reaches FY2002 and the greenbook's earliest actuals are FY1999, so the Catalog does not extend
+  the record backward — it thickens it. The Foundation Program era, *DeRolph I* and the equal yield
+  formula still need the session laws. That is the one part of the original blocker that was true.
+
+  **The 2008 and 2011 School Funding Complete Resources are a separate find, not scoped here.**
+  They are contemporaneous LSC accounts of the Evidence-Based Model and the Bridge Formula — eras
+  the corpus documents in prose and cannot price. They belong to whoever takes stream D, and are
+  recorded here so that work does not start by rediscovering them.
+alternatives: |
+  **Wire the education volumes in this phase.** Nineteen PDFs at a stable URL, one agency, no
+  index-page scraping. Rejected on the same grounds `the-greenbook-series` rejected starting its
+  own extraction, and the grounds held up: that record's successor phase found two source defects
+  that a row count would not have shown, and reverted rather than shipping a caveat. A phase that
+  discovers a source and reads it in the same breath produces a half-wired registry and a blocker
+  that is accurate about nothing again.
+
+  **Take the whole-catalog PDF rather than the education volume.**
+  `{year}-catalog-of-budget-line-items.pdf` exists and is every agency in one file. Rejected: the
+  education volume is the unit this repository reasons about, the per-agency split is the
+  publisher's own, and pinning a digest on a document that changes whenever any of a hundred
+  agencies changes would make every unrelated edit look like a source revision.
+
+  **Treat the Catalog as a replacement for the greenbook and workbook work.** Tempting, because it
+  covers both gaps and distinguishes actual from appropriated. Rejected: the Catalog is LSC's
+  standing reference and reports each line item's history as of publication, while the greenbook
+  is the analysis of a specific act as enrolled. A figure restated four editions later is not the
+  same claim as a figure published at enactment, and the corpus's existing appropriation nodes
+  cite the latter. The two are complementary and the extraction should keep which document each
+  figure came from — the discipline the workbook attempt was reverted for lacking.
