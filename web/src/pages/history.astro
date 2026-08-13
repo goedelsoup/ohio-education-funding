@@ -20,11 +20,13 @@ import {
   renderProvenance,
   renderRevenueMix,
 } from "../lib/history.ts";
+import { renderMealProgram } from "../lib/mealProgram.ts";
 import { baseYear } from "../lib/real.ts";
 import * as routes from "../lib/routes.ts";
 
 const { bundle } = loadFeed();
 const history = bundle.history;
+const meal = bundle.meal_program;
 const base = bundle.deflator
   ? baseYear(
       bundle.deflator,
@@ -34,6 +36,15 @@ const base = bundle.deflator
 
 const first = history[0];
 const last = history[history.length - 1];
+
+/**
+ * The oldest year anything on this page reaches.
+ *
+ * Two panels with different spans, so the sentence at the top cannot name either one's first
+ * year and be true. MR-81 starts in FY2001 and the Census panel in FY2009; taking the minimum
+ * means the claim stays right if either series is extended or absent.
+ */
+const earliest = Math.min(...[first?.fiscal_year, meal[0]?.fiscal_year].filter((y) => y != null));
 ---
 
 <Base
@@ -51,7 +62,7 @@ const last = history[history.length - 1];
   <p class="sub">
     {
       first && last
-        ? `What Ohio's schools took in and from whom, FY${first.fiscal_year} through FY${last.fiscal_year}, measured by the federal government rather than by the state. The only figures on this site that reach before FY2020.`
+        ? `What Ohio's schools took in and from whom, FY${first.fiscal_year} through FY${last.fiscal_year}, measured by the federal government rather than by the state — and what the formula's poverty weight is counted on, back to FY${earliest}. The only figures on this site that reach before FY2020.`
         : "This feed carries no historical panel."
     }
   </p>
@@ -77,4 +88,7 @@ const last = history[history.length - 1];
       </>
     )
   }
+
+  {/* Outside the `history.length` gate: a different source, absent for its own reasons. */}
+  <Fragment set:html={renderMealProgram(meal)} />
 </Base>

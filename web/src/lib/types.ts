@@ -19,6 +19,7 @@ export type {
   MillageAnalysis,
   National,
   HistoryYear,
+  MealProgramYear,
   StateFinance,
   RegimeCounterfactual,
   PropertyTaxYear,
@@ -44,7 +45,7 @@ import type { Bundle, District, Statewide } from "./schema/feed.ts";
  * the build and the scenario routes refuse to proceed past when the two disagree — the deliberate
  * half of drift detection, where the strictness of the schemas is the accidental half.
  */
-export const REQUIRED_CONTRACT = "28.0.0";
+export const REQUIRED_CONTRACT = "29.0.0";
 
 /**
  * A district with only the fields the funding formula reads.
@@ -122,11 +123,21 @@ export type PanelDistrict = Omit<
  * `history` is omitted for the same reason `national` is: the scenario builder re-runs the FY2027
  * formula over the 609 traditional districts, and the Census survey of a different population in
  * a different decade is not one of its inputs. It stays in the full feed and on its own route.
+ *
+ * `meal_program` goes with them, and more emphatically. It is a third population on a count that
+ * changes definition inside its own series — nothing the browser-side formula could take as an
+ * input without being wrong, and sending it would put it one property access away from a slider.
  */
 export interface Panel
   extends Omit<
     Bundle,
-    "districts" | "statewide" | "national" | "history" | "house_districts" | "senate_districts"
+    | "districts"
+    | "statewide"
+    | "national"
+    | "history"
+    | "meal_program"
+    | "house_districts"
+    | "senate_districts"
   > {
   districts: PanelDistrict[];
   statewide: Omit<Statewide, "finances" | "outcomes">;

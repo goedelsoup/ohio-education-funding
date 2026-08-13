@@ -1,5 +1,5 @@
 {
-  "contract_version": "28.0.0",
+  "contract_version": "29.0.0",
   "provenance": "Ohio DEW FY27 TRAD State Foundation Funding Calculator (a projection, not an actual) joined with the FY2024 District Profile Report. Base cost, guarantee, and formula funding are FY2027; enrolled ADM is FY2024-FY2026, of which FY2026 is partly departmental estimate; millage is TY2023; expenditure and demographics are FY2024. Achievement, growth, need, and FY2025 spending are the 2024-25 Ohio School Report Card, joined on IRN across the 606 districts every panel covers. See .yidam/catalog/.",
   "fiscal_year": 2027,
   "statewide": {
@@ -70,6 +70,19 @@
     {"fiscal_year": 2020, "districts": 612, "local_share": 0.5536, "state_share": 0.3804, "federal_share": 0.066, "poorest_local_per_pupil": 4643.0212, "richest_local_per_pupil": 13905.0411, "gap_per_pupil": 9262.02, "state_closes_per_pupil": 4056.1238, "federal_closes_per_pupil": 462.2481},
     {"fiscal_year": 2021, "districts": 612, "local_share": 0.5404, "state_share": 0.3706, "federal_share": 0.089, "poorest_local_per_pupil": 4859.6745, "richest_local_per_pupil": 14243.7168, "gap_per_pupil": 9384.0424, "state_closes_per_pupil": 3853.3327, "federal_closes_per_pupil": 499.7444},
     {"fiscal_year": 2022, "districts": 611, "local_share": 0.5173, "state_share": 0.3425, "federal_share": 0.1402, "poorest_local_per_pupil": 4341.7376, "richest_local_per_pupil": 13932.2269, "gap_per_pupil": 9590.4893, "state_closes_per_pupil": 4448.1571, "federal_closes_per_pupil": 913.2873}
+  ],
+  "meal_program": [
+    {"fiscal_year": 2001, "sponsors": 730, "enrollment": 1921522, "approved": 532105, "share": 0.2769, "basis": "adm"},
+    {"fiscal_year": 2002, "sponsors": 757, "enrollment": 1778648, "approved": 554908, "share": 0.312, "basis": "adm"},
+    {"fiscal_year": 2003, "sponsors": 768, "enrollment": 1765667, "approved": 583577, "share": 0.3305, "basis": "adm"},
+    {"fiscal_year": 2004, "sponsors": 789, "enrollment": 1790842, "approved": 604821, "share": 0.3377, "basis": "adm"},
+    {"fiscal_year": 2005, "sponsors": 820, "enrollment": 1757609, "approved": 626922, "share": 0.3567, "basis": "adm"},
+    {"fiscal_year": 2006, "sponsors": 857, "enrollment": 1786121, "approved": 656877, "share": 0.3678, "basis": "adm"},
+    {"fiscal_year": 2007, "sponsors": 883, "enrollment": 1788502, "approved": 654637, "share": 0.366, "basis": "adm"},
+    {"fiscal_year": 2008, "sponsors": 896, "enrollment": 1774190, "approved": 702086, "share": 0.3957, "basis": "adm"},
+    {"fiscal_year": 2009, "sponsors": 913, "enrollment": 1769096, "approved": 753987, "share": 0.4262, "basis": "adm"},
+    {"fiscal_year": 2010, "sponsors": 920, "enrollment": 1766148, "approved": 794024, "share": 0.4496, "basis": "ce"},
+    {"fiscal_year": 2011, "sponsors": 949, "enrollment": 1746591, "approved": 808494, "share": 0.4629, "basis": "ce"}
   ],
   "house_districts": [
     {"number": "001", "adm": 10485.7349, "realized_aid": 24760588.3788, "base_cost_state_share": 8640643.1044, "categorical_funding": 9966151.7256, "guarantee": 6153793.5488, "districts_on_guarantee": 2, "districts_at_minimum_state_share": 1, "districts_wholly_inside": 1, "members": [{"irn": "043802", "name": "Columbus City School District", "share": 0.18304334, "share_of_house_district": 0.76159859, "adm": 7985.9209, "realized_aid": 20839415.9985, "wholly_inside": false}, {"irn": "043620", "name": "Bexley City", "share": 1, "share_of_house_district": 0.23823405, "adm": 2498.0591, "realized_aid": 3909990.06, "wholly_inside": true}, {"irn": "044800", "name": "South-Western City", "share": 0.00008214, "share_of_house_district": 0.00016736, "adm": 1.7549, "realized_aid": 11182.3203, "wholly_inside": false}]},

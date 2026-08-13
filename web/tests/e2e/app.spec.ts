@@ -1914,3 +1914,56 @@ test.describe("against america", () => {
   });
 });
 
+
+test.describe("the count the poverty weight is paid on", () => {
+  test("the eleven-year series is on the page, which is the point of exporting it", async ({
+    page,
+  }) => {
+    // It was computed in `crates/dispersion`, tested there, and reachable by nobody who was not
+    // running cargo. This test is the one that would have failed for the four phases it sat there.
+    await page.goto("/history");
+    const card = page.locator(".card", { hasText: "What the poverty weight is counted on" });
+    await expect(card).toBeVisible();
+    await expect(card).toContainText("FY2001");
+    await expect(card).toContainText("FY2011");
+  });
+
+  test("the break in the denominator is stated where the chart is, not in a footnote", async ({
+    page,
+  }) => {
+    /*
+     * The share steps up at FY2010 and part of that step is the divisor changing definition. A
+     * reader who takes the eleven years as one trend gets a number nothing in the source supports,
+     * so the page has to refuse the reading before the eye has finished drawing the line.
+     */
+    await page.goto("/history");
+    const card = page.locator(".card", { hasText: "What the poverty weight is counted on" });
+    await expect(card).toContainText("The two lines are not one line");
+    await expect(card).toContainText("AdmCount");
+    await expect(card).toContainText("CECount");
+  });
+
+  test("each row says which count it divides by, so no row travels alone", async ({ page }) => {
+    // The table is the part that gets copied out. A row carrying a share without its basis is a
+    // figure that means two different things depending on a cutover the row does not mention.
+    await page.goto("/history");
+    const card = page.locator(".card", { hasText: "What the poverty weight is counted on" });
+    const rows = card.locator("tbody tr");
+    await expect(rows).toHaveCount(11);
+    await expect(rows.first()).toContainText("AdmCount");
+    await expect(rows.last()).toContainText("CECount");
+  });
+
+  test("the population is named as sponsors rather than districts", async ({ page }) => {
+    /*
+     * Everything else on this site counts 609 traditional districts. This counts meal-program
+     * sponsors — community schools and county boards of developmental disabilities included — and
+     * the count grows across the window for reasons that have nothing to do with poverty.
+     */
+    await page.goto("/history");
+    const card = page.locator(".card", { hasText: "What the poverty weight is counted on" });
+    await expect(card).toContainText("sponsors");
+    await expect(card).toContainText("community schools");
+    await expect(card).toContainText("formula side");
+  });
+});

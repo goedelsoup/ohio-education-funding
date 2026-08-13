@@ -81,6 +81,12 @@ export const DENOMINATORS = {
     note: "The federal survey's own count, on its own definitions, for every state.",
     field: "national.states[].enrollment",
   },
+  "meal-program-count": {
+    label: "Meal-program denominator, `AdmCount` then `CECount`",
+    source: "Ohio DEW, Office for Child Nutrition, MR-81, FY2001-FY2011",
+    note: "The only count here that changes definition inside its own series: `AdmCount` through FY2009, then `CECount` — 'the highest daily number of students with access to the program' — from FY2010, which is neither ADM nor the count before it. The population is sponsors, not districts: community schools and county boards of developmental disabilities are in, and the count rises from 730 to 949 across the window mostly because community schools opened. Every row carries its own `basis` so a reader cannot splice the two halves without being told.",
+    field: "meal_program[].enrollment",
+  },
   "f33-panel-membership": {
     label: "Fall membership, `V33`, per year",
     source: "U.S. Census Bureau / NCES, School District Finance Survey (F-33), FY2009-FY2022",
@@ -236,6 +242,10 @@ export const FIELD_DENOMINATORS: Record<string, DenominatorKey | null> = {
   // Dimensionless: a change, and correlations whose parts each cancel their own denominator.
   "districts[].enrollment_change": null,
   "statewide.outcomes.enrolled_spending_vs_performance": null,
+
+  // The meal-program count itself, which is the denominator rather than a quantity over one.
+  // Everything else in that block is declared by `BLOCK_DENOMINATORS`.
+  "meal_program[].enrollment": null,
 };
 
 /**
@@ -248,6 +258,11 @@ export const FIELD_DENOMINATORS: Record<string, DenominatorKey | null> = {
  */
 export const BLOCK_DENOMINATORS: Record<string, DenominatorKey> = {
   "districts[].spending_by_function.": "unweighted-adm-fy25",
+  // The second case of the same shape, and the reason `meal_program[].enrollment` exists at all.
+  // `share` and `approved` are both over the meal-program count and neither name says so, so the
+  // block is declared whole. `sponsors` is a count of sponsors rather than of pupils and the walk
+  // does not reach it.
+  "meal_program[].": "meal-program-count",
 };
 
 /**
@@ -289,4 +304,10 @@ export const DELIBERATELY_UNCOMPARABLE: [string, string][] = [
   // revenue gap beside a district's valuation per pupil will arrive, and they are a different
   // population, a different count, and a decade apart.
   ["history[].poorest_local_per_pupil", "districts[].valuation_per_pupil"],
+  // The meal-program count against the two panels it sits beside on `/history`. Recorded because
+  // the invitation here is stronger than the one above: MR-81 covers FY2001-FY2011 and the Census
+  // panel starts in FY2009, so three years overlap and a reader will want to read across them.
+  // They are different sponsors on different counts, and the meal-program denominator changes
+  // definition inside those three years.
+  ["meal_program[].enrollment", "history[].poorest_local_per_pupil"],
 ];
