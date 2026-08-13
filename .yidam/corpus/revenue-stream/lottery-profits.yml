@@ -76,7 +76,10 @@ properties:
     Not yet populated as a per-district series, and it cannot be: the fund is appropriated into
     foundation aid rather than distributed on its own formula, so there is no per-district lottery
     figure to hold. Statewide totals are in
-    [`dew-redbook.txt`](../../../crates/project/fixtures/dew-redbook.txt). [verified]
+    [`dew-greenbook.txt`](../../../crates/project/fixtures/dew-greenbook.txt), which is the
+    analysis **as enacted** — FY2026 puts Fund 7017 at $1,436,583,202 of $11,230,057,557. The
+    redbook beside it carries the same table as *introduced* and was what this cited until the
+    two were compared. [verified]
 links:
   - target: ../revenue-stream.ont.yml
     relationship: instance-of

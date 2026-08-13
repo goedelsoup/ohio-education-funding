@@ -42,9 +42,13 @@ closes 9.5% of the local gap against state equalization's 46%. The figures are o
 **The two earmarks now answer the substitution question differently, and the difference is the
 mechanism.** For the [lottery](lottery-profits.yml) it is settled as far as a budget document can
 settle it: LSC states that profits are "combined with the GRF to provide foundation funding to
-schools", and Fund 7017 sits inside the foundation aid appropriation table at $1.34 billion of an
-$11.15 billion total. The money is one of the buckets foundation aid is paid from, not an
-addition to it. [verified]
+schools", and Fund 7017 sits inside the foundation aid appropriation table at $1.44 billion of an
+$11.23 billion total in FY2026. The money is one of the buckets foundation aid is paid from, not
+an addition to it. [verified — the greenbook, as enacted]
+
+Those figures read $1.34 billion and $11.15 billion until the enacted document was read; both were
+the executive proposal. Between proposal and act the lottery line rose $97.6m and the rest of the
+table fell $15.6m — the substitution, at the margin the legislature controls. [verified]
 
 For the [casino distribution](casino-tax-distribution.yml) there is no equivalent evidence and
 cannot be, because the money never passes through an appropriation to the department — it runs

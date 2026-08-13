@@ -78,7 +78,10 @@ properties:
     state foundation aid payments for all public school students *and* scholarship payments for
     students in state scholarship programmes: GRF ALI 200550 Foundation Funding, GRF ALI 200502
     Pupil Transportation, Fund 5VS0 ALI 200604, Fund 5YO0 ALI 200491, and Lottery Fund 7017
-    ALI 200612. [verified — LSC redbook, `crates/project/fixtures/dew-redbook.txt`]
+    ALI 200612. [verified — LSC redbook and greenbook, `crates/project/fixtures/dew-redbook.txt` and
+    `dew-greenbook.txt`. Checked against the act as enacted, not only as introduced: the five
+    lines and the sentence naming them are identical in both. The *amounts* in that table are
+    not — foundation aid was enacted $82m above the proposal — so nothing here quotes one.]
 
     The Catalog of Budget Line Items would give each of these a per-line history with actuals and
     a Legal Basis naming the establishing act, and is now retrievable — see
