@@ -788,12 +788,11 @@ fn appropriation_lines() -> Vec<AppropriationLine> {
 /// The meal-program poverty share, year by year.
 ///
 /// Computed and tested in [`dispersion::mr81`], which excludes non-public sponsors and the
-/// sponsor-years whose published enrollment cannot be right. Like [`history`], this has been
-/// sitting in the workspace computed and unread — the difference is that it reaches back to
-/// FY2001, eight years before anything else in this feed.
+/// sponsor-years whose published enrollment cannot be right. It reaches back to FY1998, eleven
+/// years before anything else in this feed, and forward to FY2014, where the archive stops.
 ///
 /// Deliberately not passed to [`deflator_years`]: every field here is a count or a share, so
-/// there is nothing to deflate, and adding FY2001-FY2008 to the deflator would extend a price
+/// there is nothing to deflate, and adding FY1998-FY2008 to the deflator would extend a price
 /// index across years no dollar figure in the feed covers.
 fn meal_program() -> Vec<MealProgramYear> {
     poverty_share_by_year()
@@ -803,7 +802,12 @@ fn meal_program() -> Vec<MealProgramYear> {
             sponsors: year.sponsors,
             enrollment: year.enrollment,
             approved: year.approved,
+            identified: year.identified,
             share: year.share,
+            floor: year.floor,
+            ceiling: year.ceiling,
+            without_applications: year.without_applications,
+            streams: year.streams,
             // The upstream type carries the basis as a bool because it only has two states. The
             // feed writes the name, because a consumer reading `"basis": false` would have to
             // come back here to learn which count that was.

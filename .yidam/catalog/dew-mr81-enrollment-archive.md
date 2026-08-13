@@ -28,7 +28,7 @@ department, and free-lunch eligibility has historically been the department's op
 seventeen-year run of it is the closest thing available to a long series of the count DPIA is
 paid on.
 
-**Three breaks, each of which produces a wrong series if unhandled:**
+**Four breaks, each of which produces a wrong series if unhandled:**
 
 - **The enrollment column changes definition in 2010.** `AdmCount` and `PctFreeAdm` become
   `CECount` and `PctFreeCE`. The 2014 header states what CE means: *"Current Enrollment (CE) —
@@ -44,6 +44,10 @@ paid on.
   them every year as adoption spreads. This is the single most dangerous property of the source.
 - **Sponsors are not districts.** The 2005 file's first rows are a Residential Child Care
   Institution and a county Board of MR&DD. Any district panel needs a sponsor-type filter.
+- **The 1998-2000 files have no sponsor-type column at all**, so there is nothing to filter on.
+  They are one row per school with the district named and numbered on it, and the type has to come
+  from 2001, which leaves some thirty-five sponsors a year — three thousand to eight thousand
+  pupils, against 1.8 million — with no type anything states.
 
 **Layout eras.** Four, all resolvable by column name:
 
@@ -59,10 +63,42 @@ already. File naming is inconsistent to the point of needing a per-year table �
 `MR81-Oct2002-TabDelimited.txt`, `MR81_Oct_2010_delimited Revised 0911.txt`,
 `MR8_Oct_2011_Delimited.txt` — and one year's name is misspelled.
 
-**Status.** *Retrievable, unparsed, and correctly described as of this pass.* The single-stream
-era, 1998–2011, is fourteen consecutive Octobers behind one reader with four column maps. The
-2012–2014 three-stream era needs the CEP and Provision 2 files joined to Traditional, or it needs
-to be left out and said so.
+**Status.** *Wired in full.* Seventeen Octobers in twenty-one files, across three readers: a
+fixed-width one for 1998–2000, a delimited one for 2001–2014, and one for the printed report,
+which is the only form the 2013 community-eligibility stream was ever posted in. The panel is
+`crates/dispersion/fixtures/mr81-sponsor-panel.csv`.
+
+**What the extraction established, beyond the rows.**
+
+- **The 1998–2000 files are fixed-width, not comma-separated.** Every row is exactly 170 bytes
+  with the thirteen separators at the same offsets, so the seven district names a year carrying a
+  comma never shift anything. The earlier reading of this entry — that they need "a last-field
+  rule" — was describing a problem that only exists if the file is split on its delimiter.
+- **They were written in 2004, not in their own years.** All three carry the same 4,246 schools,
+  zero-filled where a school was not participating, and the directory dates them 5/2004 and
+  8/2004. October 2000 is the one year whose contemporaneous printing also survives, and the two
+  agree on 4,233 of 4,236 schools — which is what makes the back-fill usable.
+- **2001's delimited file was being misread, and the corpus had published the result.** It is the
+  only comma-delimited year; nine rows carry a comma inside a school name; two of them are
+  Cleveland City SD, and read positionally they put site IRNs `00026450` and `00093153` in the
+  enrollment column. The statewide public figure was 1,921,522 against a true 1,802,937 and the
+  poverty share was 27.7% against 29.5%. Repaired by anchoring the row's nine trailing fields from
+  the right; after the repair, free and reduced approvals match the printed report **exactly for
+  all 1,227 sponsor blocks**.
+- **The three streams count three different things.** Traditional is current-year applications.
+  Provision 2 is applications frozen at the base year the file names — the same sponsor reports
+  the same counts in 2012, 2013 and 2014. Community eligibility collects **no applications at
+  all**; its `PctFreeRedCE` is the directly-certified count times 1.6 capped at enrollment, which
+  reproduces in all 735 of the 2014 rows. Joining Traditional alone is the trap this entry always
+  warned about; joining all three by their approval columns is a *different* trap with the same
+  shape, and both make poverty appear to collapse.
+- **2013's community stream has no delimited file.** Only the printed report, which names its
+  sponsors and neither numbers nor types them, so the identifiers come from the delimited files
+  either side. `Believe to Achieve-Canton` is filed under Cuyahoga in 2012 and Stark in 2013, so
+  the lookup falls back from name-and-county to name.
+- **The 2012 community file's header is one column wider than its rows.** A blank column name sits
+  before `CEOEligibleStudents`, so resolving that column by name points one past the end of the
+  data — silently, since the trailing columns are all numeric.
 
 **Other caveats:**
 
@@ -77,6 +113,13 @@ to be left out and said so.
 
 ## Used by
 
-Nothing yet. The [enrolled ADM](../corpus/metric/enrolled-adm.yml) node records the
-three-observation limitation this source was expected to relieve; on the corrected reading it
-would relieve it only as an inference, since CE and headcount are neither of them ADM.
+- [`crates/dispersion/src/mr81.rs`](../../crates/dispersion/src/mr81.rs) — the panel and the
+  aggregates over it, including the band the split years carry instead of a share.
+- The `meal_program` block of the feed, which is the card "What the poverty weight is
+  counted on" on the site's `/history` route.
+- [DPIA](../corpus/formula-component/fsfp-disadvantaged-pupil-impact-aid.yml), whose fourteen-year
+  poverty series is this file.
+
+The [enrolled ADM](../corpus/metric/enrolled-adm.yml) node records the three-observation
+limitation this source was expected to relieve; on the corrected reading it would relieve it only
+as an inference, since CE and headcount are neither of them ADM.

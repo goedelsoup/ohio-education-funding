@@ -77,6 +77,9 @@ pub enum Format {
     LegacyXls,
     /// A tab-separated flat file, as the Bureau of Labor Statistics publishes.
     Tsv,
+    /// Flat text that is not delimited: a fixed-width extract, or a report laid out for a printer
+    /// and posted as the file. Read by offset, so its column positions are part of the parser.
+    Text,
     /// A web page. No parser here.
     Html,
     /// A PDF. No parser here.
@@ -1843,17 +1846,58 @@ pub const CONNECTORS: &[Connector] = &[
         feeds: &["education-agency", "metric", "formula-component"],
         status: Status::Wired {
             still_blocked: Some(
-                "wired for the eleven sponsor-centric years, 2001 through 2011. The 1998-2000 \
-                 files are a different, school-centric column set whose unquoted district names \
-                 shift three rows past the last column; from 2012 the report splits into \
-                 Traditional, Provision 2 and Community Eligibility streams, and the Traditional \
-                 file excludes the highest-poverty sponsors by design",
+                "wired for every October the archive holds, 1998 through 2014, across all three \
+                 of the streams the report splits into from 2012. Three things it still cannot \
+                 reach: October 2014 is where the directory stops, nine years short of the \
+                 corpus's FY2024 observations; the three split Octobers have a band and not a \
+                 poverty share, because community-eligibility sponsors collect no applications \
+                 at all; and the 1998-2000 files state no sponsor type, so some thirty-five \
+                 sponsors a year predate the FY2001 file they borrow one from and stay untyped",
             ),
         },
         note: "The only long series of the count Ohio's disadvantaged pupil funding is actually \
                paid on. Not an enrollment archive, which is what the catalog said it was for \
                fifteen phases.",
         sources: &[
+            Source {
+                key: "mr81-1998",
+                title: None,
+                url: "https://public.education.ohio.gov/MR81/MR81_October_1998/MR81_OCT_1998.txt",
+                filename: "mr81-1998.txt",
+                format: Format::Text,
+                catalog: Some("dew-mr81-enrollment-archive"),
+                fixtures: &[crate::fixtures::MR81_FIXTURE],
+                note: "October 1998, and the first of three school-centric files. Nominally \
+                       comma-separated and actually 170 characters wide with the separators at \
+                       fixed offsets, which is the only reason the seven district names a year \
+                       carrying a comma do not shift their own rows.",
+            },
+            Source {
+                key: "mr81-1999",
+                title: None,
+                url: "https://public.education.ohio.gov/MR81/MR81_October_1999/\
+                      MR81_OCT_1999_Delimited.TXT",
+                filename: "mr81-1999.txt",
+                format: Format::Text,
+                catalog: Some("dew-mr81-enrollment-archive"),
+                fixtures: &[crate::fixtures::MR81_FIXTURE],
+                note: "October 1999. The directory also lists `MR81.1099`, the contemporaneous \
+                       posting, which 404s — a listed file that is not there. This one and its \
+                       two neighbours were all written in 2004 from one roster.",
+            },
+            Source {
+                key: "mr81-2000",
+                title: None,
+                url: "https://public.education.ohio.gov/MR81/MR81_October_2000/\
+                      MR81_OCT_2000_Delimited.TXT",
+                filename: "mr81-2000.txt",
+                format: Format::Text,
+                catalog: Some("dew-mr81-enrollment-archive"),
+                fixtures: &[crate::fixtures::MR81_FIXTURE],
+                note: "October 2000. The one year whose contemporaneous printing survives beside \
+                       the 2004 rewrite, so it is the only check on whether the rewrite was \
+                       faithful: 4,233 of 4,236 schools carry the same three figures in both.",
+            },
             Source {
                 key: "mr81-2001",
                 title: None,
@@ -1862,9 +1906,10 @@ pub const CONNECTORS: &[Connector] = &[
                 format: Format::Tsv,
                 catalog: Some("dew-mr81-enrollment-archive"),
                 fixtures: &[crate::fixtures::MR81_FIXTURE],
-                note: "October 2001. Published filename is `MR81-Oct2001-Delimited.txt`; the naming is \
-                       inconsistent to the point of needing a per-year table, and 2011's is \
-                       misspelled.",
+                note: "October 2001, and the only comma-delimited year. Nine of its rows carry a \
+                       comma inside a school name, and split positionally they put a site IRN \
+                       into the enrolment column — which is how the panel published an FY2001 \
+                       poverty share 1.8 points low for four phases.",
             },
             Source {
                 key: "mr81-2002",
@@ -1982,9 +2027,128 @@ pub const CONNECTORS: &[Connector] = &[
                 format: Format::Tsv,
                 catalog: Some("dew-mr81-enrollment-archive"),
                 fixtures: &[crate::fixtures::MR81_FIXTURE],
-                note: "October 2011. Published filename is `MR8_Oct_2011_Delimited.txt`; the naming is \
-                       inconsistent to the point of needing a per-year table, and 2011's is \
-                       misspelled.",
+                note: "October 2011, the last year the report is one file. Published filename is \
+                       `MR8_Oct_2011_Delimited.txt` — the naming is inconsistent to the point of \
+                       needing a per-year table, and this one is misspelled.",
+            },
+            Source {
+                key: "mr81-2012-traditional",
+                title: None,
+                url: "https://public.education.ohio.gov/MR81/MR81_October_2012/MR81%20Traditional/\
+                      MR81%20Traditional%20Delimited%20File.txt",
+                filename: "mr81-2012-traditional.txt",
+                format: Format::Tsv,
+                catalog: Some("dew-mr81-enrollment-archive"),
+                fixtures: &[crate::fixtures::MR81_FIXTURE],
+                note: "October 2012, the first year the report is three. This is the stream that \
+                       still collects applications, and its own readme says it excludes the other \
+                       two — so it is the file a naive extension would append, and the one that \
+                       would bend the series downward for reasons that are not poverty.",
+            },
+            Source {
+                key: "mr81-2012-provision2",
+                title: None,
+                url: "https://public.education.ohio.gov/MR81/MR81_October_2012/\
+                      MR81%20Provision%202/MR81%20Provision%202%20Delimited%20File.txt",
+                filename: "mr81-2012-provision2.txt",
+                format: Format::Tsv,
+                catalog: Some("dew-mr81-enrollment-archive"),
+                fixtures: &[crate::fixtures::MR81_FIXTURE],
+                note: "October 2012, Provision 2. Twenty-odd sponsors whose approvals are frozen \
+                       at the base year the file names, so the same counts appear in 2012, 2013 \
+                       and 2014 while the enrolment beneath them moves.",
+            },
+            Source {
+                key: "mr81-2012-community",
+                title: None,
+                url: "https://public.education.ohio.gov/MR81/MR81_October_2012/MR81%20CEO/\
+                      MR81%20CEO%20Delimited%20File.txt",
+                filename: "mr81-2012-community.txt",
+                format: Format::Tsv,
+                catalog: Some("dew-mr81-enrollment-archive"),
+                fixtures: &[crate::fixtures::MR81_FIXTURE],
+                note: "October 2012, community eligibility. Every free and reduced figure in this \
+                       file is zero, because these sponsors collect no applications at all. Its \
+                       header also carries an empty column its rows do not, so a name resolved \
+                       against it points one past the end of the data.",
+            },
+            Source {
+                key: "mr81-2013-traditional",
+                title: None,
+                url: "https://public.education.ohio.gov/MR81/MR81_October_2013/\
+                      2013%20MR81Delimited%20tradional.txt",
+                filename: "mr81-2013-traditional.txt",
+                format: Format::Tsv,
+                catalog: Some("dew-mr81-enrollment-archive"),
+                fixtures: &[crate::fixtures::MR81_FIXTURE],
+                note: "October 2013, traditional. The published filename misspells its own \
+                       stream.",
+            },
+            Source {
+                key: "mr81-2013-provision2",
+                title: None,
+                url: "https://public.education.ohio.gov/MR81/MR81_October_2013/\
+                      2013%20MR81Delimited%20prov%202.txt",
+                filename: "mr81-2013-provision2.txt",
+                format: Format::Tsv,
+                catalog: Some("dew-mr81-enrollment-archive"),
+                fixtures: &[crate::fixtures::MR81_FIXTURE],
+                note: "October 2013, Provision 2. The directory posts this stream twice, once \
+                       delimited and once printed, and the two agree to the unit across all \
+                       twenty-four sites — which is what says the printed reader beside it can be \
+                       trusted on the stream that has no delimited file.",
+            },
+            Source {
+                key: "mr81-2013-community",
+                title: None,
+                url: "https://public.education.ohio.gov/MR81/MR81_October_2013/\
+                      2nd%20CEP%202013%20MR81.txt",
+                filename: "mr81-2013-community.txt",
+                format: Format::Text,
+                catalog: Some("dew-mr81-enrollment-archive"),
+                fixtures: &[crate::fixtures::MR81_FIXTURE],
+                note: "October 2013, community eligibility — the one stream-year with no \
+                       delimited file. Posted as the printed report, which names its sponsors \
+                       without numbering or typing them, so the identifiers come from the \
+                       delimited files either side.",
+            },
+            Source {
+                key: "mr81-2014-traditional",
+                title: None,
+                url: "https://public.education.ohio.gov/MR81/MR81_October_2014/\
+                      October_2014_MR81_Traditional_delimited.txt",
+                filename: "mr81-2014-traditional.txt",
+                format: Format::Tsv,
+                catalog: Some("dew-mr81-enrollment-archive"),
+                fixtures: &[crate::fixtures::MR81_FIXTURE],
+                note: "October 2014, traditional, and the last October the archive holds.",
+            },
+            Source {
+                key: "mr81-2014-provision2",
+                title: None,
+                url: "https://public.education.ohio.gov/MR81/MR81_October_2014/\
+                      October_2014_MR81_Provision_2_delimited.txt",
+                filename: "mr81-2014-provision2.txt",
+                format: Format::Tsv,
+                catalog: Some("dew-mr81-enrollment-archive"),
+                fixtures: &[crate::fixtures::MR81_FIXTURE],
+                note: "October 2014, Provision 2. One of its fifteen sponsors reports no \
+                       applications and a hundred per cent, which is a community-eligibility row \
+                       filed under the wrong stream.",
+            },
+            Source {
+                key: "mr81-2014-community",
+                title: None,
+                url: "https://public.education.ohio.gov/MR81/MR81_October_2014/\
+                      October_2014_MR81_CEP_delimited_REVISED.txt",
+                filename: "mr81-2014-community.txt",
+                format: Format::Tsv,
+                catalog: Some("dew-mr81-enrollment-archive"),
+                fixtures: &[crate::fixtures::MR81_FIXTURE],
+                note: "October 2014, community eligibility. By this October a sixth of Ohio's \
+                       public meal-program enrolment is in this file, against a fourteenth two \
+                       years earlier. Its printed percentage is the directly-certified count \
+                       times 1.6 capped at enrolment, in all 735 rows.",
             },
         ],
     },

@@ -1,5 +1,5 @@
 {
-  "contract_version": "31.0.0",
+  "contract_version": "32.0.0",
   "provenance": "Ohio DEW FY27 TRAD State Foundation Funding Calculator (a projection, not an actual) joined with the FY2024 District Profile Report. Base cost, guarantee, and formula funding are FY2027; enrolled ADM is FY2024-FY2026, of which FY2026 is partly departmental estimate; millage is TY2023; expenditure and demographics are FY2024. Achievement, growth, need, and FY2025 spending are the 2024-25 Ohio School Report Card, joined on IRN across the 606 districts every panel covers. See .yidam/catalog/.",
   "fiscal_year": 2027,
   "statewide": {
@@ -72,17 +72,23 @@
     {"fiscal_year": 2022, "districts": 611, "local_share": 0.5173, "state_share": 0.3425, "federal_share": 0.1402, "poorest_local_per_pupil": 4341.7376, "richest_local_per_pupil": 13932.2269, "gap_per_pupil": 9590.4893, "state_closes_per_pupil": 4448.1571, "federal_closes_per_pupil": 913.2873}
   ],
   "meal_program": [
-    {"fiscal_year": 2001, "sponsors": 730, "enrollment": 1921522, "approved": 532105, "share": 0.2769, "basis": "adm"},
-    {"fiscal_year": 2002, "sponsors": 757, "enrollment": 1778648, "approved": 554908, "share": 0.312, "basis": "adm"},
-    {"fiscal_year": 2003, "sponsors": 768, "enrollment": 1765667, "approved": 583577, "share": 0.3305, "basis": "adm"},
-    {"fiscal_year": 2004, "sponsors": 789, "enrollment": 1790842, "approved": 604821, "share": 0.3377, "basis": "adm"},
-    {"fiscal_year": 2005, "sponsors": 820, "enrollment": 1757609, "approved": 626922, "share": 0.3567, "basis": "adm"},
-    {"fiscal_year": 2006, "sponsors": 857, "enrollment": 1786121, "approved": 656877, "share": 0.3678, "basis": "adm"},
-    {"fiscal_year": 2007, "sponsors": 883, "enrollment": 1788502, "approved": 654637, "share": 0.366, "basis": "adm"},
-    {"fiscal_year": 2008, "sponsors": 896, "enrollment": 1774190, "approved": 702086, "share": 0.3957, "basis": "adm"},
-    {"fiscal_year": 2009, "sponsors": 913, "enrollment": 1769096, "approved": 753987, "share": 0.4262, "basis": "adm"},
-    {"fiscal_year": 2010, "sponsors": 920, "enrollment": 1766148, "approved": 794024, "share": 0.4496, "basis": "ce"},
-    {"fiscal_year": 2011, "sponsors": 949, "enrollment": 1746591, "approved": 808494, "share": 0.4629, "basis": "ce"}
+    {"fiscal_year": 1998, "sponsors": 718, "enrollment": 1828376, "approved": 529112, "identified": 0, "share": 0.2894, "floor": 0.2894, "ceiling": 0.2894, "without_applications": 0, "streams": 1, "basis": "adm"},
+    {"fiscal_year": 1999, "sponsors": 724, "enrollment": 1804042, "approved": 516438, "identified": 0, "share": 0.2863, "floor": 0.2863, "ceiling": 0.2863, "without_applications": 0, "streams": 1, "basis": "adm"},
+    {"fiscal_year": 2000, "sponsors": 727, "enrollment": 1784112, "approved": 508697, "identified": 0, "share": 0.2851, "floor": 0.2851, "ceiling": 0.2851, "without_applications": 0, "streams": 1, "basis": "adm"},
+    {"fiscal_year": 2001, "sponsors": 733, "enrollment": 1803323, "approved": 531326, "identified": 0, "share": 0.2946, "floor": 0.2946, "ceiling": 0.2946, "without_applications": 0, "streams": 1, "basis": "adm"},
+    {"fiscal_year": 2002, "sponsors": 757, "enrollment": 1778648, "approved": 554908, "identified": 0, "share": 0.312, "floor": 0.312, "ceiling": 0.312, "without_applications": 0, "streams": 1, "basis": "adm"},
+    {"fiscal_year": 2003, "sponsors": 768, "enrollment": 1765667, "approved": 583577, "identified": 0, "share": 0.3305, "floor": 0.3305, "ceiling": 0.3305, "without_applications": 0, "streams": 1, "basis": "adm"},
+    {"fiscal_year": 2004, "sponsors": 789, "enrollment": 1790842, "approved": 604821, "identified": 0, "share": 0.3377, "floor": 0.3377, "ceiling": 0.3377, "without_applications": 0, "streams": 1, "basis": "adm"},
+    {"fiscal_year": 2005, "sponsors": 820, "enrollment": 1757609, "approved": 626922, "identified": 0, "share": 0.3567, "floor": 0.3567, "ceiling": 0.3567, "without_applications": 0, "streams": 1, "basis": "adm"},
+    {"fiscal_year": 2006, "sponsors": 857, "enrollment": 1786121, "approved": 656877, "identified": 0, "share": 0.3678, "floor": 0.3678, "ceiling": 0.3678, "without_applications": 0, "streams": 1, "basis": "adm"},
+    {"fiscal_year": 2007, "sponsors": 883, "enrollment": 1788502, "approved": 654637, "identified": 0, "share": 0.366, "floor": 0.366, "ceiling": 0.366, "without_applications": 0, "streams": 1, "basis": "adm"},
+    {"fiscal_year": 2008, "sponsors": 896, "enrollment": 1774190, "approved": 702086, "identified": 0, "share": 0.3957, "floor": 0.3957, "ceiling": 0.3957, "without_applications": 0, "streams": 1, "basis": "adm"},
+    {"fiscal_year": 2009, "sponsors": 913, "enrollment": 1769096, "approved": 753987, "identified": 0, "share": 0.4262, "floor": 0.4262, "ceiling": 0.4262, "without_applications": 0, "streams": 1, "basis": "adm"},
+    {"fiscal_year": 2010, "sponsors": 920, "enrollment": 1766148, "approved": 794024, "identified": 0, "share": 0.4496, "floor": 0.4496, "ceiling": 0.4496, "without_applications": 0, "streams": 1, "basis": "ce"},
+    {"fiscal_year": 2011, "sponsors": 949, "enrollment": 1746591, "approved": 808494, "identified": 0, "share": 0.4629, "floor": 0.4629, "ceiling": 0.4629, "without_applications": 0, "streams": 1, "basis": "ce"},
+    {"fiscal_year": 2012, "sponsors": 971, "enrollment": 1746557, "approved": 713861, "identified": 77087, "share": null, "floor": 0.4529, "ceiling": 0.4725, "without_applications": 0.0698, "streams": 3, "basis": "ce"},
+    {"fiscal_year": 2013, "sponsors": 992, "enrollment": 1740378, "approved": 673461, "identified": 108213, "share": null, "floor": 0.4491, "ceiling": 0.4766, "without_applications": 0.0988, "streams": 3, "basis": "ce"},
+    {"fiscal_year": 2014, "sponsors": 1001, "enrollment": 1735396, "approved": 577237, "identified": 181848, "share": null, "floor": 0.4374, "ceiling": 0.4836, "without_applications": 0.1664, "streams": 3, "basis": "ce"}
   ],
   "appropriations": [
     {"fiscal_year": 2002, "enacted": 7822210625, "foundation_funding": 4877654781, "items": 139, "source": "workbook"},

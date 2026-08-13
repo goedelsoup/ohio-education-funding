@@ -78,7 +78,7 @@ properties:
       crates/foundation/fixtures/fy27-department-model.csv    FY2027 formula run, 609 districts
       crates/project/fixtures/district-finances.csv           FY2020-FY2024 actuals and balances
       crates/dispersion/fixtures/f33-ohio-panel.csv           FY2012-FY2022 revenue, federal basis
-      crates/dispersion/fixtures/mr81-sponsor-panel.csv       2001-2011 free and reduced lunch
+      crates/dispersion/fixtures/mr81-sponsor-panel.csv       1998-2014 free and reduced lunch
 links:
   - target: ../education-agency.ont.yml
     relationship: instance-of

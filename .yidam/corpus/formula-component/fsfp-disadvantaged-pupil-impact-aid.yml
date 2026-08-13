@@ -1,33 +1,50 @@
 class: formula-component
 findings: |
-  **THE COUNT THIS IS PAID ON HAS A ELEVEN-YEAR HISTORY, AND IT NEARLY DOUBLED.** R.C.
+  **THE COUNT THIS IS PAID ON HAS A FOURTEEN-YEAR HISTORY, AND IT ROSE BY MORE THAN HALF.** R.C.
   3317.03(B)(21) hands the *definition* of "economically disadvantaged" to the department,
   constrained only by "shall not be categorically excluded … based on anything other than family
   income" — and the department's operative test has been free and reduced-price lunch
   eligibility. The Office for Child Nutrition published that count every October, and over Public
   sponsors it runs: [verified — `dispersion::mr81`, pinned by test]
 
-      2001  27.7%      2005  29.9%      2009  42.6%
-      2002  31.2%      2006  36.7%      2010  44.9%   (denominator redefined)
-      2003  33.0%      2007  36.5%      2011  46.3%
-      2004  33.7%      2008  39.5%
+      1998  28.9%      2003  33.1%      2008  39.6%
+      1999  28.6%      2004  33.8%      2009  42.6%
+      2000  28.5%      2005  35.7%      2010  45.0%   (denominator redefined)
+      2001  29.5%      2006  36.8%      2011  46.3%
+      2002  31.2%      2007  36.6%
 
-  **18.6 points in eleven years**, most of it before the 2008 recession rather than after. What
+  **17.4 points in fourteen years**, most of it before the 2008 recession rather than after. What
   the state pays per disadvantaged pupil is legislated — $422 — and *how many* pupils qualify is
   delegated and has been rising steeply. A weight on a count whose definition one party sets and
   whose size neither controls is a different fiscal instrument from a weight on a fixed
   population, and the corpus had no way to see that before this series.
 
+  **TWO FIGURES IN THE TABLE THIS REPLACES WERE WRONG, AND THEY WERE WRONG IN OPPOSITE WAYS.**
+  2001 read 27.7%: the file is the only comma-delimited one in the series, and two Cleveland City
+  rows whose school names carry a comma had put site identifiers in the enrollment column, adding
+  119,603 pupils to a district of 73,562. 2005 read 29.9%, which is the figure with the published
+  342,332-pupil defect left in — the one thing `implausible_sponsors` exists to take out. The
+  first was a reading error and the second was a quoting error, and both survived because a
+  plausible percentage in a rising series looks like a measurement. [verified]
+
   Three cautions travel with it. The denominator is renamed and redefined in 2010, `AdmCount` to
-  `CECount`, so the last two points are not on the same base as the first nine. Sponsors are not
+  `CECount`, so the last two points are not on the same base as the first twelve. Sponsors are not
   districts — "Public" includes community schools and county boards of developmental disabilities.
-  And the series stops in 2011, because from 2012 the report's Traditional file excludes
-  Community Eligibility sponsors, which are precisely the highest-poverty districts. [verified]
+  And the applications-based series ends in 2011. [verified]
+
+  **IT ENDS BECAUSE THE MEASURE ENDS, NOT BECAUSE THE ARCHIVE DOES.** Three more Octobers are
+  published and extracted, and from 2012 the report is three files of which only the Traditional
+  one still counts applications: community-eligibility schools feed every child and collect no
+  forms. The enrollment under such a sponsor goes 7.0% → 9.9% → **16.6%** in three years, so
+  adding the three files gives 33.3% for 2014 and would read as poverty collapsing. What the
+  source supports for 2014 is **43.7% to 48.4%** — the directly certified count as a floor, what
+  those schools may claim for as a ceiling — and that band contains 2011's 46.3%. The direction is
+  what cannot be settled. [verified — `dispersion::mr81::streams_by_year`, pinned by test]
 
   Whether the department's current economically-disadvantaged count still tracks free-lunch
-  eligibility, after Community Eligibility made universal free meals available to whole districts,
-  is not established here and is the question that decides whether this series connects to the
-  present. [open]
+  eligibility is now half-answered: after 2011 free-lunch eligibility stops being a single measure
+  at all, so any series joining this to the present is joining two definitions. Which one the
+  department uses today is not established here. [open]
 label: FSFP Disadvantaged Pupil Impact Aid
 description: |
   **$525m**, and the only one of the six whose mechanism is neither a weight times a count nor an

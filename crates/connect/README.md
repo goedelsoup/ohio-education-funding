@@ -47,10 +47,10 @@ Fields per connector: key, status, source count, corpus classes fed; then every 
 | [`census-f33`](sources/census-f33.md) | **wired** | 15 | metric, education-agency |
 | [`nces-ccd`](sources/nces-ccd.md) | **wired**, in part | 1 | education-agency |
 | `census-geography` | **wired** | 4 | education-agency, actor |
-| `dew-child-nutrition` | **wired**, in part | 11 | education-agency, metric, formula-component |
+| `dew-child-nutrition` | **wired**, in part | 23 | education-agency, metric, formula-component |
 | `dew-school-improvement` | **wired**, in part | 3 | school, education-agency, accountability-regime |
 
-17 connectors, 128 sources between them. 15 are wired and 2 are not; 7 of the wired ones reach only part of what they feed, and say so below.
+17 connectors, 140 sources between them. 15 are wired and 2 are not; 7 of the wired ones reach only part of what they feed, and say so below.
 
 **What is blocked, in the registry's own words.**
 
@@ -61,7 +61,7 @@ Fields per connector: key, status, source count, corpus classes fed; then every 
 - `ohio-courts` — still blocked on: trial-level rulings such as the 2025 EdChoice decision are not in the supreme court archive at all, and `citing_cases` needs a citator rather than a document
 - `ofcc-projects` — blocked on: the site refuses a self-identifying agent — 404 to this project's user-agent, 200 to a browser string — and its project data is rendered by interactive maps rather than served as files
 - `nces-ccd` — still blocked on: wired for a single year of the LEA directory; the consolidation-aware long series is not built, because agency files are per-year zips whose column sets change and the identifier-change history has to be derived rather than read
-- `dew-child-nutrition` — still blocked on: wired for the eleven sponsor-centric years, 2001 through 2011. The 1998-2000 files are a different, school-centric column set whose unquoted district names shift three rows past the last column; from 2012 the report splits into Traditional, Provision 2 and Community Eligibility streams, and the Traditional file excludes the highest-poverty sponsors by design
+- `dew-child-nutrition` — still blocked on: wired for every October the archive holds, 1998 through 2014, across all three of the streams the report splits into from 2012. Three things it still cannot reach: October 2014 is where the directory stops, nine years short of the corpus's FY2024 observations; the three split Octobers have a band and not a poverty share, because community-eligibility sponsors collect no applications at all; and the 1998-2000 files state no sponsor type, so some thirty-five sponsors a year predate the FY2001 file they borrow one from and stay untyped
 - `dew-school-improvement` — still blocked on: wired for the current identification lists only. The department republishes each list in place under a dated filename rather than archiving prior cycles, so there is no history here: a school that exited before this file was written is indistinguishable from one never identified
 
 7 of them have no long form in [`sources/`](sources/): `dew-report-card`, `dew-five-year-forecast`, `dew-scholarship-reports`, `lsc-catalog`, `census-geography`, `dew-child-nutrition`, `dew-school-improvement`. Those are the connectors added after the original nine stubs, whose prose was never written — the decision record is the only account of why each exists.
