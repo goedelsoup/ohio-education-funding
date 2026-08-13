@@ -66,7 +66,16 @@ description: |
   appropriations made by the General Assembly" — and for the
   [lottery](lottery-profits.yml) the substitution question has a documented answer: LSC states
   that profits are combined with the GRF to pay foundation aid, and Fund 7017 appears **inside**
-  the foundation aid appropriation table at $1.34 billion of an $11.15 billion total. [verified]
+  the foundation aid appropriation table at **$1.44 billion of an $11.23 billion total** in
+  FY2026. [verified — the greenbook, `crates/project/fixtures/dew-greenbook.txt`]
+
+  **Those figures were $1.34 billion and $11.15 billion here until the enacted document was
+  read.** Both were the executive proposal, taken from LSC's redbook and marked verified. The
+  correction sharpens the point rather than softening it: between the proposal and the act the
+  lottery's contribution rose **$97,638,202** while everything else in the same table **fell
+  $15,575,916**, so the total grew by less than the lottery line did. That is substitution
+  happening at the one margin the General Assembly actually controls, inside a single table.
+  [verified]
 
   **That is evidence about the lottery and not about this channel, and the difference is the
   mechanism.** Lottery profits are appropriated by the General Assembly into foundation aid, which
