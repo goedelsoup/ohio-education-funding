@@ -21,6 +21,7 @@ import {
   renderRevenueMix,
 } from "../lib/history.ts";
 import { renderAppropriations } from "../lib/appropriations.ts";
+import { renderLineOrigins } from "../lib/lineOrigins.ts";
 import { renderMealProgram } from "../lib/mealProgram.ts";
 import { baseYear } from "../lib/real.ts";
 import * as routes from "../lib/routes.ts";
@@ -29,6 +30,7 @@ const { bundle } = loadFeed();
 const history = bundle.history;
 const meal = bundle.meal_program;
 const appropriations = bundle.appropriations;
+const lines = bundle.appropriation_lines;
 const base = bundle.deflator
   ? baseYear(
       bundle.deflator,
@@ -105,6 +107,9 @@ const appropriationBase = bundle.deflator
             set:html={renderEqualization(history, bundle.deflator, base, "real")}
           />
         </BasisToggle>
+
+  {/* What the totals above are made of. No dollars here, so no basis toggle. */}
+  <Fragment set:html={renderLineOrigins(lines)} />
       </>
     )
   }

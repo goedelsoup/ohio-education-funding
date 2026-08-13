@@ -12,12 +12,12 @@
 use std::collections::{BTreeMap, BTreeSet, HashMap};
 
 use bundle::{
-    AppropriationYear, BaseCostBuildUp, Bundle, CareerTechnical, Categoricals, Checkpoint,
-    Deflator, District, DistrictOutcome, Dpia, EnglishLearners, FinanceYear, ForecastCheckpoint,
-    Gifted, HistoryYear, HouseDistrictMember, HouseDistrictShare, MealProgramYear, MillageAnalysis,
-    National, OutcomeStatewide, PolicyShape, Projection, PropertyTaxYear, RegimeCounterfactual,
-    SpecialEducation, SpendingByFunction, StateFinance, Statewide, TargetedAssistance,
-    CONTRACT_VERSION,
+    AppropriationLine, AppropriationYear, BaseCostBuildUp, Bundle, CareerTechnical, Categoricals,
+    Checkpoint, Deflator, District, DistrictOutcome, Dpia, EnglishLearners, FinanceYear,
+    ForecastCheckpoint, Gifted, HistoryYear, HouseDistrictMember, HouseDistrictShare,
+    MealProgramYear, MillageAnalysis, National, OutcomeStatewide, PolicyShape, Projection,
+    PropertyTaxYear, RegimeCounterfactual, SpecialEducation, SpendingByFunction, StateFinance,
+    Statewide, TargetedAssistance, CONTRACT_VERSION,
 };
 use dispersion::mr81::poverty_share_by_year;
 use dispersion::ohio_panel::{equalization_by_year, revenue_mix_by_year};
@@ -27,6 +27,7 @@ use foundation::{aggregate_base_cost, StatewideFactors};
 use project::appropriations;
 use project::finances::{finances, for_district, Finances};
 use project::legislative_district::{legislative_districts, overlaps, Chamber};
+use project::line_origins;
 use project::outcomes::{joined, Joined};
 use project::panel::{panel, DistrictRecord, HISTORY_YEARS, MINIMUM_STATE_SHARE, MODEL_YEAR};
 use project::policy::{GuaranteeRule, Policy};
@@ -764,6 +765,26 @@ fn appropriation_block() -> Vec<AppropriationYear> {
 /// succession established before it means anything.
 const FOUNDATION_LINES: [&str; 3] = ["200501", "200550", "200612"];
 
+/// The department's appropriation lines, with the act that created each.
+///
+/// Computed in [`project::line_origins`] from the Catalog's legal-basis clause. The current
+/// edition only — a line's origin does not change, so restating it once per edition would be
+/// eighteen chances for two editions' wording to disagree and no way to adjudicate.
+fn appropriation_lines() -> Vec<AppropriationLine> {
+    line_origins::current()
+        .into_iter()
+        .map(|line| AppropriationLine {
+            fund: line.fund,
+            ali: line.ali,
+            name: line.name,
+            established_by: line.established_by,
+            convened: line.general_assembly.map(line_origins::convened),
+            general_assembly: line.general_assembly,
+            discontinued: line.discontinued,
+        })
+        .collect()
+}
+
 /// The meal-program poverty share, year by year.
 ///
 /// Computed and tested in [`dispersion::mr81`], which excludes non-public sponsors and the
@@ -1370,6 +1391,7 @@ fn main() {
     let bundle = Bundle {
         national: national(),
         history: history.clone(),
+        appropriation_lines: appropriation_lines(),
         appropriations: appropriations.clone(),
         meal_program: meal_program(),
         house_districts: house_district_block(&records, Chamber::House),

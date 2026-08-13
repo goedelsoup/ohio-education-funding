@@ -37,6 +37,12 @@ use edfund_core::Dollars;
 
 /// The bundle schema version. Bump on any change to field names, units, or semantics.
 ///
+/// `31.0.0` added `appropriation_lines`: the department's line items with the act that created
+/// each, from the Catalog's `originally established by` clause. Additive in shape and breaking in
+/// meaning, because it changes what a consumer can say about the budget — not how much it is but
+/// how old it is, and roughly half the lines answer "unknown" rather than being filled from an
+/// earlier edition that reused their number.
+///
 /// `30.0.0` added `appropriations`: what the General Assembly set aside for the department, by
 /// fiscal year, FY2002 through FY2027, continuous for the first time. Breaking rather than
 /// additive because it changes what the feed *is* in the same way `28.0.0` did — every other
@@ -97,7 +103,7 @@ use edfund_core::Dollars;
 /// from FY2022-FY2024 to FY2024-FY2026 — the years the department's `ADM Data` sheet declares.
 /// The values did not change; what they are called did, which is exactly the kind of silent
 /// meaning change the version guard exists for.
-pub const CONTRACT_VERSION: &str = "30.0.0";
+pub const CONTRACT_VERSION: &str = "31.0.0";
 
 /// How close to the floor counts as being on it, in mills.
 ///
@@ -1295,6 +1301,10 @@ pub struct Bundle {
     /// The only part of the feed that reaches before FY2020, and the only part measured on
     /// something other than the department's own formula. See [`HistoryYear`].
     pub history: Vec<HistoryYear>,
+    /// The appropriation lines themselves, with the act that created each. Empty if absent.
+    ///
+    /// The current edition only, ordered by line item. See [`AppropriationLine`].
+    pub appropriation_lines: Vec<AppropriationLine>,
     /// What the General Assembly appropriated, year by year, oldest first. Empty if absent.
     ///
     /// The only block in this feed that is an input to the funding system rather than an output
@@ -1778,6 +1788,31 @@ impl Bundle {
                 escape(&a.source)
             ));
             if i + 1 < self.appropriations.len() {
+                s.push(',');
+            }
+            s.push('\n');
+        }
+        s.push_str("  ],\n");
+
+        // `established_by` is written even when empty, and `general_assembly` as `null` rather
+        // than omitted, so a consumer can tell "this line names no founding act" from "this feed
+        // predates the field".
+        s.push_str("  \"appropriation_lines\": [\n");
+        for (i, l) in self.appropriation_lines.iter().enumerate() {
+            s.push_str(&format!(
+                "    {{\"fund\": \"{}\", \"ali\": \"{}\", \"name\": \"{}\", \
+                 \"established_by\": \"{}\", \"general_assembly\": {}, \"convened\": {}, \
+                 \"discontinued\": {}}}",
+                escape(&l.fund),
+                escape(&l.ali),
+                escape(&l.name),
+                escape(&l.established_by),
+                l.general_assembly
+                    .map_or("null".to_string(), |v| v.to_string()),
+                l.convened.map_or("null".to_string(), |v| v.to_string()),
+                l.discontinued
+            ));
+            if i + 1 < self.appropriation_lines.len() {
                 s.push(',');
             }
             s.push('\n');
@@ -2708,6 +2743,28 @@ mod tests {
             history: Vec::new(),
             // Two years across the source change, so anything serializing this fixture carries
             // both labels rather than one.
+            // One dated line and one undated, so a serializer that omitted `null` rather than
+            // writing it would fail here.
+            appropriation_lines: vec![
+                AppropriationLine {
+                    fund: "GRF".into(),
+                    ali: "200502".into(),
+                    name: "Pupil Transportation".into(),
+                    established_by: "H.B. 191 of the 112th G.A.".into(),
+                    general_assembly: Some(112),
+                    convened: Some(1977),
+                    discontinued: false,
+                },
+                AppropriationLine {
+                    fund: "GRF".into(),
+                    ali: "200321".into(),
+                    name: "Operating Expenses".into(),
+                    established_by: String::new(),
+                    general_assembly: None,
+                    convened: None,
+                    discontinued: false,
+                },
+            ],
             appropriations: vec![
                 AppropriationYear {
                     fiscal_year: 2013,
@@ -3459,6 +3516,46 @@ pub struct AppropriationYear {
     pub items: usize,
     /// Which publication answers for this year: `workbook` or `catalog`.
     pub source: String,
+}
+
+/// One appropriation line the department is funded through, and the act that created it.
+///
+/// # What this is for
+///
+/// [`AppropriationYear`] says how much the department was given. This says what the giving is made
+/// of. Together they carry a fact neither carries alone: the department's budget is accreted
+/// rather than designed — the lines in force were created by acts spanning half a century, and
+/// the oldest still-live one predates every funding regime this corpus documents.
+///
+/// # Half of them say nothing about their origin
+///
+/// [`Self::general_assembly`] is `None` for roughly half the lines, because the Catalog's legal
+/// basis cites only their current authority. Those are carried as unknown rather than filled from
+/// an earlier edition with the same number: a line item number is reused — `200604` names three
+/// different programmes across three funds in this series — so inheriting an origin down a number
+/// attributes one programme's founding act to another's.
+///
+/// # `discontinued` is a label, not a finding
+///
+/// The publisher's own mark, and it does not distinguish abolition from consolidation: a line
+/// folded into another is discontinued too. Whether the department's disappearing lines were
+/// abolished or folded is an open question in `state-foundation-aid` that this does not settle.
+#[derive(Debug, Clone, PartialEq)]
+pub struct AppropriationLine {
+    /// The fund it is paid from.
+    pub fund: String,
+    /// The six-digit line item number.
+    pub ali: String,
+    /// Its name in the current edition.
+    pub name: String,
+    /// The act that established it, as the Catalog writes it. Empty when it names none.
+    pub established_by: String,
+    /// That act's General Assembly, and the year it convened. `None` when no act is named.
+    pub general_assembly: Option<u16>,
+    /// The year that General Assembly convened. `None` alongside `general_assembly`.
+    pub convened: Option<u16>,
+    /// Whether the Catalog marks the line discontinued.
+    pub discontinued: bool,
 }
 
 /// One October of the free and reduced-price lunch report, as a share.

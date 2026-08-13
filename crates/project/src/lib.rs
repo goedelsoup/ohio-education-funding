@@ -60,6 +60,7 @@ pub mod appropriations;
 pub mod crosswalk;
 pub mod finances;
 pub mod legislative_district;
+pub mod line_origins;
 pub mod outcomes;
 pub mod panel;
 pub mod policy;

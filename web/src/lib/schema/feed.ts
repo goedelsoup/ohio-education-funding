@@ -1009,6 +1009,31 @@ export const AppropriationYearSchema = z
   })
   .strict();
 
+/**
+ * One appropriation line the department is funded through, and the act that created it.
+ *
+ * `general_assembly` is `null` for roughly half the lines, because the Catalog's legal basis cites
+ * only their current authority. Carried as unknown rather than filled from an earlier edition with
+ * the same number: a line item number is reused, so inheriting an origin down a number would
+ * attribute one programme's founding act to another's.
+ *
+ * `discontinued` is the publisher's own label and does **not** distinguish abolition from
+ * consolidation — a line folded into another is discontinued too.
+ */
+export const AppropriationLineSchema = z
+  .object({
+    fund: z.string().min(1),
+    ali: z.string().min(1),
+    name: z.string().min(1),
+    /** The act as the Catalog writes it, or empty when it names none. */
+    established_by: z.string(),
+    general_assembly: z.number().int().nullable(),
+    /** The year that General Assembly convened. `null` alongside `general_assembly`. */
+    convened: z.number().int().nullable(),
+    discontinued: z.boolean(),
+  })
+  .strict();
+
 /** The whole feed. */
 export const BundleSchema = z
   .object({
@@ -1027,6 +1052,8 @@ export const BundleSchema = z
     history: z.array(HistoryYearSchema),
     /** What the General Assembly appropriated, by fiscal year, oldest first. Empty if absent. */
     appropriations: z.array(AppropriationYearSchema),
+    /** The lines themselves, with the act that created each. Empty if absent. */
+    appropriation_lines: z.array(AppropriationLineSchema),
     /** The meal-program poverty share by October, oldest first. Empty if absent. */
     meal_program: z.array(MealProgramYearSchema),
     house_districts: z.array(HouseDistrictSchema),
@@ -1051,6 +1078,7 @@ export type National = z.infer<typeof NationalSchema>;
 export type HistoryYear = z.infer<typeof HistoryYearSchema>;
 export type MealProgramYear = z.infer<typeof MealProgramYearSchema>;
 export type AppropriationYear = z.infer<typeof AppropriationYearSchema>;
+export type AppropriationLine = z.infer<typeof AppropriationLineSchema>;
 export type Deflator = z.infer<typeof DeflatorSchema>;
 export type PolicyShape = z.infer<typeof PolicyShapeSchema>;
 export type Checkpoint = z.infer<typeof CheckpointSchema>;
