@@ -233,3 +233,64 @@ fn every_line_item_names_the_act_that_authorises_it() {
         );
     }
 }
+
+#[test]
+fn the_catalog_closes_the_two_gaps_and_contributes_nothing_else() {
+    /*
+     * The join rule, asserted from the outside. The workbook series carries an enacted figure for
+     * every year from FY2002 to FY2027 except FY2006, FY2007, FY2012 and FY2013 — the two
+     * bienniums `the-greenbook-series` recorded as unretrievable. The Catalog supplies exactly
+     * those and is not consulted anywhere else.
+     *
+     * "Exactly those" is the part worth a test. The Catalog covers FY2006-FY2027, so a merge that
+     * did not check coverage first would add a second enacted figure for eighteen years that
+     * already have one, and every total downstream would roughly double without any row looking
+     * wrong.
+     */
+    let enacted = project::appropriations::enacted_history(edfund_core::FiscalYear(2025));
+    let years: Vec<u16> = enacted.iter().map(|y| y.fiscal_year).collect();
+    assert_eq!(
+        years,
+        (2002..=2027).collect::<Vec<u16>>(),
+        "the enacted series is no longer continuous"
+    );
+
+    // Item counts move with the department's structure, never by a factor of two.
+    for pair in enacted.windows(2) {
+        let (before, after) = (&pair[0], &pair[1]);
+        assert!(
+            after.items < before.items * 2,
+            "FY{} has {} line items against FY{}'s {} — a year is being counted twice",
+            after.fiscal_year,
+            after.items,
+            before.fiscal_year,
+            before.items
+        );
+    }
+}
+
+#[test]
+fn the_appropriation_grew_in_nominal_dollars_and_did_not_in_real_ones() {
+    /*
+     * Why the series was worth building. "Record investment in education" is a true sentence about
+     * nearly every biennium here and an empty one: across FY2002-FY2025 the nominal appropriation
+     * roughly doubles, and in constant dollars the same series is close to flat.
+     *
+     * Bounded rather than pinned, because the fixture is regenerated from sources that revise.
+     */
+    let h = project::appropriations::enacted_history(edfund_core::FiscalYear(2025));
+    let first = h.first().expect("a series");
+    let last = h
+        .iter()
+        .rev()
+        .find(|y| y.real.is_some())
+        .expect("a real year");
+
+    let nominal_growth = last.nominal / first.nominal;
+    let real_growth = last.real.expect("real") / first.real.expect("real");
+    assert!(nominal_growth > 1.5, "nominal grew {nominal_growth:.2}x");
+    assert!(
+        real_growth < nominal_growth * 0.75,
+        "real growth {real_growth:.2}x is no longer far below nominal {nominal_growth:.2}x"
+    );
+}

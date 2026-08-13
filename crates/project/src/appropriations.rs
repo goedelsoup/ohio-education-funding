@@ -24,9 +24,33 @@
 //! - **The property tax reimbursement lines are not the department's budget.** They are numbered
 //!   `200xxx` and LSC states they sit in the State Revenue Distributions section. `200903` alone
 //!   is $1.3 billion a year, so including them overstates the department by roughly 9%.
-//! - **FY2012-13 has no enacted figure at all**, because LSC serves that biennium's two workbook
-//!   variants as the same file. The enacted series therefore starts at FY2014, and
-//!   [`enacted_history`] returns what exists rather than interpolating across it.
+//! - **FY2012-13 had no enacted figure in the workbook series at all**, because LSC serves that
+//!   biennium's two workbook variants as the same file. That gap is now filled from a second
+//!   publication — see below — and the workbook series still carries nothing for it.
+//!
+//! # Two sources, and which one answers for a year
+//!
+//! The workbooks and greenbooks carry an enacted figure for FY2002-FY2005, FY2008-FY2011 and
+//! FY2014-FY2027 — everything except two bienniums. Those two are the ones
+//! [`the-greenbook-series`](../../../.yidam/decisions/the-greenbook-series.yml) recorded as
+//! unretrievable: **FY2006-07**, whose greenbook has no line-item table at all, and **FY2012-13**,
+//! whose two workbook variants LSC serves as the same file.
+//!
+//! The [Catalog of Budget Line Items](../../../.yidam/catalog/lsc-catalog-of-budget-line-items.md)
+//! carries all four, and contributes **only** those four. With them the enacted series is
+//! continuous from FY2002 to FY2027 for the first time.
+//!
+//! Where both speak, the workbook series answers, and the Catalog is not consulted. That is not a
+//! preference between publishers: they agree. Across 1,712 overlapping enacted claims the two
+//! extractions do not differ by a cent — see
+//! [`two_sources_for_one_appropriation`](../../tests/two_sources_for_one_appropriation.rs) — so
+//! the rule exists to make the series reproducible rather than to arbitrate, and a year is
+//! answered by exactly one document either way.
+//!
+//! The Catalog is used **only for enacted figures in years the workbook series does not cover**.
+//! Its actuals are deliberately left out: those two sources *do* disagree, about one time in
+//! twenty, because an actual is restated as a year closes. Mixing them would build a series whose
+//! vintage changed halfway along without saying so.
 
 use std::collections::BTreeMap;
 
@@ -35,6 +59,9 @@ use edfund_core::FiscalYear;
 
 /// The committed series.
 const SERIES: &str = include_str!("../fixtures/appropriation-lines.csv");
+
+/// The Catalog extract, which reaches back further.
+const CATALOG: &str = include_str!("../fixtures/catalog-line-items.csv");
 
 /// Line items that are numbered as the department's and are not part of its budget.
 ///
@@ -106,6 +133,56 @@ pub fn lines() -> Vec<Line> {
         .collect()
 }
 
+/// Enacted lines from the Catalog, for years the workbook series does not carry.
+///
+/// The Catalog restates six fiscal years per edition, so the same year appears in up to four of
+/// them — but an enacted figure is printed by exactly one, the edition published when the biennium
+/// was enacted. Later editions replace it with `Adj. Approp.`, which this never reads. So no
+/// deduplication is needed here and none is done: if two editions ever claimed one year as
+/// enacted, the count below would rise and the test on it would fail rather than silently double a
+/// total.
+#[must_use]
+fn catalog_enacted() -> Vec<Line> {
+    let covered: BTreeMap<u16, ()> = lines()
+        .into_iter()
+        .filter(|l| l.kind == "enacted")
+        .map(|l| (l.fiscal_year, ()))
+        .collect();
+    CATALOG
+        .lines()
+        .skip(1)
+        .filter(|row| !row.trim().is_empty())
+        .filter_map(|row| {
+            let field: Vec<&str> = row.split(',').collect();
+            if field.len() < 7 || field[5] != "appropriation" {
+                return None;
+            }
+            let fiscal_year: u16 = field[4].parse().ok()?;
+            if covered.contains_key(&fiscal_year) {
+                return None;
+            }
+            Some(Line {
+                fiscal_year,
+                kind: "enacted".to_string(),
+                line_item: field[2].to_string(),
+                title: field[3].to_string(),
+                amount: field[6].parse().ok()?,
+            })
+        })
+        .collect()
+}
+
+/// Every enacted line, from whichever of the two sources answers for its year.
+#[must_use]
+pub fn enacted_lines() -> Vec<Line> {
+    let mut out: Vec<Line> = lines()
+        .into_iter()
+        .filter(|l| l.kind == "enacted")
+        .collect();
+    out.extend(catalog_enacted());
+    out
+}
+
 /// One year of the department's appropriation, nominal and real.
 #[derive(Debug, Clone, Copy, PartialEq)]
 pub struct Year {
@@ -121,14 +198,15 @@ pub struct Year {
 
 /// The department's enacted appropriation by year, restated into `base` dollars.
 ///
-/// Excludes [`TAX_REIMBURSEMENT`]. Returns only the years the series carries an enacted figure
-/// for, which is FY2014 onward — see the module note on FY2012-13.
+/// Excludes [`TAX_REIMBURSEMENT`]. Returns only the years an enacted figure exists for, which is
+/// FY2002 onward and now without a gap. FY2006-07 and FY2012-13 come from the Catalog and every
+/// other year from the workbooks — see the module note on which source answers for a year.
 #[must_use]
 pub fn enacted_history(base: FiscalYear) -> Vec<Year> {
     let cpi = CpiSeries::cpi_u_june();
     let mut totals: BTreeMap<u16, (f64, usize)> = BTreeMap::new();
-    for line in lines() {
-        if line.kind != "enacted" || TAX_REIMBURSEMENT.contains(&line.line_item.as_str()) {
+    for line in enacted_lines() {
+        if TAX_REIMBURSEMENT.contains(&line.line_item.as_str()) {
             continue;
         }
         let entry = totals.entry(line.fiscal_year).or_insert((0.0, 0));
