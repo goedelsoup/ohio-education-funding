@@ -923,7 +923,24 @@ pub fn rebuild(root: &Path) -> Result<Vec<Rebuilt>, RebuildError> {
         },
     });
 
-    // Eleven Octobers of the child nutrition report, aggregated from school sites to sponsors.
+    // Sixteen school years of the federal agency directory, Ohio only. The one fixture here whose
+    // point is *membership* rather than any figure: which agencies existed in which year.
+    out.push(match ccd_directory(root) {
+        Ok(rows) => Rebuilt::Written {
+            path: fixtures::CCD_DIRECTORY_FIXTURE.to_string(),
+            rows: fixtures::write_csv(
+                &root.join(fixtures::CCD_DIRECTORY_FIXTURE),
+                fixtures::CCD_DIRECTORY_HEADER,
+                &rows,
+            )?,
+        },
+        Err(reason) => Rebuilt::Skipped {
+            path: fixtures::CCD_DIRECTORY_FIXTURE.to_string(),
+            reason,
+        },
+    });
+
+    // Seventeen Octobers of the child nutrition report, aggregated from school sites to sponsors.
     out.push(match mr81_panel(root) {
         Ok(rows) => Rebuilt::Written {
             path: fixtures::MR81_FIXTURE.to_string(),
@@ -989,6 +1006,35 @@ fn zip_member(root: &Path, source: &Source, suffix: &str) -> Result<String, Stri
     archive
         .read_to_string(name)
         .map_err(|cause| format!("{}: {cause}", source.key))
+}
+
+/// The same, read byte for byte as Latin-1 rather than as UTF-8.
+///
+/// The 2020-21 directory carries a cp1252 en dash in an Arkansas agency's name, and
+/// [`Archive::read_to_string`](spreadsheet::zip::Archive::read_to_string) replaces what it cannot
+/// decode. A replacement character in a committed fixture is a corruption that looks like data,
+/// which is the failure the MR-81 reader was written to avoid.
+fn zip_member_latin1(root: &Path, source: &Source, suffix: &str) -> Result<String, String> {
+    let bytes = cache::read_cached(root, source).map_err(|cause| cause.to_string())?;
+    let archive = spreadsheet::zip::Archive::open(bytes)
+        .map_err(|cause| format!("{}: {cause}", source.key))?;
+    let named: Vec<&str> = archive
+        .entries()
+        .iter()
+        .map(|e| e.name.as_str())
+        .filter(|name| name.to_ascii_lowercase().ends_with(suffix))
+        .collect();
+    let [name] = named[..] else {
+        return Err(format!(
+            "{} holds {} members ending in {suffix}, expected exactly one",
+            source.key,
+            named.len()
+        ));
+    };
+    let raw = archive
+        .read(name)
+        .map_err(|cause| format!("{}: {cause}", source.key))?;
+    Ok(raw.iter().map(|b| *b as char).collect())
 }
 
 /// Block populations from the PL 94-171 release: block code to total and under-18 count.
@@ -1070,10 +1116,13 @@ const F33_PANEL_YEARS: &[(u16, &str)] = &[
     (2022, "sdf22-districts"),
 ];
 
-/// Ohio across every year of the survey, from ten archives and one directory.
+/// Ohio across every year of the survey, from thirteen archives and sixteen directories.
+///
+/// The directory is rebuilt here rather than read from its own committed fixture, so a rebuild
+/// cannot produce a panel keyed on a directory vintage the fixture no longer holds. It is the
+/// same rows [`ccd_directory`] writes.
 fn f33_ohio_panel(root: &Path) -> Result<Vec<Vec<String>>, String> {
-    let directory = source("ccd-lea-directory-2223").expect("registered").1;
-    let directory = zip_member(root, directory, ".csv")?;
+    let directory = ccd_directory(root)?;
 
     // Read every archive first: the member text has to outlive the borrow the builder takes, and
     // 30 MB of survey held at once is cheaper than a builder that takes a closure.
@@ -1090,6 +1139,43 @@ fn f33_ohio_panel(root: &Path) -> Result<Vec<Vec<String>>, String> {
         })
         .collect();
     fixtures::build_f33_ohio_panel(&years, &directory)
+}
+
+/// The school years of the LEA directory this repository holds, as the year each one opens in.
+///
+/// 2008-09 because that is the first year `f33-ohio-panel.csv` covers, and 2023-24 because that is
+/// the latest NCES has published. The fourteen years before 2008-09 are retrievable and are a
+/// different reader: fixed-width, no header, and the column positions move in seven of the nine
+/// years between 1998-99 and 2006-07.
+const CCD_DIRECTORY_YEARS: &[u16] = &[
+    2008, 2009, 2010, 2011, 2012, 2013, 2014, 2015, 2016, 2017, 2018, 2019, 2020, 2021, 2022, 2023,
+];
+
+/// The Ohio slice of every directory year, from the cached zips.
+fn ccd_directory(root: &Path) -> Result<Vec<Vec<String>>, String> {
+    let mut texts = Vec::new();
+    for opens in CCD_DIRECTORY_YEARS {
+        let key = format!(
+            "ccd-lea-directory-{:02}{:02}",
+            opens % 100,
+            (opens + 1) % 100
+        );
+        let source = source(&key).expect("registered").1;
+        // The member is chosen by extension because its name carries a release date that changes
+        // when NCES reposts, and because the modern archives hold the same directory twice — once
+        // as text and once as a SAS table nothing here can read.
+        let suffix = if *opens >= 2015 { ".csv" } else { ".txt" };
+        texts.push(zip_member_latin1(root, source, suffix)?);
+    }
+    let years: Vec<fixtures::DirectoryYear<'_>> = CCD_DIRECTORY_YEARS
+        .iter()
+        .zip(&texts)
+        .map(|(opens, text)| fixtures::DirectoryYear {
+            opens: *opens,
+            text,
+        })
+        .collect();
+    fixtures::build_ccd_directory(&years)
 }
 
 /// Every MR-81 file this repository reads: seventeen Octobers in twenty-one publications.

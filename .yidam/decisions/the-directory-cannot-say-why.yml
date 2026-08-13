@@ -1,0 +1,114 @@
+id: the-directory-cannot-say-why
+summary: >-
+  Sixteen years of the federal agency directory wired, which names every agency the F-33 panel
+  carries — and establishes that the count the panel called a consolidation history was ninety-
+  seven per cent community-school churn, and that Ohio has never once filed the code that would
+  have settled the rest.
+context: |
+  `nces-ccd` was wired for a single year, 2022-23, because that year carried the one column two
+  other connectors were waiting on: `ST_LEAID`, which is the Ohio IRN behind an `OH-` prefix. The
+  connector's blocker said the rest needed "a consolidation-aware long series", and named two
+  obstacles — per-year zips whose column sets change, and an identifier-change history that "has
+  to be derived rather than read".
+
+  The consumer that made this worth taking up is `crates/dispersion/src/ohio_panel.rs`. It builds
+  Ohio's F-33 finance panel across thirteen fiscal years and resolved every agency's IRN through
+  that one 2022-23 directory, so an agency that closed earlier had no IRN at all: 141 in FY2009,
+  124 in FY2012, 0 in FY2022. Its own docstring drew the conclusion:
+
+    > the count going from 124 in FY2012 to 0 in FY2022 *is* the consolidation history, measured.
+
+  That sentence is what this phase set out to check, and it is wrong.
+decision: |
+  Wire the **sixteen school years 2008-09 through 2023-24** — the whole delimited era, and exactly
+  the span the F-33 panel covers. Commit them as one row per Ohio agency per year:
+  `crates/dispersion/fixtures/ccd-lea-directory.csv`, 17,618 agency-years.
+
+  Resolve the panel's identifiers against **the directory for the panel's own year**, falling
+  forward to the nearest later year only where the contemporaneous one is not held.
+
+  **Publish no reason for any departure.** Carry the operational status code verbatim and read
+  nothing out of it. Hold the negative — that Ohio has never filed the consolidation code — as a
+  function with a test on it rather than as a remark, so the day the source starts answering, the
+  build fails instead of the corpus going on saying the question is unanswerable.
+
+  Leave the fourteen fixed-width years, 1994-95 through 2007-08, retrievable and unwired, with
+  what they would cost written down.
+consequences: |
+  **Every agency in every year is now named.** Unnamed agency-years go from 1,046 to zero. And
+  **no published figure moved**: the feed is byte-identical, because every one of those 1,046 rows
+  was a non-comparable agency the aggregates already excluded. That is the first evidence that the
+  count was not measuring what the docstring said — a hundred and twenty-four agencies whose
+  presence or absence cannot move a district statistic are not a district consolidation history.
+
+  **The composition settles it.** 341 agencies leave the directory across the window: **327
+  community schools, nine service agencies, five regular districts.** Two of the five are STEM
+  schools, which Ohio funds as their own unit under R.C. 3326 and the federal directory types as
+  regular districts. So the genuine traditional-district consolidations in sixteen years are
+  **three** — Bettsville Local, Ledgemont Local, Newbury Local — and the panel's own comparable
+  population barely moves across the same span, 612 agencies in FY2009 against 611 in FY2022.
+  The docstring's number was out by roughly a hundred to one.
+
+  **The reason for a departure is not derivable, and the source is worse than silent.** The CCD
+  defines eight operational-status codes and exactly one marks a consolidation: code 5,
+  *"significant change in geographic boundaries or instructional responsibility"*. Ohio has filed
+  it **zero times** in 17,618 agency-years here, and zero times in the twenty-six years back to
+  1998-99 that were checked and not wired. What Ohio files instead, for **all 341 departures with
+  no exception**, is code 2: *"closed with no effect on another agency's boundaries."*
+
+  For the three real consolidations that is false. Bettsville's territory went to Old Fort,
+  Ledgemont's to Berkshire, Newbury's to West Geauga and Chardon — and all four receiving
+  districts are coded `1 Open` in the year before, the year of, and the year after. The departing
+  row asserts the negation of what happened; the surviving row records nothing at all.
+
+  **The two obvious derivations were tested rather than assumed away.** Enrolment absorption on
+  the survivor is confounded roughly fifty to one by ordinary growth — 141 comparable-district
+  year-pairs gain more pupils than Bettsville ever had — and it gets the *sign* wrong on Newbury,
+  where Chardon lost 110 pupils the same year it received some of them. Name changes on the
+  survivor arrive up to two years out of alignment with the closure they supposedly record, and
+  share a vocabulary with cosmetic re-spellings: `ESC of Cuyahoga County` becoming `ESC of
+  Northeast Ohio` looks exactly like `Mercer County ESC` becoming `Mercer County Educational
+  Service Center`.
+
+  **Two columns that look like they would help do not.** `UPDATED_STATUS` is byte-identical to
+  `SY_STATUS` on every Ohio row from 2014 to 2023. `EFFECTIVE_DATE` holds one value per release —
+  it is when the file was cut, not when anything took effect.
+
+  **Three seams a single reader has to cross**, each capable of matching nothing silently. The
+  columns carry a year suffix through 2009-10 (`STID09`, `BOUND09`) and lose it after. The
+  delimiter is tab through 2014-15 and comma after. And `ST_LEAID` is a bare six-digit IRN through
+  2015-16 and `OH-043786` from 2016-17. Ohio is selected on `FIPST` and never on `LSTATE`, which
+  disagree in both directions: Urban Pathways of Youngstown is `FIPST=39, LSTATE=PA`, and earlier
+  years file an Arizona agency as `LSTATE=OH` with an Ohio-shaped state id beside it.
+
+  **What is still not here.** The fourteen years 1994-95 through 2007-08, all retrievable, all
+  fixed-width with no header and the column positions moving in seven of the nine years between
+  1998-99 and 2006-07. And the reason any district went, which needs Ohio's own territory-transfer
+  orders under R.C. 3311 — the same answer
+  [state-foundation-aid](../corpus/revenue-stream/state-foundation-aid.yml) already reached about
+  the department's disappearing appropriation lines, and for the same reason.
+alternatives: |
+  **Classify from the status code.** Rejected on the evidence rather than on principle. If Ohio
+  populated code 5 this would be a direct read and worth having; it does not, and the code it does
+  populate states the opposite of the truth for every case anyone would want to look up.
+
+  **Identify the successor by enrolment absorption.** Rejected at roughly forty-seven false
+  positives per true positive, and on getting Newbury backwards. A district of 400 vanishing the
+  year a neighbour grows by 400 is suggestive and is not proof, and an unproven join in a
+  committed fixture is worse than an absent one because nothing downstream can tell them apart.
+
+  **Publish the three known consolidations as facts, sourced from county records.** Rejected as
+  out of scope rather than as wrong — they are true, and this repository's rule is that a claim
+  reaches a corpus node through a committed primary source in one hop. The three are named in the
+  module and in the catalog record precisely so that someone can go and fetch those orders.
+
+  **Wire all thirty years while the discovery was in hand.** Rejected. The fixed-width era needs a
+  per-year position table for seven distinct layouts, and the F-33 panel it would serve does not
+  reach before FY2009 — so it would be a second reader built for no consumer. The URLs and the
+  layout hazards are written down in the catalog record, which is the cheap half of that work.
+
+  **Leave `unnamed_agencies` reporting the gap.** Rejected, and it is kept with its assertion
+  inverted instead. The function now says zero and a test holds it there, because the property
+  worth guarding turned out to be the opposite of the one it was written for: not "how much can
+  the directory not name" but "the directory names everything, and a hole here is a retrieval
+  failure rather than a fact about Ohio".
