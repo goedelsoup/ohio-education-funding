@@ -1967,3 +1967,53 @@ test.describe("the count the poverty weight is paid on", () => {
     await expect(card).toContainText("formula side");
   });
 });
+
+test.describe("what the legislature set aside", () => {
+  test("the appropriation card is on the page and reaches FY2002", async ({ page }) => {
+    // The series exists in the crates since the Catalog extraction; this is the test that would
+    // have failed while it was reachable only by running cargo.
+    await page.goto("/history");
+    const card = page.locator('.card[data-part="appropriations"]').first();
+    await expect(card).toBeVisible();
+    await expect(card).toContainText("FY2002");
+    await expect(card).toContainText("What the legislature set aside");
+  });
+
+  test("both dollar bases are in the document, so the switch works without script", async ({
+    page,
+  }) => {
+    /*
+     * The whole argument for this card is that the nominal and real readings of one series support
+     * opposite sentences. A reader who gets only the nominal panel has been shown the claim
+     * without the check — so both are baked in at build, as `BasisToggle` requires.
+     */
+    await page.goto("/history");
+    const cards = page.locator('.card[data-part="appropriations"]');
+    await expect(cards).toHaveCount(2);
+    await expect(cards.first()).toContainText("the dollars of each year");
+    await expect(cards.last()).toContainText("constant FY");
+  });
+
+  test("the card says which publication each year came from", async ({ page }) => {
+    // Four years rest on a different document from the rest. The two agree to the cent where both
+    // speak, so the column records provenance rather than doubt — and the card says so.
+    await page.goto("/history");
+    const card = page.locator('.card[data-part="appropriations"]').first();
+    await expect(card).toContainText("Catalog");
+    await expect(card).toContainText("Greenbook");
+    await expect(card).toContainText("agree to the cent");
+  });
+
+  test("the appropriation is never shown per pupil", async ({ page }) => {
+    /*
+     * The hazard `denominators.ts` records for this block. A statewide appropriation over a pupil
+     * count would be a per-pupil figure on a denominator nothing else here uses, a scroll away
+     * from the formula's own per-pupil numbers — and it would be a rate for money no pupil
+     * necessarily received, since an appropriation is a ceiling.
+     */
+    await page.goto("/history");
+    const card = page.locator('.card[data-part="appropriations"]').first();
+    await expect(card).not.toContainText("per pupil");
+    await expect(card).not.toContainText("per-pupil");
+  });
+});

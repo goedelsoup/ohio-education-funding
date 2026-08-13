@@ -37,6 +37,14 @@ use edfund_core::Dollars;
 
 /// The bundle schema version. Bump on any change to field names, units, or semantics.
 ///
+/// `30.0.0` added `appropriations`: what the General Assembly set aside for the department, by
+/// fiscal year, FY2002 through FY2027, continuous for the first time. Breaking rather than
+/// additive because it changes what the feed *is* in the same way `28.0.0` did — every other
+/// figure here is an output of the funding system, and this is an input to it. An appropriation is
+/// a ceiling and a payment is what was made; differencing the two produces a number that means
+/// nothing, and the deflator now reaches FY2002 so the series can be read in constant dollars,
+/// which is the only way it can be read at all.
+///
 /// `29.0.0` added `meal_program`: the free and reduced-price lunch share for FY2001 through
 /// FY2011, from the Office for Child Nutrition's MR-81. Additive in shape and breaking in
 /// meaning, on the same reasoning as `28.0.0` — this is now the third population and the third
@@ -89,7 +97,7 @@ use edfund_core::Dollars;
 /// from FY2022-FY2024 to FY2024-FY2026 — the years the department's `ADM Data` sheet declares.
 /// The values did not change; what they are called did, which is exactly the kind of silent
 /// meaning change the version guard exists for.
-pub const CONTRACT_VERSION: &str = "29.0.0";
+pub const CONTRACT_VERSION: &str = "30.0.0";
 
 /// How close to the floor counts as being on it, in mills.
 ///
@@ -1287,6 +1295,11 @@ pub struct Bundle {
     /// The only part of the feed that reaches before FY2020, and the only part measured on
     /// something other than the department's own formula. See [`HistoryYear`].
     pub history: Vec<HistoryYear>,
+    /// What the General Assembly appropriated, year by year, oldest first. Empty if absent.
+    ///
+    /// The only block in this feed that is an input to the funding system rather than an output
+    /// of it. See [`AppropriationYear`].
+    pub appropriations: Vec<AppropriationYear>,
     /// The meal-program poverty share, October by October, oldest first. Empty if absent.
     ///
     /// Reaches back further than [`Self::history`] — FY2001 against FY2009 — and on a third
@@ -1744,6 +1757,27 @@ impl Bundle {
                 escape(&m.basis)
             ));
             if i + 1 < self.meal_program.len() {
+                s.push(',');
+            }
+            s.push('\n');
+        }
+        s.push_str("  ],\n");
+
+        // `source` on every row rather than only where it changes, for the same reason
+        // `meal_program` writes its basis on every row: a consumer reading one row must be able to
+        // tell which document it came from without scanning back for the last row that said.
+        s.push_str("  \"appropriations\": [\n");
+        for (i, a) in self.appropriations.iter().enumerate() {
+            s.push_str(&format!(
+                "    {{\"fiscal_year\": {}, \"enacted\": {}, \"foundation_funding\": {}, \
+                 \"items\": {}, \"source\": \"{}\"}}",
+                a.fiscal_year,
+                num(a.enacted),
+                num(a.foundation_funding),
+                a.items,
+                escape(&a.source)
+            ));
+            if i + 1 < self.appropriations.len() {
                 s.push(',');
             }
             s.push('\n');
@@ -2672,6 +2706,24 @@ mod tests {
             deflator: None,
             national: None,
             history: Vec::new(),
+            // Two years across the source change, so anything serializing this fixture carries
+            // both labels rather than one.
+            appropriations: vec![
+                AppropriationYear {
+                    fiscal_year: 2013,
+                    enacted: 9_322_046_458.0,
+                    foundation_funding: 6_349_290_686.0,
+                    items: 115,
+                    source: "catalog".into(),
+                },
+                AppropriationYear {
+                    fiscal_year: 2014,
+                    enacted: 9_871_965_322.0,
+                    foundation_funding: 6_547_098_389.0,
+                    items: 109,
+                    source: "workbook".into(),
+                },
+            ],
             // Two rows spanning the basis change, so anything serializing this fixture has to
             // carry both names rather than one.
             meal_program: vec![
@@ -3361,6 +3413,52 @@ impl HistoryYear {
     pub fn residual_per_pupil(&self) -> f64 {
         self.gap_per_pupil - self.state_closes_per_pupil - self.federal_closes_per_pupil
     }
+}
+
+/// One fiscal year of what the General Assembly appropriated to the department.
+///
+/// # An appropriation is not a payment
+///
+/// This is what was set aside, not what a district received. An appropriation is a ceiling, and
+/// the formula's own proration factor exists because at least one line has been a residual
+/// claimant. A difference between this and the payment reports is not an error in either, and the
+/// two must never be differenced to produce a third figure.
+///
+/// # Why the source is carried
+///
+/// Two publications answer for this series and they are not interchangeable, even though they
+/// agree. The workbooks and greenbooks cover every year but four; the Catalog of Budget Line Items
+/// covers **FY2006-07 and FY2012-13**, the two bienniums the workbook route cannot reach — one
+/// because the 126th's greenbook has no line-item table at all, the other because LSC serves that
+/// biennium's two workbook variants as the same file.
+///
+/// Across the 1,712 claims where both speak, the two extractions do not differ by a cent. Carrying
+/// [`Self::source`] is therefore not a hedge about accuracy; it is so a reader can see that four
+/// years of this series rest on a different document from the rest, and check them separately if
+/// the difference ever starts to matter.
+///
+/// # No dollars per pupil here, deliberately
+///
+/// A statewide appropriation divided by a pupil count would be a per-pupil figure on a denominator
+/// no other figure in this feed uses, sitting one division away from the formula's own per-pupil
+/// numbers. The block carries totals and nothing else.
+#[derive(Debug, Clone, PartialEq)]
+pub struct AppropriationYear {
+    /// The fiscal year.
+    pub fiscal_year: u16,
+    /// Everything the department was appropriated that year, in that year's dollars.
+    ///
+    /// Excludes the property tax reimbursement lines, which are numbered as the department's and
+    /// are not its budget — `200903` alone is $1.3 billion a year.
+    pub enacted: f64,
+    /// The two foundation funding lines together: GRF `200550` and Lottery `200612`.
+    ///
+    /// The formula's own appropriation, as against everything else the department is given.
+    pub foundation_funding: f64,
+    /// How many line items the total is over.
+    pub items: usize,
+    /// Which publication answers for this year: `workbook` or `catalog`.
+    pub source: String,
 }
 
 /// One October of the free and reduced-price lunch report, as a share.

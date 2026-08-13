@@ -23,6 +23,21 @@
  *
  * It cannot check prose. A sentence putting two figures side by side is still a human's
  * responsibility; what this removes is the excuse of not knowing.
+ *
+ * # One block is absent from this file on purpose
+ *
+ * `appropriations` carries no per-pupil figure and no pupil count, so the walk below never reaches
+ * it and nothing here declares it. That is the design rather than an oversight: a statewide
+ * appropriation divided by a pupil count would be a per-pupil figure on a *seventh* denominator,
+ * rendered a scroll away from the formula's own per-pupil numbers on this site's longest-running
+ * page.
+ *
+ * The temptation is specific and will arrive: "state aid per pupil, 2002 to 2027" is the obvious
+ * chart to want from that series, and the obvious denominator to reach for is whichever ADM is
+ * nearest to hand. An appropriation is also a ceiling rather than a payment, so the result would
+ * be a per-pupil figure for money no pupil necessarily received. If a per-pupil appropriation is
+ * ever wanted, it needs an entry in `DENOMINATORS` naming the count and the year it comes from,
+ * like everything else here.
  */
 
 /** The pupil counts the sources use. Distinct measures, not variants of one. */

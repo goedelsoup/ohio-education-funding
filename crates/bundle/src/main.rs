@@ -9,13 +9,13 @@
 //! aggregates, runs a fixed set of policies to produce [`bundle::Checkpoint`]s, and prints JSON.
 //! All the logic worth testing lives in the two libraries.
 
-use std::collections::HashMap;
+use std::collections::{BTreeMap, BTreeSet, HashMap};
 
 use bundle::{
-    BaseCostBuildUp, Bundle, CareerTechnical, Categoricals, Checkpoint, Deflator, District,
-    DistrictOutcome, Dpia, EnglishLearners, FinanceYear, ForecastCheckpoint, Gifted, HistoryYear,
-    HouseDistrictMember, HouseDistrictShare, MealProgramYear, MillageAnalysis, National,
-    OutcomeStatewide, PolicyShape, Projection, PropertyTaxYear, RegimeCounterfactual,
+    AppropriationYear, BaseCostBuildUp, Bundle, CareerTechnical, Categoricals, Checkpoint,
+    Deflator, District, DistrictOutcome, Dpia, EnglishLearners, FinanceYear, ForecastCheckpoint,
+    Gifted, HistoryYear, HouseDistrictMember, HouseDistrictShare, MealProgramYear, MillageAnalysis,
+    National, OutcomeStatewide, PolicyShape, Projection, PropertyTaxYear, RegimeCounterfactual,
     SpecialEducation, SpendingByFunction, StateFinance, Statewide, TargetedAssistance,
     CONTRACT_VERSION,
 };
@@ -24,6 +24,7 @@ use dispersion::ohio_panel::{equalization_by_year, revenue_mix_by_year};
 use dispersion::{partial_correlation, wealth_neutrality};
 use edfund_core::{AgencyType, FiscalYear};
 use foundation::{aggregate_base_cost, StatewideFactors};
+use project::appropriations;
 use project::finances::{finances, for_district, Finances};
 use project::legislative_district::{legislative_districts, overlaps, Chamber};
 use project::outcomes::{joined, Joined};
@@ -681,6 +682,88 @@ fn history() -> Vec<HistoryYear> {
         .collect()
 }
 
+/// What the General Assembly appropriated, year by year.
+///
+/// Computed and tested in [`project::appropriations`], which excludes the property tax
+/// reimbursement lines and joins two publications so the enacted series is continuous — the
+/// Catalog of Budget Line Items answers for FY2006-07 and FY2012-13 and the workbooks for
+/// everything else.
+///
+/// Unlike [`meal_program`] this **is** passed to [`deflator_years`]. It is dollars across
+/// twenty-six years, and CPI-U roughly doubles across them: the nominal series grows by half and
+/// the real one is close to flat, so a page showing this without the index does not merely lose
+/// precision, it reports the opposite of what happened.
+fn appropriation_block() -> Vec<AppropriationYear> {
+    // The base year is irrelevant here — only `nominal` is carried into the feed, and the web
+    // layer deflates against `bundle.deflator` like every other financial view. Passing the model
+    // year keeps the call honest rather than inventing a base the feed does not use.
+    let by_year: HashMap<u16, usize> = appropriations::enacted_history(MODEL_YEAR)
+        .into_iter()
+        .map(|y| (y.fiscal_year, y.items))
+        .collect();
+
+    let mut totals: BTreeMap<u16, (f64, f64)> = BTreeMap::new();
+    let mut from_catalog: BTreeSet<u16> = BTreeSet::new();
+    // Which years the workbook series answers for. Everything else came from the Catalog, and the
+    // rule is read off the fixture rather than hard-coded, so a later extraction that closes
+    // FY2012-13 from the workbooks re-labels these rows without anyone editing a list of years.
+    let workbook_years: BTreeSet<u16> = appropriations::lines()
+        .into_iter()
+        .filter(|l| l.kind == "enacted")
+        .map(|l| l.fiscal_year)
+        .collect();
+
+    for line in appropriations::enacted_lines() {
+        if appropriations::TAX_REIMBURSEMENT.contains(&line.line_item.as_str()) {
+            continue;
+        }
+        if !workbook_years.contains(&line.fiscal_year) {
+            from_catalog.insert(line.fiscal_year);
+        }
+        let entry = totals.entry(line.fiscal_year).or_insert((0.0, 0.0));
+        entry.0 += line.amount;
+        if FOUNDATION_LINES.contains(&line.line_item.as_str()) {
+            entry.1 += line.amount;
+        }
+    }
+
+    totals
+        .into_iter()
+        .map(
+            |(fiscal_year, (enacted, foundation_funding))| AppropriationYear {
+                fiscal_year,
+                enacted,
+                foundation_funding,
+                items: by_year.get(&fiscal_year).copied().unwrap_or_default(),
+                source: if from_catalog.contains(&fiscal_year) {
+                    "catalog"
+                } else {
+                    "workbook"
+                }
+                .to_string(),
+            },
+        )
+        .collect()
+}
+
+/// The lines the formula itself is paid from, across the renumbering in the middle of the series.
+///
+/// `200550` and `200612` are both titled `Foundation Funding` and are the GRF and Lottery Profits
+/// halves of it today. `200501` is the same GRF money before FY2006, when it was titled `Base Cost
+/// Funding` — the Catalog records `200550` as "originally established by Am. Sub. H.B. 66 of the
+/// 126th G.A.", the FY2006-07 act, which is exactly where the number changes.
+///
+/// **Summing all three is safe and was checked rather than assumed.** The two GRF lines appear
+/// together in FY2006-FY2011, which looks like double counting and is not: `200501` is carried at
+/// exactly $0.00 in every one of those years, a discontinued line the document still lists. Had it
+/// held a residual the sum would have been wrong by that residual and nothing would have shown it.
+///
+/// This is why the pair is a constant with a note rather than a filter written inline. An
+/// appropriation line item is **not** a stable identifier across this period — `200604` names
+/// three different programmes across three funds — so any series built by line number needs its
+/// succession established before it means anything.
+const FOUNDATION_LINES: [&str; 3] = ["200501", "200550", "200612"];
+
 /// The meal-program poverty share, year by year.
 ///
 /// Computed and tested in [`dispersion::mr81`], which excludes non-public sponsors and the
@@ -709,9 +792,14 @@ fn meal_program() -> Vec<MealProgramYear> {
 }
 
 /// Every year either axis of the feed carries, oldest first.
-fn deflator_years(districts: &[District], history: &[HistoryYear]) -> Vec<u16> {
+fn deflator_years(
+    districts: &[District],
+    history: &[HistoryYear],
+    appropriations: &[AppropriationYear],
+) -> Vec<u16> {
     let mut years = covered_years(districts);
     years.extend(history.iter().map(|year| year.fiscal_year));
+    years.extend(appropriations.iter().map(|year| year.fiscal_year));
     years.sort_unstable();
     years.dedup();
     years
@@ -1277,10 +1365,12 @@ fn main() {
     };
 
     let history = history();
+    let appropriations = appropriation_block();
 
     let bundle = Bundle {
         national: national(),
         history: history.clone(),
+        appropriations: appropriations.clone(),
         meal_program: meal_program(),
         house_districts: house_district_block(&records, Chamber::House),
         senate_districts: house_district_block(&records, Chamber::Senate),
@@ -1304,7 +1394,7 @@ fn main() {
             // nominal dollars would report a widening that is partly just money getting smaller.
             // A deflator that covers only part of what the feed carries is the failure mode where
             // the page silently falls back to nominal for the years it cannot convert.
-            points: deflator_years(&districts, &history)
+            points: deflator_years(&districts, &history, &appropriations)
                 .into_iter()
                 .filter_map(|year| cpi.point(FiscalYear(year)).map(|point| (year, point.index)))
                 .collect(),
