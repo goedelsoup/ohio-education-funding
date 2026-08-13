@@ -35,11 +35,19 @@ should be able to settle.
 
 ## Status
 
-**Stub — not implemented, and now known not to be implementable from this source.** The recorded
-blocker was `dew-foundation`, and that was wrong; it is now **`dew-payment-reports`**, declared in
-`decisions/payment-reports-connector.yml`. That connector is now wired with three sources
-and the block did not lift, because **the FY2027 funding calculator does not carry the deduction
-channel at all**.
+**Stub — and the scope of what it would compute has narrowed to one era.** The current era is
+settled and computes to zero by construction; only the deduct era is left, and that is a retrieval
+problem this phase did not solve. The four programme nodes it reads now all exist:
+[EdChoice](../corpus/program/edchoice-scholarship.yml),
+[the expansion](../corpus/program/edchoice-expansion.yml),
+[Cleveland](../corpus/program/cleveland-scholarship.yml),
+[Autism](../corpus/program/autism-scholarship.yml) and
+[Jon Peterson](../corpus/program/jon-peterson-special-needs.yml).
+
+The recorded blocker was `dew-foundation`, and that was wrong; it is now **`dew-payment-reports`**,
+declared in `decisions/payment-reports-connector.yml`. That connector is now wired with three
+sources and the block did not lift, because **the FY2027 funding calculator does not carry the
+deduction channel at all**.
 
 That was an inference from the columns the corpus had extracted. It has since been checked
 against every column the workbook has, and it holds in the strongest form available:
@@ -61,6 +69,20 @@ The `[open]` question "could a deduction be inside the negative transfers" is th
 **closed**, and closed for the reason the mechanism note above predicts: under the Fair School
 Funding Plan community and STEM students are funded directly, so there is no deduction to carry.
 `crates/project/tests/the_voucher_channel_is_absent.rs` holds the bound.
+
+**And the positive form of that finding is now in hand, which the argument above could not
+supply.** R.C. 3317.022 — already wired, and read for the first time on this question — directs
+the department to compute and distribute state core foundation funding to six *funding units*:
+city, local and exempted village districts, the community and STEM school unit, and four
+scholarship units, one for each programme this calculator covers. Division (E) distributes the
+educational choice scholarship to the parent "from the funds paid to the educational choice
+scholarship unit under this section". The word "deduct" appears in none of R.C. 3310.01, 3310.03,
+3310.032, 3310.08, 3310.41, 3310.51, 3310.52 or 3313.975 as they now stand.
+
+So the current-era mechanism is settled in both directions: not a deduction, and a parallel funding
+unit inside the foundation computation rather than a separate appropriation. What this calculator
+would compute for the current era is therefore **zero per resident district, by construction** —
+which is a result, not a gap.
 
 **What remains open is the pre-FSFP era**, which is a different question and a different source.
 Deduct-era amounts per resident district — and whether ECOT recovery money returned to the
@@ -100,9 +122,13 @@ mistaken for coverage. They are where the per-district scholarship figures most 
 neither is retrievable without credentials.
 
 **The department's own annual report points at the missing file, and the link is dead.** The
-[2025 Scholarship Annual Report](https://education.ohio.gov/getattachment/About/Annual-Reports/2025-Scholarship-Annual-Report.pdf.aspx?lang=en-US)
-*is* retrievable and readable, and carries statewide and program-level aggregates — Jon Peterson
-alone reached 494 districts, over 80% of Ohio's, in 2024-25. For anything per-district it says a
+2025 Scholarship Annual Report *is* retrievable and readable, and is now **committed and
+digest-pinned** as `scholarship-annual-2025` under the `dew-scholarship-reports` connector — see
+[the catalog record](../catalog/dew-scholarship-annual-report.md), which also records two
+discrepancies inside it that the department does not explain. It carries statewide and
+program-level aggregates: the channel is $991.2m across the four programmes that publish a
+total, $1.095bn once Jon Peterson's derived figure is added, over 166,587 students in 2024-25. Jon
+Peterson alone reached 494 districts, over 80% of Ohio's. For anything per-district it says a
 breakdown "is available here" and links to:
 
     reports.education.ohio.gov/report/nonpublic-data-jon-peterson-special-needs-report      404

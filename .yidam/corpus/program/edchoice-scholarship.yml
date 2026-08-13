@@ -1,0 +1,97 @@
+class: program
+label: Traditional EdChoice Scholarship
+description: |
+  The original EdChoice: a scholarship for students assigned to a low-performing public school
+  building, established by the General Assembly in 2005 and authorised under R.C. 3310.03.
+  [verified — R.C. 3310.03; 2025 Scholarship Annual Report] It is a distinct programme from the
+  [income-based expansion](edchoice-expansion.yml) of 2013, which is R.C. 3310.032, and the two
+  run concurrently with different eligibility and — since October 2023 — different award rules.
+  [verified]
+
+  **Eligibility is a property of the building, not of the family.** A student qualifies by being
+  enrolled in a building operated by the resident district that was ranked in the lowest twenty
+  per cent of all buildings statewide by performance index score. [verified — R.C. 3310.03(A)(1)]
+  That is the design the corpus's central caution is about: the programme is triggered by a
+  performance measure this site elsewhere shows to be substantially a composition proxy, so the
+  buildings it designates are disproportionately the poorest ones. [inference]
+
+  **This is the programme whose original mechanism generated the districts' complaint.** Under the
+  deduct-era design, a scholarship was funded by reducing the resident district's foundation
+  payment — and if the student had never attended the district, the district lost money for a
+  child it had never educated. [verified] That is no longer the mechanism; see `mechanism`.
+
+  **The 2025 report does not add up, in two ways, and both are recorded rather than resolved.**
+  Its executive summary says the five programmes served "more than 175,000" students; the five
+  programme counts it publishes sum to 166,587, a gap of 8,413. And its stated average awards
+  disagree with expenditure divided by participation for this programme, the expansion, and
+  Cleveland — while matching exactly for Autism. [verified, by arithmetic on the report's own
+  figures] The natural reading is a denominator: an average over students holding a full-year
+  award rather than over everyone who used the programme at any point. Nothing in the report says
+  so, and this corpus does not adopt a reading the source does not state. [open]
+properties:
+  seeded_because: |
+    Named in the [`deduction`](../../skills/deduction.md) calculator as one of the four programmes
+    it must compute over. The corpus carried a node for the expansion and none for the programme
+    it expanded, so the distinction R.C. 3310.03 and 3310.032 draw was invisible here. [inference]
+  name: Educational Choice Scholarship Program (Traditional)
+  mechanism: |
+    **Direct payment as its own funding unit. Not a deduction.** [verified]
+
+    R.C. 3317.022 names the **educational choice scholarship unit** among the six funding units the
+    department computes and distributes state core foundation funding to, and division (E) has the
+    department distribute the scholarship to the parent — or to the student if at least eighteen —
+    "from the funds paid to the educational choice scholarship unit under this section", in monthly
+    partial payments. [verified] The scholarship never passes through the resident district's
+    payment, in either direction.
+
+    This settles positively what
+    [`edchoice-expansion`](edchoice-expansion.yml) previously recorded as unestablished: that node
+    says direct appropriation "is the natural reading and is not established here". It is
+    established here, and not from the appropriation side — from the funding-unit structure in the
+    same section that computes the formula. [verified]
+
+    **The deduct-era mechanism is a different question.** It was a deduction, the districts'
+    complaint is about it, and the per-district amounts need `dew-payment-reports`, which is
+    blocked on OH|ID authentication. [open]
+  eligibility: |
+    Enrollment in a building operated by the resident district that was ranked in the lowest twenty
+    per cent of all buildings operated by city, local and exempted village districts by performance
+    index score, as determined by the department. [verified — R.C. 3310.03(A)(1)]
+
+    Students who held a scholarship for the 2020-2021 school year under the section as it stood
+    before 2 March 2021 continue to receive it through grade twelve so long as they remain
+    eligible under division (D) — a grandfather clause that keeps a cohort on the old rules.
+    [verified — R.C. 3310.03]
+  amount: |
+    **FY2025: 42,607 students, $283,149,735.14, average award as published $6,808.75.** [verified —
+    2025 Scholarship Annual Report] Expenditure divided by participation is $6,645.62; see the
+    discrepancy noted in the description. [verified, by arithmetic] [open]
+
+    **The statutory base and the published maximum are different numbers, and the gap is the
+    index.** R.C. 3317.022(A)(10)(a)(ii)(I) bounds the award at the lesser of the school's base
+    tuition less applicable discounts, or **$5,500** for grades K-8 and **$7,500** for grades 9-12.
+    The department reports the FY2025 maxima as **$6,166** and **$8,408**. [verified] The statute
+    provides for those amounts to rise with the statewide average base cost per pupil, so the
+    published figures are the indexed values and the statutory ones are the base. A reader taking
+    either as "the" award amount without the other is wrong by about 12%. [inference]
+  appropriation_line: |
+    **No line of its own — paid from the foundation aid appropriation.** The same five line items
+    support foundation aid for all public school students and scholarship payments for students in
+    state scholarship programmes: GRF ALI 200550 Foundation Funding, GRF ALI 200502 Pupil
+    Transportation, Fund 5VS0 ALI 200604, Fund 5YO0 ALI 200491, and Lottery Fund 7017 ALI 200612.
+    [verified — LSC redbook, `crates/project/fixtures/dew-redbook.txt`]
+
+    So the budget document a reader would consult to size this programme shows it merged with the
+    formula it draws from. The department's annual report is the only committed source here that
+    sizes it separately. [verified]
+links:
+  - target: ../program.ont.yml
+    relationship: instance-of
+  - target: edchoice-expansion.yml
+    relationship: precedes
+  - target: cleveland-scholarship.yml
+    relationship: follows
+  - target: ../funding-regime/fair-school-funding-plan.yml
+    relationship: funded-under
+  - target: ../doctrine/thorough-and-efficient.yml
+    relationship: contested-under

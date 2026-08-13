@@ -522,6 +522,40 @@ pub fn rebuild(root: &Path) -> Result<Vec<Rebuilt>, RebuildError> {
         },
     });
 
+    // The scholarship annual report, sliced rather than committed whole. Unlike the redbook it is
+    // mostly provider lists — the pages that matter are five programme summaries, and the figures
+    // in them are the only published sizing of this channel.
+    //
+    // A fixture rather than prose in the corpus, because five programme nodes would otherwise each
+    // carry a hand-typed dollar figure to six decimal places. That is the transcription this
+    // repository keeps finding wrong somewhere.
+    let annual = source("scholarship-annual-2025").expect("registered").1;
+    out.push(
+        match cache::pdf_text(root, annual)
+            .map_err(|cause| cause.to_string())
+            .and_then(|text| fixtures::scholarship_programmes(&text))
+        {
+            Ok(rows) => Rebuilt::Written {
+                path: fixtures::SCHOLARSHIP_FIXTURE.to_string(),
+                rows: fixtures::write_csv(
+                    &root.join(fixtures::SCHOLARSHIP_FIXTURE),
+                    &[
+                        "program",
+                        "name",
+                        "students",
+                        "expenditure",
+                        "published_average",
+                    ],
+                    &rows,
+                )?,
+            },
+            Err(cause) => Rebuilt::Skipped {
+                path: fixtures::SCHOLARSHIP_FIXTURE.to_string(),
+                reason: cause,
+            },
+        },
+    );
+
     // The DeRolph opinions. One record per case, same shape as the statute extract, so the two
     // sources a legal claim can rest on read alike.
     //

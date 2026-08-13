@@ -178,7 +178,102 @@ pub const OHIO_LAWS_SECTIONS: &[Source] = &[
         fixtures: &[crate::fixtures::STATUTE_FIXTURE],
         note:
             "R.C. 3317.022. Core foundation funding: the section that assembles every component, \
-               and where disadvantaged pupil impact aid actually lives.",
+               and where disadvantaged pupil impact aid actually lives. Also the section that \
+               settles the scholarship mechanism: it names six funding units, four of them \
+               scholarship programs, each paid directly rather than deducted.",
+    },
+    // Chapter 3310 and the pilot project sections. Wired together because the question they
+    // answer is one question — what a scholarship is, who qualifies, and what it pays — and
+    // answering it from four programs' statutes separately is how the corpus ended up with three
+    // program nodes missing and a fourth asserting a mechanism the current law does not use.
+    Source {
+        key: "rc-3310-01",
+        title: None,
+        url: "https://codes.ohio.gov/ohio-revised-code/section-3310.01",
+        filename: "rc-3310-01.html",
+        format: Format::Html,
+        catalog: Some("ohio-revised-code"),
+        fixtures: &[crate::fixtures::STATUTE_FIXTURE],
+        note: "R.C. 3310.01. The educational choice definitions, including what a chartered \
+               nonpublic school is.",
+    },
+    Source {
+        key: "rc-3310-03",
+        title: None,
+        url: "https://codes.ohio.gov/ohio-revised-code/section-3310.03",
+        filename: "rc-3310-03.html",
+        format: Format::Html,
+        catalog: Some("ohio-revised-code"),
+        fixtures: &[crate::fixtures::STATUTE_FIXTURE],
+        note: "R.C. 3310.03. Eligibility for the original educational choice scholarship — the \
+               performance-designated route, as distinct from the income-scaled expansion in \
+               3310.032.",
+    },
+    Source {
+        key: "rc-3310-032",
+        title: None,
+        url: "https://codes.ohio.gov/ohio-revised-code/section-3310.032",
+        filename: "rc-3310-032.html",
+        format: Format::Html,
+        catalog: Some("ohio-revised-code"),
+        fixtures: &[crate::fixtures::STATUTE_FIXTURE],
+        note: "R.C. 3310.032. The expansion: eligibility for students whose resident district is \
+               not a pilot project district. This is the universal-eligibility route.",
+    },
+    Source {
+        key: "rc-3310-08",
+        title: None,
+        url: "https://codes.ohio.gov/ohio-revised-code/section-3310.08",
+        filename: "rc-3310-08.html",
+        format: Format::Html,
+        catalog: Some("ohio-revised-code"),
+        fixtures: &[crate::fixtures::STATUTE_FIXTURE],
+        note: "R.C. 3310.08. The educational choice award: the constant multiplier and the base \
+               amount the income scale is applied to.",
+    },
+    Source {
+        key: "rc-3310-41",
+        title: None,
+        url: "https://codes.ohio.gov/ohio-revised-code/section-3310.41",
+        filename: "rc-3310-41.html",
+        format: Format::Html,
+        catalog: Some("ohio-revised-code"),
+        fixtures: &[crate::fixtures::STATUTE_FIXTURE],
+        note: "R.C. 3310.41. The autism scholarship, whole: establishment, eligibility, and the \
+               alternative public provider definition the Jon Peterson statute reuses.",
+    },
+    Source {
+        key: "rc-3310-51",
+        title: None,
+        url: "https://codes.ohio.gov/ohio-revised-code/section-3310.51",
+        filename: "rc-3310-51.html",
+        format: Format::Html,
+        catalog: Some("ohio-revised-code"),
+        fixtures: &[crate::fixtures::STATUTE_FIXTURE],
+        note: "R.C. 3310.51. Jon Peterson definitions: alternative public provider and registered \
+               private provider, which the amount in 3317.022(A)(13) is bounded by.",
+    },
+    Source {
+        key: "rc-3310-52",
+        title: None,
+        url: "https://codes.ohio.gov/ohio-revised-code/section-3310.52",
+        filename: "rc-3310-52.html",
+        format: Format::Html,
+        catalog: Some("ohio-revised-code"),
+        fixtures: &[crate::fixtures::STATUTE_FIXTURE],
+        note: "R.C. 3310.52. The Jon Peterson establishment, its 2012-2013 start, and the \
+               five per cent cap on participation.",
+    },
+    Source {
+        key: "rc-3313-975",
+        title: None,
+        url: "https://codes.ohio.gov/ohio-revised-code/section-3313.975",
+        filename: "rc-3313-975.html",
+        format: Format::Html,
+        catalog: Some("ohio-revised-code"),
+        fixtures: &[crate::fixtures::STATUTE_FIXTURE],
+        note: "R.C. 3313.975. The pilot project scholarship programme — the Cleveland programme, \
+               defined by federal court supervision rather than by name.",
     },
     Source {
         key: "rc-3317-051",
@@ -726,8 +821,43 @@ pub const CONNECTORS: &[Connector] = &[
                          indexed but post-date the deduction entirely",
         },
         note: "The one source that would carry the voucher and community-school deduction per \
-               resident district, for the years it existed.",
+               resident district, for the years it existed. Kept separate from \
+               `dew-scholarship-reports`, which is the department's *public* account of the same \
+               channel: one is a per-district file behind a login, the other a statewide \
+               aggregate anyone can fetch, and collapsing them would make this blocker look \
+               half-lifted when nothing about it has moved.",
         sources: &[],
+    },
+    Connector {
+        key: "dew-scholarship-reports",
+        publisher: "Ohio Department of Education and Workforce",
+        feeds: &["program"],
+        status: Status::Wired {
+            still_blocked: Some(
+                "wired for the statewide and program-level aggregates, which is what the \
+                 department publishes openly. Per-district participation is a different file and \
+                 is not here: the annual report cites two routes for it and both 404, so the \
+                 breakdown was published, is still referenced by a current departmental document, \
+                 and has been withdrawn. See `dew-payment-reports` for the deduct-era half of the \
+                 same gap",
+            ),
+        },
+        note: "The department's own public account of the scholarship channel. It answers how \
+               large each programme is and how far it reaches; it does not answer which district \
+               a scholarship was charged against, and no public source does.",
+        sources: &[Source {
+            key: "scholarship-annual-2025",
+            title: Some("2025 Scholarship Annual Report"),
+            url: "https://education.ohio.gov/getattachment/About/Annual-Reports/\
+                  2025-Scholarship-Annual-Report.pdf.aspx?lang=en-US",
+            filename: "scholarship-annual-2025.pdf",
+            format: Format::Pdf,
+            catalog: Some("dew-scholarship-annual-report"),
+            fixtures: &[crate::fixtures::SCHOLARSHIP_FIXTURE],
+            note: "Participation and award totals for all five scholarship programmes, 2024-25. \
+                   The only committed source here that sizes the channel from the department \
+                   rather than from statute.",
+        }],
     },
     Connector {
         key: "lsc-budget",
@@ -1674,6 +1804,7 @@ mod tests {
             "census-geography",
             "dew-child-nutrition",
             "dew-school-improvement",
+            "dew-scholarship-reports",
         ];
         for key in expected {
             assert!(

@@ -38,8 +38,9 @@ Fields per connector: key, status, source count, corpus classes fed; then every 
 | `dew-five-year-forecast` | **wired** | 2 | education-agency, revenue-stream, metric, fiscal-period |
 | [`tax-abstract`](sources/tax-abstract.md) | **wired** | 4 | revenue-stream, parameter, metric |
 | [`dew-payment-reports`](sources/dew-payment-reports.md) | declared | 0 | program, education-agency, revenue-stream |
+| `dew-scholarship-reports` | **wired**, in part | 1 | program |
 | [`lsc-budget`](sources/lsc-budget.md) | **wired**, in part | 22 | legislation, fiscal-period, program, parameter |
-| [`ohio-laws`](sources/ohio-laws.md) | **wired** | 23 | legislation, parameter, formula-component |
+| [`ohio-laws`](sources/ohio-laws.md) | **wired** | 31 | legislation, parameter, formula-component |
 | [`ohio-courts`](sources/ohio-courts.md) | **wired**, in part | 4 | litigation |
 | [`ofcc-projects`](sources/ofcc-projects.md) | declared | 0 | program, education-agency |
 | [`census-f33`](sources/census-f33.md) | **wired** | 15 | metric, education-agency |
@@ -48,11 +49,12 @@ Fields per connector: key, status, source count, corpus classes fed; then every 
 | `dew-child-nutrition` | **wired**, in part | 11 | education-agency, metric, formula-component |
 | `dew-school-improvement` | **wired**, in part | 3 | school, education-agency, accountability-regime |
 
-15 connectors, 100 sources between them. 13 are wired and 2 are not; 5 of the wired ones reach only part of what they feed, and say so below.
+16 connectors, 109 sources between them. 14 are wired and 2 are not; 6 of the wired ones reach only part of what they feed, and say so below.
 
 **What is blocked, in the registry's own words.**
 
 - `dew-payment-reports` — blocked on: the deduct-era reports (1999-2021) are behind OH|ID authentication on the department's reports portal; the current-era ones are open and indexed but post-date the deduction entirely
+- `dew-scholarship-reports` — still blocked on: wired for the statewide and program-level aggregates, which is what the department publishes openly. Per-district participation is a different file and is not here: the annual report cites two routes for it and both 404, so the breakdown was published, is still referenced by a current departmental document, and has been withdrawn. See `dew-payment-reports` for the deduct-era half of the same gap
 - `lsc-budget` — still blocked on: wired for the appropriation-line series FY1999 through FY2027, from the 124th General Assembly's greenbook to the 136th's workbooks. The two bienniums the greenbook route cannot reach — FY2006-07, whose greenbook has no line-item table, and FY2012-13, whose workbook variants LSC serves as one file — are both carried by the Catalog of Budget Line Items, which was probed and is not blocked: nineteen editions, 2006 and 2008 through 2025, published per agency, every one downloading to a self-identifying agent. What remains is extraction, not retrieval, and it is scoped in the decision record `the-catalog-of-budget- line-items`. Before FY1999 there is still nothing — the Foundation Program era, DeRolph I and the equal yield formula need the session laws, and the Catalog's earliest edition reaches FY2002. The per-district simulations named in earlier versions of this string are not LSC's and have been removed from it
 - `ohio-courts` — still blocked on: trial-level rulings such as the 2025 EdChoice decision are not in the supreme court archive at all, and `citing_cases` needs a citator rather than a document
 - `ofcc-projects` — blocked on: the site refuses a self-identifying agent — 404 to this project's user-agent, 200 to a browser string — and its project data is rendered by interactive maps rather than served as files
@@ -60,7 +62,7 @@ Fields per connector: key, status, source count, corpus classes fed; then every 
 - `dew-child-nutrition` — still blocked on: wired for the eleven sponsor-centric years, 2001 through 2011. The 1998-2000 files are a different, school-centric column set whose unquoted district names shift three rows past the last column; from 2012 the report splits into Traditional, Provision 2 and Community Eligibility streams, and the Traditional file excludes the highest-poverty sponsors by design
 - `dew-school-improvement` — still blocked on: wired for the current identification lists only. The department republishes each list in place under a dated filename rather than archiving prior cycles, so there is no history here: a school that exited before this file was written is indistinguishable from one never identified
 
-5 of them have no long form in [`sources/`](sources/): `dew-report-card`, `dew-five-year-forecast`, `census-geography`, `dew-child-nutrition`, `dew-school-improvement`. Those are the connectors added after the original nine stubs, whose prose was never written — the decision record is the only account of why each exists.
+6 of them have no long form in [`sources/`](sources/): `dew-report-card`, `dew-five-year-forecast`, `dew-scholarship-reports`, `census-geography`, `dew-child-nutrition`, `dew-school-improvement`. Those are the connectors added after the original nine stubs, whose prose was never written — the decision record is the only account of why each exists.
 <!-- /REGEN -->
 
 A `declared` connector says **what blocks it** — that string is a field on the record, and a

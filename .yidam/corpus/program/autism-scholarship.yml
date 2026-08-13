@@ -1,0 +1,79 @@
+class: program
+label: Autism Scholarship
+description: |
+  The oldest of Ohio's special-needs scholarships, established in 2003 for children aged three
+  through twenty-one diagnosed as on the autism spectrum, letting a parent buy a special education
+  programme from an approved provider rather than take one from the resident district. [verified —
+  R.C. 3310.41; 2025 Scholarship Annual Report]
+
+  **It is the outlier of this channel on every axis except size.** At 6,016 students in 2024-2025
+  it is the smallest of the five programmes, and at an average award of $26,598.88 it pays roughly
+  four times what any other pays and more than five times the EdChoice expansion. [verified — 2025
+  Scholarship Annual Report] Its statutory ceiling is $34,000 against EdChoice's $5,500 and
+  $7,500. [verified — R.C. 3317.022(A)(12), (A)(10)]
+
+  That ratio is the programme's whole character: it buys a special education placement, not
+  tuition at a chartered nonpublic school, and the two are not the same purchase. Reading this
+  programme's per-pupil figure against the other four — or against any per-pupil figure on the
+  formula side — compares a placement to a tuition. [inference]
+
+  **It is also the one programme whose published average reconciles.** The report's stated average
+  award of $26,598.88 is exactly its expenditure divided by its participation. For Traditional
+  EdChoice, the expansion and Cleveland the two do not agree — see `amount` on
+  [`edchoice-scholarship`](edchoice-scholarship.yml), where the discrepancy is recorded. That this
+  one is exact and the others are not suggests the difference is a denominator rather than an
+  error, and nothing in the report says which. [inference] [open]
+properties:
+  seeded_because: |
+    Named in the [`deduction`](../../skills/deduction.md) calculator as one of the four programmes
+    it must compute over, and missing from the corpus for as long as that stub has existed.
+    [inference]
+  name: Autism Scholarship Program
+  mechanism: |
+    **Direct payment as its own funding unit. Not a deduction.** [verified]
+
+    R.C. 3317.022 names the **autism scholarship unit** as one of six funding units the department
+    computes and distributes state core foundation funding to. R.C. 3310.41(B) establishes the
+    programme and has the department "pay a scholarship under section 3317.022 of the Revised
+    Code to an eligible applicant". [verified]
+
+    The word "deduct" appears nowhere in R.C. 3310.41 as it now stands. [verified] For the
+    pre-Fair-School-Funding-Plan era, which was a deduction, see `dew-payment-reports`. [open]
+  eligibility: |
+    A child aged three through twenty-one diagnosed as on the autism spectrum, holding either an
+    individualized education program from the resident district or a private diagnosis from a
+    physician or licensed psychologist. [verified — 2025 Scholarship Annual Report]
+
+    The provider must be an alternative public provider or a registered private provider —
+    a nonpublic school or other nonpublic entity approved by the department to participate — and
+    a "special education program" is a school or facility providing special education and related
+    services to children with disabilities. [verified — R.C. 3310.41(A)]
+
+    The private-diagnosis route is worth noting beside the Jon Peterson programme, which requires
+    an Evaluation Team Report and an IEP. Autism admits a child the district has never evaluated.
+    [verified] Whether that difference shows up in the two programmes' district footprints is not
+    established — the per-district file that would answer it is the withdrawn one. [open]
+  amount: |
+    **FY2025: 6,016 students, $160,018,883.30, average award $26,598.88.** [verified — 2025
+    Scholarship Annual Report]
+
+    The statutory bound is the lesser of the tuition charged for the student's special education
+    programme, or **$34,000**. [verified — R.C. 3317.022(A)(12)] Unlike the pilot project
+    programme's $5,500 and $7,500, this ceiling carries no indexing clause in the same section, so
+    it does not rise with the statewide average base cost per pupil. [verified] Whether it has been
+    raised by amendment rather than by index is not established. [open]
+  appropriation_line: |
+    **No line of its own — paid from the foundation aid appropriation**, from the same five line
+    items that support foundation aid for all public school students: GRF ALI 200550 Foundation
+    Funding, GRF ALI 200502 Pupil Transportation, Fund 5VS0 ALI 200604, Fund 5YO0 ALI 200491, and
+    Lottery Fund 7017 ALI 200612. [verified — LSC redbook,
+    `crates/project/fixtures/dew-redbook.txt`]
+links:
+  - target: ../program.ont.yml
+    relationship: instance-of
+  - target: ../funding-regime/fair-school-funding-plan.yml
+    relationship: funded-under
+  - target: jon-peterson-special-needs.yml
+    relationship: coexists-with
+  - target: ../formula-component/fsfp-special-education-weights.yml
+    relationship: parallels
