@@ -114,7 +114,7 @@ export function pageCards(): Record<string, Card> {
     compare: {
       eyebrow: SITE,
       headline: "Put two districts side by side",
-      figure: "Any two of 609",
+      figure: `Any two of ${s.districts}`,
       figureNote: "Funding, guarantee status, property wealth, spending and outcomes, in one view",
       meta: `${fy} model`,
     },

@@ -95,7 +95,9 @@ const NAV = [
   {
     label: "Places",
     children: [
-      { key: "districts", href: "/districts", label: "All 609 districts" },
+      // Read from the feed, not typed in, for the reason `og/pages.ts` gives at length: a count
+      // that a regenerated panel makes wrong is worse than no count. This one is on every page.
+      { key: "districts", href: "/districts", label: `All ${bundle.statewide.districts} districts` },
       { key: "counties", href: "/counties", label: "Counties" },
       { key: "house", href: "/house", label: "House" },
       { key: "senate", href: "/senate", label: "Senate" },
