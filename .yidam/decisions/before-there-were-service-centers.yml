@@ -1,0 +1,196 @@
+id: before-there-were-service-centers
+summary: >-
+  The fourteen fixed-width years of the federal agency directory wired, taking the Ohio membership
+  record to thirty years without a gap — and the finding is not in the districts. Ohio had 86
+  county boards of education in 1994-95 and 47 educational service centers by 2002-03, and the
+  register files every one of those disappearances as a closure that affected nobody. The bodies
+  R.C. 3311.22 puts the transfer order in were themselves consolidating, a generation before the
+  district cases, under the same wrong code.
+context: |
+  [`the-directory-cannot-say-why`](the-directory-cannot-say-why.yml) wired the delimited era,
+  2008-09 through 2023-24, and deliberately left the fourteen years before it alone. Its stated
+  reason was not difficulty:
+
+    > it would be a second reader built for no consumer
+
+  — the F-33 finance panel starts at FY2009, so no committed fixture wanted a directory year
+  before 2008-09. The backlog issue that carried it forward said the same thing more sharply:
+  *"a reader built ahead of its reader."*
+
+  What changed since is where the unanswered question sits.
+  [`the-order-was-never-the-states`](the-order-was-never-the-states.yml) established that a
+  territory transfer is ordered by an **educational service center governing board**, not by the
+  State Board of Education, and the phase after it committed five Auditor of State reports that
+  recite those orders — one of them an educational service center's account of its own
+  dissolution ([auditor-district-audits](../catalog/auditor-district-audits.md)).
+
+  So by the time this was taken up, the question the directory could not answer had moved. It was
+  no longer only *why did a district stop* but *what are these governing boards, and where did
+  they come from*. Nobody had asked the older years that.
+decision: |
+  Wire **1994-95 through 2007-08**, giving thirty consecutive school years with no gap:
+  `crates/dispersion/fixtures/ccd-lea-directory.csv`, 30,655 agency-years, up from 17,618.
+
+  Read the thirteen fixed-width years from a **per-year byte-position table**,
+  `fixtures::CCD_FIXED_WIDTH`, and hold every record to the length its own layout document states.
+  Read 2007-08 through the existing alias table, because it is tab-delimited despite sitting in
+  the middle of the fixed-width filenames.
+
+  **Take the status column from the file where the layout document is wrong about it**, and say so
+  in the table rather than silently.
+
+  Add one cross-year check to the reader: every agency absent from a year must have been filed
+  closed in the year before. Publish `types_by_year` so the two vocabulary recodes are visible.
+
+  **Publish no successor for any departure**, exactly as before. The county-to-compound-name
+  correspondence is stated in prose as an inference and committed nowhere.
+
+  Leave 1986-87 through 1993-94 unwired, and say why in the connector rather than in a note
+  somewhere.
+consequences: |
+  **The bodies that make the orders were themselves consolidating, and the register denies it.**
+  Ohio has 86 county boards of education in 1994-95 — the CCD types them 3, *supervisory union
+  administrative center*. Thirty-nine of them disappear between 1995-96 and 2001-02, in ones and
+  fives, while multi-county centres appear beside them carrying the departed counties in their own
+  names: Athens and Meigs leave and Athens-Meigs arrives; Ross and Pike leave and Ross-Pike
+  arrives; Guernsey, Monroe and Noble leave and Guernsey-Monroe-Noble arrives. Fourteen such
+  centres join, so type 3 is 61 rather than 47 by 2001-02; sixty of those are recoded to type 4 the
+  following year and the sixty-first, Carroll-Harrison, leaves. Forty type-3 departures in all.
+
+  **Every one of the thirty-nine is filed under code 2** — *"closed with no effect on another
+  agency's boundaries"*. So the defect the previous phase found in the district rows is the
+  source's standing practice, it is not particular to school districts, and it did not begin in
+  the 2010s. It is being applied to the governing boards whose minute books hold the instruments
+  the corpus spent two phases looking for.
+
+  **The negative is now made over thirty completely enumerated years.** Code 5 — *"significant
+  change in geographic boundaries or instructional responsibility"* — appears in **zero** of
+  30,655 Ohio agency-years. All 689 departures are code 2, without one exception in thirty years:
+  616 community schools, 66 service agencies, five regular districts, one local district and one
+  state agency. That is the third time this repository has argued a negative by enumerating a
+  population rather than by failing to find something, after the casino floor and the State
+  Board's minutes.
+
+  **The one departure with an instrument behind it behaves exactly like the district cases.**
+  Geauga County ESC's final audit, already committed, recites its merger with Lake County ESC into
+  the Educational Service Center of the Western Reserve on 7 November 2019. The directory files
+  Geauga County ESC closed with no effect on anyone. Lake County ESC keeps `LEAID 3904786`, keeps
+  IRN 047860, is coded `1 Open` in the year before, the year of and the year after, and takes the
+  new name in 2020-21. The only trace of the merger in the federal register is a rename on the
+  survivor — which is the derivation the previous phase tested and rejected as unreliable, so this
+  is a case where the unreliable signal happens to be right and there is still no way to know that
+  from inside the source.
+
+  **The recorded filename convention was one year late, and the recorded record lengths caught
+  it.** The catalog said `pau9Xdata.zip` covered 1994-95 through 1998-99 and `agNNNa_dat.zip`
+  1998-99 through 2006-07. The publisher's own table says `pau94datr` is 1994-95 and `ag981c` is
+  1998-99: the archives are keyed on the year the survey *closed*. The tell was internal — the
+  nine record lengths recorded in the same note (722, 722, 723, 725, 729, 729, 519, 519, 530)
+  belong to `ag98` through `ag06`, and under the recorded filenames the last of the nine would
+  have been `ag071a`, which is not fixed-width at all. Each file's layout document states its
+  school year twice, which is what settles it rather than the sizes.
+
+  **One layout document states a column's position wrongly and the file is what decides.** The
+  2003-04 layout gives the status byte as 281 — which is the metropolitan indicator's position,
+  stated four lines above, in the same document, for the same year — and gives it again elsewhere
+  as 384. 284 is the one byte the document leaves unaccounted for, and it is where the two
+  neighbouring years put it. The check that settles it is not neighbourliness: at 284 every agency
+  the file flags closed is absent from the following year, and at 281 that fails immediately. A
+  wrong position here would not have errored. It would have yielded a column of plausible small
+  integers and a panel in which nothing ever closed.
+
+  **Two other documents are wrong in ways that would not have been caught by reading them.** The
+  2005-06 layout is the previous year's with the heading changed: its prose still says *"data for
+  the school year 2004-05"* and its observation count is still 18,085 where the file has 18,213
+  records. The 1999-2000 layout names `ag991a.dat` in its header while describing the second
+  revision. Both state a correct record length, which is the worst arrangement available — the
+  parts a reader would check *with* are wrong and the part being checked is right.
+
+  **The layout that was supposed to be the hard part is thirteen lines.** The record length moves
+  in seven of the nine middle years, and almost none of that movement is in the first 300 bytes.
+  The agency identifier is bytes 1-7 in every one of the thirteen years, the state identifier
+  8-21, the name starts at 22. The name's end and the agency type move once, together, in 1998-99.
+  The status byte moves four times. Four of the five columns this reader takes are constant across
+  thirteen years of a format that changes length seven times.
+
+  **The arrival code carries the same denial as the departure code.** Ohio forms two school
+  districts in thirty years and files both under code 3 — *"a new education agency formed with no
+  effect on another agency's boundaries."* Monroe Local appears in 2000-01 in the same year that
+  Middletown **Monroe** City is renamed Middletown City, same identifier, same IRN, coded open on
+  both sides. Manchester Local appears in 2004-05 and Adams County/Ohio Valley Local does not
+  change at all. Both new districts carry IRNs from Ohio's original county-ordered block — numbers
+  Ohio had used before, which the federal register has no way to express.
+
+  A third, `PEEBLES`, IRN 000441, is filed in 2004-05 as *"scheduled to be operational within 2
+  years"* and closed the next year without ever reaching open: a district announced and abandoned.
+  It is also the only type-2 departure in the fourteen new years, which means **not one operating
+  Ohio school district leaves the federal register between 1994-95 and 2007-08.** The five district
+  departures in thirty years are still the five the previous phase named, all after 2014.
+
+  So the defect is symmetric, and this was not looked for. The corpus had been asking why a
+  district stopped; the same source cannot say where one came from either.
+
+  **The agency type is not comparable across three years, and a rule reading type changes as
+  events would find 532 that are not.** Measured by following each identifier across the seam,
+  rather than by differencing counts that move for two reasons at once:
+
+  - **2000-01**: 47 agencies move from type 1 to type 7. They are Ohio's first community schools,
+    filed as regular school districts for two years. This is the dangerous one — on the type
+    alone Ohio appears to gain 47 school districts in 1999-2000 and lose them again.
+  - **2002-03**: 60 supervisory-union centres and 49 joint vocational school districts move into
+    type 4 together. Type 3 empties; type 4 goes from nothing to 109.
+  - **2006-07**: 376 agencies move from type 2 into type 1. Type 2 empties.
+
+  `types_by_year` exists so a consumer can see this, and the test beside it pins all three.
+
+  **Counting Ohio's districts by federal type gives three discontinuities, none of them Ohio.**
+  Types 1 and 2 together: 661 through 1997-98, then 675 and 708 in the two misfiled years, then
+  662, then 613 to 622 from 2002-03 once the joint vocational districts leave. The number
+  underneath barely moves — 661 less 47 joint vocational districts is 614 in 1994-95, and 619 in
+  2023-24. Meanwhile type 7 goes from 24 county data-processing centres in 1994-95 to 503 agencies
+  in 2005-06 and back to 345. Whatever the community school programme did to Ohio, it did not
+  change the number of school districts.
+
+  **Every superseded revision that is still served was compared.** NCES links only the latest
+  edition and leaves the earlier ones reachable. For 1999-2000, 2003-04, 2004-05, 2006-07 and
+  2007-08 the earlier edition was fetched and its Ohio rows are identical to the wired one in the
+  five columns this reader takes. That is not a claim that the files are identical, and it is
+  recorded as the narrower thing.
+
+  **No published figure moved.** The web feed is byte-identical: nothing in it reads a directory
+  year before 2008-09, and the sixteen wired years are unchanged to the byte.
+alternatives: |
+  **Take the 2003-04 status column from its layout document.** Rejected, and it is the decision
+  this phase turns on. The document is a primary artifact and this repository's habit is to prefer
+  it to a guess — but 281 is demonstrably the metropolitan indicator's byte in the same document,
+  and the file itself answers: the closure check passes at 284 and fails at 281. Preferring the
+  document here would have produced a year in which no Ohio agency ever closed, sitting quietly
+  inside a thirty-year panel.
+
+  **Skip 2003-04, since one bad year in thirty is a small loss.** Rejected, and not on
+  completeness. A gap would break the check that makes the whole era trustworthy: closures are
+  verified against the *next* year's membership, so dropping 2003-04 would blind the reader for
+  2002-03 as well and leave two years resting on nothing but their layout documents.
+
+  **Wire the nine years back to 1986-87 too.** Rejected, for the reason the previous phase gave
+  and this one did not find wanting. They are the same format and they would extend the negative,
+  but a negative already made over thirty completely enumerated years is not made stronger by
+  thirty-nine, and Ohio's county boards are all present and unchanging through 1994-95. If a
+  question arrives that needs the 1980s, the reader is written.
+
+  **Commit the county-board successors from the compound names.** Rejected. It is the strongest
+  form the answer takes anywhere in this source and it is still a reading of a name field: the
+  timing is up to two years out of alignment, and the same field moves one survivor between
+  `GUERNSEY-MONROE-NOBLE` and `OHIO VALLEY` and back over four years. Twice, in 1994-95 only, a
+  clerk wrote the answer outright — `ASHLAND (SEE ASHLAND-WAYNE) C`, `WYANDOT (SEE
+  SENECA-WYANDOT)` — and never again, which is the measure of how far this is from a field.
+
+  **Report "the fixed-width era is hard" and close the issue.** Rejected. It was recorded as hard
+  on the strength of one probing session, and the two things that made it look hard — a per-era
+  column map, and positions moving in seven of nine years — are both wrong about the columns this
+  reader needs. The thing that was genuinely hard is not in that description at all: a publisher's
+  layout document that states a position wrongly, twice, in two different places.
+
+  **Bump the contract and put the older years in the feed.** Rejected. Nothing on the site reads
+  the directory; it is a join and a membership record, and adding thirty years of agency rows to a
+  feed nothing displays would be shipping weight for no reader.

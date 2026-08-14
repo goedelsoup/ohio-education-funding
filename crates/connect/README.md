@@ -47,12 +47,12 @@ Fields per connector: key, status, source count, corpus classes fed; then every 
 | [`ohio-courts`](sources/ohio-courts.md) | **wired**, in part | 4 | litigation |
 | [`ofcc-projects`](sources/ofcc-projects.md) | declared | 0 | program, education-agency |
 | [`census-f33`](sources/census-f33.md) | **wired** | 15 | metric, education-agency |
-| [`nces-ccd`](sources/nces-ccd.md) | **wired**, in part | 16 | education-agency |
+| [`nces-ccd`](sources/nces-ccd.md) | **wired**, in part | 30 | education-agency |
 | `census-geography` | **wired** | 4 | education-agency, actor |
 | `dew-child-nutrition` | **wired**, in part | 23 | education-agency, metric, formula-component |
 | `dew-school-improvement` | **wired**, in part | 3 | school, education-agency, accountability-regime |
 
-19 connectors, 165 sources between them. 17 are wired and 2 are not; 9 of the wired ones reach only part of what they feed, and say so below.
+19 connectors, 179 sources between them. 17 are wired and 2 are not; 9 of the wired ones reach only part of what they feed, and say so below.
 
 **What is blocked, in the registry's own words.**
 
@@ -64,7 +64,7 @@ Fields per connector: key, status, source count, corpus classes fed; then every 
 - `ohio-auditor` — still blocked on: wired for the five reports that recite a territory transfer, which is what the corpus needed and not what the Auditor mostly publishes. The executed resolutions are not here at all -- those sit in educational service center minute books behind a vendor firewall, and reaching them is a records request rather than a fetch
 - `ohio-courts` — still blocked on: trial-level rulings such as the 2025 EdChoice decision are not in the supreme court archive at all, and `citing_cases` needs a citator rather than a document
 - `ofcc-projects` — blocked on: the site refuses a self-identifying agent — 404 to this project's user-agent, 200 to a browser string — and its project data is rendered by interactive maps rather than served as files
-- `nces-ccd` — still blocked on: wired for the sixteen school years the F-33 panel needs, 2008-09 through 2023-24, which is the whole delimited era. The fourteen years before it are retrievable and fixed-width with the column positions moving in seven of them, so reaching 1994-95 is a second reader. And the identifier-change history is still not derivable from this source: Ohio has never once used the operational status code that marks a consolidation
+- `nces-ccd` — still blocked on: wired for every school year the directory publishes with an Ohio slice this reader can take, 1994-95 through 2023-24. The nine years before 1994-95 exist and are not held: 1986-87 through 1993-94 are the same fixed-width family, and nothing consumes them. The identifier-change history is still not derivable from this source, and thirty years of it now say so rather than sixteen: Ohio has never once filed the status code that marks a consolidation
 - `dew-child-nutrition` — still blocked on: wired for every October the archive holds, 1998 through 2014, across all three of the streams the report splits into from 2012. Three things it still cannot reach: October 2014 is where the directory stops, nine years short of the corpus's FY2024 observations; the three split Octobers have a band and not a poverty share, because community-eligibility sponsors collect no applications at all; and the 1998-2000 files state no sponsor type, so some thirty-five sponsors a year predate the FY2001 file they borrow one from and stay untyped
 - `dew-school-improvement` — still blocked on: wired for the current identification lists only. The department republishes each list in place under a dated filename rather than archiving prior cycles, so there is no history here: a school that exited before this file was written is indistinguishable from one never identified
 

@@ -1628,7 +1628,9 @@ pub const CONNECTORS: &[Connector] = &[
                 note: "Geauga County Educational Service Center, final audit. The body that ordered two of the three \
                        district transfers, recording its own dissolution: a joint resolution with the Lake County ESC \
                        on 7 November 2019, merging into the Educational Service Center of the Western Reserve. One of \
-                       the nine service centres `dispersion::lea_directory` counts out, explained.",
+                       the 66 service agencies `dispersion::lea_directory` counts out of the federal register, and the \
+                       only one of them with an instrument behind it. The register files it closed with no effect on \
+                       anyone; Lake County ESC keeps its identifier and takes the new name.",
             },
         ],
     },
@@ -1912,12 +1914,12 @@ pub const CONNECTORS: &[Connector] = &[
         feeds: &["education-agency"],
         status: Status::Wired {
             still_blocked: Some(
-                "wired for the sixteen school years the F-33 panel needs, 2008-09 through \
-                 2023-24, which is the whole delimited era. The fourteen years before it are \
-                 retrievable and fixed-width with the column positions moving in seven of them, \
-                 so reaching 1994-95 is a second reader. And the identifier-change history is \
-                 still not derivable from this source: Ohio has never once used the operational \
-                 status code that marks a consolidation",
+                "wired for every school year the directory publishes with an Ohio slice this \
+                 reader can take, 1994-95 through 2023-24. The nine years before 1994-95 exist \
+                 and are not held: 1986-87 through 1993-94 are the same fixed-width family, and \
+                 nothing consumes them. The identifier-change history is still not derivable \
+                 from this source, and thirty years of it now say so rather than sixteen: Ohio \
+                 has never once filed the status code that marks a consolidation",
             ),
         },
         note: "A corpus spanning 1851 to the present is a panel whose members change, and a \
@@ -1925,6 +1927,146 @@ pub const CONNECTORS: &[Connector] = &[
                What the directory settles is which agencies existed when, and what it refuses to \
                settle is why any of them stopped.",
         sources: &[
+            Source {
+                key: "ccd-lea-directory-9495",
+                title: None,
+                url: "https://nces.ed.gov/ccd/data/zip/pau94datr.zip",
+                filename: "ccd-lea-directory-9495.zip",
+                format: Format::Zip,
+                catalog: Some("nces-ccd-lea-directory"),
+                fixtures: &[crate::fixtures::CCD_DIRECTORY_FIXTURE],
+                note: "School year 1994-95, and the oldest year this repository holds. Fixed-width, 1,030 bytes a record, no header. The revision is the only edition served: `pau94data.zip` is a 404 and `pau94datr.zip` is what the publisher links. 790 Ohio agencies, every one of them filed `1 No significant boundary change` — the first year held is the one year with no departure in it.",
+            },
+            Source {
+                key: "ccd-lea-directory-9596",
+                title: None,
+                url: "https://nces.ed.gov/ccd/data/zip/pau95data.zip",
+                filename: "ccd-lea-directory-9596.zip",
+                format: Format::Zip,
+                catalog: Some("nces-ccd-lea-directory"),
+                fixtures: &[crate::fixtures::CCD_DIRECTORY_FIXTURE],
+                note: "School year 1995-96. The file named `pau95` is the year *after* the file named `pau94`, which is the trap in this whole era: the archive is keyed on the year the survey closed and the directory describes the year it opened. Its own layout document settles it, saying `1995-96` in the heading and again in the sentence beneath. Nine agencies here are flagged closed, and all nine are county boards of education.",
+            },
+            Source {
+                key: "ccd-lea-directory-9697",
+                title: None,
+                url: "https://nces.ed.gov/ccd/data/zip/pau96data.zip",
+                filename: "ccd-lea-directory-9697.zip",
+                format: Format::Zip,
+                catalog: Some("nces-ccd-lea-directory"),
+                fixtures: &[crate::fixtures::CCD_DIRECTORY_FIXTURE],
+                note: "School year 1996-97. The layout document changes shape without the file changing: 1994-95 and 1995-96 print name, type, position, size, and this one prints name, size, position, type. The record is byte-for-byte the same 1,030.",
+            },
+            Source {
+                key: "ccd-lea-directory-9798",
+                title: None,
+                url: "https://nces.ed.gov/ccd/data/zip/pau97data.zip",
+                filename: "ccd-lea-directory-9798.zip",
+                format: Format::Zip,
+                catalog: Some("nces-ccd-lea-directory"),
+                fixtures: &[crate::fixtures::CCD_DIRECTORY_FIXTURE],
+                note: "School year 1997-98, and the last year before Ohio has a community school. Type 7 here is 23 agencies and every one of them is a county board's data-processing centre. Four years later type 7 is 249 and the composition is the opposite.",
+            },
+            Source {
+                key: "ccd-lea-directory-9899",
+                title: None,
+                url: "https://nces.ed.gov/ccd/data/zip/ag981c_dat.zip",
+                filename: "ccd-lea-directory-9899.zip",
+                format: Format::Zip,
+                catalog: Some("nces-ccd-lea-directory"),
+                fixtures: &[crate::fixtures::CCD_DIRECTORY_FIXTURE],
+                note: "School year 1998-99. The record shrinks to 722 bytes and every column this reader takes moves at once: the name field widens from 30 to 60, the agency type goes from byte 121 to 234, and the status from 162 to 280. Nothing before this year can be read with the offsets of anything after it.",
+            },
+            Source {
+                key: "ccd-lea-directory-9900",
+                title: None,
+                url: "https://nces.ed.gov/ccd/data/zip/ag991b_dat.zip",
+                filename: "ccd-lea-directory-9900.zip",
+                format: Format::Zip,
+                catalog: Some("nces-ccd-lea-directory"),
+                fixtures: &[crate::fixtures::CCD_DIRECTORY_FIXTURE],
+                note: "School year 1999-2000, second revision. Its layout document's own header says `FILE NAME = ag991a.dat` while the record count beneath it is this file's, which is why the layout is read for offsets and never for identity. `ag991a_dat.zip` is still served; its Ohio rows are identical in all five columns taken here.",
+            },
+            Source {
+                key: "ccd-lea-directory-0001",
+                title: None,
+                url: "https://nces.ed.gov/ccd/data/zip/ag001a_dat.zip",
+                filename: "ccd-lea-directory-0001.zip",
+                format: Format::Zip,
+                catalog: Some("nces-ccd-lea-directory"),
+                fixtures: &[crate::fixtures::CCD_DIRECTORY_FIXTURE],
+                note: "School year 2000-01. The record grows a byte, to 723, and the status column moves with it to 281. A one-byte drift is the failure this era is most likely to produce quietly, because the byte to the left is the metropolitan indicator and its values are also small integers.",
+            },
+            Source {
+                key: "ccd-lea-directory-0102",
+                title: None,
+                url: "https://nces.ed.gov/ccd/data/zip/ag011a_dat.zip",
+                filename: "ccd-lea-directory-0102.zip",
+                format: Format::Zip,
+                catalog: Some("nces-ccd-lea-directory"),
+                fixtures: &[crate::fixtures::CCD_DIRECTORY_FIXTURE],
+                note: "School year 2001-02. 725 bytes, and the member inside the archive is `AG011A.DAT` in capitals where its neighbours are lower case. The year Ohio's sixteen special-education regional resource centres and its twenty-four data-processing centres all leave the directory at once.",
+            },
+            Source {
+                key: "ccd-lea-directory-0203",
+                title: None,
+                url: "https://nces.ed.gov/ccd/data/zip/ag021a_dat.zip",
+                filename: "ccd-lea-directory-0203.zip",
+                format: Format::Zip,
+                catalog: Some("nces-ccd-lea-directory"),
+                fixtures: &[crate::fixtures::CCD_DIRECTORY_FIXTURE],
+                note: "School year 2002-03. 729 bytes, status at 284. Its layout document runs `BOUND02`'s entire entry onto the end of the line above it, so a parser that anchors variable names to the start of a line does not find the column at all — and the two neighbouring years put it somewhere else, so guessing is not available either.",
+            },
+            Source {
+                key: "ccd-lea-directory-0304",
+                title: None,
+                url: "https://nces.ed.gov/ccd/data/zip/ag031b_dat.zip",
+                filename: "ccd-lea-directory-0304.zip",
+                format: Format::Zip,
+                catalog: Some("nces-ccd-lea-directory"),
+                fixtures: &[crate::fixtures::CCD_DIRECTORY_FIXTURE],
+                note: "School year 2003-04. Named `_dat` and holding `ag031b.txt`, which is fixed-width regardless of what it is called. **Its layout document states the status column's position wrongly** — 281, which is the metropolitan indicator's — and states it a second time as 384. The true position is 284, and this repository takes it from the file rather than the document: see `fixtures::CCD_FIXED_WIDTH`. `ag031a_dat.zip` is still served and its Ohio rows agree in all five columns.",
+            },
+            Source {
+                key: "ccd-lea-directory-0405",
+                title: None,
+                url: "https://nces.ed.gov/ccd/data/zip/ag041c_dat.zip",
+                filename: "ccd-lea-directory-0405.zip",
+                format: Format::Zip,
+                catalog: Some("nces-ccd-lea-directory"),
+                fixtures: &[crate::fixtures::CCD_DIRECTORY_FIXTURE],
+                note: "School year 2004-05, third revision. The record almost halves, to 519 bytes, because the dropout and completer counts leave the agency file. Nothing this reader takes moves. `ag041a_dat.zip` is still served and agrees on Ohio.",
+            },
+            Source {
+                key: "ccd-lea-directory-0506",
+                title: None,
+                url: "https://nces.ed.gov/ccd/data/zip/ag051a_dat.zip",
+                filename: "ccd-lea-directory-0506.zip",
+                format: Format::Zip,
+                catalog: Some("nces-ccd-lea-directory"),
+                fixtures: &[crate::fixtures::CCD_DIRECTORY_FIXTURE],
+                note: "School year 2005-06. Its layout document is the previous year's with the heading changed: the sentence beneath still reads *\"data for the school year 2004-05\"* and the observation count is still 18,085, where this file has 18,213 records. The record length it gives, 519, is right — which is the worst arrangement, because the parts that are wrong are the parts a reader would use to check the parts that are not.",
+            },
+            Source {
+                key: "ccd-lea-directory-0607",
+                title: None,
+                url: "https://nces.ed.gov/ccd/data/zip/ag061c_dat.zip",
+                filename: "ccd-lea-directory-0607.zip",
+                format: Format::Zip,
+                catalog: Some("nces-ccd-lea-directory"),
+                fixtures: &[crate::fixtures::CCD_DIRECTORY_FIXTURE],
+                note: "School year 2006-07, and the last fixed-width year. 530 bytes; latitude, longitude and a congressional district code arrive ahead of the status column and push it to 309. The year the agency type stops distinguishing a local district from a component of a supervisory union: Ohio's 238 type 1 and 377 type 2 become 614 type 1, with no agency joining or leaving.",
+            },
+            Source {
+                key: "ccd-lea-directory-0708",
+                title: None,
+                url: "https://nces.ed.gov/ccd/data/zip/ag071b_txt.zip",
+                filename: "ccd-lea-directory-0708.zip",
+                format: Format::Zip,
+                catalog: Some("nces-ccd-lea-directory"),
+                fixtures: &[crate::fixtures::CCD_DIRECTORY_FIXTURE],
+                note: "School year 2007-08, and not fixed-width at all — tab-delimited with a header, exactly like 2008-09. It reads through the alias table with nothing added: `STID07`, `NAME07`, `TYPE07` and `BOUND07` were listed there before any wired year used them, because the aliases are per naming convention rather than per year.",
+            },
             Source {
                 key: "ccd-lea-directory-0809",
                 title: None,
