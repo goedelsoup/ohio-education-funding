@@ -41,6 +41,11 @@ export function fromCatalog(rows: AppropriationYear[]): number[] {
   return rows.filter((r) => r.source === "catalog").map((r) => r.fiscal_year);
 }
 
+/** The years read from the enrolled acts, which is everything before the workbook series. */
+export function fromActs(rows: AppropriationYear[]): number[] {
+  return rows.filter((r) => r.source === "act").map((r) => r.fiscal_year);
+}
+
 /**
  * The series in `base` dollars, dropping any year the index cannot reach.
  *
@@ -90,6 +95,7 @@ export function renderAppropriations(
   const multiple = growth(shown);
   const dropped = rows.length - shown.length;
   const catalogYears = fromCatalog(rows);
+  const actYears = fromActs(rows);
 
   const chart = renderToString(
     seriesSpec(
@@ -141,23 +147,43 @@ export function renderAppropriations(
               <td class="tnum">${money(r.enacted)}</td>
               <td class="tnum n">${pct(r.foundation_funding / r.enacted, 0)}</td>
               <td class="tnum n">${r.items}</td>
-              <td>${r.source === "catalog" ? "Catalog" : "Greenbook"}</td>
+              <td>${escapeHtml(
+                r.source === "catalog" ? "Catalog" : r.source === "act" ? "The act" : "Greenbook",
+              )}</td>
             </tr>`,
           )
           .join("")}</tbody>
       </table></div>
 
-      <p class="note">Two publications answer for this series.
+      <p class="note">Three publications answer for this series.
         ${
           catalogYears.length === 0
             ? ""
-            : `FY${catalogYears.join(", FY")} come from the Catalog of Budget Line Items and the
-        rest from LSC's greenbooks and budget workbooks — those are the years the workbooks cannot
-        reach, one biennium because its greenbook has no line-item table at all and the other
-        because the two workbook variants are served as the same file.`
+            : `FY${catalogYears.join(", FY")} come from the Catalog of Budget Line Items and most
+        of the rest from LSC's greenbooks and budget workbooks — those are the years the workbooks
+        cannot reach, one biennium because its greenbook has no line-item table at all and the
+        other because the two workbook variants are served as the same file.`
         }
-        Where both publications state a year, they agree to the cent across seventeen hundred
-        line items, so the column says which document a figure came from rather than how much to
-        trust it.</p>
+        Where both of those state a year, they agree to the cent across seventeen hundred line
+        items, so the column says which document a figure came from rather than how much to trust
+        it.</p>
+
+      ${
+        actYears.length === 0
+          ? ""
+          : `<p class="note"><strong>FY${actYears.join(", FY")} are read from the acts
+        themselves</strong>, because no analysis of them reaches that far: the greenbook series
+        begins with the 124th General Assembly. The acts do not reach further either, and the wall
+        is the publisher's — the legislature's own index of everything it holds stops at the 122nd,
+        so nothing enacted before 1997 is served at all. The Foundation Program era and the equal
+        yield formula cannot be priced from here.</p>
+
+      <p class="note">One of those years was appropriated twice. Am. Sub. H.B. 215, the first
+        budget enacted after the Supreme Court held the funding system unconstitutional, itemised
+        FY1998 across fifty-three general revenue lines and FY1999 across <em>one</em> — the whole
+        year in a single item, against a promise to itemise it by January 1998. The promise was
+        kept, and the figure above is the one that governed rather than the one first passed. The
+        difference is about $175 million and fifty line items.</p>`
+      }
     </div>`;
 }

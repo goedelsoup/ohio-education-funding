@@ -1493,6 +1493,22 @@ pub const CONNECTORS: &[Connector] = &[
                        the only act here for which the obvious guess is right.",
             },
             Source {
+                key: "hb770-122-enrolled",
+                title: Some("Am. Sub. H.B. 770 of the 122nd General Assembly, as enrolled"),
+                url: "https://search-prod.lis.state.oh.us/api/v2/general_assembly_122/\
+                      legislation/hb770/05_EN/pdf/",
+                filename: "hb770-122-enrolled.pdf",
+                format: Format::Pdf,
+                catalog: Some("ohio-session-laws"),
+                fixtures: &[crate::fixtures::SESSION_LAW_FIXTURE],
+                note: "The operative FY1998-99 text. It reprints Section 50 as already amended by \
+                       H.B. 650 — so its columns carry the itemisation H.B. 215 deferred, with \
+                       200-405 struck back to zero — and then amends that again, each replacement \
+                       printed on its own line under the column it replaces. Version code \
+                       `05_EN`, and the heading is `\" Sec. 50.` rather than `SECTION 50.` \
+                       because the whole section is quoted inside an amending act.",
+            },
+            Source {
                 key: "hb282-123-enrolled",
                 title: Some("Am. Sub. H.B. 282 of the 123rd General Assembly, as enrolled"),
                 url: "https://search-prod.lis.state.oh.us/api/v2/general_assembly_123/\
