@@ -33,6 +33,7 @@ use project::panel::{panel, DistrictRecord, HISTORY_YEARS, MINIMUM_STATE_SHARE, 
 use project::policy::{GuaranteeRule, Policy};
 use project::report::{enrollment_growth_prior, forecast, simulate};
 use project::series::{Method, DEFAULT_DAMPING, ONE_SIGMA};
+use project::session_laws;
 use scenario_delta::ScenarioDelta;
 
 /// The furthest year the page will offer, ten past the last observation.
@@ -728,21 +729,42 @@ fn appropriation_block() -> Vec<AppropriationYear> {
         }
     }
 
-    totals
+    // The four years before the workbook series, from the acts themselves. Kept separate down to
+    // here rather than merged into `enacted_lines`, because the acts are a different publisher
+    // reading a different document and the row that says so is `source`.
+    let from_acts = session_laws::department_total();
+    let act_foundation = session_laws::foundation_funding();
+    let act_items = session_laws::items_by_year();
+
+    from_acts
         .into_iter()
-        .map(
-            |(fiscal_year, (enacted, foundation_funding))| AppropriationYear {
-                fiscal_year,
-                enacted,
-                foundation_funding,
-                items: by_year.get(&fiscal_year).copied().unwrap_or_default(),
-                source: if from_catalog.contains(&fiscal_year) {
-                    "catalog"
-                } else {
-                    "workbook"
-                }
-                .to_string(),
-            },
+        .map(|(fiscal_year, enacted)| AppropriationYear {
+            fiscal_year,
+            enacted,
+            foundation_funding: act_foundation
+                .get(&fiscal_year)
+                .copied()
+                .unwrap_or_default(),
+            items: act_items.get(&fiscal_year).copied().unwrap_or_default(),
+            source: "act".to_string(),
+        })
+        .chain(
+            totals
+                .into_iter()
+                .map(
+                    |(fiscal_year, (enacted, foundation_funding))| AppropriationYear {
+                        fiscal_year,
+                        enacted,
+                        foundation_funding,
+                        items: by_year.get(&fiscal_year).copied().unwrap_or_default(),
+                        source: if from_catalog.contains(&fiscal_year) {
+                            "catalog"
+                        } else {
+                            "workbook"
+                        }
+                        .to_string(),
+                    },
+                ),
         )
         .collect()
 }

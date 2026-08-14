@@ -1157,18 +1157,30 @@ fn f33_ohio_panel(root: &Path) -> Result<Vec<Vec<String>>, String> {
     fixtures::build_f33_ohio_panel(&years, &directory)
 }
 
-/// The acts whose education tables are printed once and can be read as they stand.
+/// The acts this repository reads an education appropriation table out of.
 ///
-/// H.B. 650 and H.B. 770 of the 122nd are deliberately absent. Both amend Section 50 of H.B. 215
-/// and both print every changed row **twice** — the struck figure inline and the inserted one on a
-/// continuation line beneath — and H.B. 650 reprints H.B. 215's fund-group totals unchanged, so
-/// the reconciliation this reader relies on would pass against the superseded number. Reading them
-/// needs a reader that tells a struck row from an inserted one, which this is not.
+/// **H.B. 770 is the operative text for FY1998-99 and H.B. 215 is not.** It reprints Section 50
+/// *as already amended by H.B. 650*, so its two money columns carry the itemisation H.B. 215
+/// deferred, with `200-405` struck back to zero — and it then amends that in turn, printing each
+/// replacement on its own line under the column it replaces. Both acts are held: H.B. 215 because
+/// the shape of what it did is the finding, and H.B. 770 because its figures are the ones that
+/// governed the year.
+///
+/// H.B. 650 is deliberately absent even now. Its own table is the strike-and-insert edit that
+/// H.B. 770 then reprints in settled form, and it reprints H.B. 215's fund-group totals
+/// **unchanged** — so a reader reconciling against printed totals would pass against the
+/// superseded number. Everything it establishes is legible in H.B. 770 without that hazard.
 const SESSION_LAW_ACTS: &[(u16, &str, &str, u16)] = &[
     (
         122,
         "hb215",
         "SECTION 50. EDU DEPARTMENT OF EDUCATION",
+        1998,
+    ),
+    (
+        122,
+        "hb770",
+        "\" Sec. 50. EDU DEPARTMENT OF EDUCATION",
         1998,
     ),
     (123, "hb282", "SECTION 4. EDU DEPARTMENT OF EDUCATION", 2000),

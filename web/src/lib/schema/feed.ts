@@ -1034,7 +1034,7 @@ export const AppropriationYearSchema = z
     foundation_funding: num,
     /** How many line items the total is over. */
     items: z.number().int().positive(),
-    source: z.enum(["workbook", "catalog"]),
+    source: z.enum(["workbook", "catalog", "act"]),
   })
   .strict();
 

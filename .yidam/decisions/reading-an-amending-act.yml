@@ -1,0 +1,98 @@
+id: reading-an-amending-act
+summary: >-
+  H.B. 770 wired, which gives FY1999 its line items and makes the enacted appropriation series
+  continuous FY1998-FY2027 — and the amendment turns out to be positional rather than typographic,
+  so the hazard the previous phase refused to touch was smaller than it looked and the one that
+  actually cost money was somewhere else.
+context: |
+  [`the-acts-themselves`](the-acts-themselves.yml) wired H.B. 215 and H.B. 282 and deliberately
+  left two acts alone. H.B. 215 appropriated FY1999 as a single undifferentiated line — the whole
+  year in `200-405`, against a promise to itemise it by January 1998 — and H.B. 650 and H.B. 770
+  kept that promise. Neither was read, for a stated reason:
+
+    > Both print every amended row twice — the struck figure inline and the inserted one on a
+    > continuation line beneath — and H.B. 650 reprints H.B. 215's fund-group totals unchanged, so
+    > the reconciliation this reader relies on would pass against the superseded number. A wrong
+    > answer that satisfies the check is the worst property a source can have.
+
+  So FY1999 sat in the fixture as fifty-one zeros and one lump, and the four pre-2002 years stayed
+  out of the published feed because charting that draws fifty-one programmes going to zero.
+decision: |
+  Wire **H.B. 770** and not H.B. 650, and make the vintage explicit rather than implicit.
+
+  H.B. 770 reprints Section 50 *as already amended by H.B. 650* and then amends it again, so its
+  columns carry everything H.B. 650 established without the hazard that kept H.B. 650 out. Both
+  H.B. 215 and H.B. 770 are held; `session_laws::OPERATIVE` names which act answers for which year,
+  and every total reads through it.
+
+  Put the four years in the feed. Contract `33.0.0`, and `source` gains a third value, `act`.
+consequences: |
+  **The amendment is positional, not typographic, and that is why this was tractable.**
+  Strike-through does not survive into the PDF's text layer and does not need to. The row line
+  carries the figures as they stood; H.B. 770's replacements are printed beneath, right-aligned
+  under the column each replaces:
+
+      GRF 200-100   Personal Services   $  10,744,925 $  10,756,210
+                                                         11,256,210
+
+  So a replacement is a line of nothing but digits whose numbers **end where the row's amounts
+  end**. That last condition is what keeps page furniture out: the acts print a bare page number on
+  its own line, and `247` under a row whose columns end at 59 and 74 amends nothing. No blacklist,
+  no page-header rule.
+
+  **The real hazard was not the one the previous phase named.** A replacement can sit *two* lines
+  below its row, after the wrapped second half of its own title. `200-545 Vocational Education
+  Enhancements` is amended from $184,298,314 to $201,991,432 that way. A reader that only looks at
+  the next line loses **$17,693,118** — and it was the reconciliation that found it, not inspection.
+
+  **FY1999 has two enacted readings and they are not close.** Net of tax reimbursement it is
+  $6.15bn as H.B. 215 passed it and $6.33bn as H.B. 770 left it, and the composition differs by
+  about fifty line items: `200-405` struck to zero, `200-501 Base Cost Funding` restored from $0 to
+  $2,986,915,811, `200-504 Special Education` and `200-507 Vocational Education` consolidated away
+  into new numbers. "As enacted" is not a single thing for this year, which is why `OPERATIVE`
+  exists rather than a rule about which file was read last.
+
+  **The series is continuous FY1998-FY2027 and joins without a seam.** Enacted, net of
+  reimbursement: 5.91 → 6.33 → 6.84 → 7.24 → 7.75bn into FY2002. The formula's own share: 2.79 →
+  3.65 → 4.13 → 4.46 → 4.88bn. No step at the General Assembly boundary and none at the change of
+  publisher, which is the evidence that the acts and the workbooks are counting the same thing.
+
+  **One line is renumbered twice in four years.** The lottery half of the formula is `017 200670
+  School Foundation - Basic Allowance` in FY1998, `017 200610 Base Cost Funding` in FY1999, and
+  `017 200612` from FY2000 — same money, same fund, three numbers. The FY1999 identity is confirmed
+  from outside the acts: the greenbook's FY1999 *actual* for `200612` is $666,093,028, which is
+  what H.B. 770 appropriates `017 200610`, to the dollar.
+
+  And **`200610` is not a key on its own**: `454 200610` is `Guidance and Testing` in the same
+  tables, about half a million a year. `session_laws::FOUNDATION` keys on fund and number together
+  for that reason, with a test that fails if the colliding line disappears — because the day it
+  does, the test stops guarding anything and should say so rather than pass quietly.
+
+  **The act's own footing is wrong in one place and is resolved rather than tolerated.** H.B. 770's
+  FY1999 grand total omits the Education Improvement Fund's $1,443,401 while its FY1998 total
+  includes it. `appropriation-lines.csv` already carried `200689 Hazardous Waste Removal` as a
+  FY1999 *actual* of exactly that, from the greenbook — so the rows are right and the footing is
+  wrong, and the allowance is a named entry of a fixed size rather than a tolerance. The list now
+  has two entries and each is aimed at one of the two additions an act can get wrong.
+alternatives: |
+  **Wire H.B. 650 as well, for completeness.** Rejected, and the reason has not changed: it
+  reprints H.B. 215's fund-group totals unchanged, so the reconciliation would pass against the
+  superseded number. Everything it establishes is legible in H.B. 770 in settled form. Wiring a
+  source whose self-check cannot fail is worse than not wiring it.
+
+  **Read strike-through from the PDF.** Not needed, and it was the assumption that made this look
+  harder than it is. Whether the strike survives into the text layer was never established because
+  the positional reading made the question moot. Anyone reaching for it should check first.
+
+  **Keep FY1999 as H.B. 215 enacted it and footnote the amendment.** Rejected. It is the reading
+  that was superseded before the fiscal year began, and a footnote under a chart showing fifty-one
+  programmes at zero is not a correction.
+
+  **Drop H.B. 215's rows now that H.B. 770 supersedes them.** Rejected. The deferral is the finding
+  — a legislature appropriating a year's money while declining to say what it is for — and it is
+  only visible by holding both readings. `deferred_years()` reports it and moves no total.
+
+  **Fold the act years into `appropriations::enacted_lines` so there is one series.** Rejected. The
+  acts are a different publisher reading a different document, and `source: "act"` on the row is
+  what tells a reader that. The join is made once, in `bundle`, where the other two publishers are
+  already joined.

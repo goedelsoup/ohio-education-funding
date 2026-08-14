@@ -3646,17 +3646,42 @@ fn session_law_rows(
     let mut totals: Vec<GroupTotal> = Vec::new();
     let mut group = String::new();
     let mut pending: Option<String> = None;
+    // Where the last row or total put its two amounts, so a replacement printed beneath it can be
+    // assigned to the year it replaces. `None` until the first row of the table.
+    let mut last: Option<Columns> = None;
+    // Whether the open thing is a row or a total, because an amending act corrects both.
+    let mut last_was_total = false;
 
     for line in table.lines() {
         let trimmed = line.trim();
         if trimmed.is_empty() {
             continue;
         }
+        // An amendment binds to whatever it sits under, and it may sit two lines under: the
+        // amended figure for `200-545 Vocational Education Enhancements` follows the wrapped
+        // second half of its own title. So this is tried before the row and title cases and the
+        // open row stays open across a wrap.
+        if let Some(columns) = last {
+            if let Some([first, second]) = amendment(line, columns) {
+                if last_was_total {
+                    if let Some(total) = totals.last_mut() {
+                        total.first = first.unwrap_or(total.first);
+                        total.second = second.unwrap_or(total.second);
+                    }
+                } else if let Some(row) = rows.last_mut() {
+                    row.first = first.unwrap_or(row.first);
+                    row.second = second.unwrap_or(row.second);
+                }
+                continue;
+            }
+        }
         // A total's label wraps as often as not — `TOTAL GSF General Services` on one line and
         // `Fund Group   $ 12,695,447 $ 13,033,594` on the next — so a `TOTAL` with no money on it
         // opens a label that the following line closes.
         if let Some(total) = printed_total(trimmed) {
             pending = None;
+            last = columns_of(line);
+            last_was_total = true;
             totals.push(total);
             continue;
         }
@@ -3671,20 +3696,26 @@ fn session_law_rows(
             head.push(' ');
             head.push_str(trimmed);
             if let Some(total) = printed_total(head) {
+                last = columns_of(line);
+                last_was_total = true;
                 totals.push(total);
                 pending = None;
             }
             continue;
         }
         match appropriation_row(trimmed) {
-            Some((fund, item, title, first, second)) => rows.push(ActLine {
-                group: group.clone(),
-                fund,
-                item,
-                title,
-                first,
-                second,
-            }),
+            Some((fund, item, title, first, second)) => {
+                last = columns_of(line);
+                last_was_total = false;
+                rows.push(ActLine {
+                    group: group.clone(),
+                    fund,
+                    item,
+                    title,
+                    first,
+                    second,
+                });
+            }
             None => {
                 // A line with no amounts is either a fund-group heading or a wrapped title. The
                 // difference is whether a row is open: the heading always precedes the first row
@@ -3710,6 +3741,17 @@ fn session_law_rows(
         ));
     }
     Ok((rows, totals))
+}
+
+/// Where a line's two money columns end, so an amendment beneath it can be assigned to one.
+///
+/// By position because that is the only thing that says which column an amending act is changing:
+/// H.B. 770 prints the amended figure on its own line under the column it replaces, and a line
+/// carrying one number is otherwise silent about which of the two years it belongs to.
+#[derive(Debug, Clone, Copy)]
+struct Columns {
+    first: usize,
+    second: usize,
 }
 
 /// `GRF 200-501 School Foundation Basic   $  2,202,851,688 $  0` — or `None` if the line is not one.
@@ -3742,6 +3784,67 @@ fn appropriation_row(line: &str) -> Option<(String, String, String, i64, i64)> {
 }
 
 /// `TOTAL GRF General Revenue Fund   $ 4,899,708,534 $ 5,134,145,592`, or `None`.
+/// The end positions of the last two comma-grouped numbers on a line.
+fn columns_of(line: &str) -> Option<Columns> {
+    let ends: Vec<usize> = number_spans(line)
+        .into_iter()
+        .map(|(_, end, _)| end)
+        .collect();
+    match ends[..] {
+        [.., first, second] => Some(Columns { first, second }),
+        _ => None,
+    }
+}
+
+/// Every run of digits and commas on a line, with where it starts and ends.
+fn number_spans(line: &str) -> Vec<(usize, usize, i64)> {
+    let bytes = line.as_bytes();
+    let mut out = Vec::new();
+    let mut at = 0usize;
+    while at < bytes.len() {
+        if !bytes[at].is_ascii_digit() {
+            at += 1;
+            continue;
+        }
+        let start = at;
+        while at < bytes.len() && (bytes[at].is_ascii_digit() || bytes[at] == b',') {
+            at += 1;
+        }
+        // A trailing comma belongs to the prose, not to the number.
+        let end = line[start..at].trim_end_matches(',').len() + start;
+        if let Ok(value) = line[start..end].replace(',', "").parse::<i64>() {
+            out.push((start, end, value));
+        }
+    }
+    out
+}
+
+/// An amending act's replacement figures, aligned under the columns they replace.
+///
+/// `None` unless the line is nothing but numbers **and** at least one of them ends where one of
+/// the row above's amounts ends. That second condition is what keeps page furniture out: the
+/// enrolled acts print a bare page number on its own line, and `247` under a row whose columns
+/// end at 59 and 74 is not an amendment to anything.
+fn amendment(line: &str, columns: Columns) -> Option<[Option<i64>; 2]> {
+    if line.trim().is_empty() || line.chars().any(|c| c.is_ascii_alphabetic()) {
+        return None;
+    }
+    let mut out = [None, None];
+    let mut aligned = false;
+    for (_, end, value) in number_spans(line) {
+        // Two characters of slack: the columns are right-aligned but the amending line is set
+        // separately and the two do not always land on exactly the same byte.
+        if end.abs_diff(columns.first) <= 2 {
+            out[0] = Some(value);
+            aligned = true;
+        } else if end.abs_diff(columns.second) <= 2 {
+            out[1] = Some(value);
+            aligned = true;
+        }
+    }
+    aligned.then_some(out)
+}
+
 /// The prefix is matched case-insensitively because one group's is not like the others: H.B. 215
 /// closes the lottery funds with `Total 017 and 018 LPE Lottery Profits Education Fund Group`,
 /// lowercase and named by fund number rather than by group. It carries $699,892,200, and the
@@ -3770,13 +3873,25 @@ fn printed_total(line: &str) -> Option<GroupTotal> {
 /// is a list of specific known defects, and a difference that is not on it — or is on it at a
 /// different size — still fails the rebuild.
 ///
-/// The one entry is H.B. 282's: its printed GRF total for FY2001 is **one dollar more** than its
-/// own fifty-two rows, while its five group totals sum to its printed grand total exactly. So the
-/// dollar sits between the rows and the GRF footing, in the enrolled act, and there is nothing to
-/// correct it against. It is carried rather than absorbed because $1 on $7.98 billion is the kind
-/// of difference that would otherwise be rounded away by a tolerance wide enough to hide a real
-/// missing row.
-const ACT_FOOTING_DEFECTS: [(&str, u16, i64); 1] = [("hb282", 2001, 1)];
+/// Each entry is the amount by which the act's own rows **exceed** what it foots them to, and
+/// `at_grand_total` says which of the two additions is wrong: the rows against their fund-group
+/// totals, or those totals against the grand total. An act is wrong in one place and right in the
+/// other, so the allowance has to be aimed.
+///
+/// **H.B. 282, FY2001.** Its printed GRF total is one dollar *more* than its own fifty-two rows,
+/// while its five group totals sum to its grand total exactly. The dollar sits between the rows
+/// and the GRF footing and there is nothing to correct it against. Carried rather than absorbed
+/// because $1 on $7.98 billion is exactly what a tolerance wide enough to hide a missing row
+/// would swallow.
+///
+/// **H.B. 770, FY1999.** Its fund-group totals sum to $1,443,401 *more* than its printed grand
+/// total, and this one is resolvable in the rows' favour: the missing amount is the Education
+/// Improvement Fund's `006 200-689 Hazardous Waste Removal`, which the act's FY1998 grand total
+/// includes and its FY1999 grand total does not. `appropriation-lines.csv` already carries that
+/// line as a FY1999 **actual** of exactly $1,443,401, from the H.B. 94 greenbook — so the money
+/// was appropriated and spent, and it is the act's footing that is wrong rather than its rows.
+const ACT_FOOTING_DEFECTS: [(&str, u16, i64, bool); 2] =
+    [("hb282", 2001, -1, false), ("hb770", 1999, 1_443_401, true)];
 
 /// Sum the rows back against every total the act prints, in both columns.
 fn reconcile_act(
@@ -3800,14 +3915,16 @@ fn reconcile_act(
             .map(|t| if k == 0 { t.first } else { t.second })
             .sum()
     };
-    let allowed = |year: u16| -> i64 {
+    let allowed = |year: u16, at_grand_total: bool| -> i64 {
         ACT_FOOTING_DEFECTS
             .iter()
-            .find(|(bill, defect_year, _)| *bill == act.bill && *defect_year == year)
-            .map_or(0, |(_, _, by)| *by)
+            .find(|(bill, defect_year, _, at)| {
+                *bill == act.bill && *defect_year == year && *at == at_grand_total
+            })
+            .map_or(0, |(_, _, by, _)| *by)
     };
     for (k, year) in [(0usize, act.first_year), (1, act.first_year + 1)] {
-        if summed(k) != printed(k) - allowed(year) {
+        if summed(k) - printed(k) != allowed(year, false) {
             let names: Vec<&str> = totals.iter().map(|t| t.label.as_str()).collect();
             return Err(format!(
                 "{label}: FY{year} rows sum to {} against the {} its fund-group totals print \
@@ -3819,23 +3936,34 @@ fn reconcile_act(
     }
     // And the groups against the act's own grand total, which is a separate assertion: the groups
     // can each be internally consistent and still not be all of them.
-    // The grand total wraps like any other, so it is read from the first line that closes it.
+    // The grand total wraps like any other and is amended like any other: H.B. 770 prints its
+    // own replacement beneath it, and reading only the first line gets the figure the act is
+    // superseding rather than the one it enacts.
     let mut head = String::new();
-    let grand = closing
-        .lines()
-        .take(4)
-        .find_map(|line| {
-            head.push(' ');
-            head.push_str(line.trim());
-            printed_total(head.trim())
-        })
-        .ok_or_else(|| format!("{label}: the grand total does not parse"))?;
+    let mut grand = None;
+    let mut at = 0usize;
+    for (i, line) in closing.lines().take(4).enumerate() {
+        head.push(' ');
+        head.push_str(line.trim());
+        if let Some(total) = printed_total(head.trim()) {
+            grand = Some((total, columns_of(line)));
+            at = i;
+            break;
+        }
+    }
+    let (mut grand, columns) =
+        grand.ok_or_else(|| format!("{label}: the grand total does not parse"))?;
+    if let (Some(columns), Some(next)) = (columns, closing.lines().nth(at + 1)) {
+        if let Some([first, second]) = amendment(next, columns) {
+            grand.first = first.unwrap_or(grand.first);
+            grand.second = second.unwrap_or(grand.second);
+        }
+    }
     for (k, year, stated) in [
         (0usize, act.first_year, grand.first),
         (1, act.first_year + 1, grand.second),
     ] {
-        let _ = year;
-        if printed(k) != stated {
+        if printed(k) - stated != allowed(year, true) {
             return Err(format!(
                 "{label}: FY{year} fund-group totals sum to {} against the grand total's {stated}",
                 printed(k)

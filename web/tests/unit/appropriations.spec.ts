@@ -9,7 +9,7 @@
 
 import { expect, test } from "vitest";
 
-import { fromCatalog, growth, inBase, renderAppropriations } from "../../src/lib/appropriations.ts";
+import { fromActs, fromCatalog, growth, inBase, renderAppropriations } from "../../src/lib/appropriations.ts";
 import { loadFeed } from "../../src/lib/feed.ts";
 import { baseYear } from "../../src/lib/real.ts";
 
@@ -20,13 +20,38 @@ const base = baseYear(
   rows.map((r) => r.fiscal_year),
 );
 
-test("the series is continuous from FY2002, which it was not before the Catalog", () => {
-  // The workbook series had four holes in it: FY2006, FY2007, FY2012 and FY2013.
-  expect(rows.length).toBe(26);
+test("the series is continuous from FY1998, and three publications make it so", () => {
+  // It began at FY2002 with four holes in it — FY2006, FY2007, FY2012, FY2013 — which the Catalog
+  // closed. The acts themselves then took it back four more years.
+  expect(rows.length).toBe(30);
   const years = rows.map((r) => r.fiscal_year);
-  expect(years[0]).toBe(2002);
+  expect(years[0]).toBe(1998);
   expect(years[years.length - 1]).toBe(2027);
-  expect(years).toEqual(Array.from({ length: 26 }, (_, i) => 2002 + i));
+  expect(years).toEqual(Array.from({ length: 30 }, (_, i) => 1998 + i));
+});
+
+test("exactly the four years before the workbook series come from the acts", () => {
+  /*
+   * And no further. The legislature's own index of what it holds stops at the 122nd General
+   * Assembly, so FY1998 is a wall rather than a stopping point — if this list ever grows
+   * downward, something has been read from a source that does not exist.
+   */
+  expect(fromActs(rows)).toEqual([1998, 1999, 2000, 2001]);
+  for (const row of rows.filter((r) => r.source === "act")) {
+    expect(row.enacted, `FY${row.fiscal_year}`).toBeGreaterThan(5e9);
+    expect(row.foundation_funding, `FY${row.fiscal_year}`).toBeGreaterThan(2e9);
+    expect(row.items, `FY${row.fiscal_year}`).toBeGreaterThan(50);
+  }
+});
+
+test("the page says the four act years are read from the acts and why they stop", () => {
+  // A reader meeting FY1998 beside FY2002 has to be told they come from different documents, and
+  // that the series ends where it does because the publisher ends rather than because nobody
+  // looked. Both sentences are on the card.
+  const html = renderAppropriations(rows, bundle.deflator!, base, "nominal");
+  expect(html).toContain("read from the acts");
+  expect(html).toContain("stops at the 122nd");
+  expect(html).toContain("appropriated twice");
 });
 
 test("exactly the four gap years come from the Catalog", () => {

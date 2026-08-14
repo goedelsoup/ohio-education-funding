@@ -15,29 +15,32 @@
 //! decided in March 1997 and falls inside it, so the first budget enacted after the decision is
 //! reachable. The Foundation Program era and the equal yield formula are not.
 //!
-//! # FY1999 has an appropriation and does not have a breakdown
+//! # A year can be appropriated twice, and the two readings are not alike
 //!
-//! [`lump_sum_years`] is the important function here. Nine months after the Supreme Court held the
-//! funding system unconstitutional, Am. Sub. H.B. 215 appropriated FY1998 across fifty-three GRF
-//! education lines and FY1999 across **one**: `200405`, Primary and Secondary Education Funding,
-//! $4,470,135,592, with fifty-one of the other lines at zero. The act says why:
+//! Nine months after the Supreme Court held the funding system unconstitutional, Am. Sub. H.B. 215
+//! appropriated FY1998 across fifty-three GRF education lines and FY1999 across **one**: `200405`,
+//! Primary and Secondary Education Funding, $4,470,135,592, with fifty-one of the others at zero.
+//! The act says why:
 //!
 //! > By January 15, 1998, the General Assembly shall develop a plan to provide itemized
 //! > appropriations for the Department of Education for fiscal year 1999.
 //!
-//! So FY1999's zeros are claims and not gaps, and no per-line comparison may cross FY1998/FY1999.
-//! [`comparable_years`] is the set that may.
+//! The promise was kept. H.B. 650 itemised the year in February 1998 and H.B. 770 reprinted the
+//! result in June with corrections of its own. So FY1999 has two enacted readings — one from the
+//! act that opened the biennium and one from the act that governed it — about $175 million and
+//! fifty line items apart.
 //!
-//! The promise was kept: H.B. 650 itemised the year in February 1998 and H.B. 770 corrected it in
-//! June. Neither is wired — both print every amended row twice, struck and inserted, and H.B. 650
-//! reprints H.B. 215's totals unchanged, so the reconciliation that guards every other extraction
-//! here would pass against the superseded number. Until they are read, FY1999 carries the
-//! appropriation **as enacted at passage** and says so.
+//! [`OPERATIVE`] names which act answers for a year and everything computed here reads through it.
+//! The superseded reading is kept rather than discarded, because the *shape* of what H.B. 215 did
+//! is the finding: [`deferred_years`] is the set of years an act appropriated without itemising,
+//! and it is not empty.
 //!
-//! The corroboration that the promise was kept is already committed: the H.B. 94 greenbook's
-//! FY1999 *actuals* in `appropriation-lines.csv` carry 141 line items and **no `200405` at all**,
-//! with `200501` spending $3,035,363,396. A line appropriated $4.47 billion and spent nothing,
-//! because by the time the money moved it had been given its proper names.
+//! # The corroboration needed no new retrieval
+//!
+//! The H.B. 94 greenbook's FY1999 *actuals* in `appropriation-lines.csv` carry 141 line items and
+//! **no `200405` at all**, with `200501` spending $3,035,363,396 against the $2,986,915,811
+//! H.B. 770 appropriates it. A line appropriated $4.47 billion and spent nothing, because by the
+//! time the money moved it had been given its proper names.
 
 use std::collections::{BTreeMap, BTreeSet};
 
@@ -54,6 +57,83 @@ pub const LAST_YEAR: u16 = 2001;
 
 /// The line item that stands in for a whole year's itemisation.
 pub const LUMP_SUM_ITEM: &str = "200405";
+
+/// Which act's text answers for which fiscal year.
+///
+/// H.B. 770 for the first biennium and not H.B. 215, because H.B. 770 reprints Section 50 as
+/// amended by H.B. 650 and then amends it again — so its columns are the ones that governed. The
+/// difference is not cosmetic: FY1999 net of tax reimbursement reads $6.15bn as H.B. 215 enacted
+/// it and $6.33bn as H.B. 770 left it, and the composition differs by fifty-odd line items.
+pub const OPERATIVE: [(u16, &str); 4] = [
+    (1998, "hb770"),
+    (1999, "hb770"),
+    (2000, "hb282"),
+    (2001, "hb282"),
+];
+
+/// The act whose text governs a fiscal year, if this repository holds one.
+#[must_use]
+pub fn operative(fiscal_year: u16) -> Option<&'static str> {
+    OPERATIVE
+        .iter()
+        .find(|(year, _)| *year == fiscal_year)
+        .map(|(_, bill)| *bill)
+}
+
+/// Only the rows from the act that governs each year.
+#[must_use]
+pub fn operative_lines() -> Vec<Appropriation> {
+    lines()
+        .into_iter()
+        .filter(|line| operative(line.fiscal_year) == Some(line.bill.as_str()))
+        .collect()
+}
+
+/// The formula's own lines, keyed on fund as well as number.
+///
+/// **The number alone is not a key in this era.** `200-610` is `454 Guidance and Testing` and
+/// `017 Base Cost Funding` in the same H.B. 770 table, and the greenbook resolves the collision by
+/// renumbering the lottery line to `200612` from FY2002. So the formula's share is taken on the
+/// pair, and a reader filtering on `200610` alone would add a testing programme to base cost.
+///
+/// The lottery half of the formula is renumbered twice inside four years — `200670 School
+/// Foundation - Basic Allowance` in FY1998, `200610 Base Cost Funding` in FY1999, `200612` from
+/// FY2000 — for the same money in the same fund. The FY1999 identity is confirmed from outside the
+/// acts: the greenbook's FY1999 *actual* for `200612` is $666,093,028, which is what H.B. 770
+/// appropriates `017 200610`, to the dollar.
+const FOUNDATION: [(&str, &str); 4] = [
+    ("GRF", "200501"),
+    ("017", "200670"),
+    ("017", "200610"),
+    ("017", "200612"),
+];
+
+/// What the formula itself was appropriated, by year, under the operative act.
+#[must_use]
+pub fn foundation_funding() -> BTreeMap<u16, f64> {
+    let mut out: BTreeMap<u16, f64> = BTreeMap::new();
+    for line in operative_lines() {
+        if FOUNDATION
+            .iter()
+            .any(|(fund, item)| *fund == line.fund && *item == line.line_item)
+        {
+            *out.entry(line.fiscal_year).or_default() += line.amount;
+        }
+    }
+    out
+}
+
+/// How many line items the operative act funds in a year.
+#[must_use]
+pub fn items_by_year() -> BTreeMap<u16, usize> {
+    let mut out: BTreeMap<u16, usize> = BTreeMap::new();
+    for line in operative_lines() {
+        if line.amount > 0.0 {
+            *out.entry(line.fiscal_year).or_default() += 1;
+        }
+    }
+    out
+}
 
 /// One appropriation line as one act states it, for one fiscal year.
 #[derive(Debug, Clone, PartialEq)]
@@ -114,7 +194,7 @@ pub fn lines() -> Vec<Appropriation> {
 #[must_use]
 pub fn department_total() -> BTreeMap<u16, f64> {
     let mut out: BTreeMap<u16, f64> = BTreeMap::new();
-    for line in lines() {
+    for line in operative_lines() {
         if crate::appropriations::is_tax_reimbursement(&line.line_item, line.fiscal_year) {
             continue;
         }
@@ -123,12 +203,13 @@ pub fn department_total() -> BTreeMap<u16, f64> {
     out
 }
 
-/// Years whose appropriation is a single undifferentiated line rather than an itemisation.
+/// Years an act appropriated without itemising, by the act that opened their biennium.
 ///
-/// FY1999, and only FY1999. Returned as a set rather than asserted as a constant so that a
-/// consumer branches on the property instead of on the year.
+/// FY1999, and only FY1999 — under H.B. 215, which is superseded. Kept because the shape is the
+/// finding, and because a later act doing the same thing should become visible rather than be
+/// smoothed away by the vintage rule. Read through [`OPERATIVE`] this set moves no total.
 #[must_use]
-pub fn lump_sum_years() -> BTreeSet<u16> {
+pub fn deferred_years() -> BTreeSet<u16> {
     lines()
         .into_iter()
         .filter(|line| line.line_item == LUMP_SUM_ITEM && line.amount > 0.0)
@@ -136,23 +217,10 @@ pub fn lump_sum_years() -> BTreeSet<u16> {
         .collect()
 }
 
-/// The years whose line items may be compared with one another.
-///
-/// Everything this repository holds from the acts, less the years [`lump_sum_years`] names. A
-/// per-line series drawn across a lump-sum year reports fifty-one programmes going to zero and
-/// then returning, which is a fact about the act's drafting and not about any programme.
-#[must_use]
-pub fn comparable_years() -> Vec<u16> {
-    let lump = lump_sum_years();
-    (FIRST_YEAR..=LAST_YEAR)
-        .filter(|year| !lump.contains(year))
-        .collect()
-}
-
-/// One line's amount across every year the acts state it.
+/// One line's amount across every year, under the operative act for each.
 #[must_use]
 pub fn line_history(line_item: &str) -> BTreeMap<u16, f64> {
-    lines()
+    operative_lines()
         .into_iter()
         .filter(|line| line.line_item == line_item)
         .map(|line| (line.fiscal_year, line.amount))
@@ -206,25 +274,103 @@ mod tests {
         );
     }
 
-    /// The finding, pinned: one year of the biennium was not itemised, and the act says why.
+    /// The finding, pinned: one act appropriated a year without itemising it, and said why.
     #[test]
-    fn fy1999_is_appropriated_as_one_line_and_fy1998_is_not() {
-        assert_eq!(lump_sum_years(), [1999].into_iter().collect());
-        assert_eq!(comparable_years(), vec![1998, 2000, 2001]);
-
-        let lump = line_history(LUMP_SUM_ITEM);
-        assert_eq!(lump[&1998], 0.0, "the lump is FY1999's and not FY1998's");
-        assert!(
-            lump[&1999] > 4.0e9,
-            "FY1999's lump is {:.0}, not the 4.47bn the act states",
-            lump[&1999]
+    fn fy1999_was_appropriated_as_one_line_and_then_itemised() {
+        // As H.B. 215 enacted it. `200405` carries the year and the formula's own line carries
+        // nothing, which is the shape the act's prose explains.
+        let as_passed: Vec<Appropriation> = lines()
+            .into_iter()
+            .filter(|l| l.bill == "hb215" && l.fiscal_year == 1999)
+            .collect();
+        let lump = as_passed
+            .iter()
+            .find(|l| l.line_item == LUMP_SUM_ITEM)
+            .expect("H.B. 215 carries the lump");
+        assert!(lump.amount > 4.0e9, "the lump is {:.0}", lump.amount);
+        assert_eq!(
+            as_passed
+                .iter()
+                .find(|l| l.line_item == "200501")
+                .expect("the formula's line is in the table")
+                .amount,
+            0.0
         );
+        assert_eq!(deferred_years(), [1999].into_iter().collect());
 
-        // And the formula's own line is the mirror image: funded in FY1998, zero in FY1999.
-        let foundation = line_history("200501");
-        assert!(foundation[&1998] > 2.0e9);
-        assert_eq!(foundation[&1999], 0.0);
-        assert!(foundation[&2000] > 3.0e9, "FY2000 itemises again");
+        // And as H.B. 770 left it: the lump struck to zero and the formula funded.
+        let operative = line_history("200501");
+        assert!(
+            operative[&1999] > 2.9e9,
+            "FY1999 base cost is {:.0} under the operative act",
+            operative[&1999]
+        );
+        assert_eq!(line_history(LUMP_SUM_ITEM)[&1999], 0.0);
+    }
+
+    /// The vintage rule, which is the difference between two enacted answers for one year.
+    #[test]
+    fn the_operative_act_answers_and_the_superseded_one_is_kept() {
+        for year in FIRST_YEAR..=LAST_YEAR {
+            let bill = operative(year).expect("every year has an operative act");
+            assert!(
+                operative_lines()
+                    .iter()
+                    .any(|l| l.fiscal_year == year && l.bill == bill),
+                "FY{year} has no rows from {bill}"
+            );
+        }
+        // H.B. 215's rows are still in the fixture and reach no total.
+        assert!(lines().iter().any(|l| l.bill == "hb215"));
+        assert!(!operative_lines().iter().any(|l| l.bill == "hb215"));
+
+        // The two readings of FY1999 differ by more than a rounding: about $175 million.
+        let superseded: f64 = lines()
+            .iter()
+            .filter(|l| {
+                l.bill == "hb215"
+                    && l.fiscal_year == 1999
+                    && !crate::appropriations::is_tax_reimbursement(&l.line_item, 1999)
+            })
+            .map(|l| l.amount)
+            .sum();
+        let governing = department_total()[&1999];
+        assert!(
+            governing - superseded > 1.0e8,
+            "the two readings differ by {:.0}",
+            governing - superseded
+        );
+    }
+
+    /// The formula's share is keyed on the fund as well as the number, because the number collides.
+    #[test]
+    fn the_formulas_own_lines_do_not_pick_up_a_testing_programme() {
+        let foundation = foundation_funding();
+        for year in FIRST_YEAR..=LAST_YEAR {
+            assert!(
+                foundation[&year] > 2.0e9,
+                "FY{year} foundation funding is {:.0}",
+                foundation[&year]
+            );
+            assert!(foundation[&year] < department_total()[&year]);
+        }
+        // `200610` is Guidance and Testing under fund 454 in the same table, and it is small.
+        // `200610` is Guidance and Testing under fund 454 in the same tables, half a million a
+        // year against a base cost in the billions. Keyed on the number alone it would be added
+        // to the formula's share every year.
+        let stray: Vec<Appropriation> = operative_lines()
+            .into_iter()
+            .filter(|l| l.line_item == "200610" && l.fund != "017")
+            .collect();
+        assert_eq!(stray.len(), 4, "the colliding line is not in every year");
+        for line in &stray {
+            assert!(
+                line.amount > 0.0 && line.amount < 1.0e6,
+                "FY{} carries {:.0} on the colliding number",
+                line.fiscal_year,
+                line.amount
+            );
+        }
     }
 
     /// The zeros are the act's, not the reader's — most of the department goes to zero together.

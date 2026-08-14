@@ -37,6 +37,18 @@ use edfund_core::Dollars;
 
 /// The bundle schema version. Bump on any change to field names, units, or semantics.
 ///
+/// `33.0.0` extends `appropriations` back to **FY1998** and adds a third value to its `source`
+/// field, `act`. Breaking on the enum: a consumer switching on `workbook` or `catalog` now meets a
+/// third case. The four new years are read from the enrolled acts rather than from any analysis of
+/// them, because the greenbook series begins with the 124th General Assembly and the Catalog
+/// reaches FY2002. They stop at FY1998 because the legislature's own index of what it holds stops
+/// at the 122nd.
+///
+/// The same revision corrects every enacted total from FY2002 to FY2013. `200906 Tangible Tax
+/// Exemption - Education` is a tax reimbursement and was not excluded, so it sat inside the
+/// department: $73,500,000 in FY2002, 0.94%, decaying to $10,707,622 by FY2009. Because it phases
+/// out it inflated the early years more than the late ones, understating real growth.
+///
 /// `32.0.0` reworked `meal_program`. It now runs FY1998 through FY2014 rather than FY2001 through
 /// FY2011, and `share` became **nullable**. Breaking in the strongest sense available here: a
 /// consumer that reads the block the way `29.0.0` published it will find a null where it expects a
@@ -118,7 +130,7 @@ use edfund_core::Dollars;
 /// from FY2022-FY2024 to FY2024-FY2026 — the years the department's `ADM Data` sheet declares.
 /// The values did not change; what they are called did, which is exactly the kind of silent
 /// meaning change the version guard exists for.
-pub const CONTRACT_VERSION: &str = "32.0.0";
+pub const CONTRACT_VERSION: &str = "33.0.0";
 
 /// How close to the floor counts as being on it, in mills.
 ///
