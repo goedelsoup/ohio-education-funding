@@ -1,0 +1,100 @@
+id: the-order-was-never-the-states
+summary: >-
+  The territory-transfer orders this corpus twice said it needed from the State Board of Education
+  do not exist there and never did — R.C. 3311.22 gives the order to the educational service center
+  and the State Board only an appeal it was never asked to hear. The statute is now committed, the
+  negative is measured against a positive control, and a claim this repository published about
+  where Newbury's territory went is corrected.
+context: |
+  Two records reached the same wall from different directions.
+  [`state-foundation-aid`](../corpus/revenue-stream/state-foundation-aid.yml) could not say whether
+  thirty vanished appropriation lines were abolished or consolidated.
+  [`the-directory-cannot-say-why`](the-directory-cannot-say-why.yml) established the same about
+  districts, and more sharply: the federal directory has a code for a consolidation, Ohio has never
+  filed it in 17,618 agency-years, and all 341 departures are filed as *"closed with no effect on
+  another agency's boundaries"* — which is false for the three that demonstrably transferred.
+
+  Both records said the same thing about the remedy: it needs Ohio's own territory-transfer orders
+  under R.C. 3311. Neither had read R.C. 3311.
+decision: |
+  Wire **R.C. 3311.22** and **R.C. 3311.06** through the existing `ohio-laws` connector, so the
+  mechanism is a committed primary source rather than an assumption about one.
+
+  Correct both the module note and the decision record that named the wrong custodian, and correct
+  the successor claim for Newbury.
+
+  **Do not commit the auditor's reports in this phase.** They are the way in and they are a
+  different kind of source — a state officer reciting a local body's act — and bringing them in
+  deserves its own decision rather than a paragraph at the end of this one.
+consequences: |
+  **The order was never the State Board's.** R.C. 3311.22 provides that the educational service
+  center governing board "shall at its next regular meeting that occurs not earlier than thirty
+  days after the adoption … adopt a resolution making the transfer effective". The State Board
+  appears twice in the section and neither appearance is an approval:
+
+  - as an **appeal body**, reachable only "if the transfer is opposed by the board of education
+    offered the territory", and
+  - as a place a **boundary map** is filed afterwards — "the educational service center governing
+    board offering the territory shall file with the county auditor and with the state board of
+    education an accurate map showing the boundaries of the territory transferred".
+
+  West Geauga's board accepted Newbury unanimously. No appeal arose, so no State Board instrument
+  was ever created. The corpus was not meeting a closed door; it was knocking at the wrong one.
+
+  **The negative is measured, and it has a positive control.** Fifty-eight meetings of adopted
+  State Board minutes across 2014-2017 and 2019-2020, plus 4,981 board-book PDFs spanning
+  2014-2021, contain **zero** occurrences of "Bettsville", **zero** of "Ledgemont" and **zero** of
+  `3311.22`. "Newbury" appears only in early 2014, concerning an earlier abandoned consolidation.
+
+  What makes that a finding rather than a shrug is that the same corpus **does** carry State Board
+  territory-transfer resolutions for other district pairs, under R.C. 3311.24 and 3311.06 — Little
+  Miami to Loveland, Medina, Akron to Tallmadge. The instrument detects the thing being looked for.
+  This repository has now built the same argument three times: the CCD's unused code 5 over a
+  completely enumerated population, the casino floor with the lottery as its control, and this.
+
+  **A claim this repository published is wrong and is withdrawn.** Both the module and the decision
+  record said Newbury's territory "split between West Geauga and Chardon". It did not. The
+  resolution transfers *all* of Newbury to West Geauga, and the F-33 panel already committed here
+  says the same: West Geauga gains 208 pupils in FY2021 and **Chardon loses 110** in the same year.
+  A survivor that shrinks did not receive anybody.
+
+  It came from a judge's failure-mode analysis — offered there as an example of enrolment
+  absorption getting the *sign* wrong — and was carried into a docstring and a test as though it
+  were a finding. The fixture that contradicts it was sitting beside the code the whole time. The
+  test that named four survivors now names three.
+
+  **The way in exists and is not the one anybody was looking for.** All three resolutions are
+  recited, by date and issuing body, in Ohio Auditor of State reports on the *receiving* districts:
+  North Central Ohio ESC on 24 June 2014 for Bettsville, Geauga County ESC on 27 January 2015 for
+  Ledgemont and on 20 August and 1 October 2019 for Newbury. Those reports serve as PDFs to this
+  project's own user agent. That is one hop from a corpus node, which is the standard
+  `the-directory-cannot-say-why` said could not be met — so that rejection has expired and is
+  marked expired rather than quietly dropped.
+
+  **And the proposing body's own record is silent, which is the trap to carry.** Geauga County
+  ESC's final audit spans both Newbury resolutions and never says "Newbury"; its FY2015 audit spans
+  the Ledgemont resolution and never says "Ledgemont". The act surfaces in the *receiving*
+  district's audit and nowhere in the *proposing* body's. A rule that looks where the order was
+  made finds nothing and concludes wrongly that nothing happened.
+alternatives: |
+  **Commit the auditor's reports now and close the question in one phase.** Rejected, narrowly. It
+  is the right next step and it is a different source class — a state officer's recital of a local
+  body's act, where every other primary source here is the acting body's own document. That
+  distinction deserves a decision record of its own, and the three resolutions are not going
+  anywhere.
+
+  **Publish "the orders are not published" as the finding.** Rejected, because it is false. The
+  orders as executed documents sit in ESC minute books that were not obtained, but their content is
+  retrievable today from the auditor. Writing the stronger negative would have been the unmeasured
+  kind this repository keeps warning about — a statement about one afternoon's fetching rather than
+  about Ohio's record-keeping.
+
+  **Report that the ESC minute books are unreachable.** Rejected for the same reason. Geauga's sit
+  behind a vendor WAF that refuses every non-browser client, and North Central Ohio's published
+  archive begins in 2022 — eight years after the Bettsville resolution. Neither is a fact about
+  Ohio; one is a content-delivery configuration and the other a publication start date, and both
+  are remediable by a records request under R.C. 149.43.
+
+  **Leave the Chardon claim and footnote it.** Never seriously. It is a claim about which
+  children went to which district, it is wrong, and the evidence against it was already in this
+  repository.

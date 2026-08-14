@@ -124,6 +124,13 @@ const CITED: &[&str] = &[
     "3310.51",
     "3310.52",
     "3313.975",
+    // How a school district stops existing. `dispersion::lea_directory` counts three districts
+    // out of the federal agency directory and the directory files all three as closed "with no
+    // effect on another agency's boundaries"; 3311.22 is the section that says otherwise, and it
+    // is also the section that settles who issues the order — the educational service center
+    // governing board, with the State Board of Education reachable only on appeal.
+    "3311.06",
+    "3311.22",
 ];
 
 /// The extract is what it claims to be: every cited section, each with a date and an act.

@@ -172,6 +172,33 @@ pub const OHIO_LAWS_SECTIONS: &[Source] = &[
                rather than from the section; gifted units are R.C. 3317.051.",
     },
     Source {
+        key: "rc-3311-22",
+        title: None,
+        url: "https://codes.ohio.gov/ohio-revised-code/section-3311.22",
+        filename: "rc-3311-22.html",
+        format: Format::Html,
+        catalog: Some("ohio-revised-code"),
+        fixtures: &[crate::fixtures::STATUTE_FIXTURE],
+        note: "R.C. 3311.22. How a school district stops existing: one district inside a county \
+               educational service center transfers all its territory to an adjacent district \
+               served by the same center. Three Ohio districts left the federal agency directory \
+               this way inside the window `dispersion::lea_directory` holds, and that directory \
+               files all three as closed \"with no effect on another agency's boundaries\". This \
+               is the section that says otherwise.",
+    },
+    Source {
+        key: "rc-3311-06",
+        title: None,
+        url: "https://codes.ohio.gov/ohio-revised-code/section-3311.06",
+        filename: "rc-3311-06.html",
+        format: Format::Html,
+        catalog: Some("ohio-revised-code"),
+        fixtures: &[crate::fixtures::STATUTE_FIXTURE],
+        note: "R.C. 3311.06. The general territory-transfer section, which is the other route a \
+               district's land can move and the one that governs transfers between districts in \
+               different service centers.",
+    },
+    Source {
         key: "rc-3317-022",
         title: None,
         url: "https://codes.ohio.gov/ohio-revised-code/section-3317.022",
