@@ -805,6 +805,70 @@ test.describe("the wiki", () => {
   });
 });
 
+test.describe("the decisions behind the corpus", () => {
+  test("a decision record renders its sections in the order they are meant to be read", async ({
+    page,
+  }) => {
+    await page.goto("/wiki/decision/the-order-was-never-the-states");
+    await expect(page.locator("h1")).toHaveText("the-order-was-never-the-states");
+    const headings = await page.locator(".card h2").allInnerTexts();
+    expect(headings.slice(0, 4)).toEqual([
+      "Context",
+      "The decision",
+      "Consequences",
+      "Alternatives considered",
+    ]);
+  });
+
+  test("a withdrawn claim is announced at the top and marked where it stands", async ({ page }) => {
+    // The whole reason these are published. `the-directory-cannot-say-why` says Newbury Local's
+    // territory split between West Geauga and Chardon; it did not, and the record now says so in
+    // four places. A reader who lands here from a search must not have to find that by reading.
+    await page.goto("/wiki/decision/the-directory-cannot-say-why");
+    const index = page.locator(".card.correction-index");
+    await expect(index).toBeVisible();
+    await expect(index.getByRole("heading")).toContainText("been withdrawn or superseded");
+
+    // Four corrections, each with an anchor into the section that carries it.
+    await expect(page.locator("blockquote.correction")).toHaveCount(4);
+    const first = index.locator("a").first();
+    const target = (await first.getAttribute("href"))!.slice(1);
+    await first.click();
+    await expect(page.locator(`#${target}`)).toBeVisible();
+    await expect(page.locator(`#${target}`)).toHaveClass(/correction/);
+  });
+
+  test("a quotation is not dressed as a correction", async ({ page }) => {
+    // Both kinds are blockquotes and the distinction is the feature. `reading-an-amending-act`
+    // quotes the previous phase's blocker and withdraws nothing.
+    await page.goto("/wiki/decision/reading-an-amending-act");
+    await expect(page.locator("blockquote")).not.toHaveCount(0);
+    await expect(page.locator("blockquote.correction")).toHaveCount(0);
+    await expect(page.locator(".card.correction-index")).toHaveCount(0);
+  });
+
+  test("a catalog entry reaches the decision behind it without leaving the site", async ({
+    page,
+  }) => {
+    // These used to resolve to GitHub, which was honest while nothing published them. Thirteen
+    // links from published prose point into this subtree.
+    await page.goto("/wiki/source/derolph-litigation-record");
+    await page.locator('.prose-body a[href="/wiki/decision/what-a-citator-reaches"]').first().click();
+    await expect(page.locator("h1")).toHaveText("what-a-citator-reaches");
+    await expect(page.getByRole("heading", { name: "Cited by" })).toBeVisible();
+  });
+
+  test("the index leads with the records that turned out wrong", async ({ page }) => {
+    await page.goto("/wiki/decision");
+    const rows = page.locator("tbody tr");
+    await expect(rows).not.toHaveCount(0);
+    // Ordered by how much of each has since been withdrawn, so the first row carries corrections
+    // and names them. A count of zero renders as an em dash rather than as "0 claims".
+    await expect(rows.first()).toContainText("claims");
+    await expect(rows.first().locator("code")).toHaveText("the-directory-cannot-say-why");
+  });
+});
+
 test.describe("finding things", () => {
   test("the district index filters and sorts without a round trip", async ({ page }) => {
     await page.goto("/districts");

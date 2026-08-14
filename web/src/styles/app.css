@@ -469,6 +469,62 @@ tbody tr:last-child th, tbody tr:last-child td { border-bottom: 0; }
 .prose-body td { text-align: left; font-variant-numeric: normal; }
 
 /*
+ * A correction: a blockquote in a decision record that withdraws something above it.
+ *
+ * Deliberately the opposite treatment to the plain blockquote it shares a tag with. A quotation is
+ * set back and greyed because it is someone else's words being borrowed; a correction is set
+ * *forward* — full-weight text, a filled surface, and the accent used elsewhere on this site for
+ * a live question — because it is this repository saying it was wrong, which is the one thing on
+ * the page a reader must not skim past.
+ *
+ * The claim badges keep working inside it: `.claim` sets its own colours and this only changes the
+ * ground they sit on.
+ */
+.prose-body blockquote.correction {
+  border-left: 3px solid var(--series-guarantee);
+  background: color-mix(in srgb, var(--series-guarantee) 7%, transparent);
+  color: var(--text-primary);
+  padding: .75rem .9rem .05rem;
+  border-radius: 0 8px 8px 0;
+  scroll-margin-top: 1.5rem;
+}
+.prose-body blockquote.correction > p:first-child > strong:first-child {
+  color: var(--series-guarantee);
+}
+
+/*
+ * The index of what a decision record has withdrawn, at the top of the page.
+ *
+ * Same accent as the corrections it links to, so the connection is visible before it is read. It
+ * is a card rather than a banner strip because it carries a sentence explaining why the record was
+ * corrected in place rather than rewritten, and that sentence is the point of the whole feature.
+ */
+.card.correction-index {
+  border-color: color-mix(in srgb, var(--series-guarantee) 35%, var(--border));
+}
+.card.correction-index h2 { color: var(--series-guarantee); }
+
+/* A decision record's `summary` — its own one-paragraph statement of what it settled. Set a step
+   up from the body because it leads the page rather than sitting in the sequence of sections. */
+.card.lede { font-size: 1.02rem; color: var(--text-primary); }
+.card.lede p { max-width: 74ch; }
+
+/* A decision record's own name is its title, in the monospace the corpus cites it in. */
+h1.slug-title {
+  font-family: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, monospace;
+  font-size: 1.45rem;
+  overflow-wrap: anywhere;
+}
+/* The one-line summary under a row in an index table. */
+.row-note {
+  display: block;
+  font-weight: 400;
+  color: var(--text-secondary);
+  margin-top: .2rem;
+  max-width: 74ch;
+}
+
+/*
  * Claim tags. The corpus marks every substantive assertion with its epistemic status, and that
  * discipline is the reason it is worth reading — so the badge is legible rather than decorative.
  *

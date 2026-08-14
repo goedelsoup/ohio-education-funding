@@ -65,6 +65,7 @@ const YIDAM =
 
 const CORPUS = join(YIDAM, "corpus");
 const CATALOG = join(YIDAM, "catalog");
+const DECISIONS = join(YIDAM, "decisions");
 
 /** Where a link that leaves the corpus points. The repository, on GitHub. */
 const REPO = "https://github.com/goedelsoup/ohio-education-funding/blob/main";
@@ -72,13 +73,26 @@ const REPO = "https://github.com/goedelsoup/ohio-education-funding/blob/main";
 /**
  * The `.yidam/` subtrees this site does not publish.
  *
- * `corpus/` and `catalog/` become pages here; these are working documents for whoever is authoring
- * the corpus — skill definitions, decision records — and 13 links point into them from prose that
- * does become a page. They are real documents, so the honest resolution is GitHub rather than a
- * refusal; what is not honest is `/wiki/decisions/report-card-connector`, which is what
- * `decisions/…` produced for as long as nothing distinguished a subtree from an ontology class.
+ * `corpus/`, `catalog/` and `decisions/` become pages here; these three are working documents for
+ * whoever is authoring the corpus — skill definitions, protocol notes, JSON schemas. They are real
+ * documents, so the honest resolution is GitHub rather than a refusal.
+ *
+ * # Why `decisions` is no longer in this list
+ *
+ * It was, and the reason given was that a decision record is a working document for the corpus's
+ * author. That was accurate when it was written and stopped being so. Decision records became the
+ * place this repository keeps the two things a reader cannot reconstruct from anywhere else:
+ * corrections to claims *this site published*, and rejections a later phase overturned. A reader
+ * following the site's account of Ohio's district consolidations had no on-site path to the
+ * correction withdrawing it.
+ *
+ * The specific failure the old comment warns about is still a failure and is still prevented.
+ * `/wiki/decisions/report-card-connector` — plural, from reading `decisions` as an ontology class
+ * — is not a route. The route is `/wiki/decision/<slug>`, singular, exactly as `source` is, and it
+ * is produced by a branch of {@link resolveTarget} that names the subtree rather than by the
+ * `class/name.yml` branch falling through.
  */
-const UNPUBLISHED = ["skills", "decisions", "sangha", "schemas"];
+const UNPUBLISHED = ["skills", "sangha", "schemas"];
 
 /** One property of a node: a name, and prose that usually carries a claim tag. */
 export interface Property {
@@ -159,6 +173,42 @@ export interface Source {
   citedBy: { id: string; label: string; href: string }[];
 }
 
+/** One section of a decision record: the field name, and the markdown under it. */
+export interface Section {
+  /** The YAML key, verbatim: `context`, `decision`, `consequences`, `alternatives`. */
+  name: string;
+  /** What to print above it. */
+  label: string;
+  body: string;
+}
+
+/**
+ * One decision record: why the repository is shaped the way it is, including where it was wrong.
+ *
+ * # Why there is no title field
+ *
+ * Because the corpus does not write one, and inventing one here would be worse than using what it
+ * does write. A node carries `label:` and a catalog entry carries a `# ` heading; a decision
+ * record carries only `id`, and every reference to one in corpus prose is the slug in code font —
+ * ``[`the-order-was-never-the-states`](…)``. So the slug is the title, shown the way the corpus
+ * already shows it, and {@link summary} is the sentence underneath. Sentence-casing the slug would
+ * turn `the-three-streams-of-mr81` into "The three streams of mr81".
+ */
+export interface Decision {
+  /** File stem, which is also `id:` in the record and the URL. */
+  slug: string;
+  /** The record's own one-paragraph statement of what it decided. Markdown. */
+  summary: string;
+  /** Every prose field the record carries, in the order they are meant to be read. */
+  sections: Section[];
+  /** Every section's markdown concatenated — for scanning links, never for display. */
+  linkText: string;
+  /** How many correction blocks it carries. See {@link markCorrections} in `prose.ts`. */
+  corrections: number;
+  /** Nodes, catalog entries and other decisions that link here. */
+  citedBy: { id: string; label: string; href: string }[];
+}
+
 export interface Corpus {
   /**
    * Everything the validator found. Errors have already stopped the build by the time anyone can
@@ -171,6 +221,8 @@ export interface Corpus {
   byClass: Map<string, OntologyClass>;
   sources: Source[];
   bySlug: Map<string, Source>;
+  decisions: Decision[];
+  byDecision: Map<string, Decision>;
 }
 
 let cached: Corpus | null = null;
@@ -193,7 +245,9 @@ let cached: Corpus | null = null;
  * | `../corpus/class/` | catalog entries | the class page |
  * | `class` (bare) | nodes, in the ontology's own style | the class page |
  * | `../../../crates/…` | nodes | the repository, on GitHub |
- * | `../../skills/name.md`, `../decisions/name.yml` | nodes, catalog entries | the repository |
+ * | `../decisions/name.yml` | nodes, catalog entries, decisions | the decision's page |
+ * | `name.yml` | decisions | a sibling decision |
+ * | `../../skills/name.md` | nodes, catalog entries | the repository |
  * | `ACTIONS.md` | nodes | the repository, on GitHub |
  *
  * The last two rows are the ones worth explaining. {@link UNPUBLISHED} and the per-class
@@ -223,6 +277,22 @@ let cached: Corpus | null = null;
  * takes class names from `*.ont.yml` files under `corpus/`.
  */
 export const FROM_CATALOG = "catalog";
+
+/**
+ * Passed as `fromClass` when the prose being rendered is a decision record.
+ *
+ * Decision records live in `.yidam/decisions/`, a third sibling of `corpus/` and `catalog/`, and
+ * they need a sentinel of their own for exactly the reason {@link FROM_CATALOG} does: a bare
+ * `name.yml` written in one of them means **another decision record**, not a node in some class.
+ * Nine of the twenty-four cite a sibling that way. Without this they would resolve through the
+ * sibling-node branch to `/wiki/<some class>/the-three-streams-of-mr81`, which is `resolved: true`
+ * and a 404 — the same failure `FROM_CATALOG` was introduced to stop, one directory over.
+ *
+ * Safe as a sentinel for the same reason: no ontology class is called `decision`, and none can be,
+ * because the loader takes class names from `*.ont.yml` files under `corpus/`.
+ */
+export const FROM_DECISION = "decision";
+
 export interface ResolvedTarget {
   href: string;
   /** `<class>/<name>` when the target is a corpus node; null for classes, sources and code. */
@@ -238,14 +308,20 @@ export function resolveTarget(target: string, fromClass: string): ResolvedTarget
   const escaped = clean.match(/^(?:\.\.\/)+((?:crates|docs|agents)\/.*)$/);
   if (escaped) return { href: `${REPO}/${escaped[1]}`, id: null, resolved: true };
 
-  // `../../skills/deduction.md`, `../decisions/report-card-connector.yml` — a document in a
-  // `.yidam/` subtree this site does not publish. Must precede the `class/name.yml` branch, which
-  // would otherwise read `decisions` as an ontology class and emit `/wiki/decisions/…`: resolved,
-  // site-absolute, and a 404 on every one of the seven catalog entries that link there.
+  // `../../skills/deduction.md` — a document in a `.yidam/` subtree this site does not publish.
+  // Must precede the `class/name.yml` branch, which would otherwise read the subtree name as an
+  // ontology class and emit `/wiki/skills/…`: resolved, site-absolute, and a 404.
   const unpublished = clean.match(new RegExp(`(?:^|/)(${UNPUBLISHED.join("|")})/(.+)$`));
   if (unpublished) {
     return { href: `${REPO}/.yidam/${unpublished[1]}/${unpublished[2]}`, id: null, resolved: true };
   }
+
+  // `../decisions/the-order-was-never-the-states.yml` — a decision record, which is a page here
+  // now. Named explicitly and placed above the `class/name.yml` branch for the same reason the
+  // subtree above is: left to fall through, `decisions` reads as an ontology class and builds
+  // `/wiki/decisions/…`, plural, which is the shape the old comment here warned about.
+  const decision = clean.match(/(?:^|\/)decisions\/([^/]+)\.yml$/);
+  if (decision) return { href: routes.wikiDecision(decision[1]!), id: null, resolved: true };
 
   // `../../catalog/ocg-white-paper-013.md`
   const source = clean.match(/(?:^|\/)catalog\/([^/]+)\.md$/);
@@ -267,8 +343,12 @@ export function resolveTarget(target: string, fromClass: string): ResolvedTarget
   }
 
   // `northern-local-perry.yml` — a sibling node, so the same class. Refused from a catalog entry,
-  // which has no class for the sibling to be in; see {@link FROM_CATALOG}.
+  // which has no class for the sibling to be in; see {@link FROM_CATALOG}. From a decision record
+  // it is a sibling *decision*, which is how nine of the twenty-four cite each other.
   const sibling = clean.match(/^([^/]+)\.yml$/);
+  if (sibling && fromClass === FROM_DECISION) {
+    return { href: routes.wikiDecision(sibling[1]!), id: null, resolved: true };
+  }
   if (sibling && fromClass !== FROM_CATALOG && fromClass !== "") {
     const id = `${fromClass}/${sibling[1]}`;
     return { href: routes.wikiNode(fromClass, sibling[1]!), id, resolved: true };
@@ -480,6 +560,91 @@ function readSource(file: string): Source {
 }
 
 /**
+ * The prose fields a decision record can carry, in the order they are meant to be read.
+ *
+ * Not every record carries every one, and the variation is not sloppiness: the four connector
+ * records state a `rationale` where the rest state `consequences` and `alternatives`, two carry an
+ * `amendment` recording a later revision, and `ontology` carries a `corpus_depth` integer that is
+ * not prose at all. So this is the order and the labels, and a record renders the intersection —
+ * an absent field is absent rather than an empty heading.
+ *
+ * `summary` is deliberately not here. It leads the page rather than sitting in the sequence.
+ */
+const DECISION_SECTIONS: { name: string; label: string }[] = [
+  { name: "context", label: "Context" },
+  { name: "decision", label: "The decision" },
+  { name: "rationale", label: "Rationale" },
+  { name: "consequences", label: "Consequences" },
+  { name: "amendment", label: "Amendment" },
+  { name: "alternatives", label: "Alternatives considered" },
+];
+
+/**
+ * One decision record, read straight off the YAML.
+ *
+ * Parsed with the same loader the nodes use, and then read defensively: these files are hand-
+ * written prose in block scalars and the field set genuinely varies between them, so a missing
+ * field is a shape this reader expects rather than a fault.
+ */
+function readDecision(file: string): Decision {
+  const raw = readFileSync(join(DECISIONS, file), "utf8");
+  const parsed = (YAML.parse(raw) ?? {}) as Record<string, unknown>;
+  const text = (key: string): string => {
+    const value = parsed[key];
+    return typeof value === "string" ? value.trim() : "";
+  };
+
+  const sections = DECISION_SECTIONS.map(({ name, label }) => ({
+    name,
+    label,
+    body: text(name),
+  })).filter((section) => section.body !== "");
+
+  const summary = text("summary");
+  return {
+    slug: file.replace(/\.yml$/, ""),
+    summary,
+    sections,
+    linkText: [summary, ...sections.map((s) => s.body)].join("\n\n"),
+    corrections: countCorrections([summary, ...sections.map((s) => s.body)].join("\n\n")),
+    citedBy: [],
+  };
+}
+
+/**
+ * How many blockquotes in a markdown source **open** with strong emphasis.
+ *
+ * The same rule `markCorrections` applies to rendered HTML, applied to the source — because
+ * `loadCorpus` is synchronous and the markdown processor is not, so a decision's correction count
+ * has to be available before anything is rendered. `prose.spec.ts` holds the two in agreement over
+ * every record in the corpus, which is the only thing that keeps one rule from becoming two.
+ *
+ * **Opens** is doing the work. A first attempt counted every line matching `> **` and got five
+ * corrections out of a record that has four, because one continuation line inside a correction
+ * begins with a bolded word that happened to fall at a line break:
+ *
+ * ```
+ * > repository's own F-33 panel agrees: West Geauga gains 208 pupils in FY2021 while Chardon
+ * > **loses** 110. The claim came from a judge's failure-mode analysis …
+ * ```
+ *
+ * A markdown blockquote is a run of consecutive `>` lines, so a line only opens one if the line
+ * before it is not itself part of the quote. That is the whole difference, and without it the
+ * count is wrong in exactly the records that carry the most corrections.
+ */
+export function countCorrections(markdown: string): number {
+  const lines = markdown.split("\n");
+  let corrections = 0;
+  for (const [index, line] of lines.entries()) {
+    if (!/^\s*>\s*\*\*/.test(line)) continue;
+    const previous = lines[index - 1];
+    if (previous !== undefined && /^\s*>/.test(previous)) continue;
+    corrections += 1;
+  }
+  return corrections;
+}
+
+/**
  * The checks a per-file schema cannot make, because they need the rest of the corpus.
  *
  * # Errors, and why these four
@@ -614,6 +779,7 @@ function checkTargets(
   nodes: Node[],
   classes: Omit<OntologyClass, "nodes">[],
   sources: Source[],
+  decisions: Decision[],
   report: Diagnostic[],
 ): void {
   const scan = (text: string, fromClass: string, file: string) => {
@@ -636,6 +802,9 @@ function checkTargets(
     scan(entry.description, entry.className, `.yidam/corpus/${entry.className}.ont.yml`);
   }
   for (const source of sources) scan(source.body, FROM_CATALOG, `.yidam/catalog/${source.slug}.md`);
+  for (const decision of decisions) {
+    scan(decision.linkText, FROM_DECISION, `.yidam/decisions/${decision.slug}.yml`);
+  }
 }
 
 /** Read, link, and index the corpus. Memoized — the wiki pages number in the hundreds. */
@@ -700,9 +869,67 @@ export function loadCorpus(): Corpus {
     : [];
   const bySlug = new Map(sources.map((s) => [s.slug, s]));
 
+  const decisions = existsSync(DECISIONS)
+    ? readdirSync(DECISIONS)
+        .filter((f) => f.endsWith(".yml"))
+        .map(readDecision)
+        .sort((a, b) => a.slug.localeCompare(b.slug))
+    : [];
+  const byDecision = new Map(decisions.map((d) => [d.slug, d]));
+
   // After the sources are read, because catalog entries are the largest single writer of link
   // targets and half the shapes only they use.
-  checkTargets(nodes, classes, sources, report);
+  checkTargets(nodes, classes, sources, decisions, report);
+
+  /*
+   * Which node, catalog entry or other decision links to each decision record.
+   *
+   * Scanned here rather than taken from the edge lists, because a link to a decision is not an
+   * edge in the corpus graph and should not become one: it is a citation of a working document,
+   * like a footnote, and putting it in `node.out` would show it in the relationship lists on node
+   * pages beside genuine ontology edges. The inbound list is what the reader of a decision wants —
+   * "who relies on this" — and it costs one pass.
+   */
+  const cite = (target: string, entry: { id: string; label: string; href: string }) => {
+    const decision = byDecision.get(target);
+    if (!decision) return;
+    if (decision.citedBy.some((c) => c.id === entry.id)) return;
+    decision.citedBy.push(entry);
+  };
+  const DECISION_HREF = "/wiki/decision/";
+  const scanCitations = (text: string, fromClass: string, entry: { id: string; label: string; href: string }) => {
+    for (const match of text.matchAll(/\]\(([^)\s]+)\)/g)) {
+      const raw = match[1]!;
+      if (/^(https?:|mailto:|#|\/)/.test(raw)) continue;
+      const { href, resolved } = resolveTarget(raw, fromClass);
+      if (!resolved || !href.startsWith(DECISION_HREF)) continue;
+      cite(href.slice(DECISION_HREF.length), entry);
+    }
+  };
+  for (const node of nodes) {
+    scanCitations(node.linkText, node.className, {
+      id: node.id,
+      label: node.label,
+      href: routes.wikiNode(node.className, node.name),
+    });
+  }
+  for (const source of sources) {
+    scanCitations(source.body, FROM_CATALOG, {
+      id: `catalog/${source.slug}`,
+      label: source.title,
+      href: routes.wikiSource(source.slug),
+    });
+  }
+  for (const decision of decisions) {
+    scanCitations(decision.linkText, FROM_DECISION, {
+      id: `decision/${decision.slug}`,
+      label: decision.slug,
+      href: routes.wikiDecision(decision.slug),
+    });
+  }
+  for (const decision of decisions) {
+    decision.citedBy.sort((a, b) => a.label.localeCompare(b.label));
+  }
 
   // Which nodes cite which source. Taken from the edge list, which by now holds both the
   // structured `sourced-from` links and the citations written inline in prose — this corpus uses
@@ -762,6 +989,8 @@ export function loadCorpus(): Corpus {
     byClass: new Map(withNodes.map((c) => [c.className, c])),
     sources: sources.sort((a, b) => a.title.localeCompare(b.title)),
     bySlug,
+    decisions,
+    byDecision,
   };
   return cached;
 }
