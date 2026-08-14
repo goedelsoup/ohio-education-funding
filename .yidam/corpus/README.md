@@ -77,12 +77,12 @@ Fields: count per claim tag across every node; then the unresolved marks by the 
 -->
 | Tag | Count | What it records |
 |---|--:|---|
-| `[verified]` | 813 | supported by a committed primary source |
-| `[inference]` | 231 | drawn from verified facts, not witnessed |
-| `[open]` | 190 | a live question — unknown, contested, or being worked |
+| `[verified]` | 818 | supported by a committed primary source |
+| `[inference]` | 234 | drawn from verified facts, not witnessed |
+| `[open]` | 188 | a live question — unknown, contested, or being worked |
 | `[unentered]` | 34 | a knowable value nobody has typed in yet |
 
-224 unresolved marks in total, 190 of them live questions and 34 of them empty fields. Before the two were distinguished the corpus reported the sum as its count of what it does not know, which overstated it by 15%.
+222 unresolved marks in total, 188 of them live questions and 34 of them empty fields. Before the two were distinguished the corpus reported the sum as its count of what it does not know, which overstated it by 15%.
 
 | Field | `[open]` | `[unentered]` |
 |---|--:|--:|
@@ -123,8 +123,6 @@ Fields: count per claim tag across every node; then the unresolved marks by the 
 | `fiscal_effect` | 1 | 0 |
 | `district_funding_effect` | 1 | 0 |
 | `context` | 1 | 0 |
-| `citation` | 1 | 0 |
-| `case_name` | 1 | 0 |
 | `appropriating_bill` | 1 | 0 |
 <!-- /REGEN -->
 

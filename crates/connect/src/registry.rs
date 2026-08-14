@@ -1640,15 +1640,19 @@ pub const CONNECTORS: &[Connector] = &[
         feeds: &["litigation"],
         status: Status::Wired {
             still_blocked: Some(
-                "trial-level rulings such as the 2025 EdChoice decision are not in the supreme \
-                 court archive at all, and `citing_cases` needs a citator rather than a document",
+                "the 2025 EdChoice merits ruling is a common pleas decision, which the Ohio \
+                 Reporter of Decisions does not publish and the Franklin County clerk publishes \
+                 under conditions that forbid redistribution and direct organizations to a \
+                 records request. And `citing_cases` stays unfilled: a free citation graph \
+                 exists, and it identifies ten of the twenty-five Ohio decisions that cite \
+                 DeRolph I by reporter citation in its own corpus",
             ),
         },
-        note: "Wired for the four DeRolph opinions, which is what the corpus actually cites. The \
-               recorded blocker had two clauses and they are not equally true: \"opinions are \
-               PDFs\" stopped being one the moment `Format::Pdf` had a reader, and the other half \
-               is unfixable from here and is now carried in `still_blocked` rather than in this \
-               sentence.",
+        note: "Wired for the four DeRolph opinions and the EdChoice case's one appellate \
+               decision. The recorded blocker had two clauses and neither survived contact \
+               intact: \"opinions are PDFs\" stopped being one the moment `Format::Pdf` had a \
+               reader, and the other two were assumptions about a citator and about a trial \
+               court's archive that are now measured. See `sources/ohio-courts.md`.",
         sources: &[
             Source {
                 key: "derolph-i",
@@ -1698,6 +1702,23 @@ pub const CONNECTORS: &[Connector] = &[
                 fixtures: &[crate::fixtures::OPINIONS_FIXTURE],
                 note: "The last word, and the one that ended judicial supervision without \
                        a remedy.",
+            },
+            Source {
+                key: "edchoice-10th-2024",
+                title: Some("Columbus City School Dist. v. State, 2024-Ohio-1217 (10th Dist.)"),
+                url: "https://www.supremecourt.ohio.gov/rod/docs/pdf/10/2024/2024-Ohio-1217.pdf",
+                filename: "edchoice-10th-2024.pdf",
+                format: Format::Pdf,
+                catalog: Some("derolph-litigation-record"),
+                fixtures: &[crate::fixtures::EDCHOICE_FIXTURE],
+                note: "The EdChoice challenge's only appellate decision, and it is not about \
+                       EdChoice. The Ohio Senate President, a non-party, appealed an order \
+                       modifying a deposition subpoena served on him; the Tenth District \
+                       dismissed for want of a final appealable order. What it is wired for is \
+                       identity: it states the caption, the appellate number, and the trial \
+                       court's case number, all of which `vouchers-hurt-ohio-2025` carried as \
+                       `[open]` and none of which the merits ruling is published anywhere this \
+                       repository may redistribute from.",
             },
         ],
     },

@@ -2111,6 +2111,28 @@ mod tests {
     use super::*;
     use crate::conventions::STATEWIDE_ROW;
 
+    /// Ohio's two courts date an opinion differently, and one of the two has no closing bracket.
+    ///
+    /// The supreme court prints the date inside a parenthetical that ends `.)`. The courts of
+    /// appeals print `Rendered on <date>` alone on a line. A reader that looks for `.)` first and
+    /// only falls back to the line ending is right about the first and finds the *next* closing
+    /// parenthesis anywhere in the document for the second — sixty-eight lines of holding, in the
+    /// first appellate opinion this repository wired.
+    #[test]
+    fn a_date_ends_at_whichever_comes_first_of_the_bracket_and_the_line() {
+        let supreme = "(No. 95-2066--Submitted September 10, 1996--Decided March 24, 1997.)\n\
+                       Constitutional law—Education—Schools (and so on.)";
+        assert_eq!(decided_on(supreme), "March 24, 1997");
+
+        let appellate = "Rendered on March 29, 2024\n\nBOGGS, J.\n\
+                         {¶ 1} On February 2, 2024, appellees filed the instant motion.\n\
+                         The order is not final. (See R.C. 2505.02(B)(4).)";
+        assert_eq!(decided_on(appellate), "March 29, 2024");
+
+        // Neither marker present is an empty field rather than a guess.
+        assert_eq!(decided_on("IN THE COURT OF APPEALS OF OHIO"), "");
+    }
+
     fn row(width: usize, values: &[(usize, &str)]) -> Vec<String> {
         let mut row = vec![String::new(); width];
         for (index, value) in values {
@@ -3213,6 +3235,15 @@ pub const GREENBOOK_FIXTURE: &str = "crates/project/fixtures/dew-greenbook.txt";
 /// Where the court opinion extract is written, relative to the repository root.
 pub const OPINIONS_FIXTURE: &str = "crates/regime-diff/fixtures/derolph-opinions.txt";
 
+/// Where the EdChoice challenge's appellate record is written, relative to the repository root.
+///
+/// A second file rather than a fifth record in [`OPINIONS_FIXTURE`], because that file's own first
+/// line says *"DeRolph v. State, the four opinions this corpus cites"* and this is neither. The
+/// rebuild now selects a connector's sources by the fixture each one declares it feeds, rather
+/// than assuming every source of a connector feeds the same file — an assumption that was true
+/// while `ohio-courts` held one case and would have quietly stopped being true here.
+pub const EDCHOICE_FIXTURE: &str = "crates/regime-diff/fixtures/edchoice-appellate-record.txt";
+
 /// Where the legislative-district crosswalk is written, relative to the repository root.
 pub const CROSSWALK_FIXTURE: &str = "crates/project/fixtures/legislative-district-crosswalk.csv";
 
@@ -3448,6 +3479,7 @@ pub const REBUILT: &[&str] = &[
     REDBOOK_FIXTURE,
     GREENBOOK_FIXTURE,
     OPINIONS_FIXTURE,
+    EDCHOICE_FIXTURE,
     APPROPRIATION_FIXTURE,
     SCHOLARSHIP_FIXTURE,
     CATALOG_FIXTURE,
@@ -3470,26 +3502,40 @@ pub const NOT_REGENERATED: &[(&str, &str)] = &[];
 
 /// The date an opinion was decided, read off the document.
 ///
-/// The archive prints a parenthetical on the first page — `(No. 95-2066--Submitted September 10,
-/// 1996--Decided March 24, 1997.)` — with the dash rendering as `--` in the 1997 PDF and as an em
-/// dash in the later three. Only the text after `Decided ` is wanted, so the dash never has to be
-/// matched.
+/// The supreme court prints a parenthetical on the first page — `(No. 95-2066--Submitted
+/// September 10, 1996--Decided March 24, 1997.)` — with the dash rendering as `--` in the 1997 PDF
+/// and as an em dash in the later three. Only the text after `Decided ` is wanted, so the dash
+/// never has to be matched.
 ///
-/// Returns an empty string if the parenthetical is absent, which is the honest answer: a
-/// [`Record`] whose date could not be read should say nothing rather than guess. It is worth
-/// reading at all because the previous extract discarded the one date these documents actually
-/// print and wrote an empty field in its place.
+/// **The courts of appeals do not print that parenthetical.** They print `Rendered on March 29,
+/// 2024` on its own line instead, and the first opinion of theirs this repository wired came out
+/// with an empty date field. Both markers are tried, most specific first.
+///
+/// Returns an empty string if neither is present, which is the honest answer: a [`Record`] whose
+/// date could not be read should say nothing rather than guess. It is worth reading at all because
+/// the previous extract discarded the one date these documents actually print and wrote an empty
+/// field in its place.
 #[must_use]
 pub fn decided_on(body: &str) -> String {
-    const MARKER: &str = "Decided ";
-    let Some(start) = body.find(MARKER) else {
+    const MARKERS: [&str; 2] = ["Decided ", "Rendered on "];
+    let Some((start, marker)) = MARKERS
+        .iter()
+        .filter_map(|m| body.find(m).map(|at| (at, *m)))
+        .min()
+    else {
         return String::new();
     };
-    let rest = &body[start + MARKER.len()..];
-    // `March 24, 1997.)` — the date ends at the sentence stop that closes the parenthetical.
-    let end = rest
-        .find(".)")
-        .or_else(|| rest.find('\n'))
+    let rest = &body[start + marker.len()..];
+    // `March 24, 1997.)` — the date ends at the sentence stop that closes the parenthetical, or
+    // at the end of the line, **whichever comes first**. Preferring `.)` and falling back to the
+    // newline is what the supreme court's layout suggests and it is wrong: an opinion that prints
+    // the date bare on its own line has no closing parenthesis, so the search runs on to the next
+    // one anywhere in the document. The first appellate opinion wired here came out with
+    // sixty-eight lines of holding in its date field.
+    let end = [rest.find(".)"), rest.find('\n')]
+        .into_iter()
+        .flatten()
+        .min()
         .unwrap_or(rest.len());
     rest[..end].trim().to_string()
 }

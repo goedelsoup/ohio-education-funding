@@ -1,0 +1,194 @@
+# The EdChoice challenge's appellate record. Not the merits ruling, which is a common pleas decision and is not published anywhere this repository may redistribute from.
+# Regenerate with `edfund-connect rebuild`. Records begin with `=== ` at the
+# start of a line, which no record's own text does.
+
+=== edchoice-10th-2024
+title: Columbus City School Dist. v. State, 2024-Ohio-1217 (10th Dist.)
+date: March 29, 2024
+source: https://www.supremecourt.ohio.gov/rod/docs/pdf/10/2024/2024-Ohio-1217.pdf
+--
+[Cite as Columbus City School Dist. v. State, 2024-Ohio-1217.]
+
+
+                              IN THE COURT OF APPEALS OF OHIO
+
+                                   TENTH APPELLATE DISTRICT
+
+
+Columbus City School District et al.,                :
+
+                 Plaintiffs-Appellees,               :
+                                                                        No. 24AP-60
+v.                                                   :              (C.P.C. No 22CV-000067)
+
+State of Ohio et al.,                                :           (ACCELERATED CALENDAR)
+
+                 Defendants-Appellees,               :
+
+[Ohio Senate President Matthew Huffman,:
+
+                 Non-Party/Appellant].               :
+
+
+
+
+                                            D E C I S I O N
+
+                                     Rendered on March 29, 2024
+
+
+                 McCarthy, Lebit, Crystal & Liffman Co. LPA, Mark I.
+                 Wallach, and Larence R. Acton; Weston Hurd LLP, Maria
+                 Fair, and Alexandra C. Eckrich, for appellees Columbus City
+                 School Dist. et al.
+
+                 Shumaker, Loop & Kendrick, LLP, Mark D. Wagoner, and
+                 David F. Axelrod, for non-party/appellant Matthew Huffman.
+
+                                      ON MOTION TO DISMISS
+
+BOGGS, J.
+
+        {¶ 1} On February 2, 2024, plaintiffs-appellees, Columbus City School District et
+al., filed the instant motion to dismiss contending this court lacks jurisdiction over the
+December 21, 2023 order appealed by non-party/appellant, Matthew Huffman, President
+of the Ohio Senate. Appellant filed a response to the motion to dismiss arguing the
+discovery order is final and appealable under R.C. 2505.02(B)(4), and appellees filed a
+No. 24AP-60                                                                                 2
+
+
+reply. Upon review of the parties’ arguments, we conclude the order is not final and
+appealable.
+       {¶ 2} Ohio’s courts of appeal have jurisdiction “to review and affirm, modify, or
+reverse judgments or final orders.” Ohio Constitution, Article IV, Section 3(B)(2). If a trial
+court’s order is not final and appealable, a reviewing court has no jurisdiction to review the
+matter and the appeal must be dismissed. In re Special Grand Jury Investigation, 10th
+Dist. No. 17AP-446, 2018-Ohio-760, ¶ 6.
+       {¶ 3} “The general rule is that all orders in a case must be reviewed in a single
+appeal after final judgment.” State v. Glenn, 165 Ohio St.3d 432, 2021-Ohio-3369, ¶ 10.
+“[D]iscovery orders, which are generally interlocutory in nature,” are not immediately
+appealable. Karr v. Salido, 10th Dist. No. 21AP-672, 2022-Ohio-2879, ¶ 9. However, R.C.
+2505.02 provides a “limited exception” to this general rule. Glenn at ¶ 10. Under R.C.
+2505.02(B)(4), an appellate court has jurisdiction to review, affirm, modify, or reverse an
+“order that grants or denies a provisional remedy,” which is defined as “a proceeding
+ancillary to an action” and includes a proceeding for “discovery of privileged matter.” R.C.
+2505.02(B)(4) and (A)(3). However, this limited exception only applies if both of the
+following circumstances are satisfied:
+              (a) The order in effect determines the action with respect to the
+              provisional remedy and prevents a judgment in the action in
+              favor of the appealing party with respect to the provisional
+              remedy.
+
+              (b) The appealing party would not be afforded a meaningful or
+              effective remedy by an appeal following final judgment as to all
+              proceedings, issues, claims, and parties in the action.
+
+R.C. 2505.02(B)(4)(a) and (b).
+
+       {¶ 4} Whether a discovery order warrants an interlocutory appeal is evaluated on
+a “case-by-case” basis. Glenn at ¶ 28. The appellant has the “burden of establishing the
+appellate court’s jurisdiction over an interlocutory appeal.” Id. at ¶ 22.
+       {¶ 5} In this case, the underlying action involves appellees’ challenge to the
+constitutionality of the Ohio General Assembly’s expansion of the EdChoice Scholarship
+Program, codified in R.C. Chapter 3310. On March 22, 2023, appellees served appellant,
+who is the President of the Ohio Senate and is not a party to the action, with a subpoena for
+No. 24AP-60                                                                                  3
+
+
+a deposition. Appellant filed a motion to quash arguing, among other issues, that legislative
+privilege prohibited the deposition.     After further briefing, the trial court issued on
+December 21, 2023 the instant order granting appellant’s motion to quash in part and
+modifying the subpoena pursuant to Civ.R. 45(C). Specifically, the trial court modified the
+subpoena to remove the requirement that appellant attend an in-person oral deposition
+and to instead permit appellees to submit no more than 20 “written deposition” questions
+to appellant. (Dec. 21, 2023 Decision & Entry at 10.) The order specifies, “[t]hese written
+deposition questions shall be limited to matters that do not implicate legislative privilege,
+but may request the identities of entities and individuals, and other information, related to
+off the record communications about the passing of H.B. 110 between those entities and
+individuals, and [appellant].” Id. at 10. The order further allows appellees to seek
+reconsideration of the order should appellant’s answers to the written deposition questions
+demonstrate an in-person oral disposition is likely to provide additional relevant
+information that is not obtainable elsewhere and not protected by the legislative privilege.
+       {¶ 6} On this record, appellant has failed to establish this order is final and
+appealable. First, “the threshold requirement for an order to be appealable under R.C.
+2505.02(B)(4) is that the order must grant or deny a provisional remedy.” Glenn at ¶ 12.
+Appellant argues the order qualifies as a provisional remedy since it involves discovery of
+privileged matter. In assessing whether he is correct, we need only decide whether the
+appellant made a “colorable claim” that the trial court’s “order directs him to disclose
+information that might be protected” by legislative privilege. Glenn at ¶ 13, 20. In this case,
+the trial court order in pertinent part modifies the subpoena to state the plaintiffs “may”
+submit deposition questions of a certain nature and specifies that information should not
+implicate legislative privilege. (Decision & Entry at 10.) The order does not direct appellant
+to disclose any information at this point and, therefore, fails the threshold requirement.
+       {¶ 7} Even if, for sake of argument, we were to find appellant presents a “colorable
+claim” that the trial court’s order directs the disclosure of information protected by
+legislative privilege, appellant nevertheless has not shown that the order “in effect
+determines the action with respect to the provisional remedy and prevents a judgment in
+the action in favor of the appealing party with respect to the provisional remedy.” R.C.
+2505.02(B)(4)(a). At this point in the proceedings, whether appellees will decide to submit
+No. 24AP-60                                                                                 4
+
+
+deposition questions to appellant, the content of those potential questions, appellant’s
+actions upon receipt of those questions, and the trial court’s future determinations as to the
+deposition questions all have yet to be determined.
+       {¶ 8} In these circumstances, we conclude the present appeal is premature. See
+e.g. Autumn Health Care of Zanesville, LLC v. DeWine, 10th Dist. No. 14AP-593, 2015-
+Ohio-2655, ¶ 7 (determining that, to the extent the trial court’s order compelled the non-
+party appellants to attend depositions, “the record is insufficiently developed to establish
+whether the testimony to be elicited at the depositions would involve the disclosure of
+privileged information” and, therefore, the order did not constitute a final and appealable
+order under R.C. 2505.02(B)(4)(a)); Citibank, N.A. v. Hine, 4th Dist. No. 17CA3598, 2017-
+Ohio-5537, ¶ 15 (following Autumn Health Care in circumstances where the record was
+insufficiently developed to establish that the appellant’s deposition would result in the
+disclosure of any privileged materials and noting “[c]ounsel may object to questions posed
+* * * [and] the trial court can determine the applicability of any privilege[,]” and “[a]fter
+the trial court has issued its rulings, the requirements of R.C. 2505.02(B)(4) may be
+satisfied.”); Riggs v. Richard, 5th Dist. No. 2006CA00234, 2007-Ohio-490, ¶ 21-22
+(holding that an order denying the appellants’ motion for protective order was not a final,
+appealable order where “[w]hat information is being sought and whether it would be
+protected by the [asserted] privilege, whether it is subject to exception, or waived has not
+been sufficiently developed by the record in the case sub judice” and explaining “[t]o
+properly address whether the communications or material sought is subject to the
+[asserted] privilege, it is, at a minimum, necessary to ask the questions first and for the
+privilege rule to be invoked. After such has occurred, the trial court then can, at hearing,
+determine if, in fact, privileged matters may be disclosed.”); Buffmyer v. Cavalier, 5th Dist.
+No. 03COA067, 2004-Ohio-3303, ¶ 17-18 (determining order denying Civ.R. 45(C)(3)
+motion to quash or modify a subpoena was not a final appealable order since “[w]hether or
+not the matters sought by appellee would violate the [asserted] privilege is not sufficiently
+developed by the record in its present state. * * * [I]n order to properly address the issues
+raised by Civ.R. 45(C)(3), it is at a minimum necessary to ask the questions and for the
+privilege rule to be invoked. The trial court can then, at hearing, determine if in fact
+privileged matters may be disclosed.”).
+No. 24AP-60                                                                                 5
+
+
+       {¶ 9} We note that although the parties debate the applicability of Dublin v. State,
+138 Ohio App.3d 753 (10th Dist.2000), Dublin is consistent with, but does not control, the
+outcome here. Unlike the instant case, Dublin involved a trial court discovery order that
+“actually compelled” certain information to be disclosed. Id. at 758. Faced with that order,
+this court reviewed whether the sought-after information was privileged to support an
+interlocutory appeal pursuant to R.C. 2505.02(B)(4). Finding the information in that case
+was not privileged, this court determined the trial court order was not final and appealable
+and dismissed the case. Here, because the order appealed from permits appellees to submit
+questions but stops short of compelling appellant to answer, we do not proceed to
+determine the issue of legislative privilege at this juncture.
+       {¶ 10} “In short, the uncertainty surrounding what the trial court would consider
+satisfactory compliance with its order suggests that the order would be better reviewed after
+the situation has fully unfolded.” Glenn at ¶ 26. This uncertainty will lessen considerably
+once appellees have presented their deposition questions. Depending on the content of
+those questions, appellant may again move to quash, and the trial court will have the
+opportunity to review appellant’s concerns in the context of the questions being posed. If
+the trial court directs appellant to disclose information protected by legislative privilege,
+appellant may again pursue an appeal. We acknowledge appellant’s concern that this
+matter may “end up back in front of this court in a matter of days.” (Memo Contra Mot. to
+Dismiss at 11, fn 5.) However, appellant’s potential ability to quickly appeal following our
+dismissal does not influence our present jurisdiction as determined under the R.C.
+2505.02(B) requirements.
+       {¶ 11} Considering all of the above, we conclude the December 21, 2023 order is not
+a final appealable order on the facts of this case. Accordingly, this court lacks jurisdiction
+over the instant appeal.
+                                                          Motion granted; appeal dismissed.
+
+
+                           DORRIAN and EDELSTEIN, JJ., concur.

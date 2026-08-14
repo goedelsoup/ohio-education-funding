@@ -1,0 +1,165 @@
+id: what-a-citator-reaches
+summary: >-
+  The two things `ohio-courts` was blocked on were assumptions, and both are now measurements. A
+  free citator covering Ohio exists, and its citation graph identifies ten of the twenty-five Ohio
+  decisions that cite DeRolph I in the citator's own corpus — missing the state's voucher case and
+  its charter-school case — so `citing_cases` stays unfilled and says why. The 2025 EdChoice ruling
+  is not withheld by an archive; it is published by a clerk whose terms forbid redistribution. What
+  is wired instead is the case's one appellate decision, which settles its caption and its docket
+  number.
+context: |
+  [`the-last-three-connectors`](the-last-three-connectors.yml) wired the four DeRolph opinions and
+  left two clauses in `still_blocked`:
+
+    > trial-level rulings such as the 2025 EdChoice decision are not in the supreme court archive
+    > at all, and `citing_cases` needs a citator rather than a document
+
+  Both are true sentences and neither is a finding. The first says where a document is not; it does
+  not say whether the document is anywhere. The second says what a property needs; it does not say
+  whether the thing exists. The backlog issue that carried them forward was explicit about the
+  second — *"worth recording whether a free or public citator covers Ohio appellate decisions,
+  because if not this property is unfillable and should say so rather than sitting open"*.
+
+  Meanwhile [`vouchers-hurt-ohio-2025`](../corpus/litigation/vouchers-hurt-ohio-2025.yml) carried
+  three `[open]` marks — the caption, the docket number, and the appellate status — and rested on
+  reporting for all of them, while the scholarship-programme nodes leaned on it for the
+  constitutional question.
+decision: |
+  Wire **`Columbus City School Dist. v. State`, 2024-Ohio-1217, 10th Dist. No. 24AP-60**, the one
+  appellate decision in the EdChoice case, into a fixture of its own.
+
+  Do **not** wire the merits ruling, and record why in terms of the clerk's conditions of use
+  rather than in terms of difficulty.
+
+  **Do not fill `citing_cases`**, and replace the assumption behind that refusal with a
+  measurement: the recall of the free citator's citation graph against its own full text, named
+  cases included.
+
+  Rewrite the connector's `still_blocked` so it states what was measured instead of what was
+  assumed.
+consequences: |
+  **A free citator covering Ohio exists.** CourtListener, run by the Free Law Project, serves this
+  project's user agent without complaint on `/api/rest/v4/search/`, needs no credential for it, and
+  holds 87,949 Ohio Supreme Court opinions and 110,756 Ohio Court of Appeals opinions. Full-text
+  search reaches opinion bodies, checked with a control phrase. So the property is not unfillable,
+  which is what the issue asked and is the opposite of what "needs a citator" implied.
+
+  **And filling it from there would publish a list missing the two cases that matter most here.**
+  Against DeRolph I, counting only decisions other than DeRolph's own later opinions:
+
+  - the citation graph identifies **10** Ohio decisions;
+  - full-text search for `78 Ohio St.3d 193` finds **25**;
+  - and the graph is a **strict subset** — every decision in it is in the text set.
+
+  The fifteen it misses include *Simmons-Harris v. Goff* (1999), the Ohio Supreme Court's own
+  voucher decision, and *State ex rel. Ohio Congress of Parents & Teachers v. State Bd. of Edn.*
+  (2006), the community-school constitutional challenge. A corpus about school funding that
+  published a `citing_cases` edge from this graph would be asserting that Ohio's voucher case does
+  not cite DeRolph. That is worse than an empty property, because an empty property is visibly
+  empty.
+
+  So the refusal stands and the ground under it has changed completely: it used to be *"no citator
+  is available"* and it is now *"the available one has 40% recall against its own corpus, and the
+  missing 60% is not random with respect to this subject."*
+
+  **Six properties of the citator, recorded so nobody derives them twice.**
+
+  - **`cites:` takes opinion identifiers, not cluster identifiers.** A DeRolph cluster holds five
+    to seven opinions. `cites:(6775348)` — the lead opinion, the one that looks like *the* opinion
+    — returns **0**. All five siblings together return 29. The wrong query returns a plausible zero
+    rather than an error, which is the failure mode this repository keeps meeting.
+  - **Each DeRolph opinion is in the database twice**, once from the reporter feed and once from
+    Ohio's own WebCite feed, and the citation counts split between the two: 129 and 3 for DeRolph I,
+    49 and 1 for II, 29 and 1 for III, 12 and 7 for IV.
+  - **`citeCount` is not a count of citing cases.** It counts citing *opinions*, each concurrence
+    and dissent separately; the search counts decisions. The two differ by roughly four to one.
+  - **A nonexistent court identifier returns `count: 0` under HTTP 200.** The question "does
+    CourtListener hold Ohio common pleas decisions" was first answered `0` from a court code that
+    does not exist. A coverage negative from this API means nothing without a positive control,
+    which is the same discipline this repository applied to the CCD's unused status code and to the
+    State Board's minutes.
+  - **Anonymous requests are limited to five a minute.** A connector walking a citation graph would
+    be pacing against that, not against the network.
+  - **The endpoints that expose the graph directly — `/opinions-cited/` and `/clusters/` — return
+    401.** They want a free API token nobody here holds. And `courtlistener.com` itself, the human
+    site as opposed to the API, is **403 CDN-blocked** to a non-browser agent. So the API is more
+    open than the website, which is the reverse of the usual arrangement and worth knowing.
+
+  **The 2025 ruling is not withheld by an archive. It is published under terms that forbid
+  redistribution.** The Reporter of Decisions' own source list is the supreme court, the twelve
+  district courts of appeals, the Court of Claims and Miscellaneous — no common pleas court at all,
+  so this is not about EdChoice or about any one case. The ruling is on the Franklin County Clerk of
+  Courts' Case Information Online, which returns 200 to this project's user agent, and whose
+  conditions of use say the data "is not intended for distribution by other persons, entities or
+  organizations" and that an organization wanting files "must submit a Public Records Request".
+
+  That is the third time this repository has arrived at R.C. 149.43 as the remaining step, after the
+  educational service center minute books and the pre-1997 session laws. It is worth saying plainly
+  that this is not a research problem.
+
+  **What the appellate decision does settle.** 2024-Ohio-1217 states on its first page that the
+  parties are *Columbus City School District et al. v. State of Ohio et al.* and that the trial
+  court case is **Franklin C.P. No. 22CV-000067**. Two `[open]` marks resolved from a primary
+  source one hop from the node, on a case whose identity the corpus had been carrying from
+  reporting.
+
+  It is also substantive about the litigation without being about the merits: the plaintiffs
+  subpoenaed the **President of the Ohio Senate** for a deposition on 22 March 2023; he moved to
+  quash on legislative privilege; the trial court modified the subpoena to twenty written questions;
+  he appealed; the Tenth District dismissed for want of a final appealable order because he had not
+  shown that an appeal after final judgment would leave him without a meaningful remedy. So the
+  case's entire appellate record, as of this revision, is one dismissed interlocutory appeal about
+  who may be deposed.
+
+  **And no Ohio appellate court has decided the merits appeal.** Checked against an index current to
+  31 July 2026 for the Tenth District — a positive control, because a coverage claim about a recent
+  filing is worthless without one.
+
+  **One defect in this repository's own reader, found by wiring a second court.** `decided_on` took
+  the date from an opinion's first page by finding `Decided ` and then reading to the closing `.)`
+  of the supreme court's parenthetical, falling back to the end of the line. The courts of appeals
+  print `Rendered on March 29, 2024` bare on a line with no parenthesis, so the fallback never
+  fired and the search ran on to the next `.)` anywhere in the document. The first appellate opinion
+  wired here came out with **sixty-eight lines of holding in its date field**. The rule is now
+  whichever of the two comes first, and there is a test with one document of each shape.
+
+  **And an assumption in the rebuild, caught before it cost anything.** The opinions fixture was
+  built from *every* source of the `ohio-courts` connector, which was the same thing as "every
+  DeRolph opinion" for exactly as long as the connector held one case. Sources already declare
+  which fixtures they feed; the rebuild now selects on that. Otherwise a file whose first line reads
+  *"DeRolph v. State, the four opinions this corpus cites"* would have held five.
+alternatives: |
+  **Fill `citing_cases` from the citation graph and note the recall.** Rejected. A footnote does not
+  survive the trip: an edge in a graph is read by things that do not read the note, and the corpus
+  would be asserting the absence of *Simmons-Harris v. Goff* from DeRolph's citing cases. The
+  measurement is published instead, where a reader who wants the edge can see exactly what it would
+  cost.
+
+  **Fill it from the full-text hits instead, which is the larger set.** Rejected, and this is the
+  more tempting of the two. A string match on a reporter citation is not a citation — it catches a
+  case quoting a party's brief, and a string cite in a dissent, and it is still bounded by one
+  database's corpus rather than by Ohio's reports. Twenty-five is a better number than ten and it is
+  not the number, and publishing it as the number would be the same error at a different scale.
+
+  **Get a CourtListener API token.** Not rejected — deferred, and it is the obvious next step for
+  anyone who wants this. It is free, it unlocks `/opinions-cited/` and `/clusters/`, and it may
+  change the recall measured above, which was taken through the one endpoint that answers
+  anonymously. It is an account rather than a fetch, so it belongs with the other things a person
+  can unblock and an agent cannot.
+
+  **Retrieve the merits ruling from the clerk anyway, since one document is not bulk.** Rejected.
+  The terms do not turn on volume for the part that matters: the data "is not intended for
+  distribution by other persons, entities or organizations", and committing it to a public
+  repository is distribution. Reading it is fine and this repository is not a reader, it is a
+  publisher. The narrower point — that "efforts to mine large quantities of data … will be detected
+  and stopped" — was not tested and has nothing to do with the decision.
+
+  **Wire the appellate decision into `derolph-opinions.txt` as a fifth record.** Rejected on the
+  file's own first line, which says it holds four DeRolph opinions. A separate fixture costs one
+  constant and keeps the litigation record honest about what is in it.
+
+  **Leave the connector `still_blocked` sentence as it was, since both clauses are still true.**
+  Rejected. They are true and they are the wrong sentences: one describes an archive that was never
+  going to have the document, and the other describes a missing tool that turns out to exist. A
+  blocker that names the wrong obstacle is read afterwards as a fact about the world, which is the
+  failure this repository has now recorded six times.

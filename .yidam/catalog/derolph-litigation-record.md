@@ -28,6 +28,21 @@ Trial-level rulings are a different matter and are **not** reachable from this s
 pleas decision is not in the supreme court's archive, which is why the 2025 EdChoice ruling stays
 sourced to reporting.
 
+**The archive is not only DeRolph's, and the EdChoice case has one decision in it.** The Reporter
+publishes the supreme court, all twelve district courts of appeals and the Court of Claims — so
+*Columbus City School Dist. v. State*, 2024-Ohio-1217 (10th Dist.), is here at the same URL shape
+as the four DeRolph opinions, and is now held: `crates/regime-diff/fixtures/edchoice-appellate-record.txt`.
+It is an interlocutory appeal about a deposition subpoena and it decides nothing about EdChoice,
+but it states the caption and the trial court case number, both of which the corpus was carrying
+as `[open]`.
+
+**Why the 2025 merits ruling still is not here** is now a narrower statement than "not in the
+archive". The Reporter publishes no common pleas court at all. The Franklin County Clerk of Courts
+does publish it, and its conditions of use say the data "is not intended for distribution by other
+persons, entities or organizations" and direct organizations to a public records request. That is
+a licence, not a wall. See
+[`what-a-citator-reaches`](../decisions/what-a-citator-reaches.yml).
+
 **Caveat.** Counts of "how many DeRolph rulings" differ across sources — four Supreme Court
 decisions plus a 1997 clarification and the 2003 prohibition action, which some summaries
 count as five or six events. This corpus models the four numbered decisions and describes the
