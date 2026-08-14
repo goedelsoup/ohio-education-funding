@@ -923,6 +923,27 @@ pub fn rebuild(root: &Path) -> Result<Vec<Rebuilt>, RebuildError> {
         },
     });
 
+    // The five audit reports that recite a territory transfer.
+    out.push(match transfers(root) {
+        Ok(rows) => Rebuilt::Written {
+            path: fixtures::TRANSFER_FIXTURE.to_string(),
+            rows: {
+                let mut out = fixtures::TRANSFER_HEADER.join("\t");
+                for row in &rows {
+                    out.push('\n');
+                    out.push_str(&row.join("\t"));
+                }
+                out.push('\n');
+                fixtures::write_text(&root.join(fixtures::TRANSFER_FIXTURE), &out)?;
+                rows.len()
+            },
+        },
+        Err(reason) => Rebuilt::Skipped {
+            path: fixtures::TRANSFER_FIXTURE.to_string(),
+            reason,
+        },
+    });
+
     // The two acts whose education appropriation tables this repository can read as printed.
     out.push(match session_laws(root) {
         Ok(rows) => Rebuilt::Written {
@@ -1155,6 +1176,114 @@ fn f33_ohio_panel(root: &Path) -> Result<Vec<Vec<String>>, String> {
         })
         .collect();
     fixtures::build_f33_ohio_panel(&years, &directory)
+}
+
+/// What each audit report should say, declared before it is read.
+///
+/// The tuple is: source key, audited entity, its role, the resolving body, the resolution date,
+/// the effective date, the departing agency, the receiving agency, and the Revised Code section
+/// where the report names one. Only West Geauga's does.
+type Recital = (
+    &'static str,
+    &'static str,
+    &'static str,
+    &'static str,
+    &'static str,
+    &'static str,
+    &'static str,
+    &'static str,
+    &'static str,
+    &'static str,
+);
+
+const TRANSFER_REPORTS: &[Recital] = &[
+    (
+        "audit-bettsville-final-fy2014",
+        "Bettsville Local School District",
+        "departing",
+        "North Central Ohio Educational Service Center",
+        "June 24, 2014",
+        "June 30, 2014",
+        "Bettsville",
+        "Old Fort",
+        "",
+        "On June 24, 2014",
+    ),
+    (
+        "audit-old-fort-fy2015",
+        "Old Fort Local School District",
+        "receiving",
+        "North Central Ohio Educational Service Center",
+        "June 24, 2014",
+        "June 30, 2014",
+        "Bettsville",
+        "Old Fort",
+        "",
+        "On June 24, 2014",
+    ),
+    (
+        "audit-berkshire-fy2016",
+        "Berkshire Local School District",
+        "receiving",
+        "Geauga County Educational Service Center",
+        "January 27, 2015",
+        "July 1, 2015",
+        "Ledgemont",
+        "Berkshire",
+        "",
+        "On January 27, 2015",
+    ),
+    (
+        "audit-west-geauga-fy2020",
+        "West Geauga Local School District",
+        "receiving",
+        "Geauga County Educational Service Center",
+        "August 20, 2019",
+        "July 1, 2020",
+        "Newbury",
+        "West Geauga",
+        "3311.22",
+        "At the request of the Newbury",
+    ),
+    (
+        "audit-geauga-esc-final-fy2019",
+        "Geauga County Educational Service Center",
+        "departing",
+        "Geauga County and Lake County Educational Service Center Governing Boards",
+        "November 7, 2019",
+        "January 1, 2020",
+        "Geauga County Educational Service Center",
+        "Educational Service Center of the Western Reserve",
+        "",
+        "On November 7, 2019",
+    ),
+];
+
+/// The transfer orders, as the Auditor of State recites them.
+fn transfers(root: &Path) -> Result<Vec<Vec<String>>, String> {
+    let mut texts = Vec::new();
+    for (key, ..) in TRANSFER_REPORTS {
+        let source = source(key).expect("registered").1;
+        texts.push(cache::pdf_text(root, source).map_err(|cause| cause.to_string())?);
+    }
+    let reports: Vec<fixtures::AuditReport<'_>> = TRANSFER_REPORTS
+        .iter()
+        .zip(&texts)
+        .map(|(row, text)| fixtures::AuditReport {
+            report: row.0,
+            audited_entity: row.1,
+            role: row.2,
+            resolving_body: row.3,
+            resolution_date: row.4,
+            effective_date: row.5,
+            departing: row.6,
+            receiving: row.7,
+            section: row.8,
+            opens_with: row.9,
+            text,
+        })
+        .collect();
+    fixtures::build_transfers(&reports)
 }
 
 /// The acts this repository reads an education appropriation table out of.

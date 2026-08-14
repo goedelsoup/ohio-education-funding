@@ -253,6 +253,86 @@ pub fn consolidations_marked() -> Vec<Agency> {
         .collect()
 }
 
+/// The transfer orders, as the Auditor of State recites them.
+const TRANSFERS: &str = include_str!("../fixtures/territory-transfers.tsv");
+
+/// One territory transfer, from the audit report that recites it.
+///
+/// **This is a recital, not the instrument.** The order is a resolution in an educational service
+/// center's minute book, and those are not published. What is published is the Auditor of State's
+/// report on the district, which quotes the resolution by date and issuing body. A state officer's
+/// account of a local body's act is one hop from a corpus node; the act itself is not here.
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct Transfer {
+    /// The source key of the report, which is how a row reaches a digest.
+    pub report: String,
+    /// The entity whose audit it is.
+    pub audited_entity: String,
+    /// Where that entity stands to the transfer: `departing`, `receiving` or `resolving`.
+    pub role: String,
+    /// The body that passed the resolution.
+    pub resolving_body: String,
+    /// When it passed.
+    pub resolution_date: String,
+    /// When the transfer took effect.
+    pub effective_date: String,
+    /// The agency that ceased.
+    pub departing: String,
+    /// The agency that took its territory.
+    pub receiving: String,
+    /// The Revised Code section, where the report names one. Only one of the five does.
+    pub section: String,
+    /// The sentence, verbatim.
+    pub recital: String,
+}
+
+/// Every recited transfer.
+///
+/// # Panics
+///
+/// If the fixture's header is not the one this was written against.
+#[must_use]
+pub fn transfers() -> Vec<Transfer> {
+    let mut rows = TRANSFERS.lines();
+    assert_eq!(
+        rows.next().unwrap_or_default().trim(),
+        concat!(
+            "report\taudited_entity\trole\tresolving_body\tresolution_date\t",
+            "effective_date\tdeparting\treceiving\tsection\trecital"
+        ),
+        "the transfer fixture header changed; update dispersion::lea_directory"
+    );
+    rows.filter(|line| !line.trim().is_empty())
+        .filter_map(|line| {
+            let f: Vec<&str> = line.split('\t').collect();
+            Some(Transfer {
+                report: f.first()?.to_string(),
+                audited_entity: f.get(1)?.to_string(),
+                role: f.get(2)?.to_string(),
+                resolving_body: f.get(3)?.to_string(),
+                resolution_date: f.get(4)?.to_string(),
+                effective_date: f.get(5)?.to_string(),
+                departing: f.get(6)?.to_string(),
+                receiving: f.get(7)?.to_string(),
+                section: f.get(8)?.to_string(),
+                recital: f.get(9)?.to_string(),
+            })
+        })
+        .collect()
+}
+
+/// Departures this repository can now give a reason for, keyed on the departing agency's name.
+///
+/// Five of 341, and the ratio is the point: the reason for a departure is not in the directory and
+/// is not derivable from it. It has to be fetched one document at a time.
+#[must_use]
+pub fn explained() -> BTreeMap<String, Transfer> {
+    transfers()
+        .into_iter()
+        .map(|t| (t.departing.clone(), t))
+        .collect()
+}
+
 /// The school years held, oldest first.
 #[must_use]
 pub fn years() -> Vec<u16> {
@@ -405,6 +485,90 @@ mod tests {
             assert!(
                 rows.iter().all(|a| a.status == "1"),
                 "{leaid} carries a status other than open in some year"
+            );
+        }
+    }
+
+    /// The three district transfers, each recited by a state officer, with dates.
+    #[test]
+    fn every_district_departure_now_has_an_order_behind_it() {
+        let explained = explained();
+        for (departing, receiving, date) in [
+            ("Bettsville", "Old Fort", "June 24, 2014"),
+            ("Ledgemont", "Berkshire", "January 27, 2015"),
+            ("Newbury", "West Geauga", "August 20, 2019"),
+        ] {
+            let transfer = explained
+                .get(departing)
+                .unwrap_or_else(|| panic!("{departing} has no recited order"));
+            assert_eq!(transfer.receiving, receiving);
+            assert_eq!(transfer.resolution_date, date);
+            assert!(
+                transfer.recital.contains(departing) && transfer.recital.contains(receiving),
+                "{departing}'s recital names neither end of its own transfer"
+            );
+        }
+    }
+
+    /// One transfer is recited twice, by two audited entities two years apart.
+    ///
+    /// The corroboration that makes a recital usable. Bettsville's own final audit and Old Fort's
+    /// the following year carry the same resolution, the same date and the same effect — two
+    /// state reports on two entities describing one transaction. Nothing else here has that.
+    #[test]
+    fn the_bettsville_transfer_is_recited_by_both_ends() {
+        let both: Vec<Transfer> = transfers()
+            .into_iter()
+            .filter(|t| t.departing == "Bettsville")
+            .collect();
+        assert_eq!(
+            both.len(),
+            2,
+            "only one end of the Bettsville transfer is here"
+        );
+        let roles: BTreeSet<&str> = both.iter().map(|t| t.role.as_str()).collect();
+        assert_eq!(roles, ["departing", "receiving"].into_iter().collect());
+        for transfer in &both {
+            assert_eq!(transfer.resolution_date, "June 24, 2014");
+            assert_eq!(transfer.effective_date, "June 30, 2014");
+            assert_eq!(
+                transfer.resolving_body,
+                "North Central Ohio Educational Service Center"
+            );
+        }
+    }
+
+    /// Only one report names the section, and that is a fact about the reports.
+    ///
+    /// The corpus can say the mechanism is R.C. 3311.22 for Newbury because West Geauga's audit
+    /// says so. For the other two it is an inference from the statute's shape, and the empty
+    /// column is what keeps the two apart.
+    #[test]
+    fn only_one_recital_cites_a_section() {
+        let cited: Vec<Transfer> = transfers()
+            .into_iter()
+            .filter(|t| !t.section.is_empty())
+            .collect();
+        assert_eq!(cited.len(), 1);
+        assert_eq!(cited[0].departing, "Newbury");
+        assert_eq!(cited[0].section, "3311.22");
+    }
+
+    /// Every departure with an order is one the directory said had no effect on anybody.
+    #[test]
+    fn the_directory_denies_every_transfer_the_auditor_records() {
+        let departures = departures();
+        for transfer in transfers() {
+            // The service centre's own dissolution is in the panel too, under its own name.
+            let Some(row) = departures.iter().find(|d| {
+                d.name.contains(&transfer.departing) || transfer.departing.contains(&d.name)
+            }) else {
+                continue;
+            };
+            assert_eq!(
+                row.terminal_status, CLOSED_CODE,
+                "{} left under status {}, so the contradiction this module rests on has changed",
+                row.name, row.terminal_status
             );
         }
     }
