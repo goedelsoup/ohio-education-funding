@@ -678,39 +678,55 @@ pub fn rebuild(root: &Path) -> Result<Vec<Rebuilt>, RebuildError> {
     // finance panel refuses above, and no better for a litigation record: a reader who finds
     // DeRolph II absent cannot tell whether the case did not exist or the PDF did not download.
     // Skipping the whole fixture leaves the last good one committed and says why.
-    let opinions: Result<Vec<fixtures::Record>, cache::FetchError> =
-        registry::connector("ohio-courts")
-            .expect("registered")
-            .sources
-            .iter()
-            .map(|src| {
-                let text = cache::pdf_text(root, src)?;
-                let body = text.trim().to_string();
-                Ok(fixtures::Record {
-                    id: src.key.to_string(),
-                    title: src.title.unwrap_or(src.key).to_string(),
-                    date: fixtures::decided_on(&body),
-                    source: src.url.to_string(),
-                    body,
+    //
+    // Selected by the fixture each source declares it feeds, rather than by taking every source
+    // the connector holds. That was the same thing while `ohio-courts` held one case; it stopped
+    // being the same thing the moment it held two, and taking all of them would have written the
+    // EdChoice appellate decision into a file whose first line says it holds the four DeRolph
+    // opinions.
+    for (fixture, heading) in [
+        (
+            fixtures::OPINIONS_FIXTURE,
+            "DeRolph v. State, the four opinions this corpus cites. One record per case.",
+        ),
+        (
+            fixtures::EDCHOICE_FIXTURE,
+            "The EdChoice challenge's appellate record. Not the merits ruling, which is a common \
+             pleas decision and is not published anywhere this repository may redistribute from.",
+        ),
+    ] {
+        let opinions: Result<Vec<fixtures::Record>, cache::FetchError> =
+            registry::connector("ohio-courts")
+                .expect("registered")
+                .sources
+                .iter()
+                .filter(|src| src.fixtures.contains(&fixture))
+                .map(|src| {
+                    let text = cache::pdf_text(root, src)?;
+                    let body = text.trim().to_string();
+                    Ok(fixtures::Record {
+                        id: src.key.to_string(),
+                        title: src.title.unwrap_or(src.key).to_string(),
+                        date: fixtures::decided_on(&body),
+                        source: src.url.to_string(),
+                        body,
+                    })
                 })
-            })
-            .collect();
-    out.push(match opinions {
-        Ok(opinions) => Rebuilt::Written {
-            path: fixtures::OPINIONS_FIXTURE.to_string(),
-            rows: fixtures::write_text(
-                &root.join(fixtures::OPINIONS_FIXTURE),
-                &fixtures::build_records(
-                    "DeRolph v. State, the four opinions this corpus cites. One record per case.",
-                    &opinions,
-                ),
-            )?,
-        },
-        Err(cause) => Rebuilt::Skipped {
-            path: fixtures::OPINIONS_FIXTURE.to_string(),
-            reason: cause.to_string(),
-        },
-    });
+                .collect();
+        out.push(match opinions {
+            Ok(opinions) => Rebuilt::Written {
+                path: fixture.to_string(),
+                rows: fixtures::write_text(
+                    &root.join(fixture),
+                    &fixtures::build_records(heading, &opinions),
+                )?,
+            },
+            Err(cause) => Rebuilt::Skipped {
+                path: fixture.to_string(),
+                reason: cause.to_string(),
+            },
+        });
+    }
 
     // The appropriation-line series: eight bienniums, two documents each.
     //
