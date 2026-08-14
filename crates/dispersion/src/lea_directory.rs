@@ -30,22 +30,41 @@
 //!
 //! What Ohio files instead, for all 341 departures without a single exception, is code 2:
 //! *"closed with no effect on another agency's boundaries."* That is not the source declining to
-//! answer. It is the source answering wrongly, about districts whose territory demonstrably went
-//! to a neighbour — Bettsville's to Old Fort, Ledgemont's to Berkshire, Newbury's split between
-//! West Geauga and Chardon. And the receiving agencies' rows do not change at all: they are coded
-//! `1 Open` in the year before, the year of, and the year after.
+//! answer. It is the source answering wrongly, about districts whose territory went to a
+//! neighbour — Bettsville's to Old Fort, Ledgemont's to Berkshire, Newbury's to West Geauga. And
+//! the receiving agencies' rows do not change at all: they are coded `1 Open` in the year before,
+//! the year of, and the year after.
 //!
 //! Nothing here reads a reason out of that, and the alternatives were tested rather than assumed.
-//! Enrolment absorption on the survivor is confounded roughly fifty to one by ordinary growth,
-//! and it gets the sign wrong on Newbury — Chardon *lost* pupils the year it received them. Name
-//! changes on the survivor arrive up to two years out of alignment with the closure and share a
-//! vocabulary with cosmetic re-spellings. [`consolidations_marked`] holds the negative finding
+//! Enrolment absorption on the survivor is confounded roughly fifty to one by ordinary growth.
+//! Name changes on the survivor arrive up to two years out of alignment with the closure and share
+//! a vocabulary with cosmetic re-spellings. [`consolidations_marked`] holds the negative finding
 //! itself, so the day Ohio starts filing code 5 this module fails rather than stays quiet.
 //!
-//! Settling the reason needs Ohio's own record — the territory-transfer orders under R.C. 3311 —
-//! which is the same answer
-//! [`state-foundation-aid`](../../../.yidam/corpus/revenue-stream/state-foundation-aid.yml)
-//! reached about the disappearing appropriation lines, for the same reason.
+//! # Where the order is, which is not where this module first said
+//!
+//! This note used to end by saying the reason needed "the territory-transfer orders under
+//! R.C. 3311", and to imply the State Board of Education held them. **It does not, and for these
+//! districts it never did.** R.C. 3311.22 — now committed at
+//! [`revised-code.txt`](../../project/fixtures/revised-code.txt) — vests the transfer in the
+//! *educational service center governing board*, which "shall at its next regular meeting …
+//! adopt a resolution making the transfer effective". The State Board appears twice in the
+//! section and neither is an approval: once as an appeal body, reachable only if the receiving
+//! district's board opposes an ESC-initiated transfer, and once as a place a boundary **map** is
+//! filed after the fact.
+//!
+//! West Geauga's board accepted unanimously, so no appeal arose and no State Board instrument was
+//! ever created. A search of the Board's own record confirms it and is worth stating as a bound:
+//! fifty-eight meetings of adopted minutes across 2014-2017 and 2019-2020, plus 4,981 board-book
+//! PDFs spanning 2014-2021, contain zero occurrences of "Bettsville", zero of "Ledgemont" and
+//! zero of `3311.22`. The same corpus **does** carry State Board territory-transfer resolutions
+//! for other district pairs under R.C. 3311.24 and 3311.06, which is the positive control: the
+//! instrument detects the thing, and these three are not in it.
+//!
+//! So the corpus was reaching for the wrong custodian rather than meeting a closed door. The
+//! orders are recited, by date and issuing body, in the Auditor of State's reports on the
+//! *receiving* districts — a state officer's account, one hop from a node. Committing those is
+//! its own phase; what this module now says is where to look and where not to.
 
 use std::collections::{BTreeMap, BTreeSet};
 
@@ -366,10 +385,15 @@ mod tests {
     /// The receiving districts are still open and their rows say nothing happened.
     #[test]
     fn the_agencies_that_took_the_pupils_are_unmarked() {
-        // Old Fort took Bettsville, Berkshire took Ledgemont, and Newbury split between West
-        // Geauga and Chardon. Every one of them is coded `1 Open` throughout, which is why no
-        // rule over this source can find them.
-        let survivors = ["3910021", "3904716", "3904722", "3904718"];
+        // Old Fort took Bettsville, Berkshire took Ledgemont, West Geauga took Newbury. Every one
+        // is coded `1 Open` throughout, which is why no rule over this source can find them.
+        //
+        // Chardon (3904718) is deliberately absent. An earlier version of this test named it as a
+        // second receiver of Newbury's territory, on a judge's reading rather than a record. The
+        // resolution transfers "all" of Newbury to West Geauga, and this repository's own panel
+        // says the same: West Geauga gains 208 pupils in FY2021 and **Chardon loses 110** in the
+        // same year. A survivor that shrinks did not receive anybody.
+        let survivors = ["3910021", "3904716", "3904722"];
         let panel = panel();
         for leaid in survivors {
             let rows: Vec<&Agency> = panel.iter().filter(|a| a.leaid == leaid).collect();

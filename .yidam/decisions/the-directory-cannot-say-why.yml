@@ -87,6 +87,21 @@ consequences: |
   orders under R.C. 3311 — the same answer
   [state-foundation-aid](../corpus/revenue-stream/state-foundation-aid.yml) already reached about
   the department's disappearing appropriation lines, and for the same reason.
+
+  > **CORRECTED by [`the-order-was-never-the-states`](the-order-was-never-the-states.yml).** Two
+  > things above are wrong.
+  >
+  > *The custodian.* "Ohio's own territory-transfer orders under R.C. 3311" is right about the
+  > statute and wrong about the office. R.C. 3311.22 vests the transfer in the **educational
+  > service center governing board**; the State Board of Education is an appeal body, reachable
+  > only if the receiving district objects. West Geauga's board accepted unanimously, so no State
+  > Board instrument was ever made. It is not withheld — it does not exist.
+  >
+  > *And Chardon.* This record and the module both said Newbury's territory "split between West
+  > Geauga and Chardon". The resolution transfers **all** of Newbury to West Geauga, and this
+  > repository's own F-33 panel agrees: West Geauga gains 208 pupils in FY2021 while Chardon
+  > **loses** 110. The claim came from a judge's failure-mode analysis and was carried into a
+  > docstring and a test without being checked against the fixture sitting beside it.
 alternatives: |
   **Classify from the status code.** Rejected on the evidence rather than on principle. If Ohio
   populated code 5 this would be a direct read and worth having; it does not, and the code it does
@@ -101,6 +116,12 @@ alternatives: |
   out of scope rather than as wrong — they are true, and this repository's rule is that a claim
   reaches a corpus node through a committed primary source in one hop. The three are named in the
   module and in the catalog record precisely so that someone can go and fetch those orders.
+
+  > **This rejection has expired.** The ground it rested on — that no committed primary source is
+  > one hop away — turns out to be false: the Auditor of State's reports on the *receiving*
+  > districts recite each resolution by date and issuing body, and serve as PDFs to this project's
+  > user agent. See [`the-order-was-never-the-states`](the-order-was-never-the-states.yml), which
+  > scopes that as its own phase rather than doing it in passing.
 
   **Wire all thirty years while the discovery was in hand.** Rejected. The fixed-width era needs a
   per-year position table for seven distinct layouts, and the F-33 panel it would serve does not
