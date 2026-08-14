@@ -1,0 +1,127 @@
+id: the-acts-themselves
+summary: >-
+  The session laws extend the enacted appropriation series from FY2002 back to FY1998 and stop
+  there, against a floor the legislature published rather than one this project inferred — and the
+  first act after DeRolph I turns out to have refused to itemise the year the court's deadline
+  fell in.
+context: |
+  `lsc-budget`'s blocker had one clause left standing after two phases of correction: before FY1999
+  there is nothing, because the greenbook series begins at the 124th General Assembly and the
+  Catalog of Budget Line Items reaches only FY2002. Both floors were probed and both are real.
+
+  What issue #7 recorded as the remaining hope was the **session laws** — the enrolled acts rather
+  than LSC's analyses of them — and it recorded them as *not yet probed*, with the right caution
+  attached: "an act's text and an act's appropriation table are different things and only one of
+  them answers this."
+
+  They are the same thing. Ohio's operating budget acts carry the appropriation table in the bill.
+decision: |
+  Add `ohio-session-laws` as a connector in its own right rather than folding it into `ohio-laws`.
+  Same publisher, different artefact: `ohio-laws` retrieves Revised Code sections as they stand
+  today, and this retrieves acts as they were passed.
+
+  Wire the two acts whose education tables are **printed once**: Am. Sub. H.B. 215 of the 122nd
+  (FY1998-99) and Am. Sub. H.B. 282 of the 123rd (FY2000-01). Reconcile every parsed row against
+  the act's own fund-group totals and those against its grand total, in both fiscal-year columns,
+  and fail the rebuild on a difference of one dollar.
+
+  **Do not wire H.B. 650 and H.B. 770**, and record why in a form a later phase can act on.
+
+  **Keep the four years out of the published feed for now.** They are in the crates, tested, and
+  joined; the site's series still begins at FY2002. FY1999 cannot go on a chart until the shape it
+  needs is built, and putting it there without that would draw fifty-one programmes falling to zero.
+consequences: |
+  **The floor is the publisher's and it is stated, not inferred.** `GET
+  https://search-prod.lis.state.oh.us/api/v2/` returns the service's own index of every General
+  Assembly it holds: seventeen entries, oldest the **122nd**, 1997-01-06 to 1998-12-31. Nothing
+  below it exists in any version code. So the enacted record reaches FY1998 and no further, and
+  the Foundation Program era and the equal yield formula are unreachable by this route — not
+  unattempted, unpublished. That is a different kind of blocker from the one this issue carried,
+  and a much better one to have.
+
+  *DeRolph I* was decided in March 1997 and falls inside the 122nd, so the first budget enacted
+  after the decision is the oldest thing there is.
+
+  **And that act declined to itemise half of its own biennium.** H.B. 215 spreads FY1998 across
+  fifty-three GRF education lines and FY1999 across one: fifty-one of the fifty-three are `$0`
+  and the whole year — **$4,470,135,592** — sits in `200-405 Primary and Secondary Education
+  Funding`, under prose promising an itemisation by 15 January 1998 and making FY1999's earmarks
+  "subject to the passage of a new school finance formula and education reform plan".
+
+  The zeros are the act's, not the reader's, and the reconciliation is what proves it: 53 GRF rows
+  sum to the printed 4,899,708,534 and 5,134,145,592 exactly, in both columns.
+
+  **The promise was kept, and the evidence needed no new retrieval.** H.B. 650 itemised FY1999 in
+  February 1998. What shows it is a fixture this repository already held: the greenbook's FY1999
+  *actuals* carry 141 line items and **no `200405` at all**, while `200501` — appropriated nothing
+  — spent $3,035,363,396. A line appropriated $4.47 billion and spent zero, because by the time the
+  money moved it had been given its proper names.
+
+  **Two defects in this repository's own published figures, both found by reading the acts.**
+  `TAX_REIMBURSEMENT` excluded `200417` and did not exclude `200906`.
+
+  - `200906 Tangible Tax Exemption - Education` is a reimbursement by the module's own definition
+    and sits beside `200901` in every table from FY1998. Omitting it counted **$73,500,000** inside
+    the department in FY2002 — 0.94% — decaying to $10,707,622 by FY2009. Because it phases out it
+    inflated the early years more than the late ones, which is the same wrong-sign error the
+    module's docstring records catching once already. FY2002-FY2013 all move.
+  - `200417` is `Professional Development` from FY1998 to FY2003 and only becomes `Personal
+    Property Tax Replacement Phase Out` in FY2024. Excluding it by number was harmless while the
+    series began at FY2002; it stops being harmless the moment FY1998 is read, where H.B. 215
+    appropriates $14,370,077 to it.
+
+  The exclusion is now keyed on the number **and** the year. And the test that was supposed to
+  guard the class had the same blind spot as the list — it matched titles containing "allocation",
+  "replacement" or "reimbursement", and `200906` says **exemption**.
+
+  **The 123rd took education out of the operating budget.** H.B. 283 is that biennium's budget, 977
+  pages, and has no Department of Education section and no `200-5xx` line anywhere. Education was
+  appropriated by H.B. 282, enacted a day earlier, as the response to *DeRolph II*. "The operating
+  budget" is not a reliable way to find the education table.
+
+  **Three retrieval facts worth having written down.** The enrolled version code is the bill's
+  position in its own version sequence, so it differs per bill — `06_EN` for H.B. 215, `05_EN` for
+  H.B. 650 and H.B. 770, `08_EN` for H.B. 282 — and guessing wrong returns a nine-byte 404 that
+  reads exactly like "not served". The index at `.../legislation/{bill}/` gives the right one.
+  Every act served the project's own user agent without complaint.
+
+  **One act's arithmetic is wrong and is carried rather than absorbed.** H.B. 282's printed GRF
+  total for FY2001 is one dollar more than its own fifty-two rows, while its group totals sum to
+  its grand total exactly. It is listed as a named defect of a fixed size, not swallowed by a
+  tolerance — a tolerance wide enough to hide a dollar is wide enough to hide a missing row.
+
+  **What the reconciliation caught, which is the argument for having it.** H.B. 215 closes its
+  lottery funds with `Total 017 and 018 LPE Lottery Profits Education Fund Group` — lowercase,
+  named by fund number, and unlike every other total in the act. A reader matching `TOTAL ` misses
+  it and loses $699,892,200 silently. The check failed instead.
+alternatives: |
+  **Wire H.B. 650 and H.B. 770 too, and publish FY1999 itemised.** Rejected for this phase and
+  scoped rather than abandoned. Both print every amended row twice — struck inline, inserted
+  beneath — and **H.B. 650 reprints H.B. 215's fund-group totals unchanged**, so the reconciliation
+  that guards every other extraction here would pass against the superseded number. That is the
+  worst possible property in a source: a wrong answer that satisfies the check. Reading them needs
+  a reader that tells a struck row from an inserted one, and it needs its own phase.
+
+  H.B. 650 also carries a second education table that was never law — SECTION 31, $15,000,000 from
+  a School Trust Fund, conditional on a ballot measure that failed on 5 May 1998, with line items
+  printed as literal placeholders `XXX 200-YYY`. Whoever wires H.B. 650 must exclude it
+  deliberately.
+
+  **Put FY1998-FY2001 in the feed now.** Rejected. FY1999's row set is fifty-one zeros and one
+  lump; charted, it says the state stopped funding transportation, special education and
+  vocational education for a year. Carrying it needs a per-row `itemised`/`lump` distinction and a
+  vintage field naming which act a figure is read from, and both are design decisions worth making
+  deliberately rather than at the end of an extraction phase.
+
+  **Treat the FY1999 lump as a data defect and interpolate it.** Never on the table. It is the most
+  interesting thing in the four years.
+
+  **Take the totals only and skip the line items.** Rejected. The line items are what make FY1999
+  legible: a total for FY1999 looks ordinary, and it is the *shape* of the table that carries the
+  finding.
+
+  **Look for the pre-1997 acts somewhere other than the legislature.** Not attempted, and worth
+  someone's time before the corpus records the era as unreachable in general rather than unreachable
+  from this publisher. The Laws of Ohio are printed volumes and the State Library holds them; a
+  scanned run may exist. What this phase establishes is only that the General Assembly does not
+  serve them.

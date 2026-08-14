@@ -1457,6 +1457,59 @@ pub const CONNECTORS: &[Connector] = &[
         sources: OHIO_LAWS_SECTIONS,
     },
     Connector {
+        key: "ohio-session-laws",
+        publisher: "Ohio General Assembly",
+        feeds: &["legislation", "fiscal-period"],
+        status: Status::Wired {
+            still_blocked: Some(
+                "wired for the two acts whose education tables are printed once and reconcile \
+                 exactly — H.B. 215 of the 122nd and H.B. 282 of the 123rd — which gives enacted \
+                 line items for FY1998, FY2000 and FY2001. FY1999 is enacted as a single \
+                 undifferentiated line and was itemised later by H.B. 650 and corrected by \
+                 H.B. 770, both of which print every amended row twice, struck and inserted, and \
+                 need a reader that tells the two apart. And the floor is the publisher's: the \
+                 legislature's own version index stops at the 122nd General Assembly, so no act \
+                 before 1997 is served in any form",
+            ),
+        },
+        note: "The acts themselves, rather than LSC's analyses of them. This is the only route to \
+               an enacted appropriation before FY2002, and it reaches exactly four fiscal years \
+               before stopping against a wall the publisher put there.",
+        sources: &[
+            Source {
+                key: "hb215-122-enrolled",
+                title: Some("Am. Sub. H.B. 215 of the 122nd General Assembly, as enrolled"),
+                url: "https://search-prod.lis.state.oh.us/api/v2/general_assembly_122/\
+                      legislation/hb215/06_EN/pdf/",
+                filename: "hb215-122-enrolled.pdf",
+                format: Format::Pdf,
+                catalog: Some("ohio-session-laws"),
+                fixtures: &[crate::fixtures::SESSION_LAW_FIXTURE],
+                note: "The FY1998-99 main operating budget, and the first one enacted after \
+                       DeRolph I. Its education table itemises FY1998 across fifty-three GRF \
+                       lines and itemises FY1999 across none: the whole year sits in 200-405, \
+                       Primary and Secondary Education Funding, against prose promising an \
+                       itemisation by 15 January 1998. The version code is `06_EN` and this is \
+                       the only act here for which the obvious guess is right.",
+            },
+            Source {
+                key: "hb282-123-enrolled",
+                title: Some("Am. Sub. H.B. 282 of the 123rd General Assembly, as enrolled"),
+                url: "https://search-prod.lis.state.oh.us/api/v2/general_assembly_123/\
+                      legislation/hb282/08_EN/pdf/",
+                filename: "hb282-123-enrolled.pdf",
+                format: Format::Pdf,
+                catalog: Some("ohio-session-laws"),
+                fixtures: &[crate::fixtures::SESSION_LAW_FIXTURE],
+                note: "FY2000-01, and not the operating budget. The 123rd appropriated education \
+                       in its own act, enacted a day before the budget: H.B. 283 is 977 pages \
+                       and contains no Department of Education section at all. Both fiscal years \
+                       are fully itemised here — there is no successor to 200-405. Version code \
+                       `08_EN`, because two interim postings sit in its version sequence.",
+            },
+        ],
+    },
+    Connector {
         key: "ohio-courts",
         publisher: "Supreme Court of Ohio",
         feeds: &["litigation"],
@@ -2407,6 +2460,7 @@ mod tests {
             "tax-abstract",
             "lsc-budget",
             "ohio-laws",
+            "ohio-session-laws",
             "ohio-courts",
             "ofcc-projects",
             "census-f33",

@@ -59,8 +59,9 @@ Sorted by: type, then slug.
 | [`ode-idea-part-b-allocations`](ode-idea-part-b-allocations.md) | IDEA Part B Allocations to Districts | 2 |
 | [`ohio-essa-state-plan`](ohio-essa-state-plan.md) | Ohio's Consolidated State Plan under ESSA, and the April 2026 School Improvement amendment | 5 |
 | [`ohio-revised-code`](ohio-revised-code.md) | Ohio Revised Code — the sections this corpus cites | 4 |
+| [`ohio-session-laws`](ohio-session-laws.md) | Ohio session laws — the appropriation acts themselves | 1 |
 
-37 entries, 2 not yet cited by any corpus node. 155 retrieved files are pinned by SHA-256 in [`crates/connect/source-digests.txt`](../../crates/connect/source-digests.txt).
+38 entries, 2 not yet cited by any corpus node. 157 retrieved files are pinned by SHA-256 in [`crates/connect/source-digests.txt`](../../crates/connect/source-digests.txt).
 <!-- /REGEN -->
 
 ## Adding a source
