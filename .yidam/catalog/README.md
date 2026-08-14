@@ -25,6 +25,7 @@ Sorted by: type, then slug.
 | [`alec-education-savings-account-act`](alec-education-savings-account-act.md) | ALEC — Education Savings Account Act | 1 |
 | [`alec-parental-choice-scholarship-act`](alec-parental-choice-scholarship-act.md) | ALEC — Parental Choice Scholarship Program Act (Universal Eligibility) | 1 |
 | [`alec-state-education-freedom-index`](alec-state-education-freedom-index.md) | ALEC — Index of State Education Freedom (2025, 2nd edition) | 3 |
+| [`auditor-district-audits`](auditor-district-audits.md) | Auditor of State — district and service centre audit reports | 1 |
 | [`auditor-longitudinal-school-finance`](auditor-longitudinal-school-finance.md) | Longitudinal School Finance Study — Ohio Auditor of State | 1 |
 | [`bls-cpi-u`](bls-cpi-u.md) | CPI-U all items — the Bureau of Labor Statistics flat file | 3 |
 | [`census-block-geography`](census-block-geography.md) | Census block geography: school districts, legislative districts, and population | 1 |
@@ -61,7 +62,7 @@ Sorted by: type, then slug.
 | [`ohio-revised-code`](ohio-revised-code.md) | Ohio Revised Code — the sections this corpus cites | 4 |
 | [`ohio-session-laws`](ohio-session-laws.md) | Ohio session laws — the appropriation acts themselves | 1 |
 
-38 entries, 2 not yet cited by any corpus node. 160 retrieved files are pinned by SHA-256 in [`crates/connect/source-digests.txt`](../../crates/connect/source-digests.txt).
+39 entries, 2 not yet cited by any corpus node. 165 retrieved files are pinned by SHA-256 in [`crates/connect/source-digests.txt`](../../crates/connect/source-digests.txt).
 <!-- /REGEN -->
 
 ## Adding a source

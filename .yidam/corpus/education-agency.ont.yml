@@ -12,6 +12,25 @@ description: |
   The contingent labels attached to agencies in this domain — property-poor, 20-mill-floor,
   DeRolph plaintiff, guarantee district — are Roles it plays, not what it is, and several
   are typically played at once.
+
+  **THE RIGIDITY IS NOW EVIDENCED, AND THE FEDERAL REGISTER DENIES IT.** Three Ohio districts
+  ceased inside the window this repository holds — Bettsville into Old Fort in 2014, Ledgemont
+  into Berkshire in 2015, Newbury into West Geauga in 2020 — each by a resolution of a county
+  educational service center governing board under R.C. 3311.22, which transfers *all* of one
+  district's territory to an adjacent one. The order is the service centre's, not the State
+  Board's: the State Board appears in that section only as an appeal body, and none of these
+  three was appealed. [verified —
+  [the audit reports that recite each resolution](../catalog/auditor-district-audits.md), and
+  [R.C. 3311.22](../catalog/ohio-revised-code.md)]
+
+  The federal Common Core of Data files all three as *"closed with no effect on another agency's
+  boundaries"*, which is the negation of what happened, and files nothing at all on the receiving
+  agency. So an entity of this Kind can cease, its territory can move, and the national register
+  of these entities can record neither. [verified — `dispersion::lea_directory`]
+
+  What the Revised Code makes rigid the reporting does not. That gap is the reason `established`
+  and any future `ceased` property must come from Ohio's own record rather than from the
+  directory that is otherwise the canonical list of these agencies. [inference]
 properties:
   - name: irn
     type: string
