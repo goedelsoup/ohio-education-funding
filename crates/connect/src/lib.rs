@@ -1341,12 +1341,16 @@ fn session_laws(root: &Path) -> Result<Vec<Vec<String>>, String> {
 
 /// The school years of the LEA directory this repository holds, as the year each one opens in.
 ///
-/// 2008-09 because that is the first year `f33-ohio-panel.csv` covers, and 2023-24 because that is
-/// the latest NCES has published. The fourteen years before 2008-09 are retrievable and are a
-/// different reader: fixed-width, no header, and the column positions move in seven of the nine
-/// years between 1998-99 and 2006-07.
+/// 1994-95 because that is the oldest year whose archive still serves, and 2023-24 because that is
+/// the latest NCES has published. Thirty consecutive years, with no gap — which is what lets the
+/// reader check each year's closures against the next year's membership.
+///
+/// The directory itself goes back to 1986-87 in the same fixed-width family. Those nine years are
+/// left out because nothing consumes them and because the claim this series supports — that Ohio
+/// has never filed a consolidation — is already made over a completely enumerated thirty years.
 const CCD_DIRECTORY_YEARS: &[u16] = &[
-    2008, 2009, 2010, 2011, 2012, 2013, 2014, 2015, 2016, 2017, 2018, 2019, 2020, 2021, 2022, 2023,
+    1994, 1995, 1996, 1997, 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009,
+    2010, 2011, 2012, 2013, 2014, 2015, 2016, 2017, 2018, 2019, 2020, 2021, 2022, 2023,
 ];
 
 /// The Ohio slice of every directory year, from the cached zips.
@@ -1362,7 +1366,15 @@ fn ccd_directory(root: &Path) -> Result<Vec<Vec<String>>, String> {
         // The member is chosen by extension because its name carries a release date that changes
         // when NCES reposts, and because the modern archives hold the same directory twice — once
         // as text and once as a SAS table nothing here can read.
-        let suffix = if *opens >= 2015 { ".csv" } else { ".txt" };
+        //
+        // The extension says nothing about the format. `ag031b.txt` is fixed-width and
+        // `ag071b.txt` is tab-delimited, and both are `.txt`; what decides is the year's presence
+        // in `fixtures::CCD_FIXED_WIDTH`. This is only about which member to take out of the zip.
+        let suffix = match opens {
+            2015.. => ".csv",
+            2003 | 2007 | 2008..=2014 => ".txt",
+            _ => ".dat",
+        };
         texts.push(zip_member_latin1(root, source, suffix)?);
     }
     let years: Vec<fixtures::DirectoryYear<'_>> = CCD_DIRECTORY_YEARS

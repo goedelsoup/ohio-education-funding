@@ -88,6 +88,24 @@ consequences: |
   [state-foundation-aid](../corpus/revenue-stream/state-foundation-aid.yml) already reached about
   the department's disappearing appropriation lines, and for the same reason.
 
+  > **SUPERSEDED by [`before-there-were-service-centers`](before-there-were-service-centers.yml).**
+  > The fourteen years are wired. Two things said here about them are worth correcting rather than
+  > quietly overwriting.
+  >
+  > *The filenames.* The convention recorded here and in the catalog was one year late —
+  > `pau94datr` is 1994-95, not `pau95data`, and `ag981c` is 1998-99, not `ag991a`. The record
+  > lengths recorded alongside it belong to the correct alignment, so the two notes contradicted
+  > each other and the lengths were right.
+  >
+  > *The difficulty.* "The column positions move in seven of the nine years" is true of the
+  > *record* and false of the five columns this reader takes. Four of them never move at all in
+  > thirteen years; the status byte moves four times. What was actually hard was that one of the
+  > layout documents states that byte's position wrongly.
+  >
+  > *And the negative.* "Zero times in the twenty-six years back to 1998-99 that were checked and
+  > not wired" is now zero times in thirty years that are checked *and* wired, under test, over a
+  > completely enumerated population of 30,655 agency-years.
+
   > **CORRECTED by [`the-order-was-never-the-states`](the-order-was-never-the-states.yml).** Two
   > things above are wrong.
   >
@@ -127,6 +145,15 @@ alternatives: |
   per-year position table for seven distinct layouts, and the F-33 panel it would serve does not
   reach before FY2009 — so it would be a second reader built for no consumer. The URLs and the
   layout hazards are written down in the catalog record, which is the cheap half of that work.
+
+  > **This rejection was wrong on its second clause, and the first was overstated.** The per-year
+  > table is thirteen lines, not seven layouts. And there was a consumer, named in this very
+  > record without being recognised: the reason a district departs sits with an educational
+  > service center's governing board, and in 1994-95 Ohio had no service centers — it had 86
+  > county boards, thirty-nine of which disappear over the next seven years with the same code 2
+  > this record is about. The finance panel is not the only thing a membership series can serve,
+  > and "no consumer" was a statement about which fixture was in view. See
+  > [`before-there-were-service-centers`](before-there-were-service-centers.yml).
 
   **Leave `unnamed_agencies` reporting the gap.** Rejected, and it is kept with its assertion
   inverted instead. The function now says zero and a test holds it there, because the property

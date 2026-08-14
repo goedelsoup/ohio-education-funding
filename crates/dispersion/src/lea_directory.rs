@@ -3,7 +3,7 @@
 //! # What this is for
 //!
 //! Every other fixture here measures something. This one measures *membership*: the federal
-//! directory's Ohio slice for sixteen school years, 2008-09 through 2023-24, one row per agency
+//! directory's Ohio slice for thirty school years, 1994-95 through 2023-24, one row per agency
 //! per year. It exists because a panel spanning years is a panel whose members change, and
 //! [`crate::ohio_panel`] had been resolving every agency's Ohio number through a **single**
 //! directory year — so an agency that closed before 2023 had no number at all, and the module
@@ -13,22 +13,23 @@
 //!
 //! That docstring read: *"the count going from 124 in FY2012 to 0 in FY2022 is the consolidation
 //! history, measured."* All 124 are nameable from the contemporaneous 2011-12 file, and when you
-//! name them, 121 are community schools. Across this whole window **341 agencies leave the
-//! directory: 327 community schools, nine service centres, five regular districts.** Two of the
-//! five are STEM schools, which Ohio funds as their own unit under R.C. 3326 and which the federal
-//! directory types as regular districts.
+//! name them, 121 are community schools. Across thirty years **689 agencies leave the directory:
+//! 616 community schools, 66 service agencies, five regular districts, one local district and one
+//! state agency.** Two of the five regular districts are STEM schools, which Ohio funds as their
+//! own unit under R.C. 3326 and which the federal directory types as districts.
 //!
 //! So the number was measuring charter churn and being read as district consolidation, at
-//! something like a hundred to one. The three genuine district consolidations in sixteen years are
-//! Bettsville Local, Ledgemont Local and Newbury Local, and [`departures`] names them.
+//! something like a hundred to one. The three genuine district consolidations are Bettsville
+//! Local, Ledgemont Local and Newbury Local, and [`departures`] names them.
 //!
 //! # Why no departure carries a reason
 //!
 //! The CCD has eight operational-status codes and exactly one marks a consolidation — code 5,
 //! *"significant change in geographic boundaries or instructional responsibility"*. **Ohio has
-//! never used it.** Zero occurrences in 17,618 Ohio agency-years.
+//! never used it.** Zero occurrences in 30,655 Ohio agency-years, which is every agency-year the
+//! directory has published since 1994-95.
 //!
-//! What Ohio files instead, for all 341 departures without a single exception, is code 2:
+//! What Ohio files instead, for all 689 departures without a single exception, is code 2:
 //! *"closed with no effect on another agency's boundaries."* That is not the source declining to
 //! answer. It is the source answering wrongly, about districts whose territory went to a
 //! neighbour — Bettsville's to Old Fort, Ledgemont's to Berkshire, Newbury's to West Geauga. And
@@ -40,6 +41,76 @@
 //! Name changes on the survivor arrive up to two years out of alignment with the closure and share
 //! a vocabulary with cosmetic re-spellings. [`consolidations_marked`] holds the negative finding
 //! itself, so the day Ohio starts filing code 5 this module fails rather than stays quiet.
+//!
+//! # What the fourteen older years added, which was not what was expected of them
+//!
+//! They were scoped out once as *"a reader built ahead of its reader"*: the finance panel starts
+//! at FY2009 and nothing consumed a directory year before 2008-09. What they actually carry is
+//! the record of **the bodies that issue the transfer orders**.
+//!
+//! R.C. 3311.22 vests a territory transfer in an educational service center's governing board.
+//! Ohio did not have educational service centers in 1994-95. It had **86 county boards of
+//! education**, and this directory watches thirty-nine of them leave between 1995-96 and 2001-02,
+//! in ones and fives, while multi-county centres appear beside them with the departed counties'
+//! names in their own — Athens and Meigs leave, Athens-Meigs arrives; Ross and Pike leave,
+//! Ross-Pike arrives; Guernsey, Monroe and Noble leave, Guernsey-Monroe-Noble arrives. Fourteen
+//! such centres join, so the category holds 61 by 2001-02 rather than 47, and 60 of those are
+//! recoded into the service-agency type in 2002-03 while the last, Carroll-Harrison, leaves.
+//!
+//! **Every one of the forty is filed under code 2.** So the defect this module was
+//! written about is not particular to school districts and did not start in the 2010s. The
+//! register says "closed with no effect on another agency's boundaries" about the consolidation
+//! of the very bodies whose minute books hold the orders it cannot describe.
+//!
+//! The last of the sixty-six is the one this repository already holds an instrument for. Geauga
+//! County ESC's final audit recites its own merger with Lake County ESC into the Educational
+//! Service Center of the Western Reserve, on 7 November 2019. In the directory, Geauga County ESC
+//! is filed closed with no effect on anyone; Lake County ESC keeps its agency identifier, keeps
+//! IRN 047860, is coded `1 Open` in the year before, the year of and the year after, and simply
+//! takes the new name in 2020-21. That is the district case exactly, one level up.
+//!
+//! The county-to-compound-name correspondence is legible and is **not committed as a fact**. It
+//! is a reading of a name field, the timing is up to two years out of alignment, and the same
+//! field flips a survivor between "Guernsey-Monroe-Noble" and "Ohio Valley" and back over four
+//! years. It is stated because it is the strongest form the answer takes anywhere in this source,
+//! and it is still an inference — which is the measure of how far the source is from carrying one.
+//!
+//! # And the arrival code carries the same denial as the departure code
+//!
+//! Ohio forms two school districts in thirty years. **Monroe Local** appears in 2000-01 and
+//! **Manchester Local** in 2004-05, both filed under code 3 — *"a new education agency formed with
+//! no effect on another agency's boundaries."* In the same year Monroe Local appears, Middletown
+//! Monroe City is renamed **Middletown City**, same identifier, same IRN, coded open on both
+//! sides. Adams County/Ohio Valley Local, in the year Manchester Local appears, does not change at
+//! all. Both new districts carry six-digit IRNs from Ohio's original county-ordered block, which
+//! is to say numbers Ohio had used before and the federal register has no way to say so.
+//!
+//! A third, **Peebles**, is filed in 2004-05 as *"scheduled to be operational within 2 years"* and
+//! closed the following year without ever reaching open. A district announced and abandoned, and
+//! the only reason it is not a district departure is that it never arrived.
+//!
+//! So the register denies the boundary effect at both ends of an agency's life, and again the only
+//! trace of it anywhere is a rename on the survivor — present in one of the two cases and absent
+//! in the other. The successor readings here are stated and committed nowhere, on the same footing
+//! as everything else in this module.
+//!
+//! # The agency type is not comparable across three of these years
+//!
+//! Three times the CCD recodes Ohio without an agency joining or leaving. 532 agencies change
+//! type on those three seams and not one of them moved, so a rule that reads a type change as an
+//! event finds 532 events that did not happen:
+//!
+//! - **2000-01.** 47 agencies move from type 1 to type 7. They are Ohio's first community
+//!   schools, filed as regular school districts for their first two years. This is the dangerous
+//!   one: on the type alone Ohio appears to gain 47 school districts in 1999-2000 and lose them
+//!   again the next year. Types 1 and 2 together read 661 either side and 708 in between.
+//! - **2002-03.** 60 supervisory-union centres and 49 districts move into type 4 together. The 60
+//!   are what remains of the county boards; the 49 are the joint vocational school districts.
+//!   Type 3 empties and type 4 goes from nothing to 109.
+//! - **2006-07.** 376 agencies move from type 2, *"local school district component of a
+//!   supervisory union"*, into type 1. Type 2 empties.
+//!
+//! [`types_by_year`] is what makes those visible, and the test beside it pins all three.
 //!
 //! # Where the order is, which is not where this module first said
 //!
@@ -73,7 +144,10 @@ const FIXTURE: &str = include_str!("../fixtures/ccd-lea-directory.csv");
 const EXPECTED_HEADER: &str = "school_year,leaid,irn,name,agency_type,status";
 
 /// The first school year the directory is held for, as the year it opens in.
-pub const FIRST_YEAR: u16 = 2008;
+///
+/// 1994-95 because that is the oldest edition NCES still serves. The survey itself reaches back to
+/// 1986-87 in the same fixed-width family; those nine years are retrievable and unheld.
+pub const FIRST_YEAR: u16 = 1994;
 
 /// The last, which is the latest NCES has published.
 pub const LAST_YEAR: u16 = 2023;
@@ -240,6 +314,24 @@ pub fn departures_by_type() -> BTreeMap<String, usize> {
     out
 }
 
+/// How many agencies of each type each year holds.
+///
+/// Published because the type vocabulary is not stable and a reader comparing types across a year
+/// boundary needs to be able to see that. Twice — in 2002-03 and again in 2006-07 — Ohio's
+/// composition changes by hundreds of agencies with nobody joining or leaving. See the module
+/// note; the arithmetic of both seams is pinned in the tests below.
+#[must_use]
+pub fn types_by_year() -> BTreeMap<u16, BTreeMap<String, usize>> {
+    let mut out: BTreeMap<u16, BTreeMap<String, usize>> = BTreeMap::new();
+    for agency in panel() {
+        *out.entry(agency.opens)
+            .or_default()
+            .entry(agency.agency_type)
+            .or_default() += 1;
+    }
+    out
+}
+
 /// Agency-years Ohio has filed under the CCD's consolidation code. There are none.
 ///
 /// Held as a function rather than as a comment so that the day Ohio starts populating the field,
@@ -360,8 +452,10 @@ mod tests {
                 "{year}-{:02} names an agency twice",
                 (year + 1) % 100
             );
+            // The low end is 1996-97, before Ohio had a community school; the high end 2005-06,
+            // at the top of the charter opening wave.
             assert!(
-                (900..=1400).contains(&rows.len()),
+                (700..=1400).contains(&rows.len()),
                 "{year}-{:02} has {} Ohio agencies",
                 (year + 1) % 100,
                 rows.len()
@@ -397,8 +491,10 @@ mod tests {
             marked.iter().map(|a| &a.name).collect::<Vec<_>>()
         );
         // And the panel is large enough for that to mean something rather than being a small
-        // sample that happens to miss a rare code.
-        assert!(panel().len() > 17_000, "{} agency-years", panel().len());
+        // sample that happens to miss a rare code. Thirty consecutive years, completely
+        // enumerated: this is not a sample of Ohio's agency-years, it is all of them that the
+        // directory has published since 1994-95.
+        assert!(panel().len() > 30_000, "{} agency-years", panel().len());
     }
 
     /// And the code it does file says the opposite of the only reading anyone would want.
@@ -423,14 +519,236 @@ mod tests {
         let community = by_type.get("7").copied().unwrap_or(0);
         let districts = by_type.get("1").copied().unwrap_or(0);
         assert!(
-            community * 10 > total * 9,
+            community * 10 > total * 8,
             "community schools are {community} of {total} departures, and the claim that this \
              count is charter churn rather than consolidation rests on that ratio"
         );
         assert!(
             districts < 10,
-            "{districts} regular districts left the directory in sixteen years"
+            "{districts} regular districts left the directory in thirty years"
         );
+    }
+
+    /// The service agencies, which is what the fourteen older years were actually for.
+    ///
+    /// Sixty-six of them leave, and they are not a footnote to the community schools: they are
+    /// the second-largest population in the departure list and the only one whose members issue
+    /// the instruments this repository could not find. Ohio's 86 county boards of education are
+    /// 47 by 2002-03, and every disappearance in between is filed as a closure affecting nobody.
+    #[test]
+    fn the_service_agencies_consolidate_and_the_register_denies_it() {
+        let leaving: Vec<Departure> = departures()
+            .into_iter()
+            .filter(|d| d.agency_type == "3" || d.agency_type == "4")
+            .collect();
+        assert_eq!(
+            leaving.len(),
+            66,
+            "the service-agency departures have moved"
+        );
+        for departure in &leaving {
+            assert_eq!(
+                departure.terminal_status, CLOSED_CODE,
+                "{} left in {} under status {}",
+                departure.name, departure.last_year, departure.terminal_status
+            );
+        }
+
+        // The county boards, counted at both ends. Type 3 is the CCD's supervisory-union
+        // administrative centre, which is what Ohio's county boards were filed as.
+        let types = types_by_year();
+        assert_eq!(types[&1994].get("3"), Some(&86));
+        assert_eq!(types[&2001].get("3"), Some(&61));
+        assert_eq!(types[&2002].get("3"), None, "type 3 should be empty by now");
+
+        // And the one this repository already holds an order for: Geauga County ESC, whose final
+        // audit recites its own dissolution into the Educational Service Center of the Western
+        // Reserve. It is in this list, filed like all the others as a closure that affected
+        // nobody.
+        let geauga = leaving
+            .iter()
+            .find(|d| d.name.contains("Geauga County"))
+            .expect("the one service-agency departure with a recited order behind it is missing");
+        assert_eq!((geauga.irn.as_str(), geauga.last_year), ("047159", 2020));
+
+        // The body it merged into is Lake County ESC, which keeps its agency identifier and its
+        // IRN and takes the new name — and is coded open in the year before, the year of, and
+        // the year after. This is the district case exactly, one level up: the only trace of the
+        // merger anywhere in the register is a rename on the survivor, which is the derivation
+        // the module note explains why nothing here trusts.
+        let survivor: Vec<Agency> = panel()
+            .into_iter()
+            .filter(|a| a.leaid == "3904786" && (2018..=2021).contains(&a.opens))
+            .collect();
+        assert!(survivor
+            .iter()
+            .all(|a| a.status == "1" && a.irn == "047860"));
+        assert_eq!(
+            survivor.iter().map(|a| a.name.as_str()).collect::<Vec<_>>(),
+            vec![
+                "Lake County ESC",
+                "Lake County ESC",
+                "Educational Service Center of the Western Reserve",
+                "Educational Service Center of the Western Reserve",
+            ]
+        );
+    }
+
+    /// Three times the type changes under agencies that did not move, 532 of them in total.
+    ///
+    /// Measured by following each agency identifier across the seam rather than by differencing
+    /// the counts, because the counts move for two reasons at once and only one of them is a
+    /// recode. Pinned because a rule that reads a type change as an event — a district becoming a
+    /// service agency, say — would find every one of these and every one would be an artefact of
+    /// the federal vocabulary rather than anything Ohio did.
+    #[test]
+    fn the_agency_type_is_recoded_three_times_without_anyone_moving() {
+        let mut by_leaid: BTreeMap<&str, BTreeMap<u16, &str>> = BTreeMap::new();
+        let panel = panel();
+        for agency in &panel {
+            by_leaid
+                .entry(agency.leaid.as_str())
+                .or_default()
+                .insert(agency.opens, agency.agency_type.as_str());
+        }
+        let moved = |before: u16, from: &str, to: &str| {
+            by_leaid
+                .values()
+                .filter(|years| {
+                    years.get(&before) == Some(&from) && years.get(&(before + 1)) == Some(&to)
+                })
+                .count()
+        };
+
+        // Ohio's first community schools, filed as regular districts for two years.
+        assert_eq!(moved(1999, "1", "7"), 47);
+        // The county boards and the joint vocational districts, into type 4 together.
+        assert_eq!((moved(2001, "3", "4"), moved(2001, "1", "4")), (60, 49));
+        // Type 2 into type 1.
+        assert_eq!(moved(2005, "2", "1"), 376);
+
+        // And the vocabulary really does empty on each seam, rather than these being a handful of
+        // agencies inside a category that carries on.
+        let types = types_by_year();
+        let count = |year: u16, kind: &str| types[&year].get(kind).copied().unwrap_or(0);
+        assert_eq!((count(2001, "3"), count(2002, "3")), (61, 0));
+        assert_eq!((count(2001, "4"), count(2002, "4")), (0, 109));
+        assert_eq!((count(2005, "2"), count(2006, "2")), (377, 0));
+        assert_eq!(count(2006, "1"), 614);
+    }
+
+    /// The federal type is not a safe way to count Ohio's school districts, and this is the shape
+    /// of the error.
+    ///
+    /// Types 1 and 2 together give 661 through 1997-98, 675 and 708 in the two years the first
+    /// community schools were filed as districts, 662 once they move to type 7, and 613 to 622
+    /// from 2002-03 once the joint vocational districts move to type 4. Three discontinuities,
+    /// none of them an agency opening or closing, and the largest of them 47 apparent new school
+    /// districts in a single year.
+    ///
+    /// Ohio's actual number sits under all of it and barely moves: 661 minus 47 joint vocational
+    /// districts is 614, and thirty years later it is 619.
+    #[test]
+    fn counting_districts_by_federal_type_produces_three_discontinuities() {
+        let mut regular: BTreeMap<u16, usize> = BTreeMap::new();
+        for agency in panel() {
+            if agency.agency_type == "1" || agency.agency_type == "2" {
+                *regular.entry(agency.opens).or_default() += 1;
+            }
+        }
+        // The three eras, each internally steady.
+        assert!((1994..=1997).all(|y| regular[&y] == 661));
+        assert_eq!((regular[&1998], regular[&1999]), (675, 708));
+        assert!((2000..=2001).all(|y| regular[&y] == 662));
+        assert!((2002..=2023).all(|y| (613..=622).contains(&regular[&y])));
+
+        // And the step between the first era and the last is the vocabulary, not Ohio: 47 joint
+        // vocational districts leave type 1 in 2002-03, and 661 - 47 is what the modern count
+        // has been within a few agencies for thirty years.
+        assert_eq!(regular[&1994] - 47, 614);
+        assert_eq!(regular[&2023], 619);
+    }
+
+    /// Ohio forms two school districts in thirty years, and the register says neither of them
+    /// took territory from anybody.
+    ///
+    /// The mirror image of this module's whole subject. Code 3 is *"a new education agency formed
+    /// with no effect on another agency's boundaries"*, and it is what Ohio files for both — while
+    /// Middletown Monroe City becomes **Middletown City** in the same year Monroe Local appears,
+    /// and Adams County/Ohio Valley Local carries on unaltered in the year Manchester Local does.
+    /// So the arrival code carries the same denial as the departure code, and again the only
+    /// trace anywhere in the register is a rename on the survivor — this time in one of the two
+    /// cases and not the other.
+    ///
+    /// The successor reading is stated and not committed, exactly as for the departures. What is
+    /// committed is what the file says.
+    #[test]
+    fn the_two_districts_ohio_forms_are_filed_as_affecting_nobody() {
+        let panel = panel();
+        let mut first: BTreeMap<String, Agency> = BTreeMap::new();
+        for agency in panel.iter().rev() {
+            first.insert(agency.leaid.clone(), agency.clone());
+        }
+        // A district-shaped arrival is one whose first year is after the first year held and is
+        // typed as a district. Named rather than counted, and named in full, because the list is
+        // short enough to read and because the classification is the finding: everything here
+        // with an IRN in the 01xxxx block is a STEM school under R.C. 3326, which Ohio funds as
+        // its own unit and the federal directory types as a school district.
+        let mut named: Vec<(&str, u16, &str, &str)> = first
+            .values()
+            .filter(|a| a.opens > FIRST_YEAR && (a.agency_type == "1" || a.agency_type == "2"))
+            // 1998-99 and 1999-2000 are the misfiled community schools, not districts.
+            .filter(|a| !(1998..=1999).contains(&a.opens))
+            .map(|a| (a.irn.as_str(), a.opens, a.status.as_str(), a.name.as_str()))
+            .collect();
+        named.sort_unstable();
+        assert_eq!(
+            named,
+            vec![
+                // Peebles, which never reaches status 1 and is filed closed the next year: a
+                // district announced and abandoned rather than one that opened.
+                ("000441", 2004, "7", "PEEBLES"),
+                // Manchester, scheduled in 2003-04, formed in 2004-05, open ever since.
+                ("000442", 2003, "7", "MANCHESTER LOCAL SD"),
+                ("011506", 2009, "3", "DAYTON REGIONAL STEM SCHOOL"),
+                ("012391", 2012, "3", "METRO EARLY COLLEGE HIGH SCHOOL"),
+                ("013930", 2013, "3", "GLOBAL IMPACT STEM ACADEMY"),
+                ("014231", 2013, "3", "BIO-MED SCIENCE ACADEMY STEM SCHOOL"),
+                ("014877", 2015, "3", "Metro Institute of Technology"),
+                ("014943", 2014, "7", "Valley STEM+ME2 Academy"),
+                ("015328", 2015, "3", "Collins Career Center STEM Academy"),
+                (
+                    "015329",
+                    2015,
+                    "3",
+                    "iSTEM Geauga Early College High School"
+                ),
+                ("015344", 2015, "3", "Tri State Early College STEM School"),
+                ("019602", 2023, "3", "Community STE(A)M Academy - Xenia"),
+                // The one unambiguous new school district in thirty years.
+                ("139303", 2000, "3", "MONROE LOCAL SD"),
+            ],
+            "the district-shaped arrivals have changed"
+        );
+
+        let row = |leaid: &str, year: u16| {
+            panel
+                .iter()
+                .find(|a| a.leaid == leaid && a.opens == year)
+                .map(|a| (a.name.as_str(), a.status.as_str()))
+        };
+        assert_eq!(
+            row("3900537", 2004).map(|(_, s)| s),
+            Some("3"),
+            "Manchester Local should be filed as newly formed in 2004-05"
+        );
+        // Middletown drops "Monroe" from its name the year Monroe Local appears, and is coded
+        // open on both sides of it.
+        assert_eq!(
+            row("3904440", 1999),
+            Some(("MIDDLETOWN MONROE CITY SD", "1"))
+        );
+        assert_eq!(row("3904440", 2000), Some(("MIDDLETOWN CITY SD", "1")));
     }
 
     /// The three that are genuinely district consolidations, named.
