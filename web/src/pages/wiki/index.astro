@@ -43,6 +43,19 @@ const cited = corpus.sources.filter((source) => source.citedBy.length > 0);
 const leading = [...cited]
   .sort((a, b) => b.citedBy.length - a.citedBy.length || a.title.localeCompare(b.title))
   .slice(0, 12);
+
+/*
+ * The decisions worth naming on a front door are the ones that were corrected.
+ *
+ * Not the most-cited, which is the right cut for sources and the wrong one here. A source is
+ * interesting in proportion to how much rests on it; a decision record is interesting in
+ * proportion to how much of it stopped being true, because that is the part a reader cannot
+ * reconstruct from the conclusions the rest of the site states.
+ */
+const withdrawals = corpus.decisions.reduce((sum, decision) => sum + decision.corrections, 0);
+const recentlyCorrected = corpus.decisions
+  .filter((decision) => decision.corrections > 0)
+  .sort((a, b) => b.corrections - a.corrections || a.slug.localeCompare(b.slug));
 ---
 
 <Base
@@ -124,6 +137,29 @@ const leading = [...cited]
     <p class="note">
       The {leading.length} most-cited of {cited.length} sources the corpus reaches.{" "}
       <a href="/wiki/source">All {corpus.sources.length}</a>, ranked by how often they are cited.
+    </p>
+  </div>
+
+  <div class="card">
+    <h2>Decisions</h2>
+    <p class="note">
+      Everything above states a conclusion. The <a href="/wiki/decision">decision records</a> state
+      how each was reached — what was chosen, what was rejected and on what evidence, and where the
+      answer turned out to be wrong. {corpus.decisions.length} of them, carrying {withdrawals}{" "}
+      claims since withdrawn or superseded, each marked where it stands rather than edited out.
+    </p>
+    <div class="flags">
+      {
+        recentlyCorrected.map((d) => (
+          <a class="flag" href={routes.wikiDecision(d.slug)}>
+            {d.slug}
+          </a>
+        ))
+      }
+    </div>
+    <p class="note">
+      The records carrying the most corrections.{" "}
+      <a href="/wiki/decision">All {corpus.decisions.length}</a>.
     </p>
   </div>
 </Base>

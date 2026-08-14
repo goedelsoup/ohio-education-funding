@@ -1,9 +1,9 @@
 /**
- * One card per corpus node, and one per catalog source.
+ * One card per corpus node, one per catalog source, and one per decision record.
  *
- * Both live here because both live at `/wiki/<class>/<name>` on the site — `source` is the
- * fourteenth pseudo-class, and splitting the endpoint would put one route family in two files for
- * no reason a reader of either would see.
+ * All three live here because all three live at `/wiki/<class>/<name>` on the site — `source` and
+ * `decision` are the fourteenth and fifteenth pseudo-classes, and splitting the endpoint would put
+ * one route family in three files for no reason a reader of any of them would see.
  *
  * The figure line is the node's own first sentence, run through the same `summarize` the page's
  * `<meta name="description">` uses. A corpus node has no number to lead with; what it has is a
@@ -12,7 +12,7 @@
 
 import type { APIRoute, GetStaticPaths } from "astro";
 
-import { loadCorpus, type Node, type Source } from "../../../../lib/corpus.ts";
+import { type Decision, loadCorpus, type Node, type Source } from "../../../../lib/corpus.ts";
 import { count } from "../../../../lib/format.ts";
 import type { Card } from "../../../../lib/og/card.ts";
 import { SITE } from "../../../../lib/og/pages.ts";
@@ -24,11 +24,15 @@ export const getStaticPaths: GetStaticPaths = () => {
   return [
     ...corpus.nodes.map((node) => ({
       params: { class: node.className, node: node.name },
-      props: { node, source: null },
+      props: { node, source: null, decision: null },
     })),
     ...corpus.sources.map((source) => ({
       params: { class: "source", node: source.slug },
-      props: { node: null, source },
+      props: { node: null, source, decision: null },
+    })),
+    ...corpus.decisions.map((decision) => ({
+      params: { class: "decision", node: decision.slug },
+      props: { node: null, source: null, decision },
     })),
   ];
 };
@@ -59,8 +63,37 @@ export function sourceCard(source: Source): Card {
   };
 }
 
+/**
+ * Exported for the unit suite.
+ *
+ * The headline is the slug, because that is the only name a decision record has and it is how the
+ * corpus itself refers to one. The meta line leads with the withdrawals where there are any: a
+ * record that has been corrected is the more interesting of the two kinds, and a card that says so
+ * is doing the same job the page's own banner does.
+ */
+export function decisionCard(decision: Decision): Card {
+  return {
+    eyebrow: `${SITE} · Decision record`,
+    headline: decision.slug,
+    figureNote: summarize(decision.summary, 190),
+    meta:
+      decision.corrections > 0
+        ? `${count(decision.corrections)} claim${
+            decision.corrections === 1 ? "" : "s"
+          } since withdrawn or superseded`
+        : `Cited by ${count(decision.citedBy.length)} page${
+            decision.citedBy.length === 1 ? "" : "s"
+          }`,
+  };
+}
+
 export const GET: APIRoute = async ({ props, params }) => {
-  const { node, source } = props as { node: Node | null; source: Source | null };
+  const { node, source, decision } = props as {
+    node: Node | null;
+    source: Source | null;
+    decision: Decision | null;
+  };
+  if (decision) return respond(decisionCard(decision));
   if (source) return respond(sourceCard(source));
   return respond(nodeCard(node!, label(params.class ?? "")));
 };

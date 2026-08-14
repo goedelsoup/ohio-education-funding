@@ -1,0 +1,84 @@
+---
+/**
+ * Every decision behind this repository, and which of them have been corrected since.
+ *
+ * Ordered oldest question first is not available — the records carry no date — so they are ordered
+ * by how much of them has since been withdrawn, and alphabetically under that. That puts the
+ * records that turned out wrong at the top, which is the right way round: they are the ones a
+ * reader learns most from and the ones a reader is most likely to be looking for.
+ */
+import Base from "../../../layouts/Base.astro";
+import { loadCorpus } from "../../../lib/corpus.ts";
+import { summarize } from "../../../lib/prose.ts";
+import * as routes from "../../../lib/routes.ts";
+
+const { decisions } = loadCorpus();
+const ranked = [...decisions].sort(
+  (a, b) => b.corrections - a.corrections || a.slug.localeCompare(b.slug),
+);
+const corrected = decisions.filter((decision) => decision.corrections > 0);
+const withdrawals = decisions.reduce((sum, decision) => sum + decision.corrections, 0);
+---
+
+<Base
+  title="Decisions"
+  description={`The ${decisions.length} decision records behind the Ohio school funding corpus — what was chosen, what was rejected, and the ${withdrawals} claims later withdrawn.`}
+  image={routes.og.page("wiki")}
+  imageAlt="The decisions behind the Ohio school funding corpus"
+  section="wiki"
+>
+  <p class="crumb"><a href="/wiki">The corpus</a></p>
+  <h1>Decisions</h1>
+  <p class="sub">
+    {decisions.length} records of why this repository is shaped the way it is — what was chosen,
+    what was rejected and on what evidence, and what turned out to be wrong. {withdrawals} claims
+    across {corrected.length} of them have since been withdrawn or superseded, and are marked where
+    they stand rather than edited out.
+  </p>
+
+  <div class="card">
+    <h2>Why these are published</h2>
+    <p class="note">
+      Every other page on this site states a conclusion. These state how it was reached, including
+      the times the answer was wrong and something later proved it. That matters more here than it
+      would elsewhere: a corpus assembled from public records is only as good as its account of
+      what it could not establish, and the most useful thing in that account is the record of a
+      rejection that expired — a phase deciding something was out of reach and a later phase
+      reaching it.
+    </p>
+  </div>
+
+  <div class="card">
+    <div class="scroll">
+      <table class="prose">
+        <thead>
+          <tr>
+            <th>Decision</th>
+            <th>Corrected</th>
+          </tr>
+        </thead>
+        <tbody>
+          {
+            ranked.map((decision) => (
+              <tr>
+                <th>
+                  <a href={routes.wikiDecision(decision.slug)}>
+                    <code>{decision.slug}</code>
+                  </a>
+                  <span class="row-note">{summarize(decision.summary, 200)}</span>
+                </th>
+                <td>
+                  {decision.corrections === 0 ? (
+                    <span class="n">—</span>
+                  ) : (
+                    `${decision.corrections} claim${decision.corrections === 1 ? "" : "s"}`
+                  )}
+                </td>
+              </tr>
+            ))
+          }
+        </tbody>
+      </table>
+    </div>
+  </div>
+</Base>

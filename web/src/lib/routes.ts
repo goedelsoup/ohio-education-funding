@@ -83,6 +83,7 @@ export const og = {
    */
   wikiNode: (className: string, node: string): string => `/og/wiki/${className}/${node}.png`,
   wikiSource: (slug: string): string => `/og/wiki/source/${slug}.png`,
+  wikiDecision: (slug: string): string => `/og/wiki/decision/${slug}.png`,
   /** A top-level page — `/`, `/method`, `/data` — keyed by the slug in `src/lib/og/pages.ts`. */
   page: (slug: string): string => `/og/page/${slug}.png`,
 } as const;
@@ -100,6 +101,15 @@ export const wikiClass = (className: string): string => `/wiki/${className}`;
  * a fourteenth pseudo-class, not a separate section of the site.
  */
 export const wikiSource = (slug: string): string => `/wiki/source/${slug}`;
+
+/**
+ * A decision record.
+ *
+ * `decision`, singular, for the same reason `source` is: the segment names what one page is, not
+ * the directory the file came out of. `/wiki/decisions/…` was the shape produced by an old bug
+ * that read the `decisions/` subtree as an ontology class, and it is worth never building again.
+ */
+export const wikiDecision = (slug: string): string => `/wiki/decision/${slug}`;
 
 /** Two districts side by side. Query parameters, because the pair is chosen by the reader. */
 export function compare(a?: string, b?: string): string {

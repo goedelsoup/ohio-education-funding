@@ -16,8 +16,14 @@
 
 import { expect, test } from "vitest";
 
-import { loadCorpus } from "../../src/lib/corpus.ts";
-import { badgeClaims, renderProse, renderPropertyValue, summarize } from "../../src/lib/prose.ts";
+import { countCorrections, FROM_DECISION, loadCorpus } from "../../src/lib/corpus.ts";
+import {
+  badgeClaims,
+  markCorrections,
+  renderProse,
+  renderPropertyValue,
+  summarize,
+} from "../../src/lib/prose.ts";
 
 const corpus = loadCorpus();
 
@@ -164,4 +170,59 @@ test("sanitizing costs the corpus nothing it actually renders", async () => {
   for (const fragment of ["<strong>", "<em>", "<code>", "<table>", "<td>", "<pre>", "<a href="]) {
     expect(marked, fragment).toContain(fragment);
   }
+});
+
+/*
+ * Corrections: the blockquotes a decision record uses to withdraw something above them.
+ *
+ * There are two implementations of one rule and there have to be. `countCorrections` reads the
+ * markdown, because `loadCorpus` is synchronous and needs the count before anything is rendered;
+ * `markCorrections` reads the HTML, because that is where the class has to be applied. Nothing
+ * makes them agree except the test below, and they have already disagreed once — the source-side
+ * rule counted five corrections in a record that has four, because a continuation line inside one
+ * of them begins with a bolded word.
+ */
+
+test("a correction is a blockquote that opens with strong emphasis, and a quotation is not", () => {
+  // Opens. The bolded word mid-quote is the case that broke the first version of this rule.
+  expect(countCorrections("> **CORRECTED by x.** Two things above are wrong.")).toBe(1);
+  expect(
+    countCorrections("> West Geauga gains 208 pupils while Chardon\n> **loses** 110. The claim"),
+  ).toBe(0);
+  // A quotation, which is what most blockquotes in these records are.
+  expect(
+    countCorrections("> the count going from 124 in FY2012 to 0 in FY2022 *is* the history"),
+  ).toBe(0);
+  // Including one that emphasises something, as long as it does not open with it.
+  expect(countCorrections("> a quotation that ends **emphatically**")).toBe(0);
+  // Two separate blockquotes, one of each.
+  expect(countCorrections("> a quotation\n\n> **This rejection has expired.** Because")).toBe(1);
+});
+
+test("both readings of a correction agree, on every record the corpus holds", async () => {
+  const disagree: string[] = [];
+  for (const decision of corpus.decisions) {
+    let rendered = 0;
+    for (const section of [{ body: decision.summary }, ...decision.sections]) {
+      if (section.body === "") continue;
+      const html = await renderProse(section.body, FROM_DECISION);
+      rendered += markCorrections(html).corrections;
+    }
+    if (rendered !== decision.corrections) {
+      disagree.push(`${decision.slug}: source says ${decision.corrections}, HTML says ${rendered}`);
+    }
+  }
+  expect(disagree, "the two readings of the correction rule have drifted apart").toEqual([]);
+});
+
+test("marking a correction leaves an anchor and does not touch a quotation", async () => {
+  const html = await renderProse(
+    "> a quotation of something superseded\n\n> **CORRECTED by x.** The claim above is wrong.\n",
+    FROM_DECISION,
+  );
+  const { html: marked, corrections } = markCorrections(html);
+  expect(corrections).toBe(1);
+  expect(marked).toContain('<blockquote class="correction" id="correction-1">');
+  // The quotation keeps the bare tag, so the stylesheet can treat the two differently.
+  expect(marked).toContain("<blockquote>\n<p>a quotation");
 });

@@ -165,6 +165,66 @@ export function badgeClaims(html: string): string {
 }
 
 /**
+ * Mark the blockquotes in a decision record that withdraw something, and count them.
+ *
+ * # The distinction, which was measured rather than chosen
+ *
+ * Decision records use blockquotes for two unrelated jobs. Most of them **quote**: a superseded
+ * docstring, a previous record's blocker sentence, a proposal as it was put. A few **correct**:
+ * they say a claim above them is wrong, or that a rejection has expired. The second kind is the
+ * reason these records are worth publishing at all, and rendered as an ordinary quotation it is
+ * the least visible thing on the page rather than the most.
+ *
+ * Across all twenty-four records there are thirteen top-level blockquotes, and the two kinds
+ * separate cleanly on one property: **a correction opens with strong emphasis and a quotation
+ * never does.**
+ *
+ * ```
+ * > **CORRECTED by [`the-order-was-never-the-states`](…).** Two things above are wrong.
+ * > **SUPERSEDED by [`before-there-were-service-centers`](…).**
+ * > **RESOLVED by [`the-three-streams-of-mr81`](…).** The first …
+ * > **This rejection has expired.** The ground it rested on …
+ * > **This rejection was wrong on its second clause, and the first was overstated.** …
+ * ```
+ *
+ * against
+ *
+ * ```
+ * > the count going from 124 in FY2012 to 0 in FY2022 *is* the consolidation history, measured.
+ * > it would be a second reader built for no consumer
+ * > Note: The statewide average values (such as economically disadvantaged percentage, …
+ * ```
+ *
+ * Six and seven, no overlap. A keyword list was the obvious alternative and is worse: the openers
+ * are already five distinct phrases and one of them is a whole sentence, so the list would be a
+ * running record of what has been written rather than a rule. `prose.spec.ts` pins the split
+ * against the real records, so the day someone writes a correction that opens with plain prose the
+ * suite says so instead of the page quietly filing it as a quotation.
+ *
+ * # Why it runs on the HTML
+ *
+ * Because "opens with strong emphasis" is a fact about the parsed document, not about the source
+ * text. `> **CORRECTED …**` and `> __CORRECTED …__` are the same document and different strings,
+ * and a blockquote whose first paragraph is a reference-style link is neither. By this point the
+ * processor has settled all of that into `<blockquote>\n<p><strong>`.
+ *
+ * The class is added after {@link renderProse} has run, exactly as {@link badgeClaims} adds its
+ * own — `rehype-sanitize` strips class attributes, so anything this emitted before the processor
+ * would be discarded.
+ */
+export function markCorrections(html: string): { html: string; corrections: number } {
+  let corrections = 0;
+  const marked = html.replace(/<blockquote>\s*<p>\s*<strong>/g, (whole) => {
+    corrections += 1;
+    return whole.replace(
+      "<blockquote>",
+      `<blockquote class="correction" id="correction-${corrections}">`,
+    );
+  });
+  return { html: marked, corrections };
+}
+
+/**
  * Render a corpus markdown string to HTML.
  *
  * Async because the markdown processor is. Astro components can await in their frontmatter, so

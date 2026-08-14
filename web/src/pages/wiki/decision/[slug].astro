@@ -1,0 +1,136 @@
+---
+/**
+ * One decision record: why the repository is shaped the way it is, including where it was wrong.
+ *
+ * # Why this is a page and not a file in the repository
+ *
+ * It was a file in the repository, deliberately, on the ground that a decision record is a working
+ * document for whoever is authoring the corpus. That was true when it was written and stopped
+ * being true. These records became the place two things live that a reader cannot get anywhere
+ * else: **corrections to claims this site published**, and **rejections a later phase overturned.**
+ *
+ * The site said Newbury Local's territory split between West Geauga and Chardon. It did not — the
+ * resolution transferred all of it to West Geauga, and this repository's own enrolment panel says
+ * so. The withdrawal of that claim is four lines in a decision record, and until now a reader who
+ * followed the site's account of Ohio's district consolidations had no path to it at all.
+ *
+ * # Corrections are hoisted and left in place, both
+ *
+ * A reader who lands here from a search should not have to read to the middle of `consequences` to
+ * learn that part of it has been withdrawn, so the corrections are counted at the top with links
+ * down to them. A reader going through the record should meet each withdrawal where it bites,
+ * against the sentence it withdraws, so they are also rendered in place and marked there. Neither
+ * alone is enough: a banner without the inline mark tells you something was corrected and not
+ * what, and an inline mark without the banner is the least visible thing on a long page.
+ */
+import Base from "../../../layouts/Base.astro";
+import { type Decision, FROM_DECISION, loadCorpus } from "../../../lib/corpus.ts";
+import { markCorrections, renderProse, summarize } from "../../../lib/prose.ts";
+import * as routes from "../../../lib/routes.ts";
+
+export function getStaticPaths() {
+  return loadCorpus().decisions.map((decision) => ({
+    params: { slug: decision.slug },
+    props: { decision },
+  }));
+}
+
+const { decision } = Astro.props as { decision: Decision };
+
+const summary = await renderProse(decision.summary, FROM_DECISION);
+// Each section is rendered on its own so that a correction can be anchored to the section it sits
+// in. `markCorrections` numbers within the string it is given, so the numbering is restarted per
+// section and the anchor is section-qualified rather than a document-wide counter.
+const sections = await Promise.all(
+  decision.sections.map(async (section) => {
+    const rendered = await renderProse(section.body, FROM_DECISION);
+    const { html, corrections } = markCorrections(rendered);
+    return { ...section, html, corrections };
+  }),
+);
+const corrected = sections.filter((section) => section.corrections > 0);
+const total = corrected.reduce((sum, section) => sum + section.corrections, 0);
+---
+
+<Base
+  title={decision.slug}
+  description={summarize(decision.summary, 180)}
+  image={routes.og.wikiDecision(decision.slug)}
+  imageAlt={`${decision.slug} — a decision record behind the Ohio school funding corpus`}
+  section="wiki"
+>
+  <p class="crumb">
+    <a href="/wiki">The corpus</a> › <a href="/wiki/decision">Decisions</a>
+  </p>
+  <h1 class="slug-title">{decision.slug}</h1>
+  <p class="sub">
+    A decision record{
+      decision.citedBy.length > 0
+        ? ` · cited by ${decision.citedBy.length} ${decision.citedBy.length === 1 ? "page" : "pages"}`
+        : ""
+    }
+  </p>
+
+  <div class="card prose-body lede"><Fragment set:html={summary} /></div>
+
+  {
+    total > 0 && (
+      <div class="card correction-index">
+        <h2>
+          {total} {total === 1 ? "claim in this record has" : "claims in this record have"} been
+          withdrawn or superseded
+        </h2>
+        <p class="note">
+          A decision record is kept as it was written and corrected in place rather than rewritten,
+          so that the reasoning that led somewhere wrong stays legible. What follows is where.
+        </p>
+        <div class="flags">
+          {corrected.map((section) =>
+            Array.from({ length: section.corrections }, (_, index) => (
+              <a class="flag" href={`#${section.name}-correction-${index + 1}`}>
+                {section.label}
+                {section.corrections > 1 ? ` (${index + 1})` : ""}
+              </a>
+            )),
+          )}
+        </div>
+      </div>
+    )
+  }
+
+  {
+    sections.map((section) => (
+      <div class="card" id={section.name}>
+        <h2>{section.label}</h2>
+        <div
+          class="prose-body"
+          set:html={section.html.replace(
+            /id="correction-(\d+)"/g,
+            (_whole, n: string) => `id="${section.name}-correction-${n}"`,
+          )}
+        />
+      </div>
+    ))
+  }
+
+  <div class="card">
+    <h2>Cited by</h2>
+    {
+      decision.citedBy.length === 0 ? (
+        <p class="note">
+          Nothing in the corpus or the catalog points here yet. A decision nothing reaches is not
+          necessarily stale — plenty of them settle a question that has stayed settled — but it is
+          worth knowing which ones are load-bearing and which are history.
+        </p>
+      ) : (
+        <div class="flags">
+          {decision.citedBy.map((entry) => (
+            <a class="flag" href={entry.href}>
+              {entry.label}
+            </a>
+          ))}
+        </div>
+      )
+    }
+  </div>
+</Base>
