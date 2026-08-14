@@ -66,6 +66,7 @@ pub mod panel;
 pub mod policy;
 pub mod report;
 pub mod series;
+pub mod session_laws;
 
 pub use crosswalk::{coverage, Coverage};
 pub use outcomes::{joined, report_cards, Joined, ReportCard};

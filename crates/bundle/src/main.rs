@@ -715,7 +715,7 @@ fn appropriation_block() -> Vec<AppropriationYear> {
         .collect();
 
     for line in appropriations::enacted_lines() {
-        if appropriations::TAX_REIMBURSEMENT.contains(&line.line_item.as_str()) {
+        if appropriations::is_tax_reimbursement(&line.line_item, line.fiscal_year) {
             continue;
         }
         if !workbook_years.contains(&line.fiscal_year) {

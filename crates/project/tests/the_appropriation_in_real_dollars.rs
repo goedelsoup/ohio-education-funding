@@ -72,6 +72,12 @@ fn every_reimbursement_line_is_excluded_at_both_ends_of_any_window() {
             title.contains("tax allocation")
                 || title.contains("tax replacement")
                 || title.contains("tax reimbursement")
+                // `200906 Tangible Tax Exemption - Education` is a reimbursement and says
+                // "exemption". This vocabulary had the same blind spot the exclusion list did, so
+                // the test that was meant to guard the class could not see the member it was
+                // missing. It was found by reading the session laws, where 200906 sits beside
+                // 200901 in every table from FY1998.
+                || title.contains("tax exemption")
         })
         .map(|line| line.line_item.clone())
         .collect();
@@ -144,7 +150,7 @@ fn the_tax_reimbursement_lines_are_excluded_and_are_not_small() {
         "the excluded reimbursement lines are only {excluded}; either they have shrunk or the \
          exclusion has stopped working"
     );
-    assert_eq!(TAX_REIMBURSEMENT.len(), 6);
+    assert_eq!(TAX_REIMBURSEMENT.len(), 7);
 }
 
 #[test]

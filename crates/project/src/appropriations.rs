@@ -83,8 +83,40 @@ const CATALOG: &str = include_str!("../fixtures/catalog-line-items.csv");
 /// to fall in real terms across FY2014-FY2026 and does not. A rule derived from one end of a
 /// series and applied to the whole of it is the hazard here, and it is not the first time in this
 /// connector's work.
-pub const TAX_REIMBURSEMENT: [&str; 6] =
-    ["200417", "200900", "200901", "200902", "200903", "200909"];
+pub const TAX_REIMBURSEMENT: [&str; 7] = [
+    "200417", "200900", "200901", "200902", "200903", "200906", "200909",
+];
+
+/// Whether a line is a tax reimbursement **in the year it is claimed for**.
+///
+/// # Why the list alone is not the rule
+///
+/// The docstring above records making a rule from one end of a series and applying it to the
+/// whole. It then did it twice more in the same edit, and both survived until the session laws
+/// were read.
+///
+/// **`200906 Tangible Tax Exemption - Education` was missing.** It is a reimbursement by the
+/// definition above, it sits beside `200901` in every table from FY1998 to FY2011, and leaving it
+/// out counted $73,500,000 inside the department in FY2002 — 0.94% — falling to $10,707,622 by
+/// FY2009. It phases out, so it inflated the early years more than the late ones, which is the
+/// same wrong-sign error the docstring describes catching once already.
+///
+/// **`200417` is not a tax line for most of its life.** It is `Professional Development` from
+/// FY1998 to FY2003 and only becomes `Personal Property Tax Replacement Phase Out` in FY2024.
+/// Excluding it by number alone was harmless while the series began at FY2002 and there was no
+/// enacted figure for it; it stops being harmless the moment FY1998 is read, where H.B. 215
+/// appropriates $14,370,077 to it. A rule keyed on the number would delete a real programme as a
+/// tax reimbursement.
+///
+/// So the exclusion is keyed on the number **and** the year, and `200417` is a reimbursement only
+/// from FY2024.
+#[must_use]
+pub fn is_tax_reimbursement(line_item: &str, fiscal_year: u16) -> bool {
+    if line_item == "200417" {
+        return fiscal_year >= 2024;
+    }
+    TAX_REIMBURSEMENT.contains(&line_item)
+}
 
 /// One appropriation line in one fiscal year.
 #[derive(Debug, Clone, PartialEq)]
@@ -206,7 +238,7 @@ pub fn enacted_history(base: FiscalYear) -> Vec<Year> {
     let cpi = CpiSeries::cpi_u_june();
     let mut totals: BTreeMap<u16, (f64, usize)> = BTreeMap::new();
     for line in enacted_lines() {
-        if TAX_REIMBURSEMENT.contains(&line.line_item.as_str()) {
+        if is_tax_reimbursement(&line.line_item, line.fiscal_year) {
             continue;
         }
         let entry = totals.entry(line.fiscal_year).or_insert((0.0, 0));
@@ -257,7 +289,7 @@ pub fn reimbursements(base: FiscalYear) -> Vec<Year> {
     let cpi = CpiSeries::cpi_u_june();
     let mut totals: BTreeMap<u16, (f64, usize)> = BTreeMap::new();
     for line in lines() {
-        if line.kind == "enacted" && TAX_REIMBURSEMENT.contains(&line.line_item.as_str()) {
+        if line.kind == "enacted" && is_tax_reimbursement(&line.line_item, line.fiscal_year) {
             let entry = totals.entry(line.fiscal_year).or_insert((0.0, 0));
             entry.0 += line.amount;
             entry.1 += 1;
@@ -334,7 +366,7 @@ pub fn changes(base: FiscalYear, from: u16, to: u16) -> Vec<Change> {
     let mut start: BTreeMap<String, f64> = BTreeMap::new();
     let mut end: BTreeMap<String, (f64, String)> = BTreeMap::new();
     for line in lines() {
-        if line.kind != "enacted" || TAX_REIMBURSEMENT.contains(&line.line_item.as_str()) {
+        if line.kind != "enacted" || is_tax_reimbursement(&line.line_item, line.fiscal_year) {
             continue;
         }
         let Ok(real) = cpi.convert(line.amount, FiscalYear(line.fiscal_year), base) else {

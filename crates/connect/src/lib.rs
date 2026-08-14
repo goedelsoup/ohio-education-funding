@@ -923,6 +923,22 @@ pub fn rebuild(root: &Path) -> Result<Vec<Rebuilt>, RebuildError> {
         },
     });
 
+    // The two acts whose education appropriation tables this repository can read as printed.
+    out.push(match session_laws(root) {
+        Ok(rows) => Rebuilt::Written {
+            path: fixtures::SESSION_LAW_FIXTURE.to_string(),
+            rows: fixtures::write_csv(
+                &root.join(fixtures::SESSION_LAW_FIXTURE),
+                fixtures::SESSION_LAW_HEADER,
+                &rows,
+            )?,
+        },
+        Err(reason) => Rebuilt::Skipped {
+            path: fixtures::SESSION_LAW_FIXTURE.to_string(),
+            reason,
+        },
+    });
+
     // Sixteen school years of the federal agency directory, Ohio only. The one fixture here whose
     // point is *membership* rather than any figure: which agencies existed in which year.
     out.push(match ccd_directory(root) {
@@ -1139,6 +1155,47 @@ fn f33_ohio_panel(root: &Path) -> Result<Vec<Vec<String>>, String> {
         })
         .collect();
     fixtures::build_f33_ohio_panel(&years, &directory)
+}
+
+/// The acts whose education tables are printed once and can be read as they stand.
+///
+/// H.B. 650 and H.B. 770 of the 122nd are deliberately absent. Both amend Section 50 of H.B. 215
+/// and both print every changed row **twice** — the struck figure inline and the inserted one on a
+/// continuation line beneath — and H.B. 650 reprints H.B. 215's fund-group totals unchanged, so
+/// the reconciliation this reader relies on would pass against the superseded number. Reading them
+/// needs a reader that tells a struck row from an inserted one, which this is not.
+const SESSION_LAW_ACTS: &[(u16, &str, &str, u16)] = &[
+    (
+        122,
+        "hb215",
+        "SECTION 50. EDU DEPARTMENT OF EDUCATION",
+        1998,
+    ),
+    (123, "hb282", "SECTION 4. EDU DEPARTMENT OF EDUCATION", 2000),
+];
+
+/// The education appropriation tables in the acts themselves.
+fn session_laws(root: &Path) -> Result<Vec<Vec<String>>, String> {
+    let mut texts = Vec::new();
+    for (ga, bill, _, _) in SESSION_LAW_ACTS {
+        let key = format!("{bill}-{ga}-enrolled");
+        let source = source(&key).expect("registered").1;
+        texts.push(cache::pdf_text(root, source).map_err(|cause| cause.to_string())?);
+    }
+    let acts: Vec<fixtures::ActText<'_>> = SESSION_LAW_ACTS
+        .iter()
+        .zip(&texts)
+        .map(
+            |((general_assembly, bill, heading, first_year), text)| fixtures::ActText {
+                general_assembly: *general_assembly,
+                bill,
+                heading,
+                first_year: *first_year,
+                text,
+            },
+        )
+        .collect();
+    fixtures::build_session_laws(&acts)
 }
 
 /// The school years of the LEA directory this repository holds, as the year each one opens in.
