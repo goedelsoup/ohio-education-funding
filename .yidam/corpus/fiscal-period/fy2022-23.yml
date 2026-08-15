@@ -1,5 +1,9 @@
 class: fiscal-period
 label: FY2022-23 Biennium
+summary: >-
+  The biennium appropriated by H.B. 110, in which the Fair School Funding Plan began. Phase-in
+  ran 16.67% then 33.33%, with base cost priced from FY2018 statewide average salaries in both
+  years.
 description: |
   July 1, 2021 through June 30, 2023 — the biennium appropriated by
   [Am. Sub. H.B. 110](../legislation/hb-110-2021.yml), and the one in which the Fair School

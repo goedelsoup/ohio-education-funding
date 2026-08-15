@@ -1,5 +1,9 @@
 class: revenue-stream
 label: Tangible Personal Property Tax Replacement Payments
+summary: >-
+  State payments created by H.B. 66 to hold districts harmless for the phase-out of the
+  tangible personal property tax, and later for the utility assessment phase-down. Funded from
+  the commercial activity tax the same act created.
 description: |
   State payments created by [H.B. 66](../legislation/hb-66-2005.yml) to hold districts harmless
   for the phase-out of the tangible personal property tax on general business, and later

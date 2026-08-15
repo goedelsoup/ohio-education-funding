@@ -10,6 +10,9 @@
   and `amends` backward to reconstruct the statutory lineage of a provision.
 - **Veto delta.** For budget acts, compare enrolled text against what survived line-item veto.
   Vetoes in Ohio budget acts have repeatedly touched education funding provisions.
+- **What has this node been wrong about?** Read `revisions:`. Each entry carries the claim as
+  it stood, what replaced it, and the test or source that settled it — so a withdrawn figure can be
+  recognised rather than re-derived, and `found_by` gives the check to re-run.
 
 ## Transitions
 

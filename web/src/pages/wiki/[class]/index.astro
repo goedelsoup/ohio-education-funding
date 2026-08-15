@@ -51,7 +51,7 @@ const description = await renderProse(entry.description, entry.className);
                 <th>
                   <a href={routes.wikiNode(node.className, node.name)}>{node.label}</a>
                 </th>
-                <td>{summarize(node.description, 150)}</td>
+                <td>{node.summary}</td>
               </tr>
             ))
           }

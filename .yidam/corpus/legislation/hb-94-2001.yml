@@ -1,5 +1,9 @@
 class: legislation
 label: Am. Sub. H.B. 94 (2001) — FY2002-03 Budget; the post-DeRolph II formula
+summary: >-
+  The General Assembly's answer to DeRolph II, and the only Ohio school funding act a court has
+  ever examined provision by provision and found constitutional — conditionally, briefly, and
+  in a decision that was later vacated.
 description: |
   The General Assembly's answer to [DeRolph II](../litigation/derolph-ii-2000.yml), and the only
   Ohio school funding act a court has ever examined provision by provision and found
@@ -47,9 +51,10 @@ description: |
   methodology". [verified] The court was not freezing a number in the abstract; it was closing the
   adjustment mechanism the act had built.
 
-  **ITS OWN CITATIONS NO LONGER RESOLVE, AND THEY RESOLVE TO SOMETHING PLAUSIBLE.** This is the
-  reason the act is worth a node rather than a footnote. Every section DeRolph III cites has since
-  been repealed or reused: [verified — fetched 2026-08-09]
+  ### Its own citations no longer resolve, and they resolve to something plausible
+
+  This is the reason the act is worth a node rather than a footnote. Every section DeRolph III
+  cites has since been repealed or reused: [verified — fetched 2026-08-09]
 
       section          in H.B. 94 (2001)        on codes.ohio.gov today
       R.C. 3317.012    the base cost formula    "Joint vocational school district base cost"

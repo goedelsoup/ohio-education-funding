@@ -34,6 +34,41 @@ tell a deliberate coinage from a typo.
 See [corpus conventions](../.vendor/prelude/guidelines/directories.md) for authoring rules,
 the authored/generated node distinction, and `[verified]`/`[inference]`/`[open]` claim tags.
 
+## A node writes prose into four fields, and each is for a different reader
+
+A `description:` was measured carrying four documents at once — 53,196 words across 101 nodes, a
+quarter of the paragraphs about this repository rather than about Ohio, and 130 paragraphs opening
+in shouted capitals to win a skimming reader's attention against the wall of body copy around them.
+[`the-four-genres-of-a-description`](../decisions/the-four-genres-of-a-description.yml) separates
+them.
+
+| Field | Holds | Where it renders |
+|---|---|---|
+| `summary` | the lead — what the thing *is* | under the `h1`, and in every `<meta>` and OG card |
+| `description` | the subject: mechanism, statute, history | the body |
+| `findings` | what this repository computed, and how to read it | its own section |
+| `revisions` | what the node used to say and no longer does | a collapsed disclosure |
+
+**`summary:` is required, at most 50 words, and may not contain a markdown link.** It is the one
+string five call sites substitute for the whole node, and none of those five can render a link.
+Both limits are in the JSON Schema, so an editor says so while it is being typed.
+
+**`revisions:` is a list, and each entry has four fields.** `was` — the claim as it stood. `now` —
+what replaced it. `found_by` — the test, source or record that settled it, which is the field that
+earns the structure, because it turns "this was wrong once" into a check somebody can re-run.
+`reach` — what else the mistake touched, or the explicit statement that nothing downstream moved.
+
+**The corpus is never rewritten to have always been right**, the same rule
+[decision records](../decisions/README.md) follow and for the same reason: the wrong turn is the
+most useful thing on the page, and editing it out leaves a document that teaches nothing. A
+withdrawal moves out of the body so a reader does not meet it as current, and it does not leave
+the file.
+
+**Four checks run at build time and report rather than stop.** A `summary` that is its own
+description cut; a `description` over 400 words, or carrying a shouted lead, or referring to the
+corpus rather than to Ohio. `pnpm corpus:report` lists them; the count is the migration's
+remaining backlog and `web/tests/unit/schema.spec.ts` pins it so it can only shrink.
+
 ## `[unentered]` — a fourth mark, and why it is not a fourth confidence level
 
 The prelude's three tags grade *how well a claim is supported*. This domain needs one more mark,
@@ -77,26 +112,26 @@ Fields: count per claim tag across every node; then the unresolved marks by the 
 -->
 | Tag | Count | What it records |
 |---|--:|---|
-| `[verified]` | 819 | supported by a committed primary source |
-| `[inference]` | 234 | drawn from verified facts, not witnessed |
-| `[open]` | 188 | a live question — unknown, contested, or being worked |
+| `[verified]` | 835 | supported by a committed primary source |
+| `[inference]` | 236 | drawn from verified facts, not witnessed |
+| `[open]` | 193 | a live question — unknown, contested, or being worked |
 | `[unentered]` | 34 | a knowable value nobody has typed in yet |
 
-222 unresolved marks in total, 188 of them live questions and 34 of them empty fields. Before the two were distinguished the corpus reported the sum as its count of what it does not know, which overstated it by 15%.
+227 unresolved marks in total, 193 of them live questions and 34 of them empty fields. Before the two were distinguished the corpus reported the sum as its count of what it does not know, which overstated it by 14%.
 
 | Field | `[open]` | `[unentered]` |
 |---|--:|--:|
-| `description` | 103 | 3 |
+| `description` | 104 | 3 |
 | `series` | 12 | 0 |
 | `vetoes` | 7 | 1 |
 | `established` | 0 | 7 |
 | `typology` | 1 | 5 |
 | `statutory_basis` | 6 | 0 |
+| `findings` | 6 | 0 |
 | `series_path` | 0 | 5 |
 | `roles` | 4 | 1 |
 | `mechanism` | 5 | 0 |
 | `amount` | 5 | 0 |
-| `findings` | 4 | 0 |
 | `eligibility` | 4 | 0 |
 | `restriction` | 3 | 0 |
 | `performance` | 0 | 3 |
@@ -106,6 +141,7 @@ Fields: count per claim tag across every node; then the unresolved marks by the 
 | `caveats` | 3 | 0 |
 | `boundary_note` | 3 | 0 |
 | `subject` | 2 | 0 |
+| `revisions` | 2 | 0 |
 | `legal_basis` | 2 | 0 |
 | `holding` | 2 | 0 |
 | `exit` | 1 | 1 |
@@ -124,6 +160,8 @@ Fields: count per claim tag across every node; then the unresolved marks by the 
 | `district_funding_effect` | 1 | 0 |
 | `context` | 1 | 0 |
 | `appropriating_bill` | 1 | 0 |
+
+**18 recorded withdrawals across 12 nodes.** A claim the corpus published and no longer stands behind is kept in a `revisions:` block rather than edited out, with the test or source that settled it — see [`the-four-genres-of-a-description`](../decisions/the-four-genres-of-a-description.yml). Counted here for the same reason the tags above are: how often this corpus has corrected itself is a fact about it, and one nobody would think to update by hand.
 <!-- /REGEN -->
 
 ## Node index
@@ -156,20 +194,20 @@ Sorted by: kind, then alphabetically.
 | [`fy2014-15`](fiscal-period/fy2014-15.yml) | fiscal-period | FY2014-2015 Biennium | 3 | 1 |
 | [`fy2016-17`](fiscal-period/fy2016-17.yml) | fiscal-period | FY2016-2017 Biennium | 3 | 1 |
 | [`fy2018-19`](fiscal-period/fy2018-19.yml) | fiscal-period | FY2018-2019 Biennium | 3 | 1 |
-| [`fy2020-21`](fiscal-period/fy2020-21.yml) | fiscal-period | FY2020-2021 Biennium | 3 | 2 |
+| [`fy2020-21`](fiscal-period/fy2020-21.yml) | fiscal-period | FY2020-2021 Biennium | 3 | 3 |
 | [`fy2022`](fiscal-period/fy2022.yml) | fiscal-period | Fiscal Year 2022 | 3 | 3 |
 | [`fy2022-23`](fiscal-period/fy2022-23.yml) | fiscal-period | FY2022-23 Biennium | 5 | 2 |
 | [`fy2024-25`](fiscal-period/fy2024-25.yml) | fiscal-period | FY2024-25 Biennium | 5 | 3 |
 | [`fy2026`](fiscal-period/fy2026.yml) | fiscal-period | Fiscal Year 2026 | 3 | 8 |
 | [`fy2026-27`](fiscal-period/fy2026-27.yml) | fiscal-period | FY2026-27 Biennium | 4 | 6 |
-| [`fy2027`](fiscal-period/fy2027.yml) | fiscal-period | Fiscal Year 2027 | 6 | 2 |
+| [`fy2027`](fiscal-period/fy2027.yml) | fiscal-period | Fiscal Year 2027 | 6 | 3 |
 | [`charge-off-local-share`](formula-component/charge-off-local-share.yml) | formula-component | Charge-Off Local Share | 6 | 8 |
 | [`fsfp-base-cost-calculation`](formula-component/fsfp-base-cost-calculation.yml) | formula-component | FSFP Base Cost Calculation | 7 | 8 |
 | [`fsfp-career-technical-weights`](formula-component/fsfp-career-technical-weights.yml) | formula-component | FSFP Career-Technical Weights | 4 | 3 |
 | [`fsfp-disadvantaged-pupil-impact-aid`](formula-component/fsfp-disadvantaged-pupil-impact-aid.yml) | formula-component | FSFP Disadvantaged Pupil Impact Aid | 2 | 2 |
 | [`fsfp-english-learner-weights`](formula-component/fsfp-english-learner-weights.yml) | formula-component | FSFP English Learner Weights | 4 | 3 |
 | [`fsfp-enrolment-supplements`](formula-component/fsfp-enrolment-supplements.yml) | formula-component | FSFP Base and Enrollment Growth Supplements | 3 | 1 |
-| [`fsfp-formula-transition-supplement`](formula-component/fsfp-formula-transition-supplement.yml) | formula-component | FSFP Formula Transition Supplement | 4 | 3 |
+| [`fsfp-formula-transition-supplement`](formula-component/fsfp-formula-transition-supplement.yml) | formula-component | FSFP Formula Transition Supplement | 4 | 4 |
 | [`fsfp-gifted-units`](formula-component/fsfp-gifted-units.yml) | formula-component | FSFP Gifted Identification and Units | 3 | 1 |
 | [`fsfp-local-capacity-measure`](formula-component/fsfp-local-capacity-measure.yml) | formula-component | FSFP Local Capacity Measure | 6 | 7 |
 | [`fsfp-performance-supplement`](formula-component/fsfp-performance-supplement.yml) | formula-component | FSFP Performance Supplement | 7 | 3 |
@@ -177,8 +215,9 @@ Sorted by: kind, then alphabetically.
 | [`fsfp-special-education-weights`](formula-component/fsfp-special-education-weights.yml) | formula-component | FSFP Special Education Weights | 5 | 9 |
 | [`fsfp-targeted-assistance`](formula-component/fsfp-targeted-assistance.yml) | formula-component | FSFP Targeted Assistance | 4 | 4 |
 | [`fsfp-transportation`](formula-component/fsfp-transportation.yml) | formula-component | FSFP Transportation | 6 | 3 |
-| [`temporary-transitional-aid-guarantee`](formula-component/temporary-transitional-aid-guarantee.yml) | formula-component | Temporary Transitional Aid Guarantee | 8 | 12 |
-| [`bridge-formula`](funding-regime/bridge-formula.yml) | funding-regime | Bridge Formula | 8 | 11 |
+| [`guarantee-open-enrolment-clawback`](formula-component/guarantee-open-enrolment-clawback.yml) | formula-component | Guarantee Open Enrolment Clawback | 3 | 1 |
+| [`temporary-transitional-aid-guarantee`](formula-component/temporary-transitional-aid-guarantee.yml) | formula-component | Temporary Transitional Aid Guarantee | 10 | 14 |
+| [`bridge-formula`](funding-regime/bridge-formula.yml) | funding-regime | Bridge Formula | 8 | 12 |
 | [`equal-yield-formula`](funding-regime/equal-yield-formula.yml) | funding-regime | Equal Yield Formula | 3 | 2 |
 | [`evidence-based-model`](funding-regime/evidence-based-model.yml) | funding-regime | Evidence-Based Model | 3 | 6 |
 | [`fair-school-funding-plan`](funding-regime/fair-school-funding-plan.yml) | funding-regime | Fair School Funding Plan | 21 | 24 |
@@ -207,15 +246,16 @@ Sorted by: kind, then alphabetically.
 | [`enrolled-adm`](metric/enrolled-adm.yml) | metric | Enrolled ADM | 6 | 8 |
 | [`expenditure-per-equivalent-pupil`](metric/expenditure-per-equivalent-pupil.yml) | metric | Expenditure Per Equivalent Pupil | 8 | 6 |
 | [`general-fund-cash-balance`](metric/general-fund-cash-balance.yml) | metric | General Fund Cash Balance | 2 | 3 |
-| [`per-pupil-operating-expenditure`](metric/per-pupil-operating-expenditure.yml) | metric | Per-Pupil Operating Expenditure | 11 | 4 |
+| [`per-pupil-operating-expenditure`](metric/per-pupil-operating-expenditure.yml) | metric | Per-Pupil Operating Expenditure | 12 | 4 |
 | [`performance-index`](metric/performance-index.yml) | metric | Performance Index | 5 | 12 |
 | [`progress-value-added`](metric/progress-value-added.yml) | metric | Progress (Value-Added) | 5 | 5 |
 | [`state-share-percentage`](metric/state-share-percentage.yml) | metric | State Share Percentage | 5 | 3 |
 | [`education-savings-account-act`](model-policy/education-savings-account-act.yml) | model-policy | Education Savings Account Act | 4 | 0 |
 | [`parental-choice-scholarship-act`](model-policy/parental-choice-scholarship-act.yml) | model-policy | Parental Choice Scholarship Program Act (Universal Eligibility) | 4 | 1 |
 | [`appropriation-proration-factor`](parameter/appropriation-proration-factor.yml) | parameter | Appropriation Proration Factor | 2 | 3 |
-| [`base-cost-per-pupil`](parameter/base-cost-per-pupil.yml) | parameter | Base Cost Per Pupil | 9 | 15 |
+| [`base-cost-per-pupil`](parameter/base-cost-per-pupil.yml) | parameter | Base Cost Per Pupil | 9 | 16 |
 | [`fsfp-phase-in-percentage`](parameter/fsfp-phase-in-percentage.yml) | parameter | FSFP Phase-In Percentage | 4 | 13 |
+| [`guarantee-funding-base`](parameter/guarantee-funding-base.yml) | parameter | Guarantee Funding Base | 4 | 1 |
 | [`local-share-charge-off-millage`](parameter/local-share-charge-off-millage.yml) | parameter | Local Share Charge-Off Millage | 8 | 4 |
 | [`twenty-mill-floor`](parameter/twenty-mill-floor.yml) | parameter | Twenty-Mill Floor | 4 | 8 |
 | [`autism-scholarship`](program/autism-scholarship.yml) | program | Autism Scholarship | 4 | 0 |
@@ -225,7 +265,7 @@ Sorted by: kind, then alphabetically.
 | [`edchoice-scholarship`](program/edchoice-scholarship.yml) | program | Traditional EdChoice Scholarship | 4 | 2 |
 | [`jon-peterson-special-needs`](program/jon-peterson-special-needs.yml) | program | Jon Peterson Special Needs Scholarship | 3 | 1 |
 | [`casino-tax-distribution`](revenue-stream/casino-tax-distribution.yml) | revenue-stream | Casino Tax — County Student Fund | 6 | 1 |
-| [`esser`](revenue-stream/esser.yml) | revenue-stream | ESSER — Elementary and Secondary School Emergency Relief | 4 | 1 |
+| [`esser`](revenue-stream/esser.yml) | revenue-stream | ESSER — Elementary and Secondary School Emergency Relief | 4 | 2 |
 | [`idea-part-b`](revenue-stream/idea-part-b.yml) | revenue-stream | IDEA Part B | 5 | 3 |
 | [`local-property-tax`](revenue-stream/local-property-tax.yml) | revenue-stream | Local Property Tax | 6 | 8 |
 | [`lottery-profits`](revenue-stream/lottery-profits.yml) | revenue-stream | Lottery Profits Education Fund | 4 | 1 |
@@ -238,7 +278,7 @@ Sorted by: kind, then alphabetically.
 | [`barrington-road-elementary`](school/barrington-road-elementary.yml) | school | Barrington Road Elementary School | 4 | 2 |
 | [`sheridan-high-school`](school/sheridan-high-school.yml) | school | Sheridan High School | 6 | 1 |
 
-101 nodes across 17 classes. **2 have nothing pointing at them**, which the corpus rules treat as a gap rather than a fact about the node.
+103 nodes across 17 classes. **2 have nothing pointing at them**, which the corpus rules treat as a gap rather than a fact about the node.
 <!-- /REGEN -->
 
 ## Semantic index status
@@ -248,5 +288,5 @@ Regenerated by: `yidam index-status`
 Fields: total nodes indexed, embedding model, index freshness (last indexed commit vs HEAD),
         stale node count.
 -->
-No semantic index is built. The corpus is 101 nodes and fits in context; an index is added when direct retrieval stops working, which has not happened.
+No semantic index is built. The corpus is 103 nodes and fits in context; an index is added when direct retrieval stops working, which has not happened.
 <!-- /REGEN -->

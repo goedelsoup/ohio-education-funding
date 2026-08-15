@@ -1,5 +1,9 @@
 class: metric
 label: State Share Percentage
+summary: >-
+  The fraction of a district's base cost the state pays rather than the district — the
+  compensation side of the equity question, where valuation per pupil is the wealth side. Under
+  the current plan it is a statutory quantity with a floor.
 description: |
   The fraction of a district's base cost that the state pays rather than the district — the
   compensation side of the equity question, where

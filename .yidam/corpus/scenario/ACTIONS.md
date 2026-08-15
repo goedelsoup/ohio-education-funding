@@ -11,6 +11,9 @@
   perturbation against another.
 - **Sensitivity.** Re-run with the perturbation varied across a range to determine whether the
   result is robust or hinges on the chosen value.
+- **What has this node been wrong about?** Read `revisions:`. Each entry carries the claim as
+  it stood, what replaced it, and the test or source that settled it — so a withdrawn figure can be
+  recognised rather than re-derived, and `found_by` gives the check to re-run.
 
 ## Transitions
 

@@ -1,5 +1,9 @@
 class: metric
 label: Effective Operating Millage
+summary: >-
+  The operating rate a district actually levies after H.B. 920's reduction factors, as distinct
+  from the rate its voters approved. The gap between the two is the whole H.B. 920 mechanism
+  expressed as a number.
 description: |
   The property tax rate a district actually levies for current operating expenses after
   [H.B. 920](../legislation/hb-920-1976.yml) reduction factors, as distinct from the rate its

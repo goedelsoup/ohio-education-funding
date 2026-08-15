@@ -1,5 +1,9 @@
 class: scenario
 label: FSFP Cost Input Refresh vs. Freeze
+summary: >-
+  What the Fair School Funding Plan pays on refreshed cost inputs against the FY2022 inputs
+  H.B. 96 carried forward, at the same phase-in percentage. A simulation of the question the
+  FY2026-27 budget actually turned on.
 description: |
   **RUN.** First result. Reproduce with `cargo run --example input_year_refresh -p foundation`.
 
@@ -25,7 +29,9 @@ description: |
   alone.** [inference — assumes this district's cost structure is representative] The state's
   appropriation consequence is a different and smaller number; see the incidence result below.
 
-  **THE INCIDENCE RESULT IS SHARPER THAN PREDICTED.** This node predicted, before the run, that
+  ### The incidence result is sharper than predicted
+
+  This node predicted, before the run, that
   freezing would fall "disproportionately on the state's portion" and be regressive. It is not
   disproportionate — it is binary:
 
@@ -45,7 +51,9 @@ description: |
   different floor, but correlated with wealth — the share of districts insulated from an input
   refresh is a first-order question this run does not yet answer. [open]
 
-  **STATEWIDE, ALL 606 DISTRICTS.** [verified — see
+  ### Statewide, all 606 districts
+
+  [verified — see
   [`crates/foundation/tests/statewide_refresh.rs`](../../../crates/foundation/tests/statewide_refresh.rs)]
 
   Grade-band shares from the department's October FY2024 headcount file, scaled by each
@@ -60,13 +68,17 @@ description: |
   richer than the state's, and FY2024 ADM is lower than the FY2022 base cost ADM used to scale.
   The two agree to within about 6%, which is the useful check on the extrapolation.
 
-  **THE SPREAD HAS A SINGLE CAUSE, AND IT IS THE STAFFING MINIMUM.** The most-affected district
+  ### The spread has a single cause, and it is the staffing minimum
+
+  The most-affected district
   gains 1.4 times per pupil what the least-affected does — $471.10 against $338.62 — with no
   policy choice involved. **155 of 604 districts** are small enough that the six-teacher special
   teacher minimum binds, and their mean per-pupil gain is $368.44 against $343.53 for everyone
   else. [verified]
 
-  **REVISED, AND THE OLD FIGURE WAS AN ARTIFACT.** This corpus reported a 1.7× spread with a
+  ### The spread, revised
+
+  This corpus reported a 1.7× spread with a
   maximum of $580.82 through four phases. That maximum belonged to Vanlue Local, and it was
   wrong because its input was: the grade-band fixture was produced through headless LibreOffice
   by a pipeline that summed the department's withheld `<10` grade counts **as zero**. Vanlue has
@@ -89,7 +101,9 @@ description: |
   progressive twice over — once through the state share residual, and again through the
   small-district minimums — and a freeze is regressive on both.
 
-  **THE GUARANTEE HALVES IT.** [verified — the department's own FY27 model; see
+  ### The guarantee halves it
+
+  [verified — the department's own FY27 model; see
   [`crates/foundation/tests/department_model_fy27.rs`](../../../crates/foundation/tests/department_model_fy27.rs)]
 
   This node previously named the guarantee population as its largest unquantified caveat. It is
@@ -118,13 +132,16 @@ description: |
   at its computed cost, nearly half of districts are funded by a hold-harmless from the previous
   regime instead. [inference]
 
-  **INPUTS NOW VERIFIED.** The FY2022 reference-year classroom teacher salary is **$68,022.22**,
+  ### Inputs verified
+
+  The FY2022 reference-year classroom teacher salary is **$68,022.22**,
   the department's own [s5d] value, replacing the $67,654 from secondary reporting this node
   previously carried. The revised figures above use it, which is part of why the computed
   increase fell from $496.3M to $465.0M — the rest is the department's own funded-teacher counts
   replacing the corpus's reconstruction of them.
 
-  **THE STATE SHARE FLOOR IS NOT A SMALL CORRECTION, AND THE $242.1M ABOVE DOES NOT APPLY IT.**
+  ### The state share floor is not a small correction, and the $242.1m above does not apply it
+
   This node has recorded, through several phases, that the run "does not apply the 5% state share
   floor at district level, so among the non-guaranteed districts the wealthiest would receive
   less than the full increase." That item is now measured by
@@ -150,7 +167,9 @@ description: |
   magnitude rather than as a replacement to four significant figures. [inference for the
   comparison; verified for each decomposition term]
 
-  **AND THE MECHANISM BEHIND THE INCIDENCE RESULT WAS MISATTRIBUTED.** This node credits the
+  ### What actually cuts wealthy districts out
+
+  This node credits the
   floor for cutting wealthy districts out: "wealthier districts are cut out almost entirely by
   the floor." The guarantee does more of that work. Across valuation quintiles the count held on
   the guarantee runs 10, 31, 39, 88, 88 — and in the wealthiest quintile 90 districts are
@@ -163,7 +182,9 @@ description: |
   about fifteen to one. A refresh is progressive; the reason is mostly that wealthy districts are
   on the guarantee. [verified]
 
-  **WHAT THIS RUN IS STILL NOT.** It perturbs one salary of ten; administrator, counselor,
+  ### What this run is still not
+
+  It perturbs one salary of ten; administrator, counselor,
   librarian, and clerical salaries have all risen too and are held fixed, so the computed
   increase remains a **lower bound**. And FY2027 has not happened — the department's model is a
   projection, so enrollment, valuation, and income are forecast rather than observed. [open]
@@ -193,6 +214,37 @@ description: |
   scale [verified], and districts held on a **guarantee** are off-formula entirely and see no
   effect at all. [inference] If the run does not show the predicted shape, the reasoning above
   is wrong and this node should say so.
+revisions:
+  - was: |
+      A 1.7x spread with a maximum of $580.82 per pupil, reported through four phases.
+    now: |
+      The maximum was an artifact. It belonged to Vanlue Local, whose grade-band fixture was
+      produced by a headless LibreOffice pipeline that summed the department's withheld `<10`
+      grade counts **as zero**. Vanlue has four withheld grades, so its headcount was
+      understated by up to 36 in a district of 150 and the `ADM / headcount` scale factor
+      driving its funded teacher count was inflated by nearly a third.
+    found_by: |
+      Re-deriving the grade-band fixture with the withheld counts handled as withheld rather
+      than as zero.
+    reach: |
+      A pipeline defect rather than a modelling one, and it reached only districts with
+      withheld grade counts — which is to say small ones, where the proportional distortion is
+      largest.
+  - was: |
+      "Wealthier districts are cut out almost entirely by the floor" — the state share floor
+      credited with the incidence result.
+    now: |
+      The guarantee does more of that work. Across valuation quintiles the count held on the
+      guarantee runs 10, 31, 39, 88, 88; in the wealthiest quintile 90 districts are
+      guaranteed, 95 are at the floor, and **73 are both**, so the two cannot be summed as
+      independent mechanisms. In the poorest quintile **no district is at the floor at all**,
+      so there the floor explains nothing whatever. [verified]
+    found_by: |
+      Crossing floor status against guarantee status per district rather than reading each
+      margin alone.
+    reach: |
+      The incidence result itself stands. What was wrong was the mechanism assigned to it,
+      which matters because the two respond to different policy levers.
 properties:
   name: FSFP cost input refresh vs. freeze
   question: |

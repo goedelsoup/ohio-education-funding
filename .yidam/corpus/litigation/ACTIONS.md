@@ -12,6 +12,9 @@
   reached opposite results eighteen years apart.
 - **Party exposure.** Follow `has-party` to the agencies involved, then pull their funding
   series for the years around the decision.
+- **What has this node been wrong about?** Read `revisions:`. Each entry carries the claim as
+  it stood, what replaced it, and the test or source that settled it — so a withdrawn figure can be
+  recognised rather than re-derived, and `found_by` gives the check to re-run.
 
 ## Transitions
 

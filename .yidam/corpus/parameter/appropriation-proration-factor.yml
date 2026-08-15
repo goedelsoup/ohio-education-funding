@@ -1,5 +1,9 @@
 class: parameter
 label: Appropriation Proration Factor
+summary: >-
+  A number below one that every district's payment under a program is multiplied by, because
+  the appropriation did not cover what the formula computed. It is not a rate, a weight, a
+  price or a threshold.
 description: |
   A number below one that every district's payment under a program is multiplied by, because the
   appropriation did not cover what the formula computed. It is **not a rate, a weight, a price or
@@ -11,19 +15,23 @@ description: |
   expressing that the two did not agree. It moves when the legislature changes the line item or
   when the counts change, and for no other reason. [verified]
 
-  **AND IT IS A CONDITION ON AN APPROPRIATION, NOT A FORMULA IN STATUTE.** R.C. 3317.0213 does not
+  ### It is a condition on an appropriation, not a formula in statute
+
+  R.C. 3317.0213 does not
   mention proration; the redbook does — "If necessary, DEW must prorate the payments so as not to
   exceed the amount appropriated for each year." That is why the search of the Revised Code for
   "proration" found it only in the calculator's labels and not in the sections. [verified]
 
-  **THE PUBLISHED AMOUNT IS NOT WHAT THE DISTRICT IS OWED.** That is the whole reason this needs a
+  ### The published amount is not what the district is owed
+
+  That is the whole reason this needs a
   node. Under a proration the department's figure is what was available, divided — and the shortfall
   cannot be recovered from it. A reader shown $1.2m has no way to know the formula computed $1.31m,
   and nothing in the payment report says so. [verified]
 
-  **THREE ARE KNOWN AND ONLY ONE PUBLISHES ITS APPROPRIATION.**
+  ### Three are known, and only one publishes its appropriation
 
-      program                                    factor        appropriation stated?
+  program                                    factor        appropriation stated?
       special education transportation           0.91746       no
       preschool special education                0.96854448    yes — $147,500,000
       transportation, general                    1.0           no
@@ -33,7 +41,9 @@ description: |
   proration's two halves at once. Without it the factor is an unexplained multiplier; with it the
   arithmetic is legible. [verified]
 
-  **AND IT SHOWS WHY A NODE HOLDING ONLY THE FACTOR WOULD BE USELESS.** At the stated 0.96854448
+  ### Why a node holding only the factor would be useless
+
+  At the stated 0.96854448
   the preschool program totals **$148,408,184 against its own $147,500,000 limit — $908,184 over**.
   A third cell on the same sheet states $146,708,228.07, matching neither. The likeliest reading is
   a factor calibrated against an earlier ADM vintage and never recalibrated after the counts were
@@ -44,7 +54,8 @@ description: |
   stopped satisfying its own constraint is exactly what a three-property node catches and a
   one-property node cannot, and that is the argument for the class. [inference]
 
-  **NO PRORATION APPLIES INSIDE `[H] FOUNDATION FUNDING`, AND THE WORKBOOK IS EXPLICIT ABOUT IT.**
+  ### No proration applies inside `[H] Foundation Funding`, and the workbook says so
+
   The open question this node was written with is answered. Searching every label in the FY2027
   calculator for "proration" or "phase-in" separates the two cleanly: inside foundation funding the
   labels are all **phase-in** — `[Ac] Base Cost Phase In` through `[Hc] Foundation Phase In`, and
@@ -67,13 +78,17 @@ description: |
   [verified] The second is what settles the entry below: the department names transportation's
   general factor as a live dial, not a dormant one.
 
-  **A PRORATION OF 1.0 IS NOT AN ABSENCE.** Transportation's general factor is one this year. The
+  ### A proration of 1.0 is not an absence
+
+  Transportation's general factor is one this year. The
   cell exists, the multiplication happens, and the dial has evidently been turned before or it
   would not be there. Recorded as a live parameter at its neutral value, on the same grounds as
   the funded-but-zero program lines this corpus already holds — supplemental targeted assistance
   and gifted professional development. [inference]
 
-  **WHICH BUDGET LINE GOVERNS IS NOW ANSWERED, AND THE ANSWER EXPLAINS THE ANOMALY.** This node
+  ### Which budget line governs, and why it explains the anomaly
+
+  This node
   said the question needed the budget bill's line items, "which is `lsc-budget` — a connector
   still blocked on PDFs." It is not blocked; a PDF is a container. The department's redbook names
   every appropriation line item and breaks each into earmarks with amounts.
@@ -99,7 +114,9 @@ description: |
   program prorates and the others mostly do not, and nothing on the department's sheet says it —
   the sheet shows a factor and a limit. [verified — `lsc-budget`, as introduced]
 
-  **AND THE LIMIT THE CALCULATOR PRINTS IS LAST YEAR'S.** The $147,500,000 stated beside the
+  ### The limit the calculator prints is last year's
+
+  The $147,500,000 stated beside the
   0.96854448 factor is the **FY2025 estimate**. FY2026 and FY2027 are both $153,976,832. So the
   factor and the limit beside it are carried over together from the prior biennium, and on the
   year being modelled the program at $148,408,184 is **$5.6m under** its appropriation rather than
@@ -110,7 +127,9 @@ description: |
   district." The appropriation column is why. The guess was adjacent and the mechanism is sharper:
   it is not a stale *count*, it is a stale *appropriation*. [verified]
 
-  **THE ENACTED APPROPRIATION HELD, AND THE TABLE ABOVE IS NOW THE ENACTED ONE.** This node said
+  ### The enacted appropriation held, and the table above is the enacted one
+
+  This node said
   the figures were the executive proposal and that "the enacted amounts need the appropriations
   document, which is not wired." Two documents now answer it and they agree.
 
@@ -134,13 +153,17 @@ description: |
   edition gives ALI 200540 an enacted $193,272,426 for FY2026 and FY2027 and an actual
   $195,160,040 for FY2025 — the greenbook's totals exactly. [verified]
 
-  **SO THE PRORATION DOES NOT ARISE, AND THE REASON IS A STALE CELL.** The calculator's stated
+  ### So the proration does not arise, and the reason is a stale cell
+
+  The calculator's stated
   limit of $147,500,000 is the FY2025 figure — the estimate, against which the actual came in at
   $147,499,999, a dollar short. Against the FY2027 appropriation the program at $148,408,184 is
   **$5,568,648 under** rather than $908,184 over. The node's reading was right and is now
   sourced from the enacted act's analysis rather than inferred from the proposal. [verified]
 
-  **AND THE RESIDUAL CLAIMANT GREW WHILE ITS LINE SHRANK**, which is the clearest illustration of
+  ### The residual claimant grew while its line shrank
+
+  , which is the clearest illustration of
   what a residual claimant is that this corpus holds. Comparing budget figure to budget figure —
   the redbook's FY2025 *estimate* against the enacted FY2026 *appropriation*, because the
   greenbook's FY2025 column is an **actual** and an actual against an appropriation is the error
@@ -150,12 +173,28 @@ description: |
   more money because the claims ahead of it received less, and nothing on the department's own
   sheet would tell a reader that. [verified]
 
-  **STILL OPEN.** No factor publishes a history, so "when each was last set" is answered for
+  ### Still open
+
+  No factor publishes a history, so "when each was last set" is answered for
   preschool and open for the other two. [open]
 
   ~~Also open: whether prorations apply anywhere inside `[H] Foundation Funding`.~~ Answered above,
   from the workbook's own labels: none do, and the pattern is real rather than an artefact of three
   observations.
+revisions:
+  - was: |
+      The 0.96854448 factor was read against the $147,500,000 limit printed beside it, making
+      the program $908,184 over its appropriation and prorated.
+    now: |
+      That limit is the **FY2025** estimate. FY2026 and FY2027 are both $153,976,832, against
+      which the program at $148,408,184 is **$5,568,648 under** — so no proration arises at
+      all. The factor and the limit were carried over together from the prior biennium.
+    found_by: |
+      The enacted act's LSC analysis, rather than the proposal the workbook cell was priced
+      from.
+    reach: |
+      The node's reading of the mechanism was right throughout; the cell it read was stale. A
+      published proration factor is not evidence that a proration applied.
 properties:
   name: Appropriation proration factor
   unit: fraction of the computed entitlement

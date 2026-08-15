@@ -1,5 +1,9 @@
 class: fiscal-period
 label: Fiscal Year 2027
+summary: >-
+  The terminal year of the Fair School Funding Plan's six-year phase-in. Two true statements
+  about it point opposite ways: the formula reaches 100% of its computed amount, and nearly
+  half of Ohio's districts are not paid by the formula at all.
 description: |
   July 1, 2026 through June 30, 2027 — the second year of the
   [FY2026-27 biennium](fy2026-27.yml), and the year the Fair School Funding Plan's six-year

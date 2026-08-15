@@ -59,6 +59,51 @@ export const LinkSchema = z
   .strict();
 
 /**
+ * One thing this node used to say and no longer does.
+ *
+ * # Why this is structured and the corrections in a decision record are not
+ *
+ * `markCorrections` finds a withdrawal in a decision record by looking for a blockquote that opens
+ * with strong emphasis. It works, it is measured across all twenty-four records, and it is pinned
+ * by spec. The same trick was available for nodes and is not safe for nodes: in a decision record
+ * a correction misfiled as a quotation is set in the wrong type, and in a corpus node a retraction
+ * misfiled as body copy **publishes a withdrawn claim as current**. The signals are equally
+ * strong in both places; only one of them can afford the residue.
+ *
+ * # The fields
+ *
+ * `was` and `now` are the two halves nobody can reconstruct later — the corpus is not rewritten to
+ * have always been right, on the same ground `.yidam/decisions/README.md` gives for never
+ * rewriting a decision record.
+ *
+ * `found_by` is the field that earns the structure. It names the test, source, or catalog record
+ * that settled it, which turns "this was wrong once" into something an agent can re-run. Not an
+ * enum: the things that have settled a claim here are a Rust test, a catalog source, a department
+ * workbook, a court opinion, and in one case the absence of a source, and five kinds from the
+ * first pass is a sample rather than a vocabulary.
+ *
+ * `reach` is optional and says what else the mistake touched — or states that nothing downstream
+ * moved, which is the more common answer and the one a reader most needs to see stated rather
+ * than inferred from silence.
+ */
+export const RevisionSchema = z
+  .object({
+    was: z.string().min(1, "a revision has to say what the node used to claim"),
+    now: z.string().min(1, "a revision has to say what replaced the claim"),
+    found_by: z.string().min(1, "a revision names the test, source or record that settled it"),
+    reach: z.string().optional(),
+  })
+  .strict();
+
+/** What a `summary` may not be longer than, in words. See {@link NodeSchema}. */
+export const SUMMARY_MAX_WORDS = 50;
+
+/** Count words the way the summary limit means them: runs of non-whitespace. */
+export function words(text: string): number {
+  return text.split(/\s+/).filter((word) => word !== "").length;
+}
+
+/**
  * One corpus node.
  *
  * `links` is `array` and deliberately not `array | string`. Accepting the prose form would make
@@ -67,15 +112,60 @@ export const LinkSchema = z
  * Property *values* are strings because all 380 of them are: the corpus writes numbers, dates and
  * lists as prose carrying a claim tag, and a schema that admitted numbers would let
  * `irn: 044933` parse as an integer and lose its leading zero.
+ *
+ * # The four fields a node writes prose into, and which reader each is for
+ *
+ * A description was measured carrying four different documents at once — 53,196 words across 101
+ * nodes, a quarter of the paragraphs about this repository rather than about Ohio. The split is
+ * `.yidam/decisions/the-four-genres-of-a-description.yml`:
+ *
+ * | Field | Holds | Where it renders |
+ * |---|---|---|
+ * | `summary` | the lead — what the thing is | under the `h1`, and in every `<meta>` and OG card |
+ * | `description` | the subject: mechanism, statute, history | the body |
+ * | `findings` | what this repository computed, and how to read it | its own section |
+ * | `revisions` | what this node used to say | a collapsed disclosure |
+ *
+ * `summary` is capped rather than merely encouraged because it is the string five call sites
+ * substitute for the whole node — the class index cell, the node's `<meta name="description">`,
+ * two OG cards and the wiki front door. Each of those used to truncate the description with
+ * `slice()`, which is how 110 of 143 meta descriptions were once found cut mid-word. A cap that
+ * is checked cannot drift back into a paragraph.
+ *
+ * It also may not contain a markdown link, for the same reason: none of those five destinations
+ * can render one, and `summarize` stripping the target while keeping the label is what produced
+ * "the suburban counterpart to  eleven miles away across the Maumee".
  */
 export const NodeSchema = z
   .object({
     class: z.string().min(1),
     label: z.string().min(1),
+    summary: z
+      .string()
+      .min(1, "a node needs a lead")
+      /*
+       * Both caps are here on purpose and they are not redundant.
+       *
+       * The word count is the rule and carries the message worth reading. `maxLength` and
+       * `pattern` are the halves of it that survive `z.toJSONSchema` — a refinement is not
+       * representable in JSON Schema and is silently dropped, so a rule expressed only as a
+       * refinement stops the build and never reaches the editor, which is the loop this schema
+       * exists to shorten. The character cap is the word cap at a generous average.
+       */
+      .max(SUMMARY_MAX_WORDS * 9, "a summary is the lead, not the description")
+      .regex(/^(?!.*\]\()/s, "a summary may not carry a markdown link")
+      .refine((text) => words(text) <= SUMMARY_MAX_WORDS, {
+        message: `a summary is the lead, not the description — keep it to ${SUMMARY_MAX_WORDS} words`,
+      })
+      .refine((text) => !text.includes("]("), {
+        message:
+          "a summary may not carry a markdown link; it is rendered into <meta> and OG cards that cannot show one",
+      }),
     description: z.string().min(1, "a node with no description is a filename"),
     properties: z.record(z.string(), z.string()).default({}),
     links: z.array(LinkSchema).min(1, "every node must have at least one outgoing link"),
     findings: z.string().optional(),
+    revisions: z.array(RevisionSchema).optional(),
   })
   .strict();
 
@@ -162,11 +252,26 @@ export const UNIVERSAL_PROPERTIES = new Set(["seeded_because"]);
 export type NodeFile = z.infer<typeof NodeSchema>;
 export type OntologyFile = z.infer<typeof OntologyClassSchema>;
 
+/**
+ * What kind of problem a warning is, which decides how it is summarised rather than whether it is
+ * reported.
+ *
+ * Two unrelated questions arrive on the same channel and a single count conflates them. Vocabulary
+ * drift asks whoever owns an ontology whether to widen it; prose drift asks whoever is authoring a
+ * node to move a paragraph into the field it belongs in. Reporting "155 nodes use vocabulary their
+ * ontology does not declare" when 108 of those were shouted retraction leads is the kind of
+ * counter this repository has already had to fix three times — a name standing for something other
+ * than what it counts.
+ */
+export type DiagnosticKind = "shape" | "vocabulary" | "prose";
+
 /** Where a problem was found, and whether it stops the build. */
 export interface Diagnostic {
   /** Repository-relative path. */
   file: string;
   severity: "error" | "warning";
+  /** Which question the reader has to answer. Defaults to `shape` — the schema's own failures. */
+  kind?: DiagnosticKind;
   message: string;
 }
 

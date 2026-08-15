@@ -1,5 +1,9 @@
 class: metric
 label: Expenditure Per Equivalent Pupil
+summary: >-
+  The department's report-card spending measure, and a trap. It divides qualifying expenditure
+  by a membership count weighted upward for poverty, English learners and disability, so it is
+  not comparable to an ordinary per-pupil figure.
 description: |
   DEW's report-card spending measure, and a trap. It divides a district's qualifying
   expenditures — organized through the Expenditure Flow Model — by an average-daily-membership
@@ -14,7 +18,7 @@ description: |
   [verified] Quoting one where a reader expects the other understates Ohio school spending by a
   fifth.
 
-  **THE FINDING: A NEED-WEIGHTED DENOMINATOR IS A NEED ADJUSTMENT, AND IT RUNS ONE WAY.**
+  ### A need-weighted denominator is a need adjustment, and it runs one way
 
   This was recorded as an argument. It is now a measurement, and it is larger than the argument
   predicted. [verified — computed; see
@@ -53,7 +57,9 @@ description: |
   "better" is not the same. See [`skills/dispersion`](../../skills/dispersion.md) and
   [equity](../doctrine/equity.yml).
 
-  **THE MECHANISM IS CONFIRMED FROM THE OTHER SIDE.** If the divisor mattered because it is a
+  ### The mechanism, confirmed from the other side
+
+  If the divisor mattered because it is a
   composition proxy and the outcome was composition-driven, then an outcome with the composition
   taken out should make the divisor irrelevant. It does. Against
   [Progress (value-added)](progress-value-added.yml), the two divisors give **−0.039** and
@@ -61,7 +67,9 @@ description: |
   −0.015. [verified] The denominator effect is not a general property of the spending measure;
   it appears only when the outcome is a level.
 
-  **ONLY ONE OF THE TWO ESTIMATES IS STABLE, AND IT IS NOT THE PUBLISHED ONE.** [verified —
+  ### Only one of the two estimates is stable, and it is not the published one
+
+  [verified —
   [`crates/dispersion/tests/report_card_2425.rs`](../../../crates/dispersion/tests/report_card_2425.rs)]
 
   This node previously recorded the sensitivity checks as showing the result "robust, on both
@@ -87,15 +95,18 @@ description: |
   the one the corpus should make: not *the denominator matters*, but **one of these two estimates
   is stable under the paper's own checks and it is not the one it published.**
 
-  **AND A SECOND SOURCE AGREES.** The corpus's independent FY2024 Cupp Report headcount series,
+  ### And a second source agrees
+
+  The corpus's independent FY2024 Cupp Report headcount series,
   a different file for a different year, correlates with the Performance Index at **−0.388**.
   [verified] Two headcount measures from two publications give −0.337 and −0.388. The published
   equivalent-pupil measure gives −0.016. The odd one out is the one with the weighted divisor.
 
-  **WHAT THE PAPER'S TABLE 3 SHOWS, READ AGAINST THIS CORPUS.** Sorting districts by performance
-  rather than spending, the paper reports total spending as "roughly flat" and state-and-local as
-  "moving in the opposite direction, from $12,403 to $13,324." The second description is wrong in
-  a way the corpus can correct. The row is:
+  ### What the paper's Table 3 shows
+
+  Sorting districts by performance rather than spending, the paper reports total spending as
+  "roughly flat" and state-and-local as "moving in the opposite direction, from $12,403 to
+  $13,324." The second description is wrong in a way this data can correct. The row is:
 
       performance quintile      Q1(low)    Q2      Q3      Q4      Q5(high)
       state & local / pupil     $12,403 $12,436 $12,236 $12,340   $13,324
@@ -111,13 +122,17 @@ description: |
   wealthiest districts both spend above its middle, for entirely different reasons, and a single
   coefficient across that shape is two relationships cancelling.
 
-  **AND THE CORRECTED NUMBER DOES NOT SURVIVE A CHANGE OF OUTCOME.** Holding disadvantage
+  ### And the corrected number does not survive a change of outcome
+
+  Holding disadvantage
   constant, per-pupil spending correlates −0.125 with attainment level and **+0.146** with
   growth. [verified] The negative sign recorded above belongs to the level measure, not to
   spending. Anyone quoting −0.337 as what Ohio's spending achieves is making the same category
   of error this node was written to correct, one step further along.
 
-  **AND THERE IS NOW A CONCRETE CASE.** [Toledo City](../education-agency/toledo-city.yml)
+  ### A concrete case
+
+  [Toledo City](../education-agency/toledo-city.yml)
   divides $440.2 million of FY2025 operating expenditure by 21,160 enrolled pupils or by 30,758
   weighted ones: **$20,805 or $14,312**, a 45% spread on one district in one year. Both numbers
   have been published about Toledo — the second in
@@ -132,7 +147,9 @@ description: |
   with a disability the comparison reverses. A denominator does not have to be need-weighted to
   be the wrong population. [inference]
 
-  **A HYPOTHESIS THIS PHASE TESTED AND DROPPED.** The obvious suspicion was the
+  ### A hypothesis tested and dropped
+
+  The obvious suspicion was the
   [temporary transitional aid guarantee](../formula-component/temporary-transitional-aid-guarantee.yml):
   48.3% of districts are funded off-formula against an un-rebased FY2020 baseline, so much of the
   spending variation being correlated ought to be a frozen historical artifact. It is not the
@@ -145,6 +162,20 @@ description: |
   One guarantee finding does survive, and it corroborates the corpus: guaranteed districts
   average a Performance Index of 89.8 against 85.7 for on-formula districts. [verified] The
   guarantee holds up property-wealthy districts, and property-wealthy districts score higher.
+revisions:
+  - was: |
+      The −0.337 correlation between per-pupil spending and measured outcome was reported
+      without saying which outcome, inviting it to be read as what Ohio's spending achieves.
+    now: |
+      Holding disadvantage constant, per-pupil spending correlates −0.125 with attainment
+      **level** and **+0.146** with **growth**. [verified] The negative sign belongs to the
+      level measure, not to spending.
+    found_by: |
+      Running the same model against Ohio's growth measure rather than only against the
+      Performance Index.
+    reach: |
+      Quoting −0.337 as what Ohio's spending achieves is the same category of error this node
+      exists to correct, one step further along.
 properties:
   name: Expenditure per equivalent pupil
   unit: dollars-per-pupil

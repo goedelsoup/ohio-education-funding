@@ -1,5 +1,9 @@
 class: formula-component
 label: FSFP Base Cost Calculation
+summary: >-
+  The component that answers DeRolph's central charge. Base cost is assembled for each district
+  from statutory staffing ratios applied to its own enrollment and priced at statewide average
+  salaries — twenty-two elements yielding a figure unique to every district.
 description: |
   The component that answers *DeRolph*'s central charge. Instead of a statewide per-pupil
   figure set in the budget, base cost is assembled for each district from statutory staffing

@@ -1,5 +1,9 @@
 class: formula-component
 label: FSFP Performance Supplement
+summary: >-
+  The only place Ohio's funding formula pays on a measured outcome — $13 a pupil times a
+  district's star rating, $55.7 million to 427 districts. It sits outside foundation funding,
+  and therefore outside the guarantee's protection.
 description: |
   **The only place Ohio's school funding formula pays on a measured outcome.** $55.7m to 427
   districts, line `[O]`, outside `[H] Foundation Funding` and therefore outside the
@@ -18,7 +22,9 @@ description: |
   The two progress routes exist to blunt the obvious objection to outcome-based funding — that it
   pays for intake. They carry a fifth of the recipients. [verified]
 
-  **AND IT IS DISTRIBUTED INVERSELY TO NEED.** By economically disadvantaged quintile, the mean
+  ### It is distributed inversely to need
+
+  By economically disadvantaged quintile, the mean
   supplement per pupil runs **$54.74, $43.24, $36.21, $30.03, $23.31** from least-poor to poorest,
   monotonically, and the share of districts qualifying runs **91% to 49%**. The least-poor
   districts receive **2.3 times per pupil** what the poorest do. [verified —
@@ -32,7 +38,9 @@ description: |
   The progress routes are what hold the gradient to 2.3 rather than whatever it would otherwise be.
   [inference on the mechanism, [verified] on the measurement]
 
-  **ANSWERED: THE GRADIENT IS REAL AND THE SIZE IS NOT.** This node asked whether the supplement
+  ### The gradient is real and the size is not
+
+  This node asked whether the supplement
   is large enough to matter distributionally. Both halves of the answer are needed and they point
   opposite ways.
 
@@ -47,7 +55,10 @@ description: |
   numbers is quoted alone. The reason to keep watching it is that the gradient is a property of
   the design and the size is a property of one appropriation.
 
-  ~~**STILL OPEN.** Whether the supplement is large enough to matter distributionally.~~ $55.7m against
+  ~~
+  ### Still open
+
+  Whether the supplement is large enough to matter distributionally.~~ $55.7m against
   $7.28bn of state aid is 0.8%, so a district's whole supplement is smaller than the noise in most
   other lines — and a regressive 0.8% inside a progressive $7.28bn is a different object from a
   regressive program. The corpus can measure the gradient and has not measured whether it moves

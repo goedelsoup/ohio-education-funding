@@ -12,6 +12,9 @@
   before pricing any ESA proposal. The model keeps the student in the resident district's
   enrollment while subtracting the award, and a funding model that missed that clause would
   misstate both the numerator and the denominator.
+- **What has this node been wrong about?** Read `revisions:`. Each entry carries the claim as
+  it stood, what replaced it, and the test or source that settled it — so a withdrawn figure can be
+  recognised rather than re-derived, and `found_by` gives the check to re-run.
 
 ## Writing a node
 

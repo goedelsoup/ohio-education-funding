@@ -1,5 +1,9 @@
 class: doctrine
 label: Equity
+summary: >-
+  The principle that a student's resources should not depend on the wealth of the district they
+  happen to live in — a relative standard, measured by dispersion across districts. The older
+  of Ohio's two litigated doctrines, and the one that lost first.
 description: |
   The principle that a student's educational resources should not depend on the wealth of the
   district they happen to live in — a relative standard, measured by dispersion across agencies
@@ -13,8 +17,35 @@ description: |
   reduction factors made a district's revenue depend on its levy history and its voters rather
   than on any statewide standard. [inference]
 
-  Equity is the doctrine most readily made computable, and it has now been computed. Across all
-  606 traditional districts in FY2024 [verified — see
+  ### Resources and compensation are measured in opposite directions
+
+  A rule this doctrine needs before any of its statistics can be read, and the one most easily got
+  backwards. For **spending**, less dispersion is more equitable — that is the assumption behind
+  a coefficient of variation or a federal range ratio. For **state aid**, the sign flips. Aid is
+  compensatory, so a wide spread means strong targeting and a narrow one means weak targeting.
+
+  Any dispersion statistic in this domain therefore has to state whether its subject is a resource
+  a district enjoys or an offset it receives, because the direction of "better" is not the same.
+  [inference] The same coefficient supports opposite readings depending on which it is, and the
+  [guarantee](../formula-component/temporary-transitional-aid-guarantee.yml) is the case where the
+  difference is largest.
+
+  ### It trades against adequacy
+
+  Perfect equity is achievable by leveling down — every district equally underfunded satisfies
+  equity and fails adequacy. [inference] Ohio has never proposed leveling down, but the tension
+  shows up in a milder form every time a reform raises the floor without touching the ceiling:
+  adequacy improves, dispersion may not.
+
+  ### What no correlation will settle
+
+  Whether Ohio's compensation is aimed *hard enough* is not a question a coefficient answers. It
+  is the [adequacy](adequacy.yml) question, and it needs a standard rather than an association.
+  [inference]
+findings: |
+  ### Dispersion, FY2024
+
+  Across all 606 traditional districts [verified — see
   [`crates/dispersion`](../../../crates/dispersion/tests/cupp_fy24.rs)]:
 
   - Operating expenditure per pupil: median $15,646, coefficient of variation **0.202**,
@@ -23,10 +54,11 @@ description: |
   - The distribution is right-skewed — the top half runs further above the median than the
     bottom half runs below it — so any mean-based summary overstates the typical district.
 
-  **The wealth-neutrality result is more interesting than the dispersion.** State revenue per
-  pupil correlates with assessed valuation per pupil at **−0.549**: aid does fall as property
-  wealth rises, so equalisation is real, but property wealth explains only about 30% of the
-  variation in state aid. [verified]
+  ### Wealth neutrality, which is more interesting than the dispersion
+
+  State revenue per pupil correlates with assessed valuation per pupil at **−0.549**: aid does
+  fall as property wealth rises, so equalisation is real, but property wealth explains only about
+  30% of the variation in state aid. [verified]
 
   Meanwhile state revenue per pupil correlates with the economically disadvantaged share at
   **+0.630** — more tightly than with property wealth. [verified] Ohio's formula targets
@@ -38,26 +70,28 @@ description: |
   Local revenue per pupil, by contrast, tracks valuation per pupil at above +0.7. [verified]
   That is the disparity the state formula exists to offset, visible in isolation.
 
-  **One reason the wealth relationship is not stronger has now been identified.** The
-  [temporary transitional aid guarantee](../formula-component/temporary-transitional-aid-guarantee.yml)
-  holds 48.3% of districts above what the formula computes for them, and its incidence rises
-  monotonically with property wealth — 13% of the poorest quartile against 76% of the
-  wealthiest. [verified] The local capacity measure reduces state aid to wealthy districts by
-  design; the guarantee then restores it. The two mechanisms work against each other, and the
-  −0.549 correlation is the net of them rather than a measurement of what the formula alone
-  does. [inference]
+  ### One reason the wealth relationship is not stronger
 
-  **That run has now been done.** State aid against valuation per pupil correlates at −0.662 on
-  formula alone and −0.605 as realized, so the guarantee gives up about 9% of the formula's
-  equalization. [verified] But the level effect is far larger than the correlation: median
-  guarantee uplift is $0 for the two poorest quartiles and $1,154 per pupil for the wealthiest,
-  which more than doubles what the formula gives that quartile. A component can leave the
-  ranking nearly intact while moving a great deal of money. [inference]
+  The [temporary transitional aid
+  guarantee](../formula-component/temporary-transitional-aid-guarantee.yml) holds 48.3% of
+  districts above what the formula computes for them, and its incidence rises monotonically with
+  property wealth — 13% of the poorest quartile against 76% of the wealthiest. [verified] The
+  local capacity measure reduces state aid to wealthy districts by design; the guarantee then
+  restores it. The two mechanisms work against each other, and the −0.549 correlation is the net
+  of them rather than a measurement of what the formula alone does. [inference]
 
-  **HOW MUCH OF THE LOCAL GAP EACH LEVEL OF GOVERNMENT CLOSES, IN DOLLARS.** Everything above is
-  a correlation, which says whether targeting exists and not how much of the disparity it removes.
-  Quartiling the 611 comparable Ohio districts by local revenue per pupil in FY2022 and reading
-  the other two levels against it: [verified —
+  Run separately: state aid against valuation per pupil correlates at −0.662 on formula alone and
+  −0.605 as realized, so the guarantee gives up about 9% of the formula's equalization. [verified]
+  But the level effect is far larger than the correlation: median guarantee uplift is $0 for the
+  two poorest quartiles and $1,154 per pupil for the wealthiest, which more than doubles what the
+  formula gives that quartile. A component can leave the ranking nearly intact while moving a
+  great deal of money. [inference]
+
+  ### How much of the local gap each level of government closes, in dollars
+
+  Everything above is a correlation, which says whether targeting exists and not how much of the
+  disparity it removes. Quartiling the 611 comparable Ohio districts by local revenue per pupil in
+  FY2022 and reading the other two levels against it: [verified —
   `dispersion::national_peers::ohio_by_local_wealth`, pinned by test]
 
       quartile   local/pupil   state/pupil   federal/pupil
@@ -71,11 +105,10 @@ description: |
   of the gap survives both.** [verified]
 
   Two things follow that the correlations did not give. Federal money in Ohio is compensatory,
-  monotonically across all four quartiles, which the corpus had never checked and could have
-  assumed either way — Title I runs on a poverty count and IDEA Part B does not, so the aggregate
-  behaviour was not derivable from the parts. And the state's contribution is not close to full
-  equalization on any reading: nearly half of what the local base opens, the state closes, and
-  the rest stands.
+  monotonically across all four quartiles, which could have been assumed either way — Title I runs
+  on a poverty count and IDEA Part B does not, so the aggregate behaviour was not derivable from
+  the parts. And the state's contribution is not close to full equalization on any reading: nearly
+  half of what the local base opens, the state closes, and the rest stands.
 
   **The year flatters both numbers.** FY2022 is the peak of
   [ESSER](../revenue-stream/esser.yml), so the federal offset here is the largest that will ever
@@ -83,20 +116,20 @@ description: |
   local shares are both deflated by the inflated federal one. The honest reading is that this
   table is an upper bound on how equalized Ohio is, not an estimate of it. [inference]
 
-  **AND THE LEVEL THE STATE EQUALIZES FROM HAS BEEN FALLING FOR A DECADE.** The quartile table is
-  one year. Across the ten years the survey covers, the state's share of Ohio school revenue falls
-  in nine of them — 41.9% in FY2012 to 34.3% in FY2022, or three points between the two federally
-  ordinary years FY2013 and FY2019 — while the local share rises. [verified —
-  `dispersion::ohio_panel`, pinned by test; the full series is on
+  ### And the level the state equalizes from has been falling for a decade
+
+  The quartile table is one year. Across the ten years the survey covers, the state's share of
+  Ohio school revenue falls in nine of them — 41.9% in FY2012 to 34.3% in FY2022, or three points
+  between the two federally ordinary years FY2013 and FY2019 — while the local share rises.
+  [verified — `dispersion::ohio_panel`, pinned by test; the full series is on
   [DeRolph I](../litigation/derolph-i-1997.yml)]
 
   That bears on equity in a way the correlations cannot show. Targeting is a property of how a
   fixed pot is distributed; this is the pot.
 
-  **AND THE DISTRIBUTIONAL MEASURE HAS NOW BEEN RUN ACROSS THE DECADE. THE RATE HOLDS AND THE GAP
-  GROWS.** This node carried that as an open question — computable from the same panel and not
-  computed. It is computed. [verified — `dispersion::ohio_panel::equalization_by_year`, pinned by
-  test]
+  ### The rate holds and the gap grows
+
+  [verified — `dispersion::ohio_panel::equalization_by_year`, pinned by test]
 
       FY      local gap    state closes    federal    residual
       2012       $5,727           42.4%      10.2%      $2,713
@@ -132,55 +165,56 @@ description: |
   ESSER peak, each roughly double the ordinary ~5%. Read the middle years for federal and the
   whole window for state. [verified]
 
-  **AND IT FORCED A CORRECTION TO HOW THIS CLASS MEASURES THINGS.** For *spending*, less
-  dispersion is more equitable — that is the assumption behind the coefficient of variation and
-  the federal range ratio reported above. For *state aid*, the sign flips. Aid is compensatory,
-  so a wide spread means strong targeting and a narrow one means weak targeting.
+  ### The outcome side sharpens the doctrine rather than settling it
 
-  Realized aid is more equal than formula aid: CV 0.544 against 0.677, federal range ratio 9.6
-  against 12.3. [verified] Read with the spending habit, that looks like the system becoming
-  fairer. It is the opposite — the guarantee flattening the compensation. Any dispersion
-  statistic in this corpus must therefore state whether its subject is a resource or a
-  compensation, because the direction of "better" is not the same. [inference]
+  The dominant correlate of measured achievement is not money. The [Performance
+  Index](../metric/performance-index.yml) tracks the economically disadvantaged share at
+  **−0.846** — 71.6% of the cross-district variance. [verified] Against property valuation per
+  pupil it is only +0.321.
 
-  **AND THE OUTCOME SIDE HAS NOW ARRIVED, WHICH SHARPENS THE DOCTRINE RATHER THAN SETTLING IT.**
-  The corpus holds a district outcome measure for the first time, and its dominant correlate is
-  not money. The [Performance Index](../metric/performance-index.yml) tracks the economically
-  disadvantaged share at **−0.846** — 71.6% of the cross-district variance in measured
-  achievement. [verified] Against property valuation per pupil it is only +0.321.
-
-  Read that beside the aid findings above and the picture is coherent. Ohio's formula targets
-  poverty (+0.630) more tightly than property (−0.549), and poverty is what measured achievement
-  mostly tracks. So the compensation is aimed at the right variable. What the corpus cannot say
-  from a single cross-section is whether it is aimed *hard enough*, and no correlation will
-  answer that — it is the adequacy question, and it needs a standard rather than a coefficient.
-  [inference]
+  Read beside the aid findings the picture is coherent. Ohio's formula targets poverty (+0.630)
+  more tightly than property (−0.549), and poverty is what measured achievement mostly tracks. So
+  the compensation is aimed at the right variable. [inference]
 
   One consequence for how equity claims get argued. Spending per headcount pupil correlates with
   the Performance Index at **−0.337** (FY2025) and **−0.388** (FY2024, independent source).
   [verified] Quoted bare, that reads as money failing. It is the compensation showing through:
-  Ohio spends more per pupil where need is greater, and need is what the Index measures. This is
-  the resource-versus-compensation rule again, arriving from a new direction — the same
-  statistic supports opposite readings depending on whether its subject is treated as an input
-  a district enjoys or an offset it receives. [inference]
+  Ohio spends more per pupil where need is greater, and need is what the Index measures. The
+  resource-versus-compensation rule again, arriving from a new direction.
 
-  **A FINDING THAT BELONGS TO THIS DOCTRINE MORE THAN TO ANY METRIC.** In a need-adjusted model
-  over 606 districts — controlling for economic disadvantage, English-learner and disability
-  shares, district size, and per-pupil spending — assessed valuation per pupil predicts
-  attainment level (t = +3.12) and does not predict growth at all (t = +0.06). [verified]
+  ### Wealth predicts level and does not predict growth
+
+  In a need-adjusted model over 606 districts — controlling for economic disadvantage,
+  English-learner and disability shares, district size, and per-pupil spending — assessed
+  valuation per pupil predicts attainment level (t = +3.12) and does not predict growth at all
+  (t = +0.06). [verified]
 
   Property wealth tells you where a district's students are. It does not tell you how far they
   moved. That is a sharper wealth-neutrality result than the aid correlations above, because it
   is about outcomes rather than dollars, and it cuts both ways: the disparity wealth produces is
   real and visible in attainment, and it is not visibly reproducing itself in the rate of
   learning. Whether that is the funding system compensating, or a growth measure normed in a way
-  that removes level differences by construction, this corpus cannot say from one cross-section.
-  [open]
-
-  It trades against adequacy in a specific way. Perfect equity is achievable by leveling down —
-  every district equally underfunded satisfies equity and fails adequacy. [inference] Ohio has
-  never proposed leveling down, but the tension shows up in a milder form every time a reform
-  raises the floor without touching the ceiling: adequacy improves, dispersion may not.
+  that removes level differences by construction, cannot be told from one cross-section. [open]
+revisions:
+  - was: |
+      Dispersion statistics were reported for spending and for state aid on the same convention:
+      a lower coefficient of variation, or a narrower federal range ratio, read as more equitable
+      in both cases.
+    now: |
+      The sign flips between them. Spending is a resource a district enjoys, so less dispersion is
+      more equitable; state aid is compensation it receives, so a *wider* spread means stronger
+      targeting. The rule is now stated in the description, ahead of any statistic that depends on
+      it.
+    found_by: |
+      Realized aid measured against formula aid — CV 0.544 against 0.677, federal range ratio 9.6
+      against 12.3 — which reads as the system becoming fairer on the spending convention and is
+      the [guarantee](../formula-component/temporary-transitional-aid-guarantee.yml) flattening the
+      compensation.
+    reach: |
+      No figure changed; the reading of two of them did. The dispersion statistics for operating
+      expenditure above are unaffected, because spending was always the case the convention was
+      right for. What would have been wrong is any claim that Ohio's aid had grown more equitable
+      because its distribution had narrowed.
 properties:
   name: Equity
   origin: |

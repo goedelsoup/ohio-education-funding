@@ -1,5 +1,9 @@
 class: metric
 label: Performance Index
+summary: >-
+  A district's tested students distributed across Ohio's achievement levels, weighted so that
+  higher levels count for more and collapsed into one continuous score. Every other metric here
+  counts an input; this one counts a result.
 description: |
   The corpus's first outcome measure. Every other metric here counts an input — what a district
   was given, what it could raise, what it spent. This one counts a result: the distribution of a
@@ -22,7 +26,9 @@ description: |
   correlated, and quintiled. Any Ohio claim about relative district performance that quotes
   stars is answering a coarser question than it appears to. [verified]
 
-  **THE DOMINANT FACT ABOUT THIS MEASURE IS POVERTY.** Across the 606 districts where both are
+  ### The dominant fact about this measure is poverty
+
+  Across the 606 districts where both are
   held, the Performance Index correlates with the economically disadvantaged share at
   **−0.846**, which is 71.6% of the cross-district variance in the Index. [verified — computed;
   see [`crates/dispersion/tests/report_card_2425.rs`](../../../crates/dispersion/tests/report_card_2425.rs)]
@@ -37,7 +43,9 @@ description: |
   it now has been, and the hypothesis is largely right: about seven-tenths of the association was
   poverty.
 
-  **AND THE MEASURE OF POVERTY MATTERS AS MUCH AS THE FACT OF IT.** Ohio publishes two
+  ### The measure of poverty matters as much as the fact of it
+
+  Ohio publishes two
   economic-disadvantage shares and they are not the same variable. The report card's own
   2024-25 share is top-coded by community eligibility — where a district qualifies for universal
   free meals every student is counted disadvantaged — so 87 districts sit at exactly 100% against
@@ -73,7 +81,9 @@ description: |
   they score.** [verified] A near-zero coefficient between a wide distribution and a narrow one
   is a weaker statement than it sounds.
 
-  **IT BARELY MOVES, AND THAT CUTS BOTH WAYS.** Three school years are held. Adjacent years
+  ### It barely moves, and that cuts both ways
+
+  Three school years are held. Adjacent years
   correlate at **+0.988** and **+0.989**, 2022-23 against 2024-25 at **+0.981**, and the median
   district's three-year range is **2.1 points** against a cross-district standard deviation of
   10.9. [verified] So a single-year cross-section is a fair stand-in for a district's Index, and
@@ -81,7 +91,9 @@ description: |
   cannot detect anything that changes annually — including what a district spends. Over this
   window the Index is closer to a fixed district attribute than to an annual result. [inference]
 
-  **LAGGING THE SPENDING DOES NOT HELP, AND THE DIRECTION IS THE POINT.** FY2024 per-pupil
+  ### Lagging the spending does not help, and the direction is the point
+
+  FY2024 per-pupil
   spending covers the 2023-24 school year. Against the Index for the year before it, the same
   year, and the year after: [verified]
 
@@ -94,7 +106,9 @@ description: |
   itself — "test lagged and cumulative spending measures rather than same-year expenditure." It
   does not rescue the analysis; it closes it off. Nothing propagates forward here. [inference]
 
-  **AND A SECOND OUTCOME MEASURE NOW SITS BESIDE THIS ONE, DISAGREEING.** Against
+  ### A second outcome measure sits beside this one, disagreeing
+
+  Against
   [Progress (value-added)](progress-value-added.yml), the same spending variable carries the
   opposite sign. In a need-adjusted model controlling for economic disadvantage, English-learner
   and disability shares, log enrollment, and valuation per pupil, the standardised spending

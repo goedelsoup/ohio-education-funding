@@ -10,6 +10,9 @@
 - **Publication provenance.** Given a numeric claim, resolve which actor published the
   underlying series and whether an alternative actor publishes a competing figure for the
   same quantity.
+- **What has this node been wrong about?** Read `revisions:`. Each entry carries the claim as
+  it stood, what replaced it, and the test or source that settled it — so a withdrawn figure can be
+  recognised rather than re-derived, and `found_by` gives the check to re-run.
 
 ## Transitions
 

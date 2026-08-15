@@ -11,6 +11,9 @@
 - **Was it ever funded as designed?** Compare the computed formula amount against the
   appropriated amount for each fiscal period the regime was in force. For three of the five
   regimes here the answer is no, and the gap is the number that matters.
+- **What has this node been wrong about?** Read `revisions:`. Each entry carries the claim as
+  it stood, what replaced it, and the test or source that settled it — so a withdrawn figure can be
+  recognised rather than re-derived, and `found_by` gives the check to re-run.
 
 ## Transitions
 

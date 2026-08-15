@@ -35,7 +35,7 @@ Sorted by: type, then slug.
 | [`dew-academic-distress-commission`](dew-academic-distress-commission.md) | Academic Distress Commission — the department's commission page | 3 |
 | [`dew-expenditure-expanded-list`](dew-expenditure-expanded-list.md) | FY2025 Expenditure Expanded List | 1 |
 | [`dew-five-year-forecast`](dew-five-year-forecast.md) | Five-year forecast filings — the department's republished submissions | 3 |
-| [`dew-fy27-funding-calculator`](dew-fy27-funding-calculator.md) | FY27 TRAD State Foundation Funding Calculator | 15 |
+| [`dew-fy27-funding-calculator`](dew-fy27-funding-calculator.md) | FY27 TRAD State Foundation Funding Calculator | 17 |
 | [`dew-mr81-enrollment-archive`](dew-mr81-enrollment-archive.md) | MR-81 free and reduced-price lunch reports, 1998–2014 | 1 |
 | [`dew-october-enrollment`](dew-october-enrollment.md) | October headcount by grade | 2 |
 | [`dew-report-card-achievement`](dew-report-card-achievement.md) | Ohio School Report Cards — District Achievement Download | 4 |

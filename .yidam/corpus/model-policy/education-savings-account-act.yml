@@ -1,5 +1,9 @@
 class: model-policy
 label: Education Savings Account Act
+summary: >-
+  ALEC's template education savings account statute, adopted in 2017 as the successor design to
+  the voucher model: money goes to an account a parent spends across a list of approved uses
+  rather than to a school as tuition. Not law in Ohio.
 description: |
   ALEC's template education savings account statute, adopted July 20, 2017 and amended
   September 9, 2017 by its Education and Workforce Development Task Force. The successor design to

@@ -10,6 +10,9 @@
   partly on components this corpus cannot inspect.
 - **Consequence ladder.** Follow to `intervention` for what identification leads to, and read
   `fiscal_effect` there rather than inferring it from the regime.
+- **What has this node been wrong about?** Read `revisions:`. Each entry carries the claim as
+  it stood, what replaced it, and the test or source that settled it — so a withdrawn figure can be
+  recognised rather than re-derived, and `found_by` gives the check to re-run.
 
 ## Writing a node
 

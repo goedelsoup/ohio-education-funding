@@ -1,17 +1,24 @@
 class: formula-component
 label: FSFP Preschool Special Education
+summary: >-
+  $148 million, and the one component that combines a flat grant with a weight. The flat $4,000
+  per pupil is 69% of the program, and a district's wealth does not touch that part of it.
 description: |
   **$148m**, line `[P]`, and the one component that combines a flat grant with a weight. Each
   category pays `(ADM x $4,000) + (ADM x weight x average base cost x state share x 0.5)`, all of
   it prorated. [verified]
 
-  **THE FLAT $4,000 IS 69% OF THE PROGRAM AND THE STATE SHARE DOES NOT TOUCH IT.** Only the
+  ### The flat $4,000 is 69% of the program, and the state share does not touch it
+
+  Only the
   weighted half is reduced by a district's wealth. So this is the one component in Ohio's school
   funding where the wealthiest district and the poorest are funded **identically** for most of what
   they receive. Whether that is deliberate levelling or an artefact of bolting a flat grant onto a
   weighted formula is not established. [open]
 
-  **THE SAME SIX WEIGHTS BEHAVE COMPLETELY DIFFERENTLY HERE.** [School-age special
+  ### The same six weights behave completely differently here
+
+  [School-age special
   education](fsfp-special-education-weights.yml) is steeply top-heavy: Category 6 is 15% of the
   pupils and 48% of the money. Halved and sitting on a flat $4,000, the identical weight vector
   produces near parity — 5,761 Category 6 pupils draw $52.9m against 10,842 Category 2 pupils
@@ -21,7 +28,9 @@ description: |
   parameters. A table of Ohio's special education weights describes neither program, because what
   the weights do depends entirely on what sits beside them. [inference]
 
-  **AND ITS PRORATION HAS STOPPED FITTING.** This sheet carries its **appropriation limit** — 
+  ### Its proration has stopped fitting
+
+  This sheet carries its **appropriation limit** — 
   $147,500,000 — in a cell beside the factor, which is the only place in the calculator that shows
   a proration's two halves at once. At the stated 0.96854448 the program totals **$148,408,184**,
   $908,184 over. A third cell states $146,708,228.07, matching neither. See [appropriation

@@ -1,5 +1,9 @@
 class: revenue-stream
 label: Local Property Tax
+summary: >-
+  The tax a school district levies on property within its territory, and the oldest stream
+  here. Its defining Ohio characteristic is that it does not grow: reduction factors hold an
+  existing levy to roughly the dollars it first raised.
 description: |
   The tax levied by a school district on property within its territory, historically covering
   both real property and — until the [H.B. 66](../legislation/hb-66-2005.yml) phase-out —

@@ -1,5 +1,9 @@
 class: formula-component
 label: Charge-Off Local Share
+summary: >-
+  How Ohio decided, for roughly three decades, what share of a district's cost the district
+  should bear: a statutory millage rate times assessed valuation, subtracted from computed
+  cost. Its defect is treating that millage as revenue a district can actually raise.
 description: |
   The mechanism by which Ohio decided, for roughly three decades, how much of a district's
   cost the district itself should bear. It multiplies a statutory millage rate by the
@@ -19,7 +23,9 @@ description: |
   accordingly. Replacing that assumption is the specific thing
   [`fsfp-local-capacity-measure`](fsfp-local-capacity-measure.yml) was built to do.
 
-  **THE BLINDNESS IS NOW MEASURED, AND IT RUNS BOTH WAYS.** [verified —
+  ### The blindness, measured, running both ways
+
+  [verified —
   [`crates/regime-diff`](../../../crates/regime-diff/), holding the Fair School Funding Plan's
   own FY2027 base cost fixed and substituting only the local share mechanism]
 
@@ -43,7 +49,9 @@ description: |
   districts do better under local capacity and 193 would have done better under the
   charge-off.** [verified]
 
-  **AND THE CHARGE-OFF HAD NO FLOOR.** A minimum state share is a Fair School Funding Plan
+  ### And the charge-off had no floor
+
+  A minimum state share is a Fair School Funding Plan
   invention; the charge-off simply truncated at zero. **81 of 606 districts** would have a
   23-mill charge-off exceeding their entire FY2027 computed base cost and would receive no base
   cost aid at all. Ohio's answer at the time was the charge-off supplement — gap aid — which

@@ -1,5 +1,9 @@
 class: fiscal-period
 label: Fiscal Year 2022
+summary: >-
+  The first year of the Fair School Funding Plan, and the best-documented fiscal year in this
+  domain: the department's line-by-line explanation specifies the whole formula with its
+  statewide factor values attached.
 description: |
   July 1, 2021 through June 30, 2022 — the first year of the
   [Fair School Funding Plan](../funding-regime/fair-school-funding-plan.yml), and the

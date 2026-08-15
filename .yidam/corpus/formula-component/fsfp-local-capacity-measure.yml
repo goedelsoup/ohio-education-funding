@@ -1,5 +1,9 @@
 class: formula-component
 label: FSFP Local Capacity Measure
+summary: >-
+  The plan's replacement for the charge-off, and the component that most changes which
+  districts win and lose. It asks what a community can bear rather than what a fixed millage
+  would raise: 60% valuation, 20% adjusted gross income, 20% median income.
 description: |
   The Fair School Funding Plan's replacement for the charge-off, and the component that most
   changes which districts win and lose. Rather than asking what a fixed millage would raise
@@ -45,7 +49,9 @@ description: |
   from published aid by subtraction: all that can be said is that it exceeds 90% of base cost.
   [verified]
 
-  **THE 40TH-HIGHEST BENCHMARK IS NOT A DISCRETIONARY NUMBER, AND THIS NODE CALLED IT ONE.** It
+  ### The benchmark is a rank, not a value
+
+  It
   recorded the benchmark as "a single discretionary number that sets the top of the entire scale"
   and asked how it moves over time. R.C. 3317.017(A)(4)(c)–(d) settles both halves, and the
   answer changes the question: the statute writes a **rank**, not a value. Districts are ranked by
@@ -63,7 +69,9 @@ description: |
   moved between biennia is still unmeasured here, because the corpus holds one year of the
   calculator — but it is now a question about a distribution rather than about a decision. [open]
 
-  **THE VALUATION THE MEASURE USES IS THE LESSER OF TWO, AND THE RULE IS ONE-SIDED.** R.C.
+  ### The valuation is the lesser of two, and the rule is one-sided
+
+  R.C.
   3317.017(A)(1)(a) takes the minimum of a district's three-year average valuation and its most
   recent taxable value; the income side takes the same shape. Under rising valuations the average
   is lower, so the district is charged on a lagged figure; under falling valuations the recent
@@ -82,7 +90,9 @@ description: |
   aid all at once, and two different implementations. A reader told only that the plan "uses a
   three-year average" would not see that it is the successor to something. [verified]
 
-  **AGAINST THE MECHANISM IT REPLACED.** [verified —
+  ### Against the mechanism it replaced
+
+  [verified —
   [`crates/regime-diff`](../../../crates/regime-diff/), the corpus's only aligned component
   pair, run at FY2027 base cost with only the local share substituted]
 
@@ -111,7 +121,8 @@ description: |
   the first is about the ordering and the second about the level — but a claim that cites one
   without the other is quoting half the result. [inference]
 
-  **THE MEASURE IS PUBLISHED, AND THIS CORPUS SPENT ELEVEN PHASES RECOVERING IT BY SUBTRACTION.**
+  ### The measure is published per district
+
   The FY2027 calculator's `Detail_SFPR` sheet carries `[b1] Per Pupil Capacity Amount` for every
   district. Nothing here read that sheet. The corpus instead derived capacity as base cost minus
   the state's share of it, which is exact for 471 districts and impossible for the 138 where the
@@ -130,8 +141,9 @@ description: |
   district. Every argument the measure takes is in a cached file, and has been since the first
   import. [verified]
 
-  **AND THE CALCULATOR REPRODUCES THE DEPARTMENT'S FIGURE EXACTLY — 609 OF 609 DISTRICTS, TO
-  WITHIN A HUNDREDTH OF A PERCENT, ON BOTH THE CAPACITY AND THE RATE.** [verified —
+  ### The calculator reproduces the department's figure exactly
+
+  [verified —
   `crates/local-capacity/tests/against_the_departments_own_capacity.rs`] `crates/local-capacity`
   was written from the statute and had never been run against anything. It is right.
 
@@ -158,6 +170,35 @@ description: |
   because the two measures are correlated — and it is the wrong measure. The term is federal
   median income with the department's adjustment factor, exactly as the crate always said, and
   the earlier claim was marked verified on evidence that could not support it. [verified]
+revisions:
+  - was: |
+      The 40th-highest benchmark was recorded as "a single discretionary number that sets the
+      top of the entire scale", with how it moves over time left open.
+    now: |
+      The statute writes a **rank**, not a value. Districts are ranked by the ratio of their
+      federal median income to the statewide median, and the district with the **fortieth
+      highest ratio** is the point at which the capacity percentage caps at 0.025. Both halves
+      of the open question are settled by the text.
+    found_by: |
+      R.C. 3317.017(A)(4)(c)–(d).
+    reach: |
+      Changes what the parameter *is* rather than what it equals. A rank moves whenever the
+      income distribution moves, with nobody deciding — which puts it in a different kind from
+      the discretionary number it was recorded as.
+  - was: |
+      Capacity was derived as base cost minus the state's share of it, because no published
+      per-district figure was thought to exist.
+    now: |
+      The FY2027 calculator's `Detail_SFPR` sheet carries `[b1] Per Pupil Capacity Amount` for
+      every district, and always did. Nothing here had read that sheet.
+    found_by: |
+      The `Detail_SFPR` sheet of the department's own FY2027 workbook.
+    reach: |
+      The subtraction is exact for 471 districts and **impossible** for the 138 where the
+      minimum state share binds — precisely the districts where capacity is highest and the
+      subtraction understates it. Those were censored rather than reported wrong, so no
+      published figure was incorrect; 138 districts simply had no capacity figure for eleven
+      phases.
 properties:
   name: FSFP local capacity measure
   function: |

@@ -1,5 +1,9 @@
 class: actor
 label: Ohio General Assembly
+summary: >-
+  Ohio's bicameral legislature, and the body Article VI, Section 2 addresses directly: the duty
+  to secure a thorough and efficient system falls on it rather than on the department or the
+  districts. Every funding regime here is an act of this body.
 description: |
   Ohio's bicameral legislature — 99 House members and 33 Senators — and the body Article VI,
   Section 2 addresses directly: the constitutional duty to secure a thorough and efficient
@@ -15,7 +19,9 @@ description: |
   re-legislated in each of three consecutive budgets rather than guaranteed by the enactment
   that created it. [inference]
 
-  **THE MEMBER'S OWN UNIT DOES NOT EXIST IN THE FUNDING SYSTEM.** A House member votes on a
+  ### The member's own unit does not exist in the funding system
+
+  A House member votes on a
   formula whose every output is computed per school district, and Ohio publishes no figure for
   what a House district's schools receive — not because it is withheld but because no part of the
   system has ever needed the number. [verified]

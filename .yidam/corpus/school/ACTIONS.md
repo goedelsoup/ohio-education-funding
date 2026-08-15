@@ -10,6 +10,9 @@
   single-year claim about a building cannot speak to either.
 - **Contrast pairs.** Follow `contrasts-with`. A two-building comparison is an illustration and
   never an estimate — say so wherever one is used.
+- **What has this node been wrong about?** Read `revisions:`. Each entry carries the claim as
+  it stood, what replaced it, and the test or source that settled it — so a withdrawn figure can be
+  recognised rather than re-derived, and `found_by` gives the check to re-run.
 
 ## Writing a node
 

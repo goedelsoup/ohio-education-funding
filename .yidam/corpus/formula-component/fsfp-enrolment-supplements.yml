@@ -1,5 +1,9 @@
 class: formula-component
 label: FSFP Base and Enrollment Growth Supplements
+summary: >-
+  Two payments that share a sheet and nothing else — a flat $40 for every pupil in every
+  district with no test of any kind, and a separate supplement for districts whose enrollment
+  is growing.
 description: |
   Two payments that share a sheet and nothing else. Lines `[L]` and `[M]`, both inside `[N] Total
   Formula Funding`. [verified]
@@ -12,7 +16,9 @@ description: |
   **3%** over three years — and it pays on **every** pupil, not on the pupils gained. $39.4m to 43
   districts, against a median district that **shrank 4.8%**. [verified]
 
-  **PAYING ON THE WHOLE ROLL TURNS THE THRESHOLD INTO A CLIFF.** What clearing 3% is worth has
+  ### Paying on the whole roll turns the threshold into a cliff
+
+  What clearing 3% is worth has
   nothing to do with how close a district came: it is $250 times the district's size. New Lexington
   grew **2.9502%** and drew nothing; three hundredths of a percentage point further and it would
   have received **$430,477**. Two other districts sit between 2.7% and 3%. [verified —
@@ -22,7 +28,9 @@ description: |
   work: Ohio's median district is shrinking, so the districts near the threshold are few and their
   neighbours on either side are otherwise alike. [inference]
 
-  **AND IT POINTS THE OPPOSITE WAY TO THE GUARANTEE.** The
+  ### It points the opposite way to the guarantee
+
+  The
   [guarantee](temporary-transitional-aid-guarantee.yml) pays a district whose enrolment has
   **fallen**; this pays one whose enrolment has **risen**. The same formula cushions movement in
   both directions, which means it responds to enrolment change considerably less than its
@@ -35,7 +43,9 @@ description: |
   `crates/project/tests/questions_the_corpus_left_open.rs`] The guarantee comparison below stands — the guarantee tracks aid rather than enrolment, and property wealth predicts it three
   times more strongly than decline does. [verified]
 
-  **STILL OPEN.** Why 3% and why three years. Both are single numbers with a cliff behind them and
+  ### Still open
+
+  Why 3% and why three years. Both are single numbers with a cliff behind them and
   neither is explained in the calculator. [open]
 properties:
   name: Base and enrollment growth supplements

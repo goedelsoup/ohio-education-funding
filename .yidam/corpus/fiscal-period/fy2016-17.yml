@@ -1,5 +1,8 @@
 class: fiscal-period
 label: FY2016-2017 Biennium
+summary: >-
+  A Bridge formula biennium, and the one in which the state's share of school revenue falls
+  below 40% for the first time in the series, at 39.77% in FY2017.
 description: |
   A biennium of the [Bridge formula](../funding-regime/bridge-formula.yml) era, created so that
   the decade of per-district finance this corpus now holds has somewhere in the graph to land.

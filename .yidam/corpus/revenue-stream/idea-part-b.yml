@@ -1,5 +1,9 @@
 class: revenue-stream
 label: IDEA Part B
+summary: >-
+  Federal special education money on a federal formula, routinely conflated with Ohio's six
+  special education weights. The two count different children and are computed differently: a
+  block allocation against a multiplier on a state-defined category.
 description: |
   Federal special education money, on a federal formula, routinely conflated with Ohio's six
   special education weights — and the conflation matters because the two count different children

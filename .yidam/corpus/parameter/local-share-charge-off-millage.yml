@@ -1,5 +1,9 @@
 class: parameter
 label: Local Share Charge-Off Millage
+summary: >-
+  The statutory millage rate the state assumed a district could levy against its own assessed
+  valuation, used to compute its deemed local contribution before state aid. The number that
+  made the charge-off work, and the number that made it wrong.
 description: |
   The statutory millage rate the state assumed a district could levy against its own assessed
   valuation, used to compute the district's deemed local contribution before state aid.
@@ -20,7 +24,9 @@ description: |
   FY1992 through FY2021, and because the historical series is required for any
   [`regime-diff`](../../skills/regime-diff.md) between the two approaches.
 
-  **THE SERIES IS NOW SOURCED.** This node carried "not yet populated" from genesis and warned
+  ### The series, sourced
+
+  This node carried "not yet populated" from genesis and warned
   that the values had to come from statute rather than recollection. They do, and the mechanism
   is less static than "roughly 20 to 23 mills" suggested:
 
@@ -38,7 +44,9 @@ description: |
   operative in FY2008. Carried in
   [`crates/regime-diff`](../../../crates/regime-diff/src/charge_off.rs).]
 
-  **THE RATE STOPPED MOVING BECAUSE A COURT STOPPED IT.** Three changes in six years, then
+  ### The rate stopped moving because a court stopped it
+
+  Three changes in six years, then
   nothing for the remaining life of the mechanism, is a shape that reads as a policy nobody
   revisited. It is not. [DeRolph III](../litigation/derolph-iii-2001.yml) ordered, at ¶62, that
   "in determining future biennial budgets through fiscal year 2007, the rate of millage charged
@@ -54,8 +62,9 @@ description: |
   methodology R.C. 3317.012(D)(4) had provided for. Why the General Assembly never returned to
   it is not established here. [open]
 
-  **THE BASE CHANGED WHILE THE RATE STOOD STILL, AND THIS NODE DESCRIBED THE NEW BASE WRONGLY
-  FOR ITS WHOLE LIFE.** DeRolph I describes the charge-off as *total taxable value* times a
+  ### The base changed while the rate stood still
+
+  DeRolph I describes the charge-off as *total taxable value* times a
   percentage. By FY2008 the Legislative Service Commission describes the same 23 mills applied to
   **recognized valuation**. [verified]
 
@@ -83,7 +92,9 @@ description: |
   tax-history story. Under the real rule they are the ones whose county reappraised recently.
   Those sets are close to unrelated, and the second is an administrative accident.
 
-  **AND IT IS NOW COMPUTED RATHER THAN MISSING.** The recorded blocker said `tax-abstract` was
+  ### Computed rather than missing
+
+  The recorded blocker said `tax-abstract` was
   expected to supply recognized valuation and did not. Both halves of that were beside the point:
   the figure is not published per district by anyone, and it does not need to be. The rule is
   arithmetic, and Ohio's staggered county calendar supplies the identification —
@@ -122,7 +133,9 @@ description: |
   across 145 districts in FY2008**. [verified — LSC] A mechanism requiring a supplement for a
   quarter of the state is the argument for replacing it.
 
-  **THE PHANTOM REVENUE IS NOW COUNTED, AND IT IS NOT A MINORITY CASE.** This node has asserted
+  ### The phantom revenue, counted — and it is not a minority case
+
+  This node has asserted
   since genesis that a district whose effective rate has fallen below the charge-off rate is
   charged for revenue it cannot collect. Table SD-1's TY2024 effective Class I rates make it a
   count: **309 of 609 districts — half the state — charge less than the 23 mills the mechanism
@@ -140,7 +153,9 @@ description: |
   base cost**, leaving them no state aid at all — the charge-off had no minimum state share, which
   is a Fair School Funding Plan invention. [verified]
 
-  **AND THE HEADLINE COMPARISON REVERSED WHEN THE BASE WAS CORRECTED.** This node recorded that
+  ### The comparison against the plan, on the corrected base
+
+  This node recorded that
   "against the counterfactual the median district is $289 per pupil better off under the plan."
   On recognized valuation the median district is **$45 per pupil worse off**, and **316 districts
   would have done better under the charge-off against 290 under the plan** — where the corpus
@@ -162,11 +177,38 @@ description: |
   [verified — LSC] This is the one place the "uniform statewide" description is false, and a
   comparison run over JVSDs at the district rate is wrong by a factor of forty-six.
 
-  **STILL OPEN.** The Evidence-Based Model years and the Bridge formula decade are not
+  ### Still open
+
+  The Evidence-Based Model years and the Bridge formula decade are not
   established. Secondary reporting gives 22 mills for FY2010-11 under the Evidence-Based Model
   and 20 mills applied to total valuation later, and neither is sourced well enough to commit
   here. [open] The corpus deliberately holds three of the four eras rather than a complete
   series with one guessed entry.
+revisions:
+  - was: |
+      The charge-off was described as 23 mills against *total taxable value*, following DeRolph
+      I's own account of it.
+    now: |
+      By FY2008 the same 23 mills were applied to **recognized valuation**, which is a
+      different and smaller base. [verified] The rate never moved; the thing it multiplied did.
+    found_by: |
+      The Legislative Service Commission's description of the charge-off as it operated in
+      FY2008, set against DeRolph I's description of it in 1997.
+    reach: |
+      Everything computed against the old base was computed against the wrong one, including
+      the headline comparison below.
+  - was: |
+      "Against the counterfactual the median district is $289 per pupil better off under the
+      plan", with 193 districts better off under the charge-off against 413 under the plan.
+    now: |
+      On recognized valuation the median district is **$45 per pupil worse off** under the
+      plan, and **316 districts would have done better under the charge-off against 290**. The
+      zeroed count was 81 on the old base.
+    found_by: |
+      Re-running the counterfactual on recognized valuation after the base was corrected.
+    reach: |
+      The sign of the headline result reversed. This is the case for why the base correction
+      above is a claim and not a definitional footnote.
 properties:
   name: Local share charge-off millage
   kind: |

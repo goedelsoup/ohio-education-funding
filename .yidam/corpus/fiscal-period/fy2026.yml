@@ -1,5 +1,8 @@
 class: fiscal-period
 label: Fiscal Year 2026
+summary: >-
+  The first year of the FY2026-27 biennium, and the natural baseline for any current-policy
+  comparison: the first period in which enacted H.B. 96 provisions are in force.
 description: |
   July 1, 2025 through June 30, 2026 — the first year of the
   [FY2026-27 biennium](fy2026-27.yml). [verified]

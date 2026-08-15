@@ -12,6 +12,12 @@
       "type": "string",
       "minLength": 1
     },
+    "summary": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 450,
+      "pattern": "^(?!.*\\]\\()"
+    },
     "description": {
       "type": "string",
       "minLength": 1
@@ -53,11 +59,41 @@
     },
     "findings": {
       "type": "string"
+    },
+    "revisions": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "was": {
+            "type": "string",
+            "minLength": 1
+          },
+          "now": {
+            "type": "string",
+            "minLength": 1
+          },
+          "found_by": {
+            "type": "string",
+            "minLength": 1
+          },
+          "reach": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "was",
+          "now",
+          "found_by"
+        ],
+        "additionalProperties": false
+      }
     }
   },
   "required": [
     "class",
     "label",
+    "summary",
     "description",
     "links"
   ],

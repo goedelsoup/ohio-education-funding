@@ -1,5 +1,9 @@
 class: revenue-stream
 label: State Foundation Aid
+summary: >-
+  The money the state pays education agencies through whatever formula is in force, computed
+  per agency and disbursed across the year. Its defining characteristic mirrors the property
+  tax's: inflation-indifferent by design, and wholly dependent on a biennial appropriation.
 description: |
   The money the state pays education agencies through the funding formula — whatever formula
   is in force — computed per agency and disbursed across the fiscal year in periodic payments.
@@ -53,8 +57,9 @@ description: |
   FY2023 and 6 in FY2025, so each cluster belongs to a nameable act. [verified — the appropriation
   series]
 
-  **THE SAME QUESTION ABOUT DISTRICTS HAS NOW BEEN ANSWERED, AND THE ANSWER IS INSTRUCTIVE ABOUT
-  THIS ONE.** Ohio's *districts* also disappear, and the federal register of them files every
+  ### The same question about districts, answered — and instructive about this one
+
+  Ohio's *districts* also disappear, and the federal register of them files every
   departure as a closure "with no effect on another agency's boundaries" — including the three
   that demonstrably transferred all their territory to a neighbour. What settled those was not the
   register and not any derivation from it, but a single sentence in a state officer's audit of the

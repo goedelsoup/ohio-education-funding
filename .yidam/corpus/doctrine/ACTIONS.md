@@ -11,6 +11,9 @@
 - **Judicial reasoning.** Follow `invoked-by` to the cases that reasoned from a doctrine and
   compare how the same principle was applied to opposite results — *Walter* and *DeRolph I*
   on the same constitutional text.
+- **What has this node been wrong about?** Read `revisions:`. Each entry carries the claim as
+  it stood, what replaced it, and the test or source that settled it — so a withdrawn figure can be
+  recognised rather than re-derived, and `found_by` gives the check to re-run.
 
 ## Transitions
 

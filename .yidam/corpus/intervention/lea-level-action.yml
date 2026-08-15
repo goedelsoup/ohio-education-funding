@@ -1,5 +1,9 @@
 class: intervention
 label: Additional Optional Action (LEA level)
+summary: >-
+  The section of Ohio's ESSA plan that used to read "Not applicable." The April 2026 amendment
+  strikes that and lists six actions the state will take where a district holds many
+  persistently identified schools.
 description: |
   The section that used to say "Not applicable."
 

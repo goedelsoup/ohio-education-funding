@@ -294,6 +294,22 @@ h2 { font-size: .95rem; margin: 0 0 .8rem; letter-spacing: -0.005em; }
 h3 { font-size: .82rem; margin: 1.4rem 0 .6rem; color: var(--text-secondary); font-weight: 600; }
 .sub { color: var(--text-secondary); margin: 0 0 1.5rem; font-size: .92rem; }
 
+/*
+ * A corpus node's lead — what the thing is, in at most 50 words, above everything else.
+ *
+ * Set larger than body copy and above `.sub`, which is the identifier and the edge counts. That
+ * order is the change: the identifier is what a page needs to be addressable and the lead is what
+ * a reader needs to know they are in the right place, and for a long time the second was buried
+ * in a 2,806-word card while the first sat under the heading.
+ */
+.lead {
+  font-size: 1.02rem;
+  line-height: 1.55;
+  color: var(--text-primary);
+  max-width: 62ch;
+  margin: 0 0 .7rem;
+}
+
 .card {
   background: var(--surface-1);
   border: 1px solid var(--border);
@@ -633,6 +649,46 @@ h1.slug-title {
   font-size: .88rem;
 }
 .card.apparatus h2 { font-size: .95rem; color: var(--text-muted); }
+
+/*
+ * What a node used to say, one `<details>` per withdrawal.
+ *
+ * Inside `.apparatus`, so it inherits the dashed, muted treatment that says "this is the corpus
+ * about itself" — but the *withdrawn text* gets the opposite of a quotation's greying, for the
+ * same reason `blockquote.correction` does: it is this repository saying it was wrong.
+ *
+ * Struck through rather than merely tinted. A reader who lands mid-page on an open disclosure has
+ * to be able to tell in one glance which of the two blocks is the live claim, and colour alone
+ * does not survive being read quickly, printed, or seen by someone who does not distinguish the
+ * two hues. The strike is redundant with the "It said" heading on purpose.
+ */
+.card.apparatus .revision + .revision { margin-top: .5rem; }
+.card.apparatus .revision > summary {
+  cursor: pointer;
+  font-weight: 600;
+  color: var(--text-secondary);
+  padding: .3rem 0;
+}
+.card.apparatus .revision > summary:hover { color: var(--text-primary); }
+.card.apparatus .revision-body {
+  border-left: 3px solid var(--series-guarantee);
+  padding: .1rem 0 .1rem .9rem;
+  margin: .4rem 0 .2rem;
+}
+.card.apparatus .revision-body h3 {
+  margin: 1rem 0 .4rem;
+  font-size: .74rem;
+  text-transform: uppercase;
+  letter-spacing: .04em;
+  color: var(--text-muted);
+}
+.card.apparatus .revision-body > *:first-child { margin-top: 0; }
+.card.apparatus .withdrawn { text-decoration: line-through; color: var(--text-muted); }
+/* The strike is for the prose, not for a citation inside it: a struck-through link target is
+   unreadable, and the whole value of `found_by` is that somebody can go and check it. */
+.card.apparatus .withdrawn a,
+.card.apparatus .withdrawn code,
+.card.apparatus .withdrawn .claim { text-decoration: none; }
 
 footer { color: var(--text-muted); font-size: .78rem; margin-top: 1.5rem; }
 footer p { margin: .35rem 0; }

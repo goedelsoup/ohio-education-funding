@@ -1,5 +1,9 @@
 class: scenario
 label: Phasing Out the Temporary Transitional Aid Guarantee
+summary: >-
+  What Ohio's FY2027 model pays if the temporary transitional aid guarantee is removed or wound
+  down. A re-run of the department's own model with one lever moved, at observed enrollment — a
+  simulation, not a forecast.
 description: |
   **RUN.** Reproduce with `cargo run -p project --bin edfund-project -- --guarantee <rule>`.
   Every figure below is a **simulation**, not a forecast: it re-runs the department's own
@@ -13,9 +17,9 @@ description: |
   in **FY2020**: a [Bridge formula](../funding-regime/bridge-formula.yml) year Ohio froze
   rather than computed. [verified — reproduces the department's model to the cent]
 
-  **THE THREE POLICIES ARE NOT VARIANTS OF EACH OTHER.**
+  ### The three policies are not variants of each other
 
-      removal              -$879.0M    294 districts cut, 315 untouched
+  removal              -$879.0M    294 districts cut, 315 untouched
       half phase-out       -$439.5M    294 districts cut, 315 untouched
       rebase to 90%        -$87.9M     294 districts cut, 315 untouched
 
@@ -27,7 +31,9 @@ description: |
   proposal framed as fixing the formula by reforming the guarantee changes nothing for half the
   state.
 
-  **THE LARGEST PER-PUPIL LOSER IS ONE OF OHIO'S POOREST DISTRICTS.** Under a half phase-out,
+  ### The largest per-pupil loser is one of Ohio's poorest districts
+
+  Under a half phase-out,
   East Cleveland City loses **$6,489 per pupil** — more than twice the next district. Its
   guarantee is $13.7 million against $13.3 million of formula aid: **50.7% of everything it
   receives**, $12,978 per pupil, on assessed valuation of $141,623 per pupil against a
@@ -41,7 +47,9 @@ description: |
   of $349,582, well above the state's. East Cleveland is the exception that shows the two
   questions are not the same question. [inference]
 
-  **THE GUARANTEE IS A SHOCK ABSORBER THAT WEARS OUT.** Raising base cost costs the state more
+  ### The guarantee is a shock absorber that wears out
+
+  Raising base cost costs the state more
   per point the higher it goes, because each increment lifts more districts off the guarantee
   and onto a formula that then has to pay them:
 
@@ -56,7 +64,9 @@ description: |
   one **understates the cost**, and the error grows with the size of the proposal — which is
   the direction that matters, since it is the large proposals that get scored this way.
 
-  **AND IT MAKES THE STATE'S COST PREDICTABLE.** This is the projection leg and is reported
+  ### It makes the state's cost predictable
+
+  This is the projection leg and is reported
   apart from everything above. Carrying each district's enrollment forward to **FY2032** by a
   damped trend from its own FY2024-FY2026 history — statewide ADM falls 4.9% — state aid under
   current law is **$7,125M, in a band of $6,889M to $7,379M** (±3.4%). With the guarantee

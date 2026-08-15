@@ -1,5 +1,9 @@
 class: metric
 label: General Fund Cash Balance
+summary: >-
+  What a district holds, as against what it is given or what it spends: the general fund's
+  carry-over and ending balance from its own five-year forecast. The only stock in a corpus
+  otherwise made of flows.
 description: |
   What a district *holds*, as against what it is given or what it spends. The general fund's cash
   balance at 1 July (carry-over) and 30 June (ending balance), from the district's own five-year

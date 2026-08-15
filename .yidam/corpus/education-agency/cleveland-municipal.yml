@@ -1,5 +1,9 @@
 class: education-agency
 label: Cleveland Municipal School District
+summary: >-
+  Ohio's largest urban district for most of the period covered here, and where the state's
+  voucher channel began. Its valuation is large in absolute terms, so a wealth measure built on
+  valuation alone does not classify it as poor.
 description: |
   Ohio's largest urban district by enrollment for most of the period this corpus covers, and
   the district where the state's voucher channel began. [verified]

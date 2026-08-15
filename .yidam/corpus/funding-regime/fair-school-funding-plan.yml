@@ -1,5 +1,9 @@
 class: funding-regime
 label: Fair School Funding Plan
+summary: >-
+  The regime in force, enacted by H.B. 110 in 2021. Three departures from everything before it:
+  base cost computed per district rather than declared statewide, local share measured as
+  capacity rather than millage, and students funded where they are educated.
 description: |
   The regime in force, enacted by [H.B. 110](../legislation/hb-110-2021.yml) in 2021 and
   developed over several years by Representatives Cupp and Patterson with a working group of
