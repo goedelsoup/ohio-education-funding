@@ -187,7 +187,7 @@ function reportFailure(verification: Verification): void {
   if (below) below.innerHTML = "";
   const out = $("#scenario-out");
   if (out) {
-    out.innerHTML = `<div class="card err">
+    out.innerHTML = `<div class="card err" data-part="disabled">
       <h2>The scenario builder is disabled</h2>
       <p>This page re-derives Ohio's funding formula in the browser so a slider does not need a
         round trip, and it checks that derivation against results computed by
@@ -204,7 +204,7 @@ function reportForecastFailure(panel: Panel, verification: Verification): void {
   const out = $("#projection-out");
   if (!out) return;
   if (!panel.projection) {
-    out.innerHTML = `<div class="card">
+    out.innerHTML = `<div class="card" data-part="projection">
       <h2>At projected enrollment</h2>
       <p class="note">This panel carries no projection block, so enrollment cannot be carried
         forward. The simulation above is unaffected — it runs at published enrollment.</p>
@@ -223,7 +223,7 @@ function reportForecastFailure(panel: Panel, verification: Verification): void {
                 .join("; ")}</li>`,
           )
           .join("");
-  out.innerHTML = `<div class="card err">
+  out.innerHTML = `<div class="card err" data-part="projection-disabled">
     <h2>The projection is disabled</h2>
     <p>This page carries its own copy of the enrollment projection so a slider does not need a
       round trip, and checks it against forecasts computed by <code>crates/project</code> before
@@ -328,7 +328,7 @@ fetch(PANEL)
     const message = error instanceof Error ? error.message : String(error);
     const out = $("#scenario-out");
     if (out) {
-      out.innerHTML = `<div class="card err">
+      out.innerHTML = `<div class="card err" data-part="panel-unreachable">
         <p>Could not load <code>${escapeHtml(PANEL)}</code> (${escapeHtml(message)}).</p>
         <p class="note">Every other page on this site carries its figures in the document and is
           unaffected. This one re-runs the formula, so it needs the panel.</p>

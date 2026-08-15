@@ -148,7 +148,7 @@ export function renderProjection(bundle: Panel, levers: Levers): string {
   if (!meta) return "";
   const model = bundle.statewide.minimum_state_share;
   if (levers.horizon <= meta.base_year) {
-    return `<div class="card">
+    return `<div class="card" data-part="projection">
       <h2>At projected enrollment</h2>
       <p class="note">Not projected. Move <em>Project enrollment to</em> past
         FY${meta.base_year} to carry every district's enrolled ADM forward and re-run these
@@ -201,7 +201,7 @@ export function renderProjection(bundle: Panel, levers: Levers): string {
   }));
 
   return `
-    <div class="card">
+    <div class="card" data-part="projection">
       <h2>At projected enrollment</h2>
       <div class="tiles">
         <div class="tile wide"><div class="k">Total state aid, FY${end.fiscalYear}</div>
@@ -268,7 +268,7 @@ export function renderDistrictScenario(bundle: Panel, levers: Levers, irn: strin
   const model = bundle.statewide.minimum_state_share;
   const district = bundle.districts.find((d) => d.irn === irn);
   if (!district) {
-    return `<div class="card err"><p>No district with IRN ${escapeHtml(irn)} is in this feed.</p></div>`;
+    return `<div class="card err" data-part="unknown-district"><p>No district with IRN ${escapeHtml(irn)} is in this feed.</p></div>`;
   }
 
   const outcomes = applyAll(bundle.districts, toPolicy(levers), model);
@@ -289,7 +289,7 @@ export function renderDistrictScenario(bundle: Panel, levers: Levers, irn: strin
   const mine = outcomes.find((o) => o.irn === irn)!;
 
   if (isCurrentLaw(levers, model)) {
-    return `<div class="card">
+    return `<div class="card" data-part="current-law">
       <h2>Current law</h2>
       <p class="note">These are the settings the department's own FY${bundle.fiscal_year} model
         uses, so nothing moves. ${escapeHtml(district.name)} receives
@@ -330,7 +330,7 @@ export function renderDistrictScenario(bundle: Panel, levers: Levers, irn: strin
         }</div></div>
     </div>
 
-    <div class="card">
+    <div class="card" data-part="moved-here">
       <h2>What moved for this district</h2>
       <div class="scroll"><table><tbody>
         <tr><th>Formula aid</th>
@@ -354,7 +354,7 @@ export function renderDistrictScenario(bundle: Panel, levers: Levers, irn: strin
       }</p>
     </div>
 
-    <div class="card">
+    <div class="card" data-part="moved-elsewhere">
       <h2>And to everyone else</h2>
       <div class="scroll"><table><tbody>
         <tr><th>Districts reached</th><td>${t.gainers + t.losers} of ${t.districts}</td></tr>
@@ -403,7 +403,7 @@ export function renderScenario(bundle: Panel, levers: Levers): RenderedScenario 
   const model = bundle.statewide.minimum_state_share;
   if (isCurrentLaw(levers, model)) {
     return {
-      summary: `<div class="card">
+      summary: `<div class="card" data-part="current-law">
       <h2>Current law</h2>
       <p class="note">These are the settings the department's own FY${bundle.fiscal_year} model
         uses, so nothing moves. Total state foundation aid is
@@ -454,7 +454,7 @@ export function renderScenario(bundle: Panel, levers: Levers): RenderedScenario 
     </div>`;
 
   const detail = `
-    <div class="card">
+    <div class="card" data-part="distribution">
       <h2>How the change is distributed</h2>
       ${
         deltas.length > 0
@@ -472,12 +472,12 @@ export function renderScenario(bundle: Panel, levers: Levers): RenderedScenario 
       }
     </div>
 
-    <div class="card">
+    <div class="card" data-part="most-affected">
       <h2>Most affected</h2>
       ${affectedTable(outcomes)}
     </div>
 
-    <div class="card">
+    <div class="card" data-part="moved-underneath">
       <h2>What moved underneath</h2>
       <div class="scroll"><table><tbody>
         <tr><th>On the guarantee</th>
