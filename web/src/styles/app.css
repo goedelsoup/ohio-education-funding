@@ -82,7 +82,7 @@ body {
 }
 
 /* The site chrome. Sticky, because the district sub-navigation below it is how a reader moves
-   between the four views of one district and a long finances table should not strand them. */
+   between the five views of one district and a long finances table should not strand them. */
 header.site {
   position: sticky;
   top: 0;
@@ -192,7 +192,7 @@ header.site nav .menu-panel a { display: block; }
 a { color: var(--series-formula); text-decoration-color: color-mix(in srgb, var(--series-formula) 40%, transparent); }
 a:hover { text-decoration-color: currentColor; }
 
-/* The district sub-navigation: four views of one district. A tab row in appearance, real links
+/* The district sub-navigation: five views of one district. A tab row in appearance, real links
    in fact, because each one is now its own URL. */
 .subnav { display: flex; gap: .4rem; margin: 0 0 1.1rem; flex-wrap: wrap; }
 .subnav a {

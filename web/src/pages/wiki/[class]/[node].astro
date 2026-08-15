@@ -84,9 +84,14 @@ const properties = node.properties.filter((p) => p.name !== "seeded_because");
           {district.on_guarantee ? " held there by the guarantee." : " all of it from the formula."}
         </p>
         <div class="flags">
+          {/* All five, in the order the district sub-navigation puts them. Property tax was
+              omitted here for six phases after it was built — it is the heaviest of the five and
+              the one an exemplar district's page has most reason to reach, since a district is an
+              exemplar in this corpus largely on account of its tax base. */}
           <a class="flag" href={routes.district(district.irn)}>Dashboard</a>
           <a class="flag" href={routes.districtOutcome(district.irn)}>Outcome</a>
           <a class="flag" href={routes.districtFinances(district.irn)}>Finances</a>
+          <a class="flag" href={routes.districtTaxes(district.irn)}>Property tax</a>
           <a class="flag" href={routes.districtScenario(district.irn)}>Scenario</a>
         </div>
       </div>

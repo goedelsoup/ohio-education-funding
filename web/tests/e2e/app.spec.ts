@@ -384,11 +384,16 @@ test.describe("with JavaScript disabled", () => {
 });
 
 test.describe("routes", () => {
-  test("each of a district's four views is its own address", async ({ page }) => {
+  test("each of a district's five views is its own address", async ({ page }) => {
+    // `/taxes` landed after the other four and was left out of this list, so the one nav state
+    // nothing had ever asserted was the heaviest sibling's. The label is read off the rendered
+    // nav rather than hard-coded twice, so a rename fails here rather than passing on a stale
+    // expectation.
     for (const [path, heading] of [
       ["", "Dashboard"],
       ["/outcome", "Outcome"],
       ["/finances", "Finances"],
+      ["/taxes", "Property tax"],
       ["/scenario", "Scenario"],
     ] as const) {
       await page.goto(`/district/${NORTHERN}${path}`);

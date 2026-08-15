@@ -16,10 +16,26 @@
 
 import { expect, test } from "vitest";
 
+import { renderBaseCostBuildUp } from "../../src/lib/basecost.ts";
 import { FROM_CATALOG, FROM_DECISION, loadCorpus, resolveTarget } from "../../src/lib/corpus.ts";
+import {
+  renderAidSource,
+  renderCategoricals,
+  renderDetail,
+  renderHeadline,
+  renderNationalPosition,
+  renderSupplements,
+} from "../../src/lib/district.ts";
 import { loadFeed } from "../../src/lib/feed.ts";
 import { counties } from "../../src/lib/county.ts";
 import * as routes from "../../src/lib/routes.ts";
+import { renderSpendingByFunction } from "../../src/lib/spending.ts";
+import {
+  renderChargeOff,
+  renderDenominators,
+  renderMillage,
+  renderTaxBase,
+} from "../../src/lib/tax.ts";
 
 const corpus = loadCorpus();
 const { bundle } = loadFeed();
@@ -295,7 +311,82 @@ test("the metric routes the district pages link to are real nodes", () => {
   expect(PAGES.has(routes.wikiNode("funding-regime", "fair-school-funding-plan"))).toBe(true);
 });
 
-test("every district in the feed has all four of its views", () => {
+/**
+ * Every corpus link the district pages actually emit, checked by rendering them.
+ *
+ * # Why the hand list above is not enough, and what it cost
+ *
+ * The test above pins four slugs. It is a good test and it checks the wrong set: it enumerates the
+ * links someone remembered to add to it, which is not the same as the links the site emits. The
+ * renderers write `routes.metric(...)` and `routes.wikiNode(...)` inline in template strings, and
+ * a call inside a template string is enumerated by nothing — not by `astro check`, which
+ * type-checks the function and not its argument, and not by the corpus link checker, which reads
+ * `.yidam/` prose and never looks at `src/lib/`.
+ *
+ * So `tax.ts` wrote `routes.parameter("state-share-percentage")` for a node that is a **metric**,
+ * and `/wiki/parameter/state-share-percentage` shipped as a 404 on all 609 property-tax pages —
+ * nine lines from `basecost.ts` linking the identical slug correctly.
+ *
+ * # Why this renders rather than greps
+ *
+ * A regular expression over the source finds the fourteen calls whose slug is a literal and misses
+ * the thirteen `fsfp-*` slugs that reach `routes.wikiNode("formula-component", node)` through a
+ * table — which is the largest single cluster of corpus links on the page and the one a rename is
+ * most likely to break. Calling the renderers and reading their output has no such blind spot: it
+ * checks what a reader is sent, which is the only thing that can 404.
+ *
+ * Two districts, because coverage is data-dependent: a large urban one renders supplement and
+ * clawback rows a small one does not, and the union of the two is what the suite should hold.
+ */
+test("every corpus link the district renderers emit resolves", () => {
+  const districts = bundle.districts;
+  const statewide = bundle.statewide;
+  // Cleveland is the largest and renders the most branches; Kelleys Island is the smallest in the
+  // panel and renders the fewest. Chosen by size rather than by name so the pair keeps meaning
+  // something if the feed changes.
+  const bySize = [...districts].sort((a, b) => b.adm - a.adm);
+  const sample = [bySize[0]!, bySize[bySize.length - 1]!];
+
+  const emitted = new Set<string>();
+  for (const d of sample) {
+    const html = [
+      renderHeadline(d),
+      renderAidSource(bundle, d),
+      renderBaseCostBuildUp(d, statewide.districts),
+      renderCategoricals(d, statewide),
+      renderSupplements(d),
+      renderDetail(d),
+      renderNationalPosition(d),
+      renderTaxBase(d),
+      renderMillage(d, statewide),
+      renderDenominators(d),
+      renderChargeOff(d, statewide),
+      renderSpendingByFunction(d),
+    ].join("\n");
+    for (const match of html.matchAll(/href="(\/wiki\/[^"#?]+)/g)) emitted.add(match[1]!);
+  }
+
+  // Vacuity guard, at the measured number rather than a round one. Fourteen distinct targets, of
+  // which eleven are the `formula-component` slugs that reach the markup through a table — the
+  // cluster a source-reading version of this test cannot see. If a renderer signature changes and
+  // the calls above stop producing markup, the set shrinks and this fails rather than passing on
+  // nothing.
+  expect(
+    emitted.size,
+    "the district renderers emitted fewer corpus links than they used to",
+  ).toBeGreaterThanOrEqual(14);
+
+  const broken = [...emitted].filter((href) => !known(href)).sort();
+  expect(broken, "corpus links the district pages emit that resolve to nothing").toEqual([]);
+
+  // This and the hand-pinned test above are complementary, not redundant. `renderPosition`,
+  // `renderTaxChange` and `renderTaxAgainstSpending` need statewide comparison arguments this test
+  // does not assemble, so their three slugs — assessed valuation per pupil, per-pupil operating
+  // expenditure, the twenty-mill floor — are covered there and not here. Neither test alone
+  // covers the set.
+});
+
+test("every district in the feed has all five of its views", () => {
   // The route table above is generated from the feed, so this checks the thing that route table
   // asserts: that `getStaticPaths` covers the whole panel and not a filtered subset of it.
   expect(PAGES.size).toBeGreaterThanOrEqual(bundle.districts.length * 5);

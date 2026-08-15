@@ -2,8 +2,10 @@
  * The district view: what the formula computes for one district, and what it actually gets.
  *
  * Each card is exported on its own rather than assembled here. The view used to be one function
- * because it was one tab; it is now four routes — the dashboard, the outcome, the finances, and
- * the scenario — and which cards go on which page is a routing decision, made in `src/pages/`.
+ * because it was one tab; it is now five routes — the dashboard, the outcome, the finances, the
+ * property tax and the scenario — and which cards go on which page is a routing decision, made in
+ * `src/pages/`. Property tax landed after the other four and this sentence went on saying four for
+ * six phases, which is why it is worth writing the count down in only one place per file.
  *
  * Every function here is a pure string builder with no DOM behind it, which is what lets Astro
  * call them at build time and put the result in the document.

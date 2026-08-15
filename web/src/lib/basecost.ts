@@ -145,7 +145,7 @@ export function groups(b: BaseCostBuildUp): Group[] {
 }
 
 /** Render the build-up for one district. */
-export function renderBaseCostBuildUp(d: District): string {
+export function renderBaseCostBuildUp(d: District, districts: number): string {
   const b = d.base_cost_build_up;
   const parts = groups(b);
   const aggregate = b.computed_aggregate;
@@ -212,7 +212,7 @@ export function renderBaseCostBuildUp(d: District): string {
         <strong>${residual < 0.005 ? "nothing" : money(residual, 2)}</strong>, which is what
         twenty-two elements each rounded at the point the department rounds them adds up to. The
         reproduction is checked across all
-        ${count(609)} districts before this site is allowed to build.</p>
+        ${count(districts)} districts before this site is allowed to build.</p>
 
       <p class="note">What the state actually pays toward this is the
         <a href="${routes.metric("state-share-percentage")}">state share</a>, not the whole of it:
