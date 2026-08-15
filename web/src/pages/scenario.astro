@@ -15,6 +15,7 @@ import Base from "../layouts/Base.astro";
 import { loadFeed } from "../lib/feed.ts";
 import { count, millions } from "../lib/format.ts";
 import * as routes from "../lib/routes.ts";
+import { yearChip } from "../lib/year.ts";
 
 const { bundle, forecastable } = loadFeed();
 const s = bundle.statewide;
@@ -42,7 +43,7 @@ const meta = bundle.projection;
     because it is a limit on what the reader is about to do and not a footnote on what they got.
   */}
   <div class="card" data-part="held-fixed">
-    <h2>What these levers hold fixed, and one they deliberately do not</h2>
+    <h2>What these levers hold fixed, and one they deliberately do not<Fragment set:html={yearChip("formula")} /></h2>
     <p class="note">
       Ohio's formula contains statewide constants — the average base cost per pupil, the statewide
       poverty share, the median weighted wealth — that are computed once over all districts. The

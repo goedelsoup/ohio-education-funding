@@ -52,6 +52,7 @@ import { escapeHtml, pct } from "./format.ts";
 import { seriesSpec } from "./plot/spec.ts";
 import { renderToString } from "./plot/ssr.ts";
 import type { MealProgramYear } from "./types.ts";
+import { yearChip } from "./year.ts";
 
 /** The years the report is one file, and so the years a single share exists for. */
 export function singleStream(meal: MealProgramYear[]): MealProgramYear[] {
@@ -119,7 +120,7 @@ export function renderMealProgram(meal: MealProgramYear[]): string {
 
   return `
     <div class="card" data-part="meal-program">
-      <h2>What the poverty weight is counted on</h2>
+      <h2>What the poverty weight is counted on${yearChip("meal_program")}</h2>
       <p class="note">Free and reduced-price lunch applications approved, as a share of the
         meal-program enrollment count, across every public sponsor in the Office for Child
         Nutrition's MR-81. It rose from ${pct(first.share!, 1)} in FY${first.fiscal_year} to

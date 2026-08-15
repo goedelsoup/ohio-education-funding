@@ -1,0 +1,139 @@
+/**
+ * What year a figure is on, and the ways that used to be got wrong.
+ *
+ * Every case here is a defect this repository actually had. The feed's provenance paragraph named
+ * every year in the feed and said *"millage is TY2023"* while all 609 districts carried
+ * `tax_year: 2024`; the web layer carried about 190 four-digit year literals, one of them the
+ * report card's school year typed into an Astro `<meta>` description.
+ */
+
+import { expect, test } from "vitest";
+
+import { loadFeed } from "../../src/lib/feed.ts";
+import { GLOSSARY, term } from "../../src/lib/glossary.ts";
+import { seriesYear, yearChip, yearChipPair, yearTitle } from "../../src/lib/year.ts";
+
+test("every series the feed carries names its reckoning as well as its digits", () => {
+  /*
+   * The whole point. A tax year is a calendar year whose revenue reaches the district in the
+   * *following* fiscal year, so `2024` on a millage figure and `FY2024` on a spending figure are
+   * eleven months apart. A consumer given only the digits will subtract them.
+   */
+  const { bundle } = loadFeed();
+  expect(bundle.series_years.length).toBeGreaterThan(0);
+  for (const year of bundle.series_years) {
+    expect(["fiscal", "tax", "school"], year.series).toContain(year.kind);
+    expect(year.label, year.series).not.toBe("");
+    expect(year.source, year.series).not.toBe("");
+  }
+});
+
+test("the millage year is read off the data, not off the provenance paragraph", () => {
+  /*
+   * The defect that motivated the block. The paragraph said TY2023; the column said 2024. A
+   * sentence and a column cannot disagree in a way anything notices, and the sentence is the half
+   * a reader sees.
+   */
+  const { bundle } = loadFeed();
+  const observed = Math.max(
+    ...bundle.districts.flatMap((d) => (d.millage ? [d.millage.tax_year] : [])),
+  );
+  expect(seriesYear("millage")?.label).toBe(String(observed));
+});
+
+test("the provenance paragraph no longer restates a year the index carries", () => {
+  // One place, or the two drift. This is the check that keeps the paragraph from growing them
+  // back the next time someone documents the feed in prose.
+  const { bundle } = loadFeed();
+  expect(bundle.provenance).not.toMatch(/\bTY\d{4}\b/);
+  expect(bundle.provenance).not.toMatch(/\bFY\d{4}\b/);
+});
+
+test("a span of one year is not written as a range", () => {
+  // `FY2025-FY2025` tells a reader there is a span to think about when there is not.
+  for (const year of loadFeed().bundle.series_years) {
+    const [first, last] = year.label.split("-");
+    if (last !== undefined && first !== undefined && last.length === first.length) {
+      expect(first, year.series).not.toBe(last);
+    }
+  }
+});
+
+test("the report card's two reckonings are carried apart", () => {
+  /*
+   * One download, two years: attainment for the 2024-25 school year and operating expenditure for
+   * FY2025. A card showing both under one label is picking one and being wrong about the other
+   * half of its own figures.
+   */
+  expect(seriesYear("outcome.performance")?.kind).toBe("school");
+  expect(seriesYear("outcome.spending")?.kind).toBe("fiscal");
+  expect(seriesYear("outcome.performance")?.label).not.toBe(
+    seriesYear("outcome.spending")?.label,
+  );
+});
+
+test("a chip carries the long form where the short one is ambiguous", () => {
+  const tax = seriesYear("millage")!;
+  expect(yearTitle(tax)).toContain("tax year");
+  expect(yearTitle(tax)).toContain("calendar year");
+  expect(yearTitle(tax)).toContain(tax.source);
+
+  const chip = yearChip("millage");
+  expect(chip).toContain('data-kind="tax"');
+  expect(chip).toContain("title=");
+});
+
+test("a mixed chip names both years and says which is which", () => {
+  // "FY2027 · FY2022" tells a reader there are two years and not which is which.
+  const pair = yearChipPair("outcome.performance", "outcome.spending", "spending");
+  expect(pair).toContain(seriesYear("outcome.performance")!.label);
+  expect(pair).toContain(seriesYear("outcome.spending")!.label);
+  expect(pair).toContain("spending");
+});
+
+test("an absent series renders nothing rather than a placeholder", () => {
+  /*
+   * A missing chip is the honest rendering of "this block is not in the feed". A chip reading
+   * "unknown" beside figures that are present is worse than no chip, because it attaches
+   * uncertainty to the wrong thing.
+   */
+  const { bundle } = loadFeed();
+  const absent = { ...bundle, series_years: [] };
+  expect(seriesYear("millage", absent)).toBeNull();
+});
+
+test("every glossary definition is a distinction, and every link resolves to a node", async () => {
+  /*
+   * A term earns an entry when the everyday reading and the Ohio reading differ. The list is short
+   * on purpose: a page where every third word is underlined has taught the reader to ignore them.
+   */
+  const { loadCorpus } = await import("../../src/lib/corpus.ts");
+  const nodes = new Set(loadCorpus().nodes.map((n) => `/wiki/${n.id}`));
+
+  expect(Object.keys(GLOSSARY).length).toBeGreaterThan(0);
+  const broken: string[] = [];
+  for (const [slug, entry] of Object.entries(GLOSSARY)) {
+    expect(entry.definition.length, slug).toBeGreaterThan(40);
+    if (entry.href && !nodes.has(entry.href)) broken.push(`${slug} -> ${entry.href}`);
+  }
+  expect(broken).toEqual([]);
+});
+
+test("a term renders as a focusable control with its definition in the markup", () => {
+  /*
+   * Three constraints and one shape that satisfies all of them: no script, no hover, and announced
+   * once. A `title` would be read *as well as* the description, so there deliberately is not one.
+   */
+  const html = term("equivalent-pupil", "per equivalent pupil");
+  expect(html).toContain('<button type="button" class="term"');
+  expect(html).toContain('aria-describedby="def-equivalent-pupil"');
+  expect(html).toContain('id="def-equivalent-pupil"');
+  expect(html).toContain("need");
+  expect(html).not.toContain("title=");
+});
+
+test("an unknown term throws rather than silently rendering bare text", () => {
+  // A silent fallback lets a renamed entry strip the definitions off a page with nothing to
+  // notice — the same class of failure as a link that resolves to a plausible 404.
+  expect(() => term("not-a-term", "text")).toThrow(/no glossary entry/);
+});

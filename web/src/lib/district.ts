@@ -22,6 +22,7 @@ import { hasDenominators } from "./tax.ts";
 import * as routes from "./routes.ts";
 import type { Bar } from "./chart.ts";
 import type { Bundle, District, Statewide } from "./types.ts";
+import { yearChip } from "./year.ts";
 
 function strip(
   label: string,
@@ -103,7 +104,7 @@ export function renderEnrollmentYears(
 
   return `
     <div class="card" id="enrollment" data-part="enrollment">
-      <h2>What a year of enrollment is worth here</h2>
+      <h2>What a year of enrollment is worth here${yearChip("enrollment")}</h2>
       <div class="scroll"><table>
         <thead><tr>
           <th>Enrollment year</th><th>Enrolled ADM</th><th>State aid at that ADM</th>
@@ -278,7 +279,7 @@ export function renderActuals(bundle: Bundle, d: District, basis: Basis): string
     <div class="card" id="actuals" data-part="actuals">
       <h2>What it actually received, and what it holds${
         converted ? `, in FY${base} dollars` : ""
-      }</h2>
+      }${yearChip("formula")}</h2>
       <div class="tiles">
         <div class="tile"><div class="k">Cash on hand, FY${latest.fiscal_year}</div>
           <div class="v">${money(latest.ending_cash)}</div>
@@ -441,7 +442,7 @@ export function renderAidSource(bundle: Bundle, d: District): string {
 
   return `
     <div class="card" id="aid-source" data-part="aid-source">
-      <h2>Where the state aid comes from</h2>
+      <h2>Where the state aid comes from${yearChip("formula")}</h2>
       <div class="tiles" data-part="headline">
         <div class="tile"><div class="k">State aid, FY${bundle.fiscal_year}</div>
           <div class="v">${money(currentRealizedAid(d))}</div>
@@ -627,7 +628,7 @@ export function renderPosition(
 ): string {
   return `
     <div class="card" id="position" data-part="position">
-      <h2>Position among Ohio's ${bundle.statewide.districts} districts</h2>
+      <h2>Position among Ohio's ${bundle.statewide.districts} districts${yearChip("formula")}</h2>
       ${strip(
         "Assessed valuation per pupil",
         d.valuation_per_pupil,
@@ -692,7 +693,7 @@ export function renderCategoricals(d: District, statewide: Statewide): string {
 
   return `
     <div class="card" id="categoricals" data-part="categoricals">
-      <h2>The categorical half, in its six parts</h2>
+      <h2>The categorical half, in its six parts${yearChip("formula")}</h2>
       <div class="chartwrap" data-chart="categoricals">${renderToString(barSpec(bars))}</div>
 
       <div class="scroll"><table>
@@ -1232,7 +1233,7 @@ export function renderSupplements(d: District): string {
 
   return `
     <div class="card" id="supplements" data-part="supplements">
-      <h2>Outside the formula</h2>
+      <h2>Outside the formula${yearChip("formula")}</h2>
       <p class="note">These are paid on top of formula aid and the guarantee does not hold a
         district at them. Everything above this card is <strong>foundation funding</strong>, which
         is protected; this is not.</p>
@@ -1505,6 +1506,8 @@ function renderPreschoolSpecialEducation(d: District): string {
  */
 export function renderNationalPosition(d: District): string {
   const n = d.national;
+  // The absent branch carries no year chip: there are no figures here to be on a year, and a chip
+  // over a card explaining that a district is outside the comparison would be dating an absence.
   if (!n) {
     return `
       <div class="card" id="national" data-part="national">
@@ -1541,7 +1544,7 @@ export function renderNationalPosition(d: District): string {
 
   return `
     <div class="card" id="national" data-part="national">
-      <h2>Against America</h2>
+      <h2>Against America${yearChip("national")}</h2>
       <div class="scroll"><table data-program="national">
         <thead><tr><th>Measure</th><th class="tnum">This district</th>
           <th class="tnum">Nationally</th><th>What it is</th></tr></thead>

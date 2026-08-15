@@ -10,6 +10,7 @@ import Base from "../../layouts/Base.astro";
 import { loadFeed } from "../../lib/feed.ts";
 import { count, money, pct } from "../../lib/format.ts";
 import * as routes from "../../lib/routes.ts";
+import { yearChip } from "../../lib/year.ts";
 
 export async function getStaticPaths() {
   const { bundle } = loadFeed();
@@ -57,7 +58,7 @@ const partial = house.members.length - house.districts_wholly_inside;
       : ""}</p>
 
   <div class="card" data-part="apportioned">
-    <h2>Apportioned funding</h2>
+    <h2>Apportioned funding<Fragment set:html={yearChip("formula")} /></h2>
     <div class="scroll"><table>
       <thead><tr><th>Measure</th><th class="tnum">Estimate</th><th>What it is</th></tr></thead>
       <tbody>
@@ -79,7 +80,7 @@ const partial = house.members.length - house.districts_wholly_inside;
   </div>
 
   <div class="card" data-part="members">
-    <h2>The school districts here</h2>
+    <h2>The school districts here<Fragment set:html={yearChip("formula")} /></h2>
     <div class="scroll"><table>
       <thead><tr>
         <th>District</th><th class="tnum">Of the district</th><th class="tnum">Of this seat</th>

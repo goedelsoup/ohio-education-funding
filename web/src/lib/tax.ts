@@ -42,6 +42,8 @@ import { renderToString } from "./plot/ssr.ts";
 import * as routes from "./routes.ts";
 import type { TaxStatewide } from "./feed.ts";
 import type { District, PropertyTaxYear, Statewide } from "./types.ts";
+import { seriesYear, yearChip, yearChipPair } from "./year.ts";
+import { term } from "./glossary.ts";
 
 /**
  * The statutory reduction-factor floor, in mills — `millage::SCHOOL_DISTRICT_FLOOR`.
@@ -90,7 +92,7 @@ export function renderTaxBase(d: District): string {
 
   return `
     <div class="card" id="tax-base" data-part="tax-base">
-      <h2>What the tax base is made of, TY${latest.tax_year}</h2>
+      <h2>What the tax base is made of, TY${latest.tax_year}${yearChip("property_tax")}</h2>
       <div class="chartwrap" data-chart="tax-base">${renderToString(barSpec(bars))}</div>
       <p class="note">Total taxable value ${money(latest.total_value)}, or
         ${money(latest.value_per_pupil)} per pupil.
@@ -155,7 +157,7 @@ export function renderTaxChange(d: District, statewide: TaxStatewide): string {
 
   return `
     <div class="card" id="valuation-change" data-part="valuation-change">
-      <h2>TY${before.tax_year} to TY${after.tax_year}</h2>
+      <h2>TY${before.tax_year} to TY${after.tax_year}${yearChip("property_tax")}</h2>
       <div class="scroll"><table>
         <thead><tr>
           <th></th><th>TY${before.tax_year}</th><th>TY${after.tax_year}</th><th>Change</th>
@@ -284,7 +286,7 @@ export function renderMillage(d: District, statewide: Statewide): string {
 
   return `
     <div class="card" id="millage" data-part="millage">
-      <h2>What voters approved, and what the factors left</h2>
+      <h2>What voters approved, and what the factors left${yearChip("millage")}</h2>
 
       ${
         voted == null || reduced == null
@@ -294,7 +296,7 @@ export function renderMillage(d: District, statewide: Statewide): string {
               <div class="tile"><div class="k">Voted current operating millage</div>
                 <div class="v">${voted.toFixed(2)}</div>
                 <div class="n">TY2023, the rate on the ballot</div></div>
-              <div class="tile"><div class="k">Effective Class I millage</div>
+              <div class="tile"><div class="k">${term("effective-millage", "Effective")} Class I millage</div>
                 <div class="v">${m.observed_rate.toFixed(2)}</div>
                 <div class="n">TY${m.tax_year}, the rate anyone pays</div></div>
               <div class="tile"><div class="k">Taken by reduction factors</div>
@@ -444,6 +446,17 @@ export function hasDenominators(d: District): boolean {
   return Math.abs(latest.value_per_pupil / d.valuation_per_pupil - 1) >= 0.05;
 }
 
+/**
+ * Three publishers, three pupil counts — and three years, which is why the table carries a `Year`
+ * column of its own.
+ *
+ * The card's chip is a pair rather than a single because no one label is true of every row here.
+ * That is the rule this table is the worst case of: where a table's rows or columns come from one
+ * year the chip carries it and the table does not repeat it, and where they come from more than
+ * one **every** row says which. Half-labelling is worse than none, because it implies the
+ * unlabelled rows share the labelled one's year — which is exactly the mistake this card exists to
+ * stop a reader making about the pupil counts.
+ */
 export function renderDenominators(d: District): string {
   if (!hasDenominators(d)) return "";
   const latest = d.property_tax[d.property_tax.length - 1]!;
@@ -454,30 +467,34 @@ export function renderDenominators(d: District): string {
 
   return `
     <div class="card" id="denominators" data-part="denominators">
-      <h2>Two pupil counts, and why this page shows one of them</h2>
+      <h2>Two pupil counts, and why this page shows one of them${yearChipPair("formula", "profile", "profile")}</h2>
       <div class="scroll"><table>
-        <thead><tr><th>Published by</th><th class="tnum">Pupils</th>
+        <thead><tr><th>Published by</th><th>Year</th><th class="tnum">Pupils</th>
           <th class="tnum">Value per pupil</th><th>Used for</th></tr></thead>
         <tbody>
           <tr class="current">
             <th>Taxation, Table SD-1</th>
+            <td class="n">${seriesYear("property_tax")?.label ?? "—"} tax year</td>
             <td class="tnum">${count(Math.round(latest.adm))}</td>
             <td class="tnum">${money(latest.value_per_pupil)}</td>
             <td class="n">Everything on this page.</td>
           </tr>
           <tr>
             <th>Education, District Profile Report</th>
+            <td class="n">${seriesYear("profile")?.label ?? "—"}</td>
             <td class="tnum">${count(Math.round(enrolled))}</td>
             <td class="tnum">${money(d.valuation_per_pupil)}</td>
-            <td class="n">Enrolled ADM, FY2024. The funding formula's wealth measure, and every
-              other page here.</td>
+            <td class="n">Enrolled ${term("adm", "ADM")}. The funding formula's wealth measure,
+              and every other page here.</td>
           </tr>
           <tr>
             <th>Education, base cost ADM</th>
+            <td class="n">${seriesYear("formula")?.label ?? "—"}</td>
             <td class="tnum">${count(Math.round(d.adm))}</td>
             <td class="tnum n">—</td>
-            <td class="n">A third count. What base cost per pupil divides by — funded rather than
-              enrolled, so it is ${pct(Math.abs(d.adm / enrolled - 1), 1)} from the row above.</td>
+            <td class="n">A third count. What ${term("base-cost", "base cost")} per pupil divides
+              by — funded rather than enrolled, so it is
+              ${pct(Math.abs(d.adm / enrolled - 1), 1)} from the row above.</td>
           </tr>
         </tbody>
       </table></div>
@@ -532,7 +549,7 @@ export function renderChargeOff(d: District, statewide: Statewide): string {
 
   return `
     <div class="card" id="charge-off" data-part="charge-off">
-      <h2>What the mechanism this replaced would charge</h2>
+      <h2>What the mechanism this replaced would charge${yearChip("formula")}</h2>
       <p class="note">Before the Fair School Funding Plan, a district's own share of its cost was
         a flat <strong>${r.charge_off_mills.toFixed(0)} mills</strong> against its valuation —
         the same rate for every district in Ohio, whatever it could actually levy. Holding this
@@ -668,7 +685,7 @@ export function renderTaxAgainstSpending(d: District, statewide: TaxStatewide): 
 
   return `
     <div class="card" id="tax-effort" data-part="tax-effort">
-      <h2>Against what the district spends</h2>
+      <h2>Against what the district spends${yearChip("millage")}</h2>
       <div class="tiles">
         <div class="tile"><div class="k">Real property tax charged, TY${latest.tax_year}</div>
           <div class="v">${money(latest.real_property_taxes_charged)}</div>

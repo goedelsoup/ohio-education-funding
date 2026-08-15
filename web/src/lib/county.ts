@@ -35,6 +35,7 @@
 import type { District, Statewide } from "./types.ts";
 import { count, escapeHtml, money, pct } from "./format.ts";
 import * as routes from "./routes.ts";
+import { yearChip } from "./year.ts";
 
 /** A county's districts, with the dispersion measures the page is built on. */
 export interface County {
@@ -133,7 +134,7 @@ function renderSpread(c: County, statewide: Statewide): string {
 
   return `
     <div class="card" data-part="spread">
-      <h2>The spread inside ${escapeHtml(c.name)} County</h2>
+      <h2>The spread inside ${escapeHtml(c.name)} County${yearChip("formula")}</h2>
       <div class="scroll"><table>
         <thead><tr><th>District</th><th class="tnum">Valuation per pupil</th>
           <th class="tnum">State aid per pupil</th><th class="tnum">Pupils</th></tr></thead>
@@ -199,7 +200,7 @@ function renderRoster(c: County, statewide: Statewide, statewideMedianAid: numbe
 
   return `
     <div class="card" data-part="roster">
-      <h2>${count(c.districts.length)} district${c.districts.length === 1 ? "" : "s"}</h2>
+      <h2>${count(c.districts.length)} district${c.districts.length === 1 ? "" : "s"}${yearChip("formula")}</h2>
       <div class="scroll"><table>
         <thead><tr>
           <th>District</th><th class="tnum">Pupils</th>

@@ -32,6 +32,8 @@ import { barSpec } from "./plot/spec.ts";
 import { renderToString } from "./plot/ssr.ts";
 import * as routes from "./routes.ts";
 import type { District, OutcomeStatewide, SpendingByFunction } from "./types.ts";
+import { yearChip } from "./year.ts";
+import { term } from "./glossary.ts";
 
 /** The named functions, largest first, with what each covers. */
 function functions(s: SpendingByFunction): { label: string; value: number; note?: string }[] {
@@ -92,7 +94,7 @@ export function renderSpendingByFunction(d: District): string {
 
   return `
     <div class="card" id="spending-by-function" data-part="spending-by-function">
-      <h2>Where the money went, FY2025</h2>
+      <h2>Where the money went${yearChip("outcome.spending")}</h2>
       <div class="chartwrap" data-chart="functions">${renderToString(barSpec(bars))}</div>
 
       <div class="scroll"><table>
@@ -200,14 +202,14 @@ export function renderFederalShare(d: District, statewide: OutcomeStatewide | nu
 
   return `
     <div class="card" id="federal-share" data-part="federal-share">
-      <h2>Where the money came from, FY2025</h2>
+      <h2>Where the money came from, FY2025${yearChip("outcome.spending")}</h2>
       <div class="chartwrap" data-chart="origin">${renderToString(barSpec(bars))}</div>
 
       <div class="tiles">
         <div class="tile"><div class="k">Federal share of operating spending</div>
           <div class="v">${pct(share, 1)}</div>
           <div class="n">statewide median ${pct(median, 1)}</div></div>
-        <div class="tile"><div class="k">Federal, per equivalent pupil</div>
+        <div class="tile"><div class="k">Federal, per ${term("equivalent-pupil", "equivalent pupil")}</div>
           <div class="v">${money(federal)}</div>
           <div class="n">need-weighted count</div></div>
         <div class="tile"><div class="k">State and local</div>

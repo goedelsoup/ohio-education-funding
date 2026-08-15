@@ -310,6 +310,115 @@ h3 { font-size: .82rem; margin: 1.4rem 0 .6rem; color: var(--text-secondary); fo
   margin: 0 0 .7rem;
 }
 
+/*
+ * What year a card's figures are measured in, in the card's own heading.
+ *
+ * A district page shows the FY2027 formula, a 2024 tax year, a 2024-25 report card, an FY2022
+ * Census survey and a forecast reaching back to FY2020 — under one heading naming one of them.
+ * The chip is per card because the year is a property of the source, and the sources differ card
+ * by card.
+ *
+ * Muted and small: it is an annotation on the heading, not a competitor to it. `tabular-nums`
+ * because a column of these should line up when several cards stack.
+ *
+ * `data-kind` is not styled differently on purpose. A tax year and a fiscal year are equally
+ * authoritative and colouring one would imply a hierarchy; the distinction is carried by the
+ * label — `FY2027` against `2024` — and spelled out in the `title`.
+ */
+.card > h2 {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: .75rem;
+}
+.year-chip {
+  flex: none;
+  font-size: .72rem;
+  font-weight: 500;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: .01em;
+  color: var(--text-muted);
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  padding: .1rem .45rem;
+  white-space: nowrap;
+  /* A `title` is the only affordance here, and it is hover-only. The dotted underline is what
+     says there is one, on the same reasoning as `.term` below. */
+  cursor: help;
+}
+
+/*
+ * A defined term, and the definition that hangs off it.
+ *
+ * # Why the term is the trigger and not a `(?)` beside it
+ *
+ * On a page with forty figures, an affordance per term is forty pieces of furniture. The dotted
+ * underline is the older convention and carries its own discoverability without occupying space.
+ *
+ * # Why it is a `<button>` and the definition is always in the DOM
+ *
+ * Three constraints, and only one shape satisfies all of them:
+ *
+ * - **No script.** This site's filter and its basis toggle both work with JavaScript off, and a
+ *   definition that needs a bundle to appear is a definition most crawlers and some readers never
+ *   get.
+ * - **No hover.** Touch has none. A `title` alone is invisible on a phone, which is where a
+ *   reader most needs to be told what "per equivalent pupil" counts.
+ * - **Announced once.** `aria-describedby` pointing at a visually-hidden sibling gives a screen
+ *   reader the definition as the term's description. A `title` on the same element would be read
+ *   as well, so there is deliberately no `title` here — that is the difference from `.year-chip`,
+ *   which has no room for a sibling and accepts the hover-only limitation.
+ *
+ * So: a real button, focusable and tappable, with the definition beside it in the markup and
+ * revealed by `:hover`, `:focus-visible` and `:focus-within`. Nothing is hidden from anything that
+ * does not paint CSS.
+ */
+.term {
+  font: inherit;
+  color: inherit;
+  background: none;
+  border: 0;
+  padding: 0;
+  text-align: inherit;
+  text-decoration: underline dotted;
+  text-underline-offset: .18em;
+  text-decoration-thickness: 1px;
+  cursor: help;
+}
+.term:hover,
+.term:focus-visible { text-decoration-style: solid; color: var(--text-primary); }
+
+.term-wrap { position: relative; display: inline; }
+.term-def {
+  /* Laid out but not painted, rather than `display: none` — a definition removed from the box
+     tree is removed from the accessibility tree with it, and `aria-describedby` then points at
+     nothing. This is the one rule in this block that is load-bearing for correctness. */
+  position: absolute;
+  left: 0;
+  top: calc(100% + .4rem);
+  z-index: 20;
+  width: max-content;
+  max-width: min(30rem, calc(100vw - 2rem));
+  background: var(--surface-2);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: .55rem .7rem;
+  font-size: .82rem;
+  font-weight: 400;
+  line-height: 1.45;
+  color: var(--text-secondary);
+  box-shadow: 0 6px 20px rgb(0 0 0 / 18%);
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity .12s ease;
+}
+.term-wrap:hover > .term-def,
+.term-wrap:focus-within > .term-def { opacity: 1; visibility: visible; }
+.term-def a { white-space: nowrap; }
+@media (prefers-reduced-motion: reduce) {
+  .term-def { transition: none; }
+}
+
 .card {
   background: var(--surface-1);
   border: 1px solid var(--border);

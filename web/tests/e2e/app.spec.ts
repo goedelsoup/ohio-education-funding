@@ -265,10 +265,107 @@ test.describe("the document arrives complete", () => {
     );
   });
 
+  test("a card with figures says what year they are on", async ({ page }) => {
+    /*
+     * The failure this closes. A district page shows the FY2027 formula, a 2024 tax year, a
+     * 2024-25 report card, an FY2022 Census survey and a forecast reaching back to FY2020 — and
+     * every one of those used to sit under a single header reading `FY2027`.
+     *
+     * The rule is per card because the year is a property of the source, and the sources differ
+     * card by card. A card with no figures is exempt: a chip over prose dates nothing.
+     *
+     * Scanned on the built page rather than asserted per renderer, because the renderers are not
+     * where cards can go missing — a card added in an `.astro` file is as unchipped as one added
+     * in `src/lib`, and only the rendered page sees both.
+     */
+    const missing: string[] = [];
+    for (const suffix of ["", "/finances", "/outcome", "/taxes", "/scenario"]) {
+      await page.goto(`/district/${CLEVELAND}${suffix}`);
+      if (suffix === "/scenario") {
+        await expect(page.locator("#scenario-out .card")).not.toHaveCount(0);
+      }
+      const bare = await page.locator(".card").evaluateAll((nodes) =>
+        nodes
+          .filter((n) => n.querySelector("h2") && !n.querySelector("h2 .year-chip"))
+          .filter((n) => n.querySelector(".tnum, .v"))
+          .map((n) => n.querySelector("h2")?.textContent?.trim() ?? "(no heading)"),
+      );
+      for (const heading of bare) missing.push(`${suffix || "/dashboard"}: ${heading}`);
+    }
+    expect(missing, "a card showing figures has to say what year they are on").toEqual([]);
+  });
+
+  test("the chips on one page name more than one year, and say which reckoning each is", async ({
+    page,
+  }) => {
+    // The proof the feature is doing something. If every chip on a district page read `FY2027`
+    // the page would be exactly as misleading as it was before, and passing the test above.
+    await page.goto(`/district/${CLEVELAND}/taxes`);
+    const chips = page.locator(".year-chip");
+    await expect(chips).not.toHaveCount(0);
+
+    const kinds = await chips.evaluateAll((nodes) => [
+      ...new Set(nodes.map((n) => n.getAttribute("data-kind"))),
+    ]);
+    expect(kinds).toContain("tax");
+    expect(kinds).toContain("fiscal");
+
+    // And the long form is on the element, because `2024` alone does not say it is a tax year.
+    await expect(chips.filter({ hasText: /^2024$/ }).first()).toHaveAttribute(
+      "title",
+      /calendar year of valuation and levy/,
+    );
+  });
+
+  test("a defined term is reachable by keyboard and readable with no script", async ({
+    browser,
+  }) => {
+    /*
+     * Three constraints, and the shape has to satisfy all three: no script — this site's filter
+     * and basis toggle both work without it — no hover, because touch has none, and announced
+     * once, so no `title` beside the `aria-describedby`.
+     *
+     * Run in a context with JavaScript disabled, which is the only way to assert the first of
+     * those rather than assume it.
+     */
+    const context = await browser.newContext({ javaScriptEnabled: false });
+    const noScript = await context.newPage();
+    await noScript.goto(`/district/${CLEVELAND}/taxes`);
+
+    const trigger = noScript.locator("button.term").first();
+    await expect(trigger).toBeVisible();
+
+    // The definition is in the document, not fetched and not injected.
+    const id = await trigger.getAttribute("aria-describedby");
+    expect(id).toBeTruthy();
+    const definition = noScript.locator(`#${id}`);
+    await expect(definition).toHaveCount(1);
+    await expect(definition).toContainText(/H\.B\. 920|need|weighted/);
+
+    // Not announced twice: a `title` would be read alongside the description.
+    await expect(trigger).not.toHaveAttribute("title", /./);
+
+    // Focus reveals it, so a keyboard reaches what a pointer does.
+    await trigger.focus();
+    await expect(definition).toBeVisible();
+    await context.close();
+  });
+
   test("states the provenance of the figures in the footer", async ({ page }) => {
+    /*
+     * The model year and the contract, which is what the footer is for.
+     *
+     * It used to assert on `FY27` inside the provenance paragraph, and that paragraph no longer
+     * names any year — it said "millage is TY2023" while the data said 2024, so the years moved
+     * into `series_years` where they are derived. The model year is still here, from
+     * `bundle.fiscal_year`, and it is the one the footer is entitled to state because the footer
+     * is about the feed rather than about any one card.
+     */
     await page.goto(`/district/${CLEVELAND}`);
-    await expect(page.locator("footer")).toContainText("FY27");
+    await expect(page.locator("footer")).toContainText("FY2027 model");
     await expect(page.locator("footer")).toContainText("Bundle contract");
+    // And it does not quietly grow the years back, which is how the paragraph went stale.
+    await expect(page.locator("footer")).not.toContainText("TY20");
   });
 
   test("the footer reports the build-time formula check", async ({ page }) => {
