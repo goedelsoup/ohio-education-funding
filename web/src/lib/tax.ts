@@ -401,7 +401,7 @@ export function renderMillage(d: District, statewide: Statewide): string {
         ${money(statewide.max_yield_per_mill)}, a spread of
         ${Math.round(statewide.max_yield_per_mill / statewide.min_yield_per_mill)}
         times, which is the inequality
-        <a href="${routes.parameter("state-share-percentage")}">the state share</a> exists to
+        <a href="${routes.metric("state-share-percentage")}">the state share</a> exists to
         offset.</p>
     </div>`;
 }
