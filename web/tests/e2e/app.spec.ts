@@ -556,6 +556,43 @@ test.describe("the scenario builder", () => {
     await expect(tiles.nth(1).locator(".n")).toHaveText("0 up, 294 down");
   });
 
+  test("the tiles stay under the levers and the rest goes below the forecast", async ({ page }) => {
+    // The layout this page is arranged around: three headline numbers where a reader who has just
+    // moved a lever is looking, the forecast next, and the reading-at-rest material under it.
+    await page.goto("/scenario");
+    await setGuarantee(page, "removed");
+
+    await expect(page.locator("#scenario-out .tile")).toHaveCount(3);
+    await expect(page.locator("#scenario-detail")).toContainText("How the change is distributed");
+    await expect(page.locator("#scenario-detail")).toContainText("Most affected");
+    await expect(page.locator("#scenario-detail")).toContainText("What moved underneath");
+
+    // And they are in that order in the document, not merely present. `compareDocumentPosition`
+    // returns 4 — DOCUMENT_POSITION_FOLLOWING — when the argument comes after the receiver.
+    const order = await page.evaluate(() => {
+      const at = (id: string) => document.getElementById(id)!;
+      return [
+        at("scenario-out").compareDocumentPosition(at("projection-out")),
+        at("projection-out").compareDocumentPosition(at("scenario-detail")),
+      ];
+    });
+    expect(order).toEqual([4, 4]);
+  });
+
+  test("the material below the forecast does not outlive the levers that produced it", async ({
+    page,
+  }) => {
+    // The failure the split introduces if the container is only ever written and never cleared:
+    // a "Most affected" table sitting below the fan chart, describing a scenario the controls no
+    // longer hold, where a reader has to scroll past a forecast to discover it.
+    await page.goto("/scenario");
+    await setGuarantee(page, "removed");
+    await expect(page.locator("#scenario-detail")).toContainText("Most affected");
+    await page.locator("#scenario-reset").click();
+    await expect(page.locator("#scenario-out")).toContainText("Current law");
+    await expect(page.locator("#scenario-detail")).toBeEmpty();
+  });
+
   test("the retained-share slider hides for the rules that do not take one", async ({ page }) => {
     await page.goto("/scenario");
     const lever = page.locator("#lv-arg").locator("xpath=ancestor::div[@class='lever']");

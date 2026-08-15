@@ -108,13 +108,23 @@ const meta = bundle.projection;
       </div>
     </noscript>
 
-    <div id="scenario-out"></div>
     <!--
-      Separate from #scenario-out, and always after it: the simulation is exact and the projection
-      is a forecast. They are gated on separate checks and one can be disabled without the other,
-      and there is deliberately no figure anywhere that adds them together.
+      Three containers, and the order is the point.
+
+      #scenario-out takes the simulation's headline tiles, directly under the levers, because that
+      is where a reader who has just moved one looks. #projection-out takes the forecast. And
+      #scenario-detail takes the rest of the simulation — the distribution, the most-affected
+      table, the counts underneath — which are read at rest rather than at the moment a slider
+      moves.
+
+      The simulation is exact and the projection is a forecast. They are gated on separate checks
+      and one can be disabled without the other, and there is deliberately no figure anywhere that
+      adds them together. What that rule requires is that the forecast never appear above the
+      figures it is a forecast *of*, and the tiles are still above it.
     -->
+    <div id="scenario-out"></div>
     <div id="projection-out"></div>
+    <div id="scenario-detail"></div>
     <p class="note" id="scenario-status"></p>
   </div>
 

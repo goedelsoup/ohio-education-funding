@@ -142,10 +142,20 @@ function render(): void {
   // the check exists to hold shut.
   if (!isVerified(state.verification)) return;
   const out = $("#scenario-out");
-  if (out) {
-    out.innerHTML = irn
-      ? renderDistrictScenario(state.panel, state.levers, irn)
-      : renderScenario(state.panel, state.levers);
+  const detail = $("#scenario-detail");
+  if (irn) {
+    // One district, one container. There is no forecast on that route — the band is drawn once,
+    // statewide, where it is the subject — so there is nothing for a detail half to sit below.
+    if (out) out.innerHTML = renderDistrictScenario(state.panel, state.levers, irn);
+    if (detail) detail.innerHTML = "";
+  } else {
+    const rendered = renderScenario(state.panel, state.levers);
+    if (out) out.innerHTML = rendered.summary;
+    // Written on every render, including when it is empty. Under current law there is nothing to
+    // distribute or rank, and a detail half left standing from the last lever position would be
+    // describing a scenario the controls no longer hold — below the fan chart, where the reader
+    // would have to scroll past a forecast to find out.
+    if (detail) detail.innerHTML = rendered.detail;
   }
   const projection = $("#projection-out");
   // The band is gated on its own checks. A forecast that failed them costs the reader the band,
@@ -170,6 +180,11 @@ function reportFailure(verification: Verification): void {
           .join("");
   const controls = $("#scenario-controls");
   if (controls) controls.innerHTML = "";
+  // Every container the builder writes, not just the first. The disabled notice replaces the
+  // simulation, and a detail half left below the fan chart would be figures from the last render
+  // sitting under a card explaining that the derivation producing them cannot be trusted.
+  const below = $("#scenario-detail");
+  if (below) below.innerHTML = "";
   const out = $("#scenario-out");
   if (out) {
     out.innerHTML = `<div class="card err">
