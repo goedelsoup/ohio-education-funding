@@ -1442,11 +1442,18 @@ test.describe("the categorical half", () => {
      * The supportable claim is narrower and more interesting: both descend, and only English
      * learners descends along a *need* gradient. Career-technical's ordering is programme type,
      * which its own corpus node says.
+     *
+     * The correction landed in three places and missed a fourth: the six-row summary table's own
+     * description column said "Three weights that descend, unlike every other categorical", one
+     * screenful above the drill-down that had just been corrected. Both wordings are asserted here
+     * so the claim cannot come back in either of the two places it lived.
      */
     await page.goto("/district/043802");
     const card = page.locator('[data-part="categoricals"]');
     await expect(card).not.toContainText("Every other weighted categorical");
+    await expect(card).not.toContainText("unlike every other categorical");
     await expect(card).toContainText("the only categorical that pays less as the thing it is for");
+    await expect(card).toContainText("descend as need persists, alone among the six");
     // Both halves of the distinction are on the page, not just the correction.
     await expect(card).toContainText("Special education runs the other way");
     await expect(card).toContainText("along programme type rather than need");

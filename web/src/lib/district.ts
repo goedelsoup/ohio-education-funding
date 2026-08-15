@@ -576,7 +576,10 @@ export function renderCategoricals(d: District, statewide: Statewide): string {
     ["Disadvantaged Pupil Impact Aid", c.dpia, "Two poverty counts blended, indexed on the state's, and squared.", "fsfp-disadvantaged-pupil-impact-aid"],
     ["Career-technical education", c.career_technical, "Five weights against a base cost 20% above the one the rest of the plan uses.", "fsfp-career-technical-weights"],
     ["Gifted", c.gifted, "Mostly staffing units, with a floor 370 districts sit on.", "fsfp-gifted-units"],
-    ["English learners", c.english_learners, "Three weights that descend, unlike every other categorical.", "fsfp-english-learner-weights"],
+    // "unlike every other categorical" until this commit, which is the same over-claim the drill-down
+    // below carried and the same one the corpus node carried: career-technical's five weights descend
+    // too. What is true of this program alone is that its weights fall along a *need* gradient.
+    ["English learners", c.english_learners, "Three weights that descend as need persists, alone among the six.", "fsfp-english-learner-weights"],
   ] as const;
 
   const bars: Bar[] = parts
