@@ -12,6 +12,7 @@ import { counties } from "../lib/county.ts";
 import { loadFeed } from "../lib/feed.ts";
 import { count, money } from "../lib/format.ts";
 import * as routes from "../lib/routes.ts";
+import { yearChip } from "../lib/year.ts";
 
 const { bundle } = loadFeed();
 const all = counties(bundle.districts);
@@ -46,6 +47,7 @@ const measurable = all.filter((c) => c.valuationRatio != null);
   </div>
 
   <div class="card">
+    <h2>Every county<Fragment set:html={yearChip("formula")} /></h2>
     <div class="scroll"><table>
       <thead><tr>
         <th>County</th><th class="tnum">Districts</th><th class="tnum">Pupils</th>

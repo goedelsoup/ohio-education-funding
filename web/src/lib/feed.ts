@@ -110,6 +110,16 @@ export interface TaxStatewide {
    * changed last year and may change back.
    */
   crossedTheFloor: number;
+  /**
+   * Districts where Taxation's latest effective Class I rate matches Education's to 0.01 mills.
+   *
+   * Computed rather than written into the copy, on the rule the rest of this block follows: it
+   * appeared on the taxes page as the literal `219`, and the profile report's column is a year
+   * behind Taxation's latest by construction, so the number moves whenever either publisher does
+   * and nothing would have said so. It is the count that makes "the two departments disagree"
+   * readable as "one of them has published a later year".
+   */
+  agreeOnLatest: number;
 }
 
 let cached: Feed | null = null;
@@ -244,6 +254,7 @@ function taxStatewide(districts: District[]): TaxStatewide {
   const shares: { name: string; share: number }[] = [];
   let nearFloor = 0;
   let crossedTheFloor = 0;
+  let agreeOnLatest = 0;
 
   // The floor the Rust side classifies against, restated once rather than at each comparison.
   const FLOOR = 20;
@@ -277,6 +288,19 @@ function taxStatewide(districts: District[]): TaxStatewide {
       }
     }
 
+    /*
+     * Does Education's published rate match Taxation's *latest* year?
+     *
+     * Mostly it does not, and that is not a disagreement. The profile report's column is
+     * `effective_class1_millage_ty23` — a year behind Taxation's latest by construction — so the
+     * two agree on the year they share and diverge on the year only one of them has published.
+     * Counting the agreement on the latest year is what lets the page say which of those is
+     * happening instead of asserting a number somebody typed.
+     */
+    if (after && d.effective_class1_millage != null) {
+      if (Math.abs(after.class1_rate - d.effective_class1_millage) <= 0.01) agreeOnLatest++;
+    }
+
     const spending = d.spending_by_function;
     if (after && spending && spending.adm > 0) {
       const operating = spending.operating_per_pupil * spending.adm;
@@ -299,6 +323,7 @@ function taxStatewide(districts: District[]): TaxStatewide {
       .sort((a, b) => b.share - a.share),
     nearFloor,
     crossedTheFloor,
+    agreeOnLatest,
   };
 }
 

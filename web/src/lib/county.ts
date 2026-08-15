@@ -119,7 +119,7 @@ function renderSpread(c: County, statewide: Statewide): string {
   if (!c.richest || !c.poorest || c.valuationRatio == null) {
     return `
       <div class="card" data-part="spread">
-        <h2>One district</h2>
+        <h2>One district${yearChip("formula")}</h2>
         <p class="note">${escapeHtml(c.name)} County has a single district in the funding model,
           so it has no internal disparity to measure. Four of Ohio's 88 counties are in that
           position. The comparison this page is built for is between districts, so for
