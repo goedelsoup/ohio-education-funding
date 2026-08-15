@@ -2087,7 +2087,10 @@ test.describe("the answer first", () => {
     const card = page.locator('[data-part="not"]');
     await expect(card).toContainText("None of the figures above is money this district received");
     await expect(card).toContainText("divides by more than one pupil count");
-    await expect(card).toContainText("a fourth count");
+    await expect(card).toContainText("two other years on a fourth count");
+    // The two vintages `crates/bundle` names and the page did not: valuation is FY2023 and
+    // spending is FY2024, inside one card, and the closing note is the only place that says so.
+    await expect(card).toContainText("FY2023");
     await expect(card.locator(`a[href="/district/${CLEVELAND}/finances"]`)).toHaveCount(1);
     await expect(card.locator('a[href="/wiki/metric/enrolled-adm"]')).toHaveCount(1);
   });

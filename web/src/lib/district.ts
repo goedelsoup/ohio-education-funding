@@ -1619,12 +1619,12 @@ export function renderNationalPosition(d: District): string {
  * uses both in one calculation. `categorical_adm` is a third field carrying the current-year
  * number for 608 districts and a figure fifty pupils below it for Akron.
  *
- * **A different year and a different denominator, two cards down.** Assessed valuation and
- * operating expenditure per pupil are FY2024 figures on enrolled ADM FY2024 — a *fourth* count,
- * differing from base cost ADM for 601 of 609 — while `/finances` divides by the report card's
- * FY2025 unweighted headcount and `/outcome` by its FY2025 need-weighted one. Every one of those
- * is declared in `denominators.ts`, which states that it cannot check prose. This card is the
- * prose.
+ * **Two other years and a different denominator, two cards down.** `crates/bundle` names the
+ * vintages the page does not: valuation per pupil is FY2023 and operating expenditure per pupil is
+ * FY2024, two years inside one card, both on enrolled ADM FY2024 — a *fourth* count, differing
+ * from base cost ADM for 601 of 609 — while `/finances` divides by the report card's FY2025
+ * unweighted headcount and `/outcome` by its FY2025 need-weighted one. Every one of those is
+ * declared in `denominators.ts`, which states that it cannot check prose. This card is the prose.
  */
 export function renderWhatThisIsNot(bundle: Bundle, d: District): string {
   const baseCostAdm = Math.round(d.adm);
@@ -1663,12 +1663,13 @@ export function renderWhatThisIsNot(bundle: Bundle, d: District): string {
         available in Ohio school finance</a>, and
         <a href="${routes.districtTaxes(d.irn)}">the property tax page</a> reconciles the two the
         Department of Taxation and the Department of Education each publish.</p>
-      <p class="note"><strong>The position card below is a different year on a fourth count.</strong>
-        Assessed valuation and operating expenditure per pupil there are FY2024 figures divided by
-        enrolled ADM FY2024, beside a model that funds FY${bundle.fiscal_year}. Finances shows
-        FY2025 spending on the report card's unweighted headcount, and Outcome shows FY2025
-        spending on its need-weighted one. Three per-pupil figures, three counts, two years:
-        subtracting one from another produces a number that means nothing, which is why
+      <p class="note"><strong>The position card below is two other years on a fourth count.</strong>
+        Assessed valuation per pupil there is an <strong>FY2023</strong> valuation and operating
+        expenditure per pupil is <strong>FY2024</strong> spending — two different years inside one
+        card — and both divide by enrolled ADM FY2024, beside a model that funds
+        FY${bundle.fiscal_year}. Finances shows FY2025 spending on the report card's unweighted
+        headcount, and Outcome shows FY2025 spending on its need-weighted one. Subtracting any of
+        them from any other produces a number that means nothing, which is why
         <code>denominators.ts</code> exists and why it says it cannot check a sentence.</p>
     </div>`;
 }
