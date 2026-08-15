@@ -233,10 +233,26 @@ test.describe("the document arrives complete", () => {
      *
      * Scoped to the five district routes because that is the family the rule is for. `/outcomes`,
      * the front page and the wiki still name their cards in prose, deliberately.
+     *
+     * # The scenario route has to be waited for, not raced
+     *
+     * Four of the five are complete before any script runs and can be scanned the moment they
+     * load. `/district/X/scenario` is the one view that is not: `#scenario-out` ships empty and
+     * `scripts/scenario.ts` fills it after fetching the panel. A version of this test that scanned
+     * on arrival found nothing there on a fast local machine and found the "Current law" card in
+     * CI, which is a test that reports on the machine it ran on rather than on the page — and it
+     * did exactly that, passing here and failing there.
+     *
+     * So the scan waits for the client render. That also brings the script-rendered cards inside
+     * the rule, which is where they belong: a card injected by `innerHTML` is as unaddressable as
+     * one written at build time, and rather more likely to be missed.
      */
     const unaddressed: string[] = [];
     for (const suffix of ["", "/finances", "/outcome", "/taxes", "/scenario"]) {
       await page.goto(`/district/${CLEVELAND}${suffix}`);
+      if (suffix === "/scenario") {
+        await expect(page.locator("#scenario-out .card")).not.toHaveCount(0);
+      }
       const bare = await page
         .locator(".card:not([data-part])")
         .evaluateAll((nodes) =>
