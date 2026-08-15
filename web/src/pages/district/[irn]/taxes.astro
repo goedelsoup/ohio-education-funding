@@ -130,12 +130,12 @@ const description = latest
             districts carrying both.
           </p>
           <p class="note">
-            <strong>That is not the rate in the tile above.</strong> The tile is
+            <strong>That is not the rate in the tile above.</strong> The tile is{" "}
             <strong>{latestTaxYear}</strong>, this table's latest year, and the profile report's
             column is <code>effective_class1_millage_ty{String(profileTaxYear).slice(-2)}</code> — a
             year behind by construction, as <code>crates/bundle</code> names it. The two
-            publications agree on {latestTaxYear} for only <strong>{count(tax.agreeOnLatest)}</strong>
-            of the 606, which is not a disagreement between departments but the ordinary fact that
+            publications agree on {latestTaxYear} for only{" "}
+            <strong>{count(tax.agreeOnLatest)}</strong> of the 606, which is not a disagreement between departments but the ordinary fact that
             one of them has published a later year. The sentence above used to state the agreement
             without the year, three cards below a figure it was not about.
           </p>

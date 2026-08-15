@@ -326,6 +326,37 @@ const ROUTES_WITH_FIGURES = [
     expect(missing, "a card showing figures has to say what year they are on").toEqual([]);
   });
 
+  test("no word is fused to the tag beside it", async ({ page }) => {
+    /*
+     * Astro trims a newline between an element and adjacent text, the same as JSX. So a paragraph
+     * reflowed across lines silently loses a space:
+     *
+     *     ... for only <strong>{count(n)}</strong>
+     *     of the 606 ...          ->   "219of the 606"
+     *
+     * Two of these shipped in the de-literalisation of this very card, and the scan that found
+     * them turned up nine more that had been live for much longer — "computed by<code>", "in
+     * proportion to<strong>", "cost input refresh</a>question". Every one is invisible in the
+     * source, which reads correctly, and visible only in the output.
+     *
+     * The check is deliberately narrow: a letter immediately against an inline tag boundary. A
+     * tag against punctuation is normal — `<strong>219</strong>,` — and so is a tag against
+     * another tag.
+     */
+    const fused: string[] = [];
+    for (const route of ROUTES_WITH_FIGURES) {
+      await page.goto(route);
+      const html = await page.content();
+      for (const match of html.matchAll(
+        /(?:<\/(?:strong|em|code|a)>[A-Za-z]|[A-Za-z]<(?:strong|em|code)\b)/g,
+      )) {
+        const at = match.index ?? 0;
+        fused.push(`${route}: …${html.slice(Math.max(0, at - 40), at + 40).replace(/\s+/g, " ")}…`);
+      }
+    }
+    expect(fused, "a newline between text and an inline tag is trimmed, not rendered").toEqual([]);
+  });
+
   test("the chips on one page name more than one year, and say which reckoning each is", async ({
     page,
   }) => {
