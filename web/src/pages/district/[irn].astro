@@ -14,11 +14,11 @@ import {
   renderAidSource,
   renderDetail,
   renderEnrollmentYears,
-  renderHeadline,
   renderCategoricals,
   renderPosition,
   renderNationalPosition,
   renderSupplements,
+  renderWhatThisIsNot,
 } from "../../lib/district.ts";
 import { slugify } from "../../lib/county.ts";
 import { districtPaths, loadFeed } from "../../lib/feed.ts";
@@ -89,16 +89,23 @@ const description = district.on_guarantee
 
   <DistrictNav irn={district.irn} current="dashboard" />
 
-  <Fragment set:html={renderHeadline(district)} />
+  {/* The answer first. This card opened with base cost per pupil, which is an input to the
+      formula rather than money anyone receives, while the page's own description, its share image
+      and this card's heading all said the question was state aid. */}
   <Fragment set:html={renderAidSource(bundle, district)} />
+  {/* Third clause of that question, answered directly: for the 294 guaranteed districts this
+      card says a year of enrollment is worth nothing to them. It was in position six. */}
+  <Fragment set:html={renderEnrollmentYears(bundle, district, forecastable)} />
   <Fragment set:html={renderBaseCostBuildUp(district, bundle.statewide.districts)} />
   {/* The other half of formula aid, decomposed the same way and for the same reason. */}
   <Fragment set:html={renderCategoricals(district, bundle.statewide)} />
   {/* Everything above is foundation funding, which the guarantee holds. This is not. */}
   <Fragment set:html={renderSupplements(district)} />
-  <Fragment set:html={renderEnrollmentYears(bundle, district, forecastable)} />
   <Fragment set:html={renderPosition(bundle, district, valuations, expenditures)} />
   {/* Ohio describing itself cannot say whether Ohio is unusual. This is the one card that can. */}
   <Fragment set:html={renderNationalPosition(district)} />
   <Fragment set:html={renderDetail(district)} />
+  {/* Three of the four siblings close by declaring what they are not. This route has the most
+      collisions to declare and was the last to say so. */}
+  <Fragment set:html={renderWhatThisIsNot(bundle, district)} />
 </Base>

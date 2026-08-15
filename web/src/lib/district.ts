@@ -15,7 +15,7 @@ import type { FanPoint } from "./chart.ts";
 import { barSpec, fanSpec } from "./plot/spec.ts";
 import { renderToString } from "./plot/ssr.ts";
 import { count, escapeHtml, money, ordinal, pct, percentileOf, signedMoney } from "./format.ts";
-import { apply, currentLaw } from "./policy.ts";
+import { apply, currentLaw, currentRealizedAid } from "./policy.ts";
 import { forecastPath, growthPrior, observations } from "./project.ts";
 import { realChange, series, type Basis } from "./real.ts";
 import * as routes from "./routes.ts";
@@ -133,6 +133,12 @@ export function renderEnrollmentYears(
         figure exists here to show. Every row is the FY${bundle.fiscal_year} formula held fixed
         and run at that year's enrolled ADM, which isolates the enrollment channel: two years of
         published totals could not, because the formula moved between them too.</p>
+      <p class="note">This card holds the formula fixed and moves enrollment. The
+        <a href="${routes.districtScenario(d.irn)}">scenario for this district</a> does the
+        opposite — it holds enrollment at published FY${meta.base_year} and moves the formula. The
+        two were built a phase apart and neither said the other existed, which left one district's
+        counterfactual on one route and one district's projection on another with no way to get
+        between them.</p>
 
       ${carried}
     </div>`;
@@ -325,28 +331,45 @@ export function renderActuals(bundle: Bundle, d: District, basis: Basis): string
     </div>`;
 }
 
-/** The three figures a reader arriving at a district came for. */
-export function renderHeadline(d: District): string {
-  const guaranteePP = d.realized_aid_per_pupil - d.formula_aid_per_pupil;
-  return `
-    <div class="tiles" data-part="headline">
-      <div class="tile"><div class="k">Base cost / pupil</div>
-        <div class="v">${money(d.base_cost_per_pupil)}</div>
-        <div class="n">what the plan says it costs</div></div>
-      <div class="tile"><div class="k">State aid / pupil</div>
-        <div class="v">${money(d.realized_aid_per_pupil)}</div>
-        <div class="n">${
-          d.on_guarantee
-            ? money(guaranteePP) + " of it from the guarantee"
-            : "all from the formula"
-        }</div></div>
-      <div class="tile"><div class="k">Enrolled ADM</div>
-        <div class="v">${d.adm.toLocaleString("en-US", { maximumFractionDigits: 0 })}</div>
-        <div class="n">base cost enrolled</div></div>
-    </div>`;
+/**
+ * One condition the formula puts this district in, and what follows from it.
+ *
+ * The `label` alone is what this card used to print, as a pill. "At the minimum state share" is a
+ * noun phrase: it states a fact about 138 districts and gives a reader who does not already know
+ * the plan no way to reach what it means for them. A pill cannot hold a clause, so these are rows.
+ */
+interface Condition {
+  label: string;
+  href?: string;
+  consequence: string;
 }
 
-/** Where this district's state aid comes from, and the roles it plays in the formula. */
+/**
+ * Where this district's state aid comes from — the first card on the page, and the answer to it.
+ *
+ * # Why the headline tiles are inside this card
+ *
+ * They were a separate block above it, and two of the three figures were printed twice within one
+ * screen: the aid-per-pupil tile and its guarantee sub-note were the bar's legend verbatim, and the
+ * bar's own `aria-label` was a third printing of the same pair. Merging without deduplicating would
+ * have been churn — the same figures under fewer headings — so the pair is printed once, in the
+ * tiles, and the legend now names the two segments instead of restating their amounts.
+ *
+ * # Why the first figure changed
+ *
+ * It was base cost per pupil, which is an input to the formula rather than money anyone receives.
+ * This page's `<meta description>`, its OG image alt text and this card's own heading all say
+ * independently that the question is state aid and where it comes from, and the page opened by
+ * answering a different one. Base cost keeps its own card, two below, where its twenty-two
+ * elements are.
+ *
+ * # Why the total is summed rather than multiplied
+ *
+ * `realized_aid_per_pupil` divides by base cost ADM. The pupil count this page prints beside it is
+ * the current-year one, and multiplying the per-pupil figure by the count next to it is wrong by a
+ * median $112,601 and by $8.2m for Cleveland. `currentRealizedAid` sums the components instead,
+ * which is exact — the same reason `scenario.astro` reaches for it.
+ */
 export function renderAidSource(bundle: Bundle, d: District): string {
   const formulaPP = d.formula_aid_per_pupil;
   const realizedPP = d.realized_aid_per_pupil;
@@ -355,46 +378,123 @@ export function renderAidSource(bundle: Bundle, d: District): string {
   const formulaWidth = (formulaPP / total) * 100;
   const guaranteeWidth = (guaranteePP / total) * 100;
 
-  const flags: string[] = [
-    d.on_guarantee ? "Funded by the guarantee, not the formula" : "On formula",
-  ];
-  if (d.at_millage_floor) flags.push("At or below the 20-mill floor");
-  else if (d.near_millage_floor) flags.push("Within a twentieth of a mill of the floor");
-  if (d.at_minimum_state_share) flags.push("At the minimum state share");
+  /*
+   * Two chips are gone and neither is a loss. "Funded by the guarantee, not the formula" and "At or
+   * below the 20-mill floor" both restated the sub-line `[irn].astro` renders directly above this
+   * card, and the floor chip was strictly *less* precise than what it duplicated: the sub-line
+   * separates the 21 districts genuinely below 20 mills from the 155 sitting on it, and the chip
+   * collapsed all 176 into one phrase. What survives is what the sub-line does not already say.
+   */
+  const conditions: Condition[] = [];
+  if (d.near_millage_floor && !d.at_millage_floor) {
+    conditions.push({
+      label: "Within a twentieth of a mill of the floor",
+      href: routes.parameter("twenty-mill-floor"),
+      consequence: `One more reduction and H.B. 920 stops rolling its rate back at all, after
+        which a reappraisal reaches its revenue instead of being taken away again. One of 54.`,
+    });
+  }
+  if (d.at_minimum_state_share) {
+    conditions.push({
+      label: "At the minimum state share",
+      href: routes.metric("state-share-percentage"),
+      consequence: `The formula computed a share below 10% and the statute raised it to 10%, so a
+        change to the local capacity measure moves this district's aid by nothing until it is large
+        enough to lift it off the floor. One of 138.`,
+    });
+  }
   if (d.millage?.cumulative_reduction != null && d.millage.cumulative_reduction > 0.005) {
-    flags.push(`${pct(d.millage.cumulative_reduction, 0)} of voted millage reduced away`);
+    conditions.push({
+      label: `${pct(d.millage.cumulative_reduction, 0)} of voted millage reduced away`,
+      href: routes.metric("effective-operating-millage"),
+      consequence: `H.B. 920's reduction factors have rolled back that much of what voters
+        approved, so what a levy raises here is not what the ballot said it would.`,
+    });
   }
   if (d.enrollment_change != null && d.enrollment_change < 0) {
-    flags.push(`Enrollment down ${pct(-d.enrollment_change)} FY2024→FY2026`);
+    conditions.push({
+      label: `Enrollment down ${pct(-d.enrollment_change)} FY2024→FY2026`,
+      consequence: d.on_guarantee
+        ? `Its aid did not, because the guarantee holds a fixed dollar amount enrollment does not
+           enter — the next card shows what that is worth.`
+        : `Its aid falls with it, because this district is on the formula — the next card shows by
+           how much.`,
+    });
   }
 
   return `
     <div class="card" data-part="aid-source">
       <h2>Where the state aid comes from</h2>
-      <div class="barwrap">
-        <div class="bar" role="img" aria-label="Formula aid ${money(formulaPP)} per pupil, guarantee ${money(guaranteePP)} per pupil">
-          <div class="seg formula ${guaranteeWidth <= 0 ? "only" : ""}" style="width:${formulaWidth}%"></div>
-          ${guaranteeWidth > 0 ? `<div class="seg guarantee" style="width:${guaranteeWidth}%"></div>` : ""}
-        </div>
-        <div class="legend">
-          <span><i class="sw formula"></i> Formula ${money(formulaPP)}/pupil</span>
-          ${guaranteeWidth > 0 ? `<span><i class="sw guarantee"></i> Guarantee ${money(guaranteePP)}/pupil</span>` : ""}
-        </div>
+      <div class="tiles" data-part="headline">
+        <div class="tile"><div class="k">State aid, FY${bundle.fiscal_year}</div>
+          <div class="v">${money(currentRealizedAid(d))}</div>
+          <div class="n">every foundation dollar the model pays it</div></div>
+        <div class="tile"><div class="k">State aid / pupil</div>
+          <div class="v">${money(realizedPP)}</div>
+          <div class="n">${
+            d.on_guarantee
+              ? money(guaranteePP) + " of it from the guarantee"
+              : "all from the formula"
+          }</div></div>
+        <div class="tile"><div class="k">Base-cost ADM</div>
+          <div class="v">${count(Math.round(d.adm))}</div>
+          <div class="n"><a href="${routes.metric(
+            "enrolled-adm",
+          )}">not a headcount</a> — a three-year average</div></div>
       </div>
+      ${
+        /*
+         * The bar is a proportion chart and 315 districts have one proportion. A full-width single
+         * segment under a legend that has collapsed to one item says nothing the tiles did not, so
+         * those districts get the prose and no chart. Nothing is lost by the omission: where the
+         * guarantee pays zero, realized aid per pupil *is* formula aid per pupil, for all 315.
+         */
+        guaranteeWidth > 0
+          ? `<div class="barwrap">
+               <div class="bar" role="img" aria-label="${pct(
+                 formulaPP / realizedPP,
+                 0,
+               )} of this district's aid per pupil is computed by the formula; the guarantee pays the rest">
+                 <div class="seg formula" style="width:${formulaWidth}%"></div>
+                 <div class="seg guarantee" style="width:${guaranteeWidth}%"></div>
+               </div>
+               <div class="legend">
+                 <span><i class="sw formula"></i> What the formula computes</span>
+                 <span><i class="sw guarantee"></i> What the guarantee adds</span>
+               </div>
+             </div>`
+          : ""
+      }
       <p class="note">${
         d.on_guarantee
           ? `The formula computes ${money(formulaPP)} per pupil. This district receives
-             ${money(realizedPP)} because the temporary transitional aid guarantee holds it at
-             what it received in <strong>FY2020</strong> — a year Ohio froze funding under the
-             Bridge formula rather than computing it. The formula produces
+             ${money(realizedPP)} because the <a href="${routes.wikiNode(
+               "formula-component",
+               "temporary-transitional-aid-guarantee",
+             )}">temporary transitional aid guarantee</a> holds it at what it received in
+             <strong>FY2020</strong> — a year Ohio froze funding under the Bridge formula rather
+             than computing it. The formula produces
              <strong>${pct(formulaPP / realizedPP, 0)}</strong> of that level.`
           : `This district is funded by the formula, so an increase in its computed base cost
-             reaches it in full — unlike the ${bundle.statewide.on_guarantee} districts held on
-             the guarantee.`
+             reaches it in full — unlike the ${bundle.statewide.on_guarantee} districts held on the
+             <a href="${routes.wikiNode(
+               "formula-component",
+               "temporary-transitional-aid-guarantee",
+             )}">guarantee</a>.`
       }</p>
-      <div class="flags">${flags
-        .map((f) => `<span class="flag">${escapeHtml(f)}</span>`)
-        .join("")}</div>
+      ${
+        // Marion Local trips none of the four, and an empty row renders as an unexplained gap
+        // rather than as an absence.
+        conditions.length === 0
+          ? ""
+          : `<ul class="conditions">${conditions
+              .map(
+                (c) => `<li><strong>${
+                  c.href ? `<a href="${c.href}">${escapeHtml(c.label)}</a>` : escapeHtml(c.label)
+                }</strong> — ${c.consequence}</li>`,
+              )
+              .join("")}</ul>`
+      }
       ${renderHoldHarmless(d)}
     </div>`;
 }
@@ -417,12 +517,22 @@ export function renderAidSource(bundle: Bundle, d: District): string {
  * With transportation's own guarantee that is three mechanisms anchored to FY2021, on three
  * different bases. This block renders only the parts that apply, so a district touched by none of
  * them shows nothing.
+ *
+ * # The guard is a union, and it has to be
+ *
+ * It used to be `clawback || supplement`, which meant **158 of the 294 guaranteed districts** —
+ * every one carrying a guarantee and neither mechanism — had no table here at all, and their
+ * guarantee dollar total appeared on the dashboard only in the Detail card. Widening it to
+ * `guarantee > 0` *instead* would have been worse than leaving it: 22 districts have a clawback
+ * and no guarantee, 17 draw the supplement while drawing nothing from the guarantee, and the
+ * paragraph below names those 17 explicitly — so a replacement would have deleted the table from
+ * precisely the districts that sentence is about. 331 districts render it now, against 173 before.
  */
 function renderHoldHarmless(d: District): string {
   const t = d.transition;
   const clawback = t.open_enrollment_adjustment > 0;
   const supplement = t.transition_supplement > 0;
-  if (!clawback && !supplement) return "";
+  if (d.guarantee <= 0 && !clawback && !supplement) return "";
 
   const lost = t.open_enrollment_prior - t.open_enrollment_current;
   const beyond = Math.max(lost - t.open_enrollment_threshold, 0);
@@ -1485,3 +1595,80 @@ export function renderNationalPosition(d: District): string {
     </div>`;
 }
 
+
+/**
+ * What this page is not — the closing card, and the only one on the dashboard that declares
+ * collisions rather than stating figures.
+ *
+ * # Why the dashboard was the last route to get one
+ *
+ * Three of its four siblings already close this way: `finances.astro` says its actuals are not
+ * comparable line for line with the calculator and points here, `outcome.astro` names two mistakes
+ * it is built to prevent, `taxes.astro` names the department its figures come from and what they
+ * are not. The dashboard, which has the most collisions to declare, said nothing — and
+ * `finances.astro`'s note points at this page and receives no answer back.
+ *
+ * # The three it declares
+ *
+ * **Not money received.** Every figure above is the FY2027 calculator's answer, published before
+ * the year it funds. Money that changed hands is on `/finances`, from the district's own five-year
+ * forecast filing, and the two are differently constructed.
+ *
+ * **More than one pupil count.** `d.adm` is a three-year average and `d.current_year_adm` is the
+ * last year alone; they round to different integers for **499 of 609** districts, and the plan
+ * uses both in one calculation. `categorical_adm` is a third field carrying the current-year
+ * number for 608 districts and a figure fifty pupils below it for Akron.
+ *
+ * **A different year and a different denominator, two cards down.** Assessed valuation and
+ * operating expenditure per pupil are FY2024 figures on enrolled ADM FY2024 — a *fourth* count,
+ * differing from base cost ADM for 601 of 609 — while `/finances` divides by the report card's
+ * FY2025 unweighted headcount and `/outcome` by its FY2025 need-weighted one. Every one of those
+ * is declared in `denominators.ts`, which states that it cannot check prose. This card is the
+ * prose.
+ */
+export function renderWhatThisIsNot(bundle: Bundle, d: District): string {
+  const baseCostAdm = Math.round(d.adm);
+  const currentAdm = Math.round(d.current_year_adm);
+  const categoricalAdm = Math.round(d.categorical_adm);
+
+  return `
+    <div class="card" data-part="not">
+      <h2>What this page is not</h2>
+      <p class="note"><strong>None of the figures above is money this district received.</strong>
+        Every one of them is the FY${bundle.fiscal_year} funding calculator's answer for it,
+        published before the year it funds. What actually changed hands is on
+        <a href="${routes.districtFinances(d.irn)}">finances</a>, taken from this district's own
+        five-year forecast filing — audited actuals, on a different construction, in different
+        years. Reading either as a check on the other is the mistake the two routes are kept
+        apart to prevent.</p>
+      <p class="note"><strong>This page divides by more than one pupil count.</strong> Base cost
+        is built on ${count(baseCostAdm)} — a three-year average, because R.C. 3317.011 funds on
+        the greater of that and the current year. The state share of it, and every categorical
+        above, is paid on ${count(currentAdm)}: the current year alone.
+        ${
+          baseCostAdm === currentAdm
+            ? `Those round to the same figure here, which they do not for 499 of Ohio's
+               ${bundle.statewide.districts} districts.`
+            : `Those are different numbers, as they are for 499 of Ohio's
+               ${bundle.statewide.districts} districts.`
+        }
+        ${
+          categoricalAdm === currentAdm
+            ? ""
+            : `The categoricals are paid on a third field again, ${count(categoricalAdm)}, which
+               is the same count entered twice in the department's own sheet and corrected once.`
+        }
+        The corpus calls conflating them
+        <a href="${routes.metric("enrolled-adm")}">the single most common arithmetic error
+        available in Ohio school finance</a>, and
+        <a href="${routes.districtTaxes(d.irn)}">the property tax page</a> reconciles the two the
+        Department of Taxation and the Department of Education each publish.</p>
+      <p class="note"><strong>The position card below is a different year on a fourth count.</strong>
+        Assessed valuation and operating expenditure per pupil there are FY2024 figures divided by
+        enrolled ADM FY2024, beside a model that funds FY${bundle.fiscal_year}. Finances shows
+        FY2025 spending on the report card's unweighted headcount, and Outcome shows FY2025
+        spending on its need-weighted one. Three per-pupil figures, three counts, two years:
+        subtracting one from another produces a number that means nothing, which is why
+        <code>denominators.ts</code> exists and why it says it cannot check a sentence.</p>
+    </div>`;
+}

@@ -307,6 +307,14 @@ output { font-variant-numeric: tabular-nums; color: var(--text-primary); font-we
 .flags { display: flex; gap: .4rem; flex-wrap: wrap; margin-top: .9rem; }
 .flag { font-size: .76rem; padding: .2rem .5rem; border-radius: 999px; border: 1px solid var(--border); color: var(--text-secondary); background: var(--surface-2); }
 
+/* What the aid-source card's flag pills became. A pill holds a noun phrase and nothing else, and
+   "At the minimum state share" is a fact about 138 districts that a reader who does not already
+   know the plan cannot get from to what it means for theirs. These carry the consequence, so they
+   are rows rather than pills; the pill class above is unchanged and still used in eight places. */
+.conditions { list-style: none; margin: .9rem 0 0; padding: 0; display: grid; gap: .5rem; }
+.conditions li { color: var(--text-secondary); font-size: .86rem; border-left: 2px solid var(--border); padding-left: .7rem; }
+.conditions strong { color: var(--text-primary); font-weight: 600; }
+
 .note { color: var(--text-secondary); font-size: .86rem; margin: .9rem 0 0; }
 .note code { background: var(--surface-2); padding: .1rem .3rem; border-radius: 4px; }
 .err { color: var(--series-guarantee); }

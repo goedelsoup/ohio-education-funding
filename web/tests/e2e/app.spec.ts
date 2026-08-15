@@ -1936,6 +1936,181 @@ test.describe("outside the formula", () => {
   });
 });
 
+test.describe("the answer first", () => {
+  test("the page opens with state aid, not with an input to the formula", async ({ page }) => {
+    /*
+     * The first figure was base cost per pupil, which is what the plan says a district's education
+     * costs — not money it receives, and not what the page says it is about. The `<meta
+     * description>`, the share image's alt text and this card's own heading all say the question is
+     * state aid and where it comes from, and the page answered a different one for eight phases.
+     */
+    await page.goto(`/district/${CLEVELAND}`);
+    const tiles = page.locator('[data-part="headline"] .tile');
+    await expect(tiles).toHaveCount(3);
+    await expect(tiles.nth(0)).toContainText("State aid, FY2027");
+    await expect(tiles.nth(1)).toContainText("State aid / pupil");
+    await expect(tiles.nth(2)).toContainText("Base-cost ADM");
+    // And the tiles are inside the card whose heading asks the question, not floating above it.
+    await expect(page.locator('[data-part="aid-source"] [data-part="headline"]')).toHaveCount(1);
+  });
+
+  test("the aid total is summed from its components, not multiplied by a pupil count", async ({
+    page,
+  }) => {
+    /*
+     * `realized_aid_per_pupil` divides by base cost ADM, and the pupil count printed one tile to
+     * its right is the current-year one. Multiplying the per-pupil figure by the count beside it
+     * is wrong by a median $112,601 and by $8.2m for Cleveland — a figure large enough to be a
+     * finding, arrived at by an arithmetic a reader is being invited to perform.
+     */
+    const feed = await (await page.request.get("/data/bundle.json")).json();
+    const d = feed.districts.find((x: { irn: string }) => x.irn === CLEVELAND);
+    const summed = d.base_cost_state_share + d.categorical_funding + d.guarantee;
+    const multiplied = d.realized_aid_per_pupil * d.current_year_adm;
+    expect(Math.abs(summed - multiplied), "the two constructions still differ").toBeGreaterThan(
+      1_000_000,
+    );
+
+    await page.goto(`/district/${CLEVELAND}`);
+    const printed = await page
+      .locator('[data-part="headline"] .tile')
+      .first()
+      .locator(".v")
+      .innerText();
+    const dollars = Number(printed.replace(/[^0-9.]/g, ""));
+    // Printed to the nearest dollar, so the tolerance is rounding rather than construction.
+    expect(Math.abs(dollars - summed)).toBeLessThan(1);
+  });
+
+  test("what a year of enrollment is worth comes before what the plan says it costs", async ({
+    page,
+  }) => {
+    /*
+     * It was in position six of nine. For the 294 guaranteed districts this card answers the third
+     * clause of the page's own question directly — a year of enrollment is worth nothing to them,
+     * because the guarantee holds a fixed dollar amount enrollment does not enter — and a reader
+     * had to pass base cost, the categoricals and the supplements to reach it.
+     */
+    await page.goto(`/district/${CLEVELAND}`);
+    const order = await page
+      .locator("main .card[data-part]")
+      .evaluateAll((nodes) => nodes.map((n) => n.getAttribute("data-part")));
+    expect(order.slice(0, 4)).toEqual(["aid-source", "enrollment", "base-cost", "categoricals"]);
+    expect(order[order.length - 1]).toBe("not");
+  });
+
+  test("the two views of one district finally point at each other", async ({ page }) => {
+    // One district's counterfactual lever lived on one route and one district's projection on
+    // another, with no cross-reference in either direction. They hold opposite things fixed, which
+    // is the whole reason a reader on one wants the other.
+    await page.goto(`/district/${CLEVELAND}`);
+    await expect(page.locator('[data-part="enrollment"]')).toContainText(
+      "holds enrollment at published FY2026 and moves the formula",
+    );
+    await expect(
+      page.locator(`[data-part="enrollment"] a[href="/district/${CLEVELAND}/scenario"]`),
+    ).toHaveCount(1);
+
+    await page.goto(`/district/${CLEVELAND}/scenario`);
+    await expect(page.locator('[data-part="not"]')).toContainText("holds enrollment fixed");
+    await expect(
+      page.locator(`[data-part="not"] a[href="/district/${CLEVELAND}"]`),
+    ).toHaveCount(1);
+  });
+
+  test("the bar is drawn only where there are two proportions to draw", async ({ page }) => {
+    /*
+     * 315 districts receive exactly what the formula computes, so the split bar was a full-width
+     * single segment under a legend that had collapsed to one item — a proportion chart with one
+     * proportion in it. Nothing is lost by omitting it: where the guarantee pays zero, aid per
+     * pupil *is* formula aid per pupil, for all 315.
+     */
+    await page.goto(`/district/${CLEVELAND}`);
+    await expect(page.locator('[data-part="aid-source"] .bar .seg')).toHaveCount(2);
+
+    await page.goto(`/district/${ON_FORMULA}`);
+    await expect(page.locator('[data-part="aid-source"] .bar')).toHaveCount(0);
+    // The figure the legend used to carry is still on the page, in the tile above where it was.
+    await expect(page.locator('[data-part="headline"] .tile').nth(1)).toContainText(
+      "all from the formula",
+    );
+  });
+
+  test("each surviving condition says what follows from it, and links what it names", async ({
+    page,
+  }) => {
+    /*
+     * The flag row printed five pills and two of them restated the sub-line one element above.
+     * "At or below the 20-mill floor" was strictly *less* precise than what it duplicated — the
+     * sub-line separates the 21 districts genuinely below 20 mills from the 155 sitting on it, the
+     * pill collapsed all 176. What is left carries a consequence, because "At the minimum state
+     * share" is a noun phrase and a reader who does not already know the plan cannot get from it
+     * to what it means for their district.
+     */
+    // Wilmington City trips both of the two that carry a corpus link: it is within a twentieth of
+    // a mill of the floor and it is held at the minimum state share.
+    await page.goto("/district/045112");
+    const card = page.locator('[data-part="aid-source"]');
+    await expect(card).not.toContainText("At or below the 20-mill floor");
+    await expect(card).not.toContainText("Funded by the guarantee, not the formula");
+    const conditions = page.locator('[data-part="aid-source"] .conditions li');
+    await expect(conditions).toContainText([
+      "Within a twentieth of a mill of the floor",
+      "At the minimum state share",
+      "of voted millage reduced away",
+    ]);
+    await expect(card.locator('.conditions a[href="/wiki/parameter/twenty-mill-floor"]')).toHaveCount(1);
+    await expect(
+      card.locator('.conditions a[href="/wiki/metric/state-share-percentage"]'),
+    ).toHaveCount(1);
+    // Every row carries a clause, not just a label.
+    for (const text of await conditions.allInnerTexts()) {
+      expect(text, "a condition with no consequence clause").toContain(" — ");
+    }
+  });
+
+  test("the district that trips no condition renders no empty row", async ({ page }) => {
+    // Marion Local is the one. An empty `<ul>` reads as a gap in the page rather than as the
+    // absence of a fact, which is what it is.
+    await page.goto("/district/048553");
+    await expect(page.locator("h1")).toHaveText("Marion Local");
+    await expect(page.locator('[data-part="aid-source"] .conditions')).toHaveCount(0);
+  });
+
+  test("the dashboard finally says what it is not", async ({ page }) => {
+    /*
+     * Three of the four siblings close this way and the dashboard, with the most collisions to
+     * declare, did not — while `finances.astro`'s own closing card points here and received no
+     * answer back.
+     */
+    await page.goto(`/district/${CLEVELAND}`);
+    const card = page.locator('[data-part="not"]');
+    await expect(card).toContainText("None of the figures above is money this district received");
+    await expect(card).toContainText("divides by more than one pupil count");
+    await expect(card).toContainText("a fourth count");
+    await expect(card.locator(`a[href="/district/${CLEVELAND}/finances"]`)).toHaveCount(1);
+    await expect(card.locator('a[href="/wiki/metric/enrolled-adm"]')).toHaveCount(1);
+  });
+
+  test("a district whose two counts round alike is told so rather than shown two equal numbers", async ({
+    page,
+  }) => {
+    // 110 of 609. Printing the same integer twice under "more than one pupil count" would read as
+    // a rendering fault rather than as the fact that this district is one of the ones they agree
+    // for — so the sentence branches on it.
+    const feed = await (await page.request.get("/data/bundle.json")).json();
+    const same = feed.districts.find(
+      (d: { adm: number; current_year_adm: number }) =>
+        Math.round(d.adm) === Math.round(d.current_year_adm),
+    );
+    expect(same, "a district whose two counts round alike").toBeTruthy();
+    await page.goto(`/district/${same.irn}`);
+    await expect(page.locator('[data-part="not"]')).toContainText(
+      "round to the same figure here, which they do not for 499",
+    );
+  });
+});
+
 test.describe("the hold-harmless machinery", () => {
   test("the guarantee's open-enrolment clawback is shown as a deduction", async ({ page }) => {
     /*
@@ -2010,19 +2185,83 @@ test.describe("the hold-harmless machinery", () => {
     await expect(body).toContainText("A PRORATION OF 1.0 IS NOT AN ABSENCE");
   });
 
-  test("a district touched by neither shows no hold-harmless table", async ({ page }) => {
-    // The block renders only what applies, so a district on formula with no clawback and no
-    // supplement gets nothing rather than a table of dashes.
+  test("a district touched by none of the three shows no hold-harmless table", async ({ page }) => {
+    /*
+     * The guard is a union of three conditions, and this test used to select on two of them. It
+     * asked for the first district with no clawback and no supplement, which under the widened
+     * guard is not the same set — and it would have kept passing anyway, because the first such
+     * district in feed order happens to carry no guarantee either. A test that stays green while
+     * asserting something it no longer means is worse than one that goes red, so the selector
+     * names all three conditions explicitly.
+     */
     const feed = await (await page.request.get("/data/bundle.json")).json();
     const clean = feed.districts.find(
-      (d: { transition: { open_enrollment_adjustment: number; transition_supplement: number } }) =>
-        d.transition.open_enrollment_adjustment === 0 && d.transition.transition_supplement === 0,
+      (d: {
+        guarantee: number;
+        transition: { open_enrollment_adjustment: number; transition_supplement: number };
+      }) =>
+        d.guarantee <= 0 &&
+        d.transition.open_enrollment_adjustment === 0 &&
+        d.transition.transition_supplement === 0,
     );
-    expect(clean, "a district touched by neither mechanism").toBeTruthy();
+    expect(clean, "a district touched by none of the three mechanisms").toBeTruthy();
     await page.goto(`/district/${clean.irn}`);
-    await expect(page.locator('[data-part="aid-source"] table[data-program="hold-harmless"]')).toHaveCount(
-      0,
+    await expect(
+      page.locator('[data-part="aid-source"] table[data-program="hold-harmless"]'),
+    ).toHaveCount(0);
+  });
+
+  test("a guaranteed district with neither mechanism still gets its guarantee total", async ({
+    page,
+  }) => {
+    /*
+     * The 158 this phase is for. The guard was `clawback || supplement`, so a district carrying a
+     * guarantee and neither mechanism had no table here at all, and its guarantee dollar total
+     * appeared on the dashboard only in the Detail card — which is the card the next phase
+     * deletes. This has to land before that one or those 158 lose the figure silently.
+     */
+    const feed = await (await page.request.get("/data/bundle.json")).json();
+    const guaranteed = feed.districts.find(
+      (d: {
+        guarantee: number;
+        transition: { open_enrollment_adjustment: number; transition_supplement: number };
+      }) =>
+        d.guarantee > 0 &&
+        d.transition.open_enrollment_adjustment === 0 &&
+        d.transition.transition_supplement === 0,
     );
+    expect(guaranteed, "a guaranteed district with neither mechanism").toBeTruthy();
+    await page.goto(`/district/${guaranteed.irn}`);
+    const table = page.locator('[data-part="aid-source"] table[data-program="hold-harmless"]');
+    await expect(table).toBeVisible();
+    await expect(table).toContainText("FY2021 funding base");
+    await expect(table).toContainText("Guarantee");
+    // The two conditional rows stay conditional. This district has neither.
+    await expect(table).not.toContainText("Open-enrolment clawback");
+    await expect(table).not.toContainText("Formula transition supplement");
+  });
+
+  test("a district with a mechanism and no guarantee keeps its table", async ({ page }) => {
+    /*
+     * The 37 a literal reading of "widen the guard to `guarantee > 0`" would have deleted the
+     * table from — 22 with a clawback and 17 drawing the supplement while drawing nothing from the
+     * guarantee. The supplement paragraph names those 17 by count, so a replacement rather than a
+     * union would have removed the table from precisely the districts that sentence is about.
+     */
+    const feed = await (await page.request.get("/data/bundle.json")).json();
+    const touched = feed.districts.find(
+      (d: {
+        guarantee: number;
+        transition: { open_enrollment_adjustment: number; transition_supplement: number };
+      }) =>
+        d.guarantee <= 0 &&
+        (d.transition.open_enrollment_adjustment > 0 || d.transition.transition_supplement > 0),
+    );
+    expect(touched, "a district with a mechanism and no guarantee").toBeTruthy();
+    await page.goto(`/district/${touched.irn}`);
+    await expect(
+      page.locator('[data-part="aid-source"] table[data-program="hold-harmless"]'),
+    ).toBeVisible();
   });
 });
 

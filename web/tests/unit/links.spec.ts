@@ -22,9 +22,10 @@ import {
   renderAidSource,
   renderCategoricals,
   renderDetail,
-  renderHeadline,
+  renderEnrollmentYears,
   renderNationalPosition,
   renderSupplements,
+  renderWhatThisIsNot,
 } from "../../src/lib/district.ts";
 import { loadFeed } from "../../src/lib/feed.ts";
 import { counties } from "../../src/lib/county.ts";
@@ -338,6 +339,16 @@ test("the metric routes the district pages link to are real nodes", () => {
  * Two districts, because coverage is data-dependent: a large urban one renders supplement and
  * clawback rows a small one does not, and the union of the two is what the suite should hold.
  */
+/**
+ * The measured size of the set the test below harvests, written down rather than rounded.
+ *
+ * It is a floor and not an equality: a district that trips a branch the sample pair does not would
+ * legitimately raise it, and pinning it exactly would make the test fail on a correct change. It
+ * exists so that a renderer whose signature changes and stops producing markup fails here instead
+ * of passing on an empty set.
+ */
+const EMITTED_FLOOR = 25;
+
 test("every corpus link the district renderers emit resolves", () => {
   const districts = bundle.districts;
   const statewide = bundle.statewide;
@@ -350,8 +361,9 @@ test("every corpus link the district renderers emit resolves", () => {
   const emitted = new Set<string>();
   for (const d of sample) {
     const html = [
-      renderHeadline(d),
       renderAidSource(bundle, d),
+      renderEnrollmentYears(bundle, d, true),
+      renderWhatThisIsNot(bundle, d),
       renderBaseCostBuildUp(d, statewide.districts),
       renderCategoricals(d, statewide),
       renderSupplements(d),
@@ -363,21 +375,24 @@ test("every corpus link the district renderers emit resolves", () => {
       renderChargeOff(d, statewide),
       renderSpendingByFunction(d),
     ].join("\n");
-    for (const match of html.matchAll(/href="(\/wiki\/[^"#?]+)/g)) emitted.add(match[1]!);
+    for (const match of html.matchAll(/href="(\/[^"#?]*)/g)) emitted.add(match[1]!);
   }
 
-  // Vacuity guard, at the measured number rather than a round one. Fourteen distinct targets, of
-  // which eleven are the `formula-component` slugs that reach the markup through a table — the
-  // cluster a source-reading version of this test cannot see. If a renderer signature changes and
-  // the calls above stop producing markup, the set shrinks and this fails rather than passing on
-  // nothing.
+  // Every site-absolute link, not only the `/wiki/` ones. The reciprocal links between the
+  // enrollment card and the district scenario route, and the closing card's pointers at
+  // `/finances` and `/taxes`, are route strings written inline in a template — the same shape as
+  // the `routes.parameter` call that shipped a 404 on 609 pages, and enumerated by nothing else.
+  //
+  // Vacuity guard at the measured number rather than a round one. If a renderer signature changes
+  // and the calls above stop producing markup, the set shrinks and this fails rather than passing
+  // on nothing.
   expect(
     emitted.size,
-    "the district renderers emitted fewer corpus links than they used to",
-  ).toBeGreaterThanOrEqual(14);
+    "the district renderers emitted fewer internal links than they used to",
+  ).toBeGreaterThanOrEqual(EMITTED_FLOOR);
 
   const broken = [...emitted].filter((href) => !known(href)).sort();
-  expect(broken, "corpus links the district pages emit that resolve to nothing").toEqual([]);
+  expect(broken, "links the district pages emit that resolve to nothing").toEqual([]);
 
   // This and the hand-pinned test above are complementary, not redundant. `renderPosition`,
   // `renderTaxChange` and `renderTaxAgainstSpending` need statewide comparison arguments this test

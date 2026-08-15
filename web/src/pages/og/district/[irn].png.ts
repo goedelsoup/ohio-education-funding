@@ -57,7 +57,12 @@ export function districtCard(district: District, fiscalYear: number): Card {
           tone: "guarantee",
         }
       : { share: 1, label: "Funded by the formula", tone: "formula" },
-    meta: `IRN ${district.irn} · ${count(Math.round(district.adm))} pupils · FY${fiscalYear}`,
+    // "pupils" until this phase, which is the label the dashboard just stopped using. `adm` is base
+    // cost ADM — a three-year average, not a headcount — and it is the denominator under the
+    // per-pupil figure printed two lines above it in this same image. A shared card that names the
+    // count differently from the page it links to is the trap the relabelling was for, arriving by
+    // a route nobody reads.
+    meta: `IRN ${district.irn} · ${count(Math.round(district.adm))} base-cost ADM · FY${fiscalYear}`,
   };
 }
 
