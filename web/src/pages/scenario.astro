@@ -47,14 +47,14 @@ const meta = bundle.projection;
     <p class="note">
       Ohio's formula contains statewide constants — the average base cost per pupil, the statewide
       poverty share, the median weighted wealth — that are computed once over all districts. The
-      department's own calculator warns that they are
+      department's own calculator warns that they are{" "}
       <strong>not recalculated</strong> when a district's data changes. That is right for a tool
       where you change one district and everything else stays put. It is wrong here, where every
       lever moves all {count(s.districts)} at once and the statewide average is the first thing
       that would move.
     </p>
     <p class="note">
-      So <strong>this model diverges from the department's on purpose</strong>. The
+      So <strong>this model diverges from the department's on purpose</strong>. The{" "}
       <strong>cost input refresh</strong> lever scales base cost <em>and</em> the
       {millions(812_500_000).replace("+", "")} of categorical funding priced in it — special
       education, English learners and career-technical are each a weight times the average base
@@ -65,8 +65,8 @@ const meta = bundle.projection;
     </p>
     <p class="note">
       Three things are still held still, for three different reasons. The two biggest categoricals
-      — <a href={routes.wikiNode("formula-component", "fsfp-disadvantaged-pupil-impact-aid")}>DPIA</a>
-      and
+      — <a href={routes.wikiNode("formula-component", "fsfp-disadvantaged-pupil-impact-aid")}>DPIA</a>{" "}
+      and{" "}
       <a href={routes.wikiNode("formula-component", "fsfp-targeted-assistance")}>targeted assistance</a>,
       {millions(1_890_000_000).replace("+", "")} together — divide a district's figure by a
       statewide one, so under a change that moves everything the numerator and denominator move
