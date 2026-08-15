@@ -1,0 +1,124 @@
+id: every-figure-says-its-year
+summary: >-
+  A district page shows five reckonings of "the year" under one heading naming one of them. The
+  feed now derives a `series_years` index from the blocks themselves, every card carrying figures
+  is required to display its own year, and the terms whose everyday reading differs from their
+  Ohio reading carry a definition a keyboard can reach without script.
+context: |
+  A page on this site puts the FY2027 formula beside a 2024 tax year, a 2024-25 report card, an
+  FY2022 Census survey and a five-year forecast reaching back to FY2020. The header said
+  `FY2027` — the model's year, and the year of nothing else on the page.
+
+  Three things made that worse than an omission.
+
+  **The reckonings are not the same kind of thing.** A tax year is a calendar year whose revenue
+  reaches a district in the *following* fiscal year. A school year straddles two calendar years
+  and is published as `2024-25`. A fiscal year runs July to June and is named for the June. Every
+  one of those is "2024" to somebody, and rendering all three as a bare number invites a reader to
+  set them side by side as though they were the same period.
+
+  **The years were prose.** They lived in Rust doc comments — `/// Performance Index, 2024-25` —
+  and in about **190 four-digit literals across 25 files** in the web layer. One of them,
+  `2024-25`, was a string in an Astro `<meta>` description with nothing connecting it to the
+  download it described.
+
+  **And one of them was already wrong.** `Bundle::provenance` is a hand-written paragraph naming
+  every year in the feed. It said **"millage is TY2023"** while all 609 districts carried
+  `tax_year: 2024`. Nothing could have caught it: a sentence and a column cannot disagree in a way
+  a compiler or a test notices, and the sentence is the half a reader sees. This is the same
+  failure shape `connect::index`'s node count had when it was the literal `58` — a regenerated
+  constant produces no diff.
+
+  Separately, the site had **no tooltip mechanism at all**. Every `title=` in `web/src/` was the
+  page-title prop; no `<abbr>`, no `aria-describedby`. The terms most likely to be misread —
+  "per equivalent pupil", "effective millage", "on the guarantee" — had no affordance saying they
+  meant something specific.
+decision: |
+  **The year is a datum, derived, before it is a label.** `crates/bundle` gains a `series_years`
+  index: one row per block, each carrying `series`, `kind` (`fiscal` | `tax` | `school`), a
+  ready-to-render `label`, and its `source`. Every label is read off the block it describes — the
+  maximum tax year actually present, the ends of each series, `MODEL_YEAR` — so a year that moves
+  in the data moves here.
+
+  `Bundle::provenance` **stops restating years**, and a test forbids it growing them back. One
+  place, or the two drift again.
+
+  The report card is the exception that proves the rule: a school year has no number to read off a
+  row, so it is a named constant — checked against the fixture *path*, `report-card-2425-…`, so
+  swapping in next year's download without moving the label fails the build.
+
+  **Every card showing figures displays its own year**, as a chip in its `h2`, driven from the
+  index. Where a card genuinely mixes reckonings it says so — `2024-25 · spending FY2025` — rather
+  than picking one. A card with no figures carries no chip: dating an absence says nothing.
+
+  **Tables follow one rule.** Where the rows or columns are on one year, the chip carries it and
+  the table does not repeat it. Where they are on more than one, **every** row says which.
+  Half-labelling is worse than none, because it implies the unlabelled rows share the labelled
+  one's year.
+
+  **A defined term is the trigger, with a dotted underline** — not a `(?)` beside it. It renders
+  as a real `<button>` with `aria-describedby` pointing at a sibling that is always in the
+  document, revealed by `:hover` and `:focus-within`. No script, no hover dependency, and
+  deliberately no `title`, which would be announced alongside the description.
+consequences: |
+  **The stale year was the argument.** Nothing about the plan changed when TY2023 turned out to be
+  wrong, but the priority did: the derivation stopped being tidiness and became the fix for a live
+  defect. It is also the reason `series_years` is derived rather than a second hand-written table,
+  which would have been the same mistake with better formatting.
+
+  **Zero cards with figures now lack a year**, asserted on the built pages rather than per
+  renderer — a card added in an `.astro` file is as unchipped as one added in `src/lib`, and only
+  the rendered page sees both. That let the rule be a hard zero rather than a ratchet.
+
+  **The scan found the wrong branch chipped, three times.** A script that put the chip on the
+  first `h2` after each `data-part` attached it to the *empty-state* card in
+  `renderNationalPosition`, `renderOutcomes` and `renderSpendingByFunction` — the branch that says
+  a district has no data. Reading the built HTML rather than the source caught it; reading the
+  source would not have, because both branches look identical there.
+
+  **A second chip check was needed, and it is the one that matters.** A test that every card has a
+  chip passes just as happily if every chip on the page reads `FY2027`, which is the state the
+  page was already in. So there is a second assertion: the chips on one page name more than one
+  `data-kind`, and the bare `2024` carries the long form saying it is a tax year.
+
+  **The glossary is short on purpose.** Twelve entries, and the bar is that a reader who knows
+  ordinary English gets the term *wrong* — not merely that it is jargon. A page where every third
+  word is underlined has taught the reader to ignore the underlines.
+
+  **`term()` throws on an unknown slug** rather than falling back to bare text. A silent fallback
+  would let a renamed entry strip the definitions off a page with nothing to notice, which is the
+  same class of failure as a link resolving to a plausible 404.
+
+  Contract `34.0.0`. Breaking rather than additive because `series_years` is required: a consumer
+  that renders figures from this feed and has never had to say what year they are on is a consumer
+  whose pages were making the mistake this block exists to stop.
+alternatives: |
+  **A year field on every numeric field.** Rejected. The year is a property of the *source*, not
+  of the number: the report card publishes one year at a time, the Census survey publishes one
+  year at a time. Hanging a year on each of the two hundred-odd numeric fields would repeat the
+  same string two hundred times and still not say which of them moved together.
+
+  **One year on the page header, stated more loudly.** Rejected, and it is what the page already
+  did. The problem is not that `FY2027` was quiet; it is that it was true of one card in six. A
+  louder wrong label is worse than a quiet one.
+
+  **Keep the years in the provenance paragraph and render it prominently.** Rejected on the
+  evidence — the paragraph was wrong, and prose is exactly the form in which it could be wrong
+  without anything noticing. The paragraph survives as narrative and no longer carries a year.
+
+  **`<abbr title>` for the defined terms.** Rejected. Invisible on touch, inconsistently announced
+  by screen readers, and it puts the definition somewhere a reader cannot select or follow a link
+  from. The corpus link inside each definition is half the point.
+
+  **A `(?)` affordance beside each term.** Rejected on density. On a page with forty figures that
+  is forty pieces of furniture; the dotted underline is the older convention and carries its own
+  discoverability without occupying space.
+
+  **A JavaScript tooltip library.** Rejected on the house rule this site already follows — the
+  district filter and the basis toggle both work with script off — and on a stronger version of
+  it: a definition that needs a bundle to appear is a definition most crawlers and some readers
+  never get.
+
+  **Colour the chips by reckoning.** Rejected. A tax year and a fiscal year are equally
+  authoritative, and colouring one would imply a hierarchy that is not there. The distinction is
+  carried by the label and spelled out in the title.

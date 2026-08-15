@@ -29,6 +29,7 @@ import { barSpec } from "./plot/spec.ts";
 import { renderToString } from "./plot/ssr.ts";
 import * as routes from "./routes.ts";
 import type { BaseCostBuildUp, District } from "./types.ts";
+import { yearChip } from "./year.ts";
 
 /** One element of the build-up: its statutory letter, what it pays for, and how much. */
 interface Element {
@@ -213,7 +214,7 @@ export function renderBaseCostBuildUp(d: District, districts: number): string {
 
   return `
     <div class="card" id="base-cost" data-part="base-cost">
-      <h2>Why base cost is ${money(d.base_cost_per_pupil)} per pupil</h2>
+      <h2>Why base cost is ${money(d.base_cost_per_pupil)} per pupil${yearChip("formula")}</h2>
       <p class="note">Base cost is not a rate the state sets. It is assembled for each district
         from staffing ratios written into R.C. 3317.011, applied to
         <strong>this district's own enrollment</strong> and priced at statewide average salaries.

@@ -28,6 +28,10 @@ export const GET: APIRoute = () => {
     contract_version: bundle.contract_version,
     provenance: bundle.provenance,
     fiscal_year: bundle.fiscal_year,
+    // Ten short rows, and the scenario runner is the one surface that renders figures the reader
+    // never saw the build-time page for. Trimming this to save a few hundred bytes would be
+    // trimming the only thing that says what year the numbers beside it are.
+    series_years: bundle.series_years,
     statewide,
     checkpoints: bundle.checkpoints,
     projection: bundle.projection,

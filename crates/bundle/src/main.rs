@@ -16,8 +16,8 @@ use bundle::{
     Checkpoint, Deflator, District, DistrictOutcome, Dpia, EnglishLearners, FinanceYear,
     ForecastCheckpoint, Gifted, HistoryYear, HouseDistrictMember, HouseDistrictShare,
     MealProgramYear, MillageAnalysis, National, OutcomeStatewide, PolicyShape, Projection,
-    PropertyTaxYear, RegimeCounterfactual, SpecialEducation, SpendingByFunction, StateFinance,
-    Statewide, TargetedAssistance, CONTRACT_VERSION,
+    PropertyTaxYear, RegimeCounterfactual, SeriesYear, SpecialEducation, SpendingByFunction,
+    StateFinance, Statewide, TargetedAssistance, YearKind, CONTRACT_VERSION,
 };
 use dispersion::mr81::poverty_share_by_year;
 use dispersion::ohio_panel::{equalization_by_year, revenue_mix_by_year};
@@ -44,6 +44,36 @@ const HORIZON: FiscalYear = FiscalYear(2036);
 
 /// The FY2024 District Profile Report: millage, expenditure, demographics.
 const PROFILE: &str = include_str!("../../dispersion/fixtures/cupp-fy24-district-data.csv");
+
+/// The fiscal year [`PROFILE`] describes.
+const PROFILE_YEAR: u16 = 2024;
+
+/// The school year the report card describes, as its publisher writes it.
+///
+/// A constant and not a derivation, because a school year is the one reckoning with no number to
+/// read off a row: the extract carries `performance_index`, not `2024-25`. It is named here, once,
+/// rather than typed into an Astro `<meta>` description, which is where it lived and where
+/// nothing checked it.
+///
+/// It is not merely a constant, though. `report_card_fixture_and_year_agree` holds it against the
+/// fixture *path* — `report-card-2425-district-data.csv` — so swapping in next year's download
+/// without moving the label fails the build. A named constant nothing checks is the same hazard
+/// as a literal; the check is what makes the difference.
+const REPORT_CARD_YEAR: &str = "2024-25";
+
+/// The report card extract the label above describes, named so the two can be checked against
+/// each other. The file itself is read by `project::outcomes`.
+///
+/// Test-only: it exists to be compared with [`REPORT_CARD_YEAR`], not to be read.
+#[cfg(test)]
+const REPORT_CARD_FIXTURE: &str = "report-card-2425-district-data.csv";
+
+/// The fiscal year the report card's *spending* columns are on.
+///
+/// One year, two reckonings. The report card publishes attainment for the 2024-25 school year and
+/// operating expenditure for FY2025 in the same download, and a card showing both under one label
+/// would be picking one and being wrong about the other half of its own figures.
+const REPORT_CARD_SPENDING_YEAR: u16 = 2025;
 
 /// Table SD-1: taxable value by class and taxes charged, one row per district per tax year.
 ///
@@ -659,6 +689,172 @@ fn to_district(record: &DistrictRecord, joins: &Joins<'_>) -> District {
 ///
 /// FY2014 is absent because it is absent from the Bureau's archive under every naming the other
 /// years use, so the series has a hole in it rather than an interpolation across it.
+/// What year each block of this feed is measured in, read off the blocks themselves.
+///
+/// # Why nothing here is typed
+///
+/// Because the prose version was wrong. `Bundle::provenance` is a hand-written paragraph naming
+/// every year in the feed, and it said **"millage is TY2023"** while all 609 districts carried
+/// `tax_year: 2024`. Nothing could have caught it: a sentence and a column cannot disagree in a
+/// way a compiler or a test notices, and the sentence is the half a reader sees.
+///
+/// So every label below is derived — from `MODEL_YEAR`, from the maximum tax year actually
+/// present, from the ends of the series. A year that moves in the data moves here, and the
+/// stale-label failure is structurally unavailable rather than merely unlikely.
+///
+/// The report card is the exception that proves the rule, and it is handled at
+/// [`REPORT_CARD_YEAR`]: it is a school year, so there is no number in the extract to read it
+/// off. It is a named constant with a test against the fixture rather than a string typed into a
+/// page.
+fn series_years(
+    districts: &[District],
+    history: &[HistoryYear],
+    appropriations: &[AppropriationYear],
+    meal_program: &[MealProgramYear],
+) -> Vec<SeriesYear> {
+    let mut out = vec![
+        SeriesYear {
+            series: "formula".into(),
+            kind: YearKind::Fiscal,
+            label: format!("FY{}", MODEL_YEAR.0),
+            source: "DEW FY27 TRAD State Foundation Funding Calculator".into(),
+        },
+        SeriesYear {
+            series: "outcome.performance".into(),
+            kind: YearKind::School,
+            label: REPORT_CARD_YEAR.into(),
+            source: "Ohio School Report Card".into(),
+        },
+        SeriesYear {
+            series: "outcome.spending".into(),
+            kind: YearKind::Fiscal,
+            label: format!("FY{REPORT_CARD_SPENDING_YEAR}"),
+            source: "Ohio School Report Card, expenditure download".into(),
+        },
+        SeriesYear {
+            series: "profile".into(),
+            kind: YearKind::Fiscal,
+            label: format!("FY{PROFILE_YEAR}"),
+            source: "DEW District Profile Report".into(),
+        },
+    ];
+
+    // The maximum rather than a constant, and the maximum of what is *in the feed* rather than of
+    // what the source file holds. This is the field the provenance paragraph got wrong.
+    if let Some(year) = districts
+        .iter()
+        .filter_map(|d| d.millage.as_ref())
+        .map(|m| m.tax_year)
+        .max()
+    {
+        out.push(SeriesYear {
+            series: "millage".into(),
+            kind: YearKind::Tax,
+            label: year.to_string(),
+            source: "Department of Taxation, Table SD-1".into(),
+        });
+    }
+
+    if let Some((first, last)) = span(
+        districts
+            .iter()
+            .flat_map(|d| d.property_tax.iter().map(|p| p.tax_year)),
+    ) {
+        out.push(SeriesYear {
+            series: "property_tax".into(),
+            kind: YearKind::Tax,
+            label: label_span(first, last, ""),
+            source: "Department of Taxation, Table SD-1".into(),
+        });
+    }
+
+    if let Some((first, last)) = span(
+        districts
+            .iter()
+            .flat_map(|d| d.finances.iter().map(|f| f.fiscal_year)),
+    ) {
+        out.push(SeriesYear {
+            series: "finances".into(),
+            kind: YearKind::Fiscal,
+            label: label_span(first, last, "FY"),
+            source: "District five-year forecast filings, R.C. 5705.391".into(),
+        });
+    }
+
+    if let Some((first, last)) = span(history.iter().map(|h| h.fiscal_year)) {
+        out.push(SeriesYear {
+            series: "history".into(),
+            kind: YearKind::Fiscal,
+            label: label_span(first, last, "FY"),
+            source: "Census Bureau, Annual Survey of School System Finances".into(),
+        });
+        // The cross-state comparison is one year of the same survey, and it is the *last* one.
+        // Separate from `history` because a card placing Ohio among the states is showing that
+        // year alone, and a chip reading FY2009-FY2022 there would be describing the wrong thing.
+        out.push(SeriesYear {
+            series: "national".into(),
+            kind: YearKind::Fiscal,
+            label: format!("FY{last}"),
+            source: "Census Bureau, Annual Survey of School System Finances".into(),
+        });
+    }
+
+    // The enrollment counts the formula runs on, which span three years inside a single FY2027
+    // model — and the last of them is partly departmental estimate rather than observation.
+    if let Some((first, last)) = span(districts.iter().flat_map(|d| {
+        d.adm_history
+            .iter()
+            .enumerate()
+            .map(|(i, _)| MODEL_YEAR.0 - 3 + u16::try_from(i).unwrap_or(0))
+    })) {
+        out.push(SeriesYear {
+            series: "enrollment".into(),
+            kind: YearKind::Fiscal,
+            label: label_span(first, last, "FY"),
+            source: "DEW calculator, ADM Data sheet; the last year is partly estimate".into(),
+        });
+    }
+
+    if let Some((first, last)) = span(appropriations.iter().map(|a| a.fiscal_year)) {
+        out.push(SeriesYear {
+            series: "appropriations".into(),
+            kind: YearKind::Fiscal,
+            label: label_span(first, last, "FY"),
+            source: "Legislative Service Commission, enacted appropriations".into(),
+        });
+    }
+
+    if let Some((first, last)) = span(meal_program.iter().map(|m| m.fiscal_year)) {
+        out.push(SeriesYear {
+            series: "meal_program".into(),
+            kind: YearKind::Fiscal,
+            label: label_span(first, last, "FY"),
+            source: "Office for Child Nutrition, MR-81".into(),
+        });
+    }
+
+    out
+}
+
+/// The lowest and highest of an iterator of years, or `None` if it is empty.
+fn span(years: impl Iterator<Item = u16>) -> Option<(u16, u16)> {
+    let mut sorted: Vec<u16> = years.collect();
+    sorted.sort_unstable();
+    Some((*sorted.first()?, *sorted.last()?))
+}
+
+/// `FY2020-FY2025`, or just `FY2025` where the span is one year.
+///
+/// A range collapsed to its single member rather than printed as `FY2025-FY2025`, because a chip
+/// reading the latter tells a reader there is a span to think about when there is not.
+fn label_span(first: u16, last: u16, prefix: &str) -> String {
+    if first == last {
+        format!("{prefix}{last}")
+    } else {
+        format!("{prefix}{first}-{prefix}{last}")
+    }
+}
+
 fn history() -> Vec<HistoryYear> {
     let equalization = equalization_by_year();
     revenue_mix_by_year()
@@ -1423,15 +1619,22 @@ fn main() {
         house_districts: house_district_block(&records, Chamber::House),
         senate_districts: house_district_block(&records, Chamber::Senate),
         contract_version: CONTRACT_VERSION.to_string(),
-        provenance: "Ohio DEW FY27 TRAD State Foundation Funding Calculator (a projection, not \
-                     an actual) joined with the FY2024 District Profile Report. Base cost, \
-                     guarantee, and formula funding are FY2027; enrolled ADM is FY2024-FY2026, \
-                     of which FY2026 is partly departmental estimate; millage is TY2023; \
-                     expenditure and demographics are FY2024. Achievement, growth, need, and \
-                     FY2025 spending are the 2024-25 Ohio School Report Card, joined on IRN \
-                     across the 606 districts every panel covers. See .yidam/catalog/."
+        // Deliberately no longer restates the years. It used to name every one of them, and it
+        // said "millage is TY2023" while all 609 districts carried `tax_year: 2024` — a sentence
+        // and a column cannot disagree in a way anything notices, and the sentence is the half a
+        // reader sees. Years are in `series_years` now, derived, and stated once.
+        // Plain prose, no backticks: this string is rendered into the site footer as text, so a
+        // code span would print its own punctuation to the reader.
+        provenance: "Ohio DEW TRAD State Foundation Funding Calculator (a projection, not an \
+                     actual) joined with the District Profile Report, the Department of \
+                     Taxation's Table SD-1, and the Ohio School Report Card on IRN across the \
+                     606 districts every panel covers. Enrolled ADM spans three years, of which \
+                     the last is partly departmental estimate. Each block states the year it is \
+                     measured in beside its own figures; see .yidam/catalog/ for what each \
+                     source can be trusted for."
             .to_string(),
         fiscal_year: MODEL_YEAR.0,
+        series_years: series_years(&districts, &history, &appropriations, &meal_program()),
         statewide,
         checkpoints,
         projection: Some(projection),
@@ -1450,4 +1653,55 @@ fn main() {
         districts,
     };
     print!("{}", bundle.to_json());
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn report_card_fixture_and_year_agree() {
+        /*
+         * The label and the file it labels, held together.
+         *
+         * `2024-25` used to be a string literal in an Astro `<meta>` description, and the year
+         * before that it was a different string literal in the same place. Nothing connected
+         * either to the download it described, so replacing the fixture would have left the page
+         * confidently naming the wrong school year — and a regenerated constant produces no diff,
+         * which is the failure `connect::index`'s node count had when it was the literal `58`.
+         *
+         * `2024-25` -> `2425` is the department's own filename convention.
+         */
+        let compact: String = REPORT_CARD_YEAR.split('-').collect();
+        assert_eq!(compact.len(), 6, "a school year is `YYYY-YY`");
+        let short = format!("{}{}", &compact[2..4], &compact[4..6]);
+        assert!(
+            REPORT_CARD_FIXTURE.contains(&short),
+            "REPORT_CARD_YEAR is {REPORT_CARD_YEAR}, so the fixture should carry `{short}`, and \
+             it is {REPORT_CARD_FIXTURE}"
+        );
+    }
+
+    #[test]
+    fn the_spending_year_is_the_later_half_of_the_report_card_year() {
+        /*
+         * One download, two reckonings: attainment for the 2024-25 school year and operating
+         * expenditure for FY2025. They are the same period and they are not the same label, and
+         * the relationship between them is the thing worth pinning — if the report card moves on,
+         * both constants move together or the pair is wrong.
+         */
+        let ends_in: u16 = REPORT_CARD_YEAR[..4]
+            .parse::<u16>()
+            .expect("a leading year")
+            + 1;
+        assert_eq!(REPORT_CARD_SPENDING_YEAR, ends_in);
+    }
+
+    #[test]
+    fn a_one_year_span_is_not_written_as_a_range() {
+        // `FY2025-FY2025` tells a reader there is a span to think about when there is not.
+        assert_eq!(label_span(2025, 2025, "FY"), "FY2025");
+        assert_eq!(label_span(2020, 2025, "FY"), "FY2020-FY2025");
+        assert_eq!(label_span(2024, 2024, ""), "2024");
+    }
 }

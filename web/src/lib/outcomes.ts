@@ -20,6 +20,8 @@ import { barSpec } from "./plot/spec.ts";
 import { renderToString } from "./plot/ssr.ts";
 import { count, escapeHtml, money, pct } from "./format.ts";
 import type { Bundle, District, OutcomeStatewide } from "./types.ts";
+import { seriesYear, yearChip, yearChipPair } from "./year.ts";
+import { term } from "./glossary.ts";
 
 /** A correlation, signed and to three places. */
 function coefficient(v: number): string {
@@ -198,11 +200,13 @@ export function renderOutcomeContext(bundle: Bundle, district: District): string
 
   return `
     <div class="card" id="comparable-poverty" data-part="comparable-poverty">
-      <h2>Against districts with comparable poverty</h2>
+      <h2>Against districts with comparable poverty${yearChip("outcome.performance")}</h2>
       <div class="tiles">
         <div class="tile"><div class="k">This district</div>
           <div class="v">${o.performance_index.toFixed(1)}</div>
-          <div class="n">Performance Index, 2024-25</div></div>
+          <div class="n">${term("performance-index", "Performance Index")}, ${
+            seriesYear("outcome.performance")?.label ?? ""
+          }</div></div>
         <div class="tile"><div class="k">Median of its poverty fifth</div>
           <div class="v">${median.toFixed(1)}</div>
           <div class="n">${count(peers.length)} districts in the ${escapeHtml(label)},
@@ -292,6 +296,8 @@ export function renderDistrictOutcome(
 ): string {
   const o = district.outcome;
   if (!o) {
+    // No chip. There are no figures here to be on a year, and a chip over a card explaining that
+    // a district has no report card would be dating an absence.
     return `<div class="card" id="outcomes" data-part="outcomes">
       <h2>Outcomes</h2>
       <p class="note">No report card is published for this district. It is one of the three
@@ -306,7 +312,7 @@ export function renderDistrictOutcome(
 
   return `
     <div class="card" id="outcomes" data-part="outcomes">
-      <h2>Outcomes</h2>
+      <h2>Outcomes${yearChipPair("outcome.performance", "outcome.spending", "spending")}</h2>
       <div class="scroll"><table><tbody>
         ${series
           .map(

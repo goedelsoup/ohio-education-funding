@@ -130,7 +130,71 @@ use edfund_core::Dollars;
 /// from FY2022-FY2024 to FY2024-FY2026 — the years the department's `ADM Data` sheet declares.
 /// The values did not change; what they are called did, which is exactly the kind of silent
 /// meaning change the version guard exists for.
-pub const CONTRACT_VERSION: &str = "33.0.0";
+pub const CONTRACT_VERSION: &str = "34.0.0";
+
+/// How a year is reckoned, because Ohio reckons three ways and they do not line up.
+///
+/// A tax year is a calendar year, and the revenue it raises reaches a district in the *following*
+/// fiscal year. A school year straddles two calendar years and is published as `2024-25`. A fiscal
+/// year runs July to June and is named for the June. Every one of those is "2024" to somebody, and
+/// a feed that renders all three as a bare number invites the reader to subtract them.
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum YearKind {
+    /// July to June, named for the June. `FY2027`.
+    Fiscal,
+    /// A calendar year of valuation and levy. `2024 tax year`.
+    Tax,
+    /// September to June, named for both. `2024-25`.
+    School,
+}
+
+impl YearKind {
+    /// The token the feed writes, and the discriminant a consumer switches on.
+    #[must_use]
+    pub const fn as_str(self) -> &'static str {
+        match self {
+            Self::Fiscal => "fiscal",
+            Self::Tax => "tax",
+            Self::School => "school",
+        }
+    }
+}
+
+/// What year one series in this feed is measured in, and where that came from.
+///
+/// # Why this is a block rather than a field on each figure
+///
+/// Because the year is a property of the *source*, not of the number. The report card publishes
+/// one year at a time; the Census survey publishes one year at a time; a district's valuation is
+/// one tax year. Hanging a year on each of the two hundred-odd numeric fields would repeat the
+/// same string two hundred times and still not say which of them moved together.
+///
+/// # Why it is in the feed at all
+///
+/// Because until now it was in doc comments and in hand-typed strings on the web pages —
+/// `/// Performance Index, 2024-25` here, a literal `"2024-25"` in an Astro `<meta>` description
+/// there. The web layer carried about 190 four-digit year literals, and a literal cannot go stale
+/// visibly: regenerating a constant produces no diff, which is the same failure `connect`'s
+/// `index` module had when its node count was the literal `58`.
+///
+/// The consumer looks a series up by [`SeriesYear::series`] and renders [`SeriesYear::label`].
+/// Neither the year nor its form is ever composed on the page.
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct SeriesYear {
+    /// The key a consumer looks up. Finer than the object where an object mixes years — the
+    /// report card's attainment and its spending are one extract and two reckonings, so they are
+    /// `outcome.performance` and `outcome.spending` rather than one `outcome`.
+    pub series: String,
+    /// Which of Ohio's three reckonings this is.
+    pub kind: YearKind,
+    /// Ready to render, in the form its publisher uses. `FY2027`, `2024-25`, `2024`.
+    ///
+    /// A string and not a number because a school year has no single number, and forcing one
+    /// would mean the feed choosing between `2024` and `2025` for a period that is both.
+    pub label: String,
+    /// What published it, in the words the page can print beside the figure.
+    pub source: String,
+}
 
 /// How close to the floor counts as being on it, in mills.
 ///
@@ -1312,7 +1376,16 @@ pub struct Bundle {
     /// What the figures describe and where they came from.
     pub provenance: String,
     /// The fiscal year the model computes.
+    ///
+    /// **The model's year, and not the page's.** A district page shows this beside a 2024 tax
+    /// year, a 2024-25 report card, an FY2022 Census survey and a five-year forecast reaching back
+    /// to FY2020. It is the year of the formula and of nothing else; see [`Bundle::series_years`]
+    /// for what each other block is measured in.
     pub fiscal_year: u16,
+    /// The year every other series in this feed is measured in, by series key.
+    ///
+    /// Ordered by key so a diff of the feed is readable. See [`SeriesYear`].
+    pub series_years: Vec<SeriesYear>,
     /// Statewide aggregates.
     pub statewide: Statewide,
     /// Reference results the consumer must reproduce.
@@ -1471,6 +1544,27 @@ impl Bundle {
             escape(&self.provenance)
         ));
         s.push_str(&format!("  \"fiscal_year\": {},\n", self.fiscal_year));
+
+        // Sorted on the way out rather than trusted to arrive sorted, so the committed feed is
+        // byte-identical whatever order the caller assembled these in. Every fixture in this
+        // repository has to rebuild identically from a clean checkout.
+        let mut years: Vec<&SeriesYear> = self.series_years.iter().collect();
+        years.sort_by(|a, b| a.series.cmp(&b.series));
+        s.push_str("  \"series_years\": [\n");
+        for (i, y) in years.iter().enumerate() {
+            s.push_str(&format!(
+                "    {{\"series\": \"{}\", \"kind\": \"{}\", \"label\": \"{}\", \"source\": \"{}\"}}",
+                escape(&y.series),
+                y.kind.as_str(),
+                escape(&y.label),
+                escape(&y.source)
+            ));
+            if i + 1 < years.len() {
+                s.push(',');
+            }
+            s.push('\n');
+        }
+        s.push_str("  ],\n");
 
         let w = &self.statewide;
         s.push_str("  \"statewide\": {\n");
@@ -2728,6 +2822,22 @@ mod tests {
 
     fn bundle(districts: Vec<District>, checkpoints: Vec<Checkpoint>) -> Bundle {
         Bundle {
+            // Two entries and two reckonings, so the emitter's sort and its `kind` discriminant
+            // are both exercised by the fixture every other test in this module builds on.
+            series_years: vec![
+                SeriesYear {
+                    series: "millage".into(),
+                    kind: YearKind::Tax,
+                    label: "2024".into(),
+                    source: "Table SD-1".into(),
+                },
+                SeriesYear {
+                    series: "formula".into(),
+                    kind: YearKind::Fiscal,
+                    label: "FY2027".into(),
+                    source: "DEW FY27 calculator".into(),
+                },
+            ],
             senate_districts: vec![HouseDistrict {
                 number: "031".into(),
                 adm: 4_812.3,
@@ -3316,6 +3426,36 @@ mod tests {
         ] {
             assert!(json.contains(field), "{field} missing from the feed");
         }
+    }
+
+    #[test]
+    fn the_year_index_is_emitted_sorted_whatever_order_it_was_assembled_in() {
+        // Every fixture in this repository has to rebuild byte-identically from a clean checkout,
+        // and the caller assembles these in the order the blocks happen to be built. The fixture
+        // holds `millage` before `formula` for exactly this reason.
+        let json = bundle(vec![sample()], vec![]).to_json();
+        let formula = json
+            .find("\"series\": \"formula\"")
+            .expect("formula is in the index");
+        let millage = json
+            .find("\"series\": \"millage\"")
+            .expect("millage is in the index");
+        assert!(formula < millage, "the index is written in key order");
+    }
+
+    #[test]
+    fn a_year_carries_the_reckoning_it_is_on_and_not_only_its_digits() {
+        /*
+         * The whole point of the block. A tax year is a calendar year whose revenue reaches the
+         * district in the *following* fiscal year, so `2024` on a millage figure and `FY2024` on a
+         * spending figure are eleven months apart. A consumer that gets only the digits cannot
+         * tell them apart and will happily subtract them.
+         */
+        let json = bundle(vec![sample()], vec![]).to_json();
+        assert!(json.contains("{\"series\": \"millage\", \"kind\": \"tax\", \"label\": \"2024\""));
+        assert!(
+            json.contains("{\"series\": \"formula\", \"kind\": \"fiscal\", \"label\": \"FY2027\"")
+        );
     }
 
     #[test]

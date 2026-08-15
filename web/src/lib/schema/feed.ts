@@ -1064,11 +1064,39 @@ export const AppropriationLineSchema = z
   .strict();
 
 /** The whole feed. */
+/**
+ * What year one block of the feed is measured in.
+ *
+ * Ohio reckons three ways and they do not line up: a tax year is a calendar year whose revenue
+ * reaches the district in the *following* fiscal year, a school year straddles two calendar years
+ * and is published as `2024-25`, and a fiscal year runs July to June and is named for the June.
+ * Every one of those is "2024" to somebody.
+ *
+ * `label` is a string and not a number because a school year has no single number, and `kind` is
+ * carried separately so a consumer never has to infer the reckoning from the shape of the label.
+ */
+export const SeriesYearSchema = z
+  .object({
+    series: z.string().min(1),
+    kind: z.enum(["fiscal", "tax", "school"]),
+    label: z.string().min(1),
+    source: z.string().min(1),
+  })
+  .strict();
+
 export const BundleSchema = z
   .object({
     contract_version: z.string().min(1),
     provenance: z.string().min(1),
+    /**
+     * The year the *formula* computes, and the year of nothing else on a district page.
+     *
+     * See {@link SeriesYearSchema}: a district page shows this beside a 2024 tax year, a 2024-25
+     * report card, an FY2022 Census survey and a forecast reaching back to FY2020.
+     */
     fiscal_year: z.number().int(),
+    /** What year every other block is measured in, by series key. Sorted by key. */
+    series_years: z.array(SeriesYearSchema).min(1),
     statewide: StatewideSchema,
     checkpoints: z.array(CheckpointSchema),
     /** `null` disables the band: this feed cannot be projected. */
@@ -1113,4 +1141,5 @@ export type PolicyShape = z.infer<typeof PolicyShapeSchema>;
 export type Checkpoint = z.infer<typeof CheckpointSchema>;
 export type ForecastCheckpoint = z.infer<typeof ForecastCheckpointSchema>;
 export type ProjectionMeta = z.infer<typeof ProjectionMetaSchema>;
+export type SeriesYear = z.infer<typeof SeriesYearSchema>;
 export type Bundle = z.infer<typeof BundleSchema>;

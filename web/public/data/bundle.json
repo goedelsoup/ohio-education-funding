@@ -1,7 +1,21 @@
 {
-  "contract_version": "33.0.0",
-  "provenance": "Ohio DEW FY27 TRAD State Foundation Funding Calculator (a projection, not an actual) joined with the FY2024 District Profile Report. Base cost, guarantee, and formula funding are FY2027; enrolled ADM is FY2024-FY2026, of which FY2026 is partly departmental estimate; millage is TY2023; expenditure and demographics are FY2024. Achievement, growth, need, and FY2025 spending are the 2024-25 Ohio School Report Card, joined on IRN across the 606 districts every panel covers. See .yidam/catalog/.",
+  "contract_version": "34.0.0",
+  "provenance": "Ohio DEW TRAD State Foundation Funding Calculator (a projection, not an actual) joined with the District Profile Report, the Department of Taxation's Table SD-1, and the Ohio School Report Card on IRN across the 606 districts every panel covers. Enrolled ADM spans three years, of which the last is partly departmental estimate. Each block states the year it is measured in beside its own figures; see .yidam/catalog/ for what each source can be trusted for.",
   "fiscal_year": 2027,
+  "series_years": [
+    {"series": "appropriations", "kind": "fiscal", "label": "FY1998-FY2027", "source": "Legislative Service Commission, enacted appropriations"},
+    {"series": "enrollment", "kind": "fiscal", "label": "FY2024-FY2026", "source": "DEW calculator, ADM Data sheet; the last year is partly estimate"},
+    {"series": "finances", "kind": "fiscal", "label": "FY2020-FY2025", "source": "District five-year forecast filings, R.C. 5705.391"},
+    {"series": "formula", "kind": "fiscal", "label": "FY2027", "source": "DEW FY27 TRAD State Foundation Funding Calculator"},
+    {"series": "history", "kind": "fiscal", "label": "FY2009-FY2022", "source": "Census Bureau, Annual Survey of School System Finances"},
+    {"series": "meal_program", "kind": "fiscal", "label": "FY1998-FY2014", "source": "Office for Child Nutrition, MR-81"},
+    {"series": "millage", "kind": "tax", "label": "2024", "source": "Department of Taxation, Table SD-1"},
+    {"series": "national", "kind": "fiscal", "label": "FY2022", "source": "Census Bureau, Annual Survey of School System Finances"},
+    {"series": "outcome.performance", "kind": "school", "label": "2024-25", "source": "Ohio School Report Card"},
+    {"series": "outcome.spending", "kind": "fiscal", "label": "FY2025", "source": "Ohio School Report Card, expenditure download"},
+    {"series": "profile", "kind": "fiscal", "label": "FY2024", "source": "DEW District Profile Report"},
+    {"series": "property_tax", "kind": "tax", "label": "2021-2024", "source": "Department of Taxation, Table SD-1"}
+  ],
   "statewide": {
     "districts": 609,
     "on_guarantee": 294,
