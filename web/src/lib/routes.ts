@@ -17,6 +17,58 @@ export const districtFinances = (irn: string): string => `/district/${irn}/finan
 export const districtTaxes = (irn: string): string => `/district/${irn}/taxes`;
 
 /**
+ * The addressable sections of a district route.
+ *
+ * # Why there is a vocabulary rather than a fragment written where it is needed
+ *
+ * Nine entry surfaces deposit every reader at byte zero of the same 50,000-byte document, and for
+ * most of them the question they arrived with has an answer four cards down. Before this there was
+ * exactly one `id` in the whole rendering layer — `prose.ts`'s correction blockquote — so there was
+ * nothing to send them to.
+ *
+ * Every name below is a `data-part` on a card or a `data-program` on a sub-table, so a section is
+ * never invented here: `SECTIONS` names what the markup already distinguishes, and
+ * `tests/e2e` asserts that every one of these strings resolves to an element with that `id` in the
+ * built page. That is the check the `routes.parameter("state-share-percentage")` 404 got past —
+ * a fragment written inline in a template is enumerated by nothing, and a missing one fails
+ * silently rather than 404ing, which is worse.
+ */
+export const SECTIONS = {
+  aidSource: "aid-source",
+  enrollment: "enrollment",
+  baseCost: "base-cost",
+  categoricals: "categoricals",
+  supplements: "supplements",
+  position: "position",
+  national: "national",
+  specialEducation: "special-education",
+  targetedAssistance: "targeted-assistance",
+  dpia: "dpia",
+  gifted: "gifted",
+  careerTechnical: "career-technical",
+  englishLearners: "english-learners",
+  transportation: "transportation",
+  preschool: "preschool",
+  taxBase: "tax-base",
+  millage: "millage",
+  denominators: "denominators",
+  chargeOff: "charge-off",
+  spendingByFunction: "spending-by-function",
+  federalShare: "federal-share",
+} as const;
+
+export type Section = (typeof SECTIONS)[keyof typeof SECTIONS];
+
+/**
+ * A section of a district route.
+ *
+ * Takes a route rather than an IRN so the caller says which of the five it means, and the section
+ * name is typed so a rename is a compile error rather than a fragment that silently lands the
+ * reader at the top of the right page.
+ */
+export const at = (route: string, id: Section): string => `${route}#${id}`;
+
+/**
  * A county, by its slug.
  *
  * Counties are a peer group rather than a boundary here — the department attributes each district

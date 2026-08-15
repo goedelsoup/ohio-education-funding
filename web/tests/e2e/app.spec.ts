@@ -1678,8 +1678,12 @@ test.describe("counties", () => {
     await expect(spread).toContainText("Orange City");
     await expect(spread).toContainText("Maple Heights City");
     await expect(spread).toContainText("times");
-    // Both extremes must be reachable, since the point of the page is to send a reader onward.
-    await expect(spread.locator('a[href^="/district/"]')).toHaveCount(2);
+    // Both extremes must be reachable, since the point of the page is to send a reader onward. The
+    // two name links, plus — deliberately, from this phase — one into the tax base section of the
+    // poorer district's property tax page, which is the figure this card is actually arguing about
+    // and which it never linked.
+    await expect(spread.locator('a[href^="/district/"]')).toHaveCount(3);
+    await expect(spread.locator('a[href$="/taxes#tax-base"]')).toHaveCount(1);
   });
 
   test("a county page says its pupil total is a sum of districts, not the county's children", async ({
@@ -1933,6 +1937,138 @@ test.describe("outside the formula", () => {
     const card = page.locator('.card[data-part="supplements"]');
     await expect(card).toContainText("just under the growth cliff");
     await expect(card).toContainText("pays on the whole roll rather than on the pupils gained");
+  });
+});
+
+test.describe("every card has an address", () => {
+  test("every card and sub-section on the dashboard is reachable by fragment", async ({ page }) => {
+    /*
+     * Before this there was exactly one `id` in the whole rendering layer — `prose.ts`'s correction
+     * blockquote — so nine entry surfaces deposited every reader at byte zero of the same 50,000
+     * byte document and there was nothing to send them anywhere else.
+     *
+     * The names are not invented here. Each is the `data-part` the card already carried or the
+     * `data-program` its sub-table did, emitted from the same string, so the hook a test locates by
+     * and the address a reader links to cannot drift apart.
+     */
+    await page.goto("/district/043802");
+    const parts = await page
+      .locator("main .card[data-part]")
+      .evaluateAll((nodes) => nodes.map((n) => [n.getAttribute("data-part"), n.id]));
+    expect(parts.length).toBeGreaterThan(6);
+    expect(
+      parts.filter(([part, id]) => part !== id),
+      "a card whose id and data-part disagree",
+    ).toEqual([]);
+
+    // The six categoricals, transportation and preschool head themselves with an `<h3>` inside a
+    // card, so they are addressable one level below the card that contains them.
+    for (const id of [
+      "special-education",
+      "targeted-assistance",
+      "dpia",
+      "gifted",
+      "career-technical",
+      "english-learners",
+      "transportation",
+      "preschool",
+    ]) {
+      await expect(page.locator(`h3#${id}`), `#${id} is in the vocabulary`).toHaveCount(1);
+    }
+  });
+
+  test("a fragment link lands its section clear of the sticky chrome, at every breakpoint", async ({
+    page,
+  }) => {
+    /*
+     * `--sticky-chrome` is a pixel constant measured from a build, which is brittle by nature: the
+     * header wraps to three rows below 480px, two to 700, and is one row from 1000px up, and a
+     * change to its contents moves all four numbers with nothing to notice. This is what makes that
+     * a red test rather than a reader who clicked `#categoricals` and is looking at the base cost
+     * card because their target scrolled under the header.
+     *
+     * 1000px is also where the sub-navigation becomes sticky and the two bars stack, so it is the
+     * width where getting the offset wrong costs the most.
+     */
+    for (const width of [390, 700, 1000, 1280]) {
+      await page.setViewportSize({ width, height: 900 });
+      await page.goto("/district/043802#categoricals");
+      const chrome = await page
+        .locator("header.site")
+        .evaluate((n) => n.getBoundingClientRect().bottom);
+      const target = await page
+        .locator("#categoricals")
+        .evaluate((n) => n.getBoundingClientRect().top);
+      expect(
+        target,
+        `at ${width}px the section landed under the sticky header rather than below it`,
+      ).toBeGreaterThanOrEqual(chrome);
+    }
+  });
+
+  test("the sub-navigation is sticky where that is affordable and nowhere else", async ({ page }) => {
+    /*
+     * The site header's own rule justifies itself by reference to this bar — "a long finances table
+     * should not strand them" — which is a claim the stylesheet did not implement, because
+     * `.subnav` renders inside `<main>` and scrolls away with the document.
+     *
+     * It is sticky from 1000px and deliberately not below. Measured on a build: the header is 51px
+     * at 1000px and up, 96px at 700, 135px at 480 and 168px at 390. A second sticky bar under it
+     * would take 132px of an 800px viewport at 700px and 246px — 31% — at 390px, on a page whose
+     * complaint was density. The tab row is one screen from the top there and the trade is not
+     * worth it.
+     */
+    for (const [width, sticky] of [
+      [390, false],
+      [700, false],
+      [1000, true],
+      [1280, true],
+    ] as [number, boolean][]) {
+      await page.setViewportSize({ width, height: 900 });
+      await page.goto("/district/043802");
+      const position = await page
+        .locator(".subnav")
+        .evaluate((n) => getComputedStyle(n).position);
+      expect(position === "sticky", `at ${width}px .subnav sticky should be ${sticky}`).toBe(sticky);
+    }
+  });
+
+  test("the pupil-count note points at the reconciliation only where it exists", async ({ page }) => {
+    /*
+     * The dangling-fragment case, which is the one the plan's own critique caught. `#denominators`
+     * is absent for 177 of 609 districts — `renderDenominators` returns "" where the two valuations
+     * agree within 5% — and a missing fragment does not 404: it serves the right document and
+     * leaves the reader at the top of it. Both branches are asserted, because only checking the
+     * one that renders would pass on the version of this that shipped the bug.
+     */
+    const feed = await (await page.request.get("/data/bundle.json")).json();
+    const ratio = (d: any) =>
+      Math.abs(
+        d.property_tax[d.property_tax.length - 1].value_per_pupil / d.valuation_per_pupil - 1,
+      );
+    const wide = feed.districts.find((d: any) => d.valuation_per_pupil && ratio(d) >= 0.05);
+    const close = feed.districts.find((d: any) => d.valuation_per_pupil && ratio(d) < 0.05);
+    expect(wide && close, "one district on each side of the 5% test").toBeTruthy();
+
+    await page.goto(`/district/${wide.irn}`);
+    await expect(
+      page.locator(`[data-part="not"] a[href="/district/${wide.irn}/taxes#denominators"]`),
+    ).toHaveCount(1);
+
+    await page.goto(`/district/${close.irn}`);
+    await expect(
+      page.locator(`[data-part="not"] a[href="/district/${close.irn}/taxes"]`),
+    ).toHaveCount(1);
+    await expect(page.locator('[data-part="not"] a[href*="#denominators"]')).toHaveCount(0);
+  });
+
+  test("the county card sends a reader to the tax base it is arguing about", async ({ page }) => {
+    // The card's whole subject is the valuation ratio between two districts in one county, and the
+    // page that decomposes that valuation is four cards down a route it never linked.
+    await page.goto("/county/cuyahoga");
+    const link = page.locator('[data-part="spread"] a[href*="/taxes#tax-base"]');
+    await expect(link).toHaveCount(1);
+    await expect(link).toContainText("the tax base each pupil stands on");
   });
 });
 
