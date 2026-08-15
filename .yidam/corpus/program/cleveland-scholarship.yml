@@ -1,5 +1,9 @@
 class: program
 label: Cleveland Scholarship and Tutoring Program
+summary: >-
+  Ohio's first voucher program, created in the mid-1990s for a single district. Its
+  significance is national: in Zelman v. Simmons-Harris the United States Supreme Court upheld
+  it against a federal Establishment Clause challenge.
 description: |
   Ohio's first voucher program, created in the mid-1990s for students in the Cleveland City
   School District — a single-district program rather than a statewide one, established in the

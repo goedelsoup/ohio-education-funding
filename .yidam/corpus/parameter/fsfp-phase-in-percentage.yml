@@ -1,5 +1,9 @@
 class: parameter
 label: FSFP Phase-In Percentage
+summary: >-
+  The fraction of the Fair School Funding Plan's computed formula amount that is actually
+  appropriated. The enacted series runs close to equal sixths, from 16.67% in FY2022 to 100% in
+  FY2027.
 description: |
   The fraction of the Fair School Funding Plan's computed formula amount that is actually
   appropriated. The plan was designed to reach full funding over six years, and each biennial

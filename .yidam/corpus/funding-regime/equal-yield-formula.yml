@@ -1,5 +1,9 @@
 class: funding-regime
 label: Equal Yield Formula
+summary: >-
+  The regime in force when H.B. 920 was enacted and when the funding system was first
+  challenged in court. Its logic was guaranteed yield: the state made up the difference between
+  what a district's mills raised and a guaranteed per-pupil level.
 description: |
   The regime in force when H.B. 920 was enacted and when the funding system was first
   challenged in court. Its logic was guaranteed yield: the state would ensure that a district

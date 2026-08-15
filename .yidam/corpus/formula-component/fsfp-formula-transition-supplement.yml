@@ -1,5 +1,9 @@
 class: formula-component
 label: FSFP Formula Transition Supplement
+summary: >-
+  A second hold-harmless, stacked on top of the guarantee and measured against a different
+  base: $63.6 million to 144 districts. It exists because the guarantee protects the wrong
+  quantity for some of them.
 description: |
   A **second** hold-harmless, stacked on top of the [temporary transitional aid
   guarantee](temporary-transitional-aid-guarantee.yml) and against a different base. Line `[K]` of
@@ -18,7 +22,9 @@ description: |
   mechanisms are not nested and neither is a special case of the other. [verified —
   `crates/project/tests/the_supplements_outside_the_formula.rs`, reproducing `[K]` for all 609]
 
-  **THE TWO FY2021 BASES ARE NOT DERIVABLE FROM EACH OTHER.** `[L1]` is generally larger than
+  ### The two FY2021 bases are not derivable from each other
+
+  `[L1]` is generally larger than
   `[H2]`, as it must be to cover more lines — but the difference is **not** the FY2021
   transportation base, and testing that reading is how the corpus found out: the ratio of the gap
   to FY2021 transportation has a median of 1.59 and lands within one percent of unity for only 6
@@ -29,7 +35,9 @@ description: |
   figure, on the same footing as the sum it is compared against — and what it is composed *of* is
   not established here. The department publishes it as a value, not a derivation. [open]
 
-  **THREE MECHANISMS ANCHORED TO ONE YEAR.** With this and [transportation's own
+  ### Three mechanisms anchored to one year
+
+  With this and [transportation's own
   guarantee](fsfp-transportation.yml), Ohio holds districts harmless against FY2021 in three
   places, on three bases, over three overlapping-but-distinct sets of districts. That is why this
   is a node rather than a clause inside the guarantee's: a reader asking "what is a district held

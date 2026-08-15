@@ -1,5 +1,9 @@
 class: fiscal-period
 label: FY2014-2015 Biennium
+summary: >-
+  A Bridge formula biennium, and the one that is only half-measured. FY2014 is absent from the
+  federal F-33 archive under every naming its neighbours answer to, and nothing here
+  interpolates the missing year.
 description: |
   A biennium of the [Bridge formula](../funding-regime/bridge-formula.yml) era, created so that
   the decade of per-district finance this corpus now holds has somewhere in the graph to land.

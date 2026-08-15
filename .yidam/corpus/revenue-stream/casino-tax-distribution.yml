@@ -1,5 +1,9 @@
 class: revenue-stream
 label: Casino Tax — County Student Fund
+summary: >-
+  Money that reaches every Ohio school district, is constitutionally restricted to education,
+  and appears nowhere in the foundation formula or in any departmental figure. A share of the
+  33% tax on gross casino revenue, distributed quarterly by county.
 description: |
   Money that reaches every Ohio school district, is constitutionally restricted to education, and
   appears nowhere in the foundation formula, the department's budget, or any figure in this
@@ -15,7 +19,9 @@ description: |
   how [their] distributions are appropriated, but all distributions shall only be used to support
   primary and secondary education."** [verified — Art. XV §6(C)(3)(b)]
 
-  **A FIFTH PUPIL DENOMINATOR, AND THE ONLY ONE THAT DOUBLE-COUNTS ON PURPOSE.** R.C. 5753.11
+  ### A fifth pupil denominator, and the only one that double-counts on purpose
+
+  R.C. 5753.11
   defines "student population" as students residing in a county enrolled in a public school
   district in grades K-12, plus preschool children with disabilities, counted on the **Friday of
   the first full school week in October** for the January distribution and **in May** for the
@@ -37,7 +43,9 @@ description: |
     of Ohio's students, so a per-pupil figure from it is not comparable to one from any other
     source here.
 
-  **WHY IT IS INVISIBLE IN EVERYTHING THIS CORPUS HOLDS.** The distribution runs from the Tax
+  ### Why it is invisible in every other figure here
+
+  The distribution runs from the Tax
   Commissioner through county funds to districts. It is not an appropriation to the Department of
   Education and Workforce, so it is absent from the department's budget, absent from the School
   Finance Payment Report, and absent from every fixture built from either. The only casino money
@@ -60,7 +68,9 @@ description: |
   Assembly set foundation aid lower than it otherwise would have because this channel exists is a
   counterfactual about budget-making that no section of law will answer.
 
-  **THE APPROPRIATION HISTORY IS NOW HELD AND IT DOES NOT SETTLE IT. THAT IS THE FINDING.** This
+  ### The appropriation history does not settle it, and that is the finding
+
+  This
   node said settling the question needed the appropriation history, "which is `lsc-budget` work" —
   a sentence that reads as a task waiting to be done. The work is done: the enacted foundation aid
   appropriation is continuous from FY2002 to FY2027. It cannot answer this, and now that is
@@ -74,7 +84,8 @@ description: |
   twenty-four annual movements in the series. [verified — the appropriation series and the
   deflator, pinned in `crates/project/tests/what_the_series_cannot_settle.rs`]
 
-  **AND THE REASON THE LOTTERY IS DIFFERENT IS NOT THAT IT IS BIGGER. IT IS THAT IT HAS A LINE.**
+  ### The lottery is different because it has a line, not because it is bigger
+
   This is the thing the two channels together establish, and neither shows alone. The lottery's
   substitution was visible in a $97.6 million movement — *smaller* than the median annual
   variation in the total — because Fund 7017 is **itemized inside the appropriation table**, so

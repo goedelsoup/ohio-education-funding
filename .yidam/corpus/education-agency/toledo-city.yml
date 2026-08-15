@@ -1,5 +1,9 @@
 class: education-agency
 label: Toledo City School District
+summary: >-
+  Ohio's fourth-largest district, and the urban half of a pair with Perrysburg eleven miles
+  away. High operating spending per pupil against low measured outcomes, which is the shape the
+  poverty gradient takes in every Ohio comparison.
 description: |
   Ohio's fourth-largest district, and one half of a pair with
   [Perrysburg](perrysburg-exempted-village.yml) — eleven miles apart, one urban and one exempted
@@ -21,7 +25,9 @@ description: |
   a weight ratio of 1.45, the consequence of a 98.9% economically disadvantaged share and a
   21.9% disability share.
 
-  **WHERE ITS EXTRA SPENDING GOES, WHICH IS NOT WHERE THE ARGUMENT ASSUMED.** Toledo spends
+  ### Where its extra spending goes, which is not where the argument assumed
+
+  Toledo spends
   $6,173 more per pupil than Perrysburg and a markedly *smaller* share of it in a classroom:
   [verified]
 
@@ -39,7 +45,9 @@ description: |
   estate shows up in an operating budget; whether that is inefficiency or the cost of the
   buildings Toledo actually has is not a question a share can answer. [inference]
 
-  **AND A CORRECTION THE FACT-CHECK ITSELF INVITES.** It reports Toledo spending $2,766 per
+  ### Normalised by the population actually served
+
+  It reports Toledo spending $2,766 per
   pupil on special-education instruction against Perrysburg's $2,032–$2,363, and reads the
   difference as "consistent with a modestly heavier student-need profile." Toledo's disability
   share is 21.9% against Perrysburg's 11.3% — nearly double, not modest. Normalised by the
@@ -56,6 +64,23 @@ description: |
 
   Not yet held: audited-statement figures, the scholarship and community-school deduction that a
   district of this size and poverty carries, and any year before FY2024. [open]
+revisions:
+  - was: |
+      A published fact-check read Toledo's $2,766 per pupil of special-education instruction
+      against Perrysburg's $2,032–$2,363 as "consistent with a modestly heavier student-need
+      profile".
+    now: |
+      Toledo's disability share is 21.9% against Perrysburg's 11.3% — nearly double, not
+      modest. Per student **with a disability**, Toledo spends roughly **$12,600** against
+      Perrysburg's **$18,000–$20,900**: about a third less, not somewhat more.
+    found_by: |
+      The report card's own disability shares, applied to the fact-check's audited spending
+      figures.
+    reach: |
+      An order-of-magnitude normalisation rather than an audited per-pupil cost — the
+      special-education dollars are the fact-check's, from statements not held here. A 1.94x
+      population difference against a 1.36x spending difference leaves no room for the sign to
+      return. [inference]
 properties:
   seeded_because: |
     The corpus's second urban exemplar. A circulating claim about its special-education spending

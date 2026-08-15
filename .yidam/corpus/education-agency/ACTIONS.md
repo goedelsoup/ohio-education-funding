@@ -13,6 +13,9 @@
   valuation per pupil — the wealth-neutrality test at the case level.
 - **Panel continuity.** Follow `merged-into` before assembling any long series. District
   consolidations break longitudinal comparison silently.
+- **What has this node been wrong about?** Read `revisions:`. Each entry carries the claim as
+  it stood, what replaced it, and the test or source that settled it — so a withdrawn figure can be
+  recognised rather than re-derived, and `found_by` gives the check to re-run.
 
 ## Transitions
 

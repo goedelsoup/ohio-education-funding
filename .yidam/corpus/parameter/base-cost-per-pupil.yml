@@ -1,5 +1,9 @@
 class: parameter
 label: Base Cost Per Pupil
+summary: >-
+  What the state treats as the cost of educating one student before categorical additions — the
+  most consequential single number in Ohio school funding, and the one whose meaning has
+  changed most from one regime to the next.
 description: |
   The amount the state treats as the cost of educating one student before categorical
   additions — the single most consequential number in Ohio school funding, and the one whose

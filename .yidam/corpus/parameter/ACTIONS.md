@@ -9,6 +9,9 @@
   not show it.
 - **Sensitivity.** Given a parameter, identify which agencies are most exposed to a change in
   it — the input to targeting a scenario.
+- **What has this node been wrong about?** Read `revisions:`. Each entry carries the claim as
+  it stood, what replaced it, and the test or source that settled it — so a withdrawn figure can be
+  recognised rather than re-derived, and `found_by` gives the check to re-run.
 
 ## Transitions
 

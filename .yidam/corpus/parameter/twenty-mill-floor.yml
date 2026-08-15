@@ -1,5 +1,9 @@
 class: parameter
 label: Twenty-Mill Floor
+summary: >-
+  The limit below which H.B. 920's tax reduction factors may not push a district's effective
+  operating millage. A small number that does something large: at the floor, valuation growth
+  reaches revenue, and above it, it does not.
 description: |
   The limit below which [H.B. 920](../legislation/hb-920-1976.yml)'s tax reduction factors may
   not push a school district's effective operating millage. Set at 20 mills for school
@@ -70,7 +74,9 @@ description: |
   76 of 609 districts at 20.00 against 155 on the Class 1 rate, so the Class 1 figure is the one
   the floor governs. [verified — TY2024 Table SD-1]
 
-  **THE REMAINING CANDIDATE IS CONFIRMED, IN THE STATUTE ITSELF.** R.C. 319.301(A)(1): the
+  ### The remaining candidate, confirmed in the statute itself
+
+  R.C. 319.301(A)(1): the
   reductions "do not apply to ... taxes levied at whatever rate is required to produce a specified
   amount of tax money, including a tax levied under section 5705.199 or 5748.09 of the Revised
   Code, or an amount to pay debt charges." R.C. 5705.199 is the emergency levy section. Fixed-sum
@@ -88,7 +94,9 @@ description: |
   An absence of an effect in one group is not an absence of the mechanism, and the correction is
   recorded rather than quietly replaced because the wrong reading was the more natural one.
 
-  **AND THE FLOOR IS NOT WRITTEN IN MILLS.** R.C. 319.301 never says "twenty mills". It says **two
+  ### The floor is not written in mills
+
+  R.C. 319.301 never says "twenty mills". It says **two
   per cent of the taxable value** of the class, and **two-tenths of one per cent** for joint
   vocational districts. Those are the 20 and 2 mills this node carries, so the figures are right —
   but the name is a colloquialism for a percentage, and a reader searching the statute for the

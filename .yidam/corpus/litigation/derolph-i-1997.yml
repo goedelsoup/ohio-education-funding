@@ -1,5 +1,9 @@
 class: litigation
 label: DeRolph v. State (DeRolph I, 1997)
+summary: >-
+  The decision that changed the terms of Ohio school funding. On 24 March 1997 the Supreme
+  Court of Ohio held, 4-3, that the funding system violated Article VI, Section 2, and ordered
+  a complete systematic overhaul within one year.
 description: |
   The decision that changed the terms of Ohio school funding. On 24 March 1997 the Supreme
   Court of Ohio held, 4-3, that the state's school funding system violated Article VI,
@@ -31,7 +35,9 @@ description: |
   A clarification followed on 25 April 1997: local property taxes could supplement but not
   primarily fund schools, and school borrowing was permitted through 23 March 1998. [verified]
 
-  **THE FIRST BUDGET AFTER THE DECISION DECLINED TO ITEMISE THE SECOND YEAR, AND SAID SO.** The
+  ### The first budget after the decision declined to itemise the second year, and said so
+
+  The
   compliance deadline was 24 March 1998. Am. Sub. H.B. 215, the FY1998-99 main operating budget,
   was enacted on 30 June 1997 — three months after the decision — and its Department of Education
   table itemises FY1998 across fifty-three General Revenue Fund lines and FY1999 across **one**.
@@ -59,7 +65,8 @@ description: |
   What this does not settle is whether the deferral was a remedy, a holding action, or a
   bargaining position. The appropriation table records that it happened and not why. [open]
 
-  **THE RELIANCE FINDING IS NOW TESTABLE AGAINST THE OTHER FORTY-NINE STATES, AND IT HOLDS.**
+  ### The reliance finding, tested against the other forty-nine states
+
   The court found that reliance on local property tax produced disparities the state's
   equalization did not correct. Every source this corpus held until now describes Ohio alone, so
   the finding could be restated indefinitely and never checked — "too heavily" is a comparison,
@@ -83,7 +90,8 @@ description: |
   pandemic relief, so the federal share is inflated and the state and local shares are both
   deflated; in an ordinary year Ohio's local share would be higher. [verified]
 
-  **AND THE SURVEY ACROSS YEARS NOW EXISTS. THE POSITION MOVED, AND IT MOVED THE WRONG WAY.**
+  ### Across years, the position moved — and it moved the wrong way
+
   This node recorded that whether the remedy period had shifted Ohio's reliance "needs the survey
   across years and the layout is not stable enough to assume". The layout is not stable — the
   three eras carry 256, 260 and 354 columns — but the *column names* are, so ten years of it read

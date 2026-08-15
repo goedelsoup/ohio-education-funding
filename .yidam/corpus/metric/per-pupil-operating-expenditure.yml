@@ -1,5 +1,9 @@
 class: metric
 label: Per-Pupil Operating Expenditure
+summary: >-
+  What a district actually spends per student on day-to-day operations, excluding capital
+  outlay. It is the outcome side of every adequacy and equity claim here, and the measure base
+  cost per pupil should be read against.
 description: |
   What a district actually spends per student on day-to-day operations — salaries, benefits,
   purchased services, supplies — excluding capital outlay and non-elementary-secondary
@@ -28,7 +32,8 @@ description: |
   instruction +25.7%, support +28.2%, other +11.4%. [verified] Support grew fastest, but only
   slightly, and from a smaller base.
 
-  **AND THE DISAGREEMENT ABOUT THIS SERIES IS PERIODIC, NOT ONLY DEFINITIONAL.**
+  ### The disagreement about this series is periodic, not only definitional
+
   [OCG White Paper 015](../../catalog/ocg-white-paper-015.md) makes the best available case that
   Ohio's funding argument is a quarrel about definitions: it names seven standards for
   "defunding" and answers each. Its per-pupil and real-reduction rows both read **No — up
@@ -80,8 +85,9 @@ description: |
   external validation of this series, and the first time this metric has been checked against
   anything but itself.
 
-  **THE REPORT CARD SPLITS THIS FIGURE BY WHERE THE MONEY CAME FROM, AND THE SPLIT WAS NEVER
-  READ.** `exp_per_equivalent_pupil_federal` and its state-and-local twin have been in the
+  ### The report card splits this figure by where the money came from
+
+  `exp_per_equivalent_pupil_federal` and its state-and-local twin have been in the
   committed fixture since the report card was first extracted and reached no consumer. They are
   complete for all 606 districts and add to the whole to within a rounding. [verified]
 
@@ -107,6 +113,19 @@ description: |
   read backwards; quoting it without the control would state a confound as a finding, which is
   the error this corpus most often finds in secondary reporting. Neither figure identifies an
   effect in either direction. [verified]
+revisions:
+  - was: |
+      The figure was carried as a single per-pupil total, with no source split.
+    now: |
+      `exp_per_equivalent_pupil_federal` and its state-and-local twin are complete for all 606
+      districts and add to the whole to within a rounding. [verified]
+    found_by: |
+      The committed report-card fixture, which has held both columns since the report card was
+      first extracted.
+    reach: |
+      Nothing was wrong; something was unread. The split matters most for FY2020-FY2024, where
+      the federal column is [ESSER](../revenue-stream/esser.yml) and a total read as ordinary
+      operating spending is not one.
 properties:
   name: Per-pupil operating expenditure
   unit: dollars-per-pupil

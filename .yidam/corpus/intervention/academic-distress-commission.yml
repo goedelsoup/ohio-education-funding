@@ -1,5 +1,9 @@
 class: intervention
 label: Academic Distress Commission
+summary: >-
+  The point at which Ohio's accountability system stops advising and takes over the district's
+  budget. The trigger is arithmetic: three consecutive years below two stars, and the
+  department shall establish a commission.
 description: |
   The point at which Ohio's accountability system stops advising and takes the district's budget.
 
@@ -18,7 +22,9 @@ description: |
   workforce". [verified] The person exercising the district's authority is not on the district's
   payroll.
 
-  **THE POWERS ARE FISCAL, AND THIS IS WHY THE INTERVENTION BELONGS IN A FUNDING CORPUS.** The
+  ### The powers are fiscal, which is why the intervention belongs beside the funding
+
+  The
   CEO's enumerated powers under division (D) include defining employee responsibilities, setting
   compensation, allocating teacher class loads, conducting evaluations, making reductions in
   staff, setting the calendar, contracting for services, modifying board policy, establishing
@@ -42,7 +48,9 @@ description: |
   accumulating toward the loss of its budget authority. Whether any district has been in both
   positions at once is not established here and is checkable. [open]
 
-  **WHO HAS ACTUALLY BEEN UNDER ONE.** Three districts, on the department's own page: [verified —
+  ### Who has actually been under one
+
+  Three districts, on the department's own page: [verified —
   [`dew-academic-distress-commission`](../../catalog/dew-academic-distress-commission.md), read
   10 August 2026]
 

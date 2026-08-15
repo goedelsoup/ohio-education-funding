@@ -1,5 +1,9 @@
 class: fiscal-period
 label: FY2026-27 Biennium
+summary: >-
+  The current biennium, appropriated by H.B. 96, and on the plan's original six-year design the
+  one in which the phase-in completes. Two separable questions define it: what fraction is
+  appropriated, and what the computed amount is priced from.
 description: |
   The current biennium, appropriated by [Am. Sub. H.B. 96](../legislation/hb-96-2025.yml),
   running July 1, 2025 through June 30, 2027. [verified] It is the third biennium of the

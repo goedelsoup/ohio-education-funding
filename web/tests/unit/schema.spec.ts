@@ -74,15 +74,33 @@ test("the corpus validates with no errors", () => {
   expect(errors.map((d) => `${d.file}: ${d.message}`)).toEqual([]);
 });
 
+/**
+ * A node that validates, for the cases below to break one rule at a time.
+ *
+ * Each of those tests used to build its own literal, and when `summary` became required all three
+ * went on passing — for the wrong reason. A fixture that is valid on its own is what keeps
+ * "rejected because links are a paragraph" from quietly becoming "rejected because a field nobody
+ * was testing went missing".
+ */
+const VALID = {
+  class: "scenario",
+  label: "Something",
+  summary: "A lead, under fifty words and carrying no markdown link.",
+  description: "A node.",
+  properties: {},
+  links: [{ target: "../scenario.ont.yml", relationship: "instance-of" }],
+};
+
+test("the fixture the rejection tests vary is itself valid", () => {
+  expect(NodeSchema.safeParse(VALID).success).toBe(true);
+});
+
 test("links written as a paragraph are rejected", () => {
   // The defect that motivated all of this. `scenario/guarantee-phase-out` wrote its entire link
   // list as prose; it was valid YAML, so nothing complained, and its fifteen edges were invisible
   // to every consumer for as long as the node existed.
   const proseLinks = {
-    class: "scenario",
-    label: "Something",
-    description: "A node.",
-    properties: {},
+    ...VALID,
     links: "Perturbs [a](../parameter/a.yml) and baselines on [b](../funding-regime/b.yml).",
   };
   const result = NodeSchema.safeParse(proseLinks);
@@ -94,21 +112,114 @@ test("links written as a paragraph are rejected", () => {
 
 test("a node with no outgoing links is rejected", () => {
   // The corpus's own rule: a node nothing reaches and that reaches nothing is a gap, not a fact.
-  const orphan = { class: "metric", label: "X", description: "Y", properties: {}, links: [] };
-  expect(NodeSchema.safeParse(orphan).success).toBe(false);
+  expect(NodeSchema.safeParse({ ...VALID, links: [] }).success).toBe(false);
 });
 
 test("a property value that is not a string is rejected", () => {
   // `irn: 044933` unquoted would parse as a number in a schema that allowed one, and lose its
   // leading zero — silently turning a valid IRN into an invalid one.
-  const node = {
-    class: "education-agency",
-    label: "X",
-    description: "Y",
-    properties: { irn: 44933 },
-    links: [{ target: "../education-agency.ont.yml", relationship: "instance-of" }],
+  expect(NodeSchema.safeParse({ ...VALID, properties: { irn: 44933 } }).success).toBe(false);
+});
+
+test("a node with no summary is rejected", () => {
+  /*
+   * The field five call sites substitute for the whole node — the class index cell, the node's
+   * own `<meta name="description">`, both OG cards and the wiki front door. Each of those used to
+   * call `summarize(description, N)` and truncate markdown with `slice()`, which is how 110 of 143
+   * meta descriptions were once found cut mid-word.
+   */
+  const { summary, ...withoutSummary } = VALID;
+  expect(summary).toBeTruthy();
+  expect(NodeSchema.safeParse(withoutSummary).success).toBe(false);
+});
+
+test("a summary longer than the cap is rejected", () => {
+  // A cap that is not checked is a cap that becomes a paragraph. Fifty words is the lead; the
+  // description is where the rest goes.
+  const long = { ...VALID, summary: Array.from({ length: 51 }, () => "word").join(" ") };
+  const result = NodeSchema.safeParse(long);
+  expect(result.success).toBe(false);
+  expect(NodeSchema.safeParse({ ...VALID, summary: "word ".repeat(50).trim() }).success).toBe(true);
+});
+
+test("a summary carrying a markdown link is rejected", () => {
+  /*
+   * None of the five destinations can render one. `summarize` strips the target and keeps the
+   * label, which is what produced "the suburban counterpart to  eleven miles away across the
+   * Maumee" — the label deleted along with its link and a double space left behind.
+   */
+  const linked = { ...VALID, summary: "A regime enacted by [H.B. 110](../legislation/x.yml)." };
+  expect(NodeSchema.safeParse(linked).success).toBe(false);
+});
+
+test("both summary rules survive the trip through JSON Schema", () => {
+  /*
+   * A `.refine()` is not representable in JSON Schema and `z.toJSONSchema` drops it silently, so
+   * a rule expressed only as a refinement stops the build and never reaches the editor — which is
+   * the loop the generated schema exists to shorten. The word cap and the link ban each carry a
+   * representable twin, and this is what says the twin is still there.
+   */
+  const emitted = JSON.parse(
+    readFileSync(join(import.meta.dirname, "../../../.yidam/schemas/corpus-node.json"), "utf8"),
+  ) as { properties: { summary: { maxLength?: number; pattern?: string } } };
+
+  expect(emitted.properties.summary.maxLength).toBeGreaterThan(0);
+  expect(emitted.properties.summary.pattern).toBeTruthy();
+  expect(new RegExp(emitted.properties.summary.pattern!).test("has a [link](x.yml)")).toBe(false);
+  expect(new RegExp(emitted.properties.summary.pattern!).test("has no link")).toBe(true);
+});
+
+test("a revision that does not say what settled it is rejected", () => {
+  /*
+   * `found_by` is the field that earns the structure. Without it a revision is a paragraph with
+   * extra punctuation; with it, "this was wrong once" becomes a check somebody can re-run.
+   */
+  const withoutSource = {
+    ...VALID,
+    revisions: [{ was: "The old claim.", now: "The new one." }],
   };
-  expect(NodeSchema.safeParse(node).success).toBe(false);
+  expect(NodeSchema.safeParse(withoutSource).success).toBe(false);
+
+  const complete = {
+    ...VALID,
+    revisions: [{ was: "The old claim.", now: "The new one.", found_by: "A test." }],
+  };
+  expect(NodeSchema.safeParse(complete).success).toBe(true);
+});
+
+test("every revision in the corpus names what settled it", () => {
+  /*
+   * The schema covers this per node; this covers the corpus, and says how many withdrawals it is
+   * carrying. A corpus that never records one is not a corpus that was never wrong.
+   */
+  const corpus = loadCorpus();
+  const revisions = corpus.nodes.flatMap((node) =>
+    node.revisions.map((revision) => ({ node: node.id, ...revision })),
+  );
+
+  expect(revisions.length).toBeGreaterThan(0);
+  for (const revision of revisions) {
+    expect(revision.was, revision.node).not.toBe("");
+    expect(revision.now, revision.node).not.toBe("");
+    expect(revision.found_by, revision.node).not.toBe("");
+  }
+});
+
+test("no summary is its own description, cut", () => {
+  /*
+   * The cheap way to write a hundred leads is to paste the first sentence of each description,
+   * which produces a corpus where every node page says the same thing twice and no reader is
+   * better off. Reported as a warning by the loader; asserted here because it is the failure mode
+   * the whole field is one edit away from.
+   */
+  const corpus = loadCorpus();
+  const duplicated = corpus.nodes
+    .filter((node) => {
+      const opening = node.description.trim().slice(0, node.summary.length);
+      return node.summary !== "" && opening.toLowerCase() === node.summary.toLowerCase();
+    })
+    .map((node) => node.id);
+  expect(duplicated).toEqual([]);
 });
 
 test("every corpus file on disk parses and validates individually", () => {
@@ -171,8 +282,38 @@ test("the corpus is clean under the policy it declares", () => {
   // The point of stating the policy: what is left is signal. 46 undeclared relationships were
   // noise against an unstated assumption; the four undeclared properties were real omissions and
   // are now declared. Zero of either should remain.
-  const diagnostics = loadCorpus().diagnostics;
+  //
+  // Prose diagnostics are excluded and counted separately below — they are a different question,
+  // asked of whoever is authoring a node rather than of whoever owns an ontology, and summing the
+  // two gives a number that is true of nothing.
+  const diagnostics = loadCorpus().diagnostics.filter((d) => d.kind !== "prose");
   expect(diagnostics.map((d) => `${d.severity} ${d.file}: ${d.message}`)).toEqual([]);
+});
+
+/**
+ * The genre migration's remaining backlog, pinned so it can only shrink.
+ *
+ * `.yidam/decisions/the-four-genres-of-a-description.yml` splits a node's prose into four fields
+ * and stages the migration: every node has a `summary`, the withdrawals are in `revisions`, and
+ * the heaviest nodes have had their computed findings split out. The rest have not, and this is
+ * the count of what is left.
+ *
+ * A ratchet rather than a zero, because a zero here would have to be either a lie or a reason not
+ * to land the machinery until all 103 nodes were rewritten. An upper bound that only moves down
+ * says the same thing honestly and fails the day somebody folds a finding back into a
+ * description.
+ */
+const PROSE_BACKLOG = 118;
+
+test("the genre migration's backlog does not grow", () => {
+  const prose = loadCorpus().diagnostics.filter((d) => d.kind === "prose");
+  expect(prose.length).toBeLessThanOrEqual(PROSE_BACKLOG);
+
+  // Both remaining kinds are length and apparatus. A *shouted lead* means a withdrawal is sitting
+  // in body copy, which is the one class of prose defect that misinforms rather than merely
+  // sprawling, and there are none left.
+  const shouted = prose.filter((d) => d.message.includes("shouted lead"));
+  expect(shouted.map((d) => d.file)).toEqual([]);
 });
 
 test("a year-stamped observation is allowed where a bare property name would not be", () => {

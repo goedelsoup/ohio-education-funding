@@ -1,5 +1,9 @@
 class: formula-component
 label: Temporary Transitional Aid Guarantee
+summary: >-
+  The hold-harmless: where the formula computes less for a district than its FY2020 baseline,
+  the state pays the baseline instead. In FY2027, the terminal phase-in year, it pays $879
+  million to 294 of Ohio's 609 districts.
 description: |
   The hold-harmless. When the Fair School Funding Plan computes less for a district than a
   prior-year baseline, the guarantee tops the district up to that baseline instead. [verified]
@@ -12,58 +16,64 @@ description: |
   above what a meaningful base cost increase would give it, so this is not a rounding buffer
   catching a few edge cases; for half the state it is the operative funding mechanism.
 
-  **THE MECHANISM IS NOT WHAT THIS NODE SAID, AND THE DIFFERENCE IS A CLAWBACK.** This node
-  described a hold-harmless: computed funding below a baseline, pay the difference. The
-  department's own formula is
+  ### The mechanism, and the clawback inside it
+
+  The department's formula is
 
       [I] = max( [H2] Funding Base  -  [I1] Open Enrolment Adjustment  -  [H] Foundation Funding,
                  0 )
 
-  and `[I1]` is a **reduction for lost open enrolment**. A guaranteed district whose open enrolment
-  FTE has fallen by more than `max(10% of last year, 20 FTE)` has its guarantee cut by **$8,241.61
-  for every FTE beyond that threshold** — the statewide average base cost per pupil. **43 districts,
-  $5.1m withheld.** Columbus lost 106.2 FTE against a threshold of 24.3 and had **$674,561** taken
-  off; Cuyahoga Falls lost 118.1 and had $640,025. [verified —
-  `crates/project/tests/the_supplements_outside_the_formula.rs`, reproducing `[I]` for all 609]
+  `[H2]` is the [guarantee funding base](../parameter/guarantee-funding-base.yml) — the FY2020
+  anchor, published per district and never re-based. `[I1]` is the [open enrolment
+  clawback](guarantee-open-enrolment-clawback.yml), a reduction for a guaranteed district that has
+  shed entering open enrolment beyond a threshold. Each is a mechanism in its own right that this
+  line composes rather than contains. [verified]
 
-  **The rate is charged at full value, not at the district's state share.** The state was paying
-  its *share* of $8,241.61 for those pupils — about $824 for a district at the 10% minimum state
-  share — and the guarantee falls by the whole of it when they leave. Whether that is a deliberate
-  incentive against shedding open enrolment or an artefact of reaching for a convenient statewide
-  figure is not established. [open]
+  Because the guarantee is a difference rather than a rate, any increase in computed funding
+  reduces it one-for-one until it reaches zero and the district returns to formula.
 
-  **How this survived.** A guarantee described without the clawback reproduces correctly for 566
-  districts and wrongly for 43 — few enough to read as rounding rather than as a missing term, and
-  this corpus built twelve phases on top of the incomplete description. Every distributional claim
-  below is unaffected, because those were computed from the department's published `[I]` rather
-  than from this node's account of how `[I]` is made. The claim that was wrong was the account.
-  [verified]
+  ### Who is on it
 
-  **THE BASELINE IS ESTABLISHED, AND THIS NODE RECORDED IT AS OPEN.** `[H2] Funding Base` is the
-  column, published per district on `Detail_SFPR`. It carries no year label there; this corpus has
-  described it as FY2020, the year Ohio froze funding under the Bridge formula, and that remains
-  the reading. It is **not** the same as `[L1] FY21 Funding Base` on the same sheet, which is
-  explicitly labelled and is generally larger — the base for the [formula transition
-  supplement](fsfp-formula-transition-supplement.yml) rather than for this. The two differ for
-  more than half of districts and `[L1]` is smaller for seven, so neither is derivable from the
-  other. [verified]
+  Both candidate explanations — property wealth and enrollment decline — point the same way, and
+  one dominates clearly. Property wealth predicts the guarantee roughly three times more strongly
+  than enrollment decline does, and by quartile of valuation per pupil the rate runs 13%, 37%,
+  68%, 76%: monotonic, with three-quarters of Ohio's wealthiest districts held above what the
+  formula computes for them. [verified] The mechanism is not mysterious. Under the plan's own
+  logic a property-wealthy district has high local capacity, so its computed state share is small
+  — that is the formula working as designed. The guarantee then overrides that result and pays the
+  district what it used to get. [inference]
 
-  **Who is on it, and why.** Both candidate explanations point the same way and one dominates
-  clearly. [verified — computed from the department's FY27 model; see
-  [`crates/foundation/tests/department_model_fy27.rs`](../../../crates/foundation/tests/department_model_fy27.rs)]
+  ### It grows as the phase-in completes, which is the opposite of what the name implies
 
-                             enrollment falling fast    stable or rising
-      wealthy (> median)              79%                     65%
-      poor    (< median)              35%                     15%
+  [OCG White Paper 015](../../catalog/ocg-white-paper-015.md) reports the FY2024 position — the
+  phased-in amount about $741.8 million below what the formula calculated, with 180 districts
+  drawing about $181.2 million in guarantee support — and treats the phase-in gap as the
+  "unfunded statutory formula" standard for defunding. Set the FY2027 figures beside it:
 
-  Holding enrollment constant, being above the median in assessed valuation per pupil adds
-  about 45 points to the probability of being on the guarantee. Holding wealth constant, fast
-  enrollment decline adds about 15. **Property wealth predicts the guarantee roughly three
-  times more strongly than enrollment decline does.** By quartile of valuation per pupil the
-  rate runs 13%, 37%, 68%, 76% — monotonic, and three-quarters of Ohio's wealthiest districts
-  are held above what the formula computes for them. [verified]
+      FY2024    180 districts     $181.2 million     [verified — as published, secondary]
+      FY2027    294 districts     $879.0 million     [verified — department FY2027 model]
 
-  **DOES IT BUY ANYTHING? THE CORPUS CAN NOW ASK, AND THE ANSWER IS NO — CAREFULLY.**
+  Roughly fivefold in dollars, arriving *at* the terminal year, the year the formula reaches
+  100%. The phase-in gap closes and the guarantee does not; the mechanism that carries districts
+  to full funding is the hold-harmless rather than the formula. Any account that treats FY2027 as
+  the year the question resolves has the direction backwards. [inference]
+
+  ### It is a nominal floor, so it erodes by construction
+
+  A guarantee written in dollars and anchored to a fixed historical year cannot hold its value. A
+  district it protects loses ground every year through no decision by anyone, and nothing in the
+  formula records that it happened. "Held at FY2020" is a statement about nominal dollars only,
+  and across FY2020-FY2025 prices rose 25.1%. [verified]
+
+  So "temporary transitional" describes the intent and not the mechanism. A guarantee anchored to
+  a fixed historical year does not expire; it is escaped, district by district, only as the
+  formula grows past a level set in 2020. On the FY2027 evidence, for half of these districts that
+  is not close. [inference]
+
+  Still open: whether the statute or subsequent budget acts contemplate re-basing. [open]
+findings: |
+  ### Does it buy anything? No — carefully
+
   Joining the funding model to the 2024-25 report card across the 606 districts every panel
   covers, guarantee status looks like it predicts achievement: districts on the guarantee score
   **+0.187** against the Performance Index, median 89.9 against 85.6. Holding economic
@@ -71,13 +81,11 @@ description: |
   [`crates/project/tests/guarantee_and_outcomes.rs`](../../../crates/project/tests/guarantee_and_outcomes.rs)]
 
   The whole of it is poverty. Guaranteed districts are less poor — median economically
-  disadvantaged share 42.8% against 51.9% — which is the same wealth gradient established
-  above, arriving on the outcome side as an achievement effect that is not there. The result
-  holds for Ohio's growth measure as well, and for a continuous reading of guarantee dependence
-  rather than the binary one: every combination lands under 0.06 once poverty is held. [verified]
-
-  This is the sharpest instance of a rule this corpus wrote down after being caught by it: most
-  district-level correlates of the Performance Index are poverty in disguise.
+  disadvantaged share 42.8% against 51.9% — which is the same wealth gradient the description
+  establishes, arriving on the outcome side as an achievement effect that is not there. The
+  result holds for Ohio's growth measure as well, and for a continuous reading of guarantee
+  dependence rather than the binary one: every combination lands under 0.06 once poverty is held.
+  [verified]
 
   **What it does not say.** Not that the guarantee is useless, and not that its money does
   nothing. Districts are not assigned to the guarantee at random — they are on it because their
@@ -89,29 +97,14 @@ description: |
   A caution the same join makes checkable. **State aid per pupil is not a spending measure.** It
   is 38% of the median district's operating budget and substitutes for local revenue rather than
   adding to it: holding poverty constant, state aid per pupil and total operating spending per
-  pupil track each other at +0.035. So the corpus's +0.146 for spending against growth and the
+  pupil track each other at +0.035. So the +0.146 recorded for spending against growth and the
   -0.247 for aid against growth are not in tension — they are different variables, and reading
   one as the other is a mistake this node exists to make hard. [verified]
 
-  The mechanism is not mysterious. Under the plan's own logic a property-wealthy district has
-  high local capacity, so its computed state share is small — that is the formula working as
-  designed. The guarantee then overrides that result and pays the district what it used to get.
-  [inference]
+  ### Running the formula without it
 
-  **The consequence for equity is direct.** The corpus records that state aid tracks poverty
-  (+0.630) more tightly than property wealth (−0.549), and reads that as the formula's targeting
-  working. The guarantee is part of why the wealth relationship is not stronger: it props up
-  precisely the districts the local capacity measure would fund least.
-  [inference — see [equity](../doctrine/equity.yml)]
-
-  **It also absorbs reform.** Because a guaranteed district's top-up shrinks by exactly what its
-  formula amount gains, roughly half of any base cost increase is absorbed rather than
-  delivered — the finding that halved this corpus's
-  [input-refresh scenario](../scenario/fsfp-input-year-refresh.yml). [verified]
-
-  **RUNNING THE FORMULA WITHOUT IT.** The department's model publishes core foundation funding
-  [H] separately from the guarantee [I], so the two can be compared directly rather than
-  inferred. [verified]
+  The department's model publishes core foundation funding [H] separately from the guarantee [I],
+  so the two can be compared directly rather than inferred. [verified]
 
   On correlation, the guarantee's effect is modest. State aid per pupil against assessed
   valuation per pupil correlates at **−0.662 on formula alone and −0.605 as realized** — the
@@ -134,49 +127,20 @@ description: |
   not how much money moves. A component can leave the ranking almost intact while transferring
   a great deal. [inference]
 
-  **A METHODOLOGICAL POINT THIS FORCED.** For spending, less dispersion is more equitable. For
-  state aid the sign flips: aid is compensatory, so a wide spread means strong targeting and a
-  narrow one means weak targeting. Realized aid is measurably *more equal* than formula aid —
-  coefficient of variation 0.544 against 0.677, federal range ratio 9.6 against 12.3.
-  [verified] That equality is the guarantee flattening the compensation. Reporting it as an
-  improvement, which the habit from spending analysis would invite, gets the direction exactly
-  backwards. See [equity](../doctrine/equity.yml).
+  ### A methodological point this forced
 
-  **IT GROWS AS THE PHASE-IN COMPLETES, WHICH IS THE OPPOSITE OF WHAT THE NAME IMPLIES.**
-  [OCG White Paper 015](../../catalog/ocg-white-paper-015.md) reports the FY2024 position — the
-  phased-in amount about $741.8 million below what the formula calculated, with 180 districts
-  drawing about $181.2 million in guarantee support — and treats the phase-in gap as the
-  "unfunded statutory formula" standard for defunding. Set the FY2027 figures beside it:
+  For spending, less dispersion is more equitable. For state aid the sign flips: aid is
+  compensatory, so a wide spread means strong targeting and a narrow one means weak targeting.
+  Realized aid is measurably *more equal* than formula aid — coefficient of variation 0.544
+  against 0.677, federal range ratio 9.6 against 12.3. [verified] That equality is the guarantee
+  flattening the compensation. Reporting it as an improvement, which the habit from spending
+  analysis would invite, gets the direction exactly backwards. See
+  [equity](../doctrine/equity.yml).
 
-      FY2024    180 districts     $181.2 million     [verified — as published, secondary]
-      FY2027    294 districts     $879.0 million     [verified — department FY2027 model]
-
-  Roughly fivefold in dollars, arriving *at* the terminal year, the year the formula reaches
-  100%. The phase-in gap closes and the guarantee does not; the mechanism that carries districts
-  to full funding is the hold-harmless rather than the formula. Any account that treats FY2027 as
-  the year the question resolves has the direction backwards. [inference]
-
-  **THE BASELINE IS FY2020, AND IT HAS NOT BEEN RE-BASED.** [verified — FY2026 payment report
-  line-by-line explanation] The guarantee "ensures that districts do not receive less in FY 2026
-  than what they received in **FY 2020**," measured against Base State Funding.
-
-      guarantee = max(0, base_state_funding - core_foundation - open_enrollment_adjustment)
-
-  The adjustment applies only where a district has curtailed entering open enrollment beyond a
-  threshold — the greater of 10% of its prior-year entering open enrollment or 20 students —
-  and then reduces the base by the statewide average base cost per pupil for each student
-  beyond it. It is a disincentive against closing a district's borders, not a general term.
-  [verified]
-
-  **This is the finding the corpus has been walking toward.** FY2020 is a
-  [Bridge formula](../funding-regime/bridge-formula.yml) year, and one of the two Ohio funded at
-  **frozen** levels rather than computing them. So in FY2027, at 100% phase-in, nearly half of
-  Ohio's districts are funded at a level set by a placeholder formula in a year it was not even
-  run — seven years earlier, and never re-based. [inference]
+  ### How far the formula falls below the level it holds districts at
 
   Because guarantee = baseline − formula, each guaranteed district's FY2020 baseline can be
-  recovered as core foundation funding plus its guarantee. Doing that shows how far the plan
-  falls below the level it is holding them at: [verified]
+  recovered as core foundation funding plus its guarantee. [verified]
 
       FY2027 formula as a share of the district's FY2020 baseline
         median 67.8%      p25 42.3%      102 districts below 50%
@@ -193,35 +157,12 @@ description: |
   holds them there — and for the wealthiest quartile the plan produces less than half of it.
   [inference]
 
-  **FY2020 IS NOW OBSERVED, AND THE BASELINE IS NOT A DISTRICT'S FY2020 RECEIPTS.** [verified —
-  [dew-five-year-forecast](../../catalog/dew-five-year-forecast.md), FY2023 filing, line 1.035]
-  Until this source arrived, FY2020 could only be recovered *from the guarantee*, which made
-  every check of the guarantee circular. Districts' audited FY2020 unrestricted grants-in-aid
-  are now an independent observation, and the first thing they establish is a distinction the
-  recovery above cannot make on its own:
+  This is a share of the *statutory base*, which is narrower than a district's booked state aid.
+  Read the third correction below before reading it as a shortfall in receipts.
 
-      FY2027 figure as a share of observed FY2020 booked state aid, 294 guaranteed districts
-        core foundation + guarantee   median 0.899      <- the base the guarantee holds them at
-        total state support           median 1.107      <- what the district is actually paid
+  ### The real erosion, measured within one source
 
-  The observation falls **between** the two, which is what a definitional gap looks like rather
-  than a funding one. The statutory base excludes transportation, preschool special education,
-  special education transportation, and the performance supplement; a district's booked
-  unrestricted aid includes them.
-
-  This corpus reported the 0.899 as a shortfall for two phases. It is not one. A narrow FY2027
-  numerator over a broad FY2020 denominator manufactures a gap, and the recovery above is
-  correct for what it claims — the share of the *statutory base* the formula reaches — and wrong
-  for anything that behaves like total receipts. `panel::DistrictRecord::total_state_support`
-  exists so the two cannot be confused again. [verified]
-
-  What survived the correction is the comparison against a control, which was the same size on
-  either construction: guaranteed districts sit about 25 points below formula-funded ones
-  (1.107 against 1.354 wide, 0.899 against 1.186 narrow). A level can be wrong in a way a
-  contrast measured the same way is not. [verified]
-
-  **THE GUARANTEE IS A NOMINAL FLOOR, SO IT ERODES BY CONSTRUCTION.** [verified —
-  [dew-five-year-forecast](../../catalog/dew-five-year-forecast.md) both endpoints,
+  [verified — [dew-five-year-forecast](../../catalog/dew-five-year-forecast.md) both endpoints,
   [bls-cpi-u](../../catalog/bls-cpi-u.md) deflator] The clearest statement available, because it
   is measured entirely within one source on one definition and touches the calculator nowhere.
   Real change in booked state aid, FY2020 to FY2025, deflated by CPI-U June:
@@ -229,31 +170,13 @@ description: |
       median guaranteed district   -18.2%      270 of 294 lost ground
       median formula district       -3.3%      184 of 314 lost ground
 
-  A guarantee written in dollars cannot hold its value. A district it protects loses ground
-  every year through no decision by anyone, and nothing in the formula records that it happened.
-  "Held at FY2020" is a statement about nominal dollars only, and across FY2020-FY2025 prices
-  rose 25.1%. [verified]
+  Also computed in
+  [`crates/project/tests/finances_and_the_guarantee.rs`](../../../crates/project/tests/finances_and_the_guarantee.rs).
 
-  So "temporary transitional" describes the intent and not the mechanism. A guarantee anchored
-  to a fixed historical year does not expire; it is escaped, district by district, only as the
-  formula grows past a level set in 2020. On the FY2027 evidence, for half of these districts
-  that is not close. [inference]
+  ### The incidence of removal, as a distribution rather than a total
 
-  **AND IT IS A NOMINAL FLOOR, SO IT ERODES WITHOUT ANYONE DECIDING TO CUT IT.** Over the
-  observed FY2020-FY2025 span, the median guaranteed district's real unrestricted state aid fell,
-  and it fell further than the median on-formula district's. [verified — see
-  [`crates/project/tests/finances_and_the_guarantee.rs`](../../../crates/project/tests/finances_and_the_guarantee.rs)]
-  A guarantee written in dollars and anchored to a fixed year loses purchasing power every year
-  by construction, and nothing in the formula records that it happened. "Held harmless" is true
-  in nominal terms and false in real ones. [inference]
-
-  Still open: whether the statute or subsequent budget acts contemplate re-basing, and what the
-  FY2020 figure itself was composed of — the Bridge formula distributed largely by reference to
-  still earlier years, so the anchor may reach back further than 2020. [open]
-
-  **THE INCIDENCE OF REMOVAL, AS A DISTRIBUTION RATHER THAN A TOTAL.** [verified —
-  [`crates/scenario-delta`](../../../crates/scenario-delta/)] The corpus has carried "$879
-  million, 294 districts" for several phases. Crossed against wealth, per pupil:
+  [verified — [`crates/scenario-delta`](../../../crates/scenario-delta/)] Crossed against wealth,
+  per pupil:
 
       valuation quintile    per-pupil loss on removal
       Q1 (poorest)                    -136.84
@@ -273,41 +196,100 @@ description: |
   limit in wealth breaks here. [verified] And the poorest quintile does receive something: 15 of
   its 121 districts are on the guarantee. This is a strong tendency, not a rule. [verified]
 
-  **A PERTURBATION IS INERT FOR A GUARANTEED DISTRICT, EXACTLY.** Not approximately: a district
-  paid by the guarantee under two policies that differ anywhere except in the guarantee itself
-  moves by **0.000000**, because the guarantee is a `max` against a fixed baseline and the same
-  number leaves the same branch twice. For a base cost increase, 256 of 609 districts are in that
-  condition. This is why the guarantee is the only lever with a distinct incidence: every other
-  one is blocked for the same half of the state. [verified]
+  ### A perturbation is inert for a guaranteed district, exactly
 
-  **AND THE MODEL CANNOT SEE THE FLOOR UNDER A FORMULA DISTRICT.** The baseline is recoverable
-  only for districts *currently* held, because being held is the sole thing that discloses it.
-  The 315 districts the formula pays each have an FY2020 baseline sitting below their current
-  amount, and no committed source carries it. A simulated **cut** therefore lets them fall past a
-  floor that would really catch them: at a 5% phase-in the model has them lose 95% of their aid
-  and puts nobody on the guarantee. Those districts hold **46% of Ohio's students**, so any
-  scenario that reduces formula aid overstates its savings by an amount the corpus cannot bound.
-  [verified for the model's behaviour; the size of the real-world correction is [open] and needs
-  FY2020 per-district payments for districts not on the guarantee]
+  Not approximately: a district paid by the guarantee under two policies that differ anywhere
+  except in the guarantee itself moves by **0.000000**, because the guarantee is a `max` against a
+  fixed baseline and the same number leaves the same branch twice. For a base cost increase, 256
+  of 609 districts are in that condition. This is why the guarantee is the only lever with a
+  distinct incidence: every other one is blocked for the same half of the state. [verified]
+
+  It also absorbs reform. Because a guaranteed district's top-up shrinks by exactly what its
+  formula amount gains, roughly half of any base cost increase is absorbed rather than delivered
+  — the finding that halved the [input-refresh scenario](../scenario/fsfp-input-year-refresh.yml).
+  [verified]
+
+  ### And the model cannot see the floor under a formula district
+
+  The baseline is recoverable only for districts *currently* held, because being held is the sole
+  thing that discloses it. The 315 districts the formula pays each have an FY2020 baseline sitting
+  below their current amount, and no committed source carries it. A simulated **cut** therefore
+  lets them fall past a floor that would really catch them: at a 5% phase-in the model has them
+  lose 95% of their aid and puts nobody on the guarantee. Those districts hold **46% of Ohio's
+  students**, so any scenario that reduces formula aid overstates its savings by an amount that
+  cannot be bounded here. [verified for the model's behaviour; the size of the real-world
+  correction is [open] and needs FY2020 per-district payments for districts not on the guarantee]
+
+  ### The consequence for equity is direct
+
+  State aid tracks poverty (+0.630) more tightly than property wealth (−0.549), which reads as the
+  formula's targeting working. The guarantee is part of why the wealth relationship is not
+  stronger: it props up precisely the districts the local capacity measure would fund least.
+  [inference — see [equity](../doctrine/equity.yml)]
+revisions:
+  - was: |
+      A hold-harmless and nothing else: computed funding below a baseline, pay the difference.
+    now: |
+      The department's `[I]` subtracts an [open enrolment
+      clawback](guarantee-open-enrolment-clawback.yml) as well. A guaranteed district whose open
+      enrolment FTE has fallen by more than `max(10% of last year, 20 FTE)` has its guarantee cut
+      by **$8,241.61 for every FTE beyond that threshold** — the statewide average base cost per
+      pupil, charged at full value rather than at the district's state share. **43 districts,
+      $5.1m withheld.**
+    found_by: |
+      [`crates/project/tests/the_supplements_outside_the_formula.rs`](../../../crates/project/tests/the_supplements_outside_the_formula.rs),
+      reproducing `[I]` for all 609 districts.
+    reach: |
+      A guarantee described without the clawback reproduces correctly for 566 districts and
+      wrongly for 43 — few enough to read as rounding rather than as a missing term, which is how
+      twelve phases were built on top of it. **No distributional claim on this node is affected**,
+      because those were computed from the department's published `[I]` rather than from this
+      node's account of how `[I]` is made. What was wrong was the account.
+  - was: |
+      The identity of the guarantee's baseline was recorded as `[open]`.
+    now: |
+      It is `[H2] Funding Base`, published per district on `Detail_SFPR`, and it is the FY2020
+      level Ohio froze funding at under the [Bridge
+      formula](../funding-regime/bridge-formula.yml). It is **not** `[L1] FY21 Funding Base` on
+      the same sheet, which is explicitly labelled and generally larger — that one is the base for
+      the [formula transition supplement](fsfp-formula-transition-supplement.yml).
+    found_by: |
+      The department's FY2026 payment report line-by-line explanation, which states the guarantee
+      "ensures that districts do not receive less in FY 2026 than what they received in FY 2020".
+    reach: |
+      The two bases differ for more than half of districts and `[L1]` is smaller for seven, so
+      neither is derivable from the other. Recording the baseline as open had made every check of
+      the guarantee circular, because FY2020 could only be recovered *from* the guarantee.
+  - was: |
+      Guaranteed districts' FY2027 core foundation plus guarantee came to a median of 0.899 of
+      their observed FY2020 booked state aid, and this was reported as a shortfall for two phases.
+    now: |
+      It is a definitional gap, not a funding one. The statutory base excludes transportation,
+      preschool special education, special education transportation and the performance
+      supplement; a district's booked unrestricted aid includes them. Total state support against
+      the same denominator gives a median of **1.107** — the observation falls *between* the two.
+    found_by: |
+      [dew-five-year-forecast](../../catalog/dew-five-year-forecast.md), FY2023 filing, line
+      1.035, which made districts' audited FY2020 unrestricted grants-in-aid an independent
+      observation for the first time.
+    reach: |
+      A narrow FY2027 numerator over a broad FY2020 denominator manufactures a gap.
+      `panel::DistrictRecord::total_state_support` exists so the two cannot be confused again.
+      What survived the correction is the comparison against a control, which was the same size on
+      either construction: guaranteed districts sit about 25 points below formula-funded ones
+      (1.107 against 1.354 wide, 0.899 against 1.186 narrow). A level can be wrong in a way a
+      contrast measured the same way is not.
 properties:
   name: Temporary transitional aid guarantee
   function: |
-    [I2] Decrease Threshold      = max(prior-year open enrolment FTE x 0.1, 20)
-    [I1] Open Enrolment Adjust.  = if (prior FTE - current FTE) >= [I2]
-                                   then 8241.61 x ((prior - current) - [I2]) else 0
-    [I] Guarantee                = if [H2] > [H] and ([H2] - [I1] - [H]) > 0
-                                   then [H2] - [I1] - [H] else 0
+    [I] Guarantee = if [H2] > [H] and ([H2] - [I1] - [H]) > 0
+                     then [H2] - [I1] - [H] else 0
 
-    $8,241.61 is the statewide average base cost per pupil, applied at full value rather than at
-    the district's state share of it.
+    where [H2] is the guarantee funding base and [I1] the open enrolment adjustment, each of which
+    has a node of its own.
 
     Reported as line [I] of the Summary School Finance Payment Report, separate from core
     foundation funding [H], and included in total formula funding [N].
-
-    Because it is a difference rather than a rate, any increase in computed funding reduces the
-    guarantee one-for-one until it reaches zero and the district returns to formula. The clawback
-    works the same way from the other side: losing open enrolment reduces the guarantee without
-    reducing anything the formula computes.
   statutory_basis: R.C. 3317.019. [verified]
   calculator: |
     Not a standalone crate, and no longer blocked on the baseline. `[H2]` and the clawback's inputs
@@ -326,6 +308,10 @@ links:
     relationship: measured-against
   - target: ../formula-component.ont.yml
     relationship: instance-of
+  - target: guarantee-open-enrolment-clawback.yml
+    relationship: composed-of
+  - target: ../parameter/guarantee-funding-base.yml
+    relationship: parameterised-by
   - target: fsfp-base-cost-calculation.yml
     relationship: overrides
   - target: fsfp-local-capacity-measure.yml

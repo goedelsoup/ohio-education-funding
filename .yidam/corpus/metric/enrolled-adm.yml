@@ -1,5 +1,9 @@
 class: metric
 label: Enrolled ADM
+summary: >-
+  Average daily membership: the pupil count Ohio funds on, and the denominator under nearly
+  every other metric here. Two distinct counts wear the name, they differ for every district,
+  and the formula uses each of them in different places.
 description: |
   Average daily membership: the pupil count Ohio funds on. It is the denominator under nearly
   every other metric in this corpus — [per-pupil operating expenditure](per-pupil-operating-expenditure.yml),

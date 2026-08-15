@@ -43,7 +43,10 @@ export function nodeCard(node: Node, className: string): Card {
   return {
     eyebrow: `${SITE} · ${className}`,
     headline: node.label,
-    figureNote: summarize(node.description, 190),
+    // The node's own lead, not a truncation of its body. `summary` is capped at 50 words and
+    // carries no markdown, which is exactly what this card can render; `summarize` stays for the
+    // two kinds of document that have no such field.
+    figureNote: summarize(node.summary, 190),
     meta:
       // A corpus is a graph and the edge count is the only honest measure of how much of it a node
       // is load-bearing for. Nodes with no edges exist and say so rather than showing "0 links".

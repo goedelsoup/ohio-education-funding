@@ -13,6 +13,9 @@
   association is the empirical content of the equity claim.
 - **Real terms.** Any dollar-denominated metric compared across periods must pass through
   `deflate` first.
+- **What has this node been wrong about?** Read `revisions:`. Each entry carries the claim as
+  it stood, what replaced it, and the test or source that settled it — so a withdrawn figure can be
+  recognised rather than re-derived, and `found_by` gives the check to re-run.
 
 ## Transitions
 

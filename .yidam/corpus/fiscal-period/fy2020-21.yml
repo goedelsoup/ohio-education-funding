@@ -1,5 +1,9 @@
 class: fiscal-period
 label: FY2020-2021 Biennium
+summary: >-
+  The two frozen years, in which Ohio paid districts prior-year amounts rather than computing
+  them. FY2020 is the one that never went away: the Fair School Funding Plan's guarantee is
+  still anchored to it and has never been re-based.
 description: |
   A biennium of the [Bridge formula](../funding-regime/bridge-formula.yml) era, created so that
   the decade of per-district finance this corpus now holds has somewhere in the graph to land.

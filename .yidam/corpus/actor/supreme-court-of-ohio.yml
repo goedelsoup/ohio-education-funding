@@ -1,5 +1,9 @@
 class: actor
 label: Supreme Court of Ohio
+summary: >-
+  Ohio's court of last resort, and the only institution ever to declare the state's school
+  funding system unconstitutional. It did so in DeRolph I, reaffirmed it in DeRolph IV, and
+  then ended its jurisdiction without ever finding compliance.
 description: |
   Ohio's court of last resort — seven justices, elected — and the only institution that has
   ever declared the state's school funding system unconstitutional. It did so in *DeRolph I*

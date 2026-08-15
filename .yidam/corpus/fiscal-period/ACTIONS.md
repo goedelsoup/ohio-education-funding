@@ -10,6 +10,9 @@
   period in a series is usually a data gap, not a year in which nothing happened.
 - **Cross-period comparison.** Any comparison between two periods must pass through `deflate`.
   Nominal comparison across periods is not a valid operation in this corpus.
+- **What has this node been wrong about?** Read `revisions:`. Each entry carries the claim as
+  it stood, what replaced it, and the test or source that settled it — so a withdrawn figure can be
+  recognised rather than re-derived, and `found_by` gives the check to re-run.
 
 ## Transitions
 

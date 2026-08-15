@@ -14,7 +14,7 @@ import Base from "../../../layouts/Base.astro";
 import { loadCorpus } from "../../../lib/corpus.ts";
 import { loadFeed } from "../../../lib/feed.ts";
 import { money } from "../../../lib/format.ts";
-import { renderProse, renderPropertyValue, summarize } from "../../../lib/prose.ts";
+import { renderProse, renderPropertyValue } from "../../../lib/prose.ts";
 import * as routes from "../../../lib/routes.ts";
 
 export function getStaticPaths() {
@@ -29,6 +29,22 @@ const corpus = loadCorpus();
 const entry = corpus.byClass.get(node.className);
 const description = await renderProse(node.description, node.className);
 const findings = node.findings ? await renderProse(node.findings, node.className) : null;
+
+/*
+ * The withdrawals, rendered as prose because every field in one of them is prose.
+ *
+ * `found_by` is a link in nearly every entry — a Rust test path, a catalog record — so it goes
+ * through the same processor the body does rather than being printed as a string. Awaited up here
+ * in a batch because the markdown processor is async and the template is not.
+ */
+const revisions = await Promise.all(
+  node.revisions.map(async (revision) => ({
+    was: await renderProse(revision.was, node.className),
+    now: await renderProse(revision.now, node.className),
+    foundBy: await renderProse(revision.found_by, node.className),
+    reach: revision.reach ? await renderProse(revision.reach, node.className) : null,
+  })),
+);
 
 /**
  * The live district behind an exemplar node, where there is one.
@@ -59,7 +75,7 @@ const properties = node.properties.filter((p) => p.name !== "seeded_because");
 
 <Base
   title={node.label}
-  description={summarize(node.description, 200)}
+  description={node.summary}
   image={routes.og.wikiNode(node.className, node.name)}
   imageAlt={`${node.label}, a node in the Ohio school funding corpus`}
   section="wiki"
@@ -69,9 +85,15 @@ const properties = node.properties.filter((p) => p.name !== "seeded_because");
     <a href={routes.wikiClass(node.className)}>{entry?.label ?? node.className}</a>
   </p>
   <h1>{node.label}</h1>
+  {/* The lead, ahead of everything including the identifier. A reader arriving at the longest
+      node in the corpus used to meet 2,806 words before finding out what the thing was. */}
+  <p class="lead">{node.summary}</p>
   <p class="sub">
     <code>{node.id}</code>
     {node.in.length > 0 ? ` · ${node.in.length} node${node.in.length === 1 ? "" : "s"} point here` : ""}
+    {node.revisions.length > 0
+      ? ` · ${node.revisions.length} correction${node.revisions.length === 1 ? "" : "s"}`
+      : ""}
   </p>
 
   {
@@ -103,7 +125,11 @@ const properties = node.properties.filter((p) => p.name !== "seeded_because");
   {
     findings && (
       <div class="card prose-body">
-        <h2>Findings</h2>
+        <h2>What this repository computed</h2>
+        <p class="note">
+          Not what Ohio publishes. Figures derived here from committed fixtures, each one citing
+          the test that reproduces it.
+        </p>
         <Fragment set:html={findings} />
       </div>
     )
@@ -199,6 +225,52 @@ const properties = node.properties.filter((p) => p.name !== "seeded_because");
       )
     }
   </div>
+
+  {
+    /*
+     * What this node used to say.
+     *
+     * Collapsed and not omitted, which is the whole balance this block is trying to strike. A
+     * withdrawn claim set in body copy above the current one is how a reader ends up quoting the
+     * wrong figure; a withdrawn claim deleted is how the next author re-derives it. The genres
+     * were interleaved in `description:` until
+     * `.yidam/decisions/the-four-genres-of-a-description.yml`, and 130 of these were shouting in
+     * capitals to win a skimming reader's attention against 2,000 words of body copy.
+     *
+     * Open by default when there is exactly one: a lone `<details>` costs a reader a click to
+     * find out it held a paragraph, and on the nodes with several the list is the point.
+     */
+    revisions.length > 0 && (
+      <div class="card apparatus">
+        <h2>What this node used to say</h2>
+        <p class="note">
+          The corpus is not rewritten to have always been right. Each entry is a claim this node
+          carried, what replaced it, and the thing that settled it.
+        </p>
+        {revisions.map((revision, index) => (
+          <details class="revision" open={revisions.length === 1}>
+            <summary>
+              Correction {index + 1} of {revisions.length}
+            </summary>
+            <div class="revision-body">
+              <h3>It said</h3>
+              <div class="withdrawn prose-body" set:html={revision.was} />
+              <h3>It says</h3>
+              <div class="prose-body" set:html={revision.now} />
+              <h3>Settled by</h3>
+              <div class="prose-body" set:html={revision.foundBy} />
+              {revision.reach && (
+                <>
+                  <h3>What else it touched</h3>
+                  <div class="prose-body" set:html={revision.reach} />
+                </>
+              )}
+            </div>
+          </details>
+        ))}
+      </div>
+    )
+  }
 
   {
     seeded && (

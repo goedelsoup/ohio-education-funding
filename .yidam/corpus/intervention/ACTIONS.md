@@ -12,6 +12,9 @@
 - **Authority check.** Follow `authorized-by` and read the section. An intervention's powers are
   enumerated in statute and are the part most often summarised wrongly — "state takeover" is not a
   term the Revised Code uses.
+- **What has this node been wrong about?** Read `revisions:`. Each entry carries the claim as
+  it stood, what replaced it, and the test or source that settled it — so a withdrawn figure can be
+  recognised rather than re-derived, and `found_by` gives the check to re-run.
 
 ## Writing a node
 

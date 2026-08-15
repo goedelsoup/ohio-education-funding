@@ -1,11 +1,16 @@
 class: formula-component
 label: FSFP Gifted Identification and Units
+summary: >-
+  $54 million, and the only categorical that buys staff rather than pupils. Its parameters are
+  salary prices for coordinator and intervention-specialist units rather than rates, which puts
+  it in a different family from the plan's other weights.
 description: |
   **$54m**, and the only one of the six that buys **staff** rather than pupils. Two per-pupil
   amounts and three kinds of *unit*, where a unit is a headcount entitlement priced at a
   salary-like figure. **87% of the program is unit funding.** [verified]
 
-  **THE PARAMETERS ARE PRICES, NOT RATES, AND THAT PUTS THIS COMPONENT IN A DIFFERENT FAMILY.**
+  ### The parameters are prices, not rates, which puts this component in a different family
+
   $85,776 a coordinator unit, $89,378 a K-8 intervention specialist, $80,974 a 9-12 one. Those are
   salary assumptions, so they belong with the staffing costs inside the [base cost
   build-up](fsfp-base-cost-calculation.yml) and will move when those are refreshed — not with the
@@ -13,7 +18,7 @@ description: |
   that way, and a "categoricals" node treating all six parameters alike would have made this
   program's sensitivity to a salary refresh invisible. [inference]
 
-  **THE UNITS ARE CLAMPED AND THE CLAMPS ARE THE POLICY.**
+  ### The units are clamped, and the clamps are the policy
 
   - a coordinator unit per **3,300** enrolled pupils, **floored at 0.5 and capped at 8**;
   - an intervention specialist unit per **140** identified gifted pupils in K-8, **floored at 0.3**;
@@ -30,23 +35,31 @@ description: |
   substantially a payment for existing. **88 districts draw every one of their three unit
   entitlements at the floor.** [verified]
 
-  **THE CAP BINDS TOO, AT THE OTHER END.** Eight coordinator units is reached at 26,400 enrolled
+  ### The cap binds too, at the other end
+
+  Eight coordinator units is reached at 26,400 enrolled
   pupils, and **three districts are there**. Columbus and Cleveland are funded for eight
   coordinators however many pupils they have; Cleveland's enrolment earns 9.33. A floor and a cap
   on the same line means the middle of the distribution is the only place the ratio actually
   operates. [verified]
 
-  **TWO DENOMINATORS, ONE LINE APART.** Identification is $24 per **K-6** pupil; referral is $2.50
+  ### Two denominators, one line apart
+
+  Identification is $24 per **K-6** pupil; referral is $2.50
   per **enrolled** pupil. Adjacent rows in the same sheet, different bases, and neither name says
   so. [verified]
 
-  **PROFESSIONAL DEVELOPMENT IS A HARD-CODED ZERO.** `[F3]` is carried by the sheet as a value
+  ### Professional development is a hard-coded zero
+
+  `[F3]` is carried by the sheet as a value
   rather than a formula and is zero for every district. Like [targeted
   assistance](fsfp-targeted-assistance.yml)'s supplemental tier, it is a funded line at zero rather
   than an absent one — the column exists, the arithmetic sums it, and a future biennium can fill it
   without changing anything else. [verified]
 
-  **THE CORPUS ASKED, AND THEY DO.** This node recorded that gifted funding scales off
+  ### Identification rates do vary with wealth
+
+  This node recorded that gifted funding scales off
   *identified* FTE, so it depends on how many children a district identifies — a district practice
   as much as a pupil population — and that whether identification rates vary with wealth was
   "exactly the kind of question this decomposition makes askable and the corpus has not asked."
@@ -61,12 +74,28 @@ description: |
   expected, and is the more uncomfortable of the two answers. [verified —
   `crates/project/tests/questions_the_corpus_left_open.rs`]
 
-  **WHY IS NOT ESTABLISHED, AND THREE EXPLANATIONS FIT.** The underlying distribution of the trait
+  ### Why is not established, and three explanations fit
+
+  The underlying distribution of the trait
   may genuinely differ; identification practice may differ, since screening costs money and staff;
   or the instruments used to identify may differ in what they measure. This data separates none of
   them and the corpus should not pick one. What it can say is that a funding stream keyed to
   identification pays most where identification is highest, and that is where poverty is lowest.
   [open — the mechanism, not the pattern]
+revisions:
+  - was: |
+      Whether gifted identification rates vary with district wealth was recorded as "exactly
+      the kind of question this decomposition makes askable and the corpus has not asked".
+    now: |
+      It is asked and answered, from data the panel already held. Because the program scales
+      off *identified* FTE, the answer makes identification a district practice that funding
+      rewards rather than a pupil population it measures.
+    found_by: |
+      The identification rates already carried in the district panel, crossed against valuation
+      per pupil.
+    reach: |
+      Does not change the component's arithmetic. It changes what a gifted-funding total can be
+      read as evidence of.
 properties:
   name: Gifted identification and units
   function: |

@@ -1,5 +1,9 @@
 class: metric
 label: Assessed Valuation Per Pupil
+summary: >-
+  A district's total assessed property valuation divided by its student count — the standard
+  measure of local taxing capacity in school finance, and the variable against which every
+  wealth-neutrality claim in this domain is tested.
 description: |
   The district's total assessed property valuation divided by its student count — the standard
   measure of local taxing capacity in school finance, and the variable against which every

@@ -1,0 +1,84 @@
+class: parameter
+label: Guarantee Funding Base
+summary: >-
+  Column [H2] of the payment report: the FY2020 level each district is held at by the guarantee.
+  Published per district, carrying no year label of its own, and never re-based since — so in
+  FY2027 half of Ohio is funded at a figure set seven years earlier.
+description: |
+  The anchor under the [temporary transitional aid
+  guarantee](../formula-component/temporary-transitional-aid-guarantee.yml). Where the formula
+  computes less than `[H2]` for a district, the state pays `[H2]` instead. [verified]
+
+  It is published per district on the payment report's `Detail_SFPR` sheet and **carries no year
+  label there**, which is why its identity took so long to establish. It is the FY2020 level, the
+  year Ohio froze funding under the [Bridge formula](../funding-regime/bridge-formula.yml).
+  [verified — the department's FY2026 payment report line-by-line explanation states the guarantee
+  "ensures that districts do not receive less in FY 2026 than what they received in **FY 2020**"]
+
+  ### It is not `[L1] FY21 Funding Base`
+
+  The same sheet carries a second base, explicitly labelled, generally larger, and belonging to
+  the [formula transition supplement](../formula-component/fsfp-formula-transition-supplement.yml)
+  rather than to this. The two differ for more than half of districts and `[L1]` is smaller for
+  seven, so **neither is derivable from the other**. [verified] Two labelled columns one line
+  apart, doing different jobs for different mechanisms, is exactly the shape that invites a
+  transcription error nothing downstream would catch.
+
+  ### It has never been re-based
+
+  Not once since FY2022, across three biennial budgets. [verified] The consequence is the fact the
+  guarantee node is built around: in FY2027, at 100% phase-in, nearly half of Ohio's districts are
+  funded at a level set by a placeholder formula in a year that formula was not even run — seven
+  years earlier. [inference]
+
+  ### What the FY2020 figure was itself composed of
+
+  Not established. The Bridge formula distributed largely by reference to still earlier years, so
+  the anchor may reach back further than 2020, and nothing committed here says how far. [open]
+
+  ### It is a nominal quantity
+
+  Written in dollars with no escalator, so its real value falls every year by construction. Across
+  FY2020-FY2025 prices rose 25.1% and the median guaranteed district's real booked state aid fell
+  18.2%. A parameter that is never changed is still being changed, in the only terms that matter
+  to a district's payroll. [verified]
+
+  ### It is observable only where it binds
+
+  A district's `[H2]` is disclosed by the guarantee paying out against it. For the 315 districts
+  the formula pays, `[H2]` sits below their current amount and no committed source carries it —
+  so it cannot be recovered, and any simulated cut lets those districts fall past a floor that
+  would really catch them. [verified for the model's behaviour; the size of the real-world
+  correction is [open]]
+properties:
+  name: Guarantee funding base
+  kind: |
+    Legislated in origin and **measured** in practice: no section of R.C. 3317 states a value, and
+    the figure is a per-district observation carried forward from FY2020. It changes only if an
+    act re-bases it, which has not happened. [inference — the taxonomy is
+    [`the-four-kinds-of-parameter`](../../decisions/the-four-kinds-of-parameter.yml)]
+  unit: dollars-per-district, nominal and unindexed. [verified]
+  statutory_basis: R.C. 3317.019, which names the guarantee without stating the base. [verified]
+  series: |
+    One value per district rather than one per fiscal period, and it has held at the FY2020 level
+    in every year since — FY2022 through FY2027, across three biennial budgets, unchanged.
+    [verified] Carried per district in `crates/project::panel::Transition` and reproduced for all
+    609 in `crates/project/tests/the_supplements_outside_the_formula.rs`.
+  sensitivity: |
+    Nothing in the formula moves it, which is the point: it is the fixed side of a `max`, so a
+    guaranteed district is inert to every other lever. What does move it is inflation, and only in
+    real terms — 25.1% of its value across FY2020-FY2025. [verified]
+  fy2027_scale: |
+    Binding for 294 of 609 districts. Aggregate base for those districts $3.03 billion, against
+    $2.15 billion the formula computes for them — 71.0%. [verified]
+links:
+  - target: ../parameter.ont.yml
+    relationship: instance-of
+  - target: ../formula-component/temporary-transitional-aid-guarantee.yml
+    relationship: parameterises
+  - target: ../funding-regime/bridge-formula.yml
+    relationship: inherited-from
+  - target: ../fiscal-period/fy2020-21.yml
+    relationship: measured-in
+  - target: ../../catalog/dew-fy27-funding-calculator.md
+    relationship: sourced-from

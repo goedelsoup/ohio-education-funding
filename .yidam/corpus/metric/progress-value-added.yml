@@ -1,5 +1,9 @@
 class: metric
 label: Progress (Value-Added)
+summary: >-
+  The second outcome measure, and the one that answers a different question. Performance Index
+  measures where a district's students are; Progress measures how far they moved against what
+  the state's model predicted from their own prior scores.
 description: |
   The second outcome measure, and the one that answers a different question.
   [Performance Index](performance-index.yml) measures where a district's students *are*;
@@ -13,7 +17,8 @@ description: |
   [verified] But an order of magnitude less is a different measure, not a refinement of the same
   one, and the two correlate with each other at only **+0.375**.
 
-  **THE FINDING: THE SIGN OF THE SPENDING RELATIONSHIP DEPENDS ON WHICH OUTCOME IS ASKED.**
+  ### The sign of the spending relationship depends on which outcome is asked
+
   [verified — computed; see
   [`crates/dispersion/tests/report_card_2425.rs`](../../../crates/dispersion/tests/report_card_2425.rs)]
 
@@ -34,7 +39,9 @@ description: |
   two effects cancel. Removing the confounder does not weaken the relationship; it uncovers one.
   [inference]
 
-  **AND THE DENOMINATOR QUESTION SIMPLY DOES NOT ARISE HERE.** The finding that dominates
+  ### The denominator question does not arise here
+
+  The finding that dominates
   [expenditure per equivalent pupil](expenditure-per-equivalent-pupil.yml) — that dividing by a
   need-weighted pupil count moves the headline from −0.337 to −0.015 — has no counterpart on this
   measure. Against growth, the two divisors give **−0.039** and **+0.029**: indistinguishable.
@@ -43,7 +50,9 @@ description: |
   composition proxy. Take the composition out of the outcome and the divisor stops doing
   anything.
 
-  **THE NEED-ADJUSTED MODEL HAS NOW BEEN RUN, AND THE SIGN DIFFERENCE SURVIVES IT.** Controlling
+  ### The need-adjusted model, and the sign difference surviving it
+
+  Controlling
   for economic disadvantage, English-learner and disability shares, log enrollment, and assessed
   valuation per pupil — the specification
   [OCG White Paper 013](../../catalog/ocg-white-paper-013.md) named as its own priority next step
@@ -90,7 +99,8 @@ description: |
   makes the choice look immaterial. It is not: ranking districts on the composite ranks them
   partly by size. Every figure in this corpus uses the effect size. [verified]
 
-  **THE DEPARTMENT PUBLISHES TWO OF THIS MEASURE, AND THIS CORPUS HAD ONLY EVER USED ONE.**
+  ### The department publishes two of this measure
+
   Value-added is reported both as a three-year average — the headline figure, and the one every
   claim here rests on — and over a single year. The second was extracted into
   `project::outcomes` from the beginning and reached no consumer until now. [verified]
@@ -112,6 +122,19 @@ description: |
   `a > 0 != b > 0` reads every one of them as negative and reports **76** disagreements where
   there are 44 — nearly doubling the finding, and in the direction that makes it sound alarming.
   The corrected count is taken over determinate pairs only. [verified]
+revisions:
+  - was: |
+      Every claim on this node rested on value-added without stating which of the department's
+      two published forms it used.
+    now: |
+      It is the **three-year average** — the headline figure. A single-year form is published
+      beside it and was extracted into `project::outcomes` from the beginning, reaching no
+      consumer until now. [verified]
+    found_by: |
+      The report card extract, which carries both columns.
+    reach: |
+      No figure changes. A growth claim measured over three years and one measured over one are
+      different claims, and the node had not said which it was making.
 properties:
   name: Progress (value-added) effect size
   unit: index

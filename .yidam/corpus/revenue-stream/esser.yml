@@ -1,5 +1,9 @@
 class: revenue-stream
 label: ESSER — Elementary and Secondary School Emergency Relief
+summary: >-
+  A federal channel that was large, restricted, temporary, and is now gone — three acts between
+  2020 and 2021, distributed in proportion to Title I. It inflates every FY2020 through FY2024
+  figure here in a way that is invisible unless named.
 description: |
   A federal channel that was large, restricted, temporary, and is now gone — and which inflates
   every FY2020 through FY2024 figure in this corpus in a way that is invisible unless it is named.
@@ -17,7 +21,7 @@ description: |
   [`district-finances.csv`](../../../crates/project/fixtures/district-finances.csv), and the
   corpus could not express it until now. [verified]
 
-  **THE SIZE OF IT, AND WHY EVERY CROSS-YEAR COMPARISON IN THIS CORPUS TOUCHES IT.**
+  ### The size of it, and why every cross-year comparison touches it
 
   FY2022 is the peak. In that year Ohio districts took **13.87% of school revenue from federal
   sources against a national 13.24%** — $2,466 per pupil against $2,493 — which places Ohio 25th

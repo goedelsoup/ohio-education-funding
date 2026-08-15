@@ -684,7 +684,51 @@ fn claim_audit(root: &Path) -> String {
     for (open, unentered, field) in rows {
         out.push_str(&format!("| `{field}` | {open} | {unentered} |\n"));
     }
+
+    let (nodes_with, entries) = revisions(&nodes);
+    out.push_str(&format!(
+        "\n**{entries} recorded withdrawals across {nodes_with} nodes.** A claim the corpus \
+         published and no longer stands behind is kept in a `revisions:` block rather than \
+         edited out, with the test or source that settled it — see \
+         [`the-four-genres-of-a-description`](../decisions/the-four-genres-of-a-description.yml). \
+         Counted here for the same reason the tags above are: how often this corpus has corrected \
+         itself is a fact about it, and one nobody would think to update by hand.\n"
+    ));
     out
+}
+
+/// Withdrawals in the corpus, as `(nodes carrying any, entries in total)`.
+///
+/// Counted by scanning for the `revisions:` key and the `- was:` entries under it, in the same
+/// positional style as [`claim_audit`] and for the same reason: this crate has deliberately not
+/// acquired a YAML parser, and the shape being counted is one line deep.
+///
+/// The entry count is what matters and the node count is what makes it readable — three
+/// withdrawals on one node and three across three are different facts about a corpus, and a
+/// single number cannot tell them apart.
+fn revisions(nodes: &[(String, String, String, String)]) -> (usize, usize) {
+    let mut nodes_with = 0;
+    let mut entries = 0;
+    for (_, _, _, text) in nodes {
+        let mut inside = false;
+        let mut found = 0;
+        for line in text.lines() {
+            if line.starts_with("revisions:") {
+                inside = true;
+            } else if inside && !line.starts_with(char::is_whitespace) && !line.trim().is_empty() {
+                // A new top-level key. `properties:` follows `revisions:` in every node that has
+                // both, and without this the `- target:` entries under `links:` would be counted.
+                inside = false;
+            } else if inside && line.trim_start().starts_with("- was:") {
+                found += 1;
+            }
+        }
+        if found > 0 {
+            nodes_with += 1;
+            entries += found;
+        }
+    }
+    (nodes_with, entries)
 }
 
 /// Why there is no semantic index, and how much corpus there is to not index.

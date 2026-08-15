@@ -1,5 +1,9 @@
 class: accountability-regime
 label: Ohio School Report Card
+summary: >-
+  Ohio's rating system for schools and districts, and the substrate the rest of the state's
+  accountability runs on. One number carries three consequences: federal identification, the
+  academic distress trigger, and the funding formula's performance supplement.
 description: |
   Ohio's own system for rating schools and districts, and the substrate every other accountability
   mechanism in the state runs on. The federal regime identifies schools by rank-ordering this

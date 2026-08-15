@@ -1,5 +1,9 @@
 class: accountability-regime
 label: Every Student Succeeds Act
+summary: >-
+  The federal accountability regime, which in Ohio identifies schools by rank-ordering Ohio's
+  own report card rather than any federal measure. Identification is building-level, so a
+  change to the state rating propagates into federal consequences without a federal act.
 description: |
   The federal regime, which in Ohio identifies schools using
   [the state's own rating](ohio-report-card.yml) rather than a federal measure — so the two

@@ -1,5 +1,9 @@
 class: school
 label: Sheridan High School
+summary: >-
+  The building Ohio's constitutional litigation is named after. Nathan DeRolph was a student
+  here when the Ohio Coalition for Equity and Adequacy filed on his behalf in Perry County in
+  December 1991.
 description: |
   The building Ohio's constitutional litigation is named after. Nathan DeRolph was a student here
   when the [Ohio Coalition for Equity and Adequacy](../litigation/derolph-i-1997.yml) filed on his
@@ -24,7 +28,9 @@ description: |
   this building and would for a smaller one. Whether the rate reflects poverty, distance, or
   something the corpus cannot see is not established. [open]
 
-  **AND IT IS A COMPREHENSIVE SUPPORT AND IMPROVEMENT SCHOOL.** This node said one commit ago
+  ### It is a Comprehensive Support and Improvement school
+
+  This node said one commit ago
   that the corpus could not tell whether Sheridan had ever been identified, because it held no
   list. It holds the list now. Sheridan is on it: **ATSI 2022, escalated to CSI 2025**. [verified —
   `dispersion::identified`, pinned by test]

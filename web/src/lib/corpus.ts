@@ -119,6 +119,27 @@ export interface Edge {
   stated: boolean;
 }
 
+/**
+ * One thing a node used to say and no longer does.
+ *
+ * The corpus is not rewritten to have always been right — the same rule
+ * `.yidam/decisions/README.md` states for decision records, for the same reason: the wrong turn is
+ * the most useful thing on the page and editing it out leaves a document that teaches nothing.
+ *
+ * Structured rather than found in prose because the failure mode is asymmetric. See
+ * `RevisionSchema` in `schema/corpus.ts`.
+ */
+export interface Revision {
+  /** The claim as it stood. Markdown. */
+  was: string;
+  /** What replaced it. Markdown. */
+  now: string;
+  /** The test, source or record that settled it. Markdown, usually a link. */
+  found_by: string;
+  /** What else the mistake touched, where it touched anything. Markdown. */
+  reach?: string;
+}
+
 /** One corpus node. */
 export interface Node {
   /** `<class>/<name>` — the identity used throughout, and the URL. */
@@ -128,6 +149,15 @@ export interface Node {
   /** File stem. */
   name: string;
   label: string;
+  /**
+   * The lead: what this thing is, in at most 50 words and with no markdown link.
+   *
+   * The one string that stands in for the whole node wherever there is no room for the node —
+   * the `h1`'s subtitle, `<meta name="description">`, both OG cards, the class index cell and the
+   * wiki front door. Every one of those used to call `summarize(description, N)` and get a
+   * different mechanical truncation of the same paragraph.
+   */
+  summary: string;
   /** Markdown, and *only* the description. Rendered by {@link renderProse}. */
   description: string;
   /**
@@ -139,8 +169,10 @@ export interface Node {
    */
   linkText: string;
   properties: Property[];
-  /** Findings, on the three nodes that carry them. Markdown, like the description. */
+  /** What this repository computed about the node's subject, and how to read it. Markdown. */
   findings: string | null;
+  /** What the node used to say, oldest first. Empty on a node that has never been corrected. */
+  revisions: Revision[];
   /** Edges this node declares plus the ones it only mentions. */
   out: Edge[];
   /** Populated after every node is read. */
@@ -442,8 +474,12 @@ function readNode(className: string, file: string, report: Diagnostic[]): Node {
 
   const name = file.replace(/\.yml$/, "");
   const id = `${className}/${name}`;
+  const summary = String(parsed.summary ?? "").trim();
   const description = String(parsed.description ?? "");
+  const revisions = readRevisions(parsed.revisions);
   const rawLinks = parsed.links;
+
+  report.push(...lintProse(relative, summary, description));
 
   const stated: Edge[] = Array.isArray(rawLinks)
     ? rawLinks.flatMap((link) => {
@@ -484,6 +520,15 @@ function readNode(className: string, file: string, report: Diagnostic[]): Node {
     description,
     typeof rawLinks === "string" ? rawLinks : "",
     parsed.findings == null ? "" : String(parsed.findings),
+    // Revisions cite heavily — `found_by` is a path or a catalog record in nearly every entry —
+    // and a citation that only appears in a withdrawal is still a citation. Leaving them out
+    // would drop a source's backlink the moment its only mention became a correction.
+    ...revisions.flatMap((revision) => [
+      revision.was,
+      revision.now,
+      revision.found_by,
+      revision.reach ?? "",
+    ]),
     ...properties.map((property) => property.value),
   ].join("\n\n");
   const seen = new Set(declared);
@@ -499,14 +544,124 @@ function readNode(className: string, file: string, report: Diagnostic[]): Node {
     className,
     name,
     label: String(parsed.label ?? name),
+    summary,
     description,
     linkText,
     properties,
     findings: parsed.findings == null ? null : String(parsed.findings),
+    revisions,
     out: [...stated, ...inline],
     in: [],
   };
 }
+
+/**
+ * The `revisions:` block, read defensively.
+ *
+ * Same posture as everything else in this reader: the schema decides whether the build finishes,
+ * and this decides what a page can show while the diagnostics say what is wrong. An entry missing
+ * `found_by` is a schema error and still renders its `was` and `now`, because a half-recorded
+ * withdrawal is more useful on the page than no withdrawal at all.
+ */
+function readRevisions(raw: unknown): Revision[] {
+  if (!Array.isArray(raw)) return [];
+  return raw.flatMap((entry) => {
+    if (entry == null || typeof entry !== "object") return [];
+    const record = entry as Record<string, unknown>;
+    const text = (key: string): string => String(record[key] ?? "").trim();
+    const was = text("was");
+    const now = text("now");
+    if (was === "" && now === "") return [];
+    const reach = text("reach");
+    return [{ was, now, found_by: text("found_by"), ...(reach === "" ? {} : { reach }) }];
+  });
+}
+
+/**
+ * The phrases that say a paragraph is about this repository rather than about Ohio.
+ *
+ * Not a stylistic preference. `.yidam/.vendor/prelude/guidelines/directories.md` says outright
+ * that "anything that describes how the repo operates rather than what it knows" does not belong
+ * in the corpus, and 213 of 905 paragraphs did. They are real provenance and they are kept —
+ * `revisions:` is where they go.
+ */
+const APPARATUS = /\bthis corpus\b|\bthis node\b|\bthis repository\b/i;
+
+/**
+ * A run of bold capitals, which is how a retraction used to compete for attention.
+ *
+ * 130 of these across 33 nodes. They were shouting because nothing else in a 2,000-word field
+ * could carry emphasis; once a withdrawal has its own block the capitals are redundant with the
+ * structure and read on the page as exactly what they are.
+ *
+ * # The two exclusions, both found by running it
+ *
+ * No lower-case letter is not enough on its own. A first version matched `**CSI**`, `**ATSI**`,
+ * `**FY2025**` and `**FY 2020**` — acronyms and year labels the corpus bolds constantly and which
+ * are not shouting at anyone. So: **at least one space**, which drops the acronyms, and **ten
+ * characters**, which drops `**FY 2020**` while keeping `**STILL OPEN.**` at eleven.
+ *
+ * Both thresholds are set by real strings rather than chosen, and they are the reason this is a
+ * warning and not an error — the next legitimate bolded initialism with a space in it will trip
+ * it, and a build that stopped for that would be worse than a line in a report.
+ */
+const CAPS_LEAD = /\*\*(?=[^a-z*]{10,}\*\*)[A-Z][^a-z*]*\s[^a-z*]*\*\*/;
+
+/**
+ * What a node's prose may not be, checked at read time.
+ *
+ * # Why these are warnings and the schema's are errors
+ *
+ * The schema's two summary rules — a word cap and no markdown links — are mechanical facts about a
+ * string, and a violation is always a defect. These three are judgements about prose with a real
+ * false-positive rate: a node may legitimately say "this node" while quoting a source, and a
+ * long description may be long because Ohio is complicated rather than because the genres are
+ * mixed. Reported and rendered, on the same principle the ontology-vocabulary warnings use.
+ *
+ * The prefix check is the one that matters most and looks least important. The cheap way to write
+ * 101 summaries is to paste the first sentence of each description, which produces a corpus where
+ * every node page says the same thing twice and no reader is better off.
+ */
+function lintProse(file: string, summary: string, description: string): Diagnostic[] {
+  const found: Diagnostic[] = [];
+  const warn = (message: string): void => {
+    found.push({ file, severity: "warning", kind: "prose", message });
+  };
+
+  const opening = description.trim().slice(0, Math.max(summary.length, 1));
+  if (summary !== "" && opening.toLowerCase() === summary.toLowerCase()) {
+    warn("summary: is the opening of description: verbatim — the lead has to be written, not cut");
+  }
+
+  const length = description.split(/\s+/).filter((word) => word !== "").length;
+  if (length > DESCRIPTION_WARN_WORDS) {
+    warn(
+      `description: ${length} words. Over ${DESCRIPTION_WARN_WORDS} is usually two subjects in ` +
+        "one node or a genre that belongs in findings: or revisions:",
+    );
+  }
+
+  if (CAPS_LEAD.test(description)) {
+    warn("description: carries a shouted lead — a withdrawn claim belongs in revisions:");
+  }
+  if (APPARATUS.test(description)) {
+    warn(
+      "description: refers to the corpus rather than to Ohio — that is apparatus, and it belongs " +
+        "in revisions: or findings:",
+    );
+  }
+
+  return found;
+}
+
+/**
+ * Where a description stops being one subject.
+ *
+ * The vendored guideline says "2–10 sentences is often right", which is roughly 250 words, and the
+ * median node was 381. Setting the warning at the guideline would have flagged two thirds of the
+ * corpus and been ignored; 400 flags the nodes where length is actually the symptom.
+ */
+const DESCRIPTION_WARN_WORDS = 400;
 
 function readClass(file: string, report: Diagnostic[]): Omit<OntologyClass, "nodes"> {
   const relative = `.yidam/corpus/${file}`;
@@ -746,6 +901,7 @@ function validate(
       report.push({
         file,
         severity: "warning",
+        kind: "vocabulary",
         message: `property "${property.name}" is not declared by ${node.className}.ont.yml`,
       });
     }
@@ -970,15 +1126,25 @@ export function loadCorpus(): Corpus {
     );
   }
 
+  /*
+   * Not fatal, and deliberately not silent — and counted by kind, because two unrelated questions
+   * arrive here.
+   *
+   * Vocabulary drift is a question for whoever owns an ontology. Prose drift is a question for
+   * whoever is authoring a node: a genre sitting in the wrong field. Summing them under either
+   * name gives a number that is true of nothing, which is the exact defect `count_tag` and the
+   * connector table were each fixed for.
+   */
   const warnings = report.filter((d) => d.severity === "warning");
   if (warnings.length > 0) {
-    // Not fatal, and deliberately not silent. These are vocabulary drift — a relationship or a
-    // property a class's ontology has not declared — which is a question for whoever owns the
-    // ontology rather than a reason to refuse to publish.
-    console.warn(
-      `\n  ${warnings.length} corpus nodes use vocabulary their ontology does not declare.\n` +
-        `  Run \`pnpm corpus:report\` for the list.\n`,
-    );
+    const prose = warnings.filter((d) => d.kind === "prose").length;
+    const parts = [
+      prose > 0 ? `${prose} node${prose === 1 ? "" : "s"} carry prose in the wrong field` : "",
+      warnings.length - prose > 0
+        ? `${warnings.length - prose} use vocabulary their ontology does not declare`
+        : "",
+    ].filter((part) => part !== "");
+    console.warn(`\n  ${parts.join(", ")}.\n  Run \`pnpm corpus:report\` for the list.\n`);
   }
 
   cached = {

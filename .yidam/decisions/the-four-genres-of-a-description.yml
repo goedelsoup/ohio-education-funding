@@ -1,0 +1,147 @@
+id: the-four-genres-of-a-description
+summary: >-
+  A node's `description:` had become four documents in one field — the lead, the subject, what this
+  repository computed, and what this node used to say and no longer does. The fourth is the one
+  agents need most and readers need last, so it becomes a structured `revisions:` block rather than
+  a paragraph somebody has to notice, and every node gains a `summary:` the site can lead with.
+context: |
+  Measured across all 101 nodes before any of this was changed:
+
+      description words                        53,196
+      median / max per node                    381 / 2,806
+      paragraphs                               905
+      paragraphs about the corpus, not Ohio    213  (24%)
+      ALL-CAPS bold retraction leads           130  across 33 nodes
+      inline crates/… test-path citations       80  across 29 nodes
+
+  The vendored authoring rule is two sentences long and both halves are broken. A node is "2–10
+  sentences" — the median is 381 words. And "anything that describes how the repo operates rather
+  than what it knows" does not belong in the corpus — 24% of the paragraphs do exactly that.
+
+  Neither drift was careless. The corpus has been used as a lab notebook, and the notebook entries
+  are load-bearing: [temporary transitional aid
+  guarantee](../corpus/formula-component/temporary-transitional-aid-guarantee.yml) opens a paragraph
+  **THE MECHANISM IS NOT WHAT THIS NODE SAID, AND THE DIFFERENCE IS A CLAWBACK**, and that
+  paragraph is the reason a later reader does not rebuild the incomplete formula the node carried
+  for twelve phases. Deleting it to make the page readable would trade the corpus's most useful
+  property for its prettiest.
+
+  So the four genres, all four present in that one node:
+
+    1. **The lead.** What the thing is. One or two sentences, almost always the first paragraph.
+    2. **The subject.** Mechanism, statute, history, distribution — what Ohio does.
+    3. **What this repository computed.** Cited to a Rust test. `findings:` already exists for
+       this and three nodes use it; twenty-nine cite `crates/…` from inside their description.
+    4. **The apparatus.** Retractions, "this corpus carried X for two phases", methodological
+       cautions, open work with a named next step.
+
+  The web view made no distinction between any of them. `/wiki/<class>/<node>` rendered the whole
+  `description` into a single card, so a reader arriving at the guarantee met 2,806 words with the
+  definition, the current finding, and a withdrawn claim set in the same type. The five places that
+  needed a short version called `summarize(node.description, N)`, which strips markdown and cuts on
+  a word boundary — a mechanical lead, and the reason 110 of 143 `<meta name="description">` values
+  had already been found cut mid-word once before.
+decision: |
+  **Fork the fields, not the document.** One file per node stays the source of truth. Agents read
+  it whole and lose nothing; the web reads fields by genre and decides placement.
+
+  Two new top-level fields on a node, joining `description:` and the existing `findings:`:
+
+      summary     the lead. <= 50 words, no markdown links, at most one claim tag. Required.
+      revisions   a list. What this node used to say, what replaced it, and what settled it.
+
+  Each revision entry is four fields:
+
+      was         the claim as it stood, in enough of its own words to be recognised
+      now         what replaced it
+      found_by    the test, source, or catalog record that settled it
+      reach       what else was affected, or the explicit statement that nothing was
+
+  No dates. Git has dates, and the prelude already forbids them in filenames for the same reason.
+  `found_by` is the field that earns the structure: it turns "this was wrong once" into a check
+  somebody can run.
+
+  **Genre 4 leaves `description:` entirely.** Retractions go to `revisions:`; methodological
+  cautions and computed results go to `findings:`; what is left is the subject.
+
+  The node page renders lead, subject, findings, properties, links, backlinks, and then
+  `revisions:` in a collapsed disclosure in the `.apparatus` card style `seeded_because` already
+  established. Collapsed, not omitted — a reader who wants to know what the corpus got wrong is
+  exactly the reader this repository is for.
+
+  Four lints, warning-first and error once the migration completes: a `summary` that is missing,
+  over 50 words, contains `](`, or is a prefix of its own description; and a `description` that
+  still carries an ALL-CAPS bold lead or the phrase "this corpus" / "this node" / "this repository".
+
+  **Phase D is in scope.** The prelude's own answer to a 2,806-word node is not "split its fields"
+  but "decompose it", and the field split is what makes the decomposition legible rather than a
+  replacement for it.
+consequences: |
+  **`summary:` was worth more than the genre split, and it was cheaper.** Writing 101 leads touches
+  no description and immediately fixes five call sites that were each truncating markdown into a
+  different mangled string — the class index cell, the node's `<meta>` description, two OG cards,
+  and the wiki front door. That is the first prose most readers see, and it was being generated by
+  `slice()`.
+
+  **The structure is doing work the heuristic could not.** `markCorrections` in `prose.ts` already
+  classifies decision-record blockquotes on "opens with strong emphasis", measured across all
+  twenty-four records with no overlap, and pinned by spec. The same trick was available here and
+  is not safe here: in a decision record, misfiling a correction as a quotation is cosmetic; in a
+  corpus node it publishes a withdrawn claim as current. The two cases look identical and their
+  failure modes are not.
+
+  **The generated counters absorbed the new fields without being told about them.**
+  `claim_audit` attributes each tag to the last top-level key it saw, positionally, so `summary:`
+  and `revisions:` appear in the corpus README's field breakdown for free. A count of nodes
+  carrying revisions was added beside the claim inventory, on the same ground the inventory was
+  generated in the first place: how often this corpus has corrected itself is a fact about it that
+  should be derived on every index run rather than asserted once.
+
+  **The migration is ordered by words times inbound links**, which puts
+  [equity](../corpus/doctrine/equity.yml) (1,791 words, 31 nodes pointing at it) ahead of
+  [casino tax distribution](../corpus/revenue-stream/casino-tax-distribution.yml) (1,307 words, 1). The top fourteen nodes
+  by that measure hold 20,410 of the 53,196 words and 72 of the 130 caps-leads, so the reader-facing
+  win is concentrated where the traffic is.
+
+  **What decomposition cost.** Moving a claim to a new node moves the edges that point at it, and
+  edges are the expensive thing in this corpus — `backlinks` are the half of each edge nobody sees
+  while authoring, and a node that loses its inbound links loses the only navigation to it. This is
+  why Phase D runs last rather than first, after the field split has already made clear which
+  paragraphs are one subject and which are two.
+alternatives: |
+  **A parallel human-facing tree — `.yidam/corpus-readable/` or a generated `human/` mirror.**
+  Rejected, and `corpus.ts` had already written the argument in its own docstring: putting an
+  export between the YAML and the page "would add a second serialization to keep in sync without
+  anything deciding what is true along the way." A mirror is worse than an export, because nothing
+  computes it — the two copies diverge on the first edit somebody makes to the one they happened
+  to have open.
+
+  **Classify the paragraphs at render time and demote the apparatus, with no corpus edits.**
+  Rejected on the failure mode rather than on the accuracy. The signals are strong — an ALL-CAPS
+  bold lead, a `crates/` path, the literal phrase "this corpus" — and would probably run at 90-odd
+  percent. The residue is the problem: a retraction the classifier misses is rendered as current
+  body copy, which is the one outcome worse than the wall of text this exists to fix.
+
+  **Keep `[open]` and the retractions in the description and only add `summary:`.** Rejected,
+  though it was tempting, because it is Phase A and Phase A alone. It would have delivered most of
+  the readability with none of the cost. What it does not do is make the corrections addressable —
+  an agent would still have to notice a paragraph, and the whole reason the notebook entries are
+  worth keeping is that a later pass reads them. `revisions[]` can be traversed; a paragraph can
+  only be read.
+
+  **Dates on revision entries.** Rejected. The prelude forbids dates in node filenames because
+  "the git history has dates", and a hand-written date in a field has the additional property of
+  being wrong the first time somebody edits the entry without touching it. `found_by` is the
+  durable half of what a date was standing in for.
+
+  **An enum or a controlled vocabulary for `found_by`.** Rejected on the same evidence
+  [`the-four-kinds-of-parameter`](the-four-kinds-of-parameter.yml) rejected an enum for `kind`: the
+  things that settle a claim in this repository are a Rust test, a catalog source, a published
+  department workbook, a court opinion, and in one case the absence of a source. Five kinds from
+  the first pass is not a vocabulary, it is a sample.
+
+  **Leave the caps-leads in place inside `revisions:`.** Rejected. They were shouting because
+  nothing else in the field could carry emphasis — the retraction had to out-compete 2,000 words of
+  body copy for a skimming reader's attention. Once it has its own block with its own heading, the
+  capitals are doing nothing the structure is not already doing, and they read on the page as what
+  they literally are.

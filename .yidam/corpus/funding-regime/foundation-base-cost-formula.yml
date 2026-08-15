@@ -1,5 +1,9 @@
 class: funding-regime
 label: Foundation Base Cost Formula
+summary: >-
+  The regime DeRolph was decided against. The state declared a base cost per pupil, multiplied
+  it by enrollment, subtracted a charge-off for what the district was deemed able to raise
+  locally, and paid the difference.
 description: |
   The regime *DeRolph* was decided against. Its structure was simple: the state declared a
   base cost per pupil, multiplied it by the district's average daily membership, subtracted a

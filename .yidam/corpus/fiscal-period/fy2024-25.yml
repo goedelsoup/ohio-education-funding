@@ -1,5 +1,9 @@
 class: fiscal-period
 label: FY2024-25 Biennium
+summary: >-
+  The biennium appropriated by H.B. 33, and the only one in which the plan's cost inputs were
+  refreshed — FY2018 salaries to FY2022. That single change is what makes the biennium a
+  natural control case.
 description: |
   July 1, 2023 through June 30, 2025 — the biennium appropriated by
   [Am. Sub. H.B. 33](../legislation/hb-33-2023.yml), and the only one in which the Fair School

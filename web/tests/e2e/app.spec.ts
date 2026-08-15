@@ -1626,8 +1626,10 @@ test.describe("the categorical half", () => {
     await expect(page.locator("h1")).toContainText("Targeted Assistance");
     const body = page.locator("main");
     await expect(body).toContainText("does not belong with them");
-    await expect(body).toContainText("SIZE CLIFF");
-    await expect(body).toContainText("PAYS THEM NOTHING");
+    // Section headings now, not shouted capitals. The claim is what is being pinned; the
+    // capitals were how it competed for attention inside a wall of body copy.
+    await expect(body).toContainText("The capacity tier has a size cliff");
+    await expect(body).toContainText("qualifies districts and pays them nothing");
     // And it points at local capacity, which is the placement decision itself: both measure the
     // tax base, and the edge is what stops a reader filing this with the weighted programs.
     const capacity = page.locator(
@@ -2414,13 +2416,29 @@ test.describe("the hold-harmless machinery", () => {
   });
 
   test("the guarantee node records the clawback it used to omit", async ({ page }) => {
-    // The correction that matters most: the node described a hold-harmless with no clawback in it,
-    // which reproduces correctly for 566 districts and wrongly for 43.
+    /*
+     * The correction that matters most: the node described a hold-harmless with no clawback in it,
+     * which reproduces correctly for 566 districts and wrongly for 43.
+     *
+     * It is a `revisions:` entry now rather than a shouted paragraph in the body, so this asserts
+     * on the disclosure — that the withdrawal is present, that it is filed apart from the current
+     * account, and that it still carries the number that makes it legible.
+     */
     await page.goto("/wiki/formula-component/temporary-transitional-aid-guarantee");
     const body = page.locator("main");
-    await expect(body).toContainText("NOT WHAT THIS NODE SAID");
     await expect(body).toContainText("Open Enrolment Adjustment");
-    await expect(body).toContainText("566 districts and wrongly for 43");
+
+    const withdrawals = page.locator(".card.apparatus", { hasText: "What this node used to say" });
+    await expect(withdrawals).toBeVisible();
+    await expect(withdrawals.locator("details.revision")).toHaveCount(3);
+    await expect(withdrawals).toContainText("566 districts and wrongly for 43");
+
+    // Struck through, so a reader landing on an open disclosure can tell the withdrawn claim from
+    // the live one without relying on colour.
+    await expect(withdrawals.locator(".withdrawn").first()).toHaveCSS(
+      "text-decoration-line",
+      "line-through",
+    );
   });
 
   test("the proration parameter names all three and which one publishes its limit", async ({
@@ -2430,7 +2448,7 @@ test.describe("the hold-harmless machinery", () => {
     const body = page.locator("main");
     await expect(body).toContainText("not a rate, a weight, a price or a threshold");
     await expect(body).toContainText("147,500,000");
-    await expect(body).toContainText("A PRORATION OF 1.0 IS NOT AN ABSENCE");
+    await expect(body).toContainText("A proration of 1.0 is not an absence");
   });
 
   test("a district touched by none of the three shows no hold-harmless table", async ({ page }) => {

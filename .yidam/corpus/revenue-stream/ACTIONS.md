@@ -10,6 +10,9 @@
   flat under H.B. 920 is declining, and only the constant-dollar series shows it.
 - **Restriction test.** Determine what share of an agency's revenue is unrestricted and
   therefore available for the base operating cost the formula computes.
+- **What has this node been wrong about?** Read `revisions:`. Each entry carries the claim as
+  it stood, what replaced it, and the test or source that settled it — so a withdrawn figure can be
+  recognised rather than re-derived, and `found_by` gives the check to re-run.
 
 ## Transitions
 
