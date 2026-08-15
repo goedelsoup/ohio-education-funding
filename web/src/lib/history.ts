@@ -45,6 +45,7 @@ import { seriesSpec } from "./plot/spec.ts";
 import { renderToString } from "./plot/ssr.ts";
 import { convert, type Basis } from "./real.ts";
 import type { Bundle, Deflator, HistoryYear } from "./types.ts";
+import { yearChip } from "./year.ts";
 
 /** What neither level of government closes — the part a district actually experiences. */
 export function residual(year: HistoryYear): number {
@@ -153,7 +154,7 @@ export function renderRevenueMix(history: HistoryYear[]): string {
 
   return `
     <div class="card">
-      <h2>Where the money came from</h2>
+      <h2>Where the money came from${yearChip("history")}</h2>
       <p class="note">Local, state and federal revenue as shares of the total, across every
         comparable Ohio school system the Census Bureau surveyed. The state share fell from
         ${pct(first.state_share, 1)} in FY${first.fiscal_year} to ${pct(last.state_share, 1)} in
@@ -229,7 +230,7 @@ export function renderEqualization(
 
   return `
     <div class="card">
-      <h2>Whom it reached</h2>
+      <h2>Whom it reached${yearChip("history")}</h2>
       <p class="note">Districts sorted by local revenue per pupil and cut into quarters. The gap is
         the distance between the poorest quarter and the richest; the second line is what neither
         state nor federal aid closes, which is the part a district actually experiences.

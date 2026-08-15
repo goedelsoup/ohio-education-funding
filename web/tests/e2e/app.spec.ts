@@ -265,6 +265,34 @@ test.describe("the document arrives complete", () => {
     );
   });
 
+/**
+ * Every route family that renders a figure, for the year-chip rule.
+ *
+ * **Not** the five district routes the `data-part` rule uses. That scoping is deliberate for
+ * addressability — the statewide pages name their cards in prose — but it was wrong here, and
+ * silently: the first version of this test reused the district list, so it passed while four cards
+ * on the front page, two on `/outcomes`, two on `/history` and one each on `/counties` and `/data`
+ * showed figures under no year at all. A rule that only checks where it was already applied is not
+ * a rule.
+ *
+ * One district and one county stand for their families; the rest are singletons.
+ */
+const ROUTES_WITH_FIGURES = [
+  "/",
+  "/outcomes",
+  "/history",
+  "/counties",
+  "/data",
+  "/districts",
+  "/house",
+  "/senate",
+  `/district/${CLEVELAND}`,
+  `/district/${CLEVELAND}/finances`,
+  `/district/${CLEVELAND}/outcome`,
+  `/district/${CLEVELAND}/taxes`,
+  `/district/${CLEVELAND}/scenario`,
+];
+
   test("a card with figures says what year they are on", async ({ page }) => {
     /*
      * The failure this closes. A district page shows the FY2027 formula, a 2024 tax year, a
@@ -279,18 +307,21 @@ test.describe("the document arrives complete", () => {
      * in `src/lib`, and only the rendered page sees both.
      */
     const missing: string[] = [];
-    for (const suffix of ["", "/finances", "/outcome", "/taxes", "/scenario"]) {
-      await page.goto(`/district/${CLEVELAND}${suffix}`);
-      if (suffix === "/scenario") {
+    for (const route of ROUTES_WITH_FIGURES) {
+      await page.goto(route);
+      if (route.endsWith("/scenario")) {
         await expect(page.locator("#scenario-out .card")).not.toHaveCount(0);
       }
-      const bare = await page.locator(".card").evaluateAll((nodes) =>
+      // A card with no figures takes no chip: dating an absence says nothing. `.tnum` is the
+      // numeric-cell class and `.v` the stat-tile value, which between them are every figure this
+      // site renders.
+      const unchipped = await page.locator(".card").evaluateAll((nodes) =>
         nodes
-          .filter((n) => n.querySelector("h2") && !n.querySelector("h2 .year-chip"))
           .filter((n) => n.querySelector(".tnum, .v"))
+          .filter((n) => !n.querySelector(".year-chip"))
           .map((n) => n.querySelector("h2")?.textContent?.trim() ?? "(no heading)"),
       );
-      for (const heading of bare) missing.push(`${suffix || "/dashboard"}: ${heading}`);
+      for (const heading of unchipped) missing.push(`${route}: ${heading}`);
     }
     expect(missing, "a card showing figures has to say what year they are on").toEqual([]);
   });

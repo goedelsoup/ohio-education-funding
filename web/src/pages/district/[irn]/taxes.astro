@@ -11,7 +11,7 @@
 import DistrictNav from "../../../components/DistrictNav.astro";
 import Base from "../../../layouts/Base.astro";
 import { districtPaths, loadFeed } from "../../../lib/feed.ts";
-import { money, pct } from "../../../lib/format.ts";
+import { count, money, pct } from "../../../lib/format.ts";
 import * as routes from "../../../lib/routes.ts";
 import {
   renderChargeOff,
@@ -27,6 +27,19 @@ export const getStaticPaths = districtPaths;
 const { district } = Astro.props;
 const { bundle, tax } = loadFeed();
 const latest = district.property_tax[district.property_tax.length - 1];
+
+/*
+ * The two tax years this card contrasts, derived rather than typed.
+ *
+ * They were the literals `TY2023` and `TY2024`, beside a hard-coded count of `219`. Correct when
+ * written, and correct only until either publisher advances — the profile report's column is a
+ * year behind Taxation's latest **by construction**, so the pair moves together and nothing in the
+ * copy would have said so. This is the shape of the defect
+ * `.yidam/decisions/every-figure-says-its-year.yml` was written about: a claim in prose beside a
+ * claim in data, unable to disagree in a way anything notices.
+ */
+const latestTaxYear = latest ? `TY${latest.tax_year}` : "";
+const profileTaxYear = latest ? `TY${latest.tax_year - 1}` : "";
 
 const description = latest
   ? `${district.name} has ${money(latest.total_value)} of taxable property, ${money(latest.value_per_pupil)} per pupil, charged at ${latest.class1_rate.toFixed(2)} effective Class I mills in TY${latest.tax_year}.`
@@ -112,18 +125,19 @@ const description = latest
             Table SD-1, published by the <strong>Ohio Department of Taxation</strong> — a different
             department from the one that publishes the funding model every other page here reads.
             Where the two overlap they agree, <em>in the year they share</em>: this district's
-            effective Class I rate for <strong>TY2023</strong> matches the Department of Education's
-            District Profile Report to 0.01 mills, and so does every one of the 606 districts
-            carrying both.
+            effective Class I rate for <strong>{profileTaxYear}</strong> matches the Department of
+            Education's District Profile Report to 0.01 mills, and so does every one of the 606
+            districts carrying both.
           </p>
           <p class="note">
             <strong>That is not the rate in the tile above.</strong> The tile is
-            <strong>TY2024</strong>, this table's latest year, and the profile report's column is
-            <code>effective_class1_millage_ty23</code> — a year behind by construction, as
-            <code>crates/bundle</code> names it. The two publications agree on TY2024 for only
-            <strong>219</strong> of the 606, which is not a disagreement between departments but
-            the ordinary fact that one of them has published a later year. The sentence above used
-            to state the agreement without the year, three cards below a figure it was not about.
+            <strong>{latestTaxYear}</strong>, this table's latest year, and the profile report's
+            column is <code>effective_class1_millage_ty{String(profileTaxYear).slice(-2)}</code> — a
+            year behind by construction, as <code>crates/bundle</code> names it. The two
+            publications agree on {latestTaxYear} for only <strong>{count(tax.agreeOnLatest)}</strong>
+            of the 606, which is not a disagreement between departments but the ordinary fact that
+            one of them has published a later year. The sentence above used to state the agreement
+            without the year, three cards below a figure it was not about.
           </p>
           <p class="note">
             These are <strong>current expense</strong> levies only. Bond and permanent-improvement

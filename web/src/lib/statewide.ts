@@ -8,6 +8,7 @@ import { realChange, series, type Basis } from "./real.ts";
 import * as routes from "./routes.ts";
 import type { TaxStatewide } from "./feed.ts";
 import type { Bundle, District, National } from "./types.ts";
+import { yearChip, yearChipPair } from "./year.ts";
 
 /**
  * The financial actuals, statewide, in both bases.
@@ -49,7 +50,7 @@ export function renderStatewideFinances(bundle: Bundle, basis: Basis): string {
 
   return `
     <div class="card">
-      <h2>What districts actually received, spent, and hold — ${escapeHtml(label)}</h2>
+      <h2>What districts actually received, spent, and hold — ${escapeHtml(label)}${yearChipPair("formula", "finances", "held")}</h2>
       <div class="tiles">
         <div class="tile"><div class="k">Cash held, FY${latest.fiscal_year}</div>
           <div class="v">${millions(latest.ending_cash).replace("+", "")}</div>
@@ -145,7 +146,7 @@ export function renderStatewideStructure(bundle: Bundle, tax: TaxStatewide): str
     </div>
 
     <div class="card">
-      <h2>Who is on the guarantee</h2>
+      <h2>Who is on the guarantee${yearChip("formula")}</h2>
       <p class="note">Districts grouped into fifths by assessed valuation per pupil, poorest on
         the left. The guarantee was written as transitional relief for districts losing
         students; the pattern it actually produces is a wealth gradient.</p>
@@ -155,7 +156,7 @@ export function renderStatewideStructure(bundle: Bundle, tax: TaxStatewide): str
     </div>
 
     <div class="card">
-      <h2>Does state aid offset property wealth?</h2>
+      <h2>Does state aid offset property wealth?${yearChipPair("formula", "profile", "valuation")}</h2>
       <div class="scroll"><table><tbody>
         <tr><th>Aid vs. wealth — formula only</th>
             <td class="tnum">${s.wealth_neutrality_formula.toFixed(3)}</td></tr>
@@ -171,7 +172,7 @@ export function renderStatewideStructure(bundle: Bundle, tax: TaxStatewide): str
     </div>
 
     <div class="card">
-      <h2>Two floors</h2>
+      <h2>Two floors${yearChipPair("formula", "millage", "millage")}</h2>
       <div class="scroll"><table><tbody>
         <tr><th>At or below the
             <a href="${routes.parameter("twenty-mill-floor")}">20-mill floor</a></th>
@@ -308,7 +309,7 @@ export function renderNational(national: National | null): string {
 
   return `
     <div class="card">
-      <h2>Whether Ohio is unusual</h2>
+      <h2>Whether Ohio is unusual${yearChip("national")}</h2>
       <p class="note">Everything else on this site is Ohio describing itself. This is the Census
         Bureau counting every school system in the country on one set of definitions, for
         FY${national.fiscal_year} — the only figures here that can say whether what Ohio does is

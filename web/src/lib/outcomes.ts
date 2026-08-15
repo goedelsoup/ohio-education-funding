@@ -90,7 +90,7 @@ export function renderOutcomes(bundle: Bundle): string {
     </div>
 
     <div class="card">
-      <h2>Poverty is most of what the Performance Index measures</h2>
+      <h2>Poverty is most of what the Performance Index measures${yearChip("outcome.performance")}</h2>
       <p class="note">Districts in fifths by economically disadvantaged share, least poor on the
         left. Median Performance Index in each.</p>
       <div class="chartwrap" data-chart="poverty-quintiles">${renderToString(barSpec(bars, { max: 120 }))}</div>
@@ -101,7 +101,7 @@ export function renderOutcomes(bundle: Bundle): string {
     </div>
 
     <div class="card">
-      <h2>The guarantee is that trap, exactly</h2>
+      <h2>The guarantee is that trap, exactly${yearChipPair("outcome.performance", "formula", "guarantee")}</h2>
       <div class="scroll"><table><tbody>
         <tr><th>Median Performance Index, districts on the guarantee</th>
             <td class="tnum">${o.median_performance_on_guarantee.toFixed(1)}</td></tr>
@@ -123,7 +123,7 @@ export function renderOutcomes(bundle: Bundle): string {
     </div>
 
     <div class="card">
-      <h2>The same numerator, two denominators, two answers</h2>
+      <h2>The same numerator, two denominators, two answers${yearChipPair("outcome.performance", "outcome.spending", "spending")}</h2>
       <div class="scroll"><table><tbody>
         <tr><th>Spending per <em>need-weighted</em> pupil vs achievement</th>
             <td class="tnum">${coefficient(o.weighted_spending_vs_performance)}</td></tr>

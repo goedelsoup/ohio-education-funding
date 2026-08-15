@@ -137,3 +137,30 @@ test("an unknown term throws rather than silently rendering bare text", () => {
   // notice — the same class of failure as a link that resolves to a plausible 404.
   expect(() => term("not-a-term", "text")).toThrow(/no glossary entry/);
 });
+
+test("the cross-department agreement count is computed, not typed", () => {
+  /*
+   * It was the literal `219` in `taxes.astro`, beside the literals `TY2023` and `TY2024`. All
+   * three were correct when written and all three move together: the profile report's column is
+   * `effective_class1_millage_ty23`, a year behind Taxation's latest **by construction**, so when
+   * either publisher advances the pair shifts and the copy would have gone on asserting the old
+   * one. The same shape as "millage is TY2023" in the provenance paragraph.
+   *
+   * This asserts the count is derived from the two columns rather than pinned to a number — if it
+   * were still a literal, changing the fixture would leave this passing and the page wrong.
+   */
+  const { bundle, tax } = loadFeed();
+  const recomputed = bundle.districts.filter((d) => {
+    const latest = d.property_tax[d.property_tax.length - 1];
+    return (
+      latest != null &&
+      d.effective_class1_millage != null &&
+      Math.abs(latest.class1_rate - d.effective_class1_millage) <= 0.01
+    );
+  }).length;
+
+  expect(tax.agreeOnLatest).toBe(recomputed);
+  // And it is a minority, which is the fact the card exists to explain: most districts disagree
+  // on the latest year because only one department has published it.
+  expect(tax.agreeOnLatest).toBeLessThan(bundle.statewide.districts / 2);
+});

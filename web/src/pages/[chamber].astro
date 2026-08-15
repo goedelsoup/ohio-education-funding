@@ -12,6 +12,7 @@ import Base from "../layouts/Base.astro";
 import { loadFeed } from "../lib/feed.ts";
 import { count, money, pct } from "../lib/format.ts";
 import * as routes from "../lib/routes.ts";
+import { yearChip } from "../lib/year.ts";
 
 export function getStaticPaths() {
   return [{ params: { chamber: "house" } }, { params: { chamber: "senate" } }];
@@ -75,6 +76,7 @@ const senateWhole = bundle.senate_districts.reduce((a, h) => a + h.districts_who
   </div>
 
   <div class="card">
+    <h2>Every {chamber === "house" ? "House" : "Senate"} district<Fragment set:html={yearChip("formula")} /></h2>
     <div class="scroll"><table>
       <thead><tr>
         <th>District</th><th class="tnum">State aid</th><th class="tnum">Share of Ohio</th>

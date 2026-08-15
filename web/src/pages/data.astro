@@ -10,6 +10,7 @@ import Base from "../layouts/Base.astro";
 import { loadFeed } from "../lib/feed.ts";
 import { count } from "../lib/format.ts";
 import * as routes from "../lib/routes.ts";
+import { yearChip } from "../lib/year.ts";
 
 const { bundle, verification } = loadFeed();
 const s = bundle.statewide;
@@ -68,7 +69,7 @@ const s = bundle.statewide;
   </div>
 
   <div class="card">
-    <h2>The checkpoints</h2>
+    <h2>The checkpoints<Fragment set:html={yearChip("formula")} /></h2>
     <p class="note">
       The feed carries {verification.comparisons.length} scenarios computed by
       <code>crates/project</code>, and this site will not build unless its own implementation
