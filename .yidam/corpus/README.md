@@ -77,7 +77,7 @@ Fields: count per claim tag across every node; then the unresolved marks by the 
 -->
 | Tag | Count | What it records |
 |---|--:|---|
-| `[verified]` | 818 | supported by a committed primary source |
+| `[verified]` | 819 | supported by a committed primary source |
 | `[inference]` | 234 | drawn from verified facts, not witnessed |
 | `[open]` | 188 | a live question — unknown, contested, or being worked |
 | `[unentered]` | 34 | a knowable value nobody has typed in yet |

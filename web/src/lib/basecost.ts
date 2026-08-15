@@ -144,6 +144,36 @@ export function groups(b: BaseCostBuildUp): Group[] {
   ];
 }
 
+/**
+ * A staffing count, rounded — except where rounding would print a zero for something that exists.
+ *
+ * Kelleys Island is funded 0.22 classroom teachers against 5.2 pupils, and this sentence read
+ * *"**0** funded classroom teachers and 6 special teachers, across 5 pupils"* under a heading
+ * saying base cost is $371,449 per pupil. A zero in a sentence about a district that is manifestly
+ * being funded reads as a missing value, and the reader's next thought is that the page is broken
+ * rather than that the district is very small.
+ *
+ * It is one district out of 609, which is the argument for fixing it rather than against: the
+ * whole point of the smallest district in the panel is that it is where the formula's edges show.
+ */
+function staff(value: number): string {
+  if (value > 0 && value < 0.5) return value.toFixed(2);
+  return count(Math.round(value));
+}
+
+/**
+ * An element's share of base cost, which for several of the twenty-two rounds to `0.0%`.
+ *
+ * A column of `0.0%` reads as a column of missing values, and the reader has no way to tell it
+ * from one. `<0.1%` is a claim rather than an absence: it says the row was computed, it is small,
+ * and the table is not broken. The alternative — a second decimal place — widens the column on
+ * every district's page to describe rows nobody reads at that precision.
+ */
+function share(fraction: number): string {
+  if (fraction > 0 && fraction < 0.0005) return "&lt;0.1%";
+  return pct(fraction, 1);
+}
+
 /** Render the build-up for one district. */
 export function renderBaseCostBuildUp(d: District, districts: number): string {
   const b = d.base_cost_build_up;
@@ -171,7 +201,7 @@ export function renderBaseCostBuildUp(d: District, districts: number): string {
             element.note ? `<div class="n">${escapeHtml(element.note)}</div>` : ""
           }</th>
           <td class="tnum">${money(element.value)}</td>
-          <td class="tnum n">${pct(element.value / aggregate, 1)}</td>
+          <td class="tnum n">${share(element.value / aggregate)}</td>
         </tr>`,
       ),
     ])
@@ -187,9 +217,9 @@ export function renderBaseCostBuildUp(d: District, districts: number): string {
       <p class="note">Base cost is not a rate the state sets. It is assembled for each district
         from staffing ratios written into R.C. 3317.011, applied to
         <strong>this district's own enrollment</strong> and priced at statewide average salaries.
-        ${count(Math.round(b.funded_classroom_teachers))} funded classroom teachers and
-        ${count(Math.round(b.funded_special_teachers))} special teachers, across
-        ${count(Math.round(d.adm))} pupils.</p>
+        ${staff(b.funded_classroom_teachers)} funded classroom teachers and
+        ${staff(b.funded_special_teachers)} special teachers, across
+        ${staff(d.adm)} pupils.</p>
 
       <div class="chartwrap" data-chart="base-cost">${renderToString(barSpec(bars))}</div>
 
@@ -220,5 +250,13 @@ export function renderBaseCostBuildUp(d: District, districts: number): string {
         charged to local capacity, which is 60% assessed valuation. Changing the price inputs is
         the lever the <a href="${routes.wikiNode("scenario", "fsfp-input-year-refresh")}">cost input
         refresh</a> scenario perturbs; H.B. 96 held them at FY2022 through FY2027.</p>
+      <p class="note"><strong>Those two figures do not divide into the state share percentage</strong>,
+        and putting them in one sentence invites exactly that. They are computed on different pupil
+        counts — the share is paid on the current year's ADM, the base cost above is built on the
+        enrolled ADM, and the two differ for 499 of Ohio's ${count(districts)} districts. Divide
+        them anyway and 125 districts come out below the statutory 10% minimum, as low as 6.7%,
+        every one of them a district the model already flags as being <em>at</em> that minimum. How
+        Ohio intends the floor to apply across the two counts is not something this site has
+        established, so it says only that the ratio is not the percentage.</p>
     </div>`;
 }
