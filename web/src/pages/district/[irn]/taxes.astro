@@ -111,9 +111,19 @@ const description = latest
           <p class="note">
             Table SD-1, published by the <strong>Ohio Department of Taxation</strong> — a different
             department from the one that publishes the funding model every other page here reads.
-            Where the two overlap they agree: this district's effective Class I rate matches the
-            Department of Education's District Profile Report to 0.01 mills, as it does for all 606
-            districts carrying both.
+            Where the two overlap they agree, <em>in the year they share</em>: this district's
+            effective Class I rate for <strong>TY2023</strong> matches the Department of Education's
+            District Profile Report to 0.01 mills, and so does every one of the 606 districts
+            carrying both.
+          </p>
+          <p class="note">
+            <strong>That is not the rate in the tile above.</strong> The tile is
+            <strong>TY2024</strong>, this table's latest year, and the profile report's column is
+            <code>effective_class1_millage_ty23</code> — a year behind by construction, as
+            <code>crates/bundle</code> names it. The two publications agree on TY2024 for only
+            <strong>219</strong> of the 606, which is not a disagreement between departments but
+            the ordinary fact that one of them has published a later year. The sentence above used
+            to state the agreement without the year, three cards below a figure it was not about.
           </p>
           <p class="note">
             These are <strong>current expense</strong> levies only. Bond and permanent-improvement

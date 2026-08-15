@@ -133,6 +133,12 @@ export function renderEnrollmentYears(
         figure exists here to show. Every row is the FY${bundle.fiscal_year} formula held fixed
         and run at that year's enrolled ADM, which isolates the enrollment channel: two years of
         published totals could not, because the formula moved between them too.</p>
+      <p class="note"><strong>The last row's enrollment is partly a departmental
+        estimate.</strong> The FY${bundle.fiscal_year} calculator is published before
+        FY${latest.year} closes, so FY${latest.year} enrolled ADM is not a settled count — and it
+        is the row the model's own answer sits on. Every figure on this page that divides by the
+        current year inherits that, which is a different kind of uncertainty from the band below:
+        the band is a forecast and says so, this is a published number that is not final.</p>
       <p class="note">This card holds the formula fixed and moves enrollment. The
         <a href="${routes.districtScenario(d.irn)}">scenario for this district</a> does the
         opposite — it holds enrollment at published FY${meta.base_year} and moves the formula. The
@@ -411,14 +417,24 @@ export function renderAidSource(bundle: Bundle, d: District): string {
         approved, so what a levy raises here is not what the ballot said it would.`,
     });
   }
-  if (d.enrollment_change != null && d.enrollment_change < 0) {
+  /*
+   * Symmetric, because a fall is not the only thing that happened. This fired only on a negative,
+   * so for the 109 districts whose enrollment *rose* between FY2024 and FY2026 the dashboard's sole
+   * carrier of the fact was a row in the Detail card — which is why this has to change before that
+   * card is deleted rather than after.
+   */
+  if (d.enrollment_change != null && d.enrollment_change !== 0) {
+    const fell = d.enrollment_change < 0;
     conditions.push({
-      label: `Enrollment down ${pct(-d.enrollment_change)} FY2024→FY2026`,
+      label: `Enrollment ${fell ? "down" : "up"} ${pct(
+        Math.abs(d.enrollment_change),
+      )} FY2024→FY2026`,
       consequence: d.on_guarantee
-        ? `Its aid did not, because the guarantee holds a fixed dollar amount enrollment does not
-           enter — the next card shows what that is worth.`
-        : `Its aid falls with it, because this district is on the formula — the next card shows by
-           how much.`,
+        ? `Its aid did not move with it, because the guarantee holds a fixed dollar amount
+           enrollment does not enter — the next card shows what that is worth.`
+        : `Its aid ${
+            fell ? "falls" : "rises"
+          } with it, because this district is on the formula — the next card shows by how much.`,
     });
   }
 
@@ -623,36 +639,6 @@ export function renderPosition(
         expenditures,
         routes.metric("per-pupil-operating-expenditure"),
       )}
-    </div>`;
-}
-
-/** Every figure the feed carries for this district, unrounded and unnarrated. */
-export function renderDetail(d: District): string {
-  const formulaPP = d.formula_aid_per_pupil;
-  const guaranteePP = d.realized_aid_per_pupil - formulaPP;
-  return `
-    <div class="card" data-part="detail">
-      <h2>Detail</h2>
-      <div class="scroll"><table><tbody>
-        <tr><th>Base cost per pupil</th><td>${money(d.base_cost_per_pupil, 2)}</td></tr>
-        <tr><th>Aggregate base cost</th><td>${money(d.aggregate_base_cost)}</td></tr>
-        <tr><th>State share of base cost</th><td>${money(d.base_cost_state_share)}</td></tr>
-        <tr><th>Categorical funding<div class="n">Six programs; the split is below.</div></th>
-            <td>${money(d.categorical_funding)}</td></tr>
-        <tr><th>Formula aid per pupil</th><td>${money(formulaPP, 2)}</td></tr>
-        <tr><th>Guarantee per pupil</th><td>${money(guaranteePP, 2)}</td></tr>
-        <tr><th>Guarantee, total</th><td>${money(d.guarantee)}</td></tr>
-        <tr><th>Assessed valuation per pupil</th><td>${money(d.valuation_per_pupil)}</td></tr>
-        <tr><th>Effective Class 1 millage</th><td>${
-          d.effective_class1_millage == null ? "—" : d.effective_class1_millage.toFixed(2)
-        }</td></tr>
-        <tr><th>Operating expenditure per pupil</th><td>${money(d.operating_expenditure_per_pupil)}</td></tr>
-        <tr><th>Economically disadvantaged</th><td>${pct(d.economically_disadvantaged)}</td></tr>
-        <tr><th>Enrolled ADM FY2026</th><td>${d.current_year_adm.toLocaleString("en-US", { maximumFractionDigits: 0 })}</td></tr>
-        <tr><th>Enrollment change FY2024→FY2026</th><td>${pct(d.enrollment_change)}</td></tr>
-      </tbody></table></div>
-      <p class="note">FY2026 enrolled ADM is partly a departmental estimate: the calculator is
-        published before that fiscal year closes.</p>
     </div>`;
 }
 
@@ -1671,5 +1657,11 @@ export function renderWhatThisIsNot(bundle: Bundle, d: District): string {
         headcount, and Outcome shows FY2025 spending on its need-weighted one. Subtracting any of
         them from any other produces a number that means nothing, which is why
         <code>denominators.ts</code> exists and why it says it cannot check a sentence.</p>
+      <p class="note">Every figure on this page is also a column in
+        <a href="/data/districts.csv">the district export</a>, unrounded and one row per district.
+        This page used to close with a thirteen-row table of the same numbers rounded, which was
+        the better answer in the build where it was added and had become a restatement of ten
+        figures already above it. If a fixed-shape table on every district was what you were
+        reading, the CSV is where it went.</p>
     </div>`;
 }
