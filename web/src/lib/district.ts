@@ -18,6 +18,7 @@ import { count, escapeHtml, money, ordinal, pct, percentileOf, signedMoney } fro
 import { apply, currentLaw, currentRealizedAid } from "./policy.ts";
 import { forecastPath, growthPrior, observations } from "./project.ts";
 import { realChange, series, type Basis } from "./real.ts";
+import { hasDenominators } from "./tax.ts";
 import * as routes from "./routes.ts";
 import type { Bar } from "./chart.ts";
 import type { Bundle, District, Statewide } from "./types.ts";
@@ -101,7 +102,7 @@ export function renderEnrollmentYears(
          forecast.</p>`;
 
   return `
-    <div class="card" data-part="enrollment">
+    <div class="card" id="enrollment" data-part="enrollment">
       <h2>What a year of enrollment is worth here</h2>
       <div class="scroll"><table>
         <thead><tr>
@@ -274,7 +275,7 @@ export function renderActuals(bundle: Bundle, d: District, basis: Basis): string
   }));
 
   return `
-    <div class="card" data-part="actuals">
+    <div class="card" id="actuals" data-part="actuals">
       <h2>What it actually received, and what it holds${
         converted ? `, in FY${base} dollars` : ""
       }</h2>
@@ -439,7 +440,7 @@ export function renderAidSource(bundle: Bundle, d: District): string {
   }
 
   return `
-    <div class="card" data-part="aid-source">
+    <div class="card" id="aid-source" data-part="aid-source">
       <h2>Where the state aid comes from</h2>
       <div class="tiles" data-part="headline">
         <div class="tile"><div class="k">State aid, FY${bundle.fiscal_year}</div>
@@ -625,7 +626,7 @@ export function renderPosition(
   expenditures: number[],
 ): string {
   return `
-    <div class="card" data-part="position">
+    <div class="card" id="position" data-part="position">
       <h2>Position among Ohio's ${bundle.statewide.districts} districts</h2>
       ${strip(
         "Assessed valuation per pupil",
@@ -690,7 +691,7 @@ export function renderCategoricals(d: District, statewide: Statewide): string {
   const share = total / (total + d.base_cost_state_share);
 
   return `
-    <div class="card" data-part="categoricals">
+    <div class="card" id="categoricals" data-part="categoricals">
       <h2>The categorical half, in its six parts</h2>
       <div class="chartwrap" data-chart="categoricals">${renderToString(barSpec(bars))}</div>
 
@@ -773,7 +774,7 @@ function renderSpecialEducation(d: District): string {
   const biggest = [...rows].sort((a, b) => b.aid - a.aid)[0];
 
   return `
-    <h3>Special education, by category</h3>
+    <h3 id="special-education">Special education, by category</h3>
     <div class="scroll"><table data-program="special-education">
       <thead><tr><th>Category</th><th class="tnum">Weight</th><th class="tnum">Pupils</th>
         <th class="tnum">Aid</th><th class="tnum">Share of pupils</th>
@@ -848,7 +849,7 @@ function renderTargetedAssistance(d: District): string {
     enrolled > 600 ? 1 : enrolled > 400 ? (0.95 * (enrolled - 400)) / 200 + 0.05 : enrolled >= 200 ? 0.05 : 0;
 
   return `
-    <h3>Targeted assistance, in its two tiers</h3>
+    <h3 id="targeted-assistance">Targeted assistance, in its two tiers</h3>
     <div class="scroll"><table data-program="targeted-assistance">
       <thead><tr><th>Step</th><th class="tnum">Value</th><th>What it is</th></tr></thead>
       <tbody>
@@ -942,7 +943,7 @@ function renderDpia(d: District): string {
       : 0;
 
   return `
-    <h3>Disadvantaged Pupil Impact Aid, step by step</h3>
+    <h3 id="dpia">Disadvantaged Pupil Impact Aid, step by step</h3>
     <div class="scroll"><table data-program="dpia">
       <thead><tr><th>Step</th><th class="tnum">Value</th><th>What it is</th></tr></thead>
       <tbody>
@@ -1017,7 +1018,7 @@ function renderGifted(d: District): string {
   const unitTotal = g.coordinator_aid + g.specialist_k8_aid + g.specialist_9_12_aid;
 
   return `
-    <h3>Gifted: two payments and three kinds of unit</h3>
+    <h3 id="gifted">Gifted: two payments and three kinds of unit</h3>
     <div class="scroll"><table data-program="gifted">
       <thead><tr><th>Component</th><th class="tnum">Units</th><th class="tnum">Earned</th>
         <th class="tnum">Amount</th><th>What it is</th></tr></thead>
@@ -1098,7 +1099,7 @@ function renderCareerTechnical(d: District): string {
   const fte = rows.reduce((a, r) => a + r.fte, 0);
 
   return `
-    <h3>Career-technical education, by category</h3>
+    <h3 id="career-technical">Career-technical education, by category</h3>
     <div class="scroll"><table data-program="career-technical">
       <thead><tr><th>Category</th><th class="tnum">Weight</th><th class="tnum">FTE</th>
         <th class="tnum">Aid</th></tr></thead>
@@ -1167,7 +1168,7 @@ function renderEnglishLearners(d: District): string {
   const learners = rows.reduce((a, r) => a + r.adm, 0);
 
   return `
-    <h3>English learners, by category</h3>
+    <h3 id="english-learners">English learners, by category</h3>
     <div class="scroll"><table data-program="english-learners">
       <thead><tr><th>Category</th><th class="tnum">Weight</th><th class="tnum">Pupils</th>
         <th class="tnum">Aid</th></tr></thead>
@@ -1230,7 +1231,7 @@ export function renderSupplements(d: District): string {
   const nearTheCliff = !s.growth_eligible && s.enrollment_change > 0.02;
 
   return `
-    <div class="card" data-part="supplements">
+    <div class="card" id="supplements" data-part="supplements">
       <h2>Outside the formula</h2>
       <p class="note">These are paid on top of formula aid and the guarantee does not hold a
         district at them. Everything above this card is <strong>foundation funding</strong>, which
@@ -1328,7 +1329,7 @@ function renderTransportation(d: District): string {
   const shortfall = t.special_education_unprorated - t.special_education;
 
   return `
-    <h3><a href="${routes.wikiNode(
+    <h3 id="transportation"><a href="${routes.wikiNode(
       "formula-component",
       "fsfp-transportation",
     )}">Transportation</a></h3>
@@ -1441,7 +1442,7 @@ function renderPreschoolSpecialEducation(d: District): string {
   const shortfall = p.unprorated - p.total;
 
   return `
-    <h3><a href="${routes.wikiNode(
+    <h3 id="preschool"><a href="${routes.wikiNode(
       "formula-component",
       "fsfp-preschool-special-education",
     )}">Preschool special education</a></h3>
@@ -1506,7 +1507,7 @@ export function renderNationalPosition(d: District): string {
   const n = d.national;
   if (!n) {
     return `
-      <div class="card" data-part="national">
+      <div class="card" id="national" data-part="national">
         <h2>Against America</h2>
         <p class="note">This district is not in the national comparison. The Census survey's
           comparable set is unified elementary-and-secondary districts, and this is one of Ohio's
@@ -1539,7 +1540,7 @@ export function renderNationalPosition(d: District): string {
   ];
 
   return `
-    <div class="card" data-part="national">
+    <div class="card" id="national" data-part="national">
       <h2>Against America</h2>
       <div class="scroll"><table data-program="national">
         <thead><tr><th>Measure</th><th class="tnum">This district</th>
@@ -1618,7 +1619,7 @@ export function renderWhatThisIsNot(bundle: Bundle, d: District): string {
   const categoricalAdm = Math.round(d.categorical_adm);
 
   return `
-    <div class="card" data-part="not">
+    <div class="card" id="not" data-part="not">
       <h2>What this page is not</h2>
       <p class="note"><strong>None of the figures above is money this district received.</strong>
         Every one of them is the FY${bundle.fiscal_year} funding calculator's answer for it,
@@ -1647,8 +1648,17 @@ export function renderWhatThisIsNot(bundle: Bundle, d: District): string {
         The corpus calls conflating them
         <a href="${routes.metric("enrolled-adm")}">the single most common arithmetic error
         available in Ohio school finance</a>, and
-        <a href="${routes.districtTaxes(d.irn)}">the property tax page</a> reconciles the two the
-        Department of Taxation and the Department of Education each publish.</p>
+        <a href="${
+          /*
+           * The section, but only for the 432 districts that render it. `renderDenominators`
+           * returns "" where the two valuations agree within 5%, so for 177 of 609 the anchor the
+           * plan wanted named here is simply not in the target document — and a missing fragment
+           * fails silently, landing the reader at the top of a page having been promised a
+           * reconciliation. The same predicate, so the two cannot drift apart.
+           */
+          hasDenominators(d) ? routes.at(routes.districtTaxes(d.irn), routes.SECTIONS.denominators) : routes.districtTaxes(d.irn)
+        }">the property tax page</a> reconciles the two the Department of Taxation and the
+        Department of Education each publish.</p>
       <p class="note"><strong>The position card below is two other years on a fourth count.</strong>
         Assessed valuation per pupil there is an <strong>FY2023</strong> valuation and operating
         expenditure per pupil is <strong>FY2024</strong> spending — two different years inside one

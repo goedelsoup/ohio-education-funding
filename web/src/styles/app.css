@@ -81,6 +81,29 @@ body {
   border: 0;
 }
 
+/*
+ * How much of the viewport the sticky chrome occupies, by breakpoint.
+ *
+ * Fragments need this. A link to `#categoricals` scrolls the heading to y=0, which puts it under a
+ * sticky header rather than at the top of the reader's view, and the reader lands looking at the
+ * card above the one they asked for. `scroll-margin-top` fixes it and has to know the height.
+ *
+ * The numbers are measured from a build at each width rather than guessed: the header wraps to
+ * three rows below 480px, two to 700, and is one row from 1000px up. 168 / 135 / 96 / 87, the last
+ * being 51px of header plus the 36px sub-navigation that becomes sticky at that width and not
+ * before. A pixel constant in a stylesheet is brittle by nature, so `app.spec.ts` asserts that a
+ * fragment link actually lands its target clear of the chrome at each breakpoint — the brittleness
+ * becomes a red test rather than a reader looking at the wrong card.
+ */
+:root { --sticky-chrome: 168px; }
+@media (min-width: 480px) { :root { --sticky-chrome: 135px; } }
+@media (min-width: 700px) { :root { --sticky-chrome: 96px; } }
+@media (min-width: 1000px) { :root { --sticky-chrome: 87px; } }
+
+/* Every section a fragment can name. Scoped rather than `[id]` so a form control or a chart's
+   internal id does not acquire a scroll offset it has no use for. */
+.card[id], h3[id] { scroll-margin-top: calc(var(--sticky-chrome) + .75rem); }
+
 /* The site chrome. Sticky, because the district sub-navigation below it is how a reader moves
    between the five views of one district and a long finances table should not strand them. */
 header.site {
@@ -195,6 +218,31 @@ a:hover { text-decoration-color: currentColor; }
 /* The district sub-navigation: five views of one district. A tab row in appearance, real links
    in fact, because each one is now its own URL. */
 .subnav { display: flex; gap: .4rem; margin: 0 0 1.1rem; flex-wrap: wrap; }
+
+/*
+ * Sticky from 1000px up, and deliberately not below it.
+ *
+ * The header's own rule two hundred lines above justifies itself by reference to this bar — "a
+ * long finances table should not strand them" — which is a claim the stylesheet did not implement:
+ * `.subnav` renders inside `<main>` and scrolls away with the document, so a reader arriving at a
+ * fragment lands mid-page with no way between the five views except back to the top. Now that
+ * fragments exist that is the ordinary arrival rather than the unusual one.
+ *
+ * Below 1000px it stays put, measured rather than assumed. The site header wraps to 96px at 700px
+ * and to 168px at 390px, and a sticky bar under it would take 132px and 246px of an 800px viewport
+ * — 31% at the narrowest, on a page whose complaint was density. The tab row is one screen from
+ * the top there; the trade is not worth it and this is where that is written down.
+ */
+@media (min-width: 1000px) {
+  .subnav {
+    position: sticky;
+    top: 51px;
+    z-index: 4;
+    background: var(--surface-1);
+    padding: .55rem 0;
+    margin-bottom: .55rem;
+  }
+}
 .subnav a {
   font-size: .85rem;
   padding: .4rem .8rem;
@@ -494,7 +542,9 @@ tbody tr:last-child th, tbody tr:last-child td { border-bottom: 0; }
   color: var(--text-primary);
   padding: .75rem .9rem .05rem;
   border-radius: 0 8px 8px 0;
-  scroll-margin-top: 1.5rem;
+  /* Was a flat 1.5rem, which is less than the sticky header at every width — so the correction a
+     reader clicked through to landed under it. The same measured variable the section anchors use. */
+  scroll-margin-top: calc(var(--sticky-chrome) + .75rem);
 }
 .prose-body blockquote.correction > p:first-child > strong:first-child {
   color: var(--series-guarantee);

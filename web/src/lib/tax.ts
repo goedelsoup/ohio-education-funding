@@ -89,7 +89,7 @@ export function renderTaxBase(d: District): string {
   const residentialShare = (latest.residential_value + latest.agricultural_value) / latest.total_value;
 
   return `
-    <div class="card" data-part="tax-base">
+    <div class="card" id="tax-base" data-part="tax-base">
       <h2>What the tax base is made of, TY${latest.tax_year}</h2>
       <div class="chartwrap" data-chart="tax-base">${renderToString(barSpec(bars))}</div>
       <p class="note">Total taxable value ${money(latest.total_value)}, or
@@ -154,7 +154,7 @@ export function renderTaxChange(d: District, statewide: TaxStatewide): string {
   ] as const;
 
   return `
-    <div class="card" data-part="valuation-change">
+    <div class="card" id="valuation-change" data-part="valuation-change">
       <h2>TY${before.tax_year} to TY${after.tax_year}</h2>
       <div class="scroll"><table>
         <thead><tr>
@@ -283,7 +283,7 @@ export function renderMillage(d: District, statewide: Statewide): string {
     Math.abs(m.predicted_rate - FLOOR) < 0.005 && m.prior_rate > FLOOR + 0.005;
 
   return `
-    <div class="card" data-part="millage">
+    <div class="card" id="millage" data-part="millage">
       <h2>What voters approved, and what the factors left</h2>
 
       ${
@@ -425,21 +425,35 @@ export function renderMillage(d: District, statewide: Statewide): string {
  * The card only renders where the two are more than 5% apart, because for most districts they are
  * within a rounding of each other and a reader does not need the caution.
  */
-export function renderDenominators(d: District): string {
+/**
+ * Whether this district renders the two-pupil-counts card, as a predicate rather than a rerender.
+ *
+ * A caller that wants to *link* `#denominators` has to know whether the section is in the document,
+ * and 177 of 609 districts do not carry it. Asking by calling the renderer and testing for `""`
+ * works and is expensive and fragile; asking here is the same condition, once. The renderer uses
+ * it, so the two cannot drift apart — which is the whole failure mode a missing fragment has: it
+ * does not 404, it lands the reader at the top of the right page with no sign anything went wrong.
+ */
+export function hasDenominators(d: District): boolean {
   const latest = d.property_tax[d.property_tax.length - 1];
   // `adm_history[0]` is enrolled ADM FY2024 — the count the profile report's valuation per pupil
   // divides by, verified by multiplying back to SD-1's total value for all 606 districts. Not
   // `d.adm`, which is the base cost ADM and is a third number again.
   const enrolled = d.adm_history[0];
-  if (!latest || latest.adm <= 0 || enrolled <= 0 || d.valuation_per_pupil == null) return "";
+  if (!latest || latest.adm <= 0 || enrolled <= 0 || d.valuation_per_pupil == null) return false;
+  return Math.abs(latest.value_per_pupil / d.valuation_per_pupil - 1) >= 0.05;
+}
 
-  const ratio = latest.value_per_pupil / d.valuation_per_pupil;
-  if (Math.abs(ratio - 1) < 0.05) return "";
+export function renderDenominators(d: District): string {
+  if (!hasDenominators(d)) return "";
+  const latest = d.property_tax[d.property_tax.length - 1]!;
+  const enrolled = d.adm_history[0]!;
+  const ratio = latest.value_per_pupil / d.valuation_per_pupil!;
 
   const wider = latest.adm > enrolled;
 
   return `
-    <div class="card" data-part="denominators">
+    <div class="card" id="denominators" data-part="denominators">
       <h2>Two pupil counts, and why this page shows one of them</h2>
       <div class="scroll"><table>
         <thead><tr><th>Published by</th><th class="tnum">Pupils</th>
@@ -517,7 +531,7 @@ export function renderChargeOff(d: District, statewide: Statewide): string {
   const rate = d.millage?.observed_rate;
 
   return `
-    <div class="card" data-part="charge-off">
+    <div class="card" id="charge-off" data-part="charge-off">
       <h2>What the mechanism this replaced would charge</h2>
       <p class="note">Before the Fair School Funding Plan, a district's own share of its cost was
         a flat <strong>${r.charge_off_mills.toFixed(0)} mills</strong> against its valuation —
@@ -653,7 +667,7 @@ export function renderTaxAgainstSpending(d: District, statewide: TaxStatewide): 
   const share = latest.real_property_taxes_charged / operating;
 
   return `
-    <div class="card" data-part="tax-effort">
+    <div class="card" id="tax-effort" data-part="tax-effort">
       <h2>Against what the district spends</h2>
       <div class="tiles">
         <div class="tile"><div class="k">Real property tax charged, TY${latest.tax_year}</div>

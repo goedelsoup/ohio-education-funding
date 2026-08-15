@@ -154,8 +154,10 @@ function renderSpread(c: County, statewide: Statewide): string {
       </table></div>
       <p class="note">Two districts in the same county, <strong>${c.valuationRatio.toFixed(
         1,
-      )} times</strong> apart on the tax base each pupil stands on — ${money(gap)} per pupil of
-        assessed valuation. Every mill ${escapeHtml(poor.name)} levies raises
+      )} times</strong> apart on <a href="${routes.at(
+        routes.districtTaxes(poor.irn),
+        routes.SECTIONS.taxBase,
+      )}">the tax base each pupil stands on</a> — ${money(gap)} per pupil of assessed valuation. Every mill ${escapeHtml(poor.name)} levies raises
         ${(1 / c.valuationRatio).toFixed(2)} of what the same mill raises in
         ${escapeHtml(rich.name)}, which is the disparity <a href="${routes.wikiNode(
           "litigation",
