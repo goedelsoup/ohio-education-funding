@@ -89,7 +89,7 @@ export function renderTaxBase(d: District): string {
   const residentialShare = (latest.residential_value + latest.agricultural_value) / latest.total_value;
 
   return `
-    <div class="card">
+    <div class="card" data-part="tax-base">
       <h2>What the tax base is made of, TY${latest.tax_year}</h2>
       <div class="chartwrap" data-chart="tax-base">${renderToString(barSpec(bars))}</div>
       <p class="note">Total taxable value ${money(latest.total_value)}, or
@@ -154,7 +154,7 @@ export function renderTaxChange(d: District, statewide: TaxStatewide): string {
   ] as const;
 
   return `
-    <div class="card">
+    <div class="card" data-part="valuation-change">
       <h2>TY${before.tax_year} to TY${after.tax_year}</h2>
       <div class="scroll"><table>
         <thead><tr>
@@ -283,7 +283,7 @@ export function renderMillage(d: District, statewide: Statewide): string {
     Math.abs(m.predicted_rate - FLOOR) < 0.005 && m.prior_rate > FLOOR + 0.005;
 
   return `
-    <div class="card">
+    <div class="card" data-part="millage">
       <h2>What voters approved, and what the factors left</h2>
 
       ${
@@ -439,7 +439,7 @@ export function renderDenominators(d: District): string {
   const wider = latest.adm > enrolled;
 
   return `
-    <div class="card">
+    <div class="card" data-part="denominators">
       <h2>Two pupil counts, and why this page shows one of them</h2>
       <div class="scroll"><table>
         <thead><tr><th>Published by</th><th class="tnum">Pupils</th>
@@ -517,7 +517,7 @@ export function renderChargeOff(d: District, statewide: Statewide): string {
   const rate = d.millage?.observed_rate;
 
   return `
-    <div class="card">
+    <div class="card" data-part="charge-off">
       <h2>What the mechanism this replaced would charge</h2>
       <p class="note">Before the Fair School Funding Plan, a district's own share of its cost was
         a flat <strong>${r.charge_off_mills.toFixed(0)} mills</strong> against its valuation —
@@ -653,7 +653,7 @@ export function renderTaxAgainstSpending(d: District, statewide: TaxStatewide): 
   const share = latest.real_property_taxes_charged / operating;
 
   return `
-    <div class="card">
+    <div class="card" data-part="tax-effort">
       <h2>Against what the district spends</h2>
       <div class="tiles">
         <div class="tile"><div class="k">Real property tax charged, TY${latest.tax_year}</div>

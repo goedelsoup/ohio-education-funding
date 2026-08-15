@@ -101,7 +101,7 @@ export function renderEnrollmentYears(
          forecast.</p>`;
 
   return `
-    <div class="card">
+    <div class="card" data-part="enrollment">
       <h2>What a year of enrollment is worth here</h2>
       <div class="scroll"><table>
         <thead><tr>
@@ -262,7 +262,7 @@ export function renderActuals(bundle: Bundle, d: District, basis: Basis): string
   }));
 
   return `
-    <div class="card">
+    <div class="card" data-part="actuals">
       <h2>What it actually received, and what it holds${
         converted ? `, in FY${base} dollars` : ""
       }</h2>
@@ -329,7 +329,7 @@ export function renderActuals(bundle: Bundle, d: District, basis: Basis): string
 export function renderHeadline(d: District): string {
   const guaranteePP = d.realized_aid_per_pupil - d.formula_aid_per_pupil;
   return `
-    <div class="tiles">
+    <div class="tiles" data-part="headline">
       <div class="tile"><div class="k">Base cost / pupil</div>
         <div class="v">${money(d.base_cost_per_pupil)}</div>
         <div class="n">what the plan says it costs</div></div>
@@ -369,7 +369,7 @@ export function renderAidSource(bundle: Bundle, d: District): string {
   }
 
   return `
-    <div class="card">
+    <div class="card" data-part="aid-source">
       <h2>Where the state aid comes from</h2>
       <div class="barwrap">
         <div class="bar" role="img" aria-label="Formula aid ${money(formulaPP)} per pupil, guarantee ${money(guaranteePP)} per pupil">
@@ -499,7 +499,7 @@ export function renderPosition(
   expenditures: number[],
 ): string {
   return `
-    <div class="card">
+    <div class="card" data-part="position">
       <h2>Position among Ohio's ${bundle.statewide.districts} districts</h2>
       ${strip(
         "Assessed valuation per pupil",
@@ -521,7 +521,7 @@ export function renderDetail(d: District): string {
   const formulaPP = d.formula_aid_per_pupil;
   const guaranteePP = d.realized_aid_per_pupil - formulaPP;
   return `
-    <div class="card">
+    <div class="card" data-part="detail">
       <h2>Detail</h2>
       <div class="scroll"><table><tbody>
         <tr><th>Base cost per pupil</th><td>${money(d.base_cost_per_pupil, 2)}</td></tr>
@@ -591,7 +591,7 @@ export function renderCategoricals(d: District, statewide: Statewide): string {
   const share = total / (total + d.base_cost_state_share);
 
   return `
-    <div class="card">
+    <div class="card" data-part="categoricals">
       <h2>The categorical half, in its six parts</h2>
       <div class="chartwrap" data-chart="categoricals">${renderToString(barSpec(bars))}</div>
 

@@ -197,7 +197,7 @@ export function renderOutcomeContext(bundle: Bundle, district: District): string
   ][index]!;
 
   return `
-    <div class="card">
+    <div class="card" data-part="comparable-poverty">
       <h2>Against districts with comparable poverty</h2>
       <div class="tiles">
         <div class="tile"><div class="k">This district</div>
@@ -292,7 +292,7 @@ export function renderDistrictOutcome(
 ): string {
   const o = district.outcome;
   if (!o) {
-    return `<div class="card">
+    return `<div class="card" data-part="outcomes">
       <h2>Outcomes</h2>
       <p class="note">No report card is published for this district. It is one of the three
         smallest in Ohio, and it is outside every outcome figure on this site.</p>
@@ -305,7 +305,7 @@ export function renderDistrictOutcome(
   ] as const;
 
   return `
-    <div class="card">
+    <div class="card" data-part="outcomes">
       <h2>Outcomes</h2>
       <div class="scroll"><table><tbody>
         ${series

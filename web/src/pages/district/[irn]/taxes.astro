@@ -50,7 +50,7 @@ const description = latest
 
   {
     !latest ? (
-      <div class="card">
+      <div class="card" data-part="not-published">
         <h2>Not in Table SD-1</h2>
         <p class="note">
           No row is published for this district in the Department of Taxation's per-district table,
@@ -106,7 +106,7 @@ const description = latest
         <Fragment set:html={renderDenominators(district)} />
         <Fragment set:html={renderChargeOff(district, bundle.statewide)} />
 
-        <div class="card">
+        <div class="card" data-part="not">
           <h2>Where these figures come from, and what they are not</h2>
           <p class="note">
             Table SD-1, published by the <strong>Ohio Department of Taxation</strong> — a different

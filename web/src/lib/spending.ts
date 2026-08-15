@@ -72,7 +72,7 @@ function functions(s: SpendingByFunction): { label: string; value: number; note?
 export function renderSpendingByFunction(d: District): string {
   const s = d.spending_by_function;
   if (!s) {
-    return `<div class="card">
+    return `<div class="card" data-part="spending-by-function">
       <h2>Where the money went</h2>
       <p class="note">No report-card spending row is published for this district, so its operating
         expenditure cannot be broken into functions here. It is one of two in the state.</p>
@@ -91,7 +91,7 @@ export function renderSpendingByFunction(d: District): string {
   const administration = s.general_admin + s.school_admin;
 
   return `
-    <div class="card">
+    <div class="card" data-part="spending-by-function">
       <h2>Where the money went, FY2025</h2>
       <div class="chartwrap" data-chart="functions">${renderToString(barSpec(bars))}</div>
 
@@ -199,7 +199,7 @@ export function renderFederalShare(d: District, statewide: OutcomeStatewide | nu
   const median = statewide?.median_federal_share ?? 0;
 
   return `
-    <div class="card">
+    <div class="card" data-part="federal-share">
       <h2>Where the money came from, FY2025</h2>
       <div class="chartwrap" data-chart="origin">${renderToString(barSpec(bars))}</div>
 
