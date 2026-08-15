@@ -212,7 +212,7 @@ export function renderBaseCostBuildUp(d: District, districts: number): string {
   const residual = Math.abs(b.residual);
 
   return `
-    <div class="card">
+    <div class="card" data-part="base-cost">
       <h2>Why base cost is ${money(d.base_cost_per_pupil)} per pupil</h2>
       <p class="note">Base cost is not a rate the state sets. It is assembled for each district
         from staffing ratios written into R.C. 3317.011, applied to

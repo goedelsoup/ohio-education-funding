@@ -212,9 +212,41 @@ test.describe("the document arrives complete", () => {
     await page.goto(`/district/${CLEVELAND}`);
 
     await expect(page.locator("h1")).toHaveText("Cleveland Municipal");
-    await expect(page.locator(".tiles").first().locator(".tile")).toHaveCount(3);
+    await expect(page.locator('[data-part="headline"] .tile')).toHaveCount(3);
     await expect(page.locator(".err")).toHaveCount(0);
     expect(failures, "the page threw while booting").toEqual([]);
+  });
+
+  test("every card on the five district routes is addressed by attribute, not by heading", async ({
+    page,
+  }) => {
+    /*
+     * The headings are prose, and this project rewrites prose. Thirty-six e2e locators used to
+     * find their card with `hasText`, which made a house-style `<h2>` part of the test API: a
+     * reworded heading broke assertions that were about something else entirely, and a card whose
+     * heading nobody had matched on could not be scoped to at all — which is why
+     * `renderCategoricals` addressed its six sub-tables globally rather than within its own card.
+     *
+     * `data-part` is the hook now, and this asserts there is no card without one. Without it the
+     * next card arrives with no address, the next assertion about it reaches for its heading
+     * again, and the rule decays back to prose one card at a time.
+     *
+     * Scoped to the five district routes because that is the family the rule is for. `/outcomes`,
+     * the front page and the wiki still name their cards in prose, deliberately.
+     */
+    const unaddressed: string[] = [];
+    for (const suffix of ["", "/finances", "/outcome", "/taxes", "/scenario"]) {
+      await page.goto(`/district/${CLEVELAND}${suffix}`);
+      const bare = await page
+        .locator(".card:not([data-part])")
+        .evaluateAll((nodes) =>
+          nodes.map((n) => n.querySelector("h2")?.textContent?.trim() ?? "(no heading)"),
+        );
+      for (const heading of bare) unaddressed.push(`${suffix || "/dashboard"}: ${heading}`);
+    }
+    expect(unaddressed, "a card with no data-part is a card only its heading can reach").toEqual(
+      [],
+    );
   });
 
   test("states the provenance of the figures in the footer", async ({ page }) => {
@@ -697,7 +729,7 @@ test.describe("one district's own band", () => {
     // Its aid does not respond to its enrollment at all, so the band collapses — and the second
     // line, the formula's own falling answer, is what makes the chart say something.
     await expect(chart.locator(".fan-reference")).toHaveCount(1);
-    await expect(page.locator(".card", { hasText: "Carried forward" })).toContainText(
+    await expect(page.locator('[data-part="enrollment"]')).toContainText(
       "flat by construction",
     );
   });
@@ -707,14 +739,14 @@ test.describe("one district's own band", () => {
     const chart = page.locator('[data-chart="district-fan"] svg');
     await expect(chart.locator(".fan-band")).toHaveCount(1);
     await expect(chart.locator(".fan-reference")).toHaveCount(0);
-    await expect(page.locator(".card", { hasText: "Carried forward" })).toContainText(
+    await expect(page.locator('[data-part="enrollment"]')).toContainText(
       "The range, not the line, is the finding",
     );
   });
 
   test("compares enrollment years without inventing a published one", async ({ page }) => {
     await page.goto(`/district/${CLEVELAND}`);
-    const card = page.locator(".card", { hasText: "What a year of enrollment is worth here" });
+    const card = page.locator('[data-part="enrollment"]');
     await expect(card).toContainText("FY2024");
     await expect(card).toContainText("FY2026 — the model's own");
     await expect(card).toContainText("These are not published FY2025 and FY2026 funding totals");
@@ -731,7 +763,7 @@ test.describe("the finances route", () => {
   test("refuses to be read as a check on the model", async ({ page }) => {
     await page.goto(`/district/${CLEVELAND}/finances`);
     await expect(page.getByText("What these numbers are not")).toBeVisible();
-    await expect(page.locator(".card", { hasText: "What these numbers are not" })).toContainText(
+    await expect(page.locator('[data-part="not"]')).toContainText(
       "not comparable line for line",
     );
   });
@@ -776,7 +808,7 @@ test.describe("the outcome routes", () => {
     page,
   }) => {
     await page.goto(`/district/${CLEVELAND}/outcome`);
-    const card = page.locator(".card", { hasText: "Against districts with comparable poverty" });
+    const card = page.locator('[data-part="comparable-poverty"]');
     await expect(card).toContainText("Median of its poverty fifth");
     await expect(card).toContainText("It is <strong>not</strong> an effect".replace(/<[^>]+>/g, ""));
   });
@@ -1019,7 +1051,7 @@ test.describe("the base cost build-up", () => {
     page,
   }) => {
     await page.goto(`/district/${CLEVELAND}`);
-    const card = page.locator(".card", { hasText: "Why base cost is" });
+    const card = page.locator('[data-part="base-cost"]');
     await expect(card).toBeVisible();
 
     // Five sub-components and their elements, plus the aggregate row.
@@ -1057,7 +1089,7 @@ test.describe("the property tax route", () => {
     await page.goto(`/district/${AT_FLOOR}/taxes`);
     await expect(page.locator("h1")).toHaveText("Fremont City");
     await expect(page.locator(`.subnav a[aria-current="page"]`)).toHaveText("Property tax");
-    const change = page.locator(".card", { hasText: "TY2023 to TY2024" });
+    const change = page.locator('[data-part="valuation-change"]');
     await expect(change).toContainText("at the");
     await expect(change).toContainText("reduction factors have stopped operating");
     await expect(change).toContainText("A reappraisal is a revenue event here");
@@ -1073,7 +1105,7 @@ test.describe("the property tax route", () => {
      * clear of the floor. The third branch exists because this district does.
      */
     await page.goto(`/district/${NORTHERN}/taxes`);
-    const change = page.locator(".card", { hasText: "TY2023 to TY2024" });
+    const change = page.locator('[data-part="valuation-change"]');
     await expect(change).toContainText("above the");
     await expect(change).toContainText("close enough that the distinction carries little meaning");
     await expect(change).not.toContainText("fully operative");
@@ -1087,13 +1119,13 @@ test.describe("the property tax route", () => {
      * having reduction factors operative when it has never been subject to one.
      */
     await page.goto(`/district/${BELOW_FLOOR}/taxes`);
-    const change = page.locator(".card", { hasText: "TY2023 to TY2024" });
+    const change = page.locator('[data-part="valuation-change"]');
     await expect(change).toContainText("charges less than twenty mills");
     await expect(change).toContainText("never have");
     await expect(change).not.toContainText("reduction factors are fully operative");
 
     // And the millage card says the same thing from the other direction: nothing was taken.
-    const millage = page.locator(".card", { hasText: "What voters approved" });
+    const millage = page.locator('[data-part="millage"]');
     await expect(millage).toContainText("18.70");
     await expect(millage).toContainText("Reduction factors have taken nothing");
   });
@@ -1107,7 +1139,7 @@ test.describe("the property tax route", () => {
      * because it takes both departments' tables to produce it.
      */
     await page.goto(`/district/${CLEVELAND}/taxes`);
-    const millage = page.locator(".card", { hasText: "What voters approved" });
+    const millage = page.locator('[data-part="millage"]');
     await expect(millage).toContainText("Voted current operating millage");
     await expect(millage).toContainText("Taken by reduction factors");
     await expect(millage).toContainText("What the factors alone predict");
@@ -1132,7 +1164,7 @@ test.describe("the property tax route", () => {
      * exist in the earlier mechanism.
      */
     await page.goto("/district/043802/taxes");
-    const card = page.locator(".card", { hasText: "What the mechanism this replaced" });
+    const card = page.locator('[data-part="charge-off"]');
     await expect(card).toContainText("23 mills");
     await expect(card).toContainText("no minimum state share to stop at");
     await expect(card).toContainText("counterfactual at FY2027 inputs");
@@ -1154,7 +1186,7 @@ test.describe("the property tax route", () => {
     // Vinton County charges 18.70 mills against a mechanism that assumes 23 — the failure the
     // charge-off was replaced for, and half the state is in the same position.
     await page.goto(`/district/${BELOW_FLOOR}/taxes`);
-    const card = page.locator(".card", { hasText: "What the mechanism this replaced" });
+    const card = page.locator('[data-part="charge-off"]');
     await expect(card).toContainText("would be charged for revenue it could not raise");
     await expect(card).toContainText("4.30 mills short");
     await expect(card).toContainText("gap aid");
@@ -1167,7 +1199,7 @@ test.describe("the property tax route", () => {
      * only appears where the two are more than 5% apart, and Columbus is 1.7x.
      */
     await page.goto("/district/043802/taxes");
-    const card = page.locator(".card", { hasText: "Two pupil counts" });
+    const card = page.locator('[data-part="denominators"]');
     await expect(card).toContainText("The valuations are the same to the dollar");
     await expect(card).toContainText("73,746");
     await expect(card).toContainText("43,019");
@@ -1184,19 +1216,19 @@ test.describe("the property tax route", () => {
     // are within 2%; Bexley City is one, and most of the state is not — which is the finding.
     await page.goto("/district/043620/taxes");
     await expect(page.locator("h1")).toHaveText("Bexley City");
-    await expect(page.locator(".card", { hasText: "Two pupil counts" })).toHaveCount(0);
+    await expect(page.locator('[data-part="denominators"]')).toHaveCount(0);
   });
 
   test("a district above the floor is told they are operative", async ({ page }) => {
     await page.goto("/district/044933/taxes");
-    const change = page.locator(".card", { hasText: "TY2023 to TY2024" });
+    const change = page.locator('[data-part="valuation-change"]');
     await expect(change).toContainText("above the");
     await expect(change).toContainText("reduction factors are fully operative");
   });
 
   test("the base is broken into the classes that are reduced separately", async ({ page }) => {
     await page.goto(`/district/${NORTHERN}/taxes`);
-    const base = page.locator(".card", { hasText: "What the tax base is made of" });
+    const base = page.locator('[data-part="tax-base"]');
     for (const label of ["Residential", "Agricultural", "Commercial", "Public utility"]) {
       await expect(base.locator('[data-chart="tax-base"]')).toContainText(label);
     }
@@ -1206,7 +1238,7 @@ test.describe("the property tax route", () => {
     // Every other page reads the Department of Education. This one reads Taxation, and says so —
     // along with the fact that where the two overlap they agree.
     await page.goto(`/district/${NORTHERN}/taxes`);
-    const source = page.locator(".card", { hasText: "Where these figures come from" });
+    const source = page.locator('[data-part="not"]');
     await expect(source).toContainText("Ohio Department of Taxation");
     await expect(source).toContainText("to 0.01 mills");
   });
@@ -1215,7 +1247,7 @@ test.describe("the property tax route", () => {
 test.describe("spending by function", () => {
   test("splits operating spending and keeps it apart from the audited actuals", async ({ page }) => {
     await page.goto(`/district/${CLEVELAND}/finances`);
-    const card = page.locator(".card", { hasText: "Where the money went" });
+    const card = page.locator('[data-part="spending-by-function"]');
     await expect(card).toBeVisible();
     for (const fn of ["Instruction", "Pupil transportation", "General administration"]) {
       await expect(card.locator("tbody")).toContainText(fn);
@@ -1244,7 +1276,7 @@ test.describe("where the money came from", () => {
      * and the card above this one divides by a headcount — so the basis has to be on the page.
      */
     await page.goto(`/district/${MOST_FEDERAL}/finances`);
-    const card = page.locator(".card", { hasText: "Where the money came from" });
+    const card = page.locator('[data-part="federal-share"]');
     await expect(card).toContainText("29.0%");
     await expect(card).toContainText("statewide median 4.2%");
     await expect(card).toContainText("need-weighted count");
@@ -1254,7 +1286,7 @@ test.describe("where the money came from", () => {
   test("the federal correlation is never shown without its controlled twin", async ({ page }) => {
     // Federal money follows poverty. The raw figure alone would state a confound as a finding.
     await page.goto(`/district/${MOST_FEDERAL}/finances`);
-    const card = page.locator(".card", { hasText: "Where the money came from" });
+    const card = page.locator('[data-part="federal-share"]');
     await expect(card).toContainText("Holding poverty constant");
     await expect(card).toContainText("Neither figure identifies an effect");
   });
@@ -1266,7 +1298,7 @@ test.describe("where the money came from", () => {
      * error that turned 44 into 76.
      */
     await page.goto("/district/043596/outcome");
-    const card = page.locator(".card", { hasText: "Outcomes" }).first();
+    const card = page.locator('[data-part="outcomes"]');
     await expect(card).toContainText("Progress, three-year average");
     await expect(card).toContainText("Progress, one year");
     await expect(card).toContainText("has no direction to read");
@@ -1276,7 +1308,7 @@ test.describe("where the money came from", () => {
 
   test("a district whose measures point opposite ways is told to read neither", async ({ page }) => {
     await page.goto(`/district/${MOST_FEDERAL}/outcome`);
-    const card = page.locator(".card", { hasText: "Outcomes" }).first();
+    const card = page.locator('[data-part="outcomes"]');
     await expect(card).toContainText("point opposite ways for this district");
     await expect(card).toContainText("Read it as neither");
     await expect(card).toContainText("none of them with both magnitudes above 0.05");
@@ -1348,7 +1380,7 @@ test.describe("the local capacity measure", () => {
     // subtracting aid from base cost cannot reach a district whose share is set by the floor.
     // Bay Village is at the minimum state share, so the subtraction genuinely could not reach it.
     await page.goto("/district/043547/taxes");
-    const card = page.locator(".card", { hasText: "What the mechanism this replaced" });
+    const card = page.locator('[data-part="charge-off"]');
     await expect(card).toContainText("Local capacity, the plan");
     await expect(card).not.toContainText("Not recoverable");
     await expect(card).toContainText("reproduces it");
@@ -1362,7 +1394,7 @@ test.describe("the categorical half", () => {
      * of base cost. Exact, and 43% of formula aid expressed as a number with no parts.
      */
     await page.goto("/district/043802");
-    const card = page.locator(".card", { hasText: "The categorical half" });
+    const card = page.locator('[data-part="categoricals"]');
     for (const program of [
       "Targeted assistance",
       "Special education",
@@ -1383,7 +1415,7 @@ test.describe("the categorical half", () => {
      * cannot say that, and the total is what this page showed until now.
      */
     await page.goto("/district/043802");
-    const card = page.locator(".card", { hasText: "The categorical half" });
+    const card = page.locator('[data-part="categoricals"]');
     await expect(card).toContainText("Special education, by category");
     await expect(card).toContainText("3.9554");
     await expect(card).toContainText("0.2435");
@@ -1412,7 +1444,7 @@ test.describe("the categorical half", () => {
      * which its own corpus node says.
      */
     await page.goto("/district/043802");
-    const card = page.locator(".card", { hasText: "The categorical half" });
+    const card = page.locator('[data-part="categoricals"]');
     await expect(card).not.toContainText("Every other weighted categorical");
     await expect(card).toContainText("the only categorical that pays less as the thing it is for");
     // Both halves of the distinction are on the page, not just the correction.
@@ -1425,7 +1457,7 @@ test.describe("the categorical half", () => {
     // being funded, beside a base cost built on a rolling average ending FY2026. The corpus said
     // so for both programs and neither page did.
     await page.goto("/district/043802");
-    const card = page.locator(".card", { hasText: "The categorical half" });
+    const card = page.locator('[data-part="categoricals"]');
     await expect(card).toContainText("Category 1 Career Tech FTE-FY21");
     await expect(card).toContainText("Category 1 EL ADM-FY21");
     await expect(card.getByText("The counts are frozen at FY2021", { exact: false })).toHaveCount(2);
@@ -1435,7 +1467,7 @@ test.describe("the categorical half", () => {
     // They are computed on different pupil counts, and a reader who divides the pair the sentence
     // puts side by side gets a percentage below the statutory floor for 125 districts.
     await page.goto("/district/046797");
-    const card = page.locator(".card", { hasText: "Why base cost is" });
+    const card = page.locator('[data-part="base-cost"]');
     await expect(card).toContainText("do not divide into the state share percentage");
     await expect(card).toContainText("499 of Ohio's");
     // And it says only what has been established, rather than asserting how the floor applies.
@@ -1446,7 +1478,7 @@ test.describe("the categorical half", () => {
     // Kelleys Island is funded 0.22 classroom teachers. Rounded, that printed as "0 funded
     // classroom teachers" under a heading saying base cost is $371,449 per pupil.
     await page.goto("/district/046797");
-    const card = page.locator(".card", { hasText: "Why base cost is" });
+    const card = page.locator('[data-part="base-cost"]');
     await expect(card).toContainText("0.22 funded classroom teachers");
     // And no share cell reads as a missing value.
     await expect(card.locator("td", { hasText: /^0\.0%$/ })).toHaveCount(0);
@@ -1465,7 +1497,7 @@ test.describe("the categorical half", () => {
      * twice before `denominators.ts` existed.
      */
     await page.goto("/district/043786");
-    const card = page.locator(".card", { hasText: "The categorical half" });
+    const card = page.locator('[data-part="categoricals"]');
     const table = card.locator('table[data-program="targeted-assistance"]');
     await expect(table).toBeVisible();
     await expect(table).toContainText("Weighted wealth");
@@ -1483,11 +1515,11 @@ test.describe("the categorical half", () => {
      * and what a linear one would have been.
      */
     await page.goto("/district/043786");
-    const table = page.locator('table[data-program="dpia"]');
+    const table = page.locator('[data-part="categoricals"] table[data-program="dpia"]');
     await expect(table).toBeVisible();
     await expect(table).toContainText("Blended count");
     await expect(table).toContainText("squared");
-    await expect(page.locator(".card", { hasText: "The categorical half" })).toContainText(
+    await expect(page.locator('[data-part="categoricals"]')).toContainText(
       "DPIA is convex",
     );
   });
@@ -1502,7 +1534,7 @@ test.describe("the categorical half", () => {
      * earned, which is the only way a reader can see that the money is a minimum.
      */
     await page.goto("/district/043786");
-    const table = page.locator('table[data-program="gifted"]');
+    const table = page.locator('[data-part="categoricals"] table[data-program="gifted"]');
     await expect(table).toBeVisible();
     await expect(table).toContainText("Identification");
     await expect(table).toContainText("Coordinator");
@@ -1518,7 +1550,7 @@ test.describe("the categorical half", () => {
      * fifth, so the card says both figures rather than the weights alone.
      */
     await page.goto("/district/043786");
-    const card = page.locator(".card", { hasText: "The categorical half" });
+    const card = page.locator('[data-part="categoricals"]');
     await expect(card.locator('table[data-program="career-technical"]')).toBeVisible();
     await expect(card).toContainText("$9,856");
     await expect(card).toContainText("not the $8,242");
@@ -1531,7 +1563,7 @@ test.describe("the categorical half", () => {
      * reader assuming "more need, more money" has this one backwards.
      */
     await page.goto("/district/043786");
-    const card = page.locator(".card", { hasText: "The categorical half" });
+    const card = page.locator('[data-part="categoricals"]');
     await expect(card.locator('table[data-program="english-learners"]')).toBeVisible();
     await expect(card).toContainText("0.2104");
     await expect(card).toContainText("descend");
@@ -1546,7 +1578,7 @@ test.describe("the categorical half", () => {
      * were reading is a document museum — so the link out from the figure is the point.
      */
     await page.goto("/district/043786");
-    const card = page.locator(".card", { hasText: "The categorical half" });
+    const card = page.locator('[data-part="categoricals"]');
     const links = card.locator('a[href^="/wiki/formula-component/fsfp-"]');
     await expect(links).toHaveCount(6);
     for (const node of [
@@ -1588,7 +1620,7 @@ test.describe("the categorical half", () => {
      * its categorical money is DPIA instead. One number cannot distinguish those.
      */
     await page.goto("/district/043802");
-    const card = page.locator(".card", { hasText: "The categorical half" });
+    const card = page.locator('[data-part="categoricals"]');
     await expect(card).toContainText("It receives no targeted assistance");
     await expect(card).toContainText("135 districts are in the same position");
     await expect(card).toContainText("Disadvantaged Pupil Impact Aid");
@@ -1802,7 +1834,7 @@ test.describe("outside the formula", () => {
      * gains nothing from covering more ground. The card says which.
      */
     await page.goto("/district/000442");
-    const table = page.locator('table[data-program="transportation"]');
+    const table = page.locator('[data-part="supplements"] table[data-program="transportation"]');
     await expect(table).toBeVisible();
     await expect(table).toContainText("Per-rider base");
     await expect(table).toContainText("Per-mile base");
@@ -1890,7 +1922,7 @@ test.describe("the hold-harmless machinery", () => {
      * FTE and had $674,561 taken off.
      */
     await page.goto("/district/043802");
-    const table = page.locator('table[data-program="hold-harmless"]');
+    const table = page.locator('[data-part="aid-source"] table[data-program="hold-harmless"]');
     await expect(table).toBeVisible();
     await expect(table).toContainText("FY2021 funding base");
     await expect(table).toContainText("Open-enrolment clawback");
@@ -1965,7 +1997,9 @@ test.describe("the hold-harmless machinery", () => {
     );
     expect(clean, "a district touched by neither mechanism").toBeTruthy();
     await page.goto(`/district/${clean.irn}`);
-    await expect(page.locator('table[data-program="hold-harmless"]')).toHaveCount(0);
+    await expect(page.locator('[data-part="aid-source"] table[data-program="hold-harmless"]')).toHaveCount(
+      0,
+    );
   });
 });
 

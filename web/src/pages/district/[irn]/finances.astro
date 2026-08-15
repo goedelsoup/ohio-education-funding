@@ -59,7 +59,7 @@ const description = latest
 
   {
     district.finances.length === 0 ? (
-      <div class="card">
+      <div class="card" data-part="no-filing">
         <h2>No filing found</h2>
         <p class="note">
           No five-year forecast filing was matched to this district, so there is nothing here to
@@ -77,7 +77,7 @@ const description = latest
   <Fragment set:html={renderSpendingByFunction(district)} />
   <Fragment set:html={renderFederalShare(district, bundle.statewide.outcomes)} />
 
-  <div class="card">
+  <div class="card" data-part="not">
     <h2>What these numbers are not</h2>
     <p class="note">
       They are <strong>not</strong> comparable line for line with the FY{bundle.fiscal_year}{" "}

@@ -61,7 +61,7 @@ const meta = bundle.projection;
     />
 
     <noscript>
-      <div class="card err">
+      <div class="card err" data-part="needs-script">
         <h2>This is the one view that needs JavaScript</h2>
         <p class="note">
           The other three views of this district — its <a href={`/district/${district.irn}`}
@@ -78,7 +78,7 @@ const meta = bundle.projection;
     <p class="note" id="scenario-status"></p>
   </div>
 
-  <div class="card">
+  <div class="card" data-part="not">
     <h2>What this does not move</h2>
     <p class="note">
       Assessed valuation is held fixed, because the corpus has one observation per district and
