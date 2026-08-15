@@ -129,9 +129,19 @@ function range(low: number, high: number): string {
  * The same rule sets the chart: the band is a mark rather than shading, its centre line is
  * dashed, and only the two bounds are direct-labelled. See {@link fanChart}.
  *
- * This card is always **below** the simulation, and there is deliberately no figure anywhere
- * that adds the two together — a combined number would inherit the forecast's error while
- * wearing the simulation's precision.
+ * # Where this sits, which is now between the two halves of the simulation
+ *
+ * It used to sit below the whole of it. It now sits below the simulation's three headline tiles
+ * and above its distribution and tables — {@link RenderedScenario} is split for this. The part of
+ * the old arrangement that mattered is kept: this card never appears above the figures it is a
+ * forecast *of*, so a reader meets what the levers did before what they might do next, and there
+ * is still deliberately no figure anywhere that adds the two together. A combined number would
+ * inherit the forecast's error while wearing the simulation's precision.
+ *
+ * What changed is which simulation figures come first. The tiles are three numbers and a reader
+ * who has just moved a lever is looking for them; the distribution, the most-affected table and
+ * the underlying counts are the ones you read at rest, and a forecast is better company for those
+ * than a wall of scrolling is.
  */
 export function renderProjection(bundle: Panel, levers: Levers): string {
   const meta = bundle.projection;
@@ -366,11 +376,34 @@ export function renderDistrictScenario(bundle: Panel, levers: Levers, irn: strin
     </div>`;
 }
 
+/**
+ * What a rendered scenario is made of, and where each half goes on the page.
+ *
+ * # Why this returns two strings rather than one
+ *
+ * The statewide page puts the {@link renderProjection} fan chart **between** them: the three
+ * headline tiles sit directly under the levers, where a reader who has just moved one looks, and
+ * the histogram and the two tables sit below the forecast. So the two halves land in two different
+ * containers and cannot be one string.
+ *
+ * They are still computed in one pass. `applyAll` re-runs the formula over all 609 districts and
+ * this function is called on every `input` event — on a slider drag that is once per frame — so
+ * splitting it into two exported functions, each recomputing the outcomes, would double the work
+ * in the hot path for a layout decision.
+ */
+export interface RenderedScenario {
+  /** The tiles, and the current-law card when nothing has moved. Sits above the projection. */
+  summary: string;
+  /** The distribution, the most-affected table and the underlying counts. Sits below it. */
+  detail: string;
+}
+
 /** Run the levers and render the result. */
-export function renderScenario(bundle: Panel, levers: Levers): string {
+export function renderScenario(bundle: Panel, levers: Levers): RenderedScenario {
   const model = bundle.statewide.minimum_state_share;
   if (isCurrentLaw(levers, model)) {
-    return `<div class="card">
+    return {
+      summary: `<div class="card">
       <h2>Current law</h2>
       <p class="note">These are the settings the department's own FY${bundle.fiscal_year} model
         uses, so nothing moves. Total state foundation aid is
@@ -378,7 +411,13 @@ export function renderScenario(bundle: Panel, levers: Levers): string {
         ${count(bundle.statewide.districts)} districts, of which
         ${millions(bundle.statewide.guarantee_total).replace("+", "")} is the guarantee.
         Move a lever.</p>
-    </div>`;
+    </div>`,
+      // Nothing has moved, so there is nothing to distribute, rank, or account for. Returning an
+      // empty string rather than an explanatory card is what lets the caller blank the container:
+      // a stale "Most affected" left under the fan chart after a reset would be describing a
+      // scenario the levers no longer hold.
+      detail: "",
+    };
   }
 
   const outcomes = applyAll(bundle.districts, toPolicy(levers), model);
@@ -400,7 +439,7 @@ export function renderScenario(bundle: Panel, levers: Levers): string {
     .filter((o) => Math.abs(o.delta) > 0.5)
     .map((o) => o.deltaPerPupil);
 
-  return `
+  const summary = `
     <div class="tiles">
       <div class="tile"><div class="k">State aid</div>
         <div class="v ${t.cost > 0 ? "gain" : t.cost < 0 ? "loss" : ""}">${millions(t.cost)}</div>
@@ -412,8 +451,9 @@ export function renderScenario(bundle: Panel, levers: Levers): string {
       <div class="tile"><div class="k">Unmoved</div>
         <div class="v">${t.unmoved}</div>
         <div class="n">${pct(t.unmoved / t.districts, 0)} of districts</div></div>
-    </div>
+    </div>`;
 
+  const detail = `
     <div class="card">
       <h2>How the change is distributed</h2>
       ${
@@ -455,4 +495,6 @@ export function renderScenario(bundle: Panel, levers: Levers): string {
         which the corpus cannot project from one observation per district. Local capacity is
         60% valuation, so a scenario where property values move is out of reach here.</p>
     </div>`;
+
+  return { summary, detail };
 }
