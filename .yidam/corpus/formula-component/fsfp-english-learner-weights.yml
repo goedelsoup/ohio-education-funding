@@ -9,11 +9,19 @@ description: |
   year and least in their third — it tapers as need persists rather than deepening with it.
   [verified]
 
-  Every other weighted categorical runs the other way: [special
-  education](fsfp-special-education-weights.yml) ascends from 0.2435 to 3.9554 as need deepens. A
-  reader who assumes Ohio's weights mean "more need, more money" has this one backwards, and the
-  assumption is reasonable everywhere else in the formula. Established from what districts are
-  actually paid per pupil in each category rather than from the transcribed weights. [verified]
+  [Special education](fsfp-special-education-weights.yml) runs the other way, ascending from 0.2435
+  to 3.9554 as need deepens. A reader who assumes Ohio's weights mean "more need, more money" has
+  this one backwards. Established from what districts are actually paid per pupil in each category
+  rather than from the transcribed weights. [verified]
+
+  > **CORRECTED.** This paragraph read *"every other weighted categorical runs the other way"* and
+  > that is false. [Career-technical](fsfp-career-technical-weights.yml) descends too — 0.623,
+  > 0.5905, 0.2154, 0.183, 0.157 — and this node's own sibling says why the two descents are not
+  > the same fact: there "the ordering is not severity: it is programme type". So the supportable
+  > claim is narrower and more interesting than the one made here. This is the **only** categorical
+  > whose weights fall along a *need* gradient. The over-claim was inherited by
+  > `district.ts`'s English-learner card, which asserted it twice, and both have been corrected
+  > together. [verified]
 
   **THE STATUTE SETTLES THE MECHANISM AND NARROWS THE MOTIVE.** R.C. 3317.016 defines the first
   category by **time enrolled in schools in the United States** — 180 school days or less — and

@@ -1026,7 +1026,12 @@ function renderCareerTechnical(d: District): string {
       higher before any weight is applied. A Category 1 CTE pupil generates
       ${money(0.623 * baseCost)} where the same weight against the general base would give
       ${money(0.623 * 8241.61)}. Ohio's weights are not a single scale, and reading them as one
-      understates this program by a fifth.</p>`;
+      understates this program by a fifth.</p>
+    <p class="note"><strong>The counts are frozen at FY2021.</strong> The department's own column
+      header reads <code>Category 1 Career Tech FTE-FY21</code>, so the FTE column above is
+      enrolment as it stood six years before the year being funded, while the base cost it is
+      multiplied against is built on a rolling three-year average ending FY2026. A district that
+      has opened or closed a programme since 2021 is funded for the one it had then.</p>`;
 }
 
 /**
@@ -1039,9 +1044,16 @@ function renderCareerTechnical(d: District): string {
  * two, so a district whose English learners are settling in sees this money fall while they are
  * still learning English.
  *
- * Every other weighted categorical in the plan runs the other way: special education's weights
- * ascend from 0.2435 to 3.9554 as need deepens. A reader who assumes Ohio's weights mean "more
- * need, more money" has it backwards here.
+ * Special education's weights ascend from 0.2435 to 3.9554 as need deepens, which is what a reader
+ * assumes Ohio's weights mean. Here they do not.
+ *
+ * This used to say *"every other weighted categorical in the plan runs the other way"*, and that is
+ * false — [`renderCareerTechnical`] renders `[0.623, 0.5905, 0.2154, 0.183, 0.157]` five table-rows
+ * above, strictly descending, in a column headed Weight. The corpus supplies the distinction the
+ * claim was reaching for: career-technical's ordering "is not severity: it is programme type"
+ * (`fsfp-career-technical-weights.yml`), so the two descents are not the same fact. English
+ * learners is the only categorical whose weights fall along a **need** gradient, and that is the
+ * claim the page can support.
  */
 function renderEnglishLearners(d: District): string {
   const e = d.english_learners;
@@ -1077,9 +1089,17 @@ function renderEnglishLearners(d: District): string {
     </table></div>
     <p class="note">The weights <strong>descend</strong>. Category 1 is the most recently arrived
       learner and is funded at twice Category 3, so this program pays most in a pupil's first year
-      and least in their third — it tapers as need persists rather than deepening with it. Every
-      other weighted categorical in the plan runs the other way. English learner funding reaches
-      505 of Ohio's 609 districts, and 38 of them hold 80% of the $36m.</p>`;
+      and least in their third — it tapers as need persists rather than deepening with it. Special
+      education runs the other way, ascending from 0.2435 to 3.9554 as need deepens. Career-technical's
+      weights descend too, but along programme type rather than need, so this is the only categorical
+      that pays less as the thing it is for persists. English learner funding reaches
+      505 of Ohio's 609 districts, and 38 of them hold 80% of the $36m.</p>
+    <p class="note"><strong>And the counts are frozen at FY2021.</strong> The department's own
+      column header reads <code>Category 1 EL ADM-FY21</code>, so the FTE column above is enrolment
+      as it stood six years before the year being funded, while base cost beside it is built on a
+      rolling three-year average ending FY2026. For a program whose whole structure is about how
+      recently a pupil arrived, that is a stranger fact than it would be anywhere else in the
+      plan.</p>`;
 }
 
 /**

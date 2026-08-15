@@ -1399,6 +1399,60 @@ test.describe("the categorical half", () => {
     await expect(rows).toHaveCount(6);
   });
 
+  test("the descending-weights claim is the one the page can support", async ({ page }) => {
+    /*
+     * This card asserted that English learners was the only weighted categorical whose weights
+     * descend — "every other weighted categorical in the plan runs the other way" — five table
+     * rows below career-technical's own weights, 0.623 → 0.157, printed in a column headed Weight
+     * and strictly descending. The claim was false as written and was inherited from the corpus
+     * node, which asserted it too.
+     *
+     * The supportable claim is narrower and more interesting: both descend, and only English
+     * learners descends along a *need* gradient. Career-technical's ordering is programme type,
+     * which its own corpus node says.
+     */
+    await page.goto("/district/043802");
+    const card = page.locator(".card", { hasText: "The categorical half" });
+    await expect(card).not.toContainText("Every other weighted categorical");
+    await expect(card).toContainText("the only categorical that pays less as the thing it is for");
+    // Both halves of the distinction are on the page, not just the correction.
+    await expect(card).toContainText("Special education runs the other way");
+    await expect(card).toContainText("along programme type rather than need");
+  });
+
+  test("the frozen FY2021 counts travel with the columns they qualify", async ({ page }) => {
+    // Two cards print an FTE column funded on enrolment as it stood six years before the year
+    // being funded, beside a base cost built on a rolling average ending FY2026. The corpus said
+    // so for both programs and neither page did.
+    await page.goto("/district/043802");
+    const card = page.locator(".card", { hasText: "The categorical half" });
+    await expect(card).toContainText("Category 1 Career Tech FTE-FY21");
+    await expect(card).toContainText("Category 1 EL ADM-FY21");
+    await expect(card.getByText("The counts are frozen at FY2021", { exact: false })).toHaveCount(2);
+  });
+
+  test("the two base-cost figures say they do not divide into the state share", async ({ page }) => {
+    // They are computed on different pupil counts, and a reader who divides the pair the sentence
+    // puts side by side gets a percentage below the statutory floor for 125 districts.
+    await page.goto("/district/046797");
+    const card = page.locator(".card", { hasText: "Why base cost is" });
+    await expect(card).toContainText("do not divide into the state share percentage");
+    await expect(card).toContainText("499 of Ohio's");
+    // And it says only what has been established, rather than asserting how the floor applies.
+    await expect(card).toContainText("is not something this site has established");
+  });
+
+  test("the smallest district reads as small rather than as broken", async ({ page }) => {
+    // Kelleys Island is funded 0.22 classroom teachers. Rounded, that printed as "0 funded
+    // classroom teachers" under a heading saying base cost is $371,449 per pupil.
+    await page.goto("/district/046797");
+    const card = page.locator(".card", { hasText: "Why base cost is" });
+    await expect(card).toContainText("0.22 funded classroom teachers");
+    // And no share cell reads as a missing value.
+    await expect(card.locator("td", { hasText: /^0\.0%$/ })).toHaveCount(0);
+    await expect(card.locator("td", { hasText: "<0.1%" })).not.toHaveCount(0);
+  });
+
   test("targeted assistance shows both tiers and names the two pupil counts", async ({ page }) => {
     /*
      * The largest categorical in Ohio, and the one whose total says least. `[G]` is `[C] + [F]`
