@@ -12,7 +12,6 @@ import Base from "../../layouts/Base.astro";
 import { renderBaseCostBuildUp } from "../../lib/basecost.ts";
 import {
   renderAidSource,
-  renderDetail,
   renderEnrollmentYears,
   renderCategoricals,
   renderPosition,
@@ -104,7 +103,6 @@ const description = district.on_guarantee
   <Fragment set:html={renderPosition(bundle, district, valuations, expenditures)} />
   {/* Ohio describing itself cannot say whether Ohio is unusual. This is the one card that can. */}
   <Fragment set:html={renderNationalPosition(district)} />
-  <Fragment set:html={renderDetail(district)} />
   {/* Three of the four siblings close by declaring what they are not. This route has the most
       collisions to declare and was the last to say so. */}
   <Fragment set:html={renderWhatThisIsNot(bundle, district)} />

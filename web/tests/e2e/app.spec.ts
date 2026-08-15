@@ -2069,12 +2069,26 @@ test.describe("the answer first", () => {
     }
   });
 
-  test("the district that trips no condition renders no empty row", async ({ page }) => {
-    // Marion Local is the one. An empty `<ul>` reads as a gap in the page rather than as the
-    // absence of a fact, which is what it is.
+  test("the one district that tripped no condition is the one the symmetric flag was for", async ({
+    page,
+  }) => {
+    /*
+     * This asserted `toHaveCount(0)` when the conditions landed: Marion Local tripped none of the
+     * four and rendered an empty `<ul>`, which reads as a gap in the page rather than as the
+     * absence of a fact. The guard for that is still in `renderAidSource` and is still correct for
+     * a feed that carries a null enrollment change.
+     *
+     * It is unreachable with this feed, and deliberately so. Making the enrollment condition
+     * symmetric — it fired only on a fall, leaving 109 districts with a Detail row as the sole
+     * carrier — gave every district at least one condition, and Marion Local's is the rise that
+     * kept it silent before. The assertion is inverted rather than deleted, because the empty case
+     * is the thing worth remembering.
+     */
     await page.goto("/district/048553");
     await expect(page.locator("h1")).toHaveText("Marion Local");
-    await expect(page.locator('[data-part="aid-source"] .conditions')).toHaveCount(0);
+    const conditions = page.locator('[data-part="aid-source"] .conditions li');
+    await expect(conditions).toHaveCount(1);
+    await expect(conditions).toContainText("Enrollment up");
   });
 
   test("the dashboard finally says what it is not", async ({ page }) => {
@@ -2111,6 +2125,101 @@ test.describe("the answer first", () => {
     await expect(page.locator('[data-part="not"]')).toContainText(
       "round to the same figure here, which they do not for 499",
     );
+  });
+});
+
+test.describe("the card that restated the page", () => {
+  test("the Detail card is gone, and nothing it uniquely carried went with it", async ({ page }) => {
+    /*
+     * Thirteen rows, ten of them a figure already on the page — base cost per pupil printed three
+     * times, aggregate base cost four, state share of base cost three, categorical funding three,
+     * guarantee per pupil three, enrolled ADM three. Its docstring was false twice: "every figure
+     * the feed carries" was 13 of 319 numeric leaves, and "unrounded" was 9 of 13 rows calling
+     * `money()` at zero decimals. `git show 9a04427:web/src/district.ts` is byte-identical to the
+     * card as it stood, from a build where the view had three `<h2>`s and every row was the page's
+     * only carrier of its figure. Zero tests referenced it, which is its own indictment.
+     *
+     * Three things it carried alone had to move first, and each is asserted here rather than in a
+     * commit message.
+     */
+    await page.goto(`/district/${CLEVELAND}`);
+    await expect(page.locator('[data-part="detail"]')).toHaveCount(0);
+    await expect(page.locator("main")).not.toContainText("Effective Class 1 millage");
+
+    // 1. The departmental-estimate caveat, which was the only statement of that fact on any of the
+    //    five district routes, now sits on the card whose terminal year is the estimated one.
+    await expect(page.locator('[data-part="enrollment"]')).toContainText(
+      "partly a departmental estimate",
+    );
+
+    // 3. The reader who was using it as a reference index is pointed at where it went.
+    const closing = page.locator('[data-part="not"]');
+    await expect(closing).toContainText("thirteen-row table");
+    await expect(closing.locator('a[href="/data/districts.csv"]')).toHaveCount(1);
+  });
+
+  test("every guaranteed district still carries its guarantee dollar total", async ({ page }) => {
+    /*
+     * 2. The ordering the plan calls its own worst failure mode. Under the old guard 158 of the 294
+     *    guaranteed districts had no hold-harmless table, so their guarantee total was on the
+     *    dashboard only in Detail — and nothing in the suite would have caught the loss, because
+     *    nothing tested Detail. The union guard landed a phase earlier; this asserts it held.
+     */
+    const feed = await (await page.request.get("/data/bundle.json")).json();
+    const guaranteed = feed.districts.filter((d: { guarantee: number }) => d.guarantee > 0);
+    expect(guaranteed.length).toBe(294);
+    // Three sampled across the branch space: one with a clawback, one with the supplement, one
+    // with neither — the last being the class that would have lost the figure.
+    const pick = (f: (d: Record<string, never>) => boolean) => guaranteed.find(f);
+    const cases = [
+      pick((d: any) => d.transition.open_enrollment_adjustment > 0),
+      pick((d: any) => d.transition.transition_supplement > 0),
+      pick(
+        (d: any) =>
+          d.transition.open_enrollment_adjustment === 0 && d.transition.transition_supplement === 0,
+      ),
+    ];
+    for (const d of cases) {
+      expect(d, "each branch of the guard has a district").toBeTruthy();
+      await page.goto(`/district/${(d as any).irn}`);
+      const table = page.locator('[data-part="aid-source"] table[data-program="hold-harmless"]');
+      await expect(table).toContainText("Guarantee");
+      await expect(table.locator("tbody")).not.toContainText("The formula reaches its FY2021 base");
+    }
+  });
+
+  test("a district whose enrollment rose is told so, not left silent", async ({ page }) => {
+    /*
+     * The condition fired only on a negative, so for the 109 districts whose enrollment rose
+     * between FY2024 and FY2026 the dashboard's sole carrier of the fact was a Detail row. That is
+     * why the flag had to become symmetric before the card was deleted rather than after.
+     */
+    const feed = await (await page.request.get("/data/bundle.json")).json();
+    const risen = feed.districts.filter(
+      (d: { enrollment_change: number | null }) =>
+        d.enrollment_change != null && d.enrollment_change > 0,
+    );
+    expect(risen.length).toBe(109);
+    await page.goto(`/district/${risen[0].irn}`);
+    const conditions = page.locator('[data-part="aid-source"] .conditions');
+    await expect(conditions).toContainText("Enrollment up");
+    await expect(conditions).not.toContainText("Enrollment down");
+  });
+
+  test("the taxes page names the year its two publications agree in", async ({ page }) => {
+    /*
+     * The other half of the collision the millage row was deleted over. `/taxes` closed by saying
+     * its effective Class I rate matches the profile report "to 0.01 mills, as it does for all 606
+     * districts carrying both" — true of TY2023, three cards below a tile printing TY2024, which
+     * the two agree on for 219 of the 606. Deleting the dashboard row and leaving this standing
+     * would have removed the only figure on the site that contradicted it.
+     */
+    await page.goto(`/district/${CLEVELAND}/taxes`);
+    const card = page.locator('[data-part="not"]');
+    await expect(card).toContainText("for TY2023");
+    await expect(card).toContainText("That is not the rate in the tile above");
+    await expect(card).toContainText("219");
+    await expect(card).toContainText("effective_class1_millage_ty23");
   });
 });
 

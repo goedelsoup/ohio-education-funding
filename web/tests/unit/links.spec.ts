@@ -21,7 +21,6 @@ import { FROM_CATALOG, FROM_DECISION, loadCorpus, resolveTarget } from "../../sr
 import {
   renderAidSource,
   renderCategoricals,
-  renderDetail,
   renderEnrollmentYears,
   renderNationalPosition,
   renderSupplements,
@@ -367,7 +366,6 @@ test("every corpus link the district renderers emit resolves", () => {
       renderBaseCostBuildUp(d, statewide.districts),
       renderCategoricals(d, statewide),
       renderSupplements(d),
-      renderDetail(d),
       renderNationalPosition(d),
       renderTaxBase(d),
       renderMillage(d, statewide),
