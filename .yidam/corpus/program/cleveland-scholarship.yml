@@ -20,11 +20,23 @@ description: |
   separate question raised in the [2025 EdChoice
   challenge](../litigation/vouchers-hurt-ohio-2025.yml). [inference]
 
-  **It is not charged against Cleveland's funding, and the assertion that it was is corrected
-  here.** This node carried `mechanism: deduction` flatly from its seeding. Under the Fair School
-  Funding Plan the programme is the **pilot project scholarship unit**, one of six funding units
-  R.C. 3317.022 pays directly. [verified] The old value was a reasonable reading of the
-  programme's deduct-era history and wrong about the law in force.
+  **It is not charged against Cleveland's funding.** Under the Fair School Funding Plan the
+  programme is the **pilot project scholarship unit**, one of six funding units R.C. 3317.022
+  pays directly rather than a deduction from the district's foundation payment. [verified]
+revisions:
+  - was: |
+      The node carried `mechanism: deduction` flatly, from its seeding.
+    now: |
+      It is **not** charged against Cleveland's funding. Under the Fair School Funding Plan the
+      programme is the **pilot project scholarship unit**, one of six funding units R.C.
+      3317.022 pays directly.
+    found_by: |
+      R.C. 3317.022, read against the FY2027 calculator's funding units.
+    reach: |
+      The old value was a reasonable reading of the programme's deduct-era history and wrong
+      about the law in force. Which era a scholarship's mechanism is described from decides
+      whether the resident district loses the money, so the two must be dated rather than
+      merged. The deduct-era mechanism is a separate question and still open.
 properties:
   seeded_because: |
     The origin point of the scholarship channel, and the reference against which the statewide

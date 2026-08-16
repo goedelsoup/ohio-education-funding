@@ -7,9 +7,9 @@ summary: >-
 description: |
   The state education agency from 1956 until 2023, governed by the State Board of Education —
   a board with elected and appointed members — and headed by a Superintendent of Public
-  Instruction the board selected rather than the Governor. [verified] For most of the period
-  this corpus covers, ODE computed and disbursed the foundation payments, which makes it the
-  publisher of record for nearly every per-district state aid figure before FY2024.
+  Instruction the board selected rather than the Governor. [verified] Across those decades ODE
+  computed and disbursed the foundation payments, which makes it the publisher of record for
+  nearly every per-district state aid figure before FY2024.
 
   The governance structure is the reason it is a separate node rather than a renamed
   predecessor. ODE answered to an independent board; its successor answers to the Governor.

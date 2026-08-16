@@ -6,10 +6,10 @@ summary: >-
   and the formula uses each of them in different places.
 description: |
   Average daily membership: the pupil count Ohio funds on. It is the denominator under nearly
-  every other metric in this corpus — [per-pupil operating expenditure](per-pupil-operating-expenditure.yml),
+  every other per-pupil measure — [per-pupil operating expenditure](per-pupil-operating-expenditure.yml),
   [assessed valuation per pupil](assessed-valuation-per-pupil.yml),
-  [state share percentage](state-share-percentage.yml) — and it had no node of its own for
-  twenty phases, which is how a denominator error propagates without anything to attach it to.
+  [state share percentage](state-share-percentage.yml) — so an error in it moves figures that
+  never name it.
 
   Two distinct counts wear the name, they differ for every district, and the Fair School Funding
   Plan uses **both in the same calculation**. Conflating them is the single most common arithmetic

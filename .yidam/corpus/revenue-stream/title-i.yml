@@ -18,8 +18,7 @@ description: |
   3317.03(B)(21) delegates to the department, constrained only by "shall not be categorically
   excluded … based on anything other than family income". [verified] Two compensatory channels,
   two poverty definitions, and no reason for them to identify the same children. How far the two
-  counts diverge for a given district is not established here and is the question that would make
-  this node useful for anything beyond bookkeeping. [open]
+  counts diverge for a given district is not established here. [open]
 
   **Four sub-formulas, not one**, and they behave differently: Basic Grants, Concentration
   Grants, Targeted Grants and Education Finance Incentive Grants. The last is the one that reaches
@@ -27,12 +26,12 @@ description: |
   local-reliance position affects what Ohio receives. Whether that has been material for Ohio is
   not established. [open]
 
-  **What the corpus can currently say about the size of the channel** comes from the Census F-33
-  rather than from any Title I file: Ohio districts received $2,466 per pupil in *all* federal
-  revenue in FY2022, against a national $2,493, which is 13.87% of Ohio school revenue and ranks
-  Ohio 25th of 51. [verified — `crates/dispersion/src/national_peers.rs`] Title I is the largest
-  component of that but the F-33 does not decompose it, so this node cannot yet state a Title I
-  figure for Ohio or for any district. [unentered]
+  **The size of the channel is only measurable through the Census F-33**, not through any Title
+  I file: Ohio districts received $2,466 per pupil in *all* federal revenue in FY2022, against a
+  national $2,493, which is 13.87% of Ohio school revenue and ranks Ohio 25th of 51. [verified —
+  `crates/dispersion/src/national_peers.rs`] Title I is the largest component of that, but the
+  F-33 does not decompose it, so no Title I figure for Ohio or for any district is entered here.
+  [unentered]
 properties:
   name: Title I, Part A — Improving Basic Programs Operated by Local Educational Agencies
   level: federal
