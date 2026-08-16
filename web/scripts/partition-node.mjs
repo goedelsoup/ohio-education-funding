@@ -40,20 +40,36 @@ function fold(text, indent) {
           .map((line) => (line.trim() ? indent + line : ""))
           .join("\n");
       }
-      const lines = [];
-      let line = indent;
-      for (const word of para.split(/\s+/).filter(Boolean)) {
-        if (line !== indent && line.length + 1 + word.length > 95) {
-          lines.push(line);
-          line = indent + word;
-        } else {
-          line = line === indent ? indent + word : `${line} ${word}`;
-        }
+      // A markdown list is one paragraph with several items in it, and the item boundaries are
+      // content. Rewrapping it as prose runs the second bullet into the tail of the first, which
+      // parses, preserves the word count, and renders as one item — so nothing else here catches
+      // it. Fold each item on its own, with the continuation lines indented under the marker.
+      if (/^ *[-*] /m.test(para)) {
+        return para
+          .split(/\n(?= *[-*] )/)
+          .map((item) => wrap(item, indent, indent + "  "))
+          .join("\n");
       }
-      lines.push(line);
-      return lines.join("\n");
+      return wrap(para, indent, indent);
     })
     .join("\n\n");
+}
+
+/** Greedy wrap to the corpus's 95 columns, first line at `indent`, the rest at `hanging`. */
+function wrap(text, indent, hanging) {
+  const lines = [];
+  let line = indent;
+  for (const word of text.split(/\s+/).filter(Boolean)) {
+    const at = lines.length === 0 ? indent : hanging;
+    if (line !== at && line.length + 1 + word.length > 95) {
+      lines.push(line);
+      line = hanging + word;
+    } else {
+      line = line === at ? at + word : `${line} ${word}`;
+    }
+  }
+  lines.push(line);
+  return lines.join("\n");
 }
 
 /**
@@ -228,6 +244,17 @@ for (const [id, spec] of Object.entries(plan)) {
         console.log(`  ! ${id}: a table in ${field}: sits under four spaces and will collapse`);
       }
     }
+  }
+
+  // A list item lost to rewrapping. Bullets are content, and the count of them is conserved by
+  // any honest move — but a rewrap that runs the second item into the tail of the first still
+  // parses and still counts the same words, so this is the only check that sees it.
+  const bullets = (text) => (String(text ?? "").match(/^ *[-*] /gm) ?? []).length;
+  const wasList = bullets(before.description) + bullets(before.findings);
+  const nowList = bullets(after.description) + bullets(after.findings);
+  if (nowList !== wasList) {
+    console.log(`  ! ${id}: ${wasList} list items became ${nowList} — a rewrap ran two together`);
+    continue;
   }
 
   writeFileSync(file, out);

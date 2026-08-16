@@ -5,36 +5,34 @@ summary: >-
   named plaintiff attended Sheridan High School here. It is the concrete instance of the
   mechanism this whole domain is built to explain.
 description: |
-  A rural district in Perry County, in Ohio's Appalachian southeast, and the origin of
-  *DeRolph v. State*: the named plaintiff was a student at Sheridan High School in this
-  district. [verified]
+  A rural district in Perry County, in Ohio's Appalachian southeast, and the origin of *DeRolph
+  v. State*: the named plaintiff was a student at Sheridan High School in this district.
+  [verified]
 
-  The district is the concrete instance of the mechanism this corpus is built to explain. Low
-  assessed valuation per pupil means local millage produces little revenue; under
-  [H.B. 920](../legislation/hb-920-1976.yml) what it does produce does not grow with
-  inflation; the [charge-off](../formula-component/charge-off-local-share.yml) nonetheless
-  assumed a local contribution based on that valuation; and the resulting state aid was
-  computed against a base cost the Supreme Court of Ohio found had no derivation. [inference]
-  The building conditions the court described in *DeRolph I* were the visible end of that
-  chain.
+  The district is where the whole mechanism is visible in one place. Low assessed valuation per
+  pupil means local millage produces little revenue; under [H.B.
+  920](../legislation/hb-920-1976.yml) what it does produce does not grow with inflation; the
+  [charge-off](../formula-component/charge-off-local-share.yml) nonetheless assumed a local
+  contribution based on that valuation; and the resulting state aid was computed against a base
+  cost the Supreme Court of Ohio found had no derivation. [inference] The building conditions
+  the court described in *DeRolph I* were the visible end of that chain.
 
-  It is also the right district against which to test whether anything changed. The
-  [Fair School Funding Plan](../funding-regime/fair-school-funding-plan.yml)'s local capacity
-  measure adds resident income to valuation, which should help a district whose community is
-  poorer than its property base suggests — and Perry County is a place where that gap is real.
-  [inference] Whether it did, and by how much, is the first calculation this corpus should
-  perform. [open]
-
-  First hard numbers: IRN 049056, with 298 public school students with disabilities in FY2021
-  and an IDEA Part B allocation of $483,451.88. [verified] Set against
-  [Upper Arlington](upper-arlington-city.yml) — 1,121 students with disabilities and
-  $1,490,233.42 — the pair gives the corpus its first like-for-like comparison on a single
-  federal program, though on a federal formula rather than a state one.
+  It is also the right district against which to test whether anything changed. The [Fair
+  School Funding Plan](../funding-regime/fair-school-funding-plan.yml)'s local capacity measure
+  adds resident income to valuation, which should help a district whose community is poorer
+  than its property base suggests — and Perry County is a place where that gap is real.
+  [inference] Whether it did, and by how much, is unmeasured. [open]
 
   **It is at the 20-mill floor — exactly.** TY2023 effective Class 1 millage of 20.000 against
   31.35 voted operating mills. [verified] Reduction factors have absorbed more than a third of
   what its voters approved, and the district now sits on the side of the boundary where
   reappraisal raises revenue directly.
+findings: |
+  First hard numbers: IRN 049056, with 298 public school students with disabilities in FY2021
+  and an IDEA Part B allocation of $483,451.88. [verified] Set against [Upper
+  Arlington](upper-arlington-city.yml) — 1,121 students with disabilities and $1,490,233.42 —
+  the pair gives the corpus its first like-for-like comparison on a single federal program,
+  though on a federal formula rather than a state one.
 
   **And it is no longer property-poor by the standard measure.** Assessed valuation per pupil
   of $279,983 in FY2023 exceeds Cleveland Municipal's $184,904 and sits above the statewide
@@ -44,11 +42,11 @@ description: |
   pupils scores well on it. Its economically disadvantaged share is 38.8% and its teachers earn
   $66,775 against Upper Arlington's $91,750. [verified]
 
-  This is the clearest case in the corpus for why the
-  [FSFP local capacity measure](../formula-component/fsfp-local-capacity-measure.yml) added
-  resident income to valuation. On property alone Northern Local is above median; on the
-  outcome it spends $11,987 per pupil, the lowest of the three exemplars and roughly $3,700
-  below the statewide median. [verified, inference for the interpretation]
+  This is the clearest case in the corpus for why the [FSFP local capacity
+  measure](../formula-component/fsfp-local-capacity-measure.yml) added resident income to
+  valuation. On property alone Northern Local is above median; on the outcome it spends $11,987
+  per pupil, the lowest of the three exemplars and roughly $3,700 below the statewide median.
+  [verified, inference for the interpretation]
 properties:
   seeded_because: |
     The anchor case for the property-poor end of Ohio's distribution.
