@@ -5,18 +5,45 @@ summary: >-
   measures where a district's students are; Progress measures how far they moved against what
   the state's model predicted from their own prior scores.
 description: |
-  The second outcome measure, and the one that answers a different question.
-  [Performance Index](performance-index.yml) measures where a district's students *are*;
-  Progress measures how far they *moved*, by comparing observed achievement against what the
-  state's model predicted from each student's own prior performance. [verified]
+  The second outcome measure, and the one that answers a different question. [Performance
+  Index](performance-index.yml) measures where a district's students *are*; Progress measures
+  how far they *moved*, by comparing observed achievement against what the state's model
+  predicted from each student's own prior performance. [verified]
 
   The corpus acquired the Index first and immediately found that 71.6% of its cross-district
   variance is the economically disadvantaged share — so most of what it appears to say about
   schools is a statement about who attends them. Progress exists to strip that out. It does not
   fully succeed: it still tracks disadvantage at **−0.325**, about 10.6% of its variance.
-  [verified] But an order of magnitude less is a different measure, not a refinement of the same
-  one, and the two correlate with each other at only **+0.375**.
+  [verified] But an order of magnitude less is a different measure, not a refinement of the
+  same one, and the two correlate with each other at only **+0.375**.
 
+  ### The denominator question does not arise here
+
+  The finding that dominates [expenditure per equivalent
+  pupil](expenditure-per-equivalent-pupil.yml) — that dividing by a need-weighted pupil count
+  moves the headline from −0.337 to −0.015 — has no counterpart on this measure. Against
+  growth, the two divisors give **−0.039** and **+0.029**: indistinguishable. [verified] That
+  is the strongest available confirmation of why the denominator mattered in the first place.
+  It mattered because the outcome was composition-driven and the divisor was a composition
+  proxy. Take the composition out of the outcome and the divisor stops doing anything.
+
+  ### The department publishes two of this measure
+
+  Value-added is reported both as a three-year average — the headline figure, and the one every
+  claim here rests on — and over a single year. The second was extracted into
+  `project::outcomes` from the beginning and reached no consumer until now. [verified]
+
+  They agree wherever agreement carries information. Of the **534 districts printing a non-zero
+  value on both, 44 point opposite ways**, and **not one of those 44 has both magnitudes above
+  0.05**: every disagreement is a district within 0.04 of zero on both measures, which is no
+  measured growth in either direction and a sign that is arbitrary. The correlation is 0.903.
+  [verified — computed in `crates/bundle` from the 2024-25 report card]
+
+  So the smoothing choice is safe for any district with real movement, and the three-year
+  figure remains the right default: a single year of value-added is noisy enough that the
+  department smooths it deliberately. What the choice does decide is the **sign** for districts
+  sitting on zero, and the sign is what gets reported about them. [inference]
+findings: |
   ### The sign of the spending relationship depends on which outcome is asked
 
   [verified — computed; see
@@ -35,93 +62,57 @@ description: |
   survive the switch to a measure of gain.**
 
   The raw growth figure is near zero for a legible reason rather than because nothing is there.
-  Poorer districts spend more per headcount pupil (+0.345) and show lower growth (−0.325), so the
-  two effects cancel. Removing the confounder does not weaken the relationship; it uncovers one.
-  [inference]
-
-  ### The denominator question does not arise here
-
-  The finding that dominates
-  [expenditure per equivalent pupil](expenditure-per-equivalent-pupil.yml) — that dividing by a
-  need-weighted pupil count moves the headline from −0.337 to −0.015 — has no counterpart on this
-  measure. Against growth, the two divisors give **−0.039** and **+0.029**: indistinguishable.
-  [verified] That is the strongest available confirmation of why the denominator mattered in the
-  first place. It mattered because the outcome was composition-driven and the divisor was a
-  composition proxy. Take the composition out of the outcome and the divisor stops doing
-  anything.
+  Poorer districts spend more per headcount pupil (+0.345) and show lower growth (−0.325), so
+  the two effects cancel. Removing the confounder does not weaken the relationship; it uncovers
+  one. [inference]
 
   ### The need-adjusted model, and the sign difference surviving it
 
-  Controlling
-  for economic disadvantage, English-learner and disability shares, log enrollment, and assessed
-  valuation per pupil — the specification
-  [OCG White Paper 013](../../catalog/ocg-white-paper-013.md) named as its own priority next step
-  — the standardised spending coefficient is: [verified]
+  Controlling for economic disadvantage, English-learner and disability shares, log enrollment,
+  and assessed valuation per pupil — the specification [OCG White Paper
+  013](../../catalog/ocg-white-paper-013.md) named as its own priority next step — the
+  standardised spending coefficient is: [verified]
 
       on the Performance Index (level)      -0.073   t = -2.84   model R2 0.752
       on Progress effect size  (growth)     +0.209   t = +4.60   model R2 0.227
 
   **The growth coefficient strengthens at every step as controls are added** — +0.016 with
-  spending alone, +0.147 adding disadvantage, +0.209 with the full set. That is the signature of
-  a relationship being uncovered by controls rather than manufactured by them; a coefficient that
-  appears only in the saturated model is the pattern to distrust, and this is its opposite.
-  [inference]
+  spending alone, +0.147 adding disadvantage, +0.209 with the full set. That is the signature
+  of a relationship being uncovered by controls rather than manufactured by them; a coefficient
+  that appears only in the saturated model is the pattern to distrust, and this is its
+  opposite. [inference]
 
   **The published measure is a three-year average, so the year-matched check matters.** The
-  overview effect size is identical to the three-year gain (r = 1.0000), which pairs three years
-  of growth with one year of spending. Re-running the full model on the **one-year** gain gives
-  a standardised coefficient of **+0.269**, t = +5.75 — same sign, slightly larger. The mismatch
-  was not carrying the result. [verified]
+  overview effect size is identical to the three-year gain (r = 1.0000), which pairs three
+  years of growth with one year of spending. Re-running the full model on the **one-year** gain
+  gives a standardised coefficient of **+0.269**, t = +5.75 — same sign, slightly larger. The
+  mismatch was not carrying the result. [verified]
 
   **And wealth separates the two measures cleanly.** In the same model, assessed valuation per
   pupil predicts attainment level (t = +3.12) and does not predict growth at all (t = +0.06).
-  [verified] Property wealth tells you where a district's students are, not how far they moved —
-  which is close to the sharpest statement of the level/gain distinction this data supports, and
-  bears directly on [equity](../doctrine/equity.yml).
+  [verified] Property wealth tells you where a district's students are, not how far they moved
+  — which is close to the sharpest statement of the level/gain distinction this data supports,
+  and bears directly on [equity](../doctrine/equity.yml).
 
   **What this does not license.** A standardised coefficient of +0.21 in a single-year
-  cross-section is not evidence that spending raises achievement, and six controls do not make it
-  one. Adding controls removes the part of an association the controls explain; it does not turn
-  the remainder into an effect. What remains unmodelled is not a list of minor omissions:
+  cross-section is not evidence that spending raises achievement, and six controls do not make
+  it one. Adding controls removes the part of an association the controls explain; it does not
+  turn the remainder into an effect. What remains unmodelled is not a list of minor omissions:
   district typology, regional labour cost, and — the largest — **what the money was actually
   spent on**, which no column in this workspace measures. A district that spends more on
   instruction and one that spends more on transportation are the same observation here. [open]
 
-  The honest statement is unchanged in substance and firmer in support: on Ohio's growth measure
-  the relationship is not negative, and it survives the controls that were supposed to explain
-  it away. That corrects a widely quoted framing. It does not settle whether money works.
-  [inference]
+  The honest statement is unchanged in substance and firmer in support: on Ohio's growth
+  measure the relationship is not negative, and it survives the controls that were supposed to
+  explain it away. That corrects a widely quoted framing. It does not settle whether money
+  works. [inference]
 
   **A cautionary property that is easy to miss.** `Overall Composite` is a precision-scaled
   statistic — a gain divided by its standard error — so it rises with the number of tested
   students and correlates with enrollment at **+0.244**. `Overall Effect Size` is the
-  standardised gain and correlates at +0.155. The two correlate with each other at +0.917, which
-  makes the choice look immaterial. It is not: ranking districts on the composite ranks them
-  partly by size. Every figure in this corpus uses the effect size. [verified]
-
-  ### The department publishes two of this measure
-
-  Value-added is reported both as a three-year average — the headline figure, and the one every
-  claim here rests on — and over a single year. The second was extracted into
-  `project::outcomes` from the beginning and reached no consumer until now. [verified]
-
-  They agree wherever agreement carries information. Of the **534 districts printing a non-zero
-  value on both, 44 point opposite ways**, and **not one of those 44 has both magnitudes above
-  0.05**: every disagreement is a district within 0.04 of zero on both measures, which is no
-  measured growth in either direction and a sign that is arbitrary. The correlation is 0.903.
-  [verified — computed in `crates/bundle` from the 2024-25 report card]
-
-  So the smoothing choice is safe for any district with real movement, and the three-year figure
-  remains the right default: a single year of value-added is noisy enough that the department
-  smooths it deliberately. What the choice does decide is the **sign** for districts sitting on
-  zero, and the sign is what gets reported about them. [inference]
-
-  **A counting trap worth recording, because this repository fell into it.** The measure is
-  published to two decimal places, so a printed `0.00` covers anything in (-0.005, 0.005) and has
-  no sign at all. **72 districts print an exact `0.00` on one of the two measures.** A naive
-  `a > 0 != b > 0` reads every one of them as negative and reports **76** disagreements where
-  there are 44 — nearly doubling the finding, and in the direction that makes it sound alarming.
-  The corrected count is taken over determinate pairs only. [verified]
+  standardised gain and correlates at +0.155. The two correlate with each other at +0.917,
+  which makes the choice look immaterial. It is not: ranking districts on the composite ranks
+  them partly by size. Every figure in this corpus uses the effect size. [verified]
 revisions:
   - was: |
       Every claim on this node rested on value-added without stating which of the department's
@@ -135,6 +126,20 @@ revisions:
     reach: |
       No figure changes. A growth claim measured over three years and one measured over one are
       different claims, and the node had not said which it was making.
+  - was: |
+      Disagreement between the two published growth measures was counted with a bare sign test,
+      `a > 0 !== b > 0`, giving 76 districts.
+    now: |
+      44. The measure is published to two decimals, so a printed `0.00` covers (-0.005, 0.005)
+      and has no sign at all — and **72 districts print an exact `0.00` on one of the two
+      measures**. The naive test read every one of them as a disagreement.
+    found_by: |
+      Counting over determinate pairs only, pinned in the feed's own
+      `growth_measures_determinate` and `growth_measures_disagree`.
+    reach: |
+      No disagreement survives a real threshold: every one of the 44 is a district within 0.04
+      of zero on both measures, so the sign is arbitrary rather than contested. The smoothing
+      choice is safe for any district with real movement.
 properties:
   name: Progress (value-added) effect size
   unit: index
