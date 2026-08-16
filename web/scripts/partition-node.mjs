@@ -56,9 +56,24 @@ function fold(text, indent) {
     .join("\n\n");
 }
 
+/**
+ * The block header for some folded content: `|` normally, `|2` when it starts indented.
+ *
+ * A YAML block scalar takes its indentation from its **first non-empty line**. So a `findings:`
+ * whose first paragraph is an ASCII table opens a block indented six, and the next ordinary
+ * paragraph at two is *less* indented — which ends the scalar and leaves the rest of the file
+ * being parsed as mappings. The node stops loading entirely.
+ *
+ * The explicit indentation indicator pins it regardless of what the first line looks like. Only
+ * emitted where it is needed, so the diff on every other node stays empty.
+ */
+function header(folded, indent) {
+  return /^\s{2}\s+\S/.test(folded.split("\n")[0] ?? "") ? `|${indent.length}` : "|";
+}
+
 /** The raw text of a top-level block scalar field, and where it sits in the file. */
 function block(raw, field) {
-  const open = new RegExp(`^${field}: \\|\\n`, "m").exec(raw);
+  const open = new RegExp(`^${field}: \\|\\d?\\n`, "m").exec(raw);
   if (!open) return null;
   const start = open.index + open[0].length;
   const rest = raw.slice(start);
@@ -96,7 +111,15 @@ for (const [id, spec] of Object.entries(plan)) {
     continue;
   }
 
-  let out = raw.slice(0, at.start) + fold(kept.join("\n\n"), "  ") + "\n" + raw.slice(at.end);
+  const keptText = fold(kept.join("\n\n"), "  ");
+  // The header may have to change too: a description whose new first paragraph is a table needs
+  // the same explicit indicator its `findings:` sibling does.
+  const descHeader = new RegExp(`^description: \\|\\d?$`, "m");
+  let out =
+    raw.slice(0, at.start).replace(descHeader, `description: ${header(keptText, "  ")}`) +
+    keptText +
+    "\n" +
+    raw.slice(at.end);
 
   if (moved.length) {
     const existing = block(out, "findings");
@@ -112,10 +135,11 @@ for (const [id, spec] of Object.entries(plan)) {
     } else {
       // After `description:`, before whatever follows it.
       const desc = block(out, "description");
+      const movedText = fold(moved.join("\n\n"), "  ");
       out =
         out.slice(0, desc.end) +
-        "findings: |\n" +
-        fold(moved.join("\n\n"), "  ") +
+        `findings: ${header(movedText, "  ")}\n` +
+        movedText +
         "\n" +
         out.slice(desc.end);
     }
@@ -170,7 +194,12 @@ for (const [id, spec] of Object.entries(plan)) {
   try {
     after = YAML.parse(out);
   } catch (error) {
+    // Written aside rather than discarded: a refusal that leaves nothing to look at makes the
+    // next step guesswork, and the failure is in the output by definition.
+    const wreck = join("/tmp", `${id.replace(/\//g, "-")}.broken.yml`);
+    writeFileSync(wreck, out);
     console.log(`  ! ${id}: the result does not parse — ${String(error).split("\n")[0]}`);
+    console.log(`      wrote ${wreck} to look at`);
     continue;
   }
 
