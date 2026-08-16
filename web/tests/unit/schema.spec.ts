@@ -303,7 +303,7 @@ test("the corpus is clean under the policy it declares", () => {
  * says the same thing honestly and fails the day somebody folds a finding back into a
  * description.
  */
-const PROSE_BACKLOG = 118;
+const PROSE_BACKLOG = 105;
 
 test("the genre migration's backlog does not grow", () => {
   const prose = loadCorpus().diagnostics.filter((d) => d.kind === "prose");

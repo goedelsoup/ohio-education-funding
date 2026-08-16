@@ -6,9 +6,9 @@ summary: >-
   a complete systematic overhaul within one year.
 description: |
   The decision that changed the terms of Ohio school funding. On 24 March 1997 the Supreme
-  Court of Ohio held, 4-3, that the state's school funding system violated Article VI,
-  Section 2, and ordered a complete systematic overhaul — with compliance required within one
-  year, by 24 March 1998. [verified]
+  Court of Ohio held, 4-3, that the state's school funding system violated Article VI, Section
+  2, and ordered a complete systematic overhaul — with compliance required within one year, by
+  24 March 1998. [verified]
 
   The action was filed on 19 December 1991 in Perry County by the Ohio Coalition for Equity and
   Adequacy of School Funding, on behalf of Nathan DeRolph, then a student at Sheridan High
@@ -24,55 +24,32 @@ description: |
   Perry County Court of Appeals reversed on 30 August 1995; the Supreme Court accepted
   jurisdiction on 17 January 1996. [verified]
 
-  The court identified specific defects rather than a general insufficiency, and the specificity
-  is what made the decision usable. Among them: the base cost per pupil was not derived from any
-  determination of what an education costs but by dividing available money by pupils — the
-  practice this corpus records under [adequacy](../doctrine/adequacy.yml) as residual budgeting;
-  districts were forced into borrowing to meet operating costs; school buildings were in
-  conditions the court described at length; and reliance on local property tax produced
-  disparities the state's equalization did not correct. [verified]
-
   A clarification followed on 25 April 1997: local property taxes could supplement but not
   primarily fund schools, and school borrowing was permitted through 23 March 1998. [verified]
 
   ### The first budget after the decision declined to itemise the second year, and said so
 
-  The
-  compliance deadline was 24 March 1998. Am. Sub. H.B. 215, the FY1998-99 main operating budget,
-  was enacted on 30 June 1997 — three months after the decision — and its Department of Education
-  table itemises FY1998 across fifty-three General Revenue Fund lines and FY1999 across **one**.
-  Fifty-one of the fifty-three carry `$0` for FY1999; the whole year, **$4,470,135,592**, sits in
-  a single line, `200-405 Primary and Secondary Education Funding`. The act states the reason in
-  its own text: [verified —
-  [the enrolled act](../../catalog/ohio-session-laws.md), reconciled to its own printed totals]
-
-  > By January 15, 1998, the General Assembly shall develop a plan to provide itemized
-  > appropriations for the Department of Education for fiscal year 1999.
-  >
-  > In anticipation of a new, improved school finance formula and education reform plan, to be
-  > enacted before fiscal year 1999, the foregoing appropriation item, 200-405, Primary and
-  > Secondary Education Funding is hereby appropriated.
-  >
-  > Payment of fiscal year 1999 earmarks in the Department of Education's budget are subject to
-  > the passage of a new school finance formula and education reform plan.
-
-  So the legislature appropriated the money and suspended the structure it is normally paid
-  through, for the year the court's deadline fell in. The promise was kept — Am. Sub. H.B. 650
-  itemised FY1999 on 13 February 1998 — and the evidence that it was is that `200-405` never
-  appears in what was spent: the FY1999 *actuals* carry 141 line items and none of them is that
-  one, while `200-501`, appropriated nothing, spent $3,035,363,396. [verified]
-
-  What this does not settle is whether the deferral was a remedy, a holding action, or a
-  bargaining position. The appropriation table records that it happened and not why. [open]
+  The remedy was the weak point, and it is why *DeRolph* produced four decisions rather than
+  one. The court declared the system unconstitutional and directed the General Assembly to fix
+  it, without specifying what a compliant system would contain or what would follow if none
+  appeared. [inference]
+findings: |
+  The court identified specific defects rather than a general insufficiency, and the
+  specificity is what made the decision usable. Among them: the base cost per pupil was not
+  derived from any determination of what an education costs but by dividing available money by
+  pupils — the practice this corpus records under [adequacy](../doctrine/adequacy.yml) as
+  residual budgeting; districts were forced into borrowing to meet operating costs; school
+  buildings were in conditions the court described at length; and reliance on local property
+  tax produced disparities the state's equalization did not correct. [verified]
 
   ### The reliance finding, tested against the other forty-nine states
 
   The court found that reliance on local property tax produced disparities the state's
-  equalization did not correct. Every source this corpus held until now describes Ohio alone, so
-  the finding could be restated indefinitely and never checked — "too heavily" is a comparison,
-  and there was nothing to compare against. The Census Bureau's
-  [Annual Survey of School System Finances](../../catalog/census-f33-school-system-finances.md)
-  counts every school system in the country on one set of definitions.
+  equalization did not correct. Every source this corpus held until now describes Ohio alone,
+  so the finding could be restated indefinitely and never checked — "too heavily" is a
+  comparison, and there was nothing to compare against. The Census Bureau's [Annual Survey of
+  School System Finances](../../catalog/census-f33-school-system-finances.md) counts every
+  school system in the country on one set of definitions.
 
   In FY2022 Ohio raised **51.8% of school revenue locally against a national 43.4% — seventh
   highest of fifty-one** — and took **34.4% from the state against a national 43.4%,
@@ -82,20 +59,15 @@ description: |
   What makes this a finding about structure rather than about money is the two figures that are
   *not* unusual. Ohio's current spending per pupil is $14,923 against a national $15,801 —
   twenty-fourth of fifty-one, unremarkable — and its federal share is within a point of the
-  national figure. Ohio spends roughly what the country spends on schools. The distinctive thing
-  is who pays, which is the distinction the court drew in 1997 and the one the clarification a
-  month later sharpened into "supplement but not primarily fund". [inference]
+  national figure. Ohio spends roughly what the country spends on schools. The distinctive
+  thing is who pays, which is the distinction the court drew in 1997 and the one the
+  clarification a month later sharpened into "supplement but not primarily fund". [inference]
 
   The survey year understates this rather than overstating it. FY2022 is the peak of federal
   pandemic relief, so the federal share is inflated and the state and local shares are both
   deflated; in an ordinary year Ohio's local share would be higher. [verified]
 
   ### Across years, the position moved — and it moved the wrong way
-
-  This node recorded that whether the remedy period had shifted Ohio's reliance "needs the survey
-  across years and the layout is not stable enough to assume". The layout is not stable — the
-  three eras carry 256, 260 and 354 columns — but the *column names* are, so ten years of it read
-  cleanly. Over comparable districts: [verified — `dispersion::ohio_panel`, pinned by test]
 
       FY2012  local 49.17%  state 41.88%  federal  8.95%
       FY2013  local 52.83%  state 41.92%  federal  5.25%
@@ -109,28 +81,64 @@ description: |
       FY2022  local 51.73%  state 34.25%  federal 14.02%
 
   **The state share falls in nine years out of ten**, from 41.9% to 34.3%. Read between the two
-  federally ordinary years, FY2013 and FY2019, it falls three points while the local share rises
-  1.6. Read endpoint to endpoint it falls 7.6, though both endpoints are distorted — FY2012 still
-  carries the ARRA tail and FY2022 is the ESSER peak, and a large federal share deflates the two
-  domestic ones arithmetically. Either reading gives the same direction. [verified]
+  federally ordinary years, FY2013 and FY2019, it falls three points while the local share
+  rises 1.6. Read endpoint to endpoint it falls 7.6, though both endpoints are distorted —
+  FY2012 still carries the ARRA tail and FY2022 is the ESSER peak, and a large federal share
+  deflates the two domestic ones arithmetically. Either reading gives the same direction.
+  [verified]
 
   Ohio's answer to *DeRolph* was to reduce the state's share of school revenue. That is not a
-  claim about intent, and no single act did it; it is what the arithmetic of a formula phased in
-  against a local base growing faster produces. But the specific thing the court found
-  unconstitutional in 1997 — reliance on local property tax — is measurably greater now than when
-  the case ended. [inference]
+  claim about intent, and no single act did it; it is what the arithmetic of a formula phased
+  in against a local base growing faster produces. But the specific thing the court found
+  unconstitutional in 1997 — reliance on local property tax — is measurably greater now than
+  when the case ended. [inference]
 
   **What this still does not establish.** That the reliance causes the disparities, which is a
-  separate claim the court supported on a trial record this corpus does not hold. [open] And the
-  series starts in FY2012, ten years after *DeRolph IV* and fifteen after this decision, so it
-  describes the aftermath rather than the remedy period itself. Whether the position also worsened
-  between 1997 and 2012 is not answerable from this archive: NCES publishes no F-33 before FY2012
-  under any naming its later years use. [open]
+  separate claim the court supported on a trial record this corpus does not hold. [open] And
+  the series starts in FY2012, ten years after *DeRolph IV* and fifteen after this decision, so
+  it describes the aftermath rather than the remedy period itself. Whether the position also
+  worsened between 1997 and 2012 is not answerable from this archive: NCES publishes no F-33
+  before FY2012 under any naming its later years use. [open]
 
-  The remedy was the weak point, and it is why *DeRolph* produced four decisions rather than
-  one. The court declared the system unconstitutional and directed the General Assembly to fix
-  it, without specifying what a compliant system would contain or what would follow if none
-  appeared. [inference]
+  The compliance deadline was 24 March 1998. Am. Sub. H.B. 215, the FY1998-99 main operating
+  budget, was enacted on 30 June 1997 — three months after the decision — and its Department of
+  Education table itemises FY1998 across fifty-three General Revenue Fund lines and FY1999
+  across **one**. Fifty-one of the fifty-three carry `$0` for FY1999; the whole year,
+  **$4,470,135,592**, sits in a single line, `200-405 Primary and Secondary Education Funding`.
+  The act states the reason in its own text: [verified — [the enrolled
+  act](../../catalog/ohio-session-laws.md), reconciled to its own printed totals]
+
+  > By January 15, 1998, the General Assembly shall develop a plan to provide itemized >
+  appropriations for the Department of Education for fiscal year 1999. > > In anticipation of a
+  new, improved school finance formula and education reform plan, to be > enacted before fiscal
+  year 1999, the foregoing appropriation item, 200-405, Primary and > Secondary Education
+  Funding is hereby appropriated. > > Payment of fiscal year 1999 earmarks in the Department of
+  Education's budget are subject to > the passage of a new school finance formula and education
+  reform plan.
+
+  So the legislature appropriated the money and suspended the structure it is normally paid
+  through, for the year the court's deadline fell in. The promise was kept — Am. Sub. H.B. 650
+  itemised FY1999 on 13 February 1998 — and the evidence that it was is that `200-405` never
+  appears in what was spent: the FY1999 *actuals* carry 141 line items and none of them is that
+  one, while `200-501`, appropriated nothing, spent $3,035,363,396. [verified]
+
+  What this does not settle is whether the deferral was a remedy, a holding action, or a
+  bargaining position. The appropriation table records that it happened and not why. [open]
+revisions:
+  - was: |
+      Whether the remedy period had shifted Ohio's reliance on local property tax was recorded
+      as an open question — computable from the same panel, and not computed.
+    now: |
+      It is computed, and it moved the wrong way. **The state share falls in nine years out of
+      ten**, from 41.9% in FY2012 to 34.3% in FY2022, while the local share rises. Ohio's
+      answer to *DeRolph* was to reduce the state's share of school revenue.
+    found_by: |
+      `dispersion::ohio_panel`, pinned by test, over the Census Bureau's survey of Ohio school
+      systems FY2009-FY2022.
+    reach: |
+      It does not establish that the reliance *causes* the disparity — that is the court's
+      finding and this is a description of the aggregate. What it removes is the possibility
+      that the remedy period quietly fixed the structure the court named.
 properties:
   case_name: DeRolph v. State
   citation: 78 Ohio St.3d 193, 1997-Ohio-84

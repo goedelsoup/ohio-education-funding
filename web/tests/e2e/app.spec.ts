@@ -577,7 +577,10 @@ test.describe("with JavaScript disabled", () => {
     await page.goto("/wiki/parameter/twenty-mill-floor");
     await expect(page.locator("h1")).toHaveText("Twenty-Mill Floor");
     await expect(page.locator(".claim.verified").first()).toBeVisible();
-    await expect(page.locator(".prose-body")).toContainText("20 mills");
+    // `main` rather than `.prose-body`: a node now renders its description, its findings and each
+    // of its revisions in separate prose cards, so the singular locator is ambiguous. The claim
+    // being made is about the page, not about which card the phrase landed in.
+    await expect(page.locator("main")).toContainText("20 mills");
   });
 
   test("the scenario route says outright that it is the exception", async ({ page }) => {
@@ -1021,11 +1024,20 @@ test.describe("the wiki", () => {
     await page.goto("/wiki/metric/performance-index");
     await expect(page.locator(".claim.verified").first()).toBeVisible();
     await expect(page.locator(".claim.inference").first()).toBeVisible();
-    // The tags must not survive as literal text anywhere in the prose.
-    const prose = await page.locator(".prose-body").innerText();
-    expect(prose).not.toContain("[verified]");
-    expect(prose).not.toContain("[inference]");
-    expect(prose).not.toContain("[open]");
+    /*
+     * The tags must not survive as literal text anywhere in the prose — and "anywhere" now means
+     * several cards, not one. A node renders its description, its findings and each revision in
+     * its own `.prose-body`, and a badge that failed only inside `findings:` would have gone
+     * unnoticed while this read the first card and passed.
+     */
+    const cards = await page.locator(".prose-body").allInnerTexts();
+    expect(cards.length).toBeGreaterThan(1);
+    for (const prose of cards) {
+      expect(prose).not.toContain("[verified]");
+      expect(prose).not.toContain("[inference]");
+      expect(prose).not.toContain("[open]");
+      expect(prose).not.toContain("[unentered]");
+    }
   });
 
   test("joins an exemplar district to its live figures", async ({ page }) => {

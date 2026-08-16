@@ -17,30 +17,43 @@ description: |
   its levy history rather than by any current decision.
 
   This makes the floor the highest-leverage single parameter in the system for questions about
-  local revenue, and a frequent target of reform proposals in both directions. Raising it
-  would move more districts onto valuation-linked growth; lowering it would do the opposite.
+  local revenue, and a frequent target of reform proposals in both directions. Raising it would
+  move more districts onto valuation-linked growth; lowering it would do the opposite.
   [inference] Any credible simulation of a property tax change has to determine floor status
   per district first, because the same change produces opposite effects on the two groups.
 
+  ### The remaining candidate, confirmed in the statute itself
+
+  R.C. 319.301(A)(1): the reductions "do not apply to ... taxes levied at whatever rate is
+  required to produce a specified amount of tax money, including a tax levied under section
+  5705.199 or 5748.09 of the Revised Code, or an amount to pay debt charges." R.C. 5705.199 is
+  the emergency levy section. Fixed-sum levies are exempt from reduction as a matter of law.
+  [verified — `ohio-laws`, `crates/project/tests/the_statute_behind_the_weights.rs`]
+
+  An absence of an effect in one group is not an absence of the mechanism, and the correction
+  is recorded rather than quietly replaced because the wrong reading was the more natural one.
+
+  ### The floor is not written in mills
+findings: |
   **How much the reduction factors have actually taken: the median district has lost 42.4% of
   the millage its voters approved.** The median voted current operating rate is 42.32 mills
   against a median effective Class 1 rate of 23.40, and the largest reduction in the state is
   74.7%. [verified — FY2024 District Profile Report, `current_operating_millage_ty23` against
   `effective_class1_millage_ty23`] This is the magnitude of the mechanism the floor bounds, and
   it went unstated here for as long as it did because the voted-millage column was present in
-  the fixture and never parsed. Note the figure is the median of the per-district ratio, not one
-  minus the ratio of the two medians, which is a different and meaningless quantity.
+  the fixture and never parsed. Note the figure is the median of the per-district ratio, not
+  one minus the ratio of the two medians, which is a different and meaningless quantity.
 
   **A defect in the corpus's own calculator, found by running it against the tables.**
   `crates/millage` implemented the floor as a clamp: any district whose reduced rate fell below
   20 mills was raised to 20 only if its voted rate was at least 20, and otherwise took the
-  reduced rate unchanged. That reduced the six sub-twenty-mill districts as if the floor did not
-  concern them — a district voting 19 mills came out at 9.5 on a doubling of valuation. R.C.
-  319.301(D) states the floor as a guarantee of what twenty mills would raise, so a district
-  already below twenty is under the guarantee before any reduction and none applies. The
-  published data settles it: all six report voted and effective rates equal to four decimals.
-  [verified] Fixed, with `crates/millage/tests/against_published_tables.rs` holding the crate to
-  1,218 published district-years.
+  reduced rate unchanged. That reduced the six sub-twenty-mill districts as if the floor did
+  not concern them — a district voting 19 mills came out at 9.5 on a doubling of valuation.
+  R.C. 319.301(D) states the floor as a guarantee of what twenty mills would raise, so a
+  district already below twenty is under the guarantee before any reduction and none applies.
+  The published data settles it: all six report voted and effective rates equal to four
+  decimals. [verified] Fixed, with `crates/millage/tests/against_published_tables.rs` holding
+  the crate to 1,218 published district-years.
 
   **How many districts sit at the floor: 170 of 606, or 28.1%, in TY2023.** [verified —
   computed from the FY2024 District Profile Report; see
@@ -71,36 +84,13 @@ description: |
   Class 1 and Class 2 base rather than to Class 1 alone, the value-weighted real property rate
   for these districts would pin at 20 mills. It does not: across the fourteen it runs from
   19.719 to 21.562, and only two land within a hundredth of 20. Statewide the same measure puts
-  76 of 609 districts at 20.00 against 155 on the Class 1 rate, so the Class 1 figure is the one
-  the floor governs. [verified — TY2024 Table SD-1]
+  76 of 609 districts at 20.00 against 155 on the Class 1 rate, so the Class 1 figure is the
+  one the floor governs. [verified — TY2024 Table SD-1]
 
-  ### The remaining candidate, confirmed in the statute itself
-
-  R.C. 319.301(A)(1): the
-  reductions "do not apply to ... taxes levied at whatever rate is required to produce a specified
-  amount of tax money, including a tax levied under section 5705.199 or 5748.09 of the Revised
-  Code, or an amount to pay debt charges." R.C. 5705.199 is the emergency levy section. Fixed-sum
-  levies are exempt from reduction as a matter of law. [verified — `ohio-laws`,
-  `crates/project/tests/the_statute_behind_the_weights.rs`]
-
-  **And this node briefly said the opposite, from data alone.** Table SD-1 shows **155 of 611
-  districts on 20.0000 within a hundredth of a mill**, with a median excess of 0.0008 among those
-  near the floor, and that was read as disconfirming the candidate. It does not. It shows only
-  that the exclusion is not what puts *those* districts where they are — they carry no fixed-sum
-  levies in their Class I current-expense rate. The 68 districts between 20.005 and 20.5 are where
-  the mechanism would show, and attributing specific districts still needs levy-type data neither
-  Table SD-1 nor the profile report carries. [verified, and the attribution is [open]]
-
-  An absence of an effect in one group is not an absence of the mechanism, and the correction is
-  recorded rather than quietly replaced because the wrong reading was the more natural one.
-
-  ### The floor is not written in mills
-
-  R.C. 319.301 never says "twenty mills". It says **two
-  per cent of the taxable value** of the class, and **two-tenths of one per cent** for joint
-  vocational districts. Those are the 20 and 2 mills this node carries, so the figures are right —
-  but the name is a colloquialism for a percentage, and a reader searching the statute for the
-  phrase will not find it. [verified]
+  R.C. 319.301 never says "twenty mills". It says **two per cent of the taxable value** of the
+  class, and **two-tenths of one per cent** for joint vocational districts. Those are the 20
+  and 2 mills this node carries, so the figures are right — but the name is a colloquialism for
+  a percentage, and a reader searching the statute for the phrase will not find it. [verified]
 
   Twelve of the fourteen sit within 0.12 mills of the floor and eleven within 0.05, which is
   more consistent with rounding inside the reduction-factor computation than with a different
@@ -115,22 +105,36 @@ description: |
   had been counting from. [verified]
 
   **What two tax years establish that one could not.** Of the 416 districts that began TY2023
-  above the floor, 301 saw their effective Class 1 rate fall by TY2024; of the 193 that began at
-  it, 7 did. 97.7% of every effective-rate reduction in Ohio happens above the floor. [verified
-  — computed in `crates/bundle` from TY2023 and TY2024 Table SD-1]
+  above the floor, 301 saw their effective Class 1 rate fall by TY2024; of the 193 that began
+  at it, 7 did. 97.7% of every effective-rate reduction in Ohio happens above the floor.
+  [verified — computed in `crates/bundle` from TY2023 and TY2024 Table SD-1]
 
   The split must be taken at the *start* of the interval. Classifying by the end year lets a
   district that fell *to* the floor be counted as a floor district with a falling rate, which
-  puts the outcome being measured inside the category doing the measuring; it moves the at-floor
-  fall rate from 3.6% to 20.5% and the headline from 97.7% to 88.3%. [verified]
+  puts the outcome being measured inside the category doing the measuring; it moves the
+  at-floor fall rate from 3.6% to 20.5% and the headline from 97.7% to 88.3%. [verified]
 
   **And a caution against the regime language above.** 54 districts sit above the floor by less
   than a twentieth of a mill, and 82 crossed 20.0000 in one direction or the other between the
   two tax years — 61 of those by under five hundredths of a mill. For roughly an eighth of the
   state the binary is settled in the fourth decimal place and is likely to read the other way
   next year. [verified] The regime switch is real and the boundary is sharp in the statute; the
-  *assignment* of districts to sides is not stable, and a simulation that treats floor status as
-  a fixed district attribute will be wrong about that eighth. [inference]
+  *assignment* of districts to sides is not stable, and a simulation that treats floor status
+  as a fixed district attribute will be wrong about that eighth. [inference]
+revisions:
+  - was: |
+      That the floor does not apply to emergency and substitute levies was briefly stated in
+      reverse, inferred from Table SD-1 alone: the data showed no effect in the group carrying
+      them, and that was read as the mechanism being absent.
+    now: |
+      R.C. 319.301(A)(1) settles it in the statute's own words — the reductions "do not apply
+      to ... taxes levied at whatever rate is required to produce a specified amount". The
+      absence of a measurable effect in one group is not the absence of the mechanism.
+    found_by: |
+      R.C. 319.301(A)(1), read directly rather than inferred from the published rates.
+    reach: |
+      The distributional findings above are unaffected; they were computed from published
+      effective rates rather than from this reading of which levies the factors reach.
 properties:
   name: Twenty-mill floor
   unit: mills

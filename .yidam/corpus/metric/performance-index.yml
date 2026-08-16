@@ -6,54 +6,54 @@ summary: >-
   counts an input; this one counts a result.
 description: |
   The corpus's first outcome measure. Every other metric here counts an input — what a district
-  was given, what it could raise, what it spent. This one counts a result: the distribution of a
-  district's tested students across Ohio's achievement levels, weighted so that higher levels
+  was given, what it could raise, what it spent. This one counts a result: the distribution of
+  a district's tested students across Ohio's achievement levels, weighted so that higher levels
   count for more, collapsed to a single continuous score. [verified]
 
   **Its arrival changes what the corpus can be asked.** [adequacy](../doctrine/adequacy.yml)
   records an open contest over "whether outcome measures or input measures should define the
-  requirement." Until now the corpus could only take the input side of that question, because it
-  held no outcome variable at all. The Performance Index is the outcome side, and it makes the
-  outcome formulation of adequacy testable rather than merely contested. [inference]
+  requirement." Until now the corpus could only take the input side of that question, because
+  it held no outcome variable at all. The Performance Index is the outcome side, and it makes
+  the outcome formulation of adequacy testable rather than merely contested. [inference]
 
   It does not make it *answered*. A score is not a requirement. Adequacy in the outcome
   formulation needs a threshold — a level of measured achievement the state declares sufficient
-  — and Ohio publishes an index, not a floor. The Index tells you where a district sits; it does
-  not tell you where it was supposed to be. [inference]
+  — and Ohio publishes an index, not a floor. The Index tells you where a district sits; it
+  does not tell you where it was supposed to be. [inference]
 
-  **Use the Index, not the star rating.** The overall rating groups many districts into the same
-  category and cannot distinguish among them; the Index is continuous and can be ranked,
+  **Use the Index, not the star rating.** The overall rating groups many districts into the
+  same category and cannot distinguish among them; the Index is continuous and can be ranked,
   correlated, and quintiled. Any Ohio claim about relative district performance that quotes
   stars is answering a coarser question than it appears to. [verified]
-
+findings: |
   ### The dominant fact about this measure is poverty
 
-  Across the 606 districts where both are
-  held, the Performance Index correlates with the economically disadvantaged share at
-  **−0.846**, which is 71.6% of the cross-district variance in the Index. [verified — computed;
-  see [`crates/dispersion/tests/report_card_2425.rs`](../../../crates/dispersion/tests/report_card_2425.rs)]
+  Across the 606 districts where both are held, the Performance Index correlates with the
+  economically disadvantaged share at **−0.846**, which is 71.6% of the cross-district variance
+  in the Index. [verified — computed; see
+  [`crates/dispersion/tests/report_card_2425.rs`](../../../crates/dispersion/tests/report_card_2425.rs)]
 
   Nothing else in this corpus comes close to that. It is the first thing to say about any
   district-level correlate of the Index, because almost every such correlate is partly this
-  variable wearing a different label — including
-  [OCG White Paper 013](../../catalog/ocg-white-paper-013.md)'s strongest reported finding, that
-  federal expenditure per pupil tracks the Index at −0.558. Holding disadvantage constant, that
-  −0.558 falls to **−0.158**. [verified] The paper hypothesised that its federal result was a
-  poverty signal and said it could not test the hypothesis directly. It can be tested directly,
-  it now has been, and the hypothesis is largely right: about seven-tenths of the association was
+  variable wearing a different label — including [OCG White Paper
+  013](../../catalog/ocg-white-paper-013.md)'s strongest reported finding, that federal
+  expenditure per pupil tracks the Index at −0.558. Holding disadvantage constant, that −0.558
+  falls to **−0.158**. [verified] The paper hypothesised that its federal result was a poverty
+  signal and said it could not test the hypothesis directly. It can be tested directly, it now
+  has been, and the hypothesis is largely right: about seven-tenths of the association was
   poverty.
 
   ### The measure of poverty matters as much as the fact of it
 
-  Ohio publishes two
-  economic-disadvantage shares and they are not the same variable. The report card's own
-  2024-25 share is top-coded by community eligibility — where a district qualifies for universal
-  free meals every student is counted disadvantaged — so 87 districts sit at exactly 100% against
-  37 on the [Cupp Report](../../catalog/cupp-district-profile-report.md)'s FY2024 measure. They
-  correlate with each other at only +0.823, and against this Index they give **−0.734** and
-  **−0.846**. [verified] The censored measure gives the weaker association, as censoring
-  predicts. The −0.846 above is the Cupp measure and is the better estimate; both are committed,
-  and neither substitutes for the other. See
+  Ohio publishes two economic-disadvantage shares and they are not the same variable. The
+  report card's own 2024-25 share is top-coded by community eligibility — where a district
+  qualifies for universal free meals every student is counted disadvantaged — so 87 districts
+  sit at exactly 100% against 37 on the [Cupp
+  Report](../../catalog/cupp-district-profile-report.md)'s FY2024 measure. They correlate with
+  each other at only +0.823, and against this Index they give **−0.734** and **−0.846**.
+  [verified] The censored measure gives the weaker association, as censoring predicts. The
+  −0.846 above is the Cupp measure and is the better estimate; both are committed, and neither
+  substitutes for the other. See
   [dew-report-card-district-details](../../catalog/dew-report-card-district-details.md).
 
   **The measured relationships, all computed rather than quoted** [verified]:
@@ -70,60 +70,59 @@ description: |
       Progress (value-added) effect size 2024-25       +0.375
 
   The equivalent-pupil row is the one that gets quoted, and what separates it from the
-  unweighted row above it is a denominator rather than a fact about Ohio. See
-  [expenditure per equivalent pupil](expenditure-per-equivalent-pupil.yml). The Progress row is
-  the other outcome measure, not a correlate of spending — see
+  unweighted row above it is a denominator rather than a fact about Ohio. See [expenditure per
+  equivalent pupil](expenditure-per-equivalent-pupil.yml). The Progress row is the other
+  outcome measure, not a correlate of spending — see
   [progress-value-added](progress-value-added.yml) for what it does to every sign here.
 
   **A distributional asymmetry to state before any of those coefficients.** Performance has a
   coefficient of variation of about 0.124; per-pupil spending, on either denominator, about
-  0.202. **Ohio districts differ from one another about 60% more in what they spend than in what
-  they score.** [verified] A near-zero coefficient between a wide distribution and a narrow one
-  is a weaker statement than it sounds.
+  0.202. **Ohio districts differ from one another about 60% more in what they spend than in
+  what they score.** [verified] A near-zero coefficient between a wide distribution and a
+  narrow one is a weaker statement than it sounds.
 
   ### It barely moves, and that cuts both ways
 
-  Three school years are held. Adjacent years
-  correlate at **+0.988** and **+0.989**, 2022-23 against 2024-25 at **+0.981**, and the median
-  district's three-year range is **2.1 points** against a cross-district standard deviation of
-  10.9. [verified] So a single-year cross-section is a fair stand-in for a district's Index, and
-  the "single year, single measure" limitation is weaker than it looks. But a measure this static
-  cannot detect anything that changes annually — including what a district spends. Over this
-  window the Index is closer to a fixed district attribute than to an annual result. [inference]
+  Three school years are held. Adjacent years correlate at **+0.988** and **+0.989**, 2022-23
+  against 2024-25 at **+0.981**, and the median district's three-year range is **2.1 points**
+  against a cross-district standard deviation of 10.9. [verified] So a single-year
+  cross-section is a fair stand-in for a district's Index, and the "single year, single
+  measure" limitation is weaker than it looks. But a measure this static cannot detect anything
+  that changes annually — including what a district spends. Over this window the Index is
+  closer to a fixed district attribute than to an annual result. [inference]
 
   ### Lagging the spending does not help, and the direction is the point
 
-  FY2024 per-pupil
-  spending covers the 2023-24 school year. Against the Index for the year before it, the same
-  year, and the year after: [verified]
+  FY2024 per-pupil spending covers the 2023-24 school year. Against the Index for the year
+  before it, the same year, and the year after: [verified]
 
       spending one year AFTER the outcome    -0.426
       spending contemporaneous               -0.412
       spending one year BEFORE the outcome   -0.388
 
-  The backwards lag is the strongest of the three. A causal reading needs the opposite ordering,
-  and this is the remedy [OCG White Paper 013](../../catalog/ocg-white-paper-013.md) proposed for
-  itself — "test lagged and cumulative spending measures rather than same-year expenditure." It
-  does not rescue the analysis; it closes it off. Nothing propagates forward here. [inference]
+  The backwards lag is the strongest of the three. A causal reading needs the opposite
+  ordering, and this is the remedy [OCG White Paper 013](../../catalog/ocg-white-paper-013.md)
+  proposed for itself — "test lagged and cumulative spending measures rather than same-year
+  expenditure." It does not rescue the analysis; it closes it off. Nothing propagates forward
+  here. [inference]
 
   ### A second outcome measure sits beside this one, disagreeing
 
-  Against
-  [Progress (value-added)](progress-value-added.yml), the same spending variable carries the
-  opposite sign. In a need-adjusted model controlling for economic disadvantage, English-learner
-  and disability shares, log enrollment, and valuation per pupil, the standardised spending
-  coefficient is **−0.073** here (t = −2.84) and **+0.209** on growth (t = +4.60). [verified]
-  The negative association recorded on this metric is a property of measuring level. It does not
-  survive the switch to a measure of gain, and neither metric should be quoted on outcomes
-  without the other.
+  Against [Progress (value-added)](progress-value-added.yml), the same spending variable
+  carries the opposite sign. In a need-adjusted model controlling for economic disadvantage,
+  English-learner and disability shares, log enrollment, and valuation per pupil, the
+  standardised spending coefficient is **−0.073** here (t = −2.84) and **+0.209** on growth (t
+  = +4.60). [verified] The negative association recorded on this metric is a property of
+  measuring level. It does not survive the switch to a measure of gain, and neither metric
+  should be quoted on outcomes without the other.
 
   That model also explains most of this metric and little of the other: R² 0.752 against 0.227,
   with economic disadvantage carrying a standardised −0.659 here. **Three-quarters of what this
   measure records is demographics.** [verified]
 
   **The average student's district scores below the average district.** Unweighted mean 87.7;
-  weighted by enrollment, 85.1. [verified] Ohio's larger districts score lower, which is why the
-  district-weighted and student-weighted views of every relationship here diverge, and why
+  weighted by enrollment, 85.1. [verified] Ohio's larger districts score lower, which is why
+  the district-weighted and student-weighted views of every relationship here diverge, and why
   neither can be quoted alone.
 properties:
   name: Performance Index

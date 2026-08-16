@@ -5,14 +5,13 @@ summary: >-
   per agency and disbursed across the year. Its defining characteristic mirrors the property
   tax's: inflation-indifferent by design, and wholly dependent on a biennial appropriation.
 description: |
-  The money the state pays education agencies through the funding formula — whatever formula
-  is in force — computed per agency and disbursed across the fiscal year in periodic payments.
-  [verified] It is the stream every `funding-regime` node in this corpus is a method for
-  distributing.
+  The money the state pays education agencies through the funding formula — whatever formula is
+  in force — computed per agency and disbursed across the fiscal year in periodic payments.
+  [verified] Every funding regime Ohio has run is a method for distributing it.
 
-  Its defining characteristic is the mirror image of the local property tax's. Local revenue
-  is voter-controlled and inflation-frozen; foundation aid is inflation-indifferent by design
-  but entirely dependent on a biennial appropriation. [inference] A district cannot vote itself
+  Its defining characteristic is the mirror image of the local property tax's. Local revenue is
+  voter-controlled and inflation-frozen; foundation aid is inflation-indifferent by design but
+  entirely dependent on a biennial appropriation. [inference] A district cannot vote itself
   more foundation aid, and no enactment can guarantee it against the next General Assembly's
   budget. The [phase-in percentage](../parameter/fsfp-phase-in-percentage.yml) is where that
   dependence becomes visible: the formula computes an amount, and the appropriation decides
@@ -24,64 +23,73 @@ description: |
   that a uniform cut to foundation aid is not uniform in effect: it falls hardest on the
   districts for whom it is the largest revenue share. [inference]
 
+  **The formula's line changed its number.** It is `200501 Base Cost Funding` through FY2005
+  and `200550 Foundation Funding` from FY2008, retitled `Foundation Funding - All Students` at
+  FY2022. The renumbering happened inside FY2006-07 — the one biennium whose greenbook has no
+  line-item table — so the series can say the number changed and not in which act. [verified —
+  the appropriation series] Anything tracing `200550` backwards stops at FY2008 and should not
+  conclude the formula did.
+findings: |
   **The appropriation behind it grew, and so did the department around it.** Across FY2014 to
-  FY2026 the appropriation line that carries the formula — ALI 200550, Foundation Funding — rose
-  45.6% in cash and 3.9% against CPI-U, while the Department of Education's whole enacted
+  FY2026 the appropriation line that carries the formula — ALI 200550, Foundation Funding —
+  rose 45.6% in cash and 3.9% against CPI-U, while the Department of Education's whole enacted
   appropriation rose 50.6% in cash and 7.5% in constant dollars. [verified — the appropriation
   series, `lsc-appropriation-spreadsheet`] So the formula's line grew in real terms and grew
   *less* than the budget around it.
 
-  This paragraph said the opposite for two commits, and the reason is worth keeping: the list of
-  tax reimbursement line items to exclude was written from the current biennium's greenbook, where
-  the class has two members, and applied to a window whose other end had five. The FY2014 total
-  carried $1.65 billion the FY2026 total did not, and the department appeared to shrink by 7.9%.
-  A rule read off one end of a series and applied to all of it. [verified]
-
   That is a statement about appropriations rather than payments, and the two are different
-  claims: an appropriation is a ceiling the General Assembly sets, and at least one line in this
-  chapter prorates because it is a residual claimant. What a district actually received is the
-  department's own report. [verified]
+  claims: an appropriation is a ceiling the General Assembly sets, and at least one line in
+  this chapter prorates because it is a residual claimant. What a district actually received is
+  the department's own report. [verified]
 
-  **The growth is concentrated and the line count is not.** Of the 61 lines appropriated in both
-  FY2014 and FY2026, the gains outweigh the losses by roughly $1.08 billion against $0.55 billion
-  in FY2026 dollars — and the department went from **109 appropriation lines to 79** across the
-  same window, with 48 disappearing and 18 appearing. Fewer lines carrying more money, in real
-  terms, most of it in the two Foundation Funding items. [verified — the appropriation series]
+  **The growth is concentrated and the line count is not.** Of the 61 lines appropriated in
+  both FY2014 and FY2026, the gains outweigh the losses by roughly $1.08 billion against $0.55
+  billion in FY2026 dollars — and the department went from **109 appropriation lines to 79**
+  across the same window, with 48 disappearing and 18 appearing. Fewer lines carrying more
+  money, in real terms, most of it in the two Foundation Funding items. [verified — the
+  appropriation series]
 
   Whether the disappearances are abolition or consolidation this series cannot say, and the
-  distinction is the whole meaning of them. A line ceasing to be listed may have been folded into
-  another, and the two largest real gains in the window are the two Foundation Funding lines —
-  which is exactly what consolidation into the formula would look like. Settling it needs the
-  acts' own language rather than their appropriation tables. [open] The disappearances are at
-  least localized: 11 lines last appear in FY2015, 11 in FY2017, 12 in FY2019, 7 in FY2021, 4 in
-  FY2023 and 6 in FY2025, so each cluster belongs to a nameable act. [verified — the appropriation
-  series]
+  distinction is the whole meaning of them. A line ceasing to be listed may have been folded
+  into another, and the two largest real gains in the window are the two Foundation Funding
+  lines — which is exactly what consolidation into the formula would look like. Settling it
+  needs the acts' own language rather than their appropriation tables. [open] The
+  disappearances are at least localized: 11 lines last appear in FY2015, 11 in FY2017, 12 in
+  FY2019, 7 in FY2021, 4 in FY2023 and 6 in FY2025, so each cluster belongs to a nameable act.
+  [verified — the appropriation series]
 
   ### The same question about districts, answered — and instructive about this one
 
-  Ohio's *districts* also disappear, and the federal register of them files every
-  departure as a closure "with no effect on another agency's boundaries" — including the three
-  that demonstrably transferred all their territory to a neighbour. What settled those was not the
-  register and not any derivation from it, but a single sentence in a state officer's audit of the
-  *receiving* district, naming the resolution and its date. [verified —
-  [the audit reports](../../catalog/auditor-district-audits.md)]
+  Ohio's *districts* also disappear, and the federal register of them files every departure as
+  a closure "with no effect on another agency's boundaries" — including the three that
+  demonstrably transferred all their territory to a neighbour. What settled those was not the
+  register and not any derivation from it, but a single sentence in a state officer's audit of
+  the *receiving* district, naming the resolution and its date. [verified — [the audit
+  reports](../../catalog/auditor-district-audits.md)]
 
-  The parallel is exact and so is the lesson: the series that counts the things cannot say why one
-  stopped, and the document that can say why is filed by whoever received what was left. For these
-  appropriation lines that would mean the act that created the surviving line, rather than the
-  table the vanished one drops out of. [inference]
+  The parallel is exact and so is the lesson: the series that counts the things cannot say why
+  one stopped, and the document that can say why is filed by whoever received what was left.
+  For these appropriation lines that would mean the act that created the surviving line, rather
+  than the table the vanished one drops out of. [inference]
 
-  One thing the composition does say plainly: the largest real-terms falls among surviving lines
-  are federal pass-throughs — Title I, IDEA, Improving Teacher Quality, the child nutrition
-  programmes. That is a federal story arriving in a state budget document, not a decision of the
-  General Assembly's. [verified — the appropriation series]
-
-  **The formula's line changed its number.** It is `200501 Base Cost Funding` through FY2005 and
-  `200550 Foundation Funding` from FY2008, retitled `Foundation Funding - All Students` at FY2022.
-  The renumbering happened inside FY2006-07 — the one biennium whose greenbook has no line-item
-  table — so the series can say the number changed and not in which act. [verified — the
-  appropriation series] Anything tracing `200550` backwards stops at FY2008 and should not
-  conclude the formula did.
+  One thing the composition does say plainly: the largest real-terms falls among surviving
+  lines are federal pass-throughs — Title I, IDEA, Improving Teacher Quality, the child
+  nutrition programmes. That is a federal story arriving in a state budget document, not a
+  decision of the General Assembly's. [verified — the appropriation series]
+revisions:
+  - was: |
+      The department's appropriation was reported as having shrunk by 7.9% across the window.
+    now: |
+      It grew. The list of tax-reimbursement line items to exclude was written from the current
+      biennium's greenbook, where the class has two members, and applied to a window whose
+      other end had five — so the FY2014 total carried $1.65 billion the FY2026 total did not.
+    found_by: |
+      Reading the exclusion list against both ends of the series rather than against the near
+      end alone.
+    reach: |
+      A rule read off one end of a series and applied to all of it. The composition findings
+      are unaffected — those are per-line and never went through the aggregate the rule
+      distorted.
 properties:
   name: State foundation aid
   level: state
