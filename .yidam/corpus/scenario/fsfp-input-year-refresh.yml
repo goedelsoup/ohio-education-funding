@@ -12,6 +12,40 @@ description: |
   inputs [H.B. 96](../legislation/hb-96-2025.yml) carried forward, at the same phase-in
   percentage?
 
+  ### What this run is still not
+
+  It perturbs one salary of ten; administrator, counselor, librarian, and clerical salaries
+  have all risen too and are held fixed, so the computed increase remains a **lower bound**.
+  And FY2027 has not happened — the department's model is a projection, so enrollment,
+  valuation, and income are forecast rather than observed. [open]
+
+  The perturbation is now concrete. Base cost is built by applying statutory staffing ratios to
+  enrollment and pricing each funded position at a **statewide average salary for a reference
+  year**, times 1.16 for benefits, plus average employer-paid insurance. [verified] Changing
+  the reference year changes exactly those price terms and nothing else — the ratios, the
+  minimums, and the ADM definitions are untouched. That makes this a clean single-parameter
+  perturbation rather than a re-specification of the model.
+
+  There is also a measured precedent to calibrate against: [H.B.
+  33](../legislation/hb-33-2023.yml) refreshed the reference year from FY2018 to FY2022, and
+  the statewide average base cost moved from roughly $7,352 in FY2023 to roughly $8,240 in
+  FY2025 — about 12%, of which the phase-in advance accounts for none, since phase-in scales
+  the appropriation rather than the computed cost. [inference] A refresh of comparable
+  magnitude is the natural first perturbation to test.
+
+  **Predicted shape, stated in advance so the run can contradict it.** Freezing the reference
+  year should bite hardest where salaries have risen fastest since FY2022, and the effect
+  should be larger in state-share terms for districts with high state share — because state aid
+  is the residual after local capacity, a reduction in computed base cost falls
+  disproportionately on the state's portion. [inference] That would make a freeze regressive
+  across the wealth distribution despite being uniform in method.
+
+  Two effects will partly offset it and must be reported separately rather than netted:
+  districts at the **10% minimum state share** are insulated at the bottom of the state-share
+  scale [verified], and districts held on a **guarantee** are off-formula entirely and see no
+  effect at all. [inference] If the run does not show the predicted shape, the reasoning above
+  is wrong.
+findings: |
   **THE ANSWER, on the department's own published worked example district** (20,342.13 base
   cost enrolled ADM, 43 buildings), perturbing the classroom teacher salary from the FY2022
   reference of $67,654 to an FY2024 refresh of $73,777.08 — a 9.1% rise:
@@ -31,25 +65,21 @@ description: |
 
   ### The incidence result is sharper than predicted
 
-  This node predicted, before the run, that
-  freezing would fall "disproportionately on the state's portion" and be regressive. It is not
-  disproportionate — it is binary:
-
       local capacity/pupil     share of the increase the district receives
       $500 - $7,000            100%
       $12,000 (at 5% floor)      5%
 
   Because state aid is the residual after local capacity, a district on formula receives the
-  **entire** base cost increase, whatever its wealth. A district whose capacity has pushed it to
-  the 5% minimum state share receives 5% of it. There is no gradient between the two — the
+  **entire** base cost increase, whatever its wealth. A district whose capacity has pushed it
+  to the 10% minimum state share receives 10% of it. There is no gradient between the two — the
   transition is the floor itself. [verified]
 
   So refreshing the input year is progressive and freezing it is regressive, and the mechanism
-  is not that poorer districts gain proportionally more but that wealthier districts are cut out
-  almost entirely by the floor. Given that
-  [170 of 606 districts sit at the 20-mill floor](../parameter/twenty-mill-floor.yml) — a
-  different floor, but correlated with wealth — the share of districts insulated from an input
-  refresh is a first-order question this run does not yet answer. [open]
+  is not that poorer districts gain proportionally more but that wealthier districts are cut
+  out almost entirely by the floor. Given that [170 of 606 districts sit at the 20-mill
+  floor](../parameter/twenty-mill-floor.yml) — a different floor, but correlated with wealth —
+  the share of districts insulated from an input refresh is a first-order question this run
+  does not yet answer. [open]
 
   ### Statewide, all 606 districts
 
@@ -63,51 +93,38 @@ description: |
       ADM-weighted average                    $344.75 per pupil
       per-pupil range                         $338.62  to  $471.10
 
-  The single-district extrapolation above gave $528 million; the real distribution gives
-  $496.3 million. The gap is mostly denominators — the worked example's grade mix is slightly
-  richer than the state's, and FY2024 ADM is lower than the FY2022 base cost ADM used to scale.
-  The two agree to within about 6%, which is the useful check on the extrapolation.
+  The single-district extrapolation above gave $528 million; the real distribution gives $496.3
+  million. The gap is mostly denominators — the worked example's grade mix is slightly richer
+  than the state's, and FY2024 ADM is lower than the FY2022 base cost ADM used to scale. The
+  two agree to within about 6%, which is the useful check on the extrapolation.
 
   ### The spread has a single cause, and it is the staffing minimum
 
-  The most-affected district
-  gains 1.4 times per pupil what the least-affected does — $471.10 against $338.62 — with no
-  policy choice involved. **155 of 604 districts** are small enough that the six-teacher special
-  teacher minimum binds, and their mean per-pupil gain is $368.44 against $343.53 for everyone
-  else. [verified]
+  The most-affected district gains 1.4 times per pupil what the least-affected does — $471.10
+  against $338.62 — with no policy choice involved. **155 of 604 districts** are small enough
+  that the six-teacher special teacher minimum binds, and their mean per-pupil gain is $368.44
+  against $343.53 for everyone else. [verified]
 
   ### The spread, revised
 
-  This corpus reported a 1.7× spread with a
-  maximum of $580.82 through four phases. That maximum belonged to Vanlue Local, and it was
-  wrong because its input was: the grade-band fixture was produced through headless LibreOffice
-  by a pipeline that summed the department's withheld `<10` grade counts **as zero**. Vanlue has
-  four withheld grades, so its headcount total was understated by up to 36 in a district of 150,
-  and the `ADM / headcount` scale factor that drives its funded teacher count was inflated by
-  nearly a third.
-
-  Reading the pre-2007 file natively — see
-  [`crates/spreadsheet`](../../../crates/spreadsheet/) — reproduced 604 of the 606 rows byte for
-  byte and left the two suppressed districts' bands blank, which is what a band containing a
-  withheld grade actually is: unknown, not smaller. Both are now outside this panel, so the
-  denominator is 604.
+  Reading the pre-2007 file natively — see [`crates/spreadsheet`](../../../crates/spreadsheet/)
+  — reproduced 604 of the 606 rows byte for byte and left the two suppressed districts' bands
+  blank, which is what a band containing a withheld grade actually is: unknown, not smaller.
+  Both are now outside this panel, so the denominator is 604.
 
   The spread is real and structural. It was overstated, and the overstatement came from the one
   convention this corpus had already written down and the pipeline predated. [verified]
 
   This is the same structural feature that makes small districts expensive per pupil in the
-  first place, now visible as an incidence result: a minimum that funds more positions per pupil
-  also pays out more per pupil when the price of a position rises. [inference] So a refresh is
-  progressive twice over — once through the state share residual, and again through the
-  small-district minimums — and a freeze is regressive on both.
+  first place, now visible as an incidence result: a minimum that funds more positions per
+  pupil also pays out more per pupil when the price of a position rises. [inference] So a
+  refresh is progressive twice over — once through the state share residual, and again through
+  the small-district minimums — and a freeze is regressive on both.
 
   ### The guarantee halves it
 
   [verified — the department's own FY27 model; see
   [`crates/foundation/tests/department_model_fy27.rs`](../../../crates/foundation/tests/department_model_fy27.rs)]
-
-  This node previously named the guarantee population as its largest unquantified caveat. It is
-  now quantified, and it is the most consequential correction the scenario has taken:
 
       districts on the guarantee in FY2027   294 of 609   (48.3%)
       their share of ADM                     54.1%
@@ -117,37 +134,24 @@ description: |
 
   A district below its guarantee floor receives the guarantee, not the formula amount. When the
   formula amount rises, the top-up shrinks by exactly the same sum and total funding does not
-  move. So **242 districts — two in five, holding 41.8% of Ohio's students — would gain
-  nothing at all** from a reference-year refresh. Fifty-two guaranteed districts would be lifted
-  off; the median guaranteed district is held more than three times above what a refresh would
-  give it, so the guarantee is not a marginal buffer but the operative funding mechanism for
-  those districts. [verified]
+  move. So **242 districts — two in five, holding 41.8% of Ohio's students — would gain nothing
+  at all** from a reference-year refresh. Fifty-two guaranteed districts would be lifted off;
+  the median guaranteed district is held more than three times above what a refresh would give
+  it, so the guarantee is not a marginal buffer but the operative funding mechanism for those
+  districts. [verified]
 
   This does not overturn the incidence findings above — districts on formula do receive 100%,
   and the small-district minimums do concentrate the gain — but it shrinks the population those
-  findings describe to roughly half the state. Any statement that a refresh is worth
-  half a billion dollars to Ohio districts is wrong by a factor of two.
+  findings describe to roughly half the state. Any statement that a refresh is worth half a
+  billion dollars to Ohio districts is wrong by a factor of two.
 
   It also reframes the phase-in. In the terminal year of a plan designed to fund every district
-  at its computed cost, nearly half of districts are funded by a hold-harmless from the previous
-  regime instead. [inference]
+  at its computed cost, nearly half of districts are funded by a hold-harmless from the
+  previous regime instead. [inference]
 
   ### Inputs verified
 
-  The FY2022 reference-year classroom teacher salary is **$68,022.22**,
-  the department's own [s5d] value, replacing the $67,654 from secondary reporting this node
-  previously carried. The revised figures above use it, which is part of why the computed
-  increase fell from $496.3M to $465.0M — the rest is the department's own funded-teacher counts
-  replacing the corpus's reconstruction of them.
-
   ### The state share floor is not a small correction, and the $242.1m above does not apply it
-
-  This node has recorded, through several phases, that the run "does not apply the 5% state share
-  floor at district level, so among the non-guaranteed districts the wealthiest would receive
-  less than the full increase." That item is now measured by
-  [`scenario-delta`](../../skills/scenario-delta.md), and the omission is larger than the
-  wording implied. Applying the floor **and** the guarantee, at district level, to a uniform
-  increase of the same statewide size:
 
       computed base cost increase        465.0
         less the ADM denominators         -7.6   base cost averages three years;
@@ -160,60 +164,19 @@ description: |
   [`crates/scenario-delta/tests/who_a_change_reaches.rs`](../../../crates/scenario-delta/tests/who_a_change_reaches.rs)]
 
   So the deliverable share is **42.4%, not 52.1%**, and a third mechanism was missing from the
-  accounting entirely: base cost is computed on a three-year average ADM while the state share is
-  paid on the current year, which costs a shrinking state a further $7.6M. The two figures are
-  not strictly comparable — the run above perturbs one salary per district and this one applies a
-  uniform scale of the same statewide magnitude — so treat 42.4% as the corrected order of
-  magnitude rather than as a replacement to four significant figures. [inference for the
-  comparison; verified for each decomposition term]
+  accounting entirely: base cost is computed on a three-year average ADM while the state share
+  is paid on the current year, which costs a shrinking state a further $7.6M. The two figures
+  are not strictly comparable — the run above perturbs one salary per district and this one
+  applies a uniform scale of the same statewide magnitude — so treat 42.4% as the corrected
+  order of magnitude rather than as a replacement to four significant figures. [inference for
+  the comparison; verified for each decomposition term]
 
   ### What actually cuts wealthy districts out
 
-  This node credits the
-  floor for cutting wealthy districts out: "wealthier districts are cut out almost entirely by
-  the floor." The guarantee does more of that work. Across valuation quintiles the count held on
-  the guarantee runs 10, 31, 39, 88, 88 — and in the wealthiest quintile 90 districts are
-  guaranteed, 95 are at the floor, and **73 are both**, so the two cannot be summed as
-  independent mechanisms. In the poorest quintile **no district is at the floor at all**, so
-  there the floor explains nothing whatever. [verified]
-
-  The direction of the finding is unchanged and its magnitude is sharper than stated: per pupil,
-  the increase pays $305.63 to the poorest quintile and $20.81 to the wealthiest, a ratio of
-  about fifteen to one. A refresh is progressive; the reason is mostly that wealthy districts are
-  on the guarantee. [verified]
-
-  ### What this run is still not
-
-  It perturbs one salary of ten; administrator, counselor,
-  librarian, and clerical salaries have all risen too and are held fixed, so the computed
-  increase remains a **lower bound**. And FY2027 has not happened — the department's model is a
-  projection, so enrollment, valuation, and income are forecast rather than observed. [open]
-
-  The perturbation is now concrete. Base cost is built by applying statutory staffing ratios to
-  enrollment and pricing each funded position at a **statewide average salary for a reference
-  year**, times 1.16 for benefits, plus average employer-paid insurance. [verified] Changing
-  the reference year changes exactly those price terms and nothing else — the ratios, the
-  minimums, and the ADM definitions are untouched. That makes this a clean single-parameter
-  perturbation rather than a re-specification of the model.
-
-  There is also a measured precedent to calibrate against: [H.B. 33](../legislation/hb-33-2023.yml)
-  refreshed the reference year from FY2018 to FY2022, and the statewide average base cost moved
-  from roughly $7,352 in FY2023 to roughly $8,240 in FY2025 — about 12%, of which the phase-in
-  advance accounts for none, since phase-in scales the appropriation rather than the computed
-  cost. [inference] A refresh of comparable magnitude is the natural first perturbation to test.
-
-  **Predicted shape, stated in advance so the run can contradict it.** Freezing the reference
-  year should bite hardest where salaries have risen fastest since FY2022, and the effect should
-  be larger in state-share terms for districts with high state share — because state aid is the
-  residual after local capacity, a reduction in computed base cost falls disproportionately on
-  the state's portion. [inference] That would make a freeze regressive across the wealth
-  distribution despite being uniform in method.
-
-  Two effects will partly offset it and must be reported separately rather than netted:
-  districts at the **5% minimum state share** are insulated at the bottom of the state-share
-  scale [verified], and districts held on a **guarantee** are off-formula entirely and see no
-  effect at all. [inference] If the run does not show the predicted shape, the reasoning above
-  is wrong and this node should say so.
+  The direction of the finding is unchanged and its magnitude is sharper than stated: per
+  pupil, the increase pays $305.63 to the poorest quintile and $20.81 to the wealthiest, a
+  ratio of about fifteen to one. A refresh is progressive; the reason is mostly that wealthy
+  districts are on the guarantee. [verified]
 revisions:
   - was: |
       A 1.7x spread with a maximum of $580.82 per pupil, reported through four phases.
