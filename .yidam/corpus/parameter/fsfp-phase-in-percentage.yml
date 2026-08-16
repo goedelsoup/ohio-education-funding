@@ -9,7 +9,7 @@ description: |
   appropriated. The plan was designed to reach full funding over six years, and each biennial
   budget since 2021 has set the percentage for its two fiscal years. [verified]
 
-  The full enacted series is now known and it is close to equal sixths, but not exactly:
+  The full enacted series is close to equal sixths, but not exactly:
   16.67, 33.33, 50, 66.67, 83.33, 100 across FY2022 through FY2027. [verified for FY2022 from
   the department's own payment report; inference from secondary reporting for FY2026-27]
 
@@ -25,8 +25,7 @@ description: |
 
   **Reaching 100% does not mean reaching the plan.** H.B. 96 takes the phase-in to 100% in
   FY2027 while holding the cost inputs at FY2022 levels. [inference] The percentage and the
-  input reference year are separate dials, and only one of them is usually named — which is
-  exactly why this corpus holds them as separate nodes. See
+  input reference year are separate dials, and only one of them is usually named. See
   [`fsfp-base-cost-calculation`](../formula-component/fsfp-base-cost-calculation.yml).
 properties:
   name: FSFP phase-in percentage

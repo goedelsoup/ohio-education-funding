@@ -6,65 +6,75 @@ summary: >-
   category, and its state share. The weights span a factor of sixteen.
 description: |
   **$722m**, the second-largest categorical, and the plainest of the six: six categories of
-  disability, each carrying a statutory weight, each weight multiplying the statewide average base
-  cost per pupil and then the district's ADM in that category and its state share percentage.
-  [verified]
+  disability, each carrying a statutory weight, each weight multiplying the statewide average
+  base cost per pupil and then the district's ADM in that category and its state share
+  percentage. [verified]
 
   ### The weights are the policy, and they span a factor of sixteen
 
-  Category 1 is 0.2435 and
-  Category 6 is 3.9554. A Category 6 pupil generates nearly four times what a pupil with no
-  disability does; a Category 1 pupil about a quarter. Which category a child is assigned to is not
-  an administrative detail — it is most of the money. [verified]
-
-  ### The distribution runs against the weights, not with them
-
-  Statewide, **Category 6 is 15% of
-  the pupils and 48% of the money**; **Category 2 is 65% of the pupils and 34%**. Between them
-  those two are 82% of the program and they are opposite shapes — many pupils at a low weight
-  against few at a very high one. Category 4 is 1,060 pupils statewide and $5.7m. [verified]
-
-  That matters for any projection. A program dominated by a category that is 15% of its caseload is
-  sensitive to identification practice in a way a per-pupil program is not: a small change in how
-  many children are placed in Category 6 moves more money than a large change in Category 2.
-  [inference]
+  Category 1 is 0.2435 and Category 6 is 3.9554. A Category 6 pupil generates nearly four times
+  what a pupil with no disability does; a Category 1 pupil about a quarter. Which category a
+  child is assigned to is not an administrative detail — it is most of the money. [verified]
 
   ### The weights are on the general base cost, not their own
 
-  They multiply the statewide average
-  base cost per pupil, **$8,241.61** — the same multiplicand [English learner
-  weights](fsfp-english-learner-weights.yml) use, and **not** the one [career-technical
-  weights](fsfp-career-technical-weights.yml) use, which is 20% higher. Three weighted programs,
-  two multiplicands, and no published table says so. A reader comparing a special education weight
-  against a CTE weight as though they were on one scale is out by a fifth before any pupil is
-  counted. [verified]
+  They multiply the statewide average base cost per pupil, **$8,241.61** — the same
+  multiplicand [English learner weights](fsfp-english-learner-weights.yml) use, and **not** the
+  one [career-technical weights](fsfp-career-technical-weights.yml) use, which is 20% higher.
+  Three weighted programs, two multiplicands, and no published table says so. A reader
+  comparing a special education weight against a CTE weight as though they were on one scale is
+  out by a fifth before any pupil is counted. [verified]
 
-  ### The categories are named, and the weights match the law exactly
+  ### The categories are named in statute
 
-  This node held the weights
-  and their arithmetic and said the clinical definitions "are in rule rather than in the
-  calculator, and the corpus has not read them." They are in **statute**, not rule, and reading
-  them was one `curl` away: R.C. 3317.013 lists the six categories in the same order as the
-  multiples, cross-referencing Chapter 3323 for each term. Category 1 is a speech and language
-  disability; Category 2 gathers specific learning disability, developmental disability and
-  delay, other health impairment-minor, and preschool developmental delay; the higher categories
-  run through the multiple-disability and low-incidence conditions. The ordering the corpus
-  inferred from the money is the ordering the General Assembly wrote. [verified — `ohio-laws`]
+  R.C. 3317.013 lists the six categories in the same order as the multiples, cross-referencing
+  Chapter 3323 for each term. Category 1 is a speech and language disability; Category 2
+  gathers specific learning disability, developmental disability and delay, other health
+  impairment-minor, and preschool developmental delay; the higher categories run through the
+  multiple-disability and low-incidence conditions. [verified — `ohio-laws`]
+findings: |
+  ### The distribution runs against the weights, not with them
 
-  **And all six multiples match the statute to the last digit** — 0.2435, 0.6179, 1.4845, 1.9812,
-  2.6830, 3.9554. That is a genuinely new kind of check: every prior verification confirmed the
-  department agreed with *itself*, and a spreadsheet can be internally perfect and still not be
-  the law. [verified — `crates/project/tests/the_statute_behind_the_weights.rs`]
+  Statewide, **Category 6 is 15% of the pupils and 48% of the money**; **Category 2 is 65% of
+  the pupils and 34%**. Between them those two are 82% of the program and they are opposite
+  shapes — many pupils at a low weight against few at a very high one. Category 4 is 1,060
+  pupils statewide and $5.7m. [verified]
 
-  **Still open: whether the sixteen-fold range tracks a sixteen-fold difference in cost.** Naming
-  the categories settles what is being ordered and not what it costs, and no source the corpus
-  holds prices a category. [open]
+  That matters for any projection. A program dominated by a category that is 15% of its
+  caseload is sensitive to identification practice in a way a per-pupil program is not: a small
+  change in how many children are placed in Category 6 moves more money than a large change in
+  Category 2. [inference]
+
+  ### The multiples match the statute to the last digit
+
+  All six — 0.2435, 0.6179, 1.4845, 1.9812, 2.6830, 3.9554. That is a genuinely new kind of
+  check: every prior verification confirmed the department agreed with *itself*, and a
+  spreadsheet can be internally perfect and still not be the law. [verified —
+  `crates/project/tests/the_statute_behind_the_weights.rs`]
+
+  **Still open: whether the sixteen-fold range tracks a sixteen-fold difference in cost.**
+  Naming the categories settles what is being ordered and not what it costs, and no source the
+  corpus holds prices a category. [open]
 
   Nor is the relationship to the federal IDEA Part B allocation established. Ohio receives a
   federal grant for the same children and the corpus holds the allocations
   ([catalog](../../catalog/ode-idea-part-b-allocations.md)) without having joined them to this.
   A district's special education funding is the sum of both, and this component is one of them.
   [open]
+revisions:
+  - was: |
+      The clinical definitions of the six disability categories were recorded as being "in rule
+      rather than in the calculator", and unread.
+    now: |
+      They are in **statute**. R.C. 3317.013 names all six in the same order as the multiples,
+      cross-referencing Chapter 3323 for each term.
+    found_by: |
+      R.C. 3317.013, read via `ohio-laws`.
+    reach: |
+      The ordering inferred from the money is the ordering the General Assembly wrote, so no
+      figure moves. What changes is that the categories are named rather than ranked — which is
+      what any claim about who sits in Category 6 needs, and Category 6 is 15% of the pupils
+      and 48% of the money.
 properties:
   name: Special education weights
   function: |

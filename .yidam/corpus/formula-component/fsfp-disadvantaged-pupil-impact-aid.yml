@@ -45,59 +45,30 @@ findings: |
   eligibility is now half-answered: after 2011 free-lunch eligibility stops being a single measure
   at all, so any series joining this to the present is joining two definitions. Which one the
   department uses today is not established here. [open]
-label: FSFP Disadvantaged Pupil Impact Aid
-summary: >-
-  $525 million, and the only categorical whose mechanism is neither a weight times a count nor
-  an equalisation off wealth. It blends two poverty counts, indexes the blend against the
-  state's, and squares it.
-description: |
-  **$525m**, and the only one of the six whose mechanism is neither a weight times a count nor an
-  equalisation off wealth. DPIA blends two poverty counts, expresses the blend as a share of
-  enrolment, indexes that share against the state's — and **squares it**. [verified]
 
-  ### The squaring is the whole character of the program, and no DPIA total shows it
+  The squaring holds for all 609 districts and in both directions: away from an index of one,
+  the plain ratio and the published figure diverge. [verified]
 
-  Aid
-  scales with the **square** of relative poverty, so a district at twice the state's rate scores
-  four times the index rather than twice. $525m distributed on a convex curve concentrates far more
-  sharply than a per-pupil rate would, and the convexity is a policy choice as substantial as the
-  amount. Verified for all 609 districts, in both directions: away from an index of one, the plain
-  ratio and the published figure diverge. [verified]
+  Almost. **Three districts have more directly certified children than economically
+  disadvantaged ones** — Beachwood 1.03x, Nordonia Hills 1.54x, Ottawa Hills 2.35x on 32.9
+  disadvantaged pupils. All three have poverty shares of 0.03 to 0.18 against a statewide
+  median of 0.49. Small counts, where two differently-built measures can invert. Recorded
+  because the corpus briefly asserted the blend could not exceed its larger input, which is
+  false, and because either count is a tempting poverty proxy elsewhere. [verified]
 
-  ### The two poverty counts are not nested
-
-  `d1` is 65% of the FY2025 economically disadvantaged
-  ADM plus 35% of the FY2026 directly certified ADM. The second is administrative — a child is
-  directly certified through participation in another benefit program — and it finds a **median
-  61%** of what the disadvantaged count does, **fewer than half in 146 districts**. Putting 35% of
-  the weight on the smaller measure lowers the funded count almost everywhere. [verified]
-
-  Almost. **Three districts have more directly certified children than economically disadvantaged
-  ones** — Beachwood 1.03x, Nordonia Hills 1.54x, Ottawa Hills 2.35x on 32.9 disadvantaged pupils.
-  All three have poverty shares of 0.03 to 0.18 against a statewide median of 0.49. Small counts,
-  where two differently-built measures can invert. Recorded because the corpus briefly asserted the
-  blend could not exceed its larger input, which is false, and because either count is a tempting
-  poverty proxy elsewhere. [verified]
-
-  ### The weighted ADM is capped at the district's own enrolled ADM
+  ### Where the cap binds, and why
 
   Edgerton Local's published blend is 342.38 against 352.03 computed from the stated 65/35
-  weights. This node called it "the size of a data correction rather than a mechanism". It is a
-  mechanism: **the weighted ADM is capped at the district's own enrolled ADM.** Edgerton's enrolled
-  ADM is 342.3818, and the published figure is that number rounded to the two decimals the column
-  carries. The blend would have given it more disadvantaged pupils than pupils.
+  weights. Its enrolled ADM is 342.3818, and the published figure is that number rounded to the
+  two decimals the column carries.
 
-  Three independent selections over the panel return the same single district, which is what makes
-  this an identification rather than a coincidence: the only district whose blend exceeds its
-  enrolment, the only one whose weighted ADM equals its enrolment, and the only one at a
+  Three independent selections over the panel return the same single district, which is what
+  makes this an identification rather than a coincidence: the only district whose blend exceeds
+  its enrolment, the only one whose weighted ADM equals its enrolment, and the only one at a
   disadvantaged percentage of ~100%. [verified —
   `crates/project/tests/questions_the_corpus_left_open.rs`]
 
   ### The cause: a prior-year count against a collapsed enrolment
-
-  This node
-  said Edgerton's count "is on a different basis than enrolment or it is wrong". It is on a
-  different basis, the act names which, and nothing is wrong with it.
 
   The blend's first term is the **FY2025** count. Edgerton's enrolment fell from **504.48 in
   FY2025 to 342.38 in FY2026** — a third of the district in one year. Its count of 497.21 is
@@ -112,43 +83,74 @@ description: |
       Clearview Local            0.9857        0.9042          1.0901
 
   All three sit at 98.6% against the year the act measures in. What separates them is entirely
-  how much they shrank. A ratio that is identical in three unrelated districts is not a data error
-  in any of them — the dispersion is in the denominator. [verified —
+  how much they shrank. A ratio that is identical in three unrelated districts is not a data
+  error in any of them — the dispersion is in the denominator. [verified —
   `crates/project/tests/what_the_act_says_and_the_code_does_not.rs`]
 
   ### What the statewide share is
 
-  `d3` divides by 0.533380310606710 — the statewide economically
-  disadvantaged percentage. R.C. 3317.02(I)(1)(a)(i) defines it as a **computation, not a
-  constant**: the statewide ADM it divides by is the sum of enrolled ADM for all city, local and
-  exempted village districts, statewide community school enrolment, and statewide STEM school
-  enrolment. So it is recomputed rather than carried forward, and its value moves when any of
-  those three move. [verified — `ohio-laws`] How far it has moved between biennia is still
-  unrecorded here, because the corpus holds one year of the calculator. [open]
+  `d3` divides by 0.533380310606710 — the statewide economically disadvantaged percentage. R.C.
+  3317.02(I)(1)(a)(i) defines it as a **computation, not a constant**: the statewide ADM it
+  divides by is the sum of enrolled ADM for all city, local and exempted village districts,
+  statewide community school enrolment, and statewide STEM school enrolment. So it is
+  recomputed rather than carried forward, and its value moves when any of those three move.
+  [verified — `ohio-laws`] How far it has moved between biennia is still unrecorded here,
+  because the corpus holds one year of the calculator. [open]
 
-  ### The statutory citation
+  **What *is* delegated is narrower and more interesting.** R.C. 3317.03(B)(21) hands the
+  department the **definition** of "economically disadvantaged", constrained only by "a student
+  shall not be categorically excluded … based on anything other than family income." The act
+  then sets **weights** on two counts whose definitions it does not control. Two levels, not
+  one. [verified]
 
-  It cited R.C. 3317.029. **There is no such
-  section.** Disadvantaged pupil impact aid is R.C. 3317.022(A)(4), inside the section that
-  assembles core foundation funding, and the $422 per pupil is statutory there. [verified]
+  ### The poverty measure is top-coded and this component is not
 
-  ### The squaring is in statute after all
+  The report card's economically disadvantaged share saturates at 100% under community
+  eligibility, which is why 100 districts print exactly that. The count DPIA uses is an ADM
+  rather than a share and does not saturate the same way — so the two poverty figures a
+  district page can show are different measures, and the corpus holds both. [verified]
+label: FSFP Disadvantaged Pupil Impact Aid
+summary: >-
+  $525 million, and the only categorical whose mechanism is neither a weight times a count nor
+  an equalisation off wealth. It blends two poverty counts, indexes the blend against the
+  state's, and squares it.
+description: |
+  **$525m**, and the only one of the six whose mechanism is neither a weight times a count nor
+  an equalisation off wealth. DPIA blends two poverty counts, expresses the blend as a share of
+  enrolment, indexes that share against the state's — and **squares it**. [verified]
 
-  This node recorded that it "is visible in the
-  workbook's own formula and has not been located in statute here." It is at R.C.
+  ### The squaring is the whole character of the program, and no DPIA total shows it
+
+  Aid scales with the **square** of relative poverty, so a district at twice the state's rate
+  scores four times the index rather than twice. $525m distributed on a convex curve
+  concentrates far more sharply than a per-pupil rate would, and the convexity is a policy
+  choice as substantial as the amount. [verified]
+
+  ### The two poverty counts are not nested
+
+  `d1` is 65% of the FY2025 economically disadvantaged ADM plus 35% of the FY2026 directly
+  certified ADM. The second is administrative — a child is directly certified through
+  participation in another benefit program — and it finds a **median 61%** of what the
+  disadvantaged count does, **fewer than half in 146 districts**. Putting 35% of the weight on
+  the smaller measure lowers the funded count almost everywhere. [verified]
+
+  ### The weighted ADM is capped at the district's own enrolled ADM
+
+  The blend can produce more disadvantaged pupils than pupils, and where it would the published
+  figure is the enrolment instead. [verified]
+
+  ### Where the statute says it
+
+  Disadvantaged pupil impact aid is R.C. 3317.022(A)(4), inside the section that assembles core
+  foundation funding, and the $422 per pupil is statutory there. The squaring is at R.C.
   3317.02(I)(1)(a), which defines the index as **the square of the quotient** of the district's
-  percentage over the statewide one. Not a departmental elaboration — the General Assembly's own
-  construction. [verified]
+  percentage over the statewide one — not a departmental elaboration but the General Assembly's
+  own construction. [verified]
 
-  ~~
-  ### But the 65/35 blend is not in the law at all
+  ### The 65/35 blend is in the act, not the code
 
-  ~~ 
-  ### It is — in the act, not the code
-
-  This node said the blend was "a departmental choice inside a delegation, changeable without a
-  bill". That was wrong, and wrong by concluding *not in law* from *not in the Revised Code*. The
-  Revised Code is not all of the law. H.B. 96 of the 136th General Assembly sets it in a table:
+  The Revised Code is not all of the law. H.B. 96 of the 136th General Assembly sets the blend
+  in a table:
 
       economically disadvantaged student ADM        FY2026    FY2027
       FY2025 students                                 75%       65%
@@ -158,22 +160,8 @@ description: |
   changeable by the next budget and not by the department. [verified — `lsc-budget`,
   `crates/project/tests/what_the_act_says_and_the_code_does_not.rs`]
 
-  **What *is* delegated is narrower and more interesting.** R.C. 3317.03(B)(21) hands the
-  department the **definition** of "economically disadvantaged", constrained only by "a student
-  shall not be categorically excluded … based on anything other than family income." The act then
-  sets **weights** on two counts whose definitions it does not control. Two levels, and this node
-  had collapsed them into one. [verified]
-
   And the act names the **vintage**, which nothing else did: the first term is the **FY2025**
-  count. That is what explains Edgerton, below.
-
-  ### The poverty measure is top-coded and this component is not
-
-  The report card's economically
-  disadvantaged share saturates at 100% under community eligibility, which is why 100 districts
-  print exactly that. The count DPIA uses is an ADM rather than a share and does not saturate the
-  same way — so the two poverty figures a district page can show are different measures, and the
-  corpus holds both. [verified]
+  count, not the year the aid is paid in.
 revisions:
   - was: |
       Edgerton Local's published blend of 342.38 against 352.03 computed from the stated 65/35
@@ -200,6 +188,64 @@ revisions:
     reach: |
       A citation, not a figure. Everything the node says about the mechanism was right and was
       sourced from the department's workbook rather than from the section it misnamed.
+  - was: |
+      The blend of the two poverty counts was asserted to be incapable of exceeding its larger
+      input.
+    now: |
+      Three districts have more directly certified children than economically disadvantaged
+      ones — Beachwood 1.03x, Nordonia Hills 1.54x, Ottawa Hills 2.35x on 32.9 disadvantaged
+      pupils. Two differently-built measures can invert on small counts.
+    found_by: |
+      Reproducing the blend for every district and checking the assertion against the panel
+      rather than against the definition.
+    reach: |
+      No figure on the node moves — the published blend was always used as published. What it
+      removes is a shortcut anyone would reach for: either count is a tempting poverty proxy
+      elsewhere, and the two are not nested.
+  - was: |
+      Edgerton Local's disadvantaged count was recorded as being "on a different basis than
+      enrolment or it is wrong".
+    now: |
+      It is on a different basis, and the act names which: the blend's first term is the
+      **FY2025** count. Edgerton's enrolment fell from 504.48 in FY2025 to 342.38 in FY2026, so
+      its count of 497.21 is 98.6% of the enrolment it was measured against and 145% of the one
+      it is applied to.
+    found_by: |
+      H.B. 96's own table, which names the vintage of each term, read against the district's
+      two enrolment years.
+    reach: |
+      It settles the disjunction rather than one half of it — nothing about Edgerton's figure
+      is wrong. The same 98.6% appears in the two other districts whose count most exceeds
+      current enrolment, so the dispersion is entirely in the denominator.
+  - was: |
+      The squaring was recorded as "visible in the workbook's own formula and has not been
+      located in statute here."
+    now: |
+      It is at R.C. 3317.02(I)(1)(a), which defines the index as **the square of the quotient**
+      of the district's percentage over the statewide one. Not a departmental elaboration — the
+      General Assembly's own construction.
+    found_by: |
+      R.C. 3317.02(I)(1)(a), read via `ohio-laws`.
+    reach: |
+      The arithmetic was already verified against the department for all 609 districts, so no
+      figure changes. What changes is who owns the convexity: a departmental elaboration can be
+      undone by the department, and this cannot.
+  - was: |
+      The 65/35 blend was recorded as "a departmental choice inside a delegation, changeable
+      without a bill".
+    now: |
+      It is **uncodified statutory law**. H.B. 96 of the 136th General Assembly sets the two
+      weights in a table — 75/25 for FY2026 and 65/35 for FY2027 — changeable by the next
+      budget and not by the department.
+    found_by: |
+      The act itself, after the Revised Code came back empty. [`lsc-budget`;
+      `crates/project/tests/what_the_act_says_and_the_code_does_not.rs`]
+    reach: |
+      Wrong by concluding *not in law* from *not in the Revised Code*, which is a mistake
+      available anywhere the corpus checks a codification and stops there. What **is**
+      delegated is narrower: R.C. 3317.03(B)(21) hands the department the *definition* of
+      "economically disadvantaged", and the act then sets weights on two counts whose
+      definitions it does not control.
 properties:
   name: Disadvantaged Pupil Impact Aid
   function: |

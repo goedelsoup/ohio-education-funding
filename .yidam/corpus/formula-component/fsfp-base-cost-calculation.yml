@@ -12,8 +12,8 @@ description: |
   every district and community school in the state. [verified]
 
   The teacher ratios are the core, and they are graded by grade band: one funded classroom
-  teacher per 20 kindergarten, 23 in grades 1-3, 25 in grades 4-8, 27 in grades 9-12, and 18
-  in career-technical programs. [verified] Special teachers — art, music, physical education,
+  teacher per 20 kindergarten, 23 in grades 1-3, 25 in grades 4-8, 27 in grades 9-12, and 18 in
+  career-technical programs. [verified] Special teachers — art, music, physical education,
   electives — are funded at one per 150 students with a floor of six per district. [verified]
   Support staffing follows the same pattern: one guidance counselor per 360 students in grades
   9-12 with a minimum of one, one librarian or media staff per 1,000, one student wellness and
@@ -21,8 +21,8 @@ description: |
 
   Each funded position is priced at a statewide average salary plus 16% for benefits — 14%
   retirement contribution and 2% federal payroll taxes and workers' compensation — plus the
-  average employer-paid insurance cost. In FY2022 that made a funded teacher
-  ($62,696.18 x 1.16) + $14,265.53 = **$86,993.10**. [verified]
+  average employer-paid insurance cost. In FY2022 that made a funded teacher ($62,696.18 x
+  1.16) + $14,265.53 = **$86,993.10**. [verified]
 
   **The salaries are FY2018 averages.** [verified] That is the whole argument in one fact. The
   build-up is only a costing if the prices are current, and pricing FY2022 staffing at FY2018
@@ -33,11 +33,11 @@ description: |
   year, not the phase-in percentage, is the parameter that decides whether this component means
   what its name says.
 
-  The minimum staffing floors have a distributional consequence that is easy to miss: because
-  a district gets at least six special teachers and five wellness staff regardless of size,
-  small districts carry much higher per-pupil base costs — above $8,000 for the roughly
-  one-sixth of Ohio districts under about 700 students. [inference, Fordham]
-
+  The minimum staffing floors have a distributional consequence that is easy to miss: because a
+  district gets at least six special teachers and five wellness staff regardless of size, small
+  districts carry much higher per-pupil base costs — above $8,000 for the roughly one-sixth of
+  Ohio districts under about 700 students. [inference, Fordham]
+findings: |
   **What the stale input year looks like on the ground.** FY2022 base cost priced a teacher at
   the FY2018 statewide average of $62,696. By FY2024, the lowest-paying of this corpus's three
   exemplar districts — [Northern Local](../education-agency/northern-local-perry.yml), rural

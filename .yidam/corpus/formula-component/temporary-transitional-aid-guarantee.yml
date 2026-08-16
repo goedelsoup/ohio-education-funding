@@ -9,13 +9,6 @@ description: |
   prior-year baseline, the guarantee tops the district up to that baseline instead. [verified]
   Line [I] of the School Finance Payment Report, R.C. 3317.019.
 
-  It is called temporary and transitional. In FY2027 — the terminal year of the six-year
-  phase-in, the year the formula reaches 100% of its computed amount — **294 of 609 districts,
-  48.3%, holding 54.1% of Ohio's students, are funded by it rather than by the formula.**
-  [verified] It totals $878,974,300. The median guaranteed district sits more than three times
-  above what a meaningful base cost increase would give it, so this is not a rounding buffer
-  catching a few edge cases; for half the state it is the operative funding mechanism.
-
   ### The mechanism, and the clawback inside it
 
   The department's formula is
@@ -25,50 +18,24 @@ description: |
 
   `[H2]` is the [guarantee funding base](../parameter/guarantee-funding-base.yml) — the FY2020
   anchor, published per district and never re-based. `[I1]` is the [open enrolment
-  clawback](guarantee-open-enrolment-clawback.yml), a reduction for a guaranteed district that has
-  shed entering open enrolment beyond a threshold. Each is a mechanism in its own right that this
-  line composes rather than contains. [verified]
+  clawback](guarantee-open-enrolment-clawback.yml), a reduction for a guaranteed district that
+  has shed entering open enrolment beyond a threshold. Each is a mechanism in its own right
+  that this line composes rather than contains. [verified]
 
   Because the guarantee is a difference rather than a rate, any increase in computed funding
   reduces it one-for-one until it reaches zero and the district returns to formula.
 
-  ### Who is on it
-
-  Both candidate explanations — property wealth and enrollment decline — point the same way, and
-  one dominates clearly. Property wealth predicts the guarantee roughly three times more strongly
-  than enrollment decline does, and by quartile of valuation per pupil the rate runs 13%, 37%,
-  68%, 76%: monotonic, with three-quarters of Ohio's wealthiest districts held above what the
-  formula computes for them. [verified] The mechanism is not mysterious. Under the plan's own
-  logic a property-wealthy district has high local capacity, so its computed state share is small
-  — that is the formula working as designed. The guarantee then overrides that result and pays the
-  district what it used to get. [inference]
-
-  ### It grows as the phase-in completes, which is the opposite of what the name implies
-
-  [OCG White Paper 015](../../catalog/ocg-white-paper-015.md) reports the FY2024 position — the
-  phased-in amount about $741.8 million below what the formula calculated, with 180 districts
-  drawing about $181.2 million in guarantee support — and treats the phase-in gap as the
-  "unfunded statutory formula" standard for defunding. Set the FY2027 figures beside it:
-
-      FY2024    180 districts     $181.2 million     [verified — as published, secondary]
-      FY2027    294 districts     $879.0 million     [verified — department FY2027 model]
-
-  Roughly fivefold in dollars, arriving *at* the terminal year, the year the formula reaches
-  100%. The phase-in gap closes and the guarantee does not; the mechanism that carries districts
-  to full funding is the hold-harmless rather than the formula. Any account that treats FY2027 as
-  the year the question resolves has the direction backwards. [inference]
-
   ### It is a nominal floor, so it erodes by construction
 
-  A guarantee written in dollars and anchored to a fixed historical year cannot hold its value. A
-  district it protects loses ground every year through no decision by anyone, and nothing in the
-  formula records that it happened. "Held at FY2020" is a statement about nominal dollars only,
-  and across FY2020-FY2025 prices rose 25.1%. [verified]
+  A guarantee written in dollars and anchored to a fixed historical year cannot hold its value.
+  A district it protects loses ground every year through no decision by anyone, and nothing in
+  the formula records that it happened. "Held at FY2020" is a statement about nominal dollars
+  only, and across FY2020-FY2025 prices rose 25.1%. [verified]
 
-  So "temporary transitional" describes the intent and not the mechanism. A guarantee anchored to
-  a fixed historical year does not expire; it is escaped, district by district, only as the
-  formula grows past a level set in 2020. On the FY2027 evidence, for half of these districts that
-  is not close. [inference]
+  So "temporary transitional" describes the intent and not the mechanism. A guarantee anchored
+  to a fixed historical year does not expire; it is escaped, district by district, only as the
+  formula grows past a level set in 2020. On the FY2027 evidence, for half of these districts
+  that is not close. [inference]
 
   Still open: whether the statute or subsequent budget acts contemplate re-basing. [open]
 findings: |
@@ -226,6 +193,39 @@ findings: |
   formula's targeting working. The guarantee is part of why the wealth relationship is not
   stronger: it props up precisely the districts the local capacity measure would fund least.
   [inference — see [equity](../doctrine/equity.yml)]
+
+  It is called temporary and transitional. In FY2027 — the terminal year of the six-year
+  phase-in, the year the formula reaches 100% of its computed amount — **294 of 609 districts,
+  48.3%, holding 54.1% of Ohio's students, are funded by it rather than by the formula.**
+  [verified] It totals $878,974,300. The median guaranteed district sits more than three times
+  above what a meaningful base cost increase would give it, so this is not a rounding buffer
+  catching a few edge cases; for half the state it is the operative funding mechanism.
+
+  ### Who is on it
+
+  Both candidate explanations — property wealth and enrollment decline — point the same way,
+  and one dominates clearly. Property wealth predicts the guarantee roughly three times more
+  strongly than enrollment decline does, and by quartile of valuation per pupil the rate runs
+  13%, 37%, 68%, 76%: monotonic, with three-quarters of Ohio's wealthiest districts held above
+  what the formula computes for them. [verified] The mechanism is not mysterious. Under the
+  plan's own logic a property-wealthy district has high local capacity, so its computed state
+  share is small — that is the formula working as designed. The guarantee then overrides that
+  result and pays the district what it used to get. [inference]
+
+  ### It grows as the phase-in completes, which is the opposite of what the name implies
+
+  [OCG White Paper 015](../../catalog/ocg-white-paper-015.md) reports the FY2024 position — the
+  phased-in amount about $741.8 million below what the formula calculated, with 180 districts
+  drawing about $181.2 million in guarantee support — and treats the phase-in gap as the
+  "unfunded statutory formula" standard for defunding. Set the FY2027 figures beside it:
+
+      FY2024    180 districts     $181.2 million     [verified — as published, secondary]
+      FY2027    294 districts     $879.0 million     [verified — department FY2027 model]
+
+  Roughly fivefold in dollars, arriving *at* the terminal year, the year the formula reaches
+  100%. The phase-in gap closes and the guarantee does not; the mechanism that carries
+  districts to full funding is the hold-harmless rather than the formula. Any account that
+  treats FY2027 as the year the question resolves has the direction backwards. [inference]
 revisions:
   - was: |
       A hold-harmless and nothing else: computed funding below a baseline, pay the difference.

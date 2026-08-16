@@ -5,48 +5,50 @@ summary: >-
   budget. The trigger is arithmetic: three consecutive years below two stars, and the
   department shall establish a commission.
 description: |
-  The point at which Ohio's accountability system stops advising and takes the district's budget.
+  The point at which Ohio's accountability system stops advising and takes the district's
+  budget.
 
-  **The trigger is a report card rating, three years running.** R.C. 3302.10(A) says the department
-  "shall establish an academic distress commission" — shall, not may — for any district that has
-  for three consecutive years received an overall grade of "F" under R.C. 3302.03(C)(3), or an
-  overall performance rating of **less than two stars** under R.C. 3302.03(D)(3). [verified]
+  **The trigger is a report card rating, three years running.** R.C. 3302.10(A) says the
+  department "shall establish an academic distress commission" — shall, not may — for any
+  district that has for three consecutive years received an overall grade of "F" under R.C.
+  3302.03(C)(3), or an overall performance rating of **less than two stars** under R.C.
+  3302.03(D)(3). [verified]
 
-  **The commission is majority state-appointed.** Five members: three by the director of education
-  and workforce, one by the president of the district board, one by the mayor. Appointments within
-  thirty days of notice; the director designates the chairperson from among the director's own
-  three. [verified] An elected board retains one seat on the body that supersedes it.
+  **The commission is majority state-appointed.** Five members: three by the director of
+  education and workforce, one by the president of the district board, one by the mayor.
+  Appointments within thirty days of notice; the director designates the chairperson from among
+  the director's own three. [verified] An elected board retains one seat on the body that
+  supersedes it.
 
-  **And the chief executive officer is paid by the department.** Within sixty days the commission
-  appoints a CEO for the district, "who shall be paid by the department of education and
-  workforce". [verified] The person exercising the district's authority is not on the district's
-  payroll.
+  **And the chief executive officer is paid by the department.** Within sixty days the
+  commission appoints a CEO for the district, "who shall be paid by the department of education
+  and workforce". [verified] The person exercising the district's authority is not on the
+  district's payroll.
 
   ### The powers are fiscal, which is why the intervention belongs beside the funding
 
-  The
-  CEO's enumerated powers under division (D) include defining employee responsibilities, setting
-  compensation, allocating teacher class loads, conducting evaluations, making reductions in
-  staff, setting the calendar, contracting for services, modifying board policy, establishing
-  grade configurations, determining curriculum, setting class sizes — and **"(j) Creating a budget
-  for the district."** [verified]
+  The CEO's enumerated powers under division (D) include defining employee responsibilities,
+  setting compensation, allocating teacher class loads, conducting evaluations, making
+  reductions in staff, setting the calendar, contracting for services, modifying board policy,
+  establishing grade configurations, determining curriculum, setting class sizes — and **"(j)
+  Creating a budget for the district."** [verified]
 
-  The elected board continues to exist and continues to levy. What it no longer does is decide how
-  the money is spent. Every mechanism this corpus models — the base cost build-up, the local share,
-  the guarantee, the supplements — computes an amount that arrives at a district whose spending
-  decisions have been transferred to a state appointee. [inference]
+  The elected board continues to exist and continues to levy. What it no longer does is decide
+  how the money is spent. The base cost build-up, the local share, the guarantee and the
+  supplements all compute an amount that arrives at a district whose spending decisions have
+  been transferred to a state appointee. [inference]
 
-  There is also a fund of its own: the CEO "shall establish a separate fund to support innovative
-  education programs", holds **sole authority to disburse** from it until the district exits, and
-  every disbursement must support the approved improvement plan. Moneys appropriated by the
-  General Assembly for that purpose go into it. [verified]
-
-  **The same number pays and takes.** The overall rating under R.C. 3302.03 that sets this trigger
-  is the rating the
-  [FSFP performance supplement](../formula-component/fsfp-performance-supplement.yml) pays on. A
-  district can be receiving a supplement calculated from its rating in the years that rating is
-  accumulating toward the loss of its budget authority. Whether any district has been in both
-  positions at once is not established here and is checkable. [open]
+  There is also a fund of its own: the CEO "shall establish a separate fund to support
+  innovative education programs", holds **sole authority to disburse** from it until the
+  district exits, and every disbursement must support the approved improvement plan. Moneys
+  appropriated by the General Assembly for that purpose go into it. [verified]
+findings: |
+  **The same number pays and takes.** The overall rating under R.C. 3302.03 that sets this
+  trigger is the rating the [FSFP performance
+  supplement](../formula-component/fsfp-performance-supplement.yml) pays on. A district can be
+  receiving a supplement calculated from its rating in the years that rating is accumulating
+  toward the loss of its budget authority. Whether any district has been in both positions at
+  once is not established here and is checkable. [open]
 
   ### Who has actually been under one
 
@@ -58,29 +60,30 @@ description: |
       Lorain City School District   dissolved by H.B. 33, signed 4 July 2023
       Youngstown City Schools       continuing; annual reports through 2024-25 and a plan extension
 
-  All three were under oversight when a 2021 change in state law required an academic improvement
-  plan running three school years with annual benchmarks; revised plans were approved for all
-  three on 3 December 2021. [verified]
+  All three were under oversight when a 2021 change in state law required an academic
+  improvement plan running three school years with annual benchmarks; revised plans were
+  approved for all three on 3 December 2021. [verified]
 
-  **Two acts already in this corpus turn out to have accountability effects it did not record.**
-  [H.B. 33](../legislation/hb-33-2023.yml) is modelled here for refreshing the cost inputs to
-  FY2022 and making EdChoice universal; it also dissolved Lorain's commission.
-  [H.B. 110](../legislation/hb-110-2021.yml) is modelled as the Fair School Funding Plan act, and
-  the 2021 improvement-plan requirement dates to the same session. A budget bill in Ohio carries
-  the funding formula and the accountability regime in the same instrument, which is an argument
-  for holding both domains that only became visible once both were held. [inference]
+  **Two acts already in this corpus turn out to have accountability effects it did not
+  record.** [H.B. 33](../legislation/hb-33-2023.yml) is modelled here for refreshing the cost
+  inputs to FY2022 and making EdChoice universal; it also dissolved Lorain's commission. [H.B.
+  110](../legislation/hb-110-2021.yml) is modelled as the Fair School Funding Plan act, and the
+  2021 improvement-plan requirement dates to the same session. A budget bill in Ohio carries
+  the funding formula and the accountability regime in the same instrument, which is an
+  argument for holding both domains that only became visible once both were held. [inference]
 
   **And Cleveland is not one of the three.** Its
-  [node](../education-agency/cleveland-municipal.yml) records "state academic distress intervention
-  for part of the period" without saying which regime. It was the *former* R.C. 3302.10 — the
-  pre-2015 arrangement the current section refers to when it speaks of a commission "still in
-  existence on October 15, 2015". [inference] Reading the current three as the complete history
-  would put Cleveland in the wrong regime and lose the fact that Ohio has had two.
+  [node](../education-agency/cleveland-municipal.yml) records "state academic distress
+  intervention for part of the period" without saying which regime. It was the *former* R.C.
+  3302.10 — the pre-2015 arrangement the current section refers to when it speaks of a
+  commission "still in existence on October 15, 2015". [inference] Reading the current three as
+  the complete history would put Cleveland in the wrong regime and lose the fact that Ohio has
+  had two.
 
-  **What is still not established.** When each commission was established — the department's page
-  gives the 2021 plan requirement and the 2023 dissolution and no start dates. [open] Whether any
-  commission changed outcomes, which is what the apparatus rests on. [open] And the exit criteria,
-  in later divisions of the section this node has not transcribed. [unentered]
+  **What is still not established.** When each commission was established — the department's
+  page gives the 2021 plan requirement and the 2023 dissolution and no start dates. [open]
+  Whether any commission changed outcomes, which is what the apparatus rests on. [open] And the
+  exit criteria, in later divisions of the section this node has not transcribed. [unentered]
 properties:
   name: Academic distress commission
   authority: R.C. 3302.10, effective 3 October 2023 in its current form. [verified]

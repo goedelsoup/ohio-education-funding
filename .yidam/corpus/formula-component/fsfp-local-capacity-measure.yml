@@ -33,38 +33,9 @@ description: |
 
   ### The benchmark is a rank, not a value
 
-  It recorded the benchmark as "a single discretionary number that sets the top of the entire
-  scale" and asked how it moves over time. R.C. 3317.017(A)(4)(c)–(d) settles both halves, and
-  the answer changes the question: the statute writes a **rank**, not a value. Districts are
-  ranked by the ratio of their federal median income to the statewide median, and the district
-  with the **fortieth highest ratio** is the point at which the capacity percentage caps at
-  0.025.
-
-  Why the fortieth, out of 609, is not stated in the section. [open] And how far the value has
-  moved between biennia is still unmeasured here, because the corpus holds one year of the
-  calculator — but it is now a question about a distribution rather than about a decision.
-  [open]
-
-  ### The valuation is the lesser of two, and the rule is one-sided
-
-  R.C. 3317.017(A)(1)(a) takes the minimum of a district's three-year average valuation and its
-  most recent taxable value; the income side takes the same shape. Under rising valuations the
-  average is lower, so the district is charged on a lagged figure; under falling valuations the
-  recent year is lower and the fall passes straight through. **602 of 609 districts are on the
-  lagged branch and 7 on the immediate one** — the seven whose valuation fell, none by more
-  than 1.15%.
-
-  The rule therefore never charges a district on the higher of its two measures. That makes it
-  a floor on the state's share wearing the clothes of a smoothing device, and the asymmetry is
-  invisible in any one district's figures. [verified —
-  `crates/local-capacity/tests/against_the_departments_own_capacity.rs`]
-
-  **And it is the charge-off's instinct in a new device.** The mechanism this replaced also
-  lagged revaluation, through [recognized
-  valuation](../parameter/local-share-charge-off-millage.yml) — a three-year phase-in of the
-  inflationary increase. Two regimes, the same judgement that a reappraisal should not reach
-  state aid all at once, and two different implementations. A reader told only that the plan
-  "uses a three-year average" would not see that it is the successor to something. [verified]
+  R.C. 3317.017(A)(4)(c)–(d) writes a **rank**, not a value. Districts are ranked by the ratio
+  of their federal median income to the statewide median, and the district with the **fortieth
+  highest ratio** is the point at which the capacity percentage caps at 0.025. [verified]
 findings: |
   That is a large fact about how the measure actually operates. For those 138 districts the
   entire apparatus above — the three wealth terms, the 60/20/20 blend, the progressive rate
@@ -143,6 +114,32 @@ findings: |
 
   On the published inputs the residual is zero. **The 4.4% gap was not a finding about Ohio; it
   was the cost of not opening a sheet.** [verified]
+
+  Why the fortieth, out of 609, is not stated in the section. [open] And how far the value has
+  moved between biennia is still unmeasured here, because the corpus holds one year of the
+  calculator — but it is now a question about a distribution rather than about a decision.
+  [open]
+
+  ### The valuation is the lesser of two, and the rule is one-sided
+
+  R.C. 3317.017(A)(1)(a) takes the minimum of a district's three-year average valuation and its
+  most recent taxable value; the income side takes the same shape. Under rising valuations the
+  average is lower, so the district is charged on a lagged figure; under falling valuations the
+  recent year is lower and the fall passes straight through. **602 of 609 districts are on the
+  lagged branch and 7 on the immediate one** — the seven whose valuation fell, none by more
+  than 1.15%.
+
+  The rule therefore never charges a district on the higher of its two measures. That makes it
+  a floor on the state's share wearing the clothes of a smoothing device, and the asymmetry is
+  invisible in any one district's figures. [verified —
+  `crates/local-capacity/tests/against_the_departments_own_capacity.rs`]
+
+  **And it is the charge-off's instinct in a new device.** The mechanism this replaced also
+  lagged revaluation, through [recognized
+  valuation](../parameter/local-share-charge-off-millage.yml) — a three-year phase-in of the
+  inflationary increase. Two regimes, the same judgement that a reappraisal should not reach
+  state aid all at once, and two different implementations. A reader told only that the plan
+  "uses a three-year average" would not see that it is the successor to something. [verified]
 revisions:
   - was: |
       The 40th-highest benchmark was recorded as "a single discretionary number that sets the
