@@ -14,10 +14,10 @@ description: |
 
   It is not [per-pupil operating expenditure](per-pupil-operating-expenditure.yml). Within the
   FY2025 Expanded List, where the department publishes the same expenditure total over both
-  divisors, the equivalent-pupil figure is **21% lower at the median**: $12,854 against $16,289.
-  [verified] Quoting one where a reader expects the other understates Ohio school spending by a
-  fifth.
-
+  divisors, the equivalent-pupil figure is **21% lower at the median**: $12,854 against
+  $16,289. [verified] Quoting one where a reader expects the other understates Ohio school
+  spending by a fifth.
+findings: |
   ### A need-weighted denominator is a need adjustment, and it runs one way
 
   This was recorded as an argument. It is now a measurement, and it is larger than the argument
@@ -36,7 +36,8 @@ description: |
   −0.016 and describe the analysis as *unadjusted*. The word is true of the model — no
   covariates — and false of the measure. The paper's stated limitation, "no need-adjusted model
   in this version," understates it: there is a need adjustment, it is inside the independent
-  variable, it applies to one side only, and it points in the direction that flattens the result.
+  variable, it applies to one side only, and it points in the direction that flattens the
+  result.
 
   **The mechanism, measured.** The ratio of the two ADM columns is very nearly a poverty index:
 
@@ -59,48 +60,44 @@ description: |
 
   ### The mechanism, confirmed from the other side
 
-  If the divisor mattered because it is a
-  composition proxy and the outcome was composition-driven, then an outcome with the composition
-  taken out should make the divisor irrelevant. It does. Against
-  [Progress (value-added)](progress-value-added.yml), the two divisors give **−0.039** and
-  **+0.029** — indistinguishable, where against the Performance Index they give −0.337 and
-  −0.015. [verified] The denominator effect is not a general property of the spending measure;
-  it appears only when the outcome is a level.
+  If the divisor mattered because it is a composition proxy and the outcome was
+  composition-driven, then an outcome with the composition taken out should make the divisor
+  irrelevant. It does. Against [Progress (value-added)](progress-value-added.yml), the two
+  divisors give **−0.039** and **+0.029** — indistinguishable, where against the Performance
+  Index they give −0.337 and −0.015. [verified] The denominator effect is not a general
+  property of the spending measure; it appears only when the outcome is a level.
 
   ### Only one of the two estimates is stable, and it is not the published one
 
   [verified —
   [`crates/dispersion/tests/report_card_2425.rs`](../../../crates/dispersion/tests/report_card_2425.rs)]
 
-  This node previously recorded the sensitivity checks as showing the result "robust, on both
-  denominators," and that was too generous to the published measure. Run them out:
-
       scenario                              published    headcount
       all districts                          -0.0155      -0.3365
       excluding the highest per-pupil        -0.0042      -0.3546
       excluding enrollment under 582         +0.0358      -0.3371
 
-  The headcount coefficient moves by **0.018** across every check and never stops saying the same
-  thing. The published coefficient **changes sign** — the scenarios do not agree on the direction
-  of the association, which is the one thing a coefficient is for — and its magnitude varies by a
-  factor of eight.
+  The headcount coefficient moves by **0.018** across every check and never stops saying the
+  same thing. The published coefficient **changes sign** — the scenarios do not agree on the
+  direction of the association, which is the one thing a coefficient is for — and its magnitude
+  varies by a factor of eight.
 
   Weighting districts by enrollment separates them further: **−0.149** published against
   **−0.547** on a headcount denominator. That is a tenfold move in the published figure and a
   1.6× move in the other. [verified]
 
   So "near zero in every case" is stability only in the sense that near-zero numbers stay near
-  zero. The paper's robustness claim survives as a statement about a quantity too small to have a
-  direction, and not as evidence that its estimate is reliable. This is the sharper objection and
-  the one the corpus should make: not *the denominator matters*, but **one of these two estimates
-  is stable under the paper's own checks and it is not the one it published.**
+  zero. The paper's robustness claim survives as a statement about a quantity too small to have
+  a direction, and not as evidence that its estimate is reliable. This is the sharper objection
+  and the one the corpus should make: not *the denominator matters*, but **one of these two
+  estimates is stable under the paper's own checks and it is not the one it published.**
 
   ### And a second source agrees
 
-  The corpus's independent FY2024 Cupp Report headcount series,
-  a different file for a different year, correlates with the Performance Index at **−0.388**.
-  [verified] Two headcount measures from two publications give −0.337 and −0.388. The published
-  equivalent-pupil measure gives −0.016. The odd one out is the one with the weighted divisor.
+  The corpus's independent FY2024 Cupp Report headcount series, a different file for a
+  different year, correlates with the Performance Index at **−0.388**. [verified] Two headcount
+  measures from two publications give −0.337 and −0.388. The published equivalent-pupil measure
+  gives −0.016. The odd one out is the one with the weighted divisor.
 
   ### What the paper's Table 3 shows
 
@@ -114,32 +111,30 @@ description: |
 
   State-and-local is flat within $200 across four quintiles and then steps $984 at the top. Not
   a gradient, a step — and the corpus names the mechanism: local revenue per pupil tracks
-  assessed valuation per pupil at **+0.807**. [verified] "Roughly flat" total spending is a need
-  channel declining with performance plus a wealth step at the summit. Both gradients show
+  assessed valuation per pupil at **+0.807**. [verified] "Roughly flat" total spending is a
+  need channel declining with performance plus a wealth step at the summit. Both gradients show
   directly in the computed data: FY2025 spending per unweighted pupil correlates with the
   disadvantaged share at +0.345 *and* with valuation per pupil at +0.281, and the FY2024 Cupp
-  series gives +0.383 and +0.279 independently. [verified] Ohio's poorest and
-  wealthiest districts both spend above its middle, for entirely different reasons, and a single
+  series gives +0.383 and +0.279 independently. [verified] Ohio's poorest and wealthiest
+  districts both spend above its middle, for entirely different reasons, and a single
   coefficient across that shape is two relationships cancelling.
 
   ### And the corrected number does not survive a change of outcome
 
-  Holding disadvantage
-  constant, per-pupil spending correlates −0.125 with attainment level and **+0.146** with
-  growth. [verified] The negative sign recorded above belongs to the level measure, not to
-  spending. Anyone quoting −0.337 as what Ohio's spending achieves is making the same category
-  of error this node was written to correct, one step further along.
+  Holding disadvantage constant, per-pupil spending correlates −0.125 with attainment level and
+  **+0.146** with growth. [verified] The negative sign recorded above belongs to the level
+  measure, not to spending. Anyone quoting −0.337 as what Ohio's spending achieves is making
+  the same category of error this node was written to correct, one step further along.
 
   ### A concrete case
 
-  [Toledo City](../education-agency/toledo-city.yml)
-  divides $440.2 million of FY2025 operating expenditure by 21,160 enrolled pupils or by 30,758
-  weighted ones: **$20,805 or $14,312**, a 45% spread on one district in one year. Both numbers
-  have been published about Toledo — the second in
-  [White Paper 013](../../catalog/ocg-white-paper-013.md), the first three weeks later in
-  [fact-check RL-2026-021](../../catalog/ocg-fact-check-021.md) — by the same author, with
-  neither noting the other's basis. [verified] The abstract argument on this node has a district
-  attached to it.
+  [Toledo City](../education-agency/toledo-city.yml) divides $440.2 million of FY2025 operating
+  expenditure by 21,160 enrolled pupils or by 30,758 weighted ones: **$20,805 or $14,312**, a
+  45% spread on one district in one year. Both numbers have been published about Toledo — the
+  second in [White Paper 013](../../catalog/ocg-white-paper-013.md), the first three weeks
+  later in [fact-check RL-2026-021](../../catalog/ocg-fact-check-021.md) — by the same author,
+  with neither noting the other's basis. [verified] The abstract argument on this node has a
+  district attached to it.
 
   The fact-check also shows the rule generalising past this metric. It compares
   special-education spending per *total* pupil across two districts whose disability shares are
@@ -149,15 +144,15 @@ description: |
 
   ### A hypothesis tested and dropped
 
-  The obvious suspicion was the
-  [temporary transitional aid guarantee](../formula-component/temporary-transitional-aid-guarantee.yml):
-  48.3% of districts are funded off-formula against an un-rebased FY2020 baseline, so much of the
-  spending variation being correlated ought to be a frozen historical artifact. It is not the
-  explanation. Splitting the 607 districts on FY2027 guarantee status leaves the denominator gap
-  intact in both halves — guaranteed districts −0.389, on-formula districts −0.299, and both
-  near zero on the weighted divisor. [verified] The guarantee moves a great deal of money and
-  does not move this. Recorded because a negative result that was expected to be positive is
-  worth more than an untested suspicion.
+  The obvious suspicion was the [temporary transitional aid
+  guarantee](../formula-component/temporary-transitional-aid-guarantee.yml): 48.3% of districts
+  are funded off-formula against an un-rebased FY2020 baseline, so much of the spending
+  variation being correlated ought to be a frozen historical artifact. It is not the
+  explanation. Splitting the 607 districts on FY2027 guarantee status leaves the denominator
+  gap intact in both halves — guaranteed districts −0.389, on-formula districts −0.299, and
+  both near zero on the weighted divisor. [verified] The guarantee moves a great deal of money
+  and does not move this. Recorded because a negative result that was expected to be positive
+  is worth more than an untested suspicion.
 
   One guarantee finding does survive, and it corroborates the corpus: guaranteed districts
   average a Performance Index of 89.8 against 85.7 for on-formula districts. [verified] The

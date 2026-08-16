@@ -26,10 +26,27 @@ description: |
 
   ### The series, sourced
 
-  This node carried "not yet populated" from genesis and warned
-  that the values had to come from statute rather than recollection. They do, and the mechanism
-  is less static than "roughly 20 to 23 mills" suggested:
+  ### The rate stopped moving because a court stopped it
 
+  ### The base changed while the rate stood still
+
+  DeRolph I describes the charge-off as *total taxable value* times a percentage. By FY2008 the
+  Legislative Service Commission describes the same 23 mills applied to **recognized
+  valuation**. [verified]
+
+  > valuation used in calculating a district's local share of the base cost "recognizes" the >
+  district's inflationary increase in carryover real property (property that was taxed in the >
+  year before) in the reappraisal or update year evenly over three-years instead of all at
+  once.
+
+  ### Still open
+
+  The Evidence-Based Model years and the Bridge formula decade are not established. Secondary
+  reporting gives 22 mills for FY2010-11 under the Evidence-Based Model and 20 mills applied to
+  total valuation later, and neither is sourced well enough to commit here. [open] The corpus
+  deliberately holds three of the four eras rather than a complete series with one guessed
+  entry.
+findings: |2
       rate        when                                    authority
       20 mills    in force when DeRolph was filed, 1991   144 Ohio Laws, Part III, 3987, 4122
       20.5 mills  raised during the litigation            Am.Sub.H.B. 152, Sec. 36.12,
@@ -40,52 +57,36 @@ description: |
 
   [verified — [DeRolph I](../litigation/derolph-i-1997.yml) at ¶97 recites the progression with
   its session-law citations; the [LSC Complete
-  Resource](../../catalog/lsc-school-funding-complete-resource.md) gives the rate and base still
-  operative in FY2008. Carried in
+  Resource](../../catalog/lsc-school-funding-complete-resource.md) gives the rate and base
+  still operative in FY2008. Carried in
   [`crates/regime-diff`](../../../crates/regime-diff/src/charge_off.rs).]
 
-  ### The rate stopped moving because a court stopped it
+  Three changes in six years, then nothing for the remaining life of the mechanism, is a shape
+  that reads as a policy nobody revisited. It is not. [DeRolph
+  III](../litigation/derolph-iii-2001.yml) ordered, at ¶62, that "in determining future
+  biennial budgets through fiscal year 2007, the rate of millage charged off as the local share
+  of base cost funding under divisions (A)(1) and (2) of R.C. 3317.022 may not be changed from
+  twenty-three mills, irrespective of the language of R.C. 3317.012(D)(4) suggesting such a
+  methodology." [verified] For six of the years this parameter was flat, the General Assembly
+  was enjoined from moving it.
 
-  Three changes in six years, then
-  nothing for the remaining life of the mechanism, is a shape that reads as a policy nobody
-  revisited. It is not. [DeRolph III](../litigation/derolph-iii-2001.yml) ordered, at ¶62, that
-  "in determining future biennial budgets through fiscal year 2007, the rate of millage charged
-  off as the local share of base cost funding under divisions (A)(1) and (2) of R.C. 3317.022
-  may not be changed from twenty-three mills, irrespective of the language of R.C.
-  3317.012(D)(4) suggesting such a methodology." [verified] For six of the years this parameter
-  was flat, the General Assembly was enjoined from moving it.
-
-  The injunction was itself vacated fifteen months later by
-  [DeRolph IV](../litigation/derolph-iv-2002.yml), which erased *DeRolph III* entirely.
-  [verified] So the rate held at 23 mills through FY2021 under a court order that had ceased to
-  exist by the end of 2002 — the constraint outlived its authority, and no bill restored the
-  methodology R.C. 3317.012(D)(4) had provided for. Why the General Assembly never returned to
-  it is not established here. [open]
-
-  ### The base changed while the rate stood still
-
-  DeRolph I describes the charge-off as *total taxable value* times a
-  percentage. By FY2008 the Legislative Service Commission describes the same 23 mills applied to
-  **recognized valuation**. [verified]
-
-  What this node said recognized valuation *is* — "an H.B. 920-adjusted figure deliberately lower
-  than total taxable value wherever reduction factors bind" — was wrong, and wrong in a way that
-  named the wrong districts. LSC defines it arithmetically:
-
-  > valuation used in calculating a district's local share of the base cost "recognizes" the
-  > district's inflationary increase in carryover real property (property that was taxed in the
-  > year before) in the reappraisal or update year evenly over three-years instead of all at once.
+  The injunction was itself vacated fifteen months later by [DeRolph
+  IV](../litigation/derolph-iv-2002.yml), which erased *DeRolph III* entirely. [verified] So
+  the rate held at 23 mills through FY2021 under a court order that had ceased to exist by the
+  end of 2002 — the constraint outlived its authority, and no bill restored the methodology
+  R.C. 3317.012(D)(4) had provided for. Why the General Assembly never returned to it is not
+  established here. [open]
 
       recognized, reappraisal or update year = actual - 2/3 x inflationary increase
       recognized, second year                = actual - 1/3 x inflationary increase
       recognized, third year                 = actual
 
-  It is a **three-year phase-in of reappraisal growth**. H.B. 920 holds a district's revenue flat
-  by cutting the rate; recognized valuation holds its state aid flat by deferring the base. Two
-  mechanisms answering the same event from opposite ends of the same multiplication — and LSC
-  discusses them under one heading, "Provisions that Soften the Effect of H.B. 920 Tax Reduction
-  Factors", which is the likeliest way the conflation happened. [verified — [LSC Complete
-  Resource](../../catalog/lsc-school-funding-complete-resource.md), pp. 19 and 82]
+  It is a **three-year phase-in of reappraisal growth**. H.B. 920 holds a district's revenue
+  flat by cutting the rate; recognized valuation holds its state aid flat by deferring the
+  base. Two mechanisms answering the same event from opposite ends of the same multiplication —
+  and LSC discusses them under one heading, "Provisions that Soften the Effect of H.B. 920 Tax
+  Reduction Factors", which is the likeliest way the conflation happened. [verified — [LSC
+  Complete Resource](../../catalog/lsc-school-funding-complete-resource.md), pp. 19 and 82]
 
   **The correction changes which districts are affected, not only by how much.** Under the old
   reading the districts overcharged were those with long-bitten reduction factors: a wealth and
@@ -94,36 +95,36 @@ description: |
 
   ### Computed rather than missing
 
-  The recorded blocker said `tax-abstract` was
-  expected to supply recognized valuation and did not. Both halves of that were beside the point:
-  the figure is not published per district by anyone, and it does not need to be. The rule is
-  arithmetic, and Ohio's staggered county calendar supplies the identification —
+  The recorded blocker said `tax-abstract` was expected to supply recognized valuation and did
+  not. Both halves of that were beside the point: the figure is not published per district by
+  anyone, and it does not need to be. The rule is arithmetic, and Ohio's staggered county
+  calendar supplies the identification —
 
-    - the Department of Taxation publishes each county's reappraisal and update year, and every
-      one of the 88 has exactly one valuation event in TY2022–TY2024;
-    - Table SD-1, extended from two tax years to four, then gives each district one event year
-      and two quiet ones, so its own ordinary growth measures what the reappraisal added.
+  - the Department of Taxation publishes each county's reappraisal and update year, and every
+  one of the 88 has exactly one valuation event in TY2022–TY2024; - Table SD-1, extended from
+  two tax years to four, then gives each district one event year and two quiet ones, so its own
+  ordinary growth measures what the reappraisal added.
 
   The separation is not marginal: the median county's real property rose **28.6%** in its event
-  year against **1.5%** in its quiet ones, and all 88 counties' largest jump falls in the year the
-  calendar says. [verified — `crates/regime-diff/src/recognized_valuation.rs` and
+  year against **1.5%** in its quiet ones, and all 88 counties' largest jump falls in the year
+  the calendar says. [verified — `crates/regime-diff/src/recognized_valuation.rs` and
   `tests/recognized_valuation_against_the_abstract.rs`]
 
   At TY2024 recognized valuation is **8.20% below total taxable value statewide — $34.5bn, or
   $793m of charge-off at 23 mills**. It falls entirely by calendar: 12.97% of value for the 184
-  districts whose county revalued in TY2024, 7.04% for the 304 in TY2023, and nothing for the 123
-  in TY2022. [verified]
+  districts whose county revalued in TY2024, 7.04% for the 304 in TY2023, and nothing for the
+  123 in TY2022. [verified]
 
-  **This is a high point of the cycle and the node should not be read as if it were a constant.**
-  LSC put the long-run effect nearer $125m a year, about 2% of valuation; TY2024 is four times
-  that because Ohio's 2023–24 revaluations were four times the size LSC's own worked example
-  assumes. What is not cyclical is the direction — total taxable value always overstates the
-  charge-off. [verified, and the long-run figure is LSC's]
+  **This is a high point of the cycle and the node should not be read as if it were a
+  constant.** LSC put the long-run effect nearer $125m a year, about 2% of valuation; TY2024 is
+  four times that because Ohio's 2023–24 revaluations were four times the size LSC's own worked
+  example assumes. What is not cyclical is the direction — total taxable value always
+  overstates the charge-off. [verified, and the long-run figure is LSC's]
 
   **One component is still not modelled.** LSC records an **exempt property adjustment** to
-  recognized valuation for about 13 districts holding large state-owned exempt property — $836.4m
-  in FY2008, $19.2m of local share. It needs the department's own list of those districts. About
-  0.3% of statewide valuation, and absent. [open]
+  recognized valuation for about 13 districts holding large state-owned exempt property —
+  $836.4m in FY2008, $19.2m of local share. It needs the department's own list of those
+  districts. About 0.3% of statewide valuation, and absent. [open]
 
   **What the rate was doing to the system.** At 23 mills against a statewide operating rate of
   32.9 mills in TY2006, the base cost formula equalized about **69.9%** of local operating
@@ -135,38 +136,25 @@ description: |
 
   ### The phantom revenue, counted — and it is not a minority case
 
-  This node has asserted
-  since genesis that a district whose effective rate has fallen below the charge-off rate is
-  charged for revenue it cannot collect. Table SD-1's TY2024 effective Class I rates make it a
-  count: **309 of 609 districts — half the state — charge less than the 23 mills the mechanism
-  would deem them able to levy.** [verified — computed in `crates/bundle` from
-  `regime-diff::TERMINAL_MILLS` against TY2024 Table SD-1]
-
   The FY2008 comparison is the one worth holding beside it. Gap aid then covered 145 districts
-  at $73.5 million. Sixteen years of reduction factors later the same rate against the same kind
-  of base would reach twice as many districts, because that is what H.B. 920 does with time:
-  every year of valuation growth above the floor moves another district further below any fixed
-  assumed rate. The mechanism did not fail once; it was failing progressively, and the
+  at $73.5 million. Sixteen years of reduction factors later the same rate against the same
+  kind of base would reach twice as many districts, because that is what H.B. 920 does with
+  time: every year of valuation growth above the floor moves another district further below any
+  fixed assumed rate. The mechanism did not fail once; it was failing progressively, and the
   supplement's cost was a lagging measure of it. [inference]
 
   A further **65 districts have valuation high enough that 23 mills would exceed their entire
-  base cost**, leaving them no state aid at all — the charge-off had no minimum state share, which
-  is a Fair School Funding Plan invention. [verified]
+  base cost**, leaving them no state aid at all — the charge-off had no minimum state share,
+  which is a Fair School Funding Plan invention. [verified]
 
   ### The comparison against the plan, on the corrected base
 
-  This node recorded that
-  "against the counterfactual the median district is $289 per pupil better off under the plan."
-  On recognized valuation the median district is **$45 per pupil worse off**, and **316 districts
-  would have done better under the charge-off against 290 under the plan** — where the corpus
-  previously published 193 against 413. The zeroed count above was 81 on the old base.
-
-  The incidence claim moved further than the level did. The corpus published that *every* wealth
-  quintile does better under the plan, most of all the richest. Only the top quintile still gains:
-  the bottom four lose by $118 to $365 per pupil, and the poorer the quintile the less it loses.
-  The *shape* survives — the plan is genuinely more generous to property-rich districts than the
-  charge-off was — but "every quintile gains" was an artifact of charging every district about 8%
-  too much on the counterfactual side. [verified —
+  The incidence claim moved further than the level did. The corpus published that *every*
+  wealth quintile does better under the plan, most of all the richest. Only the top quintile
+  still gains: the bottom four lose by $118 to $365 per pupil, and the poorer the quintile the
+  less it loses. The *shape* survives — the plan is genuinely more generous to property-rich
+  districts than the charge-off was — but "every quintile gains" was an artifact of charging
+  every district about 8% too much on the counterfactual side. [verified —
   `crates/regime-diff/tests/the_charge_off_against_local_capacity.rs`]
 
   A correction of this size from a definition is the argument for the node carrying the base
@@ -176,14 +164,6 @@ description: |
   **Joint vocational school districts were charged off at 0.5 mills**, not the district rate.
   [verified — LSC] This is the one place the "uniform statewide" description is false, and a
   comparison run over JVSDs at the district rate is wrong by a factor of forty-six.
-
-  ### Still open
-
-  The Evidence-Based Model years and the Bridge formula decade are not
-  established. Secondary reporting gives 22 mills for FY2010-11 under the Evidence-Based Model
-  and 20 mills applied to total valuation later, and neither is sourced well enough to commit
-  here. [open] The corpus deliberately holds three of the four eras rather than a complete
-  series with one guessed entry.
 revisions:
   - was: |
       The charge-off was described as 23 mills against *total taxable value*, following DeRolph
