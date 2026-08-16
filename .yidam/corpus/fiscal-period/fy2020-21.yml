@@ -5,10 +5,8 @@ summary: >-
   them. FY2020 is the one that never went away: the Fair School Funding Plan's guarantee is
   still anchored to it and has never been re-based.
 description: |
-  A biennium of the [Bridge formula](../funding-regime/bridge-formula.yml) era, created so that
-  the decade of per-district finance this corpus now holds has somewhere in the graph to land.
-  Before this backfill nothing before FY2022 was addressable and a query about FY2020 had nowhere
-  to go.
+  July 1, 2019 through June 30, 2021 — a biennium of the [Bridge
+  formula](../funding-regime/bridge-formula.yml) era. [verified]
 
   **The two frozen years, and FY2020 is the one that never went away.** The Fair School Funding Plan's guarantee is anchored to FY2020 and has never been re-based, so 48.3% of districts are still funded at this biennium's level in FY2027.
 
@@ -23,10 +21,6 @@ description: |
   categories doing it, so a series from Ohio's own reporting would measure the reporting.
   [inference]
 
-  **This node is thin on purpose.** It carries what the panel measures and the regime in force,
-  and not a narrative of the biennium. The appropriating act, the enacted changes and the
-  per-district figures the department published are `lsc-budget` work, which now carries the appropriation series from FY2012 and is wired for one
-  document. [open]
   **The appropriating act set the department's own budget at $11.88 billion in FY2020 and $12.10 billion in FY2021.** That is what was appropriated to the Department of Education across every line in its chapter, less the property tax reimbursement items that are numbered as the department's and are carried in the State Revenue Distributions section instead. [verified — the appropriation series, `lsc-appropriation-spreadsheet`] It is a ceiling rather than a payment; what districts received is `dew-foundation`.
 
 properties:

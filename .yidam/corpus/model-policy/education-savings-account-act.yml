@@ -23,7 +23,7 @@ description: |
   artifact. What the model gains by it is a denominator that does not collapse when participation
   rises; what a district loses by it is the thing the districts sued over. [inference]
 
-  Ohio has no enacted ESA of this kind, which bounds what this node can be for. The nearest Ohio
+  Ohio has no enacted ESA of this kind. The nearest Ohio
   instrument is the "Backpack Bill" — H.B. 11 of the 135th General Assembly, a universal education
   savings account proposal that was introduced and did not pass, and which is therefore not a
   corpus node, because [`legislation`](../legislation.ont.yml) means enacted. Its sponsors
@@ -31,12 +31,9 @@ description: |
   Carolina and West Virginia. No source retrieved here names ALEC or this text in connection with
   it. [verified — as an absence in the sources retrieved]
 
-  So this node's use is comparative and prospective rather than explanatory: it records what the
-  design Ohio did not enact would have done to a district's funding and count, so that a future
-  Ohio ESA proposal can be read against a written baseline instead of against an impression. The
-  allowable-expense list is the part a funding model would have to absorb — twelve categories
+  The allowable-expense list is the part a funding model would have to absorb — twelve categories
   ending in "any other valid educational expenses approved by the Department", which is an
-  open-ended commitment that no per-pupil figure in this repository could size. [inference]
+  open-ended commitment no per-pupil figure can size. [inference]
 properties:
   publisher: |
     American Legislative Exchange Council, Education and Workforce Development Task Force. An

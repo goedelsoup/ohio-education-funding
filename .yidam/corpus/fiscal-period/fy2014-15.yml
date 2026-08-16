@@ -5,10 +5,8 @@ summary: >-
   federal F-33 archive under every naming its neighbours answer to, and nothing here
   interpolates the missing year.
 description: |
-  A biennium of the [Bridge formula](../funding-regime/bridge-formula.yml) era, created so that
-  the decade of per-district finance this corpus now holds has somewhere in the graph to land.
-  Before this backfill nothing before FY2022 was addressable and a query about FY2014 had nowhere
-  to go.
+  July 1, 2013 through June 30, 2015 — a biennium of the [Bridge
+  formula](../funding-regime/bridge-formula.yml) era. [verified]
 
   **FY2014 is absent from the F-33 archive** under every naming its neighbours answer to, so this biennium is half-measured. Nothing interpolates the missing year.
 
@@ -24,10 +22,6 @@ description: |
   categories doing it, so a series from Ohio's own reporting would measure the reporting.
   [inference]
 
-  **This node is thin on purpose.** It carries what the panel measures and the regime in force,
-  and not a narrative of the biennium. The appropriating act, the enacted changes and the
-  per-district figures the department published are `lsc-budget` work, which now carries the appropriation series from FY2012 and is wired for one
-  document. [open]
   **The appropriating act set the department's own budget at $11.52 billion in FY2014 and $12.01 billion in FY2015.** That is what was appropriated to the Department of Education across every line in its chapter, less the property tax reimbursement items that are numbered as the department's and are carried in the State Revenue Distributions section instead. [verified — the appropriation series, `lsc-appropriation-spreadsheet`] It is a ceiling rather than a payment; what districts received is `dew-foundation`.
 
 properties:

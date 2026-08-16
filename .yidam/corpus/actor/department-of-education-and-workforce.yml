@@ -10,12 +10,12 @@ description: |
   Board of Education and the Superintendent of Public Instruction were retained but stripped
   of most operational authority, which now sits with the department. [verified]
 
-  For this corpus, DEW is the publisher of record for current-era numbers: the School Finance
-  Payment Reports that carry per-agency Fair School Funding Plan amounts, the average daily
-  membership counts the formula divides by, and the scholarship and community school
-  deduction records. A break in publisher partway through a series is exactly the kind of
-  discontinuity that produces two defensible answers to the same question, so the corpus
-  keeps the transition explicit rather than presenting an unbroken series. [inference]
+  DEW is the publisher of record for current-era numbers: the School Finance Payment Reports
+  that carry per-agency Fair School Funding Plan amounts, the average daily membership counts
+  the formula divides by, and the scholarship and community school deduction records.
+  [verified] A break in publisher partway through a series is exactly the kind of discontinuity
+  that produces two defensible answers to the same question, so any Ohio state aid series that
+  spans 2023 spans two agencies. [inference]
 properties:
   name: Department of Education and Workforce
   institution_type: executive-agency

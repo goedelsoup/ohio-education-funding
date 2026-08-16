@@ -10,7 +10,7 @@ description: |
   regimes are not independent, and a change to Ohio's report card propagates into federal
   identification without any federal act.
 
-  **Identification is building-level**, which is the grain this corpus does not otherwise carry:
+  **Identification is building-level** — the unit of account is a school, not a district:
 
   - **CSI** — the lowest-performing 5% of Title I served schools on the overall rating; for
     schools with fewer than three rated components, the lowest 5% by chronic absenteeism; high

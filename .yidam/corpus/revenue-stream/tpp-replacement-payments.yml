@@ -10,8 +10,8 @@ description: |
   extended to the phase-down of utility tangible personal property assessment. [verified]
   Funded from the commercial activity tax the same act created. [verified]
 
-  This node exists to make one thing traversable: a district's tax base was reduced by a state
-  decision and replaced with a state payment. The immediate effect was neutral by construction.
+  A district's tax base was reduced by a state decision and replaced with a state payment. The
+  immediate effect was neutral by construction.
   The structural effect was not. What had been a locally-levied tax — subject to the district's
   own voted millage, growing or shrinking with local industrial activity, and beyond the reach
   of the state budget — became an appropriation whose continuation depends on each biennium.
@@ -20,9 +20,8 @@ description: |
 
   The exposure is concentrated. Districts with large industrial or utility tangible personal
   property bases lost far more of their tax base than districts without, and are correspondingly
-  more exposed to each revision of the phase-down. [inference] Identifying which districts those
-  are, and what the payments are worth to them now, is the concrete work this node points at.
-  [open]
+  more exposed to each revision of the phase-down. [inference] Which districts those are, and
+  what the payments are worth to them now, is not established here. [open]
 properties:
   name: Tangible personal property tax replacement payments
   level: state

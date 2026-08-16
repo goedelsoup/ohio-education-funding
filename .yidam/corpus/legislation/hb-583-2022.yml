@@ -15,8 +15,8 @@ description: |
   system to the FY2025-FY2026 biennium." [verified —
   [the enacted H.B. 96 analysis](../../../crates/project/fixtures/enacted-school-funding.txt)]
 
-  **Why a node for a technical corrections act.** Because its corrections are already inside every
-  FY2022 figure this corpus holds, and were before it had a name here. The
+  **A technical corrections act is not a minor one here.** Its corrections are already inside
+  every published FY2022 figure, whether or not the act is named beside them. The
   [FY2022 payment report](../fiscal-period/fy2022.yml) is H.B. 110 as corrected by this act, not
   H.B. 110 as passed. Anyone reconciling a FY2022 per-district amount against the text of H.B. 110
   alone is reconciling against a formula that was never run.

@@ -18,8 +18,8 @@ description: |
   in real terms, with both descriptions arithmetically correct. [inference] Resolving that
   requires holding
   [`fsfp-phase-in-percentage`](../parameter/fsfp-phase-in-percentage.yml) and
-  [`base-cost-per-pupil`](../parameter/base-cost-per-pupil.yml) as separate addressable values
-  — which is why this corpus does.
+  [`base-cost-per-pupil`](../parameter/base-cost-per-pupil.yml) apart: they are two dials, and
+  the biennium moves one and freezes the other.
 
   This period is also the first full biennium after the federal ESSER funds expired, so
   district budgets in FY2026 lose a revenue source that was material for high-poverty

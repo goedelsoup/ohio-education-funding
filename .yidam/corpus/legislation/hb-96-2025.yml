@@ -15,7 +15,7 @@ description: |
   had explicitly frozen base cost at FY2022 levels, and the enacted act carried that forward.
   [inference]
 
-  This is the reason `parameter` is a first-class node in this corpus. A budget that advances
+  The two dials have to be read apart to read the act at all. A budget that advances
   the phase-in to 100% while freezing the input year produces a number that is simultaneously
   describable as full implementation and as a real-terms reduction, and both descriptions are
   arithmetically correct — they differ in which parameter they hold fixed. Resolving the
