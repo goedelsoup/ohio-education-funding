@@ -25,8 +25,19 @@ import { renderLineOrigins } from "../lib/lineOrigins.ts";
 import { renderMealProgram } from "../lib/mealProgram.ts";
 import { baseYear } from "../lib/real.ts";
 import * as routes from "../lib/routes.ts";
+import { yearOf } from "../lib/year.ts";
 
 const { bundle } = loadFeed();
+
+/*
+ * Where the rest of the site starts, read rather than asserted.
+ *
+ * "The only figures that reach before FY2020" is a claim about every *other* route, and FY2020 is
+ * the first year of the five-year forecast panel — the earliest anything on the formula side
+ * reaches. Written out, it would go wrong the day a source extends backward, which is exactly what
+ * happened to the MR-81 label this same phase corrected.
+ */
+const formulaEraBegins = yearOf("finances").replace(/^FY/, "").split("-")[0] ?? "";
 const history = bundle.history;
 const meal = bundle.meal_program;
 const appropriations = bundle.appropriations;
@@ -84,7 +95,7 @@ const appropriationBase = bundle.deflator
   <p class="sub">
     {
       first && last
-        ? `What Ohio's schools took in and from whom, FY${first.fiscal_year} through FY${last.fiscal_year}, measured by the federal government rather than by the state — and what the formula's poverty weight is counted on, back to FY${earliest}. The only figures on this site that reach before FY2020.`
+        ? `What Ohio's schools took in and from whom, FY${first.fiscal_year} through FY${last.fiscal_year}, measured by the federal government rather than by the state — and what the formula's poverty weight is counted on, back to FY${earliest}. The only figures on this site that reach before FY${formulaEraBegins}.`
         : "This feed carries no historical panel."
     }
   </p>

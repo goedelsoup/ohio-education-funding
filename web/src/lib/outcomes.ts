@@ -20,7 +20,7 @@ import { barSpec } from "./plot/spec.ts";
 import { renderToString } from "./plot/ssr.ts";
 import { count, escapeHtml, money, pct } from "./format.ts";
 import type { Bundle, District, OutcomeStatewide } from "./types.ts";
-import { seriesYear, yearChip, yearChipPair } from "./year.ts";
+import { schoolYearBefore, seriesYear, yearChip, yearChipPair, yearOf } from "./year.ts";
 import { term } from "./glossary.ts";
 
 /** A correlation, signed and to three places. */
@@ -304,10 +304,19 @@ export function renderDistrictOutcome(
         smallest in Ohio, and it is outside every outcome figure on this site.</p>
     </div>`;
   }
+  /*
+   * The report card's three years, all three derived from the one the feed names.
+   *
+   * They were `2022-23` and `2023-24` written out beside a `2024-25` that is now read from
+   * `series_years` — the worst arrangement of the three available, because the current label moves
+   * with the fixture and the two behind it do not, so the column headings drift apart from each
+   * other instead of all going stale together.
+   */
+  const reportCard = yearOf("outcome.performance");
   const series = [
-    ["2022-23", o.performance_index_earliest],
-    ["2023-24", o.performance_index_prior],
-    ["2024-25", o.performance_index],
+    [schoolYearBefore(reportCard, 2), o.performance_index_earliest],
+    [schoolYearBefore(reportCard, 1), o.performance_index_prior],
+    [reportCard, o.performance_index],
   ] as const;
 
   return `
@@ -345,7 +354,8 @@ export function renderDistrictOutcome(
       </tbody></table></div>
       <p class="note">The Performance Index is close to a fixed district trait across these three
         years, which is why a change in funding is unlikely to show up in it. Progress is the
-        measure that moves. Both are 2024-25; the spending figures are FY2025.</p>
+        measure that moves. Both are ${reportCard}; the spending figures are
+        ${yearOf("outcome.spending")}.</p>
       ${growthNote(o.progress_effect_size, o.progress_effect_size_one_year, statewide)}
       <p class="note">The two economically-disadvantaged shares on this page differ: the report
         card's is top-coded by community eligibility, the profile report's

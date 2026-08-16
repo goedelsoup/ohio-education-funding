@@ -128,6 +128,17 @@ export function guaranteeRateByQuintile(districts: District[]): Bar[] {
  * restate.
  */
 export function renderStatewideStructure(bundle: Bundle, tax: TaxStatewide): string {
+  /*
+   * The two tax years the reduction-factor comparison spans, read off the feed.
+   *
+   * They were `TY2023 and TY2024`. The feed carries four tax years so that recognised valuation
+   * can be reconstructed, and this sentence is about the last two — so the pair moves whenever
+   * Table SD-1 gains a year, and the sentence would have gone on naming the old one.
+   */
+  const years = bundle.districts[0]?.property_tax.slice(-2) ?? [];
+  const taxSpan =
+    years.length === 2 ? `TY${years[0]!.tax_year} and TY${years[1]!.tax_year}` : "the two tax years";
+
   const s = bundle.statewide;
   const bars = guaranteeRateByQuintile(bundle.districts);
 
@@ -193,7 +204,7 @@ export function renderStatewideStructure(bundle: Bundle, tax: TaxStatewide): str
         <a href="${routes.wikiNode("funding-regime", "fair-school-funding-plan")}">Fair School
         Funding Plan</a> was enacted with — each biennial budget sets it.</p>
       <p class="note"><strong>The millage floor is visible in the tax record, not only in the
-        statute.</strong> Across TY2023 and TY2024,
+        statute.</strong> Across ${taxSpan},
         ${count(tax.rateFell.aboveFloor)} of the ${count(tax.districts.aboveFloor)} districts that
         began above the floor saw their effective Class I rate fall as reduction factors rolled it
         back; of the ${count(tax.districts.atFloor)} that began at it,

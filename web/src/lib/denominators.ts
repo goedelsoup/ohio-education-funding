@@ -40,28 +40,35 @@
  * like everything else here.
  */
 
+import type { Bundle } from "./types.ts";
+import { seriesYear, type SeriesKey } from "./year.ts";
+
 /** The pupil counts the sources use. Distinct measures, not variants of one. */
 export const DENOMINATORS = {
   "base-cost-adm": {
     label: "Base cost ADM",
-    source: "Department of Education, FY2027 calculator",
+    source: "Department of Education, calculator",
+    series: "formula",
     note: "Funded rather than enrolled: a three-year average, and the count the funding formula divides by.",
     field: "districts[].adm",
   },
   "enrolled-adm-fy24": {
-    label: "Enrolled ADM, FY2024",
+    label: "Enrolled ADM",
+    series: "profile",
     source: "Department of Education, District Profile Report",
     note: "A headcount of pupils the district teaches. Differs from base cost ADM by a median 1.6% and by 27% at the extreme.",
     field: "districts[].adm_history[0]",
   },
   "unweighted-adm-fy25": {
-    label: "Unweighted ADM, FY2025",
+    label: "Unweighted ADM",
+    series: "outcome.spending",
     source: "Department of Education, report card",
-    note: "The report card's headcount. Not the same year or file as enrolled ADM FY2024.",
+    note: "The report card's headcount. Not the same year or file as enrolled ADM.",
     field: "districts[].spending_by_function.adm",
   },
   "weighted-adm-fy25": {
-    label: "Need-weighted ADM, FY2025",
+    label: "Need-weighted ADM",
+    series: "outcome.spending",
     source: "Department of Education, report card",
     note: "Weighted upward for disadvantage, English learners and disability. The department's own headline per-pupil denominator, and against a composition-driven outcome it is substantially a composition proxy.",
     field: "not carried directly; implied by per_equivalent_pupil",
@@ -74,19 +81,22 @@ export const DENOMINATORS = {
   },
   "categorical-enrolled-adm": {
     label: "Enrolled ADM, `[a]`",
-    source: "Department of Education, FY2027 calculator, `ADM Data` column 3",
+    source: "Department of Education, calculator, `ADM Data` column 3",
+    series: "formula",
     note: "The count targeted assistance, gifted, career-technical and English learners are paid on. Equal to `[b3] FY26 Enrolled ADM` in 608 of 609 districts and fifty pupils apart in Akron — one number entered twice and corrected once.",
     field: "districts[].categorical_adm",
   },
   "ta-resident-adm": {
     label: "Resident ADM",
-    source: "Department of Education, FY2027 calculator, `Targeted_Assistance`",
+    source: "Department of Education, calculator, `Targeted_Assistance`",
+    series: "formula",
     note: "Enrolled ADM less pupils open-enrolling in, plus those open-enrolling out. Targeted assistance measures wealth per resident pupil and then pays on the enrolled count — two denominators, one line apart in the same formula.",
     field: "districts[].targeted_assistance.resident_adm",
   },
   "f33-fall-membership": {
     label: "Fall membership, `V33`",
-    source: "NCES, School District Finance Survey (F-33), FY2022",
+    source: "NCES, School District Finance Survey (F-33)",
+    series: "national",
     note: "The federal count for a single district, five years before the model it sits beside. Not Ohio's enrolled ADM and not the report card's headcount — and the only denominator here that is not Ohio's own.",
     field: "districts[].national.revenue_per_pupil",
   },
@@ -98,17 +108,72 @@ export const DENOMINATORS = {
   },
   "meal-program-count": {
     label: "Meal-program denominator, `AdmCount` then `CECount`",
-    source: "Ohio DEW, Office for Child Nutrition, MR-81, FY2001-FY2011",
-    note: "The only count here that changes definition inside its own series: `AdmCount` through FY2009, then `CECount` — 'the highest daily number of students with access to the program' — from FY2010, which is neither ADM nor the count before it. The population is sponsors, not districts: community schools and county boards of developmental disabilities are in, and the count rises from 730 to 949 across the window mostly because community schools opened. Every row carries its own `basis` so a reader cannot splice the two halves without being told.",
+    source: "Ohio DEW, Office for Child Nutrition, MR-81",
+    series: "meal_program",
+    note: "The only count here that changes definition inside its own series: `AdmCount` through FY2009, then `CECount` — 'the highest daily number of students with access to the program' — from FY2010, which is neither ADM nor the count before it. The population is sponsors, not districts: community schools and county boards of developmental disabilities are in, and the count rises across the window mostly because community schools opened. Every row carries its own `basis` so a reader cannot splice the two halves without being told.",
+    /*
+     * The sponsor counts used to be written here as "rises from 730 to 949". The series was later
+     * extended in both directions — FY1998 at the near end, FY2014 at the far one — and the
+     * sentence went on naming the old endpoints, as did the span in `source` above: FY2001-FY2011
+     * against a feed carrying FY1998-FY2014, and 730/949 against an actual 718/1001.
+     *
+     * Two wrong claims in one entry, both invisible: prose beside data it cannot disagree with.
+     * The endpoints are computed at render time now; see `denominatorSpan`.
+     */
+    endpoints: "meal_program",
     field: "meal_program[].enrollment",
   },
   "f33-panel-membership": {
     label: "Fall membership, `V33`, per year",
-    source: "U.S. Census Bureau / NCES, School District Finance Survey (F-33), FY2009-FY2022",
-    note: "The same measure as `f33-fall-membership` and a different population: every comparable Ohio system in each year of the panel rather than one district in FY2022, so about 950 agencies including community schools and educational service centres. Nothing on the history route may be compared to a figure from the formula side, which counts 609 traditional districts on ADM.",
+    source: "U.S. Census Bureau / NCES, School District Finance Survey (F-33)",
+    series: "history",
+    note: "The same measure as `f33-fall-membership` and a different population: every comparable Ohio system in each year of the panel rather than one district in a single year, so about 950 agencies including community schools and educational service centres. Nothing on the history route may be compared to a figure from the formula side, which counts 609 traditional districts on ADM.",
     field: "history[].poorest_local_per_pupil",
   },
 } as const;
+
+/**
+ * A denominator's source, with the year the feed actually carries appended.
+ *
+ * # Why the year is not in the string
+ *
+ * Because it went stale, twice in one entry. The MR-81 row said its series ran `FY2001-FY2011`
+ * against a feed carrying `FY1998-FY2014`, and its note said sponsors rose "from 730 to 949"
+ * against an actual 718 to 1001. The series had been extended at both ends and the prose beside it
+ * could not disagree with the data, so nothing said so.
+ *
+ * The rule this settles: **a year that moves when a fixture advances is read, not typed.** An
+ * entry naming a `series` gets its year from `bundle.series_years`; one that does not is a source
+ * with no year to state.
+ */
+export function denominatorSource(entry: { source: string; series?: string }): string {
+  if (!entry.series) return entry.source;
+  const year = seriesYear(entry.series as SeriesKey);
+  return year ? `${entry.source}, ${year.label}` : entry.source;
+}
+
+/**
+ * The first and last observation of a series, for prose that names its endpoints.
+ *
+ * Returns `null` where the block is absent, so a caller renders the sentence without the figures
+ * rather than with a placeholder in them.
+ */
+export function denominatorSpan(
+  bundle: Bundle,
+  series: "meal_program",
+): { first: number; last: number; firstYear: number; lastYear: number } | null {
+  const rows = bundle[series];
+  if (!rows || rows.length === 0) return null;
+  const first = rows[0]!;
+  const last = rows[rows.length - 1]!;
+  return {
+    first: first.sponsors,
+    last: last.sponsors,
+    firstYear: first.fiscal_year,
+    lastYear: last.fiscal_year,
+  };
+}
+
 
 export type DenominatorKey = keyof typeof DENOMINATORS;
 
