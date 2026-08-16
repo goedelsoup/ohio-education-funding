@@ -5,10 +5,10 @@ summary: >-
   the appropriation did not cover what the formula computed. It is not a rate, a weight, a
   price or a threshold.
 description: |
-  A number below one that every district's payment under a program is multiplied by, because the
-  appropriation did not cover what the formula computed. It is **not a rate, a weight, a price or
-  a threshold** — the four kinds of parameter this corpus already held — and it belongs to a
-  different world from all of them.
+  A number below one that every district's payment under a program is multiplied by, because
+  the appropriation did not cover what the formula computed. It is **not a rate, a weight, a
+  price or a threshold** — the four kinds of parameter a funding statute already held — and it
+  belongs to a different world from all of them.
 
   A rate is a policy choice about how much to pay per unit. A proration is **an appropriation
   divided by an entitlement**: a fact about a budget, arriving after the formula has run,
@@ -17,56 +17,59 @@ description: |
 
   ### It is a condition on an appropriation, not a formula in statute
 
-  R.C. 3317.0213 does not
-  mention proration; the redbook does — "If necessary, DEW must prorate the payments so as not to
-  exceed the amount appropriated for each year." That is why the search of the Revised Code for
-  "proration" found it only in the calculator's labels and not in the sections. [verified]
+  R.C. 3317.0213 does not mention proration; the redbook does — "If necessary, DEW must prorate
+  the payments so as not to exceed the amount appropriated for each year." That is why the
+  search of the Revised Code for "proration" found it only in the calculator's labels and not
+  in the sections. [verified]
 
   ### The published amount is not what the district is owed
 
-  That is the whole reason this needs a
-  node. Under a proration the department's figure is what was available, divided — and the shortfall
-  cannot be recovered from it. A reader shown $1.2m has no way to know the formula computed $1.31m,
-  and nothing in the payment report says so. [verified]
+  That is the whole reason this needs a node. Under a proration the department's figure is what
+  was available, divided — and the shortfall cannot be recovered from it. A reader shown $1.2m
+  has no way to know the formula computed $1.31m, and nothing in the payment report says so.
+  [verified]
 
+  ### A proration of 1.0 is not an absence
+
+  ### Still open
+
+  No factor publishes a history, so "when each was last set" is answered for preschool and open
+  for the other two. [open]
+
+  ~~Also open: whether prorations apply anywhere inside `[H] Foundation Funding`.~~ Answered
+  above, from the workbook's own labels: none do, and the pattern is real rather than an
+  artefact of three observations.
+findings: |
   ### Three are known, and only one publishes its appropriation
 
-  program                                    factor        appropriation stated?
-      special education transportation           0.91746       no
-      preschool special education                0.96854448    yes — $147,500,000
-      transportation, general                    1.0           no
+  program factor appropriation stated? special education transportation 0.91746 no preschool
+  special education 0.96854448 yes — $147,500,000 transportation, general 1.0 no
 
-  The preschool sheet is what makes the class describable. It carries the **appropriation limit in
-  a cell beside the factor**, which is the only place in the FY2027 calculator that shows a
-  proration's two halves at once. Without it the factor is an unexplained multiplier; with it the
-  arithmetic is legible. [verified]
+  The preschool sheet is what makes the class describable. It carries the **appropriation limit
+  in a cell beside the factor**, which is the only place in the FY2027 calculator that shows a
+  proration's two halves at once. Without it the factor is an unexplained multiplier; with it
+  the arithmetic is legible. [verified]
 
   ### Why a node holding only the factor would be useless
 
-  At the stated 0.96854448
-  the preschool program totals **$148,408,184 against its own $147,500,000 limit — $908,184 over**.
-  A third cell on the same sheet states $146,708,228.07, matching neither. The likeliest reading is
-  a factor calibrated against an earlier ADM vintage and never recalibrated after the counts were
-  refreshed. [verified — `crates/project/tests/the_supplements_outside_the_formula.rs`]
+  At the stated 0.96854448 the preschool program totals **$148,408,184 against its own
+  $147,500,000 limit — $908,184 over**. A third cell on the same sheet states $146,708,228.07,
+  matching neither. The likeliest reading is a factor calibrated against an earlier ADM vintage
+  and never recalibrated after the counts were refreshed. [verified —
+  `crates/project/tests/the_supplements_outside_the_formula.rs`]
 
-  The FY2027 calculator is a projection published before the fiscal year, so a recalibration before
-  payment is expected and this may never reach a district. But a parameter that has silently
-  stopped satisfying its own constraint is exactly what a three-property node catches and a
-  one-property node cannot, and that is the argument for the class. [inference]
+  The FY2027 calculator is a projection published before the fiscal year, so a recalibration
+  before payment is expected and this may never reach a district. But a parameter that has
+  silently stopped satisfying its own constraint is exactly what a three-property node catches
+  and a one-property node cannot, and that is the argument for the class. [inference]
 
   ### No proration applies inside `[H] Foundation Funding`, and the workbook says so
 
-  The open question this node was written with is answered. Searching every label in the FY2027
-  calculator for "proration" or "phase-in" separates the two cleanly: inside foundation funding the
-  labels are all **phase-in** — `[Ac] Base Cost Phase In` through `[Hc] Foundation Phase In`, and
-  `[H] Foundation Funding Phase-in 100%`. The word "proration" appears only on transportation,
-  special education transportation and preschool special education. [verified]
-
-  The distinction is not lexical. A **phase-in** is a policy ramp written into the enactment: the
-  Fair School Funding Plan was legislated to reach its computed amount over six years, and FY2027
-  is the terminal year at 100%. A **proration** is a budget falling short of a formula that has
-  already run. One is a plan; the other is an outcome. Ohio prorates what it pays *around*
-  schooling and phases in what it computes *for* it.
+  The distinction is not lexical. A **phase-in** is a policy ramp written into the enactment:
+  the Fair School Funding Plan was legislated to reach its computed amount over six years, and
+  FY2027 is the terminal year at 100%. A **proration** is a budget falling short of a formula
+  that has already run. One is a plan; the other is an outcome. Ohio prorates what it pays
+  *around* schooling and phases in what it computes *for* it.
 
   And the department says so itself, in two notes on its own sheets:
 
@@ -78,29 +81,22 @@ description: |
   [verified] The second is what settles the entry below: the department names transportation's
   general factor as a live dial, not a dormant one.
 
-  ### A proration of 1.0 is not an absence
-
-  Transportation's general factor is one this year. The
-  cell exists, the multiplication happens, and the dial has evidently been turned before or it
-  would not be there. Recorded as a live parameter at its neutral value, on the same grounds as
-  the funded-but-zero program lines this corpus already holds — supplemental targeted assistance
-  and gifted professional development. [inference]
+  Transportation's general factor is one this year. The cell exists, the multiplication
+  happens, and the dial has evidently been turned before or it would not be there. Recorded as
+  a live parameter at its neutral value, on the same grounds as the funded-but-zero program
+  lines this corpus already holds — supplemental targeted assistance and gifted professional
+  development. [inference]
 
   ### Which budget line governs, and why it explains the anomaly
-
-  This node
-  said the question needed the budget bill's line items, "which is `lsc-budget` — a connector
-  still blocked on PDFs." It is not blocked; a PDF is a container. The department's redbook names
-  every appropriation line item and breaks each into earmarks with amounts.
 
       transportation                    GRF ALI 200502  Pupil Transportation
       special education transportation  GRF ALI 200502  (the same line)
       preschool special education       GRF ALI 200540  Special Education Enhancements
 
-  **AND PRESCHOOL SPECIAL EDUCATION IS THE *REMAINDER* OF ITS LINE ITEM.** ALI 200540 funds five
-  earmarked purposes first — special education at DD boards and institutions, parent mentoring,
-  school psychology interns, vocational rehabilitation, secondary transition — and preschool
-  special education takes what is left:
+  **AND PRESCHOOL SPECIAL EDUCATION IS THE *REMAINDER* OF ITS LINE ITEM.** ALI 200540 funds
+  five earmarked purposes first — special education at DD boards and institutions, parent
+  mentoring, school psychology interns, vocational rehabilitation, secondary transition — and
+  preschool special education takes what is left:
 
       ALI 200540 earmark                                FY2025 est.   FY2026 intro   FY2027 intro
       Special education at DD boards and institutions   $38,500,000    $33,945,594    $33,945,594
@@ -111,33 +107,25 @@ description: |
       Remainder — preschool special education          $147,500,000   $153,976,832   $153,976,832
 
   A residual claimant is the thing that absorbs a shortfall by construction. That is *why* this
-  program prorates and the others mostly do not, and nothing on the department's sheet says it —
-  the sheet shows a factor and a limit. [verified — `lsc-budget`, as introduced]
+  program prorates and the others mostly do not, and nothing on the department's sheet says it
+  — the sheet shows a factor and a limit. [verified — `lsc-budget`, as introduced]
 
   ### The limit the calculator prints is last year's
 
-  The $147,500,000 stated beside the
-  0.96854448 factor is the **FY2025 estimate**. FY2026 and FY2027 are both $153,976,832. So the
-  factor and the limit beside it are carried over together from the prior biennium, and on the
-  year being modelled the program at $148,408,184 is **$5.6m under** its appropriation rather than
-  $908,184 over it — meaning no proration would arise at all.
-
-  This node guessed "a factor calibrated against an earlier ADM vintage and never recalibrated"
-  and hedged that "a recalibration before payment is expected and this may never reach a
-  district." The appropriation column is why. The guess was adjacent and the mechanism is sharper:
-  it is not a stale *count*, it is a stale *appropriation*. [verified]
+  The $147,500,000 stated beside the 0.96854448 factor is the **FY2025 estimate**. FY2026 and
+  FY2027 are both $153,976,832. So the factor and the limit beside it are carried over together
+  from the prior biennium, and on the year being modelled the program at $148,408,184 is
+  **$5.6m under** its appropriation rather than $908,184 over it — meaning no proration would
+  arise at all.
 
   ### The enacted appropriation held, and the table above is the enacted one
 
-  This node said
-  the figures were the executive proposal and that "the enacted amounts need the appropriations
-  document, which is not wired." Two documents now answer it and they agree.
-
   LSC's **greenbook** is the redbook as *enacted* — same structure, same earmark table, columns
-  headed `Appropriation` where the redbook's are headed `Introduced`. It existed at a sibling URL
-  to the redbook the whole time and went unwired for four phases while this corpus quoted the
-  proposal. Every earmark held from introduction to enactment, to the dollar, and the remainder
-  with them: **$153,976,832**. [verified — `crates/project/fixtures/dew-greenbook.txt`]
+  headed `Appropriation` where the redbook's are headed `Introduced`. It existed at a sibling
+  URL to the redbook the whole time and went unwired for four phases while this corpus quoted
+  the proposal. Every earmark held from introduction to enactment, to the dollar, and the
+  remainder with them: **$153,976,832**. [verified —
+  `crates/project/fixtures/dew-greenbook.txt`]
 
       ALI 200540 earmark                                FY2025 actual   FY2026 approp   FY2027 approp
       Special education at DD boards and institutions     $36,258,454     $33,945,594     $33,945,594
@@ -148,39 +136,20 @@ description: |
       Remainder — preschool special education            $147,499,999    $153,976,832    $153,976,832
       GRF ALI 200540 total                               $195,160,040    $193,272,426    $193,272,426
 
-  The [Catalog of Budget Line Items](../../catalog/lsc-catalog-of-budget-line-items.md) confirms
-  the line independently, from a different publication parsed by a different extractor: its 2025
-  edition gives ALI 200540 an enacted $193,272,426 for FY2026 and FY2027 and an actual
-  $195,160,040 for FY2025 — the greenbook's totals exactly. [verified]
+  The [Catalog of Budget Line Items](../../catalog/lsc-catalog-of-budget-line-items.md)
+  confirms the line independently, from a different publication parsed by a different
+  extractor: its 2025 edition gives ALI 200540 an enacted $193,272,426 for FY2026 and FY2027
+  and an actual $195,160,040 for FY2025 — the greenbook's totals exactly. [verified]
 
   ### So the proration does not arise, and the reason is a stale cell
 
-  The calculator's stated
-  limit of $147,500,000 is the FY2025 figure — the estimate, against which the actual came in at
-  $147,499,999, a dollar short. Against the FY2027 appropriation the program at $148,408,184 is
-  **$5,568,648 under** rather than $908,184 over. The node's reading was right and is now
-  sourced from the enacted act's analysis rather than inferred from the proposal. [verified]
+  The calculator's stated limit of $147,500,000 is the FY2025 figure — the estimate, against
+  which the actual came in at $147,499,999, a dollar short. Against the FY2027 appropriation
+  the program at $148,408,184 is **$5,568,648 under** rather than $908,184 over. The node's
+  reading was right and is now sourced from the enacted act's analysis rather than inferred
+  from the proposal. [verified]
 
   ### The residual claimant grew while its line shrank
-
-  , which is the clearest illustration of
-  what a residual claimant is that this corpus holds. Comparing budget figure to budget figure —
-  the redbook's FY2025 *estimate* against the enacted FY2026 *appropriation*, because the
-  greenbook's FY2025 column is an **actual** and an actual against an appropriation is the error
-  this corpus refuses everywhere else — ALI 200540 fell $5,577,574. The five earmarks ahead of preschool fell $12,054,406 — vocational rehabilitation
-  moved out of the department's budget entirely, and special education at DD boards was cut. So
-  the remainder *rose* $6,476,832 on a line that was cut. Preschool special education received
-  more money because the claims ahead of it received less, and nothing on the department's own
-  sheet would tell a reader that. [verified]
-
-  ### Still open
-
-  No factor publishes a history, so "when each was last set" is answered for
-  preschool and open for the other two. [open]
-
-  ~~Also open: whether prorations apply anywhere inside `[H] Foundation Funding`.~~ Answered above,
-  from the workbook's own labels: none do, and the pattern is real rather than an artefact of three
-  observations.
 revisions:
   - was: |
       The 0.96854448 factor was read against the $147,500,000 limit printed beside it, making

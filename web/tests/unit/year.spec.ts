@@ -175,3 +175,39 @@ test("a school year steps back without inventing a century", () => {
   // Not `YYYY-YY` — return nothing rather than compose from whatever this is.
   expect(schoolYearBefore("FY2027", 1)).toBe("");
 });
+
+test("no corpus node states a statewide constant the feed contradicts", () => {
+  /*
+   * The corpus disagreed with itself, and with the feed.
+   *
+   * `fsfp-local-capacity-measure` was corrected from a 5% minimum state share to 10% — the
+   * department's calculator says `0.1` in as many words — and `fsfp-input-year-refresh` went on
+   * saying 5% in two places, one of them a worked example computing 5% of a base cost increase.
+   * Nothing connected the two nodes, or either node to `bundle.statewide.minimum_state_share`.
+   *
+   * This is the prose-beside-data defect one level up: not a label against the column it
+   * describes, but two documents describing the same constant with nothing holding them together.
+   * The feed is authoritative — `crates/foundation` computes it — so the corpus may not contradict
+   * it.
+   *
+   * Narrow on purpose. It checks the constants a node is *likely to restate in prose* and that the
+   * feed carries a single unambiguous value for. A general "no number disagrees with any number"
+   * check is not available and would not be worth its false positives.
+   */
+  const { bundle } = loadFeed();
+  const { loadCorpus } = require("../../src/lib/corpus.ts") as typeof import("../../src/lib/corpus.ts");
+
+  const percent = (v: number) => `${Number((v * 100).toFixed(2))}`.replace(/\.0+$/, "");
+  const stated = percent(bundle.statewide.minimum_state_share);
+
+  // Any other whole-percent reading of "minimum state share" is a contradiction of the feed.
+  const wrong = new RegExp(`\\b(?!${stated}\\b)\\d{1,2}(\\.\\d+)?%\\s+minimum state share`, "i");
+
+  const offenders: string[] = [];
+  for (const node of loadCorpus().nodes) {
+    const prose = [node.description, node.findings ?? ""].join("\n\n");
+    const hit = wrong.exec(prose);
+    if (hit) offenders.push(`${node.id}: "${hit[0]}" against the feed's ${stated}%`);
+  }
+  expect(offenders, "the feed is authoritative for this constant").toEqual([]);
+});

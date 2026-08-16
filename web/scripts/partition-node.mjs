@@ -20,6 +20,8 @@
 import { readFileSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
 
+import YAML from "yaml";
+
 const CORPUS = "/Users/cparent/Code/goedelsoup/ohio-education-funding/main/.yidam/corpus";
 
 /** Fold one field's text to the corpus's 95-column wrap at a given indent. */
@@ -147,6 +149,55 @@ for (const [id, spec] of Object.entries(plan)) {
     } else {
       const anchor = out.indexOf("\nproperties:");
       out = `${out.slice(0, anchor)}\nrevisions:\n${entries}${out.slice(anchor)}`;
+    }
+  }
+
+  /*
+   * Parse what was written before accepting it, and diff the word counts.
+   *
+   * Every defect this tool has had corrupted its output rather than merely mis-shaping it: tables
+   * dropped below markdown's indent threshold, a `revisions:` key written twice into an
+   * unparseable duplicate, a hand edit that spliced a description into a revision entry. Not one
+   * was visible in the diff, and all three were found by parsing the result afterwards — so the
+   * parse belongs here, before the file is accepted, rather than in whoever remembers to look.
+   *
+   * The word check is the one that caught the splice: text moving between fields conserves words,
+   * so a total that changes by more than the folding can explain means something was duplicated
+   * or eaten.
+   */
+  const before = YAML.parse(raw);
+  let after;
+  try {
+    after = YAML.parse(out);
+  } catch (error) {
+    console.log(`  ! ${id}: the result does not parse — ${String(error).split("\n")[0]}`);
+    continue;
+  }
+
+  const count = (node) =>
+    ["description", "findings"]
+      .map((k) => (node[k] ? node[k].split(/\s+/).filter(Boolean).length : 0))
+      .reduce((a, b) => a + b, 0);
+  const dropped = new Set(spec.drop ?? []);
+  const allowed = [...dropped].reduce(
+    (sum, i) => sum + paras[i].split(/\s+/).filter(Boolean).length,
+    0,
+  );
+  const lost = count(before) - count(after);
+  if (Math.abs(lost - allowed) > 2) {
+    console.log(
+      `  ! ${id}: ${lost} words left description+findings but ${allowed} were dropped — ` +
+        "something was duplicated or eaten, not moved",
+    );
+    continue;
+  }
+
+  // An ASCII table under four spaces renders as a paragraph with its columns collapsed.
+  for (const field of ["description", "findings"]) {
+    for (const para of (after[field] ?? "").split(/\n\n+/)) {
+      if (/^ {2,3}\S/.test(para) && /\s{3,}\S/.test(para.split("\n")[0] ?? "")) {
+        console.log(`  ! ${id}: a table in ${field}: sits under four spaces and will collapse`);
+      }
     }
   }
 
