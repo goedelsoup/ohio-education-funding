@@ -20,24 +20,52 @@ description: |
 
   The scaling factor is where the progressivity actually lives, and it is a sliding scale, not
   a constant. A district's local capacity percentage is set by the ratio of its federal median
-  income to the state's, benchmarked against the **40th highest district** on that ratio:
-  at or above that benchmark the rate is 2.5%; below the state median it is the district's own
-  ratio times 2.25%; between the two it interpolates. [verified] A district at half the state
-  median income is charged local capacity at roughly 1.125% of its blended wealth, while a
-  wealthy district pays 2.5% — so the measure is progressive in rate as well as in base.
+  income to the state's, benchmarked against the **40th highest district** on that ratio: at or
+  above that benchmark the rate is 2.5%; below the state median it is the district's own ratio
+  times 2.25%; between the two it interpolates. [verified] A district at half the state median
+  income is charged local capacity at roughly 1.125% of its blended wealth, while a wealthy
+  district pays 2.5% — so the measure is progressive in rate as well as in base.
 
   Both wealth terms are computed as the **lesser** of the most recent year and a three-year
   average — valuation from TY20 against TY18-20, income from TY19 against TY17-19 in the FY2022
   calculation. [verified] Taking the lesser is a deliberate protection: a district whose
   valuation spikes on a single reappraisal is not immediately charged for it.
 
-  **The minimum state share is 10%, and this corpus had it at 5%.** The Fair School Funding
-  Plan was enacted with a 5% floor and `crates/local-capacity` encoded that as a constant. The
-  department's FY2027 calculator states **0.1** for both FY2026 and FY2027, on its `Notes`
-  sheet, in as many words. It is set by each biennial budget rather than fixed in permanent law,
-  and it doubled. **138 of 609 districts — 22.7% — sit exactly on it**, receiving a floor rather
-  than a computed share. [verified]
+  ### The benchmark is a rank, not a value
 
+  It recorded the benchmark as "a single discretionary number that sets the top of the entire
+  scale" and asked how it moves over time. R.C. 3317.017(A)(4)(c)–(d) settles both halves, and
+  the answer changes the question: the statute writes a **rank**, not a value. Districts are
+  ranked by the ratio of their federal median income to the statewide median, and the district
+  with the **fortieth highest ratio** is the point at which the capacity percentage caps at
+  0.025.
+
+  Why the fortieth, out of 609, is not stated in the section. [open] And how far the value has
+  moved between biennia is still unmeasured here, because the corpus holds one year of the
+  calculator — but it is now a question about a distribution rather than about a decision.
+  [open]
+
+  ### The valuation is the lesser of two, and the rule is one-sided
+
+  R.C. 3317.017(A)(1)(a) takes the minimum of a district's three-year average valuation and its
+  most recent taxable value; the income side takes the same shape. Under rising valuations the
+  average is lower, so the district is charged on a lagged figure; under falling valuations the
+  recent year is lower and the fall passes straight through. **602 of 609 districts are on the
+  lagged branch and 7 on the immediate one** — the seven whose valuation fell, none by more
+  than 1.15%.
+
+  The rule therefore never charges a district on the higher of its two measures. That makes it
+  a floor on the state's share wearing the clothes of a smoothing device, and the asymmetry is
+  invisible in any one district's figures. [verified —
+  `crates/local-capacity/tests/against_the_departments_own_capacity.rs`]
+
+  **And it is the charge-off's instinct in a new device.** The mechanism this replaced also
+  lagged revaluation, through [recognized
+  valuation](../parameter/local-share-charge-off-millage.yml) — a three-year phase-in of the
+  inflationary increase. Two regimes, the same judgement that a reappraisal should not reach
+  state aid all at once, and two different implementations. A reader told only that the plan
+  "uses a three-year average" would not see that it is the successor to something. [verified]
+findings: |
   That is a large fact about how the measure actually operates. For those 138 districts the
   entire apparatus above — the three wealth terms, the 60/20/20 blend, the progressive rate
   schedule, the 40th-highest-district benchmark — determines nothing. Their aid is a flat
@@ -49,52 +77,10 @@ description: |
   from published aid by subtraction: all that can be said is that it exceeds 90% of base cost.
   [verified]
 
-  ### The benchmark is a rank, not a value
-
-  It
-  recorded the benchmark as "a single discretionary number that sets the top of the entire scale"
-  and asked how it moves over time. R.C. 3317.017(A)(4)(c)–(d) settles both halves, and the
-  answer changes the question: the statute writes a **rank**, not a value. Districts are ranked by
-  the ratio of their federal median income to the statewide median, and the district with the
-  **fortieth highest ratio** is the point at which the capacity percentage caps at 0.025.
-
-  So nobody sets it. Its value moves every year because the ranking is recomputed from incomes
-  that move, and no budget bill has to touch it for the top of the scale to shift. That is a
-  different kind of parameter from a rate or a threshold — it is a **statutory order statistic** —
-  and it is the second time this corpus has found a class of parameter it had no shape for, after
-  the [appropriation proration factor](../parameter/appropriation-proration-factor.yml).
-  [verified — `ohio-laws`]
-
-  Why the fortieth, out of 609, is not stated in the section. [open] And how far the value has
-  moved between biennia is still unmeasured here, because the corpus holds one year of the
-  calculator — but it is now a question about a distribution rather than about a decision. [open]
-
-  ### The valuation is the lesser of two, and the rule is one-sided
-
-  R.C.
-  3317.017(A)(1)(a) takes the minimum of a district's three-year average valuation and its most
-  recent taxable value; the income side takes the same shape. Under rising valuations the average
-  is lower, so the district is charged on a lagged figure; under falling valuations the recent
-  year is lower and the fall passes straight through. **602 of 609 districts are on the lagged
-  branch and 7 on the immediate one** — the seven whose valuation fell, none by more than 1.15%.
-
-  The rule therefore never charges a district on the higher of its two measures. That makes it a
-  floor on the state's share wearing the clothes of a smoothing device, and the asymmetry is
-  invisible in any one district's figures. [verified —
-  `crates/local-capacity/tests/against_the_departments_own_capacity.rs`]
-
-  **And it is the charge-off's instinct in a new device.** The mechanism this replaced also
-  lagged revaluation, through [recognized
-  valuation](../parameter/local-share-charge-off-millage.yml) — a three-year phase-in of the
-  inflationary increase. Two regimes, the same judgement that a reappraisal should not reach state
-  aid all at once, and two different implementations. A reader told only that the plan "uses a
-  three-year average" would not see that it is the successor to something. [verified]
-
   ### Against the mechanism it replaced
 
-  [verified —
-  [`crates/regime-diff`](../../../crates/regime-diff/), the corpus's only aligned component
-  pair, run at FY2027 base cost with only the local share substituted]
+  [verified — [`crates/regime-diff`](../../../crates/regime-diff/), the corpus's only aligned
+  component pair, run at FY2027 base cost with only the local share substituted]
 
   The income terms do what they were built to do, and they do it in **both** directions. Ottawa
   Hills Local — high income, unremarkable valuation — is charged **69% more** by local capacity
@@ -112,40 +98,33 @@ description: |
   charge-off, by valuation quintile: $154.85, $102.38, $107.60, $193.23, **$873.92**. Every
   quintile does better, and the wealthiest does best by a factor of five and a half over the
   poorest. The minimum state share is part of that — the charge-off had no floor and would zero
-  out 81 districts entirely — but not the whole of it: splitting the top quintile by whether the
-  charge-off would have zeroed it leaves both halves gaining about the same, $908.63 against
-  $805.35. [verified]
+  out 81 districts entirely — but not the whole of it: splitting the top quintile by whether
+  the charge-off would have zeroed it leaves both halves gaining about the same, $908.63
+  against $805.35. [verified]
 
-  So this measure is more discriminating than the charge-off about *which* districts are wealthy
-  and simultaneously more generous to wealthy districts overall. Those are not in tension —
-  the first is about the ordering and the second about the level — but a claim that cites one
-  without the other is quoting half the result. [inference]
+  So this measure is more discriminating than the charge-off about *which* districts are
+  wealthy and simultaneously more generous to wealthy districts overall. Those are not in
+  tension — the first is about the ordering and the second about the level — but a claim that
+  cites one without the other is quoting half the result. [inference]
 
   ### The measure is published per district
 
-  The FY2027 calculator's `Detail_SFPR` sheet carries `[b1] Per Pupil Capacity Amount` for every
-  district. Nothing here read that sheet. The corpus instead derived capacity as base cost minus
-  the state's share of it, which is exact for 471 districts and impossible for the 138 where the
-  minimum state share binds — and those are precisely the districts where capacity is highest and
-  the subtraction understates it, so they were censored rather than reported wrong. [verified]
+  The FY2027 calculator's `Detail_SFPR` sheet carries `[b1] Per Pupil Capacity Amount` for
+  every district. Nothing here read that sheet. The corpus instead derived capacity as base
+  cost minus the state's share of it, which is exact for 471 districts and impossible for the
+  138 where the minimum state share binds — and those are precisely the districts where
+  capacity is highest and the subtraction understates it, so they were censored rather than
+  reported wrong. [verified]
 
-  The two agree where both exist, to **0.46% at worst**, which is the retrospective check on the
-  subtraction and the reason to trust the eleven phases of work built on it. The 138 are no longer
-  censored. [verified — `crates/project/tests/finances_and_the_guarantee.rs`]
-
-  **The inputs are held too, and the record here said otherwise.** This node's calculator was
-  described as unimplementable because the repository had no income data at any level. It has, on
-  a sheet named `Local_Capacity` that works the entire statute step by step under its own labels —
-  `[V1]` and `[I1]` through `[C7]` — including the two figures that are choices rather than
-  derivations: the statewide federal median income and the benchmark ratio of the 40th highest
-  district. Every argument the measure takes is in a cached file, and has been since the first
-  import. [verified]
+  The two agree where both exist, to **0.46% at worst**, which is the retrospective check on
+  the subtraction and the reason to trust the eleven phases of work built on it. The 138 are no
+  longer censored. [verified — `crates/project/tests/finances_and_the_guarantee.rs`]
 
   ### The calculator reproduces the department's figure exactly
 
-  [verified —
-  `crates/local-capacity/tests/against_the_departments_own_capacity.rs`] `crates/local-capacity`
-  was written from the statute and had never been run against anything. It is right.
+  [verified — `crates/local-capacity/tests/against_the_departments_own_capacity.rs`]
+  `crates/local-capacity` was written from the statute and had never been run against anything.
+  It is right.
 
   **How this was got wrong first, because the route matters more than the result.** An earlier
   pass reconstructed the inputs from the workbook's `Valuation & Income` sheet and inferred the
@@ -164,12 +143,6 @@ description: |
 
   On the published inputs the residual is zero. **The 4.4% gap was not a finding about Ohio; it
   was the cost of not opening a sheet.** [verified]
-
-  That also retracts a claim this node briefly carried. It said the third term is the district's
-  **Ohio** median income, on the evidence that substituting it fits to a few percent. It does fit,
-  because the two measures are correlated — and it is the wrong measure. The term is federal
-  median income with the department's adjustment factor, exactly as the crate always said, and
-  the earlier claim was marked verified on evidence that could not support it. [verified]
 revisions:
   - was: |
       The 40th-highest benchmark was recorded as "a single discretionary number that sets the
@@ -199,6 +172,35 @@ revisions:
       subtraction understates it. Those were censored rather than reported wrong, so no
       published figure was incorrect; 138 districts simply had no capacity figure for eleven
       phases.
+  - was: |
+      The minimum state share was encoded in `crates/local-capacity` as **5%**, the floor the
+      Fair School Funding Plan was enacted with.
+    now: |
+      It is **10%**. The department's FY2027 calculator states `0.1` for both FY2026 and FY2027
+      on its `Notes` sheet, in as many words.
+    found_by: |
+      The `Notes` sheet of the department's own FY2027 workbook.
+    reach: |
+      Large, and in a specific direction: 138 districts sit on the floor, so for those the
+      measure does not determine aid at all and the doubled minimum is the whole of what they
+      receive. It also censors the data — where the floor binds, local capacity per pupil
+      cannot be recovered by subtraction.
+  - was: |
+      The calculator was described as unimplementable because the repository held no income
+      data at any level, and the benchmark's value was recorded as discretionary and
+      unexplained.
+    now: |
+      The workbook carries a `Local_Capacity` sheet that works the entire statute step by step
+      under its own labels, and every term the corpus had inferred was the wrong one. On the
+      published inputs the residual is zero.
+    found_by: |
+      The `Local_Capacity` sheet of the FY2027 calculator, reproduced in
+      `crates/local-capacity/tests/against_the_departments_own_capacity.rs` for 609 of 609
+      districts.
+    reach: |
+      The 4.4% gap the corpus had been carrying was not a finding about the measure — it was
+      the distance between the statute as inferred and the statute as published. A residual
+      computed against guessed inputs measures the guess.
 properties:
   name: FSFP local capacity measure
   function: |

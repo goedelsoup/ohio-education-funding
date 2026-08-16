@@ -112,7 +112,7 @@ Fields: count per claim tag across every node; then the unresolved marks by the 
 -->
 | Tag | Count | What it records |
 |---|--:|---|
-| `[verified]` | 834 | supported by a committed primary source |
+| `[verified]` | 829 | supported by a committed primary source |
 | `[inference]` | 236 | drawn from verified facts, not witnessed |
 | `[open]` | 192 | a live question — unknown, contested, or being worked |
 | `[unentered]` | 34 | a knowable value nobody has typed in yet |
@@ -121,9 +121,9 @@ Fields: count per claim tag across every node; then the unresolved marks by the 
 
 | Field | `[open]` | `[unentered]` |
 |---|--:|--:|
-| `description` | 97 | 3 |
+| `description` | 96 | 3 |
+| `findings` | 13 | 0 |
 | `series` | 12 | 0 |
-| `findings` | 12 | 0 |
 | `vetoes` | 7 | 1 |
 | `established` | 0 | 7 |
 | `typology` | 1 | 5 |
@@ -161,7 +161,7 @@ Fields: count per claim tag across every node; then the unresolved marks by the 
 | `context` | 1 | 0 |
 | `appropriating_bill` | 1 | 0 |
 
-**21 recorded withdrawals across 15 nodes.** A claim the corpus published and no longer stands behind is kept in a `revisions:` block rather than edited out, with the test or source that settled it — see [`the-four-genres-of-a-description`](../decisions/the-four-genres-of-a-description.yml). Counted here for the same reason the tags above are: how often this corpus has corrected itself is a fact about it, and one nobody would think to update by hand.
+**24 recorded withdrawals across 15 nodes.** A claim the corpus published and no longer stands behind is kept in a `revisions:` block rather than edited out, with the test or source that settled it — see [`the-four-genres-of-a-description`](../decisions/the-four-genres-of-a-description.yml). Counted here for the same reason the tags above are: how often this corpus has corrected itself is a fact about it, and one nobody would think to update by hand.
 <!-- /REGEN -->
 
 ## Node index
@@ -209,7 +209,7 @@ Sorted by: kind, then alphabetically.
 | [`fsfp-enrolment-supplements`](formula-component/fsfp-enrolment-supplements.yml) | formula-component | FSFP Base and Enrollment Growth Supplements | 3 | 1 |
 | [`fsfp-formula-transition-supplement`](formula-component/fsfp-formula-transition-supplement.yml) | formula-component | FSFP Formula Transition Supplement | 4 | 4 |
 | [`fsfp-gifted-units`](formula-component/fsfp-gifted-units.yml) | formula-component | FSFP Gifted Identification and Units | 3 | 1 |
-| [`fsfp-local-capacity-measure`](formula-component/fsfp-local-capacity-measure.yml) | formula-component | FSFP Local Capacity Measure | 6 | 7 |
+| [`fsfp-local-capacity-measure`](formula-component/fsfp-local-capacity-measure.yml) | formula-component | FSFP Local Capacity Measure | 5 | 7 |
 | [`fsfp-performance-supplement`](formula-component/fsfp-performance-supplement.yml) | formula-component | FSFP Performance Supplement | 7 | 3 |
 | [`fsfp-preschool-special-education`](formula-component/fsfp-preschool-special-education.yml) | formula-component | FSFP Preschool Special Education | 4 | 2 |
 | [`fsfp-special-education-weights`](formula-component/fsfp-special-education-weights.yml) | formula-component | FSFP Special Education Weights | 5 | 9 |
@@ -252,7 +252,7 @@ Sorted by: kind, then alphabetically.
 | [`state-share-percentage`](metric/state-share-percentage.yml) | metric | State Share Percentage | 5 | 3 |
 | [`education-savings-account-act`](model-policy/education-savings-account-act.yml) | model-policy | Education Savings Account Act | 4 | 0 |
 | [`parental-choice-scholarship-act`](model-policy/parental-choice-scholarship-act.yml) | model-policy | Parental Choice Scholarship Program Act (Universal Eligibility) | 4 | 1 |
-| [`appropriation-proration-factor`](parameter/appropriation-proration-factor.yml) | parameter | Appropriation Proration Factor | 2 | 3 |
+| [`appropriation-proration-factor`](parameter/appropriation-proration-factor.yml) | parameter | Appropriation Proration Factor | 2 | 2 |
 | [`base-cost-per-pupil`](parameter/base-cost-per-pupil.yml) | parameter | Base Cost Per Pupil | 9 | 16 |
 | [`fsfp-phase-in-percentage`](parameter/fsfp-phase-in-percentage.yml) | parameter | FSFP Phase-In Percentage | 4 | 13 |
 | [`guarantee-funding-base`](parameter/guarantee-funding-base.yml) | parameter | Guarantee Funding Base | 4 | 1 |

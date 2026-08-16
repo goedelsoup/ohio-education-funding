@@ -128,8 +128,26 @@ for (const [id, spec] of Object.entries(plan)) {
           .join("\n"),
       )
       .join("\n");
-    const anchor = out.indexOf("\nproperties:");
-    out = `${out.slice(0, anchor)}\nrevisions:\n${entries}${out.slice(anchor)}`;
+
+    /*
+     * Append to an existing block rather than opening a second one.
+     *
+     * A node corrected in an earlier pass already has `revisions:`, and inserting unconditionally
+     * wrote the key twice — which is a YAML duplicate-key error, so the node stops parsing
+     * altogether. Every consumer sees it; none of them can say which entry was meant. Caught by
+     * the loader refusing the file, which is the one failure mode of this tool that announces
+     * itself.
+     */
+    const existing = /^revisions:\n/m.exec(out);
+    if (existing) {
+      const start = existing.index + existing[0].length;
+      const rest = out.slice(start);
+      const end = start + (/^\S/m.exec(rest)?.index ?? rest.length);
+      out = `${out.slice(0, end).replace(/\n+$/, "")}\n${entries}\n${out.slice(end)}`;
+    } else {
+      const anchor = out.indexOf("\nproperties:");
+      out = `${out.slice(0, anchor)}\nrevisions:\n${entries}${out.slice(anchor)}`;
+    }
   }
 
   writeFileSync(file, out);

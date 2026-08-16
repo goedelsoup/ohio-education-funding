@@ -7,10 +7,29 @@ summary: >-
 description: |
   What a district actually spends per student on day-to-day operations — salaries, benefits,
   purchased services, supplies — excluding capital outlay and non-elementary-secondary
-  programs. It is the outcome side of every adequacy and equity claim in this corpus, and the
+  programs. It is the outcome side of every adequacy and equity claim about
+  Ohio's districts, and the
   measure against which [base cost per pupil](../parameter/base-cost-per-pupil.yml) should be
   read: base cost is what the state says an education costs, this is what districts spend.
 
+  **This metric is not the state's business and that is the point.** A district's operating
+  expenditure reflects local revenue, levy history, and local choice as much as state aid.
+  Regressing it against [valuation per pupil](assessed-valuation-per-pupil.yml) is the
+  wealth-neutrality test; comparing it against base cost per pupil is the adequacy test. It
+  answers neither question by itself. [inference]
+
+  **The denominator here is a headcount, and its sibling's is not.** DEW's report card
+  publishes [expenditure per equivalent pupil](expenditure-per-equivalent-pupil.yml), which
+  divides by an ADM count weighted upward for disadvantage, English learners, and disability.
+  That measure runs about 22% lower at the median — $12,856 for 2024-2025 against $15,646 here
+  for FY2024 — and it is the one sitting next to the Performance Index on the same report card,
+  so it is the one an Ohio spending-versus-results argument will reach for. The two are not
+  interchangeable in either direction, and the difference is not cosmetic: a need-weighted
+  denominator is a need adjustment that suppresses exactly the gradient this metric exposes.
+  [verified]
+
+  ### The report card splits this figure by where the money came from
+findings: |
   **The statewide series demonstrates why deflation is not optional.** From FY2000 to FY2022,
   Ohio public school operating expenditure per pupil rose from $7,065 to $15,314 — 116.8% in
   nominal terms. Adjusted for inflation, the increase is **26.1%**. [verified] The same fact,
@@ -23,9 +42,9 @@ description: |
   between the two FY2022 figures is larger than most policy changes this corpus models.
 
   Total operating expenditure roughly doubled over the period, $13.0 billion to $25.8 billion,
-  while enrollment fell 8.3% from about 1.84 million to about 1.68 million. [verified] Per-pupil
-  growth is therefore partly a numerator effect and partly a denominator one, and attributing it
-  wholly to spending decisions is wrong.
+  while enrollment fell 8.3% from about 1.84 million to about 1.68 million. [verified]
+  Per-pupil growth is therefore partly a numerator effect and partly a denominator one, and
+  attributing it wholly to spending decisions is wrong.
 
   Growth is broadly uniform across functions, which is itself informative — it rules out the
   common claim that administrative bloat drove the increase. In real terms FY2000 to FY2022:
@@ -34,37 +53,23 @@ description: |
 
   ### The disagreement about this series is periodic, not only definitional
 
-  [OCG White Paper 015](../../catalog/ocg-white-paper-015.md) makes the best available case that
-  Ohio's funding argument is a quarrel about definitions: it names seven standards for
+  [OCG White Paper 015](../../catalog/ocg-white-paper-015.md) makes the best available case
+  that Ohio's funding argument is a quarrel about definitions: it names seven standards for
   "defunding" and answers each. Its per-pupil and real-reduction rows both read **No — up
-  ~25-26% real**, which is correct endpoint to endpoint and is this metric's own headline figure.
+  ~25-26% real**, which is correct endpoint to endpoint and is this metric's own headline
+  figure.
 
   It is still not the whole answer, because every standard in that table is applied FY2000 to
-  FY2022. Deflated year by year this series falls about 7% between FY2010 and FY2014 and does not
-  regain its FY2010 level until FY2018. A speaker who says Ohio defunded its schools and is
+  FY2022. Deflated year by year this series falls about 7% between FY2010 and FY2014 and does
+  not regain its FY2010 level until FY2018. A speaker who says Ohio defunded its schools and is
   thinking of those years is describing something that happened, under the paper's own real and
   per-pupil standards, and no choice among its seven definitions surfaces it. [inference]
 
   So the rule this metric adds to the deflation rule: **name the window as well as the index.**
-  An endpoint pair cannot see an interior reversal, and this series contains three. Two speakers
-  can select different windows on one record and both be correct, which is a second and
-  independent reason the public argument does not resolve. See
+  An endpoint pair cannot see an interior reversal, and this series contains three. Two
+  speakers can select different windows on one record and both be correct, which is a second
+  and independent reason the public argument does not resolve. See
   [`skills/deflate`](../../skills/deflate.md).
-
-  **This metric is not the state's business and that is the point.** A district's operating
-  expenditure reflects local revenue, levy history, and local choice as much as state aid.
-  Regressing it against [valuation per pupil](assessed-valuation-per-pupil.yml) is the
-  wealth-neutrality test; comparing it against base cost per pupil is the adequacy test. It
-  answers neither question by itself. [inference]
-
-  **The denominator here is a headcount, and its sibling's is not.** DEW's report card publishes
-  [expenditure per equivalent pupil](expenditure-per-equivalent-pupil.yml), which divides by an
-  ADM count weighted upward for disadvantage, English learners, and disability. That measure runs
-  about 22% lower at the median — $12,856 for 2024-2025 against $15,646 here for FY2024 — and it
-  is the one sitting next to the Performance Index on the same report card, so it is the one an
-  Ohio spending-versus-results argument will reach for. The two are not interchangeable in either
-  direction, and the difference is not cosmetic: a need-weighted denominator is a need adjustment
-  that suppresses exactly the gradient this metric exposes. [verified]
 
   That gradient, computed over the same FY2024 cross-section behind the equity findings above:
   operating expenditure per pupil correlates with the economically disadvantaged share at
@@ -73,11 +78,11 @@ description: |
   spends about $3,400 more per headcount pupil than its lowest. Any analysis reporting that
   spending and need are unrelated should be checked for which denominator it used first.
 
-  **The check has now been run, on one numerator against both divisors.** Correlated against the
-  [Performance Index](performance-index.yml), FY2025 operating expenditures give **−0.337** per
-  unweighted pupil and **−0.015** per weighted pupil; this metric's own FY2024 series gives
-  **−0.388**. [verified] Two headcount measures from two publications agree; the weighted one is
-  the outlier. The denominator is not a presentation choice.
+  **The check has now been run, on one numerator against both divisors.** Correlated against
+  the [Performance Index](performance-index.yml), FY2025 operating expenditures give **−0.337**
+  per unweighted pupil and **−0.015** per weighted pupil; this metric's own FY2024 series gives
+  **−0.388**. [verified] Two headcount measures from two publications agree; the weighted one
+  is the outlier. The denominator is not a presentation choice.
 
   A second, independent series also lands here. The FY2025 Expanded List's headcount median of
   $16,289 sits 4.1% above this metric's FY2024 Cupp Report median of $15,646 — two publishers,
@@ -85,34 +90,32 @@ description: |
   external validation of this series, and the first time this metric has been checked against
   anything but itself.
 
-  ### The report card splits this figure by where the money came from
+  `exp_per_equivalent_pupil_federal` and its state-and-local twin have been in the committed
+  fixture since the report card was first extracted and reached no consumer. They are complete
+  for all 606 districts and add to the whole to within a rounding. [verified]
 
-  `exp_per_equivalent_pupil_federal` and its state-and-local twin have been in the
-  committed fixture since the report card was first extracted and reached no consumer. They are
-  complete for all 606 districts and add to the whole to within a rounding. [verified]
-
-  **Federal money is a median 4.21% of a district's operating spending, and 29.04% at the top.**
-  49 districts are above a tenth; Alexander Local in Athens County is the most exposed, at $3,280
-  of $11,294 per equivalent pupil. The floor is 0.7%. [verified — 2024-25 report card, computed
-  in `crates/bundle`]
+  **Federal money is a median 4.21% of a district's operating spending, and 29.04% at the
+  top.** 49 districts are above a tenth; Alexander Local in Athens County is the most exposed,
+  at $3,280 of $11,294 per equivalent pupil. The floor is 0.7%. [verified — 2024-25 report
+  card, computed in `crates/bundle`]
 
   This is the only quantity in the corpus that measures exposure to a decision Ohio does not
-  make. Every other figure here describes a choice by the General Assembly, a county auditor or a
-  local electorate; this one describes what happens to a district if a federal appropriation
+  make. Every other figure here describes a choice by the General Assembly, a county auditor or
+  a local electorate; this one describes what happens to a district if a federal appropriation
   changes, and the answer differs by a factor of forty across the state. [inference]
 
   **The share, not the dollars, is the portable number.** Both parts are published per
   need-weighted pupil, the denominator this corpus has repeatedly warned about and this project
   has twice been caught mixing. A ratio taken inside one denominator carries none; a comparison
-  across two does. Any use of the dollar figures has to name the basis, and they are not additive
-  with the function breakdown, which divides by an unweighted headcount. [verified]
+  across two does. Any use of the dollar figures has to name the basis, and they are not
+  additive with the function breakdown, which divides by an unweighted headcount. [verified]
 
-  **And the correlation that must not be reported alone.** Federal share against the Performance
-  Index is **-0.546** raw and **-0.115** holding poverty constant. Federal education money is
-  allocated substantially by poverty, so the raw figure is very largely the poverty relationship
-  read backwards; quoting it without the control would state a confound as a finding, which is
-  the error this corpus most often finds in secondary reporting. Neither figure identifies an
-  effect in either direction. [verified]
+  **And the correlation that must not be reported alone.** Federal share against the
+  Performance Index is **-0.546** raw and **-0.115** holding poverty constant. Federal
+  education money is allocated substantially by poverty, so the raw figure is very largely the
+  poverty relationship read backwards; quoting it without the control would state a confound as
+  a finding, which is the error this corpus most often finds in secondary reporting. Neither
+  figure identifies an effect in either direction. [verified]
 revisions:
   - was: |
       The figure was carried as a single per-pupil total, with no source split.
