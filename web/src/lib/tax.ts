@@ -42,7 +42,7 @@ import { renderToString } from "./plot/ssr.ts";
 import * as routes from "./routes.ts";
 import type { TaxStatewide } from "./feed.ts";
 import type { District, PropertyTaxYear, Statewide } from "./types.ts";
-import { seriesYear, yearChip, yearChipPair } from "./year.ts";
+import { seriesYear, yearChip, yearChipPair, yearOf } from "./year.ts";
 import { term } from "./glossary.ts";
 
 /**
@@ -295,7 +295,7 @@ export function renderMillage(d: District, statewide: Statewide): string {
           : `<div class="tiles">
               <div class="tile"><div class="k">Voted current operating millage</div>
                 <div class="v">${voted.toFixed(2)}</div>
-                <div class="n">TY2023, the rate on the ballot</div></div>
+                <div class="n">TY${m.tax_year - 1}, the rate on the ballot</div></div>
               <div class="tile"><div class="k">${term("effective-millage", "Effective")} Class I millage</div>
                 <div class="v">${m.observed_rate.toFixed(2)}</div>
                 <div class="n">TY${m.tax_year}, the rate anyone pays</div></div>
@@ -690,7 +690,7 @@ export function renderTaxAgainstSpending(d: District, statewide: TaxStatewide): 
         <div class="tile"><div class="k">Real property tax charged, TY${latest.tax_year}</div>
           <div class="v">${money(latest.real_property_taxes_charged)}</div>
           <div class="n">current expenses, excluding joint vocational levies</div></div>
-        <div class="tile"><div class="k">Operating spending, FY2025</div>
+        <div class="tile"><div class="k">Operating spending, ${yearOf("outcome.spending")}</div>
           <div class="v">${money(operating)}</div>
           <div class="n">${money(spending.operating_per_pupil)} × ${count(Math.round(spending.adm))} pupils</div></div>
         <div class="tile"><div class="k">Charge as a share of spending</div>

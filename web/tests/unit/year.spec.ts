@@ -11,7 +11,7 @@ import { expect, test } from "vitest";
 
 import { loadFeed } from "../../src/lib/feed.ts";
 import { GLOSSARY, term } from "../../src/lib/glossary.ts";
-import { seriesYear, yearChip, yearChipPair, yearTitle } from "../../src/lib/year.ts";
+import { schoolYearBefore, seriesYear, yearChip, yearChipPair, yearTitle } from "../../src/lib/year.ts";
 
 test("every series the feed carries names its reckoning as well as its digits", () => {
   /*
@@ -163,4 +163,15 @@ test("the cross-department agreement count is computed, not typed", () => {
   // And it is a minority, which is the fact the card exists to explain: most districts disagree
   // on the latest year because only one department has published it.
   expect(tax.agreeOnLatest).toBeLessThan(bundle.statewide.districts / 2);
+});
+
+test("a school year steps back without inventing a century", () => {
+  // The two labels behind the current report card year were literals beside a derived one, so
+  // they would have drifted apart rather than all going stale together.
+  expect(schoolYearBefore("2024-25", 0)).toBe("2024-25");
+  expect(schoolYearBefore("2024-25", 1)).toBe("2023-24");
+  expect(schoolYearBefore("2024-25", 2)).toBe("2022-23");
+  expect(schoolYearBefore("2000-01", 1)).toBe("1999-00");
+  // Not `YYYY-YY` — return nothing rather than compose from whatever this is.
+  expect(schoolYearBefore("FY2027", 1)).toBe("");
 });

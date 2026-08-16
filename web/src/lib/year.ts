@@ -12,6 +12,13 @@
  * The feed now carries `series_years` — derived from the blocks themselves rather than typed — and
  * this reads it. Nothing on a page composes a year string.
  *
+ * # This module must never be imported by client code
+ *
+ * It imports `loadFeed`, and `feed.ts` opens `node:fs`. Importing it from `src/scripts/` puts the
+ * build-time feed reader into a browser bundle: the comparison table stopped rendering entirely
+ * the one time this was tried. Browser code reads `panel.series_years` directly — see the
+ * four-line `yearOf` in `scripts/compare.ts` and the reason beside it.
+ *
  * # Ohio reckons three ways, and they are eleven months apart
  *
  * | Reckoning | Span | Written |
@@ -58,8 +65,14 @@ export type SeriesKey =
  * missing chip is the honest rendering of "this data is not here" rather than a chip reading
  * "unknown" beside figures that are.
  */
-export function seriesYear(series: SeriesKey, bundle?: Bundle): SeriesYear | null {
-  const years = (bundle ?? loadFeed().bundle).series_years;
+export function seriesYear(
+  series: SeriesKey,
+  // Structural rather than `Bundle`, so the browser-side comparison script can pass the trimmed
+  // `Panel` it fetched. Both carry `series_years`; neither should have to carry the other's shape
+  // to ask what year a figure is on.
+  feed?: { series_years: SeriesYear[] },
+): SeriesYear | null {
+  const years = (feed ?? loadFeed().bundle).series_years;
   return years.find((entry) => entry.series === series) ?? null;
 }
 
@@ -150,4 +163,32 @@ function escapeAttribute(value: string): string {
     .replace(/>/g, "&gt;")
     .replace(/"/g, "&quot;")
     .replace(/'/g, "&#39;");
+}
+
+/**
+ * A school year some number of years before the one given: `2024-25`, 1 → `2023-24`.
+ *
+ * The report card publishes three years of the Performance Index and the site labels all three.
+ * Two of those labels were literals — `2022-23` and `2023-24` beside a derived `2024-25` — which
+ * is the worst of both: the current year moves with the fixture and the two behind it do not, so
+ * the column headings drift apart from each other rather than all going stale together.
+ *
+ * Returns the empty string for a label that is not `YYYY-YY`, rather than composing nonsense from
+ * whatever it was handed.
+ */
+export function schoolYearBefore(label: string, years: number): string {
+  const match = /^(\d{4})-(\d{2})$/.exec(label);
+  if (!match) return "";
+  const start = Number(match[1]) - years;
+  return `${start}-${String((start + 1) % 100).padStart(2, "0")}`;
+}
+
+/**
+ * The label for a series, or the empty string where the feed does not carry it.
+ *
+ * The common case at a call site that just needs the digits inside a sentence — `seriesYear(k)?.label ?? ""`
+ * written once rather than at each of thirty places.
+ */
+export function yearOf(series: SeriesKey): string {
+  return seriesYear(series)?.label ?? "";
 }

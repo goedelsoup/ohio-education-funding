@@ -10,13 +10,17 @@ import Base from "../layouts/Base.astro";
 import { loadCorpus } from "../lib/corpus.ts";
 import { loadFeed } from "../lib/feed.ts";
 import { count, millions, pct } from "../lib/format.ts";
-import { DENOMINATORS } from "../lib/denominators.ts";
+import { DENOMINATORS, denominatorSource, denominatorSpan } from "../lib/denominators.ts";
 import * as routes from "../lib/routes.ts";
+import { yearOf } from "../lib/year.ts";
 
 const { bundle, verification, forecastable } = loadFeed();
 const corpus = loadCorpus();
 const s = bundle.statewide;
 const meta = bundle.projection;
+// The MR-81 endpoints, read rather than typed — the pair that went stale twice. See
+// `denominatorSpan`.
+const span = denominatorSpan(bundle, "meal_program");
 ---
 
 <Base
@@ -83,8 +87,14 @@ const meta = bundle.projection;
               <tr>
                 <th>{d.label}</th>
                 <td>
-                  <div class="n">{d.source}</div>
+                  <div class="n">{denominatorSource(d)}</div>
                   {d.note}
+                  {"endpoints" in d && span && (
+                    <>
+                      {" "}Sponsors rise from {count(span.first)} in FY{span.firstYear} to{" "}
+                      {count(span.last)} in FY{span.lastYear}.
+                    </>
+                  )}
                 </td>
               </tr>
             ))
@@ -132,7 +142,7 @@ const meta = bundle.projection;
           <tr>
             <th>The outcome figures</th>
             <td>
-              A <strong>measurement</strong>, of pupils and not of districts. The 2024-25 Ohio
+              A <strong>measurement</strong>, of pupils and not of districts. The {yearOf("outcome.performance")} Ohio
               School Report Card. Every association drawn from it is a correlation over {
                 s.outcomes ? count(s.outcomes.districts) : "—"
               } districts and none of them identifies an effect. <a href="/outcomes">Why that

@@ -14,8 +14,23 @@ import Base from "../layouts/Base.astro";
 import { loadFeed } from "../lib/feed.ts";
 import { count, money, pct } from "../lib/format.ts";
 import * as routes from "../lib/routes.ts";
+import { yearOf } from "../lib/year.ts";
 
 const { bundle, alphabetical } = loadFeed();
+
+/*
+ * The two spans this page's footnote names, read rather than typed.
+ *
+ * `FY2024 to FY2026` and `FY2023` were literals, and the second is the one worth care: this
+ * table's valuation column is `valuation_per_pupil`, which is the **District Profile Report's**
+ * figure and not Table SD-1's. Deriving it from Taxation's latest tax year — the obvious thing to
+ * reach for on a page full of tax figures — labels a profile number with the other department's
+ * year, which is the confusion the denominators card exists to prevent.
+ *
+ * So it is the profile's own year, matching how `renderDenominators` labels the same field.
+ */
+const enrollmentSpan = yearOf("enrollment").replace("-", " to ");
+const valuationYear = yearOf("profile");
 const s = bundle.statewide;
 
 /** A cell whose sort key is not what it displays: dollars with separators, blanks, percentages. */
@@ -119,8 +134,8 @@ const sortable = (value: number | null) => (value == null ? "" : String(value));
   <p class="note">
     State aid per pupil is what the district receives; the guarantee column is how much of it the
     formula did not compute. Enrolled ADM is the base cost count — the greater of the three-year
-    average and the current year. Enrollment change is FY2024 to FY2026, of which FY2026 is partly
-    a departmental estimate. Property valuation is FY2023 and is missing for three districts.
+    average and the current year. Enrollment change is {enrollmentSpan}, of which the last year is partly
+    a departmental estimate. Property valuation is {valuationYear} and is missing for three districts.
   </p>
 
   <script>

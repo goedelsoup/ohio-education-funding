@@ -32,7 +32,7 @@ import { barSpec } from "./plot/spec.ts";
 import { renderToString } from "./plot/ssr.ts";
 import * as routes from "./routes.ts";
 import type { District, OutcomeStatewide, SpendingByFunction } from "./types.ts";
-import { yearChip } from "./year.ts";
+import { yearChip, yearOf } from "./year.ts";
 import { term } from "./glossary.ts";
 
 /** The named functions, largest first, with what each covers. */
@@ -136,7 +136,7 @@ export function renderSpendingByFunction(d: District): string {
         support a story about administrative bloat, and it equally does not establish that the
         composition is right. It is a share, not a verdict.</p>
 
-      <p class="note">These are the <strong>report card's</strong> FY2025 figures, divided by
+      <p class="note">These are the <strong>report card's</strong> ${yearOf("outcome.spending")} figures, divided by
         <strong>unweighted ADM</strong> — a headcount of
         ${count(Math.round(s.adm))} pupils, not the need-weighted count the department's headline
         per-pupil figure uses. The choice of denominator is not cosmetic:
@@ -202,7 +202,7 @@ export function renderFederalShare(d: District, statewide: OutcomeStatewide | nu
 
   return `
     <div class="card" id="federal-share" data-part="federal-share">
-      <h2>Where the money came from, FY2025${yearChip("outcome.spending")}</h2>
+      <h2>Where the money came from${yearChip("outcome.spending")}</h2>
       <div class="chartwrap" data-chart="origin">${renderToString(barSpec(bars))}</div>
 
       <div class="tiles">

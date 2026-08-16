@@ -22,7 +22,7 @@ import { hasDenominators } from "./tax.ts";
 import * as routes from "./routes.ts";
 import type { Bar } from "./chart.ts";
 import type { Bundle, District, Statewide } from "./types.ts";
-import { yearChip } from "./year.ts";
+import { yearChip, yearOf } from "./year.ts";
 
 function strip(
   label: string,
@@ -430,7 +430,7 @@ export function renderAidSource(bundle: Bundle, d: District): string {
     conditions.push({
       label: `Enrollment ${fell ? "down" : "up"} ${pct(
         Math.abs(d.enrollment_change),
-      )} FY2024→FY2026`,
+      )} ${yearOf("enrollment").replace("-", "→")}`,
       consequence: d.on_guarantee
         ? `Its aid did not move with it, because the guarantee holds a fixed dollar amount
            enrollment does not enter — the next card shows what that is worth.`

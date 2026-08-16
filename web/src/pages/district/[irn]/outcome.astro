@@ -12,6 +12,7 @@ import Base from "../../../layouts/Base.astro";
 import { districtPaths, loadFeed } from "../../../lib/feed.ts";
 import { renderDistrictOutcome, renderOutcomeContext } from "../../../lib/outcomes.ts";
 import * as routes from "../../../lib/routes.ts";
+import { yearOf } from "../../../lib/year.ts";
 
 export const getStaticPaths = districtPaths;
 
@@ -22,7 +23,7 @@ const o = district.outcome;
 const description =
   o?.performance_index == null
     ? `No report card is published for ${district.name}.`
-    : `${district.name} scores ${o.performance_index.toFixed(1)} on Ohio's Performance Index for 2024-25, shown against districts with comparable poverty rather than against the state.`;
+    : `${district.name} scores ${o.performance_index.toFixed(1)} on Ohio's Performance Index for ${yearOf("outcome.performance")}, shown against districts with comparable poverty rather than against the state.`;
 ---
 
 <Base
