@@ -16,23 +16,32 @@ description: |
   appropriating that. [verified] This practice — residual budgeting — makes an adequacy claim
   unfalsifiable, because the standard moves with the appropriation.
 
-  Both the [Evidence-Based Model](../funding-regime/evidence-based-model.yml) and the
-  [Fair School Funding Plan](../funding-regime/fair-school-funding-plan.yml) are direct
-  answers to that critique: each builds a cost from specified inputs so that the number has a
-  derivation independent of the budget. [verified] Neither has been operated at its computed
-  level for a sustained period, so in Ohio the adequacy question has been answered
-  methodologically and not yet fiscally. [inference]
+  Both the [Evidence-Based Model](../funding-regime/evidence-based-model.yml) and the [Fair
+  School Funding Plan](../funding-regime/fair-school-funding-plan.yml) are direct answers to
+  that critique: each builds a cost from specified inputs so that the number has a derivation
+  independent of the budget. [verified] Neither has been operated at its computed level for a
+  sustained period, so in Ohio the adequacy question has been answered methodologically and not
+  yet fiscally. [inference]
 
   Adequacy is satisfiable without equity. A system that funds every district to a genuine
   costed requirement, and permits wealthy districts to spend far beyond it, is adequate and
   unequal. [inference] Ohio's current design is of that shape.
 
+  A warning that belongs here rather than only on the metrics. A cross-sectional correlation
+  between spending and measured achievement is not an adequacy test in either formulation, and
+  the near-zero coefficients now recorded on [expenditure per equivalent
+  pupil](../metric/expenditure-per-equivalent-pupil.yml) should not be read as bearing on this
+  doctrine. Adequacy asks whether resources meet a costed requirement. Whether districts that
+  spend more score higher is a different question, answered by comparing districts to each
+  other rather than to a standard — which is the equity frame wearing adequacy language.
+  [inference]
+findings: |
   **The outcome formulation is now half-testable, which it was not before.** `contested` below
   records the standing question of whether outcome or input measures should define the
-  requirement. Until the corpus acquired the
-  [Performance Index](../metric/performance-index.yml) it could only ever argue the input side,
-  because it held no measure of a result. It now holds one. What it still does not hold is a
-  threshold: Ohio publishes a continuous index and no declared sufficient level, so the outcome
+  requirement. Until the corpus acquired the [Performance
+  Index](../metric/performance-index.yml) it could only ever argue the input side, because it
+  held no measure of a result. It now holds one. What it still does not hold is a threshold:
+  Ohio publishes a continuous index and no declared sufficient level, so the outcome
   formulation can say where a district sits and not whether that is enough. An outcome-based
   adequacy claim needs a floor the state has not set, and *DeRolph I*'s objection to residual
   budgeting applies with equal force to a floor set after the scores come in. [inference]
@@ -40,20 +49,12 @@ description: |
   **And the outcome side turned out to be two measures, not one.** The corpus now holds Ohio's
   [Progress (value-added)](../metric/progress-value-added.yml) component beside the Index. They
   rank districts differently — they correlate at only +0.375 — and against the same spending
-  variable, holding poverty constant, they carry opposite signs: −0.125 on level, +0.146 on gain.
-  [verified] So "outcome measures should define the requirement" is not one position but at
-  least two, and they do not agree about which districts are succeeding. Akron City is near the
-  bottom of the state on attainment and four stars on growth. Any outcome-based adequacy standard
-  has to choose, and the choice decides which districts are found deficient. [inference]
-
-  A warning that belongs here rather than only on the metrics. A cross-sectional correlation
-  between spending and measured achievement is not an adequacy test in either formulation, and
-  the near-zero coefficients now recorded on
-  [expenditure per equivalent pupil](../metric/expenditure-per-equivalent-pupil.yml) should not
-  be read as bearing on this doctrine. Adequacy asks whether resources meet a costed requirement.
-  Whether districts that spend more score higher is a different question, answered by comparing
-  districts to each other rather than to a standard — which is the equity frame wearing adequacy
-  language. [inference]
+  variable, holding poverty constant, they carry opposite signs: −0.125 on level, +0.146 on
+  gain. [verified] So "outcome measures should define the requirement" is not one position but
+  at least two, and they do not agree about which districts are succeeding. Akron City is near
+  the bottom of the state on attainment and four stars on growth. Any outcome-based adequacy
+  standard has to choose, and the choice decides which districts are found deficient.
+  [inference]
 properties:
   name: Adequacy
   origin: |
