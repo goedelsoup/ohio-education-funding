@@ -13,45 +13,45 @@ description: |
       [I1] Open Enrolment Adjust.  = if (prior FTE - current FTE) >= [I2]
                                       then 8241.61 x ((prior - current) - [I2]) else 0
 
-  A guaranteed district whose entering open enrolment has fallen by more than the greater of 10%
-  of last year's count or 20 FTE has its guarantee reduced by **$8,241.61 for every FTE beyond
-  that threshold**. [verified] $8,241.61 is the statewide average base cost per pupil.
+  A guaranteed district whose entering open enrolment has fallen by more than the greater of
+  10% of last year's count or 20 FTE has its guarantee reduced by **$8,241.61 for every FTE
+  beyond that threshold**. [verified] $8,241.61 is the statewide average base cost per pupil.
 
   ### The rate is charged at full value, not at the district's state share
 
-  This is the whole character of the term. The state was paying its *share* of $8,241.61 for those
-  pupils — about $824 for a district at the 10% minimum state share — and the guarantee falls by
-  the whole of it when they leave. A district at the minimum share therefore loses roughly ten
-  times what the departing pupil was costing the state. [verified]
+  This is the whole character of the term. The state was paying its *share* of $8,241.61 for
+  those pupils — about $824 for a district at the 10% minimum state share — and the guarantee
+  falls by the whole of it when they leave. A district at the minimum share therefore loses
+  roughly ten times what the departing pupil was costing the state. [verified]
 
   Whether that is a deliberate incentive against shedding open enrolment or an artefact of
   reaching for a convenient statewide figure is not established. [open] The department's own
-  framing is the former: it is described as a disincentive against closing a district's borders,
-  not as a general term.
+  framing is the former: it is described as a disincentive against closing a district's
+  borders, not as a general term.
 
   ### It is asymmetric
 
   There is no corresponding increase for a district that *gains* open enrolment. The threshold
   and the rate apply in one direction only, so the term can reduce a guarantee and can never
   raise one. [verified]
-
+findings: |
   ### Scale
 
-  **43 districts, $5.1 million withheld** in the FY2027 model. Columbus lost 106.2 FTE against a
-  threshold of 24.3 and had **$674,561** taken off; Cuyahoga Falls lost 118.1 and had $640,025.
-  [verified —
+  **43 districts, $5.1 million withheld** in the FY2027 model. Columbus lost 106.2 FTE against
+  a threshold of 24.3 and had **$674,561** taken off; Cuyahoga Falls lost 118.1 and had
+  $640,025. [verified —
   [`crates/project/tests/the_supplements_outside_the_formula.rs`](../../../crates/project/tests/the_supplements_outside_the_formula.rs)]
 
-  Small against the guarantee's $879 million, and not small for the districts it reaches: it is a
-  reduction in the one line those districts are relying on precisely because the formula computes
-  less for them than they used to receive.
+  Small against the guarantee's $879 million, and not small for the districts it reaches: it is
+  a reduction in the one line those districts are relying on precisely because the formula
+  computes less for them than they used to receive.
 
   ### Why it is a node rather than a paragraph
 
   Because it is a mechanism with its own trigger, its own threshold, its own rate and its own
-  direction, and because a guarantee described without it reproduces correctly for 566 districts
-  and wrongly for 43 — an error rate low enough to read as rounding. Naming it separately is what
-  makes its absence from an account visible. [inference]
+  direction, and because a guarantee described without it reproduces correctly for 566
+  districts and wrongly for 43 — an error rate low enough to read as rounding. Naming it
+  separately is what makes its absence from an account visible. [inference]
 properties:
   name: Open enrolment adjustment
   function: |

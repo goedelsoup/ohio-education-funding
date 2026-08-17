@@ -7,56 +7,56 @@ summary: >-
 description: |
   **$54m**, five weighted categories of career-technical FTE plus a sixth weight for associated
   services. Mechanically it is [special education](fsfp-special-education-weights.yml)'s shape
-  exactly — weight times count times a base cost times the state share — and the difference is the
-  base cost. [verified]
+  exactly — weight times count times a base cost times the state share — and the difference is
+  the base cost. [verified]
 
   ### CTE is weighted against its own base cost
 
-  The five weights multiply
-  a **career-technical base cost per pupil of $9,855.62**, where special education and English
-  learners multiply the statewide average of **$8,241.61**. A career-technical pupil starts from a
-  base **19.6% higher** before any weight is applied. [verified]
-
-  So Ohio's weights are not one scale, and a table listing them together — which is the natural
-  thing to build, and which the corpus nearly built — understates this program by a fifth. A
-  Category 1 CTE pupil at a weight of 0.623 generates $6,140; the same weight against the general
-  base would give $5,135. Established from the department's published per-category amounts rather
-  than from the transcribed constants, because asserting a difference between two numbers copied
-  out of one workbook proves only that they were copied correctly. [verified]
+  The five weights multiply a **career-technical base cost per pupil of $9,855.62**, where
+  special education and English learners multiply the statewide average of **$8,241.61**. A
+  career-technical pupil starts from a base **19.6% higher** before any weight is applied.
+  [verified]
 
   ### The associated-services weight applies to the sum, not to a category
 
-  0.0294 against total
-  CTE FTE across all five categories, $3.2m statewide. It pays for services rather than
-  instruction, and it is the one part of the program that does not vary with which category a pupil
-  is in. [verified]
+  0.0294 against total CTE FTE across all five categories, $3.2m statewide. It pays for
+  services rather than instruction, and it is the one part of the program that does not vary
+  with which category a pupil is in. [verified]
 
   ### The counts are frozen at FY2021
 
-  The sheet's own column headers say so: `Category 1 Career
-  Tech FTE-FY21`. A FY2027 calculation is funding career-technical enrolment as it stood six years
-  earlier, while base cost is computed on a rolling three-year average ending FY2026. The same is
-  true of [English learners](fsfp-english-learner-weights.yml). [verified]
+  The sheet's own column headers say so: `Category 1 Career Tech FTE-FY21`. A FY2027
+  calculation is funding career-technical enrolment as it stood six years earlier, while base
+  cost is computed on a rolling three-year average ending FY2026. The same is true of [English
+  learners](fsfp-english-learner-weights.yml). [verified]
 
   Whether that is a deliberate hold-harmless, a phase-in artefact, or a data-availability
-  constraint is not established, and it matters: a district whose career-technical programme has
-  grown since 2021 is funded for the programme it had. [open]
+  constraint is not established, and it matters: a district whose career-technical programme
+  has grown since 2021 is funded for the programme it had. [open]
 
   ### The weights descend across the five categories
 
-  — 0.623, 0.5905, 0.2154, 0.183, 0.157 — and
-  **R.C. 3317.014 names what each one buys.** Unlike special education, the ordering is not
-  severity: it is programme type. The two highest multiples are workforce development programmes
-  grouped by field — agricultural and environmental systems, construction technologies,
-  engineering and science technologies, finance, health science, information technology and
-  manufacturing technologies at 0.6230; business and administration, hospitality and tourism,
-  human services, law and public safety, transportation systems and arts and communications at
-  0.5905. The lower multiples are not workforce programmes at all: 0.2154 is career-based
-  intervention. So the gap between 0.5905 and 0.2154 is a gap between kinds of programme rather
-  than between grades of one. [verified — `ohio-laws`]
+  — 0.623, 0.5905, 0.2154, 0.183, 0.157 — and **R.C. 3317.014 names what each one buys.**
+  Unlike special education, the ordering is not severity: it is programme type. The two highest
+  multiples are workforce development programmes grouped by field — agricultural and
+  environmental systems, construction technologies, engineering and science technologies,
+  finance, health science, information technology and manufacturing technologies at 0.6230;
+  business and administration, hospitality and tourism, human services, law and public safety,
+  transportation systems and arts and communications at 0.5905. The lower multiples are not
+  workforce programmes at all: 0.2154 is career-based intervention. So the gap between 0.5905
+  and 0.2154 is a gap between kinds of programme rather than between grades of one. [verified —
+  `ohio-laws`]
 
   Why the first group is priced above the second — both are full workforce programmes, and the
   split is by field — is not stated in the section. [open]
+findings: |
+  So Ohio's weights are not one scale, and a table listing them together — which is the natural
+  thing to build, and which the corpus nearly built — understates this program by a fifth. A
+  Category 1 CTE pupil at a weight of 0.623 generates $6,140; the same weight against the
+  general base would give $5,135. Established from the department's published per-category
+  amounts rather than from the transcribed constants, because asserting a difference between
+  two numbers copied out of one workbook proves only that they were copied correctly.
+  [verified]
 
   **All five multiples match the statute exactly.** [verified —
   `crates/project/tests/the_statute_behind_the_weights.rs`]

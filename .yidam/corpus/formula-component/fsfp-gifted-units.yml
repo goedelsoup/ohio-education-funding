@@ -11,77 +11,71 @@ description: |
 
   ### The parameters are prices, not rates, which puts this component in a different family
 
-  $85,776 a coordinator unit, $89,378 a K-8 intervention specialist, $80,974 a 9-12 one. Those are
-  salary assumptions, so they belong with the staffing costs inside the [base cost
-  build-up](fsfp-base-cost-calculation.yml) and will move when those are refreshed — not with the
-  weights, which are dimensionless multipliers of a base cost. Nothing else among the six behaves
-  that way, and a "categoricals" node treating all six parameters alike would have made this
-  program's sensitivity to a salary refresh invisible. [inference]
+  $85,776 a coordinator unit, $89,378 a K-8 intervention specialist, $80,974 a 9-12 one. Those
+  are salary assumptions, so they belong with the staffing costs inside the [base cost
+  build-up](fsfp-base-cost-calculation.yml) and will move when those are refreshed — not with
+  the weights, which are dimensionless multipliers of a base cost. Nothing else among the six
+  behaves that way, so this is the one component a salary refresh moves directly. [inference]
 
   ### The units are clamped, and the clamps are the policy
 
   - a coordinator unit per **3,300** enrolled pupils, **floored at 0.5 and capped at 8**;
-  - an intervention specialist unit per **140** identified gifted pupils in K-8, **floored at 0.3**;
+  - an intervention specialist unit per **140** identified gifted pupils in K-8, **floored at
+     0.3**;
   - the same per 140 in grades 9-12, floored at 0.3, priced $8,404 lower.
 
-  **A district that identifies no gifted pupils at all still draws 0.5 + 0.3 + 0.3 units — $93,993
-  before its state share.** Gifted is the one categorical with a floor rather than a proportion.
-  [verified]
-
-  That is defensible and it is invisible. Units buy people, and half a coordinator is already the
-  smallest thing a small district can be funded for. But **370 districts sit on the coordinator
-  floor — three-fifths of Ohio** — so for most of the state that line is a minimum rather than a
-  measurement, and a district's gifted total looks like a payment for gifted pupils while being
-  substantially a payment for existing. **88 districts draw every one of their three unit
-  entitlements at the floor.** [verified]
-
-  ### The cap binds too, at the other end
-
-  Eight coordinator units is reached at 26,400 enrolled
-  pupils, and **three districts are there**. Columbus and Cleveland are funded for eight
-  coordinators however many pupils they have; Cleveland's enrolment earns 9.33. A floor and a cap
-  on the same line means the middle of the distribution is the only place the ratio actually
-  operates. [verified]
+  **A district that identifies no gifted pupils at all still draws 0.5 + 0.3 + 0.3 units —
+  $93,993 before its state share.** Gifted is the one categorical with a floor rather than a
+  proportion. [verified]
 
   ### Two denominators, one line apart
 
-  Identification is $24 per **K-6** pupil; referral is $2.50
-  per **enrolled** pupil. Adjacent rows in the same sheet, different bases, and neither name says
-  so. [verified]
+  Identification is $24 per **K-6** pupil; referral is $2.50 per **enrolled** pupil. Adjacent
+  rows in the same sheet, different bases, and neither name says so. [verified]
 
   ### Professional development is a hard-coded zero
 
-  `[F3]` is carried by the sheet as a value
-  rather than a formula and is zero for every district. Like [targeted
-  assistance](fsfp-targeted-assistance.yml)'s supplemental tier, it is a funded line at zero rather
-  than an absent one — the column exists, the arithmetic sums it, and a future biennium can fill it
-  without changing anything else. [verified]
+  `[F3]` is carried by the sheet as a value rather than a formula and is zero for every
+  district. Like [targeted assistance](fsfp-targeted-assistance.yml)'s supplemental tier, it is
+  a funded line at zero rather than an absent one — the column exists, the arithmetic sums it,
+  and a future biennium can fill it without changing anything else. [verified]
+findings: |
+  That is defensible and it is invisible. Units buy people, and half a coordinator is already
+  the smallest thing a small district can be funded for. But **370 districts sit on the
+  coordinator floor — three-fifths of Ohio** — so for most of the state that line is a minimum
+  rather than a measurement, and a district's gifted total looks like a payment for gifted
+  pupils while being substantially a payment for existing. **88 districts draw every one of
+  their three unit entitlements at the floor.** [verified]
+
+  ### The cap binds too, at the other end
+
+  Eight coordinator units is reached at 26,400 enrolled pupils, and **three districts are
+  there**. Columbus and Cleveland are funded for eight coordinators however many pupils they
+  have; Cleveland's enrolment earns 9.33. A floor and a cap on the same line means the middle
+  of the distribution is the only place the ratio actually operates. [verified]
 
   ### Identification rates do vary with wealth
 
-  This node recorded that gifted funding scales off
-  *identified* FTE, so it depends on how many children a district identifies — a district practice
-  as much as a pupil population — and that whether identification rates vary with wealth was
-  "exactly the kind of question this decomposition makes askable and the corpus has not asked."
-  It is now asked, from data the panel already held.
+  Gifted funding scales off *identified* FTE, so it depends on how many children a district
+  identifies — a district practice as much as a pupil population.
 
       identified share of enrolment, by quintile      Q1      Q5     ratio
       ordered by valuation per pupil                10.1%   19.0%     1.9x
       ordered by economically disadvantaged %       25.0%    8.6%     2.9x
 
-  Both gradients are monotone across all five quintiles. **Poverty is much the stronger axis** —
-  r = −0.67 against r = +0.35 for property wealth — which is not what the question as posed
+  Both gradients are monotone across all five quintiles. **Poverty is much the stronger axis**
+  — r = −0.67 against r = +0.35 for property wealth — which is not what the question as posed
   expected, and is the more uncomfortable of the two answers. [verified —
   `crates/project/tests/questions_the_corpus_left_open.rs`]
 
   ### Why is not established, and three explanations fit
 
-  The underlying distribution of the trait
-  may genuinely differ; identification practice may differ, since screening costs money and staff;
-  or the instruments used to identify may differ in what they measure. This data separates none of
-  them and the corpus should not pick one. What it can say is that a funding stream keyed to
-  identification pays most where identification is highest, and that is where poverty is lowest.
-  [open — the mechanism, not the pattern]
+  The underlying distribution of the trait may genuinely differ; identification practice may
+  differ, since screening costs money and staff; or the instruments used to identify may differ
+  in what they measure. This data separates none of them and the corpus should not pick one.
+  What it can say is that a funding stream keyed to identification pays most where
+  identification is highest, and that is where poverty is lowest. [open — the mechanism, not
+  the pattern]
 revisions:
   - was: |
       Whether gifted identification rates vary with district wealth was recorded as "exactly
@@ -96,6 +90,22 @@ revisions:
     reach: |
       Does not change the component's arithmetic. It changes what a gifted-funding total can be
       read as evidence of.
+  - was: |
+      Whether identification rates vary with wealth was recorded as "exactly the kind of
+      question this decomposition makes askable and the corpus has not asked."
+    now: |
+      They do, and **poverty is much the stronger axis**. Identified share of enrolment runs
+      10.1% to 19.0% across valuation quintiles (1.9x) and 25.0% to 8.6% across economically
+      disadvantaged quintiles (2.9x), monotone in both — r = −0.67 on poverty against r = +0.35
+      on property wealth.
+    found_by: |
+      `crates/project/tests/questions_the_corpus_left_open.rs`, over data the panel already
+      held.
+    reach: |
+      The question as posed expected property wealth to be the axis, and it is the weaker one.
+      A funding stream keyed to identification pays most where identification is highest, and
+      that is where poverty is lowest. Why is not established — trait distribution, screening
+      capacity and instrument differences all fit, and this data separates none of them.
 properties:
   name: Gifted identification and units
   function: |

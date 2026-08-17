@@ -8,69 +8,67 @@ description: |
   **$726m, and $183m of special education transportation beside it.** Transportation alone is
   larger than [special education](fsfp-special-education-weights.yml), which makes it the
   **second-largest single program in Ohio's school funding** after [targeted
-  assistance](fsfp-targeted-assistance.yml). This corpus carried both inside an unexplained
-  remainder for its first thirteen phases. [verified]
+  assistance](fsfp-targeted-assistance.yml). [verified]
 
   Almost nothing about it resembles the rest of the formula.
 
   ### Two competing bases, and the district is paid the greater
 
-  $1,337.175 per weighted rider, or
-  $6.867 per bus mile across a 180-day year. **350 of 611 districts are paid on the mile base**, so
-  the `MAX` is not a formality — it flips for more than half the state, and which one won is
-  invisible in the amount. A district paid on miles gains nothing from carrying more children on
-  the same routes; one paid on riders gains nothing from covering more ground. [verified]
+  $1,337.175 per weighted rider, or $6.867 per bus mile across a 180-day year. **350 of 611
+  districts are paid on the mile base**, so the `MAX` is not a formality — it flips for more
+  than half the state, and which one won is invisible in the amount. A district paid on miles
+  gains nothing from carrying more children on the same routes; one paid on riders gains
+  nothing from covering more ground. [verified]
 
   ### Non-public riders count double
 
-  Weighted ridership is `public + 2 x non-public + 1.5 x
-  community or STEM`. A district transporting a private-school child is funded at twice the rate of
-  its own pupil. Non-public riders are 4.5% of riders and 8.5% of weighted ridership. Ohio requires
-  districts to transport non-public pupils and those routes are less efficient, so a premium is
-  defensible; the size of it is a policy choice sitting in a spreadsheet. [verified, and its
-  justification is [open]]
+  Weighted ridership is `public + 2 x non-public + 1.5 x community or STEM`. A district
+  transporting a private-school child is funded at twice the rate of its own pupil. Non-public
+  riders are 4.5% of riders and 8.5% of weighted ridership. Ohio requires districts to
+  transport non-public pupils and those routes are less efficient, so a premium is defensible;
+  the size of it is a policy choice sitting in a spreadsheet. [verified, and its justification
+  is [open]]
 
   ### The state minimum share is 50%, against the formula's 10%
 
-  **440 of 611 districts sit on it**
-  — 72%, against 23% on the formula's floor. For most of Ohio, local capacity does not determine
-  transportation aid at all. This is the single largest difference between how Ohio equalises
-  instruction and how it equalises getting to it, and it is the kind of fact no published total
-  can carry. [verified]
+  The minimum is statutory and it is five times the formula's. [verified]
 
   ### Two supplements pulling opposite ways
 
-  An efficiency supplement pays up to 15% more for
-  filling buses, ramping across a riders-per-bus index from 1.0 to 1.5. A density supplement pays
-  for the absence of the thing efficiency rewards: `(28 - riders per square mile) / 100` against
-  the mile base, times 0.55. 406 districts draw the first, 388 the second, and 200-odd draw both —
-  which is coherent, since being efficient with the buses you run and having few children per
-  square mile are different problems. [verified]
-
-  ### Its own guarantee
-
-  `[F]` holds **38 districts** at their FY2021 transportation funding,
-  $24.8m, where the computed amount has fallen below it. That is a **third** mechanism anchored to
-  FY2021, distinct from the [guarantee](temporary-transitional-aid-guarantee.yml) and the [formula
-  transition supplement](fsfp-formula-transition-supplement.yml): a different base, a different
-  set of districts, and not nested in either. It is described here rather than given its own node
-  because it is a clause of this formula — `max(FY21 transportation - the five payments, 0)` —
-  with no inputs of its own. [verified]
+  An efficiency supplement pays up to 15% more for filling buses, ramping across a
+  riders-per-bus index from 1.0 to 1.5. A density supplement pays for the absence of the thing
+  efficiency rewards: `(28 - riders per square mile) / 100` against the mile base, times 0.55.
+  406 districts draw the first, 388 the second, and 200-odd draw both — which is coherent,
+  since being efficient with the buses you run and having few children per square mile are
+  different problems. [verified]
 
   ### A proration on the special education line
 
-  `[J]` is `max(state share, 50%) x reported
-  cost x 0.91746`. A factor below one means the appropriation did not cover the computed
-  entitlement, so the published amount is not what a district is owed but what there was to divide.
-  See [appropriation proration factor](../parameter/appropriation-proration-factor.yml), which this
-  program was the first to make visible and preschool special education was the first to explain.
-  [verified]
+  `[J]` is `max(state share, 50%) x reported cost x 0.91746`. A factor below one means the
+  appropriation did not cover the computed entitlement, so the published amount is not what a
+  district is owed but what there was to divide. See [appropriation proration
+  factor](../parameter/appropriation-proration-factor.yml). [verified]
+findings: |
+  **440 of 611 districts sit on it** — 72%, against 23% on the formula's floor. For most of
+  Ohio, local capacity does not determine transportation aid at all. This is the single largest
+  difference between how Ohio equalises instruction and how it equalises getting to it, and it
+  is the kind of fact no published total can carry. [verified]
+
+  ### Its own guarantee
+
+  `[F]` holds **38 districts** at their FY2021 transportation funding, $24.8m, where the
+  computed amount has fallen below it. That is a **third** mechanism anchored to FY2021,
+  distinct from the [guarantee](temporary-transitional-aid-guarantee.yml) and the [formula
+  transition supplement](fsfp-formula-transition-supplement.yml): a different base, a different
+  set of districts, and not nested in either. It is a clause of this formula rather than a
+  mechanism of its own — `max(FY21 transportation - the five payments, 0)`, with no inputs
+  besides the ones above. [verified]
 
   ### Still open
 
-  What the general proration factor `[F3]` is for. It is 1.0 in FY2027 and it
-  multiplies the whole transportation total, so it is a dial that has been used and may be again;
-  nothing here records when. [open]
+  What the general proration factor `[F3]` is for. It is 1.0 in FY2027 and it multiplies the
+  whole transportation total, so it is a dial that has been used and may be again; nothing here
+  records when. [open]
 properties:
   name: Transportation
   function: |
