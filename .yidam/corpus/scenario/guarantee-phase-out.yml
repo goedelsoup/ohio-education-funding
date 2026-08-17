@@ -21,8 +21,9 @@ description: |
 findings: |
   ### The three policies are not variants of each other
 
-  removal -$879.0M 294 districts cut, 315 untouched half phase-out -$439.5M 294 districts cut,
-  315 untouched rebase to 90% -$87.9M 294 districts cut, 315 untouched
+      removal              -$879.0M    294 districts cut, 315 untouched
+      half phase-out       -$439.5M    294 districts cut, 315 untouched
+      rebase to 90%        -$87.9M     294 districts cut, 315 untouched
 
   Removal and phase-out reach exactly the same districts and differ only in depth, because the
   guarantee is a floor and lowering a floor cannot catch anyone the floor was not already

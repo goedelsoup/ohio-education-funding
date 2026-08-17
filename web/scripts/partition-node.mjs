@@ -35,14 +35,24 @@ function fold(text, indent) {
     .split("\n\n")
     .map((para) => {
       // A block indented four or more spaces is an ASCII table; its line breaks are the content.
-      if (/^\s{4,}\S/.test(para)) {
-        // Re-indent only. The caller already stripped the block's two-space base off every line,
-        // so stripping again here left tables at two spaces relative — under markdown's four, so
-        // the columns collapse into a paragraph. Caught by reading the parsed YAML rather than the
-        // file, which is where the relative indent is what the renderer will see.
+      //
+      // Tested against *any* line rather than the paragraph's first. A table whose opening row is
+      // under-indented — which happens, by hand, and renders correctly anyway because the rows
+      // below it carry the block — would otherwise be read as prose and rewrapped into a
+      // paragraph, columns and all. Nothing downstream sees that: it parses, the word count is
+      // conserved, and once the columns are gone there is no wide gap left for the table check to
+      // find.
+      const body = para.split("\n").filter((line) => line.trim());
+      if (body.some((line) => /^ {4,}\S/.test(line))) {
+        // Re-indent, normalising the shallowest row to markdown's four and holding every other
+        // row's offset against it. Stripping again here instead left tables at two spaces
+        // relative — under markdown's four, so the columns collapse into a paragraph. Caught by
+        // reading the parsed YAML rather than the file, which is where the relative indent is
+        // what the renderer will see.
+        const base = Math.min(...body.map((line) => /^ */.exec(line)[0].length));
         return para
           .split("\n")
-          .map((line) => (line.trim() ? indent + line : ""))
+          .map((line) => (line.trim() ? `${indent}    ${line.slice(base)}` : ""))
           .join("\n");
       }
       // Markdown that lives at the *start of a line* — bullets, ordered items, blockquotes — is
@@ -272,7 +282,15 @@ for (const [id, spec] of Object.entries(plan)) {
   // slides one into the middle of a line still parses and still counts the same words, so this is
   // the only check that sees it. Count each kind separately: a bullet becoming a quote would net
   // to zero against a single total, and that is exactly the sort of thing a rewrap does.
-  const KINDS = { bullet: /^ *[-*] /gm, ordered: /^ *\d+\. /gm, quote: /^ *> /gm };
+  // `preformatted` is here for the same reason as the rest: a table reflowed into prose keeps its
+  // words and loses its rows, and once the columns are gone the table-indent check below has
+  // nothing left to recognise. Counting the rows is the only thing that sees it.
+  const KINDS = {
+    bullet: /^ *[-*] /gm,
+    ordered: /^ *\d+\. /gm,
+    quote: /^ *> /gm,
+    preformatted: /^ {4,}\S.*$/gm,
+  };
   let broke = false;
   for (const [kind, pattern] of Object.entries(KINDS)) {
     const marks = (text) => (String(text ?? "").match(pattern) ?? []).length;
