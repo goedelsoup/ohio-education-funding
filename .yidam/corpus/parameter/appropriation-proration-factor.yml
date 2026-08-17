@@ -42,8 +42,10 @@ description: |
 findings: |
   ### Three are known, and only one publishes its appropriation
 
-  program factor appropriation stated? special education transportation 0.91746 no preschool
-  special education 0.96854448 yes — $147,500,000 transportation, general 1.0 no
+      program                                    factor        appropriation stated?
+      special education transportation           0.91746       no
+      preschool special education                0.96854448    yes — $147,500,000
+      transportation, general                    1.0           no
 
   The preschool sheet is what makes the class describable. It carries the **appropriation limit
   in a cell beside the factor**, which is the only place in the FY2027 calculator that shows a
