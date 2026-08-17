@@ -6,33 +6,32 @@ summary: >-
   figure here in a way that is invisible unless named.
 description: |
   A federal channel that was large, restricted, temporary, and is now gone — and which inflates
-  every FY2020 through FY2024 figure in this corpus in a way that is invisible unless it is named.
+  every FY2020 through FY2024 figure in Ohio's district finance series in a way that is
+  invisible unless it is named.
 
   **Three acts, one fund.** ESSER I under the CARES Act (March 2020), ESSER II under CRRSA
-  (December 2020), and ESSER III under the American Rescue Plan (March 2021), each larger than the
-  last. Distributed to districts **in proportion to their Title I Part A shares**, which means it
-  arrived on a poverty formula and was therefore concentrated in exactly the districts Ohio's own
-  system leaves most dependent on a weak local base. [verified]
+  (December 2020), and ESSER III under the American Rescue Plan (March 2021), each larger than
+  the last. Distributed to districts **in proportion to their Title I Part A shares**, which
+  means it arrived on a poverty formula and was therefore concentrated in exactly the districts
+  Ohio's own system leaves most dependent on a weak local base. [verified]
 
-  **It expired.** The last obligation deadline fell in September 2024. A district that used ESSER
-  for recurring costs — staff, programmes, interventions — faced the loss of that money with no
-  state channel replacing it. This is the fiscal cliff that runs underneath every FY2025 and
-  FY2026 forecast in
-  [`district-finances.csv`](../../../crates/project/fixtures/district-finances.csv), and the
-  corpus could not express it until now. [verified]
-
+  **It expired.** The last obligation deadline fell in September 2024. A district that used
+  ESSER for recurring costs — staff, programmes, interventions — faced the loss of that money
+  with no state channel replacing it. This is the fiscal cliff that runs underneath every
+  FY2025 and FY2026 forecast in
+  [`district-finances.csv`](../../../crates/project/fixtures/district-finances.csv). [verified]
+findings: |
   ### The size of it, and why every cross-year comparison touches it
 
   FY2022 is the peak. In that year Ohio districts took **13.87% of school revenue from federal
-  sources against a national 13.24%** — $2,466 per pupil against $2,493 — which places Ohio 25th
-  of 51 and, unusually for this corpus, entirely unremarkable. [verified —
+  sources against a national 13.24%** — $2,466 per pupil against $2,493 — which places Ohio
+  25th of 51 and, unusually for this corpus, entirely unremarkable. [verified —
   `crates/dispersion/src/national_peers.rs`]
 
   The unremarkable federal share is what makes the rest of Ohio's position remarkable. Ohio is
   seventh of fifty-one on local share and forty-fifth on state share; it is ordinary on federal
   share and ordinary on spending per pupil. The distinctive thing is the split between the two
-  domestic levels, and the federal channel is a constant that does not explain it.
-  [inference]
+  domestic levels, and the federal channel is a constant that does not explain it. [inference]
 
   **Federal money is compensatory in Ohio, monotonically, and it is small.** Quartiling the 611
   comparable districts by local revenue per pupil in FY2022: [verified —
@@ -45,12 +44,12 @@ description: |
       Q4 richest     $13,932        $4,522          $1,825
 
   The local gap between the top and bottom quartile is **$9,590 per pupil**. State equalization
-  closes **$4,448 of it, 46%**. The federal channel closes **$913, or 9.5%**. Together they leave
-  **$4,229 per pupil** of the local gap standing. [verified]
+  closes **$4,448 of it, 46%**. The federal channel closes **$913, or 9.5%**. Together they
+  leave **$4,229 per pupil** of the local gap standing. [verified]
 
   **And FY2022 is the most favourable year that will ever be measured for this**, because the
-  federal column is at its ESSER peak. The offset shown here is an upper bound on a channel that
-  has since contracted to its pre-pandemic level. Whatever the answer to "does the system
+  federal column is at its ESSER peak. The offset shown here is an upper bound on a channel
+  that has since contracted to its pre-pandemic level. Whatever the answer to "does the system
   equalize", it is worse than these figures after September 2024. [inference]
 
   What this does not establish: how the cliff actually landed. Whether districts spent ESSER on

@@ -8,8 +8,7 @@ description: |
   **RUN.** Reproduce with `cargo run -p project --bin edfund-project -- --guarantee <rule>`.
   Every figure below is a **simulation**, not a forecast: it re-runs the department's own
   FY2027 model with one lever moved, at observed enrollment. Where a projection is used it is
-  labelled and reported separately, per
-  [`skills/project`](../../skills/project.md).
+  labelled and reported separately, per [`skills/project`](../../skills/project.md).
 
   Ohio's FY2027 model pays **$7,281 million** in state foundation aid to 609 districts. **$879
   million of it — 12.1% — is the temporary transitional aid guarantee**, paid to **294
@@ -17,27 +16,27 @@ description: |
   in **FY2020**: a [Bridge formula](../funding-regime/bridge-formula.yml) year Ohio froze
   rather than computed. [verified — reproduces the department's model to the cent]
 
+  This scenario generalises [fsfp-input-year-refresh](fsfp-input-year-refresh.yml) from the
+  single district that node refreshes to the whole state.
+findings: |
   ### The three policies are not variants of each other
 
-  removal              -$879.0M    294 districts cut, 315 untouched
-      half phase-out       -$439.5M    294 districts cut, 315 untouched
-      rebase to 90%        -$87.9M     294 districts cut, 315 untouched
+  removal -$879.0M 294 districts cut, 315 untouched half phase-out -$439.5M 294 districts cut,
+  315 untouched rebase to 90% -$87.9M 294 districts cut, 315 untouched
 
   Removal and phase-out reach exactly the same districts and differ only in depth, because the
   guarantee is a floor and lowering a floor cannot catch anyone the floor was not already
-  holding. **No policy applied to the guarantee can reach the 315 districts the formula
-  already pays.** [verified] That is the structural fact underneath every distributional
-  argument about it: the guarantee question and the adequacy question are disjoint, and a
-  proposal framed as fixing the formula by reforming the guarantee changes nothing for half the
-  state.
+  holding. **No policy applied to the guarantee can reach the 315 districts the formula already
+  pays.** [verified] That is the structural fact underneath every distributional argument about
+  it: the guarantee question and the adequacy question are disjoint, and a proposal framed as
+  fixing the formula by reforming the guarantee changes nothing for half the state.
 
   ### The largest per-pupil loser is one of Ohio's poorest districts
 
-  Under a half phase-out,
-  East Cleveland City loses **$6,489 per pupil** — more than twice the next district. Its
-  guarantee is $13.7 million against $13.3 million of formula aid: **50.7% of everything it
-  receives**, $12,978 per pupil, on assessed valuation of $141,623 per pupil against a
-  statewide median of $248,097. [verified]
+  Under a half phase-out, East Cleveland City loses **$6,489 per pupil** — more than twice the
+  next district. Its guarantee is $13.7 million against $13.3 million of formula aid: **50.7%
+  of everything it receives**, $12,978 per pupil, on assessed valuation of $141,623 per pupil
+  against a statewide median of $248,097. [verified]
 
   This does not overturn the finding that the guarantee is a wealth mechanism — see
   [`temporary-transitional-aid-guarantee`](../formula-component/temporary-transitional-aid-guarantee.yml).
@@ -49,9 +48,8 @@ description: |
 
   ### The guarantee is a shock absorber that wears out
 
-  Raising base cost costs the state more
-  per point the higher it goes, because each increment lifts more districts off the guarantee
-  and onto a formula that then has to pay them:
+  Raising base cost costs the state more per point the higher it goes, because each increment
+  lifts more districts off the guarantee and onto a formula that then has to pay them:
 
       base cost   state cost    on guarantee    marginal cost per point
       +2%          +$95.4M          272            $47.7M
@@ -66,12 +64,12 @@ description: |
 
   ### It makes the state's cost predictable
 
-  This is the projection leg and is reported
-  apart from everything above. Carrying each district's enrollment forward to **FY2032** by a
-  damped trend from its own FY2024-FY2026 history — statewide ADM falls 4.9% — state aid under
-  current law is **$7,125M, in a band of $6,889M to $7,379M** (±3.4%). With the guarantee
-  removed the same enrollment forecast gives **$6,060M, in a band of $5,711M to $6,430M**
-  (±5.9%). [inference — a forecast, with the caveats below]
+  This is the projection leg and is reported apart from everything above. Carrying each
+  district's enrollment forward to **FY2032** by a damped trend from its own FY2024-FY2026
+  history — statewide ADM falls 4.9% — state aid under current law is **$7,125M, in a band of
+  $6,889M to $7,379M** (±3.4%). With the guarantee removed the same enrollment forecast gives
+  **$6,060M, in a band of $5,711M to $6,430M** (±5.9%). [inference — a forecast, with the
+  caveats below]
 
   **Removing the guarantee nearly doubles the state's exposure to enrollment forecast error.**
   That is an argument for the guarantee that has nothing to do with equity or adequacy: it is a
@@ -81,9 +79,6 @@ description: |
 
   Only **two** districts move onto the guarantee between FY2027 and FY2032 under current law,
   294 to 292 — enrollment decline barely changes the count, because it is already nearly half.
-
-  This scenario generalises [fsfp-input-year-refresh](fsfp-input-year-refresh.yml) from the single
-  district that node refreshes to the whole state.
 properties:
   name: Phasing out the temporary transitional aid guarantee
   question: |

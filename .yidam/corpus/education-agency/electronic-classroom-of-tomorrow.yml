@@ -6,25 +6,19 @@ summary: >-
   had been paid for. The case establishes what a funded pupil is.
 description: |
   A statewide online community school, once among the largest in the country by enrollment, and
-  the case that establishes what "funded per pupil" means when the pupil count is contested.
-  It closed in January 2018 after the Ohio Department of Education determined it could not
+  the case that establishes what "funded per pupil" means when the pupil count is contested. It
+  closed in January 2018 after the Ohio Department of Education determined it could not
   document participation for a large share of the students it had been funded for, and sought
   recovery of the resulting overpayments. [verified] The Supreme Court of Ohio upheld the
   department's authority to require documentation of participation rather than enrollment.
   [verified]
 
   The reason it belongs in a funding corpus rather than an oversight one is that it makes the
-  formula's central quantity visible. Every regime in this corpus multiplies a per-pupil amount
-  by a student count, and the entire structure rests on that count being right. For a brick
-  and mortar district the count is checked by physical attendance. For a statewide e-school it
-  is whatever the school reports until someone audits it, and until this case Ohio's rules did
-  not clearly require the school to show that funded students were participating. [inference]
-
-  It also illustrates why the community school channel had to be modeled. Under the pre-FSFP
-  deduct mechanism, every dollar ECOT was funded came out of a resident district's foundation
-  payment, spread across most of the state's districts. [verified] The clawback, and the
-  question of whether recovered money returned to those districts, is a concrete distributional
-  event this corpus should be able to trace. [open]
+  formula's central quantity visible. Every Ohio funding regime multiplies a per-pupil amount
+  by a student count, and the entire structure rests on that count being right. For a brick and
+  mortar district the count is checked by physical attendance. For a statewide e-school it is
+  whatever the school reports until someone audits it, and until this case Ohio's rules did not
+  clearly require the school to show that funded students were participating. [inference]
 
   **The numbers are now on the record and they are large.** A 165-page department hearing
   officer's report found that ECOT had counted roughly 9,000 more full-time-equivalent students
@@ -37,7 +31,7 @@ description: |
   million** — the entirety of what it was paid — for the final months before it closed in
   January 2018. [verified] ECOT contested the recovery through 2021, when the Supreme Court of
   Ohio held it could not challenge the order. [verified]
-
+findings: |
   The distributional question this raises is the one the corpus should be able to answer and
   cannot yet: under the pre-FSFP deduct mechanism every dollar ECOT was funded came out of a
   resident district's foundation payment, spread across most districts in the state. Whether

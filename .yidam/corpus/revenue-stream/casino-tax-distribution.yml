@@ -5,82 +5,74 @@ summary: >-
   and appears nowhere in the foundation formula or in any departmental figure. A share of the
   33% tax on gross casino revenue, distributed quarterly by county.
 description: |
-  Money that reaches every Ohio school district, is constitutionally restricted to education, and
-  appears nowhere in the foundation formula, the department's budget, or any figure in this
-  corpus.
+  Money that reaches every Ohio school district, is constitutionally restricted to education,
+  and appears nowhere in the foundation formula, the department's budget, or any figure derived
+  from either.
 
   **The channel.** A 33% tax on gross casino revenue from the four casinos authorized in 2009
   (Cincinnati, Cleveland, Toledo, and Franklin County). [verified — R.C. 5753.02] **34% of that
   tax** goes to the gross casino revenue county student fund, transferred quarterly, and is
   distributed among all eighty-eight counties in proportion to their public school district
   student populations — then within each county among the districts, in proportion to each
-  district's students resident in that county. [verified — Ohio Constitution Article XV
-  Section 6(C)(3)(b); R.C. 5753.03(D)(2)] Districts are paid twice a year and **"shall determine
-  how [their] distributions are appropriated, but all distributions shall only be used to support
+  district's students resident in that county. [verified — Ohio Constitution Article XV Section
+  6(C)(3)(b); R.C. 5753.03(D)(2)] Districts are paid twice a year and **"shall determine how
+  [their] distributions are appropriated, but all distributions shall only be used to support
   primary and secondary education."** [verified — Art. XV §6(C)(3)(b)]
 
   ### A fifth pupil denominator, and the only one that double-counts on purpose
 
-  R.C. 5753.11
-  defines "student population" as students residing in a county enrolled in a public school
-  district in grades K-12, plus preschool children with disabilities, counted on the **Friday of
-  the first full school week in October** for the January distribution and **in May** for the
-  August one. [verified] That is not enrolled ADM, not formula ADM, not the report card's
-  unweighted count, and not the F-33's fall membership — the four this corpus already has to keep
-  apart, and which `web/src/lib/denominators.ts` exists because the site conflated twice.
+  R.C. 5753.11 defines "student population" as students residing in a county enrolled in a
+  public school district in grades K-12, plus preschool children with disabilities, counted on
+  the **Friday of the first full school week in October** for the January distribution and **in
+  May** for the August one. [verified] That is not enrolled ADM, not formula ADM, not the
+  report card's unweighted count, and not the F-33's fall membership — the four Ohio pupil
+  counts that already have to be kept apart. This is a fifth.
 
   Two properties make it stranger than a fifth count would otherwise be:
 
   - **"Public school district" here includes community schools, STEM schools, JVSDs and
-    college-preparatory boarding schools.** [verified — R.C. 5753.11(A)(1)] Community schools
-    receive this money directly, which is the *opposite* of how they were funded before the Fair
-    School Funding Plan, when their students were deducted from a resident district. And JVSDs are
-    included, where [IDEA Part B](idea-part-b.yml) excludes them entirely — two federal-and-state
-    channels drawing the boundary of "district" in opposite places.
+     college-preparatory boarding schools.** [verified — R.C. 5753.11(A)(1)] Community schools
+     receive this money directly, which is the *opposite* of how they were funded before the
+     Fair School Funding Plan, when their students were deducted from a resident district. And
+     JVSDs are included, where [IDEA Part B](idea-part-b.yml) excludes them entirely — two
+     federal-and-state channels drawing the boundary of "district" in opposite places.
   - **A student dual-enrolled in a JVSD and another district is counted in both.** [verified —
-    R.C. 5753.11(B)] Where the district of enrollment cannot be determined in time, the count is
-    split equally between the reporting districts. The denominator is deliberately not a partition
-    of Ohio's students, so a per-pupil figure from it is not comparable to one from any other
-    source here.
-
+     R.C. 5753.11(B)] Where the district of enrollment cannot be determined in time, the count
+     is split equally between the reporting districts. The denominator is deliberately not a
+     partition of Ohio's students, so a per-pupil figure from it is not comparable to one from
+     any other source here.
+findings: |
   ### Why it is invisible in every other figure here
 
-  The distribution runs from the Tax
-  Commissioner through county funds to districts. It is not an appropriation to the Department of
-  Education and Workforce, so it is absent from the department's budget, absent from the School
-  Finance Payment Report, and absent from every fixture built from either. The only casino money
-  in the [LSC redbook](../../../crates/project/fixtures/dew-redbook.txt) is the **casino operator
+  The distribution runs from the Tax Commissioner through county funds to districts. It is not
+  an appropriation to the Department of Education and Workforce, so it is absent from the
+  department's budget, absent from the School Finance Payment Report, and absent from every
+  fixture built from either. The only casino money in the [LSC
+  redbook](../../../crates/project/fixtures/dew-redbook.txt) is the **casino operator
   settlement fund** — a different pot entirely, which supported preschool slots through an
   interagency transfer from FY2017 to FY2023. [verified] A reader searching the department's
   budget for casino money finds that and concludes, wrongly, that they have found the channel.
 
   **The substitution question, which is what the ontology actually wanted this node for.** The
   genesis decision `proposals` named "casino revenue offsets" as an example of one stream
-  substituting for another — that is why `substitutes-for` exists as an edge at all.
-  **No offset is visible in what this corpus holds.** None of the
-  fifteen R.C. 3317 sections committed to
-  [`revised-code.txt`](../../../crates/project/fixtures/revised-code.txt) mentions the casino
-  distribution, and neither the constitution nor R.C. 5753 provides for reducing state aid by the
-  amount a district receives. [verified, as far as those sections go]
+  substituting for another — that is why `substitutes-for` exists as an edge at all. **No
+  offset is visible in what this corpus holds.** None of the fifteen R.C. 3317 sections
+  committed to [`revised-code.txt`](../../../crates/project/fixtures/revised-code.txt) mentions
+  the casino distribution, and neither the constitution nor R.C. 5753 provides for reducing
+  state aid by the amount a district receives. [verified, as far as those sections go]
 
   That is not the same as establishing that the money is additive. The substitution critique of
   earmarked gambling revenue is about the *appropriation*, not the statute: whether the General
-  Assembly set foundation aid lower than it otherwise would have because this channel exists is a
-  counterfactual about budget-making that no section of law will answer.
+  Assembly set foundation aid lower than it otherwise would have because this channel exists is
+  a counterfactual about budget-making that no section of law will answer.
 
   ### The appropriation history does not settle it, and that is the finding
 
-  This
-  node said settling the question needed the appropriation history, "which is `lsc-budget` work" —
-  a sentence that reads as a task waiting to be done. The work is done: the enacted foundation aid
-  appropriation is continuous from FY2002 to FY2027. It cannot answer this, and now that is
-  measured rather than promised.
-
   In constant FY2025 dollars the foundation funding appropriation moves by a **median of $236
   million a year**, mean $349 million, across a range from $11 million to $1.51 billion. A
-  substitution smaller than that ordinary movement is arithmetically inside it — not hard to see,
-  but indistinguishable from the year's other reasons for moving. And nothing happens at the
-  onset: FY2012 moves +$183 million and FY2013 −$101 million, the seventh smallest of the
+  substitution smaller than that ordinary movement is arithmetically inside it — not hard to
+  see, but indistinguishable from the year's other reasons for moving. And nothing happens at
+  the onset: FY2012 moves +$183 million and FY2013 −$101 million, the seventh smallest of the
   twenty-four annual movements in the series. [verified — the appropriation series and the
   deflator, pinned in `crates/project/tests/what_the_series_cannot_settle.rs`]
 
@@ -89,44 +81,69 @@ description: |
   This is the thing the two channels together establish, and neither shows alone. The lottery's
   substitution was visible in a $97.6 million movement — *smaller* than the median annual
   variation in the total — because Fund 7017 is **itemized inside the appropriation table**, so
-  the figure can be read rather than inferred from a total. Casino money never enters the table at
-  all, so the only available test is inference from the total, and the total's ordinary noise is
-  more than twice the size of the movement that was legible in the lottery's case.
+  the figure can be read rather than inferred from a total. Casino money never enters the table
+  at all, so the only available test is inference from the total, and the total's ordinary
+  noise is more than twice the size of the movement that was legible in the lottery's case.
 
   Substitution is detectable when an earmark has an appropriation line and undetectable when it
-  does not, and the threshold has almost nothing to do with how much money is involved. [inference]
+  does not, and the threshold has almost nothing to do with how much money is involved.
+  [inference]
 
-  **What would settle it.** Not more of this series. Either the casino distribution's own size, to
-  establish whether the channel is even of a magnitude the total could register — and the two
-  publishers of it, `tax.ohio.gov` and `casinocontrol.ohio.gov`, both return 404 at their document
-  root to a self-identifying agent, the same signature `ofcc-projects` is declared on — or a source
-  about budget-making rather than budgets: committee testimony, fiscal notes, the analyses behind a
-  foundation aid target. [open]
+  **What would settle it.** Not more of this series. Either the casino distribution's own size,
+  to establish whether the channel is even of a magnitude the total could register — and the
+  two publishers of it, `tax.ohio.gov` and `casinocontrol.ohio.gov`, both return 404 at their
+  document root to a self-identifying agent, the same signature `ofcc-projects` is declared on
+  — or a source about budget-making rather than budgets: committee testimony, fiscal notes, the
+  analyses behind a foundation aid target. [open]
 
-  **And the sharper case is three paragraphs above, in the same constitutional section.** Article
-  XV Section 6(A) earmarks the state lottery's net proceeds for education "as determined in
-  appropriations made by the General Assembly" — and for the
+  **And the sharper case is three paragraphs above, in the same constitutional section.**
+  Article XV Section 6(A) earmarks the state lottery's net proceeds for education "as
+  determined in appropriations made by the General Assembly" — and for the
   [lottery](lottery-profits.yml) the substitution question has a documented answer: LSC states
-  that profits are combined with the GRF to pay foundation aid, and Fund 7017 appears **inside**
-  the foundation aid appropriation table at **$1.44 billion of an $11.23 billion total** in
-  FY2026. [verified — the greenbook, `crates/project/fixtures/dew-greenbook.txt`]
-
-  **Those figures were $1.34 billion and $11.15 billion here until the enacted document was
-  read.** Both were the executive proposal, taken from LSC's redbook and marked verified. The
-  correction sharpens the point rather than softening it: between the proposal and the act the
-  lottery's contribution rose **$97,638,202** while everything else in the same table **fell
-  $15,575,916**, so the total grew by less than the lottery line did. That is substitution
-  happening at the one margin the General Assembly actually controls, inside a single table.
-  [verified]
+  that profits are combined with the GRF to pay foundation aid, and Fund 7017 appears
+  **inside** the foundation aid appropriation table at **$1.44 billion of an $11.23 billion
+  total** in FY2026. [verified — the greenbook, `crates/project/fixtures/dew-greenbook.txt`]
 
   **That is evidence about the lottery and not about this channel, and the difference is the
-  mechanism.** Lottery profits are appropriated by the General Assembly into foundation aid, which
-  is what makes the substitution visible in a budget table. Casino money never passes through an
-  appropriation to the department at all — it goes from the Tax Commissioner to county funds to
-  districts. There is no table in which it could be shown netting against anything, which means
-  the substitution question here is harder to answer rather than answered. [inference] What the
-  lottery establishes is that Ohio's other constitutional education earmark works this way, which
-  raises the prior without settling it. [open]
+  mechanism.** Lottery profits are appropriated by the General Assembly into foundation aid,
+  which is what makes the substitution visible in a budget table. Casino money never passes
+  through an appropriation to the department at all — it goes from the Tax Commissioner to
+  county funds to districts. There is no table in which it could be shown netting against
+  anything, which means the substitution question here is harder to answer rather than
+  answered. [inference] What the lottery establishes is that Ohio's other constitutional
+  education earmark works this way, which raises the prior without settling it. [open]
+revisions:
+  - was: |
+      Settling whether the casino earmark is additive or substitutive was recorded as needing
+      the appropriation history, "which is `lsc-budget` work" — a sentence that reads as a task
+      waiting to be done.
+    now: |
+      The work is done and it does not settle the question. The enacted foundation aid
+      appropriation is continuous from FY2002 to FY2027, and in constant FY2025 dollars it
+      moves by a median of $236 million a year — far too coarse for a channel this size to
+      register in.
+    found_by: |
+      The appropriation series, extended to every enacted year in the chapter.
+    reach: |
+      The conclusion is unchanged and its status is not: what was a promise is now a
+      measurement. Substitution is detectable when an earmark has an appropriation line and
+      undetectable when it does not, and the threshold has almost nothing to do with how much
+      money is involved.
+  - was: |
+      The lottery's contribution and the foundation aid total were carried as **$1.34 billion**
+      and **$11.15 billion**, marked verified.
+    now: |
+      Both were the **executive proposal**, taken from LSC's redbook rather than from the act.
+      The enacted figures differ.
+    found_by: |
+      Reading the enacted document against the redbook the figures came from.
+    reach: |
+      The correction sharpens the point rather than softening it. Between the proposal and the
+      act the lottery's contribution rose **$97,638,202** while everything else in the same
+      table **fell $15,575,916**, so the total grew by less than the lottery line did —
+      substitution happening at the one margin the General Assembly actually controls, inside a
+      single table. It also marks a verification failure of a particular kind: a redbook figure
+      is a proposal, and marking one `[verified]` reads as though the act had been checked.
 properties:
   name: Gross casino revenue county student fund
   level: state

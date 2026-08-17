@@ -6,17 +6,17 @@ summary: >-
   combined with the general fund to provide foundation aid, not added to it.
 description: |
   The earmark most Ohioans believe funds their schools on top of everything else, and the one
-  case in this corpus where the substitution question has a documented answer rather than an
-  argument.
+  case in Ohio school finance where the substitution question has a documented answer rather
+  than an argument.
 
-  **The answer, in the Legislative Service Commission's own words:** *"Generally, the majority of
-  lottery profits in each year are combined with the GRF to provide foundation funding to
-  schools."* [verified —
-  [LSC redbook](../../../crates/project/fixtures/dew-redbook.txt)] Lottery profits are not added
-  to foundation aid. They are one of the funds foundation aid is paid **from**.
+  **The answer, in the Legislative Service Commission's own words:** *"Generally, the majority
+  of lottery profits in each year are combined with the GRF to provide foundation funding to
+  schools."* [verified — [LSC redbook](../../../crates/project/fixtures/dew-redbook.txt)]
+  Lottery profits are not added to foundation aid. They are one of the funds foundation aid is
+  paid **from**.
 
-  It is visible in the appropriation table. Five line items collectively support state foundation
-  aid and scholarship payments, and one of them is the lottery: [verified]
+  It is visible in the appropriation table. Five line items collectively support state
+  foundation aid and scholarship payments, and one of them is the lottery: [verified]
 
       GRF   ALI 200550  Foundation Funding — All Students
       GRF   ALI 200502  Pupil Transportation
@@ -29,36 +29,37 @@ description: |
   rise because the lottery had a good year; the General Assembly appropriates a total and the
   lottery is one of the buckets it comes out of.
 
-  **Which is exactly what the constitutional text permits.** Article XV Section 6(A) requires the
-  entire net proceeds to be "used solely for the support of elementary, secondary, vocational, and
-  special education programs **as determined in appropriations made by the General Assembly**."
-  [verified] The earmark binds the *purpose* and leaves the *level* to the appropriation. A
-  constitutional guarantee that money be spent on schools is not a guarantee that schools receive
-  more money, and this is the clearest instance of the distinction in Ohio school finance.
+  **Which is exactly what the constitutional text permits.** Article XV Section 6(A) requires
+  the entire net proceeds to be "used solely for the support of elementary, secondary,
+  vocational, and special education programs **as determined in appropriations made by the
+  General Assembly**." [verified] The earmark binds the *purpose* and leaves the *level* to the
+  appropriation. A constitutional guarantee that money be spent on schools is not a guarantee
+  that schools receive more money, and this is the clearest instance of the distinction in Ohio
+  school finance.
 
+  **History.** Voters created the lottery by constitutional amendment in **1973**. The
+  education earmark is a **separate 1987 amendment**, fourteen years later — so the lottery
+  existed for over a decade before its profits were constitutionally tied to schools, and the
+  tie was added because the money was going elsewhere. [verified]
+findings: |
   **The share, over thirty-eight years.** Lottery profits peaked at **16.9% of combined GRF and
   Lottery Profits Education Fund K-12 spending in FY1991**, fell to a record low of **7.6% in
-  FY2007**, held around 8-9%, then rose with video lottery terminals at the racinos from FY2014 to
-  **12.4% in FY2021**, projected 12.5% in FY2026 and 12.1% in FY2027. [verified] Over FY1988 to
-  FY2025, total GRF-plus-lottery spending on primary and secondary education grew $9.48 billion,
-  of which the lottery supplied **$1.12 billion — 11.8% of the growth.** [verified]
+  FY2007**, held around 8-9%, then rose with video lottery terminals at the racinos from FY2014
+  to **12.4% in FY2021**, projected 12.5% in FY2026 and 12.1% in FY2027. [verified] Over FY1988
+  to FY2025, total GRF-plus-lottery spending on primary and secondary education grew $9.48
+  billion, of which the lottery supplied **$1.12 billion — 11.8% of the growth.** [verified]
 
   Read that series against the belief the earmark was sold on and the gap is the finding: the
   lottery's share of school funding was highest thirty-five years ago and has never returned to
-  it. What raised it after 2014 was not the lottery growing into its promise but a different form
-  of gambling being routed through the same fund.
-
-  **History.** Voters created the lottery by constitutional amendment in **1973**. The education
-  earmark is a **separate 1987 amendment**, fourteen years later — so the lottery existed for over
-  a decade before its profits were constitutionally tied to schools, and the tie was added because
-  the money was going elsewhere. [verified]
+  it. What raised it after 2014 was not the lottery growing into its promise but a different
+  form of gambling being routed through the same fund.
 
   **What this does not establish.** Whether foundation aid would be lower in a world with no
   lottery — the counterfactual the substitution critique actually asserts. LSC's "combined with
-  the GRF" describes the mechanism and not the legislature's intent, and no appropriation record
-  can show what a different General Assembly would have voted. [open] What *is* established is
-  that the mechanism offers no protection against substitution, which is the weaker and sufficient
-  claim.
+  the GRF" describes the mechanism and not the legislature's intent, and no appropriation
+  record can show what a different General Assembly would have voted. [open] What *is*
+  established is that the mechanism offers no protection against substitution, which is the
+  weaker and sufficient claim.
 properties:
   name: Lottery Profits Education Fund (Fund 7017)
   level: state

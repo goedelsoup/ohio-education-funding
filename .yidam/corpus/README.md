@@ -112,17 +112,17 @@ Fields: count per claim tag across every node; then the unresolved marks by the 
 -->
 | Tag | Count | What it records |
 |---|--:|---|
-| `[verified]` | 833 | supported by a committed primary source |
+| `[verified]` | 830 | supported by a committed primary source |
 | `[inference]` | 236 | drawn from verified facts, not witnessed |
-| `[open]` | 186 | a live question — unknown, contested, or being worked |
+| `[open]` | 185 | a live question — unknown, contested, or being worked |
 | `[unentered]` | 35 | a knowable value nobody has typed in yet |
 
-221 unresolved marks in total, 186 of them live questions and 35 of them empty fields. Before the two were distinguished the corpus reported the sum as its count of what it does not know, which overstated it by 15%.
+220 unresolved marks in total, 185 of them live questions and 35 of them empty fields. Before the two were distinguished the corpus reported the sum as its count of what it does not know, which overstated it by 15%.
 
 | Field | `[open]` | `[unentered]` |
 |---|--:|--:|
-| `description` | 70 | 3 |
-| `findings` | 33 | 1 |
+| `description` | 55 | 3 |
+| `findings` | 47 | 1 |
 | `series` | 12 | 0 |
 | `vetoes` | 7 | 1 |
 | `established` | 0 | 7 |
@@ -161,7 +161,7 @@ Fields: count per claim tag across every node; then the unresolved marks by the 
 | `context` | 1 | 0 |
 | `appropriating_bill` | 1 | 0 |
 
-**32 recorded withdrawals across 18 nodes.** A claim the corpus published and no longer stands behind is kept in a `revisions:` block rather than edited out, with the test or source that settled it — see [`the-four-genres-of-a-description`](../decisions/the-four-genres-of-a-description.yml). Counted here for the same reason the tags above are: how often this corpus has corrected itself is a fact about it, and one nobody would think to update by hand.
+**35 recorded withdrawals across 20 nodes.** A claim the corpus published and no longer stands behind is kept in a `revisions:` block rather than edited out, with the test or source that settled it — see [`the-four-genres-of-a-description`](../decisions/the-four-genres-of-a-description.yml). Counted here for the same reason the tags above are: how often this corpus has corrected itself is a fact about it, and one nobody would think to update by hand.
 <!-- /REGEN -->
 
 ## Node index
