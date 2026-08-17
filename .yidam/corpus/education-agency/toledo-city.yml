@@ -6,30 +6,18 @@ summary: >-
   poverty gradient takes in every Ohio comparison.
 description: |
   Ohio's fourth-largest district, and one half of a pair with
-  [Perrysburg](perrysburg-exempted-village.yml) — eleven miles apart, one urban and one exempted
-  village. [verified]
+  [Perrysburg](perrysburg-exempted-village.yml) — eleven miles apart, one urban and one
+  exempted village. [verified]
 
   **FY2025 in one line:** 21,160 pupils, $440.2 million of operating expenditure, **$20,805 per
   headcount pupil**, a Performance Index of 60.4, and a Progress effect size of −0.02.
   [verified — computed; see
   [`crates/dispersion/tests/expenditure_functions_fy25.rs`](../../../crates/dispersion/tests/expenditure_functions_fy25.rs)]
 
-  **It is the corpus's clearest case of the denominator problem in the wild.** The same
-  operating total divided by weighted ADM gives **$14,312** — which is what the report card
-  prints as expenditure per equivalent pupil, and what
-  [OCG White Paper 013](../../catalog/ocg-white-paper-013.md) analysed. Divided by headcount it
-  gives $20,805, which is what
-  [OCG fact-check RL-2026-021](../../catalog/ocg-fact-check-021.md) reported three weeks later.
-  A 45% spread for one district in one year, in two publications from one author, neither
-  noting the other's basis. [verified] Toledo's weighted ADM is 30,758 against 21,160 enrolled —
-  a weight ratio of 1.45, the consequence of a 98.9% economically disadvantaged share and a
-  21.9% disability share.
-
   ### Where its extra spending goes, which is not where the argument assumed
 
-  Toledo spends
-  $6,173 more per pupil than Perrysburg and a markedly *smaller* share of it in a classroom:
-  [verified]
+  Toledo spends $6,173 more per pupil than Perrysburg and a markedly *smaller* share of it in a
+  classroom: [verified]
 
                                     Toledo     Perrysburg
       instruction                    51.3%          62.6%
@@ -44,26 +32,37 @@ description: |
   already cited. Plant and building administration are where an old, large, dispersed physical
   estate shows up in an operating budget; whether that is inefficiency or the cost of the
   buildings Toledo actually has is not a question a share can answer. [inference]
+findings: |
+  **It is the corpus's clearest case of the denominator problem in the wild.** The same
+  operating total divided by weighted ADM gives **$14,312** — which is what the report card
+  prints as expenditure per equivalent pupil, and what [OCG White Paper
+  013](../../catalog/ocg-white-paper-013.md) analysed. Divided by headcount it gives $20,805,
+  which is what [OCG fact-check RL-2026-021](../../catalog/ocg-fact-check-021.md) reported
+  three weeks later. A 45% spread for one district in one year, in two publications from one
+  author, neither noting the other's basis. [verified] Toledo's weighted ADM is 30,758 against
+  21,160 enrolled — a weight ratio of 1.45, the consequence of a 98.9% economically
+  disadvantaged share and a 21.9% disability share.
 
   ### Normalised by the population actually served
 
-  It reports Toledo spending $2,766 per
-  pupil on special-education instruction against Perrysburg's $2,032–$2,363, and reads the
-  difference as "consistent with a modestly heavier student-need profile." Toledo's disability
-  share is 21.9% against Perrysburg's 11.3% — nearly double, not modest. Normalised by the
-  population actually served, Toledo spends roughly **$12,600 per student with a disability**
-  against Perrysburg's **$18,000–$20,900**: about a third less, not somewhat more. [inference —
-  the special-education dollars are the fact-check's, from audited statements this corpus does
-  not hold; the shares are the report card's, so this is an order-of-magnitude normalisation
-  rather than an audited per-pupil cost. A 1.94x population difference against a 1.36x spending
-  difference leaves no room for the sign to return.]
+  It reports Toledo spending $2,766 per pupil on special-education instruction against
+  Perrysburg's $2,032–$2,363, and reads the difference as "consistent with a modestly heavier
+  student-need profile." Toledo's disability share is 21.9% against Perrysburg's 11.3% — nearly
+  double, not modest. Normalised by the population actually served, Toledo spends roughly
+  **$12,600 per student with a disability** against Perrysburg's **$18,000–$20,900**: about a
+  third less, not somewhat more. [inference — the special-education dollars are the
+  fact-check's, from audited statements this corpus does not hold; the shares are the report
+  card's, so this is an order-of-magnitude normalisation rather than an audited per-pupil cost.
+  A 1.94x population difference against a 1.36x spending difference leaves no room for the sign
+  to return.]
 
   This is the corpus's denominator rule arriving a third time and from a new direction. The
   first two were about dividing spending by a need-weighted pupil count; this one is about
-  dividing special-education spending by a population that is mostly not receiving it. [inference]
+  dividing special-education spending by a population that is mostly not receiving it.
+  [inference]
 
-  Not yet held: audited-statement figures, the scholarship and community-school deduction that a
-  district of this size and poverty carries, and any year before FY2024. [open]
+  Not yet held: audited-statement figures, the scholarship and community-school deduction that
+  a district of this size and poverty carries, and any year before FY2024. [open]
 revisions:
   - was: |
       A published fact-check read Toledo's $2,766 per pupil of special-education instruction

@@ -6,50 +6,51 @@ summary: >-
   consecutive years below 40.
 description: |
   What the bottom of Ohio's distribution looks like at building grain, in the district that has
-  been under an [academic distress commission](../intervention/academic-distress-commission.yml).
+  been under an [academic distress
+  commission](../intervention/academic-distress-commission.yml).
 
   **A Performance Index of 36.8, and three consecutive years below 40** — 36.8, 39.1, 38.9.
   [verified — `report-card-2425-buildings.csv`] One star on the achievement component. The
-  three-year span is not incidental: it is the span R.C. 3302.10 reads for a district and the span
-  after which an ATSI building escalates to CSI.
+  three-year span is not incidental: it is the span R.C. 3302.10 reads for a district and the
+  span after which an ATSI building escalates to CSI.
 
   **Two-thirds of its students are chronically absent.** 66.7% in 2024-25, against 25.9% at
-  [Sheridan](sheridan-high-school.yml) and 2.5% at
-  [Barrington Road](barrington-road-elementary.yml). [verified] A 64-point spread between two
-  buildings in the same state, measured the same way in the same year.
+  [Sheridan](sheridan-high-school.yml) and 2.5% at [Barrington
+  Road](barrington-road-elementary.yml). [verified] A 64-point spread between two buildings in
+  the same state, measured the same way in the same year.
 
-  That figure bears on whether achievement measures are measuring the school. A Performance Index
-  is computed over tests that should have been taken, and Ohio's plan states that a school earns
-  zero points for every test not taken — so a building where two in three students are chronically
-  absent is being scored partly on attendance through a measure that is nominally about learning.
-  [inference] The corpus cannot separate the two effects and should not pretend the index is
-  clean. [open]
+  That figure bears on whether achievement measures are measuring the school. A Performance
+  Index is computed over tests that should have been taken, and Ohio's plan states that a
+  school earns zero points for every test not taken — so a building where two in three students
+  are chronically absent is being scored partly on attendance through a measure that is
+  nominally about learning. [inference] The corpus cannot separate the two effects and should
+  not pretend the index is clean. [open]
 
   ### It is on none of the three identification lists
 
-  Not CSI, not TSI, not ATSI. [verified —
-  `dispersion::identified`, pinned by test] The corpus's worst-performing exemplar building, at a
-  third of the Performance Index scale with two in three students chronically absent, is outside
-  the federal accountability system entirely — while [Sheridan](sheridan-high-school.yml), a
-  four-star building, is inside it.
-
+  Not CSI, not TSI, not ATSI. [verified — `dispersion::identified`, pinned by test] A building
+  at a third of the Performance Index scale with two in three students chronically absent is
+  outside the federal accountability system entirely — while
+  [Sheridan](sheridan-high-school.yml), a four-star building, is inside it.
+findings: |
   **That is not obviously a defect, and the corpus cannot tell.** CSI selects among **Title I
   served** schools, and neither the identification lists nor any fixture here carries a Title I
-  service flag. So the absence has at least three readings — the building is not Title I served;
-  it is served but was not in the bottom 5% of that population in the 2025 cycle; or it was
-  identified in an earlier cycle and exited. Nothing held distinguishes them, and the department
-  republishes each list in place rather than archiving cycles, so the history that would settle it
-  does not exist here. [open]
+  service flag. So the absence has at least three readings — the building is not Title I
+  served; it is served but was not in the bottom 5% of that population in the 2025 cycle; or it
+  was identified in an earlier cycle and exited. Nothing held distinguishes them, and the
+  department republishes each list in place rather than archiving cycles, so the history that
+  would settle it does not exist here. [open]
 
-  What can be said is narrower and still worth saying: **a reader who treats the CSI list as "the
-  failing schools" will not find this building on it.** Cleveland has fifteen CSI buildings and
-  this is not one of them.
+  What can be said is narrower and still worth saying: **a reader who treats the CSI list as
+  "the failing schools" will not find this building on it.** Cleveland has fifteen CSI
+  buildings and this is not one of them.
 
-  **The intervention connection is real and not yet traceable.** Cleveland Municipal is recorded
-  as having been subject to state academic distress intervention "for part of the period", with
-  dates not established. [verified] Whether this building was open, and how it performed, during
-  the commission's tenure is exactly the question the accountability expansion exists to answer
-  and cannot yet, because the corpus holds no commission timeline. [open]
+  **The intervention connection is real and not yet traceable.** Cleveland Municipal is
+  recorded as having been subject to state academic distress intervention "for part of the
+  period", with dates not established. [verified] Whether this building was open, and how it
+  performed, during the commission's tenure is exactly the question the accountability
+  expansion exists to answer and cannot yet, because the corpus holds no commission timeline.
+  [open]
 properties:
   building_irn: 000828 [verified]
   district: Cleveland Municipal School District, IRN 043786. [verified]

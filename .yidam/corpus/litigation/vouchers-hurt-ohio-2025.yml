@@ -9,8 +9,8 @@ description: |
   districts organized as Vouchers Hurt Ohio, filed in Franklin County Common Pleas Court in
   2022 and decided in the districts' favor on 24 June 2025 by Judge Jaiza Page, in a 47-page
   decision holding the program unconstitutional. [verified] Roughly 100 to 200 districts joined
-  as plaintiffs; accounts differ and the exact figure is not settled here. [open] The program at
-  issue was reported at approximately $700 million annually. [inference]
+  as plaintiffs; accounts differ and the exact figure is not settled here. [open] The program
+  at issue was reported at approximately $700 million annually. [inference]
 
   **Two grounds, and they are independent.** The court found that using public funds to
   subsidize tuition at private religious schools violates Article VI, Section 2's bar on any
@@ -29,37 +29,38 @@ description: |
 
   This is a trial-level decision and the Attorney General moved to appeal, so its precedential
   weight is limited and its outcome unsettled. [verified]
-
+findings: |
   **The caption and the docket number are now read off an Ohio appellate decision in this very
-  case.** *Columbus City School Dist. v. State*, 2024-Ohio-1217, 10th Dist. No. 24AP-60, decided
-  29 March 2024, states both on its first page: the parties are *Columbus City School District et
-  al. v. State of Ohio et al.* and the trial court case is **Franklin C.P. No. 22CV-000067**.
-  [verified]
+  case.** *Columbus City School Dist. v. State*, 2024-Ohio-1217, 10th Dist. No. 24AP-60,
+  decided 29 March 2024, states both on its first page: the parties are *Columbus City School
+  District et al. v. State of Ohio et al.* and the trial court case is **Franklin C.P. No.
+  22CV-000067**. [verified]
 
-  That decision is not about EdChoice. The Ohio Senate President, a non-party, was served with a
-  deposition subpoena on 22 March 2023; the trial court granted his motion to quash in part and
-  modified the subpoena to twenty written questions, and he appealed on legislative privilege. The
-  Tenth District dismissed for want of a final appealable order, holding that he had not shown the
-  order left him without a meaningful remedy after final judgment. [verified] So the appellate
-  record of this case, as of this revision, consists of one dismissed interlocutory appeal about
-  who may be deposed. [verified]
+  That decision is not about EdChoice. The Ohio Senate President, a non-party, was served with
+  a deposition subpoena on 22 March 2023; the trial court granted his motion to quash in part
+  and modified the subpoena to twenty written questions, and he appealed on legislative
+  privilege. The Tenth District dismissed for want of a final appealable order, holding that he
+  had not shown the order left him without a meaningful remedy after final judgment. [verified]
+  So the appellate record of this case, as of this revision, consists of one dismissed
+  interlocutory appeal about who may be deposed. [verified]
 
-  **The merits decision itself is not held and the reason is a term of use, not a wall.** Ohio's
-  Reporter of Decisions offers the supreme court, the twelve district courts of appeals and the
-  Court of Claims as its sources, and no common pleas court. The Franklin County Clerk of Courts
-  publishes the docket under conditions of use stating that the data "is not intended for
-  distribution by other persons, entities or organizations" and that an organization wanting files
-  must file a public records request. Both read off those publishers' own pages rather than off a
-  document this repository holds. [inference] So the ruling is readable by a person and is not
-  redistributable from here, which is the same shape as the educational service center minute books
-  in [`the-order-was-never-the-states`](../../decisions/the-order-was-never-the-states.yml). See
+  **The merits decision itself is not held and the reason is a term of use, not a wall.**
+  Ohio's Reporter of Decisions offers the supreme court, the twelve district courts of appeals
+  and the Court of Claims as its sources, and no common pleas court. The Franklin County Clerk
+  of Courts publishes the docket under conditions of use stating that the data "is not intended
+  for distribution by other persons, entities or organizations" and that an organization
+  wanting files must file a public records request. Both read off those publishers' own pages
+  rather than off a document this repository holds. [inference] So the ruling is readable by a
+  person and is not redistributable from here, which is the same shape as the educational
+  service center minute books in
+  [`the-order-was-never-the-states`](../../decisions/the-order-was-never-the-states.yml). See
   [`what-a-citator-reaches`](../../decisions/what-a-citator-reaches.yml).
 
   Appellate status of the merits ruling: no Ohio appellate decision in this case later than
   2024-Ohio-1217 was found on 14 August 2026, searching an index whose Tenth District coverage
-  reached 31 July 2026. That is a bound on one search rather than a fact about the docket, and the
-  docket itself has not been read. [inference] The number of districts joined as plaintiffs remains
-  unestablished. [open]
+  reached 31 July 2026. That is a bound on one search rather than a fact about the docket, and
+  the docket itself has not been read. [inference] The number of districts joined as plaintiffs
+  remains unestablished. [open]
 properties:
   seeded_because: |
     It is the live test of whether the *DeRolph* standard constrains anything in the current

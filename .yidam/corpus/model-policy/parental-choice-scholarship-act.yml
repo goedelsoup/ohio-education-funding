@@ -6,30 +6,30 @@ summary: >-
   checkable claim against what Ohio actually does.
 description: |
   ALEC's template voucher statute, in the variant that makes every school-age student eligible.
-  Finalized January 1, 2005 and amended January 16, 2016. It is not law in Ohio or anywhere else;
-  it is a draft written to be introduced. [verified]
+  Finalized January 1, 2005 and amended January 16, 2016. It is not law in Ohio or anywhere
+  else; it is a draft written to be introduced. [verified]
 
-  It is in this corpus for one reason, and it is not that it is influential. **Its funding
-  mechanism is a specific, checkable claim, and this corpus has already established Ohio's
-  answer to the same question.** The model directs that "the funds needed for a scholarship shall
-  be subtracted from the state school aid payable to the student's resident school district", and
-  that "any aid the school district would have received for the student in excess of the funds
-  needed for a scholarship will be kept by the state". [verified — ALEC model text]
+  **Its funding mechanism is a specific, checkable claim, and Ohio's answer to the same
+  question is established.** The model directs that "the funds needed for a scholarship shall
+  be subtracted from the state school aid payable to the student's resident school district",
+  and that "any aid the school district would have received for the student in excess of the
+  funds needed for a scholarship will be kept by the state". [verified — ALEC model text]
 
-  Set that against Ohio. Under the original EdChoice design a scholarship was funded by deducting
-  from the resident district's foundation payment, which is the model's shape. [verified] Under
-  the [Fair School Funding Plan](../funding-regime/fair-school-funding-plan.yml) it is **not** a
-  deduction — confirmed negatively and exhaustively against the FY2027 calculator, where the
-  payment report's transfer channel is two named lines and neither carries a scholarship,
-  pinned in `crates/project/tests/the_voucher_channel_is_absent.rs`. [verified]
+  Set that against Ohio. Under the original EdChoice design a scholarship was funded by
+  deducting from the resident district's foundation payment, which is the model's shape.
+  [verified] Under the [Fair School Funding
+  Plan](../funding-regime/fair-school-funding-plan.yml) it is **not** a deduction — confirmed
+  negatively and exhaustively against the FY2027 calculator, where the payment report's
+  transfer channel is two named lines and neither carries a scholarship, pinned in
+  `crates/project/tests/the_voucher_channel_is_absent.rs`. [verified]
 
-  So the relationship between this text and Ohio's enacted arrangement runs in two directions at
-  once, and that is the substance worth recording: Ohio's **eligibility** design converged on the
-  model — [H.B. 33](../legislation/hb-33-2023.yml) made every student eligible in 2023 — while
-  Ohio's **funding mechanism** diverged from it in the opposite direction over the same years.
-  A reader who assumed a state with universal eligibility had also adopted the model's deduct
-  would be wrong about Ohio, and wrong in the way that matters most to a district's balance sheet.
-  [inference]
+  So the relationship between this text and Ohio's enacted arrangement runs in two directions
+  at once, and that is the substance worth recording: Ohio's **eligibility** design converged
+  on the model — [H.B. 33](../legislation/hb-33-2023.yml) made every student eligible in 2023 —
+  while Ohio's **funding mechanism** diverged from it in the opposite direction over the same
+  years. A reader who assumed a state with universal eligibility had also adopted the model's
+  deduct would be wrong about Ohio, and wrong in the way that matters most to a district's
+  balance sheet. [inference]
 
   Two provisions have no established Ohio counterpart. The state keeping the difference between
   what a district would have received and what the scholarship costs is not a mechanism this
@@ -37,14 +37,14 @@ description: |
   support, where Ohio's charge-off arithmetic treats the local share as a district obligation
   rather than as a portable amount. Both are open questions rather than absences. [open]
 
-  One variant of this act is a closer match to Ohio than the text on this node. ALEC publishes
-  three — universal eligibility (this one), means-tested eligibility, and **universal eligibility
-  with a means-tested scholarship amount** — and the third's title describes H.B. 33's expansion
-  exactly: every student eligible, the award scaled by family income. Its text has not been
-  retrieved, so whether its provisions track Ohio's more closely than this one's do is
-  unestablished, and it is the first thing to read if this line of work continues. [open]
-
   **Nothing here says Ohio adopted this text.** See `adoption_evidence`.
+findings: |
+  One variant of this act is a closer match to Ohio than the text on this node. ALEC publishes
+  three — universal eligibility (this one), means-tested eligibility, and **universal
+  eligibility with a means-tested scholarship amount** — and the third's title describes H.B.
+  33's expansion exactly: every student eligible, the award scaled by family income. Its text
+  has not been retrieved, so whether its provisions track Ohio's more closely than this one's
+  do is unestablished, and it is the first thing to read if this line of work continues. [open]
 properties:
   publisher: |
     American Legislative Exchange Council, a membership organization of more than 2,000 state

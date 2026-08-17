@@ -291,29 +291,21 @@ test("the corpus is clean under the policy it declares", () => {
 });
 
 /**
- * The genre migration's remaining backlog, pinned so it can only shrink.
+ * The genre migration is finished, so the ratchet becomes a zero.
  *
- * `.yidam/decisions/the-four-genres-of-a-description.yml` splits a node's prose into four fields
- * and stages the migration: every node has a `summary`, the withdrawals are in `revisions`, and
- * the heaviest nodes have had their computed findings split out. The rest have not, and this is
- * the count of what is left.
+ * `.yidam/decisions/the-four-genres-of-a-description.yml` splits a node's prose into four fields.
+ * This was an upper bound that only moved down for as long as the migration was staged — 118 at
+ * the start, then 105, 100, 96, 92, 72, 38, 20. All 103 nodes have now been through it.
  *
- * A ratchet rather than a zero, because a zero here would have to be either a lie or a reason not
- * to land the machinery until all 103 nodes were rewritten. An upper bound that only moves down
- * says the same thing honestly and fails the day somebody folds a finding back into a
- * description.
+ * A ratchet was the honest shape while a backlog existed, because a zero would have been either a
+ * lie or a reason not to land the machinery until every node was rewritten. It is the wrong shape
+ * now: there is nothing left to shrink, and an upper bound of 20 would quietly permit twenty new
+ * defects. The failure this must catch is a finding folded back into a description, and that is a
+ * change from zero.
  */
-const PROSE_BACKLOG = 20;
-
-test("the genre migration's backlog does not grow", () => {
+test("no node carries prose in the wrong field", () => {
   const prose = loadCorpus().diagnostics.filter((d) => d.kind === "prose");
-  expect(prose.length).toBeLessThanOrEqual(PROSE_BACKLOG);
-
-  // Both remaining kinds are length and apparatus. A *shouted lead* means a withdrawal is sitting
-  // in body copy, which is the one class of prose defect that misinforms rather than merely
-  // sprawling, and there are none left.
-  const shouted = prose.filter((d) => d.message.includes("shouted lead"));
-  expect(shouted.map((d) => d.file)).toEqual([]);
+  expect(prose.map((d) => `${d.file}: ${d.message}`)).toEqual([]);
 });
 
 test("a year-stamped observation is allowed where a bare property name would not be", () => {
