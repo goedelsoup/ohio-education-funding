@@ -24,6 +24,11 @@ import YAML from "yaml";
 
 const CORPUS = "/Users/cparent/Code/goedelsoup/ohio-education-funding/main/.yidam/corpus";
 
+/** Every line of the paragraph is quoted — the whole thing is one block quotation. */
+const QUOTE = /^(?: *>.*(?:\n|$))+$/;
+/** A line-leading list marker. Group 1 is `.` for an ordered item, the bullet character else. */
+const MARKER = /^ *(?:[-*](?= )|\d+(\.)(?= ))/m;
+
 /** Fold one field's text to the corpus's 95-column wrap at a given indent. */
 function fold(text, indent) {
   return text
@@ -40,14 +45,30 @@ function fold(text, indent) {
           .map((line) => (line.trim() ? indent + line : ""))
           .join("\n");
       }
-      // A markdown list is one paragraph with several items in it, and the item boundaries are
-      // content. Rewrapping it as prose runs the second bullet into the tail of the first, which
-      // parses, preserves the word count, and renders as one item — so nothing else here catches
-      // it. Fold each item on its own, with the continuation lines indented under the marker.
-      if (/^ *[-*] /m.test(para)) {
+      // Markdown that lives at the *start of a line* — bullets, ordered items, blockquotes — is
+      // content, not spacing. Rewrapping such a paragraph as prose slides the marker into the
+      // middle of a line, where it stops being markup: two bullets render as one item, seven
+      // numbered points as one paragraph, a block quotation as prose with stray `>` in it. All of
+      // that parses, conserves the word count, and is invisible in the diff.
+      //
+      // A quotation is one flow with a marker on every line, so it rewraps as a unit and the
+      // marker goes back on each line. A list is several flows with a marker on the first line of
+      // each, so it splits at the markers and each item wraps under its own.
+      if (QUOTE.test(para)) {
+        const body = para.replace(/^ *> ?/gm, "").replace(/\n/g, " ");
+        return wrap(body, "", "")
+          .split("\n")
+          .map((line) => `${indent}> ${line}`)
+          .join("\n");
+      }
+      const marker = MARKER.exec(para);
+      if (marker) {
         return para
-          .split(/\n(?= *[-*] )/)
-          .map((item) => wrap(item, indent, indent + "  "))
+          .split(new RegExp(`\\n(?=${marker[1] === "." ? " *\\d+\\. " : " *[-*] "})`))
+          .map((item) => {
+            const width = (/^ *(?:[-*]|\d+\.) /.exec(item)?.[0].trimStart().length ?? 2) + 1;
+            return wrap(item, indent, indent + " ".repeat(width));
+          })
           .join("\n");
       }
       return wrap(para, indent, indent);
@@ -246,16 +267,25 @@ for (const [id, spec] of Object.entries(plan)) {
     }
   }
 
-  // A list item lost to rewrapping. Bullets are content, and the count of them is conserved by
-  // any honest move — but a rewrap that runs the second item into the tail of the first still
-  // parses and still counts the same words, so this is the only check that sees it.
-  const bullets = (text) => (String(text ?? "").match(/^ *[-*] /gm) ?? []).length;
-  const wasList = bullets(before.description) + bullets(before.findings);
-  const nowList = bullets(after.description) + bullets(after.findings);
-  if (nowList !== wasList) {
-    console.log(`  ! ${id}: ${wasList} list items became ${nowList} — a rewrap ran two together`);
-    continue;
+  // Line-leading markup lost to rewrapping. A bullet, an ordered item and a quotation marker are
+  // all content, and moving text between fields conserves every one of them — but a rewrap that
+  // slides one into the middle of a line still parses and still counts the same words, so this is
+  // the only check that sees it. Count each kind separately: a bullet becoming a quote would net
+  // to zero against a single total, and that is exactly the sort of thing a rewrap does.
+  const KINDS = { bullet: /^ *[-*] /gm, ordered: /^ *\d+\. /gm, quote: /^ *> /gm };
+  let broke = false;
+  for (const [kind, pattern] of Object.entries(KINDS)) {
+    const marks = (text) => (String(text ?? "").match(pattern) ?? []).length;
+    const total = (n) => marks(n.description) + marks(n.findings);
+    // A dropped paragraph takes its markers with it, exactly as it takes its words.
+    const shed = [...dropped].reduce((sum, i) => sum + marks(paras[i]), 0);
+    const [was, now] = [total(before) - shed, total(after)];
+    if (was !== now) {
+      console.log(`  ! ${id}: ${was} ${kind} markers became ${now} — a rewrap ran lines together`);
+      broke = true;
+    }
   }
+  if (broke) continue;
 
   writeFileSync(file, out);
   done += 1;

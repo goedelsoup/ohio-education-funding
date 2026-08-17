@@ -5,64 +5,70 @@ summary: >-
   downward: a first-year learner draws almost twice a third-year one. It tapers as need
   persists rather than deepening with it.
 description: |
-  **$36m**, the smallest of the six, and the only weighted categorical in the plan whose weights
-  run **downward**. [verified]
+  **$36m**, the smallest of the six, and the only weighted categorical in the plan whose
+  weights run **downward**. [verified]
 
   ### The weights descend: 0.2104, 0.1577, 0.1053
 
-  Category 1 is the most recently arrived learner
-  and is funded at almost exactly **twice** Category 3. So the program pays most in a pupil's first
-  year and least in their third — it tapers as need persists rather than deepening with it.
-  [verified]
+  Category 1 is the most recently arrived learner and is funded at almost exactly **twice**
+  Category 3. So the program pays most in a pupil's first year and least in their third — it
+  tapers as need persists rather than deepening with it. [verified]
 
-  [Special education](fsfp-special-education-weights.yml) runs the other way, ascending from 0.2435
-  to 3.9554 as need deepens. A reader who assumes Ohio's weights mean "more need, more money" has
-  this one backwards. Established from what districts are actually paid per pupil in each category
-  rather than from the transcribed weights. [verified]
-
-  > **CORRECTED.** This paragraph read *"every other weighted categorical runs the other way"* and
-  > that is false. [Career-technical](fsfp-career-technical-weights.yml) descends too — 0.623,
-  > 0.5905, 0.2154, 0.183, 0.157 — and this node's own sibling says why the two descents are not
-  > the same fact: there "the ordering is not severity: it is programme type". So the supportable
-  > claim is narrower and more interesting than the one made here. This is the **only** categorical
-  > whose weights fall along a *need* gradient. The over-claim was inherited by
-  > `district.ts`'s English-learner card, which asserted it twice, and both have been corrected
-  > together. [verified]
+  [Special education](fsfp-special-education-weights.yml) runs the other way, ascending from
+  0.2435 to 3.9554 as need deepens. A reader who assumes Ohio's weights mean "more need, more
+  money" has this one backwards. Established from what districts are actually paid per pupil in
+  each category rather than from the transcribed weights. [verified]
 
   ### The statute settles the mechanism and narrows the motive
 
-  R.C. 3317.016 defines the first
-  category by **time enrolled in schools in the United States** — 180 school days or less — and
-  the second as running until the student **achieves a proficient score** on the spring
-  administration of the English language proficiency assessment. So the taper is keyed to a clock
-  the district does not set and an exit event it does not score. [verified — `ohio-laws`]
+  R.C. 3317.016 defines the first category by **time enrolled in schools in the United States**
+  — 180 school days or less — and the second as running until the student **achieves a
+  proficient score** on the spring administration of the English language proficiency
+  assessment. So the taper is keyed to a clock the district does not set and an exit event it
+  does not score. [verified — `ohio-laws`]
 
-  That is evidence against the reclassification-incentive reading and it is not proof: a district
-  still influences how quickly a pupil reaches proficiency, and the money still falls when they
-  do. What can be said is that the statute's own construction is a schedule rather than a
-  discretion. Whether the descent expresses a judgement that acquisition costs most at the start
-  is still not established. [open]
+  That is evidence against the reclassification-incentive reading and it is not proof: a
+  district still influences how quickly a pupil reaches proficiency, and the money still falls
+  when they do. What can be said is that the statute's own construction is a schedule rather
+  than a discretion. Whether the descent expresses a judgement that acquisition costs most at
+  the start is still not established. [open]
 
+  ### The counts are frozen at FY2021
+
+  , as with [career-technical](fsfp-career-technical-weights.yml) — `Category 1 EL ADM-FY21`.
+  For a program whose whole structure is about how recently a pupil arrived, funding on a count
+  six years old is a stranger fact than it is for CTE: the FY2021 Category 1 learners are not
+  the FY2027 Category 1 learners. [verified, and its intent is [open]]
+findings: |
   **All three multiples match the statute exactly** — 0.2104, 0.1577, 0.1053. [verified]
 
   ### Near-universal and almost entirely concentrated, which the total hides both ways
 
-  **505 of 609 districts have at least one English learner** — this is not a big-city program by
-  reach. But the median receiving district's entire allocation is about **$6,300**, roughly a
-  fifteenth of one teacher, while **38 districts hold 80% of the money** and the largest five hold
-  a third. [verified]
+  **505 of 609 districts have at least one English learner** — this is not a big-city program
+  by reach. But the median receiving district's entire allocation is about **$6,300**, roughly
+  a fifteenth of one teacher, while **38 districts hold 80% of the money** and the largest five
+  hold a third. [verified]
 
-  So "almost every district receives English learner funding" and "English learner funding goes to
-  a few dozen districts" are both true of the same $36m, and a reader given only the total will
-  pick whichever they already believed. That is the general argument for decomposing the
+  So "almost every district receives English learner funding" and "English learner funding goes
+  to a few dozen districts" are both true of the same $36m, and a reader given only the total
+  will pick whichever they already believed. That is the general argument for decomposing the
   categorical lump, stated by the smallest program in it. [inference]
-
-  ### The counts are frozen at FY2021
-
-  , as with [career-technical](fsfp-career-technical-weights.yml)
-  — `Category 1 EL ADM-FY21`. For a program whose whole structure is about how recently a pupil
-  arrived, funding on a count six years old is a stranger fact than it is for CTE: the FY2021
-  Category 1 learners are not the FY2027 Category 1 learners. [verified, and its intent is [open]]
+revisions:
+  - was: |
+      This was recorded as the only weighted categorical whose weights run downward — "every
+      other weighted categorical runs the other way".
+    now: |
+      [Career-technical](fsfp-career-technical-weights.yml) descends too — 0.623, 0.5905,
+      0.2154, 0.183, 0.157. The supportable claim is narrower and more interesting: this is the
+      only categorical whose weights fall along a *need* gradient. Career-technical's ordering
+      is programme type, not severity.
+    found_by: |
+      The sibling node's own account of what each of its five multiples buys, under R.C.
+      3317.014.
+    reach: |
+      The over-claim had been inherited by `district.ts`'s English-learner card, which asserted
+      it twice; both were corrected together. No weight or amount on this component moves —
+      what changes is the class of thing it is unique within.
 properties:
   name: English learner weights
   function: |

@@ -6,47 +6,47 @@ summary: >-
   quantity for some of them.
 description: |
   A **second** hold-harmless, stacked on top of the [temporary transitional aid
-  guarantee](temporary-transitional-aid-guarantee.yml) and against a different base. Line `[K]` of
-  the payment report, $63.6m to **144 districts**. [verified]
+  guarantee](temporary-transitional-aid-guarantee.yml) and against a different base. Line `[K]`
+  of the payment report, $63.6m to **144 districts**. [verified]
 
   It exists because the guarantee protects the wrong quantity for some districts. The guarantee
-  compares foundation funding against `[H2] Funding Base`. This compares **everything the formula
-  pays** against `[L1] FY21 Funding Base`:
+  compares foundation funding against `[H2] Funding Base`. This compares **everything the
+  formula pays** against `[L1] FY21 Funding Base`:
 
       [K] = max( [L1]  -  ( [H] Foundation Funding + [I] Guarantee
                             + [J] Supplemental Targeted Assistance + [K] Transportation ),
                  0 )
 
-  So a district whose foundation funding has held up but whose *transportation* has fallen can draw
-  this while drawing nothing from the guarantee — and **17 of the 144 do exactly that**. The two
-  mechanisms are not nested and neither is a special case of the other. [verified —
+  ### Three mechanisms anchored to one year
+
+  With this and [transportation's own guarantee](fsfp-transportation.yml), Ohio holds districts
+  harmless against FY2021 in three places, on three bases, over three overlapping-but-distinct
+  sets of districts. A reader asking "what is a district held at?" has three answers and needs
+  to know which one is operating.
+findings: |
+  So a district whose foundation funding has held up but whose *transportation* has fallen can
+  draw this while drawing nothing from the guarantee — and **17 of the 144 do exactly that**.
+  The two mechanisms are not nested and neither is a special case of the other. [verified —
   `crates/project/tests/the_supplements_outside_the_formula.rs`, reproducing `[K]` for all 609]
 
   ### The two FY2021 bases are not derivable from each other
 
-  `[L1]` is generally larger than
-  `[H2]`, as it must be to cover more lines — but the difference is **not** the FY2021
-  transportation base, and testing that reading is how the corpus found out: the ratio of the gap
-  to FY2021 transportation has a median of 1.59 and lands within one percent of unity for only 6
-  of 601 districts. `[L1]` is smaller than `[H2]` for **seven** districts, which no additive
-  reading permits at all. [verified]
+  `[L1]` is generally larger than `[H2]`, as it must be to cover more lines — but the
+  difference is **not** the FY2021 transportation base, and testing that reading is how the
+  corpus found out: the ratio of the gap to FY2021 transportation has a median of 1.59 and
+  lands within one percent of unity for only 6 of 601 districts. `[L1]` is smaller than `[H2]`
+  for **seven** districts, which no additive reading permits at all. [verified]
 
-  What `[L1]` is a base *for* is therefore clear from the formula — a FY2021 total formula funding
-  figure, on the same footing as the sum it is compared against — and what it is composed *of* is
-  not established here. The department publishes it as a value, not a derivation. [open]
+  What `[L1]` is a base *for* is therefore clear from the formula — a FY2021 total formula
+  funding figure, on the same footing as the sum it is compared against — and what it is
+  composed *of* is not established here. The department publishes it as a value, not a
+  derivation. [open]
 
-  ### Three mechanisms anchored to one year
-
-  With this and [transportation's own
-  guarantee](fsfp-transportation.yml), Ohio holds districts harmless against FY2021 in three
-  places, on three bases, over three overlapping-but-distinct sets of districts. That is why this
-  is a node rather than a clause inside the guarantee's: a reader asking "what is a district held
-  at?" has three answers and needs to know which one is operating.
-
-  It is also why the phase-in is less complete than its terminal year suggests. FY2027 is the year
-  the Fair School Funding Plan reaches 100% of its computed amount, and in that year **294
-  districts are on the guarantee, 144 on this supplement, and 38 on transportation's** — with the
-  formula's own output being what all three are measured against and found short. [inference]
+  It is also why the phase-in is less complete than its terminal year suggests. FY2027 is the
+  year the Fair School Funding Plan reaches 100% of its computed amount, and in that year **294
+  districts are on the guarantee, 144 on this supplement, and 38 on transportation's** — with
+  the formula's own output being what all three are measured against and found short.
+  [inference]
 properties:
   name: Formula transition supplement
   function: |
