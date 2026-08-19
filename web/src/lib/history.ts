@@ -46,6 +46,7 @@ import { renderToString } from "./plot/ssr.ts";
 import { convert, type Basis } from "./real.ts";
 import type { Bundle, Deflator, HistoryYear } from "./types.ts";
 import { yearChip } from "./year.ts";
+import { anchor } from "./section.ts";
 
 /** What neither level of government closes — the part a district actually experiences. */
 export function residual(year: HistoryYear): number {
@@ -153,8 +154,8 @@ export function renderRevenueMix(history: HistoryYear[]): string {
   const missing = gaps(history);
 
   return `
-    <div class="card">
-      <h2>Where the money came from${yearChip("history")}</h2>
+    <div class="card" id="revenue-mix" data-part="revenue-mix">
+      <h2>${anchor("revenue-mix")}Where the money came from${yearChip("history")}</h2>
       <p class="note">Local, state and federal revenue as shares of the total, across every
         comparable Ohio school system the Census Bureau surveyed. The state share fell from
         ${pct(first.state_share, 1)} in FY${first.fiscal_year} to ${pct(last.state_share, 1)} in
@@ -200,7 +201,7 @@ export function renderEqualization(
       ? history.map((y) => inBase(deflator, y, base, basis)).filter((y): y is HistoryYear => y != null)
       : history;
   if (restated.length < 2) {
-    return `<div class="card"><h2>Whom it reached</h2>
+    return `<div class="card" data-part="equity-gap"><h2>${anchor("equity-gap")}Whom it reached</h2>
       <p class="note">The price index does not cover this panel, so these figures cannot be shown
         in constant dollars.</p></div>`;
   }
@@ -229,8 +230,8 @@ export function renderEqualization(
     Math.abs(stateShareOfGap(last) - stateShareOfGap(first)) < 0.06 ? "held" : "moved";
 
   return `
-    <div class="card">
-      <h2>Whom it reached${yearChip("history")}</h2>
+    <div class="card" data-part="equity-gap">
+      <h2>${anchor("equity-gap")}Whom it reached${yearChip("history")}</h2>
       <p class="note">Districts sorted by local revenue per pupil and cut into quarters. The gap is
         the distance between the poorest quarter and the richest; the second line is what neither
         state nor federal aid closes, which is the part a district actually experiences.
@@ -275,8 +276,8 @@ export function renderProvenance(bundle: Bundle): string {
   const last = history[history.length - 1]!;
 
   return `
-    <div class="card">
-      <h2>What this is, and what it is not</h2>
+    <div class="card" id="what-this-is" data-part="what-this-is">
+      <h2>${anchor("what-this-is")}What this is, and what it is not</h2>
       <p class="note">These figures are the U.S. Census Bureau's Annual Survey of School System
         Finances, FY${first.fiscal_year} through FY${last.fiscal_year}. They are not the state's
         funding formula and they do not reconcile with it. The survey counts about
@@ -295,8 +296,8 @@ export function renderProvenance(bundle: Bundle): string {
 /** Placeholder for a feed carrying no history, so the route is never a blank page. */
 export function renderAbsent(): string {
   return `
-    <div class="card">
-      <h2>No historical panel in this feed</h2>
+    <div class="card" id="no-panel" data-part="no-panel">
+      <h2>${anchor("no-panel")}No historical panel in this feed</h2>
       <p class="note">The feed carries no <code>history</code> block, so there is nothing to draw.
         That is a feed problem rather than a rendering one:
         <code>${escapeHtml("cargo run -p bundle")}</code> builds it from

@@ -47,6 +47,57 @@ export interface FanPoint {
   reference?: number;
 }
 
+/**
+ * One district in a scatter: two measures of it, and which half of a split it is on.
+ *
+ * The unit here is a *district* rather than a bin or a year, which is what makes this the first
+ * form on the site that shows the population rather than a summary of it. 606 of the 609 carry
+ * both members of every pair the relationship cards are about.
+ */
+export interface ScatterPoint {
+  x: number;
+  y: number;
+  /** Text shown on hover. There is no direct label on a scatter — 606 of them is not a chart. */
+  hover: string;
+  /**
+   * Which half of a two-way split this district is on, if the scatter is split at all.
+   *
+   * There is one split worth drawing on this site and it is `on_guarantee`, which is near enough
+   * balanced — 294 against 312 — that neither half is a rounding error on the other. A third
+   * category is not available and would not be drawn if it were: the palette is two hues.
+   */
+  series?: "formula" | "guarantee";
+}
+
+/**
+ * A line through a scatter, and what it is a line *of*.
+ *
+ * Never a fitted model. Every trace on this site is a median of the points in a bin of the x
+ * axis — the same computation `povertyQuintiles` and `guaranteeRateByQuintile` already do for the
+ * bar charts, drawn as a line instead of as five bars. That distinction is the whole reason the
+ * traces are allowed to live in the web layer at all: a regression line is a claim about a model
+ * and would belong in `crates/` with a checkpoint behind it, and a median is a description of the
+ * points a reader can already see.
+ */
+export interface Trace {
+  /** Printed at the end of the line, because a trace is a series and identity is never hue alone. */
+  label: string;
+  series: "formula" | "guarantee";
+  points: { x: number; y: number }[];
+}
+
+/**
+ * One value in a distribution, with the text shown when a reader points at it.
+ *
+ * Carried as a pair rather than as a bare number because the populations these draw are small
+ * enough to be pointed at individually — a county has six districts at the median and thirty-one
+ * at the largest, and "which dot is mine" is the question the form exists to answer.
+ */
+export interface DistributionValue {
+  value: number;
+  hover: string;
+}
+
 /** One year of a two-series time series. */
 export interface SeriesPoint {
   year: number;

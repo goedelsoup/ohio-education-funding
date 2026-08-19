@@ -11,6 +11,7 @@ import { loadFeed } from "../lib/feed.ts";
 import { count } from "../lib/format.ts";
 import * as routes from "../lib/routes.ts";
 import { yearChip } from "../lib/year.ts";
+import SectionAnchor from "../components/SectionAnchor.astro";
 
 const { bundle, verification } = loadFeed();
 const s = bundle.statewide;
@@ -29,8 +30,8 @@ const s = bundle.statewide;
     static files.
   </p>
 
-  <div class="card">
-    <h2>Downloads</h2>
+  <div class="card" id="downloads" data-part="downloads">
+    <h2><SectionAnchor id="downloads" />Downloads</h2>
     <div class="scroll">
       <table class="prose">
         <tbody>
@@ -68,8 +69,8 @@ const s = bundle.statewide;
     </div>
   </div>
 
-  <div class="card">
-    <h2>The checkpoints<Fragment set:html={yearChip("formula")} /></h2>
+  <div class="card" id="checkpoints" data-part="checkpoints">
+    <h2><SectionAnchor id="checkpoints" />The checkpoints<Fragment set:html={yearChip("formula")} /></h2>
     <p class="note">
       The feed carries {verification.comparisons.length} scenarios computed by{" "}
       <code>crates/project</code>, and this site will not build unless its own implementation
@@ -102,8 +103,8 @@ const s = bundle.statewide;
     </div>
   </div>
 
-  <div class="card">
-    <h2>Terms</h2>
+  <div class="card" id="terms" data-part="terms">
+    <h2><SectionAnchor id="terms" />Terms</h2>
     <p class="note">
       The underlying figures are public records published by the Ohio Department of Education and
       Workforce and the Ohio Department of Taxation; this site's contribution is the joining, the

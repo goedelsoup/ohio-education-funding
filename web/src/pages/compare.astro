@@ -43,7 +43,7 @@ const named = SEEDED.map((pair) => ({
     district's figures are a fact; two districts' figures are usually the argument.
   </p>
 
-  <div class="card">
+  <div class="card" id="pick" data-part="pick">
     <form class="filters" id="compare-form">
       <div class="field">
         <label for="cmp-a">First district</label>
@@ -75,7 +75,7 @@ const named = SEEDED.map((pair) => ({
   <div id="compare-out"></div>
 
   <noscript>
-    <div class="card err">
+    <div class="card err" id="needs-script" data-part="needs-script">
       <p class="note">
         This page needs JavaScript: the pair is chosen by the reader and there are 185,000 of them,
         which is more pages than a static site should mint. Every district's own figures are in the

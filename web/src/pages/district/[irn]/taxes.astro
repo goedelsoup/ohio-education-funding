@@ -21,6 +21,7 @@ import {
   renderTaxBase,
   renderTaxChange,
 } from "../../../lib/tax.ts";
+import SectionAnchor from "../../../components/SectionAnchor.astro";
 
 export const getStaticPaths = districtPaths;
 
@@ -64,7 +65,7 @@ const description = latest
   {
     !latest ? (
       <div class="card" id="not-published" data-part="not-published">
-        <h2>Not in Table SD-1</h2>
+        <h2><SectionAnchor id="not-published" />Not in Table SD-1</h2>
         <p class="note">
           No row is published for this district in the Department of Taxation's per-district table,
           so its tax base cannot be shown here. Its funding model is on the{" "}
@@ -120,7 +121,7 @@ const description = latest
         <Fragment set:html={renderChargeOff(district, bundle.statewide)} />
 
         <div class="card" id="not" data-part="not">
-          <h2>Where these figures come from, and what they are not</h2>
+          <h2><SectionAnchor id="not" />Where these figures come from, and what they are not</h2>
           <p class="note">
             Table SD-1, published by the <strong>Ohio Department of Taxation</strong> — a different
             department from the one that publishes the funding model every other page here reads.

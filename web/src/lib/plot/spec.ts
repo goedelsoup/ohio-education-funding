@@ -1,5 +1,5 @@
 /**
- * The four chart forms, as Observable Plot specifications.
+ * The six chart forms, as Observable Plot specifications.
  *
  * # Why the spec is separate from the rendering
  *
@@ -20,12 +20,23 @@
  * hue. Marks are thin, data-ends are rounded 4px and anchored square to the baseline, axes are
  * recessive, and text wears text tokens rather than a series colour. There is no dual-axis chart
  * here and nothing in this file could produce one.
+ *
+ * `scatterSpec` is the one form that breaks the mark-size rule, and it says why at its own
+ * definition: six hundred 8px markers is a blob, and the density is the information.
  */
 
 import * as Plot from "@observablehq/plot";
 
 import { escapeHtml } from "../format.ts";
-import type { Bar, Bin, FanPoint, SeriesPoint } from "../chart.ts";
+import type {
+  Bar,
+  Bin,
+  DistributionValue,
+  FanPoint,
+  ScatterPoint,
+  SeriesPoint,
+  Trace,
+} from "../chart.ts";
 import { INK, SERIES } from "./tokens.ts";
 
 /** A chart, and the tooltip text for the marks a reader can point at. */
@@ -120,6 +131,441 @@ export function barSpec(bars: Bar[], options: { max?: number } = {}): Spec {
     hovers: {
       selector: ".bar-fill > *",
       text: bars.map((b) => escapeHtml(b.hover ?? `${b.label}: ${b.value}`)),
+    },
+  };
+}
+
+/**
+ * Two measures of every district, one dot each.
+ *
+ * # Why this form had to exist
+ *
+ * The site carried ten correlation coefficients and no scatterplot. A coefficient is the least
+ * informative summary of a relationship there is — it is one number standing for six hundred
+ * pairs, and two very different clouds produce the same one. The cards it appeared on were the
+ * ones whose whole subject *is* the relationship: "Does state aid offset property wealth?"
+ * answered with two numbers in a table.
+ *
+ * The near-zero ones are the strongest case rather than the weakest. Spending per need-weighted
+ * pupil against attainment is −0.004, and the card spends two paragraphs explaining that dividing
+ * a spending figure by a need index and correlating it against a need-driven outcome measures the
+ * weighting rather than the spending. A flat cloud says that in one look.
+ *
+ * # Overplotting, and why the marks break the usual size rule
+ *
+ * Six hundred marks in 640×420 overlap, and the usual guidance — markers of 8px or more, a 2px
+ * surface ring on anything overlapping — is written for a handful of points and produces a solid
+ * blob here. So the marks are small and partly transparent, which makes density legible as
+ * density: where the cloud is dark, districts are stacked. What does *not* shrink is the hit
+ * target, which is a separate transparent mark at a size a reader can actually point at.
+ *
+ * # What the line is
+ *
+ * A median per bin of the x axis, and never a fitted model — see {@link Trace}. Drawn over the
+ * cloud rather than in place of it: the cloud is the evidence and the line is the summary, and
+ * showing the summary alone is how the site got here.
+ *
+ * # Axes
+ *
+ * Corner labels rather than Plot's axes, as `seriesSpec` and `fanSpec` do. A scatter needs both
+ * scales stated where a line chart can get away with the ends, so both ends of both axes are
+ * labelled and the exact pair for any one district is in its tooltip.
+ */
+export function scatterSpec(
+  points: ScatterPoint[],
+  axes: {
+    x: { label: string; format: (v: number) => string; log?: boolean };
+    y: { label: string; format: (v: number) => string; log?: boolean };
+  },
+  traces: Trace[] = [],
+  options: {
+    height?: number;
+    /**
+     * Draw the line y = x, and put both axes on one domain so that it is a diagonal.
+     *
+     * For the one shape where the two measures are the same quantity arrived at two ways — a rate
+     * this repository predicts against the rate a county auditor charged. A point on the line is a
+     * district the model reproduces; the vertical distance off it is the residual, in the units
+     * the axis is already in.
+     *
+     * Two things follow from it and both are load-bearing. The **domain is shared**, because with
+     * each axis fitted to its own range the line through (min, min) and (max, max) is not y = x at
+     * all. And the **plot area is squared**, because a shared domain on a 640×420 frame still
+     * places every point correctly and still draws the line at 33° — which reads as a trend the
+     * cloud is beating rather than as the equality it is. Squaring costs a fixed height and is the
+     * only way the picture means what it says.
+     *
+     * This is the only reference line the form draws, and it is deliberately not a general
+     * "draw a line here" API: an arbitrary line through a cloud is a claim, and the claims on this
+     * site are computed in `crates/` with a checkpoint behind them.
+     */
+    identity?: { label: string };
+  } = {},
+): Spec | null {
+  // Two points are not a cloud. Same rule as the line forms, for the same reason: a scatter of
+  // three districts would read as a finding about a population that has not been measured.
+  if (points.length < 12) return null;
+
+  const xs = points.map((p) => p.x);
+  const ys = points.map((p) => p.y);
+  const pad = (lo: number, hi: number) => (hi - lo) * 0.04 || Math.abs(hi) * 0.02 || 1;
+  const both = options.identity != null;
+  const xMin = both ? Math.min(...xs, ...ys) : Math.min(...xs);
+  const xMax = both ? Math.max(...xs, ...ys) : Math.max(...xs);
+  const yMin = both ? xMin : Math.min(...ys);
+  const yMax = both ? xMax : Math.max(...ys);
+  const xPad = pad(xMin, xMax);
+  const yPad = pad(yMin, yMax);
+
+  const hue = (p: ScatterPoint) =>
+    p.series === "guarantee" ? SERIES.guarantee : p.series === "formula" ? SERIES.formula : SERIES.neutral;
+
+  /*
+   * Shorter where a card draws two of these to be compared with each other — the spending pair on
+   * `/outcomes` is a small-multiple and stacking two full-height clouds puts the second below the
+   * fold, which is where a comparison goes to die.
+   */
+  const marginLeft = 62;
+  const marginRight = traces.length > 0 ? 24 + Math.max(...traces.map((t) => t.label.length)) * 7.2 : 24;
+  const marginTop = 28;
+  const marginBottom = 40;
+
+  /*
+   * Square where the identity line is drawn, so that y = x is drawn at 45°. Everywhere else the
+   * caller's height, or a default that suits a wide cloud.
+   */
+  const height = options.identity
+    ? WIDTH - marginLeft - marginRight + marginTop + marginBottom
+    : (options.height ?? 420);
+  return {
+    options: {
+      width: WIDTH,
+      height,
+      marginLeft,
+      marginRight,
+      marginTop,
+      marginBottom,
+      x: {
+        axis: null,
+        type: axes.x.log ? "log" : "linear",
+        domain: axes.x.log ? [xMin, xMax] : [xMin - xPad, xMax + xPad],
+      },
+      y: {
+        axis: null,
+        type: axes.y.log ? "log" : "linear",
+        domain: axes.y.log ? [yMin, yMax] : [yMin - yPad, yMax + yPad],
+      },
+      marks: [
+        // The frame, drawn as two rules rather than Plot's axes: recessive, and the same two
+        // strokes every other chart here bounds itself with.
+        Plot.ruleY([axes.y.log ? yMin : yMin - yPad], { stroke: INK.rule, className: "axis" }),
+        Plot.ruleX([axes.x.log ? xMin : xMin - xPad], { stroke: INK.rule, className: "axis" }),
+
+        // Under the cloud, because it is what the cloud is being read against rather than a mark
+        // in it. Neutral: it asserts no polarity and is not one of the two series.
+        ...(options.identity
+          ? [
+              Plot.line(
+                [
+                  { x: xMin, y: xMin },
+                  { x: xMax, y: xMax },
+                ],
+                { x: "x", y: "y", stroke: INK.rule, strokeWidth: 1.5, className: "scatter-identity" },
+              ),
+            ]
+          : []),
+
+        Plot.dot(points, {
+          x: "x",
+          y: "y",
+          r: 2.4,
+          fill: hue,
+          fillOpacity: 0.45,
+          stroke: "none",
+          className: "scatter-dot",
+        }),
+
+        ...traces.flatMap((trace) => [
+          Plot.line(trace.points, {
+            x: "x",
+            y: "y",
+            stroke: trace.series === "guarantee" ? SERIES.guarantee : SERIES.formula,
+            strokeWidth: 2,
+            className: "scatter-trace",
+          }),
+          Plot.text([trace.points[trace.points.length - 1]!], {
+            x: "x",
+            y: "y",
+            dx: 8,
+            text: () => trace.label,
+            textAnchor: "start",
+            fill: trace.series === "guarantee" ? SERIES.guarantee : SERIES.formula,
+            className: "scatter-trace-end",
+          }),
+        ]),
+
+        ...(options.identity
+          ? [
+              Plot.text([0], {
+                x: xMax,
+                y: xMax,
+                dx: -6,
+                dy: 12,
+                text: () => options.identity!.label,
+                textAnchor: "end",
+                fill: INK.muted,
+                fontSize: 11,
+                className: "scatter-identity-label",
+              }),
+            ]
+          : []),
+
+        // Both ends of both scales. A cloud with no numbers on it is a texture.
+        Plot.text([0], {
+          frameAnchor: "bottom-left",
+          dy: 20,
+          text: () => axes.x.format(xMin),
+          textAnchor: "start",
+          fill: INK.muted,
+          fontSize: 11,
+        }),
+        Plot.text([0], {
+          frameAnchor: "bottom",
+          dy: 20,
+          text: () => axes.x.label + (axes.x.log ? " (log scale)" : ""),
+          fill: INK.muted,
+          fontSize: 11,
+        }),
+        Plot.text([0], {
+          frameAnchor: "bottom-right",
+          dy: 20,
+          text: () => axes.x.format(xMax),
+          textAnchor: "end",
+          fill: INK.muted,
+          fontSize: 11,
+        }),
+        Plot.text([0], {
+          frameAnchor: "top-left",
+          dx: -marginLeft + 4,
+          text: () => axes.y.format(yMax),
+          textAnchor: "start",
+          fill: INK.muted,
+          fontSize: 11,
+        }),
+        Plot.text([0], {
+          frameAnchor: "bottom-left",
+          dx: -marginLeft + 4,
+          text: () => axes.y.format(yMin),
+          textAnchor: "start",
+          fill: INK.muted,
+          fontSize: 11,
+        }),
+        Plot.text([0], {
+          frameAnchor: "top-left",
+          dx: -marginLeft + 4,
+          dy: -12,
+          text: () => axes.y.label + (axes.y.log ? " (log scale)" : ""),
+          textAnchor: "start",
+          fill: INK.muted,
+          fontSize: 11,
+        }),
+
+        // The hit layer. Bigger than the mark and invisible, so a reader can point at a district
+        // rather than at a 2.4px dot — and drawn last so it is above every other mark.
+        Plot.dot(points, {
+          x: "x",
+          y: "y",
+          r: 7,
+          fill: "transparent",
+          stroke: "none",
+          className: "scatter-hit",
+        }),
+      ],
+    },
+    hovers: {
+      selector: ".scatter-hit > *",
+      text: points.map((p) => escapeHtml(p.hover)),
+    },
+  };
+}
+
+/**
+ * One population, along one axis, with the member this page is about marked on it.
+ *
+ * # What it replaces
+ *
+ * A marker on a flat neutral bar with the minimum at one end and the maximum at the other. That
+ * says where a district sits and nothing about what it sits among, and for these measures the
+ * difference is the whole thing: assessed valuation per pupil runs $79k to $1.35M against a median
+ * of $248k, so "the 60th percentile" is a dense neighbourhood and "the 95th" is open country, and
+ * the flat strip drew them identically. The same defect applied wherever a peer group was reduced
+ * to its extremes — a county page named its richest and poorest district and drew neither the
+ * fifteen between them nor how they were spread.
+ *
+ * # Box, dots, or both
+ *
+ * Members are drawn individually up to a population the strip can hold, and the threshold is here
+ * rather than at each call site so that four cards cannot answer it four ways. A county has six
+ * districts at the median and a poverty fifth has a hundred and twenty; both fit across 640px and
+ * both are worth seeing, and a box plot of six values is five statistics standing in for six
+ * numbers the reader wanted. Ohio's 609 do not fit — six hundred marks on a 46px strip is a rule,
+ * not a distribution — so above the threshold the box carries the shape and only the outliers are
+ * drawn, which is where the individual districts are worth pointing at anyway.
+ *
+ * The first version of this drew a box with nothing in it for the poverty fifth: 122 districts,
+ * none beyond the fences, so "outliers only" meant no marks at all. A form whose default renders
+ * an empty frame for an ordinary input has the wrong default.
+ *
+ * The vertical spread on the dots is deterministic and means nothing — it is index-based rather
+ * than random, both because this module is pure and because a jitter that moved between builds
+ * would make two renderings of one county disagree. It exists so that ties are countable.
+ *
+ * # The fences
+ *
+ * Whiskers reach the last value inside 1.5 IQR of the box and stop there; anything beyond is drawn
+ * as its own mark. That is the ordinary convention and it is worth naming because the alternative
+ * — whiskers at the extremes — would draw Ohio's one $1.35M district as the end of a continuum it
+ * is nowhere near.
+ */
+/**
+ * The largest population whose members are all drawn.
+ *
+ * 640px across five lanes: a hundred and fifty marks is one per four pixels per lane, which is
+ * still countable. Ohio's 609 districts are four times that and become a rule.
+ */
+const DOTS_UP_TO = 150;
+
+/**
+ * The smallest population that gets a box.
+ *
+ * Below this the quartiles are not a summary of anything. A seat with three school districts drew
+ * a box spanning almost the full width with three dots inside it, because the first and third
+ * quartiles of three numbers are the first and third numbers — five statistics standing in for
+ * three values, presented with all the authority of a distribution. 39 of Ohio's 132 legislative
+ * seats and 60 of its 88 counties are under this, and every one of them is better served by the
+ * dots alone: the reader wanted the six districts, and six dots on a line is six districts.
+ *
+ * Exported because the two cards that draw small populations have to say what the reader is
+ * looking at, and a sentence promising a box where there is none is worse than no sentence.
+ */
+export const BOX_FROM = 8;
+
+export function distributionSpec(
+  values: DistributionValue[],
+  options: {
+    /** The one this page is about. Drawn last, above every other mark. */
+    marker?: { value: number; label: string } | null;
+    /**
+     * Draw every value rather than only the outliers.
+     *
+     * Defaults on up to {@link DOTS_UP_TO}. Pass it explicitly only to override that for a reason
+     * the population size does not carry.
+     */
+    dots?: boolean;
+  } = {},
+): Spec | null {
+  // Two values are a pair, not a distribution. A box drawn over them would put quartiles on a
+  // population that has none, which reads as a finding about a spread nobody measured.
+  if (values.length < 3) return null;
+
+  const sorted = [...values].sort((a, b) => a.value - b.value);
+  const at = (q: number) => sorted[Math.min(sorted.length - 1, Math.floor(q * sorted.length))]!.value;
+  const q1 = at(0.25);
+  const med = at(0.5);
+  const q3 = at(0.75);
+  const iqr = q3 - q1;
+  const lowFence = q1 - 1.5 * iqr;
+  const highFence = q3 + 1.5 * iqr;
+  const whiskerLow = sorted.find((v) => v.value >= lowFence)?.value ?? sorted[0]!.value;
+  const whiskerHigh = [...sorted].reverse().find((v) => v.value <= highFence)?.value ?? sorted[sorted.length - 1]!.value;
+
+  const min = sorted[0]!.value;
+  const max = sorted[sorted.length - 1]!.value;
+  const span = max - min || Math.abs(max) || 1;
+  const pad = span * 0.03;
+
+  const dots = options.dots ?? values.length <= DOTS_UP_TO;
+  const box = values.length >= BOX_FROM;
+  const height = 46;
+  const mid = 0;
+  const outliers = dots ? [] : sorted.filter((v) => v.value < whiskerLow || v.value > whiskerHigh);
+  // Five lanes, so a run of equal values is countable rather than one mark. Deterministic: this
+  // module is pure, and a jitter that moved between builds would redraw one county two ways.
+  const lane = (i: number) => ((i % 5) - 2) * 4.2;
+  const drawn = dots ? sorted : outliers;
+
+  return {
+    options: {
+      width: WIDTH,
+      height,
+      marginLeft: 2,
+      marginRight: 2,
+      marginTop: 4,
+      marginBottom: 4,
+      x: { axis: null, domain: [min - pad, max + pad] },
+      y: { axis: null, domain: [-19, 19] },
+      marks: [
+        // The whisker, drawn first and thin: it is the range, not the mass.
+        Plot.ruleY([mid], {
+          x1: whiskerLow,
+          x2: whiskerHigh,
+          stroke: INK.rule,
+          strokeWidth: 1,
+        }),
+        ...(box
+          ? [
+              // The middle half. Filled rather than outlined — a border drawn to separate marks is
+              // what the fill and the surface gap are for.
+              Plot.rect([{ q1, q3 }], {
+                x1: "q1",
+                x2: "q3",
+                y1: -11,
+                y2: 11,
+                fill: SERIES.neutral,
+                fillOpacity: 0.28,
+                rx: 3,
+              }),
+              Plot.ruleX([med], { y1: -11, y2: 11, stroke: INK.secondary, strokeWidth: 2 }),
+            ]
+          : []),
+
+        Plot.dot(drawn, {
+          x: "value",
+          y: (_d: DistributionValue, i: number) => (dots ? lane(i) : 0),
+          r: dots ? 2.8 : 2.4,
+          fill: SERIES.neutral,
+          fillOpacity: dots ? 0.5 : 0.7,
+          stroke: "none",
+          className: "dist-dot",
+        }),
+
+        // The member the page is about: full height, full hue, above everything, and labelled.
+        ...(options.marker
+          ? [
+              Plot.ruleX([options.marker.value], {
+                y1: -17,
+                y2: 17,
+                stroke: SERIES.formula,
+                strokeWidth: 2.5,
+                className: "dist-marker",
+              }),
+            ]
+          : []),
+
+        // The hit layer, wider than the marks, above them, and only where there are marks to hit.
+        Plot.dot(drawn, {
+          x: "value",
+          y: (_d: DistributionValue, i: number) => (dots ? lane(i) : 0),
+          r: 8,
+          fill: "transparent",
+          stroke: "none",
+          className: "dist-hit",
+        }),
+      ],
+    },
+    hovers: {
+      selector: ".dist-hit > *",
+      text: drawn.map((v) => escapeHtml(v.hover)),
     },
   };
 }

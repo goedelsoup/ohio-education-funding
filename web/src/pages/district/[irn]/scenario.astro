@@ -18,6 +18,7 @@ import { districtPaths, loadFeed } from "../../../lib/feed.ts";
 import { money } from "../../../lib/format.ts";
 import { currentRealizedAid } from "../../../lib/policy.ts";
 import * as routes from "../../../lib/routes.ts";
+import SectionAnchor from "../../../components/SectionAnchor.astro";
 
 export const getStaticPaths = districtPaths;
 
@@ -62,7 +63,7 @@ const meta = bundle.projection;
 
     <noscript>
       <div class="card err" id="needs-script" data-part="needs-script">
-        <h2>This is the one view that needs JavaScript</h2>
+        <h2><SectionAnchor id="needs-script" />This is the one view that needs JavaScript</h2>
         <p class="note">
           The other three views of this district — its <a href={`/district/${district.irn}`}
             >dashboard</a
@@ -79,7 +80,7 @@ const meta = bundle.projection;
   </div>
 
   <div class="card" id="not" data-part="not">
-    <h2>What this does not move</h2>
+    <h2><SectionAnchor id="not" />What this does not move</h2>
     <p class="note">
       Assessed valuation is held fixed, because the corpus has one observation per district and
       cannot project it. Local capacity is 60% valuation, so a scenario in which property values

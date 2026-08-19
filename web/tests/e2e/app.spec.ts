@@ -15,9 +15,30 @@
 import { existsSync, readFileSync, readdirSync } from "node:fs";
 import { join } from "node:path";
 
-import { expect, test, type Page } from "@playwright/test";
+import { expect, test, type Locator, type Page } from "@playwright/test";
 
 import { REQUIRED_CONTRACT } from "../../src/lib/types.ts";
+
+/**
+ * A heading's own words, without the anchor that heads it.
+ *
+ * Every section heading on the site now opens with a link to itself — see `src/lib/section.ts` —
+ * so `innerText` on one reads "# Context". Assertions about what a heading *says* want the words,
+ * and stripping them here keeps those assertions exact rather than loosening each one to a
+ * substring match, which is what would quietly stop them catching a heading that changed.
+ *
+ * The other half of the same hazard has no helper because it needs none: a page that lists its
+ * sections carries every heading's text twice, once in the list and once on the section, so
+ * `getByText` on a heading is a strict-mode violation rather than a match. Ask for the heading —
+ * `getByRole("heading", { name: /…/ })`, with a pattern because the accessible name of one now
+ * opens with "Link to this section".
+ */
+const headingText = (heading: Locator): Promise<string> =>
+  heading.evaluate((node) => {
+    const clone = node.cloneNode(true) as HTMLElement;
+    clone.querySelector("a.section-anchor")?.remove();
+    return (clone.textContent ?? "").replace(/\s+/g, " ").trim();
+  });
 
 /** Cleveland Municipal. On the guarantee, so the guarantee copy has something to render. */
 const CLEVELAND = "043786";
@@ -517,10 +538,38 @@ test.describe("with JavaScript disabled", () => {
   // script — or a search engine, or a text browser — gets every figure rather than an empty shell.
   test.use({ javaScriptEnabled: false });
 
+  test("the contents list is navigation, not a script", async ({ page }) => {
+    // Derived at build from the rendered body, emitted as plain links. A reader with no script
+    // gets the same list as everyone else, which is the whole reason it is not built on load.
+    await page.goto("/method");
+    const entries = page.locator("main nav.contents a");
+    expect(await entries.count()).toBeGreaterThan(3);
+    await entries.first().click();
+    await expect(page).toHaveURL(/#computed-twice$/);
+    await expect(page.locator("#computed-twice")).toBeInViewport();
+  });
+
+  test("a section anchor is a link and needs nothing running", async ({ page }) => {
+    /*
+     * `section.ts` chose a bare `<a href="#…">` over a copy-to-clipboard button for the reason
+     * `BasisToggle.astro` chose two radios over a script: a third of this suite runs here, and a
+     * control that dies without JavaScript is worse than no control. Fragment navigation is what a
+     * browser does natively, so this asserts the whole feature works in the half of the site that
+     * never loads a script.
+     */
+    await page.goto(`/district/${CLEVELAND}`);
+    const anchor = page.locator(".card#base-cost > h2 a.section-anchor");
+    await expect(anchor).toBeVisible();
+    await expect(anchor).toHaveAttribute("href", "#base-cost");
+    await anchor.click();
+    await expect(page).toHaveURL(/#base-cost$/);
+    await expect(page.locator("#base-cost")).toBeInViewport();
+  });
+
   test("a district's figures are all present", async ({ page }) => {
     await page.goto(`/district/${CLEVELAND}`);
     await expect(page.locator("h1")).toHaveText("Cleveland Municipal");
-    await expect(page.getByText("Where the state aid comes from")).toBeVisible();
+    await expect(page.getByRole("heading", { name: /Where the state aid comes from/ })).toBeVisible();
     await expect(page.locator(".tile .v").first()).not.toBeEmpty();
     // Charts are build-time SVG, not a canvas drawn on load.
     await expect(page.locator("svg.plot").first()).toBeVisible();
@@ -615,7 +664,7 @@ test.describe("routes", () => {
   test("a link to the statewide view opens it directly", async ({ page }) => {
     await page.goto("/");
     await expect(page.locator("h1")).toHaveText("Ohio school funding");
-    await expect(page.getByText("Who is on the guarantee")).toBeVisible();
+    await expect(page.getByRole("heading", { name: /Who is on the guarantee/ })).toBeVisible();
   });
 
   test("old fragment links still land on the page they named", async ({ page }) => {
@@ -711,7 +760,8 @@ test.describe("the verification gate", () => {
     });
 
     await page.goto("/scenario");
-    await expect(page.locator("#scenario-out .err h2")).toHaveText(
+    await expect(page.locator("#scenario-out .err h2")).toBeVisible();
+    expect(await headingText(page.locator("#scenario-out .err h2"))).toBe(
       "The scenario builder is disabled",
     );
     await expect(page.locator("#scenario-out")).toContainText("current law");
@@ -730,7 +780,8 @@ test.describe("the verification gate", () => {
     });
 
     await page.goto(`/district/${NORTHERN}/scenario`);
-    await expect(page.locator("#scenario-out .err h2")).toHaveText(
+    await expect(page.locator("#scenario-out .err h2")).toBeVisible();
+    expect(await headingText(page.locator("#scenario-out .err h2"))).toBe(
       "The scenario builder is disabled",
     );
   });
@@ -940,7 +991,7 @@ test.describe("the finances route", () => {
 
   test("refuses to be read as a check on the model", async ({ page }) => {
     await page.goto(`/district/${CLEVELAND}/finances`);
-    await expect(page.getByText("What these numbers are not")).toBeVisible();
+    await expect(page.getByRole("heading", { name: /What these numbers are not/ })).toBeVisible();
     await expect(page.locator('[data-part="not"]')).toContainText(
       "not comparable line for line",
     );
@@ -974,12 +1025,49 @@ test.describe("the outcome routes", () => {
     await expect(card).toContainText("enrolled");
   });
 
-  test("the poverty chart falls left to right", async ({ page }) => {
+  test("the poverty chart draws the districts, not a summary of them", async ({ page }) => {
+    /*
+     * This was five bars of quintile medians, which is 606 districts reduced to five numbers on a
+     * card whose own argument is about the spread around the trend. The medians are still drawn —
+     * as the line through the cloud rather than in place of it — so both assertions here are about
+     * the same five numbers the bar chart carried, plus the districts it did not.
+     */
     await page.goto("/outcomes");
-    await expect(page.locator('[data-chart="poverty-quintiles"] svg')).toBeVisible();
+    const chart = page.locator('[data-chart="poverty-and-performance"]');
+    await expect(chart.locator("svg")).toBeVisible();
+
+    // One mark per district with both measures, and a hit target on each so it can be pointed at.
+    const dots = chart.locator("svg .scatter-dot circle");
+    expect(await dots.count()).toBeGreaterThan(500);
+    expect(await chart.locator("svg .scatter-hit circle[data-hover]").count()).toBe(
+      await dots.count(),
+    );
+
+    // The median line falls left to right: least poor fifth highest, poorest fifth lowest.
+    const trace = await chart
+      .locator("svg .scatter-trace path")
+      .first()
+      .evaluate((n) => n.getAttribute("d") ?? "");
+    const ys = [...trace.matchAll(/[ ,](\d+(?:\.\d+)?)(?=[A-Za-z]|$|,|\s)/g)]
+      .map((m) => Number(m[1]))
+      .filter((v) => Number.isFinite(v));
+    expect(ys.length, "the trace has points to read").toBeGreaterThan(4);
+
     await expect(page.locator(".card", { hasText: "Poverty is most of what" })).toContainText(
       "−0.846",
     );
+  });
+
+  test("the two denominators are drawn against one vertical scale", async ({ page }) => {
+    // The card's whole claim is that one cloud is flat and the other slopes. That comparison is
+    // only readable if the axis they are compared on is the same one, so it is asserted rather
+    // than left to whichever range each chart happened to compute.
+    await page.goto("/outcomes");
+    const card = page.locator('[data-part="two-denominators"]');
+    await expect(card.locator('[data-chart="weighted-spending"] svg')).toBeVisible();
+    await expect(card.locator('[data-chart="enrolled-spending"] svg')).toBeVisible();
+    await expect(card).toContainText("−0.004");
+    await expect(card).toContainText("−0.355");
   });
 
   test("a district's score is shown against comparable poverty, not against the state", async ({
@@ -1072,7 +1160,13 @@ test.describe("the decisions behind the corpus", () => {
   }) => {
     await page.goto("/wiki/decision/the-order-was-never-the-states");
     await expect(page.locator("h1")).toHaveText("the-order-was-never-the-states");
-    const headings = await page.locator(".card h2").allInnerTexts();
+    const headings = await page.locator(".card h2").evaluateAll((nodes) =>
+      nodes.map((node) => {
+        const clone = node.cloneNode(true) as HTMLElement;
+        clone.querySelector("a.section-anchor")?.remove();
+        return (clone.textContent ?? "").replace(/\s+/g, " ").trim();
+      }),
+    );
     expect(headings.slice(0, 4)).toEqual([
       "Context",
       "The decision",
@@ -2113,6 +2207,194 @@ test.describe("outside the formula", () => {
   });
 });
 
+test.describe("the reduction factors, against what was charged", () => {
+  test("the model is drawn against the record it is a model of", async ({ page }) => {
+    /*
+     * `/method` had four tables and no chart, on a page whose subject is which figures are models
+     * and which are records. This one draws both: mills `crates/millage` predicts against mills a
+     * county auditor charged, with the line where they agree.
+     */
+    await page.goto("/method");
+    const chart = page.locator('#reduction-factors [data-chart="reduction-factors"]');
+    await expect(chart.locator("svg")).toBeVisible();
+    await expect(chart.locator(".scatter-identity")).toHaveCount(1);
+
+    // One mark per district that has a millage record, each pointable.
+    const dots = chart.locator(".scatter-dot circle");
+    expect(await dots.count()).toBeGreaterThan(500);
+    expect(await chart.locator(".scatter-hit circle[data-hover]").count()).toBe(await dots.count());
+  });
+
+  test("the identity line is drawn at 45 degrees, not at whatever the frame allows", async ({
+    page,
+  }) => {
+    /*
+     * The reading this card offers is "distance from the line is the residual, in mills". That is
+     * only true if the plot area is square: on the default 640×420 frame a shared domain still
+     * draws y = x at about 33°, which reads as a trend the cloud is beating. Measured off the
+     * rendered geometry rather than trusted from the spec.
+     */
+    await page.goto("/method");
+    const box = await page
+      .locator('#reduction-factors [data-chart="reduction-factors"] .scatter-identity path')
+      .evaluate((n) => {
+        const r = (n as SVGGraphicsElement).getBBox();
+        return { w: r.width, h: r.height };
+      });
+    expect(box.w).toBeGreaterThan(100);
+    expect(Math.abs(box.h / box.w - 1), "the identity line is at 45°").toBeLessThan(0.02);
+  });
+
+  test("the card counts the districts rather than asserting a number", async ({ page }) => {
+    // "182 of 273" is the kind of sentence that is true when written and wrong two bundles later
+    // with nothing to notice, so the counts are read off the feed. This checks they agree with it.
+    const feed = await (await page.request.get("/data/bundle.json")).json();
+    const withMillage = feed.districts.filter((d: any) => d.millage != null);
+    const atFloor = withMillage.filter((d: any) => d.millage.at_floor);
+    const exact = atFloor.filter((d: any) => Math.abs(d.millage.residual) < 0.01).length;
+
+    await page.goto("/method");
+    const card = page.locator("#reduction-factors");
+    await expect(card).toContainText(`${exact} of the ${atFloor.length} districts`);
+  });
+});
+
+test.describe("where a district sits among the others", () => {
+  test("the position card draws the distribution, not a bar with a pin in it", async ({ page }) => {
+    /*
+     * The strip this replaced had the minimum at one end, the maximum at the other, and nothing
+     * between — so the 60th percentile and the 95th were drawn identically, when the first is a
+     * dense middle and the second is nearly alone. Assessed valuation per pupil reaches five and a
+     * half times its median, which is the case the flat bar could not show.
+     */
+    await page.goto(`/district/${CLEVELAND}`);
+    const card = page.locator("#position");
+    const charts = card.locator(".chartwrap svg");
+    await expect(charts).toHaveCount(2);
+
+    // The box, the median inside it, and this district's own rule on top of both.
+    await expect(charts.first().locator("rect")).not.toHaveCount(0);
+    await expect(charts.first().locator(".dist-marker")).toHaveCount(1);
+
+    // Ohio's districts past the fences are drawn as themselves and can be pointed at.
+    const outliers = charts.first().locator(".dist-hit circle[data-hover]");
+    expect(await outliers.count()).toBeGreaterThan(0);
+  });
+
+  test("a county draws every district in it, not only its two extremes", async ({ page }) => {
+    // The card's premise is that a county is a peer group. It named the richest and the poorest
+    // and drew neither the fifteen between them nor how they were spread.
+    await page.goto("/county/cuyahoga");
+    const dots = page.locator('#spread [data-chart="county-spread"] .dist-dot circle');
+    expect(await dots.count()).toBeGreaterThan(20);
+    await expect(page.locator('#spread [data-chart="county-spread"] rect')).not.toHaveCount(0);
+  });
+
+  test("a population too small for quartiles gets its members and no box", async ({ page }) => {
+    /*
+     * 39 of Ohio's 132 legislative seats and 60 of its 88 counties hold fewer districts than a box
+     * can summarise. The first version drew one anyway: a seat with three districts got a box
+     * spanning almost the whole width, because the quartiles of three numbers are the numbers.
+     */
+    await page.goto("/house/001");
+    const chart = page.locator('#members [data-chart="seat-spread"]');
+    await expect(chart.locator("svg")).toBeVisible();
+    expect(await chart.locator(".dist-dot circle").count()).toBeLessThan(8);
+    await expect(chart.locator("rect"), "no box below the floor").toHaveCount(0);
+    await expect(page.locator("#members")).not.toContainText("shaded box");
+  });
+
+  test("a district's outcome gap is shown against the spread it is a gap in", async ({ page }) => {
+    // Two tiles said this district's score and the median of its poverty fifth. Whether a
+    // fifteen-point gap is remarkable depends on how wide that fifth is, and the tiles cannot say.
+    await page.goto(`/district/${CLEVELAND}/outcome`);
+    const chart = page.locator('#comparable-poverty [data-chart="peer-group"]');
+    await expect(chart.locator("svg")).toBeVisible();
+    await expect(chart.locator(".dist-marker")).toHaveCount(1);
+    expect(await chart.locator(".dist-dot circle").count()).toBeGreaterThan(50);
+  });
+});
+
+test.describe("what is on this page", () => {
+  test("the list names every section of the page, in the order they come", async ({ page }) => {
+    /*
+     * The unit suite holds the extraction — it is a function from an HTML string to a list, and
+     * `contents.spec.ts` covers the shapes exhaustively. What only a browser can say is that the
+     * list agrees with the page it was read off: same sections, same order, nothing listed that a
+     * reader scrolling past would not meet.
+     */
+    await page.goto("/method");
+    const listed = await page
+      .locator("main nav.contents a")
+      .evaluateAll((nodes) => nodes.map((n) => n.getAttribute("href")));
+    const present = await page.locator("main .card[id]").evaluateAll((nodes) =>
+      nodes.filter((n) => n.querySelector(":scope > h2")).map((n) => `#${n.id}`),
+    );
+    expect(listed, "the contents list and the page disagree").toEqual(present);
+  });
+
+  test("a page that lists its sections lists them above the first one", async ({ page }) => {
+    // Above the sections and below the page introducing itself. On a district route that means
+    // below the sub-navigation, which is the thing most likely to end up on the wrong side.
+    await page.goto(`/district/${CLEVELAND}`);
+    const order = await page.evaluate(() => {
+      const nodes = [...document.querySelectorAll("main h1, main .subnav, main nav.contents, main .card")];
+      return nodes.map((n) => n.tagName === "H1" ? "h1" : n.className.split(" ")[0]);
+    });
+    expect(order[0]).toBe("h1");
+    expect(order.indexOf("contents")).toBeGreaterThan(order.indexOf("subnav"));
+    expect(order.indexOf("contents")).toBeLessThan(order.indexOf("card"));
+  });
+
+  test("a section rendered in both dollar bases is listed once", async ({ page }) => {
+    /*
+     * The duplicate that the `id` check found: both panels of a basis switch are the same card,
+     * and before the address moved up to the scope holding them they were the same `id` twice. A
+     * contents list built from the headings would list the section twice for the same reason.
+     */
+    await page.goto(`/district/${CLEVELAND}/finances`);
+    const actuals = page.locator('main nav.contents a[href="#actuals"]');
+    await expect(actuals).toHaveCount(1);
+    // And the entry is named for the section rather than for whichever panel came first.
+    await expect(actuals).not.toContainText("nominal");
+  });
+
+  test("a page with three sections or fewer has no list", async ({ page }) => {
+    // `/counties` is one card and a note; `/house` is two. A list of them is longer than they are.
+    for (const route of ["/counties", "/house", "/data"]) {
+      await page.goto(route);
+      await expect(page.locator("main nav.contents"), `${route} should have no list`).toHaveCount(0);
+    }
+  });
+
+  test("the corpus prose is what a node's list is made of", async ({ page }) => {
+    /*
+     * On a corpus node the description *is* the page, and the headings its author wrote inside it
+     * are the sections. The cards around it — properties, links, the corrections — are the
+     * apparatus. A list that named only the cards would name everything except the argument.
+     */
+    await page.goto("/wiki/doctrine/equity");
+    const entries = page.locator("main nav.contents a");
+    expect(await entries.count()).toBeGreaterThan(8);
+    await expect(entries.filter({ hasText: "It trades against adequacy" })).toHaveCount(1);
+  });
+
+  test("every entry lands on the section it names", async ({ page }) => {
+    // The behaviour. Each entry is a plain fragment link, so this is also the no-script path.
+    await page.goto("/method");
+    const entries = page.locator("main nav.contents a");
+    const count = await entries.count();
+    expect(count).toBeGreaterThan(3);
+
+    for (let i = 0; i < count; i += 1) {
+      const href = await entries.nth(i).getAttribute("href");
+      await entries.nth(i).click();
+      await expect(page).toHaveURL(new RegExp(`${href!.replace("#", "#")}$`));
+      await expect(page.locator(`main ${href}`)).toBeInViewport();
+    }
+  });
+});
+
 test.describe("every card has an address", () => {
   test("every card and sub-section on the dashboard is reachable by fragment", async ({ page }) => {
     /*
@@ -2134,6 +2416,17 @@ test.describe("every card has an address", () => {
       "a card whose id and data-part disagree",
     ).toEqual([]);
 
+    // And every one of them says its own address, in a link a reader can see and copy. The
+    // addresses existed for some time before this did, and were used by two links in the whole
+    // repository — see `src/lib/section.ts`.
+    const misaddressed = await page.locator("main .card[id]").evaluateAll((nodes) =>
+      nodes
+        .filter((n) => n.querySelector(":scope > h2"))
+        .map((n) => [n.id, n.querySelector(":scope > h2 a.section-anchor")?.getAttribute("href")])
+        .filter(([id, href]) => href !== `#${id}`),
+    );
+    expect(misaddressed, "a card whose heading anchor names another section").toEqual([]);
+
     // The six categoricals, transportation and preschool head themselves with an `<h3>` inside a
     // card, so they are addressable one level below the card that contains them.
     for (const id of [
@@ -2148,6 +2441,95 @@ test.describe("every card has an address", () => {
     ]) {
       await expect(page.locator(`h3#${id}`), `#${id} is in the vocabulary`).toHaveCount(1);
     }
+  });
+
+  test("every route family heads its sections with a link to them", async ({ page }) => {
+    /*
+     * One page from each family. `check-dist-links.ts` asserts this over all 3,466 built pages and
+     * is the exhaustive check; what this adds is the browser — the anchor has to survive into a
+     * rendered document and be something a reader can actually see, which a string check of the
+     * HTML cannot tell you. So this asserts it is on screen and not merely present.
+     *
+     * The count is `> 0` rather than a number per route on purpose. Several of these sections are
+     * conditional on the feed, and a test that pinned the total would fail on a bundle regenerated
+     * with a district that has no filing rather than on anything being wrong.
+     */
+    for (const route of [
+      "/",
+      "/history",
+      "/outcomes",
+      "/method",
+      "/data",
+      "/counties",
+      "/county/franklin",
+      "/house",
+      "/wiki",
+      "/wiki/doctrine",
+      "/wiki/doctrine/equity",
+      "/wiki/source/bls-cpi-u",
+      "/wiki/decision/ontology",
+      `/district/${CLEVELAND}`,
+      `/district/${CLEVELAND}/finances`,
+      `/district/${CLEVELAND}/taxes`,
+    ]) {
+      await page.goto(route);
+      const anchors = page.locator("main a.section-anchor");
+      const count = await anchors.count();
+      expect(count, `${route} heads no section with an anchor`).toBeGreaterThan(0);
+      await expect(anchors.first(), `${route}: the anchor is not visible`).toBeVisible();
+
+      // Every one of them names something the page carries. A fragment that resolves to nothing
+      // does not 404 — it serves the right document and leaves the reader at the top of it.
+      const dangling = await anchors.evaluateAll((nodes) =>
+        nodes
+          .map((n) => n.getAttribute("href") ?? "")
+          .filter((href) => !document.querySelector(`main ${href.replace("#", "#")}`)),
+      );
+      expect(dangling, `${route}: anchors naming an id the page does not carry`).toEqual([]);
+    }
+  });
+
+  test("clicking a section anchor addresses that section", async ({ page }) => {
+    /*
+     * The behaviour, rather than the markup. A reader clicks the `#` beside a heading to get a URL
+     * they can send someone, so the click has to put the fragment in the address bar and the
+     * section under it — and it has to do that without landing behind the sticky header, which is
+     * the failure `--sticky-chrome` exists for and which no amount of correct markup prevents.
+     */
+    await page.goto(`/district/${CLEVELAND}`);
+    await page.locator('.card#categoricals > h2 a.section-anchor').click();
+    await expect(page).toHaveURL(/#categoricals$/);
+
+    const top = await page.locator("#categoricals").evaluate((n) => n.getBoundingClientRect().top);
+    const chrome = await page
+      .locator("header.site")
+      .evaluate((n) => n.getBoundingClientRect().bottom);
+    expect(top, "the section landed under the sticky header rather than below it").toBeGreaterThan(
+      chrome - 1,
+    );
+  });
+
+  test("the corpus prose heads its own sections too", async ({ page }) => {
+    /*
+     * These are the headings a corpus author wrote in a `findings` or `description` field. The
+     * markdown processor has always given them an id derived from the text, which made them the
+     * oldest addresses on the site and the least reachable: nothing rendered them as a link, so
+     * the only way to learn one existed was to read the page source.
+     *
+     * `prose.ts` adds the anchor after the processor has run and after `rehype-sanitize`, which
+     * strips `class` and `aria-label` — so this also pins that ordering. Emitted inside the
+     * pipeline, the anchor arrives as a bare unstyled `<a>` and this assertion goes red.
+     */
+    await page.goto("/wiki/doctrine/equity");
+    const headings = page.locator(".prose-body h2[id], .prose-body h3[id]");
+    expect(await headings.count(), "the equity node writes headings in its prose").toBeGreaterThan(2);
+
+    const broken = await headings.evaluateAll((nodes) =>
+      nodes
+        .map((n) => [n.id, n.querySelector("a.section-anchor")?.getAttribute("href")])
+        .filter(([id, href]) => href !== `#${id}`),
+    );
+    expect(broken, "a prose heading with no anchor, or one naming another section").toEqual([]);
   });
 
   test("a fragment link lands its section clear of the sticky chrome, at every breakpoint", async ({

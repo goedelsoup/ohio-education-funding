@@ -13,6 +13,7 @@ import { loadCorpus } from "../../lib/corpus.ts";
 import { count } from "../../lib/format.ts";
 import { summarize } from "../../lib/prose.ts";
 import * as routes from "../../lib/routes.ts";
+import SectionAnchor from "../../components/SectionAnchor.astro";
 
 const corpus = loadCorpus();
 const edges = corpus.nodes.reduce((total, node) => total + node.out.length, 0);
@@ -74,8 +75,8 @@ const recentlyCorrected = corpus.decisions
     {count(edges)} links between them and {corpus.sources.length} sources behind them.
   </p>
 
-  <div class="card">
-    <h2>What this is, and what it deliberately does not hold</h2>
+  <div class="card" id="what-this-is" data-part="what-this-is">
+    <h2><SectionAnchor id="what-this-is" />What this is, and what it deliberately does not hold</h2>
     <p class="note">
       The corpus holds schema, mechanism, legal history, metric definitions, and a curated set of
       exemplar districts. It does <strong>not</strong> hold the per-district figures — roughly 610
@@ -95,8 +96,8 @@ const recentlyCorrected = corpus.decisions
     </p>
   </div>
 
-  <div class="card">
-    <h2>Classes</h2>
+  <div class="card" id="classes" data-part="classes">
+    <h2><SectionAnchor id="classes" />Classes</h2>
     <div class="scroll">
       <table class="prose">
         <tbody>
@@ -116,8 +117,8 @@ const recentlyCorrected = corpus.decisions
     </div>
   </div>
 
-  <div class="card">
-    <h2>Sources</h2>
+  <div class="card" id="sources" data-part="sources">
+    <h2><SectionAnchor id="sources" />Sources</h2>
     <p class="note">
       Provenance carries more weight here than in most domains. A funding figure is only useful if
       a reader can tell whether it came from a department payment report, a Legislative Service
@@ -140,8 +141,8 @@ const recentlyCorrected = corpus.decisions
     </p>
   </div>
 
-  <div class="card">
-    <h2>Decisions</h2>
+  <div class="card" id="decisions" data-part="decisions">
+    <h2><SectionAnchor id="decisions" />Decisions</h2>
     <p class="note">
       Everything above states a conclusion. The <a href="/wiki/decision">decision records</a> state
       how each was reached — what was chosen, what was rejected and on what evidence, and where the

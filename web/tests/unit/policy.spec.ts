@@ -18,7 +18,8 @@ import { compare, isVerified, toPolicy, verify } from "../../src/lib/verify.ts";
 import { bin } from "../../src/lib/chart.ts";
 import { money, millions, ordinal, pct, percentileOf, signedMoney } from "../../src/lib/format.ts";
 import { guaranteeRateByQuintile, wealthQuintiles } from "../../src/lib/statewide.ts";
-import { performanceByPoverty, povertyQuintiles } from "../../src/lib/outcomes.ts";
+import { povertyQuintiles } from "../../src/lib/outcomes.ts";
+import { medianTrace } from "../../src/lib/relationships.ts";
 import { REQUIRED_CONTRACT, type Bundle } from "../../src/lib/types.ts";
 
 const bundle: Bundle = JSON.parse(
@@ -228,9 +229,19 @@ test("outcomes: poverty quintiles keep every district that has both variables", 
 });
 
 test("outcomes: the Performance Index falls monotonically across poverty fifths", () => {
-  // The relationship the whole view is built to foreground. If it ever stopped being
-  // monotone the copy on that card would be wrong, not just the chart.
-  const medians = performanceByPoverty(bundle.districts).map((b) => b.value);
+  /*
+   * The relationship the whole view is built to foreground. If it ever stopped being monotone the
+   * copy on that card would be wrong, not just the chart.
+   *
+   * Asserted against `medianTrace`, which is what the card now draws: the five quintile medians
+   * are the line through the cloud rather than five bars in place of it. Same five numbers, same
+   * binning — the check did not move, the thing it checks is drawn differently.
+   */
+  const points = bundle.districts
+    .filter((d) => d.economically_disadvantaged != null && d.outcome?.performance_index != null)
+    .map((d) => ({ x: d.economically_disadvantaged!, y: d.outcome!.performance_index! }));
+  const medians = medianTrace(points, 5, "median of each fifth", "formula").points.map((p) => p.y);
+  expect(medians.length).toBe(5);
   for (let i = 1; i < medians.length; i++) {
     expect(medians[i]!).toBeLessThan(medians[i - 1]!);
   }

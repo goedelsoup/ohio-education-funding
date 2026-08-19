@@ -17,6 +17,7 @@ import {
   renderStatewideFinances,
   renderStatewideStructure,
 } from "../lib/statewide.ts";
+import SectionAnchor from "../components/SectionAnchor.astro";
 
 const { bundle, alphabetical, tax } = loadFeed();
 const s = bundle.statewide;
@@ -53,13 +54,13 @@ const NOTABLE = ["043802", "043786", "044909", "049056", "044933", "045583"]
   <Fragment set:html={renderStatewideStructure(bundle, tax)} />
   <Fragment set:html={renderNational(bundle.national)} />
 
-  <BasisToggle id="statewide-basis" base={base}>
+  <BasisToggle id="statewide-basis" section="finances" base={base}>
     <Fragment slot="nominal" set:html={renderStatewideFinances(bundle, "nominal")} />
     <Fragment slot="real" set:html={renderStatewideFinances(bundle, "real")} />
   </BasisToggle>
 
-  <div class="card">
-    <h2>Find a district</h2>
+  <div class="card" id="find-a-district" data-part="find-a-district">
+    <h2><SectionAnchor id="find-a-district" />Find a district</h2>
     <p class="note">
       All {count(s.districts)} are in the <a href="/districts">district index</a>, which sorts and
       filters. These are the ones most often asked about.
@@ -69,8 +70,8 @@ const NOTABLE = ["043802", "043786", "044909", "049056", "044933", "045583"]
     </div>
   </div>
 
-  <div class="card">
-    <h2>Three questions this site is built to answer</h2>
+  <div class="card" id="three-questions" data-part="three-questions">
+    <h2><SectionAnchor id="three-questions" />Three questions this site is built to answer</h2>
     <div class="scroll">
       <table class="prose">
         <tbody>

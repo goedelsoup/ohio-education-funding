@@ -13,6 +13,7 @@ import { loadFeed } from "../lib/feed.ts";
 import { count, money, pct } from "../lib/format.ts";
 import * as routes from "../lib/routes.ts";
 import { yearChip } from "../lib/year.ts";
+import SectionAnchor from "../components/SectionAnchor.astro";
 
 export function getStaticPaths() {
   return [{ params: { chamber: "house" } }, { params: { chamber: "senate" } }];
@@ -47,8 +48,8 @@ const senateWhole = bundle.senate_districts.reduce((a, h) => a + h.districts_who
       {other === "house" ? "House" : "Senate"} districts</a> are the other view.
   </p>
 
-  <div class="card">
-    <h2>These figures are estimates, and nobody publishes them</h2>
+  <div class="card" id="estimates" data-part="estimates">
+    <h2><SectionAnchor id="estimates" />These figures are estimates, and nobody publishes them</h2>
     <p class="note">
       The department computes funding <strong>per school district</strong> and stops. No
       legislative district is a unit of account anywhere in Ohio's funding system, and most school
@@ -75,8 +76,8 @@ const senateWhole = bundle.senate_districts.reduce((a, h) => a + h.districts_who
     </p>
   </div>
 
-  <div class="card">
-    <h2>Every {chamber === "house" ? "House" : "Senate"} district<Fragment set:html={yearChip("formula")} /></h2>
+  <div class="card" id="roster" data-part="roster">
+    <h2><SectionAnchor id="roster" />Every {chamber === "house" ? "House" : "Senate"} district<Fragment set:html={yearChip("formula")} /></h2>
     <div class="scroll"><table>
       <thead><tr>
         <th>District</th><th class="tnum">State aid</th><th class="tnum">Share of Ohio</th>

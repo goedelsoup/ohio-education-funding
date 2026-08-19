@@ -16,6 +16,7 @@ import { loadFeed } from "../../../lib/feed.ts";
 import { money } from "../../../lib/format.ts";
 import { renderProse, renderPropertyValue } from "../../../lib/prose.ts";
 import * as routes from "../../../lib/routes.ts";
+import SectionAnchor from "../../../components/SectionAnchor.astro";
 
 export function getStaticPaths() {
   return loadCorpus().nodes.map((node) => ({
@@ -98,8 +99,8 @@ const properties = node.properties.filter((p) => p.name !== "seeded_because");
 
   {
     district && (
-      <div class="card">
-        <h2>This district, in the current model</h2>
+      <div class="card" id="district" data-part="district">
+        <h2><SectionAnchor id="district" />This district, in the current model</h2>
         <p class="note">
           The corpus says what {district.name} illustrates. The FY{loadFeed().bundle.fiscal_year}
           {" "}model says what it is paid: {money(district.realized_aid_per_pupil)} per pupil,
@@ -120,12 +121,12 @@ const properties = node.properties.filter((p) => p.name !== "seeded_because");
     )
   }
 
-  <div class="card prose-body"><Fragment set:html={description} /></div>
+  <div class="card prose-body" id="description" data-part="description"><Fragment set:html={description} /></div>
 
   {
     findings && (
-      <div class="card prose-body">
-        <h2>What this repository computed</h2>
+      <div class="card prose-body" id="findings" data-part="findings">
+        <h2><SectionAnchor id="findings" />What this repository computed</h2>
         <p class="note">
           Not what Ohio publishes. Figures derived here from committed fixtures, each one citing
           the test that reproduces it.
@@ -137,8 +138,8 @@ const properties = node.properties.filter((p) => p.name !== "seeded_because");
 
   {
     properties.length > 0 && (
-      <div class="card">
-        <h2>Properties</h2>
+      <div class="card" id="properties" data-part="properties">
+        <h2><SectionAnchor id="properties" />Properties</h2>
         <div class="scroll">
           <table class="prose">
             <tbody>
@@ -157,8 +158,8 @@ const properties = node.properties.filter((p) => p.name !== "seeded_because");
     )
   }
 
-  <div class="card">
-    <h2>Links</h2>
+  <div class="card" id="links" data-part="links">
+    <h2><SectionAnchor id="links" />Links</h2>
     {
       stated.length > 0 && (
         <div class="scroll">
@@ -241,8 +242,8 @@ const properties = node.properties.filter((p) => p.name !== "seeded_because");
      * find out it held a paragraph, and on the nodes with several the list is the point.
      */
     revisions.length > 0 && (
-      <div class="card apparatus">
-        <h2>What this node used to say</h2>
+      <div class="card apparatus" id="revisions" data-part="revisions">
+        <h2><SectionAnchor id="revisions" />What this node used to say</h2>
         <p class="note">
           The corpus is not rewritten to have always been right. Each entry is a claim this node
           carried, what replaced it, and the thing that settled it.
@@ -274,8 +275,8 @@ const properties = node.properties.filter((p) => p.name !== "seeded_because");
 
   {
     seeded && (
-      <div class="card apparatus">
-        <h2>Why this node is here</h2>
+      <div class="card apparatus" id="why" data-part="why">
+        <h2><SectionAnchor id="why" />Why this node is here</h2>
         <p class="note">
           A note from the corpus about itself rather than about Ohio, kept because provenance
           includes why something was written down.

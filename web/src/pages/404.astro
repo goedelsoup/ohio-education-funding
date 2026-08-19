@@ -9,6 +9,7 @@
 import Base from "../layouts/Base.astro";
 import { loadFeed } from "../lib/feed.ts";
 import { count } from "../lib/format.ts";
+import SectionAnchor from "../components/SectionAnchor.astro";
 
 const { bundle } = loadFeed();
 ---
@@ -24,12 +25,12 @@ const { bundle } = loadFeed();
   </p>
 
   <div class="card" id="suggest" hidden>
-    <h2>Did you mean one of these?</h2>
+    <h2><SectionAnchor id="suggest" />Did you mean one of these?</h2>
     <div class="flags" id="suggest-list"></div>
   </div>
 
-  <div class="card">
-    <h2>Where to go instead</h2>
+  <div class="card" id="where-to-go" data-part="where-to-go">
+    <h2><SectionAnchor id="where-to-go" />Where to go instead</h2>
     <div class="scroll">
       <table>
         <tbody>

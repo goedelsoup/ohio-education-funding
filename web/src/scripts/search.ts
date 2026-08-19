@@ -45,7 +45,7 @@ async function start(): Promise<void> {
   if (!input || !out) return;
   const response = await fetch(`${import.meta.env.BASE_URL}search-index.json`);
   if (!response.ok) {
-    out.innerHTML = `<div class="card err"><p>Could not load the search index (HTTP ${response.status}).</p></div>`;
+    out.innerHTML = `<div class="card err" id="index-unreachable" data-part="index-unreachable"><p>Could not load the search index (HTTP ${response.status}).</p></div>`;
     return;
   }
   const entries = (await response.json()) as SearchEntry[];
@@ -71,7 +71,7 @@ async function start(): Promise<void> {
             : `${hits.length} match${hits.length === 1 ? "" : "es"}`;
     }
     if (hits.length === 0) {
-      out.innerHTML = `<div class="card"><p class="note">Nothing matches
+      out.innerHTML = `<div class="card" id="no-matches" data-part="no-matches"><p class="note">Nothing matches
         <strong>${escapeHtml(raw.trim())}</strong>. District pages are keyed by six-digit IRN, and
         the corpus is browsable by class from <a href="/wiki">the wiki</a>.</p></div>`;
       return;
@@ -85,7 +85,7 @@ async function start(): Promise<void> {
         </tr>`,
       )
       .join("");
-    out.innerHTML = `<div class="card"><div class="scroll"><table class="prose">
+    out.innerHTML = `<div class="card" id="results" data-part="results"><div class="scroll"><table class="prose">
       <tbody>${rows}</tbody></table></div></div>`;
   };
 

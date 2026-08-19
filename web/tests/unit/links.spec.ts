@@ -29,6 +29,10 @@ import {
 import { loadFeed } from "../../src/lib/feed.ts";
 import { counties } from "../../src/lib/county.ts";
 import * as routes from "../../src/lib/routes.ts";
+import { anchor } from "../../src/lib/section.ts";
+import { medianTrace, pairs } from "../../src/lib/relationships.ts";
+import { BOX_FROM, distributionSpec, scatterSpec } from "../../src/lib/plot/spec.ts";
+import { renderToString } from "../../src/lib/plot/ssr.ts";
 import { renderSpendingByFunction } from "../../src/lib/spending.ts";
 import {
   renderChargeOff,
@@ -408,4 +412,276 @@ test("every district in the feed has all five of its views", () => {
     expect(PAGES.has(routes.districtScenario(irn))).toBe(true);
     expect(PAGES.has(routes.districtTaxes(irn))).toBe(true);
   }
+});
+
+test("every section a decision record renders is a name the route table lists", () => {
+  /*
+   * A decision page addresses each of its cards by the corpus field the card renders — `context`,
+   * `rationale`, `amendment` — so the vocabulary in `routes.ts` and `DECISION_SECTIONS` in
+   * `corpus.ts` have to agree. They are two tables and not one on purpose: `corpus.ts` reads
+   * `.yidam/` off disk and `routes.ts` is a table of strings that must stay free of it.
+   *
+   * Which leaves them free to drift, and the drift is silent in the direction that matters. A
+   * field added to the corpus and rendered as a card would fail the built-site check with a
+   * message about `routes.ts` — a whole build, on a name nobody thought of as a route. This says
+   * it in the unit suite instead.
+   */
+  const rendered = new Set(
+    loadCorpus().decisions.flatMap((decision) => decision.sections.map((section) => section.name)),
+  );
+  expect(rendered.size, "the corpus renders decision sections at all").toBeGreaterThan(3);
+  expect(
+    [...rendered].filter((name) => !routes.SECTION_NAMES.has(name)),
+    "a decision section the route table does not list",
+  ).toEqual([]);
+});
+
+test("a section anchor names its own section, and nothing a template writes escapes it", () => {
+  /*
+   * The one place the anchor markup is defined. Both halves of the site render through it — the
+   * template literals in `src/lib/*.ts` directly, the `.astro` templates through
+   * `SectionAnchor.astro`, which renders this string rather than restating it as markup — so this
+   * is the whole contract, and `check-dist-links.ts` asserts the built pages honour it.
+   */
+  expect(anchor("base-cost")).toContain('href="#base-cost"');
+  expect(anchor("base-cost")).toContain('class="section-anchor"');
+  // The name is read out; the glyph is not. A screen reader announcing "number sign" beside every
+  // heading on the site would be worse than no anchor.
+  expect(anchor("base-cost")).toContain('aria-label="Link to this section"');
+  expect(anchor("base-cost")).toContain('aria-hidden="true"');
+  // Separated from the words beside it. `</a>` against a letter is the fused-word defect the e2e
+  // suite scans every route for, and inside a flex heading a whitespace-only run costs nothing.
+  expect(anchor("base-cost").endsWith("</a> ")).toBe(true);
+  // An id is interpolated into an attribute, so it is escaped there like any other.
+  expect(anchor('a" onclick="x')).not.toContain('onclick="x"');
+});
+
+test("a scatter draws one mark per district and never a colour the theme cannot change", () => {
+  /*
+   * The two rules the build enforces for every other chart, asserted for this one before it ships
+   * six hundred marks: a hover string per district in data order — `attachHovers` throws if those
+   * disagree, and this is the cheaper place to find out — and no literal colour, because a
+   * build-time SVG cannot re-render when a reader switches theme.
+   */
+  const points = pairs(
+    loadFeed().bundle.districts,
+    (d) => d.valuation_per_pupil,
+    (d) => d.realized_aid_per_pupil,
+    (d) => d.name,
+  );
+  expect(points.length).toBeGreaterThan(500);
+
+  const spec = scatterSpec(points, {
+    x: { label: "x", format: (v) => String(v), log: true },
+    y: { label: "y", format: (v) => String(v), log: true },
+  });
+  expect(spec?.hovers?.text.length).toBe(points.length);
+
+  // Renders, and `ensureThemeable` inside `renderToString` throws on a baked-in colour.
+  const svg = renderToString(spec);
+  expect(svg).toContain("<svg");
+  expect(svg.replace(/<style>[\s\S]*?<\/style>/g, "")).not.toMatch(/#[0-9a-f]{3,8}\b|rgba?\(/i);
+});
+
+test("a scatter refuses to draw a population it does not have", () => {
+  // Same rule the line forms use: too few points is not a cloud, and an axis with four marks on
+  // it would read as a finding about something that has not been measured.
+  const few = Array.from({ length: 6 }, (_, i) => ({ x: i, y: i, hover: String(i) }));
+  expect(
+    scatterSpec(few, { x: { label: "x", format: String }, y: { label: "y", format: String } }),
+  ).toBeNull();
+});
+
+test("a median trace bins by count and keeps every district", () => {
+  /*
+   * Equal-count and not equal-width, because every measure here is skewed: valuation per pupil
+   * runs $79k to $1.35M against a median of $248k, and equal-width tenths would put two thirds of
+   * the districts in the first bin. The last bin takes the remainder, so integer division drops
+   * nobody — the same rule the quintile helpers use.
+   */
+  const values = loadFeed()
+    .bundle.districts.filter((d) => d.valuation_per_pupil != null)
+    .map((d) => ({ x: d.valuation_per_pupil!, y: d.realized_aid_per_pupil }));
+  const trace = medianTrace(values, 10, "as received", "guarantee");
+  expect(trace.points.length).toBe(10);
+
+  // The x of each bin is its own median, so the line is drawn where the districts are.
+  const xs = trace.points.map((p) => p.x);
+  expect([...xs].sort((a, b) => a - b)).toEqual(xs);
+  expect(xs[0]).toBeGreaterThanOrEqual(Math.min(...values.map((v) => v.x)));
+  expect(xs[xs.length - 1]).toBeLessThanOrEqual(Math.max(...values.map((v) => v.x)));
+});
+
+test("the guarantee shows up as a gap between what the formula computes and what is paid", () => {
+  /*
+   * The finding the wealth-neutrality card now draws, asserted as a fact about the feed rather
+   * than as a fact about the chart. The two medians should be near enough identical among the
+   * least wealthy districts — where few are on the guarantee — and apart among the wealthiest,
+   * where most are. If that ever reversed, the paragraph under the chart would be wrong.
+   */
+  const districts = loadFeed().bundle.districts.filter((d) => d.valuation_per_pupil != null);
+  const realized = medianTrace(
+    districts.map((d) => ({ x: d.valuation_per_pupil!, y: d.realized_aid_per_pupil })),
+    10,
+    "as received",
+    "guarantee",
+  );
+  const formula = medianTrace(
+    districts.map((d) => ({ x: d.valuation_per_pupil!, y: d.formula_aid_per_pupil })),
+    10,
+    "the formula",
+    "formula",
+  );
+  const gap = (i: number) => realized.points[i]!.y - formula.points[i]!.y;
+  expect(gap(0)).toBeLessThan(100);
+  expect(gap(9)).toBeGreaterThan(500);
+  // And the payment is never below the formula's answer at the median: the guarantee only tops up.
+  for (let i = 0; i < 10; i += 1) expect(gap(i)).toBeGreaterThanOrEqual(0);
+});
+
+test("a distribution draws its members where they fit and its shape where they do not", () => {
+  /*
+   * Three populations, three answers, one rule — the form decides rather than four call sites
+   * deciding four ways. A county is six districts and a poverty fifth is a hundred and twenty:
+   * both fit across the strip and both are drawn in full. Ohio's 609 do not, so the box carries
+   * the shape and only the districts past the fences are drawn individually.
+   */
+  const values = (n: number) =>
+    Array.from({ length: n }, (_, i) => ({ value: i, hover: `d${i}` }));
+
+  const small = distributionSpec(values(30));
+  expect(small?.hovers?.text.length, "a small population is drawn in full").toBe(30);
+
+  const medium = distributionSpec(values(120));
+  expect(medium?.hovers?.text.length, "a poverty fifth is drawn in full").toBe(120);
+
+  // 609 evenly spaced values have no outliers, so the box is the whole of what is drawn.
+  const large = distributionSpec(values(609));
+  expect(large?.hovers?.text.length).toBeLessThan(30);
+});
+
+test("a distribution refuses a population too small to have a shape", () => {
+  const values = (n: number) => Array.from({ length: n }, (_, i) => ({ value: i, hover: `d${i}` }));
+  // A pair is not a distribution. Two of Ohio's legislative seats hold two school districts, and
+  // the table on those pages names both.
+  expect(distributionSpec(values(2))).toBeNull();
+  expect(distributionSpec(values(3))).not.toBeNull();
+});
+
+test("the box is drawn only where quartiles summarise something", () => {
+  /*
+   * A seat with three districts drew a box spanning almost the full width with three dots inside
+   * it: the first and third quartiles of three numbers are the first and third numbers. 39 of 132
+   * seats and 60 of 88 counties are under the floor, so this is the common case rather than the
+   * edge one.
+   */
+  const values = (n: number) => Array.from({ length: n }, (_, i) => ({ value: i, hover: `d${i}` }));
+  const boxes = (spec: ReturnType<typeof distributionSpec>) =>
+    (renderToString(spec).match(/<rect/g) ?? []).length;
+
+  expect(boxes(distributionSpec(values(BOX_FROM - 1))), "no box below the floor").toBe(0);
+  expect(boxes(distributionSpec(values(BOX_FROM))), "a box at the floor").toBeGreaterThan(0);
+});
+
+test("a district's position is drawn against the population it is being placed in", () => {
+  /*
+   * The flat strip this replaced put a pin on a bar with the minimum at one end and the maximum at
+   * the other, which drew the 60th percentile and the 95th identically. Ohio's valuation per pupil
+   * reaches five and a half times its median, so those are a dense middle and open country.
+   */
+  const bundle = loadFeed().bundle;
+  const valuations = bundle.districts
+    .filter((d) => d.valuation_per_pupil != null)
+    .map((d) => ({ value: d.valuation_per_pupil!, hover: d.name }));
+  const spec = distributionSpec(valuations, {
+    marker: { value: valuations[0]!.value, label: "a district" },
+  });
+  const svg = renderToString(spec);
+  expect(svg).toContain("dist-marker");
+  // And it is themeable, like every other chart the build emits.
+  expect(svg.replace(/<style>[\s\S]*?<\/style>/g, "")).not.toMatch(/#[0-9a-f]{3,8}\b|rgba?\(/i);
+
+  // The skew is what the form exists for: the fences sit well inside the range, so the districts
+  // past them are drawn as themselves rather than as the end of a continuum.
+  expect(spec?.hovers?.text.length).toBeGreaterThan(0);
+  expect(spec!.hovers!.text.length).toBeLessThan(valuations.length / 4);
+});
+
+test("an identity plot is square and shares one domain, or it does not mean what it says", () => {
+  /*
+   * The reduction-factor card draws the same quantity twice — mills this repository predicts
+   * against mills a county auditor charged — so a point's distance from y = x is its residual, in
+   * the units already on the axis. Two things have to hold for that reading to be true, and
+   * neither is cosmetic: both axes on one domain, because a line through (min, min) and (max, max)
+   * of two different ranges is not y = x; and a square plot area, because a shared domain on a
+   * 640×420 frame still draws the line at 33°, which reads as a trend the cloud is beating rather
+   * than as the equality it is.
+   */
+  const points = [
+    { x: 10, y: 12, hover: "a" },
+    { x: 20, y: 20, hover: "b" },
+    { x: 30, y: 44, hover: "c" },
+    ...Array.from({ length: 12 }, (_, i) => ({ x: 15 + i, y: 15 + i, hover: `d${i}` })),
+  ];
+  const spec = scatterSpec(
+    points,
+    { x: { label: "predicted", format: String }, y: { label: "charged", format: String } },
+    [],
+    { identity: { label: "predicted = charged" } },
+  )!;
+
+  const x = spec.options.x as { domain: [number, number] };
+  const y = spec.options.y as { domain: [number, number] };
+  expect(x.domain, "the two axes are on one domain").toEqual(y.domain);
+  // Which is the union of both measures, not either one of them — padded, as every axis here is.
+  expect(x.domain[0]).toBeLessThanOrEqual(10);
+  expect(x.domain[1]).toBeGreaterThanOrEqual(44);
+
+  const width = spec.options.width as number;
+  const height = spec.options.height as number;
+  const plotWidth = width - (spec.options.marginLeft as number) - (spec.options.marginRight as number);
+  const plotHeight = height - (spec.options.marginTop as number) - (spec.options.marginBottom as number);
+  expect(plotWidth, "the plot area is square").toBe(plotHeight);
+
+  expect(renderToString(spec)).toContain("scatter-identity");
+});
+
+test("a scatter without an identity line fits each axis to its own measure", () => {
+  // The ordinary case, and the reason the squaring is opt-in: valuation against aid has no
+  // meaningful diagonal, and forcing one domain on two different quantities would be nonsense.
+  const points = Array.from({ length: 20 }, (_, i) => ({ x: i, y: i * 1000, hover: `d${i}` }));
+  const spec = scatterSpec(points, {
+    x: { label: "x", format: String },
+    y: { label: "y", format: String },
+  })!;
+  const x = spec.options.x as { domain: [number, number] };
+  const y = spec.options.y as { domain: [number, number] };
+  expect(x.domain).not.toEqual(y.domain);
+  expect(renderToString(spec)).not.toContain("scatter-identity");
+});
+
+test("the reduction factors reproduce the floor and approximate everything else", () => {
+  /*
+   * The finding the card states, asserted against the feed rather than against the chart. At the
+   * twenty-mill floor the factors have stopped operating and there is nothing left to predict, so
+   * the model is near-exact; above it they are what sets the rate, and it is not. If that ever
+   * reversed, three sentences on `/method` would be wrong.
+   */
+  const withMillage = loadFeed().bundle.districts.filter((d) => d.millage != null);
+  const exact = (d: (typeof withMillage)[number]) => Math.abs(d.millage!.residual) < 0.01;
+  const atFloor = withMillage.filter((d) => d.millage!.at_floor);
+  const above = withMillage.filter((d) => !d.millage!.at_floor);
+
+  expect(atFloor.length).toBeGreaterThan(100);
+  expect(above.length).toBeGreaterThan(100);
+  const floorRate = atFloor.filter(exact).length / atFloor.length;
+  const aboveRate = above.filter(exact).length / above.length;
+  expect(floorRate, "the floor cases reproduce").toBeGreaterThan(0.5);
+  expect(aboveRate, "the rest do not").toBeLessThan(0.1);
+
+  // And the departures run one way: the factors reduce existing levies on existing property and
+  // know nothing of a levy passed since.
+  const over = withMillage.filter((d) => d.millage!.residual > 0.5).length;
+  const under = withMillage.filter((d) => d.millage!.residual < -0.5).length;
+  expect(over).toBeGreaterThan(under * 5);
 });

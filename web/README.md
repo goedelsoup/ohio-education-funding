@@ -255,6 +255,90 @@ inherits normally, which is what makes this possible; `ensureThemeable` fails th
 literal colour ever slips through, because the resulting bug is invisible to whoever writes it —
 they are looking at light mode, where the literal is very nearly right.
 
+
+### The relationships are drawn as relationships
+
+The site carried **ten correlation coefficients and no scatterplot**. A coefficient is one number
+standing for six hundred pairs, and two very different clouds produce the same one; the cards it sat
+on were the ones whose subject *is* the relationship — "Does state aid offset property wealth?"
+answered with two numbers in a table.
+
+`scatterSpec` is the fifth form. One dot per district, 606 of them, on `/` and `/outcomes` only:
+those are two pages, where a 606-mark SVG costs nothing, and the same cloud on all 3,045 district
+pages would be 22 MB. The per-district version of the question wants a distribution form, not this
+one.
+
+Three things about it are deliberate. **The marks break the usual size rule** — 2.4px and partly
+transparent, because 8px opaque markers at this density are a solid blob, and density carried as
+darkness is the information. The hit target does not shrink with them: it is a separate transparent
+7px mark so a reader can point at a district. **Both scales are logarithmic** where the measure is
+skewed — valuation per pupil spans 17× and aid per pupil 30×, and on a linear axis nine districts in
+ten sit in the left third. **Colour means one thing per chart**: the dots are neutral and the two
+median lines carry the hues, because a scheme where hue meant guarantee-status on a dot and series
+on a line would be two vocabularies in one frame.
+
+**No line here is fitted.** Every trace is a median per equal-count bin of the x axis — the same
+arithmetic `povertyQuintiles` and `guaranteeRateByQuintile` already did for the bar charts, drawn as
+a line instead of as five bars. That is the whole reason the traces are allowed in the web layer: a
+regression is a claim about a model, and a model belongs in `crates/` with a checkpoint behind it,
+while a median describes points the reader can already see. Where a fitted line would say more, the
+coefficient beside the chart is the one the crates computed and is stated as what it is.
+
+The quintile bar chart on `/outcomes` is gone, and its five medians are the line through the cloud.
+`/` is 31.8 KB → 185.5 KB and `/outcomes` 12.8 KB → 442.3 KB, which is 48.6 KB and 97.0 KB on the
+wire; repetitive SVG compresses about 4.5:1.
+
+### A model drawn against the record it is a model of
+
+`/method` had four tables and no chart, on the page whose subject is which figures here are models
+and which are records. It now draws one against the other: mills `crates/millage` predicts from H.B.
+920's reduction factors against mills the county auditor charged, with the line where they agree.
+
+The finding is where the agreement is. **182 of the 273 districts at the twenty-mill floor land on
+the line, against 6 of the 336 above it** — at the floor the factors have stopped operating and
+there is nothing left to predict, and above it they are what sets the rate. The departures run one
+way, 163 districts charging more than predicted by over half a mill against 11 charging less, which
+is what factors that reduce existing levies on existing property and know nothing of a levy passed
+since would produce. Each district's own tax page already said which its residual is consistent
+with; this is the same statement about all 609 at once.
+
+Two things about the drawing are load-bearing rather than cosmetic, and the first version got the
+second one wrong. **The axes share a domain**, because a line through the corners of two different
+ranges is not y = x. And **the plot area is squared**, because a shared domain on the ordinary
+640×420 frame still draws the line at 33° — which reads as a trend the cloud is beating rather than
+as the equality it is. An e2e test measures the rendered line's bounding box and fails if its aspect
+leaves 45°.
+
+### And a position is drawn against the population it is a position in
+
+`distributionSpec` is the sixth form, and it replaced a flat bar with a pin in it. The bar had the
+minimum at one end, the maximum at the other and nothing between, so the 60th percentile and the
+95th were drawn identically — when Ohio's assessed valuation per pupil reaches **5.5× its median**,
+those are a dense middle and open country. The same defect applied wherever a peer group was reduced
+to its extremes: a county page named its richest and poorest district and drew neither the fifteen
+between them nor how they were spread.
+
+One form, four placements — the district position card, the county spread, a legislative seat's
+schools, and a district's poverty fifth on the outcome route. **The form decides how to draw itself
+rather than four call sites deciding four ways**, on two thresholds that are in the module and
+nowhere else:
+
+- **Members are drawn individually up to 150.** A county has six districts at the median and a
+  poverty fifth has 122; both fit across 640px in five lanes and both are worth seeing. Ohio's 609
+  do not — six hundred marks on a 46px strip is a rule — so above that the box carries the shape and
+  only the districts past the fences are drawn. The first version had this backwards and rendered an
+  *empty frame* for the poverty fifth: 122 districts, none beyond the fences, so "outliers only"
+  meant no marks at all.
+- **The box is drawn from 8.** Below it the quartiles of *n* numbers are just some of the numbers. A
+  seat with three districts drew a box spanning nearly the full width with three dots in it. **39 of
+  Ohio's 132 legislative seats and 60 of its 88 counties are under the floor**, so this is the
+  common case, not the edge one — and each of them is better served by the dots alone.
+
+The vertical spread on the dots is index-based, not random: this module is pure, and a jitter that
+moved between builds would redraw one county two ways. Whiskers stop at the last value inside 1.5
+IQR and anything past them is its own mark, which is what keeps Ohio's one $1.35M district from
+being drawn as the end of a continuum it is nowhere near.
+
 ## Preview cards are the same idea, rasterized
 
 A link to any page here unfurls with a card carrying that page's own figures: a district's aid per
@@ -311,6 +395,64 @@ The nominal/constant-dollar switch is **two radio inputs and a sibling selector*
 behind it. Both panels are rendered at build and CSS decides which is shown. The previous
 implementation re-rendered from a click handler, which meant a reader without JavaScript got the
 nominal view and a dead button.
+
+## Every section has an address, and now says so
+
+A card carries an `id` that is also its `data-part`, and heads itself with a muted `#` linking to
+that id. **121 cards and 248 prose headings**, 21,504 anchors across the built site, and one
+definition of the markup in
+[`src/lib/section.ts`](src/lib/section.ts) — the template literals in `src/lib/` call it, the
+`.astro` templates render it through `SectionAnchor.astro` rather than restating it.
+
+The addresses came first and went unused. 21 names in `SECTIONS`, all on the district routes, and
+**two links in the repository ever named one** — because an address a reader cannot see is an
+address nobody asks for. So the two halves shipped together: 80 cards that had no `id` got one, and
+every heading got the link that makes its `id` visible. `SECTIONS` in
+[`src/lib/routes.ts`](src/lib/routes.ts) is now grouped by route family and covers the whole site.
+
+It is a bare `<a href="#…">` for the reason the basis switch is two radios: a third of the e2e suite
+runs with JavaScript off, and a control that dies without script is worse than no control. It is
+permanently visible rather than revealed on hover, which is the same objection the stylesheet
+already makes to `title` — a hover-only affordance does not exist on a touch screen.
+
+Three checks in `check-dist-links.ts` hold it, and each closes a hole that was already open:
+
+- **Same-page fragments were checked by nothing.** The pattern collecting fragment links required a
+  leading `/`, so `href="#base-cost"` — the most hand-written shape on the site — was invisible to
+  the dangling-fragment check. 22,026 fragment links now resolve; 516 of them were being checked.
+- **A duplicate `id` was invisible**, because a page's ids went into a `Set`. The check found one
+  immediately: `#actuals` was on every `/district/*/finances` page **twice**, once per dollar basis,
+  and a browser sent there scrolls to the nominal panel whether or not that is the one selected. The
+  address moved up to the `.basis-scope` holding both panels, which is what it always meant.
+- **Nothing stopped a new card shipping unaddressed**, which is how 80 of them accumulated. Every
+  card in `main` must now carry an `id` this table lists, and a card that heads itself must carry
+  the anchor pointing back at it — the two are written separately and this is what keeps them from
+  drifting.
+
+### The contents list is read off the page, not written beside it
+
+A page of four sections or more lists them above the first one. The list is **derived from the
+rendered body** in [`src/lib/contents.ts`](src/lib/contents.ts) — `Base.astro` renders its slot to a
+string, reads the headings out of it, and inserts the list before the first section.
+
+That is the whole design, and the reason for it is that a section on these routes is conditional.
+`#denominators` is absent for 177 of 609 districts, `renderOutcomes` returns nothing for a feed with
+no outcome block, a district with no five-year filing has no `#actuals` at all. **A declared list is
+a claim about what renders rather than a record of it**, and it is wrong silently — the entry looks
+like every other entry and lands the reader at the top of the document. Whatever is in the page is
+in the list, and nothing else can be.
+
+Every `h2`, plus the `h3`s the corpus prose grew — and not the `h3`s a card grew. A node's
+description *is* the page and its headings are what its author divided the argument into; the
+district dashboard's eight `h3`s are the six categoricals plus transportation and preschool, which
+are the rows of one breakdown. `/wiki/doctrine/equity` lists fifteen sections, `/method` eight,
+`/counties` none.
+
+Two things fall out of deriving it. A section rendered once per dollar basis has two headings and
+one address, so an entry is named by **what its headings agree on** — "…and hold — nominal" against
+"…and hold — FY2020 dollars" gives "What districts actually received, spent, and hold". And every
+entry is a same-page fragment, so `check:dist` already fails the build on one that names nothing:
+33,926 fragment links now resolve, against 516 before any of this.
 
 ## The projection, and how the interval got to be the subject
 
@@ -481,7 +623,10 @@ src/components/       the basis switch, the lever controls, the district nav
 src/lib/feed.ts       the feed, read at build, parsed, indexed — throws to fail the build
 src/lib/corpus.ts     the corpus, read at build: nodes, ontology, sources, backlinks
 src/lib/schema/       what a feed and a corpus file are allowed to be; the only definition of each
-src/lib/prose.ts      corpus markdown: link rewriting and claim badges
+src/lib/prose.ts      corpus markdown: link rewriting, claim badges, heading anchors
+src/lib/section.ts    the section anchor: one definition, rendered by both halves of the site
+src/lib/relationships.ts  district pairs and median traces; no fitted line lives here
+src/lib/contents.ts   what is on this page, read off the rendered body at build
 scripts/              schema emission and the corpus report; run by pnpm, not by the build
 src/lib/plot/         chart specifications, and the two renderers that share them
 src/lib/og/           preview cards: the palette, the layout, and the rasterizer

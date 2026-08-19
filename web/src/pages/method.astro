@@ -12,7 +12,11 @@ import { loadFeed } from "../lib/feed.ts";
 import { count, millions, pct } from "../lib/format.ts";
 import { DENOMINATORS, denominatorSource, denominatorSpan } from "../lib/denominators.ts";
 import * as routes from "../lib/routes.ts";
-import { yearOf } from "../lib/year.ts";
+import { yearChip, yearOf } from "../lib/year.ts";
+import { scatterSpec } from "../lib/plot/spec.ts";
+import { renderToString } from "../lib/plot/ssr.ts";
+import { pairs } from "../lib/relationships.ts";
+import SectionAnchor from "../components/SectionAnchor.astro";
 
 const { bundle, verification, forecastable } = loadFeed();
 const corpus = loadCorpus();
@@ -21,6 +25,50 @@ const meta = bundle.projection;
 // The MR-81 endpoints, read rather than typed — the pair that went stale twice. See
 // `denominatorSpan`.
 const span = denominatorSpan(bundle, "meal_program");
+
+/*
+ * The reduction-factor model against the rates county auditors actually charged.
+ *
+ * The same quantity twice — mills — so the two axes share a domain and the identity line is a
+ * real 45°. A district on it is one `crates/millage` reproduces; the vertical distance off it is
+ * the residual the district's own tax page states in the same units.
+ *
+ * The counts are read off the feed rather than written down. "182 of 273" is the kind of sentence
+ * that is true when it is written and wrong two bundles later with nothing to notice.
+ */
+const withMillage = bundle.districts.filter((d) => d.millage != null);
+const EXACT = 0.01; // The precision Table SD-1 publishes to.
+const atFloor = withMillage.filter((d) => d.millage!.at_floor);
+const aboveFloor = withMillage.filter((d) => !d.millage!.at_floor);
+const isExact = (d: (typeof withMillage)[number]) => Math.abs(d.millage!.residual) < EXACT;
+const millage = {
+  total: withMillage.length,
+  exact: withMillage.filter(isExact).length,
+  atFloor: atFloor.length,
+  floorExact: atFloor.filter(isExact).length,
+  aboveFloor: aboveFloor.length,
+  aboveExact: aboveFloor.filter(isExact).length,
+  over: withMillage.filter((d) => d.millage!.residual > 0.5).length,
+  under: withMillage.filter((d) => d.millage!.residual < -0.5).length,
+};
+const millageScatter = renderToString(
+  scatterSpec(
+    pairs(
+      withMillage,
+      (d) => d.millage!.predicted_rate,
+      (d) => d.millage!.observed_rate,
+      (d, predicted, observed) =>
+        `${d.name}: the factors predict ${predicted.toFixed(2)} mills, Table SD-1 charges ${observed.toFixed(2)}` +
+        (d.millage!.at_floor ? ", at the twenty-mill floor" : ""),
+    ),
+    {
+      x: { label: "what the reduction factors predict, in mills", format: (v) => v.toFixed(0) },
+      y: { label: "what the county auditor charges", format: (v) => v.toFixed(0) },
+    },
+    [],
+    { identity: { label: "predicted = charged" } },
+  ),
+);
 ---
 
 <Base
@@ -36,8 +84,8 @@ const span = denominatorSpan(bundle, "meal_program");
     deliberately does not show.
   </p>
 
-  <div class="card">
-    <h2>The formula is computed twice, on purpose</h2>
+  <div class="card" id="computed-twice" data-part="computed-twice">
+    <h2><SectionAnchor id="computed-twice" />The formula is computed twice, on purpose</h2>
     <p class="note">
       Ohio's Fair School Funding Plan is implemented in this repository twice: once in Rust, in{" "}
       <code>crates/foundation</code> and <code>crates/project</code>, and once in TypeScript, in{" "}
@@ -70,8 +118,8 @@ const span = denominatorSpan(bundle, "meal_program");
     </p>
   </div>
 
-  <div class="card">
-    <h2>Six pupil counts, and which one each figure uses</h2>
+  <div class="card" id="pupil-counts" data-part="pupil-counts">
+    <h2><SectionAnchor id="pupil-counts" />Six pupil counts, and which one each figure uses</h2>
     <p class="note">
       Ohio's sources do not agree on how many children a district has. Not because any of them is
       wrong — they count different things, for different purposes, in different years. The
@@ -114,8 +162,8 @@ const span = denominatorSpan(bundle, "meal_program");
     </p>
   </div>
 
-  <div class="card">
-    <h2>What is a model, and what is a record</h2>
+  <div class="card" id="model-and-record" data-part="model-and-record">
+    <h2><SectionAnchor id="model-and-record" />What is a model, and what is a record</h2>
     <div class="scroll">
       <table class="prose">
         <tbody>
@@ -266,8 +314,8 @@ const span = denominatorSpan(bundle, "meal_program");
     </div>
   </div>
 
-  <div class="card">
-    <h2>The one thing here that is computed</h2>
+  <div class="card" id="base-cost" data-part="base-cost">
+    <h2><SectionAnchor id="base-cost" />The one thing here that is computed</h2>
     <p class="note">
       Base cost is the exception to the row above. It is not a rate the state sets: R.C. 3317.011
       assembles it for each district from statutory staffing ratios applied to that district's own
@@ -293,8 +341,42 @@ const span = denominatorSpan(bundle, "meal_program");
     </p>
   </div>
 
-  <div class="card">
-    <h2>Why the forecast leads with a range</h2>
+  <div class="card" id="reduction-factors" data-part="reduction-factors">
+    <h2><SectionAnchor id="reduction-factors" />And the second, checked the same way<Fragment set:html={yearChip("millage")} /></h2>
+    <p class="note">
+      The card above says base cost is the exception on the <em>funding</em> side. There is one
+      more on the property-tax side: <code>crates/millage</code> runs H.B. 920's reduction factors
+      forward from each district's prior charged rate, applies the statutory floor, and predicts
+      what it should be charging now. Table SD-1 publishes what it actually charges. The two are
+      the same quantity arrived at two ways, so they can be drawn against each other and the
+      distance between them read off the axis.
+    </p>
+    <div class="chartwrap" data-chart="reduction-factors" set:html={millageScatter} />
+    <p class="note">
+      {/* `{" "}` before every expression that opens a line: Astro trims the newline between text
+          and an adjacent expression exactly as JSX does, and "for188 of 609" is what that looks
+          like. The e2e suite scans every route for the tag-boundary form of this and cannot see
+          this one, because it leaves no tag behind. */}
+      A district on the line is one the factors account for exactly. <strong>They do, for{" "}
+      {millage.exact} of {millage.total}</strong> — and where they do is the part worth stating:{" "}
+      {millage.floorExact} of the {millage.atFloor} districts at the twenty-mill floor land on the
+      line, against {millage.aboveExact} of the {millage.aboveFloor} above it. At the floor the
+      reduction factors have stopped operating and there is nothing left to predict; above it they
+      are what sets the rate, and that is where the model is approximate.
+    </p>
+    <p class="note">
+      The departures are almost all in one direction.{" "}
+      {millage.over} districts charge more than the
+      factors predict by over half a mill and {millage.under} charge less — which is the asymmetry
+      the factors themselves imply, since they reduce existing levies on existing property and
+      know nothing of a levy passed since or a building put up since. Each district's own page
+      says which of the two its residual is consistent with; this repository does not hold the levy
+      histories that would settle it.
+    </p>
+  </div>
+
+  <div class="card" id="forecast-range" data-part="forecast-range">
+    <h2><SectionAnchor id="forecast-range" />Why the forecast leads with a range</h2>
     <p class="note">
       A forecast rendered as "$7.13B (±3.4%)" is read as $7.13B. The interval becomes a disclaimer
       the eye skips, which is worse than showing no interval at all, because it lends a forecast
@@ -320,8 +402,8 @@ const span = denominatorSpan(bundle, "meal_program");
     </p>
   </div>
 
-  <div class="card">
-    <h2>Provenance</h2>
+  <div class="card" id="provenance" data-part="provenance">
+    <h2><SectionAnchor id="provenance" />Provenance</h2>
     <p class="note">{bundle.provenance}</p>
     <div class="scroll">
       <table class="prose">
@@ -359,8 +441,8 @@ const span = denominatorSpan(bundle, "meal_program");
     </p>
   </div>
 
-  <div class="card">
-    <h2>What is not here</h2>
+  <div class="card" id="not-here" data-part="not-here">
+    <h2><SectionAnchor id="not-here" />What is not here</h2>
     <div class="scroll">
       <table class="prose">
         <tbody>
@@ -417,8 +499,8 @@ const span = denominatorSpan(bundle, "meal_program");
     </div>
   </div>
 
-  <div class="card">
-    <h2>Checking it yourself</h2>
+  <div class="card" id="checking-it-yourself" data-part="checking-it-yourself">
+    <h2><SectionAnchor id="checking-it-yourself" />Checking it yourself</h2>
     <p class="note">
       Everything here is reproducible from the repository. The feed is regenerated with one
       command, the site is built with a second, and continuous integration diffs the committed feed

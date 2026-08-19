@@ -13,6 +13,7 @@ import { loadFeed } from "../lib/feed.ts";
 import { count, money } from "../lib/format.ts";
 import * as routes from "../lib/routes.ts";
 import { yearChip } from "../lib/year.ts";
+import SectionAnchor from "../components/SectionAnchor.astro";
 
 const { bundle } = loadFeed();
 const all = counties(bundle.districts);
@@ -37,7 +38,7 @@ const measurable = all.filter((c) => c.valuationRatio != null);
     counties have districts three or more times apart on the tax base each pupil stands on.
   </p>
 
-  <div class="card">
+  <div class="card" id="peer-group" data-part="peer-group">
     <p class="note">
       A county here is a <strong>peer group, not a boundary</strong>. The department attributes each
       district to exactly one county; Ohio school district lines follow historical township lines
@@ -46,8 +47,8 @@ const measurable = all.filter((c) => c.valuationRatio != null);
     </p>
   </div>
 
-  <div class="card">
-    <h2>Every county<Fragment set:html={yearChip("formula")} /></h2>
+  <div class="card" id="roster" data-part="roster">
+    <h2><SectionAnchor id="roster" />Every county<Fragment set:html={yearChip("formula")} /></h2>
     <div class="scroll"><table>
       <thead><tr>
         <th>County</th><th class="tnum">Districts</th><th class="tnum">Pupils</th>

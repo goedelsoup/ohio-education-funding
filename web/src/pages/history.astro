@@ -108,7 +108,7 @@ const appropriationBase = bundle.deflator
         <Fragment set:html={renderProvenance(bundle)} />
         <Fragment set:html={renderRevenueMix(history)} />
 
-        <BasisToggle id="history-basis" base={base}>
+        <BasisToggle id="history-basis" section="equity-gap" base={base}>
           <Fragment
             slot="nominal"
             set:html={renderEqualization(history, bundle.deflator, base, "nominal")}
@@ -134,7 +134,7 @@ const appropriationBase = bundle.deflator
     constant dollars would be the editorial claim the component declines to make. The card's own
     prose carries the point instead.
   */}
-  <BasisToggle id="appropriation-basis" base={appropriationBase}>
+  <BasisToggle id="appropriation-basis" section="appropriations" base={appropriationBase}>
     <Fragment
       slot="nominal"
       set:html={renderAppropriations(appropriations, bundle.deflator, appropriationBase, "nominal")}

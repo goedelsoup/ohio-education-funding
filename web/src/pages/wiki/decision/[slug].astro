@@ -27,6 +27,7 @@ import Base from "../../../layouts/Base.astro";
 import { type Decision, FROM_DECISION, loadCorpus } from "../../../lib/corpus.ts";
 import { markCorrections, renderProse, summarize } from "../../../lib/prose.ts";
 import * as routes from "../../../lib/routes.ts";
+import SectionAnchor from "../../../components/SectionAnchor.astro";
 
 export function getStaticPaths() {
   return loadCorpus().decisions.map((decision) => ({
@@ -71,12 +72,12 @@ const total = corrected.reduce((sum, section) => sum + section.corrections, 0);
     }
   </p>
 
-  <div class="card prose-body lede"><Fragment set:html={summary} /></div>
+  <div class="card prose-body lede" id="summary" data-part="summary"><Fragment set:html={summary} /></div>
 
   {
     total > 0 && (
-      <div class="card correction-index">
-        <h2>
+      <div class="card correction-index" id="corrections" data-part="corrections">
+        <h2><SectionAnchor id="corrections" />
           {total} {total === 1 ? "claim in this record has" : "claims in this record have"} been
           withdrawn or superseded
         </h2>
@@ -101,7 +102,7 @@ const total = corrected.reduce((sum, section) => sum + section.corrections, 0);
   {
     sections.map((section) => (
       <div class="card" id={section.name}>
-        <h2>{section.label}</h2>
+        <h2><SectionAnchor id={section.name} />{section.label}</h2>
         <div
           class="prose-body"
           set:html={section.html.replace(
@@ -113,8 +114,8 @@ const total = corrected.reduce((sum, section) => sum + section.corrections, 0);
     ))
   }
 
-  <div class="card">
-    <h2>Cited by</h2>
+  <div class="card" id="cited-by" data-part="cited-by">
+    <h2><SectionAnchor id="cited-by" />Cited by</h2>
     {
       decision.citedBy.length === 0 ? (
         <p class="note">

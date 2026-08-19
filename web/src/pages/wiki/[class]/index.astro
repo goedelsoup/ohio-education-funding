@@ -11,6 +11,7 @@ import Base from "../../../layouts/Base.astro";
 import { loadCorpus } from "../../../lib/corpus.ts";
 import { renderProse, summarize } from "../../../lib/prose.ts";
 import * as routes from "../../../lib/routes.ts";
+import SectionAnchor from "../../../components/SectionAnchor.astro";
 
 export function getStaticPaths() {
   return loadCorpus().classes.map((entry) => ({
@@ -38,10 +39,10 @@ const description = await renderProse(entry.description, entry.className);
     }
   </p>
 
-  <div class="card prose-body"><Fragment set:html={description} /></div>
+  <div class="card prose-body" id="description" data-part="description"><Fragment set:html={description} /></div>
 
-  <div class="card">
-    <h2>Nodes</h2>
+  <div class="card" id="nodes" data-part="nodes">
+    <h2><SectionAnchor id="nodes" />Nodes</h2>
     <div class="scroll">
       <table class="prose">
         <tbody>
@@ -62,8 +63,8 @@ const description = await renderProse(entry.description, entry.className);
 
   {
     entry.properties.length > 0 && (
-      <div class="card">
-        <h2>Properties</h2>
+      <div class="card" id="properties" data-part="properties">
+        <h2><SectionAnchor id="properties" />Properties</h2>
         <p class="note">What a {entry.label.toLowerCase()} may carry.</p>
         <div class="scroll">
           <table class="prose">
@@ -93,8 +94,8 @@ const description = await renderProse(entry.description, entry.className);
 
   {
     entry.edges.length > 0 && (
-      <div class="card">
-        <h2>Relationships</h2>
+      <div class="card" id="relationships" data-part="relationships">
+        <h2><SectionAnchor id="relationships" />Relationships</h2>
         <p class="note">
           The edges this class may enter into. <em>Out</em> is declared by the node itself; <em>in</em>{" "}
           is declared by the node at the other end.

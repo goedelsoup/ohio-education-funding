@@ -14,6 +14,7 @@ import Base from "../../../layouts/Base.astro";
 import { FROM_CATALOG, loadCorpus } from "../../../lib/corpus.ts";
 import { renderProse } from "../../../lib/prose.ts";
 import * as routes from "../../../lib/routes.ts";
+import SectionAnchor from "../../../components/SectionAnchor.astro";
 
 export function getStaticPaths() {
   return loadCorpus().sources.map((source) => ({
@@ -46,10 +47,10 @@ const body = await renderProse(source.body, FROM_CATALOG);
     }
   </p>
 
-  <div class="card prose-body"><Fragment set:html={body} /></div>
+  <div class="card prose-body" id="record" data-part="record"><Fragment set:html={body} /></div>
 
-  <div class="card">
-    <h2>Cited by</h2>
+  <div class="card" id="cited-by" data-part="cited-by">
+    <h2><SectionAnchor id="cited-by" />Cited by</h2>
     {
       source.citedBy.length === 0 ? (
         <p class="note">

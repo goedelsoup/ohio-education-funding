@@ -32,6 +32,7 @@
 import { escapeHtml } from "./format.ts";
 import type { AppropriationLine } from "./types.ts";
 import { yearChip } from "./year.ts";
+import { anchor } from "./section.ts";
 
 /** Live lines, oldest establishing act first; undated lines last. */
 export function byAge(lines: AppropriationLine[]): AppropriationLine[] {
@@ -74,8 +75,8 @@ export function renderLineOrigins(lines: AppropriationLine[]): string {
   const oldest = dated[0];
 
   return `
-    <div class="card" data-part="line-origins">
-      <h2>What the budget is made of${yearChip("appropriations")}</h2>
+    <div class="card" id="line-origins" data-part="line-origins">
+      <h2>${anchor("line-origins")}What the budget is made of${yearChip("appropriations")}</h2>
       <p class="note">The Department of Education and Workforce is funded through
         ${live.length} live appropriation lines${
           discontinued > 0

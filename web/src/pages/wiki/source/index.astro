@@ -31,7 +31,7 @@ const uncited = ranked.filter((s) => s.citedBy.length === 0).length;
     single hop{uncited > 0 ? `; ${uncited} are not yet cited by any node` : ""}.
   </p>
 
-  <div class="card">
+  <div class="card" id="records" data-part="records">
     <div class="scroll">
       <table class="prose">
         <thead>

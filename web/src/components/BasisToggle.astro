@@ -16,17 +16,32 @@
  * from a click handler; a reader without JavaScript got the nominal view and a dead button.
  *
  * `id` must be unique within the page: it names the radio group and both labels point at it.
+ *
+ * # Why the section address is on the scope and not on the card
+ *
+ * Both panels are the same card rendered twice, so both carried the same `id` — `#actuals` was on
+ * every `/district/*\/finances` page twice, and a browser sent to it scrolls to whichever came
+ * first in the document, which is the nominal one whether or not that is the panel the reader has
+ * selected. Nothing reported this: the check that reads the built site collected each page's ids
+ * into a `Set`, where a duplicate is indistinguishable from the single occurrence it hides behind.
+ *
+ * So the address belongs one level up. `#actuals` names *the section*, which is one section shown
+ * two ways, and the basis is a view of it rather than a different thing to link to. The panels
+ * keep their headings and their anchors; the anchors point here.
  */
 interface Props {
+  /** Names the radio group. Both labels point at it, so it must be unique within the page. */
   id: string;
+  /** The section these two panels are, from `SECTIONS` in `src/lib/routes.ts`. */
+  section: string;
   /** The year real figures are denominated in, for the label. */
   base: number | null;
 }
 
-const { id, base } = Astro.props;
+const { id, section, base } = Astro.props;
 ---
 
-<div class="basis-scope">
+<div class="basis-scope" id={section} data-part={section}>
   <input class="vh" type="radio" name={id} id={`${id}-nominal`} data-basis="nominal" checked />
   <input class="vh" type="radio" name={id} id={`${id}-real`} data-basis="real" />
   <div class="basis" role="group" aria-label="Dollar basis">
