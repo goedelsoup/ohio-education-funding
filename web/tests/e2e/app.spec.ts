@@ -363,6 +363,19 @@ const ROUTES_WITH_FIGURES = [
      * The check is deliberately narrow: a letter immediately against an inline tag boundary. A
      * tag against punctuation is normal — `<strong>219</strong>,` — and so is a tag against
      * another tag.
+     *
+     * # This is half the defect, and the other half is in the unit suite
+     *
+     * The pattern above needs a tag to match on. The same trimming with no tag involved — prose on
+     * one line and `{count(…)}` opening the next — renders `model.294` as a single text node, and
+     * nothing in the output distinguishes it from a sentence that meant to say that: scanning
+     * rendered text for a letter beside a digit finds 13,441 matches across 400 pages, essentially
+     * all of them `textContent` running across a table cell.
+     *
+     * So that half is checked at the source instead, in `tests/unit/fusion.spec.ts`, which had six
+     * of them live when it was written. The two are complements and neither subsumes the other:
+     * this one sees defects the source scan cannot infer, in components and interpolated strings;
+     * that one sees the shape no rendered output records.
      */
     const fused: string[] = [];
     for (const route of ROUTES_WITH_FIGURES) {

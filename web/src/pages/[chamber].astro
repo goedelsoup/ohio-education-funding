@@ -61,7 +61,7 @@ const senateWhole = bundle.senate_districts.reduce((a, h) => a + h.districts_who
       One thing about them is exact: each school district's shares sum to one, so these {
         count(seats.length)
       } rows add to {money(total)}, the statewide total, to the cent.
-      {chamber === "senate"
+      {" "}{chamber === "senate"
         ? `And the Senate view is the less approximate of the two: its seats are three times larger,
            so ${senateWhole} school districts sit wholly inside one against ${houseWhole} for the
            House.`
