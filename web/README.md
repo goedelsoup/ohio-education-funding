@@ -288,6 +288,34 @@ The quintile bar chart on `/outcomes` is gone, and its five medians are the line
 `/` is 31.8 KB → 185.5 KB and `/outcomes` 12.8 KB → 442.3 KB, which is 48.6 KB and 97.0 KB on the
 wire; repetitive SVG compresses about 4.5:1.
 
+### Colour that carries a third variable
+
+A median line says what the middle of a cloud does; colouring the dots by an ordered band says what
+the cloud is *made of*. On `/outcomes` that is the card's whole argument, drawn: the three poverty
+thirds sit at the **same** spending per need-weighted pupil — tenth percentiles within $500 of each
+other, ninetieths within $100 — and at median Performance Indexes eighteen points apart. That is
+what a −0.004 correlation looks like from the inside. Switch the denominator to enrolled pupils and
+the same three bands separate horizontally too.
+
+**Three bands and not five, and the number is measured.** A scatter is an all-pairs form — any band
+can sit beside any other, so every pair has to separate, not just adjacent ones. Five steps of the
+formula hue close to a normal-vision ΔE of **10.9**, which is two bands a full-colour reader cannot
+tell apart. Three reach 21.4 light and 21.6 dark, 20.8 / 20.2 under the worst CVD simulation. The
+ramp is ordinal — one hue, light to dark — because swapping two bands changes the meaning, and it is
+a *selected* dark ramp rather than an inversion. Its end steps sit near 2.2:1 against their surface,
+which obligates the legend those cards carry.
+
+**Where it is not worth spending.** Where the banding measure is already an axis. Banding the
+poverty-against-attainment scatter by poverty repaints the x axis as a gradient and says nothing,
+while spending the one channel a third variable could have used; the same is true of the
+wealth-neutrality chart, whose two median lines are its finding. And on `/method` a valuation
+banding turned out to be floor status in disguise — the terciles' exact-reproduction counts run
+80/68/38 against at-floor counts of 109/99/62 — so that chart takes the two-state split on the
+categorical pair instead.
+
+A banded chart drops its per-trace labels. Three of them ran across the densest part of the cloud
+saying what the legend already said.
+
 ### A model drawn against the record it is a model of
 
 `/method` had four tables and no chart, on the page whose subject is which figures here are models

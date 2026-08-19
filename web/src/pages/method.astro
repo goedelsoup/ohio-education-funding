@@ -50,6 +50,16 @@ const millage = {
   aboveExact: aboveFloor.filter(isExact).length,
   over: withMillage.filter((d) => d.millage!.residual > 0.5).length,
   under: withMillage.filter((d) => d.millage!.residual < -0.5).length,
+  /* How many districts the busiest single coordinate holds. Counted rather than asserted, because
+     it is the number that says how much the picture is hiding. */
+  stacked: (() => {
+    const at: Record<string, number> = {};
+    for (const d of withMillage) {
+      const k = `${d.millage!.predicted_rate.toFixed(2)},${d.millage!.observed_rate.toFixed(2)}`;
+      at[k] = (at[k] ?? 0) + 1;
+    }
+    return Math.max(...Object.values(at));
+  })(),
 };
 const millageScatter = renderToString(
   scatterSpec(
@@ -60,6 +70,14 @@ const millageScatter = renderToString(
       (d, predicted, observed) =>
         `${d.name}: the factors predict ${predicted.toFixed(2)} mills, Table SD-1 charges ${observed.toFixed(2)}` +
         (d.millage!.at_floor ? ", at the twenty-mill floor" : ""),
+      /*
+       * Split by floor status, which is the variable that explains the fit rather than a proxy for
+       * it. Banding by valuation instead was tried and is mostly this in disguise: the terciles'
+       * exact-reproduction counts run 80 / 68 / 38 and their at-floor counts 109 / 99 / 62, so the
+       * ramp would spend three ordinal steps re-drawing a two-state fact. Two states take the
+       * categorical pair.
+       */
+      { series: (d) => (d.millage!.at_floor ? "guarantee" : "formula") },
     ),
     {
       x: { label: "what the reduction factors predict, in mills", format: (v) => v.toFixed(0) },
@@ -352,6 +370,10 @@ const millageScatter = renderToString(
       distance between them read off the axis.
     </p>
     <div class="chartwrap" data-chart="reduction-factors" set:html={millageScatter} />
+    <div class="legend">
+      <span><i class="sw formula"></i> Above the floor — the factors set the rate</span>
+      <span><i class="sw guarantee"></i> At the twenty-mill floor — they have stopped</span>
+    </div>
     <p class="note">
       {/* `{" "}` before every expression that opens a line: Astro trims the newline between text
           and an adjacent expression exactly as JSX does, and "for188 of 609" is what that looks
@@ -363,6 +385,13 @@ const millageScatter = renderToString(
       line, against {millage.aboveExact} of the {millage.aboveFloor} above it. At the floor the
       reduction factors have stopped operating and there is nothing left to predict; above it they
       are what sets the rate, and that is where the model is approximate.
+    </p>
+    <p class="note">
+      Which the picture understates, because agreement has one coordinate and disagreement has
+      many. <strong>{millage.stacked} of the districts at the floor are the single dot at
+      (20.00, 20.00)</strong>, and the visible orange spike above it is the {millage.atFloor -
+      millage.floorExact} that the floor does not account for. Read the counts here rather than the
+      density: a scatter draws the exceptions and hides the rule whenever the rule is one value.
     </p>
     <p class="note">
       The departures are almost all in one direction.{" "}

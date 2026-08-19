@@ -30,9 +30,11 @@ import { loadFeed } from "../../src/lib/feed.ts";
 import { counties } from "../../src/lib/county.ts";
 import * as routes from "../../src/lib/routes.ts";
 import { anchor } from "../../src/lib/section.ts";
-import { medianTrace, pairs } from "../../src/lib/relationships.ts";
+import { bands, medianTrace, pairs } from "../../src/lib/relationships.ts";
 import { BOX_FROM, distributionSpec, scatterSpec } from "../../src/lib/plot/spec.ts";
 import { renderToString } from "../../src/lib/plot/ssr.ts";
+import { ORDINAL } from "../../src/lib/plot/tokens.ts";
+import type { District } from "../../src/lib/types.ts";
 import { renderSpendingByFunction } from "../../src/lib/spending.ts";
 import {
   renderChargeOff,
@@ -684,4 +686,132 @@ test("the reduction factors reproduce the floor and approximate everything else"
   const over = withMillage.filter((d) => d.millage!.residual > 0.5).length;
   const under = withMillage.filter((d) => d.millage!.residual < -0.5).length;
   expect(over).toBeGreaterThan(under * 5);
+});
+
+test("ordered bands are three, because a scatter is an all-pairs form", () => {
+  /*
+   * Quintiles are ordinal, not categorical: swapping two of them changes the meaning, so they take
+   * one hue in steps rather than the identity pair. The count is measured. On a scatter any band
+   * can sit beside any other, so every pair has to separate — five steps of this hue reach a
+   * normal-vision ΔE of 10.9 at their closest, which is two bands a full-colour reader cannot tell
+   * apart. Three reach 21.4 light and 21.6 dark.
+   */
+  expect(ORDINAL.length).toBe(3);
+  // References into the stylesheet, never literals: a build-time SVG cannot re-render on a theme
+  // switch, and `ensureThemeable` fails the build on a baked-in colour.
+  for (const step of ORDINAL) expect(step).toMatch(/^var\(--ordinal-\d\)$/);
+});
+
+test("a band is carried from the district, not recovered from a point's index", () => {
+  /*
+   * `pairs` drops whoever is missing a measure, so a point's index is not its district's index.
+   * Recovering one from the other means re-deriving that filter and trusting the two to agree —
+   * the kind of alignment `attachHovers` checks rather than assumes.
+   */
+  const districts = loadFeed().bundle.districts;
+  const byPoverty = bands(districts, (d) => d.economically_disadvantaged);
+  const points = pairs(
+    districts,
+    (d) => d.outcome?.per_equivalent_pupil,
+    (d) => d.outcome?.performance_index,
+    (d) => d.name,
+    { band: (d) => byPoverty.get(d) },
+  );
+
+  expect(points.length).toBeGreaterThan(500);
+  expect(points.every((p) => p.band != null)).toBe(true);
+  expect(new Set(points.map((p) => p.band))).toEqual(new Set([0, 1, 2]));
+
+  // A district with no poverty share is drawn without a band rather than defaulted into one.
+  const missing = pairs(
+    districts,
+    (d) => d.outcome?.per_equivalent_pupil,
+    (d) => d.outcome?.performance_index,
+    (d) => d.name,
+    { band: () => undefined },
+  );
+  expect(missing.every((p) => p.band === undefined)).toBe(true);
+});
+
+test("bands split the population evenly and keep everyone", () => {
+  const districts = loadFeed().bundle.districts;
+  const assigned = bands(districts, (d) => d.economically_disadvantaged);
+  const eligible = districts.filter((d) => d.economically_disadvantaged != null).length;
+  expect(assigned.size).toBe(eligible);
+
+  const sizes = [0, 1, 2].map((b) => [...assigned.values()].filter((v) => v === b).length);
+  expect(sizes.reduce((a, b) => a + b, 0)).toBe(eligible);
+  // The last band takes the remainder, so it is the only one that may differ, and by at most two.
+  expect(Math.max(...sizes) - Math.min(...sizes)).toBeLessThanOrEqual(2);
+
+  // And they are ordered: every district in band 0 is poorer-ranked than every district in band 2.
+  const worst = (b: number) =>
+    Math.max(
+      ...districts.filter((d) => assigned.get(d) === b).map((d) => d.economically_disadvantaged!),
+    );
+  const best = (b: number) =>
+    Math.min(
+      ...districts.filter((d) => assigned.get(d) === b).map((d) => d.economically_disadvantaged!),
+    );
+  expect(worst(0)).toBeLessThanOrEqual(best(1));
+  expect(worst(1)).toBeLessThanOrEqual(best(2));
+});
+
+test("the need-weighted denominator absorbs the poverty difference the enrolled one keeps", () => {
+  /*
+   * The finding the banded charts draw, asserted against the feed. On the weighted measure the
+   * three poverty thirds occupy the same spending range while their attainment differs; on the
+   * enrolled measure they separate on spending too. If that stopped being true, two paragraphs on
+   * `/outcomes` would be wrong and the colouring would be decoration.
+   */
+  const districts = loadFeed().bundle.districts;
+  const byPoverty = bands(districts, (d) => d.economically_disadvantaged);
+  const group = (b: number, of: (d: District) => number | null | undefined) =>
+    districts
+      .filter((d) => byPoverty.get(d) === b)
+      .map(of)
+      .filter((v): v is number => v != null)
+      .sort((x, y) => x - y);
+  const median = (v: number[]) => v[Math.floor(v.length / 2)]!;
+
+  const weighted = [0, 1, 2].map((b) => group(b, (d) => d.outcome?.per_equivalent_pupil));
+  const enrolled = [0, 1, 2].map((b) => group(b, (d) => d.outcome?.per_enrolled_pupil));
+  const scores = [0, 1, 2].map((b) => group(b, (d) => d.outcome?.performance_index));
+
+  // Attainment falls across the thirds on both charts — it is the same y axis.
+  expect(median(scores[0]!)).toBeGreaterThan(median(scores[1]!));
+  expect(median(scores[1]!)).toBeGreaterThan(median(scores[2]!));
+
+  // Weighted: the thirds sit at the same spending. Within $1,000 at the median.
+  const weightedSpread = Math.abs(median(weighted[2]!) - median(weighted[0]!));
+  expect(weightedSpread).toBeLessThan(1_000);
+
+  // Enrolled: they separate, and the poorest third spends more.
+  expect(median(enrolled[2]!)).toBeGreaterThan(median(enrolled[0]!) + 1_000);
+});
+
+test("the poverty measure has a ceiling, and it is the source's rather than this repository's", () => {
+  /*
+   * 31 districts publish exactly 100% economically disadvantaged, and the shares immediately below
+   * run 99.83% to 99.99% — a continuous approach, so this is universal certification rather than a
+   * cap applied here. It is still a ceiling: those districts span a third of the statewide
+   * Performance Index range at one value of the variable the page correlates against.
+   */
+  const districts = loadFeed().bundle.districts;
+  const shares = districts
+    .map((d) => d.economically_disadvantaged)
+    .filter((v): v is number => v != null);
+  const ceiling = shares.filter((v) => v >= 0.9999);
+  expect(ceiling.length).toBeGreaterThan(20);
+  // Nothing above 100%: a share is a share.
+  expect(Math.max(...shares)).toBeLessThanOrEqual(1);
+  // And no gap below it — the values approach the ceiling rather than piling against it.
+  const justBelow = shares.filter((v) => v > 0.99 && v < 0.9999);
+  expect(justBelow.length).toBeGreaterThan(20);
+
+  const onCeiling = districts
+    .filter((d) => (d.economically_disadvantaged ?? 0) >= 0.9999)
+    .map((d) => d.outcome?.performance_index)
+    .filter((v): v is number => v != null);
+  expect(Math.max(...onCeiling) - Math.min(...onCeiling)).toBeGreaterThan(25);
 });

@@ -20,6 +20,28 @@
   --series-formula: #2a78d6;
   --series-guarantee: #eb6834;
   --neutral-mark: #a8a79f;
+
+  /*
+   * The ordinal ramp: three steps of the formula hue, light to dark.
+   *
+   * Quintiles, terciles and any other ordered grouping are **not** the categorical pair. Swapping
+   * two of them changes the meaning, which is what makes them ordinal, and an ordinal scale takes
+   * one hue in steps so the order is visible in the colour rather than looked up in a legend.
+   *
+   * Three and not five, and the number is measured rather than chosen. A scatter is an all-pairs
+   * form — any class can sit beside any other, so every pair has to separate, not just adjacent
+   * ones — and five steps of this hue reach a normal-vision ΔE of 10.9 at their closest, which is
+   * two classes a reader with full colour vision cannot tell apart. Three reach 21.4 light and
+   * 21.6 dark, and 20.8 / 20.2 under the worst CVD simulation. The lightest step light and the
+   * darkest step dark sit near 2.2:1 against their surface, which obligates the relief every one
+   * of these charts already carries: a legend, a tooltip per mark, and the table beside it.
+   *
+   * Dark is a selected ramp rather than an inversion, exactly as the series pair is: the anchor
+   * flips, so the ramp runs dark-to-light against a dark surface.
+   */
+  --ordinal-1: #7fb0e8;
+  --ordinal-2: #2a78d6;
+  --ordinal-3: #123f75;
   --accent-rule: #c9c8c1;
 }
 
@@ -36,6 +58,9 @@
     --series-formula: #3987e5;
     --series-guarantee: #d95926;
     --neutral-mark: #6d6c64;
+    --ordinal-1: #1c528f;
+    --ordinal-2: #4a92ea;
+    --ordinal-3: #aed3f6;
     --accent-rule: #45443e;
   }
 }
@@ -51,6 +76,9 @@
   --text-muted: #96958c;
   --series-formula: #3987e5;
   --series-guarantee: #d95926;
+  --ordinal-1: #1c528f;
+  --ordinal-2: #4a92ea;
+  --ordinal-3: #aed3f6;
   --neutral-mark: #6d6c64;
   --accent-rule: #45443e;
 }
@@ -515,6 +543,12 @@ output { font-variant-numeric: tabular-nums; color: var(--text-primary); font-we
 .sw { display: inline-block; width: 10px; height: 10px; border-radius: 3px; margin-right: .35rem; vertical-align: baseline; }
 .sw.formula, .sw.gain { background: var(--series-formula); }
 .sw.guarantee, .sw.loss { background: var(--series-guarantee); }
+/* The ordinal ramp, for a chart grouping districts into ordered bands. Its legend is not
+   optional: the lightest step light and the darkest step dark sit near 2.2:1 against their
+   surface, and this is the relief that buys. */
+.sw.ordinal-1 { background: var(--ordinal-1); }
+.sw.ordinal-2 { background: var(--ordinal-2); }
+.sw.ordinal-3 { background: var(--ordinal-3); }
 
 .flags { display: flex; gap: .4rem; flex-wrap: wrap; margin-top: .9rem; }
 .flag { font-size: .76rem; padding: .2rem .5rem; border-radius: 999px; border: 1px solid var(--border); color: var(--text-secondary); background: var(--surface-2); }

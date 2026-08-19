@@ -23,7 +23,7 @@ import type { Bundle, District, OutcomeStatewide } from "./types.ts";
 import { schoolYearBefore, seriesYear, yearChip, yearChipPair, yearOf } from "./year.ts";
 import { term } from "./glossary.ts";
 import { anchor } from "./section.ts";
-import { medianTrace, pairs } from "./relationships.ts";
+import { bands, medianTrace, pairs } from "./relationships.ts";
 
 /** A correlation, signed and to three places. */
 function coefficient(v: number): string {
@@ -49,6 +49,35 @@ export function renderOutcomes(bundle: Bundle): string {
     return `<div class="card" id="no-outcome-data" data-part="no-outcome-data"><p class="note">This feed carries no outcome data.</p></div>`;
   }
   const withoutReportCard = bundle.statewide.districts - o.districts;
+
+  /*
+   * The ceiling in the poverty measure, counted rather than asserted.
+   *
+   * 30 rows of the FY2024 profile report publish exactly 1, and the shares immediately below run
+   * 0.9983 through 0.9999 — a continuous approach, not a pile-up against a cap this repository
+   * imposed. It is what universal certification produces and it is true as published. It is also a
+   * ceiling: the measure stops ordering districts there, and the correlation that leads this page
+   * is computed with them stacked at one value.
+   */
+  const onCeiling = bundle.districts.filter(
+    (d) => d.economically_disadvantaged != null && d.economically_disadvantaged >= 0.9999,
+  );
+  const ceilingScores = onCeiling
+    .map((d) => d.outcome?.performance_index)
+    .filter((v): v is number => v != null)
+    .sort((a, b) => a - b);
+  const allScores = bundle.districts
+    .map((d) => d.outcome?.performance_index)
+    .filter((v): v is number => v != null)
+    .sort((a, b) => a - b);
+  const saturated = onCeiling.length;
+  const saturatedLow = (ceilingScores[0] ?? 0).toFixed(1);
+  const saturatedHigh = (ceilingScores[ceilingScores.length - 1] ?? 0).toFixed(1);
+  const saturatedShare = pct(
+    (Number(saturatedHigh) - Number(saturatedLow)) /
+      ((allScores[allScores.length - 1] ?? 1) - (allScores[0] ?? 0)),
+    0,
+  );
 
   /*
    * The three relationships this page is about, as the pairs behind them.
@@ -82,23 +111,75 @@ export function renderOutcomes(bundle: Bundle): string {
     [povertyTrace],
   );
 
-  /** The two denominators, drawn at one size against one vertical scale so they can be compared. */
+  /*
+   * The two denominators, drawn at one size against one vertical scale so they can be compared —
+   * and banded by poverty, which is the variable neither axis carries and the one the card is
+   * about.
+   *
+   * A single median line through either cloud says what the middle does and hides what the cloud
+   * is made of. Banded, the weighted chart shows three poverty groups occupying the *same* range
+   * of spending — p10 within $500 of each other, p90 within $100 — at Performance Index medians
+   * eighteen points apart. That is what a −0.004 correlation looks like from the inside, and it is
+   * the difference between reading "the denominator absorbs the poverty difference" and seeing it.
+   *
+   * The bands are computed once, off poverty, and shared by both charts. Recomputing them per
+   * chart would let the two disagree about which districts are poor, which is the one thing a
+   * side-by-side comparison must not do.
+   */
+  const povertyBands = bands(bundle.districts, (d) => d.economically_disadvantaged);
+  const BAND_LABELS = ["least poor third", "middle third", "poorest third"];
+
   const spending = (x: (d: District) => number | null | undefined, label: string) => {
-    const points = pairs(bundle.districts, x, perf, (d, dollars, index) =>
-      `${d.name}: ${money(dollars)} ${label}, Performance Index ${index.toFixed(1)}`,
+    const points = pairs(
+      bundle.districts,
+      x,
+      perf,
+      (d, dollars, index) =>
+        `${d.name}: ${money(dollars)} ${label}, Performance Index ${index.toFixed(1)}, ${pct(d.economically_disadvantaged ?? 0, 0)} economically disadvantaged`,
+      { band: (d) => povertyBands.get(d) },
     );
+
+    // One median per band rather than one through everything: three lines that stay level
+    // together, or three that separate, is the finding either way.
+    const traces = BAND_LABELS.map((label, band) =>
+      medianTrace(
+        points.filter((p) => p.band === band).map((p) => ({ x: p.x, y: p.y })),
+        4,
+        label,
+        "formula",
+      ),
+    ).map((trace, band) => ({ ...trace, band }));
+
     return scatterSpec(
       points,
       {
         x: { label: `spending per ${label}`, format: (v) => money(v) },
         y: { label: "Performance Index", format: (v) => v.toFixed(0) },
       },
-      [medianTrace(points.map((p) => ({ x: p.x, y: p.y })), 8, "median", "formula")],
-      { height: 290 },
+      traces,
+      { height: 330 },
     );
   };
   const weightedScatter = spending((d) => d.outcome?.per_equivalent_pupil, "need-weighted pupil");
   const enrolledScatter = spending((d) => d.outcome?.per_enrolled_pupil, "enrolled pupil");
+
+  /* Stated rather than left to the eye. Read off the same banding the charts are drawn from, so a
+     regenerated bundle moves the sentence with the picture. */
+  const bandMedian = (band: number, of: (d: District) => number | null | undefined) => {
+    const values = bundle.districts
+      .filter((d) => povertyBands.get(d) === band)
+      .map(of)
+      .filter((v): v is number => v != null)
+      .sort((a, b) => a - b);
+    return values[Math.floor(values.length / 2)] ?? 0;
+  };
+  const bandMedians = [0, 1, 2].map((b) =>
+    bandMedian(b, (d) => d.outcome?.performance_index).toFixed(1),
+  );
+  const enrolledGap = Math.round(
+    bandMedian(2, (d) => d.outcome?.per_enrolled_pupil) -
+      bandMedian(0, (d) => d.outcome?.per_enrolled_pupil),
+  );
 
   return `
     <div class="tiles">
@@ -150,15 +231,31 @@ export function renderOutcomes(bundle: Bundle): string {
 
     <div class="card" id="two-denominators" data-part="two-denominators">
       <h2>${anchor("two-denominators")}The same numerator, two denominators, two answers${yearChipPair("outcome.performance", "outcome.spending", "spending")}</h2>
-      <p class="note">The same districts and the same vertical axis, twice. On the left-hand
-        measure the department divides spending by a count weighted upward for disadvantage,
-        English learners and disability; on the right it divides by the pupils actually enrolled.
-        <strong>The first cloud is flat and the second slopes.</strong></p>
+      <p class="note">The same districts and the same vertical axis, twice. Above, the department
+        divides spending by a count weighted upward for disadvantage, English learners and
+        disability; below, by the pupils actually enrolled. Each dot is shaded by the third of the
+        state its district's poverty rate falls in — the variable neither axis carries, and the one
+        both charts are really about.</p>
+      <div class="legend">
+        <span><i class="sw ordinal-1"></i> Least poor third</span>
+        <span><i class="sw ordinal-2"></i> Middle third</span>
+        <span><i class="sw ordinal-3"></i> Poorest third</span>
+      </div>
+
       <p class="note">Spending per <em>need-weighted</em> pupil, against attainment —
-        ${coefficient(o.weighted_spending_vs_performance)}:</p>
+        ${coefficient(o.weighted_spending_vs_performance)}. <strong>The three thirds sit at the
+        same spending and at different attainment</strong>: their tenth percentiles are within
+        ${money(500)} of each other and their ninetieths within ${money(100)}, while their median
+        Performance Index runs ${bandMedians[0]}, ${bandMedians[1]}, ${bandMedians[2]}. The
+        denominator has absorbed the difference between them, which is what a coefficient of
+        ${coefficient(o.weighted_spending_vs_performance)} looks like from the inside.</p>
       <div class="chartwrap" data-chart="weighted-spending">${renderToString(weightedScatter)}</div>
+
       <p class="note">Spending per <em>enrolled</em> pupil, against the same attainment —
-        ${coefficient(o.enrolled_spending_vs_performance)}:</p>
+        ${coefficient(o.enrolled_spending_vs_performance)}. The same three bands, and now they
+        separate on the horizontal axis too: the poorest third spends
+        ${money(enrolledGap)} more per enrolled pupil than the least poor. Nothing about the
+        districts changed between these two charts. Only the denominator did.</p>
       <div class="chartwrap" data-chart="enrolled-spending">${renderToString(enrolledScatter)}</div>
       <div class="scroll"><table><tbody>
         <tr><th>Spending per <em>need-weighted</em> pupil vs achievement</th>
@@ -188,7 +285,20 @@ export function renderOutcomes(bundle: Bundle): string {
       <p class="note">${withoutReportCard} of the ${count(bundle.statewide.districts)} districts
         in the funding model have no report card and are absent from everything above. They are
         the three smallest in Ohio.</p>
-    </div>`;
+          <p class="note"><strong>The poverty measure has a ceiling, and ${saturated} districts are
+        on it.</strong> The FY2024 District Profile Report publishes an economically disadvantaged
+        share of exactly 100% for them — not a value this repository caps, and not a break in the
+        distribution: the shares just below run 99.83%, 99.87%, 99.91% and so on to 99.99%. It is
+        what universal certification produces, and it is true as published.
+        <br><br>
+        It is still a ceiling. Those ${saturated} districts span
+        ${saturatedLow}–${saturatedHigh} on the Performance Index — about ${saturatedShare} of the
+        statewide range — at one value of the variable everything above is correlated against, so
+        the measure cannot order them and the ${coefficient(o.poverty_vs_performance)} above is
+        computed with them stacked. The report card publishes a second poverty share that is
+        top-coded by community eligibility and correlates at −0.734; this site uses the profile
+        report's throughout and says which wherever it matters.</p>
+</div>`;
 }
 
 /**
