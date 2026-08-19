@@ -43,7 +43,7 @@ const description =
   <p class="sub">
     {count(county.districts.length)} district{county.districts.length === 1 ? "" : "s"} ·
     {" "}{count(Math.round(county.adm))} pupils
-    {county.onGuarantee > 0 ? ` · ${count(county.onGuarantee)} on the guarantee` : ""}
+    {" "}{county.onGuarantee > 0 ? ` · ${count(county.onGuarantee)} on the guarantee` : ""}
     {county.atMillageFloor > 0 ? ` · ${count(county.atMillageFloor)} at the 20-mill floor` : ""}
     {county.valuationRatio != null ? ` · richest ${county.valuationRatio.toFixed(1)}× the poorest` : ""}
   </p>

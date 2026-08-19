@@ -312,6 +312,36 @@ The quintile bar chart on `/outcomes` is gone, and its five medians are the line
 `/` is 31.8 KB → 185.5 KB and `/outcomes` 12.8 KB → 442.3 KB, which is 48.6 KB and 97.0 KB on the
 wire; repetitive SVG compresses about 4.5:1.
 
+### The half of the fused-word defect that leaves no evidence
+
+Astro trims a newline between text and an adjacent expression, so a paragraph reflowed across lines
+silently loses a space. `7a78b40` found eleven of these live and scanned the built site for the
+pattern afterwards — but that scan matches a letter against an inline **tag boundary**, and the
+commonest form leaves no tag at all:
+
+```
+    ... in the department's FY{bundle.fiscal_year} model.
+    {count(s.on_guarantee)} are held above what the formula ...
+```
+
+renders `model.294` as one text node. **Six were live** when this was written — `model.294`,
+`guarantee;133`, `the$812.5M`, `moves$113.0M`, `about$25.2M`, `,$1.89B` — two of them shipped by
+the very commits that documented the defect.
+
+There is no signal in the output to scan for: a letter beside a digit matches **13,441** times
+across 400 pages, essentially all of it `textContent` running across a table cell. So this half is
+checked at the source, where the defect is an authoring pattern rather than a rendering one.
+
+**The rule is absolute and that is the point.** Every expression opening a line below prose needs an
+explicit `{" "}`, whether or not its own value happens to start with a separator. The exception
+cannot be checked — telling `{chamber === "senate" ? " Senate seats …"}` from
+`{millions(812_500_000).replace("+", "")}` means knowing which literal a conditional will emit — and
+the redundancy is free, because **HTML collapses whitespace**. A rule with no false-positive cost
+can afford to be blunt, and this defect has shipped seventeen times.
+
+Comments and expressions emitting markup are exempt; neither can fuse to a sentence. Verified by
+reintroducing a defect and watching it fail.
+
 ### A ratio is one number standing for two
 
 `/counties` ranked its 88 counties by richest ÷ poorest valuation per pupil and printed the ratio.

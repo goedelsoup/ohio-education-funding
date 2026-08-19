@@ -104,7 +104,7 @@ const properties = node.properties.filter((p) => p.name !== "seeded_because");
         <p class="note">
           The corpus says what {district.name} illustrates. The FY{loadFeed().bundle.fiscal_year}
           {" "}model says what it is paid: {money(district.realized_aid_per_pupil)} per pupil,
-          {district.on_guarantee ? " held there by the guarantee." : " all of it from the formula."}
+          {" "}{district.on_guarantee ? " held there by the guarantee." : " all of it from the formula."}
         </p>
         <div class="flags">
           {/* All five, in the order the district sub-navigation puts them. Property tax was

@@ -69,12 +69,12 @@ const spread = renderToString(distributionSpec(spreadValues));
     {count(house.members.length)} school district{house.members.length === 1 ? "" : "s"}
     {house.districts_wholly_inside > 0 ? `, ${count(house.districts_wholly_inside)} of them wholly inside` : ""}
     {" "}· an estimated {count(Math.round(house.adm))} pupils
-    {house.districts_on_guarantee > 0 ? ` · ${count(house.districts_on_guarantee)} on the guarantee` : ""}
+    {" "}{house.districts_on_guarantee > 0 ? ` · ${count(house.districts_on_guarantee)} on the guarantee` : ""}
   </p>
 
   <p class="note"><a href={`/${chamber}`}>All {seats.length} {label} districts</a>. Every figure
     here is apportioned from census blocks and is an estimate — see the note on that page.
-    {chamber === "senate"
+    {" "}{chamber === "senate"
       ? " Senate seats are three times larger than House seats, so more of their schools lie wholly inside them and the estimate is correspondingly tighter."
       : ""}</p>
 
@@ -116,7 +116,7 @@ const spread = renderToString(distributionSpec(spreadValues));
           <p class="note">
             Assessed valuation per pupil across the {spreadCount} districts here with a reported
             tax base, poorest on the left.
-            {spreadCount >= BOX_FROM ? " The shaded box is the middle half of them." : ""}
+            {" "}{spreadCount >= BOX_FROM ? " The shaded box is the middle half of them." : ""}
           </p>
           <div class="chartwrap" data-chart="seat-spread" set:html={spread} />
         </>
@@ -145,7 +145,7 @@ const spread = renderToString(distributionSpec(spreadValues));
       district</strong> is how much of that school district lies in this House district — 100% means
       the member speaks for all of it. <strong>Of this seat</strong> is how much of this House
       district's pupils that school district provides.
-      {partial > 0
+      {" "}{partial > 0
         ? partial === house.members.length
           ? ` Every district here also lies in other ${label} districts, so all of these pupils and all of this money are counted here only in part.`
           : ` ${count(partial)} of these ${count(house.members.length)} districts also ${partial === 1 ? "lies" : "lie"} in other House districts, so ${partial === 1 ? "its" : "their"} pupils and money are counted here only in part.`
