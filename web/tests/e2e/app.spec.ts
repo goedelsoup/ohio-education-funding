@@ -551,6 +551,21 @@ test.describe("with JavaScript disabled", () => {
   // script — or a search engine, or a text browser — gets every figure rather than an empty shell.
   test.use({ javaScriptEnabled: false });
 
+  test("the district index still shows a distribution", async ({ page }) => {
+    /*
+     * The reason the six strips are rendered at build rather than drawn on sort. A reader with no
+     * script cannot change which one is shown and does not get an empty frame either: the default
+     * is state aid per pupil, this site's central measure and the honest one for a page nobody has
+     * sorted.
+     */
+    await page.goto("/districts");
+    await expect(page.locator("#district-measures .measure:visible")).toHaveCount(1);
+    await expect(page.locator('.measure[data-measure="aid"] svg')).toBeVisible();
+    await expect(page.locator('.measure[data-measure="aid"]')).toContainText("State aid per pupil");
+    // And the table it summarises is complete, as it always was.
+    await expect(page.locator("#district-table tbody tr")).toHaveCount(609);
+  });
+
   test("the contents list is navigation, not a script", async ({ page }) => {
     // Derived at build from the rendered body, emitted as plain links. A reader with no script
     // gets the same list as everyone else, which is the whole reason it is not built on load.
@@ -2217,6 +2232,43 @@ test.describe("outside the formula", () => {
     const card = page.locator('.card[data-part="supplements"]');
     await expect(card).toContainText("just under the growth cliff");
     await expect(card).toContainText("pays on the whole roll rather than on the pupils gained");
+  });
+});
+
+test.describe("the district index shows the distribution it is filtering", () => {
+  test("one strip is shown and all six are in the document", async ({ page }) => {
+    /*
+     * Six rendered at build and one revealed by an attribute selector, which is `BasisToggle`'s
+     * trick applied to charts. The alternative was drawing one in the browser when the sort
+     * changes, which would put Observable Plot on the district index — roughly 100 KB gzipped, on
+     * a route likely to be someone's first — for the sake of a 46px strip. All six cost 4.6 KB.
+     */
+    await page.goto("/districts");
+    const measures = page.locator("#district-measures");
+    await expect(measures.locator(".measure")).toHaveCount(6);
+    await expect(measures.locator(".measure:visible")).toHaveCount(1);
+    await expect(measures).toHaveAttribute("data-measure", "aid");
+  });
+
+  test("the strip follows the column being sorted", async ({ page }) => {
+    // The sort keys and the strip keys are the same strings, so the script that reorders the table
+    // and the markup that reveals a strip cannot name different columns.
+    await page.goto("/districts");
+    for (const key of ["valuation", "poverty", "adm", "enrollment", "guarantee"]) {
+      await page.locator(`thead button[data-sort="${key}"]`).click();
+      await expect(page.locator("#district-measures")).toHaveAttribute("data-measure", key);
+      await expect(page.locator(`.measure[data-measure="${key}"]`)).toBeVisible();
+      await expect(page.locator("#district-measures .measure:visible")).toHaveCount(1);
+    }
+  });
+
+  test("sorting by name leaves the strip alone rather than blanking it", async ({ page }) => {
+    // `name` is the default sort and is not a quantity. Hiding all six would be the obvious bug.
+    await page.goto("/districts");
+    await page.locator('thead button[data-sort="poverty"]').click();
+    await page.locator('thead button[data-sort="name"]').click();
+    await expect(page.locator("#district-measures")).toHaveAttribute("data-measure", "poverty");
+    await expect(page.locator("#district-measures .measure:visible")).toHaveCount(1);
   });
 });
 

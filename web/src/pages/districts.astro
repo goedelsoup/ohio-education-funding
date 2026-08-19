@@ -15,6 +15,9 @@ import { loadFeed } from "../lib/feed.ts";
 import { count, money, pct } from "../lib/format.ts";
 import * as routes from "../lib/routes.ts";
 import { yearOf } from "../lib/year.ts";
+import { distributionSpec } from "../lib/plot/spec.ts";
+import { renderToString } from "../lib/plot/ssr.ts";
+import type { District } from "../lib/types.ts";
 
 const { bundle, alphabetical } = loadFeed();
 
@@ -35,6 +38,50 @@ const s = bundle.statewide;
 
 /** A cell whose sort key is not what it displays: dollars with separators, blanks, percentages. */
 const sortable = (value: number | null) => (value == null ? "" : String(value));
+
+/*
+ * One strip per sortable numeric column.
+ *
+ * The keys are the `data-sort` values the header buttons already carry, so the script that sorts
+ * the table and the markup that reveals a strip name the same column. `name` has no strip: it is
+ * the default sort and it is not a quantity.
+ *
+ * A district missing a measure is dropped rather than plotted at zero — three have no reported
+ * poverty share and the enrollment change needs three years of ADM.
+ */
+const MEASURES = (
+  [
+    ["adm", "Enrolled ADM", (d: District) => d.adm, (v: number) => count(Math.round(v))],
+    ["aid", "State aid per pupil", (d: District) => d.realized_aid_per_pupil, (v: number) => money(v)],
+    [
+      "guarantee",
+      "What the guarantee adds, per pupil",
+      (d: District) => (d.on_guarantee ? d.guarantee / Math.max(d.adm, 1) : null),
+      (v: number) => money(v),
+    ],
+    ["valuation", "Assessed valuation per pupil", (d: District) => d.valuation_per_pupil, (v: number) => money(v)],
+    [
+      "poverty",
+      "Economically disadvantaged share",
+      (d: District) => d.economically_disadvantaged,
+      (v: number) => pct(v, 0),
+    ],
+    ["enrollment", "Enrollment change", (d: District) => d.enrollment_change, (v: number) => pct(v, 1)],
+  ] as const
+).map(([key, label, read, format]) => {
+  const values = bundle.districts
+    .map((d) => ({ d, v: read(d) }))
+    .filter((row): row is { d: District; v: number } => row.v != null && Number.isFinite(row.v))
+    .map(({ d, v }) => ({ value: v, hover: `${d.name}: ${format(v)}` }));
+  const sorted = values.map((v) => v.value).sort((a, b) => a - b);
+  return {
+    key,
+    label,
+    chart: renderToString(distributionSpec(values)),
+    low: format(sorted[0] ?? 0),
+    high: format(sorted[sorted.length - 1] ?? 0),
+  };
+});
 ---
 
 <Base
@@ -53,6 +100,36 @@ const sortable = (value: number | null) => (value == null ? "" : String(value));
      are at the minimum state share. The median district has lost{" "}
     {pct(s.median_millage_reduction, 0)} of the millage its voters approved to H.B. 920.
   </p>
+
+  {/*
+      What the column you are sorting by looks like across all 609.
+    *
+    * Six strips rendered at build and one shown, exactly as `BasisToggle` renders both dollar
+    * bases and lets a sibling selector choose — see `app.css`. The alternative was drawing one in
+    * the browser when the sort changes, which would put Observable Plot on this page for the sake
+    * of a 46px strip: roughly 100 KB gzipped, on the route most likely to be someone's first.
+    *
+    * So the reader with no script gets the aid distribution, which is this site's central measure
+    * and the honest default for a page that has not been sorted; the reader with script gets the
+    * strip following their sort. Nothing here needs script to be complete.
+  */}
+  <div class="measures" id="district-measures" data-measure="aid">
+    {
+      MEASURES.map((m) => (
+        <div class="measure" data-measure={m.key}>
+          <p class="note">
+            {m.label} across all {count(s.districts)} districts. The shaded box is the middle half;
+            the dots past the whiskers are districts of their own.
+          </p>
+          <div class="chartwrap" set:html={m.chart} />
+          <div class="scale">
+            <span>{m.low}</span>
+            <span>{m.high}</span>
+          </div>
+        </div>
+      ))
+    }
+  </div>
 
   <form class="filters" id="district-filters" role="search">
     <div class="field">
