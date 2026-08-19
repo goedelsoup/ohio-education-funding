@@ -1,0 +1,97 @@
+/**
+ * The relationships, as points rather than as coefficients.
+ *
+ * # What this module is for
+ *
+ * Ten correlation coefficients were rendered on this site as numbers in two-column tables, on
+ * cards whose subject was the relationship the coefficient summarises. This turns the pairs behind
+ * them into something a reader can look at. Nothing here computes a new figure: it selects two
+ * fields per district and takes medians of them, which is the same arithmetic `povertyQuintiles`
+ * and `guaranteeRateByQuintile` already do for the bar charts.
+ *
+ * # Why there is no regression in this file
+ *
+ * A fitted line is a model, and this repository has one rule about models: they live in `crates/`,
+ * they are pure and deterministic, and the build checks them against reference scenarios before
+ * the site is allowed to render. The README states it as "one thing here is computed, and it is
+ * the base cost". A least-squares line drawn from 606 points in the web layer would be a second
+ * computed thing with nothing behind it, and it would sit on the page looking exactly as
+ * authoritative as the checked ones.
+ *
+ * A **median per bin** is not that. It describes the points the reader is already looking at, it
+ * asserts no functional form, and it can be checked by eye against the cloud it sits on. Where a
+ * fitted line would say more, the coefficient beside the chart is the one the crates computed and
+ * it is stated as what it is.
+ */
+
+import type { ScatterPoint, Trace } from "./chart.ts";
+import type { District } from "./types.ts";
+
+/**
+ * The districts carrying both measures, as points.
+ *
+ * A district missing either one is dropped rather than defaulted: three districts have no report
+ * card and three no reported poverty share, and a zero for a missing Performance Index would put
+ * six dots on the floor of a chart about attainment.
+ */
+export function pairs(
+  districts: District[],
+  x: (d: District) => number | null | undefined,
+  y: (d: District) => number | null | undefined,
+  hover: (d: District, x: number, y: number) => string,
+  series?: (d: District) => "formula" | "guarantee",
+): ScatterPoint[] {
+  const points: ScatterPoint[] = [];
+  for (const d of districts) {
+    const xv = x(d);
+    const yv = y(d);
+    if (xv == null || yv == null || !Number.isFinite(xv) || !Number.isFinite(yv)) continue;
+    points.push({
+      x: xv,
+      y: yv,
+      hover: hover(d, xv, yv),
+      ...(series ? { series: series(d) } : {}),
+    });
+  }
+  return points;
+}
+
+/**
+ * The median of each equal-count bin of the x axis, as a line.
+ *
+ * Equal-count and not equal-width, because every measure here is skewed — assessed valuation per
+ * pupil runs from $79k to $1.35M against a median of $248k — and equal-width bins would put two
+ * thirds of the districts in the first bin and one district in the last. The existing quintile
+ * bar charts bin the same way for the same reason.
+ *
+ * The x of each point is the bin's own median x rather than its midpoint, so the line is drawn
+ * where the districts are rather than where the bin edges happen to fall.
+ */
+export function medianTrace(
+  values: { x: number; y: number }[],
+  bins: number,
+  label: string,
+  series: "formula" | "guarantee",
+): Trace {
+  const sorted = [...values].sort((a, b) => a.x - b.x);
+  const points: { x: number; y: number }[] = [];
+
+  for (let i = 0; i < bins; i += 1) {
+    // The last bin takes the remainder, so integer division drops no district — the same rule
+    // `povertyQuintiles` and `wealthQuintiles` use.
+    const group = sorted.slice(
+      Math.floor((i * sorted.length) / bins),
+      i === bins - 1 ? sorted.length : Math.floor(((i + 1) * sorted.length) / bins),
+    );
+    if (group.length === 0) continue;
+    points.push({ x: median(group.map((v) => v.x)), y: median(group.map((v) => v.y)) });
+  }
+
+  return { label, series, points };
+}
+
+/** The middle value. Local, and deliberately the same lower-median every quintile helper here uses. */
+function median(values: number[]): number {
+  const sorted = [...values].sort((a, b) => a - b);
+  return sorted[Math.floor(sorted.length / 2)] ?? 0;
+}

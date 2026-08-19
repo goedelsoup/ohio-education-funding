@@ -17,6 +17,7 @@ import { money, pct } from "../lib/format.ts";
 import { currentFormulaAid, currentRealizedAid } from "../lib/policy.ts";
 import * as routes from "../lib/routes.ts";
 import type { Panel, PanelDistrict } from "../lib/types.ts";
+import { anchor } from "../lib/section.ts";
 
 /**
  * A series' label from the panel the browser fetched, or nothing if the feed omits the block.
@@ -156,8 +157,8 @@ function render(panel: Panel, left: PanelDistrict, right: PanelDistrict): void {
   </tr>`;
 
   out.innerHTML = `
-    <div class="card">
-      <h2>Side by side</h2>
+    <div class="card" id="comparison" data-part="comparison">
+      <h2>${anchor("comparison")}Side by side</h2>
       <div class="scroll"><table>
         <thead>${head}</thead>
         <tbody>${rows}${flags}</tbody>
@@ -174,7 +175,7 @@ async function start(): Promise<void> {
   if (!a || !b || !out) return;
   const response = await fetch(`${import.meta.env.BASE_URL}data/panel.json`);
   if (!response.ok) {
-    out.innerHTML = `<div class="card err"><p>Could not load the panel (HTTP ${response.status}).</p></div>`;
+    out.innerHTML = `<div class="card err" id="panel-unreachable" data-part="panel-unreachable"><p>Could not load the panel (HTTP ${response.status}).</p></div>`;
     return;
   }
   const panel = (await response.json()) as Panel;

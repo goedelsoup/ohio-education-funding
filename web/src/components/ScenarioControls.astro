@@ -14,6 +14,7 @@
  */
 import { DEFAULT_HORIZON_YEARS } from "../lib/scenario.ts";
 import { pct } from "../lib/format.ts";
+import SectionAnchor from "./SectionAnchor.astro";
 
 interface Props {
   /** The minimum state share the published model was computed under. */
@@ -76,7 +77,7 @@ const SLIDERS = [
 ---
 
 <div class="card" id="levers" data-part="levers">
-  <h2>Levers</h2>
+  <h2><SectionAnchor id="levers" />Levers</h2>
   <form id="scenario-controls">
     <div class="levers">
       <div class="lever">

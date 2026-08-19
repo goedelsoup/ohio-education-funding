@@ -101,8 +101,10 @@ body {
 @media (min-width: 1000px) { :root { --sticky-chrome: 87px; } }
 
 /* Every section a fragment can name. Scoped rather than `[id]` so a form control or a chart's
-   internal id does not acquire a scroll offset it has no use for. */
-.card[id], h3[id] { scroll-margin-top: calc(var(--sticky-chrome) + .75rem); }
+   internal id does not acquire a scroll offset it has no use for. `.basis-scope` is in the list
+   because a section shown in two dollar bases is addressed on the scope holding both panels
+   rather than on either of them. */
+.card[id], .basis-scope[id], h3[id] { scroll-margin-top: calc(var(--sticky-chrome) + .75rem); }
 
 /* The site chrome. Sticky, because the district sub-navigation below it is how a reader moves
    between the five views of one district and a long finances table should not strand them. */
@@ -328,8 +330,45 @@ h3 { font-size: .82rem; margin: 1.4rem 0 .6rem; color: var(--text-secondary); fo
 .card > h2 {
   display: flex;
   align-items: baseline;
-  justify-content: space-between;
-  gap: .75rem;
+  gap: .4rem;
+}
+/*
+ * The chip is pinned to the far end rather than won there by `space-between`.
+ *
+ * With two items in the row — a title and a chip — those are the same layout. They stop being the
+ * same the moment a heading carries three, which every heading now does: the section anchor is a
+ * flex item too, and `space-between` on three items spreads the *title* into the middle of the
+ * card. `margin-left: auto` says what was always meant, which is that the chip goes to the end and
+ * everything else stays where it started.
+ */
+.card > h2 > .year-chip { margin-left: auto; }
+
+/*
+ * The address of a section, as something a reader can see and click.
+ *
+ * Muted, small, and permanently visible. The convention elsewhere is to reveal this on hover,
+ * which is exactly what the `.year-chip` note below objects to about `title`: a hover-only
+ * affordance does not exist on a touch screen and does not exist for a keyboard reader until
+ * focus lands on it by accident. This stylesheet already carries one permanently visible muted
+ * annotation on every heading, and the second costs the design nothing the first did not.
+ *
+ * `flex: none` so it never absorbs the row's slack, and it darkens rather than underlines on
+ * hover — an underline here reads as a mis-set heading rather than as a link.
+ */
+.section-anchor {
+  flex: none;
+  color: var(--text-muted);
+  font-weight: 400;
+  text-decoration: none;
+  transition: color .12s ease;
+}
+.section-anchor:hover { color: var(--text-primary); }
+/* Never hidden on focus: this is how a keyboard reader finds a section address at all. */
+.section-anchor:focus-visible {
+  color: var(--text-primary);
+  outline: 2px solid var(--series-formula);
+  outline-offset: 2px;
+  border-radius: 3px;
 }
 .year-chip {
   flex: none;
@@ -480,6 +519,52 @@ output { font-variant-numeric: tabular-nums; color: var(--text-primary); font-we
 .flags { display: flex; gap: .4rem; flex-wrap: wrap; margin-top: .9rem; }
 .flag { font-size: .76rem; padding: .2rem .5rem; border-radius: 999px; border: 1px solid var(--border); color: var(--text-secondary); background: var(--surface-2); }
 
+/*
+ * What is on this page, above the sections it lists.
+ *
+ * `contents.ts` chooses the entries and says why it is a list rather than the pills used
+ * elsewhere; the list is absent below four of them, because a list of three is longer than what it
+ * lists. This is apparatus rather than content, so it carries no card: a boxed panel at the top of
+ * every page would push the first real figure below the fold on a laptop, and on a fifteen-section
+ * corpus node it would be the whole first screen.
+ *
+ * `column-width` and not a column count, so the columns follow the width the page has. One at
+ * phone widths, two on a laptop, three on the wide routes — with no breakpoint knowing about it.
+ */
+.contents { margin: 1.2rem 0 0; }
+.contents-label {
+  margin: 0 0 .45rem;
+  font-size: .72rem;
+  font-weight: 600;
+  letter-spacing: .06em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+}
+.contents ul {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  columns: 17rem auto;
+  column-gap: 2rem;
+}
+.contents li {
+  /* Never split an entry across the column break: half a heading at the foot of one column and
+     half at the head of the next is unreadable as either. */
+  break-inside: avoid;
+  margin: 0 0 .3rem;
+  font-size: .86rem;
+  line-height: 1.35;
+}
+.contents a {
+  color: var(--text-secondary);
+  text-decoration: none;
+  border-bottom: 1px solid transparent;
+}
+.contents a:hover {
+  color: var(--text-primary);
+  border-bottom-color: var(--border);
+}
+
 /* What the aid-source card's flag pills became. A pill holds a noun phrase and nothing else, and
    "At the minimum state share" is a fact about 138 districts that a reader who does not already
    know the plan cannot get from to what it means for theirs. These carry the consequence, so they
@@ -511,9 +596,13 @@ td { text-align: right; font-variant-numeric: tabular-nums; }
 tbody tr:last-child th, tbody tr:last-child td { border-bottom: 0; }
 
 .strip-row { margin-bottom: 1rem; }
-.strip-head { display: flex; justify-content: space-between; font-size: .86rem; }
-.strip { position: relative; height: 8px; border-radius: 4px; background: var(--surface-2); margin: .4rem 0 .3rem; }
-.marker { position: absolute; top: -3px; width: 3px; height: 14px; border-radius: 2px; background: var(--text-primary); }
+.strip-head { display: flex; justify-content: space-between; font-size: .86rem; gap: 1rem; }
+/* The percentile rides with the value it describes. Centred under the box it read as a label
+   on the middle of the axis, which is the one place the district being described is not. */
+.strip-head .n { margin-left: .45rem; font-weight: 400; }
+/* The flat strip this replaced is gone — see `distributionSpec`. What is left is the frame the
+   box plot sits in: the label and value above it, the scale below. */
+.strip-row .chartwrap { margin: .1rem 0 .1rem; }
 .scale { display: flex; justify-content: space-between; font-size: .74rem; color: var(--text-muted); }
 
 /*

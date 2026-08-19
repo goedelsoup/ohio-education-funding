@@ -34,6 +34,7 @@ import * as routes from "./routes.ts";
 import type { District, OutcomeStatewide, SpendingByFunction } from "./types.ts";
 import { yearChip, yearOf } from "./year.ts";
 import { term } from "./glossary.ts";
+import { anchor } from "./section.ts";
 
 /** The named functions, largest first, with what each covers. */
 function functions(s: SpendingByFunction): { label: string; value: number; note?: string }[] {
@@ -75,7 +76,7 @@ export function renderSpendingByFunction(d: District): string {
   const s = d.spending_by_function;
   if (!s) {
     return `<div class="card" id="spending-by-function" data-part="spending-by-function">
-      <h2>Where the money went</h2>
+      <h2>${anchor("spending-by-function")}Where the money went</h2>
       <p class="note">No report-card spending row is published for this district, so its operating
         expenditure cannot be broken into functions here. It is one of two in the state.</p>
     </div>`;
@@ -94,7 +95,7 @@ export function renderSpendingByFunction(d: District): string {
 
   return `
     <div class="card" id="spending-by-function" data-part="spending-by-function">
-      <h2>Where the money went${yearChip("outcome.spending")}</h2>
+      <h2>${anchor("spending-by-function")}Where the money went${yearChip("outcome.spending")}</h2>
       <div class="chartwrap" data-chart="functions">${renderToString(barSpec(bars))}</div>
 
       <div class="scroll"><table>
@@ -202,7 +203,7 @@ export function renderFederalShare(d: District, statewide: OutcomeStatewide | nu
 
   return `
     <div class="card" id="federal-share" data-part="federal-share">
-      <h2>Where the money came from${yearChip("outcome.spending")}</h2>
+      <h2>${anchor("federal-share")}Where the money came from${yearChip("outcome.spending")}</h2>
       <div class="chartwrap" data-chart="origin">${renderToString(barSpec(bars))}</div>
 
       <div class="tiles">

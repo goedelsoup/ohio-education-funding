@@ -13,6 +13,7 @@ import { districtPaths, loadFeed } from "../../../lib/feed.ts";
 import { renderDistrictOutcome, renderOutcomeContext } from "../../../lib/outcomes.ts";
 import * as routes from "../../../lib/routes.ts";
 import { yearOf } from "../../../lib/year.ts";
+import SectionAnchor from "../../../components/SectionAnchor.astro";
 
 export const getStaticPaths = districtPaths;
 
@@ -42,7 +43,7 @@ const description =
   <Fragment set:html={renderDistrictOutcome(district, bundle.statewide.outcomes)} />
 
   <div class="card" id="not" data-part="not">
-    <h2>Two mistakes this page is built to prevent</h2>
+    <h2><SectionAnchor id="not" />Two mistakes this page is built to prevent</h2>
     <div class="scroll">
       <table class="prose">
         <tbody>

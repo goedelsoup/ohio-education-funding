@@ -1,0 +1,21 @@
+---
+/**
+ * The section anchor, for the templates.
+ *
+ * Half the headings on this site are built as template literals in `src/lib/*.ts` and half are
+ * written as markup here in `src/pages/*.astro`. This renders the string the first half emits
+ * rather than restating it as markup, so there is one definition of what a section anchor is and
+ * no pair of implementations to keep in agreement — see `src/lib/section.ts` for why it looks the
+ * way it does.
+ */
+import { anchor } from "../lib/section.ts";
+
+interface Props {
+  /** The `id` of the card this heading belongs to. */
+  id: string;
+}
+
+const { id } = Astro.props;
+---
+
+<Fragment set:html={anchor(id)} />

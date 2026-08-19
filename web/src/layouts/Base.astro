@@ -8,6 +8,7 @@
  * hover layer, the theme switch, and the nominal/constant-dollar toggle on top of a page that
  * already reads correctly without them.
  */
+import { contentsOf, withContents } from "../lib/contents.ts";
 import { loadFeed } from "../lib/feed.ts";
 import { canonicalPath, og } from "../lib/routes.ts";
 import { HEIGHT, WIDTH } from "../lib/og/card.ts";
@@ -44,6 +45,14 @@ interface Props {
     | "data";
   /** Rendered above the page, before the slot. Used for the district sub-navigation. */
   wide?: boolean;
+  /**
+   * Whether this page lists its own sections above them.
+   *
+   * On by default, and skipped automatically below four of them — see `contents.ts`. Set it false
+   * for a page whose sections are not what a reader came for: `/search` and `/compare` are two
+   * controls and their own output, and a list of them is a list of the page.
+   */
+  contents?: boolean;
 }
 
 const {
@@ -51,6 +60,7 @@ const {
   description,
   section,
   wide = false,
+  contents = true,
   image = og.default(),
   imageAlt,
 } = Astro.props;
@@ -124,6 +134,19 @@ const NAV = [
 
 const checkpoints = verification.comparisons.length;
 const forecasts = verification.forecasts.length;
+
+/*
+ * The page, rendered to a string before the document is written around it.
+ *
+ * This is what lets the table of contents be read off the page rather than declared beside it —
+ * `contents.ts` explains at length why that distinction is the whole feature, and it is only
+ * available here, because the layout is the one place that holds the whole body at once. The
+ * pattern is Astro's own: render the slot, then `set:html` it in place of `<slot />`.
+ *
+ * Nothing on this site hydrates, so rendering the slot early costs nothing beyond the parse.
+ */
+const rendered = await Astro.slots.render("default");
+const body = contents ? withContents(rendered, contentsOf(rendered)) : rendered;
 ---
 
 <!doctype html>
@@ -215,7 +238,7 @@ const forecasts = verification.forecasts.length;
     </header>
 
     <main class={wide ? "wrap wide" : "wrap"}>
-      <slot />
+      <Fragment set:html={body} />
     </main>
 
     <footer class="site">

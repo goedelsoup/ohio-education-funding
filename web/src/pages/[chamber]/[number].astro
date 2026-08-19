@@ -11,6 +11,9 @@ import { loadFeed } from "../../lib/feed.ts";
 import { count, money, pct } from "../../lib/format.ts";
 import * as routes from "../../lib/routes.ts";
 import { yearChip } from "../../lib/year.ts";
+import SectionAnchor from "../../components/SectionAnchor.astro";
+import { BOX_FROM, distributionSpec } from "../../lib/plot/spec.ts";
+import { renderToString } from "../../lib/plot/ssr.ts";
 
 export async function getStaticPaths() {
   const { bundle } = loadFeed();
@@ -33,6 +36,24 @@ const label = chamber === "house" ? "House" : "Senate";
 const statewideAid = seats.reduce((a, h) => a + h.realized_aid, 0);
 const number = Number(house.number);
 const partial = house.members.length - house.districts_wholly_inside;
+
+/*
+ * The seat's districts by tax base, drawn rather than only listed.
+ *
+ * `house.members` carries the IRNs; the valuation lives on the district records, so the two are
+ * joined here. A member whose district is not in the funding model, or which reports no valuation,
+ * is dropped rather than plotted at zero.
+ */
+const byIrn = new Map(bundle.districts.map((d) => [d.irn, d]));
+const spreadValues = house.members
+  .map((m) => byIrn.get(m.irn))
+  .filter((d): d is NonNullable<typeof d> => d != null && d.valuation_per_pupil != null)
+  .map((d) => ({
+    value: d.valuation_per_pupil!,
+    hover: `${d.name}: ${money(d.valuation_per_pupil!)} per pupil, ${money(d.realized_aid_per_pupil)} state aid per pupil`,
+  }));
+const spreadCount = spreadValues.length;
+const spread = renderToString(distributionSpec(spreadValues));
 ---
 
 <Base
@@ -57,8 +78,8 @@ const partial = house.members.length - house.districts_wholly_inside;
       ? " Senate seats are three times larger than House seats, so more of their schools lie wholly inside them and the estimate is correspondingly tighter."
       : ""}</p>
 
-  <div class="card" data-part="apportioned">
-    <h2>Apportioned funding<Fragment set:html={yearChip("formula")} /></h2>
+  <div class="card" id="apportioned" data-part="apportioned">
+    <h2><SectionAnchor id="apportioned" />Apportioned funding<Fragment set:html={yearChip("formula")} /></h2>
     <div class="scroll"><table>
       <thead><tr><th>Measure</th><th class="tnum">Estimate</th><th>What it is</th></tr></thead>
       <tbody>
@@ -79,8 +100,28 @@ const partial = house.members.length - house.districts_wholly_inside;
     </table></div>
   </div>
 
-  <div class="card" data-part="members">
-    <h2>The school districts here<Fragment set:html={yearChip("formula")} /></h2>
+  <div class="card" id="members" data-part="members">
+    <h2><SectionAnchor id="members" />The school districts here<Fragment set:html={yearChip("formula")} /></h2>
+    {
+      /*
+       * The seat's schools by the tax base each of their pupils stands on, one dot each.
+       *
+       * A seat is a peer group in the same sense a county is — the districts in it share a
+       * legislator and nothing else — and the table below it is sorted by share of the seat, which
+       * is the right order for "whose district is this" and the wrong one for "how far apart are
+       * they". Dots rather than a box: most seats hold a handful of districts.
+       */
+      spread && (
+        <>
+          <p class="note">
+            Assessed valuation per pupil across the {spreadCount} districts here with a reported
+            tax base, poorest on the left.
+            {spreadCount >= BOX_FROM ? " The shaded box is the middle half of them." : ""}
+          </p>
+          <div class="chartwrap" data-chart="seat-spread" set:html={spread} />
+        </>
+      )
+    }
     <div class="scroll"><table>
       <thead><tr>
         <th>District</th><th class="tnum">Of the district</th><th class="tnum">Of this seat</th>

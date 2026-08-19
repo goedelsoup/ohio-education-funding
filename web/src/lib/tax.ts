@@ -44,6 +44,7 @@ import type { TaxStatewide } from "./feed.ts";
 import type { District, PropertyTaxYear, Statewide } from "./types.ts";
 import { seriesYear, yearChip, yearChipPair, yearOf } from "./year.ts";
 import { term } from "./glossary.ts";
+import { anchor } from "./section.ts";
 
 /**
  * The statutory reduction-factor floor, in mills — `millage::SCHOOL_DISTRICT_FLOOR`.
@@ -92,7 +93,7 @@ export function renderTaxBase(d: District): string {
 
   return `
     <div class="card" id="tax-base" data-part="tax-base">
-      <h2>What the tax base is made of, TY${latest.tax_year}${yearChip("property_tax")}</h2>
+      <h2>${anchor("tax-base")}What the tax base is made of, TY${latest.tax_year}${yearChip("property_tax")}</h2>
       <div class="chartwrap" data-chart="tax-base">${renderToString(barSpec(bars))}</div>
       <p class="note">Total taxable value ${money(latest.total_value)}, or
         ${money(latest.value_per_pupil)} per pupil.
@@ -157,7 +158,7 @@ export function renderTaxChange(d: District, statewide: TaxStatewide): string {
 
   return `
     <div class="card" id="valuation-change" data-part="valuation-change">
-      <h2>TY${before.tax_year} to TY${after.tax_year}${yearChip("property_tax")}</h2>
+      <h2>${anchor("valuation-change")}TY${before.tax_year} to TY${after.tax_year}${yearChip("property_tax")}</h2>
       <div class="scroll"><table>
         <thead><tr>
           <th></th><th>TY${before.tax_year}</th><th>TY${after.tax_year}</th><th>Change</th>
@@ -286,7 +287,7 @@ export function renderMillage(d: District, statewide: Statewide): string {
 
   return `
     <div class="card" id="millage" data-part="millage">
-      <h2>What voters approved, and what the factors left${yearChip("millage")}</h2>
+      <h2>${anchor("millage")}What voters approved, and what the factors left${yearChip("millage")}</h2>
 
       ${
         voted == null || reduced == null
@@ -467,7 +468,7 @@ export function renderDenominators(d: District): string {
 
   return `
     <div class="card" id="denominators" data-part="denominators">
-      <h2>Two pupil counts, and why this page shows one of them${yearChipPair("formula", "profile", "profile")}</h2>
+      <h2>${anchor("denominators")}Two pupil counts, and why this page shows one of them${yearChipPair("formula", "profile", "profile")}</h2>
       <div class="scroll"><table>
         <thead><tr><th>Published by</th><th>Year</th><th class="tnum">Pupils</th>
           <th class="tnum">Value per pupil</th><th>Used for</th></tr></thead>
@@ -549,7 +550,7 @@ export function renderChargeOff(d: District, statewide: Statewide): string {
 
   return `
     <div class="card" id="charge-off" data-part="charge-off">
-      <h2>What the mechanism this replaced would charge${yearChip("formula")}</h2>
+      <h2>${anchor("charge-off")}What the mechanism this replaced would charge${yearChip("formula")}</h2>
       <p class="note">Before the Fair School Funding Plan, a district's own share of its cost was
         a flat <strong>${r.charge_off_mills.toFixed(0)} mills</strong> against its valuation —
         the same rate for every district in Ohio, whatever it could actually levy. Holding this
@@ -685,7 +686,7 @@ export function renderTaxAgainstSpending(d: District, statewide: TaxStatewide): 
 
   return `
     <div class="card" id="tax-effort" data-part="tax-effort">
-      <h2>Against what the district spends${yearChip("millage")}</h2>
+      <h2>${anchor("tax-effort")}Against what the district spends${yearChip("millage")}</h2>
       <div class="tiles">
         <div class="tile"><div class="k">Real property tax charged, TY${latest.tax_year}</div>
           <div class="v">${money(latest.real_property_taxes_charged)}</div>

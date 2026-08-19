@@ -38,6 +38,7 @@ import { pct } from "../lib/format.ts";
 import type { Panel } from "../lib/types.ts";
 import { REQUIRED_CONTRACT } from "../lib/types.ts";
 import { isForecastVerified, isVerified, verify, type Verification } from "../lib/verify.ts";
+import { anchor } from "../lib/section.ts";
 
 const $ = <T extends HTMLElement>(selector: string): T | null =>
   document.querySelector<T>(selector);
@@ -187,8 +188,8 @@ function reportFailure(verification: Verification): void {
   if (below) below.innerHTML = "";
   const out = $("#scenario-out");
   if (out) {
-    out.innerHTML = `<div class="card err" data-part="disabled">
-      <h2>The scenario builder is disabled</h2>
+    out.innerHTML = `<div class="card err" id="disabled" data-part="disabled">
+      <h2>${anchor("disabled")}The scenario builder is disabled</h2>
       <p>This page re-derives Ohio's funding formula in the browser so a slider does not need a
         round trip, and it checks that derivation against results computed by
         <code>crates/project</code> before using it. Those checks did not pass:</p>
@@ -204,8 +205,8 @@ function reportForecastFailure(panel: Panel, verification: Verification): void {
   const out = $("#projection-out");
   if (!out) return;
   if (!panel.projection) {
-    out.innerHTML = `<div class="card" data-part="projection">
-      <h2>At projected enrollment</h2>
+    out.innerHTML = `<div class="card" id="projection" data-part="projection">
+      <h2>${anchor("projection")}At projected enrollment</h2>
       <p class="note">This panel carries no projection block, so enrollment cannot be carried
         forward. The simulation above is unaffected — it runs at published enrollment.</p>
     </div>`;
@@ -223,8 +224,8 @@ function reportForecastFailure(panel: Panel, verification: Verification): void {
                 .join("; ")}</li>`,
           )
           .join("");
-  out.innerHTML = `<div class="card err" data-part="projection-disabled">
-    <h2>The projection is disabled</h2>
+  out.innerHTML = `<div class="card err" id="projection-disabled" data-part="projection-disabled">
+    <h2>${anchor("projection-disabled")}The projection is disabled</h2>
     <p>This page carries its own copy of the enrollment projection so a slider does not need a
       round trip, and checks it against forecasts computed by <code>crates/project</code> before
       drawing a band. Those checks did not pass:</p>
@@ -328,7 +329,7 @@ fetch(PANEL)
     const message = error instanceof Error ? error.message : String(error);
     const out = $("#scenario-out");
     if (out) {
-      out.innerHTML = `<div class="card err" data-part="panel-unreachable">
+      out.innerHTML = `<div class="card err" id="panel-unreachable" data-part="panel-unreachable">
         <p>Could not load <code>${escapeHtml(PANEL)}</code> (${escapeHtml(message)}).</p>
         <p class="note">Every other page on this site carries its figures in the document and is
           unaffected. This one re-runs the formula, so it needs the panel.</p>

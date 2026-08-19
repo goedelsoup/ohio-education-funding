@@ -36,6 +36,7 @@ import { renderToString } from "./plot/ssr.ts";
 import { convert, type Basis } from "./real.ts";
 import type { AppropriationYear, Deflator } from "./types.ts";
 import { yearChip } from "./year.ts";
+import { anchor } from "./section.ts";
 
 /** The years only the Catalog of Budget Line Items reaches. */
 export function fromCatalog(rows: AppropriationYear[]): number[] {
@@ -116,7 +117,7 @@ export function renderAppropriations(
 
   return `
     <div class="card" data-part="appropriations">
-      <h2>What the legislature set aside${yearChip("appropriations")}</h2>
+      <h2>${anchor("appropriations")}What the legislature set aside${yearChip("appropriations")}</h2>
       <p class="note">Every appropriation line the Department of Education and Workforce was
         given, FY${first.fiscal_year} through FY${last.fiscal_year}, in ${escapeHtml(label)}. The
         upper line is the department's whole appropriation; the lower is the two lines the funding

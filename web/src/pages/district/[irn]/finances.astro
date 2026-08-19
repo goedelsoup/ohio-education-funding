@@ -22,6 +22,7 @@ import { districtPaths, loadFeed } from "../../../lib/feed.ts";
 import { money } from "../../../lib/format.ts";
 import { baseYear } from "../../../lib/real.ts";
 import * as routes from "../../../lib/routes.ts";
+import SectionAnchor from "../../../components/SectionAnchor.astro";
 
 export const getStaticPaths = districtPaths;
 
@@ -60,14 +61,14 @@ const description = latest
   {
     district.finances.length === 0 ? (
       <div class="card" id="no-filing" data-part="no-filing">
-        <h2>No filing found</h2>
+        <h2><SectionAnchor id="no-filing" />No filing found</h2>
         <p class="note">
           No five-year forecast filing was matched to this district, so there is nothing here to
           show. Its funding model is on the <a href={routes.district(district.irn)}>dashboard</a>.
         </p>
       </div>
     ) : (
-      <BasisToggle id="finances-basis" base={base}>
+      <BasisToggle id="finances-basis" section="actuals" base={base}>
         <Fragment slot="nominal" set:html={renderActuals(bundle, district, "nominal")} />
         <Fragment slot="real" set:html={renderActuals(bundle, district, "real")} />
       </BasisToggle>
@@ -78,7 +79,7 @@ const description = latest
   <Fragment set:html={renderFederalShare(district, bundle.statewide.outcomes)} />
 
   <div class="card" id="not" data-part="not">
-    <h2>What these numbers are not</h2>
+    <h2><SectionAnchor id="not" />What these numbers are not</h2>
     <p class="note">
       They are <strong>not</strong> comparable line for line with the FY{bundle.fiscal_year}{" "}
       calculator on the <a href={routes.district(district.irn)}>dashboard</a>. State aid here is

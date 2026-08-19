@@ -16,6 +16,7 @@ import { loadFeed } from "../lib/feed.ts";
 import { count, millions } from "../lib/format.ts";
 import * as routes from "../lib/routes.ts";
 import { yearChip } from "../lib/year.ts";
+import SectionAnchor from "../components/SectionAnchor.astro";
 
 const { bundle, forecastable } = loadFeed();
 const s = bundle.statewide;
@@ -42,8 +43,8 @@ const meta = bundle.projection;
     What every lever here holds fixed. Placed above the controls rather than below the results,
     because it is a limit on what the reader is about to do and not a footnote on what they got.
   */}
-  <div class="card" data-part="held-fixed">
-    <h2>What these levers hold fixed, and one they deliberately do not<Fragment set:html={yearChip("formula")} /></h2>
+  <div class="card" id="held-fixed" data-part="held-fixed">
+    <h2><SectionAnchor id="held-fixed" />What these levers hold fixed, and one they deliberately do not<Fragment set:html={yearChip("formula")} /></h2>
     <p class="note">
       Ohio's formula contains statewide constants — the average base cost per pupil, the statewide
       poverty share, the median weighted wealth — that are computed once over all districts. The
@@ -94,8 +95,8 @@ const meta = bundle.projection;
     />
 
     <noscript>
-      <div class="card err">
-        <h2>This is the one page that needs JavaScript</h2>
+      <div class="card err" id="needs-script" data-part="needs-script">
+        <h2><SectionAnchor id="needs-script" />This is the one page that needs JavaScript</h2>
         <p class="note">
           Every other page on this site carries its figures in the document and reads correctly
           without any script. This one re-derives Ohio's funding formula over all {

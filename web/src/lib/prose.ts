@@ -58,6 +58,7 @@
 
 import { createMarkdownProcessor } from "@astrojs/markdown-remark";
 import rehypeSanitize from "rehype-sanitize";
+import { anchor } from "./section.ts";
 
 import { resolveTarget } from "./corpus.ts";
 import { escapeHtml } from "./format.ts";
@@ -225,6 +226,34 @@ export function markCorrections(html: string): { html: string; corrections: numb
 }
 
 /**
+ * Give every heading the prose grew its own visible address.
+ *
+ * A `findings` field is written with `##` and `###` headings, and the catalog records are longer
+ * still — 248 headings across the wiki, and the processor has already given each of them an id
+ * derived from its text. So the addresses existed here before anything else on the site had them,
+ * and were the least reachable of the lot: a reader could see the heading and had no way to learn
+ * that it could be linked to.
+ *
+ * # Why this runs on the HTML rather than as a rehype plugin
+ *
+ * Same reason {@link badgeClaims} and {@link markCorrections} do, and it is not a stylistic
+ * preference: `rehype-sanitize` strips `class` and `aria-label`, so an anchor emitted inside the
+ * pipeline would arrive as a bare `<a href="#…">#</a>` with no way to style it and nothing for a
+ * screen reader to read but a number sign. Running afterwards is what lets the markup be the same
+ * markup `section.ts` emits everywhere else.
+ *
+ * The module docstring's objection to regular expressions over HTML was about finding `href`s,
+ * where the shapes are open-ended and authored by hand. This matches a tag the processor itself
+ * wrote, in the one form it writes it.
+ */
+function anchorHeadings(html: string): string {
+  return html.replace(
+    /<(h[2-6]) id="([^"]+)">/g,
+    (whole, _tag: string, id: string) => `${whole}${anchor(id)}`,
+  );
+}
+
+/**
  * Render a corpus markdown string to HTML.
  *
  * Async because the markdown processor is. Astro components can await in their frontmatter, so
@@ -240,7 +269,7 @@ export async function renderProse(markdown: string, fromClass: string): Promise<
     rehypePlugins: [rehypeSanitize],
   });
   const { code } = await processor.render(rewriteLinks(markdown, fromClass));
-  return badgeClaims(code);
+  return anchorHeadings(badgeClaims(code));
 }
 
 /**

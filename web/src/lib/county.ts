@@ -36,6 +36,9 @@ import type { District, Statewide } from "./types.ts";
 import { count, escapeHtml, money, pct } from "./format.ts";
 import * as routes from "./routes.ts";
 import { yearChip } from "./year.ts";
+import { anchor } from "./section.ts";
+import { BOX_FROM, distributionSpec } from "./plot/spec.ts";
+import { renderToString } from "./plot/ssr.ts";
 
 /** A county's districts, with the dispersion measures the page is built on. */
 export interface County {
@@ -118,8 +121,8 @@ export function counties(districts: District[]): County[] {
 function renderSpread(c: County, statewide: Statewide): string {
   if (!c.richest || !c.poorest || c.valuationRatio == null) {
     return `
-      <div class="card" data-part="spread">
-        <h2>One district${yearChip("formula")}</h2>
+      <div class="card" id="spread" data-part="spread">
+        <h2>${anchor("spread")}One district${yearChip("formula")}</h2>
         <p class="note">${escapeHtml(c.name)} County has a single district in the funding model,
           so it has no internal disparity to measure. Four of Ohio's 88 counties are in that
           position. The comparison this page is built for is between districts, so for
@@ -132,9 +135,45 @@ function renderSpread(c: County, statewide: Statewide): string {
   const poor = c.poorest;
   const gap = rich.valuation_per_pupil! - poor.valuation_per_pupil!;
 
+  /*
+   * Every district in the county, not just the two ends of it.
+   *
+   * The table below names the richest and the poorest, which is the comparison the card is built
+   * on and was also the whole of what it drew. A county has six districts at the median and
+   * thirty-one at the largest, and a pair of rows says nothing about whether the other twenty-nine
+   * are spread evenly between them or bunched at one end — which is the difference between a
+   * county with a disparity and a county with one unusual district.
+   *
+   * Dots rather than a box, because a box plot of six values is five statistics standing in for
+   * six numbers a reader could simply have been shown.
+   */
+  const dots = distributionSpec(
+    c.districts
+      .filter((d) => d.valuation_per_pupil != null)
+      .map((d) => ({
+        value: d.valuation_per_pupil!,
+        hover: `${d.name}: ${money(d.valuation_per_pupil!)} per pupil, ${money(d.realized_aid_per_pupil)} state aid per pupil`,
+      })),
+  );
+
   return `
-    <div class="card" data-part="spread">
-      <h2>The spread inside ${escapeHtml(c.name)} County${yearChip("formula")}</h2>
+    <div class="card" id="spread" data-part="spread">
+      <h2>${anchor("spread")}The spread inside ${escapeHtml(c.name)} County${yearChip("formula")}</h2>
+      ${
+        dots
+          ? `<p class="note">Every district in the county by the assessed valuation each of its
+             pupils stands on — one dot each, poorest on the left.${
+               c.districts.filter((d) => d.valuation_per_pupil != null).length >= BOX_FROM
+                 ? " The shaded box is the middle half of them."
+                 : ""
+             }</p>
+             <div class="chartwrap" data-chart="county-spread">${renderToString(dots)}</div>
+             <div class="scale">
+               <span>${money(poor.valuation_per_pupil!)}</span>
+               <span>${money(rich.valuation_per_pupil!)}</span>
+             </div>`
+          : ""
+      }
       <div class="scroll"><table>
         <thead><tr><th>District</th><th class="tnum">Valuation per pupil</th>
           <th class="tnum">State aid per pupil</th><th class="tnum">Pupils</th></tr></thead>
@@ -157,7 +196,7 @@ function renderSpread(c: County, statewide: Statewide): string {
         1,
       )} times</strong> apart on <a href="${routes.at(
         routes.districtTaxes(poor.irn),
-        routes.SECTIONS.taxBase,
+        routes.SECTIONS.district.taxBase,
       )}">the tax base each pupil stands on</a> — ${money(gap)} per pupil of assessed valuation. Every mill ${escapeHtml(poor.name)} levies raises
         ${(1 / c.valuationRatio).toFixed(2)} of what the same mill raises in
         ${escapeHtml(rich.name)}, which is the disparity <a href="${routes.wikiNode(
@@ -199,8 +238,8 @@ function renderRoster(c: County, statewide: Statewide, statewideMedianAid: numbe
   const medianAid = median(c.districts.map((d) => d.realized_aid_per_pupil));
 
   return `
-    <div class="card" data-part="roster">
-      <h2>${count(c.districts.length)} district${c.districts.length === 1 ? "" : "s"}${yearChip("formula")}</h2>
+    <div class="card" id="roster" data-part="roster">
+      <h2>${anchor("roster")}${count(c.districts.length)} district${c.districts.length === 1 ? "" : "s"}${yearChip("formula")}</h2>
       <div class="scroll"><table>
         <thead><tr>
           <th>District</th><th class="tnum">Pupils</th>

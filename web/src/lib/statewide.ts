@@ -1,7 +1,7 @@
 /** The statewide view: the three structural facts, and the one chart that shows the first. */
 
 import type { Bar } from "./chart.ts";
-import { barSpec } from "./plot/spec.ts";
+import { barSpec, scatterSpec } from "./plot/spec.ts";
 import { renderToString } from "./plot/ssr.ts";
 import { count, escapeHtml, millions, money, pct } from "./format.ts";
 import { realChange, series, type Basis } from "./real.ts";
@@ -9,6 +9,8 @@ import * as routes from "./routes.ts";
 import type { TaxStatewide } from "./feed.ts";
 import type { Bundle, District, National } from "./types.ts";
 import { yearChip, yearChipPair } from "./year.ts";
+import { anchor } from "./section.ts";
+import { medianTrace, pairs } from "./relationships.ts";
 
 /**
  * The financial actuals, statewide, in both bases.
@@ -49,8 +51,8 @@ export function renderStatewideFinances(bundle: Bundle, basis: Basis): string {
       : "nominal";
 
   return `
-    <div class="card">
-      <h2>What districts actually received, spent, and hold — ${escapeHtml(label)}${yearChipPair("formula", "finances", "held")}</h2>
+    <div class="card" data-part="finances">
+      <h2>${anchor("finances")}What districts actually received, spent, and hold — ${escapeHtml(label)}${yearChipPair("formula", "finances", "held")}</h2>
       <div class="tiles">
         <div class="tile"><div class="k">Cash held, FY${latest.fiscal_year}</div>
           <div class="v">${millions(latest.ending_cash).replace("+", "")}</div>
@@ -142,6 +144,51 @@ export function renderStatewideStructure(bundle: Bundle, tax: TaxStatewide): str
   const s = bundle.statewide;
   const bars = guaranteeRateByQuintile(bundle.districts);
 
+  /*
+   * The wealth-neutrality cloud, and the two medians through it.
+   *
+   * The dots are what districts receive, split by whether the guarantee is what they receive it
+   * under — which is the site's one genuinely two-way district split and is near enough balanced
+   * (294 against 312) that neither half is a rounding error on the other. The lines are medians
+   * per tenth of the valuation distribution: one of the formula's answer, one of the payment.
+   * Their separation is the finding, and it was previously two numbers in a table.
+   */
+  const points = pairs(
+    bundle.districts,
+    (d) => d.valuation_per_pupil,
+    (d) => d.realized_aid_per_pupil,
+    (d, valuation, aid) =>
+      `${d.name}: ${money(valuation)} valuation per pupil, ${money(aid)} state aid per pupil` +
+      (d.on_guarantee ? ", on the guarantee" : ""),
+  );
+  const withValuation = bundle.districts.filter((d) => d.valuation_per_pupil != null);
+  const realizedTrace = medianTrace(
+    withValuation.map((d) => ({ x: d.valuation_per_pupil!, y: d.realized_aid_per_pupil })),
+    10,
+    "as received",
+    "guarantee",
+  );
+  const formulaTrace = medianTrace(
+    withValuation.map((d) => ({ x: d.valuation_per_pupil!, y: d.formula_aid_per_pupil })),
+    10,
+    "the formula",
+    "formula",
+  );
+  const scatter = scatterSpec(
+    points,
+    {
+      x: { label: "assessed valuation per pupil", format: (v) => money(v), log: true },
+      y: { label: "state aid per pupil", format: (v) => money(v), log: true },
+    },
+    [formulaTrace, realizedTrace],
+  );
+  // Stated rather than left to the eye, at both ends of the wealth distribution. The gap is the
+  // subject of the paragraph under the chart and a reader should not have to measure it off a line.
+  const gapAt = (i: number) =>
+    Math.round((realizedTrace.points[i]?.y ?? 0) - (formulaTrace.points[i]?.y ?? 0));
+  const gapPoorest = gapAt(0);
+  const gapWealthiest = gapAt(realizedTrace.points.length - 1);
+
   return `
     <div class="tiles">
       <div class="tile"><div class="k">State foundation aid</div>
@@ -156,8 +203,8 @@ export function renderStatewideStructure(bundle: Bundle, tax: TaxStatewide): str
         <div class="n">of districts are funded by the guarantee</div></div>
     </div>
 
-    <div class="card">
-      <h2>Who is on the guarantee${yearChip("formula")}</h2>
+    <div class="card" id="guarantee" data-part="guarantee">
+      <h2>${anchor("guarantee")}Who is on the guarantee${yearChip("formula")}</h2>
       <p class="note">Districts grouped into fifths by assessed valuation per pupil, poorest on
         the left. The guarantee was written as transitional relief for districts losing
         students; the pattern it actually produces is a wealth gradient.</p>
@@ -166,24 +213,36 @@ export function renderStatewideStructure(bundle: Bundle, tax: TaxStatewide): str
         ${money(s.median_valuation_per_pupil)}.</p>
     </div>
 
-    <div class="card">
-      <h2>Does state aid offset property wealth?${yearChipPair("formula", "profile", "valuation")}</h2>
+    <div class="card" id="wealth-offset" data-part="wealth-offset">
+      <h2>${anchor("wealth-offset")}Does state aid offset property wealth?${yearChipPair("formula", "profile", "valuation")}</h2>
+      <p class="note">One dot per district: the assessed valuation each of its pupils stands on,
+        against the state aid each of them receives. A compensating formula slopes down to the
+        right, and this one does. The two lines are medians through ten equal-count groups of
+        districts — one of what the formula computes, one of what is actually paid. Both scales
+        are logarithmic, because valuation per pupil spans seventeen times and aid per pupil
+        thirty; on a linear axis nine districts in ten sit in the left-hand third.</p>
+      <div class="chartwrap" data-chart="wealth-offset">${renderToString(scatter)}</div>
+      <p class="note"><strong>The gap between the two lines is what the guarantee costs the
+        equalisation.</strong> It is ${money(gapPoorest)} per pupil among the least wealthy tenth
+        of districts and ${money(gapWealthiest)} among the wealthiest — the formula would pay the
+        wealthy districts least, and the guarantee is what stops it. Which districts those are is
+        the card above this one. Read as correlations against
+        valuation per pupil, the formula alone reaches
+        <strong>${s.wealth_neutrality_formula.toFixed(3)}</strong> and what districts receive
+        reaches <strong>${s.wealth_neutrality_realized.toFixed(3)}</strong>; a perfectly
+        compensating formula would be strongly negative.</p>
       <div class="scroll"><table><tbody>
         <tr><th>Aid vs. wealth — formula only</th>
             <td class="tnum">${s.wealth_neutrality_formula.toFixed(3)}</td></tr>
         <tr><th>Aid vs. wealth — as received</th>
             <td class="tnum">${s.wealth_neutrality_realized.toFixed(3)}</td></tr>
+        <tr><th>Districts drawn</th>
+            <td class="tnum">${count(points.length)}</td></tr>
       </tbody></table></div>
-      <p class="note">Correlation between assessed valuation per pupil and state aid per pupil.
-        A perfectly compensating formula would be strongly negative. The formula alone reaches
-        ${s.wealth_neutrality_formula.toFixed(3)}; what districts actually receive is
-        ${s.wealth_neutrality_realized.toFixed(3)}. <strong>The guarantee gives up part of the
-        formula's equalization</strong>, because the districts it tops up are the ones the local
-        capacity measure funds least.</p>
     </div>
 
-    <div class="card">
-      <h2>Two floors${yearChipPair("formula", "millage", "millage")}</h2>
+    <div class="card" id="two-floors" data-part="two-floors">
+      <h2>${anchor("two-floors")}Two floors${yearChipPair("formula", "millage", "millage")}</h2>
       <div class="scroll"><table><tbody>
         <tr><th>At or below the
             <a href="${routes.parameter("twenty-mill-floor")}">20-mill floor</a></th>
@@ -319,8 +378,8 @@ export function renderNational(national: National | null): string {
   ];
 
   return `
-    <div class="card">
-      <h2>Whether Ohio is unusual${yearChip("national")}</h2>
+    <div class="card" id="national" data-part="national">
+      <h2>${anchor("national")}Whether Ohio is unusual${yearChip("national")}</h2>
       <p class="note">Everything else on this site is Ohio describing itself. This is the Census
         Bureau counting every school system in the country on one set of definitions, for
         FY${national.fiscal_year} — the only figures here that can say whether what Ohio does is

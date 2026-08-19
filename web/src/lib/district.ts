@@ -12,7 +12,7 @@
  */
 
 import type { FanPoint } from "./chart.ts";
-import { barSpec, fanSpec } from "./plot/spec.ts";
+import { barSpec, distributionSpec, fanSpec } from "./plot/spec.ts";
 import { renderToString } from "./plot/ssr.ts";
 import { count, escapeHtml, money, ordinal, pct, percentileOf, signedMoney } from "./format.ts";
 import { apply, currentLaw, currentRealizedAid } from "./policy.ts";
@@ -23,11 +23,14 @@ import * as routes from "./routes.ts";
 import type { Bar } from "./chart.ts";
 import type { Bundle, District, Statewide } from "./types.ts";
 import { yearChip, yearOf } from "./year.ts";
+import { anchor } from "./section.ts";
 
 function strip(
   label: string,
   value: number | null,
   sorted: number[],
+  population: District[],
+  measure: (d: District) => number | null | undefined,
   href?: string,
 ): string {
   const named = href
@@ -35,16 +38,37 @@ function strip(
     : escapeHtml(label);
   if (value == null) return `<p class="note">${named}: not reported.</p>`;
   const p = percentileOf(sorted, value);
+
+  /*
+   * The distribution, not a flat bar with a pin in it.
+   *
+   * The bar this replaced drew the minimum at one end, the maximum at the other, and nothing in
+   * between — so a district at the 60th percentile and one at the 95th looked equally at home,
+   * when the first is in a dense middle and the second is nearly alone. These measures are the
+   * ones where that matters most: assessed valuation per pupil runs to five and a half times the
+   * median, and the top of the range is one district.
+   *
+   * The percentile stays underneath. It is the sentence a reader repeats and the box is what makes
+   * it mean something.
+   */
+  const box = distributionSpec(
+    population
+      .map((d) => ({ d, v: measure(d) }))
+      .filter((row): row is { d: District; v: number } => row.v != null)
+      .map(({ d, v }) => ({ value: v, hover: `${d.name}: ${money(v)}` })),
+    { marker: { value, label } },
+  );
+
   return `
     <div class="strip-row">
       <div class="strip-head">
         <span>${named}</span>
-        <strong class="tnum">${money(value)}</strong>
+        <strong class="tnum">${money(value)}
+          <span class="n">${ordinal(Math.round(p * 100))} percentile</span></strong>
       </div>
-      <div class="strip"><div class="marker" style="left:calc(${(p * 100).toFixed(1)}% - 1.5px)"></div></div>
+      <div class="chartwrap" data-chart="position">${renderToString(box)}</div>
       <div class="scale">
         <span>${money(sorted[0] ?? 0)}</span>
-        <span>${ordinal(Math.round(p * 100))} percentile</span>
         <span>${money(sorted[sorted.length - 1] ?? 0)}</span>
       </div>
     </div>`;
@@ -104,7 +128,7 @@ export function renderEnrollmentYears(
 
   return `
     <div class="card" id="enrollment" data-part="enrollment">
-      <h2>What a year of enrollment is worth here${yearChip("enrollment")}</h2>
+      <h2>${anchor("enrollment")}What a year of enrollment is worth here${yearChip("enrollment")}</h2>
       <div class="scroll"><table>
         <thead><tr>
           <th>Enrollment year</th><th>Enrolled ADM</th><th>State aid at that ADM</th>
@@ -276,8 +300,8 @@ export function renderActuals(bundle: Bundle, d: District, basis: Basis): string
   }));
 
   return `
-    <div class="card" id="actuals" data-part="actuals">
-      <h2>What it actually received, and what it holds${
+    <div class="card" data-part="actuals">
+      <h2>${anchor("actuals")}What it actually received, and what it holds${
         converted ? `, in FY${base} dollars` : ""
       }${yearChip("formula")}</h2>
       <div class="tiles">
@@ -442,7 +466,7 @@ export function renderAidSource(bundle: Bundle, d: District): string {
 
   return `
     <div class="card" id="aid-source" data-part="aid-source">
-      <h2>Where the state aid comes from${yearChip("formula")}</h2>
+      <h2>${anchor("aid-source")}Where the state aid comes from${yearChip("formula")}</h2>
       <div class="tiles" data-part="headline">
         <div class="tile"><div class="k">State aid, FY${bundle.fiscal_year}</div>
           <div class="v">${money(currentRealizedAid(d))}</div>
@@ -628,17 +652,24 @@ export function renderPosition(
 ): string {
   return `
     <div class="card" id="position" data-part="position">
-      <h2>Position among Ohio's ${bundle.statewide.districts} districts${yearChip("formula")}</h2>
+      <h2>${anchor("position")}Position among Ohio's ${bundle.statewide.districts} districts${yearChip("formula")}</h2>
+      <p class="note">The middle half of Ohio's districts is the shaded box, the line inside it is
+        the median, and the whiskers reach the last district within one and a half times the
+        box's width. Anything drawn past them is its own district. The coloured rule is this one.</p>
       ${strip(
         "Assessed valuation per pupil",
         d.valuation_per_pupil,
         valuations,
+        bundle.districts,
+        (other) => other.valuation_per_pupil,
         routes.metric("assessed-valuation-per-pupil"),
       )}
       ${strip(
         "Operating expenditure per pupil",
         d.operating_expenditure_per_pupil,
         expenditures,
+        bundle.districts,
+        (other) => other.operating_expenditure_per_pupil,
         routes.metric("per-pupil-operating-expenditure"),
       )}
     </div>`;
@@ -693,7 +724,7 @@ export function renderCategoricals(d: District, statewide: Statewide): string {
 
   return `
     <div class="card" id="categoricals" data-part="categoricals">
-      <h2>The categorical half, in its six parts${yearChip("formula")}</h2>
+      <h2>${anchor("categoricals")}The categorical half, in its six parts${yearChip("formula")}</h2>
       <div class="chartwrap" data-chart="categoricals">${renderToString(barSpec(bars))}</div>
 
       <div class="scroll"><table>
@@ -775,7 +806,7 @@ function renderSpecialEducation(d: District): string {
   const biggest = [...rows].sort((a, b) => b.aid - a.aid)[0];
 
   return `
-    <h3 id="special-education">Special education, by category</h3>
+    <h3 id="special-education">${anchor("special-education")}Special education, by category</h3>
     <div class="scroll"><table data-program="special-education">
       <thead><tr><th>Category</th><th class="tnum">Weight</th><th class="tnum">Pupils</th>
         <th class="tnum">Aid</th><th class="tnum">Share of pupils</th>
@@ -850,7 +881,7 @@ function renderTargetedAssistance(d: District): string {
     enrolled > 600 ? 1 : enrolled > 400 ? (0.95 * (enrolled - 400)) / 200 + 0.05 : enrolled >= 200 ? 0.05 : 0;
 
   return `
-    <h3 id="targeted-assistance">Targeted assistance, in its two tiers</h3>
+    <h3 id="targeted-assistance">${anchor("targeted-assistance")}Targeted assistance, in its two tiers</h3>
     <div class="scroll"><table data-program="targeted-assistance">
       <thead><tr><th>Step</th><th class="tnum">Value</th><th>What it is</th></tr></thead>
       <tbody>
@@ -944,7 +975,7 @@ function renderDpia(d: District): string {
       : 0;
 
   return `
-    <h3 id="dpia">Disadvantaged Pupil Impact Aid, step by step</h3>
+    <h3 id="dpia">${anchor("dpia")}Disadvantaged Pupil Impact Aid, step by step</h3>
     <div class="scroll"><table data-program="dpia">
       <thead><tr><th>Step</th><th class="tnum">Value</th><th>What it is</th></tr></thead>
       <tbody>
@@ -1019,7 +1050,7 @@ function renderGifted(d: District): string {
   const unitTotal = g.coordinator_aid + g.specialist_k8_aid + g.specialist_9_12_aid;
 
   return `
-    <h3 id="gifted">Gifted: two payments and three kinds of unit</h3>
+    <h3 id="gifted">${anchor("gifted")}Gifted: two payments and three kinds of unit</h3>
     <div class="scroll"><table data-program="gifted">
       <thead><tr><th>Component</th><th class="tnum">Units</th><th class="tnum">Earned</th>
         <th class="tnum">Amount</th><th>What it is</th></tr></thead>
@@ -1100,7 +1131,7 @@ function renderCareerTechnical(d: District): string {
   const fte = rows.reduce((a, r) => a + r.fte, 0);
 
   return `
-    <h3 id="career-technical">Career-technical education, by category</h3>
+    <h3 id="career-technical">${anchor("career-technical")}Career-technical education, by category</h3>
     <div class="scroll"><table data-program="career-technical">
       <thead><tr><th>Category</th><th class="tnum">Weight</th><th class="tnum">FTE</th>
         <th class="tnum">Aid</th></tr></thead>
@@ -1169,7 +1200,7 @@ function renderEnglishLearners(d: District): string {
   const learners = rows.reduce((a, r) => a + r.adm, 0);
 
   return `
-    <h3 id="english-learners">English learners, by category</h3>
+    <h3 id="english-learners">${anchor("english-learners")}English learners, by category</h3>
     <div class="scroll"><table data-program="english-learners">
       <thead><tr><th>Category</th><th class="tnum">Weight</th><th class="tnum">Pupils</th>
         <th class="tnum">Aid</th></tr></thead>
@@ -1233,7 +1264,7 @@ export function renderSupplements(d: District): string {
 
   return `
     <div class="card" id="supplements" data-part="supplements">
-      <h2>Outside the formula${yearChip("formula")}</h2>
+      <h2>${anchor("supplements")}Outside the formula${yearChip("formula")}</h2>
       <p class="note">These are paid on top of formula aid and the guarantee does not hold a
         district at them. Everything above this card is <strong>foundation funding</strong>, which
         is protected; this is not.</p>
@@ -1330,7 +1361,7 @@ function renderTransportation(d: District): string {
   const shortfall = t.special_education_unprorated - t.special_education;
 
   return `
-    <h3 id="transportation"><a href="${routes.wikiNode(
+    <h3 id="transportation">${anchor("transportation")}<a href="${routes.wikiNode(
       "formula-component",
       "fsfp-transportation",
     )}">Transportation</a></h3>
@@ -1443,7 +1474,7 @@ function renderPreschoolSpecialEducation(d: District): string {
   const shortfall = p.unprorated - p.total;
 
   return `
-    <h3 id="preschool"><a href="${routes.wikiNode(
+    <h3 id="preschool">${anchor("preschool")}<a href="${routes.wikiNode(
       "formula-component",
       "fsfp-preschool-special-education",
     )}">Preschool special education</a></h3>
@@ -1511,7 +1542,7 @@ export function renderNationalPosition(d: District): string {
   if (!n) {
     return `
       <div class="card" id="national" data-part="national">
-        <h2>Against America</h2>
+        <h2>${anchor("national")}Against America</h2>
         <p class="note">This district is not in the national comparison. The Census survey's
           comparable set is unified elementary-and-secondary districts, and this is one of Ohio's
           few K-8 districts — its spending per pupil is not comparable with a district that also
@@ -1544,7 +1575,7 @@ export function renderNationalPosition(d: District): string {
 
   return `
     <div class="card" id="national" data-part="national">
-      <h2>Against America${yearChip("national")}</h2>
+      <h2>${anchor("national")}Against America${yearChip("national")}</h2>
       <div class="scroll"><table data-program="national">
         <thead><tr><th>Measure</th><th class="tnum">This district</th>
           <th class="tnum">Nationally</th><th>What it is</th></tr></thead>
@@ -1623,7 +1654,7 @@ export function renderWhatThisIsNot(bundle: Bundle, d: District): string {
 
   return `
     <div class="card" id="not" data-part="not">
-      <h2>What this page is not</h2>
+      <h2>${anchor("not")}What this page is not</h2>
       <p class="note"><strong>None of the figures above is money this district received.</strong>
         Every one of them is the FY${bundle.fiscal_year} funding calculator's answer for it,
         published before the year it funds. What actually changed hands is on
@@ -1659,7 +1690,7 @@ export function renderWhatThisIsNot(bundle: Bundle, d: District): string {
            * fails silently, landing the reader at the top of a page having been promised a
            * reconciliation. The same predicate, so the two cannot drift apart.
            */
-          hasDenominators(d) ? routes.at(routes.districtTaxes(d.irn), routes.SECTIONS.denominators) : routes.districtTaxes(d.irn)
+          hasDenominators(d) ? routes.at(routes.districtTaxes(d.irn), routes.SECTIONS.district.denominators) : routes.districtTaxes(d.irn)
         }">the property tax page</a> reconciles the two the Department of Taxation and the
         Department of Education each publish.</p>
       <p class="note"><strong>The position card below is two other years on a fourth count.</strong>

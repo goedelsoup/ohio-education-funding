@@ -29,7 +29,7 @@ const corpus = loadCorpus();
     } sources. Type a district name, an IRN, or a concept.
   </p>
 
-  <div class="card">
+  <div class="card" id="query" data-part="query">
     <form class="filters" id="search-form" role="search">
       <div class="field">
         <label for="s-q">Search</label>
@@ -42,7 +42,7 @@ const corpus = loadCorpus();
   <div id="search-out"></div>
 
   <noscript>
-    <div class="card">
+    <div class="card" id="needs-script" data-part="needs-script">
       <p class="note">
         Searching needs JavaScript. Without it, the lists are still browsable in full:
         <a href="/districts">every district</a>, <a href="/wiki">the corpus by class</a>, and

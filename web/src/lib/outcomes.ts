@@ -16,12 +16,14 @@
  */
 
 import type { Bar } from "./chart.ts";
-import { barSpec } from "./plot/spec.ts";
+import { barSpec, distributionSpec, scatterSpec } from "./plot/spec.ts";
 import { renderToString } from "./plot/ssr.ts";
 import { count, escapeHtml, money, pct } from "./format.ts";
 import type { Bundle, District, OutcomeStatewide } from "./types.ts";
 import { schoolYearBefore, seriesYear, yearChip, yearChipPair, yearOf } from "./year.ts";
 import { term } from "./glossary.ts";
+import { anchor } from "./section.ts";
+import { medianTrace, pairs } from "./relationships.ts";
 
 /** A correlation, signed and to three places. */
 function coefficient(v: number): string {
@@ -40,41 +42,63 @@ export function povertyQuintiles(districts: District[]): District[][] {
   );
 }
 
-/** Median Performance Index in each poverty fifth. */
-export function performanceByPoverty(districts: District[]): Bar[] {
-  const labels = [
-    "Least poor fifth",
-    "Second",
-    "Third",
-    "Fourth",
-    "Poorest fifth",
-  ];
-  return povertyQuintiles(districts).map((group, index) => {
-    const scores = group
-      .map((d) => d.outcome!.performance_index!)
-      .sort((a, b) => a - b);
-    const median = scores[Math.floor(scores.length / 2)] ?? 0;
-    const poverty = group
-      .map((d) => d.economically_disadvantaged!)
-      .sort((a, b) => a - b);
-    const medianPoverty = poverty[Math.floor(poverty.length / 2)] ?? 0;
-    return {
-      label: labels[index]!,
-      value: median,
-      direct: median.toFixed(1),
-      hover: `${labels[index]}: ${group.length} districts, median Performance Index ${median.toFixed(1)}, median economic disadvantage ${pct(medianPoverty, 0)}`,
-    };
-  });
-}
-
 /** Render the outcome view. */
 export function renderOutcomes(bundle: Bundle): string {
   const o = bundle.statewide.outcomes;
   if (!o) {
-    return `<div class="card"><p class="note">This feed carries no outcome data.</p></div>`;
+    return `<div class="card" id="no-outcome-data" data-part="no-outcome-data"><p class="note">This feed carries no outcome data.</p></div>`;
   }
-  const bars = performanceByPoverty(bundle.districts);
   const withoutReportCard = bundle.statewide.districts - o.districts;
+
+  /*
+   * The three relationships this page is about, as the pairs behind them.
+   *
+   * Each was a coefficient in a two-column table, and the first was five bars of quintile medians.
+   * A coefficient is one number standing for six hundred pairs and two very different clouds
+   * produce the same one; the quintile bars were the same summary drawn, with the spread — which
+   * is what the card's own argument turns on — thrown away. The medians are still here, as the
+   * line through the cloud rather than in place of it.
+   */
+  const perf = (d: District) => d.outcome?.performance_index;
+  const povertyPoints = pairs(
+    bundle.districts,
+    (d) => (d.economically_disadvantaged == null ? null : d.economically_disadvantaged * 100),
+    perf,
+    (d, poverty, index) =>
+      `${d.name}: ${poverty.toFixed(0)}% economically disadvantaged, Performance Index ${index.toFixed(1)}`,
+  );
+  const povertyTrace = medianTrace(
+    povertyPoints.map((p) => ({ x: p.x, y: p.y })),
+    5,
+    "median of each fifth",
+    "formula",
+  );
+  const povertyScatter = scatterSpec(
+    povertyPoints,
+    {
+      x: { label: "economically disadvantaged share", format: (v) => `${v.toFixed(0)}%` },
+      y: { label: "Performance Index", format: (v) => v.toFixed(0) },
+    },
+    [povertyTrace],
+  );
+
+  /** The two denominators, drawn at one size against one vertical scale so they can be compared. */
+  const spending = (x: (d: District) => number | null | undefined, label: string) => {
+    const points = pairs(bundle.districts, x, perf, (d, dollars, index) =>
+      `${d.name}: ${money(dollars)} ${label}, Performance Index ${index.toFixed(1)}`,
+    );
+    return scatterSpec(
+      points,
+      {
+        x: { label: `spending per ${label}`, format: (v) => money(v) },
+        y: { label: "Performance Index", format: (v) => v.toFixed(0) },
+      },
+      [medianTrace(points.map((p) => ({ x: p.x, y: p.y })), 8, "median", "formula")],
+      { height: 290 },
+    );
+  };
+  const weightedScatter = spending((d) => d.outcome?.per_equivalent_pupil, "need-weighted pupil");
+  const enrolledScatter = spending((d) => d.outcome?.per_enrolled_pupil, "enrolled pupil");
 
   return `
     <div class="tiles">
@@ -89,19 +113,21 @@ export function renderOutcomes(bundle: Bundle): string {
         <div class="n">what is left of it</div></div>
     </div>
 
-    <div class="card">
-      <h2>Poverty is most of what the Performance Index measures${yearChip("outcome.performance")}</h2>
-      <p class="note">Districts in fifths by economically disadvantaged share, least poor on the
-        left. Median Performance Index in each.</p>
-      <div class="chartwrap" data-chart="poverty-quintiles">${renderToString(barSpec(bars, { max: 120 }))}</div>
+    <div class="card" id="poverty-and-performance" data-part="poverty-and-performance">
+      <h2>${anchor("poverty-and-performance")}Poverty is most of what the Performance Index measures${yearChip("outcome.performance")}</h2>
+      <p class="note">One dot per district: the share of its pupils the state counts as
+        economically disadvantaged, against its Performance Index. The line is the median of each
+        fifth of districts, least poor on the left — the summary this card used to show on its
+        own, now drawn over the ${count(povertyPoints.length)} districts it summarises.</p>
+      <div class="chartwrap" data-chart="poverty-and-performance">${renderToString(povertyScatter)}</div>
       <p class="note">At <strong>${coefficient(o.poverty_vs_performance)}</strong>, economic
         disadvantage explains about ${pct(o.poverty_vs_performance ** 2, 0)} of the variance in
         Ohio's attainment measure. Any other district-level variable correlated with it will
         appear to predict achievement, and mostly will not be.</p>
     </div>
 
-    <div class="card">
-      <h2>The guarantee is that trap, exactly${yearChipPair("outcome.performance", "formula", "guarantee")}</h2>
+    <div class="card" id="guarantee-trap" data-part="guarantee-trap">
+      <h2>${anchor("guarantee-trap")}The guarantee is that trap, exactly${yearChipPair("outcome.performance", "formula", "guarantee")}</h2>
       <div class="scroll"><table><tbody>
         <tr><th>Median Performance Index, districts on the guarantee</th>
             <td class="tnum">${o.median_performance_on_guarantee.toFixed(1)}</td></tr>
@@ -122,8 +148,18 @@ export function renderOutcomes(bundle: Bundle): string {
         speaks to what their funding did for them.</p>
     </div>
 
-    <div class="card">
-      <h2>The same numerator, two denominators, two answers${yearChipPair("outcome.performance", "outcome.spending", "spending")}</h2>
+    <div class="card" id="two-denominators" data-part="two-denominators">
+      <h2>${anchor("two-denominators")}The same numerator, two denominators, two answers${yearChipPair("outcome.performance", "outcome.spending", "spending")}</h2>
+      <p class="note">The same districts and the same vertical axis, twice. On the left-hand
+        measure the department divides spending by a count weighted upward for disadvantage,
+        English learners and disability; on the right it divides by the pupils actually enrolled.
+        <strong>The first cloud is flat and the second slopes.</strong></p>
+      <p class="note">Spending per <em>need-weighted</em> pupil, against attainment —
+        ${coefficient(o.weighted_spending_vs_performance)}:</p>
+      <div class="chartwrap" data-chart="weighted-spending">${renderToString(weightedScatter)}</div>
+      <p class="note">Spending per <em>enrolled</em> pupil, against the same attainment —
+        ${coefficient(o.enrolled_spending_vs_performance)}:</p>
+      <div class="chartwrap" data-chart="enrolled-spending">${renderToString(enrolledScatter)}</div>
       <div class="scroll"><table><tbody>
         <tr><th>Spending per <em>need-weighted</em> pupil vs achievement</th>
             <td class="tnum">${coefficient(o.weighted_spending_vs_performance)}</td></tr>
@@ -143,8 +179,8 @@ export function renderOutcomes(bundle: Bundle): string {
         decides which districts are found wanting.</p>
     </div>
 
-    <div class="card">
-      <h2>What this cannot tell you</h2>
+    <div class="card" id="limits" data-part="limits">
+      <h2>${anchor("limits")}What this cannot tell you</h2>
       <p class="note">Every figure here is a correlation over ${count(o.districts)} districts, and
         none identifies an effect. Districts are not assigned to the guarantee at random — they
         are on it because their FY2020 funding exceeded what the formula now computes, which is
@@ -198,9 +234,29 @@ export function renderOutcomeContext(bundle: Bundle, district: District): string
     "poorest fifth",
   ][index]!;
 
+  /*
+   * The peer group, drawn.
+   *
+   * The two tiles below say this district's score and the median of its fifth, which is a
+   * comparison against one number standing for about a hundred and twenty districts. Whether a
+   * six-point gap is remarkable depends entirely on how wide that group is, and the tiles cannot
+   * say: the same gap is unremarkable in a fifth spanning forty points and striking in one
+   * spanning ten.
+   *
+   * `distributionSpec` decides whether to draw the members: a fifth is about a hundred and twenty
+   * districts, which fits, so all of them are here.
+   */
+  const peerBox = distributionSpec(
+    peers.map((d) => ({
+      value: d.outcome!.performance_index!,
+      hover: `${d.name}: Performance Index ${d.outcome!.performance_index!.toFixed(1)}, ${pct(d.economically_disadvantaged!, 0)} economically disadvantaged`,
+    })),
+    { marker: { value: o.performance_index, label: district.name } },
+  );
+
   return `
     <div class="card" id="comparable-poverty" data-part="comparable-poverty">
-      <h2>Against districts with comparable poverty${yearChip("outcome.performance")}</h2>
+      <h2>${anchor("comparable-poverty")}Against districts with comparable poverty${yearChip("outcome.performance")}</h2>
       <div class="tiles">
         <div class="tile"><div class="k">This district</div>
           <div class="v">${o.performance_index.toFixed(1)}</div>
@@ -216,6 +272,19 @@ export function renderOutcomeContext(bundle: Bundle, district: District): string
           <div class="v">${gap >= 0 ? "+" : "−"}${Math.abs(gap).toFixed(1)}</div>
           <div class="n">points, against like-composed districts</div></div>
       </div>
+      ${
+        peerBox
+          ? `<p class="note">Every district in that fifth, by Performance Index — the shaded box is
+             its middle half, the line inside it the median the tile above reports, and the
+             coloured rule is ${escapeHtml(district.name)}. The gap in the third tile is worth what
+             the width of this box says it is worth.</p>
+             <div class="chartwrap" data-chart="peer-group">${renderToString(peerBox)}</div>
+             <div class="scale">
+               <span>${scores[0]!.toFixed(1)}</span>
+               <span>${scores[scores.length - 1]!.toFixed(1)}</span>
+             </div>`
+          : ""
+      }
       <p class="note">Ohio's attainment measure tracks economic disadvantage at
         <strong>${coefficient(bundle.statewide.outcomes?.poverty_vs_performance ?? 0)}</strong>
         statewide, so comparing this district to the state median would mostly be comparing its
@@ -299,7 +368,7 @@ export function renderDistrictOutcome(
     // No chip. There are no figures here to be on a year, and a chip over a card explaining that
     // a district has no report card would be dating an absence.
     return `<div class="card" id="outcomes" data-part="outcomes">
-      <h2>Outcomes</h2>
+      <h2>${anchor("outcomes")}Outcomes</h2>
       <p class="note">No report card is published for this district. It is one of the three
         smallest in Ohio, and it is outside every outcome figure on this site.</p>
     </div>`;
@@ -321,7 +390,7 @@ export function renderDistrictOutcome(
 
   return `
     <div class="card" id="outcomes" data-part="outcomes">
-      <h2>Outcomes${yearChipPair("outcome.performance", "outcome.spending", "spending")}</h2>
+      <h2>${anchor("outcomes")}Outcomes${yearChipPair("outcome.performance", "outcome.spending", "spending")}</h2>
       <div class="scroll"><table><tbody>
         ${series
           .map(
