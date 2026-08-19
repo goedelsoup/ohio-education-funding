@@ -2207,6 +2207,79 @@ test.describe("outside the formula", () => {
   });
 });
 
+test.describe("colour that carries a third variable", () => {
+  test("the spending charts are banded by poverty, with the legend the ramp obliges", async ({
+    page,
+  }) => {
+    /*
+     * A median line says what the middle of a cloud does. Banding says what the cloud is made of,
+     * and here that is the card's whole argument: the three poverty thirds sit at the same
+     * spending per need-weighted pupil and at different attainment.
+     *
+     * The legend is not decoration. The ramp's end steps sit near 2.2:1 against their surface,
+     * which is a contrast warning that obligates relief rather than one that can be waved off.
+     */
+    await page.goto("/outcomes");
+    const card = page.locator('[data-part="two-denominators"]');
+    await expect(card.locator(".legend .sw.ordinal-1")).toHaveCount(1);
+    await expect(card.locator(".legend .sw.ordinal-2")).toHaveCount(1);
+    await expect(card.locator(".legend .sw.ordinal-3")).toHaveCount(1);
+
+    // Three distinct fills across the dots, and they are the ramp rather than the series pair.
+    const fills = await card
+      .locator('[data-chart="weighted-spending"] .scatter-dot circle')
+      .evaluateAll((nodes) => [...new Set(nodes.map((n) => n.getAttribute("fill")))]);
+    expect(fills.sort()).toEqual([
+      "var(--ordinal-1)",
+      "var(--ordinal-2)",
+      "var(--ordinal-3)",
+    ]);
+  });
+
+  test("a banded chart does not label its traces as well as its legend", async ({ page }) => {
+    // Three labelled lines over the densest part of the cloud said the same thing the legend
+    // already said, on top of the data it was describing.
+    await page.goto("/outcomes");
+    const chart = page.locator('[data-chart="weighted-spending"]');
+    await expect(chart.locator(".scatter-trace")).toHaveCount(3);
+    await expect(chart.locator(".scatter-trace-end")).toHaveCount(0);
+  });
+
+  test("the millage chart splits on the variable that explains it, not a proxy", async ({
+    page,
+  }) => {
+    /*
+     * Banding that chart by valuation was tried and is floor status in disguise: the terciles'
+     * exact-reproduction counts track their at-floor counts almost exactly. Floor status is two
+     * states, so it takes the categorical pair rather than three steps of one hue.
+     */
+    await page.goto("/method");
+    const card = page.locator("#reduction-factors");
+    const fills = await card
+      .locator(".scatter-dot circle")
+      .evaluateAll((nodes) => [...new Set(nodes.map((n) => n.getAttribute("fill")))]);
+    expect(fills.sort()).toEqual(["var(--series-formula)", "var(--series-guarantee)"]);
+    await expect(card.locator(".legend .sw.formula")).toHaveCount(1);
+    await expect(card.locator(".legend .sw.guarantee")).toHaveCount(1);
+  });
+
+  test("the card says how much the picture is hiding", async ({ page }) => {
+    // 152 districts are one dot at (20.00, 20.00). A scatter draws the exceptions and hides the
+    // rule whenever the rule is a single value, and the counts are what a reader should take.
+    await page.goto("/method");
+    await expect(page.locator("#reduction-factors")).toContainText("single dot at (20.00, 20.00)");
+  });
+
+  test("the poverty measure's ceiling is stated where the limits are", async ({ page }) => {
+    // Not a cap this repository applies — the source publishes exactly 100% for them and the
+    // values below approach it continuously. It is still a ceiling, and the page says so.
+    await page.goto("/outcomes");
+    const limits = page.locator("#limits");
+    await expect(limits).toContainText("has a ceiling");
+    await expect(limits).toContainText("not a value this repository caps");
+  });
+});
+
 test.describe("the reduction factors, against what was charged", () => {
   test("the model is drawn against the record it is a model of", async ({ page }) => {
     /*

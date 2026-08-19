@@ -33,6 +33,30 @@ export const SERIES = {
   neutral: "var(--neutral-mark)",
 } as const;
 
+/**
+ * The ordinal ramp: three steps of one hue, light to dark.
+ *
+ * Separate from {@link SERIES} because it answers a different question. The pair above is
+ * *identity* — formula against guarantee, two things that are not versions of each other. This is
+ * *order*: a district's band within a measure, where swapping two bands changes the meaning. An
+ * ordered grouping drawn in categorical hues makes a reader look up what each one is; drawn in one
+ * hue's steps, the order is in the colour.
+ *
+ * Three steps and not five, and the number came from the validator rather than from taste. A
+ * scatter is an all-pairs form — any band can sit beside any other, so every pair must separate,
+ * not merely adjacent ones — and five steps of this hue close to a normal-vision ΔE of 10.9, which
+ * is two bands a reader with full colour vision cannot tell apart. Three reach 21.4 light and 21.6
+ * dark, and 20.8 / 20.2 under the worst CVD simulation. `app.css` carries the measurements.
+ *
+ * A chart using this must carry a legend. The end steps sit near 2.2:1 against their own surface,
+ * which is a contrast warning that obligates relief rather than one that can be waved off.
+ */
+export const ORDINAL = [
+  "var(--ordinal-1)",
+  "var(--ordinal-2)",
+  "var(--ordinal-3)",
+] as const;
+
 /** Ink. Text wears a text token and never a series colour; a mark beside it carries identity. */
 export const INK = {
   primary: "var(--text-primary)",

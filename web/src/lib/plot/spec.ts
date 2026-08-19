@@ -37,7 +37,7 @@ import type {
   SeriesPoint,
   Trace,
 } from "../chart.ts";
-import { INK, SERIES } from "./tokens.ts";
+import { INK, ORDINAL, SERIES } from "./tokens.ts";
 
 /** A chart, and the tooltip text for the marks a reader can point at. */
 export interface Spec {
@@ -218,7 +218,26 @@ export function scatterSpec(
   const yPad = pad(yMin, yMax);
 
   const hue = (p: ScatterPoint) =>
-    p.series === "guarantee" ? SERIES.guarantee : p.series === "formula" ? SERIES.formula : SERIES.neutral;
+    p.band != null
+      ? (ORDINAL[Math.min(ORDINAL.length - 1, Math.max(0, p.band))] as string)
+      : p.series === "guarantee"
+        ? SERIES.guarantee
+        : p.series === "formula"
+          ? SERIES.formula
+          : SERIES.neutral;
+  /*
+   * Banded dots carry a third measure and have to be legible one against another, so they are
+   * drawn a shade more opaque than the neutral cloud, which only has to be legible against the
+   * card. The ramp's end steps sit near 2.2:1 against their surface; this is part of what the
+   * legend those cards carry is relieving.
+   */
+  const banded = points.some((p) => p.band != null);
+  const traceHue = (t: Trace) =>
+    t.band != null
+      ? (ORDINAL[Math.min(ORDINAL.length - 1, Math.max(0, t.band))] as string)
+      : t.series === "guarantee"
+        ? SERIES.guarantee
+        : SERIES.formula;
 
   /*
    * Shorter where a card draws two of these to be compared with each other — the spending pair on
@@ -280,7 +299,7 @@ export function scatterSpec(
           y: "y",
           r: 2.4,
           fill: hue,
-          fillOpacity: 0.45,
+          fillOpacity: banded ? 0.62 : 0.45,
           stroke: "none",
           className: "scatter-dot",
         }),
@@ -289,19 +308,32 @@ export function scatterSpec(
           Plot.line(trace.points, {
             x: "x",
             y: "y",
-            stroke: trace.series === "guarantee" ? SERIES.guarantee : SERIES.formula,
+            stroke: traceHue(trace),
             strokeWidth: 2,
             className: "scatter-trace",
           }),
-          Plot.text([trace.points[trace.points.length - 1]!], {
-            x: "x",
-            y: "y",
-            dx: 8,
-            text: () => trace.label,
-            textAnchor: "start",
-            fill: trace.series === "guarantee" ? SERIES.guarantee : SERIES.formula,
-            className: "scatter-trace-end",
-          }),
+          /*
+           * A direct label, except where the bands already have one.
+           *
+           * A banded chart carries a legend by construction — the ramp's end steps are near 2.2:1
+           * against their surface and the legend is the relief that buys — so labelling each trace
+           * as well says the same thing twice and says it on top of the cloud. Three of them ran
+           * across the densest part of this one. Identity is still not hue alone; it is hue and a
+           * legend, which is what the legend is for.
+           */
+          ...(trace.band != null
+            ? []
+            : [
+                Plot.text([trace.points[trace.points.length - 1]!], {
+                  x: "x",
+                  y: "y",
+                  dx: 8,
+                  text: () => trace.label,
+                  textAnchor: "start",
+                  fill: traceHue(trace),
+                  className: "scatter-trace-end",
+                }),
+              ]),
         ]),
 
         ...(options.identity

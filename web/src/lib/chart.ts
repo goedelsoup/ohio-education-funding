@@ -67,6 +67,14 @@ export interface ScatterPoint {
    * category is not available and would not be drawn if it were: the palette is two hues.
    */
   series?: "formula" | "guarantee";
+  /**
+   * Which ordered band of a *third* measure this district falls in, 0 lowest.
+   *
+   * Drawn in the ordinal ramp, which is three steps wide — see `plot/tokens.ts` for why three and
+   * not five. Only worth spending where the banding variable is not already an axis: banding the
+   * poverty scatter by poverty would repaint the x axis in a gradient and say nothing.
+   */
+  band?: number;
 }
 
 /**
@@ -83,6 +91,8 @@ export interface Trace {
   /** Printed at the end of the line, because a trace is a series and identity is never hue alone. */
   label: string;
   series: "formula" | "guarantee";
+  /** Draw in this step of the ordinal ramp instead, for a trace summarising one band. */
+  band?: number;
   points: { x: number; y: number }[];
 }
 

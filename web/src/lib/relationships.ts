@@ -39,18 +39,32 @@ export function pairs(
   x: (d: District) => number | null | undefined,
   y: (d: District) => number | null | undefined,
   hover: (d: District, x: number, y: number) => string,
-  series?: (d: District) => "formula" | "guarantee",
+  extra?: {
+    series?: (d: District) => "formula" | "guarantee";
+    /**
+     * Which ordered band the district is in, from {@link bands}.
+     *
+     * Taken as a function of the district rather than applied to the returned points, because the
+     * points have already dropped whoever was missing a measure and recovering the district from a
+     * point's index means re-deriving that filter and trusting the two to agree. `attachHovers`
+     * exists because this repository does not trust that kind of index alignment even when it is
+     * someone else's renderer doing the aligning.
+     */
+    band?: (d: District) => number | undefined;
+  },
 ): ScatterPoint[] {
   const points: ScatterPoint[] = [];
   for (const d of districts) {
     const xv = x(d);
     const yv = y(d);
     if (xv == null || yv == null || !Number.isFinite(xv) || !Number.isFinite(yv)) continue;
+    const band = extra?.band?.(d);
     points.push({
       x: xv,
       y: yv,
       hover: hover(d, xv, yv),
-      ...(series ? { series: series(d) } : {}),
+      ...(extra?.series ? { series: extra.series(d) } : {}),
+      ...(band == null ? {} : { band }),
     });
   }
   return points;
@@ -88,6 +102,46 @@ export function medianTrace(
   }
 
   return { label, series, points };
+}
+
+/**
+ * Which ordered band each district falls in, by a measure that is not on either axis.
+ *
+ * # Why bands are worth colouring and why three of them
+ *
+ * A median line says what the middle of the cloud does. Banding says what the cloud is *made of* —
+ * and where the banding measure is a third variable, it shows a structure no line can: on
+ * `/outcomes` the three poverty bands occupy the same range of spending per need-weighted pupil,
+ * p10 within $500 of each other and p90 within $100, while their median Performance Index differs
+ * by eighteen points. Three horizontal bands stacked at one x range is the card's whole argument,
+ * drawn.
+ *
+ * Three and not five is a measurement, not a preference: a scatter is an all-pairs form and five
+ * steps of one hue close to a normal-vision ΔE of 10.9. `plot/tokens.ts` has the numbers.
+ *
+ * # Where it is not worth spending
+ *
+ * Where the banding measure is already an axis. Banding the poverty-against-attainment scatter by
+ * poverty repaints the x axis as a left-to-right gradient and adds nothing a reader could not
+ * already see, while spending the one channel a third variable could have used.
+ */
+export function bands(
+  districts: District[],
+  by: (d: District) => number | null | undefined,
+  count = 3,
+): Map<District, number> {
+  const ranked = districts
+    .map((d) => ({ d, v: by(d) }))
+    .filter((row): row is { d: District; v: number } => row.v != null && Number.isFinite(row.v))
+    .sort((a, b) => a.v - b.v);
+
+  const assigned = new Map<District, number>();
+  ranked.forEach((row, i) => {
+    // The last band takes the remainder, so integer division drops nobody — the same rule the
+    // quintile helpers and `medianTrace` use.
+    assigned.set(row.d, Math.min(count - 1, Math.floor((i * count) / ranked.length)));
+  });
+  return assigned;
 }
 
 /** The middle value. Local, and deliberately the same lower-median every quintile helper here uses. */
