@@ -97,6 +97,23 @@ export interface Trace {
 }
 
 /**
+ * One item with two values on the same measure — a low end and a high end.
+ *
+ * The shape a ratio compresses. `/counties` ranked its 88 counties by richest ÷ poorest valuation
+ * per pupil, which is one number standing for two, and the two are not recoverable from it: Brown
+ * spans $124k–$259k and Wood $198k–$407k at the same 2.1×, so Wood's *poorest* district stands on
+ * more valuation per pupil than Brown's richest. Ordering the counties by disparity and ordering
+ * them by floor agree for 29 of 84.
+ */
+export interface Range {
+  /** Printed at the row, because eighty-four unlabelled bars is a texture. */
+  label: string;
+  low: number;
+  high: number;
+  hover: string;
+}
+
+/**
  * One value in a distribution, with the text shown when a reader points at it.
  *
  * Carried as a pair rather than as a bare number because the populations these draw are small

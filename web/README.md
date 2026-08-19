@@ -312,6 +312,32 @@ The quintile bar chart on `/outcomes` is gone, and its five medians are the line
 `/` is 31.8 KB → 185.5 KB and `/outcomes` 12.8 KB → 442.3 KB, which is 48.6 KB and 97.0 KB on the
 wire; repetitive SVG compresses about 4.5:1.
 
+### A ratio is one number standing for two
+
+`/counties` ranked its 88 counties by richest ÷ poorest valuation per pupil and printed the ratio.
+The two numbers behind it are not recoverable from it: **Auglaize and Harrison are both 1.2× and
+$458,326 per pupil apart**, Harrison's *poorest* district standing on more valuation than
+Auglaize's richest. Ranking the counties by disparity and ranking them by what their poorest
+district has agree for **29 of 84** — the page was showing one of two nearly independent orders.
+
+`rangeSpec` is the seventh form: one row per county, a line from its poorest district to its
+richest. The axis is the design. **On a log axis a row's length is its ratio and its position is
+its level**, so sorted by ratio the lengths step down the page while the positions scatter freely,
+and "the same disparity somewhere else entirely" is the picture rather than a sentence. On a linear
+axis the same sort produces lengths with no fixed relation to the number they are sorted by, which
+would be worse than the table it sits above. The ends take two shades of one hue, not two hues: a
+low end and a high end are one measure at two points.
+
+The county pages gain the other half — where their own disparity sits among the 84, which the card
+never said. Cuyahoga is 5.5× against a median county of 2.1×, and only ten counties exceed 4×.
+
+**There is no map, and that is the point.** The obvious county visualisation is a choropleth, and
+this page opens by saying a county here is *a peer group, not a boundary* — Ohio school district
+lines follow historical township lines and cross county lines freely. Filling a county-shaped
+polygon with a funding figure asserts exactly the geography the page spends its first card denying,
+and the department's one-county-per-district attribution could not honestly draw the crossing even
+if the geometry were here.
+
 ### Colour that carries a third variable
 
 A median line says what the middle of a cloud does; colouring the dots by an ordered band says what

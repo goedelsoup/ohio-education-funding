@@ -31,7 +31,7 @@ import { counties } from "../../src/lib/county.ts";
 import * as routes from "../../src/lib/routes.ts";
 import { anchor } from "../../src/lib/section.ts";
 import { bands, medianTrace, pairs } from "../../src/lib/relationships.ts";
-import { BOX_FROM, distributionSpec, scatterSpec } from "../../src/lib/plot/spec.ts";
+import { BOX_FROM, distributionSpec, rangeSpec, scatterSpec } from "../../src/lib/plot/spec.ts";
 import { renderToString } from "../../src/lib/plot/ssr.ts";
 import { ORDINAL } from "../../src/lib/plot/tokens.ts";
 import type { District } from "../../src/lib/types.ts";
@@ -814,4 +814,78 @@ test("the poverty measure has a ceiling, and it is the source's rather than this
     .map((d) => d.outcome?.performance_index)
     .filter((v): v is number => v != null);
   expect(Math.max(...onCeiling) - Math.min(...onCeiling)).toBeGreaterThan(25);
+});
+
+test("a range draws both ends of each item, not the ratio between them", () => {
+  /*
+   * `/counties` ranked 88 counties by richest ÷ poorest valuation per pupil, which is one number
+   * standing for two, and the two are not recoverable from it: two counties at the same ratio can
+   * have non-overlapping wealth. Auglaize and Harrison are both 1.2× and $458,326 per pupil apart.
+   */
+  const all = counties(loadFeed().bundle.districts);
+  const measurable = all.filter((c) => c.valuationRatio != null && c.poorest && c.richest);
+  expect(measurable.length).toBeGreaterThan(70);
+
+  const spec = rangeSpec(
+    measurable.map((c) => ({
+      label: c.name,
+      low: c.poorest!.valuation_per_pupil!,
+      high: c.richest!.valuation_per_pupil!,
+      hover: c.name,
+    })),
+    { label: "valuation per pupil", format: (v) => String(v), log: true },
+  );
+
+  expect(spec?.hovers?.text.length).toBe(measurable.length);
+  const svg = renderToString(spec);
+  // Both ends drawn, and the span between them.
+  expect(svg).toContain("range-low");
+  expect(svg).toContain("range-high");
+  expect(svg).toContain("range-span");
+  // Two shades of one hue: the ends of a range are one measure at two points, not two series.
+  expect(svg).toContain("var(--ordinal-1)");
+  expect(svg).toContain("var(--ordinal-3)");
+  expect(svg).not.toContain("var(--series-guarantee)");
+  expect(svg.replace(/<style>[\s\S]*?<\/style>/g, "")).not.toMatch(/#[0-9a-f]{3,8}\b|rgba?\(/i);
+});
+
+test("the ratio and the level are nearly independent orderings", () => {
+  /*
+   * The finding the range chart draws, asserted against the feed. If ordering the counties by
+   * disparity ever started agreeing with ordering them by floor, the chart would be showing one
+   * thing twice and the paragraph under it would be wrong.
+   */
+  const measurable = counties(loadFeed().bundle.districts).filter(
+    (c) => c.valuationRatio != null && c.poorest != null,
+  );
+  const byRatio = [...measurable].sort((a, b) => b.valuationRatio! - a.valuationRatio!);
+  const byFloor = [...measurable].sort(
+    (a, b) => a.poorest!.valuation_per_pupil! - b.poorest!.valuation_per_pupil!,
+  );
+  const agree = byRatio.filter((c, i) => Math.abs(byFloor.indexOf(c) - i) < 10).length;
+  expect(agree).toBeLessThan(measurable.length / 2);
+
+  // And at least one pair at the same ratio does not overlap at all, which is the example the
+  // page names. Found rather than hard-coded, for the same reason the page finds it.
+  const sorted = [...measurable].sort((a, b) => a.valuationRatio! - b.valuationRatio!);
+  const disjoint = sorted.some((c, i) => {
+    if (i === 0) return false;
+    const other = sorted[i - 1]!;
+    if (Math.abs(c.valuationRatio! - other.valuationRatio!) >= 0.05) return false;
+    const lower = c.richest!.valuation_per_pupil! < other.richest!.valuation_per_pupil! ? c : other;
+    const upper = lower === c ? other : c;
+    return lower.richest!.valuation_per_pupil! < upper.poorest!.valuation_per_pupil!;
+  });
+  expect(disjoint, "two counties at one ratio with non-overlapping wealth").toBe(true);
+});
+
+test("a range refuses a single item", () => {
+  // One row is not a comparison, and four of Ohio's 88 counties have a single reporting district
+  // and no internal spread to draw.
+  expect(
+    rangeSpec([{ label: "only", low: 1, high: 2, hover: "only" }], {
+      label: "x",
+      format: String,
+    }),
+  ).toBeNull();
 });

@@ -63,6 +63,12 @@ export interface County {
   poorest: District | null;
 }
 
+/** The middle value. Module-level because two renderers need it and a duplicate would drift. */
+function median(values: number[]): number {
+  const sorted = [...values].sort((a, b) => a - b);
+  return sorted.length === 0 ? 0 : sorted[Math.floor(sorted.length / 2)]!;
+}
+
 /** `Van Wert` becomes `van-wert`; the slug is the URL and must round-trip through the router. */
 export function slugify(county: string): string {
   return county
@@ -118,7 +124,7 @@ export function counties(districts: District[]): County[] {
  * The state share is shown beside it because it is the formula's answer to the disparity, and
  * reading the two together is the only way to see how much of the gap the state closes.
  */
-function renderSpread(c: County, statewide: Statewide): string {
+function renderSpread(c: County, statewide: Statewide, all: County[]): string {
   if (!c.richest || !c.poorest || c.valuationRatio == null) {
     return `
       <div class="card" id="spread" data-part="spread">
@@ -134,6 +140,24 @@ function renderSpread(c: County, statewide: Statewide): string {
   const rich = c.richest;
   const poor = c.poorest;
   const gap = rich.valuation_per_pupil! - poor.valuation_per_pupil!;
+
+  /*
+   * Whether this county's disparity is a large one.
+   *
+   * The card has always stated the ratio and never said what it was a lot *of*. The median county
+   * is 2.1× and ten of the 84 measurable ones exceed 4×, so "5.5 times apart" is near the top of
+   * the state and a reader had no way to know it from this page. The same form the district pages
+   * use for the same question, over the counties rather than the districts.
+   */
+  const ratios = all
+    .filter((other) => other.valuationRatio != null)
+    .map((other) => ({
+      value: other.valuationRatio!,
+      hover: `${other.name}: ${other.valuationRatio!.toFixed(1)}× between its richest and poorest district`,
+    }));
+  const position = distributionSpec(ratios, {
+    marker: { value: c.valuationRatio, label: c.name },
+  });
 
   /*
    * Every district in the county, not just the two ends of it.
@@ -192,6 +216,19 @@ function renderSpread(c: County, statewide: Statewide): string {
             <td class="tnum">${count(Math.round(poor.adm))}</td></tr>
         </tbody>
       </table></div>
+      ${
+        position
+          ? `<p class="note">Where that sits among the ${ratios.length} counties with more than one
+             district reporting a tax base — one dot each, narrowest on the left, and the coloured
+             rule is ${escapeHtml(c.name)}. The median county is
+             ${median(ratios.map((r) => r.value)).toFixed(1)}× apart.</p>
+             <div class="chartwrap" data-chart="county-position">${renderToString(position)}</div>
+             <div class="scale">
+               <span>${Math.min(...ratios.map((r) => r.value)).toFixed(1)}×</span>
+               <span>${Math.max(...ratios.map((r) => r.value)).toFixed(1)}×</span>
+             </div>`
+          : ""
+      }
       <p class="note">Two districts in the same county, <strong>${c.valuationRatio.toFixed(
         1,
       )} times</strong> apart on <a href="${routes.at(
@@ -231,10 +268,6 @@ function renderSpread(c: County, statewide: Statewide): string {
 
 /** Every district in the county, on the measures a neighbour comparison turns on. */
 function renderRoster(c: County, statewide: Statewide, statewideMedianAid: number): string {
-  const median = (values: number[]): number => {
-    const sorted = [...values].sort((a, b) => a - b);
-    return sorted.length === 0 ? 0 : sorted[Math.floor(sorted.length / 2)]!;
-  };
   const medianAid = median(c.districts.map((d) => d.realized_aid_per_pupil));
 
   return `
@@ -313,6 +346,8 @@ export function renderCounty(
   c: County,
   statewide: Statewide,
   statewideMedianAid: number,
+  /** Every county, so the spread card can say where this one's disparity sits among them. */
+  all: County[],
 ): string {
-  return `${renderSpread(c, statewide)}${renderRoster(c, statewide, statewideMedianAid)}`;
+  return `${renderSpread(c, statewide, all)}${renderRoster(c, statewide, statewideMedianAid)}`;
 }
