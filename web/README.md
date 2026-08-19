@@ -312,6 +312,25 @@ The quintile bar chart on `/outcomes` is gone, and its five medians are the line
 `/` is 31.8 KB → 185.5 KB and `/outcomes` 12.8 KB → 442.3 KB, which is 48.6 KB and 97.0 KB on the
 wire; repetitive SVG compresses about 4.5:1.
 
+### The district index shows the distribution it is filtering
+
+609 rows, sortable and filterable, and no sense of the shape you were browsing. The last placement
+from the visualisation review, and the only one where the page's own architecture was the question:
+filtering happens in the browser, everything else on this site renders at build.
+
+**Six strips rendered at build and one revealed by an attribute selector** — `BasisToggle`'s trick
+applied to charts. A reader with no script gets the state-aid distribution and a complete page; a
+reader with script gets the strip following whichever column they sorted by, because the sort keys
+and the strip keys are the same strings.
+
+The alternative was drawing one in the browser when the sort changes, which would have put
+Observable Plot on the district index — **roughly 100 KB gzipped, on a route likely to be someone's
+first entry to the site** — for the sake of a 46px strip. All six together cost **4.6 KB gzipped**,
+on a page already 52.6 KB from its 609 rows.
+
+Sorting by name leaves the strip where it was rather than blanking it: `name` is the default sort
+and is not a quantity.
+
 ### The half of the fused-word defect that leaves no evidence
 
 Astro trims a newline between text and an adjacent expression, so a paragraph reflowed across lines

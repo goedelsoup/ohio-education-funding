@@ -565,6 +565,26 @@ output { font-variant-numeric: tabular-nums; color: var(--text-primary); font-we
  * `column-width` and not a column count, so the columns follow the width the page has. One at
  * phone widths, two on a laptop, three on the wide routes — with no breakpoint knowing about it.
  */
+/*
+ * The six distribution strips on `/districts`, of which one is shown.
+ *
+ * Rendered at build and revealed by an attribute selector, which is `BasisToggle`'s trick applied
+ * to charts: the alternative was drawing one in the browser when the sort changes, and that would
+ * put Observable Plot — about 100 KB gzipped — on the district index for the sake of a 46px strip.
+ * A reader with no script sees the aid distribution and a complete page; a reader with script sees
+ * the strip follow the column they sorted by.
+ */
+.measures { margin: 1.1rem 0 0; }
+.measure { display: none; }
+.measures[data-measure="adm"] .measure[data-measure="adm"],
+.measures[data-measure="aid"] .measure[data-measure="aid"],
+.measures[data-measure="guarantee"] .measure[data-measure="guarantee"],
+.measures[data-measure="valuation"] .measure[data-measure="valuation"],
+.measures[data-measure="poverty"] .measure[data-measure="poverty"],
+.measures[data-measure="enrollment"] .measure[data-measure="enrollment"] { display: block; }
+.measure .note { margin-top: 0; }
+.measure .chartwrap { margin: .2rem 0 0; }
+
 .contents { margin: 1.2rem 0 0; }
 .contents-label {
   margin: 0 0 .45rem;

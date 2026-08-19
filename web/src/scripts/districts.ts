@@ -90,8 +90,22 @@ if (table && body && nameInput && statusSelect && countOut) {
     for (const entry of decorated) body!.appendChild(entry.row);
   }
 
+  /*
+   * The strip above the table follows the column being sorted.
+   *
+   * All six are in the document already — see `districts.astro` for why they are rendered at build
+   * rather than drawn here — so this sets an attribute and a sibling selector does the rest.
+   * `name` is the default sort and is not a quantity, so it leaves the strip where it was rather
+   * than hiding all six.
+   */
+  const measures = document.querySelector<HTMLElement>("#district-measures");
+  const showMeasure = (key: string) => {
+    if (measures && key !== "name") measures.dataset.measure = key;
+  };
+
   for (const button of table.querySelectorAll<HTMLButtonElement>("thead button[data-sort]")) {
     button.addEventListener("click", () => {
+      showMeasure(button.dataset.sort ?? "");
       const column = (button.closest("th") as HTMLTableCellElement).cellIndex;
       const first = button.getAttribute("aria-sort") == null;
       const wasAscending = button.getAttribute("aria-sort") === "ascending";
