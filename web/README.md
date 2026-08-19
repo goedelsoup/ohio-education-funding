@@ -121,6 +121,30 @@ floor, and getting its published share scaled by the ratio of the minimums inste
 itself. It was worth $4.7 million and 273 Rust tests did not catch it, because the wrong answer is
 still an increase and still confined to districts below the new floor.
 
+### Every share in the feed is a fraction, and now something checks
+
+The bundle inherits units from its sources rather than normalising them, and for three fields that
+went wrong quietly. The report card publishes its shares as **0 to 100**; the profile report
+publishes its as a fraction; both were passed straight through. So
+`outcome.economically_disadvantaged` and `District.economically_disadvantaged` sat in one document
+under the same name, **100× apart**, both typed `maybeNum`, and neither said which it was.
+
+It never reached a page — nothing in `web/` renders the report card's copy — which is the only
+reason it was latent rather than a `10000%` on a card. Contract **`35.0.0`** converts the three at
+the seam in `crates/bundle`, where every consumer gets it right by default instead of by
+remembering, including whoever downloads the feed from `/data`.
+
+The rule is now a test in both layers, because a convention that held for every field but three and
+was enforced by nothing is how this happened. Rust asserts it over the bundle it builds; the unit
+suite asserts it over the bundle that is *committed*, which is what the site renders and what `/data`
+serves. Verified by reintroducing the defect and watching both fail — 606 offenders, named by field
+and IRN.
+
+One threshold in that test is set from the data rather than from the common case: each share must be
+present on at least 250 districts before its range means anything, because the report card
+suppresses small subgroups and `outcome.english_learner` is genuinely on 303 of 609. A floor set
+from the other two would have failed on a property of the source rather than on a defect.
+
 ## Both inputs have a schema, and both stop the build
 
 This site reads two things it does not own: a JSON feed written by `crates/bundle`, and 75 YAML
@@ -700,11 +724,11 @@ Fields: bundle contract version, feed list, last export timestamp, node counts p
 -->
 | Field | Value |
 |---|---|
-| Contract version | `34.0.0` |
+| Contract version | `35.0.0` |
 | Districts in the feed | 609 |
 | Reference checkpoints | 8 |
 | Reference forecasts | 4 |
-| Size | 5786 KB |
+| Size | 5788 KB |
 | Deployment target | Cloudflare Pages, static, with a CSP in `web/public/_headers` |
 
 Regenerate with `cargo run --manifest-path crates/Cargo.toml -p bundle > web/public/data/bundle.json`. CI fails if the committed feed and a fresh one differ.

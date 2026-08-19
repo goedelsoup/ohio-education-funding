@@ -220,6 +220,15 @@ fn controlling_for(xs: &[f64], ys: &[f64], control: &[f64]) -> f64 {
     .unwrap_or(f64::NAN)
 }
 
+/// A share the source publishes as 0 to 100, as the fraction this bundle publishes.
+///
+/// Named rather than written as `/ 100.0` at three call sites, so that the next passthrough field
+/// arriving on a percentage scale has something to reach for and `share_fields_are_fractions` has
+/// something to point at when it fails.
+fn percent_to_fraction(v: f64) -> f64 {
+    v / 100.0
+}
+
 /// Three aligned series over the districts where every one of the three is present.
 fn aligned(
     records: &[Joined],
@@ -670,9 +679,19 @@ fn to_district(record: &DistrictRecord, joins: &Joins<'_>) -> District {
             per_equivalent_pupil: joined.outcome.per_equivalent_pupil,
             per_equivalent_pupil_federal: joined.outcome.per_equivalent_pupil_federal,
             per_equivalent_pupil_state_local: joined.outcome.per_equivalent_pupil_state_local,
-            economically_disadvantaged: joined.outcome.economically_disadvantaged,
-            english_learner: joined.outcome.english_learner,
-            students_with_disabilities: joined.outcome.students_with_disabilities,
+            // The report card publishes these three as 0 to 100 and every other share this
+            // bundle carries is a fraction. Converted here, at the one seam they cross, rather
+            // than left for each consumer to remember — see `CONTRACT_VERSION` for what that
+            // cost when it was not.
+            economically_disadvantaged: joined
+                .outcome
+                .economically_disadvantaged
+                .map(percent_to_fraction),
+            english_learner: joined.outcome.english_learner.map(percent_to_fraction),
+            students_with_disabilities: joined
+                .outcome
+                .students_with_disabilities
+                .map(percent_to_fraction),
         }),
     }
 }
@@ -1381,6 +1400,16 @@ fn spending_by_function() -> HashMap<String, SpendingByFunction> {
 }
 
 fn main() {
+    print!("{}", build().to_json());
+}
+
+/// Assemble the bundle from the committed fixtures.
+///
+/// Split from `main` so the tests can assert on the document this crate actually publishes rather
+/// than on its inputs. `main` was 273 lines ending in a `print!`, and a rule about what the bundle
+/// carries — that every share in it is a fraction — could only be checked by a consumer parsing
+/// the JSON back, which is the layer that had the bug.
+fn build() -> Bundle {
     // Profile columns: 3 economically disadvantaged, 4 valuation/pupil, 6 effective class 1
     // millage, 7 operating expenditure per pupil.
     let profile: HashMap<&str, &str> = PROFILE
@@ -1610,7 +1639,7 @@ fn main() {
     let history = history();
     let appropriations = appropriation_block();
 
-    let bundle = Bundle {
+    Bundle {
         national: national(),
         history: history.clone(),
         appropriation_lines: appropriation_lines(),
@@ -1651,8 +1680,7 @@ fn main() {
                 .collect(),
         }),
         districts,
-    };
-    print!("{}", bundle.to_json());
+    }
 }
 
 #[cfg(test)]
@@ -1703,5 +1731,125 @@ mod tests {
         assert_eq!(label_span(2025, 2025, "FY"), "FY2025");
         assert_eq!(label_span(2020, 2025, "FY"), "FY2020-FY2025");
         assert_eq!(label_span(2024, 2024, ""), "2024");
+    }
+
+    /// Every share this bundle publishes is a fraction.
+    ///
+    /// The rule was true of all but three fields and enforced by nothing, so the three that broke
+    /// it broke it silently: the report card publishes 0 to 100, `main` passed those straight
+    /// through, and `outcome.economically_disadvantaged` sat in the same document as
+    /// `District::economically_disadvantaged` 100× apart under the same name. A consumer reading
+    /// the wrong one got a plausible number, and a percentage through a helper expecting a
+    /// fraction rendered `10000%` rather than failing.
+    ///
+    /// So the rule is a test rather than a convention. A share arriving from a new source on a
+    /// percentage scale now fails here, at the point it is added, naming the field.
+    #[test]
+    fn share_fields_are_fractions() {
+        let bundle = super::build();
+
+        let mut offenders: Vec<String> = Vec::new();
+        let mut check = |name: &str, irn: &str, value: Option<f64>| {
+            if let Some(v) = value {
+                if !(0.0..=1.0).contains(&v) {
+                    offenders.push(format!("{name} = {v} for IRN {irn}"));
+                }
+            }
+        };
+
+        for d in &bundle.districts {
+            check(
+                "economically_disadvantaged",
+                &d.irn,
+                d.economically_disadvantaged,
+            );
+            check("dpia.percentage", &d.irn, Some(d.dpia.percentage));
+            if let Some(r) = &d.regime {
+                check("regime.recognized_share", &d.irn, Some(r.recognized_share));
+            }
+            check(
+                "transportation.effective_state_share",
+                &d.irn,
+                Some(d.transportation.effective_state_share),
+            );
+            if let Some(o) = &d.outcome {
+                check(
+                    "outcome.economically_disadvantaged",
+                    &d.irn,
+                    o.economically_disadvantaged,
+                );
+                check("outcome.english_learner", &d.irn, o.english_learner);
+                check(
+                    "outcome.students_with_disabilities",
+                    &d.irn,
+                    o.students_with_disabilities,
+                );
+            }
+            if let Some(n) = &d.national {
+                check("national.local_share", &d.irn, Some(n.local_share));
+                check(
+                    "national.local_share_percentile",
+                    &d.irn,
+                    Some(n.local_share_percentile),
+                );
+                check(
+                    "national.revenue_per_pupil_percentile",
+                    &d.irn,
+                    Some(n.revenue_per_pupil_percentile),
+                );
+                check(
+                    "national.spending_per_pupil_percentile",
+                    &d.irn,
+                    Some(n.spending_per_pupil_percentile),
+                );
+            }
+        }
+
+        assert!(
+            offenders.is_empty(),
+            "{} share field(s) outside 0..=1, so the bundle publishes two scales under one \
+             convention. Divide at the seam in `district_json`, as the report-card shares are, \
+             and bump CONTRACT_VERSION:\n  {}",
+            offenders.len(),
+            offenders
+                .iter()
+                .take(10)
+                .cloned()
+                .collect::<Vec<_>>()
+                .join("\n  ")
+        );
+    }
+
+    /// The three the rule was written for, at the value that exposed it.
+    ///
+    /// 31 districts publish exactly 100% economically disadvantaged in the profile report, which
+    /// is the value that made the mismatch visible on the site: as a fraction that is `1.0`, and
+    /// as the report card's percentage it was `100.0`. Both are in this bundle under the same
+    /// name, and this pins which is which.
+    #[test]
+    fn report_card_shares_are_converted() {
+        let bundle = super::build();
+        let with_outcome: Vec<_> = bundle
+            .districts
+            .iter()
+            .filter_map(|d| d.outcome.as_ref())
+            .collect();
+        assert!(
+            with_outcome.len() > 500,
+            "the report card covers most districts"
+        );
+
+        let disadvantaged: Vec<f64> = with_outcome
+            .iter()
+            .filter_map(|o| o.economically_disadvantaged)
+            .collect();
+        let max = disadvantaged.iter().copied().fold(f64::MIN, f64::max);
+        // Districts genuinely reach the ceiling, so the top of the range is 1.0 and not merely
+        // "below 1.0" — a conversion that quietly clamped would pass a laxer assertion.
+        assert!((max - 1.0).abs() < 1e-9, "the ceiling is 1.0, not {max}");
+        assert!(
+            disadvantaged.iter().any(|v| *v > 0.5),
+            "the scale is not divided twice"
+        );
     }
 }

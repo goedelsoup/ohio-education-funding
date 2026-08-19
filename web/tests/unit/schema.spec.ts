@@ -778,3 +778,90 @@ test("growth-measure disagreement is counted over determinate pairs only", () =>
     expect(Math.min(Math.abs(a), Math.abs(b))).toBeLessThan(0.05);
   }
 });
+
+test("every share the feed publishes is a fraction", () => {
+  /*
+   * The rule was true of all but three fields and enforced by nothing, which is the shape a
+   * silent defect takes here. The report card publishes 0 to 100; the bundle passed those
+   * straight through until contract `35.0.0`; and `outcome.economically_disadvantaged` sat in the
+   * same document as `District.economically_disadvantaged` under the same name and 100× apart,
+   * both typed `maybeNum` and neither saying which it was.
+   *
+   * It never reached a page — nothing in `web/` rendered the report card's copy — which is the
+   * only reason it was a latent defect rather than a `10000%` on a card. The next one will not
+   * get that luck, so the rule is a test.
+   *
+   * The Rust side asserts the same thing over the bundle it builds. This asserts it over the
+   * bundle that is *committed*, which is what this site actually renders and what `/data` serves
+   * to anyone who downloads it — a regenerated feed and a stale one fail here differently.
+   */
+  const { bundle } = loadFeed();
+
+  const shares: [string, (d: (typeof bundle.districts)[number]) => number | null | undefined][] = [
+    ["economically_disadvantaged", (d) => d.economically_disadvantaged],
+    ["dpia.percentage", (d) => d.dpia.percentage],
+    ["regime.recognized_share", (d) => d.regime?.recognized_share],
+    ["transportation.effective_state_share", (d) => d.transportation?.effective_state_share],
+    ["outcome.economically_disadvantaged", (d) => d.outcome?.economically_disadvantaged],
+    ["outcome.english_learner", (d) => d.outcome?.english_learner],
+    ["outcome.students_with_disabilities", (d) => d.outcome?.students_with_disabilities],
+    ["national.local_share", (d) => d.national?.local_share],
+    ["national.local_share_percentile", (d) => d.national?.local_share_percentile],
+    ["national.revenue_per_pupil_percentile", (d) => d.national?.revenue_per_pupil_percentile],
+    ["national.spending_per_pupil_percentile", (d) => d.national?.spending_per_pupil_percentile],
+  ];
+
+  const offenders: string[] = [];
+  for (const [name, read] of shares) {
+    let seen = 0;
+    for (const d of bundle.districts) {
+      const v = read(d);
+      if (v == null) continue;
+      seen += 1;
+      if (v < 0 || v > 1) offenders.push(`${name} = ${v} for IRN ${d.irn}`);
+    }
+    /*
+     * A field nothing carries would pass the range check by being absent, which is not the same
+     * as passing it — so each one has to be present before its range means anything.
+     *
+     * The floor is 250 rather than "nearly all" because one of these genuinely is not: the report
+     * card suppresses small subgroups, so `outcome.english_learner` is on 303 districts against
+     * 606 for the other two. A threshold set from the common case would have failed on a real
+     * property of the source rather than on a defect.
+     */
+    expect(seen, `${name} is present in the feed`).toBeGreaterThan(250);
+  }
+
+  expect(
+    offenders.slice(0, 10),
+    "a share outside 0..1: the feed publishes two scales under one convention",
+  ).toEqual([]);
+});
+
+test("the two poverty shares are different variables, and say so by disagreeing", () => {
+  /*
+   * They are now the same units, which is the point of `35.0.0` — and being the same units is
+   * exactly what would let a future reader assume they are the same number. They are not: one is
+   * the FY2024 profile report's untop-coded share, the other the 2024-25 report card's, top-coded
+   * by community eligibility. Against the Performance Index they give −0.846 and −0.734, and the
+   * crates carry both deliberately.
+   *
+   * So this pins the distinction the units no longer make for us.
+   */
+  const { bundle } = loadFeed();
+  const both = bundle.districts.filter(
+    (d) => d.economically_disadvantaged != null && d.outcome?.economically_disadvantaged != null,
+  );
+  expect(both.length).toBeGreaterThan(400);
+
+  const differing = both.filter(
+    (d) => Math.abs(d.economically_disadvantaged! - d.outcome!.economically_disadvantaged!) > 0.01,
+  );
+  expect(differing.length, "the two measures are not one measure written twice").toBeGreaterThan(50);
+
+  // Both on the same scale, so neither is 100× the other any more.
+  for (const d of both) {
+    expect(d.outcome!.economically_disadvantaged!).toBeLessThanOrEqual(1);
+    expect(d.economically_disadvantaged!).toBeLessThanOrEqual(1);
+  }
+});

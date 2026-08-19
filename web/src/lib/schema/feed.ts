@@ -51,6 +51,11 @@ const maybeNum = z.number().nullable();
  *
  * `economically_disadvantaged` is the report card's, which is top-coded by community eligibility.
  * The untop-coded share is `District.economically_disadvantaged`.
+ *
+ * Both are **fractions**, as every share in this feed is. They were not always: the report card
+ * publishes 0 to 100 and the bundle passed that through until contract `35.0.0`, so two fields of
+ * the same name sat in one document 100× apart, both `maybeNum` and neither saying which it was.
+ * `sharesAreFractions` in `tests/unit/schema.spec.ts` is what keeps that from coming back.
  */
 export const DistrictOutcomeSchema = z
   .object({

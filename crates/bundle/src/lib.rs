@@ -37,7 +37,22 @@ use edfund_core::Dollars;
 
 /// The bundle schema version. Bump on any change to field names, units, or semantics.
 ///
-/// `33.0.0` extends `appropriations` back to **FY1998** and adds a third value to its `source`
+/// `35.0.0` puts the three report-card shares on the same scale as every other share the bundle
+/// publishes. `outcome.economically_disadvantaged`, `outcome.english_learner` and
+/// `outcome.students_with_disabilities` were passed through as the report card writes them —
+/// **0 to 100** — while `District::economically_disadvantaged`, `dpia.percentage`,
+/// `regime.recognized_share`, `transportation.effective_state_share` and every `national` share
+/// are fractions. Two fields named `economically_disadvantaged` in one document, 100× apart, both
+/// typed `Option<f64>` and neither saying which it was.
+///
+/// Breaking in the quietest and worst way available: a consumer reading the old values gets a
+/// plausible number that is wrong by two orders of magnitude, and a percentage rendered through a
+/// helper expecting a fraction reads `10000%` rather than failing. Nothing in this workspace
+/// computed on them — they are a passthrough into the bundle, and the partial correlations control
+/// on the *profile* report's share, which was always a fraction — so the change is to the
+/// published units and to nothing else.
+///
+/// `34.0.0` and `33.0.0` extend `appropriations` back to **FY1998** and adds a third value to its `source`
 /// field, `act`. Breaking on the enum: a consumer switching on `workbook` or `catalog` now meets a
 /// third case. The four new years are read from the enrolled acts rather than from any analysis of
 /// them, because the greenbook series begins with the 124th General Assembly and the Catalog
@@ -130,7 +145,7 @@ use edfund_core::Dollars;
 /// from FY2022-FY2024 to FY2024-FY2026 — the years the department's `ADM Data` sheet declares.
 /// The values did not change; what they are called did, which is exactly the kind of silent
 /// meaning change the version guard exists for.
-pub const CONTRACT_VERSION: &str = "34.0.0";
+pub const CONTRACT_VERSION: &str = "35.0.0";
 
 /// How a year is reckoned, because Ohio reckons three ways and they do not line up.
 ///
@@ -252,11 +267,15 @@ pub struct DistrictOutcome {
     pub per_equivalent_pupil_federal: Option<Dollars>,
     /// The state and local part. The two add to the whole for every district that has them.
     pub per_equivalent_pupil_state_local: Option<Dollars>,
-    /// Economically disadvantaged share, 2024-25, top-coded.
+    /// Economically disadvantaged share, 2024-25, top-coded. A **fraction**, as every share here is.
+    ///
+    /// The report card publishes this as 0 to 100 and `main.rs` divides on the way in. Distinct
+    /// from [`District::economically_disadvantaged`], which is the profile report's untop-coded
+    /// share — the two are different variables, and until `35.0.0` they were also different units.
     pub economically_disadvantaged: Option<f64>,
-    /// English learner share, 2024-25.
+    /// English learner share, 2024-25. A fraction; the report card publishes 0 to 100.
     pub english_learner: Option<f64>,
-    /// Students with disabilities share, 2024-25.
+    /// Students with disabilities share, 2024-25. A fraction; the report card publishes 0 to 100.
     pub students_with_disabilities: Option<f64>,
 }
 
