@@ -2207,6 +2207,83 @@ test.describe("outside the formula", () => {
   });
 });
 
+test.describe("counties, which are a peer group and not a boundary", () => {
+  test("the index draws what each county spans, not only the ratio", async ({ page }) => {
+    /*
+     * The table ranks 88 counties by richest ÷ poorest and prints the ratio. A ratio is one number
+     * standing for two and the two are not recoverable from it — two counties at the same ratio
+     * can have non-overlapping wealth.
+     *
+     * Deliberately not a map. The card above this one says a county here is a peer group and not a
+     * boundary, because district lines cross county lines freely; a choropleth would assert the
+     * geography the page spends its first card denying, and the department's one-county-per-
+     * district attribution could not honestly draw the crossing anyway.
+     */
+    await page.goto("/counties");
+    const chart = page.locator('#disparity [data-chart="county-disparity"]');
+    await expect(chart.locator("svg")).toBeVisible();
+
+    // One row per county with two districts to compare; four of the 88 have only one.
+    const spans = chart.locator(".range-span line, .range-span path");
+    expect(await spans.count()).toBeGreaterThan(70);
+    expect(await chart.locator(".range-low circle").count()).toBe(await spans.count());
+    expect(await chart.locator(".range-high circle").count()).toBe(await spans.count());
+
+    /*
+     * The ends are two shades of one hue: a low end and a high end are one measure at two points,
+     * not two series.
+     *
+     * Read off the mark *group* rather than the circles. Plot puts a constant channel on the `<g>`
+     * and a computed one on each mark, so the banded scatters — whose fill is a function of the
+     * point — carry it per circle and this one does not.
+     */
+    const fills = await chart
+      .locator(".range-low, .range-high")
+      .evaluateAll((n) => n.map((g) => g.getAttribute("fill")));
+    expect(fills.sort()).toEqual(["var(--ordinal-1)", "var(--ordinal-3)"]);
+
+    await expect(page.locator("#disparity .legend .sw.ordinal-1")).toHaveCount(1);
+    await expect(page.locator("#disparity .legend .sw.ordinal-3")).toHaveCount(1);
+  });
+
+  test("the rows are ordered the way the table beside them is", async ({ page }) => {
+    // The chart and the table are the same data at two resolutions, and a reader moving between
+    // them should not have to re-find their county.
+    await page.goto("/counties");
+    // `textContent`, not `allInnerTexts`: `innerText` is empty for an SVG `<text>`, so the
+    // convenient helper silently compares eighty-four empty strings against the table.
+    const rows = await page
+      .locator('#disparity [data-chart="county-disparity"] .range-label text')
+      .evaluateAll((nodes) => nodes.map((n) => n.textContent ?? ""));
+    const table = await page.locator("#roster tbody tr th a").allInnerTexts();
+    expect(rows.length).toBeGreaterThan(70);
+    // Every charted county is in the table, in the same relative order.
+    const positions = rows.map((r) => table.indexOf(r));
+    expect(positions.every((p) => p >= 0), "a charted county missing from the table").toBe(true);
+    expect([...positions].sort((a, b) => a - b)).toEqual(positions);
+  });
+
+  test("a county page says whether its own disparity is a large one", async ({ page }) => {
+    // The card stated the ratio and never said what it was a lot of. The median county is 2.1x
+    // and Cuyahoga is 5.5x, which the page had no way of conveying.
+    await page.goto("/county/cuyahoga");
+    const chart = page.locator('#spread [data-chart="county-position"]');
+    await expect(chart.locator("svg")).toBeVisible();
+    await expect(chart.locator(".dist-marker")).toHaveCount(1);
+    expect(await chart.locator(".dist-dot circle").count()).toBeGreaterThan(70);
+    await expect(page.locator("#spread")).toContainText("The median county is");
+  });
+
+  test("a single-district county gets neither chart, and says why", async ({ page }) => {
+    // A ratio needs two districts. Four counties have one, and their absence from the comparison
+    // is a real answer rather than a gap to fill.
+    await page.goto("/county/vinton");
+    await expect(page.locator('[data-chart="county-position"]')).toHaveCount(0);
+    await expect(page.locator('[data-chart="county-spread"]')).toHaveCount(0);
+    await expect(page.locator("#spread")).toContainText("no internal disparity to measure");
+  });
+});
+
 test.describe("colour that carries a third variable", () => {
   test("the spending charts are banded by poverty, with the legend the ramp obliges", async ({
     page,

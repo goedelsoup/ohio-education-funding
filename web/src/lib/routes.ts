@@ -123,6 +123,7 @@ export const SECTIONS = {
     peerGroup: "peer-group",
     roster: "roster",
     spread: "spread",
+    disparity: "disparity",
   },
 
   /** `/house`, `/senate`, and `/[chamber]/[number]`. */

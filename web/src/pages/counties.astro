@@ -8,11 +8,13 @@
  * reader will meet them.
  */
 import Base from "../layouts/Base.astro";
-import { counties } from "../lib/county.ts";
+import { counties, type County } from "../lib/county.ts";
 import { loadFeed } from "../lib/feed.ts";
 import { count, money } from "../lib/format.ts";
 import * as routes from "../lib/routes.ts";
 import { yearChip } from "../lib/year.ts";
+import { rangeSpec } from "../lib/plot/spec.ts";
+import { renderToString } from "../lib/plot/ssr.ts";
 import SectionAnchor from "../components/SectionAnchor.astro";
 
 const { bundle } = loadFeed();
@@ -20,6 +22,77 @@ const all = counties(bundle.districts);
 const ranked = [...all].sort((a, b) => (b.valuationRatio ?? 0) - (a.valuationRatio ?? 0));
 const widest = ranked[0]!;
 const measurable = all.filter((c) => c.valuationRatio != null);
+
+/*
+ * What each county spans, rather than the ratio that stands for it.
+ *
+ * Four of the 88 have a single reporting district and no internal spread to measure, so they are
+ * absent from the chart and present in the table — which is the right split: a ratio needs two
+ * districts and their absence is a real answer rather than a gap.
+ */
+const spanned = measurable.length;
+const rows = ranked
+  .filter((c) => c.valuationRatio != null && c.poorest && c.richest)
+  .map((c) => ({
+    label: c.name,
+    low: c.poorest!.valuation_per_pupil!,
+    high: c.richest!.valuation_per_pupil!,
+    hover:
+      `${c.name}: ${c.poorest!.name} ${money(c.poorest!.valuation_per_pupil!)}, ` +
+      `${c.richest!.name} ${money(c.richest!.valuation_per_pupil!)} — ${c.valuationRatio!.toFixed(1)}× apart`,
+  }));
+const disparity = renderToString(
+  rangeSpec(rows, {
+    label: "assessed valuation per pupil",
+    format: (v) => money(v),
+    log: true,
+  }),
+);
+
+/*
+ * How far the two orderings diverge, counted rather than asserted.
+ *
+ * "Within ten places" is a coarse test and deliberately so: the claim is that the orders are
+ * nearly independent, and a rank correlation would be a computed statistic in the web layer, which
+ * is the thing `relationships.ts` explains this repository does not do.
+ */
+const byFloor = [...measurable].sort(
+  (a, b) => a.poorest!.valuation_per_pupil! - b.poorest!.valuation_per_pupil!,
+);
+const agreement = ranked
+  .filter((c) => c.valuationRatio != null)
+  .filter((c, i) => Math.abs(byFloor.indexOf(c) - i) < 10).length;
+
+/*
+ * A pair at the same ratio whose ranges do not overlap, found rather than named.
+ *
+ * Brown and Wood are the pair today. Written down, the sentence would go on naming them after a
+ * regenerated bundle moved the ratios, and the point it makes is about the measure rather than
+ * about those two counties.
+ */
+const overlapping = (() => {
+  const sorted = [...measurable].sort((a, b) => a.valuationRatio! - b.valuationRatio!);
+  let best: { lower: County; upper: County; gap: number } | null = null;
+  for (let i = 1; i < sorted.length; i += 1) {
+    const [a, b] = [sorted[i - 1]!, sorted[i]!];
+    if (Math.abs(a.valuationRatio! - b.valuationRatio!) >= 0.05) continue;
+    const lower = a.richest!.valuation_per_pupil! < b.richest!.valuation_per_pupil! ? a : b;
+    const upper = lower === a ? b : a;
+    const gap = upper.poorest!.valuation_per_pupil! - lower.richest!.valuation_per_pupil!;
+    // Not the first qualifying pair but the most separated one. The first is whichever sits
+    // lowest in the ratio order, which is an edge of the distribution; the widest gap is the
+    // clearest statement of what the ratio is not telling you.
+    if (gap > 0 && (best == null || gap > best.gap)) best = { lower, upper, gap };
+  }
+  return best == null
+    ? null
+    : {
+        a: best.lower.name,
+        b: best.upper.name,
+        ratio: best.lower.valuationRatio!.toFixed(1),
+        gap: money(best.gap),
+      };
+})();
 ---
 
 <Base
@@ -44,6 +117,43 @@ const measurable = all.filter((c) => c.valuationRatio != null);
       district to exactly one county; Ohio school district lines follow historical township lines
       and cross county lines freely. So these pages compare districts the department groups
       together, and none of them reports a figure as the county's own.
+    </p>
+  </div>
+
+  <div class="card" id="disparity" data-part="disparity">
+    <h2><SectionAnchor id="disparity" />What each county spans<Fragment set:html={yearChip("formula")} /></h2>
+    <p class="note">
+      One row per county: the assessed valuation per pupil its poorest district stands on, its
+      richest, and the distance between them. Ordered by that distance, widest at the top — the
+      same order as the table below.
+    </p>
+    <div class="legend">
+      <span><i class="sw ordinal-1"></i> Poorest district</span>
+      <span><i class="sw ordinal-3"></i> Richest district</span>
+    </div>
+    <div class="chartwrap" data-chart="county-disparity" set:html={disparity} />
+    <p class="note">
+      {/* `{" "}` before every expression that opens a line. Astro trims the newline between text
+          and an adjacent expression exactly as JSX does, and the e2e scan for that defect only
+          sees the form that leaves a tag behind — this one leaves none. */}
+      The scale is logarithmic, which is what makes this readable rather than decorative: on a log
+      axis a row's <strong>length is its ratio</strong> and its{" "}
+      <strong>position is its level</strong>. So the lengths step down the page in the order the
+      table sorts by and the positions do not.
+      {overlapping && (
+        <>
+          {" "}
+          <strong>
+            {overlapping.a} and {overlapping.b} span the same {overlapping.ratio}&times; and do not
+            overlap at all
+          </strong>
+          : {overlapping.gap} per pupil separates them, {overlapping.b}'s <em>poorest</em> district
+          standing on more valuation than {overlapping.a}'s richest.
+        </>
+      )}{" "}
+      Ranking the counties by disparity and ranking them by what their poorest district has agree
+      for only {agreement} of {spanned}, so the column the table sorts on is one of two nearly
+      independent orders.
     </p>
   </div>
 

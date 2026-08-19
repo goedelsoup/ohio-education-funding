@@ -1,5 +1,5 @@
 /**
- * The six chart forms, as Observable Plot specifications.
+ * The seven chart forms, as Observable Plot specifications.
  *
  * # Why the spec is separate from the rendering
  *
@@ -33,6 +33,7 @@ import type {
   Bin,
   DistributionValue,
   FanPoint,
+  Range,
   ScatterPoint,
   SeriesPoint,
   Trace,
@@ -417,6 +418,138 @@ export function scatterSpec(
     hovers: {
       selector: ".scatter-hit > *",
       text: points.map((p) => escapeHtml(p.hover)),
+    },
+  };
+}
+
+/**
+ * Many items, each with a low end and a high end, on one measure.
+ *
+ * # Why the ratio was not enough
+ *
+ * `/counties` ranked 88 counties by richest ÷ poorest valuation per pupil and printed the ratio.
+ * A ratio is one number standing for two and the two are not recoverable from it. Brown and Wood
+ * are both 2.1×, and Wood's *poorest* district stands on more valuation per pupil than Brown's
+ * richest — the same "internal disparity" over non-overlapping wealth. Ordering the counties by
+ * disparity and ordering them by floor agree for 29 of 84, so the page was showing one of two
+ * nearly independent rankings and calling it the shape of the state.
+ *
+ * # Why the axis is logarithmic, which is the whole design
+ *
+ * On a log axis a bar's **length is its ratio** and its **position is its level**. Sorted by ratio
+ * the lengths step down monotonically while the positions scatter freely, so "the same disparity
+ * in a different place" is not a sentence a reader has to be told — it is the picture. On a linear
+ * axis the same sort produces bars whose lengths have no fixed relationship to the number they are
+ * sorted by, which is worse than the table it replaced.
+ *
+ * # Two shades of one hue, not two hues
+ *
+ * The ends of a range are the same measure at two points, not two series, so they take one hue in
+ * steps — the ordinal ramp's first and last, already validated all-pairs. Two categorical hues
+ * would say the low end and the high end are different kinds of thing.
+ */
+export function rangeSpec(
+  rows: Range[],
+  axis: { label: string; format: (v: number) => string; log?: boolean },
+): Spec | null {
+  if (rows.length < 2) return null;
+
+  const values = rows.flatMap((r) => [r.low, r.high]);
+  const min = Math.min(...values);
+  const max = Math.max(...values);
+
+  const rowHeight = 14;
+  const longest = Math.max(...rows.map((r) => r.label.length));
+  const marginLeft = Math.max(70, Math.min(150, Math.round(longest * 6.2) + 10));
+
+  return {
+    options: {
+      width: WIDTH,
+      height: rows.length * rowHeight,
+      marginLeft,
+      marginRight: 16,
+      marginTop: 0,
+      marginBottom: 22,
+      x: {
+        axis: null,
+        type: axis.log ? "log" : "linear",
+        domain: axis.log ? [min, max] : [min - (max - min) * 0.04, max + (max - min) * 0.04],
+      },
+      y: { axis: null, domain: rows.map((r) => r.label), padding: 0.2 },
+      marks: [
+        // The span. Thin, and under both ends: it is the distance, and the ends are what it runs
+        // between.
+        Plot.ruleY(rows, {
+          y: "label",
+          x1: "low",
+          x2: "high",
+          stroke: INK.rule,
+          strokeWidth: 1,
+          className: "range-span",
+        }),
+        Plot.dot(rows, {
+          y: "label",
+          x: "low",
+          r: 3,
+          fill: ORDINAL[0],
+          stroke: "none",
+          className: "range-low",
+        }),
+        Plot.dot(rows, {
+          y: "label",
+          x: "high",
+          r: 3,
+          fill: ORDINAL[2],
+          stroke: "none",
+          className: "range-high",
+        }),
+        Plot.text(rows, {
+          y: "label",
+          frameAnchor: "left",
+          dx: -8,
+          text: "label",
+          textAnchor: "end",
+          fill: INK.secondary,
+          fontSize: 10,
+          className: "range-label",
+        }),
+        Plot.text([0], {
+          frameAnchor: "bottom-left",
+          dy: 16,
+          text: () => axis.format(min),
+          textAnchor: "start",
+          fill: INK.muted,
+          fontSize: 11,
+        }),
+        Plot.text([0], {
+          frameAnchor: "bottom",
+          dy: 16,
+          text: () => axis.label + (axis.log ? " (log scale)" : ""),
+          fill: INK.muted,
+          fontSize: 11,
+        }),
+        Plot.text([0], {
+          frameAnchor: "bottom-right",
+          dy: 16,
+          text: () => axis.format(max),
+          textAnchor: "end",
+          fill: INK.muted,
+          fontSize: 11,
+        }),
+        // One full-width band per row, above everything: the hit target is the row, not the 3px
+        // dot at either end of it.
+        Plot.rect(rows, {
+          y: "label",
+          x1: min,
+          x2: max,
+          fill: "transparent",
+          className: "range-hit",
+        }),
+      ],
+    },
+    hovers: {
+      selector: ".range-hit > *",
+      text: rows.map((r) => escapeHtml(r.hover)),
     },
   };
 }

@@ -22,6 +22,8 @@ export async function getStaticPaths() {
 const { county } = Astro.props;
 const { bundle } = loadFeed();
 const medianAid = medianRealizedAid(bundle.districts);
+/* Every county, so the spread card can place this one's disparity among the rest. */
+const all = counties(bundle.districts);
 
 const description =
   county.valuationRatio == null
@@ -49,5 +51,5 @@ const description =
   <p class="note"><a href="/counties">All {count(88)} counties</a>, ordered by that ratio. The
     median Ohio district receives {money(medianAid)} per pupil in state aid.</p>
 
-  <Fragment set:html={renderCounty(county, bundle.statewide, medianAid)} />
+  <Fragment set:html={renderCounty(county, bundle.statewide, medianAid, all)} />
 </Base>
