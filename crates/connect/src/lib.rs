@@ -802,6 +802,54 @@ pub fn rebuild(root: &Path) -> Result<Vec<Rebuilt>, RebuildError> {
         });
     }
 
+    // LSC's education analysis of each budget act the corpus describes from one. All of them or
+    // none, for the reason the DeRolph opinions are: this is the only committed account of what
+    // those acts did, and a file that reads as a series while silently missing a biennium is worse
+    // than no file.
+    let greenbooks: Result<Vec<fixtures::Record>, cache::FetchError> =
+        registry::connector("lsc-budget")
+            .expect("registered")
+            .sources
+            .iter()
+            .filter(|src| src.fixtures.contains(&fixtures::LSC_GREENBOOK_FIXTURE))
+            .map(|src| {
+                let text = cache::pdf_text(root, src)?;
+                Ok(fixtures::Record {
+                    id: src.key.to_string(),
+                    title: src.title.unwrap_or(src.key).to_string(),
+                    // The month on the cover, which is months after the act took effect and is
+                    // the date the *analysis* speaks from rather than the date the act does.
+                    date: fixtures::published_on(&text),
+                    source: src.url.to_string(),
+                    body: text.trim().to_string(),
+                })
+            })
+            .collect();
+    out.push(match greenbooks {
+        Ok(mut greenbooks) => {
+            // Oldest first, by the General Assembly number in the URL path — the one place the
+            // ordering is stated by data rather than by the order somebody happened to add the
+            // sources in. The registry's order is the appropriation series' order and has no
+            // reason to be chronological; the file says "oldest first" and now is.
+            greenbooks.sort_by_key(|record| general_assembly(&record.source));
+            Rebuilt::Written {
+                path: fixtures::LSC_GREENBOOK_FIXTURE.to_string(),
+                rows: fixtures::write_text(
+                    &root.join(fixtures::LSC_GREENBOOK_FIXTURE),
+                    &fixtures::build_records(
+                        "LSC's education analysis of each enacted budget act this corpus \
+                         describes from one. As enrolled. One record per act, oldest first.",
+                        &greenbooks,
+                    ),
+                )?,
+            }
+        }
+        Err(cause) => Rebuilt::Skipped {
+            path: fixtures::LSC_GREENBOOK_FIXTURE.to_string(),
+            reason: cause.to_string(),
+        },
+    });
+
     // The appropriation-line series: eight bienniums, two documents each.
     //
     // Both variants, because neither carries both claims. The `as enacted` workbook states what
@@ -1647,6 +1695,19 @@ fn mr81_panel(root: &Path) -> Result<Vec<Vec<String>>, String> {
 ///
 /// With no match, the prefix is passed through to the reader so the error names it and lists the
 /// sheets that are actually there — better than a bare `None` when the department renames again.
+/// The General Assembly a document's URL puts it under, or `0` where the path does not say.
+///
+/// `.../assets/legislation/130/hb59/en/files/...` — the segment after `legislation`. Zero rather
+/// than a panic for a URL shaped differently: an unsortable record belongs at the front of the
+/// file where it is conspicuous, not in the middle of a sequence pretending to be in order.
+fn general_assembly(url: &str) -> u16 {
+    url.split("/legislation/")
+        .nth(1)
+        .and_then(|rest| rest.split('/').next())
+        .and_then(|segment| segment.parse().ok())
+        .unwrap_or(0)
+}
+
 fn sheet_by_prefix(
     book: &spreadsheet::AnyWorkbook,
     prefix: &str,

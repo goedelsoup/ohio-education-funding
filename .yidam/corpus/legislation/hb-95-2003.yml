@@ -1,0 +1,94 @@
+class: legislation
+label: Am. Sub. H.B. 95 (2003) — FY2004-05 Budget; the First After DeRolph
+summary: >-
+  The first operating budget enacted after the Supreme Court released jurisdiction over DeRolph,
+  six weeks earlier. It changed nothing structural about the formula the litigation had been
+  about: the same successful-schools base cost, the same county cost adjustment, the same 23 mills.
+description: |
+  Signed six weeks after the Ohio Supreme Court ended eleven years of school funding litigation,
+  and the clearest available evidence of what the end of that litigation did to the funding
+  system.
+
+  **The formula it kept.** Base cost is `formula amount × cost of doing business factor × formula
+  ADM`. The formula amount is **$5,058 in FY2004 and $5,169 in FY2005**, reached by inflating a
+  per-pupil figure of $4,814 — itself derived by the 124th General Assembly from FY1999 spending
+  data — at 2.8% a year. [verified — the greenbook]
+
+  The derivation is the successful-schools method: each district's spending per pupil corrected
+  for special education, career-technical education, transportation, disadvantaged pupil impact
+  aid, federal funding and the cost of doing business adjustment; the top and bottom 5% on each of
+  two wealth measures removed as outliers; the remainder averaged. The **local contribution
+  requirement stayed at 23 mills.** [verified]
+
+  **What it did move.** Parity aid — the equalisation supplement for low-wealth districts — rises
+  **59.2% in FY2004 and 33.1% in FY2005**, and the special education weighted funding percentage
+  rises to **88%** in FY2004. [verified] Both are increases inside an unchanged structure.
+
+  **Scale.** 612 school districts, 49 joint vocational districts and 132 community schools; GRF
+  appropriations of $7,149.3 million in FY2004 and $7,317.8 million in FY2005, $9,334.1 million and
+  $9,648.1 million across all funds. Combined state and local expenditure on the system exceeded
+  $16 billion in FY2002. [verified]
+findings: |
+  ### What the end of the litigation looks like in a budget act
+
+  DeRolph enforcement ended on **16 May 2003**, when the court granted a writ of prohibition
+  barring the trial court from further proceedings on remand — no compliance finding either way.
+  [verified — [`derolph-iv-2002`](../litigation/derolph-iv-2002.yml)] This act was signed six
+  weeks later.
+
+  It is the natural place to look for the system's response, and the response is that there was
+  none of a structural kind. The base cost method the court had heard argument about for a decade
+  is carried forward with an inflator; the cost of doing business factor the plaintiffs objected to
+  is retained; the 23-mill charge-off is unchanged. The money inside the structure moves — parity
+  aid substantially — but nothing about how a district's entitlement is computed does. [inference]
+
+  That is a claim about one act and not about the decade, and the corpus cannot yet check it
+  against the two budgets on either side: H.B. 94 (2001) has a node written from secondary
+  recitation, and no act between H.B. 66 (2005) and this one is missing, but the FY2006-07 pair is
+  read only through its appropriation table. [open]
+
+  ### The base cost figure the whole plan is measured against starts here
+
+  $5,058 per pupil in FY2004, on FY1999 data. The Fair School Funding Plan's own base cost is built
+  on FY2018 inputs, refreshed once to FY2022 by H.B. 33 and then frozen there by H.B. 96 — the same
+  practice of pricing a formula at a reference year and letting it age, two regimes apart.
+  [inference]
+
+  44 budget lines name H.B. 95 in their `legal_basis`. [verified]
+properties:
+  designation: Am. Sub. H.B. 95
+  general_assembly: 125th General Assembly
+  signed: 2003-06-26
+  effective: 2003-09-24
+  subject: |
+    Enacted the FY2004-05 operating budget. Retained the successful-schools base cost method, the
+    cost of doing business factor and the 23-mill local contribution unchanged; set the formula
+    amount at $5,058 and $5,169 by inflating a FY1999-data figure at 2.8% a year; raised parity aid
+    59.2% and 33.1% and the special education weighted funding percentage to 88%.
+  vetoes: |
+    Two, both small and both earmarks rather than mechanisms. [verified — the greenbook]
+
+    The Governor vetoed an earmark directing OhioReads grant recipients to use senior citizens as
+    tutors, and an item requiring the Department of Job and Family Services to reserve $3.5 million
+    of Workforce Investment Act funds for the Jobs for Ohio Graduates programme and to enter an
+    interagency agreement for it. LSC notes that both agencies already had discretion to do the
+    second thing anyway.
+
+    Nothing in this act's funding formula was vetoed, which is consistent with the rest of it: the
+    formula is what this budget left alone.
+  accountability_effect: |
+    Not assessed against `accountability-regime` here. [open]
+links:
+  - target: ../legislation.ont.yml
+    relationship: instance-of
+  - target: hb-94-2001.yml
+    relationship: amends
+  - target: ../funding-regime/foundation-base-cost-formula.yml
+    relationship: continues
+  - target: ../litigation/derolph-iv-2002.yml
+    relationship: follows
+    note: >-
+      Six weeks after the court released jurisdiction, and the reason this node is worth having:
+      it is where a structural response would have appeared and did not.
+  - target: ../../catalog/lsc-dew-redbook.md
+    relationship: sourced-from

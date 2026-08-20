@@ -35,10 +35,24 @@ properties:
     zero or at a minimum guarantee. Base cost was set in the biennial budget.
   status: superseded
   boundary_note: |
-    Treated here as one regime across roughly two decades because its structure was stable.
-    Substantial parameter changes occurred within it, particularly after DeRolph, including
-    the building-blocks recosting of the late 1990s. Whether those warrant separate regime
-    nodes is unresolved. [open]
+    Treated here as one regime across roughly two decades, and "because its structure was stable"
+    is no longer the reason — it was not stable at the end. [H.B. 119](../legislation/hb-119-2007.yml)
+    abolished the cost of doing business factor, abolished the FY2005 base cost guarantee, and
+    moved parity aid and poverty-based assistance inside the base cost calculation, all in the
+    regime's last biennium. [verified]
+
+    It stays one node anyway, and for a reason rather than for want of evidence: what those changes
+    removed were *adjustments to* a base cost computed by the successful-schools method, and that
+    method survives to the end — [H.B. 95](../legislation/hb-95-2003.yml) is still inflating a
+    FY1999-data figure in FY2005. The method is the regime; the multiplier and the floor were
+    fittings on it. That is the same test applied to
+    [`bridge-formula`](bridge-formula.yml), where the caps-and-guarantees mechanism turned out to
+    be the continuity and the formula overlays were not.
+
+    What remains open is the other end: the building-blocks recosting of the late 1990s, and
+    whether the regime as enacted in 1975 and the regime H.B. 94 rebuilt in 2001 are one thing.
+    No act before the 122nd General Assembly is served by any publisher, so that end cannot be read
+    the way this one now can. [open]
 links:
   - target: ../funding-regime.ont.yml
     relationship: instance-of

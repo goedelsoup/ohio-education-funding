@@ -1,0 +1,113 @@
+class: legislation
+label: Am. Sub. H.B. 119 (2007) — FY2008-09 Budget; Two Protections Removed
+summary: >-
+  The last budget before the Evidence-Based Model, and the one that took the foundation formula
+  apart from inside: it abolished the cost of doing business factor, abolished the base cost
+  guarantee, and folded parity aid and poverty-based assistance into the base cost.
+description: |
+  The final act of the foundation base cost regime, and the evidence that the regime's structure
+  was not stable to the end.
+
+  **The base cost formula amount** rises 3.0% a year to **$5,565 in FY2008 and $5,732 in FY2009**,
+  still built from three components — base classroom teacher cost, and the two others the formula
+  had always carried. [verified — the greenbook]
+
+  ### Three structural changes, two of them removals
+
+  **The cost of doing business factor is abolished.** The CDBF was computed per county from wages
+  in that county and every contiguous one, and it multiplied the formula amount: in FY2005 it
+  raised the highest-cost county's amount by **7.5%**. H.B. 66 had already phased the differential
+  down to 5.0% in FY2006 and 2.5% in FY2007; this act removes it. [verified] A geographic cost
+  adjustment that took eight years to build and four to dismantle, and Ohio's formula has had none
+  since.
+
+  **The base cost guarantee is abolished.** Under former law a district's state base cost funding
+  was guaranteed to be no lower than the lesser of its aggregate or per-pupil base cost funding in
+  FY2005. This act removes the provision outright. [verified]
+
+  **Parity aid and poverty-based assistance move inside the base cost.** Both were separate
+  state-funded supplements; the act adds them to total base cost before the state share percentage
+  is computed. Because both are wholly state-funded, folding them in **raises the state share
+  percentage for most districts** — and that percentage then determines the state's share of
+  special education and career-technical weighted funding. [verified] A change of accounting
+  position that moves money in a different programme.
+
+  **Other provisions.** The poverty index stops using current-year data, so it stabilises within a
+  year. A new *Closing the Achievement Gap* programme pays on an "academic distress index" — the
+  share of a district's buildings in academic watch or emergency, divided by the statewide share —
+  for districts above a threshold on both that and poverty. [verified]
+findings: |
+  ### It settles what `foundation-base-cost-formula` left open about its own boundary
+
+  That regime node records its structure as "stable" across two decades and asks, `[open]`, whether
+  the changes inside it warrant separate regime nodes. On the evidence of this act the structure
+  was not stable at the end: the multiplier was removed, the floor was removed, and two supplements
+  changed which side of the state-share calculation they sat on. Whether that is a new regime or
+  the old one being emptied is a judgement the corpus can now make from a source rather than from
+  silence. [inference]
+
+  ### Two removals, and only one of them is remembered
+
+  The Fair School Funding Plan is routinely described as ending Ohio's guarantees, and it did not:
+  it has its own, anchored at FY2020 and [never re-based](../parameter/guarantee-funding-base.yml).
+  The guarantee that was actually abolished — the FY2005 base cost floor — went in 2007, two
+  regimes earlier, and nothing in this corpus recorded it before. [verified]
+
+  ### The last formula before the Evidence-Based Model
+
+  [H.B. 1 of 2009](hb-1-2009.yml) replaced this with the EBM two years later, and
+  [H.B. 153 of 2011](hb-153-2011.yml) repealed that after one biennium. So the formula this act
+  spent its provisions rebuilding was legislated out of existence within twenty-four months, and
+  the Bridge formula that followed distributed by reference to prior-year amounts — meaning
+  FY2009's distribution, computed under the rules this act wrote, is inside the chain of anchors
+  that reaches FY2027. [inference — the chain is in
+  [`bridge-formula`](../funding-regime/bridge-formula.yml), and how far below FY2013 it reaches is
+  still open]
+
+  106 budget lines name H.B. 119 in their `legal_basis`, more than any other act of the pre-2010
+  era except H.B. 152 of the 120th. [verified]
+properties:
+  designation: Am. Sub. H.B. 119
+  general_assembly: 127th General Assembly
+  signed: 2007-06-30
+  effective: 2007-09-28
+  subject: |
+    Enacted the FY2008-09 operating budget. Raised the base cost formula amount 3.0% a year to
+    $5,565 and $5,732; abolished the cost of doing business factor and the FY2005 base cost
+    guarantee; moved parity aid and poverty-based assistance inside the base cost calculation,
+    raising most districts' state share percentage; stabilised the poverty index by dropping
+    current-year data; created Closing the Achievement Gap on an academic distress index.
+  vetoes: |
+    Three, and the first is a scholarship programme that would not exist for another four years.
+    [verified — the greenbook]
+
+    **The Special Education Scholarship Pilot Program**, creating scholarships for children with
+    disabilities to attend alternative public or private special education programmes, **funded by
+    transferring state aid from the scholarship child's resident district** — the deduct mechanism
+    exactly. Vetoed, together with its $50,000 and $250,000 administrative earmarks in
+    200-421. A materially identical programme was enacted later as the Jon Peterson Special Needs
+    Scholarship, which `dew-scholarship-reports` carries. [verified]
+
+    Also vetoed: a provision barring the department from withholding payment to a community school
+    over a disputed enrolment until the resident district proved the student was not enrolled — a
+    burden-of-proof rule in the community school deduct; and a provision letting the department
+    spend the Reading Recovery earmark on other reading programmes and on evaluating Reading
+    Recovery itself.
+  accountability_effect: |
+    Closing the Achievement Gap pays on the academic watch and academic emergency building counts,
+    which makes it one of the earliest points where Ohio's accountability ratings determine a
+    funding amount. Not assessed against `accountability-regime` here. [open]
+links:
+  - target: ../legislation.ont.yml
+    relationship: instance-of
+  - target: hb-66-2005.yml
+    relationship: amends
+  - target: ../funding-regime/foundation-base-cost-formula.yml
+    relationship: continues
+    note: >-
+      Continues it in name and dismantles it in substance. The regime node's own boundary question
+      is answered from this act.
+  - target: hb-1-2009.yml
+    relationship: precedes
+  - target: ../../catalog/lsc-dew-redbook.md
+    relationship: sourced-from

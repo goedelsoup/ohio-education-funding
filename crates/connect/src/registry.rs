@@ -1657,10 +1657,64 @@ pub const CONNECTORS: &[Connector] = &[
             filename: "hb95-greenbook.pdf",
             format: Format::Pdf,
             catalog: Some("lsc-dew-redbook"),
-            fixtures: &[crate::fixtures::APPROPRIATION_FIXTURE],
+            fixtures: &[
+                crate::fixtures::APPROPRIATION_FIXTURE,
+                crate::fixtures::LSC_GREENBOOK_FIXTURE,
+            ],
             note: "FY2004-FY2005 as enrolled, with the three preceding years as actuals. \
                    Read by clustering the right edges of the figures, because the table's own \
                    header labels sit narrower than the columns beneath them.",
+        },
+        Source {
+            key: "hb59-greenbook",
+            title: Some("H.B. 59 of the 130th General Assembly — LSC Greenbook, Department of Education"),
+            url: "https://www.lsc.ohio.gov/assets/legislation/130/hb59/en/files/\
+                  hb59-edu-greenbook-as-enrolled-130th-general-assembly.pdf",
+            filename: "hb59-greenbook.pdf",
+            format: Format::Pdf,
+            catalog: Some("lsc-dew-redbook"),
+            fixtures: &[crate::fixtures::LSC_GREENBOOK_FIXTURE],
+            note: "FY2014-FY2015, and the act that put a formula back on top of the Bridge \
+                   guarantee: the state share index, the Opportunity Grant, and seven categorical \
+                   aids. Its `Deductions and Transfers` chapter is the only committed account here \
+                   of the deduct-era mechanism `dew-payment-reports` is blocked on.",
+        },
+        Source {
+            key: "hb64-greenbook",
+            title: Some("H.B. 64 of the 131st General Assembly — LSC Greenbook, Department of Education"),
+            url: "https://www.lsc.ohio.gov/assets/legislation/131/hb64/en/files/\
+                  hb64-edu-greenbook-as-enrolled-131st-general-assembly.pdf",
+            filename: "hb64-greenbook.pdf",
+            format: Format::Pdf,
+            catalog: Some("lsc-dew-redbook"),
+            fixtures: &[crate::fixtures::LSC_GREENBOOK_FIXTURE],
+            note: "FY2016-FY2017. The second design over the same guarantee, which is the pair \
+                   `funding-regime/bridge-formula` names when it asks whether the overlays are \
+                   separate regimes or one continuous mechanism.",
+        },
+        Source {
+            key: "hb49-greenbook",
+            title: Some("H.B. 49 of the 132nd General Assembly — LSC Greenbook, Department of Education"),
+            url: "https://www.lsc.ohio.gov/assets/legislation/132/hb49/en/files/\
+                  hb49-edu-greenbook-as-enrolled-132nd-general-assembly.pdf",
+            filename: "hb49-greenbook.pdf",
+            format: Format::Pdf,
+            catalog: Some("lsc-dew-redbook"),
+            fixtures: &[crate::fixtures::LSC_GREENBOOK_FIXTURE],
+            note: "FY2018-FY2019.",
+        },
+        Source {
+            key: "hb166-greenbook",
+            title: Some("H.B. 166 of the 133rd General Assembly — LSC Greenbook, Department of Education"),
+            url: "https://www.lsc.ohio.gov/assets/legislation/133/hb166/en/files/\
+                  hb166-edu-greenbook-as-enrolled-133rd-general-assembly.pdf",
+            filename: "hb166-greenbook.pdf",
+            format: Format::Pdf,
+            catalog: Some("lsc-dew-redbook"),
+            fixtures: &[crate::fixtures::LSC_GREENBOOK_FIXTURE],
+            note: "FY2020-FY2021, the last biennium before the Fair School Funding Plan and the \
+                   one FY2020 the plan's temporary transitional aid guarantee holds districts at. \
+                   What that guarantee preserves is decided here.",
         },
         Source {
             key: "hb119-greenbook",
@@ -1670,7 +1724,10 @@ pub const CONNECTORS: &[Connector] = &[
             filename: "hb119-greenbook.pdf",
             format: Format::Pdf,
             catalog: Some("lsc-dew-redbook"),
-            fixtures: &[crate::fixtures::APPROPRIATION_FIXTURE],
+            fixtures: &[
+                crate::fixtures::APPROPRIATION_FIXTURE,
+                crate::fixtures::LSC_GREENBOOK_FIXTURE,
+            ],
             note: "FY2008-FY2009 as enrolled, with the three preceding years as actuals. \
                    Read by clustering the right edges of the figures, because the table's own \
                    header labels sit narrower than the columns beneath them.",

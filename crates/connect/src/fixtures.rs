@@ -2381,6 +2381,25 @@ pub fn build_casino_extract(sheets: &[CasinoSheet<'_>]) -> Result<Vec<Vec<String
         .collect())
 }
 
+/// LSC's education analysis of every enacted budget act the corpus describes from one.
+///
+/// One file rather than one per act, on the same ground [`OPINIONS_FIXTURE`] holds four opinions:
+/// they are the same kind of document about the same question, read together or not at all. A file
+/// that reads as a series and quietly omits the biennium whose PDF did not download is worse than
+/// no file, because a gap in the record and a gap in the cache look identical from the fixture.
+///
+/// **Named for what it holds rather than for when.** It was `bridge-era-greenbooks` for exactly one
+/// commit, which was long enough to be wrong: H.B. 95 and H.B. 119 are the two budgets before the
+/// Evidence-Based Model and are not Bridge era at all. A fixture named after the first thing put
+/// in it has to be renamed or lied about the second time, and this repository has a README's worth
+/// of evidence about which of those actually happens.
+///
+/// **As enrolled, which is the enacted document.** Not a redbook. That distinction has cost this
+/// repository a `[verified]` before: a redbook figure is the executive's proposal, and marking one
+/// verified reads as though the act had been checked. Every analysis here is LSC's account of what
+/// passed.
+pub const LSC_GREENBOOK_FIXTURE: &str = "crates/project/fixtures/lsc-education-greenbooks.txt";
+
 /// Where the deflator's check fixture is written, relative to the repository root.
 pub const CPI_FIXTURE: &str = "crates/connect/fixtures/cpi-u-june.tsv";
 /// Where the 2024-25 report card fixture is written, relative to the repository root.
@@ -4064,6 +4083,7 @@ pub const REBUILT: &[&str] = &[
     FINANCE_FIXTURE,
     SD1_FIXTURE,
     CASINO_FIXTURE,
+    LSC_GREENBOOK_FIXTURE,
     CPI_FIXTURE,
     F33_FIXTURE,
     F33_FY2024_FIXTURE,
@@ -4101,6 +4121,46 @@ pub const REBUILT: &[&str] = &[
 /// The test holds this list to both directions — an unlisted gap fails, and so does an entry that
 /// has quietly been fixed — so it cannot grow silently or rot after the work is done.
 pub const NOT_REGENERATED: &[(&str, &str)] = &[];
+
+/// The month a greenbook was published, from its cover page.
+///
+/// The cover carries a bare `August 2013` on a line of its own, some way below the analysts' names
+/// and above the table of contents. That is the date the **analysis** speaks from, which is months
+/// after the act took effect and is not the act's date — a distinction worth keeping in the field
+/// rather than in a comment, because a reader who takes it for the effective date is off by most
+/// of a fiscal year.
+///
+/// Empty where no such line is found, on the same ground as [`decided_on`]: a record whose date
+/// cannot be read should say nothing rather than guess.
+#[must_use]
+pub fn published_on(body: &str) -> String {
+    const MONTHS: [&str; 12] = [
+        "January",
+        "February",
+        "March",
+        "April",
+        "May",
+        "June",
+        "July",
+        "August",
+        "September",
+        "October",
+        "November",
+        "December",
+    ];
+    // Only the cover. Searching the whole document finds a month inside the first sentence that
+    // happens to name one — an effective date, a payment schedule — and dates the analysis by it.
+    for line in body.lines().take(40) {
+        let line = line.trim();
+        let Some((month, year)) = line.split_once(' ') else {
+            continue;
+        };
+        if MONTHS.contains(&month) && year.len() == 4 && year.bytes().all(|b| b.is_ascii_digit()) {
+            return line.to_string();
+        }
+    }
+    String::new()
+}
 
 /// The date an opinion was decided, read off the document.
 ///

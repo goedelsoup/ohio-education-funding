@@ -30,13 +30,9 @@ description: |
   Not once since FY2022, across three biennial budgets. [verified] The consequence is the fact
   the guarantee node is built around: in FY2027, at 100% phase-in, nearly half of Ohio's
   districts are funded at a level set by a placeholder formula in a year that formula was not
-  even run — seven years earlier. [inference]
-
-  ### What the FY2020 figure was itself composed of
-
-  Not established. The Bridge formula distributed largely by reference to still earlier years,
-  so the anchor may reach back further than 2020, and nothing committed here says how far.
-  [open]
+  even run — seven years earlier. The last clause is now literal rather than rhetorical, and the
+  span is **eight** years: FY2020 was a freeze of FY2019, so the distribution being held was
+  computed in FY2019. [verified]
 
   ### It is a nominal quantity
 
@@ -45,6 +41,24 @@ description: |
   aid fell 18.2%. A parameter that is never changed is still being changed, in the only terms
   that matter to a district's payroll. [verified]
 findings: |
+  ### What the FY2020 figure was itself composed of, which this repository had to go and read
+
+  **FY2019, unchanged.** [H.B. 166](../legislation/hb-166-2019.yml) ran no formula for FY2020 or
+  FY2021: every traditional district and joint vocational district received exactly its FY2019
+  allocation, with the formula amount held at $6,020 and the state share index held at FY2019.
+  So `[H2]` is not the output of a computation performed in FY2020 — it is H.B. 49's FY2019 run,
+  preserved by a statute that declined to recompute. [verified — the LSC greenbook, committed at
+  `crates/project/fixtures/lsc-education-greenbooks.txt`]
+
+  And it reaches further back than that. Each act of the decade re-anchored its guarantee on the
+  year before its biennium — FY2013, then FY2015, then FY2017 — and each base explicitly included
+  the previous biennium's transitional aid term, so a district guaranteed throughout carries its
+  earliest anchor forward. The chain is set out in
+  [`bridge-formula`](../funding-regime/bridge-formula.yml). It does not terminate at FY2013
+  either: that base is Bridge formula funding, which was itself by reference to earlier years, and
+  how far below FY2013 it goes is still not established. [open, and narrower than it was]
+
+
   ### It is observable only where it binds
 
   A district's `[H2]` is disclosed by the guarantee paying out against it. For the 315
@@ -52,6 +66,28 @@ findings: |
   carries it — so it cannot be recovered, and any simulated cut lets those districts fall past
   a floor that would really catch them. [verified for the model's behaviour; the size of the
   real-world correction is [open]]
+revisions:
+  - was: |
+      What the FY2020 figure was itself composed of was recorded as not established: "the Bridge
+      formula distributed largely by reference to still earlier years, so the anchor may reach back
+      further than 2020, and nothing committed here says how far." [open]
+    now: |
+      It reaches back at least to FY2013, by a chain of four acts that is now documented. FY2020 is
+      FY2019 unchanged, because H.B. 166 ran no formula; FY2019 came from a guarantee anchored at
+      FY2017, that one at FY2015, and that one at FY2013 — with each base explicitly including the
+      previous biennium's transitional aid term, so the anchors compose rather than replace one
+      another.
+    found_by: |
+      LSC's education greenbook for each of the four acts, retrieved and committed as
+      `crates/project/fixtures/lsc-education-greenbooks.txt`. Each states its own guarantee base in a
+      formula box; reading the four in sequence is what makes the chain visible.
+    reach: |
+      The node's central claim gets a year older and more literal. "Funded at a level set in a year
+      the formula was not even run" was written as a characterisation of FY2020 and is a
+      description of it: the run was FY2019's. The corpus's appropriation series showed the freeze
+      all along — FY2019, FY2020 and FY2021 are flat to within 0.003% — and nothing had read it as
+      one, because no node named the act that caused it.
+
 properties:
   name: Guarantee funding base
   kind: |

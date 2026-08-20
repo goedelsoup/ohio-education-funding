@@ -199,7 +199,18 @@ test("a correction is a blockquote that opens with strong emphasis, and a quotat
   expect(countCorrections("> a quotation\n\n> **This rejection has expired.** Because")).toBe(1);
 });
 
-test("both readings of a correction agree, on every record the corpus holds", async () => {
+/*
+ * Twenty seconds rather than Vitest's five. This is the only test in the suite whose cost grows
+ * with the corpus — it renders every section of every decision record through the full markdown
+ * pipeline, twice over, and there are 28 records now against the 20 there were when it was
+ * written. It takes about three seconds on an idle machine and has twice exceeded five on a loaded
+ * one, which reads in CI as a corpus defect and is not one.
+ *
+ * The budget is generous on purpose: a timeout tuned to just above the current cost would have to
+ * be raised again on the next decision record, and a test that needs re-tuning to keep passing
+ * teaches people to raise the number rather than to ask why it moved.
+ */
+test("both readings of a correction agree, on every record the corpus holds", { timeout: 20_000 }, async () => {
   const disagree: string[] = [];
   for (const decision of corpus.decisions) {
     let rendered = 0;
