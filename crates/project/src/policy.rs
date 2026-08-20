@@ -50,6 +50,41 @@ pub enum GuaranteeRule {
     Removed,
 }
 
+impl GuaranteeRule {
+    /// Read a rule from the string form the CLI and the draft fixture both use.
+    ///
+    /// `as-enacted`, `removed`, `rebase:<factor>`, `phase-out:<remaining>`. It lives here rather
+    /// than in either caller because two of them exist now — the `--guarantee` flag and a
+    /// [`mod@crate::drafts`] provision — and a rule with two hand-written parsers is a rule with two
+    /// vocabularies the day one of them gains a variant.
+    ///
+    /// # Errors
+    ///
+    /// If the rule is not one of the four, or if one that takes an argument is given something
+    /// that is not a number.
+    pub fn parse(raw: &str) -> Result<Self, String> {
+        let (kind, argument) = raw.split_once(':').unwrap_or((raw, ""));
+        let fraction = || {
+            argument
+                .parse::<f64>()
+                .map_err(|_| format!("{kind} wants a number after the colon, got {argument:?}"))
+        };
+        match kind {
+            "as-enacted" => Ok(Self::AsEnacted),
+            "removed" => Ok(Self::Removed),
+            "rebase" => Ok(Self::Rebased {
+                factor: fraction()?,
+            }),
+            "phase-out" => Ok(Self::PhasedOut {
+                remaining: fraction()?,
+            }),
+            other => Err(format!(
+                "unknown guarantee rule {other:?}; try as-enacted, removed, rebase:0.9, phase-out:0.5"
+            )),
+        }
+    }
+}
+
 /// A set of levers, together with what they are relative to.
 ///
 /// The identity is [`Policy::current_law`]: applied to the panel it reproduces the department's

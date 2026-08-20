@@ -1247,8 +1247,14 @@ test.describe("the decisions behind the corpus", () => {
     await expect(rows).not.toHaveCount(0);
     // Ordered by how much of each has since been withdrawn, so the first row carries corrections
     // and names them. A count of zero renders as an em dash rather than as "0 claims".
+    //
+    // The leader is a tripwire rather than a fact about the corpus: it changes when a record gains
+    // or loses a withdrawal, and it should be looked at when it does. It was
+    // `the-directory-cannot-say-why` until `drafts-are-not-legislation` overtook it with three —
+    // one resolving an [open] item, one narrowing another, and one withdrawing a claim that two
+    // levers partition the state, which the record's own figures disproved.
     await expect(rows.first()).toContainText("claims");
-    await expect(rows.first().locator("code")).toHaveText("the-directory-cannot-say-why");
+    await expect(rows.first().locator("code")).toHaveText("drafts-are-not-legislation");
   });
 });
 
@@ -3569,5 +3575,138 @@ test.describe("what the budget is made of", () => {
     const card = page.locator('.card[data-part="line-origins"]');
     await expect(card).toContainText("not a finding about");
     await expect(card).toContainText("open question this cannot settle");
+  });
+});
+
+test.describe("a draft opened in the runner", () => {
+  test("the unpriced provisions are on screen with the total, not below it", async ({ page }) => {
+    /*
+     * The rule this whole class rests on, at the layer where it is easiest to lose. `crates/project`
+     * cannot print a bill's cost without the clauses it failed to price; the feed carries them; and
+     * this is the check that the page actually shows them beside the number rather than somewhere a
+     * reader scrolls past.
+     */
+    await page.goto("/scenario?draft=fund-the-plan-and-retire-the-guarantee");
+    const card = page.locator('.card[data-part="draft"]');
+    await expect(card).toContainText("Opened from a draft");
+    await expect(card).toContainText("not in any figure on this page");
+    await expect(page.locator('[data-part="draft-unpriced"] li')).toHaveCount(3);
+
+    // First, not merely present: the placement the rule requires is a limit on what is about to be
+    // read rather than a footnote on what was read.
+    await expect(page.locator("#scenario-out > :first-child")).toHaveAttribute(
+      "data-part",
+      "draft",
+    );
+  });
+
+  test("the figure is the draft's even where a slider cannot express it", async ({ page }) => {
+    /*
+     * `#lv-base` steps by 0.01 and the refresh provision is 1.0395, so the control can only get to
+     * 1.04 — which is a −$139.9M scenario reaching 357 districts, against the draft's −$143.9M
+     * reaching 356. The controls are set as near as they go and the first render is computed from
+     * the draft, so the number under the banner is the bill's rather than the slider's.
+     */
+    await page.goto("/scenario?draft=fund-the-plan-and-retire-the-guarantee");
+    await expect(page.locator("#lv-guarantee")).toHaveValue("phase-out");
+    await expect(page.locator("#lv-arg")).toHaveValue("0.5");
+    await expect(page.locator("#lv-base")).toHaveValue("1.04");
+
+    // The combined figure, and not the one the rounded slider would give.
+    await expect(page.locator("#scenario-out")).toContainText("\u2212$143.9M");
+    await expect(page.locator("#scenario-out")).toContainText("356 up, 253 down");
+    await expect(page.locator('[data-part="draft-departed"]')).toHaveCount(0);
+  });
+
+  test("moving a lever says the figures are no longer the bill's", async ({ page }) => {
+    // The likely failure: a reader nudges a slider and the page goes on attributing the number to
+    // the draft. Removing the banner instead would be worse — a figure they still believe is the
+    // bill's, with nothing to correct them.
+    await page.goto("/scenario?draft=fund-the-plan-and-retire-the-guarantee");
+    await expect(page.locator('[data-part="draft-departed"]')).toHaveCount(0);
+
+    await page.locator("#lv-base").fill("1.08");
+    await page.locator("#lv-base").dispatchEvent("input");
+
+    await expect(page.locator('[data-part="draft-departed"]')).toContainText(
+      "no longer match the draft",
+    );
+    // And the missing clauses stay put: a departed scenario is short the same three provisions.
+    await expect(page.locator('[data-part="draft-unpriced"] li')).toHaveCount(3);
+  });
+
+  test("a draft that prices completely says so rather than staying silent", async ({ page }) => {
+    await page.goto("/scenario?draft=hb-96-with-refreshed-inputs");
+    await expect(page.locator('[data-part="draft-complete"]')).toContainText(
+      "a property of a one-clause draft",
+    );
+    await expect(page.locator('[data-part="draft-unpriced"]')).toHaveCount(0);
+  });
+
+  test("the draft's node page states the priced ratio beside the link, not just the link", async ({
+    page,
+  }) => {
+    // An invitation to see a bill's cost carries, at the point of the invitation, the fact that the
+    // cost is of some of its clauses. Third place the same refusal is made, and the first a reader
+    // meets.
+    await page.goto("/wiki/draft-legislation/fund-the-plan-and-retire-the-guarantee");
+    const card = page.locator('.card[data-part="runner"]');
+    await expect(card).toContainText("2 of this draft's 5 provisions");
+    await expect(card).toContainText("not of the bill");
+    await expect(card.locator("a.flag")).toHaveAttribute(
+      "href",
+      "/scenario?draft=fund-the-plan-and-retire-the-guarantee",
+    );
+  });
+
+  test("the district route carries the draft card too, and it is first", async ({ page }) => {
+    /*
+     * The failure a review caught: `?draft=` was read on both routes but the card was written only
+     * in the statewide branch, so a district page applied a bill's levers and reported a dollar
+     * and per-pupil figure with nothing naming the three provisions it could not price. A district
+     * page is the one a school board sends, which makes it the worst place for that and not the
+     * mildest.
+     */
+    await page.goto(
+      `/district/${NORTHERN}/scenario?draft=fund-the-plan-and-retire-the-guarantee`,
+    );
+    await expect(page.locator("#scenario-out > :first-child")).toHaveAttribute(
+      "data-part",
+      "draft",
+    );
+    await expect(page.locator('[data-part="draft-unpriced"] li')).toHaveCount(3);
+    // And the district figures are still there below it.
+    await expect(page.locator("#scenario-out")).toContainText("What moved for this district");
+  });
+
+  test("an unknown draft leaves the runner working rather than showing an empty card", async ({
+    page,
+  }) => {
+    await page.goto("/scenario?draft=no-such-bill");
+    await expect(page.locator('.card[data-part="draft"]')).toHaveCount(0);
+    await expect(page.locator("#scenario-out")).toContainText("Current law");
+  });
+});
+
+test.describe("a pending bill nothing here can price", () => {
+  test("the page says it is not the bill rather than showing current law", async ({ page }) => {
+    /*
+     * H.B. 643 of the 136th caps EdChoice expansion eligibility, and every provision it has falls
+     * in the scholarship channel this repository does not model. It sets no lever, so the runner
+     * shows current law — true, and indistinguishable from a bill that costs nothing unless the
+     * page says which it is.
+     */
+    await page.goto("/scenario?draft=hb-643-136-introduced");
+    const card = page.locator('.card[data-part="draft"]');
+    await expect(card).toContainText("Nothing on this page is this bill");
+    await expect(card).toContainText("There is no cost of zero to report");
+    await expect(page.locator('[data-part="draft-unpriced"] li')).toHaveCount(1);
+  });
+
+  test("its node page offers no invitation to a figure that does not exist", async ({ page }) => {
+    await page.goto("/wiki/draft-legislation/hb-643-136-introduced");
+    const card = page.locator('.card[data-part="runner"]');
+    await expect(card).toContainText("0 of this draft's 1 provisions");
+    await expect(card).toContainText("not of the bill");
   });
 });

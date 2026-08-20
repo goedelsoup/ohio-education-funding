@@ -70,6 +70,18 @@ const mentions = node.out.filter((edge) => !edge.stated);
  * It is genuine provenance and worth keeping; it is just not body copy, and the class index that
  * summarised that sentence inherited the problem.
  */
+/*
+ * The draft behind a `draft-legislation` node, where the feed carries one.
+ *
+ * The card below links into the scenario runner, and it states the priced ratio rather than only
+ * offering the link — an invitation to see a bill's cost should carry, at the point of the
+ * invitation, the fact that the cost is of some of its clauses. `crates/project` refuses to print
+ * one without the other and the runner repeats the refusal; this is the third place, and it is
+ * the one a reader meets first.
+ */
+const draft = loadFeed().bundle.drafts.find((d) => d.slug === node.name);
+const unpriced = draft?.provisions.filter((p) => p.lever === "").length ?? 0;
+
 const seeded = node.properties.find((p) => p.name === "seeded_because");
 const properties = node.properties.filter((p) => p.name !== "seeded_because");
 ---
@@ -96,6 +108,25 @@ const properties = node.properties.filter((p) => p.name !== "seeded_because");
       ? ` · ${node.revisions.length} correction${node.revisions.length === 1 ? "" : "s"}`
       : ""}
   </p>
+
+  {
+    draft && (
+      <div class="card" id="runner" data-part="runner">
+        <h2><SectionAnchor id="runner" />This draft, in the scenario runner</h2>
+        <p class="note">
+          {draft.provisions.length - unpriced} of this draft&apos;s {draft.provisions.length}
+          {" "}provisions bind a lever in the FY{loadFeed().bundle.fiscal_year} model, so they can
+          be run across all 609 districts.
+          {" "}{unpriced > 0
+            ? ` The other ${unpriced} set no lever: whatever the runner shows is the cost of ${draft.provisions.length - unpriced} clauses and not of the bill.`
+            : " There are none it cannot run, which is a property of a one-clause draft rather than of drafts."}
+        </p>
+        <div class="flags">
+          <a class="flag" href={routes.scenarioDraft(draft.slug)}>Open in the scenario runner</a>
+        </div>
+      </div>
+    )
+  }
 
   {
     district && (

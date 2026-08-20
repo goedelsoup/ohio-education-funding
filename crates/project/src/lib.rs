@@ -58,6 +58,7 @@
 
 pub mod appropriations;
 pub mod crosswalk;
+pub mod drafts;
 pub mod finances;
 pub mod legislative_district;
 pub mod line_origins;
@@ -69,6 +70,7 @@ pub mod series;
 pub mod session_laws;
 
 pub use crosswalk::{coverage, Coverage};
+pub use drafts::{draft, drafts, price, Draft, Lever, Priced, Provision};
 pub use outcomes::{joined, report_cards, Joined, ReportCard};
 pub use panel::{panel, DistrictRecord};
 pub use policy::{GuaranteeRule, Outcome, Policy};

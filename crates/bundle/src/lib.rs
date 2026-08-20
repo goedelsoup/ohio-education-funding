@@ -145,7 +145,10 @@ use edfund_core::Dollars;
 /// from FY2022-FY2024 to FY2024-FY2026 — the years the department's `ADM Data` sheet declares.
 /// The values did not change; what they are called did, which is exactly the kind of silent
 /// meaning change the version guard exists for.
-pub const CONTRACT_VERSION: &str = "35.0.0";
+/// `36.0.0` added `drafts`, the provisions of each `draft-legislation` node — including the ones
+/// no lever can run, which travel with the rest so the count a cost must be read beside cannot be
+/// dropped between the fixture and the page.
+pub const CONTRACT_VERSION: &str = "36.0.0";
 
 /// How a year is reckoned, because Ohio reckons three ways and they do not line up.
 ///
@@ -1297,6 +1300,64 @@ pub struct PolicyShape {
     pub phase_in_categorical: f64,
 }
 
+/// One clause of a draft bill, as the site needs it.
+///
+/// The lever fields carry a provision the model can run; they are empty on one it cannot, which
+/// is how [`Draft::unpriced`] is counted rather than declared.
+#[derive(Debug, Clone, PartialEq)]
+pub struct DraftProvision {
+    /// Position in the draft, one-based.
+    pub ordinal: u16,
+    /// What it does, in one line.
+    pub title: String,
+    /// The Revised Code section it would amend, or `uncodified`.
+    pub authority: String,
+    /// The corpus `parameter` node it binds, empty where none exists.
+    pub parameter: String,
+    /// The lever key — one of the five, or empty when nothing here can run it.
+    pub lever: String,
+    /// The lever's proposed value, in the string form the query string carries.
+    pub proposed: String,
+    /// Why it does not price, or what the run is sized against where it does.
+    pub note: String,
+}
+
+/// A bill that is not law, exported so the site can open it in the scenario runner.
+///
+/// # Why the feed carries this and the corpus does not
+///
+/// The binding is `crates/project/fixtures/draft-provisions.tsv`, and a test holds the corpus node
+/// to it. The site could read the node instead — it reads every other corpus document directly —
+/// but the node states a provision in prose, and building a lever position by parsing prose is
+/// the failure mode this repository has already paid for twice. So the machine-readable half
+/// travels through the feed, where Rust is authoritative, and the prose half stays in the node,
+/// where a reader is.
+///
+/// # The unpriced count travels with it, and that is the whole point
+///
+/// `project::drafts::Priced` cannot be constructed without the provisions it failed to price, so
+/// the CLI cannot print a cost without them. A feed that exported the lever positions and dropped
+/// the rest would hand the web layer exactly the hole the Rust refuses — the scenario page would
+/// show a statewide total for two of a bill's five clauses and call it the bill.
+#[derive(Debug, Clone, PartialEq)]
+pub struct Draft {
+    /// The slug, which is also the corpus node's filename.
+    pub slug: String,
+    /// Every provision, in the order the draft states them.
+    pub provisions: Vec<DraftProvision>,
+}
+
+impl Draft {
+    /// The provisions no lever reaches.
+    #[must_use]
+    pub fn unpriced(&self) -> usize {
+        self.provisions
+            .iter()
+            .filter(|p| p.lever.is_empty())
+            .count()
+    }
+}
+
 /// A Rust-computed result the web layer must reproduce before it is allowed to compute more.
 ///
 /// See the crate note. This is what makes a second implementation of the formula acceptable.
@@ -1409,6 +1470,11 @@ pub struct Bundle {
     pub statewide: Statewide,
     /// Reference results the consumer must reproduce.
     pub checkpoints: Vec<Checkpoint>,
+    /// The drafts this repository holds, ordered by slug. Empty if none.
+    ///
+    /// Carries the unpriced provisions as well as the priced ones, so a consumer cannot show a
+    /// draft's cost without what the cost leaves out. See [`Draft`].
+    pub drafts: Vec<Draft>,
     /// How to project, and the forecasts that check the projection. `None` disables the band.
     pub projection: Option<Projection>,
     /// The price index. `None` means the feed can only be shown in nominal dollars.
@@ -1740,6 +1806,35 @@ impl Bundle {
                 c.pushed_on
             ));
             if i + 1 < self.checkpoints.len() {
+                s.push(',');
+            }
+            s.push('\n');
+        }
+        s.push_str("  ],\n");
+
+        s.push_str("  \"drafts\": [\n");
+        for (i, d) in self.drafts.iter().enumerate() {
+            s.push_str(&format!(
+                "    {{\"slug\": \"{}\", \"provisions\": [",
+                escape(&d.slug)
+            ));
+            for (j, p) in d.provisions.iter().enumerate() {
+                s.push_str(&format!(
+                    "\n      {{\"ordinal\": {}, \"title\": \"{}\", \"authority\": \"{}\", \
+                     \"parameter\": \"{}\", \"lever\": \"{}\", \"proposed\": \"{}\", \
+                     \"note\": \"{}\"}}{}",
+                    p.ordinal,
+                    escape(&p.title),
+                    escape(&p.authority),
+                    escape(&p.parameter),
+                    escape(&p.lever),
+                    escape(&p.proposed),
+                    escape(&p.note),
+                    if j + 1 < d.provisions.len() { "," } else { "" }
+                ));
+            }
+            s.push_str("\n    ]}");
+            if i + 1 < self.drafts.len() {
                 s.push(',');
             }
             s.push('\n');
@@ -2841,6 +2936,32 @@ mod tests {
 
     fn bundle(districts: Vec<District>, checkpoints: Vec<Checkpoint>) -> Bundle {
         Bundle {
+            // One draft, with one provision of each kind, so the emitter's empty-`lever` branch is
+            // exercised by the fixture rather than only by the real feed — an unpriced provision
+            // that vanished in serialization is the defect this block exists to catch.
+            drafts: vec![Draft {
+                slug: "a-draft".into(),
+                provisions: vec![
+                    DraftProvision {
+                        ordinal: 1,
+                        title: "A clause a lever reaches".into(),
+                        authority: "R.C. 3317.011".into(),
+                        parameter: "base-cost-per-pupil".into(),
+                        lever: "base-cost".into(),
+                        proposed: "1.05".into(),
+                        note: "Sized to nothing; this is a fixture.".into(),
+                    },
+                    DraftProvision {
+                        ordinal: 2,
+                        title: "A clause no lever reaches".into(),
+                        authority: "R.C. 3317.014".into(),
+                        parameter: String::new(),
+                        lever: String::new(),
+                        proposed: "each weight times 1.08".into(),
+                        note: "No lever expresses a categorical weight.".into(),
+                    },
+                ],
+            }],
             // Two entries and two reckonings, so the emitter's sort and its `kind` discriminant
             // are both exercised by the fixture every other test in this module builds on.
             series_years: vec![

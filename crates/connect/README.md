@@ -43,6 +43,7 @@ Fields per connector: key, status, source count, corpus classes fed; then every 
 | [`lsc-budget`](sources/lsc-budget.md) | **wired**, in part | 23 | legislation, fiscal-period, program, parameter |
 | [`ohio-laws`](sources/ohio-laws.md) | **wired** | 33 | legislation, parameter, formula-component |
 | `ohio-session-laws` | **wired**, in part | 3 | legislation, fiscal-period |
+| `ohio-bills` | retrievable | 1 | draft-legislation |
 | `ohio-auditor` | **wired**, in part | 5 | education-agency, legislation |
 | [`ohio-courts`](sources/ohio-courts.md) | **wired**, in part | 5 | litigation |
 | [`ofcc-projects`](sources/ofcc-projects.md) | declared | 0 | program, education-agency |
@@ -52,7 +53,7 @@ Fields per connector: key, status, source count, corpus classes fed; then every 
 | `dew-child-nutrition` | **wired**, in part | 23 | education-agency, metric, formula-component |
 | `dew-school-improvement` | **wired**, in part | 3 | school, education-agency, accountability-regime |
 
-19 connectors, 180 sources between them. 17 are wired and 2 are not; 9 of the wired ones reach only part of what they feed, and say so below.
+20 connectors, 181 sources between them. 17 are wired and 3 are not; 9 of the wired ones reach only part of what they feed, and say so below.
 
 **What is blocked, in the registry's own words.**
 
@@ -68,7 +69,7 @@ Fields per connector: key, status, source count, corpus classes fed; then every 
 - `dew-child-nutrition` — still blocked on: wired for every October the archive holds, 1998 through 2014, across all three of the streams the report splits into from 2012. Three things it still cannot reach: October 2014 is where the directory stops, nine years short of the corpus's FY2024 observations; the three split Octobers have a band and not a poverty share, because community-eligibility sponsors collect no applications at all; and the 1998-2000 files state no sponsor type, so some thirty-five sponsors a year predate the FY2001 file they borrow one from and stay untyped
 - `dew-school-improvement` — still blocked on: wired for the current identification lists only. The department republishes each list in place under a dated filename rather than archiving prior cycles, so there is no history here: a school that exited before this file was written is indistinguishable from one never identified
 
-9 of them have no long form in [`sources/`](sources/): `dew-report-card`, `dew-five-year-forecast`, `dew-scholarship-reports`, `lsc-catalog`, `ohio-session-laws`, `ohio-auditor`, `census-geography`, `dew-child-nutrition`, `dew-school-improvement`. Those are the connectors added after the original nine stubs, whose prose was never written — the decision record is the only account of why each exists.
+10 of them have no long form in [`sources/`](sources/): `dew-report-card`, `dew-five-year-forecast`, `dew-scholarship-reports`, `lsc-catalog`, `ohio-session-laws`, `ohio-bills`, `ohio-auditor`, `census-geography`, `dew-child-nutrition`, `dew-school-improvement`. Those are the connectors added after the original nine stubs, whose prose was never written — the decision record is the only account of why each exists.
 <!-- /REGEN -->
 
 A `declared` connector says **what blocks it** — that string is a field on the record, and a

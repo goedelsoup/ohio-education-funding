@@ -1,0 +1,173 @@
+class: draft-legislation
+label: "Counterfactual: H.B. 96 with FY2024 Cost Inputs"
+summary: >-
+  Am. Sub. H.B. 96 as it might have been written: the phase-in completed exactly as enacted, and
+  the base cost reference year refreshed to FY2024 rather than held at FY2022. One provision,
+  one lever, and no bill anyone introduced.
+description: |
+  The FY2026-27 operating budget took the Fair School Funding Plan's phase-in to 83.33% in
+  FY2026 and 100% in FY2027 while holding the base cost inputs at **FY2022** rather than
+  refreshing them. [verified] The two dials are separately addressable, so the act is
+  simultaneously describable as full implementation and as a real-terms reduction, and both
+  descriptions are arithmetically correct — they differ in which parameter they hold fixed.
+
+  This draft holds the other one fixed. It is [H.B. 96](../legislation/hb-96-2025.yml) with the
+  phase-in schedule untouched and a single provision changed: the reference year the statewide
+  average salaries are priced at moves from FY2022 to **FY2024**.
+
+  **The road not taken is a real one.** [H.B. 33](../legislation/hb-33-2023.yml) refreshed the
+  reference year from FY2018 to FY2022 two years earlier, and statewide average base cost moved
+  from roughly $7,352 in FY2023 to roughly $8,240 in FY2025. [inference] So a refresh was an
+  established practice of the immediately preceding budget, and freezing was a decision against
+  it rather than an omission. [inference] That is what makes this a counterfactual and not an
+  invention: the alternative was on the table, had been done once, and was declined.
+
+  ### What the provision changes, and what it does not
+
+  Base cost is built by applying statutory staffing ratios to enrollment and pricing each funded
+  position at a statewide average salary for a reference year, times 1.16 for benefits, plus
+  average employer-paid insurance. [verified] Moving the reference year changes exactly those
+  price terms. The ratios, the minimums and the ADM definitions are untouched, which is what
+  makes it a single-parameter perturbation rather than a re-specification of the formula.
+
+  It does not stop at base cost. Special education, English learner and career-technical funding
+  are each `weight × statewide average base cost per pupil × count × state share`, so a provision
+  moving that multiplicand moves them too. [verified]
+
+  ### What it would not do
+
+  Nothing to the phase-in, the minimum state share, the guarantee's rule, or any channel outside
+  the foundation formula. A district's scholarship and community-school deductions are unmoved
+  and unmodelled, so a district's net position can differ from its formula payment in either
+  direction.
+findings: |
+  **The provision prices, and it is the only provision, so the draft's cost is its cost.** Run
+  with `cargo run -p project --bin edfund-project -- --base-cost 1.0395`, where the scale is the
+  one that reproduces the department's own FY2027 model for a classroom-teacher refresh to
+  FY2024 — a $465.0M statewide computed increase in base cost alone.
+
+      total state aid       $7,281M  ->  $7,502M     +$220.5M
+      districts             356 up, 0 down, 253 unmoved
+      on the guarantee      294      ->  253
+      guarantee cost        $879M    ->  $729M
+
+  [verified — `crates/project/tests/a_draft_cannot_hide_what_it_did_not_price.rs`. The figure is
+  $220,525,319; `crates/scenario-delta` pins the same run at $220.6M within a $1M tolerance, from
+  a uniform scale rather than this one, so the two agree to the significant figures either
+  supports]
+
+  ### The bill computes $497.1M and delivers $220.5M
+
+  Base cost alone rises $465.0M; the categoricals priced in the statewide average carry it to
+  $497.1M. Counting them is a deliberate divergence from the department's own simulator, which
+  holds the statewide averages fixed — correct behaviour for a tool where a user changes one
+  district, and wrong here, where a provision of a budget act moves all 609 at once. Recorded at
+  [`scenario-models-ohio`](../../decisions/scenario-models-ohio.yml).
+
+  **44% of the computed increase reaches a district.** The rest is absorbed by three mechanisms
+  that are not interchangeable and must be reported apart:
+
+  - **The guarantee**, which is most of it. 253 districts are held above their formula amount
+    both before and after, so their payment moves by exactly zero — not approximately. A floor
+    that rises to meet the formula is a top-up that shrinks by the same sum.
+  - **The minimum state share.** 138 districts keep a tenth of any base cost increase, because
+    state aid is the residual after local capacity and their residual is floored.
+  - **The ADM denominators.** Base cost averages three years of enrollment while the state share
+    is paid on the current one, which costs a shrinking state a further $7.6M.
+
+  ### Forty-one districts change which mechanism pays them
+
+  The guarantee falls from 294 districts to 253. Those 41 are lifted onto the formula, and they
+  are the only districts for which this provision changes the *kind* of thing that determines
+  their aid rather than the amount. [verified]
+
+  ### The per-pupil spread is structural, not chosen
+
+      Kelleys Island Local        $1,467 per pupil
+      College Corner Local        $  883
+      Vanlue Local                $  876
+      Bloomfield-Mespo Local      $  675
+      Jefferson Township Local    $  571
+
+  Every one is small. The six-teacher special minimum binds in 155 of 604 districts, so a
+  minimum that funds more positions per pupil also pays out more per pupil when the price of a
+  position rises. [verified] A refresh is therefore progressive twice over — through the state
+  share residual and again through the small-district minimums — and the freeze H.B. 96 enacted
+  is regressive on both.
+
+  ### Nothing is unpriced, and that is a property of this draft rather than of the class
+
+  One provision, one lever, complete coverage. A real budget act would not do this: it would also
+  move special-education weights, transportation reimbursement and the scholarship deduction,
+  none of which the five levers reach.
+properties:
+  provenance: counterfactual
+  designation: |
+    None. The act being rewritten is Am. Sub. H.B. 96 of the 136th General Assembly; this draft
+    claims no designation of its own, because there is no such bill and a number is the one thing
+    a reader will believe without checking.
+  general_assembly: |
+    Not applicable. Were the provision introduced it would have belonged to the 136th, which sat
+    2025-2026. [unentered]
+  sponsors: |
+    None. [unentered — nobody introduced this]
+  status: |
+    Never introduced, and not proposed by anyone. It is the alternative the enacted act declined,
+    reconstructed from the practice of the budget two years before it. [verified — that H.B. 33
+    refreshed the reference year; the reconstruction itself is a construction]
+  text_read: |
+    No external text exists to pin. The enactment being rewritten is read from
+    [`lsc-hb96-analysis`](../../catalog/lsc-hb96-analysis.md), with the stage caveat that record
+    carries — figures circulating for H.B. 96 belong variously to the executive proposal, the
+    House-passed version and the enacted act, and only the last is what this draft departs from.
+    [verified]
+  question: |
+    What would the FY2026-27 budget have paid Ohio's districts had it refreshed the base cost
+    reference year, as the budget before it did, while completing the phase-in exactly as
+    enacted?
+  provisions: |
+    One provision.
+
+    **1. Base cost reference year: FY2022 → FY2024.** Amends the salary figures R.C. 3317.011
+    prices funded staffing positions at. Binds
+    [`base-cost-per-pupil`](../parameter/base-cost-per-pupil.yml); run as
+    `Policy::base_cost_scale = 1.0395`, the uniform scale sized to the department's own $465.0M
+    computed increase. **Runnable.** [verified]
+
+    Everything else H.B. 96 enacted is carried forward unchanged and is not a provision of this
+    draft — the phase-in at 83.33% then 100%, the 10% minimum state share, and the temporary
+    transitional aid guarantee on its enacted rule.
+  unpriced: |
+    None. Both the count and the reason are stated rather than left to inference: this draft has
+    a single provision and it binds to an existing lever, so the cost above is the whole of it
+    and not a priced subset.
+
+    The comparison worth carrying is that a real budget act would not have this property. The
+    runnable surface is five levers, and an act that also moved special-education weights,
+    transportation reimbursement, the scholarship deduction or the capital channel would leave
+    each of those recorded here and uncosted — two of them outside the model altogether rather
+    than merely unlevered. [verified]
+links:
+  - target: ../draft-legislation.ont.yml
+    relationship: instance-of
+  - target: ../legislation/hb-96-2025.yml
+    relationship: redrafts
+    note: The enacted act this is an alternative version of. It is not amended; it is rewritten.
+  - target: ../legislation/hb-33-2023.yml
+    relationship: follows-the-practice-of
+    note: >-
+      The budget that refreshed the reference year from FY2018 to FY2022, which is what makes
+      this a road not taken rather than an invention.
+  - target: ../parameter/base-cost-per-pupil.yml
+    relationship: perturbs
+  - target: ../scenario/fsfp-input-year-refresh.yml
+    relationship: simulated-by
+    note: >-
+      The run that prices the provision. One run because there is one provision; a draft with
+      several needs one per provision and one combined, because the levers interact.
+  - target: ../funding-regime/fair-school-funding-plan.yml
+    relationship: baselines-on
+  - target: ../formula-component/fsfp-base-cost-calculation.yml
+    relationship: alters
+  - target: ../../catalog/lsc-hb96-analysis.md
+    relationship: sourced-from

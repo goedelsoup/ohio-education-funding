@@ -34,6 +34,7 @@ Fields per skill: filename, name, description, agents that invoke it.
 | [`deduction`](deduction.md) | Compute community school and scholarship diversions against a resident district by program and fiscal year |
 | [`deflate`](deflate.md) | Convert a nominal dollar series to constant dollars using a fiscal-year-aligned index; required before any cross-period comparison in this corpus |
 | [`dispersion`](dispersion.md) | Compute equity statistics across Ohio education agencies for a fiscal period — coefficient of variation, McLoone and Verstegen indices, federal range ratio, wealth neutrality |
+| [`draft-authoring`](draft-authoring.md) | Write a bill that is not law as a draft-legislation node, bind each provision to a parameter the calculators can run, and refuse the bindings that are category errors |
 | [`formula-walk`](formula-walk.md) | Decompose one agency-year funding figure into the components and parameter values that produced it, reconciling to the published total before attributing anything |
 | [`foundation`](foundation.md) | Re-run a named Ohio funding regime for a fiscal period against a parameter set, returning per-agency aid broken out by component |
 | [`local-capacity`](local-capacity.md) | Compute an agency's local wealth position and state share under either the charge-off mechanism or the FSFP capacity measure |

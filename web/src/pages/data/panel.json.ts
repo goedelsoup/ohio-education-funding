@@ -34,6 +34,10 @@ export const GET: APIRoute = () => {
     series_years: bundle.series_years,
     statewide,
     checkpoints: bundle.checkpoints,
+    // The drafts travel with the panel because the scenario page is where a draft is opened, and
+    // a draft opened without its unpriced provisions is the one thing this whole class refuses.
+    // Six short rows.
+    drafts: bundle.drafts,
     projection: bundle.projection,
     // The Census comparison is not a formula input, so it stays out of the browser's copy.
     deflator: bundle.deflator,

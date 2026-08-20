@@ -13,8 +13,8 @@ use std::collections::{BTreeMap, BTreeSet, HashMap};
 
 use bundle::{
     AppropriationLine, AppropriationYear, BaseCostBuildUp, Bundle, CareerTechnical, Categoricals,
-    Checkpoint, Deflator, District, DistrictOutcome, Dpia, EnglishLearners, FinanceYear,
-    ForecastCheckpoint, Gifted, HistoryYear, HouseDistrictMember, HouseDistrictShare,
+    Checkpoint, Deflator, District, DistrictOutcome, Dpia, Draft, DraftProvision, EnglishLearners,
+    FinanceYear, ForecastCheckpoint, Gifted, HistoryYear, HouseDistrictMember, HouseDistrictShare,
     MealProgramYear, MillageAnalysis, National, OutcomeStatewide, PolicyShape, Projection,
     PropertyTaxYear, RegimeCounterfactual, SeriesYear, SpecialEducation, SpendingByFunction,
     StateFinance, Statewide, TargetedAssistance, YearKind, CONTRACT_VERSION,
@@ -25,6 +25,7 @@ use dispersion::{partial_correlation, wealth_neutrality};
 use edfund_core::{AgencyType, FiscalYear};
 use foundation::{aggregate_base_cost, StatewideFactors};
 use project::appropriations;
+use project::drafts::Lever;
 use project::finances::{finances, for_district, Finances};
 use project::legislative_district::{legislative_districts, overlaps, Chamber};
 use project::line_origins;
@@ -103,6 +104,37 @@ fn median(mut values: Vec<f64>) -> f64 {
     }
     values.sort_by(|a, b| a.partial_cmp(b).unwrap_or(std::cmp::Ordering::Equal));
     values[values.len() / 2]
+}
+
+/// Every draft, flattened for the feed.
+///
+/// The unpriced provisions are exported alongside the priced ones rather than filtered out. A feed
+/// carrying only the levers would let the site show a statewide total for two of a bill's five
+/// clauses with nothing on the page saying so, which is the failure `project::drafts::Priced`
+/// exists to make impossible one layer down.
+fn draft_export() -> Vec<Draft> {
+    project::drafts::drafts()
+        .into_values()
+        .map(|draft| Draft {
+            slug: draft.slug,
+            provisions: draft
+                .provisions
+                .into_iter()
+                .map(|p| DraftProvision {
+                    ordinal: p.ordinal,
+                    // The key rather than the parsed variant: the query string the scenario page
+                    // reads is keyed on these five strings, and `Lever::key` is where they are
+                    // written down so this is not a second place they could drift from.
+                    lever: p.lever.map(Lever::key).unwrap_or_default().to_string(),
+                    title: p.title,
+                    authority: p.authority,
+                    parameter: p.parameter,
+                    proposed: p.proposed,
+                    note: p.note,
+                })
+                .collect(),
+        })
+        .collect()
 }
 
 /// The policies the web layer must reproduce before it may compute its own.
@@ -1666,6 +1698,7 @@ fn build() -> Bundle {
         series_years: series_years(&districts, &history, &appropriations, &meal_program()),
         statewide,
         checkpoints,
+        drafts: draft_export(),
         projection: Some(projection),
         deflator: Some(Deflator {
             label: cpi.label().to_string(),

@@ -1,0 +1,190 @@
+class: draft-legislation
+label: Fund the Plan and Retire the Guarantee
+summary: >-
+  A hypothetical five-provision bill that refreshes the cost inputs, retires half the temporary
+  transitional aid guarantee, and does three further things no lever here reaches. Nobody
+  proposed it. It exists to be the case a single-provision draft cannot be.
+description: |
+  The two halves of Ohio's school funding argument, put in one bill. Refreshing the base cost
+  reference year is what advocates of the Fair School Funding Plan ask for; retiring the
+  temporary transitional aid guarantee is what its critics ask for; and the two are usually
+  argued as though each could be decided without the other.
+
+  They cannot. Just under half of Ohio's districts are funded by the guarantee rather than by the
+  formula, holding more than half the state's students, and for them the formula is not what
+  determines their aid. [verified] So a refresh reaches them only to the extent it lifts them off
+  the floor, and a phase-out reaches only the districts standing on it. Each provision is
+  approximately inert over the population the other one moves.
+
+  ### The five provisions, and why three of them are here
+
+  Two bind to levers: the reference year moves from FY2022 to FY2024, and the guarantee closes
+  half the gap between its FY2020 baseline and the formula amount.
+
+  The other three are the point. A raise to the six special education category weights, a
+  transportation reimbursement floor, and holding a resident district harmless for its
+  scholarship deductions are all ordinary contents of an Ohio budget act — and none of the three
+  can be costed here. The first has no lever. The second and third are not merely unlevered but
+  outside the model altogether: no transportation series is carried, and the deduct channel needs
+  a per-agency participation series that does not exist.
+
+  A bill of five provisions where two produce numbers is closer to the normal case than a bill of
+  one provision that prices completely, which is the reason for authoring it.
+
+  ### What it is not
+
+  Not a proposal, not introduced, and not attributable to anyone. Ohio legislates school funding
+  inside the operating budget, so a real version of this would arrive as a few dozen sections of
+  a bill that also carries Medicaid and highway appropriations, and its provisions would not
+  arrive as a tidy list of five.
+
+  The provision values are also chosen rather than derived. A half phase-out and an 8% weight
+  raise are round numbers picked to be legible, not positions anybody has taken. [inference]
+findings: |
+  **The bill cuts $143.9 million and its two priced provisions, costed separately, say $219.0
+  million.** Run with `cargo run -p project --bin edfund-project -- --draft
+  fund-the-plan-and-retire-the-guarantee`.
+
+      total state aid       $7,281M  ->  $7,137M     -$143.9M
+      districts             356 up, 253 down, 0 unmoved
+      on the guarantee      294      ->  253
+      guarantee cost        $879M    ->  $364M
+
+      provision 1  reference year FY2022 -> FY2024        +$220.5M
+      provision 2  guarantee half retired                 -$439.5M
+                   interaction residual                    +$75.1M
+
+  [verified — `crates/project/tests/a_draft_cannot_hide_what_it_did_not_price.rs`]
+
+  ### The residual is half the answer
+
+  Pricing the two provisions apart and adding them gives −$219.0M. Running them together gives
+  −$143.9M. **The separate figures overstate the cut by $75.1 million, 52% of the true number.**
+
+  The mechanism is the guarantee's `max`, and it double-counts in both directions. Run alone, the
+  refresh lifts 41 districts off the floor and the state pays their formula amount; run alone, the
+  phase-out cuts those same districts. Run together, a district lifted off by the refresh is no
+  longer standing on the floor for the phase-out to lower. A district cannot be taken off the
+  guarantee twice.
+
+  This is why a draft's cost is one combined run and the per-provision figures are attribution
+  only. Any process that prices clauses independently and sums them — which is the natural way to
+  read a bill — is wrong by an amount that grows with how much the clauses interact. [verified]
+
+  ### No district is untouched, and the two populations overlap by exactly the districts that move
+
+  Zero unmoved, against 253 for the refresh alone and 315 for the guarantee alone:
+
+      refresh alone          356 up,   253 unmoved
+      half phase-out alone   294 down, 315 unmoved
+      both                   356 up, 253 down, 0 unmoved
+
+  The two moved sets are **not** disjoint. 356 and 294 sum to 650 against 609 districts, so **41
+  are moved by both** — and they are the same 41 the refresh lifts off the guarantee, named above.
+  A district on the floor whose formula amount the refresh raises past it is moved by the refresh;
+  it was also standing on the floor the phase-out lowers. [verified]
+
+  What *is* disjoint is narrower and still worth having: the 253 the refresh cannot reach are held
+  on the guarantee throughout, and the 315 the phase-out cannot reach are paid by the formula, and
+  those two sets do not intersect. That is the structure
+  [guarantee-phase-out](../scenario/guarantee-phase-out.yml) records — no policy applied to the
+  guarantee reaches a district the formula already pays — and it is why the combination leaves
+  nobody unmoved even though the levers overlap. 253 + 315 = 568, and the 41 in neither set are
+  the overlap. [verified]
+
+  The stronger claim is the one worth not making. Two levers that partition the state would be a
+  tidy result; these two cover it, which is a different and weaker thing.
+
+  ### Three of five provisions are not in any of these numbers
+
+  Stated here rather than only in the property, because a figure and its caveat separated by a
+  page are a figure. The special education weights, the transportation floor, and the scholarship
+  hold-harmless are absent from the −$143.9M entirely. Two of the three would move money in the
+  opposite direction to the headline, so the sign of this bill's net effect is not established by
+  its priced subset.
+properties:
+  provenance: hypothetical
+  designation: |
+    None, and none is available. There is no such bill, and a designation is the one thing a
+    reader will believe without checking.
+  general_assembly: |
+    Not applicable. [unentered — never introduced]
+  sponsors: |
+    None. [unentered — never introduced]
+  status: |
+    Never introduced and not proposed by anyone. Authored to exercise the case a
+    single-provision draft cannot: several provisions that interact, and several the calculators
+    cannot reach. [verified — that it was authored here; the provisions are a construction]
+  text_read: |
+    No text exists to pin. The two priced provisions restate changes with established precedent —
+    [H.B. 33](../legislation/hb-33-2023.yml) refreshed the reference year once, and the guarantee
+    rule is the one [`project::policy::GuaranteeRule`](../../../crates/project/src/policy.rs)
+    already models — and the three unpriced ones are constructed to be ordinary rather than drawn
+    from any instrument. [verified]
+  question: |
+    What does a bill look like when it does the thing both sides of Ohio's funding argument ask
+    for, and how much of such a bill can actually be priced?
+  provisions: |
+    Five provisions; two price.
+
+    **1. Base cost reference year: FY2022 → FY2024.** R.C. 3317.011. Binds
+    [`base-cost-per-pupil`](../parameter/base-cost-per-pupil.yml); `base_cost_scale = 1.0395`.
+    **Runnable.** [verified]
+
+    **2. Temporary transitional aid guarantee: half retired.** Uncodified — set by each biennial
+    budget and gone if not re-enacted. Binds
+    [`guarantee-funding-base`](../parameter/guarantee-funding-base.yml);
+    `GuaranteeRule::PhasedOut { remaining: 0.5 }`. **Runnable.** [verified]
+
+    **3. Special education category weights raised 8 percent.** R.C. 3317.014. **Not runnable** —
+    no lever expresses a categorical weight.
+
+    **4. Transportation reimbursement floor raised to 37.5 percent.** R.C. 3317.0212. **Not
+    runnable** — outside the model.
+
+    **5. Resident district held harmless for scholarship deductions.** R.C. 3310.41. **Not
+    runnable** — outside the model.
+
+    The committed binding is
+    [`draft-provisions.tsv`](../../../crates/project/fixtures/draft-provisions.tsv), which is
+    authoritative; a test fails if this list departs from it.
+  unpriced: |
+    Three of five, and the $143.9M figure does not include any of them.
+
+    **Special education category weights (provision 3, R.C. 3317.014).** Unlevered rather than unmodelled — the
+    six weights are carried and the categorical total is computed, but nothing scales one weight.
+    A lever would cost a field on `Policy`, a checkpoint in `bundle`, and a mirrored
+    implementation in `web/src/lib/policy.ts`, because `verify.ts` refuses to render the scenario
+    page until the browser reproduces every Rust checkpoint. [verified]
+
+    **Transportation reimbursement (provision 4, R.C. 3317.0212).** Outside the model. The panel carries no
+    transportation series, so there is nothing for a lever to move. [verified]
+
+    **Scholarship hold-harmless (provision 5, R.C. 3310.41).** Outside the model, and the furthest out of the
+    three. The deduct channel needs the per-agency participation series
+    [`deduction`](../../skills/deduction.md) was declared for and never received; the connector
+    that would carry it sits behind the department's authenticated reports portal. [open]
+links:
+  - target: ../draft-legislation.ont.yml
+    relationship: instance-of
+  - target: hb-96-with-refreshed-inputs.yml
+    relationship: shares-a-provision-with
+    note: >-
+      Provision 1 is the same lever at the same value. The two drafts differ in what surrounds
+      it, which is what makes the residual visible.
+  - target: ../parameter/base-cost-per-pupil.yml
+    relationship: perturbs
+  - target: ../parameter/guarantee-funding-base.yml
+    relationship: perturbs
+  - target: ../scenario/guarantee-phase-out.yml
+    relationship: simulated-by
+    note: >-
+      Prices provision 2 alone, and establishes the disjointness that makes the combination
+      reach every district.
+  - target: ../scenario/fsfp-input-year-refresh.yml
+    relationship: simulated-by
+    note: Prices provision 1 alone.
+  - target: ../funding-regime/fair-school-funding-plan.yml
+    relationship: baselines-on
+  - target: ../formula-component/temporary-transitional-aid-guarantee.yml
+    relationship: alters
