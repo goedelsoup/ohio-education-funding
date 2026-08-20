@@ -802,6 +802,47 @@ pub fn rebuild(root: &Path) -> Result<Vec<Rebuilt>, RebuildError> {
         });
     }
 
+    // The Bridge decade's four education greenbooks. All four or none, for the reason the DeRolph
+    // opinions are: this is the only committed account of what the acts between the Evidence-Based
+    // Model's repeal and the Fair School Funding Plan did, and a file that reads as the decade
+    // while silently missing a biennium is worse than no file.
+    let greenbooks: Result<Vec<fixtures::Record>, cache::FetchError> =
+        registry::connector("lsc-budget")
+            .expect("registered")
+            .sources
+            .iter()
+            .filter(|src| src.fixtures.contains(&fixtures::BRIDGE_GREENBOOK_FIXTURE))
+            .map(|src| {
+                let text = cache::pdf_text(root, src)?;
+                Ok(fixtures::Record {
+                    id: src.key.to_string(),
+                    title: src.title.unwrap_or(src.key).to_string(),
+                    // The month on the cover, which is months after the act took effect and is
+                    // the date the *analysis* speaks from rather than the date the act does.
+                    date: fixtures::published_on(&text),
+                    source: src.url.to_string(),
+                    body: text.trim().to_string(),
+                })
+            })
+            .collect();
+    out.push(match greenbooks {
+        Ok(greenbooks) => Rebuilt::Written {
+            path: fixtures::BRIDGE_GREENBOOK_FIXTURE.to_string(),
+            rows: fixtures::write_text(
+                &root.join(fixtures::BRIDGE_GREENBOOK_FIXTURE),
+                &fixtures::build_records(
+                    "LSC's education greenbook for each act of the Bridge-formula decade, as \
+                     enrolled. One record per biennium, FY2014 through FY2021.",
+                    &greenbooks,
+                ),
+            )?,
+        },
+        Err(cause) => Rebuilt::Skipped {
+            path: fixtures::BRIDGE_GREENBOOK_FIXTURE.to_string(),
+            reason: cause.to_string(),
+        },
+    });
+
     // The appropriation-line series: eight bienniums, two documents each.
     //
     // Both variants, because neither carries both claims. The `as enacted` workbook states what

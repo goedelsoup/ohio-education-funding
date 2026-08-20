@@ -1,0 +1,80 @@
+class: legislation
+label: Am. Sub. H.B. 49 (2017) — FY2018-19 Budget; the Guarantee Made Conditional
+summary: >-
+  Re-anchored the guarantee to FY2017 and, for the first time in the decade, made it conditional:
+  a district that had lost 10% or more of its pupils in two years was guaranteed 95% of its prior
+  aid rather than 100%, on a scale.
+description: |
+  The third of the four acts of the Bridge-formula decade, and the only one that asked anything of
+  a district in exchange for the floor.
+
+  ### The condition, which is the act's one structural idea
+
+  Temporary transitional aid is re-computed to guarantee each district at least its **FY2017**
+  state aid — and then:
+
+  - a district whose total ADM fell **10% or more** between FY2014 and FY2016 is guaranteed
+    **95%** of its FY2017 aid in both years of the biennium;
+  - a district whose ADM fell **between 5% and 10%** is guaranteed a scaled amount between 95% and
+    100%. [verified — the greenbook]
+
+  Every other biennium of the decade re-read the anchor and left it at 100%. This one made the
+  floor a function of enrolment loss, which is the only time in ten years that the mechanism
+  distinguished between districts on it. It did not remove the floor from anyone; it lowered it by
+  at most five points for the districts emptying fastest. [verified]
+
+  **The base is explicitly recursive here.** The greenbook's own formula box defines the FY2018-19
+  guarantee base as the FY2017 sum of the opportunity grant, six categoricals, capacity aid, the
+  two bonuses, transportation — *and temporary transitional aid*. A district on the guarantee in
+  FY2017 therefore carries its FY2015 anchor inside its FY2017 base. [verified]
+
+  **Recomputations and valuation losses.** The act provides for school funding recomputations and
+  requires recommendations on compensating districts for valuation losses — the tangible personal
+  property and public utility deregulation losses that
+  [`tpp-replacement-payments`](../revenue-stream/tpp-replacement-payments.yml) tracks. [verified]
+findings: |
+  ### This is where the corpus can watch a guarantee stop being a hold-harmless
+
+  A hold-harmless holds a district harmless. A guarantee at 95% of a prior year, for districts
+  chosen by enrolment loss, is a managed decline — and it is the only evidence in the decade that
+  the General Assembly regarded the floor as something to be reduced rather than re-read.
+  [inference] The Fair School Funding Plan's own
+  [clawback](../formula-component/guarantee-open-enrolment-clawback.yml) reduces the base for a
+  district that has shed open-enrolment entrants, which is the same instinct applied to a different
+  cause of loss, four years later. Whether the second was drawn from the first is not established.
+  [open]
+
+  ### The appropriation
+
+  Enacted foundation aid is **$7.89 billion in FY2018 and $8.02 billion in FY2019**, a 2.4% and
+  1.8% rise — the two slowest years of the decade before the freeze that follows. [verified —
+  `appropriation-lines.csv`, lines 200550 and 200612]
+
+  165 budget lines name H.B. 49 in their `legal_basis`. [verified]
+properties:
+  designation: Am. Sub. H.B. 49
+  general_assembly: 132nd General Assembly
+  signed: 2017-06-30
+  effective: 2017-09-29
+  subject: |
+    Enacted the FY2018-19 operating budget. Re-anchored temporary transitional aid from FY2015 to
+    FY2017 and made it conditional on enrolment: districts losing 10% or more of total ADM between
+    FY2014 and FY2016 were guaranteed 95% rather than 100%, on a scale from 5%. Provided for
+    funding recomputations and for recommendations on compensating districts for valuation losses.
+  vetoes: |
+    Line-item vetoes exercised; their education funding effects are not assessed here. [open]
+  accountability_effect: |
+    Changed the application periods for the Jon Peterson Special Needs and income-based EdChoice
+    scholarship programmes, and carried College Credit Plus provisions. Not assessed against
+    `accountability-regime` here. [open]
+links:
+  - target: ../legislation.ont.yml
+    relationship: instance-of
+  - target: hb-64-2015.yml
+    relationship: amends
+  - target: ../funding-regime/bridge-formula.yml
+    relationship: continues
+  - target: ../revenue-stream/tpp-replacement-payments.yml
+    relationship: constrains
+  - target: ../../catalog/lsc-dew-redbook.md
+    relationship: sourced-from

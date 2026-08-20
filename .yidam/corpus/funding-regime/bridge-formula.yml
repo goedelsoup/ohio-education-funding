@@ -40,6 +40,38 @@ description: |
   only 43% of the FY2020 level, so erosion would be slow. [verified for the ratio; inference
   for the conclusion]
 findings: |
+  ### The anchor chain, which is what the decade actually did
+
+  Each biennium re-read the guarantee's anchor and left the mechanism alone. Because every base
+  includes the *previous* biennium's transitional aid term, a district on the guarantee throughout
+  carries its earliest anchor forward the whole way. [verified — each act's own formula box in its
+  greenbook, committed at
+  [`bridge-era-greenbooks.txt`](../../../crates/project/fixtures/bridge-era-greenbooks.txt)]
+
+      H.B. 59   FY2014-15   100% of FY2013 state aid, base = FY2013 Bridge formula funding
+                            + supplemental guarantee + high performance subsidy
+                            gain cap 6.25% (FY2014), 10.5% (FY2015)
+      H.B. 64   FY2016-17   100% of FY2015; career-technical funds moved outside the
+                            guarantee in FY2017 and subtracted from the base
+      H.B. 49   FY2018-19   100% of FY2017 — except 95% for districts whose ADM fell 10% or
+                            more FY2014→FY2016, scaled from 5%. Base explicitly includes
+                            FY2017 temporary transitional aid
+      H.B. 166  FY2020-21   no formula: each district's FY2019 allocation, formula amount and
+                            state share index frozen at FY2019
+      H.B. 110  FY2022-     the Fair School Funding Plan anchors its guarantee at FY2020
+
+  **So the Fair School Funding Plan's FY2020 base is the far end of a chain that starts at FY2013
+  and does not terminate there** — the FY2013 base is Bridge formula funding, which H.B. 153 had
+  itself defined by reference to earlier years. In FY2027 a district guaranteed in every biennium
+  since is funded on a distribution at least fourteen years old, and the corpus can now name four
+  of the links rather than none. [verified for the four; the depth below FY2013 remains open]
+
+  ### The one act of policy the decade contains
+
+  Re-reading an anchor is not a decision about a district; it is a decision about a date. The only
+  time the mechanism distinguished between districts on it was H.B. 49's 95% floor for the fastest-
+  emptying districts — one condition, in ten years, in four acts. [inference]
+
   The statewide expenditure record carries a matching signature, and deflating it sharpens the
   picture considerably. In constant FY2022 dollars, per-pupil operating expenditure fell from
   $15,226 in FY2010 to $14,173 in FY2014 — a real decline of about 7%, leaving FY2014
@@ -66,13 +98,16 @@ properties:
     Aid was set by reference to prior-year amounts, modified by successive budgets through
     caps on year-over-year increases and guarantees against year-over-year decreases, with
     varying formula overlays across the period. FY2020 and FY2021 were funded at frozen
-    levels.
+    levels — literally, at each district's FY2019 allocation, by
+    [H.B. 166](../legislation/hb-166-2019.yml).
   status: superseded
   boundary_note: |
-    Treated as one regime for a decade that in fact contained several distinct formula
-    overlays, including the FY2014-15 and FY2016-17 designs. Whether these warrant separate
-    regime nodes, or whether the caps-and-guarantees mechanism is the real continuity, is
-    unresolved. [open]
+    One regime, four acts, and the question is settled: **the caps-and-guarantees mechanism is
+    the continuity.** It survives every biennium unchanged in kind while the formula over it is
+    built (H.B. 59), extended (H.B. 64), made conditional (H.B. 49) and finally not run at all
+    (H.B. 166) — and in that last biennium the bounds are the whole of the distribution. A regime
+    boundary drawn at a formula overlay would cut the mechanism that persisted and keep the ones
+    that did not. [verified — the four greenbooks]
 links:
   - target: ../fiscal-period/fy2012-13.yml
     relationship: opened-in
@@ -85,6 +120,17 @@ links:
     relationship: instance-of
   - target: evidence-based-model.yml
     relationship: supersedes
+  - target: ../legislation/hb-59-2013.yml
+    relationship: modified-by
+  - target: ../legislation/hb-64-2015.yml
+    relationship: modified-by
+  - target: ../legislation/hb-49-2017.yml
+    relationship: modified-by
+  - target: ../legislation/hb-166-2019.yml
+    relationship: modified-by
+    note: >-
+      The one that suspended the computation rather than changing it. Its freeze is what the Fair
+      School Funding Plan's guarantee is anchored to.
   - target: ../doctrine/adequacy.yml
     relationship: assessed-against
   - target: ../doctrine/equity.yml

@@ -1,0 +1,84 @@
+class: legislation
+label: Am. Sub. H.B. 64 (2015) — FY2016-17 Budget; Capacity Aid
+summary: >-
+  Kept H.B. 59's formula and moved the guarantee's anchor forward two years, from FY2013 to FY2015.
+  Added capacity aid, which pays on what a mill raises rather than on what a district is worth, and
+  performance bonuses for graduation and third-grade reading.
+description: |
+  The second of the four acts of the Bridge-formula decade, and the one that changed the formula's
+  content most while changing its architecture least.
+
+  **Capacity aid** is the substantive addition, and it measures something the state share index
+  does not: what one mill actually raises per pupil in a district, rather than where the district
+  sits in the statewide valuation-and-income ranking. Two districts can share an index position
+  and differ in what a levy is worth to them. [verified — the greenbook]
+
+  **Performance bonuses** pay on measured outcomes — a graduation bonus and a third-grade reading
+  bonus — which is unusual in Ohio's formula and is the ancestor of the Fair School Funding Plan's
+  [performance supplement](../formula-component/fsfp-performance-supplement.yml). A
+  **transportation supplement** sits beside base pupil transportation. [verified]
+
+  ### The anchor moves, and moving it is the decade's only recurring act of policy
+
+  Temporary transitional aid had guaranteed 100% of **FY2013** state aid. This act re-computes it
+  at 100% of **FY2015**. [verified] That is the whole of what a biennium does to the floor: it does
+  not remove it, it does not escalate it, it re-reads it two years later.
+
+  One carve-out shows how carefully the base has to be handled. In FY2017 career-technical
+  education and its associated services funds are paid **outside** the guarantee, so the guarantee
+  base for that year is adjusted by subtracting each district's FY2016 career-technical funds —
+  otherwise the base would guarantee money the formula was no longer counting toward it.
+  [verified]
+findings: |
+  ### It is the most-cited act in the whole Catalog and had no node
+
+  214 budget lines name H.B. 64 in their `legal_basis` in
+  [`catalog-line-item-basis.tsv`](../../../crates/project/fixtures/catalog-line-item-basis.tsv) —
+  more than any other act the Catalog names, including every act that already had a node.
+  [verified]
+
+  ### The appropriation
+
+  Enacted foundation aid is **$7.39 billion in FY2016 and $7.70 billion in FY2017**, a 5.5% and
+  4.2% rise. [verified — `appropriation-lines.csv`, lines 200550 and 200612] The decade's growth is
+  steady and unremarkable in every year except its last three, which is the finding on
+  [H.B. 166](hb-166-2019.yml).
+
+  ### Capacity aid and local capacity are not the same idea twice
+
+  The Fair School Funding Plan's [local capacity](../formula-component/fsfp-local-capacity-measure.yml)
+  measure replaced the charge-off and is a *deduction* from what the state pays. Capacity aid was
+  an *addition* on top of a formula whose state share came from an index. Both answer "what can
+  this district actually raise", from opposite directions, six years apart. Whether the second
+  descends from the first is not established here — no `replaces` edge is claimed and
+  `regime-diff` aligns neither. [open]
+properties:
+  designation: Am. Sub. H.B. 64
+  general_assembly: 131st General Assembly
+  signed: 2015-06-30
+  effective: 2015-09-29
+  subject: |
+    Enacted the FY2016-17 operating budget. Kept H.B. 59's state share index and Opportunity Grant,
+    added capacity aid, graduation and third-grade reading bonuses, and a transportation
+    supplement. Re-anchored temporary transitional aid from FY2013 to FY2015 and moved
+    career-technical funds outside the guarantee for FY2017.
+  vetoes: |
+    Line-item vetoes exercised; their education funding effects are not assessed here. [open]
+  accountability_effect: |
+    Introduced the graduation and third-grade reading bonuses, which pay on report-card measures
+    and so join the funding and accountability systems at a point neither
+    `accountability-regime` nor the formula nodes currently record. [open]
+links:
+  - target: ../legislation.ont.yml
+    relationship: instance-of
+  - target: hb-59-2013.yml
+    relationship: amends
+  - target: ../funding-regime/bridge-formula.yml
+    relationship: continues
+  - target: ../formula-component/fsfp-performance-supplement.yml
+    relationship: precedes
+    note: >-
+      Ohio's first payment on a measured outcome rather than an input. The Fair School Funding
+      Plan's supplement is a different mechanism and answers the same impulse.
+  - target: ../../catalog/lsc-dew-redbook.md
+    relationship: sourced-from

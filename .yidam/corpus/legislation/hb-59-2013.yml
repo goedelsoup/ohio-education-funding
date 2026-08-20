@@ -1,0 +1,89 @@
+class: legislation
+label: Am. Sub. H.B. 59 (2013) — FY2014-15 Budget; a Formula Over the Bridge
+summary: >-
+  Put a formula back on top of the Bridge guarantee two years after the Evidence-Based Model was
+  repealed: a state share index, an Opportunity Grant, and seven categorical aids — all of it
+  bounded by a guarantee at the prior distribution and a cap on gains.
+description: |
+  The first of four budget acts that governed Ohio school funding between the Evidence-Based
+  Model's repeal and the Fair School Funding Plan, and the one that ended the Bridge formula's
+  pure reference to prior-year amounts by building a computation over it.
+
+  **What it computes.** Aid runs through a **state share index** — a district's position on a
+  combined valuation and income measure, which decides the state's share of every component — and
+  a per-pupil **Opportunity Grant**, plus seven categorical aids: targeted assistance, special
+  education additional aid, limited English proficiency, economically disadvantaged aid, K-3
+  literacy, gifted, and career-technical education, with transportation beside them.
+  [verified — the greenbook]
+
+  ### The formula is bounded on both sides, and the bounds are the mechanism
+
+  **Temporary transitional aid guarantees 100% of a district's FY2013 state aid**, where the
+  guarantee base is its *FY2013 Bridge formula funding plus supplemental guarantee plus high
+  performance subsidy*. Where foundation funding computes less than that base, the difference is
+  paid. [verified] And total foundation funding is capped: a **gain cap of 6.25% in FY2014 and
+  10.5% in FY2015** against the prior year. [verified]
+
+  So a district whose formula result fell was held at FY2013 and a district whose result rose was
+  not allowed to reach it. For any district on either bound the operative distribution is not the
+  formula — which is the property `funding-regime/bridge-formula` describes for the decade, here
+  with the act that wrote it. [verified]
+
+  **Straight A Program.** A competitive innovation grant fund, outside the formula and outside the
+  guarantee. [verified]
+findings: |
+  ### The guarantee base is recursive, and this act is where the chain that reaches FY2027 starts
+
+  The FY2013 base this act guarantees is Bridge formula funding, which H.B. 153 had itself defined
+  by reference to still earlier years. Each later act then re-anchored on the year before its own
+  biennium — FY2015, then FY2017, then FY2019 — and every base included the prior act's
+  transitional aid term. The full chain is in
+  [`bridge-formula`](../funding-regime/bridge-formula.yml). What matters here is that it begins at
+  a year this act did not compute either. [verified — the greenbook's own formula box]
+
+  ### The appropriation the corpus already held shows the act working
+
+  Enacted foundation aid is **$6.58 billion in FY2014 and $7.00 billion in FY2015**, against $6.29
+  billion in FY2013 — a 6.4% rise in the first year, just inside the 6.25% cap once the guarantee's
+  floor is added, and 6.4% again in the second. [verified — `appropriation-lines.csv`, lines
+  200550 and 200612]
+
+  ### It is the most-cited act of the decade in the Catalog and had no node
+
+  205 budget lines name H.B. 59 in their `legal_basis` in
+  [`catalog-line-item-basis.tsv`](../../../crates/project/fixtures/catalog-line-item-basis.tsv),
+  third of every act the Catalog names. The corpus has been reading its line structure since the
+  Catalog was wired and could not say what the act did. [verified]
+properties:
+  designation: Am. Sub. H.B. 59
+  general_assembly: 130th General Assembly
+  signed: 2013-06-30
+  effective: 2013-09-29
+  subject: |
+    Enacted the FY2014-15 operating budget. Replaced the Bridge formula's bare reference to prior
+    amounts with a computed formula — state share index, Opportunity Grant, seven categoricals —
+    while keeping the prior distribution as a floor through temporary transitional aid at 100% of
+    FY2013 and adding a gain cap of 6.25% and 10.5%. Created the Straight A Program.
+  vetoes: |
+    Line-item vetoes exercised; their education funding effects are not assessed here. The
+    greenbook analyses the act as enrolled. [open]
+  accountability_effect: |
+    Carried the third-grade reading guarantee's retention provisions and a new generation of
+    assessments. Not assessed against `accountability-regime` here. [open]
+links:
+  - target: ../legislation.ont.yml
+    relationship: instance-of
+  - target: hb-153-2011.yml
+    relationship: amends
+  - target: ../funding-regime/bridge-formula.yml
+    relationship: continues
+    note: >-
+      Continues rather than establishes or replaces. The guarantee and the cap are H.B. 153's
+      mechanism and this act keeps both; what it adds is a computation between them.
+  - target: ../formula-component/temporary-transitional-aid-guarantee.yml
+    relationship: precedes
+    note: >-
+      Not the same mechanism — that one is the Fair School Funding Plan's — but the same name and
+      the start of the anchor chain its FY2020 base sits at the end of.
+  - target: ../../catalog/lsc-dew-redbook.md
+    relationship: sourced-from

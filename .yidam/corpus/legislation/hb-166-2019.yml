@@ -1,0 +1,103 @@
+class: legislation
+label: Am. Sub. H.B. 166 (2019) — FY2020-21 Budget; the Year There Was No Formula
+summary: >-
+  Stopped computing. For FY2020 and FY2021 every traditional district and joint vocational school
+  district received exactly its FY2019 allocation, with the formula amount, the state share index
+  and the per-pupil deduction rates all frozen at FY2019. New money went through a separate fund.
+description: |
+  The last act of the Bridge-formula decade, and the only one of the four that ran no formula at
+  all.
+
+  **The freeze.** "In FY 2020 and FY 2021, the budget provides every traditional school district
+  and JVSD with the same amount of foundation aid the districts received in FY 2019." Statewide
+  that is **$8.07 billion** for traditional districts and **$306.5 million** for joint vocational
+  districts. [verified — the greenbook]
+
+  It is a freeze of the machinery and not only of the total:
+
+  - the **formula amount** used to compute deductions and transfers is fixed at the FY2019 figure,
+    **$6,020**;
+  - the per-pupil amounts deducted and paid to community and STEM schools for targeted assistance,
+    economically disadvantaged funds and transportation are the FY2019 amounts;
+  - wherever a district's **state share index or state share percentage** is a factor — preschool
+    special education, special education transportation, county DD board and institution special
+    education, catastrophic cost — the department must use the district's **FY2019** index.
+    [verified]
+
+  **The new money went somewhere else.** Student wellness and success funds, an enrolment growth
+  supplement, and quality community schools support are paid alongside the frozen foundation
+  amount rather than through it. A biennium that adds money without touching the formula is
+  choosing not to redistribute: every district's share of foundation aid is whatever its share was
+  in FY2019. [verified — the greenbook's chapter structure; inference on the last sentence]
+findings: |
+  ### The Fair School Funding Plan's anchor is this freeze, not a FY2020 computation
+
+  The [guarantee funding base](../parameter/guarantee-funding-base.yml) — column `[H2]` of the
+  payment report, the level nearly half of Ohio is still held at in FY2027 — is the FY2020 figure.
+  That parameter recorded, `[open]`, that "what the FY2020 figure was itself composed of" was not
+  established and "may reach back further than 2020."
+
+  It does. **FY2020 is FY2019, carried forward unchanged by this act.** So `[H2]` is not the output
+  of a formula run in FY2020; it is the output of H.B. 49's formula run in FY2019, on FY2019
+  enrolment and a FY2019 state share index, preserved by a statute that declined to recompute.
+  [verified]
+
+  ### And the corpus's own appropriation series shows it, in a fixture that was already committed
+
+      FY2018   $7,885,912,816
+      FY2019   $8,024,258,845
+      FY2020   $8,024,280,845     +$22,000
+      FY2021   $8,024,518,845     +$238,000
+      FY2022   $8,202,198,712
+
+  Three consecutive years flat to within **0.003%**, against $1.44 billion of growth across the
+  five years before them. [verified — `appropriation-lines.csv`, lines 200550 and 200612] The
+  freeze was legible in the series the whole time and nothing here had read it as one, because no
+  node named the act that caused it.
+
+  ### What that does to a finding already in the corpus
+
+  The guarantee node argues that "held at FY2020" is a nominal statement and that prices rose 25.1%
+  across FY2020-FY2025. That argument is sound and it **understates the staleness by a year**: the
+  distribution being held is FY2019's. In FY2027, the terminal phase-in year, the districts on the
+  guarantee are funded at a distribution computed eight years earlier — and for a district
+  guaranteed in every biennium of the decade, the chain in
+  [`bridge-formula`](../funding-regime/bridge-formula.yml) reaches back further still. [verified]
+properties:
+  designation: Am. Sub. H.B. 166
+  general_assembly: 133rd General Assembly
+  signed: 2019-07-18
+  effective: 2019-10-17
+  subject: |
+    Enacted the FY2020-21 operating budget. Ran no school funding formula: every traditional
+    district and JVSD received its FY2019 foundation aid allocation in both years, with the formula
+    amount held at $6,020, the state share index held at FY2019, and per-pupil deduction rates held
+    at FY2019. Created the student wellness and success funds, an enrolment growth supplement, and
+    quality community schools support, all outside the frozen amount.
+  vetoes: |
+    The greenbook carries a `Vetoed provisions` chapter. Which of them touched education funding is
+    not assessed here, and this is the act in the class for which that gap matters most: a veto
+    inside a freeze changes what is frozen. [open]
+  accountability_effect: |
+    Carried academic distress commission provisions, end-of-course examination and graduation
+    requirement changes, and industry-recognised credential provisions. Not assessed against
+    `accountability-regime` here. [open]
+links:
+  - target: ../legislation.ont.yml
+    relationship: instance-of
+  - target: hb-49-2017.yml
+    relationship: amends
+  - target: ../funding-regime/bridge-formula.yml
+    relationship: continues
+    note: >-
+      Continues the regime by suspending its computation. The caps-and-guarantees mechanism is
+      still what distributes the money; there is simply nothing left for it to bound.
+  - target: hb-110-2021.yml
+    relationship: precedes
+  - target: ../parameter/guarantee-funding-base.yml
+    relationship: sets
+    note: >-
+      The strongest edge on this node. `[H2]` is the FY2020 payment, and this act is what made the
+      FY2020 payment equal to FY2019's.
+  - target: ../../catalog/lsc-dew-redbook.md
+    relationship: sourced-from
