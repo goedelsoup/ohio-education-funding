@@ -257,6 +257,34 @@ function renderCarriedForward(bundle: Bundle, d: District): string {
 const PANDEMIC_YEARS = [2021, 2022, 2023, 2024];
 
 /**
+ * The fiscal year the casino closure lands in.
+ *
+ * FY2021 and not FY2020, because the fund pays in August for the half-year that ended in June: the
+ * January-June 2020 collection was distributed in August 2020, which is FY2021. The two bases
+ * disagree about which year the pandemic hit by exactly one year, and this constant is which one
+ * the feed is on.
+ */
+const CASINO_CLOSURE_YEAR = 2021;
+
+/**
+ * The median district's casino distribution as a share of the state aid it booked the same year.
+ *
+ * Printed so a district's own share has something to be large or small against.
+ */
+const CASINO_MEDIAN_SHARE_OF_AID = 0.0115;
+
+/**
+ * Districts whose casino money comes out of exactly one county fund.
+ *
+ * This and [`CASINO_MEDIAN_SHARE_OF_AID`] are the two statewide statistics this card types rather
+ * than derives, because neither is in the feed — one is a median over a join the feed does not
+ * make and the other is a count over a nullable field. Both are asserted against the feed in
+ * `tests/unit/casino.spec.ts`, which is the difference between a figure that is checked and one
+ * that was true when it was written.
+ */
+const CASINO_SINGLE_COUNTY_DISTRICTS = 178;
+
+/**
  * What the district actually received, raised, spent, and holds.
  *
  * # This is the only card on the page that is not a model
@@ -1336,6 +1364,151 @@ export function renderSupplements(d: District): string {
 }
 
 /**
+ * The one payment on this page that no other figure on it counts.
+ *
+ * # Why it gets a card rather than a row in "Outside the formula"
+ *
+ * That card holds the performance and enrolment supplements, which are outside *foundation
+ * funding* and inside `[R] Total State Support` — the guarantee does not hold a district at them,
+ * but the department pays them and the calculator computes them. This is a different kind of
+ * outside. The gross casino revenue county student fund runs from the Tax Commissioner through
+ * eighty-eight county funds to districts, and never becomes an appropriation to the Department of
+ * Education and Workforce at all. It is therefore absent from every other number on this page —
+ * from total state support, from the categorical decomposition, and from the general-fund
+ * `finances` rows, which book it in a different fund.
+ *
+ * A reader who added up this page before this card existed was told, by omission, that they had
+ * seen all the state money. They had not.
+ *
+ * # Why there is no per-pupil figure here
+ *
+ * Because there is no pupil count on this page it could honestly divide by. R.C. 5753.11 defines
+ * the fund's denominator as county-resident students enrolled in a public school district —
+ * which for this purpose includes community schools, STEM schools and joint vocational districts —
+ * counted in October for the January payment and in May for the August one, with a pupil enrolled
+ * in both a JVSD and a district counted in *both*. That is a fifth Ohio pupil count and it is
+ * deliberately not a partition. Dividing by `categorical_adm` would produce a figure that sits
+ * beside four other per-pupil figures looking like a fifth of the same kind.
+ *
+ * What is comparable is a share of money against money in the same year, which is what the tile
+ * does: this fund against the state aid the treasurer booked in the same fiscal year.
+ */
+export function renderCasino(bundle: Bundle, d: District): string {
+  if (d.casino.length === 0) return "";
+  const first = d.casino[0]!;
+  const latest = d.casino[d.casino.length - 1]!;
+  const closure = d.casino.find((y) => y.fiscal_year === CASINO_CLOSURE_YEAR);
+  const before = d.casino.find((y) => y.fiscal_year === CASINO_CLOSURE_YEAR - 1);
+  const booked = d.finances.find((y) => y.fiscal_year === latest.fiscal_year);
+  const shareOfAid =
+    booked && booked.state_aid > 0 ? latest.amount / booked.state_aid : null;
+
+  const statewide = bundle.casino.find((y) => y.fiscal_year === latest.fiscal_year);
+  const bars: Bar[] = d.casino.map((y) => ({
+    label: `FY${y.fiscal_year}`,
+    value: y.amount,
+    hover: `FY${y.fiscal_year}: ${money(y.amount)}${
+      y.fiscal_year === CASINO_CLOSURE_YEAR ? " — the casinos were closed for a quarter of it" : ""
+    }`,
+    ...(y.fiscal_year === latest.fiscal_year || y.fiscal_year === CASINO_CLOSURE_YEAR
+      ? { direct: money(y.amount) }
+      : {}),
+  }));
+
+  return `
+    <div class="card" id="casino" data-part="casino">
+      <h2>${anchor("casino")}The money that reaches this district outside the formula${yearChip(
+        "casino",
+      )}</h2>
+      <p class="note">Every other figure on this page is state aid computed by a formula or booked
+        by the treasurer as grants-in-aid. This is neither. It is a share of the
+        <a href="${routes.wikiNode("revenue-stream", "casino-tax-distribution")}">gross casino
+        revenue county student fund</a>, which moves from the Tax Commissioner through county
+        funds to districts and never becomes an appropriation to the department — so
+        <strong>nothing above this card counts it</strong>.</p>
+
+      <div class="tiles">
+        <div class="tile"><div class="k">Received, FY${latest.fiscal_year}</div>
+          <div class="v">${money(latest.amount)}</div>
+          <div class="n">${
+            statewide
+              ? `of ${money(statewide.amount)} distributed statewide`
+              : "paid in two instalments, January and August"
+          }</div></div>
+        <div class="tile"><div class="k">Against state aid booked that year</div>
+          <div class="v">${shareOfAid == null ? "—" : pct(shareOfAid, 2)}</div>
+          <div class="n">${
+            shareOfAid == null
+              ? "no FY" + latest.fiscal_year + " forecast filing to compare against"
+              : `${money(booked!.state_aid)} of unrestricted grants-in-aid. Median across
+                 Ohio's districts is ${pct(CASINO_MEDIAN_SHARE_OF_AID, 2)}`
+          }</div></div>
+        <div class="tile"><div class="k">County funds it is paid from</div>
+          <div class="v">${d.casino_counties ?? "—"}</div>
+          <div class="n">${
+            d.casino_counties == null
+              ? "not named in the most recent distribution"
+              : d.casino_counties === 1
+                ? `its resident pupils are all in one county, as
+                   ${CASINO_SINGLE_COUNTY_DISTRICTS} of Ohio's
+                   ${bundle.statewide.districts} districts' are`
+                : `it has resident pupils in ${count(d.casino_counties)} counties, and is paid out
+                   of each county's fund separately`
+          }</div></div>
+      </div>
+
+      <div class="chartwrap" data-chart="casino">${renderToString(barSpec(bars))}</div>
+
+      <p class="note">${
+        closure && before && before.amount > 0
+          ? `<strong>FY${CASINO_CLOSURE_YEAR} is the closure.</strong> Ohio's casinos were shut by
+             order from mid-March 2020, and because this fund is paid on the tax actually collected
+             rather than on an appropriation, the drop arrives whole: ${money(closure.amount)}
+             against ${money(before.amount)} the year before, ${pct(
+               closure.amount / before.amount - 1,
+               1,
+             )}. Nothing cushioned it and nothing was made up afterwards — which is the difference
+             between money the legislature sets and money a tax yields.`
+          : `This fund is paid on the tax actually collected rather than on an appropriation, so it
+             moves with gambling activity and nothing cushions a fall in it.`
+      }</p>
+
+      <div class="scroll"><table data-program="casino">
+        <thead><tr><th>Fiscal year</th><th class="tnum">Distributed to this district</th>
+          <th class="tnum">Statewide</th></tr></thead>
+        <tbody>${d.casino
+          .map((y) => {
+            const all = bundle.casino.find((s) => s.fiscal_year === y.fiscal_year);
+            return `<tr${y.fiscal_year === CASINO_CLOSURE_YEAR ? ' class="loss"' : ""}>
+              <th>FY${y.fiscal_year}</th>
+              <td class="tnum">${money(y.amount)}</td>
+              <td class="tnum">${all == null ? "—" : money(all.amount)}</td>
+            </tr>`;
+          })
+          .join("")}</tbody>
+      </table></div>
+
+      <p class="note"><strong>There is no per-pupil figure here, and one should not be computed
+        from this page.</strong> The fund is apportioned on the count R.C. 5753.11 defines —
+        county-resident pupils, counting community, STEM and joint vocational enrolment, with a
+        pupil enrolled in both a JVSD and a district counted in both — which is a fifth Ohio pupil
+        count and is deliberately not a partition of the state's students. Dividing this by the
+        enrolled ADM above would put a number beside four other per-pupil figures that looks like a
+        fifth of the same kind and is not one.</p>
+
+      <p class="note">The district decides how to spend it. The Ohio Constitution restricts these
+        distributions to the support of primary and secondary education and imposes no other
+        condition, which makes this the least restricted money on the page — most restricted money
+        in this corpus is restricted to a programme, and this is restricted only to a purpose broad
+        enough to cover nearly any school expenditure.
+        The series runs FY${first.fiscal_year} to FY${latest.fiscal_year} because the Department of
+        Taxation's own casino page carries no distribution after January ${
+          latest.fiscal_year
+        }, and the ones before FY${first.fiscal_year} were published as PDFs.</p>
+    </div>`;
+}
+
+/**
  * Transportation, inside the card for what sits outside the formula.
  *
  * # The second-largest program in Ohio's school funding, and it looks like nothing else
@@ -1662,6 +1835,19 @@ export function renderWhatThisIsNot(bundle: Bundle, d: District): string {
         five-year forecast filing — audited actuals, on a different construction, in different
         years. Reading either as a check on the other is the mistake the two routes are kept
         apart to prevent.</p>
+      ${
+        d.casino.length > 0
+          ? `<p class="note"><strong>And there is state money in neither.</strong> This district
+             received ${money(
+               d.casino[d.casino.length - 1]!.amount,
+             )} from the casino county student fund in
+             FY${d.casino[d.casino.length - 1]!.fiscal_year}. It is not an appropriation to the
+             department, so no figure above computes it; it is booked outside the general fund, so
+             no row on the finances route carries it either. It is on
+             <a href="${routes.districtFinances(d.irn)}#casino">finances</a>, in a card of its
+             own.</p>`
+          : ""
+      }
       <p class="note"><strong>This page divides by more than one pupil count.</strong> Base cost
         is built on ${count(baseCostAdm)} — a three-year average, because R.C. 3317.011 funds on
         the greater of that and the current year. The state share of it, and every categorical

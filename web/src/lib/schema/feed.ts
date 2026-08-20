@@ -124,6 +124,23 @@ export const OutcomeStatewideSchema = z
   .strict();
 
 /** One closed fiscal year of a district's general fund. Audited actuals. */
+/**
+ * One fiscal year of the gross casino revenue county student fund.
+ *
+ * Two fields and no third. There is no per-pupil figure here and none should be computed from the
+ * rest of the record: the fund is apportioned on the count R.C. 5753.11 defines — county-resident
+ * students including community, STEM and joint vocational enrolment, dual-enrolled pupils counted
+ * twice — which is a fifth pupil denominator and a partition of nothing. Dividing it by `adm` or
+ * `categorical_adm` gives a number that reads as comparable to the ones beside it and is not.
+ */
+export const CasinoYearSchema = z
+  .object({
+    /** State fiscal year of the two payments, January and August, summed. */
+    fiscal_year: z.number().int(),
+    amount: num,
+  })
+  .strict();
+
 export const FinanceYearSchema = z
   .object({
     fiscal_year: z.number().int(),
@@ -692,6 +709,20 @@ export const DistrictSchema = z
      * differently constructed. Never render one as a check on the other.
      */
     finances: z.array(FinanceYearSchema),
+    /**
+     * The casino county student fund, oldest year first.
+     *
+     * Money the state hands this district that no other figure in the record counts — it is not an
+     * appropriation to the department, so it is absent from `realized_aid_per_pupil`, from
+     * `categoricals`, and from the `finances` rows, which carry only the general fund.
+     */
+    casino: z.array(CasinoYearSchema),
+    /**
+     * County funds the district was paid out of in the most recent distribution, or `null` where
+     * it took nothing in it. A district is paid once per county it has resident students in, so
+     * this is a fact about how far its catchment reaches — 1 for 178 of the 609 and up to 7.
+     */
+    casino_counties: z.number().int().positive().nullable(),
   })
   .strict();
 
@@ -1159,6 +1190,16 @@ export const BundleSchema = z
     appropriation_lines: z.array(AppropriationLineSchema),
     /** The meal-program poverty share by October, oldest first. Empty if absent. */
     meal_program: z.array(MealProgramYearSchema),
+    /**
+     * The whole casino county student fund, fiscal year by fiscal year.
+     *
+     * **Every district the Department of Taxation pays** — about a thousand, because R.C. 5753.11
+     * counts community schools, STEM schools and joint vocational districts as public school
+     * districts. Summing `casino` across `districts` gives 87% of this, and the missing 13% is not
+     * a rounding error: it is the part of the fund that goes to a population this feed does not
+     * carry.
+     */
+    casino: z.array(CasinoYearSchema),
     house_districts: z.array(HouseDistrictSchema),
     /** The same for the Senate: 33 seats, each exactly three House districts. */
     senate_districts: z.array(HouseDistrictSchema),

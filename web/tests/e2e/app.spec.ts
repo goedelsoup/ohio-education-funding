@@ -490,6 +490,12 @@ const ROUTES_WITH_FIGURES = [
     expect(slim.districts[0]).not.toHaveProperty("finances");
     expect(slim.districts[0]).not.toHaveProperty("outcome");
     expect(slim.districts[0]).not.toHaveProperty("base_cost_build_up");
+    // And the casino block, for the strongest version of the same reason: no lever in the
+    // scenario builder can move money that never passes through an appropriation, and a browser
+    // holding it would be one property access from a per-pupil figure whose denominator is not in
+    // the feed at all.
+    expect(slim.districts[0]).not.toHaveProperty("casino");
+    expect(slim).not.toHaveProperty("casino");
     expect(slim.districts[0]).toHaveProperty("base_cost_state_share");
   });
 
@@ -3708,5 +3714,88 @@ test.describe("a pending bill nothing here can price", () => {
     const card = page.locator('.card[data-part="runner"]');
     await expect(card).toContainText("0 of this draft's 1 provisions");
     await expect(card).toContainText("not of the bill");
+  });
+});
+
+test.describe("the money no other figure on the site counts", () => {
+  test("the card is on the finances route, and nothing above it carries the money", async ({
+    page,
+  }) => {
+    /*
+     * The failure this stands against is the one the feed made available for four phases: a
+     * per-district series computed in Rust, tested in Rust, and reachable by nobody who was not
+     * running cargo. It is also the failure the page made available for longer — a reader who
+     * added up a district's pages was told by omission that they had seen all the state money.
+     */
+    await page.goto(`/district/${CLEVELAND}/finances`);
+    const card = page.locator('.card[data-part="casino"]');
+    await expect(card).toBeVisible();
+    await expect(card).toContainText("nothing above this card counts it");
+    await expect(card).toContainText("gross casino revenue county student fund");
+  });
+
+  test("the chip says the series, not the page's year", async ({ page }) => {
+    // Nine fiscal years on a route whose other card spans six, and the chip has to describe the
+    // card it sits on rather than the route it sits in.
+    await page.goto(`/district/${CLEVELAND}/finances`);
+    const chip = page.locator('.card[data-part="casino"] .year-chip');
+    await expect(chip).toHaveText("FY2016-FY2024");
+    await expect(chip).toHaveAttribute("data-kind", "fiscal");
+  });
+
+  test("the district figure and the statewide figure are both there, and they differ", async ({
+    page,
+  }) => {
+    // A district's own money is the reason to look; the statewide column is what stops the reader
+    // concluding that this district's fall in FY2021 was about this district.
+    await page.goto(`/district/${CLEVELAND}/finances`);
+    const rows = page.locator('.card[data-part="casino"] table[data-program="casino"] tbody tr');
+    await expect(rows).toHaveCount(9);
+    await expect(rows.first()).toContainText("FY2016");
+    await expect(rows.last()).toContainText("FY2024");
+    await expect(rows.last()).toContainText("$114,177,214");
+  });
+
+  test("the closure is named as a closure and put in the year the money moved", async ({
+    page,
+  }) => {
+    /*
+     * The casinos shut in March 2020 and the money arrives in FY2021, because the August payment
+     * settles the half-year that ended in June. A page that put it in FY2020 would be describing
+     * the revenue period, which is not what any other figure on the route is on.
+     */
+    await page.goto(`/district/${CLEVELAND}/finances`);
+    const card = page.locator('.card[data-part="casino"]');
+    await expect(card).toContainText("FY2021 is the closure");
+    await expect(card).toContainText("mid-March 2020");
+    await expect(card).toContainText("Nothing cushioned it");
+  });
+
+  test("no per-pupil figure appears, and the card says which count it would have had to use", async ({
+    page,
+  }) => {
+    /*
+     * Four per-pupil figures already sit on a district's pages. A fifth computed from this fund
+     * would read as one of them and would divide by a denominator R.C. 5753.11 defines for this
+     * fund alone — county-resident pupils, community and STEM and joint vocational enrolment
+     * included, dual-enrolled pupils counted twice. The refusal is the finding.
+     */
+    await page.goto(`/district/${CLEVELAND}/finances`);
+    const card = page.locator('.card[data-part="casino"]');
+    await expect(card).toContainText("no per-pupil figure here");
+    await expect(card).toContainText("R.C. 5753.11");
+    await expect(card.locator(".tile", { hasText: "per pupil" })).toHaveCount(0);
+  });
+
+  test("the dashboard's caveat card sends a reader to it rather than staying silent", async ({
+    page,
+  }) => {
+    // "What this page is not" already told a reader that none of the figures above it is money
+    // received. It could not say that the finances route was also short of some — which made the
+    // two routes together look exhaustive.
+    await page.goto(`/district/${CLEVELAND}`);
+    const card = page.locator('.card[data-part="not"]');
+    await expect(card).toContainText("there is state money in neither");
+    await expect(card.locator('a[href$="/finances#casino"]')).toHaveCount(1);
   });
 });

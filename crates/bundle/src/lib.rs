@@ -145,10 +145,19 @@ use edfund_core::Dollars;
 /// from FY2022-FY2024 to FY2024-FY2026 — the years the department's `ADM Data` sheet declares.
 /// The values did not change; what they are called did, which is exactly the kind of silent
 /// meaning change the version guard exists for.
+/// `37.0.0` added `casino`: nine fiscal years of the gross casino revenue county student fund, per
+/// district and statewide. Breaking rather than additive because of what it does to every other
+/// per-district figure in the feed — this is money the district receives that **no** figure above
+/// it counts, so a consumer that already presented `realized_aid_per_pupil` or a `finances` row as
+/// "what the state sends this district" was making a claim the feed can now contradict. The block
+/// carries no per-pupil figure on purpose: it is apportioned on a fifth pupil count, defined by
+/// R.C. 5753.11 and shared with nothing else here, so dividing it by any ADM in this feed produces
+/// a number that looks comparable and is not.
+///
 /// `36.0.0` added `drafts`, the provisions of each `draft-legislation` node — including the ones
 /// no lever can run, which travel with the rest so the count a cost must be read beside cannot be
 /// dropped between the fixture and the page.
-pub const CONTRACT_VERSION: &str = "36.0.0";
+pub const CONTRACT_VERSION: &str = "37.0.0";
 
 /// How a year is reckoned, because Ohio reckons three ways and they do not line up.
 ///
@@ -376,6 +385,21 @@ pub struct FinanceYear {
     pub total_expenditure: Dollars,
     /// Cash balance at 30 June. What the district holds.
     pub ending_cash: Dollars,
+}
+
+/// One fiscal year of the gross casino revenue county student fund.
+///
+/// Two payments, in January and August, summed. The year is the year of the **payment**, which is
+/// how the money lands in a district's books; the halves are not carried separately here because
+/// nothing on a district page reads a half-year, and the one thing that turns on the distinction —
+/// the closure landing in FY2021 rather than FY2020 — is a property of the whole series and is
+/// stated where the series is shown.
+#[derive(Debug, Clone, Copy, PartialEq)]
+pub struct CasinoYear {
+    /// State fiscal year of the two payments.
+    pub fiscal_year: u16,
+    /// Dollars distributed.
+    pub amount: Dollars,
 }
 
 /// A price index, so a consumer can restate any year of the panel in any other year's dollars.
@@ -1140,6 +1164,24 @@ pub struct District {
     pub outcome: Option<DistrictOutcome>,
     /// Six closed fiscal years of actuals, oldest first. Empty where no filing was found.
     pub finances: Vec<FinanceYear>,
+    /// The casino county student fund, oldest year first. Empty for a district the Department of
+    /// Taxation's distributions do not name, which happens where an IRN in the funding calculator
+    /// is not the IRN the tax department pays.
+    ///
+    /// **No per-pupil figure travels with this, and none should be computed from the rest of the
+    /// record.** The fund is apportioned on the count R.C. 5753.11 defines — county-resident
+    /// students including community, STEM and joint vocational enrolment, with dual-enrolled
+    /// pupils counted twice on purpose — which is a fifth pupil denominator and a partition of
+    /// nothing. Dividing by `adm` or `categorical_adm` yields a figure that reads as comparable to
+    /// the ones beside it and is not.
+    pub casino: Vec<CasinoYear>,
+    /// How many county funds the district was paid out of in the most recent distribution.
+    ///
+    /// `None` where the district takes no casino money in the last year of the series. One for
+    /// 294 districts and 88 for the statewide e-schools, which are not in this feed — among the
+    /// 609 here it is a fact about how far a district's catchment reaches across county lines,
+    /// and it is the reason the published sheets are keyed on (county, IRN).
+    pub casino_counties: Option<usize>,
 }
 
 impl District {
@@ -1500,6 +1542,15 @@ pub struct Bundle {
     /// Reaches back further than [`Self::history`] — FY2001 against FY2009 — and on a third
     /// measurement again. See [`MealProgramYear`].
     pub meal_program: Vec<MealProgramYear>,
+    /// The whole casino county student fund, fiscal year by fiscal year, oldest first.
+    ///
+    /// **Statewide here means every district the Department of Taxation pays**, which is about a
+    /// thousand — community schools, STEM schools and joint vocational districts are inside
+    /// R.C. 5753.11's definition of a public school district. Summing [`District::casino`] across
+    /// this feed gives a smaller number, because this feed carries 609 districts. The two are
+    /// different quantities and the difference is the point: the fund's population is not the
+    /// formula's.
+    pub casino: Vec<CasinoYear>,
     /// Ohio's 99 House districts, with school funding apportioned across them.
     pub house_districts: Vec<HouseDistrict>,
     /// And its 33 Senate districts, each exactly three House districts.
@@ -1568,6 +1619,16 @@ fn finance_year(y: &FinanceYear) -> String {
         num(y.total_revenue),
         num(y.total_expenditure),
         num(y.ending_cash)
+    )
+}
+
+/// One fiscal year of the casino fund, per district. Two fields, and no third by design — see
+/// [`District::casino`] for why a per-pupil figure is not one of them.
+fn casino_year(y: &CasinoYear) -> String {
+    format!(
+        "{{\"fiscal_year\": {}, \"amount\": {}}}",
+        y.fiscal_year,
+        num(y.amount)
     )
 }
 
@@ -2011,6 +2072,25 @@ impl Bundle {
                 escape(&m.basis)
             ));
             if i + 1 < self.meal_program.len() {
+                s.push(',');
+            }
+            s.push('\n');
+        }
+        s.push_str("  ],\n");
+
+        // Whole dollars per fiscal year and nothing else. There is deliberately no share, no
+        // per-pupil and no per-district count on these rows: the fund's population is about a
+        // thousand districts against this feed's 609, so every ratio a consumer might want from
+        // here has a denominator that is not in the feed, and a row that offered one would be
+        // inviting the join that makes it wrong.
+        s.push_str("  \"casino\": [\n");
+        for (i, c) in self.casino.iter().enumerate() {
+            s.push_str(&format!(
+                "    {{\"fiscal_year\": {}, \"amount\": {}}}",
+                c.fiscal_year,
+                num(c.amount)
+            ));
+            if i + 1 < self.casino.len() {
                 s.push(',');
             }
             s.push('\n');
@@ -2626,6 +2706,20 @@ impl Bundle {
                     .join(", "),
             );
             s.push(']');
+            s.push_str(", \"casino\": [");
+            s.push_str(
+                &d.casino
+                    .iter()
+                    .map(casino_year)
+                    .collect::<Vec<_>>()
+                    .join(", "),
+            );
+            s.push(']');
+            s.push_str(&format!(
+                ", \"casino_counties\": {}",
+                d.casino_counties
+                    .map_or_else(|| "null".to_string(), |n| n.to_string())
+            ));
             s.push('}');
             if i + 1 < self.districts.len() {
                 s.push(',');
@@ -2860,6 +2954,19 @@ mod tests {
                 total_expenditure: 22_000_000.0,
                 ending_cash: 7_500_000.0,
             }],
+            // Two years and a county span, so the emitter's array and its nullable scalar are both
+            // exercised by the fixture rather than only by the real feed.
+            casino: vec![
+                CasinoYear {
+                    fiscal_year: 2023,
+                    amount: 210_446.19,
+                },
+                CasinoYear {
+                    fiscal_year: 2024,
+                    amount: 214_003.55,
+                },
+            ],
+            casino_counties: Some(3),
             outcome: Some(DistrictOutcome {
                 performance_index: Some(89.9),
                 performance_index_prior: Some(89.1),
@@ -3109,6 +3216,23 @@ mod tests {
                     without_applications: 0.166,
                     streams: 3,
                     basis: "ce".into(),
+                },
+            ],
+            // Three years, one of them the closure, so a consumer reading this fixture meets the
+            // shape the real block has: a series that falls by a quarter in the middle for a
+            // reason no appropriation records.
+            casino: vec![
+                CasinoYear {
+                    fiscal_year: 2020,
+                    amount: 95_985_938.04,
+                },
+                CasinoYear {
+                    fiscal_year: 2021,
+                    amount: 73_873_804.95,
+                },
+                CasinoYear {
+                    fiscal_year: 2022,
+                    amount: 109_385_274.99,
                 },
             ],
             districts,
@@ -3436,6 +3560,51 @@ mod tests {
                  web/src/lib/denominators.ts and a deflator that reaches FY2001, or drop it"
             );
         }
+    }
+
+    #[test]
+    fn the_casino_rows_carry_a_year_and_a_dollar_amount_and_nothing_else() {
+        /*
+         * The guard against the field this block will be asked for. A per-pupil column here would
+         * divide by the count R.C. 5753.11 defines — county-resident pupils, community and STEM
+         * and joint vocational enrolment included, dual-enrolled pupils counted twice — which is a
+         * fifth Ohio pupil count and a partition of nothing. It would sit in the feed beside four
+         * other per-pupil figures and be joined to them by the first consumer that tried.
+         *
+         * Written against the emitted text rather than the struct because the struct is not what a
+         * consumer reads, and it is the JSON that would carry the new key.
+         */
+        let json = bundle(vec![sample()], vec![]).to_json();
+        for block in json.split("\"casino\": [").skip(1) {
+            let rows = block.split(']').next().unwrap_or_default();
+            for key in ["per_pupil", "adm", "share", "students", "population"] {
+                assert!(
+                    !rows.contains(&format!("\"{key}\"")),
+                    "the casino block grew a `{key}` field; its denominator is not in this feed"
+                );
+            }
+        }
+        assert!(json.contains("{\"fiscal_year\": 2024, \"amount\": 214003.55}"));
+    }
+
+    #[test]
+    fn a_district_outside_the_last_distribution_says_null_rather_than_zero() {
+        // Zero counties and "not named in the most recent distribution" are different claims, and
+        // the second is the true one. A zero would render as a district paid from no county fund
+        // at all, which is not a thing that happens.
+        let json = Bundle {
+            ..bundle(
+                vec![District {
+                    casino: vec![],
+                    casino_counties: None,
+                    ..sample()
+                }],
+                vec![],
+            )
+        }
+        .to_json();
+        assert!(json.contains("\"casino\": []"));
+        assert!(json.contains("\"casino_counties\": null"));
     }
 
     #[test]

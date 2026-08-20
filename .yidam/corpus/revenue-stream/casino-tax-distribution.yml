@@ -236,6 +236,11 @@ properties:
     category and not only this one. That is a publisher's silence rather than a gap in retrieval,
     and it is what `tax-casino` records as still blocked. The distributions before August 2015 are
     Final SD Distribution PDFs with no machine-readable twin. [verified]
+
+    Carried into the feed at bundle contract 37.0.0 and shown on each district's finances route,
+    which is what makes it readable by anyone not running cargo. The card prints no per-pupil
+    figure and says why: four already sit on those pages, and a fifth divided by the R.C. 5753.11
+    count would read as one of them. [verified]
 links:
   - target: ../revenue-stream.ont.yml
     relationship: instance-of

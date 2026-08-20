@@ -55,7 +55,8 @@ export type SeriesKey =
   | "history"
   | "national"
   | "appropriations"
-  | "meal_program";
+  | "meal_program"
+  | "casino";
 
 /**
  * The year block for a series, or `null` where the feed does not carry one.

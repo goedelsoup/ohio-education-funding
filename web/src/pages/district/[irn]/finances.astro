@@ -16,7 +16,7 @@
 import BasisToggle from "../../../components/BasisToggle.astro";
 import DistrictNav from "../../../components/DistrictNav.astro";
 import Base from "../../../layouts/Base.astro";
-import { renderActuals } from "../../../lib/district.ts";
+import { renderActuals, renderCasino } from "../../../lib/district.ts";
 import { renderFederalShare, renderSpendingByFunction } from "../../../lib/spending.ts";
 import { districtPaths, loadFeed } from "../../../lib/feed.ts";
 import { money } from "../../../lib/format.ts";
@@ -74,6 +74,11 @@ const description = latest
       </BasisToggle>
     )
   }
+
+  {/* The general fund does not carry this, and neither does the dashboard's calculator. It is on
+      this route rather than that one because it is money that changed hands — but it sits below
+      the actuals, not inside them, because the treasurer books it in a different fund. */}
+  <Fragment set:html={renderCasino(bundle, district)} />
 
   <Fragment set:html={renderSpendingByFunction(district)} />
   <Fragment set:html={renderFederalShare(district, bundle.statewide.outcomes)} />

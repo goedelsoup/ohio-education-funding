@@ -50,7 +50,7 @@ import type { Bundle, District, Statewide } from "./schema/feed.ts";
  * the build and the scenario routes refuse to proceed past when the two disagree — the deliberate
  * half of drift detection, where the strictness of the schemas is the accidental half.
  */
-export const REQUIRED_CONTRACT = "36.0.0";
+export const REQUIRED_CONTRACT = "37.0.0";
 
 /**
  * A district with only the fields the funding formula reads.
@@ -120,6 +120,8 @@ export type PanelDistrict = Omit<
   | "dpia"
   | "targeted_assistance"
   | "gifted"
+  | "casino"
+  | "casino_counties"
 >;
 
 /**
@@ -132,6 +134,11 @@ export type PanelDistrict = Omit<
  * `meal_program` goes with them, and more emphatically. It is a third population on a count that
  * changes definition inside its own series — nothing the browser-side formula could take as an
  * input without being wrong, and sending it would put it one property access away from a slider.
+ *
+ * `casino` goes for the strongest version of that reason. It is a fourth population — about a
+ * thousand districts, on a *fifth* pupil count — and it is money no lever in the scenario builder
+ * can move, because it never passes through an appropriation. A browser holding it would be one
+ * property access from a per-pupil figure whose denominator is not in the feed.
  */
 export interface Panel
   extends Omit<
@@ -141,6 +148,7 @@ export interface Panel
     | "national"
     | "history"
     | "meal_program"
+    | "casino"
     | "appropriations"
     | "appropriation_lines"
     | "house_districts"

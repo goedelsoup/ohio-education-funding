@@ -83,6 +83,7 @@ export const SECTIONS = {
     chargeOff: "charge-off",
     taxEffort: "tax-effort",
     spendingByFunction: "spending-by-function",
+    casino: "casino",
     federalShare: "federal-share",
     outcomes: "outcomes",
     comparablePoverty: "comparable-poverty",

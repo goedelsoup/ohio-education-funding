@@ -41,7 +41,7 @@ const SRC = join(import.meta.dirname, "../../src");
  */
 const HISTORICAL: Record<string, string> = {
   "lib/district.ts":
-    "FY2020 as the Bridge-formula freeze, the FY2021 `[L1]` statutory base, FY2019 poverty, and the FY2021 count freeze — all fixed events, none of which move when a fixture advances.",
+    "FY2020 as the Bridge-formula freeze, the FY2021 `[L1]` statutory base, FY2019 poverty, the FY2021 count freeze, and FY2021 as the fiscal year the casino closure lands in — all fixed events, none of which move when a fixture advances. The closure year is the one worth naming twice: the casinos shut in March 2020 and the money arrives in FY2021 because the August payment settles the half-year that ended in June, so the literal is protecting a statement the data alone would not disambiguate.",
   "lib/glossary.ts":
     "Definitions: the FY2020 guarantee anchor, FY2022 cost pricing, and a worked tax-year-versus-fiscal-year example whose whole point is the specific pair of numbers.",
   "lib/history.ts":

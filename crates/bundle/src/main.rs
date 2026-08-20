@@ -12,12 +12,12 @@
 use std::collections::{BTreeMap, BTreeSet, HashMap};
 
 use bundle::{
-    AppropriationLine, AppropriationYear, BaseCostBuildUp, Bundle, CareerTechnical, Categoricals,
-    Checkpoint, Deflator, District, DistrictOutcome, Dpia, Draft, DraftProvision, EnglishLearners,
-    FinanceYear, ForecastCheckpoint, Gifted, HistoryYear, HouseDistrictMember, HouseDistrictShare,
-    MealProgramYear, MillageAnalysis, National, OutcomeStatewide, PolicyShape, Projection,
-    PropertyTaxYear, RegimeCounterfactual, SeriesYear, SpecialEducation, SpendingByFunction,
-    StateFinance, Statewide, TargetedAssistance, YearKind, CONTRACT_VERSION,
+    AppropriationLine, AppropriationYear, BaseCostBuildUp, Bundle, CareerTechnical, CasinoYear,
+    Categoricals, Checkpoint, Deflator, District, DistrictOutcome, Dpia, Draft, DraftProvision,
+    EnglishLearners, FinanceYear, ForecastCheckpoint, Gifted, HistoryYear, HouseDistrictMember,
+    HouseDistrictShare, MealProgramYear, MillageAnalysis, National, OutcomeStatewide, PolicyShape,
+    Projection, PropertyTaxYear, RegimeCounterfactual, SeriesYear, SpecialEducation,
+    SpendingByFunction, StateFinance, Statewide, TargetedAssistance, YearKind, CONTRACT_VERSION,
 };
 use dispersion::mr81::poverty_share_by_year;
 use dispersion::ohio_panel::{equalization_by_year, revenue_mix_by_year};
@@ -513,6 +513,9 @@ struct Joins<'a> {
     /// Shared across the whole panel rather than looked up per district, because it is parsed once
     /// from the committed abstract and every row needs it.
     recognized: &'a HashMap<String, regime_diff::Recognition>,
+    /// The casino county student fund by fiscal year, and the county funds the district was last
+    /// paid out of. Absent for a district the Department of Taxation's sheets do not name.
+    casino: Option<&'a (Vec<CasinoYear>, Option<usize>)>,
 }
 
 fn to_district(record: &DistrictRecord, joins: &Joins<'_>) -> District {
@@ -525,6 +528,7 @@ fn to_district(record: &DistrictRecord, joins: &Joins<'_>) -> District {
         house_districts,
         national,
         recognized,
+        casino,
     } = *joins;
     let adm = record.base_cost_adm();
     District {
@@ -701,6 +705,8 @@ fn to_district(record: &DistrictRecord, joins: &Joins<'_>) -> District {
                 })
                 .collect()
         }),
+        casino: casino.map_or_else(Vec::new, |(years, _)| years.clone()),
+        casino_counties: casino.and_then(|(_, counties)| *counties),
         outcome: outcome.map(|joined| DistrictOutcome {
             performance_index: joined.outcome.performance_index,
             performance_index_prior: joined.outcome.performance_index_prior,
@@ -762,6 +768,7 @@ fn series_years(
     history: &[HistoryYear],
     appropriations: &[AppropriationYear],
     meal_program: &[MealProgramYear],
+    casino: &[CasinoYear],
 ) -> Vec<SeriesYear> {
     let mut out = vec![
         SeriesYear {
@@ -881,6 +888,18 @@ fn series_years(
             kind: YearKind::Fiscal,
             label: label_span(first, last, "FY"),
             source: "Office for Child Nutrition, MR-81".into(),
+        });
+    }
+
+    // Read off the statewide block rather than off the districts, because the two do not span the
+    // same years for every district — a district that took nothing in a year has no row for it —
+    // and the chip has to describe the series the card is showing.
+    if let Some((first, last)) = span(casino.iter().map(|c| c.fiscal_year)) {
+        out.push(SeriesYear {
+            series: "casino".into(),
+            kind: YearKind::Fiscal,
+            label: label_span(first, last, "FY"),
+            source: "Department of Taxation, county student distribution".into(),
         });
     }
 
@@ -1063,6 +1082,72 @@ fn appropriation_lines() -> Vec<AppropriationLine> {
 /// Deliberately not passed to [`deflator_years`]: every field here is a count or a share, so
 /// there is nothing to deflate, and adding FY1998-FY2008 to the deflator would extend a price
 /// index across years no dollar figure in the feed covers.
+/// The casino county student fund by fiscal year, statewide.
+///
+/// **Every district the Department of Taxation pays**, which is around a thousand — not the 609
+/// this feed carries. `dispersion::casino::by_fiscal_year` drops any fiscal year missing one of
+/// its two payments, so a half-year at either end of the series is absent rather than reported as
+/// a year that fell by half.
+fn casino_statewide() -> Vec<CasinoYear> {
+    dispersion::casino::by_fiscal_year()
+        .into_iter()
+        .map(|(fiscal_year, amount)| CasinoYear {
+            fiscal_year,
+            amount,
+        })
+        .collect()
+}
+
+/// The same fund per district, plus the county funds it was last paid out of.
+///
+/// Keyed on the IRN the tax department writes, which is the IRN the funding calculator writes for
+/// every traditional district — a join checked in `crates/dispersion/tests/casino_distributions.rs`
+/// rather than assumed here.
+///
+/// The county count comes from the **last** distribution in the panel rather than the last fiscal
+/// year, because it is a fact about a district's catchment and the most recent statement of it is
+/// the best one. A district absent from that distribution gets `None` rather than a stale count.
+fn casino_by_district() -> HashMap<String, (Vec<CasinoYear>, Option<usize>)> {
+    let complete: Vec<u16> = dispersion::casino::by_fiscal_year().into_keys().collect();
+    let rows = dispersion::casino::panel();
+    let last = rows
+        .iter()
+        .map(|row| row.month.as_str())
+        .max()
+        .unwrap_or_default()
+        .to_string();
+
+    let complete: BTreeSet<u16> = complete.into_iter().collect();
+    let mut totals: BTreeMap<(String, u16), f64> = BTreeMap::new();
+    let mut counties: HashMap<String, Option<usize>> = HashMap::new();
+    for row in &rows {
+        if complete.contains(&row.fiscal_year()) {
+            *totals
+                .entry((row.irn.clone(), row.fiscal_year()))
+                .or_default() += row.amount;
+        }
+        if row.month == last {
+            counties.insert(row.irn.clone(), row.counties);
+        }
+    }
+
+    let mut out: HashMap<String, (Vec<CasinoYear>, Option<usize>)> = HashMap::new();
+    for ((irn, fiscal_year), amount) in totals {
+        if amount <= 0.0 {
+            continue;
+        }
+        let entry = out.entry(irn).or_default();
+        entry.0.push(CasinoYear {
+            fiscal_year,
+            amount,
+        });
+    }
+    for (irn, span) in counties {
+        out.entry(irn).or_default().1 = span;
+    }
+    out
+}
+
 fn meal_program() -> Vec<MealProgramYear> {
     poverty_share_by_year()
         .into_iter()
@@ -1484,6 +1569,8 @@ fn build() -> Bundle {
     // counterfactual runs on this rather than on total taxable value; see `regime_counterfactual`.
     let recognized = regime_diff::recognized_valuation::from_abstract(2024);
 
+    let casino_by_district = casino_by_district();
+
     let districts: Vec<District> = records
         .iter()
         .map(|record| {
@@ -1498,6 +1585,7 @@ fn build() -> Bundle {
                     house_districts: shares.get(&record.irn).map_or(&[][..], Vec::as_slice),
                     national: national_positions.get(&record.irn),
                     recognized: &recognized,
+                    casino: casino_by_district.get(&record.irn),
                 },
             )
         })
@@ -1677,6 +1765,7 @@ fn build() -> Bundle {
         appropriation_lines: appropriation_lines(),
         appropriations: appropriations.clone(),
         meal_program: meal_program(),
+        casino: casino_statewide(),
         house_districts: house_district_block(&records, Chamber::House),
         senate_districts: house_district_block(&records, Chamber::Senate),
         contract_version: CONTRACT_VERSION.to_string(),
@@ -1695,7 +1784,13 @@ fn build() -> Bundle {
                      source can be trusted for."
             .to_string(),
         fiscal_year: MODEL_YEAR.0,
-        series_years: series_years(&districts, &history, &appropriations, &meal_program()),
+        series_years: series_years(
+            &districts,
+            &history,
+            &appropriations,
+            &meal_program(),
+            &casino_statewide(),
+        ),
         statewide,
         checkpoints,
         drafts: draft_export(),

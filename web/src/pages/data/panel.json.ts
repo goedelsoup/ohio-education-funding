@@ -62,6 +62,8 @@ export const GET: APIRoute = () => {
         preschool_special_education: _pk,
         transition: _tn,
         national: _nat,
+        casino: _cas,
+        casino_counties: _cc,
         ...district
       }) => district,
     ),
