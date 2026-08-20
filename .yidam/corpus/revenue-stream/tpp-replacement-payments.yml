@@ -22,6 +22,37 @@ description: |
   property bases lost far more of their tax base than districts without, and are correspondingly
   more exposed to each revision of the phase-down. [inference] Which districts those are, and
   what the payments are worth to them now, is not established here. [open]
+findings: |
+  ### The phase-down has been contested twice, and both times the protection was vetoed
+
+  "The schedule has been revised more than once" is true and understates what happened. Twice in
+  three budgets the General Assembly wrote a protection against these losses into an act and the
+  Governor struck it out. [verified — the greenbooks, committed at
+  [`lsc-education-greenbooks.txt`](../../../crates/project/fixtures/lsc-education-greenbooks.txt)]
+
+  - **[H.B. 64](../legislation/hb-64-2015.yml)** appropriated **$78.3 million** for a second year
+    of the TPP supplement in FY2017, with the supporting formula calculations and a $12 million
+    annual GRF cash transfer into the School District TPP Supplement Fund. All of it vetoed;
+    FY2016's supplement stood and FY2017's did not. The same act's veto also removed an exemption
+    from the phase-out for districts containing a nuclear power plant where replacement payments
+    were 10% or more of total resources — which would have reached Perry Local in Lake County and
+    Benton-Carroll-Salem in Ottawa County, and no one else.
+  - **[H.B. 49](../legislation/hb-49-2017.yml)** capped a district's fixed-rate TPP reimbursement
+    loss, including loss of the supplement, at **3.5% of total resources** in FY2018, extended the
+    cap to JVSDs, and slowed the phase-down to one-fourth of one mill of average valuation from
+    FY2020. Vetoed entire.
+
+  ### Why none of this is visible in any series here
+
+  A vetoed appropriation is never appropriated, so it appears in no enacted total, no actual, and
+  no line item — the whole apparatus of this repository reads documents that record what happened.
+  The $78.3 million that did not reach districts in FY2017 is not a hole in the data; it is a
+  quantity that has no place in the data at all. **The only committed source in which it exists is
+  LSC's analysis of the act that contained it.** [verified]
+
+  That is the argument for reading acts rather than only the money they moved, and this stream is
+  where it pays best: the phase-down is the thing being fought over, and the record of the fight is
+  entirely in provisions that never took effect. [inference]
 properties:
   name: Tangible personal property tax replacement payments
   level: state

@@ -33,6 +33,7 @@ import { expect, test } from "vitest";
 const ROOT = join(import.meta.dirname, "../../..");
 const BASIS = join(ROOT, "crates/project/fixtures/catalog-line-item-basis.tsv");
 const NODES = join(ROOT, ".yidam/corpus/legislation");
+const GREENBOOKS = join(ROOT, "crates/project/fixtures/lsc-education-greenbooks.txt");
 
 /** `Am. Sub. H.B. 64 of the 131st G.A.` and every abbreviation of it the Catalog uses. */
 const CITATION = /(?:Am\.\s*)?(?:Sub\.\s*)?(H\.B\.|S\.B\.)\s*(\d+)\s*of the (\d+)(?:st|nd|rd|th) G\.A\./g;
@@ -168,6 +169,46 @@ test("the four acts of the Bridge decade are all present", () => {
   for (const bill of ["59", "64", "49", "166"]) {
     expect(have.has(bill), `H.B. ${bill} has no legislation node`).toBe(true);
   }
+});
+
+/**
+ * Acts whose LSC greenbook is committed, so their vetoes are readable without retrieving anything.
+ *
+ * Read off the fixture rather than listed, because the fixture is what makes the claim true: if a
+ * greenbook is in it, nobody has to go and find one to fill the field in.
+ */
+function greenbooked(): Set<string> {
+  const text = readFileSync(GREENBOOKS, "utf8");
+  return new Set(
+    [...text.matchAll(/^=== hb(\d+)-greenbook$/gm)].map((m) => m[1]!),
+  );
+}
+
+test("an act whose greenbook is committed does not leave its vetoes unread", () => {
+  /*
+   * Ohio budget acts are line-item vetoed and the vetoes have repeatedly touched school funding —
+   * a second per-pupil floor, the TPP supplement's second year, a cap on TPP losses, a requirement
+   * that gifted money buy gifted staff. All struck, and so absent from every enacted figure this
+   * repository holds: a vetoed provision is never appropriated, so it is in no total, no actual
+   * and no line item.
+   *
+   * Which means the only place it can be recorded is the node, and the only reason not to record
+   * it is not having the document. Six acts have the document. The failure this guards is the
+   * seventh landing with `vetoes:` left as the placeholder, which is how the first six sat for two
+   * phases.
+   */
+  const unread: string[] = [];
+  for (const file of readdirSync(NODES).filter((f) => /^hb-\d+-\d{4}\.yml$/.test(f))) {
+    const bill = /^hb-(\d+)-/.exec(file)![1]!;
+    if (!greenbooked().has(bill)) continue;
+    const body = readFileSync(join(NODES, file), "utf8");
+    const field = /\n  vetoes: \|\n([\s\S]*?)\n  [a-z_]+:/.exec(body)?.[1] ?? "";
+    // The placeholder these all carried: a bare `[open]` and no account of what was struck.
+    if (field.trim() === "" || (field.includes("[open]") && !/veto(ed)?\b/i.test(field))) {
+      unread.push(file);
+    }
+  }
+  expect(unread, "these acts have a committed greenbook and an unread `vetoes:` field").toEqual([]);
 });
 
 test("no budget act between DeRolph's end and the Bridge formula is missing", () => {

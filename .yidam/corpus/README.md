@@ -118,19 +118,19 @@ Fields: count per claim tag across every node; then the unresolved marks by the 
 -->
 | Tag | Count | What it records |
 |---|--:|---|
-| `[verified]` | 915 | supported by a committed primary source |
-| `[inference]` | 245 | drawn from verified facts, not witnessed |
-| `[open]` | 206 | a live question — unknown, contested, or being worked |
+| `[verified]` | 925 | supported by a committed primary source |
+| `[inference]` | 246 | drawn from verified facts, not witnessed |
+| `[open]` | 200 | a live question — unknown, contested, or being worked |
 | `[unentered]` | 38 | a knowable value nobody has typed in yet |
 
-244 unresolved marks in total, 206 of them live questions and 38 of them empty fields. Before the two were distinguished the corpus reported the sum as its count of what it does not know, which overstated it by 15%.
+238 unresolved marks in total, 200 of them live questions and 38 of them empty fields. Before the two were distinguished the corpus reported the sum as its count of what it does not know, which overstated it by 15%.
 
 | Field | `[open]` | `[unentered]` |
 |---|--:|--:|
 | `description` | 54 | 3 |
 | `findings` | 53 | 1 |
-| `vetoes` | 13 | 1 |
 | `series` | 12 | 0 |
+| `vetoes` | 7 | 1 |
 | `established` | 0 | 7 |
 | `typology` | 1 | 5 |
 | `statutory_basis` | 6 | 0 |
@@ -222,7 +222,7 @@ Sorted by: kind, then alphabetically.
 | [`fsfp-english-learner-weights`](formula-component/fsfp-english-learner-weights.yml) | formula-component | FSFP English Learner Weights | 4 | 3 |
 | [`fsfp-enrolment-supplements`](formula-component/fsfp-enrolment-supplements.yml) | formula-component | FSFP Base and Enrollment Growth Supplements | 3 | 1 |
 | [`fsfp-formula-transition-supplement`](formula-component/fsfp-formula-transition-supplement.yml) | formula-component | FSFP Formula Transition Supplement | 4 | 4 |
-| [`fsfp-gifted-units`](formula-component/fsfp-gifted-units.yml) | formula-component | FSFP Gifted Identification and Units | 3 | 1 |
+| [`fsfp-gifted-units`](formula-component/fsfp-gifted-units.yml) | formula-component | FSFP Gifted Identification and Units | 3 | 2 |
 | [`fsfp-local-capacity-measure`](formula-component/fsfp-local-capacity-measure.yml) | formula-component | FSFP Local Capacity Measure | 5 | 8 |
 | [`fsfp-performance-supplement`](formula-component/fsfp-performance-supplement.yml) | formula-component | FSFP Performance Supplement | 7 | 4 |
 | [`fsfp-preschool-special-education`](formula-component/fsfp-preschool-special-education.yml) | formula-component | FSFP Preschool Special Education | 4 | 2 |
@@ -245,10 +245,10 @@ Sorted by: kind, then alphabetically.
 | [`hb-153-2011`](legislation/hb-153-2011.yml) | legislation | Am. Sub. H.B. 153 (2011) — FY2012-13 Budget; Bridge Formula | 6 | 4 |
 | [`hb-166-2019`](legislation/hb-166-2019.yml) | legislation | Am. Sub. H.B. 166 (2019) — FY2020-21 Budget; the Year There Was No Formula | 4 | 3 |
 | [`hb-33-2023`](legislation/hb-33-2023.yml) | legislation | Am. Sub. H.B. 33 (2023) — FY2024-25 Budget | 8 | 12 |
-| [`hb-49-2017`](legislation/hb-49-2017.yml) | legislation | Am. Sub. H.B. 49 (2017) — FY2018-19 Budget; the Guarantee Made Conditional | 4 | 2 |
+| [`hb-49-2017`](legislation/hb-49-2017.yml) | legislation | Am. Sub. H.B. 49 (2017) — FY2018-19 Budget; the Guarantee Made Conditional | 4 | 3 |
 | [`hb-583-2022`](legislation/hb-583-2022.yml) | legislation | Sub. H.B. 583 (2022) — corrective and technical changes to the Fair School Funding Plan | 5 | 1 |
-| [`hb-59-2013`](legislation/hb-59-2013.yml) | legislation | Am. Sub. H.B. 59 (2013) — FY2014-15 Budget; a Formula Over the Bridge | 3 | 2 |
-| [`hb-64-2015`](legislation/hb-64-2015.yml) | legislation | Am. Sub. H.B. 64 (2015) — FY2016-17 Budget; Capacity Aid | 5 | 2 |
+| [`hb-59-2013`](legislation/hb-59-2013.yml) | legislation | Am. Sub. H.B. 59 (2013) — FY2014-15 Budget; a Formula Over the Bridge | 4 | 2 |
+| [`hb-64-2015`](legislation/hb-64-2015.yml) | legislation | Am. Sub. H.B. 64 (2015) — FY2016-17 Budget; Capacity Aid | 6 | 3 |
 | [`hb-66-2005`](legislation/hb-66-2005.yml) | legislation | Am. Sub. H.B. 66 (2005) — FY2006-07 Budget; Tangible Personal Property Tax Phase-Out | 2 | 5 |
 | [`hb-920-1976`](legislation/hb-920-1976.yml) | legislation | Am. Sub. H.B. 920 (1976) — Tax Reduction Factors | 4 | 12 |
 | [`hb-94-2001`](legislation/hb-94-2001.yml) | legislation | Am. Sub. H.B. 94 (2001) — FY2002-03 Budget; the post-DeRolph II formula | 9 | 3 |
@@ -291,7 +291,7 @@ Sorted by: kind, then alphabetically.
 | [`lottery-profits`](revenue-stream/lottery-profits.yml) | revenue-stream | Lottery Profits Education Fund | 4 | 1 |
 | [`state-foundation-aid`](revenue-stream/state-foundation-aid.yml) | revenue-stream | State Foundation Aid | 5 | 16 |
 | [`title-i`](revenue-stream/title-i.yml) | revenue-stream | Title I, Part A | 4 | 5 |
-| [`tpp-replacement-payments`](revenue-stream/tpp-replacement-payments.yml) | revenue-stream | Tangible Personal Property Tax Replacement Payments | 3 | 4 |
+| [`tpp-replacement-payments`](revenue-stream/tpp-replacement-payments.yml) | revenue-stream | Tangible Personal Property Tax Replacement Payments | 5 | 5 |
 | [`fsfp-input-year-refresh`](scenario/fsfp-input-year-refresh.yml) | scenario | FSFP Cost Input Refresh vs. Freeze | 9 | 6 |
 | [`guarantee-phase-out`](scenario/guarantee-phase-out.yml) | scenario | Phasing Out the Temporary Transitional Aid Guarantee | 11 | 3 |
 | [`anton-grdina`](school/anton-grdina.yml) | school | Anton Grdina | 6 | 1 |

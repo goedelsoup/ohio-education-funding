@@ -65,8 +65,20 @@ properties:
     while keeping the prior distribution as a floor through temporary transitional aid at 100% of
     FY2013 and adding a gain cap of 6.25% and 10.5%. Created the Straight A Program.
   vetoes: |
-    Line-item vetoes exercised; their education funding effects are not assessed here. The
-    greenbook analyses the act as enrolled. [open]
+    Three, and one of them is about what a district may do with money the formula gave it for a
+    named purpose. [verified — the greenbook]
+
+    **Gifted funding spending requirements.** The General Assembly required districts to spend
+    funding received for gifted coordinator and gifted intervention specialist services *only* on
+    those services, and to employ qualified personnel on a full-time-equivalency basis matching the
+    units allocated. **The Governor vetoed both.** So the act allocated gifted units and declined
+    to require that they buy gifted staff — which is the condition
+    [`fsfp-gifted-units`](../formula-component/fsfp-gifted-units.yml) describes for the current
+    plan, arriving eight years earlier as a deliberate choice rather than an omission. [verified]
+
+    The other two are not funding provisions: adding chiropractors to the professionals who may
+    clear a concussed athlete for play, and exempting a community school serving mainly students
+    with disabilities from the core-subject teacher retesting requirement.
   accountability_effect: |
     Carried the third-grade reading guarantee's retention provisions and a new generation of
     assessments. Not assessed against `accountability-regime` here. [open]

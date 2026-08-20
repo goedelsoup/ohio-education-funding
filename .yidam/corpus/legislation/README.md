@@ -83,7 +83,34 @@ class is stated from general knowledge; the greenbooks date the *analysis*, mont
 which is what `published_on` reads and puts in the fixture's `date:` field. The acts themselves
 carry their dates and only four of them are retrievable. [open]
 
-**What no act node here records is its vetoes.** Ohio budget acts are line-item vetoed and the
-vetoes have repeatedly touched education funding; every node in this class carries the same `[open]`
-in its `vetoes:` field. It matters most on [H.B. 166](hb-166-2019.yml), whose greenbook has a
-`Vetoed provisions` chapter: a veto inside a freeze changes what is frozen. [open]
+## What the vetoes say, which the enacted figures cannot
+
+Every act here whose greenbook is committed now records its own vetoes, and read across the six
+they are not a miscellany. **The General Assembly kept legislating floors and loss protections into
+budget acts, and the Governor kept striking exactly those out.**
+
+| Act | What was passed | What survived |
+|---|---|---|
+| [H.B. 64](hb-64-2015.yml) | A **second per-pupil floor** under the formula — at least 20% of the formula amount per pupil, $1,180 and $1,200 | Vetoed |
+| [H.B. 64](hb-64-2015.yml) | The **TPP supplement's second year**: $78.3m for FY2017 and a $12m annual GRF transfer | Vetoed |
+| [H.B. 49](hb-49-2017.yml) | A **cap on TPP reimbursement loss** at 3.5% of a district's total resources, extended to JVSDs | Vetoed |
+| [H.B. 166](hb-166-2019.yml) | A **per-pupil guarantee from FY2022** indexed to the statewide per-pupil amount paid for chartered nonpublic schools | Vetoed |
+| [H.B. 59](hb-59-2013.yml) | A requirement that **gifted funding buy gifted staff** | Vetoed |
+| [H.B. 119](hb-119-2007.yml) | A **Special Education Scholarship Pilot**, funded by deducting from the resident district | Vetoed |
+
+None of this is in any series this repository holds, and it cannot be. A vetoed provision is never
+appropriated, so it appears in no enacted total, no actual, and no line item — the whole apparatus
+here reads documents that record what happened. The $78.3 million that did not reach districts in
+FY2017 is not a gap in the data; it is a quantity with no place in the data. The only committed
+source in which any of it exists is LSC's analysis of the act that contained it.
+
+That is the argument for reading acts and not only the money they moved. It also puts a third thing
+beside the two the corpus already models: `legislation` is what became law and
+[`draft-legislation`](../draft-legislation/) is what was proposed and did not. A vetoed provision is
+neither — passed by both chambers and struck by one person. It is recorded in the `vetoes:` field of
+the act that carried it rather than given a class, because it has no life of its own: it exists only
+as a thing a particular act tried to do. [open — whether that stays the right shape if the field
+keeps growing]
+
+**H.B. 583 and the constitutional provision have no greenbook**, so their `vetoes:` fields stay
+unfilled and `web/tests/unit/legislationCoverage.spec.ts` exempts exactly those two.
