@@ -22,7 +22,9 @@ See the class definition: [legislation.ont.yml](../legislation.ont.yml).
 | [ohio-constitution-article-vi-section-2](ohio-constitution-article-vi-section-2.yml) | 1851 | Imposed the thorough-and-efficient duty |
 | [hb-920-1976](hb-920-1976.yml) | 1976 | Froze the dollar yield of voted millage against inflation |
 | [hb-94-2001](hb-94-2001.yml) | 2001 | Rebuilt the formula after DeRolph II; parity aid, gap aid, six special education weights |
+| [hb-95-2003](hb-95-2003.yml) | 2003 | First budget after DeRolph ended; changed nothing structural |
 | [hb-66-2005](hb-66-2005.yml) | 2005 | Phased out the tangible personal property tax |
+| [hb-119-2007](hb-119-2007.yml) | 2007 | Abolished the cost of doing business factor and the base cost guarantee |
 | [hb-1-2009](hb-1-2009.yml) | 2009 | Enacted the Evidence-Based Model |
 | [hb-153-2011](hb-153-2011.yml) | 2011 | Repealed the EBM; installed the Bridge formula |
 | [hb-59-2013](hb-59-2013.yml) | 2013 | Built a formula over the Bridge guarantee; anchored it at FY2013 |
@@ -50,15 +52,18 @@ sets it out in one place.
 **The measure is budget lines, not acts.** The Catalog of Budget Line Items records the act that
 established each line, and
 [`catalog-line-item-basis.tsv`](../../../crates/project/fixtures/catalog-line-item-basis.tsv)
-carries 2,416 such citations across 45 acts. **65.3% of them now reach a node**, against 33.7%
-before the Bridge decade was written. `web/tests/unit/legislationCoverage.spec.ts` holds that share
+carries 2,416 such citations across 45 acts. **71.5% of them now reach a node**, against 33.7%
+before the Bridge decade was written and 65.3% after it. `web/tests/unit/legislationCoverage.spec.ts` holds that share
 as a floor and names every remaining act above thirty citations with what it would take — the list
 is short enough to read and specific enough to work from.
 
-**Two of the remaining nine are cheap and the rest are behind a wall.** H.B. 119 of the 127th
-(FY2008-09) and H.B. 95 of the 125th (FY2004-05) have greenbooks already retrieved and digest-
-pinned; only the nodes are missing. Below the 122nd General Assembly the legislature serves nothing
-in any form — its own version index stops there — so H.B. 152 of the 120th, H.B. 191 of the 112th,
+**The two cheap ones are written and the rest are behind a wall.** H.B. 95 and H.B. 119 had
+greenbooks already retrieved and digest-pinned; the nodes were the only thing missing and they took
+one phase. Of the seven still above thirty citations, only **H.B. 282 of the 123rd** and **H.B. 650
+of the 122nd** are reachable at all — both are enrolled acts `ohio-session-laws` already pins for
+their appropriation tables, and writing them means reading the act rather than the table, which is
+the judgement step `ohio-bills` deliberately does not automate. Below the 122nd General Assembly
+the legislature serves nothing in any form, so H.B. 152 of the 120th, H.B. 191 of the 112th,
 H.B. 204 of the 113th, H.B. 238 of the 116th and H.B. 111 of the 118th need a records request or a
 library rather than a phase. That is [issue #18](https://github.com/goedelsoup/ohio-education-funding/issues/18).
 
@@ -72,6 +77,11 @@ that era rest on secondary recitation. [open]
 **[H.B. 583](hb-583-2022.yml) has a node**, though what it changed does not: LSC's final analysis
 for it is a separate document `lsc-budget` does not retrieve, so the corpus can say the corrections
 are operative and not which provisions moved. [open]
+
+**No node here is sourced for its own enactment date.** Every `signed:` and `effective:` in this
+class is stated from general knowledge; the greenbooks date the *analysis*, months after the fact,
+which is what `published_on` reads and puts in the fixture's `date:` field. The acts themselves
+carry their dates and only four of them are retrievable. [open]
 
 **What no act node here records is its vetoes.** Ohio budget acts are line-item vetoed and the
 vetoes have repeatedly touched education funding; every node in this class carries the same `[open]`

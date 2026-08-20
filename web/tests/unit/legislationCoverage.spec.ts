@@ -46,15 +46,11 @@ const CITATION = /(?:Am\.\s*)?(?:Sub\.\s*)?(H\.B\.|S\.B\.)\s*(\d+)\s*of the (\d+
 const UNWRITTEN: Record<string, string> = {
   "H.B. 152 of the 120th":
     "FY1994-95. Below the floor `ohio-session-laws` describes: the legislature's own version index stops at the 122nd G.A., so neither the act nor an LSC analysis of it is served in any form. Needs a records request or a library.",
-  "H.B. 119 of the 127th":
-    "FY2008-09. The greenbook is retrieved and pinned (`hb119-greenbook`) and feeds the appropriation series; only the node is missing. The cheapest of the nine to write.",
   "H.B. 282 of the 123rd":
     "FY2000-01. The enrolled act is retrieved and pinned (`hb282-123-enrolled`) for its appropriation table. Writing the node means reading the act rather than its table, which is the judgement step `ohio-bills` deliberately does not automate.",
   "H.B. 650 of the 122nd":
     "The mid-biennium act that itemised FY1999 after H.B. 215 deferred it. Reachable, and it prints every amended row twice — struck and inserted — which is the reader `ohio-session-laws` records as still missing.",
   "H.B. 191 of the 112th": "FY1978-79. Below the publisher's floor. Same obstacle as H.B. 152.",
-  "H.B. 95 of the 125th":
-    "FY2004-05. Greenbook retrieved and pinned (`hb95-greenbook`). Second-cheapest to write.",
   "H.B. 111 of the 118th":
     "FY1990-91, and it shares a bill number with H.B. 111 of the 117th, which the Catalog also names. Below the publisher's floor, and the pair is the reason the slug convention here carries a year rather than a General Assembly.",
   "H.B. 204 of the 113th": "FY1980-81. Below the publisher's floor.",
@@ -64,8 +60,14 @@ const UNWRITTEN: Record<string, string> = {
 /** Citations below this are one-line curiosities; above it, a missing node is a decision. */
 const MATERIAL = 30;
 
-/** How much of the Catalog's origin story the corpus can tell. Raise it; never lower it. */
-const COVERAGE_FLOOR = 0.65;
+/**
+ * How much of the Catalog's origin story the corpus can tell. Raise it; never lower it.
+ *
+ * 33.7% before the Bridge decade was written, 65.3% after, 71.5% once H.B. 95 and H.B. 119 joined
+ * them. The next six points are H.B. 152 of the 120th and H.B. 282 of the 123rd, and only one of
+ * those is reachable.
+ */
+const COVERAGE_FLOOR = 0.71;
 
 interface Named {
   label: string;
@@ -159,11 +161,24 @@ test("the share of budget lines whose origin reaches a node only rises", () => {
 });
 
 test("the four acts of the Bridge decade are all present", () => {
-  // Named individually rather than counted, because the finding this phase rests on is the
-  // sequence: each act re-anchored the guarantee on the year before its biennium, and a chain
-  // missing a link is not a chain.
+  // Named individually rather than counted, because the finding they rest on is the sequence:
+  // each act re-anchored the guarantee on the year before its biennium, and a chain missing a
+  // link is not a chain.
   const have = noded();
   for (const bill of ["59", "64", "49", "166"]) {
+    expect(have.has(bill), `H.B. ${bill} has no legislation node`).toBe(true);
+  }
+});
+
+test("no budget act between DeRolph's end and the Bridge formula is missing", () => {
+  /*
+   * H.B. 95, H.B. 66, H.B. 119, H.B. 1, H.B. 153 — every biennium from FY2004 to FY2013, with no
+   * hole. The run matters because the arguments the corpus makes across it are sequential: the
+   * base cost method survives from H.B. 95 to H.B. 119 while its adjustments are removed, and the
+   * regime boundary in `foundation-base-cost-formula` is drawn on exactly that contrast.
+   */
+  const have = noded();
+  for (const bill of ["95", "66", "119", "1", "153"]) {
     expect(have.has(bill), `H.B. ${bill} has no legislation node`).toBe(true);
   }
 });

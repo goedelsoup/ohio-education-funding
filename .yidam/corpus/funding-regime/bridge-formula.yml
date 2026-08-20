@@ -46,7 +46,7 @@ findings: |
   includes the *previous* biennium's transitional aid term, a district on the guarantee throughout
   carries its earliest anchor forward the whole way. [verified — each act's own formula box in its
   greenbook, committed at
-  [`bridge-era-greenbooks.txt`](../../../crates/project/fixtures/bridge-era-greenbooks.txt)]
+  [`lsc-education-greenbooks.txt`](../../../crates/project/fixtures/lsc-education-greenbooks.txt)]
 
       H.B. 59   FY2014-15   100% of FY2013 state aid, base = FY2013 Bridge formula funding
                             + supplemental guarantee + high performance subsidy

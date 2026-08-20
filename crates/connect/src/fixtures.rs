@@ -2381,19 +2381,24 @@ pub fn build_casino_extract(sheets: &[CasinoSheet<'_>]) -> Result<Vec<Vec<String
         .collect())
 }
 
-/// The four education greenbooks of the Bridge-formula decade, one record each.
+/// LSC's education analysis of every enacted budget act the corpus describes from one.
 ///
-/// One file rather than four, on the same ground [`OPINIONS_FIXTURE`] holds four opinions: they
-/// are the same kind of document about the same question, read together or not at all. A series
-/// that reads as the decade and quietly omits the biennium whose PDF did not download is worse
-/// than no series, because a gap in the record and a gap in the cache look identical from the
-/// fixture.
+/// One file rather than one per act, on the same ground [`OPINIONS_FIXTURE`] holds four opinions:
+/// they are the same kind of document about the same question, read together or not at all. A file
+/// that reads as a series and quietly omits the biennium whose PDF did not download is worse than
+/// no file, because a gap in the record and a gap in the cache look identical from the fixture.
+///
+/// **Named for what it holds rather than for when.** It was `bridge-era-greenbooks` for exactly one
+/// commit, which was long enough to be wrong: H.B. 95 and H.B. 119 are the two budgets before the
+/// Evidence-Based Model and are not Bridge era at all. A fixture named after the first thing put
+/// in it has to be renamed or lied about the second time, and this repository has a README's worth
+/// of evidence about which of those actually happens.
 ///
 /// **As enrolled, which is the enacted document.** Not a redbook. That distinction has cost this
 /// repository a `[verified]` before: a redbook figure is the executive's proposal, and marking one
-/// verified reads as though the act had been checked. Every greenbook here is LSC's analysis of
-/// what passed.
-pub const BRIDGE_GREENBOOK_FIXTURE: &str = "crates/project/fixtures/bridge-era-greenbooks.txt";
+/// verified reads as though the act had been checked. Every analysis here is LSC's account of what
+/// passed.
+pub const LSC_GREENBOOK_FIXTURE: &str = "crates/project/fixtures/lsc-education-greenbooks.txt";
 
 /// Where the deflator's check fixture is written, relative to the repository root.
 pub const CPI_FIXTURE: &str = "crates/connect/fixtures/cpi-u-june.tsv";
@@ -4078,7 +4083,7 @@ pub const REBUILT: &[&str] = &[
     FINANCE_FIXTURE,
     SD1_FIXTURE,
     CASINO_FIXTURE,
-    BRIDGE_GREENBOOK_FIXTURE,
+    LSC_GREENBOOK_FIXTURE,
     CPI_FIXTURE,
     F33_FIXTURE,
     F33_FY2024_FIXTURE,

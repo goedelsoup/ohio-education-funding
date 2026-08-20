@@ -1657,7 +1657,10 @@ pub const CONNECTORS: &[Connector] = &[
             filename: "hb95-greenbook.pdf",
             format: Format::Pdf,
             catalog: Some("lsc-dew-redbook"),
-            fixtures: &[crate::fixtures::APPROPRIATION_FIXTURE],
+            fixtures: &[
+                crate::fixtures::APPROPRIATION_FIXTURE,
+                crate::fixtures::LSC_GREENBOOK_FIXTURE,
+            ],
             note: "FY2004-FY2005 as enrolled, with the three preceding years as actuals. \
                    Read by clustering the right edges of the figures, because the table's own \
                    header labels sit narrower than the columns beneath them.",
@@ -1670,7 +1673,7 @@ pub const CONNECTORS: &[Connector] = &[
             filename: "hb59-greenbook.pdf",
             format: Format::Pdf,
             catalog: Some("lsc-dew-redbook"),
-            fixtures: &[crate::fixtures::BRIDGE_GREENBOOK_FIXTURE],
+            fixtures: &[crate::fixtures::LSC_GREENBOOK_FIXTURE],
             note: "FY2014-FY2015, and the act that put a formula back on top of the Bridge \
                    guarantee: the state share index, the Opportunity Grant, and seven categorical \
                    aids. Its `Deductions and Transfers` chapter is the only committed account here \
@@ -1684,7 +1687,7 @@ pub const CONNECTORS: &[Connector] = &[
             filename: "hb64-greenbook.pdf",
             format: Format::Pdf,
             catalog: Some("lsc-dew-redbook"),
-            fixtures: &[crate::fixtures::BRIDGE_GREENBOOK_FIXTURE],
+            fixtures: &[crate::fixtures::LSC_GREENBOOK_FIXTURE],
             note: "FY2016-FY2017. The second design over the same guarantee, which is the pair \
                    `funding-regime/bridge-formula` names when it asks whether the overlays are \
                    separate regimes or one continuous mechanism.",
@@ -1697,7 +1700,7 @@ pub const CONNECTORS: &[Connector] = &[
             filename: "hb49-greenbook.pdf",
             format: Format::Pdf,
             catalog: Some("lsc-dew-redbook"),
-            fixtures: &[crate::fixtures::BRIDGE_GREENBOOK_FIXTURE],
+            fixtures: &[crate::fixtures::LSC_GREENBOOK_FIXTURE],
             note: "FY2018-FY2019.",
         },
         Source {
@@ -1708,7 +1711,7 @@ pub const CONNECTORS: &[Connector] = &[
             filename: "hb166-greenbook.pdf",
             format: Format::Pdf,
             catalog: Some("lsc-dew-redbook"),
-            fixtures: &[crate::fixtures::BRIDGE_GREENBOOK_FIXTURE],
+            fixtures: &[crate::fixtures::LSC_GREENBOOK_FIXTURE],
             note: "FY2020-FY2021, the last biennium before the Fair School Funding Plan and the \
                    one FY2020 the plan's temporary transitional aid guarantee holds districts at. \
                    What that guarantee preserves is decided here.",
@@ -1721,7 +1724,10 @@ pub const CONNECTORS: &[Connector] = &[
             filename: "hb119-greenbook.pdf",
             format: Format::Pdf,
             catalog: Some("lsc-dew-redbook"),
-            fixtures: &[crate::fixtures::APPROPRIATION_FIXTURE],
+            fixtures: &[
+                crate::fixtures::APPROPRIATION_FIXTURE,
+                crate::fixtures::LSC_GREENBOOK_FIXTURE,
+            ],
             note: "FY2008-FY2009 as enrolled, with the three preceding years as actuals. \
                    Read by clustering the right edges of the figures, because the table's own \
                    header labels sit narrower than the columns beneath them.",

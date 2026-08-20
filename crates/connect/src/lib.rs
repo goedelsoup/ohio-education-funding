@@ -802,16 +802,16 @@ pub fn rebuild(root: &Path) -> Result<Vec<Rebuilt>, RebuildError> {
         });
     }
 
-    // The Bridge decade's four education greenbooks. All four or none, for the reason the DeRolph
-    // opinions are: this is the only committed account of what the acts between the Evidence-Based
-    // Model's repeal and the Fair School Funding Plan did, and a file that reads as the decade
-    // while silently missing a biennium is worse than no file.
+    // LSC's education analysis of each budget act the corpus describes from one. All of them or
+    // none, for the reason the DeRolph opinions are: this is the only committed account of what
+    // those acts did, and a file that reads as a series while silently missing a biennium is worse
+    // than no file.
     let greenbooks: Result<Vec<fixtures::Record>, cache::FetchError> =
         registry::connector("lsc-budget")
             .expect("registered")
             .sources
             .iter()
-            .filter(|src| src.fixtures.contains(&fixtures::BRIDGE_GREENBOOK_FIXTURE))
+            .filter(|src| src.fixtures.contains(&fixtures::LSC_GREENBOOK_FIXTURE))
             .map(|src| {
                 let text = cache::pdf_text(root, src)?;
                 Ok(fixtures::Record {
@@ -826,19 +826,26 @@ pub fn rebuild(root: &Path) -> Result<Vec<Rebuilt>, RebuildError> {
             })
             .collect();
     out.push(match greenbooks {
-        Ok(greenbooks) => Rebuilt::Written {
-            path: fixtures::BRIDGE_GREENBOOK_FIXTURE.to_string(),
-            rows: fixtures::write_text(
-                &root.join(fixtures::BRIDGE_GREENBOOK_FIXTURE),
-                &fixtures::build_records(
-                    "LSC's education greenbook for each act of the Bridge-formula decade, as \
-                     enrolled. One record per biennium, FY2014 through FY2021.",
-                    &greenbooks,
-                ),
-            )?,
-        },
+        Ok(mut greenbooks) => {
+            // Oldest first, by the General Assembly number in the URL path — the one place the
+            // ordering is stated by data rather than by the order somebody happened to add the
+            // sources in. The registry's order is the appropriation series' order and has no
+            // reason to be chronological; the file says "oldest first" and now is.
+            greenbooks.sort_by_key(|record| general_assembly(&record.source));
+            Rebuilt::Written {
+                path: fixtures::LSC_GREENBOOK_FIXTURE.to_string(),
+                rows: fixtures::write_text(
+                    &root.join(fixtures::LSC_GREENBOOK_FIXTURE),
+                    &fixtures::build_records(
+                        "LSC's education analysis of each enacted budget act this corpus \
+                         describes from one. As enrolled. One record per act, oldest first.",
+                        &greenbooks,
+                    ),
+                )?,
+            }
+        }
         Err(cause) => Rebuilt::Skipped {
-            path: fixtures::BRIDGE_GREENBOOK_FIXTURE.to_string(),
+            path: fixtures::LSC_GREENBOOK_FIXTURE.to_string(),
             reason: cause.to_string(),
         },
     });
@@ -1688,6 +1695,19 @@ fn mr81_panel(root: &Path) -> Result<Vec<Vec<String>>, String> {
 ///
 /// With no match, the prefix is passed through to the reader so the error names it and lists the
 /// sheets that are actually there — better than a bare `None` when the department renames again.
+/// The General Assembly a document's URL puts it under, or `0` where the path does not say.
+///
+/// `.../assets/legislation/130/hb59/en/files/...` — the segment after `legislation`. Zero rather
+/// than a panic for a URL shaped differently: an unsortable record belongs at the front of the
+/// file where it is conspicuous, not in the middle of a sequence pretending to be in order.
+fn general_assembly(url: &str) -> u16 {
+    url.split("/legislation/")
+        .nth(1)
+        .and_then(|rest| rest.split('/').next())
+        .and_then(|segment| segment.parse().ok())
+        .unwrap_or(0)
+}
+
 fn sheet_by_prefix(
     book: &spreadsheet::AnyWorkbook,
     prefix: &str,

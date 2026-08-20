@@ -48,7 +48,7 @@ findings: |
   allocation, with the formula amount held at $6,020 and the state share index held at FY2019.
   So `[H2]` is not the output of a computation performed in FY2020 — it is H.B. 49's FY2019 run,
   preserved by a statute that declined to recompute. [verified — the LSC greenbook, committed at
-  `crates/project/fixtures/bridge-era-greenbooks.txt`]
+  `crates/project/fixtures/lsc-education-greenbooks.txt`]
 
   And it reaches further back than that. Each act of the decade re-anchored its guarantee on the
   year before its biennium — FY2013, then FY2015, then FY2017 — and each base explicitly included
@@ -79,7 +79,7 @@ revisions:
       another.
     found_by: |
       LSC's education greenbook for each of the four acts, retrieved and committed as
-      `crates/project/fixtures/bridge-era-greenbooks.txt`. Each states its own guarantee base in a
+      `crates/project/fixtures/lsc-education-greenbooks.txt`. Each states its own guarantee base in a
       formula box; reading the four in sequence is what makes the chain visible.
     reach: |
       The node's central claim gets a year older and more literal. "Funded at a level set in a year
