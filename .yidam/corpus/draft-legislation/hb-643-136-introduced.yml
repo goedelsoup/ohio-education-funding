@@ -1,0 +1,143 @@
+class: draft-legislation
+label: H.B. 643 (136th G.A., as introduced)
+summary: >-
+  A pending bill capping EdChoice expansion eligibility at $500,000 of federal adjusted gross
+  income. One section, two sponsors, no committee report — and no provision any calculator here
+  can price, because the scholarship channel is not modelled at all.
+description: |
+  Introduced in the 136th General Assembly by Representatives Pizzulli and Somani. It amends a
+  single section, R.C. 3310.032, to make a student ineligible for an educational choice expansion
+  scholarship if the family's federal adjusted gross income in the preceding tax year was at or
+  above **$500,000**, beginning with the 2026-2027 school year and indexed annually to the
+  consumer price index. [verified]
+
+  It is the first income ceiling proposed since [H.B. 33](../legislation/hb-33-2023.yml) made the
+  expansion scholarship universal, and it is small: an eleven-kilobyte bill against an operating
+  budget that amends more than two thousand sections. That contrast is why it is here.
+
+  ### What it would change, and through which mechanism
+
+  The expansion scholarship is an award paid to a family, not a deduction against a resident
+  district's foundation payment — the Fair School Funding Plan changed that mechanism, after
+  which community and STEM students are funded directly rather than deducted. [verified] So a
+  narrowing of eligibility reduces the number of awards paid and the appropriation they are paid
+  from, and reaches a traditional district's own funding only through whatever enrollment
+  consequence follows a family's choice, which no source here measures. [inference]
+
+  ### Its status is a fact about the bill and not about its merits
+
+  As introduced and nothing further: the version index carries one entry. [verified] A bill that
+  has been introduced and not reported out of committee is the ordinary state of most bills, and
+  it is why this class exists separately from
+  [legislation](../legislation.ont.yml) — there is no signing date, no effective date and no veto
+  list, and there may never be any.
+
+  ### The channel it acts on is not the channel the formula runs through
+
+  Ohio funds traditional districts through the foundation formula and funds expansion
+  scholarships from a separate appropriation, and since the Fair School Funding Plan the two no
+  longer meet in a deduction against the resident district. A district's foundation payment can
+  therefore rise while its net position worsens, and a change to who may receive a scholarship
+  moves the second of those and not the first. [verified]
+findings: |
+  **Nothing. One provision, none priced, and the run says so rather than saying zero.**
+
+      $ edfund-project --draft hb-643-136-introduced
+
+      DRAFT — hb-643-136-introduced
+        provisions                        0 of 1 priced, 1 not
+
+      POLICY EFFECT — none computed
+        No provision of this draft binds a lever, so there is no figure to give.
+        That is not a cost of zero. It is the absence of a cost.
+
+  [verified — `crates/project/tests/a_draft_cannot_hide_what_it_did_not_price.rs`]
+
+  ### This bill found a defect in the machinery built to hold it
+
+  A draft whose every provision falls outside the model produces a combined policy **identical to
+  current law**, so the arithmetic gives exactly `0.00`. The first version of `Priced::cost`
+  returned a bare figure and would have published that zero — and `$0.0M` in a cost column reads
+  as *this bill is free*, which is the opposite of *this bill was not priced*.
+
+  `cost()` and `residual()` return `Option` for that reason, the CLI prints the absence rather
+  than the number, and the feed writes `null` rather than `0`. The shape is not exotic: it is the
+  ordinary one for a bill about vouchers, transportation or facilities, which is most of what
+  touches school funding outside a budget act. [verified]
+
+  ### What the retrieval established, beyond this bill
+
+  The as-introduced version code is **always `00_IN`**, because introduction is always a bill's
+  first version. That makes it simpler than the enrolled case, where the code is positional and
+  differs per bill — `06_EN`, `05_EN`, `08_EN` across the three acts
+  [`ohio-session-laws`](../../catalog/ohio-session-laws.md) carries — and a wrong guess returns a
+  nine-byte 404 that reads exactly like "not served". [verified]
+
+  **And the listing endpoint cannot be used to tell a pending bill from an enacted one.** It
+  reports a bill's *first* version rather than its current one, so H.B. 186 of this same General
+  Assembly appears there as `As Introduced` and is in fact enrolled with an effective date of
+  20 March 2026. Only the per-bill version index distinguishes them, and reading status off the
+  listing would have recorded several enacted acts as proposals. [verified]
+properties:
+  provenance: introduced
+  designation: H.B. 643
+  general_assembly: 136th General Assembly
+  sponsors: |
+    Representatives Pizzulli and Somani. [verified] Whether either has since withdrawn, and what
+    the committee referral was, is not established — the version index carries versions and not a
+    procedural history. [open]
+  status: |
+    **As introduced, and no further.** The version index holds one entry and no committee report,
+    floor vote, or effective date. [verified] Whether it is live or dead is not readable from the
+    text: a bill that is never reported out simply stops, and the General Assembly publishes no
+    marker for that. [open]
+  text_read: |
+    `hb643_00_IN`, retrieved 20 August 2026 from
+    `search-prod.lis.state.oh.us/api/v2/general_assembly_136/legislation/hb643/00_IN/html/` and
+    pinned at SHA-256 `ea8896c5ed494308dbcf98b28bb90579391f89a87b749b465cef815ff8c632bb`, 11,817
+    bytes. [verified — `crates/connect/source-digests.txt`]
+
+    The digest is load-bearing rather than ceremonial. `00_IN` is stable, but a bill's *current*
+    text moves under its own URL as it is amended, so a claim about "H.B. 643" that does not name
+    a version names a moving target. See [`ohio-bills`](../../catalog/ohio-bills.md).
+  question: |
+    What does a real pending bill about school funding look like when it reaches a model built
+    around the foundation formula, and how much of one can that model actually price?
+  provisions: |
+    One provision.
+
+    **1. EdChoice expansion eligibility capped at $500,000 federal AGI.** Amends R.C. 3310.032.
+    Binds no parameter and sets no lever. **Not runnable.** [verified]
+
+    The bill's own long title enumerates exactly one section, so this is the whole of it — unlike
+    a budget act, where the funding provisions are a few dozen sections out of several thousand
+    pages and enumerating them is itself the work.
+  unpriced: |
+    One of one. The whole bill.
+
+    **EdChoice expansion eligibility (provision 1, R.C. 3310.032).** Outside the model rather than unlevered, and
+    further outside than most: the scholarship channel is not partially represented here, it is
+    absent. The [`deduction`](../../skills/deduction.md) calculator was declared for this channel
+    and never built, because the per-agency participation series it would read does not exist —
+    `dew-payment-reports` sits behind the department's authenticated reports portal. [open]
+
+    So there is no figure, and the absence is the finding rather than a gap in this node. A bill
+    can be current, real, squarely about school funding, and completely beyond what this
+    repository can compute.
+links:
+  - target: ../draft-legislation.ont.yml
+    relationship: instance-of
+  - target: ../program/edchoice-expansion.yml
+    relationship: would-narrow
+    note: >-
+      The program whose eligibility the bill restricts. Not `amends`, which is for an enactment,
+      and not `constrains`, which this class declares for a revenue stream.
+  - target: ../legislation/hb-33-2023.yml
+    relationship: retreats-from
+    note: >-
+      The act that made the expansion scholarship universal. This bill would put a ceiling back,
+      which is the first proposed reversal of that choice.
+  - target: ../funding-regime/fair-school-funding-plan.yml
+    relationship: baselines-on
+  - target: ../../catalog/ohio-bills.md
+    relationship: sourced-from

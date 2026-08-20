@@ -66,3 +66,12 @@ edges:
     target: fiscal-period
     direction: out
     description: A fiscal period within the run's horizon
+  - relationship: simulated-by
+    target: draft-legislation
+    direction: in
+    description: >-
+      A draft whose provisions this run prices. Declared here as well as on
+      [draft-legislation](draft-legislation.ont.yml) because it changes what a scenario can be
+      *for*: a counterfactual authored around a question the levers can express, and a run
+      standing in for one clause of a bill somebody else wrote, are the same object serving two
+      purposes, and only the second can be partial by construction.

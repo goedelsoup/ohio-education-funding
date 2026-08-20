@@ -17,6 +17,15 @@ export const districtFinances = (irn: string): string => `/district/${irn}/finan
 export const districtTaxes = (irn: string): string => `/district/${irn}/taxes`;
 
 /**
+ * The scenario runner, opened from a draft bill.
+ *
+ * A query parameter rather than a route, for the reason every other lever on that page is one: a
+ * static host cannot mint a page per lever position, and a draft is a lever position with a name.
+ */
+export const scenarioDraft = (slug: string): string =>
+  `/scenario?draft=${encodeURIComponent(slug)}`;
+
+/**
  * The addressable sections of every route.
  *
  * # Why there is a vocabulary rather than a fragment written where it is needed
@@ -173,6 +182,10 @@ export const SECTIONS = {
     disabled: "disabled",
     projectionDisabled: "projection-disabled",
     panelUnreachable: "panel-unreachable",
+    /* The banner a `?draft=` opens the runner with, naming the provisions no lever reaches. Also
+       runtime-written, and addressable for a reason the others are not: it is the part of the page
+       somebody quoting a draft's cost should be able to link a reader straight to. */
+    draft: "draft",
   },
 
   /** `/wiki` and its four sub-families. */
@@ -188,6 +201,8 @@ export const SECTIONS = {
     links: "links",
     findings: "findings",
     district: "district",
+    /* The card on a `draft-legislation` node offering to open it in the scenario runner. */
+    runner: "runner",
     revisions: "revisions",
     why: "why",
     record: "record",

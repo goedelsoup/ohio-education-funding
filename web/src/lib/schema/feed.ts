@@ -889,6 +889,45 @@ export const CheckpointSchema = z
   .strict();
 
 /**
+ * One clause of a draft bill.
+ *
+ * `lever` is one of the five keys the scenario page's query string uses, or empty — and empty is
+ * the case this schema exists to keep visible. A provision no lever reaches is exported with the
+ * rest rather than filtered out of the feed, so a page rendering a draft cannot show its cost
+ * without also holding what the cost leaves out.
+ */
+export const DraftProvisionSchema = z
+  .object({
+    ordinal: z.number().int().positive(),
+    title: z.string().min(1),
+    /** The Revised Code section it would amend, or `uncodified`. */
+    authority: z.string().min(1),
+    /** The corpus `parameter` node it binds. Empty where none exists. */
+    parameter: z.string(),
+    /** One of the five lever keys, or empty when nothing here can run it. */
+    lever: z.enum(["guarantee", "base-cost", "min-share", "phase-in", "phase-in-cat", ""]),
+    /** The lever's value, in the string form the query string carries. */
+    proposed: z.string(),
+    /**
+     * Why it does not price, or what the run is sized against where it does.
+     *
+     * Required non-empty on an unpriced provision by `crates/project`'s own test, because "not
+     * runnable" alone is a shrug — the difference between a question somebody can work and one
+     * nobody has scoped lives entirely in this string.
+     */
+    note: z.string().min(1),
+  })
+  .strict();
+
+/** A bill that is not law, with every provision it states. */
+export const DraftSchema = z
+  .object({
+    slug: z.string().min(1),
+    provisions: z.array(DraftProvisionSchema).min(1),
+  })
+  .strict();
+
+/**
  * A Rust-computed forecast this page must reproduce before it may draw a band.
  *
  * The same discipline as {@link CheckpointSchema}, applied to the harder half. Reproducing a
@@ -1104,6 +1143,8 @@ export const BundleSchema = z
     series_years: z.array(SeriesYearSchema).min(1),
     statewide: StatewideSchema,
     checkpoints: z.array(CheckpointSchema),
+    /** The drafts this repository holds, ordered by slug. See {@link DraftSchema}. */
+    drafts: z.array(DraftSchema),
     /** `null` disables the band: this feed cannot be projected. */
     projection: ProjectionMetaSchema.nullable(),
     /** `null` means the feed can only be shown in nominal dollars. */
@@ -1144,6 +1185,8 @@ export type AppropriationLine = z.infer<typeof AppropriationLineSchema>;
 export type Deflator = z.infer<typeof DeflatorSchema>;
 export type PolicyShape = z.infer<typeof PolicyShapeSchema>;
 export type Checkpoint = z.infer<typeof CheckpointSchema>;
+export type Draft = z.infer<typeof DraftSchema>;
+export type DraftProvision = z.infer<typeof DraftProvisionSchema>;
 export type ForecastCheckpoint = z.infer<typeof ForecastCheckpointSchema>;
 export type ProjectionMeta = z.infer<typeof ProjectionMetaSchema>;
 export type SeriesYear = z.infer<typeof SeriesYearSchema>;

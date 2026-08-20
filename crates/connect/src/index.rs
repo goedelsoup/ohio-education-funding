@@ -415,34 +415,66 @@ fn repository_overview(root: &Path) -> String {
 /// The two blocked connectors used to be *described* here rather than named, in prose that would
 /// have gone on reading correctly if a third were blocked and silently wrongly if one were freed.
 /// They are named from the registry now, so the sentence cannot outlive the fact.
+///
+/// # Not-wired is not the same as blocked, and this used to say it was
+///
+/// The first version took every connector that is not `Wired` and called it "blocked on something
+/// this repository cannot build". That was true while the only two were `dew-payment-reports`
+/// behind an authenticated portal and `ofcc-projects` behind a browser check. It stopped being
+/// true the moment a connector was left unwired **on purpose**: `ohio-bills` is `Retrievable`
+/// because turning a bill into provisions is reading rather than extraction, and reporting it as
+/// blocked would claim an obstacle that does not exist and imply somebody should go and remove it.
+///
+/// So the two are counted apart, on the status the registry already carries.
 fn retrieval_status(root: &Path) -> String {
-    use crate::registry::CONNECTORS;
+    use crate::registry::{Status, CONNECTORS};
 
     let wired = CONNECTORS.iter().filter(|c| c.status.is_wired()).count();
-    let blocked: Vec<String> = CONNECTORS
+    let named = |keys: Vec<&'static str>| {
+        keys.iter()
+            .map(|k| format!("`{k}`"))
+            .collect::<Vec<_>>()
+            .join(" and ")
+    };
+    let blocked: Vec<&'static str> = CONNECTORS
         .iter()
-        .filter(|c| !c.status.is_wired())
-        .map(|c| format!("`{}`", c.key))
+        .filter(|c| matches!(c.status, Status::Declared { .. }))
+        .map(|c| c.key)
+        .collect();
+    let unwired: Vec<&'static str> = CONNECTORS
+        .iter()
+        .filter(|c| matches!(c.status, Status::Retrievable | Status::Parsed))
+        .map(|c| c.key)
         .collect();
     let pinned = crate::cache::parse_manifest(&read(root, crate::cache::MANIFEST)).len();
 
-    format!(
+    let mut out = format!(
         "{} connectors, {wired} wired, and {pinned} published files pinned by SHA-256. The {} \
          that {} not — {} — {} blocked on something this repository cannot build, and {} which, \
          in a field a test checks: \
          [the table](crates/connect/README.md) is generated from the registry rather than \
-         written by hand.\n",
+         written by hand.",
         CONNECTORS.len(),
         blocked.len(),
         if blocked.len() == 1 { "is" } else { "are" },
-        blocked.join(" and "),
+        named(blocked.clone()),
         if blocked.len() == 1 { "is" } else { "are" },
         if blocked.len() == 1 {
             "says"
         } else {
             "each says"
         },
-    )
+    );
+    if !unwired.is_empty() {
+        out.push_str(&format!(
+            " {} {} unwired by choice rather than by obstacle — a fetchable source whose \
+             extraction step is judgement rather than parsing.",
+            named(unwired.clone()),
+            if unwired.len() == 1 { "is" } else { "are" },
+        ));
+    }
+    out.push('\n');
+    out
 }
 
 /// The four claim tags and their counts, without the field breakdown the corpus README carries.

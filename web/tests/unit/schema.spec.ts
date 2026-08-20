@@ -254,10 +254,17 @@ test("every class states whether its edge vocabulary is open", () => {
   // about, and this is the assertion that makes it impossible to do quietly. Thirteen at genesis;
   // fifteen when `accountability-regime` and `intervention` were admitted, sixteen since `school`
   // joined them — all three by decision `accountability-domain`. Seventeen since `model-policy`,
-  // by decision `advocacy-literature`, which admitted the school choice advocacy literature and
-  // is the one class here holding documents that are not law and not Ohio's. Update it only
+  // by decision `advocacy-literature`, which admitted the school choice advocacy literature.
+  // Eighteen since `draft-legislation`, by decision `drafts-are-not-legislation`. Update it only
   // alongside a decision record.
-  expect(corpus.classes).toHaveLength(17);
+  //
+  // The two newest are the corpus's answer to the same question asked twice, and the pair is the
+  // reason the count is worth watching. `legislation` means *enacted* — a Kind whose identity is
+  // fixed at signing — so everything that reads like a statute and is not one needs somewhere
+  // else to live: a template published by an advocacy organization, and a bill that has not
+  // passed. Each got a class rather than a flag, on the ground `model-policy` states outright,
+  // that one class holding both would let a reader take the document for the law.
+  expect(corpus.classes).toHaveLength(18);
 });
 
 test("an ontology missing edge_policy is rejected", () => {
@@ -295,7 +302,7 @@ test("the corpus is clean under the policy it declares", () => {
  *
  * `.yidam/decisions/the-four-genres-of-a-description.yml` splits a node's prose into four fields.
  * This was an upper bound that only moved down for as long as the migration was staged — 118 at
- * the start, then 105, 100, 96, 92, 72, 38, 20. All 103 nodes have now been through it.
+ * the start, then 105, 100, 96, 92, 72, 38, 20. All 106 nodes have now been through it.
  *
  * A ratchet was the honest shape while a backlog existed, because a zero would have been either a
  * lie or a reason not to land the machinery until every node was rewritten. It is the wrong shape

@@ -1,0 +1,192 @@
+id: drafts-are-not-legislation
+summary: >-
+  A proposal gets its own class rather than a status field on `legislation`, on the argument that
+  class already makes about itself — and the field that earns the split is not `status` but
+  `unpriced`, because the runnable surface is five levers and a real bill is not five provisions.
+context: |
+  The request was support for authoring draft legislation and extending a draft into a scenario.
+  Three kinds of draft were confirmed in scope: a real bill before the General Assembly, a
+  counterfactual rewrite of an act that did pass, and an invented change nobody has proposed.
+  Authoring is corpus-side — a node and a skill, not a browser tool. Provisions the calculators
+  cannot run are to be recorded as `[open]` rather than rejected.
+
+  The machinery to price a proposal already existed and none of it needed changing.
+  [`parameter`](../corpus/parameter.ont.yml) nodes carry a `simulation_key` that binds to the
+  calculator; `project::policy::Policy` holds five levers and `edfund-project` runs them;
+  [`scenario`](../corpus/scenario.ont.yml) is already a valid node before it is run;
+  `scenario-delta` already refuses a total without the count of districts it fails to reach. What
+  was missing was the document at the front: nothing in the corpus could hold a bill that had not
+  passed.
+
+  Two prior decisions bore directly on where it should go. [`ontology`](ontology.yml) fixed
+  `legislation` as a UFO Kind meaning *enacted*, and
+  [`advocacy-literature`](advocacy-literature.yml) had already faced the near-identical question
+  one document earlier, when a model bill published by a national organization needed somewhere to
+  live and was given `model-policy` rather than a flag on `legislation`.
+decision: |
+  Add `draft-legislation` as an eighteenth ontology class, a Kind, holding all three draft kinds
+  with `provenance` distinguishing them.
+
+  **Nine properties, and one of them is the reason the class is worth having.** `provenance`,
+  `designation`, `general_assembly`, `sponsors`, `status`, `text_read`, `question`, `provisions`
+  — and **`unpriced`**, mandatory on every node including the ones where the answer is none.
+
+  A draft produces scenarios rather than being one: `simulated-by` runs from the draft to one or
+  more [`scenario`](../corpus/scenario/) nodes, and the reciprocal is declared on that class too.
+  A draft that passes gains an `enacted-as` edge to a new `legislation` node and is not edited.
+
+  Seeded with one node — a counterfactual H.B. 96 that refreshes the base cost reference year it
+  froze — plus [`skills/draft-authoring`](../skills/draft-authoring.md). No Rust changed, and no
+  retrieval was attempted.
+consequences: |
+  **The class split is `model-policy`'s argument at one document's remove, and it gets stronger
+  as the document gets closer to law.** That class's definition states the hazard outright:
+  holding a template and a statute in one class "would let a reader take a template for a statute,
+  which is the specific error this class exists to prevent." A model bill published by an advocacy
+  organization is obviously not Ohio law. A bill numbered, sponsored, and pending in the 136th
+  General Assembly looks exactly like Ohio law, so the same reader error is both likelier and
+  harder to catch. The split that was defensible for `model-policy` is close to compulsory here.
+
+  **`legislation` needed no edit at all**, which is the check on whether the split was right. Its
+  Kind framing, its properties and its edges are all still true of exactly the things in it.
+
+  **The label carries the provenance, because the page cannot rely on the reader looking.** A
+  node's `label` renders under the `h1` and into every social card, and a draft shown with a bill
+  number and a list of sections reads as an enactment. So a counterfactual takes a `Counterfactual:`
+  prefix, an introduced bill states its stage, and a hypothetical draft may take **no designation
+  at all** — a number is the one thing a reader will believe without checking.
+
+  **`unpriced` is the field that does the work, and its ground is already load-bearing
+  elsewhere.** `scenario-delta` cannot construct a total without its `Reach`: there is no method
+  returning a bare dollar figure, so a caller who wants the headline receives the count of
+  untouched districts in the same value. `unpriced` is that rule one level up — a cost cannot be
+  stated without the count of provisions it fails to price — and it is needed because the failure
+  is the *easy* one. The provisions that bind to levers are the provisions that produce a number,
+  so a pass that binds as it reads yields a draft consisting of precisely the clauses the model
+  can reach, reported as the bill.
+
+  **The runnable surface bounds this class much more tightly than it bounds `scenario`, and that
+  is a new exposure rather than an inherited one.** A scenario is authored around a perturbation
+  the levers can express, because whoever writes it chooses the question. A draft is authored
+  around provisions somebody else chose. Five levers — the guarantee rule, aggregate base cost,
+  the minimum state share and two phase-in dials — against a budget act that also moves
+  special-education weights, transportation reimbursement, the scholarship deduction and the
+  capital channel. The last two are outside the model entirely rather than merely unlevered.
+
+  What share of a real bill can actually be priced is therefore an open empirical question, and
+  the seeded node does not answer it: one counterfactual with a single runnable provision has
+  complete coverage by construction, which is the least representative case available. [open]
+
+  > **NARROWED by the runner phase.** A second node,
+  > [`fund-the-plan-and-retire-the-guarantee`](../corpus/draft-legislation/fund-the-plan-and-retire-the-guarantee.yml),
+  > was authored precisely because the first could not carry this: five provisions, of which two
+  > price. It does not settle the empirical question — a constructed bill is not a sample — but it
+  > does establish that the three unpriced provisions fail for three *different* reasons, one
+  > unlevered and two outside the model, which is a distinction a single ratio would have hidden.
+  > A third node since — [H.B. 643 of the 136th](../corpus/draft-legislation/hb-643-136-introduced.yml),
+  > a real pending bill — prices at **0 of 1**, which is a lower bound rather than an estimate.
+  > What the ratio looks like for a budget act stays [open].
+
+  **The interaction between provisions is larger than the decision anticipated, and it changed
+  what the runner returns.** This record proposed reporting a residual between the combined run
+  and the per-provision runs, by analogy with `regime-diff`. Measured on the second draft, the
+  residual is **$75.1M against a combined figure of $143.9M** — 52%, not a correction term. Its two
+  provisions priced apart say −$219.0M and run together say −$143.9M, because a district the base
+  cost refresh lifts off the guarantee is no longer standing on the floor for the phase-out to
+  lower. So `Priced::residual` is a first-class result rather than a diagnostic, and the CLI prints
+  it under the attribution with the reason attached.
+
+  **And the two levers turn out to cover the state, which is not the same as partitioning it.**
+  The refresh leaves 253 districts unmoved and the phase-out leaves 315, and the combination leaves
+  **zero**. What is disjoint is the two *unmoved* sets — 253 held on the guarantee throughout and
+  315 paid by the formula, 568 between them — which is the structure
+  [`guarantee-phase-out`](../corpus/scenario/guarantee-phase-out.yml) established.
+
+  > **CORRECTED in review.** This paragraph first said the two levers "partition the state" and
+  > that "neither provision reaches the other's population". Both are false, and the node's own
+  > figures disprove them two paragraphs earlier: 356 moved by the refresh and 294 by the phase-out
+  > sum to 650 against 609 districts, so **41 are moved by both** — precisely the 41 the refresh
+  > lifts off the guarantee and the phase-out would have cut. The test asserting it was worse than
+  > the prose: it pinned `253 + 315 == 568`, which is the arithmetic *disproof* of a partition,
+  > under a name claiming one. A tidier result was asserted than the numbers supported.
+
+  **A lever costs three things and the price is now written down.** A field on `Policy` needs a
+  matching entry in `bundle`'s `checkpoint_policies` and a mirrored implementation in
+  `web/src/lib/policy.ts`, or `verify.ts` refuses to render the scenario page. That refusal is the
+  mechanism keeping the browser's second implementation of the formula honest. It is recorded in
+  the skill and in the class's `ACTIONS.md` so that "just add a lever" is priced before it is
+  promised.
+
+  **Provisions do not sum, and the skill refuses to let them.** Raising base cost costs $47.7M per
+  point at +2% and $72.5M at +20%, because each increment lifts districts off the guarantee onto a
+  formula that must then pay them — measured in
+  [guarantee-phase-out](../corpus/scenario/guarantee-phase-out.yml). So a draft's cost is one
+  combined run and the per-provision runs attribute it, with the residual reported rather than
+  absorbed, on the pattern `regime-diff` already uses for a decomposition it cannot fully explain.
+
+  **The `introduced` provenance is declared and unused.** No connector reaches a pending bill:
+  `ohio-laws` serves the Revised Code as it stands and `ohio-session-laws` serves acts as passed.
+  Declaring the value now costs nothing and avoids retrofitting the field onto every node once the
+  connector exists — the same reasoning [`proposals`](proposals.yml) used when it approved twelve
+  implied edges as enrichments that are "cheap to declare now, expensive to retrofit once instances
+  exist."
+
+  > **RESOLVED by the retrieval phase.** `ohio-bills` was added on `the-acts-themselves`' precedent
+  > and [H.B. 643 of the 136th](../corpus/draft-legislation/hb-643-136-introduced.yml) has a node.
+  > The connector stays at `retrievable` rather than `wired`, and that is the decision worth
+  > recording: turning a bill into provisions is reading rather than extraction, so there is no
+  > parser and there should not be one. What the retrieval is for is the text, pinned, so a node
+  > can be checked against the document it claims to describe.
+
+  **The unpriceable draft was not anticipated, and it was a defect rather than a gap.** A bill
+  whose every provision falls outside the model produces a combined policy *identical to current
+  law*, so `Priced::cost` computed exactly `0.00` — and `$0.0M` in a cost column reads as *this
+  bill is free*, which is the opposite of *this bill was not priced*. The first real pending bill
+  wired here is exactly that shape, and it would have published the wrong reading.
+
+  `cost()` and `residual()` return `Option` now, the CLI prints the absence rather than the figure,
+  the feed writes `null`, and the scenario page says outright that nothing on it is the bill. The
+  shape is not exotic: it is the ordinary one for a bill about vouchers, transportation or
+  facilities, which is most of what touches school funding outside a budget act.
+alternatives: |
+  **A `status` or `enacted` field on `legislation`.** Rejected, and it was the obvious option. The
+  class is a Kind whose identity is fixed at enactment; a draft has no signing date, no effective
+  date, no vetoes, and its General Assembly is a hope rather than a fact. Four of seven properties
+  would be permanently empty, which is a description of a different class. And the reader hazard is
+  the one `model-policy` was split off to prevent, in a sharper form.
+
+  **Three classes, one per draft kind.** Rejected. The three differ in provenance, not identity:
+  they hold the same provisions, bind to the same parameters, and enter the graph at the same
+  places. Three classes would triple every edge declaration to encode one string.
+
+  **Make the draft a `scenario` with a text field.** Rejected, and this was the closest call. A
+  draft and a run are different objects with different lifetimes: a six-provision bill needs one
+  run per provision plus a combined one, the same run can price two drafts, and re-running against
+  a new fixture year produces a new scenario while the bill's text is unchanged. Folding them would
+  make "the draft was superseded" and "the run was superseded" the same event, when the second
+  happens routinely and the first almost never.
+
+  **Reject provisions the levers cannot run.** Rejected by the scoping question, and it would have
+  been wrong anyway: it rules out substantially every real bill, since Ohio legislates school
+  funding inside the operating budget. What it would produce is not a stricter corpus but a corpus
+  of drafts that happen to be five levers wide, reported as bills.
+
+  **Structured provisions as a real data type on the node.** Deferred rather than rejected.
+  `corpus-node.json` allows `properties` as a flat string map, so `provisions` is prose in a fixed
+  form for now. When a runner needs to read it mechanically the binding belongs in a committed
+  fixture under `crates/` with a test reconciling it against the node — the shape
+  `web/tests/unit/year.spec.ts` already uses for statewide constants, where the feed is
+  authoritative because `crates/foundation` computes it and the corpus may not contradict it.
+  Widening the node schema for one class is the larger change and it can be made later on evidence.
+
+  > **RESOLVED as described.** `crates/project/fixtures/draft-provisions.tsv` is authoritative and
+  > `crates/project/tests/a_draft_cannot_hide_what_it_did_not_price.rs` holds the node to it — on
+  > the parameter slug and the statutory authority rather than the title, because a title is prose
+  > and will be reworded while a binding that changes is a different provision. The node schema was
+  > not widened, and nothing has yet wanted it to be.
+
+  **Emit amendatory legal text — the section reprinted with strikes and inserts.** Rejected for
+  now. [`reading-an-amending-act`](reading-an-amending-act.yml) establishes how Ohio prints one, so
+  the format is known, but nothing here could check that generated language says what the provision
+  means, and unverifiable legal text next to verified figures is the worst pairing available. The
+  plain-English analysis carries the same information and can be checked.

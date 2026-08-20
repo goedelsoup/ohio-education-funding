@@ -19,7 +19,8 @@ import {
   type Policy,
 } from "./policy.ts";
 import { forecastPath, growthPrior } from "./project.ts";
-import type { Panel } from "./types.ts";
+import type { Draft, Panel } from "./types.ts";
+import * as routes from "./routes.ts";
 import { anchor } from "./section.ts";
 
 /**
@@ -498,4 +499,149 @@ export function renderScenario(bundle: Panel, levers: Levers): RenderedScenario 
     </div>`;
 
   return { summary, detail };
+}
+
+/**
+ * A draft's priced provisions, as lever positions.
+ *
+ * One function rather than two so the controls the page sets and the comparison it makes later
+ * cannot disagree about what the draft says. `matchesDraft` is the reason that matters: a reader
+ * who nudges a slider has stopped looking at the bill, and the page has to notice.
+ */
+export function draftLevers(draft: Draft, model: number, baseYear: number): Levers {
+  const levers = defaultLevers(model, baseYear);
+  for (const provision of draft.provisions) {
+    const [rule, argument] = provision.proposed.split(":");
+    switch (provision.lever) {
+      case "guarantee":
+        if (rule === "as-enacted" || rule === "removed" || rule === "rebase" || rule === "phase-out") {
+          levers.guarantee = rule;
+        }
+        if (argument != null && Number.isFinite(Number(argument))) {
+          levers.guaranteeArgument = Number(argument);
+        }
+        break;
+      case "base-cost":
+        levers.baseCostScale = Number(provision.proposed);
+        break;
+      case "min-share":
+        levers.minimumStateShare = Number(provision.proposed);
+        break;
+      case "phase-in":
+        levers.phaseInBaseCost = Number(provision.proposed);
+        break;
+      case "phase-in-cat":
+        levers.phaseInCategorical = Number(provision.proposed);
+        break;
+      default:
+        // An unpriced provision. It sets no lever, which is exactly why it has to be shown
+        // separately rather than dropped — see `renderDraft`.
+        break;
+    }
+  }
+  return levers;
+}
+
+/**
+ * Whether the controls still hold what the draft says.
+ *
+ * The horizon is excluded on the same ground {@link isCurrentLaw} excludes it: projecting further
+ * out changes what is being asked, not what the bill would do.
+ */
+export function matchesDraft(levers: Levers, draft: Draft, model: number, baseYear: number): boolean {
+  const of = draftLevers(draft, model, baseYear);
+  return (
+    levers.guarantee === of.guarantee &&
+    levers.guaranteeArgument === of.guaranteeArgument &&
+    levers.baseCostScale === of.baseCostScale &&
+    levers.minimumStateShare === of.minimumStateShare &&
+    levers.phaseInBaseCost === of.phaseInBaseCost &&
+    levers.phaseInCategorical === of.phaseInCategorical
+  );
+}
+
+/**
+ * What a draft's figure does not include, printed beside the figure.
+ *
+ * # Why this card exists, and why it is above the total rather than below it
+ *
+ * `crates/project` cannot produce a draft's cost without the provisions it failed to price:
+ * `Priced` has no constructor that skips them. That guarantee stops at the process boundary. A
+ * page that read the lever positions out of the feed and rendered the statewide total would show
+ * a number for two of a bill's five clauses with nothing saying so — the same failure, one layer
+ * up, and harder to notice because the page looks complete.
+ *
+ * So the unpriced provisions render with the total and not under it. Placement follows the
+ * held-fixed card above the controls: this is a limit on what the reader is about to read, not a
+ * footnote on what they got.
+ *
+ * # A moved lever is no longer the bill
+ *
+ * The levers are live. The moment one differs from what the draft sets, the figure below stops
+ * being the draft's and the card says so rather than disappearing — a banner that vanished would
+ * leave the reader with a number they still believe is the bill's, which is worse than no banner
+ * at all.
+ */
+export function renderDraft(panel: Panel, levers: Levers, slug: string): string {
+  const draft = panel.drafts.find((d) => d.slug === slug);
+  if (!draft) return "";
+
+  const model = panel.statewide.minimum_state_share;
+  const baseYear = panel.projection?.base_year ?? 0;
+  const unpriced = draft.provisions.filter((p) => p.lever === "");
+  const priced = draft.provisions.length - unpriced.length;
+  const intact = matchesDraft(levers, draft, model, baseYear);
+  const href = `${routes.wikiNode("draft-legislation", slug)}`;
+
+  const departed = intact
+    ? ""
+    : `<p class="note err" data-part="draft-departed"><strong>These levers no longer match the
+        draft.</strong> The figures below are yours rather than the bill's.
+        <a href="?draft=${encodeURIComponent(slug)}">Put them back</a>.</p>`;
+
+  const list = unpriced
+    .map(
+      (p) => `<li><strong>${escapeHtml(p.title)}</strong>
+        <span class="tnum">${escapeHtml(p.authority)}</span><br />
+        <span class="note">${escapeHtml(p.note)}</span></li>`,
+    )
+    .join("");
+
+  /*
+   * A draft nothing prices sets no lever, so the page below it is showing current law — which is
+   * true and reads as false. Left alone, a reader lands on a bill and meets "nothing moves",
+   * indistinguishable from a bill that costs nothing. See `Priced::cost` for the same distinction
+   * one layer down, where it returns `None` rather than zero.
+   */
+  const nothingPriced =
+    priced === 0
+      ? `<p class="note err" data-part="draft-unpriceable"><strong>Nothing on this page is this
+          bill.</strong> Not one of its ${count(draft.provisions.length)}
+          provision${draft.provisions.length === 1 ? "" : "s"} sets a lever here, so the figures
+          below are current law — which is what the controls say and not what the bill would do.
+          There is no cost of zero to report; there is no cost.</p>`
+      : "";
+
+  const missing =
+    unpriced.length === 0
+      ? `<p class="note" data-part="draft-complete">Every provision of this draft binds a lever, so
+          the figures below are the whole of it rather than the part this model can reach. That is
+          a property of a one-clause draft and not of drafts — a budget act moves special education
+          weights, transportation and the scholarship deduction too, and none of those has a lever
+          here.</p>`
+      : `<p class="note"><strong>${count(unpriced.length)} of this draft's
+          ${count(draft.provisions.length)} provisions are not in any figure on this page.</strong>
+          They set no lever, so moving the controls cannot express them and the total below is
+          the cost of ${count(priced)} clauses, not of the bill.</p>
+        <ul class="unpriced" data-part="draft-unpriced">${list}</ul>`;
+
+  return `<div class="card" id="draft" data-part="draft" data-draft="${escapeHtml(slug)}">
+    <h2>${anchor("draft")}Opened from a draft</h2>
+    <p class="note">The levers below are set to
+      <a href="${href}">${escapeHtml(slug)}</a>, a bill that is not law.
+      ${count(priced)} of its ${count(draft.provisions.length)} provisions bind a lever here.</p>
+    ${nothingPriced}
+    ${departed}
+    ${missing}
+  </div>`;
 }

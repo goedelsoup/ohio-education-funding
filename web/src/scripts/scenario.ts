@@ -29,7 +29,9 @@
 import { escapeHtml } from "../lib/format.ts";
 import {
   defaultLevers,
+  draftLevers,
   renderDistrictScenario,
+  renderDraft,
   renderProjection,
   renderScenario,
   type Levers,
@@ -46,6 +48,16 @@ const $ = <T extends HTMLElement>(selector: string): T | null =>
 const root = $("#scenario-root");
 /** Present on the district route, absent on the statewide one. That is the only difference. */
 const irn = root?.dataset.irn;
+
+/**
+ * The draft this page was opened from, if any.
+ *
+ * Read once at load and never cleared. It is not lever state: a reader who moves a slider has
+ * departed from the bill rather than stopped reading it, and `renderDraft` says which — so
+ * forgetting the slug on the first `input` event would silently turn "this is no longer the
+ * draft" into no message at all.
+ */
+const draftSlug = new URLSearchParams(location.search).get("draft") ?? "";
 
 interface State {
   panel: Panel;
@@ -98,6 +110,10 @@ function toQuery(): void {
     pc: String(l.phaseInCategorical),
     h: String(l.horizon),
   });
+  // `draft` survives every lever move. It is not lever state — see `draftSlug` — and dropping it
+  // here would make the URL in the bar stop being the one that opened the bill, while the page
+  // was still explaining that these figures came from one.
+  if (draftSlug) params.set("draft", draftSlug);
   const next = `${location.pathname}?${params.toString()}`;
   if (location.pathname + location.search !== next) history.replaceState(null, "", next);
 }
@@ -144,14 +160,25 @@ function render(): void {
   if (!isVerified(state.verification)) return;
   const out = $("#scenario-out");
   const detail = $("#scenario-detail");
+  /*
+   * Prepended rather than appended: the provisions this page cannot price belong above the total,
+   * not under it. See `renderDraft`.
+   *
+   * Written on **both** routes, and the district one is the route that most needs it. A district
+   * page is the one a school board sends, and it answers "what would this bill do to us" with a
+   * dollar figure and a per-pupil figure — so a draft's levers applied there with no card naming
+   * the clauses the model cannot reach is the invariant's worst failure, not its mildest. The
+   * first version of this wrote the banner only in the statewide branch.
+   */
+  const banner = draftSlug ? renderDraft(state.panel, state.levers, draftSlug) : "";
   if (irn) {
     // One district, one container. There is no forecast on that route — the band is drawn once,
     // statewide, where it is the subject — so there is nothing for a detail half to sit below.
-    if (out) out.innerHTML = renderDistrictScenario(state.panel, state.levers, irn);
+    if (out) out.innerHTML = banner + renderDistrictScenario(state.panel, state.levers, irn);
     if (detail) detail.innerHTML = "";
   } else {
     const rendered = renderScenario(state.panel, state.levers);
-    if (out) out.innerHTML = rendered.summary;
+    if (out) out.innerHTML = banner + rendered.summary;
     // Written on every render, including when it is empty. Under current law there is nothing to
     // distribute or rank, and a detail half left standing from the last lever position would be
     // describing a scenario the controls no longer hold — below the fan chart, where the reader
@@ -274,8 +301,18 @@ function boot(panel: Panel): void {
   }
   if (!isForecastVerified(verification)) reportForecastFailure(panel, verification);
 
-  // A shared link's levers, applied before the first read of the controls.
-  const initial = fromQuery();
+  /*
+   * A shared link's levers, applied before the first read of the controls.
+   *
+   * A `?draft=` sets them first and an explicit lever in the same URL overrides it, so the two
+   * compose: `?draft=x` opens the bill, and `?draft=x&base=1.06` opens the bill with one clause
+   * moved — which `renderDraft` then reports as a departure rather than as the bill.
+   */
+  const opened = panel.drafts.find((d) => d.slug === draftSlug);
+  const fromDraft = opened
+    ? draftLevers(opened, panel.statewide.minimum_state_share, baseYear)
+    : null;
+  const initial: Partial<Levers> = fromDraft ? { ...fromDraft, ...fromQuery() } : fromQuery();
   if (initial.guarantee) $<HTMLSelectElement>("#lv-guarantee")!.value = initial.guarantee;
   const put = (id: string, value: number | undefined) => {
     const control = $<HTMLInputElement>(id);
@@ -289,16 +326,30 @@ function boot(panel: Panel): void {
   put("#lv-horizon", initial.horizon);
 
   const fallback = defaultLevers(panel.statewide.minimum_state_share, baseYear).horizon;
-  const update = () => {
+
+  /*
+   * `fromControls: false` is for the first render of a draft, and it is not a convenience.
+   *
+   * The sliders are quantized — `#lv-base` steps by 0.01 from 0.8 — and a draft's lever value is
+   * whatever the provision says. The refresh provision is `1.0395`, which the control rounds to
+   * `1.04`: a $3.2M difference on a $220.5M figure. Reading the controls for the first render
+   * would put a number that is not the draft's under a banner saying it is, which is the one
+   * thing this path exists to prevent.
+   *
+   * So the draft is rendered from the draft. The first control the reader touches hands authority
+   * to the DOM and it keeps it — and `renderDraft` reports that as a departure, correctly,
+   * because a scenario the controls can express is a different scenario from the bill.
+   */
+  const update = (fromControls = true) => {
     if (!state) return;
-    state.levers = readLevers(fallback);
+    if (fromControls) state.levers = readLevers(fallback);
     syncLabels(state.levers, baseYear);
     toQuery();
     render();
   };
 
   for (const control of document.querySelectorAll("#scenario-controls input, #scenario-controls select")) {
-    control.addEventListener("input", update);
+    control.addEventListener("input", () => update());
   }
   $("#scenario-reset")?.addEventListener("click", () => {
     const defaults = defaultLevers(panel.statewide.minimum_state_share, baseYear);
@@ -312,7 +363,8 @@ function boot(panel: Panel): void {
     update();
   });
 
-  update();
+  if (fromDraft) state.levers = { ...fromDraft, ...fromQuery() };
+  update(fromDraft == null);
 }
 
 // The slim panel, not the full feed: this page needs every district's formula inputs and none of

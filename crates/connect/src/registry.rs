@@ -1553,6 +1553,45 @@ pub const CONNECTORS: &[Connector] = &[
         ],
     },
     Connector {
+        key: "ohio-bills",
+        publisher: "Ohio General Assembly",
+        feeds: &["draft-legislation"],
+        // Deliberately not `Wired`, and not for want of effort. Turning a bill into provisions is
+        // reading rather than extraction — deciding that a section amending R.C. 3310.032 changes
+        // eligibility rather than an award, and that no lever here expresses it, is a judgement
+        // about the funding system. A parser over section headings would emit something that
+        // looked authoritative and was not. What the retrieval is for is the text, pinned, so a
+        // draft node can be checked against the document it claims to describe.
+        status: Status::Retrievable,
+        note: "A bill before it is law, which is a third artefact and not a variant of the two \
+               already here: `ohio-laws` serves the Revised Code as it stands and \
+               `ohio-session-laws` serves acts as they were passed. The as-introduced version is \
+               always `00_IN`, so unlike an enrolled act it needs no index lookup — introduction \
+               is always a bill's first version. Every other stage is positional and does. The \
+               listing endpoint reports a bill's *first* version rather than its current one, so \
+               it cannot be used to tell a pending bill from an enacted one: H.B. 186 of the \
+               136th appears there as `As Introduced` and was enrolled effective 20 March 2026.",
+        sources: &[
+            Source {
+                key: "hb643-136-introduced",
+                title: Some("H.B. 643 of the 136th General Assembly, as introduced"),
+                url: "https://search-prod.lis.state.oh.us/api/v2/general_assembly_136/\
+                      legislation/hb643/00_IN/html/",
+                filename: "hb643-136-introduced.html",
+                format: Format::Html,
+                catalog: Some("ohio-bills"),
+                fixtures: &[],
+                note: "One section, amending R.C. 3310.032 to cap EdChoice expansion eligibility \
+                       at $500,000 of federal adjusted gross income from the 2026-2027 school \
+                       year, indexed to CPI. Chosen as the first pending bill here because every \
+                       provision it has falls in the scholarship channel, which this workspace \
+                       does not model at all — so it is the case that proves a draft can be real, \
+                       current, and entirely unpriceable, and it is the one that found \
+                       `project::drafts` reporting an unpriceable bill as costing zero.",
+            },
+        ],
+    },
+    Connector {
         key: "ohio-auditor",
         publisher: "Auditor of State of Ohio",
         feeds: &["education-agency", "legislation"],
@@ -2761,6 +2800,11 @@ mod tests {
             "dew-school-improvement",
             "dew-scholarship-reports",
             "lsc-catalog",
+            // ohio-bills from decisions/drafts-are-not-legislation.yml, which added the
+            // `draft-legislation` class and needed a third artefact from a publisher already here:
+            // `ohio-laws` serves the Revised Code as it stands and `ohio-session-laws` serves acts
+            // as passed, and a bill that has not been enacted is neither.
+            "ohio-bills",
         ];
         for key in expected {
             assert!(

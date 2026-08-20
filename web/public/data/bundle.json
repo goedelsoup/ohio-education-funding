@@ -1,5 +1,5 @@
 {
-  "contract_version": "35.0.0",
+  "contract_version": "36.0.0",
   "provenance": "Ohio DEW TRAD State Foundation Funding Calculator (a projection, not an actual) joined with the District Profile Report, the Department of Taxation's Table SD-1, and the Ohio School Report Card on IRN across the 606 districts every panel covers. Enrolled ADM spans three years, of which the last is partly departmental estimate. Each block states the year it is measured in beside its own figures; see .yidam/catalog/ for what each source can be trusted for.",
   "fiscal_year": 2027,
   "series_years": [
@@ -52,6 +52,21 @@
     {"label": "minimum state share 15%", "policy": {"guarantee": "as-enacted", "guarantee_argument": 0, "base_cost_scale": 1, "minimum_state_share": 0.15, "phase_in_base_cost": 1, "phase_in_categorical": 1}, "cost": 63361248.1159, "realized_aid": 7344588839.7659, "gainers": 53, "losers": 0, "unmoved": 556, "on_guarantee": 272, "held_throughout": 272, "lifted_off": 22, "pushed_on": 0},
     {"label": "base cost +10%, guarantee removed", "policy": {"guarantee": "removed", "guarantee_argument": 0, "base_cost_scale": 1.1, "minimum_state_share": 0.1, "phase_in_base_cost": 1, "phase_in_categorical": 1}, "cost": 59460336.1799, "realized_aid": 7340687927.8299, "gainers": 405, "losers": 204, "unmoved": 0, "on_guarantee": 0, "held_throughout": 0, "lifted_off": 294, "pushed_on": 0},
     {"label": "phase-in 50% base cost, 0% categorical", "policy": {"guarantee": "as-enacted", "guarantee_argument": 0, "base_cost_scale": 1, "minimum_state_share": 0.1, "phase_in_base_cost": 0.5, "phase_in_categorical": 0}, "cost": -3070399026.41, "realized_aid": 4210828565.24, "gainers": 0, "losers": 315, "unmoved": 294, "on_guarantee": 294, "held_throughout": 294, "lifted_off": 0, "pushed_on": 0}
+  ],
+  "drafts": [
+    {"slug": "fund-the-plan-and-retire-the-guarantee", "provisions": [
+      {"ordinal": 1, "title": "Base cost reference year: FY2022 to FY2024", "authority": "R.C. 3317.011", "parameter": "base-cost-per-pupil", "lever": "base-cost", "proposed": "1.0395", "note": "Same provision as the H.B. 96 counterfactual, so the two drafts share a lever value and differ in what surrounds it."},
+      {"ordinal": 2, "title": "Temporary transitional aid guarantee: half retired", "authority": "uncodified", "parameter": "guarantee-funding-base", "lever": "guarantee", "proposed": "phase-out:0.5", "note": "Closes half the gap between the FY2020 baseline and the formula amount. Interacts with provision 1: a higher formula amount lifts districts off the floor before the floor is lowered."},
+      {"ordinal": 3, "title": "Special education category weights raised 8 percent", "authority": "R.C. 3317.014", "parameter": "", "lever": "", "proposed": "each weight times 1.08", "note": "No lever expresses a categorical weight. Adding one costs a field on Policy, a checkpoint in bundle, and a mirrored implementation in web/src/lib/policy.ts, or verify.ts refuses to render the scenario page."},
+      {"ordinal": 4, "title": "Transportation reimbursement floor raised to 37.5 percent", "authority": "R.C. 3317.0212", "parameter": "", "lever": "", "proposed": "37.5 percent", "note": "Outside the model rather than unlevered. The panel carries no transportation series, so there is nothing for a lever to move."},
+      {"ordinal": 5, "title": "Resident district held harmless for scholarship deductions", "authority": "R.C. 3310.41", "parameter": "", "lever": "", "proposed": "held harmless", "note": "Outside the model. The deduct channel needs the per-agency participation series the deduction calculator was declared for and never got."}
+    ]},
+    {"slug": "hb-643-136-introduced", "provisions": [
+      {"ordinal": 1, "title": "EdChoice expansion eligibility capped at $500,000 federal AGI", "authority": "R.C. 3310.032", "parameter": "", "lever": "", "proposed": "families at or above $500,000 ineligible from 2026-2027, indexed to CPI", "note": "Outside the model. The scholarship channel is not carried at all: the 609 districts here are the traditional districts in the department's own calculator, and a change to who may receive a voucher moves nothing any lever reaches."}
+    ]},
+    {"slug": "hb-96-with-refreshed-inputs", "provisions": [
+      {"ordinal": 1, "title": "Base cost reference year: FY2022 to FY2024", "authority": "R.C. 3317.011", "parameter": "base-cost-per-pupil", "lever": "base-cost", "proposed": "1.0395", "note": "The uniform scale sized to the department's own $465.0M computed increase for a classroom-teacher refresh to FY2024."}
+    ]}
   ],
   "projection": {
     "base_year": 2026,

@@ -1,0 +1,151 @@
+class: draft-legislation
+label: Draft Legislation
+foundational_type:
+  ontology: ufo
+  type: kind
+description: |
+  A set of provisions that is not law: a bill before the General Assembly, an alternative
+  version of an act that did pass, or a change nobody has introduced at all. It is a Kind on
+  the same reading [model-policy](model-policy.ont.yml) is — a draft's identity is fixed at the
+  version it was read or authored at, and an amendment produces a new version rather than
+  changing what the old one said.
+
+  It is deliberately not the [legislation](legislation.ont.yml) class, and the argument is the
+  one that class already makes about itself. `legislation` is a Kind whose identity is fixed
+  *at enactment*: it carries a signing date, an effective date, a numbered General Assembly and
+  a line-item veto list. A draft has none of those and may never have any of them. Holding both
+  in one class would let a reader take a proposal for a statute, which is the specific error
+  this class exists to prevent — the same error, one document earlier in the process, that
+  `model-policy` was separated from `legislation` to stop.
+
+  **One class covers three kinds of draft, because the difference is provenance and not
+  identity.** A bill introduced in the 136th, a counterfactual rewrite of H.B. 96, and an
+  invented change are the same sort of object — provisions that would alter the funding system
+  and have not — and they enter the graph at the same places. `provenance` says which, and it
+  is the field that decides how every other one is read: `designation` and `general_assembly`
+  are facts for an introduced bill and empty for an invented one, while `question` is the
+  reason an invented one exists at all.
+
+  **What a node of this class may and may not claim.** It may state what its provisions would
+  do, because a provision is a stated change to a named parameter. It may state what the
+  calculators compute for the provisions they can run, because those runs are committed and
+  reproducible. It may **not** state a cost for the draft as a whole unless every provision
+  priced — see `unpriced`, which is mandatory rather than omitted when the answer is nothing,
+  because a class that could report a partial figure but had nowhere to record what it left out
+  would publish two thirds of a bill as its cost.
+
+  **A draft that passes does not become a `legislation` node.** A new node is written in that
+  class and this one gains an `enacted-as` edge to it. The draft is not edited, on the rule
+  `legislation/ACTIONS.md` already states for amendment: the earlier node stands as it was.
+properties:
+  - name: provenance
+    type: string
+    description: >-
+      Which kind of draft this is, and therefore how the rest of the fields read: `introduced` —
+      a real bill before the General Assembly, whose text exists and moves as it is amended;
+      `counterfactual` — an alternative version of an enactment that did pass, where the act is
+      real and the variant is not; `hypothetical` — a change nobody has introduced, authored to
+      test a question.
+  - name: designation
+    type: string
+    description: >-
+      Bill designation where the draft has one. Empty for a hypothetical draft, and for a
+      counterfactual it names the act being rewritten rather than claiming a number of its own.
+  - name: general_assembly
+    type: string
+    description: Numbered General Assembly the bill is before, where it is before one
+  - name: sponsors
+    type: text
+    description: Who introduced it, and any joint sponsors. `[unentered]` where it was not introduced
+  - name: status
+    type: text
+    description: >-
+      Where the draft stands — introduced, reported out of committee, passed one chamber, died
+      with the session, or never introduced. The field that stops a reader taking a proposal for
+      a statute on a page that otherwise looks like one.
+  - name: text_read
+    type: text
+    description: >-
+      Which version of the text this node was written from, and the digest pinning the bytes.
+      Load-bearing here in a way it is not for an enacted act: a pending bill's text moves under
+      its own URL as it is amended, so "the bill says" without a version names a moving target.
+  - name: question
+    type: text
+    description: >-
+      What the draft is constructed to test. For a hypothetical or counterfactual draft this is
+      the reason it exists; for an introduced bill it is what reading it is expected to settle.
+  - name: provisions
+    type: text
+    description: >-
+      Each provision: what it does, the Revised Code section it would amend or `uncodified`, the
+      parameter it binds, the baseline value and the proposed one, and whether the calculators
+      can run it. The unit of this class — a bill is a list of these and a scenario is a subset
+      of them, so this is where the prose meets the simulation.
+  - name: unpriced
+    type: text
+    description: >-
+      The provisions the calculators cannot run, and what each would need before they could.
+      Mandatory on every node in the class, including the ones where the answer is none. A cost
+      cannot be stated without the count of provisions it fails to price, on exactly the ground
+      `scenario-delta` refuses a total without the count of districts it fails to reach.
+# `edges:` below names the relationships this class is *defined by* — the ones a reader needs to
+# understand what it connects to. It is not the permitted set. Measured across the corpus, 46 of
+# the 90 relationships in use are undeclared, and almost all of them are single-use precise verbs
+# (`recovered-funds-from`, `retreats-from`, `reframes`) that say something a generic edge would
+# lose. Closing the vocabulary would either reject a third of the graph's edges or bloat every
+# ontology with declarations that each describe one link.
+#
+# Set this to `exhaustive` on a class whose vocabulary is deliberately closed, and the validator
+# will reject anything undeclared on it instead of reporting it.
+edge_policy: characteristic
+edges:
+  - relationship: perturbs
+    target: parameter
+    direction: out
+    description: >-
+      A parameter one of this draft's provisions would change. The same verb `scenario` uses,
+      deliberately: a provision and a perturbation are the same act described in two vocabularies,
+      and giving them different verbs would hide that the draft is what the run is of.
+  - relationship: simulated-by
+    target: scenario
+    direction: out
+    description: >-
+      A run that prices some or all of this draft's provisions. Plural in practice — a bill needs
+      one run per provision to attribute and one combined run for its total, because the levers
+      interact and the per-provision figures do not sum to it.
+  - relationship: amends
+    target: legislation
+    direction: out
+    description: An enactment this draft would change
+  - relationship: redrafts
+    target: legislation
+    direction: out
+    description: >-
+      The act a counterfactual draft is an alternative version of. Distinct from `amends`: an
+      amending bill changes a statute that stands, while a redraft asks what the same act would
+      have done had it chosen otherwise, and only one of those is a thing anyone could introduce.
+  - relationship: baselines-on
+    target: funding-regime
+    direction: out
+    description: The regime the draft's provisions are a change against
+  - relationship: enacted-as
+    target: legislation
+    direction: out
+    description: >-
+      The act this draft became, where it passed. Added to the draft rather than replacing it,
+      so that what was introduced and what was enacted stay separately readable.
+  - relationship: creates
+    target: program
+    direction: out
+    description: A program the draft would establish
+  - relationship: constrains
+    target: revenue-stream
+    direction: out
+    description: A revenue channel the draft would limit, freeze, or redirect
+  - relationship: parallels
+    target: model-policy
+    direction: out
+    description: >-
+      A published template the draft's provisions resemble. The verb is borrowed from
+      `model-policy` with its caution attached: a resemblance between two texts is all that is
+      established, and adoption needs drafting history no source here carries.
