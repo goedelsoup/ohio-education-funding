@@ -1,0 +1,86 @@
+id: the-channel-with-no-line
+summary: >-
+  A twenty-first connector, tax-casino, retrieving the per-district casino distribution — which
+  converts casino-tax-distribution's open magnitude question from a promise into a measurement,
+  and its null result from honest into conclusive.
+context: |
+  `casino-tax-distribution` has carried one open item through four phases. The constitution
+  earmarks 34% of the gross casino revenue tax for a county student fund that reaches every
+  district, and the substitution critique of earmarked gambling revenue asks whether the General
+  Assembly simply set foundation aid lower because the money exists.
+
+  The appropriation history was retrieved and did not settle it. In constant FY2025 dollars the
+  enacted foundation aid appropriation moves by a **median of $236 million a year**, so a
+  substitution smaller than that is arithmetically inside the year's other reasons for moving.
+  The node then named exactly what would settle it: the casino distribution's own size, "to
+  establish whether the channel is even of a magnitude the total could register" — and recorded
+  that both publishers, `tax.ohio.gov` and `casinocontrol.ohio.gov`, return 404 at their document
+  root to a self-identifying agent.
+
+  That last sentence was true and was not a reason. `tax.ohio.gov` serves its pages to a browser,
+  and the casino page links every document under `/static/`, which resolves to
+  `dam.assets.ohio.gov/raw/upload/tax.ohio.gov/…`. That is the route `tax-abstract` has used since
+  it was wired and `dot-sd1-school-district-taxes.md` wrote down — for a different division of the
+  same department. The channel was declared unreachable for two phases behind a mapping this
+  repository had already documented.
+
+  What is there: eighteen half-yearly per-district distributions, **August 2015 through January
+  2024**, in sixteen workbooks. Nine complete state fiscal years. Between 979 and 1,044 districts
+  each, keyed by (county, IRN) because a district is paid out of every county its students live in.
+decision: |
+  Declare `tax-casino` as a twenty-first connector, `Wired` with a recorded remainder, feeding
+  `revenue-stream`, `education-agency` and `metric`; build
+  `crates/dispersion/fixtures/casino-district-distributions.csv` from it, one row per district per
+  distribution; and read it through `dispersion::casino`.
+
+  A second connector on a publisher already in the registry, for the reason `ohio-bills` was a
+  third on a publisher already there. `tax-abstract` retrieves what a district **may levy**; this
+  retrieves what the state **hands it** outside any formula. Different division, different
+  directory, different remainder, and folding them together would give one connector two blockers
+  and one status that could describe neither.
+
+  The grain is the payment and not the year. Money moves twice a year and the halves are not
+  interchangeable: January–June 2020 came to $24.6m against a $42.9m floor across the other
+  seventeen half-years, and an annual figure averages the closure away.
+consequences: |
+  **The open item closes, negatively and conclusively.** At $114.2m in FY2024, its largest year,
+  the whole channel is under half the $236m median annual movement in foundation aid. The null
+  result stops being "we could not see it" and becomes "it is not visible at this size, and no
+  longer series will change that." That is the one thing the record said was missing.
+
+  **And it lands the node's own thesis exactly.** The lottery's substitution was legible in a
+  $97.6m movement — *smaller* than this channel's largest year — because Fund 7017 is itemized
+  inside the appropriation table. Casino money never enters the table, so the only test is
+  inference from a total whose noise is twice the size of the thing being looked for.
+  Detectability follows from itemization, not from magnitude, and the two channels now demonstrate
+  that at comparable sizes rather than asserting it.
+
+  **A new remainder, which is a publisher's silence rather than a gap.** Nothing after January 2024
+  exists on the department's page in any category, and the distributions before August 2015 are
+  PDFs. `still_blocked` says both, so a refresh that finds nothing is not read as a failure.
+
+  A twenty-first connector also means the approval list grows again. It is derived from these
+  records precisely so that growth is deliberate, and a connector appearing in the registry without
+  one keeps failing the test that first caught it.
+alternatives: |
+  **Leave issue #12 closed as a null result.** Rejected: "no offset is visible" and "no offset
+  could be visible" are different claims, and the node was carrying the first while wanting the
+  second. Without the magnitude the reader cannot tell whether the appropriation series failed to
+  find something or was never capable of finding it.
+
+  **Fold the sources into `tax-abstract`.** Rejected, above.
+
+  **Key the fixture on (county, IRN).** Rejected: 48,000 rows to carry a fact that a count carries.
+  `counties` keeps the apportionment visible — 1 for 294 districts and 88 for three e-schools — and
+  makes it assertable, without a panel five times the size in which no calculator is interested.
+
+  **Carry the revenue half-year as a column.** Rejected: it is a statutory consequence of the
+  payment month, and a derived column in a fixture is a place for two things to disagree. It is
+  derived in `dispersion::casino` and checked at build time against the fifteen sheets that print
+  it — a rule checked eighteen times a rebuild is not an assumption.
+
+  **Reach for the Internet Archive first, as the record suggested.** Unnecessary, and it would
+  have cost the finding that matters most about the end of the series. What establishes that the
+  series stops in January 2024 is the *live* page carrying nothing later in any category — an
+  archived copy of a page dated earlier could not have said that, and one dated later would still
+  leave the question of what had been removed since.

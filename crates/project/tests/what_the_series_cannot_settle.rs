@@ -25,6 +25,19 @@
 //! twice the movement that was readable in the lottery's case.
 //!
 //! Detectability follows from whether an earmark has a line, not from how large it is.
+//!
+//! # And the channel itself is now measured, which is what makes the null result conclusive
+//!
+//! When this file was written the comparison had one side. The size of the casino channel was
+//! unknown — the node said establishing it was what would settle whether the total could register
+//! the money at all — so "smaller than the noise floor" was an inference from the shape of the
+//! problem rather than a measurement.
+//!
+//! `tax-casino` retrieves it: eighteen half-yearly per-district distributions, nine complete
+//! fiscal years, FY2016 through FY2024. The largest is **$114.2 million**. That is under half the
+//! noise floor, and it is *larger* than the lottery movement that was legible — so the two
+//! channels are now compared at their real sizes rather than at an assumed one, and they still
+//! differ only in whether the money has a line.
 
 use std::collections::BTreeMap;
 
@@ -158,4 +171,72 @@ fn the_lottery_movement_would_have_been_invisible_by_this_test() {
         "the lottery movement of ${LOTTERY_MOVEMENT:.0} now exceeds the ${median:.0} noise floor, \
          which breaks the argument that itemisation rather than size is what made it legible"
     );
+}
+
+#[test]
+fn the_whole_channel_is_smaller_than_the_floor_in_every_year_it_has() {
+    /*
+     * The measurement the node had been promising for four phases. Not "the substitution is
+     * smaller than the noise" — the *entire channel* is, in each of the nine years there is a
+     * figure for. A substitution can be at most the whole of it, so no arrangement of the money
+     * produces a movement this series could distinguish.
+     */
+    let mut magnitudes: Vec<f64> = movements().into_iter().map(|(_, m)| m.abs()).collect();
+    magnitudes.sort_by(|a, b| a.partial_cmp(b).expect("finite"));
+    let median = magnitudes[magnitudes.len() / 2];
+
+    let years = dispersion::casino::by_fiscal_year();
+    assert_eq!(years.len(), 9, "the panel is nine complete fiscal years");
+    let largest = years.values().copied().fold(f64::MIN, f64::max);
+    assert!(
+        largest < median / 2.0,
+        "the channel's largest year is ${largest:.0} against a ${median:.0} floor, which is no          longer the comfortable margin the node's conclusion rests on"
+    );
+}
+
+#[test]
+fn the_channel_is_larger_than_the_lottery_movement_that_was_legible() {
+    /*
+     * The whole finding in one comparison, and it only exists now that both sides are measured.
+     *
+     * The lottery's substitution was readable at $97,638,202 because Fund 7017 is itemized inside
+     * the appropriation table. The casino channel is *bigger* than that in its last three fiscal
+     * years and is invisible, because it enters no table. Size is not what separates them.
+     */
+    const LOTTERY_MOVEMENT: f64 = 97_638_202.0;
+
+    let years = dispersion::casino::by_fiscal_year();
+    let above: Vec<u16> = years
+        .iter()
+        .filter(|(_, total)| **total > LOTTERY_MOVEMENT)
+        .map(|(year, _)| *year)
+        .collect();
+    assert_eq!(
+        above,
+        vec![2022, 2023, 2024],
+        "which years exceed the legible lottery movement has changed"
+    );
+}
+
+#[test]
+fn the_per_district_series_does_not_reach_the_years_the_channel_began() {
+    /*
+     * The limit of what the new source adds, stated so it is not quietly overclaimed.
+     *
+     * `nothing_distinguishable_happens_when_the_channel_comes_online` looks at FY2012 and FY2013.
+     * The per-district series starts in FY2016, because the distributions before August 2015 were
+     * published as PDFs. So the onset years are still argued from magnitude — the channel was
+     * *smaller* then, and the FY2016 figure bounds it — rather than measured directly.
+     */
+    let years = dispersion::casino::by_fiscal_year();
+    let first = *years.keys().next().expect("nine years");
+    assert_eq!(first, 2016);
+    assert!(
+        first > 2013,
+        "the series now reaches the onset; the argument there can be a measurement instead"
+    );
+    // What bounds the onset years: the earliest half-years are the smallest in the series apart
+    // from the closure, and every one of them is far inside the floor.
+    let earliest = years[&2016];
+    assert!(earliest < 100_000_000.0, "FY2016 came to ${earliest:.0}");
 }

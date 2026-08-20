@@ -31,6 +31,7 @@
 
 #![forbid(unsafe_code)]
 
+pub mod casino;
 pub mod identified;
 pub mod lea_directory;
 pub mod mr81;

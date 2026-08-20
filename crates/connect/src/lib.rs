@@ -435,6 +435,80 @@ pub fn rebuild(root: &Path) -> Result<Vec<Rebuilt>, RebuildError> {
         },
     });
 
+    // The casino distribution, eighteen half-years of it. See `build_casino_extract` for what the
+    // sheets are made to prove about themselves, and `crates/connect/sources/tax-casino.md` for
+    // why a channel of this size was invisible until it was retrieved.
+    //
+    // Two things about this list are load-bearing. August 2015 is published twice, and the county
+    // layout is named first so the panel keeps its county counts and the statewide sheet that
+    // follows is checked against it rather than replacing it. And every report the department
+    // generates for this is called `RP_MAIN_PG1` with a suffix that changed twice and means
+    // nothing, so the sheet is found by prefix; the combined FY2016-FY2017 workbook names its four
+    // sheets after the months instead, which is why it is spelled out.
+    /// A distribution's key, a label to name it by when a check fails, and its rows.
+    type CasinoRead = (String, String, Vec<Vec<String>>);
+    let casino_sheets: Result<Vec<CasinoRead>, RebuildError> = [
+        ("casino-2015-08", "2015-08", "RP_MAIN_PG1"),
+        ("casino-fy2016-fy2017", "2015-08", "August 2015"),
+        ("casino-fy2016-fy2017", "2016-01", "January 2016"),
+        ("casino-fy2016-fy2017", "2016-08", "August 2016"),
+        ("casino-fy2016-fy2017", "2017-01", "January 2017"),
+        ("casino-2017-08", "2017-08", "RP_MAIN_PG1"),
+        ("casino-2018-01", "2018-01", "RP_MAIN_PG1"),
+        ("casino-2018-08", "2018-08", "RP_MAIN_PG1"),
+        ("casino-2019-01", "2019-01", "RP_MAIN_PG1"),
+        ("casino-2019-08", "2019-08", "RP_MAIN_PG1"),
+        ("casino-2020-01", "2020-01", "RP_MAIN_PG1"),
+        ("casino-2020-08", "2020-08", "RP_MAIN_PG1"),
+        ("casino-2021-01", "2021-01", "RP_MAIN_PG1"),
+        ("casino-2021-08", "2021-08", "RP_MAIN_PG1"),
+        ("casino-2022-01", "2022-01", "RP_MAIN_PG1"),
+        ("casino-2022-08", "2022-08", "RP_MAIN_PG1"),
+        ("casino-2023-01", "2023-01", "RP_MAIN_PG1"),
+        ("casino-2023-08", "2023-08", "RP_MAIN_PG1"),
+        ("casino-2024-01", "2024-01", "RP_MAIN_PG1"),
+    ]
+    .into_iter()
+    .map(|(key, distribution, prefix)| {
+        let book = open_workbook(root, source(key).expect("registered").1)?;
+        Ok((
+            distribution.to_string(),
+            format!("{key} `{prefix}`"),
+            sheet_by_prefix(&book, prefix)?,
+        ))
+    })
+    .collect();
+    out.push(match casino_sheets {
+        Ok(read) => {
+            let sheets: Vec<fixtures::CasinoSheet<'_>> = read
+                .iter()
+                .map(|(distribution, label, rows)| fixtures::CasinoSheet {
+                    distribution,
+                    label,
+                    rows,
+                })
+                .collect();
+            match fixtures::build_casino_extract(&sheets) {
+                Ok(panel) => Rebuilt::Written {
+                    path: fixtures::CASINO_FIXTURE.to_string(),
+                    rows: fixtures::write_csv(
+                        &root.join(fixtures::CASINO_FIXTURE),
+                        fixtures::CASINO_HEADER,
+                        &panel,
+                    )?,
+                },
+                Err(cause) => Rebuilt::Skipped {
+                    path: fixtures::CASINO_FIXTURE.to_string(),
+                    reason: cause,
+                },
+            }
+        }
+        Err(cause) => Rebuilt::Skipped {
+            path: fixtures::CASINO_FIXTURE.to_string(),
+            reason: cause.to_string(),
+        },
+    });
+
     // The Revised Code. Skipped rather than fatal when a section is not cached, for the same
     // reason as F-33 below: it feeds prose and verification, and an absent copy should cost those
     // rather than the whole rebuild.

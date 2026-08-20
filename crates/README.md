@@ -150,19 +150,19 @@ Fields per crate: name, capability type (connector/calculator/feature-engineerin
 | Crate | Description | `#[test]` fns |
 |---|---|--:|
 | [`bundle`](bundle/) | Export a versioned JSON feed of the corpus's district-level findings for the web layer | 37 |
-| [`connect`](connect/) | Retrieval and extraction: the department's publications into committed fixtures | 104 |
+| [`connect`](connect/) | Retrieval and extraction: the department's publications into committed fixtures | 112 |
 | [`deflate`](deflate/) | Convert nominal Ohio school finance figures to constant dollars, fiscal-year aligned | 17 |
-| [`dispersion`](dispersion/) | School finance equity statistics: dispersion and wealth neutrality across agencies | 138 |
+| [`dispersion`](dispersion/) | School finance equity statistics: dispersion and wealth neutrality across agencies | 149 |
 | [`edfund-core`](edfund-core/) | Shared domain types for the Ohio education funding computer | 7 |
 | [`foundation`](foundation/) | Fair School Funding Plan base cost build-up, per R.C. 3317.011 | 45 |
 | [`local-capacity`](local-capacity/) | Fair School Funding Plan local capacity and state share, per R.C. 3317.017 | 21 |
 | [`millage`](millage/) | Effective operating millage under H.B. 920 reduction factors, and 20-mill floor status | 19 |
-| [`project`](project/) | Forward projection of funding inputs, and policy simulation over them | 255 |
+| [`project`](project/) | Forward projection of funding inputs, and policy simulation over them | 258 |
 | [`regime-diff`](regime-diff/) | Difference two funding regimes at component level, with the residual the decomposition does not explain | 36 |
 | [`scenario-delta`](scenario-delta/) | Winners and losers between two funding runs, with incidence and the off-formula count | 25 |
 | [`spreadsheet`](spreadsheet/) | Read the department's published workbooks with no dependencies | 70 |
 
-12 crates, 774 test functions, no crates.io dependencies. `cargo test` reports a different total: it adds doc-tests and counts each integration binary separately.
+12 crates, 796 test functions, no crates.io dependencies. `cargo test` reports a different total: it adds doc-tests and counts each integration binary separately.
 <!-- /REGEN -->
 
 ## Index status

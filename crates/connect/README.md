@@ -37,6 +37,7 @@ Fields per connector: key, status, source count, corpus classes fed; then every 
 | [`bls-cpi`](sources/bls-cpi.md) | **wired** | 1 | metric, fiscal-period |
 | `dew-five-year-forecast` | **wired** | 2 | education-agency, revenue-stream, metric, fiscal-period |
 | [`tax-abstract`](sources/tax-abstract.md) | **wired** | 4 | revenue-stream, parameter, metric |
+| [`tax-casino`](sources/tax-casino.md) | **wired**, in part | 16 | revenue-stream, education-agency, metric |
 | [`dew-payment-reports`](sources/dew-payment-reports.md) | declared | 0 | program, education-agency, revenue-stream |
 | `dew-scholarship-reports` | **wired**, in part | 1 | program |
 | `lsc-catalog` | **wired**, in part | 18 | fiscal-period, program, legislation, parameter |
@@ -53,10 +54,11 @@ Fields per connector: key, status, source count, corpus classes fed; then every 
 | `dew-child-nutrition` | **wired**, in part | 23 | education-agency, metric, formula-component |
 | `dew-school-improvement` | **wired**, in part | 3 | school, education-agency, accountability-regime |
 
-20 connectors, 181 sources between them. 17 are wired and 3 are not; 9 of the wired ones reach only part of what they feed, and say so below.
+21 connectors, 197 sources between them. 18 are wired and 3 are not; 10 of the wired ones reach only part of what they feed, and say so below.
 
 **What is blocked, in the registry's own words.**
 
+- `tax-casino` — still blocked on: wired for every per-district distribution the department publishes as a workbook — eighteen of them, the August 2015 distribution through the January 2024 one. It stops there because the department's own casino page stops there, and the distributions before it have no machine-readable twin: January 2015 and earlier are `Final SD Distribution` PDFs
 - `dew-payment-reports` — blocked on: the deduct-era reports (1999-2021) are behind OH|ID authentication on the department's reports portal; the current-era ones are open and indexed but post-date the deduction entirely
 - `dew-scholarship-reports` — still blocked on: wired for the statewide and program-level aggregates, which is what the department publishes openly. Per-district participation is a different file and is not here: the annual report cites two routes for it and both 404, so the breakdown was published, is still referenced by a current departmental document, and has been withdrawn. See `dew-payment-reports` for the deduct-era half of the same gap
 - `lsc-catalog` — still blocked on: wired for the education volume of every edition that has one — 2006 and 2008 through 2025, eighteen distinct documents — the 2012 URL serves the 2011 file byte for byte, and 2007 has no edition at all. The Catalog is a standing reference restated each edition rather than a record of what one act appropriated, so it does not replace `lsc-budget`'s greenbooks and is not a substitute for the session laws before FY2002

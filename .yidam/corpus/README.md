@@ -66,8 +66,14 @@ the file.
 
 **Four checks run at build time and report rather than stop.** A `summary` that is its own
 description cut; a `description` over 400 words, or carrying a shouted lead, or referring to the
-corpus rather than to Ohio. `pnpm corpus:report` lists them; the count is the migration's
-remaining backlog and `web/tests/unit/schema.spec.ts` pins it so it can only shrink.
+corpus rather than to Ohio. `pnpm corpus:report` lists them.
+
+**The count is zero, and it is asserted as a zero rather than as a ceiling.** While the genre
+migration was staged the pin in `web/tests/unit/schema.spec.ts` was an upper bound that only moved
+down — 118 nodes, then 105, 100, 96, 92, 72, 38, 20. Every node has been through it now, so a
+ratchet is the wrong shape: there is nothing left to shrink, and a bound of 20 would quietly permit
+twenty new defects. The failure the pin exists to catch is a finding folded back into a
+`description`, and that is a change from zero.
 
 ## `[unentered]` — a fourth mark, and why it is not a fourth confidence level
 
@@ -112,26 +118,26 @@ Fields: count per claim tag across every node; then the unresolved marks by the 
 -->
 | Tag | Count | What it records |
 |---|--:|---|
-| `[verified]` | 863 | supported by a committed primary source |
+| `[verified]` | 869 | supported by a committed primary source |
 | `[inference]` | 240 | drawn from verified facts, not witnessed |
-| `[open]` | 189 | a live question — unknown, contested, or being worked |
-| `[unentered]` | 39 | a knowable value nobody has typed in yet |
+| `[open]` | 190 | a live question — unknown, contested, or being worked |
+| `[unentered]` | 38 | a knowable value nobody has typed in yet |
 
-228 unresolved marks in total, 189 of them live questions and 39 of them empty fields. Before the two were distinguished the corpus reported the sum as its count of what it does not know, which overstated it by 17%.
+228 unresolved marks in total, 190 of them live questions and 38 of them empty fields. Before the two were distinguished the corpus reported the sum as its count of what it does not know, which overstated it by 16%.
 
 | Field | `[open]` | `[unentered]` |
 |---|--:|--:|
 | `description` | 55 | 3 |
-| `findings` | 47 | 1 |
+| `findings` | 48 | 1 |
 | `series` | 12 | 0 |
 | `vetoes` | 7 | 1 |
 | `established` | 0 | 7 |
 | `typology` | 1 | 5 |
 | `statutory_basis` | 6 | 0 |
-| `series_path` | 0 | 5 |
 | `roles` | 4 | 1 |
 | `mechanism` | 5 | 0 |
 | `amount` | 5 | 0 |
+| `series_path` | 0 | 4 |
 | `eligibility` | 4 | 0 |
 | `sponsors` | 1 | 2 |
 | `restriction` | 3 | 0 |
@@ -165,7 +171,7 @@ Fields: count per claim tag across every node; then the unresolved marks by the 
 | `context` | 1 | 0 |
 | `appropriating_bill` | 1 | 0 |
 
-**35 recorded withdrawals across 20 nodes.** A claim the corpus published and no longer stands behind is kept in a `revisions:` block rather than edited out, with the test or source that settled it — see [`the-four-genres-of-a-description`](../decisions/the-four-genres-of-a-description.yml). Counted here for the same reason the tags above are: how often this corpus has corrected itself is a fact about it, and one nobody would think to update by hand.
+**36 recorded withdrawals across 20 nodes.** A claim the corpus published and no longer stands behind is kept in a `revisions:` block rather than edited out, with the test or source that settled it — see [`the-four-genres-of-a-description`](../decisions/the-four-genres-of-a-description.yml). Counted here for the same reason the tags above are: how often this corpus has corrected itself is a fact about it, and one nobody would think to update by hand.
 <!-- /REGEN -->
 
 ## Node index

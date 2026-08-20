@@ -44,8 +44,9 @@ Sorted by: type, then slug.
 | [`dew-report-card-value-added`](dew-report-card-value-added.md) | Ohio School Report Cards — District Value-Added Details | 1 |
 | [`dew-scholarship-annual-report`](dew-scholarship-annual-report.md) | Scholarship Annual Report — the department's own account of the channel | 0 |
 | [`dew-sfpr-line-by-line`](dew-sfpr-line-by-line.md) | School Finance Payment Report — Line by Line Explanation | 6 |
+| [`dot-casino-student-distribution`](dot-casino-student-distribution.md) | County Student Distribution — gross casino revenue county student fund | 1 |
 | [`dot-reappraisal-calendar`](dot-reappraisal-calendar.md) | Ohio's sexennial reappraisal and triennial update calendar | 1 |
-| [`dot-sd1-school-district-taxes`](dot-sd1-school-district-taxes.md) | Table SD-1 — School district taxable value and taxes charged | 1 |
+| [`dot-sd1-school-district-taxes`](dot-sd1-school-district-taxes.md) | Table SD-1 — School district taxable value and taxes charged | 2 |
 | [`fordham-base-cost-critique`](fordham-base-cost-critique.md) | Fordham Institute — Ohio Base Cost Model Commentary | 2 |
 | [`heritage-education-freedom-report-card`](heritage-education-freedom-report-card.md) | Heritage Foundation — Education Freedom Report Card (2023, 2nd edition) | 1 |
 | [`lsc-appropriation-spreadsheet`](lsc-appropriation-spreadsheet.md) | LSC appropriation spreadsheet | 0 |
@@ -63,7 +64,7 @@ Sorted by: type, then slug.
 | [`ohio-revised-code`](ohio-revised-code.md) | Ohio Revised Code — the sections this corpus cites | 4 |
 | [`ohio-session-laws`](ohio-session-laws.md) | Ohio session laws — the appropriation acts themselves | 2 |
 
-40 entries, 2 not yet cited by any corpus node. 181 retrieved files are pinned by SHA-256 in [`crates/connect/source-digests.txt`](../../crates/connect/source-digests.txt).
+41 entries, 2 not yet cited by any corpus node. 197 retrieved files are pinned by SHA-256 in [`crates/connect/source-digests.txt`](../../crates/connect/source-digests.txt).
 <!-- /REGEN -->
 
 ## Adding a source
