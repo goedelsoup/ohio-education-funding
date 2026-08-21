@@ -566,8 +566,19 @@ output { font-variant-numeric: tabular-nums; color: var(--text-primary); font-we
 .conditions li { color: var(--text-secondary); font-size: .86rem; border-left: 2px solid var(--border); padding-left: .7rem; }
 .conditions strong { color: var(--text-primary); font-weight: 600; }
 
-.note { color: var(--text-secondary); font-size: .86rem; margin: .9rem 0 0; }
-.note code { background: var(--surface-2); padding: .1rem .3rem; border-radius: 4px; }
+/* Qualification at paragraph scale — beside the figure it qualifies, never a footnote and never
+   "see methodology". The phrase scale is `.caveat-inline`; the card scale is `.card.caveat`. */
+.note {
+  color: var(--text-secondary);
+  font-size: var(--text-base);
+  margin: var(--space-5) 0 0;
+  max-width: var(--measure-note);
+}
+.note code {
+  background: var(--surface-inset);
+  padding: .1rem .3rem;
+  border-radius: var(--radius-sm);
+}
 .err { color: var(--series-guarantee); }
 .gain { color: var(--series-formula); }
 .loss { color: var(--series-guarantee); }
@@ -790,40 +801,76 @@ h1.slug-title {
 }
 
 /*
- * Claim tags. The corpus marks every substantive assertion with its epistemic status, and that
- * discipline is the reason it is worth reading — so the badge is legible rather than decorative.
+ * Epistemic status, at sentence level. From the design system's `patterns/claims.css`.
  *
- * Colour alone never carries the distinction: each badge spells its own status. Verified and open
- * are the two that matter most to tell apart, and they are also the two furthest apart in weight.
+ * # The marks lost their boxes, and that is the refinement
+ *
+ * These appear mid-paragraph, several per sentence. A bordered, filled, uppercase pill repeated
+ * four times in one sentence turns body copy into a field of badges, and a field of badges does
+ * not get read — which defeats the discipline the marks exist to serve. Density is the adversary,
+ * not legibility.
+ *
+ * So the mark has no box. It is a small uppercase run in a status colour with a 1px rule under it,
+ * and the rule's STYLE is the second channel:
+ *
+ *   verified   solid rule    directly sourced
+ *   inference  dashed rule   derived from sourced facts
+ *   open       dotted rule   a question asked and not answered
+ *
+ * Solid, dashed, dotted is an ordered sequence a reader reads without a legend, it survives
+ * greyscale and print, and it means colour is never the only channel. Each mark also spells its
+ * own status in words, which is the third.
+ *
+ * # Two things that changed with it
+ *
+ * `inference` had no rule of its own and fell through to the base grey, so two of the three marks
+ * were distinguished and one was merely not-the-others. It has a colour and a rule style now.
+ *
+ * The marks wear `--claim-*` rather than `--series-*`. A series colour names formula aid or
+ * guarantee; spending one on an epistemic mark made every verified claim in a sentence the same
+ * blue as a data series, which is a collision this stylesheet otherwise works hard to avoid.
+ *
+ * # There is no fourth
+ *
+ * `.claim.unentered` used to sit here, dashed and unsaturated, trying to be off the support axis
+ * while still being inline on it. That mark is gone: an empty field is carried as `unfilled:`
+ * structure on the node and rendered as a block. `prose.ts` no longer emits the class, and
+ * `prose.spec.ts` fails if it starts again — so a rule for it here would match nothing.
  */
 .claim {
   display: inline;
-  font-size: .74em;
+  font-size: .68em;
   font-weight: 600;
   text-transform: uppercase;
-  letter-spacing: .04em;
-  padding: .05em .4em;
-  border-radius: 4px;
-  border: 1px solid var(--border);
-  background: var(--surface-2);
-  color: var(--text-muted);
+  letter-spacing: .06em;
   white-space: nowrap;
+  /* Rides the baseline of the sentence it qualifies. A raised mark reads as a footnote reference,
+     which is exactly what it is not: these are part of the claim, not a pointer away from it. */
+  padding-bottom: .08em;
+  border-bottom: 1px solid currentColor;
 }
-.claim.verified { color: var(--series-formula); border-color: color-mix(in srgb, var(--series-formula) 35%, transparent); }
-.claim.open { color: var(--series-guarantee); border-color: color-mix(in srgb, var(--series-guarantee) 35%, transparent); }
-/* The fourth mark, and deliberately not on the same scale as the other three. `unentered` says a
-   field is empty, not that a claim is weak — so it is dashed and unsaturated rather than placed
-   somewhere on the verified-to-open axis, where it would read as "worse than open". */
-.claim.unentered { border-style: dashed; color: var(--text-muted); background: none; }
-/* The justification, which is often a sentence. Kept out of the flow of the claim it qualifies
-   and shown on the badge itself, because inline it would dominate the sentence it belongs to. */
+.claim.verified { color: var(--claim-verified); border-bottom-style: solid; }
+.claim.inference { color: var(--claim-inference); border-bottom-style: dashed; }
+.claim.open { color: var(--claim-open); border-bottom-style: dotted; }
+/*
+ * The justification, which is often a whole clause: "verified — the enrolled act".
+ *
+ * Set at annotation weight and NOT in the mark's colour, so a long justification does not drag a
+ * status hue across half a sentence. It follows the mark and reads as an aside to it.
+ */
 .claim-detail {
   font-weight: 400;
   text-transform: none;
   letter-spacing: 0;
+  font-size: .9em;
   color: var(--text-muted);
   white-space: normal;
 }
+/* Qualification at phrase scale: inline, parenthetical, inside the sentence it qualifies. The
+   paragraph and card scales are `.note` and `.card.caveat`. */
+.caveat-inline { font-size: .92em; color: var(--text-muted); }
+.caveat-inline::before { content: "("; }
+.caveat-inline::after { content: ")"; }
 
 /*
  * The corpus talking about itself rather than about Ohio — why a node was entered at all.
