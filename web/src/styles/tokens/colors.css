@@ -42,10 +42,10 @@
    * plots, where any class may sit beside any other, so every pair must separate rather than
    * merely adjacent ones.
    *
-   * Three and not five, measured rather than chosen: five steps of this single hue close to a
-   * normal-vision delta-E of 10.9, which is two classes a reader with full colour vision cannot
-   * tell apart. Three reach 21.4 light / 21.6 dark, and 20.8 / 20.2 under the worst CVD
-   * simulation.
+   * Three and not five. The figures that arrived with this file — 21.4 light, 21.6 dark, 20.8 /
+   * 20.2 under CVD — are not reproducible under any standard metric and have been replaced by
+   * measured ones: CIEDE2000 across normal vision and three dichromacies puts this ramp's worst
+   * pair at 15.0 light and 17.1 dark. See `web/tests/unit/palette.spec.ts`, which runs it.
    */
   --ordinal-1: #7fb0e8;
   --ordinal-2: #2a78d6;
@@ -54,15 +54,19 @@
   /*
    * The 5-step ordinal ramp: quintiles.
    *
-   * Five steps ARE affordable — but not as one hue, which is where the single-hue ramp above hits
-   * its ceiling. Lightness marches monotonically (~15 L* per step, so the order is visible in the
-   * colour) WHILE hue drifts across a 30-degree arc, and the two channels together carry
-   * separation that lightness alone cannot at this step count.
+   * The construction: lightness marches monotonically (~15 L* per step) WHILE hue drifts across a
+   * 30-degree arc, so two channels carry the separation that lightness alone cannot at this step
+   * count. That was the argument for five steps being affordable after all.
    *
-   * The licence is narrower than the 3-step ramp's, and the narrowness is the point:
-   * PERMITTED where position already encodes order — choropleths, sorted tables, quintile bars,
-   * stacked strips. FORBIDDEN in all-pairs forms; a scatter gets three classes and a shape
-   * channel, never five colours.
+   * **It does not survive measurement, and this ramp is used by nothing.** CIEDE2000 across normal
+   * vision and three dichromacies puts its worst pair at 10.9 light and 10.7 dark — which is the
+   * exact figure the 3-step ramp's comment above cites as its reason for refusing five steps. The
+   * worst pair is 1-2 in both modes and it is *adjacent*, which is the pair a reader compares most
+   * in the sorted table this ramp was licensed for. No four-step subset rescues it either: the best
+   * reaches 11.9 / 12.5 against the 3-step ramp's 15.0 / 17.1.
+   *
+   * Kept as tokens, unreferenced, and gated: `palette.spec.ts` fails if any source file starts
+   * using `--ord5-*`. A five-step ramp for this site has to be reconstructed rather than adjusted.
    */
   --ord5-1: #a8d5e2;
   --ord5-2: #6fb2d4;

@@ -73,12 +73,54 @@ That argument is sound and the corpus already agrees with it in prose: `.yidam/c
 says the mark "sits on a different axis" from the other three. Adopting it is a parser change plus a
 content migration, not a stylesheet edit. **Unresolved.**
 
-**2. The five-step ordinal ramp is designed, not measured.** The three-step ramp's separation figures
-came from this repository's own validation — ΔE 21.4 light, 21.6 dark, 20.8 under the worst CVD
-simulation. The five-step ramp's are the design's, and it says so plainly and asks for the same six
-checks across all ten pairs in both modes under protan, deutan and tritan simulation before it
-ships. Until that runs, `--ord5-*` is present in the tokens and used by nothing. **Unresolved, and
-runnable here.**
+**2. The five-step ordinal ramp — answered, and the answer is no.**
+
+The design asked for six checks across all ten pairs, both modes, under protan, deutan and tritan
+simulation, and said it would rather ship four measured steps than five designed ones. That has now
+run. `web/src/lib/plot/palette.ts` carries the arithmetic — sRGB to CIELAB, CIEDE2000, the Machado
+dichromacy matrices at severity 1.0, WCAG luminance — and `web/tests/unit/palette.spec.ts` runs it
+against the tokens themselves rather than against copied values.
+
+| CIEDE2000, worst over normal + three dichromacies | light | dark |
+| --- | --: | --: |
+| 3-step ramp | 15.0 | 17.1 |
+| 5-step ramp | **10.9** | **10.7** |
+
+**10.9 is the number this repository already cited as its reason for refusing five steps** — "two
+bands a reader with full colour vision cannot tell apart". The second channel the ramp added, a
+30-degree hue drift alongside the lightness march, did not buy the separation it was introduced to
+buy. The worst pair is 1–2 in both modes and it is *adjacent*, which is the pair a reader compares
+most in the sorted table and choropleth the ramp was licensed for. Its lightest step also sits at
+1.54:1 against its own surface, below the 2.2:1 the three-step ramp's end already treats as a
+warning that obligates a legend and a table.
+
+No four-step subset rescues it: dropping any single step reaches 11.9 light / 12.5 dark at best,
+still short of 15.0 / 17.1. **Re-spacing within these five values is not enough — a five-step ramp
+for this site has to be reconstructed rather than adjusted.**
+
+`--ord5-*` stays in the tokens, is referenced by nothing, and is gated: the test fails if any source
+file begins using it.
+
+### And the three-step ramp's own figures did not reproduce either
+
+The claim was ΔE 21.4 light / 21.6 dark. No standard metric produces it from the committed values:
+
+| | light | dark |
+| --- | --: | --: |
+| claimed | 21.4 | 21.6 |
+| CIE76 | 31.1 | 28.1 |
+| CIE94 | 23.0 | 25.5 |
+| CIEDE2000 | 17.9 | 19.0 |
+| OKLab ×100 | 18.1 | 21.6 |
+
+The contrast figure in the same comment — end steps at 2.2:1 — reproduces *exactly*, in both modes,
+which is what establishes that the colour values and the sRGB chain are both right. The
+disagreement is about the metric, not the colours.
+
+**The decision those figures supported still stands.** Three steps do separate better than five
+under every metric tested; that ordering never depended on the exact number. What did not exist was
+the arithmetic. It does now, and the comments that stated the old figures say so rather than having
+been quietly rewritten.
 
 A third item — font binaries — is settled rather than open. `--font-sans` and `--font-mono` name IBM
 Plex first and fall back to the platform stacks, which is what the site ships today at zero font
