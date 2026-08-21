@@ -206,7 +206,9 @@ pub fn capacity_rate(income_ratio: f64, benchmark_ratio: f64) -> Result<f64, Cap
     Ok(if income_ratio >= benchmark_ratio {
         RATE_AT_BENCHMARK
     } else if income_ratio > 1.0 {
-        ((income_ratio - 1.0) * 0.0025) / (benchmark_ratio - 1.0) + 0.0225
+        ((income_ratio - 1.0) * (RATE_AT_BENCHMARK - RATE_AT_STATE_MEDIAN))
+            / (benchmark_ratio - 1.0)
+            + RATE_AT_STATE_MEDIAN
     } else {
         income_ratio * RATE_AT_STATE_MEDIAN
     })
@@ -514,6 +516,41 @@ mod tests {
             state_share(0.0, 100.0, 10.0, MINIMUM_STATE_SHARE_FY2022),
             Err(CapacityError::NonPositiveAdm)
         );
+    }
+
+    /// The middle branch of the scale, which is the one the workspace never checked a value on.
+    ///
+    /// Every other test of `capacity_rate` exercised the floor, the cap, or continuity at the
+    /// two joins. Nothing asserted a rate strictly between them, so the *slope* of the
+    /// interpolation was free to be wrong.
+    #[test]
+    fn the_rate_interpolates_linearly_between_the_median_and_the_benchmark() {
+        let benchmark = 1.5;
+        let span = RATE_AT_BENCHMARK - RATE_AT_STATE_MEDIAN;
+
+        // Halfway from the state median to the benchmark is halfway up the rate span.
+        let midpoint = capacity_rate(1.25, benchmark).unwrap();
+        assert!(
+            (midpoint - (RATE_AT_STATE_MEDIAN + span / 2.0)).abs() < 1e-12,
+            "midpoint rate was {midpoint}"
+        );
+        assert!((midpoint - 0.023_75).abs() < 1e-12, "and in absolute terms, {midpoint}");
+
+        // A quarter and three quarters of the way, to pin linearity rather than one point.
+        for (fraction, ratio) in [(0.25, 1.125), (0.75, 1.375)] {
+            let rate = capacity_rate(ratio, benchmark).unwrap();
+            let expected = RATE_AT_STATE_MEDIAN + span * fraction;
+            assert!(
+                (rate - expected).abs() < 1e-12,
+                "at income ratio {ratio} the rate should be {expected}, got {rate}"
+            );
+        }
+
+        // The branch meets its neighbours at both ends.
+        let just_above_median = capacity_rate(1.000_000_1, benchmark).unwrap();
+        assert!((just_above_median - RATE_AT_STATE_MEDIAN).abs() < 1e-8);
+        let just_below_benchmark = capacity_rate(benchmark - 1e-9, benchmark).unwrap();
+        assert!((just_below_benchmark - RATE_AT_BENCHMARK).abs() < 1e-8);
     }
 }
 

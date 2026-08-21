@@ -197,3 +197,46 @@ fn the_statutory_minimum_lags_increases_and_takes_decreases_at_once() {
         "deepest fall {deepest_fall:.4}"
     );
 }
+
+/// The interpolated middle of the scale, against the department's own published rate.
+///
+/// The cap and the floor were both checked against real districts; the sliding part between
+/// them was checked only for monotonicity. A wrong slope would have left every one of these
+/// districts wrong by a little and nothing would have failed.
+#[test]
+fn the_interpolated_rate_matches_the_published_one_district_by_district() {
+    let records = panel();
+    let benchmark = records
+        .iter()
+        .find_map(|r| r.benchmark_ratio)
+        .expect("the sheet publishes it");
+
+    let mut checked = 0usize;
+    let mut worst = 0.0f64;
+    for record in &records {
+        let (Some(published), Some(input)) = (record.published_capacity_rate, inputs(record))
+        else {
+            continue;
+        };
+        let result = local_capacity(&input).expect("positive ADM and statewide income");
+
+        // Only the interpolated branch: strictly between the state median and the benchmark.
+        if result.income_ratio <= 1.0 || result.income_ratio >= benchmark {
+            continue;
+        }
+        checked += 1;
+        worst = worst.max((result.capacity_rate - published).abs());
+    }
+
+    assert!(
+        checked > 0,
+        "no district sits strictly between the state median and the benchmark, so this test \
+         would pass without exercising the branch it exists for"
+    );
+    assert!(
+        worst < 1e-6,
+        "{checked} districts sit on the interpolated part of the scale and the worst differs \
+         from the department's published rate by {worst:.3e}. The slope of that interpolation \
+         is what this pins; nothing else in the workspace asserts a value on it."
+    );
+}
