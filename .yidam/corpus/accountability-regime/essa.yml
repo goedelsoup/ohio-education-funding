@@ -62,7 +62,10 @@ properties:
     years, TSI annually. [verified as proposed]
   effective: |
     ESSA replaced No Child Left Behind for accountability purposes from the 2017-18 school year.
-    NCLB has no node here. [unentered]
+    NCLB has no node here.
+unfilled:
+  - field: a node for No Child Left Behind
+    why: ESSA replaced it for accountability purposes from 2017-18, and the predecessor has no node.
 links:
   - target: ../accountability-regime.ont.yml
     relationship: instance-of

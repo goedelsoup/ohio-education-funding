@@ -856,13 +856,25 @@ fn claim_audit(root: &Path) -> String {
 
     let open = totals["[open]"];
     let unentered = totals["[unentered]"];
-    out.push_str(&format!(
-        "\n{} unresolved marks in total, {open} of them live questions and {unentered} of them \
-         empty fields. Before the two were distinguished the corpus reported the sum as its \
-         count of what it does not know, which overstated it by {}%.\n",
-        open + unentered,
-        (unentered * 100).checked_div(open + unentered).unwrap_or(0)
-    ));
+    // The zero case is the ordinary one now and needs its own sentence: "overstated it by 0%" is
+    // not a fact about anything. `[unentered]` was migrated out of the prose entirely — an empty
+    // field is carried as `unfilled:` structure on the node, not as a fourth mark in somebody's
+    // sentence — so a nonzero count here means a node has started writing the retired mark again.
+    if unentered == 0 {
+        out.push_str(&format!(
+            "\n{open} unresolved marks, and every one of them is a live question. The fourth mark \
+             is gone from the prose: a field nobody has filled in is carried as `unfilled:` \
+             structure on the node it belongs to, which is what `[unentered]` used to say inline \
+             on an axis it did not belong to.\n"
+        ));
+    } else {
+        out.push_str(&format!(
+            "\n{} unresolved marks in total, {open} of them live questions and {unentered} of \
+             them empty fields — and that second number should be zero, because the mark was \
+             migrated to `unfilled:` structure. A node has started writing it again.\n",
+            open + unentered
+        ));
+    }
 
     out.push_str("\n| Field | `[open]` | `[unentered]` |\n|---|--:|--:|\n");
     let fields: std::collections::BTreeSet<&String> =
@@ -1316,8 +1328,12 @@ mod tests {
         // value runs over several lines: the tag lands on a continuation line, not on the `key:`.
         let root = repository_root();
         let audit = claim_audit(&root);
-        // `established` is a one-line property and `typology` a block scalar; both must appear.
-        for field in ["established", "typology", "series_path", "description"] {
+        // The fields this named — `established`, `typology`, `series_path` — carried the fourth
+        // mark and were migrated to `unfilled:` structure, so they attribute nothing now and the
+        // test failed on its own examples rather than on the behaviour. Replaced with fields that
+        // still carry marks in both shapes: `exit` is a one-line property, `statutory_basis` a
+        // block scalar, and `description` and `findings` are the top-level prose fields.
+        for field in ["exit", "statutory_basis", "description", "findings"] {
             assert!(
                 audit.contains(&format!("| `{field}` |")),
                 "{field} is not attributed at all"

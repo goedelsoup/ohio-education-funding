@@ -83,7 +83,7 @@ findings: |
   **What is still not established.** When each commission was established — the department's
   page gives the 2021 plan requirement and the 2023 dissolution and no start dates. [open]
   Whether any commission changed outcomes, which is what the apparatus rests on. [open] And the
-  exit criteria, in later divisions of the section this node has not transcribed. [unentered]
+  exit criteria, in later divisions of the section this node has not transcribed. [open]
 properties:
   name: Academic distress commission
   authority: R.C. 3302.10, effective 3 October 2023 in its current form. [verified]
@@ -104,14 +104,15 @@ properties:
 
     Any previously appointed improvement coordinator under R.C. 3302.04(A) is terminated.
     [verified]
-  exit: |
-    Not transcribed here; the section's later divisions carry it. [unentered]
   fiscal_effect: |
     Transfers the power to create the district's budget from the elected board to a state-appointed
     chief executive officer whose salary the department pays. [verified] Establishes a separate
     innovation fund the CEO alone may disburse, holding any moneys the General Assembly
     appropriates for the purpose. [verified] Does not alter what the funding formula computes for
     the district — only who decides how it is spent. [inference]
+unfilled:
+  - field: exit criteria
+    why: Not transcribed here; the later divisions of R.C. 3302.10 carry them.
 links:
   - target: ../intervention.ont.yml
     relationship: instance-of

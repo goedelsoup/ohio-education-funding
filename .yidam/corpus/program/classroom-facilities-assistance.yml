@@ -39,7 +39,10 @@ properties:
     Capital appropriations, separate from the operating budget and therefore absent from the
     Department of Education and Workforce redbook this corpus holds — that document covers the
     operating budget only. [verified] The specific line is in the capital appropriations act,
-    which no connector retrieves. [unentered]
+    which no connector retrieves.
+unfilled:
+  - field: the capital appropriation line
+    why: It is in the capital appropriations act, which no connector retrieves.
 links:
   - target: ../program.ont.yml
     relationship: instance-of

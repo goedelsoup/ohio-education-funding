@@ -272,6 +272,34 @@ const properties = node.properties.filter((p) => p.name !== "seeded_because");
      * Open by default when there is exactly one: a lone `<details>` costs a reader a click to
      * find out it held a paragraph, and on the nodes with several the list is the point.
      */
+    node.unfilled.length > 0 && (
+      /*
+       * What the node does not hold, in the position the content would occupy.
+       *
+       * This was four inline badges on a three-mark axis until the migration: `[unentered]` mid
+       * sentence, reading as a weaker grade of support than `[open]` because sitting in the
+       * sequence is itself the claim that it belongs to the sequence. It does not — an empty field
+       * is the absence of a claim to grade rather than a weak one.
+       *
+       * So it is a block, and it names the missing fact specifically. "The department's typology
+       * code: the characterisation is entered, its own code is not" is a to-do somebody can act
+       * on; a badge at the end of a sentence is a shrug.
+       *
+       * Placed after the properties and before the corrections: it is about this node's coverage,
+       * which is apparatus, and it belongs with the apparatus rather than in the reading.
+       */
+      <div class="card" id="unfilled" data-part="unfilled">
+        <h2><SectionAnchor id="unfilled" />What this node does not hold</h2>
+        {node.unfilled.map((entry) => (
+          <p class="unfilled">
+            <span class="unfilled-field">{entry.field}</span>
+            {entry.why ? ` — ${entry.why}` : " — not yet entered."}
+          </p>
+        ))}
+      </div>
+    )
+  }
+  {
     revisions.length > 0 && (
       <div class="card apparatus" id="revisions" data-part="revisions">
         <h2><SectionAnchor id="revisions" />What this node used to say</h2>

@@ -39,7 +39,10 @@ test("every form the corpus writes a claim tag in becomes a badge", () => {
   // em dash, so `[verified as proposed]` — 26 occurrences, the commonest qualified form — and
   // every comma-separated one printed as brackets.
   expect(shape(badgeClaims("[verified]"))).toBe("‹verified›");
-  expect(shape(badgeClaims("[unentered]"))).toBe("‹unentered›");
+  // `unentered` is deliberately NOT a badge any more. It was a fourth inline mark on a three-mark
+  // axis; it is now `unfilled:` structure on the node, rendered as a block where the content would
+  // be. If this ever badges again, the migration has been undone by a one-word edit to TAGS.
+  expect(shape(badgeClaims("[unentered]"))).toBe("[unentered]");
   expect(shape(badgeClaims("[verified — LSC]"))).toBe("‹verified›{LSC}");
   expect(shape(badgeClaims("[inference, Fordham]"))).toBe("‹inference›{Fordham}");
   expect(shape(badgeClaims("[verified as proposed]"))).toBe("‹verified›{as proposed}");
@@ -79,6 +82,40 @@ test("a claim tag whose justification is a link keeps both the badge and the lin
   expect(html).toContain('class="claim verified"');
   expect(html).not.toMatch(/<\/a>\]/);
   expect(html).not.toContain("verified — [");
+});
+
+/**
+ * The fourth mark is gone from the corpus, and this is what keeps it gone.
+ *
+ * `[unentered]` was an inline badge on a three-mark support axis for a long time, while the corpus
+ * README argued in its own prose that it belongs on a different axis. It is now `unfilled:`
+ * structure — a block naming the missing fact, in the position the content would occupy.
+ *
+ * Two ways it could come back and both fail here: a node writing the old mark, or the migration
+ * being undone by re-adding the name to `TAGS`. The first is caught below; the second is caught by
+ * the badge assertion above, which now expects literal brackets.
+ */
+test("no node writes the retired fourth mark, and the structure replaced it", () => {
+  const writers = corpus.nodes
+    .filter((node) =>
+      [node.description, node.findings ?? "", ...node.properties.map((p) => p.value)]
+        .join("\n")
+        .includes("[unentered"),
+    )
+    .map((node) => node.id);
+  expect(writers).toEqual([]);
+
+  const carrying = corpus.nodes.filter((node) => node.unfilled.length > 0);
+  expect(carrying.length, "the migration moved 29 marks onto 18 nodes").toBeGreaterThan(15);
+  for (const node of carrying) {
+    for (const entry of node.unfilled) {
+      expect(entry.field.trim(), `${node.id} has an unfilled entry with no field`).not.toBe("");
+      // A bare field name is a shrug. Every one of these came from prose that said where the
+      // value lives, and that is the half worth keeping.
+      expect(entry.why, `${node.id}: "${entry.field}" says nothing about where the value is`)
+        .not.toBeNull();
+    }
+  }
 });
 
 test("no claim tag survives as literal brackets anywhere in the corpus", () => {

@@ -78,7 +78,10 @@ properties:
     crates/dispersion/fixtures/f33-ohio-panel.csv carries federal revenue per district for
     FY2012-FY2022, in which the ESSER rise from 6.60% of Ohio school revenue in FY2020 to 14.02%
     in FY2022 is legible as an aggregate. [verified] Separating ESSER from Title I and IDEA
-    inside that figure needs the allocation files, which no connector retrieves. [unentered]
+    inside that figure needs the allocation files, which no connector retrieves.
+unfilled:
+  - field: an ESSER-specific series
+    why: The federal channel is reported as one figure; separating it needs the allocation files, which no connector retrieves.
 links:
   - target: ../revenue-stream.ont.yml
     relationship: instance-of

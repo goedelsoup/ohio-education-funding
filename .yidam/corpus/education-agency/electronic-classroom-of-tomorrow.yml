@@ -40,11 +40,10 @@ findings: |
 
   Peak enrollment and per-district deduction impact remain unpopulated. [open]
 properties:
-  irn: Not yet established. [unentered]
   agency_type: community
   county: Statewide (chartered in Franklin County)
   typology: Not applicable; e-school.
-  established: Opened 2000; closed January 2018. Exact dates not yet established. [unentered]
+  established: Opened 2000; closed January 2018. Exact dates not yet established.
   roles: |
     Statewide e-school [verified]. Subject to attendance-based funding recovery, FY2016 and
     FY2017 [verified — amounts not yet established]. Deduct-funded from resident districts
@@ -55,6 +54,11 @@ properties:
       crates/project/fixtures/district-finances.csv           FY2020-FY2024 actuals and balances
       crates/dispersion/fixtures/f33-ohio-panel.csv           FY2012-FY2022 revenue, federal basis
       crates/dispersion/fixtures/mr81-sponsor-panel.csv       1998-2014 free and reduced lunch
+unfilled:
+  - field: IRN
+    why: The school is closed and absent from the current directory; the number is in an archived edition.
+  - field: exact opening and closing dates
+    why: The year it opened and the month it closed are held; the days are not.
 links:
   - target: ../education-agency.ont.yml
     relationship: instance-of

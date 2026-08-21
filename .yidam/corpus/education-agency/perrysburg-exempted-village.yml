@@ -53,14 +53,18 @@ properties:
     Performance Index 103.5 (2024-25), 102.8 (2023-24), 102.7 (2022-23).
     Progress effect size +0.17; composite +23.76. [verified]
   typology: |
-    Suburban, low poverty. Exact department typology code not yet entered. [unentered]
-  established: Not yet established. [unentered]
+    Suburban, low poverty. Exact department typology code not yet entered.
   roles: |
     Comparator district in OCG fact-check RL-2026-021 [verified]. First exempted village
     district in this corpus [verified].
   series_path: |
     crates/dispersion/fixtures/report-card-2425-district-data.csv and
     crates/dispersion/fixtures/expenditure-functions-fy25.csv, keyed by IRN 045583.
+unfilled:
+  - field: established
+    why: The department's district profile carries it; nobody has read it across.
+  - field: the department's typology code
+    why: The characterisation is entered; the department's own code is not.
 links:
   - target: ../education-agency.ont.yml
     relationship: instance-of

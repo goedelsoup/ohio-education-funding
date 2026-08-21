@@ -75,11 +75,14 @@ properties:
     identified population has grown since 1999 is funded on a twenty-five-year-old base.
     [inference]
   series_path: |
-    No IDEA-specific series. [unentered] Target remains
+    No IDEA-specific series. Target remains
     [`ode-idea-part-b-allocations`](../../catalog/ode-idea-part-b-allocations.md) — catalogued,
     with a known reader (`pdftotext -layout`) and no connector. IDEA is inside the undifferentiated
     federal column of crates/dispersion/fixtures/f33-ohio-panel.csv and cannot be separated from
     it.
+unfilled:
+  - field: an IDEA-specific series
+    why: Target remains the department's Part B allocations, catalogued and not extracted.
 links:
   - target: ../revenue-stream.ont.yml
     relationship: instance-of

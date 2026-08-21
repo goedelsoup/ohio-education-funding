@@ -63,8 +63,7 @@ properties:
     total revenue per pupil $20,018.15. [verified — FY2024 District Profile Report]
   typology: |
     Suburban, very low poverty, high median income. Exact department typology code not yet
-    entered. [unentered]
-  established: Not yet established. [unentered]
+    entered.
   roles: |
     Property-rich throughout the period covered [inference]. Above the 20-mill floor
     [inference — requires confirmation from tax-abstract]. Low state share [inference].
@@ -74,6 +73,11 @@ properties:
       crates/project/fixtures/district-finances.csv           FY2020-FY2024 actuals and balances
       crates/dispersion/fixtures/f33-ohio-panel.csv           FY2012-FY2022 revenue, federal basis
       crates/dispersion/fixtures/mr81-sponsor-panel.csv       1998-2014 free and reduced lunch
+unfilled:
+  - field: established
+    why: The department's district profile carries it; nobody has read it across.
+  - field: the department's typology code
+    why: The characterisation is entered; the department's own code is not.
 links:
   - target: ../education-agency.ont.yml
     relationship: instance-of
