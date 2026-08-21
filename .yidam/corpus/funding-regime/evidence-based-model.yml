@@ -23,6 +23,25 @@ description: |
   would have cost but not what it would have achieved. [inference] Its two operating years
   also coincided with federal stabilization funding, so the state-share figures for FY2010-11
   are not comparable to adjacent years without separating the federal component. [inference]
+findings: |
+  ### Its last run is still funding Ohio
+
+  The regime operated for two fiscal years, FY2010 and FY2011, and was repealed before the third.
+  That makes it the shortest-lived regime in this corpus and, by one measure, the longest-acting:
+  **FY2011 is the first term of the anchor chain that funds nearly half of Ohio's districts in
+  FY2027.** [verified — [`bridge-formula`](bridge-formula.yml)]
+
+  H.B. 153 did not compute a new starting point. It took each district's FY2011 allocation, divided
+  by a recalculated FY2011 ADM to get a per-pupil figure, and adjusted that figure by where the
+  district's **charge-off valuation** stood against the statewide median — the same charge-off
+  valuation this regime used for the local share of the adequacy amount. A district that never
+  cleared a guarantee afterwards has been carried on that figure through six re-anchorings.
+  [verified]
+
+  So a corpus that reads only current-law documents will find no trace of this regime in any
+  district's FY2027 funding, and it is there — sixteen years down, inside `[H2]`. What is not
+  established is how much of any particular district's base is still the FY2011 term. [open]
+
 properties:
   name: Evidence-Based Model
   effective_from: FY2010
@@ -35,8 +54,16 @@ properties:
     amount.
   status: superseded
   boundary_note: |
-    Repealed by Am. Sub. H.B. 153 (2011), which has no node in this corpus yet and is a
-    named gap in the legislation class.
+    Repealed by [Am. Sub. H.B. 153](../legislation/hb-153-2011.yml) (2011), before the third year
+    of a ten-year phase-in.
+
+    **`superseded` is right about the regime and wrong as a description of its effects.** The act
+    that repealed it carried its last run forward: Bridge formula aid begins from each district's
+    FY2011 state aid per pupil, and the wealth index it is adjusted by divides by the charge-off
+    valuation this regime used to compute a district's local share of the adequacy amount. Every
+    later act re-anchored on the year before its own biennium, and the Fair School Funding Plan's
+    guarantee has held at FY2020 since. See
+    [`bridge-formula`](bridge-formula.yml) for the full chain. [verified — the greenbook]
 links:
   - target: ../funding-regime.ont.yml
     relationship: instance-of

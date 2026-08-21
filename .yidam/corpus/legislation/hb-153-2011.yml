@@ -31,6 +31,74 @@ description: |
 
   Appropriation totals, the exact reimbursement phase-out schedule, and the number of districts
   affected are not yet recorded. [open]
+findings: |
+  ### The mechanism, which the corpus had only ever characterised
+
+  LSC's greenbook states it in formula boxes. Aid in FY2012 and FY2013 is **a per-pupil amount
+  carried from FY2011, adjusted for property wealth, applied to the current year's pupils** —
+  with a dollar floor beneath it. [verified — the greenbook, committed at
+  [`lsc-education-greenbooks.txt`](../../../crates/project/fixtures/lsc-education-greenbooks.txt)]
+
+      FY2011 state aid per pupil  = actual FY2011 allocation / recalculated FY2011 ADM
+                                    (recalculated on the FY2011 October count, whichever
+                                     count the district's FY2011 aid was actually paid on)
+
+      charge-off valuation index  = FY2011 charge-off valuation per pupil
+                                    / median FY2011 charge-off valuation per pupil
+
+      adjusted per-pupil amount   = FY2011 per pupil + (index x a uniform statewide adjustment,
+                                    set by the department each year so total aid fits the
+                                    appropriation)
+
+      total allocation            = adjusted per-pupil amount x current-year ADM
+
+      supplemental allocation     = FY2011 total state aid MINUS its federal stimulus portion,
+                                    less the total allocation, where that is positive
+
+  Three things follow that the characterisation did not carry. The adjustment is **indexed to
+  property wealth**, not to total resources. The uniform statewide adjustment is **set to fit the
+  appropriation**, so the formula is solved backwards from the money available rather than forwards
+  from a cost. And the floor is **FY2011 aid net of the federal stimulus**, so the one-time money is
+  excluded from what any district is held at — the expiry was not cushioned, it was designed out.
+  [verified]
+
+  Joint vocational districts were simply flat-funded at their FY2011 allocation. A high-performance
+  subsidy paid $17 per current pupil to districts rated Excellent or Excellent with Distinction.
+  [verified]
+
+  ### This is where the anchor chain ends
+
+  The chain that funds nearly half of Ohio in FY2027 runs backwards through four re-anchorings to
+  H.B. 59's FY2013 base — and that base is Bridge formula funding, which is this. **It bottoms out
+  at FY2011**, and FY2011 state aid was computed under the
+  [Evidence-Based Model](../funding-regime/evidence-based-model.yml), which this same act repealed.
+  [verified]
+
+  So a district guaranteed in every biennium since is funded in FY2027 on a figure whose origin is a
+  per-pupil amount produced by a formula that has not existed for sixteen years. The full sequence
+  is in [`bridge-formula`](../funding-regime/bridge-formula.yml). [verified]
+revisions:
+  - was: |
+      The Bridge formula's logic was described as "proportional distribution of a reduction:
+      districts received roughly the same share of a state funding cut measured against their total
+      resources including local dollars, with funding effectively frozen near FY2011 levels."
+      [inference]
+    now: |
+      Wealth-indexed, not resource-proportional, and not a freeze. Each district's FY2011 aid *per
+      pupil* is carried forward, adjusted by where its charge-off valuation per pupil sits against
+      the statewide median, and multiplied by current-year ADM — so a district's allocation moved
+      with its own enrolment every year. The freeze is the floor underneath it, and the floor is
+      FY2011 aid net of federal stimulus.
+    found_by: |
+      LSC's greenbook for the act, which states each step as a formula box. It was retrieved only
+      when the greenbook series was completed across all twelve General Assemblies; before that the
+      corpus had the act's appropriation table and no account of what the act did.
+    reach: |
+      The characterisation was a reasonable reading of the effect and it hid the mechanism. Two
+      things depended on the difference: that a Bridge-era district's aid tracked its enrolment,
+      which a freeze would not do, and that the statewide adjustment is solved to fit the
+      appropriation, which makes this the one formula in the corpus that runs backwards from
+      available money. It also fixes the depth of the anchor chain at FY2011.
 properties:
   designation: Am. Sub. H.B. 153
   general_assembly: 129th General Assembly
