@@ -96,9 +96,6 @@ pub struct Sponsor {
     pub claimable: f64,
 }
 
-impl Sponsor {
-}
-
 /// Every row of the panel.
 ///
 /// # Panics

@@ -21,7 +21,6 @@
 //! Those schools were identified through a *subgroup*, failed to exit within three years, and
 //! became whole-school identifications.
 
-
 const FIXTURE: &str = include_str!("../fixtures/identified-schools-2026.csv");
 
 const EXPECTED_HEADER: &str = "status,building_irn,building_name,lea_irn,lea_name,school_type,\

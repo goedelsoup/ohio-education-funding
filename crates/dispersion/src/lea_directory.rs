@@ -176,9 +176,6 @@ pub struct Agency {
     pub status: String,
 }
 
-impl Agency {
-}
-
 /// Every row of the directory panel.
 ///
 /// # Panics

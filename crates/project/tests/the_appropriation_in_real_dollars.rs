@@ -6,7 +6,7 @@
 
 use edfund_core::FiscalYear;
 use project::appropriations::{
-    enacted_history, growth, line_history, lines, reimbursements, is_tax_reimbursement,
+    enacted_history, growth, is_tax_reimbursement, line_history, lines, reimbursements,
     TAX_REIMBURSEMENT,
 };
 
@@ -260,8 +260,16 @@ fn the_reimbursements_are_excluded_from_the_total_and_retrievable_beside_it() {
 
     // Every year it reports is a year whose lines really are of the class.
     for year in &carved_out {
-        assert!(year.nominal > 0.0, "FY{}: a reported year carries money", year.fiscal_year);
-        assert!(year.items > 0, "FY{}: and the lines it is over", year.fiscal_year);
+        assert!(
+            year.nominal > 0.0,
+            "FY{}: a reported year carries money",
+            year.fiscal_year
+        );
+        assert!(
+            year.items > 0,
+            "FY{}: and the lines it is over",
+            year.fiscal_year
+        );
     }
 
     // The exclusion half. For a year the two series share, the department's enacted total and

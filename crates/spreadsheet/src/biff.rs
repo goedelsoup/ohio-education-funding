@@ -95,7 +95,6 @@ struct Record<'a> {
     body: &'a [u8],
 }
 
-
 /// The cells of a `MULRK` record: one row, a run of columns, a pair per column.
 ///
 /// Extracted from `Workbook::rows` so the run-walk is reachable without a compound document
@@ -675,7 +674,10 @@ mod tests {
 
         // Must return without aborting. The value does not matter; not dying does.
         let strings = SharedStrings::read(&record, 0);
-        assert!(strings.len() < 1000, "a short body cannot yield a huge table");
+        assert!(
+            strings.len() < 1000,
+            "a short body cannot yield a huge table"
+        );
     }
 
     /// A MULRK record starting at the last column stops instead of wrapping to column zero.

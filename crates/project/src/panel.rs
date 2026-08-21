@@ -157,7 +157,6 @@ impl Categoricals {
             + self.gifted
             + self.career_technical
     }
-
 }
 
 /// Ohio's five career-technical categories, for one district.
@@ -1852,6 +1851,9 @@ mod tests {
             .iter()
             .find(|d| d.transition.open_enrollment_adjustment == 0.0)
             .expect("some district was not clawed back");
-        assert_eq!(untouched.transition.guarantee_before_clawback(1_000_000.0), None);
+        assert_eq!(
+            untouched.transition.guarantee_before_clawback(1_000_000.0),
+            None
+        );
     }
 }
