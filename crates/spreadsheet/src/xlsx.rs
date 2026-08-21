@@ -58,6 +58,12 @@ impl From<ZipError> for XlsxError {
     }
 }
 
+/// The widest column reference XLSX defines is `XFD`, so a longer run of letters is not a
+/// column at all.
+const MAX_COLUMN_LETTERS: usize = 3;
+/// Zero-based index of `XFD`, the last column an XLSX sheet can carry.
+const MAX_COLUMN_INDEX: usize = 16_383;
+
 /// Zero-based column index from a cell reference such as `BA12`.
 ///
 /// Returns `None` if the reference does not begin with column letters.
@@ -69,6 +75,13 @@ pub fn column_index(reference: &str) -> Option<usize> {
         if byte.is_ascii_uppercase() {
             index = index * 26 + (byte - b'A' + 1) as usize;
             letters += 1;
+            // XFD is the last column XLSX defines, and three letters is as wide as a real
+            // reference gets. Without this, `r="ZZZZZZ1"` — eight bytes of XML — yields
+            // index 321,272,406, which `read_rows` turns into a 7.7 GB allocation; fourteen
+            // letters overflows the multiply outright.
+            if letters > MAX_COLUMN_LETTERS || index > MAX_COLUMN_INDEX + 1 {
+                return None;
+            }
         } else {
             break;
         }
@@ -228,6 +241,9 @@ fn read_rows(xml: &str, shared: &[String], limit: usize) -> Vec<Vec<String>> {
             }
             Event::Close("row") => {
                 if let Some(&(widest, _)) = cells.iter().max_by_key(|(column, _)| *column) {
+                    // `column_index` already refuses anything past XFD; this is the second
+                    // guard on the allocation itself, because it is the one that would abort.
+                    let widest = widest.min(MAX_COLUMN_INDEX);
                     let mut row = vec![String::new(); widest + 1];
                     for (column, value) in cells.drain(..) {
                         row[column] = value;
@@ -486,6 +502,33 @@ mod tests {
         assert_eq!(
             resolve(Some("0".into()), "s", &["a".to_string()]),
             Some("a".to_string())
+        );
+    }
+
+    /// A cell reference is bounded, because `read_rows` sizes a row from it.
+    ///
+    /// No test in this crate mutated a length or count field until this one. Every negative
+    /// test corrupted a *structural marker* — a magic number, a signature, a CRC, a block
+    /// type — and those are not the fields that crash. `r="ZZZZZZ1"` is eight bytes of XML
+    /// and produced column 321,272,406, which sized a `vec![String::new(); 321M]` at roughly
+    /// 7.7 GB. Fourteen letters overflowed the multiply outright.
+    #[test]
+    fn an_absurd_column_reference_is_refused_rather_than_allocated() {
+        assert_eq!(column_index("A1"), Some(0));
+        assert_eq!(column_index("XFD1"), Some(MAX_COLUMN_INDEX));
+
+        // Past the last column XLSX defines.
+        assert_eq!(column_index("XFE1"), None);
+        // The 7.7 GB reference, and the one that overflowed `usize`.
+        assert_eq!(column_index("ZZZZZZ1"), None);
+        assert_eq!(column_index("ZZZZZZZZZZZZZZ1"), None);
+
+        // And the sheet reader survives one rather than aborting.
+        let sheet = r#"<worksheet><sheetData><row><c r="ZZZZZZ1"><v>1</v></c></row></sheetData></worksheet>"#;
+        let rows = read_rows(sheet, &[], usize::MAX);
+        assert!(
+            rows.iter().all(|r| r.len() <= MAX_COLUMN_INDEX + 1),
+            "a row must never be sized from an out-of-range reference"
         );
     }
 }

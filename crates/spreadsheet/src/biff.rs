@@ -95,6 +95,33 @@ struct Record<'a> {
     body: &'a [u8],
 }
 
+
+/// The cells of a `MULRK` record: one row, a run of columns, a pair per column.
+///
+/// Extracted from `Workbook::rows` so the run-walk is reachable without a compound document
+/// to wrap it in. It was the only cell record type with no test of any kind, and its column
+/// counter walked past `u16::MAX` — wrapping to column 0 in release and panicking in debug,
+/// either way relabelling the cell.
+fn mulrk_cells(body: &[u8]) -> Vec<(u16, u16, String)> {
+    let (Some(row), Some(first)) = (u16_at(body, 0), u16_at(body, 2)) else {
+        return Vec::new();
+    };
+    let mut cells = Vec::new();
+    let mut at = 4usize;
+    let mut column = first;
+    while at + 6 <= body.len().saturating_sub(2) {
+        if let Some(value) = u32_at(body, at + 2) {
+            cells.push((row, column, format_number(rk(value))));
+        }
+        at += 6;
+        let Some(next_column) = column.checked_add(1) else {
+            break;
+        };
+        column = next_column;
+    }
+    cells
+}
+
 /// Walk the records of a stream from a byte offset.
 struct Records<'a> {
     data: &'a [u8],
@@ -176,7 +203,10 @@ impl SharedStrings {
             }
         }
 
-        let mut out = Vec::with_capacity(count as usize);
+        // The count is four bytes of an SST record and 0xFFFFFFFF asks for a 103 GB
+        // allocation. The minimum on-disk cost of one string is three bytes — a two-byte
+        // character count and a flag byte — so the body length is an exact upper bound.
+        let mut out = Vec::with_capacity((count as usize).min(body.len() / 3));
         let mut at = 0usize;
         for _ in 0..count {
             match Self::string(&body, at, &boundaries) {
@@ -377,23 +407,7 @@ impl Workbook {
                         cells.push((row, column, format_number(rk(value))));
                     }
                 }
-                MULRK => {
-                    // One record, a run of columns: `(row, first)` then a pair per column, then
-                    // the last column index.
-                    let (Some(row), Some(first)) = (u16_at(record.body, 0), u16_at(record.body, 2))
-                    else {
-                        continue;
-                    };
-                    let mut at = 4usize;
-                    let mut column = first;
-                    while at + 6 <= record.body.len().saturating_sub(2) {
-                        if let Some(value) = u32_at(record.body, at + 2) {
-                            cells.push((row, column, format_number(rk(value))));
-                        }
-                        at += 6;
-                        column += 1;
-                    }
-                }
+                MULRK => cells.extend(mulrk_cells(record.body)),
                 NUMBER => {
                     if let (Some(row), Some(column)) =
                         (u16_at(record.body, 0), u16_at(record.body, 2))
@@ -641,5 +655,62 @@ mod tests {
             Workbook::open(b"not an xls".to_vec()),
             Err(BiffError::Container(_))
         ));
+    }
+
+    /// A declared count is not a promise, and 0xFFFFFFFF is not 103 GB of strings.
+    ///
+    /// `SharedStrings::read` reads a four-byte count and pre-allocated from it. No test
+    /// called it — all six shared-string tests reached `SharedStrings::string` directly —
+    /// so the field that sizes the allocation was never exercised.
+    #[test]
+    fn a_declared_string_count_cannot_allocate_beyond_the_record() {
+        // An SST record claiming 0xFFFFFFFF strings in an eight-byte body.
+        let mut body = Vec::new();
+        body.extend_from_slice(&0u32.to_le_bytes()); // total strings
+        body.extend_from_slice(&u32::MAX.to_le_bytes()); // unique strings — the count
+        let mut record = Vec::new();
+        record.extend_from_slice(&SST.to_le_bytes());
+        record.extend_from_slice(&(body.len() as u16).to_le_bytes());
+        record.extend_from_slice(&body);
+
+        // Must return without aborting. The value does not matter; not dying does.
+        let strings = SharedStrings::read(&record, 0);
+        assert!(strings.len() < 1000, "a short body cannot yield a huge table");
+    }
+
+    /// A MULRK record starting at the last column stops instead of wrapping to column zero.
+    #[test]
+    fn a_mulrk_run_that_reaches_the_last_column_stops_there() {
+        // row 0, first column 0xFFFF, one RK pair, then the trailing sentinel.
+        let mut body = Vec::new();
+        body.extend_from_slice(&0u16.to_le_bytes()); // row
+        body.extend_from_slice(&u16::MAX.to_le_bytes()); // first column
+        body.extend_from_slice(&0u16.to_le_bytes()); // xf index
+        body.extend_from_slice(&0u32.to_le_bytes()); // rk value
+        body.extend_from_slice(&0u16.to_le_bytes()); // last column
+        let mut record = Vec::new();
+        record.extend_from_slice(&MULRK.to_le_bytes());
+        record.extend_from_slice(&(body.len() as u16).to_le_bytes());
+        record.extend_from_slice(&body);
+
+        let cells = mulrk_cells(&body);
+        assert_eq!(cells.len(), 1, "the record carries exactly one RK pair");
+        assert_eq!(cells[0].1, u16::MAX, "and it stays at the last column");
+
+        // A run that would walk past the last column stops instead of wrapping to zero.
+        let mut long = Vec::new();
+        long.extend_from_slice(&0u16.to_le_bytes());
+        long.extend_from_slice(&(u16::MAX - 1).to_le_bytes());
+        for _ in 0..4 {
+            long.extend_from_slice(&0u16.to_le_bytes());
+            long.extend_from_slice(&0u32.to_le_bytes());
+        }
+        long.extend_from_slice(&0u16.to_le_bytes());
+        let walked = mulrk_cells(&long);
+        assert!(
+            walked.iter().all(|(_, column, _)| *column >= u16::MAX - 1),
+            "columns must never wrap: {:?}",
+            walked.iter().map(|c| c.1).collect::<Vec<_>>()
+        );
     }
 }

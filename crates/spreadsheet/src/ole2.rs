@@ -112,11 +112,19 @@ impl Compound {
             return Err(Ole2Error::Malformed("byte order is not little-endian"));
         }
 
-        let sector_size = 1usize << u16_at(&data, 0x1e).ok_or(Ole2Error::NotCompound)?;
-        let mini_sector_size = 1usize << u16_at(&data, 0x20).ok_or(Ole2Error::NotCompound)?;
-        if !(64..=1 << 20).contains(&sector_size) || mini_sector_size == 0 {
+        // Validate before shifting, not after. `1usize << n` for an attacker-supplied `n`
+        // panics in debug and silently masks to `n & 63` in release, so a header declaring
+        // shift 1033 would parse as 512-byte sectors — a file read as something it never
+        // declared. The old `mini_sector_size == 0` check could never fire: `1 << n` is
+        // never zero, and the real hazard is a shift so large that `next * mini_sector_size`
+        // overflows in `read_mini_chain`.
+        let shift = u16_at(&data, 0x1e).ok_or(Ole2Error::NotCompound)?;
+        let mini_shift = u16_at(&data, 0x20).ok_or(Ole2Error::NotCompound)?;
+        if !(6..=20).contains(&shift) || !(6..=12).contains(&mini_shift) || mini_shift > shift {
             return Err(Ole2Error::Malformed("implausible sector size"));
         }
+        let sector_size = 1usize << shift;
+        let mini_sector_size = 1usize << mini_shift;
 
         let fat_sector_count = u32_at(&data, 0x2c).ok_or(Ole2Error::NotCompound)? as usize;
         let directory_start = u32_at(&data, 0x30).ok_or(Ole2Error::NotCompound)?;
@@ -142,7 +150,11 @@ impl Compound {
         incomplete.entries = incomplete.read_directory(directory_start)?;
         // The root entry's stream is the mini-stream: where every sub-cutoff stream lives.
         if let Some(root) = incomplete.entries.first().cloned() {
-            incomplete.mini_stream = incomplete.read_chain(root.start, root.size as usize)?;
+            // `root.size` is eight bytes of a directory entry. A truncating `as` cast on a
+            // value of 0xFF..FF asks for a usize::MAX allocation during open(), before any
+            // stream has been requested.
+            let declared = usize::try_from(root.size).unwrap_or(usize::MAX);
+            incomplete.mini_stream = incomplete.read_chain(root.start, declared)?;
         }
         Ok(incomplete)
     }
@@ -227,7 +239,10 @@ impl Compound {
     /// The guard is the whole point: a corrupt FAT that points a sector at itself would
     /// otherwise allocate until the process died.
     fn read_chain(&self, start: u32, size: usize) -> Result<Vec<u8>, Ole2Error> {
-        let mut out = Vec::with_capacity(size);
+        // Capacity is bounded by the file: a declared size larger than the whole compound
+        // document cannot be honoured, and asking for it aborts before the loop's own guard
+        // below ever runs.
+        let mut out = Vec::with_capacity(size.min(self.data.len()));
         let mut next = start;
         let mut guard = 0usize;
         while next != END_OF_CHAIN && next != FREE_SECTOR && out.len() < size {
@@ -248,7 +263,7 @@ impl Compound {
 
     /// Follow a mini-sector chain within the mini-stream.
     fn read_mini_chain(&self, start: u32, size: usize) -> Result<Vec<u8>, Ole2Error> {
-        let mut out = Vec::with_capacity(size);
+        let mut out = Vec::with_capacity(size.min(self.mini_stream.len()));
         let mut next = start;
         let mut guard = 0usize;
         while next != END_OF_CHAIN && next != FREE_SECTOR && out.len() < size {
@@ -256,7 +271,9 @@ impl Compound {
             if guard > self.mini_fat.len() + 1 {
                 return Err(Ole2Error::BadChain);
             }
-            let at = (next as usize) * self.mini_sector_size;
+            let Some(at) = (next as usize).checked_mul(self.mini_sector_size) else {
+                return Err(Ole2Error::BadChain);
+            };
             let sector = self
                 .mini_stream
                 .get(at..at + self.mini_sector_size)
@@ -535,5 +552,39 @@ mod tests {
         file[fat_at..fat_at + 4].copy_from_slice(&(large_start_sector as u32).to_le_bytes());
         let compound = Compound::open(file).unwrap();
         let _ = compound.read("Big");
+    }
+
+    /// The header's sector sizes are shift amounts, and a shift is validated before it happens.
+    ///
+    /// `1usize << n` for an `n` read straight from the file panics in debug and silently masks
+    /// to `n & 63` in release — so a header declaring shift 1033 parsed as 512-byte sectors, a
+    /// file read as something it never declared. No test perturbed any header field; the only
+    /// header the suite built was the valid one below.
+    #[test]
+    fn an_implausible_sector_shift_is_refused_before_it_is_shifted() {
+        let good = compound(b"large stream contents past the mini cutoff", b"small");
+        assert!(Compound::open(good.clone()).is_ok(), "the fixture must be valid");
+
+        for (offset, label) in [(0x1e, "sector shift"), (0x20, "mini sector shift")] {
+            for bytes in [[0xFF, 0xFF], [0x09, 0x04], [0x00, 0x00], [0x3E, 0x00]] {
+                let mut bad = good.clone();
+                bad[offset] = bytes[0];
+                bad[offset + 1] = bytes[1];
+                // Not dying is the assertion. A panic here is the defect.
+                let _ = (label, Compound::open(bad));
+            }
+        }
+    }
+
+    /// Truncating the file anywhere produces an error, never a panic.
+    ///
+    /// A cheap fuzzer for the whole header-and-directory path: every prefix of a valid
+    /// compound document is a malformed one, and each exercises a different partial read.
+    #[test]
+    fn every_truncation_of_a_compound_document_is_refused_rather_than_panicking() {
+        let good = compound(b"large stream contents past the mini cutoff", b"small");
+        for n in 0..good.len() {
+            let _ = Compound::open(good[..n].to_vec());
+        }
     }
 }
