@@ -264,14 +264,6 @@ fn percentile_of(sorted: &[f64], value: f64) -> f64 {
     below as f64 / sorted.len() as f64
 }
 
-fn median(sorted: &[f64]) -> f64 {
-    if sorted.is_empty() {
-        0.0
-    } else {
-        sorted[sorted.len() / 2]
-    }
-}
-
 /// Place every Ohio district in the national distribution, keyed by IRN.
 ///
 /// The distribution is built once over all 16,872 districts and each Ohio district is located in
@@ -293,9 +285,9 @@ pub fn positions() -> (BTreeMap<String, NationalPosition>, NationalMedians) {
 
     let medians = NationalMedians {
         districts: pool.len(),
-        local_share: median(&shares),
-        revenue_per_pupil: median(&revenue),
-        spending_per_pupil: median(&spending),
+        local_share: crate::median(&shares).unwrap_or(0.0),
+        revenue_per_pupil: crate::median(&revenue).unwrap_or(0.0),
+        spending_per_pupil: crate::median(&spending).unwrap_or(0.0),
     };
 
     let mut out = BTreeMap::new();

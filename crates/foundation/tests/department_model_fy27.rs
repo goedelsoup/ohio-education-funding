@@ -104,9 +104,12 @@ fn correlation(xs: &[f64], ys: &[f64]) -> f64 {
 }
 
 /// Median of a slice, by value.
-fn median(mut v: Vec<f64>) -> f64 {
-    v.sort_by(|a, b| a.partial_cmp(b).unwrap());
-    v[v.len() / 2]
+/// The median, on the one definition this workspace has.
+///
+/// Was a local upper-of-two, which disagrees with `dispersion` on every even-length series.
+fn median(mut values: Vec<f64>) -> f64 {
+    values.sort_by(|a, b| a.partial_cmp(b).unwrap_or(std::cmp::Ordering::Equal));
+    dispersion::median(&values).expect("a median is taken of a non-empty series here")
 }
 
 /// Share of a subset that is on the guarantee, as a percentage.

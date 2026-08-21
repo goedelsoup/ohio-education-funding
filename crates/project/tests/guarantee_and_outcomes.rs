@@ -93,9 +93,12 @@ fn progress(record: &Joined) -> Option<f64> {
     record.outcome.progress_effect_size
 }
 
+/// The median, on the one definition this workspace has.
+///
+/// Was a local upper-of-two, which disagrees with `dispersion` on every even-length series.
 fn median(mut values: Vec<f64>) -> f64 {
-    values.sort_by(|a, b| a.partial_cmp(b).unwrap());
-    values[values.len() / 2]
+    values.sort_by(|a, b| a.partial_cmp(b).unwrap_or(std::cmp::Ordering::Equal));
+    dispersion::median(&values).expect("a median is taken of a non-empty series here")
 }
 
 #[test]
