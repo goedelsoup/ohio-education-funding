@@ -4,13 +4,12 @@ version.workspace = true
 edition.workspace = true
 license.workspace = true
 repository.workspace = true
+publish.workspace = true
 description = "Difference two funding regimes at component level, with the residual the decomposition does not explain"
 
 [dependencies]
 edfund-core = { path = "../edfund-core" }
 project = { path = "../project" }
-
-[dev-dependencies]
 
 [lints]
 workspace = true

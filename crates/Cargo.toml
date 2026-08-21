@@ -20,6 +20,8 @@ version = "0.1.0"
 edition = "2021"
 license = "MIT"
 repository = "https://github.com/goedelsoup/ohio-education-funding"
+# Path-only crates: the domain computer is consumed from this repository, never from crates.io.
+publish = false
 
 [workspace.lints.rust]
 missing_docs = "warn"
