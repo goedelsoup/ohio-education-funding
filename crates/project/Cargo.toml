@@ -4,6 +4,7 @@ version.workspace = true
 edition.workspace = true
 license.workspace = true
 repository.workspace = true
+publish.workspace = true
 description = "Forward projection of funding inputs, and policy simulation over them"
 
 [dependencies]
@@ -13,7 +14,6 @@ foundation = { path = "../foundation" }
 local-capacity = { path = "../local-capacity" }
 
 [dev-dependencies]
-deflate = { path = "../deflate" }
 dispersion = { path = "../dispersion" }
 
 [[bin]]
