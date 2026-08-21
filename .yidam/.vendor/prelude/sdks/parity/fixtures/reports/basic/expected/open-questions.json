@@ -1,0 +1,21 @@
+{
+  "format_version": "1",
+  "yidam": {
+    "version": "<VERSION>",
+    "commit": "<COMMIT>",
+    "features": [
+      "<FEATURES>"
+    ]
+  },
+  "root": "<ROOT>",
+  "open_questions": [
+    {
+      "node": ".yidam/corpus/concept/low-flow.yml",
+      "label": "Low flow"
+    },
+    {
+      "node": ".yidam/corpus/concept/mixing-zone.yml",
+      "label": "? Does the mixing zone reach the bridge at design low flow"
+    }
+  ]
+}

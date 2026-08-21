@@ -1,0 +1,14 @@
+{
+  "format_version": "1",
+  "yidam": {
+    "version": "<VERSION>",
+    "commit": "<COMMIT>",
+    "features": [
+      "<FEATURES>"
+    ]
+  },
+  "root": "<ROOT>",
+  "range": "HEAD~1..HEAD",
+  "nodes": [],
+  "edges": []
+}

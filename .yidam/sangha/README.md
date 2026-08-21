@@ -1,5 +1,18 @@
 # sangha
 
+> **Dormant.** This repository is [`governance: single-elector`](../decisions/ontology.yml).
+> There are no registered electors, no `ma/*` branches and no resolution events; there never
+> have been. Everything below describes a protocol that is scaffolded and not running.
+>
+> Kept rather than deleted, because the prelude's advice runs the other way — a single-elector
+> repository "can adopt the sangha later by scaffolding `.yidam/sangha/` when a second elector
+> actually appears" — and this one has the machinery early rather than wrongly. What would be
+> wrong is leaving a reader to infer from its presence that positions here are being reconciled.
+> They are not. One elector holds them, and phases settle onto `main`.
+>
+> The constitution it points at is dormant in the same sense: vendored with the rest of the
+> prelude, binding on nothing, waiting for a second elector.
+
 *Community.* The collective of agents and humans who maintain and evolve the knowledge graph.
 
 `sangha/` encodes the protocol by which individual positions become collective understanding.

@@ -60,8 +60,11 @@ and whose unrunnable ones are recorded rather than dropped.
    names the provision, why it does not run, and what would have to exist before it could —
    which is the difference between a question somebody can work and one nobody has scoped.
 
-8. **Commit the node** with its provisions, its `simulated-by` edges, and the enacted counterpart
-   it redrafts or amends.
+8. **Commit the node with the `establish:` verb** — a node authored is new understanding —
+   carrying its provisions, its `simulated-by` edges, and the enacted counterpart it redrafts
+   or amends. Naming the verb at the step is the whole mechanism: `yidam lint --commits` is
+   Warn severity because history cannot be rewritten, so it reports drift only once the drift
+   is permanent. See [`GRAPH.md`](../.vendor/prelude/GRAPH.md).
 
 ## The three refusals
 

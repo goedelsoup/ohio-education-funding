@@ -1,0 +1,19 @@
+{
+  "format_version": "1",
+  "yidam": {
+    "version": "<VERSION>",
+    "commit": "<COMMIT>",
+    "features": [
+      "<FEATURES>"
+    ]
+  },
+  "root": "<ROOT>",
+  "index_present": false,
+  "meta_present": false,
+  "built_at": null,
+  "built": null,
+  "model": null,
+  "embedding_dim": null,
+  "node_count": null,
+  "stale_nodes": 0
+}

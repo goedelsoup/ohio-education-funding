@@ -1,0 +1,59 @@
+{
+  "format_version": "1",
+  "yidam": {
+    "version": "<VERSION>",
+    "commit": "<COMMIT>",
+    "features": [
+      "<FEATURES>"
+    ]
+  },
+  "root": "<ROOT>",
+  "corpus_dir": ".yidam/corpus",
+  "node": "concept/tailwater.yml",
+  "class": "concept",
+  "label": "Tailwater",
+  "description": "Water downstream of a structure. [inference] The control node — it trips nothing.",
+  "depth": 2,
+  "neighbors": [
+    {
+      "node": "concept/low-flow.yml",
+      "class": "concept",
+      "label": "Low flow",
+      "description": "A discharge regime. Carries one deliberately broken edge.",
+      "relationship": "relates-to",
+      "direction": "out",
+      "hops": 1,
+      "is_node": true
+    },
+    {
+      "node": "concept/mixing-zone.yml",
+      "class": "concept",
+      "label": "? Does the mixing zone reach the bridge at design low flow",
+      "description": "Open by its label rather than by a tag. The predicate has two arms and a corpus implementing either one alone answers identically on a fixture that uses only the other — which is the defect the MCP cases were split to expose.",
+      "relationship": "relates-to",
+      "direction": "out",
+      "hops": 1,
+      "is_node": true
+    },
+    {
+      "node": "concept/assimilative-capacit.yml",
+      "class": "",
+      "label": "",
+      "description": "",
+      "relationship": "depends-on",
+      "direction": "out",
+      "hops": 2,
+      "is_node": false
+    },
+    {
+      "node": "gauge/riffle-station.yml",
+      "class": "gauge",
+      "label": "Riffle station",
+      "description": "A stage gauge at the riffle. [verified]",
+      "relationship": "measured-by",
+      "direction": "in",
+      "hops": 2,
+      "is_node": true
+    }
+  ]
+}

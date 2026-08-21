@@ -1,0 +1,135 @@
+{
+  "format_version": "1",
+  "yidam": {
+    "version": "<VERSION>",
+    "commit": "<COMMIT>",
+    "features": [
+      "<FEATURES>"
+    ]
+  },
+  "root": "<ROOT>",
+  "corpus_dir": ".yidam/corpus",
+  "nodes": [
+    {
+      "node": "concept/low-flow.yml",
+      "class": "concept",
+      "label": "Low flow",
+      "description": "A discharge regime. Carries one deliberately broken edge.",
+      "links": [
+        {
+          "target": "../concept/assimilative-capacit.yml",
+          "relationship": "depends-on",
+          "resolved": "concept/assimilative-capacit.yml",
+          "exists": false
+        }
+      ]
+    },
+    {
+      "node": "concept/mixing-zone.yml",
+      "class": "concept",
+      "label": "? Does the mixing zone reach the bridge at design low flow",
+      "description": "Open by its label rather than by a tag. The predicate has two arms and a corpus implementing either one alone answers identically on a fixture that uses only the other — which is the defect the MCP cases were split to expose.",
+      "links": [
+        {
+          "target": "../concept/low-flow.yml",
+          "relationship": "relates-to",
+          "resolved": "concept/low-flow.yml",
+          "exists": true
+        }
+      ]
+    },
+    {
+      "node": "concept/tailwater.yml",
+      "class": "concept",
+      "label": "Tailwater",
+      "description": "Water downstream of a structure. [inference] The control node — it trips nothing.",
+      "links": [
+        {
+          "target": "../concept/low-flow.yml",
+          "relationship": "relates-to",
+          "resolved": "concept/low-flow.yml",
+          "exists": true
+        },
+        {
+          "target": "../concept/mixing-zone.yml",
+          "relationship": "relates-to",
+          "resolved": "concept/mixing-zone.yml",
+          "exists": true
+        }
+      ]
+    },
+    {
+      "node": "gauge/riffle-station.yml",
+      "class": "gauge",
+      "label": "Riffle station",
+      "description": "A stage gauge at the riffle. [verified]",
+      "links": [
+        {
+          "target": "../concept/low-flow.yml",
+          "relationship": "measured-by",
+          "resolved": "concept/low-flow.yml",
+          "exists": true
+        }
+      ]
+    }
+  ],
+  "classes": [
+    {
+      "class": "concept",
+      "label": "Concept",
+      "description": "A unit of understanding in this fixture corpus.",
+      "properties": [
+        {
+          "name": "datum",
+          "type": "string",
+          "description": "Which vertical datum the values are read against."
+        },
+        {
+          "name": "claim_tag",
+          "type": "claim",
+          "description": "The evidence standing of this node, as a tag rather than as prose."
+        }
+      ],
+      "edges": [
+        {
+          "relationship": "relates-to",
+          "target": "concept",
+          "direction": "out",
+          "description": "A bare association between two concepts."
+        },
+        {
+          "relationship": "depends-on",
+          "target": "concept",
+          "direction": "out",
+          "description": "The concept cannot be stated without the target."
+        },
+        {
+          "relationship": "measured-by",
+          "target": "gauge",
+          "direction": "in",
+          "description": "A gauge measures this concept — authored on the gauge."
+        }
+      ]
+    },
+    {
+      "class": "gauge",
+      "label": "Gauge",
+      "description": "An instrument reading a concept in the field.",
+      "properties": [
+        {
+          "name": "station",
+          "type": "string",
+          "description": "The operator's identifier for this station."
+        }
+      ],
+      "edges": [
+        {
+          "relationship": "measured-by",
+          "target": "concept",
+          "direction": "out",
+          "description": "The concept this gauge reads. Authored here, not on the concept."
+        }
+      ]
+    }
+  ]
+}
