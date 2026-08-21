@@ -1,6 +1,6 @@
 ---
 name: dispersion
-description: Compute equity statistics across Ohio education agencies for a fiscal period — coefficient of variation, McLoone and Verstegen indices, federal range ratio, wealth neutrality
+description: Compute equity statistics across Ohio education agencies for a fiscal period — coefficient of variation, McLoone and Verstegen indices, restricted range ratio, wealth neutrality
 ---
 
 # Calculator: dispersion
@@ -16,7 +16,7 @@ familiar case is the resource one.
   *wide* spread means strong targeting and a *narrow* one means weak targeting.
 
 Ohio supplies the cautionary case. Realized state aid is measurably more equal than
-formula-computed aid — coefficient of variation 0.544 against 0.677, federal range ratio 9.6
+formula-computed aid — coefficient of variation 0.544 against 0.677, restricted range ratio 9.6
 against 12.3 — because the
 [guarantee](../corpus/formula-component/temporary-transitional-aid-guarantee.yml) tops up
 precisely the wealthy districts the formula funds least. Read with the spending habit, that
@@ -35,7 +35,8 @@ the standard school-finance equity statistics over it.
 - Coefficient of variation — overall dispersion
 - McLoone index — how far the bottom half falls below the median
 - Verstegen index — how far the top half rises above it
-- Federal range ratio — the spread between the 95th and 5th percentiles
+- Restricted range ratio — the 95th percentile over the 5th. Not the federal range
+  ratio, which is (P95 - P5) / P5 and therefore this figure minus one
 - Wealth neutrality — the association between per-pupil resources and
   [assessed valuation per pupil](../corpus/metric/assessed-valuation-per-pupil.yml)
 
@@ -61,7 +62,7 @@ fixture and drives the integration tests, so the corpus's empirical equity findi
 and cannot drift silently — a fixture refresh that moves them fails the build rather than
 quietly rewriting the conclusion.
 
-Findings now computed rather than asserted: coefficient of variation 0.202, federal range ratio
+Findings now computed rather than asserted: coefficient of variation 0.202, restricted range ratio
 1.846, median operating expenditure per pupil $15,646; state aid correlates with valuation per
 pupil at −0.549 and with economically disadvantaged share at +0.630; local revenue correlates
 with valuation above +0.7.
