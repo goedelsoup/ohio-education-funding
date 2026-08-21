@@ -36,7 +36,7 @@ pub const HISTORY_YEARS: [FiscalYear; 3] = [FiscalYear(2024), FiscalYear(2025), 
 /// The department's `Notes` sheet states `0.1` for FY2026 and FY2027. It is **not** the 5% the
 /// Fair School Funding Plan was enacted with; each biennial budget sets it, and it doubled.
 /// 138 of 609 districts sit exactly on it.
-pub const MINIMUM_STATE_SHARE: f64 = local_capacity::MINIMUM_STATE_SHARE_FY2027;
+pub const MINIMUM_STATE_SHARE: f64 = edfund_core::MINIMUM_STATE_SHARE_FY2027;
 
 /// Disadvantaged Pupil Impact Aid, for one district.
 ///

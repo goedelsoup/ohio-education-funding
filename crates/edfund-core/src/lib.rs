@@ -33,6 +33,23 @@ pub type Adm = f64;
 /// valuation.
 pub type Mills = f64;
 
+/// The minimum state share of the base cost, FY2022.
+///
+/// A statutory parameter, set by each biennial budget rather than fixed in permanent law.
+/// It lives here rather than in a calculator because more than one calculator reads it and
+/// nothing about it is derived: [`local_capacity`](../local_capacity/) applies it, and
+/// `project`'s FY2027 panel names it as the floor its state-share column is censored at.
+pub const MINIMUM_STATE_SHARE_FY2022: Dollars = 0.05;
+
+/// The minimum state share for FY2026 and FY2027, per the department's own model.
+///
+/// The percentage has **doubled** against [`MINIMUM_STATE_SHARE_FY2022`]: the department's
+/// FY2027 calculator states `0.1` for both FY2026 and FY2027, on its `Notes` sheet, in as
+/// many words. In the FY2027 model 138 of 609 districts — 22.7% — sit exactly on it. That is
+/// a large policy fact, and it is the reason these are two named constants rather than one
+/// hard-coded figure applied to every year.
+pub const MINIMUM_STATE_SHARE_FY2027: Dollars = 0.10;
+
 /// An Ohio state fiscal year, named for the calendar year it ends in.
 ///
 /// FY2022 runs 1 July 2021 to 30 June 2022. The offset is not cosmetic: applying a

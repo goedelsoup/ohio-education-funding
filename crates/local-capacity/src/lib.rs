@@ -138,8 +138,11 @@ pub const RATE_AT_BENCHMARK: f64 = 0.025;
 /// Capacity rate coefficient applied at or below the statewide median income.
 pub const RATE_AT_STATE_MEDIAN: f64 = 0.0225;
 
-/// The minimum share of base cost the state pays, however wealthy the district, **as the Fair
-/// School Funding Plan was enacted for FY2022**.
+/// The minimum share of base cost the state pays, however wealthy the district.
+///
+/// Defined in [`edfund_core`] and re-exported here. It moved because `project` reads the
+/// FY2027 figure as well, and importing this crate for one `f64` made a 5,000-line crate
+/// depend on a calculator it never calls.
 ///
 /// This floor is why [`state_share`] stops discriminating at the top of the wealth
 /// distribution: a district whose local capacity exceeds 95% of its base cost and one whose
@@ -148,17 +151,10 @@ pub const RATE_AT_STATE_MEDIAN: f64 = 0.0225;
 /// # It is not a constant, and treating it as one was wrong here
 ///
 /// The percentage is set by each biennial budget, not fixed in permanent law, and it has
-/// **doubled**: the department's FY2027 calculator states a minimum state share of `0.1` for
-/// both FY2026 and FY2027, on its `Notes` sheet, in as many words. In the FY2027 model 138 of
-/// 609 districts — 22.7% — sit exactly on it. That is a large policy fact this crate concealed
-/// by hard-coding the FY2022 figure and applying it to every year.
-///
-/// Callers pass the year's value to [`state_share`]. These constants name the two that are
-/// known.
-pub const MINIMUM_STATE_SHARE_FY2022: f64 = 0.05;
-
-/// The minimum state share for FY2026 and FY2027, per the department's own model.
-pub const MINIMUM_STATE_SHARE_FY2027: f64 = 0.10;
+/// **doubled** between the two figures named here. This crate once hard-coded the FY2022
+/// value and applied it to every year, which concealed that. Callers pass the year's value
+/// to [`state_share`]; these constants name the two that are known.
+pub use edfund_core::{MINIMUM_STATE_SHARE_FY2022, MINIMUM_STATE_SHARE_FY2027};
 
 /// The lesser of a district's most recent year and its three-year average.
 ///
