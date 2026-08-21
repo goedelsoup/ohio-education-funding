@@ -5,7 +5,7 @@ description: Initialize yidam in a repository — empty, near-empty, or an exist
 
 # Skill: bootstrap
 
-Invoked when an agent enters a yidam repository with [BOOTSTRAP.md](../../../BOOTSTRAP.md)
+Invoked when an agent enters a yidam repository with [BOOTSTRAP.md](https://github.com/goedelsoup/yidam/blob/main/BOOTSTRAP.md)
 as its entry prompt. Produces a fully scaffolded, ontology-grounded, corpus-seeded repository
 with a legible genesis commit. Works in two modes:
 
@@ -66,7 +66,7 @@ Samudaya does not replace the dialogue. It seeds it.
 
 ### 1. Internalize the prelude
 
-Read these eight files — and **only** these eight files, in this exact order, using their
+Read these seven files — and **only** these seven files, in this exact order, using their
 exact paths. Do **not** run `ls`, `find`, or any directory enumeration of `yidam/prelude/`
 at any point during bootstrapping. Do not read any other file in `yidam/prelude/` (including
 `SCRIPTURE.md` or any file surfaced by enumeration). Do not read
@@ -76,13 +76,16 @@ file to internalize here.
 1. `yidam/prelude/IDENTITY.md` — what kind of knowledge artifact this repo is
 2. `yidam/prelude/GRAPH.md` — the graph model: nodes, edges, commit types, branch semantics
 3. `yidam/prelude/CONSTITUTION.md` — the governance rules that constrain what you may do
-4. `yidam/prelude/HARNESS.md` — how scenarios and the judge rubric work
-5. `yidam/prelude/PHASES.md` — the named phases of inquiry
-6. `yidam/prelude/guidelines/agent-conduct.md` — specific conduct norms
-7. `yidam/prelude/guidelines/directories.md` — where things live and what belongs in each
-8. `yidam/prelude/skills/judge.md` — the judge's criteria; internalize so the genesis commit passes
+4. `yidam/prelude/PHASES.md` — the named phases of inquiry
+5. `yidam/prelude/guidelines/agent-conduct.md` — specific conduct norms
+6. `yidam/prelude/guidelines/directories.md` — where things live and what belongs in each
+7. `yidam/prelude/skills/judge.md` — the judge's criteria; internalize so the genesis commit passes
 
-After reading all eight, output the synthesis as a **standalone message** — do not append
+`yidam/tests/HARNESS.md` is deliberately absent from this list. It documents how the yidam
+template tests itself; it is not prelude, it is not vendored into the derived repo, and
+reading it teaches you nothing about the repository you are bootstrapping.
+
+After reading all seven, output the synthesis as a **standalone message** — do not append
 questions or any other content to it. Wait for the user to acknowledge before opening the
 Step 2 dialogue. This gives the user the opportunity to correct any misread before questions
 begin.
@@ -179,8 +182,26 @@ Ask the user to choose one. Then ask:
 The user may give a number or press enter to accept the default. Record it as `corpus_depth`
 in the decision record — step 6 distributes instances across classes to reach this target.
 
-Then write the ontology decision record, including the chosen alignment and corpus depth,
-before proceeding to step 3:
+Finally, ask the governance question:
+
+> **Who will maintain this repository — one elector, or several?** [default: one]
+>
+> **One** — you (with agents acting on your behalf) are the sole elector. Phases run on
+> `phase/<name>` branches off the baseline. This is the common case.
+>
+> **Several** — multiple humans or independently-directed agents hold positions that are
+> expected to diverge and must be reconciled. This activates the sangha: each elector keeps
+> a `ma/<elector>` branch, and resolution events synthesize them into `rigpa/<evolution>`
+> baselines under the constitution.
+
+Record the answer as `governance: single-elector | collective`. Do not choose `collective`
+because it sounds more capable — it is a real protocol with real overhead, and a repository
+that adopts it and never runs a resolution has paid for machinery it does not use. If the
+user is unsure, take the default; a single-elector repo can adopt the sangha later by
+scaffolding `.yidam/sangha/` when a second elector actually appears.
+
+Then write the ontology decision record, including the chosen alignment, corpus depth, and
+governance mode, before proceeding to step 3:
 
 ```
 .yidam/decisions/ontology.yml
@@ -189,12 +210,14 @@ before proceeding to step 3:
 ```yaml
 id: ontology
 summary: <one line — the domain, class count, and chosen foundational alignment>
-corpus_depth: 13        # target instance count for initial seeding; user-configurable
+corpus_depth: 13              # target instance count for initial seeding; user-configurable
+governance: single-elector    # single-elector | collective
 context: |
   <what the ontology discovery dialogue surfaced; key choices made; examples used to explain
   the alignment options>
 decision: |
-  <the confirmed class list and edges; the chosen foundational ontology (bfo | ufo | none)>
+  <the confirmed class list and edges; the chosen foundational ontology (bfo | ufo | none);
+  the governance mode and what the user said about who maintains this>
 rationale: |
   <why these classes; what was considered and discarded; why this alignment was chosen>
 ```
@@ -212,24 +235,24 @@ ls sadhana/
 
 Then read each template file in `sadhana/`:
 
-- `sadhana/agents/README.md`
 - `sadhana/catalog/README.md`
 - `sadhana/corpus/README.md`
 - `sadhana/crates/README.md`
-- `sadhana/docs/README.md`
-- `sadhana/packages/README.md`
-- `sadhana/sangha/README.md` (and PROTOCOL.md, electors.md, resolutions/ if present)
 - `sadhana/skills/README.md`
 - `sadhana/web/README.md`
+- `sadhana/root/README.md`, `sadhana/root/AGENTS.md`, `sadhana/root/CLAUDE.md`, `sadhana/root/mise.toml`
+- `sadhana/github/workflows/ci.yml`
+- `sadhana/sangha/README.md` (and PROTOCOL.md, electors.md, resolutions/, positions/) —
+  **only if `governance: collective`**; skip these five reads entirely in single-elector mode
+
+`sadhana/agents/`, `sadhana/packages/`, and `sadhana/docs/` are deliberately not read here.
+They are templates for directories created on first use, not at genesis — see below.
 
 **Then create the derived-repo structure:**
 
 Top-level directories (created directly from sadhana templates):
 ```
-agents/README.md
 crates/README.md
-docs/README.md
-packages/README.md
 web/README.md
 ```
 
@@ -238,9 +261,50 @@ web/README.md
 .yidam/catalog/README.md
 .yidam/corpus/README.md
 .yidam/decisions/          ← new, empty; written to in steps 2 and 5
-.yidam/sangha/             ← all files from sadhana/sangha/
 .yidam/skills/README.md
 ```
+
+**Create on first use, not now:** `agents/`, `packages/`, and `docs/`. Their sadhana
+templates exist and are the right content — but scaffold them the day something goes in
+them, not at genesis. An empty directory with a README explaining what it would contain is
+indistinguishable from an abandoned one, and it stays that way: across the two repositories
+derived from this template, `agents/` and `packages/` never received a single file, and
+`docs/` received exactly one. Note them in step 9 instead, so the user knows they exist as
+conventions. The `yidam` CLI treats all three as optional — `agents-index` and
+`packages-index` are no-ops when the directory is absent.
+
+**`.yidam/sangha/` — only if `governance: collective`.** Read the governance mode recorded
+in `.yidam/decisions/ontology.yml` in step 2:
+
+- **`single-elector`** — do not create `.yidam/sangha/`. Do not copy `sadhana/sangha/`.
+  The constitution is vendored with the rest of the prelude and lies dormant; it governs
+  resolution events, and there will be none.
+- **`collective`** — create `.yidam/sangha/` with all files from `sadhana/sangha/`, and fill
+  `electors.md` with the participants the user named.
+
+Repository-root files. `sadhana/root/` and `sadhana/github/` are not directory mirrors —
+each file installs to a specific path, **overwriting yidam's own copy**:
+
+```
+sadhana/root/README.md            → README.md            (overwrites yidam's)
+sadhana/root/AGENTS.md            → AGENTS.md            (overwrites yidam's)
+sadhana/root/CLAUDE.md            → .claude/CLAUDE.md    (overwrites yidam's)
+sadhana/root/mise.toml            → mise.toml            (overwrites yidam's)
+sadhana/root/gitattributes        → .gitattributes       (overwrites yidam's)
+sadhana/github/workflows/ci.yml   → .github/workflows/ci.yml  (overwrites yidam's)
+```
+
+Yidam's copies of these six files describe yidam — its harness, its CLI workspace, its
+bootstrap-mode entry check. Left in place they are wrong the moment genesis is written, and
+yidam's `ci.yml` is worse than wrong: it builds `yidam/cli` and `yidam/tests/harness`, paths
+that step 8 removes, so it goes green having compiled nothing. Overwrite all six now. Do not
+merge yidam's content into them.
+
+`gitattributes` is spelled without its dot for the same reason `root/` and `github/` are:
+`ls sadhana/` is a step in this skill and a dotfile would not appear in it. It installs as
+`.gitattributes` and arrives holding only comments — the rule about connector fixtures and
+line endings, which costs nothing until the first connector lands and is unrecoverable
+advice afterwards.
 
 Each README may contain a `<!-- TEMPLATE -->` comment block marking fields that need
 domain-specific content. Fill every such block now, before proceeding. These are the only
@@ -401,9 +465,10 @@ exists rather than only what the bootstrap creates.
 **Opportunistic retrieval**: While seeding, watch for the demand threshold — five or more
 instances that share a missing property attributable to a single approved connector source.
 When that threshold is met, invoke the connector inline rather than deferring it: fetch the
-missing data, populate the instances, and commit the result as part of the seed. Respect
-rate limits: pause between requests; do not batch-hammer a source. Record what was fetched
-in the commit message.
+missing data, populate the instances, and commit the result as part of the seed with
+`extract:` — structured data pulled from a primary source. Respect rate limits: pause
+between requests; do not batch-hammer a source. Record what was fetched in the commit
+message.
 
 ### 7. Wire implied edges and scaffold connectors and calculators
 
@@ -426,8 +491,8 @@ the retrieval interface. Connectors invoked during seeding need no stub — thei
 and the resulting epistemic commit are the record.
 
 **Calculators** — for each approved calculator: if the seeded corpus contains enough
-instances to produce a meaningful result, run it now and commit the output as an epistemic
-commit. Otherwise write a stub in `.yidam/skills/`:
+instances to produce a meaningful result, run it now and commit the output with `compute:`
+— a calculator run and its output committed. Otherwise write a stub in `.yidam/skills/`:
 
 ```
 .yidam/skills/<calculator-name>.md
@@ -435,8 +500,9 @@ commit. Otherwise write a stub in `.yidam/skills/`:
 
 The stub should describe what it computes, which corpus nodes it reads, and what it returns.
 
-Commit implied edges as a single epistemic commit. Commit any remaining connector and
-calculator stubs together as a single operational commit.
+Commit implied edges as a single `establish:` commit — they are understanding the
+ontology entailed and nobody had written down. Commit any remaining connector and
+calculator stubs together as one `implement:` commit; a stub is structure, not a finding.
 
 ### 8. Write the genesis commit and consume transient layers
 
@@ -460,7 +526,7 @@ First try the tracked path:
 
 ```
 git rm -r samudaya/
-git commit -m "consume(samudaya): ..."
+git commit -m "consume: samudaya — ..."
 ```
 
 If `git rm` fails because samudaya files were never staged (they are untracked), delete
@@ -468,7 +534,7 @@ the directory directly and record the event as an empty commit:
 
 ```
 rm -rf samudaya/
-git commit --allow-empty -m "consume(samudaya): ..."
+git commit --allow-empty -m "consume: samudaya — ..."
 ```
 
 Do not ask the user to run either command manually — the deletion is part of the bootstrap
@@ -483,37 +549,83 @@ directory removed."
 
 ```
 git rm -r sadhana/
-git commit -m "consume(sadhana): scaffold template consumed; derived structure in place"
+git commit -m "consume: sadhana — scaffold template consumed; derived structure in place"
 ```
 
 If sadhana files were untracked:
 
 ```
 rm -rf sadhana/
-git commit --allow-empty -m "consume(sadhana): scaffold template consumed; derived structure in place"
+git commit --allow-empty -m "consume: sadhana — scaffold template consumed; derived structure in place"
 ```
 
 **Vendor the prelude** — immediately after consuming sadhana, move the inherited prelude
-from the top-level `yidam/` into the `.yidam/` infrastructure namespace. Skip if `yidam/`
-does not exist (typical in existing-repo mode; the vendor step only applies when bootstrapping
-from the yidam template).
+into the `.yidam/` infrastructure namespace and delete the rest of the template. Skip if
+`yidam/` does not exist (typical in existing-repo mode; the vendor step only applies when
+bootstrapping from the yidam template).
 
-Because `yidam/` was not staged in the genesis commit (it is untracked), use the filesystem
-move and stage the result directly:
+**Vendor exactly one directory.** `yidam/prelude/` is what a derived repo inherits. Everything
+else under `yidam/` is yidam's own machinery — the CLI source, the bootstrap test harness, the
+design notes, the docs site — and none of it is readable, runnable, or updatable from inside a
+derived repo. Carrying it produces a stale fork of the CLI that will never be rebuilt and a
+`HARNESS.md` whose links point at scenarios the repo does not have.
+
+Because `yidam/` was not staged in the genesis commit (it is untracked), use filesystem
+operations and stage the result directly:
 
 ```
-mv yidam/ .yidam/.vendor/
-git add .yidam/.vendor/
-git commit -m "vendor(yidam): move inherited prelude into .yidam/.vendor/"
+mkdir -p .yidam/.vendor
+mv yidam/prelude .yidam/.vendor/prelude
+rm -rf yidam/
 ```
 
-Do not ask the user to run this manually — the vendor step is part of the bootstrap
+**Then delete the template's own top-level files.** These describe yidam, not this repository.
+`README.md`, `AGENTS.md`, `.claude/CLAUDE.md`, `mise.toml`, and `.github/workflows/ci.yml` were
+already overwritten in step 3; what remains is:
+
+```
+rm -f BOOTSTRAP.md VERSIONING.md
+```
+
+`BOOTSTRAP.md` is the entry prompt for a repo that has not been bootstrapped — this one now
+has. `VERSIONING.md` documents how yidam releases its own three layers. Keep `LICENSE`,
+`.gitignore`, `.gitattributes`, and `mise.yidam.toml`: the first three are generic and the
+last is the inherited task layer that `mise.toml` includes.
+
+**Confirm the provenance pin.** `.yidam.toml` records which yidam this repo came from; `yidam
+clone` and `yidam overlay` write it. Check that it exists and carries a real commit:
+
+```
+cat .yidam.toml
+```
+
+If the file is missing — the template was copied by hand rather than by `yidam clone` — write
+it now, with `commit = "unknown"` if the source SHA is genuinely unavailable. Do not guess a
+commit. An honest `unknown` can be repaired by hand; a wrong SHA silently upgrades the repo
+against the wrong baseline.
+
+```toml
+[yidam]
+origin    = "git@github.com:goedelsoup/yidam.git"
+commit    = "<40-char sha, or unknown>"
+template  = "untagged"
+committed = "<YYYY-MM-DD — the date of that commit>"
+```
+
+Then commit the whole vendor step as one event:
+
+```
+git add -A
+git commit -m "vendor: yidam prelude into .yidam/.vendor/; template files removed"
+```
+
+Do not ask the user to run any of this manually — the vendor step is part of the bootstrap
 protocol and must complete before step 9.
 
 ### 9. Report
 
-Do not begin this step until the genesis commit, consume(samudaya), consume(sadhana), and
-vendor(yidam) are all written. If any is unresolved, finish it before proceeding.
+Do not begin this step until the genesis commit, both `consume:` commits, and the `vendor:`
+commit are all written. If any is unresolved, finish it before proceeding.
 
 Output a structured handoff with four sections:
 
@@ -524,15 +636,28 @@ instantiates.
 
 **Implied edges, connectors, and calculators** — edges wired, crate stubs and skill stubs scaffolded. One line each.
 
+**Conventions not yet scaffolded** — one line each, so the user knows these exist without
+finding an empty directory and guessing:
+
+- `agents/` — domain agent definitions. Create it when you write the first agent.
+- `packages/` — non-Rust toolkit code (Python/TypeScript connectors, ML pipelines). Create
+  it when a capability genuinely belongs outside `crates/`.
+- `docs/` — documentation about the repository, as distinct from the corpus's knowledge.
+  Create it when there is something to say that is not a corpus node.
+- `.yidam/sangha/` — collective resolution. State the governance mode chosen in step 2. In
+  single-elector mode, say that phases run on `phase/<name>` branches and that the sangha
+  can be adopted later if a second elector appears.
+
 **Next steps** — three concrete, ordered actions:
 
 1. **First catalog entry** — identify the most authoritative data source for this domain
    and add it to `.yidam/catalog/` as the first provenance anchor. Name it specifically.
 2. **First corpus expansion** — name the instance node most ready to grow and suggest the
-   first sub-node or property to deepen it. This becomes the first epistemic commit after
-   genesis.
+   first sub-node or property to deepen it. This becomes the first `establish:` commit
+   after genesis.
 3. **First agent** — describe the simplest agent immediately useful in this domain. One
-   sentence on what it does and which corpus nodes it draws from.
+   sentence on what it does and which corpus nodes it draws from. Creating `agents/` with
+   that one definition is the action; do not create the directory to hold nothing.
 
 Then ask:
 

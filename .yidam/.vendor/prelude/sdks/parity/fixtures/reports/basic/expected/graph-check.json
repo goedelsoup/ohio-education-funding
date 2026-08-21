@@ -1,0 +1,25 @@
+{
+  "format_version": "1",
+  "yidam": {
+    "version": "<VERSION>",
+    "commit": "<COMMIT>",
+    "features": [
+      "<FEATURES>"
+    ]
+  },
+  "root": "<ROOT>",
+  "passed": false,
+  "corpus_empty": false,
+  "total_instances": 4,
+  "clean_instances": 3,
+  "classes_defined": 2,
+  "nodes_with_issues": [
+    {
+      "node": ".yidam/corpus/concept/low-flow.yml",
+      "issues": [
+        "broken link: ../concept/assimilative-capacit.yml"
+      ]
+    }
+  ],
+  "classes_without_instances": []
+}

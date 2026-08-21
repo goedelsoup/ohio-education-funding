@@ -1,0 +1,36 @@
+{
+  "format_version": "1",
+  "yidam": {
+    "version": "<VERSION>",
+    "commit": "<COMMIT>",
+    "features": [
+      "<FEATURES>"
+    ]
+  },
+  "root": "<ROOT>",
+  "range": "HEAD",
+  "filter": "epistemic",
+  "total": 3,
+  "epistemic": 2,
+  "operational": 1,
+  "entries": [
+    {
+      "hash": "0f69cfa335882e54fe3e6c2c5543685d76521ecb",
+      "short": "0f69cfa3",
+      "kind": "epistemic",
+      "verb": "revise",
+      "subject": "revise: the corpus carries a claim tag of each kind",
+      "author": "Fixture",
+      "date": "2026-01-01T00:00:00Z"
+    },
+    {
+      "hash": "f45bcb06ac221b4a1fedbc5a8703df1af76ccf9a",
+      "short": "f45bcb06",
+      "kind": "epistemic",
+      "verb": "genesis",
+      "subject": "genesis: reports fixture",
+      "author": "Fixture",
+      "date": "2026-01-01T00:00:00Z"
+    }
+  ]
+}

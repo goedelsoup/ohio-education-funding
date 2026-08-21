@@ -1,0 +1,4 @@
+Checked 4 instances across 2 classes — 3 clean, 1 with issues:
+
+  .yidam/corpus/concept/low-flow.yml
+    - broken link: ../concept/assimilative-capacit.yml
