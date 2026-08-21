@@ -10,7 +10,7 @@ programs that route money around the formula's edges.
 It is built so that a specific dollar figure can be walked back to the parameter and the section
 that produced it, and so that "what would this change do to my district?" is a question with an
 answer rather than an opinion. The site is at
-**<https://schools.ohio.shawneesmart.systems>**.
+**<https://ohio-education-funding.pages.dev>**.
 
 ## What is here
 
@@ -73,7 +73,7 @@ said so. `//:ci` is still the thing to run before pushing; the workflow is the t
 what a dirty local tree hides.
 
 The site deploys itself. A push to `main` that clears all three jobs uploads the built site to
-Cloudflare Pages, and it is live at <https://schools.ohio.shawneesmart.systems> a minute or two
+Cloudflare Pages, and it is live at <https://ohio-education-funding.pages.dev> a minute or two
 later — the same `dist/` the browser suite ran against rather than a rebuild of it, so what is
 served is what was tested. `mise run //:deploy` publishes by hand and is the escape hatch; note
 that it sends the *checked-out* tree to production, so check out `main` first.

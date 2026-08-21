@@ -688,11 +688,14 @@ parseable or not correct, and are worth fixing at the source rather than working
 
 ## Deploying
 
-The site is served at **<https://schools.ohio.shawneesmart.systems>** from Cloudflare Pages,
-project `ohio-education-funding`. There is no deploy job: publishing is a thing someone does on
-purpose.
+The site is served at **<https://ohio-education-funding.pages.dev>** from Cloudflare Pages,
+project `ohio-education-funding`. Publishing is automatic: the `deploy` job in
+[`.github/workflows/ci.yml`](../.github/workflows/ci.yml) runs on every push to `main` that clears
+all three gates, and uploads the `dist/` the browser suite ran against rather than a rebuild of
+it, so what is served is what was tested.
 
-From the repository root:
+Publishing by hand is the escape hatch, and `mise run //:deploy` is the short form of it. The long
+form, from the repository root:
 
 ```
 pnpm --dir web test                       # both suites
@@ -717,17 +720,26 @@ what a reader sees, because the figures are in the HTML.
 third of that weight is the 995 preview cards under `og/`, which is the price of a shared link
 carrying the district's own figures; the file count is what to watch, and it has room.
 
-DNS is split, and knowing which half is which saves an hour when something breaks.
-`shawneesmart.systems` is authoritative on **Route 53**, and stays there — it carries the mail
-records. The only thing Cloudflare owns is one `CNAME` at `schools.ohio` pointing to
-`ohio-education-funding.pages.dev`, plus the certificate it issues for that hostname. Cloudflare
-Pages custom domains work against external DNS this way on the free plan; a Workers deployment
-would not, because a Workers custom domain requires the whole zone to live on Cloudflare.
+There is no custom domain, and this section used to say there was.
+`schools.ohio.shawneesmart.systems` was named as the address for long enough to reach every
+canonical link, the sitemap and a thousand preview cards, while never resolving at all — the
+record was never created. That is why the address above is the Pages project's own subdomain: it
+is the one that answers.
+
+The plan for a custom domain is kept here rather than lost. DNS would be split, and knowing which
+half is which saves an hour when something breaks. `shawneesmart.systems` is authoritative on
+**Route 53** and stays there — it carries the mail records. The only thing Cloudflare would own is
+one `CNAME` at `schools.ohio` pointing to `ohio-education-funding.pages.dev`, plus the certificate
+it issues for that hostname. Cloudflare Pages custom domains work against external DNS this way on
+the free plan; a Workers deployment would not, because a Workers custom domain requires the whole
+zone to live on Cloudflare.
 
 The order that setup happens in matters and is not recoverable in the moment: the hostname must be
 registered on the Pages project **before** the `CNAME` exists in Route 53. Reversed, the record
 resolves to a Pages edge that has never heard of the hostname and answers 522 until the association
-catches up.
+catches up. And `astro.config.mjs`'s `site` moves in the same commit as the `CNAME`, never after
+it — pointing the canonicals at a hostname that does not answer yet is the failure this section is
+a record of.
 
 [`public/_headers`](public/) is the deploy's one piece of configuration, and Astro copies it into
 `dist/` like any other public asset — Pages reads it from the deploy root rather than serving it.

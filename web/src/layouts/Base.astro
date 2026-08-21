@@ -69,7 +69,7 @@ const { bundle, verification, forecastable } = loadFeed();
  * resolves. They are computed from one value here so they cannot disagree, which they previously
  * could not have done only because there was one of them.
  */
-const site = Astro.site ?? new URL("https://schools.ohio.shawneesmart.systems");
+const site = Astro.site ?? new URL("https://ohio-education-funding.pages.dev");
 const canonical = new URL(canonicalPath(Astro.url.pathname), site);
 const cardUrl = new URL(image, site);
 /** `og:title` is read without the tab strip around it, so it carries the site name too. */

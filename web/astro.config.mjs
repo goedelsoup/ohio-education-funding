@@ -24,7 +24,12 @@ export default defineConfig({
   // Required by `@astrojs/sitemap`, and used for the canonical link in the layout. This is the
   // production hostname; a preview deploy will emit canonicals pointing at production, which is
   // the correct behaviour for a preview.
-  site: "https://schools.ohio.shawneesmart.systems",
+  //
+  // The Pages project's own subdomain, because that is what actually serves. A custom domain was
+  // named here for long enough to reach every canonical link, the sitemap and a thousand preview
+  // cards while never resolving — so if one is added later, this line moves in the same commit as
+  // the DNS record, not after it.
+  site: "https://ohio-education-funding.pages.dev",
   output: "static",
   integrations: [
     sitemap({
