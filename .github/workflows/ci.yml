@@ -178,7 +178,7 @@ jobs:
     runs-on: ubuntu-latest
     environment:
       name: production
-      url: https://schools.ohio.shawneesmart.systems
+      url: https://ohio-education-funding.pages.dev
     steps:
       # No checkout. Nothing here needs the sources: the deployable tree is the artifact the web
       # job built, and rebuilding it would mean deploying something no test has seen.

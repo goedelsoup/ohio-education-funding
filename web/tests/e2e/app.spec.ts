@@ -113,7 +113,7 @@ test.describe("the content security policy", () => {
     const offenders: string[] = [];
     for (const file of html(DIST)) {
       const found = readFileSync(file, "utf8").match(
-        /(?:src|href)\s*=\s*["'](?:https?:)?\/\/(?!schools\.ohio\.shawneesmart\.systems)[^"']+/gi,
+        /(?:src|href)\s*=\s*["'](?:https?:)?\/\/(?!ohio-education-funding\.pages\.dev)[^"']+/gi,
       );
       // Links in prose are fine; only fetched subresources matter, which are src= or a stylesheet.
       const fetched = (found ?? []).filter((m) => /^src/i.test(m) || /stylesheet/i.test(m));
