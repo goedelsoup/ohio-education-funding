@@ -1,9 +1,13 @@
 //! How to read a cell the Ohio Department of Education and Workforce wrote.
 //!
-//! [`spreadsheet`] knows the file format. This module knows the publisher: which strings mean
+//! The `spreadsheet` crate knows the file format. This module knows the publisher: which strings mean
 //! "no data", which mean "withheld", and which rows in a per-district sheet are not districts.
 //! Keeping the two apart means a change in what the department writes is a one-file edit here,
 //! and does not touch the reader.
+//!
+//! It lives in `edfund-core` rather than in `connect`, which learned these conventions,
+//! because `connect` is a leaf that nothing depends on — and four parsers downstream of it
+//! were reading a suppressed count as `0.0` for want of being able to reach [`number`].
 //!
 //! Each convention below cost something to learn. They are tests, not comments, for that
 //! reason: every one of them produces a confidently wrong number rather than an error.

@@ -281,8 +281,15 @@ fn field(line: &str, index: usize) -> &str {
     line.split(',').nth(index).unwrap_or("").trim()
 }
 
+/// A dollar column by index, zero where the department wrote no value.
+///
+/// `conventions::number` rather than `str::parse`: it is the one place that knows what the
+/// department writes where there is no value. A raw parse turns `<10`, `#N/A` and a
+/// thousands-separated figure alike into `None`, and `unwrap_or(0.0)` then reports every
+/// one of them as zero. The zero is kept here because the surrounding type has no way to
+/// carry an absence, but it is now a stated substitution rather than a parse failure.
 fn amount(line: &str, index: usize) -> Dollars {
-    field(line, index).parse().unwrap_or(0.0)
+    edfund_core::conventions::number(field(line, index)).unwrap_or(0.0)
 }
 
 /// Every district's financial panel, in IRN order.
