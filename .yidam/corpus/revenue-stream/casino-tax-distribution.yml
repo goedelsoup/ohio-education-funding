@@ -256,6 +256,12 @@ links:
     relationship: constrained-by
   - target: ../actor/ohio-general-assembly.yml
     relationship: appropriated-by
+  - target: lottery-profits.yml
+    relationship: parallels
+    note: >-
+      Ohio's other constitutional education earmark, and the comparison this node's findings turn
+      on: the lottery's substitution question has a documented answer because Fund 7017 appears
+      inside the foundation aid appropriation table, and the casino channel has no such line.
   - target: ../../catalog/ohio-revised-code.md
     relationship: sourced-from
   - target: ../../catalog/dot-casino-student-distribution.md

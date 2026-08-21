@@ -86,5 +86,11 @@ links:
   - target: ../fiscal-period/fy2022-23.yml
     relationship: appropriates-for
     note: FY2022-23.
+  - target: hb-583-2022.yml
+    relationship: amended-by
+    note: >-
+      The reciprocal of the `amends` edge H.B. 583 carries. Every FY2022 figure published under
+      this act is this act *as corrected*, so a reader who reaches H.B. 110 and cannot reach H.B.
+      583 is reading a formula that was never run.
   - target: ../../catalog/dew-sfpr-line-by-line.md
     relationship: sourced-from

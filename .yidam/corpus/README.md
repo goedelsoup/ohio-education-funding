@@ -189,13 +189,13 @@ leave the corpus and are not counted.
 -->
 | Measure | Count |
 |---|--:|
-| edges between nodes | 491 |
-| distinct relationships in use | 154 |
+| edges between nodes | 499 |
+| distinct relationships in use | 158 |
 | relationships declared across every class | 70 |
-| edges whose relationship its class does not declare | 249 |
-| relationships used exactly once | 77 |
+| edges whose relationship its class does not declare | 257 |
+| relationships used exactly once | 80 |
 
-**50% of edges use a relationship the class does not declare**, and 77 of the 154 relationships in use are used a single time. That is the case for `edge_policy: characteristic`: closing the vocabulary would reject those edges or require 77 declarations that each describe one link.
+**51% of edges use a relationship the class does not declare**, and 80 of the 158 relationships in use are used a single time. That is the case for `edge_policy: characteristic`: closing the vocabulary would reject those edges or require 80 declarations that each describe one link.
 <!-- /REGEN -->
 
 This was a hand-written sentence in fifteen ontology files, in the paragraph above, and in
@@ -305,20 +305,20 @@ Sorted by: kind, then alphabetically.
 | [`performance-index`](metric/performance-index.yml) | metric | Performance Index | 5 | 12 |
 | [`progress-value-added`](metric/progress-value-added.yml) | metric | Progress (Value-Added) | 5 | 5 |
 | [`state-share-percentage`](metric/state-share-percentage.yml) | metric | State Share Percentage | 5 | 3 |
-| [`education-savings-account-act`](model-policy/education-savings-account-act.yml) | model-policy | Education Savings Account Act | 4 | 0 |
-| [`parental-choice-scholarship-act`](model-policy/parental-choice-scholarship-act.yml) | model-policy | Parental Choice Scholarship Program Act (Universal Eligibility) | 4 | 1 |
+| [`education-savings-account-act`](model-policy/education-savings-account-act.yml) | model-policy | Education Savings Account Act | 4 | 1 |
+| [`parental-choice-scholarship-act`](model-policy/parental-choice-scholarship-act.yml) | model-policy | Parental Choice Scholarship Program Act (Universal Eligibility) | 5 | 1 |
 | [`appropriation-proration-factor`](parameter/appropriation-proration-factor.yml) | parameter | Appropriation Proration Factor | 2 | 2 |
 | [`base-cost-per-pupil`](parameter/base-cost-per-pupil.yml) | parameter | Base Cost Per Pupil | 9 | 18 |
 | [`fsfp-phase-in-percentage`](parameter/fsfp-phase-in-percentage.yml) | parameter | FSFP Phase-In Percentage | 4 | 13 |
 | [`guarantee-funding-base`](parameter/guarantee-funding-base.yml) | parameter | Guarantee Funding Base | 6 | 5 |
 | [`local-share-charge-off-millage`](parameter/local-share-charge-off-millage.yml) | parameter | Local Share Charge-Off Millage | 8 | 4 |
 | [`twenty-mill-floor`](parameter/twenty-mill-floor.yml) | parameter | Twenty-Mill Floor | 4 | 8 |
-| [`autism-scholarship`](program/autism-scholarship.yml) | program | Autism Scholarship | 4 | 0 |
+| [`autism-scholarship`](program/autism-scholarship.yml) | program | Autism Scholarship | 4 | 1 |
 | [`classroom-facilities-assistance`](program/classroom-facilities-assistance.yml) | program | Classroom Facilities Assistance Program | 3 | 2 |
 | [`cleveland-scholarship`](program/cleveland-scholarship.yml) | program | Cleveland Scholarship and Tutoring Program | 4 | 4 |
-| [`edchoice-expansion`](program/edchoice-expansion.yml) | program | EdChoice Expansion Scholarship | 4 | 10 |
-| [`edchoice-scholarship`](program/edchoice-scholarship.yml) | program | Traditional EdChoice Scholarship | 4 | 2 |
-| [`jon-peterson-special-needs`](program/jon-peterson-special-needs.yml) | program | Jon Peterson Special Needs Scholarship | 3 | 1 |
+| [`edchoice-expansion`](program/edchoice-expansion.yml) | program | EdChoice Expansion Scholarship | 5 | 10 |
+| [`edchoice-scholarship`](program/edchoice-scholarship.yml) | program | Traditional EdChoice Scholarship | 4 | 3 |
+| [`jon-peterson-special-needs`](program/jon-peterson-special-needs.yml) | program | Jon Peterson Special Needs Scholarship | 4 | 1 |
 | [`casino-tax-distribution`](revenue-stream/casino-tax-distribution.yml) | revenue-stream | Casino Tax — County Student Fund | 6 | 1 |
 | [`esser`](revenue-stream/esser.yml) | revenue-stream | ESSER — Elementary and Secondary School Emergency Relief | 4 | 2 |
 | [`idea-part-b`](revenue-stream/idea-part-b.yml) | revenue-stream | IDEA Part B | 5 | 3 |
@@ -333,7 +333,7 @@ Sorted by: kind, then alphabetically.
 | [`barrington-road-elementary`](school/barrington-road-elementary.yml) | school | Barrington Road Elementary School | 4 | 2 |
 | [`sheridan-high-school`](school/sheridan-high-school.yml) | school | Sheridan High School | 6 | 1 |
 
-117 nodes across 18 classes. **4 have nothing pointing at them**, which the corpus rules treat as a gap rather than a fact about the node.
+117 nodes across 18 classes, and **2 with nothing pointing at them** — counting a citation in somebody's prose as pointing. Whether that is a gap depends on the class: `web/tests/unit/reachability.spec.ts` holds every node to having an inbound *edge* and exempts `draft-legislation`, where a node with nothing pointing at it is the design.
 <!-- /REGEN -->
 
 ## Semantic index status
