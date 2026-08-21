@@ -72,6 +72,12 @@ the record — `cargo doc` with warnings as errors was failing for at least two 
 said so. `//:ci` is still the thing to run before pushing; the workflow is the thing that catches
 what a dirty local tree hides.
 
+The site deploys itself. A push to `main` that clears all three jobs uploads the built site to
+Cloudflare Pages, and it is live at <https://schools.ohio.shawneesmart.systems> a minute or two
+later — the same `dist/` the browser suite ran against rather than a rebuild of it, so what is
+served is what was tested. `mise run //:deploy` publishes by hand and is the escape hatch; note
+that it sends the *checked-out* tree to production, so check out `main` first.
+
 If `cargo` is not found outside mise, the host toolchain is at `~/.cargo/bin`.
 
 ## How to read a claim
