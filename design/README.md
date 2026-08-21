@@ -98,8 +98,14 @@ No four-step subset rescues it: dropping any single step reaches 11.9 light / 12
 still short of 15.0 / 17.1. **Re-spacing within these five values is not enough — a five-step ramp
 for this site has to be reconstructed rather than adjusted.**
 
-`--ord5-*` stays in the tokens, is referenced by nothing, and is gated: the test fails if any source
-file begins using it.
+**`--ord5-*` has been deleted from the tokens.** A ramp that fails its own validation and stays in a
+palette file looks sanctioned; the search script carries that history better than dead tokens do.
+`palette.spec.ts` now asserts that the ordinal vocabulary is exactly one ramp of three steps, and
+that no declaration or `var()` reference to a five-step ramp exists anywhere in `src/` or `tests/`.
+
+The design project still declares `--ord5-1..5` on its side. That is deliberate for now — the
+decision to remove them there belongs with whoever picks one of the three options, and the file
+already carries the measurement.
 
 ### The reconstruction was searched, and it does not reach five
 
