@@ -10,8 +10,11 @@
  * without the page beside it to correct it — the same reasoning that put `TaxStatewide` in
  * `feed.ts` instead of in prose.
  *
- * The keys are what `routes.og.page()` takes. They are not route paths: `/` is `"statewide"` here,
- * because `og.page("")` would be a card at `/og/page/.png`.
+ * The keys are what `routes.og.page()` takes, and they are route paths minus the slash. `/` is
+ * the exception and takes no key at all: it is the site's own card, `og.default()`, because the
+ * homepage previews as the site rather than as one of these. `"statewide"` was that exception's
+ * workaround for as long as the statewide panel *was* the root — the key outlived the arrangement
+ * by about ten minutes and now names the route it always claimed to.
  */
 
 import { loadFeed } from "../feed.ts";

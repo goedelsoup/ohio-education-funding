@@ -22,7 +22,7 @@ Fields: one row per directory; every count derived from the directory itself.
 |---|---|
 | [`.yidam/corpus/`](.yidam/corpus/) | The knowledge graph: 117 nodes across 18 classes — regimes, components, parameters, litigation, doctrine, exemplar districts |
 | [`.yidam/catalog/`](.yidam/catalog/) | 41 source records. Every numeric claim in the corpus should reach one in a single hop |
-| [`.yidam/decisions/`](.yidam/decisions/) | 28 records of why the repository is shaped the way it is, including the ones that turned out wrong |
+| [`.yidam/decisions/`](.yidam/decisions/) | 29 records of why the repository is shaped the way it is, including the ones that turned out wrong |
 | [`crates/`](crates/) | The domain computer: 12 Rust crates, 806 test functions, no crates.io dependencies |
 | [`web/`](web/) | The site — a page per district, statewide views, and a scenario runner, all static |
 | [`agents/`](agents/), [`.yidam/skills/`](.yidam/skills/) | 5 traversals and 15 procedures this domain keeps needing |

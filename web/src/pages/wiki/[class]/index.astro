@@ -9,6 +9,7 @@
  */
 import Base from "../../../layouts/Base.astro";
 import { loadCorpus } from "../../../lib/corpus.ts";
+import { sectionForClass } from "../../../lib/nav.ts";
 import { renderProse, summarize } from "../../../lib/prose.ts";
 import * as routes from "../../../lib/routes.ts";
 import SectionAnchor from "../../../components/SectionAnchor.astro";
@@ -29,7 +30,7 @@ const description = await renderProse(entry.description, entry.className);
   description={summarize(entry.description, 200)}
   image={routes.og.wikiClass(entry.className)}
   imageAlt={`${entry.label}: ${entry.nodes.length} node${entry.nodes.length === 1 ? "" : "s"} in the Ohio school funding corpus`}
-  section="wiki"
+  section={sectionForClass(entry.className)}
 >
   <p class="crumb"><a href="/wiki">The corpus</a></p>
   <h1>{entry.label}</h1>

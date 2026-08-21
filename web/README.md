@@ -3,11 +3,12 @@
 The interface layer. School boards, journalists, legislative staff, and parents will not be
 running a Rust CLI, so this was in scope from the outset.
 
-Roughly 3,150 pages, all of them static files:
+Roughly 3,500 pages, all of them static files:
 
 | Route | What it answers |
 |---|---|
-| `/` | Statewide: who is on the guarantee, whether state aid offsets property wealth, the two floors. |
+| `/` | The front door: what this is, how to find a district, and the five sections. Not a view of anything. |
+| `/statewide` | Who is on the guarantee, whether state aid offsets property wealth, the two floors. |
 | `/districts` | All 609, sortable and filterable. |
 | `/district/{irn}` | What the Fair School Funding Plan computes for one district, what it actually receives, and where the difference comes from. |
 | `/district/{irn}/outcome` | What its pupils achieve — against districts with comparable poverty, never against the state. |
@@ -25,14 +26,27 @@ Every one of them is a real URL. `#district/043786` used to be the shareable for
 redirects, but the address is `/district/043786` now, and it is a document rather than an
 instruction to a router.
 
-The bar carries five entries rather than twelve: `Statewide` and `Scenario` flat, and **Places**,
-**Findings** and **Reference** as `<details>` disclosures. Native ones, because a third of the
-end-to-end suite runs with JavaScript disabled and ten of the twelve destinations are inside a
-group — a scripted menu would put most of the site behind a script on a site whose whole claim is
-that none of it is. `site.ts` adds the closing half: one menu closes another, Escape closes the
-open one, a click outside closes it. Without it a reader gets two menus open at once, which is
-untidy and never broken. Grouping also made room for `/compare` and `/data`, which were reachable
-only from the footer.
+The bar carries five axes, and every one of them is a `<details>` disclosure:
+
+    Places▾    Law▾    Formula▾    Research▾    Reference▾
+
+**Two of them are lifted out of `.yidam/corpus/`.** `Law` reaches the acts, the cases and the
+doctrines; `Formula` reaches the regimes and the components, parameters and metrics they are built
+from. Before this they were behind `Reference › Wiki` and a scan of eighteen class names — three
+clicks, from the section a reader looks at last. Which seven of the sixteen acts the `Law` panel
+names is *derived* rather than typed: an act appears if it establishes a funding regime, if it
+does not appropriate at all, or if it is the most recently signed act that does. The menu
+re-points itself at the next budget with no edit anywhere. `src/lib/nav.ts` computes the bar and
+`Base.astro` renders what it is given; `.yidam/decisions/the-bar-lifts-the-corpus.yml` records why.
+
+Disclosures are native ones, because a third of the end-to-end suite runs with JavaScript
+disabled — and every destination in the bar is now inside a group, so a scripted menu would put
+the whole site behind a script on a site whose whole claim is that none of it is. `site.ts` adds
+the closing half: one menu closes another, Escape closes the open one, a click outside closes it.
+Without it a reader gets two menus open at once, which is untidy and never broken.
+
+The cost is that nothing in the bar is one click away any more. The search field beside it is the
+one-click path, and it is the path most readers want.
 
 ## Running it
 
