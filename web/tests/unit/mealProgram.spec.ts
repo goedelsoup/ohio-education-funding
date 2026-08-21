@@ -170,3 +170,30 @@ test("a feed without the series renders nothing rather than an empty chart", () 
   expect(basisChange([])).toBeNull();
   expect(basisChange(meal.slice(0, 3))).toBeNull();
 });
+
+/**
+ * A series that changes how it counts must show the break in the table, not only in the chart.
+ *
+ * The chart has split this into two series since it was built — `AdmCount` through FY2009,
+ * `CECount` from FY2010 — because "the share steps up across it" and a line drawn through is a
+ * lie. The table beside it ran straight through the same break, carrying the distinction only in a
+ * per-row "Counted on" cell, which a reader meets after the eye has already gone down the column.
+ *
+ * Structure and not just styling: a `</tbody><tbody>` is a row group a screen reader announces,
+ * where a `border-top` is a line only a sighted reader sees.
+ */
+test("the table marks the definitional break the chart already draws", () => {
+  const html = renderMealProgram(meal);
+  expect(
+    basisChange(meal.filter((y) => y.streams === 1)),
+    "the fixture no longer contains a basis change to mark",
+  ).not.toBeNull();
+
+  expect(html).toContain('class="series-break"');
+  // Two row groups, because the break closes one and opens another.
+  expect(html.match(/<tbody>/g)?.length ?? 0).toBeGreaterThan(1);
+  // And it says which side is which rather than only that something happened.
+  expect(html).toContain("AdmCount");
+  expect(html).toContain("CECount");
+  expect(html).toMatch(/two series/);
+});
