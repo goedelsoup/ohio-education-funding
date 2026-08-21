@@ -634,7 +634,17 @@ pub fn aggregate_base_cost(
         building_leadership,
         athletic_cocurricular,
         aggregate,
-        per_pupil: aggregate / enrollment.base_cost_enrolled_adm,
+        // Zero ADM does not make the numerator zero: the statutory minimums fund six special
+        // teachers, one counselor, five wellness staff, two administrators, two fiscal support,
+        // one EMIS and one leadership support regardless of enrolment. So the aggregate is
+        // finite and positive at zero pupils, and dividing would give `inf` — which then
+        // propagates into any dispersion statistic computed over the column. Reported as zero,
+        // which is the only figure that is not a claim about a district with no pupils.
+        per_pupil: if enrollment.base_cost_enrolled_adm > 0.0 {
+            aggregate / enrollment.base_cost_enrolled_adm
+        } else {
+            0.0
+        },
     }
 }
 
@@ -863,12 +873,107 @@ mod tests {
         let t = teacher_base_cost(&tiny, &f);
         assert!((t.funded_special_teachers - ratios::SPECIAL_TEACHER_MINIMUM).abs() < 1e-9);
         let c = district_leadership_base_cost(&tiny, &f);
-        // Two other administrators and two fiscal support staff, both minimums.
-        let expected_admin_min = ratios::OTHER_ADMINISTRATOR_MINIMUM;
-        assert!(c.other_administrators > 0.0);
         assert!(
-            (tiny.base_cost_enrolled_adm / ratios::OTHER_ADMINISTRATOR) < expected_admin_min,
+            (tiny.base_cost_enrolled_adm / ratios::OTHER_ADMINISTRATOR)
+                < ratios::OTHER_ADMINISTRATOR_MINIMUM,
             "the ratio should be below the minimum for this district"
+        );
+
+        // The funded counts are not on the returned struct, so the minimum is asserted by the
+        // property that makes it one: a second district, smaller still, is funded identically.
+        // Previously this test bound `expected_admin_min` and never compared anything to it, so
+        // it asserted only that the cost was above zero.
+        let tinier = DistrictEnrollment {
+            base_cost_enrolled_adm: 130.0,
+            grades_9_12_total: 40.0,
+            ..tiny
+        };
+        let c2 = district_leadership_base_cost(&tinier, &f);
+        assert!(
+            (c.other_administrators - c2.other_administrators).abs() < 1e-9,
+            "halving ADM below the minimum must not change the funded administrators"
+        );
+        assert!(
+            (c.fiscal_support - c2.fiscal_support).abs() < 1e-9,
+            "nor the fiscal support staff"
+        );
+        assert!((c.emis - c2.emis).abs() < 1e-9, "nor EMIS support");
+        assert!(
+            (c.leadership_support - c2.leadership_support).abs() < 1e-9,
+            "nor leadership support"
+        );
+
+        let s = student_support_base_cost(&tiny, &f);
+        let s2 = student_support_base_cost(&tinier, &f);
+        assert!(
+            (s.counselors - s2.counselors).abs() < 1e-9,
+            "nor the guidance counselor"
+        );
+        assert!(
+            (s.wellness - s2.wellness).abs() < 1e-9,
+            "nor the wellness and success staff"
+        );
+
+        // And the minimums stop binding: a district past every threshold is funded above them.
+        let large = DistrictEnrollment {
+            base_cost_enrolled_adm: 20_000.0,
+            grades_9_12_total: 6_000.0,
+            open_buildings: 20.0,
+            ..tiny
+        };
+        let cl = district_leadership_base_cost(&large, &f);
+        let sl = student_support_base_cost(&large, &f);
+        assert!(cl.other_administrators > c.other_administrators);
+        assert!(cl.fiscal_support > c.fiscal_support);
+        assert!(cl.emis > c.emis);
+        assert!(cl.leadership_support > c.leadership_support);
+        assert!(sl.counselors > s.counselors);
+        assert!(sl.wellness > s.wellness);
+    }
+
+    /// Building leadership support is capped at three per open building.
+    ///
+    /// `building_leadership_base_cost` has two branches and the existing test exercised only
+    /// the one where buildings govern. A district with many pupils across few buildings takes
+    /// the cap, and nothing asserted it: on FY2022 factors a 20,000-ADM district in 10 buildings
+    /// funds 50 clerical staff by enrolment against a cap of 30.
+    #[test]
+    fn building_support_is_capped_at_three_per_open_building() {
+        let f = StatewideFactors::fy2022();
+        let crowded = DistrictEnrollment {
+            kindergarten: 1_000.0,
+            grades_1_3: 4_000.0,
+            grades_4_8: 8_000.0,
+            grades_9_12: 7_000.0,
+            career_technical: 0.0,
+            grades_9_12_total: 7_000.0,
+            base_cost_enrolled_adm: 20_000.0,
+            open_buildings: 10.0,
+            athletics_eligible: true,
+        };
+        let by_enrollment = 20_000.0 / ratios::BUILDING_LEADERSHIP_SUPPORT;
+        let cap = crowded.open_buildings * ratios::BUILDING_SUPPORT_PER_BUILDING;
+        assert!(
+            by_enrollment > cap,
+            "the fixture must actually reach the cap: {by_enrollment} against {cap}"
+        );
+
+        let b = building_leadership_base_cost(&crowded, &f);
+        let clerical = f.position_cost(f.clerical_salary);
+        assert!(
+            (b.support - cap * clerical).abs() < 1e-6,
+            "support should be the capped 30 staff, not the {by_enrollment} enrolment implies"
+        );
+
+        // Opening buildings raises the cap, which is the only thing that can.
+        let spread = DistrictEnrollment {
+            open_buildings: 30.0,
+            ..crowded
+        };
+        let b2 = building_leadership_base_cost(&spread, &f);
+        assert!(
+            b2.support > b.support,
+            "the same pupils across more buildings lift the cap off"
         );
     }
 
@@ -996,5 +1101,38 @@ mod tests {
             (after.building_leadership.total - before.building_leadership.total).abs() < 1e-6,
             "a teacher salary change must not touch building costs"
         );
+    }
+
+    /// A district with no pupils has a finite base cost and no per-pupil figure.
+    ///
+    /// The statutory minimums fund staff regardless of enrolment, so the numerator is positive
+    /// at zero ADM and the division was returning `inf`. An infinity in the per-pupil column
+    /// propagates into any dispersion statistic computed over it — `Dispersion::of` sorts, and
+    /// an infinity poisons the mean rather than failing loudly.
+    #[test]
+    fn zero_enrollment_gives_a_finite_aggregate_and_no_per_pupil_figure() {
+        let empty = DistrictEnrollment {
+            kindergarten: 0.0,
+            grades_1_3: 0.0,
+            grades_4_8: 0.0,
+            grades_9_12: 0.0,
+            career_technical: 0.0,
+            grades_9_12_total: 0.0,
+            base_cost_enrolled_adm: 0.0,
+            open_buildings: 0.0,
+            athletics_eligible: false,
+        };
+        let b = aggregate_base_cost(&empty, &StatewideFactors::fy2022());
+        assert!(
+            b.aggregate.is_finite() && b.aggregate > 0.0,
+            "the minimums fund staff at zero enrolment, so the aggregate is positive: {}",
+            b.aggregate
+        );
+        assert!(
+            b.per_pupil.is_finite(),
+            "the per-pupil figure must not be infinite: {}",
+            b.per_pupil
+        );
+        assert_eq!(b.per_pupil, 0.0);
     }
 }
