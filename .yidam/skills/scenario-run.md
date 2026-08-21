@@ -26,8 +26,11 @@ compared across years.
    districts the change fails to reach; `scenario-delta` returns both orderings or neither, on
    purpose, so that a report cannot quietly show only the winners.
 5. **Report incidence across wealth and state share**, not just the aggregate.
-6. **Commit the node** with inputs, deltas, reach, incidence, and links to the parameter and
-   regime it binds to.
+6. **Commit the node with the `establish:` verb** — a node authored is new understanding —
+   carrying inputs, deltas, reach, incidence, and links to the parameter and regime it binds
+   to. The verb is named here rather than a document away because this is the only point at
+   which the next commit can still be caught; see the commit vocabulary in
+   [`GRAPH.md`](../.vendor/prelude/GRAPH.md).
 
 ## The three things that make a scenario overstate itself
 

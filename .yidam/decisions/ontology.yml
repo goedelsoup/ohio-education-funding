@@ -3,6 +3,7 @@ summary: >-
   Ohio K-12 education funding; 13 classes aligned to UFO; district x fiscal-year grain,
   1851 to present, all four funding channels, simulation and projection both in scope.
 corpus_depth: 45
+governance: single-elector    # single-elector | collective
 context: |
   The ontology-discovery dialogue opened on a domain given by the user as "Ohio education
   funding", with the goal of tooling and a web platform that explain the history, describe
@@ -121,6 +122,21 @@ decision: |
     fiscal-period     -[follows]->            fiscal-period
 
   Corpus depth: 45 seed instances, distributed toward hub classes.
+addendum: |
+  **`governance:` was added on 2026-08-20, at the re-vendor that brought it into existence.**
+
+  The field did not exist when this record was written. Bootstrap now asks whether one elector
+  or several will maintain the repository and records the answer here, because the answer
+  decides whether `.yidam/sangha/`, `ma/<elector>` branches, resolution events and the
+  constitution are live machinery or dormant. This repository has had one elector throughout —
+  the author, with agents acting on their behalf — and every phase since genesis has run on a
+  `phase/<name>` branch off `main`, which is exactly the single-elector shape. Recording it is
+  a statement of what has been true, not a change of course.
+
+  `.yidam/sangha/` was scaffolded at genesis and is kept rather than removed; see its README for
+  why it is dormant. The prelude's own advice is that a single-elector repo scaffolds the sangha
+  when a second elector appears, so this repository has the machinery early rather than wrongly.
+
 rationale: |
   WHY THESE CLASSES.
 
