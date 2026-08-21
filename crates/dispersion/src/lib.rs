@@ -54,8 +54,14 @@ pub struct Dispersion {
     /// Standard deviation over the mean.
     pub coefficient_of_variation: f64,
     /// Mean of the bottom half over the median.
+    ///
+    /// The halves are taken by position on the sorted series and partition it: for odd `n`
+    /// the median observation falls in neither, so both halves are `n / 2` long. Selecting
+    /// by value instead would place a tied median in both halves and inflate this index and
+    /// [`Self::verstegen_index`] together.
     pub mcloone_index: f64,
-    /// Mean of the top half over the median.
+    /// Mean of the top half over the median. See [`Self::mcloone_index`] on how the halves
+    /// are taken.
     pub verstegen_index: f64,
     /// 95th percentile over the 5th percentile.
     ///
@@ -141,8 +147,23 @@ impl Dispersion {
         let variance = sorted.iter().map(|v| (v - mean).powi(2)).sum::<f64>() / n as f64;
         let std_dev = variance.sqrt();
 
-        let bottom: Vec<f64> = sorted.iter().copied().filter(|v| *v <= median).collect();
-        let top: Vec<f64> = sorted.iter().copied().filter(|v| *v >= median).collect();
+        // Split by position, not by value. Filtering on `<= median` and `>= median` puts every
+        // observation *at* the median into both halves, so the two are not a partition: under a
+        // point mass at the median both indices are pulled toward 1.0 in the same call, and the
+        // "bottom half" can be most of the distribution. On [1, 5, 5, 5, 9] the value filter
+        // calls four of five observations the bottom half and reports McLoone 0.800 where the
+        // bottom half by count gives 0.600.
+        //
+        // Ohio carries exactly the distributions that trigger it: 120 of 611 districts sit at
+        // exactly 20.0000 mills on the 20-mill floor, and 138 of 609 sit exactly on the minimum
+        // state share.
+        //
+        // For odd `n` the median observation itself falls in neither half, which keeps the two
+        // the same size and keeps each an honest half. It is one of two defensible conventions
+        // and the choice is load-bearing, so it is stated here and in the field docs rather than
+        // left to be read off the slice arithmetic.
+        let bottom = &sorted[..n / 2];
+        let top = &sorted[n.div_ceil(2)..];
         let bottom_mean = bottom.iter().sum::<f64>() / bottom.len() as f64;
         let top_mean = top.iter().sum::<f64>() / top.len() as f64;
 
@@ -680,5 +701,42 @@ mod tests {
         assert!((percentile_sorted(&sorted, 0.5) - 5.0).abs() < 1e-12);
         assert!((percentile_sorted(&sorted, 0.0) - 0.0).abs() < 1e-12);
         assert!((percentile_sorted(&sorted, 1.0) - 10.0).abs() < 1e-12);
+    }
+
+    /// The two halves partition the series, so a tie at the median cannot land in both.
+    ///
+    /// Selecting the halves by value (`<= median` and `>= median`) put every observation *at*
+    /// the median into both, which meant a point mass at the median pulled McLoone up and
+    /// Verstegen down in the same call — each reporting the distribution as more equal than it
+    /// is. Ohio's series carry the mass that triggers it: 120 of 611 districts sit at exactly
+    /// 20.0000 mills, and 138 of 609 at exactly the minimum state share.
+    #[test]
+    fn a_tie_at_the_median_lands_in_one_half_or_neither_but_never_both() {
+        // Three of five observations sit on the median. By value, "the bottom half" was four of
+        // the five and McLoone read 0.800; by position it is [1, 5] and reads 0.600.
+        let d = Dispersion::of(&[1.0, 5.0, 5.0, 5.0, 9.0]).unwrap();
+        assert!((d.median - 5.0).abs() < 1e-12);
+        assert!(
+            (d.mcloone_index - 0.6).abs() < 1e-12,
+            "bottom half is [1, 5], mean 3, over a median of 5; got {}",
+            d.mcloone_index
+        );
+        assert!(
+            (d.verstegen_index - 1.4).abs() < 1e-12,
+            "top half is [5, 9], mean 7, over a median of 5; got {}",
+            d.verstegen_index
+        );
+
+        // A distribution that is entirely one value is the degenerate case of the same thing:
+        // both halves are that value and both indices are exactly 1, not something above it.
+        let flat = Dispersion::of(&[42.0; 9]).unwrap();
+        assert!((flat.mcloone_index - 1.0).abs() < 1e-12);
+        assert!((flat.verstegen_index - 1.0).abs() < 1e-12);
+
+        // Even n has no median observation to place, so the halves are the obvious ones.
+        let even = Dispersion::of(&[2.0, 4.0, 6.0, 8.0]).unwrap();
+        assert!((even.median - 5.0).abs() < 1e-12);
+        assert!((even.mcloone_index - 0.6).abs() < 1e-12, "[2, 4] over 5");
+        assert!((even.verstegen_index - 1.4).abs() < 1e-12, "[6, 8] over 5");
     }
 }
