@@ -7,8 +7,9 @@
  *    ramps, so a hue keeps its identity across themes without either mode being a filter over
  *    the other. `data-theme` beats the OS setting in both directions.
  * 2. Data-encoding colour is a closed set. Two categorical series exist and no code anywhere
- *    generates a third; ordinal ramps come in exactly two lengths, each licensed for a different
- *    class of chart (see --ord5-* below). A chart that needs a third series is the wrong chart.
+ *    generates a third, and there is exactly one ordinal ramp, of three steps. A chart that
+ *    needs a third series is the wrong chart; an ordering that needs more than three steps is
+ *    encoded by position and a label. See below for what happened to the five-step ramp.
  *
  * The categorical pair passes six checks in both modes — lightness band, chroma floor, CVD
  * separation (delta-E 24.7 protan, worst case), normal-vision separation, and contrast against
@@ -52,27 +53,24 @@
   --ordinal-3: #123f75;
 
   /*
-   * The 5-step ordinal ramp: quintiles.
+   * There is no five-step ramp, and the absence is a result rather than an omission.
    *
-   * The construction: lightness marches monotonically (~15 L* per step) WHILE hue drifts across a
-   * 30-degree arc, so two channels carry the separation that lightness alone cannot at this step
-   * count. That was the argument for five steps being affordable after all.
+   * One was contributed, measured, and removed. It scored 10.9 light / 10.7 dark against the
+   * three-step ramp's 15.0 / 17.1 — the same figure this file already cited as the reason five
+   * steps of one hue do not work. Its construction added a second channel (a 30-degree hue drift
+   * alongside a ~15 L* lightness march) and that did not buy the separation it was introduced to
+   * buy.
    *
-   * **It does not survive measurement, and this ramp is used by nothing.** CIEDE2000 across normal
-   * vision and three dichromacies puts its worst pair at 10.9 light and 10.7 dark — which is the
-   * exact figure the 3-step ramp's comment above cites as its reason for refusing five steps. The
-   * worst pair is 1-2 in both modes and it is *adjacent*, which is the pair a reader compares most
-   * in the sorted table this ramp was licensed for. No four-step subset rescues it either: the best
-   * reaches 11.9 / 12.5 against the 3-step ramp's 15.0 / 17.1.
+   * `web/scripts/ramp-search.ts` then searched for a replacement rather than constructing one, and
+   * found the ceiling: five ordinal steps do not fit on the dark surface at all. Its contrast floor
+   * pushes the dark end of the ramp up in lightness, leaving an L* span near 55 against light
+   * mode's 68, and tritanopia takes most of what a blue ramp has left. Four fit, by a tenth of a
+   * point in dark, and only by drifting off this palette into violet.
    *
-   * Kept as tokens, unreferenced, and gated: `palette.spec.ts` fails if any source file starts
-   * using `--ord5-*`. A five-step ramp for this site has to be reconstructed rather than adjusted.
+   * So an ordered grouping here is encoded by position and a direct label, not by five colours.
+   * Run the search again if the surfaces change or a wider hue budget is granted; do not
+   * reintroduce a ramp by choosing values.
    */
-  --ord5-1: #a8d5e2;
-  --ord5-2: #6fb2d4;
-  --ord5-3: #3d84c0;
-  --ord5-4: #2a559c;
-  --ord5-5: #1e2f66;
 
   /*
    * Epistemic status. Three marks, on one axis of support.
@@ -147,11 +145,6 @@
   --ordinal-1: #1c528f;
   --ordinal-2: #4a92ea;
   --ordinal-3: #aed3f6;
-  --ord5-1: #123a5c;
-  --ord5-2: #1d5b8a;
-  --ord5-3: #3080b5;
-  --ord5-4: #62aad3;
-  --ord5-5: #a6d6e8;
   --claim-verified: #62a8f0;
   --claim-inference: #a3a29a;
   --claim-open: #ef8352;
@@ -175,11 +168,6 @@
   --ordinal-1: #7fb0e8;
   --ordinal-2: #2a78d6;
   --ordinal-3: #123f75;
-  --ord5-1: #a8d5e2;
-  --ord5-2: #6fb2d4;
-  --ord5-3: #3d84c0;
-  --ord5-4: #2a559c;
-  --ord5-5: #1e2f66;
   --claim-verified: #1c6bc9;
   --claim-inference: #5c5b56;
   --claim-open: #c2521c;
@@ -202,11 +190,6 @@
   --ordinal-1: #1c528f;
   --ordinal-2: #4a92ea;
   --ordinal-3: #aed3f6;
-  --ord5-1: #123a5c;
-  --ord5-2: #1d5b8a;
-  --ord5-3: #3080b5;
-  --ord5-4: #62aad3;
-  --ord5-5: #a6d6e8;
   --claim-verified: #62a8f0;
   --claim-inference: #a3a29a;
   --claim-open: #ef8352;

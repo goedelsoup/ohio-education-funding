@@ -98,8 +98,47 @@ No four-step subset rescues it: dropping any single step reaches 11.9 light / 12
 still short of 15.0 / 17.1. **Re-spacing within these five values is not enough — a five-step ramp
 for this site has to be reconstructed rather than adjusted.**
 
-`--ord5-*` stays in the tokens, is referenced by nothing, and is gated: the test fails if any source
-file begins using it.
+**`--ord5-*` has been deleted from the tokens.** A ramp that fails its own validation and stays in a
+palette file looks sanctioned; the search script carries that history better than dead tokens do.
+`palette.spec.ts` now asserts that the ordinal vocabulary is exactly one ramp of three steps, and
+that no declaration or `var()` reference to a five-step ramp exists anywhere in `src/` or `tests/`.
+
+The design project still declares `--ord5-1..5` on its side. That is deliberate for now — the
+decision to remove them there belongs with whoever picks one of the three options, and the file
+already carries the measurement.
+
+### The reconstruction was searched, and it does not reach five
+
+`web/scripts/ramp-search.ts` optimises a ramp against the committed check rather than constructing
+one and testing it afterwards. Monotone lightness with a real gap, hue inside one arc, chroma
+bounded and moving smoothly, and the step nearest its own ground at 2.2:1 or better — which is what
+an ordinal ramp is, written as constraints.
+
+|  | steps | worst pair | bar | verdict |
+| --- | --: | --: | --: | --- |
+| light | 4 | 18.9 | 15.0 | clears |
+| light | 5 | 15.1 | 15.0 | clears, barely |
+| dark | 4 | 17.2 | 17.1 | clears by 0.1 |
+| dark | 5 | **13.2** | 17.1 | **fails** |
+
+**The dark surface is what binds.** Its contrast floor pushes the dark end of the ramp up in
+lightness, leaving an L\* span of about 55 against light mode's 68, and tritanopia takes most of what
+a blue ramp has left. Five steps do not fit in what remains.
+
+Four fit in both modes, but dark clears by 0.1 — which is not a margin — and both winning ramps
+drift off the site's blue into violet and pink. A ramp that clears the bar by abandoning the palette
+has traded one problem for another.
+
+**So the recommendation is option 1: three steps.** They are measured, licensed for every form
+including all-pairs, and already shipping. A quintile gets position and a direct label, which is
+what the site does today. The search script stays so the question stays answerable — if the
+surfaces change or a wider hue budget is granted, run it rather than deciding again.
+
+Two methodological corrections are recorded in the script's own header, because both were mine and
+both would have produced a confident wrong answer. A first pass maximised separation over free Lab
+points and returned a categorical palette, having been asked for separation and not for order. A
+second added ordering but required every step to clear the contrast floor, which only the step
+nearest its ground has to, and returned infeasible everywhere.
 
 ### And the three-step ramp's own figures did not reproduce either
 
