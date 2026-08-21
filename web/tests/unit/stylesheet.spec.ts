@@ -68,6 +68,52 @@ test("there are exactly three claim status classes", () => {
 });
 
 /**
+ * The four prose genres get three visual channels, and no genre gets a fourth.
+ *
+ * `lead` takes a SIZE, `prose-body` is the norm, `findings` takes a GROUND, and a withdrawal takes
+ * a STATE — a closed `<details>`. Size, ground, state. The temptation the design system names is
+ * four visual languages, and its argument against is that a reader learning four on one page
+ * learns none of them.
+ *
+ * So: none of the four may take a typeface, a hue, or a radius of its own. A hue in particular is
+ * the one to watch, because on this site a hue names a data series and spending one on a container
+ * would make every findings block look like a formula-aid figure.
+ */
+test("no prose genre takes a typeface, a hue, or a radius of its own", () => {
+  const SERIES_HUE = /var\(--(series|ordinal|claim)-/;
+  const offenders: string[] = [];
+  // Match the class as a token wherever it appears, chained or not. The first version anchored on
+  // `(^|,|\s)\.findings`, which never matched `.card.findings` — the class this site actually uses,
+  // because findings is a card here — so the whole genre was exempt and a series hue on its ground
+  // passed green. Caught by setting one deliberately.
+  // The genre's classes named in full. `(?![a-z-])` after `revision` rejected `revision-body`,
+  // which is the withdrawal's actual container — so the one element that could grow a container
+  // shape was the one out of scope, and a radius on it passed. Three attempts, three misses, each
+  // found by breaking it rather than by reading it.
+  const GENRE = /\.(lead|findings|revision|revision-body|withdrawn)(?![a-z-])/;
+  for (const [selector, body] of rules(GENRE)) {
+    for (const declaration of body.split(";")) {
+      const [property = "", value = ""] = declaration.split(":").map((part) => part.trim());
+      if (property === "font-family") offenders.push(`${selector} sets a typeface`);
+      // A card legitimately has a radius, and `findings` IS a card here — so the exemption is for
+      // a rule targeting the card itself, which means the LAST compound in the selector. Testing
+      // the whole string exempted `.card.apparatus .revision-body` too, which is a descendant and
+      // not a card, and let a radius onto the withdrawal.
+      const target = selector.split(/\s+/).at(-1) ?? "";
+      if (property === "border-radius" && !target.includes(".card")) {
+        offenders.push(`${selector} sets its own radius`);
+      }
+      // A left rule marking a withdrawal is the exception and is deliberate: `.revision-body` and
+      // the correction blockquote both use the guarantee hue as a marker, not as a ground.
+      if (SERIES_HUE.test(value) && !/^border-left/.test(property)) {
+        offenders.push(`${selector} { ${property}: ${value} }`);
+      }
+    }
+  }
+  expect(offenders).toEqual([]);
+});
+
+/**
  * Rule 15: no shadow on a card, a tile, or a table.
  *
  * Elevation belongs to things that float over the page — a menu panel, a tooltip. A page of forty

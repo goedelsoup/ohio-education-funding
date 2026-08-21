@@ -261,7 +261,10 @@ a:hover { text-decoration-color: currentColor; }
 h1 { font-size: 1.4rem; margin: 0 0 .3rem; letter-spacing: -0.01em; }
 h2 { font-size: .95rem; margin: 0 0 .8rem; letter-spacing: -0.005em; }
 h3 { font-size: .82rem; margin: 1.4rem 0 .6rem; color: var(--text-secondary); font-weight: 600; }
-.sub { color: var(--text-secondary); margin: 0 0 1.5rem; font-size: .92rem; }
+/* The identifier and edge counts, under the lead rather than over it: the identifier makes the
+   page addressable, the lead tells a reader they are in the right place, and somebody arriving
+   mid-site from a search result needs the second one first. */
+.sub { color: var(--text-secondary); margin: 0 0 var(--space-8); font-size: .92rem; }
 
 /*
  * A corpus node's lead — what the thing is, in at most 50 words, above everything else.
@@ -271,12 +274,22 @@ h3 { font-size: .82rem; margin: 1.4rem 0 .6rem; color: var(--text-secondary); fo
  * a reader needs to know they are in the right place, and for a long time the second was buried
  * in a 2,806-word card while the first sat under the heading.
  */
+/*
+ * THE LEAD — what the thing is, above everything else.
+ *
+ * One step up in size and nothing else: no container, no second typeface, no rule. The design
+ * system argued against giving the lead its own language and it is right — a reader never mistakes
+ * the first sentence on a page for the body, so a channel spent separating them is a channel spent
+ * on the one distinction that needs no help.
+ *
+ * Every value here was already the token it now names. Nothing moved.
+ */
 .lead {
-  font-size: 1.02rem;
-  line-height: 1.55;
+  font-size: var(--text-lead);
+  line-height: var(--leading-base);
   color: var(--text-primary);
-  max-width: 62ch;
-  margin: 0 0 .7rem;
+  max-width: var(--measure-lead);
+  margin: 0 0 var(--space-4);
 }
 
 /*
@@ -709,16 +722,44 @@ tbody tr:last-child th, tbody tr:last-child td { border-bottom: 0; }
  */
 .crumb { font-size: .8rem; color: var(--text-muted); margin: 0 0 .5rem; }
 .crumb a { color: var(--text-secondary); }
-.prose-body { font-size: .93rem; }
+/*
+ * THE FINDINGS — what THIS REPOSITORY computed, and how to read it.
+ *
+ * The one genre that earns a real departure, because it is the only one written in a different
+ * voice: the others describe Ohio, this one describes the work. A reader who cannot tell which is
+ * which cannot tell a statute from an estimate, and that is the single most damaging confusion
+ * available on this site.
+ *
+ * It has had the heading and the caveat since the four-genre migration and no ground, so it
+ * rendered as one more card among forty — the words said the voice had changed and nothing else
+ * did. An inset ground is what the design system spends on it, and nothing else: no hue, because a
+ * hue here names a data series and spending one on a container would make every findings block
+ * look like a formula-aid figure.
+ *
+ * Not a separate `.findings` block, which is what the design system defines. This site already
+ * renders findings as a card with a heading and a note, and those do the "named label" job better
+ * than a bare label would. What was missing was the ground, so that is what this adds.
+ */
+.card.findings { background: var(--surface-inset); }
+
+/*
+ * THE SUBJECT — mechanism, statute, history. The norm every other genre is measured against.
+ *
+ * Moved onto the type and space scales, which the tokens were imported for and nothing consumed.
+ * Two values were not already tokens and take the nearest one, which is a deliberate 0.05rem shift
+ * in each: a list item's bottom margin (.3 -> --space-2, .35rem) and a heading's (.6 -> --space-3,
+ * .55rem). Everything else named a token exactly and nothing else moved.
+ */
+.prose-body { font-size: var(--text-body); }
 .prose-body > *:first-child { margin-top: 0; }
 .prose-body > *:last-child { margin-bottom: 0; }
-.prose-body p { margin: 0 0 .95rem; max-width: 68ch; }
-.prose-body li { max-width: 66ch; margin-bottom: .3rem; }
-.prose-body h2, .prose-body h3 { margin: 1.5rem 0 .6rem; }
+.prose-body p { margin: 0 0 .95rem; max-width: var(--measure-prose); }
+.prose-body li { max-width: 66ch; margin-bottom: var(--space-2); }
+.prose-body h2, .prose-body h3 { margin: 1.5rem 0 var(--space-3); }
 .prose-body code {
-  background: var(--surface-2);
+  background: var(--surface-inset);
   padding: .08rem .28rem;
-  border-radius: 4px;
+  border-radius: var(--radius-sm);
   font-size: .9em;
   /* The corpus cites code by path — `crates/dispersion/tests/report_card_2425.rs` — which is one
      unbreakable token wider than a phone. Without this it pushes the whole document sideways. */
@@ -727,15 +768,15 @@ tbody tr:last-child th, tbody tr:last-child td { border-bottom: 0; }
 /* A fenced block scrolls inside itself rather than widening the page. */
 .prose-body pre {
   overflow-x: auto;
-  background: var(--surface-2);
-  padding: .7rem .85rem;
+  background: var(--surface-inset);
+  padding: var(--space-4) .85rem;
   border-radius: 8px;
   font-size: .85rem;
 }
 .prose-body pre code { background: none; padding: 0; overflow-wrap: normal; }
 .prose-body blockquote {
   margin: 0 0 .95rem;
-  padding-left: .9rem;
+  padding-left: var(--space-5);
   border-left: 2px solid var(--border);
   color: var(--text-secondary);
 }
