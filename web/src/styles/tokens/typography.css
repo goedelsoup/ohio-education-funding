@@ -1,0 +1,65 @@
+/*
+ * Type.
+ *
+ * # No webfont ships
+ *
+ * The site makes no external request and carries no font binary: every reader sees it in whatever
+ * their platform calls a UI sans. That is not a compromise for a reference work read mid-sentence
+ * from a search result — it is the fastest first paint available, and the humanist system faces
+ * (SF, Segoe UI Variable, Roboto) are all good at 15px at density.
+ *
+ * The stacks name IBM Plex Sans / IBM Plex Mono FIRST so a build that chooses to self-host gets a
+ * consistent face across platforms and across the preview cards. No @font-face rule is declared
+ * here, because no binary is committed; drop the .woff2 files in assets/fonts/ and add the rules
+ * and every stack picks them up with no other change.
+ *
+ * # This is a deliberate, standing state — do not "fix" it
+ *
+ * Naming a face with no binary behind it is intentional and was decided explicitly. IBM Plex is the
+ * INTENDED face; the platform stacks are what render until the files land. Tooling will report a
+ * missing @font-face for both families, and that report is a reminder addressed to whoever owns the
+ * binaries, not a defect in this file.
+ *
+ * Never resolve it by substituting a different family. A stack silently retargeted to whatever face
+ * happened to be available is how a design system ends up with a typeface nobody chose.
+ *
+ * # Seven sizes, and why not more
+ *
+ * A page carries body prose, a lead, card headings, table cells, inline claim marks, figure
+ * annotations and a footer. That is seven jobs and this is seven sizes. Anything between two of
+ * them is a size somebody chose by eye, which is how a scale becomes twelve sizes.
+ */
+
+:root {
+  --font-sans:
+    "IBM Plex Sans", ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  /* Figures, identifiers, slugs, code paths. Every dollar amount on this site is set in it. */
+  --font-mono:
+    "IBM Plex Mono", ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, monospace;
+
+  --text-xs: 0.72rem;   /* annotation: the year, the basis, a footer, a table's column head */
+  --text-sm: 0.8rem;    /* apparatus: controls, pills, breadcrumb, contents */
+  --text-base: 0.88rem; /* dense: table cells, notes, card body */
+  --text-body: 0.93rem; /* the reading size, for corpus prose only */
+  --text-lead: 1.02rem; /* the lead, and a decision record's own summary */
+  --text-h1: 1.4rem;
+  --text-figure: 1.5rem; /* the one number a tile exists to show */
+
+  --leading-tight: 1.1;   /* headlines, and the figure in a tile */
+  --leading-snug: 1.35;   /* annotation and captions */
+  --leading-base: 1.55;   /* body and lead */
+
+  --weight-regular: 400;
+  --weight-medium: 500;
+  --weight-semibold: 600;
+  --weight-bold: 650; /* the brand, and a tile's figure. Nothing else. */
+
+  /* Uppercase apparatus labels — column heads, eyebrows, contents label, claim marks. */
+  --tracking-caps: 0.04em;
+  --tracking-tight: -0.01em;
+
+  /* The reading measure. Prose is capped; data is not. */
+  --measure-lead: 62ch;
+  --measure-prose: 68ch;
+  --measure-note: 74ch;
+}

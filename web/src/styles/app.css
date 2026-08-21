@@ -1,87 +1,26 @@
 /*
- * Two series appear anywhere in this platform — formula aid and guarantee, reused as gain and
- * loss — in the categorical slots validated for both surfaces: #2a78d6/#eb6834 on light,
- * #3987e5/#d95926 on dark. All six checks pass in both modes. Dark is a selected step from the
- * same ramps rather than an inversion, and `data-theme` beats the OS setting in both directions.
+ * The site's stylesheet.
  *
- * Where the two are used as a diverging pair — the scenario histogram — zero is neutral gray,
- * never a hue.
+ * The tokens moved out. Colour, type and space now live in `tokens/`, imported below and shared
+ * with the design system this repository publishes to — see `design/README.md`. The values are
+ * unchanged: every one of the fourteen colour tokens this file used to declare is byte-identical
+ * in `tokens/colors.css`, in both modes, and the diff that established that is in the commit.
+ *
+ * Two things did change, and both are mechanism rather than appearance:
+ *
+ * 1. The dark override was `:root:where(:not([data-theme="light"]))` inside the media query. It is
+ *    now a bare `:root` in the query, with `[data-theme="light"]` and `[data-theme="dark"]`
+ *    re-stating each palette at higher specificity. Same outcome in both directions — an explicit
+ *    choice still beats the OS setting — but the theme tokens are now discoverable as theme tokens
+ *    rather than hidden behind what reads to tooling as a component selector.
+ *
+ * 2. Type and space tokens exist for the first time. Nothing below consumes them yet: the rules in
+ *    this file still carry their own literals, and moving them onto the scale is the next step, not
+ *    this one. They are imported now so the two halves cannot drift while that happens.
  */
-
-:root {
-  color-scheme: light;
-  --surface-0: #f4f4f2;
-  --surface-1: #fcfcfb;
-  --surface-2: #eeeeea;
-  --border: #dcdcd6;
-  --text-primary: #0b0b0b;
-  --text-secondary: #52514e;
-  --text-muted: #75746e;
-  --series-formula: #2a78d6;
-  --series-guarantee: #eb6834;
-  --neutral-mark: #a8a79f;
-
-  /*
-   * The ordinal ramp: three steps of the formula hue, light to dark.
-   *
-   * Quintiles, terciles and any other ordered grouping are **not** the categorical pair. Swapping
-   * two of them changes the meaning, which is what makes them ordinal, and an ordinal scale takes
-   * one hue in steps so the order is visible in the colour rather than looked up in a legend.
-   *
-   * Three and not five, and the number is measured rather than chosen. A scatter is an all-pairs
-   * form — any class can sit beside any other, so every pair has to separate, not just adjacent
-   * ones — and five steps of this hue reach a normal-vision ΔE of 10.9 at their closest, which is
-   * two classes a reader with full colour vision cannot tell apart. Three reach 21.4 light and
-   * 21.6 dark, and 20.8 / 20.2 under the worst CVD simulation. The lightest step light and the
-   * darkest step dark sit near 2.2:1 against their surface, which obligates the relief every one
-   * of these charts already carries: a legend, a tooltip per mark, and the table beside it.
-   *
-   * Dark is a selected ramp rather than an inversion, exactly as the series pair is: the anchor
-   * flips, so the ramp runs dark-to-light against a dark surface.
-   */
-  --ordinal-1: #7fb0e8;
-  --ordinal-2: #2a78d6;
-  --ordinal-3: #123f75;
-  --accent-rule: #c9c8c1;
-}
-
-@media (prefers-color-scheme: dark) {
-  :root:where(:not([data-theme="light"])) {
-    color-scheme: dark;
-    --surface-0: #111110;
-    --surface-1: #1a1a19;
-    --surface-2: #222220;
-    --border: #35342f;
-    --text-primary: #ffffff;
-    --text-secondary: #c3c2b7;
-    --text-muted: #96958c;
-    --series-formula: #3987e5;
-    --series-guarantee: #d95926;
-    --neutral-mark: #6d6c64;
-    --ordinal-1: #1c528f;
-    --ordinal-2: #4a92ea;
-    --ordinal-3: #aed3f6;
-    --accent-rule: #45443e;
-  }
-}
-
-:root[data-theme="dark"] {
-  color-scheme: dark;
-  --surface-0: #111110;
-  --surface-1: #1a1a19;
-  --surface-2: #222220;
-  --border: #35342f;
-  --text-primary: #ffffff;
-  --text-secondary: #c3c2b7;
-  --text-muted: #96958c;
-  --series-formula: #3987e5;
-  --series-guarantee: #d95926;
-  --ordinal-1: #1c528f;
-  --ordinal-2: #4a92ea;
-  --ordinal-3: #aed3f6;
-  --neutral-mark: #6d6c64;
-  --accent-rule: #45443e;
-}
+@import "./tokens/colors.css";
+@import "./tokens/typography.css";
+@import "./tokens/space.css";
 
 * { box-sizing: border-box; }
 

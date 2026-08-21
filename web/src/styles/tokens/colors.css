@@ -1,0 +1,213 @@
+/*
+ * Colour.
+ *
+ * Two rules govern this file and both come from the site it describes.
+ *
+ * 1. Light and dark are separately CHOSEN, never inverted. Dark is a selected step from the same
+ *    ramps, so a hue keeps its identity across themes without either mode being a filter over
+ *    the other. `data-theme` beats the OS setting in both directions.
+ * 2. Data-encoding colour is a closed set. Two categorical series exist and no code anywhere
+ *    generates a third; ordinal ramps come in exactly two lengths, each licensed for a different
+ *    class of chart (see --ord5-* below). A chart that needs a third series is the wrong chart.
+ *
+ * The categorical pair passes six checks in both modes — lightness band, chroma floor, CVD
+ * separation (delta-E 24.7 protan, worst case), normal-vision separation, and contrast against
+ * the card surface. The values are load-bearing; do not nudge them for taste.
+ */
+
+:root {
+  color-scheme: light;
+
+  /* Surfaces. Three, and no more: page, card, inset. A fourth would be decoration. */
+  --surface-0: #f4f4f2;
+  --surface-1: #fcfcfb;
+  --surface-2: #eeeeea;
+  --border: #dcdcd6;
+  --accent-rule: #c9c8c1;
+
+  /* Text. Three ranks. Muted is for annotation and is never used for a claim's substance. */
+  --text-primary: #0b0b0b;
+  --text-secondary: #52514e;
+  --text-muted: #75746e;
+
+  /* The categorical pair. Formula aid against guarantee; reused as gain against loss, and only
+     there. Fixed order, never cycled. */
+  --series-formula: #2a78d6;
+  --series-guarantee: #eb6834;
+  /* The diverging midpoint, and any mark with no polarity. Never a hue. */
+  --neutral-mark: #a8a79f;
+
+  /*
+   * The 3-step ordinal ramp: one hue, light to dark. Licensed for ALL-PAIRS forms — scatter
+   * plots, where any class may sit beside any other, so every pair must separate rather than
+   * merely adjacent ones.
+   *
+   * Three and not five. The figures that arrived with this file — 21.4 light, 21.6 dark, 20.8 /
+   * 20.2 under CVD — are not reproducible under any standard metric and have been replaced by
+   * measured ones: CIEDE2000 across normal vision and three dichromacies puts this ramp's worst
+   * pair at 15.0 light and 17.1 dark. See `web/tests/unit/palette.spec.ts`, which runs it.
+   */
+  --ordinal-1: #7fb0e8;
+  --ordinal-2: #2a78d6;
+  --ordinal-3: #123f75;
+
+  /*
+   * The 5-step ordinal ramp: quintiles.
+   *
+   * The construction: lightness marches monotonically (~15 L* per step) WHILE hue drifts across a
+   * 30-degree arc, so two channels carry the separation that lightness alone cannot at this step
+   * count. That was the argument for five steps being affordable after all.
+   *
+   * **It does not survive measurement, and this ramp is used by nothing.** CIEDE2000 across normal
+   * vision and three dichromacies puts its worst pair at 10.9 light and 10.7 dark — which is the
+   * exact figure the 3-step ramp's comment above cites as its reason for refusing five steps. The
+   * worst pair is 1-2 in both modes and it is *adjacent*, which is the pair a reader compares most
+   * in the sorted table this ramp was licensed for. No four-step subset rescues it either: the best
+   * reaches 11.9 / 12.5 against the 3-step ramp's 15.0 / 17.1.
+   *
+   * Kept as tokens, unreferenced, and gated: `palette.spec.ts` fails if any source file starts
+   * using `--ord5-*`. A five-step ramp for this site has to be reconstructed rather than adjusted.
+   */
+  --ord5-1: #a8d5e2;
+  --ord5-2: #6fb2d4;
+  --ord5-3: #3d84c0;
+  --ord5-4: #2a559c;
+  --ord5-5: #1e2f66;
+
+  /*
+   * Epistemic status. Three marks, on one axis of support.
+   *
+   * A fourth state exists — a field nobody has filled in — and it is deliberately NOT a token
+   * here, because it is not a point on this axis. It is a block-level absence with its own
+   * pattern (.unfilled); see patterns/claims.css.
+   *
+   * Colour is never the only channel: each mark also carries a distinct rule style, and each
+   * spells its own status in words.
+   */
+  --claim-verified: #1c6bc9;
+  --claim-inference: #5c5b56;
+  --claim-open: #c2521c;
+
+  /*
+   * Semantic aliases. Prefer these in component CSS; the base values above are for the palette.
+   *
+   * `--text-ink` is this repository's rename of an alias the design system called `--text-body`.
+   * `tokens/typography.css` defines `--text-body` as a font SIZE (0.93rem) and `patterns/prose.css`
+   * consumes it as one, so the two collided on `:root` with incompatible types. `styles.css`
+   * imports colour before type, so the size already won and the colour alias was dead on arrival —
+   * renaming it cannot break anything that works today, and it turns a silent shadow into two
+   * names. Reordering those imports without this fix would have set every `.prose-body`
+   * font-size to a colour, which computes to invalid and falls back to inherited.
+   */
+  --surface-page: var(--surface-0);
+  --surface-card: var(--surface-1);
+  --surface-inset: var(--surface-2);
+  --text-ink: var(--text-primary);
+  --text-annotation: var(--text-muted);
+  --focus-ring: var(--series-formula);
+}
+
+/*
+ * Dark, in three blocks — and the ORDER of the three is the whole mechanism.
+ *
+ * 1. The media query carries the dark values on a bare `:root`, so a reader whose OS asks for dark
+ *    gets dark with no attribute set and no script run. Bare, because a scope like
+ *    `:root:where(:not([data-theme="light"]))` reads as a component selector to tooling that
+ *    indexes design tokens, and these are theme tokens: they have to be discoverable as such.
+ *
+ * 2. `[data-theme="light"]` then re-states the light values at higher specificity, which is what
+ *    lets an explicit light choice beat a dark OS setting. Without this block the media query would
+ *    be unoverridable in that direction.
+ *
+ * 3. `[data-theme="dark"]` carries dark for the opposite case — an explicit dark choice on a light
+ *    OS. Same specificity as block 2 and later in the file, which is fine: the two can never both
+ *    match, because an element has one attribute value.
+ *
+ * So `data-theme` beats the OS setting in BOTH directions, which was the requirement, and the
+ * values are written three times rather than shared through a fourth selector. That repetition is
+ * deliberate: a shared intermediate is the thing that lets the two themes drift into disagreement.
+ * Assert the three blocks against each other in a test instead.
+ *
+ * Dark is a SELECTED palette at every slot, never an inversion of light.
+ */
+@media (prefers-color-scheme: dark) {
+  :root {
+  color-scheme: dark;
+  --surface-0: #111110;
+  --surface-1: #1a1a19;
+  --surface-2: #222220;
+  --border: #35342f;
+  --accent-rule: #45443e;
+  --text-primary: #ffffff;
+  --text-secondary: #c3c2b7;
+  --text-muted: #96958c;
+  --series-formula: #3987e5;
+  --series-guarantee: #d95926;
+  --neutral-mark: #6d6c64;
+  --ordinal-1: #1c528f;
+  --ordinal-2: #4a92ea;
+  --ordinal-3: #aed3f6;
+  --ord5-1: #123a5c;
+  --ord5-2: #1d5b8a;
+  --ord5-3: #3080b5;
+  --ord5-4: #62aad3;
+  --ord5-5: #a6d6e8;
+  --claim-verified: #62a8f0;
+  --claim-inference: #a3a29a;
+  --claim-open: #ef8352;
+  }
+}
+
+/* An explicit light choice, over a dark OS setting. */
+:root[data-theme="light"] {
+  color-scheme: light;
+  --surface-0: #f4f4f2;
+  --surface-1: #fcfcfb;
+  --surface-2: #eeeeea;
+  --border: #dcdcd6;
+  --accent-rule: #c9c8c1;
+  --text-primary: #0b0b0b;
+  --text-secondary: #52514e;
+  --text-muted: #75746e;
+  --series-formula: #2a78d6;
+  --series-guarantee: #eb6834;
+  --neutral-mark: #a8a79f;
+  --ordinal-1: #7fb0e8;
+  --ordinal-2: #2a78d6;
+  --ordinal-3: #123f75;
+  --ord5-1: #a8d5e2;
+  --ord5-2: #6fb2d4;
+  --ord5-3: #3d84c0;
+  --ord5-4: #2a559c;
+  --ord5-5: #1e2f66;
+  --claim-verified: #1c6bc9;
+  --claim-inference: #5c5b56;
+  --claim-open: #c2521c;
+}
+
+/* An explicit dark choice, over a light OS setting. */
+:root[data-theme="dark"] {
+  color-scheme: dark;
+  --surface-0: #111110;
+  --surface-1: #1a1a19;
+  --surface-2: #222220;
+  --border: #35342f;
+  --accent-rule: #45443e;
+  --text-primary: #ffffff;
+  --text-secondary: #c3c2b7;
+  --text-muted: #96958c;
+  --series-formula: #3987e5;
+  --series-guarantee: #d95926;
+  --neutral-mark: #6d6c64;
+  --ordinal-1: #1c528f;
+  --ordinal-2: #4a92ea;
+  --ordinal-3: #aed3f6;
+  --ord5-1: #123a5c;
+  --ord5-2: #1d5b8a;
+  --ord5-3: #3080b5;
+  --ord5-4: #62aad3;
+  --ord5-5: #a6d6e8;
+  --claim-verified: #62a8f0;
+  --claim-inference: #a3a29a;
+  --claim-open: #ef8352;
+}

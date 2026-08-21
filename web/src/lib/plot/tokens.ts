@@ -42,11 +42,19 @@ export const SERIES = {
  * ordered grouping drawn in categorical hues makes a reader look up what each one is; drawn in one
  * hue's steps, the order is in the colour.
  *
- * Three steps and not five, and the number came from the validator rather than from taste. A
- * scatter is an all-pairs form — any band can sit beside any other, so every pair must separate,
- * not merely adjacent ones — and five steps of this hue close to a normal-vision ΔE of 10.9, which
- * is two bands a reader with full colour vision cannot tell apart. Three reach 21.4 light and 21.6
- * dark, and 20.8 / 20.2 under the worst CVD simulation. `app.css` carries the measurements.
+ * Three steps and not five, and the ordering is real even though the figures that used to sit here
+ * were not reproducible. A scatter is an all-pairs form — any band can sit beside any other, so
+ * every pair must separate, not merely adjacent ones — and five steps of one hue do not.
+ *
+ * **The measurements are in `web/tests/unit/palette.spec.ts` now, and they are not the ones this
+ * comment used to state.** It claimed a normal-vision ΔE of 21.4 light and 21.6 dark against a
+ * five-step failure at 10.9, sourced to a validator no longer in the repository. Nothing
+ * reproduces 21.4: CIE76 gives 31.1, CIE94 23.0, CIEDE2000 17.9, OKLab 18.1. Measured in CIEDE2000
+ * across normal vision and three dichromacies, this ramp's worst pair is **15.0 light and 17.1
+ * dark**, and a five-step ramp built to escape the problem lands at 10.9 — the very number the old
+ * comment used to reject five steps.
+ *
+ * So the conclusion held and the arithmetic behind it did not exist. It does now.
  *
  * A chart using this must carry a legend. The end steps sit near 2.2:1 against their own surface,
  * which is a contrast warning that obligates relief rather than one that can be waved off.
