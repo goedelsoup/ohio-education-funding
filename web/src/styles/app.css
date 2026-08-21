@@ -188,6 +188,44 @@ header.site nav a[aria-current="page"] .menu-note { color: var(--text-secondary)
     min-width: 0;
   }
 }
+/*
+ * The regime spans on `/legislation`.
+ *
+ * Five formulas across fifty fiscal years, each bar offset by when it began and sized by how long
+ * it lasted — so the Evidence-Based Model, which ran one biennium, is a fifth the width of the
+ * Bridge Formula, which ran five. That is the fact a list of five names cannot carry, and it is
+ * arithmetic over the corpus's own `effective_from` and `effective_to`.
+ *
+ * The bar is beside the name rather than around it. The first version put the label inside a
+ * stacked strip and the narrowest band — the one the chart exists to show — rendered as `Ev…`.
+ *
+ * Colour encodes nothing. One neutral fill, because identity on this site is the
+ * formula/guarantee pair and a neutral, and a regime is none of those.
+ */
+.spans td.span { min-width: 11rem; width: 30%; vertical-align: middle; }
+/* The acts table sizes its own columns. Left to the browser, `General Assembly` — the widest
+   run of unbreakable text and the least interesting cell — took a third of the table and folded
+   `Foundation Base Cost Formula` onto three lines beside it. */
+.acts th:nth-child(2) { width: 22%; }
+.acts th:nth-child(3) { width: 17%; }
+.acts th:nth-child(4) { width: 24%; }
+.acts th:nth-child(5) { width: 12%; }
+.acts td:last-child { white-space: nowrap; }
+.span-bar { display: block; }
+.span-bar > i {
+  display: block;
+  height: .5rem;
+  min-width: 2px;
+  border-radius: 999px;
+  background: var(--text-annotation);
+}
+
+/* A cell's own year, in the figure face, so the column scans as a column. */
+td.year { font-family: var(--font-mono); color: var(--text-annotation); white-space: nowrap; }
+/* What an act amends, under the act rather than in a column of its own — the chain is a property
+   of the act and a sixth column for it would be empty on a third of the rows. */
+.amends { display: block; font-size: var(--text-xs); color: var(--text-annotation); }
+
 .site-search input {
   width: 15rem;
   max-width: 40vw;

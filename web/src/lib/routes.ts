@@ -121,6 +121,13 @@ export const SECTIONS = {
     sections: "sections",
   },
 
+  /** `/legislation` — the statute timeline, generated from the corpus. */
+  legislation: {
+    regimes: "regimes",
+    acts: "acts",
+    standing: "standing",
+  },
+
   /** `/history` — the Census panel, and the appropriation acts beside it. */
   history: {
     revenueMix: "revenue-mix",
