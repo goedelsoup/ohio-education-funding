@@ -23,6 +23,7 @@ See the class definition: [scenario.ont.yml](../scenario.ont.yml).
 | Node | Question | Status |
 |------|----------|--------|
 | [fsfp-input-year-refresh](fsfp-input-year-refresh.yml) | What does freezing FSFP cost inputs cost districts? | **Run** |
+| [guarantee-phase-out](guarantee-phase-out.yml) | What does FY2027 pay if the guarantee is removed or wound down? | **Run** |
 
 The first scenario has a statewide result. Refreshing the teacher salary input from the FY2022
 reference to FY2024 raises **computed** base cost by $465.0 million a year across all 609

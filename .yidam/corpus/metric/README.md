@@ -23,6 +23,12 @@ See the class definition: [metric.ont.yml](../metric.ont.yml).
 | [assessed-valuation-per-pupil](assessed-valuation-per-pupil.yml) | dollars per pupil | Equity — the wealth side |
 | [state-share-percentage](state-share-percentage.yml) | percent | Equity — the compensation side |
 | [per-pupil-operating-expenditure](per-pupil-operating-expenditure.yml) | dollars per pupil | Adequacy and equity — the resource side |
+| [effective-operating-millage](effective-operating-millage.yml) | mills | Equity — the local effort side |
+| [performance-index](performance-index.yml) | index | Adequacy — the outcome side, as level |
+| [progress-value-added](progress-value-added.yml) | index | Adequacy — the outcome side, as gain |
+| [expenditure-per-equivalent-pupil](expenditure-per-equivalent-pupil.yml) | dollars per pupil | Adequacy and equity — the report card's spending measure |
+| [enrolled-adm](enrolled-adm.yml) | pupils | Every other row's denominator, and two counts wear the name |
+| [general-fund-cash-balance](general-fund-cash-balance.yml) | dollars | Adequacy — the only stock in a class of flows |
 
 The third of these was named as this class's largest gap at genesis and is now populated with a
 statewide series from FY2000 to FY2022. It carries the corpus's clearest demonstration of why
@@ -30,12 +36,7 @@ statewide series from FY2000 to FY2022. It carries the corpus's clearest demonst
 expenditure rose **116.8% nominally and 26.1% in real terms** — and 19.4% if federal COVID
 relief is excluded. Three correct numbers, three different arguments.
 
-| [effective-operating-millage](effective-operating-millage.yml) | mills | Equity — the local effort side |
-| [performance-index](performance-index.yml) | index | Adequacy — the outcome side, as level |
-| [progress-value-added](progress-value-added.yml) | index | Adequacy — the outcome side, as gain |
-| [expenditure-per-equivalent-pupil](expenditure-per-equivalent-pupil.yml) | dollars per pupil | Adequacy and equity — the report card's spending measure |
-
-Two of those rows are new and the third row's label changed to make room for them. Per-pupil operating
+**The two outcome rows changed what the row above them could be called.** Per-pupil operating
 expenditure had been carrying the phrase "the outcome side," which was accurate only because
 nothing in this class measured an outcome. It is a resource. The
 [Performance Index](performance-index.yml) is the outcome, and its arrival is the first time

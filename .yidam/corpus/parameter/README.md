@@ -31,3 +31,5 @@ See the class definition: [parameter.ont.yml](../parameter.ont.yml).
 | [twenty-mill-floor](twenty-mill-floor.yml) | mills | H.B. 920, R.C. 319.301 |
 | [local-share-charge-off-millage](local-share-charge-off-millage.yml) | mills | Biennial budget |
 | [fsfp-phase-in-percentage](fsfp-phase-in-percentage.yml) | percent | Biennial budget |
+| [guarantee-funding-base](guarantee-funding-base.yml) | dollars per district | H.B. 166 (2019), and never re-based |
+| [appropriation-proration-factor](appropriation-proration-factor.yml) | factor below one | The department, when an appropriation runs short |

@@ -209,6 +209,175 @@ fn corpus_index(root: &Path) -> String {
     out
 }
 
+/// Every relationship a node declares on an edge to another node, and whether its class declared it.
+///
+/// # The number this replaces, and why it had to be generated
+///
+/// Sixteen ontology files, the corpus README and `web/src/lib/schema/corpus.ts` each carried the
+/// same hand-written measurement — "90 relationships in use against 65 declared", "46 of the 90
+/// are undeclared", "a third of the graph's edges". It was the evidence for `edge_policy:
+/// characteristic`, and by the time a review re-measured it the corpus had 152 relationships and
+/// half its edges were undeclared. The argument survived; every number in it was wrong, in
+/// eighteen places at once, and the generated node index two screens below had stayed current the
+/// whole time.
+///
+/// # What counts as an edge here
+///
+/// A `links:` entry whose target is another node in this corpus — so `instance-of`, which points
+/// at an ontology class, and `sourced-from`, which points at the catalog, are both out. They are
+/// structural rather than semantic, and counting them would inflate the undeclared share with
+/// edges no class would ever declare.
+fn edge_vocabulary(root: &Path) -> String {
+    let mut used: BTreeMap<String, usize> = BTreeMap::new();
+    let mut undeclared = 0usize;
+    let mut total = 0usize;
+
+    let ontologies = ontology_edges(root);
+    let mut declared: std::collections::BTreeSet<(String, String)> =
+        std::collections::BTreeSet::new();
+    for (class, relationships) in &ontologies {
+        for relationship in relationships {
+            declared.insert((class.clone(), relationship.clone()));
+        }
+    }
+
+    for (class, _, _, text) in corpus_nodes(root) {
+        for (target, relationship) in node_edges(&text) {
+            if !target.ends_with(".yml") || target.ends_with(".ont.yml") {
+                continue;
+            }
+            total += 1;
+            *used.entry(relationship.clone()).or_default() += 1;
+            if !declared.contains(&(class.clone(), relationship)) {
+                undeclared += 1;
+            }
+        }
+    }
+
+    let singletons = used.values().filter(|count| **count == 1).count();
+    let distinct = used.len();
+    let declared_total: usize = ontologies.values().map(Vec::len).sum();
+    let share = (undeclared * 100).checked_div(total).unwrap_or(0);
+
+    let mut out = String::from("| Measure | Count |\n|---|--:|\n");
+    out.push_str(&format!("| edges between nodes | {total} |\n"));
+    out.push_str(&format!("| distinct relationships in use | {distinct} |\n"));
+    out.push_str(&format!(
+        "| relationships declared across every class | {declared_total} |\n"
+    ));
+    out.push_str(&format!(
+        "| edges whose relationship its class does not declare | {undeclared} |\n"
+    ));
+    out.push_str(&format!(
+        "| relationships used exactly once | {singletons} |\n"
+    ));
+    out.push_str(&format!(
+        "\n**{share}% of edges use a relationship the class does not declare**, and \
+         {singletons} of the {distinct} relationships in use are used a single time. That is \
+         the case for `edge_policy: characteristic`: closing the vocabulary would reject those \
+         edges or require {singletons} declarations that each describe one link.\n"
+    ));
+    out
+}
+
+/// One `links:` entry per pair, as `(target, relationship)`.
+///
+/// Positional rather than parsed: an entry opens at `  - ` and its keys sit at four spaces, while
+/// a `note:` body sits at six. That is the same granularity [`claim_audit`] attributes fields at,
+/// and it needs no parser in a crate that has deliberately avoided acquiring one.
+fn node_edges(text: &str) -> Vec<(String, String)> {
+    let mut out = Vec::new();
+    let Some(start) = text.find("\nlinks:\n") else {
+        return out;
+    };
+    let (mut target, mut relationship) = (None, None);
+    for line in text[start + 1..].lines().skip(1) {
+        if !line.starts_with(' ') && !line.trim().is_empty() {
+            break;
+        }
+        if line.starts_with("  - ") {
+            if let (Some(t), Some(r)) = (target.take(), relationship.take()) {
+                out.push((t, r));
+            }
+        }
+        let key = line.trim_start();
+        let indent = line.len() - key.len();
+        if indent > 4 && !line.starts_with("  - ") {
+            continue;
+        }
+        if let Some(value) = key
+            .strip_prefix("- target:")
+            .or_else(|| key.strip_prefix("target:"))
+        {
+            target = Some(value.trim().to_string());
+        } else if let Some(value) = key
+            .strip_prefix("- relationship:")
+            .or_else(|| key.strip_prefix("relationship:"))
+        {
+            relationship = Some(value.trim().to_string());
+        }
+    }
+    if let (Some(t), Some(r)) = (target, relationship) {
+        out.push((t, r));
+    }
+    out
+}
+
+/// The out-direction relationships each ontology class declares.
+///
+/// `direction: in` names an edge written on the *other* node, so it is not something a node of
+/// this class declares and must not count toward what this class permits.
+fn ontology_edges(root: &Path) -> BTreeMap<String, Vec<String>> {
+    let mut out: BTreeMap<String, Vec<String>> = BTreeMap::new();
+    let Ok(entries) = fs::read_dir(root.join(".yidam/corpus")) else {
+        return out;
+    };
+    for entry in entries.flatten() {
+        let path = entry.path();
+        let name = path
+            .file_name()
+            .unwrap_or_default()
+            .to_string_lossy()
+            .into_owned();
+        let Some(class) = name.strip_suffix(".ont.yml") else {
+            continue;
+        };
+        let text = fs::read_to_string(&path).unwrap_or_default();
+        let Some(start) = text.find("\nedges:\n") else {
+            continue;
+        };
+        let mut relationship: Option<String> = None;
+        let mut inbound = false;
+        let mut declared = Vec::new();
+        for line in text[start + 1..].lines().skip(1) {
+            if line.starts_with("  - ") {
+                if let Some(name) = relationship.take() {
+                    if !inbound {
+                        declared.push(name);
+                    }
+                }
+                inbound = false;
+            }
+            let key = line.trim_start();
+            if let Some(value) = key
+                .strip_prefix("- relationship:")
+                .or_else(|| key.strip_prefix("relationship:"))
+            {
+                relationship = Some(value.trim().to_string());
+            } else if key.starts_with("direction:") && key.contains("in") {
+                inbound = true;
+            }
+        }
+        if let Some(name) = relationship {
+            if !inbound {
+                declared.push(name);
+            }
+        }
+        out.insert(class.to_string(), declared);
+    }
+    out
+}
+
 fn catalog_audit(root: &Path) -> String {
     let corpus: Vec<String> = corpus_nodes(root)
         .into_iter()
@@ -824,6 +993,7 @@ fn generate(command: &str, root: &Path) -> Option<String> {
         "yidam bundle-status" => bundle_status(root),
         "yidam connector-registry" => connector_registry(root),
         "yidam claim-audit" => claim_audit(root),
+        "yidam edge-vocabulary" => edge_vocabulary(root),
         "yidam repository-overview" => repository_overview(root),
         "yidam retrieval-status" => retrieval_status(root),
         "yidam claim-totals" => claim_totals(root),
@@ -1025,6 +1195,81 @@ mod tests {
                 "{tag} is reported as something other than {actual}"
             );
         }
+    }
+
+    #[test]
+    fn the_edge_vocabulary_counts_edges_between_nodes_and_nothing_else() {
+        // Built from lines rather than written as one escaped literal: rustfmt rewraps a long
+        // string with continuations and folds the source indentation into the value, which
+        // silently changes what is being tested.
+        let node = [
+            "class: legislation",
+            "links:",
+            "  - target: ../legislation.ont.yml",
+            "    relationship: instance-of",
+            "  - target: hb-110-2021.yml",
+            "    relationship: amends",
+            "  - target: ../fiscal-period/fy2026-27.yml",
+            "    relationship: appropriates-for",
+            "    note: >-",
+            "      A body indented six spaces, mentioning target: and relationship: in prose.",
+            "  - target: ../../catalog/lsc-hb96-analysis.md",
+            "    relationship: sourced-from",
+            "",
+        ]
+        .join("\n");
+
+        let edges = node_edges(&node);
+        let pairs: Vec<(&str, &str)> = edges
+            .iter()
+            .map(|(target, relationship)| (target.as_str(), relationship.as_str()))
+            .collect();
+        assert_eq!(
+            pairs,
+            vec![
+                ("../legislation.ont.yml", "instance-of"),
+                ("hb-110-2021.yml", "amends"),
+                ("../fiscal-period/fy2026-27.yml", "appropriates-for"),
+                ("../../catalog/lsc-hb96-analysis.md", "sourced-from"),
+            ],
+            "every entry is read once, and the note body is not mistaken for one"
+        );
+
+        let counted = edges
+            .iter()
+            .filter(|(target, _)| target.ends_with(".yml") && !target.ends_with(".ont.yml"))
+            .count();
+        assert_eq!(counted, 2, "the ontology and the catalog leave the corpus");
+    }
+
+    /// An `in` edge is written on the other node, so it is not something this class declares.
+    ///
+    /// Counting it would inflate the declared total and understate how far the corpus's actual
+    /// vocabulary runs past its ontologies — which is the whole quantity this block exists to
+    /// report, and the one that was wrong in seventeen hand-written copies.
+    #[test]
+    fn only_out_direction_relationships_count_as_declared() {
+        let declared = ontology_edges(&repository_root());
+        let legislation = declared.get("legislation").expect("the class exists");
+        assert!(legislation.contains(&"appropriates-for".to_string()));
+        assert!(
+            !legislation.contains(&"enacted-by".to_string()),
+            "enacted-by is declared `direction: in` and belongs to actor, not here"
+        );
+    }
+
+    #[test]
+    fn the_edge_vocabulary_block_agrees_with_a_direct_count() {
+        let root = repository_root();
+        let total: usize = corpus_nodes(&root)
+            .iter()
+            .flat_map(|(_, _, _, text)| node_edges(text))
+            .filter(|(target, _)| target.ends_with(".yml") && !target.ends_with(".ont.yml"))
+            .count();
+        assert!(
+            edge_vocabulary(&root).contains(&format!("| edges between nodes | {total} |")),
+            "the generated block and a direct count disagree"
+        );
     }
 
     #[test]

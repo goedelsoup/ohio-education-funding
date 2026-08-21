@@ -22,6 +22,9 @@ See the class definition: [program.ont.yml](../program.ont.yml).
 | [cleveland-scholarship](cleveland-scholarship.yml) | scholarship | Away from resident district |
 | [edchoice-expansion](edchoice-expansion.yml) | scholarship | Away from resident district |
 | [classroom-facilities-assistance](classroom-facilities-assistance.yml) | capital assistance | Toward district |
+| [edchoice-scholarship](edchoice-scholarship.yml) | scholarship | Away from resident district |
+| [autism-scholarship](autism-scholarship.yml) | scholarship | Away from resident district |
+| [jon-peterson-special-needs](jon-peterson-special-needs.yml) | scholarship | Away from resident district |
 
 ## Known gaps
 
