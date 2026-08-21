@@ -77,36 +77,38 @@ ratchet is the wrong shape: there is nothing left to shrink, and a bound of 20 w
 twenty new defects. The failure the pin exists to catch is a finding folded back into a
 `description`, and that is a change from zero.
 
-## `[unentered]` — a fourth mark, and why it is not a fourth confidence level
+## `[unentered]` — the fourth mark, and where it went
 
-The prelude's three tags grade *how well a claim is supported*. This domain needs one more mark,
-and it sits on a different axis: whether there is a claim at all.
+The prelude's three tags grade *how well a claim is supported*. This domain needed one more mark,
+and it sat on a different axis: whether there is a claim at all.
 
-- `[open]` — a live question. Why the fortieth-ranked district is the local capacity benchmark
-  and not some other rank is not stated in the section, and reading more of the section will not
-  say. Somebody has to find out.
-- `[unentered]` — a knowable value nobody has typed in. A district's `established` date, a bill's
-  `vetoes` list, an agency's typology code. No investigation is required; a source is open and
-  the field is empty.
+- `[open]` — a live question. Why the fortieth-ranked district is the local capacity benchmark and
+  not some other rank is not stated in the section, and reading more of the section will not say.
+  Somebody has to find out.
+- **A field nobody has filled in** — a knowable value, a source open, and nothing typed. No
+  investigation required.
 
-The [audit of every open claim](../decisions/the-open-item-audit.yml) found that four of the
-largest `[open]` clusters were the second kind and concluded that "a future pass should probably
-distinguish 'unknown' from 'unentered' in the notation rather than marking both `[open]`." It
-matters because the two imply different work and different reading. A corpus reporting a hundred
-and fifty open questions sounds like one with deep uncertainty about its domain; reporting live
-questions and empty fields apart says where the thinking is needed and where the typing is.
+For a long time the second was written `[unentered]`, inline, in the same brackets as the other
+three. **This section used to argue that it was not a fourth confidence level while the parser went
+on rendering it as a fourth badge**, and that contradiction is the whole story: sitting in the
+sequence *is* the claim that it belongs to the sequence, so inline it read as "worse than open"
+whatever it wore.
 
-`[unentered]` is a **narrowing** of `[open]`, not a replacement for it, so nothing outside this
-repository has to learn it: a consumer that knows only the prelude's three tags can treat an
-`[unentered]` field as unfilled and lose nothing.
+**It is structure now.** A node carries `unfilled:` entries — a `field` naming the missing fact and
+a `why` saying where the value lives — and they render as a block in the position the content would
+occupy rather than as a mark in somebody's sentence. Thirty-three property-level marks moved; four
+that named a gap in this corpus rather than an empty field on a node were reclassified `[open]`,
+which is what they always were; and four more on draft legislation were dropped outright, because a
+bill nobody introduced has no General Assembly and no sponsors and never will.
 
-The line was drawn conservatively, and one cluster the audit put on the empty-field side stayed
-`[open]`: `vetoes` reads "line-item vetoes exercised; education funding effects not yet assessed",
-and assessing an effect is analysis rather than transcription. A distinction that inflates itself
-is not worth having. Two fields split across both columns for the same reason —
-[Eastland-Fairfield](education-agency/eastland-fairfield-ctc.yml)'s typology is genuinely open,
-because JVSDs are outside the department's typology altogether and how they should be grouped for
-peer comparison is unresolved, while its neighbours are simply missing a code that exists.
+The count below is therefore zero and should stay there. `web/tests/unit/prose.spec.ts` fails if a
+node writes the old mark, and the badge assertion beside it fails if `unentered` is added back to
+the rendering vocabulary.
+
+`field` names the missing *fact*, not necessarily a property key. Only a third of these were whole
+fields; the rest sat inside a property carrying real content — an agency's `typology` holds "Urban,
+very high poverty" and lacks only the department's own code. Naming the property there would claim
+the whole field was empty, which is worse than the badge it replaced.
 
 The counts below are generated. A hand count is what the audit did, and it answered the question
 once for a corpus that has been changing ever since.
@@ -122,31 +124,25 @@ Fields: count per claim tag across every node; then the unresolved marks by the 
 |---|--:|---|
 | `[verified]` | 982 | supported by a committed primary source |
 | `[inference]` | 251 | drawn from verified facts, not witnessed |
-| `[open]` | 202 | a live question — unknown, contested, or being worked |
-| `[unentered]` | 37 | a knowable value nobody has typed in yet |
+| `[open]` | 206 | a live question — unknown, contested, or being worked |
+| `[unentered]` | 0 | a knowable value nobody has typed in yet |
 
-239 unresolved marks in total, 202 of them live questions and 37 of them empty fields. Before the two were distinguished the corpus reported the sum as its count of what it does not know, which overstated it by 15%.
+206 unresolved marks, and every one of them is a live question. The fourth mark is gone from the prose: a field nobody has filled in is carried as `unfilled:` structure on the node it belongs to, which is what `[unentered]` used to say inline on an axis it did not belong to.
 
 | Field | `[open]` | `[unentered]` |
 |---|--:|--:|
-| `findings` | 57 | 1 |
-| `description` | 51 | 3 |
+| `findings` | 58 | 0 |
+| `description` | 54 | 0 |
 | `series` | 12 | 0 |
 | `revisions` | 8 | 0 |
-| `established` | 0 | 7 |
-| `typology` | 1 | 5 |
 | `statutory_basis` | 6 | 0 |
 | `accountability_effect` | 6 | 0 |
-| `roles` | 4 | 1 |
 | `mechanism` | 5 | 0 |
 | `amount` | 5 | 0 |
-| `series_path` | 0 | 4 |
+| `roles` | 4 | 0 |
 | `eligibility` | 4 | 0 |
 | `vetoes` | 3 | 0 |
-| `sponsors` | 1 | 2 |
 | `restriction` | 3 | 0 |
-| `performance` | 0 | 3 |
-| `grades` | 0 | 3 |
 | `definition` | 3 | 0 |
 | `contested` | 3 | 0 |
 | `caveats` | 3 | 0 |
@@ -154,24 +150,22 @@ Fields: count per claim tag across every node; then the unresolved marks by the 
 | `subject` | 2 | 0 |
 | `legal_basis` | 2 | 0 |
 | `holding` | 2 | 0 |
-| `general_assembly` | 0 | 2 |
-| `exit` | 1 | 1 |
-| `effective` | 0 | 2 |
 | `confidence` | 2 | 0 |
 | `calculator` | 2 | 0 |
 | `boundary_note` | 2 | 0 |
-| `appropriation_line` | 1 | 1 |
 | `adoption_evidence` | 2 | 0 |
+| `typology` | 1 | 0 |
 | `trigger` | 1 | 0 |
 | `status` | 1 | 0 |
+| `sponsors` | 1 | 0 |
 | `sensitivity` | 1 | 0 |
 | `remedy` | 1 | 0 |
-| `measure` | 0 | 1 |
 | `kind` | 1 | 0 |
-| `irn` | 0 | 1 |
 | `fiscal_effect` | 1 | 0 |
+| `exit` | 1 | 0 |
 | `district_funding_effect` | 1 | 0 |
 | `context` | 1 | 0 |
+| `appropriation_line` | 1 | 0 |
 | `appropriating_bill` | 1 | 0 |
 
 **43 recorded withdrawals across 26 nodes.** A claim the corpus published and no longer stands behind is kept in a `revisions:` block rather than edited out, with the test or source that settled it — see [`the-four-genres-of-a-description`](../decisions/the-four-genres-of-a-description.yml). Counted here for the same reason the tags above are: how often this corpus has corrected itself is a fact about it, and one nobody would think to update by hand.

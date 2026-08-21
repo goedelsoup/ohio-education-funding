@@ -915,3 +915,30 @@ footer.site { border-top: 1px solid var(--border); padding-top: 1.1rem; margin-t
 #district-table thead button[aria-sort]::after { content: " ↕"; opacity: .45; }
 #district-table thead button[aria-sort="ascending"]::after { content: " ↑"; opacity: 1; }
 #district-table thead button[aria-sort="descending"]::after { content: " ↓"; opacity: 1; }
+
+/*
+ * What a node does not hold, as a block in the position the content would occupy.
+ *
+ * The fourth epistemic state, moved out of the sentence. Three marks grade how well a claim is
+ * supported; this one says there is no claim to grade, which is a different axis — and given
+ * inline in the same vocabulary it read as "worse than open" whatever colour it wore, because
+ * sitting in the sequence is itself the claim that it belongs to the sequence.
+ *
+ * A dashed top rule and muted text, and no hue: an empty field must not compete with a claim, and
+ * a hue on this site names a data series. It names the missing fact rather than shrugging — "the
+ * department's typology code" is a to-do, "no data" is not.
+ */
+.unfilled {
+  display: block;
+  border-top: 1px dashed var(--accent-rule);
+  padding-top: var(--space-3);
+  margin: var(--space-5) 0 0;
+  font-size: var(--text-base);
+  color: var(--text-muted);
+  max-width: var(--measure-note);
+}
+.unfilled + .unfilled { margin-top: var(--space-4); }
+.unfilled > .unfilled-field {
+  font-weight: var(--weight-semibold);
+  color: var(--text-secondary);
+}

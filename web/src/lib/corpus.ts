@@ -173,6 +173,14 @@ export interface Node {
   findings: string | null;
   /** What the node used to say, oldest first. Empty on a node that has never been corrected. */
   revisions: Revision[];
+  /**
+   * What this node does not hold, named.
+   *
+   * Structure rather than a fourth claim mark: an empty field is the absence of a claim to grade,
+   * not a weak one, so it renders as a block where the content would be instead of as a badge in
+   * somebody's sentence. See `UnfilledSchema` in `schema/corpus.ts`.
+   */
+  unfilled: Unfilled[];
   /** Edges this node declares plus the ones it only mentions. */
   out: Edge[];
   /** Populated after every node is read. */
@@ -477,6 +485,7 @@ function readNode(className: string, file: string, report: Diagnostic[]): Node {
   const summary = String(parsed.summary ?? "").trim();
   const description = String(parsed.description ?? "");
   const revisions = readRevisions(parsed.revisions);
+  const unfilled = readUnfilled(parsed.unfilled);
   const rawLinks = parsed.links;
 
   report.push(...lintProse(relative, summary, description));
@@ -550,9 +559,37 @@ function readNode(className: string, file: string, report: Diagnostic[]): Node {
     properties,
     findings: parsed.findings == null ? null : String(parsed.findings),
     revisions,
+    unfilled,
     out: [...stated, ...inline],
     in: [],
   };
+}
+
+/** One thing a node does not hold. */
+export interface Unfilled {
+  /** The missing fact, as a short noun phrase — `established`, `the department's typology code`. */
+  field: string;
+  /** Where the value lives and what it would take, when that is known. */
+  why: string | null;
+}
+
+/**
+ * The `unfilled:` block, read the same defensive way `revisions:` is.
+ *
+ * A node with none is the ordinary case, so absence of the key is not an error and an entry
+ * missing its `field` is dropped rather than thrown on — the schema is what rejects a malformed
+ * one at build time, and this runs on data the schema has already accepted.
+ */
+function readUnfilled(raw: unknown): Unfilled[] {
+  if (!Array.isArray(raw)) return [];
+  return raw.flatMap((entry) => {
+    if (typeof entry !== "object" || entry === null) return [];
+    const record = entry as Record<string, unknown>;
+    const field = typeof record.field === "string" ? record.field.trim() : "";
+    if (field === "") return [];
+    const why = typeof record.why === "string" ? record.why.trim() : "";
+    return [{ field, why: why === "" ? null : why }];
+  });
 }
 
 /**

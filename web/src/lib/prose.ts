@@ -64,14 +64,31 @@ import { resolveTarget } from "./corpus.ts";
 import { escapeHtml } from "./format.ts";
 
 /**
- * The four epistemic marks the corpus writes.
+ * The three epistemic marks a claim can carry, and the fourth that is not one.
  *
- * `unentered` is the one that is easy to leave out, and was: `.yidam/corpus/README.md` gives it a
- * section of its own explaining that it is *not* a fourth confidence level — it says nothing has
- * been entered for a field yet, where `open` says a question has been asked and not answered. It
- * is used 76 times, and every one of them printed as literal brackets.
+ * `verified`, `inference` and `open` grade how well a claim is supported. There was a fourth,
+ * `unentered`, and it was rendered as a fourth inline badge for a long time — while
+ * `.yidam/corpus/README.md` argued in prose that it is *not* a fourth confidence level, because it
+ * says nothing has been entered for a field rather than that a claim is weak. Sitting in the
+ * sequence is itself the claim that it belongs to the sequence, so inline it read as "worse than
+ * open" whatever it wore.
+ *
+ * It is now structure rather than prose: a node carries `unfilled:` entries naming what it does not
+ * hold, and they render as a block in the position the content would occupy. No node writes
+ * `[unentered]` any more, and `corpus.spec.ts` fails if one starts.
+ *
+ * # Why the two lists are separate
+ *
+ * {@link TAGS} is what gets a badge. {@link STRIPPED} is what gets removed from a summary, and it
+ * keeps `unentered` deliberately: a summary that has to survive being extracted into a `<meta>` tag
+ * must not print a literal bracket, and dropping the name from the stripping list is how a mark
+ * that no longer renders starts leaking into preview cards instead. One list doing both jobs is
+ * what made that a single-word change with two effects.
  */
-const TAGS = ["verified", "inference", "open", "unentered"] as const;
+const TAGS = ["verified", "inference", "open"] as const;
+
+/** Every mark a summary strips, including the retired one. See {@link TAGS}. */
+const STRIPPED = [...TAGS, "unentered"] as const;
 
 /**
  * What may follow the tag name inside the brackets and still leave it a tag.
@@ -338,7 +355,7 @@ export function summarize(markdown: string, max: number): string {
 
   // Claim tags, innermost first, until none is left. A summary has no room to explain what
   // "[verified]" asserts, and an unexplained bracket reads as a typo.
-  const claim = new RegExp(`\\[(?:${TAGS.join("|")})(?:[\\s,;:—–][^[\\]]*)?\\]`, "g");
+  const claim = new RegExp(`\\[(?:${STRIPPED.join("|")})(?:[\\s,;:—–][^[\\]]*)?\\]`, "g");
   for (let previous = ""; previous !== text; ) {
     previous = text;
     text = text.replace(claim, "");

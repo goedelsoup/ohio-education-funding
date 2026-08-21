@@ -88,6 +88,25 @@
         ],
         "additionalProperties": false
       }
+    },
+    "unfilled": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "field": {
+            "type": "string",
+            "minLength": 1
+          },
+          "why": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "field"
+        ],
+        "additionalProperties": false
+      }
     }
   },
   "required": [

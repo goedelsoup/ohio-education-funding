@@ -26,18 +26,21 @@ description: |
 properties:
   building_irn: 001644 [verified]
   district: Upper Arlington City School District, IRN 044933. [verified]
-  grades: Not entered; the report card files carry no grade span. [unentered]
   enrollment: 801 in 2024-25. [verified]
   performance: |
     Performance Index 105.9 in 2024-25, 106.2 in 2023-24, 104.9 in 2022-23; five stars on the
     achievement component. [verified] The overall rating is not published at building grain.
-    [unentered]
   chronic_absenteeism: 2.5% in 2024-25. [verified]
   roles: |
     Not Title I served, on the ordinary reading of a district at Upper Arlington's wealth — which
     would place it outside the CSI-eligible population entirely, since CSI selects among Title I
     served schools. Not verified here. [open]
   series_path: crates/dispersion/fixtures/report-card-2425-buildings.csv, keyed by building IRN 001644. [verified]
+unfilled:
+  - field: grade span
+    why: The report card files carry no grade span. It is on the building's own directory entry.
+  - field: the overall rating
+    why: Neither published building file carries it; the achievement component is what is held.
 links:
   - target: ../school.ont.yml
     relationship: instance-of

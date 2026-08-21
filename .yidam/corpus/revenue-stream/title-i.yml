@@ -31,7 +31,7 @@ description: |
   national $2,493, which is 13.87% of Ohio school revenue and ranks Ohio 25th of 51. [verified —
   `crates/dispersion/src/national_peers.rs`] Title I is the largest component of that, but the
   F-33 does not decompose it, so no Title I figure for Ohio or for any district is entered here.
-  [unentered]
+  [open]
 properties:
   name: Title I, Part A — Improving Basic Programs Operated by Local Educational Agencies
   level: federal
@@ -66,9 +66,12 @@ properties:
     economy and with the decennial census, so the channel is neither guaranteed nor formula-driven
     in the way state foundation aid is. [inference]
   series_path: |
-    No Title I-specific series, and no connector retrieves the allocations. [unentered] Title I
+    No Title I-specific series, and no connector retrieves the allocations. Title I
     is the largest component of the federal column in
     crates/dispersion/fixtures/f33-ohio-panel.csv, FY2012-FY2022, and is not separable from it.
+unfilled:
+  - field: a Title I-specific series
+    why: No connector retrieves the allocations, and the F-33 does not decompose the federal column.
 links:
   - target: ../revenue-stream.ont.yml
     relationship: instance-of

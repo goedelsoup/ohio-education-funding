@@ -54,7 +54,6 @@ findings: |
 properties:
   building_irn: 000828 [verified]
   district: Cleveland Municipal School District, IRN 043786. [verified]
-  grades: Not entered; the report card files carry no grade span. [unentered]
   enrollment: 314 in 2024-25. [verified]
   performance: |
     Performance Index 36.8 in 2024-25, 39.1 in 2023-24, 38.9 in 2022-23; one star on the
@@ -62,12 +61,17 @@ properties:
     maximum, and no trend in either direction.
 
     The overall rating that R.C. 3302.10 and CSI identification key on is not published in either
-    building file. [unentered]
+    building file.
   chronic_absenteeism: 66.7% in 2024-25. [verified]
   roles: |
     **On none of the three lists.** [verified — `dispersion::identified`, pinned by test] See the
     description: absence is not evidence of not failing.
   series_path: crates/dispersion/fixtures/report-card-2425-buildings.csv, keyed by building IRN 000828. [verified]
+unfilled:
+  - field: grade span
+    why: The report card files carry no grade span. It is on the building's own directory entry.
+  - field: the overall rating
+    why: Neither published building file carries it; the achievement component is what is held.
 links:
   - target: ../school.ont.yml
     relationship: instance-of

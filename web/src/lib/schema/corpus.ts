@@ -95,6 +95,43 @@ export const RevisionSchema = z
   })
   .strict();
 
+/**
+ * One thing a node does not hold, named.
+ *
+ * # Why this is structure and not a fourth claim tag
+ *
+ * The three claim tags grade how well a claim is supported. A field nobody has filled in is not a
+ * weaker grade of support — it is the absence of a claim to grade — so it does not belong on that
+ * axis, and putting it there makes it read as "worse than open" whatever it wears. The corpus
+ * README said as much for a long time while the parser went on emitting it as a fourth inline
+ * badge.
+ *
+ * So the absence moves out of the sentence and becomes data. Two things follow that prose could
+ * not give: the loader reads a list instead of matching a pattern, and a build check can assert
+ * that no `[unentered]` string survives anywhere in a node.
+ *
+ * # `field` names the missing FACT, not necessarily a property key
+ *
+ * Only a third of these are whole-field absences. The rest sit inside a property that carries real
+ * content — an agency's `typology` holds "Urban, very high poverty" and lacks only the department's
+ * own code. Naming the property there would claim the whole field is empty, which is worse than the
+ * badge it replaced. So `field` is a short noun phrase: `established`, or `the department's
+ * typology code`.
+ *
+ * # Why an object rather than a string
+ *
+ * `why` is worth keeping — most of these already explained where the value lives and what it would
+ * take to get it, and that explanation is the difference between a to-do and a shrug. Carrying it
+ * in one string would mean `field: why`, and a plain scalar containing `: ` is one of the four
+ * authoring defects this corpus has already been bitten by: YAML reads it as a nested mapping.
+ */
+export const UnfilledSchema = z
+  .object({
+    field: z.string().min(1, "an unfilled entry names what is missing"),
+    why: z.string().optional(),
+  })
+  .strict();
+
 /** What a `summary` may not be longer than, in words. See {@link NodeSchema}. */
 export const SUMMARY_MAX_WORDS = 50;
 
@@ -166,6 +203,7 @@ export const NodeSchema = z
     links: z.array(LinkSchema).min(1, "every node must have at least one outgoing link"),
     findings: z.string().optional(),
     revisions: z.array(RevisionSchema).optional(),
+    unfilled: z.array(UnfilledSchema).optional(),
   })
   .strict();
 

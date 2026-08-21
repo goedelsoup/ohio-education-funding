@@ -46,7 +46,6 @@ properties:
   typology: |
     Not applicable in the standard department typology, which classifies traditional districts.
     How JVSDs are grouped for peer comparison is unresolved. [open]
-  established: Not yet established. [unentered]
   roles: |
     Career-technical provider to member districts [verified]. Subject to the 2-mill JVSD
     reduction-factor floor rather than the 20-mill floor [verified].
@@ -56,6 +55,9 @@ properties:
       crates/project/fixtures/district-finances.csv           FY2020-FY2024 actuals and balances
       crates/dispersion/fixtures/f33-ohio-panel.csv           FY2012-FY2022 revenue, federal basis
       crates/dispersion/fixtures/mr81-sponsor-panel.csv       1998-2014 free and reduced lunch
+unfilled:
+  - field: established
+    why: The department's district profile carries it; nobody has read it across.
 links:
   - target: ../education-agency.ont.yml
     relationship: instance-of

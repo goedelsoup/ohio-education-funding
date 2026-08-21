@@ -28,7 +28,7 @@ description: |
   year. [verified]
 
   What the components are, how the overall rating is computed from them, and how the star
-  thresholds are set are in the section and not yet transcribed here. [unentered] Whether the
+  thresholds are set are in the section and not yet transcribed here. [open] Whether the
   2022-23 change of scale moved any district across the distress trigger is not established and
   is exactly the kind of question the two-regime model exists to ask. [open]
 properties:
@@ -41,7 +41,7 @@ properties:
     grades for the 2022-23 report cards and both remain in the section. [verified] Components
     include achievement, progress, gap closing, graduation, early literacy and chronic
     absenteeism; the corpus holds [performance index](../metric/performance-index.yml) and
-    [progress](../metric/progress-value-added.yml) as metrics and not the others. [unentered]
+    [progress](../metric/progress-value-added.yml) as metrics and not the others.
   identification: |
     The rating is not itself an identification. It is the input two identification systems consume:
     federal CSI, TSI and ATSI selection rank-orders it, and R.C. 3302.10 reads three consecutive
@@ -49,7 +49,12 @@ properties:
   effective: |
     In its current form from the 2022-23 report cards, when star ratings replaced letter grades.
     Ohio has published report cards in some form since well before that; the earlier eras are not
-    modelled here. [unentered]
+    modelled here.
+unfilled:
+  - field: the components other than performance index and progress
+    why: Early literacy, graduation and chronic absenteeism are named in the section and not modelled here.
+  - field: the earlier report-card eras
+    why: Ohio published report cards long before 2022-23; only the current form is modelled.
 links:
   - target: ../accountability-regime.ont.yml
     relationship: instance-of
