@@ -33,7 +33,25 @@ properties:
     general business property beginning in tax year 2006, phased down utility tangible
     personal property assessment rates, created the commercial activity tax, and established
     replacement payments to school districts for the lost local tax base.
-  vetoes: Line-item vetoes recorded; education funding effect not yet assessed. [open]
+  vetoes: |
+    Six, and the first is the only attempt in this corpus to legislate around H.B. 920.
+    [verified — the greenbook]
+
+    **A levy that would have tracked the loss of state aid.** The General Assembly authorised
+    districts to put to voters a property tax that **adjusts to offset year-to-year decreases in
+    state funding caused by increases in the district's local share of base cost funding**, capped
+    at 4% growth a year. LSC says plainly what it was for: it "would have provided one way for
+    districts to attempt to counteract the effect of H.B. 920 tax policy that limits revenue growth
+    from existing real property." **Vetoed.** See [H.B. 920](hb-920-1976.yml), whose whole subject
+    is that limit.
+
+    Also vetoed: a prescribed method for calculating the limited English proficiency funding
+    transferred to community schools, leaving the method to the department; a purpose statement for
+    the post-secondary enrolment options programme; specific reimbursement rates for the Early
+    Learning Initiative, leaving them to Job and Family Services; a delayed effective date that
+    would have kept test-scoring companies from personally identifiable student data until July
+    2006, so that the veto gave them access immediately; and a reduction of the Ohio Wyami Teacher
+    Cohorts earmark from $1.5 million each year to $1.5 million across the biennium.
 links:
   - target: ../legislation.ont.yml
     relationship: instance-of

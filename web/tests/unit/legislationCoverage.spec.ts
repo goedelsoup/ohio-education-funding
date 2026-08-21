@@ -172,6 +172,30 @@ test("the four acts of the Bridge decade are all present", () => {
 });
 
 /**
+ * The value of a top-level property of a corpus node, whether it is written inline or as a block.
+ *
+ * Scanned by line rather than matched by a regular expression, because the regular expression that
+ * did this first was wrong in a way that passed. It alternated between a block form and an inline
+ * form; on a node whose field is the *last* property before `links:` the block branch found no
+ * terminator, so the inline branch matched instead and captured the single character `|`. That is
+ * a non-empty string containing no placeholder text, so every node in that position was reported
+ * as read. It was caught by putting a placeholder back and watching the test pass.
+ */
+function fieldBody(node: string, name: string): string {
+  const lines = node.split("\n");
+  const start = lines.findIndex((line) => line.startsWith(`  ${name}:`));
+  if (start === -1) return "";
+  const inline = lines[start]!.slice(`  ${name}:`.length).trim();
+  if (inline !== "" && inline !== "|" && inline !== ">-" && inline !== ">") return inline;
+  const body: string[] = [];
+  for (let i = start + 1; i < lines.length; i += 1) {
+    if (lines[i]!.trim() !== "" && !lines[i]!.startsWith("    ")) break;
+    body.push(lines[i]!.trim());
+  }
+  return body.join(" ").trim();
+}
+
+/**
  * Acts whose LSC greenbook is committed, so their vetoes are readable without retrieving anything.
  *
  * Read off the fixture rather than listed, because the fixture is what makes the claim true: if a
@@ -179,9 +203,12 @@ test("the four acts of the Bridge decade are all present", () => {
  */
 function greenbooked(): Set<string> {
   const text = readFileSync(GREENBOOKS, "utf8");
-  return new Set(
-    [...text.matchAll(/^=== hb(\d+)-greenbook$/gm)].map((m) => m[1]!),
-  );
+  const bills = [...text.matchAll(/^=== hb(\d+)-greenbook$/gm)].map((m) => m[1]!);
+  // H.B. 96's greenbook is committed on its own at `dew-greenbook.txt`, where corpus nodes and
+  // other tests already cite it — duplicating a quarter of a megabyte into the series to make one
+  // file look complete would be paying in bytes for a tidier heading. It is greenbooked all the
+  // same, and leaving it out of this set is how a check comes to cover eleven of twelve.
+  return new Set([...bills, "96"]);
 }
 
 test("an act whose greenbook is committed does not leave its vetoes unread", () => {
@@ -202,9 +229,15 @@ test("an act whose greenbook is committed does not leave its vetoes unread", () 
     const bill = /^hb-(\d+)-/.exec(file)![1]!;
     if (!greenbooked().has(bill)) continue;
     const body = readFileSync(join(NODES, file), "utf8");
-    const field = /\n  vetoes: \|\n([\s\S]*?)\n  [a-z_]+:/.exec(body)?.[1] ?? "";
-    // The placeholder these all carried: a bare `[open]` and no account of what was struck.
-    if (field.trim() === "" || (field.includes("[open]") && !/veto(ed)?\b/i.test(field))) {
+    const text = fieldBody(body, "vetoes");
+    /*
+     * The placeholder every one of these carried — "line-item vetoes recorded; education funding
+     * effect not yet assessed" — says nothing was read. A field that reports what was struck says
+     * so; a field that reports the *greenbook is silent* also says so, and H.B. 94's does, which
+     * is why "not yet assessed" rather than "[open]" is the tell. An open question about a
+     * document somebody has read is not the same as not having read it.
+     */
+    if (text === "" || /not yet (been )?(assessed|established)/i.test(text)) {
       unread.push(file);
     }
   }

@@ -53,7 +53,25 @@ properties:
     in place of the resident-district deduction; categorical weights for special education,
     economic disadvantage, English learners, gifted, and career-technical; and a six-year
     phase-in of the computed amount, beginning at 16.67% in FY2022.
-  vetoes: Line-item vetoes recorded; education funding effect not yet assessed. [open]
+  vetoes: |
+    Four, all about who supervises community schools rather than about the plan this act is known
+    for. [verified — the greenbook]
+
+    **JCARR review of the Education Management Information System.** The act would have subjected
+    proposed changes to EMIS, and to the department's business rules and policies affecting
+    community schools, to review by the Joint Committee on Agency Rule Review. **Vetoed.** The same
+    idea returns in [H.B. 33](hb-33-2023.yml) aimed at the full-time-equivalency manual, and is
+    vetoed again.
+
+    Also vetoed: allowing a low-performing community school where most pupils are children with
+    disabilities to contract with a new sponsor without departmental approval; exempting a
+    nonpublic school that declines to take part in College Credit Plus from the programme's
+    requirements and rules; and requiring the department to award a scholarship on a conditionally
+    approved application where the pupil enrolled in an EdChoice-accepting chartered nonpublic
+    school within a year.
+
+    **Nothing in the Fair School Funding Plan itself was vetoed.** The formula, the base cost
+    build-up, the local capacity measure and the guarantee all passed as enrolled.
 links:
   - target: ../legislation.ont.yml
     relationship: instance-of

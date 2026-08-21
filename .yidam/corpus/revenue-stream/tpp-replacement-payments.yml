@@ -23,13 +23,18 @@ description: |
   more exposed to each revision of the phase-down. [inference] Which districts those are, and
   what the payments are worth to them now, is not established here. [open]
 findings: |
-  ### The phase-down has been contested twice, and both times the protection was vetoed
+  ### The phase-down has been contested three times, and every time the protection was vetoed
 
-  "The schedule has been revised more than once" is true and understates what happened. Twice in
-  three budgets the General Assembly wrote a protection against these losses into an act and the
-  Governor struck it out. [verified — the greenbooks, committed at
+  "The schedule has been revised more than once" is true and understates what happened. Three times
+  the General Assembly wrote a protection against these losses into a budget act and the Governor
+  struck it out. Not once did one survive. [verified — the greenbooks, committed at
   [`lsc-education-greenbooks.txt`](../../../crates/project/fixtures/lsc-education-greenbooks.txt)]
 
+  - **[H.B. 1](../legislation/hb-1-2009.yml)** — the largest, and the earliest. The act as passed
+    would have **reimbursed districts in full in perpetuity** rather than phasing the payments down
+    from FY2012 to FY2018. The Governor kept full reimbursement through FY2013 and vetoed the rest,
+    so the phase-down resumed on its original schedule from FY2014. The legislature voted to end
+    the phase-down altogether and got a two-year delay instead.
   - **[H.B. 64](../legislation/hb-64-2015.yml)** appropriated **$78.3 million** for a second year
     of the TPP supplement in FY2017, with the supporting formula calculations and a $12 million
     annual GRF cash transfer into the School District TPP Supplement Fund. All of it vetoed;
@@ -53,6 +58,11 @@ findings: |
   That is the argument for reading acts rather than only the money they moved, and this stream is
   where it pays best: the phase-down is the thing being fought over, and the record of the fight is
   entirely in provisions that never took effect. [inference]
+
+  It also changes what the phase-down *is*. Read from the enacted figures alone it looks like
+  settled policy revised at the margin. Read with the vetoes it is a policy the General Assembly
+  tried to stop in 2009, tried to cushion in 2015, and tried to cap in 2017, and which survived
+  each time by one signature. [inference]
 properties:
   name: Tangible personal property tax replacement payments
   level: state

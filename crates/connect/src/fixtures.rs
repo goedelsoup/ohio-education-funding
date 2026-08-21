@@ -2398,6 +2398,17 @@ pub fn build_casino_extract(sheets: &[CasinoSheet<'_>]) -> Result<Vec<Vec<String
 /// repository a `[verified]` before: a redbook figure is the executive's proposal, and marking one
 /// verified reads as though the act had been checked. Every analysis here is LSC's account of what
 /// passed.
+///
+/// **Twelve records and about 2.6 MB, which is a deliberate choice and the largest fixture here.**
+/// It is one document per General Assembly from the 124th to the 135th, unbroken — every act that
+/// set Ohio's school funding formula from FY2002 to FY2025. Committed whole rather than sliced for
+/// the reason the H.B. 96 greenbook is: a greenbook is about one agency and there is nothing in it
+/// to cut away. The alternative to the size is that no claim about any of these acts can be
+/// `[verified]` at all, which is what the class looked like three phases ago.
+///
+/// The **136th is absent on purpose**. H.B. 96's greenbook is committed on its own at
+/// [`GREENBOOK_FIXTURE`], where corpus nodes and tests already cite it; duplicating a quarter of a
+/// megabyte to make one file look complete would be paying in bytes for a tidier heading.
 pub const LSC_GREENBOOK_FIXTURE: &str = "crates/project/fixtures/lsc-education-greenbooks.txt";
 
 /// Where the deflator's check fixture is written, relative to the repository root.

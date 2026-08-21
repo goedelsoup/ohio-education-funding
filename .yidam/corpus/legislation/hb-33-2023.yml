@@ -43,7 +43,17 @@ properties:
     extended EdChoice Expansion eligibility to all students with income-scaled award amounts;
     replaced the Ohio Department of Education with the cabinet-level Department of Education
     and Workforce. Signing date to be confirmed against the enrolled act. [open]
-  vetoes: Line-item vetoes exercised; education funding effects not yet assessed. [open]
+  vetoes: |
+    One. [verified — the greenbook]
+
+    The act would have required the Joint Committee on Agency Rule Review to review any change the
+    department proposed to its manual of standards and procedures for reviewing and auditing
+    community schools' full-time-equivalency enrolment reports. **Vetoed** — the second time in two
+    budgets that a provision putting the department's community school accounting under legislative
+    rule review was struck; the first was [H.B. 110](hb-110-2021.yml)'s on EMIS.
+
+    The FTE manual decides how much a community school is paid, so what was vetoed is legislative
+    review of the document behind the deduct.
   accountability_effect: |
     Dissolved the academic distress commission for Lorain City School District. [verified —
     [the department's commission page](../../catalog/dew-academic-distress-commission.md)] Not a

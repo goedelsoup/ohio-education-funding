@@ -1644,10 +1644,65 @@ pub const CONNECTORS: &[Connector] = &[
             filename: "hb94-greenbook.pdf",
             format: Format::Pdf,
             catalog: Some("lsc-dew-redbook"),
-            fixtures: &[crate::fixtures::APPROPRIATION_FIXTURE],
+            fixtures: &[
+                crate::fixtures::APPROPRIATION_FIXTURE,
+                crate::fixtures::LSC_GREENBOOK_FIXTURE,
+            ],
             note: "FY2002-FY2003 as enrolled, with the three preceding years as actuals. \
                    Read by clustering the right edges of the figures, because the table's own \
                    header labels sit narrower than the columns beneath them.",
+        },
+        Source {
+            key: "hb66-greenbook",
+            title: Some("H.B. 66 of the 126th General Assembly — LSC Greenbook, Department of Education"),
+            url: "https://www.lsc.ohio.gov/assets/legislation/126/hb66/en/files/\
+                  hb66-edu-greenbook-as-enrolled-126th-general-assembly.pdf",
+            filename: "hb66-greenbook.pdf",
+            format: Format::Pdf,
+            catalog: Some("lsc-dew-redbook"),
+            fixtures: &[crate::fixtures::LSC_GREENBOOK_FIXTURE],
+            note: "FY2006-07, the act that began the tangible personal property phase-out. Not \
+                   also a source for the appropriation series, which reaches these years through \
+                   the Catalog.",
+        },
+        Source {
+            key: "hb153-greenbook",
+            title: Some("H.B. 153 of the 129th General Assembly — LSC Greenbook, Department of Education"),
+            url: "https://www.lsc.ohio.gov/assets/legislation/129/hb153/en/files/\
+                  hb153-edu-greenbook-as-enrolled-129th-general-assembly.pdf",
+            filename: "hb153-greenbook.pdf",
+            format: Format::Pdf,
+            catalog: Some("lsc-dew-redbook"),
+            fixtures: &[crate::fixtures::LSC_GREENBOOK_FIXTURE],
+            note: "FY2012-13, the repeal of the Evidence-Based Model and the Bridge formula's \
+                   first biennium. The anchor chain that reaches FY2027 passes into this act and \
+                   how far below it goes has been open since the chain was written.",
+        },
+        Source {
+            key: "hb110-greenbook",
+            title: Some("H.B. 110 of the 134th General Assembly — LSC Greenbook, Department of Education"),
+            url: "https://www.lsc.ohio.gov/assets/legislation/134/hb110/en/files/\
+                  hb110-edu-greenbook-as-enrolled-134th-general-assembly.pdf",
+            filename: "hb110-greenbook.pdf",
+            format: Format::Pdf,
+            catalog: Some("lsc-dew-redbook"),
+            fixtures: &[crate::fixtures::LSC_GREENBOOK_FIXTURE],
+            note: "FY2022-23, the Fair School Funding Plan as enacted. The largest of the twelve \
+                   and the one a reader is most likely to want, because every current per-district \
+                   figure in this repository is computed under it.",
+        },
+        Source {
+            key: "hb33-greenbook",
+            title: Some("H.B. 33 of the 135th General Assembly — LSC Greenbook, Department of Education"),
+            url: "https://www.lsc.ohio.gov/assets/legislation/135/hb33/en0/files/\
+                  hb33-edu-greenbook-as-enacted-135th-general-assembly.pdf",
+            filename: "hb33-greenbook.pdf",
+            format: Format::Pdf,
+            catalog: Some("lsc-dew-redbook"),
+            fixtures: &[crate::fixtures::LSC_GREENBOOK_FIXTURE],
+            note: "FY2024-25. `as-enacted` rather than `as-enrolled` in the path, and `en0` rather \
+                   than `en` — LSC changed both conventions at the 135th, which is why guessing \
+                   one naming across the series returns a 404 that looks like a missing document.",
         },
         Source {
             key: "hb95-greenbook",
@@ -1740,7 +1795,10 @@ pub const CONNECTORS: &[Connector] = &[
             filename: "hb1-greenbook.pdf",
             format: Format::Pdf,
             catalog: Some("lsc-dew-redbook"),
-            fixtures: &[crate::fixtures::APPROPRIATION_FIXTURE],
+            fixtures: &[
+                crate::fixtures::APPROPRIATION_FIXTURE,
+                crate::fixtures::LSC_GREENBOOK_FIXTURE,
+            ],
             note: "FY2010-FY2011 as enrolled, with the three preceding years as actuals. \
                    Read by clustering the right edges of the figures, because the table's own \
                    header labels sit narrower than the columns beneath them.",

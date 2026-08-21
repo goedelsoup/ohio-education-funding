@@ -23,6 +23,24 @@ description: |
   20-mill floor is a funding parameter and not merely a tax-administration detail: for the
   large number of districts sitting at the floor, valuation growth passes through to revenue
   directly, and the entire logic of H.B. 920 is suspended. [verified]
+findings: |
+  ### The one legislative attempt to work around it was vetoed
+
+  [H.B. 66 of 2005](hb-66-2005.yml) authorised districts to put to voters a property tax that would
+  **adjust to offset year-to-year decreases in state funding caused by increases in the district's
+  local share of base cost funding**, capped at 4% growth a year — a levy indexed to the loss
+  rather than fixed in dollars. LSC's analysis says what it was for in as many words: it "would
+  have provided one way for districts to attempt to counteract the effect of H.B. 920 tax policy
+  that limits revenue growth from existing real property."
+
+  **The Governor vetoed it.** [verified — the greenbook, committed at
+  `crates/project/fixtures/lsc-education-greenbooks.txt`]
+
+  It is the only provision in this corpus that would have loosened the mechanism this node
+  describes, and it never took effect — so it appears in no levy, no valuation and no enacted
+  figure here. The reason to record it is that the absence of any workaround in the data reads as
+  nobody having tried, and somebody did. [inference]
+
 properties:
   designation: Am. Sub. H.B. 920
   general_assembly: 111th General Assembly

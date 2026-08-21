@@ -92,7 +92,13 @@ properties:
     extended to transportation; a three-mill cap on the local share of categorical costs; and
     parity aid equalizing 9.5 mills of discretionary capacity to the eightieth percentile of
     income-adjusted wealth. [verified — DeRolph III at paragraphs 16 through 25]
-  vetoes: Line-item vetoes not yet assessed for education funding effect. [open]
+  vetoes: |
+    **The greenbook does not discuss them, and that is what is recorded rather than a placeholder.**
+    LSC's analysis of this act carries no vetoed-provisions chapter and the word does not appear in
+    it at all — unlike every other greenbook in the series, each of which has one. Whether that
+    means no education provision was vetoed or only that LSC did not report them is not
+    established, and the act itself is not retrievable: the legislature's version index reaches the
+    122nd General Assembly and serves no text for the 124th's budget act. [open]
 links:
   - target: ../legislation.ont.yml
     relationship: instance-of

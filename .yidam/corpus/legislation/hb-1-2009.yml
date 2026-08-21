@@ -33,7 +33,35 @@ properties:
     Evidence-Based Model, which derived a per-district adequacy amount from specified
     staffing ratios and resource inputs rather than from available appropriation divided by
     enrollment. Designed for a ten-year phase-in.
-  vetoes: Line-item vetoes recorded; education funding effect not yet assessed. [open]
+  vetoes: |
+    Several, and two of them change a number rather than strike a provision. [verified — the
+    greenbook]
+
+    **Tangible personal property reimbursement, made permanent and then not.** The act as passed
+    would have **fully reimbursed districts in perpetuity** rather than phasing the payments down
+    from FY2012 to FY2018. The Governor kept full reimbursement through FY2013 and vetoed the rest,
+    so the phase-down resumes on its original schedule from FY2014. It is the largest of the three
+    TPP protections the legislature has passed and lost — see
+    [`tpp-replacement-payments`](../revenue-stream/tpp-replacement-payments.yml).
+
+    **EdChoice maximums, partially vetoed downward.** The act set scholarship maximums and
+    eliminated the annual increase that had run since FY2007. The Governor kept the elimination and
+    **reduced the maximums** to their FY2007 levels — $4,200 for grades K-8 and $5,000 for grades
+    9-12. A partial veto that lowers a figure rather than removing a clause is the only one of its
+    kind in this class.
+
+    **The Early Learning Initiative was ended by veto**, not by repeal: the act carried the
+    defining language as previous budgets had, the Governor struck it, and the programme
+    discontinued. A companion veto removed the requirement that certain early learning providers
+    repay FY2004-05 start-up funds to the GRF by FY2019.
+
+    Also vetoed: a two-year moratorium on transfers of districts between educational service
+    centres and the revised procedure for dismantling one; the date by which business education
+    standards were to be adopted; an EdChoice eligibility route for pupils in newly opened
+    buildings drawing most of their pupils from a qualifying one; the transfer of the School
+    Employees Health Care Board to the department; a community school calamity-day waiver; and an
+    earmark of $1,279,948 and $1,500,000 in School Management Assistance for the Auditor of State
+    to run performance audits of districts in fiscal caution, watch or emergency.
 links:
   - target: ../legislation.ont.yml
     relationship: instance-of

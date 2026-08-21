@@ -60,11 +60,27 @@ findings: |
                             state share index frozen at FY2019
       H.B. 110  FY2022-     the Fair School Funding Plan anchors its guarantee at FY2020
 
-  **So the Fair School Funding Plan's FY2020 base is the far end of a chain that starts at FY2013
-  and does not terminate there** — the FY2013 base is Bridge formula funding, which H.B. 153 had
-  itself defined by reference to earlier years. In FY2027 a district guaranteed in every biennium
-  since is funded on a distribution at least fourteen years old, and the corpus can now name four
-  of the links rather than none. [verified for the four; the depth below FY2013 remains open]
+  **And it terminates.** The FY2013 base is Bridge formula funding, and
+  [H.B. 153](../legislation/hb-153-2011.yml) defines that as each district's **FY2011 state aid per
+  pupil** — actual FY2011 allocation over recalculated FY2011 ADM — adjusted by where its charge-off
+  valuation per pupil sits against the statewide median, applied to current-year pupils, with a
+  floor at **FY2011 total aid net of its federal stimulus portion**. [verified — the greenbook]
+
+      FY2011      Evidence-Based Model run, net of stimulus
+        ↓         H.B. 153: FY2011 per pupil, wealth-indexed, x current ADM; floor at FY2011
+      FY2013      H.B. 59:  100% of FY2013
+      FY2015      H.B. 64:  100% of FY2015
+      FY2017      H.B. 49:  100% of FY2017, or 95% for the fastest-emptying districts
+      FY2019      H.B. 166: no formula — every district's FY2019 amount
+      FY2020      H.B. 110: the Fair School Funding Plan anchors here, and has never re-based
+      FY2027      still held there, at 100% phase-in
+
+  **Sixteen years, six links, and the origin is a formula that no longer exists.** FY2011 state aid
+  was computed under the [Evidence-Based Model](evidence-based-model.yml) — including the charge-off
+  valuation the index divides by, which the greenbook names as the EBM's own adequacy-share
+  valuation — and the act that carried FY2011 forward is the act that repealed it. A district
+  guaranteed in every biennium since FY2012 is funded in FY2027 on a per-pupil figure produced by a
+  regime this corpus models as superseded. [verified]
 
   ### The one act of policy the decade contains
 

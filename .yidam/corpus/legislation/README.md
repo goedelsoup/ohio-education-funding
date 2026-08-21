@@ -85,18 +85,34 @@ carry their dates and only four of them are retrievable. [open]
 
 ## What the vetoes say, which the enacted figures cannot
 
-Every act here whose greenbook is committed now records its own vetoes, and read across the six
-they are not a miscellany. **The General Assembly kept legislating floors and loss protections into
-budget acts, and the Governor kept striking exactly those out.**
+Every act here whose greenbook exists now records its own vetoes — twelve consecutive General
+Assemblies, the 124th to the 135th, plus the 136th from its own file. Read across them they are not
+a miscellany. **The General Assembly kept legislating floors, loss protections and oversight into
+budget acts, and the Governor kept striking exactly those.**
 
 | Act | What was passed | What survived |
 |---|---|---|
-| [H.B. 64](hb-64-2015.yml) | A **second per-pupil floor** under the formula — at least 20% of the formula amount per pupil, $1,180 and $1,200 | Vetoed |
-| [H.B. 64](hb-64-2015.yml) | The **TPP supplement's second year**: $78.3m for FY2017 and a $12m annual GRF transfer | Vetoed |
-| [H.B. 49](hb-49-2017.yml) | A **cap on TPP reimbursement loss** at 3.5% of a district's total resources, extended to JVSDs | Vetoed |
-| [H.B. 166](hb-166-2019.yml) | A **per-pupil guarantee from FY2022** indexed to the statewide per-pupil amount paid for chartered nonpublic schools | Vetoed |
+| [H.B. 66](hb-66-2005.yml) | A **levy indexed to lost state aid**, to counteract H.B. 920's limit on revenue growth | Vetoed |
+| [H.B. 1](hb-1-2009.yml) | **Full TPP reimbursement in perpetuity**, ending the phase-down | Vetoed past FY2013 |
+| [H.B. 1](hb-1-2009.yml) | EdChoice maximums | Partially vetoed **downward**, to FY2007 levels |
 | [H.B. 59](hb-59-2013.yml) | A requirement that **gifted funding buy gifted staff** | Vetoed |
-| [H.B. 119](hb-119-2007.yml) | A **Special Education Scholarship Pilot**, funded by deducting from the resident district | Vetoed |
+| [H.B. 64](hb-64-2015.yml) | A **second per-pupil floor** — at least 20% of the formula amount per pupil | Vetoed |
+| [H.B. 64](hb-64-2015.yml) | The **TPP supplement's second year**, $78.3m for FY2017 | Vetoed |
+| [H.B. 49](hb-49-2017.yml) | A **cap on TPP reimbursement loss** at 3.5% of total resources | Vetoed |
+| [H.B. 166](hb-166-2019.yml) | A **per-pupil guarantee from FY2022**, indexed to per-pupil nonpublic spending | Vetoed |
+| [H.B. 110](hb-110-2021.yml) | **JCARR review of EMIS** and of community school business rules | Vetoed |
+| [H.B. 33](hb-33-2023.yml) | **JCARR review of the community school FTE manual** | Vetoed |
+
+Three shapes recur. **Protection against the tangible personal property phase-out** was passed and
+struck three times, in 2009, 2015 and 2017, and never survived once — see
+[`tpp-replacement-payments`](../revenue-stream/tpp-replacement-payments.yml). **A floor under
+per-pupil funding** was passed and struck twice. And **legislative review of the department's
+community school accounting** was passed and struck twice in consecutive budgets, the second time
+aimed at the manual that decides what a community school is paid.
+
+Running the other way, four separate new channels to nonpublic schools were passed and vetoed —
+H.B. 119's Special Education Scholarship Pilot, H.B. 1's EdChoice eligibility route, H.B. 110's
+conditional-approval scholarships and H.B. 96's Nonchartered Educational Savings Accounts.
 
 None of this is in any series this repository holds, and it cannot be. A vetoed provision is never
 appropriated, so it appears in no enacted total, no actual, and no line item — the whole apparatus
@@ -112,5 +128,8 @@ the act that carried it rather than given a class, because it has no life of its
 as a thing a particular act tried to do. [open — whether that stays the right shape if the field
 keeps growing]
 
-**H.B. 583 and the constitutional provision have no greenbook**, so their `vetoes:` fields stay
-unfilled and `web/tests/unit/legislationCoverage.spec.ts` exempts exactly those two.
+**Two nodes have no greenbook and are exempt by construction.** H.B. 920 of 1976 and the
+constitutional provision predate the series entirely. **H.B. 94's greenbook exists and is silent** —
+alone in the twelve it carries no vetoed-provisions chapter, so its field records that rather than a
+placeholder, which is a different claim and the ratchet in
+`web/tests/unit/legislationCoverage.spec.ts` tells them apart.

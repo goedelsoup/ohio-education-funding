@@ -47,8 +47,18 @@ properties:
     inputs rather than refreshing them. [inference — confirm against the enacted act and the
     LSC Greenbook]
   vetoes: |
-    67 line items vetoed before signing. [verified] Which of them affected school funding
-    provisions is not yet established. [open]
+    67 line items vetoed before signing. [verified] One of them is an education programme, and the
+    greenbook names it. [verified — `crates/project/fixtures/dew-greenbook.txt`]
+
+    The act established the **Nonchartered Educational Savings Account Program**, to begin in the
+    2026-27 school year for eligible pupils enrolling in participating nonchartered nonpublic
+    schools, administered by the Treasurer of State. **Vetoed.**
+
+    It is the fourth time in this class that a new channel to nonpublic schools was passed and
+    struck — after [H.B. 119](hb-119-2007.yml)'s Special Education Scholarship Pilot,
+    [H.B. 1](hb-1-2009.yml)'s EdChoice eligibility route and [H.B. 110](hb-110-2021.yml)'s
+    conditional-approval scholarships — and the first that would have run outside the chartered
+    system entirely. Which of the other 66 touched school funding is still not established. [open]
 links:
   - target: ../legislation.ont.yml
     relationship: instance-of

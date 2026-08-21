@@ -54,9 +54,20 @@ findings: |
   year before its biennium — FY2013, then FY2015, then FY2017 — and each base explicitly included
   the previous biennium's transitional aid term, so a district guaranteed throughout carries its
   earliest anchor forward. The chain is set out in
-  [`bridge-formula`](../funding-regime/bridge-formula.yml). It does not terminate at FY2013
-  either: that base is Bridge formula funding, which was itself by reference to earlier years, and
-  how far below FY2013 it goes is still not established. [open, and narrower than it was]
+  [`bridge-formula`](../funding-regime/bridge-formula.yml).
+
+  **It bottoms out at FY2011.** H.B. 153 defines Bridge formula funding as each district's FY2011
+  state aid *per pupil*, adjusted by its charge-off valuation against the statewide median and
+  applied to current-year pupils, with a floor at FY2011 total aid net of federal stimulus. And
+  FY2011 state aid was computed under the
+  [Evidence-Based Model](../funding-regime/evidence-based-model.yml), which the same act repealed —
+  including the charge-off valuation the index divides by, which is the EBM's own adequacy-share
+  valuation. [verified — the greenbook]
+
+  So `[H2]` is the sixth link of a chain sixteen years long whose first term was produced by a
+  formula that has not existed since 2011. What is *not* established is how much of any particular
+  district's `[H2]` is still that FY2011 figure rather than a later re-anchoring on a formula run
+  it cleared — the chain gives the worst case, not the distribution. [open]
 
 
   ### It is observable only where it binds
@@ -67,6 +78,25 @@ findings: |
   a floor that would really catch them. [verified for the model's behaviour; the size of the
   real-world correction is [open]]
 revisions:
+  - was: |
+      The anchor chain was recorded as reaching FY2013 and no further: "it does not terminate at
+      FY2013 either: that base is Bridge formula funding, which was itself by reference to earlier
+      years, and how far below FY2013 it goes is still not established." [open]
+    now: |
+      It terminates at **FY2011**, an Evidence-Based Model run, net of federal stimulus. H.B. 153
+      carried FY2011 aid per pupil forward wealth-indexed, with a floor at the FY2011 dollar
+      amount; every later act re-anchored on the year before its own biennium. Six links, sixteen
+      years, and the first term comes from a regime repealed by the act that carried it forward.
+    found_by: |
+      LSC's greenbook for H.B. 153, which states the FY2011 per-pupil derivation and the charge-off
+      valuation index as formula boxes. It reached the corpus only when the greenbook series was
+      completed across all twelve General Assemblies.
+    reach: |
+      The node's central claim gets its final year. "Funded at a level set by a placeholder formula
+      in a year that formula was not even run" is now sharper still: the placeholder itself was
+      carrying a figure from the formula it replaced. What remains open is narrower and different
+      in kind — how much of a given district's base is still the FY2011 term rather than a later
+      re-anchoring, which is a question about distribution rather than about depth.
   - was: |
       What the FY2020 figure was itself composed of was recorded as not established: "the Bridge
       formula distributed largely by reference to still earlier years, so the anchor may reach back
