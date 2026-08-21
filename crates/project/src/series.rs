@@ -101,9 +101,6 @@ pub const DEFAULT_DAMPING: f64 = 0.85;
 /// One standard deviation. Covers about 68% of a normal distribution.
 pub const ONE_SIGMA: f64 = 1.0;
 
-/// The multiplier for an 80% interval under normality.
-pub const EIGHTY_PERCENT: f64 = 1.281_551_6;
-
 /// The dispersion used to widen a projection, and where it came from.
 #[derive(Debug, Clone, Copy, PartialEq)]
 pub struct Prior {

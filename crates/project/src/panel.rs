@@ -158,18 +158,6 @@ impl Categoricals {
             + self.career_technical
     }
 
-    /// The programs in statewide-size order, with the labels a page should use.
-    #[must_use]
-    pub fn named(&self) -> [(&'static str, Dollars); 6] {
-        [
-            ("Targeted assistance", self.targeted_assistance),
-            ("Special education", self.special_education),
-            ("Disadvantaged Pupil Impact Aid", self.dpia),
-            ("Career-technical education", self.career_technical),
-            ("Gifted", self.gifted),
-            ("English learners", self.english_learners),
-        ]
-    }
 }
 
 /// Ohio's five career-technical categories, for one district.
@@ -1820,5 +1808,50 @@ mod tests {
         assert_eq!(observations.len(), 3);
         assert_eq!(observations[0].fiscal_year, FiscalYear(2024));
         assert_eq!(observations[2].fiscal_year, FiscalYear(2026));
+    }
+
+    /// The guarantee a clawback reduced is two numbers, and this returns the other one.
+    ///
+    /// Kept and tested rather than deleted: nothing called it, but its doc makes a claim about
+    /// how a district's guarantee is reported, and an untested public function whose doc makes a
+    /// claim is a claim nobody checks.
+    #[test]
+    fn a_clawed_back_guarantee_reports_the_amount_before_the_charge() {
+        let districts = panel();
+        let charged: Vec<_> = districts
+            .iter()
+            .filter(|d| d.transition.open_enrollment_adjustment > 0.0)
+            .collect();
+        assert!(
+            !charged.is_empty(),
+            "no district in the FY2027 panel carries an open-enrolment clawback, so this test \
+             would pass vacuously"
+        );
+
+        for d in &charged {
+            let after = 1_000_000.0;
+            let before = d
+                .transition
+                .guarantee_before_clawback(after)
+                .expect("a district with an adjustment has a before-clawback figure");
+            assert!(
+                before > after,
+                "{}: the guarantee before the clawback must exceed the one after it",
+                d.name
+            );
+            assert!(
+                (before - after - d.transition.open_enrollment_adjustment).abs() < 1e-9,
+                "{}: the difference between the two figures is the adjustment itself",
+                d.name
+            );
+        }
+
+        // The other half of the claim: where nothing was charged there is no second number,
+        // and `None` says so rather than repeating the first.
+        let untouched = districts
+            .iter()
+            .find(|d| d.transition.open_enrollment_adjustment == 0.0)
+            .expect("some district was not clawed back");
+        assert_eq!(untouched.transition.guarantee_before_clawback(1_000_000.0), None);
     }
 }

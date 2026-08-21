@@ -177,20 +177,6 @@ pub struct Agency {
 }
 
 impl Agency {
-    /// Whether the federal directory files this as a regular school district.
-    ///
-    /// Not the same as Ohio's own idea of one: two of the five regular districts that leave this
-    /// window are STEM schools, which Ohio funds as a separate unit under R.C. 3326.
-    #[must_use]
-    pub fn is_regular_district(&self) -> bool {
-        self.agency_type == "1"
-    }
-
-    /// Whether it is one of Ohio's community schools.
-    #[must_use]
-    pub fn is_community_school(&self) -> bool {
-        self.agency_type == "7"
-    }
 }
 
 /// Every row of the directory panel.
@@ -220,32 +206,6 @@ pub fn panel() -> Vec<Agency> {
             })
         })
         .collect()
-}
-
-/// Agency identifier to Ohio IRN, as each school year states it.
-///
-/// The join [`crate::ohio_panel`] uses. Keyed on the year as well as the agency because that is
-/// the whole point: asking the 2022-23 file about a district that closed in 2015 gets nothing,
-/// and asking the 2014-15 file gets the answer.
-#[must_use]
-pub fn irn_by_year() -> BTreeMap<(u16, String), String> {
-    panel()
-        .into_iter()
-        .map(|a| ((a.opens, a.leaid), a.irn))
-        .collect()
-}
-
-/// The IRN an agency carried in the most recent year the directory names it.
-///
-/// For resolving a panel row when the contemporaneous directory year is not held — the F-33
-/// reports a fiscal year and the directory a school year, and the two do not align at the edges.
-#[must_use]
-pub fn last_known_irn() -> BTreeMap<String, String> {
-    let mut out = BTreeMap::new();
-    for agency in panel() {
-        out.insert(agency.leaid, agency.irn);
-    }
-    out
 }
 
 /// An agency that stops appearing in the directory, with what the last year to name it said.

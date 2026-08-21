@@ -21,7 +21,6 @@
 //! Those schools were identified through a *subgroup*, failed to exit within three years, and
 //! became whole-school identifications.
 
-use std::collections::BTreeMap;
 
 const FIXTURE: &str = include_str!("../fixtures/identified-schools-2026.csv");
 
@@ -103,19 +102,6 @@ pub fn status_of(building_irn: &str) -> Vec<Identified> {
         .into_iter()
         .filter(|i| i.building_irn == building_irn)
         .collect()
-}
-
-/// How many identifications each agency's buildings carry, by status.
-#[must_use]
-pub fn by_agency(lea_irn: &str) -> BTreeMap<String, usize> {
-    let mut out = BTreeMap::new();
-    for row in identifications()
-        .into_iter()
-        .filter(|i| i.lea_irn == lea_irn)
-    {
-        *out.entry(row.status).or_insert(0) += 1;
-    }
-    out
 }
 
 #[cfg(test)]

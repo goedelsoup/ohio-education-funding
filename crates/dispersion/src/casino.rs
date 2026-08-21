@@ -161,19 +161,6 @@ pub fn by_fiscal_year() -> BTreeMap<u16, f64> {
         .collect()
 }
 
-/// What one district was paid across every complete fiscal year.
-#[must_use]
-pub fn district_by_fiscal_year(irn: &str) -> BTreeMap<u16, f64> {
-    let complete: BTreeSet<u16> = by_fiscal_year().into_keys().collect();
-    let mut out: BTreeMap<u16, f64> = BTreeMap::new();
-    for row in panel().into_iter().filter(|row| row.irn == irn) {
-        if complete.contains(&row.fiscal_year()) {
-            *out.entry(row.fiscal_year()).or_default() += row.amount;
-        }
-    }
-    out
-}
-
 #[cfg(test)]
 mod tests {
     use super::*;

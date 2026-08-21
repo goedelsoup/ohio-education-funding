@@ -192,14 +192,6 @@ impl Outcome {
         self.delta() / self.adm
     }
 
-    /// Realized aid per pupil.
-    #[must_use]
-    pub fn realized_per_pupil(&self) -> Dollars {
-        if self.adm <= 0.0 {
-            return 0.0;
-        }
-        self.realized_aid / self.adm
-    }
 }
 
 /// Apply a policy to one district at a given current-year enrolled ADM.

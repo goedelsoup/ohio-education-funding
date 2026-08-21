@@ -228,13 +228,6 @@ impl Finances {
         Some((self.years.first()?, self.years.last()?))
     }
 
-    /// Change in ending cash across the whole span, in dollars.
-    #[must_use]
-    pub fn cash_change(&self) -> Option<Dollars> {
-        let (first, last) = self.span()?;
-        Some(last.ending_cash - first.ending_cash)
-    }
-
     /// The whole panel restated in `base`-year dollars.
     ///
     /// # Errors
