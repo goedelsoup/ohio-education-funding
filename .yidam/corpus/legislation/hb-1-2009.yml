@@ -69,3 +69,7 @@ links:
     relationship: establishes
   - target: ../doctrine/adequacy.yml
     relationship: operationalizes
+  - target: ../fiscal-period/fy2010-11.yml
+    relationship: appropriates-for
+    note: >-
+      FY2010-11 — the Evidence-Based Model's only two years.

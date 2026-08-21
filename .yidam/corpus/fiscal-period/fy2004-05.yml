@@ -1,0 +1,61 @@
+class: fiscal-period
+label: FY2004-2005 Biennium
+summary: >-
+  The first budget after the litigation ended, and the only biennium of the decade in which
+  foundation aid fell in real terms two years running. Its share of the department's budget
+  reached 58.0%, the lowest figure the series carries between FY2002 and FY2027.
+description: |
+  July 1, 2003 through June 30, 2005 — the first biennium enacted after *DeRolph* ended.
+  [H.B. 95](../legislation/hb-95-2003.yml) changed nothing structural in the formula. [verified]
+
+  It is the quietest act of the decade and the biennium with the sharpest measured decline, which
+  is the pairing worth holding: a budget can leave a formula alone and still move what the formula
+  pays, because the formula's inputs are appropriations and appropriations are re-set every two
+  years.
+
+  The [foundation base cost formula](../funding-regime/foundation-base-cost-formula.yml) remains in
+  force. Foundation aid is still `200501` plus `200612`.
+findings: |
+  ### Foundation aid fell in real terms in both years, and its share of the budget fell in both
+
+      FY2004   enacted $8.377bn   foundation $4.997bn   59.7%   real $8.797bn
+      FY2005   enacted $8.653bn   foundation $5.016bn   58.0%   real $8.613bn
+
+  Against FY2003's $9.157bn real, that is **-3.9% and then -2.1%**, while the department's total
+  appropriation rose 3.3% and then 3.3% nominally. The money did not leave the department; it
+  stopped going through the formula. [verified — `appropriation-lines.csv`, `bundle::deflator`]
+
+  **58.0% is the lowest foundation share in the whole committed series**, FY2002 through FY2027.
+  [verified]
+
+  ### And poverty rose through it
+
+  **33.8% then 35.7%** approved for free or reduced-price meals, up from 31.2% two years earlier.
+  [verified — `mr81-sponsor-panel.csv`] Falling real formula aid and rising measured need is the
+  shape this decade repeats; it is stated once here and once on [FY2010-11](fy2010-11.yml), where
+  it is sharper.
+properties:
+  label: FY2004-2005
+  kind: biennium
+  start: 2003-07-01
+  end: 2005-06-30
+  appropriating_bill: Am. Sub. H.B. 95 (125th General Assembly). [verified — the corpus holds this act]
+  context: |
+    Foundation base cost formula era, first budget after the litigation ended. Foundation aid is
+    `200501` plus `200612`, enacted basis. [verified]
+links:
+  - target: ../fiscal-period.ont.yml
+    relationship: instance-of
+  - target: fy2002-03.yml
+    relationship: follows
+  - target: ../funding-regime/foundation-base-cost-formula.yml
+    relationship: governed-by
+  - target: ../legislation/hb-95-2003.yml
+    relationship: funded-by
+  - target: ../revenue-stream/state-foundation-aid.yml
+    relationship: carries
+    note: >-
+      The appropriation figures on this node are this stream, in this period, read off the enacted
+      line items. The stream is the subject; the period is the interval it is measured over.
+  - target: ../../catalog/lsc-catalog-of-budget-line-items.md
+    relationship: sourced-from

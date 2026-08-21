@@ -109,5 +109,9 @@ links:
       is answered from this act.
   - target: hb-1-2009.yml
     relationship: precedes
+  - target: ../fiscal-period/fy2008-09.yml
+    relationship: appropriates-for
+    note: >-
+      FY2008-09, the decade's peak in both real foundation aid and its share of the department's budget.
   - target: ../../catalog/lsc-dew-redbook.md
     relationship: sourced-from

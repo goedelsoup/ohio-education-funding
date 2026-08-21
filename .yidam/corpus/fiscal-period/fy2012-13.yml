@@ -33,6 +33,11 @@ properties:
 links:
   - target: ../fiscal-period.ont.yml
     relationship: instance-of
+  - target: fy2010-11.yml
+    relationship: follows
+    note: >-
+      The link that closes the chain. This was the oldest biennium in the corpus and followed
+      nothing; the regime it opens is the one that repealed the regime FY2010-11 ran.
   - target: ../funding-regime/bridge-formula.yml
     relationship: governed-by
   - target: ../legislation/hb-153-2011.yml

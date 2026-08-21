@@ -1,0 +1,62 @@
+class: fiscal-period
+label: FY2002-2003 Biennium
+summary: >-
+  The first biennium under the formula H.B. 94 rebuilt after DeRolph II. State foundation
+  funding was 62.9% of the department's budget in FY2002 and $4.88 billion — a level it
+  would not return to in real terms for the rest of the decade, and never exceed after
+  FY2009.
+description: |
+  July 1, 2001 through June 30, 2003 — the first biennium funded under the formula
+  [H.B. 94](../legislation/hb-94-2001.yml) rebuilt in response to *DeRolph II*, with parity aid,
+  gap aid and six special education weights. [verified]
+
+  The regime is the [foundation base cost formula](../funding-regime/foundation-base-cost-formula.yml),
+  which governs every biennium here through FY2009. Foundation aid was carried by two line items,
+  `200501 Base Cost Funding` and `200612`, and the pair is what a series of this era has to sum:
+  the single `200550 Foundation Funding` line most later readers know did not exist yet.
+  [verified — the Catalog of Budget Line Items]
+
+  *DeRolph IV* was decided in December 2002, inside this biennium, and ended the litigation
+  without a compliance finding. Nothing in the appropriation responds to it: the second year was
+  already enacted.
+findings: |
+  ### The share of the department's budget that was foundation aid, and what it did next
+
+      FY2002   enacted $7.749bn   foundation $4.878bn   62.9%
+      FY2003   enacted $8.112bn   foundation $5.037bn   62.1%
+
+  In constant FY2026 dollars that foundation figure is **$9.054bn and $9.157bn**. It is the
+  benchmark the rest of the decade is measured against on this node's siblings, and the reason it
+  matters is on [FY2010-11](fy2010-11.yml): nine years later, after $1.15 billion of nominal
+  growth, the real figure is **below** this one. [verified — `appropriation-lines.csv`,
+  `bundle::deflator`]
+
+  ### Poverty, on the basis that was in force
+
+  **31.2% of enrolled pupils were approved for free or reduced-price meals in FY2002, 33.1% in
+  FY2003**, over 757 and 768 sponsors. [verified — `mr81-sponsor-panel.csv`] That share rises in
+  every biennium of this decade and does not stop rising; see the sibling nodes.
+properties:
+  label: FY2002-2003
+  kind: biennium
+  start: 2001-07-01
+  end: 2003-06-30
+  appropriating_bill: Am. Sub. H.B. 94 (124th General Assembly). [verified — the corpus holds this act]
+  context: |
+    Foundation base cost formula era, in the biennium after *DeRolph II*. Foundation aid is the
+    sum of `200501` and `200612`; `200550` did not exist until H.B. 66. Appropriation figures are
+    enacted rather than actual. [verified]
+links:
+  - target: ../fiscal-period.ont.yml
+    relationship: instance-of
+  - target: ../funding-regime/foundation-base-cost-formula.yml
+    relationship: governed-by
+  - target: ../legislation/hb-94-2001.yml
+    relationship: funded-by
+  - target: ../revenue-stream/state-foundation-aid.yml
+    relationship: carries
+    note: >-
+      The appropriation figures on this node are this stream, in this period, read off the enacted
+      line items. The stream is the subject; the period is the interval it is measured over.
+  - target: ../../catalog/lsc-catalog-of-budget-line-items.md
+    relationship: sourced-from

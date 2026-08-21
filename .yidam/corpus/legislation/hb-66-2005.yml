@@ -59,3 +59,7 @@ links:
     relationship: constrains
   - target: ../revenue-stream/tpp-replacement-payments.yml
     relationship: creates-stream
+  - target: ../fiscal-period/fy2006-07.yml
+    relationship: appropriates-for
+    note: >-
+      FY2006-07, and the biennium in which this act replaced the line item the formula is paid through.

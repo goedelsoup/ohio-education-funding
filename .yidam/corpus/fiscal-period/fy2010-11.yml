@@ -1,0 +1,78 @@
+class: fiscal-period
+label: FY2010-2011 Biennium
+summary: >-
+  The Evidence-Based Model's only two years, and the biennium where state foundation aid fell
+  $679 million while the department's total budget rose $232 million. FY2011 is the first
+  term of the anchor chain that still funds nearly half of Ohio's districts.
+description: |
+  July 1, 2009 through June 30, 2011 — the whole life of the
+  [Evidence-Based Model](../funding-regime/evidence-based-model.yml), enacted by
+  [H.B. 1](../legislation/hb-1-2009.yml) and repealed by H.B. 153 before a third year of it ran.
+  [verified]
+
+  No other Ohio funding regime was repealed before it had run long enough to produce a trend, and
+  none other had its whole life coincide with federal stabilization funding
+  under the American Recovery and Reinvestment Act. Those two facts are related: a state share
+  computed for FY2010 or FY2011 is a share of a total that federal money was holding up.
+
+  The Fair School Funding Plan's guarantee base reaches back to this year through six successive
+  carry-forwards: an Evidence-Based Model run, net of stimulus, preserved by the act that repealed
+  the regime which produced it.
+findings: |
+  ### The state's own foundation line fell while its budget grew
+
+      FY2010   enacted $9.770bn   foundation $6.121bn   62.6%   real $9.378bn
+      FY2011   enacted $9.785bn   foundation $6.024bn   61.6%   real $8.912bn
+
+  Against FY2009: the department's total appropriation is **$232m higher** in FY2011 and its
+  foundation line is **$679m lower**. The share falls from 70.2% to 61.6% in two years. [verified —
+  `appropriation-lines.csv`]
+
+  This is what the [Evidence-Based Model](../funding-regime/evidence-based-model.yml) node means
+  when it records that the biennium "coincided with federal stabilization funding, so the
+  state-share figures for FY2010-11" cannot be read as a state's own commitment. The appropriation
+  series shows the substitution as a shape rather than as a caveat. [verified for the figures;
+  attributing the whole gap to ARRA is [inference] — the acts would have to be read for the rest]
+
+  ### FY2011 real foundation aid is below FY2002's
+
+      FY2002   real $9.054bn
+      FY2009   real $10.378bn      the peak
+      FY2011   real $8.912bn       -1.6% against FY2002, -14.1% against FY2009
+
+  Nine years, **$1.15 billion of nominal growth**, and the constant-dollar figure ends below where
+  it started. [verified — `bundle::deflator`, CPI-U all items]
+
+  ### And this is the year the anchor chain starts
+
+  Nearly half of Ohio's districts are still funded in FY2027 at a level that traces to FY2011 —
+  see [`guarantee-funding-base`](../parameter/guarantee-funding-base.yml) and
+  [`bridge-formula`](../funding-regime/bridge-formula.yml). The figure above is what that chain
+  anchors to: a foundation appropriation 14.1% below its own decade's peak, computed under a
+  regime that lasted twenty-four months. [verified]
+properties:
+  label: FY2010-2011
+  kind: biennium
+  start: 2009-07-01
+  end: 2011-06-30
+  appropriating_bill: Am. Sub. H.B. 1 (128th General Assembly). [verified — the corpus holds this act]
+  context: |
+    Evidence-Based Model era — its only two years. Enacted basis. Both years coincide with
+    federal ARRA stabilization funding, so a state-share figure for this biennium is a share of a
+    total federal money was holding up. [verified]
+links:
+  - target: ../fiscal-period.ont.yml
+    relationship: instance-of
+  - target: fy2008-09.yml
+    relationship: follows
+  - target: ../funding-regime/evidence-based-model.yml
+    relationship: governed-by
+  - target: ../legislation/hb-1-2009.yml
+    relationship: funded-by
+  - target: ../revenue-stream/state-foundation-aid.yml
+    relationship: carries
+    note: >-
+      The appropriation figures on this node are this stream, in this period, read off the enacted
+      line items. The stream is the subject; the period is the interval it is measured over.
+  - target: ../../catalog/lsc-catalog-of-budget-line-items.md
+    relationship: sourced-from
