@@ -1839,7 +1839,11 @@ pub const CONNECTORS: &[Connector] = &[
         },
         note: "The acts themselves, rather than LSC's analyses of them. This is the only route to \
                an enacted appropriation before FY2002, and it reaches exactly four fiscal years \
-               before stopping against a wall the publisher put there.",
+               before stopping against a wall the publisher put there. It also carries one act \
+               read for its provisions rather than its table — see `hb583-134-enrolled`, which \
+               establishes that the two purposes are separable and that the second has no floor: \
+               the version index serves every act back to the 122nd, whether or not the act \
+               prints a money column anyone here can read.",
         sources: &[
             Source {
                 key: "hb215-122-enrolled",
@@ -1887,6 +1891,24 @@ pub const CONNECTORS: &[Connector] = &[
                        and contains no Department of Education section at all. Both fiscal years \
                        are fully itemised here — there is no successor to 200-405. Version code \
                        `08_EN`, because two interim postings sit in its version sequence.",
+            },
+            Source {
+                key: "hb583-134-enrolled",
+                title: Some("Sub. H.B. 583 of the 134th General Assembly, as enrolled"),
+                url: "https://search-prod.lis.state.oh.us/api/v2/general_assembly_134/\
+                      legislation/hb583/08_EN/pdf/",
+                filename: "hb583-134-enrolled.pdf",
+                format: Format::Pdf,
+                catalog: Some("ohio-session-laws"),
+                fixtures: &[crate::fixtures::CORRECTIONS_FIXTURE],
+                note: "Not an appropriation table, and the reason this connector's note now has \
+                       two halves. The corpus recorded for four phases that H.B. 583's contents \
+                       were unreachable — \"a separate PDF that no connector fetches\" — while \
+                       every other act here came through this same API. Its amending title names \
+                       twelve sections of R.C. 3317 and four uncodified sections of H.B. 110, \
+                       which is the answer to \"which provisions moved\" printed on the act's own \
+                       first page. Version code `08_EN`, which is the same index H.B. 282 uses \
+                       and not a coincidence worth trusting: the six below it are all 404.",
             },
         ],
     },

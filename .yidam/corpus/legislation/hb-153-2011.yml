@@ -131,3 +131,6 @@ links:
     relationship: constrains
   - target: ../doctrine/adequacy.yml
     relationship: retreats-from
+  - target: ../fiscal-period/fy2012-13.yml
+    relationship: appropriates-for
+    note: FY2012-13, and the biennium this act's own regime was built for.

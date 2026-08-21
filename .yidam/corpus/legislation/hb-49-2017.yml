@@ -94,5 +94,8 @@ links:
     relationship: continues
   - target: ../revenue-stream/tpp-replacement-payments.yml
     relationship: constrains
+  - target: ../fiscal-period/fy2018-19.yml
+    relationship: appropriates-for
+    note: FY2018-19.
   - target: ../../catalog/lsc-dew-redbook.md
     relationship: sourced-from

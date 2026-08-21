@@ -83,5 +83,8 @@ links:
     relationship: sets
   - target: ../doctrine/adequacy.yml
     relationship: operationalizes
+  - target: ../fiscal-period/fy2022-23.yml
+    relationship: appropriates-for
+    note: FY2022-23.
   - target: ../../catalog/dew-sfpr-line-by-line.md
     relationship: sourced-from

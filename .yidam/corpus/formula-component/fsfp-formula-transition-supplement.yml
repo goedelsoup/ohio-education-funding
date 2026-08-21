@@ -47,6 +47,30 @@ findings: |
   districts are on the guarantee, 144 on this supplement, and 38 on transportation's** — with
   the formula's own output being what all three are measured against and found short.
   [inference]
+revisions:
+  - was: |
+      The statutory home of this payment was recorded as unreadable: "Reading the enacted bill
+      text is `lsc-budget`, still blocked on PDFs", with the bill section marked `[open]`.
+    now: |
+      `lsc-budget` is wired and the act is committed. The H.B. 96 final analysis names the
+      sections in its own citation block — `Sections 265.215, 265.220, 265.230, 265.237, 265.239,
+      and 265.450` — and what remains open is which of the six, not whether the document can be
+      read.
+    found_by: |
+      A corpus review crossing every blocker claim against the connector registry. `lsc-budget`
+      carries `Status::Wired`, its output has been committed at
+      `crates/project/fixtures/enacted-school-funding.txt` since the phase that landed it, and
+      `crates/project/tests/what_the_act_says_and_the_code_does_not.rs` already asserts two of
+      these three supplements' own figures against that file.
+    reach: |
+      Three nodes carried the sentence verbatim — this one, [the performance
+      supplement](fsfp-performance-supplement.yml) and [the enrolment
+      supplements](fsfp-enrolment-supplements.yml) — and a fourth,
+      [DPIA](fsfp-disadvantaged-pupil-impact-aid.yml), had already gone through the same route and
+      recorded a revision for it. The blocker was false on the day the sibling's revision was
+      written; nothing compared them. It is the failure that test's own header names — reading a
+      recorded claim instead of the source behind it — committed in the class the test was written
+      for.
 properties:
   name: Formula transition supplement
   function: |
@@ -70,12 +94,36 @@ properties:
 
     That is a statement about **durability**, not about legality; Ohio funds a great deal this way.
     It means this payment has no permanent statutory home, unlike base cost or the categorical
-    weights beside it on the same report. Reading the enacted bill text is `lsc-budget`, still
-    blocked on PDFs. [verified that it is absent from the Revised Code; the bill section is [open]]
+    weights beside it on the same report.
+
+    **The act is held, and it names the sections.** The H.B. 96 final analysis is committed at
+    `crates/project/fixtures/enacted-school-funding.txt`, and its citation block for *Funding for
+    FY 2026 and FY 2027* closes `Sections 265.215, 265.220, 265.230, 265.237, 265.239, and
+    265.450` — the six uncodified sections of the act carrying the school financing system for the
+    biennium, this payment among them. [verified — `lsc-budget`]
+
+    A bounded list, not a pinpoint. The analysis cites the sections for the topic and not for each
+    supplement inside it, and separating them needs the enrolled act rather than LSC's account of
+    it. [open — which of the six, not whether]
 
     `[L1]` is likewise absent from the Revised Code, so it is defined in the same temporary law or
     administratively. Either way it is not a permanent-law quantity, which is worth knowing about a
-    figure that decides a $63.6m payment. [open]
+    figure that decides a $63.6m payment.
+
+    **It has been temporary law with a title since the plan's first biennium.**
+    [H.B. 583](../legislation/hb-583-2022.yml) of the 134th, amending H.B. 110's Section 265.210,
+    refers an appropriation to the section "entitled **FORMULA TRANSITION SUPPLEMENT**" — so the
+    supplement had a named uncodified home in the act that created it, and has been carried
+    forward in that form through two budgets since. The surrounding words are a strike-and-insert
+    and the extract prints both halves; the reading here is the inserted one. [verified —
+    `crates/project/fixtures/hb583-corrections.txt`,
+    `crates/project/tests/the_act_that_corrected_the_plan.rs`]
+
+    And the act says what the base is: H.B. 96 extends "a formula transition supplement based on
+    an **FY 2021 funding base** to districts, community schools, and STEM schools", which is the
+    department's `[L1]` named in the legislature's own words rather than inferred from the
+    formula's shape. [verified — `lsc-budget`] What it is composed *of* is still not published;
+    the department carries it as a value. [open]
   calculator: |
     Not a standalone crate. Carried in `crates/project::panel::Transition` and reproduced for all
     609 districts in `crates/project/tests/the_supplements_outside_the_formula.rs`.

@@ -75,3 +75,6 @@ links:
     relationship: creates
   - target: ../actor/department-of-education-and-workforce.yml
     relationship: establishes-agency
+  - target: ../fiscal-period/fy2024-25.yml
+    relationship: appropriates-for
+    note: FY2024-25.

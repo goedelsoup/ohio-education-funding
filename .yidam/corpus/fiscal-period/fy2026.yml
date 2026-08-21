@@ -37,3 +37,5 @@ links:
     relationship: part-of
   - target: ../funding-regime/fair-school-funding-plan.yml
     relationship: governed-by
+  - target: ../legislation/hb-96-2025.yml
+    relationship: funded-by

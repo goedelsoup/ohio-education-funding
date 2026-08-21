@@ -32,6 +32,7 @@ See the class definition: [legislation.ont.yml](../legislation.ont.yml).
 | [hb-49-2017](hb-49-2017.yml) | 2017 | Re-anchored to FY2017 and made the guarantee conditional on enrolment loss |
 | [hb-166-2019](hb-166-2019.yml) | 2019 | Ran no formula: froze every district at its FY2019 allocation |
 | [hb-110-2021](hb-110-2021.yml) | 2021 | Enacted the Fair School Funding Plan |
+| [hb-583-2022](hb-583-2022.yml) | 2022 | Corrected the plan: thirteen sections of R.C. 3317, and its first input freeze |
 | [hb-33-2023](hb-33-2023.yml) | 2023 | Refreshed cost inputs to FY2022; made EdChoice universal |
 | [hb-96-2025](hb-96-2025.yml) | 2025 | Phase-in to 100%, cost inputs held at FY2022 |
 

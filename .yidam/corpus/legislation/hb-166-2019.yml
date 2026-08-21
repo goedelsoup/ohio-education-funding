@@ -115,5 +115,10 @@ links:
     note: >-
       The strongest edge on this node. `[H2]` is the FY2020 payment, and this act is what made the
       FY2020 payment equal to FY2019's.
+  - target: ../fiscal-period/fy2020-21.yml
+    relationship: appropriates-for
+    note: >-
+      FY2020-21, and the biennium where this edge is itself the finding: the act appropriated for
+      two years and computed for neither.
   - target: ../../catalog/lsc-dew-redbook.md
     relationship: sourced-from

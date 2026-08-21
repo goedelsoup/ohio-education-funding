@@ -36,7 +36,7 @@ links:
   - target: ../funding-regime/bridge-formula.yml
     relationship: governed-by
   - target: ../legislation/hb-153-2011.yml
-    relationship: appropriated-by
+    relationship: funded-by
   - target: ../doctrine/equity.yml
     relationship: measured-by
   - target: ../../catalog/census-f33-school-system-finances.md
