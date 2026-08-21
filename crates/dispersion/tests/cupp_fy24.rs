@@ -187,9 +187,9 @@ fn operating_expenditure_dispersion() {
         d.coefficient_of_variation
     );
     assert!(
-        (d.federal_range_ratio - 1.846).abs() < 0.02,
+        (d.restricted_range_ratio - 1.846).abs() < 0.02,
         "federal range ratio was {}",
-        d.federal_range_ratio
+        d.restricted_range_ratio
     );
     // The top half runs further above the median than the bottom half runs below it: Ohio's
     // spending distribution is right-skewed, so a mean-based summary overstates the typical

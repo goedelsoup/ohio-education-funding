@@ -21,7 +21,7 @@ description: |
 
   A rule this doctrine needs before any of its statistics can be read, and the one most easily got
   backwards. For **spending**, less dispersion is more equitable — that is the assumption behind
-  a coefficient of variation or a federal range ratio. For **state aid**, the sign flips. Aid is
+  a coefficient of variation or a restricted range ratio. For **state aid**, the sign flips. Aid is
   compensatory, so a wide spread means strong targeting and a narrow one means weak targeting.
 
   Any dispersion statistic in this domain therefore has to state whether its subject is a resource
@@ -49,7 +49,7 @@ findings: |
   [`crates/dispersion`](../../../crates/dispersion/tests/cupp_fy24.rs)]:
 
   - Operating expenditure per pupil: median $15,646, coefficient of variation **0.202**,
-    federal range ratio **1.846**. The district at the 95th percentile spends about 1.85 times
+    restricted range ratio **1.846**. The district at the 95th percentile spends about 1.85 times
     the district at the 5th.
   - The distribution is right-skewed — the top half runs further above the median than the
     bottom half runs below it — so any mean-based summary overstates the typical district.
@@ -197,6 +197,26 @@ findings: |
   that removes level differences by construction, cannot be told from one cross-section. [open]
 revisions:
   - was: |
+      The 95th-percentile-over-5th-percentile statistic was published as the **federal range
+      ratio**, in the corpus and in `dispersion`'s own field name.
+    now: |
+      It is the **restricted range ratio**. The federal range ratio is the federal range — P95
+      minus P5 — over P5, which is this figure minus one: a perfectly equal distribution scores
+      0.0 on it and 1.0 on this. Renamed in `dispersion::Dispersion` and here.
+    found_by: |
+      A review of the crates, checking each statistic against its standard definition. The
+      arithmetic was never in question — the prose beside every figure reads it correctly as a
+      ratio ("about 1.85 times what the district at the 5th percentile spends"), which is P95/P5
+      and not the federal range. The computation and the interpretation agreed with each other;
+      only the term of art did not.
+    reach: |
+      **No figure changes.** 1.846, 9.6 and 12.3 all stand, and every claim resting on them
+      stands with them, because each was already being read as a ratio. Had the name been treated
+      as authoritative instead, the fix would have been to subtract one from six published figures
+      across four files and restate every sentence interpreting them. The `was:` field of the
+      revision below keeps the older term, because it quotes a formulation rather than asserting
+      one.
+  - was: |
       Dispersion statistics were reported for spending and for state aid on the same convention:
       a lower coefficient of variation, or a narrower federal range ratio, read as more equitable
       in both cases.
@@ -206,7 +226,7 @@ revisions:
       targeting. The rule is now stated in the description, ahead of any statistic that depends on
       it.
     found_by: |
-      Realized aid measured against formula aid — CV 0.544 against 0.677, federal range ratio 9.6
+      Realized aid measured against formula aid — CV 0.544 against 0.677, restricted range ratio 9.6
       against 12.3 — which reads as the system becoming fairer on the spending convention and is
       the [guarantee](../formula-component/temporary-transitional-aid-guarantee.yml) flattening the
       compensation.

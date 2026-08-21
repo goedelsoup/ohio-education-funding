@@ -58,7 +58,16 @@ pub struct Dispersion {
     /// Mean of the top half over the median.
     pub verstegen_index: f64,
     /// 95th percentile over the 5th percentile.
-    pub federal_range_ratio: f64,
+    ///
+    /// This is the **restricted range ratio**, and it is deliberately not called the *federal
+    /// range ratio*, which is the federal range — P95 minus P5 — over P5, and therefore this
+    /// figure minus one. A perfectly equal distribution scores 1.0 here and 0.0 there.
+    ///
+    /// The ratio is the measure this repository's doctrine nodes actually interpret: they read
+    /// 1.846 as "the district at the 95th percentile spends about 1.85 times what the district
+    /// at the 5th does", which is P95/P5. The figures were right and the name was wrong, so the
+    /// name moved rather than the arithmetic.
+    pub restricted_range_ratio: f64,
     /// 5th percentile.
     pub p05: f64,
     /// 95th percentile.
@@ -148,7 +157,7 @@ impl Dispersion {
             coefficient_of_variation: std_dev / mean,
             mcloone_index: bottom_mean / median,
             verstegen_index: top_mean / median,
-            federal_range_ratio: if p05 == 0.0 { f64::INFINITY } else { p95 / p05 },
+            restricted_range_ratio: if p05 == 0.0 { f64::INFINITY } else { p95 / p05 },
             p05,
             p95,
         })
@@ -561,7 +570,7 @@ mod tests {
         assert!((d.coefficient_of_variation - 0.0).abs() < 1e-12);
         assert!((d.mcloone_index - 1.0).abs() < 1e-12);
         assert!((d.verstegen_index - 1.0).abs() < 1e-12);
-        assert!((d.federal_range_ratio - 1.0).abs() < 1e-12);
+        assert!((d.restricted_range_ratio - 1.0).abs() < 1e-12);
     }
 
     /// The indices are mirrors: raising the bottom moves McLoone, raising the top moves
@@ -592,20 +601,20 @@ mod tests {
         let u = Dispersion::of(&unequal).unwrap();
         let l = Dispersion::of(&levelled).unwrap();
         assert!(l.coefficient_of_variation < u.coefficient_of_variation);
-        assert!(l.federal_range_ratio < u.federal_range_ratio);
+        assert!(l.restricted_range_ratio < u.restricted_range_ratio);
         assert!(l.mean < u.mean, "and it makes everyone worse off");
     }
 
     #[test]
-    fn federal_range_ratio_ignores_the_extreme_tails() {
+    fn restricted_range_ratio_ignores_the_extreme_tails() {
         let mut with_outlier = vec![100.0; 100];
         with_outlier[0] = 1.0;
         with_outlier[99] = 10_000.0;
         let d = Dispersion::of(&with_outlier).unwrap();
         assert!(
-            (d.federal_range_ratio - 1.0).abs() < 0.01,
+            (d.restricted_range_ratio - 1.0).abs() < 0.01,
             "p05/p95 should be unmoved by single extreme values, got {}",
-            d.federal_range_ratio
+            d.restricted_range_ratio
         );
         assert!(
             d.coefficient_of_variation > 0.5,
