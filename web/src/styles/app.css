@@ -1067,6 +1067,11 @@ footer.site { border-top: 1px solid var(--border); padding-top: 1.1rem; margin-t
    — CPI-U is a general consumer index and school costs are majority compensation — so a real
    figure that does not name it is asserting something it has not said. */
 .fig-basis[data-basis="real"] { font-style: italic; }
+/* In a tile the value keeps the tile's own typography — the compound carries the annotation, not
+   the type. Without this the tile's headline figure drops to the body weight `.fig-value` sets. */
+.tile .v .fig-value { font: inherit; letter-spacing: inherit; }
+.tile .v .fig-year,
+.tile .v .fig-basis { font-size: .5em; font-weight: var(--weight-regular); letter-spacing: 0; }
 th .fig-year, th .fig-basis { display: inline; }
 td .fig-year, td .fig-basis { display: none; }
 

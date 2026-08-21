@@ -11,9 +11,10 @@
  *    needs a third series is the wrong chart; an ordering that needs more than three steps is
  *    encoded by position and a label. See below for what happened to the five-step ramp.
  *
- * The categorical pair passes six checks in both modes — lightness band, chroma floor, CVD
- * separation (delta-E 24.7 protan, worst case), normal-vision separation, and contrast against
- * the card surface. The values are load-bearing; do not nudge them for taste.
+ * The categorical pair is load-bearing; do not nudge it for taste. Its measured separation is
+ * CIEDE2000 52.3 light and 53.3 dark under protanopia, worst case 48.5 / 48.0 across all four
+ * visions — not the 24.7 this comment used to claim, which reproduces under no standard metric and
+ * was the third such figure in the block. `web/tests/unit/palette.spec.ts` runs it.
  */
 
 :root {

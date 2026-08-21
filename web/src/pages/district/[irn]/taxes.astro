@@ -11,7 +11,7 @@
 import DistrictNav from "../../../components/DistrictNav.astro";
 import Base from "../../../layouts/Base.astro";
 import { districtPaths, loadFeed } from "../../../lib/feed.ts";
-import { count, money, pct } from "../../../lib/format.ts";
+import { count, fig, money, pct } from "../../../lib/format.ts";
 import * as routes from "../../../lib/routes.ts";
 import {
   renderChargeOff,
@@ -77,7 +77,7 @@ const description = latest
         <div class="tiles">
           <div class="tile">
             <div class="k">Taxable value per pupil</div>
-            <div class="v">{money(latest.value_per_pupil)}</div>
+            <div class="v" set:html={fig(money(latest.value_per_pupil), `TY${latest.tax_year}`)} />
             <div class="n">
               {/* SD-1's median, not the profile report's — the two divide by different pupil
                   counts and this tile used to compare across them. */}
@@ -87,7 +87,7 @@ const description = latest
           </div>
           <div class="tile">
             <div class="k">Effective Class I millage</div>
-            <div class="v">{latest.class1_rate.toFixed(2)}</div>
+            <div class="v" set:html={fig(latest.class1_rate.toFixed(2), `TY${latest.tax_year}`)} />
             <div class="n">
               {
                 /* Below, at, near, above — four positions, because twenty-one districts charge
@@ -105,7 +105,7 @@ const description = latest
           </div>
           <div class="tile">
             <div class="k">Real property tax charged</div>
-            <div class="v">{money(latest.real_property_taxes_charged)}</div>
+            <div class="v" set:html={fig(money(latest.real_property_taxes_charged), `TY${latest.tax_year}`)} />
             <div class="n">TY{latest.tax_year}, current expenses</div>
           </div>
         </div>
