@@ -233,8 +233,13 @@ impl Archive {
                 name: entry.name.clone(),
             });
         }
+        // `usize::try_from` succeeds for every u64 on a 64-bit target, so it is not a bound.
+        // The archive is: an offset past the end of the file is malformed, and saying so here
+        // stops `head + 26` and `start + compressed` overflowing below.
         let head = usize::try_from(entry.local_header_offset)
-            .map_err(|_| ZipError::Malformed("local header offset out of range"))?;
+            .ok()
+            .filter(|head| *head < self.data.len())
+            .ok_or(ZipError::Malformed("local header offset out of range"))?;
         if u32_at(&self.data, head) != Some(LOCAL_SIGNATURE) {
             return Err(ZipError::Malformed("local header signature"));
         }
@@ -243,16 +248,24 @@ impl Archive {
         let name_len = u16_at(&self.data, head + 26).ok_or(ZipError::NotAZip)? as usize;
         let extra_len = u16_at(&self.data, head + 28).ok_or(ZipError::NotAZip)? as usize;
         let start = head + 30 + name_len + extra_len;
+        let compressed = usize::try_from(entry.compressed_size)
+            .ok()
+            .filter(|size| *size <= self.data.len())
+            .ok_or(ZipError::Malformed("compressed size out of range"))?;
         let end = start
-            + usize::try_from(entry.compressed_size)
-                .map_err(|_| ZipError::Malformed("compressed size out of range"))?;
+            .checked_add(compressed)
+            .ok_or(ZipError::Malformed("member extends past the archive"))?;
         let raw = self
             .data
             .get(start..end)
             .ok_or(ZipError::Malformed("member data runs past end of file"))?;
 
+        // DEFLATE's maximum expansion is about 1032:1, so the compressed length is a real
+        // bound on the declared one. Without it a ~200-byte archive declaring 512 MB
+        // pre-allocates 512 MB before decoding a single bit.
         let expected = usize::try_from(entry.uncompressed_size)
-            .map_err(|_| ZipError::Malformed("uncompressed size out of range"))?;
+            .map_err(|_| ZipError::Malformed("uncompressed size out of range"))?
+            .min(compressed.saturating_mul(1032));
         let out =
             match entry.method {
                 0 => raw.to_vec(),
@@ -329,10 +342,18 @@ fn read_zip64_extra(
         let size = u16_at(extra, at + 2).ok_or(ZipError::Zip64Unsupported)? as usize;
         let body = at + 4;
         if id == 0x0001 {
+            // Bound the reads to this record rather than to the whole extra field. A
+            // truncated Zip64 record would otherwise read the *next* record's bytes as a
+            // size and report them as the member's, with no error.
+            let record_end = body.checked_add(size).ok_or(ZipError::Zip64Unsupported)?;
+            if record_end > extra.len() {
+                return Err(ZipError::Zip64Unsupported);
+            }
+            let record = &extra[..record_end];
             let mut cursor = body;
             let mut take = |field: &mut u64| -> Result<(), ZipError> {
                 if *field == u64::from(u32::MAX) {
-                    *field = u64_at(extra, cursor).ok_or(ZipError::Zip64Unsupported)?;
+                    *field = u64_at(record, cursor).ok_or(ZipError::Zip64Unsupported)?;
                     cursor += 8;
                 }
                 Ok(())

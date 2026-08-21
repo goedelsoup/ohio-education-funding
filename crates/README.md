@@ -160,9 +160,9 @@ Fields per crate: name, capability type (connector/calculator/feature-engineerin
 | [`project`](project/) | Forward projection of funding inputs, and policy simulation over them | 265 |
 | [`regime-diff`](regime-diff/) | Difference two funding regimes at component level, with the residual the decomposition does not explain | 36 |
 | [`scenario-delta`](scenario-delta/) | Winners and losers between two funding runs, with incidence and the off-formula count | 25 |
-| [`spreadsheet`](spreadsheet/) | Read the department's published workbooks with no dependencies | 70 |
+| [`spreadsheet`](spreadsheet/) | Read the department's published workbooks with no dependencies | 75 |
 
-12 crates, 813 test functions, no crates.io dependencies. `cargo test` reports a different total: it adds doc-tests and counts each integration binary separately.
+12 crates, 818 test functions, no crates.io dependencies. `cargo test` reports a different total: it adds doc-tests and counts each integration binary separately.
 <!-- /REGEN -->
 
 ## Index status
