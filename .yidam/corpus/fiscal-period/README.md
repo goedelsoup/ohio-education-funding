@@ -21,6 +21,11 @@ See the class definition: [fiscal-period.ont.yml](../fiscal-period.ont.yml).
 
 | Node | Kind | Appropriated by |
 |------|------|-----------------|
+| [fy2002-03](fy2002-03.yml) | biennium | Am. Sub. H.B. 94 (2001) |
+| [fy2004-05](fy2004-05.yml) | biennium | Am. Sub. H.B. 95 (2003) |
+| [fy2006-07](fy2006-07.yml) | biennium | Am. Sub. H.B. 66 (2005) |
+| [fy2008-09](fy2008-09.yml) | biennium | Am. Sub. H.B. 119 (2007) |
+| [fy2010-11](fy2010-11.yml) | biennium | Am. Sub. H.B. 1 (2009) |
 | [fy2012-13](fy2012-13.yml) | biennium | Am. Sub. H.B. 153 (2011) |
 | [fy2014-15](fy2014-15.yml) | biennium | Am. Sub. H.B. 59 (2013) |
 | [fy2016-17](fy2016-17.yml) | biennium | Am. Sub. H.B. 64 (2015) |
@@ -33,8 +38,8 @@ See the class definition: [fiscal-period.ont.yml](../fiscal-period.ont.yml).
 | [fy2026](fy2026.yml) | fiscal year | Am. Sub. H.B. 96 (2025) |
 | [fy2027](fy2027.yml) | fiscal year | Am. Sub. H.B. 96 (2025) |
 
-**All eight biennia chain by `follows`**, unbroken from FY2012-13 to FY2026-27 — which was true
-of the first seven and not of the last until the edge was added. The three Fair School Funding
+**All thirteen biennia chain by `follows`**, unbroken from FY2002-03 to FY2026-27 — a quarter
+century in one traversal, four funding regimes deep. The three Fair School Funding
 Plan biennia carry the plan's central tension traversably rather than narrated: FY2022-23 ran on
 FY2018 cost inputs, FY2024-25 refreshed them to FY2022 and moved statewide average base cost about
 12%, and FY2026-27 completes the phase-in while holding the inputs where H.B. 33 left them.
@@ -67,9 +72,38 @@ whole corpus.
 **FY2014 is absent from the F-33 archive**, so FY2014-15 is half-measured and nothing
 interpolates the missing year. [verified]
 
+## The decade before the panel, and what it is measured with instead
+
+**FY2002-03 through FY2010-11 exist now**, and the sentence that stood here — *"Nothing before
+FY2012… the obstacle is no longer the corpus's shape but its sources"* — conflated two things. It
+was true that **NCES publishes no F-33 before FY2012**, so these five biennia cannot carry the
+revenue shares and quartile equalization measure their successors do. It did not follow that they
+could not be measured, and the argument was doing that work: no F-33 was read as no evidence, and
+two committed series covering exactly this decade went unused.
+
+They carry a different pair, and both reach further back than the panel does:
+
+- the **enacted appropriation**, from `appropriation-lines.csv`, which runs FY1999 to FY2027 —
+  the department's total, the foundation lines inside it, and its share; and
+- the **free and reduced-price meal share**, from `mr81-sponsor-panel.csv`, which runs FY1998 to
+  FY2014 and is the only per-district measure of need the corpus holds for these years.
+
+That is a statewide grain rather than a per-district one, and it is stated as such on each node.
+What it is enough for is the shape of the decade: real foundation aid peaks in FY2009, falls 14.1%
+by FY2011, and ends below where FY2002 started, while the meal share rises 11.4 points on one
+unbroken basis.
+
+**FY2006-07 is read from the wrong act's greenbook**, and there is no alternative: H.B. 66's own
+education greenbook prints no line-item table, the single gap in the `lsc-budget` series. Those two
+years are actuals taken from H.B. 119's greenbook two years later, where every other year on these
+nodes is enacted. [verified]
+
 ## Known gap
 
-**Nothing before FY2012.** The DeRolph era, the Evidence-Based Model biennium and everything back
-to 1851 still have no periods, so a query about FY1997 has nowhere to land. The obstacle is no
-longer the corpus's shape but its sources: NCES publishes no F-33 before FY2012 under any naming
-its later years use, and the pre-2000 record is the same `lsc-budget` blocker. [open]
+**Nothing before FY2002.** The equal yield formula, the whole *DeRolph* trial record, and
+everything back to 1851 still have no periods, so a query about FY1997 has nowhere to land. The
+appropriation series reaches FY1999 and the meal panel FY1998, so two of the three biennia between
+1997 and 2002 are already measurable; what is missing is their acts. H.B. 215 of the 122nd and
+H.B. 282 of the 123rd are both retrieved and pinned, and writing them is the reading step
+`ohio-session-laws` does not automate. Below the 122nd the legislature's own version index stops
+and no publisher serves anything. [open]

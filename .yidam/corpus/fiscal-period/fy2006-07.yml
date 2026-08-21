@@ -1,0 +1,75 @@
+class: fiscal-period
+label: FY2006-2007 Biennium
+summary: >-
+  The biennium that created the line item every later reader knows. H.B. 66 established
+  200550 Foundation Funding and discontinued 200501, began the tangible personal property
+  tax phase-out, and is the one biennium here whose own greenbook prints no line-item table.
+description: |
+  July 1, 2005 through June 30, 2007. [H.B. 66](../legislation/hb-66-2005.yml) began the
+  [tangible personal property tax phase-out](../revenue-stream/tpp-replacement-payments.yml) — the
+  largest change to Ohio's local tax base since H.B. 920 — and, in the same act, replaced the line
+  item through which the state pays its formula. [verified]
+
+  `200501 Base Cost Funding` becomes a discontinued line item; `200550 Foundation Funding` is
+  established. Every appropriation figure for Ohio school funding from here to FY2027 is read off
+  `200550`, and the Catalog of Budget Line Items names the act that created it in the same breath
+  it names the act that governs it: *"originally established by Am. Sub. H.B. 66 of the 126th
+  G.A."* [verified — `catalog-line-item-basis.tsv`]
+
+  The [foundation base cost formula](../funding-regime/foundation-base-cost-formula.yml) is still
+  the regime. What changed is the container, not the calculation.
+findings: |
+  ### This biennium is read from the next act's greenbook, and that is the only way to read it
+
+  H.B. 66's own education greenbook **prints no line-item table** — the single gap the `lsc-budget`
+  connector records in an otherwise continuous FY1999-FY2027 series. FY2006 and FY2007 are
+  therefore carried as **actuals from H.B. 119's greenbook**, published two years later, rather
+  than as enacted figures like every other year on these five nodes. [verified — the connector's
+  own `still_blocked` note]
+
+      FY2006   enacted $9.214bn   foundation $6.185bn   67.1%   real $10.180bn   (actual basis)
+      FY2007   enacted $9.504bn   foundation $6.315bn   66.4%   real $10.122bn   (actual basis)
+
+  ### The jump from FY2005 is across two changes at once, and only one of them is money
+
+  Foundation aid rises **$1.169bn nominal, 23.3%**, from FY2005 to FY2006. Two things happen in
+  that step: the line item is replaced, and the basis changes from enacted to actual. The line
+  replacement does **not** move the total — `200501` and `200550` are both in the set the series
+  sums, and `200501` runs down to $23.6m in FY2006 and $0 in FY2007 rather than disappearing with
+  money in it. The basis change is not so easily dismissed, and no enacted figure for these two
+  years exists to check it against. [verified for the composition; the size of the basis effect is
+  [open]]
+
+  ### What it settles elsewhere
+
+  [`state-foundation-aid`](../revenue-stream/state-foundation-aid.yml) records, `[open]`, that "a
+  line ceasing to be listed may have been folded into another" and that settling it "needs the
+  acts' own language rather than their appropriation tables." The Catalog's Legal Basis column
+  settles the identity without the language: `200501` is discontinued and `200550` is H.B. 66's.
+  What the acts would add is whether anything moved between them. [verified]
+properties:
+  label: FY2006-2007
+  kind: biennium
+  start: 2005-07-01
+  end: 2007-06-30
+  appropriating_bill: Am. Sub. H.B. 66 (126th General Assembly). [verified — the corpus holds this act]
+  context: |
+    Foundation base cost formula era. **Actual rather than enacted**, from H.B. 119's greenbook:
+    H.B. 66's own greenbook has no line-item table, which is the one gap in the FY1999-FY2027
+    series. Foundation aid moves from `200501` to `200550` inside this biennium. [verified]
+links:
+  - target: ../fiscal-period.ont.yml
+    relationship: instance-of
+  - target: fy2004-05.yml
+    relationship: follows
+  - target: ../funding-regime/foundation-base-cost-formula.yml
+    relationship: governed-by
+  - target: ../legislation/hb-66-2005.yml
+    relationship: funded-by
+  - target: ../revenue-stream/state-foundation-aid.yml
+    relationship: carries
+    note: >-
+      The appropriation figures on this node are this stream, in this period, read off the enacted
+      line items. The stream is the subject; the period is the interval it is measured over.
+  - target: ../../catalog/lsc-catalog-of-budget-line-items.md
+    relationship: sourced-from

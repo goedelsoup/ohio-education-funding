@@ -9,7 +9,7 @@ description: |
   formula](../funding-regime/bridge-formula.yml) era. [verified]
 
   **The two frozen years, and FY2020 is the one that never went away.** The Fair School Funding Plan's guarantee is anchored to FY2020 and has never been re-based, so 48.3% of districts are still funded at this biennium's level in FY2027.
-
+findings: |
   **What is measured**, over comparable districts, on federal definitions: [verified —
   `dispersion::ohio_panel`, pinned by test]
 
@@ -22,7 +22,6 @@ description: |
   [inference]
 
   **The appropriating act set the department's own budget at $11.88 billion in FY2020 and $12.10 billion in FY2021.** That is what was appropriated to the Department of Education across every line in its chapter, less the property tax reimbursement items that are numbered as the department's and are carried in the State Revenue Distributions section instead. [verified — the appropriation series, `lsc-appropriation-spreadsheet`] It is a ceiling rather than a payment; what districts received is `dew-foundation`.
-
 properties:
   label: FY2020-2021
   kind: biennium

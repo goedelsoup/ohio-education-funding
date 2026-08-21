@@ -1,0 +1,64 @@
+class: fiscal-period
+label: FY2008-2009 Biennium
+summary: >-
+  The high-water mark. Foundation aid reached 70.2% of the department's budget in FY2009 and
+  $10.38 billion in constant dollars, the largest real figure the series carries — in the
+  same act that abolished the cost of doing business factor and the base cost guarantee.
+description: |
+  July 1, 2007 through June 30, 2009 — the last biennium of the
+  [foundation base cost formula](../funding-regime/foundation-base-cost-formula.yml), and the one
+  in which [H.B. 119](../legislation/hb-119-2007.yml) removed two of its protections: the cost of
+  doing business factor and the base cost guarantee. [verified]
+
+  Both removals reduce what particular districts are owed while the total rises, which is why the
+  biennium reads two ways depending on the grain. Statewide it is the decade's peak. For a district
+  that had been held by the guarantee, it is the year the floor went.
+
+  It is also the last biennium before the Evidence-Based Model, and therefore the last one computed
+  by a method that had been in place, in recognisable form, since the 1990s.
+findings: |
+  ### The largest real foundation appropriation in the committed series
+
+      FY2008   enacted $9.369bn   foundation $6.428bn   68.6%   real $9.810bn
+      FY2009   enacted $9.553bn   foundation $6.703bn   70.2%   real $10.378bn
+
+  **$10.378bn in constant FY2026 dollars is the peak**, FY2002 through FY2027, and **70.2% is the
+  peak share.** Every later figure in the series is below both. [verified —
+  `appropriation-lines.csv`, `bundle::deflator`]
+
+  That is worth stating plainly because the decade is usually narrated as decline, and the decline
+  does not begin where the narration puts it. It begins after FY2009, in the biennium that enacted
+  the Evidence-Based Model.
+
+  ### Poverty crossed 40% here
+
+  **39.6% then 42.6%** approved for free or reduced-price meals, over 896 and 913 sponsors — up
+  **11.4 points from FY2002**, on one unbroken basis. [verified — `mr81-sponsor-panel.csv`] FY2009
+  is the last year of that basis; the department moves to a different one in FY2010 and the two
+  cannot be compared directly.
+properties:
+  label: FY2008-2009
+  kind: biennium
+  start: 2007-07-01
+  end: 2009-06-30
+  appropriating_bill: Am. Sub. H.B. 119 (127th General Assembly). [verified — the corpus holds this act]
+  context: |
+    Foundation base cost formula era, its final biennium. Enacted basis. The cost of doing
+    business factor and the base cost guarantee are both abolished by the appropriating act.
+    [verified]
+links:
+  - target: ../fiscal-period.ont.yml
+    relationship: instance-of
+  - target: fy2006-07.yml
+    relationship: follows
+  - target: ../funding-regime/foundation-base-cost-formula.yml
+    relationship: governed-by
+  - target: ../legislation/hb-119-2007.yml
+    relationship: funded-by
+  - target: ../revenue-stream/state-foundation-aid.yml
+    relationship: carries
+    note: >-
+      The appropriation figures on this node are this stream, in this period, read off the enacted
+      line items. The stream is the subject; the period is the interval it is measured over.
+  - target: ../../catalog/lsc-catalog-of-budget-line-items.md
+    relationship: sourced-from

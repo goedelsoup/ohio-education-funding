@@ -90,5 +90,9 @@ links:
     note: >-
       Six weeks after the court released jurisdiction, and the reason this node is worth having:
       it is where a structural response would have appeared and did not.
+  - target: ../fiscal-period/fy2004-05.yml
+    relationship: appropriates-for
+    note: >-
+      FY2004-05.
   - target: ../../catalog/lsc-dew-redbook.md
     relationship: sourced-from

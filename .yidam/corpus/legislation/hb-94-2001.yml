@@ -118,5 +118,9 @@ links:
     relationship: compensates-for
   - target: ../formula-component/fsfp-targeted-assistance.yml
     relationship: shares-citation-with
+  - target: ../fiscal-period/fy2002-03.yml
+    relationship: appropriates-for
+    note: >-
+      FY2002-03, the first biennium under the formula this act rebuilt.
   - target: ../../catalog/derolph-litigation-record.md
     relationship: sourced-from
