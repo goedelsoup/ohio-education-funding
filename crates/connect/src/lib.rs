@@ -1082,7 +1082,7 @@ pub fn rebuild(root: &Path) -> Result<Vec<Rebuilt>, RebuildError> {
         },
     });
 
-    // The two acts whose education appropriation tables this repository can read as printed.
+    // The three acts whose education appropriation tables this repository can read as printed.
     out.push(match session_laws(root) {
         Ok(rows) => Rebuilt::Written {
             path: fixtures::SESSION_LAW_FIXTURE.to_string(),
@@ -1095,6 +1095,21 @@ pub fn rebuild(root: &Path) -> Result<Vec<Rebuilt>, RebuildError> {
         Err(reason) => Rebuilt::Skipped {
             path: fixtures::SESSION_LAW_FIXTURE.to_string(),
             reason,
+        },
+    });
+
+    // The corrective act, which has no such table. Committed whole and skipped rather than fatal
+    // on the same two counts the enacted analysis is: the PDF may not be cached, and `pdftotext`
+    // may not be installed.
+    let corrections = source("hb583-134-enrolled").expect("registered").1;
+    out.push(match cache::pdf_text(root, corrections) {
+        Ok(text) => Rebuilt::Written {
+            path: fixtures::CORRECTIONS_FIXTURE.to_string(),
+            rows: fixtures::write_text(&root.join(fixtures::CORRECTIONS_FIXTURE), text.trim())?,
+        },
+        Err(cause) => Rebuilt::Skipped {
+            path: fixtures::CORRECTIONS_FIXTURE.to_string(),
+            reason: cause.to_string(),
         },
     });
 

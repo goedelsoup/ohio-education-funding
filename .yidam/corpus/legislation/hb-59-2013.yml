@@ -97,5 +97,8 @@ links:
     note: >-
       Not the same mechanism — that one is the Fair School Funding Plan's — but the same name and
       the start of the anchor chain its FY2020 base sits at the end of.
+  - target: ../fiscal-period/fy2014-15.yml
+    relationship: appropriates-for
+    note: FY2014-15.
   - target: ../../catalog/lsc-dew-redbook.md
     relationship: sourced-from

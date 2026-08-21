@@ -4103,6 +4103,7 @@ pub const REBUILT: &[&str] = &[
     MR81_FIXTURE,
     CCD_DIRECTORY_FIXTURE,
     SESSION_LAW_FIXTURE,
+    CORRECTIONS_FIXTURE,
     TRANSFER_FIXTURE,
     BUILDING_FIXTURE,
     IDENTIFIED_FIXTURE,
@@ -4413,6 +4414,21 @@ pub const SESSION_LAW_HEADER: &[&str] = &[
     "title",
     "amount",
 ];
+
+/// Where the corrective act's own text is written, relative to the repository root.
+///
+/// # Why this is a second file and not eight more rows in [`SESSION_LAW_FIXTURE`]
+///
+/// That fixture is a table, built by finding a department heading and reading the money columns
+/// under it. Sub. H.B. 583 of the 134th appropriates almost nothing and amends a great deal, so
+/// there is no such table in it to read. What it carries is its own amending title — every
+/// Revised Code section it changed, and every uncodified section of H.B. 110 it reopened — and
+/// that is prose, which is the form the question about it was asked in.
+///
+/// Committed whole, for the reason [`GREENBOOK_FIXTURE`] is: it is an education act by its own
+/// title, and the retirement, nursing and tax-credit sections sitting beside the school funding
+/// ones are a few pages against ninety-four.
+pub const CORRECTIONS_FIXTURE: &str = "crates/project/fixtures/hb583-corrections.txt";
 
 /// One enrolled act, with the two fiscal years its money columns stand for.
 #[derive(Debug, Clone, Copy)]

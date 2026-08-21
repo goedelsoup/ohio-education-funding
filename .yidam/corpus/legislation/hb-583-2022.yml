@@ -25,12 +25,52 @@ description: |
   direction: there, a citation resolves to a section that has since been repurposed; here, an act
   that everybody cites was amended by one that almost nobody does.
 
-  **What it changed is not held.** LSC published a final analysis for it and `lsc-budget`
-  retrieves one document — the final analysis of the *current* budget act. This one is a separate
-  PDF that no connector fetches, so the corpus can say that corrections were made, that they are
-  operative, and that they are technical on LSC's characterisation, and cannot say which
-  provisions moved. [open] Until that is retrieved, any claim that a specific FY2022 mechanism
-  came from H.B. 110 rather than from this act is unverified. [open]
+  **What it changed.** The act reprints **thirteen sections of R.C. 3317** — 3317.011, .0110,
+  .014, .016, .017, .019, .02, .0212, .0215, .024, .051, .064 and .25 — and reopens four
+  uncodified sections of H.B. 110: 265.150 Pupil Transportation, 265.210 Foundation Funding - All
+  Students, 265.225 and 265.335. It also amends S.B. 1 of the 134th and H.B. 123 of the 133rd.
+  [verified — the enrolled act]
+
+  Its own appropriation is a single federal line: **$2,415,201 in FY2022 and nothing in FY2023**,
+  for the tutoring programme it created, out of American Rescue Plan emergency funds. There is no
+  general revenue line in it at all — which is why an act that moved the formula leaves no trace
+  in an appropriation series. [verified]
+findings: |
+  ### The section that assembles foundation funding is the one it did not touch
+
+  **R.C. 3317.022 is absent from the amending title and reprinted nowhere in the act**, while the
+  sections around it are reopened wholesale. It appears ten times as a cross-reference *from* the
+  sections that were amended. So the correction reworked the inputs to core foundation funding and
+  left the assembly alone — which is a claim about what LSC's word "technical" covers, and it
+  covers more than the word suggests. [verified —
+  `crates/project/tests/the_act_that_corrected_the_plan.rs`]
+
+  ### The Fair School Funding Plan's first input-year freeze is here, in its first biennium
+
+  Section 13 holds the **statewide average cost per rider and cost per mile** — the two inputs to
+  transportation funding under R.C. 3317.0212, and to payment in lieu of transportation under
+  3327.02 — at **FY2020 data** for both FY2022 and FY2023. [verified]
+
+  The corpus asks the refresh-versus-freeze question of base cost across biennia, in
+  [`fsfp-input-year-refresh`](../scenario/fsfp-input-year-refresh.yml). It starts earlier and
+  smaller than that: the plan was enacted in July 2021 and by June 2022 two of its inputs were
+  already pinned to a year before it existed. [inference]
+
+  ### And it made prorated scholarships whole, retroactively
+
+  Section 15 provides that a student whose EdChoice expansion award had been cut under division
+  (E) of R.C. 3310.032 receives the full amount from the act's effective date. An act characterised
+  as technical moved money in the channel the districts are now
+  [litigating](../litigation/vouchers-hurt-ohio-2025.yml) over. [verified]
+
+  ### A caveat that belongs on any figure taken from this fixture
+
+  An enrolled act prints amendments as strike-and-insert, and the strike is typographic — it does
+  not survive text extraction. Section 265.210 reads *"the section of this act H.B. 110 of the
+  134th General Assembly entitled"*, where `this act` is struck and the rest replaces it. Read as
+  a run of words it is not what was enacted. `ohio-session-laws` records this hazard as the reason
+  H.B. 650 of the 122nd is deliberately unheld; it is present here too, and pinned by a test
+  rather than left to be met by surprise. [verified]
 properties:
   designation: Sub. H.B. 583
   general_assembly: 134th General Assembly
@@ -38,9 +78,36 @@ properties:
   effective: 2022-09-23
   subject: |
     Made corrective and technical changes to the Fair School Funding Plan enacted by Am. Sub.
-    H.B. 110, incorporated into the FY2022 calculations. [verified — characterised this way by
-    LSC in the H.B. 96 final analysis; the act's own final analysis is not held]
-  vetoes: Not assessed. [unentered]
+    H.B. 110, incorporated into the FY2022 calculations. Reprinted thirteen sections of R.C. 3317
+    and reopened four uncodified sections of H.B. 110, leaving R.C. 3317.022 untouched. Froze the
+    two statewide transportation cost inputs at FY2020 data for the biennium, ended the proration
+    of EdChoice expansion scholarships, and appropriated one federal line of $2.4m for a new
+    tutoring programme. [verified — the enrolled act]
+  vetoes: |
+    Not recorded here, and the enrolled act cannot record it: what the version index serves is the
+    text as presented to the Governor, and a line-item veto is exercised after that. The act does
+    make an appropriation, so it was vetoable. Settling it needs this act's own LSC final analysis,
+    which is a second document and not the one now held. [open]
+revisions:
+  - was: |
+      "What it changed is not held … This one is a separate PDF that no connector fetches, so the
+      corpus can say that corrections were made, that they are operative, and that they are
+      technical on LSC's characterisation, and cannot say which provisions moved."
+    now: |
+      The act is held. It came through `ohio-session-laws` — the same legislature version API that
+      already served H.B. 215, H.B. 770 and H.B. 282 — at version code `08_EN`, and is committed
+      at `crates/project/fixtures/hb583-corrections.txt`. What the corpus was reaching for was
+      LSC's analysis *of* the act; what answers the question is the act.
+    found_by: |
+      A corpus review crossing every blocker claim against the connector registry, then probing
+      the version index directly. Six version codes below `08_EN` return 404 and that one returns
+      ninety-four pages.
+    reach: |
+      It was the sole reason [FY2022-23](../fiscal-period/fy2022-23.yml) carried an `[open]`
+      reading "It has no node here" — a sentence written about a node that exists — and the reason
+      this node had no `findings` at all. It also turned out to answer a question filed on a
+      different node: the formula transition supplement's uncodified home is a *titled* section of
+      H.B. 110, which this act quotes by name.
 links:
   - target: ../legislation.ont.yml
     relationship: instance-of
@@ -50,5 +117,17 @@ links:
     relationship: corrects
   - target: ../fiscal-period/fy2022.yml
     relationship: governs
+  - target: ../formula-component/fsfp-transportation.yml
+    relationship: holds-fixed
+    note: >-
+      Section 13 pins the statewide cost per rider and cost per mile at FY2020 data for FY2022 and
+      FY2023 — the plan's first input-year freeze, one biennium into the plan.
+  - target: ../program/edchoice-expansion.yml
+    relationship: restores
+    note: >-
+      Section 15 ends the proration of awards under division (E) of R.C. 3310.032 and restores the
+      full amount to students already cut.
+  - target: ../../catalog/ohio-session-laws.md
+    relationship: sourced-from
   - target: ../../catalog/lsc-hb96-analysis.md
     relationship: sourced-from

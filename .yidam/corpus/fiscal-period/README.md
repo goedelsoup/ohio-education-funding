@@ -21,6 +21,11 @@ See the class definition: [fiscal-period.ont.yml](../fiscal-period.ont.yml).
 
 | Node | Kind | Appropriated by |
 |------|------|-----------------|
+| [fy2012-13](fy2012-13.yml) | biennium | Am. Sub. H.B. 153 (2011) |
+| [fy2014-15](fy2014-15.yml) | biennium | Am. Sub. H.B. 59 (2013) |
+| [fy2016-17](fy2016-17.yml) | biennium | Am. Sub. H.B. 64 (2015) |
+| [fy2018-19](fy2018-19.yml) | biennium | Am. Sub. H.B. 49 (2017) |
+| [fy2020-21](fy2020-21.yml) | biennium | Am. Sub. H.B. 166 (2019) |
 | [fy2022-23](fy2022-23.yml) | biennium | Am. Sub. H.B. 110 (2021) |
 | [fy2022](fy2022.yml) | fiscal year | Am. Sub. H.B. 110 (2021) |
 | [fy2024-25](fy2024-25.yml) | biennium | Am. Sub. H.B. 33 (2023) |
@@ -28,10 +33,11 @@ See the class definition: [fiscal-period.ont.yml](../fiscal-period.ont.yml).
 | [fy2026](fy2026.yml) | fiscal year | Am. Sub. H.B. 96 (2025) |
 | [fy2027](fy2027.yml) | fiscal year | Am. Sub. H.B. 96 (2025) |
 
-The three biennia now chain by `follows` and carry the whole Fair School Funding Plan era, which
-makes the plan's central tension traversable rather than narrated: FY2022-23 ran on FY2018 cost
-inputs, FY2024-25 refreshed them to FY2022 and moved statewide average base cost about 12%, and
-FY2026-27 completes the phase-in while holding the inputs where H.B. 33 left them.
+**All eight biennia chain by `follows`**, unbroken from FY2012-13 to FY2026-27 — which was true
+of the first seven and not of the last until the edge was added. The three Fair School Funding
+Plan biennia carry the plan's central tension traversably rather than narrated: FY2022-23 ran on
+FY2018 cost inputs, FY2024-25 refreshed them to FY2022 and moved statewide average base cost about
+12%, and FY2026-27 completes the phase-in while holding the inputs where H.B. 33 left them.
 
 [FY2022](fy2022.yml) is the best-documented period in the corpus — nearly every verified figure
 here is anchored to it — and [FY2027](fy2027.yml) is entirely prospective, with no actuals at
@@ -44,9 +50,19 @@ each carrying the revenue shares and quartile equalization measure the F-33 pane
 years. That was called the cheapest high-value expansion in the corpus and it was, though the
 value only appeared once there was a decade of per-district finance for the periods to hold.
 
-They are deliberately thin. Each carries what is measured and the regime in force, and not a
-narrative — the appropriating acts, the enacted changes and the department's own per-district
-figures are `lsc-budget` work, and only FY2012-13's act is held. [open]
+They are deliberately thin. Each carries what is measured and the regime in force rather than a
+narrative — but the sentence that stood here, saying "only FY2012-13's act is held", stopped being
+true and nobody told this file. **All five acts are held now**: H.B. 153, H.B. 59, H.B. 64,
+H.B. 49 and H.B. 166 each have a node, and each period names its act by an `appropriates-for` edge
+in one direction and `funded-by` in the other. What is still `lsc-budget` work is the department's
+own per-district figures for these years. [open]
+
+That drift is worth stating rather than editing away. This class exists to make the join
+traversable, and for five biennia the join was written as a string in `appropriating_bill:` with
+no edge under it — so a traversal from an act to the years it paid for returned nothing, while the
+prose two sections down said the acts were missing. The relationship
+[`legislation.ont.yml`](../legislation.ont.yml) declares for exactly this had one user in the
+whole corpus.
 
 **FY2014 is absent from the F-33 archive**, so FY2014-15 is half-measured and nothing
 interpolates the missing year. [verified]

@@ -45,6 +45,8 @@ links:
     relationship: follows
   - target: ../funding-regime/bridge-formula.yml
     relationship: governed-by
+  - target: ../legislation/hb-64-2015.yml
+    relationship: funded-by
   - target: ../doctrine/equity.yml
     relationship: measured-by
   - target: ../../catalog/census-f33-school-system-finances.md

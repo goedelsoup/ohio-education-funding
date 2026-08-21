@@ -100,5 +100,8 @@ links:
     note: >-
       Ohio's first payment on a measured outcome rather than an input. The Fair School Funding
       Plan's supplement is a different mechanism and answers the same impulse.
+  - target: ../fiscal-period/fy2016-17.yml
+    relationship: appropriates-for
+    note: FY2016-17.
   - target: ../../catalog/lsc-dew-redbook.md
     relationship: sourced-from

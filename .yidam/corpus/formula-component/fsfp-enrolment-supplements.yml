@@ -47,6 +47,30 @@ description: |
 
   Why 3% and why three years. Both are single numbers with a cliff behind them and
   neither is explained in the calculator. [open]
+revisions:
+  - was: |
+      The statutory home of this payment was recorded as unreadable: "Reading the enacted bill
+      text is `lsc-budget`, still blocked on PDFs", with the bill section marked `[open]`.
+    now: |
+      `lsc-budget` is wired and the act is committed. The H.B. 96 final analysis names the
+      sections in its own citation block — `Sections 265.215, 265.220, 265.230, 265.237, 265.239,
+      and 265.450` — and what remains open is which of the six, not whether the document can be
+      read.
+    found_by: |
+      A corpus review crossing every blocker claim against the connector registry. `lsc-budget`
+      carries `Status::Wired`, its output has been committed at
+      `crates/project/fixtures/enacted-school-funding.txt` since the phase that landed it, and
+      `crates/project/tests/what_the_act_says_and_the_code_does_not.rs` already asserts two of
+      these three supplements' own figures against that file.
+    reach: |
+      Three nodes carried the sentence verbatim — this one, [the performance
+      supplement](fsfp-performance-supplement.yml) and [the enrolment
+      supplements](fsfp-enrolment-supplements.yml) — and a fourth,
+      [DPIA](fsfp-disadvantaged-pupil-impact-aid.yml), had already gone through the same route and
+      recorded a revision for it. The blocker was false on the day the sibling's revision was
+      written; nothing compared them. It is the failure that test's own header names — reading a
+      recorded claim instead of the source behind it — committed in the class the test was written
+      for.
 properties:
   name: Base and enrollment growth supplements
   function: |
@@ -57,6 +81,13 @@ properties:
 
     Both paid on `[a] Enrolled ADM`. FY2023 enrolled ADM is a fourth ADM year, held nowhere else
     in this corpus.
+
+    **The rate and the window are re-specified each year, not standing.** FY2026 pays **$225** to
+    a district whose enrolled ADM grew at least **5%** from FY2022 to FY2025; FY2027 pays $250 at
+    3% from FY2023 to FY2026. Same supplement, a different price and a slacker test one year
+    apart, which is what a payment written into temporary law can do and a codified one cannot.
+    [verified — `lsc-budget`,
+    `crates/project/tests/what_the_act_says_and_the_code_does_not.rs`]
   statutory_basis: |
     Not in R.C. 3317. Reported as lines [L] and [M]; the $40, the $250 and the 3% threshold are
     transcribed from the calculator.
@@ -67,8 +98,17 @@ properties:
 
     That is a statement about **durability**, not about legality; Ohio funds a great deal this way.
     It means this payment has no permanent statutory home, unlike base cost or the categorical
-    weights beside it on the same report. Reading the enacted bill text is `lsc-budget`, still
-    blocked on PDFs. [verified that it is absent from the Revised Code; the bill section is [open]]
+    weights beside it on the same report.
+
+    **The act is held, and it names the sections.** The H.B. 96 final analysis is committed at
+    `crates/project/fixtures/enacted-school-funding.txt`, and its citation block for *Funding for
+    FY 2026 and FY 2027* closes `Sections 265.215, 265.220, 265.230, 265.237, 265.239, and
+    265.450` — the six uncodified sections of the act carrying the school financing system for the
+    biennium, this payment among them. [verified — `lsc-budget`]
+
+    A bounded list, not a pinpoint. The analysis cites the sections for the topic and not for each
+    supplement inside it, and separating them needs the enrolled act rather than LSC's account of
+    it. [open — which of the six, not whether]
 
   calculator: |
     Not a standalone crate. Carried in `crates/project::panel::Supplements` and reproduced for all

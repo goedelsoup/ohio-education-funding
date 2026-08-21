@@ -44,6 +44,11 @@ properties:
 links:
   - target: ../fiscal-period.ont.yml
     relationship: instance-of
+  - target: fy2024-25.yml
+    relationship: follows
+    note: >-
+      The last link in the biennium chain, and the one that was missing: every other biennium
+      from FY2012-13 forward names its predecessor, and this one did not.
   - target: ../funding-regime/fair-school-funding-plan.yml
     relationship: governed-by
   - target: ../legislation/hb-96-2025.yml
