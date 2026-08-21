@@ -22,6 +22,8 @@
 
 #![forbid(unsafe_code)]
 
+pub mod conventions;
+
 /// A dollar amount. See the module note on floating point.
 pub type Dollars = f64;
 

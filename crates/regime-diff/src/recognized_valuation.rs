@@ -452,11 +452,17 @@ pub fn from_abstract(tax_year: u16) -> HashMap<String, Recognition> {
                 real_property: Vec::new(),
                 actual: 0.0,
             });
-        entry
-            .real_property
-            .push((row_year, p[real].parse().unwrap_or(0.0)));
+        // `conventions::number` rather than `str::parse`: it is the one place that knows what the
+        // department writes where there is no value. A raw parse turns `<10`, `#N/A` and a
+        // thousands-separated figure alike into `None`, and `unwrap_or(0.0)` then reports every
+        // one of them as zero. The zero is kept here because the surrounding type has no way to
+        // carry an absence, but it is now a stated substitution rather than a parse failure.
+        entry.real_property.push((
+            row_year,
+            edfund_core::conventions::number(p[real]).unwrap_or(0.0),
+        ));
         if row_year == tax_year {
-            entry.actual = p[total].parse().unwrap_or(0.0);
+            entry.actual = edfund_core::conventions::number(p[total]).unwrap_or(0.0);
         }
     }
     for district in districts.values_mut() {

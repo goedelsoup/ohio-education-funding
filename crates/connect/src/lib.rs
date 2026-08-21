@@ -32,7 +32,9 @@
 #![forbid(unsafe_code)]
 
 pub mod cache;
-pub mod conventions;
+/// How to read a cell the department wrote. Moved to `edfund-core` so parsers downstream of
+/// this crate can reach it; re-exported here because this is where the conventions were learned.
+pub use edfund_core::conventions;
 pub mod cpi;
 pub mod fixtures;
 pub mod forecast;
