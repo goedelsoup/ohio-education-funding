@@ -38,14 +38,21 @@ fn inputs(record: &DistrictRecord) -> Option<CapacityInputs> {
 
 /// The calculator reproduces the department's published capacity exactly, for every district.
 ///
-/// Exact is the right standard here and it is met: 609 of 609 on both the per-pupil amount and
-/// the rate, to within a hundredth of a percent, which is the workbook's own rounding.
+/// Exact is the right standard here and it is met: 609 of 609, worst residual **6.364e-6** —
+/// six ten-thousandths of a percent, comfortably inside the workbook's own rounding. The median
+/// district agrees to within 1e-10 and 608 of the 609 sit inside 1e-6.
 ///
 /// An earlier version of this test allowed a 5% band, because the first attempt reconstructed the
 /// statewide median income and the benchmark ratio instead of reading them and came out 4.4%
 /// light. The band was not tolerance for a hard problem; it was tolerance for four wrong inputs.
 /// Reading them makes the residual vanish, and a test that had kept the band would have gone on
 /// passing while concealing that.
+///
+/// It did keep the band. The inputs were fixed and this prose was written, but the assertions
+/// underneath — a median window of `0.95..=1.00`, 70% within 5%, 97% within 10% — were left as
+/// they were, so for an era the doc comment and the test disagreed and the doc was the accurate
+/// one. The bound is now the measured residual, and it was checked by breaking it: a 2e-5
+/// perturbation fails, where the band would have passed anything short of a 5% error.
 #[test]
 fn the_statutory_blend_reproduces_the_departments_capacity() {
     let records = panel();
@@ -63,32 +70,28 @@ fn the_statutory_blend_reproduces_the_departments_capacity() {
         ratios.push(computed.per_pupil / published);
     }
 
-    assert!(
-        ratios.len() > 590,
-        "expected nearly every district: {}",
-        ratios.len()
+    assert_eq!(
+        ratios.len(),
+        records.len(),
+        "every district in the panel carries a published capacity to check against; {} of {} \
+         resolved, so either an input went missing or the fixture changed shape",
+        ratios.len(),
+        records.len()
     );
+
     ratios.sort_by(|a, b| a.partial_cmp(b).unwrap());
-    let median = ratios[ratios.len() / 2];
+    let worst = ratios.iter().map(|r| (r - 1.0).abs()).fold(0.0, f64::max);
 
+    // Measured across all 609 districts: worst 6.364e-6, median within 1e-10, 608 of 609
+    // inside 1e-6. The bound is set an order of magnitude above the worst so ordinary
+    // floating-point drift does not fail it, and three orders below the 5% band this
+    // assertion replaced — which had gone on passing for an era whose inputs were wrong.
     assert!(
-        (0.95..=1.00).contains(&median),
-        "the computed capacity is a median {median:.4} of the published one. Outside this band \
-         the systematic bias has moved, which means an input vintage changed or the benchmark \
-         reconstruction stopped matching — either is worth looking at rather than widening"
-    );
-
-    let within_five = ratios.iter().filter(|r| (0.95..=1.05).contains(*r)).count();
-    assert!(
-        within_five * 10 >= ratios.len() * 7,
-        "only {within_five} of {} districts land within five percent",
-        ratios.len()
-    );
-    let within_ten = ratios.iter().filter(|r| (0.90..=1.10).contains(*r)).count();
-    assert!(
-        within_ten * 100 >= ratios.len() * 97,
-        "only {within_ten} of {} districts land within ten percent",
-        ratios.len()
+        worst < 1e-5,
+        "the computed capacity differs from the published one by {worst:.3e} at worst. \
+         Exact is the standard here and it was met at 6.364e-6; a residual this size means an \
+         input vintage changed or the benchmark stopped being read rather than reconstructed. \
+         Widening this bound would conceal that, which is what the 5% band it replaced did."
     );
 }
 
