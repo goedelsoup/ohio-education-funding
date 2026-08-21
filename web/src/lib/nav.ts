@@ -359,6 +359,19 @@ export function nav(bundle: Bundle, corpus: Corpus = loadCorpus()): NavGroup[] {
       label: "Law",
       sections: [
         {
+          // The chronological view, above the acts rather than among them: it is the only entry
+          // here that is not a node, and a reader who wants "how did this get here" wants it
+          // before they want any single act.
+          links: [
+            {
+              key: "legislation",
+              href: "/legislation",
+              label: "The statute timeline",
+              note: "every act, in order",
+            },
+          ],
+        },
+        {
           links: acts.map((act) => ({
             href: routes.wikiNode(act.node.className, act.node.name),
             label: actLabel(act.node),

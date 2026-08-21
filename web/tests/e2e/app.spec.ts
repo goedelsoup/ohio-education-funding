@@ -300,6 +300,11 @@ test.describe("the document arrives complete", () => {
  */
 const ROUTES_WITH_FIGURES = [
   "/",
+  /* `/statewide` and not only `/`: the figures moved here when the root became a front door, and
+     this list kept pointing at the root — so the sweeps below went on passing against a page that
+     no longer carries what they scan for. */
+  "/statewide",
+  "/legislation",
   "/outcomes",
   "/history",
   "/counties",
@@ -807,10 +812,12 @@ test.describe("routes", () => {
     const hrefs = await page
       .locator("header.site nav a")
       .evaluateAll((nodes) => nodes.map((n) => (n as HTMLAnchorElement).getAttribute("href")!));
-    // Thirty across five groups. An exact count rather than a floor, so that dropping an entry
-    // fails here and adding one is an acknowledged change — and so that a derivation which
-    // quietly stops selecting anything cannot pass by returning an empty menu.
-    expect(hrefs).toHaveLength(30);
+    // Thirty-one across five groups. An exact count rather than a floor, so that dropping an
+    // entry fails here and adding one is an acknowledged change — and so that a derivation which
+    // quietly stops selecting anything cannot pass by returning an empty menu. It went from
+    // thirty to thirty-one when `/legislation` joined the `Law` panel, which is the mechanism
+    // working: the count had to be changed on purpose by somebody who knew why.
+    expect(hrefs).toHaveLength(31);
     for (const href of hrefs) {
       await page.goto(href);
       await expect(page.locator("h1"), `${href} has no heading`).toBeVisible();
@@ -3929,5 +3936,58 @@ test.describe("the money no other figure on the site counts", () => {
     const card = page.locator('.card[data-part="not"]');
     await expect(card).toContainText("there is state money in neither");
     await expect(card.locator('a[href$="/finances#casino"]')).toHaveCount(1);
+  });
+});
+
+test.describe("the statute timeline", () => {
+  test("the Law menu opens onto it, and it is the first thing in the panel", async ({ page }) => {
+    await page.goto("/");
+    const law = page.locator("header.site nav details.menu").nth(1);
+    await law.locator("summary").click();
+    const first = law.locator(".menu-panel a").first();
+    await expect(first).toHaveAttribute("href", "/legislation");
+    await first.click();
+    await expect(page).toHaveURL(/\/legislation$/);
+    await expect(page.locator("h1")).toHaveText("Ohio school funding in statute");
+  });
+
+  test("a formula that ran one biennium is drawn narrower than one that ran five", async ({
+    page,
+  }) => {
+    /*
+     * The claim the chart exists to make, measured in rendered pixels rather than in the
+     * percentages the renderer wrote — which is the half the unit suite cannot reach. The first
+     * version of this chart put each label inside its own band, and the Evidence-Based Model's
+     * band was too narrow to hold one; the bar is beside the name now precisely so that the
+     * narrowest element can stay narrow.
+     */
+    await page.goto("/legislation");
+    const row = (name: string) => page.locator("#regimes tbody tr").filter({ hasText: name });
+    const width = async (name: string) =>
+      (await row(name).locator(".span-bar > i").boundingBox())!.width;
+    const left = async (name: string) =>
+      (await row(name).locator(".span-bar > i").boundingBox())!.x;
+
+    const brief = await width("Evidence-Based Model");
+    const long = await width("Bridge Formula");
+    expect(brief).toBeGreaterThan(0);
+    expect(long).toBeGreaterThan(brief * 3);
+    // And later formulas start further along, because the axis is time.
+    expect(await left("Bridge Formula")).toBeGreaterThan(await left("Evidence-Based Model"));
+    expect(await left("Equal Yield Formula")).toBeLessThan(await left("Bridge Formula"));
+  });
+
+  test("an act with no formula edge says so rather than rendering an empty cell", async ({
+    page,
+  }) => {
+    // H.B. 920 sets the tax reduction factors and touches no formula; H.B. 583 corrects one and
+    // appropriates nothing. Both would be blank cells, and a blank cell in a generated table
+    // reads as a load that failed.
+    await page.goto("/legislation");
+    const acts = page.locator("#acts tbody tr");
+    await expect(acts.filter({ hasText: "H.B. 920" })).toContainText("no formula edge");
+    await expect(acts.filter({ hasText: "H.B. 920" })).toContainText("not a budget act");
+    await expect(acts.filter({ hasText: "H.B. 583" })).toContainText("corrects");
+    await expect(page.locator("#acts tbody td:empty")).toHaveCount(0);
   });
 });

@@ -1,0 +1,44 @@
+---
+/**
+ * Ohio school funding in statute, in the order it happened.
+ *
+ * The route the `Law` menu opens onto. Everything on it comes out of `.yidam/corpus/` through
+ * `src/lib/legislation.ts`, which explains at length why a chronological view is a different
+ * thing from the class page and not a prettier one: the class page can say what sixteen acts are,
+ * and cannot say which came first, what replaced what, or how long anything lasted.
+ *
+ * Thin, on purpose. The renderer is a library module so the derivations can be unit-tested —
+ * whether the regime spans tile the years, whether every act resolves — rather than only asserted
+ * against a built page.
+ */
+import Base from "../layouts/Base.astro";
+import { loadCorpus } from "../lib/corpus.ts";
+import { acts, regimes, renderTimeline } from "../lib/legislation.ts";
+import * as routes from "../lib/routes.ts";
+
+const corpus = loadCorpus();
+const spans = regimes(corpus);
+const statutes = acts(corpus);
+const latest = Math.max(...statutes.map((a) => a.year));
+const covered = (spans[spans.length - 1]!.to ?? latest) - spans[0]!.from + 1;
+---
+
+<Base
+  title="Statute"
+  description={`Every act behind Ohio school funding, from the 1851 constitutional duty to this biennium's budget: ${spans.length} formulas across ${covered} fiscal years, what each act did to the formula, and which biennium it paid for.`}
+  image={routes.og.page("legislation")}
+  imageAlt={`${spans.length} Ohio school funding formulas across ${covered} fiscal years, and the acts that established them`}
+  section="legislation"
+  wide
+>
+  <p class="crumb"><a href={routes.wikiClass("legislation")}>Legislation</a></p>
+  <h1>Ohio school funding in statute</h1>
+  <p class="sub">
+    The formula a district is paid by is whatever the last budget act said it was. This is every
+    act the corpus holds, in the order it was signed: {spans.length} formulas across
+    {" "}{covered} fiscal years, from a duty written in 1851 to the budget in force now. What an
+    act <em>says</em> is on its own page; what is here is where it sits.
+  </p>
+
+  <Fragment set:html={renderTimeline(corpus)} />
+</Base>

@@ -19,6 +19,7 @@ Roughly 3,500 pages, all of them static files:
 | `/history` | FY2009–FY2022 on the federal survey: where the money came from, and whom it reached. The only route that reaches before FY2020. |
 | `/scenario` | Move a lever and see who it reaches, across all 609, in the browser. |
 | `/compare` | Two districts side by side. |
+| `/legislation` | Every act behind the formula, in the order it was signed: five regimes across fifty fiscal years, what each act did, and which biennium it paid for. Generated from the corpus. |
 | `/wiki` | The corpus — regimes, statutes, litigation, parameters, metric definitions — rendered from `.yidam/` directly. |
 | `/method` · `/data` · `/search` | How the figures are made, the downloads, and one box over all of it. |
 
@@ -38,6 +39,8 @@ names is *derived* rather than typed: an act appears if it establishes a funding
 does not appropriate at all, or if it is the most recently signed act that does. The menu
 re-points itself at the next budget with no edit anywhere. `src/lib/nav.ts` computes the bar and
 `Base.astro` renders what it is given; `.yidam/decisions/the-bar-lifts-the-corpus.yml` records why.
+The panel's first entry is `/legislation`, which is the one thing in it that is not a node: the
+same graph read as a chronology rather than as a class.
 
 Disclosures are native ones, because a third of the end-to-end suite runs with JavaScript
 disabled — and every destination in the bar is now inside a group, so a scripted menu would put

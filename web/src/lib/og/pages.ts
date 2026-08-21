@@ -17,7 +17,9 @@
  * by about ten minutes and now names the route it always claimed to.
  */
 
+import { loadCorpus } from "../corpus.ts";
 import { loadFeed } from "../feed.ts";
+import { acts, regimes } from "../legislation.ts";
 import { count, millions, pct } from "../format.ts";
 import type { Card } from "./card.ts";
 
@@ -33,6 +35,17 @@ export const SITE = "Ohio school funding";
  */
 export function pageCards(): Record<string, Card> {
   const { bundle, verification } = loadFeed();
+  /* The statute page's card counts what the corpus holds, on the same footing as every figure
+     here: a card claiming five regimes that a sixth node makes wrong travels without the page
+     beside it to correct it. `loadCorpus` is the same cached disk read the wiki's own cards use. */
+  const corpus = loadCorpus();
+  const spans = regimes(corpus);
+  const statutes = acts(corpus);
+  const spanEnd =
+    spans.length === 0
+      ? 0
+      : (spans[spans.length - 1]!.to ?? Math.max(...statutes.map((a) => a.year)));
+  const spanStart = spans.length === 0 ? 0 : spans[0]!.from;
   const s = bundle.statewide;
   const fy = `FY${bundle.fiscal_year}`;
   const aid = millions(s.realized_aid_total).replace("+", "");
@@ -129,6 +142,18 @@ export function pageCards(): Record<string, Card> {
       figureNote:
         "The report-card measures beside the funding panel, with the confounders stated rather than controlled away",
       meta: `${s.districts} districts · ${fy}`,
+    },
+
+    legislation: {
+      eyebrow: SITE,
+      headline: "Ohio school funding in statute",
+      figure: `${spans.length} formulas, ${spanEnd - spanStart + 1} years`,
+      figureNote:
+        "Every act from the 1851 constitutional duty to this biennium's budget, in the order it was signed, with what each one did to the formula",
+      /* The span, and not decoration: `og.spec.ts` requires a card carrying a number to name its
+         year, because a card outlives the page it was shared from. This one's number *is* a span
+         of years, so the two ends are the honest thing to date it with. */
+      meta: `FY${spanStart}–FY${spanEnd} · ${statutes.length} acts, end to end`,
     },
 
     history: {
