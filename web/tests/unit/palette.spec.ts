@@ -79,7 +79,6 @@ const ramp = (mode: keyof typeof PALETTE, names: string[]): string[] =>
   });
 
 const ORD3 = ["--ordinal-1", "--ordinal-2", "--ordinal-3"];
-const ORD5 = ["--ord5-1", "--ord5-2", "--ord5-3", "--ord5-4", "--ord5-5"];
 const PAIR = ["--series-formula", "--series-guarantee"];
 
 /** The worst separation across normal vision and all three dichromacies. */
@@ -122,57 +121,49 @@ describe("the three-step ordinal ramp", () => {
   });
 });
 
-describe("the five-step ordinal ramp", () => {
+describe("the ramp that was removed", () => {
   /**
-   * It does not clear the bar, and the number it lands on is the one it was supposed to escape.
-   *
-   * The design system that contributed this ramp asked for exactly this check and said it would
-   * rather ship four measured steps than five designed ones. The measurement:
+   * A five-step ramp arrived with the design system, was measured, and is gone.
    *
    *     3-step, worst vision      15.0 light   17.1 dark
    *     5-step, worst vision      10.9 light   10.7 dark
    *
-   * **10.9 is the value the repository already cites as its reason for refusing five steps** — "two
-   * bands a reader with full colour vision cannot tell apart". Adding a second channel (hue drift
-   * across a 30-degree arc alongside the lightness march) did not buy the separation it was
-   * introduced to buy. The worst pair is 1-2 in both modes, and it is *adjacent*, which is the pair
-   * a reader compares most in the sorted table and choropleth the ramp is licensed for.
+   * 10.9 was already the value this repository cited as its reason for refusing five steps of one
+   * hue — "two bands a reader with full colour vision cannot tell apart". The second channel the
+   * ramp added did not buy the separation it was introduced to buy, and no four-step subset of it
+   * cleared either.
    *
-   * No four-step subset rescues it either: dropping any one step leaves 11.9 light / 12.5 dark at
-   * best, still short of the three-step ramp's 15.0 / 17.1. Re-spacing within these five values is
-   * not enough — a five-step ramp for this site has to be reconstructed, not adjusted.
+   * `scripts/ramp-search.ts` then searched for a replacement instead of constructing one, and found
+   * that five ordinal steps do not fit on the dark surface at all. The tokens were deleted rather
+   * than left in place, because a failing ramp sitting in a palette file looks sanctioned.
    *
-   * The ramp is therefore kept as tokens and used by nothing. This test pins that.
+   * This test is what stops it coming back by hand. Reintroducing a multi-step ramp means running
+   * the search and clearing the floor above — not choosing five values that look ordered.
    */
-  test("is measurably worse than the three-step ramp, in both modes", () => {
-    for (const mode of ["light", "dark"] as const) {
-      expect(worst(ramp(mode, ORD5))).toBeLessThan(worst(ramp(mode, ORD3)));
-    }
-  });
-
-  test("lands at the very separation the repository refuses five steps for", () => {
-    expect(worst(ramp("light", ORD5))).toBeCloseTo(10.9, 1);
-    expect(worst(ramp("dark", ORD5))).toBeCloseTo(10.7, 1);
-  });
-
-  test("is used by nothing, and may not be until it clears the three-step ramp's floor", () => {
-    // The gate that makes the measurement mean something. A ramp that fails its own validation and
-    // ships anyway is worse than no ramp, because the tokens make it look sanctioned.
-    const sources = ["src/lib", "src/components", "src/pages", "src/layouts", "src/scripts"];
-    const used: string[] = [];
-    for (const dir of sources) {
-      const root = resolve(process.cwd(), dir);
-      const walk = (path: string): void => {
-        for (const entry of readdirSync(path, { withFileTypes: true })) {
-          const next = resolve(path, entry.name);
-          if (entry.isDirectory()) walk(next);
-          else if (/\.(ts|tsx|astro|css)$/.test(entry.name)) {
-            if (readFileSync(next, "utf8").includes("--ord5-")) used.push(next);
-          }
+  test("is gone from the tokens, and from everything that could reference it", () => {
+    const roots = ["src", "tests"];
+    const offenders: string[] = [];
+    const walk = (path: string): void => {
+      for (const entry of readdirSync(path, { withFileTypes: true })) {
+        const next = resolve(path, entry.name);
+        if (entry.isDirectory()) {
+          walk(next);
+        } else if (/\.(ts|tsx|astro|css)$/.test(entry.name) && !next.endsWith("palette.spec.ts")) {
+          // The search script names it in prose, describing what it replaced; a declaration or a
+          // `var()` reference is the thing that would matter, and neither may exist.
+          const text = readFileSync(next, "utf8");
+          if (/--ord5-[1-9]\s*:/.test(text) || /var\(\s*--ord5-/.test(text)) offenders.push(next);
         }
-      };
-      walk(root);
+      }
+    };
+    for (const dir of roots) walk(resolve(process.cwd(), dir));
+    expect(offenders).toEqual([]);
+  });
+
+  test("and the ordinal vocabulary is exactly one ramp of three steps", () => {
+    for (const mode of ["light", "dark"] as const) {
+      const declared = [...PALETTE[mode].tokens.keys()].filter((k) => /^--ord/.test(k));
+      expect(declared.sort()).toEqual(["--ordinal-1", "--ordinal-2", "--ordinal-3"]);
     }
-    expect(used).toEqual([]);
   });
 });
