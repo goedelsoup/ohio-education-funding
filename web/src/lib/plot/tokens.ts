@@ -13,11 +13,16 @@
  * is what makes this work; `ensureThemeable` in `ssr.ts` fails the build if a literal colour ever
  * slips past, because the resulting bug is invisible to whoever writes it.
  *
- * The values behind these names are in `app.css` and are two series in slots validated for both
- * surfaces — `#2a78d6`/`#eb6834` light, `#3987e5`/`#d95926` dark. All six checks pass in both
- * modes: lightness band, chroma floor, CVD separation (ΔE 24.7 protan, worst case), normal-vision
- * separation, and contrast against the card surface. Dark is a selected step from the same ramps
- * rather than an inversion.
+ * The values behind these names are in `tokens/colors.css` and are two series in slots validated
+ * for both surfaces — `#2a78d6`/`#eb6834` light, `#3987e5`/`#d95926` dark. Dark is a selected step
+ * from the same ramps rather than an inversion.
+ *
+ * **The separation figure this comment used to carry was 24.7, and it does not reproduce either.**
+ * Measured in CIEDE2000 the pair separates at 52.3 light and 53.3 dark under protanopia, and its
+ * worst case across all four visions is 48.5 / 48.0 — roughly twice what was claimed. That makes
+ * three ΔE figures in this file's original comment block that no standard metric produces: two
+ * understating and one overstating. `palette.spec.ts` holds the pair above 45 and runs the
+ * arithmetic.
  *
  * Two series is the whole categorical palette, and there is no code anywhere here that generates
  * a third. A chart needing more is the wrong chart.

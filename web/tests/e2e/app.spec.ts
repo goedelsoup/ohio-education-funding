@@ -3461,6 +3461,33 @@ test.describe("the count the poverty weight is paid on", () => {
     await expect(rows.last()).toContainText("CECount");
   });
 
+  test("a headline tile carries its own year, because no card chip reaches it", async ({ page }) => {
+    /*
+     * Rule 1, scoped to where it is not already satisfied.
+     *
+     * The design system's highest-value rule is that no numeric or currency literal appears outside
+     * a `.fig`. Measured against the built site, 96% of figures already carry their year: 52% sit
+     * in a card whose heading has a year chip, and 44% in a table cell, where the design itself
+     * puts the annotation on the column head rather than repeating it down 609 rows.
+     *
+     * The 4% that did not were the tiles at the head of a route, above the first card, where no
+     * chip reaches them. This page led with a taxable value, a millage and a tax charged, none of
+     * which said which year they measured.
+     *
+     * A built-DOM assertion rather than a source one: "above the first card" is a fact about the
+     * rendered page. In the source those tiles sit in one branch of a ternary whose other branch
+     * opens with a card, so a source-order check reads the head as empty and passes vacuously.
+     */
+    await page.goto("/district/043653/taxes");
+    const headline = page.locator(".tiles").first().locator(".tile");
+    await expect(headline).not.toHaveCount(0);
+    for (const tile of await headline.all()) {
+      await expect(tile.locator(".v .fig-year")).toHaveCount(1);
+    }
+    // And the year is the tax year the row is measured in, not the page's own.
+    await expect(headline.first().locator(".v .fig-year")).toHaveText(/^TY\d{4}$/);
+  });
+
   test("and the change of denominator is a break in the table, not only in the chart", async ({
     page,
   }) => {

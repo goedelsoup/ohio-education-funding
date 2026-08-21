@@ -86,6 +86,21 @@ basis switch's trick applied to charts, so a sort change swaps a pre-rendered st
 loading a plotting library — and `tbody + tbody` group structure for long tables, which is also what
 carries a definitional break.
 
+## All three upstream items are claimed
+
+Written into the design project's `tokens/colors.css` on 2026-08-21:
+
+- **`--text-body` renamed `--text-ink`**, after verifying it appears exactly once across all eight
+  pattern sheets, in `prose.css`, as a font size.
+- **`--ord5-1..5` deleted** in all four blocks, with the comment saying the absence is a result.
+- **The pair's claimed ΔE of 24.7 corrected.** It measures 52.3 light / 53.3 dark under protanopia,
+  worst case 48.5 / 48.0 — roughly twice the claim. Three ΔE figures in that original comment block
+  reproduce under no standard metric: two understating, one overstating.
+
+One thing is handed back rather than done: `data.css` still declares five `.sw.ord5-*` legend
+swatches for the deleted ramp. Rewriting a file this review has read but not authored risks putting
+something unverified into it, and a five-line deletion is cheaper to make than to check.
+
 ## `figures.css`, and the number that decides the rest of it
 
 The patterns are landed. `.fig` is **available and not yet adopted**, and the number is why.
