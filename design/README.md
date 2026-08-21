@@ -61,6 +61,31 @@ The eight pattern sheets are the rest of the system and each carries a real chan
 Landing them means rewriting rules that 293 unit tests and 238 end-to-end tests assert against, so
 each is its own change with its own diff.
 
+## All eight pattern sheets are read
+
+`base.css`, `cards.css`, `data.css`, `nav.css` and `controls.css` were the five outstanding. Read on
+2026-08-21; the delta is recorded upstream in the project's own `PATTERNS-REVIEW.md`. Two results
+matter here.
+
+**The `--text-body` collision is resolved, and the fix upstream is safe.** The property appears
+exactly once across all eight sheets — in `prose.css`, as a font size. Nothing anywhere reads it as
+a colour, so the colour alias is unreachable under the import order `styles.css` declares and
+renaming it cannot break anything. This repository already renamed its copy to `--text-ink`; the
+same one-line change upstream removes a `:root` property whose value depends on which of two files
+loaded last.
+
+**`data.css` declares five `--ord5-*` legend swatches.** Consistent while the tokens exist, and this
+repository has deleted them. If the design project follows the measurement, those five rules go with
+the tokens — a legend entry for a ramp nothing may draw is a legend for a chart that cannot exist.
+Left as the project's decision.
+
+The other five sheets are very close to what ships. The differences are almost entirely literals
+that should name tokens, which is the move `prose.css` already made. Two real additions worth
+having: `.variants`, which reveals one of N build-time chart variants by attribute selector — the
+basis switch's trick applied to charts, so a sort change swaps a pre-rendered strip instead of
+loading a plotting library — and `tbody + tbody` group structure for long tables, which is also what
+carries a definitional break.
+
 ## Two decisions the design project asked for, and neither is a CSS question
 
 **1. The `unentered` migration.** The system's `.claim` has exactly three status classes and states
