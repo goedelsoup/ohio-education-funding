@@ -112,5 +112,12 @@ links:
     relationship: identifies-defect-in
   - target: ../education-agency/northern-local-perry.yml
     relationship: has-party
+  - target: ../program/classroom-facilities-assistance.yml
+    relationship: identifies-defect-in
+    note: >-
+      The third of the decision's numbered requirements is facilities funding and the levy
+      condition a district must clear to qualify for state assistance. Same verb as the
+      charge-off edge above, for the same reason: the court named the mechanism, not just the
+      shortfall.
   - target: ../../catalog/derolph-litigation-record.md
     relationship: sourced-from

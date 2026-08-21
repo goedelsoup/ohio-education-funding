@@ -197,8 +197,10 @@ fn corpus_index(root: &Path) -> String {
     }
     let orphans = inbound.values().filter(|count| **count == 0).count();
     out.push_str(&format!(
-        "\n{} nodes across {} classes. **{orphans} have nothing pointing at them**, which the \
-         corpus rules treat as a gap rather than a fact about the node.\n",
+        "\n{} nodes across {} classes, and **{orphans} with nothing pointing at them** — counting \
+         a citation in somebody's prose as pointing. Whether that is a gap depends on the class: \
+         `web/tests/unit/reachability.spec.ts` holds every node to having an inbound *edge* and \
+         exempts `draft-legislation`, where a node with nothing pointing at it is the design.\n",
         nodes.len(),
         nodes
             .iter()
@@ -1116,7 +1118,11 @@ mod tests {
         let index = corpus_index(&repository_root());
         assert!(index.contains("| Node | Class | Label | Out | In |"));
         assert!(index.contains("nodes across"));
-        assert!(index.contains("have nothing pointing at them"));
+        assert!(index.contains("with nothing pointing at them"));
+        // The sentence used to call every one of those a gap. Two are `draft-legislation`, where
+        // nothing pointing at a node is the class working — so it names the check that knows the
+        // difference instead of asserting the wrong half of it.
+        assert!(index.contains("reachability.spec.ts"));
     }
 
     #[test]

@@ -100,3 +100,9 @@ links:
     relationship: parallels
   - target: edchoice-expansion.yml
     relationship: coexists-with
+  - target: autism-scholarship.yml
+    relationship: coexists-with
+    note: >-
+      The reciprocal of an edge that has always run the other way. Autism came first and Jon
+      Peterson was built beside it rather than over it; a reader arriving at either should be
+      able to reach the other.

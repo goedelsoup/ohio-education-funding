@@ -79,5 +79,11 @@ links:
     relationship: rated-on
   - target: ../doctrine/adequacy.yml
     relationship: bears-on
+  - target: sheridan-high-school.yml
+    relationship: compares-against
+    note: >-
+      The building this node's findings are read against — a four-star rural high school inside
+      the same identified population as a one-star urban elementary, which is what makes the
+      comparison worth drawing.
   - target: ../../catalog/dew-report-card-achievement.md
     relationship: sourced-from

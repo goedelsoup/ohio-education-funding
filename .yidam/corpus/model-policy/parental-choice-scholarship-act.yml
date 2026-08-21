@@ -113,6 +113,12 @@ links:
     note: The enactment that made every Ohio student eligible, which is this variant's defining feature.
   - target: ../doctrine/thorough-and-efficient.yml
     relationship: contested-under
+  - target: education-savings-account-act.yml
+    relationship: succeeded-by
+    note: >-
+      The reciprocal of `succeeds`, which the other node already carries. ALEC's 2017 account
+      model is the successor design to this voucher model, and until now the succession was
+      legible in only one direction.
   - target: ../../catalog/alec-parental-choice-scholarship-act.md
     relationship: sourced-from
   - target: ../../catalog/alec-state-education-freedom-index.md

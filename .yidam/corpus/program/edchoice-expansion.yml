@@ -93,6 +93,18 @@ links:
     relationship: diverts-from
   - target: ../doctrine/thorough-and-efficient.yml
     relationship: contested-under
+  - target: ../litigation/vouchers-hurt-ohio-2025.yml
+    relationship: challenged-by
+    note: >-
+      The relationship `program.ont.yml` declares for exactly this pair, on the programme the
+      case is about. It was written in this node's prose and nowhere in the graph, so nothing
+      traversing edges could get from the programme to the case against it.
+  - target: edchoice-scholarship.yml
+    relationship: expands
+    note: >-
+      The programme this one is an expansion of, named in both nodes' prose and in this one's own
+      label. `edchoice-scholarship` carries `precedes` in the other direction; nothing carried
+      the relation that gives this node its name.
   - target: ../../catalog/alec-state-education-freedom-index.md
     relationship: sourced-from
   - target: ../../catalog/heritage-education-freedom-report-card.md
