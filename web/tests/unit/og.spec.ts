@@ -64,15 +64,25 @@ describe("the address a page claims for itself", () => {
 
 describe("the card palette", () => {
   /**
-   * The light-mode `:root` block of the stylesheet, as a map of custom property to value.
+   * The light-mode `:root` block of the token sheet, as a map of custom property to value.
    *
-   * Read rather than imported: `app.css` is a stylesheet, and the point of this test is that the
-   * two files are *separately* maintained and must agree anyway.
+   * Read rather than imported: this is a stylesheet, and the point of this test is that the two
+   * files are *separately* maintained and must agree anyway.
+   *
+   * It read `app.css` until the tokens moved into `tokens/colors.css`, and it failed the moment
+   * they did — which is the check working. A drift test that silently stops finding its source
+   * stops being a drift test, so this resolves the file it actually needs and would fail loudly
+   * again if that one moved too.
    */
   const root = (): Map<string, string> => {
-    const css = readFileSync(resolve(process.cwd(), "src/styles/app.css"), "utf8");
-    // The first `:root` block only. The two after it are the dark overrides, and a card is light.
-    const block = css.slice(css.indexOf(":root {"), css.indexOf("}", css.indexOf(":root {")));
+    const path = resolve(process.cwd(), "src/styles/tokens/colors.css");
+    const css = readFileSync(path, "utf8");
+    // The first `:root` block only. The three after it are the dark overrides and the two explicit
+    // theme choices; a card is a PNG baked at build time and is always the light palette.
+    const start = css.indexOf(":root {");
+    expect(start, `no :root block in ${path} — the palette this test compares against is gone`)
+      .toBeGreaterThan(-1);
+    const block = css.slice(start, css.indexOf("}", start));
     return new Map(
       [...block.matchAll(/(--[a-z0-9-]+):\s*(#[0-9a-f]{3,8})\s*;/gi)].map((m) => [
         m[1]!,
