@@ -98,12 +98,14 @@ fn parse(line: &str, index: usize) -> Option<f64> {
     field(line, index).and_then(|value| value.parse::<f64>().ok())
 }
 
+/// The median of an unsorted series, zero where it is empty.
+///
+/// Sorts, then defers to [`dispersion::median`] so the feed and the equity statistics share one
+/// definition. This used to take the upper of the two middle observations, which disagrees with
+/// `dispersion` on every even-length series — and two of the panels here are even.
 fn median(mut values: Vec<f64>) -> f64 {
-    if values.is_empty() {
-        return 0.0;
-    }
     values.sort_by(|a, b| a.partial_cmp(b).unwrap_or(std::cmp::Ordering::Equal));
-    values[values.len() / 2]
+    dispersion::median(&values).unwrap_or(0.0)
 }
 
 /// Every draft, flattened for the feed.

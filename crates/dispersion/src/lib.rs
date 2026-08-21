@@ -105,7 +105,29 @@ impl core::fmt::Display for DispersionError {
 impl std::error::Error for DispersionError {}
 
 /// Linear interpolated percentile of an already-sorted slice.
-fn percentile_sorted(sorted: &[f64], q: f64) -> f64 {
+/// The median of an already-sorted series, or `None` where there is nothing to take it of.
+///
+/// `None` rather than `0.0`: zero is a plausible dollar figure, a plausible millage and a
+/// plausible share, so returning it for an empty series puts a value where an absence belongs.
+/// The two hand-rolled copies this replaces both returned `0.0`.
+///
+/// The slice must be sorted ascending; nothing here checks it.
+#[must_use]
+pub fn median(sorted: &[f64]) -> Option<f64> {
+    (!sorted.is_empty()).then(|| percentile_sorted(sorted, 0.5))
+}
+
+/// The `q`th percentile of an already-sorted series, by linear interpolation on rank
+/// `q * (n - 1)`.
+///
+/// R's type 7 and Excel's `PERCENTILE`, which is the convention every statistic in this module
+/// is computed on. Exposed so that callers elsewhere in the workspace share one definition:
+/// there were three, and the ad-hoc ones took the upper of the two middle observations, which
+/// disagrees with this on every even-length series.
+///
+/// The slice must be sorted ascending; nothing here checks it.
+#[must_use]
+pub fn percentile_sorted(sorted: &[f64], q: f64) -> f64 {
     if sorted.len() == 1 {
         return sorted[0];
     }

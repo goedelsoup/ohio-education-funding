@@ -20,9 +20,12 @@ use edfund_core::FiscalYear;
 use project::finances::{finances, for_district, Finances};
 use project::panel::panel;
 
+/// The median, on the one definition this workspace has.
+///
+/// Was a local upper-of-two, which disagrees with `dispersion` on every even-length series.
 fn median(mut values: Vec<f64>) -> f64 {
     values.sort_by(|a, b| a.partial_cmp(b).unwrap_or(std::cmp::Ordering::Equal));
-    values[values.len() / 2]
+    dispersion::median(&values).expect("a median is taken of a non-empty series here")
 }
 
 fn statewide(year: u16, pick: impl Fn(&project::finances::YearRecord) -> f64) -> f64 {

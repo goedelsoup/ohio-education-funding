@@ -14,6 +14,7 @@ edfund-core = { path = "../edfund-core" }
 # For examples/input_year_refresh.rs, not for the tests. Cargo resolves dev-dependencies
 # for examples/ too, which is the only reason this compiles.
 local-capacity = { path = "../local-capacity" }
+dispersion = { path = "../dispersion" }
 
 [lints]
 workspace = true
