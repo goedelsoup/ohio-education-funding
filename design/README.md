@@ -86,6 +86,32 @@ basis switch's trick applied to charts, so a sort change swaps a pre-rendered st
 loading a plotting library — and `tbody + tbody` group structure for long tables, which is also what
 carries a definitional break.
 
+## `figures.css`, and the number that decides the rest of it
+
+The patterns are landed. `.fig` is **available and not yet adopted**, and the number is why.
+
+The site formats figures through `format.ts` from **750 call sites across 28 files**. The design's
+rule 1 — no numeric or currency literal outside a `.fig` — means wrapping every one of them in a
+three-child compound. That is a change worth deciding on with the number in hand rather than
+starting and discovering it, so the CSS is in place, the shape is documented at the pattern, and the
+adoption is a separate decision.
+
+Where the gap is real: the card-level year chip answers "which year" well for a card, and does not
+reach body prose, a chart label, or a table cell whose column head is silent. That is the case for
+`.fig` and it is a good one. It is not a case for 750 mechanical edits in one pass.
+
+**`.series-break` is adopted, because there the gap was concrete.** The meal-program denominator
+changes at FY2010 — `AdmCount` through FY2009, `CECount` after — and the share steps up across it.
+The chart has drawn that as two separate series since it was built. The table beside it ran straight
+through the same break, carrying the distinction only in a per-row "Counted on" cell, which a reader
+meets after the eye has already gone down the column. It now closes one row group and opens another
+with a labelled rule between them: structure a screen reader announces, not a border only a sighted
+reader sees.
+
+An end-to-end assertion counting `tbody tr` failed at 18 against an expected 17 when that landed,
+which is the check noticing that the table's shape changed — and the shape is the point. It counts
+data rows now, and a second assertion holds the break itself.
+
 ## Two decisions the design project asked for, and neither is a CSS question
 
 **1. The `unentered` migration.** The system's `.claim` has exactly three status classes and states

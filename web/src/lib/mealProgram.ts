@@ -176,8 +176,28 @@ export function renderMealProgram(meal: MealProgramYear[]): string {
         <thead><tr><th>October</th><th class="tnum">Sponsors</th><th class="tnum">Enrollment</th>
           <th class="tnum">Approved</th><th class="tnum">Share</th><th>Counted on</th></tr></thead>
         <tbody>${meal
-          .map(
-            (y) => `<tr>
+          .map((y, index) => {
+            /*
+             * The break, as a real gap rather than a column a reader reads afterwards.
+             *
+             * The chart has drawn this as two separate series since it was built — `a` through
+             * FY2009 on `AdmCount`, `b` from FY2010 on `CECount` — while the table beside it ran
+             * straight through, carrying the distinction only in a per-row "Counted on" cell. That
+             * is a fact met after the eye has already gone down the column.
+             *
+             * Closing the tbody and opening another is what makes it a gap in the document and not
+             * only in the styling: a row group is a structure a screen reader announces and a
+             * `border-top` is not.
+             */
+            const previous = meal[index - 1];
+            const broke = previous !== undefined && previous.basis !== y.basis;
+            const rule = broke
+              ? `</tbody><tbody><tr class="series-break"><th colspan="6">` +
+                `Counted differently from here — ${escapeHtml(previous.basis === "adm" ? "AdmCount" : "CECount")}` +
+                ` above, ${escapeHtml(y.basis === "adm" ? "AdmCount" : "CECount")} below. The two sides` +
+                ` are two series.</th></tr>`
+              : "";
+            return rule + `<tr>
               <th>FY${y.fiscal_year}</th>
               <td class="tnum n">${y.sponsors}</td>
               <td class="tnum n">${Math.round(y.enrollment).toLocaleString("en-US")}</td>
@@ -192,8 +212,8 @@ export function renderMealProgram(meal: MealProgramYear[]): string {
                     ? "CECount"
                     : "AdmCount",
               )}</td>
-            </tr>`,
-          )
+            </tr>`;
+          })
           .join("")}</tbody>
       </table></div>
     </div>`;

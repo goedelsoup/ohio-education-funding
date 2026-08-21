@@ -3448,12 +3448,34 @@ test.describe("the count the poverty weight is paid on", () => {
   test("each row says which count it divides by, so no row travels alone", async ({ page }) => {
     // The table is the part that gets copied out. A row carrying a share without its basis is a
     // figure that means two different things depending on a cutover the row does not mention.
+    //
+    // Data rows only: the table now closes one row group and opens another where the denominator
+    // changes, and the labelled row between them is structure rather than a year. Counting every
+    // `tr` made this fail at 18 when the break landed, which is the assertion catching a real
+    // change in the table's shape — and the shape is the point of the change.
     await page.goto("/history");
     const card = page.locator(".card", { hasText: "What the poverty weight is counted on" });
-    const rows = card.locator("tbody tr");
+    const rows = card.locator("tbody tr:not(.series-break)");
     await expect(rows).toHaveCount(17);
     await expect(rows.first()).toContainText("AdmCount");
     await expect(rows.last()).toContainText("CECount");
+  });
+
+  test("and the change of denominator is a break in the table, not only in the chart", async ({
+    page,
+  }) => {
+    /*
+     * The chart has drawn this as two separate series since it was built, because the share steps
+     * up across the cutover and a line through it is a lie. The table ran straight through the
+     * same break with only a per-row "Counted on" cell to say so — a fact a reader meets after the
+     * eye has already gone down the column.
+     */
+    await page.goto("/history");
+    const card = page.locator(".card", { hasText: "What the poverty weight is counted on" });
+    await expect(card.locator("tr.series-break")).toHaveCount(1);
+    await expect(card.locator("tr.series-break")).toContainText("two series");
+    // A row group a screen reader announces, not a border only a sighted reader sees.
+    await expect(card.locator("tbody")).toHaveCount(2);
   });
 
   test("the years published as three files carry a range where a share would be", async ({
