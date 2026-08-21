@@ -291,9 +291,6 @@ pub struct DistrictOutcome {
     pub students_with_disabilities: Option<f64>,
 }
 
-impl DistrictOutcome {
-}
-
 /// Statewide relationships between the funding side and the outcome side.
 ///
 /// Every one is a correlation over the joined panel and none identifies an effect. They are in
@@ -1372,9 +1369,6 @@ pub struct Draft {
     pub slug: String,
     /// Every provision, in the order the draft states them.
     pub provisions: Vec<DraftProvision>,
-}
-
-impl Draft {
 }
 
 /// A Rust-computed result the web layer must reproduce before it is allowed to compute more.

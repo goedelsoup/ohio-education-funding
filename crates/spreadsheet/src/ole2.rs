@@ -563,7 +563,10 @@ mod tests {
     #[test]
     fn an_implausible_sector_shift_is_refused_before_it_is_shifted() {
         let good = compound(b"large stream contents past the mini cutoff", b"small");
-        assert!(Compound::open(good.clone()).is_ok(), "the fixture must be valid");
+        assert!(
+            Compound::open(good.clone()).is_ok(),
+            "the fixture must be valid"
+        );
 
         for (offset, label) in [(0x1e, "sector shift"), (0x20, "mini sector shift")] {
             for bytes in [[0xFF, 0xFF], [0x09, 0x04], [0x00, 0x00], [0x3E, 0x00]] {

@@ -65,7 +65,7 @@ pub struct CapacityInputs {
     /// against an Ohio median of $31,555, and substituting one for the other leaves the whole
     /// blend about 4% light. Fed the real figure, this crate reproduces the department's own
     /// capacity for all 609 districts exactly — worst residual 6.364e-6, pinned by
-/// `tests/against_the_departments_own_capacity.rs`.
+    /// `tests/against_the_departments_own_capacity.rs`.
     pub federal_median_income: Dollars,
     /// Number of tax returns filed in the district for the income reference year.
     pub tax_returns: f64,
@@ -534,7 +534,10 @@ mod tests {
             (midpoint - (RATE_AT_STATE_MEDIAN + span / 2.0)).abs() < 1e-12,
             "midpoint rate was {midpoint}"
         );
-        assert!((midpoint - 0.023_75).abs() < 1e-12, "and in absolute terms, {midpoint}");
+        assert!(
+            (midpoint - 0.023_75).abs() < 1e-12,
+            "and in absolute terms, {midpoint}"
+        );
 
         // A quarter and three quarters of the way, to pin linearity rather than one point.
         for (fraction, ratio) in [(0.25, 1.125), (0.75, 1.375)] {

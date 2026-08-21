@@ -191,7 +191,6 @@ impl Outcome {
         }
         self.delta() / self.adm
     }
-
 }
 
 /// Apply a policy to one district at a given current-year enrolled ADM.
