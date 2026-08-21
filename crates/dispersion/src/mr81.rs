@@ -97,15 +97,6 @@ pub struct Sponsor {
 }
 
 impl Sponsor {
-    /// Free and reduced together, as a share of the denominator in force that year.
-    ///
-    /// `None` for a community-eligibility row, where the numerator is zero because nobody applied
-    /// rather than because nobody qualified.
-    #[must_use]
-    pub fn poverty_share(&self) -> Option<f64> {
-        (self.enrollment > 0.0 && self.stream != "community")
-            .then(|| (self.free + self.reduced) / self.enrollment)
-    }
 }
 
 /// Every row of the panel.

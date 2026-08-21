@@ -292,21 +292,6 @@ pub struct DistrictOutcome {
 }
 
 impl DistrictOutcome {
-    /// Federal money as a share of this district's operating spending.
-    ///
-    /// The share rather than the dollars, wherever one number has to stand for this. Both parts
-    /// are published per **need-weighted** pupil, so the dollars carry a denominator that has to
-    /// be named every time it appears; the ratio of two figures on the same denominator does not.
-    /// It is the one spending statistic on this site that can be set beside any other district's
-    /// without asking which pupil count either divides by.
-    #[must_use]
-    pub fn federal_share(&self) -> Option<f64> {
-        let (federal, total) = (
-            self.per_equivalent_pupil_federal?,
-            self.per_equivalent_pupil?,
-        );
-        (total > 0.0).then_some(federal / total)
-    }
 }
 
 /// Statewide relationships between the funding side and the outcome side.
@@ -1344,8 +1329,8 @@ pub struct PolicyShape {
 
 /// One clause of a draft bill, as the site needs it.
 ///
-/// The lever fields carry a provision the model can run; they are empty on one it cannot, which
-/// is how [`Draft::unpriced`] is counted rather than declared.
+/// The lever fields carry a provision the model can run; they are empty on one it cannot, so an
+/// unpriced provision is one whose levers are absent — counted from the data rather than declared.
 #[derive(Debug, Clone, PartialEq)]
 pub struct DraftProvision {
     /// Position in the draft, one-based.
@@ -1390,14 +1375,6 @@ pub struct Draft {
 }
 
 impl Draft {
-    /// The provisions no lever reaches.
-    #[must_use]
-    pub fn unpriced(&self) -> usize {
-        self.provisions
-            .iter()
-            .filter(|p| p.lever.is_empty())
-            .count()
-    }
 }
 
 /// A Rust-computed result the web layer must reproduce before it is allowed to compute more.

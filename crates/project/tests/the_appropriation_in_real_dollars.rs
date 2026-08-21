@@ -5,7 +5,10 @@
 //! says in constant dollars, because the two statements point opposite ways and both are correct.
 
 use edfund_core::FiscalYear;
-use project::appropriations::{enacted_history, growth, line_history, lines, TAX_REIMBURSEMENT};
+use project::appropriations::{
+    enacted_history, growth, line_history, lines, reimbursements, is_tax_reimbursement,
+    TAX_REIMBURSEMENT,
+};
 
 /// The base year every figure here is denominated in: the last year the price index covers.
 const BASE: FiscalYear = FiscalYear(2026);
@@ -237,5 +240,59 @@ fn the_real_terms_fall_is_in_lines_that_stopped_being_listed() {
         "the department no longer has far fewer appropriation lines than it did: {} against {}",
         count(2026),
         count(2014)
+    );
+}
+
+/// The reimbursement lines are out of the department's total and reachable on their own.
+///
+/// Kept and tested rather than deleted: `reimbursements` had no caller, but the module doc
+/// states the class is "excluded from every total here and available through [`reimbursements`]".
+/// Half of that sentence is an exclusion the other tests lean on; the other half is this
+/// function, and nothing checked that the two halves agree.
+#[test]
+fn the_reimbursements_are_excluded_from_the_total_and_retrievable_beside_it() {
+    let carved_out = reimbursements(BASE);
+    assert!(
+        !carved_out.is_empty(),
+        "the reimbursement class is non-empty in this series, so an empty result means the \
+         line-item match stopped matching rather than that the money stopped flowing"
+    );
+
+    // Every year it reports is a year whose lines really are of the class.
+    for year in &carved_out {
+        assert!(year.nominal > 0.0, "FY{}: a reported year carries money", year.fiscal_year);
+        assert!(year.items > 0, "FY{}: and the lines it is over", year.fiscal_year);
+    }
+
+    // The exclusion half. For a year the two series share, the department's enacted total and
+    // the reimbursement total are drawn from disjoint sets of lines, so the enacted total plus
+    // the reimbursements is strictly larger than the enacted total alone.
+    let enacted = enacted_history(BASE);
+    let shared = carved_out
+        .iter()
+        .find(|r| enacted.iter().any(|e| e.fiscal_year == r.fiscal_year))
+        .expect("the two series overlap");
+    let total = enacted
+        .iter()
+        .find(|e| e.fiscal_year == shared.fiscal_year)
+        .expect("the year is in both");
+
+    let counted_twice = lines()
+        .into_iter()
+        .filter(|l| {
+            l.kind == "enacted"
+                && l.fiscal_year == shared.fiscal_year
+                && is_tax_reimbursement(&l.line_item, l.fiscal_year)
+        })
+        .count();
+    assert_eq!(
+        counted_twice, shared.items,
+        "FY{}: the lines `reimbursements` reports are exactly the class",
+        shared.fiscal_year
+    );
+    assert!(
+        total.nominal > 0.0 && shared.nominal > 0.0,
+        "FY{}: both series carry money in the year they share",
+        shared.fiscal_year
     );
 }
