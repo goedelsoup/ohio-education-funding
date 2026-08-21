@@ -5,16 +5,15 @@
 #
 # # Why this exists
 #
-# There is no git remote, so that workflow file has never executed once. Its own
-# header says the gates "existed and passed for fourteen phases, and nothing ran
-# them except a person remembering to" — which was still true after it was
-# written, because a workflow with nowhere to push is a workflow that does not
-# run. `cargo doc -D warnings` was red for at least two phases and nothing said
-# so.
+# It was written when there was no git remote, so `.github/workflows/ci.yml` had
+# never executed once and this file was the only thing running the gates. There
+# is a remote now and that workflow runs on every push, so the two are peers:
+# this is what you run before pushing, and it runs the same nine gates in the
+# same order, so that a green local gate means something about the remote one.
 #
-# The workflow stays, unchanged, so it works the day a remote is added. This
-# file is the thing that runs today, and it runs the same nine gates in the same
-# order.
+# Worth remembering why it was needed at all. `cargo doc -D warnings` was red for
+# at least two phases and nothing said so, because a workflow with nowhere to
+# push is a workflow that does not run.
 
 # Monorepo task mode. Each directory in `config_roots` holding a `mise.toml` is a
 # subproject addressable from here as `//<path>:<task>` — `mise run //crates:test`.
@@ -114,7 +113,18 @@ echo "the feed and every REGEN block are current"
 '''
 
 [tasks.deploy]
-description = "Publish web/dist to Cloudflare Pages. Builds first; --branch main is not optional."
+description = "Manually publish web/dist to Cloudflare Pages. Production deploys itself on merge to main."
+# Production is deployed by the `deploy` job in `.github/workflows/ci.yml`, on
+# every push to `main` that clears all three gates, from the exact `dist/` the
+# browser suite ran against. This task is the escape hatch — a Cloudflare outage
+# mid-merge, or a deploy needed while the remote is unreachable — and running it
+# should be a decision rather than a habit.
+#
+# Note what it does from a branch. `--branch main` sends the *checked-out tree*
+# to production, reviewed or not, and it can land after the automated deploy of a
+# commit that came later, so the live site goes backwards with nothing in the
+# repository to say why. Check out `main` first.
+#
 # `--dir` steers which package pnpm runs, not where dlx resolves paths, so the
 # directory argument is `web/dist` and not `dist`. And on direct upload wrangler
 # labels the deployment with whatever branch is checked out: deploy from a

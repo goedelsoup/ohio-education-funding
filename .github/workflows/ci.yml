@@ -1,5 +1,6 @@
-# Both gates, on every push. They existed and passed for fourteen phases, and nothing ran them
-# except a person remembering to.
+# Both gates on every push, and the deploy on every merge to `main`. The gates existed and passed
+# for fourteen phases and nothing ran them except a person remembering to; the deploy was a
+# command someone typed, which is the same problem one step further along.
 #
 # Nothing here fetches from the department. Every fixture is committed and every test reads a
 # committed fixture, so CI is hermetic and a publisher's outage cannot turn the build red. The
@@ -14,7 +15,16 @@ on:
 
 concurrency:
   group: ci-${{ github.ref }}
-  cancel-in-progress: true
+  # Branch and pull-request runs still cancel — the newest push is the only one worth a runner.
+  # A `main` run must not: it is the run that deploys, and a deploy killed partway through is a
+  # state nobody can read off the dashboard afterwards.
+  cancel-in-progress: ${{ github.ref != 'refs/heads/main' }}
+
+# The repository is public, so the default grant is wider than anything here needs. No job writes
+# to it: the two gates read the tree, and the deploy job authenticates to Cloudflare with its own
+# token rather than with anything GitHub issues.
+permissions:
+  contents: read
 
 env:
   CARGO_TERM_COLOR: always
@@ -102,6 +112,19 @@ jobs:
       - name: e2e
         run: pnpm test:e2e
 
+      # The bytes Chromium was just served are the bytes that get deployed. `test:e2e` rebuilds —
+      # see the `webServer` block in playwright.config.ts — so this is the tree the browser suite
+      # passed against and the one `check:dist` scanned, rather than a second build that merely
+      # ought to match it. 194 MB across 4,568 files, so it is uploaded only on the runs that
+      # actually deploy.
+      - name: Keep the built site for the deploy job
+        if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+        uses: actions/upload-artifact@v4
+        with:
+          name: dist
+          path: web/dist
+          retention-days: 7
+
       - uses: actions/upload-artifact@v4
         if: failure()
         with:
@@ -137,3 +160,47 @@ jobs:
       # used by the local gate that actually runs, and the two would drift.
       - name: The README indexes
         run: cargo run --manifest-path crates/Cargo.toml -p connect --bin edfund-connect -- index --check
+
+  # The site goes live from here, and from nowhere else that anyone should be relying on: a push
+  # to `main` that cleared all three gates above. `mise run //:deploy` still exists and is still
+  # occasionally the right thing, but it is no longer how production changes.
+  #
+  # Gating on `generated` matters as much as gating on `web`. The district figures are written
+  # into the HTML at build time, so a build over a stale `bundle.json` produces a site that is
+  # wrong in its numbers and perfectly green in its tests.
+  deploy:
+    name: deploy to production
+    needs: [rust, web, generated]
+    # A `pull_request` event resolves `github.ref` to the PR's merge ref rather than to
+    # `refs/heads/main`, so it is already excluded. The event test is for `workflow_dispatch`,
+    # which can be aimed at `main` and would otherwise redeploy with no commit behind it.
+    if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+    runs-on: ubuntu-latest
+    environment:
+      name: production
+      url: https://schools.ohio.shawneesmart.systems
+    steps:
+      # No checkout. Nothing here needs the sources: the deployable tree is the artifact the web
+      # job built, and rebuilding it would mean deploying something no test has seen.
+      - uses: actions/download-artifact@v4
+        with:
+          name: dist
+          path: dist
+
+      # `--branch main` is not optional and cannot be inferred. On direct upload wrangler labels
+      # the deployment with whatever branch it can find, and this job has no git tree to find one
+      # in; unlabelled, the upload succeeds, a URL is printed, and the live site does not change.
+      # `--commit-hash` is what makes the Cloudflare dashboard able to say which commit is serving.
+      #
+      # The wrangler version is pinned rather than `@latest`, so that a Cloudflare release cannot
+      # turn a deploy red on a commit that touched nothing.
+      - uses: cloudflare/wrangler-action@v3
+        with:
+          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          wranglerVersion: "4.125.0"
+          command: >-
+            pages deploy dist
+            --project-name ohio-education-funding
+            --branch main
+            --commit-hash ${{ github.sha }}
