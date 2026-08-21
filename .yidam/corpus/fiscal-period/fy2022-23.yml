@@ -21,8 +21,8 @@ description: |
   and, since the enrolled act was retrieved, contents: thirteen sections of R.C. 3317 reprinted,
   four of H.B. 110's uncodified sections reopened, and the two statewide transportation cost
   inputs frozen at FY2020 data for both years of this biennium. [verified]
+findings: |
   **The appropriating act set the department's own budget at $12.55 billion in FY2022 and $12.73 billion in FY2023.** That is what was appropriated to the Department of Education across every line in its chapter, less the property tax reimbursement items that are numbered as the department's and are carried in the State Revenue Distributions section instead. [verified — the appropriation series, `lsc-appropriation-spreadsheet`] It is a ceiling rather than a payment; what districts received is `dew-foundation`.
-
 properties:
   label: FY2022-23
   kind: biennium

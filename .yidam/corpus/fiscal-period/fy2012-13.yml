@@ -9,7 +9,7 @@ description: |
   formula](../funding-regime/bridge-formula.yml) era. [verified]
 
   The first biennium of the Bridge formula, and the trough of the real-terms decline: per-pupil operating expenditure in constant FY2022 dollars fell to $14,173 by FY2014, a level indistinguishable from FY2006.
-
+findings: |
   **What is measured**, over comparable districts, on federal definitions: [verified —
   `dispersion::ohio_panel`, pinned by test]
 
@@ -20,7 +20,6 @@ description: |
   them: Ohio replaced its funding regime twice inside this decade and renamed most of its own
   categories doing it, so a series from Ohio's own reporting would measure the reporting.
   [inference]
-
 properties:
   label: FY2012-2013
   kind: biennium

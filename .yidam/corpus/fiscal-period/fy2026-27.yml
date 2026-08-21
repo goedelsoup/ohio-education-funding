@@ -29,8 +29,8 @@ description: |
 
   Enacted appropriation totals, phase-in percentages, and the cost input reference year all
   need to be established from the act and the LSC analysis. [open]
+findings: |
   **The appropriating act set the department's own budget at $14.87 billion in FY2026 and $15.27 billion in FY2027.** That is what was appropriated to the Department of Education across every line in its chapter, less the property tax reimbursement items that are numbered as the department's and are carried in the State Revenue Distributions section instead. [verified — the appropriation series, `lsc-appropriation-spreadsheet`] It is a ceiling rather than a payment; what districts received is `dew-foundation`.
-
 properties:
   label: FY2026-27
   kind: biennium
