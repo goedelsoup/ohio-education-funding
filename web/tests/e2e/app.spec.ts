@@ -615,12 +615,13 @@ test.describe("with JavaScript disabled", () => {
   });
 
   test("the section menus still open, and their links still go somewhere", async ({ page }) => {
-    // The reason they are `<details>` rather than a scripted menu. Four of the ten sections are
-    // only reachable through one of these, so a menu that needs script to open would put a
-    // quarter of the site behind JavaScript on a site whose whole point is that nothing is.
+    // The reason they are `<details>` rather than a scripted menu, and the reason it matters more
+    // than it did. Every entry in the bar is a disclosure now — the flat `Statewide` and
+    // `Scenario` links went into `Places` and `Research` — so a menu that needed script to open
+    // would put the entire site behind JavaScript, on a site whose whole point is that nothing is.
     await page.goto("/");
     const places = page.locator("header.site nav details.menu").filter({ hasText: "Places" });
-    await expect(places.locator("a")).toHaveCount(5);
+    await expect(places.locator("a")).toHaveCount(6);
     await expect(places.locator('a[href="/counties"]')).toBeHidden();
 
     await places.locator("summary").click();
@@ -630,6 +631,59 @@ test.describe("with JavaScript disabled", () => {
     await expect(page.locator("h1")).toBeVisible();
   });
 
+  test("all five entries are disclosures, and every one of them opens", async ({ page }) => {
+    /*
+     * Places was the only group this suite had ever opened without script, back when two of the
+     * five entries were plain links and a failure in the disclosure machinery still left
+     * `Statewide` and `Scenario` reachable. Both of those went into menus. There is no longer any
+     * flat link in the bar at all, so a `<details>` that needed JavaScript would now put every
+     * section of the site behind it rather than three fifths of one.
+     */
+    await page.goto("/");
+    const menus = page.locator("header.site nav details.menu");
+    await expect(menus).toHaveCount(5);
+    await expect(page.locator("header.site nav > a")).toHaveCount(0);
+
+    /*
+     * By position and not by `filter({ hasText })`, which is how this was first written and which
+     * does not work any more: the panels carry generated prose, `hasText` is a case-insensitive
+     * substring, and "Formula" matches three menus — its own, `Law` (whose note under H.B. 153
+     * reads "Bridge Formula") and `Research` ("re-run the formula").
+     *
+     * Positions are worth asserting in their own right. "After Places" is where the two lifted
+     * corpus axes were asked to go, and nothing else says so.
+     */
+    for (const [index, label] of ["Places", "Law", "Formula", "Research", "Reference"].entries()) {
+      const menu = menus.nth(index);
+      await expect(menu.locator("summary"), `entry ${index} is not ${label}`).toHaveText(label);
+      const first = menu.locator(".menu-panel a").first();
+      await expect(first, `${label} has no links`).toBeHidden();
+      await menu.locator("summary").click();
+      await expect(first, `${label} did not open`).toBeVisible();
+      await menu.locator("summary").click();
+    }
+  });
+
+  test("a menu note says why a link is in the menu, not what the link already says", async ({
+    page,
+  }) => {
+    /*
+     * Two thirds of the bar is generated from `.yidam/corpus/`, and the second line under each
+     * generated link is the derivation showing its work: which rule admitted an act, which year a
+     * regime began. This asserts the notes survive to the page — the unit suite checks the rules
+     * select correctly, and a correct selection rendered without its reason is a menu of seven
+     * bill numbers a reader has no way to tell apart.
+     */
+    await page.goto("/");
+    const law = page.locator("header.site nav details.menu").filter({ hasText: "Law" });
+    await law.locator("summary").click();
+    const fsfp = law.locator('a[href="/wiki/legislation/hb-110-2021"]');
+    await expect(fsfp.locator(".menu-label")).toHaveText("Am. Sub. H.B. 110 (2021)");
+    await expect(fsfp.locator(".menu-note")).toHaveText("Fair School Funding Plan");
+    // The rule that maintains itself: whichever act is the current budget names the biennium.
+    await expect(law.locator(".menu-note", { hasText: /^appropriates for FY/ })).toHaveCount(1);
+  });
+
   test("the group holding the current page is marked, and the page itself is marked inside it", async ({
     page,
   }) => {
@@ -637,10 +691,10 @@ test.describe("with JavaScript disabled", () => {
     // Marking the summary as the current *page* would tell a screen reader the reader is on a
     // thing that is not a destination.
     await page.goto("/history");
-    const findings = page.locator("header.site nav details.menu").filter({ hasText: "Findings" });
-    await expect(findings.locator("summary")).toHaveAttribute("aria-current", "true");
-    await findings.locator("summary").click();
-    await expect(findings.locator('a[href="/history"]')).toHaveAttribute("aria-current", "page");
+    const research = page.locator("header.site nav details.menu").filter({ hasText: "Research" });
+    await expect(research.locator("summary")).toHaveAttribute("aria-current", "true");
+    await research.locator("summary").click();
+    await expect(research.locator('a[href="/history"]')).toHaveAttribute("aria-current", "page");
   });
 
   test("the constant-dollar switch still switches", async ({ page }) => {
@@ -695,10 +749,31 @@ test.describe("routes", () => {
     }
   });
 
-  test("a link to the statewide view opens it directly", async ({ page }) => {
+  test("the root is a front door, and the statewide panel is a place", async ({ page }) => {
+    /*
+     * The move, asserted from both ends.
+     *
+     * `/` was the statewide panel for this site's whole life. It stopped being it when the bar
+     * grew from three axes to five: a reader landing on a dense financial view has been handed an
+     * answer before they asked anything, and the two axes lifted out of `.yidam/corpus/` had
+     * nowhere to be introduced.
+     *
+     * Checking only the destination is what makes a move indistinguishable from a copy — a page
+     * left behind at the old address passes every assertion about the new one. So both halves:
+     * what `/statewide` carries, and what `/` no longer does.
+     */
+    await page.goto("/statewide");
+    await expect(page.locator("h1")).toHaveText("Statewide");
+    await expect(page.getByRole("heading", { name: /Who is on the guarantee/ })).toBeVisible();
+
     await page.goto("/");
     await expect(page.locator("h1")).toHaveText("Ohio school funding");
-    await expect(page.getByRole("heading", { name: /Who is on the guarantee/ })).toBeVisible();
+    await expect(page.getByRole("heading", { name: /Who is on the guarantee/ })).toHaveCount(0);
+    await expect(page.locator(".basis-panel")).toHaveCount(0);
+
+    // No tab for it, by design: the brand mark is the way back and the bar does not say it twice.
+    await expect(page.locator('header.site nav a[href="/"]')).toHaveCount(0);
+    await expect(page.locator("a.brand")).toHaveAttribute("href", "/");
   });
 
   test("old fragment links still land on the page they named", async ({ page }) => {
@@ -724,16 +799,18 @@ test.describe("routes", () => {
   });
 
   test("every section in the navigation resolves to a page", async ({ page }) => {
-    // Grouping moved four entries behind a disclosure and admitted two pages that had never been
-    // in the bar at all. A menu item pointing at a route the build does not emit looks exactly
-    // like one that works, right up until someone opens it.
+    // A menu item pointing at a route the build does not emit looks exactly like one that works,
+    // right up until someone opens it. That risk grew: two thirds of the bar is now generated
+    // from `.yidam/corpus/` rather than typed, so a node renamed in the corpus writes a dead
+    // link into the header of all 3,486 pages and nothing else would notice.
     await page.goto("/");
     const hrefs = await page
       .locator("header.site nav a")
       .evaluateAll((nodes) => nodes.map((n) => (n as HTMLAnchorElement).getAttribute("href")!));
-    // Two flat entries and ten inside the three groups. An exact count rather than a floor, so
-    // that dropping an entry fails here and adding one is an acknowledged change.
-    expect(hrefs).toHaveLength(12);
+    // Thirty across five groups. An exact count rather than a floor, so that dropping an entry
+    // fails here and adding one is an acknowledged change — and so that a derivation which
+    // quietly stops selecting anything cannot pass by returning an empty menu.
+    expect(hrefs).toHaveLength(30);
     for (const href of hrefs) {
       await page.goto(href);
       await expect(page.locator("h1"), `${href} has no heading`).toBeVisible();
@@ -1034,7 +1111,7 @@ test.describe("the finances route", () => {
   test("deflating reverses the sign of the statewide cash story", async ({ page }) => {
     // The reason both bases are offered rather than one: they support opposite arguments, and the
     // difference is entirely CPI.
-    await page.goto("/");
+    await page.goto("/statewide");
     const nominal = page.locator(".basis-panel.nominal .tile", { hasText: "Change since FY2020" });
     await expect(nominal.locator(".v")).toHaveClass(/gain/);
     const real = page.locator(".basis-panel.real .tile", { hasText: "Change since FY2020" });
@@ -1313,7 +1390,7 @@ test.describe("presentation", () => {
     // Charts are rendered at build time and cannot re-render on a theme change, so every colour in
     // them is a custom property. This is the test that the indirection actually resolves.
     await page.emulateMedia({ colorScheme: "dark" });
-    await page.goto("/");
+    await page.goto("/statewide");
     const fill = await page
       .locator(".bar-fill")
       .first()
@@ -1324,7 +1401,7 @@ test.describe("presentation", () => {
 
   test("the theme toggle beats the OS setting in both directions", async ({ page }) => {
     await page.emulateMedia({ colorScheme: "dark" });
-    await page.goto("/");
+    await page.goto("/statewide");
     await page.locator("#theme").click();
     await expect(page.locator("html")).toHaveAttribute("data-theme", "light");
     const fill = await page
@@ -1336,7 +1413,13 @@ test.describe("presentation", () => {
 
   test("the page does not scroll sideways on a phone", async ({ page }) => {
     await page.setViewportSize({ width: 390, height: 844 });
-    for (const path of ["/", `/district/${CLEVELAND}`, "/districts", "/wiki/metric/performance-index"]) {
+    for (const path of [
+      "/",
+      "/statewide",
+      `/district/${CLEVELAND}`,
+      "/districts",
+      "/wiki/metric/performance-index",
+    ]) {
       await page.goto(path);
       const overflow = await page.evaluate(
         () => document.documentElement.scrollWidth - document.documentElement.clientWidth,
@@ -1346,7 +1429,7 @@ test.describe("presentation", () => {
   });
 
   test("the hover layer follows the marks", async ({ page }) => {
-    await page.goto("/");
+    await page.goto("/statewide");
     const tip = page.locator("#tip");
     await expect(tip).toBeHidden();
     await page.locator(".bar-fill > *").first().hover();
@@ -1643,7 +1726,7 @@ test.describe("whether Ohio is unusual", () => {
      * else here is Ohio describing itself, which cannot answer a question of the form "too
      * heavily" — the form the DeRolph holding takes.
      */
-    await page.goto("/");
+    await page.goto("/statewide");
     const card = page.locator(".card", { hasText: "Whether Ohio is unusual" });
     await expect(card).toContainText("Local share of school revenue");
     await expect(card).toContainText("7 of 51");
@@ -1658,7 +1741,7 @@ test.describe("whether Ohio is unusual", () => {
      * fifty-one would put Massachusetts and Virginia at the bottom of a measure they are near the
      * top of, and the first version of this extractor did exactly that.
      */
-    await page.goto("/");
+    await page.goto("/statewide");
     const card = page.locator(".card", { hasText: "Whether Ohio is unusual" });
     await expect(card).toContainText("39 states whose districts levy their own tax");
     await expect(card).toContainText("Massachusetts and Virginia report");
@@ -1666,7 +1749,7 @@ test.describe("whether Ohio is unusual", () => {
   });
 
   test("the relief year is named as cutting against the finding", async ({ page }) => {
-    await page.goto("/");
+    await page.goto("/statewide");
     const card = page.locator(".card", { hasText: "Whether Ohio is unusual" });
     await expect(card).toContainText("peak year of federal pandemic relief");
     await expect(card).toContainText("against this finding rather than for it");

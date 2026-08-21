@@ -1,34 +1,38 @@
 ---
 /**
- * The statewide summary, and the front door.
+ * The front door, which is not a view of anything.
  *
- * This used to be a tab. It is the root now because it is the only view that answers a question a
- * reader can have before they have chosen a district — who is on the guarantee, whether state aid
- * offsets property wealth, and what the two floors do.
+ * # Why the root stopped being the statewide panel
+ *
+ * It was the statewide panel for as long as the bar had three axes and every one of them was
+ * about money. The bar has five now, two of them lifted out of `.yidam/corpus/` — statute and
+ * formula — and neither has anywhere to be introduced on a page that opens with foundation aid
+ * totals. A reader landing on a dense financial view has been handed an answer before they asked
+ * anything, and the answer is about the one axis they were most likely to find on their own.
+ *
+ * # It takes no entry in the bar
+ *
+ * The brand mark points here and nothing else does. That is the convention a reader already has,
+ * and a tab as well would put one destination in the bar twice. It also means this page has to
+ * earn its place by orienting rather than by being unavoidable: it is three cards, and the reason
+ * there is no fourth is that a front door which lists everything is a list, not a door.
+ *
+ * # Where the figures are
+ *
+ * One sentence of them, and then a link. Tiles here would be the statewide page rendered twice,
+ * and a headline figure on a page with no panel under it is the exact thing this repository keeps
+ * catching — a number that travels without the page that qualifies it.
  */
-import BasisToggle from "../components/BasisToggle.astro";
 import Base from "../layouts/Base.astro";
+import SectionAnchor from "../components/SectionAnchor.astro";
 import { loadFeed } from "../lib/feed.ts";
 import { count, millions } from "../lib/format.ts";
-import { baseYear } from "../lib/real.ts";
+import { nav } from "../lib/nav.ts";
 import * as routes from "../lib/routes.ts";
-import {
-  renderNational,
-  renderStatewideFinances,
-  renderStatewideStructure,
-} from "../lib/statewide.ts";
-import SectionAnchor from "../components/SectionAnchor.astro";
 
-const { bundle, alphabetical, tax } = loadFeed();
+const { bundle, alphabetical } = loadFeed();
 const s = bundle.statewide;
-// The years this page actually restates — the statewide financial panel, not everything the
-// index reaches. The deflator now covers the historical route's FY2009 onward as well.
-const base = bundle.deflator
-  ? baseYear(
-      bundle.deflator,
-      s.finances.map((y) => y.fiscal_year),
-    )
-  : null;
+const sections = nav(bundle);
 
 /** The districts a reader is most likely to be looking for, as a way in that is not a table. */
 const NOTABLE = ["043802", "043786", "044909", "049056", "044933", "045583"]
@@ -37,33 +41,26 @@ const NOTABLE = ["043802", "043786", "044909", "049056", "044933", "045583"]
 ---
 
 <Base
-  title="Statewide"
-  description={`Ohio pays ${millions(s.realized_aid_total).replace("+", "")} in state foundation aid across ${s.districts} districts in FY${bundle.fiscal_year}. ${s.on_guarantee} of them are funded by the guarantee rather than the formula.`}
-  image={routes.og.page("statewide")}
+  title="Ohio school funding"
+  description={`What Ohio pays each of its ${s.districts} school districts, what the formula says it should, and what a different decision would do. Generated from the state's own model and a corpus of the statute, litigation and definitions behind it.`}
+  image={routes.og.default()}
   imageAlt="Ohio school funding: what the state pays across all 609 districts, and how much of it is guarantee money"
-  section="statewide"
 >
   <h1>Ohio school funding</h1>
   <p class="sub">
-    What the Fair School Funding Plan computes for a district, what it actually receives, and what
-    a different decision would do. The FY{bundle.fiscal_year} figures are the Department of
-    Education and Workforce's own model, shown as it publishes them; what a different decision
-    would produce is computed here, and checked before it is shown.
+    What Ohio pays each of its {count(s.districts)} school districts, what the formula says it
+    should, and what a different decision would do. The state pays{" "}
+    {millions(s.realized_aid_total).replace("+", "")} in foundation aid in FY{bundle.fiscal_year},
+    and {s.on_guarantee} districts are funded by the guarantee rather than by the formula —{" "}
+    <a href="/statewide">the statewide view</a> is where that is laid out.
   </p>
-
-  <Fragment set:html={renderStatewideStructure(bundle, tax)} />
-  <Fragment set:html={renderNational(bundle.national)} />
-
-  <BasisToggle id="statewide-basis" section="finances" base={base}>
-    <Fragment slot="nominal" set:html={renderStatewideFinances(bundle, "nominal")} />
-    <Fragment slot="real" set:html={renderStatewideFinances(bundle, "real")} />
-  </BasisToggle>
 
   <div class="card" id="find-a-district" data-part="find-a-district">
     <h2><SectionAnchor id="find-a-district" />Find a district</h2>
     <p class="note">
       All {count(s.districts)} are in the <a href="/districts">district index</a>, which sorts and
-      filters. These are the ones most often asked about.
+      filters. These are the ones most often asked about, and the field in the header searches both
+      the districts and the corpus.
     </p>
     <div class="flags">
       {NOTABLE.map((d) => <a class="flag" href={routes.district(d!.irn)}>{d!.name}</a>)}
@@ -103,5 +100,29 @@ const NOTABLE = ["043802", "043786", "044909", "049056", "044933", "045583"]
       to reproduce to within a dollar across seven billion, or there is no deploy.{" "}
       <a href="/method">How that works</a>.
     </p>
+  </div>
+
+  {/*
+    Read from `nav()`, not written here. A front door and a section bar that can disagree about
+    what the site contains is the navigability defect this page exists to fix, and a hand-written
+    list is exactly how they come to disagree — a section added to one is added to the other only
+    if somebody remembers. `tests/unit/nav.spec.ts` asserts the two carry the same groups.
+  */}
+  <div class="card" id="sections" data-part="sections">
+    <h2><SectionAnchor id="sections" />The five sections</h2>
+    <div class="scroll">
+      <table class="prose">
+        <tbody>
+          {
+            sections.map((group) => (
+              <tr>
+                <th><a href={group.front}>{group.label}</a></th>
+                <td>{group.blurb}</td>
+              </tr>
+            ))
+          }
+        </tbody>
+      </table>
+    </div>
   </div>
 </Base>

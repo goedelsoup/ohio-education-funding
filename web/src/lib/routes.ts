@@ -97,15 +97,28 @@ export const SECTIONS = {
     needsScript: "needs-script",
   },
 
-  /** The statewide view at `/`. */
+  /**
+   * The statewide view at `/statewide`.
+   *
+   * It was the root until the bar grew from three axes to five. Two of these names moved with the
+   * cards to `/` and are listed under `home` — they are the same anchors, so a link into
+   * `#three-questions` from a board packet still lands on the section it named, at a different
+   * address.
+   */
   statewide: {
     finances: "finances",
     guarantee: "guarantee",
     wealthOffset: "wealth-offset",
     twoFloors: "two-floors",
     national: "national",
+  },
+
+  /** The front door at `/`, which is orientation rather than a view of anything. */
+  home: {
     findADistrict: "find-a-district",
     threeQuestions: "three-questions",
+    /** The five groups in the bar, read from `nav.ts` so the two cannot disagree. */
+    sections: "sections",
   },
 
   /** `/history` — the Census panel, and the appropriation acts beside it. */

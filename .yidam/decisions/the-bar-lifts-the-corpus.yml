@@ -1,0 +1,119 @@
+id: the-bar-lifts-the-corpus
+summary: >-
+  The corpus was reachable only as `Reference › Wiki`, and statute was three clicks and a scan of
+  eighteen class names below that. The bar is five axes now, two of them lifted out of
+  `.yidam/corpus/` — and which acts the Law menu names is derived from edges rather than chosen,
+  so it re-points itself when the corpus moves.
+context: |
+  The bar had five entries and three of them were about money: `Statewide`, `Places`, `Findings`,
+  `Scenario`, `Reference`. That was an accurate description of the site for as long as the site
+  was a funding calculator with notes attached.
+
+  It stopped being accurate some time ago. `.yidam/corpus/` holds 117 nodes across eighteen
+  classes — sixteen acts from an 1851 constitutional duty to the FY2026-27 budget, six cases,
+  five funding regimes, sixteen formula components, the parameters a budget sets when it computes
+  them. That is a substantial reference work about how Ohio arranges school money, and the only
+  way into it was a menu item called `Wiki`, under a heading called `Reference`, which is the
+  place a reader looks last and the word that says "this is the appendix".
+
+  Three specific failures followed from it.
+
+  **Statute was three clicks deep.** `Reference` → `Wiki` → read down a list of eighteen class
+  names → `Legislation`. Nothing in the bar said Ohio's school funding statute was on this site.
+
+  **Every wiki page reported itself as `Reference`.** A reader who arrived at H.B. 110 from a
+  search — which is how most readers arrive anywhere — was told by the bar that they were in the
+  appendix of a site whose main body they had not seen.
+
+  **The root was a dense financial panel.** `/` was the statewide view: foundation aid totals,
+  the guarantee share, wealth neutrality, four cards of figures. A reader landing there had been
+  handed an answer before they asked anything, and the answer was about the one axis they were
+  most likely to find on their own. The axes that were not about money had nowhere to be
+  introduced, because the front door was already a view of something.
+decision: |
+  **Five axes, two of them lifted from the corpus, and a front door that is not a view.**
+
+      Places▾    Law▾    Formula▾    Research▾    Reference▾
+
+  `Law` carries legislation, litigation and doctrine; `Formula` carries the funding regimes and
+  the components, parameters and metrics they are built from. `Research` is the old `Findings`
+  with `Scenario` folded into it — and the rename settles a collision that predates this decision,
+  because `findings` is also the name of a prose genre on every corpus node, meaning *what this
+  repository computed* as against `description`, *what Ohio does*. Two meanings, one word, in one
+  interface.
+
+  `Statewide` moves under `Places`, where it belongs: it is the widest place, above all 609
+  districts. `/` becomes a front door — what this is, how to find a district, the three questions
+  the site answers, and the five sections — and it takes **no entry in the bar at all**. The brand
+  mark opens it, which is the convention a reader already has.
+
+  **Which acts the `Law` menu names is derived, not chosen.** Three rules over edges the corpus
+  already carries:
+
+  1. the act establishes a funding regime — H.B. 1, H.B. 153, H.B. 110;
+  2. the act does not appropriate, so it is not a biennial budget — Article VI §2, H.B. 920, and
+     H.B. 583, which corrected the Fair School Funding Plan between budgets;
+  3. it is the most recently signed act that does appropriate — the budget in force.
+
+  Seven of sixteen, and no list anywhere. `web/src/lib/nav.ts` computes the whole bar;
+  `web/src/layouts/Base.astro` renders what it is given and decides nothing.
+
+  **A menu of seven chosen out of sixteen is an editorial judgement, and a typed list does not
+  record it.** The judgement would live in whoever typed the list, the corpus would never learn
+  it, and the list would be wrong the day an act was added — silently, because a stale menu
+  renders and resolves exactly like a current one. Rule 3 is the clearest case: when H.B. 96 is
+  succeeded, the menu re-points itself with no edit anywhere.
+
+  **The homepage reads its section list from the same module.** A bar and a front door that can
+  disagree about what the site contains is the navigability defect this work exists to fix, and a
+  hand-written list on the homepage is precisely how they come to disagree.
+
+  **Nothing derived ships without a check that can fail.** Two thirds of the bar now comes out of
+  `.yidam/corpus/`, so a node renamed there writes a dead link into the header of all 3,486 pages
+  and nothing else would notice. `tests/unit/nav.spec.ts` asserts the rules select what they claim
+  and that every corpus link lands on something that exists; the end-to-end suite opens all thirty
+  hrefs. Every one of those checks was verified by introducing the defect it guards and watching
+  it fail — twelve of them, of which one passed the first time and had to be rewritten.
+consequences: |
+  **Nothing in the bar is one click away any more.** `Statewide` and `Scenario` were plain links
+  and are now inside menus; all five entries are disclosures. This is a real loss and it is paid
+  for two things — the bar holds five axes rather than three, and a bar that mixes links with
+  disclosures teaches a reader nothing about which is which until they have clicked both. The
+  search field beside it is the one-click path, and it is the path most readers want.
+
+  **`/` moved to `/statewide`, and no redirect is possible.** The build is static with
+  `build.format: "file"`. An old bookmark of `/` lands on the front door, which is the right
+  destination; nothing ever had `/statewide` to break. Two section anchors moved with their cards
+  from `statewide` to a new `home` family in `routes.ts` — the anchors are unchanged, so a link
+  into `#three-questions` from a board packet still finds the section it named.
+
+  **No case is named in the menu, and DeRolph is the most recognisable thing here.** The corpus
+  holds no short name for a case: labels are full citations, and
+  `Cincinnati City School District Board of Education v. Walter (1979)` is sixty-two characters.
+  The obvious derivation — the parenthetical — reads `DeRolph I (1997)` correctly and then reads
+  **`Franklin County (2025)`** off `EdChoice Constitutional Challenge (Franklin County, 2025)`, a
+  venue offered as the name of a case, in the bar, on every page. `Litigation` is one link with
+  its count until the corpus can say better. [open — a short name on `litigation.ont.yml` and its
+  six nodes would fix it, and would also serve a statute timeline and a case's own breadcrumb.]
+
+  **The `Law` panel is the one at risk of outgrowing its viewport.** A `<details>` has no scroll
+  of its own, so a run past roughly a dozen items leaves its tail below the fold under a sticky
+  header. It is ten today and every act added to the corpus is a candidate; a unit check fails at
+  thirteen rather than letting it happen quietly.
+alternatives: |
+  **One tab per class — `Legislation`, `Litigation`, `Formula`.** Closest to how the redesign was
+  first described, and it makes the pattern generalise: a lifted class is a tab, its instances are
+  the panel. Rejected on width. Seven top-level entries plus a search field is near the point the
+  bar's own history says it wrapped to a second row, and `Legislation` and `Litigation` are the
+  two entries a reader is least likely to distinguish at a glance — DeRolph is *about* the
+  statutes.
+
+  **Legislation only, to prove the pattern before committing.** Cheap and safe, and it would have
+  left `Formula` — sixteen components and the parameters a budget sets, the machinery every figure
+  on the site comes out of — exactly where it was.
+
+  **A landmark list on the legislation nodes themselves.** A `landmark: true` property would be
+  corpus-side and reviewable, which is the right instinct. It is still a judgement recorded as an
+  assertion rather than derived from what the acts do, and the three rules turned out to select
+  the same seven acts a hand-made list would have — with the difference that they explain why each
+  one is there, and keep selecting after the next budget.

@@ -1,0 +1,63 @@
+---
+/**
+ * The statewide summary.
+ *
+ * It was the root for as long as the site's front door and its widest view were the same page.
+ * They stopped being the same page when the bar grew from three axes to five: a reader arriving
+ * at a root that is already a dense financial panel has been given an answer before they have
+ * asked anything, and the four axes that are not about money had nowhere to be introduced. So the
+ * root is a homepage now and this is a place — the widest one, above all 609 districts, which is
+ * why it sits at the head of `Places` rather than anywhere else.
+ *
+ * What it answers is unchanged: who is on the guarantee, whether state aid offsets property
+ * wealth, and what the two floors do.
+ */
+import BasisToggle from "../components/BasisToggle.astro";
+import Base from "../layouts/Base.astro";
+import { loadFeed } from "../lib/feed.ts";
+import { count, millions } from "../lib/format.ts";
+import { baseYear } from "../lib/real.ts";
+import * as routes from "../lib/routes.ts";
+import {
+  renderNational,
+  renderStatewideFinances,
+  renderStatewideStructure,
+} from "../lib/statewide.ts";
+
+const { bundle, tax } = loadFeed();
+const s = bundle.statewide;
+// The years this page actually restates — the statewide financial panel, not everything the
+// index reaches. The deflator now covers the historical route's FY2009 onward as well.
+const base = bundle.deflator
+  ? baseYear(
+      bundle.deflator,
+      s.finances.map((y) => y.fiscal_year),
+    )
+  : null;
+
+---
+
+<Base
+  title="Statewide"
+  description={`Ohio pays ${millions(s.realized_aid_total).replace("+", "")} in state foundation aid across ${s.districts} districts in FY${bundle.fiscal_year}. ${s.on_guarantee} of them are funded by the guarantee rather than the formula.`}
+  image={routes.og.page("statewide")}
+  imageAlt="Ohio school funding: what the state pays across all 609 districts, and how much of it is guarantee money"
+  section="statewide"
+>
+  <h1>Statewide</h1>
+  <p class="sub">
+    All {count(s.districts)} districts at once: what the Fair School Funding Plan computes for them
+    and what they actually receive, how much of the total is guarantee money rather than formula
+    money, and where Ohio sits against the rest of the country. The FY{bundle.fiscal_year} figures
+    are the Department of Education and Workforce's own model, shown as it publishes them.
+  </p>
+
+  <Fragment set:html={renderStatewideStructure(bundle, tax)} />
+  <Fragment set:html={renderNational(bundle.national)} />
+
+  <BasisToggle id="statewide-basis" section="finances" base={base}>
+    <Fragment slot="nominal" set:html={renderStatewideFinances(bundle, "nominal")} />
+    <Fragment slot="real" set:html={renderStatewideFinances(bundle, "real")} />
+  </BasisToggle>
+
+</Base>

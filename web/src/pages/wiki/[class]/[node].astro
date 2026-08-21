@@ -12,6 +12,7 @@
  */
 import Base from "../../../layouts/Base.astro";
 import { loadCorpus } from "../../../lib/corpus.ts";
+import { sectionForClass } from "../../../lib/nav.ts";
 import { loadFeed } from "../../../lib/feed.ts";
 import { money } from "../../../lib/format.ts";
 import { renderProse, renderPropertyValue } from "../../../lib/prose.ts";
@@ -91,7 +92,7 @@ const properties = node.properties.filter((p) => p.name !== "seeded_because");
   description={node.summary}
   image={routes.og.wikiNode(node.className, node.name)}
   imageAlt={`${node.label}, a node in the Ohio school funding corpus`}
-  section="wiki"
+  section={sectionForClass(node.className)}
 >
   <p class="crumb">
     <a href="/wiki">The corpus</a> ›{" "}
