@@ -64,7 +64,8 @@ pub struct CapacityInputs {
     /// two are correlated, not because it is the term — Columbus's federal median is $46,395
     /// against an Ohio median of $31,555, and substituting one for the other leaves the whole
     /// blend about 4% light. Fed the real figure, this crate reproduces the department's own
-    /// capacity for all 609 districts exactly.
+    /// capacity for all 609 districts exactly — worst residual 6.364e-6, pinned by
+/// `tests/against_the_departments_own_capacity.rs`.
     pub federal_median_income: Dollars,
     /// Number of tax returns filed in the district for the income reference year.
     pub tax_returns: f64,
