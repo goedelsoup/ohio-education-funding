@@ -118,19 +118,18 @@ Fields: count per claim tag across every node; then the unresolved marks by the 
 -->
 | Tag | Count | What it records |
 |---|--:|---|
-| `[verified]` | 925 | supported by a committed primary source |
-| `[inference]` | 246 | drawn from verified facts, not witnessed |
-| `[open]` | 200 | a live question — unknown, contested, or being worked |
+| `[verified]` | 932 | supported by a committed primary source |
+| `[inference]` | 248 | drawn from verified facts, not witnessed |
+| `[open]` | 195 | a live question — unknown, contested, or being worked |
 | `[unentered]` | 38 | a knowable value nobody has typed in yet |
 
-238 unresolved marks in total, 200 of them live questions and 38 of them empty fields. Before the two were distinguished the corpus reported the sum as its count of what it does not know, which overstated it by 15%.
+233 unresolved marks in total, 195 of them live questions and 38 of them empty fields. Before the two were distinguished the corpus reported the sum as its count of what it does not know, which overstated it by 16%.
 
 | Field | `[open]` | `[unentered]` |
 |---|--:|--:|
 | `description` | 54 | 3 |
 | `findings` | 53 | 1 |
 | `series` | 12 | 0 |
-| `vetoes` | 7 | 1 |
 | `established` | 0 | 7 |
 | `typology` | 1 | 5 |
 | `statutory_basis` | 6 | 0 |
@@ -140,6 +139,7 @@ Fields: count per claim tag across every node; then the unresolved marks by the 
 | `amount` | 5 | 0 |
 | `series_path` | 0 | 4 |
 | `eligibility` | 4 | 0 |
+| `vetoes` | 2 | 1 |
 | `sponsors` | 1 | 2 |
 | `revisions` | 3 | 0 |
 | `restriction` | 3 | 0 |
@@ -239,21 +239,21 @@ Sorted by: kind, then alphabetically.
 | [`academic-distress-commission`](intervention/academic-distress-commission.yml) | intervention | Academic Distress Commission | 6 | 4 |
 | [`lea-level-action`](intervention/lea-level-action.yml) | intervention | Additional Optional Action (LEA level) | 4 | 2 |
 | [`more-rigorous-interventions`](intervention/more-rigorous-interventions.yml) | intervention | More Rigorous Interventions (CSI) | 5 | 2 |
-| [`hb-1-2009`](legislation/hb-1-2009.yml) | legislation | Am. Sub. H.B. 1 (2009) — FY2010-11 Budget; Evidence-Based Model | 2 | 4 |
-| [`hb-110-2021`](legislation/hb-110-2021.yml) | legislation | Am. Sub. H.B. 110 (2021) — FY2022-23 Budget; Fair School Funding Plan | 5 | 9 |
-| [`hb-119-2007`](legislation/hb-119-2007.yml) | legislation | Am. Sub. H.B. 119 (2007) — FY2008-09 Budget; Two Protections Removed | 6 | 1 |
+| [`hb-1-2009`](legislation/hb-1-2009.yml) | legislation | Am. Sub. H.B. 1 (2009) — FY2010-11 Budget; Evidence-Based Model | 3 | 6 |
+| [`hb-110-2021`](legislation/hb-110-2021.yml) | legislation | Am. Sub. H.B. 110 (2021) — FY2022-23 Budget; Fair School Funding Plan | 6 | 9 |
+| [`hb-119-2007`](legislation/hb-119-2007.yml) | legislation | Am. Sub. H.B. 119 (2007) — FY2008-09 Budget; Two Protections Removed | 6 | 2 |
 | [`hb-153-2011`](legislation/hb-153-2011.yml) | legislation | Am. Sub. H.B. 153 (2011) — FY2012-13 Budget; Bridge Formula | 6 | 4 |
 | [`hb-166-2019`](legislation/hb-166-2019.yml) | legislation | Am. Sub. H.B. 166 (2019) — FY2020-21 Budget; the Year There Was No Formula | 4 | 3 |
-| [`hb-33-2023`](legislation/hb-33-2023.yml) | legislation | Am. Sub. H.B. 33 (2023) — FY2024-25 Budget | 8 | 12 |
+| [`hb-33-2023`](legislation/hb-33-2023.yml) | legislation | Am. Sub. H.B. 33 (2023) — FY2024-25 Budget | 8 | 13 |
 | [`hb-49-2017`](legislation/hb-49-2017.yml) | legislation | Am. Sub. H.B. 49 (2017) — FY2018-19 Budget; the Guarantee Made Conditional | 4 | 3 |
 | [`hb-583-2022`](legislation/hb-583-2022.yml) | legislation | Sub. H.B. 583 (2022) — corrective and technical changes to the Fair School Funding Plan | 5 | 1 |
 | [`hb-59-2013`](legislation/hb-59-2013.yml) | legislation | Am. Sub. H.B. 59 (2013) — FY2014-15 Budget; a Formula Over the Bridge | 4 | 2 |
 | [`hb-64-2015`](legislation/hb-64-2015.yml) | legislation | Am. Sub. H.B. 64 (2015) — FY2016-17 Budget; Capacity Aid | 6 | 3 |
-| [`hb-66-2005`](legislation/hb-66-2005.yml) | legislation | Am. Sub. H.B. 66 (2005) — FY2006-07 Budget; Tangible Personal Property Tax Phase-Out | 2 | 5 |
-| [`hb-920-1976`](legislation/hb-920-1976.yml) | legislation | Am. Sub. H.B. 920 (1976) — Tax Reduction Factors | 4 | 12 |
+| [`hb-66-2005`](legislation/hb-66-2005.yml) | legislation | Am. Sub. H.B. 66 (2005) — FY2006-07 Budget; Tangible Personal Property Tax Phase-Out | 3 | 6 |
+| [`hb-920-1976`](legislation/hb-920-1976.yml) | legislation | Am. Sub. H.B. 920 (1976) — Tax Reduction Factors | 5 | 13 |
 | [`hb-94-2001`](legislation/hb-94-2001.yml) | legislation | Am. Sub. H.B. 94 (2001) — FY2002-03 Budget; the post-DeRolph II formula | 9 | 3 |
 | [`hb-95-2003`](legislation/hb-95-2003.yml) | legislation | Am. Sub. H.B. 95 (2003) — FY2004-05 Budget; the First After DeRolph | 3 | 1 |
-| [`hb-96-2025`](legislation/hb-96-2025.yml) | legislation | Am. Sub. H.B. 96 (2025) — FY2026-27 Budget | 6 | 10 |
+| [`hb-96-2025`](legislation/hb-96-2025.yml) | legislation | Am. Sub. H.B. 96 (2025) — FY2026-27 Budget | 8 | 10 |
 | [`ohio-constitution-article-vi-section-2`](legislation/ohio-constitution-article-vi-section-2.yml) | legislation | Ohio Constitution, Article VI, Section 2 (1851) | 2 | 5 |
 | [`cincinnati-v-walter-1979`](litigation/cincinnati-v-walter-1979.yml) | litigation | Cincinnati City School District Board of Education v. Walter (1979) | 5 | 4 |
 | [`derolph-i-1997`](litigation/derolph-i-1997.yml) | litigation | DeRolph v. State (DeRolph I, 1997) | 6 | 14 |
@@ -291,7 +291,7 @@ Sorted by: kind, then alphabetically.
 | [`lottery-profits`](revenue-stream/lottery-profits.yml) | revenue-stream | Lottery Profits Education Fund | 4 | 1 |
 | [`state-foundation-aid`](revenue-stream/state-foundation-aid.yml) | revenue-stream | State Foundation Aid | 5 | 16 |
 | [`title-i`](revenue-stream/title-i.yml) | revenue-stream | Title I, Part A | 4 | 5 |
-| [`tpp-replacement-payments`](revenue-stream/tpp-replacement-payments.yml) | revenue-stream | Tangible Personal Property Tax Replacement Payments | 5 | 5 |
+| [`tpp-replacement-payments`](revenue-stream/tpp-replacement-payments.yml) | revenue-stream | Tangible Personal Property Tax Replacement Payments | 6 | 6 |
 | [`fsfp-input-year-refresh`](scenario/fsfp-input-year-refresh.yml) | scenario | FSFP Cost Input Refresh vs. Freeze | 9 | 6 |
 | [`guarantee-phase-out`](scenario/guarantee-phase-out.yml) | scenario | Phasing Out the Temporary Transitional Aid Guarantee | 11 | 3 |
 | [`anton-grdina`](school/anton-grdina.yml) | school | Anton Grdina | 6 | 1 |

@@ -42,7 +42,16 @@ properties:
     funding held near FY2011 levels. Removed the funding guarantee. Began the phase-out of
     tangible personal property tax replacement payments. Signing date to be confirmed against
     the enrolled act. [open]
-  vetoes: Line-item vetoes exercised; education funding effects not yet assessed. [open]
+  vetoes: |
+    One, and it is not a funding provision. [verified — the greenbook]
+
+    The act repealed the requirement that districts, community schools, STEM schools and chartered
+    nonpublic schools conduct body mass index and weight status screenings for pupils in certain
+    grades. **The Governor vetoed the repeal**, so the screening requirement survived.
+
+    Worth recording precisely because of what it is not. This is the act that repealed the
+    Evidence-Based Model and installed the Bridge formula, and none of that was vetoed: the largest
+    structural change in the class passed entire.
 links:
   - target: ../legislation.ont.yml
     relationship: instance-of
