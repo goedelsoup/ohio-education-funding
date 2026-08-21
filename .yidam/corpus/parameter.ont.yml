@@ -45,11 +45,15 @@ properties:
     type: text
     description: What moves when this parameter moves, and which agencies feel it most
 # `edges:` below names the relationships this class is *defined by* — the ones a reader needs to
-# understand what it connects to. It is not the permitted set. Measured across the corpus, 46 of
-# the 90 relationships in use are undeclared, and almost all of them are single-use precise verbs
+# understand what it connects to. It is not the permitted set. A large share of the corpus's edges
+# use a relationship no class declares, and almost all of those are single-use precise verbs
 # (`recovered-funds-from`, `retreats-from`, `reframes`) that say something a generic edge would
-# lose. Closing the vocabulary would either reject a third of the graph's edges or bloat every
-# ontology with declarations that each describe one link.
+# lose. Closing the vocabulary would either reject those edges or bloat every ontology with
+# declarations that each describe one link.
+#
+# The counts are measured — see "relationship vocabulary" in `.yidam/corpus/README.md`. They are
+# not repeated here, because they were: this comment carried three hand-written figures, fifteen
+# ontologies carried the same copy, and every figure was stale before anybody re-measured.
 #
 # Set this to `exhaustive` on a class whose vocabulary is deliberately closed, and the validator
 # will reject anything undeclared on it instead of reporting it.

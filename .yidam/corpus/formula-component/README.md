@@ -30,6 +30,7 @@ See the class definition: [formula-component.ont.yml](../formula-component.ont.y
 | [fsfp-performance-supplement](fsfp-performance-supplement.yml) | Fair School Funding Plan | The only payment gated on a measured outcome |
 | [fsfp-enrolment-supplements](fsfp-enrolment-supplements.yml) | Fair School Funding Plan | $40 for every pupil, and $250 for a district that grew 3% |
 | [fsfp-formula-transition-supplement](fsfp-formula-transition-supplement.yml) | Fair School Funding Plan | A second hold-harmless, on a FY2021 base that includes transportation |
+| [guarantee-open-enrolment-clawback](guarantee-open-enrolment-clawback.yml) | Fair School Funding Plan | A reduction *inside* the guarantee, charged at statewide base cost per pupil shed |
 
 **The six categoricals are one class of node and four kinds of mechanism.** They were a single
 residual for eight phases — core foundation funding less the state share of base cost, exact and

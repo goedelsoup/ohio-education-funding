@@ -191,11 +191,15 @@ export const OntologyEdgeSchema = z
 /**
  * Whether a class's declared `edges:` are the permitted set or an illustrative one.
  *
- * The corpus behaves as though they are illustrative and always has: 46 of the 90 relationships in
- * use are undeclared, almost all of them single-use precise verbs — `recovered-funds-from`,
+ * The corpus behaves as though they are illustrative and always has: about half its edges use an
+ * undeclared relationship, almost all of them single-use precise verbs — `recovered-funds-from`,
  * `retreats-from`, `reframes` — that say something a generic edge would lose. That was previously
  * unstated, so a validator had no way to tell a deliberate coinage from a typo and every one of
  * them produced a warning.
+ *
+ * The exact counts are generated into `.yidam/corpus/README.md` under "relationship vocabulary".
+ * The figures that stood here were hand-written, shared with fifteen ontology files, and stale in
+ * all seventeen copies before anyone re-measured them.
  *
  * Stating it turns the check into something useful in both directions. `characteristic` means the
  * list documents what the class is defined by, and an undeclared relationship is fine.
