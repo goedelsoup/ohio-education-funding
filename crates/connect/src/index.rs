@@ -961,27 +961,23 @@ fn index_status(root: &Path) -> String {
 
 fn bundle_status(root: &Path) -> String {
     let feed = read(root, "web/public/data/bundle.json");
-    let version = feed
-        .lines()
-        .find_map(|line| line.trim().strip_prefix("\"contract_version\": "))
-        .map(|value| value.trim_matches(|c| c == '"' || c == ',').to_string())
-        .unwrap_or_else(|| "unknown".into());
-    // Counted by a field only a full district record carries. `"irn": ` was the discriminator
-    // until the feed gained House districts, whose member rows carry an IRN too: the count went
-    // from 609 to 1,694 without anything else changing. A key that is unique today is a
-    // discriminator only until the next block is added, and "count the occurrences of a common
-    // field name" has now failed here twice for the same reason.
+    // Asked of the model rather than counted in its output.
     //
-    // `"adm_history": ` is a district's three-year enrolment series. It is a poor thing to search
-    // for and a good thing to count: nothing else in the feed has one, and if something ever does
-    // it will be another per-district block rather than a nested row.
-    let districts = feed.matches("\"adm_history\": ").count();
-    // Each kind is counted by a field only that kind carries, rather than by subtracting one
-    // count from another. `label` was the discriminator once and stopped being unique the moment
-    // the deflator acquired one — a subtraction is only as stable as every other user of the
-    // field it subtracts from.
-    let checkpoints = feed.matches("\"cost\": ").count();
-    let forecasts = feed.matches("\"low\": ").count();
+    // These three were `feed.matches("...").count()` — a field name chosen to be unique to the
+    // block being counted. That approach failed twice. `"irn": ` stopped discriminating when
+    // House districts arrived carrying an IRN of their own, and the district count went from 609
+    // to 1,694 with nothing else changed; `label` stopped when the deflator acquired one. A key
+    // that is unique today is a discriminator only until the next block is added, and neither
+    // failure could announce itself — a wrong count renders as a number, not as an error.
+    //
+    // `bundle::build()` cannot drift from the feed, because the feed is what it prints. The
+    // check task diffs a fresh build against the committed file before this runs, so reporting
+    // from the model and reporting on the artifact are the same statement.
+    let built = bundle::build::build();
+    let version = built.contract_version.clone();
+    let districts = built.districts.len();
+    let checkpoints = built.checkpoints.len();
+    let forecasts = built.projection.as_ref().map_or(0, |p| p.checkpoints.len());
     format!(
         "| Field | Value |\n|---|---|\n\
          | Contract version | `{version}` |\n\
@@ -1147,11 +1143,16 @@ mod tests {
     }
 
     #[test]
-    fn the_bundle_status_reads_the_feed_rather_than_describing_it() {
+    fn the_bundle_status_derives_its_figures_rather_than_remembering_them() {
         let status = bundle_status(&repository_root());
-        // Against the version *in the feed*, which is the property the name claims: the block
-        // reports what it read rather than what someone typed. A literal here turns every contract
-        // bump into an unrelated failure and teaches whoever hits it to edit the assertion.
+        // Checked against the version *in the feed*, not a literal: a literal turns every
+        // contract bump into an unrelated failure and teaches whoever hits it to edit the
+        // assertion.
+        //
+        // This now compares two independently derived things — the block reports the model's
+        // `contract_version`, and this reads the committed artifact's. They agree only if the
+        // feed is current, which is worth asserting and was not assertable while the block
+        // echoed the string it had itself just read out of that file.
         let feed = read(&repository_root(), "web/public/data/bundle.json");
         let declared = feed
             .split("\"contract_version\": \"")
