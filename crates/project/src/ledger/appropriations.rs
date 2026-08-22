@@ -58,10 +58,10 @@ use deflator::{Confidence, CpiSeries};
 use edfund_core::FiscalYear;
 
 /// The committed series.
-const SERIES: &str = include_str!("../fixtures/appropriation-lines.csv");
+const SERIES: &str = include_str!("../../fixtures/appropriation-lines.csv");
 
 /// The Catalog extract, which reaches back further.
-const CATALOG: &str = include_str!("../fixtures/catalog-line-items.csv");
+const CATALOG: &str = include_str!("../../fixtures/catalog-line-items.csv");
 
 /// Line items that are numbered as the department's and are not part of its budget.
 ///

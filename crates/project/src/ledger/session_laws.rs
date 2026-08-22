@@ -1,6 +1,6 @@
 //! What the General Assembly appropriated to the schools before FY2002, read off the acts.
 //!
-//! # Why this is a separate module from [`crate::appropriations`]
+//! # Why this is a separate module from [`super::appropriations`]
 //!
 //! Different publisher and a different kind of document. Everything in the main series is the
 //! Legislative Service Commission describing what an act did; this is the act. They are kept apart
@@ -44,7 +44,7 @@
 
 use std::collections::{BTreeMap, BTreeSet};
 
-const FIXTURE: &str = include_str!("../fixtures/session-law-lines.csv");
+const FIXTURE: &str = include_str!("../../fixtures/session-law-lines.csv");
 
 const EXPECTED_HEADER: &str =
     "general_assembly,bill,fiscal_year,fund_group,fund,line_item,title,amount";
@@ -64,7 +64,7 @@ mod column {
 /// The first fiscal year any act in this repository appropriates.
 pub const FIRST_YEAR: u16 = 1998;
 
-/// The last, after which [`crate::appropriations`] answers.
+/// The last, after which [`super::appropriations`] answers.
 pub const LAST_YEAR: u16 = 2001;
 
 /// The line item that stands in for a whole year's itemisation.
@@ -193,14 +193,14 @@ pub fn lines() -> Vec<Appropriation> {
 
 /// The appropriation to the department in one year, net of the tax reimbursement lines.
 ///
-/// Net on the same rule [`crate::appropriations`] uses, so the two series are comparable at the
+/// Net on the same rule [`super::appropriations`] uses, so the two series are comparable at the
 /// seam. The rule is keyed on the year as well as the number — see
-/// [`crate::appropriations::is_tax_reimbursement`], which this era is the reason for.
+/// [`super::appropriations::is_tax_reimbursement`], which this era is the reason for.
 #[must_use]
 pub fn department_total() -> BTreeMap<u16, f64> {
     let mut out: BTreeMap<u16, f64> = BTreeMap::new();
     for line in operative_lines() {
-        if crate::appropriations::is_tax_reimbursement(&line.line_item, line.fiscal_year) {
+        if super::appropriations::is_tax_reimbursement(&line.line_item, line.fiscal_year) {
             continue;
         }
         *out.entry(line.fiscal_year).or_default() += line.amount;
@@ -235,6 +235,7 @@ pub fn line_history(line_item: &str) -> BTreeMap<u16, f64> {
 #[cfg(test)]
 mod tests {
     use super::*;
+    use crate::ledger::appropriations;
 
     #[test]
     fn the_acts_cover_four_fiscal_years_and_stop() {
@@ -246,7 +247,7 @@ mod tests {
     #[test]
     fn the_series_joins_the_one_that_begins_at_fy2002() {
         let acts = department_total();
-        let main = crate::appropriations::enacted_history(edfund_core::FiscalYear(2025));
+        let main = appropriations::enacted_history(edfund_core::FiscalYear(2025));
         let fy2002 = main
             .iter()
             .find(|y| y.fiscal_year == 2002)
@@ -335,7 +336,7 @@ mod tests {
             .filter(|l| {
                 l.bill == "hb215"
                     && l.fiscal_year == 1999
-                    && !crate::appropriations::is_tax_reimbursement(&l.line_item, 1999)
+                    && !appropriations::is_tax_reimbursement(&l.line_item, 1999)
             })
             .map(|l| l.amount)
             .sum();
@@ -399,7 +400,7 @@ mod tests {
     /// the act appropriated nothing to spent three billion.
     #[test]
     fn the_lump_never_appears_in_what_was_actually_spent() {
-        let actuals: Vec<crate::appropriations::Line> = crate::appropriations::lines()
+        let actuals: Vec<appropriations::Line> = appropriations::lines()
             .into_iter()
             .filter(|l| l.fiscal_year == 1999 && l.kind == "actual")
             .collect();

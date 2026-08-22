@@ -2,7 +2,7 @@
 //!
 //! # What this adds to the appropriation series
 //!
-//! [`crate::appropriations`] answers how much a line was given. This answers how old it is, and
+//! [`super::appropriations`] answers how much a line was given. This answers how old it is, and
 //! the two together say something neither says alone: the department's budget is not designed, it
 //! is accreted. The lines in force were created by acts spanning roughly half a century, most of
 //! them by legislatures that could not have known what the others would add.
@@ -30,7 +30,7 @@
 use std::collections::BTreeMap;
 
 /// The committed extract: one row per line item per edition.
-const BASIS: &str = include_str!("../fixtures/catalog-line-item-basis.tsv");
+const BASIS: &str = include_str!("../../fixtures/catalog-line-item-basis.tsv");
 
 /// The header [`current`] indexes against, promoted out of the reader that used to hold it
 /// inline — the only one of these that named its columns nowhere a caller could see.
