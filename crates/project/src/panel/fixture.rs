@@ -4,6 +4,8 @@
 //! arithmetic in [`super::categoricals`] and [`super::supplements`] is about weights and rates,
 //! and if it could reach the column table it could read the wrong one.
 
+use std::sync::OnceLock;
+
 use foundation::DistrictEnrollment;
 
 use crate::panel::categoricals::{
@@ -181,6 +183,12 @@ prek_sped_aid_cat5,prek_sped_aid_cat6,prek_sped_total";
 
 /// Every district in the department's FY2027 model.
 ///
+/// Parsed once per process and cloned thereafter. The fixture is 750 KB, 609 rows of 162 columns,
+/// so a call is ~98,000 `f64::from_str`; a clone is three string allocations a district. Nothing
+/// about the result changes — the input is a compile-time constant, so the second parse could only
+/// ever produce what the first did — but this crate's own suite calls it seventy-odd times and its
+/// dependents' suites more, and that was ~11.6 million float parses to read one committed file.
+///
 /// # Panics
 ///
 /// If the embedded fixture's header is not the one this loader was written against. That is a
@@ -188,6 +196,12 @@ prek_sped_aid_cat5,prek_sped_aid_cat6,prek_sped_total";
 /// wrong numbers into a scenario.
 #[must_use]
 pub fn panel() -> Vec<DistrictRecord> {
+    static PANEL: OnceLock<Vec<DistrictRecord>> = OnceLock::new();
+    PANEL.get_or_init(parse).clone()
+}
+
+/// The fixture, read.
+fn parse() -> Vec<DistrictRecord> {
     edfund_core::csv::rows(FIXTURE, EXPECTED_HEADER)
         .filter_map(|row| {
             let base_cost_adm = row.num(column::BASE_COST_ADM)?;

@@ -35,26 +35,19 @@
 //! divided by 3.5 children. Any claim about fixed costs in small districts that is computed on
 //! the complete panel has silently excluded its most extreme case.
 
-use crate::outcomes::{PROFILE_HEADER, REPORT_CARD_HEADER};
-use crate::panel::EXPECTED_HEADER as FY27_MODEL_HEADER;
-use std::collections::BTreeSet;
+use crate::outcomes::{PROFILE, PROFILE_HEADER, REPORT_CARD, REPORT_CARD_HEADER};
+use crate::panel::panel;
+use std::collections::{BTreeMap, BTreeSet};
 
-/// The department's FY2027 funding model.
-const FY27_MODEL: &str = include_str!("../../foundation/fixtures/fy27-department-model.csv");
-/// The FY2024 District Profile Report.
-const PROFILE: &str = include_str!("../../dispersion/fixtures/cupp-fy24-district-data.csv");
-/// The 2024-25 Ohio School Report Card.
-const REPORT_CARD: &str =
-    include_str!("../../dispersion/fixtures/report-card-2425-district-data.csv");
-
-/// The two columns this module reads.
+/// The one column this module reads, in all three panels.
 ///
-/// It reads only these, in all three panels, because all three identify a district the same
-/// way — IRN first, name second. That agreement is what makes a crosswalk computable at all,
-/// and it is asserted rather than assumed in the tests below.
+/// It can read only this one because all three identify a district the same way — IRN first,
+/// name second — and that agreement is what makes a crosswalk computable at all. The name comes
+/// from [`panel`] now, so only the key is read here; the tests below still assert both halves of
+/// the agreement, because it is the second half that makes taking the name from one panel and
+/// the keys from three a sound thing to do.
 mod column {
     pub const IRN: usize = 0;
-    pub const NAME: usize = 1;
 }
 
 /// A district that is missing from at least one panel, with what is known about why.
@@ -156,32 +149,31 @@ fn keys(csv: &str, header: &str) -> BTreeSet<String> {
 /// The funding model is the spine: it is the only panel that covers every district Ohio funds,
 /// and a district absent from it would be a district the state does not pay, which none of
 /// these files contains.
+///
+/// It is taken from [`panel`] rather than re-read here, which is not only a saved parse. This
+/// module used to embed the model a second time and derive its own IRN set and name map from it,
+/// so "the funding model" meant one thing in [`mod@crate::panel`] and a separately-computed thing
+/// here, and the two agreed by coincidence rather than by construction — [`panel`] drops a row
+/// with no base cost ADM and this did not.
 #[must_use]
 pub fn coverage() -> Vec<Coverage> {
-    let model = keys(FY27_MODEL, FY27_MODEL_HEADER);
+    let model = panel();
+    let names: BTreeMap<&str, &str> = model
+        .iter()
+        .map(|record| (record.irn.as_str(), record.name.as_str()))
+        .collect();
     let profile = keys(PROFILE, PROFILE_HEADER);
     let report_card = keys(REPORT_CARD, REPORT_CARD_HEADER);
 
-    let names: std::collections::BTreeMap<String, String> =
-        edfund_core::csv::rows(FY27_MODEL, FY27_MODEL_HEADER)
-            .map(|row| {
-                (
-                    row.str(column::IRN).to_string(),
-                    row.str(column::NAME).to_string(),
-                )
-            })
-            .collect();
-
-    let mut all: BTreeSet<&String> = BTreeSet::new();
-    all.extend(&model);
-    all.extend(&profile);
-    all.extend(&report_card);
+    let mut all: BTreeSet<&str> = names.keys().copied().collect();
+    all.extend(profile.iter().map(String::as_str));
+    all.extend(report_card.iter().map(String::as_str));
 
     all.into_iter()
         .map(|irn| Coverage {
-            irn: irn.clone(),
-            name: names.get(irn).cloned().unwrap_or_default(),
-            funding_model: model.contains(irn),
+            irn: irn.to_string(),
+            name: (*names.get(irn).unwrap_or(&"")).to_string(),
+            funding_model: names.contains_key(irn),
             profile_report: profile.contains(irn),
             report_card: report_card.contains(irn),
         })
@@ -213,15 +205,18 @@ pub fn counts() -> Counts {
 #[cfg(test)]
 mod tests {
     use super::*;
+    use crate::panel::fixture::EXPECTED_HEADER as FY27_MODEL_HEADER;
 
     /// The invariant that lets one reader serve three files.
     ///
-    /// `keys` takes column zero from each panel and `coverage` takes column one from the
-    /// model. If a panel ever renames or reorders those two, the header assertion catches it
-    /// — but this states the shared shape directly, so the reason the three are readable by
-    /// one function is written down rather than inferred from three long constants.
+    /// `keys` takes column zero from each panel and [`panel`] takes column one from the model.
+    /// If a panel ever renames or reorders those two, the header assertion catches it — but this
+    /// states the shared shape directly, so the reason the three are readable by one function is
+    /// written down rather than inferred from three long constants.
     #[test]
     fn all_three_panels_identify_a_district_the_same_way() {
+        const NAME: usize = 1;
+
         for (panel, header) in [
             ("FY2027 funding model", FY27_MODEL_HEADER),
             ("FY2024 District Profile Report", PROFILE_HEADER),
@@ -234,12 +229,7 @@ mod tests {
                 "{panel} column {}",
                 column::IRN
             );
-            assert_eq!(
-                columns[column::NAME],
-                "district",
-                "{panel} column {}",
-                column::NAME
-            );
+            assert_eq!(columns[NAME], "district", "{panel} column {NAME}");
         }
     }
 

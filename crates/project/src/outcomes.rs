@@ -22,15 +22,24 @@
 //! where it is, in [`mod@crate::panel`]'s sibling fixture, and callers controlling for poverty
 //! should say which one they used.
 
+use std::collections::BTreeMap;
+
 use edfund_core::Dollars;
 
 use crate::panel::{panel, DistrictRecord};
 
 /// The 2024-25 Ohio School Report Card, one row per district.
-const REPORT_CARD: &str =
+///
+/// Shared with [`crate::crosswalk`] for the reason [`REPORT_CARD_HEADER`] is: one `include_str!`
+/// per fixture rather than one per reader. Two copies is two things to keep pointed at the same
+/// file, and the compiler will not say when they stop being.
+pub(crate) const REPORT_CARD: &str =
     include_str!("../../dispersion/fixtures/report-card-2425-district-data.csv");
 /// The FY2024 District Profile Report, for the corpus's primary poverty measure.
-const PROFILE: &str = include_str!("../../dispersion/fixtures/cupp-fy24-district-data.csv");
+///
+/// Shared with [`crate::crosswalk`], same reason.
+pub(crate) const PROFILE: &str =
+    include_str!("../../dispersion/fixtures/cupp-fy24-district-data.csv");
 
 /// What the report card publishes for one district.
 #[derive(Debug, Clone, PartialEq)]
@@ -130,7 +139,7 @@ students_with_disabilities_pct_2425";
 /// The header `profile_column` is written against, asserted for the same reason.
 ///
 /// Both of these are shared with [`crate::crosswalk`], for the reason given on
-/// [`crate::panel::EXPECTED_HEADER`].
+/// [`crate::panel::fixture::EXPECTED_HEADER`].
 pub(crate) const PROFILE_HEADER: &str =
     "irn,district,enrolled_adm_fy24,econ_disadvantaged_pct_fy24,\
 assessed_valuation_per_pupil_fy23,current_operating_millage_ty23,\
@@ -218,8 +227,14 @@ impl Joined {
 /// omits and why are pinned there rather than left to the reader to notice.
 #[must_use]
 pub fn joined() -> Vec<Joined> {
-    let report_cards = report_cards();
-    let poverty: Vec<(&str, Option<f64>)> = edfund_core::csv::rows(PROFILE, PROFILE_HEADER)
+    // Keyed rather than scanned. This was two linear searches per district — 609 records against
+    // 607 report cards and 606 profile rows, ~740,000 string comparisons for a join of 606 — in a
+    // crate that reaches for `BTreeMap` for exactly this shape everywhere else.
+    let report_cards: BTreeMap<String, ReportCard> = report_cards()
+        .into_iter()
+        .map(|card| (card.irn.clone(), card))
+        .collect();
+    let poverty: BTreeMap<&str, Option<f64>> = edfund_core::csv::rows(PROFILE, PROFILE_HEADER)
         .map(|row| {
             (
                 row.str(profile_column::IRN),
@@ -231,14 +246,8 @@ pub fn joined() -> Vec<Joined> {
     panel()
         .into_iter()
         .filter_map(|funding| {
-            let outcome = report_cards
-                .iter()
-                .find(|card| card.irn == funding.irn)?
-                .clone();
-            let economically_disadvantaged = poverty
-                .iter()
-                .find(|(irn, _)| *irn == funding.irn)
-                .and_then(|(_, share)| *share);
+            let outcome = report_cards.get(&funding.irn)?.clone();
+            let economically_disadvantaged = poverty.get(funding.irn.as_str()).copied().flatten();
             // Present in the report card but not the profile report is Put-in-Bay alone, and a
             // joined record with no primary poverty measure cannot be controlled. Excluding it
             // here keeps `joined()` and `crosswalk::complete_panel()` the same set of districts.

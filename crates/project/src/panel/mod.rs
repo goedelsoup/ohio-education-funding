@@ -66,8 +66,6 @@ pub use supplements::{
     TRANSPORT_SCHOOL_DAYS, TRANSPORT_SPED_PRORATION,
 };
 
-pub(crate) use fixture::EXPECTED_HEADER;
-
 use edfund_core::FiscalYear;
 
 /// The fiscal year the model computes.
