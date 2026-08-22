@@ -27,7 +27,7 @@ use project::panel::{
     self, Transportation, TRANSPORT_COMMUNITY_WEIGHT, TRANSPORT_DENSITY_PIVOT,
     TRANSPORT_DENSITY_RATE, TRANSPORT_EFFICIENCY_BAND, TRANSPORT_EFFICIENCY_CEILING,
     TRANSPORT_MASS_TRANSIT_RATE, TRANSPORT_MINIMUM_STATE_SHARE, TRANSPORT_NONPUBLIC_WEIGHT,
-    TRANSPORT_OTHER_RATE, TRANSPORT_PER_RIDER, TRANSPORT_SPED_PRORATION,
+    TRANSPORT_OTHER_RATE, TRANSPORT_PER_RIDER, TRANSPORT_PRORATION, TRANSPORT_SPED_PRORATION,
 };
 
 /// Two cents rather than the one [`common::close`] allows, and the extra cent is measured.
@@ -338,10 +338,21 @@ fn transportation_has_its_own_guarantee_on_a_fy2021_base() {
     );
 }
 
-/// The whole thing reconciles, and the total is prorated.
+/// The whole thing reconciles, and the proration that could reduce it is one.
+///
+/// `before_proration` is named for a factor the FY2027 model does not apply. That is a finding
+/// about the year rather than a property of the formula — the transportation formula is a
+/// component of state foundation aid paid through GRF ALI 200502, and where the appropriation
+/// falls short the department scales the payments — so the factor is recovered from the
+/// department's own columns and checked rather than assumed absent.
+///
+/// It also answers, from the data side, the question [`TRANSPORT_SPED_PRORATION`] answers from
+/// the redbook: the special education entitlement is prorated at 0.9175 and this one is not
+/// prorated at all, so they cannot be the same parameter with one copy gone stale.
 #[test]
 fn the_five_payments_plus_the_guarantee_are_the_published_total() {
     let panel = panel::panel();
+    let mut with_an_entitlement = 0;
     for record in &panel {
         let t = &record.transportation;
         let expected = t.before_proration() + t.guarantee;
@@ -351,7 +362,21 @@ fn the_five_payments_plus_the_guarantee_are_the_published_total() {
             record.name,
             t.total
         );
+        if expected <= 0.0 {
+            continue;
+        }
+        with_an_entitlement += 1;
+        let implied = t.total / expected;
+        assert!(
+            (implied - TRANSPORT_PRORATION).abs() < 1e-6,
+            "{}: the published total implies a proration of {implied:.9}, not {TRANSPORT_PRORATION}",
+            record.name
+        );
     }
+    assert_eq!(
+        with_an_entitlement, 605,
+        "four districts are paid no transportation at all, and they cannot imply a factor"
+    );
     let total: f64 = panel.iter().map(|r| r.transportation.total).sum();
     assert!(
         total > 700e6,

@@ -79,10 +79,7 @@ pub use f33::{
 };
 pub use finance::{build_finance_extract, FINANCE_HEADER};
 pub use format::{clean_name, format_value};
-pub use fy27::{
-    build_fy27_model, build_profile_extract, Fy27Sheets, FY27_HEADER, PROFILE_HEADER,
-    TRANSPORT_PRORATION,
-};
+pub use fy27::{build_fy27_model, build_profile_extract, Fy27Sheets, FY27_HEADER, PROFILE_HEADER};
 pub use grade_bands::{build_grade_bands, GRADE_BANDS_HEADER};
 pub use identified::{build_identified, IDENTIFIED_HEADER};
 pub use mr81::{build_mr81, Mr81Layout, Mr81Report, Stream, MR81_HEADER};

@@ -341,15 +341,6 @@ mod dpia_columns {
     pub const INDEX: usize = 8;
 }
 
-/// The general proration factor, which is one this year and is a dial that has been used.
-///
-/// The last survivor of a block of 57 statutory parameters held here, 56 of which were
-/// byte-identical duplicates of `project::panel` and referenced by nothing. This one is kept
-/// because it has no counterpart there: the nearest name, `TRANSPORT_SPED_PRORATION`, carries
-/// 0.917459740976215, and whether that is the same parameter with a stale value or a different
-/// quantity is a question about the statute rather than about the code. See #70.
-pub const TRANSPORT_PRORATION: f64 = 1.0;
-
 /// Column positions in the `CTE` sheet, whose header is on the fourth row.
 ///
 /// Five weighted categories and an associated-services weight applied to the sum. Mechanically the

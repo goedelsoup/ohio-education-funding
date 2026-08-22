@@ -267,8 +267,36 @@ pub const TRANSPORT_EFFICIENCY_BAND: (f64, f64) = (1.0, 1.5);
 pub const TRANSPORT_DENSITY_PIVOT: f64 = 28.0;
 /// What fraction of the mile base the density supplement pays.
 pub const TRANSPORT_DENSITY_RATE: f64 = 0.55;
-/// What the appropriation could actually cover of the special education entitlement.
+/// What the appropriation could actually cover of the **special education** transportation
+/// entitlement.
+///
+/// Not [`TRANSPORT_PRORATION`], and the two are the answer to a question that was open long
+/// enough to be filed: are these one parameter with a stale copy, or two quantities? Two. The
+/// redbook says so on ALI 200502's own purpose page — *"Transportation for special education
+/// students who cannot be transported by regular school bus is reimbursed **separately through a
+/// formula funded outside state foundation aid**"* — so the regular entitlement and this one are
+/// paid by different mechanisms and prorate independently. The data agrees: this factor
+/// reproduces `trans_special_education` from `trans_reported_sped_cost` to within half a cent for
+/// every district, and the regular total needs no factor at all.
 pub const TRANSPORT_SPED_PRORATION: f64 = 0.917_459_740_976_215;
+
+/// What the appropriation covered of the **regular** transportation entitlement: all of it.
+///
+/// A dial that has been used and is not being used. Payments under the transportation formula are
+/// a component of state foundation aid, funded through GRF ALI 200502, and where the
+/// appropriation falls short the department scales them; in the FY2027 model it did not have to.
+/// The implied factor recovered from the department's own columns —
+/// `total / (before_proration() + guarantee)` — is 1.0 to within 2e-7 across all 605 districts
+/// that have an entitlement, which is float noise rather than a reduction.
+///
+/// Kept as a named constant rather than left implicit because 1.0 is a *finding* about a year and
+/// not a property of the formula, and because the value that makes it interesting is the one it
+/// takes when a biennium underfunds the line.
+///
+/// This is the last of 57 statutory parameters that lived in `connect`, byte-identical to this
+/// module's and linked to it by nothing the compiler could see. The other 56 went in `546d19d`;
+/// this one waited on the question its sibling above now answers.
+pub const TRANSPORT_PRORATION: f64 = 1.0;
 
 impl Transportation {
     /// All riders on type 1 and 2 buses, unweighted.
