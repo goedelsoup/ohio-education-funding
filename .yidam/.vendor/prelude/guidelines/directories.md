@@ -253,6 +253,17 @@ that validates them as you type.
 node on a concept that draws on a source writes `[Pearl 2009](../../catalog/pearl-2009.md)`
 rather than embedding a full citation.
 
+**A citation is a link that resolves to the entry** — either a markdown link in the prose or
+a `links:` target. Naming the slug in a sentence is not one, and the checks now agree with
+that. They used to match the bare slug anywhere in a node's bytes, so a node that merely
+mentioned a source was reported as citing it. Under `catalog-unobtained-but-cited`, which is
+Error severity and gates, that failed a build on a node containing no citation at all.
+
+The collision that surfaced it is not exotic: these conventions recommend naming connectors
+after what they fetch (`nwis`, `echo`, `census`), and a catalog entry for the source those
+connectors fetch from carries the same slug by design. Any node discussing the crate tripped
+the check.
+
 ---
 
 ## `.yidam/corpus/`
@@ -430,10 +441,44 @@ It was not theoretical. Three separate builds displaced the machine-wide binary 
 session that fixed this, one of them with a copy predating the `--format` flag entirely, which
 would have left every JSON report unreadable.
 
-`mise.yidam.toml` puts `.yidam/bin` first on `PATH` for anything mise runs, so the shell and
-the editor resolve the same binary. **If your shell does not run mise, add it yourself** — a
-`yidam` from somewhere else will otherwise answer for this repository. The VS Code extension
-checks `.yidam/bin/yidam` ahead of `PATH` for the same reason.
+**And through invocation, which needs no mis-installation at all.** The paragraph above is
+about where a binary gets *written*. The same hazard arrives from where one gets *found*: a
+`yidam` left in `~/.cargo/bin` by any earlier install — including one predating the `--root`
+convention — shadows `.yidam/bin/yidam` for any process whose `PATH` puts cargo's directory
+first. That is not a mistake anyone made; it is what a shell sourcing a Rust environment does
+by default.
+
+Your `mise.toml` puts `.yidam/bin` first on `PATH` for anything mise runs, so the shell and
+the editor resolve the same binary:
+
+```toml
+[env]
+_.path = [".yidam/bin"]
+```
+
+**In `mise.toml`, not `mise.yidam.toml`.** The inherited layer is a mise *task file*, where
+`[env]` declares a task named `env` and `_.path` is an unknown field — which orphans every
+task in the file. This paragraph asserted the opposite for as long as the declaration sat in
+the file that could not hold it, so the guarantee named here was one nothing delivered.
+
+**If your shell does not run mise, add it yourself** — a `yidam` from somewhere else will
+otherwise answer for this repository. The VS Code extension checks `.yidam/bin/yidam` ahead
+of `PATH` for the same reason.
+
+That guards a human shell. It does not guard a script, a CI step, or an agent that assembles
+`PATH` itself, and those are increasingly what runs these commands. **Wherever you build
+`PATH` by hand, put `.yidam/bin` first** — the ordering is load-bearing, not a convenience.
+
+The failure is quiet in the way that matters. An older binary lacking a subcommand exits with
+`unrecognized subcommand 'regen'`, and inside a script with output redirected — which is how a
+regen step is usually written — that is indistinguishable from success. `regen --check` is a
+real backstop, but it fires on the next full run; between the no-op and that run the
+repository holds a stale generated block and the command that refreshes it reports nothing
+wrong.
+
+So the binary now says so itself. When `.yidam/bin/yidam` exists and is not the executable
+running, every command warns on stderr naming both paths, and an unrecognized subcommand adds
+which binary refused it. Stderr, so a `--format json` consumer reading stdout is unaffected.
 
 ---
 
