@@ -54,4 +54,4 @@ spaces (`FY25 Expanded List.xlsx`), not the underscores cited in White Paper 013
 
 ## Feeds connector
 
-[`dew-report-card`](../../crates/connect/src/registry.rs), source key `spend-per-pupil-2425`.
+[`dew-report-card`](../../crates/connect/src/registry/dew.rs), source key `spend-per-pupil-2425`.

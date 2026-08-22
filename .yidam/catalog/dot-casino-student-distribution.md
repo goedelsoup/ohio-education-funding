@@ -47,7 +47,7 @@ in the key column with the total in the amount column, so a parser that sums the
 filtering to a six-digit IRN reports **exactly twice** the distribution. Ninety million dollars for
 a half-year has nothing obviously wrong about it. The same property is the reason this source can
 be trusted: the sheet states an aggregate beside its parts, so
-[`build_casino_extract`](../../crates/connect/src/fixtures.rs) makes each of the eighteen check
+[`build_casino_extract`](../../crates/connect/src/fixtures/casino.rs) makes each of the eighteen check
 itself rather than trusting a reviewer's sense of scale.
 
 **The amount column is spelled `Distrubution Amount`** in twelve of the sixteen workbooks,

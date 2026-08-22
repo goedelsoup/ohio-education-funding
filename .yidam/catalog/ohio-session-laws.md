@@ -113,7 +113,7 @@ together.
 
 ## Used by
 
-- [`crates/connect/src/fixtures.rs`](../../crates/connect/src/fixtures.rs), `build_session_laws`
+- [`crates/connect/src/fixtures/session_laws.rs`](../../crates/connect/src/fixtures/session_laws.rs), `build_session_laws`
 - `crates/project/fixtures/session-law-lines.csv`, and `project::session_laws` over it
 - The [`fiscal-period`](../corpus/fiscal-period/) nodes for FY1998-FY2001, which had no
   appropriating act named

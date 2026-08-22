@@ -65,4 +65,4 @@ and commits both. [verified — see
 
 ## Feeds connector
 
-[`dew-report-card`](../../crates/connect/src/registry.rs), source key `district-details-2425`.
+[`dew-report-card`](../../crates/connect/src/registry/dew.rs), source key `district-details-2425`.

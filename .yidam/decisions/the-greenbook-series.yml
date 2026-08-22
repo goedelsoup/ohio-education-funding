@@ -184,5 +184,5 @@ alternatives: |
   yields the same token count as a fully populated row with different years, so the error is a
   silently misdated figure rather than a parse failure. Rejected before it was written, on the
   strength of the three conventions in
-  [`conventions.rs`](../../crates/connect/src/conventions.rs), all three of which are this same
+  [`conventions.rs`](../../crates/edfund-core/src/conventions.rs), all three of which are this same
   shape.

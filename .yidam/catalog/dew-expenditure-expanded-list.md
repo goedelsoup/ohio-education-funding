@@ -54,6 +54,6 @@ against the same expenditures divided by the two counts gives −0.015 and −0.
 
 ## Feeds connector
 
-[`dew-report-card`](../../crates/connect/src/registry.rs), source key `expanded-list-fy25`.
+[`dew-report-card`](../../crates/connect/src/registry/dew.rs), source key `expanded-list-fy25`.
 Extracted into
 [`crates/dispersion/fixtures/report-card-2425-district-data.csv`](../../crates/dispersion/fixtures/report-card-2425-district-data.csv).

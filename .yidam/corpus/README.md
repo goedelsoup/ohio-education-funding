@@ -183,7 +183,7 @@ leave the corpus and are not counted.
 -->
 | Measure | Count |
 |---|--:|
-| edges between nodes | 499 |
+| edges between nodes | 503 |
 | distinct relationships in use | 158 |
 | relationships declared across every class | 70 |
 | edges whose relationship its class does not declare | 257 |
@@ -224,10 +224,10 @@ Sorted by: kind, then alphabetically.
 | [`cleveland-municipal`](education-agency/cleveland-municipal.yml) | education-agency | Cleveland Municipal School District | 3 | 7 |
 | [`eastland-fairfield-ctc`](education-agency/eastland-fairfield-ctc.yml) | education-agency | Eastland-Fairfield Career and Technical Schools | 3 | 2 |
 | [`electronic-classroom-of-tomorrow`](education-agency/electronic-classroom-of-tomorrow.yml) | education-agency | Electronic Classroom of Tomorrow (closed) | 2 | 1 |
-| [`northern-local-perry`](education-agency/northern-local-perry.yml) | education-agency | Northern Local School District (Perry County) | 6 | 11 |
+| [`northern-local-perry`](education-agency/northern-local-perry.yml) | education-agency | Northern Local School District (Perry County) | 6 | 13 |
 | [`perrysburg-exempted-village`](education-agency/perrysburg-exempted-village.yml) | education-agency | Perrysburg Exempted Village School District | 4 | 1 |
 | [`toledo-city`](education-agency/toledo-city.yml) | education-agency | Toledo City School District | 3 | 2 |
-| [`upper-arlington-city`](education-agency/upper-arlington-city.yml) | education-agency | Upper Arlington City School District | 3 | 6 |
+| [`upper-arlington-city`](education-agency/upper-arlington-city.yml) | education-agency | Upper Arlington City School District | 3 | 8 |
 | [`fy2002-03`](fiscal-period/fy2002-03.yml) | fiscal-period | FY2002-2003 Biennium | 4 | 2 |
 | [`fy2004-05`](fiscal-period/fy2004-05.yml) | fiscal-period | FY2004-2005 Biennium | 5 | 2 |
 | [`fy2006-07`](fiscal-period/fy2006-07.yml) | fiscal-period | FY2006-2007 Biennium | 5 | 2 |
@@ -292,9 +292,9 @@ Sorted by: kind, then alphabetically.
 | [`vouchers-hurt-ohio-2025`](litigation/vouchers-hurt-ohio-2025.yml) | litigation | EdChoice Constitutional Challenge (Franklin County, 2025) | 4 | 4 |
 | [`assessed-valuation-per-pupil`](metric/assessed-valuation-per-pupil.yml) | metric | Assessed Valuation Per Pupil | 7 | 4 |
 | [`effective-operating-millage`](metric/effective-operating-millage.yml) | metric | Effective Operating Millage | 7 | 1 |
-| [`enrolled-adm`](metric/enrolled-adm.yml) | metric | Enrolled ADM | 6 | 8 |
+| [`enrolled-adm`](metric/enrolled-adm.yml) | metric | Enrolled ADM | 8 | 8 |
 | [`expenditure-per-equivalent-pupil`](metric/expenditure-per-equivalent-pupil.yml) | metric | Expenditure Per Equivalent Pupil | 8 | 6 |
-| [`general-fund-cash-balance`](metric/general-fund-cash-balance.yml) | metric | General Fund Cash Balance | 2 | 3 |
+| [`general-fund-cash-balance`](metric/general-fund-cash-balance.yml) | metric | General Fund Cash Balance | 4 | 3 |
 | [`per-pupil-operating-expenditure`](metric/per-pupil-operating-expenditure.yml) | metric | Per-Pupil Operating Expenditure | 12 | 4 |
 | [`performance-index`](metric/performance-index.yml) | metric | Performance Index | 5 | 12 |
 | [`progress-value-added`](metric/progress-value-added.yml) | metric | Progress (Value-Added) | 5 | 5 |

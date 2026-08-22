@@ -80,16 +80,16 @@ links:
   - relationship: instance-of
     target: ../metric.ont.yml
   - relationship: measures
-    target: education-agency
+    target: ../education-agency/northern-local-perry.yml
     note: |
-      Every traditional district and joint vocational school district that filed. One exception:
+      Named with Upper Arlington as the low- and high-wealth ends of the range. Computed over
+      every traditional district and joint vocational school district that filed. One exception:
       Green Local (IRN 049619) is in the FY2027 funding model and in the FY2023 filing and absent
       from the FY2026 one, so it carries FY2020-FY2022 only. Pinned as
       `project::finances::PARTIAL` rather than absorbed, because a panel that silently varies its
       membership by year produces statewide figures over a different set of districts each time.
-  - relationship: derived-from
-    target: metric
-    note: Reported against total expenditure, which is the same filing's line 5.050.
+  - relationship: measures
+    target: ../education-agency/upper-arlington-city.yml
 
 findings: |
   **STATEWIDE BALANCES ROSE THROUGH THE RELIEF YEARS AND FELL IN THE FIRST YEAR AFTER THEM.**
