@@ -1,6 +1,6 @@
 //! Where Ohio's FY2010–FY2014 real spending trough actually fell.
 //!
-//! The corpus has recorded the trough since the `deflate` calculator first ran, from the Ohio
+//! The corpus has recorded the trough since the `deflator` calculator first ran, from the Ohio
 //! Auditor's statewide series: real operating expenditure per pupil down about 7% from FY2010 to
 //! FY2014, back to its FY2006 level, not recovering until FY2018. Statewide it was a single
 //! number, and a single number cannot distinguish a broad contraction from a few districts cut

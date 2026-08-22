@@ -2,7 +2,7 @@
 resolver = "2"
 members = [
     "edfund-core",
-    "deflate",
+    "deflator",
     "local-capacity",
     "foundation",
     "millage",

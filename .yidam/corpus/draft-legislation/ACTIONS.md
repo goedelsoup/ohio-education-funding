@@ -50,7 +50,7 @@
 - `project` — the five levers, and the only runnable surface a provision can bind to.
 - `scenario-delta` — the reach and incidence of the combined run.
 - `foundation` — where a provision changes the base cost build-up rather than scaling it.
-- `deflate` — required whenever a draft's horizon spans more than one fiscal period.
+- `deflator` — required whenever a draft's horizon spans more than one fiscal period.
 
 ## Connectors
 

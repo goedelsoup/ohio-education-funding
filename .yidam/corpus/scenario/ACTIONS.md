@@ -29,7 +29,7 @@
 - `foundation` — baseline and perturbed runs.
 - `scenario-delta` — the difference table.
 - `project` — forward input series where the horizon extends past observed data.
-- `deflate` — required whenever the horizon spans more than one fiscal period.
+- `deflator` — required whenever the horizon spans more than one fiscal period.
 
 ## Skills
 

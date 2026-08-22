@@ -8,7 +8,7 @@ description: Normalize a nominal Ohio funding series to constant dollars before 
 **Purpose.** Turn a nominal series into one whose values can be compared. Required before *any*
 claim that spans fiscal periods, including ones phrased as questions rather than as numbers.
 
-**Composes.** [`deflate`](deflate.md).
+**Composes.** [`deflator`](deflator.md).
 
 ## Steps
 
@@ -16,7 +16,7 @@ claim that spans fiscal periods, including ones phrased as questions rather than
    uses the June observation of CPI-U all items, `CUUR0000SA0` period `M06`.
 2. Choose and **state** a base year. A real series without a named base is as unreadable as a
    nominal one.
-3. Deflate through [`crates/deflate`](../../crates/deflate/), which is verified against the
+3. Deflate through [`crates/deflator`](../../crates/deflator/), which is verified against the
    Bureau's published file rather than against a table somebody typed.
 4. Report nominal and real together. Dropping the nominal series makes the figures
    irreconcilable with every published source, which all quote nominal.

@@ -18,7 +18,7 @@ single blended series.
 - `district-finances.csv` for what districts actually received and spent, FY2020-FY2024
 - `fy27-department-model.csv` for the current formula run, `cupp-fy24-district-data.csv` for 60
   variables per district, `sd1-district-taxes.csv` for the local side
-- [`crates/deflate`](../crates/deflate/) — mandatory, see below
+- [`crates/deflator`](../crates/deflator/) — mandatory, see below
 - [`crates/millage`](../crates/millage/) for 20-mill floor status by year
 - The [`education-agency`](../.yidam/corpus/education-agency/) node if the agency is one of the
   seven exemplars, for the roles it plays and when

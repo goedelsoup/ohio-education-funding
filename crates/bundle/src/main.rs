@@ -1548,7 +1548,7 @@ fn build() -> Bundle {
     let records = panel();
     let outcomes = joined();
     let money = finances();
-    let cpi = deflate::CpiSeries::cpi_u_june();
+    let cpi = deflator::CpiSeries::cpi_u_june();
     let taxes = property_taxes();
     let functions = spending_by_function();
 

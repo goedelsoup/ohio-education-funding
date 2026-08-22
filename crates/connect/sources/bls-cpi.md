@@ -38,7 +38,7 @@ the narrow form the deflator needs: one series, one period, parsed from the Bure
 remains the named gap.
 
 Running it found something. Twenty-one of the twenty-three points in
-[`crates/deflate`](../../deflate/) had been transcribed by hand and never checked. Twenty-two
+[`crates/deflator`](../../deflator/) had been transcribed by hand and never checked. Twenty-two
 were right; **FY2016 was 241.038 where the Bureau publishes 241.018**. The series is corrected,
 every point is now marked verified, and
 [`tests/deflator_matches_bls.rs`](../tests/deflator_matches_bls.rs) re-checks all of them on

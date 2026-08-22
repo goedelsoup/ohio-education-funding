@@ -1,5 +1,5 @@
 [package]
-name = "deflate"
+name = "deflator"
 description = "Convert nominal Ohio school finance figures to constant dollars, fiscal-year aligned"
 version.workspace = true
 edition.workspace = true

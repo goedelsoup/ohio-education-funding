@@ -5,7 +5,7 @@
 //! for commit back into that node. Run from `crates/`:
 //!
 //! ```text
-//! cargo run --example epp_real_series -p deflate
+//! cargo run --example epp_real_series -p deflator
 //! ```
 //!
 //! Output confidence is inherited from the CPI endpoints, so most rows come out
@@ -13,7 +13,7 @@
 //! nominal figures for even years are chart-label approximations. Only the FY2000 and FY2022
 //! endpoints are verified on both sides.
 
-use deflate::{Confidence, CpiSeries};
+use deflator::{Confidence, CpiSeries};
 use edfund_core::FiscalYear;
 
 /// Nominal operating expenditure per pupil, all Ohio public school entities.

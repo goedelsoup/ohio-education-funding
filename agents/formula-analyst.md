@@ -53,7 +53,7 @@ Enrolled ADM, formula ADM, and equivalent pupils are three different numbers; To
 Perrysburg differ by 45% on headcount versus equivalent-pupil spending, and two publications from
 one author reported them on different bases.
 
-**Do not compare to another year without deflating.** Use [`deflate`](../.yidam/skills/deflate.md).
+**Do not compare to another year without deflating.** Use [`deflator`](../.yidam/skills/deflator.md).
 
 **Never say "the district's funding."** State foundation aid is one channel. The scholarship and
 capital channels are not modelled here at all, so a district's total position is not something

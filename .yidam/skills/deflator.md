@@ -1,5 +1,5 @@
 ---
-name: deflate
+name: deflator
 description: Convert a nominal dollar series to constant dollars using a fiscal-year-aligned index; required before any cross-period comparison in this corpus
 ---
 
@@ -41,7 +41,7 @@ choosing different windows on one record can contradict each other without eithe
 Where a series is available annually, return the shape and not only the endpoints; where only
 endpoints exist, say so. See
 [`metric/per-pupil-operating-expenditure`](../corpus/metric/per-pupil-operating-expenditure.yml)
-and [`crates/deflate/tests/ohio_epp_real_series.rs`](../../crates/deflate/tests/ohio_epp_real_series.rs).
+and [`crates/deflator/tests/ohio_epp_real_series.rs`](../../crates/deflator/tests/ohio_epp_real_series.rs).
 
 **Fiscal year alignment.** Ohio fiscal years run July through June. A calendar-year index
 applied to a fiscal-year figure introduces a systematic half-year offset that compounds across
@@ -50,7 +50,7 @@ calendar year of the same number.
 
 ## Status
 
-**Implemented** in [`crates/deflate/`](../../crates/deflate/src/lib.rs). 11 tests.
+**Implemented** in [`crates/deflator/`](../../crates/deflator/src/lib.rs). 11 tests.
 
 The CPI-U June series for FY2000-FY2022 is committed as a fixture. Three tests reproduce the
 Ohio Auditor of State's independently published figures exactly — 71.9% CPI growth, 26.1% real

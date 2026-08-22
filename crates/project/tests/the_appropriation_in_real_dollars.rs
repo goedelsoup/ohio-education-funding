@@ -124,7 +124,7 @@ fn the_formula_line_moved_the_other_way_from_the_department_around_it() {
 #[test]
 fn the_last_appropriated_year_has_no_real_figure_rather_than_a_nominal_one() {
     // FY2027 is enacted and the index stops at FY2026. Reporting its cash amount in a column
-    // headed "constant dollars" is the failure `deflate` exists to prevent, so the year is
+    // headed "constant dollars" is the failure `deflator` exists to prevent, so the year is
     // carried with `real: None` and every caller here filters on it.
     let history = enacted_history(BASE);
     let last = history.last().expect("the series is not empty");

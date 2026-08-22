@@ -35,7 +35,7 @@ browser and a 404 to anything that identifies itself.
 - `local-capacity` — state share index and local wealth measures
 - `millage` — effective millage under HB 920 reduction factors, including the 20-mill floor
 - `dispersion` — equity statistics across agencies, operationalizing the `doctrine` nodes
-- `deflate` — nominal-to-real normalization, without which a corpus spanning 1851 to the
+- `deflator` — nominal-to-real normalization, without which a corpus spanning 1851 to the
   present cannot compare any two numbers honestly
 - `project` — forward projection of enrollment with intervals, and the policy levers over it;
   it reports simulation and forecast separately and refuses to add them
@@ -92,7 +92,7 @@ checkout with no external converter.
 | [`edfund-core`](edfund-core/) | types | shared `FiscalYear`, `AgencyType`, rounding |
 | [`spreadsheet`](spreadsheet/) | reader | inflate, zip, XML, XLSX — no dependencies |
 | [`connect`](connect/) | connectors | registry, cache, digests, fixture builders |
-| [`deflate`](deflate/) | calculator | implemented; series verified against BLS |
+| [`deflator`](deflator/) | calculator | implemented; series verified against BLS |
 | [`local-capacity`](local-capacity/) | calculator | the FSFP capacity measure; the charge-off it replaced is in [`regime-diff`](regime-diff/) |
 | [`foundation`](foundation/) | calculator | full base cost build-up; verified to the cent |
 | [`millage`](millage/) | calculator | implemented; verified on 606 real districts |
@@ -151,7 +151,7 @@ Fields per crate: name, capability type (connector/calculator/feature-engineerin
 |---|---|--:|
 | [`bundle`](bundle/) | Export a versioned JSON feed of the corpus's district-level findings for the web layer | 40 |
 | [`connect`](connect/) | Retrieval and extraction: the department's publications into committed fixtures | 105 |
-| [`deflate`](deflate/) | Convert nominal Ohio school finance figures to constant dollars, fiscal-year aligned | 17 |
+| [`deflator`](deflator/) | Convert nominal Ohio school finance figures to constant dollars, fiscal-year aligned | 17 |
 | [`dispersion`](dispersion/) | School finance equity statistics: dispersion and wealth neutrality across agencies | 150 |
 | [`edfund-core`](edfund-core/) | Shared domain types for the Ohio education funding computer | 17 |
 | [`foundation`](foundation/) | Fair School Funding Plan base cost build-up, per R.C. 3317.011 | 47 |

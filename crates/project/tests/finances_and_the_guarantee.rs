@@ -270,7 +270,7 @@ fn the_panel_spans_the_sharpest_price_change_in_forty_years() {
     // The fact that makes every nominal statement above provisional. A district whose state aid
     // rose 5% across this span lost a fifth of its purchasing power, and a reader given only the
     // nominal figure would read a gain.
-    let cpi = deflate::CpiSeries::cpi_u_june();
+    let cpi = deflator::CpiSeries::cpi_u_june();
     let growth = cpi
         .index_growth(FiscalYear(2020), FiscalYear(2025))
         .expect("both endpoints are in the committed series");
@@ -286,7 +286,7 @@ fn statewide_cash_did_not_rise_in_real_terms_and_ended_a_fifth_below_where_it_st
     // The headline of this phase, corrected. Nominally the balance rose from $8.37bn to a peak
     // of $11.20bn and fell to $9.14bn — a story about a build-up and a drawdown that still ends
     // above where it began. In FY2020 dollars it ends **below**.
-    let cpi = deflate::CpiSeries::cpi_u_june();
+    let cpi = deflator::CpiSeries::cpi_u_june();
     let real = |year: u16| {
         cpi.convert(
             statewide(year, |y| y.ending_cash),
@@ -319,7 +319,7 @@ fn real_state_aid_fell_for_most_districts_over_the_observed_span() {
     // Fully observed: FY2020 and FY2025 are both actuals and both endpoints are in the price
     // series, so this needs no assumption about a future index. Nominal state aid rose for most
     // districts across these six years. Real state aid did not.
-    let cpi = deflate::CpiSeries::cpi_u_june();
+    let cpi = deflator::CpiSeries::cpi_u_june();
     let money = finances();
 
     let mut nominal_up = 0;
@@ -374,7 +374,7 @@ fn the_guarantee_erodes_because_it_is_a_nominal_floor() {
     // Stated over the observed span so it rests on no assumption about a future index: the
     // FY2027 comparison in the sibling test cannot be deflated, because June 2027 has not
     // happened.
-    let cpi = deflate::CpiSeries::cpi_u_june();
+    let cpi = deflator::CpiSeries::cpi_u_june();
     let money = finances();
     let mut guaranteed = Vec::new();
     let mut on_formula = Vec::new();
@@ -800,7 +800,7 @@ fn direct_certification_finds_fewer_children_than_the_disadvantaged_count() {
 /// Both readings are correct; they are different windows on one record, which is the point.
 #[test]
 fn real_state_aid_fell_by_about_a_fifth_over_the_recent_window() {
-    let cpi = deflate::CpiSeries::cpi_u_june();
+    let cpi = deflator::CpiSeries::cpi_u_june();
     let money = finances();
     let (first, last) = (FiscalYear(2020), FiscalYear(2025));
 
@@ -860,7 +860,7 @@ fn real_state_aid_fell_by_about_a_fifth_over_the_recent_window() {
 /// difference was made locally, which is the mechanism behind recurring levy activity.
 #[test]
 fn spending_held_its_real_value_over_the_window_and_state_aid_did_not() {
-    let cpi = deflate::CpiSeries::cpi_u_june();
+    let cpi = deflator::CpiSeries::cpi_u_june();
     let money = finances();
     let change = |pick: fn(&project::finances::YearRecord) -> f64| {
         median(

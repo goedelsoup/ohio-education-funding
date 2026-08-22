@@ -50,7 +50,7 @@ years — CPI-U June rose **25.1%** from FY2020 to FY2025 — so a nominal state
 can have the wrong *sign*, not merely the wrong magnitude. Statewide district cash ends the span
 8% above where it started in nominal dollars and 14% below in constant ones. Anything drawn from
 this source must say which basis it is in, and
-[`crates/deflate`](../../crates/deflate/) is what converts it.
+[`crates/deflator`](../../crates/deflator/) is what converts it.
 
 **Caveats:**
 

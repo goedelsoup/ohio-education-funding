@@ -1,6 +1,6 @@
 //! The `bls-cpi` connector: the Bureau of Labor Statistics price series.
 //!
-//! [`deflate`] carries a CPI-U June series as compiled-in constants, and twenty-one of its
+//! [`deflator`] carries a CPI-U June series as compiled-in constants, and twenty-one of its
 //! twenty-three points are marked [`Confidence::Unverified`] — transcribed, never checked
 //! against the agency. The crate's own documentation says what that costs: a corpus claim
 //! resting on an unverified point must be tagged `[inference]` rather than `[verified]`.
@@ -18,7 +18,7 @@
 //! implied, because applying a calendar-year index to a fiscal-year figure introduces a
 //! systematic half-year error that compounds across a long series.
 
-use deflate::{Confidence, CpiSeries};
+use deflator::{Confidence, CpiSeries};
 use edfund_core::FiscalYear;
 
 /// The all-items CPI-U for all urban consumers, not seasonally adjusted.
@@ -70,7 +70,7 @@ pub fn parse_series(text: &str, series_id: &str, period: &str) -> Vec<Observatio
 pub struct Check {
     /// The fiscal year checked.
     pub fiscal_year: FiscalYear,
-    /// What [`deflate`] carries.
+    /// What [`deflator`] carries.
     pub committed: f64,
     /// What the Bureau publishes, if the series covers the year.
     pub published: Option<f64>,

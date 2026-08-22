@@ -16,7 +16,7 @@ nominal figures without it, and Ohio's central mechanism —
 [H.B. 920](../corpus/legislation/hb-920-1976.yml) holding levy yields nominally flat — is only
 visible as a *decline* once a series is deflated. In nominal terms it looks like stability.
 
-**What it corrected.** [`crates/deflate`](../../crates/deflate/) carried a hand-transcribed
+**What it corrected.** [`crates/deflator`](../../crates/deflator/) carried a hand-transcribed
 CPI-U June series in which twenty-one of twenty-three points had never been checked against the
 agency. Comparing them to this file confirmed twenty-two and found one wrong: **FY2016 was
 transcribed as 241.038, and the published value is 241.018.** The whole series is now marked
@@ -36,7 +36,7 @@ fetching; `crates/connect` builds the agent string from it and says so when a fe
   companion and `CUUR0000SAF1` is food. Both would deflate quietly and wrongly.
 - **CPI-U is a general consumer index.** School costs are majority compensation, for which the
   Employment Cost Index is the better deflator with much shorter coverage. Any figure produced
-  with this must name the index used — see the note in `crates/deflate`.
+  with this must name the index used — see the note in `crates/deflator`.
 - **Fiscal-year alignment is a choice.** This corpus takes the June observation as the point
   value for a fiscal year ending 30 June. A July-to-June average is the defensible alternative
   and would move long-series growth figures slightly.

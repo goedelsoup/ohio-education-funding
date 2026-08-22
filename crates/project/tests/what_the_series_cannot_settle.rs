@@ -41,7 +41,7 @@
 
 use std::collections::BTreeMap;
 
-use deflate::CpiSeries;
+use deflator::CpiSeries;
 use edfund_core::FiscalYear;
 use project::appropriations::enacted_lines;
 
