@@ -53,4 +53,3 @@ Fields per skill: filename, name, description, agents that invoke it.
 | Skill | Purpose |
 |---|---|
 | [`bootstrap`](../.vendor/prelude/skills/bootstrap.md) | Repository initialization |
-| [`judge`](../.vendor/prelude/skills/judge.md) | Bootstrap result evaluation (test harness) |

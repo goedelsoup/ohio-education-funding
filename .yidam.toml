@@ -1,18 +1,16 @@
 # Provenance of the yidam template this repository was derived from.
 #
-# This repository predates this file: it was overlaid before .yidam.toml existed, so it
-# carried a vendored prelude with no record of where the prelude came from and no way to
-# ask whether the origin had moved. Written for the first time at the re-vendor that
-# adopted the commit vocabulary.
+# Written at clone/overlay time, when the yidam source was still a git
+# repository. Updated by `mise run yidam-vendor-update`.
 #
-# `commit` is the resolvable pin: it is what the re-vendor procedure and CI check out.
-# `template` is the release tag at that commit, or "untagged". `committed` is that
-# commit's date — how old the vendored prelude is.
+# `commit` is the resolvable pin: it is what the re-vendor procedure and CI
+# check out. `template` is the release tag at that commit, or "untagged".
+# `committed` is that commit's date — how old the vendored prelude is.
 #
 # See .yidam/.vendor/prelude/guidelines/directories.md for the re-vendor procedure.
 
 [yidam]
 origin    = "git@github.com:goedelsoup/yidam.git"
-commit    = "7f58830a5528a87e5cda26c16c299d5aa7b04155"
+commit    = "75aedf0248b65214d300232a19adeaeee87854a8"
 template  = "untagged"
-committed = "2026-08-20"
+committed = "2026-08-21"
