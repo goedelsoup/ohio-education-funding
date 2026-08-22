@@ -19,7 +19,7 @@
 //! any other kind. Nothing here pretty-prints — the outer document's line breaks are written
 //! by the caller, which is where they were before.
 
-use super::{escape, num, opt, share};
+use crate::serialize::{escape, num, opt, share};
 use core::fmt::Write;
 
 /// An open JSON object. Closes itself.
