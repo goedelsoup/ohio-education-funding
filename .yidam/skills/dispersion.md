@@ -71,5 +71,5 @@ with valuation above +0.7.
 that the average district and the average student's district differ by more than $200 per
 pupil, and they answer different questions.
 
-**Not yet implemented:** cross-period comparison composed with `deflate`, and dispersion over
+**Not yet implemented:** cross-period comparison composed with `deflator`, and dispersion over
 anything but the FY2024 cross-section.

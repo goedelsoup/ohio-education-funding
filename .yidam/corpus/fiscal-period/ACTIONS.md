@@ -8,7 +8,7 @@
   because appropriations are biennial and parameters are annual.
 - **Sequence.** Follow `follows` to build a continuous series and to detect gaps. A missing
   period in a series is usually a data gap, not a year in which nothing happened.
-- **Cross-period comparison.** Any comparison between two periods must pass through `deflate`.
+- **Cross-period comparison.** Any comparison between two periods must pass through `deflator`.
   Nominal comparison across periods is not a valid operation in this corpus.
 - **What has this node been wrong about?** Read `revisions:`. Each entry carries the claim as
   it stood, what replaced it, and the test or source that settled it — so a withdrawn figure can be
@@ -24,7 +24,7 @@
 
 ## Calculators
 
-- `deflate` — indexed on fiscal period; the precondition for any cross-period claim.
+- `deflator` — indexed on fiscal period; the precondition for any cross-period claim.
 
 ## Connectors
 

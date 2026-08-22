@@ -32,7 +32,7 @@ See the class definition: [metric.ont.yml](../metric.ont.yml).
 
 The third of these was named as this class's largest gap at genesis and is now populated with a
 statewide series from FY2000 to FY2022. It carries the corpus's clearest demonstration of why
-`deflate` is a prerequisite rather than a refinement: over that span per-pupil operating
+`deflator` is a prerequisite rather than a refinement: over that span per-pupil operating
 expenditure rose **116.8% nominally and 26.1% in real terms** — and 19.4% if federal COVID
 relief is excluded. Three correct numbers, three different arguments.
 

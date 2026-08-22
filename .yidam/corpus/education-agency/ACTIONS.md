@@ -28,7 +28,7 @@
 
 ## Calculators
 
-- `millage`, `local-capacity`, `deduction`, `foundation`, `deflate`.
+- `millage`, `local-capacity`, `deduction`, `foundation`, `deflator`.
 
 ## Connectors
 

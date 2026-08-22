@@ -6,7 +6,7 @@
   and level. The share from local sources is the headline equity number in this domain.
 - **Substitution chain.** Follow `substitutes-for` to explain a discontinuity — a stream that
   drops to zero and another that appears is a policy event, not a data error.
-- **Real growth.** Apply `deflate` to a stream's series. A local levy stream that is nominally
+- **Real growth.** Apply `deflator` to a stream's series. A local levy stream that is nominally
   flat under H.B. 920 is declining, and only the constant-dollar series shows it.
 - **Restriction test.** Determine what share of an agency's revenue is unrestricted and
   therefore available for the base operating cost the formula computes.
@@ -24,7 +24,7 @@
 ## Calculators
 
 - `millage` — effective millage and 20-mill floor status, which determine local yield.
-- `deflate` — constant-dollar normalization.
+- `deflator` — constant-dollar normalization.
 - `dispersion` — cross-agency distribution of local versus state share.
 
 ## Connectors

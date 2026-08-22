@@ -91,7 +91,7 @@ findings: |
   The statewide expenditure record carries a matching signature, and deflating it sharpens the
   picture considerably. In constant FY2022 dollars, per-pupil operating expenditure fell from
   $15,226 in FY2010 to $14,173 in FY2014 — a real decline of about 7%, leaving FY2014
-  indistinguishable from FY2006's $14,166. [inference — computed by `deflate`; see
+  indistinguishable from FY2006's $14,166. [inference — computed by `deflator`; see
   [per-pupil-operating-expenditure](../metric/per-pupil-operating-expenditure.yml)] It did not
   regain the FY2010 level until FY2018, by which point this regime had been running for six
   years.

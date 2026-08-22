@@ -25,7 +25,7 @@
 ## Calculators
 
 - `dispersion` — operationalizes equity across agencies.
-- `foundation` and `deflate` — together supply the costed-requirement side of an adequacy test.
+- `foundation` and `deflator` — together supply the costed-requirement side of an adequacy test.
 
 ## Skills
 

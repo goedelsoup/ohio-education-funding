@@ -7,7 +7,7 @@
 //! education" is a true sentence about nearly every biennium in this period and an empty one —
 //! so the first question worth asking of a fourteen-year appropriation history is whether it grew.
 //!
-//! [`deflate`] is the crate that answers it, and this module is the join. Nothing here is new
+//! [`deflator`] is the crate that answers it, and this module is the join. Nothing here is new
 //! arithmetic; what it adds is that the join is made once, in one place, with the department's
 //! own line-item structure preserved rather than collapsed into a headline.
 //!
@@ -54,7 +54,7 @@
 
 use std::collections::BTreeMap;
 
-use deflate::{Confidence, CpiSeries};
+use deflator::{Confidence, CpiSeries};
 use edfund_core::FiscalYear;
 
 /// The committed series.
@@ -328,7 +328,7 @@ pub fn growth(history: &[Year]) -> Option<(f64, f64, Confidence)> {
         last.nominal / first.nominal - 1.0,
         last_real / first_real - 1.0,
         // Both endpoints ride the same index, and every point in it is verified against the
-        // Bureau's own file — see `deflate::CpiSeries::cpi_u_june`.
+        // Bureau's own file — see `deflator::CpiSeries::cpi_u_june`.
         Confidence::Verified,
     ))
 }

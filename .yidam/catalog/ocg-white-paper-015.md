@@ -23,11 +23,11 @@ explicit no-causation caveat rather than running a district cross-section.
 
 **Full corroboration on the Auditor series.** Every figure it draws from the Ohio Auditor's
 Longitudinal School Finance Study matches this corpus's independently held values, which come
-from the same source through the [`deflate`](../skills/deflate.md) calculator: $7,065 → $15,314,
+from the same source through the [`deflator`](../skills/deflator.md) calculator: $7,065 → $15,314,
 +116.8% nominal and **+26.1% real**; $14,493 excluding relief, +19.4%; total operating
 expenditure $12.97B → $25.78B; enrollment −8.3% from 1.84M to 1.68M; CPI +71.9%; instruction
 +25.7% and support services +28.2% real. [verified — see
-[`crates/deflate/tests/ohio_epp_real_series.rs`](../../crates/deflate/tests/ohio_epp_real_series.rs)]
+[`crates/deflator/tests/ohio_epp_real_series.rs`](../../crates/deflator/tests/ohio_epp_real_series.rs)]
 
 ## Three findings the corpus adds
 

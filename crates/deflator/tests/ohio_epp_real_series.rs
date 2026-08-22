@@ -14,7 +14,7 @@
 //! Cited by `corpus/metric/per-pupil-operating-expenditure.yml` and
 //! `catalog/ocg-white-paper-015.md`.
 
-use deflate::{Confidence, CpiSeries};
+use deflator::{Confidence, CpiSeries};
 use edfund_core::FiscalYear;
 
 const NOMINAL_CSV: &str = include_str!("../fixtures/ohio-epp-nominal.csv");

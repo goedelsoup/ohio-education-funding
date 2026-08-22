@@ -154,16 +154,16 @@ impl YearRecord {
     ///
     /// The index is CPI-U, a general consumer index; school costs are majority compensation,
     /// for which the Employment Cost Index would be better and has shorter coverage. Any figure
-    /// this produces must name the index, which is why [`deflate::CpiSeries::label`] exists.
+    /// this produces must name the index, which is why [`deflator::CpiSeries::label`] exists.
     ///
     /// # Errors
     ///
-    /// Returns [`deflate::DeflateError`] if either year is absent from the series.
+    /// Returns [`deflator::DeflatorError`] if either year is absent from the series.
     pub fn in_dollars_of(
         &self,
         base: FiscalYear,
-        cpi: &deflate::CpiSeries,
-    ) -> Result<Self, deflate::DeflateError> {
+        cpi: &deflator::CpiSeries,
+    ) -> Result<Self, deflator::DeflatorError> {
         let at = |value: Dollars| cpi.convert(value, self.fiscal_year, base).map(|d| d.value);
         Ok(Self {
             fiscal_year: self.fiscal_year,
@@ -232,12 +232,12 @@ impl Finances {
     ///
     /// # Errors
     ///
-    /// Returns [`deflate::DeflateError`] if any covered year is absent from the series.
+    /// Returns [`deflator::DeflatorError`] if any covered year is absent from the series.
     pub fn in_dollars_of(
         &self,
         base: FiscalYear,
-        cpi: &deflate::CpiSeries,
-    ) -> Result<Self, deflate::DeflateError> {
+        cpi: &deflator::CpiSeries,
+    ) -> Result<Self, deflator::DeflatorError> {
         Ok(Self {
             irn: self.irn.clone(),
             name: self.name.clone(),
@@ -258,12 +258,12 @@ impl Finances {
     ///
     /// # Errors
     ///
-    /// Returns [`deflate::DeflateError`] if either endpoint year is absent from the series.
+    /// Returns [`deflator::DeflatorError`] if either endpoint year is absent from the series.
     pub fn real_change(
         &self,
-        cpi: &deflate::CpiSeries,
+        cpi: &deflator::CpiSeries,
         pick: impl Fn(&YearRecord) -> Dollars,
-    ) -> Result<Option<f64>, deflate::DeflateError> {
+    ) -> Result<Option<f64>, deflator::DeflatorError> {
         let Some((first, last)) = self.span() else {
             return Ok(None);
         };

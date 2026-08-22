@@ -35,7 +35,7 @@ findings: |
   nominal terms. Adjusted for inflation, the increase is **26.1%**. [verified] The same fact,
   stated two ways, supports two entirely different arguments about whether Ohio has increased
   its investment in schools, and both numbers are correct. This is the concrete case for the
-  `deflate` calculator being a prerequisite rather than a refinement.
+  `deflator` calculator being a prerequisite rather than a refinement.
 
   A third framing is also correct and lower still: excluding federal COVID relief funds, FY2022
   operating EPP was $14,493, making real growth **19.4%**. [verified] The $821 per-pupil gap
@@ -69,7 +69,7 @@ findings: |
   An endpoint pair cannot see an interior reversal, and this series contains three. Two
   speakers can select different windows on one record and both be correct, which is a second
   and independent reason the public argument does not resolve. See
-  [`skills/deflate`](../../skills/deflate.md).
+  [`skills/deflator`](../../skills/deflator.md).
 
   That gradient, computed over the same FY2024 cross-section behind the equity findings above:
   operating expenditure per pupil correlates with the economically disadvantaged share at
@@ -165,7 +165,7 @@ properties:
     Real growth FY2000-FY2022: +26.1% including relief funds, +19.4% excluding. [verified]
     CPI growth over the same span: +71.9%. [verified]
 
-    Constant FY2022 dollars, computed by the `deflate` calculator
+    Constant FY2022 dollars, computed by the `deflator` calculator
     (`cargo run --example epp_real_series -p deflate`):
 
       FY2000  $12,143    baseline    [verified]
@@ -199,7 +199,7 @@ properties:
     TWO FINDINGS THE NOMINAL SERIES CONCEALS. [inference]
 
     Both are now pinned in
-    [`crates/deflate/tests/ohio_epp_real_series.rs`](../../../crates/deflate/tests/ohio_epp_real_series.rs)
+    [`crates/deflator/tests/ohio_epp_real_series.rs`](../../../crates/deflator/tests/ohio_epp_real_series.rs)
     rather than left as prose, including a check that perturbs both trough endpoints by the full
     chart-label uncertainty in the direction that would erase the decline and finds it intact.
 

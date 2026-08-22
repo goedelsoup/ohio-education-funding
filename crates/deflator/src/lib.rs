@@ -62,14 +62,14 @@ pub struct Deflated {
 
 /// Why a deflation could not be performed.
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum DeflateError {
+pub enum DeflatorError {
     /// No index observation exists for the requested fiscal year.
     MissingIndex(FiscalYear),
     /// The index level for the requested year is zero or negative.
     NonPositiveIndex(FiscalYear),
 }
 
-impl core::fmt::Display for DeflateError {
+impl core::fmt::Display for DeflatorError {
     fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
         match self {
             Self::MissingIndex(fy) => write!(f, "no index observation for {fy}"),
@@ -78,7 +78,7 @@ impl core::fmt::Display for DeflateError {
     }
 }
 
-impl std::error::Error for DeflateError {}
+impl std::error::Error for DeflatorError {}
 
 /// A price index series aligned to Ohio fiscal years.
 #[derive(Debug, Clone)]
@@ -120,21 +120,21 @@ impl CpiSeries {
     ///
     /// # Errors
     ///
-    /// Returns [`DeflateError`] if either fiscal year is absent from the series or carries a
+    /// Returns [`DeflatorError`] if either fiscal year is absent from the series or carries a
     /// non-positive index level.
     pub fn convert(
         &self,
         nominal: Dollars,
         from: FiscalYear,
         to: FiscalYear,
-    ) -> Result<Deflated, DeflateError> {
-        let from_pt = self.point(from).ok_or(DeflateError::MissingIndex(from))?;
-        let to_pt = self.point(to).ok_or(DeflateError::MissingIndex(to))?;
+    ) -> Result<Deflated, DeflatorError> {
+        let from_pt = self.point(from).ok_or(DeflatorError::MissingIndex(from))?;
+        let to_pt = self.point(to).ok_or(DeflatorError::MissingIndex(to))?;
         if from_pt.index <= 0.0 {
-            return Err(DeflateError::NonPositiveIndex(from));
+            return Err(DeflatorError::NonPositiveIndex(from));
         }
         if to_pt.index <= 0.0 {
-            return Err(DeflateError::NonPositiveIndex(to));
+            return Err(DeflatorError::NonPositiveIndex(to));
         }
         Ok(Deflated {
             value: nominal * (to_pt.index / from_pt.index),
@@ -149,7 +149,7 @@ impl CpiSeries {
     /// # Errors
     ///
     /// As [`Self::convert`].
-    pub fn index_growth(&self, from: FiscalYear, to: FiscalYear) -> Result<f64, DeflateError> {
+    pub fn index_growth(&self, from: FiscalYear, to: FiscalYear) -> Result<f64, DeflatorError> {
         let one = self.convert(1.0, from, to)?;
         Ok(one.value - 1.0)
     }
@@ -168,10 +168,10 @@ impl CpiSeries {
         from: FiscalYear,
         to_value: Dollars,
         to: FiscalYear,
-    ) -> Result<Deflated, DeflateError> {
+    ) -> Result<Deflated, DeflatorError> {
         let rebased = self.convert(from_value, from, to)?;
         if rebased.value == 0.0 {
-            return Err(DeflateError::NonPositiveIndex(from));
+            return Err(DeflatorError::NonPositiveIndex(from));
         }
         Ok(Deflated {
             value: to_value / rebased.value - 1.0,
@@ -369,7 +369,7 @@ mod tests {
     fn rejects_a_fiscal_year_outside_the_series() {
         let cpi = CpiSeries::cpi_u_june();
         let err = cpi.convert(100.0, FiscalYear(1975), FY2022).unwrap_err();
-        assert_eq!(err, DeflateError::MissingIndex(FiscalYear(1975)));
+        assert_eq!(err, DeflatorError::MissingIndex(FiscalYear(1975)));
     }
 
     #[test]
@@ -391,7 +391,7 @@ mod tests {
         );
         assert_eq!(
             series.convert(1.0, FY2000, FY2022).unwrap_err(),
-            DeflateError::NonPositiveIndex(FY2000)
+            DeflatorError::NonPositiveIndex(FY2000)
         );
     }
 
