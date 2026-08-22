@@ -10,7 +10,7 @@
  */
 import DistrictNav from "../../../components/DistrictNav.astro";
 import Base from "../../../layouts/Base.astro";
-import { districtPaths, loadFeed } from "../../../lib/feed.ts";
+import { districtPaths, loadFeed, qualifiedName } from "../../../lib/feed.ts";
 import { count, fig, money, pct } from "../../../lib/format.ts";
 import * as routes from "../../../lib/routes.ts";
 import {
@@ -48,13 +48,13 @@ const description = latest
 ---
 
 <Base
-  title={`${district.name} — property tax`}
+  title={`${qualifiedName(district)} — property tax`}
   description={description}
   image={routes.og.district(district.irn)}
   imageAlt={`${district.name}: state aid per pupil, and how much of it comes from the guarantee`}
   section="districts"
 >
-  <h1>{district.name}</h1>
+  <h1>{qualifiedName(district)}</h1>
   <p class="sub">
     What property here is worth, what is charged on it, and which side of the 20-mill floor the
     district is on — which decides whether a reappraisal reaches its revenue at all.

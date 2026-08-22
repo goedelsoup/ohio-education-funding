@@ -14,7 +14,7 @@
 import DistrictNav from "../../../components/DistrictNav.astro";
 import ScenarioControls from "../../../components/ScenarioControls.astro";
 import Base from "../../../layouts/Base.astro";
-import { districtPaths, loadFeed } from "../../../lib/feed.ts";
+import { districtPaths, loadFeed, qualifiedName } from "../../../lib/feed.ts";
 import { money } from "../../../lib/format.ts";
 import { currentRealizedAid } from "../../../lib/policy.ts";
 import * as routes from "../../../lib/routes.ts";
@@ -31,13 +31,13 @@ const meta = bundle.projection;
 ---
 
 <Base
-  title={`${district.name} — scenario`}
+  title={`${qualifiedName(district)} — scenario`}
   description={`What a change to the guarantee, base cost, minimum state share or phase-in would do to ${district.name}, and how many of Ohio's ${s.districts} districts it moves the other way.`}
   image={routes.og.district(district.irn)}
   imageAlt={`${district.name}: state aid per pupil, and how much of it comes from the guarantee`}
   section="districts"
 >
-  <h1>{district.name}</h1>
+  <h1>{qualifiedName(district)}</h1>
   <p class="sub">
     What a different decision would do here. Under current law this district receives {
       /*

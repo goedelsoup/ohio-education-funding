@@ -11,7 +11,7 @@
  * on this site where the combinatorics genuinely defeat static generation.
  */
 import Base from "../layouts/Base.astro";
-import { loadFeed } from "../lib/feed.ts";
+import { loadFeed, qualifiedName } from "../lib/feed.ts";
 import { count } from "../lib/format.ts";
 import * as routes from "../lib/routes.ts";
 
@@ -48,13 +48,13 @@ const named = SEEDED.map((pair) => ({
       <div class="field">
         <label for="cmp-a">First district</label>
         <select id="cmp-a">
-          {alphabetical.map((d) => <option value={d.irn}>{d.name}</option>)}
+          {alphabetical.map((d) => <option value={d.irn}>{qualifiedName(d)}</option>)}
         </select>
       </div>
       <div class="field">
         <label for="cmp-b">Second district</label>
         <select id="cmp-b">
-          {alphabetical.map((d) => <option value={d.irn}>{d.name}</option>)}
+          {alphabetical.map((d) => <option value={d.irn}>{qualifiedName(d)}</option>)}
         </select>
       </div>
     </form>

@@ -333,6 +333,33 @@ function taxStatewide(districts: District[]): TaxStatewide {
  * IRN and not a name slug: 28 of the 609 names in this feed are shared by more than one
  * district, so a name-keyed route would collide and silently drop pages.
  */
+/**
+ * A district's name, qualified by county where the name alone does not identify it.
+ *
+ * Ohio names school districts after townships, and townships repeat: there are three Green Local
+ * districts, three Buckeye Local, three Southern Local. 48 districts share a name with at least
+ * one other, and every route that identified a district identified it by bare name — so the
+ * title, the `og:title`, the `<h1>` and the compare selects were the same string for two or three
+ * different places, and 242 built pages carried a duplicate `<title>`.
+ *
+ * Qualified only where it is needed. 561 districts are uniquely named and read exactly as before;
+ * adding ", Franklin County" to all of them would make every title longer to fix 8% of them.
+ *
+ * Memoized like the other readers in this file: written once on first call and never mutated
+ * after, so the build's 3,488 pages do not each rebuild the tally.
+ */
+let ambiguousNames: Set<string> | null = null;
+export function qualifiedName(district: District): string {
+  if (!ambiguousNames) {
+    const counts = new Map<string, number>();
+    for (const d of loadFeed().bundle.districts) counts.set(d.name, (counts.get(d.name) ?? 0) + 1);
+    ambiguousNames = new Set([...counts].filter(([, n]) => n > 1).map(([name]) => name));
+  }
+  return ambiguousNames.has(district.name)
+    ? `${district.name}, ${district.county} County`
+    : district.name;
+}
+
 export function districtPaths(): { params: { irn: string }; props: { district: District } }[] {
   return loadFeed().bundle.districts.map((district) => ({
     params: { irn: district.irn },
