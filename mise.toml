@@ -24,6 +24,19 @@ monorepo_root = true
 [settings]
 experimental = true
 
+# The yidam CLI tasks live in mise.yidam.toml, the INHERITED task layer: it is as
+# much yidam's to correct as the vendored prelude is, and `mise run
+# yidam-vendor-update` replaces it wholesale. Domain tasks belong in THIS file, or
+# the next re-vendor discards them.
+#
+# It sits at the repository root rather than under .yidam/ only because mise has
+# to find it there. `[task_config] includes` and not a top-level `extends`: mise
+# accepts `extends` on an individual task and never on a config file, so it warns
+# about an unknown field and carries on — and the failure looks like nothing at
+# all, every inherited task simply absent.
+[task_config]
+includes = ["mise.yidam.toml"]
+
 # Where the Rust toolchain lives, stated because leaving it unstated is not the
 # no-op it looks like.
 #
@@ -52,7 +65,20 @@ RUSTUP_HOME = "{{env.HOME}}/.rustup"
 # PATH resolves to `~/.cargo/bin/bin` and does not exist. `RUSTUP_TOOLCHAIN` is
 # still exported from the `[tools]` pin below, so the shim found here selects
 # 1.97.0 and the pin keeps meaning what it says.
-_.path = ["{{env.HOME}}/.cargo/bin"]
+#
+# `.yidam/bin` comes FIRST, ahead of cargo's directory, and the order is
+# load-bearing rather than tidy. `mise run yidam-build` installs the CLI into
+# .yidam/bin/ beside the pin it was built from — one binary per repository, so it
+# always matches this repository's vendored prelude. Any `yidam` left in
+# ~/.cargo/bin by an older install would otherwise shadow it, and the line above
+# puts that directory on PATH for every task here.
+#
+# The failure that ordering prevents is a quiet one: an older binary missing a
+# subcommand exits with `unrecognized subcommand`, which inside a redirected
+# script step is indistinguishable from success. This guards anything mise runs;
+# a script or CI step that assembles PATH by hand has to put .yidam/bin first
+# itself.
+_.path = [".yidam/bin", "{{env.HOME}}/.cargo/bin"]
 
 [monorepo]
 config_roots = ["crates", "web"]
@@ -85,6 +111,14 @@ pnpm = "11"
 #
 # NB: a root task must not share a name with a subproject task fanned out via
 # `//...:<task>`, because `//...` matches the root too and the task would recurse.
+#
+# The inherited layer brings one such name with it: `//:bundle` packages the
+# corpus into .yidam/bundle.yiz, and `//crates:bundle` regenerates the web feed.
+# Different jobs, same word, and neither is renameable — `//:bundle` is replaced
+# on every re-vendor, and `//crates:bundle` is the domain's own. It is inert
+# today because nothing invokes `//...` and nothing calls either by fan-out, so
+# both stay reachable at their full addresses. Say which one you mean; a bare
+# `mise run bundle` from the root is the corpus one.
 
 [tasks.ci]
 description = "Everything CI runs: the crate gate, the web gate, and the generated-file check."

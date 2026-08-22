@@ -18,3 +18,15 @@ target/
 # Astro writes generated types beside whatever directory it is invoked from. `web/.gitignore`
 # covers the intended location; this covers an invocation from the repository root.
 .astro/
+
+# The yidam CLI, installed per-repository rather than per-machine. `mise run
+# yidam-build` puts it at .yidam/bin/ beside the pin in .yidam.toml, so the binary
+# and the vendored prelude always agree — one ~/.cargo/bin is last-writer-wins
+# across every yidam repository on the machine, and the loser runs a binary that
+# does not match its own prelude with nothing anywhere saying so.
+#
+# A binary is build output and does not belong in history. The two metadata files
+# are cargo's install ledger for that root, written beside the bin/ directory.
+.yidam/bin/
+.yidam/.crates.toml
+.yidam/.crates2.json
