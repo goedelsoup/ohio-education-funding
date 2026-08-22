@@ -16,17 +16,11 @@
 //! fund by some districts and separately by others, so a balance rising across them is not
 //! evidence about a district's own position.
 
+mod common;
+
 use edfund_core::FiscalYear;
 use project::finances::{finances, for_district, Finances};
 use project::panel::panel;
-
-/// The median, on the one definition this workspace has.
-///
-/// Was a local upper-of-two, which disagrees with `dispersion` on every even-length series.
-fn median(mut values: Vec<f64>) -> f64 {
-    values.sort_by(|a, b| a.partial_cmp(b).unwrap_or(std::cmp::Ordering::Equal));
-    dispersion::median(&values).expect("a median is taken of a non-empty series here")
-}
 
 fn statewide(year: u16, pick: impl Fn(&project::finances::YearRecord) -> f64) -> f64 {
     finances()
@@ -107,7 +101,7 @@ fn fy2025_is_the_year_the_spending_caught_up() {
                 .then(|| after.total_expenditure / before.total_expenditure)
         })
         .collect();
-    let typical = median(ratios);
+    let typical = common::median(ratios);
     assert!(
         (typical - 1.137).abs() < 0.01,
         "median district spending ratio {typical:.3} — a statewide jump driven by a handful of \
@@ -168,8 +162,8 @@ fn the_guarantee_is_not_producing_districts_that_sit_on_cash() {
     assert_eq!(guaranteed.len(), 294);
     assert_eq!(on_formula.len(), 314);
 
-    let held = median(guaranteed);
-    let other = median(on_formula);
+    let held = common::median(guaranteed);
+    let other = common::median(on_formula);
     assert!((held - 0.319).abs() < 0.005, "guaranteed {held:.3}");
     assert!((other - 0.338).abs() < 0.005, "formula {other:.3}");
     // The difference is about a week of spending, in the direction opposite to the claim.
@@ -216,8 +210,8 @@ fn the_guarantee_base_is_narrower_than_a_district_s_booked_state_receipts() {
     }
     assert_eq!(held.len(), 294);
 
-    let narrow = median(held);
-    let wide = median(paid);
+    let narrow = common::median(held);
+    let wide = common::median(paid);
     assert!(
         (narrow - 0.899).abs() < 0.01,
         "core + guarantee {narrow:.3}"
@@ -254,8 +248,8 @@ fn the_guarantee_gap_against_formula_districts_survives_the_correction() {
             on_formula.push(ratio);
         }
     }
-    let held = median(guaranteed);
-    let other = median(on_formula);
+    let held = common::median(guaranteed);
+    let other = common::median(on_formula);
     assert!((held - 1.107).abs() < 0.01, "guaranteed {held:.3}");
     assert!((other - 1.354).abs() < 0.01, "formula {other:.3}");
     assert!(
@@ -348,7 +342,7 @@ fn real_state_aid_fell_for_most_districts_over_the_observed_span() {
         changes.push(real);
     }
 
-    let typical = median(changes.clone());
+    let typical = common::median(changes.clone());
     assert!(
         nominal_up > changes.len() / 2,
         "{nominal_up} of {} rose nominally",
@@ -392,8 +386,8 @@ fn the_guarantee_erodes_because_it_is_a_nominal_floor() {
         }
     }
 
-    let held = median(guaranteed.clone());
-    let other = median(on_formula.clone());
+    let held = common::median(guaranteed.clone());
+    let other = common::median(on_formula.clone());
     assert!(
         held < other,
         "guaranteed districts fared {held:.3} against {other:.3} on formula"
@@ -849,7 +843,7 @@ fn real_state_aid_fell_by_about_a_fifth_over_the_recent_window() {
         "{losing} of {} districts lost real ground, a share of {share:.3}",
         changes.len()
     );
-    let typical = median(changes.clone());
+    let typical = common::median(changes.clone());
     assert!(
         (typical - -0.114).abs() < 0.015,
         "the median district's real state aid changed {typical:.3}"
@@ -863,7 +857,7 @@ fn spending_held_its_real_value_over_the_window_and_state_aid_did_not() {
     let cpi = deflator::CpiSeries::cpi_u_june();
     let money = finances();
     let change = |pick: fn(&project::finances::YearRecord) -> f64| {
-        median(
+        common::median(
             money
                 .iter()
                 .filter_map(|d| d.real_change(&cpi, pick).ok().flatten())

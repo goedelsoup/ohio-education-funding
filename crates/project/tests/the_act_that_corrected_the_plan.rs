@@ -21,12 +21,9 @@
 //! than left for somebody to meet by surprise: the assertions below quote the *printed* run,
 //! and any claim drawn from this file has to say which half of a strike-and-insert it read.
 
-const ACT: &str = include_str!("../fixtures/hb583-corrections.txt");
+mod common;
 
-/// Collapse the page furniture so a quoted phrase matches across a line break.
-fn flat() -> String {
-    ACT.split_whitespace().collect::<Vec<_>>().join(" ")
-}
+const ACT: &str = include_str!("../fixtures/hb583-corrections.txt");
 
 /// The sections of the school funding chapter this act reopened.
 ///
@@ -80,7 +77,7 @@ fn it_reopened_thirteen_funding_sections_and_left_the_assembly_section_alone() {
 /// here, on a smaller quantity, before the first biennium closed.
 #[test]
 fn it_froze_the_transportation_cost_inputs_at_fy2020_data() {
-    assert!(flat().contains(
+    assert!(common::flat(ACT).contains(
         "the statewide average cost per rider and statewide average cost per mile used to \
          calculate funding under section 3317.0212 of the Revised Code and payment in lieu of \
          transportation payment under section 3327.02 shall be based on data from fiscal year 2020"
@@ -95,7 +92,7 @@ fn it_froze_the_transportation_cost_inputs_at_fy2020_data() {
 /// are currently litigating over.
 #[test]
 fn it_made_prorated_expansion_scholarships_whole() {
-    assert!(flat().contains(
+    assert!(common::flat(ACT).contains(
         "whose scholarship amount was prorated under division (E) of that section as it existed \
          prior to that date shall, on and after that date, receive the full scholarship amount"
     ));
@@ -112,7 +109,7 @@ fn it_made_prorated_expansion_scholarships_whole() {
 /// assertion is on the pieces rather than on a phrase that only looks contiguous.
 #[test]
 fn its_only_appropriation_is_one_federal_line() {
-    let act = flat();
+    let act = common::flat(ACT);
     let start = act
         .find("SECTION 9. All items")
         .expect("the appropriating section");
@@ -137,7 +134,7 @@ fn its_only_appropriation_is_one_federal_line() {
 /// no node quotes the run of words as if the legislature had written it.
 #[test]
 fn the_struck_and_the_inserted_words_run_together_in_the_extract() {
-    assert!(flat().contains(
+    assert!(common::flat(ACT).contains(
         "the section of this act H.B. 110 of the 134th General Assembly entitled \
          \"FORMULA TRANSITION SUPPLEMENT.\""
     ));

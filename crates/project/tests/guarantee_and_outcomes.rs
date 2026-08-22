@@ -32,6 +32,8 @@
 //! itself a function of wealth and enrollment history. These tests pin what the data shows and
 //! bound how it may be read.
 
+mod common;
+
 use dispersion::{partial_correlation, rank_correlation, wealth_neutrality};
 use project::outcomes::{joined, Joined};
 
@@ -91,14 +93,6 @@ fn performance_index(record: &Joined) -> Option<f64> {
 }
 fn progress(record: &Joined) -> Option<f64> {
     record.outcome.progress_effect_size
-}
-
-/// The median, on the one definition this workspace has.
-///
-/// Was a local upper-of-two, which disagrees with `dispersion` on every even-length series.
-fn median(mut values: Vec<f64>) -> f64 {
-    values.sort_by(|a, b| a.partial_cmp(b).unwrap_or(std::cmp::Ordering::Equal));
-    dispersion::median(&values).expect("a median is taken of a non-empty series here")
 }
 
 #[test]
@@ -176,7 +170,7 @@ fn the_same_holds_for_growth_and_for_a_continuous_reading_of_dependence() {
 fn the_guaranteed_districts_are_less_poor_which_is_the_whole_mechanism() {
     let records = joined();
     let poverty_of = |on: bool| {
-        median(
+        common::median(
             records
                 .iter()
                 .filter(|r| r.on_guarantee() == on)
@@ -202,7 +196,7 @@ fn the_top_coded_measure_more_than_doubles_the_apparent_poverty_gap() {
     let records = joined();
     let gap = |share: fn(&Joined) -> Option<f64>, scale: f64| {
         let of = |on: bool| {
-            median(
+            common::median(
                 records
                     .iter()
                     .filter(|r| r.on_guarantee() == on)

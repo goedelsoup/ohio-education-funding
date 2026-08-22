@@ -21,6 +21,8 @@
 //! the computed entitlement and every district was scaled down to fit. A published amount under a
 //! proration is not what the formula says a district is owed. It is what was available, divided.
 
+mod common;
+
 use project::panel::{
     self, Transportation, TRANSPORT_COMMUNITY_WEIGHT, TRANSPORT_DENSITY_PIVOT,
     TRANSPORT_DENSITY_RATE, TRANSPORT_EFFICIENCY_BAND, TRANSPORT_EFFICIENCY_CEILING,
@@ -28,8 +30,25 @@ use project::panel::{
     TRANSPORT_OTHER_RATE, TRANSPORT_PER_RIDER, TRANSPORT_SPED_PRORATION,
 };
 
+/// Two cents rather than the one [`common::close`] allows, and the extra cent is measured.
+///
+/// The figure was a bare `0.02` with nothing saying why, which is the shape of a tolerance widened
+/// until a test passed. Measured across all 609 districts, what it actually admits is:
+///
+/// | Line | Worst disagreement | Districts over a cent |
+/// |---|--:|--:|
+/// | density supplement | 1.37¢ | 3 |
+/// | efficiency supplement | 1.00¢ | 1 |
+/// | transportation guarantee | 1.00¢ | 2 |
+/// | published total | 1.00¢ | 29 |
+/// | weighted riders, school bus, mass transit, other, special education | ≤ 0.5¢ | 0 |
+///
+/// So the extra cent is bought by one line. Which intermediate the department rounds to produce
+/// that 1.37¢ has not been identified, so this is an admitted spread and not an explained one —
+/// written down as a measurement, so that widening it again is visible as a new fact rather than
+/// as a test that was made to pass.
 fn close(computed: f64, published: f64) -> bool {
-    (computed - published).abs() <= 0.02_f64.max(published.abs() * 1e-9)
+    common::agrees_within(0.02, computed, published)
 }
 
 /// Weighted ridership is not ridership: a non-public rider counts twice.

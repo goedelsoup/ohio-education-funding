@@ -16,6 +16,8 @@
 //! either from one year to the next with nothing cushioning the fall — which is the practical
 //! reason it matters that they are outside the formula rather than a taxonomic one.
 
+mod common;
+
 use project::panel::{
     self, DistrictRecord, PerformanceSupplement, Supplements, AVERAGE_BASE_COST_PER_PUPIL,
     BASE_FUNDING_SUPPLEMENT_PER_PUPIL, ENROLLMENT_GROWTH_SUPPLEMENT_PER_PUPIL,
@@ -24,11 +26,6 @@ use project::panel::{
     PREK_SPED_FLAT_PER_PUPIL, PREK_SPED_PRORATION, PREK_SPED_WEIGHT_FRACTION,
     SPECIAL_EDUCATION_WEIGHTS,
 };
-
-/// Dollar amounts are stored to the cent, so half a cent of rounding is admissible and nothing is.
-fn close(computed: f64, published: f64) -> bool {
-    (computed - published).abs() <= 0.01_f64.max(published.abs() * 1e-9)
-}
 
 // ---------------------------------------------------------------------------------------------
 // The performance supplement
@@ -58,7 +55,7 @@ fn the_performance_supplement_reproduces_from_the_ratings_that_gate_it() {
         let rating = p.paid_rating().expect("an eligible district has a rating");
         let expected = rating * PERFORMANCE_SUPPLEMENT_PER_POINT * adm;
         assert!(
-            close(expected, p.amount),
+            common::close(expected, p.amount),
             "{}: {rating} x $13 x {adm:.4} gives {expected:.2} against published {:.2}",
             record.name,
             p.amount
@@ -193,7 +190,7 @@ fn the_base_funding_supplement_is_unconditional() {
     for record in &panel {
         let expected = record.categorical_enrolled_adm * BASE_FUNDING_SUPPLEMENT_PER_PUPIL;
         assert!(
-            close(expected, record.supplements.base_funding),
+            common::close(expected, record.supplements.base_funding),
             "{}: {expected:.2} against published {:.2}",
             record.name,
             record.supplements.base_funding
@@ -243,7 +240,7 @@ fn the_growth_supplement_is_a_cliff_paid_on_every_pupil() {
         if s.growth_eligible {
             let expected = adm * ENROLLMENT_GROWTH_SUPPLEMENT_PER_PUPIL;
             assert!(
-                close(expected, s.growth),
+                common::close(expected, s.growth),
                 "{}: {expected:.2} against published {:.2}",
                 record.name,
                 s.growth
@@ -468,7 +465,7 @@ fn preschool_special_education_is_a_flat_grant_plus_half_a_weight() {
                 p.adm[k] * weight * AVERAGE_BASE_COST_PER_PUPIL * share * PREK_SPED_WEIGHT_FRACTION;
             let expected = (flat + weighted) * PREK_SPED_PRORATION;
             assert!(
-                close(expected, p.aid[k]),
+                common::close(expected, p.aid[k]),
                 "{}: preschool category {} computed {expected:.2} against published {:.2}",
                 record.name,
                 k + 1,

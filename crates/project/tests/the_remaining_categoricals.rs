@@ -42,6 +42,8 @@
 //! the same hazard `web/src/lib/denominators.ts` was built for on the presentation side, arriving
 //! here from the department's own workbook.
 
+mod common;
+
 use project::panel::{
     self, TargetedAssistance, AVERAGE_BASE_COST_PER_PUPIL, CTE_ASSOCIATED_WEIGHT,
     CTE_BASE_COST_PER_PUPIL, CTE_WEIGHTS, ENGLISH_LEARNER_WEIGHTS, GIFTED_COORDINATOR_DIVISOR,
@@ -51,25 +53,6 @@ use project::panel::{
     TA_MEDIAN_WEALTH_PER_PUPIL, TA_MEDIAN_WEIGHTED_WEALTH, TA_WEALTH_BLEND, TA_WEALTH_INDEX_FLOOR,
     TA_WEALTH_OFFSET_RATE, TA_WEALTH_RATE,
 };
-
-/// A tolerance that admits the fixture's own rounding and nothing else.
-///
-/// Dollar amounts are stored to the cent, so a reproduction can differ by half a cent from
-/// rounding alone; the inputs are stored to nine places, which contributes a relative error far
-/// below the second term. Anything outside both is a mechanism that has not been understood.
-fn close(computed: f64, published: f64) -> bool {
-    let allowed = 0.01_f64.max(published.abs() * 1e-9);
-    (computed - published).abs() <= allowed
-}
-
-/// The same, for a total reconstructed by adding `parts` separately-rounded amounts.
-///
-/// Each part is stored to the cent and so carries up to half a cent of rounding, and the published
-/// total is rounded once more. Adding six of them can legitimately land a cent away from a figure
-/// that is right — which is a statement about the fixture's storage and not about the formula.
-fn reconciles(computed: f64, published: f64, parts: usize) -> bool {
-    (computed - published).abs() <= 0.005 * (parts as f64 + 1.0) + published.abs() * 1e-9
-}
 
 // ---------------------------------------------------------------------------------------------
 // Career-technical education
@@ -99,7 +82,7 @@ fn career_technical_reproduces_from_five_weights_against_its_own_base_cost() {
         for (k, weight) in CTE_WEIGHTS.iter().enumerate() {
             let expected = cte.fte[k] * weight * CTE_BASE_COST_PER_PUPIL * share;
             assert!(
-                close(expected, cte.aid[k]),
+                common::close(expected, cte.aid[k]),
                 "{}: CTE category {} computed {expected:.2} against published {:.2}",
                 record.name,
                 k + 1,
@@ -108,13 +91,13 @@ fn career_technical_reproduces_from_five_weights_against_its_own_base_cost() {
         }
         let associated = cte.total_fte() * CTE_ASSOCIATED_WEIGHT * CTE_BASE_COST_PER_PUPIL * share;
         assert!(
-            close(associated, cte.associated_services),
+            common::close(associated, cte.associated_services),
             "{}: associated services computed {associated:.2} against published {:.2}",
             record.name,
             cte.associated_services
         );
         assert!(
-            reconciles(cte.total(), record.categoricals.career_technical, 6),
+            common::reconciles(cte.total(), record.categoricals.career_technical, 6),
             "{}: five categories plus associated services {:.2} against published total {:.2}",
             record.name,
             cte.total(),
@@ -196,7 +179,7 @@ fn english_learners_reproduces_and_its_weights_descend() {
         for (k, weight) in ENGLISH_LEARNER_WEIGHTS.iter().enumerate() {
             let expected = el.adm[k] * weight * AVERAGE_BASE_COST_PER_PUPIL * share;
             assert!(
-                close(expected, el.aid[k]),
+                common::close(expected, el.aid[k]),
                 "{}: EL category {} computed {expected:.2} against published {:.2}",
                 record.name,
                 k + 1,
@@ -204,7 +187,7 @@ fn english_learners_reproduces_and_its_weights_descend() {
             );
         }
         assert!(
-            reconciles(el.total(), record.categoricals.english_learners, 3),
+            common::reconciles(el.total(), record.categoricals.english_learners, 3),
             "{}: three categories {:.2} against published total {:.2}",
             record.name,
             el.total(),
@@ -318,14 +301,14 @@ fn gifted_reproduces_from_two_per_pupil_amounts_and_three_kinds_of_unit() {
 
         let identification = g.adm_k6 * GIFTED_IDENTIFICATION_PER_PUPIL * share;
         assert!(
-            close(identification, g.identification),
+            common::close(identification, g.identification),
             "{}: identification computed {identification:.2} against published {:.2}",
             record.name,
             g.identification
         );
         let referral = enrolled * GIFTED_REFERRAL_PER_PUPIL * share;
         assert!(
-            close(referral, g.referral),
+            common::close(referral, g.referral),
             "{}: referral computed {referral:.2} against published {:.2}",
             record.name,
             g.referral
@@ -333,7 +316,7 @@ fn gifted_reproduces_from_two_per_pupil_amounts_and_three_kinds_of_unit() {
 
         let coordinator_units = (enrolled / GIFTED_COORDINATOR_DIVISOR).clamp(floor, cap);
         assert!(
-            close(coordinator_units, g.coordinator_units),
+            common::close(coordinator_units, g.coordinator_units),
             "{}: coordinator units computed {coordinator_units:.6} against published {:.6}",
             record.name,
             g.coordinator_units
@@ -364,20 +347,20 @@ fn gifted_reproduces_from_two_per_pupil_amounts_and_three_kinds_of_unit() {
             ),
         ] {
             assert!(
-                close(units, published_units),
+                common::close(units, published_units),
                 "{}: {label} units computed {units:.6} against published {published_units:.6}",
                 record.name
             );
             let aid = units * price * share;
             assert!(
-                close(aid, published_aid),
+                common::close(aid, published_aid),
                 "{}: {label} aid computed {aid:.2} against published {published_aid:.2}",
                 record.name
             );
         }
 
         assert!(
-            reconciles(g.total(), record.categoricals.gifted, 6),
+            common::reconciles(g.total(), record.categoricals.gifted, 6),
             "{}: the parts sum to {:.2} against published total {:.2}",
             record.name,
             g.total(),
@@ -480,7 +463,7 @@ fn targeted_assistance_reproduces_as_two_additive_tiers() {
 
         let blended = property * ta.property_valuation + income * ta.federal_gross_income;
         assert!(
-            close(blended, ta.weighted_wealth),
+            common::close(blended, ta.weighted_wealth),
             "{}: 60/40 blend gives {blended:.2} against published {:.2}",
             record.name,
             ta.weighted_wealth
@@ -501,7 +484,7 @@ fn targeted_assistance_reproduces_as_two_additive_tiers() {
             0.0
         };
         assert!(
-            close(capacity, ta.capacity_amount),
+            common::close(capacity, ta.capacity_amount),
             "{}: capacity amount computed {capacity:.2} against published {:.2} (ADM {enrolled:.1})",
             record.name,
             ta.capacity_amount
@@ -516,7 +499,7 @@ fn targeted_assistance_reproduces_as_two_additive_tiers() {
             0.0
         };
         assert!(
-            close(per_pupil, ta.wealth_per_pupil),
+            common::close(per_pupil, ta.wealth_per_pupil),
             "{}: wealth per resident pupil computed {per_pupil:.2} against published {:.2}",
             record.name,
             ta.wealth_per_pupil
@@ -528,7 +511,7 @@ fn targeted_assistance_reproduces_as_two_additive_tiers() {
             0.0
         };
         assert!(
-            close(wealth_index, ta.wealth_index),
+            common::close(wealth_index, ta.wealth_index),
             "{}: wealth index computed {wealth_index:.8} against published {:.8}",
             record.name,
             ta.wealth_index
@@ -541,14 +524,14 @@ fn targeted_assistance_reproduces_as_two_additive_tiers() {
                 * enrolled
         };
         assert!(
-            close(wealth, ta.wealth_amount),
+            common::close(wealth, ta.wealth_amount),
             "{}: wealth amount computed {wealth:.2} against published {:.2}",
             record.name,
             ta.wealth_amount
         );
 
         assert!(
-            reconciles(ta.total(), record.categoricals.targeted_assistance, 2),
+            common::reconciles(ta.total(), record.categoricals.targeted_assistance, 2),
             "{}: the two tiers sum to {:.2} against published total {:.2}",
             record.name,
             ta.total(),
@@ -858,7 +841,7 @@ fn every_one_of_the_six_categoricals_reconciles_to_its_own_decomposition() {
             ),
         ] {
             assert!(
-                reconciles(decomposed, published, 6),
+                common::reconciles(decomposed, published, 6),
                 "{}: {label} decomposes to {decomposed:.2} against published {published:.2}",
                 record.name
             );

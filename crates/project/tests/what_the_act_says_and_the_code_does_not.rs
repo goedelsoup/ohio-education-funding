@@ -26,12 +26,9 @@
 //! None of that became law. Reading the convenient file would have contradicted the department's
 //! own published payments and looked like a finding.
 
-const ACT: &str = include_str!("../fixtures/enacted-school-funding.txt");
+mod common;
 
-/// Collapse the analysis's page furniture so a quoted phrase can be matched across a line break.
-fn flat() -> String {
-    ACT.split_whitespace().collect::<Vec<_>>().join(" ")
-}
+const ACT: &str = include_str!("../fixtures/enacted-school-funding.txt");
 
 /// **The enrolment growth supplement is $250 at 3% for FY2027**, exactly as the corpus carries it.
 ///
@@ -39,7 +36,7 @@ fn flat() -> String {
 /// because it shows the supplement is re-specified each year rather than being a standing rate.
 #[test]
 fn the_enrolment_growth_supplement_is_two_hundred_and_fifty_at_three_per_cent() {
-    let act = flat();
+    let act = common::flat(ACT);
     assert!(act.contains(
         "$250 per student in FY 2027 to each district whose enrolled ADM grew by at least 3% \
          from FY 2023 to FY 2026"
@@ -58,7 +55,7 @@ fn the_enrolment_growth_supplement_is_two_hundred_and_fifty_at_three_per_cent() 
 /// that nobody simplifies the strict `>` into a `>=` and quietly admits the 3.5-star districts.
 #[test]
 fn the_performance_supplement_is_thirteen_dollars_a_star_by_the_act() {
-    let act = flat();
+    let act = common::flat(ACT);
     assert!(act.contains("multiplied by $13 multiplied by the greater of the number of “stars”"));
     assert!(act.contains("An overall performance rating of four “stars” or higher"));
     assert!(act.contains("A performance rating of three “stars” or higher for the Progress"));
@@ -92,7 +89,7 @@ fn the_performance_supplement_is_thirteen_dollars_a_star_by_the_act() {
 /// category as the supplements, and not the departmental choice the audit recorded.
 #[test]
 fn the_dpia_blend_is_set_by_the_act_and_not_by_the_department() {
-    let act = flat();
+    let act = common::flat(ACT);
     assert!(act.contains("Economically disadvantaged student ADM for FY 2026 and FY 2027"));
     // The table wraps its row labels around the figures, so the rows are matched as the extract
     // renders them rather than as a reader sees them on the page.

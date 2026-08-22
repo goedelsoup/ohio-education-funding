@@ -15,16 +15,14 @@
 //! proposal. Every figure below is labelled accordingly, because the last phase nearly published a
 //! House-passed supplement schedule as though it were law.
 
-const REDBOOK: &str = include_str!("../fixtures/dew-redbook.txt");
+mod common;
 
-fn flat() -> String {
-    REDBOOK.split_whitespace().collect::<Vec<_>>().join(" ")
-}
+const REDBOOK: &str = include_str!("../fixtures/dew-redbook.txt");
 
 /// **Which line governs.** The two prorated programs sit in named ALIs.
 #[test]
 fn the_prorated_programs_have_appropriation_line_items() {
-    let book = flat();
+    let book = common::flat(REDBOOK);
     assert!(book.contains("GRF 200502 Pupil Transportation"));
     assert!(book.contains("GRF 200540 Special Education Enhancements"));
     assert!(book.contains("GRF 200550 Foundation Funding"));
@@ -53,7 +51,7 @@ fn the_prorated_programs_have_appropriation_line_items() {
 /// ```
 #[test]
 fn preschool_special_education_is_what_is_left_of_its_line_item() {
-    let book = flat();
+    let book = common::flat(REDBOOK);
     assert!(book.contains("Remainder – preschool special education"));
     assert!(book.contains("$147,500,000 $153,976,832 $153,976,832"));
     assert!(book.contains("GRF ALI 200540 total $198,850,000 $193,272,426"));
@@ -86,7 +84,7 @@ fn preschool_special_education_is_what_is_left_of_its_line_item() {
 /// the enacted appropriations document, which is not wired. [the enacted amount is open]
 #[test]
 fn the_stated_preschool_limit_is_the_prior_years_appropriation() {
-    let book = flat();
+    let book = common::flat(REDBOOK);
     // The column header that makes the $147.5m a FY2025 number rather than a FY2027 one.
     assert!(book.contains("FY 2025 Estimate FY 2026 Introduced FY 2027 Introduced"));
 
@@ -113,6 +111,6 @@ fn the_stated_preschool_limit_is_the_prior_years_appropriation() {
 /// second independent source for a claim that started as an inference from an absence.
 #[test]
 fn the_redbook_confirms_transportation_is_paid_on_prior_year_costs() {
-    assert!(flat()
+    assert!(common::flat(REDBOOK)
         .contains("Transportation funds are mostly allocated based on the prior year’s costs"));
 }
