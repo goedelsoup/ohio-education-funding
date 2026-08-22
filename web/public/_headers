@@ -6,13 +6,34 @@
 # and the two-space indent under each path is load-bearing.
 
 /*
-  # Every route on this site is extensionless — `build.format: "file"` emits
-  # `district/043786.html` and Pages serves it at `/district/043786`. `_headers` matches the
-  # *request* path, so a `/*.html` rule matches nothing at all; the previous one silently did,
-  # and a deploy left stale HTML at the edge pointing at asset hashes the next deploy had purged.
-  # The document rule therefore lives here, on the pattern that actually matches, and the two
-  # blocks below override it for the paths that may be cached.
-  Cache-Control: public, max-age=0, must-revalidate
+  # There is deliberately NO Cache-Control here, and the absence is the whole point.
+  #
+  # The header of this file says matches are cumulative rather than first-wins. That is right, and
+  # a `Cache-Control` on `/*` then does not do what the rule below it looks like it does: Pages
+  # concatenates the two values, `/*` lands FIRST, and first is what a parser takes. Every block
+  # below was defeated by this line for as long as it was here. Observed on production:
+  #
+  #   /_astro/…js      cache-control: public, max-age=0, must-revalidate, public, max-age=31536000, immutable
+  #   /data/panel.json cache-control: public, max-age=0, must-revalidate, public, max-age=300, must-revalidate
+  #
+  # So `immutable` never applied to a content-hashed asset, and the reasoning about 300s against
+  # 3600s below decided nothing — everything on the deploy revalidated on every request. The
+  # comment that used to sit here said the blocks below "override it", which is the one thing
+  # cumulative matching does not do, and it contradicted this file's own opening note.
+  #
+  # Documents therefore take the platform default rather than an explicit header. That is the
+  # trade: the seven blocks below are now the only Cache-Control on the deploy, and each means
+  # what it says. Every route here is extensionless — `build.format: "file"` emits
+  # `district/043786.html` and Pages serves it at `/district/043786`, and `_headers` matches the
+  # *request* path — so there is no pattern that selects documents without also selecting the
+  # assets, which is why this cannot be fixed by moving the line somewhere more specific.
+  #
+  # This is not visible in `dist/`, in `vite preview`, or in any test that reads the artefact. It
+  # is only visible in a response header, so check it there after a deploy:
+  #
+  #   curl -sI https://ohio-education-funding.pages.dev/_astro/<hashed>.js | grep -i cache-control
+  #
+  # One value, not two.
   X-Content-Type-Options: nosniff
   Referrer-Policy: strict-origin-when-cross-origin
   Strict-Transport-Security: max-age=31536000
