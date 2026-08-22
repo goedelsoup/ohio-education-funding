@@ -1,51 +1,118 @@
 //! A JSON writer that closes what it opens.
 //!
-//! The serializer this replaces maintained the document's punctuation by hand: 91 sites
-//! writing `push_str(&format!(…))`, separators in four incompatible styles, and two places
-//! that chopped a closing brace back off with `truncate` so a caller could append one more
-//! field. [`super::fields`] carries the scar in its doc comment — the first version left the
-//! object open for exactly that reason and three of five callers forgot to close it, nesting
-//! `career_technical` inside `special_education`.
+//! [`super::Bundle::to_json`] maintained the document's punctuation by hand across 169 sites:
+//! 84 `push_str(&format!(…))`, 68 bare `push_str("`, 17 raw pushes of a brace or a comma,
+//! separators in four incompatible styles, and two places that wrote a trailing `", "` and then
+//! chopped it back off with `truncate`. [`super::fields`] carries the scar in its doc comment —
+//! the first version left its object open so a caller could add one more field, three of five
+//! callers forgot to close it, and `career_technical` ended up nested inside
+//! `special_education`.
 //!
 //! The fix is structural rather than disciplinary. [`Obj`] and [`Arr`] write their closing
 //! delimiter in `Drop`, so an unbalanced document is not something a caller can express; and
 //! each tracks whether it has written a member, so a separator is not something a caller can
-//! get wrong. Neither is a rule to follow — both are the only thing the type permits.
+//! get wrong. Neither is a rule to follow — both are the only thing the type permits. There are
+//! now zero hand-typed delimiters in the serializer.
 //!
 //! # Format
 //!
 //! The emitted bytes match what this feed has always emitted, because the committed feed is
-//! the regression test: `": "` after every key, `", "` between members, and no whitespace of
-//! any other kind. Nothing here pretty-prints — the outer document's line breaks are written
-//! by the caller, which is where they were before.
+//! the regression test: `": "` after every key, and `", "` between members of a container laid
+//! out on one line.
+//!
+//! Two layouts, because the feed has two. The outer document puts one member per line so that
+//! 6.19 MB of it diffs legibly; a district puts its sixty-odd fields on one line for the same
+//! reason, since a district that changed should be one changed line. [`Obj::block`] and
+//! [`Arr::block`] write the first, [`Obj::new`] and [`Arr::new`] the second, and the line breaks
+//! that used to be typed into a hundred format strings are now a property of the container.
 
 use crate::serialize::{escape, num, opt, share};
 use core::fmt::Write;
+
+/// How a container lays its members out.
+#[derive(Clone, Copy)]
+enum Layout {
+    /// All on one line, `", "` between members.
+    Inline,
+    /// One member per line, indented by `pad`, with the closing delimiter two spaces back.
+    ///
+    /// Two spaces because that is the feed's indent unit, and the closing delimiter of a block
+    /// sits at its *parent's* level — `pad` is the members' level, so the close is `pad` less
+    /// one unit. A block opened at the document root has `pad = "  "` and closes at column zero.
+    Block { pad: &'static str },
+}
+
+impl Layout {
+    /// Write whatever comes before the next member: a separator if one is due, then the indent.
+    fn open_slot(self, out: &mut String, first: bool) {
+        match self {
+            Self::Inline => {
+                if !first {
+                    out.push_str(", ");
+                }
+            }
+            Self::Block { pad } => {
+                if !first {
+                    out.push(',');
+                }
+                out.push('\n');
+                out.push_str(pad);
+            }
+        }
+    }
+
+    /// Write whatever comes before the closing delimiter.
+    ///
+    /// Nothing for an inline container. For a block, the line break and the closing indent —
+    /// *including when the block is empty*, which is not an aesthetic choice: two tests in
+    /// `tests/serialization.rs` assert that an absent history serializes as `"history": [\n  ],`
+    /// rather than as a missing key, and `[]` would fail both. An empty container that still
+    /// occupies its two lines is how this feed says "asked and empty" rather than "not asked".
+    fn close_slot(self, out: &mut String) {
+        if let Self::Block { pad } = self {
+            out.push('\n');
+            out.push_str(pad.get(2..).unwrap_or_default());
+        }
+    }
+}
 
 /// An open JSON object. Closes itself.
 pub(crate) struct Obj<'a> {
     out: &'a mut String,
     first: bool,
+    layout: Layout,
 }
 
 /// An open JSON array. Closes itself.
 pub(crate) struct Arr<'a> {
     out: &'a mut String,
     first: bool,
+    layout: Layout,
 }
 
 impl<'a> Obj<'a> {
-    /// Open an object at the end of `out`.
+    /// Open an object at the end of `out`, all on one line.
     pub(crate) fn new(out: &'a mut String) -> Self {
-        out.push('{');
-        Self { out, first: true }
+        Self::with(out, Layout::Inline)
     }
 
-    /// Write a key, with the separator before it if one is due.
-    fn key(&mut self, k: &str) {
-        if !self.first {
-            self.out.push_str(", ");
+    /// Open an object whose members each get a line, indented by `pad`.
+    pub(crate) fn block(out: &'a mut String, pad: &'static str) -> Self {
+        Self::with(out, Layout::Block { pad })
+    }
+
+    fn with(out: &'a mut String, layout: Layout) -> Self {
+        out.push('{');
+        Self {
+            out,
+            first: true,
+            layout,
         }
+    }
+
+    /// Write a key, with whatever separator and indent are due before it.
+    fn key(&mut self, k: &str) {
+        self.layout.open_slot(self.out, self.first);
         self.first = false;
         let _ = write!(self.out, "\"{k}\": ");
     }
@@ -54,6 +121,27 @@ impl<'a> Obj<'a> {
     pub(crate) fn num(&mut self, k: &str, v: f64) {
         self.key(k);
         self.out.push_str(&num(v));
+    }
+
+    /// A string, escaped.
+    pub(crate) fn text(&mut self, k: &str, v: &str) {
+        self.key(k);
+        let _ = write!(self.out, "\"{}\"", escape(v));
+    }
+
+    /// Raw text as a member's value, for the one figure the feed rounds its own way.
+    pub(crate) fn raw(&mut self, k: &str, v: &str) {
+        self.key(k);
+        self.out.push_str(v);
+    }
+
+    /// A count or a year, written as an integer.
+    ///
+    /// Not routed through [`super::num`]: an exact quantity should not acquire a decimal
+    /// representation on the way out, even one that trims back to the same digits.
+    pub(crate) fn count(&mut self, k: &str, v: impl core::fmt::Display) {
+        self.key(k);
+        let _ = write!(self.out, "{v}");
     }
 
     /// A number that may be absent, emitted as `null` when it is.
@@ -68,19 +156,15 @@ impl<'a> Obj<'a> {
         self.out.push_str(&share(v));
     }
 
-    /// A string, escaped.
-    pub(crate) fn text(&mut self, k: &str, v: &str) {
+    /// A count that may be absent, emitted as `null` when it is.
+    pub(crate) fn opt_count(&mut self, k: &str, v: Option<impl core::fmt::Display>) {
         self.key(k);
-        let _ = write!(self.out, "\"{}\"", escape(v));
-    }
-
-    /// A count, written as an integer.
-    ///
-    /// Not routed through [`super::num`]: a count is exact and should not acquire a decimal
-    /// representation on the way out, even one that trims back to the same digits.
-    pub(crate) fn count(&mut self, k: &str, v: usize) {
-        self.key(k);
-        let _ = write!(self.out, "{v}");
+        match v {
+            Some(v) => {
+                let _ = write!(self.out, "{v}");
+            }
+            None => self.out.push_str("null"),
+        }
     }
 
     /// A boolean.
@@ -100,26 +184,50 @@ impl<'a> Obj<'a> {
         self.key(k);
         Arr::new(self.out)
     }
+
+    /// A nested object laid out one member per line.
+    pub(crate) fn block_obj(&mut self, k: &str, pad: &'static str) -> Obj<'_> {
+        self.key(k);
+        Obj::block(self.out, pad)
+    }
+
+    /// A nested array laid out one element per line.
+    pub(crate) fn block_arr(&mut self, k: &str, pad: &'static str) -> Arr<'_> {
+        self.key(k);
+        Arr::block(self.out, pad)
+    }
 }
 
 impl Drop for Obj<'_> {
     fn drop(&mut self) {
+        self.layout.close_slot(self.out);
         self.out.push('}');
     }
 }
 
 impl<'a> Arr<'a> {
-    /// Open an array at the end of `out`.
+    /// Open an array at the end of `out`, all on one line.
     pub(crate) fn new(out: &'a mut String) -> Self {
-        out.push('[');
-        Self { out, first: true }
+        Self::with(out, Layout::Inline)
     }
 
-    /// Write the separator if one is due, then hand the buffer to the caller.
-    fn slot(&mut self) {
-        if !self.first {
-            self.out.push_str(", ");
+    /// Open an array whose elements each get a line, indented by `pad`.
+    pub(crate) fn block(out: &'a mut String, pad: &'static str) -> Self {
+        Self::with(out, Layout::Block { pad })
+    }
+
+    fn with(out: &'a mut String, layout: Layout) -> Self {
+        out.push('[');
+        Self {
+            out,
+            first: true,
+            layout,
         }
+    }
+
+    /// Write whatever separator and indent are due, then hand the buffer to the caller.
+    fn slot(&mut self) {
+        self.layout.open_slot(self.out, self.first);
         self.first = false;
     }
 
@@ -138,6 +246,7 @@ impl<'a> Arr<'a> {
 
 impl Drop for Arr<'_> {
     fn drop(&mut self) {
+        self.layout.close_slot(self.out);
         self.out.push(']');
     }
 }

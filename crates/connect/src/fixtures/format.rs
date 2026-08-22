@@ -10,25 +10,13 @@
 /// a district whose valuation is nil are different claims, and the calculators read the
 /// difference as `Option<f64>`.
 ///
-/// # A trailing zero is not a trailing zero
-///
-/// The trim only applies past a decimal point. Trimming the string form of an integer turns 10
-/// into 1 and 30 into 3 — which is what the predecessor of this function did to the school
-/// building count, silently, for every district that happened to have a multiple of ten.
+/// The rendering itself is [`edfund_core::decimal::trimmed`], which carries the note about what
+/// trimming an integer does to a building count. What is this function's own is the `None` arm.
 #[must_use]
 pub fn format_value(value: Option<f64>, places: usize) -> String {
-    let Some(value) = value else {
-        return String::new();
-    };
-    let rendered = format!("{value:.places$}");
-    if rendered.contains('.') {
-        rendered
-            .trim_end_matches('0')
-            .trim_end_matches('.')
-            .to_string()
-    } else {
-        rendered
-    }
+    value.map_or_else(String::new, |value| {
+        edfund_core::decimal::trimmed(value, places)
+    })
 }
 
 /// District names go into a comma-separated file, so commas are replaced rather than quoted.

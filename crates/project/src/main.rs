@@ -279,14 +279,11 @@ fn draft_json(priced: &Priced) -> String {
     // was not priced".
     let money =
         |value: Option<f64>| value.map_or_else(|| "null".to_string(), |v| format!("{v:.2}"));
-    // Escaped for the same reason `crates/bundle` escapes: the fixture is hand-edited, and a quote
-    // or a backslash in an authority column would otherwise emit invalid JSON silently.
-    let quoted = |raw: &str| {
-        raw.replace('\\', "\\\\")
-            .replace('"', "\\\"")
-            .replace('\n', "\\n")
-            .replace('\t', "\\t")
-    };
+    // Escaped for the same reason `crates/bundle` escapes: the fixture is hand-edited, and a
+    // quote or a backslash in an authority column would otherwise emit invalid JSON silently.
+    // The same function `bundle` uses, rather than a fourth-of-seven-cases copy of it, which is
+    // what this was: no `\r` and no control characters.
+    let quoted = edfund_core::decimal::escape;
     let mut out = format!(
         "{{\n  \"draft\": \"{}\",\n  \"cost\": {}, \"residual\": {},\n  \
          \"provisions\": {}, \"priced\": {}, \"unpriced\": {},\n  \"attribution\": [",
