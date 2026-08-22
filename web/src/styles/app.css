@@ -501,6 +501,38 @@ h3 { font-size: .82rem; margin: 1.4rem 0 .6rem; color: var(--text-secondary); fo
   .term-def { transition: none; }
 }
 
+/*
+ * On a narrow viewport the definition is a sheet at the foot of the screen, not a panel beside
+ * the term.
+ *
+ * `.term-wrap` is an inline box, so `left: 0` above anchors the panel to where the term happens
+ * to start. For a term near the right edge that puts a 30rem panel off the side of the document
+ * and — because an absolutely positioned box still contributes to the scroll region — pans the
+ * whole page sideways: 117px of horizontal scroll on every district finances page at 375px, and
+ * on the taxes page two of the three opened outside a clipping ancestor entirely. 1,827 built
+ * pages carry at least one.
+ *
+ * Anchoring to the card instead would put the definition below the card rather than below the
+ * term, which loses the association the panel exists to make. A viewport-fixed sheet keeps it:
+ * it appears on the same hover or focus, it is always wholly on screen, and it cannot widen the
+ * document because a fixed box is outside the scroll region by definition.
+ *
+ * The breakpoint is the width below which a 30rem panel cannot fit beside anything.
+ */
+@media (max-width: 34rem) {
+  .term-def {
+    position: fixed;
+    left: .75rem;
+    right: .75rem;
+    top: auto;
+    bottom: .75rem;
+    width: auto;
+    max-width: none;
+    font-size: .88rem;
+    box-shadow: 0 -4px 24px rgb(0 0 0 / 28%);
+  }
+}
+
 .card {
   background: var(--surface-1);
   border: 1px solid var(--border);
