@@ -66,6 +66,16 @@ const CROSSWALK: &str = include_str!("../fixtures/legislative-district-crosswalk
 /// The header this loader was written against, so a regenerated crosswalk fails loudly.
 const EXPECTED_HEADER: &str = "chamber,irn,district,population,population_under_18,share";
 
+/// The columns of [`EXPECTED_HEADER`], named where they are read.
+mod column {
+    pub const CHAMBER: usize = 0;
+    pub const IRN: usize = 1;
+    pub const DISTRICT: usize = 2;
+    pub const POPULATION: usize = 3;
+    pub const POPULATION_UNDER_18: usize = 4;
+    pub const SHARE: usize = 5;
+}
+
 /// Ohio's House has ninety-nine seats and its Senate thirty-three. Pinned because a crosswalk
 /// producing a different count would mean a bad join.
 pub const HOUSE_DISTRICTS: usize = 99;
@@ -155,27 +165,18 @@ pub struct Overlap {
 /// apportion by the wrong number and produce a page of plausible wrong totals.
 #[must_use]
 pub fn overlaps(chamber: Chamber) -> Vec<Overlap> {
-    let mut lines = CROSSWALK.lines();
-    let header = lines.next().unwrap_or_default().trim();
-    assert_eq!(
-        header, EXPECTED_HEADER,
-        "the legislative district crosswalk header changed; update project::legislative_district"
-    );
-
-    lines
-        .filter(|line| !line.trim().is_empty())
-        .filter_map(|line| {
-            let f: Vec<&str> = line.split(',').map(str::trim).collect();
-            if *f.first()? != chamber.key() {
+    edfund_core::csv::rows(CROSSWALK, EXPECTED_HEADER)
+        .filter_map(|row| {
+            if row.str(column::CHAMBER) != chamber.key() {
                 return None;
             }
             Some(Overlap {
                 chamber,
-                irn: f.get(1)?.to_string(),
-                district: f.get(2)?.to_string(),
-                population: f.get(3)?.parse().ok()?,
-                population_under_18: f.get(4)?.parse().ok()?,
-                share: f.get(5)?.parse().ok()?,
+                irn: row.str(column::IRN).to_string(),
+                district: row.str(column::DISTRICT).to_string(),
+                population: row.num(column::POPULATION)?,
+                population_under_18: row.num(column::POPULATION_UNDER_18)?,
+                share: row.num(column::SHARE)?,
             })
         })
         .collect()

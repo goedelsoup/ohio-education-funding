@@ -24,9 +24,10 @@ pub struct Row<'a> {
 impl<'a> Row<'a> {
     /// The cell at `index`, or `""` where the row is shorter than that.
     ///
-    /// Rows are padded only to their widest populated cell, so a record with nothing in its
-    /// last column is shorter than its neighbours. Indexing directly would panic on exactly
-    /// the records with missing data.
+    /// [`rows`] asserts every row against the header's width, so a short row never reaches
+    /// here. The tolerance remains for the other way to leave the row — a reader indexing a
+    /// column the header does not have — which is a mistake in the reader rather than in the
+    /// file, and not one worth a panic in the middle of a fixture load.
     #[must_use]
     pub fn str(&self, index: usize) -> &'a str {
         self.fields.get(index).copied().unwrap_or("").trim()
@@ -65,16 +66,22 @@ impl<'a> Row<'a> {
     }
 }
 
-/// The data rows of a comma-delimited fixture, after asserting its header.
+/// The data rows of a comma-delimited fixture, after asserting its header and their width.
 ///
 /// Blank lines are skipped. The header is compared verbatim after trimming, which is what
-/// makes a column insertion upstream a loud failure rather than a silent shift.
+/// makes a column insertion upstream a loud failure rather than a silent shift. Every row is
+/// then checked against the header's width, which catches the other way columns move: a cell
+/// that contains a comma splits into two and shifts everything after it.
+///
+/// Every committed fixture in this workspace is uniform-width — that was measured, not
+/// assumed, before this assertion went in — so the check costs nothing and no reader needs to
+/// tolerate a ragged row.
 ///
 /// # Panics
 ///
-/// Panics if the first line is not `expected`. That is a build-time fact rather than a runtime
-/// condition — these fixtures are compiled in — and reading shifted columns silently is worse
-/// than not reading them at all.
+/// Panics if the first line is not `expected`, or if any row's cell count differs from the
+/// header's. Both are build-time facts rather than runtime conditions — these fixtures are
+/// compiled in — and reading shifted columns silently is worse than not reading them at all.
 pub fn rows<'a>(text: &'a str, expected: &str) -> impl Iterator<Item = Row<'a>> {
     let mut lines = text.lines();
     let header = lines.next().unwrap_or_default().trim();
@@ -82,10 +89,19 @@ pub fn rows<'a>(text: &'a str, expected: &str) -> impl Iterator<Item = Row<'a>> 
         header, expected,
         "a committed fixture's header changed; the columns this reader indexes have moved"
     );
+    let width = expected.split(',').count();
     lines
         .filter(|line| !line.trim().is_empty())
-        .map(|line| Row {
-            fields: line.split(',').collect(),
+        .map(move |line| {
+            let fields: Vec<&str> = line.split(',').collect();
+            assert_eq!(
+                fields.len(),
+                width,
+                "a fixture row holds {} cells where the header names {width}; a cell containing \
+                 a comma shifts every column after it, and reads cleanly: {line}",
+                fields.len()
+            );
+            Row { fields }
         })
 }
 
@@ -106,12 +122,21 @@ mod tests {
     }
 
     #[test]
-    fn a_short_row_reads_as_empty_rather_than_panicking() {
+    #[should_panic(expected = "holds 2 cells where the header names 3")]
+    fn a_row_narrower_than_its_header_fails_loudly() {
         let text = "irn,name,amount\n000442,Manchester Local\n";
+        let _ = rows(text, HEADER).count();
+    }
+
+    /// Reading past the header's width is a mistake in the reader, not in the file, and gives
+    /// an empty cell rather than a panic part-way through a load.
+    #[test]
+    fn a_column_the_header_does_not_have_reads_as_empty() {
+        let text = "irn,name,amount\n000442,Manchester Local,1234.5\n";
         let rows: Vec<Row<'_>> = rows(text, HEADER).collect();
-        assert_eq!(rows[0].str(2), "");
-        assert_eq!(rows[0].num(2), None);
-        assert_eq!(rows[0].required(2), 0.0);
+        assert_eq!(rows[0].str(9), "");
+        assert_eq!(rows[0].num(9), None);
+        assert_eq!(rows[0].required(9), 0.0);
     }
 
     #[test]
@@ -134,23 +159,20 @@ mod tests {
         assert_eq!(rows[2].num(2), None, "and so is an empty cell");
     }
 
-    /// This reader splits on commas and does not honour quoting, deliberately.
+    /// This reader splits on commas and does not honour quoting, deliberately — and now says
+    /// so out loud rather than reading the shifted columns.
     ///
     /// It can be that simple because the fixtures are guaranteed not to need more:
     /// `connect::fixtures::write_csv` asserts on the way out that no cell contains a comma —
     /// a guard added after two sponsor names ("Holy Trinity, Swanton Ele Sch") shifted a
-    /// column and put site IRNs in an enrolment field. This test states the dependency, so
-    /// that if the guard upstream is ever relaxed the reader's limitation is already written
-    /// down rather than discovered.
+    /// column and put site IRNs in an enrolment field. But that guard only runs on a rebuild.
+    /// The width assertion is the same invariant checked on every read, so a fixture that ever
+    /// slips past it fails in `cargo test` rather than in a published figure.
     #[test]
-    fn a_quoted_comma_is_not_supported_because_no_fixture_may_contain_one() {
+    #[should_panic(expected = "holds 4 cells where the header names 3")]
+    fn a_cell_containing_a_comma_fails_rather_than_shifting_the_columns() {
         let text = "irn,name,amount\n000442,\"A, B\",1\n";
-        let rows: Vec<Row<'_>> = rows(text, HEADER).collect();
-        assert_eq!(
-            rows[0].len(),
-            4,
-            "the quoted comma splits, as a naive reader must"
-        );
+        let _ = rows(text, HEADER).count();
     }
 
     #[test]
