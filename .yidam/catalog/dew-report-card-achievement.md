@@ -55,7 +55,7 @@ for it — a question this file can answer without any further retrieval. [open]
 
 ## Feeds connector
 
-[`dew-report-card`](../../crates/connect/src/registry.rs), source key
+[`dew-report-card`](../../crates/connect/src/registry/dew.rs), source key
 `achievement-district-2425` — the tenth connector, approved in
 [`decisions/report-card-connector`](../decisions/report-card-connector.yml) and the first
 retrieving an outcome rather than a dollar.

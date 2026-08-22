@@ -37,7 +37,7 @@ which basis it is on is ambiguous by roughly 4% of the state total, so
 [the fixture carries both](../../crates/dispersion/fixtures/sd1-district-taxes.csv).
 
 **Three things "taxes charged" is not.** Each has produced a wrong number somewhere, and each is
-recorded on [`build_sd1_extract`](../../crates/connect/src/fixtures.rs) as well as here.
+recorded on [`build_sd1_extract`](../../crates/connect/src/fixtures/sd1.rs) as well as here.
 
 - **Not net of state reimbursement.** The department's own note: the figures "include taxes that
   have been reduced under various property tax programs that are reimbursed to local school

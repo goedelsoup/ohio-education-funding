@@ -9,7 +9,8 @@ description: |
   every other per-pupil measure — [per-pupil operating expenditure](per-pupil-operating-expenditure.yml),
   [assessed valuation per pupil](assessed-valuation-per-pupil.yml),
   [state share percentage](state-share-percentage.yml) — so an error in it moves figures that
-  never name it.
+  never name it. [Expenditure per equivalent pupil](expenditure-per-equivalent-pupil.yml) is the
+  exception: it divides by a need-weighted count instead, which is a third thing again.
 
   Two distinct counts wear the name, they differ for every district, and the Fair School Funding
   Plan uses **both in the same calculation**. Conflating them is the single most common arithmetic
@@ -94,15 +95,12 @@ links:
   - relationship: instance-of
     target: ../metric.ont.yml
   - relationship: measures
-    target: education-agency
-    note: All 609 traditional districts in the FY2027 model.
-  - relationship: derived-from
-    target: metric
+    target: ../education-agency/northern-local-perry.yml
     note: |
-      The denominator of [per-pupil operating expenditure](per-pupil-operating-expenditure.yml)
-      and [assessed valuation per pupil](assessed-valuation-per-pupil.yml). Note that
-      [expenditure per equivalent pupil](expenditure-per-equivalent-pupil.yml) uses a
-      need-weighted count instead, which is a third thing again.
+      Named with Upper Arlington as the low- and high-wealth ends of the range. The metric is
+      computed over all 609 traditional districts in the FY2027 model.
+  - relationship: measures
+    target: ../education-agency/upper-arlington-city.yml
 
 findings: |
   **THE GUARANTEE MAKES A DISTRICT'S AID COMPLETELY INSENSITIVE TO ITS ENROLLMENT.** [verified]

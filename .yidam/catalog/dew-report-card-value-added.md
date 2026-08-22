@@ -58,4 +58,4 @@ and is not: ranking districts on the composite ranks them partly by size. [verif
 
 ## Feeds connector
 
-[`dew-report-card`](../../crates/connect/src/registry.rs), source key `va-district-details-2425`.
+[`dew-report-card`](../../crates/connect/src/registry/dew.rs), source key `va-district-details-2425`.
