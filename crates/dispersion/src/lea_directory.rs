@@ -305,6 +305,29 @@ pub fn consolidations_marked() -> Vec<Agency> {
 /// The transfer orders, as the Auditor of State recites them.
 const TRANSFERS: &str = include_str!("../fixtures/territory-transfers.tsv");
 
+/// The header [`transfers`] indexes against.
+///
+/// Tab-delimited, not comma: a recital is a sentence of legal prose and every one of them
+/// contains commas.
+const TRANSFERS_HEADER: &str = concat!(
+    "report\taudited_entity\trole\tresolving_body\tresolution_date\t",
+    "effective_date\tdeparting\treceiving\tsection\trecital"
+);
+
+/// The columns of [`TRANSFERS_HEADER`], named where they are read.
+mod transfer_column {
+    pub const REPORT: usize = 0;
+    pub const AUDITED_ENTITY: usize = 1;
+    pub const ROLE: usize = 2;
+    pub const RESOLVING_BODY: usize = 3;
+    pub const RESOLUTION_DATE: usize = 4;
+    pub const EFFECTIVE_DATE: usize = 5;
+    pub const DEPARTING: usize = 6;
+    pub const RECEIVING: usize = 7;
+    pub const SECTION: usize = 8;
+    pub const RECITAL: usize = 9;
+}
+
 /// One territory transfer, from the audit report that recites it.
 ///
 /// **This is a recital, not the instrument.** The order is a resolution in an educational service
@@ -342,30 +365,18 @@ pub struct Transfer {
 /// If the fixture's header is not the one this was written against.
 #[must_use]
 pub fn transfers() -> Vec<Transfer> {
-    let mut rows = TRANSFERS.lines();
-    assert_eq!(
-        rows.next().unwrap_or_default().trim(),
-        concat!(
-            "report\taudited_entity\trole\tresolving_body\tresolution_date\t",
-            "effective_date\tdeparting\treceiving\tsection\trecital"
-        ),
-        "the transfer fixture header changed; update dispersion::lea_directory"
-    );
-    rows.filter(|line| !line.trim().is_empty())
-        .filter_map(|line| {
-            let f: Vec<&str> = line.split('\t').collect();
-            Some(Transfer {
-                report: f.first()?.to_string(),
-                audited_entity: f.get(1)?.to_string(),
-                role: f.get(2)?.to_string(),
-                resolving_body: f.get(3)?.to_string(),
-                resolution_date: f.get(4)?.to_string(),
-                effective_date: f.get(5)?.to_string(),
-                departing: f.get(6)?.to_string(),
-                receiving: f.get(7)?.to_string(),
-                section: f.get(8)?.to_string(),
-                recital: f.get(9)?.to_string(),
-            })
+    edfund_core::csv::delimited(TRANSFERS, TRANSFERS_HEADER, '\t')
+        .map(|row| Transfer {
+            report: row.str(transfer_column::REPORT).to_string(),
+            audited_entity: row.str(transfer_column::AUDITED_ENTITY).to_string(),
+            role: row.str(transfer_column::ROLE).to_string(),
+            resolving_body: row.str(transfer_column::RESOLVING_BODY).to_string(),
+            resolution_date: row.str(transfer_column::RESOLUTION_DATE).to_string(),
+            effective_date: row.str(transfer_column::EFFECTIVE_DATE).to_string(),
+            departing: row.str(transfer_column::DEPARTING).to_string(),
+            receiving: row.str(transfer_column::RECEIVING).to_string(),
+            section: row.str(transfer_column::SECTION).to_string(),
+            recital: row.str(transfer_column::RECITAL).to_string(),
         })
         .collect()
 }

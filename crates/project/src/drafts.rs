@@ -50,6 +50,21 @@ const FIXTURE: &str = include_str!("../fixtures/draft-provisions.tsv");
 const EXPECTED_HEADER: &str =
     "draft\tordinal\ttitle\tauthority\tparameter\tlever\tbaseline\tproposed\tnote";
 
+/// The columns of [`EXPECTED_HEADER`], named where they are read.
+///
+/// Tab-delimited, not comma: a provision's title and note are prose.
+mod column {
+    pub const DRAFT: usize = 0;
+    pub const ORDINAL: usize = 1;
+    pub const TITLE: usize = 2;
+    pub const AUTHORITY: usize = 3;
+    pub const PARAMETER: usize = 4;
+    pub const LEVER: usize = 5;
+    pub const BASELINE: usize = 6;
+    pub const PROPOSED: usize = 7;
+    pub const NOTE: usize = 8;
+}
+
 /// One lever a provision moves, already parsed.
 ///
 /// The five variants are the five fields of [`Policy`] and there is no sixth, which is the whole
@@ -343,27 +358,25 @@ pub fn price(draft: &Draft, panel: &[DistrictRecord]) -> Priced {
 /// is built to prevent — so it fails loudly instead of returning a shorter bill.
 #[must_use]
 pub fn drafts() -> BTreeMap<String, Draft> {
-    let mut rows = FIXTURE.lines();
-    assert_eq!(
-        rows.next().unwrap_or_default().trim_end(),
-        EXPECTED_HEADER,
-        "the draft-provisions fixture header changed; update project::drafts"
-    );
+    // The row-width assertion this used to carry itself now lives in the reader, which checks
+    // every row against the header. What stays here is the part that is this module's own: a
+    // provision naming a lever that does not exist is unpriced, and must not load quietly.
     let mut out: BTreeMap<String, Draft> = BTreeMap::new();
-    for line in rows.filter(|line| !line.trim().is_empty()) {
-        let f: Vec<&str> = line.split('\t').collect();
-        assert!(
-            f.len() == 9,
-            "a draft provision row has {} fields, not 9: {line}",
-            f.len()
-        );
-        let key = f[5].trim();
+    for row in edfund_core::csv::delimited(FIXTURE, EXPECTED_HEADER, '\t') {
+        let slug = row.str(column::DRAFT).to_string();
+        let title = row.str(column::TITLE).to_string();
+        let ordinal: u16 = row.str(column::ORDINAL).parse().unwrap_or_else(|_| {
+            panic!("a draft provision needs a numeric ordinal: {slug} {title:?}")
+        });
+        let key = row.str(column::LEVER);
         let lever = if key.is_empty() {
             None
         } else {
-            Some(Lever::parse(key, f[7].trim()).unwrap_or_else(|e| panic!("{line}: {e}")))
+            Some(
+                Lever::parse(key, row.str(column::PROPOSED))
+                    .unwrap_or_else(|e| panic!("{slug} provision {ordinal}: {e}")),
+            )
         };
-        let slug = f[0].trim().to_string();
         out.entry(slug.clone())
             .or_insert_with(|| Draft {
                 slug: slug.clone(),
@@ -372,16 +385,14 @@ pub fn drafts() -> BTreeMap<String, Draft> {
             .provisions
             .push(Provision {
                 draft: slug,
-                ordinal: f[1].trim().parse().unwrap_or_else(|_| {
-                    panic!("a draft provision needs a numeric ordinal: {line}")
-                }),
-                title: f[2].trim().to_string(),
-                authority: f[3].trim().to_string(),
-                parameter: f[4].trim().to_string(),
+                ordinal,
+                title,
+                authority: row.str(column::AUTHORITY).to_string(),
+                parameter: row.str(column::PARAMETER).to_string(),
                 lever,
-                baseline: f[6].trim().to_string(),
-                proposed: f[7].trim().to_string(),
-                note: f[8].trim().to_string(),
+                baseline: row.str(column::BASELINE).to_string(),
+                proposed: row.str(column::PROPOSED).to_string(),
+                note: row.str(column::NOTE).to_string(),
             });
     }
     for draft in out.values_mut() {
