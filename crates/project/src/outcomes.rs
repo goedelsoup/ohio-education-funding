@@ -116,50 +116,48 @@ mod profile_column {
     pub const ECON_DISADVANTAGED: usize = 3;
 }
 
-fn number(fields: &[&str], index: usize) -> Option<f64> {
-    fields
-        .get(index)
-        .map(|value| value.trim())
-        .filter(|value| !value.is_empty())
-        .and_then(|value| value.parse::<f64>().ok())
-        .filter(|value| value.is_finite())
-}
+/// The header `column` is written against. Asserted on every read: this module indexed the
+/// report card by bare position with nothing checking that the positions still meant what
+/// they were written to mean.
+const REPORT_CARD_HEADER: &str =
+    "irn,district,performance_index_2425,performance_index_2324,performance_index_2223,\
+unweighted_adm_fy25,weighted_adm_fy25,operating_expenditures_fy25,\
+exp_per_equivalent_pupil_fy25,exp_per_equivalent_pupil_federal_fy25,\
+exp_per_equivalent_pupil_state_local_fy25,progress_composite_2425,progress_effect_size_2425,\
+progress_effect_size_1yr_2425,econ_disadvantaged_pct_2425,english_learner_pct_2425,\
+students_with_disabilities_pct_2425";
+
+/// The header `profile_column` is written against, asserted for the same reason.
+const PROFILE_HEADER: &str = "irn,district,enrolled_adm_fy24,econ_disadvantaged_pct_fy24,\
+assessed_valuation_per_pupil_fy23,current_operating_millage_ty23,\
+effective_class1_millage_ty23,operating_expenditure_per_pupil_fy24,\
+state_revenue_per_pupil_fy24,local_revenue_per_pupil_fy24";
 
 /// Every district the report card covers.
 #[must_use]
 pub fn report_cards() -> Vec<ReportCard> {
-    REPORT_CARD
-        .lines()
-        .skip(1)
-        .filter(|line| !line.trim().is_empty())
-        .filter_map(|line| {
-            let fields: Vec<&str> = line.split(',').collect();
-            let irn = fields.get(column::IRN)?.trim();
+    edfund_core::csv::rows(REPORT_CARD, REPORT_CARD_HEADER)
+        .filter_map(|row| {
+            let irn = row.str(column::IRN);
             if irn.is_empty() {
                 return None;
             }
             Some(ReportCard {
                 irn: irn.to_string(),
-                performance_index: number(&fields, column::PERFORMANCE_INDEX),
-                performance_index_prior: number(&fields, column::PERFORMANCE_INDEX_PRIOR),
-                performance_index_earliest: number(&fields, column::PERFORMANCE_INDEX_EARLIEST),
-                progress_effect_size: number(&fields, column::PROGRESS_EFFECT_SIZE),
-                progress_effect_size_one_year: number(
-                    &fields,
-                    column::PROGRESS_EFFECT_SIZE_ONE_YEAR,
-                ),
-                unweighted_adm: number(&fields, column::UNWEIGHTED_ADM),
-                weighted_adm: number(&fields, column::WEIGHTED_ADM),
-                operating_expenditure: number(&fields, column::OPERATING_EXPENDITURE),
-                per_equivalent_pupil: number(&fields, column::PER_EQUIVALENT_PUPIL),
-                per_equivalent_pupil_federal: number(&fields, column::PER_EQUIVALENT_PUPIL_FEDERAL),
-                per_equivalent_pupil_state_local: number(
-                    &fields,
-                    column::PER_EQUIVALENT_PUPIL_STATE_LOCAL,
-                ),
-                economically_disadvantaged: number(&fields, column::ECON_DISADVANTAGED),
-                english_learner: number(&fields, column::ENGLISH_LEARNER),
-                students_with_disabilities: number(&fields, column::STUDENTS_WITH_DISABILITIES),
+                performance_index: row.num(column::PERFORMANCE_INDEX),
+                performance_index_prior: row.num(column::PERFORMANCE_INDEX_PRIOR),
+                performance_index_earliest: row.num(column::PERFORMANCE_INDEX_EARLIEST),
+                progress_effect_size: row.num(column::PROGRESS_EFFECT_SIZE),
+                progress_effect_size_one_year: row.num(column::PROGRESS_EFFECT_SIZE_ONE_YEAR),
+                unweighted_adm: row.num(column::UNWEIGHTED_ADM),
+                weighted_adm: row.num(column::WEIGHTED_ADM),
+                operating_expenditure: row.num(column::OPERATING_EXPENDITURE),
+                per_equivalent_pupil: row.num(column::PER_EQUIVALENT_PUPIL),
+                per_equivalent_pupil_federal: row.num(column::PER_EQUIVALENT_PUPIL_FEDERAL),
+                per_equivalent_pupil_state_local: row.num(column::PER_EQUIVALENT_PUPIL_STATE_LOCAL),
+                economically_disadvantaged: row.num(column::ECON_DISADVANTAGED),
+                english_learner: row.num(column::ENGLISH_LEARNER),
+                students_with_disabilities: row.num(column::STUDENTS_WITH_DISABILITIES),
             })
         })
         .collect()
@@ -217,15 +215,11 @@ impl Joined {
 #[must_use]
 pub fn joined() -> Vec<Joined> {
     let report_cards = report_cards();
-    let poverty: Vec<(&str, Option<f64>)> = PROFILE
-        .lines()
-        .skip(1)
-        .filter(|line| !line.trim().is_empty())
-        .map(|line| {
-            let fields: Vec<&str> = line.split(',').collect();
+    let poverty: Vec<(&str, Option<f64>)> = edfund_core::csv::rows(PROFILE, PROFILE_HEADER)
+        .map(|row| {
             (
-                fields.get(profile_column::IRN).map_or("", |v| v.trim()),
-                number(&fields, profile_column::ECON_DISADVANTAGED),
+                row.str(profile_column::IRN),
+                row.num(profile_column::ECON_DISADVANTAGED),
             )
         })
         .collect();
