@@ -1626,8 +1626,19 @@ fn array_pair(
     format!("\"{name}\": {{{body}}}")
 }
 
-/// `"<name>": {"k": v, …}` — an object of numeric fields and any boolean flags. Also closed.
-fn fields(name: &str, entries: &[(&str, f64)], flags: &[(&str, bool)]) -> String {
+/// `"<name>": {"k": v, …}` — numeric fields, boolean flags, then nullable numbers.
+///
+/// Closed here rather than by the caller, and `opts` is why that stays true. One call site
+/// needed three nullable fields on the end and got them by chopping the closing brace back
+/// off with `truncate(s.len() - 1)` — reproducing by hand the hazard this function was
+/// closed to prevent. A parameter is the fix: a caller that can reopen the object will
+/// eventually forget to close it.
+fn fields(
+    name: &str,
+    entries: &[(&str, f64)],
+    flags: &[(&str, bool)],
+    opts: &[(&str, Option<f64>)],
+) -> String {
     let mut body = entries
         .iter()
         .map(|(key, value)| format!("\"{key}\": {}", num(*value)))
@@ -1635,6 +1646,9 @@ fn fields(name: &str, entries: &[(&str, f64)], flags: &[(&str, bool)]) -> String
         .join(", ");
     for (key, value) in flags {
         body.push_str(&format!(", \"{key}\": {value}"));
+    }
+    for (key, value) in opts {
+        body.push_str(&format!(", \"{key}\": {}", opt(*value)));
     }
     format!("\"{name}\": {{{body}}}")
 }
@@ -2185,14 +2199,13 @@ impl Bundle {
                     ("performance_eligible", d.supplements.performance_eligible),
                     ("growth_eligible", d.supplements.growth_eligible),
                 ],
+                &[
+                    ("stars", d.supplements.stars),
+                    ("progress", d.supplements.progress),
+                    ("growth_forgone", d.supplements.growth_forgone),
+                ],
             ));
-            s.truncate(s.len() - 1);
-            s.push_str(&format!(
-                ", \"stars\": {}, \"progress\": {}, \"growth_forgone\": {}}}, ",
-                opt(d.supplements.stars),
-                opt(d.supplements.progress),
-                opt(d.supplements.growth_forgone)
-            ));
+            s.push_str(", ");
             match &d.national {
                 None => s.push_str("\"national\": null, "),
                 Some(n) => {
@@ -2212,6 +2225,7 @@ impl Bundle {
                                 n.spending_per_pupil_percentile,
                             ),
                         ],
+                        &[],
                         &[],
                     ));
                     s.push_str(", ");
@@ -2237,6 +2251,7 @@ impl Bundle {
                     ("fy21_funding_base", d.transition.fy21_funding_base),
                     ("transition_supplement", d.transition.transition_supplement),
                 ],
+                &[],
                 &[],
             ));
             s.push_str(", ");
@@ -2286,6 +2301,7 @@ impl Bundle {
                     ),
                 ],
                 &[("paid_on_miles", d.transportation.paid_on_miles)],
+                &[],
             ));
             s.push_str(", ");
             s.push_str("\"house_districts\": [");
@@ -2479,6 +2495,7 @@ impl Bundle {
                     ("index", d.dpia.index),
                 ],
                 &[],
+                &[],
             ));
             s.push_str(", ");
             s.push_str(&fields(
@@ -2504,6 +2521,7 @@ impl Bundle {
                     "supplement_eligible",
                     d.targeted_assistance.supplement_eligible,
                 )],
+                &[],
             ));
             s.push_str(", ");
             s.push_str(&fields(
@@ -2521,6 +2539,7 @@ impl Bundle {
                     ("specialist_9_12_aid", d.gifted.specialist_9_12_aid),
                 ],
                 &[("entirely_on_the_floor", d.gifted.entirely_on_the_floor)],
+                &[],
             ));
             s.push_str(&format!(
                 ", \"categorical_adm\": {}, ",
@@ -2536,6 +2555,7 @@ impl Bundle {
                     ("gifted", d.categoricals.gifted),
                     ("career_technical", d.categoricals.career_technical),
                 ],
+                &[],
                 &[],
             ));
             s.push_str(", ");
