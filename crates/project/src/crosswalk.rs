@@ -35,6 +35,8 @@
 //! divided by 3.5 children. Any claim about fixed costs in small districts that is computed on
 //! the complete panel has silently excluded its most extreme case.
 
+use crate::outcomes::{PROFILE_HEADER, REPORT_CARD_HEADER};
+use crate::panel::EXPECTED_HEADER as FY27_MODEL_HEADER;
 use std::collections::BTreeSet;
 
 /// The department's FY2027 funding model.
@@ -44,6 +46,16 @@ const PROFILE: &str = include_str!("../../dispersion/fixtures/cupp-fy24-district
 /// The 2024-25 Ohio School Report Card.
 const REPORT_CARD: &str =
     include_str!("../../dispersion/fixtures/report-card-2425-district-data.csv");
+
+/// The two columns this module reads.
+///
+/// It reads only these, in all three panels, because all three identify a district the same
+/// way — IRN first, name second. That agreement is what makes a crosswalk computable at all,
+/// and it is asserted rather than assumed in the tests below.
+mod column {
+    pub const IRN: usize = 0;
+    pub const NAME: usize = 1;
+}
 
 /// A district that is missing from at least one panel, with what is known about why.
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -120,12 +132,21 @@ pub struct Counts {
     pub complete: usize,
 }
 
-fn keys(csv: &str) -> BTreeSet<String> {
-    csv.lines()
-        .skip(1)
-        .filter(|line| !line.trim().is_empty())
-        .filter_map(|line| line.split(',').next())
-        .map(|irn| irn.trim().to_string())
+/// Every IRN in one panel.
+///
+/// The header is named at each call site rather than skipped. All three panels used to be read
+/// with `.skip(1)` and their columns taken on faith, and the two ways that could go wrong are
+/// not equally visible:
+///
+/// A column inserted *ahead* of the IRN collapses every panel to a single key, which the
+/// pinned counts below would catch — loudly, though the message would be about 609 becoming 1
+/// rather than about a moved column. A column inserted *between* the IRN and the name leaves
+/// the keys correct and replaces all 609 district names with the new column's contents, and
+/// nothing caught that at all: the full suite passed with every name in `coverage` reading
+/// the same wrong string.
+fn keys(csv: &str, header: &str) -> BTreeSet<String> {
+    edfund_core::csv::rows(csv, header)
+        .map(|row| row.str(column::IRN).to_string())
         .filter(|irn| !irn.is_empty())
         .collect()
 }
@@ -137,17 +158,19 @@ fn keys(csv: &str) -> BTreeSet<String> {
 /// these files contains.
 #[must_use]
 pub fn coverage() -> Vec<Coverage> {
-    let model = keys(FY27_MODEL);
-    let profile = keys(PROFILE);
-    let report_card = keys(REPORT_CARD);
+    let model = keys(FY27_MODEL, FY27_MODEL_HEADER);
+    let profile = keys(PROFILE, PROFILE_HEADER);
+    let report_card = keys(REPORT_CARD, REPORT_CARD_HEADER);
 
-    let mut names = std::collections::BTreeMap::new();
-    for line in FY27_MODEL.lines().skip(1) {
-        let mut fields = line.split(',');
-        if let (Some(irn), Some(name)) = (fields.next(), fields.next()) {
-            names.insert(irn.trim().to_string(), name.trim().to_string());
-        }
-    }
+    let names: std::collections::BTreeMap<String, String> =
+        edfund_core::csv::rows(FY27_MODEL, FY27_MODEL_HEADER)
+            .map(|row| {
+                (
+                    row.str(column::IRN).to_string(),
+                    row.str(column::NAME).to_string(),
+                )
+            })
+            .collect();
 
     let mut all: BTreeSet<&String> = BTreeSet::new();
     all.extend(&model);
@@ -190,6 +213,35 @@ pub fn counts() -> Counts {
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    /// The invariant that lets one reader serve three files.
+    ///
+    /// `keys` takes column zero from each panel and `coverage` takes column one from the
+    /// model. If a panel ever renames or reorders those two, the header assertion catches it
+    /// — but this states the shared shape directly, so the reason the three are readable by
+    /// one function is written down rather than inferred from three long constants.
+    #[test]
+    fn all_three_panels_identify_a_district_the_same_way() {
+        for (panel, header) in [
+            ("FY2027 funding model", FY27_MODEL_HEADER),
+            ("FY2024 District Profile Report", PROFILE_HEADER),
+            ("2024-25 report card", REPORT_CARD_HEADER),
+        ] {
+            let columns: Vec<&str> = header.split(',').collect();
+            assert_eq!(
+                columns[column::IRN],
+                "irn",
+                "{panel} column {}",
+                column::IRN
+            );
+            assert_eq!(
+                columns[column::NAME],
+                "district",
+                "{panel} column {}",
+                column::NAME
+            );
+        }
+    }
 
     #[test]
     fn the_three_counts_are_the_ones_the_corpus_has_been_quoting() {

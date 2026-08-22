@@ -119,7 +119,7 @@ mod profile_column {
 /// The header `column` is written against. Asserted on every read: this module indexed the
 /// report card by bare position with nothing checking that the positions still meant what
 /// they were written to mean.
-const REPORT_CARD_HEADER: &str =
+pub(crate) const REPORT_CARD_HEADER: &str =
     "irn,district,performance_index_2425,performance_index_2324,performance_index_2223,\
 unweighted_adm_fy25,weighted_adm_fy25,operating_expenditures_fy25,\
 exp_per_equivalent_pupil_fy25,exp_per_equivalent_pupil_federal_fy25,\
@@ -128,7 +128,11 @@ progress_effect_size_1yr_2425,econ_disadvantaged_pct_2425,english_learner_pct_24
 students_with_disabilities_pct_2425";
 
 /// The header `profile_column` is written against, asserted for the same reason.
-const PROFILE_HEADER: &str = "irn,district,enrolled_adm_fy24,econ_disadvantaged_pct_fy24,\
+///
+/// Both of these are shared with [`crate::crosswalk`], for the reason given on
+/// [`crate::panel::EXPECTED_HEADER`].
+pub(crate) const PROFILE_HEADER: &str =
+    "irn,district,enrolled_adm_fy24,econ_disadvantaged_pct_fy24,\
 assessed_valuation_per_pupil_fy23,current_operating_millage_ty23,\
 effective_class1_millage_ty23,operating_expenditure_per_pupil_fy24,\
 state_revenue_per_pupil_fy24,local_revenue_per_pupil_fy24";

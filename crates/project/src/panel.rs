@@ -1339,7 +1339,11 @@ mod column {
 
 /// The header this loader expects, so a fixture reshaped without updating [`column`] fails
 /// loudly rather than reading the wrong column.
-const EXPECTED_HEADER: &str = "irn,district,base_cost_enrolled_adm,school_buildings,\
+///
+/// Shared with [`crate::crosswalk`], which reads the same fixture for its IRN column. One
+/// constant per fixture rather than one per reader: two copies could drift apart, and the
+/// stale one would keep asserting a header the file no longer has.
+pub(crate) const EXPECTED_HEADER: &str = "irn,district,base_cost_enrolled_adm,school_buildings,\
 adm_kindergarten,adm_grades_1_3,adm_grades_4_8_non_cte,adm_grades_9_12_non_cte,adm_cte,\
 adm_grades_9_12_total,funded_classroom_teachers,funded_special_teachers,teacher_base_cost,\
 aggregate_base_cost,base_cost_per_pupil,temp_transitional_aid_guarantee,enrolled_adm_fy24,\
