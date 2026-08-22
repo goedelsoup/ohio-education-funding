@@ -13,6 +13,19 @@
 //! Numbers go through [`crate::conventions::number`], so a suppressed count reads as absent
 //! rather than as zero — the distinction `connect` established and four parsers downstream
 //! were losing.
+//!
+//! # What this is not for
+//!
+//! Committed fixtures only. They come off `connect`'s writers, so their shape is guaranteed
+//! and both assertions here are free.
+//!
+//! Three readers in this workspace parse files the workspace did not write, and they are
+//! deliberately left alone: `connect::cpi::parse_series` scans the Bureau of Labor Statistics
+//! flat file, whose trailing footnote column is absent from the rows rather than empty;
+//! `connect::forecast::parse` reads a department extract by column *name* and returns an error
+//! rather than panicking, because its column order is not ours to fix. Asserting a shape on an
+//! external file would turn the publisher changing their format into a panic in a library.
+//! Tolerance there is the correct design, not an oversight to be tidied away.
 
 use crate::conventions;
 
@@ -83,22 +96,41 @@ impl<'a> Row<'a> {
 /// header's. Both are build-time facts rather than runtime conditions — these fixtures are
 /// compiled in — and reading shifted columns silently is worse than not reading them at all.
 pub fn rows<'a>(text: &'a str, expected: &str) -> impl Iterator<Item = Row<'a>> {
+    delimited(text, expected, ',')
+}
+
+/// The same, for a fixture delimited by something other than a comma.
+///
+/// Tab-delimited fixtures exist here because their content cannot survive the no-comma rule
+/// `connect::fixtures::write_csv` enforces: legal recitals, line-item titles and draft
+/// provisions are full of commas. They come off the same pipeline and carry the same
+/// guarantee, so they get the same two assertions.
+///
+/// # Panics
+///
+/// As [`rows`]: on a header that is not `expected`, or a row whose cell count differs from the
+/// header's.
+pub fn delimited<'a>(
+    text: &'a str,
+    expected: &str,
+    delimiter: char,
+) -> impl Iterator<Item = Row<'a>> {
     let mut lines = text.lines();
     let header = lines.next().unwrap_or_default().trim();
     assert_eq!(
         header, expected,
         "a committed fixture's header changed; the columns this reader indexes have moved"
     );
-    let width = expected.split(',').count();
+    let width = expected.split(delimiter).count();
     lines
         .filter(|line| !line.trim().is_empty())
         .map(move |line| {
-            let fields: Vec<&str> = line.split(',').collect();
+            let fields: Vec<&str> = line.split(delimiter).collect();
             assert_eq!(
                 fields.len(),
                 width,
                 "a fixture row holds {} cells where the header names {width}; a cell containing \
-                 a comma shifts every column after it, and reads cleanly: {line}",
+                 the delimiter shifts every column after it, and reads cleanly: {line}",
                 fields.len()
             );
             Row { fields }
@@ -173,6 +205,29 @@ mod tests {
     fn a_cell_containing_a_comma_fails_rather_than_shifting_the_columns() {
         let text = "irn,name,amount\n000442,\"A, B\",1\n";
         let _ = rows(text, HEADER).count();
+    }
+
+    /// The tab family gets both assertions too, on the same terms.
+    #[test]
+    fn a_tab_delimited_fixture_reads_and_checks_the_same_way() {
+        let header = "report\taudited_entity\trecital";
+        let text = "report\taudited_entity\trecital\n\
+                    2019-Erie\tKelleys Island Local\tTransfer, by resolution, of territory\n";
+        let rows: Vec<Row<'_>> = delimited(text, header, '\t').collect();
+        assert_eq!(rows.len(), 1);
+        assert_eq!(
+            rows[0].str(2),
+            "Transfer, by resolution, of territory",
+            "a comma is ordinary content in a tab-delimited fixture"
+        );
+    }
+
+    #[test]
+    #[should_panic(expected = "holds 4 cells where the header names 3")]
+    fn a_tab_inside_a_cell_shifts_the_columns_and_is_refused() {
+        let header = "report\taudited_entity\trecital";
+        let text = "report\taudited_entity\trecital\n2019-Erie\tKelleys\tIsland\tresolution\n";
+        let _ = delimited(text, header, '\t').count();
     }
 
     #[test]

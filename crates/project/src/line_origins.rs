@@ -32,6 +32,21 @@ use std::collections::BTreeMap;
 /// The committed extract: one row per line item per edition.
 const BASIS: &str = include_str!("../fixtures/catalog-line-item-basis.tsv");
 
+/// The header [`current`] indexes against, promoted out of the reader that used to hold it
+/// inline — the only one of these that named its columns nowhere a caller could see.
+///
+/// Tab-delimited, not comma: a legal basis is a sentence citing sections and session laws.
+const BASIS_HEADER: &str = "edition\tfund\tali\tname\tlegal_basis";
+
+/// The columns of [`BASIS_HEADER`], named where they are read.
+mod column {
+    pub const EDITION: usize = 0;
+    pub const FUND: usize = 1;
+    pub const ALI: usize = 2;
+    pub const NAME: usize = 3;
+    pub const LEGAL_BASIS: usize = 4;
+}
+
 /// The year a General Assembly convened.
 ///
 /// Ohio numbers its General Assemblies consecutively from the first, each sitting for two years
@@ -108,29 +123,21 @@ fn established(basis: &str) -> (String, Option<u16>) {
 /// wording to disagree with another's and no way to adjudicate.
 #[must_use]
 pub fn current() -> Vec<LineOrigin> {
-    let mut rows = BASIS.lines();
-    assert_eq!(
-        rows.next().unwrap_or_default(),
-        "edition\tfund\tali\tname\tlegal_basis",
-        "the basis fixture's columns changed and this reader did not"
-    );
-    let parsed: Vec<(u16, LineOrigin)> = rows
-        .filter(|row| !row.trim().is_empty())
+    // The `f.len() < 5` guard this used to carry has moved into the reader, which asserts
+    // every row against the header's width rather than skipping the short ones.
+    let parsed: Vec<(u16, LineOrigin)> = edfund_core::csv::delimited(BASIS, BASIS_HEADER, '\t')
         .filter_map(|row| {
-            let f: Vec<&str> = row.split('\t').collect();
-            if f.len() < 5 {
-                return None;
-            }
-            let (established_by, general_assembly) = established(f[4]);
+            let basis = row.str(column::LEGAL_BASIS);
+            let (established_by, general_assembly) = established(basis);
             Some((
-                f[0].parse().ok()?,
+                row.str(column::EDITION).parse().ok()?,
                 LineOrigin {
-                    fund: f[1].to_string(),
-                    ali: f[2].to_string(),
-                    name: f[3].to_string(),
+                    fund: row.str(column::FUND).to_string(),
+                    ali: row.str(column::ALI).to_string(),
+                    name: row.str(column::NAME).to_string(),
                     established_by,
                     general_assembly,
-                    discontinued: f[4].to_lowercase().contains("discontinued line item"),
+                    discontinued: basis.to_lowercase().contains("discontinued line item"),
                 },
             ))
         })
