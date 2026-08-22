@@ -1,0 +1,401 @@
+# mise.yidam.toml — yidam CLI tasks for a derived repository.
+#
+# This is the INHERITED task layer. Pull it into your mise.toml with:
+#
+#   [task_config]
+#   includes = ["mise.yidam.toml"]
+#
+# This is a mise *task file*, not a standalone config: tables are task names
+# directly (`[graph-check]`, not `[tasks.graph-check]`) and it carries no
+# `[tools]` section — the toolchain belongs in mise.toml. It also carries no
+# `[env]`: in a task file that declares a task named `env`, not an environment.
+# Loading this as a config (`MISE_ENV=yidam`) will not work. Nor will a top-level
+# `extends`: mise accepts `extends` on an individual task, never on a config
+# file, and silently orphans every task here if you try it.
+#
+# Keep domain tasks in mise.toml, not here: `mise run yidam-vendor-update` may
+# replace this file wholesale, and anything you wrote in it would go with it.
+#
+# Run `mise run yidam-build` once to install the yidam binary. Then use
+# `mise run regen` to regenerate all README indexes.
+
+# ── yidam CLI — build ─────────────────────────────────────────────────
+# The CLI is NOT vendored into derived repos — a vendored copy is a fork that
+# never gets rebuilt. It is installed from the origin commit pinned in
+# .yidam.toml, so the binary and the vendored prelude always agree.
+#
+# INSTALLED INTO THIS REPOSITORY, at .yidam/bin/, beside the pin it is built
+# from. It used to go to ~/.cargo/bin, which is one location per machine while
+# the pin is one per repository — so on a machine with two yidam repositories it
+# was last-writer-wins, and the sentence above held for exactly one of them. The
+# other ran a binary that did not match its own vendored prelude, and nothing
+# anywhere said so.
+#
+# Putting .yidam/bin ahead on PATH is what makes the shell and the editor resolve
+# the same binary. That declaration lives in YOUR mise.toml, not here:
+#
+#   [env]
+#   _.path = [".yidam/bin"]
+#
+# It cannot live in this file. A task file has no `[env]` section — mise reads
+# `[env]` here as a task *named* env and rejects `_.path` as an unknown field,
+# which orphans every task in the file. It sat here for exactly that long.
+
+[yidam-build]
+description = "Install the yidam binary from the commit pinned in .yidam.toml."
+run = """
+set -eu
+if [ ! -f .yidam.toml ]; then
+  echo "ERROR: no .yidam.toml — this repo has no recorded yidam provenance." >&2
+  echo "       run 'mise run yidam-vendor-update' to create one." >&2
+  exit 1
+fi
+origin=$(sed -n 's/^ *origin *= *"\\(.*\\)"/\\1/p' .yidam.toml)
+commit=$(sed -n 's/^ *commit *= *"\\(.*\\)"/\\1/p' .yidam.toml)
+if [ -z "$commit" ] || [ "$commit" = "unknown" ]; then
+  echo "ERROR: .yidam.toml records no resolvable commit." >&2
+  echo "       repair it with 'mise run yidam-vendor-update'." >&2
+  exit 1
+fi
+tmp=$(mktemp -d)
+trap 'rm -rf "$tmp"' EXIT
+git clone --quiet --filter=blob:none "$origin" "$tmp/yidam"
+git -C "$tmp/yidam" checkout --quiet "$commit"
+# The light `reports` build: no protoc, no fastembed, no lancedb. Add
+# `--features full` if you need index-build/serve/sqlite/rdf/tonpa.
+#
+# --root: install here rather than into ~/.cargo/bin. `cargo install --root DIR`
+# writes DIR/bin/, so this lands at .yidam/bin/yidam.
+# --force: without it cargo refuses with "binary yidam already exists in
+# destination" (exit 101) whenever .yidam/bin holds a binary its own install
+# metadata does not account for. .yidam/bin/ is git-ignored and the metadata
+# beside it is not, so the two drift apart on any fresh clone or hand-copied
+# binary — and this task, whose whole job is to make the binary match the pin,
+# would fail rather than do it.
+cargo install --force --root "$PWD/.yidam" --path "$tmp/yidam/yidam/cli" --locked
+echo
+echo "installed .yidam/bin/yidam @ $commit"
+echo "Put .yidam/bin first on PATH — [env] _.path in mise.toml covers anything mise"
+echo "runs; a script or CI step that builds PATH by hand has to do it itself, or a"
+echo "yidam from somewhere else will answer for this repository."
+"""
+
+# ── vendored prelude — status and update ──────────────────────────────
+# The prelude is not frozen at the repo's birth. These two tasks are how a
+# correction made upstream reaches this repository.
+
+[yidam-vendor-status]
+description = "Show the pinned yidam commit and whether the origin has moved past it."
+run = """
+set -eu
+if [ ! -f .yidam.toml ]; then
+  echo "no .yidam.toml — this repo has no recorded yidam provenance"
+  exit 1
+fi
+origin=$(sed -n 's/^ *origin *= *"\\(.*\\)"/\\1/p' .yidam.toml)
+commit=$(sed -n 's/^ *commit *= *"\\(.*\\)"/\\1/p' .yidam.toml)
+template=$(sed -n 's/^ *template *= *"\\(.*\\)"/\\1/p' .yidam.toml)
+committed=$(sed -n 's/^ *committed *= *"\\(.*\\)"/\\1/p' .yidam.toml)
+ref="${YIDAM_REF:-HEAD}"
+echo "origin    $origin"
+echo "pinned    $commit ($template, committed $committed)"
+# `head -n1`: `git ls-remote <url> HEAD` can match more than one ref — HEAD itself and
+# a refs/remotes/origin/HEAD the origin happens to carry — and every extra line went
+# into $remote, so the equality test below could never be true. This task reported
+# "origin has moved" unconditionally, including when the pin was exactly current.
+remote=$(git ls-remote "$origin" "$ref" 2>/dev/null | cut -f1 | head -n1)
+if [ -z "$remote" ]; then
+  echo "remote    unreachable — cannot compare"
+  exit 0
+fi
+echo "origin/$ref  $remote"
+if [ "$remote" = "$commit" ]; then
+  echo
+  echo "up to date"
+  exit 0
+fi
+echo
+echo "origin has moved — run 'mise run yidam-vendor-update' to adopt it"
+# "Has moved" is a boolean, and a boolean is not enough to act on. How far, how old,
+# and — the part that actually costs something — whether the CLOSED COMMIT VOCABULARY
+# changed, because that is what this repository has already written history against
+# and history cannot be rewritten to match a verb.
+#
+# The clone happens only on this branch: the ls-remote above answers the common case
+# for free, and nobody pays for a fetch to be told they are current.
+tmp=$(mktemp -d)
+trap 'rm -rf "$tmp"' EXIT
+if ! git clone --quiet --filter=blob:none --no-checkout "$origin" "$tmp/y" 2>/dev/null; then
+  echo "(could not fetch $origin for detail)"
+  exit 0
+fi
+behind=$(git -C "$tmp/y" rev-list --count "$commit..origin/HEAD" 2>/dev/null || echo 0)
+pinned_at=$(git -C "$tmp/y" log -1 --format=%at "$commit" 2>/dev/null || echo "")
+if [ -n "$pinned_at" ]; then
+  days=$(( ( $(date +%s) - pinned_at ) / 86400 ))
+  echo
+  echo "behind    $behind commit(s), pinned $days day(s) ago"
+fi
+moved=$(git -C "$tmp/y" diff --name-only "$commit" origin/HEAD -- yidam/prelude/ 2>/dev/null | wc -l | tr -d ' ')
+echo "prelude   $moved file(s) changed since the pin"
+if git -C "$tmp/y" diff --name-only "$commit" origin/HEAD -- yidam/prelude/GRAPH.md 2>/dev/null | grep -q .; then
+  before="$tmp/vb"; after="$tmp/va"
+  git -C "$tmp/y" show "$commit:yidam/prelude/GRAPH.md" 2>/dev/null \\
+    | sed -n 's/^| `\\([a-z]*\\)` |.*/\\1/p' | sort -u > "$before" || true
+  git -C "$tmp/y" show "origin/HEAD:yidam/prelude/GRAPH.md" 2>/dev/null \\
+    | sed -n 's/^| `\\([a-z]*\\)` |.*/\\1/p' | sort -u > "$after" || true
+  added=$(comm -13 "$before" "$after" || true)
+  removed=$(comm -23 "$before" "$after" || true)
+  if [ -n "$added" ] || [ -n "$removed" ]; then
+    echo
+    echo "the closed commit vocabulary moved:"
+    [ -n "$added" ]   && printf '%s\\n' "$added"   | sed 's/^/  + /'
+    [ -n "$removed" ] && printf '%s\\n' "$removed" | sed 's/^/  - /'
+  fi
+fi
+"""
+
+[yidam-vendor-update]
+description = "Re-vendor .yidam/.vendor/prelude/ from the origin and re-pin .yidam.toml. Set YIDAM_REF to target a tag or branch."
+run = """
+set -eu
+origin="git@github.com:goedelsoup/yidam.git"
+if [ -f .yidam.toml ]; then
+  found=$(sed -n 's/^ *origin *= *"\\(.*\\)"/\\1/p' .yidam.toml)
+  [ -n "$found" ] && origin="$found"
+fi
+ref="${YIDAM_REF:-HEAD}"
+# The pin being replaced, captured before .yidam.toml is overwritten below. It is what
+# makes the vocabulary report at the end possible.
+previous=""
+if [ -f .yidam.toml ]; then
+  previous=$(sed -n 's/^ *commit *= *"\\(.*\\)"/\\1/p' .yidam.toml)
+fi
+tmp=$(mktemp -d)
+trap 'rm -rf "$tmp"' EXIT
+echo "fetching $origin at $ref …"
+git clone --quiet --filter=blob:none "$origin" "$tmp/yidam"
+if [ "$ref" != "HEAD" ]; then
+  git -C "$tmp/yidam" checkout --quiet "$ref"
+fi
+commit=$(git -C "$tmp/yidam" rev-parse HEAD)
+template=$(git -C "$tmp/yidam" describe --tags --exact-match HEAD 2>/dev/null || echo untagged)
+committed=$(git -C "$tmp/yidam" log -1 --format=%as HEAD)
+if [ ! -d "$tmp/yidam/yidam/prelude" ]; then
+  echo "ERROR: $origin@$commit has no yidam/prelude/ — wrong origin?" >&2
+  exit 1
+fi
+# Wholesale replacement, not a merge: the prelude is read-only in a derived
+# repo, so there is nothing local to preserve. Anything that WAS edited locally
+# shows up in the diff below, which is the point.
+rm -rf .yidam/.vendor/prelude
+mkdir -p .yidam/.vendor
+cp -R "$tmp/yidam/yidam/prelude" .yidam/.vendor/prelude
+# This file too. It is the inherited TASK layer — as read-only as the prelude and
+# as much yidam's to correct, but it does not live under .yidam/.vendor/ because
+# mise has to find it at the repo root. For a long time that meant it had no
+# update path at all: a derived repo froze whatever mise.yidam.toml it was born
+# with, permanently, including a `vendor(yidam):` line this project later found
+# to be unrecognizable to its own lint. Corrections upstream never arrived.
+#
+# Keep domain tasks in mise.toml. Anything written here is replaced on this line.
+if [ -f "$tmp/yidam/mise.yidam.toml" ]; then
+  cp "$tmp/yidam/mise.yidam.toml" mise.yidam.toml
+  echo "refreshed mise.yidam.toml (the inherited task layer)"
+fi
+cat > .yidam.toml <<EOF
+# Provenance of the yidam template this repository was derived from.
+#
+# Written at clone/overlay time, when the yidam source was still a git
+# repository. Updated by \\`mise run yidam-vendor-update\\`.
+#
+# \\`commit\\` is the resolvable pin: it is what the re-vendor procedure and CI
+# check out. \\`template\\` is the release tag at that commit, or "untagged".
+# \\`committed\\` is that commit's date — how old the vendored prelude is.
+#
+# See .yidam/.vendor/prelude/guidelines/directories.md for the re-vendor procedure.
+
+[yidam]
+origin    = "$origin"
+commit    = "$commit"
+template  = "$template"
+committed = "$committed"
+EOF
+echo
+echo "re-vendored to $commit ($template)"
+# What moved in the CLOSED VOCABULARY, specifically. Everything else in the prelude is
+# a document you can read at leisure; the vocabulary is the part this repository has
+# already written history against, and history cannot be rewritten to match a verb.
+# A derived repo once spent four commits reverting a verb that upstream had blessed
+# the same day, because nothing told it either fact.
+if [ -n "$previous" ] && [ "$previous" != "unknown" ] && [ "$previous" != "$commit" ]; then
+  verbs_at() {
+    git -C "$tmp/yidam" show "$1:yidam/prelude/GRAPH.md" 2>/dev/null \\
+      | sed -n 's/^| `\\([a-z]*\\)` |.*/\\1/p' | sort -u
+  }
+  before=$(verbs_at "$previous")
+  after=$(verbs_at "$commit")
+  if [ -n "$before" ] && [ -n "$after" ]; then
+    # Temp files rather than process substitution: these tasks run under POSIX sh,
+    # where <( ) does not exist and would fail at the first repository to run it.
+    printf '%s\\n' "$before" > "$tmp/verbs.before"
+    printf '%s\\n' "$after"  > "$tmp/verbs.after"
+    added=$(comm -13 "$tmp/verbs.before" "$tmp/verbs.after" || true)
+    removed=$(comm -23 "$tmp/verbs.before" "$tmp/verbs.after" || true)
+    if [ -n "$added" ] || [ -n "$removed" ]; then
+      echo
+      echo "the closed commit vocabulary moved:"
+      [ -n "$added" ]   && printf '%s\\n' "$added"   | sed 's/^/  + /'
+      [ -n "$removed" ] && printf '%s\\n' "$removed" | sed 's/^/  - /'
+      echo "  read .yidam/.vendor/prelude/GRAPH.md before writing more commits."
+    fi
+  fi
+fi
+echo "review the diff, then commit it as its own event:"
+echo "  git add .yidam/.vendor/prelude .yidam.toml mise.yidam.toml"
+echo "  git commit -m 'vendor: re-vendor prelude at $commit — <what changed>'"
+"""
+
+# ── yidam CLI — REGEN tasks ───────────────────────────────────────────
+
+[status]
+description = "Repo overview: node count, open questions, catalog entries, index freshness, active phases, genesis date."
+run = "yidam status"
+
+[open-questions]
+description = "List corpus nodes with open questions (? titles or [open] claims)."
+run = "yidam open-questions"
+
+[corpus-index]
+description = "Regenerate corpus/README.md index table."
+run = "yidam corpus-index"
+
+[index-status]
+description = "Report vector index state: embedding model, coverage, freshness, retrieval latency."
+run = "yidam index-status"
+
+[catalog-audit]
+description = "Audit catalog/ entries: integrity status, citation count, stale sources."
+run = "yidam catalog-audit"
+
+[phases]
+description = "List active inquiry phases (ma/* and rigpa/* branches) with owner, start date, and commit count."
+run = "yidam phases"
+
+[sangha]
+description = "Report the sangha: registered electors, their positions, and settled resolutions."
+run = "yidam sangha"
+
+[vocabulary]
+description = "Print the closed commit vocabulary. `mise run vocabulary -- --check \"verb: subject\"` checks one subject before it is committed."
+run = "yidam vocabulary"
+
+[agents-index]
+description = "Regenerate agents/README.md index table."
+run = "yidam agents-index"
+
+[skills-index]
+description = "Regenerate skills/README.md index table."
+run = "yidam skills-index"
+
+[crates-index]
+description = "Regenerate crates/README.md index table."
+run = "yidam crates-index"
+
+[packages-index]
+description = "Regenerate packages/README.md index table."
+run = "yidam packages-index"
+
+[bundle-status]
+description = "Report web/ bundle state: contract version, feeds, last export timestamp, deploy status."
+run = "yidam bundle-status"
+
+[log]
+description = "Commit history classified as testimony or pipeline work. --epistemic for testimony only."
+run = "yidam log"
+
+[graph]
+description = "Report the corpus graph: nodes, resolved edges, and the classes that license them."
+run = "yidam graph"
+
+[graph-check]
+description = "Run graph integrity check: orphans, missing labels, broken links."
+run = "yidam graph-check"
+
+[neighbors]
+description = "Show the neighbourhood of one node — `mise run neighbors -- concept/x.yml --depth 2`."
+run = "yidam neighbors"
+
+[rename]
+description = "Rename a corpus node, rewriting every edge into it — `mise run rename -- concept/old concept/new --dry-run`."
+run = "yidam rename"
+
+[graph-lint]
+description = "Lint the corpus against the baseline ratchet: 13 checks over nodes, edges, catalog, classes, and tables."
+run = "yidam lint"
+
+[graph-lint-explain]
+description = "Lint, printing each check's rationale alongside its findings."
+run = "yidam lint --explain"
+
+[graph-lint-commits]
+description = "Lint, also checking the git log against the closed commit vocabulary in GRAPH.md."
+run = "yidam lint --commits"
+
+[graph-lint-bless]
+description = "Record the corpus's current error-severity violations as its baseline. Review the diff before committing."
+run = "yidam lint --bless"
+
+[schema]
+description = "Emit JSON Schema for the corpus shapes into .yidam/schemas/ for in-editor validation."
+run = "yidam schema"
+
+[decisions-log]
+description = "Render the decisions log from .yidam/decisions/."
+run = "yidam decisions-log"
+
+[bundle]
+description = "Package corpus, skills, decisions, rendered indexes, and vector index into .yidam/bundle.yiz."
+run = "yidam bundle"
+
+# ── vector index pipeline ─────────────────────────────────────────────
+
+[embed]
+description = "Extract embedding text from corpus instances and catalog sources to .yidam/embeddings/."
+# The catalog is included by default. `yidam embed --no-catalog` for corpus nodes only —
+# a repository whose catalog holds material it does not want retrievable should say so
+# once rather than by not knowing.
+run = "yidam embed"
+
+[index-build]
+description = "Build LanceDB vector index from embeddings and export Arrow IPC. Downloads model (~22 MB) on first run."
+depends = ["embed"]
+run = "yidam index-build"
+
+# ── web shell ─────────────────────────────────────────────────────────
+
+[web-install]
+description = "Install packages/web/ npm dependencies."
+run = "cd packages/web && npm install"
+
+[web-dev]
+description = "Start corpus search dev server at localhost:5173."
+run = "cd packages/web && npm run dev"
+
+[web-build]
+description = "Build corpus search web shell to packages/web/dist/."
+depends = ["bundle"]
+run = "cd packages/web && npm run build"
+
+[regen-check]
+description = "Report which REGEN blocks are stale, writing nothing — safe to run with work in flight."
+run = "yidam regen --check"
+
+[regen]
+description = "Regenerate all REGEN sections across READMEs in one pass."
+# One `yidam regen` rather than a `depends` list, because there were two lists and they
+# drifted: this task ran eight generators and CI checked two of them, so six blocks could
+# go stale unseen. The set now lives in the CLI (`cmd::regen::GENERATORS`) and both callers
+# ask for it by name. `status` and `open-questions` are in it now too — they write blocks
+# into the root README and were in neither list.
+run = "yidam regen"
