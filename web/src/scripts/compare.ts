@@ -108,6 +108,24 @@ const FLAGS: { label: string; pick: (d: PanelDistrict) => boolean }[] = [
   { label: "At the minimum state share", pick: (d) => d.at_minimum_state_share },
 ];
 
+/**
+ * The runtime twin of `qualifiedName` in `src/lib/feed.ts`.
+ *
+ * Three districts are called Green Local. Comparing two of them put the same string in both
+ * column heads, which is the one table where the heads are the entire distinction between the
+ * columns. The panel already carries `county`, so this asks the same question of it that the
+ * build asks of the bundle, and the two answer alike because both qualify only on a repeat.
+ */
+let ambiguous: Set<string> | null = null;
+function qualified(panel: Panel, d: PanelDistrict): string {
+  if (!ambiguous) {
+    const counts = new Map<string, number>();
+    for (const other of panel.districts) counts.set(other.name, (counts.get(other.name) ?? 0) + 1);
+    ambiguous = new Set([...counts].filter(([, n]) => n > 1).map(([name]) => name));
+  }
+  return ambiguous.has(d.name) ? `${d.name}, ${d.county} County` : d.name;
+}
+
 function escapeHtml(s: string): string {
   return s.replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[c]!);
 }
@@ -151,8 +169,8 @@ function render(panel: Panel, left: PanelDistrict, right: PanelDistrict): void {
 
   const head = `<tr>
     <th></th>
-    <th><a href="${routes.district(left.irn)}">${escapeHtml(left.name)}</a></th>
-    <th><a href="${routes.district(right.irn)}">${escapeHtml(right.name)}</a></th>
+    <th><a href="${routes.district(left.irn)}">${escapeHtml(qualified(panel, left))}</a></th>
+    <th><a href="${routes.district(right.irn)}">${escapeHtml(qualified(panel, right))}</a></th>
     <th>Difference</th>
   </tr>`;
 

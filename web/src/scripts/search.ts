@@ -21,6 +21,8 @@ const LIMIT = 40;
 
 const KIND_LABEL: Record<SearchEntry["k"], string> = {
   district: "District",
+  county: "County",
+  seat: "Seat",
   node: "Corpus",
   source: "Source",
   page: "Page",

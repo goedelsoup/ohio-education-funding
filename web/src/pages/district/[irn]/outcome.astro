@@ -9,7 +9,7 @@
  */
 import DistrictNav from "../../../components/DistrictNav.astro";
 import Base from "../../../layouts/Base.astro";
-import { districtPaths, loadFeed } from "../../../lib/feed.ts";
+import { districtPaths, loadFeed, qualifiedName } from "../../../lib/feed.ts";
 import { renderDistrictOutcome, renderOutcomeContext } from "../../../lib/outcomes.ts";
 import * as routes from "../../../lib/routes.ts";
 import { yearOf } from "../../../lib/year.ts";
@@ -28,13 +28,13 @@ const description =
 ---
 
 <Base
-  title={`${district.name} — outcome`}
+  title={`${qualifiedName(district)} — outcome`}
   description={description}
   image={routes.og.district(district.irn)}
   imageAlt={`${district.name}: state aid per pupil, and how much of it comes from the guarantee`}
   section="districts"
 >
-  <h1>{district.name}</h1>
+  <h1>{qualifiedName(district)}</h1>
   <p class="sub">What its pupils achieve, and how little of it the funding side explains.</p>
 
   <DistrictNav irn={district.irn} current="outcome" />

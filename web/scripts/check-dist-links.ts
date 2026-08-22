@@ -162,6 +162,8 @@ const unaddressed: string[] = [];
 let cards = 0;
 /** A word, then an inline element opening against it with no space between the two. */
 const fused: string[] = [];
+/** Every page's `<title>`, so two pages cannot claim to be the same thing. */
+const titles = new Map<string, string[]>();
 
 /** `dist/district/043786.html` is served as `/district/043786`; `build.format` is "file". */
 const servedAs = (file: string): string => "/" + relative(DIST, file).replace(/\.html$/, "");
@@ -202,6 +204,25 @@ for (const file of htmlFiles(DIST)) {
    */
   for (const match of html.matchAll(/\shref="#([^"]+)"/g)) {
     fragments.push({ from: here, path: here, id: match[1]! });
+  }
+
+  /*
+   * The `<title>`, which is also the `og:title` and the search result and the browser tab.
+   *
+   * Ohio names districts after townships and townships repeat: three Green Local, three Buckeye
+   * Local, three Southern Local. 48 districts shared a name, every district route identified a
+   * district by bare name, and 242 pages therefore carried a title belonging to two or three
+   * different places. The corpus supplied one more on its own — a `scenario` class against the
+   * scenario runner.
+   *
+   * A title is the one string a reader sees before they have the page, so this asks the artefact
+   * whether any two pages are indistinguishable at that distance.
+   */
+  const title = /<title>([\s\S]*?)<\/title>/.exec(html)?.[1]?.trim();
+  if (title) {
+    const pages = titles.get(title);
+    if (pages) pages.push(here);
+    else titles.set(title, [here]);
   }
 
   /*
@@ -309,6 +330,26 @@ if (unaddressed.length > 0) {
   process.exit(1);
 }
 
+const duplicated = [...titles].filter(([, pages]) => pages.length > 1);
+if (duplicated.length > 0) {
+  const pages = duplicated.reduce((n, [, list]) => n + list.length, 0);
+  console.error(
+    `\n${duplicated.length} title${duplicated.length === 1 ? "" : "s"} used by more than one page, ` +
+      `across ${pages} pages.\n\n` +
+      `A title is what a reader sees in a tab, a search result and a shared link — before they\n` +
+      `have the page. Two pages with one title are indistinguishable at exactly the moment the\n` +
+      `reader is choosing between them.\n\n` +
+      `For districts, \`qualifiedName\` in src/lib/feed.ts adds the county to a name that repeats.\n\n` +
+      duplicated
+        .slice(0, 15)
+        .map(([title, list]) => `  ${title}\n    ${list.join("\n    ")}`)
+        .join("\n") +
+      (duplicated.length > 15 ? `\n  … and ${duplicated.length - 15} more` : "") +
+      `\n`,
+  );
+  process.exit(1);
+}
+
 if (fused.length > 0) {
   console.error(
     `\n${fused.length} fused word${fused.length === 1 ? "" : "s"} in the built site.\n\n` +
@@ -328,5 +369,6 @@ console.log(
   `${anchors} links across ${pages} built pages, all absolute or off-site; ` +
     `${fragments.length} fragment links all resolve to an id in the page they name; ` +
     `${cards} cards each addressed by a name routes.ts lists, with no id used twice in a page; ` +
-    `no word fused against an inline element`,
+    `no word fused against an inline element; ` +
+    `${titles.size} distinct titles across ${pages} pages, none used twice`,
 );

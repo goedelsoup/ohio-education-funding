@@ -20,7 +20,7 @@ import {
   renderWhatThisIsNot,
 } from "../../lib/district.ts";
 import { slugify } from "../../lib/county.ts";
-import { districtPaths, loadFeed } from "../../lib/feed.ts";
+import { districtPaths, loadFeed, qualifiedName } from "../../lib/feed.ts";
 import * as routes from "../../lib/routes.ts";
 import { money, pct } from "../../lib/format.ts";
 
@@ -47,13 +47,13 @@ const description = district.on_guarantee
 ---
 
 <Base
-  title={district.name}
+  title={qualifiedName(district)}
   description={description}
   image={routes.og.district(district.irn)}
   imageAlt={`${district.name}: state aid per pupil, and how much of it comes from the guarantee`}
   section="districts"
 >
-  <h1>{district.name}</h1>
+  <h1>{qualifiedName(district)}</h1>
   <p class="sub">
     IRN {district.irn} · <a href={routes.county(slugify(district.county))}>{district.county} County</a>
     {/* Every House district this district lies in, largest share first. Linked individually

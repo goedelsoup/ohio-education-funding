@@ -18,7 +18,7 @@ import DistrictNav from "../../../components/DistrictNav.astro";
 import Base from "../../../layouts/Base.astro";
 import { renderActuals, renderCasino } from "../../../lib/district.ts";
 import { renderFederalShare, renderSpendingByFunction } from "../../../lib/spending.ts";
-import { districtPaths, loadFeed } from "../../../lib/feed.ts";
+import { districtPaths, loadFeed, qualifiedName } from "../../../lib/feed.ts";
 import { money } from "../../../lib/format.ts";
 import { baseYear } from "../../../lib/real.ts";
 import * as routes from "../../../lib/routes.ts";
@@ -44,13 +44,13 @@ const description = latest
 ---
 
 <Base
-  title={`${district.name} — finances`}
+  title={`${qualifiedName(district)} — finances`}
   description={description}
   image={routes.og.district(district.irn)}
   imageAlt={`${district.name}: state aid per pupil, and how much of it comes from the guarantee`}
   section="districts"
 >
-  <h1>{district.name}</h1>
+  <h1>{qualifiedName(district)}</h1>
   <p class="sub">
     Audited actuals from the district's own five-year forecast filing — the only figures on this
     site that record money changing hands rather than a formula's output.
