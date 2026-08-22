@@ -222,6 +222,330 @@ pub fn open_workbook(root: &Path, source: &Source) -> Result<AnyWorkbook, Rebuil
     Ok(spreadsheet::open(std::fs::read(path)?)?)
 }
 
+/// The federal surveys: the Census F-33 in four cuts.
+///
+/// Self-contained by construction — nothing else in the rebuild depends on these, which is why
+/// an absent workbook costs the interstate comparison and nothing more.
+fn rebuild_federal_surveys(root: &Path) -> Result<Vec<Rebuilt>, RebuildError> {
+    let out = vec![
+        // Census F-33. Skipped rather than fatal when the workbook is not cached: it is the one
+        // source in the registry that nothing else depends on, so an absent copy should cost the
+        // interstate comparison and nothing else.
+        match sheet_rows(root, "f33-fy2022", "elsec22t") {
+            Ok(rows) => csv_fixture(
+                root,
+                fixtures::F33_FIXTURE,
+                fixtures::F33_HEADER,
+                &fixtures::build_f33_states(&rows, "the FY2022 F-33 state table")
+                    .map_err(RebuildError::Layout)?,
+            )?,
+            Err(reason) => Rebuilt::skipped(fixtures::F33_FIXTURE, reason),
+        },
+        // The same table two years later, which is the year White Paper 015 quotes. Kept as its own
+        // fixture: FY2022 is what the corpus's published interstate figures were computed from.
+        match sheet_rows(root, "f33-fy2024", "elsec24t") {
+            Ok(rows) => csv_fixture(
+                root,
+                fixtures::F33_FY2024_FIXTURE,
+                fixtures::F33_HEADER,
+                &fixtures::build_f33_states(&rows, "the FY2024 F-33 state table")
+                    .map_err(RebuildError::Layout)?,
+            )?,
+            Err(reason) => Rebuilt::skipped(fixtures::F33_FY2024_FIXTURE, reason),
+        },
+        // The same survey per district, which needs two archives: NCES's keying of the F-33, and the
+        // CCD directory that carries the `LEAID`-to-IRN join. Committed since the national comparison
+        // was built and produced by nothing until now — the registry declared the fixture, the digest
+        // manifest pinned its sources, and the derivation between them lived only in prose.
+        match f33_districts(root) {
+            Ok(rows) => csv_fixture(
+                root,
+                fixtures::F33_DISTRICTS_FIXTURE,
+                fixtures::F33_DISTRICTS_HEADER,
+                &rows,
+            )?,
+            Err(reason) => Rebuilt::skipped(fixtures::F33_DISTRICTS_FIXTURE, reason),
+        },
+        // The same survey again, Ohio only, across every year the archive publishes. The national
+        // file answers whether Ohio is unusual; this one answers how Ohio changed, and the two need
+        // different populations rather than different filters over one fixture.
+        match f33_ohio_panel(root) {
+            Ok(rows) => csv_fixture(
+                root,
+                fixtures::F33_OHIO_PANEL_FIXTURE,
+                fixtures::F33_OHIO_PANEL_HEADER,
+                &rows,
+            )?,
+            Err(reason) => Rebuilt::skipped(fixtures::F33_OHIO_PANEL_FIXTURE, reason),
+        },
+    ];
+
+    Ok(out)
+}
+
+/// The appropriation-line series: eight bienniums, two documents each.
+///
+/// Reads only the registry and the cache, so it threads none of the rebuild's shared state.
+fn rebuild_appropriation_lines(root: &Path) -> Result<Vec<Rebuilt>, RebuildError> {
+    let mut out = Vec::new();
+
+    // The appropriation-line series: eight bienniums, two documents each.
+    //
+    // Both variants, because neither carries both claims. The `as enacted` workbook states what
+    // the General Assembly passed and is never revised; the `with actual expenditures` one is
+    // revised after the biennium closes and replaces the enacted column with what was spent. A
+    // single-variant attempt produced zero appropriations for the 132nd and did not fail.
+    //
+    // All sixteen or none, as with the DeRolph opinions: a series that reads as continuous and
+    // quietly omits the biennium whose workbook did not download is worse than no series, because
+    // a gap in the record and a gap in the cache look identical from the fixture.
+    const BIENNIA: &[(&str, u16, u16)] = &[
+        ("hb153", 129, 2012),
+        ("hb59", 130, 2014),
+        ("hb64", 131, 2016),
+        ("hb49", 132, 2018),
+        ("hb166", 133, 2020),
+        ("hb110", 134, 2022),
+        ("hb33", 135, 2024),
+        ("hb96", 136, 2026),
+    ];
+    type Book = (
+        u16,
+        &'static str,
+        String,
+        &'static str,
+        u16,
+        Vec<Vec<String>>,
+    );
+    let books: Result<Vec<Book>, RebuildError> = BIENNIA
+        .iter()
+        .flat_map(|(bill, ga, first_year)| {
+            ["enacted", "actuals"]
+                .into_iter()
+                .map(move |variant| (bill, ga, first_year, variant))
+        })
+        .map(|(bill, ga, first_year, variant)| {
+            let key = format!("{bill}-{variant}");
+            let src = source(&key)
+                .ok_or_else(|| RebuildError::Layout(format!("{key} is not registered")))?
+                .1;
+            let book = open_workbook(root, src)?;
+            // The first sheet: the name differs in every one of the sixteen — `HB96`,
+            // `FY21Update`, `August 2014 Update` — and the detail is always on the first.
+            let sheet = book
+                .sheet_names()
+                .first()
+                .ok_or_else(|| RebuildError::Layout(format!("{key}: workbook has no sheets")))?
+                .to_string();
+            Ok((*ga, *bill, key, variant, *first_year, book.rows(&sheet)?))
+        })
+        .collect();
+    out.push(match books {
+        Ok(books) => {
+            let views: Vec<fixtures::AppropriationBook<'_>> = books
+                .iter()
+                .map(
+                    |(ga, bill, key, variant, first_year, rows)| fixtures::AppropriationBook {
+                        general_assembly: *ga,
+                        bill,
+                        source: key,
+                        variant,
+                        first_year: *first_year,
+                        rows,
+                    },
+                )
+                .collect();
+            // The greenbook PDFs of the 124th-128th, which reach back to FY1999 and have no
+            // later document to be checked against — the eras meet at FY2011 and do not overlap.
+            // Skipped rather than fatal when a PDF is uncached or `pdftotext` is absent, on the
+            // same footing as every other PDF here.
+            const GREENBOOKS: &[(&str, u16, u16)] = &[
+                ("hb94", 124, 2002),
+                ("hb95", 125, 2004),
+                ("hb119", 127, 2008),
+                ("hb1", 128, 2010),
+            ];
+            let texts: Vec<(u16, &str, String, u16, String)> = GREENBOOKS
+                .iter()
+                .filter_map(|(bill, ga, first_year)| {
+                    let key = format!("{bill}-greenbook");
+                    let src = source(&key)?.1;
+                    let text = cache::pdf_text(root, src).ok()?;
+                    Some((*ga, *bill, key, *first_year, text))
+                })
+                .collect();
+            let greenbooks: Vec<fixtures::Greenbook<'_>> = texts
+                .iter()
+                .map(|(ga, bill, key, first_year, text)| fixtures::Greenbook {
+                    general_assembly: *ga,
+                    bill,
+                    source: key,
+                    first_year: *first_year,
+                    text,
+                })
+                .collect();
+
+            let combined = fixtures::build_appropriations(&views).and_then(|mut rows| {
+                if !greenbooks.is_empty() {
+                    rows.extend(fixtures::build_greenbook_appropriations(&greenbooks)?);
+                }
+                fixtures::reconcile(rows)
+            });
+            match combined {
+                Ok(rows) => csv_fixture(
+                    root,
+                    fixtures::APPROPRIATION_FIXTURE,
+                    fixtures::APPROPRIATION_HEADER,
+                    &rows,
+                )?,
+                Err(cause) => Rebuilt::skipped(fixtures::APPROPRIATION_FIXTURE, cause),
+            }
+        }
+        Err(cause) => Rebuilt::skipped(fixtures::APPROPRIATION_FIXTURE, cause),
+    });
+
+    Ok(out)
+}
+
+/// The local side of the ledger: district filings, the tax abstract, and casino distributions.
+///
+/// Reads only the registry and the cache, so it threads none of the rebuild's shared state.
+fn rebuild_local_finance(root: &Path) -> Result<Vec<Rebuilt>, RebuildError> {
+    let mut out = Vec::new();
+
+    // The financial panel: two filings, three years of actuals each, tiling FY2020 to FY2025.
+    // Both must be present — half the panel is worse than none, because a series with a hole in
+    // it silently becomes a series about the years that happened to be retrievable.
+    let filings: Result<Vec<_>, RebuildError> =
+        ["five-year-forecast-fy23", "five-year-forecast-fy26"]
+            .into_iter()
+            .map(|key| {
+                let filing = registered(key);
+                let bytes = cache::read_cached(root, filing)?;
+                Ok(forecast::parse(&String::from_utf8_lossy(&bytes))?)
+            })
+            .collect();
+    out.push(match filings {
+        Ok(filings) => csv_fixture(
+            root,
+            fixtures::FINANCE_FIXTURE,
+            fixtures::FINANCE_HEADER,
+            &fixtures::build_finance_extract(&filings),
+        )?,
+        Err(cause) => Rebuilt::skipped(fixtures::FINANCE_FIXTURE, cause),
+    });
+
+    // The local side: taxable value by class and real property taxes charged, four tax years.
+    //
+    // Two would give a level and a change, which is what the tax page reads. Four are here for a
+    // different reason: Ohio's 88 counties reappraise or update on a staggered three-year cycle,
+    // so TY2022 through TY2024 contains exactly one valuation event per county — and TY2021 makes
+    // the earliest of those a change rather than a level. That window is what lets each district's
+    // reappraisal be measured against its own quiet years instead of a statewide average. See
+    // `regime_diff::recognized_valuation`.
+    let abstracts: Result<Vec<_>, RebuildError> = [
+        (2021, "sd1-ty2021"),
+        (2022, "sd1-ty2022"),
+        (2023, "sd1-ty2023"),
+        (2024, "sd1-ty2024"),
+    ]
+    .into_iter()
+    .map(|(tax_year, key)| {
+        let book = open_workbook(root, registered(key))?;
+        let excluding = sheet_by_prefix(&book, "ExJVS")?;
+        let including = sheet_by_prefix(&book, "SD1DAT")?;
+        Ok((tax_year, excluding, including))
+    })
+    .collect();
+    out.push(match abstracts {
+        Ok(abstracts) => {
+            let years: Vec<fixtures::Sd1Year<'_>> = abstracts
+                .iter()
+                .map(|(tax_year, excluding, including)| fixtures::Sd1Year {
+                    tax_year: *tax_year,
+                    excluding_jvsd: excluding,
+                    including_jvsd: including,
+                })
+                .collect();
+            csv_fixture(
+                root,
+                fixtures::SD1_FIXTURE,
+                fixtures::SD1_HEADER,
+                &fixtures::build_sd1_extract(&years),
+            )?
+        }
+        Err(cause) => Rebuilt::skipped(fixtures::SD1_FIXTURE, cause),
+    });
+
+    // The casino distribution, eighteen half-years of it. See `build_casino_extract` for what the
+    // sheets are made to prove about themselves, and `crates/connect/sources/tax-casino.md` for
+    // why a channel of this size was invisible until it was retrieved.
+    //
+    // Two things about this list are load-bearing. August 2015 is published twice, and the county
+    // layout is named first so the panel keeps its county counts and the statewide sheet that
+    // follows is checked against it rather than replacing it. And every report the department
+    // generates for this is called `RP_MAIN_PG1` with a suffix that changed twice and means
+    // nothing, so the sheet is found by prefix; the combined FY2016-FY2017 workbook names its four
+    // sheets after the months instead, which is why it is spelled out.
+    /// A distribution's key, a label to name it by when a check fails, and its rows.
+    type CasinoRead = (String, String, Vec<Vec<String>>);
+    let casino_sheets: Result<Vec<CasinoRead>, RebuildError> = [
+        ("casino-2015-08", "2015-08", "RP_MAIN_PG1"),
+        ("casino-fy2016-fy2017", "2015-08", "August 2015"),
+        ("casino-fy2016-fy2017", "2016-01", "January 2016"),
+        ("casino-fy2016-fy2017", "2016-08", "August 2016"),
+        ("casino-fy2016-fy2017", "2017-01", "January 2017"),
+        ("casino-2017-08", "2017-08", "RP_MAIN_PG1"),
+        ("casino-2018-01", "2018-01", "RP_MAIN_PG1"),
+        ("casino-2018-08", "2018-08", "RP_MAIN_PG1"),
+        ("casino-2019-01", "2019-01", "RP_MAIN_PG1"),
+        ("casino-2019-08", "2019-08", "RP_MAIN_PG1"),
+        ("casino-2020-01", "2020-01", "RP_MAIN_PG1"),
+        ("casino-2020-08", "2020-08", "RP_MAIN_PG1"),
+        ("casino-2021-01", "2021-01", "RP_MAIN_PG1"),
+        ("casino-2021-08", "2021-08", "RP_MAIN_PG1"),
+        ("casino-2022-01", "2022-01", "RP_MAIN_PG1"),
+        ("casino-2022-08", "2022-08", "RP_MAIN_PG1"),
+        ("casino-2023-01", "2023-01", "RP_MAIN_PG1"),
+        ("casino-2023-08", "2023-08", "RP_MAIN_PG1"),
+        ("casino-2024-01", "2024-01", "RP_MAIN_PG1"),
+    ]
+    .into_iter()
+    .map(|(key, distribution, prefix)| {
+        let book = open_workbook(root, registered(key))?;
+        Ok((
+            distribution.to_string(),
+            format!("{key} `{prefix}`"),
+            sheet_by_prefix(&book, prefix)?,
+        ))
+    })
+    .collect();
+    out.push(match casino_sheets {
+        Ok(read) => {
+            let sheets: Vec<fixtures::CasinoSheet<'_>> = read
+                .iter()
+                .map(|(distribution, label, rows)| fixtures::CasinoSheet {
+                    distribution,
+                    label,
+                    rows,
+                })
+                .collect();
+            match fixtures::build_casino_extract(&sheets) {
+                Ok(panel) => csv_fixture(
+                    root,
+                    fixtures::CASINO_FIXTURE,
+                    fixtures::CASINO_HEADER,
+                    &panel,
+                )?,
+                Err(cause) => Rebuilt::skipped(fixtures::CASINO_FIXTURE, cause),
+            }
+        }
+        Err(cause) => Rebuilt::skipped(fixtures::CASINO_FIXTURE, cause),
+    });
+
+    Ok(out)
+}
+
 /// Rebuild every committed fixture from the cached sources.
 ///
 /// Reads only what is already in the cache — refreshing is a separate, explicit act, so that
@@ -402,135 +726,7 @@ pub fn rebuild(root: &Path) -> Result<Vec<Rebuilt>, RebuildError> {
         Err(cause) => Rebuilt::skipped(fixtures::CPI_FIXTURE, cause),
     });
 
-    // The financial panel: two filings, three years of actuals each, tiling FY2020 to FY2025.
-    // Both must be present — half the panel is worse than none, because a series with a hole in
-    // it silently becomes a series about the years that happened to be retrievable.
-    let filings: Result<Vec<_>, RebuildError> =
-        ["five-year-forecast-fy23", "five-year-forecast-fy26"]
-            .into_iter()
-            .map(|key| {
-                let filing = registered(key);
-                let bytes = cache::read_cached(root, filing)?;
-                Ok(forecast::parse(&String::from_utf8_lossy(&bytes))?)
-            })
-            .collect();
-    out.push(match filings {
-        Ok(filings) => csv_fixture(
-            root,
-            fixtures::FINANCE_FIXTURE,
-            fixtures::FINANCE_HEADER,
-            &fixtures::build_finance_extract(&filings),
-        )?,
-        Err(cause) => Rebuilt::skipped(fixtures::FINANCE_FIXTURE, cause),
-    });
-
-    // The local side: taxable value by class and real property taxes charged, four tax years.
-    //
-    // Two would give a level and a change, which is what the tax page reads. Four are here for a
-    // different reason: Ohio's 88 counties reappraise or update on a staggered three-year cycle,
-    // so TY2022 through TY2024 contains exactly one valuation event per county — and TY2021 makes
-    // the earliest of those a change rather than a level. That window is what lets each district's
-    // reappraisal be measured against its own quiet years instead of a statewide average. See
-    // `regime_diff::recognized_valuation`.
-    let abstracts: Result<Vec<_>, RebuildError> = [
-        (2021, "sd1-ty2021"),
-        (2022, "sd1-ty2022"),
-        (2023, "sd1-ty2023"),
-        (2024, "sd1-ty2024"),
-    ]
-    .into_iter()
-    .map(|(tax_year, key)| {
-        let book = open_workbook(root, registered(key))?;
-        let excluding = sheet_by_prefix(&book, "ExJVS")?;
-        let including = sheet_by_prefix(&book, "SD1DAT")?;
-        Ok((tax_year, excluding, including))
-    })
-    .collect();
-    out.push(match abstracts {
-        Ok(abstracts) => {
-            let years: Vec<fixtures::Sd1Year<'_>> = abstracts
-                .iter()
-                .map(|(tax_year, excluding, including)| fixtures::Sd1Year {
-                    tax_year: *tax_year,
-                    excluding_jvsd: excluding,
-                    including_jvsd: including,
-                })
-                .collect();
-            csv_fixture(
-                root,
-                fixtures::SD1_FIXTURE,
-                fixtures::SD1_HEADER,
-                &fixtures::build_sd1_extract(&years),
-            )?
-        }
-        Err(cause) => Rebuilt::skipped(fixtures::SD1_FIXTURE, cause),
-    });
-
-    // The casino distribution, eighteen half-years of it. See `build_casino_extract` for what the
-    // sheets are made to prove about themselves, and `crates/connect/sources/tax-casino.md` for
-    // why a channel of this size was invisible until it was retrieved.
-    //
-    // Two things about this list are load-bearing. August 2015 is published twice, and the county
-    // layout is named first so the panel keeps its county counts and the statewide sheet that
-    // follows is checked against it rather than replacing it. And every report the department
-    // generates for this is called `RP_MAIN_PG1` with a suffix that changed twice and means
-    // nothing, so the sheet is found by prefix; the combined FY2016-FY2017 workbook names its four
-    // sheets after the months instead, which is why it is spelled out.
-    /// A distribution's key, a label to name it by when a check fails, and its rows.
-    type CasinoRead = (String, String, Vec<Vec<String>>);
-    let casino_sheets: Result<Vec<CasinoRead>, RebuildError> = [
-        ("casino-2015-08", "2015-08", "RP_MAIN_PG1"),
-        ("casino-fy2016-fy2017", "2015-08", "August 2015"),
-        ("casino-fy2016-fy2017", "2016-01", "January 2016"),
-        ("casino-fy2016-fy2017", "2016-08", "August 2016"),
-        ("casino-fy2016-fy2017", "2017-01", "January 2017"),
-        ("casino-2017-08", "2017-08", "RP_MAIN_PG1"),
-        ("casino-2018-01", "2018-01", "RP_MAIN_PG1"),
-        ("casino-2018-08", "2018-08", "RP_MAIN_PG1"),
-        ("casino-2019-01", "2019-01", "RP_MAIN_PG1"),
-        ("casino-2019-08", "2019-08", "RP_MAIN_PG1"),
-        ("casino-2020-01", "2020-01", "RP_MAIN_PG1"),
-        ("casino-2020-08", "2020-08", "RP_MAIN_PG1"),
-        ("casino-2021-01", "2021-01", "RP_MAIN_PG1"),
-        ("casino-2021-08", "2021-08", "RP_MAIN_PG1"),
-        ("casino-2022-01", "2022-01", "RP_MAIN_PG1"),
-        ("casino-2022-08", "2022-08", "RP_MAIN_PG1"),
-        ("casino-2023-01", "2023-01", "RP_MAIN_PG1"),
-        ("casino-2023-08", "2023-08", "RP_MAIN_PG1"),
-        ("casino-2024-01", "2024-01", "RP_MAIN_PG1"),
-    ]
-    .into_iter()
-    .map(|(key, distribution, prefix)| {
-        let book = open_workbook(root, registered(key))?;
-        Ok((
-            distribution.to_string(),
-            format!("{key} `{prefix}`"),
-            sheet_by_prefix(&book, prefix)?,
-        ))
-    })
-    .collect();
-    out.push(match casino_sheets {
-        Ok(read) => {
-            let sheets: Vec<fixtures::CasinoSheet<'_>> = read
-                .iter()
-                .map(|(distribution, label, rows)| fixtures::CasinoSheet {
-                    distribution,
-                    label,
-                    rows,
-                })
-                .collect();
-            match fixtures::build_casino_extract(&sheets) {
-                Ok(panel) => csv_fixture(
-                    root,
-                    fixtures::CASINO_FIXTURE,
-                    fixtures::CASINO_HEADER,
-                    &panel,
-                )?,
-                Err(cause) => Rebuilt::skipped(fixtures::CASINO_FIXTURE, cause),
-            }
-        }
-        Err(cause) => Rebuilt::skipped(fixtures::CASINO_FIXTURE, cause),
-    });
+    out.extend(rebuild_local_finance(root)?);
 
     // The Revised Code. Skipped rather than fatal when a section is not cached, for the same
     // reason as F-33 below: it feeds prose and verification, and an absent copy should cost those
@@ -828,175 +1024,9 @@ pub fn rebuild(root: &Path) -> Result<Vec<Rebuilt>, RebuildError> {
         Err(cause) => Rebuilt::skipped(fixtures::LSC_GREENBOOK_FIXTURE, cause),
     });
 
-    // The appropriation-line series: eight bienniums, two documents each.
-    //
-    // Both variants, because neither carries both claims. The `as enacted` workbook states what
-    // the General Assembly passed and is never revised; the `with actual expenditures` one is
-    // revised after the biennium closes and replaces the enacted column with what was spent. A
-    // single-variant attempt produced zero appropriations for the 132nd and did not fail.
-    //
-    // All sixteen or none, as with the DeRolph opinions: a series that reads as continuous and
-    // quietly omits the biennium whose workbook did not download is worse than no series, because
-    // a gap in the record and a gap in the cache look identical from the fixture.
-    const BIENNIA: &[(&str, u16, u16)] = &[
-        ("hb153", 129, 2012),
-        ("hb59", 130, 2014),
-        ("hb64", 131, 2016),
-        ("hb49", 132, 2018),
-        ("hb166", 133, 2020),
-        ("hb110", 134, 2022),
-        ("hb33", 135, 2024),
-        ("hb96", 136, 2026),
-    ];
-    type Book = (
-        u16,
-        &'static str,
-        String,
-        &'static str,
-        u16,
-        Vec<Vec<String>>,
-    );
-    let books: Result<Vec<Book>, RebuildError> = BIENNIA
-        .iter()
-        .flat_map(|(bill, ga, first_year)| {
-            ["enacted", "actuals"]
-                .into_iter()
-                .map(move |variant| (bill, ga, first_year, variant))
-        })
-        .map(|(bill, ga, first_year, variant)| {
-            let key = format!("{bill}-{variant}");
-            let src = source(&key)
-                .ok_or_else(|| RebuildError::Layout(format!("{key} is not registered")))?
-                .1;
-            let book = open_workbook(root, src)?;
-            // The first sheet: the name differs in every one of the sixteen — `HB96`,
-            // `FY21Update`, `August 2014 Update` — and the detail is always on the first.
-            let sheet = book
-                .sheet_names()
-                .first()
-                .ok_or_else(|| RebuildError::Layout(format!("{key}: workbook has no sheets")))?
-                .to_string();
-            Ok((*ga, *bill, key, variant, *first_year, book.rows(&sheet)?))
-        })
-        .collect();
-    out.push(match books {
-        Ok(books) => {
-            let views: Vec<fixtures::AppropriationBook<'_>> = books
-                .iter()
-                .map(
-                    |(ga, bill, key, variant, first_year, rows)| fixtures::AppropriationBook {
-                        general_assembly: *ga,
-                        bill,
-                        source: key,
-                        variant,
-                        first_year: *first_year,
-                        rows,
-                    },
-                )
-                .collect();
-            // The greenbook PDFs of the 124th-128th, which reach back to FY1999 and have no
-            // later document to be checked against — the eras meet at FY2011 and do not overlap.
-            // Skipped rather than fatal when a PDF is uncached or `pdftotext` is absent, on the
-            // same footing as every other PDF here.
-            const GREENBOOKS: &[(&str, u16, u16)] = &[
-                ("hb94", 124, 2002),
-                ("hb95", 125, 2004),
-                ("hb119", 127, 2008),
-                ("hb1", 128, 2010),
-            ];
-            let texts: Vec<(u16, &str, String, u16, String)> = GREENBOOKS
-                .iter()
-                .filter_map(|(bill, ga, first_year)| {
-                    let key = format!("{bill}-greenbook");
-                    let src = source(&key)?.1;
-                    let text = cache::pdf_text(root, src).ok()?;
-                    Some((*ga, *bill, key, *first_year, text))
-                })
-                .collect();
-            let greenbooks: Vec<fixtures::Greenbook<'_>> = texts
-                .iter()
-                .map(|(ga, bill, key, first_year, text)| fixtures::Greenbook {
-                    general_assembly: *ga,
-                    bill,
-                    source: key,
-                    first_year: *first_year,
-                    text,
-                })
-                .collect();
+    out.extend(rebuild_appropriation_lines(root)?);
 
-            let combined = fixtures::build_appropriations(&views).and_then(|mut rows| {
-                if !greenbooks.is_empty() {
-                    rows.extend(fixtures::build_greenbook_appropriations(&greenbooks)?);
-                }
-                fixtures::reconcile(rows)
-            });
-            match combined {
-                Ok(rows) => csv_fixture(
-                    root,
-                    fixtures::APPROPRIATION_FIXTURE,
-                    fixtures::APPROPRIATION_HEADER,
-                    &rows,
-                )?,
-                Err(cause) => Rebuilt::skipped(fixtures::APPROPRIATION_FIXTURE, cause),
-            }
-        }
-        Err(cause) => Rebuilt::skipped(fixtures::APPROPRIATION_FIXTURE, cause),
-    });
-
-    // Census F-33. Skipped rather than fatal when the workbook is not cached: it is the one
-    // source in the registry that nothing else depends on, so an absent copy should cost the
-    // interstate comparison and nothing else.
-    out.push(match sheet_rows(root, "f33-fy2022", "elsec22t") {
-        Ok(rows) => csv_fixture(
-            root,
-            fixtures::F33_FIXTURE,
-            fixtures::F33_HEADER,
-            &fixtures::build_f33_states(&rows, "the FY2022 F-33 state table")
-                .map_err(RebuildError::Layout)?,
-        )?,
-        Err(reason) => Rebuilt::skipped(fixtures::F33_FIXTURE, reason),
-    });
-
-    // The same table two years later, which is the year White Paper 015 quotes. Kept as its own
-    // fixture: FY2022 is what the corpus's published interstate figures were computed from.
-    out.push(match sheet_rows(root, "f33-fy2024", "elsec24t") {
-        Ok(rows) => csv_fixture(
-            root,
-            fixtures::F33_FY2024_FIXTURE,
-            fixtures::F33_HEADER,
-            &fixtures::build_f33_states(&rows, "the FY2024 F-33 state table")
-                .map_err(RebuildError::Layout)?,
-        )?,
-        Err(reason) => Rebuilt::skipped(fixtures::F33_FY2024_FIXTURE, reason),
-    });
-
-    // The same survey per district, which needs two archives: NCES's keying of the F-33, and the
-    // CCD directory that carries the `LEAID`-to-IRN join. Committed since the national comparison
-    // was built and produced by nothing until now — the registry declared the fixture, the digest
-    // manifest pinned its sources, and the derivation between them lived only in prose.
-    out.push(match f33_districts(root) {
-        Ok(rows) => csv_fixture(
-            root,
-            fixtures::F33_DISTRICTS_FIXTURE,
-            fixtures::F33_DISTRICTS_HEADER,
-            &rows,
-        )?,
-        Err(reason) => Rebuilt::skipped(fixtures::F33_DISTRICTS_FIXTURE, reason),
-    });
-
-    // The same survey again, Ohio only, across every year the archive publishes. The national
-    // file answers whether Ohio is unusual; this one answers how Ohio changed, and the two need
-    // different populations rather than different filters over one fixture.
-    out.push(match f33_ohio_panel(root) {
-        Ok(rows) => csv_fixture(
-            root,
-            fixtures::F33_OHIO_PANEL_FIXTURE,
-            fixtures::F33_OHIO_PANEL_HEADER,
-            &rows,
-        )?,
-        Err(reason) => Rebuilt::skipped(fixtures::F33_OHIO_PANEL_FIXTURE, reason),
-    });
-
+    out.extend(rebuild_federal_surveys(root)?);
     // The five audit reports that recite a territory transfer.
     out.push(match transfers(root) {
         Ok(rows) => Rebuilt::Written {
