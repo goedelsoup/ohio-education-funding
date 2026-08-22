@@ -173,6 +173,9 @@ pub fn lines() -> Vec<Line> {
 /// deduplication is needed here and none is done: if two editions ever claimed one year as
 /// enacted, the count below would rise and the test on it would fail rather than silently double a
 /// total.
+/// The header [`catalog_enacted`] indexes against.
+const CATALOG_HEADER: &str = "edition,fund,ali,name,fiscal_year,kind,amount";
+
 #[must_use]
 fn catalog_enacted() -> Vec<Line> {
     let covered: BTreeMap<u16, ()> = lines()
@@ -180,25 +183,35 @@ fn catalog_enacted() -> Vec<Line> {
         .filter(|l| l.kind == "enacted")
         .map(|l| (l.fiscal_year, ()))
         .collect();
-    CATALOG
-        .lines()
-        .skip(1)
-        .filter(|row| !row.trim().is_empty())
+    edfund_core::csv::rows(CATALOG, CATALOG_HEADER)
         .filter_map(|row| {
-            let field: Vec<&str> = row.split(',').collect();
-            if field.len() < 7 || field[5] != "appropriation" {
+            // Exactly seven, not "at least seven". The old guard was `len() < 7`, which a
+            // comma-shifted row passes — it has *more* fields, not fewer — and the amount was
+            // then read from the wrong column, failed to parse, and the row vanished through
+            // `filter_map`. A dropped appropriation changes `enacted_history` totals with no
+            // error anywhere. The sibling reader forty lines above takes its amount from the
+            // end of the row precisely because a title may contain a comma; this one indexes
+            // from the front, so the width is what has to be checked.
+            assert_eq!(
+                row.len(),
+                7,
+                "a catalog row has {} fields rather than 7, which means a title contains a \
+                 comma and every column after it has shifted",
+                row.len()
+            );
+            if row.str(5) != "appropriation" {
                 return None;
             }
-            let fiscal_year: u16 = field[4].parse().ok()?;
+            let fiscal_year: u16 = row.str(4).parse().ok()?;
             if covered.contains_key(&fiscal_year) {
                 return None;
             }
             Some(Line {
                 fiscal_year,
                 kind: "enacted".to_string(),
-                line_item: field[2].to_string(),
-                title: field[3].to_string(),
-                amount: field[6].parse().ok()?,
+                line_item: row.str(2).to_string(),
+                title: row.str(3).to_string(),
+                amount: row.num(6)?,
             })
         })
         .collect()
