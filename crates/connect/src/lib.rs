@@ -156,6 +156,18 @@ fn registered(key: &str) -> &'static registry::Source {
         .1
 }
 
+/// The registry entry for a connector this crate names as a literal.
+///
+/// The [`registered`] rule, for the other half of the registry: a connector key written as a
+/// literal in this file is a programming error if it misses, not a runtime condition.
+///
+/// # Panics
+///
+/// Panics if `key` is not in the registry.
+fn registered_connector(key: &str) -> &'static registry::Connector {
+    registry::connector(key).unwrap_or_else(|| panic!("{key} is not a registered connector"))
+}
+
 /// The rows of one sheet of a cached workbook, or the reason its fixture must be skipped.
 ///
 /// Both failures here — the workbook is not cached, the sheet is not in it — mean the source
@@ -247,22 +259,13 @@ pub fn rebuild(root: &Path) -> Result<Vec<Rebuilt>, RebuildError> {
     let extract = fixtures::build_profile_extract(&profile_rows);
 
     let mut out = vec![
-        Rebuilt::Written {
-            path: fixtures::FY27_FIXTURE.to_string(),
-            rows: fixtures::write_csv(
-                &root.join(fixtures::FY27_FIXTURE),
-                fixtures::FY27_HEADER,
-                &model,
-            )?,
-        },
-        Rebuilt::Written {
-            path: fixtures::PROFILE_FIXTURE.to_string(),
-            rows: fixtures::write_csv(
-                &root.join(fixtures::PROFILE_FIXTURE),
-                fixtures::PROFILE_HEADER,
-                &extract,
-            )?,
-        },
+        csv_fixture(root, fixtures::FY27_FIXTURE, fixtures::FY27_HEADER, &model)?,
+        csv_fixture(
+            root,
+            fixtures::PROFILE_FIXTURE,
+            fixtures::PROFILE_HEADER,
+            &extract,
+        )?,
     ];
 
     let achievement = registered("achievement-district-2425");
@@ -289,22 +292,18 @@ pub fn rebuild(root: &Path) -> Result<Vec<Rebuilt>, RebuildError> {
         &details_book.rows("District_Details")?,
     );
     let unweighted_rows = expanded_book.rows("Expenditure per Pupil")?;
-    out.push(Rebuilt::Written {
-        path: fixtures::FUNCTIONS_FIXTURE.to_string(),
-        rows: fixtures::write_csv(
-            &root.join(fixtures::FUNCTIONS_FIXTURE),
-            fixtures::FUNCTIONS_HEADER,
-            &fixtures::build_function_extract(&unweighted_rows),
-        )?,
-    });
-    out.push(Rebuilt::Written {
-        path: fixtures::REPORT_CARD_FIXTURE.to_string(),
-        rows: fixtures::write_csv(
-            &root.join(fixtures::REPORT_CARD_FIXTURE),
-            fixtures::REPORT_CARD_HEADER,
-            &report_card,
-        )?,
-    });
+    out.push(csv_fixture(
+        root,
+        fixtures::FUNCTIONS_FIXTURE,
+        fixtures::FUNCTIONS_HEADER,
+        &fixtures::build_function_extract(&unweighted_rows),
+    )?);
+    out.push(csv_fixture(
+        root,
+        fixtures::REPORT_CARD_FIXTURE,
+        fixtures::REPORT_CARD_HEADER,
+        &report_card,
+    )?);
 
     // The same report card at building grain. A separate fixture rather than more columns,
     // because it is a different unit: the funding formula pays agencies and the accountability
@@ -325,18 +324,13 @@ pub fn rebuild(root: &Path) -> Result<Vec<Rebuilt>, RebuildError> {
                     .map_err(|e| e.to_string())?,
             )
         })() {
-            Ok(rows) => Rebuilt::Written {
-                path: fixtures::BUILDING_FIXTURE.to_string(),
-                rows: fixtures::write_csv(
-                    &root.join(fixtures::BUILDING_FIXTURE),
-                    fixtures::BUILDING_HEADER,
-                    &rows,
-                )?,
-            },
-            Err(reason) => Rebuilt::Skipped {
-                path: fixtures::BUILDING_FIXTURE.to_string(),
-                reason,
-            },
+            Ok(rows) => csv_fixture(
+                root,
+                fixtures::BUILDING_FIXTURE,
+                fixtures::BUILDING_HEADER,
+                &rows,
+            )?,
+            Err(reason) => Rebuilt::skipped(fixtures::BUILDING_FIXTURE, reason),
         },
     );
 
@@ -347,9 +341,7 @@ pub fn rebuild(root: &Path) -> Result<Vec<Rebuilt>, RebuildError> {
         match (|| -> Result<Vec<Vec<String>>, String> {
             let mut books = Vec::new();
             for status in ["csi", "tsi", "atsi"] {
-                let entry = source(&format!("{status}-identified-2026"))
-                    .expect("registered")
-                    .1;
+                let entry = registered(&format!("{status}-identified-2026"));
                 books.push((
                     status,
                     open_workbook(root, entry)
@@ -362,18 +354,13 @@ pub fn rebuild(root: &Path) -> Result<Vec<Rebuilt>, RebuildError> {
                 books.iter().map(|(s, r)| (*s, r.as_slice())).collect();
             fixtures::build_identified(&lists)
         })() {
-            Ok(rows) => Rebuilt::Written {
-                path: fixtures::IDENTIFIED_FIXTURE.to_string(),
-                rows: fixtures::write_csv(
-                    &root.join(fixtures::IDENTIFIED_FIXTURE),
-                    fixtures::IDENTIFIED_HEADER,
-                    &rows,
-                )?,
-            },
-            Err(reason) => Rebuilt::Skipped {
-                path: fixtures::IDENTIFIED_FIXTURE.to_string(),
-                reason,
-            },
+            Ok(rows) => csv_fixture(
+                root,
+                fixtures::IDENTIFIED_FIXTURE,
+                fixtures::IDENTIFIED_HEADER,
+                &rows,
+            )?,
+            Err(reason) => Rebuilt::skipped(fixtures::IDENTIFIED_FIXTURE, reason),
         },
     );
 
@@ -383,14 +370,12 @@ pub fn rebuild(root: &Path) -> Result<Vec<Rebuilt>, RebuildError> {
     out.push(match open_workbook(root, enrollment) {
         Ok(book) => {
             let headcount = book.rows("fy24_hdcnt_dist")?;
-            Rebuilt::Written {
-                path: fixtures::GRADE_BANDS_FIXTURE.to_string(),
-                rows: fixtures::write_csv(
-                    &root.join(fixtures::GRADE_BANDS_FIXTURE),
-                    fixtures::GRADE_BANDS_HEADER,
-                    &fixtures::build_grade_bands(&headcount, &profile_rows),
-                )?,
-            }
+            csv_fixture(
+                root,
+                fixtures::GRADE_BANDS_FIXTURE,
+                fixtures::GRADE_BANDS_HEADER,
+                &fixtures::build_grade_bands(&headcount, &profile_rows),
+            )?
         }
         Err(cause) => Rebuilt::skipped(fixtures::GRADE_BANDS_FIXTURE, cause),
     });
@@ -424,20 +409,18 @@ pub fn rebuild(root: &Path) -> Result<Vec<Rebuilt>, RebuildError> {
         ["five-year-forecast-fy23", "five-year-forecast-fy26"]
             .into_iter()
             .map(|key| {
-                let filing = source(key).expect("registered").1;
+                let filing = registered(key);
                 let bytes = cache::read_cached(root, filing)?;
                 Ok(forecast::parse(&String::from_utf8_lossy(&bytes))?)
             })
             .collect();
     out.push(match filings {
-        Ok(filings) => Rebuilt::Written {
-            path: fixtures::FINANCE_FIXTURE.to_string(),
-            rows: fixtures::write_csv(
-                &root.join(fixtures::FINANCE_FIXTURE),
-                fixtures::FINANCE_HEADER,
-                &fixtures::build_finance_extract(&filings),
-            )?,
-        },
+        Ok(filings) => csv_fixture(
+            root,
+            fixtures::FINANCE_FIXTURE,
+            fixtures::FINANCE_HEADER,
+            &fixtures::build_finance_extract(&filings),
+        )?,
         Err(cause) => Rebuilt::skipped(fixtures::FINANCE_FIXTURE, cause),
     });
 
@@ -457,7 +440,7 @@ pub fn rebuild(root: &Path) -> Result<Vec<Rebuilt>, RebuildError> {
     ]
     .into_iter()
     .map(|(tax_year, key)| {
-        let book = open_workbook(root, source(key).expect("registered").1)?;
+        let book = open_workbook(root, registered(key))?;
         let excluding = sheet_by_prefix(&book, "ExJVS")?;
         let including = sheet_by_prefix(&book, "SD1DAT")?;
         Ok((tax_year, excluding, including))
@@ -473,14 +456,12 @@ pub fn rebuild(root: &Path) -> Result<Vec<Rebuilt>, RebuildError> {
                     including_jvsd: including,
                 })
                 .collect();
-            Rebuilt::Written {
-                path: fixtures::SD1_FIXTURE.to_string(),
-                rows: fixtures::write_csv(
-                    &root.join(fixtures::SD1_FIXTURE),
-                    fixtures::SD1_HEADER,
-                    &fixtures::build_sd1_extract(&years),
-                )?,
-            }
+            csv_fixture(
+                root,
+                fixtures::SD1_FIXTURE,
+                fixtures::SD1_HEADER,
+                &fixtures::build_sd1_extract(&years),
+            )?
         }
         Err(cause) => Rebuilt::skipped(fixtures::SD1_FIXTURE, cause),
     });
@@ -520,7 +501,7 @@ pub fn rebuild(root: &Path) -> Result<Vec<Rebuilt>, RebuildError> {
     ]
     .into_iter()
     .map(|(key, distribution, prefix)| {
-        let book = open_workbook(root, source(key).expect("registered").1)?;
+        let book = open_workbook(root, registered(key))?;
         Ok((
             distribution.to_string(),
             format!("{key} `{prefix}`"),
@@ -539,18 +520,13 @@ pub fn rebuild(root: &Path) -> Result<Vec<Rebuilt>, RebuildError> {
                 })
                 .collect();
             match fixtures::build_casino_extract(&sheets) {
-                Ok(panel) => Rebuilt::Written {
-                    path: fixtures::CASINO_FIXTURE.to_string(),
-                    rows: fixtures::write_csv(
-                        &root.join(fixtures::CASINO_FIXTURE),
-                        fixtures::CASINO_HEADER,
-                        &panel,
-                    )?,
-                },
-                Err(cause) => Rebuilt::Skipped {
-                    path: fixtures::CASINO_FIXTURE.to_string(),
-                    reason: cause,
-                },
+                Ok(panel) => csv_fixture(
+                    root,
+                    fixtures::CASINO_FIXTURE,
+                    fixtures::CASINO_HEADER,
+                    &panel,
+                )?,
+                Err(cause) => Rebuilt::skipped(fixtures::CASINO_FIXTURE, cause),
             }
         }
         Err(cause) => Rebuilt::skipped(fixtures::CASINO_FIXTURE, cause),
@@ -594,10 +570,7 @@ pub fn rebuild(root: &Path) -> Result<Vec<Rebuilt>, RebuildError> {
                 &statutes,
             ),
         )?,
-        Err(reason) => Rebuilt::Skipped {
-            path: fixtures::STATUTE_FIXTURE.to_string(),
-            reason,
-        },
+        Err(reason) => Rebuilt::skipped(fixtures::STATUTE_FIXTURE, reason),
     });
 
     // The enacted budget act. Skipped rather than fatal on two counts: the PDF may not be cached,
@@ -651,10 +624,7 @@ pub fn rebuild(root: &Path) -> Result<Vec<Rebuilt>, RebuildError> {
     let mut basis_rows: Vec<Vec<String>> = Vec::new();
     let mut catalog_failed: Vec<String> = Vec::new();
     let mut catalog_refused: Vec<String> = Vec::new();
-    for src in registry::connector("lsc-catalog")
-        .expect("registered")
-        .sources
-    {
+    for src in registered_connector("lsc-catalog").sources {
         let edition = src.key.rsplit('-').next().unwrap_or_default().to_string();
         match cache::pdf_text(root, src)
             .map_err(|cause| cause.to_string())
@@ -689,10 +659,10 @@ pub fn rebuild(root: &Path) -> Result<Vec<Rebuilt>, RebuildError> {
         }
     }
     if catalog_rows.is_empty() {
-        out.push(Rebuilt::Skipped {
-            path: fixtures::CATALOG_FIXTURE.to_string(),
-            reason: format!("no edition parsed: {}", catalog_failed.join("; ")),
-        });
+        out.push(Rebuilt::skipped(
+            fixtures::CATALOG_FIXTURE,
+            format!("no edition parsed: {}", catalog_failed.join("; ")),
+        ));
     } else {
         // Refusals are printed rather than counted. A run that silently dropped a line item would
         // report a row count that looks like success.
@@ -702,22 +672,20 @@ pub fn rebuild(root: &Path) -> Result<Vec<Rebuilt>, RebuildError> {
         for why in &catalog_failed {
             eprintln!("catalog: no rows from edition {why}");
         }
-        out.push(Rebuilt::Written {
-            path: fixtures::CATALOG_FIXTURE.to_string(),
-            rows: fixtures::write_csv(
-                &root.join(fixtures::CATALOG_FIXTURE),
-                &[
-                    "edition",
-                    "fund",
-                    "ali",
-                    "name",
-                    "fiscal_year",
-                    "kind",
-                    "amount",
-                ],
-                &catalog_rows,
-            )?,
-        });
+        out.push(csv_fixture(
+            root,
+            fixtures::CATALOG_FIXTURE,
+            &[
+                "edition",
+                "fund",
+                "ali",
+                "name",
+                "fiscal_year",
+                "kind",
+                "amount",
+            ],
+            &catalog_rows,
+        )?);
         // Tab-separated, not comma. A legal basis routinely reads "ORC 3301.0710, 3301.0711, and
         // 3301.27; Section 206.09.15 of Am. Sub. H.B. 66 of the 126th G.A." — commas are part of
         // the citation, and `write_csv` deliberately does not quote. Stripping them would damage
@@ -747,24 +715,19 @@ pub fn rebuild(root: &Path) -> Result<Vec<Rebuilt>, RebuildError> {
             .map_err(|cause| cause.to_string())
             .and_then(|text| fixtures::scholarship_programmes(&text))
         {
-            Ok(rows) => Rebuilt::Written {
-                path: fixtures::SCHOLARSHIP_FIXTURE.to_string(),
-                rows: fixtures::write_csv(
-                    &root.join(fixtures::SCHOLARSHIP_FIXTURE),
-                    &[
-                        "program",
-                        "name",
-                        "students",
-                        "expenditure",
-                        "published_average",
-                    ],
-                    &rows,
-                )?,
-            },
-            Err(cause) => Rebuilt::Skipped {
-                path: fixtures::SCHOLARSHIP_FIXTURE.to_string(),
-                reason: cause,
-            },
+            Ok(rows) => csv_fixture(
+                root,
+                fixtures::SCHOLARSHIP_FIXTURE,
+                &[
+                    "program",
+                    "name",
+                    "students",
+                    "expenditure",
+                    "published_average",
+                ],
+                &rows,
+            )?,
+            Err(cause) => Rebuilt::skipped(fixtures::SCHOLARSHIP_FIXTURE, cause),
         },
     );
 
@@ -795,8 +758,7 @@ pub fn rebuild(root: &Path) -> Result<Vec<Rebuilt>, RebuildError> {
         ),
     ] {
         let opinions: Result<Vec<fixtures::Record>, cache::FetchError> =
-            registry::connector("ohio-courts")
-                .expect("registered")
+            registered_connector("ohio-courts")
                 .sources
                 .iter()
                 .filter(|src| src.fixtures.contains(&fixture))
@@ -829,8 +791,7 @@ pub fn rebuild(root: &Path) -> Result<Vec<Rebuilt>, RebuildError> {
     // those acts did, and a file that reads as a series while silently missing a biennium is worse
     // than no file.
     let greenbooks: Result<Vec<fixtures::Record>, cache::FetchError> =
-        registry::connector("lsc-budget")
-            .expect("registered")
+        registered_connector("lsc-budget")
             .sources
             .iter()
             .filter(|src| src.fixtures.contains(&fixtures::LSC_GREENBOOK_FIXTURE))
@@ -970,18 +931,13 @@ pub fn rebuild(root: &Path) -> Result<Vec<Rebuilt>, RebuildError> {
                 fixtures::reconcile(rows)
             });
             match combined {
-                Ok(rows) => Rebuilt::Written {
-                    path: fixtures::APPROPRIATION_FIXTURE.to_string(),
-                    rows: fixtures::write_csv(
-                        &root.join(fixtures::APPROPRIATION_FIXTURE),
-                        fixtures::APPROPRIATION_HEADER,
-                        &rows,
-                    )?,
-                },
-                Err(cause) => Rebuilt::Skipped {
-                    path: fixtures::APPROPRIATION_FIXTURE.to_string(),
-                    reason: cause,
-                },
+                Ok(rows) => csv_fixture(
+                    root,
+                    fixtures::APPROPRIATION_FIXTURE,
+                    fixtures::APPROPRIATION_HEADER,
+                    &rows,
+                )?,
+                Err(cause) => Rebuilt::skipped(fixtures::APPROPRIATION_FIXTURE, cause),
             }
         }
         Err(cause) => Rebuilt::skipped(fixtures::APPROPRIATION_FIXTURE, cause),
@@ -1019,36 +975,26 @@ pub fn rebuild(root: &Path) -> Result<Vec<Rebuilt>, RebuildError> {
     // was built and produced by nothing until now — the registry declared the fixture, the digest
     // manifest pinned its sources, and the derivation between them lived only in prose.
     out.push(match f33_districts(root) {
-        Ok(rows) => Rebuilt::Written {
-            path: fixtures::F33_DISTRICTS_FIXTURE.to_string(),
-            rows: fixtures::write_csv(
-                &root.join(fixtures::F33_DISTRICTS_FIXTURE),
-                fixtures::F33_DISTRICTS_HEADER,
-                &rows,
-            )?,
-        },
-        Err(reason) => Rebuilt::Skipped {
-            path: fixtures::F33_DISTRICTS_FIXTURE.to_string(),
-            reason,
-        },
+        Ok(rows) => csv_fixture(
+            root,
+            fixtures::F33_DISTRICTS_FIXTURE,
+            fixtures::F33_DISTRICTS_HEADER,
+            &rows,
+        )?,
+        Err(reason) => Rebuilt::skipped(fixtures::F33_DISTRICTS_FIXTURE, reason),
     });
 
     // The same survey again, Ohio only, across every year the archive publishes. The national
     // file answers whether Ohio is unusual; this one answers how Ohio changed, and the two need
     // different populations rather than different filters over one fixture.
     out.push(match f33_ohio_panel(root) {
-        Ok(rows) => Rebuilt::Written {
-            path: fixtures::F33_OHIO_PANEL_FIXTURE.to_string(),
-            rows: fixtures::write_csv(
-                &root.join(fixtures::F33_OHIO_PANEL_FIXTURE),
-                fixtures::F33_OHIO_PANEL_HEADER,
-                &rows,
-            )?,
-        },
-        Err(reason) => Rebuilt::Skipped {
-            path: fixtures::F33_OHIO_PANEL_FIXTURE.to_string(),
-            reason,
-        },
+        Ok(rows) => csv_fixture(
+            root,
+            fixtures::F33_OHIO_PANEL_FIXTURE,
+            fixtures::F33_OHIO_PANEL_HEADER,
+            &rows,
+        )?,
+        Err(reason) => Rebuilt::skipped(fixtures::F33_OHIO_PANEL_FIXTURE, reason),
     });
 
     // The five audit reports that recite a territory transfer.
@@ -1066,26 +1012,18 @@ pub fn rebuild(root: &Path) -> Result<Vec<Rebuilt>, RebuildError> {
                 rows.len()
             },
         },
-        Err(reason) => Rebuilt::Skipped {
-            path: fixtures::TRANSFER_FIXTURE.to_string(),
-            reason,
-        },
+        Err(reason) => Rebuilt::skipped(fixtures::TRANSFER_FIXTURE, reason),
     });
 
     // The three acts whose education appropriation tables this repository can read as printed.
     out.push(match session_laws(root) {
-        Ok(rows) => Rebuilt::Written {
-            path: fixtures::SESSION_LAW_FIXTURE.to_string(),
-            rows: fixtures::write_csv(
-                &root.join(fixtures::SESSION_LAW_FIXTURE),
-                fixtures::SESSION_LAW_HEADER,
-                &rows,
-            )?,
-        },
-        Err(reason) => Rebuilt::Skipped {
-            path: fixtures::SESSION_LAW_FIXTURE.to_string(),
-            reason,
-        },
+        Ok(rows) => csv_fixture(
+            root,
+            fixtures::SESSION_LAW_FIXTURE,
+            fixtures::SESSION_LAW_HEADER,
+            &rows,
+        )?,
+        Err(reason) => Rebuilt::skipped(fixtures::SESSION_LAW_FIXTURE, reason),
     });
 
     // The corrective act, which has no such table. Committed whole and skipped rather than fatal
@@ -1100,34 +1038,19 @@ pub fn rebuild(root: &Path) -> Result<Vec<Rebuilt>, RebuildError> {
     // Sixteen school years of the federal agency directory, Ohio only. The one fixture here whose
     // point is *membership* rather than any figure: which agencies existed in which year.
     out.push(match ccd_directory(root) {
-        Ok(rows) => Rebuilt::Written {
-            path: fixtures::CCD_DIRECTORY_FIXTURE.to_string(),
-            rows: fixtures::write_csv(
-                &root.join(fixtures::CCD_DIRECTORY_FIXTURE),
-                fixtures::CCD_DIRECTORY_HEADER,
-                &rows,
-            )?,
-        },
-        Err(reason) => Rebuilt::Skipped {
-            path: fixtures::CCD_DIRECTORY_FIXTURE.to_string(),
-            reason,
-        },
+        Ok(rows) => csv_fixture(
+            root,
+            fixtures::CCD_DIRECTORY_FIXTURE,
+            fixtures::CCD_DIRECTORY_HEADER,
+            &rows,
+        )?,
+        Err(reason) => Rebuilt::skipped(fixtures::CCD_DIRECTORY_FIXTURE, reason),
     });
 
     // Seventeen Octobers of the child nutrition report, aggregated from school sites to sponsors.
     out.push(match mr81_panel(root) {
-        Ok(rows) => Rebuilt::Written {
-            path: fixtures::MR81_FIXTURE.to_string(),
-            rows: fixtures::write_csv(
-                &root.join(fixtures::MR81_FIXTURE),
-                fixtures::MR81_HEADER,
-                &rows,
-            )?,
-        },
-        Err(reason) => Rebuilt::Skipped {
-            path: fixtures::MR81_FIXTURE.to_string(),
-            reason,
-        },
+        Ok(rows) => csv_fixture(root, fixtures::MR81_FIXTURE, fixtures::MR81_HEADER, &rows)?,
+        Err(reason) => Rebuilt::skipped(fixtures::MR81_FIXTURE, reason),
     });
 
     // School districts across legislative seats. The last extraction because it is the only one
@@ -1138,18 +1061,13 @@ pub fn rebuild(root: &Path) -> Result<Vec<Rebuilt>, RebuildError> {
         .filter_map(|row| row.first().cloned())
         .collect();
     out.push(match legislative_crosswalk(root, &panel) {
-        Ok(rows) => Rebuilt::Written {
-            path: fixtures::CROSSWALK_FIXTURE.to_string(),
-            rows: fixtures::write_csv(
-                &root.join(fixtures::CROSSWALK_FIXTURE),
-                fixtures::CROSSWALK_HEADER,
-                &rows,
-            )?,
-        },
-        Err(reason) => Rebuilt::Skipped {
-            path: fixtures::CROSSWALK_FIXTURE.to_string(),
-            reason,
-        },
+        Ok(rows) => csv_fixture(
+            root,
+            fixtures::CROSSWALK_FIXTURE,
+            fixtures::CROSSWALK_HEADER,
+            &rows,
+        )?,
+        Err(reason) => Rebuilt::skipped(fixtures::CROSSWALK_FIXTURE, reason),
     });
 
     Ok(out)
@@ -1302,7 +1220,7 @@ fn f33_ohio_panel(root: &Path) -> Result<Vec<Vec<String>>, String> {
     // 30 MB of survey held at once is cheaper than a builder that takes a closure.
     let mut surveys = Vec::new();
     for (fiscal_year, key) in F33_PANEL_YEARS {
-        let survey = source(key).expect("registered").1;
+        let survey = registered(key);
         surveys.push((*fiscal_year, zip_member(root, survey, ".txt")?));
     }
     let years: Vec<fixtures::PanelYear<'_>> = surveys
@@ -1400,7 +1318,7 @@ const TRANSFER_REPORTS: &[Recital] = &[
 fn transfers(root: &Path) -> Result<Vec<Vec<String>>, String> {
     let mut texts = Vec::new();
     for (key, ..) in TRANSFER_REPORTS {
-        let source = source(key).expect("registered").1;
+        let source = registered(key);
         texts.push(cache::pdf_text(root, source).map_err(|cause| cause.to_string())?);
     }
     let reports: Vec<fixtures::AuditReport<'_>> = TRANSFER_REPORTS
@@ -1457,7 +1375,7 @@ fn session_laws(root: &Path) -> Result<Vec<Vec<String>>, String> {
     let mut texts = Vec::new();
     for (ga, bill, _, _) in SESSION_LAW_ACTS {
         let key = format!("{bill}-{ga}-enrolled");
-        let source = source(&key).expect("registered").1;
+        let source = registered(&key);
         texts.push(cache::pdf_text(root, source).map_err(|cause| cause.to_string())?);
     }
     let acts: Vec<fixtures::ActText<'_>> = SESSION_LAW_ACTS
@@ -1499,7 +1417,7 @@ fn ccd_directory(root: &Path) -> Result<Vec<Vec<String>>, String> {
             opens % 100,
             (opens + 1) % 100
         );
-        let source = source(&key).expect("registered").1;
+        let source = registered(&key);
         // The member is chosen by extension because its name carries a release date that changes
         // when NCES reposts, and because the modern archives hold the same directory twice — once
         // as text and once as a SAS table nothing here can read.
@@ -1664,7 +1582,7 @@ fn mr81_panel(root: &Path) -> Result<Vec<Vec<String>>, String> {
     let mut texts = Vec::new();
     for (year, stream, _) in MR81_FILES {
         let key = mr81_key(*year, *stream);
-        let source = source(&key).expect("registered").1;
+        let source = registered(&key);
         let bytes = cache::read_cached(root, source).map_err(|e| e.to_string())?;
         // Latin-1: the reports carry the occasional non-UTF-8 byte in a sponsor name, and a
         // lossy UTF-8 read would put a replacement character into committed data.
