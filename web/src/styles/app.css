@@ -244,7 +244,7 @@ td.year { font-family: var(--font-mono); color: var(--text-annotation); white-sp
   line-height: 1.2;
 }
 
-a { color: var(--series-formula); text-decoration-color: color-mix(in srgb, var(--series-formula) 40%, transparent); }
+a { color: var(--series-formula-text); text-decoration-color: color-mix(in srgb, var(--series-formula-text) 40%, transparent); }
 a:hover { text-decoration-color: currentColor; }
 
 /* The district sub-navigation: five views of one district. A tab row in appearance, real links
@@ -655,9 +655,9 @@ output { font-variant-numeric: tabular-nums; color: var(--text-primary); font-we
   padding: .1rem .3rem;
   border-radius: var(--radius-sm);
 }
-.err { color: var(--series-guarantee); }
-.gain { color: var(--series-formula); }
-.loss { color: var(--series-guarantee); }
+.err { color: var(--series-guarantee-text); }
+.gain { color: var(--series-formula-text); }
+.loss { color: var(--series-guarantee-text); }
 .tnum { font-variant-numeric: tabular-nums; }
 /* The row the published model actually uses. Weight rather than colour: the other rows are the
    same formula at a different enrollment, not a different kind of thing. */
@@ -869,7 +869,7 @@ tbody tr:last-child th, tbody tr:last-child td { border-bottom: 0; }
   scroll-margin-top: calc(var(--sticky-chrome) + .75rem);
 }
 .prose-body blockquote.correction > p:first-child > strong:first-child {
-  color: var(--series-guarantee);
+  color: var(--series-guarantee-text);
 }
 
 /*
@@ -882,7 +882,7 @@ tbody tr:last-child th, tbody tr:last-child td { border-bottom: 0; }
 .card.correction-index {
   border-color: color-mix(in srgb, var(--series-guarantee) 35%, var(--border));
 }
-.card.correction-index h2 { color: var(--series-guarantee); }
+.card.correction-index h2 { color: var(--series-guarantee-text); }
 
 /* A decision record's `summary` — its own one-paragraph statement of what it settled. Set a step
    up from the body because it leads the page rather than sitting in the sequence of sections. */
