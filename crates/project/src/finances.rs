@@ -277,20 +277,15 @@ impl Finances {
     }
 }
 
-fn field(line: &str, index: usize) -> &str {
-    line.split(',').nth(index).unwrap_or("").trim()
-}
-
-/// A dollar column by index, zero where the department wrote no value.
+/// The header this reader's column positions are written against.
 ///
-/// `conventions::number` rather than `str::parse`: it is the one place that knows what the
-/// department writes where there is no value. A raw parse turns `<10`, `#N/A` and a
-/// thousands-separated figure alike into `None`, and `unwrap_or(0.0)` then reports every
-/// one of them as zero. The zero is kept here because the surrounding type has no way to
-/// carry an absence, but it is now a stated substitution rather than a parse failure.
-fn amount(line: &str, index: usize) -> Dollars {
-    edfund_core::conventions::number(field(line, index)).unwrap_or(0.0)
-}
+/// Asserted on every read. This module indexed thirteen numeric columns by bare position with
+/// nothing checking the header at all, so a column inserted upstream would have moved
+/// `ending_cash` into `beginning_cash` and every cash figure in the corpus would have been
+/// wrong and parsed cleanly.
+const EXPECTED_HEADER: &str = "irn,name,county,fiscal_year,unrestricted_aid,restricted_aid,\
+property_tax,income_tax,property_tax_allocation,total_revenue,total_revenue_and_sources,\
+total_expenditure,beginning_cash,ending_cash";
 
 /// Every district's financial panel, in IRN order.
 ///
@@ -301,21 +296,21 @@ fn amount(line: &str, index: usize) -> Dollars {
 #[must_use]
 pub fn finances() -> Vec<Finances> {
     let mut out: Vec<Finances> = Vec::new();
-    for line in FINANCES.lines().skip(1).filter(|l| !l.trim().is_empty()) {
-        let irn = field(line, 0).to_string();
-        let fiscal_year = FiscalYear(field(line, 3).parse().unwrap_or(0));
+    for row in edfund_core::csv::rows(FINANCES, EXPECTED_HEADER) {
+        let irn = row.str(0).to_string();
+        let fiscal_year = FiscalYear(row.str(3).parse().unwrap_or(0));
         let record = YearRecord {
             fiscal_year,
-            unrestricted_aid: amount(line, 4),
-            restricted_aid: amount(line, 5),
-            property_tax: amount(line, 6),
-            income_tax: amount(line, 7),
-            property_tax_allocation: amount(line, 8),
-            total_revenue: amount(line, 9),
-            total_revenue_and_sources: amount(line, 10),
-            total_expenditure: amount(line, 11),
-            beginning_cash: amount(line, 12),
-            ending_cash: amount(line, 13),
+            unrestricted_aid: row.required(4),
+            restricted_aid: row.required(5),
+            property_tax: row.required(6),
+            income_tax: row.required(7),
+            property_tax_allocation: row.required(8),
+            total_revenue: row.required(9),
+            total_revenue_and_sources: row.required(10),
+            total_expenditure: row.required(11),
+            beginning_cash: row.required(12),
+            ending_cash: row.required(13),
         };
         // The fixture is written in (IRN, year) order, so a district's rows are adjacent and
         // this never has to search backwards.
@@ -323,8 +318,8 @@ pub fn finances() -> Vec<Finances> {
             Some(existing) if existing.irn == irn => existing.years.push(record),
             _ => out.push(Finances {
                 irn,
-                name: field(line, 1).to_string(),
-                county: field(line, 2).to_string(),
+                name: row.str(1).to_string(),
+                county: row.str(2).to_string(),
                 years: vec![record],
             }),
         }

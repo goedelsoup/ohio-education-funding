@@ -23,6 +23,7 @@
 #![forbid(unsafe_code)]
 
 pub mod conventions;
+pub mod csv;
 
 /// A dollar amount. See the module note on floating point.
 pub type Dollars = f64;
