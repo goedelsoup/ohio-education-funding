@@ -1767,14 +1767,18 @@ fn build() -> Bundle {
 
     let history = history();
     let appropriations = appropriation_block();
+    // Bound rather than called twice apiece: each reparses the MR-81 archive from scratch, and
+    // both are wanted again below in `series_years`.
+    let meal_program = meal_program();
+    let casino = casino_statewide();
 
     Bundle {
         national: national(),
         history: history.clone(),
         appropriation_lines: appropriation_lines(),
         appropriations: appropriations.clone(),
-        meal_program: meal_program(),
-        casino: casino_statewide(),
+        meal_program: meal_program.clone(),
+        casino: casino.clone(),
         house_districts: house_district_block(&records, Chamber::House),
         senate_districts: house_district_block(&records, Chamber::Senate),
         contract_version: CONTRACT_VERSION.to_string(),
@@ -1797,8 +1801,8 @@ fn build() -> Bundle {
             &districts,
             &history,
             &appropriations,
-            &meal_program(),
-            &casino_statewide(),
+            &meal_program,
+            &casino,
         ),
         statewide,
         checkpoints,
@@ -1945,7 +1949,7 @@ mod tests {
         assert!(
             offenders.is_empty(),
             "{} share field(s) outside 0..=1, so the bundle publishes two scales under one \
-             convention. Divide at the seam in `district_json`, as the report-card shares are, \
+             convention. Divide at the seam in `to_district`, as the report-card shares are, \
              and bump CONTRACT_VERSION:\n  {}",
             offenders.len(),
             offenders
