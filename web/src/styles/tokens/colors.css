@@ -27,15 +27,47 @@
   --border: #dcdcd6;
   --accent-rule: #c9c8c1;
 
-  /* Text. Three ranks. Muted is for annotation and is never used for a claim's substance. */
+  /*
+   * Text. Three ranks. Muted is for annotation and is never used for a claim's substance.
+   *
+   * Muted was #75746e and reached 4.26:1 on the page ground, 4.03 on the inset — under the 4.5:1
+   * body text needs, on the footer of every page and the district table's column heads. Solved
+   * the same way as the series text pair: OKLab hue and chroma held, lightness moved until the
+   * tightest surface clears 5:1. Only light moved; dark muted was already 5.29 at its worst.
+   *
+   * `.span-bar > i` draws a regime's span with this colour as a background rather than as text.
+   * A mark needs 3:1, so it was never the failing case, and the change moves it 4.26 -> 5.31.
+   */
   --text-primary: #0b0b0b;
   --text-secondary: #52514e;
-  --text-muted: #75746e;
+  --text-muted: #66655f;
 
   /* The categorical pair. Formula aid against guarantee; reused as gain against loss, and only
      there. Fixed order, never cycled. */
   --series-formula: #2a78d6;
   --series-guarantee: #eb6834;
+
+  /*
+   * The same two hues as TEXT rather than as marks, and the split is a contrast requirement
+   * rather than a second opinion about the colours.
+   *
+   * A mark needs 3:1 against its ground and body text needs 4.5:1. The pair above is chosen for
+   * marks and reaches the text bar in neither mode. Measured against `--surface-2`, the tightest
+   * of the three: light 3.80 formula and 2.75 guarantee, dark 4.38 and 4.10. Every link on the
+   * site was set in the mark colour, and `.err` — which carries the scenario runner's "Formula
+   * check FAILED" notice and the noscript heading — was set in the worse of the two, so the one
+   * piece of text that has to stay readable when everything else has gone wrong was the least
+   * readable text on the page.
+   *
+   * These are DERIVED, not chosen, which is the one place this file departs from its own rule.
+   * OKLab hue and chroma are held to the mark colour's exactly and only lightness moves, until
+   * the worst of the three surfaces reaches 5:1. Light drifts 0.01 degrees of hue on the formula
+   * and 2.75 on the guarantee; dark drifts under 0.1 on both, so the hue identity survives and
+   * the value is a consequence of the surfaces rather than a taste. Change a surface and
+   * `palette.spec.ts` says these have to move, rather than leaving them quietly wrong.
+   */
+  --series-formula-text: #1064c0;
+  --series-guarantee-text: #b83800;
   /* The diverging midpoint, and any mark with no polarity. Never a hue. */
   --neutral-mark: #a8a79f;
 
@@ -142,6 +174,8 @@
   --text-muted: #96958c;
   --series-formula: #3987e5;
   --series-guarantee: #d95926;
+  --series-formula-text: #4492f1;
+  --series-guarantee-text: #eb6938;
   --neutral-mark: #6d6c64;
   --ordinal-1: #1c528f;
   --ordinal-2: #4a92ea;
@@ -162,9 +196,11 @@
   --accent-rule: #c9c8c1;
   --text-primary: #0b0b0b;
   --text-secondary: #52514e;
-  --text-muted: #75746e;
+  --text-muted: #66655f;
   --series-formula: #2a78d6;
   --series-guarantee: #eb6834;
+  --series-formula-text: #1064c0;
+  --series-guarantee-text: #b83800;
   --neutral-mark: #a8a79f;
   --ordinal-1: #7fb0e8;
   --ordinal-2: #2a78d6;
@@ -187,6 +223,8 @@
   --text-muted: #96958c;
   --series-formula: #3987e5;
   --series-guarantee: #d95926;
+  --series-formula-text: #4492f1;
+  --series-guarantee-text: #eb6938;
   --neutral-mark: #6d6c64;
   --ordinal-1: #1c528f;
   --ordinal-2: #4a92ea;

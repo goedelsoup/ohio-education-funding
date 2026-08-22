@@ -167,3 +167,81 @@ describe("the ramp that was removed", () => {
     }
   });
 });
+
+/**
+ * Text is held to 4.5:1 and marks to 3:1, and the palette carries a separate pair for each.
+ *
+ * Every link on this site was set in `--series-formula`, which is a mark colour: 4.01:1 on the
+ * page ground, 3.80 on the inset, and `.err` — the scenario runner's failure notice — was set in
+ * `--series-guarantee` at 2.75. Both modes failed, not only light; the dark pair reaches 4.38 and
+ * 4.10 against `--surface-2` and had been read as passing because nothing measured it there.
+ *
+ * The `-text` variants hold OKLab hue and chroma to the mark colour and move only lightness, so
+ * this asserts the requirement rather than the values. Change a surface, or restate a hue, and
+ * the failure names the pair that has to move.
+ */
+describe("text colour", () => {
+  const SURFACES = ["--surface-0", "--surface-1", "--surface-2"] as const;
+  // Every token a rule may set `color` from. `--text-muted` is in here because it was the
+  // third failure and the least visible one: annotation, so nobody looks at it twice.
+  const TEXT = [
+    "--series-formula-text",
+    "--series-guarantee-text",
+    "--text-primary",
+    "--text-secondary",
+    "--text-muted",
+  ] as const;
+
+  test("clears 4.5:1 on every surface it can be set on, in both modes", () => {
+    for (const mode of ["light", "dark"] as const) {
+      for (const name of TEXT) {
+        const value = PALETTE[mode].tokens.get(name);
+        expect(value, `${name} is not declared in the ${mode} palette`).toBeTruthy();
+        for (const surface of SURFACES) {
+          const ground = PALETTE[mode].tokens.get(surface)!;
+          expect(
+            contrast(parseHex(value!), parseHex(ground)),
+            `${mode} ${name} on ${surface}`,
+          ).toBeGreaterThanOrEqual(4.5);
+        }
+      }
+    }
+  });
+
+  test("and the mark colours are still the ones the charts use, unchanged", () => {
+    // The split exists so the marks did NOT have to move. If these drift, a chart's colour has
+    // been changed to solve a text problem, which is the trade this pair was added to avoid.
+    expect(PALETTE.light.tokens.get("--series-formula")).toBe("#2a78d6");
+    expect(PALETTE.light.tokens.get("--series-guarantee")).toBe("#eb6834");
+    expect(PALETTE.dark.tokens.get("--series-formula")).toBe("#3987e5");
+    expect(PALETTE.dark.tokens.get("--series-guarantee")).toBe("#d95926");
+  });
+});
+
+/**
+ * The dark palette is written three times and this is the only thing holding the three together.
+ *
+ * `colors.css` states dark in the media query, restates light under `[data-theme="light"]` and
+ * dark again under `[data-theme="dark"]`, deliberately: a shared intermediate is what lets two
+ * themes drift into disagreement. But the file's own note says to assert the blocks against each
+ * other instead, and nothing did — every measurement in this file reads the explicit-choice
+ * blocks, so the media query, which is the palette a reader with no stored preference actually
+ * gets, was the one block nothing had ever looked at.
+ */
+describe("the three restatements of the palette", () => {
+  test("agree property for property", () => {
+    const media = block("@media (prefers-color-scheme: dark) {");
+    const dark = block(':root[data-theme="dark"] {');
+    const light = block(":root {");
+    const explicitLight = block(':root[data-theme="light"] {');
+
+    expect([...media.keys()].sort()).toEqual([...dark.keys()].sort());
+    for (const [name, value] of dark) {
+      expect(media.get(name), `${name} differs between the media query and [data-theme="dark"]`)
+        .toBe(value);
+    }
+    for (const [name, value] of explicitLight) {
+      expect(light.get(name), `${name} differs between :root and [data-theme="light"]`).toBe(value);
+    }
+  });
+});

@@ -39,7 +39,7 @@ export const CARD = {
   /** `--text-secondary`. The line under the headline. */
   textSecondary: "#52514e",
   /** `--text-muted`. The eyebrow and the footer line. */
-  textMuted: "#75746e",
+  textMuted: "#66655f",
   /** `--series-formula`. Formula aid, and the figure when it is not a guarantee figure. */
   formula: "#2a78d6",
   /** `--series-guarantee`. Guarantee aid. The contrasting half of the validated pair. */
