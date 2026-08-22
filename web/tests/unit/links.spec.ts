@@ -480,7 +480,7 @@ test("a scatter draws one mark per district and never a colour the theme cannot 
   expect(spec?.hovers?.text.length).toBe(points.length);
 
   // Renders, and `ensureThemeable` inside `renderToString` throws on a baked-in colour.
-  const svg = renderToString(spec);
+  const svg = renderToString(spec, { label: "test" });
   expect(svg).toContain("<svg");
   expect(svg.replace(/<style>[\s\S]*?<\/style>/g, "")).not.toMatch(/#[0-9a-f]{3,8}\b|rgba?\(/i);
 });
@@ -579,7 +579,7 @@ test("the box is drawn only where quartiles summarise something", () => {
    */
   const values = (n: number) => Array.from({ length: n }, (_, i) => ({ value: i, hover: `d${i}` }));
   const boxes = (spec: ReturnType<typeof distributionSpec>) =>
-    (renderToString(spec).match(/<rect/g) ?? []).length;
+    (renderToString(spec, { label: "test" }).match(/<rect/g) ?? []).length;
 
   expect(boxes(distributionSpec(values(BOX_FROM - 1))), "no box below the floor").toBe(0);
   expect(boxes(distributionSpec(values(BOX_FROM))), "a box at the floor").toBeGreaterThan(0);
@@ -598,7 +598,7 @@ test("a district's position is drawn against the population it is being placed i
   const spec = distributionSpec(valuations, {
     marker: { value: valuations[0]!.value, label: "a district" },
   });
-  const svg = renderToString(spec);
+  const svg = renderToString(spec, { label: "test" });
   expect(svg).toContain("dist-marker");
   // And it is themeable, like every other chart the build emits.
   expect(svg.replace(/<style>[\s\S]*?<\/style>/g, "")).not.toMatch(/#[0-9a-f]{3,8}\b|rgba?\(/i);
@@ -645,7 +645,7 @@ test("an identity plot is square and shares one domain, or it does not mean what
   const plotHeight = height - (spec.options.marginTop as number) - (spec.options.marginBottom as number);
   expect(plotWidth, "the plot area is square").toBe(plotHeight);
 
-  expect(renderToString(spec)).toContain("scatter-identity");
+  expect(renderToString(spec, { label: "test" })).toContain("scatter-identity");
 });
 
 test("a scatter without an identity line fits each axis to its own measure", () => {
@@ -659,7 +659,7 @@ test("a scatter without an identity line fits each axis to its own measure", () 
   const x = spec.options.x as { domain: [number, number] };
   const y = spec.options.y as { domain: [number, number] };
   expect(x.domain).not.toEqual(y.domain);
-  expect(renderToString(spec)).not.toContain("scatter-identity");
+  expect(renderToString(spec, { label: "test" })).not.toContain("scatter-identity");
 });
 
 test("the reduction factors reproduce the floor and approximate everything else", () => {
@@ -837,7 +837,7 @@ test("a range draws both ends of each item, not the ratio between them", () => {
   );
 
   expect(spec?.hovers?.text.length).toBe(measurable.length);
-  const svg = renderToString(spec);
+  const svg = renderToString(spec, { label: "test" });
   // Both ends drawn, and the span between them.
   expect(svg).toContain("range-low");
   expect(svg).toContain("range-high");

@@ -149,6 +149,7 @@ export function renderRevenueMix(history: HistoryYear[]): string {
           ? `FY${p.year}: not published`
           : `FY${p.year}: ${p.a.toFixed(1)}% local, ${(p.b ?? 0).toFixed(1)}% state`,
     ),
+  { label: `Local and state shares of total school revenue across the Census Bureau's Ohio school systems, percent, FY${first.fiscal_year} to FY${last.fiscal_year}`, description: "The axis is truncated to the range of the two shares rather than starting at zero" },
   );
 
   const missing = gaps(history);
@@ -224,6 +225,7 @@ export function renderEqualization(
           ? `FY${p.year}: not published`
           : `FY${p.year}: ${money(p.a)} gap, ${money(p.b ?? 0)} of it closed by nobody`,
     ),
+  { label: `Gap in local revenue per pupil between the poorest and richest quarter of districts, and the part neither state nor federal aid closes, FY${first.fiscal_year} to FY${last.fiscal_year}, ${basis === "real" && base != null ? `in FY${base} dollars` : "in the dollars of each year"}`, description: "The axis is truncated to the range of the two series rather than starting at zero, and the line breaks at any year the panel skips" },
   );
 
   const rateHeld =

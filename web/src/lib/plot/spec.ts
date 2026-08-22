@@ -40,6 +40,64 @@ import type {
 } from "../chart.ts";
 import { INK, ORDINAL, SERIES } from "./tokens.ts";
 
+/**
+ * How a chart is announced to a reader who cannot see it.
+ *
+ * Every build-time SVG on this site shipped without one of these for as long as there have been
+ * charts: 7,605 unnamed graphics, each read out as its own internal group names — "dot", "line",
+ * "rule" — followed by whatever text marks happened to sit in it. The district fan chart's entire
+ * accessible content was five numbers in a row with nothing saying what they measured.
+ *
+ * This is a required argument to both renderers rather than a field on `Spec`, and the placement
+ * is the point. `barSpec(bars)` builds six different charts here — cash balance, casino receipts,
+ * categorical aid, base cost, tax base, spending by function — so the name is a property of the
+ * USE and not of the shape. A spec cannot know what it is about; the call site always does.
+ *
+ * Being required is what makes it hold. A new chart does not compile until it says what it is,
+ * which is the same shape as `ensureThemeable` refusing to emit one with a baked colour.
+ */
+export type Naming =
+  /**
+   * Announced as one graphic with this name.
+   *
+   * `role="img"` goes on beside the label, so assistive technology reads the name instead of
+   * walking the SVG. That is the right trade here: the numbers inside are positions rather than a
+   * reading order, and every chart on this site sits beside prose or a table carrying the same
+   * figures. The label is therefore the whole of what a screen reader gets — write it as what is
+   * plotted against what, with the basis, not as a description of a picture.
+   */
+  | { label: string; description?: string }
+  /**
+   * Hidden from assistive technology, because the text beside it already says what it says.
+   *
+   * Only where that is literally true — a 46px strip whose `.note` states the same position in
+   * words — and never merely because a chart is secondary. A hidden chart is one a reader cannot
+   * reach at all.
+   */
+  | "presentational";
+
+/** Anything a renderer can put attributes on, so this file needs no DOM lib. */
+type Nameable = { setAttribute: (name: string, value: string) => void };
+
+/**
+ * Put the naming onto a rendered root. Shared by both renderers so they cannot disagree.
+ *
+ * The description is folded into the label rather than set as `aria-description`: that property
+ * is ARIA 1.3 and is not reliably announced yet, and a second sentence that may go unread is
+ * worse than one that is certainly read, because nobody writing it would know.
+ */
+export function applyNaming(node: Nameable, naming: Naming): void {
+  if (naming === "presentational") {
+    node.setAttribute("aria-hidden", "true");
+    return;
+  }
+  node.setAttribute("role", "img");
+  node.setAttribute(
+    "aria-label",
+    naming.description ? `${naming.label}. ${naming.description}` : naming.label,
+  );
+}
+
 /** A chart, and the tooltip text for the marks a reader can point at. */
 export interface Spec {
   options: Plot.PlotOptions;

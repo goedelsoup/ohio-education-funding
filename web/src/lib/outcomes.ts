@@ -200,7 +200,7 @@ export function renderOutcomes(bundle: Bundle): string {
         economically disadvantaged, against its Performance Index. The line is the median of each
         fifth of districts, least poor on the left — the summary this card used to show on its
         own, now drawn over the ${count(povertyPoints.length)} districts it summarises.</p>
-      <div class="chartwrap" data-chart="poverty-and-performance">${renderToString(povertyScatter)}</div>
+      <div class="chartwrap" data-chart="poverty-and-performance">${renderToString(povertyScatter, { label: `Economically disadvantaged share against Performance Index across ${count(povertyPoints.length)} districts, with the median of each poverty fifth, ${yearOf("outcome.performance")}` })}</div>
       <p class="note">At <strong>${coefficient(o.poverty_vs_performance)}</strong>, economic
         disadvantage explains about ${pct(o.poverty_vs_performance ** 2, 0)} of the variance in
         Ohio's attainment measure. Any other district-level variable correlated with it will
@@ -249,14 +249,14 @@ export function renderOutcomes(bundle: Bundle): string {
         Performance Index runs ${bandMedians[0]}, ${bandMedians[1]}, ${bandMedians[2]}. The
         denominator has absorbed the difference between them, which is what a coefficient of
         ${coefficient(o.weighted_spending_vs_performance)} looks like from the inside.</p>
-      <div class="chartwrap" data-chart="weighted-spending">${renderToString(weightedScatter)}</div>
+      <div class="chartwrap" data-chart="weighted-spending">${renderToString(weightedScatter, { label: `Spending per need-weighted pupil against Performance Index, one dot per district shaded by poverty third, with a median line for each third, ${yearOf("outcome.spending")} spending and ${yearOf("outcome.performance")} attainment` })}</div>
 
       <p class="note">Spending per <em>enrolled</em> pupil, against the same attainment —
         ${coefficient(o.enrolled_spending_vs_performance)}. The same three bands, and now they
         separate on the horizontal axis too: the poorest third spends
         ${money(enrolledGap)} more per enrolled pupil than the least poor. Nothing about the
         districts changed between these two charts. Only the denominator did.</p>
-      <div class="chartwrap" data-chart="enrolled-spending">${renderToString(enrolledScatter)}</div>
+      <div class="chartwrap" data-chart="enrolled-spending">${renderToString(enrolledScatter, { label: `Spending per enrolled pupil against Performance Index, one dot per district shaded by poverty third, with a median line for each third, ${yearOf("outcome.spending")} spending and ${yearOf("outcome.performance")} attainment` })}</div>
       <div class="scroll"><table><tbody>
         <tr><th>Spending per <em>need-weighted</em> pupil vs achievement</th>
             <td class="tnum">${coefficient(o.weighted_spending_vs_performance)}</td></tr>
@@ -388,7 +388,7 @@ export function renderOutcomeContext(bundle: Bundle, district: District): string
              its middle half, the line inside it the median the tile above reports, and the
              coloured rule is ${escapeHtml(district.name)}. The gap in the third tile is worth what
              the width of this box says it is worth.</p>
-             <div class="chartwrap" data-chart="peer-group">${renderToString(peerBox)}</div>
+             <div class="chartwrap" data-chart="peer-group">${renderToString(peerBox, { label: `Performance Index across the ${count(peers.length)} districts in the ${label}, with ${district.name} marked, ${seriesYear("outcome.performance")?.label ?? ""}` })}</div>
              <div class="scale">
                <span>${scores[0]!.toFixed(1)}</span>
                <span>${scores[scores.length - 1]!.toFixed(1)}</span>

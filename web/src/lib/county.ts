@@ -35,7 +35,7 @@
 import type { District, Statewide } from "./types.ts";
 import { count, escapeHtml, money, pct } from "./format.ts";
 import * as routes from "./routes.ts";
-import { yearChip } from "./year.ts";
+import { yearChip, yearOf } from "./year.ts";
 import { anchor } from "./section.ts";
 import { BOX_FROM, distributionSpec } from "./plot/spec.ts";
 import { renderToString } from "./plot/ssr.ts";
@@ -191,7 +191,7 @@ function renderSpread(c: County, statewide: Statewide, all: County[]): string {
                  ? " The shaded box is the middle half of them."
                  : ""
              }</p>
-             <div class="chartwrap" data-chart="county-spread">${renderToString(dots)}</div>
+             <div class="chartwrap" data-chart="county-spread">${renderToString(dots, { label: `Assessed valuation per pupil for each of the ${count(c.districts.filter((d) => d.valuation_per_pupil != null).length)} districts in ${c.name} County reporting a tax base, poorest at left, ${yearOf("formula")}` })}</div>
              <div class="scale">
                <span>${money(poor.valuation_per_pupil!)}</span>
                <span>${money(rich.valuation_per_pupil!)}</span>
@@ -222,7 +222,7 @@ function renderSpread(c: County, statewide: Statewide, all: County[]): string {
              district reporting a tax base — one dot each, narrowest on the left, and the coloured
              rule is ${escapeHtml(c.name)}. The median county is
              ${median(ratios.map((r) => r.value)).toFixed(1)}× apart.</p>
-             <div class="chartwrap" data-chart="county-position">${renderToString(position)}</div>
+             <div class="chartwrap" data-chart="county-position">${renderToString(position, "presentational")}</div>
              <div class="scale">
                <span>${Math.min(...ratios.map((r) => r.value)).toFixed(1)}×</span>
                <span>${Math.max(...ratios.map((r) => r.value)).toFixed(1)}×</span>

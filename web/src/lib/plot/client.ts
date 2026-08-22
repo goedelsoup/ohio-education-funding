@@ -16,10 +16,10 @@
 
 import * as Plot from "@observablehq/plot";
 
-import { BASE, type Spec } from "./spec.ts";
+import { applyNaming, BASE, type Naming, type Spec } from "./spec.ts";
 
 /** Render a specification to an SVG string, so the callers shared with the build path match. */
-export function renderToString(spec: Spec | null): string {
+export function renderToString(spec: Spec | null, naming: Naming): string {
   if (!spec) return "";
   const node = Plot.plot({ ...BASE, ...spec.options }) as unknown as Element;
   if (spec.hovers) {
@@ -32,5 +32,6 @@ export function renderToString(spec: Spec | null): string {
       });
     }
   }
+  applyNaming(node, naming);
   return node.outerHTML;
 }

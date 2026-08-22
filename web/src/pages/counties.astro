@@ -47,6 +47,9 @@ const disparity = renderToString(
     format: (v) => money(v),
     log: true,
   }),
+  {
+    label: `Assessed valuation per pupil from the poorest to the richest district in each of ${count(rows.length)} counties, widest span first, on a log scale, FY${bundle.fiscal_year}`,
+  },
 );
 
 /*

@@ -111,6 +111,7 @@ export function renderAppropriations(
       (p) =>
         `FY${p.year}: $${(p.a ?? 0).toFixed(2)}bn appropriated, $${(p.b ?? 0).toFixed(2)}bn of it the formula`,
     ),
+  { label: `Appropriation and the formula's share of it, billions of dollars by fiscal year, FY${first.fiscal_year} to FY${last.fiscal_year}, in ${basis === "real" ? `constant FY${base} dollars` : "the dollars of each year"}` },
   );
 
   const label = basis === "real" ? `constant FY${base} dollars` : "the dollars of each year";
