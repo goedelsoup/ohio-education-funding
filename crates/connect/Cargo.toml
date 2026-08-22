@@ -11,6 +11,7 @@ description = "Retrieval and extraction: the department's publications into comm
 spreadsheet = { path = "../spreadsheet" }
 deflator = { path = "../deflator" }
 edfund-core = { path = "../edfund-core" }
+bundle = { path = "../bundle" }
 
 [[bin]]
 name = "edfund-connect"

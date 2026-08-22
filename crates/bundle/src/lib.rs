@@ -35,6 +35,8 @@
 
 mod json;
 
+pub mod build;
+
 use edfund_core::Dollars;
 
 /// The bundle schema version. Bump on any change to field names, units, or semantics.
