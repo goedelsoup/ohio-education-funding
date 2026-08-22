@@ -160,6 +160,8 @@ const duplicates: { page: string; id: string }[] = [];
 /** A card in `main` with no `id`, an `id` outside the vocabulary, or a heading that misaddresses it. */
 const unaddressed: string[] = [];
 let cards = 0;
+/** A word, then an inline element opening against it with no space between the two. */
+const fused: string[] = [];
 
 /** `dist/district/043786.html` is served as `/district/043786`; `build.format` is "file". */
 const servedAs = (file: string): string => "/" + relative(DIST, file).replace(/\.html$/, "");
@@ -200,6 +202,34 @@ for (const file of htmlFiles(DIST)) {
    */
   for (const match of html.matchAll(/\shref="#([^"]+)"/g)) {
     fragments.push({ from: here, path: here, id: match[1]! });
+  }
+
+  /*
+   * A word, then an inline element opening with no space between them.
+   *
+   * Astro drops the newline between a text node that ends a line and a tag that opens the next, so
+   * `half of` on one line and `<a>preschool` on the one below render as `half ofpreschool`. The
+   * idiom that prevents it is `{" "}` closing the text line, and it is used correctly within a few
+   * lines of every place it was forgotten — this is a defect of omission, not of understanding.
+   *
+   * Two guards for this already exist and both are blind to that shape by construction.
+   * `tests/unit/fusion.spec.ts` walks `{…}` expressions, and a bare `<a>` after prose is not one.
+   * The sweep in `tests/e2e/app.spec.ts` iterates ROUTES_WITH_FIGURES, a list assembled for the
+   * year-chip rule, which contains none of the three pages that were actually fusing — though the
+   * suite loads /scenario nineteen times for other reasons. Asking the artefact closes both holes
+   * at once, because it cannot miss a page: it reads every page there is.
+   *
+   * The year chip is the one deliberate adjacency — `<h2>Two floors<span class="year-chip">` is
+   * how a chip attaches to its heading — and it is 8,806 of the 8,814 matches here. Excluded by
+   * class, because excluding it by tolerating a count is how the eight got in.
+   */
+  for (const match of html.matchAll(
+    /([A-Za-z][A-Za-z.,;:)]?)<(a|abbr|code|em|span|strong)\b([^>]*)>[A-Za-z]/g,
+  )) {
+    if (/year-chip/.test(match[3]!)) continue;
+    const at = match.index!;
+    const context = html.slice(Math.max(0, at - 45), at + match[0].length + 25).replace(/\s+/g, " ");
+    fused.push(`  ${here}\n    …${context}…`);
   }
 }
 
@@ -279,8 +309,24 @@ if (unaddressed.length > 0) {
   process.exit(1);
 }
 
+if (fused.length > 0) {
+  console.error(
+    `\n${fused.length} fused word${fused.length === 1 ? "" : "s"} in the built site.\n\n` +
+      `A text node ends and an inline element opens against it with no space, so the two words run\n` +
+      `together on the page: "the weighted half of" followed by <a>preschool…</a> is read by every\n` +
+      `reader as "half ofpreschool".\n\n` +
+      `The fix is \`{" "}\` at the end of the line the text sits on, which is what the prose on\n` +
+      `either side of each of these already does.\n\n` +
+      fused.slice(0, 20).join("\n") +
+      (fused.length > 20 ? `\n  … and ${fused.length - 20} more` : "") +
+      `\n`,
+  );
+  process.exit(1);
+}
+
 console.log(
   `${anchors} links across ${pages} built pages, all absolute or off-site; ` +
     `${fragments.length} fragment links all resolve to an id in the page they name; ` +
-    `${cards} cards each addressed by a name routes.ts lists, with no id used twice in a page`,
+    `${cards} cards each addressed by a name routes.ts lists, with no id used twice in a page; ` +
+    `no word fused against an inline element`,
 );
