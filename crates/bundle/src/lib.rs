@@ -33,6 +33,8 @@
 
 #![forbid(unsafe_code)]
 
+mod json;
+
 use edfund_core::Dollars;
 
 /// The bundle schema version. Bump on any change to field names, units, or semantics.
@@ -1619,12 +1621,26 @@ fn array_pair(
     b: &[f64],
     extra: &[(&str, f64)],
 ) -> String {
-    let list = |xs: &[f64]| xs.iter().map(|x| num(*x)).collect::<Vec<_>>().join(", ");
-    let mut body = format!("\"{first}\": [{}], \"{second}\": [{}]", list(a), list(b));
-    for (key, value) in extra {
-        body.push_str(&format!(", \"{key}\": {}", num(*value)));
+    let mut s = format!("\"{name}\": ");
+    {
+        let mut o = json::Obj::new(&mut s);
+        {
+            let mut list = o.arr(first);
+            for x in a {
+                list.num(*x);
+            }
+        }
+        {
+            let mut list = o.arr(second);
+            for x in b {
+                list.num(*x);
+            }
+        }
+        for (key, value) in extra {
+            o.num(key, *value);
+        }
     }
-    format!("\"{name}\": {{{body}}}")
+    s
 }
 
 /// `"<name>": {"k": v, …}` — numeric fields, boolean flags, then nullable numbers.
@@ -1640,18 +1656,20 @@ fn fields(
     flags: &[(&str, bool)],
     opts: &[(&str, Option<f64>)],
 ) -> String {
-    let mut body = entries
-        .iter()
-        .map(|(key, value)| format!("\"{key}\": {}", num(*value)))
-        .collect::<Vec<_>>()
-        .join(", ");
-    for (key, value) in flags {
-        body.push_str(&format!(", \"{key}\": {value}"));
+    let mut s = format!("\"{name}\": ");
+    {
+        let mut o = json::Obj::new(&mut s);
+        for (key, value) in entries {
+            o.num(key, *value);
+        }
+        for (key, value) in flags {
+            o.flag(key, *value);
+        }
+        for (key, value) in opts {
+            o.opt(key, *value);
+        }
     }
-    for (key, value) in opts {
-        body.push_str(&format!(", \"{key}\": {}", opt(*value)));
-    }
-    format!("\"{name}\": {{{body}}}")
+    s
 }
 
 fn opt(v: Option<f64>) -> String {
@@ -1687,13 +1705,14 @@ impl Bundle {
         years.sort_by(|a, b| a.series.cmp(&b.series));
         s.push_str("  \"series_years\": [\n");
         for (i, y) in years.iter().enumerate() {
-            s.push_str(&format!(
-                "    {{\"series\": \"{}\", \"kind\": \"{}\", \"label\": \"{}\", \"source\": \"{}\"}}",
-                escape(&y.series),
-                y.kind.as_str(),
-                escape(&y.label),
-                escape(&y.source)
-            ));
+            s.push_str("    ");
+            {
+                let mut o = json::Obj::new(&mut s);
+                o.text("series", &y.series);
+                o.text("kind", y.kind.as_str());
+                o.text("label", &y.label);
+                o.text("source", &y.source);
+            }
             if i + 1 < years.len() {
                 s.push(',');
             }
@@ -1831,30 +1850,29 @@ impl Bundle {
 
         s.push_str("  \"checkpoints\": [\n");
         for (i, c) in self.checkpoints.iter().enumerate() {
-            s.push_str(&format!(
-                "    {{\"label\": \"{}\", \"policy\": {{\"guarantee\": \"{}\", \
-                 \"guarantee_argument\": {}, \"base_cost_scale\": {}, \
-                 \"minimum_state_share\": {}, \"phase_in_base_cost\": {}, \
-                 \"phase_in_categorical\": {}}}, \"cost\": {}, \"realized_aid\": {}, \
-                 \"gainers\": {}, \"losers\": {}, \"unmoved\": {}, \"on_guarantee\": {}, \
-                 \"held_throughout\": {}, \"lifted_off\": {}, \"pushed_on\": {}}}",
-                escape(&c.label),
-                escape(c.policy.guarantee),
-                num(c.policy.guarantee_argument),
-                num(c.policy.base_cost_scale),
-                num(c.policy.minimum_state_share),
-                num(c.policy.phase_in_base_cost),
-                num(c.policy.phase_in_categorical),
-                num(c.cost),
-                num(c.realized_aid),
-                c.gainers,
-                c.losers,
-                c.unmoved,
-                c.on_guarantee,
-                c.held_throughout,
-                c.lifted_off,
-                c.pushed_on
-            ));
+            s.push_str("    ");
+            {
+                let mut o = json::Obj::new(&mut s);
+                o.text("label", &c.label);
+                {
+                    let mut policy = o.obj("policy");
+                    policy.text("guarantee", c.policy.guarantee);
+                    policy.num("guarantee_argument", c.policy.guarantee_argument);
+                    policy.num("base_cost_scale", c.policy.base_cost_scale);
+                    policy.num("minimum_state_share", c.policy.minimum_state_share);
+                    policy.num("phase_in_base_cost", c.policy.phase_in_base_cost);
+                    policy.num("phase_in_categorical", c.policy.phase_in_categorical);
+                }
+                o.num("cost", c.cost);
+                o.num("realized_aid", c.realized_aid);
+                o.count("gainers", c.gainers);
+                o.count("losers", c.losers);
+                o.count("unmoved", c.unmoved);
+                o.count("on_guarantee", c.on_guarantee);
+                o.count("held_throughout", c.held_throughout);
+                o.count("lifted_off", c.lifted_off);
+                o.count("pushed_on", c.pushed_on);
+            }
             if i + 1 < self.checkpoints.len() {
                 s.push(',');
             }
@@ -2308,18 +2326,16 @@ impl Bundle {
                 &[],
             ));
             s.push_str(", ");
-            s.push_str("\"house_districts\": [");
-            for (i, h) in d.house_districts.iter().enumerate() {
-                if i > 0 {
-                    s.push_str(", ");
+            s.push_str("\"house_districts\": ");
+            {
+                let mut list = json::Arr::new(&mut s);
+                for h in &d.house_districts {
+                    let mut o = list.obj();
+                    o.text("number", &h.number);
+                    o.share("share", h.share);
                 }
-                s.push_str(&format!(
-                    "{{\"number\": \"{}\", \"share\": {}}}",
-                    escape(&h.number),
-                    share(h.share)
-                ));
             }
-            s.push_str("], ");
+            s.push_str(", ");
             s.push_str(&format!("\"adm\": {}, ", num(d.adm)));
             s.push_str(&format!(
                 "\"current_year_adm\": {}, ",
