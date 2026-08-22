@@ -546,6 +546,321 @@ fn rebuild_local_finance(root: &Path) -> Result<Vec<Rebuilt>, RebuildError> {
     Ok(out)
 }
 
+/// The budget documents: the Catalog of Budget Line Items, the scholarship annual report, the
+/// DeRolph opinions, and LSC's analysis of each enacted act.
+///
+/// Threads none of the rebuild's shared state — every binding it needs it makes itself.
+fn rebuild_budget_documents(root: &Path) -> Result<Vec<Rebuilt>, RebuildError> {
+    let mut out = Vec::new();
+
+    // The Catalog of Budget Line Items, nineteen editions of the education volume.
+    //
+    // Every edition, not the newest, and the edition is a column rather than a detail. Each one
+    // restates six fiscal years, so the same year appears in up to four editions — and they do not
+    // always agree, because an actual is revised and an appropriation is superseded. Keeping the
+    // vintage is what lets a later reader ask which of two figures a claim rested on, which is
+    // exactly what the workbook attempt could not answer and was reverted for.
+    //
+    // Editions are independent: one that fails to parse is skipped and named, and the rest still
+    // build. A missing edition is a visible hole in a column; a silently short fixture is not.
+    let mut catalog_rows: Vec<Vec<String>> = Vec::new();
+    let mut basis_rows: Vec<Vec<String>> = Vec::new();
+    let mut catalog_failed: Vec<String> = Vec::new();
+    let mut catalog_refused: Vec<String> = Vec::new();
+    for src in registered_connector("lsc-catalog").sources {
+        let edition = src.key.rsplit('-').next().unwrap_or_default().to_string();
+        match cache::pdf_text(root, src)
+            .map_err(|cause| cause.to_string())
+            .and_then(|text| fixtures::catalog_items(&text))
+        {
+            Ok((items, refused)) => {
+                for why in refused {
+                    catalog_refused.push(format!("{edition}: {why}"));
+                }
+                for item in items {
+                    basis_rows.push(vec![
+                        edition.clone(),
+                        item.fund.clone(),
+                        item.ali.clone(),
+                        item.name.clone(),
+                        item.legal_basis.clone(),
+                    ]);
+                    for (year, kind, amount) in item.years {
+                        catalog_rows.push(vec![
+                            edition.clone(),
+                            item.fund.clone(),
+                            item.ali.clone(),
+                            item.name.clone(),
+                            year.to_string(),
+                            kind,
+                            amount.map_or(String::new(), |v| format!("{v:.0}")),
+                        ]);
+                    }
+                }
+            }
+            Err(cause) => catalog_failed.push(format!("{edition} ({cause})")),
+        }
+    }
+    if catalog_rows.is_empty() {
+        out.push(Rebuilt::skipped(
+            fixtures::CATALOG_FIXTURE,
+            format!("no edition parsed: {}", catalog_failed.join("; ")),
+        ));
+    } else {
+        // Refusals are printed rather than counted. A run that silently dropped a line item would
+        // report a row count that looks like success.
+        for why in &catalog_refused {
+            eprintln!("catalog: refused {why}");
+        }
+        for why in &catalog_failed {
+            eprintln!("catalog: no rows from edition {why}");
+        }
+        out.push(csv_fixture(
+            root,
+            fixtures::CATALOG_FIXTURE,
+            &[
+                "edition",
+                "fund",
+                "ali",
+                "name",
+                "fiscal_year",
+                "kind",
+                "amount",
+            ],
+            &catalog_rows,
+        )?);
+        // Tab-separated, not comma. A legal basis routinely reads "ORC 3301.0710, 3301.0711, and
+        // 3301.27; Section 206.09.15 of Am. Sub. H.B. 66 of the 126th G.A." — commas are part of
+        // the citation, and `write_csv` deliberately does not quote. Stripping them would damage
+        // the one field this fixture exists to carry.
+        let basis = basis_rows
+            .iter()
+            .map(|row| row.join("\t"))
+            .collect::<Vec<_>>()
+            .join("\n");
+        out.push(text_fixture(
+            root,
+            fixtures::CATALOG_BASIS_FIXTURE,
+            &format!("edition\tfund\tali\tname\tlegal_basis\n{basis}"),
+        )?);
+    }
+
+    // The scholarship annual report, sliced rather than committed whole. Unlike the redbook it is
+    // mostly provider lists — the pages that matter are five programme summaries, and the figures
+    // in them are the only published sizing of this channel.
+    //
+    // A fixture rather than prose in the corpus, because five programme nodes would otherwise each
+    // carry a hand-typed dollar figure to six decimal places. That is the transcription this
+    // repository keeps finding wrong somewhere.
+    let annual = registered("scholarship-annual-2025");
+    out.push(
+        match cache::pdf_text(root, annual)
+            .map_err(|cause| cause.to_string())
+            .and_then(|text| fixtures::scholarship_programmes(&text))
+        {
+            Ok(rows) => csv_fixture(
+                root,
+                fixtures::SCHOLARSHIP_FIXTURE,
+                &[
+                    "program",
+                    "name",
+                    "students",
+                    "expenditure",
+                    "published_average",
+                ],
+                &rows,
+            )?,
+            Err(cause) => Rebuilt::skipped(fixtures::SCHOLARSHIP_FIXTURE, cause),
+        },
+    );
+
+    // The DeRolph opinions. One record per case, same shape as the statute extract, so the two
+    // sources a legal claim can rest on read alike.
+    //
+    // All four or none, which is why this collects into a `Result` rather than filtering the
+    // failures out. A cache holding three of the opinions would otherwise write a fixture about
+    // the cases that happened to be retrievable and report it as a success — the hazard the
+    // finance panel refuses above, and no better for a litigation record: a reader who finds
+    // DeRolph II absent cannot tell whether the case did not exist or the PDF did not download.
+    // Skipping the whole fixture leaves the last good one committed and says why.
+    //
+    // Selected by the fixture each source declares it feeds, rather than by taking every source
+    // the connector holds. That was the same thing while `ohio-courts` held one case; it stopped
+    // being the same thing the moment it held two, and taking all of them would have written the
+    // EdChoice appellate decision into a file whose first line says it holds the four DeRolph
+    // opinions.
+    for (fixture, heading) in [
+        (
+            fixtures::OPINIONS_FIXTURE,
+            "DeRolph v. State, the four opinions this corpus cites. One record per case.",
+        ),
+        (
+            fixtures::EDCHOICE_FIXTURE,
+            "The EdChoice challenge's appellate record. Not the merits ruling, which is a common \
+         pleas decision and is not published anywhere this repository may redistribute from.",
+        ),
+    ] {
+        let opinions: Result<Vec<fixtures::Record>, cache::FetchError> =
+            registered_connector("ohio-courts")
+                .sources
+                .iter()
+                .filter(|src| src.fixtures.contains(&fixture))
+                .map(|src| {
+                    let text = cache::pdf_text(root, src)?;
+                    let body = text.trim().to_string();
+                    Ok(fixtures::Record {
+                        id: src.key.to_string(),
+                        title: src.title.unwrap_or(src.key).to_string(),
+                        date: fixtures::decided_on(&body),
+                        source: src.url.to_string(),
+                        body,
+                    })
+                })
+                .collect();
+        out.push(match opinions {
+            Ok(opinions) => Rebuilt::Written {
+                path: fixture.to_string(),
+                rows: fixtures::write_text(
+                    &root.join(fixture),
+                    &fixtures::build_records(heading, &opinions),
+                )?,
+            },
+            Err(cause) => Rebuilt::skipped(fixture, cause),
+        });
+    }
+
+    // LSC's education analysis of each budget act the corpus describes from one. All of them or
+    // none, for the reason the DeRolph opinions are: this is the only committed account of what
+    // those acts did, and a file that reads as a series while silently missing a biennium is worse
+    // than no file.
+    let greenbooks: Result<Vec<fixtures::Record>, cache::FetchError> =
+        registered_connector("lsc-budget")
+            .sources
+            .iter()
+            .filter(|src| src.fixtures.contains(&fixtures::LSC_GREENBOOK_FIXTURE))
+            .map(|src| {
+                let text = cache::pdf_text(root, src)?;
+                Ok(fixtures::Record {
+                    id: src.key.to_string(),
+                    title: src.title.unwrap_or(src.key).to_string(),
+                    // The month on the cover, which is months after the act took effect and is
+                    // the date the *analysis* speaks from rather than the date the act does.
+                    date: fixtures::published_on(&text),
+                    source: src.url.to_string(),
+                    body: text.trim().to_string(),
+                })
+            })
+            .collect();
+    out.push(match greenbooks {
+        Ok(mut greenbooks) => {
+            // Oldest first, by the General Assembly number in the URL path — the one place the
+            // ordering is stated by data rather than by the order somebody happened to add the
+            // sources in. The registry's order is the appropriation series' order and has no
+            // reason to be chronological; the file says "oldest first" and now is.
+            greenbooks.sort_by_key(|record| general_assembly(&record.source));
+            text_fixture(
+                root,
+                fixtures::LSC_GREENBOOK_FIXTURE,
+                &fixtures::build_records(
+                    "LSC's education analysis of each enacted budget act this corpus \
+                     describes from one. As enrolled. One record per act, oldest first.",
+                    &greenbooks,
+                ),
+            )?
+        }
+        Err(cause) => Rebuilt::skipped(fixtures::LSC_GREENBOOK_FIXTURE, cause),
+    });
+
+    Ok(out)
+}
+
+/// The Revised Code sections this corpus cites, the enacted budget act, and the redbook.
+///
+/// Threads none of the rebuild's shared state.
+fn rebuild_statute_and_acts(root: &Path) -> Result<Vec<Rebuilt>, RebuildError> {
+    let mut out = Vec::new();
+
+    // The Revised Code. Skipped rather than fatal when a section is not cached, for the same
+    // reason as F-33 below: it feeds prose and verification, and an absent copy should cost those
+    // rather than the whole rebuild.
+    //
+    // Skipped as a whole, though — all fifteen sections or none, for the reason the opinions are
+    // all four or none. "Skip the fixture when a section is missing" and "write the sections that
+    // happened to be there" are different behaviours, and this collected into a `Vec` and guarded
+    // on `is_empty`, which is the second one: fourteen cached sections rewrote the committed
+    // extract as a fourteen-section file and reported it as a success. A statute the corpus cites
+    // that is silently absent from the extract is worse than an extract that is not there, because
+    // the first looks like an answer.
+    let statutes: Result<Vec<fixtures::Record>, String> = registry::OHIO_LAWS_SECTIONS
+        .iter()
+        .map(|source| {
+            let page = cache::read_cached(root, source).map_err(|cause| cause.to_string())?;
+            let page = String::from_utf8_lossy(&page);
+            // The key is `rc-3317-013`; the section it cites is `3317.013`.
+            let section = source.key.trim_start_matches("rc-").replacen('-', ".", 1);
+            // `None` means neither landmark was found, which says the page is no longer the page
+            // the parser was written against — a different failure from an absent file, and one
+            // worth naming rather than counting.
+            fixtures::parse_statute(&section, &page).ok_or_else(|| {
+                format!(
+                    "{section} did not parse; {} is no longer the page it was",
+                    source.url
+                )
+            })
+        })
+        .collect();
+    out.push(match statutes {
+        Ok(statutes) => text_fixture(
+            root,
+            fixtures::STATUTE_FIXTURE,
+            &fixtures::build_records(
+                "Ohio Revised Code, the sections this corpus cites. One record per section.",
+                &statutes,
+            ),
+        )?,
+        Err(reason) => Rebuilt::skipped(fixtures::STATUTE_FIXTURE, reason),
+    });
+
+    // The enacted budget act. Skipped rather than fatal on two counts: the PDF may not be cached,
+    // and `pdftotext` may not be installed — see `cache::pdf_text` for why that is a weaker
+    // guarantee than the one `curl` gets. Either way the committed extract stands and the rebuild
+    // says what it did not do.
+    let enacted = registered("hb96-final-analysis");
+    out.push(
+        match cache::pdf_text(root, enacted)
+            .map_err(RebuildError::from)
+            .and_then(|text| {
+                fixtures::extract_school_funding(&text).ok_or_else(|| {
+                    RebuildError::Io(std::io::Error::other(
+                        "the final analysis no longer contains its school funding heading",
+                    ))
+                })
+            }) {
+            Ok(text) => text_fixture(root, fixtures::ENACTED_FIXTURE, &text)?,
+            Err(cause) => Rebuilt::skipped(fixtures::ENACTED_FIXTURE, cause),
+        },
+    );
+
+    // The department's redbook. Committed whole rather than sliced: unlike the final analysis,
+    // which legislates on everything from Medicaid to liquor permits, a redbook is about one
+    // agency and there is nothing in it to cut away.
+    // The greenbook, which is the redbook as enacted. Committed whole for the same reason the
+    // redbook is: it is about one agency and there is nothing in it to cut away.
+    let greenbook = registered("hb96-edu-greenbook");
+    out.push(match cache::pdf_text(root, greenbook) {
+        Ok(text) => text_fixture(root, fixtures::GREENBOOK_FIXTURE, text.trim())?,
+        Err(cause) => Rebuilt::skipped(fixtures::GREENBOOK_FIXTURE, cause),
+    });
+
+    let redbook = registered("hb96-edu-redbook");
+    out.push(match cache::pdf_text(root, redbook) {
+        Ok(text) => text_fixture(root, fixtures::REDBOOK_FIXTURE, text.trim())?,
+        Err(cause) => Rebuilt::skipped(fixtures::REDBOOK_FIXTURE, cause),
+    });
+
+    Ok(out)
+}
+
 /// Rebuild every committed fixture from the cached sources.
 ///
 /// Reads only what is already in the cache — refreshing is a separate, explicit act, so that
@@ -728,301 +1043,9 @@ pub fn rebuild(root: &Path) -> Result<Vec<Rebuilt>, RebuildError> {
 
     out.extend(rebuild_local_finance(root)?);
 
-    // The Revised Code. Skipped rather than fatal when a section is not cached, for the same
-    // reason as F-33 below: it feeds prose and verification, and an absent copy should cost those
-    // rather than the whole rebuild.
-    //
-    // Skipped as a whole, though — all fifteen sections or none, for the reason the opinions are
-    // all four or none. "Skip the fixture when a section is missing" and "write the sections that
-    // happened to be there" are different behaviours, and this collected into a `Vec` and guarded
-    // on `is_empty`, which is the second one: fourteen cached sections rewrote the committed
-    // extract as a fourteen-section file and reported it as a success. A statute the corpus cites
-    // that is silently absent from the extract is worse than an extract that is not there, because
-    // the first looks like an answer.
-    let statutes: Result<Vec<fixtures::Record>, String> = registry::OHIO_LAWS_SECTIONS
-        .iter()
-        .map(|source| {
-            let page = cache::read_cached(root, source).map_err(|cause| cause.to_string())?;
-            let page = String::from_utf8_lossy(&page);
-            // The key is `rc-3317-013`; the section it cites is `3317.013`.
-            let section = source.key.trim_start_matches("rc-").replacen('-', ".", 1);
-            // `None` means neither landmark was found, which says the page is no longer the page
-            // the parser was written against — a different failure from an absent file, and one
-            // worth naming rather than counting.
-            fixtures::parse_statute(&section, &page).ok_or_else(|| {
-                format!(
-                    "{section} did not parse; {} is no longer the page it was",
-                    source.url
-                )
-            })
-        })
-        .collect();
-    out.push(match statutes {
-        Ok(statutes) => text_fixture(
-            root,
-            fixtures::STATUTE_FIXTURE,
-            &fixtures::build_records(
-                "Ohio Revised Code, the sections this corpus cites. One record per section.",
-                &statutes,
-            ),
-        )?,
-        Err(reason) => Rebuilt::skipped(fixtures::STATUTE_FIXTURE, reason),
-    });
+    out.extend(rebuild_statute_and_acts(root)?);
 
-    // The enacted budget act. Skipped rather than fatal on two counts: the PDF may not be cached,
-    // and `pdftotext` may not be installed — see `cache::pdf_text` for why that is a weaker
-    // guarantee than the one `curl` gets. Either way the committed extract stands and the rebuild
-    // says what it did not do.
-    let enacted = registered("hb96-final-analysis");
-    out.push(
-        match cache::pdf_text(root, enacted)
-            .map_err(RebuildError::from)
-            .and_then(|text| {
-                fixtures::extract_school_funding(&text).ok_or_else(|| {
-                    RebuildError::Io(std::io::Error::other(
-                        "the final analysis no longer contains its school funding heading",
-                    ))
-                })
-            }) {
-            Ok(text) => text_fixture(root, fixtures::ENACTED_FIXTURE, &text)?,
-            Err(cause) => Rebuilt::skipped(fixtures::ENACTED_FIXTURE, cause),
-        },
-    );
-
-    // The department's redbook. Committed whole rather than sliced: unlike the final analysis,
-    // which legislates on everything from Medicaid to liquor permits, a redbook is about one
-    // agency and there is nothing in it to cut away.
-    // The greenbook, which is the redbook as enacted. Committed whole for the same reason the
-    // redbook is: it is about one agency and there is nothing in it to cut away.
-    let greenbook = registered("hb96-edu-greenbook");
-    out.push(match cache::pdf_text(root, greenbook) {
-        Ok(text) => text_fixture(root, fixtures::GREENBOOK_FIXTURE, text.trim())?,
-        Err(cause) => Rebuilt::skipped(fixtures::GREENBOOK_FIXTURE, cause),
-    });
-
-    let redbook = registered("hb96-edu-redbook");
-    out.push(match cache::pdf_text(root, redbook) {
-        Ok(text) => text_fixture(root, fixtures::REDBOOK_FIXTURE, text.trim())?,
-        Err(cause) => Rebuilt::skipped(fixtures::REDBOOK_FIXTURE, cause),
-    });
-
-    // The Catalog of Budget Line Items, nineteen editions of the education volume.
-    //
-    // Every edition, not the newest, and the edition is a column rather than a detail. Each one
-    // restates six fiscal years, so the same year appears in up to four editions — and they do not
-    // always agree, because an actual is revised and an appropriation is superseded. Keeping the
-    // vintage is what lets a later reader ask which of two figures a claim rested on, which is
-    // exactly what the workbook attempt could not answer and was reverted for.
-    //
-    // Editions are independent: one that fails to parse is skipped and named, and the rest still
-    // build. A missing edition is a visible hole in a column; a silently short fixture is not.
-    let mut catalog_rows: Vec<Vec<String>> = Vec::new();
-    let mut basis_rows: Vec<Vec<String>> = Vec::new();
-    let mut catalog_failed: Vec<String> = Vec::new();
-    let mut catalog_refused: Vec<String> = Vec::new();
-    for src in registered_connector("lsc-catalog").sources {
-        let edition = src.key.rsplit('-').next().unwrap_or_default().to_string();
-        match cache::pdf_text(root, src)
-            .map_err(|cause| cause.to_string())
-            .and_then(|text| fixtures::catalog_items(&text))
-        {
-            Ok((items, refused)) => {
-                for why in refused {
-                    catalog_refused.push(format!("{edition}: {why}"));
-                }
-                for item in items {
-                    basis_rows.push(vec![
-                        edition.clone(),
-                        item.fund.clone(),
-                        item.ali.clone(),
-                        item.name.clone(),
-                        item.legal_basis.clone(),
-                    ]);
-                    for (year, kind, amount) in item.years {
-                        catalog_rows.push(vec![
-                            edition.clone(),
-                            item.fund.clone(),
-                            item.ali.clone(),
-                            item.name.clone(),
-                            year.to_string(),
-                            kind,
-                            amount.map_or(String::new(), |v| format!("{v:.0}")),
-                        ]);
-                    }
-                }
-            }
-            Err(cause) => catalog_failed.push(format!("{edition} ({cause})")),
-        }
-    }
-    if catalog_rows.is_empty() {
-        out.push(Rebuilt::skipped(
-            fixtures::CATALOG_FIXTURE,
-            format!("no edition parsed: {}", catalog_failed.join("; ")),
-        ));
-    } else {
-        // Refusals are printed rather than counted. A run that silently dropped a line item would
-        // report a row count that looks like success.
-        for why in &catalog_refused {
-            eprintln!("catalog: refused {why}");
-        }
-        for why in &catalog_failed {
-            eprintln!("catalog: no rows from edition {why}");
-        }
-        out.push(csv_fixture(
-            root,
-            fixtures::CATALOG_FIXTURE,
-            &[
-                "edition",
-                "fund",
-                "ali",
-                "name",
-                "fiscal_year",
-                "kind",
-                "amount",
-            ],
-            &catalog_rows,
-        )?);
-        // Tab-separated, not comma. A legal basis routinely reads "ORC 3301.0710, 3301.0711, and
-        // 3301.27; Section 206.09.15 of Am. Sub. H.B. 66 of the 126th G.A." — commas are part of
-        // the citation, and `write_csv` deliberately does not quote. Stripping them would damage
-        // the one field this fixture exists to carry.
-        let basis = basis_rows
-            .iter()
-            .map(|row| row.join("\t"))
-            .collect::<Vec<_>>()
-            .join("\n");
-        out.push(text_fixture(
-            root,
-            fixtures::CATALOG_BASIS_FIXTURE,
-            &format!("edition\tfund\tali\tname\tlegal_basis\n{basis}"),
-        )?);
-    }
-
-    // The scholarship annual report, sliced rather than committed whole. Unlike the redbook it is
-    // mostly provider lists — the pages that matter are five programme summaries, and the figures
-    // in them are the only published sizing of this channel.
-    //
-    // A fixture rather than prose in the corpus, because five programme nodes would otherwise each
-    // carry a hand-typed dollar figure to six decimal places. That is the transcription this
-    // repository keeps finding wrong somewhere.
-    let annual = registered("scholarship-annual-2025");
-    out.push(
-        match cache::pdf_text(root, annual)
-            .map_err(|cause| cause.to_string())
-            .and_then(|text| fixtures::scholarship_programmes(&text))
-        {
-            Ok(rows) => csv_fixture(
-                root,
-                fixtures::SCHOLARSHIP_FIXTURE,
-                &[
-                    "program",
-                    "name",
-                    "students",
-                    "expenditure",
-                    "published_average",
-                ],
-                &rows,
-            )?,
-            Err(cause) => Rebuilt::skipped(fixtures::SCHOLARSHIP_FIXTURE, cause),
-        },
-    );
-
-    // The DeRolph opinions. One record per case, same shape as the statute extract, so the two
-    // sources a legal claim can rest on read alike.
-    //
-    // All four or none, which is why this collects into a `Result` rather than filtering the
-    // failures out. A cache holding three of the opinions would otherwise write a fixture about
-    // the cases that happened to be retrievable and report it as a success — the hazard the
-    // finance panel refuses above, and no better for a litigation record: a reader who finds
-    // DeRolph II absent cannot tell whether the case did not exist or the PDF did not download.
-    // Skipping the whole fixture leaves the last good one committed and says why.
-    //
-    // Selected by the fixture each source declares it feeds, rather than by taking every source
-    // the connector holds. That was the same thing while `ohio-courts` held one case; it stopped
-    // being the same thing the moment it held two, and taking all of them would have written the
-    // EdChoice appellate decision into a file whose first line says it holds the four DeRolph
-    // opinions.
-    for (fixture, heading) in [
-        (
-            fixtures::OPINIONS_FIXTURE,
-            "DeRolph v. State, the four opinions this corpus cites. One record per case.",
-        ),
-        (
-            fixtures::EDCHOICE_FIXTURE,
-            "The EdChoice challenge's appellate record. Not the merits ruling, which is a common \
-             pleas decision and is not published anywhere this repository may redistribute from.",
-        ),
-    ] {
-        let opinions: Result<Vec<fixtures::Record>, cache::FetchError> =
-            registered_connector("ohio-courts")
-                .sources
-                .iter()
-                .filter(|src| src.fixtures.contains(&fixture))
-                .map(|src| {
-                    let text = cache::pdf_text(root, src)?;
-                    let body = text.trim().to_string();
-                    Ok(fixtures::Record {
-                        id: src.key.to_string(),
-                        title: src.title.unwrap_or(src.key).to_string(),
-                        date: fixtures::decided_on(&body),
-                        source: src.url.to_string(),
-                        body,
-                    })
-                })
-                .collect();
-        out.push(match opinions {
-            Ok(opinions) => Rebuilt::Written {
-                path: fixture.to_string(),
-                rows: fixtures::write_text(
-                    &root.join(fixture),
-                    &fixtures::build_records(heading, &opinions),
-                )?,
-            },
-            Err(cause) => Rebuilt::skipped(fixture, cause),
-        });
-    }
-
-    // LSC's education analysis of each budget act the corpus describes from one. All of them or
-    // none, for the reason the DeRolph opinions are: this is the only committed account of what
-    // those acts did, and a file that reads as a series while silently missing a biennium is worse
-    // than no file.
-    let greenbooks: Result<Vec<fixtures::Record>, cache::FetchError> =
-        registered_connector("lsc-budget")
-            .sources
-            .iter()
-            .filter(|src| src.fixtures.contains(&fixtures::LSC_GREENBOOK_FIXTURE))
-            .map(|src| {
-                let text = cache::pdf_text(root, src)?;
-                Ok(fixtures::Record {
-                    id: src.key.to_string(),
-                    title: src.title.unwrap_or(src.key).to_string(),
-                    // The month on the cover, which is months after the act took effect and is
-                    // the date the *analysis* speaks from rather than the date the act does.
-                    date: fixtures::published_on(&text),
-                    source: src.url.to_string(),
-                    body: text.trim().to_string(),
-                })
-            })
-            .collect();
-    out.push(match greenbooks {
-        Ok(mut greenbooks) => {
-            // Oldest first, by the General Assembly number in the URL path — the one place the
-            // ordering is stated by data rather than by the order somebody happened to add the
-            // sources in. The registry's order is the appropriation series' order and has no
-            // reason to be chronological; the file says "oldest first" and now is.
-            greenbooks.sort_by_key(|record| general_assembly(&record.source));
-            text_fixture(
-                root,
-                fixtures::LSC_GREENBOOK_FIXTURE,
-                &fixtures::build_records(
-                    "LSC's education analysis of each enacted budget act this corpus \
-                         describes from one. As enrolled. One record per act, oldest first.",
-                    &greenbooks,
-                ),
-            )?
-        }
-        Err(cause) => Rebuilt::skipped(fixtures::LSC_GREENBOOK_FIXTURE, cause),
-    });
+    out.extend(rebuild_budget_documents(root)?);
 
     out.extend(rebuild_appropriation_lines(root)?);
 
