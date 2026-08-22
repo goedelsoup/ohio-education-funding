@@ -29,7 +29,7 @@ import { barSpec } from "./plot/spec.ts";
 import { renderToString } from "./plot/ssr.ts";
 import * as routes from "./routes.ts";
 import type { BaseCostBuildUp, District } from "./types.ts";
-import { yearChip } from "./year.ts";
+import { yearChip, yearOf } from "./year.ts";
 import { anchor } from "./section.ts";
 
 /** One element of the build-up: its statutory letter, what it pays for, and how much. */
@@ -223,7 +223,7 @@ export function renderBaseCostBuildUp(d: District, districts: number): string {
         ${staff(b.funded_special_teachers)} special teachers, across
         ${staff(d.adm)} pupils.</p>
 
-      <div class="chartwrap" data-chart="base-cost">${renderToString(barSpec(bars))}</div>
+      <div class="chartwrap" data-chart="base-cost">${renderToString(barSpec(bars), { label: `Aggregate base cost by component group of R.C. 3317.011, dollars, ${money(aggregate)} in total${yearOf("formula") ? `, ${yearOf("formula")}` : ""}` })}</div>
 
       <div class="scroll"><table>
         <thead><tr><th>Element</th><th>Amount</th><th>Share</th></tr></thead>

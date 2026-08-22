@@ -230,7 +230,7 @@ export function renderProjection(bundle: Panel, levers: Levers): string {
           p.observed
             ? `FY${p.year}: ${millions(p.point).replace("+", "")} at published enrollment — exact`
             : `FY${p.year}: ${range(p.low, p.high)}, central ${millions(p.point).replace("+", "")}`,
-      ))}</div>
+      ), { label: `Statewide total state aid by fiscal year at projected enrollment, FY${start.fiscalYear} to FY${end.fiscalYear}`, description: `Solid and exact through FY${seam.fiscalYear}, the last year of published enrollment; after it a dashed central estimate inside a band reaching ±${pct(width, 1)} at the horizon, on a vertical axis that does not start at zero` })}</div>
       <div class="legend">
         <span><i class="sw solid"></i> Observed enrollment, exact</span>
         <span><i class="sw anchor"></i> Last observed year</span>
@@ -463,7 +463,7 @@ export function renderScenario(bundle: Panel, levers: Levers): RenderedScenario 
           ? `<div class="chartwrap" data-chart="deltas">${renderToString(histogramSpec(
               bin(deltas, 24),
               (v) => signedMoney(v),
-            ))}</div>
+            ), { label: `Districts by change in state aid per pupil, for the ${count(deltas.length)} of ${count(t.districts)} districts these lever settings move against the FY${bundle.fiscal_year} model`, description: `Bins span ${signedMoney(Math.min(...deltas))} to ${signedMoney(Math.max(...deltas))} per pupil` })}</div>
         <div class="legend">
           <span><i class="sw loss"></i> Aid falls</span>
           <span><i class="sw gain"></i> Aid rises</span>

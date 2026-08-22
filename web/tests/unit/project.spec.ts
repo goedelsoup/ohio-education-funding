@@ -269,7 +269,7 @@ test("the fan draws the observed run-up solid and outside the band", () => {
   ];
   const svg = renderToString(
     fanSpec(points, (v: number) => `$${v.toFixed(0)}`, (p: FanPoint) => `FY${p.year}`),
-  );
+   { label: "test" });
   // One solid polyline over the observed years, one dashed over the projected ones.
   expect(svg).toContain("fan-observed");
   expect(svg).toContain("fan-mid");
@@ -293,7 +293,7 @@ test("the fan chart labels both bounds and dashes the centre", () => {
   ];
   const svg = renderToString(
     fanSpec(points, (v: number) => `$${v.toFixed(0)}`, (p: FanPoint) => `FY${p.year}`),
-  );
+   { label: "test" });
   expect(svg).toContain("fan-band");
   expect(svg).toContain("fan-mid");
   expect(svg).toContain(">$105<");
@@ -309,7 +309,7 @@ test("the fan chart labels both bounds and dashes the centre", () => {
 test("a fan chart of one point draws nothing rather than a degenerate axis", () => {
   const one: FanPoint[] = [{ year: 2026, point: 1, low: 1, high: 1, observed: true }];
   expect(fanSpec(one, String, () => "")).toBeNull();
-  expect(renderToString(fanSpec(one, String, () => ""))).toBe("");
+  expect(renderToString(fanSpec(one, String, () => ""), { label: "test" })).toBe("");
 });
 
 test("every colour in a rendered chart is a custom property, not a literal", () => {
@@ -321,7 +321,7 @@ test("every colour in a rendered chart is a custom property, not a literal", () 
     { year: 2026, point: 100, low: 100, high: 100, observed: true },
     { year: 2027, point: 99, low: 95, high: 103, observed: false },
   ];
-  const svg = renderToString(fanSpec(points, (v: number) => `$${v}`, () => ""));
+  const svg = renderToString(fanSpec(points, (v: number) => `$${v}`, () => ""), { label: "test" });
   expect(svg).toContain("var(--series-formula)");
   expect(svg.replace(/<style>[\s\S]*?<\/style>/g, "")).not.toMatch(/#[0-9a-f]{3,8}\b/i);
 });

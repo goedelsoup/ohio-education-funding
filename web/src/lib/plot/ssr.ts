@@ -19,7 +19,7 @@
 import * as Plot from "@observablehq/plot";
 import { parseHTML } from "linkedom";
 
-import { BASE, type Spec } from "./spec.ts";
+import { applyNaming, BASE, type Naming, type Spec } from "./spec.ts";
 
 /** Anything that looks like a baked-in colour: `#abc`, `#aabbcc`, `rgb(…)`, `hsl(…)`. */
 const LITERAL_COLOUR = /(#[0-9a-f]{3,8}\b|\brgba?\(|\bhsla?\()/i;
@@ -80,10 +80,11 @@ export function attachHovers(root: Element, selector: string, text: string[]): v
  * was asked for — a fan chart of one observation, say — and an empty string is the honest output:
  * better than an axis with a single mark on it, which would read as a finding.
  */
-export function renderToString(spec: Spec | null): string {
+export function renderToString(spec: Spec | null, naming: Naming): string {
   if (!spec) return "";
   const { document } = parseHTML("<!doctype html><html><body></body></html>");
   const node = Plot.plot({ ...BASE, ...spec.options, document }) as unknown as Element;
   if (spec.hovers) attachHovers(node, spec.hovers.selector, spec.hovers.text);
+  applyNaming(node, naming);
   return ensureThemeable(node.outerHTML);
 }

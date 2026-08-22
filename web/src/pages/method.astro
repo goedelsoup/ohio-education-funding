@@ -86,6 +86,7 @@ const millageScatter = renderToString(
     [],
     { identity: { label: "predicted = charged" } },
   ),
+  { label: `What the county auditor charges against what H.B. 920's reduction factors predict, in mills, across ${millage.total} districts, ${yearOf("millage")} tax year`, description: `Both axes are the same quantity on one shared domain, so the identity line is predicted = charged; ${millage.stacked} districts overplot as the single dot at the twenty-mill floor` },
 );
 ---
 

@@ -72,7 +72,7 @@ export function renderStatewideFinances(bundle: Bundle, basis: Basis): string {
           <div class="n">real; ${pct(nominalAid, 1)} nominal</div></div>
       </div>
 
-      <div class="chartwrap" data-chart="statewide-cash">${renderToString(barSpec(bars))}</div>
+      <div class="chartwrap" data-chart="statewide-cash">${renderToString(barSpec(bars), { label: `General fund cash held at 30 June, summed over the ${count(bundle.statewide.districts)} districts in this feed, by fiscal year, FY${first.fiscal_year} to FY${latest.fiscal_year}, ${label}` })}</div>
       <p class="note">General fund cash held at 30 June, summed over the
         ${count(bundle.statewide.districts)} districts in this feed.
         ${
@@ -208,7 +208,7 @@ export function renderStatewideStructure(bundle: Bundle, tax: TaxStatewide): str
       <p class="note">Districts grouped into fifths by assessed valuation per pupil, poorest on
         the left. The guarantee was written as transitional relief for districts losing
         students; the pattern it actually produces is a wealth gradient.</p>
-      <div class="chartwrap" data-chart="quintiles">${renderToString(barSpec(bars, { max: 1 }))}</div>
+      <div class="chartwrap" data-chart="quintiles">${renderToString(barSpec(bars, { max: 1 }), { label: `Share of districts on the guarantee by fifth of assessed valuation per pupil, poorest fifth first, FY${bundle.fiscal_year}` })}</div>
       <p class="note">Median valuation per pupil statewide is
         ${money(s.median_valuation_per_pupil)}.</p>
     </div>
@@ -221,7 +221,7 @@ export function renderStatewideStructure(bundle: Bundle, tax: TaxStatewide): str
         districts — one of what the formula computes, one of what is actually paid. Both scales
         are logarithmic, because valuation per pupil spans seventeen times and aid per pupil
         thirty; on a linear axis nine districts in ten sit in the left-hand third.</p>
-      <div class="chartwrap" data-chart="wealth-offset">${renderToString(scatter)}</div>
+      <div class="chartwrap" data-chart="wealth-offset">${renderToString(scatter, { label: `State aid per pupil against assessed valuation per pupil, one dot for each of ${count(points.length)} districts, with median lines for formula aid and aid as received, both axes logarithmic, FY${bundle.fiscal_year}` })}</div>
       <p class="note"><strong>The gap between the two lines is what the guarantee costs the
         equalisation.</strong> It is ${money(gapPoorest)} per pupil among the least wealthy tenth
         of districts and ${money(gapWealthiest)} among the wealthiest — the formula would pay the
@@ -399,7 +399,7 @@ export function renderNational(national: National | null): string {
           .join("")}</tbody>
       </table></div>
 
-      <div class="chartwrap" data-chart="local-share">${renderToString(barSpec(bars))}</div>
+      <div class="chartwrap" data-chart="local-share">${renderToString(barSpec(bars), { label: `Local share of school revenue by state, percent of total revenue, the states with the highest share and Ohio, FY${national.fiscal_year}`, description: `${shown.length} of ${national.states.length} states are drawn: those with the highest local share, and Ohio at rank ${national.ohio_local_rank}` })}</div>
 
       <p class="note"><strong>Ohio spends about what the country spends and raises it differently.
         </strong> Current spending per pupil is ${money(perPupil)} against a national

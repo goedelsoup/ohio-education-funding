@@ -66,7 +66,7 @@ function strip(
         <strong class="tnum">${money(value)}
           <span class="n">${ordinal(Math.round(p * 100))} percentile</span></strong>
       </div>
-      <div class="chartwrap" data-chart="position">${renderToString(box)}</div>
+      <div class="chartwrap" data-chart="position">${renderToString(box, { label: `${label} across the ${count(sorted.length)} districts reporting it, with this district at ${money(value)}, the ${ordinal(Math.round(p * 100))} percentile`, description: `Quartiles run ${money(sorted[Math.floor(sorted.length * 0.25)] ?? 0)} to ${money(sorted[Math.floor(sorted.length * 0.75)] ?? 0)}, median ${money(sorted[Math.floor(sorted.length * 0.5)] ?? 0)}` })}</div>
       <div class="scale">
         <span>${money(sorted[0] ?? 0)}</span>
         <span>${money(sorted[sorted.length - 1] ?? 0)}</span>
@@ -227,7 +227,7 @@ function renderCarriedForward(bundle: Bundle, d: District): string {
         p.observed
           ? `FY${p.year}: ${money(p.point)} at published enrollment — exact`
           : `FY${p.year}: ${money(p.low)} – ${money(p.high)}, central ${money(p.point)}`,
-    ))}</div>
+    ), { label: `${insensitive ? `Aid this district receives against what the formula computes for it, in dollars by enrollment year, FY${points[0]!.year} to FY${end.fiscalYear}` : `State aid in dollars by enrollment year, FY${points[0]!.year} to FY${end.fiscalYear}, with the range across projected enrollment`}`, description: `Every year is the FY${bundle.fiscal_year} formula run at that year's enrollment rather than published aid; years through FY${meta.base_year} use published enrollment and carry no interval, and the y axis is truncated to the plotted range rather than starting at zero` })}</div>
     ${
       insensitive
         ? `<div class="legend">
@@ -354,7 +354,7 @@ export function renderActuals(bundle: Bundle, d: District, basis: Basis): string
           )} nominal. ${deficits} of ${d.finances.length} years run at a deficit</div></div>
       </div>
 
-      <div class="chartwrap" data-chart="cash">${renderToString(barSpec(bars))}</div>
+      <div class="chartwrap" data-chart="cash">${renderToString(barSpec(bars), { label: `General fund cash held at 30 June by fiscal year, FY${first.fiscal_year} to FY${latest.fiscal_year}${converted ? `, in FY${base} dollars` : ""}` })}</div>
       <p class="note">Cash held at 30 June, general fund${
         converted ? `, in FY${base} dollars — deflated with ${escapeHtml(bundle.deflator?.label ?? "an index")}` : ""
       }.
@@ -753,7 +753,7 @@ export function renderCategoricals(d: District, statewide: Statewide): string {
   return `
     <div class="card" id="categoricals" data-part="categoricals">
       <h2>${anchor("categoricals")}The categorical half, in its six parts${yearChip("formula")}</h2>
-      <div class="chartwrap" data-chart="categoricals">${renderToString(barSpec(bars))}</div>
+      <div class="chartwrap" data-chart="categoricals">${renderToString(barSpec(bars), { label: `This district's categorical funding by program, in dollars, ${yearOf("formula")}` })}</div>
 
       <div class="scroll"><table>
         <thead><tr><th>Program</th><th class="tnum">Amount</th><th class="tnum">Share</th></tr></thead>
@@ -1457,7 +1457,7 @@ export function renderCasino(bundle: Bundle, d: District): string {
           }</div></div>
       </div>
 
-      <div class="chartwrap" data-chart="casino">${renderToString(barSpec(bars))}</div>
+      <div class="chartwrap" data-chart="casino">${renderToString(barSpec(bars), { label: `Casino tax distribution received by this district, in dollars by fiscal year, FY${first.fiscal_year} to FY${latest.fiscal_year}` })}</div>
 
       <p class="note">${
         closure && before && before.amount > 0
