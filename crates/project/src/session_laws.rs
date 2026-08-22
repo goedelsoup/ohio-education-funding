@@ -49,6 +49,18 @@ const FIXTURE: &str = include_str!("../fixtures/session-law-lines.csv");
 const EXPECTED_HEADER: &str =
     "general_assembly,bill,fiscal_year,fund_group,fund,line_item,title,amount";
 
+/// The columns of [`EXPECTED_HEADER`], named where they are read.
+mod column {
+    pub const GENERAL_ASSEMBLY: usize = 0;
+    pub const BILL: usize = 1;
+    pub const FISCAL_YEAR: usize = 2;
+    pub const FUND_GROUP: usize = 3;
+    pub const FUND: usize = 4;
+    pub const LINE_ITEM: usize = 5;
+    pub const TITLE: usize = 6;
+    pub const AMOUNT: usize = 7;
+}
+
 /// The first fiscal year any act in this repository appropriates.
 pub const FIRST_YEAR: u16 = 1998;
 
@@ -163,24 +175,17 @@ pub struct Appropriation {
 /// If the fixture's header is not the one this was written against.
 #[must_use]
 pub fn lines() -> Vec<Appropriation> {
-    let mut rows = FIXTURE.lines();
-    assert_eq!(
-        rows.next().unwrap_or_default().trim(),
-        EXPECTED_HEADER,
-        "the session-law fixture header changed; update project::session_laws"
-    );
-    rows.filter(|line| !line.trim().is_empty())
-        .filter_map(|line| {
-            let f: Vec<&str> = line.split(',').map(str::trim).collect();
+    edfund_core::csv::rows(FIXTURE, EXPECTED_HEADER)
+        .filter_map(|row| {
             Some(Appropriation {
-                general_assembly: f.first()?.parse().ok()?,
-                bill: f.get(1)?.to_string(),
-                fiscal_year: f.get(2)?.parse().ok()?,
-                fund_group: f.get(3)?.to_string(),
-                fund: f.get(4)?.to_string(),
-                line_item: f.get(5)?.to_string(),
-                title: f.get(6)?.to_string(),
-                amount: f.get(7)?.parse().ok()?,
+                general_assembly: row.str(column::GENERAL_ASSEMBLY).parse().ok()?,
+                bill: row.str(column::BILL).to_string(),
+                fiscal_year: row.str(column::FISCAL_YEAR).parse().ok()?,
+                fund_group: row.str(column::FUND_GROUP).to_string(),
+                fund: row.str(column::FUND).to_string(),
+                line_item: row.str(column::LINE_ITEM).to_string(),
+                title: row.str(column::TITLE).to_string(),
+                amount: row.num(column::AMOUNT)?,
             })
         })
         .collect()

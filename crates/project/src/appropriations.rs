@@ -135,34 +135,53 @@ pub struct Line {
 
 /// Every line in the committed series.
 ///
+/// The header [`lines`] indexes against.
+const SERIES_HEADER: &str = "general_assembly,bill,fiscal_year,kind,source,documents,\
+fund_group,fund,line_item,title,amount";
+
+/// The columns of [`SERIES_HEADER`] this module reads.
+mod series_column {
+    pub const FISCAL_YEAR: usize = 2;
+    pub const KIND: usize = 3;
+    pub const LINE_ITEM: usize = 8;
+    pub const TITLE: usize = 9;
+    pub const AMOUNT: usize = 10;
+}
+
 /// # Panics
 ///
 /// If the fixture's header is not the one this was written against, which means the extractor
 /// changed and this reader did not.
 #[must_use]
 pub fn lines() -> Vec<Line> {
-    let mut rows = SERIES.lines();
-    let header = rows.next().unwrap_or_default();
-    assert_eq!(
-        header,
-        "general_assembly,bill,fiscal_year,kind,source,documents,fund_group,fund,line_item,title,amount",
-        "the appropriation fixture's columns changed and this reader did not"
-    );
-    rows.filter(|row| !row.trim().is_empty())
+    // This used to take the amount from the end of the row and rejoin everything between the
+    // line item and it, because a title may contain a comma. That reassembly could not tell a
+    // comma in the title from one in an earlier column, so it guessed. The reader now asserts
+    // the row's width instead: a cell carrying a comma fails on the way in, and every column
+    // is nameable by position.
+    edfund_core::csv::rows(SERIES, SERIES_HEADER)
         .filter_map(|row| {
-            let field: Vec<&str> = row.split(',').collect();
-            // The title may contain a comma, so the amount is taken from the end and the title is
-            // whatever sits between the line item and it.
-            let amount = field.last()?.parse().ok()?;
             Some(Line {
-                fiscal_year: field[2].parse().ok()?,
-                kind: field[3].to_string(),
-                line_item: field[8].to_string(),
-                title: field[9..field.len() - 1].join(","),
-                amount,
+                fiscal_year: row.str(series_column::FISCAL_YEAR).parse().ok()?,
+                kind: row.str(series_column::KIND).to_string(),
+                line_item: row.str(series_column::LINE_ITEM).to_string(),
+                title: row.str(series_column::TITLE).to_string(),
+                amount: row.num(series_column::AMOUNT)?,
             })
         })
         .collect()
+}
+
+/// The header [`catalog_enacted`] indexes against.
+const CATALOG_HEADER: &str = "edition,fund,ali,name,fiscal_year,kind,amount";
+
+/// The columns of [`CATALOG_HEADER`] this module reads.
+mod catalog_column {
+    pub const ALI: usize = 2;
+    pub const NAME: usize = 3;
+    pub const FISCAL_YEAR: usize = 4;
+    pub const KIND: usize = 5;
+    pub const AMOUNT: usize = 6;
 }
 
 /// Enacted lines from the Catalog, for years the workbook series does not carry.
@@ -173,9 +192,6 @@ pub fn lines() -> Vec<Line> {
 /// deduplication is needed here and none is done: if two editions ever claimed one year as
 /// enacted, the count below would rise and the test on it would fail rather than silently double a
 /// total.
-/// The header [`catalog_enacted`] indexes against.
-const CATALOG_HEADER: &str = "edition,fund,ali,name,fiscal_year,kind,amount";
-
 #[must_use]
 fn catalog_enacted() -> Vec<Line> {
     let covered: BTreeMap<u16, ()> = lines()
@@ -185,33 +201,25 @@ fn catalog_enacted() -> Vec<Line> {
         .collect();
     edfund_core::csv::rows(CATALOG, CATALOG_HEADER)
         .filter_map(|row| {
-            // Exactly seven, not "at least seven". The old guard was `len() < 7`, which a
-            // comma-shifted row passes — it has *more* fields, not fewer — and the amount was
-            // then read from the wrong column, failed to parse, and the row vanished through
-            // `filter_map`. A dropped appropriation changes `enacted_history` totals with no
-            // error anywhere. The sibling reader forty lines above takes its amount from the
-            // end of the row precisely because a title may contain a comma; this one indexes
-            // from the front, so the width is what has to be checked.
-            assert_eq!(
-                row.len(),
-                7,
-                "a catalog row has {} fields rather than 7, which means a title contains a \
-                 comma and every column after it has shifted",
-                row.len()
-            );
-            if row.str(5) != "appropriation" {
+            // The width check that belongs here now lives in the reader, which asserts every
+            // row against its header. It was written locally first, after a `len() < 7` guard
+            // that checked the wrong end of the range: a comma in a title makes a row *wider*,
+            // so it passed, the amount was read from the wrong column, failed to parse, and
+            // the row vanished through `filter_map` — a dropped appropriation, changing
+            // `enacted_history` totals with no error anywhere.
+            if row.str(catalog_column::KIND) != "appropriation" {
                 return None;
             }
-            let fiscal_year: u16 = row.str(4).parse().ok()?;
+            let fiscal_year: u16 = row.str(catalog_column::FISCAL_YEAR).parse().ok()?;
             if covered.contains_key(&fiscal_year) {
                 return None;
             }
             Some(Line {
                 fiscal_year,
                 kind: "enacted".to_string(),
-                line_item: row.str(2).to_string(),
-                title: row.str(3).to_string(),
-                amount: row.num(6)?,
+                line_item: row.str(catalog_column::ALI).to_string(),
+                title: row.str(catalog_column::NAME).to_string(),
+                amount: row.num(catalog_column::AMOUNT)?,
             })
         })
         .collect()

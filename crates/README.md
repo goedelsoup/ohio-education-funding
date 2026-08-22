@@ -150,10 +150,10 @@ Fields per crate: name, capability type (connector/calculator/feature-engineerin
 | Crate | Description | `#[test]` fns |
 |---|---|--:|
 | [`bundle`](bundle/) | Export a versioned JSON feed of the corpus's district-level findings for the web layer | 45 |
-| [`connect`](connect/) | Retrieval and extraction: the department's publications into committed fixtures | 105 |
+| [`connect`](connect/) | Retrieval and extraction: the department's publications into committed fixtures | 107 |
 | [`deflator`](deflator/) | Convert nominal Ohio school finance figures to constant dollars, fiscal-year aligned | 17 |
 | [`dispersion`](dispersion/) | School finance equity statistics: dispersion and wealth neutrality across agencies | 150 |
-| [`edfund-core`](edfund-core/) | Shared domain types for the Ohio education funding computer | 23 |
+| [`edfund-core`](edfund-core/) | Shared domain types for the Ohio education funding computer | 24 |
 | [`foundation`](foundation/) | Fair School Funding Plan base cost build-up, per R.C. 3317.011 | 47 |
 | [`local-capacity`](local-capacity/) | Fair School Funding Plan local capacity and state share, per R.C. 3317.017 | 23 |
 | [`millage`](millage/) | Effective operating millage under H.B. 920 reduction factors, and 20-mill floor status | 19 |
@@ -162,7 +162,7 @@ Fields per crate: name, capability type (connector/calculator/feature-engineerin
 | [`scenario-delta`](scenario-delta/) | Winners and losers between two funding runs, with incidence and the off-formula count | 25 |
 | [`spreadsheet`](spreadsheet/) | Read the department's published workbooks with no dependencies | 75 |
 
-12 crates, 831 test functions, no crates.io dependencies. `cargo test` reports a different total: it adds doc-tests and counts each integration binary separately.
+12 crates, 834 test functions, no crates.io dependencies. `cargo test` reports a different total: it adds doc-tests and counts each integration binary separately.
 <!-- /REGEN -->
 
 ## Index status
