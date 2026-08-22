@@ -1551,10 +1551,11 @@ fn escape(s: &str) -> String {
 
 fn num(v: f64) -> String {
     if v.is_finite() {
-        format!("{v:.4}")
-            .trim_end_matches('0')
-            .trim_end_matches('.')
-            .to_string()
+        // Trim in place. `format!` then `.trim_end_matches(..).to_string()` allocates twice
+        // for every number, and the feed carries roughly 73,000 of them.
+        let mut out = format!("{v:.4}");
+        out.truncate(out.trim_end_matches('0').trim_end_matches('.').len());
+        out
     } else {
         "null".into()
     }
@@ -1664,7 +1665,10 @@ impl Bundle {
     /// feed diffs cleanly and a regenerated one shows only real changes.
     #[must_use]
     pub fn to_json(&self) -> String {
-        let mut s = String::with_capacity(self.districts.len() * 320 + 4096);
+        // Measured against the committed feed: 6,188,834 bytes over 609 districts, ~10,160
+        // each. The old hint of 320 reserved 3% of that, so the buffer doubled roughly five
+        // times on every run and each doubling memcpy'd a multi-megabyte string.
+        let mut s = String::with_capacity(self.districts.len() * 10_500 + 65_536);
         s.push_str("{\n");
         s.push_str(&format!(
             "  \"contract_version\": \"{}\",\n",
@@ -3810,6 +3814,33 @@ mod tests {
             ..HistoryYear::default()
         };
         assert!((year.residual_per_pupil() - 2_646.0).abs() < 1e-9);
+    }
+
+    /// `num` trims to the shortest form that round-trips at four places.
+    ///
+    /// Added because its implementation changed — it used to allocate a second string to trim
+    /// — and nothing pinned the output. The feed regenerating byte-identical caught it, but
+    /// that is a 6 MB diff standing in for an assertion about six characters.
+    #[test]
+    fn a_number_is_trimmed_to_four_places_and_no_trailing_zeros() {
+        assert_eq!(num(1.0), "1");
+        assert_eq!(num(1.5), "1.5");
+        assert_eq!(num(1.5000), "1.5");
+        assert_eq!(num(0.0), "0");
+        assert_eq!(num(-3.25), "-3.25");
+        assert_eq!(num(1234.5678), "1234.5678");
+
+        // Four places is the limit, and it rounds rather than truncates.
+        assert_eq!(num(0.12345), "0.1235");
+        assert_eq!(num(0.00004), "0");
+
+        // A whole number keeps no decimal point, which is what the second trim is for.
+        assert_eq!(num(42.0000), "42");
+
+        // Non-finite is `null`, not a number, so a consumer never sees `inf` or `NaN`.
+        assert_eq!(num(f64::INFINITY), "null");
+        assert_eq!(num(f64::NEG_INFINITY), "null");
+        assert_eq!(num(f64::NAN), "null");
     }
 }
 
