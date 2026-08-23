@@ -883,6 +883,16 @@ export const DeflatorSchema = z
   .object({
     label: z.string().min(1),
     points: z.array(z.object({ fiscal_year: z.number().int(), index: num }).strict()),
+    /**
+     * Fiscal years the feed carries and this index cannot reach, oldest first.
+     *
+     * Named rather than left out. The index is CPI-U June and the appropriations series runs
+     * FY1998-FY2027, so three years have no index — and a consumer seeing only the points cannot
+     * tell a year the feed does not carry from one it carries and cannot deflate. Anything
+     * offering a real-terms view of a year in here has to say it cannot, rather than quietly
+     * showing nominal.
+     */
+    uncovered: z.array(z.number().int()),
   })
   .strict();
 

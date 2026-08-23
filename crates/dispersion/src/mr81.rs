@@ -29,7 +29,10 @@
 //! **Sponsors are not districts.** "Public" covers county boards of developmental disabilities
 //! and community schools as well as traditional districts, and the report also carries non-public
 //! schools, residential child care institutions and camps. The sponsor count rising from 718 to
-//! 1,001 across the window is mostly community schools opening, not districts appearing.
+//! 973 across the window is mostly community schools opening, not districts appearing. It is 973
+//! and not the 1,001 rows FY2014 carries, because from FY2012 a sponsor may file in more than one
+//! stream — see [`PovertyYear::sponsors`], which counts bodies, and [`PovertyYear::filings`],
+//! which counts returns.
 //!
 //! **The first three Octobers do not state a type at all.** FY1998-FY2000 are one row per school
 //! with the district on it and no sponsor-type column anywhere, so the extract writes `Unknown`
@@ -100,33 +103,28 @@ pub struct Sponsor {
 ///
 /// # Panics
 ///
-/// If the fixture's header is not the one this was written against.
+/// If the fixture's header is not the one this was written against, or if a row's width differs
+/// from the header's — both by way of [`edfund_core::csv::rows`], which is what holds the
+/// uniform-width invariant these fixtures are written under. A hand-rolled `split(',')` here
+/// checked the header and then indexed by position, so a cell that grew a comma shifted every
+/// field after it and the row still parsed.
 #[must_use]
 pub fn panel() -> Vec<Sponsor> {
-    let mut lines = FIXTURE.lines();
-    assert_eq!(
-        lines.next().unwrap_or_default().trim(),
-        EXPECTED_HEADER,
-        "the MR-81 fixture header changed; update dispersion::mr81"
-    );
-    lines
-        .filter(|line| !line.trim().is_empty())
-        .filter_map(|line| {
-            let f: Vec<&str> = line.split(',').map(str::trim).collect();
-            let num = |i: usize| f.get(i).and_then(|v| v.parse::<f64>().ok());
+    edfund_core::csv::rows(FIXTURE, EXPECTED_HEADER)
+        .filter_map(|row| {
             Some(Sponsor {
-                year: f.first()?.parse().ok()?,
-                irn: f.get(1)?.to_string(),
-                name: f.get(2)?.to_string(),
-                kind: f.get(4)?.to_string(),
-                stream: f.get(5)?.to_string(),
-                sites: f.get(6)?.parse().ok()?,
-                enrollment: num(7)?,
-                basis: f.get(8)?.to_string(),
-                free: num(9)?,
-                reduced: num(10)?,
-                identified: num(11)?,
-                claimable: num(12)?,
+                year: row.str(0).parse().ok()?,
+                irn: row.str(1).to_string(),
+                name: row.str(2).to_string(),
+                kind: row.str(4).to_string(),
+                stream: row.str(5).to_string(),
+                sites: row.str(6).parse().ok()?,
+                enrollment: row.num(7)?,
+                basis: row.str(8).to_string(),
+                free: row.num(9)?,
+                reduced: row.num(10)?,
+                identified: row.num(11)?,
+                claimable: row.num(12)?,
             })
         })
         .collect()
@@ -186,8 +184,21 @@ pub fn implausible_sponsors() -> Vec<Sponsor> {
 /// The share of the meal-program denominator eligible for free or reduced-price lunch, by year.
 #[derive(Debug, Clone, PartialEq, Default)]
 pub struct PovertyYear {
-    /// Public sponsors counted.
+    /// Public sponsors counted — **distinct entities**, not rows.
+    ///
+    /// From FY2012 the report is three files and a sponsor may file in more than one of them, so
+    /// the rows are filings and counting them counts the same body twice. This was that count
+    /// until it was corrected: it published 1,001 public sponsors for FY2014 where 973 exist, and
+    /// turned the FY2011-FY2014 rise of 2.5% into one of 5.5%, which is the growth of *filings*
+    /// wearing the label of the growth of *sponsors*. See [`Self::filings`].
     pub sponsors: usize,
+    /// Rows the year is summed over: one per sponsor per stream.
+    ///
+    /// Equal to [`Self::sponsors`] through FY2011 and above it after. Carried rather than
+    /// dropped, because it is the right denominator for a question about the report — how many
+    /// returns were filed — and the wrong one for every question about Ohio, and the two were
+    /// indistinguishable while only one number was published.
+    pub filings: usize,
     /// The denominator, summed over those sponsors.
     pub enrollment: f64,
     /// Free and reduced approvals, summed over those sponsors.
@@ -249,13 +260,18 @@ pub fn poverty_share_by_year() -> BTreeMap<u16, PovertyYear> {
         .collect();
     let types = types_in_2001();
 
-    let mut totals: BTreeMap<u16, (PovertyYear, BTreeSet<String>, bool, f64)> = BTreeMap::new();
+    // The fifth slot is the set of sponsor IRNs. A sponsor that files in two of the three
+    // post-FY2011 streams is two rows and one body: the sums want both rows, and the count wants
+    // one entry, and keeping the set is the only way to have both.
+    type Totals = (PovertyYear, BTreeSet<String>, bool, f64, BTreeSet<String>);
+    let mut totals: BTreeMap<u16, Totals> = BTreeMap::new();
     for s in panel() {
         if resolved_kind(&s, &types) != "Public" || bad.contains(&(s.year, s.irn.clone())) {
             continue;
         }
         let entry = totals.entry(s.year).or_default();
-        entry.0.sponsors += 1;
+        entry.4.insert(s.irn.clone());
+        entry.0.filings += 1;
         entry.0.enrollment += s.enrollment;
         entry.0.approved += s.free + s.reduced;
         entry.0.identified += s.identified;
@@ -269,7 +285,8 @@ pub fn poverty_share_by_year() -> BTreeMap<u16, PovertyYear> {
 
     totals
         .into_iter()
-        .map(|(year, (mut totals, streams, ce, community))| {
+        .map(|(year, (mut totals, streams, ce, community, irns))| {
+            totals.sponsors = irns.len();
             if totals.enrollment > 0.0 {
                 totals.applications_share = totals.approved / totals.enrollment;
                 totals.floor = (totals.approved + totals.identified) / totals.enrollment;
@@ -535,6 +552,47 @@ mod tests {
                 );
             }
         }
+    }
+
+    /// A sponsor filing in two streams is one sponsor, and the count says so.
+    #[test]
+    fn the_sponsor_count_counts_bodies_and_the_filing_count_counts_returns() {
+        let years = poverty_share_by_year();
+
+        // Through FY2011 the report is one file, so every sponsor files once and the two counts
+        // are the same number. That is what made the error invisible for the fourteen years
+        // before it started being wrong.
+        for year in 1998..=LAST_SINGLE_STREAM {
+            assert_eq!(
+                years[&year].sponsors, years[&year].filings,
+                "FY{year} is one file and cannot have a sponsor filing twice"
+            );
+        }
+
+        // And from FY2012 they separate. 1,001 was published as a sponsor count for FY2014; it is
+        // the number of returns filed, and 28 of them are a second return from a body already
+        // counted.
+        assert_eq!(years[&2014].filings, 1_001);
+        assert_eq!(years[&2014].sponsors, 973);
+        assert!(
+            (2012..=2014).all(|y| years[&y].sponsors < years[&y].filings),
+            "the three-file Octobers have no sponsor filing in two streams"
+        );
+
+        // What the mistake was worth. Growth stated on filings is more than twice growth stated
+        // on sponsors, over exactly the window the card draws.
+        let growth = |pick: fn(&PovertyYear) -> usize| {
+            pick(&years[&2014]) as f64 / pick(&years[&LAST_SINGLE_STREAM]) as f64 - 1.0
+        };
+        let (bodies, returns) = (growth(|y| y.sponsors), growth(|y| y.filings));
+        assert!(
+            (bodies - 0.0253).abs() < 0.0005 && (returns - 0.0548).abs() < 0.0005,
+            "FY2011-FY2014: {bodies:.4} of sponsors against {returns:.4} of filings"
+        );
+        assert!(returns > bodies * 2.0);
+
+        // The endpoints the module note and the card's prose both name.
+        assert_eq!((years[&1998].sponsors, years[&2014].sponsors), (718, 973));
     }
 
     /// The measured size of the population that left the applications-based count.

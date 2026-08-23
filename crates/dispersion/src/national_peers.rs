@@ -123,33 +123,27 @@ impl NationalDistrict {
 ///
 /// # Panics
 ///
-/// If the fixture's header is not the one this loader expects.
+/// If the fixture's header is not the one this loader expects, or if a row's width differs from
+/// the header's — both by way of [`edfund_core::csv::rows`], which is what holds the
+/// uniform-width invariant these fixtures are written under. A hand-rolled `split(',')` here
+/// checked the header and then indexed by position, so a cell that grew a comma shifted every
+/// field after it and the row still parsed.
 #[must_use]
 pub fn national_panel() -> Vec<NationalDistrict> {
-    let mut lines = FIXTURE.lines();
-    let header = lines.next().unwrap_or_default().trim();
-    assert_eq!(
-        header, EXPECTED_HEADER,
-        "the F-33 district fixture header changed; update dispersion::national_peers"
-    );
-
-    lines
-        .filter(|line| !line.trim().is_empty())
-        .filter_map(|line| {
-            let f: Vec<&str> = line.split(',').map(str::trim).collect();
-            let opt = |i: usize| f.get(i).and_then(|v| v.parse::<f64>().ok());
+    edfund_core::csv::rows(FIXTURE, EXPECTED_HEADER)
+        .filter_map(|row| {
             Some(NationalDistrict {
-                leaid: f.first()?.to_string(),
-                irn: f.get(1)?.to_string(),
-                state: f.get(2)?.to_string(),
-                comparable: f.get(3)? == &"1",
-                enrollment: opt(4)?,
-                total_revenue: opt(5)?,
-                federal_revenue: opt(6)?,
-                state_revenue: opt(7)?,
-                local_revenue: opt(8)?,
-                property_tax: opt(9),
-                current_spending: opt(10),
+                leaid: row.str(0).to_string(),
+                irn: row.str(1).to_string(),
+                state: row.str(2).to_string(),
+                comparable: row.str(3) == "1",
+                enrollment: row.num(4)?,
+                total_revenue: row.num(5)?,
+                federal_revenue: row.num(6)?,
+                state_revenue: row.num(7)?,
+                local_revenue: row.num(8)?,
+                property_tax: row.num(9),
+                current_spending: row.num(10),
             })
         })
         .collect()

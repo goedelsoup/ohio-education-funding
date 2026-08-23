@@ -61,35 +61,29 @@ impl Identified {
 ///
 /// # Panics
 ///
-/// If the fixture's header is not the one this was written against.
+/// If the fixture's header is not the one this was written against, or if a row's width differs
+/// from the header's — both by way of [`edfund_core::csv::rows`], which is what holds the
+/// uniform-width invariant these fixtures are written under. A hand-rolled `split(',')` here
+/// checked the header and then indexed by position, so a cell that grew a comma shifted every
+/// field after it and the row still parsed.
 #[must_use]
 pub fn identifications() -> Vec<Identified> {
-    let mut lines = FIXTURE.lines();
-    assert_eq!(
-        lines.next().unwrap_or_default().trim(),
-        EXPECTED_HEADER,
-        "the identified-schools fixture header changed; update dispersion::identified"
-    );
-    lines
-        .filter(|line| !line.trim().is_empty())
-        .filter_map(|line| {
-            let f: Vec<&str> = line.split(',').map(str::trim).collect();
-            Some(Identified {
-                status: f.first()?.to_string(),
-                building_irn: f.get(1)?.to_string(),
-                building_name: f.get(2)?.to_string(),
-                lea_irn: f.get(3)?.to_string(),
-                lea_name: f.get(4)?.to_string(),
-                school_type: f.get(5)?.to_string(),
-                subgroups: f
-                    .get(6)?
-                    .split(';')
-                    .filter(|s| !s.is_empty())
-                    .map(str::to_string)
-                    .collect(),
-                year_identified: f.get(7)?.to_string(),
-                open_closed: f.get(8)?.to_string(),
-            })
+    edfund_core::csv::rows(FIXTURE, EXPECTED_HEADER)
+        .map(|row| Identified {
+            status: row.str(0).to_string(),
+            building_irn: row.str(1).to_string(),
+            building_name: row.str(2).to_string(),
+            lea_irn: row.str(3).to_string(),
+            lea_name: row.str(4).to_string(),
+            school_type: row.str(5).to_string(),
+            subgroups: row
+                .str(6)
+                .split(';')
+                .filter(|s| !s.is_empty())
+                .map(str::to_string)
+                .collect(),
+            year_identified: row.str(7).to_string(),
+            open_closed: row.str(8).to_string(),
         })
         .collect()
 }

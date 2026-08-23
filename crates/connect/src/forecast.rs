@@ -109,9 +109,14 @@ pub struct Line {
     /// The fiscal year this filing was made for.
     pub school_year: u16,
     /// Three prior fiscal years, oldest first. Audited actuals.
-    pub actual: [f64; 3],
+    ///
+    /// `None` where the filing left the cell blank. A district that filed no amount on a line
+    /// did not report zero on it, and this is the point where the two are still distinguishable:
+    /// `build_finance_extract` writes an empty cell for an absence and cannot invent one for a
+    /// zero that has already been fabricated here.
+    pub actual: [Option<f64>; 3],
     /// The filing year's own forecast. **Not an actual** — see the module note.
-    pub current: f64,
+    pub current: Option<f64>,
 }
 
 impl Line {
@@ -130,13 +135,24 @@ pub const fn actual_years(school_year: u16) -> [u16; 3] {
     [school_year - 3, school_year - 2, school_year - 1]
 }
 
-/// A number as the department writes it: blank, or with separators it does not usually use.
-fn number(raw: &str) -> f64 {
-    let cleaned: String = raw
-        .chars()
-        .filter(|c| c.is_ascii_digit() || *c == '-' || *c == '.')
-        .collect();
-    cleaned.parse().unwrap_or(0.0)
+/// A number as the department writes it, or `None` where it wrote nothing.
+///
+/// # Blank is not zero, and this is the last place that is knowable
+///
+/// This used to return `0.0` for anything that would not parse, blank cells included, which is
+/// the workspace rule in [`edfund_core::conventions`] broken at the writer rather than at the
+/// reader: `build_finance_extract` puts an absent line through `format_value(None, _)` so the
+/// fixture can carry an empty cell, and it cannot do that for an absence this function has
+/// already spent. Toronto City's FY2023 filing omits 5.050, 7.010 and 7.020 entirely — that
+/// absence survives because the line is missing, not blank — but a filing that carries the line
+/// with an empty amount was indistinguishable from one reporting nothing spent.
+///
+/// The parse is [`edfund_core::conventions::number`], which strips thousands separators and
+/// dollar signs and refuses anything else. The predecessor kept only digits, `-` and `.`, so
+/// `(500)` — the accounting negative — came back as a positive `500`, and any stray text around
+/// a figure was silently discarded down to whatever digits it contained.
+fn number(raw: &str) -> Option<f64> {
+    edfund_core::conventions::number(raw)
 }
 
 /// Parse a headered forecast file.
@@ -259,10 +275,10 @@ mod tests {
             "2026\tSpring\t046763\tOlentangy\tDelaware\t7.020\tEnding Cash\t100\t200\t300\t400\t500",
         ]);
         let line = &parse(&text).expect("parses")[0];
-        assert_eq!(line.actual, [100.0, 200.0, 300.0]);
+        assert_eq!(line.actual, [Some(100.0), Some(200.0), Some(300.0)]);
         assert_eq!(line.actual_years(), [2023, 2024, 2025]);
         // The filing year's own number is a forecast and is kept apart from the actuals.
-        assert!((line.current - 400.0).abs() < f64::EPSILON);
+        assert_eq!(line.current, Some(400.0));
     }
 
     #[test]
@@ -275,7 +291,7 @@ mod tests {
                          046763\t2026\tOlentangy\tDelaware\t7.010\tBeginning Cash\t7\t8\t9\t10";
         let line = &parse(reordered).expect("parses")[0];
         assert_eq!(line.irn, "046763");
-        assert_eq!(line.actual, [7.0, 8.0, 9.0]);
+        assert_eq!(line.actual, [Some(7.0), Some(8.0), Some(9.0)]);
     }
 
     #[test]
@@ -307,12 +323,28 @@ mod tests {
     }
 
     #[test]
-    fn a_blank_amount_reads_as_zero_and_a_negative_one_keeps_its_sign() {
+    fn a_blank_amount_is_absent_rather_than_zero_and_a_negative_one_keeps_its_sign() {
+        // The distinction the whole finance extract rests on. A filing that left the amount
+        // blank did not report nothing spent, and `build_finance_extract` writes an empty cell
+        // for it — which it can only do if the absence is still here to write.
         let text = file(&[
             "2026\tSpring\t046763\tOlentangy\tDelaware\t7.020\tEnding Cash\t\t-500\t1,200\t0\t0",
         ]);
         let line = &parse(&text).expect("parses")[0];
-        assert_eq!(line.actual, [0.0, -500.0, 1200.0]);
+        assert_eq!(line.actual, [None, Some(-500.0), Some(1200.0)]);
+        // A written zero is a written zero, and stays one.
+        assert_eq!(line.current, Some(0.0));
+    }
+
+    #[test]
+    fn a_cell_that_is_not_a_number_is_absent_rather_than_the_digits_inside_it() {
+        // The predecessor kept digits, `-` and `.` and discarded everything else, so an
+        // accounting negative came back positive and a footnote marker came back as a figure.
+        let text = file(&[
+            "2026\tSpring\t046763\tOlentangy\tDelaware\t7.020\tEnding Cash\t(500)\tn/a\t*\t1\t2",
+        ]);
+        let line = &parse(&text).expect("parses")[0];
+        assert_eq!(line.actual, [None, None, None]);
     }
 
     #[test]

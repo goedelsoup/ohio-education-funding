@@ -42,10 +42,15 @@
  * # Sponsors, not districts
  *
  * The population is meal-program sponsors: community schools and county boards of developmental
- * disabilities alongside traditional districts. It grows from 718 to 1,001 across the window,
- * mostly because community schools opened. The count is on the page for that reason — a rising
- * share over a changing population is two facts, and showing one without the other states the
- * wrong one.
+ * disabilities alongside traditional districts. It grows from 718 to 973 across the window, mostly
+ * because community schools opened. The count is on the page for that reason — a rising share over
+ * a changing population is two facts, and showing one without the other states the wrong one.
+ *
+ * The endpoint used to be written here as 1,001, which is the number of *returns* FY2014 carries:
+ * from FY2012 the report is three files and a sponsor may file in more than one, so the rows are
+ * filings and the bodies are 973. Counting the rows put the growth of the population at more than
+ * twice its real figure. The card reads both endpoints off the feed, so this sentence and the one
+ * it renders cannot disagree; the number above is here to be read, not to be trusted.
  */
 
 import { escapeHtml, pct } from "./format.ts";

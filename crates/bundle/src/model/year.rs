@@ -247,4 +247,20 @@ pub struct Deflator {
     pub label: String,
     /// One observation per covered fiscal year, oldest first.
     pub points: Vec<(u16, f64)>,
+    /// Fiscal years the feed carries a figure for and this index cannot reach, oldest first.
+    ///
+    /// # Why an absence is written down rather than left out
+    ///
+    /// The years wanted are the union of every axis the feed carries — the financial panel, the
+    /// history block, the appropriations series — and the index is CPI-U June, which runs FY2000
+    /// to FY2026. The appropriations series starts at FY1998 and runs to FY2027, so three of its
+    /// years have no index and used to leave through a `filter_map` with nothing to show they
+    /// had been asked for. A consumer then saw a shorter list of points and could not tell a year
+    /// the feed does not carry from one it carries and cannot deflate, so the only available
+    /// behaviour was to fall back to nominal without saying so — the failure `web/src/lib/real.ts`
+    /// exists to prevent, arriving through the feed instead.
+    ///
+    /// Naming them costs three integers and makes "this year cannot be shown in constant dollars"
+    /// something the page can say.
+    pub uncovered: Vec<u16>,
 }

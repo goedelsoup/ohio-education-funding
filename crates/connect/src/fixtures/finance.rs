@@ -44,7 +44,7 @@ pub fn build_finance_extract(filings: &[Vec<crate::forecast::Line>]) -> Vec<Vec<
 
     // (irn, fiscal year) -> (name, county, line code -> amount). BTreeMap so the output order is
     // the key order rather than a hash order that changes between builds.
-    type Cell = (String, String, BTreeMap<String, f64>);
+    type Cell = (String, String, BTreeMap<String, Option<f64>>);
     let mut panel: BTreeMap<(String, u16), Cell> = BTreeMap::new();
 
     for filing in filings {
@@ -55,6 +55,10 @@ pub fn build_finance_extract(filings: &[Vec<crate::forecast::Line>]) -> Vec<Vec<
                     .or_insert_with(|| (line.name.clone(), line.county.clone(), BTreeMap::new()));
                 entry.0 = line.name.clone();
                 entry.1 = line.county.clone();
+                // The filing's own absence, kept as one. A line carried with a blank amount
+                // is stored as `None` rather than dropped, so that where two filings restate the
+                // same year the later one wins on this line too — including when what it says
+                // is that it has no figure.
                 entry.2.insert(line.code.clone(), line.actual[index]);
             }
         }
@@ -70,7 +74,10 @@ pub fn build_finance_extract(filings: &[Vec<crate::forecast::Line>]) -> Vec<Vec<
                 // indistinguishable from a measurement, and every reader downstream then sums
                 // it. Toronto City's FY2023 filing omits 5.050, 7.010 and 7.020, and shipped
                 // $0 expenditure against $9.86M of revenue for three years because of it.
-                row.push(format_value(amounts.get(*code).copied(), 2));
+                //
+                // Two absences flatten to the same empty cell, because they are the same claim:
+                // the filing carried no such line, or carried it with no amount on it.
+                row.push(format_value(amounts.get(*code).copied().flatten(), 2));
             }
             row
         })

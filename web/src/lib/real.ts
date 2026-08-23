@@ -49,6 +49,10 @@ export function baseYear(deflator: Deflator, years?: number[]): number | null {
  *
  * Returns `null` rather than the nominal figure when the index cannot cover both years — a
  * silently un-deflated number in a column labelled "real" is the failure this guards.
+ *
+ * The years this can happen for are named: `deflator.uncovered` is the list the feed carries and
+ * the index cannot reach, so a caller with a year in hand can say *why* there is no real figure
+ * instead of only that there isn't one.
  */
 export function convert(
   deflator: Deflator,

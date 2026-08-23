@@ -106,25 +106,21 @@ impl Distribution {
 ///
 /// # Panics
 ///
-/// If the fixture's header is not the one this was written against.
+/// If the fixture's header is not the one this was written against, or if a row's width differs
+/// from the header's — both by way of [`edfund_core::csv::rows`], which is what holds the
+/// uniform-width invariant these fixtures are written under. A hand-rolled `split(',')` here
+/// checked the header and then indexed by position, so a cell that grew a comma shifted every
+/// field after it and the row still parsed.
 #[must_use]
 pub fn panel() -> Vec<Distribution> {
-    let mut lines = FIXTURE.lines();
-    assert_eq!(
-        lines.next().unwrap_or_default().trim(),
-        EXPECTED_HEADER,
-        "the casino fixture header changed; update dispersion::casino"
-    );
-    lines
-        .filter(|line| !line.trim().is_empty())
-        .filter_map(|line| {
-            let f: Vec<&str> = line.split(',').map(str::trim).collect();
+    edfund_core::csv::rows(FIXTURE, EXPECTED_HEADER)
+        .filter_map(|row| {
             Some(Distribution {
-                irn: f.first()?.to_string(),
-                district: f.get(1)?.to_string(),
-                month: f.get(2)?.to_string(),
-                counties: f.get(3).and_then(|v| v.parse().ok()),
-                amount: f.get(4)?.parse().ok()?,
+                irn: row.str(0).to_string(),
+                district: row.str(1).to_string(),
+                month: row.str(2).to_string(),
+                counties: row.str(3).parse().ok(),
+                amount: row.num(4)?,
             })
         })
         .collect()

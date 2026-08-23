@@ -1792,6 +1792,15 @@ pub fn build() -> Bundle {
     let meal_program = meal_program();
     let casino = casino_statewide();
 
+    // Every year either axis carries, and the subset of them the index can reach. Both are
+    // published: the difference is the answer to "which years cannot be shown in real terms",
+    // and it is three — FY1998, FY1999 and FY2027, the ends of the appropriations series.
+    let wanted = deflator_years(&districts, &history, &appropriations);
+    let covered: Vec<(u16, f64)> = wanted
+        .iter()
+        .filter_map(|&year| cpi.point(FiscalYear(year)).map(|point| (year, point.index)))
+        .collect();
+
     Bundle {
         national: national(),
         history: history.clone(),
@@ -1835,9 +1844,14 @@ pub fn build() -> Bundle {
             // nominal dollars would report a widening that is partly just money getting smaller.
             // A deflator that covers only part of what the feed carries is the failure mode where
             // the page silently falls back to nominal for the years it cannot convert.
-            points: deflator_years(&districts, &history, &appropriations)
-                .into_iter()
-                .filter_map(|year| cpi.point(FiscalYear(year)).map(|point| (year, point.index)))
+            points: covered.clone(),
+            // The years asked for and not answered, kept rather than dropped. `filter_map` used
+            // to discard them here, which made an index three years short of the feed
+            // indistinguishable from one covering it exactly.
+            uncovered: wanted
+                .iter()
+                .copied()
+                .filter(|year| !covered.iter().any(|(covered, _)| covered == year))
                 .collect(),
         }),
         districts,

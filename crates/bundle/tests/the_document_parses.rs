@@ -299,12 +299,32 @@ fn the_blocks_that_only_the_real_build_populates_are_in_it() {
     let deflator = built.deflator.as_ref().expect("the deflator");
     assert!(!deflator.points.is_empty(), "a deflator with no points");
 
+    // The years the feed carries and the index cannot reach, which used to leave through a
+    // `filter_map` and be visible to nothing. CPI-U June runs FY2000-FY2026 and the
+    // appropriations series runs FY1998-FY2027, so it is the two ends of that series.
+    assert_eq!(
+        deflator.uncovered,
+        vec![1998, 1999, 2027],
+        "the deflator's gap against the feed changed"
+    );
+    assert!(
+        deflator
+            .uncovered
+            .iter()
+            .all(|year| !deflator.points.iter().any(|(covered, _)| covered == year)),
+        "a year is named as uncovered and carries a point"
+    );
+
     // And that both survive into the document, rather than being built and dropped.
     let feed = built.to_json();
     assert!(parse(&feed).is_ok());
     assert!(
         feed.contains("\"deflator\": {"),
         "the deflator block is not emitted"
+    );
+    assert!(
+        feed.contains("\"uncovered\": [1998, 1999, 2027]"),
+        "the deflator's uncovered years are not emitted"
     );
 }
 

@@ -237,6 +237,15 @@ impl<'a> Arr<'a> {
         self.out.push_str(&num(v));
     }
 
+    /// A count or a year element, written as an integer.
+    ///
+    /// As [`Obj::count`]: an exact quantity should not pick up a decimal representation on the
+    /// way out.
+    pub(crate) fn count(&mut self, v: impl core::fmt::Display) {
+        self.slot();
+        let _ = write!(self.out, "{v}");
+    }
+
     /// An object element, which closes when the returned value is dropped.
     pub(crate) fn obj(&mut self) -> Obj<'_> {
         self.slot();
