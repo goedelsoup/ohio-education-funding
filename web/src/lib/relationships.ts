@@ -25,6 +25,7 @@
  */
 
 import type { ScatterPoint, Trace } from "./chart.ts";
+import { median } from "./stats.ts";
 import type { District } from "./types.ts";
 
 /**
@@ -144,8 +145,4 @@ export function bands(
   return assigned;
 }
 
-/** The middle value. Local, and deliberately the same lower-median every quintile helper here uses. */
-function median(values: number[]): number {
-  const sorted = [...values].sort((a, b) => a - b);
-  return sorted[Math.floor(sorted.length / 2)] ?? 0;
-}
+

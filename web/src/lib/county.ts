@@ -35,6 +35,7 @@
 import type { District, Statewide } from "./types.ts";
 import { count, escapeHtml, money, pct } from "./format.ts";
 import * as routes from "./routes.ts";
+import { median } from "./stats.ts";
 import { yearChip, yearOf } from "./year.ts";
 import { anchor } from "./section.ts";
 import { BOX_FROM, distributionSpec } from "./plot/spec.ts";
@@ -64,11 +65,6 @@ export interface County {
 }
 
 /** The middle value. Module-level because two renderers need it and a duplicate would drift. */
-function median(values: number[]): number {
-  const sorted = [...values].sort((a, b) => a - b);
-  return sorted.length === 0 ? 0 : sorted[Math.floor(sorted.length / 2)]!;
-}
-
 /** `Van Wert` becomes `van-wert`; the slug is the URL and must round-trip through the router. */
 export function slugify(county: string): string {
   return county
