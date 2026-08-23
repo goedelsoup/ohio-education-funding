@@ -31,6 +31,13 @@ description: |
 
   ### A proration of 1.0 is not an absence
 
+  General transportation carries a factor of **1.0**, and that is a different statement from
+  carrying no factor at all. It says the entitlement was computed, the appropriation was
+  compared against it, and the two did not bind this year — a measurement that happened to come
+  out at unity. A component with no factor was never put through that comparison. Dropping the
+  1.0 as "no proration" loses the only evidence the corpus holds that the line was tested.
+  [inference]
+
   ### Still open
 
   No factor publishes a history, so "when each was last set" is answered for preschool and open
@@ -44,7 +51,8 @@ findings: |
 
       program                                    factor        appropriation stated?
       special education transportation           0.91746       no
-      preschool special education                0.96854448    yes — $147,500,000
+      preschool special education                0.96854448    yes — $147,500,000, but that
+                                                               cell is the FY2025 estimate
       transportation, general                    1.0           no
 
   The preschool sheet is what makes the class describable. It carries the **appropriation limit
@@ -54,9 +62,10 @@ findings: |
 
   ### Why a node holding only the factor would be useless
 
-  At the stated 0.96854448 the preschool program totals **$148,408,184 against its own
-  $147,500,000 limit — $908,184 over**. A third cell on the same sheet states $146,708,228.07,
-  matching neither. The likeliest reading is a factor calibrated against an earlier ADM vintage
+  At the stated 0.96854448 the preschool program totals **$148,408,184 against the $147,500,000
+  printed beside it — $908,184 over that cell**, though the cell turns out to be the FY2025
+  estimate rather than the FY2027 appropriation; see below. A third cell on the same sheet states
+  $146,708,228.07, matching neither. The likeliest reading is a factor calibrated against an earlier ADM vintage
   and never recalibrated after the counts were refreshed. [verified —
   `crates/project/tests/the_supplements_outside_the_formula.rs`]
 
@@ -180,15 +189,18 @@ properties:
     the demand — then it is *measured*, and nobody decides it. If the department has any latitude
     in setting it, or in choosing which entitlements a line is prorated against, then it is
     *delegated*, and the choice is reviewable. The FY2027 preschool factor of 0.96854448 against
-    a stated $147,500,000 appropriation is precise enough to look arithmetic, but a factor being
-    computable does not establish that it was computed rather than set. [open]
+    the $147,500,000 printed beside it is precise enough to look arithmetic, but that cell is the
+    FY2025 estimate rather than the FY2027 appropriation, so the arithmetic it appears to be does
+    not close — and a factor being computable does not establish that it was computed rather than
+    set. [open]
 
     Deciding this needs the appropriation act's language, not the calculator's output, which is a
     `lsc-budget` question rather than a `dew-foundation` one.
   series: |
-    FY2027: special education transportation 0.91746; preschool special education 0.96854448
-    against a stated appropriation of $147,500,000; transportation general 1.0. Earlier years are
-    [open] — the calculator publishes one year and no history.
+    FY2027: special education transportation 0.91746; preschool special education 0.96854448,
+    stated beside a $147,500,000 cell that is the **FY2025 estimate** — the FY2027 appropriation
+    is $153,976,832 and the program does not reach it, so no proration arises; transportation
+    general 1.0. Earlier years are [open] — the calculator publishes one year and no history.
   statutory_basis: |
     Set by the appropriation rather than by R.C. 3317. Which budget line governs each, and whether
     the department's discretion in setting the factor is bounded, is [open].

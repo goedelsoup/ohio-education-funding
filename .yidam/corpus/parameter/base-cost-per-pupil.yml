@@ -60,13 +60,26 @@ properties:
     FY2023  $7,352.00  statewide average, FY2018 cost inputs      [inference, Fordham]
     FY2025  $8,240.00  statewide average, FY2022 cost inputs      [inference, Fordham]
     FY2026  not established                                        [open]
-    FY2027  $8,241.61  statewide average, FY2022 cost inputs      [verified, department model]
+    FY2027  $8,241.61  the calculator's stated multiplier          [verified, department model]
+            $8,257.55  aggregate / ADM, which is $15.94 higher     [verified, computed]
 
     FY2027 detail from the department's own FY27 calculator [verified]:
       statewide aggregate base cost     $11,767,054,639.44
       base cost enrolled ADM              1,425,005.53
+      aggregate / ADM                        $8,257.55
+      stated average base cost per pupil     $8,241.61   (the calculator's own multiplier)
       classroom teacher salary [s5d]         $68,022.22   (FY2022 reference year)
       average insurance cost   [s4]          $17,152.68
+
+    **Those last two are different quantities and the node used to conflate them.** Dividing the
+    aggregate by the ADM gives **$8,257.55**; the figure the calculator carries and multiplies by
+    is **$8,241.61**, and the gap is **$15.94 per pupil**. $8,241.61 is the load-bearing one — it
+    is what the English learner and special education weights multiply
+    ([`project::panel::categoricals::AVERAGE_BASE_COST_PER_PUPIL`](../../../crates/project/src/panel/categoricals.rs))
+    and what the open-enrolment clawback charges per FTE — so it is a *stated input* rather than a
+    derived average, and it is not recoverable from the two figures above it. Any statement of the
+    form "aggregate ÷ ADM = the average the formula uses" is false here by $15.94. [verified —
+    summed from `crates/foundation/fixtures/fy27-department-model.csv`, 609 districts]
 
     Note the ADM trend: 1,499,918.26 in FY2022 against 1,425,005.53 projected for FY2027, a
     5% decline. Aggregate base cost still rises because the per-pupil figure rises faster than

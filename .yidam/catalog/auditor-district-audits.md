@@ -74,6 +74,6 @@ rather than filled from the statute's shape.
 ## Used by
 
 - [`crates/dispersion/src/lea_directory.rs`](../../crates/dispersion/src/lea_directory.rs) —
-  `transfers()` and `explained()`, beside the directory whose 341 departures they explain five of.
+  `transfers()` and `explained()`, beside the directory whose 689 departures they explain five of.
 - [`the-order-was-never-the-states`](../decisions/the-order-was-never-the-states.yml), which
   established that the State Board never held these and pointed here.

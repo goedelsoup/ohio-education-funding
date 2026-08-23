@@ -98,8 +98,11 @@ findings: |
 
   For spending, less dispersion is more equitable. For state aid the sign flips: aid is
   compensatory, so a wide spread means strong targeting and a narrow one means weak targeting.
-  Realized aid is measurably *more equal* than formula aid — coefficient of variation 0.544
-  against 0.677, restricted range ratio 9.6 against 12.3. [verified] That equality is the guarantee
+  Realized aid is measurably *more equal* than formula aid — coefficient of variation 0.563
+  against 0.695, restricted range ratio 9.66 against 12.27. [verified — recomputed over the 609
+  districts of the committed feed with `dispersion::Dispersion::of`, which is R type 7 on
+  `q * (n - 1)` and population variance; the figures this replaces (0.544, 0.677, 9.6, 12.3)
+  do not reproduce under any convention in the crate] That equality is the guarantee
   flattening the compensation. Reporting it as an improvement, which the habit from spending
   analysis would invite, gets the direction exactly backwards. See
   [equity](../doctrine/equity.yml).

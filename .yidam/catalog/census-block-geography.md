@@ -59,8 +59,10 @@ Data](nces-ccd-lea-directory.md) directory, whose `ST_LEAID` column is the IRN.
 Every apportioned figure is an estimate: the weight is under-18 population, which is a proxy for
 pupils and counts children in community schools, private schools and none; and it is a **2020**
 count applied to a **FY2027** model, so a district that has grown or emptied since is weighted as
-it was. The one exact property is conservation — each district's shares sum to one, so each chamber's
-seats sum to the statewide total to the cent, and the two chambers to each other.
+it was. The one exact property is conservation — each district's shares sum to one, so the
+apportionment loses no dollar. It is exact in the arithmetic and not in the published figures: seat
+totals are rounded before they are written, so on the committed feed the two chambers differ by
+**$0.97** and each sits $1-2 above `statewide.realized_aid_total`.
 
 **Vintage risk the header assertion cannot catch.** The crosswalk is pinned to the 2024 map. When
 Ohio redistricts again the file at the same URL changes and the fixture becomes silently stale: the
