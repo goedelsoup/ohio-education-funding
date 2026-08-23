@@ -552,19 +552,27 @@ export function renderChargeOff(d: District, statewide: Statewide, tax: TaxState
   const taxYear = d.property_tax[d.property_tax.length - 1]?.tax_year;
 
   /*
-   * Why `$289` and `$45` below are still literals.
+   * The pair that used to be `$289` and `$45`.
    *
-   * They are not stale and they are not `bundle.statewide.median_regime_difference`, which reads
-   * −$47. They are the **upper-middle** medians — 289.35 and −44.62 — the definition `stats.ts`
-   * takes and states a reason for: *"the median district" names a district, so the statistic has
-   * to be a value one of them actually has.* The feed's field is `crates/dispersion::median`, a
-   * linear-interpolated R type 7 percentile, whose own documentation says it deliberately replaced
-   * the copies that "took the upper of the two middle observations".
+   * They were literals with a reason: they were the **upper-middle** medians, 289.35 and −44.62,
+   * the definition `stats.ts` took — while `bundle.statewide.median_regime_difference` is
+   * `crates/dispersion::median`, linear-interpolated, and read −$47. Two definitions of median in
+   * one workspace, so /statewide and this page said "the median district" of the same quantity
+   * and disagreed by $2. Binding these to the feed then would have picked a side of that silently.
    *
-   * So this site publishes two different statistics under one phrase, and /statewide and this page
-   * disagree by $2 for that reason alone. Binding these to the feed would not fix that; it would
-   * pick a side of it silently. Filed instead — the pair stays literal, and stays named.
+   * `stats.ts` now interpolates too, so there is one side to pick. The "after" half is the feed's
+   * own field and the "before" half is reconstructed from `overstated_by` — see
+   * `TaxStatewide.medianRegimeDifferenceUncorrected`. The figures moved by $2 and $3 and the
+   * finding did not: the correction still turns better off into worse off.
    */
+
+  // The regime difference either side of the recognised-valuation correction, and the word for
+  // each direction read off its sign. The sentence below claims the correction moved a *finding*
+  // and not only a figure, which is true exactly while the two signs differ — so it is derived
+  // rather than asserted, on the rule `renderRegimeDifference` states for the same quantity.
+  const beforeCorrection = tax.medianRegimeDifferenceUncorrected;
+  const afterCorrection = statewide.median_regime_difference;
+  const side = (value: number) => (value < 0 ? "worse" : "better");
 
   const short = r.mills_short_of_charge_off;
   const rate = d.millage?.observed_rate;
@@ -671,8 +679,13 @@ export function renderChargeOff(d: District, statewide: Statewide, tax: TaxState
         Statewide the deferral is ${pct(tax.deferredShare, 1)} of taxable value${
           taxYear == null ? "" : ` in TY${taxYear}`
         } and ${millions(tax.deferredChargeOff).replace("+", "")} of charge-off, and
-        correcting it moved findings as well as figures: the median district goes from $289 per
-        pupil better off under the plan to $45 worse.</p>
+        correcting it moved ${
+          side(beforeCorrection) === side(afterCorrection)
+            ? "the figures"
+            : "findings as well as figures"
+        }: the median difference goes from ${money(Math.abs(beforeCorrection))} per pupil
+        ${side(beforeCorrection)} off under the plan to
+        ${money(Math.abs(afterCorrection))} ${side(afterCorrection)}.</p>
 
       <p class="note">One seam inside the arithmetic, stated rather than smoothed over. The deemed
         local share is per <strong>enrolled</strong> ADM, because that is what the published

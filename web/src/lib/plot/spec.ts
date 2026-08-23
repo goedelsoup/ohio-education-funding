@@ -704,6 +704,25 @@ export function rangeSpec(
 const DOTS_UP_TO = 150;
 
 /**
+ * The `q`th quantile of an ascending series by **nearest rank**, or zero for an empty one.
+ *
+ * Deliberately not `stats.percentile`, which interpolates and is the definition every median this
+ * site *publishes* now uses. A box plot is different in kind: its rule and its hinges are drawn at
+ * observations, and a caller describing the box in prose has to name the same three values the
+ * marks sit on. Interpolating here would place the rule between two dots and then describe it as
+ * a figure the population does not contain.
+ *
+ * Exported for exactly that reason. `district.ts` writes the `description` for the strip charts —
+ * *"Quartiles run $X to $Y, median $Z"* — and had its own copy of this expression, which is a
+ * sentence and a mark agreeing by coincidence rather than by construction. See `stats.ts` on the
+ * distinction between the two conventions and why this repository now keeps both, named.
+ */
+export function nearestRank(sorted: number[], q: number): number {
+  if (sorted.length === 0) return 0;
+  return sorted[Math.min(sorted.length - 1, Math.floor(q * sorted.length))]!;
+}
+
+/**
  * The smallest population that gets a box.
  *
  * Below this the quartiles are not a summary of anything. A seat with three school districts drew
@@ -737,7 +756,7 @@ export function distributionSpec(
   if (values.length < 3) return null;
 
   const sorted = [...values].sort((a, b) => a.value - b.value);
-  const at = (q: number) => sorted[Math.min(sorted.length - 1, Math.floor(q * sorted.length))]!.value;
+  const at = (q: number) => nearestRank(sorted.map((v) => v.value), q);
   const q1 = at(0.25);
   const med = at(0.5);
   const q3 = at(0.75);

@@ -12,7 +12,7 @@
  */
 
 import type { FanPoint } from "./chart.ts";
-import { barSpec, distributionSpec, fanSpec } from "./plot/spec.ts";
+import { barSpec, distributionSpec, fanSpec, nearestRank } from "./plot/spec.ts";
 import { renderToString } from "./plot/ssr.ts";
 import { count, escapeHtml, money, ordinal, pct, percentileOf, signedMoney } from "./format.ts";
 import { apply, currentLaw, currentRealizedAid } from "./policy.ts";
@@ -66,7 +66,7 @@ function strip(
         <strong class="tnum">${money(value)}
           <span class="n">${ordinal(Math.round(p * 100))} percentile</span></strong>
       </div>
-      <div class="chartwrap" data-chart="position">${renderToString(box, { label: `${label} across the ${count(sorted.length)} districts reporting it, with this district at ${money(value)}, the ${ordinal(Math.round(p * 100))} percentile`, description: `Quartiles run ${money(sorted[Math.floor(sorted.length * 0.25)] ?? 0)} to ${money(sorted[Math.floor(sorted.length * 0.75)] ?? 0)}, median ${money(sorted[Math.floor(sorted.length * 0.5)] ?? 0)}` })}</div>
+      <div class="chartwrap" data-chart="position">${renderToString(box, { label: `${label} across the ${count(sorted.length)} districts reporting it, with this district at ${money(value)}, the ${ordinal(Math.round(p * 100))} percentile`, description: `Quartiles run ${money(nearestRank(sorted, 0.25))} to ${money(nearestRank(sorted, 0.75))}, median ${money(nearestRank(sorted, 0.5))}` })}</div>
       <div class="scale">
         <span>${money(sorted[0] ?? 0)}</span>
         <span>${money(sorted[sorted.length - 1] ?? 0)}</span>
