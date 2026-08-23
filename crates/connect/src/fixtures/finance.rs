@@ -65,10 +65,12 @@ pub fn build_finance_extract(filings: &[Vec<crate::forecast::Line>]) -> Vec<Vec<
         .map(|((irn, fiscal_year), (name, county, amounts))| {
             let mut row = vec![irn, name, county, fiscal_year.to_string()];
             for code in crate::forecast::EXTRACTED {
-                row.push(format_value(
-                    Some(amounts.get(*code).copied().unwrap_or(0.0)),
-                    2,
-                ));
+                // Empty, not zero, where the filing has no such line. A district that did not
+                // report line 5.050 did not spend nothing; writing `0` there makes an absence
+                // indistinguishable from a measurement, and every reader downstream then sums
+                // it. Toronto City's FY2023 filing omits 5.050, 7.010 and 7.020, and shipped
+                // $0 expenditure against $9.86M of revenue for three years because of it.
+                row.push(format_value(amounts.get(*code).copied(), 2));
             }
             row
         })

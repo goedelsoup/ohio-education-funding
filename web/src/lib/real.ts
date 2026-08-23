@@ -67,13 +67,22 @@ export function convert(
  *
  * The cash balance is converted on the same index as the flows. That is the right treatment for
  * a question about what a balance *buys*, which is the question anyone asks of a reserve.
+ *
+ * A line the filing never carried stays absent. Returns `null` only when the index cannot cover
+ * the year, which is the one case where the year cannot honestly be labelled real.
  */
 export function yearIn(
   deflator: Deflator,
   year: FinanceYear,
   base: number,
 ): FinanceYear | null {
-  const at = (value: number) => convert(deflator, value, year.fiscal_year, base);
+  // Two different failures, kept apart. `null` in means the filing carried no such line, and it
+  // comes back out as `null`: there is nothing to restate and an absence is the same absence in
+  // any year's dollars. `undefined` means the index could not reach the year, which is a failure
+  // to restate and disqualifies the whole year — deflating four lines of five and labelling the
+  // result "real" is the thing this module exists to prevent.
+  const at = (value: number | null): number | null | undefined =>
+    value == null ? null : (convert(deflator, value, year.fiscal_year, base) ?? undefined);
   const [aid, local, revenue, spend, cash] = [
     at(year.state_aid),
     at(year.local_tax),
@@ -82,11 +91,11 @@ export function yearIn(
     at(year.ending_cash),
   ];
   if (
-    aid == null ||
-    local == null ||
-    revenue == null ||
-    spend == null ||
-    cash == null
+    aid === undefined ||
+    local === undefined ||
+    revenue === undefined ||
+    spend === undefined ||
+    cash === undefined
   ) {
     return null;
   }
@@ -136,12 +145,16 @@ export function series(
 export function realChange(
   deflator: Deflator | null,
   years: FinanceYear[],
-  pick: (y: FinanceYear) => number,
+  pick: (y: FinanceYear) => number | null,
 ): number | null {
   const first = years[0];
   const last = years[years.length - 1];
-  if (!deflator || !first || !last || pick(first) <= 0) return null;
-  const rebased = convert(deflator, pick(first), first.fiscal_year, last.fiscal_year);
+  if (!deflator || !first || !last) return null;
+  // An endpoint the filing did not report has no change to state. Reading it as zero would make
+  // the change -100% or +infinity depending on which end it fell on, and both would be drawn.
+  const [start, end] = [pick(first), pick(last)];
+  if (start == null || end == null || start <= 0) return null;
+  const rebased = convert(deflator, start, first.fiscal_year, last.fiscal_year);
   if (rebased == null || rebased === 0) return null;
-  return pick(last) / rebased - 1;
+  return end / rebased - 1;
 }

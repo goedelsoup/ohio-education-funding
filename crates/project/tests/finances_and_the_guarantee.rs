@@ -22,11 +22,15 @@ use edfund_core::FiscalYear;
 use project::finances::{finances, for_district, Finances};
 use project::panel::panel;
 
-fn statewide(year: u16, pick: impl Fn(&project::finances::YearRecord) -> f64) -> f64 {
+/// A statewide total is the sum over the districts that reported the line.
+///
+/// An unreported figure is skipped rather than added as zero. Arithmetically identical and a
+/// different claim, and the difference is the whole of `project::finances::INCOMPLETE`.
+fn statewide(year: u16, pick: impl Fn(&project::finances::YearRecord) -> Option<f64>) -> f64 {
     finances()
         .iter()
         .filter_map(|f| f.year(FiscalYear(year)))
-        .map(&pick)
+        .filter_map(&pick)
         .sum()
 }
 
@@ -95,10 +99,9 @@ fn fy2025_is_the_year_the_spending_caught_up() {
     let ratios: Vec<f64> = finances()
         .iter()
         .filter_map(|f| {
-            let before = f.year(FiscalYear(2024))?;
-            let after = f.year(FiscalYear(2025))?;
-            (before.total_expenditure > 1e6)
-                .then(|| after.total_expenditure / before.total_expenditure)
+            let before = f.year(FiscalYear(2024))?.total_expenditure?;
+            let after = f.year(FiscalYear(2025))?.total_expenditure?;
+            (before > 1e6).then_some(after / before)
         })
         .collect();
     let typical = common::median(ratios);
@@ -114,7 +117,7 @@ fn most_districts_spent_more_than_they_received_in_the_most_recent_closed_year()
     let deficits = finances()
         .iter()
         .filter_map(|f| f.year(FiscalYear(2025)))
-        .filter(|y| y.operating_result() < 0.0)
+        .filter(|y| y.operating_result().is_some_and(|result| result < 0.0))
         .count();
     let total = finances()
         .iter()
@@ -126,7 +129,7 @@ fn most_districts_spent_more_than_they_received_in_the_most_recent_closed_year()
     let prior = finances()
         .iter()
         .filter_map(|f| f.year(FiscalYear(2024)))
-        .filter(|y| y.operating_result() < 0.0)
+        .filter(|y| y.operating_result().is_some_and(|result| result < 0.0))
         .count();
     assert!(
         prior < total / 2,
@@ -326,10 +329,14 @@ fn real_state_aid_fell_for_most_districts_over_the_observed_span() {
         ) else {
             continue;
         };
-        if first.unrestricted_aid <= 0.0 {
+        let (Some(first_aid), Some(last_aid)) = (first.unrestricted_aid, last.unrestricted_aid)
+        else {
+            continue;
+        };
+        if first_aid <= 0.0 {
             continue;
         }
-        if last.unrestricted_aid > first.unrestricted_aid {
+        if last_aid > first_aid {
             nominal_up += 1;
         }
         let real = district
@@ -804,11 +811,14 @@ fn real_state_aid_fell_by_about_a_fifth_over_the_recent_window() {
         let (Some(a), Some(b)) = (district.year(first), district.year(last)) else {
             continue;
         };
-        if a.unrestricted_aid <= 0.0 {
+        let (Some(a_aid), Some(b_aid)) = (a.unrestricted_aid, b.unrestricted_aid) else {
+            continue;
+        };
+        if a_aid <= 0.0 {
             continue;
         }
-        nominal_total.0 += a.unrestricted_aid;
-        nominal_total.1 += b.unrestricted_aid;
+        nominal_total.0 += a_aid;
+        nominal_total.1 += b_aid;
         changes.push(
             district
                 .real_change(&cpi, |y| y.unrestricted_aid)
@@ -856,7 +866,7 @@ fn real_state_aid_fell_by_about_a_fifth_over_the_recent_window() {
 fn spending_held_its_real_value_over_the_window_and_state_aid_did_not() {
     let cpi = deflator::CpiSeries::cpi_u_june();
     let money = finances();
-    let change = |pick: fn(&project::finances::YearRecord) -> f64| {
+    let change = |pick: fn(&project::finances::YearRecord) -> Option<f64>| {
         common::median(
             money
                 .iter()

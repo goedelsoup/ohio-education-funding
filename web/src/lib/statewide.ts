@@ -30,20 +30,42 @@ export function renderStatewideFinances(bundle: Bundle, basis: Basis): string {
   const { years, converted, base } = series(bundle.deflator, actuals, basis);
   const first = years[0]!;
   const latest = years[years.length - 1]!;
-  const peak = years.reduce((a, b) => (b.ending_cash > a.ending_cash ? b : a));
+  // Each statewide figure is a sum over the districts that reported the line, so it is null only
+  // if none of them did — which has never happened, and would be a fact about the panel rather
+  // than about the state. Handled rather than asserted: the card degrades to "—" instead of
+  // reading a missing filing as a state with no cash.
+  const held = years.filter((y) => y.ending_cash != null);
+  const peak = held.reduce<(typeof held)[number] | null>(
+    (a, b) => (a == null || b.ending_cash! > a.ending_cash! ? b : a),
+    null,
+  );
 
-  const cashChange = latest.ending_cash - first.ending_cash;
+  const cashChange =
+    latest.ending_cash == null || first.ending_cash == null
+      ? null
+      : latest.ending_cash - first.ending_cash;
+  const yearsOfSpending =
+    latest.ending_cash == null || !latest.total_expenditure
+      ? null
+      : latest.ending_cash / latest.total_expenditure;
   const realAid = realChange(bundle.deflator, actuals, (y) => y.state_aid);
-  const nominalAid = actuals[actuals.length - 1]!.state_aid / actuals[0]!.state_aid - 1;
+  const firstAid = actuals[0]!.state_aid;
+  const lastAid = actuals[actuals.length - 1]!.state_aid;
+  const nominalAid = lastAid == null || firstAid == null || firstAid <= 0 ? null : lastAid / firstAid - 1;
 
-  const bars: Bar[] = years.map((y) => ({
+  const bars: Bar[] = held.map((y) => ({
     label: `FY${y.fiscal_year}`,
-    value: y.ending_cash,
+    value: y.ending_cash!,
     hover: `FY${y.fiscal_year}: ${millions(y.ending_cash).replace("+", "")} held, ${millions(y.total_revenue).replace("+", "")} in, ${millions(y.total_expenditure).replace("+", "")} out`,
-    ...(y.fiscal_year === peak.fiscal_year || y.fiscal_year === latest.fiscal_year
+    ...(y.fiscal_year === peak?.fiscal_year || y.fiscal_year === latest.fiscal_year
       ? { direct: millions(y.ending_cash).replace("+", "") }
       : {}),
   }));
+
+  const nominalFirstCash = actuals[0]!.ending_cash;
+  const nominalLastCash = actuals[actuals.length - 1]!.ending_cash;
+  const nominalCashChange =
+    nominalLastCash == null || !nominalFirstCash ? null : nominalLastCash / nominalFirstCash - 1;
 
   const label = converted
     ? `FY${base} dollars`
@@ -57,10 +79,13 @@ export function renderStatewideFinances(bundle: Bundle, basis: Basis): string {
       <div class="tiles">
         <div class="tile"><div class="k">Cash held, FY${latest.fiscal_year}</div>
           <div class="v">${millions(latest.ending_cash).replace("+", "")}</div>
-          <div class="n">${(latest.ending_cash / latest.total_expenditure).toFixed(2)} years of
-            spending at this rate</div></div>
+          <div class="n">${
+            yearsOfSpending == null
+              ? "no spending reported"
+              : `${yearsOfSpending.toFixed(2)} years of spending at this rate`
+          }</div></div>
         <div class="tile"><div class="k">Change since FY${first.fiscal_year}</div>
-          <div class="v ${cashChange < 0 ? "loss" : "gain"}">${millions(cashChange)}</div>
+          <div class="v ${cashChange != null && cashChange < 0 ? "loss" : "gain"}">${millions(cashChange)}</div>
           <div class="n">${
             converted
               ? "in constant dollars, so this is purchasing power"
@@ -79,9 +104,9 @@ export function renderStatewideFinances(bundle: Bundle, basis: Basis): string {
         ${
           converted
             ? `Deflated with <strong>${bundle.deflator?.label ?? "an index"}</strong>. Nominally
-               the balance ends ${pct(actuals[actuals.length - 1]!.ending_cash / actuals[0]!.ending_cash - 1, 0)}
+               the balance ends ${pct(nominalCashChange, 0)}
                above FY${first.fiscal_year}; in constant dollars it ends
-               ${pct(cashChange / first.ending_cash, 0)}. Both are correct and they support
+               ${pct(cashChange == null || !first.ending_cash ? null : cashChange / first.ending_cash, 0)}. Both are correct and they support
                opposite arguments, which is why this page will not show only one.`
             : `These are the figures as filed. The panel spans the sharpest price change in forty
                years, so switch to constant dollars before drawing a conclusion from the shape.`

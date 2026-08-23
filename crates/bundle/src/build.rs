@@ -710,8 +710,12 @@ fn to_district(record: &DistrictRecord, joins: &Joins<'_>) -> District {
                     state_aid: year.unrestricted_aid,
                     // Property and income tax together: a district with an income tax and one
                     // without raise the local share differently, and a page comparing only
-                    // property tax would understate the second.
-                    local_tax: year.property_tax + year.income_tax,
+                    // property tax would understate the second. Both lines or neither — a sum
+                    // over one reported half is not the local levy yield.
+                    local_tax: match (year.property_tax, year.income_tax) {
+                        (Some(property), Some(income)) => Some(property + income),
+                        _ => None,
+                    },
                     total_revenue: year.total_revenue,
                     total_expenditure: year.total_expenditure,
                     ending_cash: year.ending_cash,
@@ -1215,22 +1219,31 @@ fn statewide_finances(districts: &[District]) -> Vec<FinanceYear> {
         .map(|fiscal_year| {
             let mut total = FinanceYear {
                 fiscal_year,
-                state_aid: 0.0,
-                local_tax: 0.0,
-                total_revenue: 0.0,
-                total_expenditure: 0.0,
-                ending_cash: 0.0,
+                state_aid: None,
+                local_tax: None,
+                total_revenue: None,
+                total_expenditure: None,
+                ending_cash: None,
+            };
+            // An unreported line is skipped, not added as zero — which is arithmetically the
+            // same and is a different claim: the statewide figure is the sum over the districts
+            // that reported, and `project::finances::INCOMPLETE` names the one that did not.
+            // A year no district reported at all stays `null` rather than becoming a false $0.
+            let add = |running: &mut Option<f64>, value: Option<f64>| {
+                if let Some(value) = value {
+                    *running = Some(running.unwrap_or(0.0) + value);
+                }
             };
             for year in districts
                 .iter()
                 .flat_map(|d| d.finances.iter())
                 .filter(|y| y.fiscal_year == fiscal_year)
             {
-                total.state_aid += year.state_aid;
-                total.local_tax += year.local_tax;
-                total.total_revenue += year.total_revenue;
-                total.total_expenditure += year.total_expenditure;
-                total.ending_cash += year.ending_cash;
+                add(&mut total.state_aid, year.state_aid);
+                add(&mut total.local_tax, year.local_tax);
+                add(&mut total.total_revenue, year.total_revenue);
+                add(&mut total.total_expenditure, year.total_expenditure);
+                add(&mut total.ending_cash, year.ending_cash);
             }
             total
         })

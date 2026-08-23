@@ -199,20 +199,25 @@ pub struct OutcomeStatewide {
 ///
 /// From the district's own five-year forecast filing, not from the funding calculator. The two
 /// are differently constructed and the feed never presents one as a check on the other.
+///
+/// Every figure is optional, and `None` means the filing carried no such line — not zero. One
+/// district in 660 is affected and it is named in `project::finances::INCOMPLETE`; the type is
+/// optional all the same, because a consumer that treats an unreported line as a measured zero
+/// is wrong on the one case and cannot tell which case it is on.
 #[derive(Debug, Clone, Copy, PartialEq)]
 pub struct FinanceYear {
     /// Fiscal year, ending 30 June.
     pub fiscal_year: u16,
     /// Unrestricted grants-in-aid: state foundation money as the district books it.
-    pub state_aid: Dollars,
+    pub state_aid: Option<Dollars>,
     /// Property tax plus income tax — the local levy yield actually collected.
-    pub local_tax: Dollars,
+    pub local_tax: Option<Dollars>,
     /// Total general fund revenue.
-    pub total_revenue: Dollars,
+    pub total_revenue: Option<Dollars>,
     /// Total expenditures and other financing uses.
-    pub total_expenditure: Dollars,
+    pub total_expenditure: Option<Dollars>,
     /// Cash balance at 30 June. What the district holds.
-    pub ending_cash: Dollars,
+    pub ending_cash: Option<Dollars>,
 }
 
 /// One fiscal year of the gross casino revenue county student fund.

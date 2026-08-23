@@ -220,11 +220,11 @@ fn sample() -> District {
         adm_history: [2_173.0, 2_140.0, 2_107.8],
         finances: vec![FinanceYear {
             fiscal_year: 2025,
-            state_aid: 10_252_524.0,
-            local_tax: 6_000_000.0,
-            total_revenue: 21_000_000.0,
-            total_expenditure: 22_000_000.0,
-            ending_cash: 7_500_000.0,
+            state_aid: Some(10_252_524.0),
+            local_tax: Some(6_000_000.0),
+            total_revenue: Some(21_000_000.0),
+            total_expenditure: Some(22_000_000.0),
+            ending_cash: Some(7_500_000.0),
         }],
         // Two years and a county span, so the emitter's array and its nullable scalar are both
         // exercised by the fixture rather than only by the real feed.
@@ -284,11 +284,11 @@ fn zero_statewide() -> Statewide {
         minimum_state_share: 0.1,
         finances: vec![FinanceYear {
             fiscal_year: 2025,
-            state_aid: 7_890_000_000.0,
-            local_tax: 11_000_000_000.0,
-            total_revenue: 25_090_000_000.0,
-            total_expenditure: 27_600_000_000.0,
-            ending_cash: 9_140_000_000.0,
+            state_aid: Some(7_890_000_000.0),
+            local_tax: Some(11_000_000_000.0),
+            total_revenue: Some(25_090_000_000.0),
+            total_expenditure: Some(27_600_000_000.0),
+            ending_cash: Some(9_140_000_000.0),
         }],
         outcomes: Some(OutcomeStatewide {
             districts: 606,

@@ -41,6 +41,18 @@ use edfund_core::Dollars;
 
 /// The bundle schema version. Bump on any change to field names, units, or semantics.
 ///
+/// `38.0.0` makes the five `finances` figures nullable — `state_aid`, `local_tax`,
+/// `total_revenue`, `total_expenditure`, `ending_cash` — in both the per-district and the
+/// statewide arrays. A five-year forecast filing may carry a district's year and not every line
+/// of it, and the extractor wrote the absence as `0`. Toronto City (IRN 044917) published $0 of
+/// expenditure and $0 of cash against $9.86M of revenue for FY2020-FY2022 on that reading.
+///
+/// Breaking rather than additive for the same reason `35.0.0` was: the old values parsed and
+/// plotted. A consumer summing the array, ranking on `ending_cash`, or dividing by
+/// `total_expenditure` got a number, and the number was wrong. `null` is a reported absence and
+/// must be dropped from an aggregate rather than added to it. The statewide totals are unchanged
+/// — they already excluded what was never reported, by adding zero.
+///
 /// `35.0.0` puts the three report-card shares on the same scale as every other share the bundle
 /// publishes. `outcome.economically_disadvantaged`, `outcome.english_learner` and
 /// `outcome.students_with_disabilities` were passed through as the report card writes them —
@@ -161,7 +173,7 @@ use edfund_core::Dollars;
 /// `36.0.0` added `drafts`, the provisions of each `draft-legislation` node — including the ones
 /// no lever can run, which travel with the rest so the count a cost must be read beside cannot be
 /// dropped between the fixture and the page.
-pub const CONTRACT_VERSION: &str = "37.0.0";
+pub const CONTRACT_VERSION: &str = "38.0.0";
 
 mod model;
 mod serialize;
