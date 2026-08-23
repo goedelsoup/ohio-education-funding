@@ -30,7 +30,7 @@
  * away from the formula's own per-pupil numbers. See `denominators.ts`.
  */
 
-import { escapeHtml, money, pct } from "./format.ts";
+import { escapeHtml, millions, money, pct } from "./format.ts";
 import { seriesSpec } from "./plot/spec.ts";
 import { renderToString } from "./plot/ssr.ts";
 import { convert, type Basis } from "./real.ts";
@@ -79,6 +79,23 @@ export function growth(rows: AppropriationYear[]): number | null {
   return last.enacted / first.enacted;
 }
 
+/**
+ * The unit this card writes dollars in — the site's, not one of its own.
+ *
+ * It formatted billions as `$15bn`, which appears nowhere else here: `millions()` writes `$7.28B`,
+ * and it is what every other card on the site uses for a figure at this scale. Two units for one
+ * quantity is a reader asking whether they are the same quantity.
+ *
+ * The precision matters beyond consistency. The series is passed to `seriesSpec` in dollars rather
+ * than in billions, so the truncated-axis annotation is rendered by this function — and `$15bn`'s
+ * zero places wrote *"axis starts at $1bn, not zero"* over an axis starting at $1.24bn,
+ * understating the truncation by a fifth. Two places state it.
+ *
+ * The `+` goes because `millions` signs its output for deltas and an appropriation is a level.
+ * Same call the four other users of it make.
+ */
+export const BILLIONS = (v: number): string => millions(v).replace("+", "");
+
 /** The appropriation, year by year, on one basis. */
 export function renderAppropriations(
   rows: AppropriationYear[],
@@ -103,13 +120,13 @@ export function renderAppropriations(
     seriesSpec(
       shown.map((r) => ({
         year: r.fiscal_year,
-        a: r.enacted / 1e9,
-        b: r.foundation_funding / 1e9,
+        a: r.enacted,
+        b: r.foundation_funding,
       })),
       { a: "all lines", b: "the formula" },
-      (v) => `$${v.toFixed(0)}bn`,
+      BILLIONS,
       (p) =>
-        `FY${p.year}: $${(p.a ?? 0).toFixed(2)}bn appropriated, $${(p.b ?? 0).toFixed(2)}bn of it the formula`,
+        `FY${p.year}: ${BILLIONS(p.a ?? 0)} appropriated, ${BILLIONS(p.b ?? 0)} of it the formula`,
     ),
   { label: `Appropriation and the formula's share of it, billions of dollars by fiscal year, FY${first.fiscal_year} to FY${last.fiscal_year}, in ${basis === "real" ? `constant FY${base} dollars` : "the dollars of each year"}` },
   );

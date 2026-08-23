@@ -165,6 +165,26 @@ export function barSpec(bars: Bar[], options: { max?: number } = {}): Spec {
   // than a truncation and is exactly the kind of thing nobody reports.
   const longestLabel = Math.max(0, ...bars.map((b) => b.label.length));
 
+  /*
+   * The bar the chart was built to locate, on two channels.
+   *
+   * The national chart on `/statewide` ranks the states by local share and draws Ohio among them.
+   * It set `current: true` on Ohio's bar; `Bar` did not declare the field and this function did
+   * not read it, so **Ohio carried no mark in a chart built to show Ohio's position** and a reader
+   * had to find it by reading the category names — which is the work the chart was drawn to save.
+   *
+   * Colour is one channel and never the only one, the rule the print stylesheet applies to every
+   * ground-encoded mark on the site. So the fill takes the contrasting half of the validated pair
+   * *and* the category name is drawn in primary ink at 600 rather than in secondary at normal
+   * weight. Weight survives a monochrome print and a forced-colours mode, which is the point.
+   *
+   * In signed mode the fill already carries polarity — a deficit against a surplus — and a hue
+   * cannot mean two things at once, so there the subject bar keeps the label channel alone. Only
+   * one chart in the build is signed and none of its bars is a subject.
+   */
+  const marked = bars.filter((b) => b.current);
+  const plain = bars.filter((b) => !b.current);
+
   return {
     options: {
       width: WIDTH,
@@ -188,7 +208,15 @@ export function barSpec(bars: Bar[], options: { max?: number } = {}): Spec {
           ...(signed
             ? { x1: 0, x2: (b: Bar) => b.value }
             : { x: (b: Bar) => Math.abs(b.value) }),
-          fill: signed ? (b: Bar) => (b.value < 0 ? SERIES.guarantee : SERIES.formula) : SERIES.formula,
+          // A constant where the chart has no subject, and not merely as an optimisation: Plot
+          // hoists a constant fill onto the group and pushes a channel down onto each rect, so a
+          // function here would move where the colour lives on every one of the nine charts built
+          // on this spec — including the two the theme tests read `.bar-fill`'s computed fill from.
+          fill: signed
+            ? (b: Bar) => (b.value < 0 ? SERIES.guarantee : SERIES.formula)
+            : marked.length > 0
+              ? (b: Bar) => (b.current ? SERIES.guarantee : SERIES.formula)
+              : SERIES.formula,
           className: "bar-fill",
           // Rounded at the data end, square at the baseline: the bar grows from the axis and
           // rounding that end would detach it from the thing it is measured against. Not in
@@ -196,7 +224,7 @@ export function barSpec(bars: Bar[], options: { max?: number } = {}): Spec {
           ...(signed ? {} : { rx2: 4 }),
         }),
         ...(signed ? [Plot.ruleX([0], { stroke: INK.rule })] : []),
-        Plot.text(bars, {
+        Plot.text(plain, {
           y: "label",
           frameAnchor: "left",
           dx: -10,
@@ -205,6 +233,23 @@ export function barSpec(bars: Bar[], options: { max?: number } = {}): Spec {
           fill: INK.secondary,
           className: "bar-label",
         }),
+        // The second channel. Split into its own mark because `fill` and `fontWeight` are
+        // constants in Plot rather than channels; text is not in the hover selector, so unlike the
+        // fill above these may be split without reordering anything the tooltips index into.
+        ...(marked.length > 0
+          ? [
+              Plot.text(marked, {
+                y: "label",
+                frameAnchor: "left",
+                dx: -10,
+                text: "label",
+                textAnchor: "end",
+                fill: INK.primary,
+                fontWeight: 600,
+                className: "bar-label current",
+              }),
+            ]
+          : []),
         // `dx` and `textAnchor` are constants in Plot rather than channels, so a chart with bars
         // on both sides of zero needs one text mark per direction. Text is not in the hover
         // selector, so unlike the fill above these may be split.
@@ -304,6 +349,20 @@ export function scatterSpec(
      * site are computed in `crates/` with a checkpoint behind them.
      */
     identity?: { label: string };
+    /**
+     * Draw the x axis on this domain instead of on the points' own range.
+     *
+     * For a **small multiple**: two clouds a card asks a reader to compare across. The spending
+     * pair on `/outcomes` is drawn from the same numerator over two denominators, and its own
+     * prose says the bands "separate on the horizontal axis too" — a statement about horizontal
+     * distance. Fitted to their own ranges those two axes differed by **1.64×**, so part of the
+     * separation the sentence points at was the scale rather than the data.
+     *
+     * The y axis needs no equivalent: it is already shared wherever it matters, because the two
+     * charts plot the same measure and their ranges coincide. This exists for the axis where the
+     * two denominators genuinely differ, which is the one a reader must not read as data.
+     */
+    xDomain?: [number, number];
   } = {},
 ): Spec | null {
   // Two points are not a cloud. Same rule as the line forms, for the same reason: a scatter of
@@ -314,8 +373,8 @@ export function scatterSpec(
   const ys = points.map((p) => p.y);
   const pad = (lo: number, hi: number) => (hi - lo) * 0.04 || Math.abs(hi) * 0.02 || 1;
   const both = options.identity != null;
-  const xMin = both ? Math.min(...xs, ...ys) : Math.min(...xs);
-  const xMax = both ? Math.max(...xs, ...ys) : Math.max(...xs);
+  const xMin = both ? Math.min(...xs, ...ys) : (options.xDomain?.[0] ?? Math.min(...xs));
+  const xMax = both ? Math.max(...xs, ...ys) : (options.xDomain?.[1] ?? Math.max(...xs));
   const yMin = both ? xMin : Math.min(...ys);
   const yMax = both ? xMax : Math.max(...ys);
   const xPad = pad(xMin, xMax);
@@ -349,7 +408,20 @@ export function scatterSpec(
    * fold, which is where a comparison goes to die.
    */
   const marginLeft = 62;
-  const marginRight = traces.length > 0 ? 24 + Math.max(...traces.map((t) => t.label.length)) * 7.2 : 24;
+  /*
+   * Sized to the labels that are actually drawn, which is not every trace.
+   *
+   * A banded trace carries its identity in the legend and this function deliberately draws no end
+   * label for it — see the trace marks below. The gutter was sized off `traces` all the same, so
+   * both banded scatters on `/outcomes` gave up **22% of a 640px frame** to labels that were never
+   * rendered: three bands whose longest name is "least poor third", 139px of white space beside a
+   * cloud that had been squeezed to make room for it.
+   */
+  const labelledTraces = traces.filter((t) => t.band == null);
+  const marginRight =
+    labelledTraces.length > 0
+      ? 24 + Math.max(...labelledTraces.map((t) => t.label.length)) * 7.2
+      : 24;
   const marginTop = 28;
   const marginBottom = 40;
 
@@ -773,7 +845,26 @@ export function distributionSpec(
 
   const dots = options.dots ?? values.length <= DOTS_UP_TO;
   const box = values.length >= BOX_FROM;
-  const height = 46;
+  /*
+   * A signed distribution states where zero is, on the same terms `histogramSpec` does.
+   *
+   * Five of the six strips on `/districts` measure a quantity that cannot be negative — aid,
+   * valuation, a poverty share — and for those the left edge is the smallest value and nothing is
+   * being crossed. The sixth is enrollment change, the site's one signed distribution, and it drew
+   * no zero: a dot two thirds along could have been a district that grew or one that shrank, and
+   * the strip carried nothing to say which. `histogramSpec` draws a dashed rule at zero and labels
+   * it "no change" for exactly that reason, and gives a bin straddling it a neutral fill.
+   *
+   * Detected from the domain rather than passed in, so it appears wherever the condition holds and
+   * cannot be forgotten at a call site. The rule is dashed and in muted ink: it is a reference, not
+   * a value, and must not be confused with the marker rule, which is solid, hued and full height.
+   */
+  const min0 = sorted[0]!.value;
+  const max0 = sorted[sorted.length - 1]!.value;
+  const crossesZero = min0 < 0 && max0 > 0;
+  // Room under the strip for the label, and only where there is a label — the five unsigned strips
+  // keep their exact geometry, which is what the six of them being one row apart depends on.
+  const height = crossesZero ? 64 : 46;
   const mid = 0;
   const outliers = dots ? [] : sorted.filter((v) => v.value < whiskerLow || v.value > whiskerHigh);
   // Five lanes, so a run of equal values is countable rather than one mark. Deterministic: this
@@ -788,10 +879,26 @@ export function distributionSpec(
       marginLeft: 2,
       marginRight: 2,
       marginTop: 4,
-      marginBottom: 4,
+      marginBottom: crossesZero ? 22 : 4,
       x: { axis: null, domain: [min - pad, max + pad] },
       y: { axis: null, domain: [-19, 19] },
       marks: [
+        // Under everything, because it is what the dots are read against rather than a mark
+        // among them.
+        ...(crossesZero
+          ? [
+              Plot.ruleX([0], { stroke: INK.muted, strokeDasharray: "3 3" }),
+              Plot.text([0], {
+                x: 0,
+                frameAnchor: "bottom",
+                dy: 15,
+                text: () => "no change",
+                fill: INK.muted,
+                fontSize: 11,
+              }),
+            ]
+          : []),
+
         // The whisker, drawn first and thin: it is the range, not the mass.
         Plot.ruleY([mid], {
           x1: whiskerLow,
@@ -971,10 +1078,22 @@ export function fanSpec(
   // twice.
   if (points.length < 2) return null;
   const references = points.map((p) => p.reference).filter((v): v is number => v != null);
+  // Every year or none. A reference line drawn across a partial series would bridge the years it
+  // has no value for, which is the same claim `seriesSpec` refuses to make about a missing year.
   const hasReference = references.length === points.length;
 
-  let min = Math.min(...points.map((p) => p.low), ...references);
-  let max = Math.max(...points.map((p) => p.high), ...references);
+  /*
+   * The domain fits the marks that are drawn, and the reference is one of those only when it is
+   * drawn in full.
+   *
+   * It was folded in unconditionally, so a series carrying references for *some* years stretched
+   * its y axis to contain values that never reached the frame — and this axis is truncated to the
+   * band's own range precisely because the band is narrow. Padding it out for an invisible value
+   * flattens the one thing the chart is for.
+   */
+  const inDomain = hasReference ? references : [];
+  let min = Math.min(...points.map((p) => p.low), ...inDomain);
+  let max = Math.max(...points.map((p) => p.high), ...inDomain);
   const pad = (max - min) * 0.12 || Math.abs(max) * 0.02 || 1;
   min -= pad;
   max += pad;
@@ -1138,6 +1257,27 @@ export function fanSpec(
 }
 
 /**
+ * The truncated domain a line form draws on: the values' range, padded, never zero-based.
+ *
+ * Exported because the annotation that states it — *"axis starts at $1.24B, not zero"* — is the
+ * only mark on the chart that says how far from zero the frame begins, and it is rendered with the
+ * **caller's** format. A format with too few places for its own axis start does not merely round:
+ * it understates the truncation, which is the specific way this annotation can be worse than
+ * absent. `$1bn` for an axis starting at $1.24bn understated it by a fifth on the appropriations
+ * chart, in an invented unit that appears nowhere else on the site.
+ *
+ * A caller cannot check that against a number this function used to keep to itself, so it does not
+ * keep it: `appropriations.spec.ts` asserts the annotation round-trips to within a percent of what
+ * it annotates.
+ */
+export function truncatedDomain(values: number[]): [number, number] {
+  const low = Math.min(...values);
+  const high = Math.max(...values);
+  const pad = (high - low) * 0.12 || Math.abs(high) * 0.02 || 1;
+  return [low - pad, high + pad];
+}
+
+/**
  * Two quantities in the same units, over years.
  *
  * The fourth form, and the one the historical view needed: a fan chart draws an interval and a
@@ -1168,11 +1308,7 @@ export function seriesSpec(
   const values = points.flatMap((p) => [p.a, p.b]).filter((v): v is number => v != null);
   if (values.length === 0) return null;
 
-  let min = Math.min(...values);
-  let max = Math.max(...values);
-  const pad = (max - min) * 0.12 || Math.abs(max) * 0.02 || 1;
-  min -= pad;
-  max += pad;
+  const [min, max] = truncatedDomain(values);
 
   const first = points[0]!;
   const last = points[points.length - 1]!;

@@ -9,7 +9,8 @@
 
 import { expect, test } from "vitest";
 
-import { fromActs, fromCatalog, growth, inBase, renderAppropriations } from "../../src/lib/appropriations.ts";
+import { BILLIONS, fromActs, fromCatalog, growth, inBase, renderAppropriations } from "../../src/lib/appropriations.ts";
+import { truncatedDomain } from "../../src/lib/plot/spec.ts";
 import { loadFeed } from "../../src/lib/feed.ts";
 import { baseYear } from "../../src/lib/real.ts";
 
@@ -105,4 +106,29 @@ test("the card names which publication answers for the four borrowed years", () 
 test("the card refuses to render a real view with no base year", () => {
   expect(renderAppropriations(rows, null, null, "real")).toBe("");
   expect(renderAppropriations([], bundle.deflator, base, "nominal")).toBe("");
+});
+
+test("the truncated-axis annotation does not understate the truncation", () => {
+  /*
+   * The chart's y axis does not start at zero, and the only thing on the chart that says so is one
+   * line of text rendered with the card's own dollar format. So the format has to resolve the
+   * number it is annotating.
+   *
+   * It did not. The card wrote billions as `$15bn` — zero decimal places, and a unit that appears
+   * nowhere else on this site, where `millions()` writes `$7.28B`. Applied to an axis starting at
+   * $1.24bn that produced *"axis starts at $1bn, not zero"*, understating the truncation by a
+   * fifth. An annotation that misstates the thing it exists to disclose is worse than one that is
+   * missing, because a reader who reads it stops looking.
+   *
+   * Checked by parsing the annotation back, which is what a reader does with it.
+   */
+  const values = rows.flatMap((r) => [r.enacted, r.foundation_funding]);
+  const [min] = truncatedDomain(values);
+
+  const annotation = BILLIONS(min);
+  const parsed = Number(annotation.replace(/[$,BM]/g, "")) * (annotation.endsWith("B") ? 1e9 : 1e6);
+  expect(Math.abs(parsed / min - 1)).toBeLessThan(0.01);
+
+  // And it is the site's unit, not one of the card's own.
+  expect(annotation).toMatch(/^\$[\d,]+\.\d{1,2}[BM]$/);
 });
