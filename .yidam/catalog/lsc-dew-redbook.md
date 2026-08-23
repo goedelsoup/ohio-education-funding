@@ -35,9 +35,15 @@ It also corroborates, in prose, a claim this corpus first reached by noticing an
 no dollar figure, which is how the rates were identified as **measured** rather than chosen; the
 redbook says the same thing directly.
 
-**What it is not.** Not the enacted appropriations. Whether $153,976,832 survived conference needs
-the appropriations document, which is not wired. Not a series either — this is one biennium, and
-the continuous appropriation-line record `lsc-budget` exists for is still ahead of it.
+**What it is not.** Not the enacted appropriations — for those, read the **greenbook** at
+[`lsc-hb96-analysis`](lsc-hb96-analysis.md), committed as
+[`dew-greenbook.txt`](../../crates/project/fixtures/dew-greenbook.txt). It is the same document as
+enacted: same structure, same five-line foundation aid table, columns headed `Appropriation` where
+these are headed `Introduced`. $153,976,832 did survive conference, and so did every earmark beside
+it — but the foundation aid amounts did not, and Fund 7017 alone came out $97,638,202 above the
+proposal. **Quote an amount from here only as a proposal, and only when the greenbook cannot answer
+the question.** Not a series either — this is one biennium, and the continuous appropriation-line
+record `lsc-budget` exists for is still ahead of it.
 
 **How it is read.** `connect::cache::pdf_text`, which shells out to `pdftotext`. That is a weaker
 dependency than the `curl` the rest of retrieval uses — poppler does not ship with macOS or

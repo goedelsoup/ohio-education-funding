@@ -16,10 +16,11 @@ source for the pre-2000 record where department files do not reach.
 
 **Access constraints.** Freely available. **The `lsc.ohio.gov` asset host does not present a
 valid TLS chain to standard fetching tools** — retrieval failed repeatedly during the first
-extraction phase, and the enacted-Greenbook figures below could not be taken from it directly.
-Any pipeline built on this source must handle that, and until it does, figures attributable to
-LSC in this corpus rest on secondary reporting and are tagged as inference rather than
-verified.
+extraction phase, and the enacted-Greenbook figures could not then be taken from it directly.
+That is handled now: `connect` retrieves the department's Greenbook as `hb96-edu-greenbook`,
+pins it in `source-digests.txt`, and commits the extract as
+[`dew-greenbook.txt`](../../crates/project/fixtures/dew-greenbook.txt), so enacted figures drawn
+from it are `[verified]` rather than inference.
 
 **Caveat — the most important one in the catalog.** LSC publishes at every stage of passage,
 and the versions differ materially. The House-passed *Budget in Brief* describes bridge-formula

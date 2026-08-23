@@ -52,9 +52,11 @@ indexed at `/budget/{ga}/main-operating-budget`, with
 All thirteen retrieve on a plain request.
 
 They are **greenbooks**, published *as enrolled*. That is the distinction that matters: the
-redbook wired here is *as introduced*, so its amounts are the executive proposal, and every corpus
-claim resting on it says so. A greenbook for H.B. 96 sits at a sibling URL to the redbook already
-in the registry.
+redbook wired here is *as introduced*, so its amounts are the executive proposal. The H.B. 96
+greenbook sat at a sibling URL to the redbook for four phases before anyone fetched it, and in the
+interval a corpus node published the proposal's foundation aid table as though it were the act.
+Both are registered now — `hb96-edu-redbook` and `hb96-edu-greenbook` — and a claim about an
+enacted amount belongs to the second.
 
 **Two variants per biennium, and only one of them carries the enacted figure.** This was
 established by wiring all eight workbooks and reading the result: the

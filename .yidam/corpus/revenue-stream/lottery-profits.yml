@@ -16,18 +16,23 @@ description: |
   paid **from**.
 
   It is visible in the appropriation table. Five line items collectively support state
-  foundation aid and scholarship payments, and one of them is the lottery: [verified]
+  foundation aid and scholarship payments, and one of them is the lottery — FY2026 **as
+  enacted**, each line net of its own specific earmarks, which is the basis on which the
+  Legislative Service Commission strikes the total: [verified —
+  [`dew-greenbook.txt`](../../../crates/project/fixtures/dew-greenbook.txt)]
 
-      GRF   ALI 200550  Foundation Funding — All Students
-      GRF   ALI 200502  Pupil Transportation
-      5VS0  ALI 200604  Foundation Funding
-      5YO0  ALI 200491  Public and Nonpublic Education Support
-      7017  ALI 200612  Foundation Funding — All Students     $1,338,945,000
+      GRF   ALI 200550  Foundation Funding — All Students      $8,318,925,549
+      GRF   ALI 200502  Pupil Transportation                      $703,348,806
+      5VS0  ALI 200604  Foundation Funding — All Students         $600,000,000
+      5YO0  ALI 200491  Public and Nonpublic Education Support    $171,200,000
+      7017  ALI 200612  Foundation Funding — All Students       $1,436,583,202
+                                           Total foundation aid $11,230,057,557
 
-  Fund 7017 is the Lottery Profits Education Fund. Its $1.34 billion is **inside** the $11.15
+  Fund 7017 is the Lottery Profits Education Fund. Its $1.44 billion is **inside** the $11.23
   billion FY2026 foundation aid total, not beside it. A district's foundation payment does not
   rise because the lottery had a good year; the General Assembly appropriates a total and the
-  lottery is one of the buckets it comes out of.
+  lottery is one of the buckets it comes out of. FY2027 runs the same way, at $1,398,174,884 of
+  $11,525,218,197. [verified]
 
   **Which is exactly what the constitutional text permits.** Article XV Section 6(A) requires
   the entire net proceeds to be "used solely for the support of elementary, secondary,
@@ -45,14 +50,32 @@ findings: |
   **The share, over thirty-eight years.** Lottery profits peaked at **16.9% of combined GRF and
   Lottery Profits Education Fund K-12 spending in FY1991**, fell to a record low of **7.6% in
   FY2007**, held around 8-9%, then rose with video lottery terminals at the racinos from FY2014
-  to **12.4% in FY2021**, projected 12.5% in FY2026 and 12.1% in FY2027. [verified] Over FY1988
-  to FY2025, total GRF-plus-lottery spending on primary and secondary education grew $9.48
-  billion, of which the lottery supplied **$1.12 billion — 11.8% of the growth.** [verified]
+  to **12.4% in FY2021**. [verified] Over FY1988 to FY2025, total GRF-plus-lottery spending on
+  primary and secondary education grew $9.48 billion, of which the lottery supplied **$1.12
+  billion — 11.8% of the growth.** [verified] LSC projects 12.5% in FY2026 and 12.1% in FY2027,
+  but that projection is the **executive recommendation** — it rests on lottery K-12 spending of
+  $1.65 billion in FY2026, and the enacted foundation aid line alone came in $97.6 million above
+  what was proposed. The two projected points are a proposal and the thirty-eight before them are
+  actuals, and no enacted restatement of the series exists: LSC publishes this chart in the
+  redbook and drops it from the greenbook. [open]
 
   Read that series against the belief the earmark was sold on and the gap is the finding: the
   lottery's share of school funding was highest thirty-five years ago and has never returned to
   it. What raised it after 2014 was not the lottery growing into its promise but a different
   form of gambling being routed through the same fund.
+
+  ### The substitution is legible in the passage from proposal to act
+
+  Between the redbook table and the greenbook table — the same five lines, the same year, the
+  bill as introduced against the bill as enacted — Fund 7017 rose **$97,638,202** while the other
+  four lines together **fell $15,575,916**, so the foundation aid total grew by $82,062,286,
+  which is less than the lottery line alone moved. [verified —
+  `crates/project/fixtures/dew-redbook.txt` against `dew-greenbook.txt`]
+
+  That is the mechanism caught in a single table across a single bill. It does not show intent —
+  the General Assembly was setting a total, and the four GRF and non-lottery lines move for their
+  own reasons — but it is the tightest instance available of the thing the substitution critique
+  describes: more lottery money in, and not the whole of it staying in. [inference]
 
   **What this does not establish.** Whether foundation aid would be lower in a world with no
   lottery — the counterfactual the substitution critique actually asserts. LSC's "combined with
@@ -81,10 +104,28 @@ properties:
     Not yet populated as a per-district series, and it cannot be: the fund is appropriated into
     foundation aid rather than distributed on its own formula, so there is no per-district lottery
     figure to hold. Statewide totals are in
-    [`dew-greenbook.txt`](../../../crates/project/fixtures/dew-greenbook.txt), which is the
-    analysis **as enacted** — FY2026 puts Fund 7017 at $1,436,583,202 of $11,230,057,557. The
-    redbook beside it carries the same table as *introduced* and was what this cited until the
-    two were compared. [verified]
+    [`dew-greenbook.txt`](../../../crates/project/fixtures/dew-greenbook.txt), the analysis **as
+    enacted**, whose columns are headed `Appropriation`. The redbook beside it carries the same
+    five lines under columns headed `Introduced`, and its amounts are the executive proposal.
+    [verified]
+revisions:
+  - was: |
+      Fund 7017 was published at **$1,338,945,000** of an **$11.15 billion** FY2026 foundation
+      aid total, marked `[verified]`.
+    now: |
+      Those are the **executive proposal**. As enacted the line is **$1,436,583,202** of
+      **$11,230,057,557**, and FY2027 is $1,398,174,884 of $11,525,218,197.
+    found_by: |
+      LSC's greenbook, `crates/project/fixtures/dew-greenbook.txt`, whose columns are headed
+      `Appropriation` where the redbook the figures came from heads its own `Introduced`.
+    reach: |
+      The correction sharpens the node's point rather than softening it: between the proposal
+      and the act the lottery line rose $97,638,202 while the other four fell $15,575,916, which
+      is the substitution argument inside a single table. It also marks a verification failure of
+      a particular kind — a redbook figure is a proposal, and marking one `[verified]` reads as
+      though the act had been checked. The same correction reached
+      [`casino-tax-distribution`](casino-tax-distribution.yml), which cites these figures for
+      comparison, before it reached the node they are about.
 links:
   - target: ../revenue-stream.ont.yml
     relationship: instance-of
