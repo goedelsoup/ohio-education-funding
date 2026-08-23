@@ -82,10 +82,18 @@ findings: |
 
   **The combined-base hypothesis is disconfirmed.** If the floor were applied to a combined
   Class 1 and Class 2 base rather than to Class 1 alone, the value-weighted real property rate
-  for these districts would pin at 20 mills. It does not: across the fourteen it runs from
-  19.719 to 21.562, and only two land within a hundredth of 20. Statewide the same measure puts
-  76 of 609 districts at 20.00 against 155 on the Class 1 rate, so the Class 1 figure is the
-  one the floor governs. [verified — TY2024 Table SD-1]
+  for these districts would pin at 20 mills. It does not: on TY2024 it runs from 19.719 to
+  21.562 across the fourteen, and three of them land within a hundredth of 20. Statewide the
+  same measure puts **62 of 611** districts at 20.00 against **155** on the Class 1 rate, so
+  the Class 1 figure is the one the floor governs. [verified — TY2024 Table SD-1, all four
+  counts from the same year]
+
+  The TY2023 column of the same table says 76 of 611 on the combined measure against 172 on
+  Class 1, with one of the fourteen within a hundredth of 20. Both years disconfirm the
+  hypothesis and neither is the other, which is the reason for naming the year on every count:
+  this paragraph previously carried the combined-base count from TY2023 beside the Class 1
+  count from TY2024 under a single TY2024 citation, over a denominator of 609 that belongs to
+  the FY2027 funding model rather than to Table SD-1's 611 districts.
 
   R.C. 319.301 never says "twenty mills". It says **two per cent of the taxable value** of the
   class, and **two-tenths of one per cent** for joint vocational districts. Those are the 20

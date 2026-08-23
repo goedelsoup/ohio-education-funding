@@ -42,11 +42,17 @@ findings: |
   population. [verified — [Census block geography](../../catalog/census-block-geography.md),
   joined to the funding model through the [NCES CCD
   directory](../../catalog/nces-ccd-lea-directory.md), carried in
-  `crates/project/src/house_district.rs`]
+  `crates/project/src/legislative_district.rs`]
 
-  Every figure that produces is an **estimate**, and the corpus holds it as one. The single
-  exact property is conservation: each school district's shares sum to one, so the 99 House
-  districts sum to the statewide total to the cent. [verified] What the estimate supports is
+  Every figure that produces is an **estimate**, and the corpus holds it as one. Conservation
+  is exact in the arithmetic and not in the published figures: each school district's shares
+  sum to one, so the apportionment loses no dollar by construction — but the feed carries each
+  seat's total as a rounded dollar figure, and summing 99 of them accumulates. On the committed
+  feed the House seats total $7,281,227,593.71 and the Senate seats $7,281,227,592.75 against a
+  statewide `realized_aid_total` of $7,281,227,591.65: **the two chambers disagree by $0.97 and
+  each sits $1-2 above the statewide figure.** [verified — `web/public/data/bundle.json`] Read
+  the conservation as a property of the method, not as a check a consumer can run to the cent.
+  What the estimate supports is
   scale and comparison — how much of Ohio's school money runs through the schools a member
   represents, and how many of those districts are on the guarantee. What it cannot support is
   any statement about a district's entitlement, which is exact and belongs to the district.

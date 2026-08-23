@@ -439,8 +439,13 @@ pub struct HouseDistrictMember {
 /// 2020 census.
 ///
 /// The one guarantee is that the split is exact in aggregate: each school district's shares sum to
-/// one, so the 99 House districts sum to the statewide total to the cent. Everything else about a
-/// House district figure is an estimate, and any page showing one has to say so.
+/// one, so the apportionment loses no dollar. That is a property of the arithmetic and not of the
+/// serialized figures — each seat's total is rounded to the cent before it is written, and summing
+/// 99 of them accumulates. On the committed feed the House seats total $7,281,227,593.71 and the
+/// Senate seats $7,281,227,592.75 against a statewide `realized_aid_total` of $7,281,227,591.65:
+/// the two chambers disagree by $0.97 and each sits $1-2 above the statewide figure. Do not write
+/// a consumer that reconciles them to the cent. Everything else about a House district figure is
+/// an estimate, and any page showing one has to say so.
 #[derive(Debug, Clone, PartialEq)]
 pub struct HouseDistrict {
     /// `001` through `099`.
@@ -557,8 +562,10 @@ pub struct Transportation {
 ///
 /// A flat $4,000 a pupil whatever the category — 69% of the program, and not reduced by the state
 /// share — plus the six school-age weights at half, all prorated. The proration is the point: the
-/// sheet carries its appropriation limit beside the factor, and at the stated factor the program
-/// runs $908,184 over it.
+/// sheet carries a limit beside the factor, and at the stated factor the program runs $908,184
+/// over *that cell*. The cell is the FY2025 estimate; the FY2027 appropriation is $153,976,832,
+/// which the program is $5,568,648 under. See
+/// [`project::panel::supplements::PREK_SPED_APPROPRIATION`].
 #[derive(Debug, Clone, Copy, PartialEq, Default)]
 pub struct PreschoolSpecialEducation {
     /// ADM in each category, 1 through 6.

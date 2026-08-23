@@ -21,8 +21,8 @@ description: |
   **The denominator here is a headcount, and its sibling's is not.** DEW's report card
   publishes [expenditure per equivalent pupil](expenditure-per-equivalent-pupil.yml), which
   divides by an ADM count weighted upward for disadvantage, English learners, and disability.
-  That measure runs about 22% lower at the median — $12,856 for 2024-2025 against $15,646 here
-  for FY2024 — and it is the one sitting next to the Performance Index on the same report card,
+  That measure runs about **17.8% lower** at the median — $12,856 for 2024-2025 against $15,646
+  here for FY2024 — and it is the one sitting next to the Performance Index on the same report card,
   so it is the one an Ohio spending-versus-results argument will reach for. The two are not
   interchangeable in either direction, and the difference is not cosmetic: a need-weighted
   denominator is a need adjustment that suppresses exactly the gradient this metric exposes.
@@ -92,9 +92,10 @@ findings: |
 
   `exp_per_equivalent_pupil_federal` and its state-and-local twin have been in the committed
   fixture since the report card was first extracted and reached no consumer. They are complete
-  for all 606 districts and add to the whole to within a rounding. [verified]
+  for all 607 districts and add to the whole to within a rounding — the largest disagreement in
+  the fixture is $1. [verified]
 
-  **Federal money is a median 4.21% of a district's operating spending, and 29.04% at the
+  **Federal money is a median 4.20% of a district's operating spending, and 29.04% at the
   top.** 49 districts are above a tenth; Alexander Local in Athens County is the most exposed,
   at $3,280 of $11,294 per equivalent pupil. The floor is 0.7%. [verified — 2024-25 report
   card, computed in `crates/bundle`]
@@ -120,7 +121,7 @@ revisions:
   - was: |
       The figure was carried as a single per-pupil total, with no source split.
     now: |
-      `exp_per_equivalent_pupil_federal` and its state-and-local twin are complete for all 606
+      `exp_per_equivalent_pupil_federal` and its state-and-local twin are complete for all 607
       districts and add to the whole to within a rounding. [verified]
     found_by: |
       The committed report-card fixture, which has held both columns since the report card was

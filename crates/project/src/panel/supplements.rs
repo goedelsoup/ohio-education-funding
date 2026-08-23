@@ -384,19 +384,22 @@ impl Transportation {
 /// $52.9m and 10,842 Category 2 pupils draw $50.6m, which is far closer to parity than school-age
 /// special education's 15%-of-pupils-48%-of-money.
 ///
-/// # The proration no longer fits the appropriation it was set against
+/// # The proration factor and the limit beside it were carried over together
 ///
-/// The sheet carries its **appropriation limit of $147,500,000** in a cell beside the factor,
-/// which makes this the clearest statement in the whole workbook of what a proration is: a budget
-/// divided by an entitlement. At the stated factor of 0.96854448 the program totals
-/// **$148,408,184** — **$908,184 over the limit**. The factor that would reach it is 0.96261747.
+/// The sheet carries a **limit of $147,500,000** in a cell beside the factor, which makes this the
+/// clearest statement in the whole workbook of what a proration is: a budget divided by an
+/// entitlement. At the stated factor of 0.96854448 the program totals **$148,408,184** —
+/// **$908,184 over that cell**. The factor that would reach it is 0.96261747.
+///
+/// **But the cell is not the FY2027 appropriation.** $147,500,000 is the FY2025 estimate; the
+/// enacted act's FY2026 and FY2027 remainder for this program is $153,976,832, which the program
+/// is $5,568,648 *under*. See `tests/the_appropriation_behind_the_proration.rs`. So no proration
+/// arises on the year being modelled, and the factor and the limit were carried over from the
+/// prior biennium together. A published proration factor is not evidence that a proration applied.
 ///
 /// A third cell on the same sheet states $146,708,228.07, matching neither the column above it nor
-/// the cap. The likeliest reading is that the factor was calibrated against an earlier ADM vintage
-/// and the counts were refreshed without recalibrating it. This is a projection published before
-/// the fiscal year rather than an actual, so recalibration before payment is expected — but as
-/// published the three figures are mutually inconsistent, and that is worth recording rather than
-/// smoothing over.
+/// either limit. As published the figures on this sheet are mutually inconsistent, and that is
+/// worth recording rather than smoothing over.
 #[derive(Debug, Clone, Copy, PartialEq, Default)]
 pub struct PreschoolSpecialEducation {
     /// ADM in each category, 1 through 6 — the same categories as school age.
@@ -413,8 +416,18 @@ pub const PREK_SPED_FLAT_PER_PUPIL: Dollars = 4000.0;
 pub const PREK_SPED_WEIGHT_FRACTION: f64 = 0.5;
 /// The stated factor, and the appropriation it was calibrated against.
 pub const PREK_SPED_PRORATION: f64 = 0.968_544_48;
-/// A limit the program now exceeds by $908,184.
+/// The limit the sheet prints beside the factor, which the program exceeds by $908,184.
+///
+/// **This is the FY2025 estimate, not the FY2027 appropriation.** The enacted FY2026 and FY2027
+/// figure is $153,976,832 — see [`PREK_SPED_APPROPRIATION_FY27`] — and the program is $5,568,648
+/// under it, so no proration arises. Kept because it is what the workbook states and what the
+/// factor was set against.
 pub const PREK_SPED_APPROPRIATION: Dollars = 147_500_000.0;
+/// The enacted FY2026 and FY2027 remainder for preschool special education.
+///
+/// From the act's LSC analysis rather than the calculator, which never prints it. The program at
+/// the stated factor totals $148,408,184 against this, $5,568,648 under.
+pub const PREK_SPED_APPROPRIATION_FY27: Dollars = 153_976_832.0;
 
 impl PreschoolSpecialEducation {
     /// Pupils across all six categories.

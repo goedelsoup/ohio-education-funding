@@ -28,13 +28,20 @@ description: |
   parameters. A table of Ohio's special education weights describes neither program, because what
   the weights do depends entirely on what sits beside them. [inference]
 
-  ### Its proration has stopped fitting
+  ### Its proration factor and the limit beside it are both carried over
 
-  This sheet carries its **appropriation limit** — 
-  $147,500,000 — in a cell beside the factor, which is the only place in the calculator that shows
-  a proration's two halves at once. At the stated 0.96854448 the program totals **$148,408,184**,
-  $908,184 over. A third cell states $146,708,228.07, matching neither. See [appropriation
-  proration factor](../parameter/appropriation-proration-factor.yml). [verified]
+  This sheet carries an **appropriation limit** — $147,500,000 — in a cell beside the factor,
+  which is the only place in the calculator that shows a proration's two halves at once. At the
+  stated 0.96854448 the program totals **$148,408,184**, which is $908,184 over *that* cell.
+  [verified]
+
+  **The cell is stale, and no proration arises.** $147,500,000 is the **FY2025** estimate. The
+  enacted act's FY2026 and FY2027 remainder for preschool special education is **$153,976,832**,
+  against which $148,408,184 is **$5,568,648 under**. The factor and the limit were carried over
+  together from the prior biennium, so a published proration factor is not evidence that a
+  proration applied. A third cell states $146,708,228.07, matching neither. See [appropriation
+  proration factor](../parameter/appropriation-proration-factor.yml), which holds the full
+  account. [verified — the enacted act's LSC analysis]
 properties:
   name: Preschool special education
   function: |
@@ -45,7 +52,8 @@ properties:
 
     weights = the six school-age weights, [0.2435, 0.6179, 1.4845, 1.9812, 2.6830, 3.9554]
     average base cost per pupil, FY2027 = $8,241.61
-    proration = 0.96854448, against a stated appropriation of $147,500,000
+    proration = 0.96854448, stated beside a $147,500,000 cell that is the FY2025 estimate;
+                the FY2027 appropriation is $153,976,832 and the program does not reach it
 
     Reported in [R] Total State Support and not in [N], so no guarantee holds it.
   statutory_basis: |
@@ -76,3 +84,21 @@ links:
     relationship: governed-by
   - target: ../../catalog/dew-fy27-funding-calculator.md
     relationship: sourced-from
+revisions:
+  - was: |
+      At the stated 0.96854448 the program totals $148,408,184 against its own $147,500,000
+      limit — $908,184 over — so the program is prorated.
+    now: |
+      $147,500,000 is the **FY2025** estimate. FY2026 and FY2027 are both $153,976,832, against
+      which $148,408,184 is **$5,568,648 under**, and no proration arises. The factor and the
+      limit beside it were carried over together from the prior biennium.
+    found_by: |
+      The correction was made in [appropriation proration
+      factor](../parameter/appropriation-proration-factor.yml) from the enacted act's LSC
+      analysis, and this node went on republishing the withdrawn reading as `[verified]` with no
+      `revisions:` block of its own.
+    reach: |
+      The mechanism this node describes is unaffected — the flat grant, the halving and the six
+      weights are all statutory. What changes is the claim that the appropriation binds: it does
+      not, on the year being modelled. A withdrawal recorded in one node does not reach a second
+      node that repeats the claim, which is the defect worth naming rather than the figure.
