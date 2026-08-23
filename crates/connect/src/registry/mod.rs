@@ -2,14 +2,14 @@
 //! got.
 //!
 //! Nine connectors were approved in
-//! [`decisions/proposals.yml`](../../../.yidam/decisions/proposals.yml). For a long time all
+//! [`decisions/proposals.yml`](../../../../.yidam/decisions/proposals.yml). For a long time all
 //! nine were directories holding a README describing an interface that did not exist. This
 //! module replaces that with a registry that runs: each connector declares its sources and its
 //! [`Status`], and the status is checkable rather than aspirational — a `Wired` connector has a
 //! parser and a committed fixture, and a `Declared` one says what it is blocked on.
 //!
 //! The prose describing what each connector is *for* did not deserve to be thrown away with
-//! the stubs; it lives in [`crates/connect/sources/`](../sources/) and is linked from here.
+//! the stubs; it lives in [`crates/connect/sources/`](../../sources/) and is linked from here.
 //!
 //! # Status is a claim, and the CLI checks it
 //!
@@ -140,7 +140,7 @@ pub struct Source {
     pub filename: &'static str,
     /// What kind of file it is.
     pub format: Format,
-    /// Slug of the [`.yidam/catalog/`](../../../.yidam/catalog/) node describing what this
+    /// Slug of the [`.yidam/catalog/`](../../../../.yidam/catalog/) node describing what this
     /// source is and what it can be trusted for.
     ///
     /// Provenance attaches to the artifact, not to the connector: `dew-foundation` retrieves

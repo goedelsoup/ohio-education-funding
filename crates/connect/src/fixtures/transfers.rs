@@ -71,7 +71,7 @@ pub struct AuditReport<'a> {
 /// # Why a recital rather than the order
 ///
 /// Three Ohio school districts stopped existing inside the window
-/// [`dispersion::lea_directory`](../../dispersion/src/lea_directory.rs) holds, and the federal
+/// [`dispersion::lea_directory`](../../../dispersion/src/lea_directory.rs) holds, and the federal
 /// agency directory files all three as closed *"with no effect on another agency's boundaries"*,
 /// which is false. R.C. 3311.22 puts the order in an educational service center governing board's
 /// minute book, and those are not published: one sits behind a vendor firewall, another begins its

@@ -31,7 +31,7 @@ Return both figures for any agency-year where both are computable, not just the 
 ## Status
 
 **FSFP side implemented** in [`crates/local-capacity/`](../../crates/local-capacity/src/lib.rs).
-16 tests.
+23 tests.
 
 Six tests reproduce the department's published worked example line by line — capacity
 valuation, capacity gross income, all three per-pupil terms, the income ratio, the sliding

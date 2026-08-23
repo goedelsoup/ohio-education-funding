@@ -1,6 +1,6 @@
 //! The deflator's index points, checked against the Bureau of Labor Statistics.
 //!
-//! [`deflate`](../../deflate/) marks every point of its CPI-U June series
+//! [`deflator`](../../deflator/) marks every point of its CPI-U June series
 //! [`Confidence::Verified`](deflator::Confidence::Verified). That is a claim about the outside
 //! world, and this is what makes it checkable: the committed extract in
 //! `crates/connect/fixtures/cpi-u-june.tsv` is the Bureau's own published rows for

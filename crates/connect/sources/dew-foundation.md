@@ -43,5 +43,5 @@ connector used to need is gone.
 The retrieval interface above was never built as written, and is left as the record of what was
 intended. What exists instead is narrower and concrete: `edfund-connect fetch`, a digest
 manifest pinning exactly which published file each fixture came from, and column maps in
-[`fixtures.rs`](../src/fixtures.rs) rather than record types. The per-payment-period revision
+[`fixtures/`](../src/fixtures/) rather than record types. The per-payment-period revision
 history the interface describes is real and still unretrieved.

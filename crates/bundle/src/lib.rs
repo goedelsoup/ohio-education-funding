@@ -53,6 +53,19 @@ use edfund_core::Dollars;
 /// must be dropped from an aggregate rather than added to it. The statewide totals are unchanged
 /// — they already excluded what was never reported, by adding zero.
 ///
+/// `37.0.0` added `casino`: nine fiscal years of the gross casino revenue county student fund, per
+/// district and statewide. Breaking rather than additive because of what it does to every other
+/// per-district figure in the feed — this is money the district receives that **no** figure above
+/// it counts, so a consumer that already presented `realized_aid_per_pupil` or a `finances` row as
+/// "what the state sends this district" was making a claim the feed can now contradict. The block
+/// carries no per-pupil figure on purpose: it is apportioned on a fifth pupil count, defined by
+/// R.C. 5753.11 and shared with nothing else here, so dividing it by any ADM in this feed produces
+/// a number that looks comparable and is not.
+///
+/// `36.0.0` added `drafts`, the provisions of each `draft-legislation` node — including the ones
+/// no lever can run, which travel with the rest so the count a cost must be read beside cannot be
+/// dropped between the fixture and the page.
+///
 /// `35.0.0` puts the three report-card shares on the same scale as every other share the bundle
 /// publishes. `outcome.economically_disadvantaged`, `outcome.english_learner` and
 /// `outcome.students_with_disabilities` were passed through as the report card writes them —
@@ -161,18 +174,6 @@ use edfund_core::Dollars;
 /// from FY2022-FY2024 to FY2024-FY2026 — the years the department's `ADM Data` sheet declares.
 /// The values did not change; what they are called did, which is exactly the kind of silent
 /// meaning change the version guard exists for.
-/// `37.0.0` added `casino`: nine fiscal years of the gross casino revenue county student fund, per
-/// district and statewide. Breaking rather than additive because of what it does to every other
-/// per-district figure in the feed — this is money the district receives that **no** figure above
-/// it counts, so a consumer that already presented `realized_aid_per_pupil` or a `finances` row as
-/// "what the state sends this district" was making a claim the feed can now contradict. The block
-/// carries no per-pupil figure on purpose: it is apportioned on a fifth pupil count, defined by
-/// R.C. 5753.11 and shared with nothing else here, so dividing it by any ADM in this feed produces
-/// a number that looks comparable and is not.
-///
-/// `36.0.0` added `drafts`, the provisions of each `draft-legislation` node — including the ones
-/// no lever can run, which travel with the rest so the count a cost must be read beside cannot be
-/// dropped between the fixture and the page.
 pub const CONTRACT_VERSION: &str = "38.0.0";
 
 mod model;
