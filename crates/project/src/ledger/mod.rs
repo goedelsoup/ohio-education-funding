@@ -28,7 +28,7 @@
 //! largest consumer and would depend on both halves. The binding that matters is *documentary*:
 //! `tests/the_statute_behind_the_weights.rs` asserts the statute text agrees with [`mod@crate::panel`]'s
 //! constants, and the appropriation figures those weights are prorated against live here, so a
-//! crate boundary would put the most valuable check in the suite across it. And this is 973 source
+//! crate boundary would put the most valuable check in the suite across it. And this is 1,102 source
 //! lines, where a crate buys ceremony rather than clarity.
 //!
 //! **Split it for real when either becomes true:** the ledger passes ~2,000 lines, or a second

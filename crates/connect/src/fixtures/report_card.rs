@@ -138,7 +138,7 @@ pub const FUNCTIONS_HEADER: &[&str] = &[
 /// `CLASSROOM_INSTRUCTION` = instruction + pupil support + instructional staff support, and
 /// `NONCLASSROOM` = the six administrative, plant, transport and food rows. The pair sums to
 /// operating expenditure per pupil, which
-/// [`crates/dispersion/tests/expenditure_functions_fy25.rs`](../../dispersion/tests/expenditure_functions_fy25.rs)
+/// [`crates/dispersion/tests/expenditure_functions_fy25.rs`](../../../dispersion/tests/expenditure_functions_fy25.rs)
 /// checks rather than assumes. Construction, debt and non-operating rows sit outside it and are
 /// deliberately not carried here.
 mod function_columns {

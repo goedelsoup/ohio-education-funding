@@ -41,7 +41,7 @@ pub type Mills = f64;
 ///
 /// A statutory parameter, set by each biennial budget rather than fixed in permanent law.
 /// It lives here rather than in a calculator because more than one calculator reads it and
-/// nothing about it is derived: [`local_capacity`](../local_capacity/) applies it, and
+/// nothing about it is derived: [`local-capacity`](../../local-capacity/) applies it, and
 /// `project`'s FY2027 panel names it as the floor its state-share column is censored at.
 pub const MINIMUM_STATE_SHARE_FY2022: Dollars = 0.05;
 
@@ -77,7 +77,7 @@ impl FiscalYear {
 
     /// The biennium label this fiscal year belongs to, given the biennium's first year.
     ///
-    /// Ohio biennia begin in odd-numbered fiscal years: FY2022-23, FY2024-25, FY2026-27.
+    /// Ohio biennia begin in even-numbered fiscal years: FY2022-23, FY2024-25, FY2026-27.
     #[must_use]
     pub const fn biennium_start(self) -> FiscalYear {
         if self.0.is_multiple_of(2) {

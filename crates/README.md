@@ -70,8 +70,11 @@ directory as the `//crates` subproject and shells out to the `cargo` that lives 
 
 Every directory here is now a real crate; the nine connector stubs were folded into
 [`connect`](connect/) and their
-prose kept at [`connect/sources/`](connect/sources/), where the four connectors approved since
-have not yet joined them.
+prose kept at [`connect/sources/`](connect/sources/). The registry has since grown to **21**
+connectors, and `sources/` still holds **11** long forms — for the other ten the decision record
+is the only account of why each exists. The count is not repeated here on purpose: it is checked
+by `registry::tests::every_connector_approved_in_the_ontology_is_present`, and the breakdown is
+generated into [`connect/README.md`](connect/README.md).
 
 **No external dependencies.** Every crate is pure `std` — including the XLSX reader, which
 means a zip reader, a DEFLATE decompressor, and an XML parser written here rather than pulled
@@ -81,11 +84,20 @@ dependency resolution succeeding first; and it means the *refresh* path keeps wo
 which matters more — an extraction pipeline that will not run is a corpus that cannot be
 updated.
 
-One system binary is used, named where it is used and not needed to build or compute: **curl**,
-for HTTPS. TLS is the one thing in this pipeline that should not be hand-written next to a
-DEFLATE decoder. LibreOffice was the second until [`spreadsheet`](spreadsheet/) learned to read
-the pre-2007 `.xls` format natively, so `rebuild` now regenerates every committed fixture from a
-checkout with no external converter.
+Two system binaries are used, named where they are used and needed by neither the build nor
+the computation. **curl**, for HTTPS: TLS is the one thing in this pipeline that should not be
+hand-written next to a DEFLATE decoder, and curl ships with macOS, Windows and every Linux
+distribution, so only the *refresh* path needs it. **pdftotext**, for the PDF sources — and that
+one is a weaker argument, because poppler ships with neither macOS nor Windows. Without it
+`rebuild` reports the PDF fixtures skipped and continues, so
+[`project/fixtures/appropriation-lines.csv`](project/fixtures/appropriation-lines.csv) is
+regenerated **2,083 rows short** — the whole of the greenbook era, FY1999-FY2011 — while the
+run still succeeds. See [`connect/src/cache.rs`](connect/src/cache.rs) for why that is the
+chosen behaviour rather than a hard failure.
+
+LibreOffice was a third until [`spreadsheet`](spreadsheet/) learned to read the pre-2007 `.xls`
+format natively, so `rebuild` now regenerates every committed spreadsheet fixture from a checkout
+with no external converter.
 
 | Crate | Kind | Status |
 |---|---|---|

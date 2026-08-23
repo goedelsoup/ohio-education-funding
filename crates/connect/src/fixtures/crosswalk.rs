@@ -97,7 +97,7 @@ pub struct Crosswalk<'a> {
 /// total. A district's pupils are what is being apportioned, and Ohio's under-18 share varies
 /// enough between blocks that the choice moves the answer. Shares sum to one per district and
 /// chamber, which is what lets
-/// [`project::legislative_district`](../../project/src/legislative_district.rs) apportion a
+/// [`project::legislative_district`](../../../project/src/legislative_district.rs) apportion a
 /// statewide total across seats without losing or inventing a dollar.
 ///
 /// # What is left out

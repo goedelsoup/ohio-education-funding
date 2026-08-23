@@ -438,7 +438,7 @@ pub struct National {
 ///
 /// The two do not reconcile and are not meant to. A funding formula figure and a revenue survey
 /// figure for the same district in the same year routinely disagree, which is exactly why the
-/// [catalog](../../.yidam/catalog/census-f33-school-system-finances.md) exists.
+/// [catalog](../../../../.yidam/catalog/census-f33-school-system-finances.md) exists.
 ///
 /// # Comparable only
 ///
@@ -579,7 +579,7 @@ pub struct AppropriationLine {
 /// department's operative test, and this is the longest run of that test available — seventeen
 /// years where the rest of the feed has six.
 ///
-/// [Disadvantaged pupil impact aid](../../.yidam/corpus/formula-component/fsfp-disadvantaged-pupil-impact-aid.yml)
+/// [Disadvantaged pupil impact aid](../../../../.yidam/corpus/formula-component/fsfp-disadvantaged-pupil-impact-aid.yml)
 /// is paid on that count, so this is the closest thing the feed carries to a history of what the
 /// formula's poverty weight is computed on.
 ///

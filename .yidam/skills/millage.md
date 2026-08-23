@@ -31,7 +31,7 @@ millage this calculator returns.
 
 ## Status
 
-**Implemented** in [`crates/millage/`](../../crates/millage/src/lib.rs). 13 tests.
+**Implemented** in [`crates/millage/`](../../crates/millage/src/lib.rs). 19 tests.
 
 The tests encode the mechanism rather than any particular district's numbers, because no
 per-district valuation series exists yet: doubling valuation halves effective millage and holds

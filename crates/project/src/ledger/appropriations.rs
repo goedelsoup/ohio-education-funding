@@ -32,11 +32,11 @@
 //!
 //! The workbooks and greenbooks carry an enacted figure for FY2002-FY2005, FY2008-FY2011 and
 //! FY2014-FY2027 — everything except two bienniums. Those two are the ones
-//! [`the-greenbook-series`](../../../.yidam/decisions/the-greenbook-series.yml) recorded as
+//! [`the-greenbook-series`](../../../../.yidam/decisions/the-greenbook-series.yml) recorded as
 //! unretrievable: **FY2006-07**, whose greenbook has no line-item table at all, and **FY2012-13**,
 //! whose two workbook variants LSC serves as the same file.
 //!
-//! The [Catalog of Budget Line Items](../../../.yidam/catalog/lsc-catalog-of-budget-line-items.md)
+//! The [Catalog of Budget Line Items](../../../../.yidam/catalog/lsc-catalog-of-budget-line-items.md)
 //! carries all four, and contributes **only** those four. With them the enacted series is
 //! continuous from FY2002 to FY2027 for the first time.
 //!

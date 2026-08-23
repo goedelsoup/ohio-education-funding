@@ -278,7 +278,7 @@ fn ccd_irn_map(directory: &str) -> Result<BTreeMap<String, String>, String> {
 /// figures for all 968 of them and a national position for only the 611 that have one. Leaving
 /// charters in the distribution put Ohio's 200 smallest agencies at an 8% local share, which is a
 /// fact about charter finance and not about school districts — see
-/// [`dispersion::national_peers`](../../dispersion/src/national_peers.rs).
+/// [`dispersion::national_peers`](../../../dispersion/src/national_peers.rs).
 ///
 /// A row also needs **enrolment and total revenue above zero**. The survey reports `-1` and `-2`
 /// for missing and not-applicable, and 190 agencies carry those in every money column; admitting

@@ -39,6 +39,6 @@ the recent end is a publisher's silence rather than a retrieval problem, and the
 eighteen is reconciled against itself before the fixture is written; fifteen also print the
 half-year they cover, which is checked against the payment month; and August 2015 is published
 twice in two layouts, which are checked against each other across 1,044 districts. See
-[`build_casino_extract`](../src/fixtures.rs). That property — an aggregate stated beside its parts
+[`build_casino_extract`](../src/fixtures/casino.rs). That property — an aggregate stated beside its parts
 — is the one worth looking for in any new source, and it is what a plausible figure in a rising
 series cannot substitute for.

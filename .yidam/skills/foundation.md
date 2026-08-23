@@ -32,7 +32,7 @@ counterfactual expressible: a scenario is this calculator invoked twice with two
 
 ## Status
 
-**Complete** in [`crates/foundation/`](../../crates/foundation/src/lib.rs). 43 tests.
+**Complete** in [`crates/foundation/`](../../crates/foundation/src/lib.rs). 47 tests.
 
 All five statutory sub-components and all 22 elements are implemented: teacher
 [3317.011(D)], student support [(E)], district leadership and accountability [(F)], building
