@@ -17,15 +17,57 @@
  */
 
 /**
- * The upper-middle value, or zero for an empty list.
+ * The median, by linear interpolation on rank — R's type 7, and `crates/dispersion::median`.
  *
- * Upper-middle rather than the mean of the two middles, which is what both copies did and what
- * every caller's prose says — "the median district" names a district, so the statistic has to be
- * a value one of them actually has.
+ * # Why this changed, and what it cost
+ *
+ * It used to take the **upper of the two middle observations**, with a reason written beside it:
+ * *"the median district" names a district, so the statistic has to be a value one of them actually
+ * has.* That reason is a real one, and it was wrong about which problem it was solving.
+ *
+ * Merging the two hand-rolled copies into one function fixed a drift *inside* this layer while
+ * leaving the larger one untouched. Eight `median_*` fields in `bundle.statewide` are computed by
+ * `crates/dispersion::median`, which interpolates; anything computed here did not. So `/statewide`
+ * said the median district is "$47 per pupil worse off" under the regime counterfactual while
+ * `/district/…/taxes` said "$45 worse" — one site, one phrase, two statistics, neither stale and
+ * neither a typo. Two definitions in one workspace is the exact defect the crate side already paid
+ * for, and a boundary between Rust and TypeScript does not make it a different defect.
+ *
+ * So: one definition, and it is the crates'. The prose pays the difference. A sentence naming a
+ * district as the bearer of an interpolated value — *"the median district here receives $X"* —
+ * is now written so it names the statistic instead, because on an even-length series the
+ * interpolated median belongs to nobody. That is three sentences of rewriting against eight
+ * published figures moving, and it keeps the authority where the rest of this file says it is.
+ *
+ * Not everything with "median" in its name should call this. `plot/spec.ts`'s box plot takes its
+ * quartiles by nearest rank, because a box is *drawn* at an observation and a description reading
+ * "median $X" beside a mark placed somewhere else is worse than either convention alone. That one
+ * is chart geometry describing itself; this one is a statistic the site publishes.
+ *
+ * Zero for an empty list, unlike the crate's `Option`. Every caller here interpolates the result
+ * into prose or a chart and has no branch for absence; `dispersion::median` returns `None` because
+ * on the crate side zero is a plausible dollar figure. The difference is deliberate and is the one
+ * place these two disagree.
  */
 export function median(values: number[]): number {
+  return percentile(values, 0.5);
+}
+
+/**
+ * The `q`th percentile by linear interpolation on rank `q * (n - 1)`, or zero for an empty list.
+ *
+ * `crates/dispersion::percentile_sorted`, sorting first. Exported because {@link median} is one
+ * value of `q` and having the general form named is what stops the next quantile from being
+ * hand-rolled at its call site, which is how this file's subject matter went wrong the first time.
+ */
+export function percentile(values: number[], q: number): number {
   const sorted = [...values].sort((a, b) => a - b);
-  return sorted.length === 0 ? 0 : sorted[Math.floor(sorted.length / 2)]!;
+  if (sorted.length === 0) return 0;
+  if (sorted.length === 1) return sorted[0]!;
+  const rank = q * (sorted.length - 1);
+  const lo = Math.floor(rank);
+  const hi = Math.ceil(rank);
+  return lo === hi ? sorted[lo]! : sorted[lo]! + (rank - lo) * (sorted[hi]! - sorted[lo]!);
 }
 
 /**

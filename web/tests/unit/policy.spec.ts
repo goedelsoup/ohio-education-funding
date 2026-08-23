@@ -197,18 +197,23 @@ test("a signed quantity and the word for its direction agree", () => {
   // /statewide read `−$47 per pupil better off`. The figure came from the feed and the word was
   // typed into the sentence, so nothing made the two agree; aligning `money()`'s minus with the
   // other formatters made the contradiction visible, and only the branch below removes it.
+  //
+  // The subject is "districts" and no longer "the median district". The quantity is
+  // `crates/dispersion::median`, which interpolates, so on an even-length series it is a figure no
+  // district holds — and naming one as its bearer was half of why this site carried two
+  // definitions of median at once. See `src/lib/stats.ts`.
   expect(renderRegimeDifference(-47.0217)).toBe(
-    "the median district is $47 per pupil worse off under the plan",
+    "districts are a median $47 per pupil worse off under the plan",
   );
   expect(renderRegimeDifference(289)).toBe(
-    "the median district is $289 per pupil better off under the plan",
+    "districts are a median $289 per pupil better off under the plan",
   );
   // A magnitude that rounds away loses its direction with it, the same rule `signedMoney` keeps.
   expect(renderRegimeDifference(-0.4)).toBe(
-    "the median district is neither better nor worse off under the plan",
+    "districts are neither better nor worse off under the plan at the median",
   );
   expect(renderRegimeDifference(0)).toBe(
-    "the median district is neither better nor worse off under the plan",
+    "districts are neither better nor worse off under the plan at the median",
   );
   // And the sentence the page actually renders. The amount is a magnitude and the direction is a
   // word, so a minus reaching the output means the two have come apart again — which is the

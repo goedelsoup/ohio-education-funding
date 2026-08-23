@@ -37,6 +37,7 @@ import { existsSync, readFileSync } from "node:fs";
 import { resolve } from "node:path";
 
 import { BundleSchema } from "./schema/feed.ts";
+import { median } from "./stats.ts";
 import { REQUIRED_CONTRACT, type Bundle, type District } from "./types.ts";
 import { isForecastVerified, isVerified, verify, type Verification } from "./verify.ts";
 
@@ -139,6 +140,22 @@ export interface TaxStatewide {
    * number the feed already carries. It was the literal `$793m`.
    */
   deferredChargeOff: number;
+  /**
+   * The regime difference's median as it stood *before* recognised valuation was corrected.
+   *
+   * The counterfactual sentence on the taxes page states the correction's effect — the median
+   * going from better off under the plan to worse — and both halves of that pair were literals,
+   * `$289` and `$45`, with a comment explaining that they were the upper-middle medians and that
+   * the feed's own field disagreed with them by $2. It did, and the reason was two definitions of
+   * median in one workspace. There is one now, so the "after" half is
+   * `statewide.median_regime_difference` and this is the "before".
+   *
+   * Reconstructed rather than stored: a district's `overstated_by` is exactly the charge-off the
+   * deferral removes, so adding it back to `difference` gives the uncorrected comparison. Both
+   * halves therefore move together when the panel advances, which is the property the pair of
+   * literals could not have.
+   */
+  medianRegimeDifferenceUncorrected: number;
 }
 
 let cached: Feed | null = null;
@@ -282,6 +299,10 @@ function taxStatewide(districts: District[]): TaxStatewide {
   let taxableValue = 0;
   let deferredChargeOff = 0;
 
+  // The regime difference each district would have shown before the deferral was corrected out of
+  // the charge-off. See `TaxStatewide.medianRegimeDifferenceUncorrected`.
+  const uncorrected: number[] = [];
+
   // The floor the Rust side classifies against, restated once rather than at each comparison.
   const FLOOR = 20;
 
@@ -335,6 +356,9 @@ function taxStatewide(districts: District[]): TaxStatewide {
       taxableValue += latest.total_value;
       deferredChargeOff += deferred * (regime.charge_off_mills / 1000);
     }
+    if (regime?.difference != null && regime.overstated_by != null) {
+      uncorrected.push(regime.difference + regime.overstated_by);
+    }
 
     const spending = d.spending_by_function;
     if (after && spending && spending.adm > 0) {
@@ -345,14 +369,15 @@ function taxStatewide(districts: District[]): TaxStatewide {
     }
   }
 
-  const sorted = shares.map((s) => s.share).sort((a, b) => a - b);
   const reductions = rateFell.atFloor + rateFell.aboveFloor;
 
   return {
     rateFell,
     districts: counted,
     reductionsAboveFloor: reductions === 0 ? 0 : rateFell.aboveFloor / reductions,
-    medianChargeShare: sorted[Math.floor(sorted.length / 2)] ?? 0,
+    // `stats.median`, not a fourth hand-rolled sort. This one took the upper-middle element and
+    // so disagreed with every `median_*` field the feed carries — see `stats.ts`.
+    medianChargeShare: median(shares.map((s) => s.share)),
     chargedMoreThanSpent: shares
       .filter((s) => s.share > 1)
       .sort((a, b) => b.share - a.share),
@@ -361,6 +386,7 @@ function taxStatewide(districts: District[]): TaxStatewide {
     agreeOnLatest,
     deferredShare: taxableValue === 0 ? 0 : deferredValue / taxableValue,
     deferredChargeOff,
+    medianRegimeDifferenceUncorrected: median(uncorrected),
   };
 }
 

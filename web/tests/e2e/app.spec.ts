@@ -2438,7 +2438,9 @@ test.describe("counties, which are a peer group and not a boundary", () => {
     await expect(chart.locator("svg")).toBeVisible();
     await expect(chart.locator(".dist-marker")).toHaveCount(1);
     expect(await chart.locator(".dist-dot circle").count()).toBeGreaterThan(70);
-    await expect(page.locator("#spread")).toContainText("The median county is");
+    // "The median" and not "The median county": the figure is `stats.median`, which interpolates,
+    // so on an even count of counties it is a ratio none of them has. See `src/lib/stats.ts`.
+    await expect(page.locator("#spread")).toContainText("The median is");
   });
 
   test("a single-district county gets neither chart, and says why", async ({ page }) => {

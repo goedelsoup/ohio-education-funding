@@ -8,7 +8,7 @@ import { realChange, series, type Basis } from "./real.ts";
 import * as routes from "./routes.ts";
 import type { TaxStatewide } from "./feed.ts";
 import type { Bundle, District, National } from "./types.ts";
-import { quintiles } from "./stats.ts";
+import { median, quintiles } from "./stats.ts";
 import { yearChip, yearChipPair } from "./year.ts";
 import { anchor } from "./section.ts";
 import { medianTrace, pairs } from "./relationships.ts";
@@ -137,8 +137,10 @@ export function guaranteeRateByQuintile(districts: District[]): Bar[] {
       label,
       value: share,
       direct: pct(share, 0),
+      // `stats.median` and not the middle element of an already-sorted group: that was a fifth
+      // copy of the upper-middle definition the workspace has stopped using. See `stats.ts`.
       hover: `${label}: ${onGuarantee} of ${group.length} districts on the guarantee, median valuation ${money(
-        group[Math.floor(group.length / 2)]?.valuation_per_pupil ?? 0,
+        median(group.map((d) => d.valuation_per_pupil!)),
       )} per pupil`,
     };
   });
@@ -158,11 +160,11 @@ export function guaranteeRateByQuintile(districts: District[]): Bar[] {
  * already keep, for the same reason. "Worse off" on a figure that rounds to $0 is a claim the
  * figure does not support.
  */
-export function renderRegimeDifference(median: number): string {
-  const nowhere = "the median district is neither better nor worse off under the plan";
-  if (Math.abs(median) < 0.5) return nowhere;
-  const direction = median < 0 ? "worse" : "better";
-  return `the median district is ${money(Math.abs(median))} per pupil ${direction} off under the plan`;
+export function renderRegimeDifference(value: number): string {
+  const nowhere = "districts are neither better nor worse off under the plan at the median";
+  if (Math.abs(value) < 0.5) return nowhere;
+  const direction = value < 0 ? "worse" : "better";
+  return `districts are a median ${money(Math.abs(value))} per pupil ${direction} off under the plan`;
 }
 
 /**

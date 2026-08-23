@@ -23,7 +23,7 @@ import type { Bundle, District, OutcomeStatewide } from "./types.ts";
 import { schoolYearBefore, seriesYear, yearChip, yearChipPair, yearOf } from "./year.ts";
 import { term } from "./glossary.ts";
 import { anchor } from "./section.ts";
-import { quintiles } from "./stats.ts";
+import { median, quintiles } from "./stats.ts";
 import { bands, medianTrace, pairs } from "./relationships.ts";
 
 /** A correlation, signed and to three places. */
@@ -168,9 +168,8 @@ export function renderOutcomes(bundle: Bundle): string {
     const values = bundle.districts
       .filter((d) => povertyBands.get(d) === band)
       .map(of)
-      .filter((v): v is number => v != null)
-      .sort((a, b) => a - b);
-    return values[Math.floor(values.length / 2)] ?? 0;
+      .filter((v): v is number => v != null);
+    return median(values);
   };
   const bandMedians = [0, 1, 2].map((b) =>
     bandMedian(b, (d) => d.outcome?.performance_index).toFixed(1),
@@ -330,8 +329,19 @@ export function renderOutcomeContext(bundle: Bundle, district: District): string
   if (index < 0) return "";
   const peers = quintiles[index]!;
   const scores = peers.map((d) => d.outcome!.performance_index!).sort((a, b) => a - b);
-  const median = scores[Math.floor(scores.length / 2)] ?? 0;
-  const gap = o.performance_index - median;
+
+  /*
+   * `stats.median` and not the middle of `scores`, which is what this was.
+   *
+   * The tile below is a published statistic and the tile beside it subtracts from it, so it takes
+   * the workspace's one definition — interpolated, R type 7, `crates/dispersion::median`. The box
+   * plot underneath draws its line by nearest rank, because a box is drawn at an observation; a
+   * poverty fifth has 121 or 125 districts and on the even ones those two are not the same number.
+   * The note under the chart used to say the line *was* the tile's figure, and now says the box
+   * shows the middle of the fifth, because that claim is the one both definitions support.
+   */
+  const peerMedian = median(scores);
+  const gap = o.performance_index - peerMedian;
   const povertyRange = peers
     .map((d) => d.economically_disadvantaged!)
     .sort((a, b) => a - b);
@@ -373,7 +383,7 @@ export function renderOutcomeContext(bundle: Bundle, district: District): string
             seriesYear("outcome.performance")?.label ?? ""
           }</div></div>
         <div class="tile"><div class="k">Median of its poverty fifth</div>
-          <div class="v">${median.toFixed(1)}</div>
+          <div class="v">${peerMedian.toFixed(1)}</div>
           <div class="n">${count(peers.length)} districts in the ${escapeHtml(label)},
             ${pct(povertyRange[0]!, 0)}–${pct(povertyRange[povertyRange.length - 1]!, 0)}
             economically disadvantaged</div></div>
@@ -384,7 +394,7 @@ export function renderOutcomeContext(bundle: Bundle, district: District): string
       ${
         peerBox
           ? `<p class="note">Every district in that fifth, by Performance Index — the shaded box is
-             its middle half, the line inside it the median the tile above reports, and the
+             its middle half, the line inside it the middle of the fifth, and the
              coloured rule is ${escapeHtml(district.name)}. The gap in the third tile is worth what
              the width of this box says it is worth.</p>
              <div class="chartwrap" data-chart="peer-group">${renderToString(peerBox, { label: `Performance Index across the ${count(peers.length)} districts in the ${label}, with ${district.name} marked, ${seriesYear("outcome.performance")?.label ?? ""}` })}</div>

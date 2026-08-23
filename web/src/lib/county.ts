@@ -216,7 +216,7 @@ function renderSpread(c: County, statewide: Statewide, all: County[]): string {
         position
           ? `<p class="note">Where that sits among the ${ratios.length} counties with more than one
              district reporting a tax base — one dot each, narrowest on the left, and the coloured
-             rule is ${escapeHtml(c.name)}. The median county is
+             rule is ${escapeHtml(c.name)}. The median is
              ${median(ratios.map((r) => r.value)).toFixed(1)}× apart.</p>
              <div class="chartwrap" data-chart="county-position">${renderToString(position, "presentational")}</div>
              <div class="scale">
@@ -307,7 +307,7 @@ function renderRoster(c: County, statewide: Statewide, statewideMedianAid: numbe
         elsewhere and some of the county's live in districts on another page. The department
         attributes each district to one county and this page inherits that attribution; it is a
         peer group, not a boundary.</p>
-      <p class="note">The median district here receives ${money(medianAid)} per pupil in state aid,
+      <p class="note">Median state aid here is ${money(medianAid)} per pupil,
         against ${money(statewideMedianAid)} statewide.${
           c.onGuarantee > 0
             ? ` ${count(c.onGuarantee)} of ${count(c.districts.length)} ${
@@ -331,10 +331,15 @@ function renderRoster(c: County, statewide: Statewide, statewideMedianAid: numbe
     </div>`;
 }
 
-/** The median across every district in the feed, for the roster to compare a county against. */
+/**
+ * The median across every district in the feed, for the roster to compare a county against.
+ *
+ * Deferred to `stats.median` rather than sorted here. This was a third hand-rolled copy in a file
+ * that already imports the shared one four lines above — and it took the upper-middle element,
+ * which is the definition the whole workspace has now stopped using. See `stats.ts` on why.
+ */
 export function medianRealizedAid(districts: District[]): number {
-  const sorted = districts.map((d) => d.realized_aid_per_pupil).sort((a, b) => a - b);
-  return sorted.length === 0 ? 0 : sorted[Math.floor(sorted.length / 2)]!;
+  return median(districts.map((d) => d.realized_aid_per_pupil));
 }
 
 /** One county page: the spread, then the roster. */
