@@ -356,11 +356,19 @@ impl Bundle {
                 Some(deflator) => {
                     let mut o = doc.obj("deflator");
                     o.text("label", &deflator.label);
-                    let mut list = o.arr("points");
-                    for (year, index) in &deflator.points {
-                        let mut e = list.obj();
-                        e.count("fiscal_year", year);
-                        e.num("index", *index);
+                    {
+                        let mut list = o.arr("points");
+                        for (year, index) in &deflator.points {
+                            let mut e = list.obj();
+                            e.count("fiscal_year", year);
+                            e.num("index", *index);
+                        }
+                    }
+                    // Written even when empty. A consumer that has to ask whether the field is
+                    // there before trusting the points has learnt nothing from it.
+                    let mut list = o.arr("uncovered");
+                    for year in &deflator.uncovered {
+                        list.count(*year);
                     }
                 }
             }

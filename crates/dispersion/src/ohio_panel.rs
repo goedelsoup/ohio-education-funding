@@ -76,31 +76,26 @@ pub struct PanelRow {
 ///
 /// # Panics
 ///
-/// If the fixture's header is not the one this was written against, which means the extractor
-/// changed and this reader did not.
+/// If the fixture's header is not the one this was written against — which means the extractor
+/// changed and this reader did not — or if a row's width differs from the header's. Both come
+/// from [`edfund_core::csv::rows`], which is what holds the uniform-width invariant these
+/// fixtures are written under: the hand-rolled `split(',')` this replaced checked the header
+/// and then indexed by position, so a cell that grew a comma shifted every field after it and
+/// the row still parsed.
 #[must_use]
 pub fn panel() -> Vec<PanelRow> {
-    let mut lines = FIXTURE.lines();
-    assert_eq!(
-        lines.next().unwrap_or_default().trim(),
-        EXPECTED_HEADER,
-        "the Ohio panel fixture header changed; update dispersion::ohio_panel"
-    );
-    lines
-        .filter(|line| !line.trim().is_empty())
-        .filter_map(|line| {
-            let f: Vec<&str> = line.split(',').map(str::trim).collect();
-            let num = |i: usize| f.get(i).and_then(|v| v.parse::<f64>().ok());
+    edfund_core::csv::rows(FIXTURE, EXPECTED_HEADER)
+        .filter_map(|row| {
             Some(PanelRow {
-                fiscal_year: f.first()?.parse().ok()?,
-                leaid: f.get(1)?.to_string(),
-                irn: f.get(2)?.to_string(),
-                comparable: f.get(3)? == &"1",
-                enrollment: num(4)?,
-                total_revenue: num(5)?,
-                federal_revenue: num(6)?,
-                state_revenue: num(7)?,
-                local_revenue: num(8)?,
+                fiscal_year: row.str(0).parse().ok()?,
+                leaid: row.str(1).to_string(),
+                irn: row.str(2).to_string(),
+                comparable: row.str(3) == "1",
+                enrollment: row.num(4)?,
+                total_revenue: row.num(5)?,
+                federal_revenue: row.num(6)?,
+                state_revenue: row.num(7)?,
+                local_revenue: row.num(8)?,
             })
         })
         .collect()
