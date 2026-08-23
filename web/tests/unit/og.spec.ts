@@ -244,7 +244,6 @@ describe("the card routes", () => {
       "scenario",
       "method",
       "data",
-      "search",
       "wiki",
       "sources",
       "house",

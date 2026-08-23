@@ -310,9 +310,13 @@ export function sectionForClass(className: string): Section {
  * Every top-level entry opens a panel, where `Statewide` and `Scenario` used to be links. That is
  * a real cost — nothing in the bar is one click away any more — and it buys two things. The bar
  * holds five axes now rather than three, and a bar that mixes links with disclosures teaches a
- * reader nothing about which is which until they have clicked both. The search field beside it is
- * the one-click path, and it is the path most readers want: this site is read one district at a
- * time.
+ * reader nothing about which is which until they have clicked both.
+ *
+ * That cost used to be offset by a search box sitting beside the bar, which was the one-click path
+ * to the thing most readers want: this site is read one district at a time. The box is gone, and
+ * nothing replaced it, so the shortest path to a named district is now two clicks — the panel,
+ * then `/districts` — and a name typed into that page's filter. If the depth is ever measured and
+ * found to cost readers, the fix is a flat entry in the bar, not a second index to maintain.
  *
  * The homepage takes no entry at all. It is what the brand mark points at, which is a convention a
  * reader already has, and giving it a tab as well would put one destination in the bar twice.

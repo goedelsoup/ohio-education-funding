@@ -33,7 +33,7 @@
   --radius-sm: 4px;   /* a code span, a bar segment */
   --radius-md: 7px;   /* a control: nav link, tab, select, range */
   --radius-lg: 10px;  /* a card, a menu panel */
-  --radius-pill: 999px; /* a pill: year chip, flag, basis switch, search field */
+  --radius-pill: 999px; /* a pill: year chip, flag, basis switch */
 
   --wrap-read: 900px;
   --wrap-wide: 1180px;

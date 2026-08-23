@@ -245,18 +245,13 @@ export const SECTIONS = {
     alternatives: "alternatives",
   },
 
-  /** `/search`, `/compare` and `/404` — the three routes that are not about anything. */
+  /** `/compare` and `/404` — the two routes that are not about anything. */
   tools: {
-    query: "query",
     pick: "pick",
     needsScript: "needs-script",
-    suggest: "suggest",
     whereToGo: "where-to-go",
-    /* Written by `scripts/search.ts` and `scripts/compare.ts` into a div the built page carries
-       empty, on the same terms as the scenario runner's cards above. */
-    results: "results",
-    noMatches: "no-matches",
-    indexUnreachable: "index-unreachable",
+    /* Written by `scripts/compare.ts` into a div the built page carries empty, on the same terms
+       as the scenario runner's cards above. */
     comparison: "comparison",
     panelUnreachable: "panel-unreachable",
   },

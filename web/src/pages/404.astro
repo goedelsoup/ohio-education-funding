@@ -2,9 +2,11 @@
 /**
  * Not found — which, on a site of ~2,500 pages keyed by six-digit IRN, is mostly a typo.
  *
- * So this page does not stop at saying so. It reads the path it was reached by, and if it looks
- * like a district route it offers the districts whose IRN or name is closest. A dead end here is
- * a reader who had the right district and the wrong digit.
+ * It says so and sends the reader to the district index, which is where a mistyped IRN is actually
+ * recoverable: the whole list, filterable by name. This page used to guess instead, offering the
+ * districts whose IRN was closest — but a six-digit key has no meaningful neighbourhood, so any
+ * path with three digits in it drew six unrelated districts and dressed them as answers. A wrong
+ * guess that looks like a working link is worse than a dead end that names the way out.
  */
 import Base from "../layouts/Base.astro";
 import { loadFeed } from "../lib/feed.ts";
@@ -24,11 +26,6 @@ const { bundle } = loadFeed();
     {count(bundle.statewide.districts)} of them — plus the corpus. If you typed an IRN, one digit is the usual cause.
   </p>
 
-  <div class="card" id="suggest" hidden>
-    <h2><SectionAnchor id="suggest" />Did you mean one of these?</h2>
-    <div class="flags" id="suggest-list"></div>
-  </div>
-
   <div class="card" id="where-to-go" data-part="where-to-go">
     <h2><SectionAnchor id="where-to-go" />Where to go instead</h2>
     <div class="scroll">
@@ -46,8 +43,4 @@ const { bundle } = loadFeed();
       </table>
     </div>
   </div>
-
-  <script>
-    import "../scripts/notfound.ts";
-  </script>
 </Base>

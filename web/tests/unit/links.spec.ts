@@ -53,7 +53,6 @@ const PAGES = new Set<string>([
   "/outcomes",
   "/scenario",
   "/compare",
-  "/search",
   "/method",
   "/data",
   "/wiki",
@@ -83,7 +82,6 @@ const ASSETS = new Set([
   "/data/bundle.json",
   "/data/panel.json",
   "/data/districts.csv",
-  "/search-index.json",
 ]);
 
 const internal = (href: string) => href.startsWith("/");

@@ -208,13 +208,5 @@ export function pageCards(): Record<string, Card> {
         "Department publications, Legislative Service Commission analyses, district filings, and the litigation record",
       meta: "Provenance is one hop from every figure on this site",
     },
-
-    search: {
-      eyebrow: SITE,
-      headline: "Search",
-      figure: "Districts and the corpus",
-      figureNote: "Every district by name or IRN, and every concept behind the figures",
-      meta: `${s.districts} districts · ${fy}`,
-    },
   };
 }

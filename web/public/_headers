@@ -43,8 +43,11 @@
   # stays strict, which is the half that matters: no inline script, no event-handler attributes,
   # and nothing fetched off-origin.
   #
-  # `form-action 'self'` rather than 'none': the header's search box is a real `<form>` so that it
-  # still works with scripting off, and it submits to `/search`.
+  # `form-action 'self'` rather than 'none': three real `<form>` elements remain — the scenario
+  # controls, `/compare`'s picker and `/districts`' filter — and each suppresses its own submit in
+  # script. With scripting off there is no listener to suppress it, so Enter in a filter field
+  # submits to the page's own URL. 'none' would block that with a violation rather than let it
+  # reload harmlessly, which is a worse no-JS experience for no gain: nothing here posts anywhere.
   Content-Security-Policy: default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; connect-src 'self'; object-src 'none'; base-uri 'none'; frame-ancestors 'none'; form-action 'self'
 
 # Vite content-hashes these filenames, so a changed file is a changed URL and the old one can be
@@ -60,9 +63,6 @@
 # `panel.json` matters most of the three: it is what the scenario routes run the formula over, and
 # a stale one against a fresh page is the state the runtime verification gate exists to catch.
 /data/*
-  Cache-Control: public, max-age=300, must-revalidate
-
-/search-index.json
   Cache-Control: public, max-age=300, must-revalidate
 
 # The preview cards, and the two icons rasterized from the same mark. Not content-hashed — the

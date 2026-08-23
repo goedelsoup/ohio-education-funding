@@ -59,8 +59,7 @@ const NOTABLE = ["043802", "043786", "044909", "049056", "044933", "045583"]
     <h2><SectionAnchor id="find-a-district" />Find a district</h2>
     <p class="note">
       All {count(s.districts)} are in the <a href="/districts">district index</a>, which sorts and
-      filters. These are the ones most often asked about, and the field in the header searches both
-      the districts and the corpus.
+      filters by name or IRN. These are the ones most often asked about.
     </p>
     <div class="flags">
       {NOTABLE.map((d) => <a class="flag" href={routes.district(d!.irn)}>{d!.name}</a>)}

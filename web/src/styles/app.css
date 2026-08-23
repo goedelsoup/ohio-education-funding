@@ -226,13 +226,6 @@ td.year { font-family: var(--font-mono); color: var(--text-annotation); white-sp
    of the act and a sixth column for it would be empty on a third of the rows. */
 .amends { display: block; font-size: var(--text-xs); color: var(--text-annotation); }
 
-.site-search input {
-  width: 15rem;
-  max-width: 40vw;
-  font-size: .85rem;
-  padding: .32rem .6rem;
-  border-radius: 999px;
-}
 .ghost {
   font: inherit;
   background: none;

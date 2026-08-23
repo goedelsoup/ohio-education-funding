@@ -8,8 +8,8 @@
  *
  * Note on the preview server: `vite preview` answers an unmatched path with the front page rather
  * than with `404.html`, which is a preview behaviour and not the host's. So nothing here asserts
- * on a missing route; the nearest-match logic behind the 404 page is unit-tested in
- * `tests/unit/nearest.spec.ts` instead.
+ * on a missing route. The 404 page is now static — it names four places to go and guesses at
+ * nothing — so there is no behaviour left behind it for a unit test to hold either.
  */
 
 import { existsSync, readFileSync, readdirSync } from "node:fs";
@@ -1371,14 +1371,6 @@ test.describe("finding things", () => {
       "aria-sort",
       "descending",
     );
-  });
-
-  test("search finds a district by IRN and a concept by name", async ({ page }) => {
-    await page.goto("/search?q=043786");
-    await expect(page.locator("#search-out")).toContainText("Cleveland Municipal");
-
-    await page.locator("#s-q").fill("twenty-mill");
-    await expect(page.locator("#search-out")).toContainText("Twenty-Mill Floor");
   });
 
   test("comparison puts two districts side by side", async ({ page }) => {

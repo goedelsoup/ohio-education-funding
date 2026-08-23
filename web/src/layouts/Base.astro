@@ -24,8 +24,8 @@ interface Props {
    * The preview card for this page, from the `og` table in `src/lib/routes.ts`.
    *
    * Omitting it is not an error — the page previews as the site. That is the right default for
-   * `/search` and `/404`, which are not about anything, and it means a route added later gets a
-   * usable preview rather than none while nobody notices.
+   * `/404`, which is not about anything, and it means a route added later gets a usable preview
+   * rather than none while nobody notices.
    */
   image?: string;
   /** What the card shows, for a reader who cannot see it. Falls back to the description. */
@@ -44,8 +44,8 @@ interface Props {
    * Whether this page lists its own sections above them.
    *
    * On by default, and skipped automatically below four of them — see `contents.ts`. Set it false
-   * for a page whose sections are not what a reader came for: `/search` and `/compare` are two
-   * controls and their own output, and a list of them is a list of the page.
+   * for a page whose sections are not what a reader came for: `/compare` is two controls and their
+   * own output, and a list of them is a list of the page.
    */
   contents?: boolean;
 }
@@ -216,10 +216,6 @@ const body = contents ? withContents(rendered, contentsOf(rendered)) : rendered;
             ))
           }
         </nav>
-        <form class="site-search" action="/search" method="get" role="search">
-          <label class="vh" for="q">Search districts and the corpus</label>
-          <input id="q" name="q" type="search" placeholder="District or concept…" autocomplete="off" />
-        </form>
         <button id="theme" type="button" class="ghost" aria-label="Switch colour theme">◐</button>
       </div>
     </header>
