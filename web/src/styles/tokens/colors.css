@@ -233,3 +233,46 @@
   --claim-inference: #a3a29a;
   --claim-open: #ef8352;
 }
+
+/*
+ * Print, which is a fourth restatement of light and is here for the same reason as the other three.
+ *
+ * `data-theme="dark"` is an explicit stamp on the root and paper has no theme, so without this
+ * block a reader who chose dark prints their pages in the dark palette: every text token below
+ * 4.5:1 on white, and `--text-primary` — #ffffff, which is 23% of the words on a district page —
+ * printed white on white. The OS-level dark reader has the same problem through the media query,
+ * since `print` and `prefers-color-scheme: dark` both match at once when a dark-mode reader prints.
+ *
+ * So the selector list carries both cases. `:root` beats the bare `:root` in the media query on
+ * order alone, and `:root[data-theme="dark"]` ties the explicit block's specificity and wins on
+ * order too — `app.css` imports this file first, and this block is last within it.
+ *
+ * The values are light's, byte for byte, and `palette.spec.ts` asserts that against the light
+ * block rather than trusting the copy. This is the fourth restatement the file's own note is
+ * about: a shared intermediate is what lets themes drift, so they are written out and checked.
+ */
+@media print {
+  :root,
+  :root[data-theme="dark"] {
+  color-scheme: light;
+  --surface-0: #f4f4f2;
+  --surface-1: #fcfcfb;
+  --surface-2: #eeeeea;
+  --border: #dcdcd6;
+  --accent-rule: #c9c8c1;
+  --text-primary: #0b0b0b;
+  --text-secondary: #52514e;
+  --text-muted: #66655f;
+  --series-formula: #2a78d6;
+  --series-guarantee: #eb6834;
+  --series-formula-text: #1064c0;
+  --series-guarantee-text: #b83800;
+  --neutral-mark: #a8a79f;
+  --ordinal-1: #7fb0e8;
+  --ordinal-2: #2a78d6;
+  --ordinal-3: #123f75;
+  --claim-verified: #1c6bc9;
+  --claim-inference: #5c5b56;
+  --claim-open: #c2521c;
+  }
+}

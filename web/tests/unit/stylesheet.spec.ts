@@ -138,3 +138,85 @@ test("identity is encoded by two series and a neutral, and nothing else", () => 
   );
   expect([...series].sort()).toEqual(["formula", "guarantee"]);
 });
+
+/**
+ * The body of a top-level at-rule, brace-matched from its prelude.
+ *
+ * `rules()` above is media-blind — it flattens the whole file, so it can say a border exists
+ * somewhere but not that it exists ON PAPER. The print rules are the only ones in this stylesheet
+ * whose whole point is which medium they apply to, so they need a parser that knows.
+ */
+function atRule(prelude: string): string {
+  const start = CSS.indexOf(prelude);
+  expect(start, `no \`${prelude}\` block in app.css`).toBeGreaterThan(-1);
+  let depth = 0;
+  for (let i = CSS.indexOf("{", start); i < CSS.length; i++) {
+    if (CSS[i] === "{") depth++;
+    else if (CSS[i] === "}" && --depth === 0) return CSS.slice(CSS.indexOf("{", start) + 1, i);
+  }
+  throw new Error(`unbalanced braces after \`${prelude}\``);
+}
+
+const SECOND_CHANNEL = atRule("@media print, (forced-colors: active)");
+const PAPER = atRule("@media print {");
+
+/**
+ * No mark is distinguished by its ground alone.
+ *
+ * Browsers omit backgrounds from print by default and a forced palette replaces them outright, so
+ * a swatch or a bar segment whose only channel is `background` prints as an empty square beside a
+ * label — the label survives and the thing it labels does not. Every variant that paints a ground
+ * must also carry a border, either in its own rule or in the block that adds one for paper.
+ *
+ * Derived from the stylesheet rather than listed, because a listed set does not catch the fourth
+ * swatch someone adds next year — which is exactly how this defect arrived: the legend grew and
+ * nothing was watching the channel.
+ */
+test("a swatch or a bar segment never encodes with a ground alone", () => {
+  const painted = new Map<string, string[]>();
+  for (const [selector, body] of rules(/\.(sw|seg)\./)) {
+    if (!/(^|;)\s*background\s*:/.test(`;${body}`)) continue;
+    for (const [, variant] of selector.matchAll(/\.(?:sw|seg)\.([a-z0-9-]+)/g)) {
+      painted.set(variant!, [...(painted.get(variant!) ?? []), body]);
+    }
+  }
+  expect(painted.size, "no painted swatch or segment found — has the parser drifted?")
+    .toBeGreaterThan(5);
+
+  const offenders = [...painted].filter(([variant, bodies]) => {
+    if (bodies.some((body) => /border/.test(body))) return false;
+    const onPaper = [...SECOND_CHANNEL.matchAll(/([^{}]+)\{([^{}]*)\}/g)]
+      .filter(([, s]) => new RegExp(`\\.(sw|seg)\\.${variant}(?![a-z0-9-])`).test(s!))
+      .map(([, , b]) => b!);
+    return !onPaper.some((body) => /border/.test(body));
+  });
+  expect(offenders.map(([variant]) => variant)).toEqual([]);
+});
+
+/**
+ * The findings genre survives a medium with no backgrounds.
+ *
+ * `.card.findings` is separated from every other card by its ground and nothing else, and the note
+ * on that rule calls the confusion it prevents — a statute read as an estimate — the single most
+ * damaging one available on this site. On paper the ground is gone, so something else has to say
+ * the voice changed.
+ */
+test("the findings card is not the only card by its ground alone", () => {
+  expect(SECOND_CHANNEL).toMatch(/\.card\.findings\s*\{[^}]*border-left\s*:/);
+});
+
+/**
+ * A card is the unit a reader thinks in, so a card is the unit that stays together.
+ *
+ * Without this the tallest chart printed two pages from the heading and legend that explain it.
+ */
+test("paper is told where the page may break", () => {
+  for (const target of [".card", ".chartwrap"]) {
+    const broken = [...PAPER.matchAll(/([^{}]+)\{([^{}]*)\}/g)].some(
+      ([, selector, body]) =>
+        new RegExp(`(^|,)\\s*${target.replace(".", "\\.")}\\s*(,|$)`).test(selector!.trim()) &&
+        /break-inside\s*:\s*avoid/.test(body!),
+    );
+    expect(broken, `${target} may be sliced across a page break`).toBe(true);
+  }
+});
