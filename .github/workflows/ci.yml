@@ -5,6 +5,12 @@
 # Nothing here fetches from the department. Every fixture is committed and every test reads a
 # committed fixture, so CI is hermetic and a publisher's outage cannot turn the build red. The
 # retrieval path is checked by `edfund-connect verify` when someone runs it, not here.
+#
+# Every `uses:` is pinned to a commit SHA with the version it was in a trailing comment. A major
+# tag like `@v4` is a pointer its owner can move, and one of these actions is handed the token
+# that publishes the site — the repository already pins the 206 files it merely reads, and code
+# that runs with a production credential deserves at least that. Upgrade by resolving the tag
+# again and rewriting both the SHA and the comment; never one without the other.
 name: ci
 
 on:
@@ -37,12 +43,12 @@ jobs:
       run:
         working-directory: crates
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
 
       - name: Install the pinned toolchain
         run: rustup show && rustup component add rustfmt clippy
 
-      - uses: Swatinem/rust-cache@v2
+      - uses: Swatinem/rust-cache@6323deb102c322ba6fcbdcafc7e3dddab59af2b6 # v2.9.2
         with:
           workspaces: crates
 
@@ -69,13 +75,13 @@ jobs:
       run:
         working-directory: web
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
 
-      - uses: pnpm/action-setup@v4
+      - uses: pnpm/action-setup@b906affcce14559ad1aafd4ab0e942779e9f58b1 # v4.3.0
         with:
           version: 11
 
-      - uses: actions/setup-node@v4
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4.4.0
         with:
           node-version: 24
           cache: pnpm
@@ -119,13 +125,13 @@ jobs:
       # actually deploy.
       - name: Keep the built site for the deploy job
         if: github.ref == 'refs/heads/main' && github.event_name == 'push'
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
         with:
           name: dist
           path: web/dist
           retention-days: 7
 
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
         if: failure()
         with:
           name: playwright-report
@@ -139,9 +145,9 @@ jobs:
     name: generated files are current
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
 
-      - uses: Swatinem/rust-cache@v2
+      - uses: Swatinem/rust-cache@6323deb102c322ba6fcbdcafc7e3dddab59af2b6 # v2.9.2
         with:
           workspaces: crates
 
@@ -174,15 +180,36 @@ jobs:
     # A `pull_request` event resolves `github.ref` to the PR's merge ref rather than to
     # `refs/heads/main`, so it is already excluded. The event test is for `workflow_dispatch`,
     # which can be aimed at `main` and would otherwise redeploy with no commit behind it.
-    if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+    #
+    # The attempt test is the one that is not obvious. This job never checks out; it deploys the
+    # `dist` artifact, which lives for seven days. Re-running a superseded `main` run therefore
+    # republishes that older commit's build over the live site, with nothing in the git history
+    # to say the site moved backwards. A re-run of the gates stays useful; a re-run does not
+    # deploy. The cost is that a deploy lost to a transient Cloudflare failure can no longer be
+    # recovered by pressing re-run either; that case is what `mise run //:deploy` is for, and it
+    # is the case where a person should be looking at what is live anyway.
+    if: >-
+      github.ref == 'refs/heads/main'
+      && github.event_name == 'push'
+      && github.run_attempt == '1'
     runs-on: ubuntu-latest
+    # This names the deployment in the GitHub UI, attaches the live URL to it, and — since the
+    # environment carries a deployment branch policy of `main` and nothing else — refuses to run
+    # the job at all from any other ref. That is a second, server-side copy of the first half of
+    # the `if:` above, in the one place a workflow edit cannot reach.
+    #
+    # It is not yet the whole gate the commit that introduced it claimed. `CLOUDFLARE_API_TOKEN`
+    # and `CLOUDFLARE_ACCOUNT_ID` are still repository-level secrets, readable by any job on any
+    # branch, so the branch policy governs this deployment and not the credential. Closing that
+    # means re-creating both as environment secrets, which can only be done by someone holding
+    # the values.
     environment:
       name: production
       url: https://ohio-education-funding.pages.dev
     steps:
       # No checkout. Nothing here needs the sources: the deployable tree is the artifact the web
       # job built, and rebuilding it would mean deploying something no test has seen.
-      - uses: actions/download-artifact@v4
+      - uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4.3.0
         with:
           name: dist
           path: dist
@@ -194,7 +221,7 @@ jobs:
       #
       # The wrangler version is pinned rather than `@latest`, so that a Cloudflare release cannot
       # turn a deploy red on a commit that touched nothing.
-      - uses: cloudflare/wrangler-action@v3
+      - uses: cloudflare/wrangler-action@9acf94ace14e7dc412b076f2c5c20b8ce93c79cd # v3.15.0
         with:
           apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}

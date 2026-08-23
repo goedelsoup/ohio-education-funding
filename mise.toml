@@ -183,5 +183,12 @@ description = "Manually publish web/dist to Cloudflare Pages. Production deploys
 # labels the deployment with whatever branch is checked out: deploy from a
 # `phase/*` branch without `--branch main` and the upload succeeds, wrangler
 # prints a URL, and the live site does not change.
+#
+# The wrangler version is pinned, and pinned to the same 4.125.0 the workflow
+# uses. `@latest` on a path that holds a production credential fetches whatever
+# was published this morning; and if the escape hatch ran a different wrangler
+# than the automated deploy, the two would eventually disagree about what a
+# direct upload means, which is exactly the argument you do not want to be
+# having during the outage that made you reach for this task.
 depends = ["//web:build"]
-run = "pnpm dlx wrangler@latest pages deploy web/dist --project-name ohio-education-funding --branch main"
+run = "pnpm dlx wrangler@4.125.0 pages deploy web/dist --project-name ohio-education-funding --branch main"
