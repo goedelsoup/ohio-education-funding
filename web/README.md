@@ -700,17 +700,21 @@ form, from the repository root:
 ```
 pnpm --dir web test                       # both suites
 pnpm --dir web build
-pnpm dlx wrangler@latest pages deploy web/dist \
+pnpm dlx wrangler@4.125.0 pages deploy web/dist \
   --project-name ohio-education-funding --branch main
 ```
 
-Two things about that third line are easy to get wrong and quiet when you do. `--dir` steers which
+Three things about that third line are easy to get wrong and quiet when you do. `--dir` steers which
 package pnpm runs, not where `dlx` resolves paths, so the directory argument is `web/dist` and not
 `dist` — passed the latter from the root, wrangler goes looking at the repository root and exits
 `ENOENT`. And `--branch main` is not decoration: on direct upload wrangler labels the deployment
 with whatever branch is checked out, and only the production branch reaches the production URL.
 Deploy from a `phase/*` branch without it and the upload succeeds, wrangler prints a URL, and the
-live site does not change — you have published a preview.
+live site does not change — you have published a preview. And the wrangler version is pinned, to
+the same `4.125.0` the workflow's `wranglerVersion` names: `@latest` on a command that carries a
+production credential runs whatever was published this morning, and an escape hatch that ran a
+different wrangler than the automated deploy would eventually disagree with it about what a direct
+upload means. Bump both together or neither.
 
 **A feed change is now a rebuild.** `cargo run -p bundle` followed by the three commands above,
 in that order. The old shortcut of regenerating `public/data/bundle.json` alone no longer updates
