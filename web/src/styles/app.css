@@ -1188,3 +1188,137 @@ tr.series-break > td {
   font-weight: var(--weight-semibold);
   font-variant-numeric: normal;
 }
+
+/*
+ * PAPER, AND FORCED COLOURS.
+ *
+ * This site's district and legislation pages are the kind of thing a board member prints for a
+ * meeting, and until this block existed there was no `@media print` rule anywhere. Four things
+ * were wrong, and three of them are one thing: a mark whose only channel is colour has no channel
+ * left once the medium takes colour away.
+ *
+ * The palette half of the fix is in `tokens/colors.css`, which restates light for print so a
+ * dark-theme reader stops printing white on white. What is left is the marks, and the rule the
+ * rest of this stylesheet already follows is the answer to all of them:
+ *
+ *   `.claim`   colour AND rule style AND the word
+ *   `.apparatus`  a dashed border, not a ground
+ *   `blockquote.correction`  a left rule, and the hue only beside it
+ *
+ * Every mark below is a place that rule was not applied. `background` is the channel browsers drop
+ * first — they omit backgrounds from print by default, and forced-colours mode replaces them
+ * outright — so anything drawn with one prints blank in both. That is the stacked bars, all of the
+ * legend swatches and the regime spans: charts the documentation calls load-bearing, printing as
+ * empty columns beside a legend with no keys.
+ *
+ * Two channels, then. `print-color-adjust: exact` asks for the colour to be printed and
+ * `forced-color-adjust: none` keeps it under a forced palette — but a reader can still turn
+ * backgrounds off in the print dialog, and neither property is a guarantee. So each mark also
+ * takes a BORDER, and the border's style carries the same distinction the colour does. Solid,
+ * dashed, dotted, in the ordered sequence `.claim` established: a reader reads it without a
+ * legend, and it survives greyscale, paper and a forced palette alike.
+ *
+ * The media list is deliberate. These two media break the same marks for the same reason, so they
+ * get the same rules rather than two blocks that will drift.
+ */
+@media print, (forced-colors: active) {
+  /* The stacked bar. Extent already encodes the quantity; the border style says which series it
+     is, in the same order the legend lists them. */
+  .seg {
+    print-color-adjust: exact;
+    forced-color-adjust: none;
+    border: 1px solid currentColor;
+  }
+  .seg.formula { border-style: solid; }
+  .seg.guarantee { border-style: dashed; }
+
+  /*
+   * The legend keys. A swatch is 10px of pure background and nothing else, so without this every
+   * key on the site is an empty square beside its label — the label survives and the thing it
+   * labels does not, which is worse than no legend.
+   */
+  .sw {
+    print-color-adjust: exact;
+    forced-color-adjust: none;
+    border: 1px solid currentColor;
+  }
+  .sw.formula, .sw.gain { border-style: solid; }
+  .sw.guarantee, .sw.loss { border-style: dashed; }
+  /* The ordinal ramp is ordered, so its second channel is ordered too: sparse to solid, running
+     the same direction as light to dark. */
+  .sw.ordinal-1 { border-style: dotted; }
+  .sw.ordinal-2 { border-style: dashed; }
+  .sw.ordinal-3 { border-style: solid; }
+  /* The fan chart's four keys are already shape rather than colour — a band, a dashed line, a
+     ring, a solid line — so they only need the shape drawn as a rule instead of as a fill. */
+  .sw.band { border-style: solid; }
+  .sw.dash { background: none; border: 0; border-top: 2px dashed currentColor; }
+  .sw.solid { background: none; border: 0; border-top: 2px solid currentColor; }
+
+  /*
+   * The regime spans on `/legislation`. Colour encodes nothing here — the note above says so — so
+   * the fill can become an outline with no loss at all: the length is the whole fact, and the
+   * length is what an outline keeps.
+   */
+  .span-bar > i {
+    background: none;
+    border: 1px solid var(--text-annotation);
+  }
+
+  /*
+   * The findings genre, which is separated from every other card by its ground alone. On paper
+   * that leaves the one genre written in a different voice looking like the forty that are not,
+   * and the note above calls that the single most damaging confusion available on this site.
+   *
+   * A left rule, which is what a correction already uses, and no hue — a hue here would name a
+   * data series. The ground is still asked for, for a reader who prints with backgrounds on.
+   */
+  .card.findings {
+    print-color-adjust: exact;
+    border-left: 3px solid var(--text-primary);
+  }
+
+  /* The correction's ground is a tint of the guarantee hue behind a left rule that already
+     survives on its own; this only asks for the tint back where the medium allows it. */
+  .prose-body blockquote.correction { print-color-adjust: exact; }
+
+  /*
+   * Chart marks are SVG `fill`, not `background`, so they survive print untouched — but a forced
+   * palette replaces a fill as readily as a ground, and the two series would collapse into one
+   * colour with nothing else telling them apart. Scoped to the marks: axes and labels keep
+   * `forced-color-adjust: auto` so they take the reader's chosen text colour, which is the whole
+   * point of the mode.
+   */
+  .bar-fill > *, .hist > *, .fan-edge, .fan-mid, .fan-observed, .fan-reference {
+    forced-color-adjust: none;
+  }
+}
+
+/*
+ * Paper only: furniture, and where the page is allowed to break.
+ *
+ * There was no fragmentation control at all, and the tallest chart printed two pages away from the
+ * heading and legend that explain it, after 60% of a blank sheet, sliced through a data row. A
+ * card is the unit a reader thinks in on this site, so a card is the unit that stays together.
+ */
+@media print {
+  header.site { position: static; }
+  /* A tooltip is a pointer's shadow. There is no pointer on paper. */
+  #tip { display: none; }
+
+  /*
+   * A scroll container prints as a clip: the part of a 609-row table or a wide chart that would
+   * have scrolled is simply cut off, with nothing saying it was there.
+   */
+  .chartwrap { overflow-x: visible; }
+
+  .card, .chartwrap, .tile, .strip-row, .flags, tr { break-inside: avoid; }
+  /* A heading, and a legend, belong to what follows them. */
+  h1, h2, h3, .contents-label { break-after: avoid; }
+  .legend, .scale { break-before: avoid; }
+  /* A table that does cross a page carries its column heads onto the next one. */
+  thead { display: table-header-group; }
+
+  /* A fenced block's only boundary is its ground, which does not print. */
+  .prose-body pre { border: 1px solid var(--border); }
+}

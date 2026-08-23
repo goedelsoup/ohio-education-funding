@@ -1410,6 +1410,60 @@ test.describe("presentation", () => {
     expect(fill).toBe("rgb(42, 120, 214)");
   });
 
+  /**
+   * Paper has no theme, and this is the test that the cascade agrees.
+   *
+   * `data-theme="dark"` is an explicit stamp that no medium unsets, and `print` matches at the
+   * same time as `prefers-color-scheme: dark` when a dark-mode reader prints — so both dark
+   * palettes are live when the print block has to win. Whether it does is a question about
+   * specificity and source order in a real engine, which is the one thing the stylesheet unit
+   * tests cannot answer. Before the print block existed this printed #ffffff ink on white paper.
+   */
+  test("a dark-theme reader prints in the light palette", async ({ page }) => {
+    await page.emulateMedia({ colorScheme: "dark" });
+    await page.goto("/statewide");
+    // Twice: the first click leaves the dark OS setting for light, the second stamps dark back on
+    // explicitly. That is the case the print block has to beat — a `[data-theme="dark"]` attribute
+    // AND the dark media query, both live at once.
+    await page.locator("#theme").click();
+    await page.locator("#theme").click();
+    await expect(page.locator("html")).toHaveAttribute("data-theme", "dark");
+
+    await page.emulateMedia({ media: "print" });
+    const paper = await page.evaluate(() => {
+      const style = getComputedStyle(document.body);
+      return { ink: style.color, ground: style.backgroundColor };
+    });
+    // #0b0b0b on #f4f4f2 — the light block, not dark's #ffffff on #111110.
+    expect(paper.ink).toBe("rgb(11, 11, 11)");
+    expect(paper.ground).toBe("rgb(244, 244, 242)");
+  });
+
+  /**
+   * Browsers omit backgrounds from print, so a mark drawn with one prints blank. The stacked bar,
+   * the legend swatches and the regime spans were all background-only; each carries a border on
+   * paper now, and the border's STYLE is what tells the two series apart once the colour is gone.
+   */
+  test("marks drawn with a ground carry a second channel on paper", async ({ page }) => {
+    // The stacked bar and its legend live on a district's aid card.
+    await page.goto(`/district/${CLEVELAND}`);
+    await page.emulateMedia({ media: "print" });
+    const styles = await page.evaluate(() =>
+      [".seg.formula", ".seg.guarantee", ".sw.formula", ".sw.guarantee"].map((selector) => {
+        const element = document.querySelector(selector);
+        if (!element) return `${selector} is not on the page`;
+        const { borderStyle, borderWidth } = getComputedStyle(element);
+        return `${selector} ${borderStyle} ${borderWidth}`;
+      }),
+    );
+    expect(styles).toEqual([
+      ".seg.formula solid 1px",
+      ".seg.guarantee dashed 1px",
+      ".sw.formula solid 1px",
+      ".sw.guarantee dashed 1px",
+    ]);
+  });
+
   test("the page does not scroll sideways on a phone", async ({ page }) => {
     await page.setViewportSize({ width: 390, height: 844 });
     for (const path of [

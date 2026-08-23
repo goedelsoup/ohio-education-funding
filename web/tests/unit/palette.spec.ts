@@ -221,7 +221,7 @@ describe("text colour", () => {
 });
 
 /**
- * The dark palette is written three times and this is the only thing holding the three together.
+ * The palette is written four times and this is the only thing holding the four together.
  *
  * `colors.css` states dark in the media query, restates light under `[data-theme="light"]` and
  * dark again under `[data-theme="dark"]`, deliberately: a shared intermediate is what lets two
@@ -230,7 +230,7 @@ describe("text colour", () => {
  * blocks, so the media query, which is the palette a reader with no stored preference actually
  * gets, was the one block nothing had ever looked at.
  */
-describe("the three restatements of the palette", () => {
+describe("the four restatements of the palette", () => {
   test("agree property for property", () => {
     const media = block("@media (prefers-color-scheme: dark) {");
     const dark = block(':root[data-theme="dark"] {');
@@ -245,6 +245,34 @@ describe("the three restatements of the palette", () => {
     for (const [name, value] of explicitLight) {
       expect(light.get(name), `${name} differs between :root and [data-theme="light"]`).toBe(value);
     }
+
+    // Print is the fourth, and the one a reader never chose. It has to be light in FULL — a block
+    // that restated only the text tokens would leave a dark surface behind light ink, so the
+    // key sets are compared before the values are.
+    const print = block("@media print {");
+    expect([...print.keys()].sort()).toEqual([...light.keys()].sort());
+    for (const [name, value] of light) {
+      expect(print.get(name), `${name} differs between :root and the print block`).toBe(value);
+    }
+  });
+
+  /**
+   * The print block only works if it can BEAT the dark ones, and specificity is how.
+   *
+   * The media query carries dark on a bare `:root`, and `print` matches at the same time as
+   * `prefers-color-scheme: dark` when a dark-mode reader prints. `[data-theme="dark"]` is an
+   * explicit stamp that no medium unsets. So the print block has to name both, and it has to be
+   * last in the file for the specificity ties to fall its way.
+   */
+  test("print names both dark cases and is stated last", () => {
+    const css = readFileSync(TOKENS, "utf8");
+    const start = css.indexOf("@media print {");
+    expect(start, "no print block in tokens/colors.css").toBeGreaterThan(-1);
+    const selector = css.slice(start, css.indexOf("{", css.indexOf("{", start) + 1));
+    expect(selector).toContain(":root,");
+    expect(selector).toContain(':root[data-theme="dark"]');
+    expect(start).toBeGreaterThan(css.indexOf('@media (prefers-color-scheme: dark) {'));
+    expect(start).toBeGreaterThan(css.indexOf(':root[data-theme="dark"] {'));
   });
 });
 
