@@ -312,7 +312,11 @@ impl ScenarioDelta {
                 districts: rows.len(),
                 gainers,
                 losers,
-                unmoved: rows.len() - gainers - losers,
+                // Counted, not `rows.len() - gainers - losers`. As a residual it made every
+                // "the three classes partition the panel" assertion an identity — including the
+                // one in `who_a_change_reaches`, which held the same shape on both sides of the
+                // comparison it makes (#125). `project::report` carried the same defect.
+                unmoved: rows.iter().filter(|r| r.dollars().abs() <= MOVED).count(),
                 held_throughout: rows.iter().filter(|d| d.standing.off_formula()).count(),
                 lifted_off: rows
                     .iter()
@@ -373,6 +377,39 @@ mod tests {
         assert_eq!(total.reach.gainers, 0);
         assert_eq!(total.reach.losers, 0);
         assert_eq!(total.reach.unmoved, panel.len());
+    }
+
+    #[test]
+    fn the_three_reach_classes_partition_the_rows_rather_than_being_defined_to() {
+        // #125. `unmoved` used to be `rows.len() - gainers - losers`, so this sum was an identity
+        // and held for any thresholds whatever — including thresholds with a gap between them,
+        // which would have left real districts in no class at all while the assertion stayed
+        // green. Counted directly, it is a claim about the three predicates: that `> MOVED`,
+        // `< -MOVED` and `|d| <= MOVED` cover every row exactly once.
+        //
+        // Checked across levers that move different populations, because a partition that holds
+        // for one lever's delta distribution is not yet a partition.
+        let panel = panel();
+        for (label, policy) in [
+            ("base cost up 5%", refresh()),
+            (
+                "guarantee removed",
+                Policy {
+                    guarantee: GuaranteeRule::Removed,
+                    ..Policy::current_law()
+                },
+            ),
+            ("against itself", Policy::current_law()),
+        ] {
+            let reach = ScenarioDelta::between(&panel, &Policy::current_law(), &policy)
+                .total()
+                .reach;
+            assert_eq!(
+                reach.gainers + reach.losers + reach.unmoved,
+                reach.districts,
+                "{label}: the three classes leave a district in none of them, or in two"
+            );
+        }
     }
 
     #[test]
