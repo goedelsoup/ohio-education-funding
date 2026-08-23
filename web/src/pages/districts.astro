@@ -58,17 +58,37 @@ const MEASURES = (
       "What the guarantee adds, per pupil",
       (d: District) => (d.on_guarantee ? d.guarantee / Math.max(d.adm, 1) : null),
       (v: number) => money(v),
+      "on the guarantee",
     ],
-    ["valuation", "Assessed valuation per pupil", (d: District) => d.valuation_per_pupil, (v: number) => money(v)],
+    [
+      "valuation",
+      "Assessed valuation per pupil",
+      (d: District) => d.valuation_per_pupil,
+      (v: number) => money(v),
+      "reporting a tax base",
+    ],
     [
       "poverty",
       "Economically disadvantaged share",
       (d: District) => d.economically_disadvantaged,
       (v: number) => pct(v, 0),
+      "reporting the share",
     ],
     ["enrollment", "Enrollment change", (d: District) => d.enrollment_change, (v: number) => pct(v, 1)],
   ] as const
-).map(([key, label, read, format]) => {
+/*
+ * The population is per measure, and three of the six are not every district.
+ *
+ * The note under each strip said "across all 609 districts" for all of them, while the values
+ * feeding the box plot are filtered for null: the guarantee strip draws the 294 districts ON the
+ * guarantee, and valuation and poverty draw the 606 that report them. So the box, the whiskers
+ * and the median belonged to one population and the sentence beneath named another — and for the
+ * guarantee that is not a rounding difference, it is half the districts.
+ *
+ * `subset` says why a measure has fewer, rather than leaving the reader to wonder whether three
+ * districts went missing.
+ */
+).map(([key, label, read, format, subset]) => {
   const values = bundle.districts
     .map((d) => ({ d, v: read(d) }))
     .filter((row): row is { d: District; v: number } => row.v != null && Number.isFinite(row.v))
@@ -77,6 +97,8 @@ const MEASURES = (
   return {
     key,
     label,
+    n: values.length,
+    subset,
     chart: renderToString(distributionSpec(values), { label: `${label} across ${count(values.length)} districts, from ${format(sorted[0] ?? 0)} to ${format(sorted[sorted.length - 1] ?? 0)}` }),
     low: format(sorted[0] ?? 0),
     high: format(sorted[sorted.length - 1] ?? 0),
@@ -119,8 +141,10 @@ const MEASURES = (
       MEASURES.map((m) => (
         <div class="measure" data-measure={m.key}>
           <p class="note">
-            {m.label} across all {count(s.districts)} districts. The shaded box is the middle half;
-            the dots past the whiskers are districts of their own.
+            {m.label} across{" "}
+            {m.subset ? `the ${count(m.n)} districts ${m.subset}` : `all ${count(m.n)} districts`}.
+            The shaded box is the middle half; the dots past the whiskers are districts of their
+            own.
           </p>
           <div class="chartwrap" set:html={m.chart} />
           <div class="scale">
