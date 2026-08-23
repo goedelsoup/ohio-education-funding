@@ -1083,7 +1083,7 @@ mod tests {
         let d = published_fy2022_district();
         let fy2018_priced = StatewideFactors::fy2022();
         let refreshed = StatewideFactors {
-            teacher_salary: 67_654.0,
+            teacher_salary: StatewideFactors::fy2027().teacher_salary,
             ..fy2018_priced
         };
 

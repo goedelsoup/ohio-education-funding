@@ -10,7 +10,7 @@
 //! - **A base cost increase.** A uniform scale sized to a $465.0M statewide computed increase,
 //!   which is what the department's own FY2027 model gives for refreshing the classroom teacher
 //!   salary to FY2024. It is uniform where the real refresh is not — the real one runs from
-//!   $338.62 to $471.10 per pupil because the small-district staffing minimums bind — so this is
+//!   $318.26 to $442.76 per pupil because the small-district staffing minimums bind — so this is
 //!   the right size and the wrong shape, and no claim below rests on the shape.
 //! - **Removing the guarantee.** Exact, since the guarantee is carried per district.
 

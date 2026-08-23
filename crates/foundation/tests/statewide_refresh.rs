@@ -32,12 +32,15 @@
 //!
 //! Both push the same way: the figures here are lower bounds.
 
-use foundation::ratios;
+use foundation::{ratios, StatewideFactors};
 
 const FIXTURE: &str = include_str!("../fixtures/fy24-district-grade-bands.csv");
 
-/// FY2022 reference-year teacher salary carried forward by H.B. 96. [inference]
-const FY2022_TEACHER_SALARY: f64 = 67_654.0;
+/// FY2022 reference-year teacher salary carried forward by H.B. 96. [verified]
+///
+/// Read off the department's own factor set rather than restated, so that a correction to the
+/// price vector cannot leave this panel perturbing from a figure the workspace contradicts.
+const FY2022_TEACHER_SALARY: f64 = StatewideFactors::fy2027().teacher_salary;
 /// ADM-weighted statewide average classroom teacher salary, FY2024. [verified]
 const FY2024_TEACHER_SALARY: f64 = 73_777.08;
 const BENEFIT_MULTIPLIER: f64 = 1.16;
@@ -144,26 +147,29 @@ fn fixture_covers_every_traditional_district() {
 }
 
 /// The statewide headline. Refreshing the classroom teacher salary input from the FY2022
-/// reference to FY2024 raises computed base cost by roughly half a billion dollars a year —
-/// from that one term, before any other salary category is touched.
+/// reference to FY2024 raises computed base cost by roughly $466 million a year — from that
+/// one term, before any other salary category is touched.
+///
+/// This is the panel that cross-checks the department's own FY2027 model, which gives $465.0
+/// million for the same refresh by an entirely different route. They agree to 0.3%.
 #[test]
-fn statewide_refresh_raises_base_cost_by_about_half_a_billion() {
+fn statewide_refresh_raises_base_cost_by_about_466_million() {
     let ds = districts();
     let total: f64 = ds.iter().map(District::refresh_delta).sum();
     assert!(
-        (total / 1e6 - 496.3).abs() < 2.0,
+        (total / 1e6 - 466.2).abs() < 2.0,
         "statewide delta was ${:.1}M",
         total / 1e6
     );
 }
 
 #[test]
-fn weighted_average_delta_is_about_345_per_pupil() {
+fn weighted_average_delta_is_about_324_per_pupil() {
     let ds = districts();
     let total: f64 = ds.iter().map(District::refresh_delta).sum();
     let adm: f64 = ds.iter().map(|d| d.adm).sum();
     assert!(
-        (total / adm - 344.75).abs() < 1.0,
+        (total / adm - 323.97).abs() < 1.0,
         "weighted average was ${:.2}",
         total / adm
     );
@@ -189,8 +195,8 @@ fn per_pupil_effect_varies_by_forty_percent_across_districts() {
     pp.sort_by(|a, b| a.partial_cmp(b).unwrap());
     let (min, max) = (pp[0], pp[pp.len() - 1]);
 
-    assert!((min - 338.62).abs() < 1.0, "min was {min:.2}");
-    assert!((max - 471.10).abs() < 1.0, "max was {max:.2}");
+    assert!((min - 318.26).abs() < 1.0, "min was {min:.2}");
+    assert!((max - 442.76).abs() < 1.0, "max was {max:.2}");
     assert!(
         max / min > 1.35,
         "spread was {:.2}x, expected about 1.4x",
@@ -217,11 +223,11 @@ fn the_special_teacher_minimum_concentrates_the_gain_in_small_districts() {
     };
     let (small, rest) = (mean(&binding), mean(&free));
     assert!(
-        (small - 368.44).abs() < 2.0,
+        (small - 346.28).abs() < 2.0,
         "small-district mean was {small:.2}"
     );
     assert!(
-        (rest - 343.53).abs() < 2.0,
+        (rest - 322.87).abs() < 2.0,
         "other-district mean was {rest:.2}"
     );
     assert!(

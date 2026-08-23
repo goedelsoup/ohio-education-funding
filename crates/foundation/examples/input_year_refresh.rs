@@ -21,16 +21,16 @@
 //!
 //! - District: the worked example published in the FY2022 payment report — 20,342.13 base cost
 //!   enrolled ADM, 43 open buildings. `[verified]`
-//! - FY2022 reference salary $67,654 — secondary reporting, not the department's own figure.
-//!   `[inference]`
+//! - FY2022 reference salary $68,022.22 — the department's own `FY27 TRAD State Foundation
+//!   Funding Calculator`, read through [`StatewideFactors::fy2027`]. `[verified]`
 //! - FY2024 refreshed salary $73,777.08 — ADM-weighted average of classroom teachers' average
 //!   salary across all 606 districts in the FY2024 District Profile Report. `[verified]`
 
 use foundation::{aggregate_base_cost, DistrictEnrollment, StatewideFactors};
 use local_capacity::{state_share, MINIMUM_STATE_SHARE_FY2022};
 
-/// The FY2022 reference-year teacher salary carried forward by H.B. 96. [inference]
-const FY2022_TEACHER_SALARY: f64 = 67_654.0;
+/// The FY2022 reference-year teacher salary carried forward by H.B. 96. [verified]
+const FY2022_TEACHER_SALARY: f64 = StatewideFactors::fy2027().teacher_salary;
 /// ADM-weighted statewide average classroom teacher salary, FY2024. [verified]
 const FY2024_TEACHER_SALARY: f64 = 73_777.08;
 
