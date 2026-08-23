@@ -136,6 +136,28 @@ export function barSpec(bars: Bar[], options: { max?: number } = {}): Spec {
   const rowHeight = 30;
   const max = options.max ?? Math.max(...bars.map((b) => Math.abs(b.value)), 1);
   const labelled = bars.filter((b) => b.direct != null);
+  /*
+   * A negative value is drawn as a negative value, on the one chart in the build that has one.
+   *
+   * This mark took `Math.abs(b.value)` and filled every bar with the same colour, so a deficit
+   * and a surplus of the same size were the same picture. Springfield Local held
+   * −$2,812,534 at 30 June FY2021 and its bar was indistinguishable from a $2.8M surplus —
+   * one bar out of the whole site, which is why nobody caught it. Its own tooltip said
+   * `$-2,812,534` while the bar said the opposite.
+   *
+   * Signed mode is entered only when a value is actually below zero, so the eight other charts
+   * built on this spec keep their exact geometry: same domain, same rounding, same fill. Inside
+   * it the bar runs from zero to the value, the fill takes the polarity pair the palette already
+   * licenses for gain against loss, and a rule marks the baseline the bars now sit on both sides
+   * of. The rounded data end goes, because with two directions a single `rx2` would round the
+   * baseline of a negative bar and square its data end — the opposite of what the rounding means.
+   */
+  const lowest = Math.min(0, ...bars.map((b) => b.value));
+  const signed = lowest < 0;
+  const negativeLabelled = labelled.filter((b) => b.value < 0);
+  // A direct label on a negative bar is written leftwards from the bar's end, so the domain gets
+  // room for it rather than letting it collide with the category names outside the frame.
+  const floor = signed ? lowest - (negativeLabelled.length > 0 ? (max - lowest) * 0.08 : 0) : 0;
   const longest = Math.max(0, ...bars.map((b) => b.direct?.length ?? 0));
   // Sized to the longest category name, as the right gutter is sized to the longest direct label.
   // This was a fixed 160, which silently clipped anything longer — "Building leadership and
@@ -155,18 +177,25 @@ export function barSpec(bars: Bar[], options: { max?: number } = {}): Spec {
       marginRight: longest > 0 ? 16 + longest * 7.2 : 20,
       marginTop: 0,
       marginBottom: 0,
-      x: { axis: null, domain: [0, max] },
+      x: { axis: null, domain: [floor, max] },
       y: { axis: null, domain: bars.map((b) => b.label), padding: 0.47 },
       marks: [
         Plot.barX(bars, {
           y: "label",
-          x: (b: Bar) => Math.abs(b.value),
-          fill: SERIES.formula,
+          // One mark, not two: `attachHovers` maps tooltips onto `.bar-fill > *` by index and
+          // throws if the counts disagree, so splitting positives from negatives here would
+          // reorder the marks out from under the hover layer.
+          ...(signed
+            ? { x1: 0, x2: (b: Bar) => b.value }
+            : { x: (b: Bar) => Math.abs(b.value) }),
+          fill: signed ? (b: Bar) => (b.value < 0 ? SERIES.guarantee : SERIES.formula) : SERIES.formula,
           className: "bar-fill",
           // Rounded at the data end, square at the baseline: the bar grows from the axis and
-          // rounding that end would detach it from the thing it is measured against.
-          rx2: 4,
+          // rounding that end would detach it from the thing it is measured against. Not in
+          // signed mode — see above.
+          ...(signed ? {} : { rx2: 4 }),
         }),
+        ...(signed ? [Plot.ruleX([0], { stroke: INK.rule })] : []),
         Plot.text(bars, {
           y: "label",
           frameAnchor: "left",
@@ -176,15 +205,31 @@ export function barSpec(bars: Bar[], options: { max?: number } = {}): Spec {
           fill: INK.secondary,
           className: "bar-label",
         }),
-        Plot.text(labelled, {
+        // `dx` and `textAnchor` are constants in Plot rather than channels, so a chart with bars
+        // on both sides of zero needs one text mark per direction. Text is not in the hover
+        // selector, so unlike the fill above these may be split.
+        Plot.text(signed ? labelled.filter((b) => b.value >= 0) : labelled, {
           y: "label",
-          x: (b: Bar) => Math.abs(b.value),
+          x: (b: Bar) => (signed ? b.value : Math.abs(b.value)),
           dx: 8,
           text: "direct",
           textAnchor: "start",
           fill: INK.primary,
           className: "bar-value",
         }),
+        ...(signed && negativeLabelled.length > 0
+          ? [
+              Plot.text(negativeLabelled, {
+                y: "label",
+                x: (b: Bar) => b.value,
+                dx: -8,
+                text: "direct",
+                textAnchor: "end",
+                fill: INK.primary,
+                className: "bar-value",
+              }),
+            ]
+          : []),
       ],
     },
     hovers: {

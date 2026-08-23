@@ -47,6 +47,8 @@ import { resolve } from "node:path";
 import { describe, expect, test } from "vitest";
 
 import { contrast, minSeparation, parseHex } from "../../src/lib/plot/palette.ts";
+import { barSpec } from "../../src/lib/plot/spec.ts";
+import { renderToString } from "../../src/lib/plot/ssr.ts";
 
 const TOKENS = resolve(process.cwd(), "src/styles/tokens/colors.css");
 const VISIONS = ["normal", "protan", "deutan", "tritan"] as const;
@@ -243,5 +245,44 @@ describe("the three restatements of the palette", () => {
     for (const [name, value] of explicitLight) {
       expect(light.get(name), `${name} differs between :root and [data-theme="light"]`).toBe(value);
     }
+  });
+});
+
+/**
+ * A bar below zero is drawn below zero.
+ *
+ * `barSpec` took `Math.abs(b.value)` and filled every bar alike, so a deficit and a surplus of
+ * the same size were the same picture. Exactly one bar in the build is affected — Springfield
+ * Local's −$2,812,534 at 30 June FY2021 — which is why it survived: a defect with one instance
+ * looks like a chart nobody has looked at rather than a chart that is wrong.
+ *
+ * The other assertion is the one that protects the rest of the site: eight charts are built on
+ * this spec and none of them has a negative value, so entering signed mode must not change what
+ * they draw.
+ */
+describe("a bar chart with a negative value", () => {
+  const positive = [
+    { label: "a", value: 3 },
+    { label: "b", value: 1 },
+  ];
+  const mixed = [
+    { label: "a", value: 3 },
+    { label: "b", value: -2 },
+  ];
+
+  test("puts the negative bar on the other side of zero, in the other colour", () => {
+    const svg = renderToString(barSpec(mixed), { label: "test" });
+    // The polarity pair the palette licenses for gain against loss, both present exactly here.
+    expect(svg).toContain("var(--series-formula)");
+    expect(svg).toContain("var(--series-guarantee)");
+    const abs = renderToString(barSpec([{ label: "b", value: 2 }]), { label: "test" });
+    expect(abs).not.toContain("var(--series-guarantee)");
+  });
+
+  test("and leaves an all-positive chart exactly as it was", () => {
+    const svg = renderToString(barSpec(positive), { label: "test" });
+    expect(svg).not.toContain("var(--series-guarantee)");
+    // Rounded data end, which signed mode drops and this must keep.
+    expect(svg).toMatch(/rx|A4,4/);
   });
 });
