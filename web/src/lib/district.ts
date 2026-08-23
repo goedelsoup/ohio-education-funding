@@ -307,22 +307,40 @@ export function renderActuals(bundle: Bundle, d: District, basis: Basis): string
   const { years: shown, converted, base } = series(bundle.deflator, d.finances, basis);
   const first = shown[0]!;
   const latest = shown[shown.length - 1]!;
-  const cashChange = latest.ending_cash - first.ending_cash;
+  const cashChange =
+    latest.ending_cash == null || first.ending_cash == null
+      ? null
+      : latest.ending_cash - first.ending_cash;
   const yearsOfSpending =
-    latest.total_expenditure > 0 ? latest.ending_cash / latest.total_expenditure : null;
+    latest.ending_cash != null && latest.total_expenditure != null && latest.total_expenditure > 0
+      ? latest.ending_cash / latest.total_expenditure
+      : null;
   // Counted on the published figures: whether a year was run at a deficit is a fact about that
-  // year's own dollars, and deflating both sides cannot change it.
-  const deficits = d.finances.filter(
-    (y) => y.total_expenditure > y.total_revenue,
-  ).length;
+  // year's own dollars, and deflating both sides cannot change it. Counted only over the years
+  // that reported both lines — a filing that carried no expenditure line did not run a surplus.
+  const comparable = d.finances.filter(
+    (y) => y.total_expenditure != null && y.total_revenue != null,
+  );
+  const deficits = comparable.filter((y) => y.total_expenditure! > y.total_revenue!).length;
   const realAid = realChange(bundle.deflator, d.finances, (y) => y.state_aid);
+  const nominalAid =
+    d.finances[d.finances.length - 1]!.state_aid == null || (d.finances[0]!.state_aid ?? 0) <= 0
+      ? null
+      : d.finances[d.finances.length - 1]!.state_aid! / d.finances[0]!.state_aid! - 1;
 
-  const peak = shown.reduce((a, b) => (b.ending_cash > a.ending_cash ? b : a));
-  const bars = shown.map((y) => ({
+  // Years with no reported balance are left out of the chart rather than drawn at zero, and
+  // named under it. A bar of length nothing is a claim that the district held nothing.
+  const held = shown.filter((y) => y.ending_cash != null);
+  const unreported = shown.filter((y) => y.ending_cash == null);
+  const peak = held.reduce<(typeof held)[number] | null>(
+    (a, b) => (a == null || b.ending_cash! > a.ending_cash! ? b : a),
+    null,
+  );
+  const bars = held.map((y) => ({
     label: `FY${y.fiscal_year}`,
-    value: y.ending_cash,
+    value: y.ending_cash!,
     hover: `FY${y.fiscal_year}: ${money(y.ending_cash)} held, ${money(y.total_revenue)} in, ${money(y.total_expenditure)} out`,
-    ...(y.fiscal_year === peak.fiscal_year || y.fiscal_year === latest.fiscal_year
+    ...(y.fiscal_year === peak?.fiscal_year || y.fiscal_year === latest.fiscal_year
       ? { direct: money(y.ending_cash) }
       : {}),
   }));
@@ -341,20 +359,31 @@ export function renderActuals(bundle: Bundle, d: District, basis: Basis): string
               : `${yearsOfSpending.toFixed(2)} years of spending at this rate`
           }</div></div>
         <div class="tile"><div class="k">Change since FY${first.fiscal_year}</div>
-          <div class="v ${cashChange < 0 ? "loss" : "gain"}">${signedMoney(cashChange)}</div>
+          <div class="v ${cashChange != null && cashChange < 0 ? "loss" : "gain"}">${signedMoney(cashChange)}</div>
           <div class="n">carry-over into FY${latest.fiscal_year + 1} is
             ${money(latest.ending_cash)}</div></div>
         <div class="tile"><div class="k">State aid, FY${first.fiscal_year}–FY${latest.fiscal_year}</div>
           <div class="v ${(realAid ?? 0) < 0 ? "loss" : "gain"}">${
             realAid == null ? "—" : pct(realAid, 1)
           }</div>
-          <div class="n">real; ${pct(
-            d.finances[d.finances.length - 1]!.state_aid / d.finances[0]!.state_aid - 1,
-            1,
-          )} nominal. ${deficits} of ${d.finances.length} years run at a deficit</div></div>
+          <div class="n">real; ${pct(nominalAid, 1)} nominal. ${deficits} of
+            ${comparable.length} years run at a deficit</div></div>
       </div>
 
-      <div class="chartwrap" data-chart="cash">${renderToString(barSpec(bars), { label: `General fund cash held at 30 June by fiscal year, FY${first.fiscal_year} to FY${latest.fiscal_year}${converted ? `, in FY${base} dollars` : ""}` })}</div>
+      ${
+        bars.length === 0
+          ? ""
+          : `<div class="chartwrap" data-chart="cash">${renderToString(barSpec(bars), { label: `General fund cash held at 30 June by fiscal year, FY${first.fiscal_year} to FY${latest.fiscal_year}${converted ? `, in FY${base} dollars` : ""}` })}</div>`
+      }
+      ${
+        unreported.length === 0
+          ? ""
+          : `<p class="note">This district's filing carries no cash balance for
+            ${unreported.map((y) => `FY${y.fiscal_year}`).join(", ")}. Those years are left out
+            of the chart and stand as an em dash in the table rather than being drawn at zero:
+            the line is absent from the published filing, which is not the same as a district
+            reporting that it held nothing.</p>`
+      }
       <p class="note">Cash held at 30 June, general fund${
         converted ? `, in FY${base} dollars — deflated with ${escapeHtml(bundle.deflator?.label ?? "an index")}` : ""
       }.
@@ -1401,7 +1430,7 @@ export function renderCasino(bundle: Bundle, d: District): string {
   const before = d.casino.find((y) => y.fiscal_year === CASINO_CLOSURE_YEAR - 1);
   const booked = d.finances.find((y) => y.fiscal_year === latest.fiscal_year);
   const shareOfAid =
-    booked && booked.state_aid > 0 ? latest.amount / booked.state_aid : null;
+    booked?.state_aid != null && booked.state_aid > 0 ? latest.amount / booked.state_aid : null;
 
   const statewide = bundle.casino.find((y) => y.fiscal_year === latest.fiscal_year);
   const bars: Bar[] = d.casino.map((y) => ({

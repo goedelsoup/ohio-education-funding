@@ -67,8 +67,17 @@ properties:
 
     **The panel is not one continuously audited series.** The two filings report the FY2022/FY2023
     seam three years apart and disagree about it for more than half of districts — median $2,
-    90th percentile $9,054, ten districts over $1M, largest $13.3M. Those are reclassifications
+    90th percentile $9,054, nine districts over $1M, largest $13.3M. Those are reclassifications
     across the relief years, not errors, and the corpus states them rather than smoothing them.
+
+    **One district's filing carries no cash line at all.** Toronto City (IRN 044917) is absent
+    from lines 5.050, 7.010 and 7.020 of the FY2023 filing, so it has no expenditure and no
+    balance for FY2020-FY2022 — and, until the correction, published $0 against $9.86M of
+    revenue for each of those years while every identity check passed, because a zero balance
+    carries over into a zero balance perfectly. It was the tenth of the ten seam restatements
+    above, at $8,140,842, and it was neither a restatement nor a reclassification. Pinned as
+    `project::finances::INCOMPLETE`, the missing-line counterpart to `PARTIAL`: a row count
+    finds a district short of *years*, and cannot find one short of *lines*.
 
     **A submitted forecast is not a measurement.** Each filing carries five projected years made
     by a treasurer under incentives — a board arguing for a levy and a board defending a balance
@@ -112,3 +121,23 @@ findings: |
   **[open]** Whether the FY2025 drawdown continues, which needs the FY2027 filing and one more
   closed year. **[open]** How much of the FY2021-FY2024 build-up was ESSER booked in the general
   fund, which the forecast lines cannot separate and the federal award data could.
+revisions:
+  - was: |
+      Ten districts restate the FY2022/FY2023 seam by more than $1M, and all ten are
+      reclassifications across the relief years rather than errors in either filing.
+    now: |
+      Nine. [verified] The tenth was Toronto City at $8,140,842, which is not a restatement of
+      anything: the FY2023 filing carries no line 7.020 for that district, the extract wrote the
+      absence as `0`, and the whole of the district's cash then appeared to arrive between two
+      filings. The count was the load-bearing part of the sentence — it is what said how rare
+      the disagreement is — so the correction is to the count and to what the tenth case was.
+    found_by: |
+      `project::finances::the_only_lines_a_filing_omits_are_the_named_ones`, which the
+      correction adds. Nothing before it could see the hole: the fixture is uniform width, so a
+      district missing a line has a row of exactly the same shape as one that reported every
+      line, and the identity checks pass on a zero balance carried into a zero balance.
+    reach: |
+      The live feed published $0 of expenditure and $0 of cash against $9.86M of revenue for
+      Toronto City for FY2020-FY2022, and statewide expenditure and ending cash were understated
+      by $9-10M in each of those years. Feed contract `38.0.0` makes the five `finances` figures
+      nullable so an unreported line cannot be summed again.

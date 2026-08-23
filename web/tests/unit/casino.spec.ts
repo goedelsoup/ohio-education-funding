@@ -87,7 +87,9 @@ test("the two statewide figures the card types are the ones the feed produces", 
     .map((d) => {
       const last = d.casino[d.casino.length - 1];
       const booked = d.finances.find((f) => f.fiscal_year === last?.fiscal_year);
-      return last && booked && booked.state_aid > 0 ? last.amount / booked.state_aid : null;
+      return last && booked?.state_aid != null && booked.state_aid > 0
+        ? last.amount / booked.state_aid
+        : null;
     })
     .filter((s): s is number => s != null)
     .sort((a, b) => a - b);

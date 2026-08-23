@@ -141,17 +141,27 @@ export const CasinoYearSchema = z
   })
   .strict();
 
+/**
+ * One closed fiscal year of a district's general fund.
+ *
+ * Every amount is `maybeNum`, and `null` means the five-year forecast filing carried no such
+ * line — which is not zero. One district in 660 is affected (Toronto City, IRN 044917, whose
+ * FY2023 filing omits lines 5.050, 7.010 and 7.020), and until contract `38.0.0` it was written
+ * as `0` and published $0 of spending and $0 of cash against $9.86M of revenue for three years.
+ * A page must drop a `null` from an aggregate rather than add it, and say the figure is absent
+ * rather than draw it at the axis.
+ */
 export const FinanceYearSchema = z
   .object({
     fiscal_year: z.number().int(),
     /** Unrestricted grants-in-aid: state foundation money as the district books it. */
-    state_aid: num,
+    state_aid: maybeNum,
     /** Property tax plus income tax — the local levy yield actually collected. */
-    local_tax: num,
-    total_revenue: num,
-    total_expenditure: num,
+    local_tax: maybeNum,
+    total_revenue: maybeNum,
+    total_expenditure: maybeNum,
     /** Cash balance at 30 June. What the district holds. */
-    ending_cash: num,
+    ending_cash: maybeNum,
   })
   .strict();
 

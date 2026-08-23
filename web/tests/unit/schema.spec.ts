@@ -872,3 +872,42 @@ test("the two poverty shares are different variables, and say so by disagreeing"
     expect(d.economically_disadvantaged!).toBeLessThanOrEqual(1);
   }
 });
+
+test("an unreported forecast line is null in the feed, and only for the named district", () => {
+  /*
+   * A five-year forecast filing may carry a district's year and not every line of it, and the
+   * extractor wrote the absence as `0` until contract `38.0.0`. Toronto City (IRN 044917) is
+   * missing lines 5.050, 7.010 and 7.020 from the FY2023 filing, so it published $0 of spending
+   * and $0 of cash against $9.86M of revenue for FY2020-FY2022 — and every identity check in
+   * `crates/project` passed, because a zero balance carries over into a zero balance exactly.
+   *
+   * This is the feed-side half of `project::finances::the_only_lines_a_filing_omits_are_the_named_ones`.
+   * It pins both directions: the hole is null rather than zero, and no other district has one.
+   */
+  const { bundle } = loadFeed();
+  const holes = bundle.districts
+    .flatMap((d) => d.finances.map((y) => ({ irn: d.irn, y })))
+    .filter(
+      ({ y }) =>
+        y.state_aid == null ||
+        y.local_tax == null ||
+        y.total_revenue == null ||
+        y.total_expenditure == null ||
+        y.ending_cash == null,
+    );
+  expect([...new Set(holes.map((h) => h.irn))]).toEqual(["044917"]);
+  expect(holes.map((h) => h.y.fiscal_year)).toEqual([2020, 2021, 2022]);
+  for (const { y } of holes) {
+    expect(y.total_expenditure).toBeNull();
+    expect(y.ending_cash).toBeNull();
+    // The lines the filing does carry are untouched: the absence is per line, not per year.
+    expect(y.total_revenue).toBeGreaterThan(9_000_000);
+  }
+
+  // Statewide is a sum over the districts that reported, so it is never null here — and it must
+  // not be a zero standing in for a district that filed nothing.
+  for (const y of bundle.statewide.finances) {
+    expect(y.total_expenditure, `FY${y.fiscal_year}`).toBeGreaterThan(0);
+    expect(y.ending_cash, `FY${y.fiscal_year}`).toBeGreaterThan(0);
+  }
+});

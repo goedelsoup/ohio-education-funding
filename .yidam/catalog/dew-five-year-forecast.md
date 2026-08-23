@@ -69,9 +69,17 @@ this source must say which basis it is in, and
   in code.
 - **The two filings can disagree about the instant where they meet.** FY2022's closing balance
   and FY2023's opening balance are the same moment reported by filings three years apart. The
-  median gap is **$2** and the 90th percentile **$9,054**, but ten districts restate by more than
+  median gap is **$2** and the 90th percentile **$9,054**, but nine districts restate by more than
   a million and the largest by **$13.3M** (Paint Valley Local). These are reclassifications, not
   errors, and the panel is not a single continuously audited series.
+- **A filing may carry a district's year and not every line of it.** Toronto City (IRN 044917)
+  is absent from lines 5.050, 7.010 and 7.020 of the FY2023 file, so it has no expenditure and
+  no cash balance for FY2020–FY2022. The extract writes those cells **empty**, not `0`: read as
+  zero, the district published $0 of spending against $9.86M of revenue in the live feed for
+  three years, and appeared as a tenth $1M-plus seam restatement above. Not recoverable by
+  re-fetching — the lines are not in the published file. Pinned in
+  `project::finances::INCOMPLETE`, which is what `PARTIAL` cannot see: `PARTIAL` counts rows,
+  and this district has all six.
 - **One district is short.** Green Local (IRN 049619, Scioto County) is in the FY2027 funding
   model and in the FY2023 filing, and absent from the FY2026 required spring update — so it
   carries FY2020–FY2022 only. Pinned in `project::finances::PARTIAL`.

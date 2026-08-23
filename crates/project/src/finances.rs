@@ -66,41 +66,69 @@ pub const PARTIAL: &[(&str, &str)] = &[(
     "absent from the FY2026 required spring update; FY2020-FY2022 only",
 )];
 
+/// Districts whose filing carries a year but not every line of it, and which lines.
+///
+/// [`PARTIAL`] names districts missing whole *years*, which a row count finds. This names the
+/// other hole, which a row count cannot: a filing that reports a district's revenue and simply
+/// has no expenditure or cash line for it. The row is present and full-width, so nothing about
+/// its shape says anything is missing — only the `None`s do.
+///
+/// Toronto City is the one case in 660 districts. Its FY2023 filing omits lines 5.050, 7.010
+/// and 7.020 entirely, so FY2020 through FY2022 have revenue and no spending and no balance.
+/// It is not recoverable by re-fetching: the lines are absent from the published file. The
+/// FY2026 filing carries the district in full, which is why only the first three years are
+/// short — and its FY2023 opening balance of $8,140,842 is the one figure the seam recovers,
+/// for FY2022's close alone.
+///
+/// Until FY2026 this read as `0`, and the district published $0 of expenditure against $9.86M
+/// of revenue in the live feed for three years while every identity check passed: `0 - 0` is a
+/// balance that carries over perfectly.
+pub const INCOMPLETE: &[(&str, &str)] = &[(
+    "044917",
+    "the FY2023 filing carries no line 5.050, 7.010 or 7.020; FY2020-FY2022 have no \
+     expenditure and no cash balances",
+)];
+
 /// One district's general fund in one closed fiscal year. Every figure is an audited actual.
+///
+/// Every amount is optional because a filing may simply not carry a line, and one does: see
+/// [`INCOMPLETE`]. `None` is *not reported*, which is a different fact from zero and must stay
+/// different — a district that omitted line 5.050 did not spend nothing, and summing its
+/// absence as zero understates every statewide total it enters.
 #[derive(Debug, Clone, Copy, PartialEq)]
 pub struct YearRecord {
     /// The fiscal year, ending 30 June.
     pub fiscal_year: FiscalYear,
     /// Unrestricted grants-in-aid — state foundation funding as the district books it.
-    pub unrestricted_aid: Dollars,
+    pub unrestricted_aid: Option<Dollars>,
     /// Restricted grants-in-aid — state money that may not be spent freely.
-    pub restricted_aid: Dollars,
+    pub restricted_aid: Option<Dollars>,
     /// General property tax (real estate): the levy yield after H.B. 920 reduction.
-    pub property_tax: Dollars,
+    pub property_tax: Option<Dollars>,
     /// School district income tax, where one is levied. Zero where none is.
-    pub income_tax: Dollars,
+    pub income_tax: Option<Dollars>,
     /// The state reimbursing rollback and homestead exemptions.
     ///
     /// State money that arrives on the local line in most published summaries, which is one
     /// reason the state share of Ohio school funding is quoted at different numbers by
     /// different people. Counted here as neither until a caller decides.
-    pub property_tax_allocation: Dollars,
+    pub property_tax_allocation: Option<Dollars>,
     /// Total general fund revenue: the district's own receipts.
     ///
     /// Excludes transfers, advances, and note proceeds, which is why it does **not** close the
     /// cash identity. It is the right numerator for a share-of-revenue question all the same:
     /// counting a transfer between a district's own funds as revenue would inflate both sides.
-    pub total_revenue: Dollars,
+    pub total_revenue: Option<Dollars>,
     /// Total revenue **and other financing sources** — every dollar that entered the fund.
     ///
     /// The one that closes `beginning + received - spent = ending`.
-    pub total_revenue_and_sources: Dollars,
+    pub total_revenue_and_sources: Option<Dollars>,
     /// Total expenditures and other financing uses.
-    pub total_expenditure: Dollars,
+    pub total_expenditure: Option<Dollars>,
     /// Cash balance at 1 July — the carry-over from the year before.
-    pub beginning_cash: Dollars,
+    pub beginning_cash: Option<Dollars>,
     /// Cash balance at 30 June, excluding proposed renewal, replacement, and new levies.
-    pub ending_cash: Dollars,
+    pub ending_cash: Option<Dollars>,
 }
 
 impl YearRecord {
@@ -111,8 +139,8 @@ impl YearRecord {
     /// -- and without them the figure does not reconcile to the change in cash, which is the one
     /// property that makes it checkable.
     #[must_use]
-    pub fn operating_result(&self) -> Dollars {
-        self.total_revenue_and_sources - self.total_expenditure
+    pub fn operating_result(&self) -> Option<Dollars> {
+        Some(self.total_revenue_and_sources? - self.total_expenditure?)
     }
 
     /// Ending cash as a multiple of the year's spending.
@@ -123,7 +151,8 @@ impl YearRecord {
     /// comparison figure and not a compliance one.
     #[must_use]
     pub fn cash_as_years_of_spending(&self) -> Option<f64> {
-        (self.total_expenditure > 0.0).then(|| self.ending_cash / self.total_expenditure)
+        let (cash, spending) = (self.ending_cash?, self.total_expenditure?);
+        (spending > 0.0).then_some(cash / spending)
     }
 
     /// State money as a share of total revenue, counting only what the state calls state money.
@@ -133,8 +162,9 @@ impl YearRecord {
     /// force is exactly the sort of thing that makes two honest people quote different numbers.
     #[must_use]
     pub fn state_share(&self) -> Option<f64> {
-        (self.total_revenue > 0.0)
-            .then(|| (self.unrestricted_aid + self.restricted_aid) / self.total_revenue)
+        let revenue = self.total_revenue?;
+        let aid = self.unrestricted_aid? + self.restricted_aid?;
+        (revenue > 0.0).then_some(aid / revenue)
     }
 }
 
@@ -164,7 +194,14 @@ impl YearRecord {
         base: FiscalYear,
         cpi: &deflator::CpiSeries,
     ) -> Result<Self, deflator::DeflatorError> {
-        let at = |value: Dollars| cpi.convert(value, self.fiscal_year, base).map(|d| d.value);
+        // An absent figure stays absent: there is nothing to deflate, and inventing a zero here
+        // would put the bug this guards against back in constant dollars.
+        let at = |value: Option<Dollars>| match value {
+            Some(value) => cpi
+                .convert(value, self.fiscal_year, base)
+                .map(|d| Some(d.value)),
+            None => Ok(None),
+        };
         Ok(Self {
             fiscal_year: self.fiscal_year,
             unrestricted_aid: at(self.unrestricted_aid)?,
@@ -219,7 +256,7 @@ impl Finances {
     #[must_use]
     pub fn guarantee_baseline_aid(&self) -> Option<Dollars> {
         self.year(GUARANTEE_BASELINE_YEAR)
-            .map(|y| y.unrestricted_aid)
+            .and_then(|y| y.unrestricted_aid)
     }
 
     /// The earliest and latest closed years present.
@@ -262,16 +299,19 @@ impl Finances {
     pub fn real_change(
         &self,
         cpi: &deflator::CpiSeries,
-        pick: impl Fn(&YearRecord) -> Dollars,
+        pick: impl Fn(&YearRecord) -> Option<Dollars>,
     ) -> Result<Option<f64>, deflator::DeflatorError> {
         let Some((first, last)) = self.span() else {
             return Ok(None);
         };
-        if pick(first) <= 0.0 {
+        let (Some(first_value), Some(last_value)) = (pick(first), pick(last)) else {
+            return Ok(None);
+        };
+        if first_value <= 0.0 {
             return Ok(None);
         }
         Ok(Some(
-            cpi.real_growth(pick(first), first.fiscal_year, pick(last), last.fiscal_year)?
+            cpi.real_growth(first_value, first.fiscal_year, last_value, last.fiscal_year)?
                 .value,
         ))
     }
@@ -301,16 +341,18 @@ pub fn finances() -> Vec<Finances> {
         let fiscal_year = FiscalYear(row.str(3).parse().unwrap_or(0));
         let record = YearRecord {
             fiscal_year,
-            unrestricted_aid: row.required(4),
-            restricted_aid: row.required(5),
-            property_tax: row.required(6),
-            income_tax: row.required(7),
-            property_tax_allocation: row.required(8),
-            total_revenue: row.required(9),
-            total_revenue_and_sources: row.required(10),
-            total_expenditure: row.required(11),
-            beginning_cash: row.required(12),
-            ending_cash: row.required(13),
+            // `num`, not `required`: an empty cell is a line the filing did not carry, and
+            // `required` would read it as zero. See [`INCOMPLETE`].
+            unrestricted_aid: row.num(4),
+            restricted_aid: row.num(5),
+            property_tax: row.num(6),
+            income_tax: row.num(7),
+            property_tax_allocation: row.num(8),
+            total_revenue: row.num(9),
+            total_revenue_and_sources: row.num(10),
+            total_expenditure: row.num(11),
+            beginning_cash: row.num(12),
+            ending_cash: row.num(13),
         };
         // The fixture is written in (IRN, year) order, so a district's rows are adjacent and
         // this never has to search backwards.
@@ -391,25 +433,32 @@ mod tests {
         let mut gaps: Vec<f64> = finances
             .iter()
             .filter_map(|district| {
-                let before = district.year(FiscalYear(2022))?;
-                let after = district.year(FiscalYear(2023))?;
-                Some((after.beginning_cash - before.ending_cash).abs())
+                let before = district.year(FiscalYear(2022))?.ending_cash?;
+                let after = district.year(FiscalYear(2023))?.beginning_cash?;
+                Some((after - before).abs())
             })
             .collect();
         gaps.sort_by(|a, b| a.partial_cmp(b).unwrap_or(std::cmp::Ordering::Equal));
-        assert_eq!(gaps.len(), 659);
+        // 659 districts have both years; Toronto City has no FY2022 closing balance to compare
+        // against, so it is one short of that. See [`INCOMPLETE`].
+        assert_eq!(gaps.len(), 658);
 
         let median = gaps[gaps.len() / 2];
         let p90 = gaps[gaps.len() * 9 / 10];
         let material = gaps.iter().filter(|gap| **gap > 1_000_000.0).count();
 
         // The typical district agrees to within a couple of dollars, which is rounding, not
-        // reconciliation. The tail is real and small: ten districts restate by more than a
+        // reconciliation. The tail is real and small: nine districts restate by more than a
         // million, the largest by $13.3M, and those are reclassifications across the pandemic
         // relief years rather than errors in either filing.
+        //
+        // It was ten while Toronto City's absent FY2022 closing balance was read as zero, and
+        // the $8,140,842 "restatement" that produced was neither a restatement nor a
+        // reclassification — it was the whole of the district's cash, measured against nothing.
+        // The count is what carried the claim, so it is the count that had to move.
         assert!(median < 100.0, "median seam gap ${median:.0}");
         assert!(p90 < 25_000.0, "90th percentile seam gap ${p90:.0}");
-        assert_eq!(material, 10, "districts restating the seam by over $1M");
+        assert_eq!(material, 9, "districts restating the seam by over $1M");
     }
 
     #[test]
@@ -443,14 +492,21 @@ mod tests {
                 if before.fiscal_year == FiscalYear(2022) {
                     continue;
                 }
+                // A year with no reported balance has nothing to carry over. Skipping is not
+                // leniency: the alternative reading, zero, satisfies this identity for every
+                // pair of absent years and is exactly the misread this test exists to catch.
+                let (Some(closing), Some(opening)) = (before.ending_cash, after.beginning_cash)
+                else {
+                    continue;
+                };
                 assert!(
-                    (after.beginning_cash - before.ending_cash).abs() < 1.0,
+                    (opening - closing).abs() < 1.0,
                     "{} FY{} closes at {} and FY{} opens at {}",
                     district.name,
                     before.fiscal_year.0,
-                    before.ending_cash,
+                    closing,
                     after.fiscal_year.0,
-                    after.beginning_cash
+                    opening
                 );
             }
         }
@@ -466,9 +522,15 @@ mod tests {
         let mut total = 0;
         for district in &finances {
             for year in &district.years {
+                let (Some(opening), Some(result), Some(closing)) = (
+                    year.beginning_cash,
+                    year.operating_result(),
+                    year.ending_cash,
+                ) else {
+                    continue;
+                };
                 total += 1;
-                let implied = year.beginning_cash + year.operating_result();
-                if (implied - year.ending_cash).abs() < 1.0 {
+                if (opening + result - closing).abs() < 1.0 {
                     exact += 1;
                 }
             }
@@ -513,18 +575,18 @@ mod tests {
     fn cash_is_reported_against_the_scale_of_the_operation() {
         let year = YearRecord {
             fiscal_year: FiscalYear(2025),
-            unrestricted_aid: 3_000_000.0,
-            restricted_aid: 200_000.0,
-            property_tax: 6_000_000.0,
-            income_tax: 0.0,
-            property_tax_allocation: 500_000.0,
-            total_revenue: 10_000_000.0,
-            total_revenue_and_sources: 10_000_000.0,
-            total_expenditure: 9_500_000.0,
-            beginning_cash: 4_000_000.0,
-            ending_cash: 4_500_000.0,
+            unrestricted_aid: Some(3_000_000.0),
+            restricted_aid: Some(200_000.0),
+            property_tax: Some(6_000_000.0),
+            income_tax: Some(0.0),
+            property_tax_allocation: Some(500_000.0),
+            total_revenue: Some(10_000_000.0),
+            total_revenue_and_sources: Some(10_000_000.0),
+            total_expenditure: Some(9_500_000.0),
+            beginning_cash: Some(4_000_000.0),
+            ending_cash: Some(4_500_000.0),
         };
-        assert!((year.operating_result() - 500_000.0).abs() < f64::EPSILON);
+        assert!((year.operating_result().unwrap() - 500_000.0).abs() < f64::EPSILON);
         assert!((year.cash_as_years_of_spending().unwrap() - 0.473_684).abs() < 1e-5);
         // The rollback reimbursement is state money on the local line and is deliberately not
         // counted in the state share.
@@ -535,19 +597,98 @@ mod tests {
     fn a_district_with_no_spending_has_no_ratio_rather_than_an_infinite_one() {
         let empty = YearRecord {
             fiscal_year: FiscalYear(2025),
-            unrestricted_aid: 0.0,
-            restricted_aid: 0.0,
-            property_tax: 0.0,
-            income_tax: 0.0,
-            property_tax_allocation: 0.0,
-            total_revenue: 0.0,
-            total_revenue_and_sources: 0.0,
-            total_expenditure: 0.0,
-            beginning_cash: 0.0,
-            ending_cash: 0.0,
+            unrestricted_aid: Some(0.0),
+            restricted_aid: Some(0.0),
+            property_tax: Some(0.0),
+            income_tax: Some(0.0),
+            property_tax_allocation: Some(0.0),
+            total_revenue: Some(0.0),
+            total_revenue_and_sources: Some(0.0),
+            total_expenditure: Some(0.0),
+            beginning_cash: Some(0.0),
+            ending_cash: Some(0.0),
         };
         assert_eq!(empty.cash_as_years_of_spending(), None);
         assert_eq!(empty.state_share(), None);
+    }
+
+    #[test]
+    fn a_district_that_reported_nothing_is_not_a_district_that_reported_zero() {
+        // The distinction the whole module turns on. A year with no expenditure line has no
+        // operating result and no cash ratio -- rather than a result equal to its entire
+        // revenue, and a ratio of nothing over nothing.
+        let unreported = YearRecord {
+            fiscal_year: FiscalYear(2022),
+            unrestricted_aid: Some(6_388_201.0),
+            restricted_aid: Some(239_556.0),
+            property_tax: Some(2_257_818.0),
+            income_tax: Some(0.0),
+            property_tax_allocation: Some(380_181.0),
+            total_revenue: Some(9_570_163.0),
+            total_revenue_and_sources: Some(9_640_508.0),
+            total_expenditure: None,
+            beginning_cash: None,
+            ending_cash: None,
+        };
+        assert_eq!(unreported.operating_result(), None);
+        assert_eq!(unreported.cash_as_years_of_spending(), None);
+        // The lines it does carry are unaffected: the absence is per line, not per year.
+        assert!((unreported.state_share().unwrap() - 0.692_544).abs() < 1e-5);
+    }
+
+    #[test]
+    fn the_only_lines_a_filing_omits_are_the_named_ones() {
+        // A row count cannot find this: the fixture is uniform width, so a district missing a
+        // line has a row of exactly the same shape as one that reported every line. Without
+        // this test the hole reaches the feed and nothing says so, which is what happened.
+        let mut holes: Vec<String> = Vec::new();
+        for district in &finances() {
+            let short = district.years.iter().any(|y| {
+                [
+                    y.unrestricted_aid,
+                    y.restricted_aid,
+                    y.property_tax,
+                    y.income_tax,
+                    y.property_tax_allocation,
+                    y.total_revenue,
+                    y.total_revenue_and_sources,
+                    y.total_expenditure,
+                    y.beginning_cash,
+                    y.ending_cash,
+                ]
+                .iter()
+                .any(Option::is_none)
+            });
+            if !short {
+                continue;
+            }
+            assert!(
+                INCOMPLETE.iter().any(|(irn, _)| *irn == district.irn),
+                "{} ({}) omits a line and is not a named exception",
+                district.name,
+                district.irn
+            );
+            holes.push(district.irn.clone());
+        }
+        assert_eq!(holes.len(), INCOMPLETE.len(), "{holes:?}");
+    }
+
+    #[test]
+    fn the_incomplete_district_keeps_the_lines_it_did_report() {
+        // The correction must not throw the district's revenue away with its expenditure. Its
+        // FY2020 state aid is the guarantee's own baseline year, and it is reported.
+        let finances = finances();
+        let toronto = for_district(&finances, "044917").expect("Toronto City is in the panel");
+        let fy2020 = toronto.year(FiscalYear(2020)).expect("FY2020 is filed");
+        assert_eq!(fy2020.unrestricted_aid, Some(6_092_893.0));
+        assert_eq!(fy2020.total_revenue, Some(9_855_197.0));
+        assert_eq!(fy2020.total_expenditure, None);
+        assert_eq!(fy2020.ending_cash, None);
+        assert_eq!(toronto.guarantee_baseline_aid(), Some(6_092_893.0));
+        // The FY2026 filing carries the district in full, so the later years are whole.
+        let fy2025 = toronto.year(FiscalYear(2025)).expect("FY2025 is filed");
+        assert_eq!(fy2025.total_expenditure, Some(10_796_466.0));
+        assert_eq!(fy2025.ending_cash, Some(11_910_201.0));
     }
 
     #[test]

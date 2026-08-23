@@ -39,11 +39,11 @@ pub(crate) fn share(v: f64) -> String {
 pub(crate) fn finance_year(list: &mut json::Arr<'_>, y: &FinanceYear) {
     let mut o = list.obj();
     o.count("fiscal_year", y.fiscal_year);
-    o.num("state_aid", y.state_aid);
-    o.num("local_tax", y.local_tax);
-    o.num("total_revenue", y.total_revenue);
-    o.num("total_expenditure", y.total_expenditure);
-    o.num("ending_cash", y.ending_cash);
+    o.opt("state_aid", y.state_aid);
+    o.opt("local_tax", y.local_tax);
+    o.opt("total_revenue", y.total_revenue);
+    o.opt("total_expenditure", y.total_expenditure);
+    o.opt("ending_cash", y.ending_cash);
 }
 
 /// One fiscal year of the casino fund, per district. Two fields, and no third by design — see
