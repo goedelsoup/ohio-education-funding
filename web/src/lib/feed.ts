@@ -316,6 +316,37 @@ export function admSeamGap(district: District): number | null {
 }
 
 /**
+ * How far two effective Class I rates must differ before one is treated as having fallen.
+ *
+ * # Why the rule needs a constant at all
+ *
+ * Because it is applied in two files and was written down three ways. `feed.ts` used `0.0005` to
+ * count the statewide split, `tax.ts` used `0.0005` again for the sentence on a district's own
+ * page, `schema.spec.ts` used `0.0005` a third time to check the first — and the comment beside
+ * the first named **a hundredth of a mill**, which is `0.01` and twenty times larger. At most one
+ * of those was the rule. The two surfaces do not currently contradict each other on this data,
+ * which is what makes it worth fixing now: it is the same shape as the two definitions of median
+ * #100 merged, which also agreed right up until they would not have.
+ *
+ * # Why this value
+ *
+ * Table SD-1 publishes effective rates to **four decimal places**, and the feed carries exactly
+ * what it publishes — no `class1_rate` in the feed has a fifth. So two rates differ when they
+ * differ in the fourth place, and there is nothing finer for a tolerance to discriminate. What is
+ * left for it to absorb is the binary representation of a decimal literal, which for a quantity
+ * near twenty is a part in `1e15`.
+ *
+ * Half a unit in the last published place is therefore the **widest** value that cannot discard a
+ * difference Taxation actually printed. `0.0005` is ten times that, and it did discard two: a
+ * district that went 20.3844 → 20.3840 published a lower rate and was counted as unchanged. The
+ * at-floor count is 9 rather than 7 for that reason.
+ *
+ * The tolerance `beganAtFloor` uses is a different quantity and stays where it is — that is the
+ * Rust side's `FLOOR_TOLERANCE`, applied to the statutory floor rather than to a difference.
+ */
+export const RATE_FALL_TOLERANCE = 0.00005;
+
+/**
  * The statewide property-tax picture, from the two tax years the feed carries.
  *
  * H.B. 920's reduction factors roll an effective rate back as valuation rises and cannot roll it
@@ -360,9 +391,9 @@ function taxStatewide(districts: District[]): TaxStatewide {
       // comparison, so a district resting exactly on 20.0000 in both years is not a crossing.
       if (before.class1_rate > FLOOR !== after.class1_rate > FLOOR) crossedTheFloor++;
 
-      // A hundredth of a mill, which is the precision Table SD-1 publishes to. Anything smaller
-      // is the same rate written twice.
-      const fell = after.class1_rate - before.class1_rate < -0.0005;
+      // One rule, one constant, one reason — see `RATE_FALL_TOLERANCE`. The comment here named a
+      // hundredth of a mill and the code applied a two-thousandth.
+      const fell = after.class1_rate - before.class1_rate < -RATE_FALL_TOLERANCE;
 
       // Where the district stood when the interval opened — see `rateFell`. The tolerance is the
       // Rust side's `FLOOR_TOLERANCE`, applied to the same statutory floor.

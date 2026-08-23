@@ -20,7 +20,7 @@
  * nominal terms — but they cannot roll a rate below twenty mills. So a reappraisal does opposite
  * things on either side of that floor, and a single year cannot show it. With TY2023 and TY2024
  * the mechanism is countable: at the time of writing, 301 of the 416 districts that *began*
- * above the floor saw their effective rate fall, against 7 of the 193 that began at it, and 97.7%
+ * above the floor saw their effective rate fall, against 9 of the 193 that began at it, and 97.1%
  * of every rate reduction in Ohio happened above it. Those figures are computed in `feed.ts`
  * rather than written into the copy, because they appear on 609 pages and a regenerated feed
  * would otherwise leave them wrong — as it left this comment wrong until the split was corrected.
@@ -40,7 +40,7 @@ import { count, escapeHtml, millions, money, pct } from "./format.ts";
 import { barSpec } from "./plot/spec.ts";
 import { renderToString } from "./plot/ssr.ts";
 import * as routes from "./routes.ts";
-import { admSeamGap, type TaxStatewide } from "./feed.ts";
+import { admSeamGap, RATE_FALL_TOLERANCE, type TaxStatewide } from "./feed.ts";
 import type { District, PropertyTaxYear, Statewide } from "./types.ts";
 import { seriesYear, yearChip, yearChipPair, yearOf } from "./year.ts";
 import { term } from "./glossary.ts";
@@ -212,7 +212,7 @@ export function renderTaxChange(d: District, statewide: TaxStatewide): string {
              ${rateMoved >= 0 ? "+" : "−"}${Math.abs(rateMoved).toFixed(4)} mills against a
              ${pct(valueGrowth, 2)} change in value.
              ${
-               rateMoved < -0.0005
+               rateMoved < -RATE_FALL_TOLERANCE
                  ? `That is the factors doing what they were written to do: as valuation rises they
                     roll the rate back, so revenue from existing levies stays roughly flat in
                     nominal terms and the district has to return to voters to keep pace.`
