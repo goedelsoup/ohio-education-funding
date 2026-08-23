@@ -48,18 +48,18 @@ description: |
 findings: |
   **THE ANSWER, on the department's own published worked example district** (20,342.13 base
   cost enrolled ADM, 43 buildings), perturbing the classroom teacher salary from the FY2022
-  reference of $67,654 to an FY2024 refresh of $73,777.08 — a 9.1% rise:
+  reference of $68,022.22 to an FY2024 refresh of $73,777.08 — an 8.46% rise:
 
-      base cost per pupil    $7,608.05  ->  $7,960.38     +$352.33   (+4.63%)
-      aggregate base cost  $154,763,912 -> $161,931,078  +$7,167,165
+      base cost per pupil    $7,629.24  ->  $7,960.38     +$331.14   (+4.34%)
+      aggregate base cost  $155,194,925 -> $161,931,078  +$6,736,153
 
   Only the teacher sub-component moves; student support, district leadership, building
   operations, and athletics are unchanged by construction, because the perturbation touches one
-  price term. A 9.1% salary rise produces a 4.63% base cost rise — teacher cost is roughly half
-  of base cost for a district this size. [verified]
+  price term. An 8.46% salary rise produces a 4.34% base cost rise — teacher cost is roughly
+  half of base cost for a district this size. [verified]
 
   Scaled to Ohio's FY2022 base cost enrolled ADM of 1,499,918.26, a comparable refresh raises
-  **computed base cost statewide by roughly $528 million a year, from the teacher salary term
+  **computed base cost statewide by roughly $497 million a year, from the teacher salary term
   alone.** [inference — assumes this district's cost structure is representative] The state's
   appropriation consequence is a different and smaller number; see the incidence result below.
 
@@ -89,21 +89,30 @@ findings: |
   Grade-band shares from the department's October FY2024 headcount file, scaled by each
   district's base cost enrolled ADM:
 
-      statewide computed base cost increase   $496.3 million per year
-      ADM-weighted average                    $344.75 per pupil
-      per-pupil range                         $338.62  to  $471.10
+      statewide computed base cost increase   $466.2 million per year
+      ADM-weighted average                    $323.97 per pupil
+      per-pupil range                         $318.26  to  $442.76
 
-  The single-district extrapolation above gave $528 million; the real distribution gives $496.3
+  The single-district extrapolation above gave $497 million; the real distribution gives $466.2
   million. The gap is mostly denominators — the worked example's grade mix is slightly richer
   than the state's, and FY2024 ADM is lower than the FY2022 base cost ADM used to scale. The
-  two agree to within about 6%, which is the useful check on the extrapolation.
+  two agree to within about 7%, which is the useful check on the extrapolation.
+
+  **And $466.2 million is within 0.3% of the $465.0 million the department's own FY2027 model
+  gives for the same refresh** — see the guarantee section below. Those two figures are
+  computed on different panels, from different sources, by different routes: this one applies
+  grade-band shares from the October headcount file to FY2024 ADM across 604 districts; that
+  one scales the department's own published aggregate base cost across 609. Their agreement is
+  the strongest single check this scenario has, and it is a check on the whole chain — the
+  ratios, the benefit multiplier, the professional-development term, and the fixture — not on
+  any one term of it. [verified]
 
   ### The spread has a single cause, and it is the staffing minimum
 
-  The most-affected district gains 1.4 times per pupil what the least-affected does — $471.10
-  against $338.62 — with no policy choice involved. **155 of 604 districts** are small enough
-  that the six-teacher special teacher minimum binds, and their mean per-pupil gain is $368.44
-  against $343.53 for everyone else. [verified]
+  The most-affected district gains 1.4 times per pupil what the least-affected does — $442.76
+  against $318.26 — with no policy choice involved. **155 of 604 districts** are small enough
+  that the six-teacher special teacher minimum binds, and their mean per-pupil gain is $346.28
+  against $322.87 for everyone else. [verified]
 
   ### The spread, revised
 
@@ -151,6 +160,12 @@ findings: |
 
   ### Inputs verified
 
+  The FY2022 reference salary this whole perturbation is measured from is now the department's
+  own: **$68,022.22**, read off the `FY27 TRAD State Foundation Funding Calculator` through
+  [`StatewideFactors::fy2027`](../../../crates/foundation/src/lib.rs) rather than restated as a
+  literal. [verified] The figures above are the first version of this result that perturbs from
+  a number the workspace does not contradict elsewhere; see the revision below.
+
   ### The state share floor is not a small correction, and the $242.1m above does not apply it
 
       computed base cost increase        465.0
@@ -178,6 +193,36 @@ findings: |
   ratio of about fifteen to one. A refresh is progressive; the reason is mostly that wealthy
   districts are on the guarantee. [verified]
 revisions:
+  - was: |
+      Every figure perturbed from an FY2022 reference teacher salary of $67,654 — a $496.3
+      million statewide headline, $344.75 per pupil ADM-weighted, a $338.62 to $471.10 range,
+      and a single-district rise of $352.33 per pupil.
+    now: |
+      $67,654 was Fordham's figure, secondary reporting, and it was carried as `[inference]`
+      because it was never the department's. The department's own FY27 calculator prices the
+      FY2022 reference teacher at **$68,022.22**, and the workspace had held that value in
+      [`StatewideFactors::fy2027`](../../../crates/foundation/src/lib.rs) since the calculator
+      was retrieved — so this node was perturbing from a number its own crate contradicted.
+      Corrected, the block scales down by 1/1.0640 throughout: **$466.2 million** statewide,
+      $323.97 per pupil, a $318.26 to $442.76 range, and $331.14 per pupil on the worked
+      example. [verified]
+    found_by: |
+      An audit reading the constant against the committed FY27 department-model panel rather
+      than against the secondary source it was originally taken from.
+    reach: |
+      Every derived figure in this node's own runs, and nothing outside them: the guarantee and
+      state-share-floor decompositions are computed from the department's model directly and
+      never touched the constant, which is why their $465.0 million did not move.
+
+      The correction recovers a cross-validation that the error had hidden. At $496.3 million
+      against the department model's $465.0 million the two runs sat 6.3% apart and the node
+      presented them as separate answers rather than as a discrepancy. At $466.2 million they
+      agree to 0.3%, and the agreement is now the node's strongest evidence rather than its
+      loosest end.
+
+      The three sites carrying the literal are gone: all three now read the salary off
+      `StatewideFactors::fy2027()`, so a future correction to the price vector cannot leave a
+      panel perturbing from a superseded figure again.
   - was: |
       A 1.7x spread with a maximum of $580.82 per pupil, reported through four phases.
     now: |
@@ -241,10 +286,10 @@ properties:
     separate output artifact to drift from the code that made it.
   results: |
     Worked example district, 20,342.13 base cost enrolled ADM:
-      teacher salary input      $67,654.00 -> $73,777.08   (+9.05%)
-      teacher base cost        $93,787,359 -> $100,954,525
-      aggregate base cost     $154,763,912 -> $161,931,078  (+$7,167,165)
-      base cost per pupil        $7,608.05 -> $7,960.38     (+$352.33, +4.63%)
+      teacher salary input      $68,022.22 -> $73,777.08   (+8.46%)
+      teacher base cost        $94,218,372 -> $100,954,525
+      aggregate base cost     $155,194,925 -> $161,931,078  (+$6,736,153)
+      base cost per pupil        $7,629.24 -> $7,960.38     (+$331.14, +4.34%)
     All other sub-components unchanged. [verified]
   confidence: |
     The direction and the incidence structure are robust: they follow from the residual
@@ -254,11 +299,18 @@ properties:
     The magnitude is a lower bound and should be quoted as one. Perturbing one salary of ten
     understates a real refresh; the other nine categories would each add to it.
 
-    Two sensitivities remain untested. The FY2022 baseline salary is secondary reporting, so the
-    9.05% gap could be off by a point or so in either direction. And districts held on a
-    guarantee are off-formula entirely and would receive none of the increase — the guarantee
-    population is not modelled here at all, so the "100%" column overstates coverage by however
-    many districts are guaranteed. [open]
+    The FY2022 baseline salary is no longer a sensitivity. It was secondary reporting, and it
+    was wrong; it is now the department's own $68,022.22 and the 8.46% gap is verified at both
+    ends. What that bought is an independent check rather than a narrower error bar: the
+    statewide $466.2M and the department model's $465.0M now agree to 0.3%, where the figures
+    computed from the secondary salary sat 6.3% apart and were presented as two unreconciled
+    answers.
+
+    One sensitivity remains. Districts held on a guarantee are off-formula entirely and would
+    receive none of the increase — the guarantee population is not modelled in the
+    single-district run above at all, so its "100%" column overstates coverage by however many
+    districts are guaranteed. The guarantee section of the findings quantifies this on the
+    department's model; the runner has not been rewritten to carry it. [open]
 links:
   - target: ../../catalog/dew-october-enrollment.md
     relationship: sourced-from
