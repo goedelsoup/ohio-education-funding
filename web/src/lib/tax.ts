@@ -40,7 +40,7 @@ import { count, escapeHtml, millions, money, pct } from "./format.ts";
 import { barSpec } from "./plot/spec.ts";
 import { renderToString } from "./plot/ssr.ts";
 import * as routes from "./routes.ts";
-import type { TaxStatewide } from "./feed.ts";
+import { admSeamGap, type TaxStatewide } from "./feed.ts";
 import type { District, PropertyTaxYear, Statewide } from "./types.ts";
 import { seriesYear, yearChip, yearChipPair, yearOf } from "./year.ts";
 import { term } from "./glossary.ts";
@@ -574,6 +574,12 @@ export function renderChargeOff(d: District, statewide: Statewide, tax: TaxState
   const afterCorrection = statewide.median_regime_difference;
   const side = (value: number) => (value < 0 ? "worse" : "better");
 
+  // The enrolled-versus-funded gap for this district, from the same expression the statewide
+  // median beside it is taken over. The paragraph below used to compute its own — `adm` against
+  // `adm_history[0]` — and quote a median of a different pair, so a reader compared their district
+  // against a distribution it was not drawn from. See `TaxStatewide.admSeam`.
+  const seam = admSeamGap(d);
+
   const short = r.mills_short_of_charge_off;
   const rate = d.millage?.observed_rate;
 
@@ -690,10 +696,12 @@ export function renderChargeOff(d: District, statewide: Statewide, tax: TaxState
       <p class="note">One seam inside the arithmetic, stated rather than smoothed over. The deemed
         local share is per <strong>enrolled</strong> ADM, because that is what the published
         valuation per pupil divides by; the base cost it is subtracted from is per
-        <strong>funded</strong> base cost ADM. Those two counts differ by
-        ${pct(Math.abs(d.adm / (d.adm_history[0] || d.adm) - 1), 1)} for this district and by a
-        median of 1.6% statewide. The subtraction is the one <code>regime-diff</code> performs and
-        the one the mechanism's own description implies, and it is not exact.</p>
+        <strong>funded</strong> base cost ADM, the three-year average. Those two counts differ by
+        ${seam == null ? "an amount this district does not report" : pct(seam, 1)} here and by a
+        median of ${pct(tax.admSeam.median, 1)} statewide, reaching
+        ${pct(tax.admSeam.max, 0)} at the extreme. The subtraction is the one
+        <code>regime-diff</code> performs and the one the mechanism's own description implies, and
+        it is not exact.</p>
 
       ${
         r.residual == null

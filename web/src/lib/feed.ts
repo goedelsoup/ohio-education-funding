@@ -156,6 +156,27 @@ export interface TaxStatewide {
    * literals could not have.
    */
   medianRegimeDifferenceUncorrected: number;
+  /**
+   * The enrolled-versus-funded seam, across every district: how far apart the two counts are.
+   *
+   * The charge-off counterfactual subtracts a deemed local share from a base cost, and the two
+   * are not per the same pupil. `crates/regime-diff::at_fy2027` says which counts: the deemed
+   * share is `valuation_per_pupil` times the recognized share times the millage, and
+   * `valuation_per_pupil` is the profile report's — per **enrolled** ADM, which `denominators.ts`
+   * maps to `adm_history[0]`. The base cost it comes off is `base_cost_per_pupil`, which the
+   * panel defines as aggregate base cost over **base cost enrolled ADM**, the three-year average
+   * carried as `adm`.
+   *
+   * So the seam is `adm` against `adm_history[0]`, and the paragraph that states it was rendering
+   * that ratio per district beside a statewide median of a *different* pair — `adm` against
+   * `current_year_adm`, whose median is 1.59% where this one's is 1.95%. A reader was comparing
+   * their district against a distribution it was not drawn from. Computed here, once, so the two
+   * halves of that sentence cannot come apart again.
+   *
+   * `max` as well as the median because `denominators.ts` states the same divergence with the
+   * same two figures, and its extreme was the only half of it that was right.
+   */
+  admSeam: { median: number; max: number };
 }
 
 let cached: Feed | null = null;
@@ -278,6 +299,23 @@ export function loadFeed(): Feed {
 }
 
 /**
+ * One district's enrolled-versus-funded gap, as a share, or `null` where it cannot be taken.
+ *
+ * The per-district half of `TaxStatewide.admSeam`, exported so that the sentence naming both
+ * halves computes them from one expression. It read `d.adm / (d.adm_history[0] || d.adm) - 1`
+ * inline while the median beside it came from another pair entirely.
+ *
+ * `null` and not zero for a district with no enrolled count: zero is "the two counts agree", which
+ * is a real and different state — and the `|| d.adm` fallback in the expression this replaces
+ * produced exactly that, silently, for any district whose enrolled count were absent.
+ */
+export function admSeamGap(district: District): number | null {
+  const enrolled = district.adm_history[0];
+  if (enrolled == null || enrolled <= 0) return null;
+  return Math.abs(district.adm / enrolled - 1);
+}
+
+/**
  * The statewide property-tax picture, from the two tax years the feed carries.
  *
  * H.B. 920's reduction factors roll an effective rate back as valuation rises and cannot roll it
@@ -302,6 +340,9 @@ function taxStatewide(districts: District[]): TaxStatewide {
   // The regime difference each district would have shown before the deferral was corrected out of
   // the charge-off. See `TaxStatewide.medianRegimeDifferenceUncorrected`.
   const uncorrected: number[] = [];
+
+  // How far each district's funded count sits from its enrolled one. See `TaxStatewide.admSeam`.
+  const seam: number[] = [];
 
   // The floor the Rust side classifies against, restated once rather than at each comparison.
   const FLOOR = 20;
@@ -360,6 +401,9 @@ function taxStatewide(districts: District[]): TaxStatewide {
       uncorrected.push(regime.difference + regime.overstated_by);
     }
 
+    const gap = admSeamGap(d);
+    if (gap != null) seam.push(gap);
+
     const spending = d.spending_by_function;
     if (after && spending && spending.adm > 0) {
       const operating = spending.operating_per_pupil * spending.adm;
@@ -387,6 +431,7 @@ function taxStatewide(districts: District[]): TaxStatewide {
     deferredShare: taxableValue === 0 ? 0 : deferredValue / taxableValue,
     deferredChargeOff,
     medianRegimeDifferenceUncorrected: median(uncorrected),
+    admSeam: { median: median(seam), max: seam.length === 0 ? 0 : Math.max(...seam) },
   };
 }
 

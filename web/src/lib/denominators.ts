@@ -56,7 +56,19 @@ export const DENOMINATORS = {
     label: "Enrolled ADM",
     series: "profile",
     source: "Department of Education, District Profile Report",
-    note: "A headcount of pupils the district teaches. Differs from base cost ADM by a median 1.6% and by 27% at the extreme.",
+    /*
+     * The divergence from base cost ADM used to be typed here: "a median 1.6% and by 27% at the
+     * extreme". The extreme was right and the median was not — 1.6% is `adm` against
+     * `current_year_adm`, a different pair from the one this entry is about, whose median is
+     * 1.95%. The same wrong number was rendered on 609 taxes pages beside a per-district figure
+     * computed from the correct pair.
+     *
+     * Both come from `TaxStatewide.admSeam` now. `divergence` marks the entry whose sentence
+     * carries them, the way `endpoints` marks the one whose sentence carries a span; the figures
+     * are appended by `method.astro` at render time.
+     */
+    divergence: "adm-seam",
+    note: "A headcount of pupils the district teaches, and not the count the formula funds on.",
     field: "districts[].adm_history[0]",
   },
   "unweighted-adm-fy25": {

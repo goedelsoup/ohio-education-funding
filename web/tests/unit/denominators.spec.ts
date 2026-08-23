@@ -9,13 +9,15 @@
 
 import { expect, test } from "vitest";
 
+import { median } from "../../src/lib/stats.ts";
+
 import {
   BLOCK_DENOMINATORS,
   DENOMINATORS,
   FIELD_DENOMINATORS,
   RENDERED_PAIRS,
 } from "../../src/lib/denominators.ts";
-import { loadFeed } from "../../src/lib/feed.ts";
+import { admSeamGap, loadFeed } from "../../src/lib/feed.ts";
 
 /** Every path in the feed that looks like a per-pupil quantity or a pupil count. */
 function denominatorBearingPaths(): string[] {
@@ -138,4 +140,56 @@ test("the six pupil counts are genuinely different numbers", () => {
   // And the direction is stable: Taxation counts the most, because it counts children who live
   // in the district rather than children it teaches.
   expect(counts["sd1-adm"]).toBeGreaterThan(counts["enrolled-adm-fy24"] * 1.5);
+});
+
+test("the enrolled-versus-funded seam is one pair on both halves of the sentence that states it", () => {
+  /*
+   * The taxes page names the seam the charge-off counterfactual sits on — a deemed local share
+   * per **enrolled** ADM subtracted from a base cost per **funded** ADM — and gave a per-district
+   * figure beside a statewide median. The two were computed from different pairs of counts: the
+   * district figure from `adm` against `adm_history[0]`, the median from `adm` against
+   * `current_year_adm`. A reader was comparing their district against a distribution it was not
+   * drawn from, and the two figures are 1.95% and 1.6%, close enough that nothing looked wrong.
+   *
+   * `crates/regime-diff::at_fy2027` decides which pair is right: the deemed share is built from
+   * `valuation_per_pupil`, which is the profile report's and is per enrolled ADM — the count
+   * `FIELD_DENOMINATORS` maps that very field to — and the base cost it comes off is per base
+   * cost ADM, the three-year average. So the seam is `adm` against `adm_history[0]`, and this
+   * pins the whole sentence to that one pair.
+   */
+  const { bundle, tax } = loadFeed();
+
+  expect(FIELD_DENOMINATORS["districts[].valuation_per_pupil"]).toBe("enrolled-adm-fy24");
+  expect(DENOMINATORS["enrolled-adm-fy24"].field).toBe("districts[].adm_history[0]");
+  expect(DENOMINATORS["base-cost-adm"].field).toBe("districts[].adm");
+
+  const gaps = bundle.districts
+    .map((d) => admSeamGap(d))
+    .filter((v): v is number => v != null);
+  expect(gaps).toHaveLength(bundle.districts.length);
+
+  const sorted = [...gaps].sort((a, b) => a - b);
+  expect(tax.admSeam.median).toBeCloseTo(median(sorted), 12);
+  expect(tax.admSeam.max).toBeCloseTo(sorted[sorted.length - 1]!, 12);
+
+  // And it is not the other pair, which is what the sentence used to quote. Both round to "1.6%"
+  // and "1.9%" at one decimal — a tenth of a percent apart, and about a different question.
+  const other = median(
+    bundle.districts
+      .filter((d) => d.current_year_adm > 0)
+      .map((d) => Math.abs(d.adm / d.current_year_adm - 1)),
+  );
+  expect(tax.admSeam.median).not.toBeCloseTo(other, 3);
+});
+
+test("the pupil-count table's divergence figures are read, not typed", () => {
+  /*
+   * `denominators.ts` made the same claim as the taxes page, with the same wrong median typed
+   * into its note: "a median 1.6% and by 27% at the extreme". The extreme was right and the
+   * median was the other pair's. Neither figure is written down now; `method.astro` renders them
+   * from `TaxStatewide.admSeam`, which is one computation for both places that state it.
+   */
+  const entry = DENOMINATORS["enrolled-adm-fy24"];
+  expect("divergence" in entry).toBe(true);
+  expect(entry.note).not.toMatch(/\d+(\.\d+)?%/);
 });
