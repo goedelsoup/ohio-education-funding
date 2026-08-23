@@ -206,6 +206,24 @@ impl Bundle {
                 st.num("guarantee_total", w.guarantee_total);
                 st.num("realized_aid_total", w.realized_aid_total);
                 st.num("minimum_state_share", w.minimum_state_share);
+                st.num(
+                    "targeted_assistance_median_weighted_wealth",
+                    w.targeted_assistance_median_weighted_wealth,
+                );
+                st.num(
+                    "targeted_assistance_median_wealth_per_pupil",
+                    w.targeted_assistance_median_wealth_per_pupil,
+                );
+                st.num("preschool_appropriation", w.preschool_appropriation);
+                // Eight places, like `sigma` above and unlike everything else here: the district
+                // page prints the factor as published and the feed's four-place default would
+                // round 0.968_544_48 to 0.9685, which is a different number that happens to start
+                // the same way.
+                st.raw(
+                    "preschool_proration",
+                    &format!("{:.8}", w.preschool_proration),
+                );
+                st.num("preschool_total", w.preschool_total);
                 {
                     let mut list = st.arr("finances");
                     for y in &w.finances {

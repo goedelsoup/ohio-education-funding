@@ -818,7 +818,7 @@ export function renderCategoricals(d: District, statewide: Statewide): string {
         }</p>
 
       ${renderSpecialEducation(d)}
-      ${renderTargetedAssistance(d)}
+      ${renderTargetedAssistance(d, statewide)}
       ${renderDpia(d)}
       ${renderGifted(d)}
       ${renderCareerTechnical(d)}
@@ -922,14 +922,16 @@ function renderSpecialEducation(d: District): string {
  * Where a district has heavy inbound open enrolment those differ, and the card says so rather than
  * printing a per-pupil figure over whichever one came to hand.
  */
-function renderTargetedAssistance(d: District): string {
+function renderTargetedAssistance(d: District, statewide: Statewide): string {
   const t = d.targeted_assistance;
   const total = d.categoricals.targeted_assistance;
   if (t.weighted_wealth <= 0) return "";
 
-  // The statewide medians the two indices divide by, as `crates/project::panel` holds them.
-  const medianWealth = 392_151_306.63;
-  const medianPerPupil = 276_708.97;
+  // The statewide medians the two indices divide by, from the feed rather than from this file.
+  // They were copied out of `crates/project::panel` and bound to nothing, so the shortfall below
+  // was computed against whichever value the Rust held the last time somebody remembered.
+  const medianWealth = statewide.targeted_assistance_median_weighted_wealth;
+  const medianPerPupil = statewide.targeted_assistance_median_wealth_per_pupil;
   const enrolled = d.categorical_adm;
   const openEnrollmentGap = enrolled - t.resident_adm;
 
@@ -1310,7 +1312,7 @@ function renderEnglishLearners(d: District): string {
  * For a district just below, the card prints the amount forgone, which is the only honest way to
  * show a cliff.
  */
-export function renderSupplements(d: District): string {
+export function renderSupplements(d: District, statewide: Statewide): string {
   const s = d.supplements;
   const total = s.performance + s.base_funding + s.growth;
   if (total <= 0) return "";
@@ -1380,7 +1382,7 @@ export function renderSupplements(d: District): string {
       }
 
       ${renderTransportation(d)}
-      ${renderPreschoolSpecialEducation(d)}
+      ${renderPreschoolSpecialEducation(d, statewide)}
 
       <p class="note">The performance supplement is the only part of Ohio's school funding paid on
         a <em>measured outcome</em> rather than on pupils, categories or a tax base — and it runs
@@ -1663,7 +1665,7 @@ function renderTransportation(d: District): string {
  * shows what a proration *is*: the appropriation limit sits in a cell beside the factor. At the
  * stated factor the program runs $908,184 over that limit, which the card says plainly.
  */
-function renderPreschoolSpecialEducation(d: District): string {
+function renderPreschoolSpecialEducation(d: District, statewide: Statewide): string {
   const p = d.preschool_special_education;
   if (p.total <= 0) return "";
 
@@ -1709,9 +1711,11 @@ function renderPreschoolSpecialEducation(d: District): string {
       and sitting on a flat ${money(4000)}, they produce something close to parity.</p>
     <p class="note"><strong>And this program is over its appropriation.</strong> Its sheet is the
       one place in the calculator that shows what a proration is, because it carries the
-      appropriation limit in a cell beside the factor: ${money(147_500_000)}. At the stated factor
-      of 0.96854448 the program totals <strong>${money(148_408_184)}</strong> statewide —
-      ${money(908_184)} over. This district was computed ${money(p.unprorated)} and paid
+      appropriation limit in a cell beside the factor: ${money(statewide.preschool_appropriation)}.
+      At the stated factor of ${statewide.preschool_proration}
+      the program totals <strong>${money(statewide.preschool_total)}</strong> statewide —
+      ${money(statewide.preschool_total - statewide.preschool_appropriation)} over. This district
+      was computed ${money(p.unprorated)} and paid
       ${money(p.total)}, ${money(shortfall)} short. The calculator is a projection published before
       the fiscal year, so the factor is presumably recalibrated before payment; as published, the
       factor, the limit and the total do not agree.</p>`;

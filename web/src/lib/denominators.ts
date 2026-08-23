@@ -228,6 +228,10 @@ export const FIELD_DENOMINATORS: Record<string, DenominatorKey | null> = {
   "statewide.median_yield_per_mill": "sd1-adm",
   "statewide.min_yield_per_mill": "sd1-adm",
   "statewide.max_yield_per_mill": "sd1-adm",
+  // The median targeted assistance's wealth index divides by, on the same resident count the
+  // district figure it is displayed against uses. It has to be: the index *is* the one over the
+  // other, so a mismatch here would not be a misleading comparison but a wrong quotient.
+  "statewide.targeted_assistance_median_wealth_per_pupil": "ta-resident-adm",
 
   // The Census comparison, on the federal survey's count.
   "national.national_spending_per_pupil": "census-fall-enrollment",
@@ -374,6 +378,12 @@ export const RENDERED_PAIRS: [string, string][] = [
   ["districts[].millage.yield_per_mill_per_pupil", "statewide.median_yield_per_mill"],
   ["districts[].millage.yield_per_mill_per_pupil", "statewide.min_yield_per_mill"],
   ["districts[].millage.yield_per_mill_per_pupil", "statewide.max_yield_per_mill"],
+  // The targeted assistance card renders both, one row apart: the district's wealth per resident
+  // pupil, and the statewide median the row below divides it into.
+  [
+    "districts[].targeted_assistance.wealth_per_pupil",
+    "statewide.targeted_assistance_median_wealth_per_pupil",
+  ],
 ];
 
 /**
