@@ -54,6 +54,23 @@ const spreadValues = house.members
   }));
 const spreadCount = spreadValues.length;
 const spread = renderToString(distributionSpec(spreadValues), { label: `Assessed valuation per pupil across the ${spreadCount} districts in ${label} District ${number} with a reported tax base, poorest to wealthiest` });
+/*
+ * The two ends of the strip, and the column the strip is drawn from.
+ *
+ * `distributionSpec` draws no axis by construction — every other strip on the site states its
+ * scale in a `.scale` row underneath, and these 129 pages drew the dots with no axis, no scale row
+ * and no valuation column in the table below, which left a reader nothing to recover a value with.
+ * A dot at four fifths of the width meant nothing at all.
+ *
+ * `sortedSpread` is the same array the chart is drawn from, so the two ends named here are the two
+ * ends drawn — not a min and max taken again off a different filter.
+ */
+const sortedSpread = [...spreadValues].sort((a, b) => a.value - b.value);
+const spreadLow = sortedSpread[0]?.value ?? null;
+const spreadHigh = sortedSpread[sortedSpread.length - 1]?.value ?? null;
+const valuationByIrn = new Map(
+  house.members.map((m) => [m.irn, byIrn.get(m.irn)?.valuation_per_pupil ?? null]),
+);
 ---
 
 <Base
@@ -119,13 +136,18 @@ const spread = renderToString(distributionSpec(spreadValues), { label: `Assessed
             {" "}{spreadCount >= BOX_FROM ? " The shaded box is the middle half of them." : ""}
           </p>
           <div class="chartwrap" data-chart="seat-spread" set:html={spread} />
+          <div class="scale">
+            <span>{money(spreadLow)}</span>
+            <span>{money(spreadHigh)}</span>
+          </div>
         </>
       )
     }
     <div class="scroll"><table>
       <thead><tr>
         <th>District</th><th class="tnum">Of the district</th><th class="tnum">Of this seat</th>
-        <th class="tnum">Pupils</th><th class="tnum">State aid</th>
+        <th class="tnum">Pupils</th><th class="tnum">Valuation per pupil</th>
+        <th class="tnum">State aid</th>
       </tr></thead>
       <tbody>
         {house.members.map((m) => (
@@ -135,6 +157,9 @@ const spread = renderToString(distributionSpec(spreadValues), { label: `Assessed
             <td class="tnum">{pct(m.share, 1)}</td>
             <td class="tnum">{pct(m.share_of_house_district, 1)}</td>
             <td class="tnum">{count(Math.round(m.adm))}</td>
+            {/* The measure the strip above is drawn from, so a dot can be read back to a row.
+                An em dash where the district reports none — the same districts the strip drops. */}
+            <td class="tnum">{money(valuationByIrn.get(m.irn))}</td>
             <td class="tnum">{money(m.realized_aid)}</td>
           </tr>
         ))}

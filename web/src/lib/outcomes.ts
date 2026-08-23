@@ -128,6 +128,25 @@ export function renderOutcomes(bundle: Bundle): string {
   const povertyBands = bands(bundle.districts, (d) => d.economically_disadvantaged);
   const BAND_LABELS = ["least poor third", "middle third", "poorest third"];
 
+  /*
+   * One horizontal scale across the pair, so the comparison the card asks for is a comparison.
+   *
+   * The prose under the second chart reads "now they separate on the horizontal axis too", which
+   * is a claim about horizontal distance — and the two axes were fitted to their own ranges, which
+   * differ by 1.64×. Part of the separation a reader saw was the frame. The union of the two
+   * ranges is the only domain on which the pair means what the sentence says.
+   */
+  const spendingValues = (x: (d: District) => number | null | undefined) =>
+    bundle.districts.map(x).filter((v): v is number => v != null && Number.isFinite(v));
+  const spendingRange = [
+    ...spendingValues((d) => d.outcome?.per_equivalent_pupil),
+    ...spendingValues((d) => d.outcome?.per_enrolled_pupil),
+  ];
+  const spendingDomain: [number, number] = [
+    Math.min(...spendingRange),
+    Math.max(...spendingRange),
+  ];
+
   const spending = (x: (d: District) => number | null | undefined, label: string) => {
     const points = pairs(
       bundle.districts,
@@ -156,7 +175,7 @@ export function renderOutcomes(bundle: Bundle): string {
         y: { label: "Performance Index", format: (v) => v.toFixed(0) },
       },
       traces,
-      { height: 330 },
+      { height: 330, xDomain: spendingDomain },
     );
   };
   const weightedScatter = spending((d) => d.outcome?.per_equivalent_pupil, "need-weighted pupil");
@@ -229,7 +248,9 @@ export function renderOutcomes(bundle: Bundle): string {
 
     <div class="card" id="two-denominators" data-part="two-denominators">
       <h2>${anchor("two-denominators")}The same numerator, two denominators, two answers${yearChipPair("outcome.performance", "outcome.spending", "spending")}</h2>
-      <p class="note">The same districts and the same vertical axis, twice. Above, the department
+      <p class="note">The same districts and the same two axes, twice — both charts are drawn on
+        one horizontal scale spanning the wider of the two denominators, so a difference in
+        horizontal position is a difference in dollars and not in the frame. Above, the department
         divides spending by a count weighted upward for disadvantage, English learners and
         disability; below, by the pupils actually enrolled. Each dot is shaded by the third of the
         state its district's poverty rate falls in — the variable neither axis carries, and the one

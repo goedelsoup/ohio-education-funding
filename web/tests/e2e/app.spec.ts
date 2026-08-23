@@ -1188,6 +1188,31 @@ test.describe("the outcome routes", () => {
     await expect(card).toContainText("−0.355");
   });
 
+  test("and against one horizontal scale, because the card's prose is about horizontal distance", async ({
+    page,
+  }) => {
+    /*
+     * The sentence under the second chart reads "now they separate on the horizontal axis too".
+     * Fitted to their own ranges the two x axes differed by 1.64×, so part of the separation a
+     * reader saw was the frame rather than the dollars. Both charts state their own ends, so the
+     * assertion is that the two pairs of ends are the same pair.
+     */
+    await page.goto("/outcomes");
+    const card = page.locator('[data-part="two-denominators"]');
+    const ends = async (chart: string) =>
+      (await card.locator(`[data-chart="${chart}"] svg text`).allTextContents()).filter((t) =>
+        /^\$[\d,]+$/.test(t),
+      );
+    const weighted = await ends("weighted-spending");
+    // Both ends of the x axis — the third bottom label is the axis's name. Asserted so that the
+    // comparison below is not between two empty lists, which would pass on a chart that had
+    // stopped drawing its scale at all.
+    expect(weighted).toHaveLength(2);
+    // The wider denominator's own maximum, on the chart of the narrower one.
+    expect(weighted[1]).toBe("$38,140");
+    expect(weighted).toEqual(await ends("enrolled-spending"));
+  });
+
   test("a district's score is shown against comparable poverty, not against the state", async ({
     page,
   }) => {
@@ -2218,6 +2243,27 @@ test.describe("house districts", () => {
     await expect(page.locator('a[href^="/house/"]')).toHaveCount(99);
   });
 
+  test("the seat's valuation strip can be read off, in the scale row and in the table", async ({
+    page,
+  }) => {
+    /*
+     * 129 seat pages drew a valuation strip and gave a reader no way to recover a value from it:
+     * `distributionSpec` draws no axis by construction, and this was the one page carrying it with
+     * neither the `.scale` row every other strip on the site has nor a valuation column in the
+     * table underneath. A dot four fifths along meant nothing at all.
+     *
+     * Both, and not either: the scale row states the ends, and the column is what lets a reader go
+     * from a dot to the district it belongs to.
+     */
+    await page.goto("/house/065");
+    const card = page.locator('[data-part="members"]');
+    await expect(card.locator('[data-chart="seat-spread"] svg')).toBeVisible();
+    const scale = card.locator(".scale").first();
+    await expect(scale.locator("span")).toHaveCount(2);
+    await expect(scale.locator("span").first()).toContainText("$");
+    await expect(card.locator("thead")).toContainText("Valuation per pupil");
+  });
+
   test("a seat page distinguishes the two shares it prints side by side", async ({ page }) => {
     /*
      * "Of the district" and "of this seat" answer opposite questions, and a swap would be
@@ -2407,6 +2453,29 @@ test.describe("the district index shows the distribution it is filtering", () =>
       await expect(page.locator("#district-measures")).toHaveAttribute("data-measure", key);
       await expect(page.locator(`.measure[data-measure="${key}"]`)).toBeVisible();
       await expect(page.locator("#district-measures .measure:visible")).toHaveCount(1);
+    }
+  });
+
+  test("the one signed strip draws its zero, and the other five are unchanged", async ({ page }) => {
+    /*
+     * Enrollment change is the site's one signed distribution. It drew no zero reference, so a dot
+     * two thirds along could have been a district that grew or one that shrank and the strip
+     * carried nothing to say which — while `histogramSpec` draws a dashed rule and labels it
+     * "no change" for exactly that reason.
+     *
+     * The other five measure quantities that cannot be negative, and drawing a zero on them would
+     * be a reference to a value outside their range. `distributionSpec` decides from the domain,
+     * so what is asserted here is that the decision came out one way six times.
+     */
+    await page.goto("/districts");
+    const measures = page.locator("#district-measures");
+    await expect(measures.locator('.measure[data-measure="enrollment"]')).toContainText(
+      "no change",
+    );
+    for (const key of ["aid", "valuation", "poverty", "adm", "guarantee"]) {
+      await expect(measures.locator(`.measure[data-measure="${key}"]`)).not.toContainText(
+        "no change",
+      );
     }
   });
 
@@ -3539,6 +3608,28 @@ test.describe("against america", () => {
     await page.goto("/district/044933");
     const card = page.locator('.card[data-part="national"]');
     await expect(card).toContainText("national top fifth");
+  });
+
+  test("Ohio carries a mark in the chart built to show Ohio's position", async ({ page }) => {
+    /*
+     * The statewide card ranks the states by local share and draws Ohio among the six highest. It
+     * set `current: true` on Ohio's bar and nothing read it — `Bar` did not declare the field and
+     * `barSpec` ignored it — so a reader had to find Ohio by reading the category names, which is
+     * the work the chart was drawn to save.
+     *
+     * Two channels, because one of them is colour. The weight is the one that survives a
+     * monochrome print, which is the rule the print stylesheet applies to every other mark here.
+     */
+    await page.goto("/statewide");
+    const chart = page.locator('[data-chart="local-share"] svg');
+    // Plot hoists constants onto the mark's group, which is why the subject is a group of its own.
+    const marked = chart.locator("g.bar-label.current");
+    await expect(marked).toHaveAttribute("font-weight", "600");
+    await expect(marked.locator("text")).toHaveText(["Ohio"]);
+    // And the rest of the states are still in the plain group, at the plain weight.
+    const plain = chart.locator("g.bar-label:not(.current)");
+    expect(await plain.locator("text").count()).toBeGreaterThan(3);
+    await expect(plain).not.toHaveAttribute("font-weight", "600");
   });
 
   test("the one district outside the comparable set says so rather than showing a rank", async ({

@@ -18,6 +18,17 @@ export interface Bar {
   hover?: string;
   /** Printed at the end of the bar. Use sparingly — never a number on every mark. */
   direct?: string;
+  /**
+   * The bar the chart was built to locate — Ohio, in a chart of the states.
+   *
+   * `statewide.ts` set this on the national chart and nothing read it: `Bar` did not declare the
+   * field and `barSpec` ignored it, so the one mark the chart exists to point at carried no mark
+   * at all. Honoured on two channels, because one of them is colour — see {@link barSpec}.
+   *
+   * Not a general "highlight this" flag. It says *this row is the subject*, which is a fact about
+   * the page rather than about the data, and a chart with two subjects has none.
+   */
+  current?: boolean;
 }
 
 /** One bin of a distribution. */
