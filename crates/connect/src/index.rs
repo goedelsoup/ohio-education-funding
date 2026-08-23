@@ -49,6 +49,19 @@ pub enum IndexError {
         /// Where it was found.
         file: String,
     },
+    /// A tracked document could not be read.
+    ///
+    /// Distinct from [`Self::Io`] because it used to be a `continue`. A `DOCUMENTS` entry that
+    /// cannot be read is a document that has been deleted, moved or renamed without anyone
+    /// updating the list — and skipping it made `index --check` report "every block is already
+    /// current" against a tree with all eight documents deleted (#125). A check that passes
+    /// hardest when there is nothing to check is worse than no check.
+    Unreadable {
+        /// The path as `DOCUMENTS` names it.
+        file: String,
+        /// Why it could not be read.
+        cause: io::Error,
+    },
     /// A filesystem operation failed.
     Io(io::Error),
 }
@@ -59,6 +72,11 @@ impl core::fmt::Display for IndexError {
             Self::UnknownBlock { command, file } => {
                 write!(f, "{file}: no generator for REGEN block {command:?}")
             }
+            Self::Unreadable { file, cause } => write!(
+                f,
+                "{file}: tracked in DOCUMENTS but unreadable ({cause}). \
+                 Restore it, or remove it from the list."
+            ),
             Self::Io(cause) => write!(f, "{cause}"),
         }
     }
@@ -1097,9 +1115,10 @@ fn render(root: &Path) -> Result<Vec<(&'static str, String, String)>, IndexError
     let mut rendered = Vec::new();
     for document in DOCUMENTS {
         let path = root.join(document);
-        let Ok(original) = fs::read_to_string(&path) else {
-            continue;
-        };
+        let original = fs::read_to_string(&path).map_err(|cause| IndexError::Unreadable {
+            file: (*document).to_string(),
+            cause,
+        })?;
         let out = render_document(document, &original, root)?;
         rendered.push((*document, original, out));
     }
@@ -1125,13 +1144,25 @@ mod tests {
     use super::*;
     use crate::cache::repository_root;
 
+    /// A tracked document's text, insisting the document exist.
+    ///
+    /// Every one of these reads was `unwrap_or_default()`, which turns a deleted document into an
+    /// empty string — so every check below passed hardest when its subject was gone (#125). The
+    /// generators keep `unwrap_or_default` deliberately, because a corpus directory that is not
+    /// there is a real state they report on; a document in `DOCUMENTS` that is not there is not.
+    fn document_text(root: &Path, name: &str) -> String {
+        std::fs::read_to_string(root.join(name)).unwrap_or_else(|cause| {
+            panic!("{name} is tracked in DOCUMENTS but unreadable: {cause}")
+        })
+    }
+
     #[test]
     fn every_block_in_every_document_has_a_generator() {
         // The check that keeps a heading from promising content nothing produces. Adding a new
         // REGEN block without a generator fails here rather than shipping an empty section.
         let root = repository_root();
         for document in DOCUMENTS {
-            let text = std::fs::read_to_string(root.join(document)).unwrap_or_default();
+            let text = document_text(&root, document);
             for marker in text.split("<!-- REGEN: ").skip(1) {
                 let command = marker.lines().next().unwrap_or_default().trim();
                 assert!(
@@ -1152,7 +1183,7 @@ mod tests {
         // a new block is the easy place to write the old marker back.
         let root = repository_root();
         for document in DOCUMENTS {
-            let text = std::fs::read_to_string(root.join(document)).unwrap_or_default();
+            let text = document_text(&root, document);
             for marker in text.split("<!-- REGEN: ").skip(1) {
                 let command = marker.lines().next().unwrap_or_default().trim();
                 assert!(
@@ -1173,7 +1204,7 @@ mod tests {
     fn no_document_still_tells_a_reader_to_run_a_binary_that_does_not_exist() {
         let root = repository_root();
         for document in DOCUMENTS {
-            let text = std::fs::read_to_string(root.join(document)).unwrap_or_default();
+            let text = document_text(&root, document);
             assert!(
                 !text.contains("to populate._"),
                 "{document} still carries an unpopulated block"
@@ -1610,7 +1641,7 @@ mod tests {
 
         for (document, original, _) in &rendered {
             assert_eq!(
-                &std::fs::read_to_string(root.join(document)).unwrap_or_default(),
+                &document_text(&root, document),
                 original,
                 "{document} was written by a check"
             );
@@ -1640,7 +1671,7 @@ mod tests {
         let root = repository_root();
         let before: Vec<_> = DOCUMENTS
             .iter()
-            .map(|document| std::fs::read_to_string(root.join(document)).unwrap_or_default())
+            .map(|document| document_text(&root, document))
             .collect();
 
         let _ = stale(&root).expect("generators exist");
@@ -1648,7 +1679,7 @@ mod tests {
 
         for (document, original) in DOCUMENTS.iter().zip(before) {
             assert_eq!(
-                std::fs::read_to_string(root.join(document)).unwrap_or_default(),
+                document_text(&root, document),
                 original,
                 "{document} was written by the test suite"
             );

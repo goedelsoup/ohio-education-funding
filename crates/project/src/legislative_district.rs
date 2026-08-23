@@ -331,10 +331,20 @@ mod tests {
 
     /// Ohio's constitution requires each Senate district to be exactly three whole House districts.
     ///
-    /// Asserted from the block data rather than assumed: the Senate crosswalk is read from the
-    /// Bureau's own file, and this checks that grouping the House one reproduces it. If a future
-    /// redistricting broke the rule, deriving Senate figures from House ones would silently start
-    /// producing wrong answers — so the corpus reads both and checks they agree.
+    /// Asserted from the crosswalk rather than assumed, and the composition is *derived* here
+    /// rather than looked up: which three House seats make up each Senate seat falls out of the
+    /// shares themselves, because a school district's share of a Senate seat must be the sum of
+    /// its shares of that seat's three House districts. The mapping is not sequential — Senate 2
+    /// is House 44, 75 and 89 — so recovering it is a real reconstruction of the Senate file from
+    /// the House one.
+    ///
+    /// # What this used to assert
+    ///
+    /// `assert_eq!(house.len(), senate.len() * 3)` — that is, `99 == 33 * 3`, two constants this
+    /// module declares itself. It held against a Senate crosswalk replaced wholesale by a
+    /// fabrication (#125), because nothing in it read a Senate share. The pupil reconciliation
+    /// beside it was real but weak: any partition of the state reconciles, however the seats are
+    /// drawn.
     #[test]
     fn every_senate_district_is_exactly_three_whole_house_districts() {
         let panel = panel::panel();
@@ -349,8 +359,103 @@ mod tests {
             "house apportions {h:.4} pupils and senate {s:.4}"
         );
 
-        // Three House seats per Senate seat, by count.
-        assert_eq!(house.len(), senate.len() * 3);
+        // `seat number -> school district IRN -> the share of that district lying in the seat`.
+        let shares = |seats: &[LegislativeDistrict]| -> BTreeMap<String, BTreeMap<String, f64>> {
+            seats
+                .iter()
+                .map(|seat| {
+                    (
+                        seat.number.clone(),
+                        seat.members
+                            .iter()
+                            .map(|m| (m.irn.clone(), m.share))
+                            .collect(),
+                    )
+                })
+                .collect()
+        };
+        let house_shares = shares(&house);
+        let senate_shares = shares(&senate);
+
+        // A House seat lies inside a Senate seat only if every school district reaching the House
+        // seat reaches the Senate seat by at least as much. On a real map exactly one Senate seat
+        // satisfies that for each House seat; on a fabricated one, none does or several do.
+        // The crosswalk stores `share` to eight decimal places, so each is rounded by up to 5e-9.
+        // Summing three House shares and comparing against a fourth rounded figure admits four of
+        // those, and nothing else: 2e-8. The worst actually observed is asserted below, so this
+        // cannot quietly become a tolerance chosen to make the test pass.
+        const ROUNDING: f64 = 2e-8;
+        let mut worst = 0.0_f64;
+
+        let mut composition: BTreeMap<&str, Vec<&str>> = BTreeMap::new();
+        for (number, reach) in &house_shares {
+            let containing: Vec<&str> = senate_shares
+                .iter()
+                .filter(|(_, senate_reach)| {
+                    reach.iter().all(|(irn, share)| {
+                        senate_reach
+                            .get(irn)
+                            .is_some_and(|whole| *whole >= share - 1e-9)
+                    })
+                })
+                .map(|(number, _)| number.as_str())
+                .collect();
+            assert_eq!(
+                containing.len(),
+                1,
+                "House {number} lies inside {} Senate districts, not one: {containing:?}",
+                containing.len()
+            );
+            composition.entry(containing[0]).or_default().push(number);
+        }
+
+        assert_eq!(
+            composition.len(),
+            SENATE_DISTRICTS,
+            "the House seats reconstruct {} Senate districts",
+            composition.len()
+        );
+
+        for (number, members) in &composition {
+            assert_eq!(
+                members.len(),
+                3,
+                "Senate {number} is made of {} House districts: {members:?}",
+                members.len()
+            );
+
+            // Exactly three *whole* House districts: the Senate seat's reach is the sum of theirs,
+            // district by district, with nothing left over on either side.
+            let seat = &senate_shares[*number];
+            let mut summed: BTreeMap<&str, f64> = BTreeMap::new();
+            for member in members {
+                for (irn, share) in &house_shares[*member] {
+                    *summed.entry(irn.as_str()).or_default() += share;
+                }
+            }
+            assert_eq!(
+                summed.len(),
+                seat.len(),
+                "Senate {number} reaches {} districts, its three House seats {}",
+                seat.len(),
+                summed.len()
+            );
+            for (irn, share) in seat {
+                let from_house = summed.get(irn.as_str()).copied().unwrap_or_default();
+                worst = worst.max((from_house - share).abs());
+                assert!(
+                    (from_house - share).abs() <= ROUNDING,
+                    "Senate {number}, district {irn}: the seat claims {share:.9} and its three \
+                     House districts supply {from_house:.9}"
+                );
+            }
+        }
+
+        // The measured worst case, so the tolerance above stays honest.
+        assert!(
+            worst < 1.2e-8,
+            "the worst reconstruction gap is {worst:e}, which has grown"
+        );
 
         // And the Senate is the less approximate view, because its seats are larger.
         let whole =

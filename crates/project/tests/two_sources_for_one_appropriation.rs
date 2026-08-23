@@ -101,7 +101,11 @@ fn compared() -> (Vec<Claim>, Vec<Claim>) {
     let mut differ = Vec::new();
     for (key, left) in &g {
         let Some(right) = c.get(key) else { continue };
-        if (left - right).abs() < 0.5 {
+        // `<= 0.5`, not `< 0.5`. The two publications round to different places, so a difference
+        // of exactly half a dollar is their rounding meeting in the middle and nothing else.
+        // The strict form put those ties on the *differ* side, and thirteen of them were the only
+        // thing holding `actuals_disagree_...`'s year-spread claim above its threshold (#125).
+        if (left - right).abs() <= 0.5 {
             agree.push(key.clone());
         } else {
             differ.push(key.clone());
@@ -168,11 +172,57 @@ fn actuals_disagree_because_an_actual_is_restated_and_an_appropriation_is_not() 
         rate * 100.0
     );
 
-    // And revision is not confined to one year, which a parser bug in one document would be.
+    // Every real disagreement is FY2007's. Pinned as the fact it is, rather than argued from.
+    //
+    // This read `assert!(years.len() > 3, ...)`, under a comment saying revision "is not confined
+    // to one year, which a parser bug in one document would be". It passed — on thirteen
+    // differences of *exactly fifty cents*, spread across 2010, 2013, 2014, 2015, 2021, 2022,
+    // 2023 and 2025, which are the two publications' rounding and not a restatement of anything.
+    // Absorb them at the comparison and the set is `{2007}` alone: 93 disagreements, the largest
+    // $89,389,888. The year-spread argument was never in evidence (#125).
+    //
+    // So the reassurance the old comment offered is withdrawn rather than reworded. The usual
+    // control — same document, same year, enacted figures agreeing to the cent while actuals move
+    // — is not available here either: FY2007 has **no** overlapping enacted claim, so there is
+    // nothing in this fixture that separates a 2007 restatement from a 2007 parser fault. What
+    // the file can say is what it now asserts: where the sources disagree, and by how much.
     let years: BTreeSet<u16> = differ
         .iter()
         .filter(|(_, _, k)| k == "actual")
         .map(|(y, _, _)| *y)
         .collect();
-    assert!(years.len() > 3, "only {years:?} carry a revised actual");
+    assert_eq!(
+        years,
+        BTreeSet::from([2007]),
+        "disagreement has appeared outside FY2007; it needs explaining before this is relaxed"
+    );
+}
+
+/// Outside FY2007 the two sources are never more than half a dollar apart, and thirteen sit
+/// exactly at that boundary.
+///
+/// [`compared`] absorbs everything at or under half a dollar, which means nothing downstream can
+/// see these — and something downstream was relying on them (#125). Pinned here, with the bound
+/// asserted rather than the exact values, so that a rounding tie becoming a real difference fails
+/// in the place that explains it rather than silently changing the meaning of a test elsewhere.
+#[test]
+fn the_only_disagreements_outside_fy2007_are_exact_half_dollar_rounding_ties() {
+    let (g, c) = (greenbook(), catalog());
+    let mut ties = 0_usize;
+    for (key, left) in &g {
+        let Some(right) = c.get(key) else { continue };
+        if key.2 != "actual" || key.0 == 2007 {
+            continue;
+        }
+        let difference = (left - right).abs();
+        assert!(
+            difference <= 0.5,
+            "{key:?}: the two sources differ by ${difference:.2} outside FY2007, which is past \
+             what their rounding explains"
+        );
+        if difference == 0.5 {
+            ties += 1;
+        }
+    }
+    assert_eq!(ties, 13, "the count of rounding ties has moved");
 }

@@ -88,9 +88,18 @@ impl PolicyEffect {
     ///
     /// The number worth leading with for anything that changes the formula, because the
     /// guarantee is what makes it large.
+    ///
+    /// Counted, not subtracted. This was `outcomes.len() - gainers() - losers()`, which made
+    /// `gainers + losers + unmoved == outcomes.len()` an identity — and that sum is asserted in
+    /// `scenario-delta` as "the three classes must partition the panel", where it could not fail
+    /// however the thresholds were set (#125). Written as its own filter, the sum is a real claim
+    /// about the three predicates: that they leave no district in none of them and none in two.
     #[must_use]
     pub fn unmoved(&self) -> usize {
-        self.outcomes.len() - self.gainers() - self.losers()
+        self.outcomes
+            .iter()
+            .filter(|o| (-0.005..=0.005).contains(&o.delta()))
+            .count()
     }
 }
 
