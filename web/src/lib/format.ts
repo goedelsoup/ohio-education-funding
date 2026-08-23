@@ -1,15 +1,25 @@
 /** Number and text formatting. Small enough to test exhaustively, and it has been wrong. */
 
-/** A dollar amount, or an em dash where there is no value. */
+/**
+ * A dollar amount, or an em dash where there is no value.
+ *
+ * The minus is U+2212 and sits outside the dollar sign, which is what `signedMoney` and
+ * `millions` in this file already do. This one fell through to `toLocaleString`, so it printed
+ * `$-47` while its neighbours printed `−$1,318`, and the two met in one sentence on /statewide
+ * and in one chart tooltip on a district's finances. A reader is entitled to assume two figures
+ * formatted differently were computed differently.
+ *
+ * A magnitude that rounds away loses the sign with it: `money(-0.4)` is `$0`, not `−$0`. Same
+ * rule as `signedMoney`, and for the same reason — a sign on a quantity that rounded to nothing
+ * is a claim the figure does not support.
+ */
 export function money(v: number | null | undefined, decimals = 0): string {
   if (v == null || !Number.isFinite(v)) return "—";
-  return (
-    "$" +
-    v.toLocaleString("en-US", {
-      minimumFractionDigits: decimals,
-      maximumFractionDigits: decimals,
-    })
-  );
+  const text = Math.abs(v).toLocaleString("en-US", {
+    minimumFractionDigits: decimals,
+    maximumFractionDigits: decimals,
+  });
+  return (v < 0 && Number(text.replace(/,/g, "")) !== 0 ? "−" : "") + "$" + text;
 }
 
 /** A signed dollar amount, so a zero change reads as zero rather than as a gain. */
@@ -34,10 +44,12 @@ export function millions(v: number | null | undefined): string {
     : `${sign}$${(magnitude / 1_000_000).toFixed(1)}M`;
 }
 
-/** A fraction as a percentage. */
+/** A fraction as a percentage, with the same minus the dollar formatters use. */
 export function pct(v: number | null | undefined, decimals = 1): string {
   if (v == null || !Number.isFinite(v)) return "—";
-  return (v * 100).toFixed(decimals) + "%";
+  const n = v * 100;
+  const text = Math.abs(n).toFixed(decimals);
+  return (n < 0 && Number(text) !== 0 ? "−" : "") + text + "%";
 }
 
 /** A count with thousands separators. */
