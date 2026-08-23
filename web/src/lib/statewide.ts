@@ -8,6 +8,7 @@ import { realChange, series, type Basis } from "./real.ts";
 import * as routes from "./routes.ts";
 import type { TaxStatewide } from "./feed.ts";
 import type { Bundle, District, National } from "./types.ts";
+import { quintiles } from "./stats.ts";
 import { yearChip, yearChipPair } from "./year.ts";
 import { anchor } from "./section.ts";
 import { medianTrace, pairs } from "./relationships.ts";
@@ -95,13 +96,9 @@ export function renderStatewideFinances(bundle: Bundle, basis: Basis): string {
 
 /** Quintiles of assessed valuation per pupil, poorest first. */
 export function wealthQuintiles(districts: District[]): District[][] {
-  const withValuation = districts
-    .filter((d) => d.valuation_per_pupil != null)
-    .sort((a, b) => a.valuation_per_pupil! - b.valuation_per_pupil!);
-  const size = Math.floor(withValuation.length / 5);
-  return Array.from({ length: 5 }, (_, i) =>
-    // The last quintile takes the remainder, so no district is dropped by integer division.
-    withValuation.slice(i * size, i === 4 ? withValuation.length : (i + 1) * size),
+  return quintiles(
+    districts.filter((d) => d.valuation_per_pupil != null),
+    (d) => d.valuation_per_pupil!,
   );
 }
 

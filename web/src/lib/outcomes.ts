@@ -23,6 +23,7 @@ import type { Bundle, District, OutcomeStatewide } from "./types.ts";
 import { schoolYearBefore, seriesYear, yearChip, yearChipPair, yearOf } from "./year.ts";
 import { term } from "./glossary.ts";
 import { anchor } from "./section.ts";
+import { quintiles } from "./stats.ts";
 import { bands, medianTrace, pairs } from "./relationships.ts";
 
 /** A correlation, signed and to three places. */
@@ -32,13 +33,11 @@ function coefficient(v: number): string {
 
 /** Districts grouped into fifths by poverty, poorest last. */
 export function povertyQuintiles(districts: District[]): District[][] {
-  const withBoth = districts
-    .filter((d) => d.economically_disadvantaged != null && d.outcome?.performance_index != null)
-    .sort((a, b) => a.economically_disadvantaged! - b.economically_disadvantaged!);
-  const size = Math.floor(withBoth.length / 5);
-  return Array.from({ length: 5 }, (_, i) =>
-    // The last group takes the remainder, so integer division drops no district.
-    withBoth.slice(i * size, i === 4 ? withBoth.length : (i + 1) * size),
+  return quintiles(
+    districts.filter(
+      (d) => d.economically_disadvantaged != null && d.outcome?.performance_index != null,
+    ),
+    (d) => d.economically_disadvantaged!,
   );
 }
 
