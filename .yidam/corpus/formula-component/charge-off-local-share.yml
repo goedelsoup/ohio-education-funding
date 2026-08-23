@@ -2,13 +2,15 @@ class: formula-component
 label: Charge-Off Local Share
 summary: >-
   How Ohio decided, for roughly three decades, what share of a district's cost the district
-  should bear: a statutory millage rate times assessed valuation, subtracted from computed
+  should bear: a statutory millage rate times recognized valuation, subtracted from computed
   cost. Its defect is treating that millage as revenue a district can actually raise.
 description: |
   The mechanism by which Ohio decided, for roughly three decades, how much of a district's cost
   the district itself should bear. It multiplies a statutory millage rate by the district's
-  total assessed valuation and subtracts the product from the district's computed cost; the
-  state pays what remains. [verified]
+  [recognized valuation](../parameter/local-share-charge-off-millage.yml) — a base that defers
+  the inflationary increase in carryover real property over three years and so sits below total
+  taxable value — and subtracts the product from the district's computed cost; the state pays
+  what remains. [verified]
 
   Its defect is an assumption. The charge-off treats the statutory millage as revenue the
   district can raise, but under [H.B. 920](../legislation/hb-920-1976.yml) a district's
@@ -33,17 +35,18 @@ findings: |
   ### The blindness, measured, running both ways
 
   [verified — [`crates/regime-diff`](../../../crates/regime-diff/), holding the Fair School
-  Funding Plan's own FY2027 base cost fixed and substituting only the local share mechanism]
+  Funding Plan's own FY2027 base cost fixed and substituting only the local share mechanism,
+  with the charge-off run against recognized valuation at TY2024]
 
       Ottawa Hills Local     valuation/pupil  $176,195   (below the state's 40th percentile)
-        23-mill charge-off      $4,052.49/pupil
-        FSFP local capacity     $6,845.07/pupil          +69%
-        base cost aid            $4,312.93 -> $1,520.35
+        23-mill charge-off      $3,402.39/pupil
+        FSFP local capacity     $6,845.07/pupil          +101%
+        base cost aid            $4,963.03 -> $1,520.35
 
       Jefferson Township Local  valuation/pupil  $513,389
-        23-mill charge-off     $11,807.96/pupil
-        FSFP local capacity     $8,714.77/pupil          -26%
-        base cost aid            $2,032.54 -> $5,125.73
+        23-mill charge-off     $11,157.75/pupil
+        FSFP local capacity     $8,714.77/pupil          -22%
+        base cost aid            $2,682.75 -> $5,125.73
 
   Ottawa Hills is a high-income district of unremarkable assessed valuation, and a
   property-only measure sees an ordinary district. Jefferson Township is the reverse. **The
@@ -51,19 +54,65 @@ findings: |
   poorer**, and that disagreement is the substance of the reform rather than an artifact of two
   districts. [verified]
 
-  Statewide the change of mechanism is not one-sided: at FY2027 base cost, **413 of 606
-  districts do better under local capacity and 193 would have done better under the
-  charge-off.** [verified]
+  Statewide the change of mechanism is not one-sided, and it does not run in the plan's favour:
+  at FY2027 base cost, **316 of 606 districts would have done better under the charge-off and
+  290 do better under local capacity**, and the median district is $45 per pupil worse off
+  under the plan. [verified]
 
-  **81 of 606 districts** would have a 23-mill charge-off exceeding their entire FY2027
+  **65 of 606 districts** would have a 23-mill charge-off exceeding their entire FY2027
   computed base cost and would receive no base cost aid at all. [verified]
+
+  ### The size of that comparison is a TY2024 answer
+
+  Recognized valuation defers most where a reappraisal was largest, and Ohio's TY2023-24
+  revaluation cycle was extraordinary: the statewide deferral is 8.20% of taxable value where
+  the Legislative Service Commission put the long-run effect nearer 2%. The statewide margin
+  above would be narrower in an ordinary year, and narrow enough to change hands. What does not
+  depend on the year is the sign of the *base* error: total taxable value always overstates the
+  charge-off, so any comparison run against it flatters the mechanism that replaced it.
+  [verified]
+revisions:
+  - was: |
+      The charge-off was described, here and in its `function`, as a statutory millage against
+      the district's **total assessed valuation**.
+    now: |
+      Its base is **recognized valuation**, which defers a district's inflationary increase in
+      carryover real property over three years and is therefore smaller. The rate never moved;
+      the thing it multiplied did. [verified]
+    found_by: |
+      The Legislative Service Commission's description of the charge-off as it operated in
+      FY2008, set against DeRolph I's description of it in 1997. Reconstructed per district in
+      `crates/regime-diff/src/recognized_valuation.rs`.
+    reach: |
+      Every figure in `findings:` was computed against the wrong base, and every one of them
+      moved.
+  - was: |
+      "413 of 606 districts do better under local capacity and 193 would have done better under
+      the charge-off", with 81 districts zeroed, every valuation quintile better off under the
+      plan, and Ottawa Hills charged 69% more against Jefferson Township's 26% less.
+    now: |
+      **316 would have done better under the charge-off against 290 under the plan**, the
+      median district is $45 per pupil worse off under it, **65** districts are zeroed, and
+      Ottawa Hills is charged **101%** more against Jefferson Township's **22%** less. Only the
+      wealthiest quintile still gains.
+    found_by: |
+      Re-running the counterfactual on recognized valuation:
+      `crates/regime-diff/tests/the_charge_off_against_local_capacity.rs`, which pins both the
+      corrected figures and the superseded ones.
+    reach: |
+      The sign of the headline comparison reversed. The corrected run landed in
+      `crates/regime-diff` and in
+      [`local-share-charge-off-millage`](../parameter/local-share-charge-off-millage.yml) but
+      not here, so this node published the superseded run under `[verified]` in the interval.
 properties:
   name: Charge-off local share
   function: |
-    local_share = charge_off_millage x district_total_assessed_valuation
+    local_share = charge_off_millage x district_recognized_valuation
     state_aid = computed_cost - local_share
     Charge-off millage is a statutory rate applied uniformly statewide, distinct from the
-    district's own effective operating millage.
+    district's own effective operating millage. Recognized valuation is total taxable value
+    less the deferred part of the inflationary increase in carryover real property — two
+    thirds in a reappraisal or update year, one third the year after, nothing by the third.
   statutory_basis: |
     R.C. 3317.022, with the rate set by biennial session law. The 1991-1997 progression is
     recited with its Ohio Laws citations at DeRolph I, paragraph 97. Ohio Laws' online version

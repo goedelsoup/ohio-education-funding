@@ -51,32 +51,42 @@ findings: |
   ### Against the mechanism it replaced
 
   [verified — [`crates/regime-diff`](../../../crates/regime-diff/), the corpus's only aligned
-  component pair, run at FY2027 base cost with only the local share substituted]
+  component pair, run at FY2027 base cost with only the local share substituted and the
+  charge-off taken against recognized valuation at TY2024]
 
   The income terms do what they were built to do, and they do it in **both** directions. Ottawa
-  Hills Local — high income, unremarkable valuation — is charged **69% more** by local capacity
-  than a 23-mill charge-off would ask. Jefferson Township Local — high valuation, low income —
-  is charged **26% less**. The district the charge-off treated as the richer of the two is the
-  one this measure treats as poorer. [verified]
+  Hills Local — high income, unremarkable valuation — is charged **101% more** by local
+  capacity than a 23-mill charge-off would ask. Jefferson Township Local — high valuation, low
+  income — is charged **22% less**. The district the charge-off treated as the richer of the
+  two is the one this measure treats as poorer. [verified]
 
   The half that gets less attention is the second one. Local capacity is usually described as
   catching wealth the charge-off missed; it also **relieves** districts whose property wealth
-  overstated what their residents could bear, and at FY2027 base cost **193 of 606 districts
-  would have received more under the charge-off** against 413 under this measure. A reform
-  described only as tightening is being described by half. [verified]
+  overstated what their residents could bear — and on the charge-off's own base that half is
+  the larger one. At FY2027 base cost **316 of 606 districts would have received more under the
+  charge-off** against 290 under this measure, and the median district is $45 per pupil worse
+  off under the plan. A reform described only as tightening is being described by half.
+  [verified]
 
-  **Across wealth the change of mechanism favours the top.** Mean gain per pupil against the
-  charge-off, by valuation quintile: $154.85, $102.38, $107.60, $193.23, **$873.92**. Every
-  quintile does better, and the wealthiest does best by a factor of five and a half over the
-  poorest. The minimum state share is part of that — the charge-off had no floor and would zero
-  out 81 districts entirely — but not the whole of it: splitting the top quintile by whether
-  the charge-off would have zeroed it leaves both halves gaining about the same, $908.63
-  against $805.35. [verified]
+  **Across wealth the change of mechanism favours the top, and only the top.** Mean gain per
+  pupil against the charge-off, by valuation quintile: −$118.47, −$231.81, −$294.46, −$365.14,
+  **+$632.23**. Only the wealthiest quintile does better under this measure; the four below it
+  all did better under the charge-off, and the gradient runs the wrong way — the poorer the
+  quintile, the less it loses. The minimum state share is part of the top quintile's gain — the
+  charge-off had no floor and would zero out 65 districts entirely — and here it is most of it:
+  splitting that quintile by whether the charge-off would have zeroed it gives $900.40 to the
+  65 that it would and $326.41 to the other 57. [verified]
 
   So this measure is more discriminating than the charge-off about *which* districts are
   wealthy and simultaneously more generous to wealthy districts overall. Those are not in
   tension — the first is about the ordering and the second about the level — but a claim that
   cites one without the other is quoting half the result. [inference]
+
+  The shape of that incidence is not an artifact of the year; the level of the comparison
+  partly is. Recognized valuation defers most where a reappraisal was largest, and Ohio's
+  TY2023-24 cycle deferred 8.20% of taxable value against the roughly 2% the Legislative
+  Service Commission puts the long-run effect at, so the statewide margins above would be
+  narrower in an ordinary year. [verified]
 
   ### The measure is published per district
 
@@ -141,6 +151,28 @@ findings: |
   state aid all at once, and two different implementations. A reader told only that the plan
   "uses a three-year average" would not see that it is the successor to something. [verified]
 revisions:
+  - was: |
+      The comparison against the charge-off was run on **total taxable value**: Ottawa Hills
+      charged 69% more and Jefferson Township 26% less, 413 of 606 districts better off under
+      this measure against 193 under the charge-off, 81 districts zeroed, and every valuation
+      quintile better off at $154.85, $102.38, $107.60, $193.23 and $873.92 per pupil.
+    now: |
+      The charge-off's base was **recognized valuation**, which is smaller. On it Ottawa Hills
+      is charged 101% more and Jefferson Township 22% less, **316 districts would have done
+      better under the charge-off against 290** under this measure, 65 are zeroed, and only the
+      top quintile still gains: −$118.47, −$231.81, −$294.46, −$365.14, **+$632.23**.
+    found_by: |
+      `crates/regime-diff/tests/the_charge_off_against_local_capacity.rs`, which asserts the
+      corrected figures beside the superseded ones so the old base cannot be restored quietly.
+    reach: |
+      "Every quintile does better" was an artifact of overstating the charge-off by about 8%
+      for everyone, and the headline direction reversed with it. The *shape* survives — this
+      measure is genuinely more generous to property-rich districts — because recognized
+      valuation is close to a uniform proportional discount, so it moves a level and leaves an
+      ordering alone. The correction reached `crates/regime-diff` and
+      [`local-share-charge-off-millage`](../parameter/local-share-charge-off-millage.yml)
+      before it reached this node, which published the superseded run under `[verified]` in the
+      interval.
   - was: |
       The 40th-highest benchmark was recorded as "a single discretionary number that sets the
       top of the entire scale", with how it moves over time left open.

@@ -68,22 +68,39 @@ is a legitimate reading of "what each of two regimes would pay" — it is **not*
 of any year the charge-off governed, which would need that era's formula amount,
 cost-of-doing-business factor, and DPIA.
 
+### The charge-off's base is a required argument, not a default
+
+The charge-off applies its millage to **recognized valuation** — total taxable value less the
+deferred part of the inflationary increase in carryover real property — not to total taxable
+value. `ChargeOffBase::{TotalTaxable, Recognized}` is a required parameter of `at_fy2027` and
+`panel_at_fy2027` precisely so that no call site can pick a base by omission. Every figure below
+is `Recognized`, reconstructed at TY2024 from the county reappraisal calendar and Table SD-1;
+`TotalTaxable` is retained only so a run can assert the size of the correction.
+
 **The reform's stated purpose, measured.** Ottawa Hills Local — high income, valuation below the
-state's 40th percentile — is charged 69% more by local capacity than a 23-mill charge-off asks.
-Jefferson Township Local — high valuation, low income — is charged 26% less. The district the
+state's 40th percentile — is charged 101% more by local capacity than a 23-mill charge-off asks.
+Jefferson Township Local — high valuation, low income — is charged 22% less. The district the
 charge-off treated as richer is the one local capacity treats as poorer.
 
-**And it is not one-sided:** 413 of 606 districts do better under local capacity, 193 would have
-done better under the charge-off. Across valuation quintiles the mean gain per pupil runs
-$154.85, $102.38, $107.60, $193.23, $873.92 — every quintile better off, the wealthiest most.
+**And it is not one-sided — and on the right base it runs the other way:** 316 of 606 districts
+would have done better under the charge-off, 290 do better under local capacity, and the median
+district is $45 per pupil worse off under the plan. Across valuation quintiles the mean gain per
+pupil runs −$118.47, −$231.81, −$294.46, −$365.14, +$632.23 — only the wealthiest quintile gains,
+and the poorer the quintile the less it loses.
+
+On total taxable value those same figures came out 413 against 193 with every quintile gaining,
+which is what this skill said until the base was corrected. The deferral is roughly a uniform
+proportional discount, so the wrong base moved a level and left an ordering alone: the shape of
+the incidence survived the correction and its sign did not.
 
 ### Reading the residual here
 
-It comes out **exactly zero for 463 of the 470 districts where both sides can be valued**, and
+It comes out **exactly zero for 465 of the 470 districts where both sides can be valued**, and
 that verifies the substitution rather than discovering anything: holding base cost fixed means
-the local share is the only thing that can differ. The seven exceptions are districts where the
+the local share is the only thing that can differ. The five exceptions are districts where the
 charge-off ran past the base cost it was subtracted from, and the residual is exactly that
-truncation — the old mechanism had no minimum state share.
+truncation — the old mechanism had no minimum state share. On total taxable value it was 463 and
+seven: a smaller charge-off overshoots in two fewer districts.
 
 A true Bridge-against-FSFP diff would have an enormous residual. Nothing here should be read as
 showing the two regimes differ only in this component.

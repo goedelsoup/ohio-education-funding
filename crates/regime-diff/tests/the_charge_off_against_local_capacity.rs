@@ -7,7 +7,7 @@
 //!
 //! # What the residual does and does not verify here
 //!
-//! The residual comes out **exactly zero for 463 of the 470 districts where both sides can be
+//! The residual comes out **exactly zero for 465 of the 470 districts where both sides can be
 //! valued**, and that is a check on the substitution rather than a discovery about the regimes.
 //! Holding base cost fixed means the local share is the only thing that can differ, so a nonzero
 //! residual would mean the arithmetic had gone wrong somewhere. It did not.
@@ -164,8 +164,10 @@ fn a_high_income_district_pays_far_more_under_local_capacity_than_the_charge_off
     // County, reappraised in TY2024, so 2/3 of a large revaluation is still deferred.
     assert!((charge_off - 3_402.39).abs() < 0.5);
     assert!((capacity - 6_845.07).abs() < 0.5);
+    // 2.01x on the recognized base, against 1.69x on total taxable value. The threshold moved
+    // with the base; a bound written for the old ratio would pass on either.
     assert!(
-        capacity > charge_off * 1.65,
+        capacity > charge_off * 2.0,
         "local capacity should charge it far more: {capacity:.2} against {charge_off:.2}"
     );
 
