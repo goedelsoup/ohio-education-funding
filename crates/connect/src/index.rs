@@ -1040,48 +1040,73 @@ pub fn stale(root: &Path) -> Result<Vec<String>, IndexError> {
     rewrite(root, false)
 }
 
-/// Render every block; write when asked. Returns the documents whose content would change.
-fn rewrite(root: &Path, write: bool) -> Result<Vec<String>, IndexError> {
-    let mut changed = Vec::new();
+/// One document with every block filled, as a function of its text alone.
+///
+/// The substitution is pure: it reads nothing and writes nothing, so both the write path and
+/// the check path can ask what a document *would* contain without a filesystem effect.
+///
+/// # Errors
+///
+/// As [`regenerate`].
+fn render_document(document: &str, original: &str, root: &Path) -> Result<String, IndexError> {
+    let mut out = String::with_capacity(original.len());
+    let mut rest = original;
+
+    while let Some(start) = rest.find("<!-- REGEN: ") {
+        let (before, from_marker) = rest.split_at(start);
+        out.push_str(before);
+        let Some(marker_end) = from_marker.find("-->") else {
+            break;
+        };
+        let Some(close) = from_marker.find("<!-- /REGEN -->") else {
+            break;
+        };
+        let command = from_marker["<!-- REGEN: ".len()..]
+            .lines()
+            .next()
+            .unwrap_or_default()
+            .trim()
+            .to_string();
+        let body = generate(&command, root).ok_or_else(|| IndexError::UnknownBlock {
+            command: command.clone(),
+            file: document.to_string(),
+        })?;
+        out.push_str(&from_marker[..marker_end + 3]);
+        out.push('\n');
+        out.push_str(&body);
+        rest = &from_marker[close..];
+    }
+    out.push_str(rest);
+    Ok(out)
+}
+
+/// Every document as it would be written, paired with what it holds now. Writes nothing.
+///
+/// # Errors
+///
+/// As [`regenerate`].
+fn render(root: &Path) -> Result<Vec<(&'static str, String, String)>, IndexError> {
+    let mut rendered = Vec::new();
     for document in DOCUMENTS {
         let path = root.join(document);
         let Ok(original) = fs::read_to_string(&path) else {
             continue;
         };
-        let mut out = String::with_capacity(original.len());
-        let mut rest = original.as_str();
+        let out = render_document(document, &original, root)?;
+        rendered.push((*document, original, out));
+    }
+    Ok(rendered)
+}
 
-        while let Some(start) = rest.find("<!-- REGEN: ") {
-            let (before, from_marker) = rest.split_at(start);
-            out.push_str(before);
-            let Some(marker_end) = from_marker.find("-->") else {
-                break;
-            };
-            let Some(close) = from_marker.find("<!-- /REGEN -->") else {
-                break;
-            };
-            let command = from_marker["<!-- REGEN: ".len()..]
-                .lines()
-                .next()
-                .unwrap_or_default()
-                .trim()
-                .to_string();
-            let body = generate(&command, root).ok_or_else(|| IndexError::UnknownBlock {
-                command: command.clone(),
-                file: (*document).to_string(),
-            })?;
-            out.push_str(&from_marker[..marker_end + 3]);
-            out.push('\n');
-            out.push_str(&body);
-            rest = &from_marker[close..];
-        }
-        out.push_str(rest);
-
+/// Render every block; write when asked. Returns the documents whose content would change.
+fn rewrite(root: &Path, write: bool) -> Result<Vec<String>, IndexError> {
+    let mut changed = Vec::new();
+    for (document, original, out) in render(root)? {
         if out != original {
             if write {
-                fs::write(&path, out)?;
+                fs::write(root.join(document), out)?;
             }
-            changed.push((*document).to_string());
+            changed.push(document.to_string());
         }
     }
     Ok(changed)
@@ -1531,22 +1556,26 @@ mod tests {
     fn checking_reports_what_regenerating_would_change_and_writes_nothing() {
         // The two paths share one renderer, so what this really guards is that `--check` cannot
         // acquire a side effect: the gate runs it against a dirty tree, and a check that writes
-        // would quietly stage work nobody asked for.
+        // would quietly stage work nobody asked for. Asked of `render`, not of a regeneration
+        // that just ran — this test used to call the write path against the real working tree,
+        // which repaired every stale block and left the local gate unable to fail (#134).
         let root = repository_root();
-        regenerate(&root).expect("generators exist");
-        let before: Vec<String> = DOCUMENTS
-            .iter()
-            .map(|document| std::fs::read_to_string(root.join(document)).unwrap_or_default())
-            .collect();
+        let rendered = render(&root).expect("generators exist");
 
-        assert!(
-            stale(&root).expect("generators exist").is_empty(),
-            "check disagrees with a regeneration that just ran"
+        let expected: Vec<String> = rendered
+            .iter()
+            .filter(|(_, original, out)| out != original)
+            .map(|(document, _, _)| (*document).to_string())
+            .collect();
+        assert_eq!(
+            stale(&root).expect("generators exist"),
+            expected,
+            "check disagrees with what the renderer would write"
         );
 
-        for (document, original) in DOCUMENTS.iter().zip(before) {
+        for (document, original, _) in &rendered {
             assert_eq!(
-                std::fs::read_to_string(root.join(document)).unwrap_or_default(),
+                &std::fs::read_to_string(root.join(document)).unwrap_or_default(),
                 original,
                 "{document} was written by a check"
             );
@@ -1556,12 +1585,38 @@ mod tests {
     #[test]
     fn regenerating_twice_changes_nothing_the_second_time() {
         // Idempotence is what makes the CI check meaningful: a diff after regeneration means
-        // the documents were stale, not that the generator is unstable.
+        // the documents were stale, not that the generator is unstable. Rendering the rendered
+        // text is the same question one write earlier, and costs the tree nothing.
         let root = repository_root();
-        regenerate(&root).expect("generators exist");
-        assert!(
-            regenerate(&root).expect("generators exist").is_empty(),
-            "regeneration is not idempotent"
-        );
+        for (document, _, out) in render(&root).expect("generators exist") {
+            assert_eq!(
+                render_document(document, &out, &root).expect("generators exist"),
+                out,
+                "{document}: regeneration is not idempotent"
+            );
+        }
+    }
+
+    #[test]
+    fn the_test_suite_leaves_the_working_tree_exactly_as_it_found_it() {
+        // #134: two tests here called `regenerate` on the real repository, so `cargo test` was a
+        // write. Nothing under test may touch a committed file — the gate that runs after the
+        // tests is only meaningful if the tests did not repair the thing it checks.
+        let root = repository_root();
+        let before: Vec<_> = DOCUMENTS
+            .iter()
+            .map(|document| std::fs::read_to_string(root.join(document)).unwrap_or_default())
+            .collect();
+
+        let _ = stale(&root).expect("generators exist");
+        let _ = render(&root).expect("generators exist");
+
+        for (document, original) in DOCUMENTS.iter().zip(before) {
+            assert_eq!(
+                std::fs::read_to_string(root.join(document)).unwrap_or_default(),
+                original,
+                "{document} was written by the test suite"
+            );
+        }
     }
 }
