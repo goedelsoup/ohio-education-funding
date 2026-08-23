@@ -44,7 +44,7 @@ import {
 } from "../../src/lib/tax.ts";
 
 const corpus = loadCorpus();
-const { bundle } = loadFeed();
+const { bundle, tax } = loadFeed();
 
 /** Every path this site builds a document for. */
 const PAGES = new Set<string>([
@@ -376,7 +376,7 @@ test("every corpus link the district renderers emit resolves", () => {
       renderTaxBase(d),
       renderMillage(d, statewide),
       renderDenominators(d),
-      renderChargeOff(d, statewide),
+      renderChargeOff(d, statewide, tax),
       renderSpendingByFunction(d),
     ].join("\n");
     for (const match of html.matchAll(/href="(\/[^"#?]*)/g)) emitted.add(match[1]!);

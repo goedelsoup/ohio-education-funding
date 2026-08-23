@@ -118,7 +118,7 @@ const description = latest
             formula's pupil count rather than this table's, and a reader meeting two different
             valuations per pupil needs the reason before the second one, not after. */}
         <Fragment set:html={renderDenominators(district)} />
-        <Fragment set:html={renderChargeOff(district, bundle.statewide)} />
+        <Fragment set:html={renderChargeOff(district, bundle.statewide, tax)} />
 
         <div class="card" id="not" data-part="not">
           <h2><SectionAnchor id="not" />Where these figures come from, and what they are not</h2>

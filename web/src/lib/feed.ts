@@ -120,6 +120,25 @@ export interface TaxStatewide {
    * readable as "one of them has published a later year".
    */
   agreeOnLatest: number;
+  /**
+   * Share of the latest tax year's taxable value still deferred by recognised valuation.
+   *
+   * Weighted by Table SD-1's total value, which is the base the charge-off is taken against — a
+   * plain mean of the 609 district shares would let a township outweigh Columbus. It was the
+   * literal `8.2%`, which is what this computes, and it moves whenever Taxation's staggered
+   * county calendar advances: 485 of 609 districts are mid-phase-in, and which ones changes
+   * every year by construction.
+   */
+  deferredShare: number;
+  /**
+   * The charge-off that deferral removes, in dollars.
+   *
+   * Deferred value times the charge-off millage, read off each district's own counterfactual
+   * rather than restated here. That rate is 23 for all 609 today, so the two orders agree and
+   * this is not defending against a difference — it is declining to write a second copy of a
+   * number the feed already carries. It was the literal `$793m`.
+   */
+  deferredChargeOff: number;
 }
 
 let cached: Feed | null = null;
@@ -256,6 +275,13 @@ function taxStatewide(districts: District[]): TaxStatewide {
   let crossedTheFloor = 0;
   let agreeOnLatest = 0;
 
+  // Recognised valuation, summed over the panel rather than averaged over districts — see
+  // `deferredShare`. Both run off the latest tax year, which is the year the charge-off row
+  // on the district page is computed at.
+  let deferredValue = 0;
+  let taxableValue = 0;
+  let deferredChargeOff = 0;
+
   // The floor the Rust side classifies against, restated once rather than at each comparison.
   const FLOOR = 20;
 
@@ -301,6 +327,15 @@ function taxStatewide(districts: District[]): TaxStatewide {
       if (Math.abs(after.class1_rate - d.effective_class1_millage) <= 0.01) agreeOnLatest++;
     }
 
+    const regime = d.regime;
+    const latest = d.property_tax[d.property_tax.length - 1];
+    if (regime?.recognized_share != null && latest) {
+      const deferred = (1 - regime.recognized_share) * latest.total_value;
+      deferredValue += deferred;
+      taxableValue += latest.total_value;
+      deferredChargeOff += deferred * (regime.charge_off_mills / 1000);
+    }
+
     const spending = d.spending_by_function;
     if (after && spending && spending.adm > 0) {
       const operating = spending.operating_per_pupil * spending.adm;
@@ -324,6 +359,8 @@ function taxStatewide(districts: District[]): TaxStatewide {
     nearFloor,
     crossedTheFloor,
     agreeOnLatest,
+    deferredShare: taxableValue === 0 ? 0 : deferredValue / taxableValue,
+    deferredChargeOff,
   };
 }
 

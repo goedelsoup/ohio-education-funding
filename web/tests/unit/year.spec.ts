@@ -10,6 +10,7 @@
 import { expect, test } from "vitest";
 
 import { loadFeed } from "../../src/lib/feed.ts";
+import { renderChargeOff } from "../../src/lib/tax.ts";
 import { GLOSSARY, term } from "../../src/lib/glossary.ts";
 import { schoolYearBefore, seriesYear, yearChip, yearChipPair, yearTitle } from "../../src/lib/year.ts";
 
@@ -163,6 +164,71 @@ test("the cross-department agreement count is computed, not typed", () => {
   // And it is a minority, which is the fact the card exists to explain: most districts disagree
   // on the latest year because only one department has published it.
   expect(tax.agreeOnLatest).toBeLessThan(bundle.statewide.districts / 2);
+});
+
+test("the recognised-valuation aggregates are computed, not typed", () => {
+  /*
+   * They were the literals `8.2%` and `$793m`, in a sentence that also typed `TY2024` — the same
+   * three-literals-in-one-sentence shape as the `219`/`TY2023`/`TY2024` defect above, in the last
+   * paragraph on that page still doing it.
+   *
+   * These move for a reason nothing else on the page moves for: Taxation revalues counties on a
+   * staggered calendar, so which districts are mid-phase-in changes every year by construction.
+   * A literal here is stale on a schedule.
+   */
+  const { bundle, tax } = loadFeed();
+
+  let deferred = 0;
+  let taxable = 0;
+  let chargeOff = 0;
+  for (const d of bundle.districts) {
+    const latest = d.property_tax[d.property_tax.length - 1];
+    if (d.regime?.recognized_share == null || latest == null) continue;
+    const share = (1 - d.regime.recognized_share) * latest.total_value;
+    deferred += share;
+    taxable += latest.total_value;
+    chargeOff += share * (d.regime.charge_off_mills / 1000);
+  }
+
+  expect(tax.deferredShare).toBeCloseTo(deferred / taxable, 10);
+  expect(tax.deferredChargeOff).toBeCloseTo(chargeOff, 4);
+
+  // Weighted by the panel, not averaged over districts. A plain mean of the 609 shares differs,
+  // and if this ever starts matching it the weighting has been dropped.
+  const shares = bundle.districts
+    .filter((d) => d.regime?.recognized_share != null)
+    .map((d) => 1 - d.regime!.recognized_share!);
+  const unweighted = shares.reduce((a, b) => a + b, 0) / shares.length;
+  expect(tax.deferredShare).not.toBeCloseTo(unweighted, 3);
+
+  // And the deferral is real but partial: neither zero nor the whole base.
+  expect(tax.deferredShare).toBeGreaterThan(0);
+  expect(tax.deferredShare).toBeLessThan(0.5);
+});
+
+test("the charge-off paragraph's tax year is the one the panel carries", () => {
+  /*
+   * Rendered, not read off the source, because `yearLiterals.spec.ts` cannot see this one.
+   * That gate exempts **files**: `lib/tax.ts` is allowlisted for FY2008 gap aid and FY2027, and
+   * that licence silently covered the `TY2024` this paragraph used to type. Putting `TY2024`
+   * back passes the allowlist today — which is how it got there.
+   *
+   * So the year is checked where it is printed, against the panel it claims to describe. What
+   * that catches is the year going **stale**, which is the failure mode: typing `TY2024` back in
+   * still passes here while the panel says 2024, and only a per-literal allowlist would see it.
+   * That is filed rather than fixed — enumerating the 32 literals across the 11 allowlisted files
+   * is its own change, and `lib/district.ts` alone carries 9 against a reason naming 4.
+   */
+  const { bundle, tax } = loadFeed();
+  const district = bundle.districts.find((d) => d.regime?.charge_off_local_share != null);
+  expect(district, "no district carries a charge-off counterfactual").toBeDefined();
+
+  const latest = district!.property_tax[district!.property_tax.length - 1]!;
+  const html = renderChargeOff(district!, bundle.statewide, tax);
+
+  const years = [...html.matchAll(/TY(20\d\d)/g)].map((m) => Number(m[1]));
+  expect(years.length, "the paragraph states no tax year at all").toBeGreaterThan(0);
+  for (const year of years) expect(year).toBe(latest.tax_year);
 });
 
 test("a school year steps back without inventing a century", () => {
