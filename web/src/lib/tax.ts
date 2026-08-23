@@ -36,7 +36,7 @@
  */
 
 import type { Bar } from "./chart.ts";
-import { count, escapeHtml, money, pct } from "./format.ts";
+import { count, escapeHtml, millions, money, pct } from "./format.ts";
 import { barSpec } from "./plot/spec.ts";
 import { renderToString } from "./plot/ssr.ts";
 import * as routes from "./routes.ts";
@@ -541,9 +541,30 @@ export function renderDenominators(d: District): string {
  * charge-off supplement — gap aid, $73.5m across 145 districts in FY2008 — rather than fixing it.
  * Against TY2024 rates, **half the state** is below the terminal charge-off rate.
  */
-export function renderChargeOff(d: District, statewide: Statewide): string {
+export function renderChargeOff(d: District, statewide: Statewide, tax: TaxStatewide): string {
   const r = d.regime;
   if (!r || r.charge_off_local_share == null) return "";
+
+  // The tax year the deferral figures are on, read off this district's own panel rather than
+  // written into the sentence below. `taxes.astro` already derives the pair it contrasts, for the
+  // reason `.yidam/decisions/every-figure-says-its-year.yml` gives; this paragraph was the last
+  // one on the page still asserting a year of its own.
+  const taxYear = d.property_tax[d.property_tax.length - 1]?.tax_year;
+
+  /*
+   * Why `$289` and `$45` below are still literals.
+   *
+   * They are not stale and they are not `bundle.statewide.median_regime_difference`, which reads
+   * −$47. They are the **upper-middle** medians — 289.35 and −44.62 — the definition `stats.ts`
+   * takes and states a reason for: *"the median district" names a district, so the statistic has
+   * to be a value one of them actually has.* The feed's field is `crates/dispersion::median`, a
+   * linear-interpolated R type 7 percentile, whose own documentation says it deliberately replaced
+   * the copies that "took the upper of the two middle observations".
+   *
+   * So this site publishes two different statistics under one phrase, and /statewide and this page
+   * disagree by $2 for that reason alone. Binding these to the feed would not fix that; it would
+   * pick a side of it silently. Filed instead — the pair stays literal, and stays named.
+   */
 
   const short = r.mills_short_of_charge_off;
   const rate = d.millage?.observed_rate;
@@ -647,7 +668,9 @@ export function renderChargeOff(d: District, statewide: Statewide): string {
                        being asked for`
                }.`
         }
-        Statewide the deferral is 8.2% of taxable value in TY2024 and $793m of charge-off, and
+        Statewide the deferral is ${pct(tax.deferredShare, 1)} of taxable value${
+          taxYear == null ? "" : ` in TY${taxYear}`
+        } and ${millions(tax.deferredChargeOff).replace("+", "")} of charge-off, and
         correcting it moved findings as well as figures: the median district goes from $289 per
         pupil better off under the plan to $45 worse.</p>
 
