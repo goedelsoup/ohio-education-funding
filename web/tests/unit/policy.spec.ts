@@ -17,7 +17,11 @@ import { apply, applyAll, currentLaw, currentRealizedAid, totals } from "../../s
 import { compare, isVerified, toPolicy, verify } from "../../src/lib/verify.ts";
 import { bin } from "../../src/lib/chart.ts";
 import { money, millions, ordinal, pct, percentileOf, signedMoney } from "../../src/lib/format.ts";
-import { guaranteeRateByQuintile, wealthQuintiles } from "../../src/lib/statewide.ts";
+import {
+  guaranteeRateByQuintile,
+  renderRegimeDifference,
+  wealthQuintiles,
+} from "../../src/lib/statewide.ts";
 import { povertyQuintiles } from "../../src/lib/outcomes.ts";
 import { medianTrace } from "../../src/lib/relationships.ts";
 import { REQUIRED_CONTRACT, type Bundle } from "../../src/lib/types.ts";
@@ -187,6 +191,29 @@ test("a zero change reads as zero rather than as a gain", () => {
   expect(signedMoney(0.0001)).toBe("$0");
   expect(signedMoney(120)).toBe("+$120");
   expect(signedMoney(-120)).toBe("−$120");
+});
+
+test("a signed quantity and the word for its direction agree", () => {
+  // /statewide read `−$47 per pupil better off`. The figure came from the feed and the word was
+  // typed into the sentence, so nothing made the two agree; aligning `money()`'s minus with the
+  // other formatters made the contradiction visible, and only the branch below removes it.
+  expect(renderRegimeDifference(-47.0217)).toBe(
+    "the median district is $47 per pupil worse off under the plan",
+  );
+  expect(renderRegimeDifference(289)).toBe(
+    "the median district is $289 per pupil better off under the plan",
+  );
+  // A magnitude that rounds away loses its direction with it, the same rule `signedMoney` keeps.
+  expect(renderRegimeDifference(-0.4)).toBe(
+    "the median district is neither better nor worse off under the plan",
+  );
+  expect(renderRegimeDifference(0)).toBe(
+    "the median district is neither better nor worse off under the plan",
+  );
+  // And the sentence the page actually renders. The amount is a magnitude and the direction is a
+  // word, so a minus reaching the output means the two have come apart again — which is the
+  // failure, in whichever direction the feed's median next moves.
+  expect(renderRegimeDifference(bundle.statewide.median_regime_difference)).not.toContain("−");
 });
 
 test("percentile is the share strictly below", () => {
