@@ -9,7 +9,7 @@ import * as routes from "./routes.ts";
 import type { TaxStatewide } from "./feed.ts";
 import type { Bundle, District, National } from "./types.ts";
 import { median, quintiles } from "./stats.ts";
-import { yearChip, yearChipPair } from "./year.ts";
+import { yearChip, yearChipPair, yearOf } from "./year.ts";
 import { anchor } from "./section.ts";
 import { medianTrace, pairs } from "./relationships.ts";
 
@@ -470,7 +470,7 @@ export function renderNational(national: National | null): string {
         Ohio's local share would be higher. It is also why the ${pct(share(ohio.federal_revenue), 1)}
         federal share of <em>revenue</em> on this row is not the
         <a href="/districts">4.2% federal share of operating spending</a> the report card gives for
-        FY2025: different year, different denominator, and the difference between them is the
+        ${yearOf("outcome.spending")}: different year, different denominator, and the difference between them is the
         relief cliff.</p>
     </div>`;
 }

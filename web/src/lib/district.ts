@@ -22,7 +22,7 @@ import { hasDenominators } from "./tax.ts";
 import * as routes from "./routes.ts";
 import type { Bar } from "./chart.ts";
 import type { Bundle, District, Statewide } from "./types.ts";
-import { yearChip, yearOf } from "./year.ts";
+import { seriesSpanEnd, yearChip, yearOf } from "./year.ts";
 import { anchor } from "./section.ts";
 
 function strip(
@@ -1219,7 +1219,7 @@ function renderCareerTechnical(d: District): string {
     <p class="note"><strong>The counts are frozen at FY2021.</strong> The department's own column
       header reads <code>Category 1 Career Tech FTE-FY21</code>, so the FTE column above is
       enrolment as it stood six years before the year being funded, while the base cost it is
-      multiplied against is built on a rolling three-year average ending FY2026. A district that
+      multiplied against is built on a rolling three-year average ending ${seriesSpanEnd("enrollment")}. A district that
       has opened or closed a programme since 2021 is funded for the one it had then.</p>`;
 }
 
@@ -1286,7 +1286,7 @@ function renderEnglishLearners(d: District): string {
     <p class="note"><strong>And the counts are frozen at FY2021.</strong> The department's own
       column header reads <code>Category 1 EL ADM-FY21</code>, so the FTE column above is enrolment
       as it stood six years before the year being funded, while base cost beside it is built on a
-      rolling three-year average ending FY2026. For a program whose whole structure is about how
+      rolling three-year average ending ${seriesSpanEnd("enrollment")}. For a program whose whole structure is about how
       recently a pupil arrived, that is a stranger fact than it would be anywhere else in the
       plan.</p>`;
 }
@@ -1811,7 +1811,7 @@ export function renderNationalPosition(d: District): string {
         <strong>66th</strong> national percentile on local share; its quarter-poorest sits at the
         national median.</p>
       <p class="note"><strong>These are not the figures above.</strong> They are
-        <strong>FY2022</strong> against the model's FY2027, and they divide by the federal fall
+        <strong>${yearOf("national")}</strong> against the model's ${yearOf("formula")}, and they divide by the federal fall
         membership rather than by Ohio's enrolled ADM. A revenue-per-pupil figure here and a
         spending-per-pupil figure elsewhere on this page are different quantities over different
         counts in different years, and subtracting one from the other would mean nothing.</p>
@@ -1910,10 +1910,10 @@ export function renderWhatThisIsNot(bundle: Bundle, d: District): string {
         Department of Education each publish.</p>
       <p class="note"><strong>The position card below is two other years on a fourth count.</strong>
         Assessed valuation per pupil there is an <strong>FY2023</strong> valuation and operating
-        expenditure per pupil is <strong>FY2024</strong> spending — two different years inside one
-        card — and both divide by enrolled ADM FY2024, beside a model that funds
-        FY${bundle.fiscal_year}. Finances shows FY2025 spending on the report card's unweighted
-        headcount, and Outcome shows FY2025 spending on its need-weighted one. Subtracting any of
+        expenditure per pupil is <strong>${yearOf("profile")}</strong> spending — two different years inside one
+        card — and both divide by enrolled ADM ${yearOf("profile")}, beside a model that funds
+        FY${bundle.fiscal_year}. Finances shows ${yearOf("outcome.spending")} spending on the report card's unweighted
+        headcount, and Outcome shows ${yearOf("outcome.spending")} spending on its need-weighted one. Subtracting any of
         them from any other produces a number that means nothing, which is why
         <code>denominators.ts</code> exists and why it says it cannot check a sentence.</p>
       <p class="note">Every figure on this page is also a column in

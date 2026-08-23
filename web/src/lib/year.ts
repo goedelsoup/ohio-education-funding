@@ -185,6 +185,25 @@ export function schoolYearBefore(label: string, years: number): string {
 }
 
 /**
+ * The last year of a span label: `FY2024-FY2026` → `FY2026`, and `FY2027` → `FY2027`.
+ *
+ * Written for the sentences that name one end of a window rather than the window — *"a rolling
+ * three-year average ending FY2026"* — which are the ones a chip cannot carry and which were
+ * therefore still literals. The end of the enrolment span *is* the last year of that average, so
+ * this is reading the fixture rather than asserting an offset from another year.
+ *
+ * The empty string for a school year, which is one year written with a hyphen: splitting `2024-25`
+ * would yield `25`. A caller wanting the later half of a school year wants
+ * {@link schoolYearBefore}'s arithmetic, not this.
+ */
+export function seriesSpanEnd(series: SeriesKey): string {
+  const year = seriesYear(series);
+  if (!year || year.kind === "school") return "";
+  const parts = year.label.split("-");
+  return parts[parts.length - 1] ?? "";
+}
+
+/**
  * The label for a series, or the empty string where the feed does not carry it.
  *
  * The common case at a call site that just needs the digits inside a sentence — `seriesYear(k)?.label ?? ""`
