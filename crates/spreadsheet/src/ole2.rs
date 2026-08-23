@@ -159,6 +159,14 @@ impl Compound {
         Ok(incomplete)
     }
 
+    /// How many whole sectors the file actually holds, past the 512-byte header.
+    ///
+    /// The ceiling on every chain: a header field may claim more, but a chain longer than this
+    /// has either left the file or looped inside it.
+    fn sectors(&self) -> usize {
+        self.data.len().saturating_sub(512) / self.sector_size
+    }
+
     fn sector(&self, index: u32) -> Option<&[u8]> {
         // Sector 0 begins immediately after the 512-byte header, whatever the sector size.
         let start = 512 + (index as usize).checked_mul(self.sector_size)?;
@@ -175,7 +183,12 @@ impl Compound {
         sector_count: usize,
         fat_sector_count: usize,
     ) -> Result<Vec<u32>, Ole2Error> {
-        let mut difat = Vec::with_capacity(fat_sector_count);
+        // Both counts are header fields, so both are bounded by what the file could actually
+        // hold before either is believed. `fat_sector_count` of 0xFFFFFFFF asks `with_capacity`
+        // for 16 GB up front, and `sector_count` of 0xFFFFFFFF drives the loop below through
+        // 2.2 TB of pushes on a chain one sector long that points at itself.
+        let sectors = self.sectors();
+        let mut difat = Vec::with_capacity(fat_sector_count.min(sectors));
         for index in 0..HEADER_DIFAT_ENTRIES {
             let Some(entry) = u32_at(&self.data, 0x4c + index * 4) else {
                 break;
@@ -188,9 +201,16 @@ impl Compound {
 
         let mut next = start;
         let per_sector = self.sector_size / 4;
-        for _ in 0..sector_count {
+        // A DIFAT sector visited twice is a cycle, and no honest chain visits more sectors than
+        // the file has. Refusing rather than truncating: a chain that outruns the file is not a
+        // chain this reader can follow, and silently keeping its first `sectors` entries would
+        // report a FAT assembled from half a lie.
+        for step in 0..sector_count {
             if next == END_OF_CHAIN || next == FREE_SECTOR {
                 break;
+            }
+            if step >= sectors {
+                return Err(Ole2Error::BadChain);
             }
             let sector = self.sector(next).ok_or(Ole2Error::BadChain)?;
             for index in 0..per_sector - 1 {

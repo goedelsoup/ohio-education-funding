@@ -241,8 +241,10 @@ fn read_rows(xml: &str, shared: &[String], limit: usize) -> Vec<Vec<String>> {
             }
             Event::Close("row") => {
                 if let Some(&(widest, _)) = cells.iter().max_by_key(|(column, _)| *column) {
-                    // `column_index` already refuses anything past XFD; this is the second
-                    // guard on the allocation itself, because it is the one that would abort.
+                    // `column_index` already refuses a reference past XFD, and the push
+                    // below refuses a cell that the implicit-position counter carried past it;
+                    // this is the third guard, on the allocation itself, because it is the one
+                    // that would abort.
                     let widest = widest.min(MAX_COLUMN_INDEX);
                     let mut row = vec![String::new(); widest + 1];
                     for (column, value) in cells.drain(..) {
@@ -263,18 +265,25 @@ fn read_rows(xml: &str, shared: &[String], limit: usize) -> Vec<Vec<String>> {
                     .attr("r")
                     .and_then(|reference| column_index(&reference))
                     .unwrap_or(next_column);
-                next_column = column + 1;
+                next_column = column.saturating_add(1);
             }
             Event::Open(tag) if tag.name == "c" => {
                 let column = tag
                     .attr("r")
                     .and_then(|reference| column_index(&reference))
                     .unwrap_or(next_column);
-                next_column = column + 1;
+                next_column = column.saturating_add(1);
                 let kind = tag.attr("t").unwrap_or_default().into_owned();
                 let raw = read_cell_value(&mut reader);
                 if let Some(value) = resolve(raw, &kind, shared) {
-                    cells.push((column, value));
+                    // A cell past XFD is not a cell. `column_index` refuses a *reference* past
+                    // it, but a cell carrying no `r` takes the position after the last one, and
+                    // that counter walks off the end of the sheet the moment a row is shifted
+                    // past XFD by cells that do carry one. The clamp at the row's close then
+                    // sized a 16,384-wide row and this index wrote past it.
+                    if column <= MAX_COLUMN_INDEX {
+                        cells.push((column, value));
+                    }
                 }
             }
             _ => {}

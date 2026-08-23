@@ -5,6 +5,7 @@
 use std::process::ExitCode;
 
 use edfund_core::FiscalYear;
+use project::cli;
 use project::drafts::{draft, drafts, price, Priced};
 use project::panel::{panel, MINIMUM_STATE_SHARE};
 use project::policy::{GuaranteeRule, Policy};
@@ -90,6 +91,7 @@ fn method(raw: &str) -> Result<Method, String> {
 }
 
 fn execute(args: &[String]) -> Result<(), String> {
+    cli::check(args)?;
     if args.iter().any(|a| a == "--drafts") {
         return list_drafts();
     }
