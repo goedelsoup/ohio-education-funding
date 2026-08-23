@@ -118,9 +118,11 @@ findings: |
 
   ### And the level the state equalizes from has been falling for a decade
 
-  The quartile table is one year. Across the ten years the survey covers, the state's share of
-  Ohio school revenue falls in nine of them — 41.9% in FY2012 to 34.3% in FY2022, or three points
-  between the two federally ordinary years FY2013 and FY2019 — while the local share rises.
+  The quartile table is one year. Across the ten years the survey covers from FY2012, the state's
+  share of Ohio school revenue falls in **seven of the nine year-on-year changes** — 41.9% in
+  FY2012 to 34.3% in FY2022, or three points between the two federally ordinary years FY2013 and
+  FY2019 — while the local share rises. It rises twice, in FY2013 and FY2015; the survey has no
+  FY2014, so the ten years are nine changes and not ten.
   [verified — `dispersion::ohio_panel`, pinned by test; the full series is on
   [DeRolph I](../litigation/derolph-i-1997.yml)]
 
@@ -196,6 +198,18 @@ findings: |
   learning. Whether that is the funding system compensating, or a growth measure normed in a way
   that removes level differences by construction, cannot be told from one cross-section. [open]
 revisions:
+  - was: |
+      "Across the ten years the survey covers, the state's share of Ohio school revenue falls in
+      **nine of them**."
+    now: |
+      It falls in **seven of the nine year-on-year changes**, rising in FY2013 and FY2015. The
+      survey has no FY2014, so ten year-points are nine changes and never ten.
+    found_by: |
+      Recomputing `dispersion::ohio_panel::revenue_mix_by_year` over the FY2012-FY2022 window
+      while auditing #128.
+    reach: |
+      No other figure moves: 41.9% in FY2012, 34.3% in FY2022 and the three-point fall between
+      FY2013 and FY2019 all stand, and the direction the passage argues is unaffected.
   - was: |
       The 95th-percentile-over-5th-percentile statistic was published as the **federal range
       ratio**, in the corpus and in `dispersion`'s own field name.

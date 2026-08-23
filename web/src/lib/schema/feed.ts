@@ -864,8 +864,8 @@ export const StatewideSchema = z
  *
  * The one guarantee is that the split is exact in aggregate: every school district's shares sum to
  * one, so the apportionment loses no dollar. The *serialized* seat totals are rounded before they
- * are written, so summing 99 of them lands $1-2 above `statewide.realized_aid_total` and the two
- * chambers differ from each other by $0.97. Do not reconcile them to the cent. Everything else is
+ * are written, so summing the House seats lands $2.06 above `statewide.realized_aid_total`, the
+ * Senate seats $1.10 above it, and the two chambers differ from each other by $0.96. Do not reconcile them to the cent. Everything else is
  * an estimate, and any page showing one says so.
  */
 export const HouseDistrictSchema = z

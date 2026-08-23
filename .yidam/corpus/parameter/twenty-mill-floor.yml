@@ -114,13 +114,14 @@ findings: |
 
   **What two tax years establish that one could not.** Of the 416 districts that began TY2023
   above the floor, 301 saw their effective Class 1 rate fall by TY2024; of the 193 that began
-  at it, 7 did. 97.7% of every effective-rate reduction in Ohio happens above the floor.
-  [verified — computed in `crates/bundle` from TY2023 and TY2024 Table SD-1]
+  at it, 9 did. 97.1% of every effective-rate reduction in Ohio happens above the floor.
+  [verified — computed in `crates/bundle` from TY2023 and TY2024 Table SD-1, over the 609
+  districts of the FY2027 funding model, at `RATE_FALL_TOLERANCE`]
 
   The split must be taken at the *start* of the interval. Classifying by the end year lets a
   district that fell *to* the floor be counted as a floor district with a falling rate, which
   puts the outcome being measured inside the category doing the measuring; it moves the
-  at-floor fall rate from 3.6% to 20.5% and the headline from 97.7% to 88.3%. [verified]
+  at-floor fall rate from 4.7% to 21.6% and the headline from 97.1% to 87.7%. [verified]
 
   **And a caution against the regime language above.** 54 districts sit above the floor by less
   than a twentieth of a mill, and 82 crossed 20.0000 in one direction or the other between the
@@ -130,6 +131,27 @@ findings: |
   *assignment* of districts to sides is not stable, and a simulation that treats floor status
   as a fixed district attribute will be wrong about that eighth. [inference]
 revisions:
+  - was: |
+      Of the 193 districts that began TY2023 at the floor, **7** saw their effective Class 1 rate
+      fall by TY2024 — an at-floor fall rate of **3.6%**, against a headline **97.7%** of all
+      effective-rate reductions occurring above the floor. The end-year-classification variant
+      was given as 20.5% and 88.3%.
+    now: |
+      **9**, **4.7%** and **97.1%**; the variant is **21.6%** and **87.7%**. The 416 districts
+      that began above the floor and the 301 of them whose rate fell are unchanged, as is the
+      193.
+    found_by: |
+      Recomputing the passage while auditing #128. The old figures were produced when a fall
+      meant a drop of more than `0.0005` mills. Table SD-1 publishes effective rates to four
+      decimal places, so the half-unit of its own rounding is `0.00005` — ten times smaller —
+      and that is the value `RATE_FALL_TOLERANCE` was given when the rule was unified across the
+      site. Two of the nine at-floor falls sit between the two thresholds: noise at the looser
+      one, falls at the published precision.
+    reach: |
+      The reading is unchanged and the contrast survives comfortably — 72% of above-floor
+      districts saw a fall against 4.7% of at-floor ones. What changes is that the corpus and
+      the site now compute this from the same constant; the site had been showing 97.1% while
+      this node said 97.7%.
   - was: |
       That the floor does not apply to emergency and substitute levies was briefly stated in
       reverse, inferred from Table SD-1 alone: the data showed no effect in the group carrying
