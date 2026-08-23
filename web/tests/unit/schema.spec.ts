@@ -14,7 +14,7 @@ import { expect, test } from "vitest";
 import YAML from "yaml";
 
 import { loadCorpus, resolveTarget } from "../../src/lib/corpus.ts";
-import { loadFeed } from "../../src/lib/feed.ts";
+import { loadFeed, RATE_FALL_TOLERANCE } from "../../src/lib/feed.ts";
 import {
   NodeSchema,
   OBSERVATION_PROPERTY,
@@ -515,7 +515,7 @@ test("the floor split is taken at the start of the interval, not the end", () =>
    * what its own page should say. Using it to split "whose rate fell between the two years" lets
    * a district that fell *to* the floor be counted as an at-floor district with a falling rate —
    * and 29 districts did exactly that. The contamination is large enough to matter: it moves the
-   * at-floor fall rate from 3.6% to 20.5% and drops the headline from 97.7% to 88.3%.
+   * at-floor fall rate from 4.7% to 20.5% and drops the headline from 97.1% to 88.3%.
    */
   const { bundle, tax } = loadFeed();
 
@@ -524,7 +524,7 @@ test("the floor split is taken at the start of the interval, not the end", () =>
     // The last two, not the ends: the H.B. 920 recursion is only exact between consecutive years.
     const [before, after] = d.property_tax.slice(-2);
     if (!before || !after || d.property_tax.length < 2) continue;
-    if (after.class1_rate - before.class1_rate >= -0.0005) continue;
+    if (after.class1_rate - before.class1_rate >= -RATE_FALL_TOLERANCE) continue;
     if (d.at_millage_floor) contaminated.atFloor++;
     else contaminated.aboveFloor++;
   }
