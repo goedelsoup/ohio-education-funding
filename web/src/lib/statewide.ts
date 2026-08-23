@@ -120,6 +120,27 @@ export function guaranteeRateByQuintile(districts: District[]): Bar[] {
 }
 
 /**
+ * The regime comparison's one directional sentence, with the direction read off the sign.
+ *
+ * The magnitude and the word for it were written separately: `money()` printed the figure and the
+ * prose said "better off" whatever the figure was. The median has been negative since recognised
+ * valuation was corrected, so this page read `−$47 per pupil better off` — a sentence asserting the
+ * opposite of its own number. Aligning `money()`'s minus with the other three formatters made that
+ * legible rather than causing it, and no formatter can fix it: the amount here is a magnitude and
+ * the direction is a word chosen beside it, which is the only arrangement that cannot disagree.
+ *
+ * A magnitude that rounds away loses its direction with it — the rule `money` and `signedMoney`
+ * already keep, for the same reason. "Worse off" on a figure that rounds to $0 is a claim the
+ * figure does not support.
+ */
+export function renderRegimeDifference(median: number): string {
+  const nowhere = "the median district is neither better nor worse off under the plan";
+  if (Math.abs(median) < 0.5) return nowhere;
+  const direction = median < 0 ? "worse" : "better";
+  return `the median district is ${money(Math.abs(median))} per pupil ${direction} off under the plan`;
+}
+
+/**
  * The three structural facts, and the one chart that shows the first.
  *
  * Separate from {@link renderStatewideFinances} because that card is rendered twice — once per
@@ -293,8 +314,7 @@ export function renderStatewideStructure(bundle: Bundle, tax: TaxStatewide): str
         below 23 mills today, and ${count(s.charge_off_exceeds_base_cost)} have valuation high
         enough that the charge-off would take their whole base cost and leave nothing, having no
         minimum state share to stop at. Ohio's answer was a supplement rather than a fix. Against
-        that counterfactual the median district is
-        ${money(s.median_regime_difference)} per pupil better off under the plan.</p>
+        that counterfactual ${renderRegimeDifference(s.median_regime_difference)}.</p>
     </div>`;
 }
 
