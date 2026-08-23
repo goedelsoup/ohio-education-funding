@@ -749,9 +749,9 @@ export function renderTaxAgainstSpending(d: District, statewide: TaxStatewide): 
                .join(", ")}. For the first two that is arithmetic rather than policy: a district
              whose valuation per pupil pins it to the minimum state share has to raise essentially
              all of its own cost, and the residual definition of state aid leaves nothing else for
-             it to do. The third is the timing gap above — a levy passed in November 2024 is
-             charged in full for TY2024, and roughly half of it did not reach the district until
-             the following fiscal year.`
+             it to do. The third is the timing gap above — a levy passed in November
+             ${latest.tax_year} is charged in full for TY${latest.tax_year}, and roughly half of it
+             did not reach the district until the following fiscal year.`
       }</p>
     </div>`;
 }

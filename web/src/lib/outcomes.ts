@@ -284,7 +284,7 @@ export function renderOutcomes(bundle: Bundle): string {
         in the funding model have no report card and are absent from everything above. They are
         the three smallest in Ohio.</p>
           <p class="note"><strong>The poverty measure has a ceiling, and ${saturated} districts are
-        on it.</strong> The FY2024 District Profile Report publishes an economically disadvantaged
+        on it.</strong> The ${yearOf("profile")} District Profile Report publishes an economically disadvantaged
         share of exactly 100% for them — not a value this repository caps, and not a break in the
         distribution: the shares just below run 99.83%, 99.87%, 99.91% and so on to 99.99%. It is
         what universal certification produces, and it is true as published.
