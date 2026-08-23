@@ -17,8 +17,7 @@
 /// A tolerance that admits the fixture's own rounding and nothing else.
 ///
 /// Dollar amounts are stored to the cent, so a reproduction can differ by half a cent from
-/// rounding alone; the inputs are stored to nine places, which contributes a relative error far
-/// below the second term. Anything outside both is a mechanism that has not been understood.
+/// rounding alone. Anything outside that is a mechanism that has not been understood.
 pub fn close(computed: f64, published: f64) -> bool {
     agrees_within(0.01, computed, published)
 }
@@ -28,8 +27,26 @@ pub fn close(computed: f64, published: f64) -> bool {
 ///
 /// Every caller of this owes the reader a measured worst case. A tolerance chosen to make a test
 /// pass is a test that has stopped checking anything.
+///
+/// # The allowance is absolute, and used to not be
+///
+/// This read `allowance.max(published.abs() * 1e-9)`, which is a second tolerance, in a different
+/// unit, that wins whenever the figure exceeds ten million dollars. The comment above it named a
+/// third — inputs "stored to nine places", conflating nine decimal places of *input* with 1e-9
+/// *relative on the output*, which are not the same claim and do not imply one another.
+///
+/// On the statewide totals this crate reconciles, the relative term reached **$17.57** against a
+/// stated allowance of one cent (#125). Injecting a dollar error 90% of the way to that band left
+/// 204 of 205 tests green: at that width the assertion was not checking arithmetic, it was
+/// checking that the figure was roughly the right size.
+///
+/// The term bought nothing. Measured across every comparison this module makes on a figure above
+/// ten million dollars, the largest real disagreement is **$0.0049** — under the half cent the
+/// storage alone explains — and on the largest figure compared, $17,571,781,352.21, it is
+/// **$0.000038**. Float noise sits four orders of magnitude below the cent, so the cent covers it
+/// without help. Removing the term entirely leaves the crate at 278 passing, 0 failing.
 pub fn agrees_within(allowance: f64, computed: f64, published: f64) -> bool {
-    (computed - published).abs() <= allowance.max(published.abs() * 1e-9)
+    (computed - published).abs() <= allowance
 }
 
 /// [`close`], for a total reconstructed by adding `parts` separately-rounded amounts.
@@ -37,8 +54,12 @@ pub fn agrees_within(allowance: f64, computed: f64, published: f64) -> bool {
 /// Each part is stored to the cent and so carries up to half a cent of rounding, and the published
 /// total is rounded once more. Adding six of them can legitimately land a cent away from a figure
 /// that is right — which is a statement about the fixture's storage and not about the formula.
+///
+/// Absolute, for the reason given on [`agrees_within`]: the relative term it used to carry was a
+/// second tolerance in a different unit, and the measurements say the storage term alone covers
+/// every real disagreement.
 pub fn reconciles(computed: f64, published: f64, parts: usize) -> bool {
-    (computed - published).abs() <= 0.005 * (parts as f64 + 1.0) + published.abs() * 1e-9
+    (computed - published).abs() <= 0.005 * (parts as f64 + 1.0)
 }
 
 /// The median, on the one definition this workspace has.
