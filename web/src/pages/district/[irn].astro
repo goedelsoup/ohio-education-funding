@@ -99,7 +99,7 @@ const description = district.on_guarantee
   {/* The other half of formula aid, decomposed the same way and for the same reason. */}
   <Fragment set:html={renderCategoricals(district, bundle.statewide)} />
   {/* Everything above is foundation funding, which the guarantee holds. This is not. */}
-  <Fragment set:html={renderSupplements(district)} />
+  <Fragment set:html={renderSupplements(district, bundle.statewide)} />
   <Fragment set:html={renderPosition(bundle, district, valuations, expenditures)} />
   {/* Ohio describing itself cannot say whether Ohio is unusual. This is the one card that can. */}
   <Fragment set:html={renderNationalPosition(district)} />

@@ -282,6 +282,14 @@ fn zero_statewide() -> Statewide {
         guarantee_total: 0.0,
         realized_aid_total: 0.0,
         minimum_state_share: 0.1,
+        // The four the district page prints and used to type. Real values rather than zeros: the
+        // proration is the one member of `statewide` the serializer writes to eight places, and a
+        // zero would not show whether it still does.
+        targeted_assistance_median_weighted_wealth: 392_151_306.632_980_76,
+        targeted_assistance_median_wealth_per_pupil: 276_708.97,
+        preschool_appropriation: 147_500_000.0,
+        preschool_proration: 0.968_544_48,
+        preschool_total: 148_408_183.76,
         finances: vec![FinanceYear {
             fiscal_year: 2025,
             state_aid: Some(7_890_000_000.0),

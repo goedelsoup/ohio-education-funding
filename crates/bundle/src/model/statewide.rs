@@ -72,6 +72,30 @@ pub struct Statewide {
     pub realized_aid_total: Dollars,
     /// The minimum state share this model operates under.
     pub minimum_state_share: f64,
+    /// The statewide median district's weighted wealth, which targeted assistance's capacity
+    /// index divides by — `project::panel::categoricals::TA_MEDIAN_WEIGHTED_WEALTH`.
+    ///
+    /// Carried in the feed because the district page states it, and a figure the page types is a
+    /// figure that stays exactly as stale as the last person to remember it. The two tiers of the
+    /// largest categorical in Ohio are unreadable without the median they index against, so the
+    /// page needs it; this is where it comes from.
+    pub targeted_assistance_median_weighted_wealth: Dollars,
+    /// The statewide median weighted wealth per resident pupil, which the wealth index divides
+    /// by — `project::panel::categoricals::TA_MEDIAN_WEALTH_PER_PUPIL`.
+    pub targeted_assistance_median_wealth_per_pupil: Dollars,
+    /// The appropriation limit the preschool special education sheet prints beside its factor.
+    ///
+    /// `project::panel::supplements::PREK_SPED_APPROPRIATION`. It is the FY2025 estimate rather
+    /// than the FY2027 appropriation, and the district page says so — see that constant.
+    pub preschool_appropriation: Dollars,
+    /// The proration factor that sheet states.
+    pub preschool_proration: f64,
+    /// What the program pays at that factor, summed over the districts in this feed.
+    ///
+    /// Summed here rather than on the page for the reason [`Statewide::finances`] is: the page and
+    /// the feed cannot then disagree about which districts are in the total. It exceeds
+    /// [`Statewide::preschool_appropriation`], which is the fact the card is built around.
+    pub preschool_total: Dollars,
     /// How the funding side relates to the outcome side. `None` if no district joined.
     pub outcomes: Option<OutcomeStatewide>,
     /// Closed fiscal years of actuals, summed over the districts in this feed.

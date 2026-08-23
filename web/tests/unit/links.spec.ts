@@ -369,7 +369,7 @@ test("every corpus link the district renderers emit resolves", () => {
       renderWhatThisIsNot(bundle, d),
       renderBaseCostBuildUp(d, statewide.districts),
       renderCategoricals(d, statewide),
-      renderSupplements(d),
+      renderSupplements(d, statewide),
       renderNationalPosition(d),
       renderTaxBase(d),
       renderMillage(d, statewide),

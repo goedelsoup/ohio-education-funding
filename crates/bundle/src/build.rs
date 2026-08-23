@@ -44,6 +44,8 @@ use project::finances::{finances, for_district, Finances};
 use project::legislative_district::{legislative_districts, overlaps, Chamber};
 use project::line_origins;
 use project::outcomes::{joined, Joined};
+use project::panel::categoricals::{TA_MEDIAN_WEALTH_PER_PUPIL, TA_MEDIAN_WEIGHTED_WEALTH};
+use project::panel::supplements::{PREK_SPED_APPROPRIATION, PREK_SPED_PRORATION};
 use project::panel::{panel, DistrictRecord, HISTORY_YEARS, MINIMUM_STATE_SHARE, MODEL_YEAR};
 use project::policy::{GuaranteeRule, Policy};
 use project::report::{enrollment_growth_prior, forecast, simulate};
@@ -1715,6 +1717,18 @@ pub fn build() -> Bundle {
         guarantee_total: districts.iter().map(|d| d.guarantee).sum(),
         realized_aid_total: records.iter().map(DistrictRecord::realized_aid).sum(),
         minimum_state_share: MINIMUM_STATE_SHARE,
+        // The two medians targeted assistance indexes against, and the preschool sheet's
+        // appropriation and factor. Restated here rather than left to the page: the district page
+        // prints all four, and a page that types a statutory constant has no way to notice when
+        // the constant moves. See `Statewide::targeted_assistance_median_weighted_wealth`.
+        targeted_assistance_median_weighted_wealth: TA_MEDIAN_WEIGHTED_WEALTH,
+        targeted_assistance_median_wealth_per_pupil: TA_MEDIAN_WEALTH_PER_PUPIL,
+        preschool_appropriation: PREK_SPED_APPROPRIATION,
+        preschool_proration: PREK_SPED_PRORATION,
+        preschool_total: districts
+            .iter()
+            .map(|d| d.preschool_special_education.total)
+            .sum(),
         // Summed over the districts in the feed, not over the 660-body panel behind it. The
         // page cannot then disagree with the feed about which districts are in the total, and
         // the population matches every other statewide figure here.

@@ -816,6 +816,22 @@ export const StatewideSchema = z
     guarantee_total: num,
     realized_aid_total: num,
     minimum_state_share: num,
+    /**
+     * The two statewide medians targeted assistance's indices divide by.
+     *
+     * From `project::panel::categoricals`, carried here because the district page states them.
+     * They were typed into that page until #107: a constant written into prose is always present,
+     * always finite, and always exactly as stale as the last person to remember it — which is the
+     * one failure `format.ts`'s em dash cannot surface.
+     */
+    targeted_assistance_median_weighted_wealth: num,
+    targeted_assistance_median_wealth_per_pupil: num,
+    /** The limit the preschool special education sheet prints beside its factor. */
+    preschool_appropriation: num,
+    /** That factor, carried to the eight places the sheet publishes it to. */
+    preschool_proration: num,
+    /** What the program pays at that factor, summed over the districts in this feed. */
+    preschool_total: num,
     /** How the funding side relates to the outcome side. `null` if no district joined. */
     outcomes: OutcomeStatewideSchema.nullable(),
     /**

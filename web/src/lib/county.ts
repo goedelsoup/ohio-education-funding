@@ -55,7 +55,8 @@ export interface County {
   /**
    * Richest over poorest on assessed valuation per pupil, among districts that report it.
    *
-   * `null` for a county with fewer than two reporting districts, which is four of the 88. A ratio
+   * `null` for a county with fewer than two reporting districts. `renderSpread` counts how many
+   * that is off the feed rather than stating it here, so the figure cannot go stale. A ratio
    * needs two districts and a single-district county has no internal disparity to measure — that
    * is a real answer rather than a missing one, and the page says so.
    */
@@ -122,13 +123,18 @@ export function counties(districts: District[]): County[] {
  */
 function renderSpread(c: County, statewide: Statewide, all: County[]): string {
   if (!c.richest || !c.poorest || c.valuationRatio == null) {
+    // Counted off `all` rather than written down. "Four of Ohio's 88" was typed here, and both
+    // halves of it are properties of the feed: a district joining or leaving one of these counties
+    // moves the first, and the second is however many counties the department's attribution
+    // produces — not a fact about Ohio's map.
+    const unmeasurable = all.filter((other) => other.valuationRatio == null).length;
     return `
       <div class="card" id="spread" data-part="spread">
         <h2>${anchor("spread")}One district${yearChip("formula")}</h2>
         <p class="note">${escapeHtml(c.name)} County has a single district in the funding model,
-          so it has no internal disparity to measure. Four of Ohio's 88 counties are in that
-          position. The comparison this page is built for is between districts, so for
-          ${escapeHtml(c.name)} the state distribution on
+          so it has no internal disparity to measure. ${count(unmeasurable)} of Ohio's
+          ${count(all.length)} counties are in that position. The comparison this page is built for
+          is between districts, so for ${escapeHtml(c.name)} the state distribution on
           <a href="/districts">the districts index</a> is the more useful view.</p>
       </div>`;
   }
