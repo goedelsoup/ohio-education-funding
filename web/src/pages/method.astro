@@ -18,7 +18,7 @@ import { renderToString } from "../lib/plot/ssr.ts";
 import { pairs } from "../lib/relationships.ts";
 import SectionAnchor from "../components/SectionAnchor.astro";
 
-const { bundle, verification, forecastable } = loadFeed();
+const { bundle, verification, forecastable, tax } = loadFeed();
 const corpus = loadCorpus();
 const s = bundle.statewide;
 const meta = bundle.projection;
@@ -156,6 +156,12 @@ const millageScatter = renderToString(
                 <td>
                   <div class="n">{denominatorSource(d)}</div>
                   {d.note}
+                  {"divergence" in d && (
+                    <>
+                      {" "}It differs from base cost ADM by a median {pct(tax.admSeam.median, 1)},
+                      and by {pct(tax.admSeam.max, 0)} at the extreme.
+                    </>
+                  )}
                   {"endpoints" in d && span && (
                     <>
                       {" "}Sponsors rise from {count(span.first)} in FY{span.firstYear} to{" "}
