@@ -443,7 +443,8 @@ pub struct HouseDistrictMember {
 /// serialized figures — each seat's total is rounded to the cent before it is written, and summing
 /// 99 of them accumulates. On the committed feed the House seats total $7,281,227,593.71 and the
 /// Senate seats $7,281,227,592.75 against a statewide `realized_aid_total` of $7,281,227,591.65:
-/// the two chambers disagree by $0.97 and each sits $1-2 above the statewide figure. Do not write
+/// the two chambers disagree by $0.96, the House sitting $2.06 above the statewide figure and the
+/// Senate $1.10. Do not write
 /// a consumer that reconciles them to the cent. Everything else about a House district figure is
 /// an estimate, and any page showing one has to say so.
 #[derive(Debug, Clone, PartialEq)]

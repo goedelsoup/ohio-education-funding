@@ -2,12 +2,13 @@ class: fiscal-period
 label: FY2018-2019 Biennium
 summary: >-
   A Bridge formula biennium, and the one in which the local funding gap passes $8,000 per pupil
-  while the state's share of closing it stays unchanged from FY2012.
+  while the state's share of closing it barely moves — 42.5% in FY2012 against 44.3% in FY2019.
 description: |
   July 1, 2017 through June 30, 2019 — a biennium of the [Bridge
   formula](../funding-regime/bridge-formula.yml) era. [verified]
 
-  The local gap passes $8,000 per pupil. The state's share of closing it is unchanged from FY2012.
+  The local gap passes $8,000 per pupil while the state's share of closing it barely moves: 42.5%
+  in FY2012 against 44.3% in FY2019, inside the 41-46% band it has held since.
 findings: |
   **What is measured**, over comparable districts, on federal definitions: [verified —
   `dispersion::ohio_panel`, pinned by test]
@@ -21,6 +22,19 @@ findings: |
   [inference]
 
   **The appropriating act set the department's own budget at $11.37 billion in FY2018 and $11.48 billion in FY2019.** That is what was appropriated to the Department of Education across every line in its chapter, less the property tax reimbursement items that are numbered as the department's and are carried in the State Revenue Distributions section instead. [verified — the appropriation series, `lsc-appropriation-spreadsheet`] It is a ceiling rather than a payment; what districts received is `dew-foundation`.
+revisions:
+  - was: |
+      "The state's share of closing it is unchanged from FY2012."
+    now: |
+      It barely moves rather than being unchanged: **42.5% in FY2012 against 44.3% in FY2019**,
+      inside the 41-46% band it has held since.
+    found_by: |
+      Computing `state_closes / gap` from `dispersion::ohio_panel::equalization_by_year` while
+      auditing #128.
+    reach: |
+      The point the sentence makes is strengthened rather than weakened. The share holds roughly
+      flat while the gap itself grows from $5,727 to $8,444 per pupil, so the state pays more
+      dollars into a disparity that widens anyway.
 properties:
   label: FY2018-2019
   kind: biennium

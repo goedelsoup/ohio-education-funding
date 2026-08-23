@@ -89,8 +89,11 @@ export interface TaxStatewide {
    * `District.at_millage_floor` — that reports where it stands now. The distinction is not
    * pedantic. Classifying by the end year lets a district that *fell to* the floor be counted as
    * an at-floor district whose rate fell, which is the outcome being measured leaking into the
-   * category doing the measuring. It cost this statistic a third of its contrast: 20.5% of
-   * at-floor districts appeared to have falling rates, against 3.6% under the honest split.
+   * category doing the measuring. It cost this statistic most of its contrast: 21.6% of
+   * at-floor districts appeared to have falling rates, against 4.7% under the honest split.
+   *
+   * Both figures moved when `RATE_FALL_TOLERANCE` was unified (they read 20.5% and 3.6%,
+   * computed at a threshold ten times looser than the one this file now defines).
    */
   rateFell: { atFloor: number; aboveFloor: number };
   /** How many districts began TY2023 on each side of the floor. */

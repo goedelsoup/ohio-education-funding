@@ -49,14 +49,29 @@ findings: |
   sum to one, so the apportionment loses no dollar by construction — but the feed carries each
   seat's total as a rounded dollar figure, and summing 99 of them accumulates. On the committed
   feed the House seats total $7,281,227,593.71 and the Senate seats $7,281,227,592.75 against a
-  statewide `realized_aid_total` of $7,281,227,591.65: **the two chambers disagree by $0.97 and
-  each sits $1-2 above the statewide figure.** [verified — `web/public/data/bundle.json`] Read
+  statewide `realized_aid_total` of $7,281,227,591.65: **the two chambers disagree by $0.96, and
+  the House sits $2.06 above the statewide figure and the Senate $1.10.** [verified — `web/public/data/bundle.json`] Read
   the conservation as a property of the method, not as a check a consumer can run to the cent.
   What the estimate supports is
   scale and comparison — how much of Ohio's school money runs through the schools a member
   represents, and how many of those districts are on the guarantee. What it cannot support is
   any statement about a district's entitlement, which is exact and belongs to the district.
   [verified]
+revisions:
+  - was: |
+      "The two chambers disagree by **$0.97** and each sits $1-2 above the statewide figure."
+    now: |
+      **$0.96.** The two totals it is drawn from were right — $7,281,227,593.71 and
+      $7,281,227,592.75 — and their difference was not. The House sits **$2.06** above
+      `statewide.realized_aid_total` and the Senate **$1.10**, so "each sits $1-2 above" was
+      also just outside on one side.
+    found_by: |
+      Subtracting the two figures printed beside it, from the committed feed, while auditing
+      #128.
+    reach: |
+      The instruction the passage exists to give is unchanged: do not reconcile the chambers to
+      the cent. The same figure was carried by `crates/bundle`'s rustdoc, the Zod schema comment
+      and the catalog entry, and all four are corrected together.
 properties:
   name: Ohio General Assembly
   institution_type: legislature

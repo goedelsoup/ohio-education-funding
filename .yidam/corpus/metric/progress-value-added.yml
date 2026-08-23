@@ -35,8 +35,8 @@ description: |
 
   They agree wherever agreement carries information. Of the **534 districts printing a non-zero
   value on both, 44 point opposite ways**, and **not one of those 44 has both magnitudes above
-  0.05**: every disagreement is a district within 0.04 of zero on both measures, which is no
-  measured growth in either direction and a sign that is arbitrary. The correlation is 0.903.
+  0.05**: each is within 0.04 of zero on one of the two, which is no measured growth there and a
+  sign that is arbitrary. The correlation across those 534 is 0.912.
   [verified — computed in `crates/bundle` from the 2024-25 report card]
 
   So the smoothing choice is safe for any district with real movement, and the three-year
@@ -137,9 +137,22 @@ revisions:
       Counting over determinate pairs only, pinned in the feed's own
       `growth_measures_determinate` and `growth_measures_disagree`.
     reach: |
-      No disagreement survives a real threshold: every one of the 44 is a district within 0.04
-      of zero on both measures, so the sign is arbitrary rather than contested. The smoothing
-      choice is safe for any district with real movement.
+      No disagreement survives a real threshold: every one of the 44 is within 0.04 of zero on
+      at least one of the two measures, so the sign is arbitrary rather than contested. The
+      smoothing choice is safe for any district with real movement.
+  - was: |
+      "Every disagreement is a district within 0.04 of zero **on both measures**", and "the
+      correlation is 0.903" in a sentence whose subject is the 534 districts non-zero on both.
+    now: |
+      Within 0.04 of zero on **at least one** of the two — the largest single magnitude among
+      the 44 is 0.100, on the measure that does report movement. And the correlation across the
+      534 is **0.912**; 0.903 is the figure across the 606 that print on both including zeros.
+    found_by: |
+      Recomputing both over the feed's 609-district panel while auditing #128. The 0.903 was
+      right about its own population and was printed against a different one.
+    reach: |
+      The reading is unchanged: the two measures agree wherever agreement carries information.
+      What changes is that neither number now describes a population it was not computed over.
 properties:
   name: Progress (value-added) effect size
   unit: index
