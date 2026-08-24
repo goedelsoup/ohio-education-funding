@@ -35,6 +35,9 @@
 
 #![forbid(unsafe_code)]
 
+pub mod department_model;
+pub mod grade_bands;
+
 use edfund_core::{round_dp, Adm, Dollars};
 
 /// Statewide average cost inputs for a reference year.
@@ -392,6 +395,45 @@ pub struct BaseCost {
     pub aggregate: Dollars,
     /// Aggregate divided by base cost enrolled ADM.
     pub per_pupil: Dollars,
+}
+
+/// The base cost effect of refreshing the classroom teacher salary input, per district.
+///
+/// # Why this is one function and not a term inside the build-up
+///
+/// The reference year is the parameter at the centre of Ohio's current funding argument: H.B.
+/// 110 priced FY2022 from FY2018 salaries, H.B. 33 refreshed to FY2022, and H.B. 96 held them
+/// there through FY2027. "What would refreshing cost" is therefore a question the corpus asks
+/// repeatedly, and it has a closed form — which is worth stating, because re-running the whole
+/// build-up to answer it invites the reader to wonder which of the other components moved.
+///
+/// None of them do. Within the teacher sub-component the salary enters through the classroom,
+/// special and professional-development terms, all proportional to funded teaching positions;
+/// the substitute term uses its own daily rate. Building leadership, district leadership,
+/// student support and athletics do not reference it at all. So the whole effect is
+///
+/// ```text
+/// positions x (to - from) x benefit_multiplier x (1 + professional_development / contract_days)
+/// ```
+///
+/// which is what this returns. It was written out twice, in two of this crate's own test files,
+/// each with its own copy of the 1.16 and the 4/180 — and `StatewideFactors` has carried the
+/// multiplier all along. See issue #157.
+///
+/// `positions` is funded classroom plus funded special teachers:
+/// [`department_model::ModelDistrict::funded_positions`] takes them from the department's own
+/// counts, [`grade_bands::GradeBands::funded_positions`] reconstructs them from grade bands.
+#[must_use]
+pub fn teacher_salary_refresh_delta(
+    positions: f64,
+    from_salary: Dollars,
+    to_salary: Dollars,
+    factors: &StatewideFactors,
+) -> Dollars {
+    positions
+        * (to_salary - from_salary)
+        * factors.benefit_multiplier
+        * (1.0 + ratios::PROFESSIONAL_DEVELOPMENT_DAYS / ratios::CONTRACT_DAYS)
 }
 
 /// Compute teacher base cost, per R.C. 3317.011(D).

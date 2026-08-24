@@ -32,23 +32,11 @@
 //!
 //! Cited by `corpus/metric/per-pupil-operating-expenditure.yml`.
 
+use deflator::CpiSeries;
+use dispersion::ohio_panel::{self, PanelRow};
+use dispersion::profile;
 use dispersion::{wealth_neutrality, Dispersion};
-
-const PANEL: &str = include_str!("../fixtures/f33-ohio-panel.csv");
-const PROFILE: &str = include_str!("../fixtures/cupp-fy24-district-data.csv");
-const CPI: &str = include_str!("../../connect/fixtures/cpi-u-june.tsv");
-
-/// Column indices in the panel fixture.
-mod col {
-    pub const IRN: usize = 2;
-    pub const COMPARABLE: usize = 3;
-    pub const ENROLLMENT: usize = 4;
-    pub const TOTAL_REVENUE: usize = 5;
-    pub const FEDERAL_REVENUE: usize = 6;
-    pub const STATE_REVENUE: usize = 7;
-    pub const LOCAL_REVENUE: usize = 8;
-    pub const CURRENT_SPENDING: usize = 10;
-}
+use edfund_core::FiscalYear;
 
 /// The peak of the trough, and the last year before recovery that the archive holds.
 const PEAK: u16 = 2010;
@@ -56,83 +44,66 @@ const BOTTOM: u16 = 2013;
 /// Everything is restated in the dollars of the panel's final year.
 const BASE: u16 = 2022;
 
-#[derive(Debug, Clone)]
-struct Row {
-    year: u16,
-    irn: String,
-    enrollment: f64,
-    spending_per_pupil: f64,
-    state_share: f64,
-    federal_share: f64,
-    local_share: f64,
-}
-
-fn cpi(year: u16) -> f64 {
-    CPI.lines()
-        .filter_map(|line| {
-            let f: Vec<&str> = line.split('\t').map(str::trim).collect();
-            (f.len() >= 4 && f[1].parse::<u16>().ok() == Some(year))
-                .then(|| f[3].parse::<f64>().ok())
-                .flatten()
-        })
-        .next()
-        .unwrap_or_else(|| panic!("no CPI observation for FY{year}"))
-}
-
-/// Restate a figure from `year` in [`BASE`] dollars.
+/// Restate a figure from `year` in [`BASE`] dollars, on the index the corpus deflates by.
+///
+/// Was a private scan of `connect`'s committed BLS extract for the June observation of each
+/// year. That extract is exactly what `deflator::CpiSeries::cpi_u_june` is verified against by
+/// `connect/tests/deflator_matches_bls.rs`, so this is the same arithmetic on the same numbers
+/// with one fewer parser between them.
 fn real(value: f64, year: u16) -> f64 {
-    value * cpi(BASE) / cpi(year)
+    CpiSeries::cpi_u_june()
+        .convert(value, FiscalYear(year), FiscalYear(BASE))
+        .unwrap_or_else(|e| panic!("no CPI observation for FY{year}: {e}"))
+        .value
 }
 
-fn panel() -> Vec<Row> {
-    PANEL
-        .lines()
-        .skip(1)
-        .filter(|l| !l.trim().is_empty())
-        .filter_map(|line| {
-            let f: Vec<&str> = line.split(',').map(str::trim).collect();
-            let get = |i: usize| f.get(i).and_then(|v| v.parse::<f64>().ok());
-            if f.get(col::COMPARABLE) != Some(&"1") {
-                return None;
-            }
-            let irn = (*f.get(col::IRN)?).to_string();
-            if irn.is_empty() {
-                return None;
-            }
-            let (enrollment, spending, revenue) = (
-                get(col::ENROLLMENT)?,
-                get(col::CURRENT_SPENDING)?,
-                get(col::TOTAL_REVENUE)?,
-            );
-            if enrollment <= 0.0 || revenue <= 0.0 {
-                return None;
-            }
-            Some(Row {
-                year: f.first()?.parse().ok()?,
-                irn,
-                enrollment,
-                spending_per_pupil: spending / enrollment,
-                state_share: get(col::STATE_REVENUE)? / revenue,
-                federal_share: get(col::FEDERAL_REVENUE)? / revenue,
-                local_share: get(col::LOCAL_REVENUE)? / revenue,
-            })
+/// The comparable districts of the panel, in the years they report spending.
+///
+/// The filter is the analysis's and not the reader's: [`ohio_panel::panel`] returns every row
+/// the survey holds, including the community schools and service centres that the comparability
+/// flag excludes and the years an agency reported revenue without spending.
+fn panel() -> Vec<PanelRow> {
+    ohio_panel::panel()
+        .into_iter()
+        .filter(|r| {
+            r.comparable
+                && !r.irn.is_empty()
+                && r.enrollment > 0.0
+                && r.total_revenue > 0.0
+                && r.current_spending.is_some()
         })
         .collect()
 }
 
-fn year_of(rows: &[Row], year: u16) -> Vec<Row> {
-    rows.iter().filter(|r| r.year == year).cloned().collect()
+/// Spending per pupil, which every comparable row carries by construction of [`panel`].
+fn spending_per_pupil(row: &PanelRow) -> f64 {
+    row.spending_per_pupil()
+        .expect("the panel is filtered to rows that report spending")
+}
+
+/// One revenue source as a share of total, which every row here carries for the same reason.
+fn share(row: &PanelRow, part: f64) -> f64 {
+    row.share(part)
+        .expect("the panel is filtered to rows with revenue")
+}
+
+fn year_of(rows: &[PanelRow], year: u16) -> Vec<PanelRow> {
+    rows.iter()
+        .filter(|r| r.fiscal_year == year)
+        .cloned()
+        .collect()
 }
 
 /// Districts present in both endpoint years, with the real change between them.
-fn changes(rows: &[Row]) -> Vec<(Row, f64)> {
+fn changes(rows: &[PanelRow]) -> Vec<(PanelRow, f64)> {
     let bottom = year_of(rows, BOTTOM);
     year_of(rows, PEAK)
         .into_iter()
         .filter_map(|start| {
             let end = bottom.iter().find(|r| r.irn == start.irn)?;
-            let change =
-                real(end.spending_per_pupil, BOTTOM) / real(start.spending_per_pupil, PEAK) - 1.0;
+            let change = real(spending_per_pupil(end), BOTTOM)
+                / real(spending_per_pupil(&start), PEAK)
+                - 1.0;
             Some((start, change))
         })
         .collect()
@@ -155,7 +126,7 @@ fn close(actual: f64, expected: f64, tolerance: f64, what: &str) {
 #[test]
 fn the_panel_now_opens_before_the_trough_rather_than_inside_it() {
     let rows = panel();
-    let years: std::collections::BTreeSet<u16> = rows.iter().map(|r| r.year).collect();
+    let years: std::collections::BTreeSet<u16> = rows.iter().map(|r| r.fiscal_year).collect();
     assert!(
         years.contains(&2009) && years.contains(&PEAK) && years.contains(&2011),
         "the three added years are present: {years:?}"
@@ -202,7 +173,7 @@ fn the_weighted_panel_reproduces_the_auditors_decline() {
         let rows = year_of(&rows, year);
         let pupils: f64 = rows.iter().map(|r| r.enrollment).sum();
         rows.iter()
-            .map(|r| real(r.spending_per_pupil, year) * r.enrollment)
+            .map(|r| real(spending_per_pupil(r), year) * r.enrollment)
             .sum::<f64>()
             / pupils
     };
@@ -242,9 +213,12 @@ fn the_weighted_panel_reproduces_the_auditors_decline() {
 fn no_revenue_structure_predicts_the_depth_of_the_fall() {
     let changes = changes(&panel());
     for (label, pick) in [
-        ("state share", (|r: &Row| r.state_share) as fn(&Row) -> f64),
-        ("federal share", |r: &Row| r.federal_share),
-        ("local share", |r: &Row| r.local_share),
+        (
+            "state share",
+            (|r: &PanelRow| share(r, r.state_revenue)) as fn(&PanelRow) -> f64,
+        ),
+        ("federal share", |r: &PanelRow| share(r, r.federal_revenue)),
+        ("local share", |r: &PanelRow| share(r, r.local_revenue)),
     ] {
         let pairs: Vec<(f64, f64)> = changes.iter().map(|(r, c)| (pick(r), *c)).collect();
         let r = correlate(&pairs);
@@ -263,25 +237,23 @@ fn no_revenue_structure_predicts_the_depth_of_the_fall() {
 #[test]
 fn later_poverty_and_wealth_do_not_predict_it_either() {
     let changes = changes(&panel());
-    let profile: Vec<(String, f64, f64)> = PROFILE
-        .lines()
-        .skip(1)
-        .filter_map(|line| {
-            let f: Vec<&str> = line.split(',').map(str::trim).collect();
-            Some((
-                (*f.first()?).to_string(),
-                f.get(3)?.parse().ok()?,
-                f.get(4)?.parse().ok()?,
-            ))
-        })
-        .collect();
+    let profile = profile::districts();
 
-    for (label, pick) in [("disadvantage", 0usize), ("valuation per pupil", 1usize)] {
+    for (label, pick) in [
+        (
+            "disadvantage",
+            (|d: &profile::ProfileDistrict| d.economically_disadvantaged)
+                as fn(&profile::ProfileDistrict) -> Option<f64>,
+        ),
+        ("valuation per pupil", |d: &profile::ProfileDistrict| {
+            d.valuation_per_pupil
+        }),
+    ] {
         let pairs: Vec<(f64, f64)> = changes
             .iter()
             .filter_map(|(row, change)| {
-                let entry = profile.iter().find(|(irn, _, _)| *irn == row.irn)?;
-                Some((if pick == 0 { entry.1 } else { entry.2 }, *change))
+                let district = profile.iter().find(|d| d.irn == row.irn)?;
+                Some((pick(district)?, *change))
             })
             .collect();
         assert!(pairs.len() > 590, "{label}: only {} matched", pairs.len());
@@ -301,7 +273,7 @@ fn size_and_prior_level_track_it_weakly() {
         .collect();
     let by_level: Vec<(f64, f64)> = changes
         .iter()
-        .map(|(r, c)| (real(r.spending_per_pupil, PEAK), *c))
+        .map(|(r, c)| (real(spending_per_pupil(r), PEAK), *c))
         .collect();
     close(correlate(&by_size), -0.186, 0.02, "log enrollment");
     close(correlate(&by_level), -0.176, 0.02, "FY2010 spending level");

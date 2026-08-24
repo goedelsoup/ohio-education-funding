@@ -16,19 +16,20 @@ use regime_diff::charge_off::SourcedTo;
 
 const OPINIONS: &str = include_str!("../fixtures/derolph-opinions.txt");
 
-fn opinion(key: &str) -> &'static str {
-    let marker = format!("\n=== {key}\n");
-    let start = OPINIONS
-        .find(&marker)
-        .unwrap_or_else(|| panic!("{key} is not in the committed extract"))
-        + marker.len();
-    let rest = &OPINIONS[start..];
-    let end = rest.find("\n=== ").unwrap_or(rest.len());
-    &rest[..end]
+/// One opinion, through the shared reader of the record format `connect` writes.
+///
+/// This was a hand-rolled copy of that format's parse, as was the Revised Code extract's in
+/// `project`. The writer is `connect::fixtures::statute::build_records`; the reader is
+/// [`edfund_core::records`]. See issue #157.
+fn opinion(key: &str) -> edfund_core::records::Record<'static> {
+    edfund_core::records::record(OPINIONS, key)
 }
 
+/// The opinion's text with runs of whitespace collapsed, so a citation split across a line break
+/// still reads as one token.
 fn flat(key: &str) -> String {
     opinion(key)
+        .body
         .split_whitespace()
         .collect::<Vec<_>>()
         .join(" ")
@@ -46,8 +47,7 @@ fn flat(key: &str) -> String {
 /// Official Reports it was cited to, both of which the archive prints on the first line.
 #[test]
 fn each_opinion_is_the_case_it_is_cited_as() {
-    let count = OPINIONS.lines().filter(|l| l.starts_with("=== ")).count();
-    assert_eq!(count, 4);
+    assert_eq!(edfund_core::records::records(OPINIONS).count(), 4);
 
     let expected = [
         ("derolph-i", "78 Ohio St.3d 193", "1997-Ohio-84"),
@@ -61,11 +61,9 @@ fn each_opinion_is_the_case_it_is_cited_as() {
         // of a prose note, so the reporter citation is checked here too.
         let record = opinion(key);
         assert!(
-            record
-                .lines()
-                .any(|l| l.starts_with("title: ") && l.contains(reporter)),
+            record.title.contains(reporter),
             "{key} is titled without its reporter citation: {:?}",
-            record.lines().next().unwrap_or_default()
+            record.title
         );
         let body = flat(key);
         assert!(

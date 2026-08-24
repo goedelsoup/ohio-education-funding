@@ -91,7 +91,11 @@ pub fn parse_statute(section: &str, page: &str) -> Option<Record> {
 /// truncate a record and add a phantom one. A marker no legal text has occasion to print is
 /// cheaper than an argument about which line breaks are possible — and [`build_records`] checks
 /// rather than assuming.
-pub const RECORD_MARKER: &str = "=== ";
+///
+/// Defined by [`edfund_core::records`], which is the reader half of this format. It was declared
+/// here and understood nowhere: the two files that read these fixtures each spelled the marker
+/// out again inside a test, so the writer had no way to tell them it had changed.
+pub const RECORD_MARKER: &str = edfund_core::records::MARKER;
 
 /// Render records as a committed fixture.
 ///

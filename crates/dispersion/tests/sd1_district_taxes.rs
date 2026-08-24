@@ -16,26 +16,8 @@
 //!
 //! Cited by `catalog/dot-sd1-school-district-taxes.md`.
 
-const SD1: &str = include_str!("../fixtures/sd1-district-taxes.csv");
-const FUNCTIONS: &str = include_str!("../fixtures/expenditure-functions-fy25.csv");
-
-/// Column indices in the SD-1 fixture.
-mod sd1 {
-    pub const IRN: usize = 0;
-    pub const TAX_YEAR: usize = 3;
-    pub const CLASS1_VALUE: usize = 6;
-    pub const CLASS2_VALUE: usize = 11;
-    pub const REAL_VALUE: usize = 12;
-    pub const CHARGED: usize = 17;
-    pub const CHARGED_WITH_JVSD: usize = 18;
-}
-
-/// Column indices in the FY2025 expenditure-function fixture.
-mod functions {
-    pub const IRN: usize = 0;
-    pub const ADM: usize = 2;
-    pub const OPERATING_PER_PUPIL: usize = 3;
-}
+use dispersion::functions;
+use dispersion::sd1::{self, TaxRow};
 
 const DANBURY: &str = "048934";
 const PUT_IN_BAY: &str = "048975";
@@ -44,36 +26,25 @@ const COLUMBUS: &str = "043802";
 const CLEVELAND: &str = "043786";
 const CINCINNATI: &str = "043752";
 
-fn rows(csv: &str) -> impl Iterator<Item = Vec<&str>> {
-    csv.lines().skip(1).map(|line| line.split(',').collect())
-}
-
-fn number(parts: &[&str], column: usize) -> Option<f64> {
-    parts.get(column)?.trim().parse::<f64>().ok()
-}
-
-/// Taxes charged for one district and tax year, excluding JVSD operating levies.
-fn charged(irn: &str, tax_year: &str, column: usize) -> f64 {
-    rows(SD1)
-        .find(|p| p[sd1::IRN] == irn && p[sd1::TAX_YEAR] == tax_year)
-        .and_then(|p| number(&p, column))
-        .expect("district present for that tax year")
+/// Taxes charged for one district and tax year, on a chosen JVSD basis.
+///
+/// Read through [`dispersion::sd1`] and [`dispersion::functions`], which are the crate's readers
+/// of these two files. This suite carried its own parser of each, as did `millage`'s and
+/// `regime-diff`'s, and nothing related them; see issue #157.
+fn charged(irn: &str, tax_year: u16, pick: fn(&TaxRow) -> Option<f64>) -> f64 {
+    let row = sd1::at(irn, tax_year).expect("district present for that tax year");
+    pick(&row).expect("the abstract publishes a charge for it")
 }
 
 /// FY2025 operating expenditure: per-pupil times ADM, which is the brief's own construction.
 fn operating(irn: &str) -> f64 {
-    rows(FUNCTIONS)
-        .find(|p| p[functions::IRN] == irn)
-        .map(|p| {
-            number(&p, functions::ADM).expect("adm")
-                * number(&p, functions::OPERATING_PER_PUPIL).expect("per pupil")
-        })
-        .expect("district present in the function fixture")
+    let d = functions::district(irn).expect("district present in the function fixture");
+    d.adm.expect("adm") * d.operating.expect("per pupil")
 }
 
 /// The published ratio: TY2024 charge over FY2025 operating expenditure.
 fn share(irn: &str) -> f64 {
-    charged(irn, "2024", sd1::CHARGED) / operating(irn)
+    charged(irn, 2024, |r| r.real_property_taxes_charged) / operating(irn)
 }
 
 fn close(actual: f64, expected: f64, tolerance: f64, what: &str) {
@@ -83,10 +54,12 @@ fn close(actual: f64, expected: f64, tolerance: f64, what: &str) {
     );
 }
 
-fn total(tax_year: &str, column: usize) -> f64 {
-    rows(SD1)
-        .filter(|p| p[sd1::TAX_YEAR] == tax_year)
-        .filter_map(|p| number(&p, column))
+/// One column of the abstract, summed over a tax year.
+fn total(tax_year: u16, pick: fn(&TaxRow) -> Option<f64>) -> f64 {
+    sd1::rows()
+        .iter()
+        .filter(|r| r.tax_year == tax_year)
+        .filter_map(pick)
         .sum()
 }
 
@@ -98,11 +71,13 @@ fn total(tax_year: &str, column: usize) -> f64 {
 /// would leave some county's event unmeasurable — see `regime_diff::recognized_valuation`.
 #[test]
 fn the_fixture_carries_every_district_in_all_four_tax_years() {
-    const YEARS: [&str; 4] = ["2021", "2022", "2023", "2024"];
-    assert_eq!(SD1.lines().count() - 1, 611 * YEARS.len());
+    const YEARS: [u16; 4] = [2021, 2022, 2023, 2024];
+    let rows = sd1::rows();
+    assert_eq!(sd1::tax_years(), YEARS);
+    assert_eq!(rows.len(), 611 * YEARS.len());
     for tax_year in YEARS {
         assert_eq!(
-            rows(SD1).filter(|p| p[sd1::TAX_YEAR] == tax_year).count(),
+            rows.iter().filter(|r| r.tax_year == tax_year).count(),
             611,
             "tax year {tax_year}"
         );
@@ -114,18 +89,16 @@ fn the_fixture_carries_every_district_in_all_four_tax_years() {
 /// fixture whose parts do not sum to its whole invites shares that do not add to one.
 #[test]
 fn the_two_property_classes_partition_real_property_value() {
-    for parts in rows(SD1) {
-        let (Some(one), Some(two), Some(total)) = (
-            number(&parts, sd1::CLASS1_VALUE),
-            number(&parts, sd1::CLASS2_VALUE),
-            number(&parts, sd1::REAL_VALUE),
-        ) else {
+    for row in sd1::rows() {
+        let (Some(one), Some(two), Some(total)) =
+            (row.class1_value, row.class2_value, row.real_property_value)
+        else {
             continue;
         };
         assert!(
             (one + two - total).abs() < 1.0,
             "{}: {one} + {two} against {total}",
-            parts[sd1::IRN]
+            row.irn
         );
     }
 }
@@ -141,8 +114,8 @@ fn the_two_property_classes_partition_real_property_value() {
 /// difference this table computes directly, and it agrees to the million.
 #[test]
 fn the_statewide_totals_and_the_jvsd_difference_reproduce() {
-    let excluding = total("2024", sd1::CHARGED);
-    let including = total("2024", sd1::CHARGED_WITH_JVSD);
+    let excluding = total(2024, |r| r.real_property_taxes_charged);
+    let including = total(2024, |r| r.real_property_taxes_charged_with_jvsd);
     close(
         excluding / 1e9,
         11.657,
@@ -173,10 +146,13 @@ fn the_published_district_shares_reproduce() {
 /// leads with, so the exclusion removes the corroborating cases rather than outlying ones.
 #[test]
 fn the_median_and_the_fiftieth_ranked_district_reproduce() {
-    let mut shares: Vec<f64> = rows(FUNCTIONS)
-        .map(|p| p[functions::IRN].to_string())
+    let taxed: std::collections::BTreeSet<String> =
+        sd1::rows().into_iter().map(|r| r.irn).collect();
+    let mut shares: Vec<f64> = functions::districts()
+        .into_iter()
+        .map(|d| d.irn)
         .filter(|irn| irn != PUT_IN_BAY)
-        .filter(|irn| rows(SD1).any(|p| p[sd1::IRN] == *irn))
+        .filter(|irn| taxed.contains(irn))
         .map(|irn| share(&irn))
         .collect();
     shares.sort_by(|a, b| b.partial_cmp(a).expect("no NaN"));
@@ -216,13 +192,16 @@ fn the_two_highest_shares_are_the_lake_erie_districts_and_both_exceed_one() {
 /// one district whose ranking is explained by a levy.
 #[test]
 fn mayfields_charge_outruns_its_receipts_in_the_levy_year() {
-    let growth =
-        charged(MAYFIELD, "2024", sd1::CHARGED) / charged(MAYFIELD, "2023", sd1::CHARGED) - 1.0;
+    let growth = charged(MAYFIELD, 2024, |r| r.real_property_taxes_charged)
+        / charged(MAYFIELD, 2023, |r| r.real_property_taxes_charged)
+        - 1.0;
     close(growth, 0.147, 0.002, "Mayfield TY2023 to TY2024 charge");
 
     // Statewide over the same two years, for scale: Mayfield's charge grew about three times
     // as fast as the state's.
-    let statewide = total("2024", sd1::CHARGED) / total("2023", sd1::CHARGED) - 1.0;
+    let statewide = total(2024, |r| r.real_property_taxes_charged)
+        / total(2023, |r| r.real_property_taxes_charged)
+        - 1.0;
     close(statewide, 0.0549, 0.002, "statewide charge growth");
     assert!(growth > statewide * 2.5);
 }
@@ -238,8 +217,8 @@ fn mayfields_charge_outruns_its_receipts_in_the_levy_year() {
 /// two settlements, which is how a full-year charge is collected.
 #[test]
 fn the_timing_gap_is_about_seven_points_of_mayfields_share() {
-    let increase =
-        charged(MAYFIELD, "2024", sd1::CHARGED) - charged(MAYFIELD, "2023", sd1::CHARGED);
+    let increase = charged(MAYFIELD, 2024, |r| r.real_property_taxes_charged)
+        - charged(MAYFIELD, 2023, |r| r.real_property_taxes_charged);
     let uncollected_by_fiscal_year_end = increase / 2.0;
     let points = uncollected_by_fiscal_year_end / operating(MAYFIELD);
     close(

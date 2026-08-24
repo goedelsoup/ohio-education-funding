@@ -10,5 +10,16 @@ publish.workspace = true
 [dependencies]
 edfund-core = { path = "../edfund-core" }
 
+[dev-dependencies]
+# For `tests/f33_ohio_panel_trough.rs`, which deflates the panel rather than growing a second
+# reader of `connect`'s committed CPI extract. Not a dependency of the library: nothing this
+# crate computes is in constant dollars.
+deflator = { path = "../deflator" }
+# For `tests/report_card_2425.rs`, which splits the report card on the FY2027 guarantee. The
+# model is `foundation`'s fixture, so its reader is `foundation`'s; this test was carrying a
+# third parser of it. `foundation` dev-depends on this crate in turn, which Cargo allows
+# because neither dependency is a build one.
+foundation = { path = "../foundation" }
+
 [lints]
 workspace = true

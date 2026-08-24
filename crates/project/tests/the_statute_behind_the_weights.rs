@@ -24,62 +24,7 @@
 //!
 //! One citation was simply wrong. The DPIA node cited R.C. 3317.029; there is no such section.
 
-const STATUTE: &str = include_str!("../fixtures/revised-code.txt");
-
-/// One record of the committed extract.
-struct Section<'a> {
-    title: &'a str,
-    effective: &'a str,
-    legislation: &'a str,
-    body: &'a str,
-}
-
-fn section(number: &str) -> Section<'_> {
-    let marker = format!("\n=== {number}\n");
-    let start = STATUTE
-        .find(&marker)
-        .unwrap_or_else(|| panic!("{number} is not in the committed extract"))
-        + marker.len();
-    let rest = &STATUTE[start..];
-    let end = rest.find("\n=== ").unwrap_or(rest.len());
-    let record = &rest[..end];
-    let field = |name: &str| {
-        record
-            .lines()
-            .find_map(|l| l.strip_prefix(name))
-            .unwrap_or_default()
-            .trim()
-    };
-    let body = record
-        .find("\n--\n")
-        .map_or("", |i| &record[i + 4..])
-        .trim();
-    // The extract's field labels are generic — it holds opinions as well as statutes — and are
-    // read back into the names this test's subject actually uses.
-    Section {
-        title: field("title:"),
-        effective: field("date:"),
-        legislation: field("source:"),
-        body,
-    }
-}
-
-/// Every `multiple of X` the section states, in order.
-fn multiples(body: &str) -> Vec<f64> {
-    let mut out = Vec::new();
-    let mut rest = body;
-    while let Some(i) = rest.find("multiple of ") {
-        rest = &rest[i + "multiple of ".len()..];
-        let digits: String = rest
-            .chars()
-            .take_while(|c| c.is_ascii_digit() || *c == '.')
-            .collect();
-        if let Ok(v) = digits.trim_end_matches('.').parse::<f64>() {
-            out.push(v);
-        }
-    }
-    out
-}
+use project::statute::{multiples, section};
 
 /// Every section the corpus cites, and the only ones the extract should hold.
 ///
@@ -136,7 +81,7 @@ const CITED: &[&str] = &[
 /// The extract is what it claims to be: every cited section, each with a date and an act.
 #[test]
 fn every_cited_section_is_present_and_dated() {
-    let count = STATUTE.lines().filter(|l| l.starts_with("=== ")).count();
+    let count = project::statute::sections().len();
     assert_eq!(
         count,
         CITED.len(),
@@ -144,15 +89,16 @@ fn every_cited_section_is_present_and_dated() {
          OHIO_LAWS_SECTIONS without being added here, or the reverse",
         CITED.len()
     );
+    // That each is titled, dated and substantial is `project::statute`'s own assertion. What is
+    // this file's is that the extract holds *these* sections and no others: a section added to
+    // `connect`'s `OHIO_LAWS_SECTIONS` without being cited, or cited without being fetched, is a
+    // corpus-and-connector disagreement rather than a malformed record.
+    let held: Vec<&str> = project::statute::sections()
+        .into_iter()
+        .map(|s| s.number)
+        .collect();
     for number in CITED {
-        let s = section(number);
-        assert!(!s.title.is_empty(), "{number} has no title");
-        assert!(!s.effective.is_empty(), "{number} has no effective date");
-        assert!(
-            s.body.len() > 400,
-            "{number} body is {} chars",
-            s.body.len()
-        );
+        assert!(held.contains(number), "{number} is not in the extract");
     }
     // The current text is the current budget's, which is what makes the FY2027 model checkable
     // against it at all.

@@ -27,6 +27,8 @@
 
 #![forbid(unsafe_code)]
 
+pub mod ohio_epp;
+
 use edfund_core::{Dollars, FiscalYear};
 
 /// How much trust an index point, or a result derived from one, carries.
