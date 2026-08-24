@@ -223,7 +223,7 @@ export function renderBaseCostBuildUp(d: District, districts: number): string {
         ${staff(b.funded_special_teachers)} special teachers, across
         ${staff(d.adm)} pupils.</p>
 
-      <div class="chartwrap" data-chart="base-cost">${renderToString(barSpec(bars), { label: `Aggregate base cost by component group of R.C. 3317.011, dollars, ${money(aggregate)} in total${yearOf("formula") ? `, ${yearOf("formula")}` : ""}` })}</div>
+      <div class="chartwrap" data-chart="base-cost">${renderToString((w) => barSpec(bars, { width: w }), { label: `Aggregate base cost by component group of R.C. 3317.011, dollars, ${money(aggregate)} in total${yearOf("formula") ? `, ${yearOf("formula")}` : ""}` })}</div>
 
       <div class="scroll"><table>
         <thead><tr><th>Element</th><th>Amount</th><th>Share</th></tr></thead>

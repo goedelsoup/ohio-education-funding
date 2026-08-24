@@ -16,8 +16,18 @@ import {
   fanSpec,
   scatterSpec,
   truncatedDomain,
+  WIDTHS,
 } from "../../src/lib/plot/spec.ts";
 import { renderToString } from "../../src/lib/plot/ssr.ts";
+
+/**
+ * The width these assertions are written at.
+ *
+ * Every chart is laid out twice — see `WIDTHS` — and what is asserted here is the layout
+ * arithmetic, which is the same arithmetic at either width. So the tests name one rather than
+ * running each of them twice to make the same point.
+ */
+const W = { width: WIDTHS.wide };
 
 /** A cloud big enough for `scatterSpec` to draw — it refuses fewer than twelve. */
 function cloud(xs: number[]): ScatterPoint[] {
@@ -39,12 +49,15 @@ test("the bar a chart was built to locate is marked, on two channels", () => {
     { label: "Ohio", value: 45, current: true },
     { label: "Utah", value: 30 },
   ];
-  const svg = renderToString(barSpec(bars), "presentational");
+  const svg = renderToString((w) => barSpec(bars, { width: w }), "presentational");
   expect(svg).toContain("var(--series-guarantee)");
   expect(svg).toContain('font-weight="600"');
 
   // And a chart with no subject is unchanged: same fills, no second text mark.
-  const plain = renderToString(barSpec(bars.map(({ current: _c, ...b }) => b)), "presentational");
+  const plain = renderToString(
+    (w) => barSpec(bars.map(({ current: _c, ...b }) => b), { width: w }),
+    "presentational",
+  );
   expect(plain).not.toContain("var(--series-guarantee)");
   expect(plain).not.toContain('font-weight="600"');
 });
@@ -61,16 +74,18 @@ test("a signed distribution draws its zero, and an unsigned one is unchanged", (
    */
   const signed = distributionSpec(
     [-0.08, -0.03, -0.01, 0.02, 0.05, 0.09].map((value) => ({ value, hover: `${value}` })),
+    W,
   );
   expect(signed).not.toBeNull();
   expect(signed!.options.height).toBe(64);
-  expect(renderToString(signed, "presentational")).toContain("no change");
+  expect(renderToString(() => signed, "presentational")).toContain("no change");
 
   const unsigned = distributionSpec(
     [1, 2, 3, 4, 5, 6].map((value) => ({ value, hover: `${value}` })),
+    W,
   );
   expect(unsigned!.options.height).toBe(46);
-  expect(renderToString(unsigned, "presentational")).not.toContain("no change");
+  expect(renderToString(() => unsigned, "presentational")).not.toContain("no change");
 });
 
 test("the label gutter is sized to the labels that are drawn", () => {
@@ -87,14 +102,17 @@ test("the label gutter is sized to the labels that are drawn", () => {
     points: [{ x: 10_000, y: 50 }, { x: 20_000, y: 55 }],
   }));
 
-  const withBands = scatterSpec(points, AXES, banded)!;
-  const withNone = scatterSpec(points, AXES, [])!;
+  const withBands = scatterSpec(points, AXES, banded, W)!;
+  const withNone = scatterSpec(points, AXES, [], W)!;
   expect(withBands.options.marginRight).toBe(withNone.options.marginRight);
 
   // A trace that *is* labelled still gets its room, or the label runs off the viewBox.
-  const labelled = scatterSpec(points, AXES, [
-    { label: "median of each fifth", series: "formula", points: banded[0]!.points },
-  ])!;
+  const labelled = scatterSpec(
+    points,
+    AXES,
+    [{ label: "median of each fifth", series: "formula", points: banded[0]!.points }],
+    W,
+  )!;
   expect(labelled.options.marginRight).toBeGreaterThan(withNone.options.marginRight!);
 });
 
@@ -108,12 +126,12 @@ test("a small multiple can be put on one horizontal scale", () => {
   const wide = cloud(Array.from({ length: 20 }, (_, i) => 11_000 + i * 1_300));
   const shared: [number, number] = [9_000, 11_000 + 19 * 1_300];
 
-  const a = scatterSpec(narrow, AXES, [], { xDomain: shared })!;
-  const b = scatterSpec(wide, AXES, [], { xDomain: shared })!;
+  const a = scatterSpec(narrow, AXES, [], { ...W, xDomain: shared })!;
+  const b = scatterSpec(wide, AXES, [], { ...W, xDomain: shared })!;
   expect(a.options.x!.domain).toEqual(b.options.x!.domain);
 
   // Without it they do not agree, which is the state this option exists to leave behind.
-  const own = scatterSpec(narrow, AXES, [])!;
+  const own = scatterSpec(narrow, AXES, [], W)!;
   expect(own.options.x!.domain).not.toEqual(b.options.x!.domain);
 });
 
@@ -133,8 +151,8 @@ test("a fan chart does not stretch its axis to fit a reference it will not draw"
   }));
   const partial = base.map((p, i) => (i === 0 ? { ...p, reference: 400 } : p));
 
-  const clean = fanSpec(base, (v) => `${v}`, () => "")!;
-  const withOrphan = fanSpec(partial, (v) => `${v}`, () => "")!;
+  const clean = fanSpec(base, (v) => `${v}`, () => "", W)!;
+  const withOrphan = fanSpec(partial, (v) => `${v}`, () => "", W)!;
   expect(withOrphan.options.y!.domain).toEqual(clean.options.y!.domain);
 
   // A reference on every year is drawn, and does belong in the domain.
@@ -142,6 +160,7 @@ test("a fan chart does not stretch its axis to fit a reference it will not draw"
     base.map((p) => ({ ...p, reference: 400 })),
     (v) => `${v}`,
     () => "",
+    W,
   )!;
   expect((full.options.y!.domain as number[])[1]).toBeGreaterThan(400);
 });

@@ -16,10 +16,11 @@
 
 import * as Plot from "@observablehq/plot";
 
-import { applyNaming, BASE, type Naming, type Spec } from "./spec.ts";
+import { applyNaming, BASE, type Drawing, type Naming, WIDTHS } from "./spec.ts";
 
-/** Render a specification to an SVG string, so the callers shared with the build path match. */
-export function renderToString(spec: Spec | null, naming: Naming): string {
+/** One SVG, at one width. */
+function draw(build: Drawing, naming: Naming, width: number): string {
+  const spec = build(width);
   if (!spec) return "";
   const node = Plot.plot({ ...BASE, ...spec.options }) as unknown as Element;
   if (spec.hovers) {
@@ -34,4 +35,26 @@ export function renderToString(spec: Spec | null, naming: Naming): string {
   }
   applyNaming(node, naming);
   return node.outerHTML;
+}
+
+/**
+ * Render a chart to a pair of SVGs, so the callers shared with the build path match.
+ *
+ * Both widths are drawn here too, rather than measuring the container and drawing the one that
+ * fits. These charts are replaced on every slider tick, so a width read at render time would be
+ * the width at that tick — and a reader who then rotates the phone, or drags a desktop window
+ * narrow, would keep the layout chosen for the width they no longer have until they moved a lever
+ * again. The stylesheet's container query has no such gap, and it is the same rule the 7,599
+ * baked charts already answer to.
+ */
+export function renderToString(build: Drawing, naming: Naming): string {
+  const wide = draw(build, naming, WIDTHS.wide);
+  if (!wide) return "";
+  const narrow = draw(build, naming, WIDTHS.narrow);
+  return (
+    `<div class="chart-pair">` +
+    `<div class="chart-at" data-at="narrow">${narrow}</div>` +
+    `<div class="chart-at" data-at="wide">${wide}</div>` +
+    `</div>`
+  );
 }

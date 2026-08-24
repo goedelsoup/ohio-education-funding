@@ -16,7 +16,7 @@
  */
 
 import type { Bar } from "./chart.ts";
-import { barSpec, distributionSpec, scatterSpec } from "./plot/spec.ts";
+import { barSpec, distributionSpec, type Drawing, draws, scatterSpec } from "./plot/spec.ts";
 import { renderToString } from "./plot/ssr.ts";
 import { count, escapeHtml, money, pct } from "./format.ts";
 import type { Bundle, District, OutcomeStatewide } from "./types.ts";
@@ -101,14 +101,16 @@ export function renderOutcomes(bundle: Bundle): string {
     "median of each fifth",
     "formula",
   );
-  const povertyScatter = scatterSpec(
-    povertyPoints,
-    {
-      x: { label: "economically disadvantaged share", format: (v) => `${v.toFixed(0)}%` },
-      y: { label: "Performance Index", format: (v) => v.toFixed(0) },
-    },
-    [povertyTrace],
-  );
+  const povertyScatter: Drawing = (w) =>
+    scatterSpec(
+      povertyPoints,
+      {
+        x: { label: "economically disadvantaged share", format: (v) => `${v.toFixed(0)}%` },
+        y: { label: "Performance Index", format: (v) => v.toFixed(0) },
+      },
+      [povertyTrace],
+      { width: w },
+    );
 
   /*
    * The two denominators, drawn at one size against one vertical scale so they can be compared —
@@ -168,15 +170,17 @@ export function renderOutcomes(bundle: Bundle): string {
       ),
     ).map((trace, band) => ({ ...trace, band }));
 
-    return scatterSpec(
-      points,
-      {
-        x: { label: `spending per ${label}`, format: (v) => money(v) },
-        y: { label: "Performance Index", format: (v) => v.toFixed(0) },
-      },
-      traces,
-      { height: 330, xDomain: spendingDomain },
-    );
+    const drawing: Drawing = (w) =>
+      scatterSpec(
+        points,
+        {
+          x: { label: `spending per ${label}`, format: (v) => money(v) },
+          y: { label: "Performance Index", format: (v) => v.toFixed(0) },
+        },
+        traces,
+        { width: w, height: 330, xDomain: spendingDomain },
+      );
+    return drawing;
   };
   const weightedScatter = spending((d) => d.outcome?.per_equivalent_pupil, "need-weighted pupil");
   const enrolledScatter = spending((d) => d.outcome?.per_enrolled_pupil, "enrolled pupil");
@@ -386,13 +390,17 @@ export function renderOutcomeContext(bundle: Bundle, district: District): string
    * `distributionSpec` decides whether to draw the members: a fifth is about a hundred and twenty
    * districts, which fits, so all of them are here.
    */
-  const peerBox = distributionSpec(
-    peers.map((d) => ({
-      value: d.outcome!.performance_index!,
-      hover: `${d.name}: Performance Index ${d.outcome!.performance_index!.toFixed(1)}, ${pct(d.economically_disadvantaged!, 0)} economically disadvantaged`,
-    })),
-    { marker: { value: o.performance_index, label: district.name } },
-  );
+  // Read outside the drawing, as in `county.ts`: a property narrowing does not survive into a
+  // closure that runs later.
+  const marker = { value: o.performance_index!, label: district.name };
+  const peerBox: Drawing = (w) =>
+    distributionSpec(
+      peers.map((d) => ({
+        value: d.outcome!.performance_index!,
+        hover: `${d.name}: Performance Index ${d.outcome!.performance_index!.toFixed(1)}, ${pct(d.economically_disadvantaged!, 0)} economically disadvantaged`,
+      })),
+      { width: w, marker },
+    );
 
   return `
     <div class="card" id="comparable-poverty" data-part="comparable-poverty">
@@ -413,7 +421,7 @@ export function renderOutcomeContext(bundle: Bundle, district: District): string
           <div class="n">points, against like-composed districts</div></div>
       </div>
       ${
-        peerBox
+        draws(peerBox)
           ? `<p class="note">Every district in that fifth, by Performance Index — the shaded box is
              its middle half, the line inside it the middle of the fifth, and the
              coloured rule is ${escapeHtml(district.name)}. The gap in the third tile is worth what

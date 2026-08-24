@@ -9,6 +9,7 @@
  * already reads correctly without them.
  */
 import { contentsOf, withContents } from "../lib/contents.ts";
+import { nameScrollers } from "../lib/scrollers.ts";
 import { loadFeed } from "../lib/feed.ts";
 import { nav, type Section } from "../lib/nav.ts";
 import { canonicalPath, og } from "../lib/routes.ts";
@@ -154,7 +155,16 @@ const forecasts = verification.forecasts.length;
  * Nothing on this site hydrates, so rendering the slot early costs nothing beyond the parse.
  */
 const rendered = await Astro.slots.render("default");
-const body = contents ? withContents(rendered, contentsOf(rendered)) : rendered;
+const listed = contents ? withContents(rendered, contentsOf(rendered)) : rendered;
+/*
+ * And the sideways-scrolling tables, made reachable by a keyboard and named from the heading they
+ * sit under — see `scrollers.ts` for why that is read off the page rather than written beside each
+ * of the seventy call sites.
+ *
+ * After the contents list, so the list is walked too: it is not a table and is left alone, but the
+ * ordering is what makes that a fact about this file rather than a coincidence.
+ */
+const body = nameScrollers(listed).html;
 ---
 
 <!doctype html>

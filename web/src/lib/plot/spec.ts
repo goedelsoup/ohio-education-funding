@@ -122,8 +122,154 @@ export const BASE: Plot.PlotOptions = {
   className: "plot",
 };
 
-/** Every chart is this wide; the container scrolls if the viewport is narrower. */
-const WIDTH = 640;
+/**
+ * The two widths every chart is drawn at.
+ *
+ * # Why a chart is drawn twice rather than scaled
+ *
+ * A build-time SVG has one size, and the stylesheet used to make it fit by scaling: `width: 100%`
+ * over a 640-unit `viewBox`. On a 375px phone the content box is 293px, so the whole drawing was
+ * multiplied by 0.46 — and the axis text, which carries its size as a presentation attribute in
+ * user units, came out near **4.6px**. Half the size at which text is legible, on the viewport
+ * most first visits arrive at.
+ *
+ * Scaling cannot be fixed by enlarging the type. Every gutter in this file is computed from the
+ * text that goes in it, so doubling the font to survive the scale would need every gutter doubled
+ * with it — on a frame that has not grown. The labels would collide instead of shrinking, which
+ * is the same defect wearing different clothes.
+ *
+ * So the layout is recomputed at the width it will be shown at. `NARROW` is sized so that a phone
+ * scales it by at least 0.9 rather than 0.46; `WIDE` is the width these forms were designed and
+ * tuned at, unchanged. `renderToString` draws both and the stylesheet shows one — see
+ * `.chart-pair` in `app.css` for the container query that picks, and why the swap is at 576px.
+ *
+ * The cost is real and was weighed: two SVGs per chart is about 31% more built HTML. It buys
+ * legible axis text on the width most of this site's readers are on.
+ */
+export const WIDTHS = {
+  /**
+   * For a phone. 293px is the content box at 375px, the narrowest viewport worth drawing for, so
+   * 320 is scaled by 0.92 there rather than shrunk.
+   */
+  narrow: 320,
+  /** What every chart in this file was drawn at before there were two, and still is. */
+  wide: 640,
+} as const;
+
+/**
+ * A chart, as a function of the width it is drawn at.
+ *
+ * Required by both renderers rather than optional, on the same reasoning as {@link Naming}: a
+ * builder that defaulted its width would silently draw the phone variant at desktop proportions,
+ * and the two SVGs would be identical with nothing saying so. A caller cannot express that here.
+ */
+export type Drawing = (width: number) => Spec | null;
+
+/**
+ * Whether a drawing has anything to draw.
+ *
+ * Several cards render a chart only if there is one, and the surrounding prose — "one dot each,
+ * poorest on the left" — is written for a chart that exists. The builders answer that with `null`,
+ * and the decision is about the data every time: three values are not a distribution and two
+ * points are not a series at any width. So this asks at one width and the answer stands for both.
+ */
+export function draws(drawing: Drawing): boolean {
+  return drawing(WIDTHS.wide) != null;
+}
+
+/**
+ * A gutter, bounded so it cannot eat the frame it is a margin of.
+ *
+ * The margins in this file are sized to their contents — the longest category name, the longest
+ * direct label — which is right at 640 and is how a 260px label gutter arises. At 320 that same
+ * gutter leaves 60px for the bars, so the chart becomes its own axis labels. This caps any one
+ * gutter at a share of the width; a name that no longer fits is drawn shorter by Plot rather than
+ * given the frame.
+ *
+ * 0.45 rather than a half: two gutters at the cap still leave a tenth of the frame for marks, and
+ * no form here draws two capped gutters at once. The figure is what the widest direct label on the
+ * site needs at `WIDTHS.narrow` — `the formula $10.13B` on `/history`, 135px including its offset
+ * — rather than a round number chosen first and checked afterwards.
+ */
+function gutter(width: number, wanted: number): number {
+  return Math.min(Math.round(wanted), Math.round(width * 0.45));
+}
+
+/**
+ * How wide a string is drawn, in the ems Plot measures `lineWidth` in.
+ *
+ * Plot wraps text against its own character-width table, which averages about 0.5em. Measured
+ * across the 241 text marks this site actually draws, the median is 0.519em and the ninetieth
+ * percentile 0.667em — so a budget set from Plot's own estimate lets a label of capitals and wide
+ * glyphs through at its nominal length and off the edge of the frame. `Career-technical education`
+ * is 26 characters, fitted a 26.8-character budget, and painted 27px outside the viewBox.
+ *
+ * So the budget is set from the ninetieth percentile rather than the median: a label that wraps a
+ * word early costs a line, and one that does not wrap at all is cut in half.
+ */
+const EM_PER_CHAR = 0.667;
+
+/** A `lineWidth` in ems that holds a line to `px` pixels of drawn text. */
+function lineWidth(px: number, fontSize = 10): number {
+  return (px / fontSize) * (0.5 / EM_PER_CHAR);
+}
+
+/** How wide a string is drawn, in pixels, at the annotation type size. */
+function textPx(text: string, fontSize = 11): number {
+  return text.length * EM_PER_CHAR * fontSize;
+}
+
+/**
+ * The annotation along the foot of a chart: an end of the scale at each corner, and between them
+ * the one sentence the chart has to say about itself.
+ *
+ * Four forms drew this row and all four drew it the same way — three text marks at one `dy`,
+ * anchored bottom-left, bottom and bottom-right. On a 640 frame the three fit. On a 320 one they
+ * do not: `/history` drew `FY2009`, `axis starts at 32%, not zero` and `FY2022` across 186px of
+ * frame and the centre ran through both years, so the chart's statement that its axis is truncated
+ * — the whole reason that statement is on the chart rather than in the caption — arrived as a
+ * smear of overlapping type.
+ *
+ * So the row measures itself. Where the three fit, nothing changes and the wide drawings are
+ * byte-identical to what they were. Where they do not, the centre drops to its own line under the
+ * two ends, and the caller is told how much more bottom margin that costs.
+ */
+function axisFoot(options: {
+  width: number;
+  marginLeft: number;
+  marginRight: number;
+  dy: number;
+  /** The low end of the scale, at the left corner. */
+  low: string;
+  /** What the chart says about itself, between them. */
+  says: string;
+  /** The high end, at the right corner. */
+  high: string;
+}): { marks: Plot.Markish[]; extraBottom: number } {
+  const { width, marginLeft, marginRight, dy, low, says, high } = options;
+  const frame = width - marginLeft - marginRight;
+  // A gap either side of the centre, so "fits" means legibly rather than exactly.
+  const fits = textPx(low) + textPx(says) + textPx(high) + 24 <= frame;
+  const line = 13;
+  const at = (anchor: "bottom-left" | "bottom" | "bottom-right", y: number, text: string) =>
+    Plot.text([0], {
+      frameAnchor: anchor,
+      dy: y,
+      text: () => text,
+      ...(anchor === "bottom-left" ? { textAnchor: "start" as const } : {}),
+      ...(anchor === "bottom-right" ? { textAnchor: "end" as const } : {}),
+      fill: INK.muted,
+      fontSize: 11,
+    });
+  return {
+    marks: [
+      at("bottom-left", dy, low),
+      at("bottom-right", dy, high),
+      at("bottom", fits ? dy : dy + line, says),
+    ],
+    extraBottom: fits ? 0 : line,
+  };
+}
 
 /**
  * A horizontal bar chart: magnitude compared across a handful of named categories.
@@ -132,8 +278,8 @@ const WIDTH = 640;
  * are harder to read than they are worth. Direct labels are selective — Plot is given only the
  * bars that asked for one, never a number on every mark.
  */
-export function barSpec(bars: Bar[], options: { max?: number } = {}): Spec {
-  const rowHeight = 30;
+export function barSpec(bars: Bar[], options: { width: number; max?: number }): Spec {
+  const { width } = options;
   const max = options.max ?? Math.max(...bars.map((b) => Math.abs(b.value)), 1);
   const labelled = bars.filter((b) => b.direct != null);
   /*
@@ -164,6 +310,22 @@ export function barSpec(bars: Bar[], options: { max?: number } = {}): Spec {
   // operation" rendered as "g leadership and operation", which reads as a rendering fault rather
   // than a truncation and is exactly the kind of thing nobody reports.
   const longestLabel = Math.max(0, ...bars.map((b) => b.label.length));
+  /*
+   * The name gutter, and what it costs when the frame is a phone wide.
+   *
+   * The width a name wants does not shrink with the frame — the type is the same size either way
+   * — so at `WIDTHS.narrow` the 241px "Building leadership and operation" asks for three quarters
+   * of the chart. Capped, it gets 42% and wraps inside it; `lineWidth` is what makes Plot wrap
+   * rather than run the name off the left edge of the viewBox, where it is simply cut in half.
+   *
+   * The row then has to grow to hold two lines, which is why `rowHeight` is decided here rather
+   * than at the top of the function. See {@link EM_PER_CHAR} for why the wrap budget is not simply
+   * the gutter divided by the type size.
+   */
+  const wanted = Math.max(120, Math.min(260, Math.round(longestLabel * 7.1) + 14));
+  const nameGutter = gutter(width, wanted);
+  const wraps = nameGutter < wanted;
+  const rowHeight = wraps ? 40 : 30;
 
   /*
    * The bar the chart was built to locate, on two channels.
@@ -187,14 +349,14 @@ export function barSpec(bars: Bar[], options: { max?: number } = {}): Spec {
 
   return {
     options: {
-      width: WIDTH,
+      width,
+      height: bars.length * rowHeight,
       // Bounded below so short-label charts keep their existing proportions, and above so a very
       // long name costs the bars width rather than running off the plot.
-      height: bars.length * rowHeight,
-      marginLeft: Math.max(120, Math.min(260, Math.round(longestLabel * 7.1) + 14)),
+      marginLeft: nameGutter,
       // Room at the right for the longest direct label actually present. Without it the largest
       // bar's value runs off the viewBox and is clipped — and it is the one most worth reading.
-      marginRight: longest > 0 ? 16 + longest * 7.2 : 20,
+      marginRight: gutter(width, longest > 0 ? 16 + longest * 7.2 : 20),
       marginTop: 0,
       marginBottom: 0,
       x: { axis: null, domain: [floor, max] },
@@ -231,6 +393,7 @@ export function barSpec(bars: Bar[], options: { max?: number } = {}): Spec {
           text: "label",
           textAnchor: "end",
           fill: INK.secondary,
+          lineWidth: lineWidth(nameGutter),
           className: "bar-label",
         }),
         // The second channel. Split into its own mark because `fill` and `fontWeight` are
@@ -246,6 +409,7 @@ export function barSpec(bars: Bar[], options: { max?: number } = {}): Spec {
                 textAnchor: "end",
                 fill: INK.primary,
                 fontWeight: 600,
+                lineWidth: lineWidth(nameGutter),
                 className: "bar-label current",
               }),
             ]
@@ -328,6 +492,7 @@ export function scatterSpec(
   },
   traces: Trace[] = [],
   options: {
+    width: number;
     height?: number;
     /**
      * Draw the line y = x, and put both axes on one domain so that it is a diagonal.
@@ -363,7 +528,7 @@ export function scatterSpec(
      * two denominators genuinely differ, which is the one a reader must not read as data.
      */
     xDomain?: [number, number];
-  } = {},
+  },
 ): Spec | null {
   // Two points are not a cloud. Same rule as the line forms, for the same reason: a scatter of
   // three districts would read as a finding about a population that has not been measured.
@@ -407,6 +572,7 @@ export function scatterSpec(
    * `/outcomes` is a small-multiple and stacking two full-height clouds puts the second below the
    * fold, which is where a comparison goes to die.
    */
+  const { width } = options;
   const marginLeft = 62;
   /*
    * Sized to the labels that are actually drawn, which is not every trace.
@@ -418,23 +584,34 @@ export function scatterSpec(
    * cloud that had been squeezed to make room for it.
    */
   const labelledTraces = traces.filter((t) => t.band == null);
-  const marginRight =
+  const marginRight = gutter(
+    width,
     labelledTraces.length > 0
       ? 24 + Math.max(...labelledTraces.map((t) => t.label.length)) * 7.2
-      : 24;
+      : 24,
+  );
   const marginTop = 28;
-  const marginBottom = 40;
+  const foot = axisFoot({
+    width,
+    marginLeft,
+    marginRight,
+    dy: 20,
+    low: axes.x.format(xMin),
+    says: axes.x.label + (axes.x.log ? " (log scale)" : ""),
+    high: axes.x.format(xMax),
+  });
+  const marginBottom = 40 + foot.extraBottom;
 
   /*
    * Square where the identity line is drawn, so that y = x is drawn at 45°. Everywhere else the
    * caller's height, or a default that suits a wide cloud.
    */
   const height = options.identity
-    ? WIDTH - marginLeft - marginRight + marginTop + marginBottom
+    ? width - marginLeft - marginRight + marginTop + marginBottom
     : (options.height ?? 420);
   return {
     options: {
-      width: WIDTH,
+      width,
       height,
       marginLeft,
       marginRight,
@@ -529,32 +706,14 @@ export function scatterSpec(
           : []),
 
         // Both ends of both scales. A cloud with no numbers on it is a texture.
-        Plot.text([0], {
-          frameAnchor: "bottom-left",
-          dy: 20,
-          text: () => axes.x.format(xMin),
-          textAnchor: "start",
-          fill: INK.muted,
-          fontSize: 11,
-        }),
-        Plot.text([0], {
-          frameAnchor: "bottom",
-          dy: 20,
-          text: () => axes.x.label + (axes.x.log ? " (log scale)" : ""),
-          fill: INK.muted,
-          fontSize: 11,
-        }),
-        Plot.text([0], {
-          frameAnchor: "bottom-right",
-          dy: 20,
-          text: () => axes.x.format(xMax),
-          textAnchor: "end",
-          fill: INK.muted,
-          fontSize: 11,
-        }),
+        ...foot.marks,
         Plot.text([0], {
           frameAnchor: "top-left",
           dx: -marginLeft + 4,
+          // Clear of the axis name above it. Both sat on the frame's top edge, so
+          // "Performance Index" and the 113 it labels were drawn through each other at every
+          // width — the one collision in this file that predates there being two of them.
+          dy: 3,
           text: () => axes.y.format(yMax),
           textAnchor: "start",
           fill: INK.muted,
@@ -626,6 +785,7 @@ export function scatterSpec(
 export function rangeSpec(
   rows: Range[],
   axis: { label: string; format: (v: number) => string; log?: boolean },
+  options: { width: number },
 ): Spec | null {
   if (rows.length < 2) return null;
 
@@ -635,16 +795,28 @@ export function rangeSpec(
 
   const rowHeight = 14;
   const longest = Math.max(...rows.map((r) => r.label.length));
-  const marginLeft = Math.max(70, Math.min(150, Math.round(longest * 6.2) + 10));
+  // A 14px row cannot hold a second line, so this gutter is capped rather than wrapped: a name
+  // too long for a phone's frame is drawn shorter, not folded into the row below it.
+  const { width } = options;
+  const marginLeft = gutter(width, Math.max(70, Math.min(150, Math.round(longest * 6.2) + 10)));
+  const foot = axisFoot({
+    width,
+    marginLeft,
+    marginRight: 16,
+    dy: 16,
+    low: axis.format(min),
+    says: axis.label + (axis.log ? " (log scale)" : ""),
+    high: axis.format(max),
+  });
 
   return {
     options: {
-      width: WIDTH,
+      width,
       height: rows.length * rowHeight,
       marginLeft,
       marginRight: 16,
       marginTop: 0,
-      marginBottom: 22,
+      marginBottom: 22 + foot.extraBottom,
       x: {
         axis: null,
         type: axis.log ? "log" : "linear",
@@ -688,29 +860,7 @@ export function rangeSpec(
           fontSize: 10,
           className: "range-label",
         }),
-        Plot.text([0], {
-          frameAnchor: "bottom-left",
-          dy: 16,
-          text: () => axis.format(min),
-          textAnchor: "start",
-          fill: INK.muted,
-          fontSize: 11,
-        }),
-        Plot.text([0], {
-          frameAnchor: "bottom",
-          dy: 16,
-          text: () => axis.label + (axis.log ? " (log scale)" : ""),
-          fill: INK.muted,
-          fontSize: 11,
-        }),
-        Plot.text([0], {
-          frameAnchor: "bottom-right",
-          dy: 16,
-          text: () => axis.format(max),
-          textAnchor: "end",
-          fill: INK.muted,
-          fontSize: 11,
-        }),
+        ...foot.marks,
         // One full-width band per row, above everything: the hit target is the row, not the 3px
         // dot at either end of it.
         Plot.rect(rows, {
@@ -812,6 +962,7 @@ export const BOX_FROM = 8;
 export function distributionSpec(
   values: DistributionValue[],
   options: {
+    width: number;
     /** The one this page is about. Drawn last, above every other mark. */
     marker?: { value: number; label: string } | null;
     /**
@@ -821,7 +972,7 @@ export function distributionSpec(
      * the population size does not carry.
      */
     dots?: boolean;
-  } = {},
+  },
 ): Spec | null {
   // Two values are a pair, not a distribution. A box drawn over them would put quartiles on a
   // population that has none, which reads as a finding about a spread nobody measured.
@@ -874,7 +1025,7 @@ export function distributionSpec(
 
   return {
     options: {
-      width: WIDTH,
+      width: options.width,
       height,
       marginLeft: 2,
       marginRight: 2,
@@ -972,7 +1123,11 @@ export function distributionSpec(
  * data does not have. The zero rule is drawn and labelled "no change" — a reader has to be able
  * to see where zero is, not infer it from the hues.
  */
-export function histogramSpec(bins: Bin[], format: (v: number) => string): Spec {
+export function histogramSpec(
+  bins: Bin[],
+  format: (v: number) => string,
+  options: { width: number },
+): Spec {
   const first = bins[0]!;
   const last = bins[bins.length - 1]!;
   const crossesZero = first.from < 0 && last.to > 0;
@@ -982,7 +1137,7 @@ export function histogramSpec(bins: Bin[], format: (v: number) => string): Spec 
 
   return {
     options: {
-      width: WIDTH,
+      width: options.width,
       height: 150,
       marginTop: 4,
       marginBottom: 26,
@@ -1072,6 +1227,7 @@ export function fanSpec(
   points: FanPoint[],
   format: (v: number) => string,
   hover: (p: FanPoint) => string,
+  options: { width: number },
 ): Spec | null {
   // One point is not a series. Returning null draws nothing rather than a degenerate axis with a
   // single mark on it, which would read as a finding about a quantity that has not been measured
@@ -1110,14 +1266,29 @@ export function fanSpec(
 
   const bounds = degenerate ? [last.high] : [last.high, last.low];
 
+  // The two bound labels live here. Capped like every other gutter, because 104px is a sixth of
+  // the wide frame and a third of the narrow one.
+  const marginRight = gutter(options.width, 104);
+  const foot = axisFoot({
+    width: options.width,
+    marginLeft: 0,
+    marginRight,
+    dy: 18,
+    low: `FY${points[0]!.year}`,
+    // The truncated axis, stated on the chart rather than in the caption underneath it. A reader
+    // who takes the shape at face value has been misled by the time they reach prose.
+    says: `axis starts at ${format(min)}, not zero`,
+    high: `FY${last.year}`,
+  });
+
   return {
     options: {
-      width: WIDTH,
+      width: options.width,
       height: 220,
       marginTop: 14,
-      marginBottom: 26,
+      marginBottom: 26 + foot.extraBottom,
       marginLeft: 0,
-      marginRight: 104,
+      marginRight,
       x: { axis: null, domain: [points[0]!.year, last.year] },
       y: { axis: null, domain: [min, max] },
       marks: [
@@ -1212,31 +1383,7 @@ export function fanSpec(
           className: "fan-bound",
         }),
         Plot.ruleY([min], { stroke: INK.rule, className: "axis" }),
-        Plot.text([points[0]!.year], {
-          frameAnchor: "bottom-left",
-          dy: 18,
-          text: (v: number) => `FY${v}`,
-          textAnchor: "start",
-          fill: INK.muted,
-          fontSize: 11,
-        }),
-        // The truncated axis, stated on the chart rather than in the caption underneath it. A
-        // reader who takes the shape at face value has been misled by the time they reach prose.
-        Plot.text([0], {
-          frameAnchor: "bottom",
-          dy: 18,
-          text: () => `axis starts at ${format(min)}, not zero`,
-          fill: INK.muted,
-          fontSize: 11,
-        }),
-        Plot.text([last.year], {
-          frameAnchor: "bottom-right",
-          dy: 18,
-          text: (v: number) => `FY${v}`,
-          textAnchor: "end",
-          fill: INK.muted,
-          fontSize: 11,
-        }),
+        ...foot.marks,
         // The hit layer, last so it sits above every mark. One full-height column per year: the
         // target a reader aims at is the strip, not the 2px line inside it.
         Plot.rect(points, {
@@ -1302,6 +1449,7 @@ export function seriesSpec(
   labels: { a: string; b: string },
   format: (v: number) => string,
   hover: (p: SeriesPoint) => string,
+  options: { width: number },
 ): Spec | null {
   // One point is not a series, exactly as in `fanSpec`.
   if (points.length < 2) return null;
@@ -1317,6 +1465,10 @@ export function seriesSpec(
   const endOf = (key: "a" | "b") => [...points].reverse().find((p) => p[key] != null);
   const endA = endOf("a");
   const endB = endOf("b");
+  /** What the end labels say, which is what the right gutter has to hold. */
+  const endText = (point: SeriesPoint | undefined, key: "a" | "b"): string =>
+    point ? `${key === "a" ? labels.a : labels.b} ${format(point[key] ?? 0)}` : "";
+  const longestEnd = Math.max(endText(endA, "a").length, endText(endB, "b").length);
 
   const line = (key: "a" | "b", stroke: string, className: string) =>
     Plot.line(points, {
@@ -1336,7 +1488,7 @@ export function seriesSpec(
             x: point.year,
             y: point[key] ?? 0,
             dx: 8,
-            text: () => `${key === "a" ? labels.a : labels.b} ${format(point[key] ?? 0)}`,
+            text: () => endText(point, key),
             textAnchor: "start",
             fill: stroke,
             className: "series-end",
@@ -1344,15 +1496,33 @@ export function seriesSpec(
         ]
       : [];
 
+  /*
+   * Room for the longer of the two direct labels, which carry the series identity.
+   *
+   * Sized to the string actually drawn and not to the series name alone: the label reads
+   * `unclosed $4,229`, and sizing off `unclosed` cut the gutter short by the width of the number.
+   * At 640 the shortfall was absorbed by the slack in the 7.2px-per-character estimate; at
+   * `WIDTHS.narrow` it put both of `/history`'s end labels outside the frame.
+   */
+  const marginRight = gutter(options.width, 32 + longestEnd * 7.2);
+  const foot = axisFoot({
+    width: options.width,
+    marginLeft: 0,
+    marginRight,
+    dy: 18,
+    low: `FY${first.year}`,
+    says: `axis starts at ${format(min)}, not zero`,
+    high: `FY${last.year}`,
+  });
+
   return {
     options: {
-      width: WIDTH,
+      width: options.width,
       height: 220,
       marginTop: 14,
-      marginBottom: 26,
+      marginBottom: 26 + foot.extraBottom,
       marginLeft: 0,
-      // Room for the longer of the two direct labels, which carry the series identity.
-      marginRight: 32 + Math.max(labels.a.length, labels.b.length) * 7.2,
+      marginRight,
       x: { axis: null, domain: [first.year, last.year] },
       y: { axis: null, domain: [min, max] },
       marks: [
@@ -1361,29 +1531,7 @@ export function seriesSpec(
         ...endLabel(endA, "a", SERIES.formula),
         ...endLabel(endB, "b", SERIES.guarantee),
         Plot.ruleY([min], { stroke: INK.rule, className: "axis" }),
-        Plot.text([first.year], {
-          frameAnchor: "bottom-left",
-          dy: 18,
-          text: (v: number) => `FY${v}`,
-          textAnchor: "start",
-          fill: INK.muted,
-          fontSize: 11,
-        }),
-        Plot.text([0], {
-          frameAnchor: "bottom",
-          dy: 18,
-          text: () => `axis starts at ${format(min)}, not zero`,
-          fill: INK.muted,
-          fontSize: 11,
-        }),
-        Plot.text([last.year], {
-          frameAnchor: "bottom-right",
-          dy: 18,
-          text: (v: number) => `FY${v}`,
-          textAnchor: "end",
-          fill: INK.muted,
-          fontSize: 11,
-        }),
+        ...foot.marks,
         // One full-height column per year, above every mark, as the fan chart does.
         Plot.rect(points, {
           x1: (p: SeriesPoint) => p.year - 0.5,

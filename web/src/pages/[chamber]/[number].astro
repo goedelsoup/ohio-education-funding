@@ -53,7 +53,7 @@ const spreadValues = house.members
     hover: `${d.name}: ${money(d.valuation_per_pupil!)} per pupil, ${money(d.realized_aid_per_pupil)} state aid per pupil`,
   }));
 const spreadCount = spreadValues.length;
-const spread = renderToString(distributionSpec(spreadValues), { label: `Assessed valuation per pupil across the ${spreadCount} districts in ${label} District ${number} with a reported tax base, poorest to wealthiest` });
+const spread = renderToString((w) => distributionSpec(spreadValues, { width: w }), { label: `Assessed valuation per pupil across the ${spreadCount} districts in ${label} District ${number} with a reported tax base, poorest to wealthiest` });
 /*
  * The two ends of the strip, and the column the strip is drawn from.
  *

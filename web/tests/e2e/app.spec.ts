@@ -40,6 +40,20 @@ const headingText = (heading: Locator): Promise<string> =>
     return (clone.textContent ?? "").replace(/\s+/g, " ").trim();
   });
 
+/*
+ * Why chart selectors here say `svg.plot:visible`.
+ *
+ * Every chart is in the document twice — one drawing per width, of which the stylesheet shows one.
+ * See `WIDTHS` in `src/lib/plot/spec.ts` for why. So `[data-chart="fan"] svg` matches two elements
+ * and every assertion written against it is a strict-mode violation rather than a failure that
+ * says anything.
+ *
+ * `:visible` resolves it to the drawing this viewport is actually being shown, which is also the
+ * one the assertion means: what a reader sees. Playwright's default viewport is 1280 wide, so that
+ * is the wide drawing everywhere except the phone-width tests, which set their own viewport and
+ * get the narrow one from the same selector without saying so.
+ */
+
 /** Cleveland Municipal. On the guarantee, so the guarantee copy has something to render. */
 const CLEVELAND = "043786";
 /** Northern Local (Perry County). The corpus's property-poor exemplar. */
@@ -666,7 +680,7 @@ test.describe("with JavaScript disabled", () => {
      */
     await page.goto("/districts");
     await expect(page.locator("#district-measures .measure:visible")).toHaveCount(1);
-    await expect(page.locator('.measure[data-measure="aid"] svg')).toBeVisible();
+    await expect(page.locator('.measure[data-measure="aid"] svg.plot:visible')).toBeVisible();
     await expect(page.locator('.measure[data-measure="aid"]')).toContainText("State aid per pupil");
     // And the table it summarises is complete, as it always was.
     await expect(page.locator("#district-table tbody tr")).toHaveCount(609);
@@ -706,7 +720,7 @@ test.describe("with JavaScript disabled", () => {
     await expect(page.getByRole("heading", { name: /Where the state aid comes from/ })).toBeVisible();
     await expect(page.locator(".tile .v").first()).not.toBeEmpty();
     // Charts are build-time SVG, not a canvas drawn on load.
-    await expect(page.locator("svg.plot").first()).toBeVisible();
+    await expect(page.locator("svg.plot:visible").first()).toBeVisible();
   });
 
   test("the district index lists every district", async ({ page }) => {
@@ -995,6 +1009,222 @@ test.describe("routes", () => {
   });
 });
 
+/*
+ * Charts, at the width they are actually read at.
+ *
+ * Every chart is drawn twice — see `WIDTHS` in `src/lib/plot/spec.ts` — because a static SVG
+ * scaled to a phone takes its axis text down with it. The defect these replace: at 375px the
+ * 640-unit drawing was scaled by 0.46 and the tick labels rendered near 4.6px, which is half the
+ * size at which text is legible, on the viewport most first visits arrive at. Nothing caught it,
+ * because a scaled SVG is correct markup and its `font-size` attribute still says 10.
+ *
+ * So these measure what the browser paints rather than what the file says. A unit test cannot:
+ * the scale factor only exists once the SVG is in a box of a known width.
+ */
+test.describe("charts on a phone", () => {
+  const CHARTED = [
+    "/",
+    "/statewide",
+    "/outcomes",
+    "/counties",
+    "/history",
+    "/method",
+    "/districts",
+    `/district/${CLEVELAND}`,
+    `/district/${CLEVELAND}/finances`,
+    `/district/${CLEVELAND}/outcome`,
+  ];
+
+  /** Every text mark in a chart the reader can actually see, with the size it is painted at. */
+  const paintedText = (page: Page) =>
+    page.evaluate(() => {
+      const out: { chart: string; text: string; px: number; outside: number }[] = [];
+      for (const svg of document.querySelectorAll("svg.plot")) {
+        // The drawing for the other width is `display: none`, so it paints nothing and is not
+        // what any of this is about.
+        if (!svg.getClientRects().length) continue;
+        const frame = svg.getBoundingClientRect();
+        const box = (svg as SVGSVGElement).viewBox.baseVal;
+        const scale = box.width ? frame.width / box.width : 1;
+        const chart = svg.closest("[data-chart]")?.getAttribute("data-chart") ?? "unnamed";
+        for (const mark of svg.querySelectorAll("text")) {
+          const text = (mark.textContent ?? "").trim();
+          if (!text) continue;
+          const at = mark.getBoundingClientRect();
+          out.push({
+            chart,
+            text,
+            px: (parseFloat(getComputedStyle(mark).fontSize) || 10) * scale,
+            outside: Math.max(frame.left - at.left, at.right - frame.right),
+          });
+        }
+      }
+      return out;
+    });
+
+  test("no chart draws its text below 9px", async ({ page }) => {
+    // 390px is the common modern phone and 375 the narrowest worth drawing for. The floor is 9px
+    // rather than a round 10 because `WIDTHS.narrow` is sized to scale by at least 0.9 there, and
+    // the 10px axis marks are the smallest type any of these forms uses.
+    await page.setViewportSize({ width: 375, height: 900 });
+    const small: string[] = [];
+    for (const route of CHARTED) {
+      await page.goto(route);
+      for (const mark of await paintedText(page)) {
+        if (mark.px < 9) small.push(`${route} [${mark.chart}] "${mark.text}" at ${mark.px.toFixed(1)}px`);
+      }
+    }
+    expect(small.slice(0, 10), "chart text a reader cannot read").toEqual([]);
+  });
+
+  test("no chart draws a label outside its own frame", async ({ page }) => {
+    /*
+     * The other half of drawing narrow. Every gutter in `spec.ts` is sized to the text that goes
+     * in it, and text does not shrink with the frame — so a name that fits a 640 drawing asks for
+     * three quarters of a 320 one. Capped, it has to wrap; uncapped, `Career-technical education`
+     * is drawn off the left edge of the viewBox and arrives as `er-technical education`, which
+     * reads as a rendering fault rather than as a truncation and is exactly the kind of thing
+     * nobody reports.
+     */
+    await page.setViewportSize({ width: 375, height: 900 });
+    const clipped: string[] = [];
+    for (const route of CHARTED) {
+      await page.goto(route);
+      for (const mark of await paintedText(page)) {
+        if (mark.outside > 0.5) {
+          clipped.push(`${route} [${mark.chart}] "${mark.text}" over by ${Math.round(mark.outside)}px`);
+        }
+      }
+    }
+    expect(clipped.slice(0, 10), "chart labels drawn past the edge of the drawing").toEqual([]);
+  });
+
+  test("no two chart labels are drawn through each other", async ({ page }) => {
+    /*
+     * A narrow frame is where the annotation along the foot stops fitting on one line: `/history`
+     * drew `FY2009`, `axis starts at 32%, not zero` and `FY2022` across 186px and the centre ran
+     * through both years. `axisFoot` measures the row and drops the centre to its own line — and
+     * measuring it is only possible here, because a string's drawn width is a fact about the font.
+     */
+    await page.setViewportSize({ width: 375, height: 900 });
+    const through: string[] = [];
+    for (const route of CHARTED) {
+      await page.goto(route);
+      const hits = await page.evaluate(() => {
+        const out: string[] = [];
+        for (const svg of document.querySelectorAll("svg.plot")) {
+          if (!svg.getClientRects().length) continue;
+          const marks = [...svg.querySelectorAll("text")]
+            .filter((m) => (m.textContent ?? "").trim())
+            .map((m) => ({ t: (m.textContent ?? "").trim(), r: m.getBoundingClientRect() }))
+            .filter((m) => m.r.width > 0);
+          for (let a = 0; a < marks.length; a += 1) {
+            for (let b = a + 1; b < marks.length; b += 1) {
+              const A = marks[a]!.r;
+              const B = marks[b]!.r;
+              const over =
+                Math.min(A.right, B.right) - Math.max(A.left, B.left) > 1 &&
+                Math.min(A.bottom, B.bottom) - Math.max(A.top, B.top) > 1;
+              if (over) out.push(`"${marks[a]!.t}" through "${marks[b]!.t}"`);
+            }
+          }
+        }
+        return out;
+      });
+      for (const hit of hits) through.push(`${route}: ${hit}`);
+    }
+    expect(through.slice(0, 10), "overlapping chart type").toEqual([]);
+  });
+
+  test("the reader is shown one of the two drawings, never both and never neither", async ({
+    page,
+  }) => {
+    // The container query is the only thing choosing between them, so a stylesheet that stopped
+    // loading, or a breakpoint edited to leave a gap, would show two charts stacked or none at
+    // all — both of which read as a broken page rather than as a missing rule.
+    for (const width of [375, 500, 640, 900, 1280]) {
+      await page.setViewportSize({ width, height: 900 });
+      await page.goto(`/district/${CLEVELAND}`);
+      const shown = await page.locator(".chart-pair").evaluateAll((pairs) =>
+        pairs.map((pair) =>
+          [...pair.querySelectorAll(".chart-at")].filter((at) => at.getClientRects().length).length,
+        ),
+      );
+      expect(shown.length, `${width}px`).toBeGreaterThan(0);
+      expect([...new Set(shown)], `${width}px shows one drawing per chart`).toEqual([1]);
+    }
+  });
+});
+
+/*
+ * The tables that run off the side of a phone.
+ *
+ * `.scroll` is `overflow-x: auto` and was nothing else: 14,767 boxes in the build, almost all
+ * holding a data table wider than the screen, none of them focusable and none of them named. A
+ * mouse drags them; a keyboard could not reach the columns past the right edge at all.
+ */
+test.describe("a table that scrolls sideways", () => {
+  test("can be reached and moved by the keyboard", async ({ page }) => {
+    await page.setViewportSize({ width: 375, height: 900 });
+    await page.goto(`/district/${CLEVELAND}/finances`);
+
+    // The first box on the page that genuinely has something behind its edge. Asserting on a box
+    // that fits would pass whatever this did.
+    const index = await page.locator("div.scroll").evaluateAll((boxes) =>
+      boxes.findIndex((box) => box.scrollWidth > box.clientWidth + 1),
+    );
+    expect(index, "a table wide enough to need scrolling at 375px").toBeGreaterThanOrEqual(0);
+
+    const box = page.locator("div.scroll").nth(index);
+    await expect(box).toHaveAttribute("tabindex", "0");
+    await expect(box).toHaveAttribute("role", "group");
+    // Named from the heading it sits under — see `src/lib/scrollers.ts` for why that is read off
+    // the page rather than written beside each of the seventy call sites.
+    await expect(box).toHaveAttribute("aria-label", /\S/);
+
+    await box.focus();
+    expect(await box.evaluate((el) => document.activeElement === el)).toBe(true);
+    for (let i = 0; i < 4; i += 1) await page.keyboard.press("ArrowRight");
+    await expect
+      .poll(() => box.evaluate((el) => el.scrollLeft), { message: "the keyboard moved it" })
+      .toBeGreaterThan(0);
+  });
+
+  test("every one of them in the build says what it is", () => {
+    /*
+     * Scanned over the artefact rather than a page at a time, for the reason the CSP block above
+     * gives: the treatment is applied in the layout, so it reaches every route including the ones
+     * no test visits, and a sweep of thirteen pages would not notice a route that slipped it.
+     *
+     * The six boxes with no table are deliberate and excluded at the source — a chart cannot
+     * overflow, so a tab stop on one leads nowhere. See `nameScrollers`.
+     */
+    const DIST = join(import.meta.dirname, "../../dist");
+    const walk = (dir: string): string[] =>
+      readdirSync(dir, { withFileTypes: true }).flatMap((entry) =>
+        entry.isDirectory()
+          ? walk(join(dir, entry.name))
+          : entry.name.endsWith(".html")
+            ? [join(dir, entry.name)]
+            : [],
+      );
+
+    let boxes = 0;
+    const bare: string[] = [];
+    for (const file of walk(DIST)) {
+      const page = readFileSync(file, "utf8");
+      for (const match of page.matchAll(/<div\b([^>]*\bclass="scroll"[^>]*)>/g)) {
+        const attrs = match[1] ?? "";
+        if (!attrs.includes('tabindex="0"')) continue; // a chart wrapper, excluded at the source
+        boxes += 1;
+        if (!/aria-label="[^"]+"/.test(attrs)) bare.push(`${file.slice(DIST.length + 1)}: ${attrs}`);
+      }
+    }
+    expect(boxes, "the build carries scrolling tables at all").toBeGreaterThan(10_000);
+    expect(bare.slice(0, 5), "a focusable box a screen reader cannot name").toEqual([]);
+  });
+});
+
 test.describe("the section menus", () => {
   test("opening one closes the other, and Escape closes it", async ({ page }) => {
     // Purely the enhancement half — the menus open without any of this, which the JavaScript
@@ -1237,7 +1467,7 @@ test.describe("the projection", () => {
 
   test("draws a band with both bounds labelled and the centre dashed", async ({ page }) => {
     await page.goto("/scenario");
-    const chart = page.locator('#projection-out [data-chart="fan"] svg');
+    const chart = page.locator('#projection-out [data-chart="fan"] svg.plot:visible');
     await expect(chart.locator(".fan-band")).toHaveCount(1);
     await expect(chart.locator(".fan-mid")).toHaveCount(1);
     await expect(chart.locator(".fan-mid")).toHaveAttribute("stroke-dasharray", /\d/);
@@ -1248,7 +1478,7 @@ test.describe("the projection", () => {
 
   test("says on its face that the axis is truncated", async ({ page }) => {
     await page.goto("/scenario");
-    await expect(page.locator('#projection-out [data-chart="fan"] svg')).toContainText(
+    await expect(page.locator('#projection-out [data-chart="fan"] svg.plot:visible')).toContainText(
       "not zero",
     );
   });
@@ -1276,7 +1506,7 @@ test.describe("one district's own band", () => {
     page,
   }) => {
     await page.goto(`/district/${CLEVELAND}`);
-    const chart = page.locator('[data-chart="district-fan"] svg');
+    const chart = page.locator('[data-chart="district-fan"] svg.plot:visible');
     // Its aid does not respond to its enrollment at all, so the band collapses — and the second
     // line, the formula's own falling answer, is what makes the chart say something.
     await expect(chart.locator(".fan-reference")).toHaveCount(1);
@@ -1287,7 +1517,7 @@ test.describe("one district's own band", () => {
 
   test("a formula-funded district gets a band and no second line", async ({ page }) => {
     await page.goto(`/district/${ON_FORMULA}`);
-    const chart = page.locator('[data-chart="district-fan"] svg');
+    const chart = page.locator('[data-chart="district-fan"] svg.plot:visible');
     await expect(chart.locator(".fan-band")).toHaveCount(1);
     await expect(chart.locator(".fan-reference")).toHaveCount(0);
     await expect(page.locator('[data-part="enrollment"]')).toContainText(
@@ -1355,19 +1585,17 @@ test.describe("the outcome routes", () => {
      * the same five numbers the bar chart carried, plus the districts it did not.
      */
     await page.goto("/outcomes");
-    const chart = page.locator('[data-chart="poverty-and-performance"]');
-    await expect(chart.locator("svg")).toBeVisible();
+    const chart = page.locator('[data-chart="poverty-and-performance"] svg.plot:visible');
+    await expect(chart).toBeVisible();
 
     // One mark per district with both measures, and a hit target on each so it can be pointed at.
-    const dots = chart.locator("svg .scatter-dot circle");
+    const dots = chart.locator(".scatter-dot circle");
     expect(await dots.count()).toBeGreaterThan(500);
-    expect(await chart.locator("svg .scatter-hit circle[data-hover]").count()).toBe(
-      await dots.count(),
-    );
+    expect(await chart.locator(".scatter-hit circle[data-hover]").count()).toBe(await dots.count());
 
     // The median line falls left to right: least poor fifth highest, poorest fifth lowest.
     const trace = await chart
-      .locator("svg .scatter-trace path")
+      .locator(".scatter-trace path")
       .first()
       .evaluate((n) => n.getAttribute("d") ?? "");
     const ys = [...trace.matchAll(/[ ,](\d+(?:\.\d+)?)(?=[A-Za-z]|$|,|\s)/g)]
@@ -1386,8 +1614,8 @@ test.describe("the outcome routes", () => {
     // than left to whichever range each chart happened to compute.
     await page.goto("/outcomes");
     const card = page.locator('[data-part="two-denominators"]');
-    await expect(card.locator('[data-chart="weighted-spending"] svg')).toBeVisible();
-    await expect(card.locator('[data-chart="enrolled-spending"] svg')).toBeVisible();
+    await expect(card.locator('[data-chart="weighted-spending"] svg.plot:visible')).toBeVisible();
+    await expect(card.locator('[data-chart="enrolled-spending"] svg.plot:visible')).toBeVisible();
     await expect(card).toContainText("−0.004");
     await expect(card).toContainText("−0.355");
   });
@@ -1404,7 +1632,7 @@ test.describe("the outcome routes", () => {
     await page.goto("/outcomes");
     const card = page.locator('[data-part="two-denominators"]');
     const ends = async (chart: string) =>
-      (await card.locator(`[data-chart="${chart}"] svg text`).allTextContents()).filter((t) =>
+      (await card.locator(`[data-chart="${chart}"] svg.plot:visible text`).allTextContents()).filter((t) =>
         /^\$[\d,]+$/.test(t),
       );
     const weighted = await ends("weighted-spending");
@@ -1714,7 +1942,7 @@ test.describe("presentation", () => {
     await page.goto("/statewide");
     const tip = page.locator("#tip");
     await expect(tip).toBeHidden();
-    await page.locator(".bar-fill > *").first().hover();
+    await page.locator("svg.plot:visible .bar-fill > *").first().hover();
     await expect(tip).toBeVisible();
     await expect(tip).toContainText("districts on the guarantee");
   });
@@ -1724,7 +1952,7 @@ test.describe("presentation", () => {
     // Base cost up 10% with the guarantee removed: some districts gain and some lose, so the
     // distribution straddles zero and the neutral midpoint has to be findable.
     await page.goto("/scenario?g=removed&arg=0.5&base=1.1&min=0.1&pb=1&pc=1&h=2026");
-    const chart = page.locator('[data-chart="deltas"] svg');
+    const chart = page.locator('[data-chart="deltas"] svg.plot:visible');
     await expect(chart).toBeVisible();
     await expect(chart).toContainText("no change");
     // Two hues and a neutral midpoint, never a hue at zero.
@@ -1757,9 +1985,9 @@ test.describe("the base cost build-up", () => {
     // "g leadership and operation" against the fixed margin this replaced — which reads as a
     // rendering fault rather than as truncation, and so gets reported by nobody.
     await page.goto(`/district/${CLEVELAND}`);
-    const labels = page.locator('[data-chart="base-cost"] .bar-label text');
+    const labels = page.locator('[data-chart="base-cost"] svg.plot:visible .bar-label text');
     await expect(labels).toHaveCount(5);
-    const chart = page.locator('[data-chart="base-cost"] svg');
+    const chart = page.locator('[data-chart="base-cost"] svg.plot:visible');
     const box = await chart.boundingBox();
     for (let i = 0; i < 5; i++) {
       const label = await labels.nth(i).boundingBox();
@@ -2461,7 +2689,7 @@ test.describe("house districts", () => {
      */
     await page.goto("/house/065");
     const card = page.locator('[data-part="members"]');
-    await expect(card.locator('[data-chart="seat-spread"] svg')).toBeVisible();
+    await expect(card.locator('[data-chart="seat-spread"] svg.plot:visible')).toBeVisible();
     const scale = card.locator(".scale").first();
     await expect(scale.locator("span")).toHaveCount(2);
     await expect(scale.locator("span").first()).toContainText("$");
@@ -2706,8 +2934,8 @@ test.describe("counties, which are a peer group and not a boundary", () => {
      * district attribution could not honestly draw the crossing anyway.
      */
     await page.goto("/counties");
-    const chart = page.locator('#disparity [data-chart="county-disparity"]');
-    await expect(chart.locator("svg")).toBeVisible();
+    const chart = page.locator('#disparity [data-chart="county-disparity"] svg.plot:visible');
+    await expect(chart).toBeVisible();
 
     // One row per county with two districts to compare; four of the 88 have only one.
     const spans = chart.locator(".range-span line, .range-span path");
@@ -2739,7 +2967,7 @@ test.describe("counties, which are a peer group and not a boundary", () => {
     // `textContent`, not `allInnerTexts`: `innerText` is empty for an SVG `<text>`, so the
     // convenient helper silently compares eighty-four empty strings against the table.
     const rows = await page
-      .locator('#disparity [data-chart="county-disparity"] .range-label text')
+      .locator('#disparity [data-chart="county-disparity"] svg.plot:visible .range-label text')
       .evaluateAll((nodes) => nodes.map((n) => n.textContent ?? ""));
     const table = await page.locator("#roster tbody tr th a").allInnerTexts();
     expect(rows.length).toBeGreaterThan(70);
@@ -2753,8 +2981,8 @@ test.describe("counties, which are a peer group and not a boundary", () => {
     // The card stated the ratio and never said what it was a lot of. The median county is 2.1x
     // and Cuyahoga is 5.5x, which the page had no way of conveying.
     await page.goto("/county/cuyahoga");
-    const chart = page.locator('#spread [data-chart="county-position"]');
-    await expect(chart.locator("svg")).toBeVisible();
+    const chart = page.locator('#spread [data-chart="county-position"] svg.plot:visible');
+    await expect(chart).toBeVisible();
     await expect(chart.locator(".dist-marker")).toHaveCount(1);
     expect(await chart.locator(".dist-dot circle").count()).toBeGreaterThan(70);
     // "The median" and not "The median county": the figure is `stats.median`, which interpolates,
@@ -2805,7 +3033,7 @@ test.describe("colour that carries a third variable", () => {
     // Three labelled lines over the densest part of the cloud said the same thing the legend
     // already said, on top of the data it was describing.
     await page.goto("/outcomes");
-    const chart = page.locator('[data-chart="weighted-spending"]');
+    const chart = page.locator('[data-chart="weighted-spending"] svg.plot:visible');
     await expect(chart.locator(".scatter-trace")).toHaveCount(3);
     await expect(chart.locator(".scatter-trace-end")).toHaveCount(0);
   });
@@ -2853,8 +3081,8 @@ test.describe("the reduction factors, against what was charged", () => {
      * county auditor charged, with the line where they agree.
      */
     await page.goto("/method");
-    const chart = page.locator('#reduction-factors [data-chart="reduction-factors"]');
-    await expect(chart.locator("svg")).toBeVisible();
+    const chart = page.locator('#reduction-factors [data-chart="reduction-factors"] svg.plot:visible');
+    await expect(chart).toBeVisible();
     await expect(chart.locator(".scatter-identity")).toHaveCount(1);
 
     // One mark per district that has a millage record, each pointable.
@@ -2874,7 +3102,7 @@ test.describe("the reduction factors, against what was charged", () => {
      */
     await page.goto("/method");
     const box = await page
-      .locator('#reduction-factors [data-chart="reduction-factors"] .scatter-identity path')
+      .locator('#reduction-factors [data-chart="reduction-factors"] svg.plot:visible .scatter-identity path')
       .evaluate((n) => {
         const r = (n as SVGGraphicsElement).getBBox();
         return { w: r.width, h: r.height };
@@ -2907,7 +3135,7 @@ test.describe("where a district sits among the others", () => {
      */
     await page.goto(`/district/${CLEVELAND}`);
     const card = page.locator("#position");
-    const charts = card.locator(".chartwrap svg");
+    const charts = card.locator(".chartwrap svg.plot:visible");
     await expect(charts).toHaveCount(2);
 
     // The box, the median inside it, and this district's own rule on top of both.
@@ -2935,8 +3163,8 @@ test.describe("where a district sits among the others", () => {
      * spanning almost the whole width, because the quartiles of three numbers are the numbers.
      */
     await page.goto("/house/001");
-    const chart = page.locator('#members [data-chart="seat-spread"]');
-    await expect(chart.locator("svg")).toBeVisible();
+    const chart = page.locator('#members [data-chart="seat-spread"] svg.plot:visible');
+    await expect(chart).toBeVisible();
     expect(await chart.locator(".dist-dot circle").count()).toBeLessThan(8);
     await expect(chart.locator("rect"), "no box below the floor").toHaveCount(0);
     await expect(page.locator("#members")).not.toContainText("shaded box");
@@ -2946,8 +3174,8 @@ test.describe("where a district sits among the others", () => {
     // Two tiles said this district's score and the median of its poverty fifth. Whether a
     // fifteen-point gap is remarkable depends on how wide that fifth is, and the tiles cannot say.
     await page.goto(`/district/${CLEVELAND}/outcome`);
-    const chart = page.locator('#comparable-poverty [data-chart="peer-group"]');
-    await expect(chart.locator("svg")).toBeVisible();
+    const chart = page.locator('#comparable-poverty [data-chart="peer-group"] svg.plot:visible');
+    await expect(chart).toBeVisible();
     await expect(chart.locator(".dist-marker")).toHaveCount(1);
     expect(await chart.locator(".dist-dot circle").count()).toBeGreaterThan(50);
   });
@@ -3825,7 +4053,7 @@ test.describe("against america", () => {
      * monochrome print, which is the rule the print stylesheet applies to every other mark here.
      */
     await page.goto("/statewide");
-    const chart = page.locator('[data-chart="local-share"] svg');
+    const chart = page.locator('[data-chart="local-share"] svg.plot:visible');
     // Plot hoists constants onto the mark's group, which is why the subject is a group of its own.
     const marked = chart.locator("g.bar-label.current");
     await expect(marked).toHaveAttribute("font-weight", "600");

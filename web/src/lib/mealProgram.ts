@@ -112,16 +112,18 @@ export function renderMealProgram(meal: MealProgramYear[]): string {
   const end = split[split.length - 1];
 
   const chart = renderToString(
-    seriesSpec(
-      splitByBasis(meal),
-      { a: "on ADM", b: "on CE" },
-      (v) => `${v.toFixed(0)}%`,
-      (p) => {
-        const value = p.a ?? p.b;
-        if (value == null) return `FY${p.year}`;
-        return `FY${p.year}: ${value.toFixed(1)}% ${p.a != null ? "of ADM" : "of CE count"}`;
-      },
-    ),
+    (w) =>
+      seriesSpec(
+        splitByBasis(meal),
+        { a: "on ADM", b: "on CE" },
+        (v) => `${v.toFixed(0)}%`,
+        (p) => {
+          const value = p.a ?? p.b;
+          if (value == null) return `FY${p.year}`;
+          return `FY${p.year}: ${value.toFixed(1)}% ${p.a != null ? "of ADM" : "of CE count"}`;
+        },
+        { width: w },
+      ),
   { label: `Free and reduced-price lunch applications approved as a share of meal-program enrollment, FY${first.fiscal_year} to FY${last.fiscal_year}, across every public sponsor in the MR-81`, description: `${change == null ? "" : `Drawn as two unjoined lines because the denominator changes in FY${change}, so the step across it is partly the definition moving`}` },
   );
 

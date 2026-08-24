@@ -28,7 +28,7 @@ import {
   type Observation,
 } from "../../src/lib/project.ts";
 import { type FanPoint } from "../../src/lib/chart.ts";
-import { fanSpec } from "../../src/lib/plot/spec.ts";
+import { fanSpec, WIDTHS } from "../../src/lib/plot/spec.ts";
 import { renderToString } from "../../src/lib/plot/ssr.ts";
 import { compareForecast, isForecastVerified, verify } from "../../src/lib/verify.ts";
 import type { Bundle } from "../../src/lib/types.ts";
@@ -268,8 +268,9 @@ test("the fan draws the observed run-up solid and outside the band", () => {
     { year: 2028, point: 98, low: 91, high: 105, observed: false },
   ];
   const svg = renderToString(
-    fanSpec(points, (v: number) => `$${v.toFixed(0)}`, (p: FanPoint) => `FY${p.year}`),
-   { label: "test" });
+    (w) => fanSpec(points, (v: number) => `$${v.toFixed(0)}`, (p: FanPoint) => `FY${p.year}`, { width: w }),
+    { label: "test" },
+  );
   // One solid polyline over the observed years, one dashed over the projected ones.
   expect(svg).toContain("fan-observed");
   expect(svg).toContain("fan-mid");
@@ -292,8 +293,9 @@ test("the fan chart labels both bounds and dashes the centre", () => {
     { year: 2028, point: 98, low: 91, high: 105, observed: false },
   ];
   const svg = renderToString(
-    fanSpec(points, (v: number) => `$${v.toFixed(0)}`, (p: FanPoint) => `FY${p.year}`),
-   { label: "test" });
+    (w) => fanSpec(points, (v: number) => `$${v.toFixed(0)}`, (p: FanPoint) => `FY${p.year}`, { width: w }),
+    { label: "test" },
+  );
   expect(svg).toContain("fan-band");
   expect(svg).toContain("fan-mid");
   expect(svg).toContain(">$105<");
@@ -302,14 +304,18 @@ test("the fan chart labels both bounds and dashes the centre", () => {
   // One hover target per year, and an anchor marking where measurement stops. Counted by the
   // tooltips actually attached rather than by the class, which Plot puts on the group once: the
   // property worth pinning is that every year is pointable, not how the marks are nested.
-  expect(svg.match(/data-hover=/g)?.length).toBe(3);
+  //
+  // Six because a chart is drawn twice — one drawing per width, of which the reader is shown one.
+  // Asserted on the pair rather than on a slice of it, so that a drawing losing its hover layer
+  // fails here whichever of the two it is.
+  expect(svg.match(/data-hover=/g)?.length).toBe(2 * 3);
   expect(svg).toContain("fan-anchor");
 });
 
 test("a fan chart of one point draws nothing rather than a degenerate axis", () => {
   const one: FanPoint[] = [{ year: 2026, point: 1, low: 1, high: 1, observed: true }];
-  expect(fanSpec(one, String, () => "")).toBeNull();
-  expect(renderToString(fanSpec(one, String, () => ""), { label: "test" })).toBe("");
+  expect(fanSpec(one, String, () => "", { width: WIDTHS.wide })).toBeNull();
+  expect(renderToString((w) => fanSpec(one, String, () => "", { width: w }), { label: "test" })).toBe("");
 });
 
 test("every colour in a rendered chart is a custom property, not a literal", () => {
@@ -321,7 +327,10 @@ test("every colour in a rendered chart is a custom property, not a literal", () 
     { year: 2026, point: 100, low: 100, high: 100, observed: true },
     { year: 2027, point: 99, low: 95, high: 103, observed: false },
   ];
-  const svg = renderToString(fanSpec(points, (v: number) => `$${v}`, () => ""), { label: "test" });
+  const svg = renderToString(
+    (w) => fanSpec(points, (v: number) => `$${v}`, () => "", { width: w }),
+    { label: "test" },
+  );
   expect(svg).toContain("var(--series-formula)");
   expect(svg.replace(/<style>[\s\S]*?<\/style>/g, "")).not.toMatch(/#[0-9a-f]{3,8}\b/i);
 });
