@@ -18,6 +18,7 @@ import { currentFormulaAid, currentRealizedAid } from "../lib/policy.ts";
 import * as routes from "../lib/routes.ts";
 import type { Panel, PanelDistrict } from "../lib/types.ts";
 import { anchor } from "../lib/section.ts";
+import { saying } from "../lib/status.ts";
 
 /**
  * A series' label from the panel the browser fetched, or nothing if the feed omits the block.
@@ -55,6 +56,15 @@ function taxYearLabel(panel: Panel, name: string): string {
 const a = document.querySelector<HTMLSelectElement>("#cmp-a");
 const b = document.querySelector<HTMLSelectElement>("#cmp-b");
 const out = document.querySelector<HTMLElement>("#compare-out");
+/*
+ * What the page says once the reader has stopped changing which districts it is about.
+ *
+ * `out.innerHTML` below replaces the whole comparison, and nothing announced that it had. See
+ * `src/lib/status.ts` for why the region is a separate sentence rather than `aria-live` on the
+ * table itself.
+ */
+const changed = document.querySelector<HTMLElement>("#changed");
+const say = changed ? saying(changed) : () => {};
 
 /** One comparable quantity, with the formatter that makes it readable. */
 interface Row {
@@ -209,6 +219,16 @@ function render(panel: Panel, left: PanelDistrict, right: PanelDistrict): void {
         than one. FY${panel.fiscal_year} model; valuation is ${yearOf(panel, "profile")} and
         expenditure ${yearOf(panel, "outcome.spending")}.</p>
     </div>`;
+
+  /*
+   * And say which two districts the table is now about.
+   *
+   * The names rather than a tile summary, because this route has no tiles: the whole result is one
+   * table of paired figures, and "the comparison is now Cleveland against Northern Local" is the
+   * sentence a reader needs before they go and read it. The rest is in the table, which is a
+   * keyboard region of its own.
+   */
+  say(`Comparison updated: ${qualified(panel, left)} against ${qualified(panel, right)}.`);
 }
 
 async function start(): Promise<void> {

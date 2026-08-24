@@ -41,9 +41,20 @@ import type { Panel } from "../lib/types.ts";
 import { REQUIRED_CONTRACT } from "../lib/types.ts";
 import { isForecastVerified, isVerified, verify, type Verification } from "../lib/verify.ts";
 import { anchor } from "../lib/section.ts";
+import { saying, tileSummary } from "../lib/status.ts";
 
 const $ = <T extends HTMLElement>(selector: string): T | null =>
   document.querySelector<T>(selector);
+
+/*
+ * What the page says once the levers stop moving.
+ *
+ * Every render below replaces the whole result block, and until this there was nothing telling a
+ * reader who cannot see it that anything had happened. Debounced, because a slider drag is fifty
+ * `input` events — see `saying`.
+ */
+const changed = $("#changed");
+const say = changed ? saying(changed) : () => {};
 
 const root = $("#scenario-root");
 /** Present on the district route, absent on the statewide one. That is the only difference. */
@@ -132,9 +143,22 @@ function readLevers(fallbackHorizon: number): Levers {
 }
 
 function syncLabels(levers: Levers, baseYear: number): void {
+  /*
+   * The `<output>` beside a lever's name, and the same string as the slider's spoken value.
+   *
+   * A range input announces `value`, and these carry formula multipliers: the base-cost slider
+   * runs 0.8 to 1.3 and the page shows what the reader moved it to as `+4%`. So a screen reader
+   * read out "1.04" where the label said "+4%", and the minimum-state-share slider read "0.05"
+   * against "5%" — the raw argument to the formula rather than the quantity the page is about.
+   *
+   * `aria-valuetext` replaces the announced value with the text, which is what it exists for, and
+   * writing both here rather than in two places is what stops them disagreeing.
+   */
   const set = (id: string, text: string) => {
     const output = $<HTMLOutputElement>(id);
     if (output) output.textContent = text;
+    // `#lv-arg-out` names the output; the control it belongs to is `#lv-arg`.
+    $(id.replace(/-out$/, ""))?.setAttribute("aria-valuetext", text);
   };
   set("#lv-arg-out", pct(levers.guaranteeArgument, 0));
   set(
@@ -191,6 +215,20 @@ function render(): void {
   if (projection && isForecastVerified(state.verification)) {
     projection.innerHTML = renderProjection(state.panel, state.levers);
   }
+  /*
+   * And say so. Read back off the tiles that were just written rather than composed from the
+   * levers, so the sentence a reader hears is the figure a reader sees — see `tileSummary`.
+   *
+   * The forecast tiles are included where they exist: on the statewide route the band *is* the
+   * headline, and a summary naming only the simulation would leave out the half of the page the
+   * horizon slider moves.
+   */
+  const said = [out, projection]
+    .filter((node): node is HTMLElement => node != null)
+    .map((node) => tileSummary(node))
+    .filter((part) => part !== "")
+    .join(". ");
+  if (said !== "") say(`Scenario updated. ${said}.`);
 }
 
 function reportFailure(verification: Verification): void {

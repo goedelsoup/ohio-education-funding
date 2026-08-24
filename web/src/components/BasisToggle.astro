@@ -42,9 +42,37 @@ const { id, section, base } = Astro.props;
 ---
 
 <div class="basis-scope" id={section} data-part={section}>
-  <input class="vh" type="radio" name={id} id={`${id}-nominal`} data-basis="nominal" checked />
-  <input class="vh" type="radio" name={id} id={`${id}-real`} data-basis="real" />
-  <div class="basis" role="group" aria-label="Dollar basis">
+  {/*
+    The group's name is on each radio, not on a container.
+
+    It was `role="group" aria-label="Dollar basis"` on the `.basis` div below — which holds the two
+    labels and no radios, because the inputs have to be siblings of the panels for the sibling
+    selectors in `app.css` to switch them with no script. So the name applied to a box containing
+    nothing that could be chosen, and the radios themselves announced "Nominal, radio button, 1 of
+    2" with no word about what was being chosen between.
+
+    Naming the inputs directly needs no structural change and so keeps the switch working with
+    JavaScript off, which is the property this component exists to have. The visible label is a
+    suffix of the accessible name, so a reader saying "Nominal" is still naming the control.
+  */}
+  <input
+    class="vh"
+    type="radio"
+    name={id}
+    id={`${id}-nominal`}
+    data-basis="nominal"
+    aria-label="Dollar basis: Nominal"
+    checked
+  />
+  <input
+    class="vh"
+    type="radio"
+    name={id}
+    id={`${id}-real`}
+    data-basis="real"
+    aria-label="Dollar basis: Constant dollars"
+  />
+  <div class="basis">
     <label for={`${id}-nominal`} data-basis="nominal">Nominal</label>
     <label for={`${id}-real`} data-basis="real">Constant dollars</label>
     <span class="n">{base == null ? "no index covers this series" : `FY${base} dollars`}</span>

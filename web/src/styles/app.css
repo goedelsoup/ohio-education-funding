@@ -1230,9 +1230,17 @@ footer.site { border-top: 1px solid var(--border); padding-top: 1.1rem; margin-t
   padding: 0;
   cursor: pointer;
 }
-#district-table thead button[aria-sort]::after { content: " ↕"; opacity: .45; }
-#district-table thead button[aria-sort="ascending"]::after { content: " ↑"; opacity: 1; }
-#district-table thead button[aria-sort="descending"]::after { content: " ↓"; opacity: 1; }
+/*
+ * Which way a column is sorted, and that it can be.
+ *
+ * Selected off the `th` because that is where `aria-sort` now lives — ARIA defines it on the
+ * `columnheader`, and on the button it was inert. The neutral ↕ keys off the button rather than
+ * off the attribute: it was `button[aria-sort]`, and only the sorted column ever carried one, so
+ * the six columns the arrow exists to advertise as sortable were the six that never showed it.
+ */
+#district-table thead button::after { content: " ↕"; opacity: .45; }
+#district-table thead th[aria-sort="ascending"] button::after { content: " ↑"; opacity: 1; }
+#district-table thead th[aria-sort="descending"] button::after { content: " ↓"; opacity: 1; }
 
 /*
  * What a node does not hold, as a block in the position the content would occupy.

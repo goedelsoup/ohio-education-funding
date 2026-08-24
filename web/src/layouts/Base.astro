@@ -258,7 +258,15 @@ const body = nameScrollers(listed).html;
             ))
           }
         </nav>
-        <button id="theme" type="button" class="ghost" aria-label="Switch colour theme">◐</button>
+        {/*
+          Named for the thing it toggles rather than for the act of toggling, because it carries
+          an `aria-pressed` state now and "Switch colour theme, pressed" is not a sentence. The
+          state itself is set by `site.ts`: which theme is in force depends on a stored choice and
+          on the operating system, and the build knows neither.
+        */}
+        <button id="theme" type="button" class="ghost" aria-label="Dark theme" aria-pressed="false"
+          >◐</button
+        >
       </div>
     </header>
 
@@ -290,6 +298,15 @@ const body = nameScrollers(listed).html;
       keys — see `attachValues` in `src/lib/chart.ts`.
     */}
     <div id="said" class="vh" aria-live="polite" aria-atomic="true"></div>
+    {/*
+      That the result was rebuilt, for the three routes that rebuild theirs.
+
+      A second region rather than sharing the one above, because the two have different owners and
+      different rhythms: `#said` is written by an arrow key and cleared when the reader leaves the
+      chart, and this is written once the levers stop moving. One region owned by two callers is
+      one that clears the other's sentence half-read. See `src/lib/status.ts`.
+    */}
+    <div id="changed" class="vh" aria-live="polite" aria-atomic="true"></div>
     <script>
       import "../scripts/site.ts";
     </script>

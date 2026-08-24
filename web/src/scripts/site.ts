@@ -133,11 +133,29 @@ const root = document.documentElement;
 const stored = localStorage.getItem(KEY);
 if (stored === "light" || stored === "dark") root.dataset.theme = stored;
 
-document.querySelector("#theme")?.addEventListener("click", () => {
-  const dark = matchMedia("(prefers-color-scheme: dark)").matches;
-  const current = root.dataset.theme ?? (dark ? "dark" : "light");
-  const next = current === "dark" ? "light" : "dark";
+/**
+ * Which theme is actually in force — the stored choice, or the operating system's.
+ *
+ * The same expression the click handler needed anyway, named because the pressed state below has
+ * to agree with it at load. It cannot be baked: a static build knows neither half.
+ */
+const isDark = (): boolean =>
+  (root.dataset.theme ?? (matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light")) ===
+  "dark";
+
+const toggle = document.querySelector<HTMLButtonElement>("#theme");
+/*
+ * The button carried no state at all: it announced "Switch colour theme, button" whether the page
+ * was light or dark, and activating it announced nothing, so a screen reader reader had no way to
+ * know either what the theme was or that pressing it had done anything. `aria-pressed` answers
+ * both — a toggle button's state change is announced by the screen reader on its own.
+ */
+toggle?.setAttribute("aria-pressed", String(isDark()));
+
+toggle?.addEventListener("click", () => {
+  const next = isDark() ? "light" : "dark";
   root.dataset.theme = next;
+  toggle.setAttribute("aria-pressed", String(next === "dark"));
   // Store the choice even when it agrees with the OS: the reader picked it, and an OS that later
   // changes should not silently overrule them.
   localStorage.setItem(KEY, next);
