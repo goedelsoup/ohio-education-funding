@@ -262,10 +262,20 @@ properties:
     squaring; R.C. 3317.03(B)(21) for the count. This node previously cited R.C. 3317.029, which
     does not exist. [verified — `ohio-laws`]
 
-    The 65/35 blend of economically disadvantaged and directly certified ADM appears in **no**
-    section: it is the department exercising the delegation in R.C. 3317.03(B)(21) to define who
-    is economically disadvantaged. Recorded as departmental rather than statutory, which is a
-    different durability from the rest of the component.
+    The 65/35 blend appears in **no** section of the Revised Code, and the conclusion this node
+    drew from that — "the department exercising the delegation in R.C. 3317.03(B)(21)", recorded
+    as departmental rather than statutory — was wrong and is retracted in the revisions above. It
+    is **uncodified statutory law**: H.B. 96 sets 75/25 for FY2026 and 65/35 for FY2027 in a table
+    of its own, changeable by the next budget and not by the department. [verified — the act,
+    `crates/project/fixtures/enacted-school-funding.txt`]
+
+    The retraction sat beside the retracted sentence for a phase, which is its own failure: a
+    revisions block that corrects a field and leaves the field standing has recorded the finding
+    without applying it.
+
+    What R.C. 3317.03(B)(21) does delegate is narrower and still true — the *definition* of
+    "economically disadvantaged". The act then sets weights on two counts whose definitions it
+    does not control.
   calculator: |
     Not a standalone crate. Reproduced for all 609 districts in
     `crates/project/tests/finances_and_the_guarantee.rs`; carried in `crates/project::panel::Dpia`.

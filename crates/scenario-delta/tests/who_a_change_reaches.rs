@@ -449,69 +449,97 @@ fn the_floor_and_the_guarantee_are_the_same_districts_where_they_bind() {
     assert_eq!(bottom.iter().filter(|r| r.on_guarantee()).count(), 15);
 }
 
-/// **No cut, however deep, pushes a district onto the guarantee — and that is a hole in the
-/// model rather than a fact about Ohio.**
+/// **A phase-in cut cannot push a district onto the guarantee, and that is now a fact about
+/// Ohio rather than a hole in the model.**
 ///
-/// This test was written to exercise [`Standing::PushedOn`] and instead established that the
-/// variant is unreachable. The reason is in the panel: a guarantee baseline is that district's
-/// FY2020 receipt, and the model reveals it *only for districts currently on the guarantee* —
-/// see `DistrictRecord::guarantee_baseline`, which returns `None` otherwise, because the
-/// guarantee is the only thing that discloses the figure.
+/// This test was written to exercise [`Standing::PushedOn`], established that the variant was
+/// unreachable, and recorded the reason as a gap: the panel disclosed a guarantee baseline only
+/// for districts already held at one, so the 315 districts on formula had no modelled floor and
+/// a simulated cut let them fall past it.
 ///
-/// So the 315 districts the formula pays are modelled with **no floor beneath them at all**.
-/// Every one of them has an FY2020 baseline; it simply sits below their current formula amount,
-/// which is why they are on formula. A simulated cut lets them fall past it.
+/// The gap is closed — [`DistrictRecord::guarantee_floor`] reads the published `[H2]` column for
+/// every district — and the finding survives in a different form. A phase-in cut still pushes
+/// nobody on, because R.C. 3317.022 interpolates *from the same FY2020 base the guarantee floors
+/// at*: lowering the percentage walks a district back toward its base and stops there. The
+/// guarantee has less to do at a lower phase-in, not more.
+///
+/// So `PushedOn` is reached by levers that lower computed aid without moving the base, which is
+/// what the second half of this test now pins.
 #[test]
-fn a_cut_lets_formula_districts_fall_through_a_floor_the_model_cannot_see() {
+fn a_phase_in_cut_walks_districts_toward_the_floor_and_never_through_it() {
     let districts = panel();
     for phase_in in [0.5, 0.25, 0.05] {
+        let policy = Policy {
+            phase_in_general: phase_in,
+            phase_in_dpia: phase_in,
+            ..Policy::current_law()
+        };
+        let delta = ScenarioDelta::between(&districts, &Policy::current_law(), &policy);
+        let total = delta.total();
+        assert_eq!(
+            total.reach.pushed_on, 0,
+            "at a {phase_in} phase-in the interpolation holds everyone above the floor"
+        );
+
+        // No district loses more than the distance from its computed amount down to its own
+        // FY2020 base — which is the whole difference from the model this replaces, where the
+        // worst loss was the full `1 - phase_in` fraction of aid.
+        for (record, d) in districts.iter().zip(&delta.deltas) {
+            let floor = record.guarantee_floor();
+            assert!(
+                d.perturbed >= floor - 0.02,
+                "{} fell to {:.2}, below its floor of {floor:.2}",
+                record.name,
+                d.perturbed
+            );
+        }
+    }
+}
+
+/// The variant the phase-in cannot reach, and the lever that can.
+///
+/// A base cost cut lowers the computed amount while the FY2020 base stays where it is, so
+/// districts cross it. 56 at a tenth off, and the count rises with the cut — which is the shape
+/// a floor produces and the flat `1 - scale` loss of the unfloored model never did.
+#[test]
+fn a_base_cost_cut_pushes_formula_districts_onto_the_guarantee() {
+    let districts = panel();
+    let mut counts = Vec::new();
+    for scale in [0.9_f64, 0.75, 0.5] {
         let delta = ScenarioDelta::between(
             &districts,
             &Policy::current_law(),
             &Policy {
-                phase_in_base_cost: phase_in,
-                phase_in_categorical: phase_in,
+                base_cost_scale: scale,
                 ..Policy::current_law()
             },
         );
-        let total = delta.total();
-        assert_eq!(
-            total.reach.pushed_on, 0,
-            "at a {phase_in} phase-in the model still catches nobody"
-        );
-        assert_eq!(
-            total.reach.losers, 315,
-            "every formula district, and only those"
-        );
-        assert_eq!(total.reach.held_throughout, 294);
-
-        // The formula district falls by the full cut. A real one would stop at its FY2020 level.
-        let worst = delta
-            .deltas
-            .iter()
-            .filter(|d| d.standing == Standing::FormulaThroughout)
-            .filter_map(scenario_delta::Delta::percent)
-            .fold(0.0_f64, f64::min);
+        let pushed = delta.total().reach.pushed_on;
         assert!(
-            (worst + (1.0 - phase_in)).abs() < 0.001,
-            "worst formula district lost {worst:.3} at a {phase_in} phase-in"
+            pushed > 0,
+            "a {scale} base cost must push formula districts onto the guarantee"
         );
+        assert_eq!(
+            pushed,
+            delta
+                .deltas
+                .iter()
+                .filter(|d| d.standing == Standing::PushedOn)
+                .count(),
+            "the reach count and the standing must name the same districts"
+        );
+        for (record, d) in districts.iter().zip(&delta.deltas) {
+            assert!(
+                d.perturbed >= record.guarantee_floor() - 0.02,
+                "{} fell through its floor",
+                record.name
+            );
+        }
+        counts.push(pushed);
     }
-
-    // What that costs the reader of a cut scenario: the districts with no modelled floor hold
-    // 46% of Ohio's students, so a simulated cut overstates its own savings by an amount this
-    // corpus cannot bound. `PushedOn` is kept in the enum for that reason — deleting it would
-    // remove the only place the gap is named.
-    let unfloored: f64 = districts
-        .iter()
-        .filter(|r| !r.on_guarantee())
-        .map(|r| r.current_year_adm)
-        .sum();
-    let all: f64 = districts.iter().map(|r| r.current_year_adm).sum();
     assert!(
-        (unfloored / all - 0.461).abs() < 0.005,
-        "unfloored share of ADM {:.3}",
-        unfloored / all
+        counts.windows(2).all(|w| w[1] > w[0]),
+        "a deeper cut must catch more districts: {counts:?}"
     );
 }
 

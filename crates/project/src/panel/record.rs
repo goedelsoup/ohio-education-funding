@@ -202,14 +202,27 @@ impl DistrictRecord {
         self.core_foundation_funding + self.guarantee
     }
 
-    /// The level the guarantee holds this district at, recoverable only when it is on it.
+    /// The level the guarantee holds this district at: `[H2] − [I1]`, the FY2020 funding base
+    /// less the open enrolment clawback.
     ///
-    /// For a district on the guarantee this is its FY2020 receipt — a Bridge formula year Ohio
-    /// froze rather than computed. For a district on formula the baseline is unobservable from
-    /// here, because the guarantee is the only thing that reveals it.
+    /// # It exists for every district, not only the guaranteed ones
+    ///
+    /// This used to be an `Option`, `Some` only where the district was on the guarantee, on the
+    /// reasoning that "the guarantee is the only thing that reveals the baseline". That was
+    /// wrong: `[H2]` is published per district on the same sheet and is populated for **608 of
+    /// 609**, including 314 of the 315 districts the guarantee does not currently pay.
+    ///
+    /// Returning zero for those districts made the floor unable to *newly* bind. Under any
+    /// policy that lowers computed aid — a phase-in below 100% above all — districts drop
+    /// through a floor Ohio would have caught them on, and the panel reported the loss as real.
+    /// The published column was in [`Transition::funding_base`](super::supplements::Transition)
+    /// the whole time.
+    ///
+    /// Under current law this changes nothing: for a district on formula the floor is at or
+    /// below its foundation funding by construction, so the `max` still picks the formula.
     #[must_use]
-    pub fn guarantee_baseline(&self) -> Option<Dollars> {
-        self.on_guarantee().then(|| self.realized_aid())
+    pub fn guarantee_floor(&self) -> Dollars {
+        (self.transition.funding_base - self.transition.open_enrollment_adjustment).max(0.0)
     }
 
     /// Everything in formula aid that is not base cost: the categoricals.
@@ -388,12 +401,53 @@ mod tests {
     }
 
     #[test]
-    fn a_guarantee_baseline_exists_only_for_a_guaranteed_district() {
+    fn the_guarantee_floor_is_published_for_districts_the_guarantee_does_not_pay() {
+        // The assertion this replaces was `guarantee_baseline().is_some() == on_guarantee()`,
+        // which passed because the method derived the floor from the guarantee instead of
+        // reading the column that states it. The column is populated either way.
         let panel = panel();
-        for record in &panel {
-            assert_eq!(record.guarantee_baseline().is_some(), record.on_guarantee());
+        let on_formula: Vec<_> = panel.iter().filter(|r| !r.on_guarantee()).collect();
+        let with_floor = on_formula
+            .iter()
+            .filter(|r| r.guarantee_floor() > 0.0)
+            .count();
+        assert!(
+            with_floor > 300,
+            "{with_floor} of {} formula districts carry a floor",
+            on_formula.len()
+        );
+
+        // And it binds for none of them under current law, which is why reading it costs
+        // nothing here and matters everywhere the formula is dialled down.
+        for record in &on_formula {
+            assert!(
+                record.guarantee_floor() <= record.core_foundation_funding + 0.02,
+                "{}: floor {:.2} above foundation funding {:.2}",
+                record.name,
+                record.guarantee_floor(),
+                record.core_foundation_funding
+            );
         }
-        assert!(panel.iter().filter(|r| r.on_guarantee()).count() > 250);
+    }
+
+    #[test]
+    fn the_guarantee_floor_is_what_a_guaranteed_district_actually_receives() {
+        let panel = panel();
+        let mut guaranteed = 0;
+        for record in &panel {
+            if !record.on_guarantee() {
+                continue;
+            }
+            guaranteed += 1;
+            assert!(
+                (record.guarantee_floor() - record.realized_aid()).abs() < 0.02,
+                "{}: floor {:.2} vs receipt {:.2}",
+                record.name,
+                record.guarantee_floor(),
+                record.realized_aid()
+            );
+        }
+        assert!(guaranteed > 250);
     }
 
     #[test]

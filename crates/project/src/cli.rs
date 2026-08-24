@@ -36,7 +36,7 @@ pub const FLAGS: [(&str, bool); 13] = [
     ("--base-cost", true),
     ("--min-share", true),
     ("--phase-in", true),
-    ("--phase-in-cat", true),
+    ("--phase-in-dpia", true),
     ("--through", true),
     ("--method", true),
     ("--districts", true),

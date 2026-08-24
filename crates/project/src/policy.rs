@@ -122,15 +122,34 @@ pub struct Policy {
     /// Plan was enacted with 5%; the department's FY2027 model states **10%**, and 138 of 609
     /// districts sit exactly on it.
     pub minimum_state_share: f64,
-    /// Fraction of computed base cost aid actually appropriated.
-    pub phase_in_base_cost: f64,
-    /// Fraction of computed categorical aid actually appropriated.
+    /// How far the district is moved from its FY2020 funding base toward the computed amount,
+    /// for every core foundation component except Disadvantaged Pupil Impact Aid.
     ///
-    /// Separate from base cost on purpose. In FY2022 the headline phase-in was 16.67% and
-    /// Disadvantaged Pupil Impact Aid was phased in at **0%** — so a district's realized
-    /// phase-in depended on its funding mix, and the districts DPIA exists to serve got less
-    /// than the headline. One dial cannot express that; two can.
-    pub phase_in_categorical: f64,
+    /// # It is not a fraction of computed aid
+    ///
+    /// R.C. 3317.022 pays `funding base + [(computed − funding base) × phase-in %]`. The
+    /// percentage is an **interpolation weight between the FY2020 base and the computed
+    /// amount**, not a multiplier on the computed amount. The distinction is invisible at 100%,
+    /// which is why FY2027 — the only year this panel carries — cannot reveal it, and it is
+    /// most of the answer at any lower value: a district whose computed amount is *below* its
+    /// FY2020 base is moved **down** toward the formula as the percentage rises, not up.
+    ///
+    /// Modelling it as `computed × pct` understated statewide aid by $2.57bn at 50%, because it
+    /// sends every district toward zero rather than toward the level it was already receiving.
+    pub phase_in_general: f64,
+    /// The same interpolation for Disadvantaged Pupil Impact Aid, against its own base.
+    ///
+    /// Separate because the statute separates it: R.C. 3317.022 writes two bracketed terms, one
+    /// for divisions (A)(1), (2), (3), (5), (6), (7) and (8) and one for (A)(4), each against
+    /// its own slice of the funding base — `[H2] − [H3]` and `[H3]`. R.C. 3317.02(N)(2) anchors
+    /// the DPIA slice to the district's **FY2019** DPIA payment rather than to FY2020.
+    ///
+    /// FY2022 is the year that makes the shape matter: the general percentage was 16.67% and
+    /// this one was **0%**. Under the interpolation, 0% does not mean *paid nothing* — it means
+    /// paid at 100% of the FY2019 base. The corpus read it the other way round for several
+    /// phases and concluded that high-poverty districts got less than the headline; they got
+    /// their whole prior amount while everyone else moved a sixth of the way to a new one.
+    pub phase_in_dpia: f64,
 }
 
 impl Policy {
@@ -141,8 +160,8 @@ impl Policy {
             guarantee: GuaranteeRule::AsEnacted,
             base_cost_scale: 1.0,
             minimum_state_share: MINIMUM_STATE_SHARE,
-            phase_in_base_cost: 1.0,
-            phase_in_categorical: 1.0,
+            phase_in_general: 1.0,
+            phase_in_dpia: 1.0,
         }
     }
 
@@ -265,7 +284,7 @@ pub fn apply(record: &DistrictRecord, policy: &Policy, current_year_adm: f64) ->
         floor_per_pupil * current_year_adm
     } else {
         record.base_cost_state_share * adm_ratio + increase_per_pupil * current_year_adm
-    } * policy.phase_in_base_cost;
+    };
 
     // Categoricals, with the base-cost-denominated ones moved by the same factor as base cost.
     //
@@ -279,12 +298,32 @@ pub fn apply(record: &DistrictRecord, policy: &Policy, current_year_adm: f64) ->
     // `.yidam/decisions/scenario-models-ohio.yml`. The lever's meaning is now "the statewide
     // average base cost per pupil moved by this factor", and everything priced in it follows.
     let denominated = record.base_cost_denominated_categoricals();
-    let categoricals =
-        (record.categorical_funding() - denominated) + denominated * policy.base_cost_scale;
+    let categoricals = ((record.categorical_funding() - denominated)
+        + denominated * policy.base_cost_scale)
+        * adm_ratio;
 
-    let formula_aid = base_cost_aid + categoricals * policy.phase_in_categorical * adm_ratio;
+    // The phase-in, as R.C. 3317.022 writes it:
+    //
+    //     funding base
+    //       + [(general components − general funding base) × general phase-in %]
+    //       + [(DPIA − DPIA funding base)                  × DPIA phase-in %]
+    //
+    // Two terms against two slices of one published base, not two multipliers on computed aid.
+    // `[H2] funding_base` is the whole FY2020 amount and `[H3] funding_base_econ_dis` is its
+    // DPIA part, so the general slice is the difference — the statute builds them the same way
+    // round, subtracting the FY2019 DPIA payment from FY2020 funding at R.C. 3317.02(N)(1)(b)(i).
+    //
+    // At 100% on both dials the bases cancel and this is the department's own number to the
+    // cent for all 609 districts, which is what keeps `current_law` the identity.
+    let dpia_computed = record.categoricals.dpia * adm_ratio;
+    let general_computed = base_cost_aid + (categoricals - dpia_computed);
+    let dpia_base = record.transition.funding_base_econ_dis;
+    let general_base = record.transition.funding_base - dpia_base;
 
-    let baseline = record.guarantee_baseline().unwrap_or(0.0);
+    let formula_aid = (general_base + policy.phase_in_general * (general_computed - general_base))
+        + (dpia_base + policy.phase_in_dpia * (dpia_computed - dpia_base));
+
+    let baseline = record.guarantee_floor();
     let held_at = match policy.guarantee {
         GuaranteeRule::AsEnacted => baseline,
         GuaranteeRule::Rebased { factor } => baseline * factor,
@@ -579,40 +618,157 @@ mod tests {
     #[test]
     fn the_two_phase_in_dials_move_different_money() {
         let record = on_formula();
-        let base_only = apply(
+        let general_only = apply(
             &record,
             &Policy {
-                phase_in_base_cost: 0.5,
+                phase_in_general: 0.5,
                 guarantee: GuaranteeRule::Removed,
                 ..Policy::current_law()
             },
             record.current_year_adm,
         );
-        let categorical_only = apply(
+        let dpia_only = apply(
             &record,
             &Policy {
-                phase_in_categorical: 0.5,
+                phase_in_dpia: 0.5,
                 guarantee: GuaranteeRule::Removed,
                 ..Policy::current_law()
             },
             record.current_year_adm,
         );
         assert!(
-            (base_only.formula_aid - categorical_only.formula_aid).abs() > 1.0,
-            "halving base cost and halving categoricals cannot cost the same"
+            (general_only.formula_aid - dpia_only.formula_aid).abs() > 1.0,
+            "halving the general phase-in and halving DPIA's cannot cost the same"
         );
-        // Together they halve everything.
-        let both = apply(
-            &record,
-            &Policy {
-                phase_in_base_cost: 0.5,
-                phase_in_categorical: 0.5,
-                guarantee: GuaranteeRule::Removed,
-                ..Policy::current_law()
-            },
-            record.current_year_adm,
+    }
+
+    #[test]
+    fn a_phase_in_interpolates_between_the_funding_base_and_the_computed_amount() {
+        // The property the old model got wrong. At 0% a district receives its FY2020 base, not
+        // nothing; at 100% it receives the computed amount; halfway is halfway between them.
+        // `computed × pct` satisfies only the last of those, and only where the base is zero.
+        let panel = panel();
+        let at = |record: &DistrictRecord, pct: f64| {
+            apply(
+                record,
+                &Policy {
+                    phase_in_general: pct,
+                    phase_in_dpia: pct,
+                    guarantee: GuaranteeRule::Removed,
+                    ..Policy::current_law()
+                },
+                record.current_year_adm,
+            )
+            .formula_aid
+        };
+        let mut below_base = 0;
+        for record in &panel {
+            let base = record.transition.funding_base;
+            let computed = record.core_foundation_funding;
+            assert!(
+                (at(record, 0.0) - base).abs() < 0.02,
+                "{}: 0% gave {:.2}, not the base {base:.2}",
+                record.name,
+                at(record, 0.0)
+            );
+            assert!(
+                (at(record, 1.0) - computed).abs() < 0.02,
+                "{}: 100% gave {:.2}, not the computed {computed:.2}",
+                record.name,
+                at(record, 1.0)
+            );
+            assert!(
+                (at(record, 0.5) - (base + computed) / 2.0).abs() < 0.02,
+                "{}: 50% is not halfway",
+                record.name
+            );
+            // And for a district whose computed amount is below its base, lowering the phase-in
+            // *raises* aid — the direction the multiplier model could never produce.
+            if computed < base - 1.0 {
+                below_base += 1;
+                assert!(at(record, 0.5) > at(record, 1.0));
+            }
+        }
+        assert!(
+            below_base > 250,
+            "{below_base} districts compute below their FY2020 base"
         );
-        assert!((both.formula_aid - record.core_foundation_funding / 2.0).abs() < 0.02);
+    }
+
+    #[test]
+    fn the_phase_in_is_itself_a_hold_harmless_and_the_guarantee_only_pays_the_residual() {
+        // The behaviour the multiplier model inverted, and the reason it cost $2.57bn at 50%.
+        //
+        // Lowering the phase-in does not push districts through the floor — it walks every
+        // district *back toward* its FY2020 base, which is where the floor is. So the guarantee
+        // has less to do, not more: 294 districts at 100%, 293 at 50%, and none at all at 0%,
+        // where the interpolation has already delivered the base to everyone and the only
+        // residual left is the open enrolment clawback.
+        //
+        // Under the old model the count could never rise above the 294 already on it — a
+        // district on formula carried a baseline of zero — so the two errors pointed the same
+        // way and the total fell to $4.21bn instead of holding at $6.84bn.
+        let panel = panel();
+        let at = |pct: f64| {
+            let outcomes = apply_all(
+                &panel,
+                &Policy {
+                    phase_in_general: pct,
+                    phase_in_dpia: pct,
+                    ..Policy::current_law()
+                },
+            );
+            let on = outcomes.iter().filter(|o| o.on_guarantee).count();
+            let total: Dollars = outcomes.iter().map(|o| o.realized_aid).sum();
+            (on, total, outcomes)
+        };
+
+        let (on_full, total_full, _) = at(1.0);
+        let (on_half, total_half, half) = at(0.5);
+        let (on_none, total_none, _) = at(0.0);
+
+        assert_eq!(on_full, 294);
+        assert!(
+            on_half <= on_full,
+            "a lower phase-in cannot put more districts on the guarantee: {on_half} vs {on_full}"
+        );
+
+        // At 0% the interpolation has delivered the base to everyone, so the guarantee has
+        // nothing left to top up — with exactly one exception, and it is a real one. Richmond
+        // Heights Local's funding base is **negative**, -$40,179.23: R.C. 3317.02(N)(1)(b)
+        // subtracts FY2020 community school, STEM and scholarship deductions from FY2020
+        // funding, and for this district they came to more than the funding did. The floor's
+        // `max(0.0)` is what catches it, and that clamp is the whole of the difference.
+        assert_eq!(on_none, 1, "only the district with a negative base");
+        let negative: Vec<_> = panel
+            .iter()
+            .filter(|r| r.transition.funding_base < 0.0)
+            .map(|r| r.name.as_str())
+            .collect();
+        assert_eq!(negative, ["Richmond Heights Local"]);
+
+        // Aid falls, but only by the distance between the FY2020 base and the computed amount —
+        // never toward zero.
+        // Floored at zero for the one negative base, which is the only reason this is not a
+        // bare sum of the column.
+        let base_total: Dollars = panel
+            .iter()
+            .map(|r| r.transition.funding_base.max(0.0))
+            .sum();
+        assert!(total_half < total_full && total_none < total_half);
+        assert!(
+            (total_none - base_total).abs() < 1.0,
+            "0% must pay exactly the funding base: {total_none:.0} vs {base_total:.0}"
+        );
+
+        // And no district is ever below the floor its own base sets.
+        for (record, outcome) in panel.iter().zip(&half) {
+            assert!(
+                outcome.realized_aid >= record.guarantee_floor() - 0.02,
+                "{} fell through its floor",
+                record.name
+            );
+        }
     }
 
     #[test]

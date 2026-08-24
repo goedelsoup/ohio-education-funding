@@ -57,21 +57,21 @@ const SLIDERS = [
   },
   {
     id: "lv-phase",
-    label: "Phase-in, base cost",
+    label: "Phase-in, general",
     min: 0,
     max: 1,
     step: 0.05,
     value: 1,
-    note: "Fraction of computed base cost aid appropriated.",
+    note: "How far from the FY2020 funding base toward the computed amount. At 0% a district receives its FY2020 base, not nothing.",
   },
   {
-    id: "lv-phase-cat",
-    label: "Phase-in, categoricals",
+    id: "lv-phase-dpia",
+    label: "Phase-in, DPIA",
     min: 0,
     max: 1,
     step: 0.05,
     value: 1,
-    note: "Separate because Ohio's were: DPIA was phased in at 0% while the headline was 16.67%.",
+    note: "Separate because R.C. 3317.022 writes two terms: in FY2022 the general percentage was 16.67% while DPIA's was 0%, which paid DPIA at its whole FY2019 amount.",
   },
 ];
 ---

@@ -59,8 +59,9 @@ properties:
     FY2022  $7,349.22  statewide average, FY2018 cost inputs      [verified, department]
     FY2023  $7,352.00  statewide average, FY2018 cost inputs      [inference, Fordham]
     FY2025  $8,240.00  statewide average, FY2022 cost inputs      [inference, Fordham]
-    FY2026  not established                                        [open]
-    FY2027  $8,241.61  the calculator's stated multiplier          [verified, department model]
+    FY2026  $8,242     the FY2024 statewide average, maintained  [verified — LSC greenbook]
+    FY2027  $8,242     the same FY2024 amount, maintained again  [verified — LSC greenbook]
+            $8,241.61  the calculator's stated multiplier          [verified, department model]
             $8,257.55  aggregate / ADM, which is $15.94 higher     [verified, computed]
 
     FY2027 detail from the department's own FY27 calculator [verified]:
@@ -73,7 +74,20 @@ properties:
 
     **Those last two are different quantities and the node used to conflate them.** Dividing the
     aggregate by the ADM gives **$8,257.55**; the figure the calculator carries and multiplies by
-    is **$8,241.61**, and the gap is **$15.94 per pupil**. $8,241.61 is the load-bearing one — it
+    is **$8,241.61**, and the gap is **$15.94 per pupil**.
+
+    **And the gap has an explanation, which the corpus recorded as a mystery.** The multiplier is
+    not an FY2027 quantity at all. H.B. 96 holds the categorical multiplicands at their **FY2024**
+    values: "The budget maintains the use of the FY 2024 statewide average amounts ($8,242 and
+    $9,856, respectively) in FY 2026 and FY 2027." [verified — LSC greenbook] So $8,241.61 is a
+    FY2024 average carried forward by statute, while $8,257.55 is what the FY2027 base cost model
+    actually computes — two different years, which is why neither is recoverable from the other
+    and why the difference is small but not zero.
+
+    Every place this corpus labels $8,241.61 and its career-technical companion $9,855.62 as
+    "FY2027" is naming the year they are *used* rather than the year they are *from*. The figures
+    are right; the vintage is a third input year beside FY2022 and the phase-in, and the act
+    freezes all three. $8,241.61 is the load-bearing one — it
     is what the English learner and special education weights multiply
     ([`project::panel::categoricals::AVERAGE_BASE_COST_PER_PUPIL`](../../../crates/project/src/panel/categoricals.rs))
     and what the open-enrolment clawback charges per FTE — so it is a *stated input* rather than a

@@ -23,8 +23,9 @@ LEVERS (default: current law, which reproduces the department's own FY2027 model
     --guarantee <rule>     as-enacted | removed | rebase:<factor> | phase-out:<remaining>
     --base-cost <scale>    multiplier on aggregate base cost, e.g. 1.031 for a FY2022 refresh
     --min-share <fraction> minimum state share; the FY2027 model uses 0.10
-    --phase-in <fraction>  applied to base cost aid
-    --phase-in-cat <f>     applied to categorical aid, separately — see below
+    --phase-in <fraction>  general phase-in: how far from the FY2020 funding base toward
+                           the computed amount, for everything except DPIA
+    --phase-in-dpia <f>    the same for DPIA, against its own FY2019 base
 
 DRAFTS
     --draft <slug>         price a draft-legislation node's provisions; --drafts lists them
@@ -36,9 +37,11 @@ OPTIONS
     --districts <n>        list the n districts most affected
     --json                 machine-readable output
 
-The two phase-in dials are separate because Ohio's were: in FY2022 the headline phase-in was
-16.67% and Disadvantaged Pupil Impact Aid was phased in at 0%, so a district's realized
-percentage depended on its funding mix.
+A phase-in percentage is an interpolation weight, not a multiplier: R.C. 3317.022 pays the
+funding base plus that fraction of the distance to the computed amount. At 0% a district
+receives its FY2020 base, not nothing. The two dials are separate because the statute writes
+two terms — in FY2022 the general percentage was 16.67% while DPIA's was 0%, which paid DPIA
+at its whole FY2019 amount.
 
 A draft's cost is always printed beside the count of its provisions this model cannot price,
 because the provisions that bind to levers are exactly the ones that produce a number — so the
@@ -111,7 +114,7 @@ fn execute(args: &[String]) -> Result<(), String> {
             "--base-cost",
             "--min-share",
             "--phase-in",
-            "--phase-in-cat",
+            "--phase-in-dpia",
         ];
         if let Some(flag) = LEVERS.into_iter().find(|f| args.iter().any(|a| a == f)) {
             return Err(format!(
@@ -128,8 +131,8 @@ fn execute(args: &[String]) -> Result<(), String> {
         },
         base_cost_scale: number(args, "--base-cost", 1.0)?,
         minimum_state_share: number(args, "--min-share", MINIMUM_STATE_SHARE)?,
-        phase_in_base_cost: number(args, "--phase-in", 1.0)?,
-        phase_in_categorical: number(args, "--phase-in-cat", 1.0)?,
+        phase_in_general: number(args, "--phase-in", 1.0)?,
+        phase_in_dpia: number(args, "--phase-in-dpia", 1.0)?,
     };
     let through = match value(args, "--through") {
         Some(raw) => {

@@ -37,8 +37,8 @@ export interface Levers {
   guaranteeArgument: number;
   baseCostScale: number;
   minimumStateShare: number;
-  phaseInBaseCost: number;
-  phaseInCategorical: number;
+  phaseInGeneral: number;
+  phaseInDpia: number;
   /**
    * The fiscal year to project enrollment to. Equal to the base year means "do not project".
    *
@@ -58,8 +58,8 @@ export function defaultLevers(
     guaranteeArgument: 0.5,
     baseCostScale: 1,
     minimumStateShare: modelMinimumStateShare,
-    phaseInBaseCost: 1,
-    phaseInCategorical: 1,
+    phaseInGeneral: 1,
+    phaseInDpia: 1,
     horizon: baseYear + DEFAULT_HORIZON_YEARS,
   };
 }
@@ -75,8 +75,8 @@ export function toPolicy(levers: Levers): Policy {
           : { kind: levers.guarantee },
     baseCostScale: levers.baseCostScale,
     minimumStateShare: levers.minimumStateShare,
-    phaseInBaseCost: levers.phaseInBaseCost,
-    phaseInCategorical: levers.phaseInCategorical,
+    phaseInGeneral: levers.phaseInGeneral,
+    phaseInDpia: levers.phaseInDpia,
   };
 }
 
@@ -86,8 +86,8 @@ function isCurrentLaw(levers: Levers, model: number): boolean {
     levers.guarantee === base.guarantee &&
     levers.baseCostScale === base.baseCostScale &&
     levers.minimumStateShare === base.minimumStateShare &&
-    levers.phaseInBaseCost === base.phaseInBaseCost &&
-    levers.phaseInCategorical === base.phaseInCategorical
+    levers.phaseInGeneral === base.phaseInGeneral &&
+    levers.phaseInDpia === base.phaseInDpia
   );
 }
 
@@ -530,10 +530,10 @@ export function draftLevers(draft: Draft, model: number, baseYear: number): Leve
         levers.minimumStateShare = Number(provision.proposed);
         break;
       case "phase-in":
-        levers.phaseInBaseCost = Number(provision.proposed);
+        levers.phaseInGeneral = Number(provision.proposed);
         break;
       case "phase-in-cat":
-        levers.phaseInCategorical = Number(provision.proposed);
+        levers.phaseInDpia = Number(provision.proposed);
         break;
       default:
         // An unpriced provision. It sets no lever, which is exactly why it has to be shown
@@ -557,8 +557,8 @@ export function matchesDraft(levers: Levers, draft: Draft, model: number, baseYe
     levers.guaranteeArgument === of.guaranteeArgument &&
     levers.baseCostScale === of.baseCostScale &&
     levers.minimumStateShare === of.minimumStateShare &&
-    levers.phaseInBaseCost === of.phaseInBaseCost &&
-    levers.phaseInCategorical === of.phaseInCategorical
+    levers.phaseInGeneral === of.phaseInGeneral &&
+    levers.phaseInDpia === of.phaseInDpia
   );
 }
 

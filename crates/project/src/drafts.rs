@@ -77,10 +77,11 @@ pub enum Lever {
     BaseCostScale(f64),
     /// The minimum state share of base cost.
     MinimumStateShare(f64),
-    /// Appropriated fraction of base cost aid.
-    PhaseInBaseCost(f64),
-    /// Appropriated fraction of categorical aid.
-    PhaseInCategorical(f64),
+    /// How far the district moves from its FY2020 funding base toward the computed
+    /// amount, for every core foundation component except DPIA.
+    PhaseInGeneral(f64),
+    /// The same interpolation for DPIA, against its own FY2019 base.
+    PhaseInDpia(f64),
 }
 
 impl Lever {
@@ -99,11 +100,11 @@ impl Lever {
             "guarantee" => Ok(Self::Guarantee(GuaranteeRule::parse(proposed)?)),
             "base-cost" => Ok(Self::BaseCostScale(number()?)),
             "min-share" => Ok(Self::MinimumStateShare(number()?)),
-            "phase-in" => Ok(Self::PhaseInBaseCost(number()?)),
-            "phase-in-cat" => Ok(Self::PhaseInCategorical(number()?)),
+            "phase-in" => Ok(Self::PhaseInGeneral(number()?)),
+            "phase-in-dpia" => Ok(Self::PhaseInDpia(number()?)),
             other => Err(format!(
                 "unknown lever {other:?}; the five are guarantee, base-cost, min-share, \
-                 phase-in, phase-in-cat"
+                 phase-in, phase-in-dpia"
             )),
         }
     }
@@ -120,8 +121,8 @@ impl Lever {
             Self::Guarantee(_) => "guarantee",
             Self::BaseCostScale(_) => "base-cost",
             Self::MinimumStateShare(_) => "min-share",
-            Self::PhaseInBaseCost(_) => "phase-in",
-            Self::PhaseInCategorical(_) => "phase-in-cat",
+            Self::PhaseInGeneral(_) => "phase-in",
+            Self::PhaseInDpia(_) => "phase-in-dpia",
         }
     }
 
@@ -141,12 +142,12 @@ impl Lever {
                 minimum_state_share: share,
                 ..policy
             },
-            Self::PhaseInBaseCost(fraction) => Policy {
-                phase_in_base_cost: fraction,
+            Self::PhaseInGeneral(fraction) => Policy {
+                phase_in_general: fraction,
                 ..policy
             },
-            Self::PhaseInCategorical(fraction) => Policy {
-                phase_in_categorical: fraction,
+            Self::PhaseInDpia(fraction) => Policy {
+                phase_in_dpia: fraction,
                 ..policy
             },
         }

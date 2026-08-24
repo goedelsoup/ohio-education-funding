@@ -686,6 +686,25 @@ pub struct District {
     /// *which* programs count is decided once, in `project::panel`, and the two implementations
     /// of `apply` cannot disagree about it.
     pub base_cost_denominated_categoricals: Dollars,
+    /// Disadvantaged Pupil Impact Aid alone, because the phase-in dials it separately.
+    ///
+    /// R.C. 3317.022 writes two phase-in terms, one for DPIA and one for everything else. The
+    /// browser needs the split to mirror `project::policy::apply`, and the full `dpia` block is
+    /// not in the slim panel.
+    pub dpia_funding: Dollars,
+    /// `[H2] − [H3]` — the general slice of the FY2020 funding base.
+    ///
+    /// The origin the general phase-in interpolates *from*. Not a multiplier's worth of nothing:
+    /// at a 0% phase-in this is what the district receives.
+    pub general_funding_base: Dollars,
+    /// `[H3]` — the DPIA slice, anchored to the district's FY2019 DPIA payment.
+    pub dpia_funding_base: Dollars,
+    /// `[H2] − [I1]`, floored at zero: the level the guarantee holds the district at.
+    ///
+    /// Emitted for **every** district rather than only the guaranteed ones. The browser used to
+    /// derive it as `on_guarantee ? realized : 0`, which gave the 315 formula districts no floor
+    /// and let a simulated cut push them through one Ohio would have caught them on.
+    pub guarantee_floor: Dollars,
     /// Special education's six weighted categories: ADM then aid, Category 1 through 6.
     ///
     /// The weights span a factor of sixteen and the money runs against them — Category 6 is 15%

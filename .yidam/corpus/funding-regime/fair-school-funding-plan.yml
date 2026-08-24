@@ -26,16 +26,28 @@ description: |
   foundation payment, which removes the mechanism at the center of a decade of district
   revenue-loss arguments. [verified]
 
-  The unresolved question is whether it is ever run as designed — and the answer is now partly
-  in. The phase-in reached 16.67% in FY2022, 33.33% in FY2023, 50% in FY2024, 66.67% in FY2025,
-  and is set at 83.33% in FY2026 and 100% in FY2027. [verified for FY2022; inference
-  thereafter] On the phase-in alone, the plan will have been fully implemented on schedule.
+  The unresolved question is whether it is ever run as designed — and the answer is now in. The
+  phase-in reached 16.67% in FY2022, 33.33% in FY2023, 50% in FY2024, 66.67% in FY2025, and is
+  set at 83.33% in FY2026 and 100% in FY2027. [verified — the LSC greenbook prints the series as
+  Table 1 and the H.B. 96 final analysis states the last two] On the phase-in alone, the plan
+  will have been fully implemented on schedule.
+
+  The percentage is not the fraction of the computed amount appropriated: R.C. 3317.022 pays the
+  **FY2020 funding base plus that fraction of the distance** to the computed amount, so the
+  schedule is a hold-harmless retired in sixths rather than six steps up from nothing. [verified]
+  See [`fsfp-phase-in-percentage`](../parameter/fsfp-phase-in-percentage.yml).
 
   **And a third fact undercuts both.** In FY2027, the terminal year, **294 of 609 districts —
-  48.3%, holding 54.1% of Ohio's students — are funded by the temporary transitional aid
+  48.3%, holding 54.1% of base cost enrolled ADM — are funded by the temporary transitional aid
   guarantee rather than by the formula at all.** [verified] The guarantee is a hold-harmless
-  carried forward from what districts received before, and it totals $878,974,300.
+  carried forward from what districts received before, and across those 609 it totals
+  **$878,954,627**. [verified]
 findings: |
+  The department's own `Summary_SFPR` gives the guarantee as $878,974,300 over the 611 rows that
+  sheet holds, against $878,954,627 across the committed 609. The $19,673 between them is two
+  districts the extract does not carry, and pairing the workbook total with a 609-district count
+  was a mismatch that survived because both numbers are right about something. [open — which two]
+
   The cost inputs tell a different story. Base cost was priced from FY2018 salaries for the
   first two years, refreshed to FY2022 by [H.B. 33](../legislation/hb-33-2023.yml), and held at
   FY2022 by [H.B. 96](../legislation/hb-96-2025.yml) through FY2027. [verified — the
@@ -43,6 +55,12 @@ findings: |
   year the formula reaches 100% of its computed amount, that amount is priced from data five
   years old. Both statements — fully phased in, and funded below its own costing — are true,
   and they are two dials rather than one.
+
+  And there is a third frozen input beside those two. The categorical multiplicands — the
+  statewide average base cost per pupil and its career-technical companion — are held at their
+  **FY2024** values of $8,242 and $9,856 in both FY2026 and FY2027, so special education, English
+  learners and career-technical are priced off a year that is neither the salary vintage nor the
+  year being funded. [verified — LSC greenbook] Three dials, not two.
 
   So the plan reaches 100% phase-in of a computed amount that nearly half of districts do not
   receive, priced from inputs five years stale. A regime designed to fund every district at its
@@ -60,7 +78,10 @@ properties:
     resident income determines the district share; the state pays the remainder. Categorical
     weights for special education, economic disadvantage, English learners, gifted, and
     career-technical sit on top. Community and STEM school students are funded directly rather
-    than deducted. The computed amount is appropriated at a phase-in percentage.
+    than deducted. The district is then paid its FY2020 funding base plus the phase-in
+    percentage of the distance from that base to the computed amount — two such terms, one for
+    DPIA against its own FY2019 base and one for everything else — and the temporary transitional
+    aid guarantee floors the result at the same FY2020 base.
   status: partially-implemented
 links:
   - target: ../funding-regime.ont.yml

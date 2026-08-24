@@ -50,8 +50,8 @@ export function toPolicy(shape: PolicyShape): Policy {
     guarantee,
     baseCostScale: shape.base_cost_scale,
     minimumStateShare: shape.minimum_state_share,
-    phaseInBaseCost: shape.phase_in_base_cost,
-    phaseInCategorical: shape.phase_in_categorical,
+    phaseInGeneral: shape.phase_in_general,
+    phaseInDpia: shape.phase_in_dpia,
   };
 }
 

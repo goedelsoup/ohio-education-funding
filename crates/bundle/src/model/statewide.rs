@@ -119,9 +119,9 @@ pub struct PolicyShape {
     /// Minimum state share of base cost.
     pub minimum_state_share: f64,
     /// Appropriated fraction of base cost aid.
-    pub phase_in_base_cost: f64,
+    pub phase_in_general: f64,
     /// Appropriated fraction of categorical aid.
-    pub phase_in_categorical: f64,
+    pub phase_in_dpia: f64,
 }
 
 /// One clause of a draft bill, as the site needs it.

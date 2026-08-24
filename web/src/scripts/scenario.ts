@@ -96,8 +96,8 @@ function fromQuery(): Partial<Levers> {
     ["arg", "guaranteeArgument"],
     ["base", "baseCostScale"],
     ["min", "minimumStateShare"],
-    ["pb", "phaseInBaseCost"],
-    ["pc", "phaseInCategorical"],
+    ["pb", "phaseInGeneral"],
+    ["pc", "phaseInDpia"],
     ["h", "horizon"],
   ] as const) {
     const raw = params.get(key);
@@ -117,8 +117,8 @@ function toQuery(): void {
     arg: String(l.guaranteeArgument),
     base: String(l.baseCostScale),
     min: String(l.minimumStateShare),
-    pb: String(l.phaseInBaseCost),
-    pc: String(l.phaseInCategorical),
+    pb: String(l.phaseInGeneral),
+    pc: String(l.phaseInDpia),
     h: String(l.horizon),
   });
   // `draft` survives every lever move. It is not lever state — see `draftSlug` — and dropping it
@@ -136,8 +136,8 @@ function readLevers(fallbackHorizon: number): Levers {
     guaranteeArgument: number("#lv-arg"),
     baseCostScale: number("#lv-base"),
     minimumStateShare: number("#lv-min"),
-    phaseInBaseCost: number("#lv-phase"),
-    phaseInCategorical: number("#lv-phase-cat"),
+    phaseInGeneral: number("#lv-phase"),
+    phaseInDpia: number("#lv-phase-dpia"),
     horizon: $("#lv-horizon") ? number("#lv-horizon") : fallbackHorizon,
   };
 }
@@ -166,8 +166,8 @@ function syncLabels(levers: Levers, baseYear: number): void {
     `${levers.baseCostScale >= 1 ? "+" : "−"}${pct(Math.abs(levers.baseCostScale - 1), 0)}`,
   );
   set("#lv-min-out", pct(levers.minimumStateShare, 0));
-  set("#lv-phase-out", pct(levers.phaseInBaseCost, 0));
-  set("#lv-phase-cat-out", pct(levers.phaseInCategorical, 0));
+  set("#lv-phase-out", pct(levers.phaseInGeneral, 0));
+  set("#lv-phase-dpia-out", pct(levers.phaseInDpia, 0));
   set("#lv-horizon-out", levers.horizon <= baseYear ? "not projected" : `FY${levers.horizon}`);
   // The retained-share slider only means anything for the two rules that take an argument.
   const argument = $<HTMLInputElement>("#lv-arg")?.closest(".lever") as HTMLElement | null;
@@ -359,8 +359,8 @@ function boot(panel: Panel): void {
   put("#lv-arg", initial.guaranteeArgument);
   put("#lv-base", initial.baseCostScale);
   put("#lv-min", initial.minimumStateShare);
-  put("#lv-phase", initial.phaseInBaseCost);
-  put("#lv-phase-cat", initial.phaseInCategorical);
+  put("#lv-phase", initial.phaseInGeneral);
+  put("#lv-phase-dpia", initial.phaseInDpia);
   put("#lv-horizon", initial.horizon);
 
   const fallback = defaultLevers(panel.statewide.minimum_state_share, baseYear).horizon;
@@ -395,8 +395,8 @@ function boot(panel: Panel): void {
     put("#lv-arg", defaults.guaranteeArgument);
     put("#lv-base", defaults.baseCostScale);
     put("#lv-min", defaults.minimumStateShare);
-    put("#lv-phase", defaults.phaseInBaseCost);
-    put("#lv-phase-cat", defaults.phaseInCategorical);
+    put("#lv-phase", defaults.phaseInGeneral);
+    put("#lv-phase-dpia", defaults.phaseInDpia);
     put("#lv-horizon", defaults.horizon);
     update();
   });

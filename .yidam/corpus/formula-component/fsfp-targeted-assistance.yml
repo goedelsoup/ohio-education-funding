@@ -39,10 +39,24 @@ description: |
   its total ADM — a district that was poor and had already lost more than an eighth of its
   pupils to open enrolment and community schools. [verified]
 
-  So the state maintains a test for a distress condition, identifies the districts meeting it,
-  and attaches no money. It is a **live zero rather than an absence**: a future biennium can
-  fund the line without changing anything else. [verified]
+  **The zero is a repeal.** [H.B. 96](../legislation/hb-96-2025.yml) eliminated the payment
+  outright — item 5 of the act's own list of changes to the school financing system. [verified]
+  In FY2025 it paid **$52.5 million to 36 districts**, the same 36 the eligibility column still
+  qualifies. What survives is the column, not the programme.
 findings: |
+  ### The tier was repealed while the condition it answered remained
+
+  The greenbook says who the 36 were and why the tier existed: districts that "might appear
+  relatively wealthier on a per-pupil basis because of changes in how the formula in place since
+  FY 2022 counts students" — mostly lower-wealth urban districts with large shares of resident
+  pupils in another district, a community school, or a nonpublic school on a scholarship.
+  [verified]
+
+  So the supplemental tier was compensating for an artefact of the plan's own pupil count, and
+  H.B. 96 removed the compensation and left the artefact. The eligibility test still runs each
+  year and still names the districts, which means a future biennium could fund the line without
+  changing anything else — a statement about the spreadsheet rather than about the law.
+
   It behaves like an equalisation and not like a categorical: it **falls to exactly zero for
   135 of 609 districts**, which no payment for pupils ever does. Columbus receives none of it.
   [verified]
@@ -140,6 +154,23 @@ figures:
     value: 276708.97
     field: function
     as_written: "median weighted wealth per pupil $276,708.97"
+revisions:
+  - was: |
+      The zeroed line was read as a dormancy: "a **live zero rather than an absence**: a future
+      biennium can fund the line without changing anything else", with the state characterised as
+      maintaining a test and declining to attach money to it.
+    now: |
+      H.B. 96 repealed the payment. The money was taken away, not withheld pending a decision, and
+      the FY2025 programme it ended was $52.5m to 36 districts.
+    found_by: |
+      The act's own list of changes at `crates/project/fixtures/enacted-school-funding.txt`, read
+      after the node's 36 qualifying districts turned out to be the same 36 the LSC greenbook
+      names as the repeal's losers.
+    reach: |
+      The node had the consequence of a provision it had never read, and looked complete: an
+      empty column was described accurately and attributed to nothing. Any zeroed line in the
+      FY2027 model is open to the same error — gifted professional development is the other one
+      H.B. 96 repealed, and it reads zero for the same reason.
 links:
   - target: ../formula-component.ont.yml
     relationship: instance-of

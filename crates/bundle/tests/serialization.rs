@@ -116,6 +116,12 @@ fn sample() -> District {
         // Special education, English learners and career-technical of the above — the part a
         // base cost lever moves along with base cost.
         base_cost_denominated_categoricals: 2_370_119.0,
+        // DPIA alone, and the two slices of the FY2020 funding base the phase-in interpolates
+        // from. Distinguishable values so a transposed pair of bases would not survive.
+        dpia_funding: 1_204_311.0,
+        general_funding_base: 5_100_000.0,
+        dpia_funding_base: 900_000.0,
+        guarantee_floor: 5_950_000.0,
         special_education: SpecialEducation {
             adm: [10.9, 105.2, 6.0, 1.0, 10.8, 7.1],
             aid: [21_000.0, 320_000.0, 44_000.0, 9_800.0, 143_000.0, 138_000.0],
@@ -549,8 +555,8 @@ fn checkpoint() -> Checkpoint {
             guarantee_argument: 0.0,
             base_cost_scale: 1.0,
             minimum_state_share: 0.1,
-            phase_in_base_cost: 1.0,
-            phase_in_categorical: 1.0,
+            phase_in_general: 1.0,
+            phase_in_dpia: 1.0,
         },
         cost: -879_000_000.0,
         realized_aid: 6_402_000_000.0,

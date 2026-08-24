@@ -1,30 +1,53 @@
 class: parameter
 label: FSFP Phase-In Percentage
 summary: >-
-  The fraction of the Fair School Funding Plan's computed formula amount that is actually
-  appropriated. The enacted series runs close to equal sixths, from 16.67% in FY2022 to 100% in
-  FY2027.
+  How far a district is moved from its FY2020 funding base toward the amount the Fair School
+  Funding Plan computes for it — an interpolation weight, not a fraction of computed aid. The
+  enacted series runs close to equal sixths, from 16.67% in FY2022 to 100% in FY2027.
 description: |
-  The fraction of the Fair School Funding Plan's computed formula amount that is actually
-  appropriated. The plan was designed to reach full funding over six years, and each biennial
-  budget since 2021 has set the percentage for its two fiscal years. [verified]
+  How far a district is moved from its FY2020 funding base toward the amount the plan computes
+  for it. The plan was designed to reach full funding over six years, and each biennial budget
+  since 2021 has set the percentage for its two fiscal years. [verified]
+
+  ### It is not a fraction of computed aid, and the difference is most of the mechanism
+
+  R.C. 3317.022 pays
+
+      funding base
+        + [(general components - general funding base) x general phase-in %]
+        + [(DPIA - DPIA funding base)                  x DPIA phase-in %]
+
+  [verified — `crates/project/fixtures/revised-code.txt`, and the same box appears in the LSC
+  greenbook at `crates/project/fixtures/dew-greenbook.txt`] The percentage is the weight on the
+  distance between two amounts, not a multiplier on one of them. At 0% a district receives its
+  **whole FY2020 base**; at 100% it receives the computed amount; in between it is somewhere on
+  the line joining them.
+
+  The origin and the guarantee's floor are the same published column, `[H2]`. See
+  [`guarantee-funding-base`](guarantee-funding-base.yml).
 
   The full enacted series is close to equal sixths, but not exactly:
-  16.67, 33.33, 50, 66.67, 83.33, 100 across FY2022 through FY2027. [verified for FY2022 from
-  the department's own payment report; inference from secondary reporting for FY2026-27]
+  16.67, 33.33, 50, 66.67, 83.33, 100 across FY2022 through FY2027. [verified — the LSC
+  greenbook prints the whole series as Table 1, and the H.B. 96 final analysis states the last
+  two]
 
   Two details matter more than the headline series.
 
-  **The percentage is applied by line, not to the total.** In FY2022 the 16.67% phase-in was
-  applied to base cost, targeted assistance, special education, English learners, gifted, and
-  career-technical — but Disadvantaged Pupil Impact Aid was phased in at **0%**. [verified]
-  A district's realized phase-in therefore depended on its funding mix, and high-poverty
-  districts, whose DPIA share is largest, received a smaller effective fraction than the
-  headline number implies. Any statement that FY2022 was "funded at 16.67%" is wrong for the
-  districts DPIA exists to serve.
+  **There are two percentages, and the statute writes two terms.** In FY2022 the general
+  percentage was 16.67% and Disadvantaged Pupil Impact Aid's was **0%**. [verified] The split is
+  statutory rather than a departmental elaboration: R.C. 3317.022 brackets DPIA separately
+  against its own base, and R.C. 3317.02(N)(2) anchors that base to the district's **FY2019**
+  DPIA payment while the general base is FY2020.
+
+  **A 0% DPIA phase-in paid DPIA in full at its FY2019 amount**, not nothing. In FY2022 the
+  districts DPIA serves kept their entire prior DPIA while every other line moved a sixth of the
+  way toward a new one. Whether that left them ahead or behind depends on how the FY2022 computed
+  DPIA compared with the FY2019 payment, district by district, and the FY2019 figures are not
+  held here. [open]
 
   **Reaching 100% does not mean reaching the plan.** H.B. 96 takes the phase-in to 100% in
-  FY2027 while holding the cost inputs at FY2022 levels. [inference] The percentage and the
+  FY2027 while holding the cost inputs at FY2022 levels. [verified — the LSC greenbook states
+  both] The percentage and the
   input reference year are separate dials, and only one of them is usually named. See
   [`fsfp-base-cost-calculation`](../formula-component/fsfp-base-cost-calculation.yml).
 properties:
@@ -40,34 +63,105 @@ properties:
     FY2022  16.67%  Am. Sub. H.B. 110 (134th GA)  [verified — department payment report]
                     Applied to base cost, targeted assistance, special education, English
                     learners, gifted, and career-technical. DPIA phased in at 0%. [verified]
-    FY2023  33.33%  Am. Sub. H.B. 110 (134th GA)  [inference]
-    FY2024  50%     Am. Sub. H.B. 33  (135th GA)  [inference]
-    FY2025  66.67%  Am. Sub. H.B. 33  (135th GA)  [inference]
-    FY2026  83.33%  Am. Sub. H.B. 96  (136th GA)  [inference]
-    FY2027  100%    Am. Sub. H.B. 96  (136th GA)  [verified — the department's FY27 model
-                    carries "General Phase in %" = 1]
+    FY2023  33.33%  Am. Sub. H.B. 110 (134th GA)  [verified — greenbook Table 1]
+    FY2024  50%     Am. Sub. H.B. 33  (135th GA)  [verified — greenbook Table 1]
+    FY2025  66.67%  Am. Sub. H.B. 33  (135th GA)  [verified — greenbook Table 1]
+    FY2026  83.33%  Am. Sub. H.B. 96  (136th GA)  [verified — greenbook Table 1; H.B. 96
+                    final analysis, "school financing system calculation revisions" item 1]
+    FY2027  100%    Am. Sub. H.B. 96  (136th GA)  [verified — the same two, and the
+                    department's FY27 model carries "General Phase in %" = 1]
 
     FY2022 is verified against the FY2022 School Finance Payment Report line-by-line
-    explanation, which states the applied percentages by line. The remainder are from
-    secondary reporting of the LSC analyses and should be confirmed against each enacted act
-    and its Greenbook before use in a simulation — the LSC asset host could not be read
-    directly during extraction. Whether the DPIA percentage tracks the general percentage in
-    later years is not established and matters. [open]
+    explanation, which states the applied percentages by line. The rest were carried as
+    `[inference]` from secondary reporting for several phases while two committed fixtures
+    stated them outright: `crates/project/fixtures/dew-greenbook.txt` prints the whole series as
+    Table 1, and `crates/project/fixtures/enacted-school-funding.txt` gives the last two in the
+    act's own list of changes.
+
+    **The DPIA percentage tracks the general one from FY2023.** Greenbook Table 1's footnote:
+    "DPIA was phased in at 0% in FY 2022, but matches the phase-in percentage for all other
+    components beginning in FY 2023." [verified] So FY2022 is the only year the two dials differ,
+    and the H.B. 96 final analysis names them together — "the general phase-in and DPIA phase-in
+    percentages" move as one to 83.33% and 100%.
   statutory_basis: |
     Set in each biennial appropriation act rather than in permanent law, which is itself the
     structural fact this node records. [verified] The FY2022 percentages appear in the
     uncodified sections of Am. Sub. H.B. 110 rather than in R.C. 3317.
   simulation_key: fsfp_phase_in_pct
   sensitivity: |
-    Scales state aid for every district on the formula, but has no effect on districts held on
-    a guarantee — for those the phase-in percentage is inert and the guarantee is the
-    operative number. [inference] The share of districts insulated is required context for any
-    statement about what a phase-in change would do. [open]
+    It does not scale aid — it moves each district along the line between its FY2020 funding base
+    and its computed amount, so its effect on a district is the *distance* between those two
+    numbers rather than a fraction of either. A district already near its base barely moves; a
+    district far above it moves a great deal.
 
-    Because the percentage is applied per line, its incidence is not uniform: a district whose
-    funding is weighted toward a component with a lower phase-in receives less than the
-    headline figure. FY2022's 0% DPIA is the extreme case and the one to test the calculator
-    against.
+    That makes the incidence close to the opposite of what a multiplier would produce. Statewide,
+    running the FY2027 panel from 100% down to 0% moves realized aid from $7.28bn to $6.40bn —
+    an $886m range, which is the aggregate gap between computed and base for the districts above
+    theirs. A multiplier reading of the same dial produced $4.21bn at 50% against the $6.84bn
+    the statute gives. [verified — `crates/project/src/policy.rs`]
+
+    Districts already held by the guarantee are insulated, and so are districts whose computed
+    amount is below their base, because the interpolation keeps them there: the phase-in and the
+    guarantee floor at the same FY2020 column. Lowering the percentage therefore *reduces* the
+    number of districts the guarantee has to pay rather than raising it.
+revisions:
+  - was: |
+      The percentage was defined as "the fraction of the Fair School Funding Plan's computed
+      formula amount that is actually appropriated", and the FY2022 DPIA figure was read as a
+      shortfall: high-poverty districts "received a smaller effective fraction than the headline
+      number implies. Any statement that FY2022 was 'funded at 16.67%' is wrong for the districts
+      DPIA exists to serve."
+    now: |
+      It is an interpolation weight, not a multiplier. R.C. 3317.022 pays the FY2020 funding base
+      plus that fraction of the distance to the computed amount, so 0% pays the base in full
+      rather than nothing — and the FY2022 reading inverts: those districts kept their whole
+      FY2019 DPIA while every other line moved a sixth of the way to a new figure.
+    found_by: |
+      Reading R.C. 3317.022 in `crates/project/fixtures/revised-code.txt`, which had been
+      committed for phases, against the calculator this node's series was transcribed from. The
+      LSC greenbook prints the same formula in a box.
+    reach: |
+      The definition had propagated into `crates/project/src/policy.rs`, its TypeScript mirror,
+      the scenario page's two lever notes, and the regime node's `distribution_logic`. All of
+      them modelled the dial as `computed x pct`, which understated statewide aid by $2.57bn at
+      50% — and, because the panel's terminal year is FY2027 at 100%, every identity test passed
+      throughout: the two formulations agree exactly where the fixture sits.
+  - was: |
+      The series carried FY2023 through FY2026 as `[inference]` from secondary reporting, with
+      "whether the DPIA percentage tracks the general percentage in later years is not
+      established and matters" left `[open]`.
+    now: |
+      Every year is `[verified]`, and DPIA has matched the general percentage since FY2023.
+    found_by: |
+      Greenbook Table 1 and its footnote, and the H.B. 96 final analysis — both already committed
+      under `crates/project/fixtures/`.
+    reach: |
+      The same stale tags sat on the regime node and the H.B. 96 node. It is the failure the
+      guarantee node's own revision names: a recorded blocker outliving the fixture that lifted
+      it, because nothing re-reads a source once a claim has been written against it.
+findings: |
+  ### It is a hold-harmless being retired, not a tap being opened
+
+  A district whose computed amount is *below* its FY2020 base — 294 of 609 in FY2027 — is moved
+  **down** toward the formula as the percentage rises. For those districts a lower phase-in is
+  worth *more*. The schedule that runs 16.67% to 100% is the sixfold retirement of a floor, and
+  the plan's own arrival at full funding is what removes the protection.
+
+  ### Lowering it cannot push a district onto the guarantee
+
+  The guarantee floors at the same FY2020 base the phase-in interpolates from, so a lower
+  percentage walks a district back toward the floor and stops there. Running the FY2027 panel
+  down the dial, the guarantee holds **294 districts at 100%, 293 at 50%, and none at 0%** —
+  where the interpolation has already delivered the base to everyone and the only residual left
+  is the open enrolment clawback. [verified —
+  [`crates/project/src/policy.rs`](../../../crates/project/src/policy.rs)]
+
+  ### What the dial is worth
+
+  Statewide, running from 100% to 0% moves realized aid from **$7.28bn to $6.40bn** — an $886m
+  range, which is the aggregate distance between computed and base for the districts above
+  theirs. That is the whole of what the phase-in decides, and it is an eighth of the aid it is
+  usually described as governing. [verified]
 links:
   - target: ../parameter.ont.yml
     relationship: instance-of

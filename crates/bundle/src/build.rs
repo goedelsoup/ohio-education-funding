@@ -160,8 +160,8 @@ fn checkpoint_policies() -> Vec<(&'static str, Policy, PolicyShape)> {
             guarantee_argument: argument,
             base_cost_scale,
             minimum_state_share,
-            phase_in_base_cost: base,
-            phase_in_categorical: categorical,
+            phase_in_general: base,
+            phase_in_dpia: categorical,
         }
     };
     vec![
@@ -222,8 +222,8 @@ fn checkpoint_policies() -> Vec<(&'static str, Policy, PolicyShape)> {
         (
             "phase-in 50% base cost, 0% categorical",
             Policy {
-                phase_in_base_cost: 0.5,
-                phase_in_categorical: 0.0,
+                phase_in_general: 0.5,
+                phase_in_dpia: 0.0,
                 ..Policy::current_law()
             },
             shape("as-enacted", 0.0, 1.0, MINIMUM_STATE_SHARE, 0.5, 0.0),
@@ -616,6 +616,11 @@ fn to_district(record: &DistrictRecord, joins: &Joins<'_>) -> District {
         base_cost_state_share: record.base_cost_state_share,
         categorical_funding: record.categorical_funding(),
         base_cost_denominated_categoricals: record.base_cost_denominated_categoricals(),
+        dpia_funding: record.categoricals.dpia,
+        general_funding_base: record.transition.funding_base
+            - record.transition.funding_base_econ_dis,
+        dpia_funding_base: record.transition.funding_base_econ_dis,
+        guarantee_floor: record.guarantee_floor(),
         special_education: SpecialEducation {
             adm: record.special_education.adm,
             aid: record.special_education.aid,

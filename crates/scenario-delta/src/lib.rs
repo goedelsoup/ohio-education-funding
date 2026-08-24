@@ -80,17 +80,20 @@ pub enum Standing {
     LiftedOff,
     /// On the formula in the baseline and on the guarantee under the policy.
     ///
-    /// **Unreachable with the committed panel, and kept so the reason has somewhere to live.** A
-    /// guarantee baseline is a district's FY2020 receipt, and
-    /// [`DistrictRecord::guarantee_baseline`](project::panel::DistrictRecord::guarantee_baseline)
-    /// can disclose it only for districts *already* on the guarantee — being held there is the
-    /// only thing that reveals the figure. The 315 districts the formula pays therefore have no
-    /// modelled floor at all, though every one of them has a real one sitting below its current
-    /// formula amount.
+    /// **Reachable, and it was not always.** This variant spent several phases documented as
+    /// unreachable, on the reasoning that a guarantee baseline is only disclosed by a district
+    /// already being held at it. That was wrong: `[H2]` is a published column, populated for 608
+    /// of 609 districts, and
+    /// [`DistrictRecord::guarantee_floor`](project::panel::DistrictRecord::guarantee_floor) now
+    /// reads it rather than inferring it. Until then the 315 districts the formula pays were
+    /// modelled with no floor beneath them, and a simulated cut overstated its own savings by
+    /// letting them fall past one Ohio would have caught them on.
     ///
-    /// The consequence runs one way: a simulated **cut** lets those districts fall past a floor
-    /// that would in fact catch them, so it overstates its own savings. They hold 46% of Ohio's
-    /// students. Pinned in `tests/who_a_change_reaches.rs`.
+    /// It is reached by a lever that lowers computed aid without moving the FY2020 base — a base
+    /// cost cut does it for 56 districts at −10%. Notably a *phase-in* cut does not, and that is
+    /// a fact about the statute rather than a residue of the old gap: R.C. 3317.022 interpolates
+    /// from the same base the guarantee floors at, so lowering the percentage walks a district
+    /// toward the floor and never through it. Pinned in `tests/who_a_change_reaches.rs`.
     PushedOn,
 }
 
