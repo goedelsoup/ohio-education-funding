@@ -11,41 +11,108 @@ description: |
 
   It takes the phase-in to **83.33% in FY2026 and 100% in FY2027** — completing, on paper, the
   six-year schedule the plan was designed around — while holding the base cost inputs at
-  **FY2022** levels rather than refreshing them. [inference] The Governor's executive proposal
-  had explicitly frozen base cost at FY2022 levels, and the enacted act carried that forward.
-  [inference]
+  **FY2022** levels rather than refreshing them. [verified — the act's own list of changes opens
+  "Increases the general phase-in and DPIA phase-in percentages from 66.67% in FY 2025 to 83.33%
+  in FY 2026 and 100% in FY 2027", and the LSC greenbook: "The budget retains the use of FY 2022
+  data for the various statewide average salary and spending inputs"] The Governor's executive
+  proposal had explicitly frozen base cost at FY2022 levels, and the enacted act carried that
+  forward. [inference]
 
-  The two dials have to be read apart to read the act at all. A budget that advances
-  the phase-in to 100% while freezing the input year produces a number that is simultaneously
-  describable as full implementation and as a real-terms reduction, and both descriptions are
-  arithmetically correct — they differ in which parameter they hold fixed. Resolving the
-  argument requires the phase-in percentage and the input reference year to be separately
-  addressable values with their own series, which is what
+  Both dials are the *general* and *DPIA* percentages moving together — the two the statute
+  writes separately, and the only year they have differed is FY2022. [verified]
+
+  The precedent for the other choice is recent: [H.B. 33](hb-33-2023.yml) refreshed the inputs
+  from FY2018 to FY2022 two years earlier. [verified] Freezing was a decision against an
+  established practice, not an omission. [inference]
+
+  **What it does besides the two dials.** It also:
+
+  - **Rewrites the DPIA count**, freezing economically disadvantaged ADM at FY2025 and blending it
+    with directly certified ADM 75/25 then 65/35. DPIA *falls* $84.5m then $31.8m. See
+    [`fsfp-disadvantaged-pupil-impact-aid`](../formula-component/fsfp-disadvantaged-pupil-impact-aid.yml).
+  - **Repeals supplemental targeted assistance** ($52.5m to 36 districts in FY2025) and **gifted
+    professional development** ($2.1m).
+  - **Establishes three supplements**: base funding, enrollment growth, and per-pupil performance.
+  - **Raises the minimum transportation state share** 41.67% → 45.83% → 50%, and cuts career
+    awareness funds from $10 a pupil to $3.
+  - **Rewrites the JVSD base cost state share** onto the district method, replacing an aggregate
+    0.5-mill charge-off that did not depend on enrollment at all.
+  - **Changes the income term in local capacity** from residents' total federal adjusted gross
+    income to their **median**.
+  - **Codifies the community school equity supplement**, cutting it $650 → $500 → $400.
+
+  All are in the act's own "school financing system calculation revisions" list. [verified]
+
+findings: |
+  ### The two dials have to be read apart to read the act at all
+
+  A budget that advances the phase-in to 100% while freezing the input year produces a number
+  simultaneously describable as full implementation and as a real-terms reduction, and both
+  descriptions are arithmetically correct — they differ in which parameter they hold fixed.
+  Resolving the argument requires the phase-in percentage and the input reference year to be
+  separately addressable values with their own series, which is what
   [`fsfp-phase-in-percentage`](../parameter/fsfp-phase-in-percentage.yml) and
-  [`fsfp-base-cost-calculation`](../formula-component/fsfp-base-cost-calculation.yml) now are.
+  [`fsfp-base-cost-calculation`](../formula-component/fsfp-base-cost-calculation.yml) are.
 
-  The precedent for the other choice exists and is recent:
-  [H.B. 33](hb-33-2023.yml) refreshed the inputs from FY2018 to FY2022 two years earlier.
-  [verified] So freezing was a decision against an established practice, not an omission.
-  [inference]
+  ### The enacted foundation totals
 
-  **Numbers not yet established.** The enacted foundation appropriation totals, and the
-  identity of the vetoed items affecting education. Figures in circulation must be handled
-  carefully: the House-passed Budget in Brief describes bridge-formula funding of $11.24 billion
-  in FY2026 and $11.49 billion in FY2027, and a projection of $17.55 billion in total state and
-  local formula shares for traditional districts in FY2027 — but the first pair belongs to a
-  proposal, not to the enacted act. See the stage caveat in
-  [`lsc-hb96-analysis`](../../catalog/lsc-hb96-analysis.md). [open]
+  Traditional districts **$8.15bn in FY2026 and $8.26bn in FY2027** — annual increases of $32.5m
+  (0.4%) and $109.0m (1.3%). Community and STEM schools $1.33bn and $1.40bn, up 4.8% and 5.0%.
+  JVSDs $539.1m and $566.9m, up 8.4% and 5.2%. [verified — LSC greenbook]
+
+  The traditional-district growth rate is the number to hold beside the phase-in. A budget that
+  completes a six-year implementation raises the districts' foundation aid by 0.4% and then 1.3%,
+  which is below inflation in both years — the arithmetic of a phase-in that interpolates toward a
+  computed amount priced at FY2022 salaries while enrollment falls. [inference]
+
+  Figures from earlier stages of the bill still need care: the House-passed Budget in Brief
+  describes bridge-formula funding of $11.24 billion in FY2026 and $11.49 billion in FY2027, which
+  belongs to a proposal rather than to the enacted act. See the stage caveat in
+  [`lsc-hb96-analysis`](../../catalog/lsc-hb96-analysis.md).
+revisions:
+  - was: |
+      The node recorded H.B. 96 as a phase-in decision and an input-year freeze, with the enacted
+      appropriation totals and everything else the act did marked "not yet established" and
+      `[open]`.
+    now: |
+      Eleven further changes to the school financing system are recorded, and the foundation
+      totals with them.
+    found_by: |
+      The act's own "school financing system calculation revisions" list, committed at
+      `crates/project/fixtures/enacted-school-funding.txt`, and the greenbook's formula section
+      at `crates/project/fixtures/dew-greenbook.txt`.
+    reach: |
+      Two of the changes had already reached the corpus as unexplained residue rather than as
+      policy: `fsfp-targeted-assistance` recorded supplemental targeted assistance as "a live zero
+      rather than an absence" without knowing the act had repealed it, and the FY2027 model's
+      gifted professional development column reads zero for the same reason. A node can hold the
+      consequence of a provision it has never read, and look complete.
+  - was: |
+      `effective: 2025-06-30`, the signing date.
+    now: |
+      `effective: 2025-09-30`, with the split recorded in `effective_note`.
+    found_by: |
+      Every R.C. section the corpus reads from this act is dated 30 September 2025 in
+      `crates/project/fixtures/revised-code.txt`.
+    reach: |
+      The class had no way to say "two dates", so the ontology gains `effective_note`. Every Ohio
+      budget act has the same split and the corpus holds several.
 properties:
   designation: Am. Sub. H.B. 96
   general_assembly: 136th General Assembly
   signed: 2025-06-30
-  effective: 2025-06-30
+  effective: 2025-09-30
+  effective_note: |
+    Two dates, and the node carried the wrong one for both. The appropriation sections took
+    effect on signing, 30 June 2025; the amendments to R.C. 3317 took effect ninety days later,
+    and every section this corpus reads from the act is dated **30 September 2025** in
+    `crates/project/fixtures/revised-code.txt`. `effective` is the codified date because that is
+    what the sections the formula is read from carry. [verified]
   subject: |
     Enacted the FY2026-27 operating budget. Continued the Fair School Funding Plan formula at a
     phase-in of 83.33% in FY2026 and 100% in FY2027 while carrying forward FY2022 base cost
-    inputs rather than refreshing them. [inference — confirm against the enacted act and the
-    LSC Greenbook]
+    inputs rather than refreshing them. [verified — the enacted act and the LSC Greenbook, both
+    committed]
   vetoes: |
     67 line items vetoed before signing. [verified] One of them is an education programme, and the
     greenbook names it. [verified — `crates/project/fixtures/dew-greenbook.txt`]

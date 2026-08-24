@@ -23,6 +23,15 @@ properties:
   - name: effective
     type: date
     description: Date the operative provisions took effect
+  - name: effective_note
+    type: text
+    description: >-
+      Which provisions took effect when, where the act has more than one date. Declared because
+      an Ohio budget act always does: the appropriation sections are effective on signing and the
+      codified amendments ninety days later, so a single `effective` date is right about one half
+      and wrong about the other. H.B. 96 is the case that forced it — signed 30 June 2025, with
+      every R.C. 3317 section this corpus reads from it dated 30 September — and the node had
+      carried the signing date for both.
   - name: subject
     type: text
     description: What the enactment did to the funding system, in two or three sentences

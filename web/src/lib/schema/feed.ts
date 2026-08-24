@@ -556,6 +556,24 @@ export const DistrictSchema = z
      * cannot disagree about which programs count.
      */
     base_cost_denominated_categoricals: num,
+    /** DPIA alone — the phase-in dials it separately from everything else. */
+    dpia_funding: num,
+    /**
+     * `[H2] − [H3]` — the general slice of the FY2020 funding base.
+     *
+     * The origin the general phase-in interpolates from. R.C. 3317.022 pays
+     * `base + pct × (computed − base)`, so this is what a district receives at a 0% phase-in.
+     */
+    general_funding_base: num,
+    /** `[H3]` — the DPIA slice, anchored to the district's FY2019 DPIA payment. */
+    dpia_funding_base: num,
+    /**
+     * `[H2] − [I1]` floored at zero: the level the guarantee holds the district at.
+     *
+     * Published for every district, not only the guaranteed ones. Deriving it as
+     * `on_guarantee ? realized : 0` gave the 315 formula districts no floor at all.
+     */
+    guarantee_floor: num,
     /**
      * Special education's six weighted categories: ADM and the aid each produces.
      *
@@ -921,8 +939,8 @@ export const PolicyShapeSchema = z
     guarantee_argument: num,
     base_cost_scale: num,
     minimum_state_share: num,
-    phase_in_base_cost: num,
-    phase_in_categorical: num,
+    phase_in_general: num,
+    phase_in_dpia: num,
   })
   .strict();
 

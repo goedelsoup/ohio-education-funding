@@ -424,7 +424,7 @@ fn every_lever_key_round_trips_through_parse_and_back() {
     /*
      * `Lever::key` is the inverse of `Lever::parse`, and its only production caller is the feed
      * emitter in `crates/bundle`, which writes the key the browser's query string then reads. So a
-     * transposed arm — `PhaseInBaseCost` returning `"phase-in-cat"` — would survive every other
+     * transposed arm — `PhaseInGeneral` returning `"phase-in-dpia"` — would survive every other
      * check here: the feed schema accepts any of the five, and the fixture exercises only two.
      *
      * The browser would then apply the categorical phase-in where the bill said base cost, and
@@ -435,7 +435,7 @@ fn every_lever_key_round_trips_through_parse_and_back() {
         ("base-cost", "1.0395"),
         ("min-share", "0.05"),
         ("phase-in", "0.8333"),
-        ("phase-in-cat", "0.6"),
+        ("phase-in-dpia", "0.6"),
     ] {
         let lever = Lever::parse(key, value).unwrap_or_else(|e| panic!("{key}: {e}"));
         assert_eq!(lever.key(), key, "{key} does not survive the round trip");
@@ -459,12 +459,12 @@ fn each_lever_key_moves_the_field_it_names_and_no_other() {
     );
     assert!((moved("base-cost", "1.05").base_cost_scale - 1.05).abs() < f64::EPSILON);
     assert!((moved("min-share", "0.05").minimum_state_share - 0.05).abs() < f64::EPSILON);
-    assert!((moved("phase-in", "0.75").phase_in_base_cost - 0.75).abs() < f64::EPSILON);
-    assert!((moved("phase-in-cat", "0.6").phase_in_categorical - 0.6).abs() < f64::EPSILON);
+    assert!((moved("phase-in", "0.75").phase_in_general - 0.75).abs() < f64::EPSILON);
+    assert!((moved("phase-in-dpia", "0.6").phase_in_dpia - 0.6).abs() < f64::EPSILON);
 
     // And each leaves the other four alone, which is what makes `Draft::policy`'s fold safe.
     let one = moved("phase-in", "0.75");
-    assert!((one.phase_in_categorical - base.phase_in_categorical).abs() < f64::EPSILON);
+    assert!((one.phase_in_dpia - base.phase_in_dpia).abs() < f64::EPSILON);
     assert!((one.base_cost_scale - base.base_cost_scale).abs() < f64::EPSILON);
 }
 
@@ -539,8 +539,8 @@ fn the_lever_flags_and_the_draft_flag_name_the_same_five_things() {
         Lever::Guarantee(GuaranteeRule::AsEnacted).key(),
         Lever::BaseCostScale(1.0).key(),
         Lever::MinimumStateShare(0.1).key(),
-        Lever::PhaseInBaseCost(1.0).key(),
-        Lever::PhaseInCategorical(1.0).key(),
+        Lever::PhaseInGeneral(1.0).key(),
+        Lever::PhaseInDpia(1.0).key(),
     ];
     let unique: BTreeSet<&str> = keys.into_iter().collect();
     assert_eq!(

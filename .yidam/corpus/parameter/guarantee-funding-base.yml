@@ -9,6 +9,19 @@ description: |
   guarantee](../formula-component/temporary-transitional-aid-guarantee.yml). Where the formula
   computes less than `[H2]` for a district, the state pays `[H2]` instead. [verified]
 
+  ### It does two jobs
+
+  `[H2]` is also the **origin the phase-in interpolates from**. R.C. 3317.022 pays
+  `funding base + [(computed - funding base) x phase-in %]`, so this column sets what a district
+  receives at a 0% phase-in as much as it sets the floor beneath it. [verified] The second base
+  beside it, `[H3]`, exists for the same reason: the statute dials DPIA separately and needs the
+  DPIA slice to interpolate from. R.C. 3317.02(N)(2) anchors that slice to the district's
+  **FY2019** DPIA payment, and (N)(1)(b)(i) subtracts the same figure from the general slice, so
+  the two partition `[H2]` exactly.
+
+  That shared column is why lowering the phase-in cannot push a district through the guarantee:
+  both mechanisms converge on the same FY2020 number.
+
   It is published per district on the payment report's `Detail_SFPR` sheet and **carries no
   year label there**. It is the FY2020 level, the year Ohio froze funding under the [Bridge
   formula](../funding-regime/bridge-formula.yml). [verified — the department's FY2026 payment
@@ -21,9 +34,7 @@ description: |
   the [formula transition
   supplement](../formula-component/fsfp-formula-transition-supplement.yml) rather than to this.
   The two differ for more than half of districts and `[L1]` is smaller for seven, so **neither
-  is derivable from the other**. [verified] Two labelled columns one line apart, doing
-  different jobs for different mechanisms, is exactly the shape that invites a transcription
-  error nothing downstream would catch.
+  is derivable from the other**. [verified]
 
   ### It has never been re-based
 
@@ -37,10 +48,20 @@ description: |
   ### It is a nominal quantity
 
   Written in dollars with no escalator, so its real value falls every year by construction.
-  Across FY2020-FY2025 prices rose 25.1% and the median guaranteed district's real booked state
-  aid fell 18.2%. A parameter that is never changed is still being changed, in the only terms
-  that matter to a district's payroll. [verified]
+  Across FY2020-FY2025 prices rose 25.1%. A parameter that is never changed is still being
+  changed, in the only terms that matter to a district's payroll. [verified]
 findings: |
+  ### It is published for every district, not only the guaranteed ones
+
+  608 of 609 rows carry it, including **314 of the 315 districts the guarantee does not pay**.
+  [verified] Being held at the floor is not what reveals it; the department states it either way.
+
+  One district's is **negative**: Richmond Heights Local at **-$40,179.23**, because R.C.
+  3317.02(N)(1)(b) subtracts FY2020 community school, STEM and scholarship deductions from FY2020
+  funding and for this district they exceeded the funding. [verified] It is the only place the
+  floor has to be clamped at zero, and the only district whose base says the state's FY2020
+  obligation to it was less than nothing.
+
   ### What the FY2020 figure was itself composed of, which this repository had to go and read
 
   **FY2019, unchanged.** [H.B. 166](../legislation/hb-166-2019.yml) ran no formula for FY2020 or
@@ -118,6 +139,24 @@ revisions:
       all along — FY2019, FY2020 and FY2021 are flat to within 0.003% — and nothing had read it as
       one, because no node named the act that caused it.
 
+  - was: |
+      The node described `[H2]` as the guarantee's anchor and nothing else, and the panel derived
+      it as "this district's receipt, if it is on the guarantee" and zero otherwise — recorded in
+      `DistrictRecord::guarantee_baseline` as "unobservable" for a district on formula, "because
+      the guarantee is the only thing that reveals the figure".
+    now: |
+      It is a published column, populated for 608 of 609 districts, and it is the phase-in's
+      origin as well as the guarantee's floor.
+    found_by: |
+      Reading R.C. 3317.022 against the fixture the panel already parses: `funding_base` is
+      column 141 of `crates/foundation/fixtures/fy27-department-model.csv` and had been loaded
+      into `Transition::funding_base` since that struct existed.
+    reach: |
+      The 315 districts on formula were modelled with no floor beneath them, so any simulated cut
+      let them fall past one Ohio would have caught them on. `scenario-delta` had pinned the gap
+      as a known limitation — `Standing::PushedOn` was documented as unreachable — which is the
+      failure mode worth naming: the defect was measured, recorded, and given a test that asserted
+      it, rather than being chased back to the column that closes it.
 properties:
   name: Guarantee funding base
   kind: |

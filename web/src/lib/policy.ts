@@ -30,10 +30,16 @@ export interface Policy {
   baseCostScale: number;
   /** Minimum state share of base cost. Set by each biennial budget, not permanent law. */
   minimumStateShare: number;
-  /** Appropriated fraction of base cost aid. */
-  phaseInBaseCost: number;
-  /** Appropriated fraction of categorical aid. */
-  phaseInCategorical: number;
+  /**
+   * How far the district moves from its FY2020 funding base toward the computed amount, for
+   * every core foundation component except DPIA.
+   *
+   * Not a fraction of computed aid. R.C. 3317.022 pays `base + pct × (computed − base)`, so at
+   * 0% a district receives its FY2020 base rather than nothing.
+   */
+  phaseInGeneral: number;
+  /** The same interpolation for DPIA, against its own FY2019 base. */
+  phaseInDpia: number;
 }
 
 /** What a policy does to one district. */
@@ -74,8 +80,8 @@ export function currentLaw(modelMinimumStateShare: number): Policy {
     guarantee: { kind: "as-enacted" },
     baseCostScale: 1,
     minimumStateShare: modelMinimumStateShare,
-    phaseInBaseCost: 1,
-    phaseInCategorical: 1,
+    phaseInGeneral: 1,
+    phaseInDpia: 1,
   };
 }
 
@@ -138,7 +144,6 @@ export function apply(
     baseCostAid =
       d.base_cost_state_share * admRatio + increasePerPupil * currentYearAdm;
   }
-  baseCostAid *= p.phaseInBaseCost;
 
   // The categoricals priced in the statewide average base cost move with it. Special education,
   // English learners and career-technical are each `weight × $8,241.61 × count × state share`, so
@@ -150,9 +155,27 @@ export function apply(
   const categoricals =
     d.categorical_funding - denominated + denominated * p.baseCostScale;
 
-  const formulaAid = baseCostAid + categoricals * p.phaseInCategorical * admRatio;
+  // The phase-in, as R.C. 3317.022 writes it:
+  //
+  //     funding base
+  //       + [(general components − general funding base) × general phase-in %]
+  //       + [(DPIA − DPIA funding base)                  × DPIA phase-in %]
+  //
+  // Two interpolations against two slices of one published base, not two multipliers on
+  // computed aid. At 100% on both dials the bases cancel and this is the department's own
+  // number, which is what keeps `currentLaw` the identity.
+  const dpiaComputed = d.dpia_funding * admRatio;
+  const generalComputed =
+    baseCostAid + (categoricals * admRatio - dpiaComputed);
 
-  const baseline = d.on_guarantee ? currentRealizedAid(d) : 0;
+  const formulaAid =
+    d.general_funding_base +
+    p.phaseInGeneral * (generalComputed - d.general_funding_base) +
+    (d.dpia_funding_base + p.phaseInDpia * (dpiaComputed - d.dpia_funding_base));
+
+  // `[H2] − [I1]`, published for every district. This used to be
+  // `d.on_guarantee ? currentRealizedAid(d) : 0`, which gave the 315 formula districts no floor.
+  const baseline = d.guarantee_floor;
   let heldAt: number;
   switch (p.guarantee.kind) {
     case "as-enacted":

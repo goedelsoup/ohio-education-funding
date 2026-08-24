@@ -479,9 +479,21 @@ impl PreschoolSpecialEducation {
 /// different bases, each holding a different set of districts. The corpus has one node for them.
 #[derive(Debug, Clone, Copy, PartialEq, Default)]
 pub struct Transition {
-    /// `[H2]` — the FY2021 amount the guarantee compares foundation funding against.
+    /// `[H2]` — the **FY2020** amount the guarantee compares foundation funding against.
+    ///
+    /// It is also the origin the phase-in interpolates from: R.C. 3317.022 pays
+    /// `funding base + pct x (computed - funding base)`, so this column sets what a district
+    /// receives at a 0% phase-in as well as the floor under it. R.C. 3317.02(N)(1) builds it from
+    /// FY2020 funding before the Executive Order 2020-19D reductions.
+    ///
+    /// Negative for one district: Richmond Heights Local, -$40,179.23, where the FY2020 community
+    /// school and scholarship deductions (N)(1)(b) subtracts came to more than the funding did.
     pub funding_base: Dollars,
     /// `[H3]` — the DPIA part of that base, which the phase-in dials separately.
+    ///
+    /// R.C. 3317.02(N)(2) anchors it to the district's **FY2019** DPIA payment rather than to
+    /// FY2020, and (N)(1)(b)(i) subtracts the same figure from the general slice, so the two
+    /// partition `[H2]` exactly.
     pub funding_base_econ_dis: Dollars,
     /// `[h1]`/`[h2]` — open enrolment FTE, last year and this.
     pub open_enrollment_prior: f64,

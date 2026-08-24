@@ -283,7 +283,9 @@ mod detail_columns {
     // a different and larger base: `max(FY21 funding base - (foundation funding + guarantee +
     // supplemental targeted assistance + transportation), 0)`. $63.6m to 144 districts, of which
     // 17 are not on the guarantee at all.
-    /// `[H2] Funding Base` — the FY2021 amount the guarantee compares against.
+    /// `[H2] Funding Base` — the **FY2020** amount the guarantee compares against, and the
+    /// origin R.C. 3317.022 interpolates the phase-in from. Not FY2021: that is `[L1]` below,
+    /// which belongs to the formula transition supplement.
     pub const FUNDING_BASE: usize = 17;
     /// `[H3]` — the DPIA part of it, which the phase-in dials separately.
     pub const FUNDING_BASE_ECON_DIS: usize = 18;

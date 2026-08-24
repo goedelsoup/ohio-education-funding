@@ -298,8 +298,8 @@ impl Bundle {
                         policy.num("guarantee_argument", c.policy.guarantee_argument);
                         policy.num("base_cost_scale", c.policy.base_cost_scale);
                         policy.num("minimum_state_share", c.policy.minimum_state_share);
-                        policy.num("phase_in_base_cost", c.policy.phase_in_base_cost);
-                        policy.num("phase_in_categorical", c.policy.phase_in_categorical);
+                        policy.num("phase_in_general", c.policy.phase_in_general);
+                        policy.num("phase_in_dpia", c.policy.phase_in_dpia);
                     }
                     o.num("cost", c.cost);
                     o.num("realized_aid", c.realized_aid);
@@ -356,8 +356,8 @@ impl Bundle {
                             policy.num("guarantee_argument", c.policy.guarantee_argument);
                             policy.num("base_cost_scale", c.policy.base_cost_scale);
                             policy.num("minimum_state_share", c.policy.minimum_state_share);
-                            policy.num("phase_in_base_cost", c.policy.phase_in_base_cost);
-                            policy.num("phase_in_categorical", c.policy.phase_in_categorical);
+                            policy.num("phase_in_general", c.policy.phase_in_general);
+                            policy.num("phase_in_dpia", c.policy.phase_in_dpia);
                         }
                         o.count("fiscal_year", c.fiscal_year);
                         o.num("realized_aid", c.realized_aid);
@@ -800,6 +800,10 @@ impl Bundle {
                     "base_cost_denominated_categoricals",
                     d.base_cost_denominated_categoricals,
                 );
+                o.num("dpia_funding", d.dpia_funding);
+                o.num("general_funding_base", d.general_funding_base);
+                o.num("dpia_funding_base", d.dpia_funding_base);
+                o.num("guarantee_floor", d.guarantee_floor);
                 // Special education, then the other five, then the six totals. Emitted once —
                 // this block and the categoricals beside it were pasted twice, so every district
                 // in the shipped feed carried both keys twice. JSON takes the last, so nothing
