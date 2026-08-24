@@ -47,6 +47,17 @@ browser and a 404 to anything that identifies itself.
   charge-off millage series with its statutory authority, and reports the residual its
   decomposition cannot explain
 
+**`figures` is the index layer, pointed at the corpus rather than at the data.** It computes the
+numbers a corpus node quotes — from the public API of the crate that owns each — and writes them
+to [`figures.json`](figures.json), which `web/tests/unit/corpusFigures.spec.ts` checks the prose
+against. The problem it solves is that `[verified — crates/regime-diff]` was hand-typed text with
+nothing relating it to `crates/regime-diff`, so a correction's blast radius was whichever files
+the author happened to open: the `recognized-valuation` correction reached three of its six
+carriers, and two nodes went on publishing a reversed sign under `[verified]` while every test
+here stayed green. A figure carries a pin as well as a computation, so a calculator that moves
+fails in this workspace and names what moved, rather than regenerating quietly and surfacing as a
+corpus check nobody can explain. See #131.
+
 **`deduction` is declared and not built.** It was listed here as though it existed for long enough
 that the web layer's "what is not modelled" note was written from this file rather than from the
 workspace. There is a [skill describing what it would compute](../.yidam/skills/deduction.md) —
@@ -166,6 +177,7 @@ Fields per crate: name, capability type (connector/calculator/feature-engineerin
 | [`deflator`](deflator/) | Convert nominal Ohio school finance figures to constant dollars, fiscal-year aligned | 17 |
 | [`dispersion`](dispersion/) | School finance equity statistics: dispersion and wealth neutrality across agencies | 151 |
 | [`edfund-core`](edfund-core/) | Shared domain types for the Ohio education funding computer | 30 |
+| [`figures`](figures/) | The figures the corpus quotes, computed from the crates that own them | 10 |
 | [`foundation`](foundation/) | Fair School Funding Plan base cost build-up, per R.C. 3317.011 | 47 |
 | [`local-capacity`](local-capacity/) | Fair School Funding Plan local capacity and state share, per R.C. 3317.017 | 23 |
 | [`millage`](millage/) | Effective operating millage under H.B. 920 reduction factors, and 20-mill floor status | 19 |
@@ -174,7 +186,7 @@ Fields per crate: name, capability type (connector/calculator/feature-engineerin
 | [`scenario-delta`](scenario-delta/) | Winners and losers between two funding runs, with incidence and the off-formula count | 26 |
 | [`spreadsheet`](spreadsheet/) | Read the department's published workbooks with no dependencies | 79 |
 
-12 crates, 866 test functions, no crates.io dependencies. `cargo test` reports a different total: it adds doc-tests and counts each integration binary separately.
+13 crates, 876 test functions, no crates.io dependencies. `cargo test` reports a different total: it adds doc-tests and counts each integration binary separately.
 <!-- /REGEN -->
 
 ## Index status

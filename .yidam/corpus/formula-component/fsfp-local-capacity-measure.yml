@@ -252,6 +252,23 @@ properties:
     purpose, and a frequent source of confusion between the two. [verified]
   statutory_basis: R.C. 3317.017; state share and state share percentage at 3317.017(B) and (C). [verified]
   calculator: local-capacity
+figures:
+  - key: regime-diff/districts-the-charge-off-pays-more
+    value: 316
+    field: findings
+    as_written: "316 of 606 districts would have received more under the charge-off"
+  - key: regime-diff/districts-the-plan-pays-more
+    value: 290
+    field: findings
+    as_written: "against 290 under this measure"
+  - key: regime-diff/median-shortfall-under-the-plan
+    value: 44.62
+    field: findings
+    as_written: "the median district is $45 per pupil worse off under the plan"
+  - key: regime-diff/charge-off-districts-censored
+    value: 138
+    field: findings
+    as_written: "138 where the minimum state share binds"
 links:
   - target: ../formula-component.ont.yml
     relationship: instance-of

@@ -44,6 +44,13 @@ run = "cargo run --quiet -p connect --bin edfund-connect -- index"
 description = "Regenerate the web feed from the corpus."
 run = "cargo run --quiet -p bundle > ../web/public/data/bundle.json"
 
+[tasks.figures]
+description = "Regenerate the figure manifest the corpus is cross-checked against."
+# The other half of `web/tests/unit/corpusFigures.spec.ts`. Run it after any
+# change that moves a figure in `figures::FIGURES`; `mise run //:generated` is
+# what fails if you forget.
+run = "cargo run --quiet -p figures > figures.json"
+
 [tasks.connectors]
 description = "What is retrievable, and how far each connector got."
 run = "cargo run --quiet -p connect --bin edfund-connect -- list"

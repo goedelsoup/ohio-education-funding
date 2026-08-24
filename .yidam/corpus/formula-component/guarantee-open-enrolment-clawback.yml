@@ -70,9 +70,54 @@ properties:
     `crates/project/tests/the_supplements_outside_the_formula.rs`; the threshold and both FTE
     counts are carried in `crates/project::panel::Transition`. [verified]
   fy2027_scale: |
-    43 districts affected; $5,100,000 withheld in aggregate. Largest single reduction $674,561
+    43 districts affected; $5,110,050 withheld in aggregate. Largest single reduction $674,561
     (Columbus City, 106.2 FTE against a 24.3 threshold); next $640,025 (Cuyahoga Falls, 118.1
     FTE). [verified]
+figures:
+  - key: project/open-enrolment-clawback-districts
+    value: 43
+    field: summary
+    as_written: "43 districts, $5.1 million withheld in FY2027"
+  - key: project/open-enrolment-clawback-withheld
+    value: 5110049.66
+    field: summary
+    as_written: "43 districts, $5.1 million withheld in FY2027"
+  - key: project/open-enrolment-clawback-districts
+    value: 43
+    field: findings
+    as_written: "43 districts, $5.1 million withheld"
+  - key: project/open-enrolment-clawback-withheld
+    value: 5110049.66
+    field: findings
+    as_written: "43 districts, $5.1 million withheld"
+  - key: project/open-enrolment-clawback-largest
+    value: 674560.81
+    field: findings
+    as_written: "Columbus lost 106.2 FTE against a threshold of 24.3 and had **$674,561** taken off"
+  - key: project/open-enrolment-clawback-second-largest
+    value: 640025.19
+    field: findings
+    as_written: "Cuyahoga Falls lost 118.1 and had $640,025"
+  - key: project/statewide-average-base-cost-per-pupil
+    value: 8241.61
+    field: description
+    as_written: "$8,241.61 is the statewide average base cost per pupil"
+  - key: project/open-enrolment-clawback-districts
+    value: 43
+    field: fy2027_scale
+    as_written: "43 districts affected"
+  - key: project/open-enrolment-clawback-withheld
+    value: 5110049.66
+    field: fy2027_scale
+    as_written: "$5,110,050 withheld in aggregate"
+  - key: project/open-enrolment-clawback-largest
+    value: 674560.81
+    field: fy2027_scale
+    as_written: "Largest single reduction $674,561"
+  - key: project/open-enrolment-clawback-second-largest
+    value: 640025.19
+    field: fy2027_scale
+    as_written: "next $640,025"
 links:
   - target: ../formula-component.ont.yml
     relationship: instance-of

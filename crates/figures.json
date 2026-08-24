@@ -1,0 +1,33 @@
+{
+  "contract": "1.0.0",
+  "figures": [
+    {"key": "dispersion/comparable-ohio-districts-fy2022", "owner": "crates/dispersion", "unit": "count", "value": 611, "label": "Ohio districts the Census F-33 comparability filter admits, FY2022"},
+    {"key": "dispersion/poorest-quartile-local-revenue-per-pupil", "owner": "crates/dispersion", "unit": "dollars", "value": 4341.737584169997, "label": "Local revenue per pupil in the poorest quartile of Ohio districts, FY2022"},
+    {"key": "dispersion/richest-quartile-local-revenue-per-pupil", "owner": "crates/dispersion", "unit": "dollars", "value": 13932.22687538397, "label": "Local revenue per pupil in the richest quartile of Ohio districts, FY2022"},
+    {"key": "dispersion/local-revenue-gap-per-pupil", "owner": "crates/dispersion", "unit": "dollars", "value": 9590.489291213973, "label": "The local revenue gap the two higher levels are read against — richest quartile less poorest, per pupil, FY2022"},
+    {"key": "dispersion/state-closes-of-the-local-gap", "owner": "crates/dispersion", "unit": "dollars", "value": 4448.157079098611, "label": "How much of the local gap state equalization closes, per pupil, FY2022"},
+    {"key": "dispersion/federal-closes-of-the-local-gap", "owner": "crates/dispersion", "unit": "dollars", "value": 913.2873211742847, "label": "How much of the local gap the federal channel closes, per pupil, FY2022"},
+    {"key": "dispersion/state-share-of-the-local-gap", "owner": "crates/dispersion", "unit": "share", "value": 0.46380919096314, "label": "State equalization as a share of the local gap, FY2022"},
+    {"key": "dispersion/federal-share-of-the-local-gap", "owner": "crates/dispersion", "unit": "share", "value": 0.09522843865859527, "label": "The federal channel as a share of the local gap, FY2022"},
+    {"key": "dispersion/local-gap-left-open", "owner": "crates/dispersion", "unit": "dollars", "value": 4229.044890941078, "label": "The part of the local gap neither higher level closes, per pupil, FY2022"},
+    {"key": "project/model-districts", "owner": "crates/project", "unit": "count", "value": 609, "label": "Districts in the department's FY2027 funding model"},
+    {"key": "project/districts-at-the-minimum-state-share", "owner": "crates/project", "unit": "count", "value": 138, "label": "Districts whose state share is the 10% floor rather than the computed share"},
+    {"key": "project/open-enrolment-clawback-districts", "owner": "crates/project", "unit": "count", "value": 43, "label": "Districts whose guarantee is reduced by the open-enrolment clawback, FY2027"},
+    {"key": "project/open-enrolment-clawback-withheld", "owner": "crates/project", "unit": "dollars", "value": 5110049.659999998, "label": "Total withheld by the open-enrolment clawback, FY2027"},
+    {"key": "project/open-enrolment-clawback-largest", "owner": "crates/project", "unit": "dollars", "value": 674560.81, "label": "The largest single open-enrolment clawback, FY2027 — Columbus City"},
+    {"key": "project/open-enrolment-clawback-second-largest", "owner": "crates/project", "unit": "dollars", "value": 640025.19, "label": "The second largest open-enrolment clawback, FY2027 — Cuyahoga Falls"},
+    {"key": "project/statewide-average-base-cost-per-pupil", "owner": "crates/project", "unit": "dollars", "value": 8241.61, "label": "FY2027 statewide average base cost per pupil, the rate the clawback is charged at"},
+    {"key": "project/targeted-assistance-median-weighted-wealth", "owner": "crates/project", "unit": "dollars", "value": 392151306.63298076, "label": "FY2027 statewide median weighted wealth, the targeted assistance capacity median"},
+    {"key": "project/targeted-assistance-median-wealth-per-pupil", "owner": "crates/project", "unit": "dollars", "value": 276708.97, "label": "FY2027 statewide median weighted wealth per pupil, the wealth-tier median"},
+    {"key": "regime-diff/charge-off-districts-with-a-difference", "owner": "crates/regime-diff", "unit": "count", "value": 606, "label": "Districts the charge-off counterfactual can value under both regimes"},
+    {"key": "regime-diff/charge-off-districts-censored", "owner": "crates/regime-diff", "unit": "count", "value": 138, "label": "Districts whose local capacity the minimum state share censors, so the component row is absent while the total is not"},
+    {"key": "regime-diff/charge-off-zeroes-base-cost-aid", "owner": "crates/regime-diff", "unit": "count", "value": 65, "label": "Districts a 23-mill charge-off on recognized valuation would leave with no base cost aid at all"},
+    {"key": "regime-diff/charge-off-zeroes-base-cost-aid-on-total-taxable", "owner": "crates/regime-diff", "unit": "count", "value": 81, "label": "The same count on total taxable value — the base the corpus wrongly assumed, and the measure of how much of that finding was the base"},
+    {"key": "regime-diff/districts-the-plan-pays-more", "owner": "crates/regime-diff", "unit": "count", "value": 290, "label": "Districts better off under the Fair School Funding Plan than under the charge-off"},
+    {"key": "regime-diff/districts-the-charge-off-pays-more", "owner": "crates/regime-diff", "unit": "count", "value": 316, "label": "Districts better off under the charge-off than under the plan"},
+    {"key": "regime-diff/median-shortfall-under-the-plan", "owner": "crates/regime-diff", "unit": "dollars", "value": 44.61930095516027, "label": "How much less the median district receives per pupil under the plan than it would have under a 23-mill charge-off on recognized valuation"},
+    {"key": "regime-diff/recognized-valuation-deferred-share", "owner": "crates/regime-diff", "unit": "share", "value": 0.08196273318968705, "label": "How far recognized valuation sits below total taxable value statewide at TY2024"},
+    {"key": "regime-diff/recognized-valuation-deferred-value", "owner": "crates/regime-diff", "unit": "dollars", "value": 34488438736.58911, "label": "The taxable value TY2024's reappraisals have not yet phased in, statewide"},
+    {"key": "regime-diff/deferred-charge-off", "owner": "crates/regime-diff", "unit": "dollars", "value": 793234090.9415495, "label": "The charge-off that deferral removes — deferred value at the terminal 23 mills"}
+  ]
+}

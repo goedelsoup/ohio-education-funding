@@ -107,6 +107,36 @@
         ],
         "additionalProperties": false
       }
+    },
+    "figures": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "key": {
+            "type": "string",
+            "pattern": "^[a-z0-9-]+\\/[a-z0-9-]+$"
+          },
+          "value": {
+            "type": "number"
+          },
+          "field": {
+            "type": "string",
+            "minLength": 1
+          },
+          "as_written": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "required": [
+          "key",
+          "value",
+          "field",
+          "as_written"
+        ],
+        "additionalProperties": false
+      }
     }
   },
   "required": [

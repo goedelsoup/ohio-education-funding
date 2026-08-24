@@ -128,6 +128,15 @@ properties:
     parameter's real sensitivity is to the reference year rather than to any legislative
     choice about the number itself. [verified for the arithmetic; inference for the claim
     about dominance]
+figures:
+  - key: project/districts-at-the-minimum-state-share
+    value: 138
+    field: sensitivity
+    as_written: "138 of 609 districts sit exactly on it"
+  - key: project/model-districts
+    value: 609
+    field: sensitivity
+    as_written: "138 of 609 districts sit exactly on it"
 links:
   - target: ../parameter.ont.yml
     relationship: instance-of

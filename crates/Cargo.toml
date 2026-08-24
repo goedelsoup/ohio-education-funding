@@ -10,6 +10,7 @@ members = [
     "bundle",
     "spreadsheet",
     "connect",
+    "figures",
     "project",
     "scenario-delta",
     "regime-diff",

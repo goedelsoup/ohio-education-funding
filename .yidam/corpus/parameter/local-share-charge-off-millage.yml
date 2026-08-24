@@ -238,6 +238,31 @@ properties:
 
     The same count on total taxable value is 81, which is the measure of how much a wrong
     valuation base moves a distributional result: a fifth of this finding was the base.
+figures:
+  - key: regime-diff/recognized-valuation-deferred-share
+    value: 0.08196273
+    field: findings
+    as_written: "8.20% below total taxable value statewide"
+  - key: regime-diff/recognized-valuation-deferred-value
+    value: 34488438736.59
+    field: findings
+    as_written: "below total taxable value statewide — $34.5bn"
+  - key: regime-diff/deferred-charge-off
+    value: 793234090.94
+    field: findings
+    as_written: "$793m of charge-off at 23 mills"
+  - key: regime-diff/charge-off-zeroes-base-cost-aid
+    value: 65
+    field: sensitivity
+    as_written: "65 of 606 districts"
+  - key: regime-diff/charge-off-districts-with-a-difference
+    value: 606
+    field: sensitivity
+    as_written: "65 of 606 districts"
+  - key: regime-diff/charge-off-zeroes-base-cost-aid-on-total-taxable
+    value: 81
+    field: sensitivity
+    as_written: "The same count on total taxable value is 81"
 links:
   - target: ../parameter.ont.yml
     relationship: instance-of

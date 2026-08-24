@@ -130,7 +130,16 @@ properties:
     Not a standalone crate. Verified against the department's published per-district amounts in
     `crates/project/tests/the_remaining_categoricals.rs`, which reproduces both tiers and the
     eligibility test for all 609 districts; the decomposition is carried in
-    `crates/project::panel::TargetedAssistance`.
+    `crates/project::panel::TargetedAssistance`. [verified — `crates/project`]
+figures:
+  - key: project/targeted-assistance-median-weighted-wealth
+    value: 392151306.63
+    field: function
+    as_written: "median weighted wealth $392,151,306.63"
+  - key: project/targeted-assistance-median-wealth-per-pupil
+    value: 276708.97
+    field: function
+    as_written: "median weighted wealth per pupil $276,708.97"
 links:
   - target: ../formula-component.ont.yml
     relationship: instance-of
