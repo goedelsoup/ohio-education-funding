@@ -25,6 +25,7 @@ import satori from "satori";
 
 import { HEIGHT, WIDTH, render as tree, type Card } from "./card.ts";
 import { fonts } from "./font.ts";
+import { indexedPng } from "./indexed.ts";
 
 /** See the header. Not defaults worth overriding at a call site. */
 const RESVG = {
@@ -32,7 +33,17 @@ const RESVG = {
   font: { loadSystemFonts: false },
 } as const;
 
-/** Lay a card out and rasterize it. The bytes are what an endpoint returns as its body. */
+/**
+ * Lay a card out and rasterize it. The bytes are what an endpoint returns as its body.
+ *
+ * The pixmap goes to {@link indexedPng} before `asPng` gets a chance at it. A card is flat fills
+ * and glyph outlines — 128 colours, every pixel opaque — so writing it as truecolour with alpha
+ * spent 32 bits a pixel to say one of 128 things, and the whole set came to 51.8 MB. As a palette
+ * it is 45% of that and decodes to the same picture.
+ *
+ * `asPng()` is the fallback and not the path: where the palette encoder succeeds, resvg's own PNG
+ * writer is never asked to run at all.
+ */
 export async function png(card: Card): Promise<Buffer> {
   const svg = await satori(tree(card) as Parameters<typeof satori>[0], {
     width: WIDTH,
@@ -42,7 +53,11 @@ export async function png(card: Card): Promise<Buffer> {
     // below is only correct while this holds.
     embedFont: true,
   });
-  return Buffer.from(new Resvg(svg, RESVG).render().asPng());
+  const rendered = new Resvg(svg, RESVG).render();
+  return (
+    indexedPng(rendered.pixels, rendered.width, rendered.height) ??
+    Buffer.from(rendered.asPng())
+  );
 }
 
 /**

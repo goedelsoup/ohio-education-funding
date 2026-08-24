@@ -728,10 +728,11 @@ upload means. Bump both together or neither.
 in that order. The old shortcut of regenerating `public/data/bundle.json` alone no longer updates
 what a reader sees, because the figures are in the HTML.
 
-`dist/` is about 231 MB across 4,562 files, well inside Cloudflare Pages' 20,000-file limit — the
-file count is what to watch, and it has room. 51.8 MB of the weight is the 1,050 preview cards
-under `og/`, which is the price of a shared link carrying the district's own figures, and they are
-still 8-bit RGBA holding 128 colours apiece.
+`dist/` is about 201 MB across 4,562 files, well inside Cloudflare Pages' 20,000-file limit — the
+file count is what to watch, and it has room. 21.5 MB of the weight is the 1,050 preview cards
+under `og/`, which is the price of a shared link carrying the district's own figures. They are
+indexed PNGs: a card is 128 colours and every pixel opaque, so `src/lib/og/indexed.ts` writes the
+palette resvg's truecolour output was spending four bytes a pixel to avoid.
 
 There is no custom domain, and this section used to say there was.
 `schools.ohio.shawneesmart.systems` was named as the address for long enough to reach every
