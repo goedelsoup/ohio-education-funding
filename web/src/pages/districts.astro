@@ -179,13 +179,27 @@ const MEASURES = (
     <table id="district-table">
       <thead>
         <tr>
-          <th><button type="button" data-sort="name" aria-sort="ascending">District</button></th>
-          <th><button type="button" data-sort="adm">Enrolled ADM</button></th>
-          <th><button type="button" data-sort="aid">State aid / pupil</button></th>
-          <th><button type="button" data-sort="guarantee">From guarantee</button></th>
-          <th><button type="button" data-sort="valuation">Valuation / pupil</button></th>
-          <th><button type="button" data-sort="poverty">Econ. disadv.</button></th>
-          <th><button type="button" data-sort="enrollment">Enrollment Δ</button></th>
+          {/*
+            `aria-sort` is on the `th` and not on the button inside it.
+
+            ARIA defines the property on `columnheader`, which is the cell; on a `button` it is
+            not in the role's allowed set and is simply ignored, so for as long as it sat there
+            the table announced no sort order at all. The button stays the control — it is what
+            takes focus and what is pressed — and the cell is what carries the state, which is
+            also what `src/scripts/districts.ts` now reads and writes.
+
+            `aria-sort="none"` on the other six rather than nothing: the property distinguishes
+            "sortable, not currently sorted" from "not sortable", and the six that omitted it were
+            claiming the second. It is also what the sort indicator in `app.css` selects on, which
+            is why five of the seven columns showed no affordance that they could be sorted.
+          */}
+          <th aria-sort="ascending"><button type="button" data-sort="name">District</button></th>
+          <th aria-sort="none"><button type="button" data-sort="adm">Enrolled ADM</button></th>
+          <th aria-sort="none"><button type="button" data-sort="aid">State aid / pupil</button></th>
+          <th aria-sort="none"><button type="button" data-sort="guarantee">From guarantee</button></th>
+          <th aria-sort="none"><button type="button" data-sort="valuation">Valuation / pupil</button></th>
+          <th aria-sort="none"><button type="button" data-sort="poverty">Econ. disadv.</button></th>
+          <th aria-sort="none"><button type="button" data-sort="enrollment">Enrollment Δ</button></th>
         </tr>
       </thead>
       <tbody>

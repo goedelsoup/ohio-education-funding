@@ -103,20 +103,31 @@ if (table && body && nameInput && statusSelect && countOut) {
     if (measures && key !== "name") measures.dataset.measure = key;
   };
 
+  /*
+   * The sort state lives on the `th`, which is the `columnheader` ARIA defines `aria-sort` on.
+   *
+   * It was read from and written to the `button` inside the cell, where the property is not in the
+   * role's allowed set and is inert — so the table announced no sort order however it was sorted.
+   * Moving it is not only a markup change: this is the code that read it, and an end-to-end test
+   * held the old position, which is why the mistake survived being looked at.
+   *
+   * "Not currently sorted" is now `none` rather than the attribute being absent, so a column that
+   * can be sorted always says so.
+   */
   for (const button of table.querySelectorAll<HTMLButtonElement>("thead button[data-sort]")) {
     button.addEventListener("click", () => {
       showMeasure(button.dataset.sort ?? "");
-      const column = (button.closest("th") as HTMLTableCellElement).cellIndex;
-      const first = button.getAttribute("aria-sort") == null;
-      const wasAscending = button.getAttribute("aria-sort") === "ascending";
-      for (const other of table.querySelectorAll("thead button[data-sort]")) {
-        other.removeAttribute("aria-sort");
+      const cell = button.closest("th") as HTMLTableCellElement;
+      const was = cell.getAttribute("aria-sort");
+      const first = was == null || was === "none";
+      for (const other of table.querySelectorAll("thead th[aria-sort]")) {
+        other.setAttribute("aria-sort", "none");
       }
       // Names read best ascending on first click; every other column is a quantity, and the
       // question a reader has about a quantity is almost always "who is at the top".
-      const descending = first ? button.dataset.sort !== "name" : wasAscending;
-      button.setAttribute("aria-sort", descending ? "descending" : "ascending");
-      sortBy(column, descending);
+      const descending = first ? button.dataset.sort !== "name" : was === "ascending";
+      cell.setAttribute("aria-sort", descending ? "descending" : "ascending");
+      sortBy(cell.cellIndex, descending);
     });
   }
 }
