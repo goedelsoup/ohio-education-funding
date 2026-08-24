@@ -45,6 +45,7 @@ import { join, resolve } from "node:path";
 
 import YAML from "yaml";
 
+import { compare } from "./order.ts";
 import * as routes from "./routes.ts";
 import {
   diagnose,
@@ -1113,7 +1114,7 @@ export function loadCorpus(): Corpus {
     ? readdirSync(DECISIONS)
         .filter((f) => f.endsWith(".yml"))
         .map(readDecision)
-        .sort((a, b) => a.slug.localeCompare(b.slug))
+        .sort((a, b) => compare(a.slug, b.slug))
     : [];
   const byDecision = new Map(decisions.map((d) => [d.slug, d]));
 
@@ -1168,7 +1169,7 @@ export function loadCorpus(): Corpus {
     });
   }
   for (const decision of decisions) {
-    decision.citedBy.sort((a, b) => a.label.localeCompare(b.label));
+    decision.citedBy.sort((a, b) => compare(a.label, b.label));
   }
 
   // Which nodes cite which source. Taken from the edge list, which by now holds both the
@@ -1190,7 +1191,7 @@ export function loadCorpus(): Corpus {
     ...c,
     nodes: nodes
       .filter((n) => n.className === c.className)
-      .sort((a, b) => a.label.localeCompare(b.label)),
+      .sort((a, b) => compare(a.label, b.label)),
   }));
 
   /*
@@ -1233,11 +1234,11 @@ export function loadCorpus(): Corpus {
 
   cached = {
     diagnostics: report,
-    nodes: nodes.sort((a, b) => a.label.localeCompare(b.label)),
+    nodes: nodes.sort((a, b) => compare(a.label, b.label)),
     byId,
-    classes: withNodes.sort((a, b) => a.label.localeCompare(b.label)),
+    classes: withNodes.sort((a, b) => compare(a.label, b.label)),
     byClass: new Map(withNodes.map((c) => [c.className, c])),
-    sources: sources.sort((a, b) => a.title.localeCompare(b.title)),
+    sources: sources.sort((a, b) => compare(a.title, b.title)),
     bySlug,
     decisions,
     byDecision,

@@ -149,7 +149,16 @@ export function acts(corpus: Corpus): Act[] {
     return act;
   });
 
-  return built.sort((a, b) => a.signed.localeCompare(b.signed));
+  /*
+   * Oldest first, on the ISO date each act was signed.
+   *
+   * A plain comparison and not the collator in `order.ts`: `signed` is `YYYY-MM-DD`, so ordering it
+   * as text *is* ordering it chronologically, and reaching for a collation would be describing a
+   * date as though it were a name. It was `localeCompare` with no locale, which is how it came to
+   * be one of the sixteen sites that read their ordering off the build machine's environment —
+   * this one harmlessly, since every locale agrees about ASCII digits, and only by luck.
+   */
+  return built.sort((a, b) => (a.signed < b.signed ? -1 : a.signed > b.signed ? 1 : 0));
 }
 
 /**

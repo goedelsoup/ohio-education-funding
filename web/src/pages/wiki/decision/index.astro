@@ -10,12 +10,13 @@
 import Base from "../../../layouts/Base.astro";
 import { loadCorpus } from "../../../lib/corpus.ts";
 import { summarize } from "../../../lib/prose.ts";
+import { compare } from "../../../lib/order.ts";
 import * as routes from "../../../lib/routes.ts";
 import SectionAnchor from "../../../components/SectionAnchor.astro";
 
 const { decisions } = loadCorpus();
 const ranked = [...decisions].sort(
-  (a, b) => b.corrections - a.corrections || a.slug.localeCompare(b.slug),
+  (a, b) => b.corrections - a.corrections || compare(a.slug, b.slug),
 );
 const corrected = decisions.filter((decision) => decision.corrections > 0);
 const withdrawals = decisions.reduce((sum, decision) => sum + decision.corrections, 0);
