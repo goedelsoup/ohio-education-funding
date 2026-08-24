@@ -180,8 +180,19 @@ cluster needed the same move #157 made: LSC's redbook and greenbook had three pr
 across three test files and no public one, and two of the three anchored a table differently. They
 read through `project::budget_analysis` now.
 
-What is left is `crates/bundle`'s statewide aggregates and the exemplar districts' own figures,
-neither of which is blocked.
+**Fifty-one nodes cite a crate inside a `[verified]` tag; twenty-three carry bindings.** Of the
+twenty-eight that do not, most are the identifier class above and nothing is missing: fifteen are
+`fiscal-period/*.appropriating_bill`, `program/*.appropriation_line`, `education-agency/*.irn` and
+`legislation/*` bill numbers, which carry digits inside a citation and are not quantities.
+
+The rest are a real residue, and they are named here rather than described as "the remainder" so
+that finishing them is a list rather than a search: `fsfp-disadvantaged-pupil-impact-aid`,
+`fsfp-formula-transition-supplement`, `fsfp-career-technical-weights`,
+`fsfp-special-education-weights`, `parameter/guarantee-funding-base`,
+`metric/per-pupil-operating-expenditure`, `metric/expenditure-per-equivalent-pupil`,
+`metric/progress-value-added`, and `scenario/fsfp-input-year-refresh`. Three of those quote figures
+the manifest **already exports** and simply do not bind them, which is the cheapest work left in
+this issue and the easiest to mistake for done.
 
 ### What binding a figure has cost so far
 
