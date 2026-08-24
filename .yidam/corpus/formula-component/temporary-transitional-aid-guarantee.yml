@@ -43,7 +43,7 @@ findings: |
 
   Joining the funding model to the 2024-25 report card across the 606 districts every panel
   covers, guarantee status looks like it predicts achievement: districts on the guarantee score
-  **+0.187** against the Performance Index, median 89.9 against 85.6. Holding economic
+  **+0.187** against the Performance Index, median 89.85 against 85.6. Holding economic
   disadvantage constant the association is **+0.035**. [verified — see
   [`crates/project/tests/guarantee_and_outcomes.rs`](../../../crates/project/tests/guarantee_and_outcomes.rs)]
 
@@ -229,6 +229,24 @@ findings: |
   100%. The phase-in gap closes and the guarantee does not; the mechanism that carries
   districts to full funding is the hold-harmless rather than the formula. Any account that
   treats FY2027 as the year the question resolves has the direction backwards. [inference]
+figures:
+  - key: project/guarantee-predicts-achievement-raw
+    value: 0.18686
+    field: findings
+    as_written: "districts on the guarantee score\n  **+0.187** against the Performance Index"
+  - key: project/median-performance-index-on-the-guarantee
+    value: 89.85
+    field: findings
+    as_written: "median 89.85 against 85.6"
+  - key: project/median-performance-index-on-the-formula
+    value: 85.6
+    field: findings
+    as_written: "median 89.85 against 85.6"
+  - key: project/guarantee-predicts-achievement-holding-poverty
+    value: 0.03457
+    field: findings
+    as_written: "disadvantage constant the association is **+0.035**"
+
 revisions:
   - was: |
       A hold-harmless and nothing else: computed funding below a baseline, pay the difference.

@@ -124,7 +124,7 @@ fn two_of_the_three_qualifying_routes_do_not_require_a_good_rating() {
 /// equalise flows against the grain of everything else in it, and nothing published says so.
 ///
 /// The two progress routes exist precisely to blunt this, and the measurement here is what they
-/// achieved: a gradient of 2.3 to one rather than whatever it would otherwise have been.
+/// achieved: a gradient of 2.56 to one rather than whatever it would otherwise have been.
 #[test]
 fn the_performance_supplement_pays_least_where_need_is_greatest() {
     let panel = panel::panel();

@@ -174,9 +174,32 @@ four kinds are **permanent**:
   `program/*.appropriation_line` are in this class.
 - **`revisions:` is deliberately unbindable**, for the reason given above.
 
-The remaining genuinely-bindable claims are `crates/project`'s — the supplements, the categorical
-programmes, the guarantee and the appropriation ledger — which compute through library API already
-and need no further Rust. They are the next tranche of #158 rather than a blocked one.
+`crates/project`'s supplements, gifted identification and guarantee-against-achievement findings
+are bound. What is left there is the **appropriation ledger** — the proration remainder, the
+lottery substitution, the casino series and the draft runs — which computes through library API
+and is a matter of reaching for the right function rather than of anything being blocked.
+
+### What binding a figure has cost so far
+
+Seven live claims turned out to be wrong, every one of them under `[verified]`, and none was
+reachable before the readers were made public. They are worth listing because the pattern is the
+same each time — a test standing behind the claim asserted a **bound** where the prose asserted a
+**value**:
+
+| Node | Published | Computed | What stood behind it |
+|---|---|---|---|
+| `doctrine/equity` | `1.846` | `1.8436` | `.abs() < 0.02` |
+| `doctrine/equity` | `−0.549` | `−0.548` | `.abs() < 0.02` |
+| `doctrine/equity` | `+0.630` | `+0.632` | `.abs() < 0.02` |
+| `parameter/twenty-mill-floor` | `42.32` | `42.31` | nothing |
+| `fsfp-performance-supplement` | the whole quintile table, `2.3` | `2.56` | `ratio > 2.0` |
+| `fsfp-enrolment-supplements` | `Two other districts` | three | nothing |
+| `temporary-transitional-aid-guarantee` | `89.9` | `89.85` | nothing |
+
+The last is not a transcription error but a **definition** one: the median was taken as the upper
+of the two middle observations where `dispersion::median` averages them, which is the same local
+median this workspace has now corrected in four files. A figure computed by hand beside a test
+that does not compute it is the thing this mechanism is for.
 
 ## Claim inventory
 
@@ -187,7 +210,7 @@ Fields: count per claim tag across every node; then the unresolved marks by the 
 -->
 | Tag | Count | What it records |
 |---|--:|---|
-| `[verified]` | 1000 | supported by a committed primary source |
+| `[verified]` | 1001 | supported by a committed primary source |
 | `[inference]` | 254 | drawn from verified facts, not witnessed |
 | `[open]` | 208 | a live question — unknown, contested, or being worked |
 | `[unentered]` | 0 | a knowable value nobody has typed in yet |

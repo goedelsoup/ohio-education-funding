@@ -140,6 +140,9 @@ pub struct Inputs {
         dispersion::report_card::ReportCard,
         Option<dispersion::profile::ProfileDistrict>,
     )>,
+    /// The funding model joined to the report card — 606 districts on all three panels, which is
+    /// the population every guarantee-against-achievement figure is computed over.
+    pub joined: Vec<project::outcomes::Joined>,
     /// Total taxable value as Table SD-1 publishes it, summed over the districts the county
     /// abstract can recognize.
     pub actual_total: f64,
@@ -180,6 +183,7 @@ impl Inputs {
             states: dispersion::census_states::states(),
             profile: dispersion::profile::districts(),
             sd1: dispersion::sd1::rows(),
+            joined: project::outcomes::joined(),
             outcomes: {
                 let by_irn: std::collections::BTreeMap<
                     String,
@@ -295,6 +299,106 @@ fn sd1_at_twenty(
         .filter(|row| row.tax_year == tax_year)
         .filter(|row| pick(row).is_some_and(|rate| (rate - 20.0).abs() < 0.005))
         .count()
+}
+
+/// Guarantee status, Performance Index and poverty over the districts carrying all three.
+fn guarantee_against_achievement(i: &Inputs) -> (Vec<f64>, Vec<f64>, Vec<f64>) {
+    let (mut guarantee, mut index, mut poverty) = (Vec::new(), Vec::new(), Vec::new());
+    for record in &i.joined {
+        if let (Some(pi), Some(ed)) = (
+            record.outcome.performance_index,
+            record.economically_disadvantaged,
+        ) {
+            guarantee.push(if record.on_guarantee() { 1.0 } else { 0.0 });
+            index.push(pi);
+            poverty.push(ed);
+        }
+    }
+    (guarantee, index, poverty)
+}
+
+/// The median Performance Index of the districts on, or off, the guarantee.
+fn median_index(i: &Inputs, on_guarantee: bool) -> f64 {
+    let mut values: Vec<f64> = i
+        .joined
+        .iter()
+        .filter(|r| r.on_guarantee() == on_guarantee)
+        .filter_map(|r| r.outcome.performance_index)
+        .collect();
+    values.sort_by(f64::total_cmp);
+    dispersion::median(&values).expect("districts on both sides of the guarantee")
+}
+
+/// Districts big enough for an identification *rate* to mean anything.
+///
+/// The same hundred-pupil floor `project`'s own test applies: below it, one identified pupil
+/// moves a district's share by a percentage point and the rate stops describing practice.
+fn sizeable(i: &Inputs) -> Vec<&DistrictRecord> {
+    i.panel
+        .iter()
+        .filter(|r| r.current_year_adm >= 100.0)
+        .collect()
+}
+
+/// The share of a district's roll it identifies as gifted.
+fn identified_share(r: &DistrictRecord) -> f64 {
+    (r.gifted.fte_k8 + r.gifted.fte_9_12) / r.current_year_adm
+}
+
+/// The performance supplement per pupil by economically-disadvantaged quintile, least-poor first,
+/// with the share of each band that qualifies.
+///
+/// Quintiled on `dpia.percentage` and paid per `categorical_enrolled_adm`, which is the pairing
+/// the supplement is actually computed over.
+fn performance_quintiles(i: &Inputs) -> [(f64, f64); 5] {
+    let mut sample: Vec<(f64, f64, bool)> = i
+        .panel
+        .iter()
+        .filter_map(|r| {
+            let adm = r.categorical_enrolled_adm;
+            (adm > 0.0 && r.dpia.percentage > 0.0).then(|| {
+                (
+                    r.dpia.percentage,
+                    r.performance.amount / adm,
+                    r.performance.eligible,
+                )
+            })
+        })
+        .collect();
+    sample.sort_by(|a, b| a.0.total_cmp(&b.0));
+    let size = sample.len() / 5;
+    let mut out = [(0.0, 0.0); 5];
+    for (k, slot) in out.iter_mut().enumerate() {
+        let band = if k == 4 {
+            &sample[4 * size..]
+        } else {
+            &sample[k * size..(k + 1) * size]
+        };
+        let per_pupil = band.iter().map(|b| b.1).sum::<f64>() / band.len() as f64;
+        let qualifying = band.iter().filter(|b| b.2).count() as f64 / band.len() as f64;
+        *slot = (per_pupil, qualifying);
+    }
+    out
+}
+
+/// Districts that missed the three-per-cent enrolment-growth cliff by less than three tenths of a
+/// point, with what clearing it would have paid each.
+fn just_below_the_growth_cliff(i: &Inputs) -> Vec<(&str, f64, f64)> {
+    let mut out: Vec<(&str, f64, f64)> = i
+        .panel
+        .iter()
+        .filter(|r| !r.supplements.growth_eligible && r.supplements.enrollment_change > 0.027)
+        .map(|r| {
+            (
+                r.name.as_str(),
+                r.supplements.enrollment_change,
+                r.current_year_adm
+                    * project::panel::supplements::ENROLLMENT_GROWTH_SUPPLEMENT_PER_PUPIL,
+            )
+        })
+        .collect();
+    out.sort_by(|a, b| b.1.total_cmp(&a.1));
+    out
 }
 
 /// Ohio's row of the Census state table.
@@ -988,6 +1092,305 @@ pub static FIGURES: &[Figure] = &[
         pinned: 62.0,
         tolerance: 0.0,
         compute: |i| sd1_at_twenty(i, 2024, |r| r.real_property_millage) as f64,
+    },
+    // `formula-component/fsfp-enrolment-supplements`, `fsfp-performance-supplement` and
+    // `fsfp-gifted-units`. All three compute through `project::panel`'s public API and always
+    // did — what was missing was the binding, which is what #158 is about rather than #157.
+    Figure {
+        key: "project/base-funding-supplement-total",
+        owner: "crates/project",
+        unit: Unit::Dollars,
+        label: "The base funding supplement statewide — $40 a pupil, every district, no test",
+        pinned: 56_079_575.0,
+        tolerance: 1.0,
+        compute: |i| i.panel.iter().map(|r| r.supplements.base_funding).sum(),
+    },
+    Figure {
+        key: "project/base-funding-supplement-per-district",
+        owner: "crates/project",
+        unit: Unit::Dollars,
+        label: "The same, per district",
+        pinned: 92_084.69,
+        tolerance: 0.01,
+        compute: |i| {
+            i.panel
+                .iter()
+                .map(|r| r.supplements.base_funding)
+                .sum::<f64>()
+                / i.panel.len() as f64
+        },
+    },
+    Figure {
+        key: "project/enrolment-growth-supplement-total",
+        owner: "crates/project",
+        unit: Unit::Dollars,
+        label: "The enrolment growth supplement statewide — $250 a pupil on the whole roll, for \
+                a district whose enrolment rose 3% over three years",
+        pinned: 39_379_553.0,
+        tolerance: 1.0,
+        compute: |i| i.panel.iter().map(|r| r.supplements.growth).sum(),
+    },
+    Figure {
+        key: "project/enrolment-growth-supplement-districts",
+        owner: "crates/project",
+        unit: Unit::Count,
+        label: "Districts that cleared the three-per-cent cliff",
+        pinned: 43.0,
+        tolerance: 0.0,
+        compute: |i| {
+            i.panel
+                .iter()
+                .filter(|r| r.supplements.growth_eligible)
+                .count() as f64
+        },
+    },
+    Figure {
+        key: "project/enrolment-growth-supplement-per-district",
+        owner: "crates/project",
+        unit: Unit::Dollars,
+        label: "The same, per district that draws it — the comparison that makes the two \
+                supplements different in kind rather than in size",
+        pinned: 915_803.56,
+        tolerance: 0.01,
+        compute: |i| {
+            let total: f64 = i.panel.iter().map(|r| r.supplements.growth).sum();
+            let n = i
+                .panel
+                .iter()
+                .filter(|r| r.supplements.growth_eligible)
+                .count();
+            total / n as f64
+        },
+    },
+    Figure {
+        // A magnitude, with the direction in the key: Ohio's median district is shrinking.
+        key: "project/median-three-year-enrolment-decline",
+        owner: "crates/project",
+        unit: Unit::Share,
+        label: "How far the median district's enrolment fell over the three years the growth \
+                supplement measures",
+        pinned: 0.048417,
+        tolerance: 0.00001,
+        compute: |i| {
+            let mut changes: Vec<f64> = i
+                .panel
+                .iter()
+                .map(|r| r.supplements.enrollment_change)
+                .collect();
+            changes.sort_by(f64::total_cmp);
+            -changes[changes.len() / 2]
+        },
+    },
+    Figure {
+        key: "project/largest-forgone-growth-supplement",
+        owner: "crates/project",
+        unit: Unit::Dollars,
+        label: "What three hundredths of a percentage point cost the district that came closest \
+                to the cliff and missed",
+        pinned: 430_476.80,
+        tolerance: 0.01,
+        compute: |i| {
+            just_below_the_growth_cliff(i)
+                .first()
+                .map_or(0.0, |(_, _, forgone)| *forgone)
+        },
+    },
+    Figure {
+        // *Besides* the nearest miss, which the node names and prices separately. Four districts
+        // sit in the band; the sentence is about the other three, and a figure of four bound to
+        // "three other districts" would be the check passing on a definition nobody stated.
+        key: "project/other-districts-just-below-the-growth-cliff",
+        owner: "crates/project",
+        unit: Unit::Count,
+        label: "Districts between 2.7% and 3% enrolment growth besides the nearest miss — near \
+                the cliff, and paid nothing for it",
+        pinned: 3.0,
+        tolerance: 0.0,
+        compute: |i| just_below_the_growth_cliff(i).len().saturating_sub(1) as f64,
+    },
+    Figure {
+        key: "project/performance-supplement-total",
+        owner: "crates/project",
+        unit: Unit::Dollars,
+        label: "The performance supplement statewide",
+        pinned: 55_676_980.0,
+        tolerance: 1.0,
+        compute: |i| i.panel.iter().map(|r| r.performance.amount).sum(),
+    },
+    Figure {
+        key: "project/performance-supplement-least-poor-quintile",
+        owner: "crates/project",
+        unit: Unit::Dollars,
+        label: "Mean performance supplement per pupil in the least-poor quintile",
+        pinned: 55.92,
+        tolerance: 0.005,
+        compute: |i| performance_quintiles(i)[0].0,
+    },
+    Figure {
+        key: "project/performance-supplement-second-quintile",
+        owner: "crates/project",
+        unit: Unit::Dollars,
+        label: "The same, second quintile",
+        pinned: 43.51,
+        tolerance: 0.005,
+        compute: |i| performance_quintiles(i)[1].0,
+    },
+    Figure {
+        key: "project/performance-supplement-third-quintile",
+        owner: "crates/project",
+        unit: Unit::Dollars,
+        label: "The same, third quintile",
+        pinned: 35.62,
+        tolerance: 0.005,
+        compute: |i| performance_quintiles(i)[2].0,
+    },
+    Figure {
+        key: "project/performance-supplement-fourth-quintile",
+        owner: "crates/project",
+        unit: Unit::Dollars,
+        label: "The same, fourth quintile",
+        pinned: 30.62,
+        tolerance: 0.005,
+        compute: |i| performance_quintiles(i)[3].0,
+    },
+    Figure {
+        key: "project/performance-supplement-poorest-quintile",
+        owner: "crates/project",
+        unit: Unit::Dollars,
+        label: "The same, poorest quintile — the other end of a gradient that runs against need",
+        pinned: 21.84,
+        tolerance: 0.005,
+        compute: |i| performance_quintiles(i)[4].0,
+    },
+    Figure {
+        key: "project/performance-supplement-gradient",
+        owner: "crates/project",
+        unit: Unit::Ratio,
+        label: "How many times more per pupil the least-poor quintile receives than the poorest",
+        pinned: 2.5605,
+        tolerance: 0.0005,
+        compute: |i| {
+            let q = performance_quintiles(i);
+            q[0].0 / q[4].0
+        },
+    },
+    Figure {
+        key: "project/performance-supplement-qualifying-least-poor",
+        owner: "crates/project",
+        unit: Unit::Share,
+        label: "Share of the least-poor quintile that qualifies for the supplement at all",
+        pinned: 0.9421,
+        tolerance: 0.0001,
+        compute: |i| performance_quintiles(i)[0].1,
+    },
+    Figure {
+        key: "project/performance-supplement-qualifying-poorest",
+        owner: "crates/project",
+        unit: Unit::Share,
+        label: "The same for the poorest quintile",
+        pinned: 0.4720,
+        tolerance: 0.0001,
+        compute: |i| performance_quintiles(i)[4].1,
+    },
+    Figure {
+        key: "project/gifted-identification-falls-with-poverty",
+        owner: "crates/project",
+        unit: Unit::Ratio,
+        label: "How strongly the share of pupils a district identifies as gifted falls as its \
+                disadvantaged share rises — the magnitude of a negative correlation",
+        pinned: 0.6726,
+        tolerance: 0.0005,
+        compute: |i| {
+            let (x, y): (Vec<f64>, Vec<f64>) = sizeable(i)
+                .iter()
+                .map(|r| (r.dpia.percentage, identified_share(r)))
+                .unzip();
+            dispersion::wealth_neutrality(&x, &y)
+                .expect("a paired series")
+                .correlation
+                .abs()
+        },
+    },
+    Figure {
+        key: "project/gifted-identification-rises-with-property-wealth",
+        owner: "crates/project",
+        unit: Unit::Ratio,
+        label: "The same against valuation per pupil — real, monotone, and half the strength of \
+                the poverty gradient",
+        pinned: 0.3483,
+        tolerance: 0.0005,
+        compute: |i| {
+            let (x, y): (Vec<f64>, Vec<f64>) = sizeable(i)
+                .iter()
+                .filter_map(|r| Some((r.valuation_per_pupil?, identified_share(r))))
+                .unzip();
+            dispersion::wealth_neutrality(&x, &y)
+                .expect("a paired series")
+                .correlation
+        },
+    },
+    // `formula-component/temporary-transitional-aid-guarantee`. The finding is a negative and the
+    // pair of figures is the whole of it: guarantee status looks like it predicts achievement and
+    // stops doing so the moment poverty is held constant.
+    Figure {
+        key: "project/guarantee-predicts-achievement-raw",
+        owner: "crates/project",
+        unit: Unit::Ratio,
+        label: "How strongly being on the guarantee predicts a district's Performance Index, \
+                before any control",
+        pinned: 0.18686,
+        tolerance: 0.0005,
+        compute: |i| {
+            let (guarantee, index, _) = guarantee_against_achievement(i);
+            dispersion::wealth_neutrality(&guarantee, &index)
+                .expect("a paired series")
+                .correlation
+        },
+    },
+    Figure {
+        key: "project/guarantee-predicts-achievement-holding-poverty",
+        owner: "crates/project",
+        unit: Unit::Ratio,
+        label: "The same, holding economic disadvantage constant — what is left of it, which is \
+                nothing",
+        pinned: 0.03457,
+        tolerance: 0.0005,
+        compute: |i| {
+            let (guarantee, index, poverty) = guarantee_against_achievement(i);
+            let pair = |x: &[f64], y: &[f64]| {
+                dispersion::wealth_neutrality(x, y)
+                    .expect("a paired series")
+                    .correlation
+            };
+            dispersion::partial_correlation(
+                pair(&guarantee, &index),
+                pair(&guarantee, &poverty),
+                pair(&index, &poverty),
+            )
+            .expect("a defined partial")
+        },
+    },
+    Figure {
+        key: "project/median-performance-index-on-the-guarantee",
+        owner: "crates/project",
+        unit: Unit::Ratio,
+        label: "Median Performance Index among districts the guarantee holds up",
+        // 89.85 and not the 89.9 two places carried: `dispersion::median` averages the two middle
+        // observations of an even series and the figure was taken as the upper of them, which is
+        // the same local-median defect this workspace corrected in three other files.
+        pinned: 89.85,
+        tolerance: 0.005,
+        compute: |i| median_index(i, true),
+    },
+    Figure {
+        key: "project/median-performance-index-on-the-formula",
+        owner: "crates/project",
+        unit: Unit::Ratio,
+        label: "Median Performance Index among districts the formula funds — the raw gap the \
+                control above dissolves",
+        pinned: 85.6,
+        tolerance: 0.005,
+        compute: |i| median_index(i, false),
     },
     Figure {
         key: "project/model-districts",

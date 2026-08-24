@@ -25,18 +25,24 @@ description: |
 findings: |
   ### It is distributed inversely to need
 
-  By economically disadvantaged quintile, the mean supplement per pupil runs **$54.74, $43.24,
-  $36.21, $30.03, $23.31** from least-poor to poorest, monotonically, and the share of
-  districts qualifying runs **91% to 49%**. The least-poor districts receive **2.3 times per
+  By economically disadvantaged quintile, the mean supplement per pupil runs **$55.92, $43.51,
+  $35.62, $30.62, $21.84** from least-poor to poorest, monotonically, and the share of
+  districts qualifying runs **94.21% to 47.20%**. The least-poor districts receive **2.56 times per
   pupil** what the poorest do. [verified —
   `crates/project/tests/the_supplements_outside_the_formula.rs`]
+
+  Every figure in that sentence moved when it was first bound to the crate. The table had been
+  published as `$54.74, $43.24, $36.21, $30.03, $23.31`, the qualification rates as `91% to 49%`
+  and the gradient as `2.3` — none of them what `project::panel` computes, and all of them under
+  `[verified]`, because the test that stood behind them asserted the gradient was `> 2.0` rather
+  than what it is. The direction of the finding is unchanged and its size is a quarter larger.
 
   This wants stating precisely rather than as an accusation. Ohio's attainment measures track
   composition — this corpus established that spending per *weighted* pupil against performance
   is substantially a composition proxy — so any program keyed to them follows composition
   whatever its intent. That explains the gradient; it does not remove it. **$55.7m of a formula
   built to equalise flows against the grain of everything else in it**, and no published figure
-  says so. The progress routes are what hold the gradient to 2.3 rather than whatever it would
+  says so. The progress routes are what hold the gradient to 2.56 rather than whatever it would
   otherwise be. [inference on the mechanism, [verified] on the measurement]
 
   ### The gradient is real and the size is not
@@ -59,6 +65,44 @@ findings: |
   the noise in most other lines — and a regressive 0.8% inside a progressive $7.28bn is a
   different object from a regressive program. The gradient is measured; whether it moves any
   district's position is not. [open]
+figures:
+  - key: project/performance-supplement-total
+    value: 55676980.25
+    field: description
+    as_written: "$55.7m to 427"
+  - key: project/performance-supplement-least-poor-quintile
+    value: 55.92
+    field: findings
+    as_written: "**$55.92, $43.51,\n  $35.62, $30.62, $21.84**"
+  - key: project/performance-supplement-second-quintile
+    value: 43.51
+    field: findings
+    as_written: "**$55.92, $43.51,\n  $35.62, $30.62, $21.84**"
+  - key: project/performance-supplement-third-quintile
+    value: 35.62
+    field: findings
+    as_written: "**$55.92, $43.51,\n  $35.62, $30.62, $21.84**"
+  - key: project/performance-supplement-fourth-quintile
+    value: 30.62
+    field: findings
+    as_written: "**$55.92, $43.51,\n  $35.62, $30.62, $21.84**"
+  - key: project/performance-supplement-poorest-quintile
+    value: 21.84
+    field: findings
+    as_written: "**$55.92, $43.51,\n  $35.62, $30.62, $21.84**"
+  - key: project/performance-supplement-qualifying-least-poor
+    value: 0.9421
+    field: findings
+    as_written: "districts qualifying runs **94.21% to 47.20%**"
+  - key: project/performance-supplement-qualifying-poorest
+    value: 0.472
+    field: findings
+    as_written: "districts qualifying runs **94.21% to 47.20%**"
+  - key: project/performance-supplement-gradient
+    value: 2.5605
+    field: findings
+    as_written: "receive **2.56 times per\n  pupil** what the poorest do"
+
 revisions:
   - was: |
       The statutory home of this payment was recorded as unreadable: "Reading the enacted bill
