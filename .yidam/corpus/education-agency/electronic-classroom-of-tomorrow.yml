@@ -39,11 +39,14 @@ findings: |
   [open]
 
   Peak enrollment and per-district deduction impact remain unpopulated. [open]
+
+  It opened in 2000 and closed in January 2018, but neither the charter date nor the closure
+  date is established to the day, so the node carries no `established` date — the class
+  declares that property a `date`, and a year is not one. [open]
 properties:
   agency_type: community
   county: Statewide (chartered in Franklin County)
   typology: Not applicable; e-school.
-  established: Opened 2000; closed January 2018. Exact dates not yet established.
   roles: |
     Statewide e-school [verified]. Subject to attendance-based funding recovery, FY2016 and
     FY2017 [verified — amounts not yet established]. Deduct-funded from resident districts

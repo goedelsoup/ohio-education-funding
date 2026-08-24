@@ -220,6 +220,12 @@ links:
   - target: ../formula-component/fsfp-transportation.yml
     relationship: governs
   - target: ../actor/ohio-general-assembly.yml
-    relationship: set-by
+    relationship: appropriated-by
+    note: >-
+      Not `set-by`: the class declares that for the legislation that fixes a parameter's
+      value, and this one is not fixed in statute. R.C. 3317.0213 does not mention
+      proration — the factor is an appropriation divided by an entitlement, so the General
+      Assembly reaches it through the line item rather than the section. `appropriated-by`
+      is the verb the revenue-stream nodes already use for exactly that.
   - target: ../../catalog/dew-fy27-funding-calculator.md
     relationship: sourced-from
