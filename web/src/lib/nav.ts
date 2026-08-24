@@ -23,6 +23,7 @@
 
 import type { Bundle } from "./types.ts";
 import { loadCorpus, type Corpus, type Node } from "./corpus.ts";
+import { compare } from "./order.ts";
 import * as routes from "./routes.ts";
 
 /**
@@ -274,7 +275,7 @@ function regimes(corpus: Corpus): NavLink[] {
   nodes.sort((a, b) => {
     const ya = established.get(a.id) ?? 0;
     const yb = established.get(b.id) ?? 0;
-    return yb - ya || a.label.localeCompare(b.label);
+    return yb - ya || compare(a.label, b.label);
   });
   return nodes.map((node) => {
     const link: NavLink = { href: routes.wikiNode(node.className, node.name), label: node.label };

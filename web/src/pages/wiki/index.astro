@@ -11,6 +11,7 @@
 import Base from "../../layouts/Base.astro";
 import { loadCorpus } from "../../lib/corpus.ts";
 import { count } from "../../lib/format.ts";
+import { compare } from "../../lib/order.ts";
 import { summarize } from "../../lib/prose.ts";
 import * as routes from "../../lib/routes.ts";
 import SectionAnchor from "../../components/SectionAnchor.astro";
@@ -42,7 +43,7 @@ const ordered = [...head, ...corpus.classes.filter((entry) => !shown.has(entry.c
  */
 const cited = corpus.sources.filter((source) => source.citedBy.length > 0);
 const leading = [...cited]
-  .sort((a, b) => b.citedBy.length - a.citedBy.length || a.title.localeCompare(b.title))
+  .sort((a, b) => b.citedBy.length - a.citedBy.length || compare(a.title, b.title))
   .slice(0, 12);
 
 /*
@@ -56,7 +57,7 @@ const leading = [...cited]
 const withdrawals = corpus.decisions.reduce((sum, decision) => sum + decision.corrections, 0);
 const recentlyCorrected = corpus.decisions
   .filter((decision) => decision.corrections > 0)
-  .sort((a, b) => b.corrections - a.corrections || a.slug.localeCompare(b.slug));
+  .sort((a, b) => b.corrections - a.corrections || compare(a.slug, b.slug));
 ---
 
 <Base

@@ -7,6 +7,8 @@
  * rather than an empty page and a spinner.
  */
 
+import { compare } from "../lib/order.ts";
+
 const table = document.querySelector<HTMLTableElement>("#district-table");
 const body = table?.tBodies[0];
 const nameInput = document.querySelector<HTMLInputElement>("#f-name");
@@ -80,10 +82,19 @@ if (table && body && nameInput && statusSelect && countOut) {
 
     decorated.sort((a, b) => {
       if (a.missing !== b.missing) return a.missing ? 1 : -1;
+      /*
+       * The same collation the rows were rendered in.
+       *
+       * This is the one of the sixteen `localeCompare` sites that ran in a *browser*, so the
+       * ordering came from the reader's locale rather than the document's — and the rows it is
+       * reordering were written alphabetically at build time by `feed.ts`. A reader whose machine
+       * collates differently got one order on arrival and another the moment they pressed a column
+       * heading, with the page offering no account of why.
+       */
       const order =
         a.numeric != null && b.numeric != null
           ? a.numeric - b.numeric
-          : a.text.localeCompare(b.text);
+          : compare(a.text, b.text);
       return descending ? -order : order;
     });
 

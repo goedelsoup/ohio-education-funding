@@ -34,6 +34,7 @@
 
 import type { District, Statewide } from "./types.ts";
 import { count, escapeHtml, money, pct } from "./format.ts";
+import { compare } from "./order.ts";
 import * as routes from "./routes.ts";
 import { median } from "./stats.ts";
 import { yearChip, yearOf } from "./year.ts";
@@ -85,7 +86,7 @@ export function counties(districts: District[]): County[] {
 
   return [...groups.entries()]
     .map(([name, list]) => {
-      const sorted = [...list].sort((a, b) => a.name.localeCompare(b.name));
+      const sorted = [...list].sort((a, b) => compare(a.name, b.name));
       const withValuation = sorted
         .filter((d) => d.valuation_per_pupil != null && d.valuation_per_pupil > 0)
         .sort((a, b) => a.valuation_per_pupil! - b.valuation_per_pupil!);
@@ -108,7 +109,7 @@ export function counties(districts: District[]): County[] {
         poorest: withValuation.length >= 2 ? poorest : null,
       };
     })
-    .sort((a, b) => a.name.localeCompare(b.name));
+    .sort((a, b) => compare(a.name, b.name));
 }
 
 /**

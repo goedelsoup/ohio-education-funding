@@ -8,11 +8,12 @@
  */
 import Base from "../../../layouts/Base.astro";
 import { loadCorpus } from "../../../lib/corpus.ts";
+import { compare } from "../../../lib/order.ts";
 import * as routes from "../../../lib/routes.ts";
 
 const { sources } = loadCorpus();
 const ranked = [...sources].sort(
-  (a, b) => b.citedBy.length - a.citedBy.length || a.title.localeCompare(b.title),
+  (a, b) => b.citedBy.length - a.citedBy.length || compare(a.title, b.title),
 );
 const uncited = ranked.filter((s) => s.citedBy.length === 0).length;
 ---

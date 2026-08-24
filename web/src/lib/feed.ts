@@ -37,6 +37,7 @@ import { existsSync, readFileSync } from "node:fs";
 import { resolve } from "node:path";
 
 import { BundleSchema } from "./schema/feed.ts";
+import { compare } from "./order.ts";
 import { median } from "./stats.ts";
 import { REQUIRED_CONTRACT, type Bundle, type District } from "./types.ts";
 import { isForecastVerified, isVerified, verify, type Verification } from "./verify.ts";
@@ -293,7 +294,7 @@ export function loadFeed(): Feed {
     verification,
     forecastable,
     byIrn: new Map(bundle.districts.map((d) => [d.irn, d])),
-    alphabetical: [...bundle.districts].sort((a, b) => a.name.localeCompare(b.name)),
+    alphabetical: [...bundle.districts].sort((a, b) => compare(a.name, b.name)),
     valuations: number((d) => d.valuation_per_pupil),
     expenditures: number((d) => d.operating_expenditure_per_pupil),
     tax,
