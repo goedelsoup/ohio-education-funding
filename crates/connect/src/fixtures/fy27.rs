@@ -499,12 +499,12 @@ mod growth_columns {
 /// formula:
 ///
 /// - **Two competing bases, and the district gets the greater.** Per weighted rider at $1,337.175,
-///   or per bus mile at $6.867 times a 180-day year. **350 of 611 districts are paid on the mile
+///   or per bus mile at $6.867 times a 180-day year. **350 districts are paid on the mile
 ///   base**, so the `MAX` is not a formality — it flips for more than half the state.
 /// - **Non-public riders count double and community-school riders one and a half times.** A
 ///   district transporting a private-school child is funded at twice the rate of its own pupil.
 ///   They are 4.5% of riders and 8.5% of weighted ridership.
-/// - **The state minimum share is 50%**, against the formula's 10%. **440 of 611 districts sit on
+/// - **The state minimum share is 50%**, against the formula's 10%. **440 of the department's 611 districts sit on
 ///   it**, so for most of the state a district's own capacity does not determine its transportation
 ///   aid at all.
 /// - **Two supplements pulling opposite ways.** An efficiency supplement pays up to 15% more for
@@ -818,6 +818,25 @@ pub fn build_fy27_model(sheets: &Fy27Sheets<'_>) -> Vec<Vec<String>> {
         };
         // A district present in the base cost sheet with no ADM is a placeholder row — a
         // district that closed, or one that exists only to carry a footnote.
+        //
+        // # This is not what excludes the two island districts
+        //
+        // The panel is 609 and the department pays 611. The two it does not carry are **Middle
+        // Bass Local** (048959) and **North Bass Local** (048967), both Ottawa County, and
+        // neither reaches this guard: they are absent from `Base_Cost` and `Base_Cost_adm`
+        // altogether, so the department computes no base cost for either. `districts` is keyed
+        // on `Base_Cost`, and a district that was never costed cannot enter it.
+        //
+        // They are in `ADM Data`, `Detail_SFPR` and `Summary_SFPR`, so the exclusion is this
+        // loop's and not the workbook's. **North Bass is not a placeholder**: it receives
+        // $19,672.64, entirely temporary transitional aid guarantee, against zero base cost,
+        // zero categoricals and zero transportation — the whole of the difference between this
+        // panel's guarantee total and the department's. Middle Bass receives nothing.
+        //
+        // Keyed on `Base_Cost` deliberately: everything downstream needs a base cost and a
+        // per-pupil denominator, and a district with neither would be a row of zeroes carrying a
+        // division. What it costs is that a statewide total computed here is over *funded and
+        // costed* districts, which is 609 — see `crates/project/tests/the_population_the_panel_speaks_for.rs`.
         let Some(adm) = cell_number(row, bc::ADM).filter(|adm| *adm > 0.0) else {
             continue;
         };

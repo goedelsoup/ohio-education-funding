@@ -163,7 +163,7 @@ impl Supplements {
 /// formula.
 ///
 /// **Two competing bases and the district gets the greater.** Per weighted rider at $1,337.175, or
-/// per bus mile at $6.867 across a 180-day year. **350 of 611 districts are paid on the mile
+/// per bus mile at $6.867 across a 180-day year. **350 districts are paid on the mile
 /// base**, so the choice flips for more than half the state — a district's transportation aid can
 /// be a function of its geography rather than its ridership, and which one is not visible in the
 /// amount.
@@ -172,8 +172,10 @@ impl Supplements {
 /// community or STEM`. A district transporting a private-school child is funded at twice the rate
 /// of its own pupil. Non-public riders are 4.5% of riders and 8.5% of weighted ridership.
 ///
-/// **The state minimum share is 50%.** Against the formula's 10%, and **440 of 611 districts sit
-/// on it** — 72%, against 23% on the formula's floor. For most of the state, local capacity does
+/// **The state minimum share is 50%.** Against the formula's 10%, and **440 of the department's 611 districts sit
+/// on it** — 72%, against 23% on the formula's floor. That denominator is the department's;
+/// this panel holds 609 and gives 438, the two missing being island districts it does not
+/// cost. See `crates/project/tests/the_population_the_panel_speaks_for.rs`. For most of the state, local capacity does
 /// not determine transportation aid at all. That is the single largest difference between how
 /// Ohio equalises instruction and how it equalises getting to it.
 ///
