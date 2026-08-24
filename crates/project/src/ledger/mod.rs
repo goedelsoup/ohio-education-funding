@@ -1,12 +1,13 @@
 //! The appropriations ledger: what the General Assembly set aside, line by line and year by year.
 //!
-//! Three modules, and the boundary they sit behind is the point of the directory.
+//! Four modules, and the boundary they sit behind is the point of the directory.
 //!
 //! | Module | Question it answers |
 //! |---|---|
 //! | [`appropriations`] | how much a line was given, FY2010 to FY2027 |
 //! | [`session_laws`] | the same, FY1998 to FY2001, from a different publisher |
 //! | [`line_origins`] | how old a line is, and which act established it |
+//! | [`budget_analysis`] | what a line's earmarks are, and whether they survived the legislature |
 //!
 //! # The invariant: the ledger knows nothing about districts
 //!
@@ -28,8 +29,8 @@
 //! largest consumer and would depend on both halves. The binding that matters is *documentary*:
 //! `tests/the_statute_behind_the_weights.rs` asserts the statute text agrees with [`mod@crate::panel`]'s
 //! constants, and the appropriation figures those weights are prorated against live here, so a
-//! crate boundary would put the most valuable check in the suite across it. And this is 1,102 source
-//! lines, where a crate buys ceremony rather than clarity.
+//! crate boundary would put the most valuable check in the suite across it. And this is well under
+//! the ~2,000 source lines named below, where a crate buys ceremony rather than clarity.
 //!
 //! **Split it for real when either becomes true:** the ledger passes ~2,000 lines, or a second
 //! consumer wants appropriations without compiling the district model. Today three of `project`'s
@@ -38,6 +39,7 @@
 //! cost being carried, and the directory is what makes paying it off a `git mv`.
 
 pub mod appropriations;
+pub mod budget_analysis;
 pub mod line_origins;
 pub mod session_laws;
 
@@ -55,13 +57,14 @@ mod tests {
     /// three needles are spelled in halves for the same reason: this file is one of the four it
     /// searches, and a literal `crate` followed by two colons would match itself.
     ///
-    /// The sources are read at compile time, which costs the test binary a copy of four files it
+    /// The sources are read at compile time, which costs the test binary a copy of five files it
     /// already contains and costs the library nothing.
     #[test]
     fn the_ledger_reaches_nothing_outside_itself() {
-        const SOURCES: [(&str, &str); 4] = [
+        const SOURCES: [(&str, &str); 5] = [
             ("mod.rs", include_str!("mod.rs")),
             ("appropriations.rs", include_str!("appropriations.rs")),
+            ("budget_analysis.rs", include_str!("budget_analysis.rs")),
             ("session_laws.rs", include_str!("session_laws.rs")),
             ("line_origins.rs", include_str!("line_origins.rs")),
         ];

@@ -20,8 +20,9 @@
 //! would be a transcription. Together they are a reconciliation, and the line only reconciles if
 //! both were read correctly.
 
-/// The greenbook: the department's appropriations as enacted.
-const GREENBOOK: &str = include_str!("../fixtures/dew-greenbook.txt");
+use project::budget_analysis::{
+    special_education_enhancements, Edition, ALI_200540_TOTAL, PRESCHOOL_REMAINDER,
+};
 
 /// The Catalog extract, which carries the same line item from a different publication.
 const CATALOG: &str = include_str!("../fixtures/catalog-line-items.csv");
@@ -31,46 +32,15 @@ const CATALOG: &str = include_str!("../fixtures/catalog-line-items.csv");
 /// against rather than re-derived.
 const CALCULATOR_LIMIT: f64 = 147_500_000.0;
 
-/// What the program totals at the calculator's own stated factor. Same provenance.
-const PROGRAM_AT_FACTOR: f64 = 148_408_184.0;
-
-/// The dollar amounts on a greenbook row, left to right, searched only inside one ALI's section.
+/// The enacted earmark table for the ALI this file is about.
 ///
-/// # Why the section matters
-///
-/// The greenbook has six rows beginning `Remainder –`, one per line item that has a residual
-/// earmark: foundation aid twice, preschool special education, auxiliary services, assessments and
-/// education management. A search for `Remainder` alone finds foundation aid's — an eight-billion
-/// figure where a hundred-and-fifty-million one belongs — and the first version of this file did
-/// exactly that. It failed loudly because the two years of an appropriation are equal and those
-/// two were not, which is the only reason it did not pass with the wrong row.
-///
-/// So the anchor is the section heading, and the row is the first match after it.
-fn greenbook_row(section: &str, label: &str) -> Vec<f64> {
-    // `rfind`, not `find`: the heading appears twice, once in the table of contents with dot
-    // leaders and once over the table. The contents entry carries no figures, so anchoring on it
-    // walks forward into whatever line item happens to come next — which is how this file first
-    // read foundation aid's eight-billion remainder as preschool special education's.
-    let at = GREENBOOK
-        .rfind(section)
-        .unwrap_or_else(|| panic!("the greenbook has no section {section:?}"));
-    GREENBOOK[at..]
-        .lines()
-        .find(|l| l.trim_start().starts_with(label))
-        .unwrap_or_else(|| panic!("no row {label:?} under {section:?}"))
-        .split_whitespace()
-        .filter_map(|token| {
-            token
-                .strip_prefix('$')?
-                .replace(',', "")
-                .parse::<f64>()
-                .ok()
-        })
-        .collect()
+/// The section anchoring — six greenbook rows begin `Remainder`, and the heading appears in the
+/// table of contents as well as over the table — lives on [`project::budget_analysis::row`], where
+/// the two other files that read these fixtures now get it too. It used to live here, in one of
+/// three private parsers that did not agree.
+fn enacted(label: &str) -> project::budget_analysis::Row {
+    special_education_enhancements(Edition::Enacted, label)
 }
-
-/// The ALI this file is about.
-const SECTION: &str = "Special Education Enhancements (ALI 200540)";
 
 fn catalog_200540(fiscal_year: u16, kind: &str) -> Option<f64> {
     CATALOG
@@ -90,9 +60,10 @@ fn catalog_200540(fiscal_year: u16, kind: &str) -> Option<f64> {
 fn the_greenbook_is_the_enacted_analysis_and_says_so() {
     // The distinction the corpus spent four phases quoting the wrong side of. A greenbook whose
     // columns said `Introduced` would be a redbook under another name.
-    assert!(GREENBOOK.contains("Special Education Enhancements (ALI 200540)"));
+    let greenbook = Edition::Enacted.text();
+    assert!(greenbook.contains("Special Education Enhancements (ALI 200540)"));
     assert!(
-        GREENBOOK.contains("Appropriation"),
+        greenbook.contains(Edition::Enacted.column_heading()),
         "the greenbook does not label an appropriation column"
     );
 }
@@ -104,15 +75,14 @@ fn the_remainder_held_from_introduction_to_enactment() {
      * preschool remainder and the enacted act carries the same figure — so the corpus's quoted
      * number was right, and it was right by luck rather than by evidence until now.
      */
-    let remainder = greenbook_row(SECTION, "Remainder");
-    assert_eq!(remainder.len(), 3, "the earmark table changed shape");
+    let remainder = enacted(PRESCHOOL_REMAINDER);
     // FY2025 actual, then the two enacted years, which are equal to each other.
-    assert_eq!(remainder[1], remainder[2], "the two years diverged");
-    assert_eq!(remainder[1], 153_976_832.0);
+    assert_eq!(remainder.first, remainder.second, "the two years diverged");
+    assert_eq!(remainder.first, 153_976_832.0);
 
-    let total = greenbook_row(SECTION, "GRF ALI 200540 total");
-    assert_eq!(total[1], 193_272_426.0);
-    assert_eq!(total[2], 193_272_426.0);
+    let total = enacted(ALI_200540_TOTAL);
+    assert_eq!(total.first, 193_272_426.0);
+    assert_eq!(total.second, 193_272_426.0);
 }
 
 #[test]
@@ -122,11 +92,11 @@ fn the_catalog_confirms_the_line_from_a_different_publication() {
      * Catalog is a different PDF series parsed by column count. If either extractor were reading
      * the wrong column these would not agree, and they agree to the dollar on three figures.
      */
-    let total = greenbook_row(SECTION, "GRF ALI 200540 total");
-    assert_eq!(catalog_200540(2026, "appropriation"), Some(total[1]));
-    assert_eq!(catalog_200540(2027, "appropriation"), Some(total[2]));
+    let total = enacted(ALI_200540_TOTAL);
+    assert_eq!(catalog_200540(2026, "appropriation"), Some(total.first));
+    assert_eq!(catalog_200540(2027, "appropriation"), Some(total.second));
     // And the year the calculator's stale limit came from, as an actual rather than an estimate.
-    assert_eq!(catalog_200540(2025, "actual"), Some(total[0]));
+    assert_eq!(catalog_200540(2025, "actual"), Some(total.prior));
 }
 
 #[test]
@@ -138,18 +108,30 @@ fn the_proration_does_not_arise_against_the_appropriation_that_governs_it() {
      *
      * Both comparisons are made because the first is what a reader of the calculator would
      * compute and the second is what is true.
+     *
+     * # The program total is computed here rather than pinned
+     *
+     * It used to be a `const PROGRAM_AT_FACTOR: f64 = 148_408_184.0` copied from the sibling file
+     * that derives it, and both differences below were checked against a thousand-dollar band. A
+     * band is the wrong instrument for a figure the corpus publishes to the dollar: the two
+     * numbers this file exists to state are $908,184 and $5,568,648, and a test that admits
+     * anything from $908,000 to $908,999 is not standing behind either of them. See #158.
      */
-    let enacted = greenbook_row(SECTION, "Remainder")[2];
+    let program: f64 = project::panel::panel()
+        .iter()
+        .map(|record| record.preschool_special_education.total)
+        .sum();
+    let appropriation = enacted(PRESCHOOL_REMAINDER).second;
 
-    let over = PROGRAM_AT_FACTOR - CALCULATOR_LIMIT;
-    let under = enacted - PROGRAM_AT_FACTOR;
+    let over = program - CALCULATOR_LIMIT;
+    let under = appropriation - program;
     assert!(over > 0.0, "the stale reading no longer shows an overrun");
     assert!(
         under > 0.0,
         "the program now exceeds its real appropriation"
     );
-    assert!((908_000.0..909_000.0).contains(&over), "{over}");
-    assert!((5_568_000.0..5_569_000.0).contains(&under), "{under}");
+    assert!((over - 908_183.76).abs() < 0.01, "{over:.2}");
+    assert!((under - 5_568_648.24).abs() < 0.01, "{under:.2}");
 }
 
 #[test]
@@ -164,28 +146,24 @@ fn the_residual_claimant_grew_on_a_line_that_was_cut() {
      * figure comparable to an appropriation, and the first version of this test used the actual,
      * got $8.36m for a movement that is $12.05m, and failed. An actual against an appropriation is
      * the same error `the_catalog_line_item_series` refuses at the source.
+     *
+     * Which column belongs to which edition is now `Edition::prior_year_heading`, so the two
+     * cannot be picked up interchangeably by reaching for `[0]`.
      */
-    const FY2025_ESTIMATE_LINE: f64 = 198_850_000.0;
-    const FY2025_ESTIMATE_REMAINDER: f64 = 147_500_000.0;
+    let estimate = |label| special_education_enhancements(Edition::Introduced, label).prior;
+    assert_eq!(estimate(ALI_200540_TOTAL), 198_850_000.0);
+    assert_eq!(estimate(PRESCHOOL_REMAINDER), 147_500_000.0);
 
-    let line_fell = FY2025_ESTIMATE_LINE - greenbook_row(SECTION, "GRF ALI 200540 total")[1];
-    let remainder_rose = greenbook_row(SECTION, "Remainder")[1] - FY2025_ESTIMATE_REMAINDER;
+    let line_fell = estimate(ALI_200540_TOTAL) - enacted(ALI_200540_TOTAL).first;
+    let remainder_rose = enacted(PRESCHOOL_REMAINDER).first - estimate(PRESCHOOL_REMAINDER);
     // The earmarks ahead of preschool absorbed both movements: the line's fall and the
     // remainder's rise are both paid for out of them.
     let earmarks_fell = line_fell + remainder_rose;
 
-    assert!(line_fell > 0.0, "the line did not fall");
-    assert!(remainder_rose > 0.0, "the remainder did not rise");
-    assert!(
-        (5_577_000.0..5_578_000.0).contains(&line_fell),
-        "{line_fell}"
+    assert_eq!(
+        line_fell, 5_577_574.0,
+        "the line did not fall by what it did"
     );
-    assert!(
-        (6_476_000.0..6_477_000.0).contains(&remainder_rose),
-        "{remainder_rose}"
-    );
-    assert!(
-        (12_054_000.0..12_055_000.0).contains(&earmarks_fell),
-        "the earmarks ahead of preschool moved by {earmarks_fell}"
-    );
+    assert_eq!(remainder_rose, 6_476_832.0, "the remainder moved");
+    assert_eq!(earmarks_fell, 12_054_406.0);
 }

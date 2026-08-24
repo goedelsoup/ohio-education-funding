@@ -9,6 +9,8 @@ description = "The figures the corpus quotes, computed from the crates that own 
 
 [dependencies]
 dispersion = { path = "../dispersion" }
+# For `FiscalYear`, which the appropriation series is deflated into.
+edfund-core = { path = "../edfund-core" }
 project = { path = "../project" }
 regime-diff = { path = "../regime-diff" }
 

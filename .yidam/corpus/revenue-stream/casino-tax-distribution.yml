@@ -72,8 +72,8 @@ findings: |
   million a year**, mean $349 million, across a range from $11 million to $1.51 billion. A
   substitution smaller than that ordinary movement is arithmetically inside it — not hard to
   see, but indistinguishable from the year's other reasons for moving. And nothing happens at
-  the onset: FY2012 moves +$183 million and FY2013 −$101 million, the seventh smallest of the
-  twenty-four annual movements in the series. [verified — the appropriation series and the
+  the onset: FY2012 moves +$183 million and FY2013 −$101 million — the eleventh and seventh
+  smallest of the 24 annual movements in the series. [verified — the appropriation series and the
   deflator, pinned in `crates/project/tests/what_the_series_cannot_settle.rs`]
 
   ### The lottery is different because it has a line, not because it is bigger
@@ -150,6 +150,71 @@ findings: |
   anything, which means the substitution question here is harder to answer rather than
   answered. [inference] What the lottery establishes is that Ohio's other constitutional
   education earmark works this way, which raises the prior without settling it. [open]
+figures:
+  - key: project/foundation-appropriation-noise-floor-real
+    value: 235875427.46828747
+    field: findings
+    as_written: "a **median of $236\n  million a year**"
+  - key: project/foundation-appropriation-mean-movement-real
+    value: 349304407.75213176
+    field: findings
+    as_written: "mean $349 million"
+  - key: project/foundation-appropriation-smallest-movement-real
+    value: 10512597.79604721
+    field: findings
+    as_written: "across a range from $11 million"
+  - key: project/foundation-appropriation-largest-movement-real
+    value: 1514161256.6836033
+    field: findings
+    as_written: "to $1.51 billion"
+  - key: project/foundation-appropriation-rose-fy2012-real
+    value: 182809659.5251789
+    field: findings
+    as_written: "FY2012 moves +$183 million"
+  - key: project/foundation-appropriation-fell-fy2013-real
+    value: 100531930.59197807
+    field: findings
+    as_written: "FY2013 \u2212$101 million"
+  - key: project/foundation-appropriation-annual-movements
+    value: 24
+    field: findings
+    as_written: "the 24 annual movements in the series"
+  - key: dispersion/casino-distributed-fy2016
+    value: 90832042.96000002
+    field: findings
+    as_written: "| FY2016 | $90.83m |"
+  - key: dispersion/casino-distributed-fy2017
+    value: 89356177.55999987
+    field: findings
+    as_written: "| FY2017 | $89.36m |"
+  - key: dispersion/casino-distributed-fy2018
+    value: 92029468.31000024
+    field: findings
+    as_written: "| FY2018 | $92.03m |"
+  - key: dispersion/casino-distributed-fy2019
+    value: 93928001.62999998
+    field: findings
+    as_written: "| FY2019 | $93.93m |"
+  - key: dispersion/casino-distributed-fy2020
+    value: 95985938.04000019
+    field: findings
+    as_written: "| FY2020 | $95.99m |"
+  - key: dispersion/casino-distributed-fy2021
+    value: 73873804.95000006
+    field: findings
+    as_written: "| FY2021 | **$73.87m** |"
+  - key: dispersion/casino-distributed-fy2022
+    value: 109385274.98999983
+    field: findings
+    as_written: "| FY2022 | $109.39m |"
+  - key: dispersion/casino-distributed-fy2023
+    value: 113107107.80000009
+    field: findings
+    as_written: "| FY2023 | $113.11m |"
+  - key: dispersion/casino-distributed-fy2024
+    value: 114177214.22000016
+    field: findings
+    as_written: "| FY2024 | $114.18m |"
 revisions:
   - was: |
       Settling whether the appropriation total could register this channel at all was recorded as

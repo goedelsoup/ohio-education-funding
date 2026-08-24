@@ -595,9 +595,11 @@ fn the_preschool_proration_no_longer_brings_the_program_within_its_appropriation
          if this has stopped being true the department has recalibrated and the node describing \
          it needs revisiting"
     );
+    // Stated to the cent, not as a band. `$908,184` is a figure the corpus publishes, and a check
+    // that admits anything from half a million to two million is not standing behind it. #158.
     let over = total - PREK_SPED_APPROPRIATION;
     assert!(
-        (500_000.0..2_000_000.0).contains(&over),
+        (over - 908_183.76).abs() < 0.01,
         "over the appropriation by {over:.2}, which is a different size from what was recorded"
     );
 

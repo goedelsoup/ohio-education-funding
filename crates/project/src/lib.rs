@@ -69,7 +69,7 @@ pub mod report;
 pub mod series;
 pub mod statute;
 
-pub use ledger::{appropriations, line_origins, session_laws};
+pub use ledger::{appropriations, budget_analysis, line_origins, session_laws};
 
 pub use crosswalk::{coverage, Coverage};
 pub use drafts::{draft, drafts, price, Draft, Lever, Priced, Provision};

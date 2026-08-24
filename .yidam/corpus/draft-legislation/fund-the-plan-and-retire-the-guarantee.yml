@@ -102,6 +102,19 @@ findings: |
   hold-harmless are absent from the −$143.9M entirely. Two of the three would move money in the
   opposite direction to the headline, so the sign of this bill's net effect is not established by
   its priced subset.
+figures:
+  - key: project/fund-the-plan-run-cut
+    value: 143877698.80599117
+    field: findings
+    as_written: "The bill cuts $143.9 million"
+  - key: project/fund-the-plan-provisions-costed-separately
+    value: 218951994.52816582
+    field: findings
+    as_written: "costed separately, say $219.0\n  million"
+  - key: project/fund-the-plan-interaction-residual
+    value: 75074295.72217464
+    field: findings
+    as_written: "overstate the cut by $75.1 million"
 properties:
   provenance: hypothetical
   designation: |

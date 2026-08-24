@@ -29,17 +29,36 @@
 //!
 //! # What is not here
 //!
-//! Roughly a fifth of the corpus's crate-attributed numeric claims. A figure earns a place here by
-//! being computable through a crate's **public** API; the rest are computed inside a test file, on
-//! a fixture parser that test declares privately, and exporting them means moving that parser into
-//! the library. That is worth doing and is not done here. `crates/figures.json` is a floor that
-//! only rises: `web/tests/unit/corpusFigures.spec.ts` pins the bound count at its value, so the
-//! next figure exported is a figure that cannot quietly go unbound.
+//! Four kinds of claim, and three of them are permanent. A **rank** yields no numeral in either
+//! form the corpus writes it — `seventh highest of fifty-one` has no digits and the `th` of
+//! `25th of 51` defeats the token boundary. An **identifier** carries digits inside a
+//! `[verified — crates/…]` tag and is not a quantity: an IRN, a bill number, an ALI code, a
+//! SHA-256 digest. And **`revisions:`** is unbindable by design, because the corpus is never
+//! rewritten to have always been right.
+//!
+//! The fourth kind is a **count spelled as a word**, and it is the one worth fixing rather than
+//! recording — `Twenty districts report an effective Class 1 rate below 20 mills` bound
+//! *successfully* to the `20` that meant mills, which is a false pass rather than a miss. Where the
+//! corpus states a computed count it now states it in digits.
+//!
+//! What is *not* missing any more is the crate-side constraint this section used to describe. A
+//! figure earns a place here by being computable through a crate's **public** API, and most of the
+//! corpus's crate-attributed numerals used to be computed inside a test file on a fixture parser
+//! that test declared privately. #157 moved eleven of those into the libraries that own them.
+//!
+//! `crates/figures.json` is a floor that only rises: `web/tests/unit/corpusFigures.spec.ts` pins
+//! the bound count at its value, so the next figure exported is a figure that cannot quietly go
+//! unbound — and `uncited-figure` makes an export no node binds a failure, so the manifest cannot
+//! grow ahead of the corpus either.
 
 #![forbid(unsafe_code)]
 
-use std::collections::HashMap;
+use std::collections::{BTreeMap, HashMap};
 
+use edfund_core::FiscalYear;
+use project::budget_analysis::{
+    self, Edition, ALI_200540_TOTAL, LOTTERY_LINE, PRESCHOOL_REMAINDER, TOTAL_FOUNDATION_AID,
+};
 use project::panel::{panel, DistrictRecord};
 use regime_diff::recognized_valuation::{self, Recognition};
 use regime_diff::{panel_at_fy2027, ChargeOffBase, RegimeDiff, TERMINAL_MILLS};
@@ -143,6 +162,24 @@ pub struct Inputs {
     /// The funding model joined to the report card — 606 districts on all three panels, which is
     /// the population every guarantee-against-achievement figure is computed over.
     pub joined: Vec<project::outcomes::Joined>,
+    /// Year-over-year movements in the foundation aid appropriation, in constant FY2025 dollars.
+    ///
+    /// The series `casino-tax-distribution` rests its central null result on: an earmark's arrival
+    /// is only readable off an appropriation total if it moves the total by more than the total
+    /// ordinarily moves.
+    pub movements: Vec<(u16, f64)>,
+    /// The casino channel actually distributed to districts, by state fiscal year — the other side
+    /// of that comparison, and the one that was assumed rather than measured until `tax-casino`
+    /// was wired.
+    pub casino: BTreeMap<u16, f64>,
+    /// Every school district's presence in every House seat, which is where the corpus's claims
+    /// about how badly the two geographies nest are computed.
+    pub house: Vec<project::legislative_district::Overlap>,
+    /// The base cost reference-year refresh, priced against the FY2027 panel.
+    pub refresh: project::drafts::Priced,
+    /// The same refresh run together with a half-retired guarantee — the draft whose whole point
+    /// is that the two provisions do not add.
+    pub fund_the_plan: project::drafts::Priced,
     /// Total taxable value as Table SD-1 publishes it, summed over the districts the county
     /// abstract can recognize.
     pub actual_total: f64,
@@ -156,6 +193,9 @@ impl Inputs {
     #[must_use]
     pub fn build() -> Self {
         let panel = panel();
+        // Cloned rather than borrowed: `panel` moves into the struct literal below, and the two
+        // draft runs need it before that happens.
+        let panel_for_drafts = panel.clone();
         let recognized: HashMap<String, Recognition> = recognized_valuation::from_abstract(2024);
         let at_recognized = panel_at_fy2027(
             &panel,
@@ -200,10 +240,35 @@ impl Inputs {
                     })
                     .collect()
             },
+            movements: project::appropriations::foundation_movements(BASE),
+            casino: dispersion::casino::by_fiscal_year(),
+            house: project::legislative_district::overlaps(
+                project::legislative_district::Chamber::House,
+            ),
+            refresh: priced("hb-96-with-refreshed-inputs", &panel_for_drafts),
+            fund_the_plan: priced("fund-the-plan-and-retire-the-guarantee", &panel_for_drafts),
             actual_total,
             recognized_total,
         }
     }
+}
+
+/// The base year every real appropriation figure here is stated in.
+///
+/// FY2025 because that is the year the corpus's noise-floor paragraph is written in, and a base
+/// year is part of a constant-dollar figure rather than a detail of how it was produced.
+const BASE: FiscalYear = FiscalYear(2025);
+
+/// Price one draft against the panel.
+///
+/// # Panics
+///
+/// If the slug names no draft, which would mean `project/fixtures/draft-provisions.tsv` has been
+/// edited without the figures that quote its runs being moved with it.
+fn priced(slug: &str, panel: &[DistrictRecord]) -> project::drafts::Priced {
+    let draft = project::drafts::draft(slug)
+        .unwrap_or_else(|| panic!("no draft {slug:?} in the provisions fixture"));
+    project::drafts::price(&draft, panel)
 }
 
 /// A figure and what it came out at on this run.
@@ -225,6 +290,60 @@ pub fn compute_all() -> Vec<Computed> {
             value: (figure.compute)(&inputs),
         })
         .collect()
+}
+
+/// One row of the enacted earmark table for ALI 200540.
+fn enacted_200540(label: &str) -> f64 {
+    budget_analysis::special_education_enhancements(Edition::Enacted, label).second
+}
+
+/// The preschool special education program at the department's own stated proration factor.
+fn prek_sped_program(i: &Inputs) -> f64 {
+    i.panel
+        .iter()
+        .map(|record| record.preschool_special_education.total)
+        .sum()
+}
+
+/// A movement in the foundation aid appropriation for one fiscal year, as a magnitude.
+///
+/// The sign is carried by the figure's key for the reason [`outcome_correlation`] states: prose
+/// writes `+$183 million` and `−$101 million`, and the consumer's numeral reader does not read a
+/// sign.
+///
+/// # Panics
+///
+/// If the year is not in the series, which would mean the appropriation fixtures no longer reach
+/// the years the casino channel came online — the two years the whole null result is about.
+fn movement(i: &Inputs, fiscal_year: u16) -> f64 {
+    i.movements
+        .iter()
+        .find(|(year, _)| *year == fiscal_year)
+        .map(|(_, moved)| moved.abs())
+        .unwrap_or_else(|| panic!("FY{fiscal_year} is not in the appropriation series"))
+}
+
+/// The movement magnitudes, sorted, which every summary of the noise floor is taken over.
+fn movement_magnitudes(i: &Inputs) -> Vec<f64> {
+    let mut magnitudes: Vec<f64> = i.movements.iter().map(|(_, moved)| moved.abs()).collect();
+    magnitudes.sort_by(|a, b| a.partial_cmp(b).expect("finite"));
+    magnitudes
+}
+
+/// How many House seats each school district has population in.
+fn house_reach(i: &Inputs) -> BTreeMap<&str, usize> {
+    let mut reach: BTreeMap<&str, usize> = BTreeMap::new();
+    for overlap in &i.house {
+        *reach.entry(overlap.irn.as_str()).or_default() += 1;
+    }
+    reach
+}
+
+/// How many districts a draft lifts off the guarantee — the count that changes which mechanism
+/// pays them rather than how much.
+fn lifted_off_the_guarantee(priced: &project::drafts::Priced) -> f64 {
+    let effect = priced.effect();
+    (effect.baseline.on_guarantee - effect.policy.on_guarantee) as f64
 }
 
 /// A correlation over the report card joined to the profile report, as a magnitude.
@@ -1592,5 +1711,344 @@ pub static FIGURES: &[Figure] = &[
         pinned: 793_000_000.0,
         tolerance: 500_000.0,
         compute: |i| (i.actual_total - i.recognized_total) * TERMINAL_MILLS / 1000.0,
+    },
+    Figure {
+        key: "project/prek-sped-remainder-fy2027",
+        owner: "crates/project",
+        unit: Unit::Dollars,
+        label: "The FY2027 appropriation for preschool special education — the residual earmark of GRF \
+                ALI 200540, and the limit its proration is set against",
+        pinned: 153_976_832.0,
+        tolerance: 0.0,
+        compute: |_| enacted_200540(PRESCHOOL_REMAINDER),
+    },
+    Figure {
+        key: "project/ali-200540-total-fy2027",
+        owner: "crates/project",
+        unit: Unit::Dollars,
+        label: "GRF ALI 200540, Special Education Enhancements, as enacted for FY2027",
+        pinned: 193_272_426.0,
+        tolerance: 0.0,
+        compute: |_| enacted_200540(ALI_200540_TOTAL),
+    },
+    Figure {
+        key: "project/ali-200540-actual-fy2025",
+        owner: "crates/project",
+        unit: Unit::Dollars,
+        label: "The same line in FY2025, as an actual rather than an appropriation — the year the \
+                calculator's stale limit came from",
+        pinned: 195_160_040.0,
+        tolerance: 0.0,
+        compute: |_| budget_analysis::special_education_enhancements(Edition::Enacted, ALI_200540_TOTAL).prior,
+    },
+    Figure {
+        key: "project/prek-sped-program-total-fy2027",
+        owner: "crates/project",
+        unit: Unit::Dollars,
+        label: "What preschool special education totals across the FY2027 model at the department's own \
+                stated proration factor",
+        pinned: 148_408_183.76,
+        tolerance: 0.005,
+        compute: prek_sped_program,
+    },
+    Figure {
+        key: "project/prek-sped-headroom-fy2027",
+        owner: "crates/project",
+        unit: Unit::Dollars,
+        label: "How far that total sits under the appropriation that governs it — the reason no proration \
+                arises, against a calculator cell that says one does",
+        pinned: 5_568_648.24,
+        tolerance: 0.005,
+        compute: |i| enacted_200540(PRESCHOOL_REMAINDER) - prek_sped_program(i),
+    },
+    Figure {
+        key: "project/prek-sped-over-the-stale-limit",
+        owner: "crates/project",
+        unit: Unit::Dollars,
+        label: "And how far it sits over the $147,500,000 the calculator prints beside the factor, which \
+                is the FY2025 estimate carried into an FY2027 sheet",
+        pinned: 908_183.76,
+        tolerance: 0.005,
+        compute: |i| prek_sped_program(i) - project::panel::supplements::PREK_SPED_APPROPRIATION,
+    },
+    Figure {
+        key: "project/enacted-foundation-aid-fy2026",
+        owner: "crates/project",
+        unit: Unit::Dollars,
+        label: "Total foundation aid appropriated for FY2026, as enacted — not the $11.15 billion the \
+                redbook proposed, which two nodes published under [verified]",
+        pinned: 11_230_057_557.0,
+        tolerance: 0.0,
+        compute: |_| budget_analysis::foundation_aid(Edition::Enacted, TOTAL_FOUNDATION_AID).first,
+    },
+    Figure {
+        key: "project/enacted-lottery-line-fy2026",
+        owner: "crates/project",
+        unit: Unit::Dollars,
+        label: "Fund 7017 ALI 200612 inside that total, as enacted",
+        pinned: 1_436_583_202.0,
+        tolerance: 0.0,
+        compute: |_| budget_analysis::foundation_aid(Edition::Enacted, LOTTERY_LINE).first,
+    },
+    Figure {
+        key: "project/lottery-line-rose-at-enactment",
+        owner: "crates/project",
+        unit: Unit::Dollars,
+        label: "How much the lottery's line rose between the bill as introduced and the bill as enacted",
+        pinned: 97_638_202.0,
+        tolerance: 0.0,
+        compute: |_| budget_analysis::enactment_movement(LOTTERY_LINE),
+    },
+    Figure {
+        key: "project/foundation-aid-rose-at-enactment",
+        owner: "crates/project",
+        unit: Unit::Dollars,
+        label: "How much the whole foundation aid total rose over the same passage — less than the \
+                lottery line alone did",
+        pinned: 82_062_286.0,
+        tolerance: 0.0,
+        compute: |_| budget_analysis::enactment_movement(TOTAL_FOUNDATION_AID),
+    },
+    Figure {
+        // Positive, with the direction in the key, on the convention
+        // `regime-diff/median-shortfall-under-the-plan` set: prose writes "the other four lines
+        // together fell $15,575,916", and the consumer's numeral reader does not read a sign.
+        key: "project/foundation-lines-off-the-lottery-fell-at-enactment",
+        owner: "crates/project",
+        unit: Unit::Dollars,
+        label: "And how much the other four lines fell, which is the difference between those two: the \
+                substitution argument as one subtraction",
+        pinned: 15_575_916.0,
+        tolerance: 0.0,
+        compute: |_| -budget_analysis::enactment_movement_off_the_lottery_line(),
+    },
+    Figure {
+        key: "project/foundation-appropriation-annual-movements",
+        owner: "crates/project",
+        unit: Unit::Count,
+        label: "Year-over-year movements in the foundation aid appropriation — the length of the series \
+                every figure below is a summary of",
+        pinned: 24.0,
+        tolerance: 0.0,
+        compute: |i| i.movements.len() as f64,
+    },
+    Figure {
+        key: "project/foundation-appropriation-noise-floor-real",
+        owner: "crates/project",
+        unit: Unit::Dollars,
+        label: "The median absolute annual movement in foundation aid, in constant FY2025 dollars — the \
+                floor below which a substitution cannot be read off the total at all",
+        pinned: 235_900_000.0,
+        tolerance: 100_000.0,
+        compute: |_| project::appropriations::foundation_noise_floor(BASE),
+    },
+    Figure {
+        key: "project/foundation-appropriation-mean-movement-real",
+        owner: "crates/project",
+        unit: Unit::Dollars,
+        label: "The mean of the same movements, which two years dominate and which is why the floor is \
+                stated as a median",
+        pinned: 349_300_000.0,
+        tolerance: 100_000.0,
+        compute: |i| { let m = movement_magnitudes(i); m.iter().sum::<f64>() / m.len() as f64 },
+    },
+    Figure {
+        key: "project/foundation-appropriation-smallest-movement-real",
+        owner: "crates/project",
+        unit: Unit::Dollars,
+        label: "The quietest year in the series",
+        pinned: 10_512_598.0,
+        tolerance: 1.0,
+        compute: |i| movement_magnitudes(i)[0],
+    },
+    Figure {
+        key: "project/foundation-appropriation-largest-movement-real",
+        owner: "crates/project",
+        unit: Unit::Dollars,
+        label: "And the loudest — the spread is the other half of why inference from the total fails",
+        pinned: 1_514_161_257.0,
+        tolerance: 1.0,
+        compute: |i| *movement_magnitudes(i).last().expect("a non-empty series"),
+    },
+    Figure {
+        key: "project/foundation-appropriation-rose-fy2012-real",
+        owner: "crates/project",
+        unit: Unit::Dollars,
+        label: "How much foundation aid moved in FY2012, the year the county student fund began \
+                distributing casino money",
+        pinned: 182_809_660.0,
+        tolerance: 1.0,
+        compute: |i| movement(i, 2012),
+    },
+    Figure {
+        key: "project/foundation-appropriation-fell-fy2013-real",
+        owner: "crates/project",
+        unit: Unit::Dollars,
+        label: "And in FY2013 — both unremarkable among their neighbours, which is the null result",
+        pinned: 100_531_931.0,
+        tolerance: 1.0,
+        compute: |i| movement(i, 2013),
+    },
+    Figure {
+        key: "dispersion/casino-distributed-fy2016",
+        owner: "crates/dispersion",
+        unit: Unit::Dollars,
+        label: "The casino channel distributed to school districts in FY2016, the first complete \
+                state fiscal year the per-district series reaches",
+        pinned: 90_832_043.0,
+        tolerance: 1.0,
+        compute: |i| i.casino[&2016],
+    },
+    Figure {
+        key: "dispersion/casino-distributed-fy2017",
+        owner: "crates/dispersion",
+        unit: Unit::Dollars,
+        label: "The casino channel distributed to school districts in FY2017",
+        pinned: 89_356_178.0,
+        tolerance: 1.0,
+        compute: |i| i.casino[&2017],
+    },
+    Figure {
+        key: "dispersion/casino-distributed-fy2018",
+        owner: "crates/dispersion",
+        unit: Unit::Dollars,
+        label: "The casino channel distributed to school districts in FY2018",
+        pinned: 92_029_468.0,
+        tolerance: 1.0,
+        compute: |i| i.casino[&2018],
+    },
+    Figure {
+        key: "dispersion/casino-distributed-fy2019",
+        owner: "crates/dispersion",
+        unit: Unit::Dollars,
+        label: "The casino channel distributed to school districts in FY2019",
+        pinned: 93_928_002.0,
+        tolerance: 1.0,
+        compute: |i| i.casino[&2019],
+    },
+    Figure {
+        key: "dispersion/casino-distributed-fy2020",
+        owner: "crates/dispersion",
+        unit: Unit::Dollars,
+        label: "The casino channel distributed to school districts in FY2020",
+        pinned: 95_985_938.0,
+        tolerance: 1.0,
+        compute: |i| i.casino[&2020],
+    },
+    Figure {
+        key: "dispersion/casino-distributed-fy2021",
+        owner: "crates/dispersion",
+        unit: Unit::Dollars,
+        label: "The same for FY2021 — the closure year, and the trough of the series",
+        pinned: 73_873_805.0,
+        tolerance: 1.0,
+        compute: |i| i.casino[&2021],
+    },
+    Figure {
+        key: "dispersion/casino-distributed-fy2022",
+        owner: "crates/dispersion",
+        unit: Unit::Dollars,
+        label: "The same for FY2022, the first year the channel exceeds the lottery movement that \
+                was legible",
+        pinned: 109_385_275.0,
+        tolerance: 1.0,
+        compute: |i| i.casino[&2022],
+    },
+    Figure {
+        key: "dispersion/casino-distributed-fy2023",
+        owner: "crates/dispersion",
+        unit: Unit::Dollars,
+        label: "The casino channel distributed to school districts in FY2023",
+        pinned: 113_107_108.0,
+        tolerance: 1.0,
+        compute: |i| i.casino[&2023],
+    },
+    Figure {
+        key: "dispersion/casino-distributed-fy2024",
+        owner: "crates/dispersion",
+        unit: Unit::Dollars,
+        label: "The same for FY2024 — the largest year, and still under half the noise floor",
+        pinned: 114_177_214.0,
+        tolerance: 1.0,
+        compute: |i| i.casino[&2024],
+    },
+    Figure {
+        key: "project/hb-96-refresh-run-cost",
+        owner: "crates/project",
+        unit: Unit::Dollars,
+        label: "What moving the base cost reference year from FY2022 to FY2024 costs across the FY2027 \
+                model — the draft's only provision, so the draft's cost is its cost",
+        pinned: 220_525_319.16,
+        tolerance: 0.005,
+        compute: |i| i.refresh.cost().expect("the refresh prices"),
+    },
+    Figure {
+        key: "project/hb-96-refresh-districts-lifted-off-the-guarantee",
+        owner: "crates/project",
+        unit: Unit::Count,
+        label: "Districts the refresh lifts onto the formula — the only districts for which it changes \
+                the kind of thing that determines their aid rather than the amount",
+        pinned: 41.0,
+        tolerance: 0.0,
+        compute: |i| lifted_off_the_guarantee(&i.refresh),
+    },
+    Figure {
+        // Positive, direction in the key: the prose is "the bill cuts $143.9 million".
+        key: "project/fund-the-plan-run-cut",
+        owner: "crates/project",
+        unit: Unit::Dollars,
+        label: "What the refresh and a half-retired guarantee cost when they are run together",
+        pinned: 143_877_698.81,
+        tolerance: 0.005,
+        compute: |i| -i.fund_the_plan.cost().expect("the draft prices"),
+    },
+    Figure {
+        key: "project/fund-the-plan-provisions-costed-separately",
+        owner: "crates/project",
+        unit: Unit::Dollars,
+        label: "What the same two provisions come to when each is priced alone and the two are added",
+        pinned: 218_951_994.53,
+        tolerance: 0.005,
+        compute: |i| -i.fund_the_plan.attribution().iter().map(|a| a.cost).sum::<f64>(),
+    },
+    Figure {
+        key: "project/fund-the-plan-interaction-residual",
+        owner: "crates/project",
+        unit: Unit::Dollars,
+        label: "The difference between those two — what the guarantee's `max` double-counts, and the \
+                reason a draft's cost is one combined run",
+        pinned: 75_074_295.72,
+        tolerance: 0.005,
+        compute: |i| i.fund_the_plan.residual().expect("the draft prices"),
+    },
+    Figure {
+        key: "project/school-districts-in-two-or-more-house-districts",
+        owner: "crates/project",
+        unit: Unit::Count,
+        label: "School districts with population in more than one House district — the reason there is no \
+                published crosswalk and no clean one to publish",
+        pinned: 339.0,
+        tolerance: 0.0,
+        compute: |i| house_reach(i).values().filter(|seats| **seats >= 2).count() as f64,
+    },
+    Figure {
+        key: "project/house-districts-columbus-city-reaches",
+        owner: "crates/project",
+        unit: Unit::Count,
+        label: "House seats the most-divided school district has population in",
+        pinned: 11.0,
+        tolerance: 0.0,
+        compute: |i| *house_reach(i).values().max().expect("a non-empty crosswalk") as f64,
+    },
+    Figure {
+        key: "project/ohio-under-eighteen-share",
+        owner: "crates/project",
+        unit: Unit::Share,
+        label: "Ohio's under-18 share of population, which is the weight school funding is apportioned \
+                across House seats by — not total population, which would weight a seat full of \
+                retirees the same as one full of families",
+        pinned: 0.2197,
+        tolerance: 0.00005,
+        compute: |i| { let pop: f64 = i.house.iter().map(|o| o.population).sum(); i.house.iter().map(|o| o.population_under_18).sum::<f64>() / pop },
     },
 ];
