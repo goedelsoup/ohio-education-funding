@@ -742,7 +742,43 @@ tbody tr:last-child th, tbody tr:last-child td { border-bottom: 0; }
  * lets a static chart follow the theme without being re-rendered. Plot puts each mark's class on
  * its group, so these rules address `.class > *` where they need the shape itself.
  */
-.chartwrap { overflow-x: auto; }
+/*
+ * `.chartwrap` carried `overflow-x: auto` and it never once fired.
+ *
+ * The rule was written for a chart wider than its container, and there has never been one: the SVG
+ * is `width: 100%` over a `viewBox`, so it fits by shrinking. Measured against a build at 375, 390,
+ * 430, 700, 1000 and 1280px, no `.chartwrap` on any page has anything behind its edge. The
+ * declaration was describing a scrolling affordance that did not exist, which is worse than
+ * nothing: it is where the belief that these charts scroll came from. `.scroll`, which wraps the
+ * tables, is the one that really does — and it is `overflow-x: auto` below.
+ */
+
+/*
+ * Which of a chart's two layouts the reader gets.
+ *
+ * `renderToString` emits both — see `src/lib/plot/ssr.ts` for why a chart is drawn twice rather
+ * than scaled — and this picks. A **container** query rather than a media query, because the
+ * question is how much room this chart has and not how wide the window is: the same card sits in
+ * a 900px column on a district page and an 1180px one on `/districts`, and a chart inside a
+ * `.strip-row` has less than either.
+ *
+ * The swap is at 576px because that is 0.9 × 640: below it the wide drawing would be scaled past
+ * the point where its 10px axis text stays at 9px, which is the whole defect this replaced. Above
+ * it the wide drawing is the better picture at every width. The narrow drawing is therefore shown
+ * from 293px — a phone's content box — up to 576px, and is scaled between 0.92 and 1.8 across
+ * that range.
+ *
+ * `display: none` and not `visibility`: the hidden drawing must leave the accessibility tree, or
+ * a screen reader is offered the same chart twice under the same name.
+ */
+.chart-pair { container-type: inline-size; }
+.chart-at[data-at="narrow"] { display: block; }
+.chart-at[data-at="wide"] { display: none; }
+@container (min-width: 576px) {
+  .chart-at[data-at="narrow"] { display: none; }
+  .chart-at[data-at="wide"] { display: block; }
+}
+
 .chart, svg.plot { width: 100%; height: auto; display: block; }
 .bar-value { font-variant-numeric: tabular-nums; }
 .axis { stroke: var(--accent-rule); stroke-width: 1; }
@@ -1331,10 +1367,19 @@ tr.series-break > td {
   #tip { display: none; }
 
   /*
-   * A scroll container prints as a clip: the part of a 609-row table or a wide chart that would
-   * have scrolled is simply cut off, with nothing saying it was there.
+   * A scroll container prints as a clip: the part of a 609-row table that would have scrolled is
+   * simply cut off, with nothing saying it was there.
+   *
+   * `.scroll` is named here and was not, which is the container the sentence above is actually
+   * about — `.chartwrap` was the only one unset, and it is the one that never scrolled. So every
+   * wide table on this site has printed with its right-hand columns missing.
    */
-  .chartwrap { overflow-x: visible; }
+  .scroll { overflow-x: visible; }
+  /* Paper is wider than 576px and never scrolls, so the wide drawing is the one to print. Stated
+     rather than left to the container query, which would be answering about a column this
+     stylesheet has not measured. */
+  .chart-at[data-at="narrow"] { display: none; }
+  .chart-at[data-at="wide"] { display: block; }
 
   .card, .chartwrap, .tile, .strip-row, .flags, tr { break-inside: avoid; }
   /* A heading, and a legend, belong to what follows them. */

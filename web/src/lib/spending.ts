@@ -96,7 +96,7 @@ export function renderSpendingByFunction(d: District): string {
   return `
     <div class="card" id="spending-by-function" data-part="spending-by-function">
       <h2>${anchor("spending-by-function")}Where the money went${yearChip("outcome.spending")}</h2>
-      <div class="chartwrap" data-chart="functions">${renderToString(barSpec(bars), { label: `Operating spending per pupil by function, ${yearOf("outcome.spending")}, over unweighted ADM` })}</div>
+      <div class="chartwrap" data-chart="functions">${renderToString((w) => barSpec(bars, { width: w }), { label: `Operating spending per pupil by function, ${yearOf("outcome.spending")}, over unweighted ADM` })}</div>
 
       <div class="scroll"><table>
         <thead><tr><th>Function</th><th>Per pupil</th><th>Share</th></tr></thead>
@@ -204,7 +204,7 @@ export function renderFederalShare(d: District, statewide: OutcomeStatewide | nu
   return `
     <div class="card" id="federal-share" data-part="federal-share">
       <h2>${anchor("federal-share")}Where the money came from${yearChip("outcome.spending")}</h2>
-      <div class="chartwrap" data-chart="origin">${renderToString(barSpec(bars), { label: `Operating spending per equivalent pupil, state and local against federal, ${yearOf("outcome.spending")}` })}</div>
+      <div class="chartwrap" data-chart="origin">${renderToString((w) => barSpec(bars, { width: w }), { label: `Operating spending per equivalent pupil, state and local against federal, ${yearOf("outcome.spending")}` })}</div>
 
       <div class="tiles">
         <div class="tile"><div class="k">Federal share of operating spending</div>

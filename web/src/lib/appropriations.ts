@@ -117,17 +117,19 @@ export function renderAppropriations(
   const actYears = fromActs(rows);
 
   const chart = renderToString(
-    seriesSpec(
-      shown.map((r) => ({
-        year: r.fiscal_year,
-        a: r.enacted,
-        b: r.foundation_funding,
-      })),
-      { a: "all lines", b: "the formula" },
-      BILLIONS,
-      (p) =>
-        `FY${p.year}: ${BILLIONS(p.a ?? 0)} appropriated, ${BILLIONS(p.b ?? 0)} of it the formula`,
-    ),
+    (w) =>
+      seriesSpec(
+        shown.map((r) => ({
+          year: r.fiscal_year,
+          a: r.enacted,
+          b: r.foundation_funding,
+        })),
+        { a: "all lines", b: "the formula" },
+        BILLIONS,
+        (p) =>
+          `FY${p.year}: ${BILLIONS(p.a ?? 0)} appropriated, ${BILLIONS(p.b ?? 0)} of it the formula`,
+        { width: w },
+      ),
   { label: `Appropriation and the formula's share of it, billions of dollars by fiscal year, FY${first.fiscal_year} to FY${last.fiscal_year}, in ${basis === "real" ? `constant FY${base} dollars` : "the dollars of each year"}` },
   );
 

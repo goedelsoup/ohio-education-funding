@@ -62,30 +62,31 @@ const millage = {
   })(),
 };
 const millageScatter = renderToString(
-  scatterSpec(
-    pairs(
-      withMillage,
-      (d) => d.millage!.predicted_rate,
-      (d) => d.millage!.observed_rate,
-      (d, predicted, observed) =>
-        `${d.name}: the factors predict ${predicted.toFixed(2)} mills, Table SD-1 charges ${observed.toFixed(2)}` +
-        (d.millage!.at_floor ? ", at the twenty-mill floor" : ""),
-      /*
-       * Split by floor status, which is the variable that explains the fit rather than a proxy for
-       * it. Banding by valuation instead was tried and is mostly this in disguise: the terciles'
-       * exact-reproduction counts run 80 / 68 / 38 and their at-floor counts 109 / 99 / 62, so the
-       * ramp would spend three ordinal steps re-drawing a two-state fact. Two states take the
-       * categorical pair.
-       */
-      { series: (d) => (d.millage!.at_floor ? "guarantee" : "formula") },
+  (w) =>
+    scatterSpec(
+      pairs(
+        withMillage,
+        (d) => d.millage!.predicted_rate,
+        (d) => d.millage!.observed_rate,
+        (d, predicted, observed) =>
+          `${d.name}: the factors predict ${predicted.toFixed(2)} mills, Table SD-1 charges ${observed.toFixed(2)}` +
+          (d.millage!.at_floor ? ", at the twenty-mill floor" : ""),
+        /*
+         * Split by floor status, which is the variable that explains the fit rather than a proxy for
+         * it. Banding by valuation instead was tried and is mostly this in disguise: the terciles'
+         * exact-reproduction counts run 80 / 68 / 38 and their at-floor counts 109 / 99 / 62, so the
+         * ramp would spend three ordinal steps re-drawing a two-state fact. Two states take the
+         * categorical pair.
+         */
+        { series: (d) => (d.millage!.at_floor ? "guarantee" : "formula") },
+      ),
+      {
+        x: { label: "what the reduction factors predict, in mills", format: (v) => v.toFixed(0) },
+        y: { label: "what the county auditor charges", format: (v) => v.toFixed(0) },
+      },
+      [],
+      { width: w, identity: { label: "predicted = charged" } },
     ),
-    {
-      x: { label: "what the reduction factors predict, in mills", format: (v) => v.toFixed(0) },
-      y: { label: "what the county auditor charges", format: (v) => v.toFixed(0) },
-    },
-    [],
-    { identity: { label: "predicted = charged" } },
-  ),
   { label: `What the county auditor charges against what H.B. 920's reduction factors predict, in mills, across ${millage.total} districts, ${yearOf("millage")} tax year`, description: `Both axes are the same quantity on one shared domain, so the identity line is predicted = charged; ${millage.stacked} districts overplot as the single dot at the twenty-mill floor` },
 );
 ---

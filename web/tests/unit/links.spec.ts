@@ -31,7 +31,7 @@ import { counties } from "../../src/lib/county.ts";
 import * as routes from "../../src/lib/routes.ts";
 import { anchor } from "../../src/lib/section.ts";
 import { bands, medianTrace, pairs } from "../../src/lib/relationships.ts";
-import { BOX_FROM, distributionSpec, rangeSpec, scatterSpec } from "../../src/lib/plot/spec.ts";
+import { BOX_FROM, distributionSpec, rangeSpec, scatterSpec, WIDTHS } from "../../src/lib/plot/spec.ts";
 import { renderToString } from "../../src/lib/plot/ssr.ts";
 import { ORDINAL } from "../../src/lib/plot/tokens.ts";
 import type { District } from "../../src/lib/types.ts";
@@ -42,6 +42,15 @@ import {
   renderMillage,
   renderTaxBase,
 } from "../../src/lib/tax.ts";
+
+/**
+ * The width these assertions are written at.
+ *
+ * Every chart is laid out twice — see `WIDTHS` in `src/lib/plot/spec.ts` — and what is asserted
+ * here is the layout arithmetic, which is the same arithmetic at either width. So the tests name
+ * one rather than running each of them twice to make the same point.
+ */
+const W = { width: WIDTHS.wide };
 
 const corpus = loadCorpus();
 const { bundle, tax } = loadFeed();
@@ -471,14 +480,19 @@ test("a scatter draws one mark per district and never a colour the theme cannot 
   );
   expect(points.length).toBeGreaterThan(500);
 
-  const spec = scatterSpec(points, {
-    x: { label: "x", format: (v) => String(v), log: true },
-    y: { label: "y", format: (v) => String(v), log: true },
-  });
+  const spec = scatterSpec(
+    points,
+    {
+      x: { label: "x", format: (v) => String(v), log: true },
+      y: { label: "y", format: (v) => String(v), log: true },
+    },
+    [],
+    W,
+  );
   expect(spec?.hovers?.text.length).toBe(points.length);
 
   // Renders, and `ensureThemeable` inside `renderToString` throws on a baked-in colour.
-  const svg = renderToString(spec, { label: "test" });
+  const svg = renderToString(() => spec, { label: "test" });
   expect(svg).toContain("<svg");
   expect(svg.replace(/<style>[\s\S]*?<\/style>/g, "")).not.toMatch(/#[0-9a-f]{3,8}\b|rgba?\(/i);
 });
@@ -488,7 +502,7 @@ test("a scatter refuses to draw a population it does not have", () => {
   // it would read as a finding about something that has not been measured.
   const few = Array.from({ length: 6 }, (_, i) => ({ x: i, y: i, hover: String(i) }));
   expect(
-    scatterSpec(few, { x: { label: "x", format: String }, y: { label: "y", format: String } }),
+    scatterSpec(few, { x: { label: "x", format: String }, y: { label: "y", format: String } }, [], W),
   ).toBeNull();
 });
 
@@ -549,14 +563,14 @@ test("a distribution draws its members where they fit and its shape where they d
   const values = (n: number) =>
     Array.from({ length: n }, (_, i) => ({ value: i, hover: `d${i}` }));
 
-  const small = distributionSpec(values(30));
+  const small = distributionSpec(values(30), W);
   expect(small?.hovers?.text.length, "a small population is drawn in full").toBe(30);
 
-  const medium = distributionSpec(values(120));
+  const medium = distributionSpec(values(120), W);
   expect(medium?.hovers?.text.length, "a poverty fifth is drawn in full").toBe(120);
 
   // 609 evenly spaced values have no outliers, so the box is the whole of what is drawn.
-  const large = distributionSpec(values(609));
+  const large = distributionSpec(values(609), W);
   expect(large?.hovers?.text.length).toBeLessThan(30);
 });
 
@@ -564,8 +578,8 @@ test("a distribution refuses a population too small to have a shape", () => {
   const values = (n: number) => Array.from({ length: n }, (_, i) => ({ value: i, hover: `d${i}` }));
   // A pair is not a distribution. Two of Ohio's legislative seats hold two school districts, and
   // the table on those pages names both.
-  expect(distributionSpec(values(2))).toBeNull();
-  expect(distributionSpec(values(3))).not.toBeNull();
+  expect(distributionSpec(values(2), W)).toBeNull();
+  expect(distributionSpec(values(3), W)).not.toBeNull();
 });
 
 test("the box is drawn only where quartiles summarise something", () => {
@@ -577,10 +591,10 @@ test("the box is drawn only where quartiles summarise something", () => {
    */
   const values = (n: number) => Array.from({ length: n }, (_, i) => ({ value: i, hover: `d${i}` }));
   const boxes = (spec: ReturnType<typeof distributionSpec>) =>
-    (renderToString(spec, { label: "test" }).match(/<rect/g) ?? []).length;
+    (renderToString(() => spec, { label: "test" }).match(/<rect/g) ?? []).length;
 
-  expect(boxes(distributionSpec(values(BOX_FROM - 1))), "no box below the floor").toBe(0);
-  expect(boxes(distributionSpec(values(BOX_FROM))), "a box at the floor").toBeGreaterThan(0);
+  expect(boxes(distributionSpec(values(BOX_FROM - 1), W)), "no box below the floor").toBe(0);
+  expect(boxes(distributionSpec(values(BOX_FROM), W)), "a box at the floor").toBeGreaterThan(0);
 });
 
 test("a district's position is drawn against the population it is being placed in", () => {
@@ -594,9 +608,10 @@ test("a district's position is drawn against the population it is being placed i
     .filter((d) => d.valuation_per_pupil != null)
     .map((d) => ({ value: d.valuation_per_pupil!, hover: d.name }));
   const spec = distributionSpec(valuations, {
+    ...W,
     marker: { value: valuations[0]!.value, label: "a district" },
   });
-  const svg = renderToString(spec, { label: "test" });
+  const svg = renderToString(() => spec, { label: "test" });
   expect(svg).toContain("dist-marker");
   // And it is themeable, like every other chart the build emits.
   expect(svg.replace(/<style>[\s\S]*?<\/style>/g, "")).not.toMatch(/#[0-9a-f]{3,8}\b|rgba?\(/i);
@@ -627,7 +642,7 @@ test("an identity plot is square and shares one domain, or it does not mean what
     points,
     { x: { label: "predicted", format: String }, y: { label: "charged", format: String } },
     [],
-    { identity: { label: "predicted = charged" } },
+    { ...W, identity: { label: "predicted = charged" } },
   )!;
 
   const x = spec.options.x as { domain: [number, number] };
@@ -643,21 +658,23 @@ test("an identity plot is square and shares one domain, or it does not mean what
   const plotHeight = height - (spec.options.marginTop as number) - (spec.options.marginBottom as number);
   expect(plotWidth, "the plot area is square").toBe(plotHeight);
 
-  expect(renderToString(spec, { label: "test" })).toContain("scatter-identity");
+  expect(renderToString(() => spec, { label: "test" })).toContain("scatter-identity");
 });
 
 test("a scatter without an identity line fits each axis to its own measure", () => {
   // The ordinary case, and the reason the squaring is opt-in: valuation against aid has no
   // meaningful diagonal, and forcing one domain on two different quantities would be nonsense.
   const points = Array.from({ length: 20 }, (_, i) => ({ x: i, y: i * 1000, hover: `d${i}` }));
-  const spec = scatterSpec(points, {
-    x: { label: "x", format: String },
-    y: { label: "y", format: String },
-  })!;
+  const spec = scatterSpec(
+    points,
+    { x: { label: "x", format: String }, y: { label: "y", format: String } },
+    [],
+    W,
+  )!;
   const x = spec.options.x as { domain: [number, number] };
   const y = spec.options.y as { domain: [number, number] };
   expect(x.domain).not.toEqual(y.domain);
-  expect(renderToString(spec, { label: "test" })).not.toContain("scatter-identity");
+  expect(renderToString(() => spec, { label: "test" })).not.toContain("scatter-identity");
 });
 
 test("the reduction factors reproduce the floor and approximate everything else", () => {
@@ -832,10 +849,11 @@ test("a range draws both ends of each item, not the ratio between them", () => {
       hover: c.name,
     })),
     { label: "valuation per pupil", format: (v) => String(v), log: true },
+    W,
   );
 
   expect(spec?.hovers?.text.length).toBe(measurable.length);
-  const svg = renderToString(spec, { label: "test" });
+  const svg = renderToString(() => spec, { label: "test" });
   // Both ends drawn, and the span between them.
   expect(svg).toContain("range-low");
   expect(svg).toContain("range-high");
@@ -881,9 +899,6 @@ test("a range refuses a single item", () => {
   // One row is not a comparison, and four of Ohio's 88 counties have a single reporting district
   // and no internal spread to draw.
   expect(
-    rangeSpec([{ label: "only", low: 1, high: 2, hover: "only" }], {
-      label: "x",
-      format: String,
-    }),
+    rangeSpec([{ label: "only", low: 1, high: 2, hover: "only" }], { label: "x", format: String }, W),
   ).toBeNull();
 });

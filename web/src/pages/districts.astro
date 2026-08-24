@@ -99,7 +99,7 @@ const MEASURES = (
     label,
     n: values.length,
     subset,
-    chart: renderToString(distributionSpec(values), { label: `${label} across ${count(values.length)} districts, from ${format(sorted[0] ?? 0)} to ${format(sorted[sorted.length - 1] ?? 0)}` }),
+    chart: renderToString((w) => distributionSpec(values, { width: w }), { label: `${label} across ${count(values.length)} districts, from ${format(sorted[0] ?? 0)} to ${format(sorted[sorted.length - 1] ?? 0)}` }),
     low: format(sorted[0] ?? 0),
     high: format(sorted[sorted.length - 1] ?? 0),
   };

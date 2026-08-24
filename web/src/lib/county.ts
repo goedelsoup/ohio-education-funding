@@ -38,7 +38,7 @@ import * as routes from "./routes.ts";
 import { median } from "./stats.ts";
 import { yearChip, yearOf } from "./year.ts";
 import { anchor } from "./section.ts";
-import { BOX_FROM, distributionSpec } from "./plot/spec.ts";
+import { BOX_FROM, distributionSpec, type Drawing, draws } from "./plot/spec.ts";
 import { renderToString } from "./plot/ssr.ts";
 
 /** A county's districts, with the dispersion measures the page is built on. */
@@ -157,9 +157,10 @@ function renderSpread(c: County, statewide: Statewide, all: County[]): string {
       value: other.valuationRatio!,
       hover: `${other.name}: ${other.valuationRatio!.toFixed(1)}× between its richest and poorest district`,
     }));
-  const position = distributionSpec(ratios, {
-    marker: { value: c.valuationRatio, label: c.name },
-  });
+  // Read outside the drawing: `valuationRatio` is narrowed by the guard at the top of this
+  // function, and a property narrowing does not survive into a closure that runs later.
+  const marker = { value: c.valuationRatio!, label: c.name };
+  const position: Drawing = (w) => distributionSpec(ratios, { width: w, marker });
 
   /*
    * Every district in the county, not just the two ends of it.
@@ -173,20 +174,22 @@ function renderSpread(c: County, statewide: Statewide, all: County[]): string {
    * Dots rather than a box, because a box plot of six values is five statistics standing in for
    * six numbers a reader could simply have been shown.
    */
-  const dots = distributionSpec(
-    c.districts
-      .filter((d) => d.valuation_per_pupil != null)
-      .map((d) => ({
-        value: d.valuation_per_pupil!,
-        hover: `${d.name}: ${money(d.valuation_per_pupil!)} per pupil, ${money(d.realized_aid_per_pupil)} state aid per pupil`,
-      })),
-  );
+  const dots: Drawing = (w) =>
+    distributionSpec(
+      c.districts
+        .filter((d) => d.valuation_per_pupil != null)
+        .map((d) => ({
+          value: d.valuation_per_pupil!,
+          hover: `${d.name}: ${money(d.valuation_per_pupil!)} per pupil, ${money(d.realized_aid_per_pupil)} state aid per pupil`,
+        })),
+      { width: w },
+    );
 
   return `
     <div class="card" id="spread" data-part="spread">
       <h2>${anchor("spread")}The spread inside ${escapeHtml(c.name)} County${yearChip("formula")}</h2>
       ${
-        dots
+        draws(dots)
           ? `<p class="note">Every district in the county by the assessed valuation each of its
              pupils stands on — one dot each, poorest on the left.${
                c.districts.filter((d) => d.valuation_per_pupil != null).length >= BOX_FROM
@@ -223,7 +226,7 @@ function renderSpread(c: County, statewide: Statewide, all: County[]): string {
         poor.irn,
       )}">the full comparison</a> puts the two side by side on every measure the panel carries.</p>
       ${
-        position
+        draws(position)
           ? `<p class="note">Where that sits among the ${ratios.length} counties with more than one
              district reporting a tax base — one dot each, narrowest on the left, and the coloured
              rule is ${escapeHtml(c.name)}. The median is

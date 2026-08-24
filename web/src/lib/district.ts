@@ -12,7 +12,7 @@
  */
 
 import type { FanPoint } from "./chart.ts";
-import { barSpec, distributionSpec, fanSpec, nearestRank } from "./plot/spec.ts";
+import { barSpec, distributionSpec, type Drawing, fanSpec, nearestRank } from "./plot/spec.ts";
 import { renderToString } from "./plot/ssr.ts";
 import { count, escapeHtml, money, ordinal, pct, percentileOf, signedMoney } from "./format.ts";
 import { apply, currentLaw, currentRealizedAid } from "./policy.ts";
@@ -51,13 +51,14 @@ function strip(
    * The percentile stays underneath. It is the sentence a reader repeats and the box is what makes
    * it mean something.
    */
-  const box = distributionSpec(
-    population
-      .map((d) => ({ d, v: measure(d) }))
-      .filter((row): row is { d: District; v: number } => row.v != null)
-      .map(({ d, v }) => ({ value: v, hover: `${d.name}: ${money(v)}` })),
-    { marker: { value, label } },
-  );
+  const box: Drawing = (w) =>
+    distributionSpec(
+      population
+        .map((d) => ({ d, v: measure(d) }))
+        .filter((row): row is { d: District; v: number } => row.v != null)
+        .map(({ d, v }) => ({ value: v, hover: `${d.name}: ${money(v)}` })),
+      { width: w, marker: { value, label } },
+    );
 
   return `
     <div class="strip-row">
@@ -220,13 +221,14 @@ function renderCarriedForward(bundle: Bundle, d: District): string {
 
   return `
     <h3>Carried forward</h3>
-    <div class="chartwrap" data-chart="district-fan">${renderToString(fanSpec(
+    <div class="chartwrap" data-chart="district-fan">${renderToString((w) => fanSpec(
       points,
       (v) => money(v),
       (p) =>
         p.observed
           ? `FY${p.year}: ${money(p.point)} at published enrollment — exact`
           : `FY${p.year}: ${money(p.low)} – ${money(p.high)}, central ${money(p.point)}`,
+      { width: w },
     ), { label: `${insensitive ? `Aid this district receives against what the formula computes for it, in dollars by enrollment year, FY${points[0]!.year} to FY${end.fiscalYear}` : `State aid in dollars by enrollment year, FY${points[0]!.year} to FY${end.fiscalYear}, with the range across projected enrollment`}`, description: `Every year is the FY${bundle.fiscal_year} formula run at that year's enrollment rather than published aid; years through FY${meta.base_year} use published enrollment and carry no interval, and the y axis is truncated to the plotted range rather than starting at zero` })}</div>
     ${
       insensitive
@@ -373,7 +375,7 @@ export function renderActuals(bundle: Bundle, d: District, basis: Basis): string
       ${
         bars.length === 0
           ? ""
-          : `<div class="chartwrap" data-chart="cash">${renderToString(barSpec(bars), { label: `General fund cash held at 30 June by fiscal year, FY${first.fiscal_year} to FY${latest.fiscal_year}${converted ? `, in FY${base} dollars` : ""}` })}</div>`
+          : `<div class="chartwrap" data-chart="cash">${renderToString((w) => barSpec(bars, { width: w }), { label: `General fund cash held at 30 June by fiscal year, FY${first.fiscal_year} to FY${latest.fiscal_year}${converted ? `, in FY${base} dollars` : ""}` })}</div>`
       }
       ${
         unreported.length === 0
@@ -786,7 +788,7 @@ export function renderCategoricals(d: District, statewide: Statewide): string {
   return `
     <div class="card" id="categoricals" data-part="categoricals">
       <h2>${anchor("categoricals")}The categorical half, in its six parts${yearChip("formula")}</h2>
-      <div class="chartwrap" data-chart="categoricals">${renderToString(barSpec(bars), { label: `This district's categorical funding by program, in dollars, ${yearOf("formula")}` })}</div>
+      <div class="chartwrap" data-chart="categoricals">${renderToString((w) => barSpec(bars, { width: w }), { label: `This district's categorical funding by program, in dollars, ${yearOf("formula")}` })}</div>
 
       <div class="scroll"><table>
         <thead><tr><th>Program</th><th class="tnum">Amount</th><th class="tnum">Share</th></tr></thead>
@@ -1492,7 +1494,7 @@ export function renderCasino(bundle: Bundle, d: District): string {
           }</div></div>
       </div>
 
-      <div class="chartwrap" data-chart="casino">${renderToString(barSpec(bars), { label: `Casino tax distribution received by this district, in dollars by fiscal year, FY${first.fiscal_year} to FY${latest.fiscal_year}` })}</div>
+      <div class="chartwrap" data-chart="casino">${renderToString((w) => barSpec(bars, { width: w }), { label: `Casino tax distribution received by this district, in dollars by fiscal year, FY${first.fiscal_year} to FY${latest.fiscal_year}` })}</div>
 
       <p class="note">${
         closure && before && before.amount > 0

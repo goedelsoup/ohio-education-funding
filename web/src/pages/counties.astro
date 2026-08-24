@@ -42,11 +42,12 @@ const rows = ranked
       `${c.richest!.name} ${money(c.richest!.valuation_per_pupil!)} — ${c.valuationRatio!.toFixed(1)}× apart`,
   }));
 const disparity = renderToString(
-  rangeSpec(rows, {
-    label: "assessed valuation per pupil",
-    format: (v) => money(v),
-    log: true,
-  }),
+  (w) =>
+    rangeSpec(
+      rows,
+      { label: "assessed valuation per pupil", format: (v) => money(v), log: true },
+      { width: w },
+    ),
   {
     label: `Assessed valuation per pupil from the poorest to the richest district in each of ${count(rows.length)} counties, widest span first, on a log scale, FY${bundle.fiscal_year}`,
   },

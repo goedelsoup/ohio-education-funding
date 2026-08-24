@@ -223,13 +223,14 @@ export function renderProjection(bundle: Panel, levers: Levers): string {
             FY${seam.fiscalYear}</div></div>
       </div>
 
-      <div class="chartwrap" data-chart="fan">${renderToString(fanSpec(
+      <div class="chartwrap" data-chart="fan">${renderToString((w) => fanSpec(
         points,
         (v) => millions(v).replace("+", ""),
         (p) =>
           p.observed
             ? `FY${p.year}: ${millions(p.point).replace("+", "")} at published enrollment — exact`
             : `FY${p.year}: ${range(p.low, p.high)}, central ${millions(p.point).replace("+", "")}`,
+        { width: w },
       ), { label: `Statewide total state aid by fiscal year at projected enrollment, FY${start.fiscalYear} to FY${end.fiscalYear}`, description: `Solid and exact through FY${seam.fiscalYear}, the last year of published enrollment; after it a dashed central estimate inside a band reaching ±${pct(width, 1)} at the horizon, on a vertical axis that does not start at zero` })}</div>
       <div class="legend">
         <span><i class="sw solid"></i> Observed enrollment, exact</span>
@@ -460,9 +461,10 @@ export function renderScenario(bundle: Panel, levers: Levers): RenderedScenario 
       <h2>${anchor("distribution")}How the change is distributed</h2>
       ${
         deltas.length > 0
-          ? `<div class="chartwrap" data-chart="deltas">${renderToString(histogramSpec(
+          ? `<div class="chartwrap" data-chart="deltas">${renderToString((w) => histogramSpec(
               bin(deltas, 24),
               (v) => signedMoney(v),
+              { width: w },
             ), { label: `Districts by change in state aid per pupil, for the ${count(deltas.length)} of ${count(t.districts)} districts these lever settings move against the FY${bundle.fiscal_year} model`, description: `Bins span ${signedMoney(Math.min(...deltas))} to ${signedMoney(Math.max(...deltas))} per pupil` })}</div>
         <div class="legend">
           <span><i class="sw loss"></i> Aid falls</span>
