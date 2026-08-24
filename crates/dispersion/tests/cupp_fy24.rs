@@ -1,65 +1,16 @@
 //! Equity statistics over the real FY2024 District Profile Report ("Cupp Report").
 //!
 //! The fixture is 606 Ohio traditional school districts as published by the Department of
-//! Education and Workforce. These tests are the corpus's empirical equity findings, pinned so
-//! they cannot drift silently: if a later fixture refresh moves them, the test says so and the
-//! corpus node has to be revised deliberately.
+//! Education and Workforce, read through [`dispersion::profile`] — which is the crate's one
+//! reader of that file, and was four private ones until #157. These tests are the corpus's
+//! empirical equity findings, pinned so they cannot drift silently: if a later fixture refresh
+//! moves them, the test says so and the corpus node has to be revised deliberately.
 
+use dispersion::profile::{self, column, paired, ProfileDistrict};
 use dispersion::{wealth_neutrality, Dispersion};
 
-const FIXTURE: &str = include_str!("../fixtures/cupp-fy24-district-data.csv");
-
-/// Column indices in the fixture header.
-mod col {
-    pub const DISTRICT: usize = 1;
-    pub const ENROLLED_ADM: usize = 2;
-    pub const ECON_DISADVANTAGED: usize = 3;
-    pub const VALUATION_PER_PUPIL: usize = 4;
-    pub const CURRENT_OPERATING_MILLAGE: usize = 5;
-    pub const EFFECTIVE_CLASS1_MILLAGE: usize = 6;
-    pub const OPERATING_EPP: usize = 7;
-    pub const STATE_REVENUE_PER_PUPIL: usize = 8;
-    pub const LOCAL_REVENUE_PER_PUPIL: usize = 9;
-}
-
-struct District {
-    name: String,
-    fields: Vec<Option<f64>>,
-}
-
-impl District {
-    fn get(&self, i: usize) -> Option<f64> {
-        self.fields.get(i).copied().flatten()
-    }
-}
-
-fn districts() -> Vec<District> {
-    FIXTURE
-        .lines()
-        .skip(1)
-        .filter(|l| !l.trim().is_empty())
-        .map(|line| {
-            let parts: Vec<&str> = line.split(',').collect();
-            District {
-                name: parts
-                    .get(col::DISTRICT)
-                    .unwrap_or(&"")
-                    .trim_matches('"')
-                    .to_string(),
-                fields: parts.iter().map(|p| p.trim().parse::<f64>().ok()).collect(),
-            }
-        })
-        .collect()
-}
-
-fn column(ds: &[District], i: usize) -> Vec<f64> {
-    ds.iter().filter_map(|d| d.get(i)).collect()
-}
-
-fn paired(ds: &[District], a: usize, b: usize) -> (Vec<f64>, Vec<f64>) {
-    ds.iter()
-        .filter_map(|d| Some((d.get(a)?, d.get(b)?)))
-        .unzip()
+fn districts() -> Vec<ProfileDistrict> {
+    profile::districts()
 }
 
 #[test]
@@ -73,10 +24,10 @@ fn fixture_covers_the_full_set_of_traditional_districts() {
 #[test]
 fn one_district_in_four_sits_exactly_at_the_twenty_mill_floor() {
     let ds = districts();
-    let mills = column(&ds, col::EFFECTIVE_CLASS1_MILLAGE);
-    let at_floor = mills.iter().filter(|m| (**m - 20.0).abs() < 0.005).count();
+    let reporting = column(&ds, |d| d.effective_class1_millage).len();
+    let at_floor = ds.iter().filter(|d| d.at_twenty_mill_floor()).count();
     assert_eq!(at_floor, 170);
-    assert!((at_floor as f64 / mills.len() as f64 - 0.281).abs() < 0.005);
+    assert!((at_floor as f64 / reporting as f64 - 0.281).abs() < 0.005);
 }
 
 /// Twenty districts report an effective Class 1 rate below 20 mills. Six of them simply never
@@ -85,21 +36,12 @@ fn one_district_in_four_sits_exactly_at_the_twenty_mill_floor() {
 #[test]
 fn districts_below_the_floor_that_never_voted_twenty_mills() {
     let ds = districts();
-    let below: Vec<&District> = ds
-        .iter()
-        .filter(|d| {
-            d.get(col::EFFECTIVE_CLASS1_MILLAGE)
-                .is_some_and(|m| m < 19.995)
-        })
-        .collect();
+    let below: Vec<&ProfileDistrict> = ds.iter().filter(|d| d.below_twenty_mill_floor()).collect();
     assert_eq!(below.len(), 20);
 
     let never_voted_twenty = below
         .iter()
-        .filter(|d| {
-            d.get(col::CURRENT_OPERATING_MILLAGE)
-                .is_some_and(|v| v < 20.0)
-        })
+        .filter(|d| d.never_voted_twenty_mills())
         .count();
     assert_eq!(never_voted_twenty, 6);
 }
@@ -110,17 +52,15 @@ fn districts_below_the_floor_that_never_voted_twenty_mills() {
 #[test]
 fn fourteen_districts_sit_just_below_the_floor_unexplained() {
     let ds = districts();
-    let anomalies: Vec<&District> = ds
+    let anomalies: Vec<&ProfileDistrict> = ds
         .iter()
-        .filter(|d| {
-            let eff = d.get(col::EFFECTIVE_CLASS1_MILLAGE);
-            let voted = d.get(col::CURRENT_OPERATING_MILLAGE);
-            matches!((eff, voted), (Some(e), Some(v)) if e < 19.995 && v >= 20.0)
-        })
+        .filter(|d| d.below_twenty_mill_floor() && !d.never_voted_twenty_mills())
         .collect();
     assert_eq!(anomalies.len(), 14);
     for d in &anomalies {
-        let eff = d.get(col::EFFECTIVE_CLASS1_MILLAGE).unwrap();
+        let eff = d
+            .effective_class1_millage
+            .expect("below the floor implies a rate");
         assert!(
             (19.7..19.995).contains(&eff),
             "{} sits at {eff}, outside the observed anomaly band",
@@ -137,10 +77,8 @@ fn fourteen_districts_sit_just_below_the_floor_unexplained() {
 fn no_district_reports_effective_millage_meaningfully_above_its_voted_millage() {
     let mut rounding_artifacts = 0;
     for d in districts() {
-        if let (Some(eff), Some(voted)) = (
-            d.get(col::EFFECTIVE_CLASS1_MILLAGE),
-            d.get(col::CURRENT_OPERATING_MILLAGE),
-        ) {
+        if let (Some(eff), Some(voted)) = (d.effective_class1_millage, d.current_operating_millage)
+        {
             if eff > voted {
                 rounding_artifacts += 1;
                 assert!(
@@ -161,7 +99,7 @@ fn exactly_one_district_reports_no_operating_expenditure() {
     let ds = districts();
     let missing: Vec<&str> = ds
         .iter()
-        .filter(|d| d.get(col::OPERATING_EPP).is_none())
+        .filter(|d| d.operating_expenditure_per_pupil.is_none())
         .map(|d| d.name.as_str())
         .collect();
     assert_eq!(missing.len(), 1);
@@ -172,9 +110,9 @@ fn exactly_one_district_reports_no_operating_expenditure() {
 #[test]
 fn operating_expenditure_dispersion() {
     let ds = districts();
-    let d = Dispersion::of(&column(&ds, col::OPERATING_EPP)).unwrap();
+    let d = Dispersion::of(&column(&ds, |d| d.operating_expenditure_per_pupil)).unwrap();
 
-    // 605, not 606 — one district reports no operating expenditure. See the test below.
+    // 605, not 606 — one district reports no operating expenditure. See the test above.
     assert_eq!(d.n, 605);
     assert!(
         (d.median - 15_646.0).abs() < 50.0,
@@ -202,7 +140,11 @@ fn operating_expenditure_dispersion() {
 #[test]
 fn state_aid_compensates_for_property_wealth_but_only_partly() {
     let ds = districts();
-    let (wealth, aid) = paired(&ds, col::VALUATION_PER_PUPIL, col::STATE_REVENUE_PER_PUPIL);
+    let (wealth, aid) = paired(
+        &ds,
+        |d| d.valuation_per_pupil,
+        |d| d.state_revenue_per_pupil,
+    );
     let w = wealth_neutrality(&wealth, &aid).unwrap();
 
     assert!(w.n >= 600);
@@ -226,8 +168,16 @@ fn state_aid_compensates_for_property_wealth_but_only_partly() {
 #[test]
 fn state_aid_tracks_poverty_more_closely_than_property_wealth() {
     let ds = districts();
-    let (wealth, aid) = paired(&ds, col::VALUATION_PER_PUPIL, col::STATE_REVENUE_PER_PUPIL);
-    let (poverty, aid2) = paired(&ds, col::ECON_DISADVANTAGED, col::STATE_REVENUE_PER_PUPIL);
+    let (wealth, aid) = paired(
+        &ds,
+        |d| d.valuation_per_pupil,
+        |d| d.state_revenue_per_pupil,
+    );
+    let (poverty, aid2) = paired(
+        &ds,
+        |d| d.economically_disadvantaged,
+        |d| d.state_revenue_per_pupil,
+    );
 
     let by_wealth = wealth_neutrality(&wealth, &aid).unwrap();
     let by_poverty = wealth_neutrality(&poverty, &aid2).unwrap();
@@ -254,7 +204,11 @@ fn state_aid_tracks_poverty_more_closely_than_property_wealth() {
 #[test]
 fn local_revenue_tracks_property_wealth_strongly() {
     let ds = districts();
-    let (wealth, local) = paired(&ds, col::VALUATION_PER_PUPIL, col::LOCAL_REVENUE_PER_PUPIL);
+    let (wealth, local) = paired(
+        &ds,
+        |d| d.valuation_per_pupil,
+        |d| d.local_revenue_per_pupil,
+    );
     let w = wealth_neutrality(&wealth, &local).unwrap();
     assert!(
         w.correlation > 0.7,
@@ -269,11 +223,11 @@ fn local_revenue_tracks_property_wealth_strongly() {
 #[test]
 fn enrollment_weighting_moves_the_statewide_average() {
     let ds = districts();
-    let pairs: Vec<(f64, f64)> = ds
-        .iter()
-        .filter_map(|d| Some((d.get(col::OPERATING_EPP)?, d.get(col::ENROLLED_ADM)?)))
-        .collect();
-    let (epp, adm): (Vec<f64>, Vec<f64>) = pairs.into_iter().unzip();
+    let (epp, adm) = paired(
+        &ds,
+        |d| d.operating_expenditure_per_pupil,
+        |d| d.enrolled_adm,
+    );
 
     let unweighted = Dispersion::of(&epp).unwrap().mean;
     let weighted = dispersion::weighted_mean(&epp, &adm).unwrap();

@@ -32,11 +32,16 @@
 #![forbid(unsafe_code)]
 
 pub mod casino;
+pub mod census_states;
+pub mod functions;
 pub mod identified;
 pub mod lea_directory;
 pub mod mr81;
 pub mod national_peers;
 pub mod ohio_panel;
+pub mod profile;
+pub mod report_card;
+pub mod sd1;
 
 use edfund_core::Dollars;
 

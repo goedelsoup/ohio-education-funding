@@ -70,6 +70,38 @@ pub struct PanelRow {
     pub state_revenue: f64,
     /// And the local share.
     pub local_revenue: f64,
+    /// `T06` â school property tax. `None` where the agency reports none, which for a fiscally
+    /// dependent agency means the tax belongs to a parent government rather than that none was
+    /// levied.
+    pub property_tax: Option<f64>,
+    /// `TCURELSC` â current spending on elementary and secondary education, in thousands.
+    ///
+    /// Absent from this record until the real-spending trough was computed from it. That
+    /// analysis lived in `tests/f33_ohio_panel_trough.rs` on a second, private parser of this
+    /// same fixture â which read the column this reader did not carry, and disagreed with it
+    /// about which rows are rows. See issue #157.
+    pub current_spending: Option<f64>,
+}
+
+impl PanelRow {
+    /// Current spending per pupil, on the Bureau's own count. `None` where either is missing.
+    ///
+    /// Nominal. The whole point of the series is what happens to it deflated, so a caller has to
+    /// restate it â `deflator::CpiSeries::cpi_u_june` is the index the corpus uses.
+    #[must_use]
+    pub fn spending_per_pupil(&self) -> Option<f64> {
+        match (self.current_spending, self.enrollment) {
+            (Some(spending), pupils) if pupils > 0.0 => Some(spending / pupils),
+            _ => None,
+        }
+    }
+
+    /// One revenue source as a share of total revenue. `None` where the agency reports no
+    /// revenue at all.
+    #[must_use]
+    pub fn share(&self, part: f64) -> Option<f64> {
+        (self.total_revenue > 0.0).then(|| part / self.total_revenue)
+    }
 }
 
 /// Every row of the panel.
@@ -96,6 +128,8 @@ pub fn panel() -> Vec<PanelRow> {
                 federal_revenue: row.num(6)?,
                 state_revenue: row.num(7)?,
                 local_revenue: row.num(8)?,
+                property_tax: row.num(9),
+                current_spending: row.num(10),
             })
         })
         .collect()

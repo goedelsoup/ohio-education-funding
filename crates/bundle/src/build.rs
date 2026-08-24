@@ -22,6 +22,21 @@
 //! wrong count renders as a number, not as an error.
 //!
 //! [`build`] is an ordinary function now, and `main.rs` is the three lines it always was.
+//!
+//! # Where the fixtures are read
+//!
+//! Four district-level files this feed joins belong to `dispersion`, and this module used to
+//! `include_str!` and parse all four itself: the FY2024 District Profile Report, Table SD-1, the
+//! FY2025 spending-by-function file, and the Census Bureau's state-level survey. It resolved
+//! three of them by header name and the profile report by bare column position — four
+//! conventions for reading four files belonging to one crate, and none of them shared with the
+//! tests that assert against the same rows.
+//!
+//! They are [`dispersion::profile`], [`dispersion::sd1`], [`dispersion::functions`] and
+//! [`dispersion::census_states`] now. The model types stay, because they are the JSON contract
+//! the web layer reads; what they are built *from* is the owning crate's reader. Where a reader
+//! returns `None` and a model field cannot carry an absence, the substitution to zero is made at
+//! the point of construction rather than inside a parse, so that it is visible. See issue #157.
 
 use std::collections::{BTreeMap, BTreeSet, HashMap};
 
@@ -33,8 +48,10 @@ use crate::{
     Projection, PropertyTaxYear, RegimeCounterfactual, SeriesYear, SpecialEducation,
     SpendingByFunction, StateFinance, Statewide, TargetedAssistance, YearKind, CONTRACT_VERSION,
 };
+use dispersion::census_states::StateFinance as CensusState;
 use dispersion::mr81::poverty_share_by_year;
 use dispersion::ohio_panel::{equalization_by_year, revenue_mix_by_year};
+use dispersion::profile::ProfileDistrict;
 use dispersion::{partial_correlation, wealth_neutrality};
 use edfund_core::{AgencyType, FiscalYear};
 use foundation::{aggregate_base_cost, StatewideFactors};
@@ -59,10 +76,8 @@ use scenario_delta::ScenarioDelta;
 /// confident and absurd number at a long horizon, and offering FY2050 would invite one anyway.
 const HORIZON: FiscalYear = FiscalYear(2036);
 
-/// The FY2024 District Profile Report: millage, expenditure, demographics.
-const PROFILE: &str = include_str!("../../dispersion/fixtures/cupp-fy24-district-data.csv");
-
-/// The fiscal year [`PROFILE`] describes.
+/// The fiscal year the District Profile Report describes. The report itself is
+/// [`dispersion::profile`].
 const PROFILE_YEAR: u16 = 2024;
 
 /// The school year the report card describes, as its publisher writes it.
@@ -91,28 +106,6 @@ const REPORT_CARD_FIXTURE: &str = "report-card-2425-district-data.csv";
 /// operating expenditure for FY2025 in the same download, and a card showing both under one label
 /// would be picking one and being wrong about the other half of its own figures.
 const REPORT_CARD_SPENDING_YEAR: u16 = 2025;
-
-/// Table SD-1: taxable value by class and taxes charged, one row per district per tax year.
-///
-/// The Department of Taxation's table rather than the Department of Education's — the local half
-/// of the funding formula, from the half of the state that measures it.
-const SD1: &str = include_str!("../../dispersion/fixtures/sd1-district-taxes.csv");
-
-/// The report card's FY2025 operating spending, broken into functions, per pupil.
-const FUNCTIONS: &str = include_str!("../../dispersion/fixtures/expenditure-functions-fy25.csv");
-
-/// The Census Bureau's Annual Survey of School System Finances, aggregated to states.
-///
-/// The only federal source in the feed, and the only one that can say whether Ohio is unusual.
-const F33: &str = include_str!("../../dispersion/fixtures/census-f33-states.csv");
-
-fn field(line: &str, index: usize) -> Option<&str> {
-    line.split(',').nth(index).map(str::trim)
-}
-
-fn parse(line: &str, index: usize) -> Option<f64> {
-    field(line, index).and_then(|value| value.parse::<f64>().ok())
-}
 
 /// The median of an unsorted series, zero where it is empty.
 ///
@@ -311,27 +304,20 @@ fn aligned(
 /// appropriation and is comparable either way, so that rank is over everyone and the property tax
 /// rank is over the thirty-nine that report one.
 fn national() -> Option<National> {
-    let head = header(F33);
-    let states: Vec<StateFinance> = F33
-        .lines()
-        .skip(1)
-        .filter(|line| !line.trim().is_empty())
-        .map(|line| {
-            let p: Vec<&str> = line.split(',').collect();
-            let n = |name: &str| number(&head, &p, name);
-            StateFinance {
-                fips: at(&head, &p, "fips").to_string(),
-                name: at(&head, &p, "state").to_string(),
-                systems: n("systems") as usize,
-                enrollment: n("enrollment"),
-                total_revenue: n("total_revenue"),
-                federal_revenue: n("federal_revenue"),
-                state_revenue: n("state_revenue"),
-                local_revenue: n("local_revenue"),
-                property_tax_revenue: n("property_tax_revenue"),
-                parent_government_revenue: n("parent_government_revenue"),
-                current_spending: n("current_spending"),
-            }
+    let states: Vec<StateFinance> = dispersion::census_states::states()
+        .into_iter()
+        .map(|state: CensusState| StateFinance {
+            fips: state.fips,
+            name: state.name,
+            systems: state.systems.unwrap_or(0.0) as usize,
+            enrollment: state.enrollment,
+            total_revenue: state.total_revenue,
+            federal_revenue: state.federal_revenue,
+            state_revenue: state.state_revenue,
+            local_revenue: state.local_revenue,
+            property_tax_revenue: state.property_tax,
+            parent_government_revenue: state.parent_government,
+            current_spending: state.current_spending,
         })
         .collect();
 
@@ -516,7 +502,7 @@ fn house_district_block(records: &[DistrictRecord], chamber: Chamber) -> Vec<cra
 /// `Option<&…>` of different types, so a transposition is a compile error more often than not —
 /// but `taxes` and `functions` are both `Option<&…>` over collections and would swap silently.
 struct Joins<'a> {
-    profile: Option<&'a &'a str>,
+    profile: Option<&'a ProfileDistrict>,
     outcome: Option<&'a Joined>,
     money: Option<&'a Finances>,
     taxes: Option<&'a Vec<PropertyTaxYear>>,
@@ -692,13 +678,13 @@ fn to_district(record: &DistrictRecord, joins: &Joins<'_>) -> District {
         at_minimum_state_share: record.at_minimum_state_share(),
         valuation_per_pupil: record
             .valuation_per_pupil
-            .or_else(|| profile.and_then(|line| parse(line, 4))),
-        effective_class1_millage: profile.and_then(|line| parse(line, 6)),
-        voted_operating_millage: profile.and_then(|line| parse(line, 5)),
-        millage: millage_analysis(taxes, profile.and_then(|line| parse(line, 5))),
+            .or_else(|| profile.and_then(|p| p.valuation_per_pupil)),
+        effective_class1_millage: profile.and_then(|p| p.effective_class1_millage),
+        voted_operating_millage: profile.and_then(|p| p.current_operating_millage),
+        millage: millage_analysis(taxes, profile.and_then(|p| p.current_operating_millage)),
         regime: regime_counterfactual(record, taxes, recognized),
-        operating_expenditure_per_pupil: profile.and_then(|line| parse(line, 7)),
-        economically_disadvantaged: profile.and_then(|line| parse(line, 3)),
+        operating_expenditure_per_pupil: profile.and_then(|p| p.operating_expenditure_per_pupil),
+        economically_disadvantaged: profile.and_then(|p| p.economically_disadvantaged),
         enrollment_change: {
             let [first, _, last] = record.adm_history;
             (first > 0.0).then(|| last / first - 1.0)
@@ -1305,69 +1291,46 @@ fn build_up(record: &DistrictRecord) -> BaseCostBuildUp {
     }
 }
 
-/// Column positions, resolved from the header so a reordered fixture fails loudly.
-fn header(csv: &str) -> Vec<&str> {
-    csv.lines().next().unwrap_or_default().split(',').collect()
-}
-
-fn at<'a>(head: &[&str], parts: &[&'a str], name: &str) -> &'a str {
-    let index = head
-        .iter()
-        .position(|c| *c == name)
-        .unwrap_or_else(|| panic!("{name} is not a column of the fixture"));
-    parts.get(index).copied().unwrap_or_default()
-}
-
-/// A numeric column by header name, zero where the department wrote no value.
-///
-/// `conventions::number` rather than `str::parse`: it is the one place that knows what the
-/// department writes where there is no value. A raw parse turns `<10`, `#N/A` and a
-/// thousands-separated figure alike into `None`, and `unwrap_or(0.0)` then reports every
-/// one of them as zero. The zero is kept here because the surrounding type has no way to
-/// carry an absence, but it is now a stated substitution rather than a parse failure.
-fn number(head: &[&str], parts: &[&str], name: &str) -> f64 {
-    edfund_core::conventions::number(at(head, parts, name)).unwrap_or(0.0)
-}
-
 /// Every tax year of SD-1 for a district, keyed by IRN and ordered oldest first.
 ///
 /// Ordered because the page reads it as a change rather than as independent years, and a
 /// reversed sequence would silently invert every direction it reports. Consumers that want a
 /// change should take the **last two**, not the ends — see [`millage_analysis`].
 fn property_taxes() -> HashMap<String, Vec<PropertyTaxYear>> {
-    let head = header(SD1);
-    let mut out: HashMap<String, Vec<PropertyTaxYear>> = HashMap::new();
-    for line in SD1.lines().skip(1).filter(|l| !l.trim().is_empty()) {
-        let p: Vec<&str> = line.split(',').collect();
-        let n = |name: &str| number(&head, &p, name);
-        out.entry(at(&head, &p, "irn").to_string())
-            .or_default()
-            .push(PropertyTaxYear {
-                tax_year: n("tax_year") as u16,
-                class1_value: n("class1_value"),
-                class2_value: n("class2_value"),
-                public_utility_value: n("public_utility_value"),
-                total_value: n("total_value"),
-                agricultural_value: n("agricultural_value"),
-                residential_value: n("residential_value"),
-                commercial_value: n("commercial_value"),
-                industrial_value: n("industrial_value"),
-                mineral_value: n("mineral_value"),
-                railroad_value: n("railroad_value"),
-                class1_rate: n("class1_rate"),
-                class2_rate: n("class2_rate"),
-                class1_taxes_charged: n("class1_taxes_charged"),
-                class2_taxes_charged: n("class2_taxes_charged"),
-                real_property_taxes_charged: n("real_property_taxes_charged"),
-                public_utility_taxes_charged: n("public_utility_taxes_charged"),
-                value_per_pupil: n("value_per_pupil"),
-                adm: n("adm"),
-            });
-    }
-    for years in out.values_mut() {
-        years.sort_by_key(|y| y.tax_year);
-    }
-    out
+    // `dispersion::sd1::by_district` already groups and orders. The zeros below are this feed's
+    // substitution and not the reader's: the abstract distinguishes a district that reports no
+    // railroad property from one that reports none, and the serialized model has no way to carry
+    // an absence, so the substitution is made here where it is visible.
+    dispersion::sd1::by_district()
+        .into_iter()
+        .map(|(irn, years)| {
+            let rows = years
+                .into_iter()
+                .map(|row| PropertyTaxYear {
+                    tax_year: row.tax_year,
+                    class1_value: row.class1_value.unwrap_or(0.0),
+                    class2_value: row.class2_value.unwrap_or(0.0),
+                    public_utility_value: row.public_utility_value.unwrap_or(0.0),
+                    total_value: row.total_value.unwrap_or(0.0),
+                    agricultural_value: row.agricultural_value.unwrap_or(0.0),
+                    residential_value: row.residential_value.unwrap_or(0.0),
+                    commercial_value: row.commercial_value.unwrap_or(0.0),
+                    industrial_value: row.industrial_value.unwrap_or(0.0),
+                    mineral_value: row.mineral_value.unwrap_or(0.0),
+                    railroad_value: row.railroad_value.unwrap_or(0.0),
+                    class1_rate: row.class1_rate.unwrap_or(0.0),
+                    class2_rate: row.class2_rate.unwrap_or(0.0),
+                    class1_taxes_charged: row.class1_taxes_charged.unwrap_or(0.0),
+                    class2_taxes_charged: row.class2_taxes_charged.unwrap_or(0.0),
+                    real_property_taxes_charged: row.real_property_taxes_charged.unwrap_or(0.0),
+                    public_utility_taxes_charged: row.public_utility_taxes_charged.unwrap_or(0.0),
+                    value_per_pupil: row.value_per_pupil.unwrap_or(0.0),
+                    adm: row.adm.unwrap_or(0.0),
+                })
+                .collect();
+            (irn, rows)
+        })
+        .collect()
 }
 
 /// Run H.B. 920 against a district, instead of describing it.
@@ -1521,30 +1484,25 @@ fn regime_counterfactual(
 
 /// FY2025 operating spending by function, per pupil, keyed by IRN.
 fn spending_by_function() -> HashMap<String, SpendingByFunction> {
-    let head = header(FUNCTIONS);
-    FUNCTIONS
-        .lines()
-        .skip(1)
-        .filter(|l| !l.trim().is_empty())
-        .map(|line| {
-            let p: Vec<&str> = line.split(',').collect();
-            let n = |name: &str| number(&head, &p, name);
+    dispersion::functions::districts()
+        .into_iter()
+        .map(|d| {
             (
-                at(&head, &p, "irn").to_string(),
+                d.irn,
                 SpendingByFunction {
-                    adm: n("unweighted_adm_fy25"),
-                    operating_per_pupil: n("operating_expenditure_per_pupil_fy25"),
-                    classroom_instruction: n("classroom_instruction_per_pupil"),
-                    nonclassroom: n("nonclassroom_per_pupil"),
-                    instruction: n("instruction_per_pupil"),
-                    pupil_support: n("pupil_support_per_pupil"),
-                    instructional_staff_support: n("instructional_staff_support_per_pupil"),
-                    general_admin: n("general_admin_per_pupil"),
-                    school_admin: n("school_admin_per_pupil"),
-                    operations_maintenance: n("operations_maintenance_per_pupil"),
-                    pupil_transportation: n("pupil_transportation_per_pupil"),
-                    other_support: n("other_support_per_pupil"),
-                    food_service: n("food_service_per_pupil"),
+                    adm: d.adm.unwrap_or(0.0),
+                    operating_per_pupil: d.operating.unwrap_or(0.0),
+                    classroom_instruction: d.classroom_instruction.unwrap_or(0.0),
+                    nonclassroom: d.nonclassroom.unwrap_or(0.0),
+                    instruction: d.instruction.unwrap_or(0.0),
+                    pupil_support: d.pupil_support.unwrap_or(0.0),
+                    instructional_staff_support: d.instructional_staff_support.unwrap_or(0.0),
+                    general_admin: d.general_admin.unwrap_or(0.0),
+                    school_admin: d.school_admin.unwrap_or(0.0),
+                    operations_maintenance: d.operations_maintenance.unwrap_or(0.0),
+                    pupil_transportation: d.pupil_transportation.unwrap_or(0.0),
+                    other_support: d.other_support.unwrap_or(0.0),
+                    food_service: d.food_service.unwrap_or(0.0),
                 },
             )
         })
@@ -1558,13 +1516,9 @@ fn spending_by_function() -> HashMap<String, SpendingByFunction> {
 /// carries — that every share in it is a fraction — could only be checked by a consumer parsing
 /// the JSON back, which is the layer that had the bug.
 pub fn build() -> Bundle {
-    // Profile columns: 3 economically disadvantaged, 4 valuation/pupil, 6 effective class 1
-    // millage, 7 operating expenditure per pupil.
-    let profile: HashMap<&str, &str> = PROFILE
-        .lines()
-        .skip(1)
-        .filter(|line| !line.trim().is_empty())
-        .filter_map(|line| field(line, 0).map(|irn| (irn, line)))
+    let profile: HashMap<String, ProfileDistrict> = dispersion::profile::districts()
+        .into_iter()
+        .map(|district| (district.irn.clone(), district))
         .collect();
 
     let records = panel();
@@ -1608,7 +1562,7 @@ pub fn build() -> Bundle {
             to_district(
                 record,
                 &Joins {
-                    profile: profile.get(record.irn.as_str()),
+                    profile: profile.get(&record.irn),
                     outcome: outcomes.iter().find(|j| j.funding.irn == record.irn),
                     money: for_district(&money, &record.irn),
                     taxes: taxes.get(&record.irn),

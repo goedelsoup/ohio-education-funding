@@ -15,82 +15,46 @@
 //! `corpus/metric/performance-index.yml`. A fixture refresh that moves them fails the build
 //! rather than quietly rewriting the corpus.
 
+use std::collections::BTreeMap;
+
+use dispersion::profile::{self, ProfileDistrict};
+use dispersion::report_card::{self, ReportCard};
 use dispersion::{
     least_squares, partial_correlation, rank_correlation, wealth_neutrality, weighted_mean,
     Dispersion,
 };
+use foundation::department_model;
 
-const REPORT_CARD: &str = include_str!("../fixtures/report-card-2425-district-data.csv");
-const PROFILE: &str = include_str!("../fixtures/cupp-fy24-district-data.csv");
-const FY27_MODEL: &str = include_str!("../../foundation/fixtures/fy27-department-model.csv");
+/// A column reader over the report card, and one over the profile report it joins to.
+///
+/// All three fixtures behind this file are read through their crates' own public readers now:
+/// [`dispersion::report_card`], [`dispersion::profile`] and [`foundation::department_model`].
+/// This file used to carry a fourth parser of the report card, a second of the profile report
+/// and a third of the department model, each with its own column table. See issue #157.
+type Pick = fn(&ReportCard) -> Option<f64>;
+type FromProfile = fn(&ProfileDistrict) -> Option<f64>;
 
-/// Column indices in the report-card fixture.
-mod col {
-    pub const IRN: usize = 0;
-    pub const PERFORMANCE_INDEX: usize = 2;
-    pub const UNWEIGHTED_ADM: usize = 5;
-    pub const WEIGHTED_ADM: usize = 6;
-    pub const OPERATING_EXPENDITURES: usize = 7;
-    pub const EQUIVALENT_PUPIL: usize = 8;
-    pub const FEDERAL: usize = 9;
-    pub const STATE_AND_LOCAL: usize = 10;
-    pub const PROGRESS_COMPOSITE: usize = 11;
-    pub const PROGRESS_EFFECT_SIZE: usize = 12;
-    pub const PI_2324: usize = 3;
-    pub const PI_2223: usize = 4;
-    pub const PROGRESS_EFFECT_1YR: usize = 13;
-    pub const ED_SHARE_2425: usize = 14;
-    pub const EL_SHARE_2425: usize = 15;
-    pub const SWD_SHARE_2425: usize = 16;
+fn report_card() -> Vec<ReportCard> {
+    report_card::report_cards()
 }
 
-/// Column indices in the profile-report fixture.
-mod profile {
-    pub const IRN: usize = 0;
-    pub const ECON_DISADVANTAGED: usize = 3;
-    pub const VALUATION_PER_PUPIL: usize = 4;
-    pub const OPERATING_EPP: usize = 7;
+/// One column of the report card, aligned to `rows`.
+fn column(rows: &[ReportCard], pick: Pick) -> Vec<Option<f64>> {
+    rows.iter().map(pick).collect()
 }
 
-/// Column indices in the FY2027 department-model fixture.
-mod model {
-    pub const IRN: usize = 0;
-    pub const GUARANTEE: usize = 15;
-}
-
-struct Row(Vec<String>);
-
-impl Row {
-    fn key(&self) -> &str {
-        self.0.get(col::IRN).map_or("", String::as_str)
-    }
-    fn get(&self, i: usize) -> Option<f64> {
-        self.0.get(i).and_then(|c| c.trim().parse::<f64>().ok())
-    }
-}
-
-fn parse(csv: &str) -> Vec<Row> {
-    csv.lines()
-        .skip(1)
-        .filter(|l| !l.trim().is_empty())
-        .map(|l| Row(l.split(',').map(str::to_string).collect()))
-        .collect()
-}
-
-fn report_card() -> Vec<Row> {
-    parse(REPORT_CARD)
-}
-
-/// Look up a column of another fixture by IRN, aligned to the report-card rows.
-fn joined(rows: &[Row], other: &str, key: usize, value: usize) -> Vec<Option<f64>> {
-    let table = parse(other);
+/// A column of the profile report, aligned to the report-card rows by IRN.
+///
+/// The report card rates 607 districts and the profile report covers 606, so a joined column
+/// carries one `None` that the report card's own columns do not — which is why every
+/// correlation here is computed over complete cases rather than over a count.
+fn joined(rows: &[ReportCard], pick: FromProfile) -> Vec<Option<f64>> {
+    let table: BTreeMap<String, ProfileDistrict> = profile::districts()
+        .into_iter()
+        .map(|d| (d.irn.clone(), d))
+        .collect();
     rows.iter()
-        .map(|r| {
-            table
-                .iter()
-                .find(|o| o.0.get(key).map(String::as_str) == Some(r.key()))
-                .and_then(|o| o.get(value))
-        })
+        .map(|r| table.get(&r.irn).and_then(pick))
         .collect()
 }
 
@@ -100,20 +64,6 @@ fn pairs(a: &[Option<f64>], b: &[Option<f64>]) -> (Vec<f64>, Vec<f64>) {
         .zip(b)
         .filter_map(|(x, y)| Some(((*x)?, (*y)?)))
         .unzip()
-}
-
-fn column(rows: &[Row], i: usize) -> Vec<Option<f64>> {
-    rows.iter().map(|r| r.get(i)).collect()
-}
-
-/// Operating expenditures over a chosen ADM column — the whole subject of this file.
-fn per_pupil(rows: &[Row], adm: usize) -> Vec<Option<f64>> {
-    rows.iter()
-        .map(|r| match (r.get(col::OPERATING_EXPENDITURES), r.get(adm)) {
-            (Some(dollars), Some(pupils)) if pupils > 0.0 => Some(dollars / pupils),
-            _ => None,
-        })
-        .collect()
 }
 
 fn correlate(a: &[Option<f64>], b: &[Option<f64>]) -> f64 {
@@ -143,7 +93,7 @@ fn close(actual: f64, expected: f64, tolerance: f64, what: &str) {
 fn the_rated_population_is_607_districts() {
     let rows = report_card();
     assert_eq!(rows.len(), 607);
-    assert!(rows.iter().all(|r| r.get(col::PERFORMANCE_INDEX).is_some()));
+    assert!(rows.iter().all(|r| r.performance_index.is_some()));
 }
 
 /// The published per-equivalent-pupil figure is reconstructible from the numerator and the
@@ -166,14 +116,13 @@ fn published_spending_equals_expenditures_over_weighted_adm() {
     let rows = report_card();
     let mut checked = 0;
     for row in &rows {
-        let (Some(dollars), Some(pupils), Some(published)) = (
-            row.get(col::OPERATING_EXPENDITURES),
-            row.get(col::WEIGHTED_ADM),
-            row.get(col::EQUIVALENT_PUPIL),
+        let (Some(computed), Some(pupils), Some(published)) = (
+            row.per_weighted_pupil(),
+            row.weighted_adm,
+            row.per_equivalent_pupil,
         ) else {
             continue;
         };
-        let computed = dollars / pupils;
         // Half a pupil of rounding in the denominator, plus a dollar for the published figure's
         // own rounding.
         let tolerance = published * (0.5 / pupils) + 1.0;
@@ -181,7 +130,7 @@ fn published_spending_equals_expenditures_over_weighted_adm() {
             (computed - published).abs() < tolerance,
             "{} reconstructs to {computed:.2} against a published {published:.0}, \
              outside the {tolerance:.2} the integer ADM allows",
-            row.0.get(1).map_or("?", String::as_str),
+            row.name,
         );
         checked += 1;
     }
@@ -191,11 +140,11 @@ fn published_spending_equals_expenditures_over_weighted_adm() {
     // premise of the tolerance above.
     assert!(rows
         .iter()
-        .filter_map(|r| r.get(col::WEIGHTED_ADM))
+        .filter_map(|r| r.weighted_adm)
         .all(|v| (v.fract()).abs() < 1e-9));
     assert!(
         rows.iter()
-            .filter_map(|r| r.get(col::UNWEIGHTED_ADM))
+            .filter_map(|r| r.unweighted_adm)
             .filter(|v| v.fract().abs() > 1e-9)
             .count()
             > 500
@@ -205,36 +154,36 @@ fn published_spending_equals_expenditures_over_weighted_adm() {
 #[test]
 fn the_white_paper_coefficients_reproduce() {
     let rows = report_card();
-    let pi = column(&rows, col::PERFORMANCE_INDEX);
+    let pi = column(&rows, |r| r.performance_index);
 
     close(
-        correlate(&pi, &column(&rows, col::EQUIVALENT_PUPIL)),
+        correlate(&pi, &column(&rows, |r| r.per_equivalent_pupil)),
         -0.016,
         0.001,
         "PI against total spending per equivalent pupil",
     );
     close(
-        rank(&pi, &column(&rows, col::EQUIVALENT_PUPIL)),
+        rank(&pi, &column(&rows, |r| r.per_equivalent_pupil)),
         0.048,
         0.001,
         "the same, Spearman",
     );
     close(
-        correlate(&pi, &column(&rows, col::FEDERAL)),
+        correlate(&pi, &column(&rows, |r| r.per_equivalent_pupil_federal)),
         -0.558,
         0.001,
         "PI against federal expenditure per equivalent pupil",
     );
     close(
-        correlate(&pi, &column(&rows, col::STATE_AND_LOCAL)),
+        correlate(&pi, &column(&rows, |r| r.per_equivalent_pupil_state_local)),
         0.086,
         0.001,
         "PI against state-and-local expenditure per equivalent pupil",
     );
     close(
         rank(
-            &column(&rows, col::UNWEIGHTED_ADM),
-            &column(&rows, col::EQUIVALENT_PUPIL),
+            &column(&rows, |r| r.unweighted_adm),
+            &column(&rows, |r| r.per_equivalent_pupil),
         ),
         -0.366,
         0.001,
@@ -245,7 +194,7 @@ fn the_white_paper_coefficients_reproduce() {
 #[test]
 fn the_white_paper_distributions_reproduce() {
     let rows = report_card();
-    let spending: Vec<f64> = column(&rows, col::EQUIVALENT_PUPIL)
+    let spending: Vec<f64> = column(&rows, |r| r.per_equivalent_pupil)
         .into_iter()
         .flatten()
         .collect();
@@ -258,7 +207,7 @@ fn the_white_paper_distributions_reproduce() {
     );
     close(d.mean, 13_224.0, 1.0, "mean spending per equivalent pupil");
 
-    let pi: Vec<f64> = column(&rows, col::PERFORMANCE_INDEX)
+    let pi: Vec<f64> = column(&rows, |r| r.performance_index)
         .into_iter()
         .flatten()
         .collect();
@@ -281,10 +230,10 @@ fn the_white_paper_distributions_reproduce() {
 #[test]
 fn the_divisor_decides_the_headline() {
     let rows = report_card();
-    let pi = column(&rows, col::PERFORMANCE_INDEX);
+    let pi = column(&rows, |r| r.performance_index);
 
-    let weighted = correlate(&pi, &per_pupil(&rows, col::WEIGHTED_ADM));
-    let unweighted = correlate(&pi, &per_pupil(&rows, col::UNWEIGHTED_ADM));
+    let weighted = correlate(&pi, &column(&rows, ReportCard::per_weighted_pupil));
+    let unweighted = correlate(&pi, &column(&rows, ReportCard::per_enrolled_pupil));
 
     close(
         weighted,
@@ -308,16 +257,8 @@ fn the_divisor_decides_the_headline() {
 #[test]
 fn the_adm_weight_ratio_is_a_poverty_measure() {
     let rows = report_card();
-    let ratio: Vec<Option<f64>> = rows
-        .iter()
-        .map(
-            |r| match (r.get(col::WEIGHTED_ADM), r.get(col::UNWEIGHTED_ADM)) {
-                (Some(w), Some(u)) if u > 0.0 => Some(w / u),
-                _ => None,
-            },
-        )
-        .collect();
-    let disadvantaged = joined(&rows, PROFILE, profile::IRN, profile::ECON_DISADVANTAGED);
+    let ratio = column(&rows, ReportCard::weight_ratio);
+    let disadvantaged = joined(&rows, |d| d.economically_disadvantaged);
 
     close(
         correlate(&ratio, &disadvantaged),
@@ -326,7 +267,7 @@ fn the_adm_weight_ratio_is_a_poverty_measure() {
         "ADM weight ratio against economically disadvantaged share",
     );
     close(
-        correlate(&ratio, &column(&rows, col::PERFORMANCE_INDEX)),
+        correlate(&ratio, &column(&rows, |r| r.performance_index)),
         -0.745,
         0.002,
         "ADM weight ratio against Performance Index",
@@ -342,8 +283,8 @@ fn the_adm_weight_ratio_is_a_poverty_measure() {
 #[test]
 fn disadvantage_explains_most_of_the_performance_index() {
     let rows = report_card();
-    let pi = column(&rows, col::PERFORMANCE_INDEX);
-    let disadvantaged = joined(&rows, PROFILE, profile::IRN, profile::ECON_DISADVANTAGED);
+    let pi = column(&rows, |r| r.performance_index);
+    let disadvantaged = joined(&rows, |d| d.economically_disadvantaged);
 
     let (a, b) = pairs(&pi, &disadvantaged);
     let fit = wealth_neutrality(&b, &a).unwrap();
@@ -362,8 +303,8 @@ fn disadvantage_explains_most_of_the_performance_index() {
 #[test]
 fn holding_disadvantage_constant_shrinks_every_spending_relationship() {
     let rows = report_card();
-    let pi = column(&rows, col::PERFORMANCE_INDEX);
-    let ed = joined(&rows, PROFILE, profile::IRN, profile::ECON_DISADVANTAGED);
+    let pi = column(&rows, |r| r.performance_index);
+    let ed = joined(&rows, |d| d.economically_disadvantaged);
 
     // All three coefficients must come from the same 606 districts. One district is missing an
     // economically disadvantaged share, and computing the raw correlation over 607 while the
@@ -389,13 +330,13 @@ fn holding_disadvantage_constant_shrinks_every_spending_relationship() {
     };
 
     check(
-        &per_pupil(&rows, col::UNWEIGHTED_ADM),
+        &column(&rows, ReportCard::per_enrolled_pupil),
         -0.355,
         -0.125,
         "spending per unweighted pupil, raw then holding disadvantage",
     );
     check(
-        &column(&rows, col::FEDERAL),
+        &column(&rows, |r| r.per_equivalent_pupil_federal),
         -0.558,
         -0.158,
         "federal spending per equivalent pupil, raw then holding disadvantage",
@@ -421,14 +362,14 @@ fn holding_disadvantage_constant_shrinks_every_spending_relationship() {
 #[test]
 fn only_the_headcount_estimate_is_stable_across_the_papers_sensitivity_checks() {
     let all = report_card();
-    let scenarios: Vec<(&str, Vec<&Row>)> = vec![
+    let scenarios: Vec<(&str, Vec<&ReportCard>)> = vec![
         ("all districts", all.iter().collect()),
         ("excluding the highest per-pupil district", {
             let top = all
                 .iter()
                 .max_by(|a, b| {
-                    a.get(col::EQUIVALENT_PUPIL)
-                        .partial_cmp(&b.get(col::EQUIVALENT_PUPIL))
+                    a.per_equivalent_pupil
+                        .partial_cmp(&b.per_equivalent_pupil)
                         .unwrap()
                 })
                 .unwrap();
@@ -436,7 +377,7 @@ fn only_the_headcount_estimate_is_stable_across_the_papers_sensitivity_checks() 
         }),
         ("excluding enrollment under 582", {
             all.iter()
-                .filter(|r| r.get(col::UNWEIGHTED_ADM).is_some_and(|a| a >= 582.0))
+                .filter(|r| r.unweighted_adm.is_some_and(|a| a >= 582.0))
                 .collect()
         }),
     ];
@@ -444,10 +385,10 @@ fn only_the_headcount_estimate_is_stable_across_the_papers_sensitivity_checks() 
     let mut published = Vec::new();
     let mut headcount = Vec::new();
     for (name, subset) in scenarios {
-        let rows: Vec<Row> = subset.into_iter().map(|r| Row(r.0.clone())).collect();
-        let pi = column(&rows, col::PERFORMANCE_INDEX);
-        let weighted = correlate(&pi, &per_pupil(&rows, col::WEIGHTED_ADM));
-        let unweighted = correlate(&pi, &per_pupil(&rows, col::UNWEIGHTED_ADM));
+        let rows: Vec<ReportCard> = subset.into_iter().cloned().collect();
+        let pi = column(&rows, |r| r.performance_index);
+        let weighted = correlate(&pi, &column(&rows, ReportCard::per_weighted_pupil));
+        let unweighted = correlate(&pi, &column(&rows, ReportCard::per_enrolled_pupil));
         assert!(
             unweighted < -0.30,
             "{name}: headcount divisor should stay clearly negative, got {unweighted:.4}"
@@ -517,8 +458,8 @@ fn only_the_headcount_estimate_is_stable_across_the_papers_sensitivity_checks() 
 #[test]
 fn enrollment_weighting_moves_the_published_coefficient_tenfold() {
     let rows = report_card();
-    let pi = column(&rows, col::PERFORMANCE_INDEX);
-    let adm = column(&rows, col::UNWEIGHTED_ADM);
+    let pi = column(&rows, |r| r.performance_index);
+    let adm = column(&rows, |r| r.unweighted_adm);
 
     // Pearson correlation with each district weighted by its students. Written here rather than
     // in `dispersion` because it is a reading of one table, not an equity statistic.
@@ -543,8 +484,8 @@ fn enrollment_weighting_moves_the_published_coefficient_tenfold() {
         covariance / (var_y * var_x).sqrt()
     };
 
-    let published = weighted_correlation(&per_pupil(&rows, col::WEIGHTED_ADM));
-    let headcount = weighted_correlation(&per_pupil(&rows, col::UNWEIGHTED_ADM));
+    let published = weighted_correlation(&column(&rows, ReportCard::per_weighted_pupil));
+    let headcount = weighted_correlation(&column(&rows, ReportCard::per_enrolled_pupil));
     close(
         published,
         -0.149,
@@ -570,11 +511,11 @@ fn enrollment_weighting_moves_the_published_coefficient_tenfold() {
 #[test]
 fn enrollment_weighting_deepens_the_gap() {
     let rows = report_card();
-    let adm: Vec<f64> = column(&rows, col::UNWEIGHTED_ADM)
+    let adm: Vec<f64> = column(&rows, |r| r.unweighted_adm)
         .into_iter()
         .flatten()
         .collect();
-    let pi: Vec<f64> = column(&rows, col::PERFORMANCE_INDEX)
+    let pi: Vec<f64> = column(&rows, |r| r.performance_index)
         .into_iter()
         .flatten()
         .collect();
@@ -597,8 +538,8 @@ fn enrollment_weighting_deepens_the_gap() {
 #[test]
 fn the_fy24_profile_report_agrees_on_a_headcount_denominator() {
     let rows = report_card();
-    let pi = column(&rows, col::PERFORMANCE_INDEX);
-    let cupp = joined(&rows, PROFILE, profile::IRN, profile::OPERATING_EPP);
+    let pi = column(&rows, |r| r.performance_index);
+    let cupp = joined(&rows, |d| d.operating_expenditure_per_pupil);
 
     close(
         correlate(&pi, &cupp),
@@ -608,7 +549,7 @@ fn the_fy24_profile_report_agrees_on_a_headcount_denominator() {
     );
 
     // Two sources, two years, one direction — and both far from the published −0.016.
-    let fy25 = correlate(&pi, &per_pupil(&rows, col::UNWEIGHTED_ADM));
+    let fy25 = correlate(&pi, &column(&rows, ReportCard::per_enrolled_pupil));
     assert!(fy25 < -0.30 && correlate(&pi, &cupp) < -0.30);
 }
 
@@ -616,9 +557,9 @@ fn the_fy24_profile_report_agrees_on_a_headcount_denominator() {
 #[test]
 fn spending_rises_at_both_ends_of_the_wealth_distribution() {
     let rows = report_card();
-    let valuation = joined(&rows, PROFILE, profile::IRN, profile::VALUATION_PER_PUPIL);
-    let spending = per_pupil(&rows, col::UNWEIGHTED_ADM);
-    let disadvantaged = joined(&rows, PROFILE, profile::IRN, profile::ECON_DISADVANTAGED);
+    let valuation = joined(&rows, |d| d.valuation_per_pupil);
+    let spending = column(&rows, ReportCard::per_enrolled_pupil);
+    let disadvantaged = joined(&rows, |d| d.economically_disadvantaged);
 
     // Both correlations are positive: the poorest districts spend more, and so do the richest.
     assert!(correlate(&spending, &disadvantaged) > 0.3);
@@ -635,13 +576,12 @@ fn spending_rises_at_both_ends_of_the_wealth_distribution() {
 #[test]
 fn the_guarantee_does_not_explain_the_denominator_gap() {
     let all = report_card();
-    let guarantee = joined(&all, FY27_MODEL, model::IRN, model::GUARANTEE);
+    let guarantee = department_model::guarantees();
 
-    let split = |on: bool| -> Vec<Row> {
+    let split = |on: bool| -> Vec<ReportCard> {
         all.iter()
-            .zip(&guarantee)
-            .filter(|(_, g)| g.is_some_and(|v| (v > 0.0) == on))
-            .map(|(r, _)| Row(r.0.clone()))
+            .filter(|r| guarantee.get(&r.irn).is_some_and(|v| (*v > 0.0) == on))
+            .cloned()
             .collect()
     };
     let guaranteed = split(true);
@@ -657,23 +597,23 @@ fn the_guarantee_does_not_explain_the_denominator_gap() {
         ("guaranteed", &guaranteed, -0.389),
         ("on formula", &on_formula, -0.299),
     ] {
-        let pi = column(rows, col::PERFORMANCE_INDEX);
+        let pi = column(rows, |r| r.performance_index);
         close(
-            correlate(&pi, &per_pupil(rows, col::UNWEIGHTED_ADM)),
+            correlate(&pi, &column(rows, ReportCard::per_enrolled_pupil)),
             expected,
             0.003,
             name,
         );
         assert!(
-            correlate(&pi, &per_pupil(rows, col::WEIGHTED_ADM)).abs() < 0.1,
+            correlate(&pi, &column(rows, ReportCard::per_weighted_pupil)).abs() < 0.1,
             "{name}: weighted divisor is near zero in both halves too"
         );
     }
 
     // And the corpus's wealth finding shows through: guaranteed districts score higher, because
     // the guarantee holds up property-wealthy districts.
-    let mean = |rows: &[Row]| {
-        let v: Vec<f64> = column(rows, col::PERFORMANCE_INDEX)
+    let mean = |rows: &[ReportCard]| {
+        let v: Vec<f64> = column(rows, |r| r.performance_index)
             .into_iter()
             .flatten()
             .collect();
@@ -695,15 +635,19 @@ fn the_guarantee_does_not_explain_the_denominator_gap() {
 #[test]
 fn the_performance_index_is_almost_static_across_three_years() {
     let rows = report_card();
-    let years = [col::PI_2223, col::PI_2324, col::PERFORMANCE_INDEX];
+    let years: [Pick; 3] = [
+        |r| r.performance_index_earliest,
+        |r| r.performance_index_prior,
+        |r| r.performance_index,
+    ];
     for pair in years.windows(2) {
         let r = correlate(&column(&rows, pair[0]), &column(&rows, pair[1]));
         assert!(r > 0.98, "adjacent years correlate at {r:.4}");
     }
     close(
         correlate(
-            &column(&rows, col::PI_2223),
-            &column(&rows, col::PERFORMANCE_INDEX),
+            &column(&rows, |r| r.performance_index_earliest),
+            &column(&rows, |r| r.performance_index),
         ),
         0.981,
         0.003,
@@ -714,7 +658,7 @@ fn the_performance_index_is_almost_static_across_three_years() {
     let mut ranges: Vec<f64> = rows
         .iter()
         .filter_map(|r| {
-            let v: Vec<f64> = years.iter().filter_map(|c| r.get(*c)).collect();
+            let v: Vec<f64> = years.iter().filter_map(|pick| pick(r)).collect();
             (v.len() == 3).then(|| {
                 v.iter().copied().fold(f64::MIN, f64::max)
                     - v.iter().copied().fold(f64::MAX, f64::min)
@@ -740,11 +684,11 @@ fn the_performance_index_is_almost_static_across_three_years() {
 #[test]
 fn lagging_the_spending_does_not_change_the_association() {
     let rows = report_card();
-    let spending = joined(&rows, PROFILE, profile::IRN, profile::OPERATING_EPP);
+    let spending = joined(&rows, |d| d.operating_expenditure_per_pupil);
 
-    let before = correlate(&column(&rows, col::PI_2223), &spending); // spending after outcome
-    let same = correlate(&column(&rows, col::PI_2324), &spending); // contemporaneous
-    let after = correlate(&column(&rows, col::PERFORMANCE_INDEX), &spending); // spending before
+    let before = correlate(&column(&rows, |r| r.performance_index_earliest), &spending); // spending after outcome
+    let same = correlate(&column(&rows, |r| r.performance_index_prior), &spending); // contemporaneous
+    let after = correlate(&column(&rows, |r| r.performance_index), &spending); // spending before
 
     close(
         before,
@@ -778,7 +722,7 @@ fn lagging_the_spending_does_not_change_the_association() {
 #[test]
 fn the_progress_measure_is_centred_by_construction() {
     let rows = report_card();
-    let effect: Vec<f64> = column(&rows, col::PROGRESS_EFFECT_SIZE)
+    let effect: Vec<f64> = column(&rows, |r| r.progress_effect_size)
         .into_iter()
         .flatten()
         .collect();
@@ -793,16 +737,16 @@ fn the_progress_measure_is_centred_by_construction() {
 #[test]
 fn the_composite_carries_district_size_and_the_effect_size_carries_less() {
     let rows = report_card();
-    let adm = column(&rows, col::UNWEIGHTED_ADM);
-    let composite = correlate(&column(&rows, col::PROGRESS_COMPOSITE), &adm);
-    let effect = correlate(&column(&rows, col::PROGRESS_EFFECT_SIZE), &adm);
+    let adm = column(&rows, |r| r.unweighted_adm);
+    let composite = correlate(&column(&rows, |r| r.progress_composite), &adm);
+    let effect = correlate(&column(&rows, |r| r.progress_effect_size), &adm);
     close(composite, 0.244, 0.003, "composite against enrollment");
     close(effect, 0.155, 0.003, "effect size against enrollment");
     // They agree closely enough that the difference is easy to miss, which is the hazard.
     assert!(
         correlate(
-            &column(&rows, col::PROGRESS_COMPOSITE),
-            &column(&rows, col::PROGRESS_EFFECT_SIZE)
+            &column(&rows, |r| r.progress_composite),
+            &column(&rows, |r| r.progress_effect_size)
         ) > 0.9
     );
 }
@@ -816,8 +760,8 @@ fn the_composite_carries_district_size_and_the_effect_size_carries_less() {
 #[test]
 fn spending_flips_sign_between_the_level_measure_and_the_growth_measure() {
     let rows = report_card();
-    let ed = joined(&rows, PROFILE, profile::IRN, profile::ECON_DISADVANTAGED);
-    let spending = per_pupil(&rows, col::UNWEIGHTED_ADM);
+    let ed = joined(&rows, |d| d.economically_disadvantaged);
+    let spending = column(&rows, ReportCard::per_enrolled_pupil);
 
     let partial_against = |outcome: Vec<Option<f64>>| {
         // Same complete cases for all three coefficients.
@@ -842,8 +786,8 @@ fn spending_flips_sign_between_the_level_measure_and_the_growth_measure() {
         .unwrap()
     };
 
-    let level = partial_against(column(&rows, col::PERFORMANCE_INDEX));
-    let growth = partial_against(column(&rows, col::PROGRESS_EFFECT_SIZE));
+    let level = partial_against(column(&rows, |r| r.performance_index));
+    let growth = partial_against(column(&rows, |r| r.progress_effect_size));
 
     close(level, -0.125, 0.005, "level measure, holding disadvantage");
     close(growth, 0.146, 0.005, "growth measure, holding disadvantage");
@@ -854,10 +798,10 @@ fn spending_flips_sign_between_the_level_measure_and_the_growth_measure() {
 #[test]
 fn growth_is_less_poverty_bound_than_level_without_being_independent_of_it() {
     let rows = report_card();
-    let ed = joined(&rows, PROFILE, profile::IRN, profile::ECON_DISADVANTAGED);
+    let ed = joined(&rows, |d| d.economically_disadvantaged);
 
-    let level = correlate(&column(&rows, col::PERFORMANCE_INDEX), &ed);
-    let growth = correlate(&column(&rows, col::PROGRESS_EFFECT_SIZE), &ed);
+    let level = correlate(&column(&rows, |r| r.performance_index), &ed);
+    let growth = correlate(&column(&rows, |r| r.progress_effect_size), &ed);
     close(
         level,
         -0.846,
@@ -877,8 +821,8 @@ fn growth_is_less_poverty_bound_than_level_without_being_independent_of_it() {
     // And the two outcome measures are far from interchangeable.
     close(
         correlate(
-            &column(&rows, col::PERFORMANCE_INDEX),
-            &column(&rows, col::PROGRESS_EFFECT_SIZE),
+            &column(&rows, |r| r.performance_index),
+            &column(&rows, |r| r.progress_effect_size),
         ),
         0.375,
         0.003,
@@ -891,9 +835,9 @@ fn growth_is_less_poverty_bound_than_level_without_being_independent_of_it() {
 #[test]
 fn on_the_growth_measure_the_divisor_stops_mattering() {
     let rows = report_card();
-    let growth = column(&rows, col::PROGRESS_EFFECT_SIZE);
-    let unweighted = correlate(&growth, &per_pupil(&rows, col::UNWEIGHTED_ADM));
-    let weighted = correlate(&growth, &per_pupil(&rows, col::WEIGHTED_ADM));
+    let growth = column(&rows, |r| r.progress_effect_size);
+    let unweighted = correlate(&growth, &column(&rows, ReportCard::per_enrolled_pupil));
+    let weighted = correlate(&growth, &column(&rows, ReportCard::per_weighted_pupil));
 
     assert!(unweighted.abs() < 0.06, "unweighted: {unweighted:+.3}");
     assert!(weighted.abs() < 0.06, "weighted: {weighted:+.3}");
@@ -914,9 +858,9 @@ fn on_the_growth_measure_the_divisor_stops_mattering() {
 /// hidden, and `the_model_survives_dropping_the_imputed_rows` re-runs without them.
 fn model_frame(impute_english_learner: bool) -> (Vec<Vec<f64>>, Vec<f64>, Vec<f64>, Vec<f64>) {
     let rows = report_card();
-    let ed = joined(&rows, PROFILE, profile::IRN, profile::ECON_DISADVANTAGED);
-    let valuation = joined(&rows, PROFILE, profile::IRN, profile::VALUATION_PER_PUPIL);
-    let spending = per_pupil(&rows, col::UNWEIGHTED_ADM);
+    let ed = joined(&rows, |d| d.economically_disadvantaged);
+    let valuation = joined(&rows, |d| d.valuation_per_pupil);
+    let spending = column(&rows, ReportCard::per_enrolled_pupil);
 
     let (mut spend, mut disadvantage, mut learner, mut disability) =
         (vec![], vec![], vec![], vec![]);
@@ -924,7 +868,7 @@ fn model_frame(impute_english_learner: bool) -> (Vec<Vec<f64>>, Vec<f64>, Vec<f6
     let (mut level, mut growth, mut growth_one_year) = (vec![], vec![], vec![]);
 
     for (i, row) in rows.iter().enumerate() {
-        let el = match row.get(col::EL_SHARE_2425) {
+        let el = match row.english_learner {
             Some(v) => Some(v),
             None if impute_english_learner => Some(0.0),
             None => None,
@@ -933,12 +877,12 @@ fn model_frame(impute_english_learner: bool) -> (Vec<Vec<f64>>, Vec<f64>, Vec<f6
             spending[i],
             ed[i],
             el,
-            row.get(col::SWD_SHARE_2425),
-            row.get(col::UNWEIGHTED_ADM),
+            row.students_with_disabilities,
+            row.unweighted_adm,
             valuation[i],
-            row.get(col::PERFORMANCE_INDEX),
-            row.get(col::PROGRESS_EFFECT_SIZE),
-            row.get(col::PROGRESS_EFFECT_1YR),
+            row.performance_index,
+            row.progress_effect_size,
+            row.progress_effect_size_one_year,
         ) else {
             continue;
         };
@@ -1071,9 +1015,9 @@ fn the_model_survives_dropping_the_imputed_rows() {
 #[test]
 fn the_two_economic_disadvantage_measures_are_not_the_same_variable() {
     let rows = report_card();
-    let report_card_share = column(&rows, col::ED_SHARE_2425);
-    let cupp_share = joined(&rows, PROFILE, profile::IRN, profile::ECON_DISADVANTAGED);
-    let pi = column(&rows, col::PERFORMANCE_INDEX);
+    let report_card_share = column(&rows, |r| r.economically_disadvantaged);
+    let cupp_share = joined(&rows, |d| d.economically_disadvantaged);
+    let pi = column(&rows, |r| r.performance_index);
 
     close(
         correlate(&report_card_share, &cupp_share),
@@ -1100,8 +1044,8 @@ fn the_two_economic_disadvantage_measures_are_not_the_same_variable() {
 #[test]
 fn the_published_progress_figure_is_the_three_year_gain() {
     let rows = report_card();
-    let headline = column(&rows, col::PROGRESS_EFFECT_SIZE);
-    let one_year = column(&rows, col::PROGRESS_EFFECT_1YR);
+    let headline = column(&rows, |r| r.progress_effect_size);
+    let one_year = column(&rows, |r| r.progress_effect_size_one_year);
     // Same construct, different window: correlated but distinguishable, and the shorter window
     // is noisier, exactly as a gain measure over fewer cohorts should be.
     close(

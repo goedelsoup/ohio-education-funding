@@ -6,61 +6,15 @@
 //! unusual — and the central holding of *DeRolph* is a claim of the second kind.
 //!
 //! Both traps below produced a wrong answer during extraction, and neither produced an error.
+//! They are now stated on [`dispersion::census_states`], which is the crate's reader of this
+//! file; this suite asserts them against that reader rather than against a copy of its own.
 //!
 //! Cited by `catalog/census-f33-school-system-finances.md`.
 
-const F33: &str = include_str!("../fixtures/census-f33-states.csv");
+use dispersion::census_states::{self, national_share, ohio, rank_of, StateFinance};
 
-struct State {
-    fips: String,
-    name: String,
-    enrollment: f64,
-    total_revenue: f64,
-    federal_revenue: f64,
-    state_revenue: f64,
-    local_revenue: f64,
-    property_tax: f64,
-    parent_government: f64,
-    current_spending: f64,
-}
-
-impl State {
-    fn local_share(&self) -> f64 {
-        self.local_revenue / self.total_revenue
-    }
-    fn state_share(&self) -> f64 {
-        self.state_revenue / self.total_revenue
-    }
-    fn independent(&self) -> bool {
-        self.parent_government < self.local_revenue * 0.10
-    }
-}
-
-fn states() -> Vec<State> {
-    F33.lines()
-        .skip(1)
-        .filter(|line| !line.trim().is_empty())
-        .map(|line| {
-            let p: Vec<&str> = line.split(',').collect();
-            let n = |i: usize| p[i].trim().parse::<f64>().unwrap_or(0.0);
-            State {
-                fips: p[0].trim().to_string(),
-                name: p[1].trim().to_string(),
-                enrollment: n(3),
-                total_revenue: n(4),
-                federal_revenue: n(5),
-                state_revenue: n(6),
-                local_revenue: n(7),
-                property_tax: n(8),
-                parent_government: n(9),
-                current_spending: n(10),
-            }
-        })
-        .collect()
-}
-
-fn ohio(all: &[State]) -> &State {
-    all.iter().find(|s| s.name == "Ohio").expect("Ohio")
+fn states() -> Vec<StateFinance> {
+    census_states::states()
 }
 
 #[test]
@@ -86,7 +40,7 @@ fn the_fixture_is_fifty_states_and_the_district_of_columbia() {
 #[test]
 fn ohio_is_fips_thirty_nine_and_not_census_thirty_nine() {
     let all = states();
-    let oh = ohio(&all);
+    let oh = ohio();
     assert_eq!(oh.fips, "39");
     assert!(
         (1_500_000.0..1_600_000.0).contains(&oh.enrollment),
@@ -108,7 +62,7 @@ fn ohio_is_fips_thirty_nine_and_not_census_thirty_nine() {
 #[test]
 fn the_states_reporting_no_property_tax_are_the_ones_with_dependent_districts() {
     let all = states();
-    let silent: Vec<&State> = all.iter().filter(|s| s.property_tax == 0.0).collect();
+    let silent: Vec<&StateFinance> = all.iter().filter(|s| s.property_tax == 0.0).collect();
     assert!(
         silent.len() >= 8,
         "expected the dependent-district states, found {}",
@@ -137,8 +91,7 @@ fn the_states_reporting_no_property_tax_are_the_ones_with_dependent_districts() 
 /// Local revenue is the aggregate that survives the difference, so it is what Ohio is ranked on.
 #[test]
 fn local_revenue_includes_the_parent_appropriation_and_is_comparable_across_both() {
-    let all = states();
-    for state in &all {
+    for state in states() {
         assert!(
             state.parent_government <= state.local_revenue + 1.0,
             "{}: parent contributions cannot exceed local revenue",
@@ -151,20 +104,18 @@ fn local_revenue_includes_the_parent_appropriation_and_is_comparable_across_both
         );
     }
     // And Ohio, an independent-district state, routes none of its local revenue that way.
-    assert_eq!(ohio(&all).parent_government, 0.0);
-    assert!(ohio(&all).independent());
+    assert_eq!(ohio().parent_government, 0.0);
+    assert!(ohio().independent());
 }
 
 /// The finding. Ohio spends about the national average and raises it differently.
 #[test]
 fn ohio_is_high_on_local_share_and_low_on_state_share() {
     let all = states();
-    let oh = ohio(&all);
+    let oh = ohio();
 
-    let rank = |key: &dyn Fn(&State) -> f64| all.iter().filter(|s| key(s) > key(oh)).count() + 1;
-
-    let local_rank = rank(&State::local_share);
-    let state_rank = rank(&State::state_share);
+    let local_rank = rank_of(&oh, StateFinance::local_share);
+    let state_rank = rank_of(&oh, StateFinance::state_share);
     assert!(
         local_rank <= 10,
         "Ohio should be near the top on local share; it ranks {local_rank}"
@@ -174,8 +125,7 @@ fn ohio_is_high_on_local_share_and_low_on_state_share() {
         "Ohio should be near the bottom on state share; it ranks {state_rank}"
     );
 
-    let total = |pick: &dyn Fn(&State) -> f64| all.iter().map(pick).sum::<f64>();
-    let national_local = total(&|s| s.local_revenue) / total(&|s| s.total_revenue);
+    let national_local = national_share(|s| s.local_revenue);
     assert!(
         oh.local_share() > national_local + 0.05,
         "Ohio {:.3} against a national {:.3}",
@@ -184,15 +134,15 @@ fn ohio_is_high_on_local_share_and_low_on_state_share() {
     );
 
     // Spending and the federal share are unremarkable, which is what makes the split the story.
-    let national_spending = total(&|s| s.current_spending) * 1_000.0 / total(&|s| s.enrollment);
-    let ohio_spending = oh.current_spending * 1_000.0 / oh.enrollment;
+    let national_spending = all.iter().map(|s| s.current_spending).sum::<f64>() * 1_000.0
+        / all.iter().map(|s| s.enrollment).sum::<f64>();
+    let ohio_spending = oh.spending_per_pupil();
     assert!(
         (ohio_spending - national_spending).abs() / national_spending < 0.10,
         "Ohio spends {ohio_spending:.0} against a national {national_spending:.0}"
     );
-    let national_federal = total(&|s| s.federal_revenue) / total(&|s| s.total_revenue);
     assert!(
-        (oh.federal_revenue / oh.total_revenue - national_federal).abs() < 0.02,
+        (oh.federal_share() - national_share(|s| s.federal_revenue)).abs() < 0.02,
         "Ohio's federal share should be within two points of the national figure"
     );
 }

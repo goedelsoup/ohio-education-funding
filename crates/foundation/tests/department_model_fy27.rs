@@ -11,86 +11,49 @@
 //! spanning three orders of magnitude of enrollment, against a factor set (`fy2027`) two
 //! reference years newer than the one the implementation was originally written against.
 
+use foundation::department_model::{self, ModelDistrict as Row};
 use foundation::{
-    aggregate_base_cost, ratios, teacher_base_cost, DistrictEnrollment, StatewideFactors,
+    aggregate_base_cost, teacher_base_cost, teacher_salary_refresh_delta, StatewideFactors,
 };
-
-const FIXTURE: &str = include_str!("../fixtures/fy27-department-model.csv");
 
 /// ADM-weighted statewide average classroom teacher salary, FY2024, from the District Profile
 /// Report. The refreshed input a reference-year update would adopt. [verified]
 const FY2024_TEACHER_SALARY: f64 = 73_777.08;
-const BENEFIT_MULTIPLIER: f64 = 1.16;
 
-struct Row {
-    name: String,
-    adm: f64,
-    buildings: f64,
-    kindergarten: f64,
-    grades_1_3: f64,
-    grades_4_8: f64,
-    grades_9_12: f64,
-    cte: f64,
-    grades_9_12_total: f64,
-    funded_classroom: f64,
-    funded_special: f64,
-    teacher_base_cost: f64,
-    /// Column 13: the department's own aggregate base cost, before per-pupil division.
-    aggregate_base_cost: f64,
-    guarantee: f64,
-    adm_fy24: f64,
-    adm_fy26: f64,
-    valuation_per_pupil: Option<f64>,
-    core_foundation: f64,
+/// Every district in the department's model, read through [`foundation::department_model`].
+///
+/// Was a private parser here. It is the crate's own fixture and two other test files were
+/// reading it with two more copies of the column table; see issue #157.
+fn rows() -> Vec<Row> {
+    department_model::districts()
 }
 
-impl Row {
-    fn enrollment(&self) -> DistrictEnrollment {
-        DistrictEnrollment {
-            kindergarten: self.kindergarten,
-            grades_1_3: self.grades_1_3,
-            grades_4_8: self.grades_4_8,
-            grades_9_12: self.grades_9_12,
-            career_technical: self.cte,
-            grades_9_12_total: self.grades_9_12_total,
-            base_cost_enrolled_adm: self.adm,
-            open_buildings: self.buildings,
-            athletics_eligible: true,
-        }
-    }
+/// Base cost increase from refreshing the teacher salary input, using the department's own
+/// funded position counts rather than any reconstruction of them.
+///
+/// The arithmetic is [`foundation::teacher_salary_refresh_delta`], which this file and
+/// `tests/statewide_refresh.rs` each used to spell out with their own copy of the benefit
+/// multiplier.
+fn refresh_delta(r: &Row, factors: &StatewideFactors) -> f64 {
+    teacher_salary_refresh_delta(
+        r.funded_positions(),
+        factors.teacher_salary,
+        FY2024_TEACHER_SALARY,
+        factors,
+    )
+}
 
-    /// Base cost increase from refreshing the teacher salary input, using the department's own
-    /// funded position counts rather than any reconstruction of them.
-    fn refresh_delta(&self, from_salary: f64) -> f64 {
-        (self.funded_classroom + self.funded_special)
-            * (FY2024_TEACHER_SALARY - from_salary)
-            * BENEFIT_MULTIPLIER
-            * (1.0 + ratios::PROFESSIONAL_DEVELOPMENT_DAYS / ratios::CONTRACT_DAYS)
-    }
+/// The FY2020 Base State Funding a district is held at, recovered from its guarantee.
+///
+/// Only meaningful where the district is on the guarantee. See the section note below for the
+/// open-enrollment assumption this rests on.
+fn implied_fy2020_baseline(r: &Row) -> f64 {
+    r.core_foundation + r.guarantee
+}
 
-    fn on_guarantee(&self) -> bool {
-        self.guarantee > 0.0
-    }
-
-    /// Enrollment change from FY2024 to FY2026, as a fraction.
-    ///
-    /// Named for the years the `ADM Data` sheet declares. The `Base_Cost` sheet labels the same
-    /// three columns FY22/FY23/FY24, which is stale — base cost enrolled ADM is their average,
-    /// and an FY2027 calculation averages FY2024 through FY2026. The earlier version of this
-    /// fixture carried the stale names.
-    fn enrollment_change(&self) -> f64 {
-        self.adm_fy26 / self.adm_fy24 - 1.0
-    }
-
-    /// State aid per pupil as the formula computes it, before the guarantee.
-    fn formula_aid_per_pupil(&self) -> f64 {
-        self.core_foundation / self.adm
-    }
-
-    /// State aid per pupil as the district actually receives it.
-    fn realized_aid_per_pupil(&self) -> f64 {
-        (self.core_foundation + self.guarantee) / self.adm
-    }
+/// What FY2027's formula produces as a share of the FY2020 level being guaranteed.
+fn formula_share_of_baseline(r: &Row) -> f64 {
+    r.core_foundation / implied_fy2020_baseline(r)
 }
 
 /// Pearson correlation between two equal-length series.
@@ -103,7 +66,6 @@ fn correlation(xs: &[f64], ys: &[f64]) -> f64 {
     cov / (vx * vy).sqrt()
 }
 
-/// Median of a slice, by value.
 /// The median, on the one definition this workspace has.
 ///
 /// Was a local upper-of-two, which disagrees with `dispersion` on every even-length series.
@@ -115,38 +77,6 @@ fn median(mut values: Vec<f64>) -> f64 {
 /// Share of a subset that is on the guarantee, as a percentage.
 fn guarantee_rate(set: &[&Row]) -> f64 {
     100.0 * set.iter().filter(|r| r.on_guarantee()).count() as f64 / set.len() as f64
-}
-
-fn rows() -> Vec<Row> {
-    FIXTURE
-        .lines()
-        .skip(1)
-        .filter(|l| !l.trim().is_empty())
-        .map(|line| {
-            let p: Vec<&str> = line.split(',').collect();
-            let f = |i: usize| p[i].trim().parse::<f64>().unwrap_or(0.0);
-            Row {
-                name: p[1].to_string(),
-                adm: f(2),
-                buildings: f(3),
-                kindergarten: f(4),
-                grades_1_3: f(5),
-                grades_4_8: f(6),
-                grades_9_12: f(7),
-                cte: f(8),
-                grades_9_12_total: f(9),
-                funded_classroom: f(10),
-                funded_special: f(11),
-                teacher_base_cost: f(12),
-                aggregate_base_cost: f(13),
-                guarantee: f(15),
-                adm_fy24: f(16),
-                adm_fy26: f(18),
-                valuation_per_pupil: p[19].trim().parse::<f64>().ok(),
-                core_foundation: f(20),
-            }
-        })
-        .collect()
 }
 
 #[test]
@@ -162,15 +92,15 @@ fn reproduces_departments_funded_teacher_counts_for_every_district() {
     let mut worst = 0.0_f64;
     for r in rows() {
         let mine = teacher_base_cost(&r.enrollment(), &f);
-        let dc = (mine.funded_classroom_teachers - r.funded_classroom).abs();
-        let ds = (mine.funded_special_teachers - r.funded_special).abs();
+        let dc = (mine.funded_classroom_teachers - r.funded_classroom_teachers).abs();
+        let ds = (mine.funded_special_teachers - r.funded_special_teachers).abs();
         worst = worst.max(dc).max(ds);
         assert!(
             dc < 0.02,
             "{}: classroom {} vs department {}",
             r.name,
             mine.funded_classroom_teachers,
-            r.funded_classroom
+            r.funded_classroom_teachers
         );
         assert!(ds < 0.02, "{}: special mismatch", r.name);
     }
@@ -230,8 +160,8 @@ fn almost_half_of_districts_are_on_the_guarantee_in_fy2027() {
     assert_eq!(on.len(), 294);
     assert!((on.len() as f64 / rs.len() as f64 - 0.483).abs() < 0.005);
 
-    let guaranteed_adm: f64 = on.iter().map(|r| r.adm).sum();
-    let all_adm: f64 = rs.iter().map(|r| r.adm).sum();
+    let guaranteed_adm: f64 = on.iter().map(|r| r.base_cost_adm).sum();
+    let all_adm: f64 = rs.iter().map(|r| r.base_cost_adm).sum();
     assert!(
         (guaranteed_adm / all_adm - 0.541).abs() < 0.01,
         "guaranteed ADM share was {:.3}",
@@ -247,11 +177,11 @@ fn the_guarantee_absorbs_about_half_of_a_refresh() {
     let f = StatewideFactors::fy2027();
     let rs = rows();
 
-    let computed: f64 = rs.iter().map(|r| r.refresh_delta(f.teacher_salary)).sum();
+    let computed: f64 = rs.iter().map(|r| refresh_delta(r, &f)).sum();
     let absorbed: f64 = rs
         .iter()
         .filter(|r| r.on_guarantee())
-        .map(|r| r.refresh_delta(f.teacher_salary).min(r.guarantee))
+        .map(|r| refresh_delta(r, &f).min(r.guarantee))
         .sum();
     let delivered = computed - absorbed;
 
@@ -280,11 +210,11 @@ fn two_in_five_districts_would_gain_nothing_from_a_refresh() {
     let rs = rows();
     let stuck: Vec<&Row> = rs
         .iter()
-        .filter(|r| r.on_guarantee() && r.refresh_delta(f.teacher_salary) <= r.guarantee)
+        .filter(|r| r.on_guarantee() && refresh_delta(r, &f) <= r.guarantee)
         .collect();
     let lifted_off = rs
         .iter()
-        .filter(|r| r.on_guarantee() && r.refresh_delta(f.teacher_salary) > r.guarantee)
+        .filter(|r| r.on_guarantee() && refresh_delta(r, &f) > r.guarantee)
         .count();
 
     assert_eq!(stuck.len(), 242);
@@ -295,8 +225,8 @@ fn two_in_five_districts_would_gain_nothing_from_a_refresh() {
         stuck.len() as f64 / rs.len() as f64
     );
 
-    let stuck_adm: f64 = stuck.iter().map(|r| r.adm).sum();
-    let all_adm: f64 = rs.iter().map(|r| r.adm).sum();
+    let stuck_adm: f64 = stuck.iter().map(|r| r.base_cost_adm).sum();
+    let all_adm: f64 = rs.iter().map(|r| r.base_cost_adm).sum();
     assert!(
         (stuck_adm / all_adm - 0.418).abs() < 0.01,
         "stuck ADM share {:.3}",
@@ -313,7 +243,7 @@ fn the_median_guaranteed_district_is_far_above_its_formula_amount() {
     let mut ratios: Vec<f64> = rows()
         .iter()
         .filter(|r| r.on_guarantee())
-        .map(|r| r.guarantee / r.refresh_delta(f.teacher_salary))
+        .map(|r| r.guarantee / refresh_delta(r, &f))
         .collect();
     ratios.sort_by(|a, b| a.partial_cmp(b).unwrap());
     let median = ratios[ratios.len() / 2];
@@ -651,19 +581,6 @@ fn realized_aid_is_more_equal_than_formula_aid_and_that_is_the_problem() {
 // below carries that assumption.
 // ---------------------------------------------------------------------------------------
 
-impl Row {
-    /// The FY2020 Base State Funding this district is held at, recovered from the guarantee.
-    /// Only meaningful where the district is on the guarantee.
-    fn implied_fy2020_baseline(&self) -> f64 {
-        self.core_foundation + self.guarantee
-    }
-
-    /// What FY2027's formula produces as a share of the FY2020 level being guaranteed.
-    fn formula_share_of_baseline(&self) -> f64 {
-        self.core_foundation / self.implied_fy2020_baseline()
-    }
-}
-
 /// For a guaranteed district, the Fair School Funding Plan at 100% phase-in produces a median
 /// **67.8%** of what the district received in FY2020. A hundred and two of them would receive
 /// under half.
@@ -672,7 +589,7 @@ fn the_formula_pays_guaranteed_districts_two_thirds_of_their_fy2020_level() {
     let owned = rows();
     let on: Vec<&Row> = owned.iter().filter(|r| r.on_guarantee()).collect();
 
-    let shares: Vec<f64> = on.iter().map(|r| r.formula_share_of_baseline()).collect();
+    let shares: Vec<f64> = on.iter().map(|r| formula_share_of_baseline(r)).collect();
     let med = median(shares.clone());
     assert!((med - 0.678).abs() < 0.02, "median share {med:.3}");
 
@@ -684,7 +601,7 @@ fn the_formula_pays_guaranteed_districts_two_thirds_of_their_fy2020_level() {
 
     // In aggregate the formula reaches 71% of the guaranteed baseline; the guarantee holds the
     // remaining $879M.
-    let baseline: f64 = on.iter().map(|r| r.implied_fy2020_baseline()).sum();
+    let baseline: f64 = on.iter().map(|r| implied_fy2020_baseline(r)).sum();
     let formula: f64 = on.iter().map(|r| r.core_foundation).sum();
     assert!((formula / baseline - 0.710).abs() < 0.02);
     assert!(((baseline - formula) / 1e6 - 879.0).abs() < 5.0);
@@ -710,14 +627,8 @@ fn the_formula_falls_furthest_below_the_baseline_for_wealthy_districts() {
             .unwrap()
     });
     let q = on.len() / 4;
-    let share = |slice: &[&Row]| {
-        median(
-            slice
-                .iter()
-                .map(|r| r.formula_share_of_baseline())
-                .collect(),
-        )
-    };
+    let share =
+        |slice: &[&Row]| median(slice.iter().map(|r| formula_share_of_baseline(r)).collect());
 
     let poorest = share(&on[..q]);
     let wealthiest = share(&on[3 * q..]);
@@ -751,7 +662,7 @@ fn the_formula_falls_furthest_below_the_baseline_for_wealthy_districts() {
 #[test]
 fn no_guaranteed_district_exceeds_its_own_baseline() {
     for r in rows().iter().filter(|r| r.on_guarantee()) {
-        let share = r.formula_share_of_baseline();
+        let share = formula_share_of_baseline(r);
         assert!(
             (0.0..=1.0).contains(&share),
             "{} formula/baseline = {share:.4}, outside [0,1]",

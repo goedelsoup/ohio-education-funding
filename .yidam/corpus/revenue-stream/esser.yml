@@ -26,7 +26,14 @@ findings: |
   FY2022 is the peak. In that year Ohio districts took **13.87% of school revenue from federal
   sources against a national 13.24%** — $2,466 per pupil against $2,493 — which places Ohio
   25th of 51 and, unusually for this corpus, entirely unremarkable. [verified —
-  `crates/dispersion/src/national_peers.rs`]
+  `crates/dispersion/src/census_states.rs`]
+
+  All four of those figures are the **state-level** F-33 table, and the citation used to name
+  `national_peers.rs`, which is the district panel and computes none of them. The two sources are
+  close and not equal — the district panel gives Ohio a 51.7% local share against this table's
+  51.8%, and `litigation/derolph-i-1997` publishes the 51.8% — so the wrong one was cited for
+  figures that reproduce only from the right one. The table had no public reader when the citation
+  was written; it does now.
 
   The unremarkable federal share is what makes the rest of Ohio's position remarkable. Ohio is
   seventh of fifty-one on local share and forty-fifth on state share; it is ordinary on federal

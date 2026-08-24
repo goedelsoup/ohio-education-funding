@@ -10,14 +10,14 @@ use std::collections::BTreeSet;
 use dispersion::casino;
 
 /// The FY2027 department model, which is the formula's own list of districts.
-const FY27: &str = include_str!("../../foundation/fixtures/fy27-department-model.csv");
-
+///
+/// Read through [`foundation::department_model`] rather than by splitting the first column off
+/// the fixture: the model is `foundation`'s file and three test files were reaching into it with
+/// three different parsers. See issue #157.
 fn formula_districts() -> BTreeSet<String> {
-    FY27.lines()
-        .skip(1)
-        .filter_map(|line| line.split(',').next())
-        .filter(|irn| irn.len() == 6 && irn.bytes().all(|b| b.is_ascii_digit()))
-        .map(str::to_string)
+    foundation::department_model::districts()
+        .into_iter()
+        .map(|d| d.irn)
         .collect()
 }
 

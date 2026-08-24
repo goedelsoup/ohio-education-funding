@@ -13,38 +13,16 @@
 //! nominal figures for even years are chart-label approximations. Only the FY2000 and FY2022
 //! endpoints are verified on both sides.
 
-use deflator::{Confidence, CpiSeries};
+use deflator::ohio_epp::{nominal_series, quotable, real_series, BASE_YEAR};
+use deflator::CpiSeries;
 use edfund_core::FiscalYear;
-
-/// Nominal operating expenditure per pupil, all Ohio public school entities.
-///
-/// Moved to a fixture so the integration test reads the same series this example prints. A
-/// series that lives only inside an example binary cannot be asserted on.
-const NOMINAL_CSV: &str = include_str!("../fixtures/ohio-epp-nominal.csv");
-
-/// Parse the fixture into (fiscal year, nominal dollars, exact-or-chart-label).
-fn nominal() -> Vec<(u16, f64, bool)> {
-    NOMINAL_CSV
-        .lines()
-        .skip(1)
-        .filter(|l| !l.trim().is_empty())
-        .map(|line| {
-            let f: Vec<&str> = line.split(',').collect();
-            (
-                f[0].trim().parse().expect("fiscal year"),
-                f[1].trim().parse().expect("dollars"),
-                f[2].trim() == "true",
-            )
-        })
-        .collect()
-}
 
 /// FY2022 excluding federal COVID relief funds.
 const FY2022_EX_RELIEF: f64 = 14_493.0;
 
 fn main() {
     let cpi = CpiSeries::cpi_u_june();
-    let base = FiscalYear(2022);
+    let base = BASE_YEAR;
 
     println!("Ohio public school operating expenditure per pupil");
     println!("Constant FY2022 dollars, deflated by {}", cpi.label());
@@ -55,17 +33,15 @@ fn main() {
     );
 
     let fy2000_real = cpi
-        .convert(nominal()[0].1, FiscalYear(2000), base)
+        .convert(nominal_series()[0].dollars, FiscalYear(2000), base)
         .expect("FY2000 is in the series");
 
-    for &(year, nominal, exact_nominal) in &nominal() {
-        let fy = FiscalYear(year);
-        let real = cpi.convert(nominal, fy, base).expect("year in series");
+    for (point, real) in real_series(base) {
         let growth = real.value / fy2000_real.value - 1.0;
 
         // A row is only as strong as its weakest input: the CPI endpoints and the nominal
         // figure both have to be solid for the result to be quotable as verified.
-        let confidence = if real.confidence == Confidence::Verified && exact_nominal {
+        let confidence = if quotable(&point, &real) {
             "verified"
         } else {
             "inference"
@@ -73,8 +49,8 @@ fn main() {
 
         println!(
             "{:<8} {:>12} {:>14} {:>13.1}%  {}",
-            fy,
-            format!("${nominal:>10.0}"),
+            point.fiscal_year,
+            format!("${:>10.0}", point.dollars),
             format!("${:>10.0}", real.value),
             growth * 100.0,
             confidence

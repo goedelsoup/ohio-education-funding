@@ -58,6 +58,17 @@ here stayed green. A figure carries a pin as well as a computation, so a calcula
 fails in this workspace and names what moved, rather than regenerating quietly and surfacing as a
 corpus check nobody can explain. See #131.
 
+What bounded that gate was not the corpus but the phrase *public API*. Ten cited test files
+computed their figures on a fixture parser the test declared privately, so `figures` could not
+reach them without a second parser that would immediately disagree with the first — and one file
+was parsed **four** separate ways, each with its own column table and its own reading of an
+unparseable cell, with nothing checking that any two of them agreed about what a row is. Each of
+those fixtures now has exactly one reader, in the crate that owns it: `dispersion::profile`,
+`report_card`, `functions`, `census_states` and `sd1`; `foundation::department_model` and
+`grade_bands`; `deflator::ohio_epp`; `project::statute`. `edfund_core::records` is their
+counterpart for the document format `connect` writes, which had a writer and three readers. See
+#157.
+
 **`deduction` is declared and not built.** It was listed here as though it existed for long enough
 that the web layer's "what is not modelled" note was written from this file rather than from the
 workspace. There is a [skill describing what it would compute](../.yidam/skills/deduction.md) —
@@ -175,18 +186,18 @@ Fields per crate: name, capability type (connector/calculator/feature-engineerin
 | [`bundle`](bundle/) | Export a versioned JSON feed of the corpus's district-level findings for the web layer | 50 |
 | [`connect`](connect/) | Retrieval and extraction: the department's publications into committed fixtures | 110 |
 | [`deflator`](deflator/) | Convert nominal Ohio school finance figures to constant dollars, fiscal-year aligned | 17 |
-| [`dispersion`](dispersion/) | School finance equity statistics: dispersion and wealth neutrality across agencies | 151 |
-| [`edfund-core`](edfund-core/) | Shared domain types for the Ohio education funding computer | 30 |
+| [`dispersion`](dispersion/) | School finance equity statistics: dispersion and wealth neutrality across agencies | 170 |
+| [`edfund-core`](edfund-core/) | Shared domain types for the Ohio education funding computer | 35 |
 | [`figures`](figures/) | The figures the corpus quotes, computed from the crates that own them | 10 |
-| [`foundation`](foundation/) | Fair School Funding Plan base cost build-up, per R.C. 3317.011 | 47 |
+| [`foundation`](foundation/) | Fair School Funding Plan base cost build-up, per R.C. 3317.011 | 54 |
 | [`local-capacity`](local-capacity/) | Fair School Funding Plan local capacity and state share, per R.C. 3317.017 | 23 |
 | [`millage`](millage/) | Effective operating millage under H.B. 920 reduction factors, and 20-mill floor status | 19 |
-| [`project`](project/) | Forward projection of funding inputs, and policy simulation over them | 278 |
+| [`project`](project/) | Forward projection of funding inputs, and policy simulation over them | 281 |
 | [`regime-diff`](regime-diff/) | Difference two funding regimes at component level, with the residual the decomposition does not explain | 36 |
 | [`scenario-delta`](scenario-delta/) | Winners and losers between two funding runs, with incidence and the off-formula count | 26 |
 | [`spreadsheet`](spreadsheet/) | Read the department's published workbooks with no dependencies | 79 |
 
-13 crates, 876 test functions, no crates.io dependencies. `cargo test` reports a different total: it adds doc-tests and counts each integration binary separately.
+13 crates, 910 test functions, no crates.io dependencies. `cargo test` reports a different total: it adds doc-tests and counts each integration binary separately.
 <!-- /REGEN -->
 
 ## Index status

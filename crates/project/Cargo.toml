@@ -9,11 +9,11 @@ description = "Forward projection of funding inputs, and policy simulation over 
 
 [dependencies]
 deflator = { path = "../deflator" }
+# The report card and the District Profile Report are `dispersion`'s fixtures, so their readers
+# are too. This crate used to carry a second copy of each; see issue #157. Was a dev-dependency.
+dispersion = { path = "../dispersion" }
 edfund-core = { path = "../edfund-core" }
 foundation = { path = "../foundation" }
-
-[dev-dependencies]
-dispersion = { path = "../dispersion" }
 
 [[bin]]
 name = "edfund-project"

@@ -14,51 +14,20 @@
 //! Cited by `corpus/metric/per-pupil-operating-expenditure.yml` and
 //! `catalog/ocg-white-paper-015.md`.
 
-use deflator::{Confidence, CpiSeries};
+use deflator::ohio_epp::{nominal_series, quotable, real_at, real_series, BASE_YEAR};
+use deflator::CpiSeries;
 use edfund_core::FiscalYear;
 
-const NOMINAL_CSV: &str = include_str!("../fixtures/ohio-epp-nominal.csv");
-
-/// (fiscal year, nominal dollars, whether the nominal figure is exact rather than a chart label)
-fn nominal() -> Vec<(u16, f64, bool)> {
-    NOMINAL_CSV
-        .lines()
-        .skip(1)
-        .filter(|l| !l.trim().is_empty())
-        .map(|line| {
-            let f: Vec<&str> = line.split(',').collect();
-            (
-                f[0].trim().parse().expect("fiscal year"),
-                f[1].trim().parse().expect("dollars"),
-                f[2].trim() == "true",
-            )
-        })
-        .collect()
-}
-
-/// The series restated in constant FY2022 dollars.
-fn real_series() -> Vec<(u16, f64)> {
-    let cpi = CpiSeries::cpi_u_june();
-    let base = FiscalYear(2022);
-    nominal()
+/// The series restated in constant FY2022 dollars, as (fiscal year, real dollars).
+fn series() -> Vec<(u16, f64)> {
+    real_series(BASE_YEAR)
         .into_iter()
-        .map(|(year, value, _)| {
-            (
-                year,
-                cpi.convert(value, FiscalYear(year), base)
-                    .expect("year in the CPI series")
-                    .value,
-            )
-        })
+        .map(|(point, real)| (point.fiscal_year.0, real.value))
         .collect()
 }
 
 fn at(year: u16) -> f64 {
-    real_series()
-        .into_iter()
-        .find(|(y, _)| *y == year)
-        .expect("year in the series")
-        .1
+    real_at(FiscalYear(year))
 }
 
 #[test]
@@ -130,7 +99,7 @@ fn the_trough_survives_the_chart_label_uncertainty() {
 /// inflation.
 #[test]
 fn the_real_peak_precedes_the_nominal_peak_by_two_years() {
-    let series = real_series();
+    let series = series();
     let (peak_year, peak_value) =
         series.iter().copied().fold(
             (0u16, f64::MIN),
@@ -139,13 +108,15 @@ fn the_real_peak_precedes_the_nominal_peak_by_two_years() {
     assert_eq!(peak_year, 2020, "the real series peaks in FY{peak_year}");
 
     // The nominal series peaks at the end, which is why the distinction is invisible undeflated.
-    let nominal_peak = nominal()
+    let nominal_peak = nominal_series()
         .iter()
-        .copied()
-        .fold(
-            (0u16, f64::MIN),
-            |acc, (y, v, _)| if v > acc.1 { (y, v) } else { acc },
-        )
+        .fold((0u16, f64::MIN), |acc, p| {
+            if p.dollars > acc.1 {
+                (p.fiscal_year.0, p.dollars)
+            } else {
+                acc
+            }
+        })
         .0;
     assert_eq!(nominal_peak, 2022);
 
@@ -162,7 +133,7 @@ fn the_real_peak_precedes_the_nominal_peak_by_two_years() {
 /// series happens to demonstrate.
 #[test]
 fn an_endpoint_comparison_cannot_see_an_interior_reversal() {
-    let series = real_series();
+    let series = series();
     let full = series.last().unwrap().1 / series.first().unwrap().1 - 1.0;
     assert!(full > 0.0, "the full window rises");
 
@@ -188,15 +159,13 @@ fn an_endpoint_comparison_cannot_see_an_interior_reversal() {
 /// corpus tags them that way. Asserted so a future series refresh cannot quietly promote them.
 #[test]
 fn interior_rows_are_inference_and_the_endpoints_are_not() {
-    let cpi = CpiSeries::cpi_u_june();
-    let base = FiscalYear(2022);
-    for (year, value, exact) in nominal() {
-        let row = cpi.convert(value, FiscalYear(year), base).unwrap();
-        let quotable = row.confidence == Confidence::Verified && exact;
+    for (point, real) in real_series(BASE_YEAR) {
+        let year = point.fiscal_year.0;
+        let is_quotable = quotable(&point, &real);
         assert_eq!(
-            quotable,
+            is_quotable,
             year == 2000 || year == 2022,
-            "FY{year} quotability is {quotable}"
+            "FY{year} quotability is {is_quotable}"
         );
     }
 }

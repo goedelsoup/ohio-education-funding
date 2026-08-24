@@ -7,9 +7,10 @@
 //!
 //! These do. Two independent tables — the Department of Taxation's Table SD-1 and the Department
 //! of Education's District Profile Report — carry, between them, every quantity the crate takes
-//! and every quantity it returns, for 606 districts across two tax years. So each of the crate's
-//! claims becomes a statement that either survives 1,218 district-years of published data or does
-//! not:
+//! and every quantity it returns. So each of the crate's claims becomes a statement that either
+//! survives the published data or does not. How much data is not restated here, because it grew:
+//! SD-1 carried two tax years when this was written and now carries four, and the sentence that
+//! said "1,218 district-years" went stale while the assertions below moved with the file.
 //!
 //! - [`millage::yield_of`] says a mill is a dollar per thousand of valuation. Multiply SD-1's rate
 //!   by SD-1's value and the product has to be SD-1's charge.
@@ -23,81 +24,29 @@
 //! Cited by `catalog/dot-sd1-school-district-taxes.md` and
 //! `catalog/ode-district-profile-report.md`.
 
+use dispersion::profile::{self, ProfileDistrict};
+use dispersion::sd1::{self, TaxRow};
 use edfund_core::AgencyType;
 use millage::{effective_millage, floor_for, yield_of, FloorStatus};
 
-const SD1: &str = include_str!("../../dispersion/fixtures/sd1-district-taxes.csv");
-const PROFILE: &str = include_str!("../../dispersion/fixtures/cupp-fy24-district-data.csv");
-
-/// Column indices in the SD-1 fixture.
-mod sd1 {
-    pub const IRN: usize = 0;
-    pub const TAX_YEAR: usize = 3;
-    pub const CLASS1_VALUE: usize = 6;
-    pub const CLASS2_VALUE: usize = 11;
-    pub const CLASS1_CHARGED: usize = 15;
-    pub const CLASS2_CHARGED: usize = 16;
-    pub const CLASS1_RATE: usize = 20;
-    pub const CLASS2_RATE: usize = 21;
-}
-
-/// Column indices in the District Profile Report fixture.
-mod profile {
-    pub const IRN: usize = 0;
-    /// Total current operating millage — the rate voters approved.
-    pub const VOTED: usize = 5;
-    /// Effective Class I operating millage — the rate anyone pays.
-    pub const EFFECTIVE: usize = 6;
-}
-
-fn rows(csv: &str) -> impl Iterator<Item = Vec<&str>> {
-    csv.lines()
-        .skip(1)
-        .filter(|line| !line.trim().is_empty())
-        .map(|line| line.split(',').collect())
-}
-
-fn number(parts: &[&str], column: usize) -> Option<f64> {
-    parts.get(column)?.trim().parse().ok()
-}
-
-/// Every SD-1 row as (irn, tax year, class I value, class II value, charges, rates).
-struct TaxRow {
-    irn: String,
-    tax_year: u16,
-    class1_value: f64,
-    class2_value: f64,
-    class1_charged: f64,
-    class2_charged: f64,
-    class1_rate: f64,
-    class2_rate: f64,
-}
-
+/// The abstract's rows, and the profile report's, through `dispersion`'s own readers.
+///
+/// This file used to reach across the crate boundary with `include_str!` and two column tables
+/// of its own — a fifth parser of Table SD-1 and a fourth of the profile report, with nothing
+/// relating any of them. See issue #157.
 fn tax_rows() -> Vec<TaxRow> {
-    rows(SD1)
-        .filter_map(|parts| {
-            Some(TaxRow {
-                irn: parts.get(sd1::IRN)?.trim().to_string(),
-                tax_year: parts.get(sd1::TAX_YEAR)?.trim().parse().ok()?,
-                class1_value: number(&parts, sd1::CLASS1_VALUE)?,
-                class2_value: number(&parts, sd1::CLASS2_VALUE)?,
-                class1_charged: number(&parts, sd1::CLASS1_CHARGED)?,
-                class2_charged: number(&parts, sd1::CLASS2_CHARGED)?,
-                class1_rate: number(&parts, sd1::CLASS1_RATE)?,
-                class2_rate: number(&parts, sd1::CLASS2_RATE)?,
-            })
-        })
-        .collect()
+    sd1::rows()
 }
 
-/// Voted and effective millage from the profile report, keyed by IRN.
+/// Voted and effective millage from the profile report, for the districts publishing both.
 fn voted_and_effective() -> Vec<(String, f64, f64)> {
-    rows(PROFILE)
-        .filter_map(|parts| {
+    profile::districts()
+        .into_iter()
+        .filter_map(|d: ProfileDistrict| {
             Some((
-                parts.get(profile::IRN)?.trim().to_string(),
-                number(&parts, profile::VOTED)?,
-                number(&parts, profile::EFFECTIVE)?,
+                d.irn,
+                d.current_operating_millage?,
+                d.effective_class1_millage?,
             ))
         })
         .collect()
@@ -129,9 +78,22 @@ fn one_mill_raises_a_dollar_per_thousand_in_every_district_and_year() {
 
     for row in &rows {
         for (value, rate, charged, class) in [
-            (row.class1_value, row.class1_rate, row.class1_charged, "I"),
-            (row.class2_value, row.class2_rate, row.class2_charged, "II"),
+            (
+                row.class1_value,
+                row.class1_rate,
+                row.class1_taxes_charged,
+                "I",
+            ),
+            (
+                row.class2_value,
+                row.class2_rate,
+                row.class2_taxes_charged,
+                "II",
+            ),
         ] {
+            let (Some(value), Some(rate), Some(charged)) = (value, rate, charged) else {
+                continue;
+            };
             if value <= 0.0 || charged <= 0.0 {
                 continue;
             }
@@ -246,12 +208,7 @@ fn districts_that_never_voted_twenty_mills_are_not_pushed_up_to_it() {
 /// law is being checked in years when a district's valuation jumped and in years when it did not.
 #[test]
 fn reduction_factors_alone_predict_a_rate_no_higher_than_the_one_charged() {
-    let rows = tax_rows();
-    let mut by_irn: std::collections::BTreeMap<String, Vec<&TaxRow>> =
-        std::collections::BTreeMap::new();
-    for row in &rows {
-        by_irn.entry(row.irn.clone()).or_default().push(row);
-    }
+    let by_irn = sd1::by_district();
 
     let (mut over, mut under, mut exact) = (0_usize, 0_usize, 0_usize);
 
@@ -261,19 +218,22 @@ fn reduction_factors_alone_predict_a_rate_no_higher_than_the_one_charged() {
         // the loop ran zero times and only the count assertion below noticed.
         for pair in years.windows(2) {
             let [before, after] = pair else { continue };
-            if before.class1_value <= 0.0 || after.class1_value <= 0.0 {
-                continue;
-            }
-            let predicted = effective_millage(
-                before.class1_rate,
+            let (Some(from), Some(to), Some(rate), Some(charged_rate)) = (
                 before.class1_value,
                 after.class1_value,
-                AgencyType::City,
-            )
-            .expect("positive valuations")
-            .effective;
+                before.class1_rate,
+                after.class1_rate,
+            ) else {
+                continue;
+            };
+            if from <= 0.0 || to <= 0.0 {
+                continue;
+            }
+            let predicted = effective_millage(rate, from, to, AgencyType::City)
+                .expect("positive valuations")
+                .effective;
 
-            let residual = after.class1_rate - predicted;
+            let residual = charged_rate - predicted;
             if residual > 0.01 {
                 under += 1;
             } else if residual < -0.01 {

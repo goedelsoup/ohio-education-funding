@@ -10,5 +10,11 @@ publish.workspace = true
 [dependencies]
 edfund-core = { path = "../edfund-core" }
 
+[dev-dependencies]
+# Table SD-1 and the District Profile Report are `dispersion`'s fixtures, and
+# `tests/against_published_tables.rs` is where this crate is checked against them. It used to
+# reach across the boundary with `include_str!` and its own column tables; see issue #157.
+dispersion = { path = "../dispersion" }
+
 [lints]
 workspace = true

@@ -67,6 +67,7 @@ pub mod panel;
 pub mod policy;
 pub mod report;
 pub mod series;
+pub mod statute;
 
 pub use ledger::{appropriations, line_origins, session_laws};
 
