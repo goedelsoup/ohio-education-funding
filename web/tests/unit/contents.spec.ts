@@ -15,7 +15,17 @@ import { anchor } from "../../src/lib/section.ts";
 const card = (id: string, heading: string, chip = "") =>
   `<div class="card" id="${id}" data-part="${id}"><h2>${anchor(id)}${heading}${chip}</h2><p>body</p></div>`;
 
-const CHIP = '<span class="year-chip" data-kind="fiscal">FY2027</span>';
+/*
+ * A chip as `yearChip` writes one: a button naming the reckoning, and beside it the panel a
+ * sighted reader is shown. The panel is why the fixture is not just the button — a heading's
+ * `textContent` picks it up, so a rule that strips only the button would put the whole sentence
+ * into the contents entry.
+ */
+const CHIP =
+  '<span class="year-chip-wrap">' +
+  '<button type="button" class="year-chip" data-kind="fiscal" aria-label="FY2027 — fiscal year, July to June. Source: t.">FY2027</button>' +
+  '<span class="year-chip-def" aria-hidden="true">FY2027 — fiscal year, July to June. Source: t.</span>' +
+  "</span>";
 
 test("a section is listed by its card's address and its heading's words", () => {
   const body = `<h1>A page</h1><p class="sub">What it is.</p>${card("base-cost", "Why base cost is $8,120 per pupil", CHIP)}`;

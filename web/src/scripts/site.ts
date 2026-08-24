@@ -10,10 +10,23 @@
  * selector in `app.css`, so it works with nothing running — see `BasisToggle.astro`.
  */
 
-import { attachHover } from "../lib/chart.ts";
+import { attachValues, openToKeyboard } from "../lib/chart.ts";
 
+/*
+ * The value layer: a tooltip for a pointer, a tap for a touch screen, and an arrow-key cursor for
+ * a keyboard. Every chart's marks already carry their value as `data-hover`; until this, only a
+ * mouse could get at it.
+ *
+ * The tab stops are set here rather than baked into the build because the cursor they advertise
+ * is this script. The scenario charts set their own — they are drawn in the browser, so the
+ * question does not arise there.
+ */
 const tip = document.querySelector<HTMLElement>("#tip");
-if (tip) attachHover(document.body, tip);
+const said = document.querySelector<HTMLElement>("#said");
+if (tip && said) {
+  attachValues(document.body, tip, said);
+  for (const chart of document.querySelectorAll("svg.plot")) openToKeyboard(chart);
+}
 
 /**
  * Honour the links the old single-page site handed out.

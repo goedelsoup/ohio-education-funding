@@ -53,7 +53,7 @@ import { parseHTML } from "linkedom";
  */
 function words(heading: Element): string {
   const clone = heading.cloneNode(true) as Element;
-  for (const annotation of clone.querySelectorAll("a.section-anchor, .year-chip")) {
+  for (const annotation of clone.querySelectorAll("a.section-anchor, .year-chip-wrap")) {
     annotation.remove();
   }
   return (clone.textContent ?? "").replace(/\s+/g, " ").trim();

@@ -171,26 +171,174 @@ export function bin(values: number[], n: number): Bin[] {
 }
 
 /**
- * Attach a hover tooltip to every mark carrying `data-hover` inside `root`.
+ * What a chart is worth, to a pointer, to a finger and to a keyboard.
  *
- * Delegated from the container so it survives a re-render — the scenario charts are replaced on
- * every slider tick — and positioned against the viewport so it is not clipped by a card's
- * overflow.
+ * # What was wrong
+ *
+ * This bound `mousemove` and nothing else. There are 159,530 marks in the build carrying a
+ * `data-hover` string, and every one of those values was reachable only by a mouse: no focus
+ * handler, so a keyboard could not reach them; no touch handler, so a phone could not either.
+ * The forms whose stated purpose is "which dot is mine" answered that question for pointers only.
+ *
+ * # The three ways in
+ *
+ * **Pointer.** Delegated `mousemove`, unchanged, so it survives the scenario charts being replaced
+ * on every slider tick and is positioned against the viewport rather than clipped by a card.
+ *
+ * **Touch.** A tap. There is no hover to precede it, so `click` is the whole of the interaction —
+ * and the tooltip is placed against the mark rather than the finger, which is under it.
+ *
+ * **Keyboard.** One tab stop per chart, not one per mark: 159,530 tab stops would be a worse
+ * defect than the one being fixed. Focus the chart and the arrow keys walk its marks, `Home` and
+ * `End` jump to the ends, `Escape` steps out. The value shows in the same tooltip and is written
+ * to a polite live region.
+ *
+ * # What this does not fix, stated rather than implied
+ *
+ * A screen reader in browse mode takes the arrow keys for itself before the page sees them, so
+ * the cursor below is reached by a sighted keyboard reader, a switch user, and a screen-reader
+ * user who has switched to focus mode — and not by one who has not. Exposing every mark to the
+ * accessibility tree instead would mean 159,530 nodes and would undo the `role="img"` naming that
+ * makes a chart announce itself as one thing. Where a chart sits beside a table of the same
+ * figures — 4,501 of the 7,593 do — that table is still the better route, and it is now a keyboard
+ * region of its own. The rest is the honest remainder.
  */
-export function attachHover(root: HTMLElement, tip: HTMLElement): void {
+
+/** Text a chart is given when it becomes operable, so the affordance is announced with it. */
+const CURSOR_HINT = "Use the arrow keys to read each value.";
+
+/**
+ * Make one drawing a single tab stop, and say so in its name.
+ *
+ * Applied from script and never baked into the build, because the cursor it advertises is script.
+ * A `tabindex` in the HTML would be a stop that goes nowhere for a reader with none running, which
+ * is the trade `BasisToggle.astro` already decided once for this site.
+ *
+ * Skips a chart with no values to walk and a chart hidden from assistive technology — a
+ * presentational strip is one whose `.note` already says the same thing in words, and giving it a
+ * tab stop would be adding an affordance to a graphic that is deliberately not content.
+ */
+export function openToKeyboard(svg: Element): void {
+  if (svg.getAttribute("aria-hidden") === "true") return;
+  if (!svg.querySelector("[data-hover]")) return;
+  svg.setAttribute("tabindex", "0");
+  const named = svg.getAttribute("aria-label");
+  if (named && !named.endsWith(CURSOR_HINT)) {
+    svg.setAttribute("aria-label", `${named}. ${CURSOR_HINT}`);
+  }
+}
+
+/**
+ * Attach the value layer to everything under `root`.
+ *
+ * `tip` is the tooltip a reader sees; `said` is the visually hidden live region a screen reader
+ * hears. Two elements rather than one because the tooltip is written on every mouse move, and a
+ * live region that announced each of those would be unusable.
+ */
+export function attachValues(root: HTMLElement, tip: HTMLElement, said: HTMLElement): void {
+  /** The mark the keyboard cursor is on, if a keyboard put it there. */
+  let at: Element | null = null;
+
+  const put = (left: number, top: number) => {
+    const pad = 12;
+    tip.style.left = `${Math.min(left + pad, window.innerWidth - tip.offsetWidth - pad)}px`;
+    tip.style.top = `${top + pad}px`;
+  };
+
+  const show = (mark: Element, left: number, top: number) => {
+    tip.textContent = mark.getAttribute("data-hover") ?? "";
+    tip.hidden = false;
+    put(left, top);
+  };
+
+  /** Show the value at a mark's own position, for the two ways in that have no cursor position. */
+  const showAtMark = (mark: Element) => {
+    const box = mark.getBoundingClientRect();
+    show(mark, box.left + box.width / 2, box.bottom);
+  };
+
+  const drop = () => {
+    at?.classList.remove("at");
+    at = null;
+    said.textContent = "";
+  };
+
   root.addEventListener("mousemove", (event) => {
     const target = (event.target as Element | null)?.closest("[data-hover]");
     if (!target) {
       tip.hidden = true;
       return;
     }
-    tip.textContent = target.getAttribute("data-hover") ?? "";
-    tip.hidden = false;
-    const pad = 12;
-    tip.style.left = `${Math.min(event.clientX + pad, window.innerWidth - tip.offsetWidth - pad)}px`;
-    tip.style.top = `${event.clientY + pad}px`;
+    // A reader who has picked up the mouse has left the cursor behind, and two highlighted marks
+    // would be two answers to "which one am I on".
+    if (at && at !== target) drop();
+    show(target, event.clientX, event.clientY);
   });
+
   root.addEventListener("mouseleave", () => {
+    tip.hidden = true;
+  });
+
+  /*
+   * Touch. `click` rather than `pointerdown`, so a drag that happens to begin on a mark scrolls
+   * the page instead of firing a tooltip at the reader.
+   */
+  root.addEventListener("click", (event) => {
+    const target = (event.target as Element | null)?.closest?.("[data-hover]");
+    if (!target) {
+      if (at == null) tip.hidden = true;
+      return;
+    }
+    showAtMark(target);
+  });
+
+  root.addEventListener("keydown", (event) => {
+    const svg = (event.target as Element | null)?.closest?.("svg.plot[tabindex]");
+    if (!svg) return;
+    const marks = [...svg.querySelectorAll("[data-hover]")];
+    if (marks.length === 0) return;
+
+    const here = at ? marks.indexOf(at) : -1;
+    const last = marks.length - 1;
+    let next: number;
+    switch (event.key) {
+      case "ArrowRight":
+      case "ArrowDown":
+        next = here < 0 ? 0 : Math.min(last, here + 1);
+        break;
+      case "ArrowLeft":
+      case "ArrowUp":
+        // From nowhere, leftwards means the far end — the same reading a reader would give it.
+        next = here < 0 ? last : Math.max(0, here - 1);
+        break;
+      case "Home":
+        next = 0;
+        break;
+      case "End":
+        next = last;
+        break;
+      case "Escape":
+        drop();
+        tip.hidden = true;
+        return;
+      default:
+        return;
+    }
+    // Only once a key is one this handles: arrows still scroll a chart nobody is reading.
+    event.preventDefault();
+    at?.classList.remove("at");
+    at = marks[next] ?? null;
+    if (!at) return;
+    at.classList.add("at");
+    showAtMark(at);
+    said.textContent = at.getAttribute("data-hover") ?? "";
+  });
+
+  // Tabbing out of a chart takes the cursor with it, or the highlight outlives the reading.
+  root.addEventListener("focusout", (event) => {
+    const svg = (event.target as Element | null)?.closest?.("svg.plot[tabindex]");
+    if (!svg) return;
+    drop();
     tip.hidden = true;
   });
 }

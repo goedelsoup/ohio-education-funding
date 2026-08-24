@@ -401,7 +401,7 @@ h3 { font-size: .82rem; margin: 1.4rem 0 .6rem; color: var(--text-secondary); fo
  * card. `margin-left: auto` says what was always meant, which is that the chip goes to the end and
  * everything else stays where it started.
  */
-.card > h2 > .year-chip { margin-left: auto; }
+.card > h2 > .year-chip-wrap { margin-left: auto; }
 
 /*
  * The address of a section, as something a reader can see and click.
@@ -430,20 +430,79 @@ h3 { font-size: .82rem; margin: 1.4rem 0 .6rem; color: var(--text-secondary); fo
   outline-offset: 2px;
   border-radius: 3px;
 }
+/*
+ * The chip, which is a button now.
+ *
+ * It was a `<span>` with a `title`, and the note that used to sit here conceded the limitation
+ * rather than fixing it: a `title` reaches a mouse and nothing else, so on the 12,449 chips in
+ * this build the difference between a tax year and a fiscal year was unavailable to a keyboard,
+ * to a screen reader and to every touch screen. `.term` below had already solved exactly this
+ * problem on this site; the chip now wears the same shape. See `yearChip` in `src/lib/year.ts`.
+ *
+ * `flex: none` on the wrapper rather than on the button, because the wrapper is what a card
+ * heading lays out now.
+ */
+.year-chip-wrap { position: relative; display: inline-flex; flex: none; }
 .year-chip {
-  flex: none;
+  font: inherit;
   font-size: .72rem;
   font-weight: 500;
   font-variant-numeric: tabular-nums;
   letter-spacing: .01em;
   color: var(--text-muted);
+  background: none;
   border: 1px solid var(--border);
   border-radius: 999px;
   padding: .1rem .45rem;
   white-space: nowrap;
-  /* A `title` is the only affordance here, and it is hover-only. The dotted underline is what
-     says there is one, on the same reasoning as `.term` below. */
   cursor: help;
+}
+.year-chip:hover { color: var(--text-primary); border-color: var(--text-muted); }
+/* Never hidden on focus: this is how a keyboard reader finds the reckoning at all. */
+.year-chip:focus-visible {
+  color: var(--text-primary);
+  outline: 2px solid var(--series-formula);
+  outline-offset: 2px;
+}
+
+/*
+ * What the chip says, for eyes.
+ *
+ * `aria-hidden`, because the button's own name already carries the sentence — see `yearChip` for
+ * why the long form is a name rather than a description. That also means this panel may be hidden
+ * however is convenient, unlike `.term-def`, whose box-tree presence is load-bearing.
+ *
+ * Anchored to the right rather than the left, which is the difference from `.term-def`: a chip is
+ * pinned to the end of its card heading by `margin-left: auto`, so a panel opening rightwards
+ * from there opens off the side of the page.
+ */
+.year-chip-def {
+  position: absolute;
+  right: 0;
+  top: calc(100% + .35rem);
+  z-index: 20;
+  width: max-content;
+  max-width: min(26rem, calc(100vw - 2rem));
+  background: var(--surface-2);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: .5rem .65rem;
+  font-size: .78rem;
+  font-weight: 400;
+  line-height: 1.45;
+  letter-spacing: normal;
+  text-align: left;
+  white-space: normal;
+  color: var(--text-secondary);
+  box-shadow: 0 6px 20px rgb(0 0 0 / 18%);
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity .12s ease;
+}
+.year-chip-wrap:hover > .year-chip-def,
+.year-chip-wrap:focus-within > .year-chip-def { opacity: 1; visibility: visible; }
+@media (prefers-reduced-motion: reduce) {
+  .year-chip-def { transition: none; }
 }
 
 /*
@@ -537,7 +596,12 @@ h3 { font-size: .82rem; margin: 1.4rem 0 .6rem; color: var(--text-secondary); fo
  * The breakpoint is the width below which a 30rem panel cannot fit beside anything.
  */
 @media (max-width: 34rem) {
-  .term-def {
+  /* The chip's panel joins the term's down here for the same reason and one of its own: anchored
+     to a chip at the end of a card heading, a 26rem panel on a 375px screen reaches past the left
+     edge of the document and is simply not readable. A sheet at the foot has room for the
+     sentence. */
+  .term-def,
+  .year-chip-def {
     position: fixed;
     left: .75rem;
     right: .75rem;
@@ -780,6 +844,24 @@ tbody tr:last-child th, tbody tr:last-child td { border-bottom: 0; }
 }
 
 .chart, svg.plot { width: 100%; height: auto; display: block; }
+/*
+ * The mark the keyboard cursor is on.
+ *
+ * Two channels, as everywhere else on this site: an outline around the shape and a brightening of
+ * it, so the cursor survives a forced-colours mode that discards the second. `outline` rather than
+ * a `stroke`, because these marks are rects, circles and paths with strokes of their own that mean
+ * something — a cursor drawn in the mark's own stroke would be indistinguishable from data.
+ *
+ * Set by `attachValues` in `src/lib/chart.ts`; there is never more than one on a page.
+ */
+svg.plot [data-hover].at {
+  outline: 2px solid var(--series-formula);
+  outline-offset: 1px;
+  filter: brightness(1.2);
+}
+/* The chart itself is a tab stop — one per chart, not one per mark. See `openToKeyboard`. */
+svg.plot:focus-visible { outline: 2px solid var(--series-formula); outline-offset: 2px; }
+
 .bar-value { font-variant-numeric: tabular-nums; }
 .axis { stroke: var(--accent-rule); stroke-width: 1; }
 .bar-fill > *, .hist > * { cursor: default; }

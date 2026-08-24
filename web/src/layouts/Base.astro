@@ -282,6 +282,14 @@ const body = nameScrollers(listed).html;
     </footer>
 
     <div id="tip" hidden></div>
+    {/*
+      What the keyboard cursor is on, for a reader who cannot see the tooltip.
+
+      Separate from `#tip` rather than announcing that, because the tooltip is rewritten on every
+      mouse move and a live region tracking those would be unusable. Written only by the arrow
+      keys — see `attachValues` in `src/lib/chart.ts`.
+    */}
+    <div id="said" class="vh" aria-live="polite" aria-atomic="true"></div>
     <script>
       import "../scripts/site.ts";
     </script>

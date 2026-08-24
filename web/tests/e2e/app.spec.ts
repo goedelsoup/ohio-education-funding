@@ -37,6 +37,9 @@ const headingText = (heading: Locator): Promise<string> =>
   heading.evaluate((node) => {
     const clone = node.cloneNode(true) as HTMLElement;
     clone.querySelector("a.section-anchor")?.remove();
+    // The chip carries its reckoning in a panel beside it now, so a heading's `textContent`
+    // includes that sentence unless the whole wrapper goes. See `yearChip` in `src/lib/year.ts`.
+    clone.querySelector(".year-chip-wrap")?.remove();
     return (clone.textContent ?? "").replace(/\s+/g, " ").trim();
   });
 
@@ -520,9 +523,16 @@ const ROUTES_WITH_FIGURES = [
     expect(kinds).toContain("tax");
     expect(kinds).toContain("fiscal");
 
-    // And the long form is on the element, because `2024` alone does not say it is a tax year.
+    /*
+     * And the long form is on the element, because `2024` alone does not say it is a tax year.
+     *
+     * It is the button's own `aria-label` rather than a `title`. A `title` reached a mouse and
+     * nothing else — no keyboard, no touch screen, and not announced by most screen readers —
+     * which for 12,449 chips meant the distinction this whole feature exists to draw was
+     * available only to a pointer. See `yearChip` in `src/lib/year.ts`.
+     */
     await expect(chips.filter({ hasText: /^2024$/ }).first()).toHaveAttribute(
-      "title",
+      "aria-label",
       /calendar year of valuation and levy/,
     );
   });
@@ -1231,6 +1241,172 @@ test.describe("a table that scrolls sideways", () => {
   });
 });
 
+/*
+ * The values behind the marks, and the reckoning behind a chip.
+ *
+ * Both were mouse-only. 159,530 marks carried their value in `data-hover` and the layer that read
+ * it bound `mousemove` and nothing else; 12,449 chips carried their reckoning in a `title`, which
+ * is not announced by most screen readers, cannot be reached from a keyboard, and does not exist
+ * on a touch screen at all.
+ */
+test.describe("a chart's values, beyond the mouse", () => {
+  /** What the page is currently saying a mark is worth, by all three channels at once. */
+  const reading = (page: Page) =>
+    page.evaluate(() => ({
+      marked: document.querySelectorAll("svg.plot [data-hover].at").length,
+      on: document.querySelector("svg.plot [data-hover].at")?.getAttribute("data-hover") ?? null,
+      tip:
+        document.querySelector<HTMLElement>("#tip")?.hidden === false
+          ? (document.querySelector("#tip")?.textContent ?? "")
+          : null,
+      said: document.querySelector("#said")?.textContent ?? "",
+    }));
+
+  test("the arrow keys walk the marks, and say what each is worth", async ({ page }) => {
+    await page.goto(`/district/${CLEVELAND}`);
+    const chart = page.locator("svg.plot[tabindex='0']:visible").first();
+    await chart.scrollIntoViewIfNeeded();
+    await chart.focus();
+
+    // Focusing a chart reads nothing on its own: the reader is on the graphic, not in it.
+    expect(await reading(page)).toMatchObject({ marked: 0, tip: null, said: "" });
+
+    await page.keyboard.press("ArrowRight");
+    const first = await reading(page);
+    expect(first.marked, "exactly one mark carries the cursor").toBe(1);
+    expect(first.on).toBeTruthy();
+    // The same value by both routes: the tooltip a reader sees, the live region a reader hears.
+    expect(first.tip).toBe(first.on);
+    expect(first.said).toBe(first.on);
+
+    await page.keyboard.press("ArrowRight");
+    const second = await reading(page);
+    expect(second.on, "the cursor moved").not.toBe(first.on);
+    expect(second.marked, "and did not leave the last one behind").toBe(1);
+
+    await page.keyboard.press("ArrowLeft");
+    expect((await reading(page)).on, "and moves back").toBe(first.on);
+
+    await page.keyboard.press("End");
+    const end = await reading(page);
+    await page.keyboard.press("Home");
+    expect((await reading(page)).on, "Home and End are the two ends").not.toBe(end.on);
+
+    await page.keyboard.press("Escape");
+    expect(await reading(page), "Escape steps out of the chart").toMatchObject({
+      marked: 0,
+      tip: null,
+      said: "",
+    });
+  });
+
+  test("a chart is one tab stop, not one per mark", async ({ page }) => {
+    /*
+     * The reason there is a cursor at all. This district page draws 159 marks a reader can point
+     * at; making each of them focusable would put 159 tab stops between the top of the page and
+     * the next link, which is a worse defect than the one being fixed.
+     */
+    await page.goto(`/district/${CLEVELAND}`);
+    const counts = await page.evaluate(() => {
+      const drawn = [...document.querySelectorAll("svg.plot")].filter(
+        (svg) => svg.getClientRects().length,
+      );
+      return {
+        charts: drawn.length,
+        stops: drawn.filter((svg) => svg.getAttribute("tabindex") === "0").length,
+        marks: drawn.reduce((n, svg) => n + svg.querySelectorAll("[data-hover]").length, 0),
+        focusableMarks: document.querySelectorAll("svg.plot [data-hover][tabindex]").length,
+      };
+    });
+    expect(counts.marks, "the page has marks worth reading").toBeGreaterThan(50);
+    expect(counts.focusableMarks, "and not one of them is its own tab stop").toBe(0);
+    expect(counts.stops, "every chart with marks is reachable").toBeGreaterThan(0);
+    expect(counts.stops).toBeLessThanOrEqual(counts.charts);
+  });
+
+  test("the tab stop and its instruction arrive together, or not at all", async ({ page }) => {
+    // The cursor is script, so the affordance advertising it is added by script too. A `tabindex`
+    // baked into the build would be a stop that goes nowhere for a reader running none.
+    await page.goto(`/district/${CLEVELAND}`);
+    const label = await page.locator("svg.plot[tabindex='0']:visible").first().getAttribute("aria-label");
+    expect(label, "the chart still says what it plots").toBeTruthy();
+    expect(label, "and that it can be read").toContain("arrow keys");
+  });
+
+  test("a tap reaches a value, where there is no pointer to hover", async ({ page }) => {
+    await page.goto(`/district/${CLEVELAND}`);
+    const shown = await page.evaluate(() => {
+      const mark = [...document.querySelectorAll("svg.plot [data-hover]")].find(
+        (m) => m.getClientRects().length,
+      );
+      mark?.dispatchEvent(new MouseEvent("click", { bubbles: true }));
+      const tip = document.querySelector<HTMLElement>("#tip");
+      return { hidden: tip?.hidden, text: tip?.textContent ?? "", want: mark?.getAttribute("data-hover") };
+    });
+    expect(shown.hidden, "a tap on a mark shows its value").toBe(false);
+    expect(shown.text).toBe(shown.want);
+  });
+});
+
+test.describe("a year chip", () => {
+  test("says its reckoning to a keyboard, and to a screen reader", async ({ page }) => {
+    await page.goto(`/district/${CLEVELAND}`);
+    const wrap = page.locator(".year-chip-wrap").first();
+    const chip = wrap.locator("button.year-chip");
+
+    // The whole of what the chip means is the button's own name, so nothing has to be pointed at
+    // to reach it. `yearTitle` opens with the label the chip shows, so the visible text is a
+    // prefix of the accessible name.
+    const label = (await chip.getAttribute("aria-label")) ?? "";
+    expect(label).toContain(((await chip.textContent()) ?? "").trim());
+    expect(label, "the reckoning, not just the digits").toMatch(/fiscal year|tax year|school year/);
+    expect(label, "and where the figure came from").toContain("Source:");
+
+    // And the panel a sighted reader gets opens on focus rather than only on hover.
+    const panel = wrap.locator(".year-chip-def");
+    await expect(panel).toBeHidden();
+    await chip.focus();
+    await expect(panel).toBeVisible();
+    await expect(panel).toHaveText(label);
+  });
+
+  test("no chip in the build hides behind a title", () => {
+    /*
+     * `title` is what this replaced, and it is the shape the defect would grow back in: it looks
+     * right to whoever writes it, because a mouse is what they are testing with.
+     *
+     * Scanned over the artefact rather than a page at a time, since a chip is written by two
+     * functions and rendered on 3,487 pages.
+     */
+    const DIST = join(import.meta.dirname, "../../dist");
+    const walk = (dir: string): string[] =>
+      readdirSync(dir, { withFileTypes: true }).flatMap((entry) =>
+        entry.isDirectory()
+          ? walk(join(dir, entry.name))
+          : entry.name.endsWith(".html")
+            ? [join(dir, entry.name)]
+            : [],
+      );
+
+    let chips = 0;
+    const bad: string[] = [];
+    for (const file of walk(DIST)) {
+      for (const match of readFileSync(file, "utf8").matchAll(
+        /<button\b([^>]*\bclass="year-chip"[^>]*)>/g,
+      )) {
+        const attrs = match[1] ?? "";
+        chips += 1;
+        if (attrs.includes("title=")) bad.push(`${file.slice(DIST.length + 1)}: title on a chip`);
+        if (!/aria-label="[^"]+"/.test(attrs)) {
+          bad.push(`${file.slice(DIST.length + 1)}: a chip with no name`);
+        }
+      }
+    }
+    expect(chips, "the build carries chips at all").toBeGreaterThan(10_000);
+    expect(bad.slice(0, 5)).toEqual([]);
+  });
+});
+
 test.describe("the section menus", () => {
   test("opening one closes the other, and Escape closes it", async ({ page }) => {
     // Purely the enhancement half — the menus open without any of this, which the JavaScript
@@ -1745,6 +1921,9 @@ test.describe("the decisions behind the corpus", () => {
       nodes.map((node) => {
         const clone = node.cloneNode(true) as HTMLElement;
         clone.querySelector("a.section-anchor")?.remove();
+    // The chip carries its reckoning in a panel beside it now, so a heading's `textContent`
+    // includes that sentence unless the whole wrapper goes. See `yearChip` in `src/lib/year.ts`.
+    clone.querySelector(".year-chip-wrap")?.remove();
         return (clone.textContent ?? "").replace(/\s+/g, " ").trim();
       }),
     );
