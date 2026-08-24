@@ -16,6 +16,7 @@
 
 import * as Plot from "@observablehq/plot";
 
+import { openToKeyboard } from "../chart.ts";
 import { applyNaming, BASE, type Drawing, type Naming, WIDTHS } from "./spec.ts";
 
 /** One SVG, at one width. */
@@ -34,6 +35,10 @@ function draw(build: Drawing, naming: Naming, width: number): string {
     }
   }
   applyNaming(node, naming);
+  // Unlike the baked charts, these are only ever produced by a browser that is running this
+  // module — so the tab stop can be part of the markup rather than added to it afterwards, and a
+  // scenario re-render carries it without the scenario script having to remember.
+  openToKeyboard(node);
   return node.outerHTML;
 }
 

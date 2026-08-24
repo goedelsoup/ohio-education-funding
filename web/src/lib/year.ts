@@ -103,20 +103,66 @@ export function yearTitle(year: SeriesYear): string {
 }
 
 /**
- * The chip itself, as HTML, for the card renderers in `src/lib/*.ts`.
+ * A chip, its short label, and the reckoning that hangs off it — as HTML.
+ *
+ * # Why this is a button and not a span with a `title`
+ *
+ * It was a span with a `title`, and a `title` reaches a mouse and nothing else. It is not
+ * announced by most screen readers, there is no way to bring it up from a keyboard, and on a
+ * touch screen it does not exist at all — which is the width where a reader most needs telling
+ * that this `2024` is a tax year and the `FY2025` two cards down is not. 12,449 chips in the
+ * build carried the distinction where only a pointer could reach it, under a rule whose own
+ * comment described an affordance it did not implement.
+ *
+ * So it takes the shape `.term` already uses on this site and for the same three reasons: a real
+ * button, so it is focusable and tappable; the long form beside it in the markup, so nothing has
+ * to be fetched or computed to show it; and no `title`, which would be announced on top of what
+ * the button already says.
+ *
+ * # Why the long form is an `aria-label` and not an `aria-describedby`
+ *
+ * `.term` points at its definition by id, which works because a glossary slug appears once in a
+ * sentence. A series does not: `yearChip("formula")` is written on eight cards of one district
+ * page, so an id derived from the series would be duplicated eight times — and a counter would
+ * make the markup depend on the order pages happen to be built in, which is a defect this
+ * repository already has an open issue about.
+ *
+ * Naming the button directly needs no id at all. {@link yearTitle} opens with the label the chip
+ * shows, so the visible text is a prefix of the accessible name and a reader who says "twenty
+ * twenty-four" is still saying the name of the control. The panel beside it is `aria-hidden`,
+ * because it is the same sentence again for eyes rather than a second fact.
+ *
+ * `<button>` and not `<abbr>`: the label is not an abbreviation of the title, it is a shorter
+ * statement of the same fact, and `<abbr>` on a non-abbreviation is announced as one.
  *
  * Returns the empty string for a missing series rather than a placeholder, so a caller can
  * interpolate it unconditionally. See {@link seriesYear} for why absent is a real state.
- *
- * `<span>` and not `<abbr>`: the label is not an abbreviation of the title, it is a shorter
- * statement of the same fact, and `<abbr>` on a non-abbreviation is announced as one.
  */
 export function yearChip(series: SeriesKey): string {
   const year = seriesYear(series);
   if (!year) return "";
+  return chip(
+    { kind: year.kind, series: year.series },
+    yearLabel(year),
+    yearTitle(year),
+  );
+}
+
+/**
+ * The markup both chip forms share.
+ *
+ * `label` is what the chip shows; `says` is the whole of what it means, and it is written twice —
+ * once as the button's name, once as the panel a sighted reader sees. That duplication is the
+ * cost of the panel not needing an id; see {@link yearChip}.
+ */
+function chip(data: { kind: string; series: string }, label: string, says: string): string {
   return (
-    `<span class="year-chip" data-kind="${year.kind}" data-series="${year.series}" ` +
-    `title="${escapeAttribute(yearTitle(year))}">${escapeAttribute(yearLabel(year))}</span>`
+    `<span class="year-chip-wrap">` +
+    `<button type="button" class="year-chip" data-kind="${data.kind}" ` +
+    `data-series="${data.series}" aria-label="${escapeAttribute(says)}">` +
+    `${escapeAttribute(label)}</button>` +
+    `<span class="year-chip-def" aria-hidden="true">${escapeAttribute(says)}</span>` +
+    `</span>`
   );
 }
 
@@ -139,11 +185,11 @@ export function yearChipPair(
   const second = seriesYear(secondary);
   if (!first) return "";
   if (!second) return yearChip(primary);
-  const title = `${yearTitle(first)} And ${qualifier}: ${yearTitle(second)}`;
-  return (
-    `<span class="year-chip" data-kind="${first.kind}" data-series="${first.series}" ` +
-    `title="${escapeAttribute(title)}">${escapeAttribute(first.label)} · ${escapeAttribute(qualifier)} ` +
-    `${escapeAttribute(second.label)}</span>`
+  const says = `${yearTitle(first)} And ${qualifier}: ${yearTitle(second)}`;
+  return chip(
+    { kind: first.kind, series: first.series },
+    `${first.label} · ${qualifier} ${second.label}`,
+    says,
   );
 }
 

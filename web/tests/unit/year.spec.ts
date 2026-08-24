@@ -81,7 +81,17 @@ test("a chip carries the long form where the short one is ambiguous", () => {
 
   const chip = yearChip("millage");
   expect(chip).toContain('data-kind="tax"');
-  expect(chip).toContain("title=");
+  /*
+   * A button carrying the long form as its own name, and no `title`.
+   *
+   * `title` is why this needed changing: it reaches a mouse and nothing else, so the distinction
+   * between a tax year and a fiscal year — the whole point of the chip — was unavailable to a
+   * keyboard, to a screen reader and to every touch screen. A `title` here now would also be read
+   * out on top of the name. Same rule `.term` follows.
+   */
+  expect(chip).not.toContain("title=");
+  expect(chip).toContain("<button");
+  expect(chip).toContain(`aria-label="${yearTitle(tax).replace(/"/g, "&quot;")}"`);
 });
 
 test("a mixed chip names both years and says which is which", () => {
