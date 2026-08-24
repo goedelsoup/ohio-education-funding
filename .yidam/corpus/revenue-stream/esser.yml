@@ -90,6 +90,22 @@ unfilled:
   - field: an ESSER-specific series
     why: The federal channel is reported as one figure; separating it needs the allocation files, which no connector retrieves.
 figures:
+  - key: dispersion/ohio-federal-share-fy2022
+    value: 0.1387
+    field: findings
+    as_written: "13.87% of school revenue from federal\n  sources against a national 13.24%"
+  - key: dispersion/national-federal-share-fy2022
+    value: 0.1324
+    field: findings
+    as_written: "13.87% of school revenue from federal\n  sources against a national 13.24%"
+  - key: dispersion/ohio-federal-revenue-per-pupil-fy2022
+    value: 2466.19
+    field: findings
+    as_written: "$2,466 per pupil against $2,493"
+  - key: dispersion/national-federal-revenue-per-pupil-fy2022
+    value: 2492.86
+    field: findings
+    as_written: "$2,466 per pupil against $2,493"
   - key: dispersion/comparable-ohio-districts-fy2022
     value: 611
     field: findings

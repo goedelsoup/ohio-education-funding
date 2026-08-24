@@ -32,6 +32,19 @@ description: |
   `crates/dispersion/src/census_states.rs`] Title I is the largest component of that, but the
   F-33 does not decompose it, so no Title I figure for Ohio or for any district is entered here.
   [open]
+figures:
+  - key: dispersion/ohio-federal-revenue-per-pupil-fy2022
+    value: 2466.19
+    field: description
+    as_written: "Ohio districts received $2,466 per pupil in *all* federal revenue in FY2022, against a\n  national $2,493"
+  - key: dispersion/national-federal-revenue-per-pupil-fy2022
+    value: 2492.86
+    field: description
+    as_written: "Ohio districts received $2,466 per pupil in *all* federal revenue in FY2022, against a\n  national $2,493"
+  - key: dispersion/ohio-federal-share-fy2022
+    value: 0.1387
+    field: description
+    as_written: "which is 13.87% of Ohio school revenue"
 properties:
   name: Title I, Part A — Improving Basic Programs Operated by Local Educational Agencies
   level: federal

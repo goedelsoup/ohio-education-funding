@@ -122,6 +122,24 @@ pub struct Inputs {
     /// Ohio's comparable districts quartiled by local revenue per pupil, FY2022, with what each
     /// level of government pays into each quartile.
     pub quartiles: [dispersion::national_peers::WealthQuartile; 4],
+    /// The Census Bureau's state-level survey, FY2022 — the only source here that can say whether
+    /// Ohio is unusual, and the one the corpus quotes for every national comparison.
+    ///
+    /// Not [`dispersion::national_peers`], which is the *district* panel and gives Ohio a 51.7%
+    /// local share against this table's 51.8%. Two nodes cited the first for four figures only the
+    /// second computes; see #157.
+    pub states: Vec<dispersion::census_states::StateFinance>,
+    /// The FY2024 District Profile Report — 606 traditional districts, and the cross-section most
+    /// of the corpus's district-level findings are computed over.
+    pub profile: Vec<dispersion::profile::ProfileDistrict>,
+    /// Table SD-1, every district and every tax year the abstract carries.
+    pub sd1: Vec<dispersion::sd1::TaxRow>,
+    /// The 2024-25 report card, joined to the profile report by IRN — 606 districts on both, the
+    /// report card rating 607 and the profile report covering 606.
+    pub outcomes: Vec<(
+        dispersion::report_card::ReportCard,
+        Option<dispersion::profile::ProfileDistrict>,
+    )>,
     /// Total taxable value as Table SD-1 publishes it, summed over the districts the county
     /// abstract can recognize.
     pub actual_total: f64,
@@ -159,6 +177,25 @@ impl Inputs {
             at_recognized,
             at_total_taxable,
             quartiles: dispersion::national_peers::ohio_by_local_wealth(),
+            states: dispersion::census_states::states(),
+            profile: dispersion::profile::districts(),
+            sd1: dispersion::sd1::rows(),
+            outcomes: {
+                let by_irn: std::collections::BTreeMap<
+                    String,
+                    dispersion::profile::ProfileDistrict,
+                > = dispersion::profile::districts()
+                    .into_iter()
+                    .map(|d| (d.irn.clone(), d))
+                    .collect();
+                dispersion::report_card::report_cards()
+                    .into_iter()
+                    .map(|card| {
+                        let profile = by_irn.get(&card.irn).cloned();
+                        (card, profile)
+                    })
+                    .collect()
+            },
             actual_total,
             recognized_total,
         }
@@ -184,6 +221,103 @@ pub fn compute_all() -> Vec<Computed> {
             value: (figure.compute)(&inputs),
         })
         .collect()
+}
+
+/// A correlation over the report card joined to the profile report, as a magnitude.
+///
+/// The sign is deliberately dropped and carried by the figure's key instead. Prose writes these
+/// `−0.846` and `+0.375`, and the consumer's numeral reader does not read a sign — so a figure
+/// pinned negative could not be bound to the sentence that states it without the check ignoring
+/// direction, which is the one thing #120 was about.
+fn outcome_correlation(
+    i: &Inputs,
+    x: fn(
+        &dispersion::report_card::ReportCard,
+        Option<&dispersion::profile::ProfileDistrict>,
+    ) -> Option<f64>,
+    y: fn(&dispersion::report_card::ReportCard) -> Option<f64>,
+) -> f64 {
+    let (mut xs, mut ys) = (Vec::new(), Vec::new());
+    for (card, profile) in &i.outcomes {
+        if let (Some(a), Some(b)) = (x(card, profile.as_ref()), y(card)) {
+            xs.push(a);
+            ys.push(b);
+        }
+    }
+    dispersion::wealth_neutrality(&xs, &ys)
+        .expect("a paired series")
+        .correlation
+        .abs()
+}
+
+/// The dispersion of operating expenditure per pupil across the profile report.
+///
+/// Over the 605 districts that report one — the panel is 606 and one district publishes no
+/// operating expenditure at all, which is a fact about coverage rather than about spending.
+fn operating_dispersion(i: &Inputs) -> dispersion::Dispersion {
+    let column = dispersion::profile::column(&i.profile, |d| d.operating_expenditure_per_pupil);
+    dispersion::Dispersion::of(&column).expect("districts report operating expenditure")
+}
+
+/// The median of a profile-report column, over the districts reporting it.
+fn profile_median(
+    i: &Inputs,
+    pick: fn(&dispersion::profile::ProfileDistrict) -> Option<f64>,
+) -> f64 {
+    let column = dispersion::profile::column(&i.profile, pick);
+    dispersion::Dispersion::of(&column)
+        .expect("the profile report is not empty")
+        .median
+}
+
+/// Every district's millage reduction as a fraction of what its voters approved, ascending.
+///
+/// The per-district ratio, and the median of *that* — not one minus the ratio of the two medians,
+/// which is a different and meaningless quantity.
+fn millage_reductions(i: &Inputs) -> Vec<f64> {
+    let mut out: Vec<f64> = i
+        .profile
+        .iter()
+        .filter_map(|d| Some(1.0 - d.effective_class1_millage? / d.current_operating_millage?))
+        .collect();
+    out.sort_by(f64::total_cmp);
+    out
+}
+
+/// Districts at exactly twenty mills on a chosen rate, in one tax year of Table SD-1.
+fn sd1_at_twenty(
+    i: &Inputs,
+    tax_year: u16,
+    pick: fn(&dispersion::sd1::TaxRow) -> Option<f64>,
+) -> usize {
+    i.sd1
+        .iter()
+        .filter(|row| row.tax_year == tax_year)
+        .filter(|row| pick(row).is_some_and(|rate| (rate - 20.0).abs() < 0.005))
+        .count()
+}
+
+/// Ohio's row of the Census state table.
+fn ohio(i: &Inputs) -> &dispersion::census_states::StateFinance {
+    i.states
+        .iter()
+        .find(|s| s.name == "Ohio")
+        .expect("the state table holds Ohio")
+}
+
+/// A national figure per pupil, in dollars, from the survey's thousands.
+fn national_per_pupil(
+    i: &Inputs,
+    pick: fn(&dispersion::census_states::StateFinance) -> f64,
+) -> f64 {
+    i.states.iter().map(pick).sum::<f64>() * 1_000.0
+        / i.states.iter().map(|s| s.enrollment).sum::<f64>()
+}
+
+/// A national share of total revenue: the aggregate, not the mean of fifty-one state shares.
+fn national_share(i: &Inputs, pick: fn(&dispersion::census_states::StateFinance) -> f64) -> f64 {
+    let total: f64 = i.states.iter().map(|s| s.total_revenue).sum();
+    i.states.iter().map(pick).sum::<f64>() / total
 }
 
 /// Districts whose regime difference has a total, i.e. where both regimes can be valued.
@@ -332,6 +466,529 @@ pub static FIGURES: &[Figure] = &[
         },
     },
     // ---- crates/project ----------------------------------------------------------------------
+    // The Census F-33 state table. `litigation/derolph-i-1997` rests its central comparative
+    // claim on these, and `revenue-stream/esser` and `title-i` on the federal three — which is
+    // why they were the two nodes that had cited the wrong F-33 panel for them.
+    //
+    // Ohio's *rank* is not here, and the omission is the mechanism working rather than a gap.
+    // The corpus writes ranks as ordinals — `seventh highest of fifty-one`, `25th of 51` — and
+    // `numerals()` reads neither: a spelled-out ordinal has no digits, and the `th` of `25th`
+    // defeats the token boundary that stops `65 more` reading as sixty-five million. A rank is
+    // therefore a claim this gate cannot hold, and `.yidam/corpus/README.md` says so rather than
+    // this file exporting a figure nothing can bind.
+    Figure {
+        key: "dispersion/ohio-local-share-fy2022",
+        owner: "crates/dispersion",
+        unit: Unit::Share,
+        label: "Ohio's local share of school revenue, FY2022, on the Census Bureau's definitions",
+        pinned: 0.5177,
+        tolerance: 0.0001,
+        compute: |i| ohio(i).local_share(),
+    },
+    Figure {
+        key: "dispersion/national-local-share-fy2022",
+        owner: "crates/dispersion",
+        unit: Unit::Share,
+        label: "The national local share of school revenue, FY2022",
+        pinned: 0.4335,
+        tolerance: 0.0001,
+        compute: |i| national_share(i, |s| s.local_revenue),
+    },
+    Figure {
+        key: "dispersion/ohio-state-share-fy2022",
+        owner: "crates/dispersion",
+        unit: Unit::Share,
+        label: "Ohio's state share of school revenue, FY2022",
+        pinned: 0.3436,
+        tolerance: 0.0001,
+        compute: |i| ohio(i).state_share(),
+    },
+    Figure {
+        key: "dispersion/national-state-share-fy2022",
+        owner: "crates/dispersion",
+        unit: Unit::Share,
+        label: "The national state share of school revenue, FY2022",
+        pinned: 0.4341,
+        tolerance: 0.0001,
+        compute: |i| national_share(i, |s| s.state_revenue),
+    },
+    Figure {
+        key: "dispersion/ohio-spending-per-pupil-fy2022",
+        owner: "crates/dispersion",
+        unit: Unit::Dollars,
+        label: "Ohio's current spending per pupil, FY2022, on the Bureau's own enrolment count",
+        pinned: 14_923.0,
+        tolerance: 1.0,
+        compute: |i| ohio(i).spending_per_pupil(),
+    },
+    Figure {
+        key: "dispersion/national-spending-per-pupil-fy2022",
+        owner: "crates/dispersion",
+        unit: Unit::Dollars,
+        label: "National current spending per pupil, FY2022",
+        pinned: 15_801.0,
+        tolerance: 1.0,
+        compute: |i| national_per_pupil(i, |s| s.current_spending),
+    },
+    Figure {
+        key: "dispersion/ohio-federal-share-fy2022",
+        owner: "crates/dispersion",
+        unit: Unit::Share,
+        label: "Ohio's federal share of school revenue, FY2022 — the peak of pandemic relief",
+        pinned: 0.1387,
+        tolerance: 0.0001,
+        compute: |i| ohio(i).federal_share(),
+    },
+    Figure {
+        key: "dispersion/national-federal-share-fy2022",
+        owner: "crates/dispersion",
+        unit: Unit::Share,
+        label: "The national federal share of school revenue, FY2022",
+        pinned: 0.1324,
+        tolerance: 0.0001,
+        compute: |i| national_share(i, |s| s.federal_revenue),
+    },
+    Figure {
+        key: "dispersion/ohio-federal-revenue-per-pupil-fy2022",
+        owner: "crates/dispersion",
+        unit: Unit::Dollars,
+        label: "Ohio's federal revenue per pupil, all federal sources, FY2022",
+        pinned: 2_466.0,
+        tolerance: 1.0,
+        compute: |i| {
+            let oh = ohio(i);
+            oh.federal_revenue * 1_000.0 / oh.enrollment
+        },
+    },
+    Figure {
+        key: "dispersion/national-federal-revenue-per-pupil-fy2022",
+        owner: "crates/dispersion",
+        unit: Unit::Dollars,
+        label: "National federal revenue per pupil, all federal sources, FY2022",
+        pinned: 2_493.0,
+        tolerance: 1.0,
+        compute: |i| national_per_pupil(i, |s| s.federal_revenue),
+    },
+    // `doctrine/equity`, which is the node the whole crate operationalizes. Every one of these
+    // was computed inside `tests/cupp_fy24.rs` on a parser that test declared privately until
+    // #157; they are the clearest case of the constraint #158 was filed about.
+    //
+    // The two correlations are exported as **magnitudes**, with the direction in the key. Prose
+    // writes them `−0.549` and `+0.630`, and `numerals()` does not read a sign — so a figure
+    // pinned at `-0.549` could not be bound to the sentence that states it without the check
+    // ignoring the one thing #120 was about.
+    Figure {
+        key: "dispersion/operating-expenditure-median",
+        owner: "crates/dispersion",
+        unit: Unit::Dollars,
+        label: "Median operating expenditure per pupil, FY2024",
+        pinned: 15_646.0,
+        tolerance: 1.0,
+        compute: |i| operating_dispersion(i).median,
+    },
+    Figure {
+        key: "dispersion/operating-expenditure-coefficient-of-variation",
+        owner: "crates/dispersion",
+        unit: Unit::Ratio,
+        label: "Coefficient of variation of operating expenditure per pupil, FY2024",
+        pinned: 0.2016,
+        tolerance: 0.0005,
+        compute: |i| operating_dispersion(i).coefficient_of_variation,
+    },
+    Figure {
+        key: "dispersion/operating-expenditure-restricted-range-ratio",
+        owner: "crates/dispersion",
+        unit: Unit::Ratio,
+        label: "P95 over P5 of operating expenditure per pupil, FY2024 — the restricted range \
+                ratio, which is the federal range ratio plus one",
+        pinned: 1.8436,
+        tolerance: 0.0005,
+        compute: |i| operating_dispersion(i).restricted_range_ratio,
+    },
+    Figure {
+        key: "dispersion/state-aid-falls-with-property-wealth",
+        owner: "crates/dispersion",
+        unit: Unit::Ratio,
+        label: "How strongly state aid per pupil falls as valuation per pupil rises, FY2024 — \
+                the magnitude of a negative correlation",
+        pinned: 0.5483,
+        tolerance: 0.0005,
+        compute: |i| {
+            let (wealth, aid) = dispersion::profile::paired(
+                &i.profile,
+                |d| d.valuation_per_pupil,
+                |d| d.state_revenue_per_pupil,
+            );
+            dispersion::wealth_neutrality(&wealth, &aid)
+                .expect("a paired series")
+                .correlation
+                .abs()
+        },
+    },
+    Figure {
+        key: "dispersion/state-aid-rises-with-poverty",
+        owner: "crates/dispersion",
+        unit: Unit::Ratio,
+        label: "How strongly state aid per pupil rises with the economically disadvantaged \
+                share, FY2024 — the finding that Ohio targets poverty better than property",
+        pinned: 0.6323,
+        tolerance: 0.0005,
+        compute: |i| {
+            let (poverty, aid) = dispersion::profile::paired(
+                &i.profile,
+                |d| d.economically_disadvantaged,
+                |d| d.state_revenue_per_pupil,
+            );
+            dispersion::wealth_neutrality(&poverty, &aid)
+                .expect("a paired series")
+                .correlation
+        },
+    },
+    // `metric/performance-index`. The dominant fact about Ohio's attainment measure is poverty,
+    // and the node's whole argument is a table of correlations — every one of which was computed
+    // in a test file on a private parser until #157.
+    Figure {
+        key: "dispersion/performance-index-tracks-poverty",
+        owner: "crates/dispersion",
+        unit: Unit::Ratio,
+        label: "How strongly the Performance Index falls with the profile report's economically \
+                disadvantaged share — the magnitude of a negative correlation",
+        pinned: 0.84596,
+        tolerance: 0.0005,
+        compute: |i| {
+            outcome_correlation(
+                i,
+                |_, p| p?.economically_disadvantaged,
+                |c| c.performance_index,
+            )
+        },
+    },
+    Figure {
+        key: "dispersion/performance-index-variance-poverty-explains",
+        owner: "crates/dispersion",
+        unit: Unit::Share,
+        label: "The share of cross-district variance in the Performance Index that the \
+                disadvantaged share accounts for",
+        pinned: 0.71564,
+        tolerance: 0.0005,
+        compute: |i| {
+            let r = outcome_correlation(
+                i,
+                |_, p| p?.economically_disadvantaged,
+                |c| c.performance_index,
+            );
+            r * r
+        },
+    },
+    Figure {
+        key: "dispersion/performance-index-tracks-the-top-coded-poverty-measure",
+        owner: "crates/dispersion",
+        unit: Unit::Ratio,
+        label: "The same against the report card's own disadvantaged share, which community \
+                eligibility top-codes — the weaker association censoring predicts",
+        pinned: 0.73434,
+        tolerance: 0.0005,
+        compute: |i| {
+            outcome_correlation(
+                i,
+                |c, _| c.economically_disadvantaged,
+                |c| c.performance_index,
+            )
+        },
+    },
+    Figure {
+        key: "dispersion/the-two-poverty-measures-against-each-other",
+        owner: "crates/dispersion",
+        unit: Unit::Ratio,
+        label: "How closely Ohio's two economically-disadvantaged shares track each other — \
+                closely enough to look interchangeable and not closely enough to be",
+        pinned: 0.82273,
+        tolerance: 0.0005,
+        compute: |i| {
+            outcome_correlation(
+                i,
+                |_, p| p?.economically_disadvantaged,
+                |c| c.economically_disadvantaged,
+            )
+        },
+    },
+    Figure {
+        key: "dispersion/districts-at-the-report-card-poverty-ceiling",
+        owner: "crates/dispersion",
+        unit: Unit::Count,
+        label: "Districts the report card places at exactly 100% economically disadvantaged",
+        pinned: 87.0,
+        tolerance: 0.0,
+        compute: |i| {
+            i.outcomes
+                .iter()
+                .filter(|(c, _)| c.economically_disadvantaged.is_some_and(|v| v >= 99.95))
+                .count() as f64
+        },
+    },
+    Figure {
+        key: "dispersion/districts-at-the-profile-poverty-ceiling",
+        owner: "crates/dispersion",
+        unit: Unit::Count,
+        label: "Districts the profile report places at 100% — the same ceiling on the \
+                uncensored measure, and a third as many",
+        pinned: 37.0,
+        tolerance: 0.0,
+        compute: |i| {
+            i.profile
+                .iter()
+                .filter(|d| d.economically_disadvantaged.is_some_and(|v| v >= 0.9995))
+                .count() as f64
+        },
+    },
+    Figure {
+        key: "dispersion/performance-index-tracks-the-adm-weight-ratio",
+        owner: "crates/dispersion",
+        unit: Unit::Ratio,
+        label: "How strongly the Performance Index falls with the weighted-over-headcount ADM \
+                ratio — which is why dividing spending by the weighted count removes the signal",
+        pinned: 0.74455,
+        tolerance: 0.0005,
+        compute: |i| outcome_correlation(i, |c, _| c.weight_ratio(), |c| c.performance_index),
+    },
+    Figure {
+        key: "dispersion/performance-index-tracks-spending-per-headcount-pupil",
+        owner: "crates/dispersion",
+        unit: Unit::Ratio,
+        label: "The Performance Index against FY2025 operating expenditure per *headcount* \
+                pupil — the divisor that leaves the association visible",
+        pinned: 0.33652,
+        tolerance: 0.0005,
+        compute: |i| outcome_correlation(i, |c, _| c.per_enrolled_pupil(), |c| c.performance_index),
+    },
+    Figure {
+        key: "dispersion/performance-index-tracks-spending-per-weighted-pupil",
+        owner: "crates/dispersion",
+        unit: Unit::Ratio,
+        label: "The same on the department's published divisor, the weighted count — near zero, \
+                which is the published finding this corpus disagrees with",
+        pinned: 0.01552,
+        tolerance: 0.0005,
+        compute: |i| outcome_correlation(i, |c, _| c.per_equivalent_pupil, |c| c.performance_index),
+    },
+    Figure {
+        key: "dispersion/performance-index-tracks-federal-spending-per-pupil",
+        owner: "crates/dispersion",
+        unit: Unit::Ratio,
+        label: "The Performance Index against federal expenditure per equivalent pupil — OCG \
+                White Paper 013's strongest reported finding",
+        pinned: 0.55764,
+        tolerance: 0.0005,
+        compute: |i| {
+            outcome_correlation(
+                i,
+                |c, _| c.per_equivalent_pupil_federal,
+                |c| c.performance_index,
+            )
+        },
+    },
+    Figure {
+        key: "dispersion/attainment-against-growth",
+        owner: "crates/dispersion",
+        unit: Unit::Ratio,
+        label: "The Performance Index against the value-added effect size — related, and far \
+                from interchangeable",
+        pinned: 0.37525,
+        tolerance: 0.0005,
+        compute: |i| outcome_correlation(i, |c, _| c.progress_effect_size, |c| c.performance_index),
+    },
+    // The twenty-mill floor, from the two tables that measure it. `parameter/twenty-mill-floor`
+    // is the node; the count of districts sitting on the floor is the corpus's answer to what it
+    // recorded for a long time as a first-order open question.
+    Figure {
+        key: "dispersion/profile-districts",
+        owner: "crates/dispersion",
+        unit: Unit::Count,
+        label: "Traditional districts in the FY2024 District Profile Report",
+        pinned: 606.0,
+        tolerance: 0.0,
+        compute: |i| i.profile.len() as f64,
+    },
+    Figure {
+        key: "dispersion/districts-at-the-twenty-mill-floor",
+        owner: "crates/dispersion",
+        unit: Unit::Count,
+        label: "Districts whose effective Class I rate sits exactly on the twenty-mill floor, \
+                TY2023",
+        pinned: 170.0,
+        tolerance: 0.0,
+        compute: |i| {
+            i.profile
+                .iter()
+                .filter(|d| d.at_twenty_mill_floor())
+                .count() as f64
+        },
+    },
+    Figure {
+        key: "dispersion/share-at-the-twenty-mill-floor",
+        owner: "crates/dispersion",
+        unit: Unit::Share,
+        label: "The same, as a share of the districts reporting a rate",
+        pinned: 0.2805,
+        tolerance: 0.0001,
+        compute: |i| {
+            let at = i
+                .profile
+                .iter()
+                .filter(|d| d.at_twenty_mill_floor())
+                .count();
+            at as f64 / i.profile.len() as f64
+        },
+    },
+    Figure {
+        // `< 20.5` and not `|m - 20| < 0.5`, which is what the prose's "within half a mill" reads
+        // as and gives 60 rather than 63: three of the twenty districts *below* the floor sit
+        // more than half a mill under it. The count the node states is this one, so this is what
+        // is exported — the looser sentence is the thing that would have to move, not the figure.
+        key: "dispersion/districts-at-or-against-the-twenty-mill-floor",
+        owner: "crates/dispersion",
+        unit: Unit::Count,
+        label: "Districts whose effective Class I rate is below 20.5 mills — at the floor or \
+                close enough that reduction factors barely operate",
+        pinned: 233.0,
+        tolerance: 0.0,
+        compute: |i| {
+            i.profile
+                .iter()
+                .filter(|d| d.effective_class1_millage.is_some_and(|m| m < 20.5))
+                .count() as f64
+        },
+    },
+    Figure {
+        key: "dispersion/districts-below-the-twenty-mill-floor",
+        owner: "crates/dispersion",
+        unit: Unit::Count,
+        label: "Districts reporting an effective Class I rate below twenty mills, TY2023",
+        pinned: 20.0,
+        tolerance: 0.0,
+        compute: |i| {
+            i.profile
+                .iter()
+                .filter(|d| d.below_twenty_mill_floor())
+                .count() as f64
+        },
+    },
+    Figure {
+        key: "dispersion/districts-that-never-voted-twenty-mills",
+        owner: "crates/dispersion",
+        unit: Unit::Count,
+        label: "Districts below the floor because their voters never approved twenty mills — the \
+                condition `millage`'s own guard encodes",
+        pinned: 6.0,
+        tolerance: 0.0,
+        compute: |i| {
+            i.profile
+                .iter()
+                .filter(|d| d.below_twenty_mill_floor() && d.never_voted_twenty_mills())
+                .count() as f64
+        },
+    },
+    Figure {
+        key: "dispersion/districts-just-below-the-floor-unexplained",
+        owner: "crates/dispersion",
+        unit: Unit::Count,
+        label: "Districts that voted well above twenty mills and still report a Class I rate just \
+                under it — the anomaly the corpus's model of the floor does not explain",
+        pinned: 14.0,
+        tolerance: 0.0,
+        compute: |i| {
+            i.profile
+                .iter()
+                .filter(|d| d.below_twenty_mill_floor() && !d.never_voted_twenty_mills())
+                .count() as f64
+        },
+    },
+    Figure {
+        key: "dispersion/median-effective-class1-millage",
+        owner: "crates/dispersion",
+        unit: Unit::Ratio,
+        label: "The statewide median effective Class I operating rate, in mills, TY2023",
+        pinned: 23.40,
+        tolerance: 0.005,
+        compute: |i| profile_median(i, |d| d.effective_class1_millage),
+    },
+    Figure {
+        key: "dispersion/median-voted-operating-millage",
+        owner: "crates/dispersion",
+        unit: Unit::Ratio,
+        label: "The statewide median voted current operating rate, in mills, TY2023",
+        pinned: 42.31,
+        tolerance: 0.005,
+        compute: |i| profile_median(i, |d| d.current_operating_millage),
+    },
+    Figure {
+        key: "dispersion/maximum-effective-class1-millage",
+        owner: "crates/dispersion",
+        unit: Unit::Ratio,
+        label: "The highest effective Class I operating rate in the state, in mills, TY2023",
+        pinned: 84.29,
+        tolerance: 0.005,
+        compute: |i| {
+            dispersion::profile::column(&i.profile, |d| d.effective_class1_millage)
+                .into_iter()
+                .fold(f64::MIN, f64::max)
+        },
+    },
+    Figure {
+        key: "dispersion/median-millage-reduction",
+        owner: "crates/dispersion",
+        unit: Unit::Share,
+        label: "How much of its voted millage the median district has lost to H.B. 920 reduction \
+                factors — the median of the per-district ratio",
+        pinned: 0.4245,
+        tolerance: 0.0001,
+        compute: |i| {
+            let r = millage_reductions(i);
+            r[r.len() / 2]
+        },
+    },
+    Figure {
+        key: "dispersion/largest-millage-reduction",
+        owner: "crates/dispersion",
+        unit: Unit::Share,
+        label: "The largest reduction in the state, as a share of voted millage",
+        pinned: 0.7467,
+        tolerance: 0.0001,
+        compute: |i| {
+            *millage_reductions(i)
+                .last()
+                .expect("districts report a reduction")
+        },
+    },
+    Figure {
+        key: "dispersion/sd1-districts",
+        owner: "crates/dispersion",
+        unit: Unit::Count,
+        label: "Districts in one tax year of Table SD-1 — a different population from the \
+                profile report's 606 and from the funding model's 609",
+        pinned: 611.0,
+        tolerance: 0.0,
+        compute: |i| i.sd1.iter().filter(|r| r.tax_year == 2024).count() as f64,
+    },
+    Figure {
+        key: "dispersion/districts-at-twenty-mills-on-class-one-ty2024",
+        owner: "crates/dispersion",
+        unit: Unit::Count,
+        label: "Districts at exactly twenty mills on the Class I rate, TY2024 Table SD-1",
+        pinned: 155.0,
+        tolerance: 0.0,
+        compute: |i| sd1_at_twenty(i, 2024, |r| r.class1_rate) as f64,
+    },
+    Figure {
+        key: "dispersion/districts-at-twenty-mills-on-the-combined-base-ty2024",
+        owner: "crates/dispersion",
+        unit: Unit::Count,
+        label: "Districts at exactly twenty mills on the value-weighted real property rate, \
+                TY2024 — the combined-base hypothesis, disconfirmed",
+        pinned: 62.0,
+        tolerance: 0.0,
+        compute: |i| sd1_at_twenty(i, 2024, |r| r.real_property_millage) as f64,
+    },
     Figure {
         key: "project/model-districts",
         owner: "crates/project",

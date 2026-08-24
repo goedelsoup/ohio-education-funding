@@ -124,6 +124,55 @@ findings: |
   weighted by enrollment, 85.1. [verified] Ohio's larger districts score lower, which is why
   the district-weighted and student-weighted views of every relationship here diverge, and why
   neither can be quoted alone.
+figures:
+  - key: dispersion/performance-index-tracks-poverty
+    value: 0.84596
+    field: findings
+    as_written: "economically disadvantaged share at **\u22120.846**"
+  - key: dispersion/performance-index-variance-poverty-explains
+    value: 0.71564
+    field: findings
+    as_written: "which is 71.6% of the cross-district variance"
+  - key: dispersion/profile-districts
+    value: 606
+    field: findings
+    as_written: "Across the 606 districts where both are held"
+  - key: dispersion/performance-index-tracks-federal-spending-per-pupil
+    value: 0.55764
+    field: findings
+    as_written: "federal\n  expenditure per pupil tracks the Index at \u22120.558"
+  - key: dispersion/districts-at-the-report-card-poverty-ceiling
+    value: 87
+    field: findings
+    as_written: "87 districts\n  sit at exactly 100%"
+  - key: dispersion/districts-at-the-profile-poverty-ceiling
+    value: 37
+    field: findings
+    as_written: "against 37 on the [Cupp"
+  - key: dispersion/the-two-poverty-measures-against-each-other
+    value: 0.82273
+    field: findings
+    as_written: "They correlate with\n  each other at only +0.823"
+  - key: dispersion/performance-index-tracks-the-top-coded-poverty-measure
+    value: 0.73434
+    field: findings
+    as_written: "economically disadvantaged share, report card    -0.734"
+  - key: dispersion/performance-index-tracks-the-adm-weight-ratio
+    value: 0.74455
+    field: findings
+    as_written: "ADM weight ratio, weighted/unweighted            -0.745"
+  - key: dispersion/performance-index-tracks-spending-per-headcount-pupil
+    value: 0.33652
+    field: findings
+    as_written: "operating expenditure per UNWEIGHTED pupil FY25  -0.337"
+  - key: dispersion/performance-index-tracks-spending-per-weighted-pupil
+    value: 0.01552
+    field: findings
+    as_written: "total expenditure per EQUIVALENT pupil (FY25)    -0.016"
+  - key: dispersion/attainment-against-growth
+    value: 0.37525
+    field: findings
+    as_written: "Progress (value-added) effect size 2024-25       +0.375"
 properties:
   name: Performance Index
   unit: index
