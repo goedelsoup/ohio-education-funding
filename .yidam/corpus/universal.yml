@@ -1,0 +1,36 @@
+# Properties any class may carry, whatever its own ontology declares.
+#
+# `yidam lint`'s `undeclared-property` gates, and rightly: a property absent from the class is
+# invisible to every consumer that reaches the corpus through the ontology. Two shapes here fit
+# neither that description nor being a defect, and this file is where the corpus says so.
+#
+# THIS FILE IS THE SECOND HOME OF ONE RULE. The same two shapes are encoded in
+# `web/src/lib/schema/corpus.ts` as `UNIVERSAL_PROPERTIES` and `OBSERVATION_PROPERTY`, which is
+# what the site's own vocabulary check reads — it predates this file and is not generated from
+# it. The pattern below is character-for-character that regex. Change one and change the other,
+# or the two validators start disagreeing about the same corpus: yidam gates in CI-adjacent
+# tooling while the site reports, so a drift shows up as a warning nobody can reproduce.
+#
+# Adopted 2026-08-24 with yidam cli/v0.3.0, which added the mechanism. Before it, these 29
+# properties were 29 of this corpus's 29 `undeclared-property` errors — every one of them the
+# corpus working as designed.
+properties:
+  # Why a node is in the corpus at all — "the anchor case for the property-poor end of Ohio's
+  # distribution", "JVSDs are funded on rules that differ from traditional districts". A fact
+  # about the corpus rather than about Ohio, carried by nodes of six different classes.
+  # Declaring it per class would be sixteen copies of one decision, and a seventeenth class
+  # would silently not have it.
+  - name: seeded_because
+    type: text
+    description: Why this node is in the corpus at all — apparatus, not a fact about its subject
+
+  # A fiscal year's figures pasted onto the node they describe: `fy2024_profile`,
+  # `fy2021_idea_part_b`, `fy2027_scale`. They recur, so they are not typos, but naming each
+  # would mean editing an ontology every July to permit next year's. The year in the name is
+  # what makes them self-describing, and it is what this matches on.
+  #
+  # Anchored at both ends deliberately. An unanchored pattern licenses every name that merely
+  # contains a match, and `undeclared-property` is what catches the next real typo.
+  - pattern: '^fy\d{4}(_\d{2})?_[a-z0-9_]+$'
+    type: text
+    description: A fiscal year's figures, pasted onto the node they describe
