@@ -38,6 +38,18 @@ export default defineConfig({
     // Never inherit a server this run did not start. A stale one serving a stale `dist/` would
     // make the suite pass against the previous build.
     reuseExistingServer: false,
-    timeout: 120_000,
+    /*
+     * Long enough for the build in front of it, on the slowest machine that runs it.
+     *
+     * This was 120s and the command it is timing is `pnpm build && vite preview` — so the window
+     * has to hold a full build, not a server start. A GitHub runner builds this site in 2m 24s
+     * now, against roughly 1m 50s before charts were drawn at two widths, and the whole e2e step
+     * failed with `Timed out waiting 120000ms from config.webServer` rather than with anything a
+     * reader would recognise as "the build takes longer than the limit".
+     *
+     * Five minutes is not a target. It is enough headroom that a contended runner does not turn a
+     * green suite red, and the build's actual cost is tracked where it belongs — see #111.
+     */
+    timeout: 300_000,
   },
 });
