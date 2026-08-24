@@ -41,6 +41,27 @@ interface Props {
   /** Rendered above the page, before the slot. Used for the district sub-navigation. */
   wide?: boolean;
   /**
+   * A `schema.org` object describing what this page *is*, as JSON-LD.
+   *
+   * Optional, and almost always omitted. Structured data is worth emitting where a machine can do
+   * something with it that reading the prose would not achieve, and worth skipping everywhere
+   * else: a `WebPage` object restating the `<title>` and the description two tags above it is
+   * markup for its own sake, and it is the shape that goes stale without anyone noticing because
+   * nothing renders it.
+   *
+   * `/data` is the page where it earns its place. It offers files at fixed URLs with stated media
+   * types, a licence-shaped Terms section and a contract version — which is exactly a
+   * `schema.org/Dataset` with its `distribution`s — and dataset search is a thing that exists and
+   * indexes on this vocabulary. Nothing on this site was discoverable that way.
+   *
+   * Passed as an object rather than a string so the caller cannot emit invalid JSON, and
+   * serialised here with `<` escaped: `JSON.stringify` will happily produce `</script>` inside a
+   * string value and end the element early. `set:html` is correct for the same reason it is
+   * everywhere else in this layout — the content is JSON, not markup, and Astro would otherwise
+   * entity-escape the quotes into something no parser accepts.
+   */
+  jsonLd?: Record<string, unknown>;
+  /**
    * Whether this page lists its own sections above them.
    *
    * On by default, and skipped automatically below four of them — see `contents.ts`. Set it false
@@ -58,6 +79,7 @@ const {
   contents = true,
   image = og.default(),
   imageAlt,
+  jsonLd,
 } = Astro.props;
 const { bundle, verification, forecastable } = loadFeed();
 
@@ -177,6 +199,16 @@ const body = contents ? withContents(rendered, contentsOf(rendered)) : rendered;
     <meta name="twitter:title" content={socialTitle} />
     <meta name="twitter:description" content={description} />
     <meta name="twitter:image" content={cardUrl} />
+
+    {
+      jsonLd && (
+        <script
+          is:inline
+          type="application/ld+json"
+          set:html={JSON.stringify(jsonLd).replaceAll("<", "\\u003c")}
+        />
+      )
+    }
   </head>
   <body>
     <header class="site">

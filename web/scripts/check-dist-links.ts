@@ -252,6 +252,35 @@ for (const file of htmlFiles(DIST)) {
     const context = html.slice(Math.max(0, at - 45), at + match[0].length + 25).replace(/\s+/g, " ");
     fused.push(`  ${here}\n    …${context}…`);
   }
+
+  /*
+   * The same trimming, where the thing fused is a separator rather than a word.
+   *
+   * The rule above needs a letter on the outside of the tag, and a letter is what it looked for
+   * because that is what the eight live cases had. This is the other outcome of the identical
+   * mistake: a line that *begins* with `·`, below a line ending in an element or an expression.
+   *
+   *     …{district.county} County</a>
+   *     · Senate {senateSeats.map(…)}      ->   "Cuyahoga County· Senate 18"
+   *
+   * It was live on every district dashboard, three times each — 1,827 in the build, more than
+   * every other fusion this file has ever found put together, and invisible to both the rule
+   * above and to `tests/unit/fusion.spec.ts`, whose scan is written around `{…}` expressions.
+   *
+   * Only the middot, not punctuation generally. A comma or a full stop closes the clause the tag
+   * ended and belongs tight against it — `<strong>219</strong>,` is correct and common. A
+   * separator does the opposite: it stands *between* two items and this site spaces it on both
+   * sides everywhere it writes one, so `</a>·` is never what anybody meant. An em dash is spaced
+   * here too, but it is also written closed-up as a range, and a rule with exceptions is one
+   * somebody eventually suppresses.
+   */
+  for (const match of html.matchAll(
+    /(<\/(?:a|abbr|code|em|span|strong)>·|·<(?:a|abbr|code|em|span|strong)\b)/g,
+  )) {
+    const at = match.index!;
+    const context = html.slice(Math.max(0, at - 45), at + match[0].length + 25).replace(/\s+/g, " ");
+    fused.push(`  ${here}\n    …${context}…`);
+  }
 }
 
 if (offenders.length > 0) {
@@ -353,9 +382,10 @@ if (duplicated.length > 0) {
 if (fused.length > 0) {
   console.error(
     `\n${fused.length} fused word${fused.length === 1 ? "" : "s"} in the built site.\n\n` +
-      `A text node ends and an inline element opens against it with no space, so the two words run\n` +
+      `A text node ends and an inline element opens against it with no space, so the two run\n` +
       `together on the page: "the weighted half of" followed by <a>preschool…</a> is read by every\n` +
-      `reader as "half ofpreschool".\n\n` +
+      `reader as "half ofpreschool", and a "·" opening a line below an element renders as\n` +
+      `"Cuyahoga County· Senate 18".\n\n` +
       `The fix is \`{" "}\` at the end of the line the text sits on, which is what the prose on\n` +
       `either side of each of these already does.\n\n` +
       fused.slice(0, 20).join("\n") +
@@ -369,6 +399,6 @@ console.log(
   `${anchors} links across ${pages} built pages, all absolute or off-site; ` +
     `${fragments.length} fragment links all resolve to an id in the page they name; ` +
     `${cards} cards each addressed by a name routes.ts lists, with no id used twice in a page; ` +
-    `no word fused against an inline element; ` +
+    `nothing fused against an inline element, word or separator; ` +
     `${titles.size} distinct titles across ${pages} pages, none used twice`,
 );

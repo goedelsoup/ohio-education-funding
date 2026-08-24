@@ -48,7 +48,15 @@ const description =
     {county.valuationRatio != null ? ` · richest ${county.valuationRatio.toFixed(1)}× the poorest` : ""}
   </p>
 
-  <p class="note"><a href="/counties">All {count(88)} counties</a>, ordered by that ratio. The
+  {/* "that ratio" is the richest-over-poorest figure in the line above — which the line above
+      only carries when the county holds more than one district reporting a tax base. Four
+      counties hold exactly one district, and on those four pages the sentence pointed at a ratio
+      the reader could not see anywhere on the page. A demonstrative needs something to
+      demonstrate, so where there is none the sentence names the ratio instead of pointing. */}
+  <p class="note"><a href="/counties">All {count(88)} counties</a>, ordered by{" "}
+    {county.valuationRatio != null
+      ? "that ratio"
+      : "the gap between each county's richest and poorest school district"}. The
     median Ohio district receives {money(medianAid)} per pupil in state aid.</p>
 
   <Fragment set:html={renderCounty(county, bundle.statewide, medianAid, all)} />

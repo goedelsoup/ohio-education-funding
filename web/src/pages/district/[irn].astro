@@ -60,18 +60,24 @@ const description = district.on_guarantee
         rather than counted: the reverse question — who represents these schools — is the one a
         reader arriving from a legislative page is asking, and 28 of Ohio's districts share a name
         so the seat number is often the clearer handle. */}
-    · {senateSeats.length === 1 ? "Senate" : "Senate"} {senateSeats.map((n, i) => (
+    {/* Each `·` below opens its line behind an explicit {" "}, and every one of them needs it.
+        Astro trims a newline that sits against an element or an expression, so `County</a>` ran
+        straight into the separator on the next line and 609 pages shipped reading
+        `Cuyahoga County· Senate 18` — three of these per page, 1,827 in the build. It is the same
+        trimming `tests/unit/fusion.spec.ts` was written for, in the one shape neither that scan
+        nor the built-output sweep looked for: the fused thing is punctuation rather than a word. */}
+    {" "}· Senate {senateSeats.map((n, i) => (
       <Fragment>
         {i > 0 ? ", " : ""}<a href={routes.senateDistrict(n)}>{Number(n)}</a>
       </Fragment>
     ))}
-    · House {district.house_districts.map((h, i) => (
+    {" "}· House {district.house_districts.map((h, i) => (
       <Fragment>
         {i > 0 ? ", " : ""}<a href={routes.houseDistrict(h.number)}>{Number(h.number)}</a>
       </Fragment>
     ))}
-    · {bundle.statewide.districts} districts in the FY{bundle.fiscal_year} model
-    · {district.on_guarantee ? "on the guarantee" : "on formula"}
+    {" "}· {bundle.statewide.districts} districts in the FY{bundle.fiscal_year} model
+    {" "}· {district.on_guarantee ? "on the guarantee" : "on formula"}
     {
       district.at_millage_floor
         ? (district.millage?.observed_rate ?? 20) < 19.995

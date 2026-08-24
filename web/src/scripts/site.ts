@@ -26,18 +26,33 @@ if (tip) attachHover(document.body, tip);
  *
  * Only ever a redirect from the root, and only for fragments that were real routes. A fragment on
  * any other page is an anchor and is left alone.
+ *
+ * # Why the table is a `Map` and not an object literal
+ *
+ * Because the lookup key comes out of the URL, and an object literal answers for every name on
+ * `Object.prototype`. `/#toString` read `moved["toString"]` and got `Function.prototype.toString`
+ * — truthy, and not equal to `location.pathname`, so both guards passed and `location.replace`
+ * was handed a function. It stringifies to `function toString() { [native code] }`, which
+ * resolves as a relative URL: a reader following `/#toString` or `/#constructor` was bounced off
+ * the homepage into a 404 on a path made of source code.
+ *
+ * A `Map` has no prototype keys, so `has`/`get` answer for what was put in and nothing else.
+ * `Object.create(null)` would work too; a `Map` says the intent in the type rather than in a
+ * comment nobody re-reads.
  */
 if (location.pathname === "/" && location.hash.length > 1) {
   const [route, query] = location.hash.slice(1).split("?");
   const [view, irn] = (route ?? "").split("/");
   const search = query ? `?${query}` : "";
-  const moved: Record<string, string> = {
-    statewide: "/",
-    outcomes: "/outcomes",
-    scenario: `/scenario${search}`,
-  };
+  const moved = new Map<string, string>([
+    ["statewide", "/"],
+    ["outcomes", "/outcomes"],
+    ["scenario", `/scenario${search}`],
+  ]);
   const target =
-    view === "district" && /^\d{6}$/.test(irn ?? "") ? `/district/${irn}` : moved[view ?? ""];
+    view === "district" && /^\d{6}$/.test(irn ?? "")
+      ? `/district/${irn}`
+      : moved.get(view ?? "");
   // `/` is in the table so a `#statewide` link is recognised rather than falling through, but
   // redirecting the front page to itself would be a loop.
   if (target && target !== location.pathname) location.replace(target);

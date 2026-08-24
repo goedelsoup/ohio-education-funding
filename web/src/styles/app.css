@@ -187,6 +187,30 @@ header.site nav a[aria-current="page"] .menu-note { color: var(--text-secondary)
     padding: .2rem 0 .2rem .7rem;
     min-width: 0;
   }
+  /*
+   * And bound how far it may push, because the header is `position: sticky; top: 0`.
+   *
+   * A static panel adds its own height to the header's. `Law` is seven acts over the class index,
+   * each a two-line run, and on a 375px viewport the open menu made the header taller than the
+   * screen — so the header occupied the whole viewport, its last entries sat below the fold, and
+   * *nothing scrolled to them*: a sticky box pinned to y=0 does not move when the document does,
+   * and the entries were inside the box rather than under it. The menu's own bottom links were
+   * unreachable on a phone, which is the one width the grouped bar exists for.
+   *
+   * `dvh` rather than `vh` because mobile browsers count their own collapsing chrome as viewport
+   * in `vh`, which would leave the cap a browser-bar's height too generous — the same defect,
+   * smaller. `vh` first for anything that does not know the unit.
+   *
+   * The overflow is scoped to this breakpoint deliberately. Above 640px the panel is absolutely
+   * positioned and hangs *outside* the header; an `overflow` of anything but `visible` on the
+   * header would clip it to a strip.
+   */
+  header.site {
+    max-height: 100vh;
+    max-height: 100dvh;
+    overflow-y: auto;
+    overscroll-behavior: contain;
+  }
 }
 /*
  * The regime spans on `/legislation`.

@@ -113,10 +113,60 @@ export function rewriteLinks(markdown: string, fromClass: string): string {
   });
 }
 
-/** The index of the `]` closing the `[` at `open`, or -1. Counts nesting. */
-function closingBracket(text: string, open: number): number {
+/** A half-open `[from, to)` range of `html` that {@link badgeClaims} must not read into. */
+type Span = readonly [number, number];
+
+/**
+ * The spans of rendered HTML that are code.
+ *
+ * `<pre>` before `<code>` in the alternation, so `<pre><code>…</code></pre>` — which is every
+ * fenced block the markdown processor emits — is taken as one span rather than the inner element
+ * leaving the `<pre>` tags either side of it exposed.
+ *
+ * A regular expression over HTML, which the module docstring objects to elsewhere. The objection
+ * there is about `href`s: open-ended shapes authored by hand. These are two tags the processor
+ * itself wrote, in the one form it writes them, and the alternative — a parse — would be a second
+ * HTML implementation in a file whose job is to add three `<span>`s.
+ */
+function codeSpans(html: string): Span[] {
+  return [...html.matchAll(/<pre\b[^>]*>[\s\S]*?<\/pre>|<code\b[^>]*>[\s\S]*?<\/code>/gi)].map(
+    (region) => [region.index, region.index + region[0].length] as const,
+  );
+}
+
+/** The span containing `at`, if any. */
+function spanAt(spans: Span[], at: number): Span | undefined {
+  return spans.find(([from, to]) => at >= from && at < to);
+}
+
+/** The next `[` at or after `from` that is not inside code, or -1. */
+function nextBracket(text: string, from: number, code: Span[]): number {
+  for (let at = text.indexOf("[", from); at !== -1; at = text.indexOf("[", at + 1)) {
+    const span = spanAt(code, at);
+    if (!span) return at;
+    at = span[1] - 1;
+  }
+  return -1;
+}
+
+/**
+ * The index of the `]` closing the `[` at `open`, or -1. Counts nesting, and skips code.
+ *
+ * Skipping code here as well as in {@link nextBracket} is what makes the two halves agree. A
+ * claim's justification may legitimately *contain* code — `[verified — [`ode-idea-part-b-allocations`](…)]`
+ * is in the module docstring's list of real shapes — so the closing bracket of a tag opened in
+ * prose is often on the far side of a `<code>` element. Treating a code span as opaque rather than
+ * as a boundary is the difference between that tag badging correctly and its `[` being emitted
+ * literally with the rest of the sentence swallowed.
+ */
+function closingBracket(text: string, open: number, code: Span[]): number {
   let depth = 0;
   for (let index = open; index < text.length; index += 1) {
+    const span = spanAt(code, index);
+    if (span) {
+      index = span[1] - 1;
+      continue;
+    }
     const char = text[index];
     if (char === "[") depth += 1;
     else if (char === "]") {
@@ -149,20 +199,42 @@ function leadingTag(inner: string): (typeof TAGS)[number] | null {
  * rather than badging the inner one inside a pair of literal brackets. A bracket that does not
  * open with a tag is left alone and scanned into, because the corpus brackets plenty of things
  * that are not claims and some of them contain claims.
+ *
+ * # Except inside code, which is quoted rather than asserted
+ *
+ * `<pre>` and `<code>` are skipped whole. A claim tag in running prose is the author grading a
+ * claim they are making; the same characters inside code are the author *showing* a tag —
+ * documenting the vocabulary, or drawing a table with one in a cell. Badging those turns a
+ * monospaced ASCII table into markup, which breaks its column alignment (the badge is a styled
+ * `<span>`, not five characters wide) and asserts a confidence level about a line that is an
+ * example. Every code block in this corpus is an unlabelled ASCII table — see `renderProse` — so
+ * the alignment is the entire content.
+ *
+ * The `<pre>` half of this is latent — no fenced block in the corpus carries a tag today, and the
+ * reason to close it anyway is that the corpus documents its own vocabulary, so the first table
+ * to show an example would ship broken with nothing to catch it. **The inline half is live.**
+ * `draft-legislation.ont.yml` describes a property as *"`[unentered]` where it was not
+ * introduced"*, and that renders on `/wiki/draft-legislation` as a badge inside a `<code>` —
+ * the page teaching what the mark means, demonstrating it wrongly.
+ *
+ * Code is opaque rather than a boundary, which is the distinction that makes this correct instead
+ * of merely quieter. See {@link closingBracket}: a claim's justification may legitimately contain
+ * code, so a tag opened in prose has to be able to close on the far side of a `<code>` element.
  */
 export function badgeClaims(html: string): string {
+  const code = codeSpans(html);
   let out = "";
   let index = 0;
 
   while (index < html.length) {
-    const open = html.indexOf("[", index);
+    const open = nextBracket(html, index, code);
     if (open === -1) {
       out += html.slice(index);
       return out;
     }
     out += html.slice(index, open);
 
-    const close = closingBracket(html, open);
+    const close = closingBracket(html, open, code);
     const inner = close === -1 ? "" : html.slice(open + 1, close);
     const tag = close === -1 ? null : leadingTag(inner);
     if (!tag) {

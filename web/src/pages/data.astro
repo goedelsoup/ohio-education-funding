@@ -15,6 +15,68 @@ import SectionAnchor from "../components/SectionAnchor.astro";
 
 const { bundle, verification } = loadFeed();
 const s = bundle.statewide;
+
+/**
+ * This page, as a `schema.org/Dataset`.
+ *
+ * The only JSON-LD on the site, and the only page that earns it. Everywhere else the structured
+ * data would restate the `<title>` and the description already in the head, which is markup for
+ * its own sake. Here it is a genuinely different statement: three files, at fixed URLs, with
+ * stated media types and byte sizes, versioned by a contract number — machine-readable facts a
+ * dataset index can act on, and which the prose below states in a form that only a reader can.
+ *
+ * Everything in it is read from the feed rather than typed. The three `distribution` URLs are the
+ * three `<a href>`s in the table below; `version` is the bundle's own contract version, so a
+ * breaking change to the feed's shape changes what this claims about it in the same build; and
+ * the temporal coverage is the formula series' own year. A hand-written block would go stale the
+ * first time any of those moved, silently, because nothing on the page renders it.
+ *
+ * `sdPublisher` rather than `publisher`: the *figures* are the department's public records, and
+ * this project's contribution is the joining and the re-computation — the distinction `/data`'s
+ * own Terms card makes in prose. Claiming to publish the underlying records would be a stronger
+ * claim than the page beside it makes.
+ */
+const site = Astro.site ?? new URL("https://ohio-education-funding.pages.dev");
+const formulaYear = bundle.series_years.find((entry) => entry.series === "formula");
+const jsonLd = {
+  "@context": "https://schema.org",
+  "@type": "Dataset",
+  name: "Ohio school funding panel",
+  description: `Every Ohio school district under the Fair School Funding Plan: formula and realized state aid, the base cost build-up, the guarantee, assessed valuation and millage, spending, and report card outcomes. ${s.districts} districts, FY${bundle.fiscal_year}.`,
+  url: new URL("/data", site).href,
+  version: bundle.contract_version,
+  isAccessibleForFree: true,
+  creator: { "@type": "Organization", name: "Ohio school funding" },
+  sdPublisher: { "@type": "Organization", name: "Ohio school funding" },
+  spatialCoverage: { "@type": "State", name: "Ohio" },
+  ...(formulaYear ? { temporalCoverage: formulaYear.label } : {}),
+  measurementTechnique: bundle.provenance,
+  distribution: [
+    {
+      "@type": "DataDownload",
+      name: "districts.csv",
+      description: `One row per district — ${s.districts} rows — of the figures this site renders.`,
+      encodingFormat: "text/csv",
+      contentUrl: new URL("/data/districts.csv", site).href,
+    },
+    {
+      "@type": "DataDownload",
+      name: "bundle.json",
+      description:
+        "The complete feed, exactly as the build reads it: districts, statewide aggregates, finances, outcomes, tax base, the national comparison and the reference checkpoints.",
+      encodingFormat: "application/json",
+      contentUrl: new URL("/data/bundle.json", site).href,
+    },
+    {
+      "@type": "DataDownload",
+      name: "panel.json",
+      description:
+        "The same feed with the finances and report-card blocks removed — the formula inputs alone.",
+      encodingFormat: "application/json",
+      contentUrl: new URL("/data/panel.json", site).href,
+    },
+  ],
+};
 ---
 
 <Base
@@ -23,6 +85,7 @@ const s = bundle.statewide;
   image={routes.og.page("data")}
   imageAlt="The Ohio school funding panel, as JSON and CSV"
   section="data"
+  jsonLd={jsonLd}
 >
   <h1>Data</h1>
   <p class="sub">

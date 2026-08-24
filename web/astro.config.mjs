@@ -1,6 +1,60 @@
 // @ts-check
+import { appendFileSync, existsSync, readFileSync } from "node:fs";
+
 import sitemap from "@astrojs/sitemap";
 import { defineConfig } from "astro/config";
+
+/**
+ * Put the CSV download's response headers back, where the static host will actually apply them.
+ *
+ * `src/pages/data/districts.csv.ts` returns a `Response` carrying `Content-Type: text/csv` and a
+ * `Content-Disposition` naming the file — and in a static build a `Response`'s headers are
+ * discarded. Astro takes the body, writes `dist/data/districts.csv`, and throws the rest away;
+ * there is no server left to send them. So the comment in that route saying "the provenance
+ * travels in the filename" described something that had stopped happening: a browser saved the
+ * file as `districts.csv`, with the fiscal year the figures are on nowhere on it, and a reader
+ * with three of them in a downloads folder could not tell which model each came from.
+ *
+ * Cloudflare Pages reads `_headers` from the deploy root, so that is where they have to go. It
+ * cannot be written into `public/_headers` by hand, because the filename carries the fiscal year
+ * and that moves with the feed — a literal there would be right until the next calculator and
+ * then quietly wrong, which is the class of defect `src/lib/year.ts` exists to end. This appends
+ * the block after the build, reading the year out of the same feed the pages were built from.
+ *
+ * Not visible in `dist/`'s HTML, in `vite preview`, or in any test that opens a page — the same
+ * blind spot the rest of `public/_headers` documents at length. `tests/e2e/app.spec.ts` reads the
+ * built `_headers` instead, which is the artefact that gets deployed.
+ */
+function csvDownloadHeaders() {
+  return {
+    name: "csv-download-headers",
+    hooks: {
+      /** @type {(context: { dir: URL }) => void} */
+      "astro:build:done": ({ dir }) => {
+        const feed = JSON.parse(
+          readFileSync(new URL("./public/data/bundle.json", import.meta.url), "utf8"),
+        );
+        const headers = new URL("_headers", dir);
+        // The rest of the file is the point; appending to a file that is not there would produce
+        // a `_headers` holding only this block and silently drop the CSP.
+        if (!existsSync(headers)) {
+          throw new Error(
+            "public/_headers did not reach dist/ — appending the CSV block would replace it",
+          );
+        }
+        appendFileSync(
+          headers,
+          "\n# Written by the `csv-download-headers` integration in `astro.config.mjs`, not by hand.\n" +
+            "# A static build discards the headers the route returns; these are the ones it meant.\n" +
+            "# The filename carries the fiscal year, so it is read from the feed rather than typed.\n" +
+            "/data/districts.csv\n" +
+            "  Content-Type: text/csv; charset=utf-8\n" +
+            `  Content-Disposition: attachment; filename="ohio-school-funding-fy${feed.fiscal_year}.csv"\n`,
+        );
+      },
+    },
+  };
+}
 
 /**
  * Astro, in static mode, over Vite.
@@ -47,6 +101,7 @@ export default defineConfig({
         !page.endsWith("apple-touch-icon.png") &&
         !page.endsWith("icon-32.png"),
     }),
+    csvDownloadHeaders(),
   ],
   build: {
     // `dist/district/043786.html` rather than `dist/district/043786/index.html`. Keeps the deploy
