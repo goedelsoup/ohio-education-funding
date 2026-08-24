@@ -161,14 +161,14 @@ Fields: count per claim tag across every node; then the unresolved marks by the 
 |---|--:|---|
 | `[verified]` | 999 | supported by a committed primary source |
 | `[inference]` | 254 | drawn from verified facts, not witnessed |
-| `[open]` | 207 | a live question — unknown, contested, or being worked |
+| `[open]` | 208 | a live question — unknown, contested, or being worked |
 | `[unentered]` | 0 | a knowable value nobody has typed in yet |
 
-207 unresolved marks, and every one of them is a live question. The fourth mark is gone from the prose: a field nobody has filled in is carried as `unfilled:` structure on the node it belongs to, which is what `[unentered]` used to say inline on an axis it did not belong to.
+208 unresolved marks, and every one of them is a live question. The fourth mark is gone from the prose: a field nobody has filled in is carried as `unfilled:` structure on the node it belongs to, which is what `[unentered]` used to say inline on an axis it did not belong to.
 
 | Field | `[open]` | `[unentered]` |
 |---|--:|--:|
-| `findings` | 59 | 0 |
+| `findings` | 60 | 0 |
 | `description` | 54 | 0 |
 | `series` | 12 | 0 |
 | `revisions` | 8 | 0 |
@@ -223,7 +223,7 @@ leave the corpus and are not counted.
 | edges between nodes | 503 |
 | distinct relationships in use | 158 |
 | relationships declared across every class | 70 |
-| edges whose relationship its class does not declare | 257 |
+| edges whose relationship its class does not declare | 258 |
 | relationships used exactly once | 80 |
 
 **51% of edges use a relationship the class does not declare**, and 80 of the 158 relationships in use are used a single time. That is the case for `edge_policy: characteristic`: closing the vocabulary would reject those edges or require 80 declarations that each describe one link.

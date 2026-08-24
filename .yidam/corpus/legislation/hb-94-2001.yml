@@ -107,7 +107,13 @@ links:
   - target: ../litigation/derolph-iii-2001.yml
     relationship: reviewed-by
   - target: ../funding-regime/foundation-base-cost-formula.yml
-    relationship: amends
+    relationship: rebuilds
+    note: >-
+      Not `amends`, which this class declares for a prior *enactment* and which pointed at
+      a funding-regime here; and not `continues`, which H.B. 95 and H.B. 119 use for
+      carrying this regime forward. This act recalculated the base cost from a new
+      127-district model set and funded it in full without phase-in — the formula it
+      rebuilt, in the words this node already uses of it.
   - target: ../parameter/base-cost-per-pupil.yml
     relationship: sets
   - target: ../parameter/local-share-charge-off-millage.yml
