@@ -85,9 +85,9 @@ architecture exists to provide.
 
 ## The build, and what it gave up
 
-[Astro](https://astro.build) in static mode over Vite. `pnpm build` writes [`dist/`](dist/): about
-2,500 documents, one hashed stylesheet, a code-split JavaScript bundle, and the data files.
-Nothing runs behind it.
+[Astro](https://astro.build) in static mode over Vite. `pnpm build` writes [`dist/`](dist/): 3,487
+documents, one hashed stylesheet, a code-split JavaScript bundle, and the data files. Nothing runs
+behind it.
 
 This used to be **one** document that fetched a 1.1 MB feed and rendered every figure in the
 browser. The feed sat outside the module graph on purpose, so regenerating it was a `cargo run`
@@ -97,11 +97,19 @@ feed and the build are one artefact and publishing a feed change is a rebuild**.
 
 What that bought:
 
-- A district page is **12 KB**, 4 KB over the wire, against 1.1 MB before.
+- A district page is **99.7 KB**, 16.4 KB over the wire under brotli — against 1.1 MB before, and
+  against the 12 KB this line claimed for long enough to be quoted back. The old figure was never
+  right; the page has also grown since, most recently by the second copy of every chart that makes
+  it legible on a phone. What survives the correction is the comparison it was making: the feed
+  was 1.1 MB before a reader saw a single figure.
 - Every page is complete before any script runs. Figures, tables, and charts are all in the
   document — the charts as SVG, not as a canvas drawn on load.
 - A search engine, a screen reader, and a text browser all get the whole page.
-- 2,500 pages build in about 5 seconds, so the trade costs nothing in practice.
+- 3,487 pages build in about 54 seconds, on eight cores. Not the 5 seconds this line used to
+  claim, and worth knowing before reaching for a rebuild: page emission is nearly all of it, three
+  quarters of that is the 3,045 district routes, and 15 seconds is rasterising preview cards.
+  Astro's `build.concurrency` does not help — the work is synchronous, so raising it past 1 buys
+  scheduling overhead and a slower build. Measured, not assumed.
 
 The feed is still copied verbatim into `dist/` and still served. It is what the scenario routes
 fetch, and what [`/data`](src/pages/data.astro) offers for download.
@@ -720,9 +728,10 @@ upload means. Bump both together or neither.
 in that order. The old shortcut of regenerating `public/data/bundle.json` alone no longer updates
 what a reader sees, because the figures are in the HTML.
 
-`dist/` is about 131 MB across ~4,450 files, well inside Cloudflare Pages' 20,000-file limit. A
-third of that weight is the 995 preview cards under `og/`, which is the price of a shared link
-carrying the district's own figures; the file count is what to watch, and it has room.
+`dist/` is about 231 MB across 4,562 files, well inside Cloudflare Pages' 20,000-file limit — the
+file count is what to watch, and it has room. 51.8 MB of the weight is the 1,050 preview cards
+under `og/`, which is the price of a shared link carrying the district's own figures, and they are
+still 8-bit RGBA holding 128 colours apiece.
 
 There is no custom domain, and this section used to say there was.
 `schools.ohio.shawneesmart.systems` was named as the address for long enough to reach every
