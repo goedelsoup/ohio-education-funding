@@ -39,6 +39,29 @@ description: |
 
   Still open: whether the statute or subsequent budget acts contemplate re-basing. [open]
 findings: |
+  ### The limit case, and the panel cannot see it
+
+  **North Bass Local receives $19,672.64, and every cent of it is this guarantee.** Zero base
+  cost, zero categoricals, zero transportation, zero of everything the formula computes — a Lake
+  Erie island district in Ottawa County that the department does not cost at all, funded because
+  it was funded in FY2020. [verified — the department's FY27 calculator, `Summary_SFPR`]
+
+  It is what the mechanism looks like with the formula subtracted out. Every other guaranteed
+  district is a comparison between two numbers; this one has only the historical number, and the
+  hold-harmless is not topping up its aid but constituting it. Whatever the guarantee is *for*,
+  North Bass is the case where nothing else is doing any work.
+
+  Its neighbour **Middle Bass Local** is the other half of the pair and receives nothing at all,
+  which is the same fact from the other side: two districts the formula has no answer for, one
+  carrying a 2020 figure forward indefinitely and one carrying zero.
+
+  **Neither is in the committed panel**, because the extract is keyed on the base cost sheet and
+  the department computes no base cost for either. So the $878,954,627 above is the 609-district
+  total and the department's is $878,974,300 — the whole difference is North Bass. [verified —
+  [`the_population_the_panel_speaks_for.rs`](../../../crates/project/tests/the_population_the_panel_speaks_for.rs)]
+  Every statistical claim in this node is over the 609, and the district that would most sharply
+  illustrate it is the one excluded.
+
   ### Does it buy anything? No — carefully
 
   Joining the funding model to the 2024-25 report card across the 606 districts every panel
@@ -200,9 +223,9 @@ findings: |
   It is called temporary and transitional. In FY2027 — the terminal year of the six-year
   phase-in, the year the formula reaches 100% of its computed amount — **294 of 609 districts,
   48.3%, holding 54.1% of base cost enrolled ADM, are funded by it rather than by the formula.**
-  [verified] Across those 609 it totals **$878,954,627**; the $878,974,300 this node carried
-  before is the workbook's 611-row total, and the $19,673 between them is the two districts the
-  committed extract does not hold. [open — which two] The median guaranteed district sits more than three times
+  [verified] Across those 609 it totals **$878,954,627**, against the department's
+  **$878,974,300** over the 611 districts it pays. The $19,672.64 between them is one district,
+  North Bass Local, and it is in the findings below. The median guaranteed district sits more than three times
   above what a meaningful base cost increase would give it, so this is not a rounding buffer
   catching a few edge cases; for half the state it is the operative funding mechanism.
 
@@ -321,8 +344,9 @@ properties:
     effect is computed in `crates/foundation/tests/department_model_fy27.rs`. A general
     implementation in the `foundation` crate is now writable. [open]
   fy2027_scale: |
-    294 of 609 districts (48.3%); 54.1% of base cost enrolled ADM; $878,954,627 total across
-    those 609, against $878,974,300 on the workbook's 611 rows.
+    294 of 609 districts (48.3%); 54.1% of base cost enrolled ADM; $878,954,627 across those
+    609, against $878,974,300 over the 611 the department pays. The difference is North Bass
+    Local, which the panel excludes and which is 100% guarantee.
     Guarantee amounts: median $1,946,072, p25 $924,177, p75 $3,684,989, max $25,894,168
     (Columbus City). [verified]
 links:

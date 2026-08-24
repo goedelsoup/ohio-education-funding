@@ -40,6 +40,21 @@ needing a spreadsheet engine.
 - **`Summary_SFPR` includes a "State of Ohio" aggregate row.** Treating the sheet as 612
   districts double-counts every total. There are 611 districts plus one statewide row, and the
   guarantee sums to $878,974,300 once, not twice.
+- **The committed extract holds 609 of those 611, and the two are not arbitrary.** **Middle Bass
+  Local** (IRN 048959) and **North Bass Local** (048967), Lake Erie island districts in Ottawa
+  County, are absent from `Base_Cost` and `Base_Cost_adm` altogether — the department computes no
+  base cost for either. The extract is keyed on `Base_Cost`, so a district that was never costed
+  cannot enter it. They do appear in `ADM Data`, `Detail_SFPR` and `Summary_SFPR`.
+
+  **North Bass is funded.** It receives $19,672.64, entirely temporary transitional aid guarantee,
+  against zero base cost, zero categoricals and zero transportation. Middle Bass receives nothing.
+  So any guarantee total computed from the extract is short by exactly $19,672.64, and the
+  workbook's $878,974,300 above is not the same quantity as the extract's $878,954,627.
+
+  **Which means the two populations have to be named.** A count over the extract is a count over
+  609 funded-and-costed districts; a count over the sheet is over 611 funded ones. Both are
+  correct and they are not interchangeable — the transportation floor catches 440 of 611 and 438
+  of 609. Pinned at `crates/project/tests/the_population_the_panel_speaks_for.rs`.
 - **Display sheets and data sheets are different things.** `Base Cost`, `Local Capacity`, and
   `Summary SFPR` (with spaces) are single-district display views driven by a selector. The
   per-district tables are the underscore variants: `Base_Cost`, `Local_Capacity`,

@@ -14,9 +14,9 @@ description: |
 
   ### Two competing bases, and the district is paid the greater
 
-  $1,337.175 per weighted rider, or $6.867 per bus mile across a 180-day year. **350 of 611
-  districts are paid on the mile base**, so the `MAX` is not a formality — it flips for more
-  than half the state, and which one won is invisible in the amount. A district paid on miles
+  $1,337.175 per weighted rider, or $6.867 per bus mile across a 180-day year. **350 districts
+  are paid on the mile base**, so the `MAX` is not a formality — it flips for more than half the
+  state, and which one won is invisible in the amount. A district paid on miles
   gains nothing from carrying more children on the same routes; one paid on riders gains
   nothing from covering more ground. [verified]
 
@@ -49,10 +49,17 @@ description: |
   district is owed but what there was to divide. See [appropriation proration
   factor](../parameter/appropriation-proration-factor.yml). [verified]
 findings: |
-  **440 of 611 districts sit on it** — 72%, against 23% on the formula's floor. For most of
-  Ohio, local capacity does not determine transportation aid at all. This is the single largest
-  difference between how Ohio equalises instruction and how it equalises getting to it, and it
-  is the kind of fact no published total can carry. [verified]
+  **440 of the department's 611 districts sit on it** — 72%, against 23% on the formula's floor.
+  For most of Ohio, local capacity does not determine transportation aid at all. This is the
+  single largest difference between how Ohio equalises instruction and how it equalises getting
+  to it, and it is the kind of fact no published total can carry. [verified]
+
+  The denominator is the department's rather than this repository's, and the two differ. The
+  committed panel holds **609** districts and gives **438**; the department pays 611 and gives
+  440. Both are right about their own population — the two districts between them are Lake Erie
+  islands the department computes no base cost for, so they are below the transportation floor
+  and outside every figure the crates compute. [verified —
+  [`the_population_the_panel_speaks_for.rs`](../../../crates/project/tests/the_population_the_panel_speaks_for.rs)]
 
   ### Its own guarantee
 
