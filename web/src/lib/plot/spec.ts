@@ -272,7 +272,20 @@ function axisFoot(options: {
   const frame = width - marginLeft - marginRight;
   // A gap either side of the centre, so "fits" means legibly rather than exactly.
   const fits = textPx(low) + textPx(says) + textPx(high) + 24 <= frame;
-  const line = 13;
+  /*
+   * The drop to a second line, and why it is not the type size.
+   *
+   * This was 13, which is what an 11px line occupies — so the two rows were laid exactly touching
+   * and the gap between them was whatever the font happened to leave. On the machine this was
+   * written on that was 0.1px; under DejaVu Sans, which is what `system-ui` resolves to on a great
+   * many Linux and Android readers, the glyph boxes are a pixel taller and the rows overlap. The
+   * chart's statement about its own truncated axis then runs through the year labels — the exact
+   * defect this function exists to prevent, moved from one font to another.
+   *
+   * 16 leaves three user units of clear space at the tallest metrics measured across `system-ui`,
+   * DejaVu Sans, Liberation Sans, Arial, Verdana and Tahoma.
+   */
+  const line = 16;
   const at = (anchor: "bottom-left" | "bottom" | "bottom-right", y: number, text: string) =>
     Plot.text([0], {
       frameAnchor: anchor,

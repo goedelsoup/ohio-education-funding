@@ -1116,6 +1116,12 @@ test.describe("charts on a phone", () => {
      * drew `FY2009`, `axis starts at 32%, not zero` and `FY2022` across 186px and the centre ran
      * through both years. `axisFoot` measures the row and drops the centre to its own line — and
      * measuring it is only possible here, because a string's drawn width is a fact about the font.
+     *
+     * Any overlap at all, rather than a pixel of slack. The slack is what let this through once:
+     * the two foot rows were laid exactly touching, which came out as a 0.1px overlap under the
+     * font this was written against and a 1.1px one under DejaVu Sans, so a tolerance of a pixel
+     * made the defect a property of the reviewer's machine. Zero pairs on this build clear even a
+     * 1px *gap* requirement, so there is no slack being spent here.
      */
     await page.setViewportSize({ width: 375, height: 900 });
     const through: string[] = [];
@@ -1134,8 +1140,8 @@ test.describe("charts on a phone", () => {
               const A = marks[a]!.r;
               const B = marks[b]!.r;
               const over =
-                Math.min(A.right, B.right) - Math.max(A.left, B.left) > 1 &&
-                Math.min(A.bottom, B.bottom) - Math.max(A.top, B.top) > 1;
+                Math.min(A.right, B.right) - Math.max(A.left, B.left) > 0 &&
+                Math.min(A.bottom, B.bottom) - Math.max(A.top, B.top) > 0;
               if (over) out.push(`"${marks[a]!.t}" through "${marks[b]!.t}"`);
             }
           }
