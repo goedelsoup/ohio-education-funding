@@ -49,19 +49,19 @@ findings: |
   [`crates/dispersion`](../../../crates/dispersion/tests/cupp_fy24.rs)]:
 
   - Operating expenditure per pupil: median $15,646, coefficient of variation **0.202**,
-    restricted range ratio **1.846**. The district at the 95th percentile spends about 1.85 times
+    restricted range ratio **1.844**. The district at the 95th percentile spends about 1.85 times
     the district at the 5th.
   - The distribution is right-skewed — the top half runs further above the median than the
     bottom half runs below it — so any mean-based summary overstates the typical district.
 
   ### Wealth neutrality, which is more interesting than the dispersion
 
-  State revenue per pupil correlates with assessed valuation per pupil at **−0.549**: aid does
+  State revenue per pupil correlates with assessed valuation per pupil at **−0.548**: aid does
   fall as property wealth rises, so equalisation is real, but property wealth explains only about
   30% of the variation in state aid. [verified]
 
   Meanwhile state revenue per pupil correlates with the economically disadvantaged share at
-  **+0.630** — more tightly than with property wealth. [verified] Ohio's formula targets
+  **+0.632** — more tightly than with property wealth. [verified] Ohio's formula targets
   *poverty* better than it targets *property*. Under a design that adds resident income to
   valuation and weights disadvantaged pupils, that is the mechanism working as intended — and
   it means the classic wealth-neutrality test, run on valuation alone, understates how much
@@ -77,7 +77,7 @@ findings: |
   districts above what the formula computes for them, and its incidence rises monotonically with
   property wealth — 13% of the poorest quartile against 76% of the wealthiest. [verified] The
   local capacity measure reduces state aid to wealthy districts by design; the guarantee then
-  restores it. The two mechanisms work against each other, and the −0.549 correlation is the net
+  restores it. The two mechanisms work against each other, and the −0.548 correlation is the net
   of them rather than a measurement of what the formula alone does. [inference]
 
   Run separately: state aid against valuation per pupil correlates at −0.662 on formula alone and
@@ -174,8 +174,8 @@ findings: |
   **−0.846** — 71.6% of the cross-district variance. [verified] Against property valuation per
   pupil it is only +0.321.
 
-  Read beside the aid findings the picture is coherent. Ohio's formula targets poverty (+0.630)
-  more tightly than property (−0.549), and poverty is what measured achievement mostly tracks. So
+  Read beside the aid findings the picture is coherent. Ohio's formula targets poverty (+0.632)
+  more tightly than property (−0.548), and poverty is what measured achievement mostly tracks. So
   the compensation is aimed at the right variable. [inference]
 
   One consequence for how equity claims get argued. Spending per headcount pupil correlates with
@@ -267,6 +267,30 @@ properties:
     property and income together — the question the Fair School Funding Plan answered by
     including both. [open]
 figures:
+  - key: dispersion/operating-expenditure-median
+    value: 15646.03
+    field: findings
+    as_written: "Operating expenditure per pupil: median $15,646"
+  - key: dispersion/operating-expenditure-coefficient-of-variation
+    value: 0.20157
+    field: findings
+    as_written: "coefficient of variation **0.202**"
+  - key: dispersion/operating-expenditure-restricted-range-ratio
+    value: 1.84357
+    field: findings
+    as_written: "restricted range ratio **1.844**"
+  - key: dispersion/profile-districts
+    value: 606
+    field: findings
+    as_written: "Across all 606 traditional districts"
+  - key: dispersion/state-aid-falls-with-property-wealth
+    value: 0.54831
+    field: findings
+    as_written: "State revenue per pupil correlates with assessed valuation per pupil at **\u22120.548**"
+  - key: dispersion/state-aid-rises-with-poverty
+    value: 0.63229
+    field: findings
+    as_written: "correlates with the economically disadvantaged share at\n  **+0.632**"
   - key: dispersion/comparable-ohio-districts-fy2022
     value: 611
     field: findings

@@ -51,17 +51,25 @@ findings: |
   School System Finances](../../catalog/census-f33-school-system-finances.md) counts every
   school system in the country on one set of definitions.
 
-  In FY2022 Ohio raised **51.8% of school revenue locally against a national 43.4% — seventh
-  highest of fifty-one** — and took **34.4% from the state against a national 43.4%,
-  forty-fifth of fifty-one.** Only six states contribute a smaller share. [verified — computed
-  in `crates/bundle`; see `crates/dispersion/tests/census_f33_states.rs`]
+  In FY2022 Ohio raised **51.8% of school revenue locally against a national 43.35% — seventh
+  highest of fifty-one** — and took **34.4% from the state against a national 43.41%,
+  forty-fifth of fifty-one.** Only six states contribute a smaller share. [verified —
+  `crates/dispersion/src/census_states.rs`, computed for the feed in `crates/bundle`]
+
+  The two national figures were both written `43.4%` until the cross-check refused them. They
+  are not the same number — 43.35% local against 43.41% state — and at one decimal place they
+  are indistinguishable, which made a real and interesting fact about the country read as an
+  identity: **nationally, the state and local shares are within six hundredths of a point of
+  each other**, and Ohio's differ by seventeen points. That is the comparison, stated at the
+  precision that carries it.
 
   What makes this a finding about structure rather than about money is the two figures that are
-  *not* unusual. Ohio's current spending per pupil is $14,923 against a national $15,801 —
-  twenty-fourth of fifty-one, unremarkable — and its federal share is within a point of the
-  national figure. Ohio spends roughly what the country spends on schools. The distinctive
-  thing is who pays, which is the distinction the court drew in 1997 and the one the
-  clarification a month later sharpened into "supplement but not primarily fund". [inference]
+  *not* unusual. Ohio's current spending per pupil is **$14,923 against a national $15,801** —
+  twenty-fourth of fifty-one — and its federal share is within a point of the national figure.
+  [verified — `crates/dispersion/src/census_states.rs`] Ohio spends roughly what the country
+  spends on schools, which is unremarkable. The distinctive thing is who pays, which is the
+  distinction the court drew in 1997 and the one the clarification a month later sharpened into
+  "supplement but not primarily fund". [inference]
 
   The survey year understates this rather than overstating it. FY2022 is the peak of federal
   pandemic relief, so the federal share is inflated and the state and local shares are both
@@ -141,6 +149,31 @@ revisions:
       It does not establish that the reliance *causes* the disparity — that is the court's
       finding and this is a description of the aggregate. What it removes is the possibility
       that the remedy period quietly fixed the structure the court named.
+figures:
+  - key: dispersion/ohio-local-share-fy2022
+    value: 0.5177
+    field: findings
+    as_written: "51.8% of school revenue locally against a national 43.35%"
+  - key: dispersion/national-local-share-fy2022
+    value: 0.4335
+    field: findings
+    as_written: "51.8% of school revenue locally against a national 43.35%"
+  - key: dispersion/ohio-state-share-fy2022
+    value: 0.3436
+    field: findings
+    as_written: "34.4% from the state against a national 43.41%"
+  - key: dispersion/national-state-share-fy2022
+    value: 0.4341
+    field: findings
+    as_written: "34.4% from the state against a national 43.41%"
+  - key: dispersion/ohio-spending-per-pupil-fy2022
+    value: 14923.06
+    field: findings
+    as_written: "$14,923 against a national $15,801"
+  - key: dispersion/national-spending-per-pupil-fy2022
+    value: 15800.88
+    field: findings
+    as_written: "$14,923 against a national $15,801"
 properties:
   case_name: DeRolph v. State
   citation: 78 Ohio St.3d 193, 1997-Ohio-84

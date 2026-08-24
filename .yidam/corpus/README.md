@@ -145,10 +145,38 @@ corpus is never rewritten to have always been right; a check that made a withdra
 figure would demand editing the record of a correction. The body restates the live figure and the
 body is what binds.
 
-**Roughly a fifth of the crate-attributed numeric claims are covered.** A figure is exportable when
-the crate computes it through public API; the rest live inside a test file on a fixture parser that
-test declares privately. The spec pins the bound count as a floor at its value rather than below
-it, so the coverage can only rise — see #131 for why a floor with slack in it is not a ratchet.
+The spec pins the bound count as a floor at its value rather than below it, so coverage can only
+rise — see #131 for why a floor with slack in it is not a ratchet.
+
+### What is bound, and what cannot be
+
+The constraint used to be crate-side: a figure is exportable only when its crate computes it
+through **public** API, and most of the corpus's crate-attributed numerals were computed inside a
+test file on a fixture parser that test declared privately. #157 removed that — every fixture now
+has one public reader in the crate that owns it — and the four clusters it unblocked are bound:
+the Census F-33 state table, the District Profile Report's millage and dispersion columns, the
+2024-25 report card's correlations, and the twenty-mill floor.
+
+What remains unbound is not one thing, and the distinction is worth stating because three of the
+four kinds are **permanent**:
+
+- **A rank is not readable.** The corpus writes ranks as ordinals — `seventh highest of fifty-one`,
+  `25th of 51` — and neither form yields a numeral. A spelled-out ordinal has no digits at all, and
+  the `th` of `25th` defeats the token boundary that stops `65 more` from reading as sixty-five
+  million. Ohio's local, state, spending and federal ranks are therefore stated and not checked.
+- **A count spelled as a word is not readable either**, and it is the one kind that is worth
+  fixing rather than recording. `Twenty districts report an effective Class 1 rate below 20 mills`
+  bound *successfully* to the wrong numeral — the `20` that meant mills — which is a false pass
+  rather than a miss. Where the corpus states a computed count, it now states it in digits.
+- **An identifier is not a figure.** An IRN, a bill number, an ALI code and a SHA-256 digest all
+  carry digits inside a `[verified — crates/…]` tag and none of them is a quantity a calculator
+  computes. `education-agency/*.irn`, `fiscal-period/*.appropriating_bill` and
+  `program/*.appropriation_line` are in this class.
+- **`revisions:` is deliberately unbindable**, for the reason given above.
+
+The remaining genuinely-bindable claims are `crates/project`'s — the supplements, the categorical
+programmes, the guarantee and the appropriation ledger — which compute through library API already
+and need no further Rust. They are the next tranche of #158 rather than a blocked one.
 
 ## Claim inventory
 
@@ -159,7 +187,7 @@ Fields: count per claim tag across every node; then the unresolved marks by the 
 -->
 | Tag | Count | What it records |
 |---|--:|---|
-| `[verified]` | 999 | supported by a committed primary source |
+| `[verified]` | 1000 | supported by a committed primary source |
 | `[inference]` | 254 | drawn from verified facts, not witnessed |
 | `[open]` | 208 | a live question — unknown, contested, or being worked |
 | `[unentered]` | 0 | a knowable value nobody has typed in yet |

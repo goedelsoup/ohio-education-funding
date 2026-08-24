@@ -36,7 +36,7 @@ description: |
   ### The floor is not written in mills
 findings: |
   **How much the reduction factors have actually taken: the median district has lost 42.4% of
-  the millage its voters approved.** The median voted current operating rate is 42.32 mills
+  the millage its voters approved.** The median voted current operating rate is 42.31 mills
   against a median effective Class 1 rate of 23.40, and the largest reduction in the state is
   74.7%. [verified — FY2024 District Profile Report, `current_operating_millage_ty23` against
   `effective_class1_millage_ty23`] This is the magnitude of the mechanism the floor bounds, and
@@ -68,14 +68,14 @@ findings: |
   property tax analysis that treats districts as homogeneous is averaging across a regime
   boundary. [inference]
 
-  **An anomaly the corpus's model does not explain.** Twenty districts report an effective
-  Class 1 rate *below* 20 mills. Six are straightforward: they never voted 20 mills — voted
-  rates of 18.7 to 19.71 — and the floor cannot lift a rate above what voters approved. All six
+  **An anomaly the corpus's model does not explain.** 20 of the 606 report an effective
+  Class 1 rate *below* the floor. 6 of them are straightforward: they never voted twenty mills —
+  voted rates of 18.7 to 19.71 — and the floor cannot lift a rate above what voters approved. All six
   are in Appalachian and southern Ohio counties (Vinton, Morrow, Lawrence, Jackson, Pike,
   Scioto), which is itself worth noting: the districts levying least sit in the poorest part of
   the state. [verified]
 
-  The other fourteen voted between 23 and 48 mills and still report effective Class 1 rates
+  The other 14 voted between 23 and 48 mills and still report effective Class 1 rates
   between 19.72 and 19.994 — just below the floor. [verified] Nothing in the corpus's current
   account of R.C. 319.301 explains this. Two candidate explanations were offered when this was
   first recorded; Table SD-1 now lets one of them be tested, and it fails.
@@ -165,6 +165,67 @@ revisions:
     reach: |
       The distributional findings above are unaffected; they were computed from published
       effective rates rather than from this reading of which levies the factors reach.
+figures:
+  - key: dispersion/median-millage-reduction
+    value: 0.42446
+    field: findings
+    as_written: "the median district has lost 42.4% of\n  the millage its voters approved"
+  - key: dispersion/median-voted-operating-millage
+    value: 42.31
+    field: findings
+    as_written: "The median voted current operating rate is 42.31 mills"
+  - key: dispersion/median-effective-class1-millage
+    value: 23.4
+    field: findings
+    as_written: "a median effective Class 1 rate of 23.40"
+  - key: dispersion/largest-millage-reduction
+    value: 0.7467
+    field: findings
+    as_written: "the largest reduction in the state is\n  74.7%"
+  - key: dispersion/districts-at-the-twenty-mill-floor
+    value: 170
+    field: findings
+    as_written: "How many districts sit at the floor: 170 of 606"
+  - key: dispersion/profile-districts
+    value: 606
+    field: findings
+    as_written: "How many districts sit at the floor: 170 of 606"
+  - key: dispersion/share-at-the-twenty-mill-floor
+    value: 0.280528
+    field: findings
+    as_written: "or 28.1%, in TY2023"
+  - key: dispersion/districts-at-or-against-the-twenty-mill-floor
+    value: 233
+    field: findings
+    as_written: "so 233 districts"
+  - key: dispersion/maximum-effective-class1-millage
+    value: 84.29
+    field: findings
+    as_written: "the maximum\n  is 84.29"
+  - key: dispersion/districts-below-the-twenty-mill-floor
+    value: 20
+    field: findings
+    as_written: "20 of the 606 report an effective\n  Class 1 rate *below* the floor"
+  - key: dispersion/districts-that-never-voted-twenty-mills
+    value: 6
+    field: findings
+    as_written: "6 of them are straightforward"
+  - key: dispersion/districts-just-below-the-floor-unexplained
+    value: 14
+    field: findings
+    as_written: "The other 14 voted between 23 and 48 mills"
+  - key: dispersion/districts-at-twenty-mills-on-the-combined-base-ty2024
+    value: 62
+    field: findings
+    as_written: "**62 of 611** districts at 20.00"
+  - key: dispersion/sd1-districts
+    value: 611
+    field: findings
+    as_written: "**62 of 611** districts at 20.00"
+  - key: dispersion/districts-at-twenty-mills-on-class-one-ty2024
+    value: 155
+    field: findings
+    as_written: "against **155** on the Class 1 rate"
 properties:
   name: Twenty-mill floor
   unit: mills

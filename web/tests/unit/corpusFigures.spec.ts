@@ -59,11 +59,11 @@ test("every bound figure in the corpus agrees with the crate it cites", () => {
  * node from dropping a `figures:` entry to make a red gate green.
  */
 test("the corpus binds no fewer figures than it did", () => {
-  expect(bindings.length, "44 bindings; raise this when you add one").toBeGreaterThanOrEqual(44);
+  expect(bindings.length, "90 bindings; raise this when you add one").toBeGreaterThanOrEqual(90);
   expect(
     corpus.nodes.filter((node) => node.figures.length > 0).length,
-    "8 nodes carry bindings; raise this when a ninth does",
-  ).toBeGreaterThanOrEqual(8);
+    "12 nodes carry bindings; raise this when a thirteenth does",
+  ).toBeGreaterThanOrEqual(12);
   expect(
     new Set(bindings.map((binding) => binding.key)).size,
     "every figure the manifest exports is bound by some node",
@@ -148,6 +148,45 @@ test("a scale word is a scale word and not the start of the next one", () => {
   expect(numerals("65 more districts", "count")).toEqual([{ value: 65, precision: 0.5 }]);
   expect(numerals("$793m of charge-off", "dollars")).toEqual([
     { value: 793e6, precision: 500_000 },
+  ]);
+});
+
+/**
+ * A rank is not readable, in either form the corpus writes one.
+ *
+ * Recorded as a test rather than only as prose in `.yidam/corpus/README.md`, because it is the
+ * reason four of `litigation/derolph-i-1997`'s figures are stated and not bound, and a future
+ * reader is otherwise entitled to assume nobody tried.
+ *
+ * A spelled-out ordinal has no digits at all. A digit ordinal has digits and still yields
+ * nothing: the `th` follows `25` with no token boundary between them, so the optional scale
+ * group cannot close and the numeral is dropped. That is the same `\b` that stops `65 more
+ * districts` from reading as sixty-five million — the rule is right and this is its cost.
+ */
+test("a rank is not a numeral this check can read, spelled or in digits", () => {
+  expect(numerals("seventh highest of fifty-one", "count")).toEqual([]);
+  expect(numerals("ranks Ohio 25th of 51", "count")).toEqual([{ value: 51, precision: 0.5 }]);
+});
+
+/**
+ * A count spelled as a word can bind to the wrong numeral and pass.
+ *
+ * The hazard that made `parameter/twenty-mill-floor` state its counts in digits. `Twenty
+ * districts report an effective Class 1 rate below 20 mills` bound cleanly to a figure of 20 —
+ * on the `20` that meant *mills*. One numeral matched, so `phrase-ambiguous` had nothing to
+ * report, and the binding was satisfied by a quantity in the wrong dimension.
+ *
+ * There is no check that catches this: the reader cannot know which of two identical numbers a
+ * sentence means. What the corpus does instead is write a computed count in digits, so the
+ * numeral that matches is the one the binding is about.
+ */
+test("a phrase can satisfy a binding with a number that means something else", () => {
+  expect(numerals("Twenty districts report a rate below 20 mills", "count")).toEqual([
+    { value: 20, precision: 0.5 },
+  ]);
+  expect(numerals("20 of the 606 report a rate below the floor", "count")).toEqual([
+    { value: 20, precision: 0.5 },
+    { value: 606, precision: 0.5 },
   ]);
 });
 
