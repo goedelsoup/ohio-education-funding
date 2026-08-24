@@ -1,5 +1,5 @@
 // @ts-check
-import { appendFileSync, existsSync, readFileSync } from "node:fs";
+import { appendFileSync, existsSync, readdirSync, readFileSync, writeFileSync } from "node:fs";
 
 import sitemap from "@astrojs/sitemap";
 import { defineConfig } from "astro/config";
@@ -74,6 +74,57 @@ function csvDownloadHeaders() {
  * fetch — they compute in the browser, so they need the whole 609-district panel and the
  * checkpoints that gate it — and it is what `/data` offers for download.
  */
+/**
+ * Keep the sourcemaps that explain the arithmetic; drop the library source riding along with them.
+ *
+ * `vite.build.sourcemap` is on for a stated reason — the scenario routes re-derive Ohio's funding
+ * formula in the browser and somebody checking that arithmetic should be able to read it. What
+ * ships alongside it is not that: `scenario.js.map` is 1.37 MB of which **82% is d3 and Plot**,
+ * 385 sources, none of which is the formula. The 155 KB that is `src/` is the whole of what the
+ * option was turned on for.
+ *
+ * So the map keeps its mappings and every `src/` file keeps its text; a `node_modules` entry keeps
+ * its name and loses its `sourcesContent`. A debugger stepping into Plot then shows a frame it
+ * cannot source rather than one it cannot name, which is what a library frame is anyway.
+ *
+ * Done here rather than through a Vite option because Vite has none that fits:
+ * `sourcemapExcludeSources` drops every source including the formula, and `sourcemapIgnoreList`
+ * only marks frames as third-party without removing the text they carry.
+ */
+function trimVendorSources() {
+  return {
+    name: "trim-vendor-sources",
+    hooks: {
+      /** @type {(context: { dir: URL }) => void} */
+      "astro:build:done": ({ dir }) => {
+        const assets = new URL("_astro/", dir);
+        let saved = 0;
+        for (const name of readdirSync(assets)) {
+          if (!name.endsWith(".map")) continue;
+          const path = new URL(name, assets);
+          const before = readFileSync(path, "utf8");
+          /** @type {{ sources?: string[], sourcesContent?: (string | null)[] }} */
+          const map = JSON.parse(before);
+          const sources = map.sources ?? [];
+          if (!Array.isArray(map.sourcesContent)) continue;
+          map.sourcesContent = map.sourcesContent.map((content, i) =>
+            String(sources[i] ?? "").includes("node_modules") ? null : content,
+          );
+          const after = JSON.stringify(map);
+          if (after.length >= before.length) continue;
+          writeFileSync(path, after);
+          saved += before.length - after.length;
+        }
+        if (saved > 0) {
+          console.log(
+            `[trim-vendor-sources] dropped ${(saved / 1e6).toFixed(2)} MB of library source text`,
+          );
+        }
+      },
+    },
+  };
+}
+
 export default defineConfig({
   // Required by `@astrojs/sitemap`, and used for the canonical link in the layout. This is the
   // production hostname; a preview deploy will emit canonicals pointing at production, which is
@@ -102,6 +153,7 @@ export default defineConfig({
         !page.endsWith("icon-32.png"),
     }),
     csvDownloadHeaders(),
+    trimVendorSources(),
   ],
   build: {
     // `dist/district/043786.html` rather than `dist/district/043786/index.html`. Keeps the deploy

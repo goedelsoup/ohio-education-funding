@@ -1,6 +1,36 @@
 /** Number and text formatting. Small enough to test exhaustively, and it has been wrong. */
 
 /**
+ * The number formatters, built once each.
+ *
+ * `toLocaleString(locale, options)` constructs a fresh `Intl.NumberFormat` for every call, and
+ * this module is the hottest code in the build: a district page formats its own figures, and then
+ * `strip` formats the same measure for all 609 districts twice over to decide which of them the
+ * distribution is going to draw. About a million calls per build, measured at 16.0s against 0.39s
+ * for the identical work through a cached formatter — a fortieth of the cost for the same string.
+ *
+ * Keyed by decimal places, which is the only thing that varies. Three entries live here in
+ * practice: 0, 1 and 2.
+ *
+ * The output is the formatter's, not a reimplementation of it, so this is byte-for-byte what
+ * `toLocaleString` produced — including the cases that make this file worth testing exhaustively:
+ * a magnitude that rounds to nothing, a non-finite value, a negative zero.
+ */
+const FORMATTERS = new Map<number, Intl.NumberFormat>();
+
+function decimal(decimals: number): Intl.NumberFormat {
+  let formatter = FORMATTERS.get(decimals);
+  if (!formatter) {
+    formatter = new Intl.NumberFormat("en-US", {
+      minimumFractionDigits: decimals,
+      maximumFractionDigits: decimals,
+    });
+    FORMATTERS.set(decimals, formatter);
+  }
+  return formatter;
+}
+
+/**
  * A dollar amount, or an em dash where there is no value.
  *
  * The minus is U+2212 and sits outside the dollar sign, which is what `signedMoney` and
@@ -15,10 +45,7 @@
  */
 export function money(v: number | null | undefined, decimals = 0): string {
   if (v == null || !Number.isFinite(v)) return "—";
-  const text = Math.abs(v).toLocaleString("en-US", {
-    minimumFractionDigits: decimals,
-    maximumFractionDigits: decimals,
-  });
+  const text = decimal(decimals).format(Math.abs(v));
   return (v < 0 && Number(text.replace(/,/g, "")) !== 0 ? "−" : "") + "$" + text;
 }
 
@@ -54,8 +81,11 @@ export function pct(v: number | null | undefined, decimals = 1): string {
 
 /** A count with thousands separators. */
 export function count(v: number): string {
-  return v.toLocaleString("en-US", { maximumFractionDigits: 0 });
+  return WHOLE.format(v);
 }
+
+/** `count`'s formatter. Separate from {@link decimal}: it sets no minimum. */
+const WHOLE = new Intl.NumberFormat("en-US", { maximumFractionDigits: 0 });
 
 /**
  * 1st, 2nd, 3rd, 4th … 11th, 12th, 13th … 21st.

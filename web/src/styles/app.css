@@ -904,6 +904,24 @@ tbody tr:last-child th, tbody tr:last-child td { border-bottom: 0; }
   .chart-at[data-at="wide"] { display: block; }
 }
 
+/*
+ * What Plot used to inline into every SVG it drew.
+ *
+ * It emitted the same 198-byte `<style>` block inside each chart — 15,210 copies and 3.01 MB of
+ * built HTML for five declarations. `untangle` in `plot/spec.ts` takes it out; these are the
+ * declarations, once, where the rest of this site's chart styling already lives.
+ *
+ * `white-space: pre` on the text is the load-bearing one. Plot wraps a long category name into
+ * `<tspan>`s and relies on it to keep the spacing it laid out; without it the wrapped bar labels
+ * on a phone re-flow and stop lining up with the rows they name.
+ *
+ * `--plot-background` is not reproduced. It is the one colour Plot's block carried, it is `white`,
+ * and nothing on this site reads it — which `ensureThemeable` had to know about in order to
+ * exclude the block from the literal-colour check it would otherwise have failed.
+ */
+.plot { max-width: 100%; }
+.plot text, .plot tspan { white-space: pre; }
+
 .chart, svg.plot { width: 100%; height: auto; display: block; }
 /*
  * The mark the keyboard cursor is on.

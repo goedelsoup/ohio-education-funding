@@ -32,8 +32,11 @@ const LITERAL_COLOUR = /(#[0-9a-f]{3,8}\b|\brgba?\(|\bhsla?\()/i;
  * failure only shows up for a reader on a dark page, which is not a reader this build has. So it
  * stops the build instead.
  *
- * Plot's own `<style>` block is excluded. It sets type, display and overflow, and the one colour
- * in it is a `--plot-background` custom property this platform never uses.
+ * Plot's own `<style>` block used to be excluded here — it sets type, display and overflow, and
+ * the one colour in it is a `--plot-background` custom property this platform never uses. There is
+ * no block to exclude any more: `untangle` takes it out before this runs, and its declarations
+ * live in `app.css`. The exclusion stays as the guard it always was, so a future Plot that inlines
+ * a literal somewhere this does not strip is caught rather than waved through.
  */
 function ensureThemeable(svg: string): string {
   const found = svg.replace(/<style>[\s\S]*?<\/style>/g, "").match(LITERAL_COLOUR);

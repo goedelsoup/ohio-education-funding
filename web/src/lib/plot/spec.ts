@@ -87,28 +87,84 @@ type Nameable = { setAttribute: (name: string, value: string) => void };
  * worse than one that is certainly read, because nobody writing it would know.
  */
 /**
- * Strip the labels Plot puts on its own mark groups.
+ * Take out what Plot emits that this platform supplies itself.
  *
- * Plot writes `aria-label="bar"`, `aria-label="rule"`, `aria-label="text"` onto the `<g>` it wraps
- * each mark in. On a `g` with no role that attribute is not permitted — `aria-label` needs a role
- * that supports naming — so every chart on this site carried a handful of invalid ARIA, which is
- * what `axe` reports as `aria-prohibited-attr`. It was also useless before it was invalid: the
- * whole SVG is `role="img"`, so nothing inside it is exposed to be named, and "bar" is not a name
- * for anything a reader wanted.
+ * Two things, and both are Plot describing its own rendering rather than the chart.
  *
- * Removed rather than given a role. A `g` per mark type is Plot's rendering structure, not the
- * chart's meaning, and the meaning is the label on the graphic — see {@link Naming}.
+ * **The mark labels.** Plot writes `aria-label="bar"`, `aria-label="rule"`, `aria-label="text"`
+ * onto the `<g>` it wraps each mark in. On a `g` with no role that attribute is not permitted —
+ * `aria-label` needs a role that supports naming — so every chart carried a handful of invalid
+ * ARIA, which is what `axe` reports as `aria-prohibited-attr`. It was useless before it was
+ * invalid: the whole SVG is `role="img"`, so nothing inside is exposed to be named, and "bar" is
+ * not a name for anything a reader wanted.
+ *
+ * **The stylesheet.** Plot inlines a 198-byte `<style>` into every SVG it draws, and every one of
+ * them is the same 198 bytes: 15,210 copies, **3.01 MB** of the built HTML, for five declarations.
+ * They live in `app.css` under `.plot` now, which is where the rest of this site's chart styling
+ * already is — see the `.plot` block there for what each one is doing and which of them is
+ * load-bearing.
+ *
+ * Removed rather than given a role, and hoisted rather than deduplicated by the host: a `g` per
+ * mark type is Plot's rendering structure and a stylesheet repeated per element is a stylesheet in
+ * the wrong place, whatever compresses it on the wire.
  */
-function stripPlotLabels(node: Element): void {
+function untangle(node: Element): void {
   for (const group of node.querySelectorAll("g[aria-label]")) {
     if (!group.hasAttribute("role")) group.removeAttribute("aria-label");
+  }
+  for (const style of node.querySelectorAll("style")) style.remove();
+  round(node);
+}
+
+/**
+ * The geometry attributes, and only those.
+ *
+ * A whitelist rather than a pass over the whole serialized SVG, because two of the attributes that
+ * carry long decimals are *text*: `data-hover` holds a district's figures — `1499.2266` enrolled
+ * ADM — and `aria-label` holds the sentence a screen reader is read. Rounding those would be
+ * rounding what the chart says rather than where it puts it, silently, in the one place a reader
+ * cannot check it against the table.
+ *
+ * `d`, `transform` and `points` hold several numbers each; the rest hold one. The same rule
+ * applies inside all of them, which is why the substitution is on the value and not the attribute.
+ */
+const GEOMETRY = new Set([
+  "cx", "cy", "d", "dx", "dy", "height", "points", "r", "rx", "ry",
+  "transform", "width", "x", "x1", "x2", "y", "y1", "y2",
+]);
+
+/**
+ * Round coordinates to two decimal places.
+ *
+ * Plot serialises float64 verbatim, so a scatter dot is placed at `cx="171.26003133728457"` — 18
+ * characters to say something the frame can express in six. Across the build that is **15.2 MB of
+ * the 79.6 MB** of SVG spent on digits below the visible threshold, and `/outcomes` alone is 29%
+ * decimal noise.
+ *
+ * Two places is not a guess. A chart's `viewBox` is 320 or 640 units wide and is drawn between
+ * about 293px and 1,100px, so one user unit is 0.5px at its smallest — and a hundredth of that is
+ * 0.005px, which is a fortieth of a device pixel on a three-times display. Nothing at that scale
+ * reaches a screen, and the end-to-end tests measure the rendered geometry rather than trusting
+ * this: the identity line on `/method` is still asserted square to within 2%.
+ */
+function round(node: Element): void {
+  for (const element of node.querySelectorAll("*")) {
+    for (const name of element.getAttributeNames()) {
+      if (!GEOMETRY.has(name)) continue;
+      const value = element.getAttribute(name);
+      if (value == null || !value.includes(".")) continue;
+      element.setAttribute(
+        name,
+        value.replace(/-?\d+\.\d+/g, (n) => String(Number(Number(n).toFixed(2)))),
+      );
+    }
   }
 }
 
 export function applyNaming(node: Nameable, naming: Naming): void {
-  // `Nameable` is deliberately the smallest surface this file needs, so the strip is guarded
+  // `Nameable` is deliberately the smallest surface this file needs, so the tidy-up is guarded
   // rather than assumed: `ssr.ts` and `client.ts` both hand over a real element.
-  if ("querySelectorAll" in node) stripPlotLabels(node as unknown as Element);
+  if ("querySelectorAll" in node) untangle(node as unknown as Element);
   if (naming === "presentational") {
     node.setAttribute("aria-hidden", "true");
     return;
