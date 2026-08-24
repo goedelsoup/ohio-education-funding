@@ -218,6 +218,10 @@ function renderSpread(c: County, statewide: Statewide, all: County[]): string {
             <td class="tnum">${count(Math.round(poor.adm))}</td></tr>
         </tbody>
       </table></div>
+      <p class="note">These four figures are the headline; <a href="${routes.compare(
+        rich.irn,
+        poor.irn,
+      )}">the full comparison</a> puts the two side by side on every measure the panel carries.</p>
       ${
         position
           ? `<p class="note">Where that sits among the ${ratios.length} counties with more than one

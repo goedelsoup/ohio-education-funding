@@ -378,10 +378,23 @@ export const wikiSource = (slug: string): string => `/wiki/source/${slug}`;
  */
 export const wikiDecision = (slug: string): string => `/wiki/decision/${slug}`;
 
-/** Two districts side by side. Query parameters, because the pair is chosen by the reader. */
+/**
+ * Two districts side by side. Query parameters, because the pair is chosen by the reader.
+ *
+ * One district is a legitimate argument and not half of an error. `/compare` was reachable only
+ * from the global menu — every district page held the figures and none of them offered to set
+ * those figures beside another district's — and the entry point that fixes it is a link from a
+ * district to the comparison *starting from that district*, which is a route with one IRN in it.
+ * The runner fills the other side from the corpus's own contrast pair, and takes care not to put
+ * a district beside itself. Returning a bare `/compare` for a half-specified pair, as this used
+ * to, would throw away the only thing the caller knew.
+ */
 export function compare(a?: string, b?: string): string {
-  if (!a || !b) return "/compare";
-  return `/compare?a=${encodeURIComponent(a)}&b=${encodeURIComponent(b)}`;
+  const query = new URLSearchParams();
+  if (a) query.set("a", a);
+  if (b) query.set("b", b);
+  const search = query.toString();
+  return search ? `/compare?${search}` : "/compare";
 }
 
 /**

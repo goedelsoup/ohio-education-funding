@@ -97,11 +97,22 @@ test.describe("the content security policy", () => {
   test("no page carries an inline script block", () => {
     // Astro bundles every `<script>` to a hashed file under `_astro/`, so any `<script>` left with
     // a body is either a mistake or a deliberate exception that the CSP has not been told about.
+    //
+    // `application/ld+json` is the one exception, and it is an exception to this test rather than
+    // to the directive. `script-src` governs elements the browser would *execute*; an element
+    // whose type is not a JavaScript MIME type is a data block, never parsed as script and never
+    // blocked. `/data` carries one — a `schema.org/Dataset` naming the three downloads, which is
+    // the one page on this site where the vocabulary does work prose cannot. It has to be inline
+    // because a data block has no `src`.
+    //
+    // Every `<` in it is written as `<`, so the JSON cannot close its own element early
+    // whatever a description string turns out to contain.
     const offenders: string[] = [];
     for (const file of html(DIST)) {
       const body = readFileSync(file, "utf8");
-      for (const match of body.matchAll(/<script(?![^>]*\bsrc=)[^>]*>([\s\S]*?)<\/script>/gi)) {
-        if ((match[1] ?? "").trim() !== "") offenders.push(file.slice(DIST.length + 1));
+      for (const match of body.matchAll(/<script(?![^>]*\bsrc=)([^>]*)>([\s\S]*?)<\/script>/gi)) {
+        if (/type\s*=\s*["']application\/ld\+json["']/i.test(match[1] ?? "")) continue;
+        if ((match[2] ?? "").trim() !== "") offenders.push(file.slice(DIST.length + 1));
       }
     }
     expect([...new Set(offenders)].slice(0, 10)).toEqual([]);
@@ -222,6 +233,88 @@ test.describe("what a link to this site looks like when it is pasted somewhere",
     for (const icon of ["favicon.svg", "icon-32.png", "apple-touch-icon.png"]) {
       expect(existsSync(join(DIST, icon)), `${icon} was not emitted`).toBe(true);
     }
+  });
+});
+
+/**
+ * The three files a machine reads that no reader ever opens.
+ *
+ * `robots.txt`, the JSON-LD on `/data`, and the response headers in `_headers`. Each is invisible
+ * from every page of the site and from `vite preview`, and each was wrong: there was no
+ * `robots.txt` at all, so Cloudflare served an auto-injected one that is entirely comments and
+ * names no sitemap; there was no structured data anywhere, on a site whose `/data` route is
+ * literally a dataset with three distributions; and the CSV route's `Content-Disposition` was
+ * discarded by the static build, so the fiscal year the figures are on reached nobody.
+ *
+ * They are checked against the artefact rather than through a browser for the reason the block
+ * above gives about `og:` tags: the consumers are crawlers and unfurlers, none of which is
+ * available to a test, and the failure they produce is silence.
+ */
+test.describe("what a machine reads", () => {
+  const DIST = join(import.meta.dirname, "../../dist");
+  const feed = JSON.parse(readFileSync(join(DIST, "data", "bundle.json"), "utf8"));
+
+  test("robots.txt names the sitemap, at the host the canonical links use", () => {
+    const robots = readFileSync(join(DIST, "robots.txt"), "utf8");
+    const sitemap = robots.match(/^Sitemap:\s*(\S+)$/m)?.[1];
+    expect(sitemap, "no Sitemap: line — the whole reason to ship this file").toBeTruthy();
+
+    // The host is written out in `robots.txt` and configured in `astro.config.mjs`, and a crawler
+    // that follows a sitemap URL on the wrong host gets nothing. Take the site's own canonical
+    // link as the authority rather than restating the hostname here for a third time.
+    const canonical = readFileSync(join(DIST, "index.html"), "utf8").match(
+      /<link rel="canonical" href="([^"]*)"/i,
+    )?.[1];
+    expect(new URL(sitemap!).origin).toBe(new URL(canonical!).origin);
+
+    // And it has to point at something that was built.
+    expect(existsSync(join(DIST, new URL(sitemap!).pathname.slice(1)))).toBe(true);
+  });
+
+  test("/data describes itself as a Dataset, and every distribution it names exists", () => {
+    const body = readFileSync(join(DIST, "data.html"), "utf8");
+    const block = body.match(/<script type="application\/ld\+json">([\s\S]*?)<\/script>/i)?.[1];
+    expect(block, "/data carries no structured data").toBeTruthy();
+
+    const data = JSON.parse(block!);
+    expect(data["@type"]).toBe("Dataset");
+    // Read from the feed, not typed — so a contract bump moves this without anyone editing it,
+    // which is the property that makes the block worth emitting rather than a liability.
+    expect(data.version).toBe(feed.contract_version);
+    expect(data.version).toBe(REQUIRED_CONTRACT);
+
+    const named = data.distribution.map((d: { contentUrl: string }) => new URL(d.contentUrl).pathname);
+    expect(named).toEqual(["/data/districts.csv", "/data/bundle.json", "/data/panel.json"]);
+    for (const path of named) {
+      expect(existsSync(join(DIST, path.slice(1))), `${path} is named but was not built`).toBe(true);
+    }
+
+    // The three the page links are the three it declares. A fourth download added to the table
+    // and not to the block would leave the structured data quietly describing an older site.
+    const linked = [...body.matchAll(/href="(\/data\/[^"]+)"/g)].map((m) => m[1]!);
+    expect([...new Set(linked)].sort()).toEqual([...named].sort());
+  });
+
+  test("the CSV download's headers survive the static build", () => {
+    /*
+     * `output: "static"` discards the headers an endpoint's `Response` carries — Astro keeps the
+     * body and writes a file. So the `Content-Disposition` in `src/pages/data/districts.csv.ts`
+     * reached `astro dev` and `vite preview` and never the deploy, and the comment in that route
+     * about provenance travelling in the filename described a local session.
+     *
+     * The `csv-download-headers` integration in `astro.config.mjs` appends them to `dist/_headers`,
+     * reading the fiscal year out of the same feed. This asserts against the built `_headers`
+     * because that is the file Cloudflare Pages reads; nothing else in this repository looks at it.
+     */
+    const headers = readFileSync(join(DIST, "_headers"), "utf8");
+    expect(headers).toContain("/data/districts.csv");
+    expect(headers).toContain(
+      `Content-Disposition: attachment; filename="ohio-school-funding-fy${feed.fiscal_year}.csv"`,
+    );
+    // The block is appended, and appending to a file that had gone missing would produce a
+    // `_headers` holding only this and silently dropping the CSP. The integration throws in that
+    // case; this is the assertion that the throw is about something real.
+    expect(headers).toContain("Content-Security-Policy:");
   });
 });
 
@@ -367,7 +460,9 @@ const ROUTES_WITH_FIGURES = [
      *
      * The check is deliberately narrow: a letter immediately against an inline tag boundary. A
      * tag against punctuation is normal — `<strong>219</strong>,` — and so is a tag against
-     * another tag.
+     * another tag. The one punctuation mark that is *not* normal against a tag is the middot
+     * separator, and that is checked in `scripts/check-dist-links.ts` rather than here, because
+     * the page it was live on is not in `ROUTES_WITH_FIGURES` and that sweep reads every page.
      *
      * # This is half the defect, and the other half is in the unit suite
      *
@@ -796,6 +891,81 @@ test.describe("routes", () => {
     await expect(page.locator("#lv-guarantee")).toHaveValue("removed");
   });
 
+  test("a fragment that names nothing leaves the reader where they are", async ({ page }) => {
+    /*
+     * The redirect table above was an object literal, and an object literal answers for every name
+     * on `Object.prototype`. `/#toString` looked up `moved["toString"]`, got
+     * `Function.prototype.toString` — truthy, and unequal to `location.pathname`, so both guards
+     * passed — and handed `location.replace` a function. It stringifies to
+     * `function toString() { [native code] }`, which resolves as a relative URL, so the reader was
+     * bounced off the front page onto a 404 whose path was source code.
+     *
+     * These are not hypothetical fragments. `#constructor` and `#toString` are what a fuzzer, a
+     * link checker and an autocompleting URL bar all produce, and the failure is on the homepage.
+     *
+     * The table is a `Map` now. `#nowhere` is here beside them as the control: an unknown name
+     * that is *not* a prototype key has always been handled correctly, and if it ever stops being
+     * handled correctly this test says which of the two things broke.
+     */
+    for (const fragment of ["#toString", "#constructor", "#valueOf", "#nowhere"]) {
+      await page.goto(`/${fragment}`);
+      // Still on `/`, still carrying the fragment it arrived with — a fragment naming no route is
+      // an anchor, and an anchor that matches no element is a no-op rather than a navigation.
+      await expect(page, `${fragment} redirected off the homepage`).toHaveURL(
+        new RegExp(`/${fragment}$`),
+      );
+      await expect(page.locator("h1")).toHaveText("Ohio school funding");
+    }
+  });
+
+  test("/compare is reachable by following links, not only from the global menu", async ({
+    page,
+  }) => {
+    /*
+     * It was in the bar and nowhere else: `routes.compare()` was called by no template in the
+     * repository, so a reader on a district page — holding exactly the figures the comparison is
+     * built from — had no way to get to it except by going back to the menu and starting over.
+     *
+     * The two entry points are the two places where the question "compared to whom" is already
+     * being asked. A district's position card places it against all 609 at once; a county's
+     * spread card names that county's richest and poorest district and prints four figures for
+     * each. Both now link on, and the link carries the district it came from.
+     */
+    await page.goto(`/district/${NORTHERN}`);
+    const fromDistrict = page.locator(`#position a[href^="/compare"]`);
+    await expect(fromDistrict).toHaveAttribute("href", `/compare?a=${NORTHERN}`);
+    await fromDistrict.click();
+
+    // And the runner honours it: the district that was linked from is on one side, and the other
+    // side is not the same district — a half-specified pair used to be thrown away entirely.
+    await expect(page.locator("#cmp-a")).toHaveValue(NORTHERN);
+    await expect(page.locator("#cmp-b")).not.toHaveValue(NORTHERN);
+    await expect(page.locator("#comparison")).toBeVisible();
+
+    await page.goto("/county/cuyahoga");
+    const fromCounty = page.locator(`#spread a[href^="/compare"]`);
+    await expect(fromCounty).toHaveAttribute("href", /^\/compare\?a=\d{6}&b=\d{6}$/);
+  });
+
+  test("the comparison table says which year its tax figures are on", async ({ page }) => {
+    /*
+     * Two rows here are on a tax year, and the footnote under the table names three *other* years
+     * — the fiscal year of the model, the year of the valuations, the year of the expenditure. So
+     * the millage rows read as though they belonged to one of those, and a tax year is eleven
+     * months out of step with the fiscal year it funds.
+     *
+     * "2024 tax year" in words rather than a bare "2024", which is the rule `src/lib/year.ts`
+     * sets and the reason it gives: `FY2024` and `2024` differ by a prefix, and a prefix reads as
+     * typography rather than as a claim about which period a figure covers.
+     */
+    await page.goto("/compare");
+    const label = page.locator("#comparison tbody th").filter({ hasText: "Voted operating" });
+    await expect(label).toContainText(/\d{4} tax year/);
+    await expect(
+      page.locator("#comparison tbody th").filter({ hasText: "Effective Class 1" }),
+    ).toContainText(/\d{4} tax year/);
+  });
+
   test("the sitemap lists the district pages", async ({ request }) => {
     const index = await request.get("/sitemap-index.xml");
     expect(index.status()).toBe(200);
@@ -853,6 +1023,40 @@ test.describe("the section menus", () => {
     await expect(places).toHaveAttribute("open", "");
     await page.locator("h1").click();
     await expect(places).not.toHaveAttribute("open", "");
+  });
+
+  test("on a phone the longest menu stays inside the viewport, and scrolls if it cannot", async ({
+    page,
+  }) => {
+    /*
+     * Below 640px the panel is `position: static`, so an open menu adds its own height to the
+     * header's rather than hanging below it — see the note in `app.css` for why absolute
+     * positioning is wrong at that width.
+     *
+     * The header is also `position: sticky; top: 0`. Those two together are the defect: `Law` is
+     * seven acts over a class index, each a two-line run, and on a 375px screen the open menu made
+     * the header taller than the viewport. A sticky box pinned to y=0 does not move when the
+     * document scrolls, and the overflowing entries were *inside* the box rather than under it —
+     * so the bottom of the menu could not be reached by any gesture. On the one width the grouped
+     * bar exists for.
+     *
+     * 375×667 is an iPhone SE, the smallest screen worth holding the site to. The assertion is in
+     * two halves because either alone can pass while the defect is live: the header must fit, and
+     * the last link in the longest menu must be somewhere a reader can actually get to.
+     */
+    await page.setViewportSize({ width: 375, height: 667 });
+    await page.goto("/");
+
+    const law = page.locator("header.site nav details.menu").filter({ hasText: "Law" });
+    await law.locator("summary").click();
+    await expect(law).toHaveAttribute("open", "");
+
+    const header = page.locator("header.site");
+    expect((await header.boundingBox())!.height).toBeLessThanOrEqual(667);
+
+    const last = law.locator(".menu-panel a").last();
+    await last.scrollIntoViewIfNeeded();
+    await expect(last).toBeInViewport();
   });
 });
 

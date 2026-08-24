@@ -1,0 +1,24 @@
+# Everything here is public record joined, recomputed and checked. There is nothing to withhold
+# from a crawler, and the one line that matters is the last one.
+#
+# # Why this file exists at all, given that it allows everything
+#
+# Without it Cloudflare Pages serves an auto-injected `robots.txt` — a block of comments about
+# AI crawler management and no directives, which is a 200 that says nothing. It is what a crawler
+# reads before it reads anything else, and the site's own sitemap was not in it.
+#
+# `@astrojs/sitemap` writes `sitemap-index.xml` at build time (see `astro.config.mjs` for what it
+# excludes and why). Google and Bing accept a submitted sitemap without one of these; every other
+# crawler finds it here or does not find it. Roughly 2,500 documents, most of them one district's
+# figures, are reachable only by following links from `/districts` — so a crawler that discovers
+# by traversal alone gets there eventually and a crawler reading the index gets there first.
+
+User-agent: *
+Allow: /
+
+# Not `/og/*`, deliberately. They are preview cards fetched by unfurlers, which do not consult
+# this file, and disallowing them would not stop that while also hiding them from image search
+# for no gain. The sitemap already omits them for the reason that matters: they are an attribute
+# of a document rather than documents.
+
+Sitemap: https://ohio-education-funding.pages.dev/sitemap-index.xml

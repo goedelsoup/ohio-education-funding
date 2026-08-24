@@ -729,6 +729,10 @@ export function renderPosition(
         (other) => other.operating_expenditure_per_pupil,
         routes.metric("per-pupil-operating-expenditure"),
       )}
+      <p class="note">This card places the district against all ${bundle.statewide.districts} at
+        once, which is the question "is this unusual". The other question — "unusual compared to
+        <em>whom</em>" — is <a href="${routes.compare(d.irn)}">the comparison table</a>, which puts
+        this district's figures beside any one other district's.</p>
     </div>`;
 }
 

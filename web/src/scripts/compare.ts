@@ -37,6 +37,21 @@ function yearOf(panel: Panel, series: string): string {
   return panel.series_years.find((entry) => entry.series === series)?.label ?? "";
 }
 
+/**
+ * A millage row's label, with the tax year it is measured in spelled out.
+ *
+ * `2024 tax year` in full rather than a bare `2024`, which is the rule `lib/year.ts` sets for the
+ * chips and states the reason for: `FY2024` and `2024` differ by a prefix, and a prefix reads as
+ * typography rather than as a claim about which eleven-month-offset period a figure covers.
+ *
+ * The label falls back to the bare name where the feed carries no millage block. A row saying
+ * nothing about its year is what this is fixing, but a row saying "undefined tax year" is worse.
+ */
+function taxYearLabel(panel: Panel, name: string): string {
+  const year = yearOf(panel, "millage");
+  return year ? `${name}, ${year} tax year` : name;
+}
+
 const a = document.querySelector<HTMLSelectElement>("#cmp-a");
 const b = document.querySelector<HTMLSelectElement>("#cmp-b");
 const out = document.querySelector<HTMLElement>("#compare-out");
@@ -77,12 +92,19 @@ const ROWS: Row[] = [
   {
     // Beside the effective rate rather than instead of it: the two are only interesting as a
     // pair, and the gap between them is what H.B. 920 has taken.
-    label: "Voted operating millage",
+    //
+    // Both carry the tax year they are measured in, and it is the only row family here that has
+    // to say the *reckoning* as well as the digits. The footnote below the table names three
+    // years — the fiscal year of the model, the profile year of the valuations, the fiscal year
+    // of the expenditure — and these two rows were on a fourth, silently. A bare `2024` beside
+    // `FY2027` in the same table invites exactly the reading `lib/year.ts` exists to prevent, so
+    // the words go in the label where there is room for them.
+    label: (panel) => taxYearLabel(panel, "Voted operating millage"),
     pick: (d) => d.voted_operating_millage,
     format: (v) => (v == null ? "—" : v.toFixed(2)),
   },
   {
-    label: "Effective Class 1 millage",
+    label: (panel) => taxYearLabel(panel, "Effective Class 1 millage"),
     pick: (d) => d.effective_class1_millage,
     format: (v) => (v == null ? "—" : v.toFixed(2)),
     href: routes.metric("effective-operating-millage"),
@@ -200,10 +222,20 @@ async function start(): Promise<void> {
   const byIrn = new Map(panel.districts.map((d) => [d.irn, d]));
 
   const params = new URLSearchParams(location.search);
-  // Defaults are the corpus's own contrast pair, so an empty `/compare` still shows the argument
-  // the page exists to make rather than a district against itself.
-  a.value = params.get("a") ?? "049056";
-  b.value = params.get("b") ?? "044933";
+  /*
+   * Defaults are the corpus's own contrast pair, so an empty `/compare` still shows the argument
+   * the page exists to make rather than a district against itself.
+   *
+   * Either side may arrive alone: every district page links here with its own IRN and no partner,
+   * which is the entry point that makes this route reachable at all. So the side that was not
+   * given falls back to whichever half of the pair the given one is *not* — otherwise a reader
+   * arriving from Northern Local's page lands on Northern Local against Northern Local, a table
+   * of "the same" in every row.
+   */
+  const POOR = "049056";
+  const RICH = "044933";
+  a.value = params.get("a") ?? (params.get("b") === POOR ? RICH : POOR);
+  b.value = params.get("b") ?? (a.value === RICH ? POOR : RICH);
   if (!byIrn.has(a.value)) a.value = panel.districts[0]!.irn;
   if (!byIrn.has(b.value)) b.value = panel.districts[1]?.irn ?? panel.districts[0]!.irn;
 

@@ -115,6 +115,21 @@ export const GET: APIRoute = () => {
   // the filename and on `/data` instead. What goes in the file is the table.
   const csv = [COLUMNS.join(","), ...rows.map((r) => r.join(","))].join("\n") + "\n";
 
+  /*
+   * These headers are documentation of intent, and the deploy gets them from somewhere else.
+   *
+   * `output` is `"static"`, so Astro takes this response's *body*, writes it to
+   * `dist/data/districts.csv`, and discards the headers — there is no server at request time to
+   * send them. They are kept here because they say what the file is, and because `astro dev` and
+   * `vite preview` do serve them, so a `Content-Disposition` typo is visible locally.
+   *
+   * What the deployed site actually sends is appended to `dist/_headers` by the
+   * `csv-download-headers` integration in `astro.config.mjs`, which reads the same
+   * `bundle.fiscal_year` this line does. The two agreeing is asserted against the built artefact
+   * in `tests/e2e/app.spec.ts`; before that integration existed the filename below reached
+   * nobody, and the comment above about provenance travelling in it was describing a
+   * `vite preview` session rather than the deploy.
+   */
   return new Response(csv, {
     headers: {
       "content-type": "text/csv; charset=utf-8",

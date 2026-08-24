@@ -121,15 +121,59 @@ test("no node writes the retired fourth mark, and the structure replaced it", ()
 test("no claim tag survives as literal brackets anywhere in the corpus", () => {
   // The property values are the ones that regressed: they do not go through the markdown
   // processor, so nothing else would have noticed.
+  //
+  // Code is stripped before the check rather than counted as a leak. A tag inside backticks is
+  // the author *naming* a mark rather than making a claim under it — `edchoice-expansion`'s
+  // `mechanism` says "So the earlier `[open]` here … is closed", referring back to a state this
+  // field used to be in — and badging that would assert the field is open when the sentence's
+  // whole point is that it no longer is. `badgeClaims` leaves code alone for that reason, so the
+  // brackets are supposed to be there and this is the one place they may be.
   const literal = /\[(verified|inference|open|unentered)\b/;
+  const withoutCode = (html: string) =>
+    html.replace(/<pre\b[^>]*>[\s\S]*?<\/pre>|<code\b[^>]*>[\s\S]*?<\/code>/gi, "");
   const leaked: string[] = [];
   for (const node of corpus.nodes) {
     for (const property of node.properties) {
       const html = renderPropertyValue(property.value, node.className);
-      if (literal.test(html)) leaked.push(`${node.id}#${property.name}`);
+      if (literal.test(withoutCode(html))) leaked.push(`${node.id}#${property.name}`);
     }
   }
   expect(leaked, "property values still printing a claim tag as brackets").toEqual([]);
+});
+
+test("a claim tag inside code is quoted rather than asserted", async () => {
+  /*
+   * The defect: `badgeClaims` had no code exclusion, so any `[verified]` inside a `<pre><code>`
+   * or a `<code>` was replaced by a styled `<span>`.
+   *
+   * Two things go wrong with that, and they are different failures. In a fenced block — every one
+   * in this corpus is an unlabelled ASCII table — the badge is not five characters wide, so the
+   * columns stop lining up and the table's only content is its alignment. Inline, the badge makes
+   * an assertion the sentence did not: `draft-legislation.ont.yml` describes a property as
+   * "`[unentered]` where it was not introduced", which is documentation of the vocabulary, and it
+   * rendered on `/wiki/draft-legislation` as a live claim badge.
+   */
+  const table = await renderProse(
+    "Prose with [verified] in it.\n\n```\n| field | mark        |\n| adm   | [verified]  |\n```\n",
+    "metric",
+  );
+  expect(table).toContain('<span class="claim verified">verified</span>');
+  expect(table).toContain("| adm   | [verified]  |");
+
+  const inline = await renderProse("`[unentered]` where it was not introduced. [open]", "metric");
+  expect(inline).toContain("<code>[unentered]</code>");
+  expect(shape(inline)).toContain("‹open›");
+
+  /*
+   * And the half that makes this an exclusion rather than a split: a claim's justification may
+   * contain code, so the `]` closing a tag opened in prose is often on the far side of a `<code>`
+   * element. A scanner that treated code as a boundary rather than as opaque would emit that `[`
+   * literally and swallow the rest — which is the shape the module docstring already lists as
+   * real, `[verified — [`ode-idea-part-b-allocations`](…)]`.
+   */
+  expect(shape(badgeClaims("[verified — <a href='/x'><code>ode-idea</code></a>]"))).toBe(
+    "‹verified›{<a href='/x'><code>ode-idea</code></a>}",
+  );
 });
 
 test("summarize keeps a link's label and drops only its target", () => {

@@ -15,7 +15,7 @@ import { loadCorpus } from "../../../lib/corpus.ts";
 import { sectionForClass } from "../../../lib/nav.ts";
 import { loadFeed } from "../../../lib/feed.ts";
 import { money } from "../../../lib/format.ts";
-import { renderProse, renderPropertyValue } from "../../../lib/prose.ts";
+import { renderProse, renderPropertyValue, summarize } from "../../../lib/prose.ts";
 import * as routes from "../../../lib/routes.ts";
 import SectionAnchor from "../../../components/SectionAnchor.astro";
 
@@ -83,13 +83,29 @@ const mentions = node.out.filter((edge) => !edge.stated);
 const draft = loadFeed().bundle.drafts.find((d) => d.slug === node.name);
 const unpriced = draft?.provisions.filter((p) => p.lever === "").length ?? 0;
 
+/*
+ * The `<meta name="description">`, cut to what a search result and a preview card actually show.
+ *
+ * `node.summary` went in whole. The corpus schema caps it at 450 characters, the longest in the
+ * corpus runs to 287, and 107 of the 117 nodes are over 200 — all well past the ~160 a result
+ * snippet renders. So the tail was cut by the search engine, mid-word, at a boundary nothing
+ * here chose. That is the exact defect `summarize` was written for: it cuts on a word boundary
+ * and only claims an elision when there was one. Every other wiki route already routes its
+ * description through it; this was the one that did not, and it is the largest family of pages
+ * on the site.
+ *
+ * 200 rather than 160, matching `/wiki/[class]`: a preview card shows more than a snippet does,
+ * and the extra words cost a reader of the snippet nothing.
+ */
+const metaDescription = summarize(node.summary, 200);
+
 const seeded = node.properties.find((p) => p.name === "seeded_because");
 const properties = node.properties.filter((p) => p.name !== "seeded_because");
 ---
 
 <Base
   title={node.label}
-  description={node.summary}
+  description={metaDescription}
   image={routes.og.wikiNode(node.className, node.name)}
   imageAlt={`${node.label}, a node in the Ohio school funding corpus`}
   section={sectionForClass(node.className)}
