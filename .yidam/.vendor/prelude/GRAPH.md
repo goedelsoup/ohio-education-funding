@@ -48,6 +48,274 @@ follow edges to traverse related knowledge.
 Edges are **directional** — the file containing the reference is the source node, the
 referenced file is the target. Bidirectional relationships require a reference in both files.
 
+## The class contract
+
+`<class>.ont.yml` is not documentation. It declares, per class, which properties an instance
+carries and which relationships it may enter into, and `yidam lint` checks every instance
+against it:
+
+| Check | Finding | Gates |
+|---|---|---|
+| `undeclared-property` | a property the class never declared | yes |
+| `property-type` | a value contradicting the declared `type` | yes |
+| `unlicensed-edge` | a relationship the class does not declare | only under `edge_policy: exhaustive` |
+| `edge-target-class` | an edge resolving to a node of the wrong class | yes |
+| `missing-property` | a declared property the instance omits | no — reported |
+
+The fourth is the one no other check could produce. `dangling-edge` catches an edge to
+nothing; an edge to the *wrong* thing resolves, traverses, and exports, and is simply false.
+
+**A `date` is accepted at the precision it is known to** — `YYYY`, `YYYY-MM`, or
+`YYYY-MM-DD`. What `property-type` catches in a date field is prose, and `1985` is not
+prose: it is the precision the fact is actually known to, and demanding a month and a day
+there does not make the record more accurate, it makes it invented. `last spring` and
+`[open] No date.` still fail.
+
+Two rules keep this honest, and both are about not over-reading the ontology.
+
+**Silence is not a contract**, read one field at a time. A class with no `properties:` has
+said nothing about properties and none are checked; a class with no `edges:` has said
+nothing about edges and none are licensed. Reading either silence as *and therefore none
+are permitted* would flood every corpus whose ontology is not filled in — which is the
+corpus with the least reason to trust its graph. The same rule decides which classes are
+source classes for `orphan-in`.
+
+**A non-empty `edges:` is not a contract either, and this is the part that was got wrong.**
+Naming the relationships a class enters into says *these exist*; on its own it never said
+*and no others may*. Reading it as the second put 210 errors on a derived corpus that coins
+precise single-use verbs on purpose — 107 distinct relationships across 18 classes, none of
+them a defect. `edge_policy:` is what makes the difference sayable:
+
+| `edge_policy:` | An undeclared relationship is |
+|---|---|
+| `exhaustive` | an **error**. The class closed its vocabulary and asked for this gate. |
+| `characteristic` | not reported. `edges:` names what the class is *defined by*, and a verb outside it is a deliberate coinage. |
+| *absent* | a **warning**. The typo case is real and worth seeing; gating on it would enforce a contract nobody wrote. |
+
+Declaring it is how a corpus that means `exhaustive` gets a gate it can rely on, and how one
+that means `characteristic` stops being told its own vocabulary is wrong. `characteristic`
+licenses an *undeclared* relationship and nothing more: where a **declared** one may land is
+still `edge-target-class`'s question, and that check does not read the policy at all.
+
+**Only edges between instances are licensed edges.** The `instance-of` link to
+`../<class>.ont.yml` and a citation into `catalog/` are not relationships and no class
+declares them, so the licensing checks read only links landing on another corpus instance.
+A link that resolves to nothing is `dangling-edge`'s finding and is not reported twice.
+
+### Properties every class may carry
+
+`.yidam/corpus/universal.yml` is the corpus speaking about itself rather than about one of
+its classes. It is absent from most corpora, and exists because two shapes were measured
+that no per-class declaration handles:
+
+```yaml
+properties:
+  - name: seeded_because
+    type: text
+    description: Why this node is in the corpus at all
+  - pattern: '^fy\d{4}(_\d{2})?_[a-z0-9_]+$'
+    type: text
+    description: A fiscal year's figures, pasted onto the node they describe
+```
+
+A `name:` is apparatus that applies to every class — declaring it per class would be sixteen
+copies of one decision, and a seventeenth class would silently not have it. A `pattern:` is a
+self-describing family: a fiscal-year snapshot recurs, so it is not a typo, but declaring
+each by name would mean editing an ontology every July to permit next year's. Between them
+these were 29 of one derived corpus's 29 `undeclared-property` findings.
+
+**Universal does not mean untyped.** `property-type` checks these exactly as it checks a
+class's own, and a class declaring the same name wins — the more specific statement about
+its own instances. `missing-property` never reports one, because *any class may carry it* is
+not *every instance does*. Anchor a pattern: an unanchored one licenses every name that
+merely contains a match, and `undeclared-property` is what catches the next real typo.
+
+This is deliberately **not** a property-side `edge_policy`. The corpus that needed it
+measured its property vocabulary at 94% declared against its relationships at 68%, and wants
+the property gate; what it lacked was a way to say that two specific shapes are apparatus
+rather than schema.
+
+`missing-property` reports and does not gate. The property declaration has no `required`
+field, so it cannot distinguish *every instance has this* from *an instance may have this* —
+and a node carrying no `claim_tag` is a real state, not a defect. Its siblings gate on
+something the ontology actually said being contradicted, and an omission contradicts
+nothing. `unlicensed-edge` sits between the two: it gates where the class said `exhaustive`,
+because there the ontology did make the statement being contradicted.
+
+### Published, not only enforced
+
+`yidam schema` compiles every `.ont.yml` into a JSON Schema at
+`.yidam/schemas/class/<class>.json` and maps it to `.yidam/corpus/<class>/*.yml`, so an
+editor validates an instance against *its own class* while you type — and so does any
+validator or CI step that never links against yidam.
+
+The compiled schema is **no stricter than the checks above**. Declared properties are typed
+but never `required`, because `missing-property` does not gate. The property bag is closed,
+because `undeclared-property` does — and every universal property is folded into it, by name
+or as `patternProperties`, so the editor accepts exactly what the gate accepts. A schema that
+stayed strict where the gate had relaxed would underline a field the build is happy with,
+which is the same drift arriving from the direction nobody watches. Relationships are published for completion under
+`x-yidam-edges` rather than constrained, because whether an edge is licensed depends on
+where its target resolves and no schema can see that.
+
+That symmetry is the point. A consumer that rejected what the gate accepts would fail a
+build on a file that looked fine everywhere else, and the ontology would get the blame.
+
+### Changing a class
+
+An ontology is only as good as its ability to change, and once the contract gates, editing
+a class definition in place breaks the corpus that adopted it: add a property and every
+instance trips `missing-property`, retype one and they trip `property-type`, re-target an
+edge and they trip `edge-target-class`. That is a strong incentive to leave a definition
+wrong.
+
+`yidam migrate` does both halves as one event:
+
+| Command | What it touches |
+|---|---|
+| `migrate class <old> <new>` | the class file, its directory, every instance's `class:`, the `instance-of` edge into the class file, and every edge declaring the class at either end |
+| `migrate property <class> <old> <new>` | the declaration, and the key on every instance carrying it |
+| `migrate retype <class> <prop> <type>` | the declaration — and **refuses** if any instance's value would not satisfy the new type |
+| `migrate edge <class> <rel> <target>` | the declaration at both ends, plus a report of the instances now in violation |
+
+`--dry-run` prints the plan and writes nothing.
+
+**A retype is refused rather than guessed.** `type: string` → `type: date` over a value
+reading `last spring` has no mechanical conversion, and writing it back unchanged while
+reporting success would leave the corpus in a state its own gate rejects. The predicate that
+decides is the one `property-type` gates on, so a migration that succeeds leaves a corpus
+`yidam lint` still accepts.
+
+**An edge re-target reports what it cannot decide.** Which instances should now point
+elsewhere is a question about the corpus, not about the ontology. The migration names every
+one of them; it does not repoint them.
+
+Each applied migration writes a record to `.yidam/migrations/` naming the operation, the
+files it rewrote, and any violations it left behind. That is the *mechanical* half of the
+event. The **argument** — why the class was wrong — belongs in `.yidam/decisions/`, and the
+two are meant to be read together: a record that also had to carry the reasoning would make
+`decisions-log` a list of two different kinds of thing.
+
+## Residence time
+
+A finding about corpus state has a level and, on its own, no clock — and the level cannot
+say the thing worth knowing. A node uncited for five commits is a sweep in progress and
+entirely healthy. A node uncited for two hundred is over-collection. The measurable quantity
+is **how long the condition has held**, not how bad it looks.
+
+So `orphan-in` reports both the commit its finding dates from and how long it has held:
+
+```text
+INFO [orphan-in] Node nothing points to — 2 finding(s)
+  .yidam/corpus/recording/scum.yml: nothing links to this node — uncited since 2026-03-04, 3 commit(s)
+  .yidam/corpus/concept/tailwater.yml: nothing links to this node — uncited since 2025-11-02, 214 commit(s)
+```
+
+**Commits, not days.** A day count is a function of when you ran the report, so the same
+corpus answers differently tomorrow and nothing can pin or cache it. A commit count is a
+function of `HEAD`. Only commits that touched `.yidam/corpus` are counted: a commit that
+changed nothing here could not have cited anything, so counting it would inflate every age
+in a repository that also holds code.
+
+The clock starts when the condition *began*, which is not the same as when the node was
+written. A node cited on the day it was authored and orphaned two hundred commits later
+dates from the orphaning — which is why this is a replay of the graph rather than a look at
+each file's age.
+
+### Reachability is per class, not a corpus rate
+
+`yidam replay` reports uncited nodes per class, against what the class declared:
+
+```text
+Uncited at HEAD, by class, against what the class declares
+  recording                 13 of 20   declared cited — this is the asymmetry worth reading
+  person                    12 of 12   uncited by design — the ontology holding
+  note                       3 of 5    the class declares no edges, so no expectation to read against
+```
+
+Three readings, and a single corpus-wide percentage sums them into one that means none of
+them. A source class at 12 of 12 is the model working. The same figure on a class declaring
+an inbound edge is the only one of the three that is a finding. A class that declared no
+edges is not being scored at all — and saying so beats printing nothing, which reads as a
+pass.
+
+The series keeps a percentage column because a trend needs one number per commit to be a
+trend. It counts the population `orphan-in` reports, so source classes are excluded from it
+— which is the difference between the 22% and the 7% the same corpus reads at, and why the
+column says what it is a percentage *of*.
+
+### Ageing into an error
+
+Residence time is what makes a corpus-state check gate-eligible at all. The commit checks
+must stay at Warn because history cannot be rewritten to fix a verb, so a gate on immutable
+state could only ever be noise. Corpus state is not immutable: an orphaned node can be
+linked or deleted today.
+
+A corpus may declare how long is too long, in `.yidam/config.toml`:
+
+```toml
+[lint]
+# Corpus-touching commits an aged finding may hold before it fails the build.
+escalate_after = 100
+```
+
+A finding that reaches it escalates to an error and gates; its younger siblings under the
+same check do not. **Absent, nothing ever escalates** — and that is the default. The right
+number depends on how fast this corpus is meant to consume what it collects, so a value
+compiled into the binary would be one repository's judgement arriving as a build failure in
+another that never agreed to it. Declaring it here keeps the argument for the number in the
+repository that has to live with it.
+
+An escalated finding is ordinary debt: `yidam lint --bless` records it like any other, and
+the gate is quiet until something new ages past the line.
+
+## The baseline, and its own clock
+
+`.yidam/lint-baseline.yml` records the error-severity findings that were already true when
+the gate was installed, so that the next one is attributable to the commit that introduced
+it. Two things about it are easy to get wrong, and both were measured going wrong.
+
+**A repository with no baseline has no ratchet.** Not a lenient one — none. `yidam lint`
+reports `no regression` on every commit, whatever the corpus does, because there is nothing
+to compare against. `mise run yidam-vendor-update` therefore runs `yidam lint
+--init-baseline`, which writes a baseline if and only if there is not one already. It is
+safe to run at any time and leaves an existing file untouched.
+
+**A baseline is a scheduled repayment, not a permanent exemption.** Each entry records
+`since` — the corpus commit at which it was *first* accepted — and the file may declare how
+long an entry stands:
+
+```yaml
+expire_after: 200        # corpus-touching commits an entry may survive
+violations:
+  dangling-edge:
+    - node: .yidam/corpus/concept/tailwater.yml
+      detail: 'target does not exist: ../concept/gone.yml'
+      since: 4f2a1c9…
+```
+
+Past that, the entry stops forgiving and the violation gates again. **Blessing does not
+reset the clock** — `since` is carried forward, so re-running `--bless` records new debt
+without forgiving old debt a second time. The two ways out of an expired entry are to fix
+the finding, or to raise `expire_after` and say in the commit message why this corpus needs
+longer than it said it did. That argument then lives in the repository, in a diff somebody
+reviews.
+
+Absent, entries never expire, which is where every baseline starts.
+
+### Two clocks, two questions
+
+They are named apart because they are different questions:
+
+| Declaration | Where | Asks |
+|---|---|---|
+| `escalate_after` | `.yidam/config.toml` | how long a **finding** may hold before it becomes an error |
+| `expire_after` | `.yidam/lint-baseline.yml` | how long an **accepted entry** may stand before it gates again |
+
+The first is about the corpus; the second is about the file that forgives it. A finding can
+escalate under the first, be blessed, and later expire under the second — and each step is
+a different thing having happened.
+
 ## Commits as events
 
 Not all commits carry the same kind of meaning. Two types coexist in every yidam-derived
