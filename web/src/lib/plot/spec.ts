@@ -86,7 +86,29 @@ type Nameable = { setAttribute: (name: string, value: string) => void };
  * is ARIA 1.3 and is not reliably announced yet, and a second sentence that may go unread is
  * worse than one that is certainly read, because nobody writing it would know.
  */
+/**
+ * Strip the labels Plot puts on its own mark groups.
+ *
+ * Plot writes `aria-label="bar"`, `aria-label="rule"`, `aria-label="text"` onto the `<g>` it wraps
+ * each mark in. On a `g` with no role that attribute is not permitted — `aria-label` needs a role
+ * that supports naming — so every chart on this site carried a handful of invalid ARIA, which is
+ * what `axe` reports as `aria-prohibited-attr`. It was also useless before it was invalid: the
+ * whole SVG is `role="img"`, so nothing inside it is exposed to be named, and "bar" is not a name
+ * for anything a reader wanted.
+ *
+ * Removed rather than given a role. A `g` per mark type is Plot's rendering structure, not the
+ * chart's meaning, and the meaning is the label on the graphic — see {@link Naming}.
+ */
+function stripPlotLabels(node: Element): void {
+  for (const group of node.querySelectorAll("g[aria-label]")) {
+    if (!group.hasAttribute("role")) group.removeAttribute("aria-label");
+  }
+}
+
 export function applyNaming(node: Nameable, naming: Naming): void {
+  // `Nameable` is deliberately the smallest surface this file needs, so the strip is guarded
+  // rather than assumed: `ssr.ts` and `client.ts` both hand over a real element.
+  if ("querySelectorAll" in node) stripPlotLabels(node as unknown as Element);
   if (naming === "presentational") {
     node.setAttribute("aria-hidden", "true");
     return;
