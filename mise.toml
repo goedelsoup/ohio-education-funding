@@ -148,21 +148,38 @@ run = [
 ]
 
 [tasks.generated]
-description = "Fail if the committed feed or any REGEN block is stale."
-# Both artifacts are committed and both are easy to forget. If either drifts the
-# repository is describing itself wrongly and nothing else would notice — which
-# is exactly what happened to the connector table and the corpus node count.
+description = "Fail if the committed feed, the figure manifest, or any REGEN block is stale."
+# All three artifacts are committed and all three are easy to forget. If any
+# drifts the repository is describing itself wrongly and nothing else would
+# notice — which is exactly what happened to the connector table and the corpus
+# node count.
+#
+# `crates/figures.json` is the corpus-to-crate cross-check's crate half (#131):
+# the figures a corpus node quotes, computed from the crates that own them. Stale
+# here means `//web:test-unit` is comparing this month's prose against last
+# month's calculators and calling it agreement.
 run = '''
 set -e
+stale() {
+  echo "error: $1 is stale." >&2
+  echo "  regenerate: $2" >&2
+  diff "$3" "$1" | head -40 >&2
+  exit 1
+}
 cargo run --quiet --manifest-path crates/Cargo.toml -p bundle > /tmp/edfund-bundle.json
 if ! diff -q /tmp/edfund-bundle.json web/public/data/bundle.json > /dev/null; then
-  echo "error: web/public/data/bundle.json is stale." >&2
-  echo "  regenerate: cargo run --manifest-path crates/Cargo.toml -p bundle > web/public/data/bundle.json" >&2
-  diff /tmp/edfund-bundle.json web/public/data/bundle.json | head -40 >&2
-  exit 1
+  stale web/public/data/bundle.json \
+    "cargo run --manifest-path crates/Cargo.toml -p bundle > web/public/data/bundle.json" \
+    /tmp/edfund-bundle.json
+fi
+cargo run --quiet --manifest-path crates/Cargo.toml -p figures > /tmp/edfund-figures.json
+if ! diff -q /tmp/edfund-figures.json crates/figures.json > /dev/null; then
+  stale crates/figures.json \
+    "cargo run --manifest-path crates/Cargo.toml -p figures > crates/figures.json" \
+    /tmp/edfund-figures.json
 fi
 cargo run --quiet --manifest-path crates/Cargo.toml -p connect --bin edfund-connect -- index --check
-echo "the feed and every REGEN block are current"
+echo "the feed, the figure manifest and every REGEN block are current"
 '''
 
 [tasks.deploy]

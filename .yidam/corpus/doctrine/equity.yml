@@ -266,6 +266,43 @@ properties:
     and whether wealth-neutrality should be measured against property alone or against
     property and income together — the question the Fair School Funding Plan answered by
     including both. [open]
+figures:
+  - key: dispersion/comparable-ohio-districts-fy2022
+    value: 611
+    field: findings
+    as_written: "Quartiling the 611 comparable Ohio districts by local revenue per pupil in FY2022"
+  - key: dispersion/poorest-quartile-local-revenue-per-pupil
+    value: 4341.74
+    field: findings
+    as_written: "Q1 poorest      $4,342"
+  - key: dispersion/richest-quartile-local-revenue-per-pupil
+    value: 13932.23
+    field: findings
+    as_written: "Q4 richest     $13,932"
+  - key: dispersion/local-revenue-gap-per-pupil
+    value: 9590.49
+    field: findings
+    as_written: "The local gap is **$9,590 per pupil**"
+  - key: dispersion/state-closes-of-the-local-gap
+    value: 4448.16
+    field: findings
+    as_written: "State equalization closes **$4,448 of it"
+  - key: dispersion/state-share-of-the-local-gap
+    value: 0.46380919
+    field: findings
+    as_written: "**$4,448 of it — 46%**"
+  - key: dispersion/federal-closes-of-the-local-gap
+    value: 913.29
+    field: findings
+    as_written: "closes **$913, or 9.5%**"
+  - key: dispersion/federal-share-of-the-local-gap
+    value: 0.09522844
+    field: findings
+    as_written: "**$913, or 9.5%**"
+  - key: dispersion/local-gap-left-open
+    value: 4229.04
+    field: findings
+    as_written: "**$4,229 per pupil of the gap survives both.**"
 links:
   - target: ../doctrine.ont.yml
     relationship: instance-of

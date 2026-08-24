@@ -113,6 +113,43 @@ the whole field was empty, which is worse than the badge it replaced.
 The counts below are generated. A hand count is what the audit did, and it answered the question
 once for a corpus that has been changing ever since.
 
+## `figures:` — the numbers a node quotes, bound to the crate that computes them
+
+`[verified — crates/regime-diff]` is hand-typed text, and nothing related it to
+`crates/regime-diff`. A correction's blast radius was therefore whichever files the author
+happened to open. That is not a hypothetical failure: the `recognized-valuation` correction
+reached **three of its six carriers**, and two `formula-component` nodes went on publishing a
+reversed sign on the headline distributional claim, live, under `[verified]`, while all 849 crate
+tests stayed green.
+
+A node now binds the number itself. `crates/figures` computes each figure from the public API of
+the crate that owns it and writes [`crates/figures.json`](../../crates/figures.json);
+`web/tests/unit/corpusFigures.spec.ts` asserts a three-way agreement between the manifest, the
+entry, and the sentence a reader sees.
+
+```yaml
+figures:
+  - key: regime-diff/charge-off-zeroes-base-cost-aid
+    value: 65
+    field: sensitivity
+    as_written: "65 of 606 districts"
+```
+
+**`as_written` is a phrase and not a numeral, and that is the leg worth having.** The reversal
+above was not a wrong number — it was the *same* two numerals attached to the opposite regimes. A
+numeral match passes that. `316 districts would have done better under the charge-off` stops being
+a substring the moment the sentence is turned around.
+
+**`revisions:` cannot be bound, on purpose.** A revision records what a node used to say, and this
+corpus is never rewritten to have always been right; a check that made a withdrawal track a moving
+figure would demand editing the record of a correction. The body restates the live figure and the
+body is what binds.
+
+**Roughly a fifth of the crate-attributed numeric claims are covered.** A figure is exportable when
+the crate computes it through public API; the rest live inside a test file on a fixture parser that
+test declares privately. The spec pins the bound count as a floor at its value rather than below
+it, so the coverage can only rise — see #131 for why a floor with slack in it is not a ratchet.
+
 ## Claim inventory
 
 <!-- REGEN: edfund-connect claim-audit
@@ -122,7 +159,7 @@ Fields: count per claim tag across every node; then the unresolved marks by the 
 -->
 | Tag | Count | What it records |
 |---|--:|---|
-| `[verified]` | 998 | supported by a committed primary source |
+| `[verified]` | 999 | supported by a committed primary source |
 | `[inference]` | 254 | drawn from verified facts, not witnessed |
 | `[open]` | 207 | a live question — unknown, contested, or being worked |
 | `[unentered]` | 0 | a knowable value nobody has typed in yet |

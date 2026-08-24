@@ -82,6 +82,27 @@ properties:
 unfilled:
   - field: an ESSER-specific series
     why: The federal channel is reported as one figure; separating it needs the allocation files, which no connector retrieves.
+figures:
+  - key: dispersion/comparable-ohio-districts-fy2022
+    value: 611
+    field: findings
+    as_written: "Quartiling the 611 comparable districts by local revenue per pupil in FY2022"
+  - key: dispersion/local-revenue-gap-per-pupil
+    value: 9590.49
+    field: findings
+    as_written: "The local gap between the top and bottom quartile is **$9,590 per pupil**"
+  - key: dispersion/state-closes-of-the-local-gap
+    value: 4448.16
+    field: findings
+    as_written: "State equalization closes **$4,448 of it"
+  - key: dispersion/federal-closes-of-the-local-gap
+    value: 913.29
+    field: findings
+    as_written: "The federal channel closes **$913, or 9.5%**"
+  - key: dispersion/local-gap-left-open
+    value: 4229.04
+    field: findings
+    as_written: "leave **$4,229 per pupil** of the local gap standing"
 links:
   - target: ../revenue-stream.ont.yml
     relationship: instance-of

@@ -181,6 +181,14 @@ export interface Node {
    * somebody's sentence. See `UnfilledSchema` in `schema/corpus.ts`.
    */
   unfilled: Unfilled[];
+  /**
+   * Numbers in this node's prose bound to the crate that computes them.
+   *
+   * The corpus's answer to a `[verified — crates/X]` that nothing relates to `crates/X`. Checked
+   * against `crates/figures.json` by `tests/unit/corpusFigures.spec.ts`; see `FigureSchema` in
+   * `schema/corpus.ts` for why an entry carries both a value and a phrase.
+   */
+  figures: BoundFigure[];
   /** Edges this node declares plus the ones it only mentions. */
   out: Edge[];
   /** Populated after every node is read. */
@@ -486,6 +494,7 @@ function readNode(className: string, file: string, report: Diagnostic[]): Node {
   const description = String(parsed.description ?? "");
   const revisions = readRevisions(parsed.revisions);
   const unfilled = readUnfilled(parsed.unfilled);
+  const figures = readFigures(parsed.figures);
   const rawLinks = parsed.links;
 
   report.push(...lintProse(relative, summary, description));
@@ -560,9 +569,47 @@ function readNode(className: string, file: string, report: Diagnostic[]): Node {
     findings: parsed.findings == null ? null : String(parsed.findings),
     revisions,
     unfilled,
+    figures,
     out: [...stated, ...inline],
     in: [],
   };
+}
+
+/** One number in this node's prose, bound to the crate that computes it. */
+export interface BoundFigure {
+  /** The `crates/figures.json` key. */
+  key: string;
+  /** What this node says the crate computes. */
+  value: number;
+  /** Which prose field carries it — `description`, `findings`, or a property name. */
+  field: string;
+  /** The phrase that field writes, verbatim. */
+  as_written: string;
+}
+
+/**
+ * The `figures:` block, read the same defensive way `unfilled:` and `revisions:` are.
+ *
+ * With one difference that matters: an entry missing `value` is **dropped**, not defaulted. A
+ * default of `0` would parse, bind, and then be compared against the manifest — where it would
+ * either fail with a message about the wrong thing or, for a figure that really is zero, pass. The
+ * schema is what rejects a malformed entry at build time; this decides only what a consumer sees,
+ * and what it must not see is an entry the author never wrote.
+ */
+function readFigures(raw: unknown): BoundFigure[] {
+  if (!Array.isArray(raw)) return [];
+  return raw.flatMap((entry) => {
+    if (typeof entry !== "object" || entry === null) return [];
+    const record = entry as Record<string, unknown>;
+    const text = (key: string): string =>
+      typeof record[key] === "string" ? (record[key] as string).trim() : "";
+    const key = text("key");
+    const field = text("field");
+    const as_written = text("as_written");
+    const value = record.value;
+    if (key === "" || field === "" || as_written === "" || typeof value !== "number") return [];
+    return [{ key, value, field, as_written }];
+  });
 }
 
 /** One thing a node does not hold. */

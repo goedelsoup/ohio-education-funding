@@ -132,6 +132,56 @@ export const UnfilledSchema = z
   })
   .strict();
 
+/**
+ * One number in this node's prose, bound to the crate that computes it.
+ *
+ * # What this is for
+ *
+ * `[verified — crates/regime-diff]` is hand-typed text. Nothing relates it to
+ * `crates/regime-diff`, so the blast radius of a correction is whichever files the author happened
+ * to open — which is how the `recognized-valuation` correction reached three of its six carriers
+ * while two nodes went on publishing a reversed sign under `[verified]`. See #120 and #131.
+ *
+ * A `figures:` entry is the missing edge. `crates/figures.json` carries each figure computed from
+ * the crate that owns it, and `tests/unit/corpusFigures.spec.ts` asserts a three-way agreement:
+ * the manifest, this entry, and the sentence a reader sees. Change the calculator and every node
+ * bound to that key goes red at once.
+ *
+ * # Why `value` as well as `as_written`
+ *
+ * They are two different claims and both have been wrong here before. `value` is what this node
+ * says the crate computes; `as_written` is what the page prints. #128 found seventeen numeric
+ * claims disagreeing with their source, and #118 found a sentence whose two halves were computed
+ * over different populations — the first is `value` against the manifest, the second is
+ * `as_written` against `value`. Collapsing them into one field would drop whichever check the
+ * remaining field did not make.
+ *
+ * # Why `as_written` is a phrase and not a number
+ *
+ * Because a bare numeral binds nothing. `316` appears in six places across three nodes, and the
+ * one thing the audit found there was two of them stating the *opposite* distributional claim with
+ * the same two numerals in it. A phrase — `316 districts would have done better under the
+ * charge-off` — has to survive verbatim, so swapping which regime the count belongs to breaks it
+ * where a numeral match would not.
+ */
+export const FigureSchema = z
+  .object({
+    /** The manifest key, `<crate-directory>/<what-it-is>`. */
+    key: z
+      .string()
+      .regex(
+        /^[a-z0-9-]+\/[a-z0-9-]+$/,
+        "a figure key is `<crate-directory>/<what-it-is>`, lower-case kebab",
+      ),
+    /** What this node says the crate computes. Compared against `crates/figures.json`. */
+    value: z.number(),
+    /** Which prose field carries it — `description`, `findings`, or a property name. */
+    field: z.string().min(1, "a figure names the field whose prose carries it"),
+    /** The phrase, verbatim, as that field writes it. */
+    as_written: z.string().min(1, "a figure quotes the phrase its field writes"),
+  })
+  .strict();
+
 /** What a `summary` may not be longer than, in words. See {@link NodeSchema}. */
 export const SUMMARY_MAX_WORDS = 50;
 
@@ -204,6 +254,7 @@ export const NodeSchema = z
     findings: z.string().optional(),
     revisions: z.array(RevisionSchema).optional(),
     unfilled: z.array(UnfilledSchema).optional(),
+    figures: z.array(FigureSchema).optional(),
   })
   .strict();
 

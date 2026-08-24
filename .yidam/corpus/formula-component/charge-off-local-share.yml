@@ -121,6 +121,27 @@ properties:
   calculator: |
     regime-diff (computes the local share and differences it against FSFP local capacity);
     millage supplies effective millage inputs.
+figures:
+  - key: regime-diff/districts-the-charge-off-pays-more
+    value: 316
+    field: findings
+    as_written: "316 of 606 districts would have done better under the charge-off"
+  - key: regime-diff/charge-off-districts-with-a-difference
+    value: 606
+    field: findings
+    as_written: "316 of 606 districts would have done better under the charge-off"
+  - key: regime-diff/districts-the-plan-pays-more
+    value: 290
+    field: findings
+    as_written: "290 do better under local capacity"
+  - key: regime-diff/median-shortfall-under-the-plan
+    value: 44.62
+    field: findings
+    as_written: "the median district is $45 per pupil worse off under the plan"
+  - key: regime-diff/charge-off-zeroes-base-cost-aid
+    value: 65
+    field: findings
+    as_written: "65 of 606 districts"
 links:
   - target: ../formula-component.ont.yml
     relationship: instance-of
