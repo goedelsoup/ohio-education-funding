@@ -70,8 +70,63 @@ body {
 /* Every section a fragment can name. Scoped rather than `[id]` so a form control or a chart's
    internal id does not acquire a scroll offset it has no use for. `.basis-scope` is in the list
    because a section shown in two dollar bases is addressed on the scope holding both panels
-   rather than on either of them. */
-.card[id], .basis-scope[id], h3[id] { scroll-margin-top: calc(var(--sticky-chrome) + .75rem); }
+   rather than on either of them.
+
+   `h2[id]` was missing, and it is the depth the corpus's own prose headings are placed at — 88
+   fragment targets across 37 pages, every one of which landed completely underneath the header.
+
+   `main[id]` is the skip link's target, and it needs this for exactly the same reason the others
+   do: a skip link that lands the reader under the chrome has skipped them past the top of the
+   content. The end-to-end test for the link found this rather than a reading of the rule. */
+.card[id], .basis-scope[id], h2[id], h3[id], main[id] {
+  scroll-margin-top: calc(var(--sticky-chrome) + .75rem);
+}
+
+/*
+ * And the same offset for anything focus can land on.
+ *
+ * `--sticky-chrome` was measured for fragment links and spent only on them. A browser scrolls a
+ * focused element into view with exactly the same arithmetic and the same header in the way, so a
+ * reader tabbing down a long page lost every control that happened to be near the top of the
+ * viewport underneath it — the affordance is reached, and cannot be seen.
+ *
+ * Broad on purpose: the set of things focus reaches is not a list this stylesheet can keep, and a
+ * scroll margin on something that is never scrolled to costs nothing.
+ */
+a[href], button, input, select, textarea, summary, [tabindex] {
+  scroll-margin-top: calc(var(--sticky-chrome) + .75rem);
+}
+
+/*
+ * Past the header, before the bar.
+ *
+ * Off-screen until focused rather than `display: none`, which would take it out of the tab order
+ * and leave the page exactly as it was. `top` clears the sticky header when it appears, so the
+ * one control whose whole purpose is to be reached by a keyboard is not the one that lands under
+ * it.
+ */
+.skip {
+  position: absolute;
+  left: .75rem;
+  top: -4rem;
+  z-index: 10;
+  padding: .5rem .8rem;
+  background: var(--surface-2);
+  color: var(--text-primary);
+  border: 1px solid var(--border-control);
+  border-radius: 7px;
+  font-size: .88rem;
+  text-decoration: none;
+  transition: top .12s ease;
+}
+.skip:focus-visible {
+  top: .75rem;
+  outline: 2px solid var(--series-formula);
+  outline-offset: 2px;
+}
+@media (prefers-reduced-motion: reduce) {
+  .skip { transition: none; }
+}
 
 /* The site chrome. Sticky, because the district sub-navigation below it is how a reader moves
    between the five views of one district and a long finances table should not strand them. */
@@ -253,7 +308,7 @@ td.year { font-family: var(--font-mono); color: var(--text-annotation); white-sp
 .ghost {
   font: inherit;
   background: none;
-  border: 1px solid var(--border);
+  border: 1px solid var(--border-control);
   border-radius: 999px;
   color: var(--text-secondary);
   cursor: pointer;
@@ -296,7 +351,7 @@ a:hover { text-decoration-color: currentColor; }
   font-size: .85rem;
   padding: .4rem .8rem;
   border-radius: 7px;
-  border: 1px solid var(--border);
+  border: 1px solid var(--border-control);
   background: var(--surface-1);
   color: var(--text-secondary);
   text-decoration: none;
@@ -321,7 +376,7 @@ a:hover { text-decoration-color: currentColor; }
   font-size: .8rem;
   padding: .3rem .7rem;
   border-radius: 999px;
-  border: 1px solid var(--border);
+  border: 1px solid var(--border-control);
   background: var(--surface-2);
   color: var(--text-secondary);
   cursor: pointer;
@@ -451,7 +506,7 @@ h3 { font-size: .82rem; margin: 1.4rem 0 .6rem; color: var(--text-secondary); fo
   letter-spacing: .01em;
   color: var(--text-muted);
   background: none;
-  border: 1px solid var(--border);
+  border: 1px solid var(--border-control);
   border-radius: 999px;
   padding: .1rem .45rem;
   white-space: nowrap;
@@ -623,12 +678,18 @@ h3 { font-size: .82rem; margin: 1.4rem 0 .6rem; color: var(--text-secondary); fo
 }
 
 label { display: block; font-size: .8rem; color: var(--text-secondary); margin-bottom: .35rem; }
-select, input[type="range"] {
+/*
+ * A control's boundary is what says where the control is, so it answers to 1.4.11 rather than to
+ * the eye. `--border` is the site's hairline — card edges, table rules — and at 1.34:1 light and
+ * 1.40:1 dark it is right for those and nowhere near the 3:1 a UI component boundary needs.
+ * `--border-control` is that same neutral taken to 3.0:1 against both surfaces a control sits on.
+ */
+select, input[type="range"], input[type="text"], input[type="search"], textarea {
   width: 100%;
   font: inherit;
   color: var(--text-primary);
   background: var(--surface-2);
-  border: 1px solid var(--border);
+  border: 1px solid var(--border-control);
   border-radius: 7px;
   padding: .5rem .6rem;
 }
@@ -641,7 +702,7 @@ output { font-variant-numeric: tabular-nums; color: var(--text-primary); font-we
   font: inherit;
   padding: .45rem .85rem;
   border-radius: 7px;
-  border: 1px solid var(--border);
+  border: 1px solid var(--border-control);
   background: var(--surface-1);
   color: var(--text-secondary);
   cursor: pointer;
@@ -679,7 +740,7 @@ output { font-variant-numeric: tabular-nums; color: var(--text-primary); font-we
 .sw.ordinal-3 { background: var(--ordinal-3); }
 
 .flags { display: flex; gap: .4rem; flex-wrap: wrap; margin-top: .9rem; }
-.flag { font-size: .76rem; padding: .2rem .5rem; border-radius: 999px; border: 1px solid var(--border); color: var(--text-secondary); background: var(--surface-2); }
+.flag { font-size: .76rem; padding: .2rem .5rem; border-radius: 999px; border: 1px solid var(--border-control); color: var(--text-secondary); background: var(--surface-2); }
 
 /*
  * What is on this page, above the sections it lists.
@@ -928,7 +989,7 @@ svg.plot:focus-visible { outline: 2px solid var(--series-formula); outline-offse
   font-size: .8rem;
   padding: .3rem .7rem;
   border-radius: 999px;
-  border: 1px solid var(--border);
+  border: 1px solid var(--border-control);
   background: var(--surface-2);
   color: var(--text-secondary);
   cursor: pointer;
@@ -1122,6 +1183,9 @@ h1.slug-title {
 }
 .claim.verified { color: var(--claim-verified); border-bottom-style: solid; }
 .claim.inference { color: var(--claim-inference); border-bottom-style: dashed; }
+/* `--claim-open` was #c2521c and measured 4.00:1 on `--surface-2`, under the 4.5:1 text of this
+   size needs. Solved the way the series text pair was: OKLab hue and chroma held to the tenth of a
+   degree, lightness moved until the worst of the three grounds clears — 4.52:1 at #b8490e. */
 .claim.open { color: var(--claim-open); border-bottom-style: dotted; }
 /*
  * The justification, which is often a whole clause: "verified — the enrolled act".

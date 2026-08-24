@@ -25,6 +25,20 @@
   --surface-1: #fcfcfb;
   --surface-2: #eeeeea;
   --border: #dcdcd6;
+  /*
+   * The boundary of something a reader operates, which is a different requirement from a hairline.
+   *
+   * `--border` is right for a card edge and a table rule and answers to nothing but the eye. The
+   * edge of a select, a tab or a toggle is what says where the control *is*, and WCAG 1.4.11 asks
+   * 3:1 of it against what it sits on. `--border` measures 1.34:1 against `--surface-1` and 1.18:1
+   * against `--surface-2` in light, 1.40 and 1.28 in dark — so every form control on this site had
+   * a boundary at roughly half the required contrast in both themes.
+   *
+   * The same warm neutral, moved until it clears 3:1 against BOTH surfaces a control sits on: 3.43
+   * and 3.02 here, 3.30 and 3.02 dark. Solved rather than picked, and `stylesheet.spec.ts` runs
+   * the arithmetic so it stays solved.
+   */
+  --border-control: #898983;
   --accent-rule: #c9c8c1;
 
   /*
@@ -117,7 +131,7 @@
    */
   --claim-verified: #1c6bc9;
   --claim-inference: #5c5b56;
-  --claim-open: #c2521c;
+  --claim-open: #b8490e;
 
   /*
    * Semantic aliases. Prefer these in component CSS; the base values above are for the palette.
@@ -168,6 +182,7 @@
   --surface-1: #1a1a19;
   --surface-2: #222220;
   --border: #35342f;
+  --border-control: #6c6c66;
   --accent-rule: #45443e;
   --text-primary: #ffffff;
   --text-secondary: #c3c2b7;
@@ -193,6 +208,7 @@
   --surface-1: #fcfcfb;
   --surface-2: #eeeeea;
   --border: #dcdcd6;
+  --border-control: #898983;
   --accent-rule: #c9c8c1;
   --text-primary: #0b0b0b;
   --text-secondary: #52514e;
@@ -207,7 +223,7 @@
   --ordinal-3: #123f75;
   --claim-verified: #1c6bc9;
   --claim-inference: #5c5b56;
-  --claim-open: #c2521c;
+  --claim-open: #b8490e;
 }
 
 /* An explicit dark choice, over a light OS setting. */
@@ -217,6 +233,7 @@
   --surface-1: #1a1a19;
   --surface-2: #222220;
   --border: #35342f;
+  --border-control: #6c6c66;
   --accent-rule: #45443e;
   --text-primary: #ffffff;
   --text-secondary: #c3c2b7;
@@ -259,6 +276,7 @@
   --surface-1: #fcfcfb;
   --surface-2: #eeeeea;
   --border: #dcdcd6;
+  --border-control: #898983;
   --accent-rule: #c9c8c1;
   --text-primary: #0b0b0b;
   --text-secondary: #52514e;
@@ -273,6 +291,6 @@
   --ordinal-3: #123f75;
   --claim-verified: #1c6bc9;
   --claim-inference: #5c5b56;
-  --claim-open: #c2521c;
+  --claim-open: #b8490e;
   }
 }

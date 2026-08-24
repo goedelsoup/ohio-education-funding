@@ -9,7 +9,7 @@
  * already reads correctly without them.
  */
 import { contentsOf, withContents } from "../lib/contents.ts";
-import { nameScrollers } from "../lib/scrollers.ts";
+import { applySemantics } from "../lib/semantics.ts";
 import { loadFeed } from "../lib/feed.ts";
 import { nav, type Section } from "../lib/nav.ts";
 import { canonicalPath, og } from "../lib/routes.ts";
@@ -157,14 +157,15 @@ const forecasts = verification.forecasts.length;
 const rendered = await Astro.slots.render("default");
 const listed = contents ? withContents(rendered, contentsOf(rendered)) : rendered;
 /*
- * And the sideways-scrolling tables, made reachable by a keyboard and named from the heading they
- * sit under — see `scrollers.ts` for why that is read off the page rather than written beside each
- * of the seventy call sites.
+ * What the markup means, decided where the whole body is in hand: which cell heads which row, what
+ * each scrolling box is called, and how deep the corpus's own headings sit in the page they were
+ * placed into. See `semantics.ts` for why each of those is a property of the document rather than
+ * of the renderer that wrote a piece of it.
  *
- * After the contents list, so the list is walked too: it is not a table and is left alone, but the
- * ordering is what makes that a fact about this file rather than a coincidence.
+ * After the contents list, so the list is walked too, and after `contentsOf` has read the headings
+ * — that reads what the corpus authored, and this is what places it.
  */
-const body = nameScrollers(listed).html;
+const body = applySemantics(listed).html;
 ---
 
 <!doctype html>
@@ -221,6 +222,18 @@ const body = nameScrollers(listed).html;
     }
   </head>
   <body>
+    {/*
+      The first thing in the document, and the first thing a keyboard reaches.
+
+      There was none. Every page opens with a header carrying a brand link and five section
+      disclosures, so a reader moving by keyboard passed six controls before the content on every
+      page of the site, and a reader using a screen reader heard the whole bar again on each. It is
+      the oldest affordance on the web and this site did not have it.
+
+      Visible only on focus, which is what makes it free for everyone else — see `.skip` in
+      `app.css`, where it is also placed clear of the sticky header it would otherwise land under.
+    */}
+    <a class="skip" href="#main">Skip to content</a>
     <header class="site">
       <div class="site-inner">
         <a class="brand" href="/">Ohio school funding</a>
@@ -270,7 +283,7 @@ const body = nameScrollers(listed).html;
       </div>
     </header>
 
-    <main class={wide ? "wrap wide" : "wrap"}>
+    <main id="main" class={wide ? "wrap wide" : "wrap"}>
       <Fragment set:html={body} />
     </main>
 

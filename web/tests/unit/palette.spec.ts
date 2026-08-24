@@ -95,6 +95,48 @@ describe("the categorical pair", () => {
   });
 });
 
+describe("the boundary of a control", () => {
+  /*
+   * A different requirement from a hairline, and it was being met with one.
+   *
+   * `--border` draws card edges and table rules, where the eye is the only judge. It also drew
+   * every select, tab, toggle and pill on the site — and the edge of a control is what says where
+   * the control *is*, which WCAG 1.4.11 asks 3:1 of against its surround. `--border` measures
+   * 1.34:1 against `--surface-1` and 1.18:1 against `--surface-2` in light, 1.40 and 1.28 in dark:
+   * roughly half, in both themes, on every form control the site has.
+   *
+   * Both surfaces, because a control sits on the inset ground inside a card that sits on the page
+   * ground, and its boundary is against both.
+   */
+  test("clears 3:1 against both surfaces a control sits on, in both modes", () => {
+    for (const mode of ["light", "dark"] as const) {
+      const tokens = PALETTE[mode].tokens;
+      const edge = tokens.get("--border-control");
+      expect(edge, `--border-control is not declared in the ${mode} palette`).toBeTruthy();
+      for (const surface of ["--surface-1", "--surface-2"] as const) {
+        const ground = tokens.get(surface)!;
+        expect(
+          contrast(parseHex(edge!), parseHex(ground)),
+          `${mode} --border-control on ${surface}`,
+        ).toBeGreaterThanOrEqual(3);
+      }
+    }
+  });
+
+  test("the hairline is left alone, and is still the thing that failed", () => {
+    // Stated rather than assumed: this is why there are two tokens and not one darkened one. A
+    // `--border` at 3:1 would put a control's boundary on every card edge and table rule on the
+    // site, which is a different design and not the one being asked for.
+    for (const mode of ["light", "dark"] as const) {
+      const tokens = PALETTE[mode].tokens;
+      expect(
+        contrast(parseHex(tokens.get("--border")!), parseHex(tokens.get("--surface-1")!)),
+        `${mode} --border is a hairline`,
+      ).toBeLessThan(3);
+    }
+  });
+});
+
 describe("the three-step ordinal ramp", () => {
   /**
    * The floor is the ramp's own measured worst, less a point of slack.

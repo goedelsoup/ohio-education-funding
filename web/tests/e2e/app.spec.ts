@@ -15,6 +15,7 @@
 import { existsSync, readFileSync, readdirSync } from "node:fs";
 import { join } from "node:path";
 
+import AxeBuilder from "@axe-core/playwright";
 import { expect, test, type Locator, type Page } from "@playwright/test";
 
 import { REQUIRED_CONTRACT } from "../../src/lib/types.ts";
@@ -1528,6 +1529,188 @@ test.describe("announcing what changed", () => {
     await expect(radios.first()).toHaveAttribute("aria-label", /Nominal/);
     await expect(radios.nth(1)).toHaveAttribute("aria-label", /Constant dollars/);
   });
+});
+
+/*
+ * What a document means, rather than what it looks like.
+ *
+ * The structural baseline here was already strong — across 3,487 pages, zero unlabelled form
+ * controls, zero images without `alt`, zero duplicate ids, zero positive `tabindex`. These are the
+ * layer above it, and the reason none of them were caught is at the foot of this block: a
+ * 245-test suite with no automated accessibility assertion in it.
+ */
+test.describe("document semantics", () => {
+  const DIST = join(import.meta.dirname, "../../dist");
+  const walk = (dir: string): string[] =>
+    readdirSync(dir, { withFileTypes: true }).flatMap((entry) =>
+      entry.isDirectory()
+        ? walk(join(dir, entry.name))
+        : entry.name.endsWith(".html")
+          ? [join(dir, entry.name)]
+          : [],
+    );
+
+  test("every header cell in the build says what it heads", () => {
+    /*
+     * 13,164 two-axis tables across 2,074 pages carried no `scope`, and `/districts` was the only
+     * table on the site that did. Without it a screen reader cannot associate a cell with its row
+     * and its column, which is most of what makes a data table readable without sight — and this
+     * site is substantially data tables.
+     *
+     * Over the artefact rather than a page at a time, because the treatment is applied in the
+     * layout and so reaches routes no test visits.
+     */
+    let scoped = 0;
+    const bare: string[] = [];
+    for (const file of walk(DIST)) {
+      const page = readFileSync(file, "utf8");
+      for (const table of page.matchAll(/<table\b[\s\S]*?<\/table>/g)) {
+        for (const cell of (table[0] ?? "").matchAll(/<th\b([^>]*)>/g)) {
+          if (/\sscope="(col|row|colgroup|rowgroup)"/.test(cell[1] ?? "")) scoped += 1;
+          else bare.push(`${file.slice(DIST.length + 1)}: ${cell[0]}`);
+        }
+      }
+    }
+    expect(scoped, "the build carries header cells at all").toBeGreaterThan(100_000);
+    expect(bare.slice(0, 5), "a header cell that does not say what it heads").toEqual([]);
+  });
+
+  test("no page skips a heading level", () => {
+    /*
+     * 32 wiki node pages went from `<h1>` straight to `<h3>`: a corpus field is written with `##`
+     * and `###` and the processor renders it at the depth it was authored at. The corpus is right
+     * to author that way — its author is dividing an argument, not choosing a position in a page
+     * they cannot see — so the renderer is what places it. See `levelHeadings`.
+     */
+    const skipped: string[] = [];
+    for (const file of walk(DIST)) {
+      const page = readFileSync(file, "utf8");
+      const main = page.slice(page.indexOf("<main"), page.indexOf("</main>"));
+      const levels = [...main.matchAll(/<h([1-6])\b/g)].map((m) => Number(m[1]));
+      for (let i = 1; i < levels.length; i += 1) {
+        if (levels[i]! > levels[i - 1]! + 1) {
+          skipped.push(`${file.slice(DIST.length + 1)}: h${levels[i - 1]} to h${levels[i]}`);
+          break;
+        }
+      }
+    }
+    expect(skipped.slice(0, 5)).toEqual([]);
+  });
+
+  test("the first thing a keyboard reaches is a way past the bar", async ({ page }) => {
+    /*
+     * There was no skip link anywhere on the site. Every page opens with a header carrying a brand
+     * link and five section disclosures, so a keyboard reader passed six controls before the
+     * content on every page, and a screen-reader reader heard the whole bar again on each.
+     */
+    await page.goto(`/district/${CLEVELAND}`);
+    await page.keyboard.press("Tab");
+    const first = page.locator(":focus");
+    await expect(first).toHaveClass(/skip/);
+    // Off-screen until focused, and on screen once it is — `display: none` would take it out of
+    // the tab order and leave the page exactly as it was.
+    await expect(first).toBeVisible();
+
+    await first.press("Enter");
+    expect(await page.evaluate(() => location.hash)).toBe("#main");
+    // And it lands clear of the sticky header rather than under it.
+    const top = await page.locator("#main").evaluate((el) => el.getBoundingClientRect().top);
+    expect(top, "the content starts below the chrome, not beneath it").toBeGreaterThan(0);
+  });
+
+  test("a fragment target lands clear of the header, prose headings included", async ({ page }) => {
+    /*
+     * `--sticky-chrome` is measured per breakpoint and was spent on `.card[id]`, `.basis-scope[id]`
+     * and `h3[id]`. The corpus's own prose headings render at `h2`, and 88 of them across 37 pages
+     * were fragment targets that landed completely underneath the header.
+     */
+    await page.goto("/wiki/doctrine/equity");
+    const ids = await page.locator("#description h2[id]").evaluateAll((nodes) =>
+      nodes.slice(0, 3).map((n) => n.id),
+    );
+    expect(ids.length, "the page has prose headings to address").toBeGreaterThan(0);
+    for (const id of ids) {
+      await page.goto(`/wiki/doctrine/equity#${id}`);
+      // An attribute selector, not `#id`: these ids come from heading text and carry characters a
+      // bare fragment selector will not take.
+      const top = await page
+        .locator(`[id="${id}"]`)
+        .evaluate((el) => el.getBoundingClientRect().top);
+      expect(top, `#${id} lands under the header`).toBeGreaterThan(0);
+    }
+  });
+
+  test("a focused control is not scrolled under the header", async ({ page }) => {
+    // The same measured offset, which had been spent only on fragment links. A browser scrolls a
+    // focused element into view with the same arithmetic and the same header in the way.
+    await page.goto("/districts");
+    const button = page.locator('#district-table thead button[data-sort="aid"]');
+    await page.evaluate(() => window.scrollTo(0, 2000));
+    await button.focus();
+    const box = await button.evaluate((el) => el.getBoundingClientRect().top);
+    const chrome = await page.evaluate(() =>
+      Number.parseFloat(getComputedStyle(document.documentElement).getPropertyValue("--sticky-chrome")),
+    );
+    expect(box, "focus landed under the sticky header").toBeGreaterThanOrEqual(chrome);
+  });
+});
+
+/*
+ * The check that would have caught the four issues this suite has just grown assertions for.
+ *
+ * A 245-test Playwright suite with no automated accessibility assertion in it is how 13,164
+ * unscoped tables, 12,449 mouse-only chips and 7,605 unnamed charts all shipped green. `axe` is
+ * not a substitute for the specific assertions above — it cannot know that a chip's reckoning
+ * matters or that a chart is drawn twice — but it holds the whole floor those sit on, and it holds
+ * it on routes nobody thought to write a test for.
+ *
+ * One representative page per route family rather than all 3,487: the families differ in what they
+ * render, and pages within a family differ only in their figures.
+ */
+test.describe("axe", () => {
+  const FAMILIES = [
+    ["the front door", "/"],
+    ["the statewide panel", "/statewide"],
+    ["the district index, which is the one table with controls over it", "/districts"],
+    ["a district dashboard", `/district/${CLEVELAND}`],
+    ["a district's finances, which is where the basis switch is", `/district/${CLEVELAND}/finances`],
+    ["a district's outcomes", `/district/${CLEVELAND}/outcome`],
+    ["a district's taxes", `/district/${CLEVELAND}/taxes`],
+    ["the scenario runner, which rewrites itself", "/scenario"],
+    ["the comparison", `/compare?a=${CLEVELAND}&b=${NORTHERN}`],
+    ["a county", "/county/cuyahoga"],
+    ["the counties index", "/counties"],
+    ["outcomes", "/outcomes"],
+    ["the method note", "/method"],
+    ["history", "/history"],
+    ["legislation", "/legislation"],
+    ["a wiki node, which is where the corpus's own prose renders", "/wiki/doctrine/equity"],
+    ["a decision record", "/wiki/decision/the-order-was-never-the-states"],
+    ["a legislative seat", "/house/1"],
+    ["the data page", "/data"],
+    ["the 404", "/404"],
+  ] as const;
+
+  for (const [what, route] of FAMILIES) {
+    test(`${what} has no violation axe can name`, async ({ page }) => {
+      await page.goto(route);
+      // The scenario and comparison routes compute in the browser; scanning before they have
+      // rendered would be scanning an empty container and calling it clean.
+      if (route.startsWith("/scenario")) {
+        await expect(page.locator("#scenario-out .tile, #scenario-out .card")).not.toHaveCount(0);
+      }
+      if (route.startsWith("/compare")) await expect(page.locator("#compare-out table")).toBeVisible();
+
+      const { violations } = await new AxeBuilder({ page })
+        .withTags(["wcag2a", "wcag2aa", "wcag21a", "wcag21aa"])
+        .analyze();
+
+      expect(
+        violations.map((v) => `${v.id} (${v.nodes.length}): ${v.help}`),
+        `${route}`,
+      ).toEqual([]);
+    });
+  }
 });
 
 test.describe("the section menus", () => {
