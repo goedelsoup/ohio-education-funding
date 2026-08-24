@@ -174,14 +174,18 @@ four kinds are **permanent**:
   `program/*.appropriation_line` are in this class.
 - **`revisions:` is deliberately unbindable**, for the reason given above.
 
-`crates/project`'s supplements, gifted identification and guarantee-against-achievement findings
-are bound. What is left there is the **appropriation ledger** — the proration remainder, the
-lottery substitution, the casino series and the draft runs — which computes through library API
-and is a matter of reaching for the right function rather than of anything being blocked.
+The **appropriation ledger** is bound too — the proration remainder, the lottery substitution, the
+casino series, the noise floor the substitution argument rests on, and both draft runs. That
+cluster needed the same move #157 made: LSC's redbook and greenbook had three private row parsers
+across three test files and no public one, and two of the three anchored a table differently. They
+read through `project::budget_analysis` now.
+
+What is left is `crates/bundle`'s statewide aggregates and the exemplar districts' own figures,
+neither of which is blocked.
 
 ### What binding a figure has cost so far
 
-Seven live claims turned out to be wrong, every one of them under `[verified]`, and none was
+Eight live claims turned out to be wrong, every one of them under `[verified]`, and none was
 reachable before the readers were made public. They are worth listing because the pattern is the
 same each time — a test standing behind the claim asserted a **bound** where the prose asserted a
 **value**:
@@ -195,11 +199,19 @@ same each time — a test standing behind the claim asserted a **bound** where t
 | `fsfp-performance-supplement` | the whole quintile table, `2.3` | `2.56` | `ratio > 2.0` |
 | `fsfp-enrolment-supplements` | `Two other districts` | three | nothing |
 | `temporary-transitional-aid-guarantee` | `89.9` | `89.85` | nothing |
+| `casino-tax-distribution` | `seventh smallest` (of two years) | eleventh and seventh | `moved < largest / 2.0` |
 
-The last is not a transcription error but a **definition** one: the median was taken as the upper
-of the two middle observations where `dispersion::median` averages them, which is the same local
-median this workspace has now corrected in four files. A figure computed by hand beside a test
-that does not compute it is the thing this mechanism is for.
+Two of the eight are not transcription errors but **definition** ones. The guarantee's median index
+was taken as the upper of the two middle observations where `dispersion::median` averages them —
+the same local median this workspace has now corrected in five files. And the casino node's noise
+floor is the reverse case, the only one so far where the corpus was right and the crate was not:
+the node publishes the $236 million median that `dispersion::median` gives, the test standing
+behind it computed $252 million from the upper-of-two, and the assertion was
+`(200_000_000.0..300_000_000.0).contains(&median)`, which holds both.
+
+A figure computed by hand beside a test that does not compute it is the thing this mechanism is
+for — and so is a figure computed twice, by two definitions, with a band wide enough to hide the
+difference.
 
 ## Claim inventory
 

@@ -59,11 +59,11 @@ test("every bound figure in the corpus agrees with the crate it cites", () => {
  * node from dropping a `figures:` entry to make a red gate green.
  */
 test("the corpus binds no fewer figures than it did", () => {
-  expect(bindings.length, "113 bindings; raise this when you add one").toBeGreaterThanOrEqual(113);
+  expect(bindings.length, "152 bindings; raise this when you add one").toBeGreaterThanOrEqual(152);
   expect(
     corpus.nodes.filter((node) => node.figures.length > 0).length,
-    "16 nodes carry bindings; raise this when a seventeenth does",
-  ).toBeGreaterThanOrEqual(16);
+    "23 nodes carry bindings; raise this when a twenty-fourth does",
+  ).toBeGreaterThanOrEqual(23);
   expect(
     new Set(bindings.map((binding) => binding.key)).size,
     "every figure the manifest exports is bound by some node",

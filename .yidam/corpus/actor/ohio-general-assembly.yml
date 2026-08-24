@@ -27,7 +27,7 @@ description: |
 
   The reason is structural rather than administrative: school districts and House districts do
   not nest. **339 of Ohio's 609 school districts have population in two or more of the 99 House
-  districts**, and Columbus City has population in eleven. [verified — computed from Census
+  districts**, and Columbus City has population in 11. [verified — computed from Census
   block geography] County can be an attribution, because the department assigns each district
   exactly one; a legislative district cannot be, because most districts genuinely lie in
   several.
@@ -57,6 +57,19 @@ findings: |
   represents, and how many of those districts are on the guarantee. What it cannot support is
   any statement about a district's entitlement, which is exact and belongs to the district.
   [verified]
+figures:
+  - key: project/school-districts-in-two-or-more-house-districts
+    value: 339
+    field: description
+    as_written: "**339 of Ohio's 609 school districts have population in two or more of the 99 House\n  districts**"
+  - key: project/house-districts-columbus-city-reaches
+    value: 11
+    field: description
+    as_written: "Columbus City has population in 11"
+  - key: project/ohio-under-eighteen-share
+    value: 0.21968677707056486
+    field: description
+    as_written: "Ohio is 22.0% under 18 statewide"
 revisions:
   - was: |
       "The two chambers disagree by **$0.97** and each sits $1-2 above the statewide figure."

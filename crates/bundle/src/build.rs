@@ -55,7 +55,7 @@ use dispersion::profile::ProfileDistrict;
 use dispersion::{partial_correlation, wealth_neutrality};
 use edfund_core::{AgencyType, FiscalYear};
 use foundation::{aggregate_base_cost, StatewideFactors};
-use project::appropriations;
+use project::appropriations::{self, FOUNDATION_LINES};
 use project::drafts::Lever;
 use project::finances::{finances, for_district, Finances};
 use project::legislative_district::{legislative_districts, overlaps, Chamber};
@@ -1040,23 +1040,10 @@ fn appropriation_block() -> Vec<AppropriationYear> {
         .collect()
 }
 
-/// The lines the formula itself is paid from, across the renumbering in the middle of the series.
-///
-/// `200550` and `200612` are both titled `Foundation Funding` and are the GRF and Lottery Profits
-/// halves of it today. `200501` is the same GRF money before FY2006, when it was titled `Base Cost
-/// Funding` — the Catalog records `200550` as "originally established by Am. Sub. H.B. 66 of the
-/// 126th G.A.", the FY2006-07 act, which is exactly where the number changes.
-///
-/// **Summing all three is safe and was checked rather than assumed.** The two GRF lines appear
-/// together in FY2006-FY2011, which looks like double counting and is not: `200501` is carried at
-/// exactly $0.00 in every one of those years, a discontinued line the document still lists. Had it
-/// held a residual the sum would have been wrong by that residual and nothing would have shown it.
-///
-/// This is why the pair is a constant with a note rather than a filter written inline. An
-/// appropriation line item is **not** a stable identifier across this period — `200604` names
-/// three different programmes across three funds — so any series built by line number needs its
-/// succession established before it means anything.
-const FOUNDATION_LINES: [&str; 3] = ["200501", "200550", "200612"];
+// The lines the formula itself is paid from — `200501`, `200550`, `200612` — used to be defined
+// here, with the succession argument and the double-counting check that make summing all three
+// safe. Both moved to `project::appropriations::FOUNDATION_LINES`: this constant was the original
+// and two integration tests each restated it, so there were three lists and one argument. #158.
 
 /// The department's appropriation lines, with the act that created each.
 ///

@@ -39,53 +39,30 @@
 //! channels are now compared at their real sizes rather than at an assumed one, and they still
 //! differ only in whether the money has a line.
 
-use std::collections::BTreeMap;
-
-use deflator::CpiSeries;
 use edfund_core::FiscalYear;
-use project::appropriations::enacted_lines;
+use project::appropriations::{foundation_movements, foundation_noise_floor};
 
-/// The lines the formula itself is paid from, across the renumbering at FY2006.
-///
-/// `200501` is the GRF line before the change and `200550` after; `200612` is the Lottery half
-/// throughout. The two GRF lines coexist for six years with `200501` at exactly $0.00, so summing
-/// all three double-counts nothing — established in `crates/bundle`, where the same constant lives.
-const FOUNDATION_LINES: [&str; 3] = ["200501", "200550", "200612"];
+/// The base year every real figure below is stated in.
+const BASE: FiscalYear = FiscalYear(2025);
 
-/// The **foundation aid** appropriation in constant dollars, oldest first.
+/// The lottery's substitution, as the appropriation tables print it.
 ///
-/// Not the department's whole appropriation, which is a different series and a different question.
-/// The substitution claim is about what the General Assembly set *foundation aid* at, so the noise
-/// floor has to be the noise in foundation aid. The two differ by about a factor of two — the
-/// department as a whole moves a median $449m a year against foundation aid's $236m — and using
-/// the wrong one would overstate how hard the question is by exactly that factor.
-fn real_series() -> Vec<(u16, f64)> {
-    // `enacted_lines`, not `lines`: the workbook fixture alone is missing FY2006-07 and FY2012-13,
-    // and a noise floor computed over a series with holes in it is measuring the holes.
-    let cpi = CpiSeries::cpi_u_june();
-    let mut nominal: BTreeMap<u16, f64> = BTreeMap::new();
-    for line in enacted_lines() {
-        if FOUNDATION_LINES.contains(&line.line_item.as_str()) {
-            *nominal.entry(line.fiscal_year).or_default() += line.amount;
-        }
-    }
-    nominal
-        .into_iter()
-        .filter_map(|(year, amount)| {
-            cpi.convert(amount, FiscalYear(year), FiscalYear(2025))
-                .ok()
-                .map(|deflated| (year, deflated.value))
-        })
-        .collect()
+/// Read rather than asserted: `project::budget_analysis` computes it from the redbook and the
+/// greenbook, and this file's whole argument is that this number was *legible* where the casino
+/// channel's is not. Pinning it as a literal would have made the comparison a comparison with a
+/// constant.
+fn lottery_movement() -> f64 {
+    project::budget_analysis::enactment_movement(project::budget_analysis::LOTTERY_LINE)
 }
 
-/// Year-over-year movements in constant dollars.
+/// Year-over-year movements in the foundation aid appropriation, in constant FY2025 dollars.
+///
+/// The series, the deflation and the noise floor all live in
+/// [`project::appropriations`](project::appropriations::foundation_movements) now. They were three
+/// private functions here, and the median one of them computed was not the median the corpus
+/// publishes — see [`foundation_noise_floor`] for what that cost.
 fn movements() -> Vec<(u16, f64)> {
-    let series = real_series();
-    series
-        .windows(2)
-        .map(|pair| (pair[1].0, pair[1].1 - pair[0].1))
-        .collect()
+    foundation_movements(BASE)
 }
 
 #[test]
@@ -104,11 +81,18 @@ fn the_ordinary_annual_movement_is_larger_than_a_channel_this_size_could_be() {
      */
     let mut magnitudes: Vec<f64> = movements().into_iter().map(|(_, m)| m.abs()).collect();
     magnitudes.sort_by(|a, b| a.partial_cmp(b).expect("finite"));
-    let median = magnitudes[magnitudes.len() / 2];
+    let median = foundation_noise_floor(BASE);
 
+    // To the million, not to a hundred-million band. The band this used to carry —
+    // `(200_000_000.0..300_000_000.0)` — held both the $236m the corpus publishes and the $252m
+    // this file was computing from a different definition of "median". #158.
     assert!(
-        (200_000_000.0..300_000_000.0).contains(&median),
-        "the median annual movement is ${median:.0}, outside the band this node quotes"
+        (median / 1e6).round() == 236.0,
+        "the median annual movement is ${median:.0}, and the corpus publishes $236 million"
+    );
+    assert!(
+        (magnitudes.iter().sum::<f64>() / magnitudes.len() as f64 / 1e6).round() == 349.0,
+        "the mean the node quotes beside the median has moved"
     );
     // And the spread is wide, which is the other half of why inference from the total fails.
     assert!(
@@ -160,16 +144,14 @@ fn the_lottery_movement_would_have_been_invisible_by_this_test() {
      *
      * So the two channels differ in whether the money is itemized, not in whether it is large.
      */
-    const LOTTERY_MOVEMENT: f64 = 97_638_202.0;
-
-    let mut magnitudes: Vec<f64> = movements().into_iter().map(|(_, m)| m.abs()).collect();
-    magnitudes.sort_by(|a, b| a.partial_cmp(b).expect("finite"));
-    let median = magnitudes[magnitudes.len() / 2];
+    let lottery_movement = lottery_movement();
+    let median = foundation_noise_floor(BASE);
 
     assert!(
-        LOTTERY_MOVEMENT < median,
-        "the lottery movement of ${LOTTERY_MOVEMENT:.0} now exceeds the ${median:.0} noise floor, \
-         which breaks the argument that itemisation rather than size is what made it legible"
+        lottery_movement < median,
+        "the lottery movement of ${lottery_movement:.0} now exceeds the ${median:.0} noise \
+         floor, which breaks the argument that itemisation rather than size is what made it \
+         legible"
     );
 }
 
@@ -181,9 +163,7 @@ fn the_whole_channel_is_smaller_than_the_floor_in_every_year_it_has() {
      * figure for. A substitution can be at most the whole of it, so no arrangement of the money
      * produces a movement this series could distinguish.
      */
-    let mut magnitudes: Vec<f64> = movements().into_iter().map(|(_, m)| m.abs()).collect();
-    magnitudes.sort_by(|a, b| a.partial_cmp(b).expect("finite"));
-    let median = magnitudes[magnitudes.len() / 2];
+    let median = foundation_noise_floor(BASE);
 
     let years = dispersion::casino::by_fiscal_year();
     assert_eq!(years.len(), 9, "the panel is nine complete fiscal years");
@@ -203,12 +183,12 @@ fn the_channel_is_larger_than_the_lottery_movement_that_was_legible() {
      * the appropriation table. The casino channel is *bigger* than that in its last three fiscal
      * years and is invisible, because it enters no table. Size is not what separates them.
      */
-    const LOTTERY_MOVEMENT: f64 = 97_638_202.0;
+    let lottery_movement = lottery_movement();
 
     let years = dispersion::casino::by_fiscal_year();
     let above: Vec<u16> = years
         .iter()
-        .filter(|(_, total)| **total > LOTTERY_MOVEMENT)
+        .filter(|(_, total)| **total > lottery_movement)
         .map(|(year, _)| *year)
         .collect();
     assert_eq!(

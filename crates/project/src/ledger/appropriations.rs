@@ -330,6 +330,113 @@ pub fn reimbursements(base: FiscalYear) -> Vec<Year> {
         .collect()
 }
 
+/// The lines the formula itself is paid from, across the renumbering in the middle of the series.
+///
+/// `200550` and `200612` are both titled `Foundation Funding` and are the GRF and Lottery Profits
+/// halves of it today. `200501` is the same GRF money before FY2006, when it was titled `Base Cost
+/// Funding` — the Catalog records `200550` as "originally established by Am. Sub. H.B. 66 of the
+/// 126th G.A.", the FY2006-07 act, which is exactly where the number changes.
+///
+/// **Summing all three is safe and was checked rather than assumed.** The two GRF lines appear
+/// together in FY2006-FY2011, which looks like double counting and is not: `200501` is carried at
+/// exactly $0.00 in every one of those years, a discontinued line the document still lists. Had it
+/// held a residual the sum would have been wrong by that residual and nothing would have shown it.
+///
+/// This is why the trio is a constant with a note rather than a filter written inline. An
+/// appropriation line item is **not** a stable identifier across this period — `200604` names
+/// three different programmes across three funds — so any series built by line number needs its
+/// succession established before it means anything.
+///
+/// It lived in three places: `bundle`, and two integration tests that each restated it. One list.
+pub const FOUNDATION_LINES: [&str; 3] = ["200501", "200550", "200612"];
+
+/// The **foundation aid** appropriation by year, restated into `base` dollars.
+///
+/// Not [`enacted_history`], which is the department's whole appropriation and a different
+/// question. The substitution claim two revenue-stream nodes make is about what the General
+/// Assembly set *foundation aid* at, and the two series differ by about a factor of two — the
+/// department as a whole moves a median $449m a year against foundation aid's $236m. Using the
+/// wrong one overstates how hard the question is by exactly that factor.
+///
+/// Built from [`enacted_lines`] rather than [`lines`]: the workbook fixture alone is missing
+/// FY2006-07 and FY2012-13, and a noise floor computed over a series with holes in it is
+/// measuring the holes.
+#[must_use]
+pub fn foundation_history(base: FiscalYear) -> Vec<Year> {
+    let cpi = CpiSeries::cpi_u_june();
+    let mut totals: BTreeMap<u16, (f64, usize)> = BTreeMap::new();
+    for line in enacted_lines() {
+        if FOUNDATION_LINES.contains(&line.line_item.as_str()) {
+            let entry = totals.entry(line.fiscal_year).or_insert((0.0, 0));
+            entry.0 += line.amount;
+            entry.1 += 1;
+        }
+    }
+    totals
+        .into_iter()
+        .map(|(fiscal_year, (nominal, items))| Year {
+            fiscal_year,
+            nominal,
+            real: cpi
+                .convert(nominal, FiscalYear(fiscal_year), base)
+                .ok()
+                .map(|deflated| deflated.value),
+            items,
+        })
+        .collect()
+}
+
+/// Year-over-year movements in [`foundation_history`], in `base` dollars, oldest first.
+///
+/// Years the index cannot reach are dropped before the differencing, so a movement is always
+/// between two adjacent years that both have a real figure.
+#[must_use]
+pub fn foundation_movements(base: FiscalYear) -> Vec<(u16, f64)> {
+    let real: Vec<(u16, f64)> = foundation_history(base)
+        .into_iter()
+        .filter_map(|year| year.real.map(|value| (year.fiscal_year, value)))
+        .collect();
+    real.windows(2)
+        .map(|pair| (pair[1].0, pair[1].1 - pair[0].1))
+        .collect()
+}
+
+/// The **median absolute annual movement** in foundation aid — the floor below which a
+/// substitution cannot be read off the total.
+///
+/// An appropriation total moves every year for many reasons. A substitution can only be read off
+/// the total if it is larger than the total's ordinary movement, so this is the instrument that
+/// decides whether an earmark's arrival is detectable at all. `casino-tax-distribution` rests its
+/// central null result on it.
+///
+/// A **median** rather than a mean, because two years dominate the mean — FY2006's $1.5bn rise and
+/// FY2010's $1bn fall — and a floor set by the outliers would overstate how hard the question is.
+///
+/// # Which median, and the fourth copy of a defect
+///
+/// [`dispersion::median`], which interpolates between the two middle observations of an even
+/// series. The test this computation was hoisted out of took `magnitudes[len / 2]` — the *upper*
+/// of the two — and the series has 24 movements in it, so the two definitions differ: **$251.9m**
+/// against **$235.9m**. The corpus publishes $236 million and the crate standing behind it
+/// computed $252 million, and nothing said so, because the assertion was
+/// `(200_000_000.0..300_000_000.0).contains(&median)` and that band holds both.
+///
+/// [`dispersion::percentile_sorted`] already named this as a defect it had corrected in three
+/// places. This was the fourth. See #158.
+///
+/// # Panics
+///
+/// If the series is empty, which would mean the appropriation fixtures carry no foundation line.
+#[must_use]
+pub fn foundation_noise_floor(base: FiscalYear) -> f64 {
+    let mut magnitudes: Vec<f64> = foundation_movements(base)
+        .into_iter()
+        .map(|(_, moved)| moved.abs())
+        .collect();
+    magnitudes.sort_by(|a, b| a.partial_cmp(b).expect("finite"));
+    dispersion::median(&magnitudes).expect("the foundation aid series is empty")
+}
+
 /// Growth across a series of years, nominal and real, as fractions.
 ///
 /// Returns `None` if either endpoint is missing a real figure — a growth rate computed from one

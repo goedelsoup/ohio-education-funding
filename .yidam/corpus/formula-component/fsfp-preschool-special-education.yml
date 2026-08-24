@@ -33,7 +33,7 @@ description: |
   This sheet carries an **appropriation limit** — $147,500,000 — in a cell beside the factor,
   which is the only place in the calculator that shows a proration's two halves at once. At the
   stated 0.96854448 the program totals **$148,408,184**, which is $908,184 over *that* cell.
-  [verified]
+  [verified — `crates/project/src/panel/supplements.rs`]
 
   **The cell is stale, and no proration arises.** $147,500,000 is the **FY2025** estimate. The
   enacted act's FY2026 and FY2027 remainder for preschool special education is **$153,976,832**,
@@ -41,7 +41,25 @@ description: |
   together from the prior biennium, so a published proration factor is not evidence that a
   proration applied. A third cell states $146,708,228.07, matching neither. See [appropriation
   proration factor](../parameter/appropriation-proration-factor.yml), which holds the full
-  account. [verified — the enacted act's LSC analysis]
+  account. [verified — the enacted act's LSC analysis, read by
+  `crates/project/src/ledger/budget_analysis.rs`]
+figures:
+  - key: project/prek-sped-remainder-fy2027
+    value: 153976832.0
+    field: description
+    as_written: "remainder for preschool special education is **$153,976,832**"
+  - key: project/prek-sped-program-total-fy2027
+    value: 148408183.76000014
+    field: description
+    as_written: "the program totals **$148,408,184**"
+  - key: project/prek-sped-over-the-stale-limit
+    value: 908183.7600001395
+    field: description
+    as_written: "which is $908,184 over *that* cell"
+  - key: project/prek-sped-headroom-fy2027
+    value: 5568648.2399998605
+    field: description
+    as_written: "against which $148,408,184 is **$5,568,648 under**"
 properties:
   name: Preschool special education
   function: |

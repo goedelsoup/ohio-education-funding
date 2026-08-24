@@ -69,6 +69,17 @@ those fixtures now has exactly one reader, in the crate that owns it: `dispersio
 counterpart for the document format `connect` writes, which had a writer and three readers. See
 #157.
 
+The eleventh was LSC's budget analysis, and it is the one that shows why the phrase matters. The
+**redbook** analyses a bill as introduced and the **greenbook** the same bill as enacted; the two
+are structurally identical and differ in three words of column heading, so a figure copied from one
+is indistinguishable from a figure copied from the other — and the corpus published $1.34 billion
+of an $11.15 billion foundation aid total, both proposals, under `[verified]`. Three test files
+parsed those two documents with three private row readers that did not agree about how to find a
+table: two anchored on the first occurrence of a heading and one on the last, and the two that
+used the first only worked because the heading they wanted has no table-of-contents entry.
+`project::budget_analysis` is the one reader, and `Edition` is why a caller has to say which
+document it is quoting.
+
 **`deduction` is declared and not built.** It was listed here as though it existed for long enough
 that the web layer's "what is not modelled" note was written from this file rather than from the
 workspace. There is a [skill describing what it would compute](../.yidam/skills/deduction.md) —
@@ -192,12 +203,12 @@ Fields per crate: name, capability type (connector/calculator/feature-engineerin
 | [`foundation`](foundation/) | Fair School Funding Plan base cost build-up, per R.C. 3317.011 | 54 |
 | [`local-capacity`](local-capacity/) | Fair School Funding Plan local capacity and state share, per R.C. 3317.017 | 23 |
 | [`millage`](millage/) | Effective operating millage under H.B. 920 reduction factors, and 20-mill floor status | 19 |
-| [`project`](project/) | Forward projection of funding inputs, and policy simulation over them | 281 |
+| [`project`](project/) | Forward projection of funding inputs, and policy simulation over them | 287 |
 | [`regime-diff`](regime-diff/) | Difference two funding regimes at component level, with the residual the decomposition does not explain | 36 |
 | [`scenario-delta`](scenario-delta/) | Winners and losers between two funding runs, with incidence and the off-formula count | 26 |
 | [`spreadsheet`](spreadsheet/) | Read the department's published workbooks with no dependencies | 79 |
 
-13 crates, 910 test functions, no crates.io dependencies. `cargo test` reports a different total: it adds doc-tests and counts each integration binary separately.
+13 crates, 916 test functions, no crates.io dependencies. `cargo test` reports a different total: it adds doc-tests and counts each integration binary separately.
 <!-- /REGEN -->
 
 ## Index status

@@ -100,6 +100,15 @@ findings: |
   One provision, one lever, complete coverage. A real budget act would not do this: it would also
   move special-education weights, transportation reimbursement and the scholarship deduction,
   none of which the five levers reach.
+figures:
+  - key: project/hb-96-refresh-run-cost
+    value: 220525319.161829
+    field: findings
+    as_written: "The figure is\n  $220,525,319"
+  - key: project/hb-96-refresh-districts-lifted-off-the-guarantee
+    value: 41
+    field: findings
+    as_written: "Those 41 are lifted onto the formula"
 properties:
   provenance: counterfactual
   designation: |

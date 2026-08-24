@@ -17,7 +17,14 @@
 
 mod common;
 
-const REDBOOK: &str = include_str!("../fixtures/dew-redbook.txt");
+use project::budget_analysis::{
+    special_education_enhancements, Edition, ALI_200540_TOTAL, PRESCHOOL_REMAINDER,
+};
+
+/// The bill as introduced, read through [`project::budget_analysis`] rather than through a fourth
+/// private copy of a row parser. This file wants the document as prose; the two sibling files want
+/// it as tables.
+const REDBOOK: &str = project::budget_analysis::REDBOOK;
 
 /// **Which line governs.** The two prorated programs sit in named ALIs.
 #[test]
@@ -52,9 +59,14 @@ fn the_prorated_programs_have_appropriation_line_items() {
 #[test]
 fn preschool_special_education_is_what_is_left_of_its_line_item() {
     let book = common::flat(REDBOOK);
-    assert!(book.contains("Remainder – preschool special education"));
-    assert!(book.contains("$147,500,000 $153,976,832 $153,976,832"));
-    assert!(book.contains("GRF ALI 200540 total $198,850,000 $193,272,426"));
+    let remainder = special_education_enhancements(Edition::Introduced, PRESCHOOL_REMAINDER);
+    assert_eq!(remainder.prior, 147_500_000.0);
+    assert_eq!(remainder.first, 153_976_832.0);
+    assert_eq!(remainder.second, 153_976_832.0);
+
+    let total = special_education_enhancements(Edition::Introduced, ALI_200540_TOTAL);
+    assert_eq!(total.prior, 198_850_000.0);
+    assert_eq!(total.first, 193_272_426.0);
     // The five earmarks that come first.
     for earmark in [
         "Special education at DD boards and institutions",
@@ -93,14 +105,17 @@ fn the_stated_preschool_limit_is_the_prior_years_appropriation() {
         .iter()
         .map(|r| r.preschool_special_education.total)
         .sum();
+    let proposed = special_education_enhancements(Edition::Introduced, PRESCHOOL_REMAINDER).second;
+
     // Over the limit the calculator prints...
     assert!(program > 147_500_000.0);
-    // ...and comfortably under the one the budget proposes for the year being modelled.
-    assert!(program < 153_976_832.0);
+    // ...and comfortably under the one the budget proposes for the year being modelled. Stated as
+    // the figure the corpus publishes rather than as a band: this file's whole point is that
+    // $147,500,000 and $153,976,832 are different numbers, so the distance between them and the
+    // program is worth asserting exactly.
     assert!(
-        (153_976_832.0 - program) / 1e6 > 5.0,
-        "headroom is ${:.1}m",
-        (153_976_832.0 - program) / 1e6
+        (proposed - program - 5_568_648.24).abs() < 0.01,
+        "{program:.2}"
     );
 }
 

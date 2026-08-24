@@ -161,6 +161,31 @@ findings: |
   from the proposal. [verified]
 
   ### The residual claimant grew while its line shrank
+figures:
+  - key: project/prek-sped-remainder-fy2027
+    value: 153976832.0
+    field: findings
+    as_written: "remainder with them: **$153,976,832**"
+  - key: project/ali-200540-total-fy2027
+    value: 193272426.0
+    field: findings
+    as_written: "an enacted $193,272,426 for FY2026 and FY2027"
+  - key: project/ali-200540-actual-fy2025
+    value: 195160040.0
+    field: findings
+    as_written: "an actual $195,160,040 for FY2025"
+  - key: project/prek-sped-program-total-fy2027
+    value: 148408183.76000014
+    field: findings
+    as_written: "the program at $148,408,184"
+  - key: project/prek-sped-headroom-fy2027
+    value: 5568648.2399998605
+    field: findings
+    as_written: "**$5,568,648 under** rather than $908,184 over"
+  - key: project/prek-sped-over-the-stale-limit
+    value: 908183.7600001395
+    field: findings
+    as_written: "rather than $908,184 over"
 revisions:
   - was: |
       The 0.96854448 factor was read against the $147,500,000 limit printed beside it, making

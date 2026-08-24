@@ -83,6 +83,27 @@ findings: |
   record can show what a different General Assembly would have voted. [open] What *is*
   established is that the mechanism offers no protection against substitution, which is the
   weaker and sufficient claim.
+figures:
+  - key: project/enacted-lottery-line-fy2026
+    value: 1436583202.0
+    field: description
+    as_written: "7017  ALI 200612  Foundation Funding \u2014 All Students       $1,436,583,202"
+  - key: project/enacted-foundation-aid-fy2026
+    value: 11230057557.0
+    field: description
+    as_written: "Total foundation aid $11,230,057,557"
+  - key: project/lottery-line-rose-at-enactment
+    value: 97638202.0
+    field: findings
+    as_written: "Fund 7017 rose **$97,638,202**"
+  - key: project/foundation-lines-off-the-lottery-fell-at-enactment
+    value: 15575916.0
+    field: findings
+    as_written: "four lines together **fell $15,575,916**"
+  - key: project/foundation-aid-rose-at-enactment
+    value: 82062286.0
+    field: findings
+    as_written: "the foundation aid total grew by $82,062,286"
 properties:
   name: Lottery Profits Education Fund (Fund 7017)
   level: state
