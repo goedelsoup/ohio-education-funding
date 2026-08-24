@@ -125,6 +125,102 @@ function trimVendorSources() {
   };
 }
 
+/**
+ * Tell the browser about the second file before it has finished reading the first.
+ *
+ * Every page loads one module — `<script type="module" src="…Base…js">` — and that module's first
+ * line imports another. So the chain is: parse the HTML, fetch the stub, parse it, discover the
+ * import, fetch that. **Two serial round trips before any of it runs**, for about 2 KB, on all
+ * 3,487 pages; the scenario routes go one deeper and take three.
+ *
+ * A `modulepreload` link in the head starts the second fetch at the same moment as the first, so
+ * the round trips overlap instead of queueing. Nothing about the bundle changes — same files, same
+ * hashes, same order of execution — only when the browser learns they exist.
+ *
+ * # Why this is a post-build pass over the HTML
+ *
+ * Astro emits these links for hydrated components; a plain `<script>` in a static build gets none,
+ * and the import graph is not known at render time anyway — it is a property of the bundle Vite
+ * produces afterwards. So the graph is read back off the emitted chunks, which is the same
+ * argument `semantics.ts` makes about reading the document: whatever is in the artefact is what
+ * gets preloaded, and a chunk that stops existing stops being named.
+ *
+ * Same-origin and governed by `script-src 'self'`, which the CSP already grants — see
+ * `public/_headers`.
+ */
+function preloadModules() {
+  return {
+    name: "preload-modules",
+    hooks: {
+      /** @type {(context: { dir: URL }) => void} */
+      "astro:build:done": ({ dir }) => {
+        const assetDir = new URL("_astro/", dir);
+        /** What each chunk imports, by filename. */
+        const imports = new Map();
+        for (const name of readdirSync(assetDir)) {
+          if (!name.endsWith(".js")) continue;
+          const code = readFileSync(new URL(name, assetDir), "utf8");
+          imports.set(name, [...code.matchAll(/["']\.\/([^"']+\.js)["']/g)].map((m) => m[1]));
+        }
+
+        /** @type {(entry: string) => string[]} Everything a chunk pulls in, transitively. */
+        const closure = (entry) => {
+          const found = new Set();
+          const queue = [...(imports.get(entry) ?? [])];
+          while (queue.length > 0) {
+            const next = queue.pop();
+            if (next == null || found.has(next)) continue;
+            found.add(next);
+            queue.push(...(imports.get(next) ?? []));
+          }
+          return [...found];
+        };
+
+        /** @type {URL[]} */
+        const pages = [];
+        /** @type {(at: URL) => void} */
+        const walk = (at) => {
+          for (const entry of readdirSync(at, { withFileTypes: true })) {
+            const path = new URL(`${entry.name}${entry.isDirectory() ? "/" : ""}`, at);
+            if (entry.isDirectory()) walk(path);
+            else if (entry.name.endsWith(".html")) pages.push(path);
+          }
+        };
+        walk(dir);
+
+        let linked = 0;
+        for (const page of pages) {
+          const html = readFileSync(page, "utf8");
+          /*
+           * Every module script on the page, not the first one.
+           *
+           * A scenario route carries two — its own and the layout's — and reading only the first
+           * left the layout's chunk undeclared on exactly the pages that already take the most
+           * round trips. The two closures overlap, so they are unioned rather than concatenated.
+           */
+          const entries = [
+            ...html.matchAll(/<script type="module" src="\/_astro\/([^"]+\.js)"/g),
+          ].map((m) => m[1] ?? "");
+          if (entries.length === 0) continue;
+          const deps = [...new Set(entries.flatMap((entry) => closure(entry)))].filter(
+            (name) => !entries.includes(name),
+          );
+          if (deps.length === 0) continue;
+          const links = deps
+            .map((name) => `<link rel="modulepreload" href="/_astro/${name}">`)
+            .join("");
+          // Into the head, where the browser has already begun looking for what to fetch.
+          const updated = html.replace("</head>", `${links}</head>`);
+          if (updated === html) continue;
+          writeFileSync(page, updated);
+          linked += deps.length;
+        }
+        console.log(`[preload-modules] ${linked} preload links across ${pages.length} pages`);
+      },
+    },
+  };
+}
+
 export default defineConfig({
   // Required by `@astrojs/sitemap`, and used for the canonical link in the layout. This is the
   // production hostname; a preview deploy will emit canonicals pointing at production, which is
@@ -154,6 +250,7 @@ export default defineConfig({
     }),
     csvDownloadHeaders(),
     trimVendorSources(),
+    preloadModules(),
   ],
   build: {
     // `dist/district/043786.html` rather than `dist/district/043786/index.html`. Keeps the deploy

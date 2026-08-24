@@ -1713,6 +1713,102 @@ test.describe("axe", () => {
   }
 });
 
+/*
+ * What a page tells the browser to fetch before it has finished reading the first file.
+ *
+ * Every page loads one module and that module's first line imports another, so the chain was:
+ * parse the HTML, fetch the stub, parse it, discover the import, fetch that — two serial round
+ * trips before anything ran, for about 2 KB, on all 3,487 pages. The scenario routes went a level
+ * deeper. `preloadModules` in `astro.config.mjs` reads the import graph off the emitted chunks and
+ * declares it.
+ */
+test.describe("module preloading", () => {
+  const DIST = join(import.meta.dirname, "../../dist");
+  const walk = (dir: string): string[] =>
+    readdirSync(dir, { withFileTypes: true }).flatMap((entry) =>
+      entry.isDirectory()
+        ? walk(join(dir, entry.name))
+        : entry.name.endsWith(".html")
+          ? [join(dir, entry.name)]
+          : [],
+    );
+
+  test("every page declares the chunks its script will import, and no others", () => {
+    /*
+     * Three properties at once, because they fail in different directions. A preload naming a file
+     * that is not there is a wasted request and a console error; a preload naming a script the page
+     * already loads directly is a duplicate fetch; and a page whose module imports something it
+     * never declares is the round trip this exists to remove, back again.
+     */
+    const dangling: string[] = [];
+    const duplicated: string[] = [];
+    const undeclared: string[] = [];
+    let declared = 0;
+
+    // What each emitted chunk imports, read off the bundle exactly as the integration does.
+    const chunks = new Map<string, string[]>();
+    for (const name of readdirSync(join(DIST, "_astro"))) {
+      if (!name.endsWith(".js")) continue;
+      const code = readFileSync(join(DIST, "_astro", name), "utf8");
+      chunks.set(name, [...code.matchAll(/["']\.\/([^"']+\.js)["']/g)].map((m) => m[1] ?? ""));
+    }
+    const closure = (entry: string): string[] => {
+      const found = new Set<string>();
+      const queue = [...(chunks.get(entry) ?? [])];
+      while (queue.length > 0) {
+        const next = queue.pop();
+        if (next == null || found.has(next)) continue;
+        found.add(next);
+        queue.push(...(chunks.get(next) ?? []));
+      }
+      return [...found];
+    };
+
+    for (const file of walk(DIST)) {
+      const html = readFileSync(file, "utf8");
+      const where = file.slice(DIST.length + 1);
+      const scripts = [...html.matchAll(/<script type="module" src="\/_astro\/([^"]+\.js)"/g)].map(
+        (m) => m[1] ?? "",
+      );
+      const preloads = [...html.matchAll(/<link rel="modulepreload" href="\/_astro\/([^"]+)"/g)].map(
+        (m) => m[1] ?? "",
+      );
+      declared += preloads.length;
+
+      for (const name of preloads) {
+        if (!existsSync(join(DIST, "_astro", name))) dangling.push(`${where}: ${name}`);
+        if (scripts.includes(name)) duplicated.push(`${where}: ${name}`);
+      }
+      const wanted = new Set(scripts.flatMap((s) => closure(s)));
+      for (const name of wanted) {
+        if (!scripts.includes(name) && !preloads.includes(name)) undeclared.push(`${where}: ${name}`);
+      }
+    }
+
+    expect(declared, "the build declares preloads at all").toBeGreaterThan(3_000);
+    expect(dangling.slice(0, 5), "a preload naming a file that is not there").toEqual([]);
+    expect(duplicated.slice(0, 5), "a preload for a script the page already loads").toEqual([]);
+    expect(undeclared.slice(0, 5), "an import the page never declared").toEqual([]);
+  });
+
+  test("the preloads are what the browser actually fetches", async ({ page }) => {
+    // The artefact check above says the links are right; this says the browser agrees they are
+    // modules and asks for them, rather than treating them as an unknown `rel` and ignoring them.
+    const asked = new Set<string>();
+    page.on("request", (request) => {
+      if (request.url().includes("/_astro/")) asked.add(new URL(request.url()).pathname);
+    });
+    await page.goto(`/district/${CLEVELAND}`);
+    await expect(page.locator("svg.plot:visible").first()).toBeVisible();
+
+    const preloads = await page.locator('link[rel="modulepreload"]').evaluateAll((links) =>
+      links.map((l) => new URL((l as HTMLLinkElement).href).pathname),
+    );
+    expect(preloads.length, "the page declares at least one").toBeGreaterThan(0);
+    for (const href of preloads) expect([...asked], `${href} was fetched`).toContain(href);
+  });
+});
+
 test.describe("the section menus", () => {
   test("opening one closes the other, and Escape closes it", async ({ page }) => {
     // Purely the enhancement half — the menus open without any of this, which the JavaScript
