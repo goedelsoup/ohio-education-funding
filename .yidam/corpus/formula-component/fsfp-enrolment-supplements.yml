@@ -21,7 +21,7 @@ description: |
   What clearing 3% is worth has
   nothing to do with how close a district came: it is $250 times the district's size. New Lexington
   grew **2.9502%** and drew nothing; three hundredths of a percentage point further and it would
-  have received **$430,477**. Two other districts sit between 2.7% and 3%. [verified —
+  have received **$430,477**. 3 other districts sit between 2.7% and 3%. [verified —
   `crates/project/tests/the_supplements_outside_the_formula.rs`]
 
   The cliff sits in a thin part of the distribution, which is where a cliff does its most arbitrary
@@ -47,6 +47,40 @@ description: |
 
   Why 3% and why three years. Both are single numbers with a cliff behind them and
   neither is explained in the calculator. [open]
+figures:
+  - key: project/base-funding-supplement-total
+    value: 56079575.54
+    field: description
+    as_written: "$56.1m statewide"
+  - key: project/enrolment-growth-supplement-total
+    value: 39379553.15
+    field: description
+    as_written: "$39.4m to 43\n  districts"
+  - key: project/enrolment-growth-supplement-districts
+    value: 43
+    field: description
+    as_written: "$39.4m to 43\n  districts"
+  - key: project/median-three-year-enrolment-decline
+    value: 0.048417
+    field: description
+    as_written: "a median district that **shrank 4.8%**"
+  - key: project/largest-forgone-growth-supplement
+    value: 430476.8
+    field: description
+    as_written: "it would\n  have received **$430,477**"
+  - key: project/other-districts-just-below-the-growth-cliff
+    value: 3
+    field: description
+    as_written: "3 other districts sit between 2.7% and 3%"
+  - key: project/base-funding-supplement-per-district
+    value: 92084.69
+    field: description
+    as_written: "is $92k a district against $916k"
+  - key: project/enrolment-growth-supplement-per-district
+    value: 915803.56
+    field: description
+    as_written: "is $92k a district against $916k"
+
 revisions:
   - was: |
       The statutory home of this payment was recorded as unreadable: "Reading the enacted bill

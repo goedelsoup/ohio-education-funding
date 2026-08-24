@@ -76,6 +76,16 @@ findings: |
   What it can say is that a funding stream keyed to identification pays most where
   identification is highest, and that is where poverty is lowest. [open — the mechanism, not
   the pattern]
+figures:
+  - key: project/gifted-identification-falls-with-poverty
+    value: 0.6726
+    field: findings
+    as_written: "r = \u22120.67 against r = +0.35 for property wealth"
+  - key: project/gifted-identification-rises-with-property-wealth
+    value: 0.3483
+    field: findings
+    as_written: "r = \u22120.67 against r = +0.35 for property wealth"
+
 revisions:
   - was: |
       Whether gifted identification rates vary with district wealth was recorded as "exactly

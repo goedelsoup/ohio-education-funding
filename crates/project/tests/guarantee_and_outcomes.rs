@@ -7,7 +7,7 @@
 //! # The answer is no, and the way it is no is the point
 //!
 //! Guarantee status looks like it predicts achievement. Districts the guarantee protects score
-//! **+0.187** against the Performance Index, and their median Index is 89.9 against 85.6 for
+//! **+0.187** against the Performance Index, and their median Index is 89.85 against 85.6 for
 //! districts on the formula. Hold poverty constant and the association is **+0.035** — nothing.
 //!
 //! The guaranteed districts score higher because they are **less poor**: median economic
