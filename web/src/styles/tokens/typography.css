@@ -23,11 +23,36 @@
  * Never resolve it by substituting a different family. A stack silently retargeted to whatever face
  * happened to be available is how a design system ends up with a typeface nobody chose.
  *
- * # Seven sizes, and why not more
+ * # A serif, from the platform, for the display face only
  *
- * A page carries body prose, a lead, card headings, table cells, inline claim marks, figure
- * annotations and a footer. That is seven jobs and this is seven sizes. Anything between two of
- * them is a size somebody chose by eye, which is how a scale becomes twelve sizes.
+ * `--font-serif` was decided rather than defaulted, and the alternative it was chosen over was
+ * committing a subsetted IBM Plex Serif. Zero bytes won. The cost is real and is accepted: the
+ * face differs by platform — Iowan Old Style on macOS, Palatino Linotype on Windows, Georgia or
+ * DejaVu Serif on Linux, Noto Serif on Android — and the preview cards, which render through
+ * satori on the build machine, cannot match what a given reader sees.
+ *
+ * That variance is affordable HERE and nowhere else, and the boundary is not a matter of taste.
+ * A heading reflows; it is not laid out against pixel constants. Chart text is, and this
+ * repository has already shipped a defect that reproduced under DejaVu Sans and not under SF Pro
+ * — see `plot/spec.ts`. So the serif is for the display face and the lead, and for nothing that
+ * carries a number, sits in a table, or is drawn inside an `<svg>`.
+ *
+ * # Two ramps, not one scale
+ *
+ * The file used to claim seven sizes for seven jobs. The page rendered thirteen, eleven of them
+ * crowded inside 3.7px and then a jump to the `h1` — so the scale was not being disobeyed at the
+ * edges, it was being ignored in the middle. There was no size to read *with*: an apparatus voice
+ * and a headline voice and nothing between them.
+ *
+ * The fix is to admit these are two scales with two jobs, and to say which is which.
+ *
+ * **The reading ramp** — display, lead, body — is for prose, and it grew. **The apparatus ramp**
+ * — base, sm, xs — is for chips, column heads, table cells, controls and the footer, and it did
+ * NOT move. The density that makes a 609-row table usable is not the density that makes a
+ * paragraph readable, and the old scale confused them by running both through one sequence.
+ *
+ * A size that belongs to neither ramp is a size somebody chose by eye. `tokens.spec.ts` holds the
+ * count.
  */
 
 :root {
@@ -36,18 +61,48 @@
   /* Figures, identifiers, slugs, code paths. Every dollar amount on this site is set in it. */
   --font-mono:
     "IBM Plex Mono", ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, monospace;
+  /*
+   * The display face. Headings and the lead — never body, never a figure, never inside an `<svg>`.
+   *
+   * Named most-distinctive-first rather than most-available-first: Iowan Old Style and Palatino are
+   * humanist and warm at a display size, and Georgia is the floor rather than the target. `serif`
+   * last, because a platform with none of these still has to render a heading.
+   */
+  --font-serif:
+    "Iowan Old Style", "Palatino Linotype", Palatino, Charter, "Iowan Old Style Roman", Georgia,
+    serif;
 
+  /*
+   * THE APPARATUS RAMP. Unchanged, and deliberately so: every value here was already correct for
+   * what it does, and a 609-row table is meant to be dense.
+   */
   --text-xs: 0.72rem;   /* annotation: the year, the basis, a footer, a table's column head */
   --text-sm: 0.8rem;    /* apparatus: controls, pills, breadcrumb, contents */
-  --text-base: 0.88rem; /* dense: table cells, notes, card body */
-  --text-body: 0.93rem; /* the reading size, for corpus prose only */
-  --text-lead: 1.02rem; /* the lead, and a decision record's own summary */
-  --text-h1: 1.4rem;
-  --text-figure: 1.5rem; /* the one number a tile exists to show */
+  --text-base: 0.88rem; /* dense: table cells, notes, a caption */
+
+  /*
+   * THE READING RAMP. Prose, and only prose.
+   *
+   * `--text-body` was 0.93rem, four hundredths above `--text-base` — which is to say the site's
+   * reading size and its table-cell size were the same size, and the page had nothing to read
+   * with. 1.06rem is 17px against a 16px root.
+   *
+   * The ratio between the ends is what makes it a hierarchy: 2.4 / 1.06 is 2.26x, against the
+   * 1.49x an `h1` used to have over body. Below about 2x a heading is not a rank, it is a
+   * rounding error.
+   */
+  --text-body: 1.06rem;  /* the reading size: corpus prose, and prose inside a card */
+  --text-lead: 1.25rem;  /* the lead, and a decision record's own summary */
+  --text-h2: 1.35rem;    /* a card's heading — the step that did not exist */
+  --text-h1: 2.4rem;     /* the page's own title, and the only display size there is */
+
+  --text-figure: 1.5rem; /* the one number a tile exists to show. Neither ramp: it is a figure. */
 
   --leading-tight: 1.1;   /* headlines, and the figure in a tile */
   --leading-snug: 1.35;   /* annotation and captions */
-  --leading-base: 1.55;   /* body and lead */
+  --leading-base: 1.55;   /* apparatus, and anything dense */
+  /* Prose only. Longer lines want more leading, and the measure below is 68ch. */
+  --leading-prose: 1.62;
 
   --weight-regular: 400;
   --weight-medium: 500;

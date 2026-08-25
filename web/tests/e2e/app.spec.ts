@@ -2449,6 +2449,78 @@ test.describe("finding things", () => {
   });
 });
 
+/*
+ * The display face is a platform stack, so it is six different faces in the wild.
+ *
+ * `--font-serif` names Iowan Old Style, Palatino, Charter and Georgia and falls through to
+ * whatever `serif` resolves to. That variance was chosen deliberately over committing a font
+ * binary — see `tokens/typography.css` — and the way a chosen risk stays affordable is that
+ * something checks it.
+ *
+ * This repository has paid for the alternative once already: `axisFoot` laid two rows touching
+ * under DejaVu Sans and a pixel apart under SF Pro, and the defect was invisible on the machine it
+ * was written on. The lesson there was to re-measure under other fonts rather than to reason about
+ * one. A heading is far more forgiving than a chart axis — it reflows, and it is not laid out
+ * against pixel constants — but "more forgiving" is not "cannot break", and the failure mode here
+ * is a title running off the side of a phone or sitting on the line beneath it.
+ *
+ * Times New Roman and DejaVu Serif are in the list precisely because they are NOT named by the
+ * token: they are what a Linux or Android reader with none of the four gets, and they are the
+ * widest and the narrowest of the set.
+ */
+test.describe("the display face, under every fallback it can resolve to", () => {
+  const FACES = ["Iowan Old Style", "Palatino", "Charter", "Georgia", "Times New Roman", "DejaVu Serif"];
+  const ROUTES = [
+    "/district/043786",
+    "/wiki/funding-regime/fair-school-funding-plan",
+    "/wiki/decision/the-four-kinds-of-parameter",
+  ];
+
+  for (const face of FACES) {
+    test(`neither overflows nor collides in ${face}`, async ({ page }) => {
+      await page.addInitScript((family: string) => {
+        addEventListener("DOMContentLoaded", () => {
+          const style = document.createElement("style");
+          /* Only the two elements that take the serif. Forcing it wider would test a site that
+             does not exist — body and every figure stay in the sans stack by design. */
+          style.textContent = `h1, .lead { font-family: "${family}", serif !important }`;
+          document.head.append(style);
+        });
+      }, face);
+
+      const complaints: string[] = [];
+      for (const width of [375, 768, 1280]) {
+        await page.setViewportSize({ width, height: 1000 });
+        for (const route of ROUTES) {
+          await page.goto(route);
+          const found = await page.evaluate(() => {
+            const out: string[] = [];
+            const doc = document.documentElement;
+            if (doc.scrollWidth > doc.clientWidth + 1) {
+              out.push(`the page scrolls sideways by ${doc.scrollWidth - doc.clientWidth}px`);
+            }
+            for (const selector of ["h1", ".lead"]) {
+              const el = document.querySelector(selector);
+              if (el == null) continue;
+              const box = el.getBoundingClientRect();
+              if (box.right > doc.clientWidth + 1) {
+                out.push(`${selector} runs ${Math.round(box.right - doc.clientWidth)}px off the right`);
+              }
+              const next = el.nextElementSibling;
+              if (next != null && next.getBoundingClientRect().top < box.bottom - 1) {
+                out.push(`${selector} sits on what follows it`);
+              }
+            }
+            return out;
+          });
+          for (const complaint of found) complaints.push(`${width}px ${route}: ${complaint}`);
+        }
+      }
+      expect(complaints, complaints.join("\n")).toEqual([]);
+    });
+  }
+});
+
 test.describe("presentation", () => {
   test("renders in dark mode without losing the series colours", async ({ page }) => {
     // Charts are rendered at build time and cannot re-render on a theme change, so every colour in

@@ -188,7 +188,10 @@ if (breaches.length > 0) {
   if (set.length === 0) {
     console.log("  No thresholds are set yet. Each redesign phase fills one in; see #183.");
   } else {
-    console.log(`  ${set.length} threshold(s) set and green: ${set.map(([k, v]) => `${k} <= ${v}`).join(", ")}`);
+    /* `headingRatio` is a FLOOR and every other threshold is a ceiling, so one comparator for all
+       of them would have printed the one that matters most here backwards. */
+    const shown = set.map(([k, v]) => `${k} ${k === "headingRatio" ? ">=" : "<="} ${v}`);
+    console.log(`  ${set.length} threshold(s) set and green: ${shown.join(", ")}`);
     console.log("  The rest of the report is printed and not graded; see #183.");
   }
 }

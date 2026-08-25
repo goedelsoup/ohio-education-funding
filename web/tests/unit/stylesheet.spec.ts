@@ -78,9 +78,30 @@ test("there are exactly three claim status classes", () => {
  * So: none of the four may take a typeface, a hue, or a radius of its own. A hue in particular is
  * the one to watch, because on this site a hue names a data series and spending one on a container
  * would make every findings block look like a formula-aid figure.
+ *
+ * # One amendment, made in #186, and the word it turns on is "own"
+ *
+ * This rule was written when the site had one typeface, so "no genre takes a typeface" cost
+ * nothing to say. #186 gave the site a display face — `--font-serif`, on the `h1` and on the lead
+ * — and that made the rule fire on `.lead`.
+ *
+ * The amendment is narrow and it is NOT an exemption. The lead may take `--font-serif` and nothing
+ * else, and only while the `h1` takes it too: the assertion below reads both. So the lead cannot
+ * own a face, it can only share the page's. The moment the title stops using it, the lead is in
+ * breach — which is the property the original rule was protecting, stated in a way that survives
+ * the site having a display voice at all.
+ *
+ * The other three genres are unchanged and may take no typeface under any circumstances. A
+ * findings block or a withdrawal in a second face would be the fourth visual language the rule
+ * exists to prevent, and neither of them pairs with anything.
  */
 test("no prose genre takes a typeface, a hue, or a radius of its own", () => {
   const SERIES_HUE = /var\(--(series|ordinal|claim)-/;
+  /* Read once, from the `h1` rule itself. This is what makes the lead's typeface a loan rather
+     than a possession: drop the serif from the title and the lead's copy becomes a breach. */
+  const H1_TAKES_SERIF = [...rules(/^h1$/)].some(([, body]) =>
+    /font-family\s*:\s*var\(--font-serif\)/.test(body),
+  );
   const offenders: string[] = [];
   // Match the class as a token wherever it appears, chained or not. The first version anchored on
   // `(^|,|\s)\.findings`, which never matched `.card.findings` — the class this site actually uses,
@@ -94,7 +115,14 @@ test("no prose genre takes a typeface, a hue, or a radius of its own", () => {
   for (const [selector, body] of rules(GENRE)) {
     for (const declaration of body.split(";")) {
       const [property = "", value = ""] = declaration.split(":").map((part) => part.trim());
-      if (property === "font-family") offenders.push(`${selector} sets a typeface`);
+      if (property === "font-family") {
+        /* `.lead` may carry the display face, and only it, and only while the title carries it
+           too — see the amendment in this test's header. Every other genre, and every other
+           value, is a breach. */
+        const isSharedDisplayFace =
+          /\.lead(?![a-z-])/.test(selector) && value === "var(--font-serif)" && H1_TAKES_SERIF;
+        if (!isSharedDisplayFace) offenders.push(`${selector} sets a typeface: ${value}`);
+      }
       // A card legitimately has a radius, and `findings` IS a card here — so the exemption is for
       // a rule targeting the card itself, which means the LAST compound in the selector. Testing
       // the whole string exempted `.card.apparatus .revision-body` too, which is a descendant and
