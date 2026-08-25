@@ -1026,6 +1026,15 @@ function renderTargetedAssistance(d: District, statewide: Statewide): string {
  * The two counts also disagree. Direct certification is administrative and finds a median 61% of
  * what the economically disadvantaged count does, so putting 35% of the weight on it lowers the
  * funded count almost everywhere. In three districts it runs the other way.
+ *
+ * # The second count is a year behind the weights, and the table says so
+ *
+ * H.B. 96 puts the second term on the year being funded, and the department's FY2027 workbook
+ * carries FY2026 against the FY2027 weights — its own column header reads `d1b FY26 Directly
+ * Certified ADM`. A simulation cannot use a count the year it prices has not produced, so every
+ * DPIA figure on this page is computed on a count the actual FY2027 payment will not use. That is
+ * a property of the source rather than of the district, which is why it is stated in the row and
+ * not in a caveat somewhere else. See #174.
  */
 function renderDpia(d: District): string {
   const p = d.dpia;
@@ -1053,7 +1062,8 @@ function renderDpia(d: District): string {
             certificationRatio > 0
               ? `${pct(certificationRatio, 0)} of the disadvantaged one here`
               : "smaller almost everywhere"
-          }.</td></tr>
+          }. A year behind the weights beside it: the model cannot use a count the year it
+          prices has not produced.</td></tr>
         <tr class="current"><th>Blended count</th>
           <td class="tnum">${count(Math.round(p.weighted_adm))}</td>
           <td class="n">The 65/35 mix. This is the number the money is paid on.</td></tr>

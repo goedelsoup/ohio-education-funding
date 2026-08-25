@@ -21,7 +21,8 @@ use edfund_core::{Adm, Dollars};
 ///    the FY2026 directly certified ADM. The two disagree substantially — direct certification is
 ///    administrative and finds a **median 61%** of what the disadvantaged count does, and fewer
 ///    than half of them in 146 districts — so the 35% weight pulls the funded count below the
-///    disadvantaged count everywhere.
+///    disadvantaged count everywhere. The second vintage is a year behind the weights beside it,
+///    which is the model rather than a mistake: see [`Dpia::directly_certified_adm`].
 /// 2. **Express it as a share** of the district's enrolled ADM.
 /// 3. **Index that share against the state's**, 0.5334 — and *square it*.
 ///
@@ -33,6 +34,27 @@ pub struct Dpia {
     /// `d1a` — FY2025 economically disadvantaged ADM.
     pub economically_disadvantaged_adm: Adm,
     /// `d1b` — FY2026 directly certified ADM. Consistently the smaller of the two.
+    ///
+    /// # The vintage is a year behind the weights, and the act says it should not be
+    ///
+    /// H.B. 96 sets this term on "the ADM of students directly certified as economically
+    /// disadvantaged **for the fiscal year for which the DPIA payment is calculated**", and the
+    /// LSC greenbook writes the FY2027 row of the formula out with `FY 2027 Directly certified
+    /// ADM` in it. The FY2027 workbook this panel is read from carries **FY2026** against the
+    /// FY2027 65/35 weights: its `DPIA` sheet heads the column `d1b FY26 Directly Certified ADM`
+    /// and its `Directions` sheet sources it from the `FY26 Nov #2` collection.
+    ///
+    /// **Because the workbook is a simulation.** FY2027 direct certification has not been
+    /// collected, so the model substitutes the latest year that has — the same `FY26 Nov #2`
+    /// collection every other count in it comes from, the current-year enrolled ADM at the end of
+    /// [`super::HISTORY_YEARS`] included. The label is the department's own word and is not an
+    /// error; what it means is that the DPIA figures here are computed on a count the actual
+    /// FY2027 payment will not use.
+    ///
+    /// Settled at #174 and pinned by
+    /// `crates/project/tests/what_the_act_says_and_the_code_does_not.rs`, which shows the same
+    /// thing arithmetically: `d1a` sums to within 1.1% of the greenbook's FY2025 economically
+    /// disadvantaged estimate, and `d1b` sums 15% below its FY2025 direct-certification figure.
     pub directly_certified_adm: Adm,
     /// `d1` — the 65/35 blend.
     pub weighted_adm: Adm,

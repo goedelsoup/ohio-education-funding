@@ -87,6 +87,41 @@ findings: |
   error in any of them — the dispersion is in the denominator. [verified —
   `crates/project/tests/what_the_act_says_and_the_code_does_not.rs`]
 
+  ### The second count is a year behind the weights, and the act says it should not be
+
+  H.B. 96 fixes the first term at FY2025 and sets the second on *"the ADM of students directly
+  certified as economically disadvantaged **for the fiscal year for which the DPIA payment is
+  calculated**"*. The greenbook writes the FY2027 row out to match — `(FY 2027 Directly certified
+  ADM x 35%)` — with the rule in prose beside it: *"the formula for each fiscal year will use a
+  district's directly certified ADM for that year."* The department's FY2027 workbook carries
+  **FY2026** against those FY2027 weights. Its `DPIA` sheet heads the column `d1b FY26 Directly
+  Certified ADM`, and its `Directions` sheet names the collection the column came from: `FY26 Nov
+  #2`. [verified — the workbook's own header and vintage table]
+
+  **It is the simulation, not an error, and it is not an exception either.** FY2027 direct
+  certification has not been collected, so the model substitutes the latest year that has — and
+  enrolled ADM, the categorical FTEs and preschool special education ADM are all `FY26 (Nov #2)`
+  on the same sheet. Every count in the model is the most recent collection there was rather than
+  the year being funded. What that costs a reader is specific: every DPIA figure the corpus
+  carries is computed on a count the actual FY2027 payment will not use. [verified]
+
+  The sizes say the same thing without the workbook. The greenbook publishes both counts statewide
+  for traditional districts in FY2025, and the term the corpus labels FY2025 lands on its figure
+  while the term it labels FY2026 does not:
+
+      term                              greenbook, FY2025    the model carries
+      economically disadvantaged ADM      847,000 (est.)         856,236     +1.1%
+      directly certified ADM              557,000                474,197    -14.9%
+
+  A term on the greenbook's vintage would sit inside the first row's band. [verified —
+  `crates/project/tests/what_the_act_says_and_the_code_does_not.rs`]
+
+  The 82,800-pupil gap is **not** a measured one-year fall in direct certification. The two figures
+  are a fiscal year and possibly a collection point apart — `Nov #2` is a point in the year and the
+  greenbook does not say what its own is — so the difference is not attributable. What it settles
+  is only that `d1b` is not FY2025's count, which together with the header is the whole question.
+  [verified]
+
   ### What the statewide share is
 
   `d3` divides by 0.533380310606710 — the statewide economically disadvantaged percentage. R.C.
@@ -162,6 +197,16 @@ description: |
 
   And the act names the **vintage**, which nothing else did: the first term is the **FY2025**
   count, not the year the aid is paid in.
+figures:
+  - key: project/dpia-economically-disadvantaged-adm-statewide
+    value: 856236
+    field: findings
+    as_written: "847,000 (est.)         856,236"
+  - key: project/dpia-directly-certified-adm-statewide
+    value: 474197
+    field: findings
+    as_written: "557,000                474,197"
+
 revisions:
   - was: |
       Edgerton Local's published blend of 342.38 against 352.03 computed from the stated 65/35
@@ -249,8 +294,8 @@ revisions:
 properties:
   name: Disadvantaged Pupil Impact Aid
   function: |
-    d1a  FY2025 economically disadvantaged ADM
-    d1b  FY2026 directly certified ADM
+    d1a  FY2025 economically disadvantaged ADM   <- the sheet's own header, `d1a FY25 ...`
+    d1b  FY2026 directly certified ADM           <- `d1b FY26 ...`, a year behind the weights
     d1   = 0.65 x d1a + 0.35 x d1b
     d2   = d1 / enrolled ADM
     d3   = (d2 / 0.533380310606710) ^ 2          <- squared, for all 609 districts

@@ -191,6 +191,86 @@ fn edgertons_disadvantaged_count_is_a_prior_year_count_against_a_collapsed_enrol
     );
 }
 
+/// **The second poverty count is a year behind the one the act names, and that is the model.**
+///
+/// H.B. 96 fixes the first term at FY2025 and sets the second on "the ADM of students directly
+/// certified as economically disadvantaged **for the fiscal year for which the DPIA payment is
+/// calculated**". The greenbook writes the FY2027 row out with `FY 2027 Directly certified ADM`
+/// in it and says so in prose: "the formula for each fiscal year will use a district's directly
+/// certified ADM for that year."
+///
+/// The department's FY2027 workbook carries the **FY2026** count against the FY2027 65/35
+/// weights. Its `DPIA` sheet heads the column `d1b FY26 Directly Certified ADM`, and its
+/// `Directions` sheet sources it from the `FY26 Nov #2` collection — the same collection every
+/// other count in the model comes from, enrolled ADM and categorical FTEs included.
+///
+/// **It is a simulation, not a payment.** FY2027 direct certification has not been collected, so
+/// the model substitutes the latest year that has. The `FY2026` label the corpus and these crates
+/// carry is the department's own word and is not an error — but it means the DPIA figures in the
+/// fixture are computed on a count the actual FY2027 payment will not use. Settled at #174.
+///
+/// The workbook is not committed, so what is pinned here is the arithmetic that shows the same
+/// thing: the term the workbook labels FY25 lands on the greenbook's FY2025 estimate, and the
+/// term it labels FY26 lands nowhere near the greenbook's FY2025 figure.
+#[test]
+fn the_directly_certified_count_is_a_year_behind_the_one_the_act_names() {
+    let act = common::flat(ACT);
+    assert!(act.contains(
+        "in part on the ADM of students directly certified as economically disadvantaged for the \
+         fiscal year for which the DPIA payment is calculated"
+    ));
+
+    let greenbook = common::flat(project::ledger::budget_analysis::GREENBOOK);
+    assert!(
+        greenbook.contains(
+            "The formula for each fiscal year will use a district\u{2019}s directly certified \
+             ADM for that year."
+        ),
+        "the greenbook's prose rule"
+    );
+    assert!(
+        greenbook.contains(
+            "FY 2027 DPIA student count = (FY 2025 Economically disadvantaged ADM x 65%) + \
+             (FY 2027 Directly certified ADM x 35%)"
+        ),
+        "the greenbook's FY2027 formula box"
+    );
+
+    // The greenbook's statewide figures for the two counts, both stated for FY2025 and both for
+    // traditional districts — the same population the panel holds.
+    assert!(greenbook.contains("an estimated 847,000 students in FY 2025"));
+    assert!(greenbook.contains("about 557,000 students for traditional districts in FY 2025"));
+
+    let panel = project::panel::panel();
+    let disadvantaged: f64 = panel
+        .iter()
+        .map(|r| r.dpia.economically_disadvantaged_adm)
+        .sum();
+    let certified: f64 = panel.iter().map(|r| r.dpia.directly_certified_adm).sum();
+
+    // `d1a` **is** the FY2025 count: 856,236 against the greenbook's estimate of 847,000, which
+    // is the distance between a figure estimated before the year closed and one collected after.
+    assert!(
+        (disadvantaged / 847_000.0 - 1.0).abs() < 0.02,
+        "d1a sums to {disadvantaged:.0} against an estimated 847,000 for FY2025"
+    );
+    // `d1b` is not. It sums to 474,197 — **15% below** the greenbook's FY2025 direct-certification
+    // figure, far outside that band, and the numeric form of the vintage the workbook's own column
+    // header states.
+    assert!(
+        certified < 500_000.0,
+        "d1b sums to {certified:.0}; the greenbook's FY2025 figure is 557,000"
+    );
+
+    // And the year it is on is the model's current enrolment year rather than a vintage of its
+    // own. If a later model moves that year, every `FY2026` label on this count moves with it.
+    assert_eq!(
+        project::panel::HISTORY_YEARS[2],
+        edfund_core::FiscalYear(2026),
+        "the directly certified count is on the model's current enrolment year"
+    );
+}
+
 /// The extract is the school funding portion and not the whole act.
 #[test]
 fn the_committed_extract_is_bounded_and_is_about_schools() {

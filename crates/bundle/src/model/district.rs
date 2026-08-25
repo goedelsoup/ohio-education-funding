@@ -311,6 +311,12 @@ pub struct Dpia {
     /// FY2025 economically disadvantaged ADM, weighted 65%.
     pub economically_disadvantaged_adm: f64,
     /// FY2026 directly certified ADM, weighted 35%. Consistently the smaller of the two.
+    ///
+    /// A year behind the FY2027 weights it is multiplied by. The act and the LSC greenbook both
+    /// put this term on the year being funded; the department's workbook heads the column `d1b
+    /// FY26 Directly Certified ADM` and sources it from the `FY26 Nov #2` collection, because a
+    /// simulation of FY2027 cannot use a count FY2027 has not produced. See #174 and
+    /// `project::panel::Dpia::directly_certified_adm`.
     pub directly_certified_adm: f64,
     /// The blend of the two.
     pub weighted_adm: f64,
