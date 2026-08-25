@@ -1448,6 +1448,45 @@ pub static FIGURES: &[Figure] = &[
                 .correlation
         },
     },
+    // `formula-component/fsfp-disadvantaged-pupil-impact-aid`. The two counts DPIA blends, summed
+    // over the panel, because the node's claim about their *vintages* rests on their sizes: the
+    // greenbook publishes both statewide for FY2025, the term the workbook labels FY25 lands on
+    // its figure and the term it labels FY26 lands 15% away from it. See #174.
+    //
+    // Rounded to a whole pupil inside `compute`. An ADM is a full-time equivalent and sums to a
+    // fraction; a `Count` is compared exactly, and the corpus quotes these as pupils.
+    Figure {
+        key: "project/dpia-economically-disadvantaged-adm-statewide",
+        owner: "crates/project",
+        unit: Unit::Count,
+        label: "`d1a` summed over the panel — the FY2025 economically disadvantaged ADM the \
+                FY2027 model is still funding on",
+        pinned: 856_236.0,
+        tolerance: 0.0,
+        compute: |i| {
+            i.panel
+                .iter()
+                .map(|r| r.dpia.economically_disadvantaged_adm)
+                .sum::<f64>()
+                .round()
+        },
+    },
+    Figure {
+        key: "project/dpia-directly-certified-adm-statewide",
+        owner: "crates/project",
+        unit: Unit::Count,
+        label: "`d1b` summed over the panel — the directly certified ADM, which the workbook \
+                heads FY26 and the act would have on FY2027",
+        pinned: 474_197.0,
+        tolerance: 0.0,
+        compute: |i| {
+            i.panel
+                .iter()
+                .map(|r| r.dpia.directly_certified_adm)
+                .sum::<f64>()
+                .round()
+        },
+    },
     // `formula-component/temporary-transitional-aid-guarantee`. The finding is a negative and the
     // pair of figures is the whole of it: guarantee status looks like it predicts achievement and
     // stops doing so the moment poverty is held constant.

@@ -323,7 +323,9 @@ mod special_education_columns {
 ///
 /// - `d1` weights the FY2025 economically disadvantaged ADM at 65% and the FY2026 directly
 ///   certified ADM at 35%. Two measures of the same thing that disagree — direct certification
-///   is administrative and captures fewer children than the disadvantaged count does.
+///   is administrative and captures fewer children than the disadvantaged count does. Both
+///   vintages are the sheet's own, read off its header row; the second is a year behind the
+///   weights beside it for the reason given on [`dpia_columns::DIRECTLY_CERTIFIED_ADM`].
 /// - `d2` is that blended count as a share of enrolled ADM.
 /// - `d3` indexes `d2` against the statewide figure of 0.5334, so a district at the state average
 ///   scores one and the aid scales from there.
@@ -333,7 +335,20 @@ mod dpia_columns {
     pub const IRN: usize = 0;
     /// `d1a` FY2025 economically disadvantaged ADM.
     pub const ECON_DISADVANTAGED_ADM: usize = 4;
-    /// `d1b` FY2026 directly certified ADM.
+    /// `d1b` FY2026 directly certified ADM — the column the sheet heads `d1b FY26 Directly
+    /// Certified ADM`.
+    ///
+    /// **A year behind the FY2027 weights it is multiplied by, and that is the model rather than
+    /// a mistake.** H.B. 96 puts the second term on "the ADM of students directly certified …
+    /// for the fiscal year for which the DPIA payment is calculated", and the LSC greenbook
+    /// writes the FY2027 row out with `FY 2027 Directly certified ADM` in it. The workbook is a
+    /// simulation: FY2027 direct certification has not been collected, so the `Directions` sheet
+    /// sources this column from the `FY26 Nov #2` collection — the same one enrolled ADM, the
+    /// categorical FTEs and preschool special education ADM all come from.
+    ///
+    /// So the fixture's DPIA figures are computed on a count the actual FY2027 payment will not
+    /// use. Settled at #174; pinned by
+    /// `crates/project/tests/what_the_act_says_and_the_code_does_not.rs`.
     pub const DIRECTLY_CERTIFIED_ADM: usize = 5;
     /// `d1` the 65/35 blend of the two.
     pub const WEIGHTED_ADM: usize = 6;
