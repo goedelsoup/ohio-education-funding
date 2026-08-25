@@ -1,0 +1,90 @@
+id: what-approves-a-connector
+summary: >-
+  The registry's approval list is derived from these records rather than restated beside them, and
+  the four connectors that had been wired without one get a record — written now, and saying so.
+context: |
+  [`crates/connect/README.md`](../../crates/connect/README.md) said, for eleven phases, that a
+  connector appearing in the registry without a decision record fails a test. It did not. The test
+  it named — `registry::tests::every_connector_approved_in_the_ontology_is_present` — compared
+  `CONNECTORS` against a hand-written array of 21 keys sitting six lines above it, with a comment
+  attributing each key to the record that approved it.
+
+  A hand-written array cannot check the property the sentence claimed, and the gap was not
+  hypothetical. Four connectors — `dew-scholarship-reports`, `dew-school-improvement`,
+  `ohio-auditor` and `lsc-catalog` — were in the array, in the registry, and in no decision record
+  that names them. The array had been extended alongside each one, so every addition passed.
+
+  Issue #129 found the sentence and pull request #137 corrected it — it now says the test cannot
+  do this, and names the four. That was the honest move and it was not the fix. A
+  README that documents its own gap still leaves the gap, and the sentence that was there first was
+  the one worth making true.
+
+  **Prose mention cannot stand in for approval, and the distance is not small.** `tax-abstract` is
+  named in seven of the 29 records here and approved by one; `dew-foundation` in seven, approved by
+  one. A record cites the connectors it reasons about far more often than it declares one. Any test
+  reading these files as text would have to treat a citation as an approval, which would pass the
+  four this is meant to catch and would also make `the-channel-with-no-line` — a record about
+  `tax-casino` that discusses `tax-abstract` and `ohio-bills` at length — look like the approving
+  record for three.
+decision: |
+  **Declare it, in the record, in a field.** A decision record that approves one or more connectors
+  carries a `connectors:` sequence of registry keys. Thirteen records carry it and they account for
+  all 21 connectors, each named exactly once.
+
+  The field is data and not prose, and it is chosen for the reason `Revision` in
+  `web/src/lib/corpus.ts` is structured rather than found in prose: the failure mode is
+  asymmetric. A record that forgets the field fails the test loudly; a record
+  whose prose happens to mention a key stays silent, which is the direction that has already gone
+  wrong once.
+
+  It costs the site nothing. `readDecision` reads fields off `DECISION_SECTIONS`, an allowlist, so
+  an unlisted field is ignored rather than rendered as an unheaded card — and `ontology` has
+  carried a non-prose `corpus_depth` since genesis, so this is a shape these files already have.
+
+  **The test derives the list and checks it both ways.** Every connector in the registry is
+  declared by some record, every declared connector is in the registry, and no connector is
+  declared twice. The third is not redundant: without it, two records claiming the same key would
+  let a dropped connector pass on the count.
+
+  **And the four get records.** [`scholarship-reports-connector`](scholarship-reports-connector.yml),
+  [`school-improvement-connector`](school-improvement-connector.yml),
+  [`auditor-reports-connector`](auditor-reports-connector.yml) and
+  [`catalog-connector`](catalog-connector.yml), each written from the commit that wired the
+  connector and each opening by saying it was written after the fact. A retroactive record dated
+  as though it were contemporaneous would be a worse defect than the one being closed.
+consequences: |
+  **The README's original sentence is true now, and it is the test that makes it so.** A
+  twenty-second connector added without a record fails `cargo test -p connect` on the line that
+  names it, before review.
+
+  **Four records exist that record no deliberation.** They reconstruct a decision from the commit
+  that made it, and they are weaker documents than the nine written at the time — there is no
+  rejected alternative in them that was actually rejected in front of anyone. Each says so in its
+  own first paragraph. This is the cost of the fix and it is not recoverable: the reasoning that
+  was not written down at the time is gone, and what can be salvaged is the reasoning the commit
+  message preserved.
+
+  **The registry comment shrinks from 34 lines to a reference.** The attribution it carried —
+  which record approved which key — moves into the records themselves, where it can be wrong in a
+  way something notices.
+alternatives: |
+  **Scan the records' prose for each key.** Rejected on the counts above: seven mentions to one
+  approval for two different connectors, and no rule over text distinguishes them. A test that
+  passes for the wrong reason is worse than the array, because the array at least did not claim to
+  have checked.
+
+  **Put the approval list in one file — a manifest of key to record.** Rejected: it is the array
+  with a different extension. The property worth holding is that the approval lives *in* the
+  document that made it, so that adding a connector and writing its record are the same act. A
+  separate manifest is a third place to forget.
+
+  **Delete the claim instead, and let the array be an array.** Considered, and it is what #137 did
+  as far as it went. Rejected here because the claim describes a discipline this repository
+  actually wants and has mostly kept — 17 of 21 connectors did have a record, written before the
+  code. The four are the exception, and the cheaper repair of the sentence would have made the
+  exception permanent.
+
+  **Require a record before a connector may be `Wired` rather than before it may exist.** Rejected:
+  it would exempt exactly the connectors most in need of a stated reason. `ofcc-projects` has been
+  `Declared` since genesis behind a policy blocker, and the argument for keeping it declared is the
+  most contested thing in `proposals`.

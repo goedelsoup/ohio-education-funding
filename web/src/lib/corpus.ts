@@ -802,11 +802,16 @@ function readSource(file: string): Source {
 /**
  * The prose fields a decision record can carry, in the order they are meant to be read.
  *
- * Not every record carries every one, and the variation is not sloppiness: the four connector
- * records state a `rationale` where the rest state `consequences` and `alternatives`, two carry an
- * `amendment` recording a later revision, and `ontology` carries a `corpus_depth` integer that is
- * not prose at all. So this is the order and the labels, and a record renders the intersection —
- * an absent field is absent rather than an empty heading.
+ * Not every record carries every one, and the variation is not sloppiness: four records state a
+ * `rationale` where the rest state `consequences` and `alternatives`, two carry an `amendment`
+ * recording a later revision, and `ontology` carries a `corpus_depth` integer that is not prose at
+ * all. So this is the order and the labels, and a record renders the intersection — an absent
+ * field is absent rather than an empty heading.
+ *
+ * Reading an allowlist rather than the file's own keys is also what lets a record carry data
+ * beside its prose. Thirteen of them declare a `connectors:` sequence that `crates/connect`'s
+ * registry tests read to derive the connector approval list; none of it reaches this page, which
+ * is the intended outcome rather than an oversight.
  *
  * `summary` is deliberately not here. It leads the page rather than sitting in the sequence.
  */

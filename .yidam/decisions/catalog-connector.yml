@@ -1,0 +1,90 @@
+id: catalog-connector
+summary: >-
+  lsc-catalog, a second connector on a publisher already in the registry — the Catalog of Budget
+  Line Items is a standing reference restated each edition, which is a different claim from a
+  greenbook's account of one act as enrolled, and folding them would lose which.
+context: |
+  **Written after the fact.** The connector was declared and wired in `09ae433`, and no decision
+  record named it until [`what-approves-a-connector`](what-approves-a-connector.yml) found four
+  connectors in that state. It is the least uncovered of the four:
+  [`the-catalog-of-budget-line-items`](the-catalog-of-budget-line-items.yml) scoped the source in
+  detail, probed it, and deliberately did not start the extraction. What that record does not do is
+  decide whether the Catalog is a connector at all or a second source under `lsc-budget`, because
+  in the phase it was written there was nothing to attach either way.
+
+  The extraction phase then had to decide it, and did so in a commit message. Eighteen editions of
+  the education volume, **12,048 money rows and 2,008 line items**, and the series the corpus had
+  wanted since genesis: GRF 200550 Foundation Funding, enacted, one figure per fiscal year from
+  FY2006 to FY2027 with no year missing and none claimed by two editions.
+decision: |
+  Declare `lsc-catalog` as a connector in its own right rather than as sources under `lsc-budget`,
+  `Wired` with a recorded remainder, feeding `fiscal-period`, `program`, `legislation` and
+  `parameter`.
+
+  Same publisher, different artefact — the reason `ohio-session-laws` is not folded into
+  `ohio-laws` and `tax-casino` is not folded into `tax-abstract`. `lsc-budget` retrieves the
+  greenbook, which is LSC's analysis of **a specific act as enrolled**. The Catalog is LSC's
+  standing reference, restating each line item's history **as of publication**. A figure restated
+  four editions later is not the same claim as a figure published at enactment, and the corpus's
+  appropriation nodes cite the latter. One connector holding both would have one status and one
+  blocker for two claims that a reader must be able to tell apart.
+
+  **Keep the vintage.** Every row carries the edition it came from, which is what makes the two
+  claims distinguishable at all rather than merely distinguished in prose here.
+
+  **Pair columns by count, not by position.** The greenbook workbook attempt failed reading nearest
+  header label, because labels are narrower than the figures beneath them. Here the years, the
+  labels and the amounts agree in number on all **566 sampled blocks** once `---` is read as the
+  stated absence it is, so order is the pairing and no position arithmetic is involved. A block
+  whose three counts disagree is refused and named rather than guessed at.
+consequences: |
+  **Both bienniums the greenbook route cannot reach are now held.** FY2006-07, whose greenbook has
+  no line-item table at all, is in the 2006 edition. FY2012-13, whose two workbook variants LSC
+  serves as one file, is in the 2011 edition.
+
+  **The defect that reverted the workbook attempt is labelled here rather than silent.** An edition
+  published at a biennium's start carries two `Appropriation` columns; the next carries one
+  `Adj. Approp.` in their place — the enacted figure revised by what has happened since. That is
+  the same supersession that produced zero appropriation rows for a whole biennium without
+  failing. The
+  difference is that the publisher *names* it, so the only way to repeat that failure is to throw
+  the label away. Three kinds, never two, and a test asserts no edition mixes them.
+
+  **Eighteen editions, not the nineteen the scoping record claimed.** The 2012 URL resolves and
+  returns a PDF; it is the 2011 document byte for byte — same SHA-256, same length. That record
+  verified existence by status code and content type, and only a digest catches a file served under
+  two names. Wiring both would have put every FY2012 and FY2013 enacted appropriation in the fixture
+  twice under two vintages that are one document. The scoping record is amended in place and the
+  test holds the count.
+
+  **Four `fiscal-period` nodes stop resting on an index page.** They cited one for their
+  appropriating act with an explicit caveat that the `Am. Sub.` designation came from a greenbook
+  not held here. The Catalog confirms it for H.B. 59 and H.B. 64 — and prints H.B. 49, H.B. 166,
+  H.B. 110 and H.B. 33 bare on every one of hundreds of mentions. That is chronological, so it reads
+  as LSC's house style changing at the 132nd rather than as a fact about four bills, and it is
+  recorded as unresolved rather than corrected in either direction.
+
+  **The remainder is what the Catalog is, not what it is missing.** Wired for the education volume
+  of every edition that has one — 2006 and 2008 through 2025. 2007 has no edition. And the earliest
+  edition reaches FY2002, so the Catalog thickens the pre-2000 record rather than extending it: the
+  Foundation Program era and *DeRolph I* still need the session laws.
+alternatives: |
+  **Add the editions as sources under `lsc-budget`.** Rejected, above. It is the economical move
+  and it costs the distinction between an enacted figure and a restated one, which is the single
+  thing this source is uniquely good for.
+
+  **Take the whole-catalog PDF rather than the education volume.** Rejected in the scoping record
+  and the reasoning held: the education volume is the unit this repository reasons about, the
+  per-agency split is the publisher's own, and pinning a digest on a document that changes whenever
+  any of a hundred agencies changes would make every unrelated edit look like a source revision.
+
+  **Treat the Catalog as a replacement for the greenbook and session-law work.** Rejected in the
+  scoping record, and the extraction confirmed why: the Catalog's earliest edition reaches FY2002
+  and the greenbook's earliest actuals are FY1999, so it does not even cover the range it would
+  have had to replace.
+
+  **Wire the 2012 URL as a nineteenth edition, as the scoping record's count implied.** Rejected on
+  the digest. Keeping it would have been the same pathology `the-greenbook-series` found in the
+  workbooks, caught this time before it reached a fixture rather than after.
+connectors:
+  - lsc-catalog

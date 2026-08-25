@@ -89,3 +89,5 @@ rationale: |
   general fund the district's budget. Capital, food service, and most federal programmes sit in
   other funds, so an expenditure figure from this source is not total spending and must never be
   compared to a per-pupil expenditure figure from the profile report without saying so.
+connectors:
+  - dew-five-year-forecast

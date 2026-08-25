@@ -100,3 +100,5 @@ alternatives: |
   **Repair the two published defects in the extractor.** Rejected. The digest manifest pins what
   the department published; a fixture that silently disagrees with it breaks the one property that
   makes the whole retrieval layer checkable.
+connectors:
+  - dew-child-nutrition

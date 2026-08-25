@@ -84,3 +84,5 @@ alternatives: |
   series stops in January 2024 is the *live* page carrying nothing later in any category — an
   archived copy of a page dated earlier could not have said that, and one dated later would still
   leave the question of what had been removed since.
+connectors:
+  - tax-casino

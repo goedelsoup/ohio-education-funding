@@ -125,3 +125,5 @@ alternatives: |
   from this publisher. The Laws of Ohio are printed volumes and the State Library holds them; a
   scanned run may exist. What this phase establishes is only that the General Assembly does not
   serve them.
+connectors:
+  - ohio-session-laws

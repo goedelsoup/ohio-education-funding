@@ -234,54 +234,118 @@ pub fn sources() -> impl Iterator<Item = (&'static Connector, &'static Source)> 
 mod tests {
     use super::*;
 
-    #[test]
-    fn every_connector_approved_in_the_ontology_is_present() {
-        // The nine from decisions/proposals.yml, plus dew-report-card from
-        // decisions/report-card-connector.yml, dew-five-year-forecast from
-        // decisions/five-year-forecast-connector.yml, and dew-payment-reports from
-        // decisions/payment-reports-connector.yml, and census-geography from
-        // decisions/census-geography-connector.yml. A connector dropping out of this list is a
-        // decision, not an oversight, and should fail here first — as should one appearing in the
-        // registry without a decision record behind it, which is what caught the twelfth.
-        let expected = [
-            "dew-foundation",
-            "tax-abstract",
-            "lsc-budget",
-            "ohio-laws",
-            "ohio-session-laws",
-            "ohio-auditor",
-            "ohio-courts",
-            "ofcc-projects",
-            "census-f33",
-            "nces-ccd",
-            "bls-cpi",
-            "dew-report-card",
-            "dew-five-year-forecast",
-            "dew-payment-reports",
-            "census-geography",
-            "dew-child-nutrition",
-            "dew-school-improvement",
-            "dew-scholarship-reports",
-            "lsc-catalog",
-            // ohio-bills from decisions/drafts-are-not-legislation.yml, which added the
-            // `draft-legislation` class and needed a third artefact from a publisher already here:
-            // `ohio-laws` serves the Revised Code as it stands and `ohio-session-laws` serves acts
-            // as passed, and a bill that has not been enacted is neither.
-            "ohio-bills",
-            // tax-casino from decisions/the-channel-with-no-line.yml. A second connector on a
-            // publisher already here for the same reason as `ohio-bills`: `tax-abstract` retrieves
-            // what a district may levy, and this retrieves what the state hands it outside any
-            // formula. They share a publisher and nothing else — different division, different
-            // directory, different blocker.
-            "tax-casino",
-        ];
-        for key in expected {
-            assert!(
-                connector(key).is_some(),
-                "{key} is missing from the registry"
-            );
+    use std::collections::BTreeMap;
+    use std::path::{Path, PathBuf};
+
+    /// The repository root. `CARGO_MANIFEST_DIR` is `<repo>/crates/connect`, so the root is two up.
+    fn root() -> PathBuf {
+        Path::new(env!("CARGO_MANIFEST_DIR"))
+            .ancestors()
+            .nth(2)
+            .unwrap_or(Path::new("."))
+            .to_path_buf()
+    }
+
+    /// Every connector a decision record approves, mapped to the record that approves it.
+    ///
+    /// A record declares its approvals in a `connectors:` block sequence of registry keys, and
+    /// [`what-approves-a-connector`](../../../../.yidam/decisions/what-approves-a-connector.yml)
+    /// records why it is a field rather than something read out of the prose: a record cites the
+    /// connectors it reasons about far more often than it approves one — `tax-abstract` is named
+    /// in seven records and approved by one — so no rule over text can tell a citation from an
+    /// approval, and one that guessed would pass for the wrong reason.
+    ///
+    /// The reader is deliberately narrow: a top-level `connectors:` with nothing after the colon,
+    /// then `  - key` lines until something else. It refuses the flow style rather than reading it
+    /// as an empty list, because a parser that silently sees no connectors would turn this whole
+    /// check off in the one direction that has already gone wrong.
+    fn approved_in_decisions() -> BTreeMap<String, String> {
+        let dir = root().join(".yidam/decisions");
+        let mut files: Vec<PathBuf> = std::fs::read_dir(&dir)
+            .unwrap_or_else(|e| panic!("cannot read {}: {e}", dir.display()))
+            .map(|entry| entry.expect("a readable directory entry").path())
+            .filter(|path| path.extension().is_some_and(|ext| ext == "yml"))
+            .collect();
+        files.sort();
+        assert!(
+            !files.is_empty(),
+            "no decision records at {}",
+            dir.display()
+        );
+
+        let mut approved = BTreeMap::new();
+        for path in files {
+            let record = path
+                .file_stem()
+                .expect("a .yml path has a stem")
+                .to_string_lossy()
+                .into_owned();
+            let text = std::fs::read_to_string(&path)
+                .unwrap_or_else(|e| panic!("cannot read {}: {e}", path.display()));
+
+            let mut in_list = false;
+            for line in text.lines() {
+                if let Some(rest) = line.strip_prefix("connectors:") {
+                    assert!(
+                        rest.trim().is_empty(),
+                        "{record} writes `connectors:` inline; this reader takes a block sequence \
+                         of `  - key` lines and would otherwise see none"
+                    );
+                    in_list = true;
+                    continue;
+                }
+                if !in_list {
+                    continue;
+                }
+                match line.strip_prefix("  - ").map(str::trim) {
+                    Some(key) if !key.is_empty() => {
+                        if let Some(first) = approved.insert(key.to_owned(), record.clone()) {
+                            panic!("{key} is approved twice, by {first} and by {record}");
+                        }
+                    }
+                    _ => in_list = false,
+                }
+            }
         }
-        assert_eq!(CONNECTORS.len(), expected.len());
+        approved
+    }
+
+    #[test]
+    fn every_connector_in_the_registry_was_approved_in_a_decision_record() {
+        // The property `crates/connect/README.md` has always claimed and for eleven phases did not
+        // have. It was checked against a hand-written array of the same 21 keys, which cannot
+        // catch what it was written to catch: the array was extended alongside each connector, so
+        // `dew-scholarship-reports`, `dew-school-improvement`, `ohio-auditor` and `lsc-catalog`
+        // all reached the registry with no record behind them and passed.
+        let approved = approved_in_decisions();
+        let undocumented: Vec<&str> = CONNECTORS
+            .iter()
+            .map(|c| c.key)
+            .filter(|key| !approved.contains_key(*key))
+            .collect();
+        assert!(
+            undocumented.is_empty(),
+            "in the registry and approved by no decision record: {undocumented:?}. \
+             Add a `connectors:` entry to the record that decided it, or write the record."
+        );
+    }
+
+    #[test]
+    fn every_connector_approved_in_a_decision_record_is_present() {
+        // The other direction, and the one the array did check. A connector dropping out of the
+        // registry is a decision, not an oversight, and it should fail here first — against the
+        // record that approved it, which is where the argument for keeping it is written down.
+        let approved = approved_in_decisions();
+        let missing: Vec<String> = approved
+            .iter()
+            .filter(|(key, _)| connector(key).is_none())
+            .map(|(key, record)| format!("{key} (approved in {record})"))
+            .collect();
+        assert!(
+            missing.is_empty(),
+            "approved in a decision record and missing from the registry: {missing:?}. \
+             Removing a connector means withdrawing its approval in the record, not deleting a line."
+        );
     }
 
     #[test]

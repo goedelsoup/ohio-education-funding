@@ -60,3 +60,5 @@ alternatives: |
   **Fold it into `dew-foundation`.** Rejected: that connector retrieves the department's *model*,
   and the payment reports are a *record*. The corpus keeps that distinction everywhere else and
   the two would have different blockers, different vintages, and different failure modes.
+connectors:
+  - dew-payment-reports

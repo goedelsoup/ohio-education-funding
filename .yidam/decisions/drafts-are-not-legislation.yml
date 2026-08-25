@@ -190,3 +190,5 @@ alternatives: |
   the format is known, but nothing here could check that generated language says what the provision
   means, and unverifiable legal text next to verified figures is the worst pairing available. The
   plain-English analysis carries the same information and can be checked.
+connectors:
+  - ohio-bills

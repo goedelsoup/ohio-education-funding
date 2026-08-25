@@ -283,7 +283,7 @@ test("a correction is a blockquote that opens with strong emphasis, and a quotat
 /*
  * Twenty seconds rather than Vitest's five. This is the only test in the suite whose cost grows
  * with the corpus — it renders every section of every decision record through the full markdown
- * pipeline, twice over, and there are 28 records now against the 20 there were when it was
+ * pipeline, twice over, and there are 34 records now against the 20 there were when it was
  * written. It takes about three seconds on an idle machine and has twice exceeded five on a loaded
  * one, which reads in CI as a corpus defect and is not one.
  *

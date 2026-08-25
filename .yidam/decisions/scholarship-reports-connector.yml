@@ -1,0 +1,71 @@
+id: scholarship-reports-connector
+summary: >-
+  dew-scholarship-reports, kept apart from dew-payment-reports so that one lifted blocker does not
+  read as two — and the report it retrieves disagrees with itself in two places that are pinned
+  rather than reconciled.
+context: |
+  **Written after the fact.** The connector was declared and wired in `2428ae9`, and no decision
+  record named it until [`what-approves-a-connector`](what-approves-a-connector.yml) found four
+  connectors in that state. What follows is reconstructed from that commit and from the registry;
+  the alternatives below are the ones the commit shows were weighed, not a deliberation anyone
+  witnessed.
+
+  The scholarship channel was in the corpus only negatively. The FY2027 calculator carries no
+  deduction line — established exhaustively and pinned by a test — which ruled out a reduction
+  without saying what happens instead, and `edchoice-expansion` recorded direct appropriation as
+  "the natural reading and not established here".
+
+  Reading R.C. 3317.022 settled the mechanism positively. The department computes and distributes
+  state core foundation funding to **six funding units**: districts, the community and STEM school
+  unit, and one unit each for educational choice, the pilot project, autism and Jon Peterson.
+  Division (E) pays the EdChoice award to the parent "from the funds paid to the educational choice
+  scholarship unit". The word *deduct* appears in none of the eight sections wired. It is not an
+  appropriation and not a deduction: it is a parallel unit inside the foundation computation, and
+  `cleveland-scholarship` had asserted `mechanism: deduction` flatly and was corrected.
+
+  What the statute cannot give is size. That is the department's 2025 Scholarship Annual Report,
+  which is public, unauthenticated, and had never been committed.
+decision: |
+  Declare `dew-scholarship-reports` as a connector in its own right, `Wired` with a recorded
+  remainder, feeding `program`, with the 2025 Scholarship Annual Report as its single source.
+
+  **Kept apart from `dew-payment-reports` deliberately.** Same department, and folding them
+  together was the obvious economy. One is a statewide aggregate the department publishes to
+  anyone; the other is a per-district file behind an OH|ID login. A single connector would carry
+  one status and one blocker for two access regimes, and wiring the public half would have read as
+  lifting the credentialed half's blocker — which is the one thing about that blocker a reader must
+  not conclude.
+
+  **Committed as a rebuilt fixture rather than quoted.** Five programme totals to the cent is
+  exactly the transcription this repository keeps finding wrong, and a figure reaching the corpus
+  through prose is a figure nothing recomputes.
+consequences: |
+  **Two internal contradictions in the report, both pinned rather than resolved.** Its executive
+  summary claims "more than 175,000" students; its five programme counts sum to **166,587**. And
+  three of its four published averages are not expenditure over participation — Autism reconciles
+  to the cent, the other three sit **1.5% to 3.4% above**. That is a denominator the report does
+  not name, not a slip, and the fixture carries both readings rather than picking one.
+
+  **The deduction stub stays a stub, with a smaller scope.** The current era computes to zero by
+  construction, which is a result rather than a gap. Only the deduct era is left, and it needs
+  credentials, a records request, or a withdrawn route restored.
+
+  **A remainder that is a withdrawal, not an absence.** Per-district participation is a different
+  file: the annual report cites two routes to it and both 404. The breakdown *was* published, is
+  still referenced by a current departmental document, and has been taken down. `still_blocked`
+  says that, so a refresh that finds nothing is not read as a failure to look.
+alternatives: |
+  **Fold the annual report into `dew-payment-reports` as a second source.** Rejected, above. The
+  cost of the separate connector is one more row in the registry table; the cost of folding is a
+  status that describes neither half.
+
+  **Quote the five programme totals into the corpus nodes and skip the connector.** Rejected: the
+  figures are the whole reason to hold the document, and a number in a node with no fixture behind
+  it is the shape issue #131 exists to catch.
+
+  **Reconcile the 175,000 against the 166,587 and publish one.** Rejected: both are the
+  department's, in one document, and choosing between them would be this repository asserting
+  something the publisher does not. It is recorded as a defect in the source, which is what the
+  catalog is for.
+connectors:
+  - dew-scholarship-reports
