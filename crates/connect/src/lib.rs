@@ -283,6 +283,55 @@ fn rebuild_federal_surveys(root: &Path) -> Result<Vec<Rebuilt>, RebuildError> {
     Ok(out)
 }
 
+/// One greenbook's extracted text: general assembly, bill, source key, first fiscal year, text.
+type GreenbookText = (u16, &'static str, String, u16, String);
+
+/// The four greenbooks the PDF era rests on, all of them or an error.
+///
+/// # Why a missing one skips the whole fixture rather than shortening it
+///
+/// These reach back to FY1999 and have no later document to be checked against — the eras meet at
+/// FY2011 and do not overlap — so nothing downstream can notice their absence by disagreeing with
+/// them. That is exactly the case the rule above `BIENNIA` states: a series that reads as
+/// continuous and quietly omits what did not load is worse than no series, because a gap in the
+/// record and a gap in the cache look identical from the fixture.
+///
+/// This used to collect with `filter_map` and `.ok()?`, which broke that rule three lines under
+/// where it is written down. Without poppler the rebuild wrote `appropriation-lines.csv`
+/// **2,083 rows short** — the whole greenbook era, FY1999-FY2011 — reported it as written rather
+/// than skipped, and exited zero. The truncation was caught, but three crates away: four tests in
+/// `project` fail on a fixture that no longer reaches FY1999, none of them able to say the word
+/// `pdftotext`. Returning the error here puts the diagnosis where the cause is, and leaves the
+/// committed extract standing, which is what [`cache::pdf_text`] promises a caller without
+/// poppler.
+///
+/// Partial availability is the worse half of the same defect and is refused for the same reason:
+/// two of the four cached would have written a hole into the middle of the era.
+///
+/// # Errors
+///
+/// The first greenbook that is unregistered, uncached, or unreadable because `pdftotext` is
+/// absent.
+fn greenbook_texts(root: &Path) -> Result<Vec<GreenbookText>, RebuildError> {
+    const GREENBOOKS: &[(&str, u16, u16)] = &[
+        ("hb94", 124, 2002),
+        ("hb95", 125, 2004),
+        ("hb119", 127, 2008),
+        ("hb1", 128, 2010),
+    ];
+    GREENBOOKS
+        .iter()
+        .map(|(bill, ga, first_year)| {
+            let key = format!("{bill}-greenbook");
+            let src = source(&key)
+                .ok_or_else(|| RebuildError::Layout(format!("{key} is not registered")))?
+                .1;
+            let text = cache::pdf_text(root, src)?;
+            Ok((*ga, *bill, key, *first_year, text))
+        })
+        .collect()
+}
+
 /// The appropriation-line series: eight bienniums, two documents each.
 ///
 /// Reads only the registry and the cache, so it threads none of the rebuild's shared state.
@@ -340,69 +389,50 @@ fn rebuild_appropriation_lines(root: &Path) -> Result<Vec<Rebuilt>, RebuildError
             Ok((*ga, *bill, key, variant, *first_year, book.rows(&sheet)?))
         })
         .collect();
-    out.push(match books {
-        Ok(books) => {
-            let views: Vec<fixtures::AppropriationBook<'_>> = books
-                .iter()
-                .map(
-                    |(ga, bill, key, variant, first_year, rows)| fixtures::AppropriationBook {
+    out.push(
+        match books.and_then(|books| Ok((books, greenbook_texts(root)?))) {
+            Ok((books, texts)) => {
+                let views: Vec<fixtures::AppropriationBook<'_>> = books
+                    .iter()
+                    .map(
+                        |(ga, bill, key, variant, first_year, rows)| fixtures::AppropriationBook {
+                            general_assembly: *ga,
+                            bill,
+                            source: key,
+                            variant,
+                            first_year: *first_year,
+                            rows,
+                        },
+                    )
+                    .collect();
+                let greenbooks: Vec<fixtures::Greenbook<'_>> = texts
+                    .iter()
+                    .map(|(ga, bill, key, first_year, text)| fixtures::Greenbook {
                         general_assembly: *ga,
                         bill,
                         source: key,
-                        variant,
                         first_year: *first_year,
-                        rows,
-                    },
-                )
-                .collect();
-            // The greenbook PDFs of the 124th-128th, which reach back to FY1999 and have no
-            // later document to be checked against — the eras meet at FY2011 and do not overlap.
-            // Skipped rather than fatal when a PDF is uncached or `pdftotext` is absent, on the
-            // same footing as every other PDF here.
-            const GREENBOOKS: &[(&str, u16, u16)] = &[
-                ("hb94", 124, 2002),
-                ("hb95", 125, 2004),
-                ("hb119", 127, 2008),
-                ("hb1", 128, 2010),
-            ];
-            let texts: Vec<(u16, &str, String, u16, String)> = GREENBOOKS
-                .iter()
-                .filter_map(|(bill, ga, first_year)| {
-                    let key = format!("{bill}-greenbook");
-                    let src = source(&key)?.1;
-                    let text = cache::pdf_text(root, src).ok()?;
-                    Some((*ga, *bill, key, *first_year, text))
-                })
-                .collect();
-            let greenbooks: Vec<fixtures::Greenbook<'_>> = texts
-                .iter()
-                .map(|(ga, bill, key, first_year, text)| fixtures::Greenbook {
-                    general_assembly: *ga,
-                    bill,
-                    source: key,
-                    first_year: *first_year,
-                    text,
-                })
-                .collect();
+                        text,
+                    })
+                    .collect();
 
-            let combined = fixtures::build_appropriations(&views).and_then(|mut rows| {
-                if !greenbooks.is_empty() {
+                let combined = fixtures::build_appropriations(&views).and_then(|mut rows| {
                     rows.extend(fixtures::build_greenbook_appropriations(&greenbooks)?);
+                    fixtures::reconcile(rows)
+                });
+                match combined {
+                    Ok(rows) => csv_fixture(
+                        root,
+                        fixtures::APPROPRIATION_FIXTURE,
+                        fixtures::APPROPRIATION_HEADER,
+                        &rows,
+                    )?,
+                    Err(cause) => Rebuilt::skipped(fixtures::APPROPRIATION_FIXTURE, cause),
                 }
-                fixtures::reconcile(rows)
-            });
-            match combined {
-                Ok(rows) => csv_fixture(
-                    root,
-                    fixtures::APPROPRIATION_FIXTURE,
-                    fixtures::APPROPRIATION_HEADER,
-                    &rows,
-                )?,
-                Err(cause) => Rebuilt::skipped(fixtures::APPROPRIATION_FIXTURE, cause),
             }
-        }
-        Err(cause) => Rebuilt::skipped(fixtures::APPROPRIATION_FIXTURE, cause),
-    });
+            Err(cause) => Rebuilt::skipped(fixtures::APPROPRIATION_FIXTURE, cause),
+        },
+    );
 
     Ok(out)
 }
@@ -1693,6 +1723,26 @@ fn sheet_by_prefix(
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    #[test]
+    fn one_unavailable_greenbook_is_an_error_rather_than_a_shorter_series() {
+        // The rule stated three lines above `BIENNIA`, applied to the era that cannot enforce it
+        // for itself. The greenbooks reach back to FY1999 with no later document to disagree with
+        // them, so a fixture written without one is not wrong in any way the fixture can show.
+        //
+        // This used to collect with `filter_map` and `.ok()?`. Without poppler the rebuild wrote
+        // `appropriation-lines.csv` 2,083 rows short — the whole FY1999-FY2011 era — reported it
+        // as *written* rather than skipped, and exited zero.
+        //
+        // A root with no cache stands in for every way a greenbook goes missing, poppler included:
+        // `cache::cached_path` only joins a path, so this creates nothing and reads nothing.
+        let error = greenbook_texts(Path::new("/nonexistent-root"))
+            .expect_err("a root with no cache cannot produce four greenbooks");
+        assert!(
+            error.to_string().contains("hb94-greenbook"),
+            "the error should name the greenbook it could not read, and said: {error}"
+        );
+    }
 
     #[test]
     fn the_fixtures_rebuild_names_point_at_files_that_exist() {

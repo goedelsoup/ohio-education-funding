@@ -124,11 +124,18 @@ the computation. **curl**, for HTTPS: TLS is the one thing in this pipeline that
 hand-written next to a DEFLATE decoder, and curl ships with macOS, Windows and every Linux
 distribution, so only the *refresh* path needs it. **pdftotext**, for the PDF sources — and that
 one is a weaker argument, because poppler ships with neither macOS nor Windows. Without it
-`rebuild` reports the PDF fixtures skipped and continues, so
-[`project/fixtures/appropriation-lines.csv`](project/fixtures/appropriation-lines.csv) is
-regenerated **2,083 rows short** — the whole of the greenbook era, FY1999-FY2011 — while the
-run still succeeds. See [`connect/src/cache.rs`](connect/src/cache.rs) for why that is the
-chosen behaviour rather than a hard failure.
+`rebuild` leaves all **12** PDF-backed fixtures alone, reports each one skipped against the
+source it could not read, and continues. See [`connect/src/cache.rs`](connect/src/cache.rs) for
+why that is the chosen behaviour rather than a hard failure.
+
+That was true of eleven of the twelve.
+[`project/fixtures/appropriation-lines.csv`](project/fixtures/appropriation-lines.csv) was
+regenerated **2,083 rows short** — the whole greenbook era, FY1999-FY2011 — and reported as
+*written*, because the four greenbooks behind that era were gathered with `filter_map` and
+`.ok()?` rather than all-or-none. The truncation was caught, but by four tests in `project` that
+can say the series no longer reaches FY1999 and cannot say why. `connect::greenbook_texts`
+returns the first greenbook it cannot read, so the fixture is now skipped rather than shortened
+and the reason names `pdftotext`.
 
 LibreOffice was a third until [`spreadsheet`](spreadsheet/) learned to read the pre-2007 `.xls`
 format natively, so `rebuild` now regenerates every committed spreadsheet fixture from a checkout
@@ -197,7 +204,7 @@ Fields per crate: name, capability type (connector/calculator/feature-engineerin
 | Crate | Description | `#[test]` fns |
 |---|---|--:|
 | [`bundle`](bundle/) | Export a versioned JSON feed of the corpus's district-level findings for the web layer | 50 |
-| [`connect`](connect/) | Retrieval and extraction: the department's publications into committed fixtures | 111 |
+| [`connect`](connect/) | Retrieval and extraction: the department's publications into committed fixtures | 112 |
 | [`deflator`](deflator/) | Convert nominal Ohio school finance figures to constant dollars, fiscal-year aligned | 17 |
 | [`dispersion`](dispersion/) | School finance equity statistics: dispersion and wealth neutrality across agencies | 170 |
 | [`edfund-core`](edfund-core/) | Shared domain types for the Ohio education funding computer | 35 |
@@ -210,7 +217,7 @@ Fields per crate: name, capability type (connector/calculator/feature-engineerin
 | [`scenario-delta`](scenario-delta/) | Winners and losers between two funding runs, with incidence and the off-formula count | 27 |
 | [`spreadsheet`](spreadsheet/) | Read the department's published workbooks with no dependencies | 79 |
 
-13 crates, 926 test functions, no crates.io dependencies. `cargo test` reports a different total: it adds doc-tests and counts each integration binary separately.
+13 crates, 927 test functions, no crates.io dependencies. `cargo test` reports a different total: it adds doc-tests and counts each integration binary separately.
 <!-- /REGEN -->
 
 ## Index status
