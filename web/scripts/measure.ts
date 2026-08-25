@@ -44,6 +44,7 @@ import {
   PROSE_CELL_MIN_WORDS,
   PROSE_MIN_CHARS,
   ROUTES,
+  THRESHOLDS,
   WIDTHS,
   collect,
   formatReport,
@@ -179,8 +180,17 @@ if (breaches.length > 0) {
     console.log(`    ${breach.route} @${breach.width}px — ${breach.message}`);
   }
 } else {
+  /* Say which thresholds held, not merely that nothing failed. "No thresholds are set" printed
+     while one was set and passing, which is a report contradicting itself — the same shape as the
+     `_headers` comment that claimed an override the platform does not do. */
+  const set = Object.entries(THRESHOLDS);
   console.log("");
-  console.log("  No thresholds are set yet. Each redesign phase fills one in; see #183.");
+  if (set.length === 0) {
+    console.log("  No thresholds are set yet. Each redesign phase fills one in; see #183.");
+  } else {
+    console.log(`  ${set.length} threshold(s) set and green: ${set.map(([k, v]) => `${k} <= ${v}`).join(", ")}`);
+    console.log("  The rest of the report is printed and not graded; see #183.");
+  }
 }
 
 process.exit(FAIL && breaches.length > 0 ? 1 : 0);

@@ -667,12 +667,50 @@ h3 { font-size: .82rem; margin: 1.4rem 0 .6rem; color: var(--text-secondary); fo
   }
 }
 
+/*
+ * A card, which is a ground and an interval rather than a box.
+ *
+ * It used to carry a border AND a radius AND a ground, on a page where the card is the only
+ * container there is — so a district page drew 30 bordered boxes, 11 of them decoration, nested
+ * two deep, and no boundary on the page meant anything in particular. The reader's cue that one
+ * section has ended was the same cue as "this is a control", "this is a floating menu" and "this
+ * is a tile inside the thing you are already reading".
+ *
+ * Softness here is FEWER boundaries, not softer ones. The ground already separates a card from the
+ * page — `--surface-1` on `--surface-0` — so the border was a second channel saying what the first
+ * one had said, and the radius made a document section look like a widget. Both go. What replaces
+ * them is the interval: `--space-10` between cards, against the 1.1rem it was, which is the step
+ * the scale did not have until this phase added it.
+ *
+ * The ground stays, and that is deliberate rather than timid. `.card.findings` is distinguished
+ * from every other card by its ground alone on screen — see the print block, where a second
+ * channel is added because paper has no grounds — so removing grounds here would take a genre
+ * distinction with it.
+ */
 .card {
   background: var(--surface-1);
-  border: 1px solid var(--border);
-  border-radius: var(--radius-lg);
-  padding: 1.15rem var(--space-7);
-  margin-bottom: var(--space-6);
+  padding: var(--space-7) var(--space-8);
+  margin-bottom: var(--space-10);
+}
+/*
+ * On a phone the side padding goes back to what it was, and this is a chart constraint rather than
+ * a taste one.
+ *
+ * A chart is drawn at two widths and the narrow drawing's viewBox is 320 units against a content
+ * box measured at 293px — a phone's, through `.wrap` and a card. Widening the card's side padding
+ * to `--space-8` took that box from 295px to 279px at 375px, so every narrow drawing scaled to
+ * 0.872 and its 10px axis text landed at 8.7px. The e2e suite caught it: `no chart draws its text
+ * below 9px`.
+ *
+ * So below 40rem the horizontal padding is `--space-7` exactly, which is the value this card had
+ * before #185 and therefore leaves the chart arithmetic where every constant in `plot/spec.ts` was
+ * calibrated. The vertical padding still grows; it costs a chart nothing.
+ *
+ * 56px of padding on a 375px screen was too much anyway. The failing test is the reason it was
+ * found, not the reason it is wrong.
+ */
+@media (max-width: 40rem) {
+  .card { padding: var(--space-6) var(--space-7); }
 }
 
 label { display: block; font-size: var(--text-sm); color: var(--text-secondary); margin-bottom: var(--space-2); }
@@ -712,8 +750,33 @@ output { font-variant-numeric: tabular-nums; color: var(--text-primary); font-we
   font-weight: var(--weight-semibold);
 }
 
-.tiles { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: var(--space-4); margin-bottom: var(--space-6); }
-.tile { background: var(--surface-1); border: 1px solid var(--border); border-radius: var(--radius-lg); padding: .85rem 1rem; }
+/*
+ * The tiles, which are a row of figures and not five boxes inside a sixth.
+ *
+ * A tile carried the same ground, border and radius as the card holding it — so the card's own
+ * background was drawn twice, and the second copy was outlined. That is the nesting the box count
+ * was measuring: three tiles inside one card is four boxes where a reader sees one card with three
+ * figures in it.
+ *
+ * A tile has two channels of its own already and neither is a border: the key is uppercase at
+ * annotation size, and the value is the largest number on the page. Grouping is the gap.
+ */
+.tiles {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: var(--space-8);
+  margin-bottom: var(--space-8);
+}
+/*
+ * No ground and no padding, in a card or out of one.
+ *
+ * A `.tiles` group outside a card was the case this was written for, and it did not need the
+ * exception it was given: three figures set directly on the page under the lead — `/statewide`
+ * opens that way — read as a headline stat row rather than as something unmoored. The rule that
+ * put a ground back was written, looked at, and deleted rather than kept in case. This repository
+ * has five dead rule groups in its history for exactly that reason.
+ */
+.tile { padding: 0; }
 .tile .k { font-size: .74rem; text-transform: uppercase; letter-spacing: var(--tracking-caps); color: var(--text-muted); }
 .tile .v { font-size: var(--text-figure); font-weight: var(--weight-bold); letter-spacing: -0.02em; font-variant-numeric: tabular-nums; margin: .15rem 0; }
 .tile .n { font-size: .78rem; color: var(--text-secondary); }
@@ -772,7 +835,19 @@ output { font-variant-numeric: tabular-nums; color: var(--text-primary); font-we
 .measure .note { margin-top: 0; }
 .measure .chartwrap { margin: var(--space-1) 0 0; }
 
-.contents { margin: 1.2rem 0 0; }
+/*
+ * The contents, which was the one untreated thing on the route.
+ *
+ * It sat between the sub-navigation and the first card as bare text with a margin, on a site where
+ * every other block had been thought about. It is apparatus — the reader is deciding where to go,
+ * not reading — so it gets the apparatus treatment: a rule above it to say the page proper starts
+ * here, and the interval a section deserves rather than 1.2rem.
+ */
+.contents {
+  margin: var(--space-8) 0 var(--space-10);
+  padding-top: var(--space-6);
+  border-top: 1px solid var(--accent-rule);
+}
 .contents-label {
   margin: 0 0 .45rem;
   font-size: var(--text-xs);

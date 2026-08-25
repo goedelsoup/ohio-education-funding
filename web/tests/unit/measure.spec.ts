@@ -31,7 +31,7 @@ function row(overrides: Partial<Measured> = {}): Measured {
     width: 1280,
     sizes: [11, 11.52, 12, 13.6, 14.72, 15, 15.2, 22.4, 24],
     headingRatio: 1.49,
-    boxes: { count: 38, maxDepth: 2 },
+    boxes: { count: 30, decorative: 11, maxDepth: 2 },
     rightAlignedProse: 31,
     measure: { median: 75, p90: 92, max: 110, over78: 3, count: 42 },
     headerHeight: 51,
@@ -88,12 +88,31 @@ describe("the widest step in a size census", () => {
   });
 });
 
-describe("with no thresholds set", () => {
-  test("today's figures breach nothing", () => {
-    // #183 grades nothing on purpose. A check that starts red teaches whoever added it to skip it,
-    // so the instrument lands green over the very numbers it was built to condemn.
-    expect(THRESHOLDS).toEqual({});
-    expect(violations(report(row()))).toEqual([]);
+describe("the thresholds a phase has set", () => {
+  test("#185 holds decorative boxes at a hard zero", () => {
+    // The only one set so far. #183 deliberately shipped the instrument grading nothing; each
+    // phase since fills in the row it is about, and this is #185's.
+    expect(THRESHOLDS).toEqual({ boxDecorative: 0 });
+  });
+
+  test("and it bites on the figures it was written against", () => {
+    // `row()` carries the pre-#185 district page: 30 boxes, 11 of them decoration.
+    const found = violations(report(row()));
+    expect(found).toHaveLength(1);
+    expect(found[0]?.metric).toBe("boxDecorative");
+    expect(found[0]?.measured).toBe(11);
+  });
+
+  test("and passes the page that came out of it", () => {
+    // 19 boxes left, every one an operable edge or a floating panel, and none of them decoration.
+    expect(violations(report(row({ boxes: { count: 19, decorative: 0, maxDepth: 1 } })))).toEqual([]);
+  });
+
+  test("does not constrain the total, which is mostly affordances", () => {
+    // A threshold on `count` could only be met by removing controls' boundaries, which WCAG 1.4.11
+    // requires. Asserted so that adding one later is a deliberate act rather than a tidy-up.
+    expect(THRESHOLDS.boxCount).toBeUndefined();
+    expect(THRESHOLDS.boxDepth).toBeUndefined();
   });
 });
 
