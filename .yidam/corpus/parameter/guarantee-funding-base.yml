@@ -53,8 +53,9 @@ description: |
 findings: |
   ### It is published for every district, not only the guaranteed ones
 
-  608 of 609 rows carry it, including **314 of the 315 districts the guarantee does not pay**.
-  [verified] Being held at the floor is not what reveals it; the department states it either way.
+  All 609 rows carry a figure and **608** of them carry a positive one, including **314 of the
+  315 districts the guarantee does not pay**. [verified] Being held at the floor is not what
+  reveals it; the department states it either way.
 
   One district's is **negative**: Richmond Heights Local at **-$40,179.23**, because R.C.
   3317.02(N)(1)(b) subtracts FY2020 community school, STEM and scholarship deductions from FY2020
@@ -98,6 +99,40 @@ findings: |
   carries it — so it cannot be recovered, and any simulated cut lets those districts fall past
   a floor that would really catch them. [verified for the model's behaviour; the size of the
   real-world correction is [open]]
+figures:
+  - key: project/model-districts
+    value: 609
+    field: findings
+    as_written: "All 609 rows carry a figure"
+  - key: project/districts-with-a-positive-guarantee-funding-base
+    value: 608
+    field: findings
+    as_written: "**608** of them carry a positive one"
+  - key: project/districts-off-the-guarantee-with-a-positive-funding-base
+    value: 314
+    field: findings
+    as_written: "**314 of the\n  315 districts the guarantee does not pay**"
+  - key: project/largest-negative-guarantee-funding-base
+    value: 40179.23
+    field: findings
+    as_written: "Richmond Heights Local at **-$40,179.23**"
+  - key: project/districts-on-the-guarantee
+    value: 294
+    field: fy2027_scale
+    as_written: "Binding for 294 of 609 districts"
+  - key: project/guaranteed-districts-aggregate-funding-base
+    value: 3032797430.41
+    field: fy2027_scale
+    as_written: "Aggregate base for those districts $3.03 billion"
+  - key: project/guaranteed-districts-formula-amount
+    value: 2150812372.08
+    field: fy2027_scale
+    as_written: "$2.15 billion the formula computes for them"
+  - key: project/guaranteed-districts-formula-share-of-base
+    value: 0.7091843162730566
+    field: fy2027_scale
+    as_written: "the formula computes for them — **70.9%**"
+
 revisions:
   - was: |
       The anchor chain was recorded as reaching FY2013 and no further: "it does not terminate at
@@ -177,7 +212,7 @@ properties:
     real terms — 25.1% of its value across FY2020-FY2025. [verified]
   fy2027_scale: |
     Binding for 294 of 609 districts. Aggregate base for those districts $3.03 billion, against
-    $2.15 billion the formula computes for them — 71.0%. [verified]
+    $2.15 billion the formula computes for them — **70.9%**. [verified]
 links:
   - target: ../parameter.ont.yml
     relationship: instance-of

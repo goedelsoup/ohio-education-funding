@@ -103,7 +103,8 @@ links:
     target: ../education-agency/upper-arlington-city.yml
 
 findings: |
-  **THE GUARANTEE MAKES A DISTRICT'S AID COMPLETELY INSENSITIVE TO ITS ENROLLMENT.** [verified]
+  **THE GUARANTEE MAKES A DISTRICT'S AID COMPLETELY INSENSITIVE TO ITS ENROLLMENT.** [verified —
+  `crates/project`]
   The [temporary transitional aid guarantee](../formula-component/temporary-transitional-aid-guarantee.yml)
   pays a fixed dollar amount that enrollment does not enter. For the 294 districts it funds — very
   nearly half the state — running the FY2027 formula at FY2024, FY2025 or FY2026 enrolment
@@ -126,3 +127,8 @@ findings: |
   **[open]** Whether a damped trend is the right method, which needs an enrollment history longer
   than three points — `nces-ccd` is where one would come from, and it is also what would handle
   district consolidation, without which a long series is silently wrong.
+figures:
+  - key: project/districts-on-the-guarantee
+    value: 294
+    field: findings
+    as_written: "For the 294 districts it funds"

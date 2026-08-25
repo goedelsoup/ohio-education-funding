@@ -162,6 +162,12 @@ findings: |
   range, which is the aggregate distance between computed and base for the districts above
   theirs. That is the whole of what the phase-in decides, and it is an eighth of the aid it is
   usually described as governing. [verified]
+figures:
+  - key: project/districts-on-the-guarantee
+    value: 294
+    field: findings
+    as_written: "the guarantee holds **294 districts at 100%"
+
 links:
   - target: ../parameter.ont.yml
     relationship: instance-of

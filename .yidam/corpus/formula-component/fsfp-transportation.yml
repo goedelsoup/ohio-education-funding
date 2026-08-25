@@ -48,6 +48,20 @@ description: |
   appropriation did not cover the computed entitlement, so the published amount is not what a
   district is owed but what there was to divide. See [appropriation proration
   factor](../parameter/appropriation-proration-factor.yml). [verified]
+figures:
+  - key: project/model-districts
+    value: 609
+    field: findings
+    as_written: "The committed panel holds **609** districts"
+  - key: project/panel-districts-under-the-transportation-floor
+    value: 438
+    field: findings
+    as_written: "**609** districts and gives **438**"
+  - key: project/districts-on-the-transportation-guarantee
+    value: 38
+    field: findings
+    as_written: "`[F]` holds **38 districts** at their FY2021 transportation funding"
+
 findings: |
   **440 of the department's 611 districts sit on it** — 72%, against 23% on the formula's floor.
   For most of Ohio, local capacity does not determine transportation aid at all. This is the

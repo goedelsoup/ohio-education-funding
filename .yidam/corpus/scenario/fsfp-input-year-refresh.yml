@@ -132,7 +132,7 @@ findings: |
 
   ### The guarantee halves it
 
-  [verified — the department's own FY27 model; see
+  [verified — the department's own FY27 model, carried in `crates/project`; see
   [`crates/foundation/tests/department_model_fy27.rs`](../../../crates/foundation/tests/department_model_fy27.rs)]
 
       districts on the guarantee in FY2027   294 of 609   (48.3%)
@@ -192,6 +192,12 @@ findings: |
   pupil, the increase pays $305.63 to the poorest quintile and $20.81 to the wealthiest, a
   ratio of about fifteen to one. A refresh is progressive; the reason is mostly that wealthy
   districts are on the guarantee. [verified]
+figures:
+  - key: project/districts-on-the-guarantee
+    value: 294
+    field: findings
+    as_written: "districts on the guarantee in FY2027   294 of 609"
+
 revisions:
   - was: |
       Every figure perturbed from an FY2022 reference teacher salary of $67,654 — a $496.3

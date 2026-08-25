@@ -59,11 +59,11 @@ test("every bound figure in the corpus agrees with the crate it cites", () => {
  * node from dropping a `figures:` entry to make a red gate green.
  */
 test("the corpus binds no fewer figures than it did", () => {
-  expect(bindings.length, "154 bindings; raise this when you add one").toBeGreaterThanOrEqual(154);
+  expect(bindings.length, "206 bindings; raise this when you add one").toBeGreaterThanOrEqual(206);
   expect(
     corpus.nodes.filter((node) => node.figures.length > 0).length,
-    "24 nodes carry bindings; raise this when a twenty-fifth does",
-  ).toBeGreaterThanOrEqual(24);
+    "37 nodes carry bindings; raise this when a thirty-eighth does",
+  ).toBeGreaterThanOrEqual(37);
   expect(
     new Set(bindings.map((binding) => binding.key)).size,
     "every figure the manifest exports is bound by some node",
@@ -94,6 +94,34 @@ test("the charge-off comparison is bound in all three nodes that state it", () =
   expect(carriers("regime-diff/median-shortfall-under-the-plan").sort()).toEqual([
     "formula-component/charge-off-local-share",
     "formula-component/fsfp-local-capacity-measure",
+  ]);
+});
+
+/**
+ * The most-repeated computed number in the corpus is bound everywhere it is written.
+ *
+ * `294 of 609` — how many districts the guarantee pays in the terminal year — is stated in ten
+ * nodes across five classes, and until #158's fourth tranche not one of them was bound. That is
+ * the #120 shape at its widest: a correction would have had to find ten files, and the corpus has
+ * already demonstrated twice that it finds three of six.
+ */
+test("the guarantee's district count is bound in all ten nodes that state it", () => {
+  const carriers = corpus.nodes
+    .filter((node) => node.figures.some((f) => f.key === "project/districts-on-the-guarantee"))
+    .map((n) => n.id)
+    .sort();
+
+  expect(carriers).toEqual([
+    "draft-legislation/fund-the-plan-and-retire-the-guarantee",
+    "draft-legislation/hb-96-with-refreshed-inputs",
+    "formula-component/fsfp-formula-transition-supplement",
+    "formula-component/temporary-transitional-aid-guarantee",
+    "funding-regime/fair-school-funding-plan",
+    "metric/enrolled-adm",
+    "parameter/fsfp-phase-in-percentage",
+    "parameter/guarantee-funding-base",
+    "scenario/fsfp-input-year-refresh",
+    "scenario/guarantee-phase-out",
   ]);
 });
 

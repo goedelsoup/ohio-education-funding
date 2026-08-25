@@ -60,6 +60,44 @@ findings: |
 
   **All five multiples match the statute exactly.** [verified —
   `crates/project/tests/the_statute_behind_the_weights.rs`]
+figures:
+  - key: project/career-technical-total
+    value: 53875678.32
+    field: description
+    as_written: "**$54m**, five weighted categories"
+  - key: project/career-technical-associated-services
+    value: 3234233.67
+    field: description
+    as_written: "across all five categories, $3.2m statewide"
+  - key: project/career-technical-base-cost-premium
+    value: 0.19583673578342098
+    field: description
+    as_written: "a base **19.6% higher**"
+  - key: project/statewide-average-base-cost-per-pupil
+    value: 8241.61
+    field: description
+    as_written: "the statewide average of **$8,241.61**"
+
+  - key: project/career-technical-weight-category-one
+    value: 0.6230
+    field: description
+    as_written: "— 0.623, 0.5905, 0.2154, 0.183, 0.157 —"
+  - key: project/career-technical-weight-category-two
+    value: 0.5905
+    field: description
+    as_written: "— 0.623, 0.5905, 0.2154, 0.183, 0.157 —"
+  - key: project/career-technical-weight-category-three
+    value: 0.2154
+    field: description
+    as_written: "— 0.623, 0.5905, 0.2154, 0.183, 0.157 —"
+  - key: project/career-technical-weight-category-four
+    value: 0.1830
+    field: description
+    as_written: "— 0.623, 0.5905, 0.2154, 0.183, 0.157 —"
+  - key: project/career-technical-weight-category-five
+    value: 0.1570
+    field: description
+    as_written: "— 0.623, 0.5905, 0.2154, 0.183, 0.157 —"
 properties:
   name: Career-technical education weights
   function: |

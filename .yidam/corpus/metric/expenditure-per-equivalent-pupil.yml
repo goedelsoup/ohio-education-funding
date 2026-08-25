@@ -25,7 +25,7 @@ findings: |
   [`crates/dispersion/tests/report_card_2425.rs`](../../../crates/dispersion/tests/report_card_2425.rs)]
 
       Performance Index against FY2025 operating expenditures
-        divided by WEIGHTED ADM      -0.015     (the published measure)
+        divided by WEIGHTED ADM      -0.0155    (the published measure)
         divided by UNWEIGHTED ADM    -0.337
 
   One numerator. Two divisors the department publishes side by side in one workbook. The same
@@ -64,7 +64,7 @@ findings: |
   composition-driven, then an outcome with the composition taken out should make the divisor
   irrelevant. It does. Against [Progress (value-added)](progress-value-added.yml), the two
   divisors give **−0.039** and **+0.029** — indistinguishable, where against the Performance
-  Index they give −0.337 and −0.015. [verified] The denominator effect is not a general
+  Index they give −0.337 and −0.0155. [verified] The denominator effect is not a general
   property of the spending measure; it appears only when the outcome is a level.
 
   ### Only one of the two estimates is stable, and it is not the published one
@@ -157,6 +157,20 @@ findings: |
   One guarantee finding does survive, and it corroborates the corpus: guaranteed districts
   average a Performance Index of 89.8 against 85.7 for on-formula districts. [verified] The
   guarantee holds up property-wealthy districts, and property-wealthy districts score higher.
+figures:
+  - key: dispersion/performance-index-tracks-spending-per-headcount-pupil
+    value: 0.33652467581370193
+    field: findings
+    as_written: "Index they give −0.337"
+  - key: dispersion/performance-index-tracks-spending-per-weighted-pupil
+    value: 0.015522201722083795
+    field: findings
+    as_written: "−0.337 and −0.0155. [verified]"
+  - key: dispersion/operating-expenditure-coefficient-of-variation
+    value: 0.20156700075075248
+    field: series
+    as_written: "both match the 0.202 that `crates/dispersion` computes"
+
 revisions:
   - was: |
       The −0.337 correlation between per-pupil spending and measured outcome was reported

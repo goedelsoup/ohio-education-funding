@@ -47,6 +47,28 @@ findings: |
   districts are on the guarantee, 144 on this supplement, and 38 on transportation's** — with
   the formula's own output being what all three are measured against and found short.
   [inference]
+figures:
+  - key: project/transition-supplement-total
+    value: 63578629.47
+    field: description
+    as_written: "$63.6m to **144 districts**"
+  - key: project/transition-supplement-districts
+    value: 144
+    field: description
+    as_written: "**144 districts**"
+  - key: project/transition-supplement-districts-off-the-guarantee
+    value: 17
+    field: findings
+    as_written: "**17 of the 144 do exactly that**"
+  - key: project/districts-on-the-guarantee
+    value: 294
+    field: findings
+    as_written: "**294\n  districts are on the guarantee"
+  - key: project/districts-on-the-transportation-guarantee
+    value: 38
+    field: findings
+    as_written: "38 on transportation's**"
+
 revisions:
   - was: |
       The statutory home of this payment was recorded as unreadable: "Reading the enacted bill

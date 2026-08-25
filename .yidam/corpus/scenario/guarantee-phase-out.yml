@@ -14,10 +14,17 @@ description: |
   million of it — 12.1% — is the temporary transitional aid guarantee**, paid to **294
   districts** holding just over half the state's students, holding them at what they received
   in **FY2020**: a [Bridge formula](../funding-regime/bridge-formula.yml) year Ohio froze
-  rather than computed. [verified — reproduces the department's model to the cent]
+  rather than computed. [verified — `crates/project`, which reproduces the department's model to
+  the cent]
 
   This scenario generalises [fsfp-input-year-refresh](fsfp-input-year-refresh.yml) from the
   single district that node refreshes to the whole state.
+figures:
+  - key: project/districts-on-the-guarantee
+    value: 294
+    field: description
+    as_written: "paid to **294\n  districts**"
+
 findings: |
   ### The three policies are not variants of each other
 

@@ -272,6 +272,10 @@ figures:
     field: findings
     as_written: "disadvantage constant the association is **+0.035**"
 
+  - key: project/districts-on-the-guarantee
+    value: 294
+    field: findings
+    as_written: "**294 of 609 districts"
 revisions:
   - was: |
       A hold-harmless and nothing else: computed funding below a baseline, pay the difference.
