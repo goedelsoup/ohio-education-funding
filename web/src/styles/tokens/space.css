@@ -29,6 +29,19 @@
   --space-7: 1.25rem;
   --space-8: 1.75rem;
   --space-9: 2.5rem;
+  /*
+   * Two steps the scale did not have, and the reason it needed them.
+   *
+   * Everything from 1 to 9 is intra-component: the gap inside a card, between a label and its
+   * value, around a control. Nothing here was large enough to separate one section of a page from
+   * the next, so that job fell to a border — which is how a page ended up with 30 bordered boxes
+   * and no boundary meaning anything in particular. See #185.
+   *
+   * These are the inter-section steps. 10 is the interval between cards; 11 is the one before a
+   * genre changes — the apparatus block at the foot of a wiki node, the footer.
+   */
+  --space-10: 3.25rem;
+  --space-11: 4.5rem;
 
   --radius-sm: 4px;   /* a code span, a bar segment */
   --radius-md: 7px;   /* a control: nav link, tab, select, range */

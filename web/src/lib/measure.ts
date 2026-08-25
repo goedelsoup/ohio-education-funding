@@ -96,8 +96,19 @@ export interface Measured {
   sizes: number[];
   /** `h1` size over `body` size. Below about 2 there is no hierarchy, only a rounding error. */
   headingRatio: number | null;
-  /** Bordered, radiused boxes, and how deep they nest inside one another. */
-  boxes: { count: number; maxDepth: number };
+  /**
+   * Bordered, radiused boxes: how many, how deep they nest, and how many are decoration.
+   *
+   * `count` is what a reader sees. `decorative` is the subset a redesign may actually remove —
+   * everything that is not an operable edge and not a floating panel.
+   *
+   * The split is not a convenience. WCAG 1.4.11 requires a control's boundary to clear 3:1 against
+   * its ground, which is what `--border-control` was solved for, so the border on a chip, a tab, a
+   * select or the skip link is an accessibility requirement rather than a style. Of the 30 boxes
+   * on a district page, 19 are those. A threshold on `count` would therefore be a threshold that
+   * can only be met by removing affordances, which is the opposite of the intent — see #185.
+   */
+  boxes: { count: number; decorative: number; maxDepth: number };
   /** `<td>` carrying more than {@link PROSE_CELL_MIN_WORDS} words and set `text-align: right`. */
   rightAlignedProse: number;
 
@@ -128,7 +139,7 @@ export interface Report {
  * #183 builds the instrument and fails nothing — a check that starts red teaches whoever added it
  * to pass `--no-verify`. Each later phase turns one row of this report into a limit here:
  *
- * - #185 sets `boxCount` and `boxDepth` once the card stops being a bordered box
+ * - #185 set `boxDecorative` to a hard zero once the card stopped being a bordered box
  * - #186 sets `sizeCount`, `sizeGap` and `headingRatio`, and `measureMax` under a stated font
  * - #188 sets `rightAlignedProse` to a hard zero
  * - #189 sets `firstContentY` at 375px, under a stated font
@@ -142,8 +153,10 @@ export interface Thresholds {
   sizeGap?: number;
   /** Smallest permitted `h1`-to-body ratio. Deterministic. */
   headingRatio?: number;
-  /** Most bordered boxes a route may carry. Deterministic. */
+  /** Most bordered boxes a route may carry, operable edges included. Deterministic. */
   boxCount?: number;
+  /** Most bordered boxes that are neither an operable edge nor a floating panel. Deterministic. */
+  boxDecorative?: number;
   /** Deepest a bordered box may nest inside another. Deterministic. */
   boxDepth?: number;
   /** Most right-aligned cells carrying prose. Deterministic, and the target is zero. */
@@ -154,7 +167,24 @@ export interface Thresholds {
   firstContentY?: number;
 }
 
-export const THRESHOLDS: Thresholds = {};
+export const THRESHOLDS: Thresholds = {
+  /*
+   * #185. A bordered, radiused box that is neither an operable edge nor a floating panel is
+   * decoration, and there are none left: the card and the tile both gave theirs up, and what
+   * separates a section from the next one is now the interval.
+   *
+   * A hard zero rather than a budget, because there is no case where a document section needs an
+   * outline to say it has ended — the ground and the space already say it. Anything that genuinely
+   * needs an edge is a control or floats, and neither is counted here.
+   *
+   * `boxCount` is deliberately NOT set. 19 of the 30 boxes a district page used to draw are
+   * operable edges answering to WCAG 1.4.11, so a threshold on the total could only be met by
+   * removing affordances. `boxDepth` is not set either: it fell from 2 to 1 as a consequence of
+   * this, not as an independent constraint, and a floating menu panel legitimately contains
+   * bordered links — asserting depth would forbid that for no reason.
+   */
+  boxDecorative: 0,
+};
 
 /** One breach of one threshold, named so the message says what to do rather than what happened. */
 export interface Violation {
@@ -218,6 +248,10 @@ export function violations(report: Report, thresholds: Thresholds = THRESHOLDS):
       at(row, "boxCount", row.boxes.count, thresholds.boxCount,
         `carries ${row.boxes.count} bordered boxes, over ${thresholds.boxCount}`);
     }
+    if (thresholds.boxDecorative != null && row.boxes.decorative > thresholds.boxDecorative) {
+      at(row, "boxDecorative", row.boxes.decorative, thresholds.boxDecorative,
+        `carries ${row.boxes.decorative} bordered boxes that are decoration, over ${thresholds.boxDecorative}`);
+    }
     if (thresholds.boxDepth != null && row.boxes.maxDepth > thresholds.boxDepth) {
       at(row, "boxDepth", row.boxes.maxDepth, thresholds.boxDepth,
         `nests bordered boxes ${row.boxes.maxDepth} deep, over ${thresholds.boxDepth}`);
@@ -265,6 +299,7 @@ export function formatReport(report: Report): string {
     { head: "max", width: 4, of: (r) => cell(r.measure?.max) },
     { head: ">78", width: 4, of: (r) => cell(r.measure?.over78) },
     { head: "boxes", width: 5, of: (r) => cell(r.boxes.count) },
+    { head: "deco", width: 4, of: (r) => cell(r.boxes.decorative) },
     { head: "deep", width: 4, of: (r) => cell(r.boxes.maxDepth) },
     { head: "cells", width: 5, of: (r) => cell(r.rightAlignedProse) },
     { head: "chrome", width: 6, of: (r) => cell(r.firstContentY) },
@@ -392,12 +427,20 @@ export function collect(limits: {
   /* Bordered, radiused boxes, and their nesting. A box needs a border that is actually drawn —
      a `border-style: none` at 1px paints nothing and is not a boundary a reader can see. */
   const boxed = new Set<Element>();
+  const decorative = new Set<Element>();
+  /* An operable edge answers to WCAG 1.4.11 rather than to taste, and a floating panel needs an
+     edge because it sits over content rather than in it. Shadow is a sound proxy for floating
+     here and not a guess: `stylesheet.spec.ts` asserts that nothing which sits on the page
+     carries one, so anything that does is by construction above it. */
+  const OPERABLE = "a[href], button, input, select, textarea, summary, label, [tabindex]";
   for (const el of document.querySelectorAll("body *")) {
     const style = getComputedStyle(el);
     if (style.borderTopStyle === "none" || parseFloat(style.borderTopWidth) === 0) continue;
     if (parseFloat(style.borderTopLeftRadius) < boxMinRadius) continue;
     if (!visible(el)) continue;
     boxed.add(el);
+    const floating = style.boxShadow !== "none" && style.boxShadow !== "";
+    if (!el.matches(OPERABLE) && !floating) decorative.add(el);
   }
   let maxDepth = 0;
   for (const el of boxed) {
@@ -419,7 +462,7 @@ export function collect(limits: {
   return {
     sizes: [...sizes].sort((a, b) => a - b),
     headingRatio,
-    boxes: { count: boxed.size, maxDepth },
+    boxes: { count: boxed.size, decorative: decorative.size, maxDepth },
     rightAlignedProse,
     measure,
     headerHeight: header == null ? null : Math.round(header.getBoundingClientRect().height),
