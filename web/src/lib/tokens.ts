@@ -59,14 +59,17 @@ export const NEAR = 0.2;
 /**
  * The near-miss ceiling, which is a ratchet and not a target.
  *
- * 93 declarations sit within 20% of a token they do not use. Every one is a pixel somebody chose
+ * 55 declarations sit within 20% of a token they do not use. #186 took every `font-size` and
+ * `line-height` among them onto the ramps — those were the register — and left the spacing ones,
+ * which are rhythm rather than type and would have doubled that phase's visual diff for a
+ * different reason than the one it was about. Every one is a pixel somebody chose
  * by eye next to a value the scale already had an opinion about, and resolving them is #186's job
  * because each resolution moves something.
  *
  * Until then this may not rise. A new literal near a token is a new size chosen by eye, which is
  * exactly how a seven-size scale became the thirteen the page renders.
  */
-export const NEAR_MISS_CEILING = 93;
+export const NEAR_MISS_CEILING = 55;
 
 /** A token declaration. */
 export interface Token {

@@ -30,6 +30,21 @@ body {
   background: var(--surface-0);
   color: var(--text-primary);
   font: 15px/1.55 ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  /*
+   * `body` stays at 15px and stays off `--font-sans`, and both are decisions rather than leftovers.
+   *
+   * 15px is the APPARATUS size — table cells, chips, controls, the footer — which is what most of
+   * the elements on this site are. Prose no longer inherits it: `--text-body` is 1.06rem and the
+   * rules that matter reach for it directly. Raising `body` instead would have raised the 609-row
+   * table with it.
+   *
+   * `--font-sans` names IBM Plex Sans first and no binary ships. Pointing `body` at it would put
+   * that face in front for whoever happens to have it installed, giving those readers a site
+   * measured against a font nobody calibrated: the chart constants in `plot/spec.ts`, the four
+   * `--sticky-chrome` values and the reading measure were all set against the platform stack. The
+   * serif decision settled the general question — this site renders in platform faces — and this
+   * is the same answer applied to the sans. See `tokens.spec.ts`.
+   */
 }
 
 .wrap { max-width: var(--wrap-read); margin: 0 auto; padding: 0 var(--space-7); }
@@ -148,7 +163,7 @@ header.site {
 .brand { font-weight: var(--weight-bold); letter-spacing: var(--tracking-tight); color: var(--text-primary); text-decoration: none; }
 header.site nav { display: flex; gap: .15rem; flex-wrap: wrap; margin-right: auto; }
 header.site nav a {
-  font-size: .85rem;
+  font-size: var(--text-base);
   padding: .3rem .6rem;
   border-radius: var(--radius-md);
   color: var(--text-secondary);
@@ -165,7 +180,7 @@ header.site nav a[aria-current="page"] {
    see the note in `Base.astro`. Everything below is appearance; none of it is behaviour. */
 header.site nav .menu { position: relative; }
 header.site nav summary {
-  font-size: .85rem;
+  font-size: var(--text-base);
   padding: .3rem .6rem;
   border-radius: var(--radius-md);
   color: var(--text-secondary);
@@ -311,7 +326,7 @@ td.year { font-family: var(--font-mono); color: var(--text-annotation); white-sp
   color: var(--text-secondary);
   cursor: pointer;
   padding: var(--space-1) .5rem;
-  line-height: 1.2;
+  line-height: var(--leading-tight);
 }
 
 a { color: var(--series-formula-text); text-decoration-color: color-mix(in srgb, var(--series-formula-text) 40%, transparent); }
@@ -346,7 +361,7 @@ a:hover { text-decoration-color: currentColor; }
   }
 }
 .subnav a {
-  font-size: .85rem;
+  font-size: var(--text-base);
   padding: .4rem .8rem;
   border-radius: var(--radius-md);
   border: 1px solid var(--border-control);
@@ -391,13 +406,62 @@ a:hover { text-decoration-color: currentColor; }
 .basis-scope input:focus-visible ~ .basis label[data-basis="real"] { outline: 2px solid var(--series-formula); outline-offset: 2px; }
 .basis-scope input[data-basis="nominal"]:focus-visible ~ .basis label[data-basis="real"],
 .basis-scope input[data-basis="real"]:focus-visible ~ .basis label[data-basis="nominal"] { outline: none; }
-h1 { font-size: var(--text-h1); margin: 0 0 .3rem; letter-spacing: var(--tracking-tight); }
-h2 { font-size: .95rem; margin: 0 0 .8rem; letter-spacing: -0.005em; }
-h3 { font-size: .82rem; margin: 1.4rem 0 .6rem; color: var(--text-secondary); font-weight: var(--weight-semibold); }
+/*
+ * The display face, and the only place on this site it appears besides the lead.
+ *
+ * `--font-serif` is a platform stack — Iowan Old Style, Palatino, Charter, Georgia — so what a
+ * reader gets depends on what they have. That variance was chosen over committing a font binary
+ * and it is affordable here for a specific reason: a heading reflows. It is not laid out against
+ * pixel constants the way chart text is, and chart text is where this repository has already paid
+ * for assuming a font. Nothing below the lead takes this face.
+ *
+ * `text-wrap: balance` because a display size makes a one-word last line very visible, and a
+ * district name is two to four words with no control over where they break.
+ */
+h1 {
+  font-family: var(--font-serif);
+  font-size: var(--text-h1);
+  line-height: var(--leading-tight);
+  letter-spacing: var(--tracking-tight);
+  font-weight: var(--weight-semibold);
+  margin: 0 0 var(--space-3);
+  text-wrap: balance;
+}
+/*
+ * A card's heading, at the step that did not exist.
+ *
+ * It was 0.95rem — under the 1.06rem its own card's prose is now set at, so a section title was
+ * smaller than the sentences inside it and rank was carried by weight alone. `--text-h2` is the
+ * middle of the reading ramp and the reason the ramp needed a middle.
+ *
+ * Sans, not serif. The serif is the page's voice; a card heading is structure, and setting forty
+ * of them in a display face would make the page a contents list of itself.
+ */
+h2 {
+  font-size: var(--text-h2);
+  line-height: var(--leading-tight);
+  letter-spacing: var(--tracking-tight);
+  margin: 0 0 var(--space-5);
+  text-wrap: balance;
+}
+h3 {
+  font-size: var(--text-base);
+  margin: var(--space-8) 0 var(--space-3);
+  color: var(--text-secondary);
+  font-weight: var(--weight-semibold);
+}
 /* The identifier and edge counts, under the lead rather than over it: the identifier makes the
    page addressable, the lead tells a reader they are in the right place, and somebody arriving
    mid-site from a search result needs the second one first. */
-.sub { color: var(--text-secondary); margin: 0 0 var(--space-8); font-size: .92rem; }
+/* Capped for the same reason as the footer: it is 107 characters of middot-joined metadata on a
+   district page, and a reader scanning for the county should not have to track a full column
+   width to find it. #188 restructures what it says; this only stops it running the page. */
+.sub {
+  color: var(--text-secondary);
+  margin: 0 0 var(--space-8);
+  font-size: var(--text-base);
+  max-width: var(--measure-note);
+}
 
 /*
  * A corpus node's lead — what the thing is, in at most 50 words, above everything else.
@@ -418,11 +482,12 @@ h3 { font-size: .82rem; margin: 1.4rem 0 .6rem; color: var(--text-secondary); fo
  * Every value here was already the token it now names. Nothing moved.
  */
 .lead {
+  font-family: var(--font-serif);
   font-size: var(--text-lead);
-  line-height: var(--leading-base);
+  line-height: var(--leading-prose);
   color: var(--text-primary);
   max-width: var(--measure-lead);
-  margin: 0 0 var(--space-4);
+  margin: 0 0 var(--space-6);
 }
 
 /*
@@ -540,9 +605,9 @@ h3 { font-size: .82rem; margin: 1.4rem 0 .6rem; color: var(--text-secondary); fo
   border: 1px solid var(--border);
   border-radius: 8px;
   padding: .5rem .65rem;
-  font-size: .78rem;
+  font-size: var(--text-sm);
   font-weight: var(--weight-regular);
-  line-height: 1.45;
+  line-height: var(--leading-base);
   letter-spacing: normal;
   text-align: left;
   white-space: normal;
@@ -614,9 +679,9 @@ h3 { font-size: .82rem; margin: 1.4rem 0 .6rem; color: var(--text-secondary); fo
   border: 1px solid var(--border);
   border-radius: 8px;
   padding: var(--space-3) .7rem;
-  font-size: .82rem;
+  font-size: var(--text-sm);
   font-weight: var(--weight-regular);
-  line-height: 1.45;
+  line-height: var(--leading-base);
   color: var(--text-secondary);
   box-shadow: 0 6px 20px rgb(0 0 0 / 18%);
   opacity: 0;
@@ -691,6 +756,27 @@ h3 { font-size: .82rem; margin: 1.4rem 0 .6rem; color: var(--text-secondary); fo
   background: var(--surface-1);
   padding: var(--space-7) var(--space-8);
   margin-bottom: var(--space-10);
+}
+/*
+ * Prose inside a card, which had neither a size nor a measure of its own.
+ *
+ * A `<p>` in a card inherited `body`'s 15px — the apparatus size — and ran the full column, which
+ * on `/districts` is 146 characters and on a district page 110. `--measure-prose` and
+ * `--measure-note` existed the whole time and were read by exactly two rules in the file.
+ *
+ * The measure is on `max-width` rather than on the card, because a card also holds tables, charts
+ * and tile rows, and none of those wants to be 68 characters wide. Only the sentences are capped.
+ *
+ * `.note` and `.conditions li` keep `--measure-note`: they are qualification beside a figure
+ * rather than a paragraph of argument, and 74ch is the wider of the two measures for that reason.
+ */
+.card > p,
+.card > ul,
+.card > ol,
+.basis-panel > p {
+  font-size: var(--text-body);
+  line-height: var(--leading-prose);
+  max-width: var(--measure-prose);
 }
 /*
  * On a phone the side padding goes back to what it was, and this is a chart constraint rather than
@@ -777,9 +863,9 @@ output { font-variant-numeric: tabular-nums; color: var(--text-primary); font-we
  * has five dead rule groups in its history for exactly that reason.
  */
 .tile { padding: 0; }
-.tile .k { font-size: .74rem; text-transform: uppercase; letter-spacing: var(--tracking-caps); color: var(--text-muted); }
+.tile .k { font-size: var(--text-xs); text-transform: uppercase; letter-spacing: var(--tracking-caps); color: var(--text-muted); }
 .tile .v { font-size: var(--text-figure); font-weight: var(--weight-bold); letter-spacing: -0.02em; font-variant-numeric: tabular-nums; margin: .15rem 0; }
-.tile .n { font-size: .78rem; color: var(--text-secondary); }
+.tile .n { font-size: var(--text-sm); color: var(--text-secondary); }
 
 /* Stacked bar: a 2px surface gap so the two quantities read as separate. */
 .barwrap { margin: var(--space-1) 0 0; }
@@ -789,7 +875,7 @@ output { font-variant-numeric: tabular-nums; color: var(--text-primary); font-we
 .seg.formula { background: var(--series-formula); }
 .seg.guarantee { background: var(--series-guarantee); }
 
-.legend { display: flex; gap: var(--space-6); flex-wrap: wrap; margin-top: var(--space-3); font-size: .82rem; color: var(--text-secondary); }
+.legend { display: flex; gap: var(--space-6); flex-wrap: wrap; margin-top: var(--space-3); font-size: var(--text-sm); color: var(--text-secondary); }
 .sw { display: inline-block; width: 10px; height: 10px; border-radius: 3px; margin-right: var(--space-2); vertical-align: baseline; }
 .sw.formula, .sw.gain { background: var(--series-formula); }
 .sw.guarantee, .sw.loss { background: var(--series-guarantee); }
@@ -801,7 +887,7 @@ output { font-variant-numeric: tabular-nums; color: var(--text-primary); font-we
 .sw.ordinal-3 { background: var(--ordinal-3); }
 
 .flags { display: flex; gap: .4rem; flex-wrap: wrap; margin-top: var(--space-5); }
-.flag { font-size: .76rem; padding: var(--space-1) .5rem; border-radius: var(--radius-pill); border: 1px solid var(--border-control); color: var(--text-secondary); background: var(--surface-2); }
+.flag { font-size: var(--text-sm); padding: var(--space-1) .5rem; border-radius: var(--radius-pill); border: 1px solid var(--border-control); color: var(--text-secondary); background: var(--surface-2); }
 
 /*
  * What is on this page, above the sections it lists.
@@ -868,7 +954,7 @@ output { font-variant-numeric: tabular-nums; color: var(--text-primary); font-we
      half at the head of the next is unreadable as either. */
   break-inside: avoid;
   margin: 0 0 .3rem;
-  font-size: .86rem;
+  font-size: var(--text-base);
   line-height: var(--leading-snug);
 }
 .contents a {
@@ -886,7 +972,7 @@ output { font-variant-numeric: tabular-nums; color: var(--text-primary); font-we
    know the plan cannot get from to what it means for theirs. These carry the consequence, so they
    are rows rather than pills; the pill class above is unchanged and still used in eight places. */
 .conditions { list-style: none; margin: var(--space-5) 0 0; padding: 0; display: grid; gap: .5rem; }
-.conditions li { color: var(--text-secondary); font-size: .86rem; border-left: 2px solid var(--border); padding-left: var(--space-4); }
+.conditions li { color: var(--text-secondary); font-size: var(--text-base); border-left: 2px solid var(--border); padding-left: var(--space-4); }
 .conditions strong { color: var(--text-primary); font-weight: var(--weight-semibold); }
 
 /* Qualification at paragraph scale — beside the figure it qualifies, never a footnote and never
@@ -917,20 +1003,20 @@ table.prose td { text-align: left; font-variant-numeric: normal; }
 table.prose th { width: 32%; }
 table { width: 100%; border-collapse: collapse; font-size: var(--text-base); }
 th, td { text-align: left; padding: .42rem .5rem; border-bottom: 1px solid var(--border); }
-thead th { color: var(--text-muted); font-size: .76rem; text-transform: uppercase; letter-spacing: var(--tracking-caps); }
+thead th { color: var(--text-muted); font-size: var(--text-sm); text-transform: uppercase; letter-spacing: var(--tracking-caps); }
 th { font-weight: var(--weight-medium); color: var(--text-secondary); }
 td { text-align: right; font-variant-numeric: tabular-nums; }
 tbody tr:last-child th, tbody tr:last-child td { border-bottom: 0; }
 
 .strip-row { margin-bottom: 1rem; }
-.strip-head { display: flex; justify-content: space-between; font-size: .86rem; gap: 1rem; }
+.strip-head { display: flex; justify-content: space-between; font-size: var(--text-base); gap: 1rem; }
 /* The percentile rides with the value it describes. Centred under the box it read as a label
    on the middle of the axis, which is the one place the district being described is not. */
 .strip-head .n { margin-left: .45rem; font-weight: var(--weight-regular); }
 /* The flat strip this replaced is gone — see `distributionSpec`. What is left is the frame the
    box plot sits in: the label and value above it, the scale below. */
 .strip-row .chartwrap { margin: .1rem 0 .1rem; }
-.scale { display: flex; justify-content: space-between; font-size: .74rem; color: var(--text-muted); }
+.scale { display: flex; justify-content: space-between; font-size: var(--text-xs); color: var(--text-muted); }
 
 /*
  * Charts. Marks are thin, axes recessive, text wears text tokens rather than series color.
@@ -1035,7 +1121,7 @@ svg.plot:focus-visible { outline: 2px solid var(--series-formula); outline-offse
 .tile.wide { grid-column: span 2; }
 /* A range is two numbers and has to stay one line's worth of thought, so it sets a shade
    smaller than a point estimate would. It is still the largest thing in the card. */
-.tile .v.range { font-size: 1.3rem; }
+.tile .v.range { font-size: var(--text-h2); }
 .sw.band { background: var(--series-formula); opacity: .5; }
 .sw.dash {
   background: repeating-linear-gradient(90deg,
@@ -1091,10 +1177,10 @@ svg.plot:focus-visible { outline: 2px solid var(--series-formula); outline-offse
   border-color: var(--accent-rule);
   font-weight: var(--weight-semibold);
 }
-.basis .n { font-size: .78rem; color: var(--text-muted); margin-left: .3rem; }
+.basis .n { font-size: var(--text-sm); color: var(--text-muted); margin-left: .3rem; }
 
 .levers { display: grid; grid-template-columns: repeat(auto-fit, minmax(230px, 1fr)); gap: var(--space-5); }
-.lever .n { font-size: .74rem; color: var(--text-muted); margin-top: .25rem; }
+.lever .n { font-size: var(--text-xs); color: var(--text-muted); margin-top: .25rem; }
 
 /*
  * The wiki.
@@ -1132,11 +1218,11 @@ svg.plot:focus-visible { outline: 2px solid var(--series-formula); outline-offse
  * in each: a list item's bottom margin (.3 -> --space-2, .35rem) and a heading's (.6 -> --space-3,
  * .55rem). Everything else named a token exactly and nothing else moved.
  */
-.prose-body { font-size: var(--text-body); }
+.prose-body { font-size: var(--text-body); line-height: var(--leading-prose); }
 .prose-body > *:first-child { margin-top: 0; }
 .prose-body > *:last-child { margin-bottom: 0; }
-.prose-body p { margin: 0 0 .95rem; max-width: var(--measure-prose); }
-.prose-body li { max-width: 66ch; margin-bottom: var(--space-2); }
+.prose-body p { margin: 0 0 var(--space-6); max-width: var(--measure-prose); }
+.prose-body li { max-width: var(--measure-prose); margin-bottom: var(--space-2); }
 .prose-body h2, .prose-body h3 { margin: 1.5rem 0 var(--space-3); }
 .prose-body code {
   background: var(--surface-inset);
@@ -1153,7 +1239,7 @@ svg.plot:focus-visible { outline: 2px solid var(--series-formula); outline-offse
   background: var(--surface-inset);
   padding: var(--space-4) .85rem;
   border-radius: 8px;
-  font-size: .85rem;
+  font-size: var(--text-base);
 }
 .prose-body pre code { background: none; padding: 0; overflow-wrap: normal; }
 .prose-body blockquote {
@@ -1209,9 +1295,26 @@ svg.plot:focus-visible { outline: 2px solid var(--series-formula); outline-offse
 .card.lede p { max-width: var(--measure-note); }
 
 /* A decision record's own name is its title, in the monospace the corpus cites it in. */
+/*
+ * A decision record's own name is its title, in the monospace the corpus cites it in.
+ *
+ * It was `--text-figure` — 24px, which is 1.41x the prose underneath it, so the page's title was
+ * barely larger than its own sentences. The mono face is the point and stays; the size joins the
+ * reading ramp's top step like every other `h1`.
+ *
+ * Mono is wide, and the longest slug here is 33 characters, so the size is clamped rather than
+ * fixed: at 2.4rem in a monospace that is roughly 760px, which fits the 900px column on a desktop
+ * and does not fit a phone. `overflow-wrap` stays as the backstop for a slug longer than any that
+ * exists today.
+ */
 h1.slug-title {
-  font-family: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, monospace;
-  font-size: 1.45rem;
+  font-family: var(--font-mono);
+  /* The floor is 2rem and not smaller. At 375px a 1.4rem clamp landed the title at 1.49x body —
+     the exact ratio this phase exists to remove, reintroduced on one route at one width, and the
+     threshold caught it. 2rem holds the rank at every width; a 33-character slug wraps there, and
+     `overflow-wrap` below is what makes wrapping safe. */
+  font-size: clamp(2rem, 6vw, var(--text-h1));
+  letter-spacing: -0.02em;
   overflow-wrap: anywhere;
 }
 /* The one-line summary under a row in an index table. */
@@ -1312,7 +1415,7 @@ h1.slug-title {
   color: var(--text-secondary);
   font-size: var(--text-base);
 }
-.card.apparatus h2 { font-size: .95rem; color: var(--text-muted); }
+.card.apparatus h2 { font-size: var(--text-base); color: var(--text-muted); }
 
 /*
  * What a node used to say, one `<details>` per withdrawal.
@@ -1341,7 +1444,7 @@ h1.slug-title {
 }
 .card.apparatus .revision-body h3 {
   margin: 1rem 0 .4rem;
-  font-size: .74rem;
+  font-size: var(--text-xs);
   text-transform: uppercase;
   letter-spacing: var(--tracking-caps);
   color: var(--text-muted);
@@ -1354,8 +1457,19 @@ h1.slug-title {
 .card.apparatus .withdrawn code,
 .card.apparatus .withdrawn .claim { text-decoration: none; }
 
-footer { color: var(--text-muted); font-size: .78rem; margin-top: 1.5rem; }
-footer p { margin: var(--space-2) 0; }
+footer { color: var(--text-muted); font-size: var(--text-sm); margin-top: var(--space-8); }
+/*
+ * The footer takes a measure, which it had never had.
+ *
+ * Its provenance paragraph ran the full column — 107 characters on a district page and 142 on
+ * `/districts`, where the route is wider. Small type does not excuse a long line; if anything it
+ * is the harder of the two to track back to the left edge, and this is the paragraph that says
+ * which department's workbook every figure above it came from.
+ *
+ * `--measure-note` rather than `--measure-prose`: this is annotation beside the page rather than
+ * argument, which is the distinction the wider of the two measures exists for.
+ */
+footer p { margin: var(--space-2) 0; max-width: var(--measure-note); }
 footer.site { border-top: 1px solid var(--border); padding-top: var(--space-6); margin-top: var(--space-9); }
 
 /*
@@ -1367,7 +1481,7 @@ footer.site { border-top: 1px solid var(--border); padding-top: var(--space-6); 
 .filters { display: flex; gap: .6rem; flex-wrap: wrap; align-items: flex-end; margin-bottom: 1rem; }
 .filters .field { display: flex; flex-direction: column; gap: var(--space-1); }
 .filters label { margin: 0; }
-.filters input, .filters select { width: auto; min-width: 11rem; font-size: .85rem; padding: var(--space-2) .55rem; }
+.filters input, .filters select { width: auto; min-width: 11rem; font-size: var(--text-base); padding: var(--space-2) .55rem; }
 .filters .count { font-size: var(--text-sm); color: var(--text-muted); padding-bottom: .45rem; }
 #district-table td { text-align: right; }
 #district-table th[scope="row"] { text-align: left; font-weight: var(--weight-medium); }
@@ -1376,7 +1490,7 @@ footer.site { border-top: 1px solid var(--border); padding-top: var(--space-6); 
 /* A sort control is a button in a header cell, so it is reachable by keyboard and announces. */
 #district-table thead button {
   font: inherit;
-  font-size: .76rem;
+  font-size: var(--text-sm);
   text-transform: uppercase;
   letter-spacing: var(--tracking-caps);
   color: var(--text-muted);

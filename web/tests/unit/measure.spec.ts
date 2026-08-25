@@ -29,7 +29,9 @@ function row(overrides: Partial<Measured> = {}): Measured {
   return {
     route: "/district/043786.html",
     width: 1280,
-    sizes: [11, 11.52, 12, 13.6, 14.72, 15, 15.2, 22.4, 24],
+    // The district page's real census before the redesign: thirteen sizes, eleven of them inside
+    // 3.7px, then the jump to the h1. Every threshold below is written against these figures.
+    sizes: [11.5, 12, 12.5, 13, 13.5, 14, 14, 14.5, 15, 15, 15.5, 22.5, 24],
     headingRatio: 1.49,
     boxes: { count: 30, decorative: 11, maxDepth: 2 },
     rightAlignedProse: 31,
@@ -89,23 +91,38 @@ describe("the widest step in a size census", () => {
 });
 
 describe("the thresholds a phase has set", () => {
-  test("#185 holds decorative boxes at a hard zero", () => {
-    // The only one set so far. #183 deliberately shipped the instrument grading nothing; each
-    // phase since fills in the row it is about, and this is #185's.
-    expect(THRESHOLDS).toEqual({ boxDecorative: 0 });
+  test("carry one entry per phase that has landed, and no others", () => {
+    // #183 shipped the instrument grading nothing; each phase since fills in the row it is about.
+    // Asserted as a whole object so a threshold cannot be added without a phase behind it.
+    expect(THRESHOLDS).toEqual({
+      boxDecorative: 0, // #185
+      sizeCount: 10, //    #186
+      headingRatio: 2, //  #186
+      measureMax: 80, //   #186, font-sensitive
+    });
   });
 
-  test("and it bites on the figures it was written against", () => {
-    // `row()` carries the pre-#185 district page: 30 boxes, 11 of them decoration.
-    const found = violations(report(row()));
-    expect(found).toHaveLength(1);
-    expect(found[0]?.metric).toBe("boxDecorative");
-    expect(found[0]?.measured).toBe(11);
+  test("and #186 leaves sizeGap unset, because a display size is a leap by design", () => {
+    // The metric was built for "a cluster and then a leap"; the crowding was the defect and the
+    // leap never was. Asserted so that setting it later is a decision rather than a tidy-up.
+    expect(THRESHOLDS.sizeGap).toBeUndefined();
   });
 
-  test("and passes the page that came out of it", () => {
-    // 19 boxes left, every one an operable edge or a floating panel, and none of them decoration.
-    expect(violations(report(row({ boxes: { count: 19, decorative: 0, maxDepth: 1 } })))).toEqual([]);
+  test("and bite on the figures they were written against", () => {
+    // `row()` is the pre-redesign district page: 30 boxes with 11 decorative, 13 sizes, an h1 at
+    // 1.49x body and a paragraph at 110ch. Every threshold set should have something to say.
+    const metrics = violations(report(row())).map((v) => v.metric).sort();
+    expect(metrics).toEqual(["boxDecorative", "headingRatio", "measureMax", "sizeCount"]);
+  });
+
+  test("and pass the page that came out of them", () => {
+    const after = row({
+      boxes: { count: 19, decorative: 0, maxDepth: 1 },
+      sizes: [11.5, 12.5, 14, 15, 17, 21.5, 24, 38.5],
+      headingRatio: 2.56,
+      measure: { median: 71, p90: 75, max: 75, over78: 0, count: 42 },
+    });
+    expect(violations(report(after))).toEqual([]);
   });
 
   test("does not constrain the total, which is mostly affordances", () => {

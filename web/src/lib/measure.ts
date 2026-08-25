@@ -184,6 +184,42 @@ export const THRESHOLDS: Thresholds = {
    * bordered links — asserting depth would forbid that for no reason.
    */
   boxDecorative: 0,
+
+  /*
+   * #186. The reading ramp and the apparatus ramp, held apart.
+   *
+   * `sizeCount` at 10 is the wiki node, which is the busiest page here: eight named steps, `body`
+   * at the apparatus size, and the em-relative inline marks that scale with whatever sentence they
+   * sit in. Every one is a token or a proportion of one. It was thirteen, eleven of them crowded
+   * inside 3.7px.
+   *
+   * `headingRatio` at 2 against the 2.56 measured. Below about 2 a heading is not a rank, it is a
+   * rounding error — it was 1.49.
+   */
+  sizeCount: 10,
+  headingRatio: 2,
+
+  /*
+   * `measureMax` is FONT-SENSITIVE and the 80 carries the platform spread rather than ignoring it.
+   *
+   * Measured 75ch here and 77 on the widest route; a runner's UI sans draws `0` at 9.54px against
+   * this machine's 9.21, which is 3.6% wider per glyph and therefore ~2% FEWER characters on the
+   * same column. So the runner reads lower than this, and 80 clears both with room. The report
+   * prints the advance width beside every `ch` figure for exactly this comparison.
+   *
+   * It was 146ch on `/districts` and 110 in the reading column.
+   */
+  measureMax: 80,
+
+  /*
+   * `sizeGap` is deliberately NOT set, and the metric it would have used is why.
+   *
+   * It was built to catch "a cluster and then a leap" — eleven sizes inside 3.7px and then 22.4px.
+   * The crowding was the defect; the leap never was. A display size IS a leap, and after this
+   * phase the widest step on `/districts` is 2.57x precisely because the `h1` is doing its job. A
+   * threshold here would forbid the thing the phase exists to create, so `sizeCount` carries the
+   * finding alone and this stays unset.
+   */
 };
 
 /** One breach of one threshold, named so the message says what to do rather than what happened. */
@@ -370,7 +406,11 @@ export function collect(limits: {
       if (node.nodeType === 3 && (node.textContent ?? "").trim().length > 0) paintsText = true;
     }
     if (!paintsText || !visible(el)) continue;
-    sizes.add(Math.round(parseFloat(getComputedStyle(el).fontSize) * 100) / 100);
+    /* Rounded to the nearest half pixel, because two sizes 0.01px apart are not two sizes.
+       `.claim` is `0.68em` of prose and lands at 11.53px where `--text-xs` lands at 11.52 — a
+       census that reports those as separate steps is counting float error, not decisions. Half a
+       pixel is below what any reader distinguishes and above what rounding produces. */
+    sizes.add(Math.round(parseFloat(getComputedStyle(el).fontSize) * 2) / 2);
   }
 
   const bodyStyle = getComputedStyle(document.body);

@@ -70,13 +70,24 @@ describe("app.css", () => {
     expect(near.length).toBeLessThanOrEqual(NEAR_MISS_CEILING);
   });
 
-  test("and the ledger is grouped, so #186 has decisions rather than an inventory", () => {
+  test("holds no type left, because #186 took the type", () => {
+    /*
+     * This test used to assert the opposite — that eight-plus distinct literal font sizes were
+     * reaching for a handful of `--text-*` tokens — and said that if it stopped being true the
+     * finding behind #186 had changed shape. It has: #186 snapped every `font-size` and
+     * `line-height` near miss onto the reading and apparatus ramps.
+     *
+     * A hard zero now, because the register is the thing that was wrong and a new literal size is
+     * how it comes back. What remains on the ratchet is spacing, which is rhythm rather than type.
+     */
     const grouped = clusters(near);
-    // The largest clusters are the type scale: many distinct literal sizes reaching for a few
-    // `--text-*` tokens. If that stops being true the finding behind #186 has changed shape.
-    const sizes = grouped.filter((c) => c.property === "font-size");
-    expect(new Set(sizes.map((c) => c.part)).size).toBeGreaterThanOrEqual(8);
-    expect(new Set(sizes.map((c) => c.token)).size).toBeLessThanOrEqual(6);
+    expect(grouped.filter((c) => /^(font-size|line-height|letter-spacing)$/.test(c.property))).toEqual([]);
+    // What is left is geometry — spacing and one radius — which is the ratchet's remaining job and
+    // a different phase's decision. `border-radius: 8px` against `--radius-md: 7px`, five times,
+    // is the largest of them and is not a type question at all.
+    const kinds = [...new Set(grouped.map((c) => c.property))].sort();
+    const GEOMETRY = /^(margin|padding|gap|row-gap|column-gap|inset|top|right|bottom|left|border-radius)/;
+    expect(kinds.every((k) => GEOMETRY.test(k)), kinds.join(", ")).toBe(true);
   });
 });
 
