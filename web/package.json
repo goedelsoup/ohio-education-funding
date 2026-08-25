@@ -11,6 +11,8 @@
     "schemas": "node scripts/schemas.ts",
     "check:dist": "node scripts/check-dist-links.ts",
     "corpus:report": "node scripts/corpus-report.ts",
+    "measure": "node scripts/measure.ts",
+    "baseline": "node scripts/baseline.ts",
     "test": "pnpm test:unit && pnpm test:e2e",
     "test:unit": "vitest run",
     "test:watch": "vitest",
