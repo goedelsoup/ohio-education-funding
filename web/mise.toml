@@ -3,13 +3,14 @@
 # `mise run //web:<task>`, or run bare names from inside this directory.
 
 [tasks.gate]
-description = "Everything the web job in CI runs: check, unit, build, dist links, e2e."
+description = "Everything the web job in CI runs: check, unit, build, dist links, measure, e2e."
 run = [
   "mise run install",
   "mise run check",
   "mise run test-unit",
   "mise run build",
   "mise run check-dist",
+  "mise run measure",
   "mise run test-e2e",
 ]
 
@@ -49,6 +50,24 @@ description = "The site in Chromium, a third of it with JavaScript disabled."
 # held shut on every tab except the one it exists for, and only a real browser
 # found it. Needs `pnpm exec playwright install chromium` once.
 run = "pnpm test:e2e"
+
+[tasks.measure]
+description = "What the built pages look like, as numbers: measure, size census, boxes, chrome."
+# In the gate and grading nothing, which is deliberate. #183 builds the instrument; each redesign
+# phase then fills in one entry of THRESHOLDS in src/lib/measure.ts and this starts biting. A check
+# that arrives red teaches whoever added it to skip it, so this one arrives green over the very
+# figures it exists to condemn, and prints them.
+#
+# After `build`, never before: it reports on `dist/`, and a stale one is the previous commit.
+run = "pnpm measure"
+
+[tasks.baseline]
+description = "Capture the pages as images, and say what moved since the last --promote."
+# NOT in the gate, and the reference images are not committed. A screenshot is a rendering of text
+# and this site ships no font binary, so a reference taken here is red on a runner with different
+# faces — see the header of scripts/baseline.ts. Promote before a redesign phase, capture after it,
+# and look at what moved.
+run = "pnpm baseline"
 
 [tasks.schemas]
 description = "Emit the JSON Schema the editor's YAML language server reads."

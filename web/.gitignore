@@ -10,3 +10,13 @@ test-results/
 playwright-report/
 blob-report/
 .playwright/
+
+# The visual baseline (`scripts/baseline.ts`). Local by design and not committed: a screenshot is a
+# rendering of text, this site ships no font binary, and the platform faces disagree — so a
+# committed reference encodes one machine's fonts as the truth and is red everywhere else. The
+# script's header has the long version.
+.baseline/
+
+# The measure report, when written with `--json`. Reproducible from a build, and it carries a
+# timestamp, so committing one is churn.
+measure.json
