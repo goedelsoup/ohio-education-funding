@@ -112,6 +112,19 @@ jobs:
       - name: Install the browser
         run: pnpm exec playwright install --with-deps chromium
 
+      # What the built pages look like, as numbers — reading measure, the census of font sizes,
+      # bordered boxes, the chrome above the first heading. Grades nothing: `THRESHOLDS` in
+      # `src/lib/measure.ts` is empty and each redesign phase fills in one entry. It is here to
+      # print, because the 2026-08 audit found 96 findings behind a gate that was green and never
+      # once looked at the page.
+      #
+      # After the browser install, which is the whole reason it sits here rather than beside
+      # `dist links`: it needs Chromium for computed style and layout. And note the runner's fonts
+      # are not a laptop's — the font-sensitive columns carry the advance width that produced them
+      # so the two are comparable rather than merely different.
+      - name: measure
+        run: pnpm measure
+
       # The e2e suite is what catches the class of bug unit tests structurally cannot: the
       # verification gate held shut on every tab except the one it exists for, and only a real
       # browser found it.
