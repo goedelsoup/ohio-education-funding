@@ -319,6 +319,12 @@ pub fn check_against(manifest: &[Digest], computed: &Digest) -> Result<(), Fetch
 /// finding in its own notes. A caller without poppler gets [`FetchError::NotCached`]-shaped
 /// behaviour: the rebuild reports the fixture skipped and says why, rather than failing.
 ///
+/// That last sentence was itself the quiet overclaim the one before it warns about. It held for
+/// eleven of the twelve PDF-backed fixtures; `appropriation-lines.csv` was regenerated **2,083
+/// rows short** and reported as *written*, because the greenbooks behind its earliest era were
+/// gathered leniently. `connect::greenbook_texts` is what makes the sentence true, and it says
+/// so at more length there.
+///
 /// The alternative is a PDF text extractor in pure std. It is genuinely feasible here —
 /// `spreadsheet` already carries a DEFLATE decoder, which is the hard half — and it is a
 /// disproportionate amount of surface for one document. If the redbook series is ever wired, that
