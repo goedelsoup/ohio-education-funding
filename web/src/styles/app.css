@@ -32,9 +32,9 @@ body {
   font: 15px/1.55 ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
 }
 
-.wrap { max-width: 900px; margin: 0 auto; padding: 0 1.25rem; }
+.wrap { max-width: var(--wrap-read); margin: 0 auto; padding: 0 var(--space-7); }
 /* Wider than the reading measure, for the pages that are a table of 609 rows. */
-.wrap.wide { max-width: 1180px; }
+.wrap.wide { max-width: var(--wrap-wide); }
 
 /* Screen-reader-only. Used for the radio inputs behind the basis switch and for form labels
    whose purpose the adjacent control already makes visually obvious. */
@@ -49,23 +49,21 @@ body {
 }
 
 /*
- * How much of the viewport the sticky chrome occupies, by breakpoint.
+ * `--sticky-chrome` and its three breakpoints used to be restated here, byte for byte, under a
+ * copy of the comment that is now in `tokens/space.css`.
  *
- * Fragments need this. A link to `#categoricals` scrolls the heading to y=0, which puts it under a
- * sticky header rather than at the top of the reader's view, and the reader lands looking at the
- * card above the one they asked for. `scroll-margin-top` fixes it and has to know the height.
+ * Two declarations of one token is not a redundancy that costs nothing. This file imports the
+ * token files at the top, so both blocks matched at the same specificity and the one here won on
+ * order alone — which means the token file's copy was inert, and anyone editing the value where
+ * the tokens live would have changed nothing and had no way to find that out. #112 counted this
+ * and it stayed. Deleted rather than reconciled: the values were identical, so there is nothing
+ * to reconcile and one of them simply has to go.
  *
- * The numbers are measured from a build at each width rather than guessed: the header wraps to
- * three rows below 480px, two to 700, and is one row from 1000px up. 168 / 135 / 96 / 87, the last
- * being 51px of header plus the 36px sub-navigation that becomes sticky at that width and not
- * before. A pixel constant in a stylesheet is brittle by nature, so `app.spec.ts` asserts that a
- * fragment link actually lands its target clear of the chrome at each breakpoint — the brittleness
- * becomes a red test rather than a reader looking at the wrong card.
+ * The values themselves are NOT touched here — this phase moves literals onto tokens and changes
+ * no pixel. #112 also measured the >=1000px value as 17px short, the sub-navigation being 53px
+ * rather than the 36px its comment claims, and correcting that moves where a fragment lands. That
+ * belongs to #189, which re-measures all four against a header it has just changed.
  */
-:root { --sticky-chrome: 168px; }
-@media (min-width: 480px) { :root { --sticky-chrome: 135px; } }
-@media (min-width: 700px) { :root { --sticky-chrome: 96px; } }
-@media (min-width: 1000px) { :root { --sticky-chrome: 87px; } }
 
 /* Every section a fragment can name. Scoped rather than `[id]` so a form control or a chart's
    internal id does not acquire a scroll offset it has no use for. `.basis-scope` is in the list
@@ -114,8 +112,8 @@ a[href], button, input, select, textarea, summary, [tabindex] {
   background: var(--surface-2);
   color: var(--text-primary);
   border: 1px solid var(--border-control);
-  border-radius: 7px;
-  font-size: .88rem;
+  border-radius: var(--radius-md);
+  font-size: var(--text-base);
   text-decoration: none;
   transition: top .12s ease;
 }
@@ -136,23 +134,23 @@ header.site {
   z-index: 5;
   background: var(--surface-1);
   border-bottom: 1px solid var(--border);
-  margin-bottom: 1.75rem;
+  margin-bottom: var(--space-8);
 }
 .site-inner {
-  max-width: 1180px;
+  max-width: var(--wrap-wide);
   margin: 0 auto;
-  padding: .6rem 1.25rem;
+  padding: .6rem var(--space-7);
   display: flex;
   align-items: center;
   gap: 1rem;
   flex-wrap: wrap;
 }
-.brand { font-weight: 650; letter-spacing: -0.01em; color: var(--text-primary); text-decoration: none; }
+.brand { font-weight: var(--weight-bold); letter-spacing: var(--tracking-tight); color: var(--text-primary); text-decoration: none; }
 header.site nav { display: flex; gap: .15rem; flex-wrap: wrap; margin-right: auto; }
 header.site nav a {
   font-size: .85rem;
   padding: .3rem .6rem;
-  border-radius: 7px;
+  border-radius: var(--radius-md);
   color: var(--text-secondary);
   text-decoration: none;
 }
@@ -160,7 +158,7 @@ header.site nav a:hover { background: var(--surface-2); color: var(--text-primar
 header.site nav a[aria-current="page"] {
   background: var(--surface-2);
   color: var(--text-primary);
-  font-weight: 600;
+  font-weight: var(--weight-semibold);
 }
 
 /* The three grouped sections. A native `<details>`, so the menu opens with nothing running —
@@ -169,7 +167,7 @@ header.site nav .menu { position: relative; }
 header.site nav summary {
   font-size: .85rem;
   padding: .3rem .6rem;
-  border-radius: 7px;
+  border-radius: var(--radius-md);
   color: var(--text-secondary);
   cursor: pointer;
   white-space: nowrap;
@@ -188,7 +186,7 @@ header.site nav summary:hover,
 header.site nav details[open] > summary { background: var(--surface-2); color: var(--text-primary); }
 /* The group holding the current page. Weight rather than the full current-page treatment: the
    summary is not a link and marking it as though it were would say the reader is on it. */
-header.site nav summary[aria-current] { color: var(--text-primary); font-weight: 600; }
+header.site nav summary[aria-current] { color: var(--text-primary); font-weight: var(--weight-semibold); }
 header.site nav summary:focus-visible { outline: 2px solid var(--series-formula); outline-offset: 2px; }
 
 header.site nav .menu-panel {
@@ -202,11 +200,11 @@ header.site nav .menu-panel {
   max-width: 21rem;
   display: flex;
   flex-direction: column;
-  padding: .35rem;
+  padding: var(--space-2);
   background: var(--surface-1);
   border: 1px solid var(--border);
-  border-radius: 10px;
-  box-shadow: 0 10px 28px rgb(0 0 0 / 18%);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-panel);
 }
 header.site nav .menu-panel a { display: block; }
 
@@ -216,8 +214,8 @@ header.site nav .menu-panel a { display: block; }
    built from. */
 header.site nav .menu-run { display: flex; flex-direction: column; gap: .1rem; }
 header.site nav .menu-run + .menu-run {
-  margin-top: .35rem;
-  padding-top: .35rem;
+  margin-top: var(--space-2);
+  padding-top: var(--space-2);
   border-top: 1px solid var(--border);
 }
 /* Two lines: what the link is, and why it is in the menu. The second is never decoration — under
@@ -239,7 +237,7 @@ header.site nav a[aria-current="page"] .menu-note { color: var(--text-secondary)
     position: static;
     border: none;
     box-shadow: none;
-    padding: .2rem 0 .2rem .7rem;
+    padding: var(--space-1) 0 var(--space-1) .7rem;
     min-width: 0;
   }
   /*
@@ -295,7 +293,7 @@ header.site nav a[aria-current="page"] .menu-note { color: var(--text-secondary)
   display: block;
   height: .5rem;
   min-width: 2px;
-  border-radius: 999px;
+  border-radius: var(--radius-pill);
   background: var(--text-annotation);
 }
 
@@ -309,10 +307,10 @@ td.year { font-family: var(--font-mono); color: var(--text-annotation); white-sp
   font: inherit;
   background: none;
   border: 1px solid var(--border-control);
-  border-radius: 999px;
+  border-radius: var(--radius-pill);
   color: var(--text-secondary);
   cursor: pointer;
-  padding: .2rem .5rem;
+  padding: var(--space-1) .5rem;
   line-height: 1.2;
 }
 
@@ -321,7 +319,7 @@ a:hover { text-decoration-color: currentColor; }
 
 /* The district sub-navigation: five views of one district. A tab row in appearance, real links
    in fact, because each one is now its own URL. */
-.subnav { display: flex; gap: .4rem; margin: 0 0 1.1rem; flex-wrap: wrap; }
+.subnav { display: flex; gap: .4rem; margin: 0 0 var(--space-6); flex-wrap: wrap; }
 
 /*
  * Sticky from 1000px up, and deliberately not below it.
@@ -343,14 +341,14 @@ a:hover { text-decoration-color: currentColor; }
     top: 51px;
     z-index: 4;
     background: var(--surface-1);
-    padding: .55rem 0;
-    margin-bottom: .55rem;
+    padding: var(--space-3) 0;
+    margin-bottom: var(--space-3);
   }
 }
 .subnav a {
   font-size: .85rem;
   padding: .4rem .8rem;
-  border-radius: 7px;
+  border-radius: var(--radius-md);
   border: 1px solid var(--border-control);
   background: var(--surface-1);
   color: var(--text-secondary);
@@ -360,7 +358,7 @@ a:hover { text-decoration-color: currentColor; }
   background: var(--surface-2);
   color: var(--text-primary);
   border-color: var(--accent-rule);
-  font-weight: 600;
+  font-weight: var(--weight-semibold);
 }
 
 /*
@@ -373,9 +371,9 @@ a:hover { text-decoration-color: currentColor; }
 .basis-scope .basis label {
   display: inline-block;
   margin: 0;
-  font-size: .8rem;
-  padding: .3rem .7rem;
-  border-radius: 999px;
+  font-size: var(--text-sm);
+  padding: .3rem var(--space-4);
+  border-radius: var(--radius-pill);
   border: 1px solid var(--border-control);
   background: var(--surface-2);
   color: var(--text-secondary);
@@ -386,16 +384,16 @@ a:hover { text-decoration-color: currentColor; }
   background: var(--surface-1);
   color: var(--text-primary);
   border-color: var(--accent-rule);
-  font-weight: 600;
+  font-weight: var(--weight-semibold);
 }
 /* Keyboard focus has to be visible on the label, because the input it belongs to is off-screen. */
 .basis-scope input:focus-visible ~ .basis label[data-basis="nominal"],
 .basis-scope input:focus-visible ~ .basis label[data-basis="real"] { outline: 2px solid var(--series-formula); outline-offset: 2px; }
 .basis-scope input[data-basis="nominal"]:focus-visible ~ .basis label[data-basis="real"],
 .basis-scope input[data-basis="real"]:focus-visible ~ .basis label[data-basis="nominal"] { outline: none; }
-h1 { font-size: 1.4rem; margin: 0 0 .3rem; letter-spacing: -0.01em; }
+h1 { font-size: var(--text-h1); margin: 0 0 .3rem; letter-spacing: var(--tracking-tight); }
 h2 { font-size: .95rem; margin: 0 0 .8rem; letter-spacing: -0.005em; }
-h3 { font-size: .82rem; margin: 1.4rem 0 .6rem; color: var(--text-secondary); font-weight: 600; }
+h3 { font-size: .82rem; margin: 1.4rem 0 .6rem; color: var(--text-secondary); font-weight: var(--weight-semibold); }
 /* The identifier and edge counts, under the lead rather than over it: the identifier makes the
    page addressable, the lead tells a reader they are in the right place, and somebody arriving
    mid-site from a search result needs the second one first. */
@@ -473,7 +471,7 @@ h3 { font-size: .82rem; margin: 1.4rem 0 .6rem; color: var(--text-secondary); fo
 .section-anchor {
   flex: none;
   color: var(--text-muted);
-  font-weight: 400;
+  font-weight: var(--weight-regular);
   text-decoration: none;
   transition: color .12s ease;
 }
@@ -500,14 +498,14 @@ h3 { font-size: .82rem; margin: 1.4rem 0 .6rem; color: var(--text-secondary); fo
 .year-chip-wrap { position: relative; display: inline-flex; flex: none; }
 .year-chip {
   font: inherit;
-  font-size: .72rem;
-  font-weight: 500;
+  font-size: var(--text-xs);
+  font-weight: var(--weight-medium);
   font-variant-numeric: tabular-nums;
   letter-spacing: .01em;
   color: var(--text-muted);
   background: none;
   border: 1px solid var(--border-control);
-  border-radius: 999px;
+  border-radius: var(--radius-pill);
   padding: .1rem .45rem;
   white-space: nowrap;
   cursor: help;
@@ -543,7 +541,7 @@ h3 { font-size: .82rem; margin: 1.4rem 0 .6rem; color: var(--text-secondary); fo
   border-radius: 8px;
   padding: .5rem .65rem;
   font-size: .78rem;
-  font-weight: 400;
+  font-weight: var(--weight-regular);
   line-height: 1.45;
   letter-spacing: normal;
   text-align: left;
@@ -615,9 +613,9 @@ h3 { font-size: .82rem; margin: 1.4rem 0 .6rem; color: var(--text-secondary); fo
   background: var(--surface-2);
   border: 1px solid var(--border);
   border-radius: 8px;
-  padding: .55rem .7rem;
+  padding: var(--space-3) .7rem;
   font-size: .82rem;
-  font-weight: 400;
+  font-weight: var(--weight-regular);
   line-height: 1.45;
   color: var(--text-secondary);
   box-shadow: 0 6px 20px rgb(0 0 0 / 18%);
@@ -664,7 +662,7 @@ h3 { font-size: .82rem; margin: 1.4rem 0 .6rem; color: var(--text-secondary); fo
     bottom: .75rem;
     width: auto;
     max-width: none;
-    font-size: .88rem;
+    font-size: var(--text-base);
     box-shadow: 0 -4px 24px rgb(0 0 0 / 28%);
   }
 }
@@ -672,12 +670,12 @@ h3 { font-size: .82rem; margin: 1.4rem 0 .6rem; color: var(--text-secondary); fo
 .card {
   background: var(--surface-1);
   border: 1px solid var(--border);
-  border-radius: 10px;
-  padding: 1.15rem 1.25rem;
-  margin-bottom: 1.1rem;
+  border-radius: var(--radius-lg);
+  padding: 1.15rem var(--space-7);
+  margin-bottom: var(--space-6);
 }
 
-label { display: block; font-size: .8rem; color: var(--text-secondary); margin-bottom: .35rem; }
+label { display: block; font-size: var(--text-sm); color: var(--text-secondary); margin-bottom: var(--space-2); }
 /*
  * A control's boundary is what says where the control is, so it answers to 1.4.11 rather than to
  * the eye. `--border` is the site's hairline — card edges, table rules — and at 1.34:1 light and
@@ -690,18 +688,18 @@ select, input[type="range"], input[type="text"], input[type="search"], textarea 
   color: var(--text-primary);
   background: var(--surface-2);
   border: 1px solid var(--border-control);
-  border-radius: 7px;
+  border-radius: var(--radius-md);
   padding: .5rem .6rem;
 }
-input[type="range"] { padding: .35rem 0; accent-color: var(--series-formula); }
-output { font-variant-numeric: tabular-nums; color: var(--text-primary); font-weight: 600; }
+input[type="range"] { padding: var(--space-2) 0; accent-color: var(--series-formula); }
+output { font-variant-numeric: tabular-nums; color: var(--text-primary); font-weight: var(--weight-semibold); }
 
 /* Tabs. The filter row sits above the content, in one row. */
-.tabs { display: flex; gap: .4rem; margin-bottom: 1.1rem; flex-wrap: wrap; }
+.tabs { display: flex; gap: .4rem; margin-bottom: var(--space-6); flex-wrap: wrap; }
 .tabs button {
   font: inherit;
   padding: .45rem .85rem;
-  border-radius: 7px;
+  border-radius: var(--radius-md);
   border: 1px solid var(--border-control);
   background: var(--surface-1);
   color: var(--text-secondary);
@@ -711,25 +709,25 @@ output { font-variant-numeric: tabular-nums; color: var(--text-primary); font-we
   background: var(--surface-2);
   color: var(--text-primary);
   border-color: var(--accent-rule);
-  font-weight: 600;
+  font-weight: var(--weight-semibold);
 }
 
-.tiles { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: .7rem; margin-bottom: 1.1rem; }
-.tile { background: var(--surface-1); border: 1px solid var(--border); border-radius: 10px; padding: .85rem 1rem; }
-.tile .k { font-size: .74rem; text-transform: uppercase; letter-spacing: .04em; color: var(--text-muted); }
-.tile .v { font-size: 1.5rem; font-weight: 650; letter-spacing: -0.02em; font-variant-numeric: tabular-nums; margin: .15rem 0; }
+.tiles { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: var(--space-4); margin-bottom: var(--space-6); }
+.tile { background: var(--surface-1); border: 1px solid var(--border); border-radius: var(--radius-lg); padding: .85rem 1rem; }
+.tile .k { font-size: .74rem; text-transform: uppercase; letter-spacing: var(--tracking-caps); color: var(--text-muted); }
+.tile .v { font-size: var(--text-figure); font-weight: var(--weight-bold); letter-spacing: -0.02em; font-variant-numeric: tabular-nums; margin: .15rem 0; }
 .tile .n { font-size: .78rem; color: var(--text-secondary); }
 
 /* Stacked bar: a 2px surface gap so the two quantities read as separate. */
-.barwrap { margin: .2rem 0 0; }
+.barwrap { margin: var(--space-1) 0 0; }
 .bar { display: flex; height: 22px; border-radius: 5px; overflow: hidden; background: var(--surface-2); gap: 2px; }
-.seg { height: 100%; border-radius: 4px; }
-.seg.only { border-radius: 4px; }
+.seg { height: 100%; border-radius: var(--radius-sm); }
+.seg.only { border-radius: var(--radius-sm); }
 .seg.formula { background: var(--series-formula); }
 .seg.guarantee { background: var(--series-guarantee); }
 
-.legend { display: flex; gap: 1.1rem; flex-wrap: wrap; margin-top: .55rem; font-size: .82rem; color: var(--text-secondary); }
-.sw { display: inline-block; width: 10px; height: 10px; border-radius: 3px; margin-right: .35rem; vertical-align: baseline; }
+.legend { display: flex; gap: var(--space-6); flex-wrap: wrap; margin-top: var(--space-3); font-size: .82rem; color: var(--text-secondary); }
+.sw { display: inline-block; width: 10px; height: 10px; border-radius: 3px; margin-right: var(--space-2); vertical-align: baseline; }
 .sw.formula, .sw.gain { background: var(--series-formula); }
 .sw.guarantee, .sw.loss { background: var(--series-guarantee); }
 /* The ordinal ramp, for a chart grouping districts into ordered bands. Its legend is not
@@ -739,8 +737,8 @@ output { font-variant-numeric: tabular-nums; color: var(--text-primary); font-we
 .sw.ordinal-2 { background: var(--ordinal-2); }
 .sw.ordinal-3 { background: var(--ordinal-3); }
 
-.flags { display: flex; gap: .4rem; flex-wrap: wrap; margin-top: .9rem; }
-.flag { font-size: .76rem; padding: .2rem .5rem; border-radius: 999px; border: 1px solid var(--border-control); color: var(--text-secondary); background: var(--surface-2); }
+.flags { display: flex; gap: .4rem; flex-wrap: wrap; margin-top: var(--space-5); }
+.flag { font-size: .76rem; padding: var(--space-1) .5rem; border-radius: var(--radius-pill); border: 1px solid var(--border-control); color: var(--text-secondary); background: var(--surface-2); }
 
 /*
  * What is on this page, above the sections it lists.
@@ -763,7 +761,7 @@ output { font-variant-numeric: tabular-nums; color: var(--text-primary); font-we
  * A reader with no script sees the aid distribution and a complete page; a reader with script sees
  * the strip follow the column they sorted by.
  */
-.measures { margin: 1.1rem 0 0; }
+.measures { margin: var(--space-6) 0 0; }
 .measure { display: none; }
 .measures[data-measure="adm"] .measure[data-measure="adm"],
 .measures[data-measure="aid"] .measure[data-measure="aid"],
@@ -772,13 +770,13 @@ output { font-variant-numeric: tabular-nums; color: var(--text-primary); font-we
 .measures[data-measure="poverty"] .measure[data-measure="poverty"],
 .measures[data-measure="enrollment"] .measure[data-measure="enrollment"] { display: block; }
 .measure .note { margin-top: 0; }
-.measure .chartwrap { margin: .2rem 0 0; }
+.measure .chartwrap { margin: var(--space-1) 0 0; }
 
 .contents { margin: 1.2rem 0 0; }
 .contents-label {
   margin: 0 0 .45rem;
-  font-size: .72rem;
-  font-weight: 600;
+  font-size: var(--text-xs);
+  font-weight: var(--weight-semibold);
   letter-spacing: .06em;
   text-transform: uppercase;
   color: var(--text-muted);
@@ -796,7 +794,7 @@ output { font-variant-numeric: tabular-nums; color: var(--text-primary); font-we
   break-inside: avoid;
   margin: 0 0 .3rem;
   font-size: .86rem;
-  line-height: 1.35;
+  line-height: var(--leading-snug);
 }
 .contents a {
   color: var(--text-secondary);
@@ -812,9 +810,9 @@ output { font-variant-numeric: tabular-nums; color: var(--text-primary); font-we
    "At the minimum state share" is a fact about 138 districts that a reader who does not already
    know the plan cannot get from to what it means for theirs. These carry the consequence, so they
    are rows rather than pills; the pill class above is unchanged and still used in eight places. */
-.conditions { list-style: none; margin: .9rem 0 0; padding: 0; display: grid; gap: .5rem; }
-.conditions li { color: var(--text-secondary); font-size: .86rem; border-left: 2px solid var(--border); padding-left: .7rem; }
-.conditions strong { color: var(--text-primary); font-weight: 600; }
+.conditions { list-style: none; margin: var(--space-5) 0 0; padding: 0; display: grid; gap: .5rem; }
+.conditions li { color: var(--text-secondary); font-size: .86rem; border-left: 2px solid var(--border); padding-left: var(--space-4); }
+.conditions strong { color: var(--text-primary); font-weight: var(--weight-semibold); }
 
 /* Qualification at paragraph scale — beside the figure it qualifies, never a footnote and never
    "see methodology". The phrase scale is `.caveat-inline`; the card scale is `.card.caveat`. */
@@ -835,17 +833,17 @@ output { font-variant-numeric: tabular-nums; color: var(--text-primary); font-we
 .tnum { font-variant-numeric: tabular-nums; }
 /* The row the published model actually uses. Weight rather than colour: the other rows are the
    same formula at a different enrollment, not a different kind of thing. */
-tr.current th, tr.current td { color: var(--text-primary); font-weight: 600; }
+tr.current th, tr.current td { color: var(--text-primary); font-weight: var(--weight-semibold); }
 
 .scroll { overflow-x: auto; }
 /* A table of sentences rather than of quantities: the numeric right-alignment below is wrong for
    it, and so is the tabular figure width. */
 table.prose td { text-align: left; font-variant-numeric: normal; }
 table.prose th { width: 32%; }
-table { width: 100%; border-collapse: collapse; font-size: .88rem; }
+table { width: 100%; border-collapse: collapse; font-size: var(--text-base); }
 th, td { text-align: left; padding: .42rem .5rem; border-bottom: 1px solid var(--border); }
-thead th { color: var(--text-muted); font-size: .76rem; text-transform: uppercase; letter-spacing: .04em; }
-th { font-weight: 500; color: var(--text-secondary); }
+thead th { color: var(--text-muted); font-size: .76rem; text-transform: uppercase; letter-spacing: var(--tracking-caps); }
+th { font-weight: var(--weight-medium); color: var(--text-secondary); }
 td { text-align: right; font-variant-numeric: tabular-nums; }
 tbody tr:last-child th, tbody tr:last-child td { border-bottom: 0; }
 
@@ -853,7 +851,7 @@ tbody tr:last-child th, tbody tr:last-child td { border-bottom: 0; }
 .strip-head { display: flex; justify-content: space-between; font-size: .86rem; gap: 1rem; }
 /* The percentile rides with the value it describes. Centred under the box it read as a label
    on the middle of the axis, which is the one place the district being described is not. */
-.strip-head .n { margin-left: .45rem; font-weight: 400; }
+.strip-head .n { margin-left: .45rem; font-weight: var(--weight-regular); }
 /* The flat strip this replaced is gone — see `distributionSpec`. What is left is the frame the
    box plot sits in: the label and value above it, the scale below. */
 .strip-row .chartwrap { margin: .1rem 0 .1rem; }
@@ -992,21 +990,21 @@ svg.plot:focus-visible { outline: 2px solid var(--series-formula); outline-offse
   background: var(--surface-1);
   color: var(--text-primary);
   border: 1px solid var(--accent-rule);
-  border-radius: 7px;
-  padding: .35rem .55rem;
-  font-size: .8rem;
-  box-shadow: 0 2px 10px rgb(0 0 0 / 18%);
+  border-radius: var(--radius-md);
+  padding: var(--space-2) .55rem;
+  font-size: var(--text-sm);
+  box-shadow: var(--shadow-tip);
   max-width: 320px;
 }
 
 /* The nominal / constant-dollar switch. A pair, not a checkbox: neither basis is the default
    truth, and a checkbox would make one of them a modification of the other. */
-.basis { display: flex; align-items: center; gap: .4rem; margin-bottom: .9rem; flex-wrap: wrap; }
+.basis { display: flex; align-items: center; gap: .4rem; margin-bottom: var(--space-5); flex-wrap: wrap; }
 .basis button {
   font: inherit;
-  font-size: .8rem;
-  padding: .3rem .7rem;
-  border-radius: 999px;
+  font-size: var(--text-sm);
+  padding: .3rem var(--space-4);
+  border-radius: var(--radius-pill);
   border: 1px solid var(--border-control);
   background: var(--surface-2);
   color: var(--text-secondary);
@@ -1016,11 +1014,11 @@ svg.plot:focus-visible { outline: 2px solid var(--series-formula); outline-offse
   background: var(--surface-1);
   color: var(--text-primary);
   border-color: var(--accent-rule);
-  font-weight: 600;
+  font-weight: var(--weight-semibold);
 }
 .basis .n { font-size: .78rem; color: var(--text-muted); margin-left: .3rem; }
 
-.levers { display: grid; grid-template-columns: repeat(auto-fit, minmax(230px, 1fr)); gap: .9rem; }
+.levers { display: grid; grid-template-columns: repeat(auto-fit, minmax(230px, 1fr)); gap: var(--space-5); }
 .lever .n { font-size: .74rem; color: var(--text-muted); margin-top: .25rem; }
 
 /*
@@ -1029,7 +1027,7 @@ svg.plot:focus-visible { outline: 2px solid var(--series-formula); outline-offse
  * Corpus prose is long-form and argumentative in a way nothing else on this site is, so it gets a
  * reading measure and real paragraph rhythm rather than the compact card type the data pages use.
  */
-.crumb { font-size: .8rem; color: var(--text-muted); margin: 0 0 .5rem; }
+.crumb { font-size: var(--text-sm); color: var(--text-muted); margin: 0 0 .5rem; }
 .crumb a { color: var(--text-secondary); }
 /*
  * THE FINDINGS — what THIS REPOSITORY computed, and how to read it.
@@ -1108,7 +1106,7 @@ svg.plot:focus-visible { outline: 2px solid var(--series-formula); outline-offse
   border-left: 3px solid var(--series-guarantee);
   background: color-mix(in srgb, var(--series-guarantee) 7%, transparent);
   color: var(--text-primary);
-  padding: .75rem .9rem .05rem;
+  padding: .75rem var(--space-5) .05rem;
   border-radius: 0 8px 8px 0;
   /* Was a flat 1.5rem, which is less than the sticky header at every width — so the correction a
      reader clicked through to landed under it. The same measured variable the section anchors use. */
@@ -1132,8 +1130,8 @@ svg.plot:focus-visible { outline: 2px solid var(--series-formula); outline-offse
 
 /* A decision record's `summary` — its own one-paragraph statement of what it settled. Set a step
    up from the body because it leads the page rather than sitting in the sequence of sections. */
-.card.lede { font-size: 1.02rem; color: var(--text-primary); }
-.card.lede p { max-width: 74ch; }
+.card.lede { font-size: var(--text-lead); color: var(--text-primary); }
+.card.lede p { max-width: var(--measure-note); }
 
 /* A decision record's own name is its title, in the monospace the corpus cites it in. */
 h1.slug-title {
@@ -1144,10 +1142,10 @@ h1.slug-title {
 /* The one-line summary under a row in an index table. */
 .row-note {
   display: block;
-  font-weight: 400;
+  font-weight: var(--weight-regular);
   color: var(--text-secondary);
-  margin-top: .2rem;
-  max-width: 74ch;
+  margin-top: var(--space-1);
+  max-width: var(--measure-note);
 }
 
 /*
@@ -1190,7 +1188,7 @@ h1.slug-title {
 .claim {
   display: inline;
   font-size: .68em;
-  font-weight: 600;
+  font-weight: var(--weight-semibold);
   text-transform: uppercase;
   letter-spacing: .06em;
   white-space: nowrap;
@@ -1212,7 +1210,7 @@ h1.slug-title {
  * status hue across half a sentence. It follows the mark and reads as an aside to it.
  */
 .claim-detail {
-  font-weight: 400;
+  font-weight: var(--weight-regular);
   text-transform: none;
   letter-spacing: 0;
   font-size: .9em;
@@ -1237,7 +1235,7 @@ h1.slug-title {
   border-style: dashed;
   background: none;
   color: var(--text-secondary);
-  font-size: .88rem;
+  font-size: var(--text-base);
 }
 .card.apparatus h2 { font-size: .95rem; color: var(--text-muted); }
 
@@ -1256,21 +1254,21 @@ h1.slug-title {
 .card.apparatus .revision + .revision { margin-top: .5rem; }
 .card.apparatus .revision > summary {
   cursor: pointer;
-  font-weight: 600;
+  font-weight: var(--weight-semibold);
   color: var(--text-secondary);
   padding: .3rem 0;
 }
 .card.apparatus .revision > summary:hover { color: var(--text-primary); }
 .card.apparatus .revision-body {
   border-left: 3px solid var(--series-guarantee);
-  padding: .1rem 0 .1rem .9rem;
-  margin: .4rem 0 .2rem;
+  padding: .1rem 0 .1rem var(--space-5);
+  margin: .4rem 0 var(--space-1);
 }
 .card.apparatus .revision-body h3 {
   margin: 1rem 0 .4rem;
   font-size: .74rem;
   text-transform: uppercase;
-  letter-spacing: .04em;
+  letter-spacing: var(--tracking-caps);
   color: var(--text-muted);
 }
 .card.apparatus .revision-body > *:first-child { margin-top: 0; }
@@ -1282,8 +1280,8 @@ h1.slug-title {
 .card.apparatus .withdrawn .claim { text-decoration: none; }
 
 footer { color: var(--text-muted); font-size: .78rem; margin-top: 1.5rem; }
-footer p { margin: .35rem 0; }
-footer.site { border-top: 1px solid var(--border); padding-top: 1.1rem; margin-top: 2.5rem; }
+footer p { margin: var(--space-2) 0; }
+footer.site { border-top: 1px solid var(--border); padding-top: var(--space-6); margin-top: var(--space-9); }
 
 /*
  * The district index. 609 rows is too many to scroll and too few to paginate, so it filters in
@@ -1292,12 +1290,12 @@ footer.site { border-top: 1px solid var(--border); padding-top: 1.1rem; margin-t
  * document.
  */
 .filters { display: flex; gap: .6rem; flex-wrap: wrap; align-items: flex-end; margin-bottom: 1rem; }
-.filters .field { display: flex; flex-direction: column; gap: .2rem; }
+.filters .field { display: flex; flex-direction: column; gap: var(--space-1); }
 .filters label { margin: 0; }
-.filters input, .filters select { width: auto; min-width: 11rem; font-size: .85rem; padding: .35rem .55rem; }
-.filters .count { font-size: .8rem; color: var(--text-muted); padding-bottom: .45rem; }
+.filters input, .filters select { width: auto; min-width: 11rem; font-size: .85rem; padding: var(--space-2) .55rem; }
+.filters .count { font-size: var(--text-sm); color: var(--text-muted); padding-bottom: .45rem; }
 #district-table td { text-align: right; }
-#district-table th[scope="row"] { text-align: left; font-weight: 500; }
+#district-table th[scope="row"] { text-align: left; font-weight: var(--weight-medium); }
 #district-table th[scope="row"] a { color: var(--text-primary); text-decoration-color: var(--border); }
 #district-table tr[hidden] { display: none; }
 /* A sort control is a button in a header cell, so it is reachable by keyboard and announces. */
@@ -1305,7 +1303,7 @@ footer.site { border-top: 1px solid var(--border); padding-top: 1.1rem; margin-t
   font: inherit;
   font-size: .76rem;
   text-transform: uppercase;
-  letter-spacing: .04em;
+  letter-spacing: var(--tracking-caps);
   color: var(--text-muted);
   background: none;
   border: 0;
