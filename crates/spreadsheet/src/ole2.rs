@@ -323,7 +323,7 @@ impl Compound {
         }
 
         let mut entries = Vec::new();
-        for chunk in raw.chunks_exact(DIRECTORY_ENTRY_SIZE) {
+        for chunk in raw.as_chunks::<DIRECTORY_ENTRY_SIZE>().0 {
             let kind = chunk[0x42];
             if kind == 0 {
                 continue;
@@ -332,8 +332,10 @@ impl Compound {
             // reports 26.
             let name_bytes = u16_at(chunk, 0x40).unwrap_or(0) as usize;
             let units: Vec<u16> = chunk[..name_bytes.min(64).saturating_sub(2)]
-                .chunks_exact(2)
-                .map(|pair| u16::from_le_bytes([pair[0], pair[1]]))
+                .as_chunks::<2>()
+                .0
+                .iter()
+                .map(|pair| u16::from_le_bytes(*pair))
                 .collect();
             entries.push(Entry {
                 name: String::from_utf16_lossy(&units),

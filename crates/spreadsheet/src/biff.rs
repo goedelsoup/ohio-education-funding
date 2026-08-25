@@ -275,8 +275,10 @@ fn unicode_string(body: &[u8], at: usize) -> Option<String> {
     let start = at + 3;
     let units: Vec<u16> = if wide {
         body.get(start..start + char_count * 2)?
-            .chunks_exact(2)
-            .map(|pair| u16::from_le_bytes([pair[0], pair[1]]))
+            .as_chunks::<2>()
+            .0
+            .iter()
+            .map(|pair| u16::from_le_bytes(*pair))
             .collect()
     } else {
         body.get(start..start + char_count)?
@@ -295,8 +297,10 @@ fn short_unicode_string(body: &[u8], at: usize) -> Option<String> {
     let start = at + 2;
     let units: Vec<u16> = if wide {
         body.get(start..start + char_count * 2)?
-            .chunks_exact(2)
-            .map(|pair| u16::from_le_bytes([pair[0], pair[1]]))
+            .as_chunks::<2>()
+            .0
+            .iter()
+            .map(|pair| u16::from_le_bytes(*pair))
             .collect()
     } else {
         body.get(start..start + char_count)?
