@@ -39,7 +39,8 @@ description: |
 
   **And a third fact undercuts both.** In FY2027, the terminal year, **294 of 609 districts —
   48.3%, holding 54.1% of base cost enrolled ADM — are funded by the temporary transitional aid
-  guarantee rather than by the formula at all.** [verified] The guarantee is a hold-harmless
+  guarantee rather than by the formula at all.** [verified — `crates/project`] The guarantee is
+  a hold-harmless
   carried forward from what districts received before, and across those 609 it totals
   **$878,954,627**. [verified]
 findings: |
@@ -68,6 +69,12 @@ findings: |
   the regime it replaced. [inference] Whether that reflects a formula that would cut those
   districts absent the guarantee, or enrollment decline outrunning the formula, or both, is not
   established here and is the sharpest open question about the plan. [open]
+figures:
+  - key: project/districts-on-the-guarantee
+    value: 294
+    field: description
+    as_written: "**294 of 609 districts —"
+
 properties:
   name: Fair School Funding Plan
   effective_from: FY2022

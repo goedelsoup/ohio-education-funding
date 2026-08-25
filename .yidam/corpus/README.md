@@ -180,20 +180,30 @@ cluster needed the same move #157 made: LSC's redbook and greenbook had three pr
 across three test files and no public one, and two of the three anchored a table differently. They
 read through `project::budget_analysis` now.
 
-**Fifty-one nodes cite a crate inside a `[verified]` tag; twenty-four carry bindings.** Of the
-twenty-seven that do not, most are the identifier class above and nothing is missing: fifteen are
-`fiscal-period/*.appropriating_bill`, `program/*.appropriation_line`, `education-agency/*.irn` and
-`legislation/*` bill numbers, which carry digits inside a citation and are not quantities.
+**Fifty-six nodes cite a crate inside a `[verified]` tag; thirty-seven carry bindings.** The
+nineteen that carry none are all citation rather than computation, and nothing is missing from
+them: **seventeen** are the identifier class above — `fiscal-period/*.appropriating_bill`,
+`program/*.appropriation_line`, `education-agency/*.irn` and `legislation/*` bill numbers — and the
+remaining two, [`bridge-formula`](../corpus/funding-regime/bridge-formula.yml) and
+[`tpp-replacement-payments`](../corpus/revenue-stream/tpp-replacement-payments.yml), cite a
+committed **fixture path** rather than a calculator. A path is not a quantity either.
 
-The rest are a real residue, and they are named here rather than described as "the remainder" so
-that finishing them is a list rather than a search: `fsfp-formula-transition-supplement`,
-`fsfp-career-technical-weights`, `fsfp-special-education-weights`,
-`parameter/guarantee-funding-base`, `metric/per-pupil-operating-expenditure`,
-`metric/expenditure-per-equivalent-pupil`, `metric/progress-value-added`, and
-`scenario/fsfp-input-year-refresh`. Three of those quote figures the manifest **already exports**
-and simply do not bind them, which is the cheapest work left in this issue and the easiest to
-mistake for done. `fsfp-disadvantaged-pupil-impact-aid` came off the list at #174, which bound the
-two poverty counts DPIA blends.
+**The most-repeated computed number in the corpus was bound in none of its carriers until the
+fourth tranche.** `294 of 609` — the districts the guarantee pays in the terminal year — is
+written in **ten** nodes across five classes. That is the #120 shape at its widest, and it is a
+test now rather than a convention: `corpusFigures.spec.ts` names the ten and fails if one drops
+out. Four of the ten stated the figure without naming the crate that computes it, so the citation
+went in where the binding did — a figure checked against a crate a node never mentions is a check
+nobody reading the page could have anticipated, which is what the `unattributed` diagnostic says.
+
+**What is left is four nodes that are bound but not finished.** Each carries the figures this
+manifest already exported and still states claims of its own that need a figure owner it does not
+have: `metric/per-pupil-operating-expenditure` and `metric/progress-value-added` want
+`crates/deflator`'s real EPP series, `crates/dispersion`'s F-33 trough panel, and the value-added
+agreement statistics `crates/bundle` computes; `metric/expenditure-per-equivalent-pupil` wants its
+sensitivity table; and `scenario/fsfp-input-year-refresh` wants `crates/foundation` and
+`crates/scenario-delta`. All of them compute through public API — what is missing is `FIGURES`
+entries and `Inputs` fields, not a refactor.
 
 ### What binding a figure has cost so far
 
@@ -234,7 +244,7 @@ Fields: count per claim tag across every node; then the unresolved marks by the 
 -->
 | Tag | Count | What it records |
 |---|--:|---|
-| `[verified]` | 1036 | supported by a committed primary source |
+| `[verified]` | 1037 | supported by a committed primary source |
 | `[inference]` | 249 | drawn from verified facts, not witnessed |
 | `[open]` | 208 | a live question — unknown, contested, or being worked |
 | `[unentered]` | 0 | a knowable value nobody has typed in yet |

@@ -115,6 +115,10 @@ figures:
     value: 75074295.72217464
     field: findings
     as_written: "overstate the cut by $75.1 million"
+  - key: project/districts-on-the-guarantee
+    value: 294
+    field: findings
+    as_written: "356 and 294 sum to 650 against 609 districts"
 properties:
   provenance: hypothetical
   designation: |

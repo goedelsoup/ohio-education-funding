@@ -109,6 +109,10 @@ figures:
     value: 41
     field: findings
     as_written: "Those 41 are lifted onto the formula"
+  - key: project/districts-on-the-guarantee
+    value: 294
+    field: findings
+    as_written: "The guarantee falls from 294 districts to 253"
 properties:
   provenance: counterfactual
   designation: |

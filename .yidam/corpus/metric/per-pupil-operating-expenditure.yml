@@ -117,6 +117,12 @@ findings: |
   poverty relationship read backwards; quoting it without the control would state a confound as
   a finding, which is the error this corpus most often finds in secondary reporting. Neither
   figure identifies an effect in either direction. [verified]
+figures:
+  - key: dispersion/operating-expenditure-median
+    value: 15646.0288
+    field: findings
+    as_written: "this metric's FY2024 Cupp Report median of $15,646"
+
 revisions:
   - was: |
       The figure was carried as a single per-pupil total, with no source split.

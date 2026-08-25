@@ -451,6 +451,34 @@ fn median_index(i: &Inputs, on_guarantee: bool) -> f64 {
 /// Districts big enough for an identification *rate* to mean anything.
 ///
 /// The same hundred-pupil floor `project`'s own test applies: below it, one identified pupil
+/// Districts the guarantee actually pays, which is the population three nodes state a count for.
+fn on_the_guarantee(i: &Inputs) -> Vec<&DistrictRecord> {
+    i.panel.iter().filter(|r| r.on_guarantee()).collect()
+}
+
+/// Statewide special education ADM and aid, by category. Index 0 is Category 1.
+fn special_education_totals(i: &Inputs) -> ([f64; 6], [f64; 6]) {
+    let mut adm = [0.0; 6];
+    let mut aid = [0.0; 6];
+    for record in &i.panel {
+        for k in 0..6 {
+            adm[k] += record.special_education.adm[k];
+            aid[k] += record.special_education.aid[k];
+        }
+    }
+    (adm, aid)
+}
+
+/// One category's share of the programme, by pupils and by money.
+fn special_education_shares(i: &Inputs, category: usize) -> (f64, f64) {
+    let (adm, aid) = special_education_totals(i);
+    let k = category - 1;
+    (
+        adm[k] / adm.iter().sum::<f64>(),
+        aid[k] / aid.iter().sum::<f64>(),
+    )
+}
+
 /// moves a district's share by a percentage point and the rate stops describing practice.
 fn sizeable(i: &Inputs) -> Vec<&DistrictRecord> {
     i.panel
@@ -2089,5 +2117,408 @@ pub static FIGURES: &[Figure] = &[
         pinned: 0.2197,
         tolerance: 0.00005,
         compute: |i| { let pop: f64 = i.house.iter().map(|o| o.population).sum(); i.house.iter().map(|o| o.population_under_18).sum::<f64>() / pop },
+    },
+    // `formula-component/temporary-transitional-aid-guarantee` and the eight other nodes that
+    // state its count. This is the single most-repeated computed number in the corpus -- nine
+    // nodes across five classes write "294 of 609" -- and until #158 not one of them was bound,
+    // which is the shape of the failure #120 was filed about rather than a near miss.
+    Figure {
+        key: "project/districts-on-the-guarantee",
+        owner: "crates/project",
+        unit: Unit::Count,
+        label: "Districts the temporary transitional aid guarantee pays in FY2027 -- the terminal \
+                year, at a phase-in of 100%",
+        pinned: 294.0,
+        tolerance: 0.0,
+        compute: |i| on_the_guarantee(i).len() as f64,
+    },
+    // `formula-component/fsfp-formula-transition-supplement`. The second hold-harmless, and the
+    // node's point is that it is not nested inside the first.
+    Figure {
+        key: "project/transition-supplement-total",
+        owner: "crates/project",
+        unit: Unit::Dollars,
+        label: "Line [K], the formula transition supplement, statewide",
+        pinned: 63_578_629.47,
+        tolerance: 0.01,
+        compute: |i| i.panel.iter().map(|r| r.transition.transition_supplement).sum(),
+    },
+    Figure {
+        key: "project/transition-supplement-districts",
+        owner: "crates/project",
+        unit: Unit::Count,
+        label: "Districts line [K] pays",
+        pinned: 144.0,
+        tolerance: 0.0,
+        compute: |i| {
+            i.panel
+                .iter()
+                .filter(|r| r.transition.transition_supplement > 0.0)
+                .count() as f64
+        },
+    },
+    Figure {
+        // The definition is in the key, per the convention #171 recorded: this is the subset that
+        // draws the second hold-harmless while drawing nothing from the first, and a figure of 144
+        // bound to "17 of the 144" would be the check passing on a definition nobody wrote down.
+        key: "project/transition-supplement-districts-off-the-guarantee",
+        owner: "crates/project",
+        unit: Unit::Count,
+        label: "Districts drawing line [K] that the guarantee does not pay -- the two \
+                hold-harmlesses are not nested",
+        pinned: 17.0,
+        tolerance: 0.0,
+        compute: |i| {
+            i.panel
+                .iter()
+                .filter(|r| r.transition.transition_supplement > 0.0 && !r.on_guarantee())
+                .count() as f64
+        },
+    },
+    Figure {
+        // The panel's population, said so in the key. The department's 611-row count is 440, and
+        // the two figures are both right about different populations -- which is the seam
+        // `crates/project/tests/the_population_the_panel_speaks_for.rs` exists to hold open.
+        key: "project/panel-districts-under-the-transportation-floor",
+        owner: "crates/project",
+        unit: Unit::Count,
+        label: "Districts of the 609-row panel whose base cost state share sits below the 50% \
+                transportation minimum -- the department's 611-row count is 440",
+        pinned: 438.0,
+        tolerance: 0.0,
+        compute: |i| {
+            i.panel
+                .iter()
+                .filter(|r| r.state_share_fraction() < 0.5)
+                .count() as f64
+        },
+    },
+    Figure {
+        key: "project/districts-on-the-transportation-guarantee",
+        owner: "crates/project",
+        unit: Unit::Count,
+        label: "Districts held harmless by transportation's own FY2021 guarantee -- the third of \
+                the three mechanisms anchored to that year",
+        pinned: 38.0,
+        tolerance: 0.0,
+        compute: |i| {
+            i.panel
+                .iter()
+                .filter(|r| r.transportation.guarantee > 0.0)
+                .count() as f64
+        },
+    },
+    // `parameter/guarantee-funding-base`. Column [H2], which is both the floor under the guarantee
+    // and the origin the phase-in interpolates from.
+    Figure {
+        // **Positive**, not merely present. All 609 rows carry a figure; one of them is negative,
+        // and the sentence this binds is about the 608 that are not. Naming that in the key is the
+        // convention #171 arrived at after a count bound cleanly to a number meaning something else.
+        key: "project/districts-with-a-positive-guarantee-funding-base",
+        owner: "crates/project",
+        unit: Unit::Count,
+        label: "Districts whose published [H2] guarantee funding base is above zero",
+        pinned: 608.0,
+        tolerance: 0.0,
+        compute: |i| {
+            i.panel
+                .iter()
+                .filter(|r| r.transition.funding_base > 0.0)
+                .count() as f64
+        },
+    },
+    Figure {
+        key: "project/districts-off-the-guarantee-with-a-positive-funding-base",
+        owner: "crates/project",
+        unit: Unit::Count,
+        label: "Districts the guarantee does not pay that carry a positive [H2] anyway -- being \
+                held at the floor is not what reveals the figure",
+        pinned: 314.0,
+        tolerance: 0.0,
+        compute: |i| {
+            i.panel
+                .iter()
+                .filter(|r| !r.on_guarantee() && r.transition.funding_base > 0.0)
+                .count() as f64
+        },
+    },
+    Figure {
+        // A magnitude with the direction in the key, per the convention #171 recorded: the corpus
+        // writes this as `-$40,179.23` and the numeral reader cannot see the sign.
+        key: "project/largest-negative-guarantee-funding-base",
+        owner: "crates/project",
+        unit: Unit::Dollars,
+        label: "How far below zero the one negative [H2] sits -- Richmond Heights Local, where the \
+                FY2020 deductions R.C. 3317.02(N)(1)(b) subtracts exceeded the funding",
+        pinned: 40_179.23,
+        tolerance: 0.01,
+        compute: |i| {
+            -i.panel
+                .iter()
+                .map(|r| r.transition.funding_base)
+                .fold(f64::INFINITY, f64::min)
+        },
+    },
+    Figure {
+        key: "project/guaranteed-districts-aggregate-funding-base",
+        owner: "crates/project",
+        unit: Unit::Dollars,
+        label: "The [H2] base summed over the districts the guarantee pays -- what Ohio is \
+                committed to for them regardless of what the formula computes",
+        pinned: 3_032_797_430.41,
+        tolerance: 0.01,
+        compute: |i| on_the_guarantee(i).iter().map(|r| r.transition.funding_base).sum(),
+    },
+    Figure {
+        key: "project/guaranteed-districts-formula-amount",
+        owner: "crates/project",
+        unit: Unit::Dollars,
+        label: "What the formula computes for those same districts -- the quantity the base is \
+                compared against and found larger than",
+        pinned: 2_150_812_372.08,
+        tolerance: 0.01,
+        compute: |i| {
+            on_the_guarantee(i)
+                .iter()
+                .map(|r| r.core_foundation_funding)
+                .sum()
+        },
+    },
+    Figure {
+        key: "project/guaranteed-districts-formula-share-of-base",
+        owner: "crates/project",
+        unit: Unit::Share,
+        label: "The formula amount as a share of the base, over the guaranteed districts -- 70.9%, \
+                where the node published 71.0% from dividing the two rounded billions",
+        pinned: 0.7092,
+        tolerance: 0.00005,
+        compute: |i| {
+            let base: f64 = on_the_guarantee(i).iter().map(|r| r.transition.funding_base).sum();
+            on_the_guarantee(i)
+                .iter()
+                .map(|r| r.core_foundation_funding)
+                .sum::<f64>()
+                / base
+        },
+    },
+    // `formula-component/fsfp-special-education-weights`. The distribution runs against the
+    // weights: the category carrying the most money is not the one carrying the most pupils.
+    Figure {
+        key: "project/special-education-total",
+        owner: "crates/project",
+        unit: Unit::Dollars,
+        label: "Special education aid statewide, the second-largest categorical",
+        pinned: 722_177_050.74,
+        tolerance: 0.01,
+        compute: |i| i.panel.iter().map(|r| r.special_education.total()).sum(),
+    },
+    Figure {
+        key: "project/special-education-category-six-share-of-pupils",
+        owner: "crates/project",
+        unit: Unit::Share,
+        label: "Category 6's share of special education pupils -- few pupils at the highest weight",
+        pinned: 0.1508,
+        tolerance: 0.00005,
+        compute: |i| special_education_shares(i, 6).0,
+    },
+    Figure {
+        key: "project/special-education-category-six-share-of-money",
+        owner: "crates/project",
+        unit: Unit::Share,
+        label: "Category 6's share of special education money, against a sixth of the pupils",
+        pinned: 0.4810,
+        tolerance: 0.00005,
+        compute: |i| special_education_shares(i, 6).1,
+    },
+    Figure {
+        key: "project/special-education-category-two-share-of-pupils",
+        owner: "crates/project",
+        unit: Unit::Share,
+        label: "Category 2's share of special education pupils -- the opposite shape, many pupils \
+                at a low weight",
+        pinned: 0.6500,
+        tolerance: 0.00005,
+        compute: |i| special_education_shares(i, 2).0,
+    },
+    Figure {
+        key: "project/special-education-category-two-share-of-money",
+        owner: "crates/project",
+        unit: Unit::Share,
+        label: "Category 2's share of special education money",
+        pinned: 0.3385,
+        tolerance: 0.00005,
+        compute: |i| special_education_shares(i, 2).1,
+    },
+    Figure {
+        key: "project/special-education-categories-two-and-six-share-of-money",
+        owner: "crates/project",
+        unit: Unit::Share,
+        label: "What the two together are of the programme, by money -- the pair is 82% of the \
+                spending and 80% of the pupils, which is why the sentence has to say which",
+        pinned: 0.8195,
+        tolerance: 0.00005,
+        compute: |i| special_education_shares(i, 2).1 + special_education_shares(i, 6).1,
+    },
+    Figure {
+        key: "project/special-education-category-four-pupils",
+        owner: "crates/project",
+        unit: Unit::Count,
+        label: "Category 4 pupils statewide, the smallest of the six",
+        pinned: 1_060.0,
+        tolerance: 0.0,
+        compute: |i| special_education_totals(i).0[3].round(),
+    },
+    Figure {
+        key: "project/special-education-category-four-aid",
+        owner: "crates/project",
+        unit: Unit::Dollars,
+        label: "What Category 4 generates statewide",
+        pinned: 5_675_479.07,
+        tolerance: 0.01,
+        compute: |i| special_education_totals(i).1[3],
+    },
+    // `formula-component/fsfp-career-technical-weights`. Mechanically special education's shape,
+    // and the difference is entirely the multiplicand.
+    Figure {
+        key: "project/career-technical-total",
+        owner: "crates/project",
+        unit: Unit::Dollars,
+        label: "Career-technical aid statewide, the five categories plus associated services",
+        pinned: 53_875_678.32,
+        tolerance: 0.01,
+        compute: |i| i.panel.iter().map(|r| r.career_technical.total()).sum(),
+    },
+    Figure {
+        key: "project/career-technical-associated-services",
+        owner: "crates/project",
+        unit: Unit::Dollars,
+        label: "The sixth weight, applied to total FTE rather than to any category -- services \
+                rather than instruction",
+        pinned: 3_234_233.67,
+        tolerance: 0.01,
+        compute: |i| {
+            i.panel
+                .iter()
+                .map(|r| r.career_technical.associated_services)
+                .sum()
+        },
+    },
+    Figure {
+        key: "project/career-technical-base-cost-premium",
+        owner: "crates/project",
+        unit: Unit::Share,
+        label: "How far the career-technical base cost per pupil sits above the statewide average \
+                the other weighted categoricals multiply -- a CTE pupil starts higher before any \
+                weight is applied",
+        pinned: 0.1958,
+        tolerance: 0.00005,
+        compute: |_| {
+            project::panel::CTE_BASE_COST_PER_PUPIL / project::panel::AVERAGE_BASE_COST_PER_PUPIL
+                - 1.0
+        },
+    },
+
+    // The eleven statutory multiples, which two nodes state and a test checks against the Revised
+    // Code. Bound as figures rather than left to that test alone because the test compares the
+    // crate against `ohio-laws`, and this compares the *corpus* against the crate: an edit to
+    // either constant array reddens every sentence that quotes it, which is the whole mechanism.
+    Figure {
+        key: "project/special-education-weight-category-one",
+        owner: "crates/project",
+        unit: Unit::Ratio,
+        label: "The statutory special education weight on Category one, R.C. 3317.013(A)",
+        pinned: 0.2435,
+        tolerance: 0.0,
+        compute: |_| project::panel::SPECIAL_EDUCATION_WEIGHTS[0],
+    },
+    Figure {
+        key: "project/special-education-weight-category-two",
+        owner: "crates/project",
+        unit: Unit::Ratio,
+        label: "The statutory special education weight on Category two, R.C. 3317.013(A)",
+        pinned: 0.6179,
+        tolerance: 0.0,
+        compute: |_| project::panel::SPECIAL_EDUCATION_WEIGHTS[1],
+    },
+    Figure {
+        key: "project/special-education-weight-category-three",
+        owner: "crates/project",
+        unit: Unit::Ratio,
+        label: "The statutory special education weight on Category three, R.C. 3317.013(A)",
+        pinned: 1.4845,
+        tolerance: 0.0,
+        compute: |_| project::panel::SPECIAL_EDUCATION_WEIGHTS[2],
+    },
+    Figure {
+        key: "project/special-education-weight-category-four",
+        owner: "crates/project",
+        unit: Unit::Ratio,
+        label: "The statutory special education weight on Category four, R.C. 3317.013(A)",
+        pinned: 1.9812,
+        tolerance: 0.0,
+        compute: |_| project::panel::SPECIAL_EDUCATION_WEIGHTS[3],
+    },
+    Figure {
+        key: "project/special-education-weight-category-five",
+        owner: "crates/project",
+        unit: Unit::Ratio,
+        label: "The statutory special education weight on Category five, R.C. 3317.013(A)",
+        pinned: 2.6830,
+        tolerance: 0.0,
+        compute: |_| project::panel::SPECIAL_EDUCATION_WEIGHTS[4],
+    },
+    Figure {
+        key: "project/special-education-weight-category-six",
+        owner: "crates/project",
+        unit: Unit::Ratio,
+        label: "The statutory special education weight on Category six, R.C. 3317.013(A)",
+        pinned: 3.9554,
+        tolerance: 0.0,
+        compute: |_| project::panel::SPECIAL_EDUCATION_WEIGHTS[5],
+    },
+    Figure {
+        key: "project/career-technical-weight-category-one",
+        owner: "crates/project",
+        unit: Unit::Ratio,
+        label: "The statutory career-technical weight on Category one, R.C. 3317.014(A)",
+        pinned: 0.6230,
+        tolerance: 0.0,
+        compute: |_| project::panel::CTE_WEIGHTS[0],
+    },
+    Figure {
+        key: "project/career-technical-weight-category-two",
+        owner: "crates/project",
+        unit: Unit::Ratio,
+        label: "The statutory career-technical weight on Category two, R.C. 3317.014(A)",
+        pinned: 0.5905,
+        tolerance: 0.0,
+        compute: |_| project::panel::CTE_WEIGHTS[1],
+    },
+    Figure {
+        key: "project/career-technical-weight-category-three",
+        owner: "crates/project",
+        unit: Unit::Ratio,
+        label: "The statutory career-technical weight on Category three, R.C. 3317.014(A)",
+        pinned: 0.2154,
+        tolerance: 0.0,
+        compute: |_| project::panel::CTE_WEIGHTS[2],
+    },
+    Figure {
+        key: "project/career-technical-weight-category-four",
+        owner: "crates/project",
+        unit: Unit::Ratio,
+        label: "The statutory career-technical weight on Category four, R.C. 3317.014(A)",
+        pinned: 0.1830,
+        tolerance: 0.0,
+        compute: |_| project::panel::CTE_WEIGHTS[3],
+    },
+    Figure {
+        key: "project/career-technical-weight-category-five",
+        owner: "crates/project",
+        unit: Unit::Ratio,
+        label: "The statutory career-technical weight on Category five, R.C. 3317.014(A)",
+        pinned: 0.1570,
+        tolerance: 0.0,
+        compute: |_| project::panel::CTE_WEIGHTS[4],
     },
 ];

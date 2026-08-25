@@ -43,6 +43,12 @@ description: |
   figure remains the right default: a single year of value-added is noisy enough that the
   department smooths it deliberately. What the choice does decide is the **sign** for districts
   sitting on zero, and the sign is what gets reported about them. [inference]
+figures:
+  - key: dispersion/attainment-against-growth
+    value: 0.37524603489784697
+    field: description
+    as_written: "the two correlate with each other at only **+0.375**"
+
 findings: |
   ### The sign of the spending relationship depends on which outcome is asked
 
