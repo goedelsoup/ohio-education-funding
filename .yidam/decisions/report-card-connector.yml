@@ -74,3 +74,5 @@ rationale: |
   records that Ohio publishes an index and no threshold, and `corpus/doctrine/adequacy.yml`,
   which records that a spending-outcome correlation is not an adequacy test in either
   formulation.
+connectors:
+  - dew-report-card

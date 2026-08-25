@@ -105,9 +105,11 @@ Every directory here is now a real crate; the nine connector stubs were folded i
 [`connect`](connect/) and their
 prose kept at [`connect/sources/`](connect/sources/). The registry has since grown to **21**
 connectors, and `sources/` still holds **11** long forms — for the other ten the decision record
-is the only account of why each exists. The count is not repeated here on purpose: it is checked
-by `registry::tests::every_connector_approved_in_the_ontology_is_present`, and the breakdown is
-generated into [`connect/README.md`](connect/README.md).
+is the only account of why each exists, which became true of all ten only once the four
+connectors that had no record got one. The count is not repeated here on purpose: it is checked
+by `registry::tests` against the `connectors:` field the approving records in
+[`.yidam/decisions/`](../.yidam/decisions/) carry, and the breakdown is generated into
+[`connect/README.md`](connect/README.md).
 
 **No external dependencies.** Every crate is pure `std` — including the XLSX reader, which
 means a zip reader, a DEFLATE decompressor, and an XML parser written here rather than pulled
@@ -195,7 +197,7 @@ Fields per crate: name, capability type (connector/calculator/feature-engineerin
 | Crate | Description | `#[test]` fns |
 |---|---|--:|
 | [`bundle`](bundle/) | Export a versioned JSON feed of the corpus's district-level findings for the web layer | 50 |
-| [`connect`](connect/) | Retrieval and extraction: the department's publications into committed fixtures | 110 |
+| [`connect`](connect/) | Retrieval and extraction: the department's publications into committed fixtures | 111 |
 | [`deflator`](deflator/) | Convert nominal Ohio school finance figures to constant dollars, fiscal-year aligned | 17 |
 | [`dispersion`](dispersion/) | School finance equity statistics: dispersion and wealth neutrality across agencies | 170 |
 | [`edfund-core`](edfund-core/) | Shared domain types for the Ohio education funding computer | 35 |
@@ -208,7 +210,7 @@ Fields per crate: name, capability type (connector/calculator/feature-engineerin
 | [`scenario-delta`](scenario-delta/) | Winners and losers between two funding runs, with incidence and the off-formula count | 27 |
 | [`spreadsheet`](spreadsheet/) | Read the department's published workbooks with no dependencies | 79 |
 
-13 crates, 925 test functions, no crates.io dependencies. `cargo test` reports a different total: it adds doc-tests and counts each integration binary separately.
+13 crates, 926 test functions, no crates.io dependencies. `cargo test` reports a different total: it adds doc-tests and counts each integration binary separately.
 <!-- /REGEN -->
 
 ## Index status

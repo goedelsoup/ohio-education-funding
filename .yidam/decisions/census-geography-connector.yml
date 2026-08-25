@@ -89,4 +89,5 @@ amendment: |
   Seats three times larger mean 392 of 609 school districts lie wholly inside one against 270 for
   the House. That does not change the decision to apportion, but it does mean the two chambers'
   pages carry different amounts of derivation and each says which.
-
+connectors:
+  - census-geography

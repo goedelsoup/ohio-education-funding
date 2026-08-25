@@ -1,0 +1,69 @@
+id: school-improvement-connector
+summary: >-
+  dew-school-improvement, three identification lists wired — the corpus had modelled the regime,
+  the trigger and the intervention before it could name one identified school, and the building
+  DeRolph is named for is on the list.
+context: |
+  **Written after the fact.** The connector was declared and wired in `08488b0`, and no decision
+  record named it until [`what-approves-a-connector`](what-approves-a-connector.yml) found four
+  connectors in that state. What follows is reconstructed from that commit and from the registry.
+
+  [`accountability-domain`](accountability-domain.yml) brought the federal regime into the corpus:
+  the identification categories, the thresholds that trigger them, and the interventions that
+  follow. All of it was the rule and none of it was the roster. The corpus could state what makes
+  a school a Comprehensive Support and Improvement school and could not say whether any particular
+  school was one.
+
+  The lists are published, and finding them took reading the department's page rather than
+  inferring a filename. Six probes against the report card storage all 404'd; the links sat on
+  `Identification-and-Requirements` the whole time.
+decision: |
+  Declare `dew-school-improvement` as a connector in its own right, `Wired` with a recorded
+  remainder, feeding `school`, `education-agency` and `accountability-regime`, with the three
+  current identification workbooks as its sources: **231 CSI, 117 ATSI, 60 TSI**.
+
+  Separate from `dew-report-card` although both are the department and both are accountability.
+  The report card is a graded measurement republished annually with its history intact; this is a
+  status list republished *in place*. They fail differently and a shared status could not say so.
+consequences: |
+  **The corpus can answer a question it had recorded itself unable to answer.** Sheridan High
+  School — Nathan DeRolph's building — was ATSI in 2022 and escalated to CSI in 2025. Its node
+  said one commit earlier that the corpus "cannot say whether Sheridan has ever been identified";
+  it now says what changed rather than reading as though it always knew.
+
+  **And the route is the finding, not the fact.** A four-star building with a Performance Index of
+  **89.9** did not reach CSI by performing in the lowest 5%. It was ATSI — one or more *subgroups*
+  at or below the CSI threshold — and did not exit within three years, which escalates
+  automatically. **Forty-two of the 231** CSI schools arrived that way. The whole-school figures and
+  the status are not in tension; they measure different things, and the federal system exists to
+  surface that gap.
+
+  **The corpus's worst-performing exemplar is on no list, and the corpus cannot say why.** Anton
+  Grdina, Performance Index 36.8, two in three students chronically absent, is not CSI, TSI or
+  ATSI while Sheridan is. CSI selects among **Title I served** schools and nothing held here carries
+  a Title I flag, so the absence reads three ways and none can be ruled out. What can be said is
+  that a reader treating the CSI list as "the failing schools" will not find this building on it.
+
+  **A remainder that is the publisher's archiving practice.** The department republishes each list
+  in place under a dated filename rather than archiving prior cycles, so there is no history here:
+  a school that exited before this file was written is indistinguishable from one never identified.
+  Some CSI rows still carry a 2018 identification against exit criteria that allow three years.
+
+  **The comma guard earned its keep.** `Year Identified` is not always a year — for escalated
+  schools it carries a history, `ATSI 2022 , CSI 2025` — and the writer refused it on the first
+  build. That cell is now the only place the escalation path is legible per school.
+alternatives: |
+  **Fold the lists into `dew-report-card`.** Rejected, above: same publisher, opposite archiving
+  behaviour, and one `still_blocked` string cannot describe both.
+
+  **Wait for an archived cycle before wiring anything.** Rejected: the snapshot is the only thing
+  the department publishes, and refusing it would have left the accountability nodes unable to name
+  a school for as long as the practice lasts, which is indefinitely. The limit is recorded on the
+  connector instead of being the reason not to have one.
+
+  **Infer Title I service from the CSI list itself.** Tempting, and it would explain Anton Grdina
+  in one line. Rejected: it assumes the conclusion. A school absent from a list that selects among
+  Title I schools tells you nothing about whether it is one, and deriving the flag from the
+  selection would make the absence self-explaining and unfalsifiable.
+connectors:
+  - dew-school-improvement

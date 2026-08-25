@@ -21,12 +21,43 @@ One file per decision, named for what it settled rather than for the phase that 
     decision      what was chosen
     consequences  what followed, including what it cost
     alternatives  what was rejected, and why — one paragraph each
-    rationale     used by the four connector records in place of the last two
+    rationale     stated in place of the last two by four records — `ontology`, `proposals`,
+                  `report-card-connector` and `five-year-forecast-connector`
     amendment     a later revision of the record, where one was made
+    connectors    the registry keys this record approves. Not prose; see below.
 
-Every field is markdown in a YAML block scalar. Links are relative file paths so they work in an
-editor: `../corpus/class/name.yml`, `../catalog/name.md`, and a bare `name.yml` for a sibling
-decision. The site rewrites all three.
+Every prose field is markdown in a YAML block scalar. Links are relative file paths so they work
+in an editor: `../corpus/class/name.yml`, `../catalog/name.md`, and a bare `name.yml` for a
+sibling decision. The site rewrites all three.
+
+A record may carry fields outside this list — `ontology` has a `corpus_depth` integer and a
+`governance` string — and the site ignores them rather than rendering them as unheaded cards,
+because `readDecision` in [`web/src/lib/corpus.ts`](../../web/src/lib/corpus.ts) reads an
+allowlist. That is worth knowing in both directions: a data field costs the page nothing, and a
+*prose* field added here will not appear on it until it is added to `DECISION_SECTIONS` and to
+`SECTION_NAMES` in `routes.ts`, which `web/tests/unit/links.spec.ts` holds in agreement.
+
+## `connectors:`
+
+A record that approves one or more connectors lists their registry keys:
+
+```yaml
+connectors:
+  - dew-foundation
+  - tax-abstract
+```
+
+Thirteen records carry it and they account for all 21 connectors, each named exactly once.
+`registry::tests` in [`crates/connect`](../../crates/connect/src/registry/mod.rs) derives the
+approval list from these fields and checks it against the registry in both directions, so a
+connector cannot enter the registry without a record here and cannot leave it without its approval
+being withdrawn in the record that made it.
+
+It is a field and not something read out of the prose because a record cites the connectors it
+reasons about far more often than it approves one — `tax-abstract` is named in seven records and
+approved by one. [`what-approves-a-connector`](what-approves-a-connector.yml) records that, and
+records the eleven phases during which `crates/connect/README.md` claimed this check existed while
+the test compared the registry against a hand-written array.
 
 ## Correcting a record
 

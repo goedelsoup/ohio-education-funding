@@ -124,3 +124,13 @@ rationale: |
   scope: nine connectors and nine calculators is a large domain computer, and most will exist
   as stubs for some time. That is acknowledged rather than mitigated — the stubs record
   intent, and the phase that needs one builds it.
+connectors:
+  - dew-foundation
+  - tax-abstract
+  - lsc-budget
+  - ohio-laws
+  - ohio-courts
+  - ofcc-projects
+  - census-f33
+  - nces-ccd
+  - bls-cpi

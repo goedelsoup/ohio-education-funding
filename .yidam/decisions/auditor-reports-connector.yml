@@ -1,0 +1,102 @@
+id: auditor-reports-connector
+summary: >-
+  ohio-auditor, five audit reports read for one paragraph each — the only route to the resolutions
+  that dissolved three school districts, and the first source here that is a state officer reciting
+  a local body's act rather than the acting body's own document.
+context: |
+  **Written after the fact.** The connector was declared and wired in `7c41b79`, and no decision
+  record named it until [`what-approves-a-connector`](what-approves-a-connector.yml) found four
+  connectors in that state. What follows is reconstructed from that commit and from the registry.
+
+  [`the-order-was-never-the-states`](the-order-was-never-the-states.yml) established that Ohio's
+  territory-transfer orders are not the State Board's, corrected the corpus where it had said so,
+  and pointed at the Auditor of State without opening anything. This is the phase that opened it.
+
+  The reason a district stopped existing is not derivable from any series held here.
+  [`dispersion::lea_directory`](../../crates/dispersion/src/lea_directory.rs) counts **689 agencies
+  leaving the federal directory across thirty years**, and Ohio files every one of them without a
+  single exception under status code 2, *"closed with no effect on another agency's boundaries."*
+  The CCD has a code that means consolidation — code 5 — and Ohio has never used it: zero
+  occurrences in 30,655 Ohio agency-years. For Bettsville, Ledgemont and Newbury, whose territory
+  went whole to a neighbour, code 2 is not the source declining to answer. It is the source
+  answering wrongly.
+
+  R.C. 3311.22 puts the order in an educational service center's minute book, and those are not
+  published. What *is* published is the Auditor's report on the district that received the
+  territory, which quotes the resolution by date and issuing body:
+
+  > On June 24, 2014, the Governing Board of the North Central Ohio Educational Service Center
+  > passed a resolution to transfer all of the territory of Bettsville Local District to Old Fort
+  > Local District effective June 30, 2014.
+decision: |
+  Declare `ohio-auditor` as a connector, `Wired` with a recorded remainder, feeding
+  `education-agency` and `legislation`, with five audit reports as its sources — read for one
+  paragraph each.
+
+  **Admit a recital as evidence, and say in the fixture that it is one.** Every other primary
+  source in the registry is the acting body's own document. This is not: it is a state officer
+  restating what a local board resolved. The fixture therefore declares, before a report is read,
+  the departing agency, the receiving one, the resolution date, and **the words the recital opens
+  with** — so the extraction is checked against a stated expectation rather than trusted to find
+  the paragraph.
+
+  The last of those is not fastidiousness. A sentence boundary is not a sentence boundary in a PDF
+  financial statement: page numbers, running heads and all-capital note titles carry no full stop,
+  and a naive bound reaches back through `- iv -` and `NOTES TO THE BASIC FINANCIAL STATEMENTS` and
+  swallows them into the quotation. Two reports were extracted wrongly that way before the openings
+  were declared.
+
+  The fixture is TSV rather than CSV, and for once the reason is the quotation rather than a name:
+  the recital is carried verbatim, this repository's writer does not quote, and a sentence with its
+  commas stripped is a damaged sentence.
+consequences: |
+  **One transfer is recited twice, and that is what makes a recital evidence rather than a lead.**
+  Bettsville's own final audit and Old Fort's the following year carry the same resolution, the
+  same date and the same effect — two audited entities, two reports, one transaction, differing
+  only in where they put the definite article. Nothing else in the registry has that kind of
+  corroboration.
+
+  **A claim of this repository's was withdrawn by it.** West Geauga's report states that *all* of
+  Newbury's $180,214,110 valuation moved, which is what retired the corpus's assertion that the
+  territory was split with Chardon. It is also the only one of the five that names a section —
+  R.C. 3311.22. The `section` column is left empty for Bettsville and Ledgemont rather than filled
+  in from the statute's shape; Berkshire's audit cites 3311.241 for solvency-fund debt
+  cancellation, which may indicate a different route and is not resolved here.
+
+  **The proposing body's own audit says nothing.** Geauga County ESC's final report spans both
+  Newbury resolutions and never says "Newbury"; its FY2015 report spans the Ledgemont resolution
+  and never says "Ledgemont"; North Central Ohio ESC's FY2014 report names Bettsville only as a
+  member of an insurance pool. The act surfaces where the territory landed and nowhere where the
+  order was made — so a rule that looks at the issuing body finds nothing and concludes nothing
+  happened. That is the transferable lesson, and `state-foundation-aid` inherits it: its own thirty
+  vanished appropriation lines have the same shape, and the document that can say why is filed by
+  whoever received what was left.
+
+  **The remainder is a records request, not a fetch.** Wired for the five reports that recite a
+  transfer, which is what the corpus needed and not what the Auditor mostly publishes. The executed
+  resolutions are not here at all — those sit in service center minute books behind a vendor
+  firewall.
+
+  Also recorded, because it cost a probe: `ohioauditor.gov` returns HTTP 200 with a 34,330-byte
+  HTML body for any nonexistent path under `/auditsearch/Reports/`. That is the third distinct
+  soft-404 signature this project has had to fingerprint, after LSC's 10,835 bytes and the State
+  Board's 3,548.
+alternatives: |
+  **Drive AuditSearch rather than direct paths.** Rejected: it is machine-drivable only by carrying
+  `__VIEWSTATE` on a cookie jar, and the direct report paths make the whole apparatus unnecessary.
+  A connector that needs session state to fetch a static PDF is a connector that will break on a
+  vendor upgrade nobody announces.
+
+  **Request the minute books.** Not rejected — deferred, and recorded on the connector as the
+  remainder. It is a records request to individual service centers, which is a different kind of
+  work from anything else in the registry and does not belong inside a phase that fetches.
+
+  **Infer the reason for a departure from the series instead.** Rejected, and tested rather than
+  assumed: enrolment absorption on the surviving district is confounded roughly fifty to one by
+  ordinary growth. The reason has to be fetched one document at a time, which is exactly why five
+  of them are worth a connector.
+
+  **Read the recital as the instrument.** Rejected, and the fixture is built so it cannot be. A
+  recital is a state officer's account of a local board's act, and the corpus says which it holds.
+connectors:
+  - ohio-auditor
