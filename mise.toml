@@ -61,10 +61,11 @@ includes = ["mise.yidam.toml"]
 CARGO_HOME = "{{env.HOME}}/.cargo"
 RUSTUP_HOME = "{{env.HOME}}/.rustup"
 # And the rustup shims, which mise does not add itself: its `rust` install for
-# 1.97.0 *is* a symlink to `~/.cargo/bin`, so the `<install>/bin` it would put on
-# PATH resolves to `~/.cargo/bin/bin` and does not exist. `RUSTUP_TOOLCHAIN` is
-# still exported from the `[tools]` pin below, so the shim found here selects
-# 1.97.0 and the pin keeps meaning what it says.
+# the pinned version *is* a symlink to `~/.cargo/bin`, so the `<install>/bin` it
+# would put on PATH resolves to `~/.cargo/bin/bin` and does not exist.
+# `RUSTUP_TOOLCHAIN` is still exported from the `[tools]` pin below, so the shim
+# found here selects that version and the pin keeps meaning what it says. Written
+# without the number because the number moves; see the pin for why it has to.
 #
 # `.yidam/bin` comes FIRST, ahead of cargo's directory, and the order is
 # load-bearing rather than tidy. `mise run yidam-build` installs the CLI into
@@ -91,17 +92,25 @@ config_roots = ["crates", "web"]
 # of the runner rather than a floor. When GitHub's image moves to a newer stable,
 # clippy gains lints and CI can go red with no commit behind it — and this line is
 # what has to move for a local run to reproduce the failure. That is exactly how
-# it went red at 1.97 while the local gate sat green on 1.82.
+# it went red at 1.97 while the local gate sat green on 1.82, and again at 1.98
+# on `chunks_exact_to_as_chunks` while this line still said 1.97: the failing job
+# was a PR that touched neither crate the lint fired in.
+#
+# **Moving this line is the whole procedure.** With the pin behind the runner
+# there is no local invocation that reproduces the failure — `cargo clippy` is
+# green, the log is the only evidence, and the fix has to be written against a
+# compiler nobody in the repository is running. Bump it first, then lint.
 #
 # The workspace's real floor is lower — `Option::is_none_or` (1.82) in `connect`
-# and `spreadsheet`, `u16::is_multiple_of` (1.87) in `edfund-core` — but nothing
+# and `spreadsheet`, `u16::is_multiple_of` (1.87) in `edfund-core`, and now
+# `slice::as_chunks` in both, which those two lint fixes introduced — but nothing
 # enforces it, so treat this as the only version any check has been verified
 # against.
 #
 # mise installs Rust through rustup with its own profile and does not read a
 # `rust-toolchain.toml` component list, so rustfmt and clippy are requested here
 # or a clean install omits them and the lint task fails with "no such command".
-rust = { version = "1.97.0", components = "rustfmt,clippy" }
+rust = { version = "1.98.0", components = "rustfmt,clippy" }
 # Both named in `.github/workflows/ci.yml`; kept identical so a green local gate
 # means something about the remote one.
 node = "24"
