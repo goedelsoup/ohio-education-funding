@@ -82,8 +82,8 @@ properties:
     for all 609 districts. Counts are FY2021.
   function_tex: |
     \begin{aligned}
-    \text{aid}_k &= \text{ADM}_k \times w_k \times \text{statewide average base cost per pupil}
-      \times \text{state share} \\
+    \text{aid}_k &= \text{ADM}_k \times w_k \\
+      &\quad \times \text{statewide average base cost per pupil} \times \text{state share} \\
     w &= (0.2104,\ 0.1577,\ 0.1053) && \text{category 1 is the newest arrival} \\
     \text{statewide average base cost per pupil} &= \$8{,}241.61 && \text{FY2027} \\
     \text{total} &= \sum_{k=1}^{3} \text{aid}_k
