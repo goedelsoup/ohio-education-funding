@@ -175,6 +175,73 @@ export function checkAndClean(element: Element, where: string): void {
   for (const child of [...element.children]) checkAndClean(child as Element, where);
 }
 
+const spaces = (text: string): string => text.replace(/\s+/gu, " ").trim();
+
+/**
+ * Turn the named quantities in a formula into links to the parameter nodes that define them.
+ *
+ * # Why the phrases are declared and not matched
+ *
+ * #204 proposed deriving the link from a parameter's `name` property, so that nothing is
+ * hand-authored. Measured against the corpus: the fourteen `function_tex` fields write **152
+ * distinct `\text{}` phrases**, and exactly **one** of them equals a parameter's `name`. A
+ * formula does not write "Special education category multiples"; it writes `w_k` and, where it
+ * names a quantity in words, it writes the words the section uses — "statewide average base cost
+ * per pupil", "the school-age weights", "general proration".
+ *
+ * So the phrases are declared, on the parameter, as `written_as:`. That keeps the property #204
+ * actually cares about — **zero hand-written hrefs in any `function_tex`** — while putting the
+ * vocabulary beside the thing being named rather than beside each use of it. A parameter written
+ * six ways declares six phrases once; `formulaLinks.spec.ts` fails if a phrase stops being used.
+ *
+ * # Scoped by the edge, which is what keeps it honest
+ *
+ * A formula only links to a parameter its component declares a `governed-by` edge to. That is why
+ * `supplement` can be an alias of the performance supplement rate without linking every other
+ * component's supplements: the map handed in here is built per node from that node's own edges.
+ * A phrase with no edge behind it links to nothing, silently and correctly.
+ *
+ * Only a whole `<mtext>` is linked, never a substring. A partial match inside a named quantity
+ * would put an underline through half a phrase, and the phrase is the unit of meaning.
+ *
+ * # The spaces are not spaces
+ *
+ * temml writes the gaps inside `\text{}` as U+00A0, so the words of `\text{statewide average
+ * base cost per pupil}` arrive joined by non-breaking spaces rather than by U+0020 — written
+ * out here rather than pasted, because the character is invisible in source and the next
+ * reformat would delete the demonstration without changing a visible byte. A lookup on
+ * the raw `textContent` therefore matched only the single-word phrases: five of twenty-eight,
+ * and every one of the five was a word with no gap in it. Both sides are normalised here rather
+ * than the corpus being asked to type a non-breaking space it cannot see.
+ */
+export function linkTerms(root: Element, terms: Map<string, string>, document: Document): number {
+  if (terms.size === 0) return 0;
+  let linked = 0;
+  const walk = (element: Element): void => {
+    if (element.tagName.toLowerCase() === "mtext") {
+      const raw = element.textContent ?? "";
+      const href = terms.get(spaces(raw).toLowerCase());
+      // `element.children.length` guards against wrapping something already wrapped, which is what
+      // a second pass over the same tree would otherwise do.
+      if (href !== undefined && element.children.length === 0 && raw.trim() !== "") {
+        const anchor = document.createElement("a");
+        anchor.setAttribute("href", href);
+        /* The ORIGINAL text, not the normalised one. Those gaps are U+00A0 and temml means them:
+           a named quantity that starts breaking across lines inside a formula is a phrase the
+           reader has to reassemble. Only the lookup is normalised. */
+        anchor.textContent = raw;
+        element.textContent = "";
+        element.appendChild(anchor);
+        linked += 1;
+      }
+      return;
+    }
+    for (const child of [...element.children]) walk(child as Element);
+  };
+  walk(root);
+  return linked;
+}
+
 /**
  * One LaTeX expression, as MathML.
  *
@@ -185,7 +252,10 @@ export function checkAndClean(element: Element, where: string): void {
  *
  * @param where names the node and field, so a failure says which formula to go and fix.
  */
-export function renderMath(latex: string, options: { display: boolean; where: string }): string {
+export function renderMath(
+  latex: string,
+  options: { display: boolean; where: string; terms?: Map<string, string> },
+): string {
   let markup: string;
   try {
     markup = temml.renderToString(latex, {
@@ -202,6 +272,11 @@ export function renderMath(latex: string, options: { display: boolean; where: st
   const document = new DOMParser().parseFromString(markup, "text/xml");
   const root = document.querySelector("math");
   if (!root) throw new MathError(`${options.where}: temml produced no <math> element`);
+  /* Before the boundary, not after: an anchor this function inserts is held to the same allowlist
+     as anything temml produced, so a malformed href fails the build rather than shipping. */
+  if (options.terms) {
+    linkTerms(root as unknown as Element, options.terms, document as unknown as Document);
+  }
   checkAndClean(root as unknown as Element, options.where);
 
   /*

@@ -125,6 +125,9 @@ properties:
     beside them.
 
     Constants, not levers.
+  written_as: |
+    per rider base
+    per mile base
   sensitivity: |
     $726.1m of transportation and $182.6m of special education transportation. 350 of 611
     districts are paid on the mile base rather than the rider base, so the two rates do not

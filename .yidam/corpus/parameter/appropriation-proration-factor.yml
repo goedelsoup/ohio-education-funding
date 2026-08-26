@@ -230,6 +230,9 @@ properties:
     Set by the appropriation rather than by R.C. 3317. Which budget line governs each, and whether
     the department's discretion in setting the factor is bounded, is [open].
   simulation_key: proration_factor
+  written_as: |
+    general proration
+    proration
   sensitivity: |
     Linear and universal within a program: every district's amount moves in exact proportion, so a
     proration changes the level and nothing about the distribution. That makes it the one parameter

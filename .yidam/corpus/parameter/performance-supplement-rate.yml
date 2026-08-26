@@ -90,6 +90,8 @@ properties:
     `PERFORMANCE_STAR_THRESHOLD` and `PERFORMANCE_PROGRESS_THRESHOLD`.
 
     Constants, no lever.
+  written_as: |
+    supplement
   sensitivity: |
     The rate and the thresholds move different things. $13 scales the whole supplement and does
     not change who receives it; the two thresholds change who receives it and not the rate.

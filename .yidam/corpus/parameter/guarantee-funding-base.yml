@@ -206,6 +206,8 @@ properties:
     in every year since — FY2022 through FY2027, across three biennial budgets, unchanged.
     [verified] Carried per district in `crates/project::panel::Transition` and reproduced for all
     609 in `crates/project/tests/the_supplements_outside_the_formula.rs`.
+  written_as: |
+    guarantee funding base
   sensitivity: |
     Nothing in the formula moves it, which is the point: it is the fixed side of a `max`, so a
     guaranteed district is inert to every other lever. What does move it is inflation, and only in

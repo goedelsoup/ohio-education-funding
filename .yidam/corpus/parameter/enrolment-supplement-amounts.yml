@@ -83,6 +83,9 @@ properties:
     `ENROLLMENT_GROWTH_SUPPLEMENT_PER_PUPIL` and `ENROLLMENT_GROWTH_THRESHOLD`.
 
     Constants, no lever.
+  written_as: |
+    base funding supplement
+    growth supplement
   sensitivity: |
     The $40 is the most linear parameter in the plan: it multiplies enrolment and nothing else,
     so its cost is exactly $40 times statewide ADM and its distribution is exactly the

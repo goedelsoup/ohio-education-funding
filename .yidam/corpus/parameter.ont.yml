@@ -41,6 +41,18 @@ properties:
   - name: simulation_key
     type: string
     description: Identifier the crates/ foundation calculator uses to bind this parameter
+  - name: written_as
+    type: text
+    description: >-
+      The phrases a formula writes this parameter as, one per line. A formula does not name a
+      parameter the way this class does — it writes "statewide average base cost per pupil" or
+      "the school-age weights", the words the Revised Code section uses. Measured across the
+      corpus's fourteen `function_tex` fields: 152 distinct `\text{}` phrases, of which exactly
+      one equals a parameter's `name`. So the site links a named quantity in a formula to the node
+      that defines it by reading this field rather than by matching the name, and a `function_tex`
+      carries no hand-written link. A phrase counts only inside a formula whose component declares
+      a `governed-by` edge to this parameter, which is what lets a generic word like "supplement"
+      be an alias without linking every other component's supplements.
   - name: sensitivity
     type: text
     description: What moves when this parameter moves, and which agencies feel it most

@@ -94,6 +94,10 @@ properties:
 
     Nine constants, no lever. This is the parameter with the most separate dials in the plan and
     the scenario runner can move none of them.
+  written_as: |
+    targeted assistance
+    capacity amount
+    wealth amount
   sensitivity: |
     The 0.014 / 0.0112 asymmetry is the tier's whole progressivity, and it is not obvious from
     either number alone. Setting the two equal would make the tier pay nothing at the median and

@@ -15,7 +15,7 @@ import { loadCorpus } from "../../../lib/corpus.ts";
 import { sectionForClass } from "../../../lib/nav.ts";
 import { loadFeed } from "../../../lib/feed.ts";
 import { money } from "../../../lib/format.ts";
-import { isBlockProperty, isMathProperty, renderMathProperty, renderProse, renderPropertyValue, shownProperties, summarize } from "../../../lib/prose.ts";
+import { isBlockProperty, isListProperty, isMathProperty, renderListProperty, renderMathProperty, renderProse, renderPropertyValue, shownProperties, summarize } from "../../../lib/prose.ts";
 import * as routes from "../../../lib/routes.ts";
 import SectionAnchor from "../../../components/SectionAnchor.astro";
 
@@ -102,6 +102,30 @@ const unpriced = draft?.provisions.filter((p) => p.lever === "").length ?? 0;
 const metaDescription = summarize(node.summary, 200);
 
 const seeded = node.properties.find((p) => p.name === "seeded_because");
+
+/**
+ * The named quantities this node's formulas may link, built from the node's own edges.
+ *
+ * A component links a term only to a parameter it declares `governed-by` — so the map is this
+ * node's declared dials and nothing else, and the same phrase can mean different parameters on
+ * two pages without either one being wrong. `supplement` is the case that makes it necessary:
+ * it is the performance supplement on one page and a word on every other.
+ *
+ * Derived rather than authored. `formulaLinks.spec.ts` asserts that no `function_tex` in the
+ * corpus contains an `href`, which is the property #204 asked for; the vocabulary that produces
+ * these links lives on the parameter, as `written_as`.
+ */
+const formulaTerms = new Map<string, string>();
+for (const edge of node.out) {
+  if (edge.relationship !== "governed-by" || edge.id === null) continue;
+  const parameter = loadCorpus().byId.get(edge.id);
+  const phrases = parameter?.properties.find((p) => p.name === "written_as")?.value ?? "";
+  for (const phrase of phrases.split("\n")) {
+    const trimmed = phrase.trim();
+    if (trimmed !== "") formulaTerms.set(trimmed.toLowerCase(), edge.href);
+  }
+}
+
 /*
  * Rendered here rather than in the table, because a maths property takes a different path from a
  * prose one: `renderPropertyValue` escapes its input, which is exactly what makes it safe and
@@ -111,8 +135,10 @@ const properties = shownProperties(node.properties.filter((p) => p.name !== "see
   .map((property) => ({
     name: property.shownAs,
     html: isMathProperty(property.name)
-      ? renderMathProperty(property.value, `${node.id}#${property.name}`)
-      : renderPropertyValue(property.value, node.className),
+      ? renderMathProperty(property.value, `${node.id}#${property.name}`, formulaTerms)
+      : isListProperty(property.name)
+        ? renderListProperty(property.value, node.className)
+        : renderPropertyValue(property.value, node.className),
     /* A formula spans the row for the same reason an aligned block does: it is wider than a
        two-column row can offer, and the half it would hide is the right-hand one. */
     spans: isMathProperty(property.name) || isBlockProperty(property.value),
