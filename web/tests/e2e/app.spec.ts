@@ -339,6 +339,181 @@ test.describe("what a machine reads", () => {
   });
 });
 
+test.describe("the chrome above the fold", () => {
+  /**
+   * A fragment lands its target clear of whatever is stuck to the top of the screen.
+   *
+   * `--sticky-chrome` exists for exactly this and it was wrong in both directions: 96px against a
+   * 52px header between 680 and 999, and 87px against a 105px covered region from 1000 up — so at
+   * every desktop width a fragment link put its own heading 19px underneath the bar the reader was
+   * looking at. #189 re-derived it to 52 and 106.
+   *
+   * The four widths are the ones the token used to step at. Three of them no longer have a step,
+   * which is the point: the header is one row everywhere now, so a value measured at 700px is the
+   * same value measured at 480px, and a test that only checked the step boundaries would not have
+   * caught the 43px error at 520px that the old four had between them.
+   */
+  for (const width of [375, 480, 700, 1000]) {
+    test(`a fragment lands clear of the sticky chrome at ${width}px`, async ({ page }) => {
+      await page.setViewportSize({ width, height: 800 });
+      await page.goto("/district/043786");
+
+      const landed = await page.evaluate(async () => {
+        location.hash = "#categoricals";
+        await new Promise((settle) => setTimeout(settle, 80));
+        const covered = Math.max(
+          0,
+          ...[...document.querySelectorAll("body *")]
+            .filter((node) => {
+              const style = getComputedStyle(node);
+              return style.position === "sticky" && style.top !== "auto";
+            })
+            .map((node) => node.getBoundingClientRect().bottom),
+        );
+        return {
+          covered: Math.round(covered),
+          top: Math.round(document.getElementById("categoricals")!.getBoundingClientRect().top),
+        };
+      });
+
+      expect(landed.covered, "nothing is stuck to the top at all").toBeGreaterThan(0);
+      expect(
+        landed.top,
+        `the target lands ${landed.covered - landed.top}px under the chrome`,
+      ).toBeGreaterThanOrEqual(landed.covered);
+    });
+  }
+
+  test("the header is one row at every width, and the page never scrolls sideways", async ({
+    page,
+  }) => {
+    /*
+     * The defect, as a number: 166px of header at 390px and the `h1` beginning at y=194, which is
+     * a quarter of a phone screen spent before the page says which district it is about.
+     *
+     * Checked across the range rather than at the breakpoints, because the header height used to
+     * be a continuous function of width — it wrapped — and the four `--sticky-chrome` values were
+     * measured at four widths that were their own breakpoints rather than at the widths where the
+     * layout actually changed. 520px was 43px out and nothing looked at 520px.
+     */
+    const heights: string[] = [];
+    for (const width of [360, 390, 480, 520, 700, 900, 1000, 1280]) {
+      await page.setViewportSize({ width, height: 800 });
+      await page.goto("/district/043786");
+      const state = await page.evaluate(() => ({
+        header: Math.round(document.querySelector("header.site")!.getBoundingClientRect().height),
+        h1: Math.round(document.querySelector("h1")!.getBoundingClientRect().top + window.scrollY),
+        sideways:
+          document.documentElement.scrollWidth > document.documentElement.clientWidth + 1,
+      }));
+      expect(state.sideways, `the document scrolls sideways at ${width}px`).toBe(false);
+      heights.push(`${width}: header ${state.header}, h1 at ${state.h1}`);
+    }
+    // One row is 52px. Asserted as a set so a regression names the width it happened at.
+    expect(heights).toEqual([
+      "360: header 52, h1 at 80",
+      "390: header 52, h1 at 80",
+      "480: header 52, h1 at 80",
+      "520: header 52, h1 at 80",
+      "700: header 52, h1 at 80",
+      "900: header 52, h1 at 80",
+      "1000: header 52, h1 at 80",
+      "1280: header 52, h1 at 80",
+    ]);
+  });
+
+  test("keyboard focus never lands under the header", async ({ page }) => {
+    /*
+     * The same question as the fragment, asked the other way. A reader tabbing down a long page
+     * has the browser scroll each focused control into view, and `scroll-margin-top` is what keeps
+     * it out from under a sticky bar — the same token, spent on a different mechanism.
+     *
+     * # Asked by hit-testing, after two false starts
+     *
+     * The obvious version compares the control's bottom edge against the lowest sticky bottom, and
+     * it is wrong twice over. It reported the brand and the section menus, which are *inside* the
+     * sticky header and so are the chrome rather than hidden by it. It then reported the county
+     * and seat links, because at scroll 0 the district sub-navigation has not been reached yet and
+     * sits in flow at y≈234, covering nothing. Both were fixed and it still reported the skip link,
+     * which has `z-index: 10` against the header's 5 and is painted *over* it — geometry cannot
+     * see that at all.
+     *
+     * So the question is put to the renderer: at the middle of the control, what is on top? If it
+     * is the control, a reader can see and click it. That answers z-order, transforms and the
+     * chrome-is-not-hiding-itself case in one, without this test having to model any of them.
+     *
+     * The settle loop is for the skip link too: `.skip` animates `top` over 120ms on focus, so a
+     * single frame's wait catches it in flight somewhere between -64px and +12px. Waiting for the
+     * rect to stop moving is what makes this deterministic — it passed alone and failed once in a
+     * full run before that was added, which is the signature of a race and not of a defect.
+     */
+    /*
+     * As a reader who has asked for less motion, which is not a workaround.
+     *
+     * `.skip` animates `top` over 120ms when it takes and loses focus, so tabbing off it leaves it
+     * mid-flight across the brand for two more frames — the hit test caught exactly that and
+     * reported `a Ohio school funding <- a.skip`. Waiting for the *focused* element to settle does
+     * not help, because the thing still moving is the one that just lost focus.
+     *
+     * `app.css` already turns that transition off under `prefers-reduced-motion`, so asking for it
+     * removes the only animation in the path and exercises a configuration real readers use. The
+     * geometry this test is about is identical either way.
+     */
+    await page.emulateMedia({ reducedMotion: "reduce" });
+    await page.setViewportSize({ width: 1000, height: 800 });
+    await page.goto("/district/043786");
+
+    /*
+     * BACKWARDS, from the bottom, and that is the whole test.
+     *
+     * Tabbing forwards cannot land a control under the top chrome: chromium scrolls the minimum
+     * distance, so a control below the fold arrives at the *bottom* edge. Measured — of 40 forward
+     * stops only two scroll the page at all, and with `scroll-margin-top` deleted entirely this
+     * test still passed. It was close to vacuous.
+     *
+     * Scrolling up is the direction that aligns to the top, and it is the direction a reader goes
+     * when they shift-tab back to something they passed. That is the case `scroll-margin-top`
+     * exists for and the one where a wrong `--sticky-chrome` shows.
+     */
+    await page.evaluate(() => window.scrollTo(0, document.body.scrollHeight));
+    await page.locator("footer a").last().focus();
+
+    const obscured: string[] = [];
+    for (let step = 0; step < 40; step += 1) {
+      await page.keyboard.press("Shift+Tab");
+      const state = await page.evaluate(async () => {
+        const frame = () => new Promise((settle) => requestAnimationFrame(settle));
+        const active = document.activeElement as HTMLElement | null;
+        if (!active || active === document.body) return null;
+
+        let last = "";
+        for (let wait = 0; wait < 12; wait += 1) {
+          await frame();
+          const now = JSON.stringify(active.getBoundingClientRect());
+          if (now === last) break;
+          last = now;
+        }
+
+        const box = active.getBoundingClientRect();
+        if (box.width === 0 || box.height === 0) return null;
+        const x = box.left + box.width / 2;
+        const y = box.top + box.height / 2;
+        if (x < 0 || y < 0 || x > innerWidth || y > innerHeight) return null;
+
+        const onTop = document.elementFromPoint(x, y);
+        return {
+          covered: onTop != null && onTop !== active && !active.contains(onTop) && !onTop.contains(active),
+          what: `${active.tagName.toLowerCase()} ${(active.textContent ?? "").trim().slice(0, 24)}`,
+          behind: onTop ? `${onTop.tagName.toLowerCase()}.${String(onTop.className).split(" ")[0]}` : "",
+        };
+      });
+      if (state?.covered) obscured.push(`${state.what} <- ${state.behind}`);
+    }
+
+    expect(obscured.slice(0, 3), "a focused control is painted over by something").toEqual([]);
+  });
+});
+
 test.describe("the document arrives complete", () => {
   test("a district page carries its figures before any script runs", async ({ page }) => {
     const failures: string[] = [];
@@ -790,6 +965,38 @@ test.describe("with JavaScript disabled", () => {
       await expect(first, `${label} did not open`).toBeVisible();
       await menu.locator("summary").click();
     }
+  });
+
+  test("at phone width the bar is one disclosure, and it still opens without script", async ({
+    page,
+  }) => {
+    /*
+     * The other half of the no-JS contract, at the width #189 was about.
+     *
+     * Above 700px the five menus sit loose in the bar and the outer `<details>` is neutralised by
+     * CSS — its summary hidden, its content forced visible. Below 700px that CSS does not apply
+     * and the outer one is a real disclosure, so reaching `/counties` takes two opens rather than
+     * one. Both have to work with JavaScript off, and only the wide path was covered.
+     *
+     * This is also the check that the neutralisation is doing what it claims. If
+     * `::details-content { content-visibility: visible }` ever stopped applying, the desktop tests
+     * above would fail and this one would keep passing — they are the two sides of the same
+     * mechanism and neither on its own says it works.
+     */
+    await page.setViewportSize({ width: 390, height: 844 });
+    await page.goto("/");
+
+    const bar = page.locator("header.site nav details.menu-all");
+    const places = bar.locator("details.menu").filter({ hasText: "Places" });
+    await expect(bar.locator("> summary")).toBeVisible();
+    await expect(places.locator("summary")).toBeHidden();
+
+    await bar.locator("> summary").click();
+    await expect(places.locator("summary")).toBeVisible();
+    await places.locator("summary").click();
+    await places.locator('a[href="/counties"]').click();
+    await expect(page).toHaveURL(/\/counties$/);
+    await expect(page.locator("h1")).toBeVisible();
   });
 
   test("a menu note says why a link is in the menu, not what the link already says", async ({
@@ -2342,10 +2549,19 @@ test.describe("the section menus", () => {
      * 375×667 is an iPhone SE, the smallest screen worth holding the site to. The assertion is in
      * two halves because either alone can pass while the defect is live: the header must fit, and
      * the last link in the longest menu must be somewhere a reader can actually get to.
+     *
+     * # Two opens now, and the risk this guards went up rather than down
+     *
+     * #189 folded the five menus into one outer disclosure below 700px, so reaching `Law` on a
+     * phone means opening `Menu` and then opening `Law` inside it. This test caught that change by
+     * timing out on a summary that is no longer rendered — which is the right failure, because the
+     * thing it is about is now worse in principle: an open menu is nested one level deeper inside
+     * the same sticky box, and the box still may not outgrow the screen.
      */
     await page.setViewportSize({ width: 375, height: 667 });
     await page.goto("/");
 
+    await page.locator("header.site nav details.menu-all > summary").click();
     const law = page.locator("header.site nav details.menu").filter({ hasText: "Law" });
     await law.locator("summary").click();
     await expect(law).toHaveAttribute("open", "");

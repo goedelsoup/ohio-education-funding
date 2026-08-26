@@ -238,6 +238,23 @@ const body = applySemantics(listed).html;
       <div class="site-inner">
         <a class="brand" href="/">Ohio school funding</a>
         <nav aria-label="Sections">
+          {/*
+            One outer disclosure holding the five, rather than five in a row.
+
+            At 390px the header wrapped to three rows and measured 166px, with the `h1` beginning
+            at y=194 — a quarter of a phone screen spent before the reader learns which district
+            they are looking at. The three flex children are the brand at 142px, this nav at 404px
+            and the theme button at 32px, against about 352px of usable width, so no arrangement of
+            them fits on one row. Only collapsing the nav does.
+
+            It is ONE set of links, not a narrow copy and a wide copy. The wide layout is this same
+            element with its outer summary hidden and its content forced visible — see
+            `.menu-all` in `app.css`. A second copy would have meant 4,103 bytes of duplicate nav
+            on every one of 3,492 pages, and 31 links in the document twice.
+          */}
+          <details class="menu-all">
+            <summary aria-label="Sections menu">Menu</summary>
+            <div class="menu-groups">
           {
             NAV.map((group) => (
               <details class="menu">
@@ -270,6 +287,8 @@ const body = applySemantics(listed).html;
               </details>
             ))
           }
+            </div>
+          </details>
         </nav>
         {/*
           Named for the thing it toggles rather than for the act of toggling, because it carries
