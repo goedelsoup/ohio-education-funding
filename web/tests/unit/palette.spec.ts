@@ -46,7 +46,18 @@ import { resolve } from "node:path";
 
 import { describe, expect, test } from "vitest";
 
-import { contrast, minSeparation, parseHex } from "../../src/lib/plot/palette.ts";
+import {
+  contrast,
+  deltaE2000,
+  fromOklch,
+  hueGap,
+  minSeparation,
+  parseHex,
+  simulate,
+  toHex,
+  toLab,
+  toOklch,
+} from "../../src/lib/plot/palette.ts";
 import { barSpec } from "../../src/lib/plot/spec.ts";
 import { renderToString } from "../../src/lib/plot/ssr.ts";
 
@@ -234,6 +245,9 @@ describe("text colour", () => {
     "--text-primary",
     "--text-secondary",
     "--text-muted",
+    // A link is set in the ink, so this is never body-length text — but it IS the word under the
+    // cursor on hover and on keyboard focus, so it is held to the text bar and not the mark's.
+    "--link",
   ] as const;
 
   test("clears 4.5:1 on every surface it can be set on, in both modes", () => {
@@ -354,5 +368,302 @@ describe("a bar chart with a negative value", () => {
     expect(svg).not.toContain("var(--series-guarantee)");
     // Rounded data end, which signed mode drops and this must keep.
     expect(svg).toMatch(/rx|A4,4/);
+  });
+});
+
+/**
+ * The rule this file says it derives by, run instead of trusted.
+ *
+ * `colors.css` claims the `-text` variants hold "OKLab hue and chroma to the mark colour's exactly
+ * and only lightness moves, until the worst of the three surfaces reaches 5:1", and states the
+ * drift to the hundredth of a degree. Nothing here could check any of it, in a file whose own
+ * header records three separate figures that turned out to come from a tool nobody committed.
+ *
+ * It reproduces. Every claimed number below came back within the tolerance stated beside it, which
+ * is worth saying plainly: this derivation is the one thing in the palette that was always what it
+ * said it was. The test exists so it stays that way, and so `--link` — which is derived the same
+ * way and could not be checked against a parent, having none — is held to the same rule.
+ */
+describe("the derivation rule", () => {
+  const SURFACES = ["--surface-0", "--surface-1", "--surface-2"] as const;
+  const tightest = (mode: keyof typeof PALETTE, hex: string): number =>
+    Math.min(
+      ...SURFACES.map((s) => contrast(parseHex(hex), parseHex(PALETTE[mode].tokens.get(s)!))),
+    );
+
+  /** Hue drift a `-text` variant is allowed from its mark, as the file states it, per mode. */
+  const DERIVED = [
+    { mark: "--series-formula", text: "--series-formula-text", drift: { light: 0.02, dark: 0.1 } },
+    { mark: "--series-guarantee", text: "--series-guarantee-text", drift: { light: 2.8, dark: 0.1 } },
+  ] as const;
+
+  test("holds hue and chroma to the mark, and moves only lightness", () => {
+    for (const mode of ["light", "dark"] as const) {
+      for (const pair of DERIVED) {
+        const mark = toOklch(parseHex(PALETTE[mode].tokens.get(pair.mark)!));
+        const text = toOklch(parseHex(PALETTE[mode].tokens.get(pair.text)!));
+        expect(hueGap(mark.h, text.h), `${mode} ${pair.text} hue drift`).toBeLessThanOrEqual(
+          pair.drift[mode],
+        );
+        expect(Math.abs(mark.c - text.c), `${mode} ${pair.text} chroma`).toBeLessThan(0.004);
+        // And lightness DID move, or the split would not exist. Direction is the mode's: darker
+        // against a light surface, lighter against a dark one.
+        const moved = mode === "light" ? mark.l - text.l : text.l - mark.l;
+        expect(moved, `${mode} ${pair.text} lightness`).toBeGreaterThan(0.01);
+      }
+    }
+  });
+
+  /*
+   * "Until the worst of the three surfaces reaches 5:1" is a stronger claim than "clears 5:1", and
+   * it is the one worth holding: a value that merely clears could be anything darker, chosen by
+   * eye. Landing ON the bar is what makes it the least move, which is what makes it derived.
+   */
+  test("lands on the 5:1 bar rather than merely clearing it", () => {
+    for (const mode of ["light", "dark"] as const) {
+      for (const name of ["--series-formula-text", "--series-guarantee-text", "--link"] as const) {
+        const cr = tightest(mode, PALETTE[mode].tokens.get(name)!);
+        expect(cr, `${mode} ${name} tightest surface`).toBeGreaterThanOrEqual(5);
+        expect(cr, `${mode} ${name} is further from the bar than one step of lightness`).toBeLessThan(5.1);
+      }
+    }
+  });
+
+  test("except light muted, which moved, and dark muted, which the file says did not", () => {
+    // Stated rather than skipped. `--text-muted` was solved the same way in light and came out at
+    // 5.03; dark was already at 5.29 and was left alone, so it clears the bar without landing on
+    // it. An assertion that ignored the difference would be asserting nothing about either.
+    expect(tightest("light", PALETTE.light.tokens.get("--text-muted")!)).toBeLessThan(5.1);
+    expect(tightest("dark", PALETTE.dark.tokens.get("--text-muted")!)).toBeGreaterThan(5.2);
+  });
+});
+
+/**
+ * One hue for "you can operate this", and the reason it is not a third data hue.
+ *
+ * #187 asked for `--link` as a third TEXT colour so a coloured word could not be a link and a
+ * datum at once. `scripts/link-hue-search.ts` searched for one and there is none: at this
+ * palette's own chroma the best hue anywhere on the circle separates from the two series text
+ * colours by CIEDE2000 10.2 under the worst of four visions, against 15.0 for the ordinal ramp
+ * this file accepted and 10.9 for the five-step ramp it deleted. Blue and orange are the two ends
+ * of the axis a dichromat keeps and both are spent.
+ *
+ * So the link is set in the ink and `--link` carries the underline. These tests hold the parts of
+ * that which can go wrong quietly.
+ */
+describe("the interaction hue", () => {
+  const SERIES_TEXT = ["--series-formula-text", "--series-guarantee-text"] as const;
+
+  test("is one hue and one chroma across both themes, as the palette's rule 1 requires", () => {
+    const light = toOklch(parseHex(PALETTE.light.tokens.get("--link")!));
+    const dark = toOklch(parseHex(PALETTE.dark.tokens.get("--link")!));
+    expect(hueGap(light.h, dark.h), "--link hue across themes").toBeLessThan(0.2);
+    expect(Math.abs(light.c - dark.c), "--link chroma across themes").toBeLessThan(0.001);
+  });
+
+  test("is as far from both series hues as one hue can be", () => {
+    // 326.7 degrees is the bisector of the arc the palette does not spend: 71.2 from each. The
+    // floor is well under that, because the claim being held is "not a series hue", not the exact
+    // bisector — but a value that drifted toward either series would be choosing a side.
+    for (const mode of ["light", "dark"] as const) {
+      const link = toOklch(parseHex(PALETTE[mode].tokens.get("--link")!));
+      for (const series of ["--series-formula", "--series-guarantee"] as const) {
+        const hue = toOklch(parseHex(PALETTE[mode].tokens.get(series)!)).h;
+        expect(hueGap(link.h, hue), `${mode} --link against ${series}`).toBeGreaterThan(60);
+      }
+    }
+  });
+
+  test("and it is as saturated as the colours it sits beside, not a duller third rank", () => {
+    // The search will trade saturation for separation without being asked — a grey separates from
+    // everything. The chroma floor is what stopped it, and this is that floor, kept.
+    for (const mode of ["light", "dark"] as const) {
+      const link = toOklch(parseHex(PALETTE[mode].tokens.get("--link")!));
+      const series = SERIES_TEXT.map((n) => toOklch(parseHex(PALETTE[mode].tokens.get(n)!)).c);
+      expect(link.c, `${mode} --link chroma`).toBeGreaterThan(Math.min(...series) - 0.01);
+    }
+  });
+
+  /**
+   * The measurement the whole decision rests on: what a link gains by not being coloured.
+   *
+   * A link set in `--series-formula-text` separated from a formula figure by nothing at all — it
+   * WAS the formula figure's colour. Set in the ink it separates by more than three times what
+   * the best available third hue could have bought, because it is not competing on colour.
+   */
+  test("an ink-set link separates from a series figure by far more than any hue could", () => {
+    for (const mode of ["light", "dark"] as const) {
+      const ink = parseHex(PALETTE[mode].tokens.get("--text-primary")!);
+      const worstVision = Math.min(
+        ...VISIONS.map((vision) =>
+          Math.min(
+            ...SERIES_TEXT.map((n) =>
+              deltaE2000(
+                toLab(simulate(ink, vision)),
+                toLab(simulate(parseHex(PALETTE[mode].tokens.get(n)!), vision)),
+              ),
+            ),
+          ),
+        ),
+      );
+      // 31.2 light and 33.8 dark when this was written. The floor is the ordinal ramp's own bar
+      // doubled, which the best third hue (10.2) missed by a factor of three.
+      expect(worstVision, `${mode} ink against the series text pair`).toBeGreaterThan(30);
+    }
+  });
+});
+
+/**
+ * The focus ring, which was a token nothing read.
+ *
+ * `--focus-ring` was declared as `var(--series-formula)` and every one of the seven
+ * `:focus-visible` rules in `app.css` hard-coded the series token instead — so the indirection
+ * existed, pointed at the data hue, and could not have been changed from the palette.
+ *
+ * `svg.plot [data-hover].at` is the case that made it more than tidiness. Its own comment says a
+ * cursor "drawn in the mark's own stroke would be indistinguishable from data", and it then drew
+ * the cursor in `--series-formula`, which is the formula mark's fill: 1.00:1 against every formula
+ * bar on the site, on the affordance a keyboard reader navigates by.
+ */
+describe("the focus ring", () => {
+  const APP = readFileSync(resolve(process.cwd(), "src/styles/app.css"), "utf8");
+  const outlineRules = [...APP.matchAll(/outline:\s*([^;]+);?/g)].map((m) => m[1]!.trim());
+
+  test("is a token that something actually reads", () => {
+    expect(readFileSync(TOKENS, "utf8")).toMatch(/--focus-ring:\s*var\(--link\)/);
+    expect(outlineRules.filter((r) => r.includes("var(--focus-ring)")).length).toBeGreaterThan(4);
+  });
+
+  test("and no ring anywhere is drawn in a data colour", () => {
+    // The hard zero. A ring is "you are here"; a series token is "this is what the number is".
+    // There is no case for the two being the same value, and this is what stops one reappearing.
+    const offenders = outlineRules.filter((r) => /var\(--(series|ordinal)-/.test(r));
+    expect(offenders).toEqual([]);
+  });
+
+  /**
+   * The chart cursor takes the ink, and `--link` would not have done.
+   *
+   * A ring around a MARK is a different problem from a ring on a surface: it has to contrast with
+   * the thing it surrounds. No single hue on this palette clears 3:1 against every mark — the best
+   * available is 2.02:1, and `--link` itself manages 1.19 light and 1.03 dark against the formula
+   * blue. The ink clears it, because the ink is the one colour a chart never draws with.
+   */
+  test("around a chart mark is the ink, which clears 3:1 against both series marks", () => {
+    expect(APP).toMatch(/\[data-hover\]\.at\s*\{[^}]*outline:\s*2px solid var\(--text-primary\)/);
+    for (const mode of ["light", "dark"] as const) {
+      const ink = parseHex(PALETTE[mode].tokens.get("--text-primary")!);
+      for (const mark of ["--series-formula", "--series-guarantee"] as const) {
+        expect(
+          contrast(ink, parseHex(PALETTE[mode].tokens.get(mark)!)),
+          `${mode} ink ring on ${mark}`,
+        ).toBeGreaterThanOrEqual(3);
+      }
+    }
+  });
+
+  test("and still does not clear it against the dark end of the ordinal ramp", () => {
+    // Asserted as a failure on purpose, the way `--border` is asserted to still be a hairline.
+    // 1.87 light and 1.56 dark against `--ordinal-3`; there the `brightness(1.2)` second channel
+    // and the offset are what carry the cursor. If this ever starts passing, the comment in
+    // `app.css` that says so has become wrong and should be rewritten rather than left.
+    for (const mode of ["light", "dark"] as const) {
+      expect(
+        contrast(
+          parseHex(PALETTE[mode].tokens.get("--text-primary")!),
+          parseHex(PALETTE[mode].tokens.get("--ordinal-3")!),
+        ),
+        `${mode} ink ring on --ordinal-3`,
+      ).toBeLessThan(3);
+    }
+  });
+});
+
+/**
+ * A link is the ink with a rule under it, asserted at the source rather than at the value.
+ *
+ * The token being right is half of it; the rule consuming it is the other half, and that is where
+ * this would rot — a later change that sets `a { color }` back to a series token would leave every
+ * measurement in this file passing.
+ */
+describe("what a link is made of", () => {
+  const APP = readFileSync(resolve(process.cwd(), "src/styles/app.css"), "utf8");
+  const base = APP.slice(APP.indexOf("\na {"), APP.indexOf("}", APP.indexOf("\na {")));
+
+  test("is set in the ink, and carries the interaction hue as its underline", () => {
+    expect(base).toMatch(/color:\s*var\(--text-primary\)/);
+    expect(base).toMatch(/text-decoration-color:\s*var\(--link\)/);
+  });
+
+  test("and no rule anywhere sets a link's colour from a series token", () => {
+    const offenders = [...APP.matchAll(/([^{}]*\ba\b[^{}]*)\{([^}]*)\}/g)]
+      .map((m) => ({ selector: m[1] ?? "", body: m[2] ?? "" }))
+      .filter((r) => /(^|[\s,>+~])a(:|\[|\s|$|\.)/.test(r.selector))
+      .filter((r) => /color:\s*var\(--series-/.test(r.body))
+      .map((r) => r.selector.trim());
+    expect(offenders).toEqual([]);
+  });
+});
+
+/**
+ * OKLCH, round-tripped, because every claim above is stated in it.
+ *
+ * The conversion is new to this repository and the palette's derivation rule is now checked
+ * through it, so a silent error in the matrices would make the derivation tests agree with a
+ * wrong answer.
+ */
+describe("the OKLCH conversion", () => {
+  test("round-trips every colour in the palette exactly", () => {
+    for (const mode of ["light", "dark"] as const) {
+      for (const [name, hex] of PALETTE[mode].tokens) {
+        const back = fromOklch(toOklch(parseHex(hex)));
+        expect(back, `${mode} ${name} left the gamut`).not.toBeNull();
+        expect(toHex(back!), `${mode} ${name}`).toBe(hex);
+      }
+    }
+  });
+
+  test("refuses a coordinate outside sRGB rather than clamping it into a different colour", () => {
+    // The clamp is the dangerous failure: a search over the space would optimise over values it
+    // cannot ship, and every one of them would come back as a plausible hex.
+    expect(fromOklch({ l: 0.6, c: 0.4, h: 150 })).toBeNull();
+    expect(fromOklch({ l: 0.5, c: 0.165, h: 326.7 })).not.toBeNull();
+  });
+
+  /**
+   * An absolute anchor, because the round-trip above is not one.
+   *
+   * Checked rather than assumed: perturbing a forward matrix coefficient in the fourth decimal
+   * leaves the round-trip passing. It has to — the inverse is validated against the forward and
+   * nothing else, the two errors partly cancel, and 8-bit quantisation absorbs what is left. Only
+   * a transposed digit, three orders of magnitude larger, gets through to a changed hex.
+   *
+   * So the conversion is also pinned to the sRGB primaries' published OKLab coordinates, which
+   * come from outside this repository. That is what catches an error in the matrices themselves
+   * rather than an error in one direction of them.
+   */
+  test("agrees with the published coordinates of the sRGB primaries", () => {
+    // Five decimals, and the precision is the whole value of the test. At three it still passes
+    // with a matrix coefficient wrong in the fourth decimal — no better than the round-trip. At
+    // five it catches one wrong in the fifth, which is finer than an 8-bit palette can express.
+    const anchors = [
+      { hex: "#ff0000", l: 0.627955, c: 0.257683, h: 29.2339 },
+      { hex: "#00ff00", l: 0.86644, c: 0.294827, h: 142.4953 },
+      { hex: "#0000ff", l: 0.452014, c: 0.313214, h: 264.052 },
+    ];
+    for (const a of anchors) {
+      const got = toOklch(parseHex(a.hex));
+      expect(got.l, `${a.hex} L`).toBeCloseTo(a.l, 5);
+      expect(got.c, `${a.hex} C`).toBeCloseTo(a.c, 5);
+      expect(got.h, `${a.hex} hue`).toBeCloseTo(a.h, 3);
+    }
+    // White is L = 1 exactly, which is the one value the whole scale is normalised on.
+    expect(toOklch(parseHex("#ffffff")).l).toBeCloseTo(1, 5);
+    expect(toOklch(parseHex("#000000")).l).toBeCloseTo(0, 5);
+  });
+
+  test("and puts the two spent hues where the palette says they are", () => {
+    expect(toOklch(parseHex("#2a78d6")).h).toBeCloseTo(255.5, 1);
+    expect(toOklch(parseHex("#eb6834")).h).toBeCloseTo(40.6, 1);
   });
 });
