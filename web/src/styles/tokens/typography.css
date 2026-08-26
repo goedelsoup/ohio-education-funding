@@ -1,27 +1,40 @@
 /*
  * Type.
  *
- * # No webfont ships
+ * # No TEXT face ships as a binary. One maths face now does.
  *
- * The site makes no external request and carries no font binary: every reader sees it in whatever
- * their platform calls a UI sans. That is not a compromise for a reference work read mid-sentence
- * from a search result — it is the fastest first paint available, and the humanist system faces
- * (SF, Segoe UI Variable, Roboto) are all good at 15px at density.
+ * This file used to open "No webfont ships", and that sentence was true for as long as everything
+ * on the site was text. It is not true any more, and #202 reversed it on purpose rather than by
+ * implication — a standing decision that gets quietly outgrown is worse than one that gets argued
+ * with, because nobody can tell afterwards whether it was decided or forgotten.
  *
- * The stacks name IBM Plex Sans / IBM Plex Mono FIRST so a build that chooses to self-host gets a
- * consistent face across platforms and across the preview cards. No @font-face rule is declared
- * here, because no binary is committed; drop the .woff2 files in assets/fonts/ and add the rules
- * and every stack picks them up with no other change.
+ * What is unchanged, and is still the rule: **no text face ships as a binary.** Every reader sees
+ * the prose, the figures and the headings in whatever their platform calls a UI sans, a mono and a
+ * serif. That is not a compromise for a reference work read mid-sentence from a search result — it
+ * is the fastest first paint available, and the humanist system faces (SF, Segoe UI Variable,
+ * Roboto) are all good at 15px at density.
  *
- * # This is a deliberate, standing state — do not "fix" it
+ * The text stacks name IBM Plex Sans / IBM Plex Mono FIRST so a build that chooses to self-host
+ * gets a consistent face across platforms and across the preview cards. No @font-face rule is
+ * declared for them, because no binary is committed; drop the .woff2 files in assets/fonts/ beside
+ * the maths one and add the rules and every stack picks them up with no other change.
  *
- * Naming a face with no binary behind it is intentional and was decided explicitly. IBM Plex is the
- * INTENDED face; the platform stacks are what render until the files land. Tooling will report a
- * missing @font-face for both families, and that report is a reminder addressed to whoever owns the
- * binaries, not a defect in this file.
+ * What changed: `src/assets/fonts/ohio-math-fallback.woff2`, 27,220 bytes, declared below. It is a
+ * 174-codepoint subset of STIX Two Math and it is the LAST entry in `--font-math`, so it is only
+ * fetched by a reader whose platform answered with nothing — see that token for what the
+ * measurement was and why a name is not enough on its own.
+ *
+ * # The text rule is a standing state — do not "fix" it
+ *
+ * Naming a text face with no binary behind it is intentional and was decided explicitly. IBM Plex
+ * is the INTENDED face; the platform stacks are what render until the files land. Tooling will
+ * report a missing @font-face for both families, and that report is a reminder addressed to
+ * whoever owns the binaries, not a defect in this file.
  *
  * Never resolve it by substituting a different family. A stack silently retargeted to whatever face
- * happened to be available is how a design system ends up with a typeface nobody chose.
+ * happened to be available is how a design system ends up with a typeface nobody chose. The maths
+ * face is not that: it is one named family, subsetted from a stated source by a committed script,
+ * and it renders only where the alternative is a formula drawn wrong.
  *
  * # A serif, from the platform, for the display face only
  *
@@ -55,6 +68,34 @@
  * count.
  */
 
+/*
+ * The one binary. 27,220 bytes, and the only asset on this site that is a typeface.
+ *
+ * Built by `scripts/subset-math-font.ts` from `@fontsource/stix-two-math` — a devDependency, so the
+ * source is pinned by the lockfile rather than being a file that happened to exist on somebody's
+ * laptop. The licence is `src/assets/fonts/OFL.txt` and also rides inside the font's own name
+ * table, where it survives being copied out of this repository.
+ *
+ * Vite content-hashes it into `/_astro/`, which is the one path `public/_headers` already marks
+ * `immutable` — so the caching rule this needs was already written, and needed no new block.
+ *
+ * # `font-display: block`, which is NOT what a text face would take
+ *
+ * `swap` is right for text, where the fallback period shows the same words in a different face.
+ * It is wrong here. This font is reached only by a reader whose platform has no maths face, and
+ * what that reader sees during a swap is not a differently-shaped formula — it is a `{` drawn at
+ * one line tall beside a five-line table, which is a formula that means something else. A blank
+ * space for up to three seconds is the more honest intermediate state, and `block`'s swap period
+ * is unbounded, so nothing is ever hidden permanently: late is late, not lost.
+ */
+@font-face {
+  font-family: "Ohio Math Fallback";
+  src: url("../../assets/fonts/ohio-math-fallback.woff2") format("woff2");
+  font-weight: 400;
+  font-style: normal;
+  font-display: block;
+}
+
 :root {
   --font-sans:
     "IBM Plex Sans", ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
@@ -82,14 +123,22 @@
    * installed on the machine that ran the test.
    *
    * So most readers already have what this needs and were not being given it: Cambria Math on
-   * Windows, STIX Two Math on macOS, Noto Sans Math on most Linux distributions. A reader with
-   * none of them still falls through to `math` and gets unstretched delimiters — shipping a
-   * subsetted fallback for that case is #202, and it is the only part of this that costs bytes.
+   * Windows, STIX Two Math on macOS, Noto Sans Math on most Linux distributions. Every one of
+   * those is a face the platform already has, and for those readers nothing is downloaded.
    *
-   * No text face is named here and none should be. `typography.css` ships no font binary for text
-   * and that remains true; this is a stack of faces the platform already has.
+   * "Ohio Math Fallback" is for everyone else — Android, and any machine with no maths face
+   * installed — and it is LAST on purpose. CSS matches a font stack per character, so a browser
+   * only fetches a family when it actually needs a glyph from it: a reader whose platform answered
+   * never touches the file. Putting it any earlier would have inverted that, and declaring it under
+   * the name "STIX Two Math" would have inverted it worse, because an @font-face shadows a local
+   * font of the same name and every macOS reader would have swapped 5,000 glyphs for 357.
+   *
+   * `math` stays at the end. It reaches nothing here that the named families did not, but it is
+   * what a future platform's own maths face would be found through.
    */
-  --font-math: "Cambria Math", "STIX Two Math", "STIXTwoMath-Regular", "NotoSansMath-Regular", math;
+  --font-math:
+    "Cambria Math", "STIX Two Math", "STIXTwoMath-Regular", "NotoSansMath-Regular",
+    "Ohio Math Fallback", math;
 
   /*
    * THE APPARATUS RAMP. Unchanged, and deliberately so: every value here was already correct for
