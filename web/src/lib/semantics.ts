@@ -189,6 +189,183 @@ function scopeTables(document: Document): number {
 }
 
 /**
+ * A cell that reads as a null value in a column of figures.
+ *
+ * `no change` sits among `+0.57%`, `not published` among dollar amounts, `—` everywhere. They are
+ * the *absence* of a figure rather than prose about one, and counting them as text is what turned
+ * four otherwise-uniform columns into mixed ones when this rule was measured.
+ */
+const NOTHING = /^(—|–|-|n\/a|none|no change|not published|not stated|not reported|unknown)$/i;
+
+/**
+ * A cell whose whole content is a quantity: what it is, optionally what it is measured in, and
+ * optionally a range. `<0.1%` is here because the site writes suppressed small shares that way.
+ */
+const FIGURE =
+  /^[\s(\[]*[<>]?\s*[-+−]?\$?[\d,]+(\.\d+)?\s*(%|pp|x|×|mills?|per pupil|FTE|ADM|of\s+[\d,]+|districts?(\s*\([\d.]+%\))?)?[\s)\]]*((–|—|to|-)\s*[-+−]?\$?[\d,]+(\.\d+)?\s*(%|pp)?)?[\s)\]]*$/i;
+
+const isFigure = (text: string): boolean => text === "" || NOTHING.test(text) || FIGURE.test(text);
+
+/**
+ * Move a section's address to the end of its heading, where it stops being the first thing read.
+ *
+ * # What was wrong
+ *
+ * `section.ts` puts a muted `#` at the head of every section heading and argues, correctly, that
+ * it must be permanently visible rather than revealed on hover — a hover-only affordance does not
+ * exist on a touch screen. What it also did was make `#` the first glyph on all **22,334** cards
+ * in the build, so every card opened with something that reads as leaked markup.
+ *
+ * The fix is its position, not its existence. Nothing about the decision to keep it visible
+ * changes; it hangs after the title instead of before it.
+ *
+ * # Why here and not at the 141 call sites
+ *
+ * The same argument `nameScrollers` makes above, with a larger number. `<SectionAnchor id="…" />`
+ * is written 141 times across `src/pages` and `src/lib`, always immediately after the opening
+ * `<h2>`, and moving it in each one is 141 chances to leave one behind — with no check that would
+ * notice, because a heading with its anchor in the wrong place is still a valid heading.
+ *
+ * It also could not simply go last. Most of these headings carry a year chip pinned to the far end
+ * of the same flex row, and appending the anchor after that would put the address beyond the chip
+ * rather than beside the title. So it goes *before the chip*, which is a relationship only the
+ * rendered heading knows.
+ *
+ * # Why the DOM and not `order`
+ *
+ * CSS `order` would move it visually in one line and leave it first for anything reading the
+ * document — a keyboard, a screen reader, a copy-paste. A heading that says one thing to the eye
+ * and another to everything else is the shape of defect this module exists to remove.
+ */
+function moveAnchors(document: Document): number {
+  let moved = 0;
+  for (const anchor of document.querySelectorAll("a.section-anchor")) {
+    const heading = anchor.parentElement;
+    if (!heading) continue;
+
+    /*
+     * The separator moves with it, and this is not cosmetic.
+     *
+     * `section.ts` emits a trailing space after `</a>` on purpose, so the anchor never sits
+     * against the first letter of the title — it records eleven shipped defects of exactly that
+     * shape. Moving the element and leaving the space behind reproduces the defect at the other
+     * end: `from<a` is a letter immediately against an inline tag boundary, which is what
+     * `app.spec.ts` scans every route for.
+     */
+    const after = anchor.nextSibling;
+    if (after && after.nodeType === 3 && /^\s/.test(after.textContent ?? "")) {
+      after.textContent = (after.textContent ?? "").replace(/^\s+/, "");
+    }
+
+    const chip = heading.querySelector(".year-chip-wrap");
+    if (chip) chip.before(anchor);
+    else heading.append(anchor);
+    anchor.before(document.createTextNode(" "));
+    moved += 1;
+  }
+  return moved;
+}
+
+/**
+ * Right-align the columns that hold figures, and leave the rest alone.
+ *
+ * # What was wrong
+ *
+ * `app.css` sets `td { text-align: right }` for every table on the site and corrects it only for
+ * tables tagged `.prose`. Measured against a build: **21,333 cells carrying more than six words
+ * are set right-aligned, on 1,433 of 3,492 pages** — including 31 on the district dashboard, whose
+ * build-up tables are headed `STEP / VALUE / WHAT IT IS` and whose third column is a sentence.
+ * Ragged-left multi-line prose is hard to read for everyone and hardest for the readers who need
+ * the explanation.
+ *
+ * # Why the column and not the cell, and why not the table
+ *
+ * Tagging tables one at a time is what `.prose` already is, and it has been applied to none of the
+ * fourteen tables on the flagship route in the year it has existed. A per-CELL rule is worse than
+ * either: a column of figures with one long footnote in it would have that one cell jump to the
+ * left while its neighbours stay right, and alignment is what makes a column a column.
+ *
+ * So the unit is the column, and the question asked of it is what it holds.
+ *
+ * # The rule, and why this test rather than the obvious one
+ *
+ * The obvious test is word count, and it does not work. Measured over every table in the build,
+ * classifying columns by "how many of these cells run past six words" leaves **83.6%** of them
+ * genuinely mixed — because a column of dollar amounts contains plenty of short cells and a column
+ * of sentences contains plenty of terse ones, and the boundary is nowhere.
+ *
+ * Asking whether each cell *is a figure* instead splits almost perfectly: of 38,029 body columns,
+ * **31,101 are entirely figures, 6,923 are entirely not, and 5 are mixed** — one part in ten
+ * thousand. Two of those five are `GRF` and an act's name in columns that are 16% and 3% figures,
+ * which the majority test lands correctly; the other three were `<0.1%`, now part of the pattern.
+ *
+ * A middle test also failed and is worth recording so nobody re-derives it: "starts with a digit"
+ * scores `609 districts in the FY2027 model` as a figure and puts 3,565 columns back in the mixed
+ * band.
+ *
+ * The threshold is half, and with a split this clean it is not doing any work — it is there so the
+ * five have an answer rather than so the boundary can be tuned.
+ */
+function alignColumns(document: Document): number {
+  let marked = 0;
+
+  for (const table of document.querySelectorAll("table")) {
+    // `.prose` already left-aligns everything it holds and says why in `app.css`. Leave it.
+    if (table.classList.contains("prose")) continue;
+
+    /*
+     * Column index has to count `colspan`, not children. `scopeTables` records what happened the
+     * last time a rule here was keyed on position without doing that: eighteen cells went unscoped
+     * while the code claimed to have covered the table.
+     */
+    const columns = new Map<number, Element[]>();
+    for (const row of table.querySelectorAll("tr")) {
+      let index = 0;
+      for (const cell of row.children) {
+        const span = Number(cell.getAttribute("colspan") ?? 1);
+        if (cell.tagName === "TD") {
+          if (!columns.has(index)) columns.set(index, []);
+          columns.get(index)!.push(cell);
+        }
+        index += span;
+      }
+    }
+
+    for (const cells of columns.values()) {
+      const filled = cells.filter((cell) => (cell.textContent ?? "").trim() !== "");
+      if (filled.length === 0) continue;
+      const figures = filled.filter((cell) =>
+        isFigure((cell.textContent ?? "").replace(/\s+/g, " ").trim()),
+      ).length;
+      if (figures * 2 >= filled.length) continue;
+
+      /*
+       * A second question, because "not a figure" covers two different things.
+       *
+       * A column of district names and a column of explanations both read left, and only one of
+       * them wants a minimum width. Measured across the build's 6,925 text columns, by the length
+       * of their longest cell: 1,054 stay under 20 characters, 56 land between 20 and 39, and
+       * 5,815 run past 40. The valley is at 20-39, so that is where the line goes — and it is a
+       * real valley rather than a chosen number, which is why 40 and not 50.
+       *
+       * Without this the district dashboard's `WHAT IT IS` column is squeezed to about fifteen
+       * characters a line at 390px, which is a ribbon rather than a sentence.
+       */
+      const longest = Math.max(
+        ...filled.map((cell) => (cell.textContent ?? "").replace(/\s+/g, " ").trim().length),
+      );
+      for (const cell of cells) {
+        cell.classList.add("says");
+        if (longest > 40) cell.classList.add("reads");
+        marked += 1;
+      }
+    }
+  }
+
+  return marked;
+}
+
+/**
  * Put the corpus's headings at the depth of the page they were placed into.
  *
  * # What was wrong
@@ -267,6 +444,10 @@ export function applySemantics(body: string): {
   unnamed: number;
   scoped: number;
   relevelled: number;
+  /** Cells in a column that holds words rather than quantities, and so reads left. */
+  aligned: number;
+  /** Section addresses moved out of the first position in their heading. */
+  anchored: number;
 } {
   /*
    * A whole document and then an assignment, rather than `parseHTML(\`<body>…</body>\`)`.
@@ -289,6 +470,8 @@ export function applySemantics(body: string): {
   const relevelled = levelHeadings(document);
   const unnamed = nameScrollers(document, order);
   const scoped = scopeTables(document);
+  const aligned = alignColumns(document);
+  const anchored = moveAnchors(document);
 
-  return { html: document.body.innerHTML, unnamed, scoped, relevelled };
+  return { html: document.body.innerHTML, unnamed, scoped, relevelled, aligned, anchored };
 }

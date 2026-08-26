@@ -484,6 +484,40 @@ h3 {
 /* Capped for the same reason as the footer: it is 107 characters of middot-joined metadata on a
    district page, and a reader scanning for the county should not have to track a full column
    width to find it. #188 restructures what it says; this only stops it running the page. */
+/*
+ * The identity line: name/value pairs the eye can target, instead of a run of middots.
+ *
+ * Two type sizes doing two jobs. The label takes the apparatus voice — `--text-xs`, uppercase,
+ * tracked — which is the same voice a column head uses, and for the same reason: it is not content,
+ * it says what the content is. The value stays at reading size.
+ *
+ * `flex-wrap` with a column gap larger than the row gap, so that when the row breaks — Columbus
+ * spans sixteen seats — the pairs stack as pairs rather than dissolving into a paragraph.
+ */
+.facts {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-4) var(--space-7);
+  margin: 0 0 var(--space-8);
+  max-width: var(--measure-note);
+}
+.facts > div {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+}
+.facts dt {
+  font-size: var(--text-xs);
+  text-transform: uppercase;
+  letter-spacing: var(--tracking-caps);
+  color: var(--text-muted);
+}
+.facts dd {
+  margin: 0;
+  font-size: var(--text-base);
+  color: var(--text-secondary);
+}
+
 .sub {
   color: var(--text-secondary);
   margin: 0 0 var(--space-8);
@@ -1185,6 +1219,39 @@ th, td { text-align: left; padding: .42rem .5rem; border-bottom: 1px solid var(-
 thead th { color: var(--text-muted); font-size: var(--text-sm); text-transform: uppercase; letter-spacing: var(--tracking-caps); }
 th { font-weight: var(--weight-medium); color: var(--text-secondary); }
 td { text-align: right; font-variant-numeric: tabular-nums; }
+/*
+ * …except where the column holds words. `alignColumns` in `src/lib/semantics.ts` marks those after
+ * the page has rendered, because which columns they are is a property of the document rather than
+ * of any one renderer — and because tagging tables by hand is what `.prose` already is, applied to
+ * none of the fourteen tables on the district dashboard in the year it has existed.
+ *
+ * `tabular-nums` goes with the alignment. It is there so digits line up in a column, and a column
+ * of sentences has no digits to line up; leaving it on gives a sentence's stray figures the wrong
+ * width for the face they are set in.
+ */
+td.says {
+  text-align: left;
+  font-variant-numeric: normal;
+}
+
+/*
+ * And a column that holds sentences gets a sentence's width.
+ *
+ * `.says` is every text column; `.reads` is the subset whose longest cell runs past 40 characters,
+ * which is where the length histogram has its valley — see `alignColumns`. The distinction matters
+ * because a column of district names and a column of explanations both read left and only one of
+ * them should refuse to be narrow.
+ *
+ * `min-width` rather than a percentage. At 390px the district dashboard's `WHAT IT IS` column was
+ * being compressed to roughly fifteen characters a line — a ribbon of two-word rows, and the last
+ * one clipped. A table cannot make a sentence fit a phone; it can decline to shred it and let the
+ * `.scroll` box it already sits in do what that box is for. `--measure-note` caps the other end so
+ * a wide screen does not hand the same sentence a 120-character line.
+ */
+td.reads {
+  min-width: 28ch;
+  max-width: var(--measure-note);
+}
 tbody tr:last-child th, tbody tr:last-child td { border-bottom: 0; }
 
 .strip-row { margin-bottom: 1rem; }
