@@ -54,7 +54,7 @@ The eight pattern sheets are the rest of the system and each carries a real chan
 | Sheet | Why it is not a copy-in |
 | --- | --- |
 | `claims.css` | Removes the box from `.claim` — no border, no background, no radius — and carries status on a coloured rule whose *style* is the second channel. It also drops the fourth inline variant, which this corpus emits **76 times**. |
-| `figures.css` | Introduces `.fig` as a compound element: value, year, basis as three children, so an unlabelled number is a missing child a build check can see. The site annotates *cards* with a year today, not figures. |
+| `figures.css` | Introduces `.fig` as a compound element: value, year, basis as three children, so an unlabelled number is a missing child a build check can see. Adopted where the card-level year chip cannot reach — tiles, a column head, one figure in a `<dl>` — and the build check exists: `tests/e2e/figures.spec.ts`. |
 | `prose.css` | Four fields, three visual channels — size, ground, state. Close to what ships; the `.findings` inset and the `<details>` withdrawal are new treatments of fields that already exist. |
 | `base.css`, `cards.css`, `data.css`, `nav.css`, `controls.css` | Not yet read. |
 
@@ -101,19 +101,48 @@ One thing is handed back rather than done: `data.css` still declares five `.sw.o
 swatches for the deleted ramp. Rewriting a file this review has read but not authored risks putting
 something unverified into it, and a five-line deletion is cheaper to make than to check.
 
-## `figures.css`, and the number that decides the rest of it
+## `figures.css` — adopted where the chip could not reach, and the count that was the wrong count
 
-The patterns are landed. `.fig` is **available and not yet adopted**, and the number is why.
+This section used to say `.fig` was **available and not yet adopted**, and gave the reason as
+**750 call sites across 28 files**. #191 recounted and got a different number — 450 formatter calls
+against three `fig()` ones — and both are answers to "how many places format a number", which is not
+the question the rule exists for.
 
-The site formats figures through `format.ts` from **750 call sites across 28 files**. The design's
-rule 1 — no numeric or currency literal outside a `.fig` — means wrapping every one of them in a
-three-child compound. That is a change worth deciding on with the number in hand rather than
-starting and discovering it, so the CSS is in place, the shape is documented at the pattern, and the
-adoption is a separate decision.
+The question is how many rendered figures a reader cannot date, and only the built pages can answer
+it: a figure is dated by where it lands — a card's chip, a column head, the sentence around it — and
+not by the call that formatted it. Measured over all 3,493 pages, in eighteen shapes:
 
-Where the gap is real: the card-level year chip answers "which year" well for a card, and does not
-reach body prose, a chart label, or a table cell whose column head is silent. That is the case for
-`.fig` and it is a good one. It is not a case for 750 mechanical edits in one pass.
+| | figures with no year in reach |
+| --- | --: |
+| before | **4,637** |
+| after | **73**, every one declared with a reason |
+
+Not 450 edits. **Six site-authored templates**, and one of them held 2,724 of the 4,637: the
+`/districts` table, six columns drawn from three series under heads that named none, with the
+footnote that gave two of the three years sitting 609 rows below the first figure it is about. A
+wide table repeats an omission once per cell, which is why one page held more of these than the rest
+of the build put together.
+
+What the eighteen shapes did *not* include is as much of the answer. No chipped card was in them,
+no table whose head carries its year, and none of the 44% of money strings that sit in a dated
+column. The chip mechanism was working everywhere it had been applied; it had not been applied
+outside cards, and nothing said so.
+
+So the adoption is: the compound where the chip cannot reach — three tiles on `/statewide`, the
+one profile-year figure in a district's identity list, and six column heads on `/districts` — and a
+year named in the sentence everywhere the prose could simply say it. `th .fig-value` and
+`th .fig { white-space: normal }` are new, and they exist because `app.css` had been written for a
+column head using `.fig` in the year before one did.
+
+The 73 that remain are two categories, both declared in `web/tests/e2e/figures.spec.ts` with the
+reason each rests on: corpus prose, which the corpus dates through its own `figures:` bindings
+(#158), and six figures on `/method` that are not measurements — two statutory rates, two defect
+magnitudes from this repository's own history, and one quoted example of a rendering the page argues
+against.
+
+**The guard is the half that makes it stay true.** Every figure on every built page, five ways to
+reach a year, exemptions enforced in both directions — an entry that stops matching fails as loudly
+as a figure no entry covers.
 
 **`.series-break` is adopted, because there the gap was concrete.** The meal-program denominator
 changes at FY2010 — `AdmCount` through FY2009, `CECount` after — and the share steps up across it.
@@ -129,15 +158,25 @@ data rows now, and a second assertion holds the break itself.
 
 ## Two decisions the design project asked for, and neither is a CSS question
 
-**1. The `unentered` migration.** The system's `.claim` has exactly three status classes and states
-that a fourth is an error. This corpus marks 76 fields `[unentered]`, and `web/src/lib/prose.ts`
-badges them as a fourth inline variant. The design argues the fourth state is not a weaker grade of
-support but the absence of a claim to grade, so it belongs in the position the content would
-occupy — a block, naming the field — rather than inline in a sequence it does not belong to.
+**1. The `unentered` migration — done, and the last of it took two more passes than it looked.**
 
-That argument is sound and the corpus already agrees with it in prose: `.yidam/corpus/README.md`
-says the mark "sits on a different axis" from the other three. Adopting it is a parser change plus a
-content migration, not a stylesheet edit. **Unresolved.**
+The system's `.claim` has exactly three status classes and states that a fourth is an error. The
+corpus marked 76 fields `[unentered]` and `web/src/lib/prose.ts` badged them as a fourth inline
+variant. The design argued the fourth state is not a weaker grade of support but the absence of a
+claim to grade, so it belongs in the position the content would occupy — a block, naming the field —
+rather than inline in a sequence it does not belong to. That argument was right, and the corpus
+already agreed with it in its own prose while the parser went on contradicting it.
+
+The migration landed: `unfilled:` structure on the node, rendered as *What this node does not hold*,
+and the count is a hard zero with a guard on it. Two things outlived it. `.claim.unentered` was
+deleted from `app.css` beside a comment reading "a rule for it here would match nothing", which was
+true of `prose.ts` and not true of `/wiki`, where the class was still written by hand — so the
+retired mark fell through to the base rule and was drawn with `verified`'s solid rule on the one
+page whose subject is telling the marks apart. And the mark survived in two *instructions* — an
+ontology `description:` and an authoring skill — where naming it is how it would have come back.
+
+**Resolved (#112, #192).** The guard now reads the markup as well as the stylesheet, and the corpus
+scan distinguishes a record, which may name the retired mark, from an instruction, which may not.
 
 **2. The five-step ordinal ramp — answered, and the answer is no.**
 

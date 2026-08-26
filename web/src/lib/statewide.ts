@@ -3,7 +3,7 @@
 import type { Bar } from "./chart.ts";
 import { barSpec, type Drawing, scatterSpec } from "./plot/spec.ts";
 import { renderToString } from "./plot/ssr.ts";
-import { count, escapeHtml, millions, money, pct } from "./format.ts";
+import { count, escapeHtml, fig, millions, money, pct } from "./format.ts";
 import { realChange, series, type Basis } from "./real.ts";
 import * as routes from "./routes.ts";
 import type { TaxStatewide } from "./feed.ts";
@@ -236,17 +236,25 @@ export function renderStatewideStructure(bundle: Bundle, tax: TaxStatewide): str
   const gapPoorest = gapAt(0);
   const gapWealthiest = gapAt(realizedTrace.points.length - 1);
 
+  /*
+   * The three tiles take the compound, which is the case it was built for and did not have.
+   *
+   * A tile sits outside any card, so the year chip cannot reach it, and there is no column head
+   * above it either. Two of these three carried no year in the key, the value or the note; the
+   * first carried one in its note, which is a sentence a reader arrives at rather than a child of
+   * the figure. These are the numbers the statewide route opens with.
+   */
   return `
     <div class="tiles">
       <div class="tile"><div class="k">State foundation aid</div>
-        <div class="v">${millions(s.realized_aid_total).replace("+", "")}</div>
-        <div class="n">FY${bundle.fiscal_year}, ${count(s.districts)} districts</div></div>
+        <div class="v">${fig(millions(s.realized_aid_total).replace("+", ""), yearOf("formula"))}</div>
+        <div class="n">${count(s.districts)} districts</div></div>
       <div class="tile"><div class="k">Paid by the guarantee</div>
-        <div class="v">${millions(s.guarantee_total).replace("+", "")}</div>
+        <div class="v">${fig(millions(s.guarantee_total).replace("+", ""), yearOf("formula"))}</div>
         <div class="n">${pct(s.guarantee_total / s.realized_aid_total, 1)} of the total,
           to ${s.on_guarantee} districts</div></div>
       <div class="tile"><div class="k">Off the formula</div>
-        <div class="v">${pct(s.on_guarantee / s.districts, 0)}</div>
+        <div class="v">${fig(pct(s.on_guarantee / s.districts, 0), yearOf("formula"))}</div>
         <div class="n">of districts are funded by the guarantee</div></div>
     </div>
 

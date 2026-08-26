@@ -1940,7 +1940,9 @@ footer.site { border-top: 1px solid var(--border); padding-top: var(--space-6); 
 .fig-value { font-family: var(--font-mono); font-weight: var(--weight-medium); }
 .fig-year,
 .fig-basis { font-size: .78em; color: var(--text-muted); font-variant-numeric: tabular-nums; }
-.fig-year { margin-left: .28em; }
+/* The gap is a word space in the markup, not a margin here — see `fig()` in `lib/format.ts`. Two
+   adjacent inline spans concatenate with nothing between them in the accessible name, so a margin
+   is a gap only a sighted reader gets, and the tiles were announcing "$251,661TY2024". */
 /* A middot rather than a space: they are two facts about one number, and a space makes them look
    like two numbers. */
 .fig-basis::before { content: " \00b7 "; }
@@ -1953,6 +1955,21 @@ footer.site { border-top: 1px solid var(--border); padding-top: var(--space-6); 
 .tile .v .fig-value { font: inherit; letter-spacing: inherit; }
 .tile .v .fig-year,
 .tile .v .fig-basis { font-size: .5em; font-weight: var(--weight-regular); letter-spacing: 0; }
+/*
+ * A column head is the one place the compound's VALUE is a label rather than a number.
+ *
+ * `/districts` is why: 2,724 figures in six columns drawn from three series, and putting the
+ * annotation on each cell would repeat it 609 times down each column to say something that is
+ * true of the whole column. So the head carries it and the cells do not — which is the rule the
+ * two `display` lines below were written for, in the year before any head used them.
+ *
+ * The head keeps the header row's own type. Without this the label drops to the mono face and the
+ * uppercase run breaks in the middle of the row, which is the same override `.tile .v` takes
+ * above and for the same reason: the compound carries the annotation, not the typography. The
+ * `nowrap` has to go with it, or a six-word head can no longer wrap and the table widens.
+ */
+th .fig { white-space: normal; }
+th .fig-value { font: inherit; letter-spacing: inherit; }
 th .fig-year, th .fig-basis { display: inline; }
 td .fig-year, td .fig-basis { display: none; }
 

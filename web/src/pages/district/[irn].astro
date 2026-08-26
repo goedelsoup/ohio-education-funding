@@ -22,7 +22,8 @@ import {
 import { slugify } from "../../lib/county.ts";
 import { districtPaths, loadFeed, qualifiedName } from "../../lib/feed.ts";
 import * as routes from "../../lib/routes.ts";
-import { money, pct } from "../../lib/format.ts";
+import { fig, money, pct } from "../../lib/format.ts";
+import { yearOf } from "../../lib/year.ts";
 
 export const getStaticPaths = districtPaths;
 
@@ -120,7 +121,15 @@ const description = district.on_guarantee
     {district.economically_disadvantaged != null && (
       <div>
         <dt>Disadvantaged</dt>
-        <dd>{pct(district.economically_disadvantaged, 1)}</dd>
+        {/*
+            The one figure in this list, and the one item whose year is not the model's.
+
+            It comes from the District Profile Report and the entry below it names the formula
+            year, so a reader taking the FY at the end of the row as covering the row would be
+            two years out on this. The compound is what stops that: the value cannot be written
+            without the year it is measured in.
+        */}
+        <dd set:html={fig(pct(district.economically_disadvantaged, 1), yearOf("profile"))} />
       </div>
     )}
     {/* Not a fact about this district, and labelled so it does not read as one: it says what the
