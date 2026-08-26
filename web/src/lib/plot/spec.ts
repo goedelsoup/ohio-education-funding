@@ -848,6 +848,12 @@ export function scatterSpec(
 }
 
 /**
+ * The end dots of a range row. Named because the hit band has to know it: a band that stops where
+ * the dot's centre is leaves the dot's outer half outside its own hit area.
+ */
+const DOT_RADIUS = 3;
+
+/**
  * Many items, each with a low end and a high end, on one measure.
  *
  * # Why the ratio was not enough
@@ -928,7 +934,7 @@ export function rangeSpec(
         Plot.dot(rows, {
           y: "label",
           x: "low",
-          r: 3,
+          r: DOT_RADIUS,
           fill: ORDINAL[0],
           stroke: "none",
           className: "range-low",
@@ -936,7 +942,7 @@ export function rangeSpec(
         Plot.dot(rows, {
           y: "label",
           x: "high",
-          r: 3,
+          r: DOT_RADIUS,
           fill: ORDINAL[2],
           stroke: "none",
           className: "range-high",
@@ -952,12 +958,31 @@ export function rangeSpec(
           className: "range-label",
         }),
         ...foot.marks,
-        // One full-width band per row, above everything: the hit target is the row, not the 3px
-        // dot at either end of it.
+        /*
+         * One band per row, above everything: the hit target is the row, not the 3px dot at
+         * either end of it.
+         *
+         * The negative insets are the fix for #198 and are not cosmetic. The band ran `min` to
+         * `max`, so the row holding the maximum had its high dot **centred on the band's right
+         * edge** and overhanging it by the dot's radius — measured at 5.08 device pixels on
+         * `/counties`, which is `DOT_RADIUS` times the 1.69 that SVG is scaled up by.
+         *
+         * Two things followed from that. The dot's outer half was not hoverable, on the one row
+         * a reader is most likely to point at. And the keyboard cursor's outline, drawn 1px
+         * outside this band, ran straight through a **full-opacity `--ordinal-3` dot** — the one
+         * place on the site where the cursor is adjacent to the single mark the ink does not
+         * clear 3:1 against. See the cursor rule in `app.css`.
+         *
+         * Insets rather than a padded domain, because this chart's scale is sometimes log and
+         * padding a log domain by a share of its span is not a thing the span means. An inset is
+         * pixels, and the overhang is pixels.
+         */
         Plot.rect(rows, {
           y: "label",
           x1: min,
           x2: max,
+          insetLeft: -DOT_RADIUS,
+          insetRight: -DOT_RADIUS,
           fill: "transparent",
           className: "range-hit",
         }),

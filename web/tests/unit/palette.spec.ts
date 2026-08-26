@@ -562,19 +562,61 @@ describe("the focus ring", () => {
     }
   });
 
-  test("and still does not clear it against the dark end of the ordinal ramp", () => {
-    // Asserted as a failure on purpose, the way `--border` is asserted to still be a hairline.
-    // 1.87 light and 1.56 dark against `--ordinal-3`; there the `brightness(1.2)` second channel
-    // and the offset are what carry the cursor. If this ever starts passing, the comment in
-    // `app.css` that says so has become wrong and should be rewritten rather than left.
+  /**
+   * And still does not clear it against the **raw** `--ordinal-3` token — which is true, and was
+   * the wrong thing to conclude from.
+   *
+   * Asserted as a failure on purpose, the way `--border` is asserted to still be a hairline. #198
+   * read this row as "a keyboard reader landing on the darkest class of a scatter plot gets a ring
+   * they cannot see as a ring", and that does not happen. A cursor does not land on a mark; it
+   * lands on whatever carries `data-hover`, and measured over the built site not one of 319,060
+   * hover targets is filled with an ordinal token. `tests/e2e/cursor.spec.ts` holds that.
+   *
+   * The value below is a fact about two tokens. It is not a fact about anything a reader meets.
+   */
+  test("and still does not clear it against the raw dark end of the ordinal ramp", () => {
     for (const mode of ["light", "dark"] as const) {
       expect(
         contrast(
           parseHex(PALETTE[mode].tokens.get("--text-primary")!),
           parseHex(PALETTE[mode].tokens.get("--ordinal-3")!),
         ),
-        `${mode} ink ring on --ordinal-3`,
+        `${mode} ink ring on the raw --ordinal-3 token`,
       ).toBeLessThan(3);
+    }
+  });
+
+  /**
+   * But it clears against the ramp **as the site paints it**, which is the figure that was missing.
+   *
+   * A banded scatter draws the ramp at `fill-opacity: 0.62` and the neutral cloud at `0.45`, so the
+   * colour a ring is ever adjacent to is the token composited over the card and not the token. The
+   * blend moves every step *away* from the ink, necessarily: the ink and the surface are 19.17
+   * apart light and 17.42 dark, so anything pulled toward one is pulled away from the other.
+   *
+   * `--ordinal-3` at 0.62 comes out at 5.30 light and 3.44 dark. That is the number the cursor
+   * comment should have carried, and the reason the scatter was never the problem.
+   */
+  test("and does clear it against the ramp as a chart actually paints it", () => {
+    /** `fillOpacity` for a banded scatter in `plot/spec.ts` — the most opaque the ramp is drawn. */
+    const BANDED = 0.62;
+    const over = (mark: string, surface: string, alpha: number) => {
+      const [f, b] = [parseHex(mark), parseHex(surface)];
+      return {
+        r: Math.round(alpha * f.r + (1 - alpha) * b.r),
+        g: Math.round(alpha * f.g + (1 - alpha) * b.g),
+        b: Math.round(alpha * f.b + (1 - alpha) * b.b),
+      };
+    };
+    for (const mode of ["light", "dark"] as const) {
+      const tokens = PALETTE[mode].tokens;
+      const ink = parseHex(tokens.get("--text-primary")!);
+      for (const step of ORD3) {
+        expect(
+          contrast(ink, over(tokens.get(step)!, tokens.get("--surface-1")!, BANDED)),
+          `${mode} ink ring on ${step} as painted`,
+        ).toBeGreaterThanOrEqual(3);
+      }
     }
   });
 });
