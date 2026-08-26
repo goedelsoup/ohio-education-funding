@@ -114,13 +114,13 @@ properties:
     `[G] Career-Technical` to the cent for all 609 districts.
   function_tex: |
     \begin{aligned}
-    \text{aid}_k &= \text{FTE}_k \times w_k \times \text{career-technical base cost per pupil}
-      \times \text{state share} \\
+    \text{aid}_k &= \text{FTE}_k \times w_k \\
+      &\quad \times \text{career-technical base cost per pupil} \times \text{state share} \\
     w &= (0.6230,\ 0.5905,\ 0.2154,\ 0.1830,\ 0.1570) \\
     \text{career-technical base cost per pupil} &= \$9{,}855.62
       && \text{FY2027, not the } \$8{,}241.61 \\
-    \text{associated services} &= \biggl( \sum_{k=1}^{5} \text{FTE}_k \biggr) \times 0.0294
-      \times \text{career-technical base cost per pupil} \times \text{state share} \\
+    \text{associated services} &= \biggl( \sum_{k=1}^{5} \text{FTE}_k \biggr) \times 0.0294 \\
+      &\quad \times \text{career-technical base cost per pupil} \times \text{state share} \\
     \text{total} &= \sum_{k=1}^{5} \text{aid}_k + \text{associated services}
     \end{aligned}
   statutory_basis: |

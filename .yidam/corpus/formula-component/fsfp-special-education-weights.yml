@@ -146,8 +146,8 @@ properties:
     to the cent for all 609 districts.
   function_tex: |
     \begin{aligned}
-    \text{aid}_k &= \text{ADM}_k \times w_k \times \text{statewide average base cost per pupil}
-      \times \text{state share} \\
+    \text{aid}_k &= \text{ADM}_k \times w_k \\
+      &\quad \times \text{statewide average base cost per pupil} \times \text{state share} \\
     w &= (0.2435,\ 0.6179,\ 1.4845,\ 1.9812,\ 2.6830,\ 3.9554) \\
     \text{statewide average base cost per pupil} &= \$8{,}241.61 && \text{FY2027} \\
     \text{total} &= \sum_{k=1}^{6} \text{aid}_k
