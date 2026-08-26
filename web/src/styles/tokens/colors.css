@@ -56,6 +56,39 @@
   --text-secondary: #52514e;
   --text-muted: #66655f;
 
+  /*
+   * Interaction. One hue for "you can operate this", and it is not a data hue.
+   *
+   * `a` was `--series-formula-text`, which is also `.gain`; and `--series-guarantee-text` is
+   * simultaneously the guarantee series, `.loss`, `.err` and a correction heading. On a district
+   * page that draws a formula bar and sets links under it, a reader had to work out whether a
+   * coloured word was navigable or was a datum.
+   *
+   * The obvious repair — give links a third text hue — was searched for and does not exist on this
+   * palette. `scripts/link-hue-search.ts` has the run: at this palette's own chroma, the best hue
+   * on the whole circle separates from the two series text colours by CIEDE2000 10.2 under the
+   * worst of four visions. That is BELOW the 10.9 that got a five-step ramp deleted from this file
+   * a few blocks down. Blue and orange are the two ends of the axis a dichromat keeps, and this
+   * palette has spent both.
+   *
+   * So a link stops being a coloured word. It is set in the ink and carries an underline in this
+   * token, which moves the distinction from a hue a protanope cannot resolve to a form nobody has
+   * to resolve at all: separation from a series figure goes 0 -> 31.2 light and 33.8 dark, because
+   * the word is no longer coloured at all. The district index already worked this way for its 609
+   * rows, which is the same conclusion reached once already and never generalised.
+   *
+   * The value is DERIVED by this file's own rule rather than chosen: chroma held at the palette's
+   * level (the series text pair sits at 0.162 and 0.173), lightness moved until the tightest of
+   * the three surfaces reaches 5:1. The hue is the bisector of the arc the palette does not spend
+   * — 326.7 degrees, 71.2 from each series hue, which is as far from both as one hue can be. The
+   * two modes hold that hue to 0.09 degrees and the chroma to four decimals.
+   *
+   * It is also the focus ring. A ring is the same statement as an underline — "this is a thing you
+   * operate" — and drawing it in the formula blue meant the keyboard cursor on a formula bar was
+   * a blue ring around a blue mark. See `--focus-ring` below.
+   */
+  --link: #9a419c;
+
   /* The categorical pair. Formula aid against guarantee; reused as gain against loss, and only
      there. Fixed order, never cycled. */
   --series-formula: #2a78d6;
@@ -149,7 +182,21 @@
   --surface-inset: var(--surface-2);
   --text-ink: var(--text-primary);
   --text-annotation: var(--text-muted);
-  --focus-ring: var(--series-formula);
+  /*
+   * The keyboard cursor, and it was a declared token nothing read: every one of the seven
+   * `:focus-visible` rules in `app.css` hard-coded `var(--series-formula)` instead. So the
+   * indirection existed, was aliased to the data hue, and could not have been changed here.
+   *
+   * `svg.plot [data-hover].at` is why this matters rather than being tidiness. Its own comment
+   * says a cursor "drawn in the mark's own stroke would be indistinguishable from data" — and it
+   * then drew the cursor in `--series-formula`, which IS the formula mark's fill. 1.00:1 against
+   * every formula bar on the site, on the affordance a keyboard reader navigates by.
+   *
+   * Pointing it at `--link` fixes the control case and is honest about the chart case: a ring
+   * around a mark cannot clear 3:1 against every mark from any single hue on this palette (the
+   * best available is 2.02:1), so that rule takes the ink instead. See `app.css`.
+   */
+  --focus-ring: var(--link);
 }
 
 /*
@@ -187,6 +234,7 @@
   --text-primary: #ffffff;
   --text-secondary: #c3c2b7;
   --text-muted: #96958c;
+  --link: #ca6ecb;
   --series-formula: #3987e5;
   --series-guarantee: #d95926;
   --series-formula-text: #4492f1;
@@ -213,6 +261,7 @@
   --text-primary: #0b0b0b;
   --text-secondary: #52514e;
   --text-muted: #66655f;
+  --link: #9a419c;
   --series-formula: #2a78d6;
   --series-guarantee: #eb6834;
   --series-formula-text: #1064c0;
@@ -238,6 +287,7 @@
   --text-primary: #ffffff;
   --text-secondary: #c3c2b7;
   --text-muted: #96958c;
+  --link: #ca6ecb;
   --series-formula: #3987e5;
   --series-guarantee: #d95926;
   --series-formula-text: #4492f1;
@@ -281,6 +331,7 @@
   --text-primary: #0b0b0b;
   --text-secondary: #52514e;
   --text-muted: #66655f;
+  --link: #9a419c;
   --series-formula: #2a78d6;
   --series-guarantee: #eb6834;
   --series-formula-text: #1064c0;

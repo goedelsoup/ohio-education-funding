@@ -134,7 +134,7 @@ a[href], button, input, select, textarea, summary, [tabindex] {
 }
 .skip:focus-visible {
   top: .75rem;
-  outline: 2px solid var(--series-formula);
+  outline: 2px solid var(--focus-ring);
   outline-offset: 2px;
 }
 @media (prefers-reduced-motion: reduce) {
@@ -202,7 +202,7 @@ header.site nav details[open] > summary { background: var(--surface-2); color: v
 /* The group holding the current page. Weight rather than the full current-page treatment: the
    summary is not a link and marking it as though it were would say the reader is on it. */
 header.site nav summary[aria-current] { color: var(--text-primary); font-weight: var(--weight-semibold); }
-header.site nav summary:focus-visible { outline: 2px solid var(--series-formula); outline-offset: 2px; }
+header.site nav summary:focus-visible { outline: 2px solid var(--focus-ring); outline-offset: 2px; }
 
 header.site nav .menu-panel {
   position: absolute;
@@ -329,8 +329,36 @@ td.year { font-family: var(--font-mono); color: var(--text-annotation); white-sp
   line-height: var(--leading-tight);
 }
 
-a { color: var(--series-formula-text); text-decoration-color: color-mix(in srgb, var(--series-formula-text) 40%, transparent); }
-a:hover { text-decoration-color: currentColor; }
+/*
+ * A link is the ink with a rule under it. The rule is the affordance; the colour is not.
+ *
+ * It was `--series-formula-text` — the same token as `.gain` and as every formula figure on the
+ * site — so "coloured word" meant either "navigable" or "datum" and a reader had to work out
+ * which. The repair that suggests itself is a third text hue, and `scripts/link-hue-search.ts`
+ * shows there is not one: at this palette's chroma the best hue anywhere on the circle separates
+ * from the two series text colours by 10.2, under a bar this repository set at 15.0 and rejected
+ * a ramp at 10.9 for missing.
+ *
+ * Setting the word in the ink does what no hue could: separation from a series figure is 31.2
+ * light and 33.8 dark, because the word is not competing on colour at all. `--link` then carries
+ * the underline, which is a mark rather than text and is the only thing saying "link" — so it is
+ * solid and legible rather than the 40%-transparent hairline it used to be, and the offset
+ * matches `.term` so a definition (dotted) and a link (solid) read as two kinds of underline.
+ *
+ * Hover and keyboard focus put the word INTO `--link`. Colour is a state here, not an identity,
+ * which is why `--link` is solved to the 5:1 text bar and not the 3:1 a mark would need.
+ *
+ * Chrome links — nav, subnav, brand, contents, section anchors, the skip link — all set their own
+ * colour and drop the underline already, and are untouched: position is their affordance.
+ */
+a {
+  color: var(--text-primary);
+  text-decoration-color: var(--link);
+  text-decoration-thickness: 1px;
+  text-underline-offset: .18em;
+}
+a:hover,
+a:focus-visible { color: var(--link); text-decoration-thickness: 2px; }
 
 /* The district sub-navigation: five views of one district. A tab row in appearance, real links
    in fact, because each one is now its own URL. */
@@ -403,7 +431,7 @@ a:hover { text-decoration-color: currentColor; }
 }
 /* Keyboard focus has to be visible on the label, because the input it belongs to is off-screen. */
 .basis-scope input:focus-visible ~ .basis label[data-basis="nominal"],
-.basis-scope input:focus-visible ~ .basis label[data-basis="real"] { outline: 2px solid var(--series-formula); outline-offset: 2px; }
+.basis-scope input:focus-visible ~ .basis label[data-basis="real"] { outline: 2px solid var(--focus-ring); outline-offset: 2px; }
 .basis-scope input[data-basis="nominal"]:focus-visible ~ .basis label[data-basis="real"],
 .basis-scope input[data-basis="real"]:focus-visible ~ .basis label[data-basis="nominal"] { outline: none; }
 /*
@@ -544,7 +572,7 @@ h3 {
 /* Never hidden on focus: this is how a keyboard reader finds a section address at all. */
 .section-anchor:focus-visible {
   color: var(--text-primary);
-  outline: 2px solid var(--series-formula);
+  outline: 2px solid var(--focus-ring);
   outline-offset: 2px;
   border-radius: 3px;
 }
@@ -579,7 +607,7 @@ h3 {
 /* Never hidden on focus: this is how a keyboard reader finds the reckoning at all. */
 .year-chip:focus-visible {
   color: var(--text-primary);
-  outline: 2px solid var(--series-formula);
+  outline: 2px solid var(--focus-ring);
   outline-offset: 2px;
 }
 
@@ -815,7 +843,8 @@ select, input[type="range"], input[type="text"], input[type="search"], textarea 
   border-radius: var(--radius-md);
   padding: .5rem .6rem;
 }
-input[type="range"] { padding: var(--space-2) 0; accent-color: var(--series-formula); }
+/* The thumb and the filled track are control chrome, not a series. Same reason as the ring. */
+input[type="range"] { padding: var(--space-2) 0; accent-color: var(--link); }
 output { font-variant-numeric: tabular-nums; color: var(--text-primary); font-weight: var(--weight-semibold); }
 
 /* Tabs. The filter row sits above the content, in one row. */
@@ -887,7 +916,9 @@ output { font-variant-numeric: tabular-nums; color: var(--text-primary); font-we
 .sw.ordinal-3 { background: var(--ordinal-3); }
 
 .flags { display: flex; gap: .4rem; flex-wrap: wrap; margin-top: var(--space-5); }
-.flag { font-size: var(--text-sm); padding: var(--space-1) .5rem; border-radius: var(--radius-pill); border: 1px solid var(--border-control); color: var(--text-secondary); background: var(--surface-2); }
+/* A bordered pill, so the border is the affordance and the underline is a second one. Same call
+   as `.subnav a` and the header nav, which are the same shape and already drop it. */
+.flag { font-size: var(--text-sm); padding: var(--space-1) .5rem; border-radius: var(--radius-pill); border: 1px solid var(--border-control); color: var(--text-secondary); background: var(--surface-2); text-decoration: none; }
 
 /*
  * What is on this page, above the sections it lists.
@@ -1093,12 +1124,31 @@ tbody tr:last-child th, tbody tr:last-child td { border-bottom: 0; }
  * Set by `attachValues` in `src/lib/chart.ts`; there is never more than one on a page.
  */
 svg.plot [data-hover].at {
-  outline: 2px solid var(--series-formula);
+  /*
+   * The ink, and NOT `--focus-ring`, which is the one place on the site those differ.
+   *
+   * The comment above is right and the colour under it was not: this ring was
+   * `var(--series-formula)`, which is the formula mark's own fill, so a keyboard cursor on a
+   * formula bar was a blue ring 1px outside a blue bar — 1.00:1, on the affordance a keyboard
+   * reader navigates by. `--ordinal-2` is the same colour again, so a scatter plot's middle
+   * class had it too.
+   *
+   * `--link` is not the fix. A ring surrounds a MARK here rather than sitting on a surface, and
+   * no single hue on this palette clears 3:1 against every mark: the best available is 2.02:1,
+   * and `--link` itself manages 1.19 light and 1.03 dark against the formula blue. The ink does
+   * clear it — 4.46 and 6.15 light, 3.64 and 3.88 dark against the two series marks — because
+   * the ink is the one colour a chart never draws with.
+   *
+   * It is not universal even so. `--ordinal-3` is a dark navy and the ink reaches only 1.87 light
+   * and 1.56 dark against it; there the `brightness(1.2)` second channel and the offset are what
+   * carry the cursor. Recorded rather than papered over.
+   */
+  outline: 2px solid var(--text-primary);
   outline-offset: 1px;
   filter: brightness(1.2);
 }
 /* The chart itself is a tab stop — one per chart, not one per mark. See `openToKeyboard`. */
-svg.plot:focus-visible { outline: 2px solid var(--series-formula); outline-offset: 2px; }
+svg.plot:focus-visible { outline: 2px solid var(--focus-ring); outline-offset: 2px; }
 
 .bar-value { font-variant-numeric: tabular-nums; }
 .axis { stroke: var(--accent-rule); stroke-width: 1; }
@@ -1485,7 +1535,19 @@ footer.site { border-top: 1px solid var(--border); padding-top: var(--space-6); 
 .filters .count { font-size: var(--text-sm); color: var(--text-muted); padding-bottom: .45rem; }
 #district-table td { text-align: right; }
 #district-table th[scope="row"] { text-align: left; font-weight: var(--weight-medium); }
-#district-table th[scope="row"] a { color: var(--text-primary); text-decoration-color: var(--border); }
+/*
+ * 609 links in one column, so the underline is quieted — but to `--border-control` and not to
+ * `--border`, which is where it was.
+ *
+ * The `color` here used to be the whole point: this table reached the conclusion the rest of the
+ * site has now reached, that a district name is not a datum and should not be set in the series
+ * blue. That is the base rule now, so only the underline is local. It was drawn in `--border`, a
+ * hairline at 1.34:1 — and with the colour no longer distinguishing a link from the IRN beside
+ * it, a 1.34:1 rule was the only thing left saying "link". `--border-control` is the token for
+ * the boundary of something a reader operates and clears 3:1, which is what this needs and what
+ * `--border` was never for.
+ */
+#district-table th[scope="row"] a { text-decoration-color: var(--border-control); }
 #district-table tr[hidden] { display: none; }
 /* A sort control is a button in a header cell, so it is reachable by keyboard and announces. */
 #district-table thead button {

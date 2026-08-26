@@ -107,6 +107,85 @@ export function toLab(colour: Rgb): Lab {
 /** Chroma in the a*b* plane. The "chroma floor" check reads this. */
 export const chroma = (lab: Lab): number => Math.hypot(lab.a, lab.b);
 
+/**
+ * OKLCH, because that is the space this palette's derivation rule is stated in.
+ *
+ * `tokens/colors.css` says the `-text` variants hold "OKLab hue and chroma to the mark colour's
+ * exactly and only lightness moves". Nothing in this repository could check that — the file has a
+ * documented history of figures computed once, elsewhere, by a tool nobody committed, and this was
+ * one more of them. It is here so the rule can be run rather than trusted.
+ *
+ * It reproduces, which is worth saying plainly given that history: the claimed hue drifts of 0.01
+ * and 2.75 degrees on light, and "under 0.1" on dark, come back as 0.00, 2.75, 0.06 and 0.05.
+ *
+ * Ottosson's matrices, straight through. Lightness here is OKLab's `L`, on 0–1, and is a different
+ * quantity from CIELAB's `l` on 0–100 — the two are not interchangeable and this file carries both.
+ */
+export interface Oklch {
+  /** 0–1. Perceptual lightness, NOT CIELAB `l`. */
+  l: number;
+  c: number;
+  /** Degrees, 0–360. */
+  h: number;
+}
+
+const CBRT = (t: number): number => Math.cbrt(t);
+
+export function toOklch(colour: Rgb): Oklch {
+  const r = linearize(colour.r);
+  const g = linearize(colour.g);
+  const b = linearize(colour.b);
+  const l = CBRT(0.4122214708 * r + 0.5363325363 * g + 0.0514459929 * b);
+  const m = CBRT(0.2119034982 * r + 0.6806995451 * g + 0.1073969566 * b);
+  const s = CBRT(0.0883024619 * r + 0.2817188376 * g + 0.6299787005 * b);
+  const okL = 0.2104542553 * l + 0.793617785 * m - 0.0040720468 * s;
+  const okA = 1.9779984951 * l - 2.428592205 * m + 0.4505937099 * s;
+  const okB = 0.0259040371 * l + 0.7827717662 * m - 0.808675766 * s;
+  return {
+    l: okL,
+    c: Math.hypot(okA, okB),
+    h: ((Math.atan2(okB, okA) * 180) / Math.PI + 360) % 360,
+  };
+}
+
+/**
+ * OKLCH back to channels, or `null` when the coordinate is outside sRGB.
+ *
+ * `null` rather than a clamp on purpose. A clamped out-of-gamut colour is a DIFFERENT colour that
+ * still answers to the coordinate that produced it, so a search over the space would quietly
+ * optimise over values it cannot ship. The tolerance below absorbs float error at the boundary and
+ * nothing wider.
+ */
+export function fromOklch(colour: Oklch): Rgb | null {
+  const a = colour.c * Math.cos((colour.h * Math.PI) / 180);
+  const b = colour.c * Math.sin((colour.h * Math.PI) / 180);
+  const l = (colour.l + 0.3963377774 * a + 0.2158037573 * b) ** 3;
+  const m = (colour.l - 0.1055613458 * a - 0.0638541728 * b) ** 3;
+  const s = (colour.l - 0.0894841775 * a - 1.291485548 * b) ** 3;
+  // Gamut is decided on the LINEAR channels, before companding, because `compand` clamps — an
+  // out-of-gamut coordinate would otherwise come back as a valid-looking hex that is a different
+  // colour from the one asked for. 1e-4 of linear light is a third of a channel step at the dark
+  // end: float slop at the boundary, and nothing a search could hide inside.
+  const linear = [
+    4.0767416621 * l - 3.3077115913 * m + 0.2309699292 * s,
+    -1.2684380046 * l + 2.6097574011 * m - 0.3413193965 * s,
+    -0.0041960863 * l - 0.7034186147 * m + 1.707614701 * s,
+  ];
+  if (linear.some((v) => v < -1e-4 || v > 1 + 1e-4)) return null;
+  const out = linear.map(compand);
+  return { r: out[0]!, g: out[1]!, b: out[2]! };
+}
+
+/** Channels back to `#rrggbb`, the form the token files are written in. */
+export const toHex = (colour: Rgb): string =>
+  `#${[colour.r, colour.g, colour.b].map((c) => c.toString(16).padStart(2, "0")).join("")}`;
+
+/** The smallest angle between two hues, which is not `a - b` when the pair straddles 0. */
+export const hueGap = (a: number, b: number): number => {
+  const d = Math.abs(a - b) % 360;
+  return d > 180 ? 360 - d : d;
+};
+
 /** Straight-line distance in Lab. The 1976 definition, kept for identifying older figures. */
 export function deltaE76(a: Lab, b: Lab): number {
   return Math.hypot(a.l - b.l, a.a - b.a, a.b - b.b);
