@@ -1604,6 +1604,59 @@ test.describe("a table that scrolls sideways", () => {
     }
   });
 
+  test("a named quantity in a formula reaches the parameter that defines it", async ({ page }) => {
+    /*
+     * #204's last clause, and the one that needed measuring rather than assuming: `href` on a
+     * MathML element is dead in MathML Core — the cursor stays `auto` and the element does not
+     * activate — so the anchor goes inside an `<mtext>`, which is the one arrangement that
+     * renders. `lib/math.ts` holds it to the allowlist, and this is the half only a browser sees.
+     *
+     * Three things, because the link failing in three different ways looks identical in the
+     * markup: it has to be laid out (a zero-width anchor inside a maths box is not a target), it
+     * has to be distinguishable **without colour** — the underline is the channel, the same one
+     * `--link` carries everywhere else since #187 — and it has to navigate.
+     */
+    await page.goto("/wiki/formula-component/fsfp-special-education-weights");
+    const term = page.locator(".formula mtext a").first();
+    await expect(term).toBeVisible();
+
+    const shown = await page.locator(".formula").first().evaluate((box) => {
+      const a = box.querySelector("mtext a")!;
+      const style = getComputedStyle(a);
+      const rect = a.getBoundingClientRect();
+      /* An `<mtext>` on the same page carrying no link: the ink to compare against. */
+      const plain = [...box.querySelectorAll("mtext")].find((t) => !t.querySelector("a"))!;
+      return {
+        width: rect.width,
+        height: rect.height,
+        decoration: style.textDecorationLine,
+        cursor: style.cursor,
+        ink: style.color,
+        underline: style.textDecorationColor,
+        neighbour: getComputedStyle(plain).color,
+      };
+    });
+    expect(shown.width, "a term with no width is not a target").toBeGreaterThan(20);
+    expect(shown.height).toBeGreaterThan(5);
+    expect(shown.decoration, "the underline is the channel that survives greyscale").toContain(
+      "underline",
+    );
+    expect(shown.cursor).toBe("pointer");
+
+    /*
+     * And the word stays in the formula's own ink, which is the site's link doctrine since #187:
+     * colour is a hover and focus state, never the identity. A `.formula a { color }` rule added
+     * later would repaint one named quantity inside a line of maths and read as emphasis rather
+     * than as a link — so the two inks matching is the assertion, and the underline being a
+     * different colour from both is what says the anchor is styled at all.
+     */
+    expect(shown.ink, "a linked term is the same ink as the maths around it").toBe(shown.neighbour);
+    expect(shown.underline, "the underline carries --link and the word does not").not.toBe(shown.ink);
+
+    await term.click();
+    await expect(page.locator("h1")).toHaveText("Base Cost Per Pupil");
+  });
+
   /**
    * The shipped font stretches a brace — asked of the browser, not of the table.
    *

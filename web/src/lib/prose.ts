@@ -465,8 +465,12 @@ export function shownProperties<T extends { name: string }>(properties: T[]): (T
  * backslashes. This does not go near the markdown processor either: `lib/math.ts` holds the output
  * to its own allowlist, so there is nothing for the markdown schema to widen.
  */
-export function renderMathProperty(value: string, where: string): string {
-  return renderMath(value.trim(), { display: true, where });
+export function renderMathProperty(
+  value: string,
+  where: string,
+  terms?: Map<string, string>,
+): string {
+  return renderMath(value.trim(), { display: true, where, ...(terms ? { terms } : {}) });
 }
 
 /**
@@ -520,6 +524,41 @@ export function isBlockProperty(value: string): boolean {
     .some((paragraph) =>
       isAlignedBlock(paragraph.split("\n").filter((line) => line.trim() !== "")),
     );
+}
+
+/**
+ * A property whose newlines ARE the content: one item per line, and joining them destroys it.
+ *
+ * {@link renderPropertyValue} joins single newlines, and is right to — in 544 of the corpus's 601
+ * multi-line paragraphs a newline is where the author wrapped the YAML at column 95 and means
+ * nothing. {@link isAlignedBlock} rescues the 57 that are really tables, by looking for columns.
+ *
+ * A list of phrases has no columns to find, so it fell through to the join and arrived as a
+ * run-on: `written_as` on `base-cost-per-pupil` rendered as "statewide average base cost per pupil
+ * average base cost per pupil district base cost per pupil district aggregate base cost" — four
+ * phrases, with nothing saying where any of them ends. On the one field whose whole subject is
+ * which exact phrases name a quantity, that is the worst available rendering.
+ *
+ * Declared by name rather than sniffed from the value, because "this is a list" is a fact about
+ * the property's schema: a `written_as` carrying one phrase is still a list, and a `sensitivity`
+ * that happens to have short lines is still prose.
+ */
+export const isListProperty = (name: string): boolean => name === "written_as";
+
+/**
+ * One property value that is a list, as a list.
+ *
+ * Each line goes through {@link renderPropertyValue} on its own, so a phrase keeps the claim
+ * badges, inline links and backticks every other property gets — and a single line cannot be
+ * joined to anything, which is the whole point.
+ */
+export function renderListProperty(value: string, fromClass: string): string {
+  const items = value
+    .split("\n")
+    .map((line) => line.trim())
+    .filter((line) => line !== "")
+    .map((line) => `<li>${renderPropertyValue(line, fromClass)}</li>`);
+  return items.length === 0 ? "" : `<ul class="phrases">${items.join("")}</ul>`;
 }
 
 /**

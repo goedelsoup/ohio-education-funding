@@ -112,6 +112,11 @@ properties:
     a constant-dollar companion series before any cross-era comparison. [open]
   statutory_basis: R.C. 3317.011, with sub-components at 3317.011(D) through (H). [verified]
   simulation_key: base_cost_per_pupil
+  written_as: |
+    statewide average base cost per pupil
+    average base cost per pupil
+    district base cost per pupil
+    district aggregate base cost
   sensitivity: |
     Moves every district's computed cost proportionally before local share is applied. Because
     state aid is the residual after local capacity, **a dollar of extra base cost per pupil is

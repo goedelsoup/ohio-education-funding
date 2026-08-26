@@ -26,6 +26,8 @@ import {
   markCorrections,
   renderProse,
   isBlockProperty,
+  isListProperty,
+  renderListProperty,
   renderPropertyValue,
   summarize,
 } from "../../src/lib/prose.ts";
@@ -502,5 +504,57 @@ describe("a property value whose columns carry meaning", () => {
     }
     expect(drifted, "non-block properties whose rendering moved").toEqual([]);
     expect(unchanged, "properties checked against the old rule").toBeGreaterThan(600);
+  });
+});
+
+/**
+ * The list that was run together.
+ *
+ * The join above is right for 544 paragraphs and the aligned-block rescue catches the 57 that are
+ * tables — it looks for columns. A list of phrases has no columns, so it fell through to the join:
+ * `written_as` on `base-cost-per-pupil` shipped as "statewide average base cost per pupil average
+ * base cost per pupil district base cost per pupil district aggregate base cost". Four phrases and
+ * no way to tell where any of them ends, on the one field whose entire subject is which exact
+ * phrases name a quantity.
+ */
+describe("a property value that is a list", () => {
+  test("is declared by name, because a one-item list is still a list", () => {
+    expect(isListProperty("written_as")).toBe(true);
+    // A property whose lines happen to be short is still prose, and must keep the join.
+    expect(isListProperty("sensitivity")).toBe(false);
+    expect(isListProperty("series")).toBe(false);
+  });
+
+  test("renders one item per line rather than one run-on sentence", () => {
+    const html = renderListProperty(
+      "statewide average base cost per pupil\naverage base cost per pupil\ndistrict aggregate base cost",
+      "parameter",
+    );
+    expect(html.match(/<li>/g), "one item per phrase").toHaveLength(3);
+    expect(html).toContain("<li>statewide average base cost per pupil</li>");
+    // The failure this exists to prevent: two phrases with nothing between them.
+    expect(html).not.toContain("per pupil average base cost");
+  });
+
+  test("gives a phrase the badges, links and code spans every other property gets", () => {
+    const html = renderListProperty("the `school-age` weights [verified]\nthe weights", "parameter");
+    expect(html).toContain("<code>school-age</code>");
+    expect(html).toContain('class="claim verified"');
+  });
+
+  test("carries every phrase the corpus declares, and drops the blank lines", () => {
+    const declared = corpus.nodes.flatMap((node) =>
+      node.properties.filter((property) => isListProperty(property.name)).map((property) => ({
+        id: node.id,
+        phrases: property.value.split("\n").map((line) => line.trim()).filter((line) => line !== ""),
+        html: renderListProperty(property.value, node.className),
+      })),
+    );
+    expect(declared.length, "parameters declaring the phrases a formula writes them as").toBeGreaterThan(10);
+    for (const { id, phrases, html } of declared) {
+      expect(html.match(/<li>/g) ?? [], `${id} renders one item per declared phrase`).toHaveLength(
+        phrases.length,
+      );
+    }
   });
 });

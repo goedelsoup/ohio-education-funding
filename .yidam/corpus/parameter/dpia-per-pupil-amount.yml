@@ -101,6 +101,10 @@ properties:
     `Policy::phase_in_dpia`, separate from `phase_in_general` because the statute separates them
     — so a scenario can move how much of the FY2019 base a district is held at and cannot move
     the $422.
+  written_as: |
+    disadvantaged share
+    index, squared
+    blended count
   sensitivity: |
     The largest categorical, and the one whose sensitivity is least about its own rate. $422
     scales the whole programme linearly; the index squares, so it is the term that decides the

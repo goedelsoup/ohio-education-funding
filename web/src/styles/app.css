@@ -1154,6 +1154,21 @@ tr.current th, tr.current td { color: var(--text-primary); font-weight: var(--we
 table.prose td { text-align: left; font-variant-numeric: normal; }
 table.prose th { width: 32%; }
 /*
+ * A property that is a list of phrases — today only `written_as`, the words a statute and a
+ * formula use for one parameter.
+ *
+ * Left-aligned against the `td { text-align: right }` above, and not tabular: these are words. The
+ * markers are dropped because the lines are already separated by being lines, and a bullet in a
+ * two-column property row reads as a nested structure that is not there.
+ */
+table.prose td > ul.phrases {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  text-align: left;
+  font-variant-numeric: normal;
+}
+/*
  * A property value whose columns carry meaning, rather than prose the author wrapped.
  *
  * `renderPropertyValue` joins single newlines with a space, which is right for 544 of the corpus's

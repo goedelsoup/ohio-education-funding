@@ -87,6 +87,9 @@ properties:
     Not bound. `crates/regime-diff` substitutes the whole local share to compare the plan
     against the charge-off, and `Policy` exposes no lever that moves the rate or the blend, so a
     counterfactual on the 60/20/20 split or the 2.5% cap cannot currently be run.
+  written_as: |
+    local capacity percentage
+    local capacity per pupil
   sensitivity: |
     Moves the local share of every district that is not on the minimum state share, and moves it
     proportionally — so it is the most direct lever on the state-local split that exists, and

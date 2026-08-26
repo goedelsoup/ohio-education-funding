@@ -83,6 +83,8 @@ properties:
     A constant, not a lever. `Policy` exposes four fields — the guarantee rule, a base cost
     scale, the minimum state share and two phase-in percentages — and none of them is this. A
     counterfactual that moved a category weight cannot currently be run.
+  written_as: |
+    the school-age weights
   sensitivity: |
     Moves $722m, the second-largest categorical, and moves it unevenly. Because the caseload is
     concentrated in Category 2 and the money in Category 6, a proportional change to all six

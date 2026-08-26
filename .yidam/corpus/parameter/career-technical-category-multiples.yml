@@ -102,6 +102,9 @@ properties:
     `CTE_BASE_COST_PER_PUPIL` beside it.
 
     Constants, not levers. Nothing in `Policy` moves them.
+  written_as: |
+    career-technical base cost per pupil
+    associated services
   sensitivity: |
     $54m in all, the smaller of the two weighted programmes, and $3.2m of it is associated
     services. [verified]

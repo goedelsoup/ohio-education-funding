@@ -97,6 +97,10 @@ properties:
     and `GIFTED_SPECIALIST_UNIT_PRICES`.
 
     Eight constants, no lever.
+  written_as: |
+    identification
+    referral
+    unit funding
   sensitivity: |
     The two per-pupil rates and the three unit prices move different money in different
     directions. Identification and referral scale with enrolment and reach every district; unit
