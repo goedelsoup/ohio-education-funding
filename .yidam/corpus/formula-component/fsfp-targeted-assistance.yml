@@ -211,3 +211,5 @@ links:
     relationship: consumes
   - target: ../../catalog/dew-fy27-funding-calculator.md
     relationship: sourced-from
+  - target: ../parameter/targeted-assistance-rates.yml
+    relationship: governed-by

@@ -176,3 +176,5 @@ links:
     relationship: parallels
   - target: ../../catalog/dew-fy27-funding-calculator.md
     relationship: sourced-from
+  - target: ../parameter/transportation-cost-rates.yml
+    relationship: governed-by

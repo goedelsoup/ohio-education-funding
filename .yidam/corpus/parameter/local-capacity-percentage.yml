@@ -1,0 +1,136 @@
+class: parameter
+label: Local Capacity Percentage
+summary: >-
+  The rate the plan charges against a district's blended wealth — 2.5% at the top, the
+  district's own income ratio times 2.25% at the bottom, interpolating between. Its top is
+  pinned to a rank rather than a value: the fortieth-highest district in the state.
+description: |
+  A district's per-pupil local capacity amount is its blended wealth times this percentage. The
+  blend is fixed — 60% valuation per pupil, 20% federal adjusted gross income per pupil, 20%
+  adjusted median income per pupil — and the percentage is a sliding scale with three branches.
+  [verified — R.C. 3317.017(A)(4) and (A)(5)]
+
+  Ranked by the ratio of a district's federal median income to the statewide median:
+
+  - at or above the **fortieth-highest** district's ratio, the percentage is **0.025**
+  - below that but above 1.0, it interpolates:
+    `[(ratio − 1) × 0.0025] / (fortieth-highest ratio − 1) + 0.0225`
+  - at or below 1.0, it is the district's own ratio times **0.0225**
+
+  So a district at the state median income pays 2.25% of its blended wealth, one at half the
+  median pays about 1.125%, and everything from the fortieth district upward pays 2.5%. The
+  measure is progressive in its rate as well as in its base. [verified]
+
+  **The top of the scale is a rank, not a value.** R.C. 3317.017(A)(4)(c) and (d) direct the
+  department to order all districts by that income ratio and take the fortieth highest. Nothing
+  in the section says what ratio that is, and the value therefore moves when the distribution of
+  district incomes moves, with no act and no departmental decision. Why the fortieth and not
+  some other rank is not stated in the section. [verified for the mechanism; open for the
+  choice of forty]
+findings: |
+  ### Three of the four kinds, in one parameter
+
+  0.025, 0.0225 and 0.0025 are legislated: they are digits in the section and only an act moves
+  them. The fortieth-highest ratio the top branch is pinned to is **measured** — a statistic of
+  the income distribution, recomputed each year from certified tax data, that nobody sets. And
+  the section itself applies only to FY2026 and FY2027, so the whole schedule's durability is a
+  budget act's.
+
+  That combination is what makes this parameter worth separating from the component that uses
+  it. A reader told "the rate is 2.5%" has a legislated constant in mind; the rate that actually
+  binds at the top is defined by where the fortieth district happens to fall. [verified]
+
+  ### And it stops mattering for 138 districts
+
+  The [minimum state share](minimum-state-share.yml) floors the state share at 10%, which means
+  that for districts whose capacity exceeds 90% of base cost none of the three branches
+  determines anything. That is 138 of 609 in the FY2027 model, and they are the districts at the
+  top of the distribution — exactly the ones the 2.5% cap was written for. [verified —
+  crates/project]
+properties:
+  name: Per-pupil local capacity percentage
+  unit: percent
+  kind: |
+    **Legislated in its constants, measured in its benchmark, and expiring with the section.**
+
+    The three rates are written out. The point at which the top rate begins is not: it is the
+    fortieth-highest district's income ratio, which is a fact about the distribution rather
+    than a value anyone chose. A parameter whose ceiling is a rank has a value that changes
+    when districts change, with nothing to amend and nobody to decide.
+
+    R.C. 3317.017 opens *"This section shall apply only for fiscal years 2026 and 2027"*, so
+    the schedule lapses with the biennium unless the next budget act re-enacts it.
+  series: |
+    Rate schedule, FY2026 and FY2027, from R.C. 3317.017(A)(4)(d):
+
+      0.025    at or above the fortieth-highest income ratio        (i)
+      0.0225   plus [(ratio − 1) × 0.0025] / (fortieth ratio − 1)   (ii), for 1.0 < ratio < the
+               fortieth-highest                                          fortieth-highest
+      0.0225   times the district's own ratio                       (iii), for ratio ≤ 1.0
+
+    Blend weights, from (A)(5):
+
+      0.60  valuation per pupil
+      0.20  local share federal adjusted gross income per pupil
+      0.20  adjusted local share federal adjusted gross income per pupil
+
+    Both wealth terms are taken as the **lesser** of the most recent year and a three-year
+    average, which is a deliberate protection: a district whose valuation spikes on a single
+    reappraisal is not immediately charged for it. [verified]
+
+    The section states no value for FY2028 or later, because it does not apply then. [verified]
+  statutory_basis: |
+    R.C. 3317.017, read — (A)(1) to (A)(3) for the three wealth terms, (A)(4) for the
+    percentage, (A)(5) for the blend. The section is the plan's replacement for the charge-off
+    and it carries the minimum state share as well, in (B)(1) and (C). [verified — `ohio-laws`]
+  simulation_key: |
+    Not bound. `crates/regime-diff` substitutes the whole local share to compare the plan
+    against the charge-off, and `Policy` exposes no lever that moves the rate or the blend, so a
+    counterfactual on the 60/20/20 split or the 2.5% cap cannot currently be run.
+  sensitivity: |
+    Moves the local share of every district that is not on the minimum state share, and moves it
+    proportionally — so it is the most direct lever on the state-local split that exists, and
+    the one no scenario can pull.
+
+    Splitting the income term is what makes the blend more than a rename of the charge-off.
+    Property alone treats a district with expensive housing and modest household earnings as
+    wealthy; an aggregate income measure rises with population and with concentration at the
+    top; a median measure does not. The 60/20/20 weights decide how much of each of those
+    errors the measure carries. [inference]
+
+    The benchmark's sensitivity is different in kind from the rates'. Nothing has to be enacted
+    for the top of the scale to move — it moves when the fortieth district's income ratio moves,
+    which is to say when a handful of districts near that rank change position. [inference]
+unfilled:
+  - field: the fortieth-highest income ratio itself
+    why: >-
+      The section defines the benchmark as a rank and the department computes the value. It is
+      not in the committed FY2027 calculator extract; the department's certified income data
+      under R.C. 3317.021 is what would settle it.
+  - field: why the fortieth rank
+    why: >-
+      Neither the section nor the plan's published rationale in this corpus says. The Fair
+      School Funding Plan workgroup's own documentation is where a reason would be.
+figures:
+  - key: project/districts-at-the-minimum-state-share
+    value: 138
+    field: findings
+    as_written: "That is 138 of 609 in the FY2027 model"
+  - key: project/model-districts
+    value: 609
+    field: findings
+    as_written: "138 of 609 in the FY2027 model"
+links:
+  - target: ../parameter.ont.yml
+    relationship: instance-of
+  - target: ../formula-component/fsfp-local-capacity-measure.yml
+    relationship: consumed-by
+  - target: ../fiscal-period/fy2026-27.yml
+    relationship: valued-in
+  - target: ../legislation/hb-96-2025.yml
+    relationship: set-by
+  - target: local-share-charge-off-millage.yml
+    relationship: replaces
+    note: The mechanism this one displaced, and the pair `crates/regime-diff` runs against.
+  - target: ../../catalog/ohio-revised-code.md
+    relationship: sourced-from

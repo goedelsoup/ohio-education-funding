@@ -1,0 +1,111 @@
+id: the-plan-expires-and-the-projection-does-not
+summary: >-
+  Reading the Revised Code for the parameter class found that eight of the nine sections carrying
+  the Fair School Funding Plan's constants stop at FY2027 — three by their own terms and five
+  clause by clause — while this repository projects current law to FY2036.
+context: |
+  #204 asked, before building anything, how many named quantities in the corpus's `function_tex`
+  fields ought to be `parameter` nodes and are not. The answer was 32 of 33 statutory rates, and
+  the issue's own pre-committed rule fired: the corpus work comes first.
+
+  Writing those nodes meant reading R.C. 3317 rather than transcribing from the department's
+  calculator, which the workspace could do because `crates/project/fixtures/revised-code.txt`
+  already holds the sections as committed text. The `kind` field is what forced the reading:
+  "what would have to happen for this value to change" is not answerable from a spreadsheet.
+
+  The expected answer for a weight schedule was `legislated` — digits in a section, moved only by
+  an act. That is what `parameter.ont.yml`'s own examples assume, and it is what the corpus's
+  prose had assumed for four years of nodes.
+decision: |
+  **Record the durability of every parameter, and treat a one-biennium series as a complete
+  reading rather than as an unfilled field.**
+
+  Measured over the committed extract, across the nine sections that carry the plan's parameters:
+
+  | | sections |
+  |---|--:|
+  | apply only to FY2026 and FY2027, by their own opening sentence | 3 |
+  | hand individual values to the General Assembly from FY2028 | 5 |
+  | state their values flatly, with no end | **1** |
+
+  The three that expire outright are R.C. 3317.011 (base cost), 3317.017 (local capacity, and the
+  minimum state share inside it) and 3317.0217 (targeted assistance). Each opens *"This section
+  shall apply only for fiscal years 2026 and 2027."*
+
+  The five that expire clause by clause carry **forty** divisions reading *"For fiscal year 2028
+  and each fiscal year thereafter, an amount calculated in a manner determined by the general
+  assembly"* — seventeen of them in R.C. 3317.022 alone, the section that assembles core
+  foundation funding.
+
+  The one that does not is **R.C. 3317.013, the special education multiples**. It is also the only
+  one of the nine not amended by the current budget act: its effective date is 6 April 2023 and its
+  source is H.B. 554 of the 134th General Assembly, where every other section carries H.B. 96 of
+  the 136th and 30 September 2025.
+
+  So each new parameter node states its durability in `kind:` and stops its `series:` where the
+  section stops, with `FY2028 — an amount determined by the general assembly` as a real row rather
+  than a gap. The class README says the same, so a reader does not mistake a two-year series for an
+  unfinished node.
+consequences: |
+  **The distinction the corpus had been drawing is not the one that matters.** For four phases the
+  corpus separated codified parameters from uncodified ones, and treated "lapses with the biennium
+  unless re-enacted" as the uncodified ones' distinguishing weakness — it is written that way in
+  three formula components. On durability the two are the same: R.C. 3317.017 expires exactly as
+  the performance supplement does. What being codified actually buys is **retrievability** — a
+  citation, a version archive, a text on `codes.ohio.gov` — and that is worth having for entirely
+  different reasons. The `enrolment-supplement-amounts` and `performance-supplement-rate` nodes say
+  so in their `kind:` fields.
+
+  **This repository projects current law past the last year it exists.** `crates/bundle` fits
+  forecasts at FY2028, FY2032 and FY2036, and `guarantee-phase-out` publishes "FY2032 at projected
+  enrollment, current law: $7,125M in a band of $6,889M to $7,379M". Nothing in that band's
+  construction is wrong: the enrollment forecast carries its interval, the basis is marked
+  `Projected`, and the arithmetic reproduces. What was missing is that **"current law" at FY2032 is
+  not a law**. Three of the sections it runs on will have ceased to apply, and forty divisions will
+  have handed their values to a General Assembly that has not met.
+
+  That is not a defect in the projection and it is not fixed by shortening the horizon — a
+  five-year question about a two-year statute is still worth asking, and the answer "if the plan
+  continues unchanged" is the only tractable one. It is a defect in the *label*. This pass records
+  the fact in the parameter nodes; making the site say it where the band is drawn is left as
+  follow-on work, because it is a rendering change and this pass is a corpus one.
+
+  **A `kind` of "legislated" was hiding two different things.** R.C. 3317.013's multiples and R.C.
+  3317.014's are both digits in a section, and only one of them survives the biennium. The `kind`
+  field is text rather than an enum precisely so it could say that — the four-kind decision
+  anticipated a parameter changing kind at a regime boundary and did not anticipate a codified
+  parameter carrying its own expiry. Both are now recorded in the field rather than in a category.
+
+  **Three things came out of the reading that no calculator would have shown.** R.C. 3317.014(E)
+  pays $3 per pupil for career awareness and exploration, and nothing in this repository models it.
+  R.C. 3317.0212 states the transportation rider weights the corpus had recorded as possibly
+  departmental, closing an `[open]`. And the 180-day multiplier in the per-mile transportation base
+  appears nowhere in that section, which the corpus had not noticed because the calculator carries
+  it.
+alternatives: |
+  **Leave the series at one row and mark the rest `[open]`.** Rejected, and this is the substance
+  of the decision. `[open]` says a question is live and somebody should answer it. "What is the
+  FY2028 special education weight" is not a live question — it is a question the statute has
+  declined to answer, and recording it as open would put forty of them in the corpus with no
+  investigation that could close any. The `FY2028 —` row states the fact instead.
+
+  **Write one parameter node per statutory rate rather than per section.** Rejected. Thirty-three
+  nodes, most of them a single number with the same `kind`, the same `statutory_basis` and the same
+  expiry as their five siblings. The section is the unit the General Assembly legislates in and the
+  unit a counterfactual binds to: a proposal amends R.C. 3317.014, not its division (A)(3).
+
+  **Merge the preschool halving into the special education multiples.** Rejected, and it is the
+  case that shows why the section is the right unit. R.C. 3317.0213 names each division of
+  3317.013 and multiplies by 0.50; the multiples do not expire and the halving does. Merging them
+  would give one node two durabilities.
+
+  **Shorten the projection horizon to FY2027.** Rejected. The question the scenario runner exists
+  to answer is what a policy change does over time, and a horizon inside the current biennium
+  cannot show a guarantee phasing out or enrollment decline compounding. The horizon is right and
+  the label needs a caveat.
+
+  **Fix the label in this pass.** Deferred rather than rejected. The band is drawn by
+  `web/src/lib/scenario.ts` and named in `crates/bundle`; saying "current law, as it stands for
+  FY2026-27" wherever a projected year is shown is a change to the site and to the crate that
+  feeds it. Doing it here would mean a corpus pass carrying a rendering change nobody reviewed for
+  what it does to the page, which is the shape of change this repository has stopped making.

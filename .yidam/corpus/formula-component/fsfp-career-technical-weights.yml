@@ -144,3 +144,5 @@ links:
     relationship: governed-by
   - target: ../../catalog/dew-fy27-funding-calculator.md
     relationship: sourced-from
+  - target: ../parameter/career-technical-category-multiples.yml
+    relationship: governed-by

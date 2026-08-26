@@ -172,3 +172,5 @@ links:
     relationship: shares-price-basis-with
   - target: ../../catalog/dew-fy27-funding-calculator.md
     relationship: sourced-from
+  - target: ../parameter/gifted-funding-rates.yml
+    relationship: governed-by

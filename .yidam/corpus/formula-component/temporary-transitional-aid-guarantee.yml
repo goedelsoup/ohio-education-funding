@@ -386,3 +386,7 @@ links:
     relationship: sourced-from
   - target: ../../catalog/ocg-white-paper-015.md
     relationship: sourced-from
+  - target: ../parameter/guarantee-funding-base.yml
+    relationship: governed-by
+  - target: ../parameter/fsfp-phase-in-percentage.yml
+    relationship: governed-by

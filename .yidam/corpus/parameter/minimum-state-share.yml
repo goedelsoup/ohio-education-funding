@@ -1,0 +1,147 @@
+class: parameter
+label: Minimum State Share
+summary: >-
+  The floor under a district's state share of base cost — 10% for FY2026-27, twice the 5% the
+  Fair School Funding Plan began with. 138 of 609 districts sit exactly on it, and for those
+  districts every other term in the local capacity measure decides nothing.
+description: |
+  The floor under the state share percentage. R.C. 3317.017(C) computes the share as
+  `(base cost per pupil − per-pupil local capacity) / base cost per pupil`, and then says: *"If
+  the result is less than 0.10, the state share percentage shall be 0.10."* Division (B)(1)
+  states the same rule from the other side — a district whose local capacity exceeds 90% of its
+  base cost is paid `base cost per pupil × 0.10 × enrolled ADM`. [verified — the section]
+
+  **It doubled, and the doubling is not in permanent law.** The plan was enacted with 5%
+  [inference]; the 10% above is what H.B. 96 wrote into a section that applies only to FY2026
+  and FY2027 [verified]. So the most consequential distributional parameter at the top of the
+  wealth range is one a biennium sets and the next biennium need not re-set.
+
+  **For 138 of 609 districts it is the whole answer.** Their state share is not computed from
+  valuation, adjusted gross income, median income, the 60/20/20 blend, the sliding capacity
+  rate or the fortieth-highest-district benchmark. It is a tenth. The
+  [local capacity measure](local-capacity-percentage.yml)'s entire apparatus determines nothing
+  for roughly a fifth of Ohio's districts. [verified]
+findings: |
+  ### It censors the data it floors
+
+  Where the floor binds, per-pupil local capacity is not recoverable from published aid by
+  subtraction. All that can be said of those 138 districts is that their capacity exceeds 90%
+  of base cost; how far it exceeds it is not published and cannot be inferred from the payment.
+  Any analysis that regresses aid on wealth across all 609 is fitting a censored dependent
+  variable at the top of the range. [verified]
+
+  The charge-off counterfactual records the same problem from the other direction: 138 districts
+  are the ones whose local capacity the minimum state share censors, so it cannot value them
+  under both regimes on the same basis. [verified — crates/regime-diff]
+
+  ### And it makes the formula's response to base cost non-linear
+
+  A dollar of extra base cost per pupil is a dollar of extra state aid per pupil for a district
+  on the formula, because local capacity does not move when base cost does. For a district on
+  this floor it is ten cents. So the aggregate response to a base cost increase depends on how
+  many districts are on the floor, and that count is itself a function of base cost. [verified
+  — `crates/project`]
+
+  The cost-input refresh scenario prices the effect: of the run's total, $118.7m does not reach
+  districts because 138 of them keep only a tenth of what the refresh computes for them.
+  [verified]
+properties:
+  name: Minimum state share percentage
+  unit: percent
+  kind: |
+    **Uncodified in substance and codified in form, which is the case the taxonomy was built to
+    separate and this one sits between.**
+
+    The value is in the Revised Code — R.C. 3317.017(B)(1) and (C), stated as 0.10 — so it is
+    not `uncodified` the way the enrolment and performance supplements are: it is citable and a
+    reader can look it up. But the section opens *"This section shall apply only for fiscal
+    years 2026 and 2027"*, and H.B. 96 is what put 0.10 in it. The number's authority is a
+    budget act; its residence is permanent law; and its life is two years.
+
+    So "what would have to happen for this to change" has an unusual answer: **nothing**. It
+    does not have to be repealed or amended. If the next budget act writes a different number
+    into the next version of this section, or writes none, the 10% simply stops.
+
+    Recorded here because the four-kind taxonomy in
+    [the four kinds of parameter](../../decisions/the-four-kinds-of-parameter.yml) distinguishes
+    "in the Revised Code" from "in a budget act" and this is both at once.
+  series: |
+    FY2022  0.05   as the Fair School Funding Plan was enacted      [inference — carried by
+                   `crates/project`, not read from the enacting act]
+    FY2026  0.10   R.C. 3317.017(C), as amended by H.B. 96          [verified]
+    FY2027  0.10   the same section, the same two-year scope        [verified]
+    FY2028  —      the section does not apply                       [verified]
+
+    The department's own `Notes` sheet states 0.1 for FY2026 and FY2027, which is how this
+    repository first established the value. The section says it too, and the section is the
+    stronger source: a departmental note records what the department did, and the statute
+    records what it was told to do. [verified]
+  statutory_basis: |
+    R.C. 3317.017(B)(1) and (C), read. Both divisions state the floor, once as a threshold on
+    the capacity-to-base-cost ratio (0.90) and once as a floor on the resulting percentage
+    (0.10). They are the same rule and they are algebraically equivalent, which is worth knowing
+    because a reader who finds one and not the other may conclude the floor applies only to the
+    payment or only to the percentage. [verified — `ohio-laws`]
+  simulation_key: |
+    `Policy::minimum_state_share`, defaulting to
+    `project::panel::MINIMUM_STATE_SHARE`.
+
+    **One of the four levers the scenario runner exposes, and the only one that had no node in
+    this class until now.** The others are the guarantee rule
+    ([guarantee-funding-base](guarantee-funding-base.yml)), the base cost scale
+    ([base-cost-per-pupil](base-cost-per-pupil.yml)) and the two phase-in percentages
+    ([fsfp-phase-in-percentage](fsfp-phase-in-percentage.yml)).
+  sensitivity: |
+    Binds at the wealthy end and nowhere else, so raising it is a transfer toward districts that
+    need it least and lowering it is a cut concentrated on the same districts. That is the
+    opposite shape from almost every other lever here, and it is why the floor is the one to
+    check before reading a distributional claim about a base cost change. [inference]
+
+    The number of districts it binds is not fixed. Raising base cost lifts districts *onto* the
+    floor — their capacity stops exceeding 90% of a larger base cost — and lowering it pushes
+    them off. So the count of 138 is a property of the FY2027 model rather than of the
+    parameter. [verified for the mechanism; the 138 is FY2027]
+
+    Interacts with the guarantee. A district on both the floor and the guarantee is insulated
+    twice, and the two mechanisms are usually described separately. [inference]
+unfilled:
+  - field: the enacting act and division that set 5%
+    why: >-
+      This repository carries the 5% figure in `crates/project` and in prose, without a citation
+      to H.B. 110 of the 134th General Assembly or to the version of R.C. 3317.017 it enacted.
+      Ohio Laws' version archive for the section is where the FY2022 text would be read.
+  - field: the value for FY2023 through FY2025
+    why: >-
+      Between the enactment and the current biennium the floor moved from 5% to 10% and the
+      corpus does not hold which budget act moved it or whether it moved once. The intervening
+      versions of R.C. 3317.017 would settle it.
+figures:
+  - key: project/districts-at-the-minimum-state-share
+    value: 138
+    field: description
+    as_written: "**For 138 of 609 districts it is the whole answer.**"
+  - key: project/model-districts
+    value: 609
+    field: description
+    as_written: "138 of 609 districts"
+  - key: regime-diff/charge-off-districts-censored
+    value: 138
+    field: findings
+    as_written: "138 districts are the\n  ones whose local capacity the minimum state share censors"
+links:
+  - target: ../parameter.ont.yml
+    relationship: instance-of
+  - target: ../formula-component/fsfp-local-capacity-measure.yml
+    relationship: consumed-by
+  - target: ../fiscal-period/fy2026-27.yml
+    relationship: valued-in
+  - target: ../legislation/hb-96-2025.yml
+    relationship: set-by
+  - target: ../scenario/fsfp-input-year-refresh.yml
+    relationship: perturbed-by
+  - target: ../scenario/guarantee-phase-out.yml
+    relationship: perturbed-by
+  - target: ../../catalog/ohio-revised-code.md
+    relationship: sourced-from
+  - target: ../../catalog/dew-fy27-funding-calculator.md
+    relationship: sourced-from

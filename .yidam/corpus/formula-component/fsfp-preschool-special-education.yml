@@ -112,6 +112,10 @@ links:
     relationship: governed-by
   - target: ../../catalog/dew-fy27-funding-calculator.md
     relationship: sourced-from
+  - target: ../parameter/preschool-special-education-amounts.yml
+    relationship: governed-by
+  - target: ../parameter/special-education-category-multiples.yml
+    relationship: governed-by
 revisions:
   - was: |
       At the stated 0.96854448 the program totals $148,408,184 against its own $147,500,000

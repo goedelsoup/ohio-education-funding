@@ -1,0 +1,152 @@
+class: parameter
+label: Disadvantaged Pupil Impact Aid Per-Pupil Amount
+summary: >-
+  $422 a pupil, times a district's economically disadvantaged index, times its count. The $422
+  and the index's squaring are in statute; the 65/35 blend that builds the count is in no
+  section of the Revised Code and is the department exercising a delegation.
+description: |
+  The largest categorical in the plan is one dollar figure with two multipliers on it. R.C.
+  3317.022(A)(4)(a)(i): `$422 × the district's economically disadvantaged index × the number of
+  students who are economically disadvantaged as certified under R.C. 3317.03(B)(21)`. [verified
+  — the section]
+
+  **The index is squared, and that is statutory.** R.C. 3317.02(I)(1) defines the economically
+  disadvantaged index and the squaring is in the definition rather than being a departmental
+  convention. [verified]
+
+  **The count is where the delegation lives.** The certified figure is a blend of two counts —
+  the economically disadvantaged ADM at 65% and the directly certified ADM at 35%. Those two
+  weights appear in **no section of the Revised Code**. R.C. 3317.03(B)(21) tells the department
+  what to certify and the department decides how; the 65/35 is that decision. [verified]
+
+  So a single line of the formula carries three different kinds of authority: a legislated
+  dollar amount, a legislated squaring, and a delegated blend that moves the count the dollar
+  amount multiplies.
+findings: |
+  ### The delegated half is the half that moved a district by 45%
+
+  The blend's first term is a **prior-year** count. Edgerton Local's enrolment fell from 504.48
+  in FY2025 to 342.38 in FY2026, so its FY2025 disadvantaged count of 497.21 is 98.6% of the
+  enrolment it was measured against and **145%** of the enrolment it is applied to. Three
+  districts sit at 98.6% against the measurement year and differ only in how much they shrank.
+  [verified]
+
+  Nothing in the statute produces that. The $422 is fixed, the index is defined, and the
+  dispersion is entirely in a count built by a rule the Revised Code does not contain. A reader
+  auditing this line against the section will not find the mechanism that generated the
+  outlier. [verified for the arithmetic; inference for the reading]
+
+  ### And a second vintage disagreement sits inside the same delegation
+
+  H.B. 96 sets the directly certified term on "the ADM ... for the fiscal year for which the
+  DPIA payment is calculated", and the LSC greenbook writes the FY2027 row out to match. The
+  department's FY2027 workbook carries **FY2026** in that column — its own header says `d1b FY26
+  Directly Certified ADM`. So 35% of the count is a year behind what the act asks for.
+  [verified — the workbook's header and vintage table]
+
+  ### DPIA is the one component with its own phase-in
+
+  R.C. 3317.022 writes two bracketed interpolation terms, one for divisions (A)(1), (2), (3),
+  (5), (6), (7) and (8) and one for (A)(4) alone, each against its own slice of the FY2020
+  funding base — and R.C. 3317.02(N)(2) anchors the DPIA slice to the district's **FY2019** DPIA
+  payment rather than to FY2020. In FY2022 the general phase-in was 16.67% and DPIA's was 0%,
+  which under an interpolation means DPIA was paid at 100% of its FY2019 amount. [verified]
+properties:
+  name: Disadvantaged pupil impact aid per-pupil amount
+  unit: dollars-per-pupil
+  kind: |
+    **Legislated in the amount, delegated in the count, and expiring in both.**
+
+    $422 is a digit in R.C. 3317.022(A)(4)(a)(i) and only an act moves it. The 65/35 blend is
+    the department's, made under the certification delegation in R.C. 3317.03(B)(21), and a
+    departmental decision needs no act at all — which is what makes it the harder half to audit:
+    it is not written anywhere a reader would look for it.
+
+    Division (A)(4)(a)(ii) hands FY2028 and thereafter to the General Assembly, so the $422 has
+    the same two-year life as almost everything else in the plan.
+
+    This node is the reason the taxonomy's `delegated` exists as a separate kind rather than
+    being folded into `uncodified`. The blend is not absent from law by oversight; the statute
+    deliberately assigns the decision, and "the department decided" is a different and more
+    answerable provenance than "nobody has found it".
+  series: |
+    FY2026  $422   R.C. 3317.022(A)(4)(a)(i)                        [verified]
+    FY2027  $422   the same division, same two-year scope           [verified]
+    FY2028  —      an amount calculated in a manner determined by
+                   the general assembly                             [verified]
+
+    Count construction, FY2027, delegated rather than statutory:
+
+      0.65   economically disadvantaged ADM, FY2025                 [verified]
+      0.35   directly certified ADM, FY2026 in the workbook against
+             FY2027 in the act                                      [verified]
+
+    Statewide inputs behind those weights, from the committed panel:
+
+      economically disadvantaged ADM   856,236
+      directly certified ADM           474,197
+
+    The statewide economically disadvantaged percentage the calculator carries for FY2027 is
+    0.533380310606710. [verified — crates/project]
+  statutory_basis: |
+    R.C. 3317.022(A)(4) for the programme and the $422; R.C. 3317.02(I)(1) for the index and its
+    squaring; R.C. 3317.03(B)(21) for the certification the count rests on; R.C. 3317.02(N)(2)
+    for the FY2019 anchor of DPIA's own phase-in slice. The component previously cited R.C.
+    3317.029, which does not exist. [verified — `ohio-laws`]
+  simulation_key: |
+    `project::panel::categoricals::DPIA_PER_PUPIL`, with `DPIA_BLEND` and
+    `DPIA_STATEWIDE_PERCENTAGE` beside it.
+
+    The amount is a constant with no lever. Its phase-in *is* a lever —
+    `Policy::phase_in_dpia`, separate from `phase_in_general` because the statute separates them
+    — so a scenario can move how much of the FY2019 base a district is held at and cannot move
+    the $422.
+  sensitivity: |
+    The largest categorical, and the one whose sensitivity is least about its own rate. $422
+    scales the whole programme linearly; the index squares, so it is the term that decides the
+    distribution; and the count is a delegated construction that has already produced a district
+    funded on 145% of its enrolment.
+
+    A proposal that raises the $422 is a proportional increase to every district in the
+    programme. A proposal that changes the 65/35 blend needs no legislation at all and can move
+    individual districts by more. Only the first will appear in a fiscal note. [inference]
+
+    Interacts with its own phase-in rather than the general one, which is the trap: at a general
+    phase-in of 50% and a DPIA phase-in of 0%, DPIA is paid in **full** at its FY2019 base while
+    everything else moves halfway to the computed amount. The corpus read that the other way
+    round for several phases. [verified]
+unfilled:
+  - field: the departmental instrument that sets 65/35
+    why: >-
+      The weights are the department's decision under R.C. 3317.03(B)(21) and are not in the
+      Revised Code. A rule in the Administrative Code, or the department's certification
+      guidance, is where the decision would be written down.
+  - field: the $422 before FY2026
+    why: >-
+      Prior versions of R.C. 3317.022 in Ohio Laws' version archive for the section. The
+      programme predates the Fair School Funding Plan under other names.
+figures:
+  - key: project/dpia-economically-disadvantaged-adm-statewide
+    value: 856236
+    field: series
+    as_written: "economically disadvantaged ADM   856,236"
+  - key: project/dpia-directly-certified-adm-statewide
+    value: 474197
+    field: series
+    as_written: "directly certified ADM           474,197"
+links:
+  - target: ../parameter.ont.yml
+    relationship: instance-of
+  - target: ../formula-component/fsfp-disadvantaged-pupil-impact-aid.yml
+    relationship: consumed-by
+  - target: ../fiscal-period/fy2026-27.yml
+    relationship: valued-in
+  - target: ../legislation/hb-96-2025.yml
+    relationship: set-by
+  - target: fsfp-phase-in-percentage.yml
+    relationship: interacts-with
+    note: DPIA's phase-in is a separate term against a FY2019 base, not the general FY2020 one.
+  - target: ../../catalog/ohio-revised-code.md
+    relationship: sourced-from
+  - target: ../../catalog/dew-fy27-funding-calculator.md
+    relationship: sourced-from
