@@ -1433,33 +1433,55 @@ tbody tr:last-child th, tbody tr:last-child td { border-bottom: 0; }
 /*
  * The mark the keyboard cursor is on.
  *
- * Two channels, as everywhere else on this site: an outline around the shape and a brightening of
- * it, so the cursor survives a forced-colours mode that discards the second. `outline` rather than
- * a `stroke`, because these marks are rects, circles and paths with strokes of their own that mean
- * something — a cursor drawn in the mark's own stroke would be indistinguishable from data.
+ * `outline` rather than a `stroke`, because these marks are rects, circles and paths with strokes
+ * of their own that mean something — a cursor drawn in the mark's own stroke would be
+ * indistinguishable from data.
  *
  * Set by `attachValues` in `src/lib/chart.ts`; there is never more than one on a page.
+ *
+ * # What the cursor actually lands on, which is not what this comment used to assume
+ *
+ * Measured over the built site: **319,060 `[data-hover]` elements across 2,652 pages, and every
+ * one of them is either `transparent` or `--series-formula`, with six on `--series-guarantee`.**
+ * Not one carries an ordinal token. Most charts draw an invisible hit layer above the marks —
+ * `.scatter-hit`, `.range-hit` — precisely so a reader can point at a district rather than at a
+ * 2.4px dot, and the cursor rings that layer.
+ *
+ * So the ring's own contrast question has exactly two answers, and both clear: the ink against
+ * `--series-formula` is 4.46 light and 3.64 dark, and against `--series-guarantee` 6.15 and 3.88.
+ * `tests/e2e/cursor.spec.ts` asserts that over `dist/` so a mark cannot quietly become hoverable
+ * in a colour the ink cannot clear.
+ *
+ * # `--ordinal-3`, and why it stopped being reachable
+ *
+ * The ink reaches only **1.87 light and 1.56 dark** against the raw `--ordinal-3` token, which is
+ * true and is asserted in `palette.spec.ts`. It is not reachable by the cursor:
+ *
+ *   - No hover target is filled with it, per the sweep above.
+ *   - Where the ramp is drawn on a scatter it is composited at `fill-opacity: 0.62`, and against
+ *     what is actually painted the ink clears — **5.30 light and 3.44 dark**.
+ *   - The one place it was drawn at full opacity *underneath this ring* was `/counties`, where a
+ *     `range-high` dot overhung its own hit band by the dot's radius and the ring ran through it.
+ *     `rangeSpec` insets the band by `DOT_RADIUS` now, so the dot is inside the band it belongs
+ *     to and the ring is outside both. That was the whole of #198's defect, in one chart, and not
+ *     the scatter the issue described.
+ *
+ * `--link` is not the alternative and never was. A ring surrounds a MARK here rather than sitting
+ * on a surface, no single hue on this palette clears 3:1 against every mark — the best available
+ * is 2.02:1 — and `--link` itself manages 1.19 light and 1.03 dark against the formula blue. The
+ * ink clears it because the ink is the one colour a chart never draws with.
+ *
+ * # One channel here, not two
+ *
+ * The rule elsewhere on this site is two channels, and the comment here used to claim them: an
+ * outline and a brightening. **`filter: brightness(1.2)` on a `fill: transparent` element
+ * brightens nothing**, so on every chart with a hit layer — which is 82% of the hover targets
+ * above — the cursor is the outline alone. It is kept because it is live on the bar charts, where
+ * the hover target is the bar itself, and because `outline` is the channel that survives a
+ * forced-colours mode either way. Giving a transparent target a real second channel is a change
+ * to what the cursor IS — the tried-and-rejected options are in #220, with the screenshots.
  */
 svg.plot [data-hover].at {
-  /*
-   * The ink, and NOT `--focus-ring`, which is the one place on the site those differ.
-   *
-   * The comment above is right and the colour under it was not: this ring was
-   * `var(--series-formula)`, which is the formula mark's own fill, so a keyboard cursor on a
-   * formula bar was a blue ring 1px outside a blue bar — 1.00:1, on the affordance a keyboard
-   * reader navigates by. `--ordinal-2` is the same colour again, so a scatter plot's middle
-   * class had it too.
-   *
-   * `--link` is not the fix. A ring surrounds a MARK here rather than sitting on a surface, and
-   * no single hue on this palette clears 3:1 against every mark: the best available is 2.02:1,
-   * and `--link` itself manages 1.19 light and 1.03 dark against the formula blue. The ink does
-   * clear it — 4.46 and 6.15 light, 3.64 and 3.88 dark against the two series marks — because
-   * the ink is the one colour a chart never draws with.
-   *
-   * It is not universal even so. `--ordinal-3` is a dark navy and the ink reaches only 1.87 light
-   * and 1.56 dark against it; there the `brightness(1.2)` second channel and the offset are what
-   * carry the cursor. Recorded rather than papered over.
-   */
   outline: 2px solid var(--text-primary);
   outline-offset: 1px;
   filter: brightness(1.2);
