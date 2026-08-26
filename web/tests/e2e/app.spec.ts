@@ -1303,6 +1303,92 @@ test.describe("a table that scrolls sideways", () => {
   });
 
   /**
+   * A formula that loses half its terms and still looks like a formula.
+   *
+   * temml serialises `<mspace width="0.1667em" />`. Inside `<math>` an HTML parser is in foreign
+   * content and honours that solidus — but every page here is re-serialised by `applySemantics`,
+   * which parses with linkedom, and linkedom drops it. What shipped was `<mspace width="…">`
+   * unclosed; `mspace` is an empty element, so the browser made the rest of the row its children
+   * and painted none of them.
+   *
+   * `\bigl( 0.6\,C_1 + 0.2\,C_2 + 0.2\,C_3 \bigr) \times C_6` rendered as "= ( 0.6".
+   *
+   * Nothing measured it as wrong. The row still reported 552px and still sat inside its box, so
+   * every geometric check on this page passed while four of five terms were missing. It was found
+   * by looking at a screenshot, and the assertion that catches it is structural rather than
+   * geometric: an empty MathML element may not have a child.
+   */
+  test("no empty MathML element in the build has swallowed its siblings", () => {
+    const DIST = join(import.meta.dirname, "../../dist");
+    const walk = (dir: string): string[] =>
+      readdirSync(dir, { withFileTypes: true }).flatMap((entry) =>
+        entry.isDirectory()
+          ? walk(join(dir, entry.name))
+          : entry.name.endsWith(".html")
+            ? [join(dir, entry.name)]
+            : [],
+      );
+
+    /*
+     * Checked by ADJACENCY and not by counting, and the difference is the whole test.
+     *
+     * Counting `<mspace` against `</mspace>` cannot see this bug, verified by trying it: linkedom
+     * parses the unclosed tag, makes the rest of the row its children, and re-serialises with a
+     * closing tag in the wrong place. The counts balance perfectly on markup that has swallowed
+     * four terms. For the same reason the artefact never contains a `/>` to look for — linkedom
+     * has already dropped the solidus by the time anything lands in `dist`.
+     *
+     * An empty element's open tag must be followed immediately by its close tag. That is a
+     * statement about structure, and it is one a text scan can still make because the markup is
+     * machine-generated and the two are always adjacent.
+     */
+    const EMPTY = ["mspace", "mprescripts", "none"];
+    let formulas = 0;
+    const unclosed: string[] = [];
+    for (const file of walk(DIST)) {
+      const page = readFileSync(file, "utf8");
+      if (!page.includes("<math")) continue;
+      formulas += (page.match(/<math\b/g) ?? []).length;
+      for (const tag of EMPTY) {
+        for (const match of page.matchAll(new RegExp(`<${tag}\\b[^>]*>`, "g"))) {
+          const after = page.slice(match.index + match[0].length);
+          if (!after.startsWith(`</${tag}>`)) {
+            unclosed.push(
+              `${file.slice(DIST.length + 1)}: <${tag}> is followed by ${after.slice(0, 40)}`,
+            );
+          }
+        }
+      }
+    }
+    expect(formulas, "the build carries rendered formulas at all").toBeGreaterThan(0);
+    expect(unclosed.slice(0, 5), "an empty MathML element that will eat the rest of its row").toEqual([]);
+  });
+
+  /**
+   * And a formula scrolls itself, like every other wide thing on this site.
+   *
+   * The scroll is on the `.formula` wrapper and never on the `<math>` element: measured, with
+   * `overflow-x: auto` on a `display: block math` box Chromium reports `scrollWidth ===
+   * clientWidth` while visibly cutting the last row in half.
+   */
+  test("a formula scrolls inside its own box and never the page", async ({ page }) => {
+    for (const width of [375, 1280]) {
+      await page.setViewportSize({ width, height: 900 });
+      await page.goto("/wiki/formula-component/fsfp-local-capacity-measure");
+      const state = await page.locator(".formula").first().evaluate((box) => ({
+        boxScrolls: box.scrollWidth > box.clientWidth + 1,
+        mathOverflow: getComputedStyle(box.querySelector("math")!).overflowX,
+        pageScrolls: document.documentElement.scrollWidth > document.documentElement.clientWidth + 1,
+        emptyWithChildren: [...box.querySelectorAll("mspace")].filter((e) => e.childNodes.length > 0).length,
+      }));
+      expect(state.pageScrolls, `the document scrolls sideways at ${width}px`).toBe(false);
+      expect(state.mathOverflow, "the scroll belongs to the wrapper, not the element").toBe("visible");
+      expect(state.emptyWithChildren, "an <mspace> has eaten the rest of its row").toBe(0);
+      if (width === 375) expect(state.boxScrolls, "a wide formula scrolls on a phone").toBe(true);
+    }
+  });
+
+  /**
    * A property name never prints on top of its own value.
    *
    * This is here because it happened. `table-layout: fixed` — added so an aligned block scrolls

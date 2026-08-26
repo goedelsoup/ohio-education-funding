@@ -23,6 +23,15 @@ properties:
   - name: calculator
     type: string
     description: Name of the crates/ calculator implementing this component, if implemented
+  - name: function_tex
+    type: text
+    description: >-
+      The same calculation as `function`, written in LaTeX so the site can set it in type. The
+      web build compiles it to MathML with Temml and holds the output to an enumerated allowlist;
+      a value that will not compile fails the build rather than rendering an error string. The
+      pair is deliberate — `function` stays the aligned ASCII a reader meets in the YAML — and
+      the two are two statements of one calculation, so they have to be kept saying the same
+      thing.
 # `edges:` below names the relationships this class is *defined by* — the ones a reader needs to
 # understand what it connects to. It is not the permitted set. A large share of the corpus's edges
 # use a relationship no class declares, and almost all of those are single-use precise verbs
