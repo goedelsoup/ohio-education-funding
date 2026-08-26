@@ -212,6 +212,25 @@ export const THRESHOLDS: Thresholds = {
   measureMax: 80,
 
   /*
+   * #188. A hard zero, and it is deterministic — a word count and a computed `text-align`, neither
+   * of which moves with the platform's font.
+   *
+   * The defect it closes was 21,333 cells over six words set right-aligned, on 1,433 of 3,492
+   * pages, because `td { text-align: right }` applied to every table and was corrected only for
+   * the ones tagged `.prose` — which was none of the fourteen on the district dashboard.
+   *
+   * Zero rather than a budget for the same reason `boxDecorative` is: there is no table on this
+   * site where a sentence wants to be ragged-left. `alignColumns` in `src/lib/semantics.ts` decides
+   * it per column from what the column holds, so a new table is covered the day it is written and
+   * nobody has to remember a class.
+   *
+   * This report walks eight routes and the defect was on 1,433 pages, so the threshold alone would
+   * have been satisfied by fixing five of them. The build-wide sweep in `tests/e2e/app.spec.ts` is
+   * the half that reads every page.
+   */
+  rightAlignedProse: 0,
+
+  /*
    * `sizeGap` is deliberately NOT set, and the metric it would have used is why.
    *
    * It was built to catch "a cluster and then a leap" — eleven sizes inside 3.7px and then 22.4px.

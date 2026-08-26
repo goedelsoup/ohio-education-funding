@@ -18,6 +18,8 @@ import { join, sep } from "node:path";
 import AxeBuilder from "@axe-core/playwright";
 import { expect, test, type Locator, type Page } from "@playwright/test";
 
+import { parseHTML } from "linkedom";
+
 import { FONT_PATH, readCmap, readWoff2Tables } from "../../src/lib/math-font.ts";
 import { REQUIRED_CONTRACT } from "../../src/lib/types.ts";
 
@@ -1442,6 +1444,71 @@ test.describe("a table that scrolls sideways", () => {
     expect(none.brace, "a font with no MATH table must not stretch, or this proves nothing").toBeLessThan(
       none.rows * 0.5,
     );
+  });
+
+  /**
+   * No sentence in any table on the site is set ragged-left, and no card opens with a `#`.
+   *
+   * Two sweeps in one walk, because both are about every page and the walk is the expensive part.
+   *
+   * `measure.ts` now carries `rightAlignedProse: 0`, and that is the deterministic gate — but the
+   * report it grades walks eight routes and the defect was on **1,433 of 3,492 pages**. Fixing the
+   * eight would have satisfied it. This is the half that reads the build.
+   *
+   * The anchor half is here rather than in `measure.ts` because it is not a number about layout:
+   * `section.ts` puts a muted `#` at the head of every heading and `alignColumns`' neighbour
+   * `moveAnchors` moves it to the end, and what has to hold afterwards is that no heading has one
+   * in front again — including a heading written at one of the 141 call sites that still put it
+   * there, which is exactly what this cannot be allowed to miss.
+   */
+  test("no sentence reads ragged-left, and no heading opens with its own address", () => {
+    const DIST = join(import.meta.dirname, "../../dist");
+    const walk = (dir: string): string[] =>
+      readdirSync(dir, { withFileTypes: true }).flatMap((entry) =>
+        entry.isDirectory()
+          ? walk(join(dir, entry.name))
+          : entry.name.endsWith(".html")
+            ? [join(dir, entry.name)]
+            : [],
+      );
+
+    const ragged: string[] = [];
+    const leading: string[] = [];
+    let cells = 0;
+    let anchors = 0;
+
+    for (const file of walk(DIST)) {
+      const where = file.slice(DIST.length + 1);
+      const html = readFileSync(file, "utf8");
+      const { document } = parseHTML(html);
+
+      for (const cell of document.querySelectorAll("td")) {
+        if (cell.closest("table")?.classList.contains("prose")) continue;
+        if (cell.classList.contains("says")) continue;
+        cells += 1;
+        const words = (cell.textContent ?? "").trim().split(/\s+/).filter(Boolean).length;
+        if (words > 6 && ragged.length < 5) {
+          ragged.push(`${where}: ${(cell.textContent ?? "").trim().slice(0, 60)}`);
+        }
+      }
+
+      /*
+       * "Opens with" is about the rendered text, not about being the first child. The title is a
+       * text node, so the anchor is the heading's first *element* either way — reading the
+       * heading's own words is the only version of this question that means anything.
+       */
+      for (const anchor of document.querySelectorAll("h1 a.section-anchor, h2 a.section-anchor, h3 a.section-anchor")) {
+        anchors += 1;
+        const heading = anchor.parentElement!;
+        const text = (heading.textContent ?? "").trim();
+        if (text.startsWith("#") && leading.length < 5) leading.push(`${where}: ${text.slice(0, 50)}`);
+      }
+    }
+
+    expect(cells, "the build carries right-aligned cells to check").toBeGreaterThan(1000);
+    expect(anchors, "the build carries section anchors to check").toBeGreaterThan(1000);
+    expect(ragged, "a sentence set ragged-left in a column of figures").toEqual([]);
+    expect(leading, "a card heading still opens with its own address").toEqual([]);
   });
 
   /**
@@ -3745,7 +3812,10 @@ test.describe("senate districts", () => {
   test("a district page links both chambers", async ({ page }) => {
     // Columbus spans eleven House seats and four Senate seats.
     await page.goto("/district/043802");
-    const sub = page.locator("p.sub").first();
+    // `[data-part]` rather than `p.sub`: #188 made this a labelled `<dl>`, and a test that names
+    // the element is a test that breaks when the markup is improved. Addressed by part, like the
+    // cards are, for the reason the card-locator note above gives.
+    const sub = page.locator('[data-part="identity"]').first();
     await expect(sub.locator('a[href^="/house/"]')).toHaveCount(11);
     await expect(sub.locator('a[href^="/senate/"]')).toHaveCount(4);
   });
@@ -3811,7 +3881,7 @@ test.describe("house districts", () => {
     // Columbus spans eleven. The reverse direction is the one a reader arriving from a legislative
     // page is asking about, so it has to be complete rather than a count.
     await page.goto("/district/043802");
-    const sub = page.locator("p.sub").first();
+    const sub = page.locator('[data-part="identity"]').first();
     await expect(sub.locator('a[href^="/house/"]')).toHaveCount(11);
   });
 

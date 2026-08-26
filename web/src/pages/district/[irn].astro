@@ -54,43 +54,82 @@ const description = district.on_guarantee
   section="districts"
 >
   <h1>{qualifiedName(district)}</h1>
-  <p class="sub">
-    IRN {district.irn} · <a href={routes.county(slugify(district.county))}>{district.county} County</a>
-    {/* Every House district this district lies in, largest share first. Linked individually
-        rather than counted: the reverse question — who represents these schools — is the one a
-        reader arriving from a legislative page is asking, and 28 of Ohio's districts share a name
-        so the seat number is often the clearer handle. */}
-    {/* Each `·` below opens its line behind an explicit {" "}, and every one of them needs it.
-        Astro trims a newline that sits against an element or an expression, so `County</a>` ran
-        straight into the separator on the next line and 609 pages shipped reading
-        `Cuyahoga County· Senate 18` — three of these per page, 1,827 in the build. It is the same
-        trimming `tests/unit/fusion.spec.ts` was written for, in the one shape neither that scan
-        nor the built-output sweep looked for: the fused thing is punctuation rather than a word. */}
-    {" "}· Senate {senateSeats.map((n, i) => (
-      <Fragment>
-        {i > 0 ? ", " : ""}<a href={routes.senateDistrict(n)}>{Number(n)}</a>
-      </Fragment>
-    ))}
-    {" "}· House {district.house_districts.map((h, i) => (
-      <Fragment>
-        {i > 0 ? ", " : ""}<a href={routes.houseDistrict(h.number)}>{Number(h.number)}</a>
-      </Fragment>
-    ))}
-    {" "}· {bundle.statewide.districts} districts in the FY{bundle.fiscal_year} model
-    {" "}· {district.on_guarantee ? "on the guarantee" : "on formula"}
-    {
-      district.at_millage_floor
-        ? (district.millage?.observed_rate ?? 20) < 19.995
-          ? " · below 20 mills"
-          : " · at the 20-mill floor"
-        : ""
-    }
-    {
-      district.economically_disadvantaged != null
-        ? ` · ${pct(district.economically_disadvantaged, 1)} economically disadvantaged`
-        : ""
-    }
-  </p>
+  {/*
+     The identity line, as a labelled set rather than a middot-joined sentence.
+
+     What it was: IRN, county, every Senate seat, every House seat, the model's district count,
+     the funding status, the millage position and the disadvantage share, all joined by `·`. On
+     the two districts that span the most seats — Columbus at 16 links, Cleveland at 14 — that is
+     a wall of underlined text before the reader reaches anything they can read.
+
+     It is a tail: measured across all 609 district pages the mean is 4.2 links and 572 of them
+     carry between three and six, so this is not the emergency the issue's "twenty" suggested. It
+     is still worth doing, because a label tells a reader what a number IS — `18, 21, 23, 24` is
+     meaningless without the word Senate in front of it, and in a run of middots that word is
+     doing double duty as both a label and a separator.
+
+     A `<dl>` because these are name/value pairs and that is what a description list is for. The
+     `<div>` wrappers are the grouping HTML5 allows inside one, and they are what lets each pair
+     stay together when the row wraps.
+
+     One hazard disappears with the middots. `check-dist-links.ts` scans every built page for a
+     `·` fused to an element boundary, because Astro trims a newline against an expression and
+     609 pages once shipped reading `Cuyahoga County· Senate 18` — 1,827 of them in the build.
+     That scan stays; this page simply stops being able to fail it.
+  */}
+  <dl class="facts" data-part="identity">
+    <div><dt>IRN</dt><dd>{district.irn}</dd></div>
+    <div>
+      <dt>County</dt>
+      <dd><a href={routes.county(slugify(district.county))}>{district.county}</a></dd>
+    </div>
+    {/* Every seat this district lies in, linked individually rather than counted: the reverse
+        question — who represents these schools — is the one a reader arriving from a legislative
+        page is asking, and 28 of Ohio's districts share a name so the seat number is often the
+        clearer handle. */}
+    <div>
+      <dt>Senate</dt>
+      <dd>
+        {senateSeats.map((n, i) => (
+          <Fragment>
+            {i > 0 ? ", " : ""}<a href={routes.senateDistrict(n)}>{Number(n)}</a>
+          </Fragment>
+        ))}
+      </dd>
+    </div>
+    <div>
+      <dt>House</dt>
+      <dd>
+        {district.house_districts.map((h, i) => (
+          <Fragment>
+            {i > 0 ? ", " : ""}<a href={routes.houseDistrict(h.number)}>{Number(h.number)}</a>
+          </Fragment>
+        ))}
+      </dd>
+    </div>
+    <div>
+      <dt>Funding</dt>
+      <dd>{district.on_guarantee ? "on the guarantee" : "on formula"}</dd>
+    </div>
+    {district.at_millage_floor && (
+      <div>
+        <dt>Millage</dt>
+        <dd>{(district.millage?.observed_rate ?? 20) < 19.995 ? "below 20 mills" : "at the 20-mill floor"}</dd>
+      </div>
+    )}
+    {district.economically_disadvantaged != null && (
+      <div>
+        <dt>Disadvantaged</dt>
+        <dd>{pct(district.economically_disadvantaged, 1)}</dd>
+      </div>
+    )}
+    {/* Not a fact about this district, and labelled so it does not read as one: it says what the
+        district is being counted among, which is the thing every figure below is relative to. */}
+    <div>
+      <dt>In the model</dt>
+      <dd>{bundle.statewide.districts} districts, FY{bundle.fiscal_year}</dd>
+    </div>
+  </dl>
 
   <DistrictNav irn={district.irn} current="dashboard" />
 

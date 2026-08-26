@@ -99,6 +99,7 @@ describe("the thresholds a phase has set", () => {
       sizeCount: 10, //    #186
       headingRatio: 2, //  #186
       measureMax: 80, //   #186, font-sensitive
+      rightAlignedProse: 0, // #188
     });
   });
 
@@ -112,7 +113,13 @@ describe("the thresholds a phase has set", () => {
     // `row()` is the pre-redesign district page: 30 boxes with 11 decorative, 13 sizes, an h1 at
     // 1.49x body and a paragraph at 110ch. Every threshold set should have something to say.
     const metrics = violations(report(row())).map((v) => v.metric).sort();
-    expect(metrics).toEqual(["boxDecorative", "headingRatio", "measureMax", "sizeCount"]);
+    expect(metrics).toEqual([
+      "boxDecorative",
+      "headingRatio",
+      "measureMax",
+      "rightAlignedProse",
+      "sizeCount",
+    ]);
   });
 
   test("and pass the page that came out of them", () => {
@@ -121,6 +128,9 @@ describe("the thresholds a phase has set", () => {
       sizes: [11.5, 12.5, 14, 15, 17, 21.5, 24, 38.5],
       headingRatio: 2.56,
       measure: { median: 71, p90: 75, max: 75, over78: 0, count: 42 },
+      // #188. `alignColumns` decides this per column from what the column holds, so the page that
+      // came out of the phase carries none rather than carrying few.
+      rightAlignedProse: 0,
     });
     expect(violations(report(after))).toEqual([]);
   });
