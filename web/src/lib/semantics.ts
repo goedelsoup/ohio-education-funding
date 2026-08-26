@@ -123,6 +123,30 @@ function nameScrollers(document: Document, order: Map<Element, number>): number 
     if (label === "") unnamed += 1;
     else box.setAttribute("aria-label", label);
   }
+
+  /*
+   * The aligned property blocks, which are the site's second kind of scrolling box.
+   *
+   * `pre.aligned` is `overflow-x: auto` and the corpus wraps its YAML at column 95, so these
+   * scroll on nearly every viewport — the widest needs 803px and the widest row offers 788. That
+   * is the situation the whole of this function exists for, arriving in a new element: a box a
+   * mouse can drag and a keyboard could not put focus in, holding the right-hand half of a
+   * piecewise rule.
+   *
+   * Named from the property name rather than from the heading above it, which is the one place
+   * this departs from `nameOf`. Every one of these sits under "Properties", so the heading names
+   * eight boxes the same thing; the spanning `<th>` immediately before each one says which
+   * property it is, and it is on the page for the same reason — a sighted reader uses exactly
+   * that word to know what they are looking at.
+   */
+  for (const block of document.querySelectorAll("pre.aligned")) {
+    block.setAttribute("tabindex", "0");
+    block.setAttribute("role", "group");
+    const row = block.closest("tr");
+    const name = row?.previousElementSibling?.textContent?.trim() ?? "";
+    if (name === "") unnamed += 1;
+    else block.setAttribute("aria-label", name);
+  }
   return unnamed;
 }
 

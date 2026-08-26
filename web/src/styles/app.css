@@ -1032,6 +1032,70 @@ tr.current th, tr.current td { color: var(--text-primary); font-weight: var(--we
    it, and so is the tabular figure width. */
 table.prose td { text-align: left; font-variant-numeric: normal; }
 table.prose th { width: 32%; }
+/*
+ * A property value whose columns carry meaning, rather than prose the author wrapped.
+ *
+ * `renderPropertyValue` joins single newlines with a space, which is right for 544 of the corpus's
+ * 601 multi-line property paragraphs and destroyed the other 57 — a formula component's `function`
+ * arrived as three piecewise branches run together with no separator between them. The ones that
+ * are blocks now arrive as blocks, and this is what they look like.
+ *
+ * Deliberately the same ground, radius and size as `.prose-body pre`: a reader meets an aligned
+ * block in a node's description and in its properties table, and there is no reason for those to
+ * be two different objects.
+ *
+ * `table-layout: fixed` is what lets the block scroll inside itself. Without it the cell sizes to
+ * its widest unbreakable content, the table outgrows the card, and the OUTER `.scroll` takes the
+ * scroll instead — so a reader dragging a wide formula sideways also drags its property name off
+ * the screen, which is the one column they need to keep.
+ */
+table.prose { table-layout: fixed; }
+/*
+ * A fixed column cannot grow for a long name, so the name has to be allowed to wrap.
+ *
+ * `statutory_basis` is fifteen monospace characters and the name column is 32% — 99px at 390px,
+ * against the 127px the word needs. Under the auto layout this table used to have, the column
+ * simply widened. Under `table-layout: fixed` it does not, and the word ran straight across its
+ * own cell boundary and printed on top of the value: "statutory_ba*stat*e share percentage".
+ *
+ * `anywhere` rather than `break-word` because these are snake_case identifiers with no break
+ * opportunity in them at all, which is the case `break-word` declines to handle.
+ */
+table.prose th, table.prose th code { overflow-wrap: anywhere; }
+pre.aligned {
+  overflow-x: auto;
+  margin: 0;
+  background: var(--surface-inset);
+  padding: var(--space-3) .7rem;
+  border-radius: var(--radius-md);
+  font-size: var(--text-base);
+  line-height: var(--leading-base);
+}
+/* Two blocks in one value are two paragraphs, and need the gap a `<br><br>` is not giving them. */
+pre.aligned + pre.aligned { margin-top: var(--space-3); }
+pre.aligned code { background: none; padding: 0; }
+
+/*
+ * A property whose value is a block gets its name ABOVE it rather than beside it.
+ *
+ * Not a preference. The widest block in the corpus is 95 characters — the column the corpus wraps
+ * its YAML at — and 95 characters needs 803px at this size. A two-column row gives the value 531px
+ * at a 1280px viewport, because the name column takes 257px of the 804px whatever the name is. So
+ * the block showed about two thirds of itself on a desktop and hid the right-hand third, which on
+ * a piecewise rule is every `then` value.
+ *
+ * It spans instead, in two rows. A first attempt gave the row `display: block`, which is the
+ * familiar responsive-table trick and is wrong here: it takes the row out of the table's layout
+ * entirely, and the block came back at 241px — worse than the 531 it started with.
+ *
+ * Two rows rather than one is a real cost and is accepted with the reason stated: this table has
+ * no header row and is a name/value list, so a spanning `<th>` reads as the label for the value
+ * under it. The alternative was a per-row column width, which `table-layout: fixed` does not have
+ * — and fixed layout is what keeps the block scrolling inside itself instead of dragging the
+ * property name off screen with it.
+ */
+table.prose tr.spanning-name th { border-bottom: 0; padding-bottom: var(--space-2); }
+table.prose tr.spanning-value td { padding-top: 0; }
 table { width: 100%; border-collapse: collapse; font-size: var(--text-base); }
 th, td { text-align: left; padding: .42rem .5rem; border-bottom: 1px solid var(--border); }
 thead th { color: var(--text-muted); font-size: var(--text-sm); text-transform: uppercase; letter-spacing: var(--tracking-caps); }
@@ -1810,5 +1874,8 @@ tr.series-break > td {
   thead { display: table-header-group; }
 
   /* A fenced block's only boundary is its ground, which does not print. */
-  .prose-body pre { border: 1px solid var(--border); }
+  .prose-body pre,
+  pre.aligned { border: 1px solid var(--border); }
+  /* Paper cannot scroll, so the one thing it can do with a wide block is wrap it. */
+  pre.aligned { white-space: pre-wrap; overflow-x: visible; }
 }

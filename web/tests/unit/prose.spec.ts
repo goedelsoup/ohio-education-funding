@@ -14,13 +14,15 @@
  * occurrences at the time of writing.
  */
 
-import { expect, test } from "vitest";
+import { describe, expect, test } from "vitest";
 
-import { countCorrections, FROM_DECISION, loadCorpus } from "../../src/lib/corpus.ts";
+import { countCorrections, FROM_DECISION, loadCorpus, resolveTarget } from "../../src/lib/corpus.ts";
+import { escapeHtml } from "../../src/lib/format.ts";
 import {
   badgeClaims,
   markCorrections,
   renderProse,
+  isBlockProperty,
   renderPropertyValue,
   summarize,
 } from "../../src/lib/prose.ts";
@@ -317,4 +319,123 @@ test("marking a correction leaves an anchor and does not touch a quotation", asy
   expect(marked).toContain('<blockquote class="correction" id="correction-1">');
   // The quotation keeps the bare tag, so the stylesheet can treat the two differently.
   expect(marked).toContain("<blockquote>\n<p>a quotation");
+});
+
+/**
+ * The alignment that was thrown away.
+ *
+ * `renderPropertyValue` joins single newlines with a space, and the comment above it is right
+ * about why: a newline in a YAML block scalar is usually where the author wrapped at column 95 and
+ * means nothing, and rendering those as `<br>` put line breaks mid-sentence on every multi-line
+ * property on the site.
+ *
+ * It is right for 544 of the corpus's 601 multi-line paragraphs and it destroyed the other 57.
+ * `fsfp-local-capacity-measure`'s `function` — the site's statement of how local capacity computes
+ * — shipped as "…if C4 >= C5 then 0.025 if C4 > 1 and C4 < C5 then ((C4-1) x 0.0025)/(C5-1) +
+ * 0.0225 if C4 <= 1 then C4 x 0.0225": three piecewise branches with nothing between them.
+ */
+describe("a property value whose columns carry meaning", () => {
+  const BLOCK = /<pre class="aligned">/;
+
+  test("is recognised by a column run, or by a continuation indent, and by nothing else", () => {
+    // Padding somebody typed to line a column up. Prose does not contain this on purpose.
+    expect(isBlockProperty("C1 Assessed Valuation  = V1 / ADM\nC2 Gross Income        = I1 / ADM")).toBe(true);
+    // A hanging indent under a numbered item, a bullet, or an expression broken across lines.
+    expect(isBlockProperty("[K] = max( [L1] FY21 Funding Base\n           - ( [H] Foundation Funding ),\n           0 )")).toBe(true);
+    // Wrapped prose, which is the overwhelming majority and must not move.
+    expect(isBlockProperty("Three consecutive years of an overall grade of \"F\" under R.C.\n3302.03(C)(3), or an overall grade of D.")).toBe(false);
+    // One line is never a block: there is no alignment to preserve in a single line.
+    expect(isBlockProperty("R.C. 3317.017;   state share at 3317.017(B).")).toBe(false);
+  });
+
+  test("keeps its line breaks and its columns, where the old rule ran them together", () => {
+    const html = renderPropertyValue(
+      "C6 Local Capacity Percentage = if C4 >= C5              then 0.025\n" +
+        "                               if C4 <= 1               then C4 x 0.0225",
+      "formula-component",
+    );
+    expect(html).toMatch(BLOCK);
+    expect(html).toContain("then 0.025\n");
+    // The interior padding is what lines the `then` column up, and is the whole point.
+    expect(html).toMatch(/C5 {2,}then/);
+  });
+
+  test("strips trailing whitespace, which is invisible and widens the scroll box", () => {
+    const html = renderPropertyValue("a  = 1   \nbb = 2", "metric");
+    expect(html).toContain("a  = 1\nbb = 2");
+  });
+
+  test("still badges a claim tag inside a block", () => {
+    // Safe only because the tags sit at the ends of lines — measured, 43 tagged lines inside
+    // blocks and every one carries its tag at or past the last column, so nothing a reader is
+    // comparing moves. A badge in the middle of a block would break the alignment under it.
+    const html = renderPropertyValue(
+      "FY2026  83.33%  H.B. 96  [verified]\nFY2027  100%    H.B. 96  [verified]",
+      "parameter",
+    );
+    expect(html).toMatch(BLOCK);
+    expect(html).toContain('class="claim verified"');
+  });
+
+  /**
+   * The corpus drives this rather than a fixture, so a property written tomorrow is covered today.
+   *
+   * The count is asserted loosely on purpose: pinning it exactly would fail on every corpus commit
+   * that adds an aligned property, which is a change this test should welcome rather than block.
+   * What it does pin is that the known-worst offenders are among them.
+   */
+  test("every aligned property in the corpus renders as a block", () => {
+    const blocks = corpus.nodes.flatMap((node) =>
+      node.properties
+        .filter((property) => BLOCK.test(renderPropertyValue(property.value, node.className)))
+        .map((property) => `${node.id}#${property.name}`),
+    );
+    expect(blocks.length, "aligned property values in the corpus").toBeGreaterThan(30);
+    for (const known of [
+      "formula-component/fsfp-local-capacity-measure#function",
+      "formula-component/fsfp-transportation#function",
+      "formula-component/fsfp-targeted-assistance#function",
+      "litigation/derolph-ii-2000#procedural_history",
+      "parameter/fsfp-phase-in-percentage#series",
+    ]) {
+      expect(blocks, `${known} is an aligned block and must render as one`).toContain(known);
+    }
+  });
+
+  /**
+   * And the 544 that are prose are byte-identical to what shipped.
+   *
+   * This is the assertion that makes the change safe to ship: it touches every property on 3,492
+   * pages, and "I only changed the aligned ones" is exactly the sort of claim that is true when
+   * written and false three commits later. The old rule is reproduced here as the oracle rather
+   * than described, so the comparison is against behaviour rather than against a summary of it.
+   */
+  test("and every property that is not a block renders exactly as it did before", () => {
+    const before = (value: string, fromClass: string): string =>
+      badgeClaims(
+        escapeHtml(value)
+          .replace(/\[([^[\]]+)\]\(([^)\s]+)\)/g, (_whole, label: string, target: string) => {
+            const href = /^(https?:|\/)/.test(target) ? target : resolveTarget(target, fromClass).href;
+            return `<a href="${href}">${label}</a>`;
+          })
+          .replace(/`([^`]+)`/g, "<code>$1</code>"),
+      )
+        .split(/\n\s*\n/)
+        .map((paragraph) => paragraph.replace(/\s*\n\s*/g, " ").trim())
+        .filter((paragraph) => paragraph !== "")
+        .join("<br><br>");
+
+    const drifted: string[] = [];
+    let unchanged = 0;
+    for (const node of corpus.nodes) {
+      for (const property of node.properties) {
+        if (isBlockProperty(property.value)) continue;
+        const now = renderPropertyValue(property.value, node.className);
+        if (now === before(property.value, node.className)) unchanged += 1;
+        else drifted.push(`${node.id}#${property.name}`);
+      }
+    }
+    expect(drifted, "non-block properties whose rendering moved").toEqual([]);
+    expect(unchanged, "properties checked against the old rule").toBeGreaterThan(600);
+  });
 });

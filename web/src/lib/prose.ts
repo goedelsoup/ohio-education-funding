@@ -362,6 +362,59 @@ export async function renderProse(markdown: string, fromClass: string): Promise<
 }
 
 /**
+ * Is this paragraph a block whose columns carry meaning, or prose the author wrapped?
+ *
+ * The distinction has to be drawn because {@link renderPropertyValue} joins lines with a space,
+ * and that is right for one of these and destroys the other. `fsfp-local-capacity-measure`'s
+ * `function` — the site's statement of how local capacity computes — shipped as "…if C4 >= C5 then
+ * 0.025 if C4 > 1 and C4 < C5 then …", three piecewise branches run together with no separator.
+ *
+ * Two signals, and a paragraph needs only one:
+ *
+ * - **an interior column run** — two or more spaces between non-space characters, which is padding
+ *   somebody typed to line a column up and which prose never contains on purpose;
+ * - **a continuation indent** — any line after the first that begins with whitespace, which is a
+ *   hanging indent under a numbered item, a bullet list, or an expression broken across lines.
+ *
+ * Measured against the whole corpus: 57 of 601 multi-line paragraphs in property values are
+ * blocks, on `function`, `series`, `series_path`, `definition`, `procedural_history`, `powers`,
+ * `results`, `perturbations`, `remedy` and `fy2022_inputs`. The other 544 are prose and keep
+ * exactly the rendering they had — `prose.spec.ts` asserts that byte for byte rather than trusting
+ * it, because this touches every property on 3,492 pages.
+ *
+ * Being wrong in the two directions costs differently, which is why the signals are what they are.
+ * Prose misread as a block gets ragged line breaks and stays readable. A block misread as prose is
+ * the defect above, and is not.
+ */
+function isAlignedBlock(lines: string[]): boolean {
+  if (lines.length < 2) return false;
+  return (
+    lines.some((line) => /\S {2,}\S/.test(line)) || lines.slice(1).some((line) => /^\s+\S/.test(line))
+  );
+}
+
+/**
+ * Does this property render as an aligned block, so the table can give it the whole row?
+ *
+ * Measured, and this is why it is not a styling detail: the widest block in the corpus is 95
+ * characters, because that is the column the corpus wraps its YAML at. At the properties table's
+ * size, 95 characters needs 803px — and the two-column row gives a value 531px at a 1280px
+ * viewport, because the name column takes 257px of it whether the name is `function` or `name`.
+ *
+ * So a block laid out beside its name shows about two thirds of itself on a desktop, and the third
+ * it hides is the right-hand one: the `then` values of a piecewise rule, which is the half a reader
+ * came for. Given the whole row it fits at 1000px and above. A phone still scrolls, as
+ * `.prose-body pre` already does, and no arrangement of a 95-character block fits 390px.
+ */
+export function isBlockProperty(value: string): boolean {
+  return value
+    .split(/\n\s*\n/)
+    .some((paragraph) =>
+      isAlignedBlock(paragraph.split("\n").filter((line) => line.trim() !== "")),
+    );
+}
+
+/**
  * Render one property value: a short string that is usually a claim with a tag on the end.
  *
  * Not put through the markdown processor — these are values in a table, and wrapping each in a
@@ -370,29 +423,56 @@ export async function renderProse(markdown: string, fromClass: string): Promise<
  *
  * Because it escapes rather than sanitizes, this never renders markup a node wrote; the two paths
  * reach the same guarantee by different means.
+ *
+ * # Paragraphs, and the one that is not a paragraph
+ *
+ * A blank line is a deliberate break; a single newline is where the author wrapped the YAML block
+ * scalar at column 95 and means nothing. Preserving both as `<br>` put line breaks mid-sentence in
+ * every multi-line property on the site, so single newlines are joined — and that is correct for
+ * 544 of the corpus's 601 multi-line paragraphs and destroys the other 57. See
+ * {@link isAlignedBlock} for which is which.
+ *
+ * Claim tags are still badged inside a block. A badge is not the same width as the text it
+ * replaces, so this can only be safe if the tags sit at the ends of lines: measured, 43 tagged
+ * lines inside blocks and every one of them carries its tag at or past the last column, so nothing
+ * a reader is comparing moves.
  */
 export function renderPropertyValue(value: string, fromClass: string): string {
-  const escaped = escapeHtml(value)
-    // Inline links, which several properties carry. The label may not contain a bracket: a
-    // property that writes `[verified — [the department's page](…)]` nests one link inside one
-    // claim tag, and a label pattern that ran across the inner `[` captured "verified — [the
-    // department's page" as the anchor text and left the `]` dangling after it.
-    .replace(/\[([^[\]]+)\]\(([^)\s]+)\)/g, (_whole, label: string, target: string) => {
-      const href = /^(https?:|\/)/.test(target) ? target : resolveTarget(target, fromClass).href;
-      return `<a href="${href}">${label}</a>`;
+  const inline = (text: string): string =>
+    badgeClaims(
+      escapeHtml(text)
+        // Inline links, which several properties carry. The label may not contain a bracket: a
+        // property that writes `[verified — [the department's page](…)]` nests one link inside one
+        // claim tag, and a label pattern that ran across the inner `[` captured "verified — [the
+        // department's page" as the anchor text and left the `]` dangling after it.
+        .replace(/\[([^[\]]+)\]\(([^)\s]+)\)/g, (_whole, label: string, target: string) => {
+          const href = /^(https?:|\/)/.test(target) ? target : resolveTarget(target, fromClass).href;
+          return `<a href="${href}">${label}</a>`;
+        })
+        // Backticks, which they carry more often.
+        .replace(/`([^`]+)`/g, "<code>$1</code>"),
+    );
+
+  const chunks = value
+    .split(/\n\s*\n/)
+    .map((paragraph) => {
+      const lines = paragraph.split("\n").filter((line) => line.trim() !== "");
+      if (lines.length === 0) return null;
+      if (isAlignedBlock(lines)) {
+        // Trailing whitespace on a line is invisible in the source and would widen the scroll box.
+        return { block: true, html: `<pre class="aligned">${inline(lines.map((l) => l.replace(/\s+$/, "")).join("\n"))}</pre>` };
+      }
+      const joined = inline(paragraph.replace(/\s*\n\s*/g, " ").trim());
+      return joined === "" ? null : { block: false, html: joined };
     })
-    // Backticks, which they carry more often.
-    .replace(/`([^`]+)`/g, "<code>$1</code>");
-  return (
-    badgeClaims(escaped)
-      // A blank line is a deliberate break; a single newline is where the author wrapped the YAML
-      // block scalar at column 95 and means nothing. Preserving both as `<br>` put line breaks
-      // mid-sentence in every multi-line property on the site.
-      .split(/\n\s*\n/)
-      .map((paragraph) => paragraph.replace(/\s*\n\s*/g, " ").trim())
-      .filter((paragraph) => paragraph !== "")
-      .join("<br><br>")
-  );
+    .filter((chunk): chunk is { block: boolean; html: string } => chunk !== null);
+
+  // `<br><br>` between two prose paragraphs, which is what shipped and what the 544 expect. A
+  // `<pre>` is block-level and brings its own separation, so a `<br>` beside one is a blank line
+  // nobody asked for.
+  return chunks
+    .map((chunk, i) => (i > 0 && !chunk.block && !chunks[i - 1]!.block ? "<br><br>" : "") + chunk.html)
+    .join("");
 }
 
 /**

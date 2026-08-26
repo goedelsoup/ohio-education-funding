@@ -248,3 +248,28 @@ test("paper is told where the page may break", () => {
     expect(broken, `${target} may be sliced across a page break`).toBe(true);
   }
 });
+
+/**
+ * An aligned property block scrolls inside itself, and the two declarations that make it do that.
+ *
+ * The corpus wraps its YAML at column 95, so no block is wider than 95 characters — which needs
+ * 803px at this size, against 788px the widest card row can offer. A block is therefore going to
+ * scroll on nearly every viewport, and WHAT scrolls is the whole question.
+ *
+ * Without `table-layout: fixed` the cell sizes to its widest unbreakable content, the table
+ * outgrows the card, and the outer `.scroll` takes the scroll instead — so a reader dragging a
+ * piecewise rule sideways to reach its `then` values drags the property name off the screen with
+ * it. Both declarations are load-bearing and neither looks it, which is what this is for.
+ */
+test("a block property scrolls itself rather than the table around it", () => {
+  const declares = (selector: RegExp, property: RegExp): boolean =>
+    rules(selector).some(([, body]) => property.test(body));
+  expect(
+    declares(/^pre\.aligned$/, /overflow-x\s*:\s*auto/),
+    "pre.aligned must scroll inside itself",
+  ).toBe(true);
+  expect(
+    declares(/^table\.prose$/, /table-layout\s*:\s*fixed/),
+    "without fixed layout the cell sizes to content and the outer .scroll takes over",
+  ).toBe(true);
+});
