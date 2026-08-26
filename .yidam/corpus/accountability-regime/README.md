@@ -29,4 +29,4 @@ changed when ESSA replaced it. [open]
 
 **The pre-2022 report card eras are not modelled.** The star scale replaced letter grades for the
 2022-23 report cards and both remain in statute; anything before that is absent, which means the
-class cannot currently be read against the Bridge formula decade it overlaps. [unentered]
+class cannot currently be read against the Bridge formula decade it overlaps. [open]

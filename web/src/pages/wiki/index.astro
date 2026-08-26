@@ -89,11 +89,33 @@ const recentlyCorrected = corpus.decisions
       Every substantive claim carries its epistemic status inline:{" "}
       <span class="claim verified">verified</span> against a named source,{" "}
       <span class="claim inference">inference</span> drawn from what is verified, or{" "}
-      <span class="claim open">open</span> — a question asked and not yet answered. A fourth mark,{" "}
-      <span class="claim unentered">unentered</span>, is not a fourth level of confidence: it says
-      a field has nothing in it yet, where <span class="claim open">open</span> says the corpus
-      has taken a position on how much it does not know. Those badges are the corpus's own, not
-      this site's editorialising.
+      <span class="claim open">open</span> — a question asked and not yet answered. Those badges
+      are the corpus's own, not this site's editorialising.
+    </p>
+    {/*
+     * The fourth state, shown in the treatment it actually has rather than in a fourth badge.
+     *
+     * This paragraph used to render `<span class="claim unentered">` directly, and it was the
+     * last place on the site that did: `prose.ts` stopped emitting the class when the mark was
+     * retired, and `app.css` deleted the variant rule beside a comment saying a rule for it here
+     * would match nothing. True of the corpus, and not true of this page — so the span fell
+     * through to the base `.claim`, whose solid rule is `verified`'s exact treatment. On the one
+     * page that explains the difference between the marks, the retired one was drawn as the
+     * strongest of the three, and in greyscale it was indistinguishable from it.
+     *
+     * The replacement is `.unfilled-field`, which is not a fourth style invented for a legend: it
+     * is what a node page draws, so a reader who follows this to a node meets the thing they were
+     * shown. Off the support axis is the whole claim being made, and a mark that looks like the
+     * other three cannot make it.
+     */}
+    <p class="note">
+      There is no fourth badge, and for a long time there was. A field nobody has filled in is not
+      a weaker grade of support — it is the absence of a claim to grade — and set inline, in the
+      same brackets as the three above, it read as a rung below <span class="claim open">open</span>{" "}
+      whatever it wore. It is structure now: the node names the missing fact and where the value
+      lives, and the page renders those as a block headed{" "}
+      <em>What this node does not hold</em> — <span class="unfilled-field">the department's
+      typology code</span>, and then the sentence saying where to get it.
     </p>
   </div>
 

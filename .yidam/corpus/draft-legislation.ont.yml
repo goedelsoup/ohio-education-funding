@@ -56,7 +56,10 @@ properties:
     description: Numbered General Assembly the bill is before, where it is before one
   - name: sponsors
     type: text
-    description: Who introduced it, and any joint sponsors. `[unentered]` where it was not introduced
+    description: >-
+      Who introduced it, and any joint sponsors. "None." where the draft was never introduced —
+      which is an answer rather than an empty field, because a bill nobody introduced has no
+      sponsors and never will.
   - name: status
     type: text
     description: >-

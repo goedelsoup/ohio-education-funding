@@ -23,8 +23,11 @@ dollar-denominated parameter.
    with its session-law citations at *DeRolph I* ¶97 and nowhere more conveniently.
 3. **Record the base as well as the rate.** A rate applied to a changed base is a changed
    parameter even when the number is identical.
-4. **Mark gaps as gaps.** A missing year is `[open]` if nobody knows and `[unentered]` if the
-   source is open and nobody has typed it in.
+4. **Mark gaps as gaps, and on the right axis.** A missing year is `[open]` if nobody knows —
+   that is a claim about the state of knowledge and it belongs inline with the other three marks.
+   If the source is open and nobody has typed the value in there is no claim to grade, so it is
+   not a mark at all: add an `unfilled:` entry naming the missing fact and where the value lives.
+   That renders as a block on the node rather than as a fourth badge in somebody's sentence.
 
 ## Two failures worth expecting
 

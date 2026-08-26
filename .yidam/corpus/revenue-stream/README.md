@@ -61,4 +61,4 @@ None of the three federal nodes carries a per-district series. Title I and ESSER
 not retrieved by any connector; IDEA Part B is
 [catalogued](../../catalog/ode-idea-part-b-allocations.md) with a known reader and no connector,
 which makes it extraction work rather than a blocker. The aggregate federal channel per district
-is available for FY2022 only, from the Census F-33. [unentered]
+is available for FY2022 only, from the Census F-33. [verified]

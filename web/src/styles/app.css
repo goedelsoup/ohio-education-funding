@@ -1713,7 +1713,14 @@ h1.slug-title {
  * `.claim.unentered` used to sit here, dashed and unsaturated, trying to be off the support axis
  * while still being inline on it. That mark is gone: an empty field is carried as `unfilled:`
  * structure on the node and rendered as a block. `prose.ts` no longer emits the class, and
- * `prose.spec.ts` fails if it starts again — so a rule for it here would match nothing.
+ * `prose.spec.ts` fails if it starts again.
+ *
+ * The sentence that used to end this section read "so a rule for it here would match nothing",
+ * and it was measured against `prose.ts` alone. `/wiki` was writing the class into its markup by
+ * hand — so the selector matched, fell through to the base rule, and drew the retired mark with
+ * `verified`'s solid rule on the page whose whole subject is telling the marks apart. Deleting a
+ * variant is not the same as deleting the class, and only the built page knows the difference.
+ * That markup is gone too; `stylesheet.spec.ts` now checks the rendering rather than the source.
  */
 .claim {
   display: inline;
@@ -1897,7 +1904,10 @@ footer.site { border-top: 1px solid var(--border); padding-top: var(--space-6); 
   max-width: var(--measure-note);
 }
 .unfilled + .unfilled { margin-top: var(--space-4); }
-.unfilled > .unfilled-field {
+/* Not `.unfilled > .unfilled-field`. `/wiki` explains the vocabulary and has to show this one,
+   and a child combinator meant the sample there rendered as unstyled body text — which on a page
+   whose sentence is "it is not a badge" left nothing at all to look at. */
+.unfilled-field {
   font-weight: var(--weight-semibold);
   color: var(--text-secondary);
 }

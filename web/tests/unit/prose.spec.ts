@@ -14,6 +14,9 @@
  * occurrences at the time of writing.
  */
 
+import { readdirSync, readFileSync } from "node:fs";
+import { join, relative, sep } from "node:path";
+
 import { describe, expect, test } from "vitest";
 
 import { countCorrections, FROM_DECISION, loadCorpus, resolveTarget } from "../../src/lib/corpus.ts";
@@ -118,6 +121,68 @@ test("no node writes the retired fourth mark, and the structure replaced it", ()
         .not.toBeNull();
     }
   }
+});
+
+/**
+ * The same rule, over the prose *beside* the nodes — and the distinction that makes it checkable.
+ *
+ * The guard above reads nodes. It was written when the migration was about nodes, and five marks
+ * survived outside its reach: three in class READMEs, one in an ontology `description:` that
+ * renders on `/wiki/draft-legislation`, and one in `skills/parameter-history.md` telling whoever
+ * writes the next parameter node to use the mark. The last is the one that mattered — a retired
+ * convention in an instruction regenerates itself.
+ *
+ * # Record or instruction, not code or prose
+ *
+ * The obvious rule is the one {@link badgeClaims} uses: a tag inside backticks is the author
+ * *naming* a mark rather than asserting one. It is the wrong rule here, and the counts say so.
+ * Of the thirteen surviving mentions, eleven sat inside backticks — and two of those eleven were
+ * the ontology description and the skill, which are as live as any node.
+ *
+ * What separates them is what the file is FOR. A decision record and the corpus README's own
+ * account of the migration are history: they exist to say that this mark was added, argued with
+ * and withdrawn, and rewriting them to have always been right is the one thing
+ * `.yidam/corpus/README.md` says the corpus never does. Everything else — a class README, an
+ * ontology, a skill, a node — answers "how do I write this today", and there the answer is that
+ * the mark does not exist.
+ *
+ * So records may name it, inside code, where `badgeClaims` will not assert it. Instructions may
+ * not name it at all.
+ */
+test("the retired mark survives only where the corpus is recording that it retired it", () => {
+  const YIDAM = join(import.meta.dirname, "../../../.yidam");
+  const files = (dir: string): string[] =>
+    readdirSync(dir, { withFileTypes: true }).flatMap((entry) =>
+      entry.isDirectory()
+        ? files(join(dir, entry.name))
+        : /\.(md|yml)$/.test(entry.name)
+          ? [join(dir, entry.name)]
+          : [],
+    );
+
+  /** History. It says the mark existed, which is true, and it is not rewritten. */
+  const isRecord = (path: string) =>
+    path.includes(`${sep}decisions${sep}`) || path.endsWith(join("corpus", "README.md"));
+  const withoutCode = (text: string) =>
+    text.replace(/```[\s\S]*?```/g, "").replace(/`[^`\n]*`/g, "");
+
+  const asserted: string[] = [];
+  const taught: string[] = [];
+  for (const path of files(YIDAM)) {
+    const text = readFileSync(path, "utf8");
+    if (!text.includes("[unentered")) continue;
+    const where = relative(YIDAM, path);
+    for (const [n, line] of text.split("\n").entries()) {
+      if (!line.includes("[unentered")) continue;
+      if (!isRecord(path)) taught.push(`${where}:${n + 1}`);
+      else if (withoutCode(line).includes("[unentered")) asserted.push(`${where}:${n + 1}`);
+    }
+  }
+
+  expect(taught, "a file that says how to write a node today must not name the retired mark")
+    .toEqual([]);
+  expect(asserted, "a record may name the mark, inside code, where nothing will badge it")
+    .toEqual([]);
 });
 
 test("no claim tag survives as literal brackets anywhere in the corpus", () => {

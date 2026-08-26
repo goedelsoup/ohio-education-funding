@@ -9,8 +9,8 @@
  * A rule with no check is a preference. That is the whole reason for this file.
  */
 
-import { readFileSync } from "node:fs";
-import { resolve } from "node:path";
+import { readdirSync, readFileSync } from "node:fs";
+import { join, relative, resolve } from "node:path";
 
 import { expect, test } from "vitest";
 
@@ -60,11 +60,47 @@ test("a claim mark carries no border, background or radius", () => {
   expect(offenders).toEqual([]);
 });
 
-test("there are exactly three claim status classes", () => {
-  const statuses = new Set(
-    [...CSS.matchAll(/\.claim\.([a-z]+)/g)].map(([, status]) => status!),
-  );
-  expect([...statuses].sort()).toEqual(["inference", "open", "verified"]);
+/**
+ * Three status classes in the stylesheet, and the same three in the markup.
+ *
+ * The second half is the half that was missing, and it cost a live defect. This test read the
+ * stylesheet alone, so when `.claim.unentered` was deleted it went green and stayed green while
+ * `/wiki` — the page that exists to explain the marks — went on writing `class="claim unentered"`
+ * by hand. With no variant rule the span fell through to the base `.claim`, whose solid rule is
+ * `verified`'s exact treatment, so the retired mark was drawn as the strongest of the three. In
+ * greyscale, which is the channel the rule styles exist to survive, they were identical.
+ *
+ * Deleting a variant is not the same as deleting the class. Only reading both sides says so.
+ *
+ * Block comments are stripped from the source for the reason this file's header already gives:
+ * the paragraph documenting that defect necessarily contains the markup that caused it.
+ */
+test("there are exactly three claim status classes, in the stylesheet and in the markup", () => {
+  const STATUSES = ["inference", "open", "verified"];
+  const styled = new Set([...CSS.matchAll(/\.claim\.([a-z]+)/g)].map(([, status]) => status!));
+  expect([...styled].sort()).toEqual(STATUSES);
+
+  const SRC = resolve(process.cwd(), "src");
+  const sources = (dir: string): string[] =>
+    readdirSync(dir, { withFileTypes: true }).flatMap((entry) =>
+      entry.isDirectory()
+        ? sources(join(dir, entry.name))
+        : /\.(ts|astro|css)$/.test(entry.name)
+          ? [join(dir, entry.name)]
+          : [],
+    );
+
+  const written: string[] = [];
+  for (const path of sources(SRC)) {
+    const code = readFileSync(path, "utf8").replace(/\/\*[\s\S]*?\*\//g, "");
+    // Only a literal status is matched. `badgeClaims` writes `class="claim ${tag}"` from its own
+    // tag list, and what constrains that list is asserted in `prose.spec.ts`, where the vocabulary
+    // lives. This is for the hand-written ones, which is where the fourth mark survived.
+    for (const [, status] of code.matchAll(/class="claim ([a-z]+)"/g)) {
+      if (!STATUSES.includes(status!)) written.push(`${relative(SRC, path)}: class="claim ${status}"`);
+    }
+  }
+  expect(written, "markup writing a claim status the stylesheet does not draw").toEqual([]);
 });
 
 /**
