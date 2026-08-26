@@ -470,14 +470,27 @@ describe("a property value whose columns carry meaning", () => {
   });
 
   /**
-   * And the 544 that are prose are byte-identical to what shipped.
+   * And the 544 that are prose are byte-identical to what shipped, **emphasis excepted**.
    *
-   * This is the assertion that makes the change safe to ship: it touches every property on 3,492
-   * pages, and "I only changed the aligned ones" is exactly the sort of claim that is true when
-   * written and false three commits later. The old rule is reproduced here as the oracle rather
-   * than described, so the comparison is against behaviour rather than against a summary of it.
+   * This is the assertion that makes a change to this renderer safe to ship: it touches every
+   * property on 3,506 pages, and "I only changed the aligned ones" is exactly the sort of claim
+   * that is true when written and false three commits later. The old rule is reproduced here as
+   * the oracle rather than described, so the comparison is against behaviour rather than against
+   * a summary of it.
+   *
+   * # Why it is no longer *exactly* as before, and how it keeps its teeth
+   *
+   * #216 added `**bold**` and `*italic*`, which by construction moves 209 and 53 cells. Adding
+   * those to the oracle would make the test compare a reimplementation against itself and assert
+   * nothing at all.
+   *
+   * So the emphasis is **undone** before the comparison — `<strong>x</strong>` back to `**x**` —
+   * and the result must still be byte-identical to the old rule. That keeps the whole of the
+   * original guarantee: every property whose rendering moved for any reason other than emphasis
+   * is still named, and the count of properties that did gain emphasis is asserted separately so
+   * the change cannot silently reach nothing.
    */
-  test("and every property that is not a block renders exactly as it did before", () => {
+  test("and every property that is not a block renders exactly as it did before, emphasis aside", () => {
     const before = (value: string, fromClass: string): string =>
       badgeClaims(
         escapeHtml(value)
@@ -492,18 +505,39 @@ describe("a property value whose columns carry meaning", () => {
         .filter((paragraph) => paragraph !== "")
         .join("<br><br>");
 
+    /**
+     * The one difference this test licenses, put back so everything else must match.
+     *
+     * `[\s\S]*?` and not `[^<]*`: the corpus writes `**\`Am. Sub.\` is not confirmed**` and
+     * `**[the plan](…)**`, so emphasis routinely wraps a tag the earlier passes already emitted.
+     * A body that stopped at `<` failed to undo exactly those, and the test reported them as
+     * drift — which is the right failure for the wrong reason, and would have been read as the
+     * renderer breaking links.
+     *
+     * Strong is undone before em so a nested pair unwinds outside-in. Neither can nest in itself:
+     * both patterns run on `[^*]`, which cannot cross the delimiter that would open a second one.
+     */
+    const unemphasised = (html: string): string =>
+      html
+        .replace(/<strong>([\s\S]*?)<\/strong>/g, "**$1**")
+        .replace(/<em>([\s\S]*?)<\/em>/g, "*$1*");
+
     const drifted: string[] = [];
     let unchanged = 0;
+    let emphasised = 0;
     for (const node of corpus.nodes) {
       for (const property of node.properties) {
         if (isBlockProperty(property.value)) continue;
         const now = renderPropertyValue(property.value, node.className);
-        if (now === before(property.value, node.className)) unchanged += 1;
+        if (/<(strong|em)>/.test(now)) emphasised += 1;
+        if (unemphasised(now) === before(property.value, node.className)) unchanged += 1;
         else drifted.push(`${node.id}#${property.name}`);
       }
     }
-    expect(drifted, "non-block properties whose rendering moved").toEqual([]);
+    expect(drifted, "non-block properties whose rendering moved for a reason other than emphasis").toEqual([]);
     expect(unchanged, "properties checked against the old rule").toBeGreaterThan(600);
+    // The other direction: a renderer that emphasised nothing would satisfy everything above.
+    expect(emphasised, "properties that gained emphasis").toBeGreaterThan(40);
   });
 });
 
@@ -556,5 +590,73 @@ describe("a property value that is a list", () => {
         phrases.length,
       );
     }
+  });
+});
+
+/**
+ * Emphasis in a property cell.
+ *
+ * `renderPropertyValue` handled inline links and backticks and not emphasis, so the asterisks
+ * shipped. Measured over the built site before the fix: **209 bold pairs across 67 of the 226 wiki
+ * pages, and 53 italic pairs across 33** — including case names, which is where it read worst:
+ * `*DeRolph II*` and `*Columbus City School Dist. v. State*` in the middle of a sentence about
+ * them.
+ *
+ * The description above each table has always rendered both, because that path goes through the
+ * markdown processor. So the corpus was writing one convention and the page was honouring it in
+ * one of the two places it appears.
+ */
+describe("emphasis in a property value", () => {
+  test("renders bold and italic, and nests a link or a code span inside either", () => {
+    expect(renderPropertyValue("the **operative** mechanism", "parameter")).toBe(
+      "the <strong>operative</strong> mechanism",
+    );
+    expect(renderPropertyValue("in *DeRolph II* the court", "litigation")).toBe(
+      "in <em>DeRolph II</em> the court",
+    );
+    // Both of these read as drift until the oracle's undo was widened to reach them.
+    expect(renderPropertyValue("**`Am. Sub.` is not confirmed**", "fiscal-period")).toBe(
+      "<strong><code>Am. Sub.</code> is not confirmed</strong>",
+    );
+    expect(
+      renderPropertyValue("[*DeRolph I*](../litigation/derolph-i-1997.yml) held", "parameter"),
+    ).toContain("<em>DeRolph I</em>");
+  });
+
+  test("bold wins over italic where they would both match", () => {
+    // `**x**` read italic-first is an empty `<em>` wrapping `*x*`, which is why the order matters.
+    expect(renderPropertyValue("**x**", "metric")).toBe("<strong>x</strong>");
+    expect(renderPropertyValue("*a* and *b*", "metric")).toBe("<em>a</em> and <em>b</em>");
+  });
+
+  test("and leaves arithmetic alone, which is the only other thing an asterisk means here", () => {
+    /*
+     * Three occurrences in the corpus and every one is a product: `enrolled-adm`'s projection line
+     * and `dispersion::of`'s `q * (n - 1)`. The guard is adjacency — an emphasis delimiter has a
+     * non-space immediately inside it and a product has spaces on both sides.
+     */
+    const formula = "value = ADM[last] * PROD over h of (1 + rate * damping^h)";
+    expect(renderPropertyValue(formula, "metric")).not.toContain("<em>");
+    expect(renderPropertyValue("R type 7 on `q * (n - 1)`", "metric")).not.toContain("<em>");
+    // A snake_case identifier is not italic either, which is why underscores are not emphasis.
+    expect(renderPropertyValue("`exp_per_equivalent_pupil_federal`", "metric")).not.toContain(
+      "<em>",
+    );
+  });
+
+  test("no property in the corpus still ships an emphasis delimiter", () => {
+    /*
+     * The whole-corpus form, which catches a shape the four cases above do not have. An asterisk
+     * surviving into the output is either emphasis this did not reach or a delimiter the author
+     * left unclosed, and both are worth a failure. A spaced ` * ` is arithmetic and is exempt.
+     */
+    const left: string[] = [];
+    for (const node of corpus.nodes) {
+      for (const property of node.properties) {
+        const html = renderPropertyValue(property.value, node.className).replace(/\s\*\s/g, " ");
+        if (html.includes("*")) left.push(`${node.id}#${property.name}`);
+      }
+    }
+    expect(left, "a property value still carrying an emphasis delimiter").toEqual([]);
   });
 });
