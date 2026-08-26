@@ -342,3 +342,5 @@ links:
     relationship: operationalizes
   - target: ../../catalog/dew-fy27-funding-calculator.md
     relationship: sourced-from
+  - target: ../parameter/dpia-per-pupil-amount.yml
+    relationship: governed-by

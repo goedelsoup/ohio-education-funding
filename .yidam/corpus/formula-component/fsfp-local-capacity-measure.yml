@@ -302,3 +302,7 @@ links:
     relationship: determines
   - target: ../../catalog/dew-sfpr-line-by-line.md
     relationship: sourced-from
+  - target: ../parameter/local-capacity-percentage.yml
+    relationship: governed-by
+  - target: ../parameter/minimum-state-share.yml
+    relationship: governed-by

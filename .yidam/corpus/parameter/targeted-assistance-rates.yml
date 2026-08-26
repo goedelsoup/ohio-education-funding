@@ -1,0 +1,148 @@
+class: parameter
+label: Targeted Assistance Rates
+summary: >-
+  Two tiers with different arithmetic: a capacity tier charging 0.008 against the gap to median
+  weighted wealth, and a wealth tier whose two coefficients deliberately differ — 0.014 against
+  the median and 0.0112 against the district. The mismatch is the policy.
+description: |
+  Targeted assistance pays a district the sum of a capacity amount and a wealth amount, and the
+  two are built differently. [verified — R.C. 3317.0217]
+
+  **The capacity tier** takes the gap between statewide median weighted wealth and the
+  district's own, at **0.008** on each side, and then scales it by district size: zero below 200
+  enrolled ADM, 5% of the computed amount from 200 to 400, a linear ramp from 5% to 100% between
+  400 and 600, and the whole amount at 600 and above. Weighted wealth is itself a blend — 60%
+  of the valuation term and 40% of the aggregate income term from R.C. 3317.017, which is a
+  *different* blend from the 60/20/20 the
+  [local capacity percentage](local-capacity-percentage.yml) uses. [verified]
+
+  **The wealth tier** is where the arithmetic stops being symmetric. The formula is
+  `[(median weighted wealth per pupil × 0.014) − (the district's weighted wealth per pupil ×
+  0.0112)] × enrolled ADM`, and the two coefficients are not the same number. A district
+  exactly at the median does not get zero: it gets `median × 0.0028 × ADM`. The tier pays
+  something to every district down to a wealth index of 0.8, below which it pays nothing.
+  [verified — the section]
+
+  That asymmetry is easy to read as a transcription error and it is in the statute. Both figures
+  appear in the same bracketed expression in division (C)(4)(b), to four and three decimals
+  respectively. [verified]
+findings: |
+  ### The size ramp is a cliff and a ramp, not one shape
+
+  Below 200 ADM a district gets nothing from the capacity tier. At 200 it gets 5%. That is a
+  discontinuity: one pupil across the threshold is worth nineteen twentieths of the amount still
+  withheld, and then the remaining 95% arrives gradually across the next two hundred pupils. A
+  district of 199 and a district of 201 are treated as different kinds of thing. [verified for
+  the schedule; inference for the reading]
+
+  Whether the 200 floor is an administrative de minimis or a policy about very small districts
+  is not stated in the section. [open]
+
+  ### Two blends of the same wealth terms, in two sections
+
+  R.C. 3317.0217(B)(1) blends the valuation and aggregate income terms 60/40. R.C.
+  3317.017(A)(5) blends valuation, aggregate income and adjusted median income 60/20/20. They
+  draw on the same certified data and produce different quantities, both called weighted wealth
+  in the ordinary sense, and a reader who carries one definition into the other section will be
+  wrong about which districts are poor. [verified]
+properties:
+  name: Targeted assistance rates
+  unit: ratio
+  kind: |
+    **Legislated, and expiring.** Every coefficient and every bracket is a digit in R.C.
+    3317.0217, so only an act moves them while they apply — and the section opens *"This section
+    shall apply only for fiscal years 2026 and 2027"*, so nothing has to happen for them to
+    stop.
+
+    The medians the rates are charged against are **measured**: statewide median weighted wealth
+    and median weighted wealth per pupil are statistics of the district panel, recomputed each
+    year. So the rate is legislated and the thing it is charged against is not, which is the
+    same two-level structure [base-cost-per-pupil](base-cost-per-pupil.yml) has.
+  series: |
+    Capacity tier, R.C. 3317.0217(B):
+
+      0.6 / 0.4   weighted wealth blend — valuation term, aggregate income term
+      0.008       against median weighted wealth and against the district's, both sides
+      < 200 ADM   capacity amount is zero
+      200-400     0.05 of the computed amount
+      400-600     [0.95 × (ADM − 400) / 200] + 0.05 of it
+      >= 600      the whole amount
+      index < 1   capacity amount is zero
+
+    Wealth tier, R.C. 3317.0217(C):
+
+      0.014       against median weighted wealth per pupil
+      0.0112      against the district's weighted wealth per pupil
+      index < 0.8 wealth amount is zero
+
+    FY2026 and FY2027 only. [verified]
+
+    FY2027 medians, from the department's model rather than from statute. [verified —
+    crates/project]
+      median weighted wealth            $392,151,306.63
+      median weighted wealth per pupil     $276,708.97
+  statutory_basis: |
+    R.C. 3317.0217, read. (B) for the capacity tier including the size brackets, (C) for the
+    wealth tier and its two coefficients, and (B)(1) for the 60/40 weighted wealth blend that
+    refers back to divisions (A)(1)(a) and (A)(2)(a) of R.C. 3317.017. Payment is made under
+    R.C. 3317.022(A). [verified — `ohio-laws`]
+  simulation_key: |
+    `project::panel::categoricals::TA_CAPACITY_RATE`, `TA_WEALTH_RATE`,
+    `TA_WEALTH_OFFSET_RATE`, `TA_WEALTH_BLEND`, `TA_CAPACITY_MINIMUM_ADM`,
+    `TA_CAPACITY_RAMP_START`, `TA_CAPACITY_FULL_AT`, `TA_CAPACITY_SMALL_SHARE` and
+    `TA_WEALTH_INDEX_FLOOR`.
+
+    Nine constants, no lever. This is the parameter with the most separate dials in the plan and
+    the scenario runner can move none of them.
+  sensitivity: |
+    The 0.014 / 0.0112 asymmetry is the tier's whole progressivity, and it is not obvious from
+    either number alone. Setting the two equal would make the tier pay nothing at the median and
+    turn it into a pure gap-closing formula; the 0.0028 residual is what makes it pay every
+    district above the 0.8 index. A proposal that "simplifies" the coefficients to one number is
+    a substantive cut whatever number is chosen. [inference]
+
+    The size brackets are the sensitivity nobody prices. They are counts, not dollars, so a
+    fiscal note on a rate change will not show that a district crossing 200, 400 or 600 pupils
+    moves discontinuously in the capacity tier regardless of its wealth. [inference]
+
+    Both tiers are charged against medians of the district panel, so a change in the
+    *distribution* of Ohio's district wealth moves this programme with no enactment at all.
+    [inference]
+unfilled:
+  - field: the targeted assistance total, statewide
+    why: >-
+      The corpus binds the capacity tier's two medians but not what the programme pays in
+      aggregate. `crates/project`'s panel computes it per district and the figure manifest has
+      no key for the sum.
+  - field: the rates before FY2026
+    why: >-
+      H.B. 96's version is the one held. Prior versions of R.C. 3317.0217 in Ohio Laws' version
+      archive would give the FY2022-25 schedule, and the section's own two-year scope means each
+      biennium has one.
+figures:
+  - key: project/targeted-assistance-median-weighted-wealth
+    value: 392151306.63298076
+    field: series
+    as_written: "median weighted wealth            $392,151,306.63"
+  - key: project/targeted-assistance-median-wealth-per-pupil
+    value: 276708.97
+    field: series
+    as_written: "median weighted wealth per pupil     $276,708.97"
+links:
+  - target: ../parameter.ont.yml
+    relationship: instance-of
+  - target: ../formula-component/fsfp-targeted-assistance.yml
+    relationship: consumed-by
+  - target: ../fiscal-period/fy2026-27.yml
+    relationship: valued-in
+  - target: ../legislation/hb-96-2025.yml
+    relationship: set-by
+  - target: local-capacity-percentage.yml
+    relationship: shares-inputs-with
+    note: >-
+      Both blend the same certified valuation and income terms, and they blend them differently
+      — 60/40 here against 60/20/20 there.
+  - target: ../../catalog/ohio-revised-code.md
+    relationship: sourced-from
+  - target: ../../catalog/dew-fy27-funding-calculator.md
+    relationship: sourced-from

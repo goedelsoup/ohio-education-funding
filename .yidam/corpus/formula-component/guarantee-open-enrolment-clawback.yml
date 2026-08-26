@@ -139,3 +139,5 @@ links:
     relationship: measured-in
   - target: ../../catalog/dew-fy27-funding-calculator.md
     relationship: sourced-from
+  - target: ../parameter/base-cost-per-pupil.yml
+    relationship: governed-by

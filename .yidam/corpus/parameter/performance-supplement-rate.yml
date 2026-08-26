@@ -1,0 +1,156 @@
+class: parameter
+label: Performance Supplement Rate
+summary: >-
+  $13 a pupil per qualifying rating — the only place Ohio's funding formula pays on a measured
+  outcome. It is in no section of the Revised Code, and per pupil it runs 2.6 times higher in
+  the least-poor fifth of districts than in the poorest.
+description: |
+  The performance supplement pays `$13 × enrolled ADM` for each of three routes a district can
+  qualify on: an overall star rating at or above 3.5, a progress rating at or above 3.0, and a
+  third route the department computes on its own sheet. $55.7m statewide to 427 of 609
+  districts. [verified]
+
+  **It is the only component of Ohio's funding formula that pays on a measured outcome.**
+  Everything else prices an input — pupils, categories, miles, poverty — or holds a district at
+  a historical amount. This prices the report card. [verified for the mechanism; inference for
+  the "only"]
+
+  Neither the $13 nor the two thresholds is in R.C. 3317. The department computes the supplement
+  on its own sheet and reports it as line [O]; the authority is H.B. 96's temporary law, which
+  `codes.ohio.gov` does not carry and which lapses with the biennium unless re-enacted.
+  [verified]
+findings: |
+  ### Per pupil it runs 2.6 times higher at the top of the wealth distribution
+
+  Mean supplement per pupil by fifth of districts, poorest to least poor: $21.84, $30.62,
+  $35.62, $43.51, $55.92. The least-poor fifth receives **2.56 times** what the poorest does per
+  pupil. [verified]
+
+  The mechanism is qualification rather than rate: 94% of the least-poor fifth qualifies against
+  **47%** of the poorest. The rate is the same $13 everywhere and the outcome it is paid on is
+  not evenly distributed. [verified]
+
+  ### Which makes it the one line where the formula's gradient runs the wrong way
+
+  Every other component in the plan either equalises on wealth, weights on need, or pays flat.
+  This one pays more per pupil to districts with less poverty, and it does so through a rate
+  nobody would call regressive on its face. A per-pupil amount paid on an outcome that tracks
+  poverty is a wealth gradient with an extra step in it. [inference]
+
+  Whether that is the intended design — a reward, which by construction goes to those who
+  qualify — or an unexamined consequence, is not established by anything this corpus holds.
+  [open]
+properties:
+  name: Performance supplement rate
+  unit: dollars-per-pupil
+  kind: |
+    **Uncodified.** Not in R.C. 3317.022, and not in any other section this corpus cites. The
+    statute audit searched them all; the $13 and the three routes are transcribed from the
+    department's own sheet.
+
+    Its authority is the budget act's temporary law, so it has the same three properties as the
+    [enrolment supplements](enrolment-supplement-amounts.yml): the text is not on
+    `codes.ohio.gov`, there is no version archive to read a prior value out of, and it ends with
+    the biennium by default.
+
+    Being uncodified matters more here than it does for a flat per-pupil grant. This parameter
+    encodes a policy judgment — that the state should pay on measured performance — and it
+    encodes it in a document that is not part of permanent law and that nobody has to vote to
+    let expire.
+  series: |
+    FY2027, from the department's calculator:
+
+      $13     per pupil, per qualifying route                    line [O]
+      3.5     overall star rating threshold
+      3.0     progress rating threshold
+
+    Scale, from the committed panel. [verified — crates/project]
+      statewide                                  $55,676,980.25
+      districts qualifying                          427 of 609
+
+    Mean per pupil by poverty fifth:
+      poorest                                            $21.84
+      second                                             $30.62
+      third                                              $35.62
+      fourth                                             $43.51
+      least poor                                         $55.92
+      the ratio between the ends                          2.56x
+
+    Share of districts qualifying:
+      least-poor fifth                                    94.2%
+      poorest fifth                                       47.2%
+
+    No prior-year values are held. [open]
+  statutory_basis: |
+    None. Not in R.C. 3317.022 and not in any other section of the Revised Code; the rate and the
+    routes are transcribed from the department's sheet, where the supplement is line [O]. The
+    authority is H.B. 96's temporary law. [verified — the statute audit]
+  simulation_key: |
+    `project::panel::supplements::PERFORMANCE_SUPPLEMENT_PER_POINT`, with
+    `PERFORMANCE_STAR_THRESHOLD` and `PERFORMANCE_PROGRESS_THRESHOLD`.
+
+    Constants, no lever.
+  sensitivity: |
+    The rate and the thresholds move different things. $13 scales the whole supplement and does
+    not change who receives it; the two thresholds change who receives it and not the rate.
+    Because qualification already runs 94% against 47% across the wealth range, a threshold
+    change is a distributional lever and a rate change is not. [inference]
+
+    The supplement's cost is a function of the report card, so it moves when ratings move — with
+    no enactment, and on a schedule the funding system does not control. A projection of this
+    line is a projection of statewide school performance. [inference]
+
+    It interacts with nothing else in the formula. It is added after the phase-in and outside
+    the guarantee's base, so unlike the categoricals it is not multiplied by anything. [verified
+    — `crates/project`]
+unfilled:
+  - field: the enrolled act's text and division
+    why: >-
+      H.B. 96's temporary law is where the rate and the three routes live and `codes.ohio.gov`
+      does not carry it. The enrolled act as published by the General Assembly would fix the
+      wording of the third route, which is the one this corpus describes least precisely.
+  - field: the FY2022-25 values
+    why: >-
+      No version archive exists for an uncodified parameter. The prior budget act and its LSC
+      greenbook are where an earlier rate would be.
+figures:
+  - key: project/performance-supplement-total
+    value: 55676980.25
+    field: series
+    as_written: "statewide                                  $55,676,980.25"
+  - key: project/performance-supplement-poorest-quintile
+    value: 21.840000012937647
+    field: findings
+    as_written: "$21.84, $30.62,\n  $35.62, $43.51, $55.92"
+  - key: project/performance-supplement-least-poor-quintile
+    value: 55.92148724630777
+    field: findings
+    as_written: "$21.84, $30.62,\n  $35.62, $43.51, $55.92"
+  - key: project/performance-supplement-gradient
+    value: 2.5605076562811733
+    field: findings
+    as_written: "**2.56 times** what the poorest does per\n  pupil"
+  - key: project/performance-supplement-qualifying-least-poor
+    value: 0.9421487603305785
+    field: findings
+    as_written: "94% of the least-poor fifth qualifies"
+  - key: project/performance-supplement-qualifying-poorest
+    value: 0.472
+    field: findings
+    as_written: "against\n  **47%** of the poorest"
+links:
+  - target: ../parameter.ont.yml
+    relationship: instance-of
+  - target: ../formula-component/fsfp-performance-supplement.yml
+    relationship: consumed-by
+  - target: ../fiscal-period/fy2026-27.yml
+    relationship: valued-in
+  - target: ../legislation/hb-96-2025.yml
+    relationship: set-by
+  - target: ../doctrine/equity.yml
+    relationship: bears-on
+    note: The one line in the formula whose per-pupil gradient runs with wealth rather than against it.
+  - target: ../../catalog/dew-fy27-funding-calculator.md
+    relationship: sourced-from
+  - target: ../../catalog/lsc-hb96-analysis.md
+    relationship: sourced-from

@@ -1,0 +1,147 @@
+class: parameter
+label: Gifted Funding Rates
+summary: >-
+  Five numbers across two sections: $24 a pupil to identify, $2.50 a pupil to refer, and three
+  unit salaries of $85,776, $89,378 and $80,974. The unit prices are salaries the General
+  Assembly writes down, which is unusual — nothing else in the plan prices a post.
+description: |
+  Gifted funding is paid in two shapes and the statute keeps them in two sections.
+
+  **Per pupil, in R.C. 3317.022(A)(6)(a).** Identification is `$24 × enrolled ADM for
+  kindergarten through six × state share percentage`; referral is `$2.50 × enrolled ADM × state
+  share percentage`. Note the different denominators: identification is paid on the K-6 count
+  and referral on the whole district. [verified — the section]
+
+  **Per unit, in R.C. 3317.051.** A district is allocated one gifted coordinator unit per 3,300
+  enrolled ADM, floored at 0.5 units and capped at 8; one K-8 intervention specialist unit per
+  140 identified gifted pupils, floored at 0.3; and one 9-12 specialist unit per 140, floored at
+  0.3. Each unit is then priced: **$85,776** for a coordinator, **$89,378** for a K-8 specialist
+  and **$80,974** for a 9-12 specialist, each times the district's state share percentage.
+  [verified]
+
+  **The unit prices are salaries, stated by the General Assembly.** Everywhere else the plan
+  prices a *pupil* — a weight times a base cost times a count. Here it prices a *post*, and it
+  writes three different figures for what are three different jobs. The K-8 specialist is priced
+  above the coordinator and the 9-12 specialist below both; the section gives no reason.
+  [verified for the figures; open for the ordering]
+
+  The unit floors do most of the distributional work at the small end. A district of any size
+  gets at least half a coordinator unit and at least three tenths of each specialist unit, so a
+  district with almost no identified gifted pupils is still funded for a fraction of two posts.
+  [verified for the floors; inference for the effect]
+findings: |
+  ### The cap is a cap on large districts and there is no analogue elsewhere
+
+  Eight coordinator units is the maximum however large the district. At one unit per 3,300
+  enrolled ADM, the cap binds above 26,400 pupils — which is a handful of Ohio districts, and
+  they are the largest. No other component in the plan stops paying at a size threshold.
+  [verified for the arithmetic; inference for the comparison]
+
+  ### Identification funding runs against the districts most likely to under-identify
+
+  The share of pupils a district identifies as gifted falls with poverty and rises with property
+  wealth across the district panel — r = −0.67 against poverty and r = +0.35 against valuation
+  per pupil. [verified — crates/project] Identification funds are paid on the K-6 *enrolled* count
+  rather than on identified pupils, so that part is neutral; unit funding is paid on the
+  *identified* count, so it is not. A district that identifies fewer gifted pupils receives
+  fewer specialist units to identify and serve them. [verified for the correlations; inference
+  for the mechanism]
+
+  ### And the whole schedule is written for two years
+
+  Division (B)(2) of R.C. 3317.051 hands unit allocation to the General Assembly for FY2028 and
+  thereafter; (C)(2) does the same for the unit prices; and R.C. 3317.022(A)(6)(b) does it for
+  identification and referral — with the referral payment carrying an additional condition, "if
+  the general assembly authorizes such a payment". Referral funding is the one line in this
+  parameter whose continuation the statute explicitly declines to assume. [verified]
+properties:
+  name: Gifted funding rates
+  unit: dollars-per-pupil
+  kind: |
+    **Legislated, through FY2027.**
+
+    All five figures and all four unit divisors and bounds are digits in the two sections. Only
+    an act moves them while they apply, and no act is required for them to stop: both sections
+    hand FY2028 onward to the General Assembly, and the referral payment is handed over with an
+    explicit "if the general assembly authorizes such a payment".
+
+    The unit prices deserve a note of their own. A price on a post is a legislated *salary
+    assumption*, and it does not move with the labour market — so it behaves like a legislated
+    parameter in law and like a deteriorating one in substance, in the way a nominal figure
+    always does. The corpus's `deflator` is the tool for that and no constant-dollar companion
+    series exists here yet.
+  series: |
+    Per pupil, R.C. 3317.022(A)(6)(a), FY2026-27:
+
+      $24.00   gifted identification, on enrolled ADM for grades K-6
+      $2.50    gifted referral, on the whole district's enrolled ADM
+
+    Per unit, R.C. 3317.051, FY2026-27:
+
+      $85,776  gifted coordinator unit            1 per 3,300 enrolled ADM, min 0.5, max 8
+      $89,378  K-8 intervention specialist unit   1 per 140 identified gifted pupils, min 0.3
+      $80,974  9-12 intervention specialist unit  1 per 140 identified gifted pupils, min 0.3
+
+    Each unit amount is multiplied by the district's state share percentage. [verified]
+
+    FY2028 and thereafter: allocation, prices, identification and referral are each "determined
+    by the general assembly", and the section states no value. [verified]
+  statutory_basis: |
+    R.C. 3317.022(A)(6)(a) for identification and referral; R.C. 3317.051(B) for unit allocation
+    and (C) for unit prices. This node's component previously cited R.C. 3317.053, which does
+    not exist — the second wrong citation the statute audit turned up. [verified — `ohio-laws`]
+  simulation_key: |
+    `project::panel::categoricals::GIFTED_IDENTIFICATION_PER_PUPIL`,
+    `GIFTED_REFERRAL_PER_PUPIL`, `GIFTED_COORDINATOR_DIVISOR`, `GIFTED_COORDINATOR_UNIT_BOUNDS`,
+    `GIFTED_COORDINATOR_UNIT_PRICE`, `GIFTED_SPECIALIST_DIVISOR`, `GIFTED_SPECIALIST_UNIT_FLOOR`
+    and `GIFTED_SPECIALIST_UNIT_PRICES`.
+
+    Eight constants, no lever.
+  sensitivity: |
+    The two per-pupil rates and the three unit prices move different money in different
+    directions. Identification and referral scale with enrolment and reach every district; unit
+    funding scales with identified pupils and with the floors, so it reaches small districts
+    disproportionately at the bottom and stops scaling at the top.
+
+    A proposal that raises "gifted funding" by a percentage therefore has no single
+    distributional answer until it says which of the five numbers it raises. [inference]
+
+    The unit floors are the sensitivity that will not show in a rate change at all. A district
+    at the 0.3 specialist floor is funded on the floor rather than on its count, so its payment
+    does not respond to identifying more pupils until it crosses 42 of them — 0.3 of 140.
+    [inference]
+unfilled:
+  - field: what the programme totals statewide
+    why: >-
+      `crates/project`'s panel computes gifted identification, referral and unit funding per
+      district; the figure manifest carries neither the total nor the split between the three
+      unit types.
+  - field: why the three unit prices differ
+    why: >-
+      R.C. 3317.051(C)(1) states $85,776, $89,378 and $80,974 and gives no derivation. The Fair
+      School Funding Plan workgroup's costing papers are where a salary basis would be.
+  - field: the rates before FY2026
+    why: >-
+      Prior versions of R.C. 3317.051 and 3317.022 in Ohio Laws' version archive.
+figures:
+  - key: project/gifted-identification-falls-with-poverty
+    value: 0.6725985512946641
+    field: findings
+    as_written: "r = \u22120.67 against poverty"
+  - key: project/gifted-identification-rises-with-property-wealth
+    value: 0.34834053443544444
+    field: findings
+    as_written: "r = +0.35 against valuation"
+links:
+  - target: ../parameter.ont.yml
+    relationship: instance-of
+  - target: ../formula-component/fsfp-gifted-units.yml
+    relationship: consumed-by
+  - target: ../fiscal-period/fy2026-27.yml
+    relationship: valued-in
+  - target: ../legislation/hb-96-2025.yml
+    relationship: set-by
+  - target: ../../catalog/ohio-revised-code.md
+    relationship: sourced-from
+  - target: ../../catalog/dew-fy27-funding-calculator.md
+    relationship: sourced-from

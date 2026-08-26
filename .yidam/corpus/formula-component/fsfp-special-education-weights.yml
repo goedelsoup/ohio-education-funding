@@ -174,3 +174,5 @@ links:
     relationship: sourced-from
   - target: ../../catalog/dew-fy27-funding-calculator.md
     relationship: sourced-from
+  - target: ../parameter/special-education-category-multiples.yml
+    relationship: governed-by

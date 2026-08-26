@@ -197,3 +197,5 @@ links:
     relationship: tensions-with
   - target: ../../catalog/dew-fy27-funding-calculator.md
     relationship: sourced-from
+  - target: ../parameter/performance-supplement-rate.yml
+    relationship: governed-by

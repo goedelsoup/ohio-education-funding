@@ -171,3 +171,5 @@ links:
     relationship: consumes
   - target: ../../catalog/dew-fy27-funding-calculator.md
     relationship: sourced-from
+  - target: ../parameter/enrolment-supplement-amounts.yml
+    relationship: governed-by

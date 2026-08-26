@@ -244,18 +244,18 @@ Fields: count per claim tag across every node; then the unresolved marks by the 
 -->
 | Tag | Count | What it records |
 |---|--:|---|
-| `[verified]` | 1037 | supported by a committed primary source |
-| `[inference]` | 249 | drawn from verified facts, not witnessed |
-| `[open]` | 208 | a live question — unknown, contested, or being worked |
+| `[verified]` | 1159 | supported by a committed primary source |
+| `[inference]` | 275 | drawn from verified facts, not witnessed |
+| `[open]` | 216 | a live question — unknown, contested, or being worked |
 | `[unentered]` | 0 | a knowable value nobody has typed in yet |
 
-208 unresolved marks, and every one of them is a live question. The fourth mark is gone from the prose: a field nobody has filled in is carried as `unfilled:` structure on the node it belongs to, which is what `[unentered]` used to say inline on an axis it did not belong to.
+216 unresolved marks, and every one of them is a live question. The fourth mark is gone from the prose: a field nobody has filled in is carried as `unfilled:` structure on the node it belongs to, which is what `[unentered]` used to say inline on an axis it did not belong to.
 
 | Field | `[open]` | `[unentered]` |
 |---|--:|--:|
-| `findings` | 61 | 0 |
-| `description` | 54 | 0 |
-| `series` | 10 | 0 |
+| `findings` | 66 | 0 |
+| `description` | 55 | 0 |
+| `series` | 12 | 0 |
 | `revisions` | 10 | 0 |
 | `statutory_basis` | 6 | 0 |
 | `accountability_effect` | 6 | 0 |
@@ -304,13 +304,13 @@ leave the corpus and are not counted.
 -->
 | Measure | Count |
 |---|--:|
-| edges between nodes | 503 |
-| distinct relationships in use | 158 |
+| edges between nodes | 566 |
+| distinct relationships in use | 163 |
 | relationships declared across every class | 70 |
-| edges whose relationship its class does not declare | 258 |
-| relationships used exactly once | 80 |
+| edges whose relationship its class does not declare | 293 |
+| relationships used exactly once | 78 |
 
-**51% of edges use a relationship the class does not declare**, and 80 of the 158 relationships in use are used a single time. That is the case for `edge_policy: characteristic`: closing the vocabulary would reject those edges or require 80 declarations that each describe one link.
+**51% of edges use a relationship the class does not declare**, and 78 of the 163 relationships in use are used a single time. That is the case for `edge_policy: characteristic`: closing the vocabulary would reject those edges or require 78 declarations that each describe one link.
 <!-- /REGEN -->
 
 This was a hand-written sentence in fifteen ontology files, in the paragraph above, and in
@@ -337,7 +337,7 @@ Sorted by: kind, then alphabetically.
 | [`ohio-general-assembly`](actor/ohio-general-assembly.yml) | actor | Ohio General Assembly | 6 | 5 |
 | [`supreme-court-of-ohio`](actor/supreme-court-of-ohio.yml) | actor | Supreme Court of Ohio | 3 | 5 |
 | [`adequacy`](doctrine/adequacy.yml) | doctrine | Adequacy | 8 | 25 |
-| [`equity`](doctrine/equity.yml) | doctrine | Equity | 9 | 31 |
+| [`equity`](doctrine/equity.yml) | doctrine | Equity | 9 | 32 |
 | [`thorough-and-efficient`](doctrine/thorough-and-efficient.yml) | doctrine | Thorough and Efficient | 5 | 14 |
 | [`fund-the-plan-and-retire-the-guarantee`](draft-legislation/fund-the-plan-and-retire-the-guarantee.yml) | draft-legislation | Fund the Plan and Retire the Guarantee | 8 | 0 |
 | [`hb-643-136-introduced`](draft-legislation/hb-643-136-introduced.yml) | draft-legislation | H.B. 643 (136th G.A., as introduced) | 3 | 0 |
@@ -363,24 +363,24 @@ Sorted by: kind, then alphabetically.
 | [`fy2022-23`](fiscal-period/fy2022-23.yml) | fiscal-period | FY2022-23 Biennium | 6 | 4 |
 | [`fy2024-25`](fiscal-period/fy2024-25.yml) | fiscal-period | FY2024-25 Biennium | 5 | 5 |
 | [`fy2026`](fiscal-period/fy2026.yml) | fiscal-period | Fiscal Year 2026 | 4 | 8 |
-| [`fy2026-27`](fiscal-period/fy2026-27.yml) | fiscal-period | FY2026-27 Biennium | 5 | 6 |
+| [`fy2026-27`](fiscal-period/fy2026-27.yml) | fiscal-period | FY2026-27 Biennium | 5 | 18 |
 | [`fy2027`](fiscal-period/fy2027.yml) | fiscal-period | Fiscal Year 2027 | 6 | 3 |
 | [`charge-off-local-share`](formula-component/charge-off-local-share.yml) | formula-component | Charge-Off Local Share | 6 | 8 |
 | [`fsfp-base-cost-calculation`](formula-component/fsfp-base-cost-calculation.yml) | formula-component | FSFP Base Cost Calculation | 7 | 9 |
-| [`fsfp-career-technical-weights`](formula-component/fsfp-career-technical-weights.yml) | formula-component | FSFP Career-Technical Weights | 4 | 3 |
-| [`fsfp-disadvantaged-pupil-impact-aid`](formula-component/fsfp-disadvantaged-pupil-impact-aid.yml) | formula-component | FSFP Disadvantaged Pupil Impact Aid | 2 | 6 |
-| [`fsfp-english-learner-weights`](formula-component/fsfp-english-learner-weights.yml) | formula-component | FSFP English Learner Weights | 4 | 3 |
-| [`fsfp-enrolment-supplements`](formula-component/fsfp-enrolment-supplements.yml) | formula-component | FSFP Base and Enrollment Growth Supplements | 5 | 3 |
+| [`fsfp-career-technical-weights`](formula-component/fsfp-career-technical-weights.yml) | formula-component | FSFP Career-Technical Weights | 5 | 4 |
+| [`fsfp-disadvantaged-pupil-impact-aid`](formula-component/fsfp-disadvantaged-pupil-impact-aid.yml) | formula-component | FSFP Disadvantaged Pupil Impact Aid | 3 | 7 |
+| [`fsfp-english-learner-weights`](formula-component/fsfp-english-learner-weights.yml) | formula-component | FSFP English Learner Weights | 5 | 4 |
+| [`fsfp-enrolment-supplements`](formula-component/fsfp-enrolment-supplements.yml) | formula-component | FSFP Base and Enrollment Growth Supplements | 6 | 4 |
 | [`fsfp-formula-transition-supplement`](formula-component/fsfp-formula-transition-supplement.yml) | formula-component | FSFP Formula Transition Supplement | 8 | 4 |
-| [`fsfp-gifted-units`](formula-component/fsfp-gifted-units.yml) | formula-component | FSFP Gifted Identification and Units | 3 | 2 |
-| [`fsfp-local-capacity-measure`](formula-component/fsfp-local-capacity-measure.yml) | formula-component | FSFP Local Capacity Measure | 5 | 8 |
-| [`fsfp-performance-supplement`](formula-component/fsfp-performance-supplement.yml) | formula-component | FSFP Performance Supplement | 9 | 6 |
-| [`fsfp-preschool-special-education`](formula-component/fsfp-preschool-special-education.yml) | formula-component | FSFP Preschool Special Education | 4 | 2 |
-| [`fsfp-special-education-weights`](formula-component/fsfp-special-education-weights.yml) | formula-component | FSFP Special Education Weights | 5 | 9 |
-| [`fsfp-targeted-assistance`](formula-component/fsfp-targeted-assistance.yml) | formula-component | FSFP Targeted Assistance | 5 | 4 |
-| [`fsfp-transportation`](formula-component/fsfp-transportation.yml) | formula-component | FSFP Transportation | 6 | 4 |
+| [`fsfp-gifted-units`](formula-component/fsfp-gifted-units.yml) | formula-component | FSFP Gifted Identification and Units | 4 | 3 |
+| [`fsfp-local-capacity-measure`](formula-component/fsfp-local-capacity-measure.yml) | formula-component | FSFP Local Capacity Measure | 7 | 10 |
+| [`fsfp-performance-supplement`](formula-component/fsfp-performance-supplement.yml) | formula-component | FSFP Performance Supplement | 10 | 7 |
+| [`fsfp-preschool-special-education`](formula-component/fsfp-preschool-special-education.yml) | formula-component | FSFP Preschool Special Education | 6 | 4 |
+| [`fsfp-special-education-weights`](formula-component/fsfp-special-education-weights.yml) | formula-component | FSFP Special Education Weights | 6 | 10 |
+| [`fsfp-targeted-assistance`](formula-component/fsfp-targeted-assistance.yml) | formula-component | FSFP Targeted Assistance | 6 | 5 |
+| [`fsfp-transportation`](formula-component/fsfp-transportation.yml) | formula-component | FSFP Transportation | 7 | 5 |
 | [`guarantee-open-enrolment-clawback`](formula-component/guarantee-open-enrolment-clawback.yml) | formula-component | Guarantee Open Enrolment Clawback | 3 | 2 |
-| [`temporary-transitional-aid-guarantee`](formula-component/temporary-transitional-aid-guarantee.yml) | formula-component | Temporary Transitional Aid Guarantee | 10 | 16 |
+| [`temporary-transitional-aid-guarantee`](formula-component/temporary-transitional-aid-guarantee.yml) | formula-component | Temporary Transitional Aid Guarantee | 11 | 16 |
 | [`bridge-formula`](funding-regime/bridge-formula.yml) | funding-regime | Bridge Formula | 12 | 20 |
 | [`equal-yield-formula`](funding-regime/equal-yield-formula.yml) | funding-regime | Equal Yield Formula | 3 | 2 |
 | [`evidence-based-model`](funding-regime/evidence-based-model.yml) | funding-regime | Evidence-Based Model | 5 | 8 |
@@ -403,7 +403,7 @@ Sorted by: kind, then alphabetically.
 | [`hb-920-1976`](legislation/hb-920-1976.yml) | legislation | Am. Sub. H.B. 920 (1976) — Tax Reduction Factors | 5 | 13 |
 | [`hb-94-2001`](legislation/hb-94-2001.yml) | legislation | Am. Sub. H.B. 94 (2001) — FY2002-03 Budget; the post-DeRolph II formula | 10 | 4 |
 | [`hb-95-2003`](legislation/hb-95-2003.yml) | legislation | Am. Sub. H.B. 95 (2003) — FY2004-05 Budget; the First After DeRolph | 4 | 2 |
-| [`hb-96-2025`](legislation/hb-96-2025.yml) | legislation | Am. Sub. H.B. 96 (2025) — FY2026-27 Budget | 9 | 12 |
+| [`hb-96-2025`](legislation/hb-96-2025.yml) | legislation | Am. Sub. H.B. 96 (2025) — FY2026-27 Budget | 9 | 23 |
 | [`ohio-constitution-article-vi-section-2`](legislation/ohio-constitution-article-vi-section-2.yml) | legislation | Ohio Constitution, Article VI, Section 2 (1851) | 2 | 5 |
 | [`cincinnati-v-walter-1979`](litigation/cincinnati-v-walter-1979.yml) | litigation | Cincinnati City School District Board of Education v. Walter (1979) | 5 | 4 |
 | [`derolph-i-1997`](litigation/derolph-i-1997.yml) | litigation | DeRolph v. State (DeRolph I, 1997) | 6 | 14 |
@@ -422,11 +422,23 @@ Sorted by: kind, then alphabetically.
 | [`state-share-percentage`](metric/state-share-percentage.yml) | metric | State Share Percentage | 5 | 3 |
 | [`education-savings-account-act`](model-policy/education-savings-account-act.yml) | model-policy | Education Savings Account Act | 4 | 1 |
 | [`parental-choice-scholarship-act`](model-policy/parental-choice-scholarship-act.yml) | model-policy | Parental Choice Scholarship Program Act (Universal Eligibility) | 5 | 1 |
-| [`appropriation-proration-factor`](parameter/appropriation-proration-factor.yml) | parameter | Appropriation Proration Factor | 2 | 2 |
-| [`base-cost-per-pupil`](parameter/base-cost-per-pupil.yml) | parameter | Base Cost Per Pupil | 9 | 18 |
-| [`fsfp-phase-in-percentage`](parameter/fsfp-phase-in-percentage.yml) | parameter | FSFP Phase-In Percentage | 5 | 14 |
-| [`guarantee-funding-base`](parameter/guarantee-funding-base.yml) | parameter | Guarantee Funding Base | 6 | 6 |
-| [`local-share-charge-off-millage`](parameter/local-share-charge-off-millage.yml) | parameter | Local Share Charge-Off Millage | 8 | 4 |
+| [`appropriation-proration-factor`](parameter/appropriation-proration-factor.yml) | parameter | Appropriation Proration Factor | 2 | 4 |
+| [`base-cost-per-pupil`](parameter/base-cost-per-pupil.yml) | parameter | Base Cost Per Pupil | 9 | 23 |
+| [`career-technical-category-multiples`](parameter/career-technical-category-multiples.yml) | parameter | Career-Technical Category Multiples | 6 | 2 |
+| [`dpia-per-pupil-amount`](parameter/dpia-per-pupil-amount.yml) | parameter | Disadvantaged Pupil Impact Aid Per-Pupil Amount | 4 | 1 |
+| [`english-learner-category-multiples`](parameter/english-learner-category-multiples.yml) | parameter | English Learner Category Multiples | 5 | 2 |
+| [`enrolment-supplement-amounts`](parameter/enrolment-supplement-amounts.yml) | parameter | Enrolment Supplement Amounts | 3 | 2 |
+| [`fsfp-phase-in-percentage`](parameter/fsfp-phase-in-percentage.yml) | parameter | FSFP Phase-In Percentage | 5 | 17 |
+| [`gifted-funding-rates`](parameter/gifted-funding-rates.yml) | parameter | Gifted Funding Rates | 3 | 1 |
+| [`guarantee-funding-base`](parameter/guarantee-funding-base.yml) | parameter | Guarantee Funding Base | 6 | 7 |
+| [`local-capacity-percentage`](parameter/local-capacity-percentage.yml) | parameter | Local Capacity Percentage | 5 | 3 |
+| [`local-share-charge-off-millage`](parameter/local-share-charge-off-millage.yml) | parameter | Local Share Charge-Off Millage | 8 | 5 |
+| [`minimum-state-share`](parameter/minimum-state-share.yml) | parameter | Minimum State Share | 9 | 3 |
+| [`performance-supplement-rate`](parameter/performance-supplement-rate.yml) | parameter | Performance Supplement Rate | 5 | 1 |
+| [`preschool-special-education-amounts`](parameter/preschool-special-education-amounts.yml) | parameter | Preschool Special Education Amounts | 5 | 2 |
+| [`special-education-category-multiples`](parameter/special-education-category-multiples.yml) | parameter | Special Education Category Multiples | 6 | 5 |
+| [`targeted-assistance-rates`](parameter/targeted-assistance-rates.yml) | parameter | Targeted Assistance Rates | 5 | 1 |
+| [`transportation-cost-rates`](parameter/transportation-cost-rates.yml) | parameter | Transportation Cost Rates | 5 | 1 |
 | [`twenty-mill-floor`](parameter/twenty-mill-floor.yml) | parameter | Twenty-Mill Floor | 4 | 8 |
 | [`autism-scholarship`](program/autism-scholarship.yml) | program | Autism Scholarship | 4 | 1 |
 | [`classroom-facilities-assistance`](program/classroom-facilities-assistance.yml) | program | Classroom Facilities Assistance Program | 3 | 2 |
@@ -442,13 +454,13 @@ Sorted by: kind, then alphabetically.
 | [`state-foundation-aid`](revenue-stream/state-foundation-aid.yml) | revenue-stream | State Foundation Aid | 5 | 21 |
 | [`title-i`](revenue-stream/title-i.yml) | revenue-stream | Title I, Part A | 4 | 5 |
 | [`tpp-replacement-payments`](revenue-stream/tpp-replacement-payments.yml) | revenue-stream | Tangible Personal Property Tax Replacement Payments | 6 | 7 |
-| [`fsfp-input-year-refresh`](scenario/fsfp-input-year-refresh.yml) | scenario | FSFP Cost Input Refresh vs. Freeze | 9 | 7 |
-| [`guarantee-phase-out`](scenario/guarantee-phase-out.yml) | scenario | Phasing Out the Temporary Transitional Aid Guarantee | 11 | 3 |
+| [`fsfp-input-year-refresh`](scenario/fsfp-input-year-refresh.yml) | scenario | FSFP Cost Input Refresh vs. Freeze | 9 | 8 |
+| [`guarantee-phase-out`](scenario/guarantee-phase-out.yml) | scenario | Phasing Out the Temporary Transitional Aid Guarantee | 11 | 4 |
 | [`anton-grdina`](school/anton-grdina.yml) | school | Anton Grdina | 6 | 1 |
 | [`barrington-road-elementary`](school/barrington-road-elementary.yml) | school | Barrington Road Elementary School | 4 | 2 |
 | [`sheridan-high-school`](school/sheridan-high-school.yml) | school | Sheridan High School | 6 | 1 |
 
-117 nodes across 18 classes, and **2 with nothing pointing at them** — counting a citation in somebody's prose as pointing. Whether that is a gap depends on the class: `web/tests/unit/reachability.spec.ts` holds every node to having an inbound *edge* and exempts `draft-legislation`, where a node with nothing pointing at it is the design.
+129 nodes across 18 classes, and **2 with nothing pointing at them** — counting a citation in somebody's prose as pointing. Whether that is a gap depends on the class: `web/tests/unit/reachability.spec.ts` holds every node to having an inbound *edge* and exempts `draft-legislation`, where a node with nothing pointing at it is the design.
 <!-- /REGEN -->
 
 ## Semantic index status
@@ -458,5 +470,5 @@ Regenerated by: `edfund-connect index`
 Fields: total nodes indexed, embedding model, index freshness (last indexed commit vs HEAD),
         stale node count.
 -->
-No semantic index is built. The corpus is 117 nodes and fits in context; an index is added when direct retrieval stops working, which has not happened.
+No semantic index is built. The corpus is 129 nodes and fits in context; an index is added when direct retrieval stops working, which has not happened.
 <!-- /REGEN -->

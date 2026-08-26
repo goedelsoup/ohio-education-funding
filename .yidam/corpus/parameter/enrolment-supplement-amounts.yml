@@ -1,0 +1,153 @@
+class: parameter
+label: Enrolment Supplement Amounts
+summary: >-
+  $40 a pupil to every district and $250 a pupil to the 43 that grew more than 3%, neither rate
+  in any section of the Revised Code. The 3% is a cliff: the nearest miss cost $430,477.
+description: |
+  Two supplements paid on the same sheet and sharing nothing but their line numbers.
+
+  **The base funding supplement is $40 per pupil, to every district, with no test.** $56.1m
+  statewide across 609 districts, a mean of $92,085 each. Nothing has to be true of a district
+  to receive it. [verified]
+
+  **The enrolment growth supplement is $250 per pupil, to districts whose enrolment grew more
+  than 3%.** $39.4m statewide to **43** districts, a mean of $915,804 each — ten times the base
+  supplement's per-district amount, concentrated in 7% of districts. [verified]
+
+  Neither rate, nor the 3% threshold, is in R.C. 3317.022 or in any other section of the Revised
+  Code. They are reported as lines [L] and [M], and their authority is the budget act's temporary
+  law — H.B. 96 of the 136th General Assembly — which `codes.ohio.gov` does not carry and which
+  lapses with the biennium unless re-enacted. [verified]
+findings: |
+  ### The 3% is a cliff, and the corpus can price the edge of it
+
+  The growth supplement pays $250 on the district's **whole** enrolment, not on the growth
+  above the threshold. So a district at 3.01% growth receives $250 a pupil across every pupil
+  and a district at 2.99% receives nothing.
+
+  The nearest miss cost **$430,477**, and 3 other districts sit between 2.7% and 3% growth.
+  [verified — crates/project]
+
+  A taper would have made the same total payment a continuous function of growth; a cliff makes
+  it a step, and the step is where the money is largest relative to the difference in
+  circumstances. [inference]
+
+  ### They run against the direction of the panel
+
+  The median district's enrolment **fell 4.8%** over the three years the supplement measures.
+  So a supplement written to reward growth reaches a seventh of districts in a state where most
+  are shrinking, and the base supplement — flat, universal, and a sixth the size per district —
+  is what the other 566 get. [verified]
+properties:
+  name: Enrolment supplement amounts
+  unit: dollars-per-pupil
+  kind: |
+    **Uncodified.** Not in R.C. 3317.022, which assembles core foundation funding, and not in
+    any other section this corpus cites. The statute audit searched them all.
+
+    The authority is the budget act's temporary law. That has three consequences a codified
+    parameter does not have: the text is not on `codes.ohio.gov`, so a reader cannot look it up
+    the way they can look up a special education multiple; there is no version archive, so the
+    prior biennium's value is not retrievable by the same route; and the payment ends with the
+    biennium by default rather than by repeal.
+
+    The last of those turns out to be less distinctive than it looks. Almost every *codified*
+    parameter in the plan also ends with the biennium — R.C. 3317.017 and 3317.0217 apply only
+    to FY2026-27 by their own terms, and forty divisions elsewhere hand FY2028 to the General
+    Assembly. So what separates uncodified from codified here is retrievability, not durability,
+    which is not the distinction the four-kind taxonomy was drawn to make. See
+    [the four kinds of parameter](../../decisions/the-four-kinds-of-parameter.yml).
+  series: |
+    FY2027, from the department's calculator:
+
+      $40     base funding supplement, per pupil, every district        line [L]
+      $250    enrolment growth supplement, per pupil, whole enrolment   line [M]
+      3%      three-year enrolment growth threshold for [M]
+
+    Scale, from the committed panel. [verified — crates/project]
+      base funding supplement, statewide      $56,079,575.54
+      per district                                $92,084.69
+      growth supplement, statewide            $39,379,553.15
+      districts drawing it                                43
+      per district that draws it                 $915,803.56
+      the largest forgone growth supplement       $430,476.80
+      median three-year enrolment change              −4.84%
+
+    No prior-year values are held. [open]
+  statutory_basis: |
+    None. Not in R.C. 3317.022 and not in any other section this corpus cites; the two rates and
+    the threshold are transcribed from the calculator, where they appear as lines [L] and [M].
+    The authority is H.B. 96's temporary law. [verified — the statute audit]
+  simulation_key: |
+    `project::panel::supplements::BASE_FUNDING_SUPPLEMENT_PER_PUPIL`,
+    `ENROLLMENT_GROWTH_SUPPLEMENT_PER_PUPIL` and `ENROLLMENT_GROWTH_THRESHOLD`.
+
+    Constants, no lever.
+  sensitivity: |
+    The $40 is the most linear parameter in the plan: it multiplies enrolment and nothing else,
+    so its cost is exactly $40 times statewide ADM and its distribution is exactly the
+    distribution of pupils.
+
+    The $250 is the least. Its cost depends on which districts clear 3%, which depends on a
+    three-year enrolment trend, so a forecast of the supplement is a forecast of the growth
+    distribution rather than of a rate. Moving the threshold is a far larger lever than moving
+    the rate: the four districts between 2.7% and 3.0% would together draw about a million
+    dollars from a threshold change that costs nothing per pupil. [inference]
+
+    Neither responds to wealth, poverty, or state share. Both are paid gross. [verified]
+unfilled:
+  - field: the enrolled act's text and division
+    why: >-
+      H.B. 96's temporary law is where these live and `codes.ohio.gov` does not carry it. The
+      enrolled act as published by the General Assembly is the source that would fix the
+      division and the exact wording of the 3% test.
+  - field: the FY2022-25 values
+    why: >-
+      Uncodified parameters have no version archive. The prior biennium's budget act and the LSC
+      greenbook for it are where the earlier rates would be.
+figures:
+  - key: project/base-funding-supplement-total
+    value: 56079575.54000001
+    field: series
+    as_written: "base funding supplement, statewide      $56,079,575.54"
+  - key: project/base-funding-supplement-per-district
+    value: 92084.6888998358
+    field: series
+    as_written: "per district                                $92,084.69"
+  - key: project/enrolment-growth-supplement-total
+    value: 39379553.14999999
+    field: series
+    as_written: "growth supplement, statewide            $39,379,553.15"
+  - key: project/enrolment-growth-supplement-districts
+    value: 43
+    field: description
+    as_written: "$39.4m statewide to **43** districts"
+  - key: project/enrolment-growth-supplement-per-district
+    value: 915803.5616279067
+    field: description
+    as_written: "a mean of $915,804 each"
+  - key: project/largest-forgone-growth-supplement
+    value: 430476.80000000005
+    field: findings
+    as_written: "The nearest miss cost **$430,477**"
+  - key: project/other-districts-just-below-the-growth-cliff
+    value: 3
+    field: findings
+    as_written: "3 other districts sit between 2.7% and 3% growth"
+  - key: project/median-three-year-enrolment-decline
+    value: 0.048417089
+    field: findings
+    as_written: "The median district's enrolment **fell 4.8%**"
+links:
+  - target: ../parameter.ont.yml
+    relationship: instance-of
+  - target: ../formula-component/fsfp-enrolment-supplements.yml
+    relationship: consumed-by
+  - target: ../fiscal-period/fy2026-27.yml
+    relationship: valued-in
+  - target: ../legislation/hb-96-2025.yml
+    relationship: set-by
+  - target: ../../catalog/dew-fy27-funding-calculator.md
+    relationship: sourced-from
+  - target: ../../catalog/lsc-hb96-analysis.md
+    relationship: sourced-from

@@ -116,6 +116,11 @@ const CONTAINERS: Exempt[] = [
       ".row-note",
       "p.lead",
       "table.prose td",
+      /* "What this node does not hold" — the node's own account of a fact it lacks, and the
+         facts it names are frequently figures: a statutory rate nobody has entered a series for,
+         a per-pupil amount in a section the corpus has not read. Same authorship and the same
+         binding mechanism as the prose above it. */
+      ".unfilled",
     ],
   },
   {

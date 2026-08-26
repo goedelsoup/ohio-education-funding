@@ -1,0 +1,187 @@
+class: parameter
+label: Transportation Cost Rates
+summary: >-
+  $1,337.175 per rider and $6.867 per mile — the two rates in the plan that nobody chose. The
+  section names no dollar figure: both are trimmed means of what districts themselves reported
+  spending last year, so the rate moves when districts' own behaviour moves.
+description: |
+  Every district's school bus payment is the greater of two bases: weighted ridership times a
+  statewide cost per student, or bus miles times a statewide cost per mile. In the FY2027 model
+  those are **$1,337.175** and **$6.867**. [verified]
+
+  **R.C. 3317.0212 contains no dollar figure at all.** Division (C) tells the department to
+  divide each district's total school bus costs in the previous fiscal year by its qualifying
+  ridership, then — after excluding districts that provide no bus service, the ten with the
+  highest cost per student and the ten with the lowest — divide the remaining aggregate cost by
+  the remaining aggregate ridership. Division (D) does the same per mile. Both rates are
+  **trimmed means of what districts reported spending**. [verified — the section]
+
+  So these are endogenous. A year in which districts spend more on buses raises the rate they
+  are paid at the following year, and the twenty-district trim is the only thing bounding that.
+  Nobody decides them and no bill is required for them to move. [verified for the mechanism;
+  inference for the feedback]
+
+  **The rider weights are the General Assembly's, and the mass-transit factors are the
+  department's.** A community or STEM school rider counts 1.5 and a nonpublic rider 2.0, on both
+  the rider base and the mile base — division (E)(1)(a) and (b) state both. Transport by means
+  other than a school bus falls under division (G), which pays "in accordance with rules adopted
+  by the department" and states no factor, so the 0.35 for mass transit and 0.50 for other types
+  are the department's rules rather than the statute's. [verified]
+findings: |
+  ### The state share floor moved twice, and it is a floor on a floor
+
+  The school bus payment is multiplied by the greater of the district's own state share
+  percentage and a fixed minimum: **45.83% in FY2026 and 50% in FY2027**, both written into
+  division (E)(1)(c). H.B. 96's own summary records the sequence as 41.67% → 45.83% → 50%.
+  [verified — the section for the two current values]
+
+  That is a different floor from the [minimum state share](minimum-state-share.yml)'s 10%, five
+  times higher, and it binds far more widely. The committed 609-district panel puts **438** on
+  the transportation floor against 138 on the formula's; the department's own 611 give 440, and
+  both are right about their own population. Transportation is therefore the component where the
+  state pays the largest share of cost for the largest number of districts, and it is usually
+  discussed as a small line. [verified — crates/project]
+
+  ### Two constants in the calculator are not in the section
+
+  The per-mile base is `bus miles × $6.867 × 180`, and **180 does not appear anywhere in R.C.
+  3317.0212**. The section speaks of "miles driven for school bus service as reported", with no
+  annualisation. So either the reported figure is a daily one the department annualises by
+  convention, or the multiplier is doing something else; the section does not say and the
+  distinction changes what the rate means. [verified that the section omits it; open as to what
+  it is]
+
+  The FY2021 transportation guarantee — the line that holds 38 districts at their FY2021
+  payment — is likewise absent from the section, as is the 0.91746 factor on special education
+  transportation. Both behave like the enrolment and performance supplements: alive in the
+  calculator and not in permanent law. [verified that they are absent; inference for the
+  parallel]
+
+  ### This closes an open question the component carried
+
+  `fsfp-transportation` recorded that "whether the rider weights and the guarantee are statutory
+  has not been separated out here". They separate: the weights are statutory, in division
+  (E)(1); the guarantee is not in the section.
+properties:
+  name: Transportation cost rates
+  unit: dollars-per-pupil
+  kind: |
+    **Measured — and this parameter is the corpus's clearest example of the category.**
+
+    The two rates are statistics. Division (C) and (D) specify a computation over reported data
+    and the value falls out of it, so the answer to "what would have to happen for this to
+    change" is: districts spend differently on buses. No act, no departmental decision, no
+    negotiation.
+
+    The rest of the section is not measured, and the mixture is the point. The rider weights,
+    the efficiency thresholds, the density supplement's 28 and 0.55, and the state share floor
+    are **legislated**. The mass transit and other-types factors are **delegated** — division
+    (G) hands them to departmental rule. The 180-day multiplier and the FY2021 guarantee are in
+    neither and behave as **uncodified**.
+
+    Four kinds in one section, which is what
+    [the four kinds of parameter](../../decisions/the-four-kinds-of-parameter.yml) argued would
+    happen and what a single `kind` enum would have flattened.
+
+    And, like almost every other section in the plan, it stops: eight divisions read "for fiscal
+    year 2028 and each fiscal year thereafter" and hand the value or the definition back to the
+    General Assembly. Division (E)(2) does it for the base payment itself.
+  series: |
+    FY2027 rates, from the department's model:
+
+      $1,337.175   statewide transportation cost per student   [measured, R.C. 3317.0212(C)]
+      $6.867       statewide transportation cost per mile      [measured, R.C. 3317.0212(D)]
+
+    State share floor on the school bus payment, from R.C. 3317.0212(E)(1)(c):
+
+      FY2026   45.83%   "forty-five and eighty-three hundredths per cent"   [verified]
+      FY2027   50%      "fifty per cent"                                    [verified]
+      FY2028   —        an amount determined by the general assembly        [verified]
+
+    H.B. 96 raised it 41.67% → 45.83% → 50%; the FY2025 value is carried by
+    [hb-96-2025](../legislation/hb-96-2025.yml) and not read from the section here. [inference]
+
+    Legislated constants alongside them, all FY2026-27:
+
+      1.5    community and STEM riders and their miles      (E)(1)(a)(ii), (b)(ii)
+      2.0    nonpublic riders and their miles               (E)(1)(a)(iii), (b)(iii)
+      1.5    efficiency index at which the supplement caps  (F)(3)(a)
+      0.15   efficiency supplement rate                     (F)(3)(a)
+      28     rider density the supplement tapers from       (H)(1)(a)
+      0.55   density supplement rate                        (H)(2)
+
+    Departmental rule, not in the section:
+
+      0.35   mass transit riders                            (G), by rule
+      0.50   other types of transport                       (G), by rule
+  statutory_basis: |
+    R.C. 3317.0212, read. (C) and (D) define the two rates as trimmed means; (E) assembles the
+    base payment and states the rider weights and the state share floor; (F) the efficiency
+    adjustment; (G) hands non-bus transport to departmental rule; (H) the density supplement.
+    [verified — `ohio-laws`]
+  simulation_key: |
+    `project::panel::supplements::TRANSPORT_PER_RIDER` and `TRANSPORT_PER_MILE`, with
+    `TRANSPORT_SCHOOL_DAYS`, `TRANSPORT_NONPUBLIC_WEIGHT` and `TRANSPORT_COMMUNITY_WEIGHT`
+    beside them.
+
+    Constants, not levers.
+  sensitivity: |
+    $726.1m of transportation and $182.6m of special education transportation. 350 of 611
+    districts are paid on the mile base rather than the rider base, so the two rates do not
+    move the same districts: raising the per-rider rate reaches the 261 on that base and
+    nothing else, until a district crosses over. [verified]
+
+    The `max` of the two bases makes the response to either rate piecewise. A district near the
+    crossover is insensitive to an increase in the rate it is not paid on, and then abruptly
+    sensitive. A fiscal note that scales both rates together will not show that. [inference]
+
+    The measured nature is the sensitivity that has no lever. If districts' reported bus costs
+    rise 10%, the rates rise with them the following year and the state's bill rises without
+    anything having been decided — bounded only by the twenty-district trim and by the
+    appropriation, which is what the
+    [proration factor](appropriation-proration-factor.yml) exists to handle. [inference]
+unfilled:
+  - field: the 180-day multiplier's authority
+    why: >-
+      It is in the calculator's per-mile base and in `crates/project`, and not in R.C. 3317.0212.
+      The department's transportation reporting instructions would say whether reported miles
+      are daily or annual, which is what decides whether the multiplier is an annualisation.
+  - field: the FY2021 transportation guarantee
+    why: >-
+      Holds 38 districts and is absent from the section. H.B. 96's temporary law, which
+      `codes.ohio.gov` does not carry, is where the enrolled act would have it.
+  - field: the rates before FY2027
+    why: >-
+      Each year's rate is a trimmed mean of the prior year's reported costs, so the series is
+      recoverable in principle from the department's transportation cost reports. None is
+      committed here.
+figures:
+  - key: project/panel-districts-under-the-transportation-floor
+    value: 438
+    field: findings
+    as_written: "**438** on
+      the transportation floor"
+  - key: project/districts-at-the-minimum-state-share
+    value: 138
+    field: findings
+    as_written: "against 138 on the formula's"
+  - key: project/districts-on-the-transportation-guarantee
+    value: 38
+    field: findings
+    as_written: "the line that holds 38 districts at their FY2021\n  payment"
+links:
+  - target: ../parameter.ont.yml
+    relationship: instance-of
+  - target: ../formula-component/fsfp-transportation.yml
+    relationship: consumed-by
+  - target: ../fiscal-period/fy2026-27.yml
+    relationship: valued-in
+  - target: ../legislation/hb-96-2025.yml
+    relationship: set-by
+  - target: appropriation-proration-factor.yml
+    relationship: constrained-by
+    note: The general proration factor multiplies the whole transportation total.
+  - target: ../../catalog/ohio-revised-code.md
+    relationship: sourced-from
+  - target: ../../catalog/dew-fy27-funding-calculator.md
+    relationship: sourced-from

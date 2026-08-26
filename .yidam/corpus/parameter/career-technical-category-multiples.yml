@@ -1,0 +1,175 @@
+class: parameter
+label: Career-Technical Category Multiples
+summary: >-
+  Five multiples from 0.6230 down to 0.1570, plus 0.0294 for associated services, applied to a
+  career-technical base cost 19.6% above the general one. Written for FY2026 and FY2027 only:
+  from FY2028 the section pays "an amount calculated in a manner determined by the general assembly".
+description: |
+  Five multiples, one per approved programme category, and a sixth for associated services:
+  0.6230, 0.5905, 0.2154, 0.1830, 0.1570, and 0.0294. [verified — R.C. 3317.014(A) and (B)]
+
+  **They descend by programme type, not by severity.** Special education's six ascend with the
+  disability; these five sort programmes. The top two are workforce development grouped by
+  field — agricultural and environmental systems, construction technologies, engineering and
+  science technologies, finance, health science, information technology and manufacturing at
+  0.6230; business and administration, hospitality and tourism, human services, law and public
+  safety, transportation systems and arts and communications at 0.5905. The gap below them, to
+  0.2154, is not a further grade of workforce programme: it is career-based intervention, a
+  different kind of thing. [verified — the section]
+
+  Why the first field group is priced above the second, both being full workforce programmes,
+  is not stated in the section. [open]
+
+  **The multiplicand is not the one the other weight schedules use.** These five multiply a
+  statewide average *career-technical* base cost per pupil of $9,855.62, where
+  [special education](special-education-category-multiples.yml) and
+  [English learners](english-learner-category-multiples.yml) multiply $8,241.61 — a base
+  **19.6% higher** before any weight applies. That is the General Assembly's construction and
+  not a departmental convenience: the section says each category is multiplied by "the
+  statewide average career-technical base cost per pupil for that fiscal year". [verified]
+
+  The associated-services multiple is the odd one. 0.0294 applies to the sum of categories one
+  through five rather than to any category, so it is the one part of the programme that does
+  not vary with which category a pupil is in. [verified]
+findings: |
+  ### The section prices a third thing this corpus does not hold
+
+  R.C. 3317.014(E)(1)(a) pays the lead district of each career technical planning district
+  **$3 times the summed enrolled ADM of every district and school in that planning district**,
+  for career awareness and exploration. It is a statutory per-pupil rate in the same section as
+  the six multiples, and nothing in this repository models it: no component, no crate constant,
+  no column in the committed FY2027 calculator extract. [verified — the section; and searched]
+
+  It is not clear whether the payment is absent from the department's model, absent from the
+  extract this corpus took, or paid on a sheet the extract does not cover. Those are three
+  different facts and the corpus cannot presently distinguish them. [open]
+
+  ### And the whole schedule is written for two years
+
+  Divisions (C)(2), (D)(2) and (E)(1)(b) each say that for fiscal year 2028 and thereafter the
+  amount is "calculated in a manner determined by the general assembly". So the multiples
+  above are the FY2026-27 schedule and the section states no successor — which makes any
+  projection past FY2027 a projection under a rule the statute does not carry that far. The
+  scenario runner projects to FY2032 and FY2036. [verified — the section, and
+  `crates/bundle/src/build.rs`]
+properties:
+  name: Career-technical category multiples
+  unit: ratio
+  kind: |
+    **Legislated through FY2027, and unstated after it.**
+
+    The five multiples and the associated-services multiple are in the section, to four
+    decimals, and only an act can change them while they apply. What an act does *not* have to
+    do is let them lapse: divisions (C)(2), (D)(2) and (E)(1)(b) already hand FY2028 onward to
+    the General Assembly, so the default is not continuation.
+
+    That is a distinction the four-kind taxonomy does not have a word for, and it is not the
+    same as `uncodified`. The enrolment and performance supplements are uncodified — nowhere in
+    the Revised Code, alive only in a budget act's temporary law. These multiples are codified,
+    published, and citable, and they still stop. See the decision record
+    [the four kinds of parameter](../../decisions/the-four-kinds-of-parameter.yml), which
+    anticipated that a parameter can change kind at a regime boundary and did not anticipate a
+    codified parameter with an expiry written into its own section.
+  series: |
+    (A)(1)  0.6230  workforce development: agriculture and environmental systems, construction
+                    technologies, engineering and science technologies, finance, health science,
+                    information technology, manufacturing technologies
+    (A)(2)  0.5905  workforce development: business and administration, hospitality and tourism,
+                    human services, law and public safety, transportation systems, arts and
+                    communications
+    (A)(3)  0.2154  career-based intervention
+    (A)(4)  0.1830  workforce development: education and training, marketing, workforce
+                    development academics, public administration, career development
+    (A)(5)  0.1570  family and consumer science
+    (B)     0.0294  associated services, against the sum of categories one to five
+
+    All five category multiples verified against the Revised Code to the last digit —
+    `crates/project/tests/the_statute_behind_the_weights.rs`. [verified — crates/project]
+
+    FY2026 and FY2027 only. The section states no value for FY2028 or later. [verified]
+
+    The counts these multiply are frozen at FY2021: the calculator's own column headers read
+    `Category 1 Career Tech FTE-FY21`. So a FY2027 payment funds the programme a district ran
+    six years earlier, while base cost is computed on a rolling three-year average ending
+    FY2026. [verified]
+  statutory_basis: |
+    R.C. 3317.014, read. Divisions (A)(1) to (A)(5) for the category multiples, (B) for
+    associated services, (C) and (D) for how each is applied. The separate career-technical
+    base cost per pupil is statutory too — the section names it rather than leaving it to the
+    department. [verified — `ohio-laws`]
+  simulation_key: |
+    `project::panel::categoricals::CTE_WEIGHTS`, with `CTE_ASSOCIATED_WEIGHT` and
+    `CTE_BASE_COST_PER_PUPIL` beside it.
+
+    Constants, not levers. Nothing in `Policy` moves them.
+  sensitivity: |
+    $54m in all, the smaller of the two weighted programmes, and $3.2m of it is associated
+    services. [verified]
+
+    The multiplicand is the exposure that is easy to miss. Because these five are priced in the
+    career-technical base cost rather than the general one, a change to
+    [base-cost-per-pupil](base-cost-per-pupil.yml) does *not* move them at the same rate — the
+    two averages are separate quantities that happen to move together, and a scenario that
+    scales one and not the other is making a policy choice rather than an arithmetic one.
+    [inference]
+
+    The frozen FY2021 counts mean this programme's sensitivity to *enrolment* is currently
+    zero. Growth since 2021 is unfunded and decline since 2021 is unpenalised, so a projection
+    that moves career-technical aid with enrolment is modelling something the calculator does
+    not do. [verified for the freeze; inference for the consequence]
+unfilled:
+  - field: the $3 career awareness and exploration rate
+    why: >-
+      R.C. 3317.014(E)(1)(a) sets it and this repository models nothing that pays it. The
+      department's career technical planning district payments, if they are published, are
+      where the value and its recipients would come from.
+  - field: the multiples before FY2026
+    why: >-
+      H.B. 96 is the version held. Prior versions of R.C. 3317.014 are in Ohio Laws' version
+      archive for the section, which is where the FY2022-25 schedule would be read.
+figures:
+  - key: project/career-technical-weight-category-one
+    value: 0.623
+    field: description
+    as_written: "0.6230, 0.5905, 0.2154, 0.1830, 0.1570, and 0.0294"
+  - key: project/career-technical-weight-category-two
+    value: 0.5905
+    field: description
+    as_written: "0.6230, 0.5905, 0.2154, 0.1830, 0.1570, and 0.0294"
+  - key: project/career-technical-weight-category-three
+    value: 0.2154
+    field: description
+    as_written: "0.6230, 0.5905, 0.2154, 0.1830, 0.1570, and 0.0294"
+  - key: project/career-technical-weight-category-four
+    value: 0.183
+    field: description
+    as_written: "0.6230, 0.5905, 0.2154, 0.1830, 0.1570, and 0.0294"
+  - key: project/career-technical-weight-category-five
+    value: 0.157
+    field: description
+    as_written: "0.6230, 0.5905, 0.2154, 0.1830, 0.1570, and 0.0294"
+  - key: project/career-technical-total
+    value: 53875678.32
+    field: sensitivity
+    as_written: "$54m in all"
+  - key: project/career-technical-associated-services
+    value: 3234233.67
+    field: sensitivity
+    as_written: "$3.2m of it is associated services"
+  - key: project/career-technical-base-cost-premium
+    value: 0.19583673578342098
+    field: description
+    as_written: "**19.6% higher**"
+links:
+  - target: ../parameter.ont.yml
+    relationship: instance-of
+  - target: ../formula-component/fsfp-career-technical-weights.yml
+    relationship: consumed-by
+  - target: ../fiscal-period/fy2026-27.yml
+    relationship: valued-in
+  - target: ../legislation/hb-96-2025.yml
+    relationship: set-by
+  - target: ../../catalog/ohio-revised-code.md
+    relationship: sourced-from
+  - target: ../../catalog/dew-fy27-funding-calculator.md
+    relationship: sourced-from

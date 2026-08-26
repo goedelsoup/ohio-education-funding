@@ -1,0 +1,147 @@
+class: parameter
+label: Preschool Special Education Amounts
+summary: >-
+  $4,000 flat per preschool child with a disability, plus the six special education multiples
+  at half strength. The flat grant is 69% of the programme and the state share does not touch
+  it, so this is the one component where the wealthiest district and the poorest are funded alike.
+description: |
+  R.C. 3317.0213(A) states the calculation in one line and then six: `($4,000 × the number of
+  students who are preschool children with disabilities)` plus, for each of the six categories,
+  `count × the multiple in R.C. 3317.013 × the statewide average base cost per pupil × the
+  district's state share percentage × 0.50`. [verified — the section]
+
+  Two parameters in one formula, and they behave oppositely.
+
+  **The $4,000 is flat and unequalised.** It is not multiplied by the state share percentage. A
+  district at the 10% minimum state share receives the same $4,000 per preschool child as a
+  district at 90%, which makes this the one place in the plan where property wealth changes
+  nothing. [verified]
+
+  **The halving is the General Assembly's, and it is explicit.** Every one of the six weighted
+  terms carries "X 0.50" written out in the section — it is not a departmental convention and
+  not a proration. A preschool child in Category 6 generates half what a school-age child in
+  Category 6 does, before the flat grant. [verified]
+
+  The multiples themselves are not restated here. The section names each division of R.C.
+  3317.013 by letter, so
+  [special education category multiples](special-education-category-multiples.yml) is the
+  parameter and this section is a consumer of it. That construction is why the two must not be
+  merged: a change to the multiples moves both programmes, and a change to the 0.50 moves only
+  this one.
+findings: |
+  ### The flat grant is most of the money, which inverts the usual reading
+
+  The flat component is **$102.7m of the programme's $148.4m**, or 69%. So the part that
+  responds to disability category and to district wealth is the minority of it, and a
+  description that leads with the six weights describes a third of the payment. [verified]
+
+  ### The programme runs under an appropriation that does not appear in its own formula
+
+  Preschool special education is paid out of GRF ALI 200540, Special Education Enhancements,
+  and the calculator prints a $147,500,000 limit beside it. The programme totals $148.4m across
+  the FY2027 model — **$908,184 over** the figure printed on the sheet — while the enacted
+  FY2027 appropriation for the line is $193.3m, leaving $5.6m of headroom against the residual
+  the department actually computes. The printed limit is stale rather than binding. [verified]
+
+  That is a constraint with no term in the formula, which is what
+  [the proration factor](appropriation-proration-factor.yml) exists for.
+properties:
+  name: Preschool special education amounts
+  unit: dollars-per-pupil
+  kind: |
+    **Legislated, both of them, and expiring.**
+
+    $4,000 and 0.50 are digits in R.C. 3317.0213(A) and only an act moves them. The section's
+    closing paragraph hands FY2028 and thereafter to a "formula specified by the general
+    assembly" — not merely an amount, a whole formula — so the structure as well as the values
+    lapses with the biennium.
+
+    Worth separating from the multiples it borrows. The six multiples are the one schedule in
+    the plan that does *not* expire; the halving that this section applies to them does. So the
+    same six numbers have two different lives depending on which section is applying them.
+  series: |
+    FY2026  $4,000  flat, per preschool child with a disability, no state share applied
+    FY2027  $4,000  the same
+    FY2028  —       a formula specified by the general assembly
+
+    FY2026  0.50    on every one of the six weighted terms
+    FY2027  0.50    the same
+    FY2028  —       part of the same handover
+
+    The weighted terms multiply the statewide average base cost per pupil, $8,241.61, and the
+    district's state share percentage; the flat term multiplies neither. [verified]
+
+    FY2027 scale, from the committed panel. [verified — crates/project]
+      programme total                          $148,408,183.76
+      of which the flat component              $102.7m, 69%
+      appropriation for GRF ALI 200540         $193,272,426
+      the residual the calculator prints        $147,500,000
+      the programme's overrun against it            $908,183.76
+  statutory_basis: |
+    R.C. 3317.0213, read. Division (A) states the formula, names each division of R.C. 3317.013
+    for the six categories, and writes "X 0.50" on each. The categories themselves are the ones
+    prescribed in R.C. 3317.013, which the section says in terms. [verified — `ohio-laws`]
+  simulation_key: |
+    Not bound as a named constant. `crates/project` reproduces the programme in its panel and
+    the flat amount and the halving are inline there rather than exported.
+
+    No lever.
+  sensitivity: |
+    The flat grant and the halving move different populations. Raising $4,000 is a per-child
+    increase identical everywhere, so it is the most wealth-neutral lever in the plan; raising
+    0.50 toward 1.00 is an increase concentrated on districts with high-category preschool
+    caseloads and high state shares, which is the ordinary equalised shape.
+
+    A proposal that "increases preschool special education by 10%" therefore has two entirely
+    different distributional answers and the fiscal cost is nearly the same. [inference]
+
+    The appropriation is the binding constraint rather than the formula. The programme already
+    exceeds the limit printed beside it, so an increase to either parameter runs into the
+    proration factor before it runs into anything else. [verified for the overrun; inference for
+    the consequence]
+unfilled:
+  - field: the flat grant before FY2026
+    why: >-
+      Prior versions of R.C. 3317.0213 in Ohio Laws' version archive. A flat nominal grant is
+      the kind of figure a constant-dollar series would say most about, and none is held.
+  - field: whether the 0.50 has always been 0.50
+    why: >-
+      Same source. The halving is the substantive policy in this section and its history is not
+      held here.
+figures:
+  - key: project/prek-sped-program-total-fy2027
+    value: 148408183.76000014
+    field: series
+    as_written: "programme total                          $148,408,183.76"
+  - key: project/ali-200540-total-fy2027
+    value: 193272426.0
+    field: series
+    as_written: "appropriation for GRF ALI 200540         $193,272,426"
+  - key: project/prek-sped-over-the-stale-limit
+    value: 908183.7600001395
+    field: series
+    as_written: "the programme's overrun against it            $908,183.76"
+  - key: project/prek-sped-headroom-fy2027
+    value: 5568648.2399998605
+    field: findings
+    as_written: "leaving $5.6m of headroom"
+links:
+  - target: ../parameter.ont.yml
+    relationship: instance-of
+  - target: ../formula-component/fsfp-preschool-special-education.yml
+    relationship: consumed-by
+  - target: ../fiscal-period/fy2026-27.yml
+    relationship: valued-in
+  - target: ../legislation/hb-96-2025.yml
+    relationship: set-by
+  - target: special-education-category-multiples.yml
+    relationship: applies
+    note: >-
+      The section names each division of R.C. 3317.013 rather than restating the multiples, and
+      halves the product.
+  - target: appropriation-proration-factor.yml
+    relationship: constrained-by
+  - target: ../../catalog/ohio-revised-code.md
+    relationship: sourced-from
+  - target: ../../catalog/dew-fy27-funding-calculator.md
+    relationship: sourced-from

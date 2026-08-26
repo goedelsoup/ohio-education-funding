@@ -1,0 +1,114 @@
+class: parameter
+label: English Learner Category Multiples
+summary: >-
+  Three multiples that run downward — 0.2104, 0.1577, 0.1053 — as a pupil progresses. The only
+  weight schedule in the plan that falls as the pupil it prices improves, and it is a taper by
+  construction rather than a ranking.
+description: |
+  Three multiples: 0.2104, 0.1577, 0.1053. Each multiplies the statewide average base cost per
+  pupil, the district's ADM in that category, and its state share percentage. [verified — R.C.
+  3317.016]
+
+  **They descend, and what they descend with is time and proficiency.** Category 1 is a pupil
+  enrolled in schools in the United States for 180 school days or less. Category 2 is a pupil
+  past that threshold and not yet proficient on the spring English language proficiency
+  assessment. Category 3 is the two school years *after* the pupil scores proficient. So the
+  schedule is a taper: a pupil funded at 0.2104 in their first year is funded at half that two
+  years after they stop needing the service, and then at nothing. [verified — the section]
+
+  That is a different object from the other two schedules. Special education's six ascend with
+  severity and career-technical's five sort programme types; both price a standing condition.
+  These three price a trajectory, and the number falling is the intended behaviour rather than
+  a ranking of need. A table that lists all fourteen of the plan's multiples together makes
+  this one look like the cheapest category of something, which it is not. [inference]
+
+  The multiplicand is the general statewide average base cost per pupil, $8,241.61 — the same
+  one special education uses and not the career-technical figure. [verified]
+findings: |
+  ### Category 3 is the one that needs the definition to be read
+
+  A pupil in category 3 has already achieved a proficient score. The money continues for two
+  school years afterwards, which is a policy about consolidation rather than about need, and it
+  is invisible in the number: 0.1053 beside 0.2104 reads as "less English learner", not as
+  "still funded after the pupil stopped being one". [verified for the definition; inference for
+  the reading]
+
+  ### The counts are frozen at FY2021, like career-technical
+
+  The FY2027 calculator prices these against FY2021 English learner counts. A district whose
+  English learner population has changed since 2021 — and the years since include a period of
+  substantial change in arrivals — is funded for the population it had. [verified]
+
+  ### And the definitions stop at FY2027
+
+  Divisions (B) and (C) each state their criterion "for fiscal years 2026 and 2027" and then
+  say that for FY2028 and thereafter the pupil is one who "satisfies criteria specified by the
+  general assembly". The multiples themselves are stated without a year — but two of the three
+  categories they price cease to be defined, which is the same expiry arriving by a different
+  route. [verified — the section]
+properties:
+  name: English learner category multiples
+  unit: ratio
+  kind: |
+    **Legislated, with two of the three categories defined only through FY2027.**
+
+    The three multiples in division (A), (B) and (C) carry no fiscal-year condition. The
+    *definitions* of categories two and three do: each says "for fiscal years 2026 and 2027" and
+    hands FY2028 to the General Assembly. A multiple that survives its category is not a value
+    anyone can apply, so the practical durability is the category's and not the number's.
+
+    Worth stating because reading the multiples alone would place this parameter with
+    [special education](special-education-category-multiples.yml) — the one schedule that
+    genuinely does not expire — when it belongs with the rest.
+  series: |
+    (A)  0.2104  identified as an English learner, enrolled in United States schools 180 school
+                 days or less
+    (B)  0.1577  past 180 days and not yet proficient on the spring English language proficiency
+                 assessment  [FY2026-27 definition only]
+    (C)  0.1053  the two school years following a proficient score  [FY2026-27 definition only]
+
+    All three verified against the Revised Code to the last digit —
+    `crates/project/tests/the_statute_behind_the_weights.rs`. [verified]
+
+    Applied to FY2021 English learner counts in the FY2027 model. [verified]
+  statutory_basis: |
+    R.C. 3317.016, read. "English learner" takes its meaning from R.C. 3301.0731 and the
+    proficiency assessment from R.C. 3301.0711(C)(3), so the categories are defined by
+    cross-reference and the multiples are here. [verified — `ohio-laws`]
+  simulation_key: |
+    `project::panel::categoricals::ENGLISH_LEARNER_WEIGHTS`.
+
+    A constant, not a lever.
+  sensitivity: |
+    The smallest of the three weighted programmes by money, and the one whose sensitivity is
+    least about its own multiples. Because the counts are frozen at FY2021 and the schedule
+    tapers, what moves this programme is the *composition* of a district's English learner
+    population across the three categories rather than its size — and the composition is a
+    property of a count taken six years before the payment. [inference]
+
+    Priced in the general statewide average base cost per pupil, so
+    [base-cost-per-pupil](base-cost-per-pupil.yml) moves all three together, and the scenario
+    runner's `base_cost_scale` carries them along with special education. [verified]
+unfilled:
+  - field: the FY2028 category definitions
+    why: >-
+      Divisions (B) and (C) hand them to the General Assembly and the section names no
+      successor. The budget act that covers FY2028-29 is where they would first appear.
+  - field: the multiples before FY2026
+    why: >-
+      Prior versions of R.C. 3317.016 in Ohio Laws' version archive for the section.
+links:
+  - target: ../parameter.ont.yml
+    relationship: instance-of
+  - target: ../formula-component/fsfp-english-learner-weights.yml
+    relationship: consumed-by
+  - target: ../fiscal-period/fy2026-27.yml
+    relationship: valued-in
+  - target: ../legislation/hb-96-2025.yml
+    relationship: set-by
+  - target: base-cost-per-pupil.yml
+    relationship: priced-in
+  - target: ../../catalog/ohio-revised-code.md
+    relationship: sourced-from
+  - target: ../../catalog/dew-fy27-funding-calculator.md
+    relationship: sourced-from

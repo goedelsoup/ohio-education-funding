@@ -35,7 +35,7 @@ Sorted by: type, then slug.
 | [`dew-academic-distress-commission`](dew-academic-distress-commission.md) | Academic Distress Commission — the department's commission page | 3 |
 | [`dew-expenditure-expanded-list`](dew-expenditure-expanded-list.md) | FY2025 Expenditure Expanded List | 1 |
 | [`dew-five-year-forecast`](dew-five-year-forecast.md) | Five-year forecast filings — the department's republished submissions | 3 |
-| [`dew-fy27-funding-calculator`](dew-fy27-funding-calculator.md) | FY27 TRAD State Foundation Funding Calculator | 17 |
+| [`dew-fy27-funding-calculator`](dew-fy27-funding-calculator.md) | FY27 TRAD State Foundation Funding Calculator | 28 |
 | [`dew-mr81-enrollment-archive`](dew-mr81-enrollment-archive.md) | MR-81 free and reduced-price lunch reports, 1998–2014 | 1 |
 | [`dew-october-enrollment`](dew-october-enrollment.md) | October headcount by grade | 2 |
 | [`dew-report-card-achievement`](dew-report-card-achievement.md) | Ohio School Report Cards — District Achievement Download | 4 |
@@ -52,7 +52,7 @@ Sorted by: type, then slug.
 | [`lsc-appropriation-spreadsheet`](lsc-appropriation-spreadsheet.md) | LSC appropriation spreadsheet | 0 |
 | [`lsc-catalog-of-budget-line-items`](lsc-catalog-of-budget-line-items.md) | Catalog of Budget Line Items — what each appropriation line was given | 10 |
 | [`lsc-dew-redbook`](lsc-dew-redbook.md) | LSC Redbook — Ohio Department of Education and Workforce | 7 |
-| [`lsc-hb96-analysis`](lsc-hb96-analysis.md) | LSC Budget Analysis — H.B. 96 (FY2026-27) | 4 |
+| [`lsc-hb96-analysis`](lsc-hb96-analysis.md) | LSC Budget Analysis — H.B. 96 (FY2026-27) | 6 |
 | [`lsc-school-funding-complete-resource`](lsc-school-funding-complete-resource.md) | LSC School Funding Complete Resource | 2 |
 | [`nces-ccd-lea-directory`](nces-ccd-lea-directory.md) | Common Core of Data: local education agency directory | 1 |
 | [`ocg-fact-check-021`](ocg-fact-check-021.md) | OCG Ground Truth Fact-Check RL-2026-021 — Toledo–Perrysburg Special-Needs Spending | 3 |
@@ -61,7 +61,7 @@ Sorted by: type, then slug.
 | [`ode-idea-part-b-allocations`](ode-idea-part-b-allocations.md) | IDEA Part B Allocations to Districts | 2 |
 | [`ohio-bills`](ohio-bills.md) | Ohio bills before enactment — the text as introduced | 1 |
 | [`ohio-essa-state-plan`](ohio-essa-state-plan.md) | Ohio's Consolidated State Plan under ESSA, and the April 2026 School Improvement amendment | 5 |
-| [`ohio-revised-code`](ohio-revised-code.md) | Ohio Revised Code — the sections this corpus cites | 4 |
+| [`ohio-revised-code`](ohio-revised-code.md) | Ohio Revised Code — the sections this corpus cites | 14 |
 | [`ohio-session-laws`](ohio-session-laws.md) | Ohio session laws — the appropriation acts themselves | 3 |
 
 41 entries, 2 not yet cited by any corpus node. 206 retrieved files are pinned by SHA-256 in [`crates/connect/source-digests.txt`](../../crates/connect/source-digests.txt).
