@@ -100,6 +100,7 @@ describe("the thresholds a phase has set", () => {
       headingRatio: 2, //  #186
       measureMax: 80, //   #186, font-sensitive
       rightAlignedProse: 0, // #188
+      firstContentY: 110, //   #189, font-sensitive
     });
   });
 

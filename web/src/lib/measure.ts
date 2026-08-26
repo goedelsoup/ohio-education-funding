@@ -231,6 +231,32 @@ export const THRESHOLDS: Thresholds = {
   rightAlignedProse: 0,
 
   /*
+   * #189. How far down the page the `h1` starts at the narrowest width, which is how much of a
+   * phone screen is spent before the reader learns what they are looking at.
+   *
+   * It was 194px on a district page at 390px — the header wrapped to three rows and measured
+   * 166px. The five section menus now fold into one disclosure and the district sub-navigation
+   * scrolls rather than wrapping, so the header is 52px at every width and the `h1` starts at 80.
+   *
+   * 110 against a measured 80 on the six page-level routes and 107 on the two wiki routes, whose
+   * breadcrumb sits above the heading and is content rather than chrome. A header that wrapped
+   * back to two rows would add about 40px and put every route over.
+   *
+   * # The font it holds under
+   *
+   * ui-sans-serif / system-ui at 375px, where a digit advance is 9.21px. Unlike `measureMax`, this
+   * one turned out NOT to move: measured under DejaVu Sans and Georgia at the same width, every
+   * route reports the same 80 and 107.
+   *
+   * The sensitivity is real but it lives below this width. At 320px, under Georgia or Courier New,
+   * the brand and the disclosure no longer fit on one row and the header goes to 92px — see
+   * `--sticky-chrome` in `tokens/space.css`, which records the same boundary. 320px is narrower
+   * than any width this report walks and narrower than any phone the site is built for, so the
+   * threshold is stated at 375px and the edge is written down rather than guarded.
+   */
+  firstContentY: 110,
+
+  /*
    * `sizeGap` is deliberately NOT set, and the metric it would have used is why.
    *
    * It was built to catch "a cluster and then a leap" — eleven sizes inside 3.7px and then 22.4px.

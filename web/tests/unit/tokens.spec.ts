@@ -107,12 +107,23 @@ describe("--sticky-chrome", () => {
     expect(declaring).toEqual(["tokens/space.css"]);
   });
 
-  test("carries all four measured breakpoints in that one file", () => {
-    // Deleting a duplicate must not delete a breakpoint with it. The four are measured from a
-    // build at each width and a missing one lands fragment links under the header.
+  test("carries both measured values in that one file, and no longer four", () => {
+    /*
+     * It was four — 168 / 135 / 96 / 87 — and #189 re-derived them, because the header they
+     * measure stopped wrapping. The four were right at approximately the four widths they were
+     * taken at and wrong between them: at 680-999px the header is 52px against a token of 96, and
+     * at 1000px and up the covered region is 105px against a token of 87, so every fragment link
+     * at desktop width landed 19px beneath the chrome.
+     *
+     * Two now, and the step is the one at 1000px where `.subnav` becomes sticky and adds itself.
+     * Asserted as a count as well as by value so that a third breakpoint reappearing is a decision
+     * somebody made rather than a value somebody guessed.
+     */
     const space = withoutComments(read("tokens/space.css"));
-    expect([...space.matchAll(/--sticky-chrome\s*:/g)]).toHaveLength(4);
-    for (const px of ["168px", "135px", "96px", "87px"]) expect(space).toContain(px);
+    expect([...space.matchAll(/--sticky-chrome\s*:/g)]).toHaveLength(2);
+    expect(space).toContain("52px");
+    expect(space).toContain("106px");
+    for (const stale of ["168px", "135px", "96px", "87px"]) expect(space).not.toContain(stale);
   });
 });
 

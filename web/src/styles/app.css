@@ -161,8 +161,65 @@ header.site {
   flex-wrap: wrap;
 }
 .brand { font-weight: var(--weight-bold); letter-spacing: var(--tracking-tight); color: var(--text-primary); text-decoration: none; }
-header.site nav { display: flex; gap: .15rem; flex-wrap: wrap; margin-right: auto; }
-header.site nav a {
+header.site nav { display: flex; gap: .15rem; margin-right: auto; }
+
+/*
+ * The five section menus, inside one disclosure below 700px and loose above it.
+ *
+ * # What was wrong
+ *
+ * The header wrapped to three rows on a phone. Measured at 390px: 166px of chrome and the `h1`
+ * beginning at y=194, which is a quarter of the screen before the page says which district it is
+ * about. The `.site-inner` row holds three items — the brand at 142px, the nav at 404px and the
+ * theme button at 32px — and about 352px to put them in, so they wrapped. No rearranging fits
+ * 578px of content into 352px; the nav had to fold.
+ *
+ * # Why one element and not two
+ *
+ * The obvious build is a narrow copy and a wide copy with `display: none` between them. That is
+ * 4,103 bytes of duplicated nav on each of 3,492 pages and the same 31 links in the document
+ * twice. Instead there is one `<details>` and the wide layout takes its summary away.
+ *
+ * `::details-content` is what makes that possible: it is the box a closed `<details>` hides its
+ * content in, and setting `content-visibility: visible` on it un-hides it. Verified in chromium
+ * rather than assumed — a closed control reports its link `checkVisibility() === false` and not
+ * focusable, and the neutralised one reports both true. `display: flex` on the panel is the same
+ * override for engines that predate the pseudo-element and hide the content with `display` instead.
+ *
+ * Where NEITHER override lands, a desktop reader gets the phone's disclosure: every link still
+ * reachable, one click further away. That is the degradation, it is stated here, and it is not a
+ * breakage — which is the property that made this worth doing rather than shipping two copies.
+ *
+ * It stays a native `<details>` at both sizes. A third of the end-to-end suite runs with
+ * JavaScript disabled and opens these menus.
+ */
+/* The same shape as a nav item, because it is one — restated by selector, not by value. */
+.menu-all > summary {
+  cursor: pointer;
+  list-style: none;
+}
+.menu-all > summary::-webkit-details-marker { display: none; }
+.menu-all > summary::after { content: " ▾"; color: var(--text-muted); }
+.menu-all > summary:hover { background: var(--surface-2); color: var(--text-primary); }
+.menu-all > .menu-groups { display: flex; flex-direction: column; gap: .15rem; padding: var(--space-3) 0; }
+
+/*
+ * With the disclosure open the row is tall, and `align-items: center` floats the brand and the
+ * theme button halfway down beside it. They belong at the top, next to the summary they were
+ * beside a moment ago. Only while it is open — closed, the row is 52px and centring is right.
+ *
+ * `:has()` because the state lives on a descendant. Where it is not supported the header keeps
+ * today's centred look, which is untidy and not broken.
+ */
+.site-inner:has(.menu-all[open]) { align-items: flex-start; }
+
+@media (min-width: 700px) {
+  .menu-all > summary { display: none; }
+  .menu-all::details-content { content-visibility: visible; block-size: auto; }
+  .menu-all > .menu-groups { flex-direction: row; padding: 0; }
+}
+header.site nav a,
+.menu-all > summary {
   font-size: var(--text-base);
   padding: .3rem .6rem;
   border-radius: var(--radius-md);
@@ -362,7 +419,28 @@ a:focus-visible { color: var(--link); text-decoration-thickness: 2px; }
 
 /* The district sub-navigation: five views of one district. A tab row in appearance, real links
    in fact, because each one is now its own URL. */
-.subnav { display: flex; gap: .4rem; margin: 0 0 var(--space-6); flex-wrap: wrap; }
+/*
+ * The five views of one district, on one row at every width.
+ *
+ * It wrapped to two rows below 560px — 80px against the 37px it takes when it fits — which was the
+ * second and third of the three header rows a phone was showing before the `h1`. It scrolls
+ * sideways instead, which is what the rest of this site does with a row too wide for the screen.
+ *
+ * No `tabindex` here, and that is the difference from `.scroll`. Those boxes hold tables, and a
+ * keyboard has nothing inside them to focus, so `semantics.ts` makes the box itself a tab stop.
+ * This holds five links: tabbing reaches each one and the browser scrolls it into view on focus.
+ * A tab stop on the container would put a sixth, contentless stop in front of them.
+ */
+.subnav {
+  display: flex;
+  gap: .4rem;
+  margin: 0 0 var(--space-6);
+  flex-wrap: nowrap;
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+.subnav::-webkit-scrollbar { display: none; }
+.subnav a { flex: none; }
 
 /*
  * Sticky from 1000px up, and deliberately not below it.
@@ -373,10 +451,19 @@ a:focus-visible { color: var(--link); text-decoration-thickness: 2px; }
  * fragment lands mid-page with no way between the five views except back to the top. Now that
  * fragments exist that is the ordinary arrival rather than the unusual one.
  *
- * Below 1000px it stays put, measured rather than assumed. The site header wraps to 96px at 700px
- * and to 168px at 390px, and a sticky bar under it would take 132px and 246px of an 800px viewport
- * — 31% at the narrowest, on a page whose complaint was density. The tab row is one screen from
- * the top there; the trade is not worth it and this is where that is written down.
+ * Below 1000px it stays put, and the reason has changed with the header.
+ *
+ * The note here used to say "the site header wraps to 96px at 700px and to 168px at 390px", and
+ * the first of those was never a measurement — 96px is the `--sticky-chrome` value for that
+ * breakpoint, written back into prose as though it were the thing the token was measured from.
+ * The header at 700px was 52px. #189 then made it 52px everywhere.
+ *
+ * So the old argument — that a second sticky bar would cost 31% of a phone screen — no longer
+ * holds on its own numbers: the two together would take 89px of 800px, which is 11%. What keeps
+ * this rule is a different and better reason. Below 1000px the sub-navigation is a horizontally
+ * scrolling row, and a sticky element that scrolls sideways under a finger is a control fighting
+ * the gesture that moves the page. It stays in the document there, and it is sticky only where it
+ * is wide enough to sit still.
  */
 @media (min-width: 1000px) {
   .subnav {
