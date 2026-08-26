@@ -597,7 +597,28 @@ export function renderPropertyValue(value: string, fromClass: string): string {
           return `<a href="${href}">${label}</a>`;
         })
         // Backticks, which they carry more often.
-        .replace(/`([^`]+)`/g, "<code>$1</code>"),
+        .replace(/`([^`]+)`/g, "<code>$1</code>")
+        /*
+         * Emphasis. Bold before italic, or `**x**` is read as an empty italic wrapping `*x*`.
+         *
+         * Neither pattern excludes `<` or `>`, and that is deliberate: the corpus writes
+         * `**[the plan](…)**` and `*[DeRolph I](…)*`, and by this point the link is already an
+         * anchor. Excluding the tag characters would leave those two asterisks on the page. It is
+         * safe because `[^*]` cannot cross an intervening asterisk, so a run can never span from
+         * one emphasis to the next.
+         *
+         * The italic guards are what keep arithmetic out of it. `ADM[last] * PROD over h of (1 +
+         * rate * damping^h)` is a real line in `enrolled-adm`, and `q * (n - 1)` is another —
+         * requiring a non-space immediately inside each delimiter excludes both, along with every
+         * other ` * ` in the corpus. Measured: three occurrences, all of them arithmetic.
+         *
+         * Underscores are not emphasis here. Markdown says they are and `renderProse` honours
+         * that, but no property in the corpus uses them for it, and the corpus is full of
+         * `snake_case` identifiers — `exp_per_equivalent_pupil_federal` — which is a bad thing to
+         * be one regex away from italicising.
+         */
+        .replace(/\*\*([^*]+)\*\*/g, "<strong>$1</strong>")
+        .replace(/(?<![*\w])\*(?!\s)([^*]+?)(?<!\s)\*(?![*\w])/g, "<em>$1</em>"),
     );
 
   const chunks = value
