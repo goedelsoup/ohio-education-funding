@@ -1,0 +1,101 @@
+id: the-redesign-that-argued-back
+summary: >-
+  Six phases of #182 landed and four of their premises did not survive contact with a measurement.
+  The record is of those: a link hue that does not exist, a sanitize schema that should not be
+  widened, a formula-linking feature with almost nothing to link to, and a standing no-font-binary
+  decision reversed for exactly one face. The serif question is settled in two different directions
+  for two different surfaces, and that is the point rather than an inconsistency.
+context: |
+  #182 diagnosed the site as dense and undesigned and proposed three moves behind six
+  measurements. It became #185 through #190, plus a LaTeX arc (#199–#204) that grew out of the
+  same reading: the hardest pages on the site are the ones carrying a calculation.
+
+  What the phases changed is in the diff. What is not in the diff is the set of things each phase
+  was *asked* to do and did not, and this repository has a habit of writing those down — see
+  `design/README.md` on the five-step ordinal ramp, whose refusal is better evidence than its
+  adoption would have been.
+
+  Every entry below was a phase's own stated plan, disproved by running the check the phase
+  existed to institute. That is the pattern worth recording: in each case the instrument was
+  built first and then contradicted the brief.
+decision: |
+  **The link hue does not exist, so links stopped being a colour.** #187 asked for a third text
+  hue, separated from the two chart series and legible on three surfaces. `web/scripts/link-hue-search.ts`
+  is the committed search: at the palette's own chroma there is no hue in 40°–240° with any
+  solution at all, because blue at 255.5° and orange at 37.9° are the two ends of the axis
+  dichromats keep. The best candidate scored **ΔE 10.2** — below the **10.9** that got a five-step
+  ramp deleted from this palette for being two bands a reader cannot tell apart. So `--link`
+  became an underline colour rather than a text colour: a mark at 3:1 instead of text at 5:1, and
+  the word itself stays ink.
+
+  **The sanitize schema was not widened.** #201 asked for it, to admit MathML. `prose.ts` records
+  that syntax highlighting was turned off *specifically* so `rehype-sanitize` could run the default
+  schema with nothing widened. Widening it would have put every corpus node's prose inside a larger
+  allowlist to serve sixteen formulas. Maths renders **after** sanitize instead, from a fence
+  sanitize has already escaped to text, through an enumerated allowlist that only has to describe
+  MathML. That list has since stopped two conversions at the boundary rather than after it —
+  `mstyle` on the first pilot, `<munder>` on the corpus's first `\sum_k`.
+
+  **One font binary ships, and it is not a text face.** `typography.css` opened "No webfont ships"
+  and #186 reaffirmed it for the display serif. #202 reversed it for a 27,236-byte subset of STIX
+  Two Math, last in `--font-math`, fetched only by a reader whose platform has no maths face. The
+  text rule is unchanged and restated. The reversal is in writing because a standing decision that
+  gets quietly outgrown cannot afterwards be told from one that was forgotten.
+
+  **The serif is a platform stack on the page and a shipped file on the cards, deliberately.**
+  #186 chose `--font-serif` as Iowan Old Style → Palatino → Charter → Georgia at zero bytes,
+  accepting that the face differs by platform, because a heading reflows and is not laid out
+  against pixel constants. A preview card cannot make that trade: it is rasterized on the build
+  machine and served as a PNG, so "system-ui" is not a thing it has. #190 gives the cards **Source
+  Serif 4**, chosen by rendering the real headline at the real size against Newsreader and Libre
+  Baskerville and looking. The card cannot match the reader's serif; it can agree about the
+  decision, which is that a headline is set in an old-style serif.
+consequences: |
+  **The refusals are enforced, not just recorded.** `palette.spec.ts` asserts no third text hue is
+  reintroduced and that `--link` is the underline colour. `math.ts` carries the allowlist and the
+  build fails on an element outside it. `tokens.spec.ts` asserts exactly one `@font-face` and that
+  no text stack names the shipped face. `og.spec.ts` lays the card headline out twice, with and
+  without the serif, and requires the geometry to differ — satori falls back silently, so a source
+  scan for the family name would agree with itself.
+
+  **#204 is open and blocked, with the number that blocks it.** Named quantities in a formula were
+  to link to the `parameter` nodes defining them. Measured across the fourteen converted formulas:
+  93 distinct named quantities, 6 parameter nodes, 10 `governed-by` edges — and **32 of the 33
+  statutory rates in the formulas have no parameter node at all**, against an ontology whose own
+  description names "a special-education category weight" as an example of the class. The feature
+  would light up ten edges. The corpus work comes first, which is what the issue said to do if the
+  number came back large.
+
+  **Two formula components are deliberately not typeset.** #203 asked whether the other eleven
+  follow the pilot; fourteen of sixteen do. `charge-off-local-share` is two products and
+  `fsfp-formula-transition-supplement` is one maximum over a sum — LaTeX would restate them with a
+  prettier multiplication sign and add a second statement to keep in step. The criterion is in
+  `formula-component.ont.yml`: a fraction, a piecewise rule, an exponent or an indexed family
+  earns the notation, and nothing else does.
+alternatives: |
+  **A coloured link, accepted below the bar.** The 10.2 could have shipped — it is one candidate
+  among many that this site would previously have taken on a glance. Refusing it cost a
+  familiar affordance; keeping it would have meant applying a standard to links that the palette
+  had already refused to apply to a chart ramp, in the same file, three weeks apart.
+
+  **A widened sanitize schema.** Simpler, one line, and it would have worked. It also moves the
+  boundary for every corpus node to serve sixteen formulas, and the two conversions the narrow
+  allowlist has since stopped would instead have rendered.
+
+  **The 394 KB font as-is, or no font at all.** #202 listed three options. Shipping whole would
+  have been 14× the bytes for glyphs no formula reaches; shipping nothing would have left Android
+  readers with unstretched delimiters — a `{` one line tall beside a five-line table, which is a
+  formula that means something else rather than a formula that looks different.
+
+  **A serif for the cards' figures too.** More internally consistent and less consistent with the
+  page it previews: `.tile .v` on the site inherits the sans with tabular figures, and
+  `typography.css` says the serif is for the display face "and for nothing that carries a number".
+  The card follows the page rather than itself.
+
+  **Duplicating the nav for the phone header.** #189 needed the five section menus on one row and
+  the obvious build is a narrow copy and a wide copy with `display: none` between them — 4,103
+  bytes of duplicate nav on each of 3,492 pages and the same 31 links in the document twice.
+  Rejected in favour of one `<details>` whose summary the wide layout hides, which depends on
+  `::details-content` and degrades to the phone's disclosure where that is unsupported. The
+  degradation is stated in the stylesheet because it is the part a reviewer should get to disagree
+  with.

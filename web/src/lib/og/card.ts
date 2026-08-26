@@ -21,6 +21,7 @@
  * project that has neither, in order to draw a rectangle with five text runs in it.
  */
 
+import { SERIF } from "./font.ts";
 import { CARD } from "./palette.ts";
 
 /** Which series the figure and the bar belong to. Two, as everywhere else on this site. */
@@ -125,8 +126,17 @@ export function render(card: Card): Element {
       type: "div",
       props: { style: { display: "flex", height: 2, background: CARD.rule, marginTop: 18 } },
     },
-    // The subject, and the only thing on the card set in the heavier weight.
+    /*
+     * The subject, and the only thing on the card set in the serif.
+     *
+     * #186 made the site's display face a serif and these cards stayed in Inter, so a card and the
+     * page it previews disagreed about what the site looks like — on the one occasion a reader
+     * sees both, which is clicking through from a link they were shown. `og/font.ts` explains why
+     * it is Source Serif 4 rather than the `--font-serif` stack itself, and why nothing else here
+     * follows it: the figure below is a number, and the site sets numbers in the sans.
+     */
     text(clamp(card.headline, 58), {
+      fontFamily: SERIF,
       fontSize: headlineSize(card.headline),
       fontWeight: 600,
       color: CARD.text,

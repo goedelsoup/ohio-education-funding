@@ -22,7 +22,10 @@ import { expect, test, describe } from "vitest";
 import { loadCorpus } from "../../src/lib/corpus.ts";
 import { counties } from "../../src/lib/county.ts";
 import { loadFeed } from "../../src/lib/feed.ts";
+import satori from "satori";
+
 import { clamp, render, WIDTH, HEIGHT } from "../../src/lib/og/card.ts";
+import { SERIF, fonts } from "../../src/lib/og/font.ts";
 import { CARD, SOURCE_PROPERTY } from "../../src/lib/og/palette.ts";
 import { pageCards } from "../../src/lib/og/pages.ts";
 import { canonicalPath, og } from "../../src/lib/routes.ts";
@@ -102,6 +105,60 @@ describe("the card palette", () => {
           `only place it gets the colour — update it, or the cards keep the old palette.`,
       ).toBe(value.toLowerCase());
     }
+  });
+});
+
+describe("the card's display face", () => {
+  /*
+   * That the headline is actually SET in the serif, not merely asked for.
+   *
+   * satori does not fail on a `fontFamily` it has no font for. It falls back to the first face it
+   * was given — which here is Inter, which is what the card used to be entirely — so a typo in the
+   * family name, a renamed subpath in the fontsource package, or a `fonts()` that stopped loading
+   * the file all produce a card that renders perfectly and silently undoes #190.
+   *
+   * So the check is behavioural: lay the same headline out twice, once with the serif available
+   * and once without, and require the geometry to differ. Nothing about the family name has to be
+   * spelled correctly here for that to work, which is the point — a source scan for the string
+   * would agree with itself.
+   */
+  const headline = "What Ohio pays its school districts";
+  const card = { eyebrow: "Ohio school funding", headline } as Parameters<typeof render>[0];
+
+  const layout = async (faces: Awaited<ReturnType<typeof fonts>>): Promise<string> =>
+    satori(render(card) as Parameters<typeof satori>[0], { width: WIDTH, height: HEIGHT, fonts: faces });
+
+  test("is loaded, and named the same way the renderer asks for it", () => {
+    // The two halves that have to agree. Neither implies the other, and the render check below
+    // cannot say which of them broke.
+    expect(fonts().map((face) => face.name)).toContain(SERIF);
+    expect(readFileSync(resolve(process.cwd(), "src/lib/og/card.ts"), "utf8")).toContain("fontFamily: SERIF");
+  });
+
+  test("actually reaches the headline, rather than falling back to the sans", async () => {
+    const withSerif = await layout(fonts());
+    const withoutSerif = await layout(fonts().filter((face) => face.name !== SERIF));
+    expect(withSerif).not.toBe(withoutSerif);
+  });
+
+  test("and the figure is NOT set in it, because the site sets numbers in the sans", async () => {
+    /*
+     * `tokens/typography.css` says the serif is for the display face "and for nothing that carries
+     * a number, sits in a table, or is drawn inside an `<svg>`". `.tile .v` on the page obeys that
+     * by inheriting the body stack. A card that put its dollar amount in the serif too would look
+     * more consistent with itself and less consistent with the page it previews.
+     *
+     * Checked by removing the SANS and seeing the figure change: if the figure were set in the
+     * serif, dropping Inter would leave it untouched.
+     */
+    const figured = { ...card, figure: "$7.28B" } as Parameters<typeof render>[0];
+    const both = await satori(render(figured) as Parameters<typeof satori>[0], {
+      width: WIDTH, height: HEIGHT, fonts: fonts(),
+    });
+    const serifOnly = await satori(render(figured) as Parameters<typeof satori>[0], {
+      width: WIDTH, height: HEIGHT, fonts: fonts().filter((face) => face.name === SERIF),
+    });
+    expect(both).not.toBe(serifOnly);
   });
 });
 
