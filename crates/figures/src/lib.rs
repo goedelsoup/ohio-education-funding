@@ -186,6 +186,23 @@ pub struct Inputs {
     /// The same sum with each reappraisal's inflationary increase phased in rather than counted
     /// whole. The difference between the two is what the charge-off does not reach.
     pub recognized_total: f64,
+    /// The FY2010-FY2013 real contraction, over the districts the F-33 panel carries in both.
+    pub trough: dispersion::ohio_panel::trough::Contraction,
+    /// What tracks the depth of that fall, and what does not — the corpus's seven-row null.
+    pub predictors: dispersion::ohio_panel::trough::Predictors,
+    /// The worst tenth of it, which is real and is not what moved the state.
+    pub decile: dispersion::ohio_panel::trough::DeepestDecile,
+    /// What refreshing the classroom teacher salary input to FY2024 does, across the state.
+    pub refresh_incidence: foundation::Refresh,
+    /// The same increase run as a uniform base cost scale, so the guarantee can be applied to
+    /// it. A DIFFERENT run from `refresh_incidence` — that one perturbs one salary per district
+    /// and this one scales the department's published aggregate — which the corpus states.
+    pub refresh_reach: scenario_delta::ScenarioDelta,
+    /// The White Paper's sensitivity table on both denominators.
+    pub sensitivity: dispersion::report_card::SensitivityTable,
+    /// The report card's statewide outcome block — the federal-share distribution and the two
+    /// value-added agreement statistics, over the 606 districts joined on all three panels.
+    pub outcome_block: bundle::OutcomeStatewide,
 }
 
 impl Inputs {
@@ -193,9 +210,15 @@ impl Inputs {
     #[must_use]
     pub fn build() -> Self {
         let panel = panel();
+        // Built before the struct literal because the outcome block is computed FROM it, and the
+        // literal below moves it in.
+        let joined = project::outcomes::joined();
+        let outcome_block =
+            bundle::build::outcome_statewide(&joined).expect("the joined panel is non-empty");
         // Cloned rather than borrowed: `panel` moves into the struct literal below, and the two
         // draft runs need it before that happens.
         let panel_for_drafts = panel.clone();
+        let panel_for_reach = panel.clone();
         let recognized: HashMap<String, Recognition> = recognized_valuation::from_abstract(2024);
         let at_recognized = panel_at_fy2027(
             &panel,
@@ -223,7 +246,7 @@ impl Inputs {
             states: dispersion::census_states::states(),
             profile: dispersion::profile::districts(),
             sd1: dispersion::sd1::rows(),
-            joined: project::outcomes::joined(),
+            joined,
             outcomes: {
                 let by_irn: std::collections::BTreeMap<
                     String,
@@ -249,6 +272,27 @@ impl Inputs {
             fund_the_plan: priced("fund-the-plan-and-retire-the-guarantee", &panel_for_drafts),
             actual_total,
             recognized_total,
+            // Computed once here rather than per figure: each of the three walks the whole
+            // ten-year panel and deflates it, and fourteen figures below read them.
+            trough: dispersion::ohio_panel::trough::contraction(),
+            predictors: dispersion::ohio_panel::trough::predictors(),
+            decile: dispersion::ohio_panel::trough::deepest_decile(),
+            sensitivity: dispersion::report_card::sensitivity(),
+            refresh_incidence: foundation::refresh(),
+            refresh_reach: {
+                // The department's own FY2027 computed increase, applied as a uniform scale.
+                const COMPUTED_INCREASE: f64 = 465.0e6;
+                let aggregate: f64 = panel_for_reach.iter().map(|r| r.aggregate_base_cost).sum();
+                scenario_delta::ScenarioDelta::between(
+                    &panel_for_reach,
+                    &project::policy::Policy::current_law(),
+                    &project::policy::Policy {
+                        base_cost_scale: 1.0 + COMPUTED_INCREASE / aggregate,
+                        ..project::policy::Policy::current_law()
+                    },
+                )
+            },
+            outcome_block,
         }
     }
 }
@@ -615,6 +659,212 @@ fn clawback(panel: &[DistrictRecord]) -> (usize, f64, f64, f64) {
 /// Ordered by owning crate, then by what the figure is about. The order is the manifest's order,
 /// so keep it stable: reordering rewrites a committed artefact for no reason.
 pub static FIGURES: &[Figure] = &[
+    // ---- crates/bundle -----------------------------------------------------------------------
+    //
+    // The report card's statewide outcome block, which two `metric/` nodes quote between them:
+    // the federal-share distribution on `per-pupil-operating-expenditure`, and the two value-added
+    // agreement statistics on `progress-value-added`.
+    //
+    // Reached through `build::outcome_statewide` rather than `build()`, which would rebuild every
+    // panel in the bundle to read one struct.
+    Figure {
+        key: "bundle/median-federal-share-of-operating-spending",
+        owner: "crates/bundle",
+        unit: Unit::Share,
+        label: "The median district's federal share of operating spending, 2024-25",
+        pinned: 0.042_038_401_6,
+        tolerance: 0.000_01,
+        compute: |i| i.outcome_block.median_federal_share,
+    },
+    Figure {
+        key: "bundle/max-federal-share-of-operating-spending",
+        owner: "crates/bundle",
+        unit: Unit::Share,
+        label: "The highest federal share in the state \u{2014} the most exposed district in \
+                Ohio to a decision Ohio does not make",
+        pinned: 0.290_419_691_9,
+        tolerance: 0.000_01,
+        compute: |i| i.outcome_block.max_federal_share,
+    },
+    Figure {
+        key: "bundle/districts-over-a-tenth-federal",
+        owner: "crates/bundle",
+        unit: Unit::Count,
+        label: "Districts where more than a tenth of operating spending is federal",
+        pinned: 49.0,
+        tolerance: 0.0,
+        compute: |i| i.outcome_block.federal_share_above_tenth as f64,
+    },
+    // Both halves of the correlation, because the raw one must never be quoted alone: federal
+    // money is allocated substantially by poverty, so raw is very largely the poverty
+    // relationship read backwards. A magnitude each, since prose writes the minus sign and the
+    // numeral reader cannot see it.
+    Figure {
+        key: "bundle/federal-share-against-performance-raw",
+        owner: "crates/bundle",
+        unit: Unit::Ratio,
+        label: "Federal share against the Performance Index, raw",
+        pinned: 0.546_227_415_1,
+        tolerance: 0.000_01,
+        compute: |i| i.outcome_block.federal_share_vs_performance_raw.abs(),
+    },
+    Figure {
+        key: "bundle/federal-share-against-performance-controlled",
+        owner: "crates/bundle",
+        unit: Unit::Ratio,
+        label: "The same, holding economic disadvantage constant \u{2014} the figure that says \
+                anything, and a fifth the size of the one that does not",
+        pinned: 0.114_562_368_9,
+        tolerance: 0.000_01,
+        compute: |i| i.outcome_block.federal_share_vs_performance.abs(),
+    },
+    // The two growth measures, for `progress-value-added`.
+    Figure {
+        key: "bundle/growth-measures-determinate",
+        owner: "crates/bundle",
+        unit: Unit::Count,
+        label: "Districts printing a non-zero value on both the one-year and three-year growth \
+                measures \u{2014} the denominator the disagreement is counted over",
+        pinned: 534.0,
+        tolerance: 0.0,
+        compute: |i| i.outcome_block.growth_measures_determinate as f64,
+    },
+    Figure {
+        key: "bundle/growth-measures-disagree",
+        owner: "crates/bundle",
+        unit: Unit::Count,
+        label: "Of those, how many point opposite ways",
+        pinned: 44.0,
+        tolerance: 0.0,
+        compute: |i| i.outcome_block.growth_measures_disagree as f64,
+    },
+    Figure {
+        key: "bundle/growth-measures-disagree-materially",
+        owner: "crates/bundle",
+        unit: Unit::Count,
+        label: "How many disagree with both magnitudes past 0.05 \u{2014} it is zero, which is \
+                what makes the disagreement readable as noise around a district sitting on zero",
+        pinned: 0.0,
+        tolerance: 0.0,
+        compute: |i| i.outcome_block.growth_measures_disagree_materially as f64,
+    },
+    Figure {
+        key: "bundle/growth-measure-agreement",
+        owner: "crates/bundle",
+        unit: Unit::Ratio,
+        label: "The correlation between the one-year and three-year growth measures across the \
+                districts determinate on both",
+        pinned: 0.903_134_341_1,
+        tolerance: 0.000_01,
+        compute: |i| i.outcome_block.growth_measure_agreement,
+    },
+    // ---- crates/deflator ---------------------------------------------------------------------
+    //
+    // The one figure family here that is a time series rather than a distribution over districts.
+    // `metric/per-pupil-operating-expenditure` states the whole restated series and then five
+    // sentences about its shape; the sentences are what is exported, because the series itself is
+    // in the node as a table and a reader acts on the claims made about it.
+    //
+    // Every one of these is a `[verified]` claim that stood on nothing a corpus check could reach.
+    Figure {
+        key: "deflator/real-operating-expenditure-growth",
+        owner: "crates/deflator",
+        unit: Unit::Share,
+        label: "Real growth in Ohio operating expenditure per pupil, FY2000 to FY2022, \
+                including federal relief",
+        pinned: 0.261_147_73,
+        tolerance: 0.000_01,
+        compute: |_| deflator::ohio_epp::real_growth_from_fy2000(),
+    },
+    Figure {
+        key: "deflator/real-operating-expenditure-growth-excluding-relief",
+        owner: "crates/deflator",
+        unit: Unit::Share,
+        label: "The same growth on the FY2022 figure that excludes federal COVID relief funds",
+        pinned: 0.193_536_25,
+        tolerance: 0.000_01,
+        compute: |_| deflator::ohio_epp::real_growth_from_fy2000_ex_relief(),
+    },
+    Figure {
+        key: "deflator/nominal-operating-expenditure-growth",
+        owner: "crates/deflator",
+        unit: Unit::Share,
+        label: "The same span undeflated \u{2014} the figure the same record supports and which \
+                reads four times larger",
+        pinned: 1.167_586_69,
+        tolerance: 0.000_01,
+        compute: |_| {
+            let series = deflator::ohio_epp::nominal_series();
+            series[series.len() - 1].dollars / series[0].dollars - 1.0
+        },
+    },
+    Figure {
+        key: "deflator/real-operating-expenditure-fy2000",
+        owner: "crates/deflator",
+        unit: Unit::Dollars,
+        label: "Ohio operating expenditure per pupil, FY2000, in constant FY2022 dollars",
+        pinned: 12_142.907_28,
+        tolerance: 0.01,
+        compute: |_| deflator::ohio_epp::real_at(edfund_core::FiscalYear(2000)),
+    },
+    Figure {
+        key: "deflator/real-operating-expenditure-peak",
+        owner: "crates/deflator",
+        unit: Unit::Dollars,
+        label: "The real peak of the series \u{2014} FY2020, two years before the nominal peak",
+        pinned: 15_746.733_67,
+        tolerance: 0.01,
+        compute: |_| deflator::ohio_epp::real_at(edfund_core::FiscalYear(2020)),
+    },
+    // A magnitude with the direction in the key, per the convention the second tranche set: a
+    // signed pin cannot be matched, because the numeral reader sees `7%` and never the minus.
+    Figure {
+        key: "deflator/real-operating-expenditure-trough-decline",
+        owner: "crates/deflator",
+        unit: Unit::Share,
+        label: "How far the real series fell from FY2010 to FY2014 \u{2014} the decline the \
+                nominal series conceals entirely",
+        pinned: 0.069_168_25,
+        tolerance: 0.000_01,
+        compute: |_| {
+            1.0 - deflator::ohio_epp::real_at(edfund_core::FiscalYear(2014))
+                / deflator::ohio_epp::real_at(edfund_core::FiscalYear(2010))
+        },
+    },
+    Figure {
+        key: "deflator/operating-expenditure-fy2022-excluding-relief",
+        owner: "crates/deflator",
+        unit: Unit::Dollars,
+        label: "FY2022 operating expenditure per pupil excluding federal COVID relief funds",
+        pinned: 14_493.0,
+        tolerance: 0.0,
+        compute: |_| deflator::ohio_epp::FY2022_EX_RELIEF,
+    },
+    Figure {
+        key: "deflator/relief-funds-per-pupil-fy2022",
+        owner: "crates/deflator",
+        unit: Unit::Dollars,
+        label: "The gap between the two FY2022 figures \u{2014} federal relief, per pupil",
+        pinned: 821.0,
+        tolerance: 0.0,
+        compute: |_| {
+            let series = deflator::ohio_epp::nominal_series();
+            series[series.len() - 1].dollars - deflator::ohio_epp::FY2022_EX_RELIEF
+        },
+    },
+    Figure {
+        key: "deflator/cpi-growth-fy2000-fy2022",
+        owner: "crates/deflator",
+        unit: Unit::Share,
+        label: "CPI-U growth over the same span, which is what separates the two readings",
+        pinned: 0.718_741_08,
+        tolerance: 0.000_01,
+        compute: |_| {
+            deflator::CpiSeries::cpi_u_june()
+                .index_growth(edfund_core::FiscalYear(2000), edfund_core::FiscalYear(2022))
+                .expect("both endpoints are in the CPI series")
+        },
+    },
     // ---- crates/dispersion -------------------------------------------------------------------
     //
     // `ohio_by_local_wealth` quartiles the comparable Ohio districts of the Census F-33 panel by
@@ -714,6 +964,355 @@ pub static FIGURES: &[Figure] = &[
             (q[3].local_per_pupil - q[0].local_per_pupil)
                 - (q[0].state_per_pupil - q[3].state_per_pupil)
                 - (q[0].federal_per_pupil - q[3].federal_per_pupil)
+        },
+    },
+    // The White Paper's own sensitivity table, both denominators. Magnitudes with the direction
+    // in the key, per convention two — and the direction is the whole finding here: the published
+    // measure CHANGES SIGN across the paper's three scenarios while the headcount one does not.
+    Figure {
+        key: "dispersion/published-estimate-negative-all-districts",
+        owner: "crates/dispersion",
+        unit: Unit::Ratio,
+        label: "Performance Index against spending per weighted pupil, all rated districts \
+                \u{2014} negative, and too small to have a direction",
+        pinned: 0.015_450_670_9,
+        tolerance: 0.000_01,
+        compute: |i| i.sensitivity.published.all_districts.abs(),
+    },
+    Figure {
+        key: "dispersion/published-estimate-negative-excluding-top-spender",
+        owner: "crates/dispersion",
+        unit: Unit::Ratio,
+        label: "The same less the single highest per-pupil spender \u{2014} still negative, and \
+                a quarter the size",
+        pinned: 0.004_216_665_8,
+        tolerance: 0.000_01,
+        compute: |i| i.sensitivity.published.excluding_top_spender.abs(),
+    },
+    Figure {
+        key: "dispersion/published-estimate-positive-excluding-small-districts",
+        owner: "crates/dispersion",
+        unit: Unit::Ratio,
+        label: "The same less districts under 582 pupils \u{2014} and now POSITIVE. The paper \
+                calls this range robustness; a measure that changes sign has none to report",
+        pinned: 0.035_822_857_6,
+        tolerance: 0.000_01,
+        compute: |i| i.sensitivity.published.excluding_small_districts.abs(),
+    },
+    Figure {
+        key: "dispersion/headcount-estimate-negative-all-districts",
+        owner: "crates/dispersion",
+        unit: Unit::Ratio,
+        label: "The same three scenarios on a headcount divisor: all rated districts",
+        pinned: 0.336_524_675_8,
+        tolerance: 0.000_01,
+        compute: |i| i.sensitivity.headcount.all_districts.abs(),
+    },
+    Figure {
+        key: "dispersion/headcount-estimate-negative-excluding-top-spender",
+        owner: "crates/dispersion",
+        unit: Unit::Ratio,
+        label: "The same on a headcount divisor, less the top spender \u{2014} the scenario \
+                that moves the published measure most and this one least",
+        pinned: 0.354_553_510_9,
+        tolerance: 0.000_01,
+        compute: |i| i.sensitivity.headcount.excluding_top_spender.abs(),
+    },
+    Figure {
+        key: "dispersion/headcount-estimate-negative-excluding-small-districts",
+        owner: "crates/dispersion",
+        unit: Unit::Ratio,
+        label: "Less the small districts \u{2014} the three move by 0.018 in total and never \
+                leave the same conclusion, which is what stability looks like",
+        pinned: 0.337_137_690_2,
+        tolerance: 0.000_01,
+        compute: |i| i.sensitivity.headcount.excluding_small_districts.abs(),
+    },
+    // The FY2010-FY2013 contraction, from `ohio_panel::trough`. Every one of these was published
+    // under `[verified]` against a test that asserted a band around it — `close(share, 0.807,
+    // 0.02)` — so the corpus and the crate could disagree indefinitely and both stay green. Four
+    // of the nine did.
+    Figure {
+        key: "dispersion/trough-panel-districts",
+        owner: "crates/dispersion",
+        unit: Unit::Count,
+        label: "Districts the F-33 panel carries in BOTH FY2010 and FY2013 — the population a \
+                change can be computed over, and smaller than either year alone",
+        pinned: 610.0,
+        tolerance: 0.0,
+        compute: |i| i.trough.districts as f64,
+    },
+    Figure {
+        key: "dispersion/trough-districts-falling",
+        owner: "crates/dispersion",
+        unit: Unit::Count,
+        label: "How many of them spent less per pupil in real terms in FY2013 than in FY2010",
+        pinned: 490.0,
+        tolerance: 0.0,
+        compute: |i| i.trough.falling as f64,
+    },
+    Figure {
+        key: "dispersion/trough-share-falling",
+        owner: "crates/dispersion",
+        unit: Unit::Share,
+        label: "The same, as a share — the contraction was broad rather than a few districts cut \
+                hard enough to move an average",
+        pinned: 0.803_278_69,
+        tolerance: 0.000_01,
+        compute: |i| i.trough.falling_share,
+    },
+    Figure {
+        key: "dispersion/trough-median-decline",
+        owner: "crates/dispersion",
+        unit: Unit::Share,
+        label: "The median district's real decline over the window",
+        pinned: 0.055_679_23,
+        tolerance: 0.000_01,
+        compute: |i| i.trough.median_decline,
+    },
+    Figure {
+        key: "dispersion/trough-first-quartile-decline",
+        owner: "crates/dispersion",
+        unit: Unit::Share,
+        label: "The first quartile's real decline",
+        pinned: 0.090_901_61,
+        tolerance: 0.000_01,
+        compute: |i| i.trough.first_quartile_decline,
+    },
+    Figure {
+        key: "dispersion/trough-weighted-decline",
+        owner: "crates/dispersion",
+        unit: Unit::Share,
+        label: "Enrollment-weighted, which is the figure comparable to the Auditor's statewide \
+                series — a different survey over a different entity set, same shape",
+        pinned: 0.067_952_36,
+        tolerance: 0.000_01,
+        compute: |i| i.trough.weighted_decline,
+    },
+    // The negative result, as five correlations. Magnitudes, because prose writes `+0.029` and
+    // `-0.186` and the numeral reader sees neither sign.
+    Figure {
+        key: "dispersion/trough-against-state-share",
+        owner: "crates/dispersion",
+        unit: Unit::Ratio,
+        label: "FY2010 state revenue share against the depth of the fall — the hypothesis this \
+                refutes, and the one that should have held",
+        pinned: 0.020_299_20,
+        tolerance: 0.000_01,
+        compute: |i| i.predictors.state_share.abs(),
+    },
+    Figure {
+        key: "dispersion/trough-against-federal-share",
+        owner: "crates/dispersion",
+        unit: Unit::Ratio,
+        label: "FY2010 federal revenue share against the depth of the fall",
+        pinned: 0.026_258_69,
+        tolerance: 0.000_01,
+        compute: |i| i.predictors.federal_share.abs(),
+    },
+    Figure {
+        key: "dispersion/trough-against-local-share",
+        owner: "crates/dispersion",
+        unit: Unit::Ratio,
+        label: "FY2010 local revenue share against the depth of the fall",
+        pinned: 0.024_392_39,
+        tolerance: 0.000_01,
+        compute: |i| i.predictors.local_share.abs(),
+    },
+    Figure {
+        key: "dispersion/trough-against-log-enrolment",
+        owner: "crates/dispersion",
+        unit: Unit::Ratio,
+        label: "Log enrollment against the depth of the fall — the strongest of the five, and \
+                still far smaller than the spread it is trying to explain",
+        pinned: 0.196_980_44,
+        tolerance: 0.000_01,
+        compute: |i| i.predictors.log_enrollment.abs(),
+    },
+    Figure {
+        key: "dispersion/trough-against-prior-spending",
+        owner: "crates/dispersion",
+        unit: Unit::Ratio,
+        label: "FY2010 real spending per pupil against the depth of the fall, which is partly \
+                mechanical: a district starting higher has more room to fall",
+        pinned: 0.167_893_44,
+        tolerance: 0.000_01,
+        compute: |i| i.predictors.prior_spending.abs(),
+    },
+    Figure {
+        key: "dispersion/trough-deepest-decile-districts",
+        owner: "crates/dispersion",
+        unit: Unit::Count,
+        label: "Districts in the worst tenth of the contraction",
+        pinned: 61.0,
+        tolerance: 0.0,
+        compute: |i| i.decile.districts as f64,
+    },
+    Figure {
+        key: "dispersion/trough-deepest-decile-decline",
+        owner: "crates/dispersion",
+        unit: Unit::Share,
+        label: "Their mean real decline",
+        pinned: 0.175_011_05,
+        tolerance: 0.000_01,
+        compute: |i| i.decile.mean_decline,
+    },
+    Figure {
+        key: "dispersion/trough-deepest-decile-pupil-share",
+        owner: "crates/dispersion",
+        unit: Unit::Share,
+        label: "The share of the panel's pupils they hold — which is why the deepest decile is a \
+                tail rather than the story",
+        pinned: 0.119_861_53,
+        tolerance: 0.000_01,
+        compute: |i| i.decile.pupil_share,
+    },
+    // ---- crates/foundation -------------------------------------------------------------------
+    //
+    // The input-year refresh, from `foundation::refresh`. `scenario/fsfp-input-year-refresh` is
+    // the one scenario whose whole subject is a measurement rather than a policy dial, so its
+    // incidence figures are the scenario.
+    Figure {
+        key: "foundation/refresh-panel-districts",
+        owner: "crates/foundation",
+        unit: Unit::Count,
+        label: "Districts in the grade-band panel the refresh is measured over",
+        pinned: 604.0,
+        tolerance: 0.0,
+        compute: |i| i.refresh_incidence.districts as f64,
+    },
+    Figure {
+        key: "foundation/refresh-statewide-base-cost-increase",
+        owner: "crates/foundation",
+        unit: Unit::Dollars,
+        label: "The statewide base cost increase from refreshing the classroom teacher salary \
+                input to FY2024 — computed cost, before any state-share or guarantee reduction",
+        pinned: 466_233_428.14,
+        tolerance: 1.0,
+        compute: |i| i.refresh_incidence.statewide_delta,
+    },
+    Figure {
+        key: "foundation/refresh-average-per-pupil",
+        owner: "crates/foundation",
+        unit: Unit::Dollars,
+        label: "The ADM-weighted average increase per pupil",
+        pinned: 323.970_247_833,
+        tolerance: 0.01,
+        compute: |i| i.refresh_incidence.average_per_pupil,
+    },
+    Figure {
+        key: "foundation/refresh-least-affected-per-pupil",
+        owner: "crates/foundation",
+        unit: Unit::Dollars,
+        label: "The least-affected district's increase per pupil",
+        pinned: 318.258_703_931,
+        tolerance: 0.01,
+        compute: |i| i.refresh_incidence.min_per_pupil,
+    },
+    Figure {
+        key: "foundation/refresh-most-affected-per-pupil",
+        owner: "crates/foundation",
+        unit: Unit::Dollars,
+        label: "The most-affected district's, which is about 1.4 times the least — with no \
+                policy choice anywhere in the difference",
+        pinned: 442.771_078_440,
+        tolerance: 0.01,
+        compute: |i| i.refresh_incidence.max_per_pupil,
+    },
+    Figure {
+        key: "foundation/refresh-districts-at-the-special-teacher-minimum",
+        owner: "crates/foundation",
+        unit: Unit::Count,
+        label: "Districts small enough that the six-teacher special minimum binds — the single \
+                cause of the spread above",
+        pinned: 155.0,
+        tolerance: 0.0,
+        compute: |i| i.refresh_incidence.special_minimum_binds as f64,
+    },
+    Figure {
+        key: "foundation/refresh-per-pupil-where-the-minimum-binds",
+        owner: "crates/foundation",
+        unit: Unit::Dollars,
+        label: "Their mean increase per pupil",
+        pinned: 346.279_581_056,
+        tolerance: 0.01,
+        compute: |i| i.refresh_incidence.bound_mean_per_pupil,
+    },
+    Figure {
+        key: "foundation/refresh-per-pupil-where-it-does-not",
+        owner: "crates/foundation",
+        unit: Unit::Dollars,
+        label: "Everyone else's mean increase per pupil, which is the comparison that makes the \
+                staffing minimum the cause rather than a correlate",
+        pinned: 322.872_511_005,
+        tolerance: 0.01,
+        compute: |i| i.refresh_incidence.free_mean_per_pupil,
+    },
+    Figure {
+        key: "foundation/fy2024-classroom-teacher-salary",
+        owner: "crates/foundation",
+        unit: Unit::Dollars,
+        label: "The FY2024 statewide average classroom teacher salary — the year a refresh reads, \
+                and the number the whole perturbation runs to",
+        pinned: 73_777.08,
+        tolerance: 0.0,
+        compute: |_| foundation::FY2024_TEACHER_SALARY,
+    },
+    Figure {
+        key: "foundation/fy2022-classroom-teacher-salary",
+        owner: "crates/foundation",
+        unit: Unit::Dollars,
+        label: "The FY2022 reference salary it runs from, as the department's FY2027 calculator \
+                carries it",
+        pinned: 68_022.22,
+        tolerance: 0.0,
+        compute: |_| foundation::StatewideFactors::fy2027().teacher_salary,
+    },
+    // ---- crates/scenario-delta ---------------------------------------------------------------
+    //
+    // Who a base cost increase does NOT reach, which is the half of the answer the scenario
+    // exists to state. The corpus published a decomposition that summed correctly and disagreed
+    // with the crate in both terms: 242 unmoved and 52 lifted off against 253 and 41.
+    Figure {
+        key: "scenario-delta/refresh-districts-unmoved",
+        owner: "crates/scenario-delta",
+        unit: Unit::Count,
+        label: "Districts a base cost increase of the department's own size does not move at \
+                all, because the guarantee pays them under both policies",
+        pinned: 253.0,
+        tolerance: 0.0,
+        compute: |i| i.refresh_reach.total().reach.unmoved as f64,
+    },
+    Figure {
+        key: "scenario-delta/refresh-districts-lifted-off",
+        owner: "crates/scenario-delta",
+        unit: Unit::Count,
+        label: "Guaranteed districts an increase this size lifts off the guarantee and onto the \
+                formula — the mechanism by which a large enough increase shrinks the guarantee",
+        pinned: 41.0,
+        tolerance: 0.0,
+        compute: |i| i.refresh_reach.total().reach.lifted_off as f64,
+    },
+    Figure {
+        key: "scenario-delta/refresh-districts-gaining",
+        owner: "crates/scenario-delta",
+        unit: Unit::Count,
+        label: "Districts whose aid actually rises",
+        pinned: 356.0,
+        tolerance: 0.0,
+        compute: |i| i.refresh_reach.total().reach.gainers as f64,
+    },
+    Figure {
+        key: "scenario-delta/refresh-adm-share-unmoved",
+        owner: "crates/scenario-delta",
+        unit: Unit::Share,
+        label: "The share of Ohio's modelled enrollment held by the districts an increase does \
+                not reach — the figure that says whether the unmoved count is a large fact",
+        pinned: 0.430_474_04,
+        tolerance: 0.000_01,
+        compute: |i| {
+            let unmoved = i.refresh_reach.aggregate(|d| !d.moved());
+            unmoved.adm / i.refresh_reach.total().adm
         },
     },
     // ---- crates/project ----------------------------------------------------------------------

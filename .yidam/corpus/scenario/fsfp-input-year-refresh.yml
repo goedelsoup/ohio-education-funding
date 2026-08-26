@@ -49,6 +49,7 @@ findings: |
   **THE ANSWER, on the department's own published worked example district** (20,342.13 base
   cost enrolled ADM, 43 buildings), perturbing the classroom teacher salary from the FY2022
   reference of $68,022.22 to an FY2024 refresh of $73,777.08 — an 8.46% rise:
+  [verified — crates/foundation]
 
       base cost per pupil    $7,629.24  ->  $7,960.38     +$331.14   (+4.34%)
       aggregate base cost  $155,194,925 -> $161,931,078  +$6,736,153
@@ -91,7 +92,9 @@ findings: |
 
       statewide computed base cost increase   $466.2 million per year
       ADM-weighted average                    $323.97 per pupil
-      per-pupil range                         $318.26  to  $442.76
+      per-pupil range                         $318.26  to  $442.77
+
+  [verified — crates/foundation]
 
   The single-district extrapolation above gave $497 million; the real distribution gives $466.2
   million. The gap is mostly denominators — the worked example's grade mix is slightly richer
@@ -109,10 +112,10 @@ findings: |
 
   ### The spread has a single cause, and it is the staffing minimum
 
-  The most-affected district gains 1.4 times per pupil what the least-affected does — $442.76
+  The most-affected district gains 1.4 times per pupil what the least-affected does — $442.77
   against $318.26 — with no policy choice involved. **155 of 604 districts** are small enough
   that the six-teacher special teacher minimum binds, and their mean per-pupil gain is $346.28
-  against $322.87 for everyone else. [verified]
+  against $322.87 for everyone else. [verified — crates/foundation]
 
   ### The spread, revised
 
@@ -143,11 +146,15 @@ findings: |
 
   A district below its guarantee floor receives the guarantee, not the formula amount. When the
   formula amount rises, the top-up shrinks by exactly the same sum and total funding does not
-  move. So **242 districts — two in five, holding 41.8% of Ohio's students — would gain nothing
-  at all** from a reference-year refresh. Fifty-two guaranteed districts would be lifted off;
-  the median guaranteed district is held more than three times above what a refresh would give
-  it, so the guarantee is not a marginal buffer but the operative funding mechanism for those
-  districts. [verified]
+  move. So **253 districts — two in five, holding 43.0% of Ohio's students — would gain nothing
+  at all** from a reference-year refresh, and 356 districts do gain. 41 guaranteed districts
+  would be lifted off; the median guaranteed district is held more than three times above what a
+  refresh would give it, so the guarantee is not a marginal buffer but the operative funding
+  mechanism for those districts. [verified — crates/scenario-delta]
+
+  The three counts were published as 242 unmoved and 52 lifted off. Both sum to the same 294 on
+  the guarantee, which is why the decomposition read as coherent while neither term matched the
+  calculator — the arithmetic that would have caught it was the one already satisfied.
 
   This does not overturn the incidence findings above — districts on formula do receive 100%,
   and the small-district minimums do concentrate the gain — but it shrinks the population those
@@ -193,6 +200,65 @@ findings: |
   ratio of about fifteen to one. A refresh is progressive; the reason is mostly that wealthy
   districts are on the guarantee. [verified]
 figures:
+  # The refresh's own incidence, which is what this scenario is. The department's $465.0M in the
+  # decomposition below is a DIFFERENT run — a uniform scale of the same statewide magnitude —
+  # and the node says so; it is not bound to this.
+  - key: foundation/refresh-panel-districts
+    value: 604
+    field: findings
+    as_written: "**155 of 604 districts**"
+  - key: foundation/refresh-statewide-base-cost-increase
+    value: 466233428.1428537
+    field: findings
+    as_written: "statewide computed base cost increase   $466.2 million per year"
+  - key: foundation/refresh-average-per-pupil
+    value: 323.97024783327146
+    field: findings
+    as_written: "ADM-weighted average                    $323.97 per pupil"
+  - key: foundation/refresh-least-affected-per-pupil
+    value: 318.2587039312633
+    field: findings
+    as_written: "per-pupil range                         $318.26"
+  - key: foundation/refresh-most-affected-per-pupil
+    value: 442.7710784402109
+    field: findings
+    as_written: "$442.77\n  against $318.26"
+  - key: foundation/refresh-districts-at-the-special-teacher-minimum
+    value: 155
+    field: findings
+    as_written: "155 of 604 districts"
+  - key: foundation/refresh-per-pupil-where-the-minimum-binds
+    value: 346.2795810561409
+    field: findings
+    as_written: "their mean per-pupil gain is $346.28"
+  - key: foundation/refresh-per-pupil-where-it-does-not
+    value: 322.87251100527686
+    field: findings
+    as_written: "against $322.87 for everyone else"
+  - key: foundation/fy2022-classroom-teacher-salary
+    value: 68022.22
+    field: findings
+    as_written: "reference of $68,022.22 to an FY2024 refresh"
+  - key: foundation/fy2024-classroom-teacher-salary
+    value: 73777.08
+    field: findings
+    as_written: "an FY2024 refresh of $73,777.08"
+  - key: scenario-delta/refresh-districts-unmoved
+    value: 253
+    field: findings
+    as_written: "**253 districts"
+  - key: scenario-delta/refresh-adm-share-unmoved
+    value: 0.43047404315735277
+    field: findings
+    as_written: "holding 43.0% of Ohio's students"
+  - key: scenario-delta/refresh-districts-gaining
+    value: 356
+    field: findings
+    as_written: "356 districts do gain"
+  - key: scenario-delta/refresh-districts-lifted-off
+    value: 41
+    field: findings
+    as_written: "41 guaranteed districts\n  would be lifted off"
   - key: project/districts-on-the-guarantee
     value: 294
     field: findings

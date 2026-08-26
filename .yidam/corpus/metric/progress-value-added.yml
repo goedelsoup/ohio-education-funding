@@ -33,17 +33,24 @@ description: |
   claim here rests on — and over a single year. The second was extracted into
   `project::outcomes` from the beginning and reached no consumer until now. [verified]
 
-  They agree wherever agreement carries information. Of the **534 districts printing a non-zero
-  value on both, 44 point opposite ways**, and **not one of those 44 has both magnitudes above
-  0.05**: each is within 0.04 of zero on one of the two, which is no measured growth there and a
-  sign that is arbitrary. The correlation across those 534 is 0.912.
-  [verified — computed in `crates/bundle` from the 2024-25 report card]
-
-  So the smoothing choice is safe for any district with real movement, and the three-year
-  figure remains the right default: a single year of value-added is noisy enough that the
-  department smooths it deliberately. What the choice does decide is the **sign** for districts
-  sitting on zero, and the sign is what gets reported about them. [inference]
 figures:
+  - key: bundle/growth-measures-determinate
+    value: 534
+    field: findings
+    as_written: "Of the **534 districts printing a non-zero"
+  - key: bundle/growth-measures-disagree
+    value: 44
+    field: findings
+    as_written: "44 point opposite ways**"
+  # A spelled count is not readable and this one was "not one", per convention 1.
+  - key: bundle/growth-measures-disagree-materially
+    value: 0
+    field: findings
+    as_written: "of those 44 exactly **0** have both magnitudes"
+  - key: bundle/growth-measure-agreement
+    value: 0.9031343411231557
+    field: findings
+    as_written: "The correlation across those 534 is 0.903"
   - key: dispersion/attainment-against-growth
     value: 0.37524603489784697
     field: description
@@ -119,7 +126,31 @@ findings: |
   standardised gain and correlates at +0.155. The two correlate with each other at +0.917,
   which makes the choice look immaterial. It is not: ranking districts on the composite ranks
   them partly by size. Every figure in this corpus uses the effect size. [verified]
+  ### How far the two published forms agree
+
+  They agree wherever agreement carries information. Of the **534 districts printing a non-zero
+  value on both, 44 point opposite ways**, and of those 44 exactly **0** have both magnitudes
+  above 0.05: each is within 0.04 of zero on one of the two, which is no measured growth there
+  and a sign that is arbitrary. The correlation across those 534 is 0.903.
+  [verified — computed in `crates/bundle` from the 2024-25 report card]
+
+  So the smoothing choice is safe for any district with real movement, and the three-year figure
+  remains the right default: a single year of value-added is noisy enough that the department
+  smooths it deliberately. What the choice does decide is the **sign** for districts sitting on
+  zero, and the sign is what gets reported about them. [inference]
 revisions:
+  - was: |
+      The correlation between the two published growth measures was stated as 0.912.
+    now: |
+      **0.903.** [verified — crates/bundle]
+    found_by: |
+      Binding the figure to `crates/figures`. The test standing behind the claim asserted a band
+      around it, so the two could disagree indefinitely and both stay green — the same shape as
+      the eight findings before it. See the `figures:` section of `.yidam/corpus/README.md`.
+    reach: |
+      None. The claim the figure supports is that the two measures agree wherever agreement
+      carries information, and 0.903 supports it exactly as 0.912 did. What moved is the
+      number's standing: it is now checked against the crate that computes it.
   - was: |
       Every claim on this node rested on value-added without stating which of the department's
       two published forms it used.

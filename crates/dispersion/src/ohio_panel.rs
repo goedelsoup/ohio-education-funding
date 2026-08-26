@@ -533,3 +533,268 @@ mod tests {
         }
     }
 }
+
+/// The FY2010-FY2013 contraction, district by district.
+///
+/// # Why this is here rather than in the test that found it
+///
+/// `tests/f33_ohio_panel_trough.rs` located the trough and then asserted it in **bands** —
+/// `close(share, 0.807, 0.02)`, `close(median, -0.056, 0.006)`. The corpus publishes the same
+/// quantities as *values*: `490 — 81%`, `median change -5.6%`, `first quartile -9.2%`. A band and
+/// a value can disagree indefinitely and both stay green, which is the failure convention four
+/// was written for after it had already happened four times.
+///
+/// So the analysis is public and pinned in `crates/figures`, and the test keeps its bands — they
+/// are the right shape for "this result is robust", which is a different claim from "this is the
+/// number the corpus prints".
+///
+/// # The years, and the hole in them
+///
+/// [`trough::PEAK_YEAR`] to [`trough::BOTTOM_YEAR`], because **FY2014 is absent from the NCES archive** under
+/// every naming the surrounding years use. The Auditor's statewide series is still falling
+/// between FY2012 and FY2014, so this measurement stops short of the bottom and *understates*
+/// the contraction. Stated rather than interpolated.
+pub mod trough {
+    use super::{panel, PanelRow};
+    use crate::percentile_sorted;
+    use deflator::CpiSeries;
+    use edfund_core::FiscalYear;
+
+    /// The year the real series peaks, on the Auditor's wider entity set and on this one.
+    pub const PEAK_YEAR: u16 = 2010;
+    /// The last year before the archive's gap, and as deep as this panel can see.
+    pub const BOTTOM_YEAR: u16 = 2013;
+    /// The dollars every figure here is stated in.
+    pub const BASE_YEAR: u16 = 2022;
+
+    /// The comparable districts, in the years they report spending.
+    ///
+    /// The filter is the analysis's rather than the reader's: [`panel`] returns every row the
+    /// survey holds, including the community schools and service centres the comparability flag
+    /// excludes, and the years an agency reported revenue without spending.
+    #[must_use]
+    pub fn comparable() -> Vec<PanelRow> {
+        panel()
+            .into_iter()
+            .filter(|r| {
+                r.comparable
+                    && !r.irn.is_empty()
+                    && r.enrollment > 0.0
+                    && r.total_revenue > 0.0
+                    && r.current_spending.is_some()
+            })
+            .collect()
+    }
+
+    /// A figure restated in [`BASE_YEAR`] dollars.
+    ///
+    /// # Panics
+    ///
+    /// If the CPI series has no observation for the year, which the committed series rules out
+    /// across this window.
+    #[must_use]
+    pub fn real(value: f64, year: u16) -> f64 {
+        CpiSeries::cpi_u_june()
+            .convert(value, FiscalYear(year), FiscalYear(BASE_YEAR))
+            .unwrap_or_else(|e| panic!("no CPI observation for FY{year}: {e}"))
+            .value
+    }
+
+    /// The rows of one year.
+    #[must_use]
+    pub fn year_of(rows: &[PanelRow], year: u16) -> Vec<PanelRow> {
+        rows.iter()
+            .filter(|r| r.fiscal_year == year)
+            .cloned()
+            .collect()
+    }
+
+    /// Districts present in **both** endpoint years, with the real change between them.
+    ///
+    /// The inner join is the population every figure below is computed over, and it is smaller
+    /// than either year alone: a district the survey lost or gained between them cannot carry a
+    /// change. That is why the count here is not the panel's district count.
+    #[must_use]
+    pub fn changes(rows: &[PanelRow]) -> Vec<(PanelRow, f64)> {
+        let bottom = year_of(rows, BOTTOM_YEAR);
+        year_of(rows, PEAK_YEAR)
+            .into_iter()
+            .filter_map(|start| {
+                let end = bottom.iter().find(|r| r.irn == start.irn)?;
+                let spend = |row: &PanelRow, year: u16| {
+                    real(
+                        row.spending_per_pupil()
+                            .expect("filtered to rows that report spending"),
+                        year,
+                    )
+                };
+                Some((
+                    start.clone(),
+                    spend(end, BOTTOM_YEAR) / spend(&start, PEAK_YEAR) - 1.0,
+                ))
+            })
+            .collect()
+    }
+
+    /// What the contraction looked like across the districts that lived through it.
+    #[derive(Debug, Clone, Copy, PartialEq)]
+    pub struct Contraction {
+        /// Districts present in both endpoint years.
+        pub districts: usize,
+        /// How many of them spent less per pupil in real terms.
+        pub falling: usize,
+        /// [`Self::falling`] as a fraction of [`Self::districts`].
+        pub falling_share: f64,
+        /// The median real change, as a **magnitude of decline** — positive, because the key
+        /// carries the direction and a numeral reader cannot see a minus sign.
+        pub median_decline: f64,
+        /// The first-quartile real change, on the same convention.
+        pub first_quartile_decline: f64,
+        /// The enrollment-weighted decline, which is the figure comparable to the Auditor's
+        /// statewide series — a different survey over a different entity set.
+        pub weighted_decline: f64,
+    }
+
+    /// Measure it.
+    ///
+    /// # Panics
+    ///
+    /// If the panel carries no district in both endpoint years, which the committed fixture
+    /// rules out.
+    #[must_use]
+    pub fn contraction() -> Contraction {
+        let rows = comparable();
+        let changes = changes(&rows);
+        assert!(!changes.is_empty(), "no district spans both endpoint years");
+
+        let falling = changes.iter().filter(|(_, c)| *c < 0.0).count();
+        let mut values: Vec<f64> = changes.iter().map(|(_, c)| *c).collect();
+        values.sort_by(f64::total_cmp);
+
+        let weighted = |year: u16| {
+            let rows = year_of(&rows, year);
+            let pupils: f64 = rows.iter().map(|r| r.enrollment).sum();
+            rows.iter()
+                .map(|r| {
+                    real(
+                        r.spending_per_pupil()
+                            .expect("filtered to rows that report spending"),
+                        year,
+                    ) * r.enrollment
+                })
+                .sum::<f64>()
+                / pupils
+        };
+
+        /*
+         * `percentile_sorted` and not `values[len / 2]`, which is what the test did and what this
+         * function did when it was lifted out of it. On an even-length series the ad-hoc form
+         * takes the upper of the two middle observations; this interpolates them. The difference
+         * is small and it is not nothing — and `percentile_sorted`'s own docstring already names
+         * three places in this workspace that had the ad-hoc form and were corrected. This was
+         * the fourth, and it reached the corpus.
+         */
+        Contraction {
+            districts: changes.len(),
+            falling,
+            falling_share: falling as f64 / changes.len() as f64,
+            median_decline: -percentile_sorted(&values, 0.5),
+            first_quartile_decline: -percentile_sorted(&values, 0.25),
+            weighted_decline: 1.0 - weighted(BOTTOM_YEAR) / weighted(PEAK_YEAR),
+        }
+    }
+    /// What tracks the depth of the fall, and what does not.
+    ///
+    /// The corpus publishes this as a seven-row table of correlations under `[verified]`, and it
+    /// is a **negative** result: the hypothesis it refutes is that a contraction coinciding with
+    /// the withdrawal of federal stimulus should land hardest on the districts most dependent on
+    /// state aid. It did not. Only size and prior level register at all.
+    ///
+    /// Each figure is a magnitude with its sign carried in the field name, per the convention a
+    /// numeral reader forces: prose writes `+0.029` and `-0.186` and the reader sees neither sign.
+    #[derive(Debug, Clone, Copy, PartialEq)]
+    pub struct Predictors {
+        /// FY2010 state revenue share against the depth of the fall.
+        pub state_share: f64,
+        /// FY2010 federal revenue share.
+        pub federal_share: f64,
+        /// FY2010 local revenue share.
+        pub local_share: f64,
+        /// Natural log of enrollment — the strongest of the seven, and still weak.
+        pub log_enrollment: f64,
+        /// FY2010 real spending per pupil, which is partly mechanical: a district starting higher
+        /// has more room to fall.
+        pub prior_spending: f64,
+    }
+
+    /// Compute them.
+    ///
+    /// # Panics
+    ///
+    /// If the paired series cannot be correlated, which a non-empty panel rules out.
+    #[must_use]
+    pub fn predictors() -> Predictors {
+        let changes = changes(&comparable());
+        let correlate = |pairs: &[(f64, f64)]| {
+            let (x, y): (Vec<f64>, Vec<f64>) = pairs.iter().copied().unzip();
+            crate::wealth_neutrality(&x, &y)
+                .expect("paired series")
+                .correlation
+        };
+        let against = |pick: &dyn Fn(&PanelRow) -> f64| {
+            correlate(
+                &changes
+                    .iter()
+                    .map(|(r, c)| (pick(r), *c))
+                    .collect::<Vec<_>>(),
+            )
+        };
+        let share =
+            |row: &PanelRow, part: f64| row.share(part).expect("filtered to rows with revenue");
+        Predictors {
+            state_share: against(&|r| share(r, r.state_revenue)),
+            federal_share: against(&|r| share(r, r.federal_revenue)),
+            local_share: against(&|r| share(r, r.local_revenue)),
+            log_enrollment: against(&|r| r.enrollment.ln()),
+            prior_spending: against(&|r| {
+                real(
+                    r.spending_per_pupil()
+                        .expect("filtered to rows that report spending"),
+                    PEAK_YEAR,
+                )
+            }),
+        }
+    }
+
+    /// The worst tenth of districts — real, and not what moved the state.
+    #[derive(Debug, Clone, Copy, PartialEq)]
+    pub struct DeepestDecile {
+        /// How many districts are in it.
+        pub districts: usize,
+        /// Their mean decline, as a magnitude.
+        pub mean_decline: f64,
+        /// The share of the panel's pupils they hold, which is the reason this is a tail rather
+        /// than the story.
+        pub pupil_share: f64,
+    }
+
+    /// Measure it.
+    ///
+    /// # Panics
+    ///
+    /// If the panel is empty.
+    #[must_use]
+    pub fn deepest_decile() -> DeepestDecile {
+        let mut changes = changes(&comparable());
+        changes.sort_by(|a, b| a.1.total_cmp(&b.1));
+        let tenth = changes.len() / 10;
+        assert!(tenth > 0, "the panel is too small to have a decile");
+        let worst = &changes[..tenth];
+        let pupils: f64 = changes.iter().map(|(r, _)| r.enrollment).sum();
+        DeepestDecile {
+            districts: tenth,
+            mean_decline: -worst.iter().map(|(_, c)| *c).sum::<f64>() / tenth as f64,
+            pupil_share: worst.iter().map(|(r, _)| r.enrollment).sum::<f64>() / pupils,
+        }
+    }
+}

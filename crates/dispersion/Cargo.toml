@@ -9,12 +9,14 @@ publish.workspace = true
 
 [dependencies]
 edfund-core = { path = "../edfund-core" }
+# For `ohio_panel::trough`, which is a real-terms result and so cannot be computed without a
+# deflator. It was a dev-dependency while the deflation lived in `tests/f33_ohio_panel_trough.rs`,
+# under a comment saying nothing this crate computes is in constant dollars. That stopped being
+# true when the trough moved into the library so `crates/figures` could pin what the corpus
+# publishes about it — the test asserted bands where the corpus states values.
+deflator = { path = "../deflator" }
 
 [dev-dependencies]
-# For `tests/f33_ohio_panel_trough.rs`, which deflates the panel rather than growing a second
-# reader of `connect`'s committed CPI extract. Not a dependency of the library: nothing this
-# crate computes is in constant dollars.
-deflator = { path = "../deflator" }
 # For `tests/report_card_2425.rs`, which splits the report card on the FY2027 guarantee. The
 # model is `foundation`'s fixture, so its reader is `foundation`'s; this test was carrying a
 # third parser of it. `foundation` dev-depends on this crate in turn, which Cargo allows

@@ -32,47 +32,41 @@
 //!
 //! Cited by `corpus/metric/per-pupil-operating-expenditure.yml`.
 
-use deflator::CpiSeries;
-use dispersion::ohio_panel::{self, PanelRow};
+use dispersion::ohio_panel::PanelRow;
 use dispersion::profile;
 use dispersion::{wealth_neutrality, Dispersion};
-use edfund_core::FiscalYear;
 
-/// The peak of the trough, and the last year before recovery that the archive holds.
-const PEAK: u16 = 2010;
-const BOTTOM: u16 = 2013;
-/// Everything is restated in the dollars of the panel's final year.
-const BASE: u16 = 2022;
+/// The peak of the trough, and the last year before recovery that the archive holds. Read from
+/// the module rather than restated, so a test and the figures it backs cannot drift apart.
+const PEAK: u16 = trough::PEAK_YEAR;
+const BOTTOM: u16 = trough::BOTTOM_YEAR;
 
-/// Restate a figure from `year` in [`BASE`] dollars, on the index the corpus deflates by.
+/*
+ * The analysis these tests used to carry privately now lives in `ohio_panel::trough`, and this
+ * file delegates to it rather than keeping a second copy.
+ *
+ * The move was not tidying. Every assertion below is a **band** — `close(share, 0.807, 0.02)` —
+ * which is the right shape for "this result is robust to how it is measured" and the wrong shape
+ * for checking a number the corpus prints. The corpus printed `81%`, `-9.2%` and `-0.186`; the
+ * bands held while all three drifted. `crates/figures` now pins the values and this file keeps
+ * the bands, which is the division of labour convention four asks for.
+ */
+use dispersion::ohio_panel::trough;
+
+/// Restate a figure from `year` in the dollars of the panel's final year, on the index the corpus
+/// deflates by.
 ///
 /// Was a private scan of `connect`'s committed BLS extract for the June observation of each
 /// year. That extract is exactly what `deflator::CpiSeries::cpi_u_june` is verified against by
 /// `connect/tests/deflator_matches_bls.rs`, so this is the same arithmetic on the same numbers
 /// with one fewer parser between them.
 fn real(value: f64, year: u16) -> f64 {
-    CpiSeries::cpi_u_june()
-        .convert(value, FiscalYear(year), FiscalYear(BASE))
-        .unwrap_or_else(|e| panic!("no CPI observation for FY{year}: {e}"))
-        .value
+    trough::real(value, year)
 }
 
 /// The comparable districts of the panel, in the years they report spending.
-///
-/// The filter is the analysis's and not the reader's: [`ohio_panel::panel`] returns every row
-/// the survey holds, including the community schools and service centres that the comparability
-/// flag excludes and the years an agency reported revenue without spending.
 fn panel() -> Vec<PanelRow> {
-    ohio_panel::panel()
-        .into_iter()
-        .filter(|r| {
-            r.comparable
-                && !r.irn.is_empty()
-                && r.enrollment > 0.0
-                && r.total_revenue > 0.0
-                && r.current_spending.is_some()
-        })
-        .collect()
+    trough::comparable()
 }
 
 /// Spending per pupil, which every comparable row carries by construction of [`panel`].
@@ -88,25 +82,12 @@ fn share(row: &PanelRow, part: f64) -> f64 {
 }
 
 fn year_of(rows: &[PanelRow], year: u16) -> Vec<PanelRow> {
-    rows.iter()
-        .filter(|r| r.fiscal_year == year)
-        .cloned()
-        .collect()
+    trough::year_of(rows, year)
 }
 
 /// Districts present in both endpoint years, with the real change between them.
 fn changes(rows: &[PanelRow]) -> Vec<(PanelRow, f64)> {
-    let bottom = year_of(rows, BOTTOM);
-    year_of(rows, PEAK)
-        .into_iter()
-        .filter_map(|start| {
-            let end = bottom.iter().find(|r| r.irn == start.irn)?;
-            let change = real(spending_per_pupil(end), BOTTOM)
-                / real(spending_per_pupil(&start), PEAK)
-                - 1.0;
-            Some((start, change))
-        })
-        .collect()
+    trough::changes(rows)
 }
 
 fn correlate(pairs: &[(f64, f64)]) -> f64 {

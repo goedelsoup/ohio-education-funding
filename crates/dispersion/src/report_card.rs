@@ -224,6 +224,88 @@ pub fn district(irn: &str) -> Option<ReportCard> {
     cached().iter().find(|card| card.irn == irn).cloned()
 }
 
+/// The White Paper's own sensitivity check, run on both denominators.
+///
+/// # What it settles
+///
+/// The paper reports that its spending-versus-outcome estimate "stays near zero" across three
+/// scenarios and calls that robustness. It is not: **a near-zero estimate staying near zero is
+/// arithmetic, not stability.** Across the three, the published measure changes *sign* and its
+/// magnitude varies by a factor of eight, while the headcount measure moves by 0.018 and never
+/// leaves the same conclusion.
+///
+/// That is a stronger objection than "the denominator matters", because it is drawn from the
+/// paper's own table rather than from a different one.
+///
+/// Public because `metric/expenditure-per-equivalent-pupil` prints all six figures under
+/// `[verified]`. They were computed inside `tests/report_card_2425.rs` and reachable from
+/// nothing.
+#[derive(Debug, Clone, Copy, PartialEq)]
+pub struct Sensitivity {
+    /// Every rated district.
+    pub all_districts: f64,
+    /// Less the single highest per-pupil spender.
+    pub excluding_top_spender: f64,
+    /// Less districts under 582 enrolled pupils, which is the paper's own cut.
+    pub excluding_small_districts: f64,
+}
+
+/// Both rows of it: the published weighted denominator, and the headcount one.
+#[derive(Debug, Clone, Copy, PartialEq)]
+pub struct SensitivityTable {
+    /// Performance Index against spending per **weighted** pupil — the published measure.
+    pub published: Sensitivity,
+    /// The same against spending per **enrolled** pupil.
+    pub headcount: Sensitivity,
+}
+
+/// Run it.
+///
+/// # Panics
+///
+/// If a scenario leaves no complete pair to correlate, which the committed report card rules out.
+#[must_use]
+pub fn sensitivity() -> SensitivityTable {
+    let all = report_cards();
+
+    let correlate = |rows: &[ReportCard], pick: fn(&ReportCard) -> Option<Dollars>| {
+        let (x, y): (Vec<f64>, Vec<f64>) = rows
+            .iter()
+            .filter_map(|r| Some((r.performance_index?, pick(r)?)))
+            .unzip();
+        crate::wealth_neutrality(&x, &y)
+            .expect("paired series")
+            .correlation
+    };
+
+    let top = all
+        .iter()
+        .max_by(|a, b| {
+            a.per_equivalent_pupil
+                .partial_cmp(&b.per_equivalent_pupil)
+                .expect("the report card carries no NaN per-pupil figure")
+        })
+        .expect("the report card is non-empty")
+        .clone();
+    let without_top: Vec<ReportCard> = all.iter().filter(|r| r.irn != top.irn).cloned().collect();
+    let without_small: Vec<ReportCard> = all
+        .iter()
+        .filter(|r| r.unweighted_adm.is_some_and(|a| a >= 582.0))
+        .cloned()
+        .collect();
+
+    let row = |pick: fn(&ReportCard) -> Option<Dollars>| Sensitivity {
+        all_districts: correlate(&all, pick),
+        excluding_top_spender: correlate(&without_top, pick),
+        excluding_small_districts: correlate(&without_small, pick),
+    };
+
+    SensitivityTable {
+        published: row(ReportCard::per_weighted_pupil),
+        headcount: row(ReportCard::per_enrolled_pupil),
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
