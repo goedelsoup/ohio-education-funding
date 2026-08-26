@@ -18,6 +18,7 @@ import { join } from "node:path";
 import AxeBuilder from "@axe-core/playwright";
 import { expect, test, type Locator, type Page } from "@playwright/test";
 
+import { FONT_PATH, readCmap, readWoff2Tables } from "../../src/lib/math-font.ts";
 import { REQUIRED_CONTRACT } from "../../src/lib/types.ts";
 
 /**
@@ -1386,6 +1387,155 @@ test.describe("a table that scrolls sideways", () => {
       expect(state.emptyWithChildren, "an <mspace> has eaten the rest of its row").toBe(0);
       if (width === 375) expect(state.boxScrolls, "a wide formula scrolls on a phone").toBe(true);
     }
+  });
+
+  /**
+   * The shipped font stretches a brace — asked of the browser, not of the table.
+   *
+   * `tests/unit/math-font.spec.ts` reads the file and says the `MATH` table is there with thirteen
+   * variants and five assembly parts behind the brace. That is a claim about bytes. This is the
+   * claim that matters: that a browser handed only this font draws a delimiter the height of what
+   * it delimits. A subsetter that dropped `MATH`, or kept it while dropping the glyphs it points
+   * at, produces a font that passes every structural check and fails here.
+   *
+   * The family has to be forced. `--font-math` names Cambria Math and STIX Two Math ahead of the
+   * shipped one on purpose, so on any machine with either — which is every machine this suite runs
+   * on except a bare Linux runner — the fallback is never fetched and a test that just loaded the
+   * page would be measuring the platform's font and reporting it as ours.
+   *
+   * The control is in the same test. `serif` has no `MATH` table, and it is what a reader with no
+   * maths face would see if this font did not exist: the brace stays at one line while the table
+   * it belongs to is five, which is the state #202 was opened to end.
+   */
+  test("a brace stretches with the shipped font, and does not without it", async ({ page }) => {
+    await page.goto("/wiki/formula-component/fsfp-local-capacity-measure");
+    await page.waitForFunction(() => document.fonts.status === "loaded");
+
+    const measure = async (family: string) =>
+      page.locator(".formula math").first().evaluate(async (math, declared) => {
+        (math as HTMLElement).style.fontFamily = declared;
+        await document.fonts.load(`17px ${declared}`);
+        await document.fonts.ready;
+        const brace = [...math.querySelectorAll("mo")].find((mo) => mo.textContent?.trim() === "{");
+        const rows = brace?.parentElement?.querySelector("mtable");
+        return {
+          brace: brace?.getBoundingClientRect().height ?? 0,
+          rows: rows?.getBoundingClientRect().height ?? 0,
+          drawnWith: getComputedStyle(brace!).fontFamily,
+        };
+      }, family);
+
+    const shipped = await measure('"Ohio Math Fallback"');
+    expect(shipped.rows, "the cases block is several rows tall").toBeGreaterThan(60);
+    expect(shipped.drawnWith).toContain("Ohio Math Fallback");
+    // Not "taller than one line" — the brace has to reach the block. Anything less is a font that
+    // stepped up through its variants and then ran out, which is a dropped GlyphAssembly.
+    expect(shipped.brace, "the brace does not reach the block it opens").toBeGreaterThan(shipped.rows * 0.95);
+
+    const none = await measure("serif");
+    expect(none.brace, "a font with no MATH table must not stretch, or this proves nothing").toBeLessThan(
+      none.rows * 0.5,
+    );
+  });
+
+  /**
+   * The font is served from the one path that already says `immutable`.
+   *
+   * #202 asked for a cache rule and the answer was to need none: reaching the file with a relative
+   * `url()` from `tokens/typography.css` puts it through Vite, which content-hashes it into
+   * `/_astro/` — and `/_astro/*` has held `immutable` since the header block was fixed. Dropping
+   * the same file in `public/` instead would have served it unhashed at a fixed path, where
+   * `immutable` is not available and it would have revalidated on every visit.
+   *
+   * `_headers` is unreadable from a page, so this reads the built artefact, like the CSV block.
+   */
+  test("the maths font is content-hashed into the path marked immutable", () => {
+    const DIST = join(import.meta.dirname, "../../dist");
+    const stylesheets = readdirSync(join(DIST, "_astro")).filter((name) => name.endsWith(".css"));
+    const references = stylesheets.flatMap((name) =>
+      [...readFileSync(join(DIST, "_astro", name), "utf8").matchAll(/url\(([^)]*\.woff2)\)/g)].map(
+        ([, url]) => url!,
+      ),
+    );
+    expect(references, "the @font-face reaches exactly one font").toHaveLength(1);
+    expect(references[0]).toMatch(/^\/_astro\/ohio-math-fallback\.[A-Za-z0-9_-]{8}\.woff2$/);
+    expect(existsSync(join(DIST, references[0]!.slice(1))), "the URL points at nothing").toBe(true);
+
+    const headers = readFileSync(join(DIST, "_headers"), "utf8");
+    const block = headers.match(/^\/_astro\/\*$\n((?:^ {2}.*$\n?)+)/m)?.[1] ?? "";
+    expect(block).toContain("immutable");
+  });
+
+  /**
+   * And the corpus has not written a character the shipped font cannot draw.
+   *
+   * The repertoire in `src/lib/math-font.ts` is stated rather than derived from the corpus, which
+   * is the safer direction but leaves one gap: a formula using a character outside it renders that
+   * character in some other face, and nothing about that looks like a failure. So the corpus is
+   * checked against the font instead of the font against the corpus, and the fix when this fails
+   * is to widen `REPERTOIRE` and re-run `scripts/subset-math-font.ts --write`.
+   *
+   * `<annotation>` is skipped: it holds the LaTeX source, it is `display: none`, and its backslashes
+   * and braces are not what anybody renders.
+   */
+  test("every character inside a formula is one the shipped font carries", async () => {
+    const DIST = join(import.meta.dirname, "../../dist");
+    const walk = (dir: string): string[] =>
+      readdirSync(dir, { withFileTypes: true }).flatMap((entry) =>
+        entry.isDirectory()
+          ? walk(join(dir, entry.name))
+          : entry.name.endsWith(".html")
+            ? [join(dir, entry.name)]
+            : [],
+      );
+
+    const font = new Uint8Array(readFileSync(join(import.meta.dirname, "../..", FONT_PATH)));
+    const cmap = readCmap(readWoff2Tables(font).get("cmap")!);
+
+    const outside = new Map<number, string>();
+    let formulas = 0;
+    for (const file of walk(DIST)) {
+      const html = readFileSync(file, "utf8");
+      if (!html.includes("<math")) continue;
+      for (const [element] of html.matchAll(/<math[\s\S]*?<\/math>/g)) {
+        formulas += 1;
+        const text = element
+          .replace(/<annotation[\s\S]*?<\/annotation>/g, "")
+          .replace(/<[^>]+>/g, "")
+          .replace(/&#x([0-9a-f]+);/gi, (_, hex: string) => String.fromCodePoint(parseInt(hex, 16)))
+          .replace(/&#(\d+);/g, (_, decimal: string) => String.fromCodePoint(Number(decimal)))
+          .replace(/&(amp|lt|gt|quot|apos);/g, (_, name: string) =>
+            ({ amp: "&", lt: "<", gt: ">", quot: '"', apos: "'" })[name]!,
+          );
+        const where = file.slice(DIST.length + 1);
+        for (const character of text) {
+          const codepoint = character.codePointAt(0)!;
+          if (!cmap.has(codepoint)) outside.set(codepoint, `${where}: ${JSON.stringify(character)}`);
+        }
+
+        /*
+         * And the twin. A single-character `<mi>` with no `mathvariant` gets `text-transform:
+         * math-auto`, so the letter in the markup is NOT the codepoint that renders — `<mi>C</mi>`
+         * draws U+1D436. Checking the markup alone would pass over a font with no italic block at
+         * all, which is the exact subset this suite has to be able to reject.
+         */
+        for (const [, letter] of element.matchAll(/<mi>([A-Za-z])<\/mi>/g)) {
+          const code = letter!.charCodeAt(0);
+          const italic =
+            letter === "h"
+              ? 0x210e // Unicode leaves a hole at U+1D455 and puts italic h in Letterlike Symbols.
+              : code <= 0x5a
+                ? 0x1d434 + code - 0x41
+                : 0x1d44e + code - 0x61;
+          if (!cmap.has(italic)) outside.set(italic, `${where}: <mi>${letter}</mi> renders as it`);
+        }
+      }
+    }
+
+    expect(formulas, "the build carries formulas to check at all").toBeGreaterThan(0);
+    expect(
+      [...outside].map(([codepoint, where]) => `U+${codepoint.toString(16).toUpperCase().padStart(4, "0")} ${where}`),
+    ).toEqual([]);
   });
 
   /**

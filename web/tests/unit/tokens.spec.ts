@@ -139,4 +139,61 @@ describe("the font stacks", () => {
     expect(body).toContain("font: 15px/1.55");
     expect(body).not.toContain("var(--font-sans)");
   });
+
+  /*
+   * `--font-math` is the one stack where naming the families IS the mechanism.
+   *
+   * Measured in chromium, same markup, same machine: with the generic `math` keyword alone a
+   * `cases` brace rendered 13.7px against a 74.6px table; with the families named it rendered
+   * 81.6px against 81.6px. The keyword did not reach a maths font even on a machine that had one
+   * installed. So a stack that decayed back to `math` would not fail — it would draw every formula
+   * on the site with flat delimiters and nothing would say so.
+   */
+  test("--font-math names families, and never decays to the bare `math` keyword", () => {
+    const typography = withoutComments(read("tokens/typography.css"));
+    const stack = typography.match(/--font-math:\s*([^;]+);/)?.[1]?.replace(/\s+/g, " ").trim();
+    expect(stack).toBeDefined();
+    expect(stack).not.toBe("math");
+    for (const family of ["Cambria Math", "STIX Two Math", "NotoSansMath-Regular"]) {
+      expect(stack).toContain(family);
+    }
+  });
+
+  /*
+   * The shipped fallback is last, and that position is the whole cost control.
+   *
+   * CSS matches a font stack per character, so a browser fetches a family only when it needs a
+   * glyph from it. Last means a reader whose platform already has Cambria Math or STIX Two Math
+   * never touches the file. Anywhere earlier and every reader downloads 27 KB to be handed a face
+   * their machine already had — and if it were declared under the name "STIX Two Math", the
+   * @font-face would shadow the local font and they would get 357 glyphs instead of 5,169.
+   */
+  test("the one shipped face is last in the stack, and declared with font-display: block", () => {
+    const typography = withoutComments(read("tokens/typography.css"));
+    const stack = typography.match(/--font-math:\s*([^;]+);/)![1]!.replace(/\s+/g, " ").trim();
+    const families = stack.split(",").map((family) => family.trim().replace(/^"|"$/g, ""));
+    expect(families.at(-1), "the generic keyword still closes the stack").toBe("math");
+    expect(families.at(-2)).toBe("Ohio Math Fallback");
+
+    const face = typography.match(/@font-face\s*\{[^}]*\}/)?.[0]?.replace(/\s+/g, " ") ?? "";
+    expect(face).toContain('font-family: "Ohio Math Fallback"');
+    expect(face).toContain("ohio-math-fallback.woff2");
+    /*
+     * `block`, not `swap`, and the difference is not stylistic. A swap on a text face shows the
+     * same words in another face. A swap here shows a `{` one line tall beside a five-line table,
+     * which is a formula that means something else, and then moves the page under the reader when
+     * it arrives. `block`'s swap period is unbounded, so a slow font is late rather than lost.
+     */
+    expect(face).toContain("font-display: block");
+  });
+
+  test("exactly one @font-face is declared, and it is not for a text face", () => {
+    // The standing rule this phase reversed says text ships no binary. One face crossing that line
+    // was argued for in writing; a second one arriving quietly is what this counts.
+    const typography = withoutComments(read("tokens/typography.css"));
+    expect(typography.match(/@font-face/g) ?? []).toHaveLength(1);
+    for (const stack of ["--font-sans", "--font-mono", "--font-serif"]) {
+      expect(typography.match(new RegExp(`${stack}:[^;]+;`))![0]).not.toContain("Ohio Math");
+    }
+  });
 });

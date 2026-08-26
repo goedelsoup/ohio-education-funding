@@ -53,6 +53,12 @@
 # Vite content-hashes these filenames, so a changed file is a changed URL and the old one can be
 # held forever. The `.js.map` beside the bundle is hashed too, and is deployed on purpose:
 # `astro.config.mjs` turns sourcemaps on so the arithmetic stays readable in the browser.
+#
+# The maths font rides this rule and needed no block of its own. `tokens/typography.css` reaches it
+# with a relative `url()`, so Vite hashes it into `/_astro/` like a stylesheet — which is the whole
+# reason it is imported from `src/assets/` rather than dropped in `public/`, where it would have
+# been unhashed and stuck with a revalidating max-age like `/data/*`. A font is the asset that
+# benefits most from `immutable`: it is fetched once, by a reader whose platform gave them nothing.
 /_astro/*
   Cache-Control: public, max-age=31536000, immutable
 
