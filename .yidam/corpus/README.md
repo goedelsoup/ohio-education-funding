@@ -180,13 +180,19 @@ cluster needed the same move #157 made: LSC's redbook and greenbook had three pr
 across three test files and no public one, and two of the three anchored a table differently. They
 read through `project::budget_analysis` now.
 
-**Fifty-six nodes cite a crate inside a `[verified]` tag; thirty-seven carry bindings.** The
-nineteen that carry none are all citation rather than computation, and nothing is missing from
-them: **seventeen** are the identifier class above — `fiscal-period/*.appropriating_bill`,
-`program/*.appropriation_line`, `education-agency/*.irn` and `legislation/*` bill numbers — and the
-remaining two, [`bridge-formula`](../corpus/funding-regime/bridge-formula.yml) and
-[`tpp-replacement-payments`](../corpus/revenue-stream/tpp-replacement-payments.yml), cite a
-committed **fixture path** rather than a calculator. A path is not a quantity either.
+**Fifty-eight nodes cite a crate inside a `[verified]` tag; forty-six carry bindings.** Of the
+twelve that carry none, **ten are citation rather than computation** — the identifier class above,
+plus the nodes that cite a committed **fixture path** rather than a calculator. A path is not a
+quantity either.
+
+**The other two are a real residue, and this paragraph used to deny they existed.** It said the
+non-binding nodes were "all citation rather than computation", which was true when it was written
+and was not re-measured after. [`toledo-city`](../corpus/education-agency/toledo-city.yml) and
+[`perrysburg-exempted-village`](../corpus/education-agency/perrysburg-exempted-village.yml) both
+publish computed cross-sections — 21,160 pupils and $20,805 per headcount pupil for one, $14,632
+and a 13.8% disadvantaged share for the other — under `[verified — computed]`, against
+`crates/dispersion/tests/expenditure_functions_fy25.rs`. That test holds its own reader, so
+finishing them is a hoist and not just a `FIGURES` entry.
 
 **The most-repeated computed number in the corpus was bound in none of its carriers until the
 fourth tranche.** `294 of 609` — the districts the guarantee pays in the terminal year — is
@@ -196,21 +202,26 @@ out. Four of the ten stated the figure without naming the crate that computes it
 went in where the binding did — a figure checked against a crate a node never mentions is a check
 nobody reading the page could have anticipated, which is what the `unattributed` diagnostic says.
 
-**What is left is four nodes that are bound but not finished.** Each carries the figures this
-manifest already exported and still states claims of its own that need a figure owner it does not
-have: `metric/per-pupil-operating-expenditure` and `metric/progress-value-added` want
-`crates/deflator`'s real EPP series, `crates/dispersion`'s F-33 trough panel, and the value-added
-agreement statistics `crates/bundle` computes; `metric/expenditure-per-equivalent-pupil` wants its
-sensitivity table; and `scenario/fsfp-input-year-refresh` wants `crates/foundation` and
-`crates/scenario-delta`. All of them compute through public API — what is missing is `FIGURES`
-entries and `Inputs` fields, not a refactor.
+**Those four nodes are finished.** `metric/per-pupil-operating-expenditure` and
+`metric/progress-value-added` now bind `crates/deflator`'s real EPP series, `crates/dispersion`'s
+F-33 trough panel and `crates/bundle`'s outcome block; `metric/expenditure-per-equivalent-pupil`
+binds its sensitivity table; `scenario/fsfp-input-year-refresh` binds `crates/foundation`'s
+refresh incidence and `crates/scenario-delta`'s reach.
+
+**"All of them compute through public API" was wrong, and this paragraph said it.** Five of the
+computations lived in a test file or a private literal and were reachable from nothing:
+`deflator::ohio_epp::FY2022_EX_RELIEF` (a literal in a unit test, a private `const` in an example,
+and a number in the corpus, with nothing relating the three), `dispersion::ohio_panel::trough`,
+`dispersion::report_card::sensitivity`, `foundation::{FY2024_TEACHER_SALARY, refresh}` and
+`bundle::build::outcome_statewide`. The claim was made from reading which *fixtures* the tests
+read rather than which *functions* they called.
 
 ### What binding a figure has cost so far
 
-Eight live claims turned out to be wrong, every one of them under `[verified]`, and none was
-reachable before the readers were made public. They are worth listing because the pattern is the
-same each time — a test standing behind the claim asserted a **bound** where the prose asserted a
-**value**:
+**Twenty-two live claims turned out to be wrong**, every one of them under `[verified]`, and none
+was reachable before the readers were made public. They are worth listing because the pattern is
+the same each time — a test standing behind the claim asserted a **bound** where the prose asserted
+a **value**:
 
 | Node | Published | Computed | What stood behind it |
 |---|---|---|---|
@@ -222,13 +233,46 @@ same each time — a test standing behind the claim asserted a **bound** where t
 | `fsfp-enrolment-supplements` | `Two other districts` | three | nothing |
 | `temporary-transitional-aid-guarantee` | `89.9` | `89.85` | nothing |
 | `casino-tax-distribution` | `seventh smallest` (of two years) | eleventh and seventh | `moved < largest / 2.0` |
+| `per-pupil-operating-expenditure` | `607 comparable districts` | `610` | `changes.len() > 600` |
+| `per-pupil-operating-expenditure` | `81%` fell | `80.3%` | `close(share, 0.807, 0.02)` |
+| `per-pupil-operating-expenditure` | first quartile `-9.2%` | `-9.1%` | `close(q1, -0.092, 0.008)` |
+| `per-pupil-operating-expenditure` | state share `+0.029` | `+0.020` | `r.abs() < 0.06` |
+| `per-pupil-operating-expenditure` | federal share `+0.029` | `+0.026` | `r.abs() < 0.06` |
+| `per-pupil-operating-expenditure` | local share `-0.032` | `-0.024` | `r.abs() < 0.06` |
+| `per-pupil-operating-expenditure` | log enrollment `-0.186` | `-0.197` | `close(r, -0.186, 0.02)` |
+| `per-pupil-operating-expenditure` | prior spending `-0.176` | `-0.168` | `close(r, -0.176, 0.02)` |
+| `per-pupil-operating-expenditure` | deepest decile `60` districts | `61` | `changes.len() / 10` |
+| `per-pupil-operating-expenditure` | its mean `-17.6%` | `-17.5%` | `close(mean, -0.176, 0.02)` |
+| `per-pupil-operating-expenditure` | its pupils `11.8%` | `12.0%` | `close(share, 0.118, 0.02)` |
+| `progress-value-added` | agreement `0.912` | `0.903` | a band |
+| `fsfp-input-year-refresh` | most-affected `$442.76` | `$442.77` | `(max - 442.76).abs() < 1.0` |
+| `fsfp-input-year-refresh` | `242` districts unmoved | `253` | nothing |
+| `fsfp-input-year-refresh` | `Fifty-two` lifted off | `41` | nothing |
+| `fsfp-input-year-refresh` | `41.8%` of pupils unmoved | `43.0%` | nothing |
 
-Two of the eight are not transcription errors but **definition** ones. The guarantee's median index
-was taken as the upper of the two middle observations where `dispersion::median` averages them —
-the same local median this workspace has now corrected in five files. And the casino node's noise
-floor is the reverse case, the only one so far where the corpus was right and the crate was not:
-the node publishes the $236 million median that `dispersion::median` gives, the test standing
-behind it computed $252 million from the upper-of-two, and the assertion was
+**The refresh decomposition is the one to learn from.** `242` unmoved and `52` lifted off sum to
+the `294` districts on the guarantee, and so do the correct `253` and `41`. The decomposition read
+as coherent because the only arithmetic that could have caught it was the arithmetic it already
+satisfied — an internal consistency check is not an external one.
+
+Several are not transcription errors but **definition** ones, and they are the ones worth reading
+twice.
+
+**The upper-of-two median, for the sixth time.** The guarantee's median index was taken as the
+upper of the two middle observations where `dispersion::median` averages them. The F-33 trough's
+median was the sixth instance: `values[len / 2]`, inherited from the test the analysis was lifted
+out of. Correcting it moved the computed figure onto the published `-5.6%`, which makes this the
+only case in the table where binding a figure **vindicated** the prose rather than moving it —
+the ad-hoc definition was what disagreed.
+
+**A wrong population is a wrong figure even when the numerator is right.** `490` districts fell
+and that was correct; `607` was the report card's district count, borrowed for a panel that joins
+FY2010 to FY2013 and admits `610`. The share published from it was wrong twice over — wrong
+denominator, then rounded.
+
+**And the casino noise floor is the reverse case,** the only one so far where the corpus was right
+and the crate was not: the node publishes the $236 million median that `dispersion::median` gives,
+the test standing behind it computed $252 million from the upper-of-two, and the assertion was
 `(200_000_000.0..300_000_000.0).contains(&median)`, which holds both.
 
 A figure computed by hand beside a test that does not compute it is the thing this mechanism is
@@ -244,7 +288,7 @@ Fields: count per claim tag across every node; then the unresolved marks by the 
 -->
 | Tag | Count | What it records |
 |---|--:|---|
-| `[verified]` | 1159 | supported by a committed primary source |
+| `[verified]` | 1172 | supported by a committed primary source |
 | `[inference]` | 275 | drawn from verified facts, not witnessed |
 | `[open]` | 216 | a live question — unknown, contested, or being worked |
 | `[unentered]` | 0 | a knowable value nobody has typed in yet |
@@ -289,7 +333,7 @@ Fields: count per claim tag across every node; then the unresolved marks by the 
 | `appropriation_line` | 1 | 0 |
 | `appropriating_bill` | 1 | 0 |
 
-**62 recorded withdrawals across 35 nodes.** A claim the corpus published and no longer stands behind is kept in a `revisions:` block rather than edited out, with the test or source that settled it — see [`the-four-genres-of-a-description`](../decisions/the-four-genres-of-a-description.yml). Counted here for the same reason the tags above are: how often this corpus has corrected itself is a fact about it, and one nobody would think to update by hand.
+**63 recorded withdrawals across 35 nodes.** A claim the corpus published and no longer stands behind is kept in a `revisions:` block rather than edited out, with the test or source that settled it — see [`the-four-genres-of-a-description`](../decisions/the-four-genres-of-a-description.yml). Counted here for the same reason the tags above are: how often this corpus has corrected itself is a fact about it, and one nobody would think to update by hand.
 <!-- /REGEN -->
 
 ## Relationship vocabulary

@@ -15,15 +15,13 @@
 //! the corpus node with them.
 
 use foundation::grade_bands::{self, GradeBands as District, SUPPRESSED_BANDS};
-use foundation::{teacher_salary_refresh_delta, StatewideFactors};
+use foundation::{teacher_salary_refresh_delta, StatewideFactors, FY2024_TEACHER_SALARY};
 
 /// FY2022 reference-year teacher salary carried forward by H.B. 96. [verified]
 ///
 /// Read off the department's own factor set rather than restated, so that a correction to the
 /// price vector cannot leave this panel perturbing from a figure the workspace contradicts.
 const FY2022_TEACHER_SALARY: f64 = StatewideFactors::fy2027().teacher_salary;
-/// ADM-weighted statewide average classroom teacher salary, FY2024. [verified]
-const FY2024_TEACHER_SALARY: f64 = 73_777.08;
 
 /// The panel, read through [`foundation::grade_bands`].
 ///

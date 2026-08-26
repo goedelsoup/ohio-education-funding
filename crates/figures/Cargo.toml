@@ -8,10 +8,21 @@ publish.workspace = true
 description = "The figures the corpus quotes, computed from the crates that own them"
 
 [dependencies]
+# The statewide operating-expenditure series, which is the one figure family here that is a
+# time series rather than a distribution — see `deflator::ohio_epp`.
+# For `build::outcome_statewide`, which computes the report-card outcome block the two `metric/`
+# nodes quote — the federal-share distribution and the two value-added agreement statistics.
+bundle = { path = "../bundle" }
+deflator = { path = "../deflator" }
+# For `foundation::refresh`, the input-year-refresh incidence the scenario node publishes.
+foundation = { path = "../foundation" }
 dispersion = { path = "../dispersion" }
 # For `FiscalYear`, which the appropriation series is deflated into.
 edfund-core = { path = "../edfund-core" }
 project = { path = "../project" }
+# For the reach of a base cost increase: who a refresh does not touch, and how many pupils they
+# hold. `scenario/fsfp-input-year-refresh` states both.
+scenario-delta = { path = "../scenario-delta" }
 regime-diff = { path = "../regime-diff" }
 
 [[bin]]

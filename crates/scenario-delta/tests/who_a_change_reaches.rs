@@ -124,9 +124,10 @@ fn a_base_cost_increase_does_not_reach_two_in_five_districts() {
         "reaches {:.3}",
         total.reaches()
     );
-    // 38 districts are lifted off the guarantee by an increase this size and become formula
-    // districts. That is the mechanism by which a large enough increase eventually shrinks the
-    // guarantee population, and at this size it is 38 of 294.
+    // Districts lifted off the guarantee onto the formula by an increase this size. That is the
+    // mechanism by which a large enough increase eventually shrinks the guarantee population,
+    // and at this size it is 41 of 294. The comment here said 38, twice, against an assertion of
+    // 41 — a stale number in the one place a reader looks to find out what the number means.
     assert_eq!(total.reach.lifted_off, 41);
     assert_eq!(total.reach.pushed_on, 0);
 }

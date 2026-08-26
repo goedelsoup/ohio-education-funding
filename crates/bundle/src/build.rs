@@ -365,7 +365,12 @@ fn national() -> Option<National> {
 }
 
 /// The statewide outcome block, or `None` if nothing joined.
-fn outcome_statewide(records: &[Joined]) -> Option<OutcomeStatewide> {
+///
+/// Public because `crates/figures` pins nine of these figures for the corpus, and calling
+/// [`build`] to reach them would rebuild every panel in the bundle to read one struct. The
+/// argument is `project::outcomes::Joined`, which the manifest already holds.
+#[must_use]
+pub fn outcome_statewide(records: &[Joined]) -> Option<OutcomeStatewide> {
     if records.is_empty() {
         return None;
     }

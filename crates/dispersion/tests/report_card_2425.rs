@@ -361,40 +361,27 @@ fn holding_disadvantage_constant_shrinks_every_spending_relationship() {
 /// stronger objection than "the denominator matters".
 #[test]
 fn only_the_headcount_estimate_is_stable_across_the_papers_sensitivity_checks() {
-    let all = report_card();
-    let scenarios: Vec<(&str, Vec<&ReportCard>)> = vec![
-        ("all districts", all.iter().collect()),
-        ("excluding the highest per-pupil district", {
-            let top = all
-                .iter()
-                .max_by(|a, b| {
-                    a.per_equivalent_pupil
-                        .partial_cmp(&b.per_equivalent_pupil)
-                        .unwrap()
-                })
-                .unwrap();
-            all.iter().filter(|r| !std::ptr::eq(*r, top)).collect()
-        }),
-        ("excluding enrollment under 582", {
-            all.iter()
-                .filter(|r| r.unweighted_adm.is_some_and(|a| a >= 582.0))
-                .collect()
-        }),
+    // The scenarios themselves live in `report_card::sensitivity`, because the corpus prints all
+    // six of these figures and a table computed inside a test file is reachable from nothing.
+    let table = report_card::sensitivity();
+    let published = [
+        table.published.all_districts,
+        table.published.excluding_top_spender,
+        table.published.excluding_small_districts,
     ];
-
-    let mut published = Vec::new();
-    let mut headcount = Vec::new();
-    for (name, subset) in scenarios {
-        let rows: Vec<ReportCard> = subset.into_iter().cloned().collect();
-        let pi = column(&rows, |r| r.performance_index);
-        let weighted = correlate(&pi, &column(&rows, ReportCard::per_weighted_pupil));
-        let unweighted = correlate(&pi, &column(&rows, ReportCard::per_enrolled_pupil));
+    let headcount = [
+        table.headcount.all_districts,
+        table.headcount.excluding_top_spender,
+        table.headcount.excluding_small_districts,
+    ];
+    for (name, value) in ["all districts", "less the top spender", "less the small"]
+        .iter()
+        .zip(headcount)
+    {
         assert!(
-            unweighted < -0.30,
-            "{name}: headcount divisor should stay clearly negative, got {unweighted:.4}"
+            value < -0.30,
+            "{name}: headcount divisor should stay clearly negative, got {value:.4}"
         );
-        published.push(weighted);
-        headcount.push(unweighted);
     }
 
     close(published[0], -0.0155, 0.0005, "published, all districts");

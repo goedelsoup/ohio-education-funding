@@ -81,23 +81,54 @@ fn a_count_is_whole_and_exact() {
     }
 }
 
-/// A share is a fraction of one, so a pin above one is a percentage that forgot to divide.
+/// A share is small enough that a percentage typed in its place would be obvious.
 ///
 /// The failure this forecloses is bundle contract `35.0.0`'s: two fields with the same name, 100x
 /// apart, both `f64` and neither saying which it was. Here it would put `28.1` in the manifest
 /// where the consumer expects `0.281`, and the consumer would read a corpus's `28.1%` as agreeing
 /// with a figure a hundred times its size.
+///
+/// # Why the ceiling is not one
+///
+/// It was `0.0..=1.0`, which is right for a *proportion* and wrong for the other thing prose
+/// writes with a percent sign: a **growth rate**. Ohio's operating expenditure per pupil rose
+/// **116.8%** in nominal terms between FY2000 and FY2022, which is `1.168` and is not a mistake.
+/// `Unit::Ratio` is not the escape either — `numerals()` rejects a `%` on a ratio, by design, so
+/// a ratio binding could not match the sentence the corpus actually writes.
+///
+/// So the ceiling states the invariant the guard is really for, rather than a proxy for it: a pin
+/// must be far enough below a percentage that the two cannot be confused. The second assertion is
+/// what keeps that honest — it checks the guard's own premise, that **every** share here is large
+/// enough for its 100x typo to land above the ceiling. Measured over the manifest at the time of
+/// writing: the smallest share is `0.048`, whose mistyped form is `4.8`. Add a share below
+/// [`SHARE_FLOOR`] and this test fails and says so, rather than quietly losing its teeth.
 #[test]
-fn a_share_is_a_fraction_of_one() {
+fn a_share_cannot_be_confused_with_a_percentage() {
+    /// A growth rate may exceed one. Nothing this manifest carries approaches two.
+    const SHARE_CEILING: f64 = 2.0;
+    /// Below this, a share's own 100x typo would slip under the ceiling undetected.
+    const SHARE_FLOOR: f64 = SHARE_CEILING / 100.0;
+
     for f in FIGURES {
         if f.unit != Unit::Share {
             continue;
         }
+        // Signed shares exist — a decline is a share too — so the magnitude is what is bounded.
+        let magnitude = f.pinned.abs();
         assert!(
-            (0.0..=1.0).contains(&f.pinned),
-            "{}: pinned at {}, which is not a share of one — is it a percentage?",
+            magnitude <= SHARE_CEILING,
+            "{}: pinned at {}, which is past {SHARE_CEILING} — is it a percentage?",
             f.key,
             f.pinned
+        );
+        assert!(
+            magnitude > SHARE_FLOOR,
+            "{}: pinned at {}, small enough that typing it as a percentage would give {}, \
+             which is under the {SHARE_CEILING} ceiling and would pass. Either it is not a \
+             share, or the ceiling above no longer holds.",
+            f.key,
+            f.pinned,
+            magnitude * 100.0
         );
     }
 }

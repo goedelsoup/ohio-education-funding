@@ -397,6 +397,94 @@ pub struct BaseCost {
     pub per_pupil: Dollars,
 }
 
+/// The FY2024 statewide average classroom teacher salary — the year a refresh would read.
+///
+/// # Why this is here and not in the test that used it
+///
+/// It was `const FY2024_TEACHER_SALARY: f64 = 73_777.08` inside
+/// `tests/statewide_refresh.rs`, which is the only place in the workspace that knew the number
+/// the entire input-year-refresh scenario perturbs *to*. `scenario/fsfp-input-year-refresh`
+/// publishes it twice, and nothing related the two.
+///
+/// Its FY2022 counterpart is not a constant here because it is not a separate fact: it is
+/// [`StatewideFactors::fy2027`]'s own `teacher_salary`, which is what the calculator uses and
+/// what the refresh moves away from.
+pub const FY2024_TEACHER_SALARY: f64 = 73_777.08;
+
+/// What refreshing the classroom teacher salary input to FY2024 does, across the state.
+///
+/// Every figure here was asserted in `tests/statewide_refresh.rs` as a band — `(total / 1e6 -
+/// 466.2).abs() < 2.0` — while the corpus published the value. Both stayed green for as long as
+/// they disagreed, which is the pattern #158 has now found nine times.
+#[derive(Debug, Clone, Copy, PartialEq)]
+pub struct Refresh {
+    /// Districts in the grade-band panel.
+    pub districts: usize,
+    /// The statewide base cost increase, in dollars.
+    pub statewide_delta: f64,
+    /// The enrollment-weighted average increase per pupil.
+    pub average_per_pupil: f64,
+    /// The least-affected district's increase per pupil.
+    pub min_per_pupil: f64,
+    /// The most-affected district's, which is about 1.4 times the least.
+    pub max_per_pupil: f64,
+    /// Districts small enough that the six-teacher special minimum binds.
+    pub special_minimum_binds: usize,
+    /// Their mean increase per pupil.
+    pub bound_mean_per_pupil: f64,
+    /// Everyone else's, which is the comparison that makes the minimum the cause.
+    pub free_mean_per_pupil: f64,
+}
+
+/// Measure it over the committed grade-band panel.
+///
+/// # Panics
+///
+/// If the panel is empty, or if a per-pupil figure is NaN — both ruled out by the fixture's own
+/// width and non-zero-ADM checks.
+#[must_use]
+pub fn refresh() -> Refresh {
+    let factors = StatewideFactors::fy2027();
+    let districts = grade_bands::districts();
+    assert!(!districts.is_empty(), "the grade-band panel is empty");
+
+    let delta = |d: &grade_bands::GradeBands| {
+        teacher_salary_refresh_delta(
+            d.funded_positions(),
+            factors.teacher_salary,
+            FY2024_TEACHER_SALARY,
+            &factors,
+        )
+    };
+    let per_pupil = |d: &grade_bands::GradeBands| delta(d) / d.adm;
+    let mean = |set: &[&grade_bands::GradeBands]| {
+        set.iter().map(|d| per_pupil(d)).sum::<f64>() / set.len() as f64
+    };
+
+    let mut pp: Vec<f64> = districts.iter().map(&per_pupil).collect();
+    pp.sort_by(f64::total_cmp);
+    let bound: Vec<&grade_bands::GradeBands> = districts
+        .iter()
+        .filter(|d| d.special_minimum_binds())
+        .collect();
+    let free: Vec<&grade_bands::GradeBands> = districts
+        .iter()
+        .filter(|d| !d.special_minimum_binds())
+        .collect();
+
+    Refresh {
+        districts: districts.len(),
+        statewide_delta: districts.iter().map(&delta).sum(),
+        average_per_pupil: districts.iter().map(&delta).sum::<f64>()
+            / districts.iter().map(|d| d.adm).sum::<f64>(),
+        min_per_pupil: pp[0],
+        max_per_pupil: pp[pp.len() - 1],
+        special_minimum_binds: bound.len(),
+        bound_mean_per_pupil: mean(&bound),
+        free_mean_per_pupil: mean(&free),
+    }
+}
+
 /// The base cost effect of refreshing the classroom teacher salary input, per district.
 ///
 /// # Why this is one function and not a term inside the build-up

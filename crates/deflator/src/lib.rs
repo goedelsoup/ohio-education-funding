@@ -293,10 +293,16 @@ mod tests {
     /// Excluding federal COVID relief funds the FY2022 figure is $14,493, which the Auditor
     /// reports as 19.4% real growth. The $821 gap between the two FY2022 figures is larger
     /// than most policy changes this corpus models.
+    ///
+    /// The figure is read from [`ohio_epp::FY2022_EX_RELIEF`] rather than typed here. It was a
+    /// literal in this test, a private const in `examples/epp_real_series.rs` and a number in the
+    /// corpus, with nothing relating the three — the shape #120 was filed about.
     #[test]
     fn reproduces_auditor_real_growth_excluding_relief_funds() {
         let cpi = CpiSeries::cpi_u_june();
-        let real = cpi.real_growth(7_065.0, FY2000, 14_493.0, FY2022).unwrap();
+        let real = cpi
+            .real_growth(7_065.0, FY2000, crate::ohio_epp::FY2022_EX_RELIEF, FY2022)
+            .unwrap();
         assert!(
             (real.value - 0.194).abs() < 0.001,
             "expected ~19.4% real growth, got {:.4}",

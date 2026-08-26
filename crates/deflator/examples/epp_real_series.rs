@@ -13,12 +13,9 @@
 //! nominal figures for even years are chart-label approximations. Only the FY2000 and FY2022
 //! endpoints are verified on both sides.
 
-use deflator::ohio_epp::{nominal_series, quotable, real_series, BASE_YEAR};
+use deflator::ohio_epp::{nominal_series, quotable, real_series, BASE_YEAR, FY2022_EX_RELIEF};
 use deflator::CpiSeries;
 use edfund_core::FiscalYear;
-
-/// FY2022 excluding federal COVID relief funds.
-const FY2022_EX_RELIEF: f64 = 14_493.0;
 
 fn main() {
     let cpi = CpiSeries::cpi_u_june();

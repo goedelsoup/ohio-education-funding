@@ -32,14 +32,15 @@ description: |
 findings: |
   **The statewide series demonstrates why deflation is not optional.** From FY2000 to FY2022,
   Ohio public school operating expenditure per pupil rose from $7,065 to $15,314 — 116.8% in
-  nominal terms. Adjusted for inflation, the increase is **26.1%**. [verified] The same fact,
-  stated two ways, supports two entirely different arguments about whether Ohio has increased
-  its investment in schools, and both numbers are correct. This is the concrete case for the
-  `deflator` calculator being a prerequisite rather than a refinement.
+  nominal terms. Adjusted for inflation, the increase is **26.1%**. [verified — crates/deflator]
+  The same fact, stated two ways, supports two entirely different arguments about whether Ohio
+  has increased its investment in schools, and both numbers are correct. This is the concrete
+  case for the `deflator` calculator being a prerequisite rather than a refinement.
 
   A third framing is also correct and lower still: excluding federal COVID relief funds, FY2022
-  operating EPP was $14,493, making real growth **19.4%**. [verified] The $821 per-pupil gap
-  between the two FY2022 figures is larger than most policy changes this corpus models.
+  operating EPP was $14,493, making real growth **19.4%**. [verified — crates/deflator] The $821
+  per-pupil gap between the two FY2022 figures is larger than most policy changes this corpus
+  models.
 
   Total operating expenditure roughly doubled over the period, $13.0 billion to $25.8 billion,
   while enrollment fell 8.3% from about 1.84 million to about 1.68 million. [verified]
@@ -112,7 +113,8 @@ findings: |
   additive with the function breakdown, which divides by an unweighted headcount. [verified]
 
   **And the correlation that must not be reported alone.** Federal share against the
-  Performance Index is **-0.546** raw and **-0.115** holding poverty constant. Federal
+  Performance Index is **-0.546** raw and **-0.115** holding poverty constant.
+  [verified — crates/bundle] Federal
   education money is allocated substantially by poverty, so the raw figure is very largely the
   poverty relationship read backwards; quoting it without the control would state a confound as
   a finding, which is the error this corpus most often finds in secondary reporting. Neither
@@ -122,6 +124,130 @@ figures:
     value: 15646.0288
     field: findings
     as_written: "this metric's FY2024 Cupp Report median of $15,646"
+  # The statewide series, which is the whole argument of this node: one record, three readings,
+  # and the gap between them larger than most policy changes the corpus models.
+  - key: deflator/nominal-operating-expenditure-growth
+    value: 1.1675866949752298
+    field: findings
+    as_written: "116.8% in nominal terms"
+  - key: deflator/real-operating-expenditure-growth
+    value: 0.2611477340150372
+    field: findings
+    as_written: "Adjusted for inflation, the increase is **26.1%**"
+  - key: deflator/operating-expenditure-fy2022-excluding-relief
+    value: 14493.0
+    field: findings
+    as_written: "excluding federal COVID relief funds, FY2022 operating EPP was $14,493"
+  - key: deflator/real-operating-expenditure-growth-excluding-relief
+    value: 0.1935362484706762
+    field: findings
+    as_written: "making real growth **19.4%**"
+  - key: deflator/relief-funds-per-pupil-fy2022
+    value: 821.0
+    field: findings
+    as_written: "The $821\n  per-pupil gap between the two FY2022 figures"
+  - key: deflator/real-operating-expenditure-growth
+    value: 0.2611477340150372
+    field: series
+    as_written: "+26.1% including relief funds"
+  - key: deflator/real-operating-expenditure-growth-excluding-relief
+    value: 0.1935362484706762
+    field: series
+    as_written: "+19.4% excluding"
+  - key: deflator/cpi-growth-fy2000-fy2022
+    value: 0.7187412993039441
+    field: series
+    as_written: "CPI growth over the same span: +71.9%"
+  - key: deflator/real-operating-expenditure-fy2000
+    value: 12142.907279582365
+    field: series
+    as_written: "FY2000  $12,143    baseline"
+  - key: deflator/real-operating-expenditure-peak
+    value: 15746.733670290962
+    field: series
+    as_written: "At $15,747 it stands"
+  - key: deflator/real-operating-expenditure-trough-decline
+    value: 0.06916824852058945
+    field: series
+    as_written: "a real decline of 6.9%"
+  # The F-33 district panel underneath the statewide series.
+  - key: dispersion/trough-panel-districts
+    value: 610
+    field: series
+    as_written: "the 610 comparable districts the panel carries"
+  - key: dispersion/trough-districts-falling
+    value: 490
+    field: series
+    as_written: "**490 — 80.3% — spent less per pupil in real terms"
+  - key: dispersion/trough-share-falling
+    value: 0.8032786885245902
+    field: series
+    as_written: "80.3% — spent less per pupil in real terms"
+  - key: dispersion/trough-median-decline
+    value: 0.055679230808840297
+    field: series
+    as_written: "Median change\n    -5.6%"
+  - key: dispersion/trough-first-quartile-decline
+    value: 0.0909016141545774
+    field: series
+    as_written: "first quartile -9.1%"
+  - key: dispersion/trough-weighted-decline
+    value: 0.06795235992243631
+    field: series
+    as_written: "the F-33 panel falls **6.8%** from"
+  - key: dispersion/trough-against-state-share
+    value: 0.020299199770100144
+    field: series
+    as_written: "FY2010 state share of revenue      +0.020"
+  - key: dispersion/trough-against-federal-share
+    value: 0.026258688462313756
+    field: series
+    as_written: "FY2010 federal share of revenue    +0.026"
+  - key: dispersion/trough-against-local-share
+    value: 0.024392385221814368
+    field: series
+    as_written: "FY2010 local share of revenue      -0.024"
+  - key: dispersion/trough-against-log-enrolment
+    value: 0.196980437313325
+    field: series
+    as_written: "log enrollment                     -0.197"
+  - key: dispersion/trough-against-prior-spending
+    value: 0.16789343863645997
+    field: series
+    as_written: "FY2010 spending per pupil          -0.168"
+  - key: dispersion/trough-deepest-decile-districts
+    value: 61
+    field: series
+    as_written: "61 districts averaging -17.5%"
+  - key: dispersion/trough-deepest-decile-decline
+    value: 0.17501104500073833
+    field: series
+    as_written: "averaging -17.5%"
+  # The report card's federal split, which measures exposure to a decision Ohio does not take.
+  - key: bundle/median-federal-share-of-operating-spending
+    value: 0.04203840156654025
+    field: findings
+    as_written: "a median 4.20% of a district's operating spending"
+  - key: bundle/max-federal-share-of-operating-spending
+    value: 0.29041969187179034
+    field: findings
+    as_written: "29.04% at the\n  top"
+  - key: bundle/districts-over-a-tenth-federal
+    value: 49
+    field: findings
+    as_written: "49 districts are above a tenth"
+  - key: bundle/federal-share-against-performance-raw
+    value: 0.5462274151195977
+    field: findings
+    as_written: "**-0.546** raw"
+  - key: bundle/federal-share-against-performance-controlled
+    value: 0.1145623688759802
+    field: findings
+    as_written: "**-0.115** holding poverty constant"
+  - key: dispersion/trough-deepest-decile-pupil-share
+    value: 0.11986153491422291
+    field: series
+    as_written: "carries 12.0% of pupils"
 
 revisions:
   - was: |
@@ -169,13 +295,14 @@ properties:
       FY2020  ~$13,700
       FY2022  $15,314 including COVID relief; $14,493 excluding  [verified]
 
-    Real growth FY2000-FY2022: +26.1% including relief funds, +19.4% excluding. [verified]
-    CPI growth over the same span: +71.9%. [verified]
+    Real growth FY2000-FY2022: +26.1% including relief funds, +19.4% excluding.
+    [verified — crates/deflator]
+    CPI growth over the same span: +71.9%. [verified — crates/deflator]
 
     Constant FY2022 dollars, computed by the `deflator` calculator
     (`cargo run --example epp_real_series -p deflate`):
 
-      FY2000  $12,143    baseline    [verified]
+      FY2000  $12,143    baseline    [verified — crates/deflator]
       FY2002  $13,341    +9.9%       [inference]
       FY2004  $14,058   +15.8%       [inference]
       FY2006  $14,166   +16.7%       [inference]
@@ -211,7 +338,7 @@ properties:
     chart-label uncertainty in the direction that would erase the decline and finds it intact.
 
     Real per-pupil spending did not grow steadily — it fell. From FY2010 to FY2014 it dropped
-    from $15,226 to $14,173, a real decline of about 7%, leaving FY2014 statistically
+    from $15,226 to $14,173, a real decline of 6.9%, leaving FY2014 statistically
     indistinguishable from FY2006's $14,166. Eight years of no real gain. That trough sits
     inside the [Bridge formula](../funding-regime/bridge-formula.yml) decade and coincides with
     the withdrawal of federal stimulus. Causation is still not established, but the shape is no
@@ -219,9 +346,9 @@ properties:
     the FY2010 level again until FY2018.
 
     Real spending peaked in FY2020, not FY2022. At $15,747 it stands about $433 above the
-    FY2022 figure of $15,314. Federal COVID relief arrived while prices were still low and was
-    then eroded by the FY2021-22 inflation, so the nominal high and the real high are two
-    years apart. The FY2020 nominal input is a chart approximation, so the gap should be
+    FY2022 figure of $15,314. [verified — crates/deflator] Federal COVID relief arrived while
+    prices were still low and was then eroded by the FY2021-22 inflation, so the nominal high and
+    the real high are two years apart. The FY2020 nominal input is a chart approximation, so the gap should be
     confirmed against exact figures — but it exceeds the approximation error. [open]
 
     **THE TROUGH HAS NOW BEEN LOCATED DISTRICT BY DISTRICT**, not from the Auditor's dashboard
@@ -230,29 +357,42 @@ properties:
     use. The panel had opened at FY2012, three years inside the decline. [verified — see
     [`crates/dispersion/tests/f33_ohio_panel_trough.rs`](../../../crates/dispersion/tests/f33_ohio_panel_trough.rs)]
 
-    IT WAS BROAD. Of 607 comparable districts, **490 — 81% — spent less per pupil in real terms
-    in FY2013 than in FY2010.** Median change -5.6%, first quartile -9.2%. This was not a handful
-    of districts cut hard enough to move a statewide average; four in five actually spent less.
+    IT WAS BROAD. Of the 610 comparable districts the panel carries in **both** endpoint years,
+    **490 — 80.3% — spent less per pupil in real terms in FY2013 than in FY2010.** Median change
+    -5.6%, first quartile -9.1%. [verified — crates/dispersion] This was not a handful of
+    districts cut hard enough to move a statewide average; four in five actually spent less.
+
+    The denominator is the inner join and not a district count. It was written here as 607 — the
+    report card's population, a different panel for a different year — and 490 of that is 80.7%,
+    which is where the 81% came from. A district the survey gained or lost between FY2010 and
+    FY2013 cannot carry a change, so the population that can is smaller than either year alone.
 
     AND NOTHING ABOUT A DISTRICT PREDICTS HOW FAR IT FELL. The obvious hypothesis — a contraction
     coinciding with the withdrawal of federal stimulus, inside the Bridge formula decade, should
     land hardest on districts most dependent on state aid — is not supported. Against the depth
     of the fall:
 
-      FY2010 state share of revenue      +0.029
-      FY2010 federal share of revenue    +0.029
-      FY2010 local share of revenue      -0.032
+      FY2010 state share of revenue      +0.020   [verified — crates/dispersion]
+      FY2010 federal share of revenue    +0.026   [verified — crates/dispersion]
+      FY2010 local share of revenue      -0.024   [verified — crates/dispersion]
       economically disadvantaged share   -0.033   [later vintage, directional]
       assessed valuation per pupil       +0.033   [later vintage, directional]
-      log enrollment                     -0.186
-      FY2010 spending per pupil          -0.176
+      log enrollment                     -0.197   [verified — crates/dispersion]
+      FY2010 spending per pupil          -0.168   [verified — crates/dispersion]
 
     Only size and prior level register at all, both weakly and the second partly mechanical. The
-    deepest decile is real — 60 districts averaging -17.6% — but carries 11.8% of pupils, so it
-    is a tail rather than the story. [verified]
+    deepest decile is real — 61 districts averaging -17.5% — but carries 12.0% of pupils, so it
+    is a tail rather than the story. [verified — crates/dispersion]
+
+    Every figure in that table moved when it was bound. The test behind them asserts a band —
+    `r.abs() < 0.06` for the three revenue shares, `close(r, -0.186, 0.02)` for the two that
+    register — and the corpus published the band's centre as though it were the measurement. The
+    bands still hold and every one of the values inside them had drifted, which is the eighth
+    occurrence of that pattern in this issue and the reason convention four exists.
 
     A SECOND SOURCE CONFIRMS THE SHAPE. Enrollment-weighted, the F-33 panel falls **6.8%** from
-    FY2010 to FY2013 against the Auditor's **6.9%** from FY2010 to FY2014 — different survey,
+    FY2010 to FY2013 [verified — crates/dispersion] against the Auditor's **6.9%** from FY2010 to
+    FY2014 — different survey,
     different entity set, levels about $1,500 apart, same decline. [verified] The two series are
     not interchangeable and should never be quoted as one; that they agree on the shape is what
     licenses reading them together.

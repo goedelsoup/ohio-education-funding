@@ -118,3 +118,53 @@ pub fn real_at(year: FiscalYear) -> f64 {
 pub fn quotable(point: &NominalPoint, deflated: &Deflated) -> bool {
     point.exact && deflated.confidence == Confidence::Verified
 }
+
+/// FY2022 operating expenditure per pupil **excluding federal COVID relief funds**, as the
+/// Auditor publishes it.
+///
+/// # Why the series carries two figures for one year
+///
+/// [`nominal_series`] ends at $15,314, which includes [ESSER] and every other federal relief
+/// dollar a district spent that year. The Auditor also publishes the figure without them, and
+/// the two support different arguments about whether Ohio increased its investment in schools:
+/// real growth from FY2000 is **+26.1%** including relief and **+19.4%** excluding it. Both are
+/// correct, and the $821 gap between them is larger than most policy changes this corpus models.
+///
+/// It is a constant rather than a row because it is not a different year — it is a different
+/// *definition* of the same year, and putting it in the fixture would give FY2022 two rows and
+/// make every fold over the series wrong in a way no reader would see.
+///
+/// [ESSER]: https://oese.ed.gov/offices/education-stabilization-fund/
+pub const FY2022_EX_RELIEF: f64 = 14_493.0;
+
+/// Real growth from the series' first year to its last, on the relief-inclusive figure.
+///
+/// # Panics
+///
+/// If either endpoint is absent from the index, which [`CpiSeries::cpi_u_june`] rules out.
+#[must_use]
+pub fn real_growth_from_fy2000() -> f64 {
+    real_at(FiscalYear(2022)) / real_at(FiscalYear(2000)) - 1.0
+}
+
+/// The same growth computed on [`FY2022_EX_RELIEF`] instead.
+///
+/// Both endpoints are exact and both index points are verified, so this is the second of the
+/// two figures a caller has to choose between — and naming which one is quoted is the whole
+/// substance of the choice. See [`FY2022_EX_RELIEF`].
+///
+/// # Panics
+///
+/// If either year is absent from the index.
+#[must_use]
+pub fn real_growth_from_fy2000_ex_relief() -> f64 {
+    let cpi = crate::CpiSeries::cpi_u_june();
+    cpi.real_growth(
+        nominal_series()[0].dollars,
+        FiscalYear(2000),
+        FY2022_EX_RELIEF,
+        FiscalYear(2022),
+    )
+    .expect("both endpoints are in the CPI series")
+    .value
+}
