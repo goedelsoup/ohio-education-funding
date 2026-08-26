@@ -1049,6 +1049,37 @@ table.prose th { width: 32%; }
  * scroll instead — so a reader dragging a wide formula sideways also drags its property name off
  * the screen, which is the one column they need to keep.
  */
+/*
+ * A formula, set in type.
+ *
+ * `display="block"` on the element is what makes it a block — the UA stylesheet resolves it to
+ * `display: block math`, measured — so nothing here restates that. What this does is give it the
+ * maths face, a size, and somewhere to scroll.
+ *
+ * Same ground and radius as `pre.aligned` beside it, for the same reason those match
+ * `.prose-body pre`: a reader meets an equation and an aligned block in the same table, and there
+ * is no reason for them to be two different objects.
+ */
+math {
+  font-family: var(--font-math);
+  font-size: var(--text-body);
+}
+/*
+ * The scroll goes on the wrapper and never on the `<math>` element. See `lib/math.ts`: with
+ * `overflow-x: auto` on a `display: block math` box, Chromium reports no overflow while visibly
+ * cutting the last row of an `aligned` environment in half.
+ */
+.formula {
+  overflow-x: auto;
+  background: var(--surface-inset);
+  padding: var(--space-4) .7rem;
+  border-radius: var(--radius-md);
+}
+math[display="block"] { margin: 0; }
+/* The LaTeX source rides along in an `<annotation>` so a formula stays recoverable. It is data for
+   whoever copies it, not something to paint. */
+math annotation { display: none; }
+
 table.prose { table-layout: fixed; }
 /*
  * A fixed column cannot grow for a long name, so the name has to be allowed to wrap.

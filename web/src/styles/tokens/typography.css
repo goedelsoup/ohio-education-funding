@@ -73,6 +73,25 @@
     serif;
 
   /*
+   * The maths face, and naming it IS the mechanism — this is not a preference.
+   *
+   * Measured in chromium, same markup, same machine, only the family changed: with the generic
+   * `math` keyword a `cases` brace rendered 13.7px tall against a 74.6px table; with the families
+   * below named it rendered 81.6px against 81.6px. Stretchy delimiters need a font carrying glyph
+   * assembly tables, and the generic keyword did not reach one even though STIXTwoMath.otf is
+   * installed on the machine that ran the test.
+   *
+   * So most readers already have what this needs and were not being given it: Cambria Math on
+   * Windows, STIX Two Math on macOS, Noto Sans Math on most Linux distributions. A reader with
+   * none of them still falls through to `math` and gets unstretched delimiters — shipping a
+   * subsetted fallback for that case is #202, and it is the only part of this that costs bytes.
+   *
+   * No text face is named here and none should be. `typography.css` ships no font binary for text
+   * and that remains true; this is a stack of faces the platform already has.
+   */
+  --font-math: "Cambria Math", "STIX Two Math", "STIXTwoMath-Regular", "NotoSansMath-Regular", math;
+
+  /*
    * THE APPARATUS RAMP. Unchanged, and deliberately so: every value here was already correct for
    * what it does, and a 609-row table is meant to be dense.
    */

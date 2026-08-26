@@ -15,7 +15,7 @@ import { loadCorpus } from "../../../lib/corpus.ts";
 import { sectionForClass } from "../../../lib/nav.ts";
 import { loadFeed } from "../../../lib/feed.ts";
 import { money } from "../../../lib/format.ts";
-import { isBlockProperty, renderProse, renderPropertyValue, summarize } from "../../../lib/prose.ts";
+import { isBlockProperty, isMathProperty, renderMathProperty, renderProse, renderPropertyValue, summarize } from "../../../lib/prose.ts";
 import * as routes from "../../../lib/routes.ts";
 import SectionAnchor from "../../../components/SectionAnchor.astro";
 
@@ -29,8 +29,10 @@ export function getStaticPaths() {
 const { node } = Astro.props;
 const corpus = loadCorpus();
 const entry = corpus.byClass.get(node.className);
-const description = await renderProse(node.description, node.className);
-const findings = node.findings ? await renderProse(node.findings, node.className) : null;
+const description = await renderProse(node.description, node.className, `${node.id}#description`);
+const findings = node.findings
+  ? await renderProse(node.findings, node.className, `${node.id}#findings`)
+  : null;
 
 /*
  * The withdrawals, rendered as prose because every field in one of them is prose.
@@ -100,7 +102,22 @@ const unpriced = draft?.provisions.filter((p) => p.lever === "").length ?? 0;
 const metaDescription = summarize(node.summary, 200);
 
 const seeded = node.properties.find((p) => p.name === "seeded_because");
-const properties = node.properties.filter((p) => p.name !== "seeded_because");
+/*
+ * Rendered here rather than in the table, because a maths property takes a different path from a
+ * prose one: `renderPropertyValue` escapes its input, which is exactly what makes it safe and
+ * exactly what would turn a formula into a screenful of backslashes.
+ */
+const properties = node.properties
+  .filter((p) => p.name !== "seeded_because")
+  .map((property) => ({
+    name: property.name,
+    html: isMathProperty(property.name)
+      ? renderMathProperty(property.value, `${node.id}#${property.name}`)
+      : renderPropertyValue(property.value, node.className),
+    /* A formula spans the row for the same reason an aligned block does: it is wider than a
+       two-column row can offer, and the half it would hide is the right-hand one. */
+    spans: isMathProperty(property.name) || isBlockProperty(property.value),
+  }));
 ---
 
 <Base
@@ -202,7 +219,7 @@ const properties = node.properties.filter((p) => p.name !== "seeded_because");
                  * dragging the property name off screen with it — and fixed layout takes its
                  * columns from the first row, so a per-row width is not available. Spanning is.
                  */
-                isBlockProperty(property.value) ? (
+                property.spans ? (
                   <>
                     <tr class="spanning-name">
                       <th colspan="2">
@@ -210,7 +227,7 @@ const properties = node.properties.filter((p) => p.name !== "seeded_because");
                       </th>
                     </tr>
                     <tr class="spanning-value">
-                      <td colspan="2" set:html={renderPropertyValue(property.value, node.className)} />
+                      <td colspan="2" set:html={property.html} />
                     </tr>
                   </>
                 ) : (
@@ -218,7 +235,7 @@ const properties = node.properties.filter((p) => p.name !== "seeded_because");
                     <th>
                       <code>{property.name}</code>
                     </th>
-                    <td set:html={renderPropertyValue(property.value, node.className)} />
+                    <td set:html={property.html} />
                   </tr>
                 ),
               )}

@@ -58,6 +58,7 @@
 
 import { createMarkdownProcessor } from "@astrojs/markdown-remark";
 import rehypeSanitize from "rehype-sanitize";
+import { renderMath } from "./math.ts";
 import { anchor } from "./section.ts";
 
 import { resolveTarget } from "./corpus.ts";
@@ -348,7 +349,12 @@ function anchorHeadings(html: string): string {
  * Async because the markdown processor is. Astro components can await in their frontmatter, so
  * this costs nothing at the call site.
  */
-export async function renderProse(markdown: string, fromClass: string): Promise<string> {
+export async function renderProse(
+  markdown: string,
+  fromClass: string,
+  /** The node and field, so a formula that will not compile says which one to go and fix. */
+  where?: string,
+): Promise<string> {
   processor ??= await createMarkdownProcessor({
     gfm: true,
     smartypants: true,
@@ -358,7 +364,77 @@ export async function renderProse(markdown: string, fromClass: string): Promise<
     rehypePlugins: [rehypeSanitize],
   });
   const { code } = await processor.render(rewriteLinks(markdown, fromClass));
-  return anchorHeadings(badgeClaims(code));
+  return renderMathFences(anchorHeadings(badgeClaims(code)), where ?? fromClass);
+}
+
+/**
+ * The five entity forms `rehype-sanitize` can leave inside a fence, undone.
+ *
+ * Only these: the sanitizer escapes `<` and `&` and leaves `>`, `"` and `'` alone, and the
+ * numeric forms it writes are lower-case hex. The general case is a whole library; this is the
+ * output of one known encoder and is treated as such.
+ */
+const unescapeFence = (text: string): string =>
+  text.replace(/&(?:#x([0-9a-f]+)|#(\d+)|(amp|lt|gt|quot|apos));/gi, (whole, hex, dec, name) => {
+    if (hex) return String.fromCodePoint(Number.parseInt(hex, 16));
+    if (dec) return String.fromCodePoint(Number.parseInt(dec, 10));
+    return { amp: "&", lt: "<", gt: ">", quot: '"', apos: "'" }[String(name).toLowerCase()] ?? whole;
+  });
+
+/**
+ * Replace every maths fence the sanitizer left behind with its rendered MathML.
+ *
+ * # Why this runs after sanitize rather than inside the pipeline
+ *
+ * The module docstring gives the reason in full: widening the markdown schema would put every
+ * corpus node's prose inside a larger allowlist to serve sixteen formulas, and `lib/math.ts` holds
+ * MathML to a boundary that only has to describe MathML. By the time this runs, the fence's
+ * contents have been through the sanitizer as *text* — so what reaches temml is what the author
+ * wrote and nothing a node could smuggle.
+ *
+ * # Why a pattern over HTML is safe here, when this file says elsewhere that it is not
+ *
+ * The docstring on `rewriteLinks` says rewriting rendered HTML would mean parsing it with regular
+ * expressions to find `href`s, and that is right. This is a different situation and the difference
+ * is checkable: the target is one exact shape emitted by the sanitizer, and its body cannot
+ * contain the closing tag, because `<` is escaped before this ever sees it. A `</code>` written
+ * inside a formula arrives as `&#x3C;/code>` — verified, and asserted in `math.spec.ts`.
+ */
+function renderMathFences(html: string, where: string): string {
+  return html.replace(
+    /<pre><code class="language-math">([\s\S]*?)<\/code><\/pre>/g,
+    (_whole, body: string) =>
+      renderMath(unescapeFence(body).trim(), { display: true, where: `${where} (math fence)` }),
+  );
+}
+
+/**
+ * A property whose value is LaTeX rather than prose, named so by its own key.
+ *
+ * `_tex` in the name and not a lookup table of which properties are maths: a table has to be kept
+ * in step with an ontology it does not live beside, and the first node to add `function_tex` to a
+ * class nobody updated would render its formula as escaped backslashes. The suffix travels with
+ * the value.
+ *
+ * The pair is deliberate rather than a migration left half-done. `function:` stays as the aligned
+ * ASCII a reader meets in the YAML, which `.yidam` is authored to be read in; `function_tex:` is
+ * the same statement set in type. Whether both should survive is #203's question, and the answer
+ * belongs to whoever looks at the two side by side — but two disagreeing statements of one formula
+ * is the defect this repository has fixed most often, so if both stay, something has to check that
+ * they agree.
+ */
+export const isMathProperty = (name: string): boolean => name.endsWith("_tex");
+
+/**
+ * One property value, as MathML.
+ *
+ * A separate path from {@link renderPropertyValue} because that one escapes rather than sanitizes
+ * — which is what makes it safe, and which would turn a formula into a page full of visible
+ * backslashes. This does not go near the markdown processor either: `lib/math.ts` holds the output
+ * to its own allowlist, so there is nothing for the markdown schema to widen.
+ */
+export function renderMathProperty(value: string, where: string): string {
+  return renderMath(value.trim(), { display: true, where });
 }
 
 /**
