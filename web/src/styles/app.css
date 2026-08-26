@@ -1078,6 +1078,59 @@ math {
 math[display="block"] { margin: 0; }
 /* The LaTeX source rides along in an `<annotation>` so a formula stays recoverable. It is data for
    whoever copies it, not something to paint. */
+/*
+ * `aligned` has to be made to align, because MathML Core took the attribute away.
+ *
+ * `\begin{aligned}` means "line these rows up at the `&`", and it was not doing it. Measured on
+ * the local capacity measure: nine rows, and the `=` sign started at EIGHT different x positions —
+ * 508, 525, 618, 618, 552, 586, 550, 536, 595. The first column was fine; the second was centred,
+ * so every row placed its `=` wherever that row's own width put it. A page of equations with no
+ * common axis is a page a reader cannot scan down, which is most of what the notation was for.
+ *
+ * The cause is a spec change rather than a bug in temml. MathML 3 aligned a table with a
+ * `columnalign` attribute; MathML Core dropped it, so temml emits none and Chromium would ignore
+ * one if it did — verified by setting it and measuring no change. Core's replacement is ordinary
+ * CSS `text-align` on the cell, which works: the same nine rows collapse to ONE `=` position.
+ *
+ * The second rule is not tidiness. `\begin{cases}` is a table nested inside the aligned table, and
+ * `mtd:first-child` reaches its first column too — which would right-align the values of every
+ * piecewise rule against their own conditions. LaTeX left-aligns both, and so does this.
+ */
+.formula mtd {
+  text-align: left;
+}
+
+.formula mtd:first-child {
+  text-align: right;
+}
+
+.formula mtable mtable mtd:first-child {
+  text-align: left;
+}
+
+/*
+ * And a relation with nothing but a name after it still gets a relation's spacing.
+ *
+ * `F_1 = FY21 transportation` printed as `=FY21`, with the `=` touching its own right-hand side,
+ * on ten rows across the corpus — every row that defines a quantity rather than computing one.
+ * Measured across the transportation component: every other row put the `=` at x 374 with a 5px
+ * gap after it, and those ten put it at 369 with zero.
+ *
+ * The condition is exact and it is about the tree, not the content. MathML infers an operator's
+ * form from its position, and an `mo` first in an `mrow` of exactly TWO children does not come out
+ * infix — so it gets no lspace and no rspace, while `= <mtext>riders</mtext> <mo>×</mo> …` in the
+ * next row does. `:first-child:nth-last-child(2)` is that condition, and the 0.2777em is the
+ * dictionary's own infix value, applied to both sides because the missing lspace is what moved the
+ * sign 5px left of the column it was supposed to share.
+ *
+ * Fixed here rather than in the corpus. The alternative was `\mathpunct{}` after the text — it
+ * measures identically — but that is a renderer detail, and putting it in twelve YAML files means
+ * every author after this copies it without knowing what it is for.
+ */
+.formula mtd > mrow > mo:first-child:nth-last-child(2) {
+  margin-inline: 0.2777em;
+}
+
 math annotation { display: none; }
 
 table.prose { table-layout: fixed; }

@@ -19,8 +19,8 @@
  * declared for them, because no binary is committed; drop the .woff2 files in assets/fonts/ beside
  * the maths one and add the rules and every stack picks them up with no other change.
  *
- * What changed: `src/assets/fonts/ohio-math-fallback.woff2`, 27,220 bytes, declared below. It is a
- * 174-codepoint subset of STIX Two Math and it is the LAST entry in `--font-math`, so it is only
+ * What changed: `src/assets/fonts/ohio-math-fallback.woff2`, 27,236 bytes, declared below. It is a
+ * 178-codepoint subset of STIX Two Math and it is the LAST entry in `--font-math`, so it is only
  * fetched by a reader whose platform answered with nothing — see that token for what the
  * measurement was and why a name is not enough on its own.
  *
@@ -69,7 +69,7 @@
  */
 
 /*
- * The one binary. 27,220 bytes, and the only asset on this site that is a typeface.
+ * The one binary. 27,236 bytes, and the only asset on this site that is a typeface.
  *
  * Built by `scripts/subset-math-font.ts` from `@fontsource/stix-two-math` — a devDependency, so the
  * source is pinned by the lockfile rather than being a file that happened to exist on somebody's

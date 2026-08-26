@@ -74,6 +74,16 @@ properties:
                 the FY2027 appropriation is $153,976,832 and the program does not reach it
 
     Reported in [R] Total State Support and not in [N], so no guarantee holds it.
+  function_tex: |
+    \begin{aligned}
+    \text{aid}_k &= \Bigl( \text{ADM}_k \times \$4{,}000
+      + \text{ADM}_k \times w_k \times \text{average base cost per pupil} \times \text{state share}
+      \times 0.5 \Bigr) \\
+      &\quad \times \text{proration} && k = 1 \ldots 6 \\
+    w &= (0.2435,\ 0.6179,\ 1.4845,\ 1.9812,\ 2.6830,\ 3.9554) && \text{the school-age weights} \\
+    \text{average base cost per pupil} &= \$8{,}241.61 && \text{FY2027} \\
+    \text{proration} &= 0.96854448
+    \end{aligned}
   statutory_basis: |
     R.C. 3317.0213, read. **Codified.** Division (A) states the formula as "($4,000 X the number of
     students who are preschool children with disabilities) + …", and every weighted term carries an

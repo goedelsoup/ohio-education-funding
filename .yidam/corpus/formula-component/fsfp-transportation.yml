@@ -111,6 +111,31 @@ properties:
 
     The school bus line is ROUNDDOWN to a tenth of a dollar, which no other line in the calculator
     is.
+  function_tex: |
+    \begin{aligned}
+    b &= \text{public} + 2 \times \text{non-public} + 1.5 \times \text{community/STEM}
+      && \text{weighted ridership} \\
+    A_1 &= b \times 1337.175 && \text{per rider base} \\
+    A_2 &= \text{bus miles} \times 6.867 \times 180 && \text{per mile base} \\
+    A &= \operatorname{ROUNDDOWN}\bigl( \max(A_1, A_2) \times \max(\text{state share},\ 0.5),\ 1 \bigr)
+      && \text{school bus} \\
+    B &= \text{mass transit riders} \times 1337.175 \times 0.35 && \text{mass transit} \\
+    C &= \text{other riders} \times 1337.175 \times 0.50 && \text{other types} \\
+    D_2 &= \operatorname{round}\biggl( \frac{\operatorname{round}(\text{riders} / \text{buses},\ 4)}{\text{capacity target}},\ 4 \biggr)
+      && \text{efficiency index} \\
+    D &= \begin{cases}
+      0.15\,A & \text{if } D_2 \ge 1.5 \\
+      \dfrac{D_2 - 1}{0.5} \times 0.15\,A & \text{if } 1.0 \le D_2 < 1.5 \\
+      0 & \text{if } D_2 < 1.0
+    \end{cases} && \text{efficiency} \\
+    E_2 &= \frac{\text{riders}}{\text{square miles}} && \text{density} \\
+    E &= \max\biggl( 0,\ \frac{28 - E_2}{100} \biggr) \times A_2 \times 0.55 && \text{density supplement} \\
+    F_1 &= \text{FY21 transportation} && \text{guarantee base} \\
+    F &= \max\bigl( F_1 - (A + B + C + D + E),\ 0 \bigr) && \text{guarantee} \\
+    G &= (A + B + C + D + E + F) \times \text{general proration} && \text{transportation} \\
+    J &= \max(\text{state share},\ 0.5) \times \text{reported SpEd cost} \times 0.91746
+      && \text{SpEd transport}
+    \end{aligned}
   statutory_basis: |
     R.C. 3317.0212, read — and it changes what kind of parameter the two rates are.
 

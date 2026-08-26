@@ -64,6 +64,16 @@ properties:
 
     Subtracted inside [I], so it reduces the guarantee without reducing anything the formula
     computes. There is no matching term for a district that gains open enrolment.
+  function_tex: |
+    \begin{aligned}
+    I_2 &= \max\bigl( \text{prior-year entering open enrolment FTE} \times 0.1,\ 20 \bigr)
+      && \text{decrease threshold} \\
+    I_1 &= \begin{cases}
+      8241.61 \times \bigl( (\text{prior} - \text{current}) - I_2 \bigr)
+        & \text{if } \text{prior} - \text{current} \ge I_2 \\
+      0 & \text{otherwise}
+    \end{cases} && \text{open enrolment adjustment}
+    \end{aligned}
   statutory_basis: R.C. 3317.019, with the department's FY2027 workbook supplying the rate. [verified]
   calculator: |
     Reproduced for all 609 districts alongside `[I]` in

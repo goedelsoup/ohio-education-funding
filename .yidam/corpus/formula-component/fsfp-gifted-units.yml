@@ -135,6 +135,19 @@ properties:
     F Gifted           = F1 + F2 + F3 + Unit Funding
 
     Reconciles to the department's published `[F] Gifted` to the cent for all 609 districts.
+  function_tex: |
+    \begin{aligned}
+    F_1 &= \text{K-6 enrolled ADM} \times \$24.00 \times \text{state share} && \text{identification} \\
+    F_2 &= \text{enrolled ADM} \times \$2.50 \times \text{state share} && \text{referral} \\
+    F_3 &= \text{professional development} && \text{carried as a value; zero for every district} \\
+    \text{coordinator units} &= \operatorname{clamp}\biggl( \frac{\text{enrolled ADM}}{3300},\ 0.5,\ 8 \biggr) \\
+    \text{specialist K-8 units} &= \max\biggl( \frac{\text{gifted K-8 FTE}}{140},\ 0.3 \biggr) \\
+    \text{specialist 9-12 units} &= \max\biggl( \frac{\text{gifted 9-12 FTE}}{140},\ 0.3 \biggr) \\
+    \text{unit funding} &= (\text{coordinator units} \times \$85{,}776
+      + \text{specialist K-8 units} \times \$89{,}378 \\
+      &\quad + \text{specialist 9-12 units} \times \$80{,}974) \times \text{state share} \\
+    F &= F_1 + F_2 + F_3 + \text{unit funding} && \text{gifted}
+    \end{aligned}
   statutory_basis: |
     **R.C. 3317.022(A)(6) and R.C. 3317.051.** This node cited R.C. 3317.053, which does not
     exist — the second wrong citation the statute audit turned up, after the DPIA node's

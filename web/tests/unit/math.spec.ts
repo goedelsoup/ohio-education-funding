@@ -170,3 +170,137 @@ test("function_tex is declared by the formula-component ontology", () => {
   );
   expect(ontology).toContain("name: function_tex");
 });
+
+/*
+ * ------------------------------------------------------------------
+ * Two statements of one calculation, and what can be checked between them.
+ * ------------------------------------------------------------------
+ *
+ * `function:` and `function_tex:` are the same arithmetic written twice, and the ontology says
+ * they "have to be kept saying the same thing" without anything enforcing it. The pilot proved why
+ * that mattered: the typeset version had been on the site for a day, and it used `V_1` and `I_1`
+ * in two fractions without ever defining either — the two "lesser of" lines that say where those
+ * quantities come from had been dropped in translation, along with every quantity's name.
+ *
+ * The obvious check is a text diff, and it does not work. Every one of the sixteen `function`
+ * fields ends in a prose note — 21 lines across the corpus — carrying figures the formula does not
+ * (`3317.0217`, `60%`, `[verified]`). Diffing the two produces a false positive on all sixteen.
+ *
+ * So the checks below are three narrower ones, each catching something the others cannot, and none
+ * of them looking at prose:
+ *
+ *   1. Structural, inside `function_tex` alone: a symbol used on the right of a relation has to be
+ *      introduced on the left of some row. This is the one that catches the pilot, and it needs no
+ *      comparison at all — a formula that uses a quantity it never defines is incomplete on its
+ *      own terms.
+ *   2. Identifiers agree in both directions, so a conversion cannot quietly rename or drop one.
+ *   3. Figures in the typeset version all appear in the ASCII — one direction only, because the
+ *      prose note is where the extra numbers live. Catches the mistyped constant, which is the
+ *      error with the worst consequences.
+ */
+
+/*
+ * A quantity's name, spelled the same way from either source: one letter and one digit.
+ *
+ * Both cases, because the corpus names families in both — `C_1`…`C_6` in the local capacity
+ * measure, `d1`…`d3` in disadvantaged pupil impact aid. The letter has to be adjacent to the digit
+ * and the pair has to stand alone, which is what keeps `FY26`, `40th` and `Gr 1-3` out.
+ *
+ * What this deliberately does not reach: a name with a trailing letter, `d1a` and `d1b`, the two
+ * ADM counts disadvantaged pupil impact aid blends. Neither spelling matches, so they are absent
+ * from both sides and the comparison stays symmetric rather than one-sided — but they are not
+ * covered, and a conversion that dropped one would get past this check. The defined-before-used
+ * check above is what stands behind that gap.
+ */
+const texIdentifiers = (tex: string): Set<string> =>
+  new Set([...tex.matchAll(/\b([A-Za-z])_(\d)\b/g)].map(([, letter, digit]) => `${letter}${digit}`));
+
+const asciiIdentifiers = (ascii: string): Set<string> =>
+  new Set([...ascii.matchAll(/\b([A-Za-z])(\d)\b/g)].map(([, letter, digit]) => `${letter}${digit}`));
+
+/**
+ * Numeric literals, from either source, spelled the same way.
+ *
+ * Three normalisations, each for a real difference between the two encodings rather than for
+ * tidiness. `{,}` is how LaTeX writes a thousands comma in maths mode, so `\$8{,}241.61` would
+ * otherwise extract as `8` and `241.61` and match neither side. Control sequences go next, because
+ * `\frac` and `\bigl` are not figures. And a name with a digit in it — `C_1`, `d2` — is a name,
+ * not a number.
+ */
+const figures = (text: string): Set<string> =>
+  new Set(
+    [
+      ...text
+        .replace(/\{,\}/g, ",")
+        .replace(/\\[a-zA-Z]+/g, " ")
+        .replace(/\b[A-Za-z]_?\d\b/g, " ")
+        .matchAll(/\d[\d,]*(?:\.\d+)?/g),
+    ].map(([found]) => found.replace(/,/g, "")),
+  );
+
+/** Every node carrying both statements, which is what all three checks below are about. */
+const pairs = corpus.nodes.flatMap((node) => {
+  const tex = node.properties.find((property) => property.name === "function_tex")?.value;
+  const ascii = node.properties.find((property) => property.name === "function")?.value;
+  return tex && ascii ? [{ id: node.id, tex, ascii }] : [];
+});
+
+test("a node that states its formula twice states it in both places", () => {
+  // The guard on the guard: all three checks below iterate `pairs`, and an empty list passes them
+  // all. This is the assertion that says the corpus still has something to check.
+  expect(pairs.length).toBeGreaterThan(0);
+});
+
+/**
+ * 1. Nothing is used before it is introduced.
+ *
+ * The check that catches the pilot, and the only one of the three that would have. `V_1` appeared
+ * exclusively inside `\frac{V_1}{…}` — never on the left of an `&=` — so the reader was told to
+ * divide by base-cost enrolled ADM a quantity the formula never named. The identifier sets still
+ * matched, because `V_1` was present; it was present only as a consumer.
+ *
+ * `aligned` puts the subject of each row before its `&`, so "introduced" is exactly "appears left
+ * of the alignment marker on some row". Rows that are continuations carry no `&=` and are skipped.
+ */
+test.each(pairs.map((pair) => [pair.id, pair] as const))(
+  "%s defines every quantity its typeset formula uses",
+  (_id, { tex }) => {
+    const rows = tex.split(/\\\\/);
+    const introduced = new Set(
+      rows.flatMap((row) => {
+        const subject = row.split("&=")[0];
+        return row.includes("&=") ? [...texIdentifiers(subject!)] : [];
+      }),
+    );
+    const used = [...texIdentifiers(tex)].filter((name) => !introduced.has(name));
+    expect(used, "used on the right of a relation and never introduced on the left").toEqual([]);
+  },
+);
+
+/** 2. The two statements name the same quantities. */
+test.each(pairs.map((pair) => [pair.id, pair] as const))(
+  "%s names the same quantities in both statements",
+  (_id, { tex, ascii }) => {
+    const inTex = texIdentifiers(tex);
+    const inAscii = asciiIdentifiers(ascii);
+    expect([...inTex].filter((name) => !inAscii.has(name)), "typeset only").toEqual([]);
+    expect([...inAscii].filter((name) => !inTex.has(name)), "ASCII only").toEqual([]);
+  },
+);
+
+/**
+ * 3. Every figure in the typeset formula is one the ASCII already carried.
+ *
+ * One direction. The reverse would fire on all sixteen nodes, because `function` ends in a prose
+ * note and those notes carry statute numbers and percentages the calculation does not — see the
+ * header of this block. What this catches is the constant that changed in translation, which is
+ * the error a reader has no way to detect and the department's worksheet has every way to punish.
+ */
+test.each(pairs.map((pair) => [pair.id, pair] as const))(
+  "%s introduces no figure its ASCII statement did not have",
+  (_id, { tex, ascii }) => {
+    const known = figures(ascii);
+    const invented = [...figures(tex)].filter((figure) => !known.has(figure));
+    expect(invented, "a figure the typeset formula has and the ASCII does not").toEqual([]);
+  },
+);

@@ -48,7 +48,7 @@ describe("the file", () => {
    */
   test("parses into something, so nothing below passes vacuously", () => {
     expect(TABLES.size).toBeGreaterThan(10);
-    expect(GLYPHS).toBe(357);
+    expect(GLYPHS).toBe(361);
     expect(CMAP.size).toBeGreaterThan(170);
     expect(CONSTRUCTIONS.size).toBeGreaterThan(0);
   });
@@ -60,8 +60,8 @@ describe("the file", () => {
    * one of the three options the issue listed. The subset is 6.8% of it. The ceiling is not a
    * target — it is there so a repertoire widened without a thought costs somebody a conversation.
    */
-  test("is 27,220 bytes, against 403,344 for the font it came from", () => {
-    expect(statSync(path).size).toBe(27_220);
+  test("is 27,236 bytes, against 403,344 for the font it came from", () => {
+    expect(statSync(path).size).toBe(27_236);
     expect(statSync(path).size).toBeLessThan(60_000);
   });
 

@@ -302,6 +302,15 @@ properties:
 
     Aid = d1 x $422 x d3, in effect: the department publishes the total, and the per-pupil amount
     of $422 against the weighted count scaled by the index reproduces it.
+  function_tex: |
+    \begin{aligned}
+    d_{1a} &= \text{FY2025 economically disadvantaged ADM} \\
+    d_{1b} &= \text{FY2026 directly certified ADM} && \text{a year behind the weights} \\
+    d_1 &= 0.65\,d_{1a} + 0.35\,d_{1b} && \text{blended count} \\
+    d_2 &= \frac{d_1}{\text{enrolled ADM}} && \text{disadvantaged share} \\
+    d_3 &= \biggl( \frac{d_2}{0.533380310606710} \biggr)^{2} && \text{index, squared} \\
+    \text{aid} &= d_1 \times \$422 \times d_3
+    \end{aligned}
   statutory_basis: |
     R.C. 3317.022(A)(4) for the programme and the $422; R.C. 3317.02(I)(1) for the index and its
     squaring; R.C. 3317.03(B)(21) for the count. This node previously cited R.C. 3317.029, which

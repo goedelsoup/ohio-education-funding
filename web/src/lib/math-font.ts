@@ -340,6 +340,17 @@ const REPERTOIRE = {
    * rounds down in four places, and `ROUNDDOWN(x, 1)` set in type is a floor bracket.
    */
   delimiters: [...range(0x2308, 0x2309), ...range(0x230a, 0x230b), ...range(0x27e8, 0x27e9)],
+  /**
+   * The invisible operators, which are in the markup whether or not anybody typed them.
+   *
+   * Temml emits U+2061 FUNCTION APPLICATION between a name and the bracket it applies to, so
+   * `s(\text{ADM})` and `\text{ROUNDDOWN}(\ldots)` both carry one. They draw nothing, and a font
+   * missing them still looks correct — which is exactly why they belong in a stated repertoire
+   * rather than in an exemption. The corpus sweep found U+2061 on the open-enrolment clawback and
+   * had no way to know it was harmless; widening the repertoire is cheaper than teaching a check
+   * which characters not to care about, and these four are zero-width glyphs.
+   */
+  invisible: range(0x2061, 0x2064),
 } as const;
 
 export const CODEPOINTS: number[] = Object.values(REPERTOIRE).flat();

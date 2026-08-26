@@ -133,6 +133,33 @@ properties:
     Statewide constants, FY2027: median weighted wealth $392,151,306.63; median weighted wealth
     per pupil $276,708.97. Both computed over all districts; the sheet publishes an
     island-excluded pair beside them that no formula references. [verified]
+  function_tex: |
+    \begin{aligned}
+    A &= 0.6 \times \text{assessed valuation} + 0.4 \times \text{federal adjusted gross income}
+      && \text{district weighted wealth} \\
+    B &= \frac{\text{statewide median weighted wealth}}{A} && \text{capacity index} \\
+    s(\text{ADM}) &= \begin{cases}
+      0 & \text{if ADM} < 200 \\
+      0.05 & \text{if } 200 \le \text{ADM} \le 400 \\
+      0.95 \times \dfrac{\text{ADM} - 400}{200} + 0.05 & \text{if } 400 < \text{ADM} < 600 \\
+      1 & \text{if ADM} \ge 600
+    \end{cases} && \text{size share} \\
+    C &= \begin{cases}
+      0 & \text{if } A \ge \text{median} \\
+      s(\text{ADM}) \times 0.008 \times (\text{median} - A) & \text{otherwise}
+    \end{cases} && \text{capacity amount} \\
+    D &= \frac{A}{\text{enrolled ADM} - \text{open enrolment in} + \text{open enrolment out}}
+      && \text{weighted wealth per pupil} \\
+    E &= \frac{\text{statewide median wealth per pupil}}{D} && \text{wealth index} \\
+    F &= \begin{cases}
+      0 & \text{if } E < 0.8 \\
+      (\text{median per pupil} \times 0.014 - D \times 0.0112) \times \text{enrolled ADM} & \text{otherwise}
+    \end{cases} && \text{wealth amount} \\
+    G &= C + F && \text{targeted assistance} \\
+    H &= \text{FY19 wealth index} > 1.6 \ \text{ and }\ \text{FY19 enrolled} < 0.88 \times \text{FY19 total}
+      && \text{supplement eligibility} \\
+    I &= 0 \text{ for every district in FY2027} && \text{supplemental}
+    \end{aligned}
   statutory_basis: |
     R.C. 3317.0217, read. **Codified.** The capacity tier's coefficient appears as "(The median
     weighted wealth of all school districts in this state for that fiscal year X 0.008) - (the

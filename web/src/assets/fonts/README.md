@@ -1,13 +1,13 @@
 # The one font binary
 
-`ohio-math-fallback.woff2` — 27,220 bytes — is the only typeface this repository ships. Everything
+`ohio-math-fallback.woff2` — 27,236 bytes — is the only typeface this repository ships. Everything
 else on the site is set in whatever the reader's platform calls a UI sans, a mono or a serif, and
 `../../styles/tokens/typography.css` explains at length why that is a standing decision rather than
 an unfinished one.
 
 ## What it is
 
-A 174-codepoint subset of **STIX Two Math 2.12 b168a**, cut from `@fontsource/stix-two-math` — a
+A 178-codepoint subset of **STIX Two Math 2.12 b168a**, cut from `@fontsource/stix-two-math` — a
 devDependency, so the source is pinned by `pnpm-lock.yaml` rather than being a file that happened to
 exist on somebody's machine. It keeps the `MATH` table and the vertical glyph assemblies inside it,
 which is the only reason a delimiter can be drawn taller than a line.

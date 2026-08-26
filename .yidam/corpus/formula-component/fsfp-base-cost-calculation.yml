@@ -74,6 +74,25 @@ properties:
     enrollment, community and STEM school ADM, and Jon Peterson, Autism, EdChoice, and
     Cleveland Scholarship ADM. Uses the greater of the three-year average or the prior year,
     which stabilizes funding for districts with declining enrollment. [verified]
+  function_tex: |
+    \begin{aligned}
+    \text{funded classroom teachers} &= \frac{\text{K ADM}}{20} + \frac{\text{Gr 1-3 ADM}}{23}
+      + \frac{\text{Gr 4-8 ADM}}{25} + \frac{\text{Gr 9-12 ADM}}{27} + \frac{\text{CTE ADM}}{18} \\
+    \text{funded special teachers} &= \max\biggl( \frac{\text{base cost enrolled ADM}}{150},\ 6 \biggr) \\
+    \text{average teacher base cost} &= (\text{statewide average teacher salary} \times 1.16)
+      + \text{average insurance cost} \\
+    \text{substitute cost} &= (\text{classroom} + \text{special}) \times (\$90 \times 1.16) \times 5
+      && \text{5 days} \\
+    \text{professional development} &= (\text{classroom} + \text{special})
+      \times \frac{\text{salary} \times 1.16}{180} \times 4 && \text{4 days} \\
+    \text{teacher base cost} &= \text{classroom} + \text{special} + \text{substitute}
+      + \text{professional development} \\
+    \text{district aggregate base cost} &= \text{teacher} + \text{student support}
+      + \text{district leadership and accountability} \\
+      &\quad + \text{building leadership and operation} + \text{athletic co-curricular} \\
+    \text{district base cost per pupil} &= \frac{\text{district aggregate base cost}}{\text{district base cost enrolled ADM}} \\
+    \text{statewide average base cost per pupil} &= \frac{\sum \text{district aggregates}}{\sum \text{district ADM}}
+    \end{aligned}
   statutory_basis: |
     R.C. 3317.011. Teacher base cost 3317.011(D); student support 3317.011(E); district
     leadership and accountability 3317.011(F); building leadership and operation 3317.011(G);
