@@ -1239,6 +1239,111 @@ test.describe("a table that scrolls sideways", () => {
     }
     expect(boxes, "the build carries scrolling tables at all").toBeGreaterThan(10_000);
     expect(bare.slice(0, 5), "a focusable box a screen reader cannot name").toEqual([]);
+
+    /*
+     * The second kind of scrolling box, swept the same way and for the same reason.
+     *
+     * `pre.aligned` holds a property value whose columns carry meaning. The corpus wraps its YAML
+     * at column 95, the widest of those needs 803px, and the widest row on a card offers 788 — so
+     * these scroll on nearly every viewport, and a box that scrolls and cannot be focused is
+     * unreachable content. This is the defect the whole describe block above was written for,
+     * arriving in a new element, and the sweep is what stops it arriving in the next one.
+     */
+    let blocks = 0;
+    const nameless: string[] = [];
+    for (const file of walk(DIST)) {
+      const page = readFileSync(file, "utf8");
+      for (const match of page.matchAll(/<pre\b([^>]*\bclass="aligned"[^>]*)>/g)) {
+        const attrs = match[1] ?? "";
+        blocks += 1;
+        if (!attrs.includes('tabindex="0"') || !attrs.includes('role="group"'))
+          nameless.push(`${file.slice(DIST.length + 1)}: not focusable — ${attrs}`);
+        else if (!/aria-label="[^"]+"/.test(attrs))
+          nameless.push(`${file.slice(DIST.length + 1)}: ${attrs}`);
+      }
+    }
+    expect(blocks, "the build carries aligned property blocks at all").toBeGreaterThan(30);
+    expect(nameless.slice(0, 5), "an aligned block a keyboard cannot reach").toEqual([]);
+  });
+
+  /**
+   * And it is the block that scrolls, not the table around it.
+   *
+   * `table-layout: fixed` is what decides this and does not look like it does. Without it the cell
+   * sizes to its widest unbreakable content, the table outgrows the card, and the outer `.scroll`
+   * takes the scroll — so a reader dragging a piecewise rule sideways to reach its `then` values
+   * drags the property name off the screen with it.
+   */
+  test("an aligned property block scrolls itself, and the page never scrolls with it", async ({ page }) => {
+    await page.setViewportSize({ width: 375, height: 900 });
+    await page.goto("/wiki/formula-component/fsfp-local-capacity-measure");
+
+    const block = page.locator("pre.aligned").first();
+    await expect(block).toHaveAttribute("tabindex", "0");
+    await expect(block).toHaveAttribute("aria-label", /\S/);
+
+    const state = await block.evaluate((el) => ({
+      blockScrolls: el.scrollWidth > el.clientWidth + 1,
+      tableScrolls: (() => {
+        const box = el.closest("div.scroll");
+        return box ? box.scrollWidth > box.clientWidth + 1 : false;
+      })(),
+      pageScrolls: document.documentElement.scrollWidth > document.documentElement.clientWidth + 1,
+    }));
+    expect(state.blockScrolls, "a 95-character block at 375px has something behind its edge").toBe(true);
+    expect(state.tableScrolls, "the table must not be what scrolls").toBe(false);
+    expect(state.pageScrolls, "the document must never scroll sideways").toBe(false);
+
+    // Reachable and movable, which is the whole point of the tab stop.
+    await block.focus();
+    for (let i = 0; i < 6; i += 1) await page.keyboard.press("ArrowRight");
+    await expect
+      .poll(() => block.evaluate((el) => el.scrollLeft), { message: "the keyboard moved it" })
+      .toBeGreaterThan(0);
+  });
+
+  /**
+   * A property name never prints on top of its own value.
+   *
+   * This is here because it happened. `table-layout: fixed` — added so an aligned block scrolls
+   * inside itself rather than dragging the table with it — also stops the name column growing for
+   * a long name, and `statutory_basis` is fifteen monospace characters against a 99px column at
+   * 390px. It ran across its own cell boundary and printed over the value: "statutory_ba*stat*e
+   * share percentage". Nothing in the suite noticed; it was found by looking at a screenshot.
+   *
+   * The `#186` collision sweep exists and did not cover it, because that one walks three routes to
+   * check a display face across six fallbacks and none of them is a corpus node. This walks the
+   * property tables instead, at the width where a fixed column is tightest.
+   */
+  test("a property name never overlaps the value beside it", async ({ page }) => {
+    const ROUTES = [
+      // A long name against a block value, which is the case that broke.
+      "/wiki/formula-component/fsfp-local-capacity-measure",
+      // The longest property names in the corpus: `procedural_history`, `general_assembly`.
+      "/wiki/litigation/derolph-ii-2000",
+      "/wiki/legislation/hb-33-2023",
+      "/wiki/parameter/fsfp-phase-in-percentage",
+      "/wiki/metric/per-pupil-operating-expenditure",
+    ];
+    for (const width of [375, 768]) {
+      await page.setViewportSize({ width, height: 900 });
+      for (const route of ROUTES) {
+        await page.goto(route);
+        const overlaps = await page.evaluate(() =>
+          [...document.querySelectorAll("table.prose tr")].flatMap((row) => {
+            const name = row.querySelector("th");
+            const value = row.querySelector("td");
+            if (!name || !value) return [];
+            // The name's own text box rather than the cell's: the cell stayed put and the word
+            // inside it was what escaped.
+            const box = (name.firstElementChild ?? name).getBoundingClientRect();
+            const beside = value.getBoundingClientRect();
+            return box.right > beside.left + 1 ? [`${name.textContent?.trim()}`] : [];
+          }),
+        );
+        expect(overlaps, `${route} at ${width}px`).toEqual([]);
+      }
+    }
   });
 });
 

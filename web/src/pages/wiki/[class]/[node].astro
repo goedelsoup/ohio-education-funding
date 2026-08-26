@@ -15,7 +15,7 @@ import { loadCorpus } from "../../../lib/corpus.ts";
 import { sectionForClass } from "../../../lib/nav.ts";
 import { loadFeed } from "../../../lib/feed.ts";
 import { money } from "../../../lib/format.ts";
-import { renderProse, renderPropertyValue, summarize } from "../../../lib/prose.ts";
+import { isBlockProperty, renderProse, renderPropertyValue, summarize } from "../../../lib/prose.ts";
 import * as routes from "../../../lib/routes.ts";
 import SectionAnchor from "../../../components/SectionAnchor.astro";
 
@@ -191,14 +191,37 @@ const properties = node.properties.filter((p) => p.name !== "seeded_because");
         <div class="scroll">
           <table class="prose">
             <tbody>
-              {properties.map((property) => (
-                <tr>
-                  <th>
-                    <code>{property.name}</code>
-                  </th>
-                  <td set:html={renderPropertyValue(property.value, node.className)} />
-                </tr>
-              ))}
+              {properties.map((property) =>
+                /*
+                 * A block-valued property spans both columns, in two rows, and that is a layout
+                 * decision forced by arithmetic rather than a preference. See `pre.aligned` in
+                 * `app.css`: the widest block in the corpus is 95 characters and needs 803px,
+                 * while the name column takes 257px of an 804px row whatever the name is.
+                 *
+                 * `table-layout: fixed` is what makes the block scroll inside itself instead of
+                 * dragging the property name off screen with it — and fixed layout takes its
+                 * columns from the first row, so a per-row width is not available. Spanning is.
+                 */
+                isBlockProperty(property.value) ? (
+                  <>
+                    <tr class="spanning-name">
+                      <th colspan="2">
+                        <code>{property.name}</code>
+                      </th>
+                    </tr>
+                    <tr class="spanning-value">
+                      <td colspan="2" set:html={renderPropertyValue(property.value, node.className)} />
+                    </tr>
+                  </>
+                ) : (
+                  <tr>
+                    <th>
+                      <code>{property.name}</code>
+                    </th>
+                    <td set:html={renderPropertyValue(property.value, node.className)} />
+                  </tr>
+                ),
+              )}
             </tbody>
           </table>
         </div>
@@ -357,7 +380,13 @@ const properties = node.properties.filter((p) => p.name !== "seeded_because");
           A note from the corpus about itself rather than about Ohio, kept because provenance
           includes why something was written down.
         </p>
-        <p set:html={renderPropertyValue(seeded.value, node.className)} />
+        {/*
+          A `<div>` and not a `<p>`: `renderPropertyValue` emits a `<pre>` for an aligned value, and
+          a `<pre>` inside a `<p>` is not nesting a parser will keep — it closes the paragraph and
+          leaves the rest of the value outside it. No `seeded_because` in the corpus is aligned
+          today, which is exactly why this would have shipped broken on the first one that was.
+        */}
+        <div set:html={renderPropertyValue(seeded.value, node.className)} />
       </div>
     )
   }
