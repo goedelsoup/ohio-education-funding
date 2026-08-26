@@ -47,7 +47,7 @@ three years. [verified]
 **No overall rating.** R.C. 3302.10 and CSI both key on the report card's *overall* rating, and
 neither published building file carries it — `Achievement_Building` gives the achievement
 component and `Building_Details` gives none. What is held is an input to the trigger, not the
-trigger. [unentered]
+trigger. [verified]
 
 **No grade spans, and no commission timeline**, so the Cleveland building cannot yet be placed
 against the years its district was under state control. [open]

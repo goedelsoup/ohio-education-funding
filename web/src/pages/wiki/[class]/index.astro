@@ -6,11 +6,24 @@
  * files say what a kind of thing is, which properties it may carry and which relationships it may
  * enter into — and that is exactly the context a reader needs while looking at a list of its
  * instances. Splitting them would make the schema a page nobody arrives at.
+ *
+ * # The two schema tables render their prose; they used to print its source
+ *
+ * `entry.description` went through the markdown processor and the property and edge descriptions
+ * beside it did not, so a `description:` that named a field in backticks rendered the backticks.
+ * 18 of the ontology files' 236 descriptions carry markdown, and the one that found it was
+ * `draft-legislation`'s `sponsors` — the page that documents the schema, printing a schema
+ * convention as literal source.
+ *
+ * {@link renderPropertyValue} rather than {@link renderProse} because these are table cells:
+ * it escapes and then puts back the inline links, code spans and claim badges, with no `<p>`
+ * wrapper to fight the row. It is the same renderer the node pages use for a property's *value*,
+ * so a schema cell and an instance cell read alike, which is the point of the two being one page.
  */
 import Base from "../../../layouts/Base.astro";
 import { loadCorpus } from "../../../lib/corpus.ts";
 import { sectionForClass } from "../../../lib/nav.ts";
-import { renderProse, summarize } from "../../../lib/prose.ts";
+import { renderProse, renderPropertyValue, summarize } from "../../../lib/prose.ts";
 import * as routes from "../../../lib/routes.ts";
 import SectionAnchor from "../../../components/SectionAnchor.astro";
 
@@ -91,7 +104,7 @@ const title = `${entry.label} — the corpus`;
                     <code>{property.name}</code>
                   </th>
                   <td>{property.type}</td>
-                  <td>{property.description}</td>
+                  <td set:html={renderPropertyValue(property.description, entry.className)} />
                 </tr>
               ))}
             </tbody>
@@ -131,7 +144,7 @@ const title = `${entry.label} — the corpus`;
                       edge.target
                     )}
                   </td>
-                  <td>{edge.description}</td>
+                  <td set:html={renderPropertyValue(edge.description, entry.className)} />
                 </tr>
               ))}
             </tbody>
