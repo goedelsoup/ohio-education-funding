@@ -227,7 +227,84 @@ under every metric tested; that ordering never depended on the exact number. Wha
 the arithmetic. It does now, and the comments that stated the old figures say so rather than having
 been quietly rewritten.
 
-A third item — font binaries — is settled rather than open. `--font-sans` and `--font-mono` name IBM
-Plex first and fall back to the platform stacks, which is what the site ships today at zero font
-bytes. Tooling will report a missing `@font-face` for both families; that report is addressed to
-whoever owns the files and is not a defect to resolve by substituting a different family.
+A third item — font binaries — was settled rather than open, and has since been partly reopened.
+`--font-sans` and `--font-mono` still name IBM Plex first and fall back to the platform stacks, at
+zero font bytes; tooling will report a missing `@font-face` for both families, and that report is
+addressed to whoever owns the files and is not a defect to resolve by substituting a different
+family. **That is now a rule about TEXT faces specifically.** #202 added one 27,236-byte subset of
+STIX Two Math as the last entry in `--font-math`, for readers whose platform has no maths face at
+all — see below.
+
+## The redesign landed, and here is what moved
+
+#182 became six phases. What each changed is in the diff; what is worth keeping here is the six
+measurements it named, before and after. Measured by `web/scripts/measure.ts` against a build, on
+the eight routes it walks, under `ui-sans-serif` at a 9.21px digit advance.
+
+| | before | after |
+| --- | --: | --: |
+| distinct rendered sizes | 15 | **8** on a district page, 10 at the busiest |
+| heading-to-body ratio | 1.49× | **2.56×** |
+| max paragraph measure | 110ch | **75ch** |
+| bordered boxes per district page | 38 | **19** |
+| right-aligned sentence cells | 21,601 | **0** |
+| chrome above the `h1` at 390px | 166px | **80px** |
+
+Five of the six are now graded rather than reported: `THRESHOLDS` in `web/src/lib/measure.ts`
+carries `sizeCount`, `headingRatio`, `measureMax`, `boxDecorative`, `rightAlignedProse` and
+`firstContentY`. `sizeGap` is deliberately unset and says why — it was built to catch "a cluster
+and then a leap", the crowding was the defect, and a display size *is* a leap.
+
+Two of the before figures did not reproduce when re-measured at the start of the phase that used
+them, and the corrected values are on #188: 21,601 right-aligned cells measured **21,333**, and
+17,613 cards opening with a `#` measured **22,334**. A third — "twenty middot-joined links" under a
+district title — describes the tail rather than the general case: across all 609 district pages the
+mean is **4.2** and 572 carry between three and six. Only Columbus (16) and Cleveland (14) are the
+wall the issue described, and they are the two districts that genuinely span that many seats.
+
+## The preview cards carry the redesign now
+
+The cards are the surface this README has always described as separately maintained and obliged to
+agree anyway, and for four phases they did not: #186 made the site's display face a serif and the
+cards stayed in Inter, so a card and the page it previewed disagreed about what the site looks like
+— on the one occasion a reader sees both, which is clicking through from a link they were shown.
+
+`web/src/lib/og/font.ts` now loads **Source Serif 4** alongside Inter, and the headline is the only
+thing set in it. `--font-serif` is a platform stack — Iowan Old Style, Palatino, Charter, Georgia —
+and none of those can be handed to satori; Charter is not on npm at all. So the card takes the
+nearest available face rather than the same one, chosen by rendering the real headline at the real
+size in three candidates and looking: Newsreader is narrower and higher-contrast than Iowan, Libre
+Baskerville much wider and higher-contrast still, Source Serif 4 closest in colour and width.
+
+This is the case #190 predicted. A card cannot match a platform stack; what it can do is agree
+about the decision, which is that a headline is set in an old-style serif.
+
+Everything else on the card stays sans, following the site's own rule from `tokens/typography.css`
+— the serif is for the display face and the lead, "and for nothing that carries a number, sits in a
+table, or is drawn inside an `<svg>`". The card's figure is a number, and `.tile .v` on the page
+inherits the body stack with tabular figures, so the card does the same.
+
+`tests/unit/og.spec.ts` lays the headline out twice, with the serif loaded and without, and requires
+the geometry to differ. satori does not fail on a `fontFamily` it has no font for — it falls back to
+the first face it was given, which is Inter, which is what the card used to be. A source scan for
+the family name would agree with itself; this does not.
+
+## What the upstream design project has not been told
+
+Three things, and none is a CSS edit this repository can make on the project's behalf:
+
+- **The type scale moved.** `--text-body` is 1.06rem and the ramp is two ramps — a reading ramp
+  (display, lead, body) and an apparatus ramp (base, sm, xs) — with the rationale in
+  `tokens/typography.css`. The design project's sheets predate the split.
+- **`--link` is an underline colour, not a text colour.** The search that establishes no third text
+  hue exists is `web/scripts/link-hue-search.ts`, and the reasoning is in
+  `.yidam/decisions/the-redesign-that-argued-back.yml`.
+- **`--sticky-chrome` is two values, not four.** 52px and 106px, re-derived in #189 after the
+  header stopped wrapping. The old four were measured at four widths that were their own
+  breakpoints and were wrong between them by as much as 44px.
+
+One warning worth passing on with them. The comment beside `.subnav` in `app.css` said "the site
+header wraps to 96px at 700px" — and 96px was never a measurement. It is `--sticky-chrome`'s value
+for that breakpoint, written back into prose as though it were the thing the token was derived
+from; the header at 700px was 52px. Any figure copied into the design project from a comment rather
+than from a measurement can have the same shape.
