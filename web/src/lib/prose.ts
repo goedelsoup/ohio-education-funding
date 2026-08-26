@@ -426,6 +426,38 @@ function renderMathFences(html: string, where: string): string {
 export const isMathProperty = (name: string): boolean => name.endsWith("_tex");
 
 /**
+ * Which properties a page shows, when one calculation is stated twice.
+ *
+ * `function:` and `function_tex:` are two statements of one formula, and the node page used to
+ * render both — the aligned ASCII, and then the same arithmetic set in type directly beneath it.
+ * That is the duplication #203 was opened about, and seeing it on the page is what settled the
+ * question: whatever the checks say about the two agreeing, a reader met the local capacity
+ * measure twice on one screen and had to work out that they were the same thing.
+ *
+ * So the page shows one. `function_tex` wins where it exists, and prints under the plain name,
+ * because `_tex` names an encoding and a reader is not reading an encoding. `function` stays in
+ * the YAML either way: it is what `.yidam` is authored to be read in, it is the statement that was
+ * checked against the department's worksheet, and on a node with no `function_tex` it is what
+ * renders.
+ *
+ * This makes a partial conversion coherent rather than untidy. A node whose formula is a list of
+ * products gains nothing from being typeset — see `formula-component.ont.yml` for the criterion —
+ * and on those pages the aligned block is simply what a reader sees, with nothing missing beside
+ * it.
+ */
+export function shownProperties<T extends { name: string }>(properties: T[]): (T & { shownAs: string })[] {
+  const typeset = new Set(
+    properties.map((property) => property.name).filter(isMathProperty).map((name) => name.slice(0, -"_tex".length)),
+  );
+  return properties
+    .filter((property) => !typeset.has(property.name))
+    .map((property) => ({
+      ...property,
+      shownAs: isMathProperty(property.name) ? property.name.slice(0, -"_tex".length) : property.name,
+    }));
+}
+
+/**
  * One property value, as MathML.
  *
  * A separate path from {@link renderPropertyValue} because that one escapes rather than sanitizes

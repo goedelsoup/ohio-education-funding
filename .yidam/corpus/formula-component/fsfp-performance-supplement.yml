@@ -137,6 +137,17 @@ properties:
 
     Paid on `[a] Enrolled ADM`, the same count four of the six categoricals use. Reported in
     [R] Total State Support and not in [N] Total Formula Funding, so no guarantee holds it.
+  function_tex: |
+    \begin{aligned}
+    O_1 &= \text{overall stars} \\
+    O_2 &= \text{progress rating} \\
+    O_3 &= \text{progress rating, the year before} \\
+    Q_4 &= (O_1 > 3.5) \ \text{ or }\ (O_2 \ge 3) \ \text{ or }\ (O_2 > O_3) && \text{eligibility} \\
+    O &= \begin{cases}
+      \max(O_1, O_2) \times \$13 \times \text{enrolled ADM} & \text{if } Q_4 \\
+      0 & \text{otherwise}
+    \end{cases} && \text{supplement}
+    \end{aligned}
   statutory_basis: |
     Not in R.C. 3317. The department computes it on its own sheet and reports it as line [O]; the
     $13 and the three routes are transcribed from there.

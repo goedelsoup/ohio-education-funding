@@ -340,6 +340,16 @@ properties:
 
     Reported as line [I] of the Summary School Finance Payment Report, separate from core
     foundation funding [H], and included in total formula funding [N].
+  function_tex: |
+    \begin{aligned}
+    H &= \text{foundation funding} \\
+    H_2 &= \text{guarantee funding base} && \text{a node of its own} \\
+    I_1 &= \text{open enrolment adjustment} && \text{a node of its own} \\
+    I &= \begin{cases}
+      H_2 - I_1 - H & \text{if } H_2 > H \ \text{ and }\ H_2 - I_1 - H > 0 \\
+      0 & \text{otherwise}
+    \end{cases} && \text{guarantee}
+    \end{aligned}
   statutory_basis: R.C. 3317.019. [verified]
   calculator: |
     Not a standalone crate, and no longer blocked on the baseline. `[H2]` and the clawback's inputs

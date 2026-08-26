@@ -112,6 +112,17 @@ properties:
 
     Total = the five plus associated services. Reconciles to the department's published
     `[G] Career-Technical` to the cent for all 609 districts.
+  function_tex: |
+    \begin{aligned}
+    \text{aid}_k &= \text{FTE}_k \times w_k \times \text{career-technical base cost per pupil}
+      \times \text{state share} \\
+    w &= (0.6230,\ 0.5905,\ 0.2154,\ 0.1830,\ 0.1570) \\
+    \text{career-technical base cost per pupil} &= \$9{,}855.62
+      && \text{FY2027, not the } \$8{,}241.61 \\
+    \text{associated services} &= \biggl( \sum_{k=1}^{5} \text{FTE}_k \biggr) \times 0.0294
+      \times \text{career-technical base cost per pupil} \times \text{state share} \\
+    \text{total} &= \sum_{k=1}^{5} \text{aid}_k + \text{associated services}
+    \end{aligned}
   statutory_basis: |
     R.C. 3317.014, read. **Codified.** The five multiples are in division (A) to four decimals and
     match the corpus exactly; the separate base cost is statutory too — the section multiplies each

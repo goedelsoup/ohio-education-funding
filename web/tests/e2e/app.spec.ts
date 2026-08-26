@@ -13,7 +13,7 @@
  */
 
 import { existsSync, readFileSync, readdirSync } from "node:fs";
-import { join } from "node:path";
+import { join, sep } from "node:path";
 
 import AxeBuilder from "@axe-core/playwright";
 import { expect, test, type Locator, type Page } from "@playwright/test";
@@ -1274,10 +1274,16 @@ test.describe("a table that scrolls sideways", () => {
    * sizes to its widest unbreakable content, the table outgrows the card, and the outer `.scroll`
    * takes the scroll — so a reader dragging a piecewise rule sideways to reach its `then` values
    * drags the property name off the screen with it.
+   *
+   * The node moved. This used to open the local capacity measure, whose `function` was the widest
+   * aligned block in the corpus — and #203 gave that node a `function_tex`, so its ASCII statement
+   * is no longer what the page shows. `fy2022_inputs` on the base cost calculation is now the
+   * subject: a table of statewide salaries, wider than a phone, and a property nothing is going to
+   * typeset because it is not a calculation.
    */
   test("an aligned property block scrolls itself, and the page never scrolls with it", async ({ page }) => {
     await page.setViewportSize({ width: 375, height: 900 });
-    await page.goto("/wiki/formula-component/fsfp-local-capacity-measure");
+    await page.goto("/wiki/formula-component/fsfp-base-cost-calculation");
 
     const block = page.locator("pre.aligned").first();
     await expect(block).toHaveAttribute("tabindex", "0");
@@ -1291,7 +1297,7 @@ test.describe("a table that scrolls sideways", () => {
       })(),
       pageScrolls: document.documentElement.scrollWidth > document.documentElement.clientWidth + 1,
     }));
-    expect(state.blockScrolls, "a 95-character block at 375px has something behind its edge").toBe(true);
+    expect(state.blockScrolls, "a wide salary table at 375px has something behind its edge").toBe(true);
     expect(state.tableScrolls, "the table must not be what scrolls").toBe(false);
     expect(state.pageScrolls, "the document must never scroll sideways").toBe(false);
 
@@ -1436,6 +1442,77 @@ test.describe("a table that scrolls sideways", () => {
     expect(none.brace, "a font with no MATH table must not stretch, or this proves nothing").toBeLessThan(
       none.rows * 0.5,
     );
+  });
+
+  /**
+   * No page states one calculation twice.
+   *
+   * `function:` and `function_tex:` are the same arithmetic in two encodings, and for one day the
+   * node page rendered both — the aligned ASCII, and the typeset version directly beneath it. That
+   * is what settled #203: whatever the checks say about the two agreeing, a reader met the local
+   * capacity measure twice on one screen and had to work out they were the same thing.
+   *
+   * `shownProperties` in `src/lib/prose.ts` now shows the typeset one under the plain name where it
+   * exists. This asserts the outcome on the artefact: a property name never appears twice in one
+   * table, and `_tex` — which names an encoding, not a quantity — never reaches a reader at all.
+   */
+  test("a node never shows one property under two names", () => {
+    const DIST = join(import.meta.dirname, "../../dist");
+    const walk = (dir: string): string[] =>
+      readdirSync(dir, { withFileTypes: true }).flatMap((entry) =>
+        entry.isDirectory()
+          ? walk(join(dir, entry.name))
+          : entry.name.endsWith(".html")
+            ? [join(dir, entry.name)]
+            : [],
+      );
+
+    const offenders: string[] = [];
+    let tables = 0;
+    for (const file of walk(join(DIST, "wiki"))) {
+      /*
+       * Node pages only — `wiki/<class>/<node>.html`, two segments deep.
+       *
+       * `wiki/<class>.html` is the class index, and its properties card is the ontology's own
+       * schema: "What a formula component may carry", one row per declared property with its type
+       * and meaning. `function_tex` belongs there under exactly that name, because an author
+       * needs the name to write one. The rule below is about a reader meeting a formula, not
+       * about a reader meeting the schema, and the first version of this check conflated them.
+       */
+      if (file.slice(join(DIST, "wiki").length + 1).split(sep).length !== 2) continue;
+      const html = readFileSync(file, "utf8");
+      /*
+       * The properties card, and only it. Three tables on a node page carry `table.prose`, and the
+       * other two are the edge lists — where a repeated name is the point: `ohio-general-assembly`
+       * states `enacts` five times and `sourced` twice, one row per act. Scoping by class alone
+       * reported those as duplicates, which is the first thing this check did.
+       */
+      const card = html.match(/<div class="card" id="properties"[\s\S]*?<\/table>/)?.[0];
+      for (const [, found] of (card ?? "").matchAll(/<table class="prose">([\s\S]*?)$/g)) {
+        const body = found ?? "";
+        tables += 1;
+        /*
+         * One pass over the row headers, not two. Matching `scope="row"` and `colspan="2"`
+         * separately counted every spanning property twice — a block value carries both attributes
+         * on the same `<th>` — and reported `series_path` as a duplicate of itself on five pages.
+         */
+        const all = [...body.matchAll(/<th[^>]*scope="row"[^>]*>(?:<code>)?([a-z0-9_]+)/g)].map(
+          ([, name]) => name!,
+        );
+        const where = file.slice(DIST.length + 1);
+        for (const name of all.filter((name) => name.endsWith("_tex"))) {
+          offenders.push(`${where}: ${name} reached the page under its encoding's name`);
+        }
+        const seen = new Set<string>();
+        for (const name of all) {
+          if (seen.has(name)) offenders.push(`${where}: ${name} appears twice in one table`);
+          seen.add(name);
+        }
+      }
+    }
+
+    expect(tables, "the wiki carries property tables to check").toBeGreaterThan(50);
+    expect(offenders.slice(0, 5)).toEqual([]);
   });
 
   /**

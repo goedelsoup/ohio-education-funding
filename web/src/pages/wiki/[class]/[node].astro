@@ -15,7 +15,7 @@ import { loadCorpus } from "../../../lib/corpus.ts";
 import { sectionForClass } from "../../../lib/nav.ts";
 import { loadFeed } from "../../../lib/feed.ts";
 import { money } from "../../../lib/format.ts";
-import { isBlockProperty, isMathProperty, renderMathProperty, renderProse, renderPropertyValue, summarize } from "../../../lib/prose.ts";
+import { isBlockProperty, isMathProperty, renderMathProperty, renderProse, renderPropertyValue, shownProperties, summarize } from "../../../lib/prose.ts";
 import * as routes from "../../../lib/routes.ts";
 import SectionAnchor from "../../../components/SectionAnchor.astro";
 
@@ -107,10 +107,9 @@ const seeded = node.properties.find((p) => p.name === "seeded_because");
  * prose one: `renderPropertyValue` escapes its input, which is exactly what makes it safe and
  * exactly what would turn a formula into a screenful of backslashes.
  */
-const properties = node.properties
-  .filter((p) => p.name !== "seeded_because")
+const properties = shownProperties(node.properties.filter((p) => p.name !== "seeded_because"))
   .map((property) => ({
-    name: property.name,
+    name: property.shownAs,
     html: isMathProperty(property.name)
       ? renderMathProperty(property.value, `${node.id}#${property.name}`)
       : renderPropertyValue(property.value, node.className),

@@ -122,6 +122,17 @@ properties:
     apart, which is what a payment written into temporary law can do and a codified one cannot.
     [verified — `lsc-budget`,
     `crates/project/tests/what_the_act_says_and_the_code_does_not.rs`]
+  function_tex: |
+    \begin{aligned}
+    L &= \text{enrolled ADM} \times \$40 && \text{base funding supplement} \\
+    M_1 &= \frac{\text{FY26 enrolled ADM} - \text{FY23 enrolled ADM}}{\text{FY23 enrolled ADM}}
+      && \text{enrolment change} \\
+    M_2 &= M_1 \ge 3\% && \text{eligibility} \\
+    M &= \begin{cases}
+      \text{enrolled ADM} \times \$250 & \text{if } M_2 \\
+      0 & \text{otherwise}
+    \end{cases} && \text{growth supplement}
+    \end{aligned}
   statutory_basis: |
     Not in R.C. 3317. Reported as lines [L] and [M]; the $40, the $250 and the 3% threshold are
     transcribed from the calculator.

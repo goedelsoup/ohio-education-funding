@@ -68,6 +68,21 @@ export const ELEMENTS = new Set([
   "msub",
   "msup",
   "msubsup",
+  /*
+   * Limits above and below an operator, which is what `\sum_{k}` is in display style.
+   *
+   * Added deliberately, and the allowlist is why it had to be: the first indexed formula in the
+   * corpus — the special-education weights, summed over six categories — failed the build with
+   * "`<munder>` is not on the MathML allowlist" rather than rendering something wrong. That is the
+   * second time this list has stopped a conversion at the boundary instead of after it; `mstyle`
+   * was the first.
+   *
+   * These are MathML Core, they carry no scripting and no styling surface, and a summation with
+   * its index under the sign is exactly the notation LaTeX was brought in for.
+   */
+  "munder",
+  "mover",
+  "munderover",
   "mfrac",
   "msqrt",
   "mroot",
@@ -107,6 +122,10 @@ export const ATTRIBUTES: Record<string, Set<string>> = {
   mn: new Set(["mathvariant"]),
   mtext: new Set(["mathvariant"]),
   mfrac: new Set(["linethickness"]),
+  // Whether a limit is set as an accent — tighter, and without the operator's own spacing.
+  munder: new Set(["accentunder"]),
+  mover: new Set(["accent"]),
+  munderover: new Set(["accent", "accentunder"]),
   msqrt: new Set([]),
   // `mathcolor` and `mathbackground` are deliberately absent. A formula that can set its own
   // colours can hide a term inside itself, and on this site colour is solved rather than picked

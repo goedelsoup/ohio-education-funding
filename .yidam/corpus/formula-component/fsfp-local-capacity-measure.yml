@@ -252,16 +252,22 @@ properties:
     purpose, and a frequent source of confusion between the two. [verified]
   function_tex: |
     \begin{aligned}
-    C_1 &= \frac{V_1}{\text{base-cost enrolled ADM}} \\
-    C_2 &= \frac{I_1}{\text{base-cost enrolled ADM}} \\
-    C_3 &= \frac{\text{federal median income} \times \text{state tax returns}}{\text{ADM}} \\
-    C_4 &= \frac{\text{district federal median income}}{\text{statewide federal median income}} \\
-    C_5 &= C_4 \text{ as computed for the 40th highest district} \\
+    V_1 &= \min\bigl( \text{most recent TY assessed valuation},\ \text{3-year average} \bigr)
+        && \text{capacity valuation} \\
+    I_1 &= \min\bigl( \text{most recent TY federal AGI},\ \text{3-year average} \bigr)
+        && \text{capacity gross income} \\
+    C_1 &= \frac{V_1}{\text{base-cost enrolled ADM}} && \text{assessed valuation per pupil} \\
+    C_2 &= \frac{I_1}{\text{base-cost enrolled ADM}} && \text{gross income per pupil} \\
+    C_3 &= \frac{\text{federal median income} \times \text{state tax returns}}{\text{ADM}}
+        && \text{median income per pupil} \\
+    C_4 &= \frac{\text{district federal median income}}{\text{statewide federal median income}}
+        && \text{income ratio} \\
+    C_5 &= C_4 \text{ as computed for the 40th highest district} && \text{benchmark} \\
     C_6 &= \begin{cases}
       0.025 & \text{if } C_4 \ge C_5 \\
       \dfrac{(C_4 - 1) \times 0.0025}{C_5 - 1} + 0.0225 & \text{if } 1 < C_4 < C_5 \\
       C_4 \times 0.0225 & \text{if } C_4 \le 1
-    \end{cases} \\
+    \end{cases} && \text{local capacity percentage} \\
     \text{local capacity per pupil} &= \bigl( 0.6\,C_1 + 0.2\,C_2 + 0.2\,C_3 \bigr) \times C_6
     \end{aligned}
   statutory_basis: R.C. 3317.017; state share and state share percentage at 3317.017(B) and (C). [verified]
