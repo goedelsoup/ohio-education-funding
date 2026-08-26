@@ -18,6 +18,7 @@ import { districtPaths, loadFeed, qualifiedName } from "../../../lib/feed.ts";
 import { money } from "../../../lib/format.ts";
 import { currentRealizedAid } from "../../../lib/policy.ts";
 import * as routes from "../../../lib/routes.ts";
+import { yearOf } from "../../../lib/year.ts";
 import SectionAnchor from "../../../components/SectionAnchor.astro";
 
 export const getStaticPaths = districtPaths;
@@ -49,7 +50,8 @@ const meta = bundle.projection;
        */
       money(currentRealizedAid(district))
     }{" "}
-    {district.on_guarantee ? "and is held there by the guarantee." : "and is funded by the formula."}
+    in {yearOf("formula")}
+    {district.on_guarantee ? ", and is held there by the guarantee." : ", and is funded by the formula."}
   </p>
 
   <DistrictNav irn={district.irn} current="scenario" />

@@ -352,7 +352,8 @@ const millageScatter = renderToString(
     <p class="note">
       Which is a claim, so it is reconciled rather than asserted. The department publishes its own
       aggregate for every district; the build-up is shown beside it with the difference stated. The
-      worst of the {count(s.districts)} is <strong>$1.09</strong> on figures in the millions, and
+      worst of the {count(s.districts)} in {yearOf("formula")} is <strong>$1.09</strong> on figures
+      in the millions, and
       the residuals cancel to nothing statewide — twenty-two elements each rounded at the point the
       department rounds them. The reproduction is checked across the whole panel in{" "}
       <code>crates/foundation</code>'s tests before this site is allowed to build.
@@ -544,7 +545,7 @@ const millageScatter = renderToString(
       against a fresh one so the two cannot silently disagree.
     </p>
     <p class="note">
-      Total state foundation aid in this model is{" "}
+      Total state foundation aid in the {yearOf("formula")} model is{" "}
       {millions(s.realized_aid_total).replace("+", "")} across {count(s.districts)} districts, of which {millions(s.guarantee_total).replace("+", "")}
       {" "}is paid by the guarantee to {s.on_guarantee} districts. If a figure on this site
       disagrees with the department's own, that is a defect and the repository is where to file it.

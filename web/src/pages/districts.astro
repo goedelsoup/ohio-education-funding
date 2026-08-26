@@ -12,9 +12,9 @@
  */
 import Base from "../layouts/Base.astro";
 import { loadFeed } from "../lib/feed.ts";
-import { count, money, pct } from "../lib/format.ts";
+import { count, fig, money, pct } from "../lib/format.ts";
 import * as routes from "../lib/routes.ts";
-import { yearOf } from "../lib/year.ts";
+import { yearOf, type SeriesKey } from "../lib/year.ts";
 import { distributionSpec } from "../lib/plot/spec.ts";
 import { renderToString } from "../lib/plot/ssr.ts";
 import type { District } from "../lib/types.ts";
@@ -40,7 +40,7 @@ const s = bundle.statewide;
 const sortable = (value: number | null) => (value == null ? "" : String(value));
 
 /*
- * One strip per sortable numeric column.
+ * One strip per sortable numeric column, and the series each column is drawn from.
  *
  * The keys are the `data-sort` values the header buttons already carry, so the script that sorts
  * the table and the markup that reveals a strip name the same column. `name` has no strip: it is
@@ -48,14 +48,30 @@ const sortable = (value: number | null) => (value == null ? "" : String(value));
  *
  * A district missing a measure is dropped rather than plotted at zero — three have no reported
  * poverty share and the enrollment change needs three years of ADM.
+ *
+ * # The series, and why the column heads have to say it
+ *
+ * Six numeric columns, three different series, and for a year the page named none of them at the
+ * head: "State aid / pupil" and "Valuation / pupil" sat side by side with nothing between the
+ * heading and 609 rows to say the first is FY2027 and the second a profile report three years
+ * behind it. 2,724 figures on this one page, more than the rest of the build's undated figures
+ * put together, because a wide table repeats an omission once per cell.
+ *
+ * The footnote under the table already named two of the three years, and it is 609 rows below the
+ * first figure it is about. A reader who sorts by valuation never reaches it.
+ *
+ * The design system's rule is that a cell takes its annotation from the column head rather than
+ * repeating it down every row, and `app.css` was written for exactly this — `th .fig-year` shows
+ * and `td .fig-year` hides — with no column head using it in the year the rule existed.
  */
 const MEASURES = (
   [
-    ["adm", "Enrolled ADM", (d: District) => d.adm, (v: number) => count(Math.round(v))],
-    ["aid", "State aid per pupil", (d: District) => d.realized_aid_per_pupil, (v: number) => money(v)],
+    ["adm", "Enrolled ADM", "formula", (d: District) => d.adm, (v: number) => count(Math.round(v))],
+    ["aid", "State aid per pupil", "formula", (d: District) => d.realized_aid_per_pupil, (v: number) => money(v)],
     [
       "guarantee",
       "What the guarantee adds, per pupil",
+      "formula",
       (d: District) => (d.on_guarantee ? d.guarantee / Math.max(d.adm, 1) : null),
       (v: number) => money(v),
       "on the guarantee",
@@ -63,6 +79,7 @@ const MEASURES = (
     [
       "valuation",
       "Assessed valuation per pupil",
+      "profile",
       (d: District) => d.valuation_per_pupil,
       (v: number) => money(v),
       "reporting a tax base",
@@ -70,12 +87,13 @@ const MEASURES = (
     [
       "poverty",
       "Economically disadvantaged share",
+      "profile",
       (d: District) => d.economically_disadvantaged,
       (v: number) => pct(v, 0),
       "reporting the share",
     ],
-    ["enrollment", "Enrollment change", (d: District) => d.enrollment_change, (v: number) => pct(v, 1)],
-  ] as const
+    ["enrollment", "Enrollment change", "enrollment", (d: District) => d.enrollment_change, (v: number) => pct(v, 1)],
+  ] as const satisfies readonly (readonly [string, string, SeriesKey, ...unknown[]])[]
 /*
  * The population is per measure, and three of the six are not every district.
  *
@@ -88,7 +106,7 @@ const MEASURES = (
  * `subset` says why a measure has fewer, rather than leaving the reader to wonder whether three
  * districts went missing.
  */
-).map(([key, label, read, format, subset]) => {
+).map(([key, label, series, read, format, subset]) => {
   const values = bundle.districts
     .map((d) => ({ d, v: read(d) }))
     .filter((row): row is { d: District; v: number } => row.v != null && Number.isFinite(row.v))
@@ -97,6 +115,7 @@ const MEASURES = (
   return {
     key,
     label,
+    year: yearOf(series),
     n: values.length,
     subset,
     chart: renderToString((w) => distributionSpec(values, { width: w }), { label: `${label} across ${count(values.length)} districts, from ${format(sorted[0] ?? 0)} to ${format(sorted[sorted.length - 1] ?? 0)}` }),
@@ -104,6 +123,13 @@ const MEASURES = (
     high: format(sorted[sorted.length - 1] ?? 0),
   };
 });
+
+/* The same year on the column head and on the strip below it, from one declaration. The `data-sort`
+   key is what the header button, the strip and `scripts/districts.ts` all already agree on. */
+const years = Object.fromEntries(MEASURES.map((m) => [m.key, m.year])) as Record<
+  (typeof MEASURES)[number]["key"],
+  string
+>;
 ---
 
 <Base
@@ -142,9 +168,9 @@ const MEASURES = (
         <div class="measure" data-measure={m.key}>
           <p class="note">
             {m.label} across{" "}
-            {m.subset ? `the ${count(m.n)} districts ${m.subset}` : `all ${count(m.n)} districts`}.
-            The shaded box is the middle half; the dots past the whiskers are districts of their
-            own.
+            {m.subset ? `the ${count(m.n)} districts ${m.subset}` : `all ${count(m.n)} districts`},
+            {" "}{m.year}. The shaded box is the middle half; the dots past the whiskers are
+            districts of their own.
           </p>
           <div class="chartwrap" set:html={m.chart} />
           <div class="scale">
@@ -193,13 +219,21 @@ const MEASURES = (
             claiming the second. It is also what the sort indicator in `app.css` selects on, which
             is why five of the seven columns showed no affordance that they could be sorted.
           */}
+          {/*
+            The year rides inside the sort button, which is what names the column to a screen
+            reader — so "State aid / pupil, FY2027" is the control's own name rather than a second
+            thing to find. It is a `.fig` and not a `year-chip` for one reason: the cell already
+            holds a button, and a chip is a button too, so chipping six columns would take this
+            header row from seven tab stops to thirteen. Every year here is fiscal, so the `FY`
+            prefix carries the reckoning that a chip's long form would otherwise have to.
+          */}
           <th aria-sort="ascending"><button type="button" data-sort="name">District</button></th>
-          <th aria-sort="none"><button type="button" data-sort="adm">Enrolled ADM</button></th>
-          <th aria-sort="none"><button type="button" data-sort="aid">State aid / pupil</button></th>
-          <th aria-sort="none"><button type="button" data-sort="guarantee">From guarantee</button></th>
-          <th aria-sort="none"><button type="button" data-sort="valuation">Valuation / pupil</button></th>
-          <th aria-sort="none"><button type="button" data-sort="poverty">Econ. disadv.</button></th>
-          <th aria-sort="none"><button type="button" data-sort="enrollment">Enrollment Δ</button></th>
+          <th aria-sort="none"><button type="button" data-sort="adm" set:html={fig("Enrolled ADM", years.adm)} /></th>
+          <th aria-sort="none"><button type="button" data-sort="aid" set:html={fig("State aid / pupil", years.aid)} /></th>
+          <th aria-sort="none"><button type="button" data-sort="guarantee" set:html={fig("From guarantee", years.guarantee)} /></th>
+          <th aria-sort="none"><button type="button" data-sort="valuation" set:html={fig("Valuation / pupil", years.valuation)} /></th>
+          <th aria-sort="none"><button type="button" data-sort="poverty" set:html={fig("Econ. disadv.", years.poverty)} /></th>
+          <th aria-sort="none"><button type="button" data-sort="enrollment" set:html={fig("Enrollment Δ", years.enrollment)} /></th>
         </tr>
       </thead>
       <tbody>

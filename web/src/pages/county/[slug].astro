@@ -10,6 +10,7 @@ import { counties, medianRealizedAid, renderCounty } from "../../lib/county.ts";
 import { loadFeed } from "../../lib/feed.ts";
 import { count, money } from "../../lib/format.ts";
 import * as routes from "../../lib/routes.ts";
+import { yearOf } from "../../lib/year.ts";
 
 export async function getStaticPaths() {
   const { bundle } = loadFeed();
@@ -57,7 +58,7 @@ const description =
     {county.valuationRatio != null
       ? "that ratio"
       : "the gap between each county's richest and poorest school district"}. The
-    median Ohio district receives {money(medianAid)} per pupil in state aid.</p>
+    median Ohio district receives {money(medianAid)} per pupil in state aid in {yearOf("formula")}.</p>
 
   <Fragment set:html={renderCounty(county, bundle.statewide, medianAid, all)} />
 </Base>

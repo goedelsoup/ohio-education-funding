@@ -153,5 +153,16 @@ export function fig(
   if (basis !== null) {
     parts.push(`<span class="fig-basis" data-basis="${basis}">${basis}</span>`);
   }
-  return `<span class="fig">${parts.join("")}</span>`;
+  /*
+   * Joined by a real space, not by the stylesheet's margin.
+   *
+   * Two adjacent inline spans concatenate with nothing between them in the accessible name and in
+   * `textContent`: the tiles were announcing "$251,661TY2024", and the `/districts` column heads
+   * would have named their sort buttons "State aid / pupilFY2027". The margin is a picture of a
+   * gap and only a sighted reader gets it.
+   *
+   * The gap is therefore in the markup and `.fig-year` carries no `margin-left` — a word space at
+   * this size is within a hundredth of an em of the .28 that rule used to set, so nothing moves.
+   */
+  return `<span class="fig">${parts.join(" ")}</span>`;
 }
