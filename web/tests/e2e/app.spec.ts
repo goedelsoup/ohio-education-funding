@@ -5558,14 +5558,48 @@ test.describe("what the scenario holds fixed", () => {
      * closed: `base_cost_scale` now moves the $812.5m of it that sits inside foundation funding,
      * and the page's job changed from confessing a gap to declaring a deliberate divergence from
      * the department's own simulator. A caveat without a magnitude is unfalsifiable; so is a
-     * divergence, and both numbers are asserted here.
+     * divergence, and the magnitude is asserted here.
+     *
+     * The second figure used to be pinned as `$25.2M` and no longer is. That literal was one half
+     * of a worked example the card typed rather than ran — `$113.0M of base cost aid and about
+     * $25.2M more` — where the first number was `3.1% × base cost state share`, a proportional
+     * product `policy.ts` explicitly rejects. This test was green over it the whole time, because
+     * asserting a string the page also hard-codes checks that two literals match and nothing else.
+     *
+     * What replaces it is the check that could have failed: the card's own arithmetic against the
+     * tile a reader sees when they put the slider where the card says. That is the disagreement
+     * that was live — `$138.2M` in the card against `+$163.1M` in the tile.
      */
     await page.goto("/scenario");
     const caveat = page.locator('.card[data-part="held-fixed"]');
     await expect(caveat).toContainText("diverges from the department's on purpose");
     await expect(caveat).toContainText("$812.5M");
-    await expect(caveat).toContainText("$25.2M");
     await expect(caveat).toContainText("genuinely cancel");
+
+    const worked = (await caveat.innerText()).replace(/\s+/g, " ");
+    const stated =
+      /The refresh (\S+) prices — [\d.]+% on base cost — delivers \$([\d.]+)M through base cost aid and \$([\d.]+)M/.exec(
+        worked,
+      );
+    expect(stated, "the card states a worked example").not.toBeNull();
+    const [, slug, throughBase, throughCategoricals] = stated!;
+
+    /*
+     * Opened through the draft rather than through `?base=`, and that is not a detail.
+     *
+     * The refresh is `1.0395` and the base-cost slider steps by `0.01`, so `?base=1.0395` is
+     * sanitised to `1.04` by the control before `readLevers` ever sees it — a $3.2M difference on a
+     * $220.5M figure, which is the quantization `boot()`'s `fromControls: false` path exists to
+     * avoid. The draft path renders from the draft, so it is the one that can be compared against a
+     * figure the card computed from the draft's own value.
+     */
+    await page.goto(`/scenario?draft=${slug}`);
+    await expect(page.locator("#scenario-out .tile, #scenario-out .card")).not.toHaveCount(0);
+    await expect(page.locator('[data-part="draft-departed"]')).toHaveCount(0);
+    const tile = (await page.locator("#scenario-out .tile .v").first().innerText()).trim();
+
+    const sum = Number(throughBase) + Number(throughCategoricals);
+    expect(tile, `card says $${sum.toFixed(1)}M, tile says ${tile}`).toBe(`+$${sum.toFixed(1)}M`);
   });
 
   test("the three things still held fixed are given three different reasons", async ({ page }) => {

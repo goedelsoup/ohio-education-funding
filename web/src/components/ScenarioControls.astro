@@ -13,6 +13,7 @@
  * around them says so rather than pretending otherwise.
  */
 import { DEFAULT_HORIZON_YEARS, LEVER_BOUNDS } from "../lib/scenario.ts";
+import type { RefreshEffect } from "../lib/refresh.ts";
 import { pct } from "../lib/format.ts";
 import { yearOf } from "../lib/year.ts";
 import SectionAnchor from "./SectionAnchor.astro";
@@ -24,9 +25,17 @@ interface Props {
   onGuarantee: number;
   /** The last observed fiscal year, and the furthest the feed's checkpoints reach. */
   projection: { available: boolean; baseYear: number; maxYear: number };
+  /**
+   * The refresh the feed prices, for the base cost lever's note. `null` where it prices none.
+   *
+   * This note read "roughly +3%" while both drafts that price a refresh set `1.0395`, and the
+   * held-fixed card said 3.1% for a third refresh the model has already absorbed. Three numbers for
+   * one quantity, and none of them said which refresh it was.
+   */
+  refresh: RefreshEffect | null;
 }
 
-const { model, onGuarantee, projection } = Astro.props;
+const { model, onGuarantee, projection, refresh } = Astro.props;
 
 /*
  * The five sliders. Their ends come from `LEVER_BOUNDS` rather than being written here.
@@ -49,7 +58,9 @@ const SLIDERS = [
     label: "Base cost",
     ...LEVER_BOUNDS.baseCostScale,
     value: 1,
-    note: "A refresh of the FY2022 cost inputs is roughly +3%.",
+    note: refresh
+      ? `A refresh of the FY2022 cost inputs is +${pct(refresh.scale - 1, 2)} — the restatement ${refresh.slug} prices.`
+      : "A refresh restates the cost inputs at a later year's prices.",
   },
   {
     id: "lv-min",

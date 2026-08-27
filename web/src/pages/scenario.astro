@@ -13,7 +13,8 @@
 import ScenarioControls from "../components/ScenarioControls.astro";
 import Base from "../layouts/Base.astro";
 import { loadFeed } from "../lib/feed.ts";
-import { count, millions } from "../lib/format.ts";
+import { count, millions, pct } from "../lib/format.ts";
+import { heldFixed, refreshEffect } from "../lib/refresh.ts";
 import * as routes from "../lib/routes.ts";
 import { yearChip } from "../lib/year.ts";
 import SectionAnchor from "../components/SectionAnchor.astro";
@@ -21,6 +22,22 @@ import SectionAnchor from "../components/SectionAnchor.astro";
 const { bundle, forecastable } = loadFeed();
 const s = bundle.statewide;
 const meta = bundle.projection;
+
+/*
+ * The held-fixed card's figures, every one summed or run rather than typed.
+ *
+ * Five were literals. Three of them — the denominated total, the index-driven pair and preschool's
+ * weighted half — were right, and checked by `what_a_scenario_holds_fixed.rs` on the other side of
+ * a process boundary. Two were the worked example, and both were wrong: `$113.0M` was a
+ * proportional product the formula on this page explicitly rejects, and it came from a pre-fix
+ * corpus table while the `$25.2M` beside it had been recomputed after. A reader could catch it with
+ * the slider directly below — at +3% the tile read `+$163.1M` against the card's `$138.2M`.
+ *
+ * `refresh` is null only if the feed carries no priced base-cost provision, in which case the card
+ * drops the worked example rather than inventing a scale for it.
+ */
+const fixed = heldFixed(bundle.districts);
+const refresh = refreshEffect(bundle.districts, bundle.drafts, s.minimum_state_share);
 ---
 
 <Base
@@ -57,19 +74,28 @@ const meta = bundle.projection;
     <p class="note">
       So <strong>this model diverges from the department's on purpose</strong>. The{" "}
       <strong>cost input refresh</strong> lever scales base cost <em>and</em> the
-      {" "}{millions(812_500_000).replace("+", "")} of categorical funding priced in it — special
+      {" "}{millions(fixed.denominated).replace("+", "")} of categorical funding priced in it — special
       education, English learners and career-technical are each a weight times the average base
-      cost per pupil, so they rise mechanically when it does. A 3.1% refresh moves
-      {" "}{millions(113_000_000).replace("+", "")} of base cost aid and about
-      {" "}{millions(25_200_000).replace("+", "")} more through those three. Until recently this page
-      showed only the first number and said the second was missing.
+      cost per pupil, so they rise mechanically when it does.
+      {
+        refresh && (
+          <Fragment>
+            {" "}The refresh <a href={routes.wikiNode("draft-legislation", refresh.slug)}>{
+              refresh.slug
+            }</a> prices — {pct(refresh.scale - 1, 2)} on base cost — delivers{" "}
+            {millions(refresh.throughBaseCost).replace("+", "")} through base cost aid and{" "}
+            {millions(refresh.throughCategoricals).replace("+", "")} more through those three. Until
+            recently this page delivered only the first.
+          </Fragment>
+        )
+      }
     </p>
     <p class="note">
       Three things are still held still, for three different reasons. The two biggest categoricals
       — <a href={routes.wikiNode("formula-component", "fsfp-disadvantaged-pupil-impact-aid")}>DPIA</a>{" "}
       and{" "}
       <a href={routes.wikiNode("formula-component", "fsfp-targeted-assistance")}>targeted assistance</a>,
-      {" "}{millions(1_890_000_000).replace("+", "")} together — divide a district's figure by a
+      {" "}{millions(fixed.indexDriven).replace("+", "")} together — divide a district's figure by a
       statewide one, so under a change that moves everything the numerator and denominator move
       together and genuinely cancel.{" "}
       <a href={routes.wikiNode("formula-component", "fsfp-gifted-units")}>Gifted</a> is priced in
@@ -77,7 +103,7 @@ const meta = bundle.projection;
       amount, and scaling them by this factor would be a guess wearing the shape of an identity.
       And the weighted half of{" "}
       <a href={routes.wikiNode("formula-component", "fsfp-preschool-special-education")}>preschool
-      special education</a>, {millions(45_700_000).replace("+", "")}, is denominated the same way
+      special education</a>, {millions(fixed.preschoolWeighted).replace("+", "")}, is denominated the same way
       but sits outside foundation funding — outside everything on this page, not held fixed within
       it.
     </p>
@@ -92,6 +118,7 @@ const meta = bundle.projection;
         baseYear: meta?.base_year ?? 0,
         maxYear: meta?.horizon ?? 0,
       }}
+      refresh={refresh}
     />
 
     <noscript>
