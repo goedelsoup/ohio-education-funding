@@ -12,6 +12,7 @@
  * checkpoints are statewide totals, and a gate that could not check them would not be a gate.
  */
 import DistrictNav from "../../../components/DistrictNav.astro";
+import HeldFixed from "../../../components/HeldFixed.astro";
 import ScenarioControls from "../../../components/ScenarioControls.astro";
 import Base from "../../../layouts/Base.astro";
 import { districtPaths, loadFeed, qualifiedName } from "../../../lib/feed.ts";
@@ -30,7 +31,8 @@ const { district } = Astro.props;
 const { bundle } = loadFeed();
 const s = bundle.statewide;
 const meta = bundle.projection;
-// The base cost lever's note names the refresh the feed prices, on both routes that render it.
+// The refresh the feed prices: named in the base cost lever's note and worked through in the
+// held-fixed card, on both routes that render them.
 const refresh = refreshEffect(bundle.districts, bundle.drafts, s.minimum_state_share);
 ---
 
@@ -58,6 +60,16 @@ const refresh = refreshEffect(bundle.districts, bundle.drafts, s.minimum_state_s
   </p>
 
   <DistrictNav irn={district.irn} current="scenario" />
+
+  {/*
+    The same caveat the statewide runner puts above its controls, above these for the same reason.
+
+    This route had none of it. It renders the identical five levers, and the base cost one scales
+    $812.5M of categoricals on top of base cost — a divergence from the department's own simulator
+    that a reader of this page is entitled to know about before moving the slider, not after. That
+    is more true here than on `/scenario`, not less: this is the page a school board sends.
+  */}
+  <HeldFixed districts={bundle.districts} total={s.districts} refresh={refresh} />
 
   <div id="scenario-root" data-irn={district.irn}>
     <ScenarioControls
