@@ -3275,6 +3275,95 @@ test.describe("the display face, under every fallback it can resolve to", () => 
   }
 });
 
+/*
+ * The body face, under every fallback the sans stack can resolve to.
+ *
+ * The sibling sweep above covers `--font-serif`, which is a platform stack by choice. `--font-sans`
+ * is one too — "IBM Plex Sans", ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto — and
+ * it was not swept, which is a gap #182's exit gate names in as many words: *zero text overlap
+ * under `system-ui`, DejaVu Sans, Liberation Sans, Arial and Verdana*. Those are the five here.
+ *
+ * # Why the charts and not the prose
+ *
+ * A paragraph reflows. A chart does not: `plot/spec.ts` lays its labels out against pixel
+ * constants — margins, tick counts, the `axisFoot` row — computed from one font's metrics, and a
+ * wider face pushes two labels through each other with nothing to give. This repository has
+ * already paid for that once, in the defect the sweep above cites: `axisFoot` laid two rows
+ * touching under DejaVu Sans and a pixel apart under SF Pro, and it was invisible on the machine
+ * it was written on.
+ *
+ * 375px because that is where a chart has least room, which is where a wider face lands first.
+ *
+ * # What a missing font does here, and why it is still worth running
+ *
+ * Forcing a family the machine does not carry falls back rather than failing, so a runner without
+ * DejaVu measures its fallback under DejaVu's name. That makes this a sweep over *whatever faces
+ * the runner has*, not a proof about five specific ones — and it is still the check that would
+ * have caught the `axisFoot` defect, because the failure needs only a face with different metrics
+ * from the author's, not a particular one.
+ */
+test.describe("the body face, under every fallback it can resolve to", () => {
+  const FACES = ["system-ui", "DejaVu Sans", "Liberation Sans", "Arial", "Verdana"];
+  /* The three densest charted routes: a bar row, a scatter, and the range strip. */
+  const ROUTES = ["/statewide", "/outcomes", "/counties"];
+
+  for (const face of FACES) {
+    test(`draws no chart label through another in ${face}`, async ({ page }) => {
+      await page.addInitScript((family: string) => {
+        addEventListener("DOMContentLoaded", () => {
+          const style = document.createElement("style");
+          /*
+           * `system-ui` is a generic keyword and the other four are family names. Quoting the
+           * keyword turns it into a lookup for a family called "system-ui", which no machine has,
+           * so the run silently fell through to `sans-serif` and measured the same face twice.
+           */
+          const named = family === "system-ui" ? family : `"${family}"`;
+          // The sans stack and the charts that inherit from it. Headings keep the serif, which the
+          // sibling sweep owns, and figures keep the mono.
+          style.textContent =
+            `:root { --font-sans: ${named}, sans-serif !important }` +
+            `svg.plot, svg.plot text, svg.plot tspan { font-family: ${named}, sans-serif !important }`;
+          document.head.append(style);
+        });
+      }, face);
+
+      await page.setViewportSize({ width: 375, height: 900 });
+      const through: string[] = [];
+      for (const route of ROUTES) {
+        await page.goto(route);
+        const hits = await page.evaluate(() => {
+          const out: string[] = [];
+          const doc = document.documentElement;
+          if (doc.scrollWidth > doc.clientWidth + 1) {
+            out.push(`the page scrolls sideways by ${doc.scrollWidth - doc.clientWidth}px`);
+          }
+          for (const svg of document.querySelectorAll("svg.plot")) {
+            if (!svg.getClientRects().length) continue;
+            const labels = [...svg.querySelectorAll("text")]
+              .filter((label) => (label.textContent ?? "").trim())
+              .map((label) => ({ text: (label.textContent ?? "").trim(), box: label.getBoundingClientRect() }))
+              .filter((label) => label.box.width > 0);
+            for (let a = 0; a < labels.length; a += 1) {
+              for (let b = a + 1; b < labels.length; b += 1) {
+                const [A, B] = [labels[a]!.box, labels[b]!.box];
+                const overlaps =
+                  Math.min(A.right, B.right) - Math.max(A.left, B.left) > 0 &&
+                  Math.min(A.bottom, B.bottom) - Math.max(A.top, B.top) > 0;
+                if (overlaps) out.push(`"${labels[a]!.text}" through "${labels[b]!.text}"`);
+              }
+            }
+          }
+          return out;
+        });
+        for (const hit of hits) through.push(`${route}: ${hit}`);
+      }
+      // Zero tolerance, for the reason the sibling sweep records: a pixel of slack made the last
+      // defect of this kind a property of the reviewer's machine.
+      expect(through.slice(0, 10), through.join("\n")).toEqual([]);
+    });
+  }
+});
+
 test.describe("presentation", () => {
   test("renders in dark mode without losing the series colours", async ({ page }) => {
     // Charts are rendered at build time and cannot re-render on a theme change, so every colour in
