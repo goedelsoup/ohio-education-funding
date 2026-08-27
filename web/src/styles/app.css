@@ -1499,20 +1499,48 @@ tbody tr:last-child th, tbody tr:last-child td { border-bottom: 0; }
  * is 2.02:1 — and `--link` itself manages 1.19 light and 1.03 dark against the formula blue. The
  * ink clears it because the ink is the one colour a chart never draws with.
  *
- * # One channel here, not two
+ * # The second channel, and the 3.5% of targets that do not get one
  *
- * The rule elsewhere on this site is two channels, and the comment here used to claim them: an
- * outline and a brightening. **`filter: brightness(1.2)` on a `fill: transparent` element
- * brightens nothing**, so on every chart with a hit layer — which is 82% of the hover targets
- * above — the cursor is the outline alone. It is kept because it is live on the bar charts, where
- * the hover target is the bar itself, and because `outline` is the channel that survives a
- * forced-colours mode either way. Giving a transparent target a real second channel is a change
- * to what the cursor IS — the tried-and-rejected options are in #220, with the screenshots.
+ * The rule elsewhere on this site is two channels: an outline, which survives a forced-colours
+ * mode, and a brightening, which is the redundancy for a reader who misses a thin ring. This
+ * comment used to claim both and deliver one, because **`filter: brightness(1.2)` on a
+ * `fill: transparent` element brightens nothing** and 81.5% of hover targets are invisible hit
+ * layers. That was #220.
+ *
+ * The fix is not a CSS selector, because CSS cannot say "the dot under this band". Each chart in
+ * `plot/spec.ts` now declares, in a `Cursor`, which of three situations it is in, and
+ * `declareCursor` writes the pairing onto the hit layer as `data-paired` for `attachValues` to
+ * follow by index. Measured over the built site:
+ *
+ *     the mark itself       59,076   18.5%   bar-fill, hist — the target IS the bar
+ *     paired marks         248,796   78.0%   dist-hit, scatter-hit, range-hit
+ *     none                  11,188    3.5%   fan-hit, series-hit
+ *
+ * So 95.7% of the previously single-channel targets have two now, and the remainder is named
+ * rather than left to be rediscovered.
+ *
+ * **The exemption is a fact about those two charts and not a shortcut.** A fan and a two-series
+ * line chart put one full-height column per year over marks that are *paths* — a band and two
+ * lines. There is no per-year element in the document to brighten; brightening the whole path
+ * would say the wrong thing, and washing the column would paint over the band, which is the one
+ * thing this site's chart rules exist to stop. What those targets get instead is an outline the
+ * height of the plot, which is not a thin ring. `tests/e2e/cursor.spec.ts` requires each exempt
+ * layer to be named there with its reason, so a third one cannot join them quietly.
+ *
+ * `fill-opacity: 1` is on the paired rule and is doing most of the work. A `--neutral-mark` dot
+ * on `/districts` is drawn at `fill-opacity: 0.5`, against which a 20% brightening is close to
+ * nothing; bringing it to full opacity is the change a reader actually sees. It alters no hue and
+ * covers nothing, which is what separates it from the tried-and-rejected options in #220.
  */
 svg.plot [data-hover].at {
   outline: 2px solid var(--text-primary);
   outline-offset: 1px;
   filter: brightness(1.2);
+}
+/* The mark a ringed hit layer names. See `data-paired` above; set with `.at`, never on its own. */
+svg.plot .at-mark {
+  filter: brightness(1.2);
+  fill-opacity: 1;
 }
 /* The chart itself is a tab stop — one per chart, not one per mark. See `openToKeyboard`. */
 svg.plot:focus-visible { outline: 2px solid var(--focus-ring); outline-offset: 2px; }

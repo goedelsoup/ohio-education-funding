@@ -19,7 +19,14 @@
 import * as Plot from "@observablehq/plot";
 import { parseHTML } from "linkedom";
 
-import { applyNaming, BASE, type Drawing, type Naming, WIDTHS } from "./spec.ts";
+import {
+  applyNaming,
+  BASE,
+  declareCursor,
+  type Drawing,
+  type Naming,
+  WIDTHS,
+} from "./spec.ts";
 
 /** Anything that looks like a baked-in colour: `#abc`, `#aabbcc`, `rgb(…)`, `hsl(…)`. */
 const LITERAL_COLOUR = /(#[0-9a-f]{3,8}\b|\brgba?\(|\bhsla?\()/i;
@@ -82,7 +89,11 @@ function draw(build: Drawing, naming: Naming, width: number): string {
   if (!spec) return "";
   const { document } = parseHTML("<!doctype html><html><body></body></html>");
   const node = Plot.plot({ ...BASE, ...spec.options, document }) as unknown as Element;
-  if (spec.hovers) attachHovers(node, spec.hovers.selector, spec.hovers.text);
+  if (spec.hovers) {
+    attachHovers(node, spec.hovers.selector, spec.hovers.text);
+    const misaligned = declareCursor(node, spec.hovers);
+    if (misaligned) throw new Error(misaligned);
+  }
   applyNaming(node, naming);
   return ensureThemeable(node.outerHTML);
 }
