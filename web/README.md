@@ -103,13 +103,27 @@ What that bought:
   it legible on a phone. What survives the correction is the comparison it was making: the feed
   was 1.1 MB before a reader saw a single figure.
 - Every page is complete before any script runs. Figures, tables, and charts are all in the
-  document — the charts as SVG, not as a canvas drawn on load.
+  document — the charts as SVG, not as a canvas drawn on load. `/compare` was the last exception
+  and is not one any more: it ships the pair it is seeded with, and a reader who changes the pair
+  fetches **two files of about a kilobyte** rather than the 641 KB panel. Measured at
+  400 Kbps / 400 ms RTT, the table went from **4,340 ms** to 1,688 ms with a query and to *first
+  paint, with nothing fetched at all*, without one.
 - A search engine, a screen reader, and a text browser all get the whole page.
 - 3,487 pages build in about 54 seconds, on eight cores. Not the 5 seconds this line used to
   claim, and worth knowing before reaching for a rebuild: page emission is nearly all of it, three
   quarters of that is the 3,045 district routes, and 15 seconds is rasterising preview cards.
   Astro's `build.concurrency` does not help — the work is synchronous, so raising it past 1 buys
   scheduling overhead and a slower build. Measured, not assumed.
+
+**The stored theme is applied before first paint on a fast connection and 50 ms after it on a slow
+one**, which is the last figure #111 asked about and is recorded here rather than acted on. The
+issue described "two serial round trips", and that was true: the page loaded one module whose first
+line imported another. The `modulepreload` pass in `astro.config.mjs` collapsed that — measured,
+`chart.js` and the chrome module both start at 15 ms and finish at 20 and 21 ms, in parallel — so
+what is left is parse time and not a fetch. Unthrottled the theme lands at 21 ms against a first
+paint of 32 ms, which is no flash at all; at 400 Kbps / 400 ms RTT it lands at 926 ms against 876
+ms, which is 50 ms of one. Splitting the theme into its own chunk would still be correct and would
+buy that 50 ms; the reason given for it — a round trip — no longer exists.
 
 The feed is still copied verbatim into `dist/` and still served. It is what the scenario routes
 fetch, and what [`/data`](src/pages/data.astro) offers for download.

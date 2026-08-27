@@ -39,7 +39,12 @@ import { resolve } from "node:path";
 import { BundleSchema } from "./schema/feed.ts";
 import { compare } from "./order.ts";
 import { median } from "./stats.ts";
-import { REQUIRED_CONTRACT, type Bundle, type District } from "./types.ts";
+import {
+  REQUIRED_CONTRACT,
+  type Bundle,
+  type District,
+  type PanelDistrict,
+} from "./types.ts";
 import { isForecastVerified, isVerified, verify, type Verification } from "./verify.ts";
 
 /**
@@ -492,6 +497,42 @@ function taxStatewide(districts: District[]): TaxStatewide {
  * after, so the build's 3,488 pages do not each rebuild the tally.
  */
 let ambiguousNames: Set<string> | null = null;
+/**
+ * One district, with everything the funding formula does not read removed.
+ *
+ * Shared by `/data/panel.json` — the scenario runner's whole-panel copy — and
+ * `/data/district/[irn].json`, which `/compare` fetches two of. Two endpoints stripping the same
+ * blocks by hand would drift the first time a block was added, and the drift would be invisible:
+ * both would still parse.
+ *
+ * What may be dropped is not a judgement call. {@link PanelDistrict} is the type the formula is
+ * written against, so the compiler rejects any use of a field this omits.
+ */
+export const formulaInputs = ({
+    finances: _f,
+    outcome: _o,
+    base_cost_build_up: _b,
+    property_tax: _p,
+    spending_by_function: _s,
+    millage: _m,
+    regime: _r,
+    special_education: _se,
+    career_technical: _ct,
+    english_learners: _el,
+    dpia: _d,
+    targeted_assistance: _ta,
+    gifted: _g,
+    house_districts: _hd,
+    supplements: _sup,
+    transportation: _tr,
+    preschool_special_education: _pk,
+    transition: _tn,
+    national: _nat,
+    casino: _cas,
+    casino_counties: _cc,
+    ...district
+  }: District): PanelDistrict => district;
+
 export function qualifiedName(district: District): string {
   if (!ambiguousNames) {
     const counts = new Map<string, number>();
