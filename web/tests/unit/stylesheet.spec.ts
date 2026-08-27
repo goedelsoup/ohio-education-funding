@@ -309,3 +309,43 @@ test("a block property scrolls itself rather than the table around it", () => {
     "without fixed layout the cell sizes to content and the outer .scroll takes over",
   ).toBe(true);
 });
+
+/**
+ * Every transition has an off switch, and the list is derived rather than trusted.
+ *
+ * #182's exit gate says "`prefers-reduced-motion` honoured by every transition added". That was a
+ * sentence and not a check, and the audit that closed the gate found it already violated:
+ * `.section-anchor` faded `color` over 120ms with no reduced-motion rule, while the other three
+ * animated selectors each had one. Three out of four is what a convention looks like on the way to
+ * being broken.
+ *
+ * Derived from the stylesheet on both sides, so the check cannot go stale the way the sentence
+ * did: every selector that animates has to appear under a `prefers-reduced-motion: reduce` block
+ * turning it off. A transition added tomorrow fails here until it comes with its own off switch.
+ *
+ * A colour or opacity fade is not motion in the vestibular sense, and honouring the query for it
+ * is still right — the gate says every transition, and a reader who asked for less asked for less.
+ */
+test("every animated selector is switched off under prefers-reduced-motion", () => {
+  /*
+   * `CSS` has its comments stripped, which matters here: this file's own header explains why, and
+   * a stylesheet that discusses `transition: none` in prose would otherwise satisfy the check by
+   * talking about it.
+   */
+  const animated = new Map<string, string>();
+  const disabled = new Set<string>();
+  for (const [selector, body] of rules(/./)) {
+    const declared = /(?:^|[;\s])(transition|animation)\s*:\s*([^;]+)/.exec(body);
+    if (!declared) continue;
+    // A selector may carry a pseudo-class; the off switch is written on the base selector.
+    const base = selector.split(",").map((one) => one.trim().split(":")[0]!.trim());
+    if (/^\s*none\s*$/.test(declared[2]!)) for (const one of base) disabled.add(one);
+    else for (const one of base) animated.set(one, declared[2]!.trim());
+  }
+
+  expect(animated.size, "the stylesheet animates something, or this check is vacuous").toBeGreaterThan(2);
+  expect(
+    [...animated].filter(([selector]) => !disabled.has(selector)).map(([s, v]) => `${s} { ${v} }`),
+    "an animated selector with no `transition: none` under prefers-reduced-motion",
+  ).toEqual([]);
+});

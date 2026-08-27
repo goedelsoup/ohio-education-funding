@@ -658,6 +658,20 @@ h3 {
   display: flex;
   align-items: baseline;
   gap: .4rem;
+  /*
+   * Wrapping, because a chip cannot break and a heading row can.
+   *
+   * `/outcomes` carries `2024-25 · spending FY2025` — a two-part chip, 178px and `nowrap`, which
+   * is right: a year range broken across lines is two numbers a reader has to put back together.
+   * Beside a 295px title in a 335px card at 375px, the nowrap row ran 12px past the viewport and
+   * **the whole page scrolled sideways**. That is the one thing #182's exit gate forbids outright,
+   * and it was live on one route with nothing covering it.
+   *
+   * The fix belongs on the row rather than on the chip. Given somewhere to go, the chip drops to
+   * its own line and keeps `margin-left: auto`, so it stays at the end of whichever line it lands
+   * on — which is what the pinning below has always meant.
+   */
+  flex-wrap: wrap;
 }
 /*
  * The chip is pinned to the far end rather than won there by `space-between`.
@@ -690,6 +704,20 @@ h3 {
   transition: color .12s ease;
 }
 .section-anchor:hover { color: var(--text-primary); }
+/*
+ * The colour fade, off.
+ *
+ * `.skip`, `.year-chip-def` and `.term-def` each carry this and this one did not, which is the
+ * whole reason `stylesheet.spec.ts` now derives the list from the stylesheet instead of trusting
+ * that a transition added later would remember to come with its own off switch.
+ *
+ * A 120ms colour fade is not motion in the vestibular sense, and honouring the query for it is
+ * still right: a reader who has asked for less has asked for less, and the site's own exit gate
+ * says every transition and not every animation.
+ */
+@media (prefers-reduced-motion: reduce) {
+  .section-anchor { transition: none; }
+}
 /* Never hidden on focus: this is how a keyboard reader finds a section address at all. */
 .section-anchor:focus-visible {
   color: var(--text-primary);
