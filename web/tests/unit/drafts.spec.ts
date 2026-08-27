@@ -139,6 +139,74 @@ test("moving a lever off the draft is reported, not silently accepted", () => {
   expect(html).toContain("draft-unpriced");
 });
 
+test("a field the guarantee rule does not read is not a departure", () => {
+  /*
+   * `matchesDraft` compared `guaranteeArgument` and `isCurrentLaw` did not, and both were asking
+   * "have the levers moved?". So `?draft=hb-96-with-refreshed-inputs&arg=0.7` reported:
+   *
+   *   These levers no longer match the draft. The figures below are yours rather than the bill's.
+   *
+   * over tiles identical to the bill's — because that draft's guarantee rule is `as-enacted`, which
+   * `toPolicy` builds as `{ kind }` with the number dropped. The retained-share control is hidden
+   * in that state, so the reader could not have moved it and cannot see what differs.
+   *
+   * Both now compare the policy rather than the levers, so a field the formula never reads cannot
+   * make two scenarios different.
+   */
+  const draft = bundle.drafts.find((d) => d.slug === "hb-96-with-refreshed-inputs")!;
+  const levers = draftLevers(draft, MODEL, BASE_YEAR);
+  expect(levers.guarantee).toBe("as-enacted");
+  expect(matchesDraft({ ...levers, guaranteeArgument: 0.7 }, draft, MODEL, BASE_YEAR)).toBe(true);
+  expect(flat(renderDraft(panel(), { ...levers, guaranteeArgument: 0.7 }, draft.slug))).not.toContain(
+    "no longer match",
+  );
+});
+
+test("a field the guarantee rule does read is still a departure", () => {
+  // The other direction, which is what stops the fix above from being a blanket exemption: under
+  // `phase-out` the argument is the policy.
+  const draft = bundle.drafts.find((d) => d.slug === "fund-the-plan-and-retire-the-guarantee")!;
+  const levers = draftLevers(draft, MODEL, BASE_YEAR);
+  expect(levers.guarantee).toBe("phase-out");
+  expect(matchesDraft({ ...levers, guaranteeArgument: 0.7 }, draft, MODEL, BASE_YEAR)).toBe(false);
+});
+
+test("a draft nothing prices does not also report a cost of zero clauses", () => {
+  /*
+   * `nothingPriced` and `missing` were emitted independently, so a draft with no priced provision
+   * got both, in adjacent sentences:
+   *
+   *   There is no cost of zero to report; there is no cost.
+   *   ... the total below is the cost of 0 clauses, not of the bill.
+   *
+   * The second was written assuming at least one clause priced, and it reported the zero the first
+   * had just refused to report. The unpriced list still renders — it is the substance — but the
+   * sentence does not.
+   */
+  const draft = bundle.drafts.find((d) => d.slug === "hb-643-136-introduced")!;
+  const html = flat(renderDraft(panel(), draftLevers(draft, MODEL, BASE_YEAR), draft.slug));
+  expect(html).toContain("There is no cost of zero to report");
+  expect(html).not.toContain("cost of 0 clause");
+  // The provisions themselves are still named.
+  expect(html).toContain('data-part="draft-unpriced"');
+  expect(html).toContain("EdChoice");
+});
+
+test("the unpriced sentence agrees with itself about number", () => {
+  // "1 of this draft's 1 provisions are not in any figure" — the branch above it handles the
+  // singular and this one did not. Checked on a synthesised two-provision draft so the assertion
+  // does not depend on which bills the feed happens to carry.
+  const base = bundle.drafts.find((d) => d.slug === "fund-the-plan-and-retire-the-guarantee")!;
+  const oneUnpriced = {
+    ...base,
+    provisions: [base.provisions[0]!, { ...base.provisions[2]!, lever: "" as const }],
+  };
+  const withDraft = { ...panel(), drafts: [oneUnpriced] };
+  const html = flat(renderDraft(withDraft, draftLevers(oneUnpriced, MODEL, BASE_YEAR), base.slug));
+  expect(html).toContain("1 of this draft's 2 provisions is not in any figure");
+  expect(html).toContain("the cost of 1 clause,");
+});
+
 test("the horizon is not part of matching a draft", () => {
   // Projecting further out changes what is being asked, not what the bill would do — the same
   // exclusion `isCurrentLaw` makes for the same reason.
@@ -149,10 +217,34 @@ test("the horizon is not part of matching a draft", () => {
   );
 });
 
-test("an unknown draft renders nothing rather than an empty card", () => {
-  // A `?draft=` naming something that does not exist is a stale link, and a card headed "opened
-  // from a draft" with no draft in it would be worse than no card.
-  expect(renderDraft(panel(), defaultLevers(MODEL, BASE_YEAR), "no-such-bill")).toBe("");
+test("an unknown draft says the figures are current law and not that bill's", () => {
+  /*
+   * This used to assert `""`, on the ground that a card headed "opened from a draft" with no draft
+   * in it would be worse than no card. That reasoning was right about the *heading* and wrong about
+   * the outcome: rendering nothing left `/scenario?draft=hb-XXX` showing a plain current-law page
+   * with `&draft=hb-XXX` still in the address bar, so a reader who followed a link to a bill met
+   * figures they had every reason to read as the bill's.
+   *
+   * Which is the argument `renderDraft` already makes about the departure banner — "a banner that
+   * vanished would leave the reader with a number they still believe is the bill's, which is worse
+   * than no banner at all". A slug is exactly the thing that goes stale in a shared link.
+   *
+   * So the card is rendered and its heading names the real state instead.
+   */
+  const html = flat(renderDraft(panel(), defaultLevers(MODEL, BASE_YEAR), "no-such-bill"));
+  expect(html).toContain("That bill is not in this feed");
+  expect(html).toContain("no-such-bill");
+  expect(html).toContain("The figures below are current law");
+  expect(html).toContain('data-part="draft-unknown"');
+  // Not the card that describes a bill this feed does carry.
+  expect(html).not.toContain("Opened from a draft");
+});
+
+test("an unknown slug is escaped rather than interpolated", () => {
+  // The slug is the one part of this card that comes from the URL bar.
+  const html = renderDraft(panel(), defaultLevers(MODEL, BASE_YEAR), '<img src=x onerror=alert(1)>');
+  expect(html).not.toContain("<img");
+  expect(html).toContain("&lt;img");
 });
 
 test("a draft nothing prices says the page is not the bill", () => {
