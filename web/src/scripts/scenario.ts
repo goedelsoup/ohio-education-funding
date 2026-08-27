@@ -28,12 +28,14 @@
 
 import { escapeHtml } from "../lib/format.ts";
 import {
+  clampLevers,
   defaultLevers,
   draftLevers,
   renderDistrictScenario,
   renderDraft,
   renderProjection,
   renderScenario,
+  type HorizonBound,
   type Levers,
 } from "../lib/scenario.ts";
 import { pct } from "../lib/format.ts";
@@ -85,7 +87,7 @@ let state: State | null = null;
  * someone, and on a static host the query string is the only part of a URL that can carry state
  * without minting a page for every combination.
  */
-function fromQuery(): Partial<Levers> {
+function fromQuery(horizon: HorizonBound): Partial<Levers> {
   const params = new URLSearchParams(location.search);
   const levers: Partial<Levers> = {};
   const rule = params.get("g");
@@ -102,10 +104,20 @@ function fromQuery(): Partial<Levers> {
   ] as const) {
     const raw = params.get(key);
     if (raw == null) continue;
-    const value = Number(raw);
-    if (Number.isFinite(value)) levers[field] = value;
+    levers[field] = Number(raw);
   }
-  return levers;
+  /*
+   * Held to the lever bounds here rather than by the controls downstream.
+   *
+   * This used to return whatever parsed, and the range inputs did the clamping on the way back out
+   * through `readLevers`. That covered every path but one: `?draft=` renders before the first read
+   * of a control, on purpose, so `?draft=x&h=999999` reached `forecastPath` with a million-year
+   * horizon and locked the tab, and `?draft=x&base=100` rendered $928B under a slider reading 1.3.
+   *
+   * Clamping at the boundary makes the two paths agree instead of making one of them defend the
+   * other. See `clampLevers` for why the step is not enforced with the ends.
+   */
+  return clampLevers(levers, horizon);
 }
 
 /** Put the current levers in the query string, without adding a history entry per tick. */
@@ -320,6 +332,17 @@ function boot(panel: Panel): void {
 
   const verification = verify(panel);
   const baseYear = panel.projection?.base_year ?? 0;
+  /*
+   * The horizon's two ends, from the feed rather than from the control.
+   *
+   * `max` collapses onto `base` when there is no projection block, which is the honest bound: a
+   * panel that cannot carry enrollment forward cannot be asked to. The district route has no
+   * horizon control at all and still needs this, because its query string can carry `h=`.
+   */
+  const horizonBound: HorizonBound = {
+    base: baseYear,
+    max: panel.projection?.horizon ?? baseYear,
+  };
   state = { panel, verification, levers: defaultLevers(panel.statewide.minimum_state_share, baseYear) };
 
   const status = $("#scenario-status");
@@ -350,7 +373,9 @@ function boot(panel: Panel): void {
   const fromDraft = opened
     ? draftLevers(opened, panel.statewide.minimum_state_share, baseYear)
     : null;
-  const initial: Partial<Levers> = fromDraft ? { ...fromDraft, ...fromQuery() } : fromQuery();
+  const initial: Partial<Levers> = fromDraft
+    ? { ...fromDraft, ...fromQuery(horizonBound) }
+    : fromQuery(horizonBound);
   if (initial.guarantee) $<HTMLSelectElement>("#lv-guarantee")!.value = initial.guarantee;
   const put = (id: string, value: number | undefined) => {
     const control = $<HTMLInputElement>(id);
@@ -401,7 +426,7 @@ function boot(panel: Panel): void {
     update();
   });
 
-  if (fromDraft) state.levers = { ...fromDraft, ...fromQuery() };
+  if (fromDraft) state.levers = { ...fromDraft, ...fromQuery(horizonBound) };
   update(fromDraft == null);
 }
 

@@ -12,7 +12,7 @@
  * `src/scripts/scenario.ts`. With no script they render and do nothing — which is why the page
  * around them says so rather than pretending otherwise.
  */
-import { DEFAULT_HORIZON_YEARS } from "../lib/scenario.ts";
+import { DEFAULT_HORIZON_YEARS, LEVER_BOUNDS } from "../lib/scenario.ts";
 import { pct } from "../lib/format.ts";
 import { yearOf } from "../lib/year.ts";
 import SectionAnchor from "./SectionAnchor.astro";
@@ -28,31 +28,33 @@ interface Props {
 
 const { model, onGuarantee, projection } = Astro.props;
 
+/*
+ * The five sliders. Their ends come from `LEVER_BOUNDS` rather than being written here.
+ *
+ * They used to be written here, and that made this file the only validator: `readLevers` reads
+ * `input.value`, which a browser has already clamped against these attributes. The `?draft=` path
+ * renders before the first read of a control, so a query string reaching it was never held to
+ * anything — see `clampLevers`. One declaration, two consumers.
+ */
 const SLIDERS = [
   {
     id: "lv-arg",
     label: "Guarantee retained",
-    min: 0,
-    max: 1,
-    step: 0.05,
+    ...LEVER_BOUNDS.guaranteeArgument,
     value: 0.5,
     note: "Applies to phase-out and re-base.",
   },
   {
     id: "lv-base",
     label: "Base cost",
-    min: 0.8,
-    max: 1.3,
-    step: 0.01,
+    ...LEVER_BOUNDS.baseCostScale,
     value: 1,
     note: "A refresh of the FY2022 cost inputs is roughly +3%.",
   },
   {
     id: "lv-min",
     label: "Minimum state share",
-    min: 0.05,
-    max: 0.3,
-    step: 0.01,
+    ...LEVER_BOUNDS.minimumStateShare,
     value: model,
     /* The one lever note whose figure is read from the model rather than being a fact about the
        past. The other four name their own years already — FY2022 cost inputs, the FY2020 base,
@@ -62,18 +64,14 @@ const SLIDERS = [
   {
     id: "lv-phase",
     label: "Phase-in, general",
-    min: 0,
-    max: 1,
-    step: 0.05,
+    ...LEVER_BOUNDS.phaseInGeneral,
     value: 1,
     note: "How far from the FY2020 funding base toward the computed amount. At 0% a district receives its FY2020 base, not nothing.",
   },
   {
     id: "lv-phase-dpia",
     label: "Phase-in, DPIA",
-    min: 0,
-    max: 1,
-    step: 0.05,
+    ...LEVER_BOUNDS.phaseInDpia,
     value: 1,
     note: "Separate because R.C. 3317.022 writes two terms: in FY2022 the general percentage was 16.67% while DPIA's was 0%, which paid DPIA at its whole FY2019 amount.",
   },

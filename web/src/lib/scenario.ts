@@ -48,6 +48,40 @@ export interface Levers {
   horizon: number;
 }
 
+/**
+ * What each lever will accept.
+ *
+ * # Why this is here rather than in the control that renders it
+ *
+ * The bounds used to live only in `ScenarioControls.astro`'s `SLIDERS`, as `min`/`max`/`step` on
+ * five range inputs, and that made the *DOM* the validator: `readLevers` reads `input.value`, which
+ * a browser has already clamped, so a hostile `?base=100` was corrected on its way through a
+ * control rather than on its way in.
+ *
+ * That held for as long as every path read the controls. It stopped holding when `?draft=` gained
+ * the ability to render before the first read of them — a draft's lever values are not on the
+ * slider's step grid, so the draft path renders from the draft and skips `readLevers` deliberately.
+ * `?draft=x&h=999999` then reached `forecastPath` with a million-year horizon and locked the tab.
+ *
+ * So the bounds are stated once, here, and both the control and the query string are held to them.
+ * See {@link clampLevers}.
+ */
+export const LEVER_BOUNDS = {
+  guaranteeArgument: { min: 0, max: 1, step: 0.05 },
+  baseCostScale: { min: 0.8, max: 1.3, step: 0.01 },
+  minimumStateShare: { min: 0.05, max: 0.3, step: 0.01 },
+  phaseInGeneral: { min: 0, max: 1, step: 0.05 },
+  phaseInDpia: { min: 0, max: 1, step: 0.05 },
+} as const;
+
+/** The two ends of the horizon, which are a property of the feed rather than of the control. */
+export interface HorizonBound {
+  /** The last observed year. Equal to it means "do not project". */
+  base: number;
+  /** The furthest year the feed carries a checkpoint for. */
+  max: number;
+}
+
 /** The levers at their current-law positions. */
 export function defaultLevers(
   modelMinimumStateShare: number,
@@ -62,6 +96,43 @@ export function defaultLevers(
     phaseInDpia: 1,
     horizon: baseYear + DEFAULT_HORIZON_YEARS,
   };
+}
+
+/**
+ * Hold a partial set of levers to what the page can actually run.
+ *
+ * Applied to the query string and not to a draft's own values. A draft is priced by
+ * `crates/project` and its `base-cost` provision is `1.0395` — deliberately off the slider's step
+ * grid, which is the whole reason the draft path renders from the draft rather than from the
+ * controls. Snapping or rejecting that would reintroduce the defect the draft path exists to
+ * avoid. The query string has no such warrant: nothing computed it.
+ *
+ * Only the ends are enforced, never the step. A shared link carrying `base=1.0395` is a link to a
+ * scenario this page can run and should keep running; one carrying `base=100` is not.
+ *
+ * A non-finite value is dropped rather than clamped, because there is no end of the range that
+ * `NaN` was reaching for.
+ */
+export function clampLevers(levers: Partial<Levers>, horizon: HorizonBound): Partial<Levers> {
+  const held: Partial<Levers> = { ...levers };
+  for (const field of Object.keys(LEVER_BOUNDS) as (keyof typeof LEVER_BOUNDS)[]) {
+    const value = held[field];
+    if (value == null) continue;
+    if (!Number.isFinite(value)) {
+      delete held[field];
+      continue;
+    }
+    const { min, max } = LEVER_BOUNDS[field];
+    held[field] = Math.min(max, Math.max(min, value));
+  }
+  if (held.horizon != null) {
+    if (!Number.isFinite(held.horizon)) delete held.horizon;
+    // Rounded as well as bounded: the horizon indexes a loop over fiscal years, and a fractional
+    // one runs to `through` without ever equalling it — `projectSeries` would return no projected
+    // point for any district and the band would come back empty rather than wrong.
+    else held.horizon = Math.min(horizon.max, Math.max(horizon.base, Math.round(held.horizon)));
+  }
+  return held;
 }
 
 /** Turn the controls into a policy. */
