@@ -39,6 +39,32 @@
  * What sampling cannot catch is a family that appears only on a route nobody visits. That is the
  * limit; the alternative is tabbing every one of 3,506 pages.
  *
+ * # Two populations, and only one of them is measurable
+ *
+ * The site authors a ring for some controls and leaves the rest to the browser, which is the
+ * recommended arrangement — enhance the default rather than remove it. Measured over the four
+ * routes, those are two distinct computed shapes and the split is clean:
+ *
+ *     solid 2px, var(--link)   a.section-anchor, button.year-chip, summary, svg
+ *     auto 1px, the UA ring    a, a.brand, a.flag, button, button.flag, button.ghost,
+ *                              div.scroll, input, input.vh, select
+ *
+ * **An `auto` ring cannot be judged from `outlineColor`.** Chromium paints it as a two-tone
+ * indicator — a dark stroke and a light one — precisely so it stays visible on any background, and
+ * `getComputedStyle` reports a single colour that is neither the whole thing nor stable across
+ * platforms: `rgb(0, 95, 204)` on macOS against `rgb(16, 16, 16)` on the Linux runner, same
+ * commit, same theme.
+ *
+ * The first version of this checked both populations alike. It passed locally and failed on CI
+ * with ten families at 1.01:1 — and all ten were `auto`, while the four `solid` ones passed on
+ * both. A green that was a property of the reviewer's machine, which is the hazard `axisFoot` and
+ * the display-face sweep are both already about.
+ *
+ * So contrast is asserted on the rings the site *authors*, which is exactly what item 8 names:
+ * "every **restyled** interactive element". Presence is asserted on all of them, and the authored
+ * count is asserted too — otherwise dropping every `outline` rule would fall through to the UA
+ * ring and read as fine.
+ *
  * # Both themes
  *
  * `--focus-ring` resolves to `--link`, which is a different colour in each, and the surfaces it is
@@ -64,6 +90,8 @@ test.describe("the keyboard focus ring", () => {
       const missing = new Map<string, string>();
       const faint = new Map<string, string>();
       const families = new Set<string>();
+      /** Families whose ring the site draws itself, rather than leaving to the browser. */
+      const authored = new Set<string>();
 
       for (const route of ROUTES) {
         await page.goto(route);
@@ -89,6 +117,13 @@ test.describe("the keyboard focus ring", () => {
             if (style.outlineStyle === "none" || width === 0) {
               return { name, visible: true, ring: false };
             }
+            /*
+             * The browser's own ring. Present, which is the half that can be checked here; its
+             * contrast cannot be, because it is two strokes and this is one colour. Left to the UA
+             * on purpose — removing it to gain a measurable ring would trade a working indicator
+             * for a checkable one.
+             */
+            if (style.outlineStyle === "auto") return { name, visible: true, ring: true, ua: true };
 
             const parse = (value: string) => {
               const parts = value.match(/[\d.]+/g)!.map(Number);
@@ -132,8 +167,11 @@ test.describe("the keyboard focus ring", () => {
           if (!stop.visible) continue;
           if (!stop.ring) {
             missing.set(stop.name, `${route}: no outline on keyboard focus`);
-          } else if (stop.ratio! < 3) {
-            faint.set(stop.name, `${route}: ${stop.ratio!.toFixed(2)}:1 — ${stop.colours}`);
+          } else if (!stop.ua) {
+            authored.add(stop.name);
+            if (stop.ratio! < 3) {
+              faint.set(stop.name, `${route}: ${stop.ratio!.toFixed(2)}:1 — ${stop.colours}`);
+            }
           }
         }
       }
@@ -148,8 +186,14 @@ test.describe("the keyboard focus ring", () => {
       ).toEqual([]);
       expect(
         [...faint].map(([name, where]) => `${name} — ${where}`),
-        "a focus ring under WCAG 1.4.11's 3:1 against the surface behind it",
+        "a site-authored focus ring under WCAG 1.4.11's 3:1 against the surface behind it",
       ).toEqual([]);
+      // Otherwise a stylesheet that dropped every `outline` rule would satisfy everything above by
+      // falling through to the UA ring, and this would call that fine.
+      expect(
+        authored.size,
+        "no control on these routes draws its own focus ring any more",
+      ).toBeGreaterThanOrEqual(4);
     });
   }
 });
