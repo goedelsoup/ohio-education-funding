@@ -151,15 +151,57 @@ export function toPolicy(levers: Levers): Policy {
   };
 }
 
-function isCurrentLaw(levers: Levers, model: number): boolean {
-  const base = defaultLevers(model);
+/**
+ * The argument a guarantee rule actually takes, or `null` where it takes none.
+ *
+ * `as-enacted` and `removed` are nullary: {@link toPolicy} builds `{ kind }` and drops the number.
+ * So two lever sets differing only in `guaranteeArgument` under one of those rules are the same
+ * policy, and the retained-share control is hidden in exactly that state — a reader could not have
+ * moved it, and cannot see what is supposed to differ.
+ */
+function guaranteeArgumentOf(rule: Policy["guarantee"]): number | null {
+  switch (rule.kind) {
+    case "rebase":
+      return rule.factor;
+    case "phase-out":
+      return rule.remaining;
+    default:
+      return null;
+  }
+}
+
+/**
+ * Whether two sets of levers express the same policy.
+ *
+ * # Why this is one function and was two
+ *
+ * `isCurrentLaw` compared five fields and skipped `guaranteeArgument`; `matchesDraft` compared all
+ * six. Both were asking "have the levers moved?" and they disagreed about which fields count, so
+ * `?draft=hb-96-with-refreshed-inputs&arg=0.7` reported a departure from a bill it matched exactly
+ * — the tiles were identical, and the control that supposedly differed was hidden.
+ *
+ * Comparing the *policies* rather than the levers settles it at the root: a field the formula never
+ * reads cannot make two scenarios different, and there is no second list to keep in step.
+ *
+ * The horizon is outside this by construction — {@link toPolicy} does not carry it — which is the
+ * behaviour both callers already wanted. Projecting further out changes what is being asked, not
+ * what the state would do.
+ */
+function samePolicy(a: Levers, b: Levers): boolean {
+  const x = toPolicy(a);
+  const y = toPolicy(b);
   return (
-    levers.guarantee === base.guarantee &&
-    levers.baseCostScale === base.baseCostScale &&
-    levers.minimumStateShare === base.minimumStateShare &&
-    levers.phaseInGeneral === base.phaseInGeneral &&
-    levers.phaseInDpia === base.phaseInDpia
+    x.guarantee.kind === y.guarantee.kind &&
+    guaranteeArgumentOf(x.guarantee) === guaranteeArgumentOf(y.guarantee) &&
+    x.baseCostScale === y.baseCostScale &&
+    x.minimumStateShare === y.minimumStateShare &&
+    x.phaseInGeneral === y.phaseInGeneral &&
+    x.phaseInDpia === y.phaseInDpia
   );
+}
+
+function isCurrentLaw(levers: Levers, model: number): boolean {
+  return samePolicy(levers, defaultLevers(model));
 }
 
 function affectedTable(outcomes: Outcome[]): string {
@@ -619,19 +661,12 @@ export function draftLevers(draft: Draft, model: number, baseYear: number): Leve
 /**
  * Whether the controls still hold what the draft says.
  *
- * The horizon is excluded on the same ground {@link isCurrentLaw} excludes it: projecting further
- * out changes what is being asked, not what the bill would do.
+ * Delegates to {@link samePolicy}, which is what stops this and {@link isCurrentLaw} from
+ * disagreeing about which fields count — they did, and the disagreement was visible as a departure
+ * banner over figures identical to the bill's.
  */
 export function matchesDraft(levers: Levers, draft: Draft, model: number, baseYear: number): boolean {
-  const of = draftLevers(draft, model, baseYear);
-  return (
-    levers.guarantee === of.guarantee &&
-    levers.guaranteeArgument === of.guaranteeArgument &&
-    levers.baseCostScale === of.baseCostScale &&
-    levers.minimumStateShare === of.minimumStateShare &&
-    levers.phaseInGeneral === of.phaseInGeneral &&
-    levers.phaseInDpia === of.phaseInDpia
-  );
+  return samePolicy(levers, draftLevers(draft, model, baseYear));
 }
 
 /**
@@ -658,7 +693,24 @@ export function matchesDraft(levers: Levers, draft: Draft, model: number, baseYe
  */
 export function renderDraft(panel: Panel, levers: Levers, slug: string): string {
   const draft = panel.drafts.find((d) => d.slug === slug);
-  if (!draft) return "";
+  /*
+   * A slug this feed does not carry, which is what a shared link goes stale as.
+   *
+   * This returned `""`, so `/scenario?draft=hb-XXX` rendered a plain current-law page with
+   * `&draft=hb-XXX` still in the address bar and nothing saying a bill had been asked for. That is
+   * the failure this card exists to prevent, one level up: a reader who followed a link to a bill
+   * meets figures they have every reason to read as the bill's.
+   */
+  if (!draft) {
+    return `<div class="card err" id="draft" data-part="draft-unknown">
+      <h2>${anchor("draft")}That bill is not in this feed</h2>
+      <p class="note">This page was opened for a draft called
+        <code>${escapeHtml(slug)}</code>, and this build of the feed carries no such bill — it was
+        renamed, withdrawn, or the link predates it. <strong>The figures below are current law</strong>,
+        not that bill's. <a href="/legislation">The bills this site does price</a> are on
+        the legislation page.</p>
+    </div>`;
+  }
 
   const model = panel.statewide.minimum_state_share;
   const baseYear = panel.projection?.base_year ?? 0;
@@ -696,6 +748,19 @@ export function renderDraft(panel: Panel, levers: Levers, slug: string): string 
           There is no cost of zero to report; there is no cost.</p>`
       : "";
 
+  /*
+   * What the model cannot reach, in the three cases that read differently.
+   *
+   * The middle one is the defect this replaced. `nothingPriced` and this were emitted
+   * independently, so a draft nothing prices got both — "There is no cost of zero to report; there
+   * is no cost", immediately followed by "the total below is the cost of 0 clauses". The second
+   * sentence was written assuming at least one clause priced, and it reported the zero the first
+   * had just refused to report.
+   *
+   * So when nothing prices, the paragraph above has already said all of it and this contributes the
+   * list alone.
+   */
+  const plural = unpriced.length === 1 ? "is" : "are";
   const missing =
     unpriced.length === 0
       ? `<p class="note" data-part="draft-complete">Every provision of this draft binds a lever, so
@@ -703,11 +768,14 @@ export function renderDraft(panel: Panel, levers: Levers, slug: string): string 
           a property of a one-clause draft and not of drafts — a budget act moves special education
           weights, transportation and the scholarship deduction too, and none of those has a lever
           here.</p>`
-      : `<p class="note"><strong>${count(unpriced.length)} of this draft's
-          ${count(draft.provisions.length)} provisions are not in any figure on this page.</strong>
-          They set no lever, so moving the controls cannot express them and the total below is
-          the cost of ${count(priced)} clauses, not of the bill.</p>
-        <ul class="unpriced" data-part="draft-unpriced">${list}</ul>`;
+      : priced === 0
+        ? `<ul class="unpriced" data-part="draft-unpriced">${list}</ul>`
+        : `<p class="note"><strong>${count(unpriced.length)} of this draft's
+            ${count(draft.provisions.length)} provisions ${plural} not in any figure on this
+            page.</strong> They set no lever, so moving the controls cannot express them and the
+            total below is the cost of ${count(priced)}
+            clause${priced === 1 ? "" : "s"}, not of the bill.</p>
+          <ul class="unpriced" data-part="draft-unpriced">${list}</ul>`;
 
   return `<div class="card" id="draft" data-part="draft" data-draft="${escapeHtml(slug)}">
     <h2>${anchor("draft")}Opened from a draft</h2>
