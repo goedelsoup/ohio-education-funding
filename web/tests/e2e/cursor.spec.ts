@@ -37,12 +37,14 @@
  * `fill-opacity: 0.62` there, against which the ink clears anyway — 5.30 light and 3.44 dark. That
  * second figure is asserted in `palette.spec.ts`, beside the raw-token one it corrects.
  *
- * # What this does not cover
+ * # The second channel, which is #220 and is here now
  *
- * The cursor's *second* channel. `filter: brightness(1.2)` on a `fill: transparent` element
- * brightens nothing, so on the 81.5% of hover targets that are hit layers the cursor is the
- * outline alone. That is #220, and it is a change to what the cursor is rather than to its
- * contrast, which is why it is not fixed here.
+ * `filter: brightness(1.2)` on a `fill: transparent` element brightens nothing, so on 81.5% of
+ * hover targets the cursor was the outline alone. Each chart declares a `Cursor` in `plot/spec.ts`
+ * now, `declareCursor` writes the pairing onto the hit layer, and `attachValues` moves both marks
+ * together. The two tests at the bottom of this file are the check: one over the whole build that
+ * every invisible target either names its mark or is named as having none, and one in a browser
+ * that the naming actually reaches the paint.
  */
 
 import { readFileSync, readdirSync } from "node:fs";
@@ -161,5 +163,158 @@ test("a range row's dots are inside the band the cursor rings", async ({ page })
         `is drawn 1px outside that band, so it runs through the dot — and on range-high the dot ` +
         `is --ordinal-3 at full opacity, which the ink clears at only 1.87:1. Inset the band.`,
     ).toBeGreaterThanOrEqual(0);
+  }
+});
+
+/**
+ * The two hit layers with no mark to brighten, and why.
+ *
+ * Named here rather than inferred from a class, so that a third one cannot join them by being
+ * written. The reasons are the `because` strings the specs carry; if they diverge, one of the two
+ * is wrong and the divergence is the finding.
+ */
+const EXEMPT = new Map([
+  [
+    "fan-hit",
+    "A full-height column over a continuous line: the band and both series are paths, so there " +
+      "is no per-year mark to brighten.",
+  ],
+  ["series-hit", "The same, over two lines."],
+]);
+
+test("every invisible hover target names the mark it brightens, or is named as having none", () => {
+  /*
+   * A single ordered pass rather than the quadratic re-scan the first test does. The question is
+   * per *layer* and not per mark — `declareCursor` writes one attribute on the `<g>`, which is
+   * 485,000 fewer attributes than stamping an index on every element and its twin would be — so
+   * what this needs is the last `<g>` seen before each hoverable element, which one pass gives.
+   */
+  const layers = new Map<string, { transparent: boolean; paired: boolean; where: string }>();
+  let scanned = 0;
+
+  for (const file of walk(DIST)) {
+    const page = readFileSync(file, "utf8");
+    if (!page.includes("data-hover")) continue;
+    scanned += 1;
+    let open: { cls: string; fill: string | undefined; paired: boolean } | null = null;
+    const token = /<g\b([^>]*)>|<(?:circle|rect|path|line)\b([^>]*\bdata-hover=[^>]*)>/g;
+    for (const match of page.matchAll(token)) {
+      if (match[1] !== undefined) {
+        const attrs = match[1];
+        open = {
+          cls: /\bclass="([^"]*)"/.exec(attrs)?.[1] ?? "",
+          fill: /\bfill="([^"]*)"/.exec(attrs)?.[1],
+          paired: attrs.includes("data-paired="),
+        };
+        continue;
+      }
+      if (!open) continue;
+      const own = /\bfill="([^"]*)"/.exec(match[2]!)?.[1];
+      const fill = own ?? open.fill ?? "(none)";
+      const seen = layers.get(open.cls);
+      if (!seen) {
+        layers.set(open.cls, {
+          transparent: fill === "transparent",
+          paired: open.paired,
+          where: relative(DIST, file),
+        });
+      } else if (fill !== "transparent") {
+        seen.transparent = false;
+      }
+    }
+  }
+
+  expect(scanned, "the build carries charts at all").toBeGreaterThan(1000);
+  expect(layers.size, "and more than one kind of hover layer").toBeGreaterThan(3);
+
+  const unexplained = [...layers]
+    .filter(([cls, l]) => l.transparent && !l.paired && !EXEMPT.has(cls))
+    .map(([cls, l]) => `${cls} — invisible, pairs with nothing, unexplained (${l.where})`);
+  expect(
+    unexplained,
+    "a hover target a reader cannot see, whose cursor is therefore the outline alone. Give its " +
+      "spec a `Cursor` of `paired marks` naming the layer it should brighten, or of `none` with " +
+      "the reason — and add it to EXEMPT above, which is where the reason has to be argued.",
+  ).toEqual([]);
+
+  // And the exemption cannot outlive the chart it was written for.
+  const stale = [...EXEMPT.keys()].filter((cls) => !layers.has(cls));
+  expect(stale, "an exemption for a hover layer the build no longer draws").toEqual([]);
+
+  // The declaration is not a comment: the layers that claim a pairing carry the attribute.
+  const declared = [...layers].filter(([, l]) => l.paired).map(([cls]) => cls);
+  expect(declared.sort(), "the layers that pair").toEqual([
+    "dist-hit",
+    "range-hit",
+    "scatter-hit",
+  ]);
+});
+
+/**
+ * The declaration reaches the paint.
+ *
+ * Everything above is about the document. This is the part that can be true in the markup and
+ * false on the screen — a `data-paired` selector that resolves to nothing, a class the stylesheet
+ * does not match, an index that lands on the wrong element. One route per paired chart form,
+ * driven with the arrow keys the cursor is actually for.
+ */
+test.describe("the cursor's second channel", () => {
+  for (const { route, hit, mark } of [
+    { route: "/outcomes", hit: ".scatter-hit", mark: ".scatter-dot" },
+    { route: "/counties", hit: ".range-hit", mark: ".range-high" },
+    { route: "/district/043786", hit: ".dist-hit", mark: ".dist-dot" },
+  ]) {
+    test(`brightens the ${mark.slice(1)} under the ring on ${route}`, async ({ page }) => {
+      await page.setViewportSize({ width: 1280, height: 900 });
+      await page.goto(route);
+
+      const svg = page.locator(`svg.plot:visible:has(${hit})`).first();
+      await svg.focus();
+      await page.keyboard.press("ArrowRight");
+
+      const reading = await svg.evaluate(
+        (node, selectors) => {
+          const [hitSelector, markSelector] = selectors;
+          const at = node.querySelector("[data-hover].at");
+          const twins = [...(node.querySelectorAll(`${markSelector} > *`) ?? [])];
+          const lit = twins.filter((t) => t.classList.contains("at-mark"));
+          const style = lit[0] ? getComputedStyle(lit[0]) : null;
+          return {
+            ringed: at !== null,
+            index: at ? [...at.parentElement!.children].indexOf(at) : -1,
+            litIndexes: lit.map((t) => twins.indexOf(t)),
+            filter: style?.filter ?? "",
+            fillOpacity: style?.fillOpacity ?? "",
+            hits: node.querySelectorAll(`${hitSelector} > *`).length,
+            marks: twins.length,
+          };
+        },
+        [hit, mark] as const,
+      );
+
+      expect(reading.ringed, "the arrow key put the cursor somewhere").toBe(true);
+      expect(reading.hits, "the hit layer and the mark layer hold the same marks").toBe(
+        reading.marks,
+      );
+      expect(
+        reading.litIndexes,
+        "exactly one mark is lit, and it is the one the ring is on",
+      ).toEqual([reading.index]);
+      expect(reading.filter, "and the stylesheet is acting on it").not.toBe("none");
+      expect(reading.fillOpacity, "at full opacity, which is the channel a reader sees").toBe("1");
+
+      // And it moves rather than accumulating: two lit marks would be two answers to "which one".
+      await page.keyboard.press("ArrowRight");
+      const after = await svg.evaluate(
+        (node, markSelector) =>
+          [...node.querySelectorAll(`${markSelector} > *`)]
+            .map((t, i) => (t.classList.contains("at-mark") ? i : -1))
+            .filter((i) => i >= 0),
+        mark,
+      );
+      expect(after, "the cursor moved on and took its brightening with it").toEqual([
+        reading.index + 1,
+      ]);
+    });
   }
 });

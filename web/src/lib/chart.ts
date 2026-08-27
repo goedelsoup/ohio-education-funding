@@ -257,8 +257,36 @@ export function attachValues(root: HTMLElement, tip: HTMLElement, said: HTMLElem
     show(mark, box.left + box.width / 2, box.bottom);
   };
 
+  /**
+   * The visible marks a hit target names, if its layer declares any.
+   *
+   * The pairing is written on the layer by `declareCursor` and followed here by DOM position: a
+   * hit mark's index among its siblings is its index in the data, because Plot draws one element
+   * per datum in order and both layers are drawn from the same array. #220's own measurement of
+   * that alignment was 84 of 84 on `/counties`; `tests/e2e/cursor.spec.ts` now checks it over the
+   * whole build rather than one page, by child count on every paired layer.
+   */
+  const paired = (mark: Element): Element[] => {
+    const layer = mark.parentElement;
+    const declared = layer?.getAttribute("data-paired");
+    if (!layer || !declared) return [];
+    const index = [...layer.children].indexOf(mark);
+    const svg = layer.closest("svg.plot");
+    if (!svg || index < 0) return [];
+    return declared.split(",").flatMap((selector) => {
+      const twin = svg.querySelector(selector.trim())?.children[index];
+      return twin ? [twin] : [];
+    });
+  };
+
+  /** Put the cursor on a mark, or take it off: both channels move together or neither does. */
+  const cursor = (mark: Element, on: boolean) => {
+    mark.classList.toggle("at", on);
+    for (const twin of paired(mark)) twin.classList.toggle("at-mark", on);
+  };
+
   const drop = () => {
-    at?.classList.remove("at");
+    if (at) cursor(at, false);
     at = null;
     said.textContent = "";
   };
@@ -326,10 +354,10 @@ export function attachValues(root: HTMLElement, tip: HTMLElement, said: HTMLElem
     }
     // Only once a key is one this handles: arrows still scroll a chart nobody is reading.
     event.preventDefault();
-    at?.classList.remove("at");
+    if (at) cursor(at, false);
     at = marks[next] ?? null;
     if (!at) return;
-    at.classList.add("at");
+    cursor(at, true);
     showAtMark(at);
     said.textContent = at.getAttribute("data-hover") ?? "";
   });

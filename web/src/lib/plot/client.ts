@@ -17,7 +17,7 @@
 import * as Plot from "@observablehq/plot";
 
 import { openToKeyboard } from "../chart.ts";
-import { applyNaming, BASE, type Drawing, type Naming, WIDTHS } from "./spec.ts";
+import { applyNaming, BASE, declareCursor, type Drawing, type Naming, WIDTHS } from "./spec.ts";
 
 /** One SVG, at one width. */
 function draw(build: Drawing, naming: Naming, width: number): string {
@@ -32,6 +32,10 @@ function draw(build: Drawing, naming: Naming, width: number): string {
       marks.forEach((mark, index) => {
         mark.setAttribute("data-hover", spec.hovers!.text[index]!);
       });
+      // Ignored rather than thrown, as the count check above is: a chart that cannot pair its
+      // marks should lose its second channel, not take the page down with it. The build path
+      // throws, so a misalignment cannot reach a reader in the first place.
+      declareCursor(node, spec.hovers);
     }
   }
   applyNaming(node, naming);

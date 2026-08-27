@@ -176,11 +176,73 @@ export function applyNaming(node: Nameable, naming: Naming): void {
   );
 }
 
+/**
+ * How a chart delivers the *second* of the keyboard cursor's two channels.
+ *
+ * The site's rule is an outline around the mark and a brightening of it, so the cursor survives a
+ * forced-colours mode that discards the second. `filter: brightness()` on a `fill: transparent`
+ * element brightens nothing, and most charts here point the reader at an invisible hit layer
+ * drawn above the marks — so on 81.5% of the site's 319,060 hover targets the rule was a
+ * description of one channel. That is #220, and this type is the fix: each chart says which of
+ * three situations it is in, so the answer is declared and checkable rather than inferred from
+ * a class name.
+ */
+export type Cursor =
+  /** The target is the mark. `filter` acts on it directly — the bar charts and the histogram. */
+  | { second: "the mark itself" }
+  /**
+   * The target is invisible, and these layers hold the marks it names. Index-aligned with the hit
+   * layer because both are drawn from the same array, which is what makes the pairing safe to
+   * follow by DOM position; {@link declareCursor} writes it into the document and
+   * `attachValues` reads it back.
+   */
+  | { second: "paired marks"; layers: string[] }
+  /**
+   * There is no mark to brighten. `because` is not documentation — `tests/e2e/cursor.spec.ts`
+   * requires every exempt layer to be named there with its reason, so an exemption cannot be
+   * taken silently.
+   */
+  | { second: "none"; because: string };
+
 /** A chart, and the tooltip text for the marks a reader can point at. */
 export interface Spec {
   options: Plot.PlotOptions;
   /** CSS selector for the hoverable marks, and one string per mark in data order. */
-  hovers?: { selector: string; text: string[] };
+  hovers?: { selector: string; text: string[]; cursor: Cursor };
+}
+
+/**
+ * Write the mark pairing onto the hit layer, for the cursor to follow at read time.
+ *
+ * One attribute per chart rather than one per mark. Stamping an index onto every hoverable
+ * element and its twin would be 485,000 attributes across the built site — about 2.5 KB a page on
+ * `/districts` — to encode something the DOM already says: a hit mark's position among its
+ * siblings *is* its index, because Plot draws one element per datum in order.
+ */
+export function declareCursor(root: Element, hovers: Spec["hovers"]): string | null {
+  if (!hovers || hovers.cursor.second !== "paired marks") return null;
+  const marks = root.querySelectorAll(hovers.selector);
+  const layer = marks[0]?.parentElement;
+  if (!layer) return null;
+  /*
+   * The alignment is checked here rather than asserted in a test over `dist/`, on the same
+   * argument `attachHovers` makes one function above: a pairing followed by index that does not
+   * line up brightens the *wrong* mark and looks entirely correct doing it. The build is where
+   * that can be caught for all 3,506 pages at once.
+   */
+  for (const selector of hovers.cursor.layers) {
+    const twin = root.querySelector(selector);
+    const held = twin?.childElementCount ?? 0;
+    if (held !== marks.length) {
+      return (
+        `The cursor's paired layer "${selector}" holds ${held} marks against ${marks.length} ` +
+        `hit targets matching "${hovers.selector}". Following that by index would brighten the ` +
+        `wrong mark.`
+      );
+    }
+  }
+  layer.setAttribute("data-paired", hovers.cursor.layers.join(","));
+  return null;
 }
 
 /**
@@ -535,6 +597,7 @@ export function barSpec(bars: Bar[], options: { width: number; max?: number }): 
     hovers: {
       selector: ".bar-fill > *",
       text: bars.map((b) => escapeHtml(b.hover ?? `${b.label}: ${b.value}`)),
+      cursor: { second: "the mark itself" },
     },
   };
 }
@@ -843,6 +906,7 @@ export function scatterSpec(
     hovers: {
       selector: ".scatter-hit > *",
       text: points.map((p) => escapeHtml(p.hover)),
+      cursor: { second: "paired marks", layers: [".scatter-dot"] },
     },
   };
 }
@@ -991,6 +1055,7 @@ export function rangeSpec(
     hovers: {
       selector: ".range-hit > *",
       text: rows.map((r) => escapeHtml(r.hover)),
+      cursor: { second: "paired marks", layers: [".range-low", ".range-high"] },
     },
   };
 }
@@ -1227,6 +1292,7 @@ export function distributionSpec(
     hovers: {
       selector: ".dist-hit > *",
       text: drawn.map((v) => escapeHtml(v.hover)),
+      cursor: { second: "paired marks", layers: [".dist-dot"] },
     },
   };
 }
@@ -1312,6 +1378,7 @@ export function histogramSpec(
           `${b.count} district${b.count === 1 ? "" : "s"}: ${format(b.from)} to ${format(b.to)}`,
         ),
       ),
+      cursor: { second: "the mark itself" },
     },
   };
 }
@@ -1515,6 +1582,11 @@ export function fanSpec(
     hovers: {
       selector: ".fan-hit > *",
       text: points.map((p) => escapeHtml(hover(p))),
+      cursor: {
+        second: "none",
+        because:
+          "A full-height column over a continuous line. The band and both series are paths, so there is no per-year mark to brighten, and the outline is the height of the plot.",
+      },
     },
   };
 }
@@ -1662,6 +1734,11 @@ export function seriesSpec(
     hovers: {
       selector: ".series-hit > *",
       text: points.map((p) => escapeHtml(hover(p))),
+      cursor: {
+        second: "none",
+        because:
+          "A full-height column over two continuous lines, as the fan chart is. Nothing per-year exists to brighten.",
+      },
     },
   };
 }
