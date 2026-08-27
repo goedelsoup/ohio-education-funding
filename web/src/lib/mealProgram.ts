@@ -65,9 +65,18 @@ export function singleStream(meal: MealProgramYear[]): MealProgramYear[] {
   return meal.filter((y) => y.streams === 1 && y.share != null);
 }
 
-/** The years published as three files, which carry a band instead. */
+/**
+ * The years published as more than one file, which carry a band instead of a share.
+ *
+ * **The two waiver Octobers are excluded.** Under USDA's nationwide free-meal waivers a sponsor
+ * could serve every student free without collecting one application, and almost every one of them
+ * stopped filing: FY2021 and FY2022 carry 296 and 261 sponsors against about 850, and a quarter of
+ * the enrolment. Their band reads twenty points above the years either side and every point of
+ * that is about who filed. They are still in `meal`, and the table below still shows them — with
+ * the reason in the row, which is the only place a reader meets them.
+ */
 export function splitStream(meal: MealProgramYear[]): MealProgramYear[] {
-  return meal.filter((y) => y.streams > 1);
+  return meal.filter((y) => y.streams > 1 && y.comparable);
 }
 
 /** The fiscal year the denominator changes, or `null` if the series never crosses it. */
@@ -110,6 +119,8 @@ export function renderMealProgram(meal: MealProgramYear[]): string {
   const last = single[single.length - 1]!;
   const change = basisChange(single);
   const end = split[split.length - 1];
+  /** The Octobers the feed marks as not a reading of the state. See `splitStream`. */
+  const waived = meal.filter((y) => !y.comparable);
 
   const chart = renderToString(
     (w) =>
@@ -173,6 +184,19 @@ export function renderMealProgram(meal: MealProgramYear[]): string {
         settle is not the level but the direction.</p>`
       }
 
+      ${
+        waived.length === 0
+          ? ""
+          : `<p class="note"><strong>${waived.length === 2 ? "Two Octobers are" : "An October is"}
+        in the table and in no figure above it.</strong> Under USDA's nationwide free-meal
+        waivers a sponsor could serve every student free without collecting one application — and
+        almost every one stopped filing. ${waived
+          .map((y) => `FY${y.fiscal_year} carries ${y.sponsors} sponsors`)
+          .join(" and ")}, against ${(end ?? last).sponsors} the year this page ends on, on about
+        a quarter of the enrolment. What they report is true of the sponsors in them and is not a
+        reading of Ohio, so nothing above ranges over them.</p>`
+      }
+
       <p class="note">The population is <em>sponsors</em>, not districts: community schools and
         county boards of developmental disabilities are counted alongside traditional districts,
         and the sponsor count rises from ${first.sponsors} to ${(end ?? last).sponsors} across the
@@ -211,11 +235,17 @@ export function renderMealProgram(meal: MealProgramYear[]): string {
               <td class="tnum n">${Math.round(y.enrollment).toLocaleString("en-US")}</td>
               <td class="tnum n">${Math.round(y.approved).toLocaleString("en-US")}</td>
               <td class="tnum">${
-                y.share == null ? `${pct(y.floor, 1)}–${pct(y.ceiling, 1)}` : pct(y.share, 1)
+                !y.comparable
+                  ? "not the state"
+                  : y.share == null
+                    ? `${pct(y.floor, 1)}–${pct(y.ceiling, 1)}`
+                    : pct(y.share, 1)
               }</td>
               <td>${escapeHtml(
-                y.streams > 1
-                  ? "CECount, three files"
+                !y.comparable
+                  ? "CECount — most sponsors did not file"
+                  : y.streams > 1
+                    ? "CECount, three files"
                   : y.basis === "ce"
                     ? "CECount"
                     : "AdmCount",

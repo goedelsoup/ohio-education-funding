@@ -5643,9 +5643,14 @@ test.describe("the count the poverty weight is paid on", () => {
     await page.goto("/history");
     const card = page.locator(".card", { hasText: "What the poverty weight is counted on" });
     const rows = card.locator("tbody tr:not(.series-break)");
-    await expect(rows).toHaveCount(17);
+    // Twenty-eight Octobers, which used to be seventeen: the open directory ends at October 2014
+    // and the report did not — it moved to the department's own page. See #16.
+    await expect(rows).toHaveCount(28);
     await expect(rows.first()).toContainText("AdmCount");
     await expect(rows.last()).toContainText("CECount");
+    // And the two the waivers emptied say so where a reader meets them, rather than printing a
+    // band twenty points above their neighbours as though it were a reading of Ohio.
+    await expect(card.locator("tbody tr", { hasText: "not the state" })).toHaveCount(2);
   });
 
   test("a headline tile carries its own year, because no card chip reaches it", async ({ page }) => {

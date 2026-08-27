@@ -1143,8 +1143,21 @@ export const MealProgramYearSchema = z
      * because community eligibility is open to schools whose poverty is already high.
      */
     without_applications: num,
-    /** How many files the October was published as. One through FY2011, three from FY2012. */
+    /**
+     * How many filings the October carries. One through FY2011, three from FY2012 — and **two**
+     * in October 2021, when not one Provision 2 sponsor filed at all.
+     */
     streams: z.number().int().positive(),
+    /**
+     * Whether this October is a reading of the state at all.
+     *
+     * False for exactly two. Under USDA's nationwide free-meal waivers a sponsor could serve
+     * every student free without collecting one application, and almost every one stopped:
+     * October 2020 and October 2021 carry 296 and 261 sponsors against about 850, and a quarter
+     * of the enrolment. Their floor reads twenty points above the years either side and every
+     * point of that is about who filed. `mealProgram.ts` breaks its series on this.
+     */
+    comparable: z.boolean(),
     /** Which denominator that is. Not inferred from the year — see above. */
     basis: z.enum(["adm", "ce"]),
   })

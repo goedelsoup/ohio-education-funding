@@ -7,7 +7,7 @@
 
 use std::collections::BTreeMap;
 
-use super::delimited::{column, delimited_fields};
+use super::delimited::{column, column_named, delimited_fields};
 use super::text::fixed;
 
 /// Columns of the MR-81 sponsor panel.
@@ -29,6 +29,7 @@ pub const MR81_HEADER: &[&str] = &[
     "reduced_lunch",
     "identified",
     "claimable",
+    "censored",
 ];
 
 /// Which of the report's publications a row came from.
@@ -53,6 +54,20 @@ pub enum Stream {
 }
 
 impl Stream {
+    /// The stream a workbook row's `NSLP Provision` cell names.
+    ///
+    /// The three labels the department writes, and nothing else. `Single` is not reachable here:
+    /// it is the era before the column existed.
+    #[must_use]
+    pub fn of_provision(stated: &str) -> Option<Self> {
+        match stated.trim() {
+            "Traditional" => Some(Self::Traditional),
+            "Provision 2" => Some(Self::Provision2),
+            "Community Eligibility Provision" => Some(Self::Community),
+            _ => None,
+        }
+    }
+
     /// The value written to the fixture.
     #[must_use]
     pub const fn label(self) -> &'static str {
@@ -64,6 +79,14 @@ impl Stream {
         }
     }
 }
+
+/// The Octobers USDA's nationwide free-meal waivers were in force.
+///
+/// Under the pandemic waivers a sponsor could serve every student free without collecting an
+/// application, so the Traditional stream all but empties and its counts are a fact about the
+/// waiver rather than about poverty. Named here because two things depend on it: the site floor
+/// below, and `dispersion::mr81`, which refuses to read an applications share for these years.
+pub const WAIVER_OCTOBERS: [u16; 2] = [2020, 2021];
 
 /// How a year's file is laid out, which decides which reader runs.
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -87,17 +110,43 @@ pub enum Mr81Layout {
     Printed,
 }
 
-/// One published MR-81 file: which October, which stream, which layout, and its text.
-#[derive(Debug, Clone, Copy)]
+/// One MR-81 filing: which October, which stream, and the bytes it arrived as.
+#[derive(Debug, Clone)]
 pub struct Mr81Report<'a> {
     /// The October the report counts.
     pub year: u16,
     /// Which of the three publications this is.
     pub stream: Stream,
-    /// Which reader this file needs.
-    pub layout: Mr81Layout,
-    /// The file's text.
-    pub text: &'a str,
+    /// The filing itself.
+    pub body: Mr81Body<'a>,
+}
+
+/// How a filing arrived, which decides which reader runs.
+///
+/// # Why a workbook is not another `Mr81Layout`
+///
+/// Through FY2014 a filing *is* a file, so the year, the stream and the reader travel together.
+/// From FY2015 the department publishes **one workbook an October** with an `NSLP Provision`
+/// column, so the three streams are rows. The driver splits them and hands three filings over,
+/// because a filing is still what everything below is written against — the site floors, the
+/// denominator agreement check, the per-stream claimable rule. Making the *stream* a property of
+/// the row instead would have meant rewriting all three.
+#[derive(Debug, Clone)]
+pub enum Mr81Body<'a> {
+    /// A published text file, read by the layout named beside it.
+    Text {
+        /// Which reader this file needs.
+        layout: Mr81Layout,
+        /// The file's text.
+        text: &'a str,
+    },
+    /// One stream's rows, lifted from the October's workbook, with the sheet's header row.
+    Rows {
+        /// The `Data` sheet's header, which every column below is resolved against by name.
+        head: &'a [String],
+        /// The rows carrying this stream, in sheet order.
+        rows: Vec<&'a [String]>,
+    },
 }
 
 /// One sponsor's running totals while its school sites are being summed.
@@ -112,6 +161,7 @@ struct SponsorTotal {
     reduced: i64,
     identified: i64,
     claimable: i64,
+    censored: i64,
 }
 
 /// One school site, whichever layout it was read from.
@@ -126,6 +176,12 @@ struct Site {
     identified: i64,
     /// The percentage the report itself prints in its free-and-reduced-of-enrolment column.
     reported_share: f64,
+    /// How many of this site's application cells the publisher censored as `<10`.
+    ///
+    /// Zero for every file through FY2014, which censors nothing. From FY2015 a count under ten
+    /// is printed `<10` — or `< 10` in the last two Octobers — and the cell it replaces is a
+    /// number this repository does not have. See [`workbook_sites`].
+    censored: i64,
 }
 
 /// Sponsor number and type by name, for the printed report that carries neither.
@@ -253,11 +309,15 @@ pub fn build_mr81(reports: &[Mr81Report<'_>]) -> Result<Vec<Vec<String>>, String
     // before anything is read, so the lookup does not depend on the order reports arrive in.
     let mut identity = Identity::default();
     for report in reports {
-        if report.layout != Mr81Layout::Delimited {
+        let Mr81Body::Text {
+            layout: Mr81Layout::Delimited,
+            text,
+        } = report.body
+        else {
             continue;
-        }
+        };
         let label = format!("the MR-81 report for October {}", report.year);
-        for site in delimited_sites(report.text, &label)?.0 {
+        for site in delimited_sites(text, &label)?.0 {
             identity.insert(
                 &site.sponsor_name,
                 &site.county,
@@ -270,6 +330,8 @@ pub fn build_mr81(reports: &[Mr81Report<'_>]) -> Result<Vec<Vec<String>>, String
     // Sponsor totals, keyed so the output is stable without a sort: year, stream, then IRN.
     let mut totals: BTreeMap<(u16, &'static str, String), SponsorTotal> = BTreeMap::new();
     let mut basis: BTreeMap<u16, &'static str> = BTreeMap::new();
+    // Sites read from each workbook October, across its streams. See the floor below.
+    let mut october_sites: BTreeMap<u16, usize> = BTreeMap::new();
 
     for report in reports {
         let label = format!(
@@ -277,13 +339,19 @@ pub fn build_mr81(reports: &[Mr81Report<'_>]) -> Result<Vec<Vec<String>>, String
             report.stream.label(),
             report.year
         );
-        let (sites, which) = match report.layout {
-            Mr81Layout::SchoolCentric => (school_centric_sites(report.text, &label)?, "adm"),
-            Mr81Layout::Delimited => delimited_sites(report.text, &label)?,
-            // The one printed file is FY2013's, which is well inside the CE era. Stated rather
-            // than sniffed because the printed heading spells CE out in prose and not in a
-            // column name.
-            Mr81Layout::Printed => (printed_sites(report.text, &identity, &label)?, "ce"),
+        let (sites, which) = match &report.body {
+            Mr81Body::Text { layout, text } => match layout {
+                Mr81Layout::SchoolCentric => (school_centric_sites(text, &label)?, "adm"),
+                Mr81Layout::Delimited => delimited_sites(text, &label)?,
+                // The one printed file is FY2013's, which is well inside the CE era. Stated
+                // rather than sniffed because the printed heading spells CE out in prose and not
+                // in a column name.
+                Mr81Layout::Printed => (printed_sites(text, &identity, &label)?, "ce"),
+            },
+            // The workbook's own Notes sheet defines enrolment as "the highest daily number of
+            // students ... with access to meals", which is the CE definition the delimited files
+            // named in a column.
+            Mr81Body::Rows { head, rows } => (workbook_sites(head, rows, &identity, &label)?, "ce"),
         };
         // Every stream of one October shares a denominator, and they agree.
         if let Some(prior) = basis.insert(report.year, which) {
@@ -295,11 +363,25 @@ pub fn build_mr81(reports: &[Mr81Report<'_>]) -> Result<Vec<Vec<String>>, String
             }
         }
 
-        // The traditional and single-stream files have never carried fewer than three thousand
-        // sites; the other two are small by construction and only have to be non-empty.
-        let floor = match report.stream {
-            Stream::Single | Stream::Traditional => 2000,
-            Stream::Provision2 | Stream::Community => 1,
+        /*
+         * A floor, so a filing that parsed to nothing is not written as a sponsor that closed.
+         *
+         * Through FY2014 it can be per stream: the single and traditional *files* never carried
+         * fewer than three thousand sites, and the other two are small by construction.
+         *
+         * From FY2015 it cannot, and the reason is the finding rather than an inconvenience. The
+         * Traditional stream is emptying into community eligibility — **2,849 sites in October
+         * 2015 against 1,782 in October 2025**, while CEP goes 844 to 1,754 — so any number this
+         * floor could name would be a claim about the migration and not about the parser. And
+         * under USDA's pandemic waivers it falls to 207 and then **23**, because a sponsor could
+         * serve every student free without collecting one application.
+         *
+         * So the workbook era is floored on the October instead, below the loop: the streams
+         * together, which is the quantity that stays a fact about the report.
+         */
+        let floor = match (&report.body, report.stream) {
+            (Mr81Body::Text { .. }, Stream::Single | Stream::Traditional) => 2000,
+            _ => 1,
         };
         if sites.len() < floor {
             return Err(format!(
@@ -309,8 +391,16 @@ pub fn build_mr81(reports: &[Mr81Report<'_>]) -> Result<Vec<Vec<String>>, String
             ));
         }
 
+        if matches!(report.body, Mr81Body::Rows { .. }) {
+            *october_sites.entry(report.year).or_default() += sites.len();
+        }
+
+        let how = match report.body {
+            Mr81Body::Text { .. } => Reproduces::ToTheHundredth,
+            Mr81Body::Rows { .. } => Reproduces::ToThePupil,
+        };
         for site in sites {
-            check_reported_share(&site, &label)?;
+            check_reported_share(&site, &label, how)?;
             let entry = totals
                 .entry((report.year, report.stream.label(), site.sponsor_irn))
                 .or_insert_with(|| SponsorTotal {
@@ -324,6 +414,7 @@ pub fn build_mr81(reports: &[Mr81Report<'_>]) -> Result<Vec<Vec<String>>, String
             entry.free += site.free;
             entry.reduced += site.reduced;
             entry.identified += site.identified;
+            entry.censored += site.censored;
             // Capped at enrolment site by site, because that is where the programme caps it.
             // Rolled up first, the cap would let one site's slack forgive another's overshoot.
             entry.claimable += if report.stream == Stream::Community {
@@ -331,6 +422,22 @@ pub fn build_mr81(reports: &[Mr81Report<'_>]) -> Result<Vec<Vec<String>>, String
             } else {
                 site.free + site.reduced
             };
+        }
+    }
+
+    /*
+     * The October, for the era whose streams cannot each be floored.
+     *
+     * A thousand and not more: October 2021 is the smallest at 1,074 sites, which is what a
+     * waiver year looks like when almost every sponsor has stopped collecting applications. A
+     * layout that had moved would land near zero and not near a thousand.
+     */
+    for (year, held) in &october_sites {
+        if *held < 1000 {
+            return Err(format!(
+                "the MR-81 workbook for October {year} yielded {held} sites across all streams \
+                 against a floor of 1000, so the sheet or the layout is wrong"
+            ));
         }
     }
 
@@ -351,6 +458,7 @@ pub fn build_mr81(reports: &[Mr81Report<'_>]) -> Result<Vec<Vec<String>>, String
                 t.reduced.to_string(),
                 t.identified.to_string(),
                 t.claimable.to_string(),
+                t.censored.to_string(),
             ]
         })
         .collect())
@@ -374,14 +482,43 @@ fn without_comma(raw: &str) -> String {
 }
 
 /// The printed percentage has to reproduce from the counts beside it, or the row is misread.
-fn check_reported_share(site: &Site, label: &str) -> Result<(), String> {
+/// How closely a row's counts must reproduce the percentage printed beside them.
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+enum Reproduces {
+    /// Through FY2014, to a hundredth of a percentage point — which those files hold exactly.
+    ToTheHundredth,
+    /// From FY2015, to one pupil.
+    ///
+    /// Two reasons, and both are properties of the publication rather than slack chosen to make
+    /// a test pass. The percentages are printed to four decimals of a *fraction*, so at a site of
+    /// sixty pupils one ulp is already a third of a pupil. And **Provision 2 freezes its
+    /// applications at a base year while its enrolment moves underneath them**, so its printed
+    /// share is over the base year's count and not over the enrolment in the next column —
+    /// `Della School of Coding and Design` in October 2024 prints 54.09% against 32 of 60, which
+    /// is 32 of 59.
+    ///
+    /// Measured over all **22,257** workbook application rows, the worst disagreement is
+    /// **0.454 pupils**. A shifted row misses by orders of magnitude, so this still catches the
+    /// thing the check exists for.
+    ToThePupil,
+}
+
+fn check_reported_share(site: &Site, label: &str, how: Reproduces) -> Result<(), String> {
     // No applications at all is the community-eligibility signature, not a shifted row: those
     // files publish a claiming rate in this column and nothing to reproduce it from.
-    if site.enrollment <= 0 || (site.free == 0 && site.reduced == 0) {
+    //
+    // A row with a masked cell is not that. Its counts are recovered from the two per-benefit
+    // percentage columns, and the check below then holds them against a *third* printed column —
+    // the combined share — which is what makes the recovery falsifiable rather than assumed.
+    if site.enrollment <= 0 || (site.free == 0 && site.reduced == 0 && site.censored == 0) {
         return Ok(());
     }
     let computed = 100.0 * (site.free + site.reduced) as f64 / site.enrollment as f64;
-    if (computed - site.reported_share).abs() > 0.02 {
+    let slack = match how {
+        Reproduces::ToTheHundredth => 0.02,
+        Reproduces::ToThePupil => 100.0 / site.enrollment as f64,
+    };
+    if (computed - site.reported_share).abs() > slack {
         return Err(format!(
             "in {label}, a site of {} in {} reports {} and {} approvals against {} enrolled, \
              which is {computed:.2}% and not the {:.2}% printed beside it — the columns have \
@@ -395,6 +532,201 @@ fn check_reported_share(site: &Site, label: &str) -> Result<(), String> {
         ));
     }
     Ok(())
+}
+
+/// Whether a published cell is a masked count rather than a number.
+///
+/// # What the spellings mean, measured rather than assumed
+///
+/// Three non-numeric spellings appear in the application columns from FY2015 and they do **not**
+/// mean the same thing:
+///
+/// - **`-`.** Recovers **0 in all 133 cases** in October 2016. Not a mask: the department writing
+///   a dash where the count is none. A community row says the same thing in words — the Notes
+///   sheet's *"This information is not applicable to CEP sites"*.
+/// - **`<10`, and `< 10` in the last two Octobers.** A mask. And **not a bound**, which is the
+///   part worth knowing: the value behind it lands in 0-9 for 1,525 of 1,532 cells and then at
+///   10, 11, 12, 15 and 19. St Brendan in October 2015 is printed `<10` twice against a free
+///   count of 7 and a reduced count of **15**. The operative rule is evidently that when either
+///   of the pair falls under ten *both* are masked, so reading `<10` as "at most nine" would be
+///   wrong on the larger one.
+///
+/// [`workbook_sites`] therefore recovers the count rather than bounding it. See there for the
+/// identity that makes that a reading rather than a repair.
+fn is_masked(cell: &str) -> bool {
+    let text = cell.trim();
+    text.starts_with('<') && text.trim_start_matches('<').trim().parse::<f64>().is_ok()
+}
+
+/// Split one October's workbook into the filings it holds.
+///
+/// From FY2015 the report is one file again and the stream is a column, so this is where the
+/// three come back apart. A stream with no rows is not emitted: October 2021 has **no Provision 2
+/// filing at all**, and an empty filing would trip the site floor as though the parser had failed.
+///
+/// The trailing rows are dropped by the same test that assigns the stream. Every one of these
+/// sheets ends with two to four note lines appended below the data — `Note:`, then a sentence
+/// about self-reporting — which carry no provision and no IRN.
+///
+/// # Errors
+///
+/// Returns a description if the sheet has no header, no provision column, or a provision this
+/// does not recognise. An unrecognised one is an error rather than a skip: a fourth stream would
+/// be a change in the programme, and silently dropping its rows would understate every total.
+pub fn workbook_filings<'a>(
+    year: u16,
+    sheet: &'a [Vec<String>],
+    label: &str,
+) -> Result<Vec<Mr81Report<'a>>, String> {
+    let Some((head, body)) = sheet.split_first() else {
+        return Err(format!("{label} is empty"));
+    };
+    let provision = column_named(head, &["NSLP Provision"])
+        .ok_or_else(|| format!("{label} has no NSLP Provision column; its layout has moved"))?;
+    let irn = column_named(head, &["Sponsor IRN"])
+        .ok_or_else(|| format!("{label} has no Sponsor IRN column; its layout has moved"))?;
+
+    let mut held: Vec<(Stream, Vec<&'a [String]>)> = vec![
+        (Stream::Traditional, Vec::new()),
+        (Stream::Provision2, Vec::new()),
+        (Stream::Community, Vec::new()),
+    ];
+    for row in body {
+        /*
+         * A data row's Sponsor IRN is a number, and that is the whole test.
+         *
+         * Every one of these sheets ends with two to four note lines below the data — `Note:`, a
+         * sentence about self-reporting, a revision date. "Has something in the IRN column" does
+         * not tell them apart: October 2015's last row is `["", "Last updated 06-14-16"]`, which
+         * puts prose exactly there, and October 2018's is twelve empty cells and a stray `W`.
+         */
+        let numbered = row.get(irn).is_some_and(|cell| {
+            let text = cell.trim();
+            !text.is_empty() && text.chars().all(|c| c.is_ascii_digit())
+        });
+        if !numbered {
+            continue;
+        }
+        let stated = row
+            .get(provision)
+            .map(String::as_str)
+            .unwrap_or_default()
+            .trim();
+        let stream = Stream::of_provision(stated).ok_or_else(|| {
+            format!("{label} carries a site under \"{stated}\", which is not a stream this reads")
+        })?;
+        for (which, rows) in &mut held {
+            if *which == stream {
+                rows.push(row.as_slice());
+            }
+        }
+    }
+
+    Ok(held
+        .into_iter()
+        .filter(|(_, rows)| !rows.is_empty())
+        .map(|(stream, rows)| Mr81Report {
+            year,
+            stream,
+            body: Mr81Body::Rows { head, rows },
+        })
+        .collect())
+}
+
+/// FY2015 onward: one October's workbook, already split to one stream's rows.
+///
+/// # What the workbook says that the delimited files did not
+///
+/// Its Notes sheet states the community-eligibility rule outright — *"CEP eligible students are
+/// multiplied by 1.6 in order to account for underestimation of eligible students from direct
+/// certification. ((CEP eligible students \*1.6)/CE)"*. That is exactly the `claimable` quantity
+/// [`build_mr81`] computes, and which this repository had previously *measured* off the FY2014
+/// file rather than read anywhere. The publisher now says it, so the ceiling half of the corpus's
+/// band is the programme's own arithmetic rather than an inference from 735 rows.
+///
+/// # Two things the sheet does not carry
+///
+/// **No sponsor type.** The delimited files had a `SponsorType` column and these do not, so the
+/// type comes from `identity` — the same lookup the printed FY2013 file uses — and a sponsor that
+/// appears for the first time after FY2014 is written `Unknown`, as FY1998-FY2000 are.
+///
+/// **A percentage rather than a share.** `Percent Free and Reduced Price Lunch` is `0.5154` where
+/// the delimited files printed `51.54`, so it is scaled here before
+/// [`check_reported_share`] sees it. Without that every row in eleven Octobers would read as a
+/// shifted row.
+fn workbook_sites(
+    head: &[String],
+    rows: &[&[String]],
+    identity: &Identity,
+    label: &str,
+) -> Result<Vec<Site>, String> {
+    let at = |names: &[&str]| {
+        column_named(head, names)
+            .ok_or_else(|| format!("{label} has no {} column; its layout has moved", names[0]))
+    };
+    let county = at(&["County"])?;
+    let irn = at(&["Sponsor IRN"])?;
+    let name = at(&["Sponsor"])?;
+    let enrolment = at(&["Enrollment"])?;
+    let free = at(&["Free Lunch Applications"])?;
+    let reduced = at(&["Reduced Price Lunch Applications"])?;
+    let share = at(&["Percent Free and Reduced Price Lunch"])?;
+    let free_share = at(&["Percent Free Lunch"])?;
+    let reduced_share = at(&["Percent Reduced Price Lunch"])?;
+    let identified = at(&["CEP Eligible Students"])?;
+
+    let mut sites = Vec::new();
+    for row in rows {
+        let field = |i: usize| row.get(i).map(|v| v.trim()).unwrap_or_default();
+        let number = |i: usize| field(i).parse::<f64>().unwrap_or(0.0).round() as i64;
+        let enrolled = number(enrolment);
+        /*
+         * A masked count, read out of the percentage the publisher prints beside it.
+         *
+         * A reading and not a repair, and the difference is measurable: over the eleven workbook
+         * Octobers there are **42,983 application cells printed as numbers, and
+         * `round(percent x enrolment)` reproduces every one of them** — no disagreements at all.
+         * So the percentage column *is* the count column, to the pupil, wherever both are
+         * printed. Where only one is, it still is.
+         *
+         * The alternative was to write the mask as a zero and carry a bound, which would have
+         * understated 1,532 cells by up to nineteen pupils each and left every consumer to
+         * re-derive what the publisher had already printed two columns along.
+         */
+        let count = |cell: usize, percent: usize| -> i64 {
+            if is_masked(field(cell)) {
+                (field(percent).parse::<f64>().unwrap_or(0.0) * enrolled as f64).round() as i64
+            } else {
+                number(cell)
+            }
+        };
+        let masked = [free, reduced]
+            .iter()
+            .filter(|i| is_masked(field(**i)))
+            .count() as i64;
+        let Some(key) = sponsor_key(field(irn)) else {
+            continue;
+        };
+        let sponsor = without_comma(field(name));
+        let place = without_comma(field(county));
+        let kind = identity
+            .get(&sponsor, &place)
+            .map_or_else(|| "Unknown".to_string(), |(_, kind)| kind.clone());
+        sites.push(Site {
+            sponsor_irn: key,
+            sponsor_name: sponsor,
+            county: place,
+            kind,
+            enrollment: enrolled,
+            free: count(free, free_share),
+            reduced: count(reduced, reduced_share),
+            identified: number(identified),
+            // A fraction of one in the workbook against a percentage in every file before it.
+            reported_share: field(share).parse::<f64>().unwrap_or(0.0) * 100.0,
+            censored: masked,
+        });
+    }
+    Ok(sites)
 }
 
 /// FY2001-FY2014, one row per site, and which denominator the file is on.
@@ -455,6 +787,8 @@ fn delimited_sites(text: &str, label: &str) -> Result<(Vec<Site>, &'static str),
             reduced: number(reduced),
             identified: identified.map_or(0, number),
             reported_share: field(share).parse::<f64>().unwrap_or(0.0),
+            // Nothing before FY2015 is censored: these files print every count.
+            censored: 0,
         });
     }
     Ok((sites, which))
@@ -578,6 +912,8 @@ fn school_centric_sites(text: &str, label: &str) -> Result<Vec<Site>, String> {
             reduced: number(REDUCED),
             identified: 0,
             reported_share: at(SHARE).parse::<f64>().unwrap_or(0.0),
+            // Nothing before FY2015 is censored: these files print every count.
+            censored: 0,
         });
     }
     if sites.is_empty() {
@@ -667,6 +1003,8 @@ fn printed_sites(text: &str, identity: &Identity, label: &str) -> Result<Vec<Sit
             reduced: number(2),
             identified: number(6),
             reported_share: figures[5].parse::<f64>().unwrap_or(0.0),
+            // Nothing before FY2015 is censored: these files print every count.
+            censored: 0,
         });
     }
 

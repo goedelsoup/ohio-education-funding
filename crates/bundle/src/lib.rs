@@ -174,7 +174,7 @@ use edfund_core::Dollars;
 /// from FY2022-FY2024 to FY2024-FY2026 — the years the department's `ADM Data` sheet declares.
 /// The values did not change; what they are called did, which is exactly the kind of silent
 /// meaning change the version guard exists for.
-pub const CONTRACT_VERSION: &str = "39.0.0";
+pub const CONTRACT_VERSION: &str = "40.0.0";
 
 mod model;
 mod serialize;

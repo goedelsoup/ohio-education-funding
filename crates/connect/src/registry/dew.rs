@@ -589,6 +589,161 @@ pub(super) const CHILD_NUTRITION: Connector = Connector {
                    years earlier. Its printed percentage is the directly-certified count \
                    times 1.6 capped at enrolment, in all 735 rows.",
         },
+        // --- The workbook era. One file an October again, with the stream on every row. ---
+        Source {
+            key: "mr81-2015",
+            title: None,
+            url: "https://education.ohio.gov/getattachment/Topics/Student-Supports/Food-and-Nutrition/\
+                  Resources-and-Tools-for-Food-and-Nutrition/\
+                  Data-for-Free-and-Reduced-Price-Meal-Eligibility/\
+                  October_2015_-Data_for_Free-and-Reduced-Price-Meal.xlsx.aspx?lang=en-US",
+            filename: "mr81-2015.xlsx",
+            format: Format::Xlsx,
+            catalog: Some("dew-mr81-enrollment-archive"),
+            fixtures: &[crate::fixtures::MR81_FIXTURE],
+            note: "October 2015, and the October the report came back together. One workbook \
+                   per year with an `NSLP Provision` column, so the three streams are rows \
+                   rather than three files again. Its Notes sheet states the CEP rule this \
+                   repository had measured off the FY2014 file: the printed percentage is the \
+                   directly-certified count times 1.6 over enrolment.",
+        },
+        Source {
+            key: "mr81-2016",
+            title: None,
+            url: "https://education.ohio.gov/getattachment/Topics/Student-Supports/Food-and-Nutrition/\
+                  Resources-and-Tools-for-Food-and-Nutrition/\
+                  Data-for-Free-and-Reduced-Price-Meal-Eligibility/\
+                  October_2016_-Data_for_Free-and-Reduced-Price-Meal.xlsx.aspx?lang=en-US",
+            filename: "mr81-2016.xlsx",
+            format: Format::Xlsx,
+            catalog: Some("dew-mr81-enrollment-archive"),
+            fixtures: &[crate::fixtures::MR81_FIXTURE],
+            note: "October 2016.",
+        },
+        Source {
+            key: "mr81-2017",
+            title: None,
+            url: "https://education.ohio.gov/getattachment/Topics/Student-Supports/Food-and-Nutrition/\
+                  Resources-and-Tools-for-Food-and-Nutrition/\
+                  Data-for-Free-and-Reduced-Price-Meal-Eligibility/\
+                  October_2017_-Data_for_Free-and-Reduced-Price-Meal.xlsx.aspx?lang=en-US",
+            filename: "mr81-2017.xlsx",
+            format: Format::Xlsx,
+            catalog: Some("dew-mr81-enrollment-archive"),
+            fixtures: &[crate::fixtures::MR81_FIXTURE],
+            note: "October 2017.",
+        },
+        Source {
+            key: "mr81-2018",
+            title: None,
+            url: "https://education.ohio.gov/getattachment/Topics/Other-Resources/Food-and-Nutrition/\
+                  Resources-and-Tools-for-Food-and-Nutrition/\
+                  MR81-Data-for-Free-and-Reduced-Price-Meal-Eligibil/\
+                  October_2018_Data-for-Free-and-Reduced-Price-Meal.xlsx.aspx?lang=en-US",
+            filename: "mr81-2018.xlsx",
+            format: Format::Xlsx,
+            catalog: Some("dew-mr81-enrollment-archive"),
+            fixtures: &[crate::fixtures::MR81_FIXTURE],
+            note: "October 2018. Filed under `Topics/Other-Resources` rather than \
+                   `Topics/Student-Supports`, alone among the eleven — the department moved \
+                   the page and left this one attachment behind.",
+        },
+        Source {
+            key: "mr81-2019",
+            title: None,
+            url: "https://education.ohio.gov/getattachment/Topics/Student-Supports/Food-and-Nutrition/\
+                  Resources-and-Tools-for-Food-and-Nutrition/\
+                  MR81-Data-for-Free-and-Reduced-Price-Meal-Eligibil/\
+                  October-2019-Data-for-Free-and-Reduced-Price-Meal-Eligibility.xlsx.aspx?lang=en-US",
+            filename: "mr81-2019.xlsx",
+            format: Format::Xlsx,
+            catalog: Some("dew-mr81-enrollment-archive"),
+            fixtures: &[crate::fixtures::MR81_FIXTURE],
+            note: "October 2019.",
+        },
+        Source {
+            key: "mr81-2020",
+            title: None,
+            url: "https://education.ohio.gov/getattachment/Topics/Student-Supports/Food-and-Nutrition/\
+                  Resources-and-Tools-for-Food-and-Nutrition/\
+                  MR81-Data-for-Free-and-Reduced-Price-Meal-Eligibil/\
+                  October-2020-Data-for-Free-and-Reduced-Price-Meal-Eligibility.xlsx.aspx?lang=en-US",
+            filename: "mr81-2020.xlsx",
+            format: Format::Xlsx,
+            catalog: Some("dew-mr81-enrollment-archive"),
+            fixtures: &[crate::fixtures::MR81_FIXTURE],
+            note: "October 2020, the first pandemic October. USDA's nationwide free-meal \
+                   waivers ran through this school year, so the applications a Traditional \
+                   sponsor collected are not comparable with the years around it.",
+        },
+        Source {
+            key: "mr81-2021",
+            title: None,
+            url: "https://education.ohio.gov/getattachment/Topics/Student-Supports/Food-and-Nutrition/\
+                  Resources-and-Tools-for-Food-and-Nutrition/\
+                  Data-for-Free-and-Reduced-Price-Meal-Eligibility/\
+                  October-2021-Data-for-Free-and-Reduced-Price-Meal-Eligibility-2.xlsx.aspx?lang=en-US",
+            filename: "mr81-2021.xlsx",
+            format: Format::Xlsx,
+            catalog: Some("dew-mr81-enrollment-archive"),
+            fixtures: &[crate::fixtures::MR81_FIXTURE],
+            note: "October 2021, the second waiver year. The published filename carries a \
+                   `-2` suffix, which is a revision marker rather than a second file.",
+        },
+        Source {
+            key: "mr81-2022",
+            title: None,
+            url: "https://education.ohio.gov/getattachment/Topics/Student-Supports/Food-and-Nutrition/\
+                  Resources-and-Tools-for-Food-and-Nutrition/\
+                  Data-for-Free-and-Reduced-Price-Meal-Eligibility/\
+                  October-2022-Data-for-Free-and-Reduced-Price-Meal-Eligibilty.xlsx.aspx?lang=en-US",
+            filename: "mr81-2022.xlsx",
+            format: Format::Xlsx,
+            catalog: Some("dew-mr81-enrollment-archive"),
+            fixtures: &[crate::fixtures::MR81_FIXTURE],
+            note: "October 2022.",
+        },
+        Source {
+            key: "mr81-2023",
+            title: None,
+            url: "https://education.ohio.gov/getattachment/Topics/Student-Supports/Food-and-Nutrition/\
+                  Resources-and-Tools-for-Food-and-Nutrition/\
+                  Data-for-Free-and-Reduced-Price-Meal-Eligibility/\
+                  October-2023-Data-for-Free-and-Reduced-Price-Meal-Eligibilty.xlsx.aspx?lang=en-US",
+            filename: "mr81-2023.xlsx",
+            format: Format::Xlsx,
+            catalog: Some("dew-mr81-enrollment-archive"),
+            fixtures: &[crate::fixtures::MR81_FIXTURE],
+            note: "October 2023.",
+        },
+        Source {
+            key: "mr81-2024",
+            title: None,
+            url: "https://education.ohio.gov/getattachment/Topics/Student-Supports/Food-and-Nutrition/\
+                  Resources-and-Tools-for-Food-and-Nutrition/\
+                  Data-for-Free-and-Reduced-Price-Meal-Eligibility/\
+                  October-2024-FY2025-Data-for-Free-and-Reduced-Price-Meal-Eligibilty.xlsx.aspx?lang=en-US",
+            filename: "mr81-2024.xlsx",
+            format: Format::Xlsx,
+            catalog: Some("dew-mr81-enrollment-archive"),
+            fixtures: &[crate::fixtures::MR81_FIXTURE],
+            note: "October 2024.",
+        },
+        Source {
+            key: "mr81-2025",
+            title: None,
+            url: "https://education.ohio.gov/getattachment/Topics/Student-Supports/Food-and-Nutrition/\
+                  Resources-and-Tools-for-Food-and-Nutrition/\
+                  Data-for-Free-and-Reduced-Price-Meal-Eligibility/\
+                  October-2025-FY2026-Data-for-Free-and-Reduced-Price-Meal-Eligibilty.xlsx.aspx?lang=en-US",
+            filename: "mr81-2025.xlsx",
+            format: Format::Xlsx,
+            catalog: Some("dew-mr81-enrollment-archive"),
+            fixtures: &[crate::fixtures::MR81_FIXTURE],
+            note: "October 2025, posted 13 February 2026 and the most recent published. The \
+                   department is `Education & Workforce` and the office is `Office of \
+                   Nutrition` on this one; the series is otherwise unchanged.",
+        },
     ],
 };
 

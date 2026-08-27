@@ -476,6 +476,7 @@ fn bundle(districts: Vec<District>, checkpoints: Vec<Checkpoint>) -> Bundle {
                 without_applications: 0.0,
                 streams: 1,
                 basis: "adm".into(),
+                comparable: true,
             },
             MealProgramYear {
                 fiscal_year: 2010,
@@ -489,6 +490,7 @@ fn bundle(districts: Vec<District>, checkpoints: Vec<Checkpoint>) -> Bundle {
                 without_applications: 0.0,
                 streams: 1,
                 basis: "ce".into(),
+                comparable: true,
             },
             MealProgramYear {
                 fiscal_year: 2014,
@@ -502,6 +504,7 @@ fn bundle(districts: Vec<District>, checkpoints: Vec<Checkpoint>) -> Bundle {
                 without_applications: 0.166,
                 streams: 3,
                 basis: "ce".into(),
+                comparable: true,
             },
         ],
         // Three years, one of them the closure, so a consumer reading this fixture meets the
@@ -805,7 +808,7 @@ fn every_meal_program_row_names_the_count_it_divides_by() {
         json.contains(
             "\"enrollment\": 1000000, \"approved\": 412000, \"identified\": 0, \
              \"share\": 0.412, \"floor\": 0.412, \"ceiling\": 0.412, \
-             \"without_applications\": 0, \"streams\": 1, \"basis\": \"adm\""
+             \"without_applications\": 0, \"comparable\": true, \"streams\": 1, \"basis\": \"adm\""
         ),
         "{json}"
     );
@@ -813,7 +816,7 @@ fn every_meal_program_row_names_the_count_it_divides_by() {
         json.contains(
             "\"enrollment\": 1000000, \"approved\": 437000, \"identified\": 0, \
              \"share\": 0.437, \"floor\": 0.437, \"ceiling\": 0.437, \
-             \"without_applications\": 0, \"streams\": 1, \"basis\": \"ce\""
+             \"without_applications\": 0, \"comparable\": true, \"streams\": 1, \"basis\": \"ce\""
         ),
         "{json}"
     );
@@ -823,7 +826,7 @@ fn every_meal_program_row_names_the_count_it_divides_by() {
         json.contains(
             "\"approved\": 333000, \"identified\": 105000, \"share\": null, \
              \"floor\": 0.438, \"ceiling\": 0.484, \"without_applications\": 0.166, \
-             \"streams\": 3, \"basis\": \"ce\""
+             \"comparable\": true, \"streams\": 3, \"basis\": \"ce\""
         ),
         "{json}"
     );
