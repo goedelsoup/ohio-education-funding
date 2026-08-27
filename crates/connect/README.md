@@ -69,10 +69,10 @@ Fields per connector: key, status, source count, corpus classes fed; then every 
 | [`census-f33`](sources/census-f33.md) | **wired** | 15 | metric, education-agency |
 | [`nces-ccd`](sources/nces-ccd.md) | **wired**, in part | 30 | education-agency |
 | `census-geography` | **wired** | 4 | education-agency, actor |
-| `dew-child-nutrition` | **wired**, in part | 23 | education-agency, metric, formula-component |
+| `dew-child-nutrition` | **wired**, in part | 34 | education-agency, metric, formula-component |
 | `dew-school-improvement` | **wired**, in part | 3 | school, education-agency, accountability-regime |
 
-21 connectors, 206 sources between them. 18 are wired and 3 are not; 10 of the wired ones reach only part of what they feed, and say so below.
+21 connectors, 217 sources between them. 18 are wired and 3 are not; 10 of the wired ones reach only part of what they feed, and say so below.
 
 **What is blocked, in the registry's own words.**
 

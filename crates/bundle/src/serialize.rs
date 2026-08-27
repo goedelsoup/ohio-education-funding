@@ -469,6 +469,7 @@ impl Bundle {
                     o.num("floor", m.floor);
                     o.num("ceiling", m.ceiling);
                     o.num("without_applications", m.without_applications);
+                    o.flag("comparable", m.comparable);
                     o.count("streams", m.streams);
                     o.text("basis", &m.basis);
                 }

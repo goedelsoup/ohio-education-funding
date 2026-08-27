@@ -697,4 +697,16 @@ pub struct MealProgramYear {
     /// this as one line without breaking it at the basis change is making the error this field
     /// exists to prevent.
     pub basis: String,
+    /// Whether this October is a reading of the state at all.
+    ///
+    /// False for exactly two, and a consumer drawing a series has to break on it. Under USDA's
+    /// nationwide free-meal waivers a sponsor could serve every student free without collecting
+    /// one application, and almost every one of them stopped: October 2020 and October 2021 carry
+    /// **296 and 261 sponsors against about 850**, and a quarter of the enrolment. Their floor
+    /// reads twenty points above the years either side, and every point of that is about who
+    /// filed rather than about Ohio.
+    ///
+    /// The rows are carried rather than dropped because they are true about the sponsors in them,
+    /// and because a gap would be indistinguishable from a year nobody retrieved.
+    pub comparable: bool,
 }

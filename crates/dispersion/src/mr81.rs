@@ -58,10 +58,24 @@ use std::collections::{BTreeMap, BTreeSet};
 const FIXTURE: &str = include_str!("../fixtures/mr81-sponsor-panel.csv");
 
 const EXPECTED_HEADER: &str = "fiscal_year,sponsor_irn,sponsor_name,county,sponsor_type,stream,\
-sites,enrollment,enrollment_basis,free_lunch,reduced_lunch,identified,claimable";
+sites,enrollment,enrollment_basis,free_lunch,reduced_lunch,identified,claimable,censored";
 
-/// The October the report was last one file, and the last one it was published at all.
+/// The October the report was last one file.
 pub const LAST_SINGLE_STREAM: u16 = 2011;
+
+/// The Octobers whose population is not the state, because most sponsors did not file.
+///
+/// Under USDA's nationwide free-meal waivers a sponsor could serve every student free without
+/// collecting one application, and almost every one of them did. These two Octobers carry
+/// **296 and 261 sponsors against about 850**, and **425,154 and 398,209 pupils against 1.7
+/// million** — so what they report is not Ohio, it is the sponsors who still had a reason to
+/// file. Their floor and ceiling read twenty points above the years on either side, and every
+/// point of that is about the waiver.
+///
+/// Carried rather than dropped: the rows are true about the sponsors in them, and a gap in the
+/// panel would be indistinguishable from a year nobody retrieved. [`PovertyYear::comparable`] is
+/// how a consumer tells them apart, and `web/src/lib/mealProgram.ts` breaks its line on it.
+pub const WAIVER_OCTOBERS: [u16; 2] = [2020, 2021];
 
 /// The October whose sponsor types are borrowed by the three school-centric years before it.
 const TYPE_SOURCE: u16 = 2001;
@@ -97,6 +111,15 @@ pub struct Sponsor {
     /// What the sponsor may claim for: its approvals, or for community eligibility the
     /// directly-certified count multiplied by USDA's 1.6 and capped at enrollment site by site.
     pub claimable: f64,
+    /// How many of this sponsor-year's application cells the publisher printed as `<10`.
+    ///
+    /// Zero for every October through FY2014, which masks nothing. From FY2015 a count is masked
+    /// when either half of the free/reduced pair falls under ten — **not** when the cell itself
+    /// does, which is why it is not a bound. The extractor recovers the number from the
+    /// percentage the workbook prints beside it, on an identity that reproduces all 42,983
+    /// unmasked cells exactly, so the counts here are the publisher's own. This column says how
+    /// many of them arrived by the second route.
+    pub censored: f64,
 }
 
 /// Every row of the panel.
@@ -125,6 +148,7 @@ pub fn panel() -> Vec<Sponsor> {
                 reduced: row.num(10)?,
                 identified: row.num(11)?,
                 claimable: row.num(12)?,
+                censored: row.num(13)?,
             })
         })
         .collect()
@@ -206,6 +230,13 @@ pub struct PovertyYear {
     /// Directly certified children under community eligibility, where the sponsor collects no
     /// applications. Zero before FY2012.
     pub identified: f64,
+    /// Whether this October's filings are a reading of the state at all.
+    ///
+    /// False for the two [`WAIVER_OCTOBERS`], and true everywhere else. A consumer drawing a
+    /// series has to break on it: those two years are twenty points above their neighbours
+    /// because two thirds of the sponsors stopped filing, not because Ohio got poorer and then
+    /// better again.
+    pub comparable: bool,
     /// Approvals, or for community eligibility what the sponsor may claim for.
     pub claimable: f64,
     /// Approvals as a share of enrollment.
@@ -295,6 +326,7 @@ pub fn poverty_share_by_year() -> BTreeMap<u16, PovertyYear> {
             }
             totals.basis_is_ce = ce;
             totals.streams = streams.len();
+            totals.comparable = !WAIVER_OCTOBERS.contains(&year);
             // One file, one share. The three readings coincide there because `identified` is
             // zero and `claimable` is the approvals, so which of them is written is arbitrary —
             // what is not arbitrary is that from FY2012 there is nothing to write.
@@ -368,10 +400,16 @@ pub fn streams_by_year() -> BTreeMap<u16, BTreeMap<String, StreamYear>> {
 mod tests {
     use super::*;
 
+    /// Twenty-eight Octobers without a gap, which used to be seventeen.
+    ///
+    /// The open directory at `public.education.ohio.gov/MR81/` really does end at October 2014,
+    /// and the Internet Archive holds nothing later either — 101 URLs captured and the newest
+    /// directory is `MR81_October_2014`. What ended was the directory. The report moved to the
+    /// department's own page and has been published every year since, which is #16.
     #[test]
     fn the_panel_holds_every_october_the_archive_publishes() {
         let years: Vec<u16> = poverty_share_by_year().keys().copied().collect();
-        assert_eq!(years, (1998..=2014).collect::<Vec<u16>>());
+        assert_eq!(years, (1998..=2025).collect::<Vec<u16>>());
     }
 
     /// The one published defect, pinned by name so a new one cannot hide behind it.
@@ -543,7 +581,22 @@ mod tests {
         for (year, y) in &by_year {
             let single = *year <= LAST_SINGLE_STREAM;
             assert_eq!(y.share.is_some(), single, "FY{year}");
-            assert_eq!(y.streams, if single { 1 } else { 3 }, "FY{year}");
+            /*
+             * Three streams from FY2012 — except October 2021, which has **two**.
+             *
+             * Under USDA's nationwide free-meal waivers a sponsor could serve every student free
+             * without collecting an application, and that October **not one Provision 2 sponsor
+             * filed at all**. An absent filing is not an empty one: it is not written, so the
+             * year carries two streams rather than three with a zero in it.
+             */
+            let expected = if single {
+                1
+            } else if *year == 2021 {
+                2
+            } else {
+                3
+            };
+            assert_eq!(y.streams, expected, "FY{year}");
             if single {
                 assert_eq!(
                     (y.applications_share, y.floor),
@@ -601,7 +654,7 @@ mod tests {
         let streams = streams_by_year();
         assert_eq!(
             streams.keys().copied().collect::<Vec<u16>>(),
-            vec![2012, 2013, 2014]
+            (2012..=2025).collect::<Vec<u16>>()
         );
         let by_year = poverty_share_by_year();
         let share = |year: u16| streams[&year]["community"].of_enrollment;
@@ -633,10 +686,12 @@ mod tests {
         );
 
         for (year, by_stream) in &streams {
+            // Three, except the waiver October when no Provision 2 sponsor filed. See
+            // `only_the_years_published_as_one_file_carry_one_share`.
             assert_eq!(
                 by_stream.len(),
-                3,
-                "FY{year} is not published as three files"
+                if *year == 2021 { 2 } else { 3 },
+                "FY{year} does not carry the streams it should"
             );
             assert_eq!(
                 by_stream["community"].approved, 0.0,
@@ -647,6 +702,43 @@ mod tests {
                 "FY{year}'s traditional file reports directly certified children"
             );
         }
+    }
+
+    /// The two Octobers that are not a reading of Ohio, and how far out they read.
+    ///
+    /// The whole reason `comparable` exists. Drawn as part of the series these are a twenty-point
+    /// poverty spike and a twenty-point recovery, and both are about who filed.
+    #[test]
+    fn the_waiver_octobers_are_not_the_state() {
+        let by_year = poverty_share_by_year();
+        for year in WAIVER_OCTOBERS {
+            let y = &by_year[&year];
+            assert!(
+                !y.comparable,
+                "FY{year} should not be drawn with its neighbours"
+            );
+            // A third of the sponsors and a quarter of the pupils the years either side carry.
+            assert!(
+                y.sponsors < by_year[&2019].sponsors / 2,
+                "FY{year} has {} sponsors against FY2019's {}",
+                y.sponsors,
+                by_year[&2019].sponsors
+            );
+            assert!(y.enrollment < 0.3 * by_year[&2019].enrollment);
+            // And the floor reads far above the years on either side, which is the defect.
+            assert!(
+                y.floor > by_year[&2019].floor + 0.15 && y.floor > by_year[&2022].floor + 0.15,
+                "FY{year}'s floor of {:.4} is not the outlier this test is about",
+                y.floor
+            );
+        }
+        // Everything else is a reading of the state, including the eleven new Octobers.
+        assert!(
+            (1998..=2025)
+                .filter(|y| !WAIVER_OCTOBERS.contains(y))
+                .all(|y| by_year[&y].comparable),
+            "a year outside the waivers is marked incomparable"
+        );
     }
 
     /// The three Octobers with no type column of their own, and what borrowing FY2001 costs.

@@ -1168,6 +1168,7 @@ fn meal_program() -> Vec<MealProgramYear> {
             // feed writes the name, because a consumer reading `"basis": false` would have to
             // come back here to learn which count that was.
             basis: if year.basis_is_ce { "ce" } else { "adm" }.to_string(),
+            comparable: year.comparable,
         })
         .collect()
 }

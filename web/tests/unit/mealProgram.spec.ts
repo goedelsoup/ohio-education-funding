@@ -27,9 +27,12 @@ const meal = bundle.meal_program;
 test("the feed carries the series at all", () => {
   // The failure this guards is the one that already happened twice: a panel computed in Rust,
   // tested in Rust, and exported to no reader. `history` was the first; this was the second.
-  expect(meal.length).toBe(17);
+  // Twenty-eight Octobers, which used to be seventeen. The open directory really does stop at
+  // October 2014 — the Internet Archive holds nothing later either — but the report moved to the
+  // department's own page and has been published every year since. See #16.
+  expect(meal.length).toBe(28);
   expect(meal[0]!.fiscal_year).toBe(1998);
-  expect(meal[meal.length - 1]!.fiscal_year).toBe(2014);
+  expect(meal[meal.length - 1]!.fiscal_year).toBe(2025);
 });
 
 test("years are ordered and unique, because a chart reads them as an axis", () => {
@@ -57,7 +60,10 @@ test("the split years carry a band and no share, and the band is checkable too",
    * not, and either would be read as a number.
    */
   const split = splitStream(meal);
-  expect(split.map((y) => y.fiscal_year)).toEqual([2012, 2013, 2014]);
+  // Every October from FY2012 except the two waiver years, which `splitStream` holds out.
+  expect(split.map((y) => y.fiscal_year)).toEqual([
+    2012, 2013, 2014, 2015, 2016, 2017, 2018, 2019, 2022, 2023, 2024, 2025,
+  ]);
   for (const y of split) {
     expect(y.share, `FY${y.fiscal_year}`).toBeNull();
     expect(y.streams, `FY${y.fiscal_year}`).toBe(3);
@@ -72,11 +78,31 @@ test("the split years carry a band and no share, and the band is checkable too",
   }
 });
 
-test("the band brackets the last year that has a share, so the direction is what is unsettled", () => {
+/**
+ * The direction the source cannot settle — and the three Octobers where it can.
+ *
+ * For six years after the split the band contains FY2011's share, which is what made the level
+ * readable and the direction not. Eleven more Octobers changed that: in **FY2018, FY2019 and
+ * FY2022 the whole band sits below FY2011**, so on any reading the measured need had fallen. Then
+ * community eligibility widens again — 1,082 sites in FY2023 against 1,638 in FY2024 — the ceiling
+ * rises with it, and the band brackets once more.
+ *
+ * Both halves are asserted. A test that only held the bracketing would have quietly stopped being
+ * about anything the first time a band cleared.
+ */
+test("the band brackets the last year that has a share, except in three Octobers", () => {
   const last = singleStream(meal).at(-1)!;
+  const clears = splitStream(meal)
+    .filter((y) => y.ceiling < last.share!)
+    .map((y) => y.fiscal_year);
+  expect(clears, "the years the source does settle the direction for").toEqual([2018, 2019, 2022]);
+
   for (const y of splitStream(meal)) {
+    // The floor is under FY2011 in every one of them: the level never reads as having risen.
     expect(y.floor, `FY${y.fiscal_year}`).toBeLessThan(last.share!);
-    expect(y.ceiling, `FY${y.fiscal_year}`).toBeGreaterThan(last.share!);
+    if (!clears.includes(y.fiscal_year)) {
+      expect(y.ceiling, `FY${y.fiscal_year}`).toBeGreaterThan(last.share!);
+    }
   }
 });
 
@@ -98,7 +124,8 @@ test("the denominator changes exactly once, at FY2010", () => {
     1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009,
   ]);
   expect(meal.filter((y) => y.basis === "ce").map((y) => y.fiscal_year)).toEqual([
-    2010, 2011, 2012, 2013, 2014,
+    2010, 2011, 2012, 2013, 2014, 2015, 2016, 2017, 2018, 2019, 2020, 2021, 2022, 2023, 2024,
+    2025,
   ]);
 });
 
@@ -148,7 +175,11 @@ test("the page says why the line stops before the data does", () => {
   expect(html).toContain("community\n        eligibility");
   expect(html).toContain("poverty collapsing");
   // The band is quoted with both ends, and the table prints it as a range rather than a figure.
-  expect(html).toMatch(/43\.7% to 48\.4%/);
+  // The band is quoted with both ends of the *last comparable* October, which is FY2025.
+  expect(html).toMatch(/44\.5% to 55\.9%/);
+  // And the two waiver Octobers are named, in the table and in a paragraph of their own.
+  expect(html).toContain("not the state");
+  expect(html).toContain("most sponsors did not file");
   expect(html).toMatch(/43\.7%–48\.4%/);
 });
 

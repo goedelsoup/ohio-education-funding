@@ -1660,6 +1660,14 @@ fn mr81_key(year: u16, stream: fixtures::Stream) -> String {
     }
 }
 
+/// The Octobers published as one workbook with the stream on every row.
+///
+/// The series stopped being three files after FY2014, and stopped being an open directory too:
+/// `public.education.ohio.gov/MR81/` ends at October 2014 and everything since is an attachment on
+/// the department's own page, which links back to that directory for "years prior". The archive
+/// confirms the directory is finished; it was never the question. See #16.
+const MR81_WORKBOOKS: std::ops::RangeInclusive<u16> = 2015..=2025;
+
 /// The MR-81 sponsor panel, from every published file.
 fn mr81_panel(root: &Path) -> Result<Vec<Vec<String>>, String> {
     let mut texts = Vec::new();
@@ -1671,16 +1679,42 @@ fn mr81_panel(root: &Path) -> Result<Vec<Vec<String>>, String> {
         // lossy UTF-8 read would put a replacement character into committed data.
         texts.push(bytes.iter().map(|b| *b as char).collect::<String>());
     }
-    let reports: Vec<fixtures::Mr81Report<'_>> = MR81_FILES
+
+    // Read before any of it is split, because the rows are borrowed from these sheets.
+    let mut sheets: Vec<(u16, Vec<Vec<String>>)> = Vec::new();
+    for year in MR81_WORKBOOKS {
+        let source = registered(&format!("mr81-{year}"));
+        let bytes = cache::read_cached(root, source).map_err(|e| e.to_string())?;
+        let book = spreadsheet::open(bytes).map_err(|e| e.to_string())?;
+        // October 2019 and October 2021 name the sheet `Data ` — with a trailing space. Matched
+        // by stem for the same reason SD-1's worksheets are: the name is the publisher's typing
+        // and the sheet is the publisher's data.
+        let name = book
+            .sheet_names()
+            .into_iter()
+            .find(|sheet| sheet.trim() == "Data")
+            .ok_or_else(|| format!("the MR-81 workbook for October {year} has no Data sheet"))?;
+        // `&name` would be a needless borrow of a `String`; the reader takes `&str`.
+        let rows = book.rows(name.as_ref()).map_err(|e| e.to_string())?;
+        sheets.push((year, rows));
+    }
+
+    let mut reports: Vec<fixtures::Mr81Report<'_>> = MR81_FILES
         .iter()
         .zip(&texts)
         .map(|((year, stream, layout), text)| fixtures::Mr81Report {
             year: *year,
             stream: *stream,
-            layout: *layout,
-            text,
+            body: fixtures::Mr81Body::Text {
+                layout: *layout,
+                text,
+            },
         })
         .collect();
+    for (year, sheet) in &sheets {
+        let label = format!("the MR-81 workbook for October {year}");
+        reports.extend(fixtures::workbook_filings(*year, sheet, &label)?);
+    }
     fixtures::build_mr81(&reports)
 }
 
