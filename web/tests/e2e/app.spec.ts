@@ -5530,25 +5530,53 @@ test.describe("the hold-harmless machinery", () => {
 });
 
 test.describe("what the scenario holds fixed", () => {
-  test("the caveat is above the controls, not below the results", async ({ page }) => {
-    /*
-     * It is a limit on what the reader is about to do, not a footnote on what they got. The
-     * department's own calculator warns that its statewide constants are not recalculated when a
-     * district's data changes; that caveat is larger here, where every lever moves every district.
-     */
-    await page.goto("/scenario");
-    const caveat = page.locator('.card[data-part="held-fixed"]');
-    await expect(caveat).toContainText("What these levers hold fixed");
-    await expect(caveat).toContainText("not recalculated");
+  /*
+   * Both routes, and the district one is the route that most needed it.
+   *
+   * It renders the identical five levers and carried none of this: its own "What this does not
+   * move" card names assessed valuation and enrollment — limits specific to that view — and said
+   * nothing about the $812.5M of categoricals the base cost lever also scales. A test that checked
+   * only `/scenario` is what let that stand, and it is the same scoping mistake the year-chip rule
+   * records making.
+   */
+  for (const route of ["/scenario", `/district/${CLEVELAND}/scenario`]) {
+    test(`the caveat is above the controls, not below the results — ${route}`, async ({ page }) => {
+      /*
+       * It is a limit on what the reader is about to do, not a footnote on what they got. The
+       * department's own calculator warns that its statewide constants are not recalculated when a
+       * district's data changes; that caveat is larger here, where every lever moves every district.
+       */
+      await page.goto(route);
+      const caveat = page.locator('.card[data-part="held-fixed"]');
+      await expect(caveat).toContainText("What these levers hold fixed");
+      await expect(caveat).toContainText("not recalculated");
+      // The four things it exists to name, none of which the district route said before.
+      await expect(caveat).toContainText("DPIA");
+      await expect(caveat).toContainText("targeted assistance");
+      await expect(caveat).toContainText("Gifted");
+      await expect(caveat).toContainText("preschool");
 
-    // Above the controls in document order.
-    const order = await page.evaluate(() => {
-      const c = document.querySelector('[data-part="held-fixed"]');
-      const controls = document.querySelector("#scenario-root");
-      if (!c || !controls) return null;
-      return c.compareDocumentPosition(controls) & Node.DOCUMENT_POSITION_FOLLOWING ? "before" : "after";
+      // Above the controls in document order.
+      const order = await page.evaluate(() => {
+        const c = document.querySelector('[data-part="held-fixed"]');
+        const controls = document.querySelector("#scenario-root");
+        if (!c || !controls) return null;
+        return c.compareDocumentPosition(controls) & Node.DOCUMENT_POSITION_FOLLOWING
+          ? "before"
+          : "after";
+      });
+      expect(order).toBe("before");
     });
-    expect(order).toBe("before");
+  }
+
+  test("the two routes state the same caveat rather than two drifting copies", async ({ page }) => {
+    // One component, so this is a property of the arrangement rather than of the prose. It fails
+    // the moment somebody copies the markup back into a page to reword it there.
+    await page.goto("/scenario");
+    const statewide = (await page.locator('[data-part="held-fixed"]').innerText()).replace(/\s+/g, " ");
+    await page.goto(`/district/${CLEVELAND}/scenario`);
+    const district = (await page.locator('[data-part="held-fixed"]').innerText()).replace(/\s+/g, " ");
+    expect(district).toBe(statewide);
   });
 
   test("the divergence from the department's tool is stated, with its size", async ({ page }) => {

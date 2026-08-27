@@ -59,6 +59,17 @@ export interface RefreshEffect {
   slug: string;
 }
 
+/*
+ * Both results are memoised on the district array's identity.
+ *
+ * `loadFeed` caches, so every page in a build receives the same array object, and these are now
+ * called from a component two routes render — one of which is 609 pages. `refreshEffect` runs
+ * `applyAll` three times over the whole panel; doing that per district page is 1.1M formula
+ * evaluations for one sentence that is identical on all of them.
+ */
+const effects = new WeakMap<object, WeakMap<object, RefreshEffect | null>>();
+const totalsByPanel = new WeakMap<object, HeldFixed>();
+
 /** Total realized aid across the panel at one base cost scale. */
 function delivered(districts: PanelDistrict[], scale: number, model: number): number {
   return totals(applyAll(districts, { ...currentLaw(model), baseCostScale: scale }, model))
@@ -77,6 +88,15 @@ export function refreshEffect(
   drafts: Draft[],
   model: number,
 ): RefreshEffect | null {
+  // Keyed on both arguments. Keying on the panel alone was wrong the moment anything called this
+  // twice with different drafts, and `null` is a real answer here — so `has`, not a truthy check.
+  let byDrafts = effects.get(districts);
+  if (byDrafts?.has(drafts)) return byDrafts.get(drafts)!;
+  if (!byDrafts) {
+    byDrafts = new WeakMap();
+    effects.set(districts, byDrafts);
+  }
+
   const candidates = drafts
     .flatMap((draft) => draft.provisions.map((provision) => ({ draft, provision })))
     .filter(({ provision }) => provision.lever === "base-cost");
@@ -91,10 +111,16 @@ export function refreshEffect(
    */
   const priced =
     candidates.find(({ draft }) => draft.provisions.length === 1) ?? candidates[0];
-  if (!priced) return null;
+  if (!priced) {
+    byDrafts.set(drafts, null);
+    return null;
+  }
 
   const scale = Number(priced.provision.proposed);
-  if (!Number.isFinite(scale) || scale <= 0) return null;
+  if (!Number.isFinite(scale) || scale <= 0) {
+    byDrafts.set(drafts, null);
+    return null;
+  }
 
   /*
    * The same panel with the denominated categoricals zeroed, which is what "held fixed" means in
@@ -110,12 +136,14 @@ export function refreshEffect(
   const throughBaseCost = delivered(held, scale, model) - baseline;
   const both = delivered(districts, scale, model) - baseline;
 
-  return {
+  const effect: RefreshEffect = {
     scale,
     throughBaseCost,
     throughCategoricals: both - throughBaseCost,
     slug: priced.draft.slug,
   };
+  byDrafts.set(drafts, effect);
+  return effect;
 }
 
 /**
@@ -137,6 +165,8 @@ export interface HeldFixed {
 
 /** Sum them. Build-time: `preschool_special_education` is not on the browser's slim panel. */
 export function heldFixed(districts: District[]): HeldFixed {
+  const seen = totalsByPanel.get(districts);
+  if (seen) return seen;
   let denominated = 0;
   let indexDriven = 0;
   let preschoolWeighted = 0;
@@ -146,5 +176,7 @@ export function heldFixed(districts: District[]): HeldFixed {
     // The weighted half is the total less the flat component, which is how the Rust separates it.
     preschoolWeighted += d.preschool_special_education.total - d.preschool_special_education.flat_component;
   }
-  return { denominated, indexDriven, preschoolWeighted };
+  const summed = { denominated, indexDriven, preschoolWeighted };
+  totalsByPanel.set(districts, summed);
+  return summed;
 }
