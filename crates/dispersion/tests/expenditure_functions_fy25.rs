@@ -206,9 +206,21 @@ fn normalising_by_the_population_served_reverses_the_comparison() {
 // The comparison the same file supports and the fact-check did not make
 // ---------------------------------------------------------------------------------------
 
-/// Toledo spends $6,173 more per pupil and a markedly *smaller* share of it in the classroom.
+/// Toledo spends $6,172 more per pupil and a markedly *smaller* share of it in the classroom.
 /// This is a function-level difference between the two districts an order of magnitude larger
 /// than the special-education share the claim happened to name.
+///
+/// # Every figure here is asserted as a value, and two of them used not to be
+///
+/// `education-agency/toledo-city` prints this table to the tenth of a point and the gap to the
+/// dollar. Plant and building administration were checked here as *ratios* — `Toledo > 1.8x
+/// Perrysburg` — which is true of the published shares and would also be true of a great many
+/// wrong ones, so the two figures the corpus published were not the two figures under test.
+///
+/// The gap was worse than that in a smaller way. It was asserted at `6_173.0` within two dollars,
+/// and the difference of the two published per-pupil figures is `$6,172.41`. Both nodes published
+/// `$6,173`, and the tolerance was wide enough that nothing said so for as long as the corpus
+/// carried it. See #218 and both nodes' `revisions:`.
 #[test]
 fn toledo_spends_more_and_a_smaller_share_of_it_on_instruction() {
     close(
@@ -236,15 +248,35 @@ fn toledo_spends_more_and_a_smaller_share_of_it_on_instruction() {
         "Perrysburg classroom instruction share",
     );
 
-    // Where the gap actually opens: plant and building administration, not instruction.
-    assert!(
-        share(TOLEDO, |d| d.operations_maintenance)
-            > 1.8 * share(PERRYSBURG, |d| d.operations_maintenance)
+    // Where the gap actually opens: plant and building administration, not instruction. Stated
+    // to the tenth of a point because that is how the corpus prints them.
+    close(
+        share(TOLEDO, |d| d.operations_maintenance),
+        0.148,
+        0.0005,
+        "Toledo operations and maintenance share",
     );
-    assert!(share(TOLEDO, |d| d.school_admin) > 1.7 * share(PERRYSBURG, |d| d.school_admin));
+    close(
+        share(PERRYSBURG, |d| d.operations_maintenance),
+        0.077,
+        0.0005,
+        "Perrysburg operations and maintenance share",
+    );
+    close(
+        share(TOLEDO, |d| d.school_admin),
+        0.085,
+        0.0005,
+        "Toledo building administration share",
+    );
+    close(
+        share(PERRYSBURG, |d| d.school_admin),
+        0.048,
+        0.0005,
+        "Perrysburg building administration share",
+    );
 
     let gap = function(TOLEDO, |d| d.operating) - function(PERRYSBURG, |d| d.operating);
-    close(gap, 6_173.0, 2.0, "per-pupil spending gap");
+    close(gap, 6_172.41, 0.01, "per-pupil spending gap");
 }
 
 /// Neither district is typical, which is the point of holding both. Toledo sits near the top of

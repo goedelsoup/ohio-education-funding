@@ -16,7 +16,7 @@ description: |
 
   ### Where its extra spending goes, which is not where the argument assumed
 
-  Toledo spends $6,173 more per pupil than Perrysburg and a markedly *smaller* share of it in a
+  Toledo spends $6,172 more per pupil than Perrysburg and a markedly *smaller* share of it in a
   classroom: [verified]
 
                                     Toledo     Perrysburg
@@ -80,6 +80,179 @@ revisions:
       special-education dollars are the fact-check's, from statements not held here. A 1.94x
       population difference against a 1.36x spending difference leaves no room for the sign to
       return. [inference]
+  - was: |
+      Toledo spends $6,173 more per pupil than Perrysburg.
+    now: |
+      $6,172. The department publishes $20,804.57 and $14,632.16, whose difference is $6,172.41.
+    found_by: |
+      Binding the gap to `crates/figures`. The crate test that already checked it asserted
+      `close(gap, 6_173.0, 2.0)` — two dollars of tolerance around a figure the corpus published
+      to the dollar, so the rounding sat inside the check the whole time.
+    reach: |
+      One dollar on one figure, stated in this node and in
+      [Perrysburg](perrysburg-exempted-village.yml). Nothing reads the gap to the dollar, and the
+      function shares beside it are untouched. [verified]
+figures:
+  - key: dispersion/toledo-enrolled-adm
+    value: 21159.7532
+    field: description
+    as_written: "21,160 pupils"
+  - key: dispersion/toledo-operating-expenditure
+    value: 440219539.58
+    field: description
+    as_written: "$440.2 million of operating expenditure"
+  - key: dispersion/toledo-operating-per-headcount-pupil
+    value: 20804.57
+    field: description
+    as_written: "**$20,805 per headcount pupil**"
+  - key: dispersion/toledo-performance-index
+    value: 60.4
+    field: description
+    as_written: "a Performance Index of 60.4"
+  - key: dispersion/toledo-progress-effect-size-below-zero
+    value: 0.02
+    field: description
+    as_written: "a Progress effect size of −0.02"
+  - key: dispersion/toledo-perrysburg-operating-gap
+    value: 6172.41
+    field: description
+    as_written: "$6,172 more per pupil than Perrysburg"
+  - key: dispersion/toledo-instruction-share
+    value: 0.51264
+    field: description
+    as_written: "instruction 51.3%"
+  - key: dispersion/perrysburg-instruction-share
+    value: 0.626336
+    field: description
+    as_written: "instruction 51.3% 62.6%"
+  - key: dispersion/toledo-classroom-instruction-share
+    value: 0.634295
+    field: description
+    as_written: "classroom instruction (CRI) 63.4%"
+  - key: dispersion/perrysburg-classroom-instruction-share
+    value: 0.731052
+    field: description
+    as_written: "classroom instruction (CRI) 63.4% 73.1%"
+  - key: dispersion/toledo-operations-maintenance-share
+    value: 0.147773
+    field: description
+    as_written: "operations and maintenance 14.8%"
+  - key: dispersion/perrysburg-operations-maintenance-share
+    value: 0.077453
+    field: description
+    as_written: "operations and maintenance 14.8% 7.7%"
+  - key: dispersion/toledo-school-admin-share
+    value: 0.085123
+    field: description
+    as_written: "school administration 8.5%"
+  - key: dispersion/perrysburg-school-admin-share
+    value: 0.048492
+    field: description
+    as_written: "school administration 8.5% 4.8%"
+  - key: dispersion/toledo-pupil-support-share
+    value: 0.081497
+    field: description
+    as_written: "pupil support 8.1%"
+  - key: dispersion/perrysburg-pupil-support-share
+    value: 0.084977
+    field: description
+    as_written: "pupil support 8.1% 8.5%"
+  - key: dispersion/perrysburg-pupil-transportation-share
+    value: 0.033671
+    field: description
+    as_written: "pupil transportation 1.6% 3.4%"
+  - key: dispersion/toledo-per-equivalent-pupil
+    value: 14312
+    field: findings
+    as_written: "weighted ADM gives **$14,312**"
+  - key: dispersion/toledo-operating-per-headcount-pupil
+    value: 20804.57
+    field: findings
+    as_written: "Divided by headcount it gives $20,805"
+  - key: dispersion/toledo-denominator-spread
+    value: 0.453609
+    field: findings
+    as_written: "A 45% spread for one district in one year"
+  - key: dispersion/toledo-weighted-adm
+    value: 30758
+    field: findings
+    as_written: "Toledo's weighted ADM is 30,758"
+  - key: dispersion/toledo-enrolled-adm
+    value: 21159.7532
+    field: findings
+    as_written: "against 21,160 enrolled"
+  - key: dispersion/toledo-weight-ratio
+    value: 1.453609
+    field: findings
+    as_written: "a weight ratio of 1.45"
+  - key: dispersion/toledo-economically-disadvantaged-share
+    value: 0.989
+    field: findings
+    as_written: "a 98.9% economically disadvantaged share"
+  - key: dispersion/toledo-students-with-disabilities-share
+    value: 0.219
+    field: findings
+    as_written: "a 21.9% disability share"
+  - key: dispersion/perrysburg-students-with-disabilities-share
+    value: 0.113
+    field: findings
+    as_written: "disability share is 21.9% against Perrysburg's 11.3%"
+  - key: dispersion/toledo-enrolled-adm
+    value: 21159.7532
+    field: fy2025_profile
+    as_written: "Enrolled ADM (unweighted) 21,159.75"
+  - key: dispersion/toledo-weighted-adm
+    value: 30758
+    field: fy2025_profile
+    as_written: "weighted ADM 30,758"
+  - key: dispersion/toledo-weight-ratio
+    value: 1.453609
+    field: fy2025_profile
+    as_written: "weight ratio 1.454"
+  - key: dispersion/toledo-operating-expenditure
+    value: 440219539.58
+    field: fy2025_profile
+    as_written: "Operating expenditure $440,219,539.58"
+  - key: dispersion/toledo-operating-per-headcount-pupil
+    value: 20804.57
+    field: fy2025_profile
+    as_written: "$20,805 per headcount pupil,"
+  - key: dispersion/toledo-per-equivalent-pupil
+    value: 14312
+    field: fy2025_profile
+    as_written: "$14,312 per equivalent pupil"
+  - key: dispersion/toledo-economically-disadvantaged-share
+    value: 0.989
+    field: fy2025_profile
+    as_written: "Economically disadvantaged 98.9%"
+  - key: dispersion/toledo-students-with-disabilities-share
+    value: 0.219
+    field: fy2025_profile
+    as_written: "students with disabilities 21.9%"
+  - key: dispersion/toledo-english-learner-share
+    value: 0.024
+    field: fy2025_profile
+    as_written: "English learners 2.4%"
+  - key: dispersion/toledo-performance-index
+    value: 60.4
+    field: fy2025_profile
+    as_written: "Performance Index 60.4 (2024-25)"
+  - key: dispersion/toledo-performance-index-prior
+    value: 57.9
+    field: fy2025_profile
+    as_written: "57.9 (2023-24)"
+  - key: dispersion/toledo-performance-index-earliest
+    value: 58.8
+    field: fy2025_profile
+    as_written: "58.8 (2022-23)"
+  - key: dispersion/toledo-progress-effect-size-below-zero
+    value: 0.02
+    field: fy2025_profile
+    as_written: "Progress effect size −0.02"
+  - key: dispersion/toledo-progress-composite-below-zero
+    value: 5.07
+    field: fy2025_profile
+    as_written: "composite −5.07"
 properties:
   seeded_because: |
     The corpus's second urban exemplar. A circulating claim about its special-education spending
