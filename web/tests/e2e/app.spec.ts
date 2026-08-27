@@ -6146,3 +6146,94 @@ test.describe("the statute timeline", () => {
     await expect(page.locator("#acts tbody td:empty")).toHaveCount(0);
   });
 });
+
+/**
+ * `/compare` ships its comparison, and fetches a pair rather than a panel.
+ *
+ * # The measurement this holds
+ *
+ * The route used to download the whole 609-district panel — 641,042 B, 127,961 gzipped — to render
+ * seventeen rows about two districts, and shipped an empty `#compare-out` until it landed. At
+ * 400 Kbps / 400 ms RTT: first paint 1,284 ms, panel finishing **4,131 ms**, table 4,340 ms. Three
+ * seconds of an empty box. That was the last open half of #111.
+ *
+ * Measured again after: a bare `/compare` has its table in the HTML and fetches **nothing**, and
+ * `?a=&b=` fetches two files totalling **1,181 B** and finishes at 1,678 ms against a first paint
+ * of 1,264 ms.
+ *
+ * # Why none of these assertions is a stopwatch
+ *
+ * A wall-clock threshold in CI is a claim about the runner. What actually changed is *what the
+ * page does*, and that is exact: the table is either in the document or it is not, and the request
+ * list is either two district files or it is a panel. Both survive a slow machine, and neither can
+ * be satisfied by the old shape.
+ */
+test.describe("the comparison arrives with the page", () => {
+  const DIST = join(import.meta.dirname, "../../dist");
+
+  test("the built page carries a whole comparison table, not an empty div", () => {
+    const page = readFileSync(join(DIST, "compare.html"), "utf8");
+    const card = /<div class="card" id="comparison"[^>]*data-a="(\d+)"[^>]*data-b="(\d+)"/.exec(page);
+    expect(card, "#compare-out holds a comparison card naming its own pair").not.toBeNull();
+    expect(card![1], "and the pair is the corpus's own property-poor half").toBe(NORTHERN);
+
+    // Seventeen rows: thirteen quantities and four flags, each addressable by its own key.
+    expect((page.match(/data-row="/g) ?? []).length).toBe(17);
+    // Both column heads name a district and link to it, which is the half a swap rewrites.
+    // `[^>]*` because a post-build pass adds `scope="col"` between the tag and the attribute.
+    expect((page.match(/<th[^>]*data-head="[ab]"[^>]*><a href="\/district\//g) ?? []).length).toBe(2);
+    // And no cell is waiting to be filled in: the figures are there, not placeholders.
+    expect(page).not.toContain("<td class=\"tnum\"></td>");
+  });
+
+  test("one district is about a kilobyte, and there are 609 of them", () => {
+    const dir = join(DIST, "data", "district");
+    const files = readdirSync(dir).filter((name) => name.endsWith(".json"));
+    expect(files.length, "one per district in the feed").toBe(609);
+    const sizes = files.map((name) => readFileSync(join(dir, name), "utf8").length);
+    const largest = Math.max(...sizes);
+    expect(
+      largest,
+      "a district's formula inputs, against the 641,042 B panel this route used to download",
+    ).toBeLessThan(2_048);
+  });
+
+  test("a bare /compare fetches no data at all", async ({ page }) => {
+    const asked: string[] = [];
+    page.on("request", (request) => {
+      if (request.url().includes("/data/")) asked.push(request.url().split("/data/")[1]!);
+    });
+    await page.goto("/compare");
+    await expect(page.locator("#comparison")).toBeVisible();
+    // Settle: a fetch fired late would still be a fetch.
+    await expect(page.locator("#comparison th[data-head='a']")).toContainText("Northern Local");
+    expect(
+      asked,
+      "the document it was served is already the comparison it is about, so there is nothing to ask for",
+    ).toEqual([]);
+  });
+
+  test("a pair in the query costs two districts, and a swap costs one more", async ({ page }) => {
+    const asked: string[] = [];
+    page.on("request", (request) => {
+      if (request.url().includes("/data/")) asked.push(request.url().split("/data/")[1]!);
+    });
+    await page.goto(`/compare?a=${CLEVELAND}&b=043802`);
+    await expect(page.locator("#comparison")).toHaveAttribute("data-a", CLEVELAND);
+    expect(asked.sort(), "two districts, and never the panel").toEqual([
+      `district/${CLEVELAND}.json`,
+      "district/043802.json",
+    ]);
+
+    // The other half of the pair is already held, so only the newcomer is fetched.
+    await page.selectOption("#cmp-a", NORTHERN);
+    await expect(page.locator("#comparison")).toHaveAttribute("data-a", NORTHERN);
+    expect(asked.length, "one more request, not two").toBe(3);
+    expect(asked[2]).toBe(`district/${NORTHERN}.json`);
+
+    // And back: nothing is fetched twice.
+    await page.selectOption("#cmp-a", CLEVELAND);
+    await expect(page.locator("#comparison")).toHaveAttribute("data-a", CLEVELAND);
+    expect(asked.length, "a district looked at twice is fetched once").toBe(3);
+  });
+});

@@ -11,9 +11,11 @@
  * on this site where the combinatorics genuinely defeat static generation.
  */
 import Base from "../layouts/Base.astro";
+import { comparison, type Years } from "../lib/compare.ts";
 import { loadFeed, qualifiedName } from "../lib/feed.ts";
 import { count } from "../lib/format.ts";
 import * as routes from "../lib/routes.ts";
+import { yearChipPair, yearOf } from "../lib/year.ts";
 
 const { bundle, alphabetical } = loadFeed();
 
@@ -28,6 +30,52 @@ const named = SEEDED.map((pair) => ({
   aName: alphabetical.find((d) => d.irn === pair.a)?.name ?? pair.a,
   bName: alphabetical.find((d) => d.irn === pair.b)?.name ?? pair.b,
 }));
+
+/**
+ * The comparison is in the document, for the pair a bare `/compare` is about.
+ *
+ * It used to be an empty `<div>` filled after a 641 KB download: at 400 Kbps / 400 ms RTT, first
+ * paint at 1,284 ms and a table at 4,340 ms. Three seconds of an empty box for seventeen rows.
+ * Rendering it here costs one card of HTML and makes the front door of this route complete before
+ * any script runs — which is what every other page on this site already promises.
+ *
+ * The first seeded pair rather than an arbitrary one: it is the corpus's own property-poor against
+ * property-rich contrast, it is what `scripts/compare.ts` falls back to, and a reader who arrives
+ * with no query is asking this page to make its argument rather than a particular one.
+ */
+const default_ = SEEDED[0]!;
+const side = (irn: string) => {
+  const district = bundle.districts.find((d) => d.irn === irn);
+  if (!district) {
+    throw new Error(
+      `/compare is seeded with ${irn}, which is not in the feed. The seeded pairs are the ` +
+        `corpus's own contrast arguments, so a missing one is a corpus edit rather than a typo.`,
+    );
+  }
+  return { district, name: qualifiedName(district) };
+};
+/*
+ * Every year the table names, read from the feed rather than written here. `Years` spells its four
+ * series out instead of taking a lookup, so a row that wants a fifth has to come through this
+ * object — see the rule in `lib/year.ts`.
+ */
+const years: Years = {
+  fiscal: bundle.fiscal_year,
+  millage: yearOf("millage"),
+  enrollment: yearOf("enrollment"),
+  profile: yearOf("profile"),
+  spending: yearOf("outcome.spending"),
+};
+/*
+ * Two reckonings in the chip and the third in a row header. The aid rows are the model's FY, the
+ * spending row is the report card's, and the valuation row says its own — see `lib/compare.ts`.
+ */
+const seeded = comparison(
+  years,
+  side(default_.a),
+  side(default_.b),
+  yearChipPair("formula", "outcome.spending", "spending"),
+);
 ---
 
 <Base
@@ -72,14 +120,16 @@ const named = SEEDED.map((pair) => ({
     </div>
   </div>
 
-  <div id="compare-out"></div>
+  <div id="compare-out" set:html={seeded} />
 
   <noscript>
-    <div class="card err" id="needs-script" data-part="needs-script">
+    <div class="card" id="needs-script" data-part="needs-script">
       <p class="note">
-        This page needs JavaScript: the pair is chosen by the reader and there are 185,000 of them,
-        which is more pages than a static site should mint. Every district's own figures are in the
-        document on <a href="/districts">its page</a>, which needs nothing.
+        The comparison above is the one this page is seeded with, and it is complete without
+        JavaScript. <strong>Changing the pair needs it</strong>: there are 185,000 pairs, which is
+        more pages than a static site should mint, so the two districts you pick are fetched. Every
+        district's own figures are in the document on <a href="/districts">its page</a>, which
+        needs nothing.
       </p>
     </div>
   </noscript>

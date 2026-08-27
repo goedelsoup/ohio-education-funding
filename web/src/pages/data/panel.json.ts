@@ -17,7 +17,7 @@
 
 import type { APIRoute } from "astro";
 
-import { loadFeed } from "../../lib/feed.ts";
+import { formulaInputs, loadFeed } from "../../lib/feed.ts";
 import type { Panel } from "../../lib/types.ts";
 
 export const GET: APIRoute = () => {
@@ -41,32 +41,7 @@ export const GET: APIRoute = () => {
     projection: bundle.projection,
     // The Census comparison is not a formula input, so it stays out of the browser's copy.
     deflator: bundle.deflator,
-    districts: bundle.districts.map(
-      ({
-        finances: _f,
-        outcome: _o,
-        base_cost_build_up: _b,
-        property_tax: _p,
-        spending_by_function: _s,
-        millage: _m,
-        regime: _r,
-        special_education: _se,
-        career_technical: _ct,
-        english_learners: _el,
-        dpia: _d,
-        targeted_assistance: _ta,
-        gifted: _g,
-        house_districts: _hd,
-        supplements: _sup,
-        transportation: _tr,
-        preschool_special_education: _pk,
-        transition: _tn,
-        national: _nat,
-        casino: _cas,
-        casino_counties: _cc,
-        ...district
-      }) => district,
-    ),
+    districts: bundle.districts.map(formulaInputs),
   };
 
   return new Response(JSON.stringify(panel), {
