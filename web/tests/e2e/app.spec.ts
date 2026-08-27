@@ -5821,6 +5821,25 @@ test.describe("what the budget is made of", () => {
 });
 
 test.describe("a draft opened in the runner", () => {
+  /**
+   * The runner is live: its panel has arrived and its levers are wired.
+   *
+   * Nothing may touch a control before this resolves, and on a draft URL that is not a matter of
+   * patience. `src/scripts/scenario.ts` boots from `fetch(data/panel.json)`, and until it lands
+   * `#scenario-out` is empty and no `input` listener exists — so a control is an `<input>` and not
+   * a lever. `boot` then calls `put()` for every lever the draft sets and renders with
+   * `fromControls: false`, on purpose, because the sliders are quantized and the bill's values are
+   * not. An edit made before boot is therefore not ignored. It is **undone**.
+   *
+   * That is #219. The test below waited on `[data-part="draft-departed"]` having count zero, which
+   * the empty pre-boot page satisfies exactly as well as the loaded one does, and then moved a
+   * lever into a page with nothing listening. It failed twice in full-suite runs, where the fetch
+   * competes with three other workers, and never in isolation or on CI.
+   */
+  async function runnerIsLive(page: Page): Promise<void> {
+    await expect(page.locator('.card[data-part="draft"]')).toContainText("Opened from a draft");
+  }
+
   test("the unpriced provisions are on screen with the total, not below it", async ({ page }) => {
     /*
      * The rule this whole class rests on, at the layer where it is easiest to lose. `crates/project`
@@ -5865,6 +5884,7 @@ test.describe("a draft opened in the runner", () => {
     // the draft. Removing the banner instead would be worse — a figure they still believe is the
     // bill's, with nothing to correct them.
     await page.goto("/scenario?draft=fund-the-plan-and-retire-the-guarantee");
+    await runnerIsLive(page);
     await expect(page.locator('[data-part="draft-departed"]')).toHaveCount(0);
 
     await page.locator("#lv-base").fill("1.08");
@@ -5875,6 +5895,44 @@ test.describe("a draft opened in the runner", () => {
     );
     // And the missing clauses stay put: a departed scenario is short the same three provisions.
     await expect(page.locator('[data-part="draft-unpriced"] li')).toHaveCount(3);
+  });
+
+  test("a lever moved before the runner is live is undone, not obeyed", async ({ page }) => {
+    /*
+     * The behaviour the test above depends on, pinned rather than assumed, and the reason #219
+     * could not be closed by adding a `retry`.
+     *
+     * The panel is held back so the window is a certainty instead of a race — 800ms against a
+     * fetch that normally takes single-digit milliseconds. The slider is moved into that window,
+     * where nothing is listening, and the assertions are that `boot` puts it back and renders the
+     * *bill's* figure under the banner that says it is the bill's.
+     *
+     * `−$143.9M` is what makes this worth a test rather than a comment. The control cannot express
+     * the refresh provision's 1.0395 — it steps by 0.01 — so a runner that read its controls for
+     * the first render would publish −$139.9M under "Opened from a draft". That is the one thing
+     * `fromControls: false` exists to prevent, and it is invisible in every other test here
+     * because every other test lets the page settle first.
+     */
+    await page.route("**/data/panel.json", async (route) => {
+      await new Promise((resolve) => setTimeout(resolve, 800));
+      await route.continue();
+    });
+    await page.goto("/scenario?draft=fund-the-plan-and-retire-the-guarantee");
+
+    // Into the window. Without the route above this line is a coin flip, which is what #219 was.
+    await page.locator("#lv-base").fill("1.08");
+    await page.locator("#lv-base").dispatchEvent("input");
+
+    await runnerIsLive(page);
+    await expect(page.locator("#lv-base"), "the draft put its own value back").toHaveValue("1.04");
+    await expect(
+      page.locator('[data-part="draft-departed"]'),
+      "nothing departed, because nothing the reader did survived",
+    ).toHaveCount(0);
+    await expect(
+      page.locator("#scenario-out"),
+      "and the figure is the bill's, not the one the quantized slider can reach",
+    ).toContainText("\u2212$143.9M");
   });
 
   test("a draft that prices completely says so rather than staying silent", async ({ page }) => {
