@@ -2793,6 +2793,59 @@ test.describe("the scenario builder", () => {
     await expect(page.locator("#scenario-out")).toContainText("294");
     await expect(page.locator("#scenario-out")).toContainText("moves the district onto the formula");
   });
+
+  /*
+   * The `?draft=` path renders before the first read of a control, on purpose — a draft's lever
+   * values are off the slider's step grid. That made it the one path a query string reached
+   * unvalidated, because the range inputs were doing the clamping everywhere else.
+   *
+   * Both of these were live: the first locked the tab, the second put four readings of one scenario
+   * on screen at once. They are pinned here rather than in the unit suite because what went wrong
+   * is the *composition* of two entry points, and only a browser has both.
+   */
+  test("a draft composed with an absurd horizon still renders", async ({ page }) => {
+    await page.goto("/scenario?draft=hb-96-with-refreshed-inputs&h=999999");
+    // Before the clamp this never resolved: `forecastPath` walked a million fiscal years, each one
+    // a projection plus three formula runs over 609 districts.
+    await expect(page.locator("#projection-out .tile").first()).toBeVisible({ timeout: 15_000 });
+    await expect(page.locator("#lv-horizon")).toHaveValue("2036");
+    await expect(page).toHaveURL(/[?&]h=2036/);
+  });
+
+  test("a draft composed with an out-of-range lever agrees with its own control", async ({
+    page,
+  }) => {
+    await page.goto("/scenario?draft=hb-96-with-refreshed-inputs&base=100");
+    await expect(page.locator("#scenario-out .tile, #scenario-out .card")).not.toHaveCount(0);
+
+    // The three that used to disagree: the figure was computed at 100, the slider showed 1.3, and
+    // the label read +9900%.
+    await expect(page.locator("#lv-base")).toHaveValue("1.3");
+    await expect(page.locator("#lv-base-out")).toHaveText("+30%");
+    await expect(page).toHaveURL(/[?&]base=1\.3(&|$)/);
+
+    /*
+     * And the figure is the bound's, not the request's. Asserted against the same URL written with
+     * the bound rather than against a literal: `+$2.31B` at the top of the slider is a real number
+     * that will move when the feed does, and pinning it here would make this test fail for the
+     * wrong reason. What has to hold is that 100 and 1.3 are the same scenario — before the clamp,
+     * 100 rendered `+$928.15B`.
+     */
+    const clamped = await page.locator("#scenario-out .tile .v").first().textContent();
+    await page.goto("/scenario?draft=hb-96-with-refreshed-inputs&base=1.3");
+    await expect(page.locator("#scenario-out .tile, #scenario-out .card")).not.toHaveCount(0);
+    await expect(page.locator("#scenario-out .tile .v").first()).toHaveText(clamped!);
+  });
+
+  test("a draft's own off-grid value survives the clamp", async ({ page }) => {
+    // The clamp enforces the ends and not the step, and this is why: `1.0395` is what the bill
+    // prices, the slider steps by 0.01, and snapping would put a number that is not the bill's
+    // under a banner saying it is.
+    await page.goto("/scenario?draft=hb-96-with-refreshed-inputs");
+    await expect(page.locator("#scenario-out .tile, #scenario-out .card")).not.toHaveCount(0);
+    await expect(page.locator('[data-part="draft-departed"]')).toHaveCount(0);
+    await expect(page.locator("#scenario-out .tile .v").first()).toHaveText("+$220.5M");
+  });
 });
 
 test.describe("the projection", () => {
