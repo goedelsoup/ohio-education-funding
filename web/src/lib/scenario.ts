@@ -645,7 +645,11 @@ export function renderScenario(bundle: Panel, levers: Levers, chip = ""): Render
       <div class="scroll"><table><tbody>
         <tr><th>On the guarantee</th>
             <td>${bundle.statewide.on_guarantee} → ${t.onGuarantee}</td></tr>
-        <tr><th>At the minimum state share</th>
+        <tr><th>At the minimum state share<div class="n">A floor, not a census. A district the
+          published model put on the minimum has its local capacity censored — all that is known is
+          that it exceeds the threshold, not by how much — so it stays on the floor here whatever
+          the lever does. <strong>This count can rise and cannot fall.</strong> Lower the minimum
+          below the model's and it will not move, though aid does.</div></th>
             <td>${bundle.statewide.at_minimum_state_share} → ${t.atMinimumStateShare}</td></tr>
         <tr><th>Guarantee, total</th>
             <td>${money(bundle.statewide.guarantee_total)} → ${money(t.guarantee)}</td></tr>

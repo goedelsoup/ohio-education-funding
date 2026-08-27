@@ -972,6 +972,23 @@ export const CheckpointSchema = z
     held_throughout: z.number().int().nonnegative(),
     lifted_off: z.number().int().nonnegative(),
     pushed_on: z.number().int().nonnegative(),
+    /**
+     * The rest of what `/scenario`'s "What moved underneath" card renders.
+     *
+     * Three of that card's five rows were computed in the browser and compared against nothing —
+     * directly beneath the claim that the page refuses to render until it has reproduced every
+     * checkpoint. `crates/project`'s `Totals` had carried all three since it was written; the
+     * checkpoint dropped them on the way out, so the gap was in the export rather than in the
+     * computation.
+     *
+     * `at_minimum_state_share` is the one worth naming: it can rise but never fall, because
+     * `censored` is read from the published model and never re-evaluated. Checking it against the
+     * Rust does not make it say more than it can — see the caveat the card now carries — but it does
+     * make the two implementations agree about what it says.
+     */
+    at_minimum_state_share: z.number().int().nonnegative(),
+    guarantee: num,
+    formula_aid: num,
   })
   .strict();
 

@@ -15,6 +15,7 @@ import { join } from "node:path";
 
 import { apply, applyAll, currentLaw, currentRealizedAid, totals } from "../../src/lib/policy.ts";
 import { compare, isVerified, toPolicy, verify } from "../../src/lib/verify.ts";
+import { loadFeed } from "../../src/lib/feed.ts";
 import { bin } from "../../src/lib/chart.ts";
 import { money, millions, ordinal, pct, percentileOf, signedMoney } from "../../src/lib/format.ts";
 import {
@@ -297,4 +298,81 @@ test("outcomes: spending per enrolled pupil is never below spending per weighted
       d.outcome.per_equivalent_pupil - 0.01,
     );
   }
+});
+
+/**
+ * The minimum-state-share count is a floor, and the page now says so.
+ *
+ * `apply` sets `atMinimum = censored || residualPerPupil < floorPerPupil`, and `censored` is read
+ * from the published model rather than re-evaluated. That is the honest treatment of a censored
+ * observation — a district the department put on the floor has local capacity known only to exceed
+ * the threshold — but it makes the derived count monotone, and `/scenario` was rendering it as a
+ * plain before → after pair.
+ *
+ * The visible consequence: at a 5% minimum, below the model's 10%, the row read `138 → 138` while
+ * realized aid fell $35M and 306 districts landed on the guarantee. The lever had plainly done
+ * something and the row said nothing had.
+ *
+ * This pins the property the new caveat states, so the sentence cannot become false quietly.
+ */
+test("the minimum-state-share count can rise and cannot fall", () => {
+  const { bundle } = loadFeed();
+  const model = bundle.statewide.minimum_state_share;
+  const at = (minimumStateShare: number) =>
+    totals(applyAll(bundle.districts, { ...currentLaw(model), minimumStateShare }, model))
+      .atMinimumStateShare;
+
+  const published = bundle.statewide.at_minimum_state_share;
+  expect(at(model)).toBe(published);
+
+  // Below the model's minimum: cannot fall, however far down the lever goes.
+  for (const lower of [0.09, 0.07, 0.05]) {
+    expect(at(lower), `minimum ${lower}`).toBe(published);
+  }
+  // Above it: rises, which is the direction the model can actually observe.
+  expect(at(0.3)).toBeGreaterThan(published);
+});
+
+/**
+ * The three new checkpoint fields reject a wrong value, one position at a time.
+ *
+ * `corpusFigures.spec.ts` states the rule this follows: *"A check that has only ever seen correct
+ * input has not been shown to reject anything."* Sixteen checks in this repository were green
+ * against the defect they were written for, and every one was found by mutation.
+ *
+ * That matters more than usual here. These three rows — districts at the minimum state share, the
+ * guarantee total, the formula aid total — were rendered by `/scenario` and compared against
+ * nothing, directly beneath the claim that the page will not render until it has reproduced every
+ * checkpoint. Adding them to the comparison without breaking it once would replace an unchecked
+ * figure with an unproven check.
+ */
+test("a wrong value in any of the three newly-exported fields is caught", () => {
+  const { bundle } = loadFeed();
+  const feed = { ...bundle, districts: bundle.districts } as never;
+  const clean = bundle.checkpoints[1]!;
+  expect(compare(feed, clean).agrees).toBe(true);
+
+  const mutations = [
+    ["at_minimum_state_share", clean.at_minimum_state_share + 1, "districts at the minimum state share"],
+    ["guarantee", clean.guarantee + 1_000, "guarantee total"],
+    ["formula_aid", clean.formula_aid + 1_000, "formula aid total"],
+  ] as const;
+
+  for (const [field, wrong, reported] of mutations) {
+    const found = compare(feed, { ...clean, [field]: wrong });
+    expect(found.agrees, `${field} accepted a wrong value`).toBe(false);
+    expect(found.differences.join(" "), `${field} was not the field reported`).toContain(reported);
+    // Only that one. A mutation that trips three comparisons has not shown which one is watching.
+    expect(found.differences).toHaveLength(1);
+  }
+});
+
+test("the dollar fields are checked at the same tolerance as the rest", () => {
+  // A dollar across seven billion. A looser bound on these two would let them agree while the
+  // formula they sum had drifted in a lever that only moves a few districts.
+  const { bundle } = loadFeed();
+  const feed = { ...bundle, districts: bundle.districts } as never;
+  const clean = bundle.checkpoints[1]!;
+  expect(compare(feed, { ...clean, formula_aid: clean.formula_aid + 0.5 }).agrees).toBe(true);
+  expect(compare(feed, { ...clean, formula_aid: clean.formula_aid + 1.5 }).agrees).toBe(false);
 });

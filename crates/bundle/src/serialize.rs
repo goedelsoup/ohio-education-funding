@@ -310,6 +310,9 @@ impl Bundle {
                     o.count("held_throughout", c.held_throughout);
                     o.count("lifted_off", c.lifted_off);
                     o.count("pushed_on", c.pushed_on);
+                    o.count("at_minimum_state_share", c.at_minimum_state_share);
+                    o.num("guarantee", c.guarantee);
+                    o.num("formula_aid", c.formula_aid);
                 }
             }
 
