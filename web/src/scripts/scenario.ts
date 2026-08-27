@@ -144,8 +144,10 @@ function toQuery(): void {
     min: String(l.minimumStateShare),
     pb: String(l.phaseInGeneral),
     pc: String(l.phaseInDpia),
-    h: String(l.horizon),
   });
+  // Only where a horizon can be set. The district route has no such control, draws no band, and
+  // reads nothing from `h` — so every URL it minted carried `h=2032` for a reader to copy and send.
+  if ($("#lv-horizon")) params.set("h", String(l.horizon));
   // `draft` survives every lever move. It is not lever state — see `draftSlug` — and dropping it
   // here would make the URL in the bar stop being the one that opened the bill, while the page
   // was still explaining that these figures came from one.
@@ -269,8 +271,14 @@ function reportFailure(verification: Verification): void {
                 .join("; ")}</li>`,
           )
           .join("");
-  const controls = $("#scenario-controls");
-  if (controls) controls.innerHTML = "";
+  /*
+   * The whole card, not the form inside it.
+   *
+   * Emptying `#scenario-controls` left `#levers` standing with nothing in it but its own heading —
+   * a card reading `Levers #` above an explanation that the builder is disabled. There are no
+   * levers; the heading was describing an empty box.
+   */
+  $("#levers")?.remove();
   // Every container the builder writes, not just the first. The disabled notice replaces the
   // simulation, and a detail half left below the fan chart would be figures from the last render
   // sitting under a card explaining that the derivation producing them cannot be trusted.

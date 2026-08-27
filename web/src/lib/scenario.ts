@@ -11,6 +11,7 @@ import { renderToString } from "./plot/client.ts";
 import { fanSpec, histogramSpec } from "./plot/spec.ts";
 import { count, escapeHtml, millions, money, pct, signedMoney } from "./format.ts";
 import {
+  MOVED,
   applyAll,
   currentFormulaAid,
   currentLaw,
@@ -19,7 +20,7 @@ import {
   type Policy,
 } from "./policy.ts";
 import { forecastPath, growthPrior, statuteNote } from "./project.ts";
-import type { Draft, Panel } from "./types.ts";
+import type { Draft, Panel, PanelDistrict } from "./types.ts";
 import * as routes from "./routes.ts";
 import { heading } from "./section.ts";
 
@@ -204,9 +205,36 @@ function isCurrentLaw(levers: Levers, model: number): boolean {
   return samePolicy(levers, defaultLevers(model));
 }
 
+/**
+ * What the settings did to the guarantee population.
+ *
+ * The reached/unmoved split does not say it: a formula district can be unmoved because this lever
+ * does not touch it, a guarantee district because nothing can touch it until the formula overtakes
+ * its frozen baseline.
+ *
+ * `crates/scenario-delta` computes the same counts and the feed's checkpoints carry them, so the
+ * build has already checked this classification against the Rust before a reader sees it.
+ *
+ * One function because it was two identical loops under two identical six-line comments, in
+ * `renderScenario` and `renderDistrictScenario`.
+ */
+function guaranteeMovement(
+  districts: PanelDistrict[],
+  outcomes: Outcome[],
+): { liftedOff: number; pushedOn: number } {
+  let liftedOff = 0;
+  let pushedOn = 0;
+  for (const [i, d] of districts.entries()) {
+    const after = outcomes[i]!;
+    if (d.on_guarantee && !after.onGuarantee) liftedOff++;
+    else if (!d.on_guarantee && after.onGuarantee) pushedOn++;
+  }
+  return { liftedOff, pushedOn };
+}
+
 function affectedTable(outcomes: Outcome[]): string {
   const moved = outcomes
-    .filter((o) => Math.abs(o.delta) > 0.5)
+    .filter((o) => Math.abs(o.delta) > MOVED)
     .sort((a, b) => Math.abs(b.deltaPerPupil) - Math.abs(a.deltaPerPupil))
     .slice(0, 12);
   if (moved.length === 0) {
@@ -396,18 +424,7 @@ export function renderDistrictScenario(
   const outcomes = applyAll(bundle.districts, toPolicy(levers), model);
   const t = totals(outcomes);
 
-  // What the settings did to the guarantee population, which the reached/unmoved split does not
-  // say: a formula district can be unmoved because this lever does not touch it, a guarantee
-  // district because nothing can touch it until the formula overtakes its frozen baseline.
-  // `crates/scenario-delta` computes the same three counts and the feed's checkpoints carry them,
-  // so the build has already checked this classification against the Rust before you see it.
-  let liftedOff = 0;
-  let pushedOn = 0;
-  for (const [i, d] of bundle.districts.entries()) {
-    const after = outcomes[i]!;
-    if (d.on_guarantee && !after.onGuarantee) liftedOff++;
-    else if (!d.on_guarantee && after.onGuarantee) pushedOn++;
-  }
+  const { liftedOff, pushedOn } = guaranteeMovement(bundle.districts, outcomes);
   const mine = outcomes.find((o) => o.irn === irn)!;
 
   if (isCurrentLaw(levers, model)) {
@@ -428,11 +445,23 @@ export function renderDistrictScenario(
   // way to say "a lot" or "a little": the same dollar figure is a rounding error in Columbus and
   // a levy in a district of six hundred.
   const movers = outcomes
-    .filter((o) => Math.abs(o.delta) > 0.5)
+    .filter((o) => Math.abs(o.delta) > MOVED)
     .sort((a, b) => b.deltaPerPupil - a.deltaPerPupil);
   const rank = movers.findIndex((o) => o.irn === irn);
-  const moved = Math.abs(mine.delta) > 0.5;
+  const moved = Math.abs(mine.delta) > MOVED;
 
+  /*
+   * Two things in the card below are not the obvious rendering.
+   *
+   * `Cost to the state` is uncoloured. The gain/loss classes mean "more aid" and "less aid", which
+   * is what the tiles above are about; under a row headed *cost* the same green rendered a billion
+   * dollars of spending as a win. The sign carries it without the colour making a judgement the
+   * label contradicts.
+   *
+   * And the closing note has a zero case. That card exists to interrupt "good for us, therefore
+   * good" — when nothing is lost there is nothing to interrupt, and delivering the interruption
+   * with a zero attached made an argument the numbers did not support.
+   */
   return `
     <div class="card" id="outcome" data-part="outcome">
       <h2>${heading("outcome", `What this would do to ${escapeHtml(district.name)}`, chip)}</h2>
@@ -489,12 +518,18 @@ export function renderDistrictScenario(
           than their FY2020 baseline.</div></th><td>${liftedOff}</td></tr>
         <tr><th>Pushed onto it<div class="n">The formula now computes less.</div></th>
           <td>${pushedOn}</td></tr>
-        <tr><th>Cost to the state</th><td class="${t.cost > 0 ? "gain" : t.cost < 0 ? "loss" : ""}">${millions(t.cost)}</td></tr>
+        <tr><th>Cost to the state</th><td class="tnum">${millions(t.cost)}</td></tr>
       </tbody></table></div>
-      <p class="note">A change that helps this district is not thereby a good change, and the
-        count above is the reason: ${t.losers} district${t.losers === 1 ? "" : "s"} ${
-          t.losers === 1 ? "receives" : "receive"
-        } less under these settings. <a href="/scenario">The distribution across all
+      <p class="note">${
+        t.losers === 0
+          ? `No district receives less under these settings, so the usual caution — that a change
+             helping this district is not thereby a good change — has nothing to bite on here. What
+             it costs the state is the question instead.`
+          : `A change that helps this district is not thereby a good change, and the count above is
+             the reason: ${t.losers} district${t.losers === 1 ? "" : "s"} ${
+               t.losers === 1 ? "receives" : "receive"
+             } less under these settings.`
+      } <a href="/scenario">The distribution across all
         ${t.districts}</a> — who gains, who loses, and how that falls across property wealth — is
         the statewide view.</p>
     </div>`;
@@ -547,20 +582,9 @@ export function renderScenario(bundle: Panel, levers: Levers, chip = ""): Render
   const outcomes = applyAll(bundle.districts, toPolicy(levers), model);
   const t = totals(outcomes);
 
-  // What the settings did to the guarantee population, which the reached/unmoved split does not
-  // say: a formula district can be unmoved because this lever does not touch it, a guarantee
-  // district because nothing can touch it until the formula overtakes its frozen baseline.
-  // `crates/scenario-delta` computes the same three counts and the feed's checkpoints carry them,
-  // so the build has already checked this classification against the Rust before you see it.
-  let liftedOff = 0;
-  let pushedOn = 0;
-  for (const [i, d] of bundle.districts.entries()) {
-    const after = outcomes[i]!;
-    if (d.on_guarantee && !after.onGuarantee) liftedOff++;
-    else if (!d.on_guarantee && after.onGuarantee) pushedOn++;
-  }
+  const { liftedOff, pushedOn } = guaranteeMovement(bundle.districts, outcomes);
   const deltas = outcomes
-    .filter((o) => Math.abs(o.delta) > 0.5)
+    .filter((o) => Math.abs(o.delta) > MOVED)
     .map((o) => o.deltaPerPupil);
 
   /*
@@ -645,7 +669,28 @@ export function renderScenario(bundle: Panel, levers: Levers, chip = ""): Render
  * cannot disagree about what the draft says. `matchesDraft` is the reason that matters: a reader
  * who nudges a slider has stopped looking at the bill, and the page has to notice.
  */
+/**
+ * A provision's value as a number, or `null` where it is not one.
+ *
+ * The blank is why this is a function. `Number("")` is `0`, not `NaN`, so a bare finiteness test
+ * admits an empty `proposed` as a base cost scale of zero — a scenario rather than an error, and it
+ * would have rendered as one.
+ */
+function leverValue(proposed: string): number | null {
+  if (proposed.trim() === "") return null;
+  const value = Number(proposed);
+  return Number.isFinite(value) ? value : null;
+}
+
 export function draftLevers(draft: Draft, model: number, baseYear: number): Levers {
+  /*
+   * Every numeric lever is checked for finiteness, not just the guarantee's argument.
+   *
+   * `Number("1.04x")` is `NaN`, and a `NaN` reaching `baseCostScale` turns every figure on the page
+   * into `$NaN` — 609 districts of it, under a banner saying these are the bill's numbers. The
+   * schema now rejects such a value at the feed boundary, which is where it should be impossible;
+   * this is the second line, because the schema is one process away.
+   */
   const levers = defaultLevers(model, baseYear);
   for (const provision of draft.provisions) {
     const [rule, argument] = provision.proposed.split(":");
@@ -654,22 +699,29 @@ export function draftLevers(draft: Draft, model: number, baseYear: number): Leve
         if (rule === "as-enacted" || rule === "removed" || rule === "rebase" || rule === "phase-out") {
           levers.guarantee = rule;
         }
-        if (argument != null && Number.isFinite(Number(argument))) {
-          levers.guaranteeArgument = Number(argument);
-        }
+        const argumentValue = argument == null ? null : leverValue(argument);
+        if (argumentValue != null) levers.guaranteeArgument = argumentValue;
         break;
-      case "base-cost":
-        levers.baseCostScale = Number(provision.proposed);
+      case "base-cost": {
+        const value = leverValue(provision.proposed);
+        if (value != null) levers.baseCostScale = value;
         break;
-      case "min-share":
-        levers.minimumStateShare = Number(provision.proposed);
+      }
+      case "min-share": {
+        const value = leverValue(provision.proposed);
+        if (value != null) levers.minimumStateShare = value;
         break;
-      case "phase-in":
-        levers.phaseInGeneral = Number(provision.proposed);
+      }
+      case "phase-in": {
+        const value = leverValue(provision.proposed);
+        if (value != null) levers.phaseInGeneral = value;
         break;
-      case "phase-in-cat":
-        levers.phaseInDpia = Number(provision.proposed);
+      }
+      case "phase-in-cat": {
+        const value = leverValue(provision.proposed);
+        if (value != null) levers.phaseInDpia = value;
         break;
+      }
       default:
         // An unpriced provision. It sets no lever, which is exactly why it has to be shown
         // separately rather than dropped — see `renderDraft`.

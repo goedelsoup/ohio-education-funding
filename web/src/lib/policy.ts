@@ -59,6 +59,22 @@ export interface Outcome {
   deltaPerPupil: number;
 }
 
+/**
+ * Below this, a change in a district's aid is floating-point residue rather than a change.
+ *
+ * `formulaAid` interpolates through `base + pct × (computed − base)`, which at `pct = 1` is not
+ * exactly `computed` in binary floating point — so an identity run leaves deltas around 1e-9 and a
+ * bare `!== 0` would report all 609 districts moved.
+ *
+ * Exported because the page filters on it too. `totals()` counted at this bound while the
+ * histogram, the most-affected table and the district's rank each counted at half a dollar, so
+ * "Districts reached" and the histogram's "the N of 609 districts these lever settings move" were
+ * two counts of one quantity. No lever setting reachable from the controls made them disagree —
+ * the steps are too coarse to produce a sub-dollar delta — but one shared constant is cheaper than
+ * the argument that they cannot.
+ */
+export const MOVED = 0.005;
+
 /** Statewide totals for a set of outcomes. */
 export interface Totals {
   districts: number;
@@ -238,8 +254,8 @@ export function totals(outcomes: Outcome[]): Totals {
     baseline += o.baselineRealizedAid;
     if (o.onGuarantee) onGuarantee++;
     if (o.atMinimumStateShare) atMinimumStateShare++;
-    if (o.delta > 0.005) gainers++;
-    else if (o.delta < -0.005) losers++;
+    if (o.delta > MOVED) gainers++;
+    else if (o.delta < -MOVED) losers++;
   }
   return {
     districts: outcomes.length,
