@@ -2928,6 +2928,62 @@ test.describe("the scenario builder", () => {
     });
   }
 
+  test("the district route mints no horizon it cannot set", async ({ page }) => {
+    // It has no horizon control, draws no band, and reads nothing from `h` — so every URL it minted
+    // carried `h=2032` for a reader to copy and send.
+    await page.goto(`/district/${CLEVELAND}/scenario`);
+    await expect(page.locator("#scenario-out .tile, #scenario-out .card")).not.toHaveCount(0);
+    await page.locator("#lv-base").fill("1.05");
+    await page.locator("#lv-base").dispatchEvent("input");
+    await expect(page).toHaveURL(/[?&]base=1\.05/);
+    expect(new URL(page.url()).searchParams.has("h")).toBe(false);
+
+    // And the statewide route, which does have one, still carries it.
+    await page.goto("/scenario");
+    await expect(page.locator("#scenario-out .tile, #scenario-out .card")).not.toHaveCount(0);
+    await page.locator("#lv-base").fill("1.05");
+    await page.locator("#lv-base").dispatchEvent("input");
+    await expect(page).toHaveURL(/[?&]h=\d{4}/);
+  });
+
+  test("a cost is not rendered as a gain", async ({ page }) => {
+    // The gain/loss classes mean "more aid" and "less aid", which is what the tiles are about.
+    // Under a row headed *cost* the same green rendered a billion dollars of spending as a win.
+    await page.goto(`/district/${CLEVELAND}/scenario?g=as-enacted&arg=0.5&base=1.15&min=0.1&pb=1&pc=1`);
+    const row = page.locator('[data-part="moved-elsewhere"] tr', { hasText: "Cost to the state" });
+    await expect(row.locator("td")).not.toHaveClass(/gain|loss/);
+    await expect(row.locator("td")).toContainText("+$");
+  });
+
+  test("the interruption holds its fire when nothing is lost", async ({ page }) => {
+    /*
+     * "A change that helps this district is not thereby a good change, and the count above is the
+     * reason: 0 districts receive less" — the card exists to interrupt self-interest, and delivered
+     * the interruption with a zero attached.
+     */
+    await page.goto(`/district/${CLEVELAND}/scenario?g=as-enacted&arg=0.5&base=1.15&min=0.1&pb=1&pc=1`);
+    const card = page.locator('[data-part="moved-elsewhere"]');
+    await expect(card.locator("tr", { hasText: "Down" }).locator("td")).toHaveText("0");
+    await expect(card).toContainText("No district receives less");
+    await expect(card).not.toContainText("0 districts receive less");
+    // The statewide view is still offered either way.
+    await expect(card).toContainText("The distribution across all");
+  });
+
+  test("a failed gate leaves no card describing controls that are gone", async ({ page }) => {
+    // Emptying the form left `#levers` standing with nothing in it but its own heading.
+    await page.route("**/data/panel.json", async (route) => {
+      const response = await route.fetch();
+      const panel = await response.json();
+      panel.checkpoints[0].cost += 1e6;
+      await route.fulfill({ json: panel });
+    });
+    await page.goto("/scenario");
+    await expect(page.locator("#scenario-out .err")).toBeVisible();
+    await expect(page.locator("#levers")).toHaveCount(0);
+    await expect(page.locator("#scenario-status")).toContainText("FAILED");
+  });
+
   test("a draft's own off-grid value survives the clamp", async ({ page }) => {
     // The clamp enforces the ends and not the step, and this is why: `1.0395` is what the bill
     // prices, the slider steps by 0.01, and snapping would put a number that is not the bill's

@@ -12,6 +12,7 @@
 import { expect, test } from "vitest";
 
 import { loadFeed } from "../../src/lib/feed.ts";
+import { DraftProvisionSchema } from "../../src/lib/schema/feed.ts";
 import {
   defaultLevers,
   draftLevers,
@@ -270,4 +271,51 @@ test("a draft that prices nothing still leaves the levers at current law", () =>
   const draft = bundle.drafts.find((d) => d.slug === "hb-643-136-introduced")!;
   const levers = draftLevers(draft, MODEL, BASE_YEAR);
   expect(levers).toEqual(defaultLevers(MODEL, BASE_YEAR));
+});
+
+test("a lever-bearing provision whose value does not parse is rejected at the schema", () => {
+  /*
+   * `Number("1.04x")` is `NaN`, and a `NaN` reaching `baseCostScale` turns every figure on the
+   * scenario page into `$NaN` across 609 districts — under a banner saying these are the bill's
+   * numbers. `draftLevers` guards it too, but the schema is the boundary between a Rust guarantee
+   * and a JSON file, and a value that cannot be a lever position should not get past it.
+   */
+  const ok = {
+    ordinal: 1,
+    title: "Base cost reference year",
+    authority: "R.C. 3317.011",
+    parameter: "",
+    lever: "base-cost" as const,
+    proposed: "1.0395",
+    note: "sized against the FY2024 restatement",
+  };
+  expect(DraftProvisionSchema.safeParse(ok).success).toBe(true);
+  expect(DraftProvisionSchema.safeParse({ ...ok, proposed: "1.04x" }).success).toBe(false);
+  expect(DraftProvisionSchema.safeParse({ ...ok, proposed: "" }).success).toBe(false);
+
+  // An unpriced provision says whatever it needs to say — it sets no lever.
+  expect(
+    DraftProvisionSchema.safeParse({ ...ok, lever: "", proposed: "each weight times 1.08" }).success,
+  ).toBe(true);
+
+  // A guarantee provision names a rule rather than a number.
+  const guarantee = { ...ok, lever: "guarantee" as const, proposed: "phase-out:0.5" };
+  expect(DraftProvisionSchema.safeParse(guarantee).success).toBe(true);
+  expect(DraftProvisionSchema.safeParse({ ...guarantee, proposed: "abolished" }).success).toBe(false);
+});
+
+test("a provision the schema would reject cannot reach the levers either", () => {
+  // The second line, because the schema is one process away. `draftLevers` leaves the default
+  // standing rather than writing `NaN` into it.
+  const draft = {
+    slug: "synthetic",
+    provisions: [
+      { ordinal: 1, title: "t", authority: "a", parameter: "", lever: "base-cost" as const, proposed: "1.04x", note: "n" },
+      { ordinal: 2, title: "t", authority: "a", parameter: "", lever: "min-share" as const, proposed: "", note: "n" },
+    ],
+  };
+  const levers = draftLevers(draft, MODEL, BASE_YEAR);
+  expect(Number.isFinite(levers.baseCostScale)).toBe(true);
+  expect(levers.baseCostScale).toBe(1);
+  expect(levers.minimumStateShare).toBe(MODEL);
 });

@@ -1004,7 +1004,35 @@ export const DraftProvisionSchema = z
      */
     note: z.string().min(1),
   })
-  .strict();
+  .strict()
+  /*
+   * A provision that binds a lever has to carry a value that lever can take.
+   *
+   * `proposed` is a string because the guarantee's form is `rule:argument`, and the four numeric
+   * levers were parsed with a bare `Number()`. `Number("1.04x")` is `NaN`, and a `NaN` reaching
+   * `baseCostScale` turns every figure on the scenario page into `$NaN` across 609 districts —
+   * under a banner saying these are the bill's numbers.
+   *
+   * Nothing in the committed feed does this; `crates/project` prices these. But the schema is the
+   * boundary between a Rust guarantee and a JSON file, and this is the boundary's job.
+   *
+   * The blank is checked separately because `Number("")` is `0`, not `NaN` — so a finiteness test
+   * alone admits an empty `proposed` as a base cost scale of zero, which is a scenario rather than
+   * an error and would have rendered as one.
+   */
+  .refine(
+    (p) =>
+      p.lever === "" ||
+      p.lever === "guarantee" ||
+      (p.proposed.trim() !== "" && Number.isFinite(Number(p.proposed))),
+    { message: "a numeric lever's `proposed` must parse as a finite number", path: ["proposed"] },
+  )
+  .refine(
+    (p) =>
+      p.lever !== "guarantee" ||
+      ["as-enacted", "removed", "rebase", "phase-out"].includes(p.proposed.split(":")[0] ?? ""),
+    { message: "a guarantee provision must name one of the four rules", path: ["proposed"] },
+  );
 
 /** A bill that is not law, with every provision it states. */
 export const DraftSchema = z
