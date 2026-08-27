@@ -21,7 +21,7 @@ import {
 import { forecastPath, growthPrior, statuteNote } from "./project.ts";
 import type { Draft, Panel } from "./types.ts";
 import * as routes from "./routes.ts";
-import { anchor } from "./section.ts";
+import { heading } from "./section.ts";
 
 /**
  * The default horizon, in years past the last observation.
@@ -258,13 +258,13 @@ function range(low: number, high: number): string {
  * the underlying counts are the ones you read at rest, and a forecast is better company for those
  * than a wall of scrolling is.
  */
-export function renderProjection(bundle: Panel, levers: Levers): string {
+export function renderProjection(bundle: Panel, levers: Levers, chip = ""): string {
   const meta = bundle.projection;
   if (!meta) return "";
   const model = bundle.statewide.minimum_state_share;
   if (levers.horizon <= meta.base_year) {
     return `<div class="card" id="projection" data-part="projection">
-      <h2>${anchor("projection")}At projected enrollment</h2>
+      <h2>${heading("projection", "At projected enrollment", chip)}</h2>
       <p class="note">Not projected. Move <em>Project enrollment to</em> past
         FY${meta.base_year} to carry every district's enrolled ADM forward and re-run these
         levers against it.</p>
@@ -317,7 +317,7 @@ export function renderProjection(bundle: Panel, levers: Levers): string {
 
   return `
     <div class="card" id="projection" data-part="projection">
-      <h2>${anchor("projection")}At projected enrollment</h2>
+      <h2>${heading("projection", "At projected enrollment", chip)}</h2>
       <div class="tiles">
         <div class="tile wide"><div class="k">Total state aid, FY${end.fiscalYear}</div>
           <div class="v range">${range(end.low, end.high)}</div>
@@ -381,7 +381,12 @@ export function renderProjection(bundle: Panel, levers: Levers): string {
  * district's own figure and then states, in the same card, how many districts move the other way
  * — and links to the distribution rather than summarising it away.
  */
-export function renderDistrictScenario(bundle: Panel, levers: Levers, irn: string): string {
+export function renderDistrictScenario(
+  bundle: Panel,
+  levers: Levers,
+  irn: string,
+  chip = "",
+): string {
   const model = bundle.statewide.minimum_state_share;
   const district = bundle.districts.find((d) => d.irn === irn);
   if (!district) {
@@ -407,7 +412,7 @@ export function renderDistrictScenario(bundle: Panel, levers: Levers, irn: strin
 
   if (isCurrentLaw(levers, model)) {
     return `<div class="card" id="current-law" data-part="current-law">
-      <h2>${anchor("current-law")}Current law</h2>
+      <h2>${heading("current-law", "Current law", chip)}</h2>
       <p class="note">These are the settings the department's own FY${bundle.fiscal_year} model
         uses, so nothing moves. ${escapeHtml(district.name)} receives
         ${money(mine.realizedAid)}${
@@ -429,6 +434,8 @@ export function renderDistrictScenario(bundle: Panel, levers: Levers, irn: strin
   const moved = Math.abs(mine.delta) > 0.5;
 
   return `
+    <div class="card" id="outcome" data-part="outcome">
+      <h2>${heading("outcome", `What this would do to ${escapeHtml(district.name)}`, chip)}</h2>
     <div class="tiles">
       <div class="tile"><div class="k">State aid under this scenario</div>
         <div class="v">${money(mine.realizedAid)}</div>
@@ -445,10 +452,10 @@ export function renderDistrictScenario(bundle: Panel, levers: Levers, irn: strin
             ? `districts that move, ranked from largest gain to largest loss`
             : `this district's funding does not change under these settings`
         }</div></div>
-    </div>
+    </div></div>
 
     <div class="card" id="moved-here" data-part="moved-here">
-      <h2>${anchor("moved-here")}What moved for this district</h2>
+      <h2>${heading("moved-here", "What moved for this district", chip)}</h2>
       <div class="scroll"><table><tbody>
         <tr><th>Formula aid</th>
             <td>${money(currentFormulaAid(district))} → ${money(mine.formulaAid)}</td></tr>
@@ -472,7 +479,7 @@ export function renderDistrictScenario(bundle: Panel, levers: Levers, irn: strin
     </div>
 
     <div class="card" id="moved-elsewhere" data-part="moved-elsewhere">
-      <h2>${anchor("moved-elsewhere")}And to everyone else</h2>
+      <h2>${heading("moved-elsewhere", "And to everyone else", chip)}</h2>
       <div class="scroll"><table><tbody>
         <tr><th>Districts reached</th><td>${t.gainers + t.losers} of ${t.districts}</td></tr>
         <tr><th>Up</th><td>${t.gainers}</td></tr>
@@ -516,12 +523,12 @@ export interface RenderedScenario {
 }
 
 /** Run the levers and render the result. */
-export function renderScenario(bundle: Panel, levers: Levers): RenderedScenario {
+export function renderScenario(bundle: Panel, levers: Levers, chip = ""): RenderedScenario {
   const model = bundle.statewide.minimum_state_share;
   if (isCurrentLaw(levers, model)) {
     return {
       summary: `<div class="card" id="current-law" data-part="current-law">
-      <h2>${anchor("current-law")}Current law</h2>
+      <h2>${heading("current-law", "Current law", chip)}</h2>
       <p class="note">These are the settings the department's own FY${bundle.fiscal_year} model
         uses, so nothing moves. Total state foundation aid is
         ${millions(bundle.statewide.realized_aid_total).replace("+", "")} across
@@ -556,7 +563,21 @@ export function renderScenario(bundle: Panel, levers: Levers): RenderedScenario 
     .filter((o) => Math.abs(o.delta) > 0.5)
     .map((o) => o.deltaPerPupil);
 
+  /*
+   * A card with a heading, which the result did not have.
+   *
+   * Under current law there was one — `Current law` — and the moment a lever moved the headline
+   * became a bare `<div class="tiles">`. So heading navigation went from the controls straight past
+   * "State aid +$288.1M, 366 districts reached" to the *forecast*, and the one block on the page a
+   * reader came for was the one block with no place in the document outline. axe reports nothing:
+   * no rule requires a content block to be headed.
+   *
+   * Being a `.card` is also what puts it inside the year-chip rule, which scans `.card` for a
+   * figure and a chip. The tiles were outside it by markup accident rather than by argument.
+   */
   const summary = `
+    <div class="card" id="outcome" data-part="outcome">
+      <h2>${heading("outcome", "What these levers do", chip)}</h2>
     <div class="tiles">
       <div class="tile"><div class="k">State aid</div>
         <div class="v ${t.cost > 0 ? "gain" : t.cost < 0 ? "loss" : ""}">${millions(t.cost)}</div>
@@ -568,11 +589,11 @@ export function renderScenario(bundle: Panel, levers: Levers): RenderedScenario 
       <div class="tile"><div class="k">Unmoved</div>
         <div class="v">${t.unmoved}</div>
         <div class="n">${pct(t.unmoved / t.districts, 0)} of districts</div></div>
-    </div>`;
+    </div></div>`;
 
   const detail = `
     <div class="card" id="distribution" data-part="distribution">
-      <h2>${anchor("distribution")}How the change is distributed</h2>
+      <h2>${heading("distribution", "How the change is distributed", chip)}</h2>
       ${
         deltas.length > 0
           ? `<div class="chartwrap" data-chart="deltas">${renderToString((w) => histogramSpec(
@@ -591,12 +612,12 @@ export function renderScenario(bundle: Panel, levers: Levers): RenderedScenario 
     </div>
 
     <div class="card" id="most-affected" data-part="most-affected">
-      <h2>${anchor("most-affected")}Most affected</h2>
+      <h2>${heading("most-affected", "Most affected", chip)}</h2>
       ${affectedTable(outcomes)}
     </div>
 
     <div class="card" id="moved-underneath" data-part="moved-underneath">
-      <h2>${anchor("moved-underneath")}What moved underneath</h2>
+      <h2>${heading("moved-underneath", "What moved underneath", chip)}</h2>
       <div class="scroll"><table><tbody>
         <tr><th>On the guarantee</th>
             <td>${bundle.statewide.on_guarantee} → ${t.onGuarantee}</td></tr>
@@ -703,7 +724,7 @@ export function renderDraft(panel: Panel, levers: Levers, slug: string): string 
    */
   if (!draft) {
     return `<div class="card err" id="draft" data-part="draft-unknown">
-      <h2>${anchor("draft")}That bill is not in this feed</h2>
+      <h2>${heading("draft", "That bill is not in this feed")}</h2>
       <p class="note">This page was opened for a draft called
         <code>${escapeHtml(slug)}</code>, and this build of the feed carries no such bill — it was
         renamed, withdrawn, or the link predates it. <strong>The figures below are current law</strong>,
@@ -778,7 +799,7 @@ export function renderDraft(panel: Panel, levers: Levers, slug: string): string 
           <ul class="unpriced" data-part="draft-unpriced">${list}</ul>`;
 
   return `<div class="card" id="draft" data-part="draft" data-draft="${escapeHtml(slug)}">
-    <h2>${anchor("draft")}Opened from a draft</h2>
+    <h2>${heading("draft", "Opened from a draft")}</h2>
     <p class="note">The levers below are set to
       <a href="${href}">${escapeHtml(slug)}</a>, a bill that is not law.
       ${count(priced)} of its ${count(draft.provisions.length)} provisions bind a lever here.</p>

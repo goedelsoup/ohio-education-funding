@@ -606,6 +606,12 @@ const ROUTES_WITH_FIGURES = [
   `/district/${CLEVELAND}/outcome`,
   `/district/${CLEVELAND}/taxes`,
   `/district/${CLEVELAND}/scenario`,
+  /*
+   * `/scenario` was missing, and the omission is the same shape the docstring above describes.
+   * Scanned by hand it had two unchipped cards carrying figures — the projection, present in the
+   * default state, and "Most affected".
+   */
+  "/scenario",
 ];
 
   test("a card with figures says what year they are on", async ({ page }) => {
@@ -625,7 +631,23 @@ const ROUTES_WITH_FIGURES = [
     for (const route of ROUTES_WITH_FIGURES) {
       await page.goto(route);
       if (route.endsWith("/scenario")) {
-        await expect(page.locator("#scenario-out .card")).not.toHaveCount(0);
+        /*
+         * Past a lever, not merely past the first render.
+         *
+         * Waiting for `#scenario-out .card` was enough to make this route *appear* covered and not
+         * enough to cover it. In the default state `renderDistrictScenario` returns the
+         * `current-law` card alone, which carries no `.tnum` and no `.v` — so the filter dropped it
+         * and the route contributed nothing to the sweep for as long as it had been in the list.
+         *
+         * Moving a lever is what brings out the cards that hold figures. The projection is waited
+         * for separately: it is a second gate and renders into its own container.
+         */
+        await page.locator("#lv-base").fill("1.05");
+        await page.locator("#lv-base").dispatchEvent("input");
+        await expect(page.locator('[data-part="outcome"]')).toBeVisible();
+        if (route === "/scenario") {
+          await expect(page.locator('#projection-out [data-part="projection"]')).toBeVisible();
+        }
       }
       // A card with no figures takes no chip: dating an absence says nothing. `.tnum` is the
       // numeric-cell class and `.v` the stat-tile value, which between them are every figure this
@@ -2836,6 +2858,75 @@ test.describe("the scenario builder", () => {
     await expect(page.locator("#scenario-out .tile, #scenario-out .card")).not.toHaveCount(0);
     await expect(page.locator("#scenario-out .tile .v").first()).toHaveText(clamped!);
   });
+
+  /*
+   * The result is a card with a heading, and every heading on the page wears its anchor the same
+   * way. Both were properties of the *client-rendered* half, which no build-time pass can see.
+   */
+  for (const route of ["/scenario", `/district/${CLEVELAND}/scenario`]) {
+    test(`the result has a heading, and it is the answer — ${route}`, async ({ page }) => {
+      /*
+       * Under current law there was one, "Current law". Move a lever and the headline became a bare
+       * `<div class="tiles">`: heading navigation went from the controls straight past "State aid
+       * +$288.1M, 366 districts reached" to the forecast, and the one block a reader came for had no
+       * place in the outline. axe reports nothing — no rule requires a content block to be headed.
+       */
+      await page.goto(route);
+      await expect(page.locator("#scenario-out .tile, #scenario-out .card")).not.toHaveCount(0);
+      await page.locator("#lv-base").fill("1.05");
+      await page.locator("#lv-base").dispatchEvent("input");
+
+      const result = page.locator('[data-part="outcome"]');
+      await expect(result).toBeVisible();
+      await expect(result.locator("h2")).toHaveCount(1);
+      // The tiles are inside it rather than beside it, which is what makes the heading theirs.
+      await expect(result.locator(".tile")).toHaveCount(3);
+
+      // And it comes before everything the result is elaborated by.
+      const outline = await page
+        .locator("main h2")
+        .evaluateAll((ns) => ns.map((n) => n.textContent!.replace(/\s+/g, " ").trim()));
+      const result_at = outline.findIndex((h) => /What (these levers do|this would do)/.test(h));
+      expect(result_at, `no result heading in ${JSON.stringify(outline)}`).toBeGreaterThan(-1);
+      expect(outline.slice(result_at + 1).join(" ")).not.toContain("Levers");
+    });
+
+    test(`every heading wears its anchor the same way — ${route}`, async ({ page }) => {
+      /*
+       * `moveAnchors` relocates `a.section-anchor` after the title at build time, and it sees
+       * server-rendered markup only. The scenario routes build headings in the browser from the
+       * same `anchor()` helper, so `/scenario` shipped `Levers #` and `What these levers hold fixed
+       * … #` beside `# At projected enrollment`, `# Most affected` and `# What moved underneath` —
+       * the transform's input and its output on one screen.
+       */
+      await page.goto(route);
+      await expect(page.locator("#scenario-out .tile, #scenario-out .card")).not.toHaveCount(0);
+      await page.locator("#lv-base").fill("1.05");
+      await page.locator("#lv-base").dispatchEvent("input");
+      await expect(page.locator('[data-part="outcome"]')).toBeVisible();
+
+      const positions = await page.locator("main h2").evaluateAll((ns) =>
+        ns
+          .map((n) => {
+            const a = n.querySelector("a.section-anchor");
+            if (!a) return null;
+            const kids = [...n.childNodes].filter(
+              (k) => k.nodeType !== Node.TEXT_NODE || k.textContent!.trim(),
+            );
+            return {
+              heading: n.textContent!.replace(/\s+/g, " ").trim().slice(0, 44),
+              first: kids.indexOf(a as ChildNode) === 0,
+            };
+          })
+          .filter((x): x is { heading: string; first: boolean } => x != null),
+      );
+      expect(positions.length).toBeGreaterThan(3);
+      expect(
+        positions.filter((p) => p.first),
+        "these headings open with their own address; the rest do not",
+      ).toEqual([]);
+    });
+  }
 
   test("a draft's own off-grid value survives the clamp", async ({ page }) => {
     // The clamp enforces the ends and not the step, and this is why: `1.0395` is what the bill
