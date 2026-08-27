@@ -16,6 +16,7 @@ import ScenarioControls from "../../../components/ScenarioControls.astro";
 import Base from "../../../layouts/Base.astro";
 import { districtPaths, loadFeed, qualifiedName } from "../../../lib/feed.ts";
 import { money } from "../../../lib/format.ts";
+import { refreshEffect } from "../../../lib/refresh.ts";
 import { currentRealizedAid } from "../../../lib/policy.ts";
 import * as routes from "../../../lib/routes.ts";
 import { yearOf } from "../../../lib/year.ts";
@@ -29,6 +30,8 @@ const { district } = Astro.props;
 const { bundle } = loadFeed();
 const s = bundle.statewide;
 const meta = bundle.projection;
+// The base cost lever's note names the refresh the feed prices, on both routes that render it.
+const refresh = refreshEffect(bundle.districts, bundle.drafts, s.minimum_state_share);
 ---
 
 <Base
@@ -61,6 +64,7 @@ const meta = bundle.projection;
       model={s.minimum_state_share}
       onGuarantee={s.on_guarantee}
       projection={{ available: false, baseYear: meta?.base_year ?? 0, maxYear: meta?.horizon ?? 0 }}
+      refresh={refresh}
     />
 
     <noscript>
