@@ -534,6 +534,7 @@ fn projection() -> Projection {
         sigma: 0.023_456_7,
         z: 1.0,
         prior_source: "cross-sectional spread of district annual enrolled-ADM growth".into(),
+        statute_ends: 2027,
         checkpoints: vec![ForecastCheckpoint {
             label: "current law, FY2032".into(),
             policy: checkpoint().policy,

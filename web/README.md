@@ -842,7 +842,7 @@ Fields: bundle contract version, feed list, last export timestamp, node counts p
 -->
 | Field | Value |
 |---|---|
-| Contract version | `38.0.0` |
+| Contract version | `39.0.0` |
 | Districts in the feed | 609 |
 | Reference checkpoints | 8 |
 | Reference forecasts | 4 |

@@ -132,6 +132,14 @@ properties:
   confidence: |
     The simulation figures are exact against the department's model and carry no interval.
 
+    **"Current law" at FY2032 is not a law, and this node says it because the band is drawn under
+    that label.** R.C. 3317.011, 3317.017 and 3317.0217 each apply only for FY2026 and FY2027 by
+    their own terms, and forty divisions of five further sections hand their values to a General
+    Assembly that has not met. [verified] The FY2032 figures are this formula continued unchanged
+    — the only tractable assumption for a five-year question about a two-year statute, and not a
+    forecast of what the law will say. See
+    [`the-plan-expires-and-the-projection-does-not`](../../decisions/the-plan-expires-and-the-projection-does-not.yml).
+
     The FY2032 band is not this district's uncertainty. Three observations cannot estimate a
     variance, so the interval rests on the cross-sectional spread of district growth rates used
     as a floor; a district with genuinely volatile enrollment has a wider true interval than

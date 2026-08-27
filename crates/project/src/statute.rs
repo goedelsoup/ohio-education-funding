@@ -30,6 +30,7 @@
 //! the record's date.
 
 use edfund_core::records;
+use edfund_core::FiscalYear;
 
 /// The committed extract.
 pub const FIXTURE: &str = include_str!("../fixtures/revised-code.txt");
@@ -63,6 +64,42 @@ impl<'a> From<records::Record<'a>> for Section<'a> {
             body: record.body,
         }
     }
+}
+
+/// The clause three sections of the plan open with, verbatim.
+const EXPIRY: &str = "This section shall apply only for fiscal years 2026 and 2027.";
+
+/// The last fiscal year the Fair School Funding Plan's own sections apply to.
+///
+/// # Why this is a constant and not a horizon
+///
+/// This repository projects state aid to FY2032 and FY2036, and labels those runs "current law".
+/// At FY2032 **current law is not a law**: R.C. 3317.011 (base cost), 3317.017 (local capacity and
+/// the minimum state share inside it) and 3317.0217 (targeted assistance) each open with
+/// [`EXPIRY`], and five further sections hand values back clause by clause — forty divisions
+/// reading *"For fiscal year 2028 and each fiscal year thereafter, an amount calculated in a
+/// manner determined by the general assembly"*, seventeen of them in R.C. 3317.022 alone.
+///
+/// The projection is not wrong and shortening its horizon would not improve it: a five-year
+/// question about a two-year statute is still worth asking, and "if the plan continues unchanged"
+/// is the only tractable answer. What was missing is that the page never said so. See
+/// `.yidam/decisions/the-plan-expires-and-the-projection-does-not.yml`.
+///
+/// `sections_expiring_in_2027` checks this against the committed extract rather than trusting the
+/// digits here, so an amendment that moves the date fails in this crate rather than surfacing as a
+/// caveat that has quietly become false.
+pub const LAST_STATUTORY_YEAR: FiscalYear = FiscalYear(2027);
+
+/// How many sections of the extract carry [`EXPIRY`].
+///
+/// Three, and naming the count is what makes [`LAST_STATUTORY_YEAR`] a reading of the source
+/// rather than a number somebody typed.
+#[must_use]
+pub fn sections_expiring() -> usize {
+    sections()
+        .iter()
+        .filter(|s| s.body.contains(EXPIRY))
+        .count()
 }
 
 /// Every section the extract holds, in file order.
@@ -147,5 +184,25 @@ mod tests {
     #[test]
     fn a_section_that_states_no_multiple_yields_none() {
         assert!(multiples(section("319.301").body).is_empty());
+    }
+}
+
+#[cfg(test)]
+mod expiry {
+    use super::{sections_expiring, LAST_STATUTORY_YEAR};
+
+    /// The constant is a reading of the extract, and this is the reading.
+    ///
+    /// Three sections carry the clause: R.C. 3317.011, 3317.017 and 3317.0217. If an amendment
+    /// moves the date or adds a fourth, this fails here — in the crate that owns the text —
+    /// rather than as a caveat on a page that has quietly stopped being true.
+    #[test]
+    fn three_sections_expire_with_the_biennium() {
+        assert_eq!(
+            sections_expiring(),
+            3,
+            "sections carrying the expiry clause"
+        );
+        assert_eq!(LAST_STATUTORY_YEAR.0, 2027);
     }
 }

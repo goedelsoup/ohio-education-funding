@@ -1051,6 +1051,13 @@ export const ProjectionMetaSchema = z
     sigma: num,
     z: num,
     prior_source: z.string().min(1),
+    /**
+     * The last fiscal year the plan's own sections apply to.
+     *
+     * Not a bound on the forecast — `horizon` is that. This is the year past which "current law"
+     * stops naming a law, and a surface drawing a year beyond it has to say so.
+     */
+    statute_ends: num,
     checkpoints: z.array(ForecastCheckpointSchema),
   })
   .strict();

@@ -1731,6 +1731,7 @@ pub fn build() -> Bundle {
         sigma: prior.sigma,
         z: prior.z,
         prior_source: prior.source.to_string(),
+        statute_ends: project::statute::LAST_STATUTORY_YEAR.0,
         checkpoints: forecast_years()
             .into_iter()
             .map(|(label, index, year)| {
