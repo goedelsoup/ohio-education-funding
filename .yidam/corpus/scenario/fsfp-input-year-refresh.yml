@@ -176,20 +176,26 @@ findings: |
   ### The state share floor is not a small correction, and the $242.1m above does not apply it
 
       computed base cost increase        465.0
+        plus the denominated categoricals +32.1   special education, English learners and
+                                                  career-technical are priced in base cost
+                                                  per pupil, so a refresh raises them too
+      computed in total                  497.1
         less the ADM denominators         -7.6   base cost averages three years;
                                                  the state share is paid on this one
         less the minimum state share    -118.7   138 districts keep a tenth of it
-        less the guarantee              -141.6   256 districts keep none of it
-      delivered as state aid             197.1   42.4% of the computed increase
+        less the guarantee              -150.2   253 districts keep none of it
+      delivered as state aid             220.6   44.4% of what a refresh computes
 
   [verified — see
-  [`crates/scenario-delta/tests/who_a_change_reaches.rs`](../../../crates/scenario-delta/tests/who_a_change_reaches.rs)]
+  [`crates/scenario-delta/tests/who_a_change_reaches.rs`](../../../crates/scenario-delta/tests/who_a_change_reaches.rs),
+  which asserts every line and that the four close on the total, so this is a decomposition
+  rather than four separately plausible numbers]
 
-  So the deliverable share is **42.4%, not 52.1%**, and a third mechanism was missing from the
+  So the deliverable share is **44.4%, not 52.1%**, and a third mechanism was missing from the
   accounting entirely: base cost is computed on a three-year average ADM while the state share
   is paid on the current year, which costs a shrinking state a further $7.6M. The two figures
   are not strictly comparable — the run above perturbs one salary per district and this one
-  applies a uniform scale of the same statewide magnitude — so treat 42.4% as the corrected
+  applies a uniform scale of the same statewide magnitude — so treat 44.4% as the corrected
   order of magnitude rather than as a replacement to four significant figures. [inference for
   the comparison; verified for each decomposition term]
 
@@ -265,6 +271,40 @@ figures:
     as_written: "districts on the guarantee in FY2027   294 of 609"
 
 revisions:
+  - was: |
+      A four-line decomposition of a $465.0 million computed base cost increase, delivering
+      $197.1 million as state aid — 42.4% — with the guarantee absorbing $141.6 million and 256
+      districts keeping none of it.
+    now: |
+      The decomposition predated `Policy::base_cost_scale` reaching the categoricals denominated
+      in base cost per pupil. A refresh computes **$497.1 million**, not $465.0 million: special
+      education, English learners and career-technical are each `weight x base cost per pupil x
+      count x state share`, which adds **$32.1 million** the old accounting had nowhere to put.
+      With that line present the guarantee absorbs $150.2 million rather than $141.6 million, 253
+      districts keep none of it rather than 256, and **$220.6 million is delivered — 44.4%**.
+      [verified]
+    found_by: |
+      An audit of the `/scenario` routes that began at the page and ran back to its sources. The
+      page's held-fixed card had taken a proportional product from
+      [`scenario/ACTIONS.md`](ACTIONS.md) and printed it as delivered aid (#233); tracing that
+      figure found this block still carrying the pre-decision decomposition, and citing
+      `who_a_change_reaches.rs` for it — a test that had been updated to the new numbers and now
+      asserted different ones than the block quoting it.
+    reach: |
+      This block and the summary sentence under it. The per-quintile incidence below is unaffected
+      — it is computed from the same runs and was already recomputed when the decision was taken,
+      which is why its ratio of about fifteen to one did not move.
+
+      The wider correction is #251: the same superseded arithmetic survived in
+      [`scenario/ACTIONS.md`](ACTIONS.md) and in
+      [`decisions/scenario-models-ohio`](../../decisions/scenario-models-ohio.yml), in both cases
+      carrying the strongest claim tag while citing a test that asserts something else. A figure
+      corrected in a crate and left standing in three prose carriers is the #120 shape, and this
+      is the third time this repository has found it.
+
+      Naming a claim tag in prose is avoided here on purpose: the counter that produces the totals
+      in `README.md` matches the token wherever it appears, so a sentence *about* a tag is counted
+      as one. This paragraph inflated the verified count by one before it was reworded.
   - was: |
       Every figure perturbed from an FY2022 reference teacher salary of $67,654 — a $496.3
       million statewide headline, $344.75 per pupil ADM-weighted, a $338.62 to $471.10 range,
