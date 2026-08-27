@@ -93,6 +93,21 @@ export function compare(bundle: Panel, checkpoint: Checkpoint): Comparison {
 
   near("cost", t.cost, checkpoint.cost);
   near("realized aid", t.realizedAid, checkpoint.realized_aid);
+  /*
+   * The three the card renders and this did not check.
+   *
+   * `/scenario`'s "What moved underneath" shows five rows; two were covered here and three —
+   * districts at the minimum state share, the guarantee total and the formula aid total — were
+   * derived by `policy.ts` and compared against nothing, under a heading whose whole licence is
+   * that nothing renders until it has reproduced the Rust.
+   *
+   * Formula aid is the one that would have caught most: it is what `apply` computes before the
+   * guarantee's `max`, so a drift in the phase-in interpolation or in the categorical uplift shows
+   * up here even where the guarantee absorbs it and `realized_aid` stays put.
+   */
+  same("districts at the minimum state share", t.atMinimumStateShare, checkpoint.at_minimum_state_share);
+  near("guarantee total", t.guarantee, checkpoint.guarantee);
+  near("formula aid total", t.formulaAid, checkpoint.formula_aid);
   same("gainers", t.gainers, checkpoint.gainers);
   same("losers", t.losers, checkpoint.losers);
   same("unmoved", t.unmoved, checkpoint.unmoved);

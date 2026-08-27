@@ -1712,6 +1712,12 @@ pub fn build() -> Bundle {
                 lifted_off: reach.lifted_off,
                 pushed_on: reach.pushed_on,
                 on_guarantee: effect.policy.on_guarantee,
+                // The rest of `Totals`. Exporting the whole of what the page renders costs three
+                // numbers already computed and closes the gap between what it shows and what it
+                // has proved.
+                at_minimum_state_share: effect.policy.at_minimum_state_share,
+                guarantee: effect.policy.guarantee,
+                formula_aid: effect.policy.formula_aid,
             }
         })
         .collect();

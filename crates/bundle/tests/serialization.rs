@@ -571,6 +571,9 @@ fn checkpoint() -> Checkpoint {
         lifted_off: 0,
         pushed_on: 0,
         on_guarantee: 0,
+        at_minimum_state_share: 138,
+        guarantee: 0.0,
+        formula_aid: 6_402_000_000.0,
     }
 }
 

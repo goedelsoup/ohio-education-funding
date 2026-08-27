@@ -204,6 +204,18 @@ pub struct Checkpoint {
     pub lifted_off: usize,
     /// Districts the policy pushed from the formula onto the guarantee.
     pub pushed_on: usize,
+    /// Districts whose base cost aid is set by the minimum state share under the policy.
+    ///
+    /// Exported because `/scenario` renders it and could not check it. Three of the five rows in
+    /// that page's "What moved underneath" card — this, [`Checkpoint::guarantee`] and
+    /// [`Checkpoint::formula_aid`] — were computed by the browser and compared against nothing,
+    /// directly under the claim that the page refuses to render until it has reproduced every
+    /// checkpoint. `Totals` had carried all three the whole time; the checkpoint dropped them.
+    pub at_minimum_state_share: usize,
+    /// Total guarantee top-up under the policy.
+    pub guarantee: Dollars,
+    /// Total formula aid under the policy, before the guarantee.
+    pub formula_aid: Dollars,
 }
 
 /// A Rust-computed *forecast* the web layer must reproduce before it may draw a band.
