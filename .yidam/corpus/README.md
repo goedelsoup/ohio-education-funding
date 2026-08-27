@@ -186,18 +186,29 @@ cluster needed the same move #157 made: LSC's redbook and greenbook had three pr
 across three test files and no public one, and two of the three anchored a table differently. They
 read through `project::budget_analysis` now.
 
-**Sixty-seven nodes cite a crate inside a `[verified]` tag; fifty carry bindings.** Of the
-seventeen that carry none, **fifteen are citation rather than computation** — the identifier class
-above, plus the nodes that cite a committed **fixture path** rather than a calculator. A path is
-not a quantity either.
+**Sixty-seven nodes cite a crate inside a `[verified]` tag; fifty-two carry bindings.** The
+**fifteen** that carry none are citation rather than computation — the identifier class above, plus
+the nodes that cite a committed **fixture path** rather than a calculator. A path is not a quantity
+either. Re-measured at each tranche, because this count has twice been stated here and then not
+checked again.
 
-**The other two cite a crate *test*, which is the shape that has never yet been only a citation.**
-[`legislation/hb-583-2022`](../corpus/legislation/hb-583-2022.yml) says R.C. 3317.022 "appears ten
-times as a cross-reference" and
+**The two that used to cite a crate *test* are bound, and that shape has still never turned out to
+be only a citation.** #226 asked for the measurement rather than prescribing the fix, and the two
+answers were different.
 [`draft-legislation/hb-643-136-introduced`](../corpus/draft-legislation/hb-643-136-introduced.yml)
-prints a run showing `0 of 1 priced`, each under a `[verified — crates/…/tests/…]` tag. Both are
-counts something computed. Whether they are exportable is a measurement nobody has taken, and this
-paragraph is not going to guess at it a second time — see #226.
+needed nothing at all: `project::drafts` already publishes a draft's provisions and which of them
+price, so its `0 of 1 priced` binds directly.
+[`legislation/hb-583-2022`](../corpus/legislation/hb-583-2022.yml) genuinely needed the hoist #218
+turned out not to — the enrolled act had no reader anywhere but inside its own test — and reads
+through `project::act` now, which draws the distinction the node's finding rests on: a section an
+act **reprints** is one it amends, and a section it merely cites is untouched.
+
+**And the figure that node published was ten of the wrong thing.** It said R.C. 3317.022 *"appears
+ten times as a cross-reference"*. The phrase `section 3317.022 of the Revised Code` is printed
+**13** times and the number appears **23** times in all; what is ten is the number of the act's own
+**sections** that cite it. The test standing behind the claim asserted `count() > 5`. That is the
+fourth convention below arriving in a fifth place — and here the number was right and the noun was
+not, which a band could not have told anyone either way.
 
 **The district pair is finished, and what had kept it open was a premise nobody re-measured.** This
 section used to say that [`toledo-city`](../corpus/education-agency/toledo-city.yml) and
@@ -309,7 +320,7 @@ Fields: count per claim tag across every node; then the unresolved marks by the 
 -->
 | Tag | Count | What it records |
 |---|--:|---|
-| `[verified]` | 1175 | supported by a committed primary source |
+| `[verified]` | 1176 | supported by a committed primary source |
 | `[inference]` | 275 | drawn from verified facts, not witnessed |
 | `[open]` | 216 | a live question — unknown, contested, or being worked |
 | `[unentered]` | 0 | a knowable value nobody has typed in yet |
@@ -354,7 +365,7 @@ Fields: count per claim tag across every node; then the unresolved marks by the 
 | `appropriation_line` | 1 | 0 |
 | `appropriating_bill` | 1 | 0 |
 
-**65 recorded withdrawals across 36 nodes.** A claim the corpus published and no longer stands behind is kept in a `revisions:` block rather than edited out, with the test or source that settled it — see [`the-four-genres-of-a-description`](../decisions/the-four-genres-of-a-description.yml). Counted here for the same reason the tags above are: how often this corpus has corrected itself is a fact about it, and one nobody would think to update by hand.
+**66 recorded withdrawals across 36 nodes.** A claim the corpus published and no longer stands behind is kept in a `revisions:` block rather than edited out, with the test or source that settled it — see [`the-four-genres-of-a-description`](../decisions/the-four-genres-of-a-description.yml). Counted here for the same reason the tags above are: how often this corpus has corrected itself is a fact about it, and one nobody would think to update by hand.
 <!-- /REGEN -->
 
 ## Relationship vocabulary

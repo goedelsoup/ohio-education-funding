@@ -78,6 +78,15 @@ findings: |
   Assembly appears there as `As Introduced` and is in fact enrolled with an effective date of
   20 March 2026. Only the per-bill version index distinguishes them, and reading status off the
   listing would have recorded several enacted acts as proposals. [verified]
+figures:
+  - key: project/hb-643-provisions
+    value: 1
+    field: findings
+    as_written: "0 of 1 priced"
+  - key: project/hb-643-provisions-priced
+    value: 0
+    field: findings
+    as_written: "0 of 1 priced"
 properties:
   provenance: introduced
   designation: H.B. 643

@@ -386,6 +386,26 @@ impl CrossSection {
     }
 }
 
+/// H.B. 643 of the 136th, the corpus's one pending bill.
+///
+/// Read per figure rather than held on [`Inputs`]: it is one row of a committed TSV, against the
+/// FY2027 panel and two draft runs that are not.
+///
+/// # Panics
+///
+/// If the draft register does not carry the slug.
+fn hb643() -> project::drafts::Draft {
+    project::drafts::draft("hb-643-136-introduced").expect("the draft register carries this bill")
+}
+
+/// How many of an act's reprinted sections are in one chapter.
+fn reprinted_in(act: &str, chapter: &str) -> f64 {
+    project::act::headings(act)
+        .iter()
+        .filter(|heading| heading.starts_with(chapter))
+        .count() as f64
+}
+
 /// The base year every real appropriation figure here is stated in.
 ///
 /// FY2025 because that is the year the corpus's noise-floor paragraph is written in, and a base
@@ -3594,5 +3614,52 @@ pub static FIGURES: &[Figure] = &[
             let weighted = dollars / i.toledo.card(|c| c.weighted_adm);
             headcount / weighted - 1.0
         },
+    },
+    // --- Sub. H.B. 583 of the 134th, read from the enrolled act ---------------------------
+    Figure {
+        key: "project/hb583-sections-of-chapter-3317-reprinted",
+        owner: "crates/project",
+        unit: Unit::Count,
+        label: "Sections of R.C. 3317 that H.B. 583 reprints, and therefore amends",
+        pinned: 13.0,
+        tolerance: 0.0,
+        compute: |_| reprinted_in(project::act::HB583, "3317."),
+    },
+    Figure {
+        key: "project/hb583-uncodified-sections-reopened",
+        owner: "crates/project",
+        unit: Unit::Count,
+        label: "Uncodified sections of H.B. 110 that H.B. 583 reopens",
+        pinned: 4.0,
+        tolerance: 0.0,
+        compute: |_| reprinted_in(project::act::HB583, "265."),
+    },
+    Figure {
+        key: "project/hb583-sections-citing-the-assembly-section",
+        owner: "crates/project",
+        unit: Unit::Count,
+        label: "Sections of H.B. 583 that cite R.C. 3317.022, the section it does not reopen",
+        pinned: 10.0,
+        tolerance: 0.0,
+        compute: |_| project::act::sections_citing(project::act::HB583, "3317.022").len() as f64,
+    },
+    // --- H.B. 643 of the 136th, the draft the model cannot price ---------------------------
+    Figure {
+        key: "project/hb-643-provisions",
+        owner: "crates/project",
+        unit: Unit::Count,
+        label: "Provisions in H.B. 643 of the 136th General Assembly, as introduced",
+        pinned: 1.0,
+        tolerance: 0.0,
+        compute: |_| hb643().provisions.len() as f64,
+    },
+    Figure {
+        key: "project/hb-643-provisions-priced",
+        owner: "crates/project",
+        unit: Unit::Count,
+        label: "How many of them this repository can price, which is none of them",
+        pinned: 0.0,
+        tolerance: 0.0,
+        compute: |_| hb643().priced().len() as f64,
     },
 ];

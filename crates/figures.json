@@ -257,6 +257,11 @@
     {"key": "dispersion/toledo-progress-composite-below-zero", "owner": "crates/dispersion", "unit": "ratio", "value": 5.07, "label": "How far Toledo value-added composite sits below zero, 2024-25"},
     {"key": "dispersion/perrysburg-progress-effect-size-above-zero", "owner": "crates/dispersion", "unit": "ratio", "value": 0.17, "label": "How far Perrysburg value-added effect size sits above zero, 2024-25"},
     {"key": "dispersion/perrysburg-progress-composite-above-zero", "owner": "crates/dispersion", "unit": "ratio", "value": 23.76, "label": "How far Perrysburg value-added composite sits above zero, 2024-25"},
-    {"key": "dispersion/toledo-denominator-spread", "owner": "crates/dispersion", "unit": "share", "value": 0.4536086366073493, "label": "How much higher Toledo spending reads per headcount pupil than per weighted one"}
+    {"key": "dispersion/toledo-denominator-spread", "owner": "crates/dispersion", "unit": "share", "value": 0.4536086366073493, "label": "How much higher Toledo spending reads per headcount pupil than per weighted one"},
+    {"key": "project/hb583-sections-of-chapter-3317-reprinted", "owner": "crates/project", "unit": "count", "value": 13, "label": "Sections of R.C. 3317 that H.B. 583 reprints, and therefore amends"},
+    {"key": "project/hb583-uncodified-sections-reopened", "owner": "crates/project", "unit": "count", "value": 4, "label": "Uncodified sections of H.B. 110 that H.B. 583 reopens"},
+    {"key": "project/hb583-sections-citing-the-assembly-section", "owner": "crates/project", "unit": "count", "value": 10, "label": "Sections of H.B. 583 that cite R.C. 3317.022, the section it does not reopen"},
+    {"key": "project/hb-643-provisions", "owner": "crates/project", "unit": "count", "value": 1, "label": "Provisions in H.B. 643 of the 136th General Assembly, as introduced"},
+    {"key": "project/hb-643-provisions-priced", "owner": "crates/project", "unit": "count", "value": 0, "label": "How many of them this repository can price, which is none of them"}
   ]
 }

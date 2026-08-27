@@ -23,7 +23,7 @@
 
 mod common;
 
-const ACT: &str = include_str!("../fixtures/hb583-corrections.txt");
+use project::act::{self, HB583 as ACT};
 
 /// The sections of the school funding chapter this act reopened.
 ///
@@ -49,23 +49,42 @@ const AMENDED_3317: &[&str] = &[
 /// **Thirteen sections of R.C. 3317 are reprinted, and `3317.022` is not one of them.**
 ///
 /// That is the shape of the correction: the act reworked the sections that *feed* core foundation
-/// funding and left the section that *assembles* it alone. `3317.022` appears in the act only as
-/// a cross-reference from the sections it does amend — ten times, never as a heading.
+/// funding and left the section that *assembles* it alone. `3317.022` is cited by ten of the act's
+/// own sections and is a heading in none of them.
+///
+/// # The count that was a band, and the noun that was wrong
+///
+/// This asserted `matches("section 3317.022 of the Revised Code").count() > 5` while the corpus
+/// published *"it appears ten times as a cross-reference"*. Neither half survived measurement. The
+/// canonical phrasing occurs **13** times and the number occurs **23** times in all, so "ten
+/// times" was true of no occurrence count — what is ten is the number of the act's **sections**
+/// that cite it. A lower bound of five stood behind a published figure and could not have said so;
+/// that is the fourth convention in #158, and #226 is where it reached this file.
 #[test]
 fn it_reopened_thirteen_funding_sections_and_left_the_assembly_section_alone() {
+    let headings = act::headings(ACT);
     for section in AMENDED_3317 {
         assert!(
-            ACT.contains(&format!("Sec. {section}.")),
+            headings.contains(section),
             "{section} should be reprinted as a section heading"
         );
     }
+    assert_eq!(
+        headings.iter().filter(|h| h.starts_with("3317.")).count(),
+        AMENDED_3317.len(),
+        "the act reprints these sections of R.C. 3317 and no others"
+    );
+    // Four uncodified sections of H.B. 110, which the corpus states beside the thirteen.
+    assert_eq!(headings.iter().filter(|h| h.starts_with("265.")).count(), 4);
+
     assert!(
-        !ACT.contains("Sec. 3317.022."),
+        !act::reprints(ACT, "3317.022"),
         "3317.022 is cited by this act and not amended by it"
     );
-    assert!(
-        ACT.matches("section 3317.022 of the Revised Code").count() > 5,
-        "and it is cited repeatedly, which is what makes the absence a choice"
+    assert_eq!(
+        act::sections_citing(ACT, "3317.022").len(),
+        10,
+        "and ten of the act's own sections cite it, which is what makes the absence a choice"
     );
 }
 
