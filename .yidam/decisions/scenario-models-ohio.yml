@@ -20,8 +20,17 @@ context: |
   The exposure is concentrated and was measured before the decision was taken. **$858m of
   categorical funding is denominated in the statewide average base cost per pupil**: special
   education, English learners, career-technical and the weighted half of preschool special
-  education are each `weight x $8,241.61 x count x state share`. A 3.1% input-year refresh moved
-  $113.0m in the model and would have moved about $26.6m more in fact — a quarter again.
+  education are each `weight x $8,241.61 x count x state share`. Of that, $812.5m is inside
+  `[H] Foundation Funding` and reachable; the $45.7m weighted half of preschool special education
+  is not.
+
+  Sized against a 3.1% input-year refresh, base cost aid carried $113.0m of arithmetic and the
+  reachable categoricals another $25.2m — a fifth again, which is the ratio the decision turns on.
+  Both are statewide totals times a rate rather than model runs: the formula absorbs the per-pupil
+  increase dollar-for-dollar and then the guarantee clips it, so what the same refresh *delivers*
+  is $169.1m. This paragraph read "moved $113.0m in the model and would have moved about $26.6m
+  more in fact" until #251 — stating a proportional product as a measurement, and pricing the
+  preschool residue the sentence above excludes.
 
   The two largest categoricals are *not* exposed, and that is a property of the mechanisms rather
   than a convenience. DPIA divides a district's poverty share by the state's; targeted assistance
