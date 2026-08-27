@@ -25,8 +25,8 @@ description: |
   direction: there, a citation resolves to a section that has since been repurposed; here, an act
   that everybody cites was amended by one that almost nobody does.
 
-  **What it changed.** The act reprints **thirteen sections of R.C. 3317** — 3317.011, .0110,
-  .014, .016, .017, .019, .02, .0212, .0215, .024, .051, .064 and .25 — and reopens four
+  **What it changed.** The act reprints **13 sections of R.C. 3317** — 3317.011, .0110,
+  .014, .016, .017, .019, .02, .0212, .0215, .024, .051, .064 and .25 — and reopens **4**
   uncodified sections of H.B. 110: 265.150 Pupil Transportation, 265.210 Foundation Funding - All
   Students, 265.225 and 265.335. It also amends S.B. 1 of the 134th and H.B. 123 of the 133rd.
   [verified — the enrolled act]
@@ -39,11 +39,11 @@ findings: |
   ### The section that assembles foundation funding is the one it did not touch
 
   **R.C. 3317.022 is absent from the amending title and reprinted nowhere in the act**, while the
-  sections around it are reopened wholesale. It appears ten times as a cross-reference *from* the
-  sections that were amended. So the correction reworked the inputs to core foundation funding and
-  left the assembly alone — which is a claim about what LSC's word "technical" covers, and it
-  covers more than the word suggests. [verified —
-  `crates/project/tests/the_act_that_corrected_the_plan.rs`]
+  sections around it are reopened wholesale. **10** of the act's own sections cite it, and a
+  heading is what none of them is. So the correction reworked the inputs to core foundation funding
+  and left the assembly alone — which is a claim about what LSC's word "technical" covers, and it
+  covers more than the word suggests. [verified — `crates/project`'s reader for the enrolled act,
+  exercised by `tests/the_act_that_corrected_the_plan.rs`]
 
   ### The Fair School Funding Plan's first input-year freeze is here, in its first biennium
 
@@ -78,8 +78,8 @@ properties:
   effective: 2022-09-23
   subject: |
     Made corrective and technical changes to the Fair School Funding Plan enacted by Am. Sub.
-    H.B. 110, incorporated into the FY2022 calculations. Reprinted thirteen sections of R.C. 3317
-    and reopened four uncodified sections of H.B. 110, leaving R.C. 3317.022 untouched. Froze the
+    H.B. 110, incorporated into the FY2022 calculations. Reprinted **13** sections of R.C. 3317
+    and reopened **4** uncodified sections of H.B. 110, leaving R.C. 3317.022 untouched. Froze the
     two statewide transportation cost inputs at FY2020 data for the biennium, ended the proration
     of EdChoice expansion scholarships, and appropriated one federal line of $2.4m for a new
     tutoring programme. [verified — the enrolled act]
@@ -88,6 +88,27 @@ properties:
     text as presented to the Governor, and a line-item veto is exercised after that. The act does
     make an appropriation, so it was vetoable. Settling it needs this act's own LSC final analysis,
     which is a second document and not the one now held. [open]
+figures:
+  - key: project/hb583-sections-of-chapter-3317-reprinted
+    value: 13
+    field: description
+    as_written: "reprints **13 sections of R.C. 3317**"
+  - key: project/hb583-uncodified-sections-reopened
+    value: 4
+    field: description
+    as_written: "reopens **4**\n  uncodified sections of H.B. 110"
+  - key: project/hb583-sections-citing-the-assembly-section
+    value: 10
+    field: findings
+    as_written: "**10** of the act's own sections cite it"
+  - key: project/hb583-sections-of-chapter-3317-reprinted
+    value: 13
+    field: subject
+    as_written: "Reprinted **13** sections of R.C. 3317"
+  - key: project/hb583-uncodified-sections-reopened
+    value: 4
+    field: subject
+    as_written: "reopened **4** uncodified sections of H.B. 110"
 revisions:
   - was: |
       "What it changed is not held … This one is a separate PDF that no connector fetches, so the
@@ -108,6 +129,22 @@ revisions:
       this node had no `findings` at all. It also turned out to answer a question filed on a
       different node: the formula transition supplement's uncodified home is a *titled* section of
       H.B. 110, which this act quotes by name.
+  - was: |
+      R.C. 3317.022 "appears ten times as a cross-reference from the sections that were amended".
+    now: |
+      **10** of the act's own sections cite it. Ten is not a count of occurrences: the phrase
+      `section 3317.022 of the Revised Code` is printed 13 times and the number appears 23 times
+      in all.
+    found_by: |
+      Binding the figure to `crates/figures`, which needed a public reader for the act and got one
+      at `crates/project::act`. The test standing behind the claim had asserted
+      `matches(...).count() > 5` — a lower bound under a figure the corpus published exactly, which
+      is the fourth of #158's conventions arriving in a fifth place.
+    reach: |
+      The number was right and the noun was wrong, so nothing downstream moves. Worth recording
+      because the act prints four of those 23 occurrences inside a flattened strike-and-insert,
+      where 3317.022 is the struck half twice and the inserted half twice — and the set of citing
+      sections is the same ten either way. See this node's own caveat on that hazard. [verified]
 links:
   - target: ../legislation.ont.yml
     relationship: instance-of
