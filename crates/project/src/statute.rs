@@ -76,7 +76,8 @@ const EXPIRY: &str = "This section shall apply only for fiscal years 2026 and 20
 /// This repository projects state aid to FY2032 and FY2036, and labels those runs "current law".
 /// At FY2032 **current law is not a law**: R.C. 3317.011 (base cost), 3317.017 (local capacity and
 /// the minimum state share inside it) and 3317.0217 (targeted assistance) each open with
-/// [`EXPIRY`], and five further sections hand values back clause by clause — forty divisions
+/// *"This section shall apply only for fiscal years 2026 and 2027."*, and five further sections
+/// hand values back clause by clause — forty divisions
 /// reading *"For fiscal year 2028 and each fiscal year thereafter, an amount calculated in a
 /// manner determined by the general assembly"*, seventeen of them in R.C. 3317.022 alone.
 ///
@@ -90,7 +91,8 @@ const EXPIRY: &str = "This section shall apply only for fiscal years 2026 and 20
 /// caveat that has quietly become false.
 pub const LAST_STATUTORY_YEAR: FiscalYear = FiscalYear(2027);
 
-/// How many sections of the extract carry [`EXPIRY`].
+/// How many sections of the extract open *"This section shall apply only for fiscal years 2026
+/// and 2027."*
 ///
 /// Three, and naming the count is what makes [`LAST_STATUTORY_YEAR`] a reading of the source
 /// rather than a number somebody typed.
