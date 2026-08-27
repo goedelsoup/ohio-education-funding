@@ -346,6 +346,7 @@ impl Bundle {
                     pr.raw("sigma", &format!("{:.6}", p.sigma));
                     pr.num("z", p.z);
                     pr.text("prior_source", &p.prior_source);
+                    pr.num("statute_ends", f64::from(p.statute_ends));
                     let mut list = pr.block_arr("checkpoints", "      ");
                     for c in &p.checkpoints {
                         let mut o = list.obj();

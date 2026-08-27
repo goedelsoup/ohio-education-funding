@@ -244,6 +244,15 @@ pub struct Projection {
     pub base_year: u16,
     /// The furthest year the checkpoints reach, and the furthest the page should offer.
     pub horizon: u16,
+    /// The last fiscal year the plan's own sections apply to.
+    ///
+    /// Not a bound on the forecast — the horizon above is that. This is the year past which
+    /// "current law" stops naming a law: three sections of R.C. 3317 apply only for FY2026 and
+    /// FY2027 by their own terms, and forty divisions of five more hand their values to a General
+    /// Assembly that has not met. A consumer drawing a year past this one has to say so.
+    ///
+    /// Read from `project::statute`, which derives it from the committed extract.
+    pub statute_ends: u16,
     /// `damped`, `cagr`, `linear`, or `flat`.
     pub method: String,
     /// Per-year decay applied to the fitted growth rate. 1.0 is undamped.

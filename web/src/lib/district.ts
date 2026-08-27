@@ -16,7 +16,7 @@ import { barSpec, distributionSpec, type Drawing, fanSpec, nearestRank } from ".
 import { renderToString } from "./plot/ssr.ts";
 import { count, escapeHtml, money, ordinal, pct, percentileOf, signedMoney } from "./format.ts";
 import { apply, currentLaw, currentRealizedAid } from "./policy.ts";
-import { forecastPath, growthPrior, observations } from "./project.ts";
+import { forecastPath, growthPrior, observations, statuteNote } from "./project.ts";
 import { realChange, series, type Basis } from "./real.ts";
 import { hasDenominators } from "./tax.ts";
 import * as routes from "./routes.ts";
@@ -252,7 +252,8 @@ function renderCarriedForward(bundle: Bundle, d: District): string {
            district's aid is somewhere between ${money(end.low)} and ${money(end.high)}. The
            band is the cross-sectional spread of district enrollment growth, not this
            district's own history — three observations cannot give that.`
-    }</p>`;
+    }</p>
+    ${statuteNote(end.fiscalYear, meta.statute_ends)}`;
 }
 
 /** Fiscal years federal pandemic relief makes uncomparable to what came before and after. */

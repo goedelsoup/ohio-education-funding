@@ -379,3 +379,42 @@ export function forecastPath(
   }
   return path;
 }
+
+/**
+ * The caveat a projected year past the statute's own last year has to carry.
+ *
+ * # The defect this closes
+ *
+ * The forecast card already states what it holds fixed — "the levers are held fixed and only
+ * enrollment moves" — and the band already carries the enrollment interval. Both are honest about
+ * *enrollment*. Neither says anything about the *law*, and the runner's default horizon is FY2032.
+ *
+ * At FY2032 "current law" does not name a law. R.C. 3317.011 (base cost), 3317.017 (local capacity
+ * and the minimum state share inside it) and 3317.0217 (targeted assistance) each open *"This
+ * section shall apply only for fiscal years 2026 and 2027."* Five further sections hand values back
+ * clause by clause — forty divisions reading *"For fiscal year 2028 and each fiscal year
+ * thereafter, an amount calculated in a manner determined by the general assembly"*, seventeen of
+ * them in R.C. 3317.022 alone.
+ *
+ * # What this is not
+ *
+ * Not a reason to shorten the horizon. A five-year question about a two-year statute is still worth
+ * asking, and "if the plan continues unchanged" is the only tractable answer to it. Nothing in the
+ * band's construction is wrong: the enrollment forecast carries its interval, the basis is marked
+ * projected, and the arithmetic reproduces. It was the *label* that was short of the truth.
+ *
+ * `statuteEnds` comes from the feed, which reads it from `project::statute::LAST_STATUTORY_YEAR`,
+ * which is checked against the committed extract of the Revised Code. Nobody types 2027 twice.
+ *
+ * @returns the note, or `""` when the horizon is inside the statute and there is nothing to say.
+ */
+export function statuteNote(horizon: number, statuteEnds: number): string {
+  if (horizon <= statuteEnds) return "";
+  return (
+    `<p class="note"><strong>“Current law” stops at FY${statuteEnds}.</strong> Three sections of ` +
+    `R.C. 3317 — base cost, local capacity and targeted assistance — apply only for FY${statuteEnds - 1} ` +
+    `and FY${statuteEnds} by their own terms, and forty divisions of five more hand their values to ` +
+    `a General Assembly that has not met. FY${horizon} here is this formula continued unchanged, ` +
+    `which is the only tractable assumption and is not a forecast of what the law will say.</p>`
+  );
+}

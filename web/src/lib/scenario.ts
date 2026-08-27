@@ -18,7 +18,7 @@ import {
   type Outcome,
   type Policy,
 } from "./policy.ts";
-import { forecastPath, growthPrior } from "./project.ts";
+import { forecastPath, growthPrior, statuteNote } from "./project.ts";
 import type { Draft, Panel } from "./types.ts";
 import * as routes from "./routes.ts";
 import { anchor } from "./section.ts";
@@ -244,6 +244,7 @@ export function renderProjection(bundle: Panel, levers: Levers): string {
         forward from FY${meta.base_year} by a damped trend, and the FY${bundle.fiscal_year}
         formula is re-run at it. Nothing here projects the formula, the appropriation, or
         assessed valuation.</p>
+      ${statuteNote(levers.horizon, meta.statute_ends)}
       <p class="note">The band is not this district's — or this state's — own historical
         variability. Three observations cannot give that. It is the ${escapeHtml(
           meta.prior_source,
