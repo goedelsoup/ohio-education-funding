@@ -203,6 +203,13 @@ pub struct Inputs {
     /// The report card's statewide outcome block — the federal-share distribution and the two
     /// value-added agreement statistics, over the 606 districts joined on all three panels.
     pub outcome_block: bundle::OutcomeStatewide,
+    /// Toledo City, FY2025: the expenditure-function row beside the report card row.
+    pub toledo: CrossSection,
+    /// Perrysburg Exempted Village, the other half of the pair.
+    pub perrysburg: CrossSection,
+    /// The median district's operating spending per headcount pupil, over the 607 the department
+    /// rates. The line `perrysburg-exempted-village` places itself below.
+    pub median_operating_per_pupil: f64,
 }
 
 impl Inputs {
@@ -293,7 +300,89 @@ impl Inputs {
                 )
             },
             outcome_block,
+            toledo: CrossSection::of(TOLEDO),
+            perrysburg: CrossSection::of(PERRYSBURG),
+            median_operating_per_pupil: {
+                let mut column: Vec<f64> = dispersion::functions::districts()
+                    .iter()
+                    .filter_map(|d| d.operating)
+                    .collect();
+                column.sort_by(|a, b| a.partial_cmp(b).expect("no NaN in a published dollar"));
+                dispersion::median(&column).expect("the function file is not empty")
+            },
         }
+    }
+}
+
+/// Toledo City, in both FY2025 fixtures.
+const TOLEDO: &str = "044909";
+/// Perrysburg Exempted Village, in both.
+const PERRYSBURG: &str = "045583";
+
+/// One district's FY2025 cross-section: its expenditure-function row and its report card row.
+///
+/// Held as a pair because the corpus quotes them in one breath — *21,160 pupils, $440.2 million of
+/// operating expenditure, $20,805 per headcount pupil, a Performance Index of 60.4* crosses the two
+/// files twice in a sentence — and every figure the pair of nodes publishes is one file or the
+/// other, keyed on the same IRN.
+pub struct CrossSection {
+    /// Operating spending by function, per headcount pupil, FY2025.
+    pub functions: dispersion::functions::Functions,
+    /// The 2024-25 report card row for the same district.
+    pub card: dispersion::report_card::ReportCard,
+}
+
+impl CrossSection {
+    /// Both fixtures' rows for one district.
+    ///
+    /// # Panics
+    ///
+    /// If either committed fixture does not carry the IRN.
+    #[must_use]
+    pub fn of(irn: &str) -> Self {
+        Self {
+            functions: dispersion::functions::district(irn)
+                .unwrap_or_else(|| panic!("{irn} is in the expenditure-function file")),
+            card: dispersion::report_card::district(irn)
+                .unwrap_or_else(|| panic!("{irn} is in the 2024-25 report card")),
+        }
+    }
+
+    /// Operating spending per headcount pupil, as the department's function file publishes it.
+    ///
+    /// Not the report card's total divided by its ADM. The two agree to the cent here, and the
+    /// published figure is the one the corpus quotes.
+    ///
+    /// # Panics
+    ///
+    /// If the district reports no operating total. Both of these do.
+    #[must_use]
+    pub fn operating(&self) -> f64 {
+        self.functions
+            .operating
+            .expect("the department publishes an operating total for both districts")
+    }
+
+    /// One function as a share of that total.
+    ///
+    /// # Panics
+    ///
+    /// If the district reports no figure for the function. Both report every one below.
+    #[must_use]
+    pub fn share(&self, pick: fn(&dispersion::functions::Functions) -> Option<f64>) -> f64 {
+        self.functions
+            .share(pick(&self.functions))
+            .expect("the department publishes this function for both districts")
+    }
+
+    /// One report-card field.
+    ///
+    /// # Panics
+    ///
+    /// If the district reports no value for it. Both are fully reported.
+    #[must_use]
+    pub fn card(&self, pick: fn(&dispersion::report_card::ReportCard) -> Option<f64>) -> f64 {
+        pick(&self.card).expect("the report card carries this field for both districts")
     }
 }
 
@@ -3119,5 +3208,391 @@ pub static FIGURES: &[Figure] = &[
         pinned: 0.1570,
         tolerance: 0.0,
         compute: |_| project::panel::CTE_WEIGHTS[4],
+    },
+    // --- The Toledo–Perrysburg cross-section, FY2025 ------------------------------------
+    Figure {
+        key: "dispersion/toledo-operating-per-headcount-pupil",
+        owner: "crates/dispersion",
+        unit: Unit::Dollars,
+        label: "Toledo operating spending per headcount pupil, FY2025",
+        pinned: 20_804.57,
+        tolerance: 0.01,
+        compute: |i| i.toledo.operating(),
+    },
+    Figure {
+        key: "dispersion/perrysburg-operating-per-headcount-pupil",
+        owner: "crates/dispersion",
+        unit: Unit::Dollars,
+        label: "Perrysburg operating spending per headcount pupil, FY2025",
+        pinned: 14_632.16,
+        tolerance: 0.01,
+        compute: |i| i.perrysburg.operating(),
+    },
+    Figure {
+        key: "dispersion/median-operating-per-headcount-pupil",
+        owner: "crates/dispersion",
+        unit: Unit::Dollars,
+        label: "Median operating spending per headcount pupil, over the 607 districts rated",
+        pinned: 16_289.44,
+        tolerance: 0.01,
+        compute: |i| i.median_operating_per_pupil,
+    },
+    Figure {
+        key: "dispersion/toledo-perrysburg-operating-gap",
+        owner: "crates/dispersion",
+        unit: Unit::Dollars,
+        label: "What Toledo spends per pupil over Perrysburg, FY2025",
+        pinned: 6_172.41,
+        tolerance: 0.01,
+        compute: |i| i.toledo.operating() - i.perrysburg.operating(),
+    },
+    Figure {
+        key: "dispersion/toledo-instruction-share",
+        owner: "crates/dispersion",
+        unit: Unit::Share,
+        label: "Instruction as a share of Toledo operating spending, FY2025",
+        pinned: 0.512_640_251_6,
+        tolerance: 0.000_001,
+        compute: |i| i.toledo.share(|f| f.instruction),
+    },
+    Figure {
+        key: "dispersion/perrysburg-instruction-share",
+        owner: "crates/dispersion",
+        unit: Unit::Share,
+        label: "Instruction as a share of Perrysburg operating spending, FY2025",
+        pinned: 0.626_336_098,
+        tolerance: 0.000_001,
+        compute: |i| i.perrysburg.share(|f| f.instruction),
+    },
+    Figure {
+        key: "dispersion/toledo-classroom-instruction-share",
+        owner: "crates/dispersion",
+        unit: Unit::Share,
+        label: "Classroom instruction as a share of Toledo operating spending, FY2025",
+        pinned: 0.634_294_772_7,
+        tolerance: 0.000_001,
+        compute: |i| i.toledo.share(|f| f.classroom_instruction),
+    },
+    Figure {
+        key: "dispersion/perrysburg-classroom-instruction-share",
+        owner: "crates/dispersion",
+        unit: Unit::Share,
+        label: "Classroom instruction as a share of Perrysburg operating spending, FY2025",
+        pinned: 0.731_052_011_5,
+        tolerance: 0.000_001,
+        compute: |i| i.perrysburg.share(|f| f.classroom_instruction),
+    },
+    Figure {
+        key: "dispersion/toledo-operations-maintenance-share",
+        owner: "crates/dispersion",
+        unit: Unit::Share,
+        label: "Operations and maintenance as a share of Toledo operating spending, FY2025",
+        pinned: 0.147_772_821_1,
+        tolerance: 0.000_001,
+        compute: |i| i.toledo.share(|f| f.operations_maintenance),
+    },
+    Figure {
+        key: "dispersion/perrysburg-operations-maintenance-share",
+        owner: "crates/dispersion",
+        unit: Unit::Share,
+        label: "Operations and maintenance as a share of Perrysburg operating spending, FY2025",
+        pinned: 0.077_453_363,
+        tolerance: 0.000_001,
+        compute: |i| i.perrysburg.share(|f| f.operations_maintenance),
+    },
+    Figure {
+        key: "dispersion/toledo-school-admin-share",
+        owner: "crates/dispersion",
+        unit: Unit::Share,
+        label: "Building administration as a share of Toledo operating spending, FY2025",
+        pinned: 0.085_123_124_39,
+        tolerance: 0.000_001,
+        compute: |i| i.toledo.share(|f| f.school_admin),
+    },
+    Figure {
+        key: "dispersion/perrysburg-school-admin-share",
+        owner: "crates/dispersion",
+        unit: Unit::Share,
+        label: "Building administration as a share of Perrysburg operating spending, FY2025",
+        pinned: 0.048_491_815_29,
+        tolerance: 0.000_001,
+        compute: |i| i.perrysburg.share(|f| f.school_admin),
+    },
+    Figure {
+        key: "dispersion/toledo-pupil-support-share",
+        owner: "crates/dispersion",
+        unit: Unit::Share,
+        label: "Student support as a share of Toledo operating spending, FY2025",
+        pinned: 0.081_496_998_02,
+        tolerance: 0.000_001,
+        compute: |i| i.toledo.share(|f| f.pupil_support),
+    },
+    Figure {
+        key: "dispersion/perrysburg-pupil-support-share",
+        owner: "crates/dispersion",
+        unit: Unit::Share,
+        label: "Student support as a share of Perrysburg operating spending, FY2025",
+        pinned: 0.084_976_517_48,
+        tolerance: 0.000_001,
+        compute: |i| i.perrysburg.share(|f| f.pupil_support),
+    },
+    Figure {
+        key: "dispersion/perrysburg-pupil-transportation-share",
+        owner: "crates/dispersion",
+        unit: Unit::Share,
+        label: "Pupil transportation as a share of Perrysburg operating spending, FY2025",
+        pinned: 0.033_671_036_95,
+        tolerance: 0.000_001,
+        compute: |i| i.perrysburg.share(|f| f.pupil_transportation),
+    },
+
+    // --- The same two districts on the 2024-25 report card -------------------------------
+    Figure {
+        key: "dispersion/toledo-operating-expenditure",
+        owner: "crates/dispersion",
+        unit: Unit::Dollars,
+        label: "Toledo total operating expenditure, FY2025",
+        pinned: 440_219_539.58,
+        tolerance: 0.01,
+        compute: |i| i.toledo.card(|c| c.operating_expenditure),
+    },
+    Figure {
+        key: "dispersion/toledo-per-equivalent-pupil",
+        owner: "crates/dispersion",
+        unit: Unit::Dollars,
+        label: "Toledo operating spending per equivalent pupil, as the report card prints it",
+        pinned: 14_312.0,
+        tolerance: 0.01,
+        compute: |i| i.toledo.card(|c| c.per_equivalent_pupil),
+    },
+    Figure {
+        key: "dispersion/toledo-enrolled-adm",
+        owner: "crates/dispersion",
+        unit: Unit::Ratio,
+        label: "Toledo enrolled ADM, FY2025, a headcount and not a whole number of pupils",
+        pinned: 21_159.753_2,
+        tolerance: 0.000_001,
+        compute: |i| i.toledo.card(|c| c.unweighted_adm),
+    },
+    Figure {
+        key: "dispersion/toledo-weighted-adm",
+        owner: "crates/dispersion",
+        unit: Unit::Count,
+        label: "Toledo weighted ADM, FY2025, as the report card publishes it",
+        pinned: 30_758.0,
+        tolerance: 0.0,
+        compute: |i| i.toledo.card(|c| c.weighted_adm),
+    },
+    Figure {
+        key: "dispersion/toledo-weight-ratio",
+        owner: "crates/dispersion",
+        unit: Unit::Ratio,
+        label: "Toledo weighted ADM over its headcount, FY2025",
+        pinned: 1.453_608_637,
+        tolerance: 0.000_001,
+        compute: |i| i.toledo.card(|c| c.weighted_adm) / i.toledo.card(|c| c.unweighted_adm),
+    },
+    Figure {
+        key: "dispersion/toledo-performance-index",
+        owner: "crates/dispersion",
+        unit: Unit::Ratio,
+        label: "Toledo Performance Index, 2024-25",
+        pinned: 60.4,
+        tolerance: 0.000_001,
+        compute: |i| i.toledo.card(|c| c.performance_index),
+    },
+    Figure {
+        key: "dispersion/toledo-performance-index-prior",
+        owner: "crates/dispersion",
+        unit: Unit::Ratio,
+        label: "Toledo Performance Index, 2023-24",
+        pinned: 57.9,
+        tolerance: 0.000_001,
+        compute: |i| i.toledo.card(|c| c.performance_index_prior),
+    },
+    Figure {
+        key: "dispersion/toledo-performance-index-earliest",
+        owner: "crates/dispersion",
+        unit: Unit::Ratio,
+        label: "Toledo Performance Index, 2022-23",
+        pinned: 58.8,
+        tolerance: 0.000_001,
+        compute: |i| i.toledo.card(|c| c.performance_index_earliest),
+    },
+    Figure {
+        key: "dispersion/toledo-economically-disadvantaged-share",
+        owner: "crates/dispersion",
+        unit: Unit::Share,
+        label: "Toledo: Share of pupils economically disadvantaged, 2024-25",
+        pinned: 0.989,
+        tolerance: 0.000_001,
+        compute: |i| i.toledo.card(|c| c.economically_disadvantaged) / 100.0,
+    },
+    Figure {
+        key: "dispersion/toledo-students-with-disabilities-share",
+        owner: "crates/dispersion",
+        unit: Unit::Share,
+        label: "Toledo: Share of pupils with a disability, 2024-25",
+        pinned: 0.219,
+        tolerance: 0.000_001,
+        compute: |i| i.toledo.card(|c| c.students_with_disabilities) / 100.0,
+    },
+    Figure {
+        key: "dispersion/toledo-english-learner-share",
+        owner: "crates/dispersion",
+        unit: Unit::Share,
+        label: "Toledo: Share of pupils who are English learners, 2024-25",
+        pinned: 0.024,
+        tolerance: 0.000_001,
+        compute: |i| i.toledo.card(|c| c.english_learner) / 100.0,
+    },
+    Figure {
+        key: "dispersion/perrysburg-operating-expenditure",
+        owner: "crates/dispersion",
+        unit: Unit::Dollars,
+        label: "Perrysburg total operating expenditure, FY2025",
+        pinned: 79_735_653.02,
+        tolerance: 0.01,
+        compute: |i| i.perrysburg.card(|c| c.operating_expenditure),
+    },
+    Figure {
+        key: "dispersion/perrysburg-per-equivalent-pupil",
+        owner: "crates/dispersion",
+        unit: Unit::Dollars,
+        label: "Perrysburg operating spending per equivalent pupil, as the report card prints it",
+        pinned: 12_392.0,
+        tolerance: 0.01,
+        compute: |i| i.perrysburg.card(|c| c.per_equivalent_pupil),
+    },
+    Figure {
+        key: "dispersion/perrysburg-enrolled-adm",
+        owner: "crates/dispersion",
+        unit: Unit::Ratio,
+        label: "Perrysburg enrolled ADM, FY2025, a headcount and not a whole number of pupils",
+        pinned: 5_449.342_8,
+        tolerance: 0.000_001,
+        compute: |i| i.perrysburg.card(|c| c.unweighted_adm),
+    },
+    Figure {
+        key: "dispersion/perrysburg-weighted-adm",
+        owner: "crates/dispersion",
+        unit: Unit::Count,
+        label: "Perrysburg weighted ADM, FY2025, as the report card publishes it",
+        pinned: 6_435.0,
+        tolerance: 0.0,
+        compute: |i| i.perrysburg.card(|c| c.weighted_adm),
+    },
+    Figure {
+        key: "dispersion/perrysburg-weight-ratio",
+        owner: "crates/dispersion",
+        unit: Unit::Ratio,
+        label: "Perrysburg weighted ADM over its headcount, FY2025",
+        pinned: 1.180_876_343,
+        tolerance: 0.000_001,
+        compute: |i| i.perrysburg.card(|c| c.weighted_adm) / i.perrysburg.card(|c| c.unweighted_adm),
+    },
+    Figure {
+        key: "dispersion/perrysburg-performance-index",
+        owner: "crates/dispersion",
+        unit: Unit::Ratio,
+        label: "Perrysburg Performance Index, 2024-25",
+        pinned: 103.5,
+        tolerance: 0.000_001,
+        compute: |i| i.perrysburg.card(|c| c.performance_index),
+    },
+    Figure {
+        key: "dispersion/perrysburg-performance-index-prior",
+        owner: "crates/dispersion",
+        unit: Unit::Ratio,
+        label: "Perrysburg Performance Index, 2023-24",
+        pinned: 102.8,
+        tolerance: 0.000_001,
+        compute: |i| i.perrysburg.card(|c| c.performance_index_prior),
+    },
+    Figure {
+        key: "dispersion/perrysburg-performance-index-earliest",
+        owner: "crates/dispersion",
+        unit: Unit::Ratio,
+        label: "Perrysburg Performance Index, 2022-23",
+        pinned: 102.7,
+        tolerance: 0.000_001,
+        compute: |i| i.perrysburg.card(|c| c.performance_index_earliest),
+    },
+    Figure {
+        key: "dispersion/perrysburg-economically-disadvantaged-share",
+        owner: "crates/dispersion",
+        unit: Unit::Share,
+        label: "Perrysburg: Share of pupils economically disadvantaged, 2024-25",
+        pinned: 0.138,
+        tolerance: 0.000_001,
+        compute: |i| i.perrysburg.card(|c| c.economically_disadvantaged) / 100.0,
+    },
+    Figure {
+        key: "dispersion/perrysburg-students-with-disabilities-share",
+        owner: "crates/dispersion",
+        unit: Unit::Share,
+        label: "Perrysburg: Share of pupils with a disability, 2024-25",
+        pinned: 0.113,
+        tolerance: 0.000_001,
+        compute: |i| i.perrysburg.card(|c| c.students_with_disabilities) / 100.0,
+    },
+    Figure {
+        key: "dispersion/perrysburg-english-learner-share",
+        owner: "crates/dispersion",
+        unit: Unit::Share,
+        label: "Perrysburg: Share of pupils who are English learners, 2024-25",
+        pinned: 0.023,
+        tolerance: 0.000_001,
+        compute: |i| i.perrysburg.card(|c| c.english_learner) / 100.0,
+    },
+    Figure {
+        key: "dispersion/toledo-progress-effect-size-below-zero",
+        owner: "crates/dispersion",
+        unit: Unit::Ratio,
+        label: "How far Toledo value-added effect size sits below zero, 2024-25",
+        pinned: 0.02,
+        tolerance: 0.000_001,
+        compute: |i| -i.toledo.card(|c| c.progress_effect_size),
+    },
+    Figure {
+        key: "dispersion/toledo-progress-composite-below-zero",
+        owner: "crates/dispersion",
+        unit: Unit::Ratio,
+        label: "How far Toledo value-added composite sits below zero, 2024-25",
+        pinned: 5.07,
+        tolerance: 0.000_001,
+        compute: |i| -i.toledo.card(|c| c.progress_composite),
+    },
+    Figure {
+        key: "dispersion/perrysburg-progress-effect-size-above-zero",
+        owner: "crates/dispersion",
+        unit: Unit::Ratio,
+        label: "How far Perrysburg value-added effect size sits above zero, 2024-25",
+        pinned: 0.17,
+        tolerance: 0.000_001,
+        compute: |i| i.perrysburg.card(|c| c.progress_effect_size),
+    },
+    Figure {
+        key: "dispersion/perrysburg-progress-composite-above-zero",
+        owner: "crates/dispersion",
+        unit: Unit::Ratio,
+        label: "How far Perrysburg value-added composite sits above zero, 2024-25",
+        pinned: 23.76,
+        tolerance: 0.000_001,
+        compute: |i| i.perrysburg.card(|c| c.progress_composite),
+    },
+    Figure {
+        key: "dispersion/toledo-denominator-spread",
+        owner: "crates/dispersion",
+        unit: Unit::Share,
+        label: "How much higher Toledo spending reads per headcount pupil than per weighted one",
+        pinned: 0.453_608_636_6,
+        tolerance: 0.000_001,
+        compute: |i| {
+            let dollars = i.toledo.card(|c| c.operating_expenditure);
+            let headcount = dollars / i.toledo.card(|c| c.unweighted_adm);
+            let weighted = dollars / i.toledo.card(|c| c.weighted_adm);
+            headcount / weighted - 1.0
+        },
     },
 ];

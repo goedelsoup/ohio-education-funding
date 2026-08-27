@@ -157,8 +157,8 @@ has one public reader in the crate that owns it — and the four clusters it unb
 the Census F-33 state table, the District Profile Report's millage and dispersion columns, the
 2024-25 report card's correlations, and the twenty-mill floor.
 
-What remains unbound is not one thing, and the distinction is worth stating because three of the
-four kinds are **permanent**:
+What remains unbound is not one thing, and the distinction is worth stating because four of the
+five kinds are **permanent**:
 
 - **A rank is not readable.** The corpus writes ranks as ordinals — `seventh highest of fifty-one`,
   `25th of 51` — and neither form yields a numeral. A spelled-out ordinal has no digits at all, and
@@ -172,6 +172,12 @@ four kinds are **permanent**:
   carry digits inside a `[verified — crates/…]` tag and none of them is a quantity a calculator
   computes. `education-agency/*.irn`, `fiscal-period/*.appropriating_bill` and
   `program/*.appropriation_line` are in this class.
+- **A share below one part in fifty cannot be exported.** `figures`'s own guard requires that a
+  share, mistyped as a percentage, land above the ceiling that tells the two apart — so `0.0157`
+  cannot go in the manifest, because `1.57` would pass for a growth rate and one of those is
+  already there. Toledo spends 1.6% of its operating budget on pupil transportation, and that one
+  cell of its function table is stated and not bound; the other eleven are. Weakening the guard to
+  fit the cell would cost more than the cell is worth.
 - **`revisions:` is deliberately unbindable**, for the reason given above.
 
 The **appropriation ledger** is bound too — the proration remainder, the lottery substitution, the
@@ -180,19 +186,34 @@ cluster needed the same move #157 made: LSC's redbook and greenbook had three pr
 across three test files and no public one, and two of the three anchored a table differently. They
 read through `project::budget_analysis` now.
 
-**Fifty-eight nodes cite a crate inside a `[verified]` tag; forty-six carry bindings.** Of the
-twelve that carry none, **ten are citation rather than computation** — the identifier class above,
-plus the nodes that cite a committed **fixture path** rather than a calculator. A path is not a
-quantity either.
+**Sixty-seven nodes cite a crate inside a `[verified]` tag; fifty carry bindings.** Of the
+seventeen that carry none, **fifteen are citation rather than computation** — the identifier class
+above, plus the nodes that cite a committed **fixture path** rather than a calculator. A path is
+not a quantity either.
 
-**The other two are a real residue, and this paragraph used to deny they existed.** It said the
-non-binding nodes were "all citation rather than computation", which was true when it was written
-and was not re-measured after. [`toledo-city`](../corpus/education-agency/toledo-city.yml) and
-[`perrysburg-exempted-village`](../corpus/education-agency/perrysburg-exempted-village.yml) both
-publish computed cross-sections — 21,160 pupils and $20,805 per headcount pupil for one, $14,632
-and a 13.8% disadvantaged share for the other — under `[verified — computed]`, against
-`crates/dispersion/tests/expenditure_functions_fy25.rs`. That test holds its own reader, so
-finishing them is a hoist and not just a `FIGURES` entry.
+**The other two cite a crate *test*, which is the shape that has never yet been only a citation.**
+[`legislation/hb-583-2022`](../corpus/legislation/hb-583-2022.yml) says R.C. 3317.022 "appears ten
+times as a cross-reference" and
+[`draft-legislation/hb-643-136-introduced`](../corpus/draft-legislation/hb-643-136-introduced.yml)
+prints a run showing `0 of 1 priced`, each under a `[verified — crates/…/tests/…]` tag. Both are
+counts something computed. Whether they are exportable is a measurement nobody has taken, and this
+paragraph is not going to guess at it a second time — see #226.
+
+**The district pair is finished, and what had kept it open was a premise nobody re-measured.** This
+section used to say that [`toledo-city`](../corpus/education-agency/toledo-city.yml) and
+[`perrysburg-exempted-village`](../corpus/education-agency/perrysburg-exempted-village.yml) needed
+a hoist first, because `crates/dispersion/tests/expenditure_functions_fy25.rs` "holds its own
+reader". It does not, and has not since **#157** — the commit two paragraphs above gave the
+expenditure-function file and the 2024-25 report card one public reader each, in the crate that
+owns them, and that test has called them ever since. Nothing was in the way. The two nodes carry
+**66 bindings across 42 figures** now: the function table both of them print, the report-card row
+each publishes under `fy2025_profile`, and the denominator spread the pair exists to demonstrate.
+
+**Binding them found a figure a dollar out.** Both nodes published Toledo's per-pupil gap over
+Perrysburg as `$6,173`. The department publishes $20,804.57 and $14,632.16, whose difference is
+$6,172.41. The crate test that already checked that gap asserted it within two dollars, so the
+rounding sat inside the check the whole time — the #153 class again, found by a binding rather than
+by reading. Both nodes record the withdrawal.
 
 **The most-repeated computed number in the corpus was bound in none of its carriers until the
 fourth tranche.** `294 of 609` — the districts the guarantee pays in the terminal year — is
@@ -288,7 +309,7 @@ Fields: count per claim tag across every node; then the unresolved marks by the 
 -->
 | Tag | Count | What it records |
 |---|--:|---|
-| `[verified]` | 1173 | supported by a committed primary source |
+| `[verified]` | 1175 | supported by a committed primary source |
 | `[inference]` | 275 | drawn from verified facts, not witnessed |
 | `[open]` | 216 | a live question — unknown, contested, or being worked |
 | `[unentered]` | 0 | a knowable value nobody has typed in yet |
@@ -333,7 +354,7 @@ Fields: count per claim tag across every node; then the unresolved marks by the 
 | `appropriation_line` | 1 | 0 |
 | `appropriating_bill` | 1 | 0 |
 
-**63 recorded withdrawals across 35 nodes.** A claim the corpus published and no longer stands behind is kept in a `revisions:` block rather than edited out, with the test or source that settled it — see [`the-four-genres-of-a-description`](../decisions/the-four-genres-of-a-description.yml). Counted here for the same reason the tags above are: how often this corpus has corrected itself is a fact about it, and one nobody would think to update by hand.
+**65 recorded withdrawals across 36 nodes.** A claim the corpus published and no longer stands behind is kept in a `revisions:` block rather than edited out, with the test or source that settled it — see [`the-four-genres-of-a-description`](../decisions/the-four-genres-of-a-description.yml). Counted here for the same reason the tags above are: how often this corpus has corrected itself is a fact about it, and one nobody would think to update by hand.
 <!-- /REGEN -->
 
 ## Relationship vocabulary

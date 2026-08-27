@@ -59,11 +59,11 @@ test("every bound figure in the corpus agrees with the crate it cites", () => {
  * node from dropping a `figures:` entry to make a red gate green.
  */
 test("the corpus binds no fewer figures than it did", () => {
-  expect(bindings.length, "310 bindings; raise this when you add one").toBeGreaterThanOrEqual(310);
+  expect(bindings.length, "376 bindings; raise this when you add one").toBeGreaterThanOrEqual(376);
   expect(
     corpus.nodes.filter((node) => node.figures.length > 0).length,
-    "48 nodes carry bindings; raise this when a forty-ninth does",
-  ).toBeGreaterThanOrEqual(48);
+    "50 nodes carry bindings; raise this when a fifty-first does",
+  ).toBeGreaterThanOrEqual(50);
   expect(
     new Set(bindings.map((binding) => binding.key)).size,
     "every figure the manifest exports is bound by some node",
@@ -123,6 +123,41 @@ test("the guarantee's district count is bound in all ten nodes that state it", (
     "scenario/fsfp-input-year-refresh",
     "scenario/guarantee-phase-out",
   ]);
+});
+
+/**
+ * The Toledo–Perrysburg pair states each other's figures, and both ends are bound.
+ *
+ * This is the #120 shape in miniature and the reason #218 finished both nodes in one commit rather
+ * than one each. Eight figures are written twice — the per-pupil gap, three function shares for
+ * each district, and Perrysburg's disability share, which Toledo's `findings` quotes to make the
+ * comparison it corrects. A district page that moved and a comparator that did not is exactly the
+ * `recognized-valuation` failure: one carrier corrected, one left publishing the old number under
+ * `[verified]`.
+ *
+ * Named rather than derived. A test that computed "every key both nodes bind" from the corpus would
+ * agree with itself after somebody dropped a binding, which is the thing it exists to catch.
+ */
+test("the district pair binds each shared figure at both ends", () => {
+  const carriers = (key: string) =>
+    corpus.nodes
+      .filter((node) => node.figures.some((figure) => figure.key === key))
+      .map((node) => node.id)
+      .sort();
+  const both = ["education-agency/perrysburg-exempted-village", "education-agency/toledo-city"];
+
+  for (const key of [
+    "dispersion/toledo-perrysburg-operating-gap",
+    "dispersion/toledo-instruction-share",
+    "dispersion/perrysburg-instruction-share",
+    "dispersion/toledo-classroom-instruction-share",
+    "dispersion/perrysburg-classroom-instruction-share",
+    "dispersion/toledo-pupil-support-share",
+    "dispersion/perrysburg-pupil-support-share",
+    "dispersion/perrysburg-students-with-disabilities-share",
+  ]) {
+    expect(carriers(key), `${key} is stated in both nodes and bound in one`).toEqual(both);
+  }
 });
 
 test("the manifest declares the contract this check reads", () => {

@@ -16,7 +16,7 @@ description: |
   It is an ordinary well-off Ohio suburb, which is exactly what makes it the right comparator
   when someone wants to know whether an urban district's spending is unusual.
 
-  **What the comparison actually shows.** Toledo spends $6,173 more per pupil and puts a
+  **What the comparison actually shows.** Toledo spends $6,172 more per pupil and puts a
   markedly smaller share of it in a classroom — 51.3% on instruction against Perrysburg's 62.6%,
   63.4% on classroom instruction against 73.1%. [verified] Perrysburg's operating budget is more
   concentrated on teaching and less on plant and building administration, which is what a newer,
@@ -38,6 +38,123 @@ description: |
 
   Not yet held: valuation per pupil, millage, guarantee status, and anything before FY2024.
   [open]
+revisions:
+  - was: |
+      Toledo spends $6,173 more per pupil than Perrysburg.
+    now: |
+      $6,172. The department publishes $20,804.57 and $14,632.16, whose difference is $6,172.41.
+    found_by: |
+      Binding the gap to `crates/figures`. The crate test that already checked it asserted
+      `close(gap, 6_173.0, 2.0)` — two dollars of tolerance around a figure the corpus published
+      to the dollar, so the rounding sat inside the check the whole time.
+    reach: |
+      One dollar on one figure, stated in this node and in [Toledo](toledo-city.yml). Nothing
+      reads the gap to the dollar, and the function shares beside it are untouched. [verified]
+figures:
+  - key: dispersion/perrysburg-operating-per-headcount-pupil
+    value: 14632.16
+    field: description
+    as_written: "**$14,632 per headcount pupil**"
+  - key: dispersion/median-operating-per-headcount-pupil
+    value: 16289.44
+    field: description
+    as_written: "below the statewide median of $16,289"
+  - key: dispersion/perrysburg-enrolled-adm
+    value: 5449.3428
+    field: description
+    as_written: "on 5,449 pupils"
+  - key: dispersion/perrysburg-economically-disadvantaged-share
+    value: 0.138
+    field: description
+    as_written: "a 13.8% economically disadvantaged share"
+  - key: dispersion/perrysburg-students-with-disabilities-share
+    value: 0.113
+    field: description
+    as_written: "an 11.3% disability share"
+  - key: dispersion/toledo-perrysburg-operating-gap
+    value: 6172.41
+    field: description
+    as_written: "Toledo spends $6,172 more per pupil"
+  - key: dispersion/toledo-instruction-share
+    value: 0.51264
+    field: description
+    as_written: "51.3% on instruction against Perrysburg's 62.6%"
+  - key: dispersion/perrysburg-instruction-share
+    value: 0.626336
+    field: description
+    as_written: "on instruction against Perrysburg's 62.6%"
+  - key: dispersion/toledo-classroom-instruction-share
+    value: 0.634295
+    field: description
+    as_written: "63.4% on classroom instruction against 73.1%"
+  - key: dispersion/perrysburg-classroom-instruction-share
+    value: 0.731052
+    field: description
+    as_written: "on classroom instruction against 73.1%"
+  - key: dispersion/toledo-pupil-support-share
+    value: 0.081497
+    field: description
+    as_written: "8.1% Toledo"
+  - key: dispersion/perrysburg-pupil-support-share
+    value: 0.084977
+    field: description
+    as_written: "8.5% Perrysburg"
+  - key: dispersion/perrysburg-enrolled-adm
+    value: 5449.3428
+    field: fy2025_profile
+    as_written: "Enrolled ADM (unweighted) 5,449.34"
+  - key: dispersion/perrysburg-weighted-adm
+    value: 6435
+    field: fy2025_profile
+    as_written: "weighted ADM 6,435"
+  - key: dispersion/perrysburg-weight-ratio
+    value: 1.180876
+    field: fy2025_profile
+    as_written: "weight ratio 1.181"
+  - key: dispersion/perrysburg-operating-expenditure
+    value: 79735653.02
+    field: fy2025_profile
+    as_written: "Operating expenditure $79,735,653.02"
+  - key: dispersion/perrysburg-operating-per-headcount-pupil
+    value: 14632.16
+    field: fy2025_profile
+    as_written: "$14,632 per headcount pupil,"
+  - key: dispersion/perrysburg-per-equivalent-pupil
+    value: 12392
+    field: fy2025_profile
+    as_written: "$12,392 per equivalent pupil"
+  - key: dispersion/perrysburg-economically-disadvantaged-share
+    value: 0.138
+    field: fy2025_profile
+    as_written: "Economically disadvantaged 13.8%"
+  - key: dispersion/perrysburg-students-with-disabilities-share
+    value: 0.113
+    field: fy2025_profile
+    as_written: "students with disabilities 11.3%"
+  - key: dispersion/perrysburg-english-learner-share
+    value: 0.023
+    field: fy2025_profile
+    as_written: "English learners 2.3%"
+  - key: dispersion/perrysburg-performance-index
+    value: 103.5
+    field: fy2025_profile
+    as_written: "Performance Index 103.5 (2024-25)"
+  - key: dispersion/perrysburg-performance-index-prior
+    value: 102.8
+    field: fy2025_profile
+    as_written: "102.8 (2023-24)"
+  - key: dispersion/perrysburg-performance-index-earliest
+    value: 102.7
+    field: fy2025_profile
+    as_written: "102.7 (2022-23)"
+  - key: dispersion/perrysburg-progress-effect-size-above-zero
+    value: 0.17
+    field: fy2025_profile
+    as_written: "Progress effect size +0.17"
+  - key: dispersion/perrysburg-progress-composite-above-zero
+    value: 23.76
+    field: fy2025_profile
+    as_written: "composite +23.76"
 properties:
   seeded_because: |
     The corpus's first exempted village district, closing one of the two agency-type gaps this
