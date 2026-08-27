@@ -50,8 +50,19 @@ import { escapeHtml } from "./format.ts";
  *
  * The `#` is `aria-hidden` and the accessible name comes from the label, so a screen reader
  * announces "Link to this section" rather than "number sign" — and the heading it sits in keeps a
- * name a reader can recognise. It is first in the heading rather than last so that it never lands
- * between a title and the year chip pinned to the other end of the same flex row.
+ * name a reader can recognise.
+ *
+ * # Where it goes, which is not where this puts it
+ *
+ * This emits the anchor and the caller prepends it to a title. `semantics.ts`'s `moveAnchors` then
+ * relocates it *after* the title and *before* the year chip, as a build-time pass over the rendered
+ * HTML — the placement argued for at length in that function, and the one that ships.
+ *
+ * That pass sees server-rendered markup only. The scenario routes build their headings in the
+ * browser from this same helper, so `/scenario` rendered two headings with the anchor last and four
+ * with it first, on one screen. {@link heading} is the fix: it states the final order once, in a
+ * form both sides can use, and `moveAnchors` is what still carries the markup that has not moved to
+ * it.
  *
  * # The trailing space is not cosmetic
  *
@@ -67,4 +78,32 @@ export function anchor(id: string): string {
     `<a class="section-anchor" href="#${safe}" aria-label="Link to this section">` +
     `<span aria-hidden="true">#</span></a> `
   );
+}
+
+/**
+ * A whole heading's content, in the order it ships in.
+ *
+ * # Why this exists rather than a rule about calling `anchor` last
+ *
+ * Because a rule stated in prose is what produced the defect. Fifteen call sites wrote
+ * `${anchor(id)}Title`, `moveAnchors` corrected the server-rendered ones on the way out, and the
+ * fourteen the browser renders were never corrected — so `/scenario` showed `Levers #` beside
+ * `# Most affected` and `# What moved underneath`.
+ *
+ * A helper that takes both pieces cannot be called in the wrong order.
+ *
+ * # The separator
+ *
+ * A space before the anchor, which `moveAnchors` also inserts and for the reason `anchor` records:
+ * `</a>` immediately against a letter is the fused-word defect `app.spec.ts` scans every route for,
+ * and the same defect at the other end is `from<a`. Inside a card heading's flex row the gap does
+ * the separating and a whitespace-only run between two flex items is not rendered at all, so the
+ * space costs nothing there and is the separation everywhere else.
+ *
+ * @param id the `id` of the card this heading belongs to
+ * @param title the heading's text, already escaped or trusted
+ * @param chip a year chip to pin at the far end of the row, or `""`
+ */
+export function heading(id: string, title: string, chip = ""): string {
+  return `${title} ${anchor(id).trimEnd()}${chip}`;
 }

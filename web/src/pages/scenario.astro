@@ -64,6 +64,16 @@ const refresh = refreshEffect(bundle.districts, bundle.drafts, s.minimum_state_s
   <HeldFixed districts={bundle.districts} total={s.districts} refresh={refresh} />
 
   <div id="scenario-root">
+    {/*
+      The year chip, rendered here because the client cannot build one.
+
+      `yearChip` reads the feed through `loadFeed`, which touches the filesystem, so the cards this
+      route renders in the browser had no way to say what year their figures are on — and did not.
+      Handing over the markup keeps one definition of the chip and puts it on cards a build-time
+      pass can never reach. See `scripts/scenario.ts`.
+    */}
+    <template id="scenario-chip" set:html={yearChip("formula")} />
+
     <ScenarioControls
       model={s.minimum_state_share}
       onGuarantee={s.on_guarantee}

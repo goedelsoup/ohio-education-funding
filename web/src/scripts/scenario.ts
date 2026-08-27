@@ -42,7 +42,7 @@ import { pct } from "../lib/format.ts";
 import type { Panel } from "../lib/types.ts";
 import { REQUIRED_CONTRACT } from "../lib/types.ts";
 import { isForecastVerified, isVerified, verify, type Verification } from "../lib/verify.ts";
-import { anchor } from "../lib/section.ts";
+import { heading } from "../lib/section.ts";
 import { saying, tileSummary } from "../lib/status.ts";
 
 const $ = <T extends HTMLElement>(selector: string): T | null =>
@@ -71,6 +71,19 @@ const irn = root?.dataset.irn;
  * draft" into no message at all.
  */
 const draftSlug = new URLSearchParams(location.search).get("draft") ?? "";
+
+/**
+ * The year chip, rendered into a `<template>` by the page that carries this script.
+ *
+ * `yearChip` reads the feed through `loadFeed`, which touches the filesystem, so nothing rendered
+ * in the browser could build one — which is why every card on these two routes carried figures
+ * under no year at all. The chip rule never caught it: `/scenario` is not in the sweep's route
+ * list, and the district route passes it in a state where the only card rendered has no figures in
+ * it.
+ *
+ * Read once. It is a property of the feed, not of the levers.
+ */
+const chip = $<HTMLTemplateElement>("#scenario-chip")?.innerHTML ?? "";
 
 interface State {
   panel: Panel;
@@ -210,10 +223,10 @@ function render(): void {
   if (irn) {
     // One district, one container. There is no forecast on that route — the band is drawn once,
     // statewide, where it is the subject — so there is nothing for a detail half to sit below.
-    if (out) out.innerHTML = banner + renderDistrictScenario(state.panel, state.levers, irn);
+    if (out) out.innerHTML = banner + renderDistrictScenario(state.panel, state.levers, irn, chip);
     if (detail) detail.innerHTML = "";
   } else {
-    const rendered = renderScenario(state.panel, state.levers);
+    const rendered = renderScenario(state.panel, state.levers, chip);
     if (out) out.innerHTML = banner + rendered.summary;
     // Written on every render, including when it is empty. Under current law there is nothing to
     // distribute or rank, and a detail half left standing from the last lever position would be
@@ -225,7 +238,7 @@ function render(): void {
   // The band is gated on its own checks. A forecast that failed them costs the reader the band,
   // not the scenario builder: they are different claims and one can be wrong alone.
   if (projection && isForecastVerified(state.verification)) {
-    projection.innerHTML = renderProjection(state.panel, state.levers);
+    projection.innerHTML = renderProjection(state.panel, state.levers, chip);
   }
   /*
    * And say so. Read back off the tiles that were just written rather than composed from the
@@ -266,7 +279,7 @@ function reportFailure(verification: Verification): void {
   const out = $("#scenario-out");
   if (out) {
     out.innerHTML = `<div class="card err" id="disabled" data-part="disabled">
-      <h2>${anchor("disabled")}The scenario builder is disabled</h2>
+      <h2>${heading("disabled", "The scenario builder is disabled")}</h2>
       <p>This page re-derives Ohio's funding formula in the browser so a slider does not need a
         round trip, and it checks that derivation against results computed by
         <code>crates/project</code> before using it. Those checks did not pass:</p>
@@ -283,7 +296,7 @@ function reportForecastFailure(panel: Panel, verification: Verification): void {
   if (!out) return;
   if (!panel.projection) {
     out.innerHTML = `<div class="card" id="projection" data-part="projection">
-      <h2>${anchor("projection")}At projected enrollment</h2>
+      <h2>${heading("projection", "At projected enrollment")}</h2>
       <p class="note">This panel carries no projection block, so enrollment cannot be carried
         forward. The simulation above is unaffected — it runs at published enrollment.</p>
     </div>`;
@@ -302,7 +315,7 @@ function reportForecastFailure(panel: Panel, verification: Verification): void {
           )
           .join("");
   out.innerHTML = `<div class="card err" id="projection-disabled" data-part="projection-disabled">
-    <h2>${anchor("projection-disabled")}The projection is disabled</h2>
+    <h2>${heading("projection-disabled", "The projection is disabled")}</h2>
     <p>This page carries its own copy of the enrollment projection so a slider does not need a
       round trip, and checks it against forecasts computed by <code>crates/project</code> before
       drawing a band. Those checks did not pass:</p>
