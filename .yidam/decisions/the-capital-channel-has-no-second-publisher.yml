@@ -1,0 +1,83 @@
+id: the-capital-channel-has-no-second-publisher
+summary: >-
+  #11 named three alternate publishers for OFCC project data and called them unsurveyed. They are
+  surveyed now. The capital appropriation acts are reachable with machinery this repository already
+  has and appropriate the whole school facilities programme as two lump lines; the Internet Archive
+  holds OFCC's portal shell and none of its data. The blocker stands, and it is narrower and better
+  founded than it was.
+
+context: |
+  `ofcc-projects` is the only connector blocked by a policy choice rather than a data problem: the
+  site 404s a self-identifying agent, `crates/connect/src/cache.rs` refuses to send a browser
+  string, and impersonating one would be discourteous besides.
+
+  #11 recorded that and named what had not been tried:
+
+  > **Choose an alternate publisher.** Not yet surveyed. The Auditor of State, the Controlling
+  > Board, or capital appropriation acts may carry project-level detail.
+
+  A blocker whose alternatives are unsurveyed is a blocker nobody has finished reading. This is the
+  survey.
+
+decision: |
+  **The refusal is the estate's, not the commission's.** `ofcc.ohio.gov` answers every path with an
+  identical 5,248-byte 404 — root, `robots.txt`, `sitemap.xml`, and a path invented to be absent.
+  `obm.ohio.gov` does the same at 5,278 bytes; `tax.ohio.gov` at 5,036, which this repository had
+  already recorded for a different connector.
+
+  So it is one filter across `*.ohio.gov` and not a decision this commission took. Two things follow.
+  **No 404 from that host is evidence about any document** — the same trap the casino connector fell
+  into and was rescued from by checking a CDN. And asking OFCC to change it would be asking the wrong
+  body. `ohioauditor.gov`, on its own domain rather than under `ohio.gov`, answers this project's
+  agent with a 200.
+
+  **The capital appropriation acts size the channel and cannot allocate it.** They are reachable
+  through the Legislative Information Systems API this repository already speaks for
+  `ohio-session-laws`, and Am. Sub. H.B. 2 of the 135th General Assembly, as enrolled, carries the
+  Facilities Construction Commission's school appropriations as exactly two lines:
+
+      Public School Building Fund (Fund 7021)
+        C23001  Public School Buildings                    $  7,000,000
+      School Building Program Assistance Fund (Fund 7032)
+        C23002  School Building Program Assistance         $600,000,000
+
+  Six hundred million dollars in one line item, with no district named. The act does enumerate
+  hundreds of individual local projects by name — a school playground renovation at $250,000, a
+  church school building expansion — but those are community project earmarks in a different section
+  and a different channel, and reading them as school facilities assistance would be a category
+  error that the act's own fund codes rule out. [verified — the enrolled text, fetched from
+  `search-prod.lis.state.oh.us/api/v2/general_assembly_135/legislation/hb2/05_EN/html/`]
+
+  **The Internet Archive holds the site and not the data.** `ofcc.ohio.gov/data.json` has four
+  captures and every one is eighty kilobytes of WebSphere Portal HTML rather than JSON; the
+  annual-reports index carries no document links because the page renders client-side. This is the
+  trap recorded elsewhere in this repository as a lesson: a Wayback 200 on a portal proves the
+  crawler stored a shell, not that it captured anything.
+
+consequences: |
+  `ofcc-projects` stays `Declared` and stays `needs-access`, with a `blocked_on` that now says what
+  was tried rather than only what stands in the way.
+
+  What is left is genuinely narrower. The acts are ruled out on evidence rather than on a guess, and
+  ruled out for a reason that will not change: a lump appropriation cannot be disaggregated by
+  anyone, including the commission, because the allocation happens after the act in Controlling
+  Board releases. `controllingboard.ohio.gov` does not resolve at all, which is the one thread this
+  survey leaves live — Controlling Board releases itemise project by project and are the natural
+  home for exactly this, and finding where they are published is the next thing to try.
+
+  The Auditor is the second live thread and a better-founded one than when #11 named it: it is
+  already a wired publisher here, and it answers this project's agent. What its district audits carry
+  is the district's own capital spending rather than the state's contribution to it, so it is a
+  different quantity and not a substitute — but it is reachable, which none of the others is.
+
+alternatives: |
+  **Send a browser string.** Rejected again, and now for a second reason. The first is the standing
+  one in `cache.rs`. The second is that the filter is estate-wide, so the decision is not about one
+  agency's preference and changing it for OFCC would change it for every Ohio source at once.
+
+  **Treat the $600m line as the capital channel.** Rejected. It is the channel's *size*, and this
+  repository already declines to publish a statewide figure it cannot put beside a district — the
+  same reasoning that keeps the scholarship channel's aggregate from standing in for its incidence.
+  A per-district capital figure is the thing that is missing and a state total is not a version of it.
+
+  **Ask OFCC to serve a self-identifying agent.** Rejected as addressed to the wrong body, per above.
