@@ -236,7 +236,10 @@ pub(super) const PAYMENT_REPORTS: Connector = Connector {
     status: Status::Declared {
         blocked_on: "the deduct-era reports (1999-2021) are behind OH|ID authentication on \
                      the department's reports portal; the current-era ones are open and \
-                     indexed but post-date the deduction entirely",
+                     indexed but post-date the deduction entirely. The portal is an obstacle \
+                     to an unattended agent and not to a person who holds an OH|ID account, so \
+                     wiring this means a human fetching the files into the cache and a refresh \
+                     path that says so — `edfund-connect fetch` will not re-run it",
     },
     note: "The one source that would carry the voucher and community-school deduction per \
            resident district, for the years it existed. Kept separate from \
