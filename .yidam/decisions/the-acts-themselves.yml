@@ -120,10 +120,27 @@ alternatives: |
   legible: a total for FY1999 looks ordinary, and it is the *shape* of the table that carries the
   finding.
 
-  **Look for the pre-1997 acts somewhere other than the legislature.** Not attempted, and worth
-  someone's time before the corpus records the era as unreachable in general rather than unreachable
-  from this publisher. The Laws of Ohio are printed volumes and the State Library holds them; a
-  scanned run may exist. What this phase establishes is only that the General Assembly does not
-  serve them.
+  **Look for the pre-1997 acts somewhere other than the legislature.** Attempted 2026-08-27, and the
+  answer is better than the negative it was expecting: **the acts are not lost, they are licensed.**
+
+  HathiTrust holds the bound *Laws of Ohio* for **1853-1921**. The Internet Archive's fifty-nine
+  title matches are all 1881-1942 topical compilations and not one is a session-law volume.
+  **HeinOnline holds 1803-2022 complete, by subscription.** LSC's own searchable record begins
+  1997/98 — the same Legislative Information Systems floor this decision establishes from the
+  publisher's index, reached independently and agreeing with it.
+
+  So the era this decision cannot price is digitised and behind a paywall rather than absent. The
+  span that matters most — the Foundation Program era, the equal yield formula, and the years
+  *DeRolph* was tried on — falls in the gap between HathiTrust's 1921 and the 1997 floor, and is
+  served by exactly one publisher, commercially.
+
+  That changes the ask rather than clearing it. It is a request to a licence-holder and not a
+  digitisation hunt, and the State Library of Ohio is the obvious first one: it is the institution
+  most likely both to hold the subscription and to answer a reference request. **The corpus must not
+  record the era as unreachable in general** — what is established is that one publisher does not
+  serve it and another does, for a fee.
+
+  Two routes remain genuinely unprobed: the Ohio History Connection, and the department's own
+  historical annual reports. Both are questions to an institution rather than URLs. See #18.
 connectors:
   - ohio-session-laws
