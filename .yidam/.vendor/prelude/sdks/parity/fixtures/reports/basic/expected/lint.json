@@ -114,6 +114,13 @@
       "violations": []
     },
     {
+      "id": "unimplemented-class",
+      "title": "Class naming an implementation the code does not define",
+      "severity": "error",
+      "rationale": "A class declaring `implemented_by:` has stated a fact about `crates/`, and a tree with no type of that name contradicts it — which is what this check's siblings gate on, and an omission is not. A class that declares nothing is not checked, and that silence is measured rather than timid: across twelve derived corpora 129 of 157 declared classes have no type bearing their name, and matching every language in the tree raises it to 88%. Their ontologies model a domain and their code models the pipeline that gathers evidence about it, so a class without a type is the normal case and reporting it would call four fifths of every ontology debt. A rename is invisible: the tree is scanned rather than a diff, so a class implemented under a new name is simply found.",
+      "violations": []
+    },
+    {
       "id": "unlicensed-edge",
       "title": "Relationship the class does not declare",
       "severity": "warn",
@@ -229,6 +236,20 @@
       "violations": []
     },
     {
+      "id": "catalog-artifact-malformed",
+      "title": "Obtained-artifact record is missing or mistyped",
+      "severity": "error",
+      "rationale": "An artifact record is what makes `obtained: true` demonstrable rather than asserted — the digest names the bytes the entry claims to have. A record without a well-formed digest names nothing, so it is a claim of retrieval with no more standing than the flag it was added to support. Error, because the failure is in the record itself and is settled entirely by files in this repository.",
+      "violations": []
+    },
+    {
+      "id": "catalog-artifact-unroutable",
+      "title": "Artifact routed to a vault nothing declares",
+      "severity": "error",
+      "rationale": "A record naming a vault that `.yidam/config.toml` does not declare is a route to nowhere: nothing will ever store or fetch those bytes, and the entry reads as though something will. Both sides are committed, so this check answers identically in every clone — it reports a defect in the corpus, never a fact about your credentials. `vault: none` is a route and means the local cache and nowhere else.",
+      "violations": []
+    },
+    {
       "id": "malformed-table",
       "title": "Markdown table whose rows disagree on width",
       "severity": "warn",
@@ -301,6 +322,13 @@
       "title": "A declared authorship region matches nothing on disk",
       "severity": "warn",
       "rationale": "A manifest permitted to be wrong drifts, exactly as a lint baseline does, and the entry that outlives the directory it describes is the one that quietly excuses a path somebody later creates under the same name. `generated` regions are exempt: they are written by a build and are frequently git-ignored, so absence on a fresh clone carries no information. Warn rather than Error, unlike the baseline's own staleness rule, and for the reason this check exists — an imported region is re-synced by somebody upstream on their schedule, and gating on it would make the build's colour depend on that.",
+      "violations": []
+    },
+    {
+      "id": "policy-override",
+      "title": "A disclosure decision is this repository's own rule",
+      "severity": "info",
+      "rationale": "A policy in `.yidam/policy/` supersedes the default `yidam` carries, and may permit what the default refused — that is the authoritative model RFC-0024 settled on, and a repository is entitled to use it. This check does not object to that. It exists so that the choice cannot be made quietly: a guard loosened in a file nobody reads is the shape `.yidam/private-paths` was built to end, where access control looked enforced and was not. Record why in `.yidam/decisions/`, and use `yidam policy test` to see exactly which inherited expectations your rule changed.",
       "violations": []
     }
   ]

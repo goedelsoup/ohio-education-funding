@@ -18,6 +18,8 @@ After bootstrap, a derived repository has two tiers:
 - `.yidam/skills/` — domain-specific skills
 - `.yidam/.vendor/` — inherited yidam prelude; not modified in derived repos
 - `.yidam/bin/` — the `yidam` binary built from this repo's pin; git-ignored, see below
+- `.yidam/index.lock` — which computed artifacts are in which vault, and which store holds
+  each; committed, and written by `yidam vault push --index`
 - `.yidam/sangha/` — collective resolution protocol *(collective governance only)*
 
 **Created on first use.** Bootstrap does not scaffold `agents/`, `docs/`, or `packages/`.
@@ -245,6 +247,14 @@ location:
     description: publisher's copy   # required only when there are several locations
 used-by:
   - ../corpus/concept/confounding.yml
+artifacts:                     # optional; what was actually obtained
+  - sha256: 9f2c8e…            # 64 lowercase hex — the content address
+    bytes: 4194304
+    media_type: application/pdf
+    retrieved: 2026-08-22
+    from: 0                    # which `location` it came from, or a URL
+    vault: sources             # optional; overrides the route its kind takes. `none` = local only
+    redistributable: false     # whether they may leave this machine at all
 ---
 ```
 
@@ -283,6 +293,49 @@ used-by:
 - **`used-by`** is optional and hand-maintained, so it can drift; the citations cannot.
   Both are kept so the disagreement is visible rather than averaged away
   (`catalog-used-by-drift`). Declaring a list asserts it is current.
+
+- **`artifacts`** is what makes `obtained: true` *demonstrable*. The flag says a source was
+  fetched; until this existed, nothing anywhere held what was fetched, so an entry marked
+  obtained and an entry marked obtained falsely were the same observation and every check
+  passed on both. A digest is the difference.
+
+  The **bytes are not in the repository**. They live in a vault — a content-addressed store,
+  configured under `[vault.…]` in `.yidam/config.toml` — and what is committed here is the
+  record of them. That split is the whole design: a stale vault cannot lie, because the digest
+  is in the commit; and losing a vault costs no knowledge claim, only the time to re-fetch.
+  `yidam vault --help` lists the commands.
+
+  Optional, and absent on every entry written before it existed. **Adopting it is a corpus
+  deciding to record what it holds, not a requirement arriving in a build** — the two checks
+  that read it fire only on entries that declare it, so a corpus that has not adopted the field
+  sees no new findings at all.
+
+  - `sha256` is required per record and is **64 lowercase hex characters**. Lowercase because
+    hex is case-insensitive and a content-addressed store is not: two spellings would be two
+    keys for one artifact. `catalog-artifact-malformed` reports the rest — a digest of the
+    wrong length or alphabet, or a `from:` index naming a location the entry does not declare.
+  - `vault` says **where these bytes may be kept**, and is optional. Omitted, the artifact
+    goes wherever the config routes its kind: a lone vault that declares no `holds` takes
+    everything, and where there are several, the one whose `holds` lists `catalog` takes it.
+    Naming a vault here **overrides that route** — the specific assertion outranks the general
+    one — and must name a store `.yidam/config.toml` declares, or `none`. `none` is a route,
+    the local cache and nowhere else, spelled rather than omitted so that *nobody has decided*
+    and *decided to keep it here* are different states. `catalog-artifact-unroutable` reports a
+    name nothing declares; it may gate because both sides are committed, so it answers
+    identically in every clone. An artifact whose *kind* no vault claims is reported by
+    `yidam vault push` and `yidam doctor` rather than by lint, because the defect is in the
+    config and blaming the catalog entry would point at the wrong file.
+  - `redistributable` is a **licensing fact about the source**, and it is deliberately not
+    folded into `vault`. A route is edited casually — somebody reorganising storage moves a
+    dozen entries between stores in an afternoon — and a licence is not something that edit is
+    allowed to undo. Keeping it separate means the reorganisation meets a refusal instead of
+    publishing a paper.
+
+  **What no check here can tell you is whether the bytes are present or correct.** That is a
+  fact about the machine asking rather than about `HEAD`, and every check in `yidam lint` reads
+  the working tree and nothing else — a gate whose verdict depended on which machine ran it is
+  one a corpus could not reason about. `yidam vault verify` answers it, per machine, which is
+  the only place the answer means anything.
 
 Run `yidam schema` to emit JSON Schema for this shape (and for corpus nodes and class
 definitions) into `.yidam/schemas/`, then `yidam schema --settings` for the editor mapping
@@ -332,6 +385,17 @@ or anything that describes how the repo operates rather than what it knows.
   steady-state number at; it runs smoothly from 20 to 534. The length an instance should be
   is a question about its class — a statutory obligation quoting the text it arises from is
   not the length of a person — so the class is where the number lives, if a corpus wants one.
+- A class may name the type that implements it, with `implemented_by:` in its `.ont.yml`.
+  `unimplemented-class` then **gates** when the tree defines no `struct` or `enum` of that
+  name: the class stated a fact about `crates/`, and a missing type contradicts it rather
+  than merely omitting something. A class that omits the field is not checked at all, and
+  that default is measured rather than timid — across twelve derived corpora 129 of 157
+  declared classes have no type bearing their name, and matching traits, aliases and every
+  language in the tree makes it worse, 165 of 186. Five of those corpora match nothing at
+  all, and they are not behind: an ontology models a domain while `crates/` models the
+  pipeline that gathers evidence about it, so a class without a type is the ordinary case.
+  Name the Rust type as Rust spells it rather than expecting the class name to be derived —
+  `HTTPServer` and `HttpServer` are two types and one kebab-case name.
 - Every node must have at least one outgoing edge. Orphan nodes do not belong in the corpus.
 - If a concept is uncertain or under investigation, mark it: prefix the title with `?` or
   open a branch. Uncertainty is valid; unlabeled speculation is not.
@@ -438,6 +502,21 @@ true, relied upon, and unenforced. An assumption about access control that looks
 and is not is worse than one everybody knows is manual, because nobody checks the second
 kind by hand. Declaring the paths is what turns the assumption into a gate.
 
+### Derived artifacts inherit the privacy of what they were derived from
+
+`.yidam/index/` and `.yidam/embeddings/` are not files that happen to sit next to the corpus.
+They are a re-encoding of it: each indexed row carries the node's own text, composed from
+`.yidam/corpus/` **and** `.yidam/catalog/`. A bundle carries the index inside it.
+
+So a path declared private that overlaps either directory makes the index private too, and
+`yidam vault push --index` refuses on exactly that ground, naming the path. The refusal is the
+same rule `sadhana/github/workflows/release.yml` applies to a bundle and for the same reason —
+*the artifact outlives the access* — extended to the channel a vault opens.
+
+A declared directory holding only a `README.md` or a `.gitkeep` is a statement of intent rather
+than material, and does not refuse. Declaring the path before there is anything in it is the
+order this file asks you to work in, and it should not cost you a push.
+
 ### What this does not cover
 
 **This is access control over material at rest. It says nothing about data leaving at
@@ -470,6 +549,42 @@ protected.** A channel nobody has examined is not a channel known to be safe, an
 asserting that an exposure does not exist is worse than no comment, because it stops the
 next reader from looking. Where a channel matters, examine it and record what you found in
 `.yidam/decisions/` — including, honestly, what remains unobtained.
+
+---
+
+## `.yidam/policy/` (optional)
+
+The rules this repository writes about itself, as Rego. Absent in most repositories: the
+`yidam` binary carries a complete default policy, and this directory exists only to supersede
+part of it.
+
+**What belongs here:** `*.rego` files declaring a package the binary already defines — today
+`yidam.disclose.at_rest`, `yidam.disclose.record`, `yidam.disclose.derived` — and `*_test.rego`
+files holding this repository's own cases. `yidam policy check` lists the decisions and where
+each came from.
+
+**Why a file rather than a config field.** The same argument `.yidam/private-paths` makes one
+level down. A rule compiled into the binary is one repository's judgement applied to every
+other, and the four fields in `.yidam/config.toml` are what answering that one case at a time
+looks like. A quorum threshold, a corpus's own reading of what may leave, a domain article this
+constitution permits — none of them can be a field somebody ships.
+
+**The local rule decides.** A file here supersedes the default for its package outright,
+including by permitting what the default refused. That is deliberate: a layer whose purpose is
+to stop the binary imposing its judgement cannot reserve the interesting half of every
+judgement to the binary.
+
+It is also why nothing here is quiet. `yidam policy check` names every override and the file it
+came from; `yidam policy test` runs the *inherited* cases against your rule and reports which
+expectations it no longer meets; `yidam lint` reports each override as `policy-override` at
+info severity, so it reaches the editor; and `yidam doctor` counts them and fails outright on a
+rule that does not compile. None of those gates — the repository decided. Apply the rule `.yidam/private-paths` states about
+itself: **an assumption about access control that looks enforced and is not is worse than one
+everybody knows is manual.** An override is a decision; record why in `.yidam/decisions/`.
+
+**Not the vendored copy.** The default policy is readable at
+`.yidam/.vendor/prelude/policy/`, which is read-only and re-vendored like the rest of the
+prelude. Read it there; write here.
 
 ---
 
