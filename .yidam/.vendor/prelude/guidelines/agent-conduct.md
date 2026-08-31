@@ -55,6 +55,15 @@ readers and agents can assess the node's reliability without reading sources:
   citation inside matches nothing and the claim is counted as untagged. It looks tagged to a
   reader and reads as bare assertion to every tool. Write `[verified]` and then the citation.
   `yidam lint` reports the near miss as `claim-tag-malformed`.
+- **A `[verified]` claim in a node that links no catalog entry is reported**, as
+  `verified-unsourced`. This rule is the first line of this section and, until that check
+  existed, nothing echoed it back: `catalog/` recorded provenance and three checks verified
+  the catalog's own bookkeeping, while no check asked whether a claim rested on anything.
+  Over-counting evidence is the flattering error and it is the one this vocabulary exists to
+  prevent — a mature corpus measured eight miscounts and every one of them promoted. The fix
+  is a citation or a demotion, and which is yours to decide: nothing proposes a promotion.
+  A `cites:` into a dependency does not discharge it, because a foreign tag is the
+  producer's and does not transfer.
 - **To name a tag rather than make one, say that you are naming it.** A node whose subject
   touches the evidence vocabulary has to write the tokens to talk about them, and a scanner
   reading bytes cannot tell that from an assertion. The signal is **grammar, not
@@ -265,6 +274,31 @@ carries `corpus/`, `skills/` and `decisions/` — no sangha, no elector register
 history. You receive conclusions without the apparatus that made them accountable. The rule
 that a derived assertion travels only as far as the weakest claim beneath it still holds, and
 across this boundary "weakest" is genuinely unknown.
+
+**The prose form has a structured form, and the gate reads it.** *"Saying where it came
+from"* leaves no trace a tool can check, so a local node may carry a `cites:` block beside its
+`links:` — never inside it, because a citation is not a relationship and must never enter a
+traversal:
+
+```yaml
+cites:
+  - package: upstream          # the dependency, as .yidam/tonpa.toml names it
+    node: concept/base-flow    # <class>/<name> over there; `package` already says whose
+    commit: 8d35441            # the manifest commit it was read at; absent for a path dependency
+    tag: verified              # the producer's standing AS OBSERVED — recorded, never transferred
+    span: >-                   # verbatim text from that node
+      the slowly varying component sustained by groundwater discharge
+```
+
+**`span` is the load-bearing field, for the reason the outbound rule gives.** Cite a span, not
+a node: a node reference alone rots invisibly, because the node keeps its name while its
+content is rewritten and the citation still resolves. The gate asserts the span still appears
+there. It is the only check that survives this boundary, because it needs nothing from the
+producer — and the producer's apparatus is exactly what a bundle does not carry.
+
+When it fails, **the repair is never to re-quote.** The far side changed its mind; the question
+is whether your claim survives it. And `commit` is recorded rather than enforced: a moved pin
+reports, because a producer cutting a release must not be able to turn your build red.
 
 **A shared class name is not agreement.** Classes are named per-corpus. A `concept/risk`
 there and a `concept/risk` here are two nodes sharing a string. That is a question worth

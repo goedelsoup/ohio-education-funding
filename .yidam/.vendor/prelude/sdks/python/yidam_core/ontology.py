@@ -38,6 +38,13 @@ class OntologyProperty:
     #: ``string``, ``text``, ``date``, ``ref``, ``claim`` — or a type this corpus coined.
     type: str = ""
     description: str = ""
+    #: Whether every instance of the class must carry this property.
+    #:
+    #: **Absent means false**, and not out of timidity: every corpus written before this
+    #: field existed was written under a schema where the question could not be asked.
+    #: Defaulting to ``True`` would require a declaration nobody made, in every derived
+    #: repository at once. It is what lets ``missing-property`` gate at all.
+    required: bool = False
 
 
 @dataclass
@@ -57,14 +64,47 @@ class OntologyClass:
     properties: list[OntologyProperty] = field(default_factory=list)
     edges: list[OntologyEdge] = field(default_factory=list)
 
-    def is_source_class(self) -> bool:
-        """A class nothing is meant to point at: it declares edges, none of them inbound.
 
-        A class that declares no edges at all is **not** a source class — it has said
-        nothing about its shape, and reading silence as a declaration would exempt every
-        instance in a corpus whose ontology is not filled in.
-        """
-        return bool(self.edges) and not any(e.direction == "in" for e in self.edges)
+
+def source_classes(classes: list[OntologyClass]) -> set[str]:
+    """Classes the ontology says nothing points at.
+
+    The same derivation ``orphan-in`` exempts on, exposed here so a consumer computing a
+    per-class orphan expectation reads the rule rather than re-deriving it.
+
+    **It takes the whole ontology, and that is the correction.** This was once
+    ``OntologyClass.is_source_class()``, reading one class's own edge list for a
+    ``direction: in`` entry — which reads half the ontology. ``B: {target: A, direction:
+    out}`` declares that instances of ``B`` point at instances of ``A``; it is the same fact
+    as ``A: {direction: in}`` stated from the authoring end, and ``target`` is *"the class at
+    the other end, whichever end authors the link"*. Reading only a class's own list treated
+    its silence about inbound edges as a positive declaration that nothing points at it.
+    Measured upstream: all three classes of the worked example derived as source classes, so
+    ``orphan-in`` could not fire anywhere in it.
+
+    Two things it deliberately does not do:
+
+    - **A class declaring no edges at all is not a source class.** It has said nothing about
+      its shape, and reading silence as a declaration would exempt every instance in a corpus
+      whose ontology is not filled in.
+    - **A self-edge does not make a class pointed at.** ``reach -downstream-of-> reach`` says
+      instances relate to each other, not that every instance is cited — any acyclic
+      self-relation has an endpoint that is not.
+    """
+    pointed: set[str] = set()
+    for cls in classes:
+        for edge in cls.edges:
+            if edge.target == cls.name:
+                continue
+            if edge.direction == "in":
+                pointed.add(cls.name)
+            elif edge.direction == "out":
+                pointed.add(edge.target)
+            else:
+                # A declaration that does not say which way it runs exempts neither end.
+                pointed.add(cls.name)
+                pointed.add(edge.target)
+    return {c.name for c in classes if c.edges and c.name not in pointed}
 
 
 def _str(value: Any) -> str:
@@ -101,6 +141,7 @@ def parse_class(name: str, content: str) -> OntologyClass:
                 name=_str(p.get("name")),
                 type=_str(p.get("type")),
                 description=_str(p.get("description")),
+                required=p.get("required") is True,
             )
             for p in _mappings(doc.get("properties"))
         ],
@@ -143,9 +184,11 @@ def _property_schema(property_type: str) -> Any:
 def compile_class_schema(cls: OntologyClass) -> dict[str, Any]:
     """Compile a class definition into a JSON Schema for its instances.
 
-    Two things it deliberately does not constrain. **No declared property is required** —
-    ``missing-property`` reports and does not gate, so demanding them would reject
-    instances the gate accepts. **``links[].relationship`` is left open** — the gate
+    Two things about strictness. **A declared property is required only where the class
+    says ``required: true``** — the compiled schema must be no stricter than the gate, and
+    ``missing-property`` gates on exactly those and warns for the rest, so the same
+    declaration decides both and neither can outrun the other. **``links[].relationship``
+    is left open** — the gate
     licenses a relationship only for edges landing on another instance, and JSON Schema
     cannot resolve a path, so a constraint here would reject the ``instance-of`` link every
     instance is required to carry. The declared relationships are published as
@@ -171,12 +214,17 @@ def compile_class_schema(cls: OntologyClass) -> dict[str, Any]:
             if isinstance(body, dict) and p.description:
                 body = {**body, "description": p.description}
             declared[p.name] = body
-        properties["properties"] = {
-            "type": "object",
-            "properties": declared,
-            # Closed, matching `undeclared-property`, which gates.
-            "additionalProperties": False,
-        }
+        bag: dict[str, Any] = {"type": "object", "properties": declared}
+        # Emitted for exactly the properties declared `required: true`, and omitted
+        # entirely when there are none — an empty `required: []` would be a different
+        # document for the same meaning, and these schemas are compared byte for byte
+        # across three languages.
+        required = [p.name for p in cls.properties if p.required]
+        if required:
+            bag["required"] = required
+        # Closed, matching `undeclared-property`, which gates.
+        bag["additionalProperties"] = False
+        properties["properties"] = bag
 
     schema["properties"] = properties
     schema["required"] = ["class"]

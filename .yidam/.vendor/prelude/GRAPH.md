@@ -16,10 +16,19 @@ This repository's knowledge graph lives in git. No external store is required.
 | `refs/heads/phase/<name>` | A bounded phase of inquiry in progress |
 | `refs/heads/rigpa/<evolution>` | *Collective mode only* — a settled, named collective understanding |
 | `refs/heads/ma/<elector>` | *Collective mode only* — one elector's current working position |
+| `refs/heads/propose/<head>` | A branch of proposed commits `yidam propose` drafted, awaiting review |
 
-The last two exist only in repositories bootstrapped as `governance: collective`. In a
+`rigpa/` and `ma/` exist only in repositories bootstrapped as `governance: collective`. In a
 single-elector repository — the common case — the baseline is `main` and inquiry runs on
 `phase/<name>` branches. See [PHASES.md](PHASES.md).
+
+`propose/<head>` is deliberately named in plain English while the others are not. The
+distinction between `ma/` and `rigpa/` is ontological rather than procedural — `ma/` is a
+voice moving toward recognition, `rigpa/` is recognition — and a proposal is neither. It is a
+draft awaiting a person, and a name from that vocabulary would be the first move toward
+treating it as a standing it does not have. It is named after the commit it was computed
+against, for the reason the residence clock counts commits: a date is a function of when you
+ran the command, and a commit is a function of the repository.
 
 ## Nodes
 
@@ -60,7 +69,7 @@ against it:
 | `property-type` | a value contradicting the declared `type` | yes |
 | `unlicensed-edge` | a relationship the class does not declare | only under `edge_policy: exhaustive` |
 | `edge-target-class` | an edge resolving to a node of the wrong class | yes |
-| `missing-property` | a declared property the instance omits | no — reported |
+| `missing-property` | a declared property the instance omits | only where the class says `required: true` |
 
 The fourth is the one no other check could produce. `dangling-edge` catches an edge to
 nothing; an edge to the *wrong* thing resolves, traverses, and exports, and is simply false.
@@ -79,6 +88,41 @@ nothing about edges and none are licensed. Reading either silence as *and theref
 are permitted* would flood every corpus whose ontology is not filled in — which is the
 corpus with the least reason to trust its graph. The same rule decides which classes are
 source classes for `orphan-in`.
+
+### Which classes are source classes, and which end declares it
+
+A **source class** is one the ontology says nothing points at. Its instances have no inbound
+edges by design, so reporting them as orphans reports the ontology working — in one derived
+repository that was 17 of 35 `orphan-in` findings.
+
+**Both ends of the edge are read.** `gage` declaring
+
+```yaml
+edges:
+  - relationship: sources-from
+    target: concept
+    direction: out
+```
+
+is a statement that gages point at concepts, so `concept` is a class something is meant to
+point at — whether or not `concept.ont.yml` also says so from its own side. `target` is *the
+class at the other end, whichever end authors the link*, and either end may author it.
+
+This is stated because the derivation once read only a class's own list, looking for a
+`direction: in` entry. That treated a class's silence about inbound edges as a positive
+declaration that nothing points at it, while the ontology said elsewhere that something
+does — the inverse of the over-read above. It was measured on the worked example, where all
+three classes derived as source classes and `orphan-in` could not fire anywhere in the
+corpus. **You do not need to declare an edge from both ends**, and declaring it twice is not
+an error; it is simply not required.
+
+Two cases the derivation deliberately leaves alone:
+
+| Declaration | Read as |
+|---|---|
+| a class with no `edges:` at all | **not** a source class — silence is not a contract |
+| a self-edge (`reach -downstream-of-> reach`) | says instances relate to each other, not that every instance is cited: any acyclic self-relation has an endpoint that is not, so it decides nothing either way |
+| an edge with no `direction:` | exempts neither end — it says a relationship exists, not which way it runs |
 
 **A non-empty `edges:` is not a contract either, and this is the part that was got wrong.**
 Naming the relationships a class enters into says *these exist*; on its own it never said
@@ -135,12 +179,32 @@ measured its property vocabulary at 94% declared against its relationships at 68
 the property gate; what it lacked was a way to say that two specific shapes are apparatus
 rather than schema.
 
-`missing-property` reports and does not gate. The property declaration has no `required`
-field, so it cannot distinguish *every instance has this* from *an instance may have this* —
-and a node carrying no `claim_tag` is a real state, not a defect. Its siblings gate on
-something the ontology actually said being contradicted, and an omission contradicts
-nothing. `unlicensed-edge` sits between the two: it gates where the class said `exhaustive`,
-because there the ontology did make the statement being contradicted.
+`missing-property` gates on what the class asked for. A property declares whether instances
+must carry it:
+
+```yaml
+properties:
+  - name: parameter
+    type: string
+    required: true          # absent means false
+    description: The measured quantity, by its publisher's parameter code.
+```
+
+Omitting a `required: true` property is an **error**; omitting any other declared property is
+reported and does not gate. That is the same rule its four siblings follow — they gate on
+something the ontology actually *said* being contradicted — and it is why the check could not
+gate before the field existed: without it, an omission contradicted nothing, and a node
+carrying no `claim_tag` is a real state rather than a defect. `unlicensed-edge` sits in the
+same place, gating only where the class said `exhaustive`.
+
+**Absent means false**, and that default is load-bearing rather than timid. Every corpus
+written before this field existed was written under a schema where the question could not be
+asked, so defaulting to `true` would gate every class in every derived repository on a
+declaration nobody made.
+
+The declaration decides two things at once: the gate above, and the JSON Schema below, which
+lists exactly the required properties as its own `required`. One statement, so the editor and
+the build cannot come to disagree about which fields a node owes.
 
 ### Published, not only enforced
 
@@ -307,12 +371,20 @@ Absent, entries never expire, which is where every baseline starts.
 
 They are named apart because they are different questions:
 
-| Declaration | Where | Asks |
-|---|---|---|
-| `escalate_after` | `.yidam/config.toml` | how long a **finding** may hold before it becomes an error |
-| `expire_after` | `.yidam/lint-baseline.yml` | how long an **accepted entry** may stand before it gates again |
+| Declaration | Where | Counts | Asks |
+|---|---|---|---|
+| `escalate_after` | `.yidam/config.toml` | commits | how long a **finding** may hold before it becomes an error |
+| `expire_after` | `.yidam/lint-baseline.yml` | commits | how long an **accepted entry** may stand before it gates again |
+| `ttl_days` | a catalog entry, or `[catalog]` in `.yidam/config.toml` | **days** | how long a **source record** may stand before it is worth looking at again |
 
-The first is about the corpus; the second is about the file that forgives it. A finding can
+The first is about the corpus; the second is about the file that forgives it.
+
+The third counts days and the other two count commits, which is a deliberate departure rather
+than an oversight. The commits rule is about *corpus state*: how long a node has gone uncited
+is a fact about this repository, so the repository's clock is the honest one. A source's
+staleness is not a fact about this repository — a statute does not become stale because you
+committed, and a gauge record does not stay fresh because you did not. So that one report does
+answer differently tomorrow, and that is what a TTL is for. A finding can
 escalate under the first, be blessed, and later expire under the second — and each step is
 a different thing having happened.
 
@@ -421,6 +493,25 @@ bootstrap layer consumed at genesis.
 | `fix` | A defect corrected |
 | `vendor` | The prelude re-vendored |
 | `consume` | A transient bootstrap layer consumed |
+
+### A tool may write three of these verbs
+
+`yidam propose` drafts `open`, `withdraw` and `close` commits onto a `propose/<head>` branch,
+and nothing else in this list. It is the only tool that writes an epistemic commit, and what
+licenses it is `transport`'s licence one paragraph up: **carriage is not synthesis.** A
+proposal records a question a finding already phrased, withdraws a node this corpus declared
+over-collected in its own `.yidam/config.toml`, or retires a question `propose` itself opened
+once the finding is gone. Each asserts only what was already asserted.
+
+What it may never do follows from the same rule, and the boundary is worth stating because it
+is easy to cross by accident: **no `establish`** (authoring a node), **no `revise`**
+(retagging a claim, or splitting one node into two), **no `synthesize`**, **no `resolve`**.
+Drawing an edge asserts a relationship; retagging asserts a standing; splitting asserts two
+nodes and a partition of claims. None of those is in any finding.
+
+**Nothing merges itself.** The branch is reviewed as commits and rejected by deleting it. See
+[RFC-0020](https://github.com/goedelsoup/yidam/blob/main/docs/rfcs/0020-proposal-surface.md) for the argument, including why three of
+the four acts originally proposed for it are not here.
 
 **Why closed.** An open vocabulary decays into one verb per commit. A repository derived
 from this template ran a hundred commits with roughly sixty distinct leading words — `lift`,

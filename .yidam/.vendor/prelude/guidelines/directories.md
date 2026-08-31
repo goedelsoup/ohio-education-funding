@@ -98,6 +98,25 @@ Found in a derived repository by a commit whose message says it exactly: *the fi
 being normalised, so the committed record was of what git did rather than what the register
 said.*
 
+**A type declared here is a claim about the domain, and `yidam check-diff a..b` asks about
+it.** The ontology is a contract that every check reads from the corpus side; this reads it
+from the code side, comparing the type and enum names a diff *adds* under `crates/` against
+the classes, properties and relationships `.ont.yml` declares. `RatingCurve` where nothing is
+named `rating-curve` is a question — is this a concept the corpus should model, or a helper
+the ontology has no reason to know about? — and the answer is yours. It never gates and never
+will: the fix is a new class or a decision not to have one, and both are judgement.
+
+Expect it to be quiet. Across the three repositories derived from this template the median
+code-touching commit introduces no new type at all, and it is the commit that lands ten that
+you want to be asked about. Where it is *not* quiet, the vocabulary is what to look at: one
+of those repositories declares fifteen classes while its code defines two hundred and
+seventy-five types, and a 7% match rate is not a naming problem.
+
+Do not exclude test or fixture code by inventing a path convention. `.yidam/authorship.yml`
+is the vocabulary for that, and it is the same one every prose check uses — a region declared
+`imported` or `generated` is still reported, at info severity, naming who can act on it;
+only `excluded` is silent.
+
 ---
 
 ## `docs/`
@@ -218,6 +237,8 @@ name: Pearl 2009
 description: Causality — models, reasoning, inference.
 type: paper                  # paper | dataset | api | database | other
 obtained: true               # absent means true; see below
+retrieved: 2026-08-22        # optional; when it was last actually fetched
+ttl_days: 3650               # optional; how long this record may stand
 location:
   - kind: url                # url | url_template | address | file
     value: https://example.org/pearl-2009
@@ -241,6 +262,24 @@ used-by:
   body to close the gap. **When an entry is created for one fact, say in its body what else
   the document holds, or say plainly that nobody has looked.** The second sentence is the
   useful one; it is the only thing that distinguishes an unread source from a read one.
+- **`ttl_days` says how long this record may stand**, and `retrieved` says what to count
+  from. Both are optional and absent means nothing expires. Declare it per entry, because a
+  gauge record and a statute do not age at the same rate — Pearl 2009 will say what it says
+  in ten years, and an inventory pulled from an API will not. A corpus whose sources mostly
+  age alike can set one default instead, under `[catalog] ttl_days` in `.yidam/config.toml`;
+  an entry's own value always wins.
+
+  **Days, not commits.** Every other clock in yidam counts commits, because a corpus-state
+  finding must be a function of `HEAD` rather than of when you ran the report. This one is
+  different in kind: a statute does not become stale because you committed, and a gauge
+  record does not stay fresh because you did not.
+
+  Without `retrieved`, the date is read from the commit that last touched the entry's file —
+  which counts a typo fix as a refresh, so it errs in the flattering direction. `yidam lint`
+  says which of the two it used, every time. **Expiry is reported, never enforced**, and it
+  does not claim the source changed: nothing here reads upstream and `doctor` does no
+  network. It claims nobody has looked. Refreshing a source is a knowledge event, and it is
+  yours to own.
 - **`used-by`** is optional and hand-maintained, so it can drift; the citations cannot.
   Both are kept so the disagreement is visible rather than averaged away
   (`catalog-used-by-drift`). Declaring a list asserts it is current.
@@ -282,7 +321,17 @@ or anything that describes how the repo operates rather than what it knows.
 - One concept per file; one file per concept
 - Filenames are kebab-case, descriptive, and stable — renaming a node severs edges, so choose
   well. Do not include dates in filenames; the git history has dates.
-- Size: 2–10 sentences is often right. If a node grows beyond a screen, decompose it.
+- Size: 2–10 sentences is often right. If a node grows beyond a screen, decompose it. A
+  class may make that checkable by declaring `max_lines:` in its `.ont.yml`, and
+  `node-too-long` then reports an instance over it. No class carries a default, and that is
+  measured rather than timid: the bootstrap rubric caps a node at 40 lines, and across five
+  real corpora 335 of 410 nodes exceed it — 86%, 86% and 97% in the three mature ones — while
+  the same corpora at their genesis commits run to a median of 35, where 40 is right for
+  three of four. So 40 is a *genesis* norm that a corpus grows out of, and growing out of it
+  is what a corpus doing its job looks like. There is no knee in the distribution to put a
+  steady-state number at; it runs smoothly from 20 to 534. The length an instance should be
+  is a question about its class — a statutory obligation quoting the text it arises from is
+  not the length of a person — so the class is where the number lives, if a corpus wants one.
 - Every node must have at least one outgoing edge. Orphan nodes do not belong in the corpus.
 - If a concept is uncertain or under investigation, mark it: prefix the title with `?` or
   open a branch. Uncertainty is valid; unlabeled speculation is not.

@@ -1,0 +1,26 @@
+# Known error-severity lint violations — this corpus's inherited debt.
+#
+# GENERATED. Rewritten by `yidam lint --bless`; do not hand-edit, except for
+# `expire_after`, which is this repository's own argument and is preserved.
+#
+# `yidam lint` fails on any error-severity violation NOT listed here, and also when
+# something listed here no longer occurs — an exact baseline is the only kind that keeps
+# its meaning. Neither failure means the corpus got worse on its own; both mean this file
+# and the corpus disagree.
+#
+# Listing a violation here is not absolution. It records that the corpus was already in
+# this state when the ratchet was installed, so that the next one is attributable to the
+# commit that introduced it.
+#
+# `since` is the corpus commit at which an entry was first recorded, and it is CARRIED
+# FORWARD by later blessings rather than restamped — otherwise re-blessing would forgive
+# the debt again and the clock below would never run out.
+#
+# `expire_after` is how many corpus-touching commits an entry may survive before it stops
+# forgiving and the violation gates again. Absent means never, which is where a repository
+# starts. Raising it is the supported way to argue for more time — and the argument is then
+# in the repository, in a diff somebody reviews, rather than in a build nobody can see.
+#
+# `detail` is informational. Violations are identified by check id and node, so rewording
+# a message does not make the baseline stale.
+violations: {}

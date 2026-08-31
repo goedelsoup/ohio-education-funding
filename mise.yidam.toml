@@ -281,7 +281,7 @@ if [ "$ref" != "HEAD" ]; then
   git -C "$tmp/yidam" checkout --quiet "$ref"
 fi
 commit=$(git -C "$tmp/yidam" rev-parse HEAD)
-template=$(git -C "$tmp/yidam" describe --tags --exact-match HEAD 2>/dev/null || echo untagged)
+template=$(git -C "$tmp/yidam" describe --tags --exact-match --match 'v[0-9]*' HEAD 2>/dev/null || echo untagged)
 committed=$(git -C "$tmp/yidam" log -1 --format=%as HEAD)
 if [ ! -d "$tmp/yidam/yidam/prelude" ]; then
   echo "ERROR: $origin@$commit has no yidam/prelude/ — wrong origin?" >&2
@@ -447,7 +447,7 @@ description = "Rename a corpus node, rewriting every edge into it — `mise run 
 run = "yidam rename"
 
 [graph-lint]
-description = "Lint the corpus against the baseline ratchet: 13 checks over nodes, edges, catalog, classes, and tables."
+description = "Lint the corpus against the baseline ratchet: 31 checks over nodes, edges, catalog, classes, and tables."
 run = "yidam lint"
 
 [graph-lint-explain]

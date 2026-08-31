@@ -49,7 +49,7 @@
           "severity": "error",
           "in_baseline": false,
           "span": {
-            "line": 7
+            "line": 9
           }
         }
       ]
@@ -65,7 +65,7 @@
       "id": "missing-property",
       "title": "Declared property the instance omits",
       "severity": "warn",
-      "rationale": "The commonest cause is a class that grew a field its instances never did — invisible to every reader and obvious in a list. Reported rather than gated because the ontology has no `required` field: it cannot say whether every instance carries a property or merely may, and a node that makes no tagged claim is a real state, not a defect. Its four siblings gate; they report the ontology being contradicted, and an omission contradicts nothing.",
+      "rationale": "The commonest cause is a class that grew a field its instances never did — invisible to every reader and obvious in a list. A property declared `required: true` GATES: the class wrote that contract, and an instance omitting it contradicts the ontology, which is what this check's four siblings gate on. Everything else is reported, because a class that said nothing about a property cannot be read as demanding it — a node that makes no tagged claim is a real state, not a defect, and gating on omission would assert a contract nobody wrote.",
       "violations": [
         {
           "node": ".yidam/corpus/concept/low-flow.yml",
@@ -100,6 +100,13 @@
       ]
     },
     {
+      "id": "node-too-long",
+      "title": "Instance longer than its class allows",
+      "severity": "warn",
+      "rationale": "A long node is usually two nodes, or a node carrying quoted source that belongs in the catalog entry it cites. The ceiling is the class's own — a class that declares no `max_lines:` is not checked, because the length an instance should be is a question about that class and not about corpora in general. Measured before choosing: a fixed ceiling of 40, which the bootstrap rubric uses at genesis, is exceeded by 335 of 410 nodes across five real corpora once they have grown.",
+      "violations": []
+    },
+    {
       "id": "property-type",
       "title": "Property value that contradicts its declared type",
       "severity": "error",
@@ -118,6 +125,58 @@
       "title": "Edge that resolves to a node of the wrong class",
       "severity": "error",
       "rationale": "`dangling-edge` catches an edge to nothing. This catches an edge to the wrong thing — which resolves, traverses, and exports, and is simply false. The class names the target class for each relationship it declares; a declaration that names none licenses any target.",
+      "violations": []
+    },
+    {
+      "id": "external-citation-unresolved",
+      "title": "Citation into a dependency that is not there",
+      "severity": "error",
+      "rationale": "A citation that does not resolve asserts a provenance that is not there, which is strictly worse than claiming none. The local graph is trustworthy because a link cannot rot silently; a corpus that cites across a boundary without this check has inverted that property at exactly the point where it is hardest to recover. A missing package and a missing node inside a present one are different findings with different repairs, and the message says which.",
+      "violations": []
+    },
+    {
+      "id": "external-citation-span-drift",
+      "title": "Cited span no longer appears in the dependency",
+      "severity": "error",
+      "rationale": "A node reference alone rots invisibly: the node keeps its name while its content is rewritten, and the citation still resolves. The span is what makes the rot visible, and it is the only check available across this boundary that needs nothing from the producer — a bundle carries no sangha, no elector register and no resolution history, so the text is the whole of the evidence. Re-quoting to clear the finding is the one repair that is always wrong: the far side changed its mind, and the question is whether the local claim survives it.",
+      "violations": []
+    },
+    {
+      "id": "external-citation-pin-moved",
+      "title": "Citation written against a pin that has moved",
+      "severity": "warn",
+      "rationale": "A stale dependency is a normal state: it is pinned deliberately, and where its currency bears on a conclusion the thing to do is say which pin was read. This reports rather than gates because escalating it would let a producer cutting a release turn a stranger's CI red without the stranger changing anything — the exact failure a pin exists to prevent. Where the text this claim rests on actually moved, `external-citation-span-drift` is the finding that gates.",
+      "violations": []
+    },
+    {
+      "id": "external-citation-unpinned",
+      "title": "Citation into a dependency that carries no pin",
+      "severity": "info",
+      "rationale": "A path dependency is read where it sits and is not fetched, not hashed and not locked, because hashing a working tree that changes under you records nothing. It is also the only dependency form that supports a development loop, so refusing to cite one would exclude the case people actually work in. Reported rather than refused, and reported every time: a citation whose pin is silently absent is indistinguishable from one whose pin is current.",
+      "violations": []
+    },
+    {
+      "id": "verified-unsourced",
+      "title": "A claim asserted at `[verified]` that rests on nothing",
+      "severity": "warn",
+      "rationale": "`[verified]` means supported by a committed primary source. A node asserting one while linking to no catalog entry has claimed a standing it cannot demonstrate. This is the one direction the claim vocabulary exists to prevent: over-counting evidence is the flattering error, and a mature corpus measured eight miscounts of which all eight promoted. The catalog checks beside this one verify the catalog's own bookkeeping; this is the only one that asks whether a claim rests on anything. The fix is a citation or a demotion, and which of the two is the author's call — nothing here proposes a promotion, ever.",
+      "violations": [
+        {
+          "node": ".yidam/corpus/gauge/riffle-station.yml",
+          "detail": "1 `[verified]` claim, and this node draws on no source",
+          "severity": "warn",
+          "in_baseline": false,
+          "span": {
+            "line": 4
+          }
+        }
+      ]
+    },
+    {
+      "id": "catalog-expired",
+      "title": "A source record older than the corpus said it may be",
+      "severity": "warn",
+      "rationale": "A catalog entry records where something came from; until it could also record how long that record may stand, a source fetched a year ago read exactly like one fetched today. Declare `ttl_days:` on the entry — a gauge record and a statute do not age at the same rate — or a corpus-wide default under `[catalog]` in `.yidam/config.toml`. Absent both, nothing expires. This reports rather than gates because an aged record is a thing to look at, and refreshing it is a knowledge event a person owns. It does not claim the source changed: nothing here reads upstream, and `doctor` does no network. It claims nobody has looked. The finding names the nodes resting on the record, because the reader who has to act is the one who wrote them — and naming them here is what keeps the question in one file instead of copied into every node that cites it.",
       "violations": []
     },
     {
@@ -153,7 +212,14 @@
       "title": "`used-by` list disagreeing with the citations",
       "severity": "warn",
       "rationale": "The citations are authoritative — they cannot drift from the corpus, and a hand-maintained list can. Both are kept so the disagreement is visible rather than averaged away. The list is optional; an entry that declares one is asserting it is current.",
-      "violations": []
+      "violations": [
+        {
+          "node": ".yidam/catalog/stage-discharge.md",
+          "detail": "claims mixing-zone.yml that do not cite it; omits tailwater.yml that do",
+          "severity": "warn",
+          "in_baseline": false
+        }
+      ]
     },
     {
       "id": "catalog-location-malformed",
@@ -173,7 +239,7 @@
       "id": "orphan-in",
       "title": "Node nothing points to",
       "severity": "info",
-      "rationale": "Instances of a class that declares no `direction: in` edge are exempt — the ontology says nothing points at them, so an orphan there is the model working. What remains is a class whose *other* instances are cited and this one is not, which is the asymmetry worth reading. Still reported rather than gated: a node authored this morning legitimately has no inbound edges yet.",
+      "rationale": "Instances of a class the ontology declares no inbound edge for — from either end of the edge — are exempt: nothing is meant to point at them, so an orphan there is the model working. What remains is a class whose *other* instances are cited and this one is not, which is the asymmetry worth reading. Still reported rather than gated: a node authored this morning legitimately has no inbound edges yet.",
       "violations": [
         {
           "node": ".yidam/corpus/concept/tailwater.yml",
