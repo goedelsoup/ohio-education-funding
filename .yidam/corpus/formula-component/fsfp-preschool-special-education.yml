@@ -33,7 +33,7 @@ description: |
   This sheet carries an **appropriation limit** — $147,500,000 — in a cell beside the factor,
   which is the only place in the calculator that shows a proration's two halves at once. At the
   stated 0.96854448 the program totals **$148,408,184**, which is $908,184 over *that* cell.
-  [verified] (`crates/project/src/panel/supplements.rs`)
+  [verified — `crates/project/src/panel/supplements.rs`]
 
   **The cell is stale, and no proration arises.** $147,500,000 is the **FY2025** estimate. The
   enacted act's FY2026 and FY2027 remainder for preschool special education is **$153,976,832**,
@@ -41,8 +41,8 @@ description: |
   together from the prior biennium, so a published proration factor is not evidence that a
   proration applied. A third cell states $146,708,228.07, matching neither. See [appropriation
   proration factor](../parameter/appropriation-proration-factor.yml), which holds the full
-  account. [verified] (the enacted act's LSC analysis, read by
-  `crates/project/src/ledger/budget_analysis.rs`)
+  account. [verified — the enacted act's LSC analysis, read by
+  `crates/project/src/ledger/budget_analysis.rs`]
 figures:
   - key: project/prek-sped-remainder-fy2027
     value: 153976832.0
@@ -91,7 +91,7 @@ properties:
     what makes this the one component where the wealthiest district and the poorest are funded
     identically for most of what they receive, by design rather than by accident. The **proration**
     is not in the section and is not statutory; see [appropriation proration
-    factor](../parameter/appropriation-proration-factor.yml). [verified] (`ohio-laws`)
+    factor](../parameter/appropriation-proration-factor.yml). [verified — `ohio-laws`]
   calculator: |
     Not a standalone crate. Carried in `crates/project::panel::PreschoolSpecialEducation` and
     reproduced for all 609 districts in

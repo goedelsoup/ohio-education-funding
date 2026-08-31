@@ -32,13 +32,13 @@ description: |
 findings: |
   **The statewide series demonstrates why deflation is not optional.** From FY2000 to FY2022,
   Ohio public school operating expenditure per pupil rose from $7,065 to $15,314 — 116.8% in
-  nominal terms. Adjusted for inflation, the increase is **26.1%**. [verified] (crates/deflator)
+  nominal terms. Adjusted for inflation, the increase is **26.1%**. [verified — crates/deflator]
   The same fact, stated two ways, supports two entirely different arguments about whether Ohio
   has increased its investment in schools, and both numbers are correct. This is the concrete
   case for the `deflator` calculator being a prerequisite rather than a refinement.
 
   A third framing is also correct and lower still: excluding federal COVID relief funds, FY2022
-  operating EPP was $14,493, making real growth **19.4%**. [verified] (crates/deflator) The $821
+  operating EPP was $14,493, making real growth **19.4%**. [verified — crates/deflator] The $821
   per-pupil gap between the two FY2022 figures is larger than most policy changes this corpus
   models.
 
@@ -98,8 +98,8 @@ findings: |
 
   **Federal money is a median 4.20% of a district's operating spending, and 29.04% at the
   top.** 49 districts are above a tenth; Alexander Local in Athens County is the most exposed,
-  at $3,280 of $11,294 per equivalent pupil. The floor is 0.7%. [verified] (2024-25 report
-  card, computed in `crates/bundle`)
+  at $3,280 of $11,294 per equivalent pupil. The floor is 0.7%. [verified — 2024-25 report
+  card, computed in `crates/bundle`]
 
   This is the only quantity in the corpus that measures exposure to a decision Ohio does not
   make. Every other figure here describes a choice by the General Assembly, a county auditor or
@@ -114,7 +114,7 @@ findings: |
 
   **And the correlation that must not be reported alone.** Federal share against the
   Performance Index is **-0.546** raw and **-0.115** holding poverty constant.
-  [verified] (crates/bundle) Federal
+  [verified — crates/bundle] Federal
   education money is allocated substantially by poverty, so the raw figure is very largely the
   poverty relationship read backwards; quoting it without the control would state a confound as
   a finding, which is the error this corpus most often finds in secondary reporting. Neither
@@ -283,7 +283,7 @@ properties:
   series: |
     Statewide, all Ohio public school entities, nominal:
       FY2000  $7,065   [verified]
-      FY2002  ~$8,100  [verified] (chart label, approximately $100 precision)
+      FY2002  ~$8,100  [verified — chart label, approximately $100 precision]
       FY2004  ~$9,000
       FY2006  ~$9,700
       FY2008  ~$10,300
@@ -296,13 +296,13 @@ properties:
       FY2022  $15,314 including COVID relief; $14,493 excluding  [verified]
 
     Real growth FY2000-FY2022: +26.1% including relief funds, +19.4% excluding.
-    [verified] (crates/deflator)
-    CPI growth over the same span: +71.9%. [verified] (crates/deflator)
+    [verified — crates/deflator]
+    CPI growth over the same span: +71.9%. [verified — crates/deflator]
 
     Constant FY2022 dollars, computed by the `deflator` calculator
     (`cargo run --example epp_real_series -p deflate`):
 
-      FY2000  $12,143    baseline    [verified] (crates/deflator)
+      FY2000  $12,143    baseline    [verified — crates/deflator]
       FY2002  $13,341    +9.9%       [inference]
       FY2004  $14,058   +15.8%       [inference]
       FY2006  $14,166   +16.7%       [inference]
@@ -346,7 +346,7 @@ properties:
     the FY2010 level again until FY2018.
 
     Real spending peaked in FY2020, not FY2022. At $15,747 it stands about $433 above the
-    FY2022 figure of $15,314. [verified] (crates/deflator) Federal COVID relief arrived while
+    FY2022 figure of $15,314. [verified — crates/deflator] Federal COVID relief arrived while
     prices were still low and was then eroded by the FY2021-22 inflation, so the nominal high and
     the real high are two years apart. The FY2020 nominal input is a chart approximation, so the gap should be
     confirmed against exact figures — but it exceeds the approximation error. [open]
@@ -359,7 +359,7 @@ properties:
 
     IT WAS BROAD. Of the 610 comparable districts the panel carries in **both** endpoint years,
     **490 — 80.3% — spent less per pupil in real terms in FY2013 than in FY2010.** Median change
-    -5.6%, first quartile -9.1%. [verified] (crates/dispersion) This was not a handful of
+    -5.6%, first quartile -9.1%. [verified — crates/dispersion] This was not a handful of
     districts cut hard enough to move a statewide average; four in five actually spent less.
 
     The denominator is the inner join and not a district count. It was written here as 607 — the
@@ -372,17 +372,17 @@ properties:
     land hardest on districts most dependent on state aid — is not supported. Against the depth
     of the fall:
 
-      FY2010 state share of revenue      +0.020   [verified] (crates/dispersion)
-      FY2010 federal share of revenue    +0.026   [verified] (crates/dispersion)
-      FY2010 local share of revenue      -0.024   [verified] (crates/dispersion)
+      FY2010 state share of revenue      +0.020   [verified — crates/dispersion]
+      FY2010 federal share of revenue    +0.026   [verified — crates/dispersion]
+      FY2010 local share of revenue      -0.024   [verified — crates/dispersion]
       economically disadvantaged share   -0.033   [later vintage, directional]
       assessed valuation per pupil       +0.033   [later vintage, directional]
-      log enrollment                     -0.197   [verified] (crates/dispersion)
-      FY2010 spending per pupil          -0.168   [verified] (crates/dispersion)
+      log enrollment                     -0.197   [verified — crates/dispersion]
+      FY2010 spending per pupil          -0.168   [verified — crates/dispersion]
 
     Only size and prior level register at all, both weakly and the second partly mechanical. The
     deepest decile is real — 61 districts averaging -17.5% — but carries 12.0% of pupils, so it
-    is a tail rather than the story. [verified] (crates/dispersion)
+    is a tail rather than the story. [verified — crates/dispersion]
 
     Every figure in that table moved when it was bound. The test behind them asserts a band —
     `r.abs() < 0.06` for the three revenue shares, `close(r, -0.186, 0.02)` for the two that
@@ -391,7 +391,7 @@ properties:
     occurrence of that pattern in this issue and the reason convention four exists.
 
     A SECOND SOURCE CONFIRMS THE SHAPE. Enrollment-weighted, the F-33 panel falls **6.8%** from
-    FY2010 to FY2013 [verified] (crates/dispersion) against the Auditor's **6.9%** from FY2010 to
+    FY2010 to FY2013 [verified — crates/dispersion] against the Auditor's **6.9%** from FY2010 to
     FY2014 — different survey,
     different entity set, levels about $1,500 apart, same decline. [verified] The two series are
     not interchangeable and should never be quoted as one; that they agree on the shape is what

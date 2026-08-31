@@ -11,7 +11,7 @@ description: |
   **The freeze.** "In FY 2020 and FY 2021, the budget provides every traditional school district
   and JVSD with the same amount of foundation aid the districts received in FY 2019." Statewide
   that is **$8.07 billion** for traditional districts and **$306.5 million** for joint vocational
-  districts. [verified] (the greenbook)
+  districts. [verified — the greenbook]
 
   It is a freeze of the machinery and not only of the total:
 
@@ -28,7 +28,7 @@ description: |
   supplement, and quality community schools support are paid alongside the frozen foundation
   amount rather than through it. A biennium that adds money without touching the formula is
   choosing not to redistribute: every district's share of foundation aid is whatever its share was
-  in FY2019. [verified] (the greenbook's chapter structure; inference on the last sentence)
+  in FY2019. [verified — the greenbook's chapter structure; inference on the last sentence]
 findings: |
   ### The Fair School Funding Plan's anchor is this freeze, not a FY2020 computation
 
@@ -51,7 +51,7 @@ findings: |
       FY2022   $8,202,198,712
 
   Three consecutive years flat to within **0.003%**, against $1.44 billion of growth across the
-  five years before them. [verified] (`appropriation-lines.csv`, lines 200550 and 200612) The
+  five years before them. [verified — `appropriation-lines.csv`, lines 200550 and 200612] The
   freeze was legible in the series the whole time and nothing here had read it as one, because no
   node named the act that caused it.
 
@@ -76,7 +76,7 @@ properties:
     quality community schools support, all outside the frozen amount.
   vetoes: |
     Four, and the first is a per-pupil floor that would have begun in the Fair School Funding
-    Plan's first year. [verified] (the greenbook)
+    Plan's first year. [verified — the greenbook]
 
     **A per-pupil funding guarantee.** From FY2022, every city, local and exempted village district
     would have been guaranteed at least as much funding per pupil as the statewide per-pupil amount

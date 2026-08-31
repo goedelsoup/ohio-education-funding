@@ -14,7 +14,7 @@ description: |
   a per-pupil **Opportunity Grant**, plus seven categorical aids: targeted assistance, special
   education additional aid, limited English proficiency, economically disadvantaged aid, K-3
   literacy, gifted, and career-technical education, with transportation beside them.
-  [verified] (the greenbook)
+  [verified — the greenbook]
 
   ### The formula is bounded on both sides, and the bounds are the mechanism
 
@@ -39,14 +39,14 @@ findings: |
   biennium — FY2015, then FY2017, then FY2019 — and every base included the prior act's
   transitional aid term. The full chain is in
   [`bridge-formula`](../funding-regime/bridge-formula.yml). What matters here is that it begins at
-  a year this act did not compute either. [verified] (the greenbook's own formula box)
+  a year this act did not compute either. [verified — the greenbook's own formula box]
 
   ### The appropriation the corpus already held shows the act working
 
   Enacted foundation aid is **$6.58 billion in FY2014 and $7.00 billion in FY2015**, against $6.29
   billion in FY2013 — a 6.4% rise in the first year, just inside the 6.25% cap once the guarantee's
-  floor is added, and 6.4% again in the second. [verified] (`appropriation-lines.csv`, lines
-  200550 and 200612)
+  floor is added, and 6.4% again in the second. [verified — `appropriation-lines.csv`, lines
+  200550 and 200612]
 
   ### It is the most-cited act of the decade in the Catalog and had no node
 
@@ -66,7 +66,7 @@ properties:
     FY2013 and adding a gain cap of 6.25% and 10.5%. Created the Straight A Program.
   vetoes: |
     Three, and one of them is about what a district may do with money the formula gave it for a
-    named purpose. [verified] (the greenbook)
+    named purpose. [verified — the greenbook]
 
     **Gifted funding spending requirements.** The General Assembly required districts to spend
     funding received for gifted coordinator and gifted intervention specialist services *only* on

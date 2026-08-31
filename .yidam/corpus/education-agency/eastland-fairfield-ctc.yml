@@ -36,8 +36,8 @@ properties:
     JVSDs are funded on rules that differ from traditional districts in ways easy to overlook and
     consequential to get wrong. [inference]
   irn: |
-    051003 [verified] (`crates/dispersion/fixtures/mr81-sponsor-panel.csv`, where it reports as
-    "Eastland-Fairfield Career/Tech Jt Voc SD" in October 2001). Absent from the FY2021 IDEA Part
+    051003 [verified — `crates/dispersion/fixtures/mr81-sponsor-panel.csv`, where it reports as
+    "Eastland-Fairfield Career/Tech Jt Voc SD" in October 2001]. Absent from the FY2021 IDEA Part
     B allocation list, because federal special education money reaches career-technical students
     through their member districts rather than through the JVSD — which is why this took a
     child-nutrition return to establish.

@@ -195,8 +195,8 @@ properties:
     the `dew-report-card` connector and committed at
     [`crates/dispersion/fixtures/report-card-2425-district-data.csv`](../../../crates/dispersion/fixtures/report-card-2425-district-data.csv).
   series: |
-    2024-2025, 607 rated traditional districts [verified] (computed from the committed
-    fixture; the same figures appear in OCG White Paper 013 and reproduce exactly):
+    2024-2025, 607 rated traditional districts [verified — computed from the committed
+    fixture; the same figures appear in OCG White Paper 013 and reproduce exactly]:
 
       minimum   53.1
       p25       81.5

@@ -64,7 +64,7 @@ findings: |
   [H.B. 153](../legislation/hb-153-2011.yml) defines that as each district's **FY2011 state aid per
   pupil** — actual FY2011 allocation over recalculated FY2011 ADM — adjusted by where its charge-off
   valuation per pupil sits against the statewide median, applied to current-year pupils, with a
-  floor at **FY2011 total aid net of its federal stimulus portion**. [verified] (the greenbook)
+  floor at **FY2011 total aid net of its federal stimulus portion**. [verified — the greenbook]
 
       FY2011      Evidence-Based Model run, net of stimulus
         ↓         H.B. 153: FY2011 per pupil, wealth-indexed, x current ADM; floor at FY2011
@@ -123,7 +123,7 @@ properties:
     built (H.B. 59), extended (H.B. 64), made conditional (H.B. 49) and finally not run at all
     (H.B. 166) — and in that last biennium the bounds are the whole of the distribution. A regime
     boundary drawn at a formula overlay would cut the mechanism that persisted and keep the ones
-    that did not. [verified] (the four greenbooks)
+    that did not. [verified — the four greenbooks]
 links:
   - target: ../fiscal-period/fy2012-13.yml
     relationship: opened-in

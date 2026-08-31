@@ -21,8 +21,8 @@ description: |
   What clearing 3% is worth has
   nothing to do with how close a district came: it is $250 times the district's size. New Lexington
   grew **2.9502%** and drew nothing; three hundredths of a percentage point further and it would
-  have received **$430,477**. 3 other districts sit between 2.7% and 3%. [verified]
-  (`crates/project/tests/the_supplements_outside_the_formula.rs`)
+  have received **$430,477**. 3 other districts sit between 2.7% and 3%. [verified —
+  `crates/project/tests/the_supplements_outside_the_formula.rs`]
 
   The cliff sits in a thin part of the distribution, which is where a cliff does its most arbitrary
   work: Ohio's median district is shrinking, so the districts near the threshold are few and their
@@ -39,8 +39,8 @@ description: |
   draw it; the growth supplement reaches 43, so the growth districts are a strict subset and "both"
   is a consequence rather than a coincidence. The two share a sheet and nothing else — $56.1m
   spread flat across everyone against $39.4m concentrated on 43 districts behind a 3% cliff, which
-  is $92k a district against $916k. [verified]
-  (`crates/project/tests/questions_the_corpus_left_open.rs`) The guarantee comparison below stands — the guarantee tracks aid rather than enrolment, and property wealth predicts it three
+  is $92k a district against $916k. [verified —
+  `crates/project/tests/questions_the_corpus_left_open.rs`] The guarantee comparison below stands — the guarantee tracks aid rather than enrolment, and property wealth predicts it three
   times more strongly than decline does. [verified]
 
   ### Still open
@@ -120,8 +120,8 @@ properties:
     a district whose enrolled ADM grew at least **5%** from FY2022 to FY2025; FY2027 pays $250 at
     3% from FY2023 to FY2026. Same supplement, a different price and a slacker test one year
     apart, which is what a payment written into temporary law can do and a codified one cannot.
-    [verified] (`lsc-budget`,
-    `crates/project/tests/what_the_act_says_and_the_code_does_not.rs`)
+    [verified — `lsc-budget`,
+    `crates/project/tests/what_the_act_says_and_the_code_does_not.rs`]
   function_tex: |
     \begin{aligned}
     L &= \text{enrolled ADM} \times \$40 && \text{base funding supplement} \\
@@ -149,11 +149,11 @@ properties:
     `crates/project/fixtures/enacted-school-funding.txt`, and its citation block for *Funding for
     FY 2026 and FY 2027* closes `Sections 265.215, 265.220, 265.230, 265.237, 265.239, and
     265.450` — the six uncodified sections of the act carrying the school financing system for the
-    biennium, this payment among them. [verified] (`lsc-budget`)
+    biennium, this payment among them. [verified — `lsc-budget`]
 
     A bounded list, not a pinpoint. The analysis cites the sections for the topic and not for each
     supplement inside it, and separating them needs the enrolled act rather than LSC's account of
-    it. [open] (which of the six, not whether)
+    it. [open — which of the six, not whether]
 
   calculator: |
     Not a standalone crate. Carried in `crates/project::panel::Supplements` and reproduced for all

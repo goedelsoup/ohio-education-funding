@@ -9,7 +9,7 @@ description: |
   `(base cost per pupil − per-pupil local capacity) / base cost per pupil`, and then says: *"If
   the result is less than 0.10, the state share percentage shall be 0.10."* Division (B)(1)
   states the same rule from the other side — a district whose local capacity exceeds 90% of its
-  base cost is paid `base cost per pupil × 0.10 × enrolled ADM`. [verified] (the section)
+  base cost is paid `base cost per pupil × 0.10 × enrolled ADM`. [verified — the section]
 
   **It doubled, and the doubling is not in permanent law.** The plan was enacted with 5%
   [inference]; the 10% above is what H.B. 96 wrote into a section that applies only to FY2026
@@ -32,7 +32,7 @@ findings: |
 
   The charge-off counterfactual records the same problem from the other direction: 138 districts
   are the ones whose local capacity the minimum state share censors, so it cannot value them
-  under both regimes on the same basis. [verified] (crates/regime-diff)
+  under both regimes on the same basis. [verified — crates/regime-diff]
 
   ### And it makes the formula's response to base cost non-linear
 
@@ -66,8 +66,8 @@ properties:
     [the four kinds of parameter](../../decisions/the-four-kinds-of-parameter.yml) distinguishes
     "in the Revised Code" from "in a budget act" and this is both at once.
   series: |
-    FY2022  0.05   as the Fair School Funding Plan was enacted      [inference] (carried by
-                   `crates/project`, not read from the enacting act)
+    FY2022  0.05   as the Fair School Funding Plan was enacted      [inference — carried by
+                   `crates/project`, not read from the enacting act]
     FY2026  0.10   R.C. 3317.017(C), as amended by H.B. 96          [verified]
     FY2027  0.10   the same section, the same two-year scope        [verified]
     FY2028  —      the section does not apply                       [verified]
@@ -81,7 +81,7 @@ properties:
     the capacity-to-base-cost ratio (0.90) and once as a floor on the resulting percentage
     (0.10). They are the same rule and they are algebraically equivalent, which is worth knowing
     because a reader who finds one and not the other may conclude the floor applies only to the
-    payment or only to the percentage. [verified] (`ohio-laws`)
+    payment or only to the percentage. [verified — `ohio-laws`]
   simulation_key: |
     `Policy::minimum_state_share`, defaulting to
     `project::panel::MINIMUM_STATE_SHARE`.

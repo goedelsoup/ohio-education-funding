@@ -10,14 +10,14 @@ description: |
   from either.
 
   **The channel.** A 33% tax on gross casino revenue from the four casinos authorized in 2009
-  (Cincinnati, Cleveland, Toledo, and Franklin County). [verified] (R.C. 5753.02) **34% of that
+  (Cincinnati, Cleveland, Toledo, and Franklin County). [verified — R.C. 5753.02] **34% of that
   tax** goes to the gross casino revenue county student fund, transferred quarterly, and is
   distributed among all eighty-eight counties in proportion to their public school district
   student populations — then within each county among the districts, in proportion to each
-  district's students resident in that county. [verified] (Ohio Constitution Article XV Section
-  6(C)(3)(b); R.C. 5753.03(D)(2)) Districts are paid twice a year and **"shall determine how
+  district's students resident in that county. [verified — Ohio Constitution Article XV Section
+  6(C)(3)(b); R.C. 5753.03(D)(2)] Districts are paid twice a year and **"shall determine how
   [their] distributions are appropriated, but all distributions shall only be used to support
-  primary and secondary education."** [verified] (Art. XV §6(C)(3)(b))
+  primary and secondary education."** [verified — Art. XV §6(C)(3)(b)]
 
   ### A fifth pupil denominator, and the only one that double-counts on purpose
 
@@ -31,13 +31,13 @@ description: |
   Two properties make it stranger than a fifth count would otherwise be:
 
   - **"Public school district" here includes community schools, STEM schools, JVSDs and
-     college-preparatory boarding schools.** [verified] (R.C. 5753.11(A)(1)) Community schools
+     college-preparatory boarding schools.** [verified — R.C. 5753.11(A)(1)] Community schools
      receive this money directly, which is the *opposite* of how they were funded before the
      Fair School Funding Plan, when their students were deducted from a resident district. And
      JVSDs are included, where [IDEA Part B](idea-part-b.yml) excludes them entirely — two
      federal-and-state channels drawing the boundary of "district" in opposite places.
-  - **A student dual-enrolled in a JVSD and another district is counted in both.** [verified]
-     (R.C. 5753.11(B)) Where the district of enrollment cannot be determined in time, the count
+  - **A student dual-enrolled in a JVSD and another district is counted in both.** [verified —
+     R.C. 5753.11(B)] Where the district of enrollment cannot be determined in time, the count
      is split equally between the reporting districts. The denominator is deliberately not a
      partition of Ohio's students, so a per-pupil figure from it is not comparable to one from
      any other source here.
@@ -59,7 +59,7 @@ findings: |
   offset is visible in what this corpus holds.** None of the fifteen R.C. 3317 sections
   committed to [`revised-code.txt`](../../../crates/project/fixtures/revised-code.txt) mentions
   the casino distribution, and neither the constitution nor R.C. 5753 provides for reducing
-  state aid by the amount a district receives. [verified] (as far as those sections go)
+  state aid by the amount a district receives. [verified, as far as those sections go]
 
   That is not the same as establishing that the money is additive. The substitution critique of
   earmarked gambling revenue is about the *appropriation*, not the statute: whether the General
@@ -73,8 +73,8 @@ findings: |
   substitution smaller than that ordinary movement is arithmetically inside it — not hard to
   see, but indistinguishable from the year's other reasons for moving. And nothing happens at
   the onset: FY2012 moves +$183 million and FY2013 −$101 million — the eleventh and seventh
-  smallest of the 24 annual movements in the series. [verified] (the appropriation series and the
-  deflator, pinned in `crates/project/tests/what_the_series_cannot_settle.rs`)
+  smallest of the 24 annual movements in the series. [verified — the appropriation series and the
+  deflator, pinned in `crates/project/tests/what_the_series_cannot_settle.rs`]
 
   ### The lottery is different because it has a line, not because it is bigger
 
@@ -112,8 +112,8 @@ findings: |
   in foundation aid. A substitution can be at most the whole of it, so no arrangement of this
   money produces a movement the appropriation series could distinguish — which converts the null
   result above from "we could not see it" into "it is not visible at this size, and a longer
-  series will not change that." [verified]
-  (`crates/project/tests/what_the_series_cannot_settle.rs`)
+  series will not change that." [verified —
+  `crates/project/tests/what_the_series_cannot_settle.rs`]
 
   **And the comparison with the lottery is now between two measured quantities.** The lottery's
   substitution was legible in a movement of **$97.6 million**. This channel is *larger* than that
@@ -140,7 +140,7 @@ findings: |
   [lottery](lottery-profits.yml) the substitution question has a documented answer: LSC states
   that profits are combined with the GRF to pay foundation aid, and Fund 7017 appears
   **inside** the foundation aid appropriation table at **$1.44 billion of an $11.23 billion
-  total** in FY2026. [verified] (the greenbook, `crates/project/fixtures/dew-greenbook.txt`)
+  total** in FY2026. [verified — the greenbook, `crates/project/fixtures/dew-greenbook.txt`]
 
   **That is evidence about the lottery and not about this channel, and the difference is the
   mechanism.** Lottery profits are appropriated by the General Assembly into foundation aid,

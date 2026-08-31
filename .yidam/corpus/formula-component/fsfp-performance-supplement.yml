@@ -28,8 +28,8 @@ findings: |
   By economically disadvantaged quintile, the mean supplement per pupil runs **$55.92, $43.51,
   $35.62, $30.62, $21.84** from least-poor to poorest, monotonically, and the share of
   districts qualifying runs **94.21% to 47.20%**. The least-poor districts receive **2.56 times per
-  pupil** what the poorest do. [verified]
-  (`crates/project/tests/the_supplements_outside_the_formula.rs`)
+  pupil** what the poorest do. [verified —
+  `crates/project/tests/the_supplements_outside_the_formula.rs`]
 
   Every figure in that sentence moved when it was first bound to the crate. The table had been
   published as `$54.74, $43.24, $36.21, $30.03, $23.31`, the qualification rates as `91% to 49%`
@@ -54,8 +54,8 @@ findings: |
   disadvantaged fifth of districts against $22.06 to the most**, monotone across all five
   quintiles, a factor of 2.5. But the supplement is **0.77% of realized state aid**, it reaches
   at most **7.0%** of any one district's aid, and the ninetieth-percentile district gets 2.8%.
-  A mechanism pointed the wrong way and turned down almost to nothing. [verified]
-  (`crates/project/tests/questions_the_corpus_left_open.rs`)
+  A mechanism pointed the wrong way and turned down almost to nothing. [verified —
+  `crates/project/tests/questions_the_corpus_left_open.rs`]
 
   Recorded precisely because it reads as either alarming or trivial depending on which of the
   two numbers is quoted alone. The reason to keep watching it is that the gradient is a
@@ -164,11 +164,11 @@ properties:
     `crates/project/fixtures/enacted-school-funding.txt`, and its citation block for *Funding for
     FY 2026 and FY 2027* closes `Sections 265.215, 265.220, 265.230, 265.237, 265.239, and
     265.450` — the six uncodified sections of the act carrying the school financing system for the
-    biennium, this payment among them. [verified] (`lsc-budget`)
+    biennium, this payment among them. [verified — `lsc-budget`]
 
     A bounded list, not a pinpoint. The analysis cites the sections for the topic and not for each
     supplement inside it, and separating them needs the enrolled act rather than LSC's account of
-    it. [open] (which of the six, not whether)
+    it. [open — which of the six, not whether]
 
   calculator: |
     Not a standalone crate. Carried in `crates/project::panel::PerformanceSupplement` and

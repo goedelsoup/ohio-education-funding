@@ -10,8 +10,8 @@ description: |
 
   The first biennium of the Bridge formula, and the trough of the real-terms decline: per-pupil operating expenditure in constant FY2022 dollars fell to $14,173 by FY2014, a level indistinguishable from FY2006.
 findings: |
-  **What is measured**, over comparable districts, on federal definitions: [verified]
-  (`dispersion::ohio_panel`, pinned by test)
+  **What is measured**, over comparable districts, on federal definitions: [verified —
+  `dispersion::ohio_panel`, pinned by test]
 
       FY2012   local 49.17%   state 41.88%   federal 8.95%   gap $5,727   residual $2,713
       FY2013   local 52.83%   state 41.92%   federal 5.25%   gap $6,030   residual $3,084
@@ -25,7 +25,7 @@ properties:
   kind: biennium
   start: 2011-07-01
   end: 2013-06-30
-  appropriating_bill: Am. Sub. H.B. 153 (129th General Assembly). [verified] (the corpus holds this act)
+  appropriating_bill: Am. Sub. H.B. 153 (129th General Assembly). [verified — the corpus holds this act]
   context: |
     Bridge formula era. Revenue shares and the quartile equalization measure above are from the
     Census F-33 as NCES publishes it, comparable districts only. [verified]

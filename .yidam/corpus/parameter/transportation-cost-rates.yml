@@ -14,7 +14,7 @@ description: |
   ridership, then — after excluding districts that provide no bus service, the ten with the
   highest cost per student and the ten with the lowest — divide the remaining aggregate cost by
   the remaining aggregate ridership. Division (D) does the same per mile. Both rates are
-  **trimmed means of what districts reported spending**. [verified] (the section)
+  **trimmed means of what districts reported spending**. [verified — the section]
 
   So these are endogenous. A year in which districts spend more on buses raises the rate they
   are paid at the following year, and the twenty-district trim is the only thing bounding that.
@@ -33,14 +33,14 @@ findings: |
   The school bus payment is multiplied by the greater of the district's own state share
   percentage and a fixed minimum: **45.83% in FY2026 and 50% in FY2027**, both written into
   division (E)(1)(c). H.B. 96's own summary records the sequence as 41.67% → 45.83% → 50%.
-  [verified] (the section for the two current values)
+  [verified — the section for the two current values]
 
   That is a different floor from the [minimum state share](minimum-state-share.yml)'s 10%, five
   times higher, and it binds far more widely. The committed 609-district panel puts **438** on
   the transportation floor against 138 on the formula's; the department's own 611 give 440, and
   both are right about their own population. Transportation is therefore the component where the
   state pays the largest share of cost for the largest number of districts, and it is usually
-  discussed as a small line. [verified] (crates/project)
+  discussed as a small line. [verified — crates/project]
 
   ### Two constants in the calculator are not in the section
 
@@ -118,7 +118,7 @@ properties:
     R.C. 3317.0212, read. (C) and (D) define the two rates as trimmed means; (E) assembles the
     base payment and states the rider weights and the state share floor; (F) the efficiency
     adjustment; (G) hands non-bus transport to departmental rule; (H) the density supplement.
-    [verified] (`ohio-laws`)
+    [verified — `ohio-laws`]
   simulation_key: |
     `project::panel::supplements::TRANSPORT_PER_RIDER` and `TRANSPORT_PER_MILE`, with
     `TRANSPORT_SCHOOL_DAYS`, `TRANSPORT_NONPUBLIC_WEIGHT` and `TRANSPORT_COMMUNITY_WEIGHT`

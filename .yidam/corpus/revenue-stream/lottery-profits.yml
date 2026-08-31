@@ -69,8 +69,8 @@ findings: |
   Between the redbook table and the greenbook table — the same five lines, the same year, the
   bill as introduced against the bill as enacted — Fund 7017 rose **$97,638,202** while the other
   four lines together **fell $15,575,916**, so the foundation aid total grew by $82,062,286,
-  which is less than the lottery line alone moved. [verified]
-  (`crates/project/fixtures/dew-redbook.txt` against `dew-greenbook.txt`)
+  which is less than the lottery line alone moved. [verified —
+  `crates/project/fixtures/dew-redbook.txt` against `dew-greenbook.txt`]
 
   That is the mechanism caught in a single table across a single bill. It does not show intent —
   the General Assembly was setting a total, and the four GRF and non-lottery lines move for their

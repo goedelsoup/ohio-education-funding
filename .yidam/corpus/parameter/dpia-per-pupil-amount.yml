@@ -42,7 +42,7 @@ findings: |
   DPIA payment is calculated", and the LSC greenbook writes the FY2027 row out to match. The
   department's FY2027 workbook carries **FY2026** in that column — its own header says `d1b FY26
   Directly Certified ADM`. So 35% of the count is a year behind what the act asks for.
-  [verified] (the workbook's header and vintage table)
+  [verified — the workbook's header and vintage table]
 
   ### DPIA is the one component with its own phase-in
 
@@ -87,12 +87,12 @@ properties:
       directly certified ADM           474,197
 
     The statewide economically disadvantaged percentage the calculator carries for FY2027 is
-    0.533380310606710. [verified] (crates/project)
+    0.533380310606710. [verified — crates/project]
   statutory_basis: |
     R.C. 3317.022(A)(4) for the programme and the $422; R.C. 3317.02(I)(1) for the index and its
     squaring; R.C. 3317.03(B)(21) for the certification the count rests on; R.C. 3317.02(N)(2)
     for the FY2019 anchor of DPIA's own phase-in slice. The component previously cited R.C.
-    3317.029, which does not exist. [verified] (`ohio-laws`)
+    3317.029, which does not exist. [verified — `ohio-laws`]
   simulation_key: |
     `project::panel::categoricals::DPIA_PER_PUPIL`, with `DPIA_BLEND` and
     `DPIA_STATEWIDE_PERCENTAGE` beside it.

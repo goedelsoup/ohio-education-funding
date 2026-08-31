@@ -31,7 +31,7 @@ description: |
   Chapter 3323 for each term. Category 1 is a speech and language disability; Category 2
   gathers specific learning disability, developmental disability and delay, other health
   impairment-minor, and preschool developmental delay; the higher categories run through the
-  multiple-disability and low-incidence conditions. [verified] (`ohio-laws`)
+  multiple-disability and low-incidence conditions. [verified — `ohio-laws`]
 findings: |
   ### The distribution runs against the weights, not with them
 
@@ -49,8 +49,8 @@ findings: |
 
   All six — 0.2435, 0.6179, 1.4845, 1.9812, 2.6830, 3.9554. That is a genuinely new kind of
   check: every prior verification confirmed the department agreed with *itself*, and a
-  spreadsheet can be internally perfect and still not be the law. [verified]
-  (`crates/project/tests/the_statute_behind_the_weights.rs`)
+  spreadsheet can be internally perfect and still not be the law. [verified —
+  `crates/project/tests/the_statute_behind_the_weights.rs`]
 
   **Still open: whether the sixteen-fold range tracks a sixteen-fold difference in cost.**
   Naming the categories settles what is being ordered and not what it costs, and no source the

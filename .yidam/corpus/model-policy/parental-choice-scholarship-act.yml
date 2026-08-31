@@ -13,7 +13,7 @@ description: |
   question is established.** The model directs that "the funds needed for a scholarship shall
   be subtracted from the state school aid payable to the student's resident school district",
   and that "any aid the school district would have received for the student in excess of the
-  funds needed for a scholarship will be kept by the state". [verified] (ALEC model text)
+  funds needed for a scholarship will be kept by the state". [verified — ALEC model text]
 
   Set that against Ohio. Under the original EdChoice design a scholarship was funded by
   deducting from the resident district's foundation payment, which is the model's shape.
@@ -59,19 +59,19 @@ properties:
     "Any elementary or secondary student who was eligible to attend a public school in [state] in
     the preceding semester or is starting school in [state] for the first time" — drafted to
     include kindergarteners and new residents rather than only students leaving a public school.
-    [verified] (ALEC model text)
+    [verified — ALEC model text]
   award_basis: |
     The lesser of the participating school's annual cost per pupil "including both operational and
     capital facility costs", or "the dollar amount the resident school district would have
     received to serve and educate the eligible student from state and local sources had the
     student enrolled there". Participating schools may charge tuition above the award.
-    [verified] (ALEC model text)
+    [verified — ALEC model text]
   district_funding_effect: |
     **A deduction, with the state keeping the remainder.** "The funds needed for a scholarship
     shall be subtracted from the state school aid payable to the student's resident school
     district. Any aid the school district would have received for the student in excess of the
     funds needed for a scholarship will be kept by the state."
-    [verified] (ALEC model text)
+    [verified — ALEC model text]
 
     Ohio's post-FSFP arrangement is not this. See the description, and
     [edchoice-expansion](../program/edchoice-expansion.yml) for the negative confirmation and the
@@ -83,7 +83,7 @@ properties:
     nondiscrimination under 42 U.S.C. 1981, and a surety bond or demonstration of financial
     viability for schools receiving $50,000 or more. It then forbids anything further, in terms:
     "The Department or any other state agency may not in any way regulate the educational
-    program" of a participating school. [verified] (ALEC model text)
+    program" of a participating school. [verified — ALEC model text]
   adoption_evidence: |
     **Nothing.** No source retrieved for this corpus connects this text to any Ohio bill. The
     resemblance recorded on this node is a resemblance between two published documents, which is

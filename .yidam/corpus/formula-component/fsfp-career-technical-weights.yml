@@ -44,8 +44,8 @@ description: |
   business and administration, hospitality and tourism, human services, law and public safety,
   transportation systems and arts and communications at 0.5905. The lower multiples are not
   workforce programmes at all: 0.2154 is career-based intervention. So the gap between 0.5905
-  and 0.2154 is a gap between kinds of programme rather than between grades of one. [verified]
-  (`ohio-laws`)
+  and 0.2154 is a gap between kinds of programme rather than between grades of one. [verified —
+  `ohio-laws`]
 
   Why the first group is priced above the second — both are full workforce programmes, and the
   split is by field — is not stated in the section. [open]
@@ -58,8 +58,8 @@ findings: |
   two numbers copied out of one workbook proves only that they were copied correctly.
   [verified]
 
-  **All five multiples match the statute exactly.** [verified]
-  (`crates/project/tests/the_statute_behind_the_weights.rs`)
+  **All five multiples match the statute exactly.** [verified —
+  `crates/project/tests/the_statute_behind_the_weights.rs`]
 figures:
   - key: project/career-technical-total
     value: 53875678.32
@@ -128,7 +128,7 @@ properties:
     match the corpus exactly; the separate base cost is statutory too — the section multiplies each
     category by "the statewide average career-technical base cost per pupil for that fiscal year",
     so it is a distinct quantity by legislative construction rather than a departmental convenience.
-    [verified] (`ohio-laws`)
+    [verified — `ohio-laws`]
   calculator: |
     Not a standalone crate. Reproduced for all 609 districts in
     `crates/project/tests/the_remaining_categoricals.rs`; carried in

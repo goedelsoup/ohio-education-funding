@@ -46,12 +46,12 @@ findings: |
   measure](../formula-component/fsfp-local-capacity-measure.yml) added resident income to
   valuation. On property alone Northern Local is above median; on the outcome it spends $11,987
   per pupil, the lowest of the three exemplars and roughly $3,700 below the statewide median.
-  [verified] (inference for the interpretation)
+  [verified, inference for the interpretation]
 properties:
   seeded_because: |
     The anchor case for the property-poor end of Ohio's distribution.
   irn: |
-    049056 [verified] (appears as "Northern Local" in the FY2021 IDEA Part B allocation list).
+    049056 [verified — appears as "Northern Local" in the FY2021 IDEA Part B allocation list].
     Distinct from Hardin Northern Local (047498). County attribution to Perry is [inference]:
     the allocation list gives no county, and confirmation should come from an `nces-ccd`
     crosswalk before this IRN is used to key a series.
@@ -69,7 +69,7 @@ properties:
     Current operating millage (TY2023) 31.35; effective Class 1 millage 20.000 — AT THE FLOOR.
     Total operating expenditure per pupil $11,986.62.
     State revenue per pupil $6,423.28 (47.52% of total); local $5,277.43 (39.04%);
-    total revenue per pupil $13,517.67. [verified] (FY2024 District Profile Report)
+    total revenue per pupil $13,517.67. [verified — FY2024 District Profile Report]
   roles: |
     DeRolph plaintiff district (1991-2003) [verified]. Property-poor throughout the period
     covered [inference]. 20-mill floor status by fiscal period not yet determined and is a

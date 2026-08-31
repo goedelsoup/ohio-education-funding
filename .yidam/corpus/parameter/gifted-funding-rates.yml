@@ -10,7 +10,7 @@ description: |
   **Per pupil, in R.C. 3317.022(A)(6)(a).** Identification is `$24 × enrolled ADM for
   kindergarten through six × state share percentage`; referral is `$2.50 × enrolled ADM × state
   share percentage`. Note the different denominators: identification is paid on the K-6 count
-  and referral on the whole district. [verified] (the section)
+  and referral on the whole district. [verified — the section]
 
   **Per unit, in R.C. 3317.051.** A district is allocated one gifted coordinator unit per 3,300
   enrolled ADM, floored at 0.5 units and capped at 8; one K-8 intervention specialist unit per
@@ -41,7 +41,7 @@ findings: |
 
   The share of pupils a district identifies as gifted falls with poverty and rises with property
   wealth across the district panel — r = −0.67 against poverty and r = +0.35 against valuation
-  per pupil. [verified] (crates/project) Identification funds are paid on the K-6 *enrolled* count
+  per pupil. [verified — crates/project] Identification funds are paid on the K-6 *enrolled* count
   rather than on identified pupils, so that part is neutral; unit funding is paid on the
   *identified* count, so it is not. A district that identifies fewer gifted pupils receives
   fewer specialist units to identify and serve them. [verified for the correlations; inference
@@ -89,7 +89,7 @@ properties:
   statutory_basis: |
     R.C. 3317.022(A)(6)(a) for identification and referral; R.C. 3317.051(B) for unit allocation
     and (C) for unit prices. This node's component previously cited R.C. 3317.053, which does
-    not exist — the second wrong citation the statute audit turned up. [verified] (`ohio-laws`)
+    not exist — the second wrong citation the statute audit turned up. [verified — `ohio-laws`]
   simulation_key: |
     `project::panel::categoricals::GIFTED_IDENTIFICATION_PER_PUPIL`,
     `GIFTED_REFERRAL_PER_PUPIL`, `GIFTED_COORDINATOR_DIVISOR`, `GIFTED_COORDINATOR_UNIT_BOUNDS`,

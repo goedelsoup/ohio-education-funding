@@ -8,7 +8,7 @@ description: |
   R.C. 3317.0213(A) states the calculation in one line and then six: `($4,000 × the number of
   students who are preschool children with disabilities)` plus, for each of the six categories,
   `count × the multiple in R.C. 3317.013 × the statewide average base cost per pupil × the
-  district's state share percentage × 0.50`. [verified] (the section)
+  district's state share percentage × 0.50`. [verified — the section]
 
   Two parameters in one formula, and they behave oppositely.
 
@@ -71,7 +71,7 @@ properties:
     The weighted terms multiply the statewide average base cost per pupil, $8,241.61, and the
     district's state share percentage; the flat term multiplies neither. [verified]
 
-    FY2027 scale, from the committed panel. [verified] (crates/project)
+    FY2027 scale, from the committed panel. [verified — crates/project]
       programme total                          $148,408,183.76
       of which the flat component              $102.7m, 69%
       appropriation for GRF ALI 200540         $193,272,426
@@ -80,7 +80,7 @@ properties:
   statutory_basis: |
     R.C. 3317.0213, read. Division (A) states the formula, names each division of R.C. 3317.013
     for the six categories, and writes "X 0.50" on each. The categories themselves are the ones
-    prescribed in R.C. 3317.013, which the section says in terms. [verified] (`ohio-laws`)
+    prescribed in R.C. 3317.013, which the section says in terms. [verified — `ohio-laws`]
   simulation_key: |
     Not bound as a named constant. `crates/project` reproduces the programme in its panel and
     the flat amount and the halving are inline there rather than exported.

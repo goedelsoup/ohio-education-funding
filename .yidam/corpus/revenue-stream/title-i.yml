@@ -28,8 +28,8 @@ description: |
 
   **The size of the channel is only measurable through the Census F-33**, not through any Title
   I file: Ohio districts received $2,466 per pupil in *all* federal revenue in FY2022, against a
-  national $2,493, which is 13.87% of Ohio school revenue and ranks Ohio 25th of 51. [verified]
-  (`crates/dispersion/src/census_states.rs`) Title I is the largest component of that, but the
+  national $2,493, which is 13.87% of Ohio school revenue and ranks Ohio 25th of 51. [verified —
+  `crates/dispersion/src/census_states.rs`] Title I is the largest component of that, but the
   F-33 does not decompose it, so no Title I figure for Ohio or for any district is entered here.
   [open]
 figures:
@@ -66,8 +66,8 @@ properties:
     proposes that a school failing to exit Comprehensive Support and Improvement within three
     years may be subject to "annual approval of expenditure of all federal funds by the
     Department", Title I A named first; and that districts with many persistently identified
-    schools may be required to have their federal expenditure plans approved. [verified] (as a
-    statement of what the amendment proposes) Whether it has been approved by the U.S. Department
+    schools may be required to have their federal expenditure plans approved. [verified — as a
+    statement of what the amendment proposes] Whether it has been approved by the U.S. Department
     of Education is not established here, and the amendment is a request. [open]
 
     This is a different kind of restriction from supplement-not-supplant. That one binds the

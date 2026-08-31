@@ -132,7 +132,7 @@ findings: |
   value on both, 44 point opposite ways**, and of those 44 exactly **0** have both magnitudes
   above 0.05: each is within 0.04 of zero on one of the two, which is no measured growth there
   and a sign that is arbitrary. The correlation across those 534 is 0.903.
-  [verified] (computed in `crates/bundle` from the 2024-25 report card)
+  [verified — computed in `crates/bundle` from the 2024-25 report card]
 
   So the smoothing choice is safe for any district with real movement, and the three-year figure
   remains the right default: a single year of value-added is noisy enough that the department
@@ -142,7 +142,7 @@ revisions:
   - was: |
       The correlation between the two published growth measures was stated as 0.912.
     now: |
-      **0.903.** [verified] (crates/bundle)
+      **0.903.** [verified — crates/bundle]
     found_by: |
       Binding the figure to `crates/figures`. The test standing behind the claim asserted a band
       around it, so the two could disagree indefinitely and both stay green — the same shape as

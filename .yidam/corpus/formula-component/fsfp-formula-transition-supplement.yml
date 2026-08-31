@@ -122,11 +122,11 @@ properties:
     `crates/project/fixtures/enacted-school-funding.txt`, and its citation block for *Funding for
     FY 2026 and FY 2027* closes `Sections 265.215, 265.220, 265.230, 265.237, 265.239, and
     265.450` — the six uncodified sections of the act carrying the school financing system for the
-    biennium, this payment among them. [verified] (`lsc-budget`)
+    biennium, this payment among them. [verified — `lsc-budget`]
 
     A bounded list, not a pinpoint. The analysis cites the sections for the topic and not for each
     supplement inside it, and separating them needs the enrolled act rather than LSC's account of
-    it. [open] (which of the six, not whether)
+    it. [open — which of the six, not whether]
 
     `[L1]` is likewise absent from the Revised Code, so it is defined in the same temporary law or
     administratively. Either way it is not a permanent-law quantity, which is worth knowing about a
@@ -137,14 +137,14 @@ properties:
     refers an appropriation to the section "entitled **FORMULA TRANSITION SUPPLEMENT**" — so the
     supplement had a named uncodified home in the act that created it, and has been carried
     forward in that form through two budgets since. The surrounding words are a strike-and-insert
-    and the extract prints both halves; the reading here is the inserted one. [verified]
-    (`crates/project/fixtures/hb583-corrections.txt`,
-    `crates/project/tests/the_act_that_corrected_the_plan.rs`)
+    and the extract prints both halves; the reading here is the inserted one. [verified —
+    `crates/project/fixtures/hb583-corrections.txt`,
+    `crates/project/tests/the_act_that_corrected_the_plan.rs`]
 
     And the act says what the base is: H.B. 96 extends "a formula transition supplement based on
     an **FY 2021 funding base** to districts, community schools, and STEM schools", which is the
     department's `[L1]` named in the legislature's own words rather than inferred from the
-    formula's shape. [verified] (`lsc-budget`) What it is composed *of* is still not published;
+    formula's shape. [verified — `lsc-budget`] What it is composed *of* is still not published;
     the department carries it as a value. [open]
   calculator: |
     Not a standalone crate. Carried in `crates/project::panel::Transition` and reproduced for all

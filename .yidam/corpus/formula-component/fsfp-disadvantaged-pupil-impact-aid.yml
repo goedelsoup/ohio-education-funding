@@ -5,7 +5,7 @@ findings: |
   constrained only by "shall not be categorically excluded … based on anything other than family
   income" — and the department's operative test has been free and reduced-price lunch
   eligibility. The Office for Child Nutrition published that count every October, and over Public
-  sponsors it runs: [verified] (`dispersion::mr81`, pinned by test)
+  sponsors it runs: [verified — `dispersion::mr81`, pinned by test]
 
       1998  28.9%      2003  33.1%      2008  39.6%
       1999  28.6%      2004  33.8%      2009  42.6%
@@ -39,7 +39,7 @@ findings: |
   adding the three files gives 33.3% for 2014 and would read as poverty collapsing. What the
   source supports for 2014 is **43.7% to 48.4%** — the directly certified count as a floor, what
   those schools may claim for as a ceiling — and that band contains 2011's 46.3%. The direction is
-  what cannot be settled. [verified] (`dispersion::mr81::streams_by_year`, pinned by test)
+  what cannot be settled. [verified — `dispersion::mr81::streams_by_year`, pinned by test]
 
   Whether the department's current economically-disadvantaged count still tracks free-lunch
   eligibility is now half-answered: after 2011 free-lunch eligibility stops being a single measure
@@ -65,8 +65,8 @@ findings: |
   Three independent selections over the panel return the same single district, which is what
   makes this an identification rather than a coincidence: the only district whose blend exceeds
   its enrolment, the only one whose weighted ADM equals its enrolment, and the only one at a
-  disadvantaged percentage of ~100%. [verified]
-  (`crates/project/tests/questions_the_corpus_left_open.rs`)
+  disadvantaged percentage of ~100%. [verified —
+  `crates/project/tests/questions_the_corpus_left_open.rs`]
 
   ### The cause: a prior-year count against a collapsed enrolment
 
@@ -84,8 +84,8 @@ findings: |
 
   All three sit at 98.6% against the year the act measures in. What separates them is entirely
   how much they shrank. A ratio that is identical in three unrelated districts is not a data
-  error in any of them — the dispersion is in the denominator. [verified]
-  (`crates/project/tests/what_the_act_says_and_the_code_does_not.rs`)
+  error in any of them — the dispersion is in the denominator. [verified —
+  `crates/project/tests/what_the_act_says_and_the_code_does_not.rs`]
 
   ### The second count is a year behind the weights, and the act says it should not be
 
@@ -96,7 +96,7 @@ findings: |
   district's directly certified ADM for that year."* The department's FY2027 workbook carries
   **FY2026** against those FY2027 weights. Its `DPIA` sheet heads the column `d1b FY26 Directly
   Certified ADM`, and its `Directions` sheet names the collection the column came from: `FY26 Nov
-  #2`. [verified] (the workbook's own header and vintage table)
+  #2`. [verified — the workbook's own header and vintage table]
 
   **It is the simulation, not an error, and it is not an exception either.** FY2027 direct
   certification has not been collected, so the model substitutes the latest year that has — and
@@ -113,8 +113,8 @@ findings: |
       economically disadvantaged ADM      847,000 (est.)         856,236     +1.1%
       directly certified ADM              557,000                474,197    -14.9%
 
-  A term on the greenbook's vintage would sit inside the first row's band. [verified]
-  (`crates/project/tests/what_the_act_says_and_the_code_does_not.rs`)
+  A term on the greenbook's vintage would sit inside the first row's band. [verified —
+  `crates/project/tests/what_the_act_says_and_the_code_does_not.rs`]
 
   The 82,800-pupil gap is **not** a measured one-year fall in direct certification. The two figures
   are a fiscal year and possibly a collection point apart — `Nov #2` is a point in the year and the
@@ -129,7 +129,7 @@ findings: |
   divides by is the sum of enrolled ADM for all city, local and exempted village districts,
   statewide community school enrolment, and statewide STEM school enrolment. So it is
   recomputed rather than carried forward, and its value moves when any of those three move.
-  [verified] (`ohio-laws`) How far it has moved between biennia is still unrecorded here,
+  [verified — `ohio-laws`] How far it has moved between biennia is still unrecorded here,
   because the corpus holds one year of the calculator. [open]
 
   **What *is* delegated is narrower and more interesting.** R.C. 3317.03(B)(21) hands the
@@ -192,8 +192,8 @@ description: |
       students certified as categorically eligible    25%       35%
 
   So the blend is **uncodified statutory law** — the same category as the four supplements —
-  changeable by the next budget and not by the department. [verified] (`lsc-budget`,
-  `crates/project/tests/what_the_act_says_and_the_code_does_not.rs`)
+  changeable by the next budget and not by the department. [verified — `lsc-budget`,
+  `crates/project/tests/what_the_act_says_and_the_code_does_not.rs`]
 
   And the act names the **vintage**, which nothing else did: the first term is the **FY2025**
   count, not the year the aid is paid in.
@@ -314,14 +314,14 @@ properties:
   statutory_basis: |
     R.C. 3317.022(A)(4) for the programme and the $422; R.C. 3317.02(I)(1) for the index and its
     squaring; R.C. 3317.03(B)(21) for the count. This node previously cited R.C. 3317.029, which
-    does not exist. [verified] (`ohio-laws`)
+    does not exist. [verified — `ohio-laws`]
 
     The 65/35 blend appears in **no** section of the Revised Code, and the conclusion this node
     drew from that — "the department exercising the delegation in R.C. 3317.03(B)(21)", recorded
     as departmental rather than statutory — was wrong and is retracted in the revisions above. It
     is **uncodified statutory law**: H.B. 96 sets 75/25 for FY2026 and 65/35 for FY2027 in a table
-    of its own, changeable by the next budget and not by the department. [verified] (the act,
-    `crates/project/fixtures/enacted-school-funding.txt`)
+    of its own, changeable by the next budget and not by the department. [verified — the act,
+    `crates/project/fixtures/enacted-school-funding.txt`]
 
     The retraction sat beside the retracted sentence for a phase, which is its own failure: a
     revisions block that corrects a field and leaves the field standing has recorded the finding

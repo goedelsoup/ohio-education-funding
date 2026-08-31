@@ -6,7 +6,7 @@ summary: >-
   the median and 0.0112 against the district. The mismatch is the policy.
 description: |
   Targeted assistance pays a district the sum of a capacity amount and a wealth amount, and the
-  two are built differently. [verified] (R.C. 3317.0217)
+  two are built differently. [verified — R.C. 3317.0217]
 
   **The capacity tier** takes the gap between statewide median weighted wealth and the
   district's own, at **0.008** on each side, and then scales it by district size: zero below 200
@@ -21,7 +21,7 @@ description: |
   0.0112)] × enrolled ADM`, and the two coefficients are not the same number. A district
   exactly at the median does not get zero: it gets `median × 0.0028 × ADM`. The tier pays
   something to every district down to a wealth index of 0.8, below which it pays nothing.
-  [verified] (the section)
+  [verified — the section]
 
   That asymmetry is easy to read as a transcription error and it is in the statute. Both figures
   appear in the same bracketed expression in division (C)(4)(b), to four and three decimals
@@ -77,15 +77,15 @@ properties:
 
     FY2026 and FY2027 only. [verified]
 
-    FY2027 medians, from the department's model rather than from statute. [verified]
-    (crates/project)
+    FY2027 medians, from the department's model rather than from statute. [verified —
+    crates/project]
       median weighted wealth            $392,151,306.63
       median weighted wealth per pupil     $276,708.97
   statutory_basis: |
     R.C. 3317.0217, read. (B) for the capacity tier including the size brackets, (C) for the
     wealth tier and its two coefficients, and (B)(1) for the 60/40 weighted wealth blend that
     refers back to divisions (A)(1)(a) and (A)(2)(a) of R.C. 3317.017. Payment is made under
-    R.C. 3317.022(A). [verified] (`ohio-laws`)
+    R.C. 3317.022(A). [verified — `ohio-laws`]
   simulation_key: |
     `project::panel::categoricals::TA_CAPACITY_RATE`, `TA_WEALTH_RATE`,
     `TA_WEALTH_OFFSET_RATE`, `TA_WEALTH_BLEND`, `TA_CAPACITY_MINIMUM_ADM`,

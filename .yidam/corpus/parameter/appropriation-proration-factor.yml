@@ -66,8 +66,8 @@ findings: |
   printed beside it — $908,184 over that cell**, though the cell turns out to be the FY2025
   estimate rather than the FY2027 appropriation; see below. A third cell on the same sheet states
   $146,708,228.07, matching neither. The likeliest reading is a factor calibrated against an earlier ADM vintage
-  and never recalibrated after the counts were refreshed. [verified]
-  (`crates/project/tests/the_supplements_outside_the_formula.rs`)
+  and never recalibrated after the counts were refreshed. [verified —
+  `crates/project/tests/the_supplements_outside_the_formula.rs`]
 
   The FY2027 calculator is a projection published before the fiscal year, so a recalibration
   before payment is expected and this may never reach a district. But a parameter that has
@@ -119,7 +119,7 @@ findings: |
 
   A residual claimant is the thing that absorbs a shortfall by construction. That is *why* this
   program prorates and the others mostly do not, and nothing on the department's sheet says it
-  — the sheet shows a factor and a limit. [verified] (`lsc-budget`, as introduced)
+  — the sheet shows a factor and a limit. [verified — `lsc-budget`, as introduced]
 
   ### The limit the calculator prints is last year's
 
@@ -135,8 +135,8 @@ findings: |
   headed `Appropriation` where the redbook's are headed `Introduced`. It existed at a sibling
   URL to the redbook the whole time and went unwired for four phases while this corpus quoted
   the proposal. Every earmark held from introduction to enactment, to the dollar, and the
-  remainder with them: **$153,976,832**. [verified]
-  (`crates/project/fixtures/dew-greenbook.txt`)
+  remainder with them: **$153,976,832**. [verified —
+  `crates/project/fixtures/dew-greenbook.txt`]
 
       ALI 200540 earmark                                FY2025 actual   FY2026 approp   FY2027 approp
       Special education at DD boards and institutions     $36,258,454     $33,945,594     $33,945,594

@@ -33,8 +33,8 @@ findings: |
   have provided one way for districts to attempt to counteract the effect of H.B. 920 tax policy
   that limits revenue growth from existing real property."
 
-  **The Governor vetoed it.** [verified] (the greenbook, committed at
-  `crates/project/fixtures/lsc-education-greenbooks.txt`)
+  **The Governor vetoed it.** [verified — the greenbook, committed at
+  `crates/project/fixtures/lsc-education-greenbooks.txt`]
 
   It is the only provision in this corpus that would have loosened the mechanism this node
   describes, and it never took effect — so it appears in no levy, no valuation and no enacted

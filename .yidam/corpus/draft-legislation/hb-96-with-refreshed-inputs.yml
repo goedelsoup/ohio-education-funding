@@ -51,10 +51,10 @@ findings: |
       on the guarantee      294      ->  253
       guarantee cost        $879M    ->  $729M
 
-  [verified] (`crates/project/tests/a_draft_cannot_hide_what_it_did_not_price.rs`. The figure is
+  [verified — `crates/project/tests/a_draft_cannot_hide_what_it_did_not_price.rs`. The figure is
   $220,525,319; `crates/scenario-delta` pins the same run at $220.6M within a $1M tolerance, from
   a uniform scale rather than this one, so the two agree to the significant figures either
-  supports)
+  supports]
 
   ### The bill computes $497.1M and delivers $220.5M
 
@@ -126,8 +126,8 @@ properties:
     None.
   status: |
     Never introduced, and not proposed by anyone. It is the alternative the enacted act declined,
-    reconstructed from the practice of the budget two years before it. [verified] (that H.B. 33
-    refreshed the reference year; the reconstruction itself is a construction)
+    reconstructed from the practice of the budget two years before it. [verified — that H.B. 33
+    refreshed the reference year; the reconstruction itself is a construction]
   text_read: |
     No external text exists to pin. The enactment being rewritten is read from
     [`lsc-hb96-analysis`](../../catalog/lsc-hb96-analysis.md), with the stage caveat that record

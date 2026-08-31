@@ -25,8 +25,8 @@ findings: |
 
   FY2022 is the peak. In that year Ohio districts took **13.87% of school revenue from federal
   sources against a national 13.24%** — $2,466 per pupil against $2,493 — which places Ohio
-  25th of 51 and, unusually for this corpus, entirely unremarkable. [verified]
-  (`crates/dispersion/src/census_states.rs`)
+  25th of 51 and, unusually for this corpus, entirely unremarkable. [verified —
+  `crates/dispersion/src/census_states.rs`]
 
   All four of those figures are the **state-level** F-33 table, and the citation used to name
   `national_peers.rs`, which is the district panel and computes none of them. The two sources are
@@ -41,8 +41,8 @@ findings: |
   domestic levels, and the federal channel is a constant that does not explain it. [inference]
 
   **Federal money is compensatory in Ohio, monotonically, and it is small.** Quartiling the 611
-  comparable districts by local revenue per pupil in FY2022: [verified]
-  (`dispersion::national_peers::ohio_by_local_wealth`, pinned by test)
+  comparable districts by local revenue per pupil in FY2022: [verified —
+  `dispersion::national_peers::ohio_by_local_wealth`, pinned by test]
 
       quartile   local/pupil   state/pupil   federal/pupil
       Q1 poorest      $4,342        $8,970          $2,738

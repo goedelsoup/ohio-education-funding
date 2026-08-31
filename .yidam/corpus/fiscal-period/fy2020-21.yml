@@ -10,8 +10,8 @@ description: |
 
   **The two frozen years, and FY2020 is the one that never went away.** The Fair School Funding Plan's guarantee is anchored to FY2020 and has never been re-based, so 48.3% of districts are still funded at this biennium's level in FY2027.
 findings: |
-  **What is measured**, over comparable districts, on federal definitions: [verified]
-  (`dispersion::ohio_panel`, pinned by test)
+  **What is measured**, over comparable districts, on federal definitions: [verified —
+  `dispersion::ohio_panel`, pinned by test]
 
       FY2020   local 55.36%   state 38.04%   federal 6.60%   gap $9,262   residual $4,744
       FY2021   local 54.04%   state 37.06%   federal 8.90%   gap $9,384   residual $5,031
@@ -21,7 +21,7 @@ findings: |
   categories doing it, so a series from Ohio's own reporting would measure the reporting.
   [inference]
 
-  **The appropriating act set the department's own budget at $11.88 billion in FY2020 and $12.10 billion in FY2021.** That is what was appropriated to the Department of Education across every line in its chapter, less the property tax reimbursement items that are numbered as the department's and are carried in the State Revenue Distributions section instead. [verified] (the appropriation series, `lsc-appropriation-spreadsheet`) It is a ceiling rather than a payment; what districts received is `dew-foundation`.
+  **The appropriating act set the department's own budget at $11.88 billion in FY2020 and $12.10 billion in FY2021.** That is what was appropriated to the Department of Education across every line in its chapter, less the property tax reimbursement items that are numbered as the department's and are carried in the State Revenue Distributions section instead. [verified — the appropriation series, `lsc-appropriation-spreadsheet`] It is a ceiling rather than a payment; what districts received is `dew-foundation`.
 properties:
   label: FY2020-2021
   kind: biennium
@@ -36,8 +36,8 @@ properties:
     The Catalog cites this act on 177 line items and prints it bare, `H.B. 166 of the 133rd
     G.A.`, which agrees with the form used here.
 
-    The funding levels for both years were frozen rather than recomputed. [verified] (see the
-    Bridge formula node)
+    The funding levels for both years were frozen rather than recomputed. [verified — see the
+    Bridge formula node]
   context: |
     Bridge formula era. Revenue shares and the quartile equalization measure above are from the
     Census F-33 as NCES publishes it, comparable districts only. [verified]

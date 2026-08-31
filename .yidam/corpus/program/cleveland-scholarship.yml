@@ -44,8 +44,8 @@ properties:
     district, and what grew from it was universal eligibility statewide. [inference]
   name: Cleveland Scholarship and Tutoring Program
   mechanism: |
-    **Direct payment as the pilot project scholarship unit. Not a deduction.** [verified]
-    (R.C. 3317.022, R.C. 3313.975)
+    **Direct payment as the pilot project scholarship unit. Not a deduction.** [verified —
+    R.C. 3317.022, R.C. 3313.975]
 
     The statute never names Cleveland. R.C. 3313.975(A) has the director implement the programme in
     "any school districts that are or have ever been under federal court order requiring
@@ -57,26 +57,26 @@ properties:
     Students residing in the Cleveland Metropolitan School District — reached in statute through
     the federal-court-supervision definition in R.C. 3313.975(A) rather than by name — subject to
     income-based priority in awarding. Created in 1995 as a pilot initiative; authorised under
-    R.C. 3313.974 through 3313.979. [verified] (R.C. 3313.975; 2025 Scholarship Annual Report)
+    R.C. 3313.974 through 3313.979. [verified — R.C. 3313.975; 2025 Scholarship Annual Report]
   amount: |
-    **FY2025: 8,345 students, $55,155,295.70, average award as published $6,836.35.** [verified]
-    (2025 Scholarship Annual Report) Expenditure over participation is $6,609.38; the same
+    **FY2025: 8,345 students, $55,155,295.70, average award as published $6,836.35.** [verified —
+    2025 Scholarship Annual Report] Expenditure over participation is $6,609.38; the same
     unexplained gap the other programmes show, recorded on
     [`edchoice-scholarship`](edchoice-scholarship.yml). [open]
 
     Statutory bound: the lesser of the alternative school's net tuition charges, or **$5,500** for
     grades K-8 and **$7,500** for 9-12, with those amounts rising by the same percentage as the
-    statewide average base cost per pupil. [verified] (R.C. 3317.022(A)(11)) The department reports
+    statewide average base cost per pupil. [verified — R.C. 3317.022(A)(11)] The department reports
     FY2025 maxima of $6,166 and $8,408, which are the indexed values. [verified]
   appropriation_line: |
     **No line of its own — it is paid from the foundation aid appropriation.** Five line items
     "are used to collectively support state foundation aid payments for all public school students
     in the state **and scholarship payments for students enrolled in state scholarship
     programs**": GRF ALI 200550 Foundation Funding, GRF ALI 200502 Pupil Transportation, Fund 5VS0
-    ALI 200604, Fund 5YO0 ALI 200491, and Lottery Fund 7017 ALI 200612. [verified] (LSC redbook and greenbook, `crates/project/fixtures/dew-redbook.txt` and
+    ALI 200604, Fund 5YO0 ALI 200491, and Lottery Fund 7017 ALI 200612. [verified — LSC redbook and greenbook, `crates/project/fixtures/dew-redbook.txt` and
     `dew-greenbook.txt`. Checked against the act as enacted, not only as introduced: the five
     lines and the sentence naming them are identical in both. The *amounts* in that table are
-    not — foundation aid was enacted $82m above the proposal — so nothing here quotes one.)
+    not — foundation aid was enacted $82m above the proposal — so nothing here quotes one.]
 
     That is a finding rather than a citation. The scholarship channel does not appear as a
     separate appropriation, so the budget document a reader would consult to size it shows it

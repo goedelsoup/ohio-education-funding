@@ -64,7 +64,7 @@ properties:
       3.5     overall star rating threshold
       3.0     progress rating threshold
 
-    Scale, from the committed panel. [verified] (crates/project)
+    Scale, from the committed panel. [verified — crates/project]
       statewide                                  $55,676,980.25
       districts qualifying                          427 of 609
 
@@ -84,7 +84,7 @@ properties:
   statutory_basis: |
     None. Not in R.C. 3317.022 and not in any other section of the Revised Code; the rate and the
     routes are transcribed from the department's sheet, where the supplement is line [O]. The
-    authority is H.B. 96's temporary law. [verified] (the statute audit)
+    authority is H.B. 96's temporary law. [verified — the statute audit]
   simulation_key: |
     `project::panel::supplements::PERFORMANCE_SUPPLEMENT_PER_POINT`, with
     `PERFORMANCE_STAR_THRESHOLD` and `PERFORMANCE_PROGRESS_THRESHOLD`.

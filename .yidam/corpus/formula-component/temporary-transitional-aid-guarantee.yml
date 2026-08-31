@@ -44,7 +44,7 @@ findings: |
   **North Bass Local receives $19,672.64, and every cent of it is this guarantee.** Zero base
   cost, zero categoricals, zero transportation, zero of everything the formula computes — a Lake
   Erie island district in Ottawa County that the department does not cost at all, funded because
-  it was funded in FY2020. [verified] (the department's FY27 calculator, `Summary_SFPR`)
+  it was funded in FY2020. [verified — the department's FY27 calculator, `Summary_SFPR`]
 
   It is what the mechanism looks like with the formula subtracted out. Every other guaranteed
   district is a comparison between two numbers; this one has only the historical number, and the
@@ -122,10 +122,10 @@ findings: |
   For spending, less dispersion is more equitable. For state aid the sign flips: aid is
   compensatory, so a wide spread means strong targeting and a narrow one means weak targeting.
   Realized aid is measurably *more equal* than formula aid — coefficient of variation 0.563
-  against 0.695, restricted range ratio 9.66 against 12.27. [verified] (recomputed over the 609
+  against 0.695, restricted range ratio 9.66 against 12.27. [verified — recomputed over the 609
   districts of the committed feed with `dispersion::Dispersion::of`, which is R type 7 on
   `q * (n - 1)` and population variance; the figures this replaces (0.544, 0.677, 9.6, 12.3)
-  do not reproduce under any convention in the crate) That equality is the guarantee
+  do not reproduce under any convention in the crate] That equality is the guarantee
   flattening the compensation. Reporting it as an improvement, which the habit from spending
   analysis would invite, gets the direction exactly backwards. See
   [equity](../doctrine/equity.yml).
@@ -247,8 +247,8 @@ findings: |
   drawing about $181.2 million in guarantee support — and treats the phase-in gap as the
   "unfunded statutory formula" standard for defunding. Set the FY2027 figures beside it:
 
-      FY2024    180 districts     $181.2 million     [verified] (as published, secondary)
-      FY2027    294 districts     $879.0 million     [verified] (department FY2027 model)
+      FY2024    180 districts     $181.2 million     [verified — as published, secondary]
+      FY2027    294 districts     $879.0 million     [verified — department FY2027 model]
 
   Roughly fivefold in dollars, arriving *at* the terminal year, the year the formula reaches
   100%. The phase-in gap closes and the guarantee does not; the mechanism that carries

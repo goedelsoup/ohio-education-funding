@@ -9,8 +9,8 @@ description: |
 
   The state share falls below 40% for the first time in the series, at 39.77% in FY2017.
 findings: |
-  **What is measured**, over comparable districts, on federal definitions: [verified]
-  (`dispersion::ohio_panel`, pinned by test)
+  **What is measured**, over comparable districts, on federal definitions: [verified —
+  `dispersion::ohio_panel`, pinned by test]
 
       FY2016   local 52.84%   state 40.05%   federal 7.11%   gap $6,768   residual $3,352
       FY2017   local 53.40%   state 39.77%   federal 6.83%   gap $7,041   residual $3,408
@@ -20,7 +20,7 @@ findings: |
   categories doing it, so a series from Ohio's own reporting would measure the reporting.
   [inference]
 
-  **The appropriating act set the department's own budget at $11.11 billion in FY2016 and $11.32 billion in FY2017.** That is what was appropriated to the Department of Education across every line in its chapter, less the property tax reimbursement items that are numbered as the department's and are carried in the State Revenue Distributions section instead. [verified] (the appropriation series, `lsc-appropriation-spreadsheet`) It is a ceiling rather than a payment; what districts received is `dew-foundation`.
+  **The appropriating act set the department's own budget at $11.11 billion in FY2016 and $11.32 billion in FY2017.** That is what was appropriated to the Department of Education across every line in its chapter, less the property tax reimbursement items that are numbered as the department's and are carried in the State Revenue Distributions section instead. [verified — the appropriation series, `lsc-appropriation-spreadsheet`] It is a ceiling rather than a payment; what districts received is `dew-foundation`.
 properties:
   label: FY2016-2017
   kind: biennium

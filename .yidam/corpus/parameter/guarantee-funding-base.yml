@@ -24,9 +24,9 @@ description: |
 
   It is published per district on the payment report's `Detail_SFPR` sheet and **carries no
   year label there**. It is the FY2020 level, the year Ohio froze funding under the [Bridge
-  formula](../funding-regime/bridge-formula.yml). [verified] (the department's FY2026 payment
+  formula](../funding-regime/bridge-formula.yml). [verified — the department's FY2026 payment
   report line-by-line explanation states the guarantee "ensures that districts do not receive
-  less in FY 2026 than what they received in **FY 2020**")
+  less in FY 2026 than what they received in **FY 2020**"]
 
   ### It is not `[L1] FY21 Funding Base`
 
@@ -69,8 +69,8 @@ findings: |
   FY2021: every traditional district and joint vocational district received exactly its FY2019
   allocation, with the formula amount held at $6,020 and the state share index held at FY2019.
   So `[H2]` is not the output of a computation performed in FY2020 — it is H.B. 49's FY2019 run,
-  preserved by a statute that declined to recompute. [verified] (the LSC greenbook, committed at
-  `crates/project/fixtures/lsc-education-greenbooks.txt`)
+  preserved by a statute that declined to recompute. [verified — the LSC greenbook, committed at
+  `crates/project/fixtures/lsc-education-greenbooks.txt`]
 
   And it reaches further back than that. Each act of the decade re-anchored its guarantee on the
   year before its biennium — FY2013, then FY2015, then FY2017 — and each base explicitly included
@@ -84,7 +84,7 @@ findings: |
   FY2011 state aid was computed under the
   [Evidence-Based Model](../funding-regime/evidence-based-model.yml), which the same act repealed —
   including the charge-off valuation the index divides by, which is the EBM's own adequacy-share
-  valuation. [verified] (the greenbook)
+  valuation. [verified — the greenbook]
 
   So `[H2]` is the sixth link of a chain sixteen years long whose first term was produced by a
   formula that has not existed since 2011. What is *not* established is how much of any particular

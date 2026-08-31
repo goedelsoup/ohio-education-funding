@@ -19,33 +19,33 @@ description: |
 
   The base cost came from an **unweighted average over 127 "model" districts** — the 170
   districts that met at least 20 of 27 performance standards in FY1999, less those in the top
-  and bottom 5% by income and property wealth. [verified] (¶17) The formula was `ADM × base
-  cost × cost-of-doing-business − 0.023 × valuation`. [verified] (¶18)
+  and bottom 5% by income and property wealth. [verified — ¶17] The formula was `ADM × base
+  cost × cost-of-doing-business − 0.023 × valuation`. [verified — ¶18]
 
   **Four mechanisms it introduced or restructured**, three of which the corpus already models
   under later names:
 
-  - **Six special education weights.** [verified] (¶22) Ohio's six clinical categories, which
+  - **Six special education weights.** [verified — ¶22] Ohio's six clinical categories, which
      [the FSFP node](../formula-component/fsfp-special-education-weights.yml) still carries,
      date from this act. It also added catastrophic-cost thresholds — $30,000 in category six,
      $25,000 in categories two through five — above which the state funds all of half the
-     excess plus its share of the other half. [verified] (¶22)
+     excess plus its share of the other half. [verified — ¶22]
   - **Gap aid**, extended to transportation as well as base cost, special and vocational
      education, explicitly to address **phantom revenue**: the state contributes more where the
-     tax base does not grow with the base cost amount. [verified] (¶19) This is the corpus's
+     tax base does not grow with the base cost amount. [verified — ¶19] This is the corpus's
      [charge-off](../formula-component/charge-off-local-share.yml) problem, named and partially
      compensated by the legislature seventeen years before the charge-off was retired.
   - **A three-mill cap** on what a district must raise locally toward special education,
-     vocational education and transportation. [verified] (¶20)
+     vocational education and transportation. [verified — ¶20]
   - **Parity aid.** Poor districts received the difference between what 9.5 mills raises for
      them and what it raises at the eightieth percentile of income-adjusted wealth. Estimated
      at $100m in FY2002 and $500m a year fully phased in by FY2006 — which [DeRolph
-     III](../litigation/derolph-iii-2001.yml) accelerated to FY2004. [verified] (¶23)
+     III](../litigation/derolph-iii-2001.yml) accelerated to FY2004. [verified — ¶23]
 findings: |
   **And a stabilizer, which is the provision the court later overrode.** R.C. 3317.012(D)(4)
   required the state share percentage of base cost and parity aid not to vary by more than 2.5%
   from the preceding update year, and directed the General Assembly to bring it back within
-  range "by any means it determines to be necessary". [verified] (¶25) One available means was
+  range "by any means it determines to be necessary". [verified — ¶25] One available means was
   moving the charge-off millage. DeRolph III ¶62 forbade exactly that, holding the rate at 23
   mills through FY2007 "irrespective of the language of R.C. 3317.012(D)(4) suggesting such a
   methodology". [verified] The court was not freezing a number in the abstract; it was closing
@@ -54,7 +54,7 @@ findings: |
   ### Its own citations no longer resolve, and they resolve to something plausible
 
   This is the reason the act is worth a node rather than a footnote. Every section DeRolph III
-  cites has since been repealed or reused: [verified] (fetched 2026-08-09)
+  cites has since been repealed or reused: [verified — fetched 2026-08-09]
 
       section          in H.B. 94 (2001)        on codes.ohio.gov today
       R.C. 3317.012    the base cost formula    "Joint vocational school district base cost"
@@ -91,7 +91,7 @@ properties:
     127 model districts; six special education weights with catastrophic-cost thresholds; gap aid
     extended to transportation; a three-mill cap on the local share of categorical costs; and
     parity aid equalizing 9.5 mills of discretionary capacity to the eightieth percentile of
-    income-adjusted wealth. [verified] (DeRolph III at paragraphs 16 through 25)
+    income-adjusted wealth. [verified — DeRolph III at paragraphs 16 through 25]
   vetoes: |
     **The greenbook does not discuss them, and that is what is recorded rather than a placeholder.**
     LSC's analysis of this act carries no vetoed-provisions chapter and the word does not appear in

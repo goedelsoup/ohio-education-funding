@@ -28,7 +28,7 @@ description: |
   required to produce a specified amount of tax money, including a tax levied under section
   5705.199 or 5748.09 of the Revised Code, or an amount to pay debt charges." R.C. 5705.199 is
   the emergency levy section. Fixed-sum levies are exempt from reduction as a matter of law.
-  [verified] (`ohio-laws`, `crates/project/tests/the_statute_behind_the_weights.rs`)
+  [verified — `ohio-laws`, `crates/project/tests/the_statute_behind_the_weights.rs`]
 
   An absence of an effect in one group is not an absence of the mechanism, and the correction
   is recorded rather than quietly replaced because the wrong reading was the more natural one.
@@ -38,8 +38,8 @@ findings: |
   **How much the reduction factors have actually taken: the median district has lost 42.4% of
   the millage its voters approved.** The median voted current operating rate is 42.31 mills
   against a median effective Class 1 rate of 23.40, and the largest reduction in the state is
-  74.7%. [verified] (FY2024 District Profile Report, `current_operating_millage_ty23` against
-  `effective_class1_millage_ty23`) This is the magnitude of the mechanism the floor bounds, and
+  74.7%. [verified — FY2024 District Profile Report, `current_operating_millage_ty23` against
+  `effective_class1_millage_ty23`] This is the magnitude of the mechanism the floor bounds, and
   it went unstated here for as long as it did because the voted-millage column was present in
   the fixture and never parsed. Note the figure is the median of the per-district ratio, not
   one minus the ratio of the two medians, which is a different and meaningless quantity.
@@ -85,8 +85,8 @@ findings: |
   for these districts would pin at 20 mills. It does not: on TY2024 it runs from 19.719 to
   21.562 across the fourteen, and three of them land within a hundredth of 20. Statewide the
   same measure puts **62 of 611** districts at 20.00 against **155** on the Class 1 rate, so
-  the Class 1 figure is the one the floor governs. [verified] (TY2024 Table SD-1, all four
-  counts from the same year)
+  the Class 1 figure is the one the floor governs. [verified — TY2024 Table SD-1, all four
+  counts from the same year]
 
   The TY2023 column of the same table says 76 of 611 on the combined measure against 172 on
   Class 1, with one of the fourteen within a hundredth of 20. Both years disconfirm the
@@ -115,8 +115,8 @@ findings: |
   **What two tax years establish that one could not.** Of the 416 districts that began TY2023
   above the floor, 301 saw their effective Class 1 rate fall by TY2024; of the 193 that began
   at it, 9 did. 97.1% of every effective-rate reduction in Ohio happens above the floor.
-  [verified] (computed in `crates/bundle` from TY2023 and TY2024 Table SD-1, over the 609
-  districts of the FY2027 funding model, at `RATE_FALL_TOLERANCE`)
+  [verified — computed in `crates/bundle` from TY2023 and TY2024 Table SD-1, over the 609
+  districts of the FY2027 funding model, at `RATE_FALL_TOLERANCE`]
 
   The split must be taken at the *start* of the interval. Classifying by the end year lets a
   district that fell *to* the floor be counted as a floor district with a falling rate, which

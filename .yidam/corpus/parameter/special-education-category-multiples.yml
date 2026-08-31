@@ -8,12 +8,12 @@ description: |
   Six numbers, written out in R.C. 3317.013 in the same order as the categories they price:
   0.2435, 0.6179, 1.4845, 1.9812, 2.6830, 3.9554. Each multiplies the statewide average base
   cost per pupil, the district's ADM in that category, and its state share percentage.
-  [verified] (the section, in `crates/project/fixtures/revised-code.txt`)
+  [verified — the section, in `crates/project/fixtures/revised-code.txt`]
 
   **The range is the policy.** A Category 6 pupil generates sixteen times what a Category 1
   pupil does, so which category a child is assigned to is not an administrative detail — it is
   most of the money. Statewide, Category 6 is 15% of the pupils and 48% of the aid; Category 2
-  is 65% of the pupils and 34%. [verified] (`crates/project`)
+  is 65% of the pupils and 34%. [verified — `crates/project`]
 
   **What they multiply is not obvious from the numbers.** The multiplicand is the general
   statewide average base cost per pupil, $8,241.61, and *not* the career-technical figure
@@ -30,12 +30,12 @@ findings: |
   *"This section shall apply only for fiscal years 2026 and 2027"*. Five more hand their values
   back clause by clause: forty divisions across six sections read *"For fiscal year 2028 and
   each fiscal year thereafter, an amount calculated in a manner determined by the general
-  assembly"*. R.C. 3317.013 does neither. [verified] (counted over the committed extract)
+  assembly"*. R.C. 3317.013 does neither. [verified — counted over the committed extract]
 
   It is also the only one of the nine not amended by the current budget act. Its effective date
   is 6 April 2023 and its source is H.B. 554 of the 134th General Assembly; every other section
-  here carries H.B. 96 of the 136th and 30 September 2025. [verified] (the extract's own
-  `date:` and `source:` fields)
+  here carries H.B. 96 of the 136th and 30 September 2025. [verified — the extract's own
+  `date:` and `source:` fields]
 
   Whether the durability is deliberate or an artefact of the section not having needed
   amendment is not established, and the two are not distinguishable from the text. [open]
@@ -95,7 +95,7 @@ properties:
     statewide average base cost per pupil, so
     [base-cost-per-pupil](base-cost-per-pupil.yml) moves all six at once — which is why the
     scenario runner's `base_cost_scale` carries about $812m of categorical exposure on top of
-    what base cost alone does. [verified] (`crates/project`)
+    what base cost alone does. [verified — `crates/project`]
 
     A program dominated by a category that is a sixth of its caseload is sensitive to
     identification practice in a way a per-pupil program is not. A small change in how many
