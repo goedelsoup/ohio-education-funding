@@ -14,7 +14,7 @@ description: |
   established. Every appropriation figure for Ohio school funding from here to FY2027 is read off
   `200550`, and the Catalog of Budget Line Items names the act that created it in the same breath
   it names the act that governs it: *"originally established by Am. Sub. H.B. 66 of the 126th
-  G.A."* [verified — `catalog-line-item-basis.tsv`]
+  G.A."* [verified] (`catalog-line-item-basis.tsv`)
 
   The [foundation base cost formula](../funding-regime/foundation-base-cost-formula.yml) is still
   the regime. What changed is the container, not the calculation.
@@ -24,8 +24,8 @@ findings: |
   H.B. 66's own education greenbook **prints no line-item table** — the single gap the `lsc-budget`
   connector records in an otherwise continuous FY1999-FY2027 series. FY2006 and FY2007 are
   therefore carried as **actuals from H.B. 119's greenbook**, published two years later, rather
-  than as enacted figures like every other year on these five nodes. [verified — the connector's
-  own `still_blocked` note]
+  than as enacted figures like every other year on these five nodes. [verified] (the connector's
+  own `still_blocked` note)
 
       FY2006   enacted $9.214bn   foundation $6.185bn   67.1%   real $10.180bn   (actual basis)
       FY2007   enacted $9.504bn   foundation $6.315bn   66.4%   real $10.122bn   (actual basis)
@@ -52,7 +52,7 @@ properties:
   kind: biennium
   start: 2005-07-01
   end: 2007-06-30
-  appropriating_bill: Am. Sub. H.B. 66 (126th General Assembly). [verified — the corpus holds this act]
+  appropriating_bill: Am. Sub. H.B. 66 (126th General Assembly). [verified] (the corpus holds this act)
   context: |
     Foundation base cost formula era. **Actual rather than enacted**, from H.B. 119's greenbook:
     H.B. 66's own greenbook has no line-item table, which is the one gap in the FY1999-FY2027

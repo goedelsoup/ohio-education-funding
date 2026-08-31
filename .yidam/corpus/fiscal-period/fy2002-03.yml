@@ -14,7 +14,7 @@ description: |
   which governs every biennium here through FY2009. Foundation aid was carried by two line items,
   `200501 Base Cost Funding` and `200612`, and the pair is what a series of this era has to sum:
   the single `200550 Foundation Funding` line most later readers know did not exist yet.
-  [verified — the Catalog of Budget Line Items]
+  [verified] (the Catalog of Budget Line Items)
 
   *DeRolph IV* was decided in December 2002, inside this biennium, and ended the litigation
   without a compliance finding. Nothing in the appropriation responds to it: the second year was
@@ -28,20 +28,20 @@ findings: |
   In constant FY2026 dollars that foundation figure is **$9.054bn and $9.157bn**. It is the
   benchmark the rest of the decade is measured against on this node's siblings, and the reason it
   matters is on [FY2010-11](fy2010-11.yml): nine years later, after $1.15 billion of nominal
-  growth, the real figure is **below** this one. [verified — `appropriation-lines.csv`,
-  `bundle::deflator`]
+  growth, the real figure is **below** this one. [verified] (`appropriation-lines.csv`,
+  `bundle::deflator`)
 
   ### Poverty, on the basis that was in force
 
   **31.2% of enrolled pupils were approved for free or reduced-price meals in FY2002, 33.1% in
-  FY2003**, over 757 and 768 sponsors. [verified — `mr81-sponsor-panel.csv`] That share rises in
+  FY2003**, over 757 and 768 sponsors. [verified] (`mr81-sponsor-panel.csv`) That share rises in
   every biennium of this decade and does not stop rising; see the sibling nodes.
 properties:
   label: FY2002-2003
   kind: biennium
   start: 2001-07-01
   end: 2003-06-30
-  appropriating_bill: Am. Sub. H.B. 94 (124th General Assembly). [verified — the corpus holds this act]
+  appropriating_bill: Am. Sub. H.B. 94 (124th General Assembly). [verified] (the corpus holds this act)
   context: |
     Foundation base cost formula era, in the biennium after *DeRolph II*. Foundation aid is the
     sum of `200501` and `200612`; `200550` did not exist until H.B. 66. Appropriation figures are

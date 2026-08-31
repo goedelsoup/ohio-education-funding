@@ -99,11 +99,11 @@ findings: |
 
   The two agree where both exist, to **0.46% at worst**, which is the retrospective check on
   the subtraction and the reason to trust the eleven phases of work built on it. The 138 are no
-  longer censored. [verified — `crates/project/tests/finances_and_the_guarantee.rs`]
+  longer censored. [verified] (`crates/project/tests/finances_and_the_guarantee.rs`)
 
   ### The calculator reproduces the department's figure exactly
 
-  [verified — `crates/local-capacity/tests/against_the_departments_own_capacity.rs`]
+  [verified] (`crates/local-capacity/tests/against_the_departments_own_capacity.rs`)
   `crates/local-capacity` was written from the statute and had never been run against anything.
   It is right.
 
@@ -141,8 +141,8 @@ findings: |
 
   The rule therefore never charges a district on the higher of its two measures. That makes it
   a floor on the state's share wearing the clothes of a smoothing device, and the asymmetry is
-  invisible in any one district's figures. [verified —
-  `crates/local-capacity/tests/against_the_departments_own_capacity.rs`]
+  invisible in any one district's figures. [verified]
+  (`crates/local-capacity/tests/against_the_departments_own_capacity.rs`)
 
   **And it is the charge-off's instinct in a new device.** The mechanism this replaced also
   lagged revaluation, through [recognized

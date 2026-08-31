@@ -166,12 +166,12 @@ properties:
     district's weighted wealth for that fiscal year X 0.008)", and the size brackets are statutory
     as well — "greater than or equal to 200 but less than or equal to 400" and the rest. The
     two-tier structure the corpus recovered from the sheet is the structure the section describes.
-    [verified — `ohio-laws`]
+    [verified] (`ohio-laws`)
   calculator: |
     Not a standalone crate. Verified against the department's published per-district amounts in
     `crates/project/tests/the_remaining_categoricals.rs`, which reproduces both tiers and the
     eligibility test for all 609 districts; the decomposition is carried in
-    `crates/project::panel::TargetedAssistance`. [verified — `crates/project`]
+    `crates/project::panel::TargetedAssistance`. [verified] (`crates/project`)
 figures:
   - key: project/targeted-assistance-median-weighted-wealth
     value: 392151306.63

@@ -49,7 +49,7 @@ findings: |
   **THE ANSWER, on the department's own published worked example district** (20,342.13 base
   cost enrolled ADM, 43 buildings), perturbing the classroom teacher salary from the FY2022
   reference of $68,022.22 to an FY2024 refresh of $73,777.08 — an 8.46% rise:
-  [verified — crates/foundation]
+  [verified] (crates/foundation)
 
       base cost per pupil    $7,629.24  ->  $7,960.38     +$331.14   (+4.34%)
       aggregate base cost  $155,194,925 -> $161,931,078  +$6,736,153
@@ -61,7 +61,7 @@ findings: |
 
   Scaled to Ohio's FY2022 base cost enrolled ADM of 1,499,918.26, a comparable refresh raises
   **computed base cost statewide by roughly $497 million a year, from the teacher salary term
-  alone.** [inference — assumes this district's cost structure is representative] The state's
+  alone.** [inference] (assumes this district's cost structure is representative) The state's
   appropriation consequence is a different and smaller number; see the incidence result below.
 
   ### The incidence result is sharper than predicted
@@ -94,7 +94,7 @@ findings: |
       ADM-weighted average                    $323.97 per pupil
       per-pupil range                         $318.26  to  $442.77
 
-  [verified — crates/foundation]
+  [verified] (crates/foundation)
 
   The single-district extrapolation above gave $497 million; the real distribution gives $466.2
   million. The gap is mostly denominators — the worked example's grade mix is slightly richer
@@ -115,7 +115,7 @@ findings: |
   The most-affected district gains 1.4 times per pupil what the least-affected does — $442.77
   against $318.26 — with no policy choice involved. **155 of 604 districts** are small enough
   that the six-teacher special teacher minimum binds, and their mean per-pupil gain is $346.28
-  against $322.87 for everyone else. [verified — crates/foundation]
+  against $322.87 for everyone else. [verified] (crates/foundation)
 
   ### The spread, revised
 
@@ -150,7 +150,7 @@ findings: |
   at all** from a reference-year refresh, and 356 districts do gain. 41 guaranteed districts
   would be lifted off; the median guaranteed district is held more than three times above what a
   refresh would give it, so the guarantee is not a marginal buffer but the operative funding
-  mechanism for those districts. [verified — crates/scenario-delta]
+  mechanism for those districts. [verified] (crates/scenario-delta)
 
   The three counts were published as 242 unmoved and 52 lifted off. Both sum to the same 294 on
   the guarantee, which is why the decomposition read as coherent while neither term matched the
@@ -376,7 +376,7 @@ properties:
     Single perturbation: the cost input reference year in the FSFP base cost calculation
     [R.C. 3317.011].
       Baseline  = FY2022 statewide average salaries and per-pupil operating amounts, as carried
-                  forward by H.B. 96. [inference — confirm against the enacted act]
+                  forward by H.B. 96. [inference] (confirm against the enacted act)
       Perturbed = the most recent fiscal year for which statewide average salary and operating
                   expenditure data are available.
     Affects only the price terms: average salary by staff category, average employer-paid

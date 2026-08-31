@@ -14,7 +14,7 @@ description: |
   **The provision worth having on the record is the one about enrollment counts.** The model
   subtracts the award "from the state school aid payable to the student's resident school
   district" — and then provides that the participating student "shall be counted in the enrollment
-  figures for his or her resident school district". [verified — ALEC model text]
+  figures for his or her resident school district". [verified] (ALEC model text)
 
   Those two clauses together describe a district that keeps the student in its count while losing
   the money attached to them. That is close to the mechanism Ohio districts identify as the core
@@ -29,7 +29,7 @@ description: |
   corpus node, because [`legislation`](../legislation.ont.yml) means enacted. Its sponsors
   described it as modeled on programs in Arizona, Florida, Nevada, Tennessee, Mississippi, North
   Carolina and West Virginia. No source retrieved here names ALEC or this text in connection with
-  it. [verified — as an absence in the sources retrieved]
+  it. [verified] (as an absence in the sources retrieved)
 
   The allowable-expense list is the part a funding model would have to absorb — twelve categories
   ending in "any other valid educational expenses approved by the Department", which is an
@@ -46,12 +46,12 @@ properties:
     The model's own commentary offers narrower alternatives — students with disabilities,
     income-qualified families, military dependents, foster youth, siblings of prior recipients —
     so universality is the default rather than the only drafting on offer.
-    [verified — ALEC model text]
+    [verified] (ALEC model text)
   award_basis: |
     "The dollar amount the resident school district would have received to serve and educate the
     eligible student from state and local sources." The model provides 100% of that amount; its
     commentary notes Nevada's enacted variant paying 100% for special-needs and
-    free-and-reduced-lunch students and 90% for everyone else. [verified — ALEC model text]
+    free-and-reduced-lunch students and 90% for everyone else. [verified] (ALEC model text)
 
     Note what the denominator includes: **state and local**. Ohio's charge-off arithmetic treats
     the local share as a district obligation measured against its own valuation, not as an amount
@@ -61,7 +61,7 @@ properties:
     **A deduction that leaves the student in the count.** The award is "subtracted from the state
     school aid payable to the student's resident school district", while the participating student
     "shall be counted in the enrollment figures for his or her resident school district".
-    [verified — ALEC model text]
+    [verified] (ALEC model text)
 
     Whether the second clause is intended to protect the district's other enrollment-driven
     funding or to keep the state's own aggregate stable is not stated in the text.
@@ -72,7 +72,7 @@ properties:
     gender, family income and race, public reporting from year three, and a required annual
     parental satisfaction survey. Administration sits with "the Department of Public Instruction or
     an organization chosen by the state", which may contract private financial firms to run the
-    accounts. [verified — ALEC model text]
+    accounts. [verified] (ALEC model text)
 
     Lighter on the provider than the voucher model, because an ESA's regulated party is the
     account rather than the school.

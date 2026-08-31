@@ -14,8 +14,8 @@ description: |
   million of it — 12.1% — is the temporary transitional aid guarantee**, paid to **294
   districts** holding just over half the state's students, holding them at what they received
   in **FY2020**: a [Bridge formula](../funding-regime/bridge-formula.yml) year Ohio froze
-  rather than computed. [verified — `crates/project`, which reproduces the department's model to
-  the cent]
+  rather than computed. [verified] (`crates/project`, which reproduces the department's model to
+  the cent)
 
   This scenario generalises [fsfp-input-year-refresh](fsfp-input-year-refresh.yml) from the
   single district that node refreshes to the whole state.
@@ -76,8 +76,8 @@ findings: |
   district's enrollment forward to **FY2032** by a damped trend from its own FY2024-FY2026
   history — statewide ADM falls 4.9% — state aid under current law is **$7,125M, in a band of
   $6,889M to $7,379M** (±3.4%). With the guarantee removed the same enrollment forecast gives
-  **$6,060M, in a band of $5,711M to $6,430M** (±5.9%). [inference — a forecast, with the
-  caveats below]
+  **$6,060M, in a band of $5,711M to $6,430M** (±5.9%). [inference] (a forecast, with the
+  caveats below)
 
   **Removing the guarantee nearly doubles the state's exposure to enrollment forecast error.**
   That is an argument for the guarantee that has nothing to do with equity or adequacy: it is a

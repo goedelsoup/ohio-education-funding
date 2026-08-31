@@ -11,7 +11,7 @@ description: |
   **Capacity aid** is the substantive addition, and it measures something the state share index
   does not: what one mill actually raises per pupil in a district, rather than where the district
   sits in the statewide valuation-and-income ranking. Two districts can share an index position
-  and differ in what a levy is worth to them. [verified — the greenbook]
+  and differ in what a levy is worth to them. [verified] (the greenbook)
 
   **Performance bonuses** pay on measured outcomes — a graduation bonus and a third-grade reading
   bonus — which is unusual in Ohio's formula and is the ancestor of the Fair School Funding Plan's
@@ -40,7 +40,7 @@ findings: |
   ### The appropriation
 
   Enacted foundation aid is **$7.39 billion in FY2016 and $7.70 billion in FY2017**, a 5.5% and
-  4.2% rise. [verified — `appropriation-lines.csv`, lines 200550 and 200612] The decade's growth is
+  4.2% rise. [verified] (`appropriation-lines.csv`, lines 200550 and 200612) The decade's growth is
   steady and unremarkable in every year except its last three, which is the finding on
   [H.B. 166](hb-166-2019.yml).
 
@@ -63,7 +63,7 @@ properties:
     supplement. Re-anchored temporary transitional aid from FY2013 to FY2015 and moved
     career-technical funds outside the guarantee for FY2017.
   vetoes: |
-    Five, and two of them are the largest funding vetoes in the decade. [verified — the greenbook]
+    Five, and two of them are the largest funding vetoes in the decade. [verified] (the greenbook)
 
     **The secondary per-pupil guarantee.** The General Assembly wrote a second floor into the
     formula: after the temporary transitional aid guarantee and the gain cap were applied, every

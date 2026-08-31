@@ -50,11 +50,11 @@ findings: |
   student-need profile." Toledo's disability share is 21.9% against Perrysburg's 11.3% — nearly
   double, not modest. Normalised by the population actually served, Toledo spends roughly
   **$12,600 per student with a disability** against Perrysburg's **$18,000–$20,900**: about a
-  third less, not somewhat more. [inference — the special-education dollars are the
+  third less, not somewhat more. [inference] (the special-education dollars are the
   fact-check's, from audited statements this corpus does not hold; the shares are the report
   card's, so this is an order-of-magnitude normalisation rather than an audited per-pupil cost.
   A 1.94x population difference against a 1.36x spending difference leaves no room for the sign
-  to return.]
+  to return.)
 
   This is the corpus's denominator rule arriving a third time and from a new direction. The
   first two were about dividing spending by a need-weighted pupil count; this one is about
@@ -259,7 +259,7 @@ properties:
     made it the subject of a published fact-check, and the pair it forms with
     [Perrysburg](perrysburg-exempted-village.yml) is a sharper contrast than any this corpus
     previously held. [verified]
-  irn: 044909 [verified — report card district files]
+  irn: 044909 [verified] (report card district files)
   agency_type: city
   county: Lucas
   fy2025_profile: |

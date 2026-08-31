@@ -10,8 +10,8 @@ description: |
   The local gap passes $8,000 per pupil while the state's share of closing it barely moves: 42.5%
   in FY2012 against 44.3% in FY2019, inside the 41-46% band it has held since.
 findings: |
-  **What is measured**, over comparable districts, on federal definitions: [verified —
-  `dispersion::ohio_panel`, pinned by test]
+  **What is measured**, over comparable districts, on federal definitions: [verified]
+  (`dispersion::ohio_panel`, pinned by test)
 
       FY2018   local 54.05%   state 39.62%   federal 6.33%   gap $7,558   residual $3,661
       FY2019   local 54.46%   state 38.89%   federal 6.65%   gap $8,444   residual $4,305
@@ -21,7 +21,7 @@ findings: |
   categories doing it, so a series from Ohio's own reporting would measure the reporting.
   [inference]
 
-  **The appropriating act set the department's own budget at $11.37 billion in FY2018 and $11.48 billion in FY2019.** That is what was appropriated to the Department of Education across every line in its chapter, less the property tax reimbursement items that are numbered as the department's and are carried in the State Revenue Distributions section instead. [verified — the appropriation series, `lsc-appropriation-spreadsheet`] It is a ceiling rather than a payment; what districts received is `dew-foundation`.
+  **The appropriating act set the department's own budget at $11.37 billion in FY2018 and $11.48 billion in FY2019.** That is what was appropriated to the Department of Education across every line in its chapter, less the property tax reimbursement items that are numbered as the department's and are carried in the State Revenue Distributions section instead. [verified] (the appropriation series, `lsc-appropriation-spreadsheet`) It is a ceiling rather than a payment; what districts received is `dew-foundation`.
 revisions:
   - was: |
       "The state's share of closing it is unchanged from FY2012."

@@ -26,7 +26,7 @@ findings: |
   and a district at 2.99% receives nothing.
 
   The nearest miss cost **$430,477**, and 3 other districts sit between 2.7% and 3% growth.
-  [verified — crates/project]
+  [verified] (crates/project)
 
   A taper would have made the same total payment a continuous function of growth; a cliff makes
   it a step, and the step is where the money is largest relative to the difference in
@@ -64,7 +64,7 @@ properties:
       $250    enrolment growth supplement, per pupil, whole enrolment   line [M]
       3%      three-year enrolment growth threshold for [M]
 
-    Scale, from the committed panel. [verified — crates/project]
+    Scale, from the committed panel. [verified] (crates/project)
       base funding supplement, statewide      $56,079,575.54
       per district                                $92,084.69
       growth supplement, statewide            $39,379,553.15
@@ -77,7 +77,7 @@ properties:
   statutory_basis: |
     None. Not in R.C. 3317.022 and not in any other section this corpus cites; the two rates and
     the threshold are transcribed from the calculator, where they appear as lines [L] and [M].
-    The authority is H.B. 96's temporary law. [verified — the statute audit]
+    The authority is H.B. 96's temporary law. [verified] (the statute audit)
   simulation_key: |
     `project::panel::supplements::BASE_FUNDING_SUPPLEMENT_PER_PUPIL`,
     `ENROLLMENT_GROWTH_SUPPLEMENT_PER_PUPIL` and `ENROLLMENT_GROWTH_THRESHOLD`.

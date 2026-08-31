@@ -26,7 +26,7 @@ description: |
   The federal Common Core of Data files all three as *"closed with no effect on another agency's
   boundaries"*, which is the negation of what happened, and files nothing at all on the receiving
   agency. So an entity of this Kind can cease, its territory can move, and the national register
-  of these entities can record neither. [verified — `dispersion::lea_directory`]
+  of these entities can record neither. [verified] (`dispersion::lea_directory`)
 
   What the Revised Code makes rigid the reporting does not. That gap is the reason `established`
   and any future `ceased` property must come from Ohio's own record rather than from the

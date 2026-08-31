@@ -91,8 +91,8 @@ findings: |
 
   Everything above is a correlation, which says whether targeting exists and not how much of the
   disparity it removes. Quartiling the 611 comparable Ohio districts by local revenue per pupil in
-  FY2022 and reading the other two levels against it: [verified —
-  `dispersion::national_peers::ohio_by_local_wealth`, pinned by test]
+  FY2022 and reading the other two levels against it: [verified]
+  (`dispersion::national_peers::ohio_by_local_wealth`, pinned by test)
 
       quartile   local/pupil   state/pupil   federal/pupil
       Q1 poorest      $4,342        $8,970          $2,738
@@ -131,7 +131,7 @@ findings: |
 
   ### The rate holds and the gap grows
 
-  [verified — `dispersion::ohio_panel::equalization_by_year`, pinned by test]
+  [verified] (`dispersion::ohio_panel::equalization_by_year`, pinned by test)
 
       FY      local gap    state closes    federal    residual
       2012       $5,727           42.4%      10.2%      $2,713

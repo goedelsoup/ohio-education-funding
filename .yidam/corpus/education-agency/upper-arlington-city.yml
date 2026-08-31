@@ -46,7 +46,7 @@ properties:
     The contrast case against [Northern Local](northern-local-perry.yml), to make the
     distributional question concrete. Seeded as an exemplar, not as an accusation: nothing in this
     node asserts that the district did anything other than pass levies its residents supported.
-  irn: 044933 [verified — FY2021 IDEA Part B allocation list]
+  irn: 044933 [verified] (FY2021 IDEA Part B allocation list)
   agency_type: city
   county: Franklin
   fy2021_idea_part_b: |
@@ -60,13 +60,13 @@ properties:
     the floor, so reduction factors are fully operative.
     Total operating expenditure per pupil $18,416.05.
     State revenue per pupil $2,423.54 (12.11% of total); local $15,311.58 (76.49%);
-    total revenue per pupil $20,018.15. [verified — FY2024 District Profile Report]
+    total revenue per pupil $20,018.15. [verified] (FY2024 District Profile Report)
   typology: |
     Suburban, very low poverty, high median income. Exact department typology code not yet
     entered.
   roles: |
     Property-rich throughout the period covered [inference]. Above the 20-mill floor
-    [inference — requires confirmation from tax-abstract]. Low state share [inference].
+    [inference] (requires confirmation from tax-abstract). Low state share [inference].
   series_path: |
     Per-agency series are held by IRN across four committed fixtures, not one path: [verified]
       crates/foundation/fixtures/fy27-department-model.csv    FY2027 formula run, 609 districts

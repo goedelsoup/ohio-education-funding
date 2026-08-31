@@ -63,7 +63,7 @@ properties:
     valuation this regime used to compute a district's local share of the adequacy amount. Every
     later act re-anchored on the year before its own biennium, and the Fair School Funding Plan's
     guarantee has held at FY2020 since. See
-    [`bridge-formula`](bridge-formula.yml) for the full chain. [verified — the greenbook]
+    [`bridge-formula`](bridge-formula.yml) for the full chain. [verified] (the greenbook)
 links:
   - target: ../funding-regime.ont.yml
     relationship: instance-of

@@ -8,17 +8,17 @@ description: |
   A scholarship for children with disabilities, letting a parent buy special education services
   from an alternative public provider or a registered private provider instead of taking them
   from the resident district. Established by the General Assembly for the 2012-2013 school year
-  and named for a former state representative who worked on special education. [verified —
-  R.C. 3310.52; 2025 Scholarship Annual Report]
+  and named for a former state representative who worked on special education. [verified]
+  (R.C. 3310.52; 2025 Scholarship Annual Report)
 
   **It is capped, and it is the only scholarship programme here that is.** Participation may not
   exceed five per cent of the students statewide identified as children with disabilities in the
-  previous fiscal year. [verified — R.C. 3310.52(B)] Nothing comparable bounds EdChoice, the
+  previous fiscal year. [verified] (R.C. 3310.52(B)) Nothing comparable bounds EdChoice, the
   expansion, Cleveland or Autism, which makes this the one programme whose size is a policy
   decision rather than a demand outcome.
 
   **It reaches almost every district in the state.** Students enrolled in 2024-2025 came from
-  494 school districts — over 80% of Ohio's. [verified — 2025 Scholarship Annual Report] That is
+  494 school districts — over 80% of Ohio's. [verified] (2025 Scholarship Annual Report) That is
   the widest footprint of any programme in this channel, and it is why a per-district figure
   matters more here than anywhere else: a programme touching four fifths of districts at 8,680
   students is thin almost everywhere, and a district-level effect is invisible in the statewide
@@ -44,7 +44,7 @@ properties:
     pilot project scholarship unit; the autism scholarship unit; and **the Jon Peterson special
     needs scholarship unit**. The scholarship is paid to the unit, and R.C. 3310.52(C) has the
     department pay the eligible applicant — or the provider, if the applicant so authorises.
-    [verified — R.C. 3317.022, R.C. 3310.52]
+    [verified] (R.C. 3317.022, R.C. 3310.52)
 
     This is the positive form of a finding the corpus previously held only negatively. The
     absence of a deduction line in the FY2027 calculator established that a resident district's
@@ -58,20 +58,20 @@ properties:
   eligibility: |
     A child in kindergarten through grade 12 identified as having a specific disability, with an
     Evaluation Team Report and an individualized education program specifying the services
-    required. [verified — 2025 Scholarship Annual Report] The provider must be an alternative
+    required. [verified] (2025 Scholarship Annual Report) The provider must be an alternative
     public provider or a registered private provider as R.C. 3310.51 defines those terms.
     [verified]
 
     Subject to the five per cent statewide cap in R.C. 3310.52(B). Whether the cap has ever bound
     — whether applications have been refused for reaching it — is not established. [open]
   amount: |
-    **FY2025: 8,680 students, $103,944,388.15, across 530 approved providers.** [verified — 2025
+    **FY2025: 8,680 students, $103,944,388.15, across 530 approved providers.** [verified] (2025
     Scholarship Annual Report; the dollar figure is the sum of the report's six disability-category
-    totals, which the report displays without totalling]
+    totals, which the report displays without totalling)
 
     The statutory bound is the least of: the fees charged by the student's provider; or $7,190
     plus a supplement determined by disability category — $2,855 for a disability specified in
-    R.C. 3317.013(A), and other amounts for other categories. [verified — R.C. 3317.022(A)(13)]
+    R.C. 3317.013(A), and other amounts for other categories. [verified] (R.C. 3317.022(A)(13))
 
     The award is therefore category-scaled in the same way the special education weights are, and
     the six category totals in the annual report are the only published decomposition of this
@@ -82,10 +82,10 @@ properties:
     state foundation aid payments for all public school students *and* scholarship payments for
     students in state scholarship programmes: GRF ALI 200550 Foundation Funding, GRF ALI 200502
     Pupil Transportation, Fund 5VS0 ALI 200604, Fund 5YO0 ALI 200491, and Lottery Fund 7017
-    ALI 200612. [verified — LSC redbook and greenbook, `crates/project/fixtures/dew-redbook.txt` and
+    ALI 200612. [verified] (LSC redbook and greenbook, `crates/project/fixtures/dew-redbook.txt` and
     `dew-greenbook.txt`. Checked against the act as enacted, not only as introduced: the five
     lines and the sentence naming them are identical in both. The *amounts* in that table are
-    not — foundation aid was enacted $82m above the proposal — so nothing here quotes one.]
+    not — foundation aid was enacted $82m above the proposal — so nothing here quotes one.)
 
     The Catalog of Budget Line Items would give each of these a per-line history with actuals and
     a Legal Basis naming the establishing act, and is now retrievable — see

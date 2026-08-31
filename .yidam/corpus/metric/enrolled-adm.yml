@@ -103,8 +103,8 @@ links:
     target: ../education-agency/upper-arlington-city.yml
 
 findings: |
-  **THE GUARANTEE MAKES A DISTRICT'S AID COMPLETELY INSENSITIVE TO ITS ENROLLMENT.** [verified —
-  `crates/project`]
+  **THE GUARANTEE MAKES A DISTRICT'S AID COMPLETELY INSENSITIVE TO ITS ENROLLMENT.** [verified]
+  (`crates/project`)
   The [temporary transitional aid guarantee](../formula-component/temporary-transitional-aid-guarantee.yml)
   pays a fixed dollar amount that enrollment does not enter. For the 294 districts it funds — very
   nearly half the state — running the FY2027 formula at FY2024, FY2025 or FY2026 enrolment
@@ -113,7 +113,7 @@ findings: |
   as enrollment does; the widening gap between the two is the guarantee.
 
   **REMOVING THE GUARANTEE NEARLY DOUBLES THE STATE'S EXPOSURE TO ENROLLMENT FORECAST ERROR.**
-  [inference — a forecast] At FY2032 enrollment, total state aid under current law is $7,125M in
+  [inference] (a forecast) At FY2032 enrollment, total state aid under current law is $7,125M in
   a band of $6,889M to $7,379M (±3.4%). With the guarantee removed the same forecast error
   produces ±5.9%. The guarantee is a shock absorber for the *appropriation* as well as for the
   district, and that is not usually how it is argued about. Recorded in full at

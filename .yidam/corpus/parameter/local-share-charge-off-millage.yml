@@ -106,8 +106,8 @@ findings: |2
 
   The separation is not marginal: the median county's real property rose **28.6%** in its event
   year against **1.5%** in its quiet ones, and all 88 counties' largest jump falls in the year
-  the calendar says. [verified — `crates/regime-diff/src/recognized_valuation.rs` and
-  `tests/recognized_valuation_against_the_abstract.rs`]
+  the calendar says. [verified] (`crates/regime-diff/src/recognized_valuation.rs` and
+  `tests/recognized_valuation_against_the_abstract.rs`)
 
   At TY2024 recognized valuation is **8.20% below total taxable value statewide — $34.5bn, or
   $793m of charge-off at 23 mills**. It falls entirely by calendar: 12.97% of value for the 184
@@ -118,7 +118,7 @@ findings: |2
   constant.** LSC put the long-run effect nearer $125m a year, about 2% of valuation; TY2024 is
   four times that because Ohio's 2023–24 revaluations were four times the size LSC's own worked
   example assumes. What is not cyclical is the direction — total taxable value always
-  overstates the charge-off. [verified, and the long-run figure is LSC's]
+  overstates the charge-off. [verified] (and the long-run figure is LSC's)
 
   **One component is still not modelled.** LSC records an **exempt property adjustment** to
   recognized valuation for about 13 districts holding large state-owned exempt property —
@@ -127,10 +127,10 @@ findings: |2
 
   **What the rate was doing to the system.** At 23 mills against a statewide operating rate of
   32.9 mills in TY2006, the base cost formula equalized about **69.9%** of local operating
-  revenue; a higher rate equalizes more and a lower rate less. [verified — LSC] And the phantom
+  revenue; a higher rate equalizes more and a lower rate less. [verified] (LSC) And the phantom
   revenue the mechanism generated was large enough to need its own program: the **charge-off
   supplement**, known as gap aid, reimbursed the difference and cost about **$73.5 million
-  across 145 districts in FY2008**. [verified — LSC] A mechanism requiring a supplement for a
+  across 145 districts in FY2008**. [verified] (LSC) A mechanism requiring a supplement for a
   quarter of the state is the argument for replacing it.
 
   ### The phantom revenue, counted — and it is not a minority case
@@ -153,15 +153,15 @@ findings: |2
   still gains: the bottom four lose by $118 to $365 per pupil, and the poorer the quintile the
   less it loses. The *shape* survives — the plan is genuinely more generous to property-rich
   districts than the charge-off was — but "every quintile gains" was an artifact of charging
-  every district about 8% too much on the counterfactual side. [verified —
-  `crates/regime-diff/tests/the_charge_off_against_local_capacity.rs`]
+  every district about 8% too much on the counterfactual side. [verified]
+  (`crates/regime-diff/tests/the_charge_off_against_local_capacity.rs`)
 
   A correction of this size from a definition is the argument for the node carrying the base
   beside the rate, which it did, and for it being right about what the base *is*, which it was
   not.
 
   **Joint vocational school districts were charged off at 0.5 mills**, not the district rate.
-  [verified — LSC] This is the one place the "uniform statewide" description is false, and a
+  [verified] (LSC) This is the one place the "uniform statewide" description is false, and a
   comparison run over JVSDs at the district rate is wrong by a factor of forty-six.
 revisions:
   - was: |
@@ -234,7 +234,7 @@ properties:
     Measured at FY2027 base cost on recognized valuation: **65 of 606 districts** would have a
     23-mill charge-off exceeding their entire computed base cost, and so would receive no base
     cost aid at all. The charge-off had no minimum state share — that is a Fair School Funding
-    Plan invention — so the mechanism simply truncated at zero. [verified — `crates/regime-diff`]
+    Plan invention — so the mechanism simply truncated at zero. [verified] (`crates/regime-diff`)
 
     The same count on total taxable value is 81, which is the measure of how much a wrong
     valuation base moves a distributional result: a fifth of this finding was the base.

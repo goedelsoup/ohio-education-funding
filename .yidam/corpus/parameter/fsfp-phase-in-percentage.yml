@@ -17,8 +17,8 @@ description: |
         + [(general components - general funding base) x general phase-in %]
         + [(DPIA - DPIA funding base)                  x DPIA phase-in %]
 
-  [verified — `crates/project/fixtures/revised-code.txt`, and the same box appears in the LSC
-  greenbook at `crates/project/fixtures/dew-greenbook.txt`] The percentage is the weight on the
+  [verified] (`crates/project/fixtures/revised-code.txt`, and the same box appears in the LSC
+  greenbook at `crates/project/fixtures/dew-greenbook.txt`) The percentage is the weight on the
   distance between two amounts, not a multiplier on one of them. At 0% a district receives its
   **whole FY2020 base**; at 100% it receives the computed amount; in between it is somewhere on
   the line joining them.
@@ -27,9 +27,9 @@ description: |
   [`guarantee-funding-base`](guarantee-funding-base.yml).
 
   The full enacted series is close to equal sixths, but not exactly:
-  16.67, 33.33, 50, 66.67, 83.33, 100 across FY2022 through FY2027. [verified — the LSC
+  16.67, 33.33, 50, 66.67, 83.33, 100 across FY2022 through FY2027. [verified] (the LSC
   greenbook prints the whole series as Table 1, and the H.B. 96 final analysis states the last
-  two]
+  two)
 
   Two details matter more than the headline series.
 
@@ -46,8 +46,8 @@ description: |
   held here. [open]
 
   **Reaching 100% does not mean reaching the plan.** H.B. 96 takes the phase-in to 100% in
-  FY2027 while holding the cost inputs at FY2022 levels. [verified — the LSC greenbook states
-  both] The percentage and the
+  FY2027 while holding the cost inputs at FY2022 levels. [verified] (the LSC greenbook states
+  both) The percentage and the
   input reference year are separate dials, and only one of them is usually named. See
   [`fsfp-base-cost-calculation`](../formula-component/fsfp-base-cost-calculation.yml).
 properties:
@@ -60,16 +60,16 @@ properties:
     percentage, the phase-in has no value rather than reverting to its last one, and the schedule
     that runs 16.67% to 100% across six years is six separate decisions rather than one.
   series: |
-    FY2022  16.67%  Am. Sub. H.B. 110 (134th GA)  [verified — department payment report]
+    FY2022  16.67%  Am. Sub. H.B. 110 (134th GA)  [verified] (department payment report)
                     Applied to base cost, targeted assistance, special education, English
                     learners, gifted, and career-technical. DPIA phased in at 0%. [verified]
-    FY2023  33.33%  Am. Sub. H.B. 110 (134th GA)  [verified — greenbook Table 1]
-    FY2024  50%     Am. Sub. H.B. 33  (135th GA)  [verified — greenbook Table 1]
-    FY2025  66.67%  Am. Sub. H.B. 33  (135th GA)  [verified — greenbook Table 1]
-    FY2026  83.33%  Am. Sub. H.B. 96  (136th GA)  [verified — greenbook Table 1; H.B. 96
-                    final analysis, "school financing system calculation revisions" item 1]
-    FY2027  100%    Am. Sub. H.B. 96  (136th GA)  [verified — the same two, and the
-                    department's FY27 model carries "General Phase in %" = 1]
+    FY2023  33.33%  Am. Sub. H.B. 110 (134th GA)  [verified] (greenbook Table 1)
+    FY2024  50%     Am. Sub. H.B. 33  (135th GA)  [verified] (greenbook Table 1)
+    FY2025  66.67%  Am. Sub. H.B. 33  (135th GA)  [verified] (greenbook Table 1)
+    FY2026  83.33%  Am. Sub. H.B. 96  (136th GA)  [verified] (greenbook Table 1; H.B. 96
+                    final analysis, "school financing system calculation revisions" item 1)
+    FY2027  100%    Am. Sub. H.B. 96  (136th GA)  [verified] (the same two, and the
+                    department's FY27 model carries "General Phase in %" = 1)
 
     FY2022 is verified against the FY2022 School Finance Payment Report line-by-line
     explanation, which states the applied percentages by line. The rest were carried as
@@ -98,7 +98,7 @@ properties:
     running the FY2027 panel from 100% down to 0% moves realized aid from $7.28bn to $6.40bn —
     an $886m range, which is the aggregate gap between computed and base for the districts above
     theirs. A multiplier reading of the same dial produced $4.21bn at 50% against the $6.84bn
-    the statute gives. [verified — `crates/project/src/policy.rs`]
+    the statute gives. [verified] (`crates/project/src/policy.rs`)
 
     Districts already held by the guarantee are insulated, and so are districts whose computed
     amount is below their base, because the interpolation keeps them there: the phase-in and the

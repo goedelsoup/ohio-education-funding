@@ -23,7 +23,7 @@ description: |
   The biennium also spans the end of federal COVID relief and the ODE-to-DEW transition in
   October 2023, so both the revenue series and the publisher change inside it. [verified]
 findings: |
-  **The appropriating act set the department's own budget at $15.76 billion in FY2024 and $14.40 billion in FY2025.** That is what was appropriated to the Department of Education across every line in its chapter, less the property tax reimbursement items that are numbered as the department's and are carried in the State Revenue Distributions section instead. [verified — the appropriation series, `lsc-appropriation-spreadsheet`] It is a ceiling rather than a payment; what districts received is `dew-foundation`.
+  **The appropriating act set the department's own budget at $15.76 billion in FY2024 and $14.40 billion in FY2025.** That is what was appropriated to the Department of Education across every line in its chapter, less the property tax reimbursement items that are numbered as the department's and are carried in the State Revenue Distributions section instead. [verified] (the appropriation series, `lsc-appropriation-spreadsheet`) It is a ceiling rather than a payment; what districts received is `dew-foundation`.
 properties:
   label: FY2024-25
   kind: biennium

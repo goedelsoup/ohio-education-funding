@@ -54,7 +54,7 @@ findings: |
       provision 2  guarantee half retired                 -$439.5M
                    interaction residual                    +$75.1M
 
-  [verified — `crates/project/tests/a_draft_cannot_hide_what_it_did_not_price.rs`]
+  [verified] (`crates/project/tests/a_draft_cannot_hide_what_it_did_not_price.rs`)
 
   ### The residual is half the answer
 
@@ -131,7 +131,7 @@ properties:
   status: |
     Never introduced and not proposed by anyone. Authored to exercise the case a
     single-provision draft cannot: several provisions that interact, and several the calculators
-    cannot reach. [verified — that it was authored here; the provisions are a construction]
+    cannot reach. [verified] (that it was authored here; the provisions are a construction)
   text_read: |
     No text exists to pin. The two priced provisions restate changes with established precedent —
     [H.B. 33](../legislation/hb-33-2023.yml) refreshed the reference year once, and the guarantee

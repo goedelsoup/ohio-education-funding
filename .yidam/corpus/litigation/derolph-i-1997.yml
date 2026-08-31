@@ -53,8 +53,8 @@ findings: |
 
   In FY2022 Ohio raised **51.8% of school revenue locally against a national 43.35% — seventh
   highest of fifty-one** — and took **34.4% from the state against a national 43.41%,
-  forty-fifth of fifty-one.** Only six states contribute a smaller share. [verified —
-  `crates/dispersion/src/census_states.rs`, computed for the feed in `crates/bundle`]
+  forty-fifth of fifty-one.** Only six states contribute a smaller share. [verified]
+  (`crates/dispersion/src/census_states.rs`, computed for the feed in `crates/bundle`)
 
   The two national figures were both written `43.4%` until the cross-check refused them. They
   are not the same number — 43.35% local against 43.41% state — and at one decimal place they
@@ -66,7 +66,7 @@ findings: |
   What makes this a finding about structure rather than about money is the two figures that are
   *not* unusual. Ohio's current spending per pupil is **$14,923 against a national $15,801** —
   twenty-fourth of fifty-one — and its federal share is within a point of the national figure.
-  [verified — `crates/dispersion/src/census_states.rs`] Ohio spends roughly what the country
+  [verified] (`crates/dispersion/src/census_states.rs`) Ohio spends roughly what the country
   spends on schools, which is unremarkable. The distinctive thing is who pays, which is the
   distinction the court drew in 1997 and the one the clarification a month later sharpened into
   "supplement but not primarily fund". [inference]

@@ -10,7 +10,7 @@ description: |
   commission](../intervention/academic-distress-commission.yml).
 
   **A Performance Index of 36.8, and three consecutive years below 40** — 36.8, 39.1, 38.9.
-  [verified — `report-card-2425-buildings.csv`] One star on the achievement component. The
+  [verified] (`report-card-2425-buildings.csv`) One star on the achievement component. The
   three-year span is not incidental: it is the span R.C. 3302.10 reads for a district and the
   span after which an ATSI building escalates to CSI.
 
@@ -28,7 +28,7 @@ description: |
 
   ### It is on none of the three identification lists
 
-  Not CSI, not TSI, not ATSI. [verified — `dispersion::identified`, pinned by test] A building
+  Not CSI, not TSI, not ATSI. [verified] (`dispersion::identified`, pinned by test) A building
   at a third of the Performance Index scale with two in three students chronically absent is
   outside the federal accountability system entirely — while
   [Sheridan](sheridan-high-school.yml), a four-star building, is inside it.
@@ -64,7 +64,7 @@ properties:
     building file.
   chronic_absenteeism: 66.7% in 2024-25. [verified]
   roles: |
-    **On none of the three lists.** [verified — `dispersion::identified`, pinned by test] See the
+    **On none of the three lists.** [verified] (`dispersion::identified`, pinned by test) See the
     description: absence is not evidence of not failing.
   series_path: crates/dispersion/fixtures/report-card-2425-buildings.csv, keyed by building IRN 000828. [verified]
 unfilled:

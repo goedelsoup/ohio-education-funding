@@ -6,7 +6,7 @@ summary: >-
   from FY2028 the section pays "an amount calculated in a manner determined by the general assembly".
 description: |
   Five multiples, one per approved programme category, and a sixth for associated services:
-  0.6230, 0.5905, 0.2154, 0.1830, 0.1570, and 0.0294. [verified — R.C. 3317.014(A) and (B)]
+  0.6230, 0.5905, 0.2154, 0.1830, 0.1570, and 0.0294. [verified] (R.C. 3317.014(A) and (B))
 
   **They descend by programme type, not by severity.** Special education's six ascend with the
   disability; these five sort programmes. The top two are workforce development grouped by
@@ -15,7 +15,7 @@ description: |
   0.6230; business and administration, hospitality and tourism, human services, law and public
   safety, transportation systems and arts and communications at 0.5905. The gap below them, to
   0.2154, is not a further grade of workforce programme: it is career-based intervention, a
-  different kind of thing. [verified — the section]
+  different kind of thing. [verified] (the section)
 
   Why the first field group is priced above the second, both being full workforce programmes,
   is not stated in the section. [open]
@@ -38,7 +38,7 @@ findings: |
   **$3 times the summed enrolled ADM of every district and school in that planning district**,
   for career awareness and exploration. It is a statutory per-pupil rate in the same section as
   the six multiples, and nothing in this repository models it: no component, no crate constant,
-  no column in the committed FY2027 calculator extract. [verified — the section; and searched]
+  no column in the committed FY2027 calculator extract. [verified] (the section; and searched)
 
   It is not clear whether the payment is absent from the department's model, absent from the
   extract this corpus took, or paid on a sheet the extract does not cover. Those are three
@@ -50,8 +50,8 @@ findings: |
   amount is "calculated in a manner determined by the general assembly". So the multiples
   above are the FY2026-27 schedule and the section states no successor — which makes any
   projection past FY2027 a projection under a rule the statute does not carry that far. The
-  scenario runner projects to FY2032 and FY2036. [verified — the section, and
-  `crates/bundle/src/build.rs`]
+  scenario runner projects to FY2032 and FY2036. [verified] (the section, and
+  `crates/bundle/src/build.rs`)
 properties:
   name: Career-technical category multiples
   unit: ratio
@@ -84,7 +84,7 @@ properties:
     (B)     0.0294  associated services, against the sum of categories one to five
 
     All five category multiples verified against the Revised Code to the last digit —
-    `crates/project/tests/the_statute_behind_the_weights.rs`. [verified — crates/project]
+    `crates/project/tests/the_statute_behind_the_weights.rs`. [verified] (crates/project)
 
     FY2026 and FY2027 only. The section states no value for FY2028 or later. [verified]
 
@@ -96,7 +96,7 @@ properties:
     R.C. 3317.014, read. Divisions (A)(1) to (A)(5) for the category multiples, (B) for
     associated services, (C) and (D) for how each is applied. The separate career-technical
     base cost per pupil is statutory too — the section names it rather than leaving it to the
-    department. [verified — `ohio-laws`]
+    department. [verified] (`ohio-laws`)
   simulation_key: |
     `project::panel::categoricals::CTE_WEIGHTS`, with `CTE_ASSOCIATED_WEIGHT` and
     `CTE_BASE_COST_PER_PUPIL` beside it.

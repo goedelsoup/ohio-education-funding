@@ -77,7 +77,7 @@ findings: |
       excluding the highest per-pupil        -0.0042      -0.3546
       excluding enrollment under 582         +0.0358      -0.3371
 
-  [verified — crates/dispersion]
+  [verified] (crates/dispersion)
 
   The headcount coefficient moves by **0.018** across every check and never stops saying the
   same thing. The published coefficient **changes sign** — the scenarios do not agree on the
@@ -245,8 +245,8 @@ properties:
     Both retrieved by the `dew-report-card` connector and committed at
     [`crates/dispersion/fixtures/report-card-2425-district-data.csv`](../../../crates/dispersion/fixtures/report-card-2425-district-data.csv).
   series: |
-    2024-2025, 607 rated traditional districts, as published [verified — computed from the
-    committed fixture, and reproducing OCG White Paper 013 exactly]:
+    2024-2025, 607 rated traditional districts, as published [verified] (computed from the
+    committed fixture, and reproducing OCG White Paper 013 exactly):
 
                           min      p25   median     mean      p75       max
       total            $8,913  $11,615  $12,856  $13,224  $14,254   $46,716

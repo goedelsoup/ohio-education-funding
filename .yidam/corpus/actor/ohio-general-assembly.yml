@@ -27,8 +27,8 @@ description: |
 
   The reason is structural rather than administrative: school districts and House districts do
   not nest. **339 of Ohio's 609 school districts have population in two or more of the 99 House
-  districts**, and Columbus City has population in 11. [verified — computed from Census
-  block geography] County can be an attribution, because the department assigns each district
+  districts**, and Columbus City has population in 11. [verified] (computed from Census
+  block geography) County can be an attribution, because the department assigns each district
   exactly one; a legislative district cannot be, because most districts genuinely lie in
   several.
 
@@ -50,7 +50,7 @@ findings: |
   seat's total as a rounded dollar figure, and summing 99 of them accumulates. On the committed
   feed the House seats total $7,281,227,593.71 and the Senate seats $7,281,227,592.75 against a
   statewide `realized_aid_total` of $7,281,227,591.65: **the two chambers disagree by $0.96, and
-  the House sits $2.06 above the statewide figure and the Senate $1.10.** [verified — `web/public/data/bundle.json`] Read
+  the House sits $2.06 above the statewide figure and the Senate $1.10.** [verified] (`web/public/data/bundle.json`) Read
   the conservation as a property of the method, not as a check a consumer can run to the cent.
   What the estimate supports is
   scale and comparison — how much of Ohio's school money runs through the schools a member

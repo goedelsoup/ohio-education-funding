@@ -29,7 +29,7 @@ description: |
   .014, .016, .017, .019, .02, .0212, .0215, .024, .051, .064 and .25 — and reopens **4**
   uncodified sections of H.B. 110: 265.150 Pupil Transportation, 265.210 Foundation Funding - All
   Students, 265.225 and 265.335. It also amends S.B. 1 of the 134th and H.B. 123 of the 133rd.
-  [verified — the enrolled act]
+  [verified] (the enrolled act)
 
   Its own appropriation is a single federal line: **$2,415,201 in FY2022 and nothing in FY2023**,
   for the tutoring programme it created, out of American Rescue Plan emergency funds. There is no
@@ -42,8 +42,8 @@ findings: |
   sections around it are reopened wholesale. **10** of the act's own sections cite it, and a
   heading is what none of them is. So the correction reworked the inputs to core foundation funding
   and left the assembly alone — which is a claim about what LSC's word "technical" covers, and it
-  covers more than the word suggests. [verified — `crates/project`'s reader for the enrolled act,
-  exercised by `tests/the_act_that_corrected_the_plan.rs`]
+  covers more than the word suggests. [verified] (`crates/project`'s reader for the enrolled act,
+  exercised by `tests/the_act_that_corrected_the_plan.rs`)
 
   ### The Fair School Funding Plan's first input-year freeze is here, in its first biennium
 
@@ -82,7 +82,7 @@ properties:
     and reopened **4** uncodified sections of H.B. 110, leaving R.C. 3317.022 untouched. Froze the
     two statewide transportation cost inputs at FY2020 data for the biennium, ended the proration
     of EdChoice expansion scholarships, and appropriated one federal line of $2.4m for a new
-    tutoring programme. [verified — the enrolled act]
+    tutoring programme. [verified] (the enrolled act)
   vetoes: |
     Not recorded here, and the enrolled act cannot record it: what the version index serves is the
     text as presented to the Governor, and a line-item veto is exercised after that. The act does

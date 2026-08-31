@@ -25,7 +25,7 @@ description: |
   ### It is a Comprehensive Support and Improvement school
 
   Sheridan is on the federal identification list: **ATSI 2022, escalated to CSI 2025**.
-  [verified — `dispersion::identified`, pinned by test]
+  [verified] (`dispersion::identified`, pinned by test)
 
   The building Ohio's constitutional litigation is named for is federally identified as one of
   the state's schools needing comprehensive support, thirty-four years after the case was filed
@@ -81,7 +81,7 @@ properties:
   chronic_absenteeism: 25.9% in 2024-25. [verified]
   roles: |
     DeRolph plaintiff's school, 1991. [verified] **ATSI 2022; CSI 2025**, the latter by escalation
-    after failing to exit ATSI within three years. [verified — `dispersion::identified`] Title I
+    after failing to exit ATSI within three years. [verified] (`dispersion::identified`) Title I
     served status is not published on these lists and is not held.
   series_path: crates/dispersion/fixtures/report-card-2425-buildings.csv, keyed by building IRN 034363. [verified]
 unfilled:
