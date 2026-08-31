@@ -1,0 +1,60 @@
+# What this repository is owed, and how long it may go unowed.
+#
+# Read by `yidam due`, which reports four clocks together and exits zero however
+# much is due — being owed is not being broken, and `yidam doctor` is the report
+# that answers whether anything is. A clock with no interval declared here
+# reports what it measured and never comes due, which is where this repository
+# sat until 2026-08-31: four clocks, all decorative.
+#
+# `escalate_after` is deliberately NOT set. It turns a standing finding into an
+# error after N corpus-touching commits, and 232 of this corpus's 326 findings
+# are one malformed-claim-tag shape awaiting a single editorial pass. Arming the
+# clock before that pass lands schedules a red gate with no commit behind it.
+# Set it once the claim tags are uniform, not before.
+
+[catalog]
+# Days, not commits, and that is the one place yidam's clocks disagree on units
+# deliberately: a statute does not become stale because you committed, and a
+# published enrollment file does not stay fresh because you did not.
+#
+# Two years rather than one. The 41 sources here are overwhelmingly statutes,
+# court records and annual state publications — things that change on their own
+# schedule and announce it. The ones that rot are a different problem than the
+# ones that age, and rot is what the wayback work already found: two sources
+# dead, one moved to a CMS, one recovered only by IRN. A TTL cannot detect that;
+# it can only make somebody look. Two years is the interval at which looking is
+# worth the interruption.
+#
+# No entry declares `retrieved:`, so yidam counts from the commit that last
+# touched the entry's file and says so in every report. That errs flattering — a
+# typo fix reads as a refresh — and is the right default until the catalog
+# carries artifact records.
+ttl_days = 730
+
+[due]
+# These two do NOT share a unit, and the reports say which is which — verified
+# against `yidam due` rather than assumed: questions are counted in COMMITS, and
+# phases in DAYS. The split follows the rule the prelude gives for the catalog:
+# a question going unanswered is a fact about corpus state, so the repository's
+# own clock is the honest one; a branch left open is a fact about elapsed time,
+# and a phase does not become abandoned because somebody committed elsewhere.
+#
+# `index_after` is omitted rather than set. There is no vector index, and the
+# released binary cannot build one — `index-build` needs the `index` feature,
+# which pulls fastembed and lancedb and wants protoc. An interval on a clock
+# measuring an artifact this repository has decided not to have would report a
+# debt nobody intends to pay.
+
+# 97 questions are open. That is not a backlog, it is what a corpus of open
+# inquiry looks like; the ones worth surfacing are the ones nothing has returned
+# to across a long stretch of work. 200 commits is roughly two months at this
+# repository's rate.
+questions_after = 200
+
+# Days. 22 refs are in flight and the oldest opened 2026-08-24, so at 50 days
+# none is due and none should be — they are recent. This clock is not the
+# instrument for the branches that are merged and simply never deleted, which is
+# git hygiene and answers to `git branch --merged`, not to elapsed time. What it
+# catches is the other failure: a phase that opened, went quiet, and was still
+# open two months later with nobody remembering it.
+phases_after = 50
