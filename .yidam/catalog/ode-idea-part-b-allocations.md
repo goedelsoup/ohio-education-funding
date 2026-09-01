@@ -3,12 +3,14 @@
 **Source.** Ohio Department of Education (now DEW), Special Education Data and Funding —
 annual IDEA Part B special education allocation tables, one per fiscal year.
 **Type.** Primary source — official allocation record.
-**Status.** *Catalogued, never retrieved, cited by nothing.* There is no connector for it
-and no corpus node rests on it. It is kept because the special education weights are a
-live question the corpus cannot currently answer — federal IDEA money is a separate channel
-from Ohio's six special education categories and is often conflated with them — and the
-entry records where the answer would come from. Retrieving it means a PDF-per-year reader,
-the same blocker as `lsc-budget`. Until then this is a pointer, not a source.
+**Status.** *Catalogued, never retrieved, cited by hand.* There is no connector for it, so
+nothing here rests on bytes this repository holds. Four corpus nodes draw on it anyway: two
+name the federal channel itself, and two are districts read off the FY2021 list by hand. It is
+kept because the special education weights are a live question the corpus cannot currently
+answer — federal IDEA money is a separate channel from Ohio's six special education categories
+and is often conflated with them — and the entry records where the answer would come from.
+Retrieving it means a PDF-per-year reader, the same blocker as `lsc-budget`. Until then this is
+a pointer, not a source, and the claims resting on it say so.
 **Location.** `education.ohio.gov`, Topics → Special Education → Special Education Data and
 Funding → Special Education Part B Allocations. The FY2021 file is
 `Fiscal-Year-2021-IDEA-Part-B-Special-Education-funds-allocation-to-districts.pdf`.

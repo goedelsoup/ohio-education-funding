@@ -85,3 +85,13 @@ links:
     relationship: peer-of
   - target: ../doctrine/equity.yml
     relationship: illustrates
+  - target: ../../catalog/cupp-district-profile-report.md
+    relationship: sourced-from
+    note: >-
+      The FY2024 District Profile Report, which this node's valuation, tax effort and
+      per-pupil figures are read from.
+  - target: ../../catalog/ode-idea-part-b-allocations.md
+    relationship: sourced-from
+    note: >-
+      The FY2021 IDEA Part B allocation list, where this district appears by name. A separate
+      federal channel from Ohio's special education weights, and cited here as such.

@@ -42,3 +42,8 @@ links:
     relationship: governed-by
   - target: ../legislation/hb-110-2021.yml
     relationship: funded-by
+  - target: ../../catalog/lsc-appropriation-spreadsheet.md
+    relationship: sourced-from
+    note: >-
+      The appropriation series the biennium's departmental totals are read from, named in the
+      claim that states them.
