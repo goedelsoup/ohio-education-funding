@@ -255,3 +255,8 @@ links:
     relationship: constrains
   - target: ../fiscal-period/fy2026.yml
     relationship: valued-in
+  - target: ../../catalog/ohio-revised-code.md
+    relationship: sourced-from
+    note: >-
+      The statute behind the floor: R.C. 5705.199 and 5748.09, and the fixed-sum exemption the
+      node quotes.

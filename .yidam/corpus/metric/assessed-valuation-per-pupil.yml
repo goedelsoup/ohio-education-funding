@@ -109,3 +109,13 @@ links:
     relationship: measures
   - target: ../fiscal-period/fy2026.yml
     relationship: computed-for
+  - target: ../../catalog/dot-sd1-school-district-taxes.md
+    relationship: sourced-from
+    note: >-
+      Taxation's count — total taxable value by tax year, one of the two tables this metric
+      shows disagreeing.
+  - target: ../../catalog/cupp-district-profile-report.md
+    relationship: sourced-from
+    note: >-
+      Education's count — valuation per pupil on enrolled ADM, the other side of the same
+      disagreement.

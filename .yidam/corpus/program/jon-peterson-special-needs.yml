@@ -106,3 +106,13 @@ links:
       The reciprocal of an edge that has always run the other way. Autism came first and Jon
       Peterson was built beside it rather than over it; a reader arriving at either should be
       able to reach the other.
+  - target: ../../catalog/dew-scholarship-annual-report.md
+    relationship: sourced-from
+    note: >-
+      The administrator's own account of the programme, and where this node's participation and
+      expenditure figures for 2024-2025 come from.
+  - target: ../../catalog/ohio-revised-code.md
+    relationship: sourced-from
+    note: >-
+      The authorising sections this node cites by number — eligibility, the award, and the
+      deduction that pays for it.
