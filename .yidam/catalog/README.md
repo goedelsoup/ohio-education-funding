@@ -48,6 +48,7 @@ Sorted by: type, then slug.
 | [`dot-reappraisal-calendar`](dot-reappraisal-calendar.md) | Ohio's sexennial reappraisal and triennial update calendar | 1 |
 | [`dot-sd1-school-district-taxes`](dot-sd1-school-district-taxes.md) | Table SD-1 — School district taxable value and taxes charged | 3 |
 | [`fordham-base-cost-critique`](fordham-base-cost-critique.md) | Fordham Institute — Ohio Base Cost Model Commentary | 2 |
+| [`fordham-house-bridge-commentary`](fordham-house-bridge-commentary.md) | Fordham Institute — "Ohio House puts the brakes on Cupp-Patterson" | 2 |
 | [`heritage-education-freedom-report-card`](heritage-education-freedom-report-card.md) | Heritage Foundation — Education Freedom Report Card (2023, 2nd edition) | 1 |
 | [`jhu-homeschool-hub`](jhu-homeschool-hub.md) | Johns Hopkins Homeschool Hub — state and district home-education counts | 0 |
 | [`lsc-appropriation-spreadsheet`](lsc-appropriation-spreadsheet.md) | LSC appropriation spreadsheet | 3 |
@@ -65,7 +66,7 @@ Sorted by: type, then slug.
 | [`ohio-revised-code`](ohio-revised-code.md) | Ohio Revised Code — the sections this corpus cites | 19 |
 | [`ohio-session-laws`](ohio-session-laws.md) | Ohio session laws — the appropriation acts themselves | 3 |
 
-42 entries, 1 not yet cited by any corpus node. 217 retrieved files are pinned by SHA-256 in [`crates/connect/source-digests.txt`](../../crates/connect/source-digests.txt).
+43 entries, 1 not yet cited by any corpus node. 217 retrieved files are pinned by SHA-256 in [`crates/connect/source-digests.txt`](../../crates/connect/source-digests.txt).
 <!-- /REGEN -->
 
 ## Adding a source

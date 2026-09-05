@@ -122,6 +122,38 @@ findings: |
   is only that `d1b` is not FY2025's count, which together with the header is the whole question.
   [verified]
 
+  ### The blend improves the targeting and cuts the pot, and the cut is the larger term
+
+  The direct-certification term was recommended before it was enacted. A Fordham Institute
+  commentary on the House-passed budget called the count "a mess" — community eligibility
+  inflating the disadvantaged rate until it no longer distinguishes a poor district from one that
+  feeds everybody — and named direct certification as the fix that would "significantly improve
+  the allocation of funds". Three months later the enacted act adopted it. [verified —
+  [`fordham-house-bridge-commentary`](../../catalog/fordham-house-bridge-commentary.md)]
+
+  **The targeting claim is right.** Holding the statewide dollar total fixed so that only the
+  distribution can move, the 65/35 blend sends the eight urban districts **+$16.07m** against the
+  pure disadvantaged count — **+11.3%, +$96 a pupil** — and 423 of 609 districts gain. The
+  districts that pay for it are the ones the diagnosis names: **Pickerington Local at −$3.08m** is
+  the largest single loser in the state, a Columbus suburb reporting 97.9% economically
+  disadvantaged against 25.5% directly certified, and Cleveland Municipal at **+$5.82m** is the
+  largest gainer. [verified — `crates/project/tests/what_direct_certification_moved.rs`]
+
+  **And it is a cut about twice the size of the improvement.** DPIA for traditional districts
+  falls $84.5m then $31.8m, $649.2m to $532.8m before phase-in. The eight hold 30.1% of enacted
+  DPIA, so their share of that $116.4m is roughly **−$35m** against **+$16m** of better targeting —
+  net about $19m worse off. [inference for the apportionment, which is pro-rata and the cut is
+  not; verified for the share and for the sign of the comparison] A better measure of a smaller
+  pot, and either half quoted alone describes a different policy than the one that passed.
+
+  **The counterfactual rescales the index rather than recomputing it, and that is a declared
+  limit.** Under the prior count the statewide percentage below would itself have been larger, so
+  holding it fixed while the counts rise 17.6% overstates the level badly. The denominator implied
+  by the published 0.5334 is 1,354,592 — smaller than traditional enrolled ADM — so it divides a
+  population this model does not carry and cannot be recomputed here. The run therefore holds the
+  statewide total exactly fixed, which prices the redistribution and declines to price the level.
+  The greenbook prices the level. [open — what the statewide percentage would have been]
+
   ### What the statewide share is
 
   `d3` divides by 0.533380310606710 — the statewide economically disadvantaged percentage. R.C.
@@ -344,3 +376,9 @@ links:
     relationship: sourced-from
   - target: ../parameter/dpia-per-pupil-amount.yml
     relationship: governed-by
+  - target: ../../catalog/fordham-house-bridge-commentary.md
+    relationship: sourced-from
+    note: >-
+      The critique that named direct certification as the fix, made against the House-passed bill
+      three months before the enacted act adopted it. A secondary source with a stated alignment;
+      what it recommended is checked here rather than adopted.

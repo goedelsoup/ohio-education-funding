@@ -69,6 +69,29 @@ findings: |
   describes bridge-formula funding of $11.24 billion in FY2026 and $11.49 billion in FY2027, which
   belongs to a proposal rather than to the enacted act. See the stage caveat in
   [`lsc-hb96-analysis`](../../catalog/lsc-hb96-analysis.md).
+
+  ### The House bridge plan is the counterfactual the act was chosen over, and it is priced
+
+  The House passed a bridge formula instead: every district and community school held at FY2025
+  aid by a guarantee, with prescribed increases above FY2025 halved. Contemporaneous analysis
+  reports its foundation increases FY2025 → FY2027 as $179m (2.2%) for traditional districts, $80m
+  (6.3%) for community schools and $38m (7.6%) for JVSDs — $297m against the executive proposal's
+  $149m. [verified — [`fordham-house-bridge-commentary`](../../catalog/fordham-house-bridge-commentary.md),
+  whose implied FY2025 bases of $8,136m, $1,270m and $500m sit on the greenbook's $8,117.9m,
+  $1,270.3m and $497.2m, which is what makes the two stages comparable rather than two different
+  years]
+
+      school type            FY2025      House-passed        enacted     enacted - House
+      traditional           8,117.9    +179   (+2.2%)   +141.5 (+1.7%)          -37.5
+      community and STEM    1,270.3    + 80   (+6.3%)   +128.5 (+10.1%)         +48.5
+      JVSDs                   497.2    + 38   (+7.6%)   + 69.7 (+14.0%)         +31.7
+      total                 9,885.4    +297   (+3.0%)   +339.7 (+3.4%)          +42.7
+
+  **The enacted act spent $42.7m more than the plan it replaced and gave traditional districts
+  $37.5m less.** The whole difference, and $37.5m besides, went to community schools and JVSDs.
+  [verified] That is the fact the phase-in reading obscures from either side: an act described as
+  completing a six-year implementation for districts moved money away from them relative to the
+  proposal that was described as abandoning it. [inference]
 revisions:
   - was: |
       The node recorded H.B. 96 as a phase-in decision and an input-year freeze, with the enacted
@@ -141,3 +164,9 @@ links:
     relationship: continues
   - target: ../../catalog/lsc-hb96-analysis.md
     relationship: sourced-from
+  - target: ../../catalog/fordham-house-bridge-commentary.md
+    relationship: sourced-from
+    note: >-
+      The House-passed stage this act departs from, and the only committed account of what that
+      stage would have paid each sector. A secondary source with a stated alignment; the enacted
+      figures beside it are the greenbook's.
