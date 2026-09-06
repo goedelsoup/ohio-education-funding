@@ -86,7 +86,7 @@ config_roots = ["crates", "web"]
 
 [tools]
 # <!-- YIDAM:TOOLS --> written by yidam-vendor-update from .yidam.toml — do not edit
-"github:goedelsoup/yidam" = { version = "0.9.0", version_prefix = "cli/v" }
+"github:goedelsoup/yidam" = { version = "0.10.0", version_prefix = "cli/v" }
 # <!-- /YIDAM:TOOLS -->
 # Pinned rather than "latest" so the gate is reproducible, and pinned to *this*
 # version because `.github/workflows/ci.yml` has nothing to select a toolchain

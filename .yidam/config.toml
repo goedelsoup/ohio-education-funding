@@ -7,10 +7,23 @@
 # sat until 2026-08-31: four clocks, all decorative.
 #
 # `escalate_after` is deliberately NOT set. It turns a standing finding into an
-# error after N corpus-touching commits, and 232 of this corpus's 326 findings
+# error after N corpus-touching commits, and 402 of this corpus's 485 findings
 # are one malformed-claim-tag shape awaiting a single editorial pass. Arming the
 # clock before that pass lands schedules a red gate with no commit behind it.
 # Set it once the claim tags are uniform, not before.
+#
+# That count read 232 of 326 until yidam 0.10.0, and the corpus did not move:
+# the check was line-scoped, its code-span mask inverted on a span that wrapped,
+# and it never read a class's own prose — goedelsoup/yidam#601, #602 and #603,
+# all closed upstream. 402 of the 445 detail-carrying tags is what the fixed
+# check sees. The other 43 carry their detail after a plain space, which
+# `TAG_SEPARATORS` excludes deliberately, so no further fix reaches them.
+#
+# The shape being reported is this repository's figure attribution: the citation
+# lives inside the tag, where `citedCrates` in `web/src/lib/corpusFigures.ts`
+# reads it. Doing the rewrite the finding asks for empties `detail` and takes
+# every binding's citation with it, which is what #256 records and what `440e49e`
+# reverted. A larger number is a better-calibrated check, not a worse corpus.
 
 [catalog]
 # Days, not commits, and that is the one place yidam's clocks disagree on units

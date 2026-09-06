@@ -1,0 +1,93 @@
+id: kuten
+summary: >-
+  This corpus declares `inquiry` as what its loop is aimed at. Four of the five measures
+  diverge from the profile's bands, and two of the four are the `(scope)` suffix rather than
+  the practice: 73 commits written as `phase(<slug>):` settle a phase, which is 17.5% and
+  inside the declared band, and none of them is visible to a check that reads everything
+  before the first colon as the verb.
+kuten: inquiry
+revision: 1
+context: |
+  A yidam repository has always declared what it is *about* — the ontology, the classes, the
+  edge policy — and never what its work is *for*. That second thing had exactly one value,
+  assumed by the four phase types, the four clocks and the genesis rubric, and written down
+  nowhere a tool could read. The kuten layer arrived vendored with the prelude at
+  `fc96175`, and until this record existed `yidam kuten check` reported that this repository
+  held none, which is a supported state and not a finding.
+
+  Only one profile is vendored, so the choice was `inquiry` or nothing. It fits: this corpus
+  is authored in git rather than regenerated from something else, it holds 97 open questions,
+  and its object — the Rust workspace and the site — is derived from the corpus rather than
+  the corpus from the object. That is the `authored` half of the one fork the profile draws,
+  and every history-derived surface here reads it that way already.
+decision: |
+  This corpus's practice is `inquiry`: the corpus grows through sustained inquiry — questions opened, and settled.
+
+  Adopted with `yidam kuten adopt` against the profile vendored at
+  `.yidam/.vendor/prelude/kuten/inquiry/kuten.yml`, at revision 1.
+  The revision is copied from that profile, and every consumer reads the
+  kuten at the vintage this repository holds rather than at upstream's
+  current one.
+
+  Four of the five measures diverge, and the declaration is what makes them askable. None
+  of them binds anything, and `kuten-check` sits beside `due` rather than inside `ci` for
+  that reason. This repository's answers, at adoption:
+
+  **Phase-commit share: 0% measured, 0.12 to 0.27 declared — and the measurement is the
+  suffix.** 73 commits here are written `phase(<slug>): …`. GRAPH.md reads everything before
+  the first `: ` as the verb, so each of those is the unrecognized verb `phase(<slug>)` and
+  not one of them counts as settling a phase. Counted by the verb the suffix hides it is 75
+  of the 429 commits the check measured, 17.5% and inside the band, and 48 of the 401 that
+  are not merges, 12.0% and at the band's floor. The share depends on how the population is
+  drawn and on no reading of it is the answer zero. The practice is not missing; the spelling
+  makes it unreadable, and 22 phase branches open since 2026-08-24 are the same fact from the
+  other end.
+
+  **Off-vocabulary share: 49% measured, 0.00 to 0.02 declared.** 211 of 429 commits. 80 of
+  those are the suffix again — a valid verb wearing a scope — which leaves 130 that are
+  genuinely outside: `corpus`, `web`, `connect`, `add`, `gate`, `wiki`, `perf`. The check
+  asks whether those commits are this corpus's work or an artifact's, and here the honest
+  answer is the artifact's. `web/tests/unit/commitVerbs.spec.ts` already states this and
+  holds the only thing that can be held — that the next instruction telling somebody to
+  commit names its verb. History is not rewritten to match a vocabulary it predates.
+
+  **Nodes per commit: 0.30 measured, 0.50 to 1.12 declared.** Read against maturity, which
+  the profile says to do: 478 commits, and most of them are not corpus commits. The object
+  here is a gated Rust workspace and a gated Astro site, and the band was fitted over corpora
+  whose object is smaller. This one is a fact about the shape of the repository rather than
+  about the rate of inquiry.
+
+  **Median node lines: 118 measured, 35 to 62 declared — measured on the file.** The median
+  `description` here is 21 lines and all four prose fields together run to 34, which is at
+  the floor of the band rather than double its ceiling. The other 85 lines are `properties`,
+  `links`, `figures` and `revisions` — structure, not prose. yidam 0.10.0 narrowed
+  `node-too-long` to the description for exactly this reason, and this band still reads the
+  whole file, so the two disagree about what a node's length is.
+consequences: |
+  Nothing gates on any of it. `yidam kuten check` writes nothing and exits zero however far
+  the corpus has drifted, and `mise run kuten-check` is deliberately outside `mise run //:ci`.
+
+  The record is a page on the site like every other decision record, and it moves the
+  decision count the root README carries, so `edfund-connect index` runs with it.
+
+  Every consumer reads revision 1 as vendored here, never upstream's current one. A later
+  re-vendor that brings revision 2 does not change what this repository declared; a
+  comparison spanning two revisions is annotated rather than quietly made.
+
+  Changing this is a superseding `decide:` record, never an edit to this file and never an
+  edit to the vendored profile, which the next re-vendor discards.
+
+  Two of the four divergences are a check reading a suffix the prelude forbids. That is worth
+  reporting upstream rather than absorbing here, and it is the same shape as the three lint
+  defects this repository filed and upstream closed at 0.10.0.
+alternatives: |
+  **Hold no kuten.** The supported state, and what this repository did until now. Declined
+  because the assumption was being made anyway — by the phase types, by the clocks, by the
+  rubric — and an assumption a tool cannot read is one nothing can be measured against. The
+  four divergences above are the argument: none was visible before the declaration existed.
+
+  **Adopt the profile's proposed clocks with it.** Declined, and the profile says to: a kuten
+  proposes intervals and the corpus's own config holds them. `.yidam/config.toml` keeps
+  `questions_after = 200` against a proposed 100, `phases_after = 50` against 60, and
+  `ttl_days = 730` against 180, each with an argument already written beside it, and it goes
+  on omitting `index_after` for an index this repository has decided not to build.
