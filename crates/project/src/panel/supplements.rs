@@ -212,6 +212,19 @@ pub struct Transportation {
     pub other_riders: f64,
     /// `[e]` through `[h]` — the mile base and the two supplements' inputs.
     pub bus_miles: f64,
+    /// `[e1]`/`[e2]`/`[e3]` — the same miles split by the kind of school the rider attends.
+    ///
+    /// `bus_miles = public + 2 × nonpublic + 1.5 × community`, exactly, on every district: the
+    /// statute weights miles by the same factors it weights riders by. These are the parts.
+    ///
+    /// They are not a restatement of the rider mix. A non-public rider generates 1.72× the miles
+    /// of a public one, so non-district riders are 5.82% of heads, 10.42% of weighted ridership
+    /// and **16.70% of weighted miles** — and the mile base is what 350 districts are paid on.
+    pub public_miles: f64,
+    /// Weighted double, like the riders.
+    pub nonpublic_miles: f64,
+    /// Weighted one and a half.
+    pub community_miles: f64,
     /// Type 1 and 2 buses, which the efficiency index divides riders by.
     pub assigned_buses: f64,
     /// What the efficiency index measures riders per bus against.

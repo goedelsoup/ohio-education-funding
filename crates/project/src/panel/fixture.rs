@@ -126,22 +126,23 @@ mod column {
     pub const ENROLLMENT_CHANGE_THREE_YEAR: usize = 116;
     pub const GROWTH_SUPPLEMENT_ELIGIBLE: usize = 117;
     pub const ENROLLMENT_GROWTH_SUPPLEMENT: usize = 118;
-    /// Transportation: eleven inputs then nine payments, in sheet order.
+    /// Transportation: sixteen inputs then nine payments, in sheet order. The three mile
+    /// columns sit inside the inputs, after `[e]`, which is why everything below moved.
     pub const TRANS_FIRST_INPUT: usize = 119;
-    pub const TRANS_FIRST_PAYMENT: usize = 132;
+    pub const TRANS_FIRST_PAYMENT: usize = 135;
     /// The guarantee's machinery, emitted before the preschool block.
-    pub const FUNDING_BASE: usize = 141;
-    pub const FUNDING_BASE_ECON_DIS: usize = 142;
-    pub const OPEN_ENROLLMENT_PRIOR: usize = 143;
-    pub const OPEN_ENROLLMENT_CURRENT: usize = 144;
-    pub const OPEN_ENROLLMENT_THRESHOLD: usize = 145;
-    pub const OPEN_ENROLLMENT_ADJUSTMENT: usize = 146;
-    pub const FY21_FUNDING_BASE: usize = 147;
-    pub const FORMULA_TRANSITION_SUPPLEMENT: usize = 148;
+    pub const FUNDING_BASE: usize = 144;
+    pub const FUNDING_BASE_ECON_DIS: usize = 145;
+    pub const OPEN_ENROLLMENT_PRIOR: usize = 146;
+    pub const OPEN_ENROLLMENT_CURRENT: usize = 147;
+    pub const OPEN_ENROLLMENT_THRESHOLD: usize = 148;
+    pub const OPEN_ENROLLMENT_ADJUSTMENT: usize = 149;
+    pub const FY21_FUNDING_BASE: usize = 150;
+    pub const FORMULA_TRANSITION_SUPPLEMENT: usize = 151;
     /// Preschool special education: six counts, six amounts, and their total.
-    pub const PREK_FIRST_ADM: usize = 149;
-    pub const PREK_FIRST_AID: usize = 155;
-    pub const PREK_TOTAL: usize = 161;
+    pub const PREK_FIRST_ADM: usize = 152;
+    pub const PREK_FIRST_AID: usize = 158;
+    pub const PREK_TOTAL: usize = 164;
 }
 
 /// The header this loader expects, so a fixture reshaped without updating [`column`] fails
@@ -170,7 +171,8 @@ performance_stars,performance_progress,performance_progress_prior,performance_el
 performance_supplement,base_funding_supplement,enrolled_adm_fy23,enrollment_change_three_year,\
 growth_supplement_eligible,enrollment_growth_supplement,\
 trans_public_riders,trans_nonpublic_riders,trans_community_riders,trans_weighted_riders,\
-trans_mass_transit_riders,trans_other_riders,trans_bus_miles,trans_assigned_buses,\
+trans_mass_transit_riders,trans_other_riders,trans_bus_miles,trans_public_miles,\
+trans_nonpublic_miles,trans_community_miles,trans_assigned_buses,\
 trans_rider_capacity_target,trans_efficiency_index,trans_district_density,trans_square_miles,trans_reported_sped_cost,trans_school_bus,\
 trans_mass_transit,trans_other,trans_efficiency,trans_density,trans_fy21_base,trans_guarantee,\
 trans_total,trans_special_education,\
@@ -329,12 +331,15 @@ fn parse() -> Vec<DistrictRecord> {
                         mass_transit_riders: input(4),
                         other_riders: input(5),
                         bus_miles: input(6),
-                        assigned_buses: input(7),
-                        rider_capacity_target: input(8),
-                        efficiency_index: input(9),
-                        district_density: input(10),
-                        square_miles: input(11),
-                        reported_sped_cost: input(12),
+                        public_miles: input(7),
+                        nonpublic_miles: input(8),
+                        community_miles: input(9),
+                        assigned_buses: input(10),
+                        rider_capacity_target: input(11),
+                        efficiency_index: input(12),
+                        district_density: input(13),
+                        square_miles: input(14),
+                        reported_sped_cost: input(15),
                         school_bus: pay(0),
                         mass_transit: pay(1),
                         other: pay(2),

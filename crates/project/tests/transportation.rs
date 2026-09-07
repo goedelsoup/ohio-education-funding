@@ -508,3 +508,157 @@ fn the_transportation_struct_is_populated_rather_than_defaulted() {
         "almost every district runs buses"
     );
 }
+
+/// The mile base splits by school type too, and not in the same proportion the riders do.
+///
+/// This is the column the corpus went without. `[e]` is a weighted total —
+/// `public + 2 × nonpublic + 1.5 × community` — exactly as the ridership is, and until the
+/// reported-inputs sheet was read the parts were not committed, so **half the school bus payment
+/// could not be attributed at all**. 350 districts are paid on miles.
+#[test]
+fn bus_miles_are_weighted_by_school_type_exactly_as_riders_are() {
+    let panel = panel::panel();
+    let mut with_nonpublic = 0;
+
+    for record in &panel {
+        let t = &record.transportation;
+        let expected = ((t.public_miles
+            + t.nonpublic_miles * TRANSPORT_NONPUBLIC_WEIGHT
+            + t.community_miles * TRANSPORT_COMMUNITY_WEIGHT)
+            * 10_000.0)
+            .round()
+            / 10_000.0;
+        assert!(
+            close(expected, t.bus_miles),
+            "{}: 1/2/1.5 weighting of miles gives {expected:.4} against published {:.4}",
+            record.name,
+            t.bus_miles
+        );
+        if t.nonpublic_miles > 0.0 {
+            with_nonpublic += 1;
+        }
+    }
+
+    assert!(
+        with_nonpublic > 200,
+        "only {with_nonpublic} districts report non-public miles, which is too few for a \
+         mandate that applies statewide"
+    );
+}
+
+/// A non-public rider costs more miles than a public one, and then those miles are weighted again.
+///
+/// The finding that makes the mile split worth committing rather than deriving. Non-district
+/// riders are **5.82% of heads and 16.70% of weighted miles**, and the gap is not the statutory
+/// weight alone — it is that these children are dispersed, so carrying one takes further.
+///
+/// The effective multiplier on the mile base is therefore the product of the two: about 1.72
+/// times the miles, weighted 2.0, or roughly **3.4× a public rider**. Nothing states that; it
+/// falls out of two columns that were not in the same file until now.
+#[test]
+fn a_non_public_rider_takes_more_miles_to_carry_before_any_weighting() {
+    let panel = panel::panel();
+    let (mut pub_r, mut np_r, mut cs_r) = (0.0, 0.0, 0.0);
+    let (mut pub_m, mut np_m, mut cs_m) = (0.0, 0.0, 0.0);
+
+    for record in &panel {
+        let t = &record.transportation;
+        pub_r += t.public_riders;
+        np_r += t.nonpublic_riders;
+        cs_r += t.community_riders;
+        pub_m += t.public_miles;
+        np_m += t.nonpublic_miles;
+        cs_m += t.community_miles;
+    }
+
+    let per_rider = |miles: f64, riders: f64| if riders > 0.0 { miles / riders } else { 0.0 };
+    let (public, nonpublic, community) = (
+        per_rider(pub_m, pub_r),
+        per_rider(np_m, np_r),
+        per_rider(cs_m, cs_r),
+    );
+
+    assert!(
+        (1.70..=1.75).contains(&(nonpublic / public)),
+        "a non-public rider should take about 1.72x the miles of a public one; it takes {:.2}x",
+        nonpublic / public
+    );
+    assert!(
+        (1.73..=1.79).contains(&(community / public)),
+        "a community or STEM rider should take about 1.76x; it takes {:.2}x",
+        community / public
+    );
+
+    // And the two shares the corpus quotes are not interchangeable, which is the whole point.
+    let raw_share = (np_m + cs_m) / (pub_m + np_m + cs_m);
+    let weighted_share = (np_m * TRANSPORT_NONPUBLIC_WEIGHT + cs_m * TRANSPORT_COMMUNITY_WEIGHT)
+        / (pub_m + np_m * TRANSPORT_NONPUBLIC_WEIGHT + cs_m * TRANSPORT_COMMUNITY_WEIGHT);
+    assert!(
+        (0.095..=0.098).contains(&raw_share),
+        "non-district riders should burn about 9.64% of the miles; {raw_share:.4}"
+    );
+    assert!(
+        (0.165..=0.169).contains(&weighted_share),
+        "and generate about 16.70% of the weighted mile base; {weighted_share:.4}"
+    );
+}
+
+/// What the state pays to carry children to private and charter schools, on the binding base.
+///
+/// The question the mile split existed to answer, and the answer moved when it arrived. Each
+/// district is attributed on the base it is actually paid on — the weighted rider mix where the
+/// rider base binds, the weighted mile mix where the mile base does — because the other base is
+/// not what produced its payment.
+///
+/// **$82.2m of the $608.9m school bus payment, 13.5%.** Estimating the mile-base districts from
+/// their rider mix instead, which is what could be done before this column, gives about $63m and
+/// is wrong by nearly a third: their weighted mile share is 16.07% against a weighted rider share
+/// of 10.01%.
+#[test]
+fn thirteen_percent_of_the_school_bus_payment_carries_non_district_riders() {
+    let panel = panel::panel();
+    let (mut total, mut attributed) = (0.0, 0.0);
+    let (mut on_miles, mut on_riders) = (0.0, 0.0);
+
+    for record in &panel {
+        let t = &record.transportation;
+        let share = if t.paid_on_miles() {
+            if t.bus_miles > 0.0 {
+                (t.nonpublic_miles * TRANSPORT_NONPUBLIC_WEIGHT
+                    + t.community_miles * TRANSPORT_COMMUNITY_WEIGHT)
+                    / t.bus_miles
+            } else {
+                0.0
+            }
+        } else if t.weighted_riders > 0.0 {
+            (t.nonpublic_riders * TRANSPORT_NONPUBLIC_WEIGHT
+                + t.community_riders * TRANSPORT_COMMUNITY_WEIGHT)
+                / t.weighted_riders
+        } else {
+            0.0
+        };
+
+        total += t.school_bus;
+        attributed += t.school_bus * share;
+        if t.paid_on_miles() {
+            on_miles += t.school_bus * share;
+        } else {
+            on_riders += t.school_bus * share;
+        }
+    }
+
+    assert!(
+        (80_000_000.0..=84_000_000.0).contains(&attributed),
+        "about $82.2m of the school bus payment should carry non-district riders; ${attributed:.0}"
+    );
+    assert!(
+        (0.133..=0.137).contains(&(attributed / total)),
+        "which is about 13.5% of it; {:.4}",
+        attributed / total
+    );
+    // The mile base carries more of it than the rider base does, in dollars and in rate.
+    assert!(
+        on_miles > on_riders,
+        "the mile base should carry the larger share: ${on_miles:.0} against ${on_riders:.0}"
+    );
+}

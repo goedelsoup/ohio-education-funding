@@ -147,6 +147,9 @@ pub const FY27_HEADER: &[&str] = &[
     "trans_mass_transit_riders",
     "trans_other_riders",
     "trans_bus_miles",
+    "trans_public_miles",
+    "trans_nonpublic_miles",
+    "trans_community_miles",
     "trans_assigned_buses",
     "trans_rider_capacity_target",
     "trans_efficiency_index",
@@ -503,6 +506,27 @@ mod growth_columns {
     pub const AMOUNT: usize = 9;
 }
 
+/// Column positions in the `Transportation Data` sheet, whose header is on the first row.
+///
+/// The reported inputs, before the `Transportation` sheet weights them. It carries the one thing
+/// that sheet does not: **miles split by the kind of school the rider attends.**
+///
+/// `[e] = [e1] + 2 × [e2] + 1.5 × [e3]` exactly, on all 611 districts — the same 1.5 and 2.0 the
+/// statute applies to riders, applied again to their miles. Without this sheet the mile base
+/// cannot be attributed at all, and the mile base is what 350 districts are paid on.
+///
+/// It is not a restatement of the rider mix. A non-public rider generates **1.72×** the miles of
+/// a public one and a community or STEM rider **1.76×**, so the two shares are not
+/// interchangeable: non-district riders are 5.82% of heads, 10.42% of weighted ridership, and
+/// **16.70% of weighted miles**.
+mod transportation_data_columns {
+    pub const IRN: usize = 0;
+    /// `[e1]`/`[e2]`/`[e3]` — miles by the kind of school the rider attends.
+    pub const PUBLIC_MILES: usize = 8;
+    pub const NONPUBLIC_MILES: usize = 9;
+    pub const COMMUNITY_MILES: usize = 10;
+}
+
 /// Column positions in the `Transportation` sheet, whose header is on the fifth row.
 ///
 /// **$726m, plus $183m of special education transportation beside it.** Transportation alone is
@@ -725,6 +749,8 @@ pub struct Fy27Sheets<'a> {
     pub growth_rows: &'a [Vec<String>],
     /// `Transportation` — two rate bases, two supplements, and a second guarantee.
     pub transportation_rows: &'a [Vec<String>],
+    /// The reported inputs behind them, which carry the mile split the payment sheet does not.
+    pub transportation_data_rows: &'a [Vec<String>],
     /// `PSS_pec_Ed` — preschool special education, a flat amount plus a half-weight.
     pub prek_sped_rows: &'a [Vec<String>],
 }
@@ -764,6 +790,7 @@ pub fn build_fy27_model(sheets: &Fy27Sheets<'_>) -> Vec<Vec<String>> {
         performance_rows,
         growth_rows,
         transportation_rows,
+        transportation_data_rows,
         prek_sped_rows,
     } = *sheets;
     use base_cost_columns as bc;
@@ -812,6 +839,8 @@ pub fn build_fy27_model(sheets: &Fy27Sheets<'_>) -> Vec<Vec<String>> {
     let growth: HashMap<&str, &Vec<String>> = rows_by_irn(growth_rows, growth_columns::IRN);
     let transportation: HashMap<&str, &Vec<String>> =
         rows_by_irn(transportation_rows, transportation_columns::IRN);
+    let transportation_data: HashMap<&str, &Vec<String>> =
+        rows_by_irn(transportation_data_rows, transportation_data_columns::IRN);
     let prek_sped: HashMap<&str, &Vec<String>> =
         rows_by_irn(prek_sped_rows, prek_sped_columns::IRN);
 
@@ -1144,6 +1173,7 @@ pub fn build_fy27_model(sheets: &Fy27Sheets<'_>) -> Vec<Vec<String>> {
 
         // Transportation: the counts it is computed from, then the payments it produces.
         let trans = transportation.get(irn);
+        let trans_data = transportation_data.get(irn);
         use transportation_columns as tc;
         for (column, places) in [
             (tc::PUBLIC_RIDERS, 4),
@@ -1153,6 +1183,25 @@ pub fn build_fy27_model(sheets: &Fy27Sheets<'_>) -> Vec<Vec<String>> {
             (tc::MASS_TRANSIT_RIDERS, 4),
             (tc::OTHER_RIDERS, 4),
             (tc::BUS_MILES, 4),
+        ] {
+            let value = trans.and_then(|row| cell_number(row, column));
+            out.last_mut()
+                .expect("just pushed")
+                .push(format_value(value, places));
+        }
+
+        // The mile split, from the reported-inputs sheet. It sits here rather than with the rest
+        // of that sheet's columns because the header reads `[e]` then `[e1] [e2] [e3]`, and a
+        // weighted total is only legible beside the parts it weights.
+        use transportation_data_columns as td;
+        for column in [td::PUBLIC_MILES, td::NONPUBLIC_MILES, td::COMMUNITY_MILES] {
+            let value = trans_data.and_then(|row| cell_number(row, column));
+            out.last_mut()
+                .expect("just pushed")
+                .push(format_value(value, 4));
+        }
+
+        for (column, places) in [
             (tc::ASSIGNED_BUSES, 4),
             (tc::RIDER_CAPACITY_TARGET, 4),
             (tc::EFFICIENCY_INDEX, 4),
