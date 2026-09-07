@@ -43,7 +43,7 @@ Sorted by: type, then slug.
 | [`dew-report-card-spending`](dew-report-card-spending.md) | Ohio School Report Cards — District Spending Per Pupil | 1 |
 | [`dew-report-card-value-added`](dew-report-card-value-added.md) | Ohio School Report Cards — District Value-Added Details | 1 |
 | [`dew-scholarship-annual-report`](dew-scholarship-annual-report.md) | Scholarship Annual Report — the department's own account of the channel | 4 |
-| [`dew-sfpr-line-by-line`](dew-sfpr-line-by-line.md) | School Finance Payment Report — Line by Line Explanation | 6 |
+| [`dew-sfpr-line-by-line`](dew-sfpr-line-by-line.md) | School Finance Payment Report — Line by Line Explanation | 7 |
 | [`dot-casino-student-distribution`](dot-casino-student-distribution.md) | County Student Distribution — gross casino revenue county student fund | 1 |
 | [`dot-reappraisal-calendar`](dot-reappraisal-calendar.md) | Ohio's sexennial reappraisal and triennial update calendar | 1 |
 | [`dot-sd1-school-district-taxes`](dot-sd1-school-district-taxes.md) | Table SD-1 — School district taxable value and taxes charged | 3 |
@@ -67,7 +67,7 @@ Sorted by: type, then slug.
 | [`ohio-revised-code`](ohio-revised-code.md) | Ohio Revised Code — the sections this corpus cites | 19 |
 | [`ohio-session-laws`](ohio-session-laws.md) | Ohio session laws — the appropriation acts themselves | 3 |
 
-44 entries, 2 not yet cited by any corpus node. 218 retrieved files are pinned by SHA-256 in [`crates/connect/source-digests.txt`](../../crates/connect/source-digests.txt).
+44 entries, 2 not yet cited by any corpus node. 224 retrieved files are pinned by SHA-256 in [`crates/connect/source-digests.txt`](../../crates/connect/source-digests.txt).
 <!-- /REGEN -->
 
 ## Adding a source

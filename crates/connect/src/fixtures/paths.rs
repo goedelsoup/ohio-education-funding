@@ -62,6 +62,15 @@ pub const LSC_GREENBOOK_FIXTURE: &str = "crates/project/fixtures/lsc-education-g
 pub const CPI_FIXTURE: &str = "crates/connect/fixtures/cpi-u-june.tsv";
 /// Where the Midwest diesel price series is written, relative to the repository root.
 pub const DIESEL_FIXTURE: &str = "crates/connect/fixtures/midwest-diesel-monthly.csv";
+
+/// The department's own line-by-line specification of the payment report, one record per year.
+///
+/// A text fixture rather than a table, on the same ground [`LSC_GREENBOOK_FIXTURE`] is one: it is
+/// prose about a method, and the figures in it are scattered through sentences rather than laid
+/// out in columns. What it is *for* is the method — it is the only published series that says how
+/// the department computed a component in a year whose calculator the department has since
+/// replaced.
+pub const SFPR_FIXTURE: &str = "crates/project/fixtures/dew-sfpr-line-by-line.txt";
 /// Where the 2024-25 report card fixture is written, relative to the repository root.
 pub const REPORT_CARD_FIXTURE: &str =
     "crates/dispersion/fixtures/report-card-2425-district-data.csv";
@@ -176,6 +185,7 @@ pub const REBUILT: &[&str] = &[
     LSC_GREENBOOK_FIXTURE,
     CPI_FIXTURE,
     DIESEL_FIXTURE,
+    SFPR_FIXTURE,
     F33_FIXTURE,
     F33_FY2024_FIXTURE,
     F33_DISTRICTS_FIXTURE,
