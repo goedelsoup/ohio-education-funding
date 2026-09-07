@@ -1,0 +1,73 @@
+id: diesel-price-connector
+summary: >-
+  A twenty-second connector, eia-diesel, retrieving the Midwest diesel price — the first
+  source here that is not about schools, admitted because R.C. 3317.0212 makes a fuel price
+  an input to the funding formula whether or not the corpus holds one.
+context: |
+  Every connector approved so far retrieves something a school, a district, a court or the
+  legislature produced. This one retrieves a commodity price, and the ordinary answer to a
+  proposal like that is no: the corpus is about how Ohio funds its schools, and an energy series
+  is somebody else's domain.
+
+  The reason it is admitted is that R.C. 3317.0212 puts it inside the formula.
+
+  Divisions (C) and (D) name no dollar figure. Both of the state's transportation rates — the
+  $1,337.175 per weighted rider and the $6.867 per mile the FY2027 model carries — are defined as
+  **trimmed means of what districts themselves reported spending in the prior fiscal year**,
+  after excluding non-transporting districts and the ten highest and ten lowest per-pupil costs.
+  Nobody chooses them. They are statistics over district behaviour, and they move when that
+  behaviour moves, with no act required.
+
+  That makes the cost of running a bus a formula input, and diesel is the part of that cost with
+  a published monthly price. Without it the corpus can say the rates are endogenous — the
+  parameter node already does — and cannot say to what.
+
+  The gap this closes is a live one rather than a theoretical one. On a July-to-June fiscal year
+  the Midwest series gives FY2025 $3.558, FY2026 $4.181, and FY2027 through August 2026 $5.121 —
+  a 44% rise across two years. The FY2027 rates were computed from FY2026 reported costs, and the
+  department's calculator is dated 16 December 2025, before most of that move. The lag the
+  section specifies is currently running about a fifth of a fuel price wide.
+decision: |
+  Approved. A twenty-second connector, `eia-diesel`, publisher U.S. Energy Information
+  Administration, feeding `metric` and `fiscal-period`, status **Parsed** rather than Wired: it
+  retrieves and parses to a committed fixture, and nothing downstream consumes it yet. It becomes
+  Wired when a calculator reads it.
+
+  One source: `EMD_EPD2D_PTE_R20_DPG`, No. 2 diesel retail prices for the Midwest (PADD 2),
+  monthly, from the `hist_xls` path. Catalogued at
+  [`eia-diesel-prices`](../catalog/eia-diesel-prices.md).
+
+  It is a separate connector rather than a second source under `bls-cpi` — the shape that was
+  considered first, since both are federal statistical series read for context rather than for
+  a funding figure. Rejected: a price index and a commodity price do different jobs here. The
+  CPI restates dollars so that two years can be compared; this explains why one of them moved.
+  Putting them behind one status flag would mean a diesel outage could report as a deflator
+  problem.
+
+  Three constraints are approved with it.
+
+  **The fixture stays monthly.** Every question this series will be asked is a fiscal-year one
+  and the temptation is to commit twelve averaged numbers. `connect` parses and does not compute,
+  and the aggregation is a real choice rather than a formality: fuel is bought across the year,
+  so a July-to-June *mean* is the natural window, where the deflator takes a June *point*
+  observation because an index level is not consumed. A monthly fixture can be re-aggregated;
+  an annual one cannot be taken apart.
+
+  **The retail-price caveat travels with every figure.** This is a retail price including excise
+  tax. Districts buy in bulk and are exempt from part of it, so the level is wrong for a district
+  budget and percentage changes are close but not equal — an unmoving per-gallon tax wedge
+  compresses the proportional swing. No Ohio school-bus bulk diesel price has been located, and
+  the catalog entry carries that as `[open]` rather than substituting a national benchmark.
+
+  **PADD 2 is not Ohio, and the entry says so.** The Administration publishes no Ohio retail
+  diesel series. The Midwest region is the smallest published geography containing the state.
+
+  A note against the obvious next step: this does **not** approve fitting a fuel elasticity to
+  the F-33 transportation series. `crates/dispersion/tests/f33_student_transportation.rs`
+  establishes that the two largest moves in that panel are the FY2021 pandemic collapse and its
+  FY2022 rebound, and diesel collapsed in calendar 2020 at the same moment Ohio's buses stopped.
+  The confound is nearly collinear with the treatment. A regression over the full panel would
+  recover the closure of Ohio's schools and report it as a fuel response. What to do about that
+  is a later decision, and it needs the pre-FY2027 rate series that nothing here yet holds.
+connectors:
+  - eia-diesel

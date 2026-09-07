@@ -41,6 +41,7 @@ mod bls;
 mod census;
 mod courts;
 mod dew;
+mod eia;
 mod lsc;
 mod nces;
 mod ofcc;
@@ -189,6 +190,7 @@ pub const CONNECTORS: &[Connector] = &[
     dew::FOUNDATION,
     dew::REPORT_CARD,
     bls::CPI,
+    eia::DIESEL,
     dew::FIVE_YEAR_FORECAST,
     tax::ABSTRACT,
     tax::CASINO,

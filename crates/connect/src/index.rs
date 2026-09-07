@@ -638,9 +638,19 @@ fn retrieval_status(root: &Path) -> String {
         .filter(|c| matches!(c.status, Status::Declared { .. }))
         .map(|c| c.key)
         .collect();
-    let unwired: Vec<&'static str> = CONNECTORS
+    // `Retrievable` and `Parsed` are both "not wired" and are not the same fact, so they are
+    // counted apart. A retrievable connector has no parser because writing one is a judgement
+    // call; a parsed one has a parser and a committed fixture and is waiting on a consumer.
+    // They shared a sentence until `eia-diesel` became the first `Parsed` connector and the
+    // sentence started saying its extraction step was judgement, which it is not.
+    let retrievable: Vec<&'static str> = CONNECTORS
         .iter()
-        .filter(|c| matches!(c.status, Status::Retrievable | Status::Parsed))
+        .filter(|c| matches!(c.status, Status::Retrievable))
+        .map(|c| c.key)
+        .collect();
+    let parsed: Vec<&'static str> = CONNECTORS
+        .iter()
+        .filter(|c| matches!(c.status, Status::Parsed))
         .map(|c| c.key)
         .collect();
     let pinned = crate::cache::parse_manifest(&read(root, crate::cache::MANIFEST)).len();
@@ -662,12 +672,19 @@ fn retrieval_status(root: &Path) -> String {
             "each says"
         },
     );
-    if !unwired.is_empty() {
+    if !retrievable.is_empty() {
         out.push_str(&format!(
             " {} {} unwired by choice rather than by obstacle — a fetchable source whose \
              extraction step is judgement rather than parsing.",
-            named(unwired.clone()),
-            if unwired.len() == 1 { "is" } else { "are" },
+            named(retrievable.clone()),
+            if retrievable.len() == 1 { "is" } else { "are" },
+        ));
+    }
+    if !parsed.is_empty() {
+        out.push_str(&format!(
+            " {} {} to a committed fixture that nothing downstream reads yet.",
+            named(parsed.clone()),
+            if parsed.len() == 1 { "parses" } else { "parse" },
         ));
     }
     out.push('\n');
