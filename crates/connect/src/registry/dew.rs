@@ -62,6 +62,84 @@ pub(super) const FOUNDATION: Connector = Connector {
                    format, which `spreadsheet` now reads natively; district data is on the \
                    third of seven sheets.",
         },
+        Source {
+            key: "sfpr-line-by-line-fy21",
+            title: Some("FY 2021 School Finance Payment Report Line by Line Explanation"),
+            url: "https://education.ohio.gov/getattachment/Topics/Finance-and-Funding/\
+                  School-Payment-Reports/State-Funding-For-Schools/\
+                  Traditional-School-Districts/\
+                  FY21-SFPR-Funding-Form-Line-by-Line-Explanation.pdf.aspx?lang=en-US",
+            filename: "fy21-sfpr-funding-form-line-by-line-explanation.pdf",
+            format: Format::Pdf,
+            catalog: Some("dew-sfpr-line-by-line"),
+            fixtures: &[crate::fixtures::SFPR_FIXTURE],
+            note: "The first edition, published under the Fair School Funding Plan's opening year.",
+        },
+        Source {
+            key: "sfpr-line-by-line-fy22",
+            title: Some("FY 2022 School Finance Payment Report Line by Line Explanation"),
+            url: "https://education.ohio.gov/getattachment/Topics/Finance-and-Funding/\
+                  School-Payment-Reports/State-Funding-For-Schools/\
+                  Traditional-School-Districts/\
+                  FY22-SFPR-Funding-Line-by-Line-Explanation-7-18-2022.pdf.aspx?lang=en-US",
+            filename: "fy22-sfpr-funding-line-by-line-explanation-7-18-2022.pdf",
+            format: Format::Pdf,
+            catalog: Some("dew-sfpr-line-by-line"),
+            fixtures: &[crate::fixtures::SFPR_FIXTURE],
+            note: "The edition most of this corpus's verified base-cost figures came from.",
+        },
+        Source {
+            key: "sfpr-line-by-line-fy23",
+            title: Some("FY 2023 School Finance Payment Report Line by Line Explanation"),
+            url: "https://education.ohio.gov/getattachment/Topics/Finance-and-Funding/\
+                  School-Payment-Reports/State-Funding-For-Schools/\
+                  Traditional-School-Districts/\
+                  FY23-SFPR-Funding-Line-by-Line-Explanation-2-23-2023.pdf.aspx?lang=en-US",
+            filename: "fy23-sfpr-funding-line-by-line-explanation-2-23-2023.pdf",
+            format: Format::Pdf,
+            catalog: Some("dew-sfpr-line-by-line"),
+            fixtures: &[crate::fixtures::SFPR_FIXTURE],
+            note: "The last edition published as the Ohio Department of Education.",
+        },
+        Source {
+            key: "sfpr-line-by-line-fy24",
+            title: Some("FY 2024 School Finance Payment Report Line by Line Explanation"),
+            url: "https://education.ohio.gov/getattachment/Topics/Finance-and-Funding/\
+                  School-Payment-Reports/State-Funding-For-Schools/\
+                  Traditional-School-Districts/\
+                  FY24-SFPR-Funding-Line-by-Line-Explanation-11-2-2023.pdf.aspx?lang=en-US",
+            filename: "fy24-sfpr-funding-line-by-line-explanation-11-2-2023.pdf",
+            format: Format::Pdf,
+            catalog: Some("dew-sfpr-line-by-line"),
+            fixtures: &[crate::fixtures::SFPR_FIXTURE],
+            note: "The first published as the Department of Education and Workforce.",
+        },
+        Source {
+            key: "sfpr-line-by-line-fy25",
+            title: Some("FY 2025 School Finance Payment Report Line by Line Explanation"),
+            url: "https://education.ohio.gov/getattachment/Topics/Finance-and-Funding/\
+                  School-Payment-Reports/State-Funding-For-Schools/\
+                  Traditional-School-Districts/\
+                  FY25-SFPR-Funding-Line-by-Line-Explanation-10-25-2024.pdf.aspx?lang=en-US",
+            filename: "fy25-sfpr-funding-line-by-line-explanation-10-25-2024.pdf",
+            format: Format::Pdf,
+            catalog: Some("dew-sfpr-line-by-line"),
+            fixtures: &[crate::fixtures::SFPR_FIXTURE],
+            note: "The year whose reported costs set the FY2026 transportation rates.",
+        },
+        Source {
+            key: "sfpr-line-by-line-fy26",
+            title: Some("FY 2026 School Finance Payment Report Line by Line Explanation"),
+            url: "https://education.ohio.gov/getattachment/Topics/Finance-and-Funding/\
+                  School-Payment-Reports/State-Funding-For-Schools/\
+                  Traditional-School-Districts/\
+                  FY26-SFPR-Funding-Line-by-Line-Explanation-9-29-2025.pdf.aspx?lang=en-US",
+            filename: "fy26-sfpr-funding-line-by-line-explanation-9-29-2025.pdf",
+            format: Format::Pdf,
+            catalog: Some("dew-sfpr-line-by-line"),
+            fixtures: &[crate::fixtures::SFPR_FIXTURE],
+            note: "States the 180 days of service that annualise reported daily miles, and that the density supplement is prorated to fit the biennial appropriation.",
+        },
     ],
 };
 

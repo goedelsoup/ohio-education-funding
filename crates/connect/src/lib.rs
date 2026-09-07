@@ -801,6 +801,48 @@ fn rebuild_budget_documents(root: &Path) -> Result<Vec<Rebuilt>, RebuildError> {
         Err(cause) => Rebuilt::skipped(fixtures::LSC_GREENBOOK_FIXTURE, cause),
     });
 
+    // The department's own line-by-line specification, FY2021 to FY2026. All of them or none, on
+    // the same ground as the greenbooks above: the point of the file is the series, and an edition
+    // silently missing from it reads as a year the department did not publish.
+    //
+    // This is the only published account of how a component was computed in a year whose
+    // calculator has since been replaced — the department overwrites rather than archives, so for
+    // FY2021 to FY2025 the model itself is gone and this is what is left of it.
+    let sfpr: Result<Vec<fixtures::Record>, cache::FetchError> =
+        registered_connector("dew-foundation")
+            .sources
+            .iter()
+            .filter(|src| src.fixtures.contains(&fixtures::SFPR_FIXTURE))
+            .map(|src| {
+                let text = cache::pdf_text(root, src)?;
+                Ok(fixtures::Record {
+                    id: src.key.to_string(),
+                    title: src.title.unwrap_or(src.key).to_string(),
+                    date: fixtures::published_on(&text),
+                    source: src.url.to_string(),
+                    body: text.trim().to_string(),
+                })
+            })
+            .collect();
+    out.push(match sfpr {
+        Ok(mut sfpr) => {
+            // By the fiscal year in the key rather than by registry order, so the file's promise
+            // of "oldest first" is kept by the data and not by how the sources were typed in.
+            sfpr.sort_by(|a, b| a.id.cmp(&b.id));
+            text_fixture(
+                root,
+                fixtures::SFPR_FIXTURE,
+                &fixtures::build_records(
+                    "The department's line-by-line explanation of the School Finance Payment \
+                     Report, one record per fiscal year, oldest first. FY2027 is not published \
+                     yet.",
+                    &sfpr,
+                ),
+            )?
+        }
+        Err(cause) => Rebuilt::skipped(fixtures::SFPR_FIXTURE, cause),
+    });
+
     Ok(out)
 }
 

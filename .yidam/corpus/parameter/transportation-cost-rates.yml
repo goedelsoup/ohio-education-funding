@@ -46,10 +46,17 @@ findings: |
 
   The per-mile base is `bus miles × $6.867 × 180`, and **180 does not appear anywhere in R.C.
   3317.0212**. The section speaks of "miles driven for school bus service as reported", with no
-  annualisation. So either the reported figure is a daily one the department annualises by
-  convention, or the multiplier is doing something else; the section does not say and the
-  distinction changes what the rate means. [verified that the section omits it; open as to what
-  it is]
+  annualisation.
+
+  **It is an annualisation, and the department says so in five consecutive editions of its own
+  line-by-line explanation.** The method is to "calculate the statewide average annual per-mile
+  expenditure for each district based on 180 days of service", and "the mileage is based on the
+  average number of miles traveled during the rider count week". Reported miles are a *daily*
+  figure — one week's average, taken in the first full week of October — and 180 is the school
+  year it is multiplied out over. So the multiplier is a convention of the department's rather
+  than a constant of the statute's, which is what this node suspected and could not show.
+  [verified — [the department's own explanation](../../catalog/dew-sfpr-line-by-line.md),
+  FY2022 through FY2026, tested in `crates/project`]
 
   The FY2021 transportation guarantee — the line that holds 38 districts at their FY2021
   payment — is likewise absent from the section, as is the 0.91746 factor on special education
@@ -155,9 +162,13 @@ unfilled:
       `codes.ohio.gov` does not carry, is where the enrolled act would have it.
   - field: the rates before FY2027
     why: >-
-      Each year's rate is a trimmed mean of the prior year's reported costs, so the series is
-      recoverable in principle from the department's transportation cost reports. None is
-      committed here.
+      Each year's rate is a trimmed mean of the prior year's reported costs, and none but
+      FY2027's is committed. The department replaces the calculator rather than archiving it, so
+      the live page carries FY2027 alone. FY2026's rates are readable from an archived copy of
+      the FY2026 model and are not yet retrieved here; FY2022 to FY2025 are not recoverable by
+      that route at all, the only archived FY2025 file being truncated at exactly one mebibyte.
+      The line-by-line explanations now committed give the method for every one of those years
+      and the rates for none of them.
 figures:
   - key: project/panel-districts-under-the-transportation-floor
     value: 438

@@ -284,7 +284,11 @@ test("citations are counted from both the forms the corpus writes them in", () =
     corpus.sources.find((s) => s.slug === slug)?.citedBy.length ?? -1;
 
   // Cited only through structured `sourced-from` edges.
-  expect(count("dew-sfpr-line-by-line")).toBe(6);
+  expect(count("lsc-dew-redbook")).toBe(7);
+  // Cited both ways: six structured edges and one markdown link, in the claim tag that closed
+  // the transportation parameter's 180-day question. One number that a reader dropping either
+  // form gets wrong.
+  expect(count("dew-sfpr-line-by-line")).toBe(7);
   // Cited only inline, in prose.
   expect(count("ocg-white-paper-013")).toBeGreaterThanOrEqual(4);
 
