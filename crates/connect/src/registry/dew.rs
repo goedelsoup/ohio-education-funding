@@ -63,6 +63,25 @@ pub(super) const FOUNDATION: Connector = Connector {
                    third of seven sheets.",
         },
         Source {
+            key: "fy26-calculator",
+            title: Some("FY26 TRAD State Foundation Funding Calculator"),
+            // The only address this file still has. The department replaced it in place when the
+            // FY2027 model went up; see `decisions/an-archived-source-is-still-a-source`.
+            url: "https://web.archive.org/web/20251008001131id_/\
+                  https://education.ohio.gov/getattachment/Topics/Finance-and-Funding/\
+                  School-Payment-Reports/State-Funding-For-Schools/\
+                  Traditional-School-Districts/\
+                  FY26-TRAD-State-Foundation-Funding-Calculator-9-22-2025.xlsx.aspx?lang=en-US",
+            filename: "fy26-calculator.xlsx",
+            format: Format::Xlsx,
+            catalog: Some("dew-fy26-funding-calculator"),
+            fixtures: &[crate::fixtures::TRANSPORT_RATES_FIXTURE],
+            note: "The FY2026 model, from the Internet Archive because the department serves \
+                   no copy. Read only for the statewide transportation factors; its \
+                   per-district tables are the FY2027 model's a year earlier and are not \
+                   committed.",
+        },
+        Source {
             key: "sfpr-line-by-line-fy21",
             title: Some("FY 2021 School Finance Payment Report Line by Line Explanation"),
             url: "https://education.ohio.gov/getattachment/Topics/Finance-and-Funding/\

@@ -71,6 +71,14 @@ pub const DIESEL_FIXTURE: &str = "crates/connect/fixtures/midwest-diesel-monthly
 /// the department computed a component in a year whose calculator the department has since
 /// replaced.
 pub const SFPR_FIXTURE: &str = "crates/project/fixtures/dew-sfpr-line-by-line.txt";
+
+/// The statewide transportation factors, one row per fiscal year.
+///
+/// Two rows, which is the whole of what is recoverable: the department replaces the calculator
+/// rather than archiving it, and only FY2026 survives anywhere besides the current year. Small,
+/// and the smallness is the finding — a parameter that moves without an act, observable across
+/// exactly one interval.
+pub const TRANSPORT_RATES_FIXTURE: &str = "crates/project/fixtures/transportation-rates.csv";
 /// Where the 2024-25 report card fixture is written, relative to the repository root.
 pub const REPORT_CARD_FIXTURE: &str =
     "crates/dispersion/fixtures/report-card-2425-district-data.csv";
@@ -186,6 +194,7 @@ pub const REBUILT: &[&str] = &[
     CPI_FIXTURE,
     DIESEL_FIXTURE,
     SFPR_FIXTURE,
+    TRANSPORT_RATES_FIXTURE,
     F33_FIXTURE,
     F33_FY2024_FIXTURE,
     F33_DISTRICTS_FIXTURE,

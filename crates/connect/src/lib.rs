@@ -843,6 +843,40 @@ fn rebuild_budget_documents(root: &Path) -> Result<Vec<Rebuilt>, RebuildError> {
         Err(cause) => Rebuilt::skipped(fixtures::SFPR_FIXTURE, cause),
     });
 
+    // The one parameter in the plan that moves without an act, across the one interval it can be
+    // observed over. FY2026 comes from the Internet Archive because the department serves no copy
+    // of its own model a year later — see `decisions/an-archived-source-is-still-a-source`, which
+    // admits that address on the condition the builder enforces: the workbook has to reproduce
+    // its own published per-rider bases from the rate read out of its header.
+    let rates = (|| -> Result<Vec<Vec<String>>, RebuildError> {
+        let fy26 = open_workbook(root, registered("fy26-calculator"))?;
+        let fy27 = open_workbook(root, registered("fy27-calculator"))?;
+        let (fy26_rows, fy27_rows) = (
+            fy26.rows(fixtures::TRANSPORT_SHEET)?,
+            fy27.rows(fixtures::TRANSPORT_SHEET)?,
+        );
+        fixtures::build_transportation_rates(&[
+            fixtures::CalculatorYear {
+                fiscal_year: 2026,
+                rows: &fy26_rows,
+            },
+            fixtures::CalculatorYear {
+                fiscal_year: 2027,
+                rows: &fy27_rows,
+            },
+        ])
+        .map_err(RebuildError::Layout)
+    })();
+    out.push(match rates {
+        Ok(rows) => csv_fixture(
+            root,
+            fixtures::TRANSPORT_RATES_FIXTURE,
+            fixtures::TRANSPORT_RATES_HEADER,
+            &rows,
+        )?,
+        Err(cause) => Rebuilt::skipped(fixtures::TRANSPORT_RATES_FIXTURE, cause.to_string()),
+    });
+
     Ok(out)
 }
 
