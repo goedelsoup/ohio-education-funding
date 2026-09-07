@@ -55,6 +55,12 @@ const CITED: &[&str] = &[
     "3302.10",
     "3302.12",
     "3770.06",
+    // The motor fuel excise tax, at 47 cents a gallon on diesel and refundable to school
+    // districts. Cited by `eia-diesel-prices` for why a retail price is not what a district pays
+    // — and, more usefully, for which way that error runs: a fixed per-gallon wedge widens a
+    // proportional rise rather than narrowing it, so the retail series understates the increase
+    // a district's fuel bill actually took.
+    "5735.05",
     "5753.02",
     "5753.03",
     "5753.11",
