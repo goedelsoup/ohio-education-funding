@@ -47,7 +47,7 @@ const FIXTURE: &str = include_str!("../fixtures/f33-ohio-panel.csv");
 
 /// The header this loader was written against.
 const EXPECTED_HEADER: &str = "fiscal_year,leaid,irn,comparable,enrollment,total_revenue,\
-federal_revenue,state_revenue,local_revenue,property_tax,current_spending";
+federal_revenue,state_revenue,local_revenue,property_tax,current_spending,student_transportation";
 
 /// One Ohio agency in one year of the survey.
 #[derive(Debug, Clone, PartialEq)]
@@ -81,6 +81,14 @@ pub struct PanelRow {
     /// same fixture â which read the column this reader did not carry, and disagreed with it
     /// about which rows are rows. See issue #157.
     pub current_spending: Option<f64>,
+    /// `V45` — support services, student transportation, in dollars.
+    ///
+    /// The only fuel-exposed line the survey separates, and the reason this column exists: the
+    /// state's two transportation rates are trimmed means of what districts reported spending,
+    /// so the cost side of that feedback is measurable here and nowhere else across years.
+    /// `None` where the agency reports none, which for a district that buses nobody is a real
+    /// zero reported as absent rather than as `0`.
+    pub student_transportation: Option<f64>,
 }
 
 impl PanelRow {
@@ -92,6 +100,27 @@ impl PanelRow {
     pub fn spending_per_pupil(&self) -> Option<f64> {
         match (self.current_spending, self.enrollment) {
             (Some(spending), pupils) if pupils > 0.0 => Some(spending / pupils),
+            _ => None,
+        }
+    }
+
+    /// Student transportation spending per pupil, on the Bureau's own count.
+    ///
+    /// Nominal, like [`Self::spending_per_pupil`], and for the same reason.
+    #[must_use]
+    pub fn transportation_per_pupil(&self) -> Option<f64> {
+        match (self.student_transportation, self.enrollment) {
+            (Some(spending), pupils) if pupils > 0.0 => Some(spending / pupils),
+            _ => None,
+        }
+    }
+
+    /// Student transportation as a share of current spending. `None` where either is missing,
+    /// or where the agency reports no current spending to take a share of.
+    #[must_use]
+    pub fn transportation_share(&self) -> Option<f64> {
+        match (self.student_transportation, self.current_spending) {
+            (Some(transport), Some(current)) if current > 0.0 => Some(transport / current),
             _ => None,
         }
     }
@@ -130,6 +159,7 @@ pub fn panel() -> Vec<PanelRow> {
                 local_revenue: row.num(8)?,
                 property_tax: row.num(9),
                 current_spending: row.num(10),
+                student_transportation: row.num(11),
             })
         })
         .collect()

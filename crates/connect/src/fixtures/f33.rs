@@ -375,6 +375,7 @@ pub const F33_OHIO_PANEL_HEADER: &[&str] = &[
     "local_revenue",
     "property_tax",
     "current_spending",
+    "student_transportation",
 ];
 
 /// One year of the survey, paired with the fiscal year it reports.
@@ -445,6 +446,9 @@ pub fn build_f33_ohio_panel(
             at("TLOCREV")?,
         ];
         let (property_tax, spending) = (at("T06")?, at("TCURELSC")?);
+        // `V45` is support services — student transportation, the only fuel-exposed line the
+        // survey separates. Present under the same name in all three layout eras.
+        let transportation = at("V45")?;
 
         let mut kept = 0usize;
         for line in rows {
@@ -498,6 +502,7 @@ pub fn build_f33_ohio_panel(
             row.extend(revenue.iter().map(|i| plain(*i)));
             row.push(unreported_is_blank(property_tax));
             row.push(unreported_is_blank(spending));
+            row.push(unreported_is_blank(transportation));
             out.push(row);
             kept += 1;
         }

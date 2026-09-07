@@ -1071,6 +1071,23 @@ pub fn rebuild(root: &Path) -> Result<Vec<Rebuilt>, RebuildError> {
         Err(cause) => Rebuilt::skipped(fixtures::CPI_FIXTURE, cause),
     });
 
+    // The price the transportation rates are a lagged, trimmed mean of. A workbook rather than a
+    // flat file, and a 2004-vintage one, so it goes through the same OLE2 reader the department's
+    // October headcount does.
+    let diesel = registered("midwest-diesel-monthly");
+    out.push(match open_workbook(root, diesel) {
+        Ok(book) => {
+            let sheet = book.rows(fixtures::DIESEL_SHEET)?;
+            csv_fixture(
+                root,
+                fixtures::DIESEL_FIXTURE,
+                fixtures::DIESEL_HEADER,
+                &fixtures::build_diesel_series(&sheet).map_err(RebuildError::Layout)?,
+            )?
+        }
+        Err(cause) => Rebuilt::skipped(fixtures::DIESEL_FIXTURE, cause),
+    });
+
     out.extend(rebuild_local_finance(root)?);
 
     out.extend(rebuild_statute_and_acts(root)?);

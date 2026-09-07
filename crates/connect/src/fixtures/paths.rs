@@ -60,6 +60,8 @@ pub const LSC_GREENBOOK_FIXTURE: &str = "crates/project/fixtures/lsc-education-g
 
 /// Where the deflator's check fixture is written, relative to the repository root.
 pub const CPI_FIXTURE: &str = "crates/connect/fixtures/cpi-u-june.tsv";
+/// Where the Midwest diesel price series is written, relative to the repository root.
+pub const DIESEL_FIXTURE: &str = "crates/connect/fixtures/midwest-diesel-monthly.csv";
 /// Where the 2024-25 report card fixture is written, relative to the repository root.
 pub const REPORT_CARD_FIXTURE: &str =
     "crates/dispersion/fixtures/report-card-2425-district-data.csv";
@@ -173,6 +175,7 @@ pub const REBUILT: &[&str] = &[
     CASINO_FIXTURE,
     LSC_GREENBOOK_FIXTURE,
     CPI_FIXTURE,
+    DIESEL_FIXTURE,
     F33_FIXTURE,
     F33_FY2024_FIXTURE,
     F33_DISTRICTS_FIXTURE,
