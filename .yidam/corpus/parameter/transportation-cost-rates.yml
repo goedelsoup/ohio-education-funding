@@ -28,6 +28,28 @@ description: |
   by the department" and states no factor, so the 0.35 for mass transit and 0.50 for other types
   are the department's rules rather than the statute's. [verified]
 findings: |
+  ### What the state pays to carry children to private and charter schools
+
+  **$82.2m of the $608.9m school bus payment, 13.5%.** The mile base carries more of it than the
+  rider base does — $49.6m against $32.6m — which is the reverse of what the rider counts
+  suggest, and the reason is a column that was not committed until now.
+
+  The department's reported-inputs sheet splits miles by school type as well as riders, and `[e]`
+  is a weighted total exactly as `[b]` is: `public + 2 × non-public + 1.5 × community`, on all 611
+  districts. The parts are not proportional to the riders. **A non-public rider takes 1.72× the
+  miles of a public one and a community or STEM rider 1.76×** — these children are dispersed, so
+  carrying one goes further — and the statute then weights those miles again. The effective
+  multiplier on the mile base is the product, roughly 3.4× a public rider, which no source
+  states.
+
+  So the three shares differ and are not interchangeable: non-district riders are **5.82% of
+  heads, 10.42% of weighted ridership, and 16.70% of weighted miles**. [verified —
+  [the FY2027 model](../../catalog/dew-fy27-funding-calculator.md), tested in `crates/project`]
+
+  And the fuel arithmetic is not the payment arithmetic. Miles are what burns diesel, so
+  non-district riders account for **9.64% of the fuel** and 13.5% of the payment; the weights are
+  what open the gap. [inference]
+
   ### The two rates disagree about which way costs went
 
   Across the one interval the corpus can observe, **the per-rider rate rose 4.88% and the
