@@ -31,11 +31,22 @@ a fifth below what they are paying. That is the lag working exactly as the secti
 - **It is a legacy BIFF8 workbook, not an XLSX.** Saved by Excel in 2004 and still served in that
   format. [`spreadsheet::ole2`](../../crates/spreadsheet/src/ole2.rs) reads it natively; nothing
   here needs LibreOffice.
-- **Retail, not what a district pays.** The price includes federal and state excise tax, and
-  school districts buy in bulk and are exempt from some of it. The *level* is therefore wrong
-  for a district budget. Percentage *changes* are close but not equal, because a per-gallon tax
-  wedge that does not move compresses the proportional swing. Any elasticity taken from this
-  should say so. [open — no Ohio school-bus bulk diesel price has been located]
+- **Retail, not what a district pays — and the difference runs the other way from the obvious
+  guess.** Ohio levies **47 cents a gallon** on diesel under
+  [R.C. 5735.05](../corpus/parameter/transportation-cost-rates.yml)(E)(2), *"forty-seven cents on
+  each gallon of motor fuel other than gasoline"*, and school districts **claim it back** through
+  the department's Motor Fuel Tax Refund programme. So the retail level is wrong for a district
+  budget, which is expected.
+
+  What is not expected is the direction. Subtracting a fixed per-gallon wedge from both ends of a
+  rise **widens** the proportional change rather than narrowing it. FY2025 to FY2026 is +17.5% at
+  retail and **+20.2%** net of the Ohio tax. **The retail series understates what districts
+  experience**, and an elasticity fitted to it without the adjustment is biased low.
+
+  (An earlier revision of this entry said the wedge "compresses the proportional swing". That was
+  wrong, and wrong in the direction that flatters the series. The arithmetic is unconditional:
+  for `p1 > p0 > w`, `(p1−w)/(p0−w) > p1/p0`.) [verified for the rate and the arithmetic; open as
+  to the federal excise, which districts may also be exempt from and which is not sourced here]
 - **PADD 2 is not Ohio.** The Administration publishes no Ohio retail diesel series; the Midwest
   region is the smallest published geography containing it.
 - **The first row carries no value.** March 1994 is written with an empty price because the

@@ -54,10 +54,15 @@ decision: |
   an annual one cannot be taken apart.
 
   **The retail-price caveat travels with every figure.** This is a retail price including excise
-  tax. Districts buy in bulk and are exempt from part of it, so the level is wrong for a district
-  budget and percentage changes are close but not equal — an unmoving per-gallon tax wedge
-  compresses the proportional swing. No Ohio school-bus bulk diesel price has been located, and
-  the catalog entry carries that as `[open]` rather than substituting a national benchmark.
+  tax, and Ohio's is 47 cents a gallon on diesel under R.C. 5735.05(E)(2), refundable to school
+  districts. The level is therefore wrong for a district budget.
+
+  The direction of the error is the part worth stating, because this decision originally stated
+  it backwards. Subtracting a fixed per-gallon wedge from both ends of a rise **widens** the
+  proportional change: FY2025 to FY2026 is +17.5% at retail and +20.2% net of the tax. The retail
+  series **understates** what districts experience, so an elasticity fitted to it without the
+  adjustment is biased low rather than high. No Ohio school-bus bulk price has been located; the
+  catalog entry keeps that open rather than substituting a national benchmark.
 
   **PADD 2 is not Ohio, and the entry says so.** The Administration publishes no Ohio retail
   diesel series. The Midwest region is the smallest published geography containing the state.

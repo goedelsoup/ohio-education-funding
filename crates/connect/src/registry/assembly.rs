@@ -358,6 +358,19 @@ pub const OHIO_LAWS_SECTIONS: &[Source] = &[
                foundation aid rather than added to it.",
     },
     Source {
+        key: "rc-5735-05",
+        title: None,
+        url: "https://codes.ohio.gov/ohio-revised-code/section-5735.05",
+        filename: "rc-5735-05.html",
+        format: Format::Html,
+        catalog: Some("ohio-revised-code"),
+        fixtures: &[crate::fixtures::STATUTE_FIXTURE],
+        note: "R.C. 5735.05. The motor fuel excise tax: 47 cents a gallon on everything that \
+               is not gasoline, so on diesel. School districts claim it back, which is why \
+               a retail diesel price is not what a district pays and why the difference \
+               widens rather than narrows a proportional change.",
+    },
+    Source {
         key: "rc-5753-02",
         title: None,
         url: "https://codes.ohio.gov/ohio-revised-code/section-5753.02",

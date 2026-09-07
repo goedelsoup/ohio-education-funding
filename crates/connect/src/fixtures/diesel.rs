@@ -114,6 +114,69 @@ pub fn build_diesel_series(rows: &[Vec<String>]) -> Result<Vec<Vec<String>>, Str
 mod tests {
     use super::*;
 
+    /// The committed series, for the one claim about it that was published wrong.
+    const COMMITTED: &str = include_str!("../../fixtures/midwest-diesel-monthly.csv");
+
+    /// Ohio's motor fuel tax on diesel, R.C. 5735.05(E)(2): "forty-seven cents on each gallon of
+    /// motor fuel other than gasoline". School districts claim it back.
+    const OHIO_DIESEL_TAX: f64 = 0.47;
+
+    /// A fiscal-year mean, July to June, from the committed monthly series.
+    fn fiscal_year_mean(fy: u16) -> f64 {
+        let mut sum = 0.0;
+        let mut n = 0.0;
+        for line in COMMITTED.lines().skip(1) {
+            let mut f = line.split(',');
+            let (Some(y), Some(m), Some(v)) = (f.next(), f.next(), f.next()) else {
+                continue;
+            };
+            let (Ok(y), Ok(m), Ok(v)) = (y.parse::<u16>(), m.parse::<u32>(), v.parse::<f64>())
+            else {
+                continue;
+            };
+            let in_year = (y == fy - 1 && m >= 7) || (y == fy && m <= 6);
+            if in_year {
+                sum += v;
+                n += 1.0;
+            }
+        }
+        sum / n
+    }
+
+    /// The tax wedge **widens** a proportional rise. This entry once said it narrowed one.
+    ///
+    /// The claim matters because it decides which way an elasticity fitted to retail prices is
+    /// biased. Subtracting a fixed per-gallon amount from both ends of a rise always increases
+    /// the ratio — for `p1 > p0 > w`, `(p1 − w)/(p0 − w) > p1/p0` — so the retail series
+    /// *understates* what a district's fuel bill did, and a coefficient taken from it without
+    /// the adjustment is too small rather than too large.
+    #[test]
+    fn the_refundable_tax_widens_the_rise_rather_than_narrowing_it() {
+        let (fy25, fy26) = (fiscal_year_mean(2025), fiscal_year_mean(2026));
+        assert!(
+            (3.55..=3.57).contains(&fy25) && (4.17..=4.19).contains(&fy26),
+            "FY2025 and FY2026 should average about $3.558 and $4.181; {fy25:.3} and {fy26:.3}"
+        );
+
+        let retail = fy26 / fy25 - 1.0;
+        let net = (fy26 - OHIO_DIESEL_TAX) / (fy25 - OHIO_DIESEL_TAX) - 1.0;
+
+        assert!(
+            (0.174..=0.176).contains(&retail),
+            "retail rises about 17.5%; {:.3}",
+            retail
+        );
+        assert!(
+            (0.201..=0.203).contains(&net),
+            "net of the refundable tax it rises about 20.2%; {:.3}",
+            net
+        );
+        assert!(
+            net > retail,
+            "the wedge must widen the rise, not narrow it: net {net:.4} against retail              {retail:.4}"
+        );
+    }
+
     #[test]
     fn the_epoch_lands_on_the_dates_the_workbook_means() {
         // The first two rows of the published sheet, and one modern anchor.
