@@ -1,0 +1,71 @@
+id: an-archived-source-is-still-a-source
+summary: >-
+  The first connector source pointing at web.archive.org, admitted because the department
+  overwrites its own model and the alternative is not a live URL but no record at all — and
+  admitted with a check, because this repository has already been burned by a Wayback 200.
+context: |
+  Every source registered so far has a live publisher URL. This one does not, and cannot.
+
+  The department publishes one State Foundation Funding Calculator and **replaces it in place**.
+  There is no archive directory, no versioned filename series, no "prior years" page. When the
+  FY2027 model went up, the FY2026 model stopped existing at any address the department serves.
+  That is not an outage to wait out; it is the publisher's release model.
+
+  What is lost with it is not decoration. The two transportation rates — the per-rider and
+  per-mile amounts of R.C. 3317.0212(C) and (D) — are **trimmed means of what districts reported
+  spending**, so they are the formula's only endogenous parameter and the only one that moves
+  without an act. `parameter/transportation-cost-rates` has carried "the rates before FY2027" as
+  an open field since it was written. One prior year is recoverable. It is recoverable only from
+  the Internet Archive.
+
+  **And this repository has a recorded lesson about exactly that.**
+  `the-capital-channel-has-no-second-publisher` states it: *a Wayback 200 on a portal proves the
+  crawler stored a shell, not that it captured anything.* That lesson is not theoretical here.
+  Every archived copy of the **FY2025** calculator — two capture dates, two filenames, four
+  URLs — is exactly **1,048,576 bytes**, truncated at one mebibyte mid-stream, and fails a zip
+  integrity check. The archive holds a file that is the right name, the right content type and
+  the wrong length, and answers 200 for all of it.
+
+  So the question is not whether to trust the Internet Archive. It is whether a retrieved file
+  can be shown to be the publisher's, by something better than the status code that has already
+  lied once.
+decision: |
+  Approved, narrowly and with a check.
+
+  One source, `fy26-calculator`, under the existing `dew-foundation` connector, its `url` a
+  `web.archive.org/web/<timestamp>id_/` capture of the department's own FY2026 workbook. It is
+  not a new connector: same publisher, same office, same page, same release calendar, same
+  epistemic status. Only the address is the archive's, and that is a fact about where a copy
+  survives rather than about what the document is.
+
+  **The rule this establishes.** An archived URL is admissible when three things hold, and all
+  three are recorded on the source rather than left to judgement:
+
+    1. The publisher no longer serves the file at any address, and the reason is the publisher's
+       release model rather than a transient failure.
+    2. The retrieved bytes are pinned by SHA-256 like every other source, so the archive cannot
+       quietly serve something else later.
+    3. **The file proves it is the publisher's by reproducing the publisher's own arithmetic.**
+
+  The third is the one that answers the FY2025 trap, and it is the reason this is approved
+  rather than declined. A digest pins what was retrieved; it says nothing about whether what was
+  retrieved is the real document. So the builder recomputes a published figure from the
+  workbook's own inputs and fails if it disagrees: each district's `[A1] Per Rider Based` must
+  equal its weighted ridership times the rate read from the sheet header. A truncated file has
+  no district rows to check and fails; a wrong file fails on the first row; the 1 MiB FY2025
+  capture fails before that, at the zip.
+
+  That is a stronger claim than any live source in this registry currently makes about itself,
+  which is the appropriate asymmetry: an archived source should have to prove more.
+
+  **What is not approved.** Not a general licence to prefer the archive. A live publisher URL is
+  used wherever one exists, and `verify` continues to check the live sources against their
+  digests. Not the FY2025 calculator, which is unrecoverable and stays that way in the record —
+  the catalog entry names its length so a later reader does not spend the afternoon this one
+  cost. And not backfilling FY2022 to FY2024, which the archive does not hold at all.
+
+  A note on what this does and does not close. It gives the rate series a **second** year, not a
+  series. Two observations cannot separate a fuel response from anything else, and the two rates
+  move in opposite directions across them — the per-rider up 4.88% and the per-mile down 2.73%
+  against a 17.5% rise in diesel between the cost years they are drawn from. What the second
+  year buys is the ability to say that, which the corpus could not say at all with one.

@@ -28,6 +28,31 @@ description: |
   by the department" and states no factor, so the 0.35 for mass transit and 0.50 for other types
   are the department's rules rather than the statute's. [verified]
 findings: |
+  ### The two rates disagree about which way costs went
+
+  Across the one interval the corpus can observe, **the per-rider rate rose 4.88% and the
+  per-mile rate fell 2.73%** — $1,275.000 to $1,337.175, and $7.060 to $6.867. They are computed
+  from the same districts' returns for the same year under the same trimming rule.
+
+  Between the two cost years they are drawn from, Midwest diesel rose **17.5%**. The rider rate
+  rose about a quarter as fast and the mile rate moved against it, which is evidence that the
+  mile base does not track fuel in any direct way — and the mile base is what 350 districts and
+  $308.8m of school bus payment are actually paid on. A per-mile rate is a ratio whose
+  denominator moves too, so districts driving further push the statewide figure down while their
+  own costs rise; that is the obvious mechanism and two observations cannot establish it.
+  [verified for the rates — [the FY2026 model](../../catalog/dew-fy26-funding-calculator.md) and
+  the FY2027 one, tested in `crates/project`; inference for the mechanism]
+
+  ### The appropriation began binding, and the year is known
+
+  Special education transportation prorated at **1.0 in FY2026 and 0.917459740976215 in
+  FY2027**. It is the first year the line was cut to fit. The department's own FY2026
+  explanation had added the same constraint to the density supplement a year earlier — "prorated
+  to remain within amounts provided in the biennial budget" — so the pressure reached two
+  transportation lines in two consecutive years. [verified —
+  [the two models](../../catalog/dew-fy26-funding-calculator.md) and
+  [the explanations](../../catalog/dew-sfpr-line-by-line.md)]
+
   ### The state share floor moved twice, and it is a floor on a floor
 
   The school bus payment is multiplied by the greater of the district's own state share
@@ -160,15 +185,14 @@ unfilled:
     why: >-
       Holds 38 districts and is absent from the section. H.B. 96's temporary law, which
       `codes.ohio.gov` does not carry, is where the enrolled act would have it.
-  - field: the rates before FY2027
+  - field: the rates before FY2026
     why: >-
-      Each year's rate is a trimmed mean of the prior year's reported costs, and none but
-      FY2027's is committed. The department replaces the calculator rather than archiving it, so
-      the live page carries FY2027 alone. FY2026's rates are readable from an archived copy of
-      the FY2026 model and are not yet retrieved here; FY2022 to FY2025 are not recoverable by
-      that route at all, the only archived FY2025 file being truncated at exactly one mebibyte.
-      The line-by-line explanations now committed give the method for every one of those years
-      and the rates for none of them.
+      FY2026's are now committed, from an archived copy of that year's model — $1,275.000 per
+      rider and $7.060 per mile. Earlier years are not recoverable. The department replaces the
+      calculator rather than archiving it; the Internet Archive holds FY2025 only as a file
+      truncated at exactly one mebibyte, and FY2022 to FY2024 not at all. The line-by-line
+      explanations give the method for every one of those years and the rates for none of them,
+      so what is missing is four values that no surviving document states.
 figures:
   - key: project/panel-districts-under-the-transportation-floor
     value: 438

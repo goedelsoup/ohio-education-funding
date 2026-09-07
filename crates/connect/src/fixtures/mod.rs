@@ -55,6 +55,7 @@ pub mod session_laws;
 pub mod statute;
 pub mod text;
 pub mod transfers;
+mod transport_rates;
 pub mod write;
 
 pub use appropriations::{
@@ -95,7 +96,7 @@ pub use paths::{
     GRADE_BANDS_FIXTURE, GREENBOOK_FIXTURE, IDENTIFIED_FIXTURE, LSC_GREENBOOK_FIXTURE,
     MR81_FIXTURE, NOT_REGENERATED, OPINIONS_FIXTURE, PROFILE_FIXTURE, REBUILT, REDBOOK_FIXTURE,
     REPORT_CARD_FIXTURE, SCHOLARSHIP_FIXTURE, SD1_FIXTURE, SESSION_LAW_FIXTURE, SFPR_FIXTURE,
-    STATUTE_FIXTURE, TRANSFER_FIXTURE,
+    STATUTE_FIXTURE, TRANSFER_FIXTURE, TRANSPORT_RATES_FIXTURE,
 };
 pub use report_card::{
     build_function_extract, build_report_card_extract, FUNCTIONS_HEADER, REPORT_CARD_HEADER,
@@ -105,4 +106,7 @@ pub use sd1::{build_sd1_extract, Sd1Year, SD1_HEADER};
 pub use session_laws::{build_session_laws, ActText, SESSION_LAW_HEADER};
 pub use statute::{build_records, parse_statute, Record, RECORD_MARKER};
 pub use transfers::{build_transfers, AuditReport, TRANSFER_HEADER};
+pub use transport_rates::{
+    build_transportation_rates, CalculatorYear, TRANSPORT_RATES_HEADER, TRANSPORT_SHEET,
+};
 pub use write::{write_csv, write_text};
