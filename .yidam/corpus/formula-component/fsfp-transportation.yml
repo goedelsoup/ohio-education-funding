@@ -63,6 +63,56 @@ figures:
     as_written: "`[F]` holds **38 districts** at their FY2021 transportation funding"
 
 findings: |
+  ### The private and charter channel is wider than the weights, and one part of it is not
+  in the formula at all
+
+  The 1.5 and 2.0 weights on riders and miles carry **$82.2m of the $608.9m school bus payment**
+  — [the mile split](../parameter/transportation-cost-rates.yml) prices that. They are not the
+  whole channel. Two other devices reach the same pupils, both funded from the same GRF line
+  item 200502 as earmarks rather than as formula output:
+
+  - **Payment in lieu of transportation**, R.C. 3327.02. Where a district declares a pupil
+    impractical to transport, it pays the parent instead. Division (G) has non-public and
+    community schools receiving these payments directly and either passing them to the parent or
+    buying transportation with them. Historically a **$5,000,000** earmark, halved to
+    $2,500,000 in one biennium. [verified — the section and the greenbooks]
+  - **Nontraditional school transportation**, a **$650,000** earmark reimbursing districts for
+    carrying community and chartered non-public pupils **on days the district itself is closed**.
+    It exists because the calendars differ, which no weight can express. [verified — the
+    greenbooks]
+
+  **And R.C. 3327.02(D) pegs its ceiling to the same lagged statistic the rates are.** The
+  payment is "not less than fifty per cent, and not more than the amount determined by the
+  department as the average cost of pupil transportation **for the previous school year**". So
+  the endogenous, one-year-lagged response to what districts spend — the thing that makes the
+  transportation rates move without an act — governs this payment too. A fuel year reaches the
+  parent's cheque by the same route and on the same delay. [verified — the section; inference
+  that the two averages are the same statistic]
+
+  The predecessor formula did it with a third device again: a **nontraditional rider
+  adjustment** of `(nontraditional riders / total riders) × 0.1 × base payment`, a proportional
+  uplift rather than a per-rider weight. Ohio has compensated this cost under every formula and
+  has never used the same instrument twice. [verified — the greenbooks]
+
+  ### The appropriation does not cover the entitlement, and this is the arithmetic
+
+  Special education transportation is prorated at 0.917459740976215 because the money ran out.
+  What that costs is computable:
+
+      $182,630,489    paid
+      $199,061,039    computed entitlement
+      $16,430,550     cut to fit
+
+  Set that against the line item. GRF 200502 is enacted at **$959,429,701** for FY2027, up 8.8%
+  on FY2026's $882,035,414 — and traditional districts alone claim **$925,120,619** of it once
+  the special education entitlement is counted before proration rather than after. That leaves
+  **$34.3m** for everything else the line funds: community school and JVSD transportation, bus
+  driver training, the nontraditional earmark and payments in lieu.
+
+  An 8.8% increase is not generous against that. It is why the proration exists, and it is why
+  the two earmarks that reach private and charter pupils are the smallest and most exposed part
+  of the channel. [verified for the figures; inference for what the headroom must cover]
+
   **440 of the department's 611 districts sit on it** — 72%, against 23% on the formula's floor.
   For most of Ohio, local capacity does not determine transportation aid at all. This is the
   single largest difference between how Ohio equalises instruction and how it equalises getting

@@ -61,7 +61,7 @@ Fields per connector: key, status, source count, corpus classes fed; then every 
 | `dew-scholarship-reports` | **wired**, in part | 1 | program |
 | `lsc-catalog` | **wired**, in part | 18 | fiscal-period, program, legislation, parameter |
 | [`lsc-budget`](sources/lsc-budget.md) | **wired**, in part | 31 | legislation, fiscal-period, program, parameter |
-| [`ohio-laws`](sources/ohio-laws.md) | **wired** | 34 | legislation, parameter, formula-component |
+| [`ohio-laws`](sources/ohio-laws.md) | **wired** | 35 | legislation, parameter, formula-component |
 | `ohio-session-laws` | **wired**, in part | 4 | legislation, fiscal-period |
 | `ohio-bills` | retrievable | 1 | draft-legislation |
 | `ohio-auditor` | **wired**, in part | 5 | education-agency, legislation |
@@ -73,7 +73,7 @@ Fields per connector: key, status, source count, corpus classes fed; then every 
 | `dew-child-nutrition` | **wired**, in part | 34 | education-agency, metric, formula-component |
 | `dew-school-improvement` | **wired**, in part | 3 | school, education-agency, accountability-regime |
 
-22 connectors, 226 sources between them. 18 are wired and 4 are not; 10 of the wired ones reach only part of what they feed, and say so below.
+22 connectors, 227 sources between them. 18 are wired and 4 are not; 10 of the wired ones reach only part of what they feed, and say so below.
 
 **What is blocked, in the registry's own words.**
 

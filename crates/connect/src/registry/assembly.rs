@@ -358,6 +358,19 @@ pub const OHIO_LAWS_SECTIONS: &[Source] = &[
                foundation aid rather than added to it.",
     },
     Source {
+        key: "rc-3327-02",
+        title: None,
+        url: "https://codes.ohio.gov/ohio-revised-code/section-3327.02",
+        filename: "rc-3327-02.html",
+        format: Format::Html,
+        catalog: Some("ohio-revised-code"),
+        fixtures: &[crate::fixtures::STATUTE_FIXTURE],
+        note: "R.C. 3327.02. Payment in lieu of transportation, for a pupil a district \
+               declares impractical to transport. Division (D) caps it at the department's \
+               average cost of pupil transportation for the previous school year — the same \
+               lagged statistic the two rates are, so a fuel year reaches this too.",
+    },
+    Source {
         key: "rc-5735-05",
         title: None,
         url: "https://codes.ohio.gov/ohio-revised-code/section-5735.05",
