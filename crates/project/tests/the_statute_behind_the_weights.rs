@@ -82,6 +82,11 @@ const CITED: &[&str] = &[
     // governing board, with the State Board of Education reachable only on appeal.
     "3311.06",
     "3311.22",
+    // Payment in lieu of transportation. Cited by `fsfp-transportation` for a channel that
+    // reaches non-district pupils outside the weights entirely, and for division (D)'s ceiling:
+    // the department's average cost of pupil transportation for the previous school year, which
+    // is the same lagged endogenous statistic R.C. 3317.0212(C) and (D) make the two rates.
+    "3327.02",
 ];
 
 /// The extract is what it claims to be: every cited section, each with a date and an act.
