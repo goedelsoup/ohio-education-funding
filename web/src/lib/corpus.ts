@@ -164,9 +164,10 @@ export interface Node {
   /**
    * Every place this node writes a link, concatenated — for scanning, never for display.
    *
-   * The description, the `links:` block when a node wrote it as a paragraph, `findings:`, and
-   * each property value. Consumers that want to know what a node references read this; consumers
-   * that want to show a reader something read {@link description}.
+   * The description, the `links:` block when a node wrote it as a paragraph, `findings:`, every
+   * {@link revisions} entry, and each property value. Consumers that want to know what a node
+   * references read this; consumers that want to show a reader something read
+   * {@link description}.
    */
   linkText: string;
   properties: Property[];
@@ -527,12 +528,13 @@ function readNode(className: string, file: string, report: Diagnostic[]): Node {
   ).map(([key, value]) => ({ name: key, value: String(value).trim() }));
 
   /*
-   * Every place this corpus writes a link, which is four places and not one.
+   * Every place this corpus writes a link, which is five places and not one.
    *
    * `links:` is the structured one. The rest are prose: the description, the `findings` block two
-   * nodes carry, individual property values, and — for the one node that writes its whole link
-   * list as a paragraph — that paragraph. Each of those was found the hard way, by a source page
-   * or a backlink list coming up empty for a node that plainly referenced something.
+   * nodes carry, the revision entries, individual property values, and — for the one node that
+   * writes its whole link list as a paragraph — that paragraph. Each of those was found the hard
+   * way, by a source page or a backlink list coming up empty for a node that plainly referenced
+   * something.
    */
   const declared = new Set(stated.map((edge) => edge.id ?? edge.href));
   const linkText = [
