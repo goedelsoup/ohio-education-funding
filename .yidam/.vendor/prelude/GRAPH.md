@@ -146,6 +146,127 @@ still `edge-target-class`'s question, and that check does not read the policy at
 declares them, so the licensing checks read only links landing on another corpus instance.
 A link that resolves to nothing is `dangling-edge`'s finding and is not reported twice.
 
+### Which keys hold prose
+
+`description` was the only key anything read as prose, and corpora write more than one.
+Closing the node schema over the top level rejected **117 nodes of 117** in one derived
+repository — `summary`, `findings`, `revisions`, `unfilled` — and a projecting consumer 199
+of 199. None of those keys reached the parsed node, so the checks that read a *field* saw a
+fraction of what the node says while the ones that scan the *file* saw all of it. On one
+corpus the two answer **118 lines against 21**.
+
+So a class says which of its top-level keys carry prose, and the corpus may say it once for
+every class:
+
+```yaml
+# <class>.ont.yml — a key this class's instances carry
+prose: [findings]
+```
+
+```yaml
+# universal.yml — apparatus every class may carry
+prose: [summary, findings]
+```
+
+The effective set is `{description} ∪ universal ∪ class`, and two things about it are
+deliberate.
+
+**Union rather than override.** Universal *properties* let a class win, and must, because two
+declarations of one property's `type` contradict each other. Two declarations that a key holds
+prose agree, so there is nothing for the more specific one to win.
+
+### Prose in a property
+
+A fifth of what corpora write is not at the top level at all. Measured over sixteen corpora and
+2,763 nodes: **1,895 of them — 68.6% — hold a block scalar nested inside another key**, and 83%
+of that sits under `properties:`. A `method`, a `verbatim`, a `location_description` is the
+node saying something, and nothing that read prose could see it.
+
+So a property declaration says whether its value is prose:
+
+```yaml
+# <class>.ont.yml
+properties:
+  - name: method
+    type: string
+    prose: true
+    description: How the figure was computed.
+```
+
+**Absent means false**, for the reason `required:` absent means false: a corpus written before
+the field existed never had the chance to say. Flagging one is what a corpus does when the
+substance is there, and it is per class — there is no universal property, because a property
+belongs to the class that declared it.
+
+**It is a flag beside `type:`, not a type.** Prose-ness is orthogonal to what a value *is*:
+`method` and `identifier` are both strings. A `type: prose` would also change the compiled
+class schema, which three SDKs are held to.
+
+**What changes when you flag one.** `node-too-long` counts those lines — on one public corpus,
+flagging 14 property declarations took it from 58 findings to 94, which is the length the nodes
+always were. `missing-description` stops reporting a node whose whole substance is a
+transcription in a property. And `yidam embed` composes it, so **re-run `yidam index-build`**:
+on that same corpus the flag adds 10.4% more prose and changes the text of 380 nodes of 694.
+
+**`description` is always in the set**, including for a class that declares `prose:` and omits
+it. Silence is not a contract, here as everywhere: naming `findings` says findings is prose,
+and never said *and description is not*. Reading it as the second would let one added line
+silently stop measuring the field every corpus writes.
+
+Absent both declarations the set is `[description]`, which is every corpus written before this
+existed — nothing changes for them.
+
+| Reads the declared set | What changes |
+|---|---|
+| `node-too-long` | counts every declared prose field; the finding says `lines of prose`, not of `description` |
+| `missing-description` | reports a node with prose in **no** declared field. A node carrying a `summary` and no `description` has said something |
+| `yidam embed` | embeds all the prose. A node whose substance is in `summary` was retrievable by its title and by nothing it says |
+
+The claim counter is unchanged, and that is the point: `count_in_node` and `is_open_question`
+always read the whole file, so they always saw every prose field. What this closes is the gap
+between them and the field readers, which is where the two numbers came from.
+
+`description` is **not** in the node schema's `required` list, because the check no longer asks
+for that key by name. A schema demanding it would reject, in the editor, a node the build
+accepts.
+
+### A question this tool carried
+
+`yidam propose` opens a question by recording the finding on the node it is about. It used to
+do that by splicing a paragraph into the `description:` block and identifying it later by
+searching the prose for the sentence it had written. It records instead:
+
+```yaml
+yidam:
+  findings:
+    - id: 7f3a1c94b2e1
+      check: orphan-in
+      opened_at: 4f2a1c9
+      detail: 'nothing links to this node — uncited since 2026-03-04, 3 commit(s)'
+      standing: open
+```
+
+The `id` is a digest of the check and the finding's own words, so the same finding computes
+the same id at any commit. Four things follow, and each was a defect of the prose form:
+
+| | Prose paragraph | Record |
+|---|---|---|
+| an author rewords the question | unclosable — `close:` matched the sentence | closed by `id` |
+| the corpus counts its open questions | the paragraph ended in `[open]` and was counted as one | counted as nothing the corpus claims |
+| *which questions are open here, from which check, since when* | scan the prose | read the records |
+| a node whose `description:` is a plain scalar | refused — a paragraph would reformat a line somebody wrote | recorded; the prose is not touched |
+
+**Under `yidam:` and not at the top level**, because the obvious key is taken: one derived
+corpus writes a top-level `findings:` holding its own research prose. The tool claims one key,
+named after itself, and the corpus keeps the rest of the top level.
+
+**A carried question is not a claim the corpus makes.** That is the point of the separation:
+`open-questions` and the claim counts report what the corpus asserts, and a question this tool
+carried is not that. It is still reported — by `yidam lint`, which is where it came from — and
+the record is what lets it be closed when the check stops reporting it.
+
+Paragraphs written by an earlier release are still read and still closed. Nothing strands.
+
 ### Properties every class may carry
 
 `.yidam/corpus/universal.yml` is the corpus speaking about itself rather than about one of
