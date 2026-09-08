@@ -69,7 +69,7 @@
 mod common;
 
 use dispersion::ohio_panel::{self, PanelRow};
-use edfund_core::csv;
+use project::panel;
 use std::collections::BTreeMap;
 
 /// Every fiscal year the panel carries, oldest first. FY2014 is absent from the archive.
@@ -315,67 +315,74 @@ fn the_blend_does_not_justify_moving_the_damping_a_second_time() {
 /// The projection runs on enrolled ADM and the long rate is `V33` fall membership. The join is
 /// sound — the two count nearly the same children — and the growth rates still disagree, which is
 /// the whole problem and also the best evidence that a two-year rate is mostly noise.
+///
+/// Both sides are read through the readers that already exist: `project::panel` for the
+/// department's model and `dispersion::ohio_panel` for the survey. An earlier draft of this test
+/// parsed the model's CSV itself, which would have been a third reader of a fixture two crates
+/// already read, and passed the file's own header line to `csv::rows` as the expected one — an
+/// assertion that cannot fail.
 #[test]
 fn the_two_enrollment_counts_agree_on_levels_and_not_on_rates() {
-    const MODEL: &str = include_str!("../../foundation/fixtures/fy27-department-model.csv");
-
-    let mut by_irn: BTreeMap<String, History> = BTreeMap::new();
-    let mut irn_of: BTreeMap<String, String> = BTreeMap::new();
-    for row in ohio_panel::panel()
-        .into_iter()
-        .filter(|r: &PanelRow| r.comparable)
-    {
+    // Two passes, though one would work today. `PanelRow::irn` is documented as carrying Ohio's
+    // identifier "where the FY2022-23 directory still carries the agency", which reads as though
+    // only those years hold one; in fact the directory's IRN is backfilled onto every year of a
+    // surviving agency, so the earliest row already names it. Resolving the map first does not
+    // depend on that, and the assertion below is what would notice if it stopped being true.
+    let survey = ohio_panel::panel();
+    let mut irn_of: BTreeMap<&str, &str> = BTreeMap::new();
+    for row in survey.iter().filter(|r: &&PanelRow| r.comparable) {
         if !row.irn.is_empty() {
-            irn_of.insert(row.leaid.clone(), row.irn.clone());
+            irn_of.insert(row.leaid.as_str(), row.irn.as_str());
         }
-        if let Some(irn) = irn_of.get(&row.leaid) {
+    }
+    let mut by_irn: BTreeMap<&str, History> = BTreeMap::new();
+    for row in survey.iter().filter(|r: &&PanelRow| r.comparable) {
+        if let Some(irn) = irn_of.get(row.leaid.as_str()) {
             if row.enrollment > 0.0 {
                 by_irn
-                    .entry(irn.clone())
+                    .entry(irn)
                     .or_default()
                     .insert(row.fiscal_year, row.enrollment);
             }
         }
     }
-
-    let header = MODEL.lines().next().expect("the model has a header");
-    let columns: Vec<&str> = header.split(',').collect();
-    let at = |name: &str| {
-        columns
-            .iter()
-            .position(|c| *c == name)
-            .unwrap_or_else(|| panic!("the model carries `{name}`"))
-    };
-    let (irn_at, fy24_at, fy26_at) = (at("irn"), at("enrolled_adm_fy24"), at("enrolled_adm_fy26"));
+    let reaching_2009 = by_irn.values().filter(|h| h.contains_key(&2009)).count();
+    assert!(
+        reaching_2009 * 100 > by_irn.len() * 99,
+        "the join should reach FY2009 for all but a handful of agencies; it reaches {reaching_2009} \
+         of {}",
+        by_irn.len()
+    );
 
     let mut levels = Vec::new();
     let mut rates = Vec::new();
-    for row in csv::rows(MODEL, header) {
-        let irn = row.str(irn_at).to_string();
-        let (Some(adm24), Some(adm26)) = (row.num(fy24_at), row.num(fy26_at)) else {
+    for record in panel::panel() {
+        let adm = record.adm_observations();
+        let (Some(first), Some(last)) = (adm.first(), adm.last()) else {
             continue;
         };
-        let Some(history) = by_irn.get(&irn) else {
+        let Some(history) = by_irn.get(record.irn.as_str()) else {
             continue;
         };
         let (Some(v24), Some(v22)) = (history.get(&2024), history.get(&2022)) else {
             continue;
         };
-        if adm24 <= 0.0 || adm26 <= 0.0 {
+        if first.value <= 0.0 || last.value <= 0.0 {
             continue;
         }
-        levels.push((adm24, *v24));
+        let span = f64::from(last.fiscal_year.0 - first.fiscal_year.0);
+        levels.push((first.value, *v24));
         rates.push((
-            compound_rate(adm24, adm26, 2.0),
+            compound_rate(first.value, last.value, span),
             compound_rate(*v22, *v24, 2.0),
         ));
     }
 
     assert!(levels.len() > 590, "{} districts joined", levels.len());
+    let on_levels = common::correlation(&levels);
     assert!(
-        common::correlation(&levels) > 0.999,
-        "the two counts should agree on levels; they correlate at {:.4}",
-        common::correlation(&levels)
+        on_levels > 0.999,
+        "the two counts should agree on levels; they correlate at {on_levels:.4}"
     );
     let on_rates = common::correlation(&rates);
     assert!(
