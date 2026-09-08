@@ -1,7 +1,7 @@
 /**
  * The historical panel, and the three ways a series like this misleads.
  *
- * The panel spans FY2009-FY2022 with a hole in it, is measured on a population that is not the
+ * The panel spans FY2009-FY2024 with a hole in it, is measured on a population that is not the
  * one every other page uses, and is denominated in dollars that lost a third of their value
  * across the window. Each of those is a way for a correct chart to state something false, and
  * each has a test here.
@@ -30,7 +30,7 @@ test("the feed carries the panel the page exists to draw", () => {
   // one that already happened: a fixture in the workspace that no reader could reach.
   expect(history.length).toBeGreaterThan(10);
   expect(history[0]!.fiscal_year).toBe(2009);
-  expect(history[history.length - 1]!.fiscal_year).toBe(2022);
+  expect(history[history.length - 1]!.fiscal_year).toBe(2024);
 });
 
 test("years are ordered and unique, because a chart reads them as an axis", () => {
@@ -61,7 +61,7 @@ test("FY2014 is a break in the series rather than a bridge across it", () => {
   expect(missing!.a).toBeNull();
   expect(missing!.b).toBeNull();
   // And every other year is still there, in order.
-  expect(points).toHaveLength(2022 - 2009 + 1);
+  expect(points).toHaveLength(2024 - 2009 + 1);
 });
 
 test("the residual is the part no level of government closes", () => {
@@ -80,15 +80,33 @@ test("the state share fell across the panel, which is the finding the page state
   expect(last.local_share).toBeGreaterThan(last.state_share);
 });
 
-test("the rate held while the gap grew — both halves, or the page says the wrong thing", () => {
-  // The claim on the card. State aid's share of the gap stays in a narrow band while the gap
-  // itself grows, so the unclosed part grows with it. If either half stopped being true the
-  // sentence beside the chart would be false and nothing else would notice.
+test("the gap grew across the whole panel, and the residual grew with it", () => {
+  // The half of the card's claim that has never stopped being true.
   const first = history[0]!;
   const last = history[history.length - 1]!;
-  expect(Math.abs(stateShareOfGap(last) - stateShareOfGap(first))).toBeLessThan(0.06);
   expect(last.gap_per_pupil).toBeGreaterThan(first.gap_per_pupil * 1.5);
   expect(residual(last)).toBeGreaterThan(residual(first));
+});
+
+test("the rate held through FY2022 and does not hold after it", () => {
+  // The other half, which stopped being true when the panel reached FY2023 from the Bureau's own
+  // file. The card's prose is computed rather than written — it reads "held" or "moved" off these
+  // same numbers — so this test is what keeps the two from drifting apart.
+  const held = history.filter((y) => y.fiscal_year >= 2012 && y.fiscal_year <= 2022);
+  for (const year of held) {
+    expect(stateShareOfGap(year)).toBeGreaterThan(0.38);
+    expect(stateShareOfGap(year)).toBeLessThan(0.49);
+  }
+  const after = history.filter((y) => y.fiscal_year >= 2023);
+  expect(after).toHaveLength(2);
+  for (const year of after) {
+    expect(stateShareOfGap(year)).toBeLessThan(0.38);
+  }
+  // And the endpoint comparison the card renders from is now outside the band it used to sit in,
+  // which is what flips the sentence from "held" to "moved".
+  const first = history[0]!;
+  const last = history[history.length - 1]!;
+  expect(Math.abs(stateShareOfGap(last) - stateShareOfGap(first))).toBeGreaterThan(0.06);
 });
 
 test("a real-terms year is deflated on every dollar column or dropped entirely", () => {

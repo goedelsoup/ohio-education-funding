@@ -77,8 +77,8 @@ pub use dates::{decided_on, published_on};
 pub use diesel::{build_diesel_series, year_month_from_serial, DIESEL_HEADER, DIESEL_SHEET};
 pub use enacted::extract_school_funding;
 pub use f33::{
-    build_f33_districts, build_f33_ohio_panel, build_f33_states, PanelYear, F33_DISTRICTS_HEADER,
-    F33_HEADER, F33_OHIO_PANEL_HEADER,
+    build_f33_districts, build_f33_ohio_panel, build_f33_states, PanelSource, PanelYear,
+    F33_DISTRICTS_HEADER, F33_HEADER, F33_OHIO_PANEL_HEADER,
 };
 pub use finance::{build_finance_extract, FINANCE_HEADER};
 pub use format::{clean_name, format_value};

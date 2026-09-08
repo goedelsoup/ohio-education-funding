@@ -1,5 +1,5 @@
 /**
- * The long view: Ohio's school revenue as the Census Bureau measured it, FY2009 to FY2022.
+ * The long view: Ohio's school revenue as the Census Bureau measured it, FY2009 to FY2024.
  *
  * # Why this is a separate page and not a card on the front one
  *
@@ -20,19 +20,26 @@
  * 1. **The state share fell and the local share rose.** State revenue went from roughly 46% of
  *    school revenue to roughly 34% across the panel. That is the H.B. 920 story arriving from
  *    outside Ohio's own accounting.
- * 2. **The rate held and the gap grew.** State aid closes a stable share of the distance between
- *    the poorest and richest quartiles of districts, while that distance itself grew by two
- *    thirds — so the part no level of government closes grew with it. A page showing only the
- *    percentage would report that as stability, which is why the residual is drawn in dollars.
+ * 2. **The rate held while the gap grew — and then it stopped holding.** State aid closed a
+ *    stable share of the distance between the poorest and richest quartiles of districts from
+ *    FY2012 to FY2022, between 40% and 47%, while that distance itself grew by two thirds. In
+ *    FY2023 and FY2024 the share is 37% in both years, below every year since FY2011, while the
+ *    gap is 16% and 21% wider than FY2022's. A page showing only the percentage would have
+ *    reported the first decade as stability, which is why the residual is drawn in dollars — and
+ *    the residual is what moves most: it rises 46% across the two new years.
  *
- * Both endpoints flatter the federal column: FY2009-FY2011 carry the ARRA tail and FY2022 is the
- * ESSER peak, so the federal contribution is roughly double its ordinary size at each end. The
+ * The prose beside the chart is computed from the endpoints rather than written, so it says
+ * "held" or "moved" according to what the panel does. It said "held" until the panel reached
+ * FY2023.
+ *
+ * Both endpoints flatter the federal column: FY2009-FY2011 carry the ARRA tail and FY2022-FY2023
+ * carry ESSER, so the federal contribution is roughly double its ordinary size at each end. The
  * card says so, because a reader taking the federal line at face value would draw the wrong
  * conclusion from exactly the years that are easiest to notice.
  *
  * # Real dollars are not optional here
  *
- * CPI-U rose 37% across this panel. A gap growing from $5,674 to $9,590 per pupil in nominal
+ * CPI-U rose 45% across this panel. A gap growing from $5,674 to $11,586 per pupil in nominal
  * terms is a different claim from the same gap in constant dollars, and only one of them is the
  * finding. The dollar series is therefore shown on both bases, through the same {@link Basis}
  * toggle every other financial view uses, and a year the index cannot cover is dropped rather
@@ -248,9 +255,13 @@ export function renderEqualization(
       <p class="note">State aid's share of the gap ${rateHeld} — ${pct(stateShareOfGap(first), 0)}
         in FY${first.fiscal_year} against ${pct(stateShareOfGap(last), 0)} in
         FY${last.fiscal_year} — while the gap itself grew from ${money(first.gap_per_pupil)} to
-        ${money(last.gap_per_pupil)}. A formula doing the same proportional job against a larger problem
-        leaves districts further apart every year, and the percentage is the thing that looks
-        stable.</p>
+        ${money(last.gap_per_pupil)}. ${
+          rateHeld === "held"
+            ? `A formula doing the same proportional job against a larger problem leaves districts
+        further apart every year, and the percentage is the thing that looks stable.`
+            : `A formula closing a smaller proportion of a larger gap leaves districts further apart
+        for both reasons at once, and the residual below is where the two compound.`
+        }</p>
 
       <div class="scroll"><table>
         <thead><tr><th>Year</th><th class="tnum">Poorest quarter</th>

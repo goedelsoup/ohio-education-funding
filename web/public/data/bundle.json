@@ -8,7 +8,7 @@
     {"series": "enrollment", "kind": "fiscal", "label": "FY2024-FY2026", "source": "DEW calculator, ADM Data sheet; the last year is partly estimate"},
     {"series": "finances", "kind": "fiscal", "label": "FY2020-FY2025", "source": "District five-year forecast filings, R.C. 5705.391"},
     {"series": "formula", "kind": "fiscal", "label": "FY2027", "source": "DEW FY27 TRAD State Foundation Funding Calculator"},
-    {"series": "history", "kind": "fiscal", "label": "FY2009-FY2022", "source": "Census Bureau, Annual Survey of School System Finances"},
+    {"series": "history", "kind": "fiscal", "label": "FY2009-FY2024", "source": "Census Bureau, Annual Survey of School System Finances"},
     {"series": "meal_program", "kind": "fiscal", "label": "FY1998-FY2025", "source": "Office for Child Nutrition, MR-81"},
     {"series": "millage", "kind": "tax", "label": "2024", "source": "Department of Taxation, Table SD-1"},
     {"series": "national", "kind": "fiscal", "label": "FY2022", "source": "Census Bureau, Annual Survey of School System Finances"},
@@ -105,7 +105,9 @@
     {"fiscal_year": 2019, "districts": 613, "local_share": 0.5446, "state_share": 0.3889, "federal_share": 0.0665, "poorest_local_per_pupil": 4479.2609, "richest_local_per_pupil": 12923.0848, "gap_per_pupil": 8443.824, "state_closes_per_pupil": 3742.7524, "federal_closes_per_pupil": 396.0361},
     {"fiscal_year": 2020, "districts": 612, "local_share": 0.5536, "state_share": 0.3804, "federal_share": 0.066, "poorest_local_per_pupil": 4643.0212, "richest_local_per_pupil": 13905.0411, "gap_per_pupil": 9262.02, "state_closes_per_pupil": 4056.1238, "federal_closes_per_pupil": 462.2481},
     {"fiscal_year": 2021, "districts": 612, "local_share": 0.5404, "state_share": 0.3706, "federal_share": 0.089, "poorest_local_per_pupil": 4859.6745, "richest_local_per_pupil": 14243.7168, "gap_per_pupil": 9384.0424, "state_closes_per_pupil": 3853.3327, "federal_closes_per_pupil": 499.7444},
-    {"fiscal_year": 2022, "districts": 611, "local_share": 0.5173, "state_share": 0.3425, "federal_share": 0.1402, "poorest_local_per_pupil": 4341.7376, "richest_local_per_pupil": 13932.2269, "gap_per_pupil": 9590.4893, "state_closes_per_pupil": 4448.1571, "federal_closes_per_pupil": 913.2873}
+    {"fiscal_year": 2022, "districts": 611, "local_share": 0.5173, "state_share": 0.3425, "federal_share": 0.1402, "poorest_local_per_pupil": 4341.7376, "richest_local_per_pupil": 13932.2269, "gap_per_pupil": 9590.4893, "state_closes_per_pupil": 4448.1571, "federal_closes_per_pupil": 913.2873},
+    {"fiscal_year": 2023, "districts": 609, "local_share": 0.5285, "state_share": 0.337, "federal_share": 0.1345, "poorest_local_per_pupil": 4830.3222, "richest_local_per_pupil": 15969.1475, "gap_per_pupil": 11138.8252, "state_closes_per_pupil": 4146.721, "federal_closes_per_pupil": 910.0362},
+    {"fiscal_year": 2024, "districts": 609, "local_share": 0.5359, "state_share": 0.3455, "federal_share": 0.1187, "poorest_local_per_pupil": 5303.6523, "richest_local_per_pupil": 16890.0213, "gap_per_pupil": 11586.369, "state_closes_per_pupil": 4310.9041, "federal_closes_per_pupil": 1090.502}
   ],
   "meal_program": [
     {"fiscal_year": 1998, "sponsors": 718, "enrollment": 1828376, "approved": 529112, "identified": 0, "share": 0.2894, "floor": 0.2894, "ceiling": 0.2894, "without_applications": 0, "comparable": true, "streams": 1, "basis": "adm"},

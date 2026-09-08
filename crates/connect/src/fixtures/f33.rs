@@ -383,8 +383,49 @@ pub const F33_OHIO_PANEL_HEADER: &[&str] = &[
 pub struct PanelYear<'a> {
     /// The fiscal year the file reports, which is not derivable from the file itself.
     pub fiscal_year: u16,
-    /// The survey member's text.
-    pub survey: &'a str,
+    /// Which publisher's rendering of that year this is, and its contents.
+    pub source: PanelSource<'a>,
+}
+
+/// The two publishers of the same survey, which do not publish it the same way.
+///
+/// The F-33 is one collection and two files. NCES keys it on `LEAID` and carries a charter flag,
+/// which is what makes a district join possible; the Bureau keys it on `NCESID`, states dollars
+/// in thousands, and does not carry Ohio's community schools at all. NCES stops at FY2022 and the
+/// Bureau does not, so a panel that wants FY2023 has to read both — and the three places the two
+/// disagree are reconciled in [`build_f33_ohio_panel`] rather than left to show up as a break in
+/// the series.
+#[derive(Debug, Clone, Copy)]
+pub enum PanelSource<'a> {
+    /// NCES's keying of the survey: the tab-delimited member of `sdfNN_1a.zip`, in dollars.
+    Nces(&'a str),
+    /// The Bureau's own individual unit file: the rows of `elsecNN.xlsx`, in thousands.
+    Census(&'a [Vec<String>]),
+}
+
+/// One year's header and its rows, whichever publisher wrote it.
+///
+/// NCES's member is 23 MB of tab-delimited text and its rows are yielded lazily; the Bureau's
+/// workbook has already been read into memory by the time it arrives here. Boxing the two into one
+/// iterator is what lets the rule that follows be written once instead of twice.
+fn panel_rows(
+    source: PanelSource<'_>,
+) -> (Vec<String>, Box<dyn Iterator<Item = Vec<String>> + '_>) {
+    match source {
+        PanelSource::Nces(text) => {
+            let mut lines = text.lines();
+            let head = delimited_fields(lines.next().unwrap_or_default(), '\t');
+            let body = lines
+                .filter(|line| !line.trim().is_empty())
+                .map(|line| delimited_fields(line, '\t'));
+            (head, Box::new(body))
+        }
+        PanelSource::Census(rows) => {
+            let head = rows.first().cloned().unwrap_or_default();
+            let body = rows.iter().skip(1).cloned();
+            (head, Box::new(body))
+        }
+    }
 }
 
 /// Ohio across every year of the survey this repository holds.
@@ -433,11 +474,23 @@ pub fn build_f33_ohio_panel(
 
     for year in years {
         let label = format!("the F-33 district survey for FY{}", year.fiscal_year);
-        let mut rows = year.survey.lines();
-        let head = delimited_fields(rows.next().unwrap_or_default(), '\t');
+        let census = matches!(year.source, PanelSource::Census(_));
+        let (head, body) = panel_rows(year.source);
         let at = |name: &str| column(&head, name, &label);
-        let (leaid, state, charter, level) =
-            (at("LEAID")?, at("STABBR")?, at("AGCHRT")?, at("SCHLEV")?);
+        // The two publishers key the same agency differently and name the state differently.
+        // Everything after this line is resolved by header, so only the keys are era-specific.
+        let (leaid, state) = if census {
+            (at("NCESID")?, at("FIPST")?)
+        } else {
+            (at("LEAID")?, at("STABBR")?)
+        };
+        let level = at("SCHLEV")?;
+        // The charter flag exists only in NCES's file. It is not missing from the Bureau's: the
+        // Bureau surveys governments, Ohio's community schools are not governments, and all 324 of
+        // the agencies NCES flags `AGCHRT == 1` are simply absent. So `SCHLEV == 03` alone selects
+        // there the population `AGCHRT != 1 && SCHLEV == 03` selects here, and the two eras' 609
+        // and 613 differ by six agencies rather than by a rule.
+        let charter = if census { None } else { Some(at("AGCHRT")?) };
         let enrolment = at("V33")?;
         let revenue = [
             at("TOTALREV")?,
@@ -447,22 +500,33 @@ pub fn build_f33_ohio_panel(
         ];
         let (property_tax, spending) = (at("T06")?, at("TCURELSC")?);
         // `V45` is support services — student transportation, the only fuel-exposed line the
-        // survey separates. Present under the same name in all three layout eras.
+        // survey separates. Present under the same name in all four layout eras.
         let transportation = at("V45")?;
+        // The Bureau's `TCURELSC` is not NCES's. It counts the two instruction lines that pay
+        // somebody else to teach — `V91` to private schools, `V92` to charter schools — inside
+        // `E13`, and NCES nets them out. Across FY2022's 710 shared Ohio agencies the identity is
+        // exact and one-directional: the Bureau's total is NCES's plus `V91 + V92`, on every row,
+        // and it moves 79 of them. Subtracting is what keeps thirteen years of this column and the
+        // two new ones measuring the same thing.
+        let payments_out = if census {
+            Some((at("V91")?, at("V92")?))
+        } else {
+            None
+        };
+        // Money is stated in thousands in the Bureau's file and in dollars in NCES's. Enrolment is
+        // a headcount in both, so the scale is applied per column rather than per row.
+        let scale: i64 = if census { 1_000 } else { 1 };
 
         let mut kept = 0usize;
-        for line in rows {
-            if line.trim().is_empty() {
-                continue;
-            }
-            let f = delimited_fields(line, '\t');
+        for f in body {
             let field = |i: usize| f.get(i).map(|v| v.trim()).unwrap_or_default();
-            let number = |i: usize| field(i).parse::<i64>().ok();
+            let raw = |i: usize| field(i).parse::<i64>().ok();
+            let number = |i: usize| raw(i).map(|v| if v < 0 { v } else { v * scale });
 
-            if field(state) != "OH" {
+            if field(state) != if census { "39" } else { "OH" } {
                 continue;
             }
-            if number(enrolment).unwrap_or(-1) <= 0 || number(revenue[0]).unwrap_or(-1) <= 0 {
+            if raw(enrolment).unwrap_or(-1) <= 0 || number(revenue[0]).unwrap_or(-1) <= 0 {
                 continue;
             }
 
@@ -482,27 +546,33 @@ pub fn build_f33_ohio_panel(
                 .cloned()
                 .unwrap_or_default();
             let plain = |i: usize| number(i).map(|v| v.to_string()).unwrap_or_default();
-            let unreported_is_blank = |i: usize| match number(i) {
+            let unreported_is_blank = |v: Option<i64>| match v {
                 Some(v) if v >= 0 => v.to_string(),
                 _ => String::new(),
             };
+            // NCES writes `-1` and `-2` where a value is not reported or not applicable. The
+            // Bureau writes `0`, so a Bureau-era blank is unreachable: the fifty Ohio agencies
+            // carrying a `-2` in FY2022 are all outside `SCHLEV == 03`, which is why this costs
+            // the panel nothing it uses and is recorded anyway.
+            let comparable = charter.is_none_or(|c| field(c) != "1") && field(level) == "03";
+            let net_spending = number(spending).map(|total| match payments_out {
+                Some((private, charter_schools)) => {
+                    total - number(private).unwrap_or(0) - number(charter_schools).unwrap_or(0)
+                }
+                None => total,
+            });
 
             let mut row = vec![
                 year.fiscal_year.to_string(),
                 key,
                 irn,
-                if field(charter) != "1" && field(level) == "03" {
-                    "1"
-                } else {
-                    "0"
-                }
-                .to_string(),
-                plain(enrolment),
+                if comparable { "1" } else { "0" }.to_string(),
+                raw(enrolment).map(|v| v.to_string()).unwrap_or_default(),
             ];
             row.extend(revenue.iter().map(|i| plain(*i)));
-            row.push(unreported_is_blank(property_tax));
-            row.push(unreported_is_blank(spending));
-            row.push(unreported_is_blank(transportation));
+            row.push(unreported_is_blank(number(property_tax)));
+            row.push(unreported_is_blank(net_spending));
+            row.push(unreported_is_blank(number(transportation)));
             out.push(row);
             kept += 1;
         }

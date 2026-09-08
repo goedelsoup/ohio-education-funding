@@ -1,4 +1,4 @@
-//! What Ohio's districts actually spend moving children, across thirteen years of the survey.
+//! What Ohio's districts actually spend moving children, across fifteen years of the survey.
 //!
 //! This column exists because of a feedback loop. The state's two transportation rates —
 //! $1,337.175 per weighted rider and $6.867 per mile — are not chosen by anyone. R.C. 3317.0212(C)
@@ -7,16 +7,19 @@
 //! and it is measurable here and nowhere else across years. Census F-33 `V45` is the only
 //! fuel-exposed line the survey separates.
 //!
-//! Three findings, and the third is the one that constrains what can be asked of this series.
+//! Four findings, and the last two are the ones that constrain what can be asked of this series.
 //!
 //! **Transportation is a remarkably stable share of current spending.** Between 5.02% and 5.39%
-//! in every pre-pandemic year of the panel, on 611 comparable districts. A share that steady
-//! across a decade that includes the FY2010–FY2013 real-spending trough means transportation is
-//! not what districts cut first, and not what they protect first either.
+//! in every year of the panel but the two pandemic ones, on 609 to 613 comparable districts. A
+//! share that steady across a decade that includes the FY2010–FY2013 real-spending trough means
+//! transportation is not what districts cut first, and not what they protect first either. The two
+//! years the Bureau supplies sit inside it — 5.28% and 5.16% — so the change below is not a
+//! reallocation.
 //!
-//! **In real terms it rose about 16% and then gave a third of it back.** $673 per pupil in
-//! FY2009, peaking at $779 in FY2019, in FY2022 dollars. That is the opposite shape from
-//! `f33_ohio_panel_trough`'s finding on total spending, which fell over the same early years.
+//! **In real terms it rose about 16%, gave a third of it back, and then took a new peak.** $673
+//! per pupil in FY2009, $779 at the FY2019 peak, $689 at the FY2021 trough, and **$794 in FY2023**,
+//! all in FY2022 dollars. FY2019 was the maximum of the series until the panel could see past
+//! FY2022; it is not.
 //!
 //! **The FY2021 trough is a service interruption, not a price.** Real per-pupil transportation
 //! fell 11.6% from FY2019 to FY2021 — buses stopped running — and the share of current spending
@@ -25,9 +28,14 @@
 //! collinear with the treatment**: diesel collapsed in calendar 2020 at the same moment Ohio's
 //! buses stopped. A naive regression over this panel will read a pandemic as a fuel elasticity.
 //!
-//! Nothing here estimates a fuel response. The panel is the cost side; the price side is not yet
-//! retrieved, and these tests exist so that the shape of the series is pinned before anything is
-//! fitted to it.
+//! **And the largest real move in the series is now FY2023, not either pandemic year.** +7.8%,
+//! against the FY2022 rebound's +7.0% and the FY2021 collapse's −6.6%. FY2023 is the year of the
+//! diesel excursion and it is not confounded by a school closure, which is the whole reason two
+//! more years of this column were worth acquiring: the identifying variation the earlier panel was
+//! missing is in these two rows.
+//!
+//! Nothing here estimates a fuel response. The panel is the cost side; these tests exist so that
+//! the shape of the series is pinned before anything is fitted to it.
 
 use deflator::CpiSeries;
 use dispersion::ohio_panel::{self, PanelRow};
@@ -80,17 +88,18 @@ fn real_per_pupil(rows: &[PanelRow], year: u16) -> f64 {
 
 /// The column is present in every era of the survey, which is why it can be a series at all.
 ///
-/// The three layouts carry 256, 260 and 354 columns and `V45` is in all of them under that name.
-/// A year that lost the column would read as a shorter series rather than as a failure, so the
-/// count is asserted rather than assumed.
+/// The four layouts carry 256, 260, 354 and 183 columns and `V45` is in all of them under that
+/// name — including the Bureau's own file, which is where FY2023 and FY2024 come from. A year that
+/// lost the column would read as a shorter series rather than as a failure, so the count is
+/// asserted rather than assumed.
 #[test]
 fn every_year_of_the_panel_carries_student_transportation() {
     let rows = comparable();
     let years = years(&rows);
     assert_eq!(
         years.len(),
-        13,
-        "the panel should hold thirteen years, FY2009-FY2022 less the missing FY2014"
+        15,
+        "the panel should hold fifteen years, FY2009-FY2024 less the missing FY2014"
     );
 
     for year in years {
@@ -151,60 +160,87 @@ fn transportation_is_a_stable_share_of_current_spending_except_when_buses_stop()
     );
 }
 
-/// The series rises in real terms, peaks in FY2019, and the pandemic takes back a third of it.
+/// The series rises in real terms, the pandemic takes back a third of it, and FY2023 takes a new
+/// peak.
 ///
 /// Stated as measurements rather than bands where the value is what the corpus would cite, and
 /// as inequalities where the claim is about shape.
+///
+/// **What changed when the panel gained two years:** FY2019's $779.31 was the maximum of the
+/// series and was asserted as such. It is now the pre-pandemic maximum, and the maximum is FY2023
+/// at $794.31 — 1.9% above it. FY2024 holds that level at $788.74 rather than giving it back, so
+/// the new peak is not a single-year spike.
 #[test]
-fn real_transportation_spending_peaks_in_fy2019_and_troughs_in_fy2021() {
+fn real_transportation_spending_takes_a_new_peak_in_fy2023() {
     let rows = comparable();
 
     let first = real_per_pupil(&rows, 2009);
-    let peak = real_per_pupil(&rows, 2019);
+    let pre_pandemic_peak = real_per_pupil(&rows, 2019);
     let trough = real_per_pupil(&rows, 2021);
-    let last = real_per_pupil(&rows, BASE_YEAR);
+    let rebound = real_per_pupil(&rows, BASE_YEAR);
+    let peak = real_per_pupil(&rows, 2023);
 
     assert!(
         (672.0..=674.0).contains(&first),
         "FY2009 real transportation per pupil is ${first:.2}, not the measured $673.12"
     );
     assert!(
-        (778.0..=781.0).contains(&peak),
-        "FY2019 real transportation per pupil is ${peak:.2}, not the measured $779.31"
+        (778.0..=781.0).contains(&pre_pandemic_peak),
+        "FY2019 real transportation per pupil is ${pre_pandemic_peak:.2}, not the measured $779.31"
+    );
+    assert!(
+        (793.0..=796.0).contains(&peak),
+        "FY2023 real transportation per pupil is ${peak:.2}, not the measured $794.31"
     );
 
-    // FY2019 is the maximum of the whole series, not merely greater than its neighbours.
+    // FY2023 is the maximum of the whole series, not merely greater than its neighbours.
     for year in years(&rows) {
         let value = real_per_pupil(&rows, year);
         assert!(
             value <= peak,
-            "FY{year} at ${value:.2} exceeds the FY2019 peak of ${peak:.2}"
+            "FY{year} at ${value:.2} exceeds the FY2023 peak of ${peak:.2}"
         );
     }
+    // And it clears the old peak rather than tying it.
+    assert!(
+        peak > pre_pandemic_peak,
+        "FY2023 (${peak:.2}) should exceed the FY2019 peak (${pre_pandemic_peak:.2})"
+    );
+    // FY2024 holds the new level: the peak is a step, not a spike.
+    let after = real_per_pupil(&rows, 2024);
+    assert!(
+        after > pre_pandemic_peak && (peak - after) / peak < 0.02,
+        "FY2024 (${after:.2}) should hold the FY2023 level (${peak:.2})"
+    );
 
-    let fall = (peak - trough) / peak;
+    let fall = (pre_pandemic_peak - trough) / pre_pandemic_peak;
     assert!(
         (0.110..=0.122).contains(&fall),
         "FY2019 to FY2021 should fall about 11.6% in real terms; it falls {:.1}%",
         fall * 100.0
     );
 
-    // And the rebound is partial: FY2022 is back inside the pre-pandemic range but below peak.
+    // And the FY2022 rebound is partial: back inside the pre-pandemic range but below its peak.
     assert!(
-        trough < last && last < peak,
-        "FY2022 (${last:.2}) should sit above the FY2021 trough (${trough:.2}) and below the \
-         FY2019 peak (${peak:.2})"
+        trough < rebound && rebound < pre_pandemic_peak,
+        "FY2022 (${rebound:.2}) should sit above the FY2021 trough (${trough:.2}) and below the \
+         FY2019 peak (${pre_pandemic_peak:.2})"
     );
 }
 
 /// The pandemic confound, stated as a test so that fitting anything to this series has to
-/// contend with it.
+/// contend with it — and the year that is now larger than either.
 ///
-/// The two pandemic years are the largest year-on-year moves in the panel in both directions.
-/// Any fuel-price elasticity estimated over the full thirteen years without holding them out is
+/// The two pandemic years are still the largest moves *of the thirteen NCES years*, in both
+/// directions, and any fuel-price elasticity estimated over those without holding them out is
 /// fitting the closure of Ohio's schools.
+///
+/// **FY2023 is larger than both.** +7.8% real against the FY2022 rebound's +7.0% and the FY2021
+/// collapse's −6.6%, and it is the first large move in the series that is not a school closure or
+/// the recovery from one. That is why two more years of this column were worth acquiring: the
+/// panel's identifying variation used to be entirely pandemic.
 #[test]
-fn the_largest_moves_in_the_series_are_both_pandemic_years() {
+fn the_largest_move_is_fy2023_and_the_pandemic_years_are_next() {
     let rows = comparable();
     let years = years(&rows);
 
@@ -223,10 +259,28 @@ fn the_largest_moves_in_the_series_are_both_pandemic_years() {
             .expect("no NaN in the series")
     });
 
-    let largest: Vec<u16> = moves.iter().take(2).map(|(year, _)| *year).collect();
+    let largest: Vec<u16> = moves.iter().take(3).map(|(year, _)| *year).collect();
+    assert_eq!(
+        largest[0], 2023,
+        "the largest real move should be FY2023; the ordering is {largest:?}"
+    );
     assert!(
         largest.contains(&2021) && largest.contains(&2022),
-        "the two largest real moves should be the FY2021 collapse and the FY2022 rebound; \
-         they are {largest:?}"
+        "the FY2021 collapse and the FY2022 rebound should follow it; they are {largest:?}"
+    );
+
+    // And within the thirteen years NCES published, the pandemic pair is still the largest two —
+    // which is the confound as it stood, unchanged by the two years added after it.
+    let mut nces_only: Vec<(u16, f64)> =
+        moves.iter().copied().filter(|(y, _)| *y <= 2022).collect();
+    nces_only.sort_by(|a, b| {
+        b.1.abs()
+            .partial_cmp(&a.1.abs())
+            .expect("no NaN in the series")
+    });
+    let pre: Vec<u16> = nces_only.iter().take(2).map(|(year, _)| *year).collect();
+    assert!(
+        pre.contains(&2021) && pre.contains(&2022),
+        "through FY2022 the two largest moves should still be the pandemic pair; they are {pre:?}"
     );
 }
