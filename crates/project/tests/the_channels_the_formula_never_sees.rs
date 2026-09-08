@@ -9,7 +9,10 @@
 //!
 //! At **53,051** it is larger than the joint vocational school districts (49,524), larger than
 //! every voucher programme but EdChoice Expansion, and larger than every Ohio e-school put
-//! together (33,014). It is 3.2% of the department's own statewide enrolment.
+//! together (33,014). It is 3.2% of the department's own statewide *public* enrolment — a ratio
+//! to the public system, not a share of all Ohio children, because home education and the
+//! chartered private schools sit outside that 1,665,521 and only the community schools sit
+//! inside it.
 //!
 //! And it is the only one of the thirteen with no per-district record anywhere. Community schools
 //! report through EMIS and appear in the F-33; vouchers are administered per student and
@@ -55,11 +58,15 @@ const SCHOLARSHIPS: &str = include_str!("../fixtures/scholarship-programs.csv");
 /// The header of that fixture.
 const SCHOLARSHIPS_HEADER: &str = "program,name,students,expenditure,published_average";
 
-/// The statewide enrolment the same sheet prints, and the denominator for every share here.
+/// The statewide enrolment the same sheet prints, read from the fixture's last row.
 ///
-/// Not in the fixture: it belongs to a different table on the sheet, and putting it in a file
-/// whose every other row is a School Options channel would make it look like one.
-const TOTAL_ENROLLMENT: f64 = 1_665_521.0;
+/// It belongs to a different table and is emitted anyway, because a denominator the corpus
+/// quotes is a denominator nothing recomputes. It is deliberately **not** a channel: this is
+/// Ohio's *public* enrolment, so the community schools are inside it and home education, the
+/// chartered private schools and the voucher students at them are not. A share taken against it
+/// is a ratio to the public system, which is the comparison this file makes, and not a share of
+/// all Ohio children — that denominator would be larger and nothing here publishes it.
+const TOTAL_LABEL: &str = "Total Enrollment";
 
 /// One row of the School Options table.
 struct Channel {
@@ -118,7 +125,21 @@ fn the_published_parts_sum_to_the_published_wholes() {
             count(whole)
         );
     }
-    assert_eq!(rows.len(), 13, "thirteen channels, five of them components");
+    assert_eq!(
+        rows.len(),
+        14,
+        "thirteen channels, five of them components, and the public-enrolment denominator"
+    );
+    let total = count(TOTAL_LABEL);
+    assert!(
+        (1_665_000.0..1_666_000.0).contains(&total),
+        "the sheet's own statewide enrolment should be about 1.67m; it is {total}"
+    );
+    // Every channel is smaller than the public enrolment, including the ones outside it.
+    assert!(rows
+        .iter()
+        .filter(|c| c.name != TOTAL_LABEL)
+        .all(|c| c.enrollment < total));
 }
 
 /// Home education is larger than three things the corpus treats as significant channels.
@@ -143,7 +164,7 @@ fn home_education_outnumbers_the_jvsds_the_e_schools_and_four_of_five_voucher_pr
         "only one voucher programme should be larger than home education"
     );
 
-    let share = home / TOTAL_ENROLLMENT;
+    let share = home / count(TOTAL_LABEL);
     assert!(
         (0.031..0.033).contains(&share),
         "home education is {:.2}% of the department's own statewide enrolment",

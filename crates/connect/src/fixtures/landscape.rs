@@ -30,6 +30,12 @@ const HEADING: &str = "School Options";
 
 /// The statewide public enrolment printed elsewhere on the same sheet, and the denominator every
 /// share here is taken against.
+///
+/// It is emitted as the fixture's last row despite belonging to a different table, because the
+/// alternative is a figure the corpus quotes and nothing recomputes — which is the transcription
+/// this repository keeps finding wrong. It is **not** a channel and not a parent of any: home
+/// education and the chartered private schools are outside this count, and only the community
+/// schools are inside it.
 const TOTAL_LABEL: &str = "Total Enrollment";
 
 /// The channel every row must be one of, and what it is a part of.
@@ -110,8 +116,13 @@ pub fn build_landscape_channels(text: &str) -> Result<Vec<Vec<String>>, String> 
         .iter()
         .position(|line| line.contains(HEADING))
         .ok_or_else(|| format!("the sheet carries no `{HEADING}` heading"))?;
+    // A **character** offset, not the byte one `str::find` returns. The two agree only while
+    // everything left of the heading is ASCII, and this sheet's bullets are not — they sit just
+    // right of the boundary today, and a layout that moved one left of it would slice the wrong
+    // column and read plausible wrong numbers.
     let column = lines[heading]
         .find(HEADING)
+        .map(|byte| lines[heading][..byte].chars().count())
         .ok_or("the heading moved between two reads of the same line")?;
 
     let mut found: BTreeMap<String, u64> = BTreeMap::new();
@@ -157,7 +168,7 @@ pub fn build_landscape_channels(text: &str) -> Result<Vec<Vec<String>>, String> 
         }
     }
 
-    let mut rows = Vec::with_capacity(CHANNELS.len());
+    let mut rows = Vec::with_capacity(CHANNELS.len() + 1);
     for (channel, parent) in CHANNELS {
         let value = found.get(*channel).ok_or_else(|| {
             format!("the School Options table no longer carries `{channel}`; it read {order:?}")
@@ -168,6 +179,11 @@ pub fn build_landscape_channels(text: &str) -> Result<Vec<Vec<String>>, String> 
             (*parent).to_string(),
         ]);
     }
+    rows.push(vec![
+        TOTAL_LABEL.to_string(),
+        total_enrollment(text)?.to_string(),
+        String::new(),
+    ]);
     Ok(rows)
 }
 
@@ -239,5 +255,28 @@ Total Enrollment         1,665,521       100%
     #[test]
     fn the_statewide_total_is_the_enrollment_and_not_the_percentage() {
         assert_eq!(total_enrollment(SHEET), Ok(1_665_521));
+    }
+
+    /// The denominator is built rather than quoted, and is marked as belonging to no channel.
+    #[test]
+    fn the_denominator_is_the_last_row_and_is_not_a_channel() {
+        let rows = build_landscape_channels(SHEET).expect("the sheet is well formed");
+        assert_eq!(rows.len(), CHANNELS.len() + 1);
+        let last = rows.last().expect("the rows are not empty");
+        assert_eq!(last[0], "Total Enrollment");
+        assert_eq!(last[1], "1665521");
+        assert_eq!(last[2], "", "the total is a parent of nothing");
+        assert!(
+            !CHANNELS.iter().any(|(name, _)| *name == last[0]),
+            "the total must not also be pinned as a channel"
+        );
+    }
+
+    /// A sheet that stops printing its own total fails rather than losing the denominator.
+    #[test]
+    fn a_sheet_without_a_total_fails_rather_than_dropping_the_denominator() {
+        let without = SHEET.replace("Total Enrollment         1,665,521       100%", "");
+        let error = build_landscape_channels(&without).expect_err("the total is missing");
+        assert!(error.contains("Total Enrollment"), "{error}");
     }
 }

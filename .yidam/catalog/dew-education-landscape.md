@@ -29,8 +29,15 @@ than in a traditional district classroom.
 | **Home School** | **53,051** |
 | Joint Vocational School Districts | 49,524 |
 
-The sheet also prints **Total Enrollment 1,665,521** for the same year, which is the denominator
-every share taken from this table is against.
+The sheet also prints **Total Enrollment 1,665,521** for the same year, which is committed as the
+fixture's last row rather than quoted — a denominator nothing recomputes is the transcription this
+repository keeps finding wrong.
+
+**It is not a total of the table above it.** That figure is Ohio's *public* enrolment: the
+community schools are inside it, and home education, the chartered private schools and the
+voucher students attending them are not. A share taken against it is a ratio to the public
+system, which is the comparison the corpus makes; a share of all Ohio children would need a
+larger denominator that no source here publishes.
 
 ## Why it matters here
 
