@@ -533,7 +533,7 @@ fn projection() -> Projection {
         base_year: 2026,
         horizon: 2036,
         method: "damped".into(),
-        damping: 0.85,
+        damping: 0.30,
         sigma: 0.023_456_7,
         z: 1.0,
         prior_source: "cross-sectional spread of district annual enrolled-ADM growth".into(),
@@ -928,7 +928,7 @@ fn the_projection_block_carries_its_method_and_the_prior_the_band_rests_on() {
     };
     let json = b.to_json();
     assert!(json.contains("\"method\": \"damped\""));
-    assert!(json.contains("\"damping\": 0.85"));
+    assert!(json.contains("\"damping\": 0.3"));
     assert!(json.contains("\"base_year\": 2026"));
     assert!(json.contains("cross-sectional spread"));
 }

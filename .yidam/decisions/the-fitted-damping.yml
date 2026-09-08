@@ -1,0 +1,104 @@
+id: the-fitted-damping
+summary: >-
+  DEFAULT_DAMPING moves from 0.85 to 0.30 — the first parameter in this repository replaced by a
+  fitted value rather than a convention, and the constant's own comment had asked for exactly this
+  since it was written.
+context: |
+  `project::series::DEFAULT_DAMPING` governs how much of a fitted growth rate survives into each
+  further year of a projection. Every enrollment forecast in the published feed runs through it,
+  out to a FY2036 horizon.
+
+  It shipped at 0.85 and said so plainly: *"A convention, not an estimate. Three observations per
+  district cannot identify a damping parameter, and there is no Ohio-specific study here to borrow
+  one from; 0.85 is the value damped-trend forecasting commonly defaults to. It is named as a
+  constant so that a future phase with a real enrollment history can replace it with a fitted
+  number and see what moves."* [`metric/enrolled-adm`](../corpus/metric/enrolled-adm.yml) carried
+  the same thing as its one open question, and expected the history to come from `nces-ccd`.
+
+  **The history arrived from a different direction.** Extending the F-33 panel past FY2022 (#277)
+  put `V33` fall membership for 602 districts across fourteen years into a committed fixture,
+  keyed on `LEAID` — four to five times the three points that sentence was written against. The
+  key is also what answers the consolidation worry the open question raised: a district that stops
+  being surveyed leaves the population rather than distorting it.
+
+  #282 backtested the parameter over **13,244 out-of-sample forecasts** — six origins from FY2013
+  to FY2019, horizons of one to five years, the two pandemic years dropped as targets because no
+  method predicts a school closure. Every forecast produced by `series::project` itself, so what
+  was measured is what ships.
+
+      damping                              mean absolute log error
+      0.20  the fitted optimum                     0.04031
+      0.30                                         0.04033
+      0.85  what shipped                           0.04441
+      1.00  undamped                               0.04874
+      carrying the last observation forward        0.04340
+
+  0.85 cost about a tenth of the error against the optimum in all four metrics tried, and on
+  three of the four it was **beaten by making no forecast at all**.
+decision: |
+  Set `DEFAULT_DAMPING` to **0.30**.
+
+  **Why 0.30 rather than the 0.20 that minimises the headline metric.** The objective is flat
+  between them — 0.04033 against 0.04031 on the three-point window the callers actually use,
+  0.05%, which no honest reading distinguishes. 0.30 is the optimum on the *enrollment-weighted*
+  metric, which is the one that governs a statewide total rather than a typical district, and on
+  the fit that uses the full history rather than three points. It is also the smaller departure
+  from the value it replaces, and the only value whose consequence for the feed was measured
+  before the change was made.
+
+  **The method is unchanged.** This is a wrong constant, not a wrong shape: at its optimum the
+  damped trend beats a flat carry-forward by 7.1%, an undamped trend is 20.9% worse, and a
+  least-squares straight line is worse still and deteriorates with more history — it projects a
+  district through zero, which is the failure damping exists to prevent.
+consequences: |
+  **The published feed moves, and it was measured first.** At the FY2036 horizon, under current
+  law, through `report::forecast`:
+
+      statewide ADM                1,315,656  ->  1,376,953    +4.66%   61,297 pupils
+      realized state aid          $7,154.7m   ->  $7,230.1m    +1.05%   $75.4m
+      districts on the guarantee        367   ->        320       -47
+
+  **The enrollment number moves four times as far as the aid number**, because the guarantee pays
+  a fixed amount that enrollment does not enter to about half the state and absorbs most of the
+  difference. That is the finding
+  [`the_forecast_interval_is_narrower_than_the_enrollment_interval_that_drives_it`] already held;
+  it applies here too. The largest proportional movement is not a dollar figure at all: 47
+  districts change guarantee status at the horizon, and that is a count the site publishes.
+
+  **Projections become less confident in their own trend, which is the point.** A district's
+  fitted growth rate is now nearly spent by the second projected year instead of the fourth. Long
+  horizons sit closer to the last observation, which is what fourteen years of Ohio enrollment say
+  they should do — the series is close enough to a random walk that a fitted rate is worth
+  carrying about one year.
+
+  **Two tests changed their names, which is the honest record.**
+  `what_ships_is_worse_than_making_no_forecast_at_all` was true of 0.85 and is not true of 0.30.
+  It is now `what_used_to_ship_was_worse_than_making_no_forecast_at_all`, holding both facts: that
+  the old value lost to the trivial baseline, and that the new one beats it. A test whose name
+  stops being true is a finding, not a maintenance chore.
+
+  **The open question on `metric/enrolled-adm` closes.** It asked whether a damped trend is the
+  right method; the answer is yes, at a damping the corpus had not fitted. What replaced it — the
+  narrower question of whether to move the constant — is now answered too.
+alternatives: |
+  **Leave it at 0.85 and record the measurement only.** This is what #282 did, deliberately,
+  because the measurement was the missing half and moving a published number is a different act
+  from measuring it. Rejected now that both halves are on record: a constant known to be about a
+  tenth worse than the optimum, and worse than doing nothing on three metrics, is not a defensible
+  default to keep once it is known.
+
+  **Move to 0.20, the headline optimum.** Rejected on the flatness of the objective and the
+  enrollment-weighted metric, above. The difference is 0.05% and the argument for 0.20 is that it
+  wins a metric that weights a 300-pupil district equally with Columbus.
+
+  **Fit per district rather than one constant for the feed.** Rejected for now, and it is the real
+  next question. Fourteen observations per district is enough to fit a district-level damping, and
+  the statewide optimum being flat between 0.0 and 0.4 hints the right value differs across them.
+  It would also mean a projection whose method varies by district, which the feed's single
+  `damping` field cannot express and the page has no way to explain.
+
+  **Lengthen the fitting window instead of moving the damping.** Not an alternative — it is a
+  second, larger improvement that is still available. Fitting on the full history rather than
+  three points lowers the error at every damping tried, and the observations are already
+  committed. `HISTORY_YEARS` is three because that is what the department's model carries, so this
+  needs the panel wired into the projection path and is a bigger change than a constant.

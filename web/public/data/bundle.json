@@ -78,16 +78,16 @@
     "base_year": 2026,
     "horizon": 2036,
     "method": "damped",
-    "damping": 0.85,
+    "damping": 0.3,
     "sigma": 0.024206,
     "z": 1,
     "prior_source": "cross-sectional spread of district annual enrolled-ADM growth, FY2024-FY2026",
     "statute_ends": 2027,
     "checkpoints": [
-      {"label": "current law, FY2028", "policy": {"guarantee": "as-enacted", "guarantee_argument": 0, "base_cost_scale": 1, "minimum_state_share": 0.1, "phase_in_general": 1, "phase_in_dpia": 1}, "fiscal_year": 2028, "realized_aid": 7218412198.8029, "low": 7092766075.3722, "high": 7356782298.7203, "adm": 1369756.1311, "on_guarantee": 326},
-      {"label": "current law, FY2032", "policy": {"guarantee": "as-enacted", "guarantee_argument": 0, "base_cost_scale": 1, "minimum_state_share": 0.1, "phase_in_general": 1, "phase_in_dpia": 1}, "fiscal_year": 2032, "realized_aid": 7170954347.8987, "low": 6975062127.0094, "high": 7395825192.8315, "adm": 1333256.5383, "on_guarantee": 360},
-      {"label": "guarantee removed, FY2032", "policy": {"guarantee": "removed", "guarantee_argument": 0, "base_cost_scale": 1, "minimum_state_share": 0.1, "phase_in_general": 1, "phase_in_dpia": 1}, "fiscal_year": 2032, "realized_aid": 6059580228.2409, "low": 5710730889.5824, "high": 6429739599.439, "adm": 1333256.5383, "on_guarantee": 0},
-      {"label": "base cost +5%, FY2036", "policy": {"guarantee": "as-enacted", "guarantee_argument": 0, "base_cost_scale": 1.05, "minimum_state_share": 0.1, "phase_in_general": 1, "phase_in_dpia": 1}, "fiscal_year": 2036, "realized_aid": 7373801408.2723, "low": 7092926711.524, "high": 7712437558.6914, "adm": 1315656.415, "on_guarantee": 335}
+      {"label": "current law, FY2028", "policy": {"guarantee": "as-enacted", "guarantee_argument": 0, "base_cost_scale": 1, "minimum_state_share": 0.1, "phase_in_general": 1, "phase_in_dpia": 1}, "fiscal_year": 2028, "realized_aid": 7233970851.4816, "low": 7105757651.5687, "high": 7377276576.0286, "adm": 1379110.2925, "on_guarantee": 316},
+      {"label": "current law, FY2032", "policy": {"guarantee": "as-enacted", "guarantee_argument": 0, "base_cost_scale": 1, "minimum_state_share": 0.1, "phase_in_general": 1, "phase_in_dpia": 1}, "fiscal_year": 2032, "realized_aid": 7230142605.9267, "low": 7017237834.3728, "high": 7485669971.8857, "adm": 1376970.3315, "on_guarantee": 320},
+      {"label": "guarantee removed, FY2032", "policy": {"guarantee": "removed", "guarantee_argument": 0, "base_cost_scale": 1, "minimum_state_share": 0.1, "phase_in_general": 1, "phase_in_dpia": 1}, "fiscal_year": 2032, "realized_aid": 6277476330.3128, "low": 5916082738.0525, "high": 6660946241.3654, "adm": 1376970.3315, "on_guarantee": 0},
+      {"label": "base cost +5%, FY2036", "policy": {"guarantee": "as-enacted", "guarantee_argument": 0, "base_cost_scale": 1.05, "minimum_state_share": 0.1, "phase_in_general": 1, "phase_in_dpia": 1}, "fiscal_year": 2036, "realized_aid": 7490697058.5054, "low": 7161750832.485, "high": 7907244873.7539, "adm": 1376953.0677, "on_guarantee": 262}
     ]
   },
   "deflator": {"label": "CPI-U all items, June, NSA", "points": [{"fiscal_year": 2000, "index": 172.4}, {"fiscal_year": 2001, "index": 178}, {"fiscal_year": 2002, "index": 179.9}, {"fiscal_year": 2003, "index": 183.7}, {"fiscal_year": 2004, "index": 189.7}, {"fiscal_year": 2005, "index": 194.5}, {"fiscal_year": 2006, "index": 202.9}, {"fiscal_year": 2007, "index": 208.352}, {"fiscal_year": 2008, "index": 218.815}, {"fiscal_year": 2009, "index": 215.693}, {"fiscal_year": 2010, "index": 217.965}, {"fiscal_year": 2011, "index": 225.722}, {"fiscal_year": 2012, "index": 229.478}, {"fiscal_year": 2013, "index": 233.504}, {"fiscal_year": 2014, "index": 238.343}, {"fiscal_year": 2015, "index": 238.638}, {"fiscal_year": 2016, "index": 241.018}, {"fiscal_year": 2017, "index": 244.955}, {"fiscal_year": 2018, "index": 251.989}, {"fiscal_year": 2019, "index": 256.143}, {"fiscal_year": 2020, "index": 257.797}, {"fiscal_year": 2021, "index": 271.696}, {"fiscal_year": 2022, "index": 296.311}, {"fiscal_year": 2023, "index": 305.109}, {"fiscal_year": 2024, "index": 314.175}, {"fiscal_year": 2025, "index": 322.561}, {"fiscal_year": 2026, "index": 333.952}], "uncovered": [1998, 1999, 2027]},
