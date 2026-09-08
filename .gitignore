@@ -30,3 +30,18 @@ target/
 .yidam/bin/
 .yidam/.crates.toml
 .yidam/.crates2.json
+
+# `yidam embed` composes each node's and each catalog entry's prose into one text file per
+# node, as input to `yidam index-build`. Derived output, and derived from something already
+# committed: every character in it is a copy of the corpus or the catalog, so it is the
+# corpus twice in history, rewritten in bulk by anything that changes how prose is composed.
+# Declaring the four prose fields moved it from 462K characters to 746K across 174 files in
+# one commit's worth of work.
+#
+# Nothing reads it. There is no vector index here — `index-build` needs the `index` feature,
+# which is not in the released binary's default set — and `.yidam/config.toml` omits
+# `[due] index_after` deliberately so no clock reports a debt nobody intends to pay. It is
+# regenerated with `mise run embed` on the day an index is decided on, which is the same
+# argument `.yidam/bin/` above is ignored under: build output, cheap to remake, obsolete the
+# moment the thing it was built from moves.
+.yidam/embeddings/
