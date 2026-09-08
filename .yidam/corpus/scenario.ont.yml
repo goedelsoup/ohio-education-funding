@@ -16,12 +16,15 @@ properties:
     description: Short name for the counterfactual
   - name: question
     type: text
+    prose: true
     description: The policy question this scenario is constructed to answer
   - name: perturbations
     type: text
+    prose: true
     description: Each parameter altered, its baseline value, and its scenario value
   - name: input_projections
     type: text
+    prose: true
     description: Which input series were projected rather than observed, and by what method
   - name: horizon
     type: string
@@ -31,9 +34,11 @@ properties:
     description: Path under crates/ to the committed per-agency delta output
   - name: confidence
     type: text
+    prose: true
     description: What the result is sensitive to, and where it should not be trusted
   - name: results
     type: text
+    prose: true
     description: The figures the run produced, as a table, with the units and the panel they are over
 # `edges:` below names the relationships this class is *defined by* — the ones a reader needs to
 # understand what it connects to. It is not the permitted set. A large share of the corpus's edges

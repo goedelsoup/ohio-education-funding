@@ -19,18 +19,22 @@ properties:
     description: dollars | dollars-per-pupil | percent | mills | ratio | index
   - name: definition
     type: text
+    prose: true
     description: The computation, stated as a formula over named inputs
   - name: inputs
     type: text
+    prose: true
     description: The source series required, and where each comes from
   - name: caveats
     type: text
+    prose: true
     description: Known ways this measure misleads, and what it excludes
   - name: calculator
     type: string
     description: Name of the crates/ calculator implementing it, if implemented
   - name: series
     type: text
+    prose: true
     description: The published series this metric is computed from, and the years it covers
 # `edges:` below names the relationships this class is *defined by* — the ones a reader needs to
 # understand what it connects to. It is not the permitted set. A large share of the corpus's edges

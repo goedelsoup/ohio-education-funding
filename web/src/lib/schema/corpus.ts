@@ -263,6 +263,26 @@ export const OntologyPropertySchema = z
   .object({
     name: z.string().min(1),
     type: z.string().min(1),
+    /**
+     * Whether this property's value is prose the node is saying, rather than a value it is
+     * carrying. `sensitivity` and `caveats` are paragraphs; `irn` and `simulation_key` are not.
+     *
+     * Read by yidam from 0.11.0, and by nothing here: `readOntology` drops it, because the class
+     * page has no reason to render a fact about how the corpus is measured. What it reaches is
+     * `node-too-long`, which counts the lines, `missing-description`, which stops reporting a node
+     * whose substance is in a property, and `yidam embed`, which composes the text an index would
+     * be built from — 51 declarations here, and 173K characters, a fifth of what this corpus
+     * writes.
+     *
+     * **Absent means false**, for the reason `required:` absent means false upstream: a corpus
+     * written before the field existed never had the chance to say. Optional rather than
+     * defaulted so the generated JSON Schema describes a key an author may add, not one every
+     * declaration is expected to carry.
+     *
+     * The rule this corpus applies is in [`the-prose-a-node-holds`](../../../../.yidam/decisions/the-prose-a-node-holds.yml):
+     * `type: text` means prose, with three named exceptions.
+     */
+    prose: z.boolean().optional(),
     description: z.string().min(1),
   })
   .strict();

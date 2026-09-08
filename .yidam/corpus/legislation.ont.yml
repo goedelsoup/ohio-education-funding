@@ -25,6 +25,7 @@ properties:
     description: Date the operative provisions took effect
   - name: effective_note
     type: text
+    prose: true
     description: >-
       Which provisions took effect when, where the act has more than one date. Declared because
       an Ohio budget act always does: the appropriation sections are effective on signing and the
@@ -34,12 +35,15 @@ properties:
       carried the signing date for both.
   - name: subject
     type: text
+    prose: true
     description: What the enactment did to the funding system, in two or three sentences
   - name: vetoes
     type: text
+    prose: true
     description: Line-item vetoes affecting education funding, where relevant
   - name: accountability_effect
     type: text
+    prose: true
     description: >-
       What the enactment did to the accountability regime, as distinct from the funding system.
       Declared because an Ohio budget act carries both in one instrument — H.B. 33 refreshed the

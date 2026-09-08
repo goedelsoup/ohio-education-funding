@@ -20,9 +20,11 @@ properties:
     description: deduction | direct-appropriation | reimbursement | competitive-grant
   - name: eligibility
     type: text
+    prose: true
     description: Who qualifies, and how eligibility has changed over time
   - name: amount
     type: text
+    prose: true
     description: Per-recipient or per-project amount, by fiscal period
   - name: appropriation_line
     type: string

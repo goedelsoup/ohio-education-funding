@@ -19,9 +19,11 @@ properties:
     description: Where the principle enters the domain — constitutional text, a decision, or scholarship
   - name: formulation
     type: text
+    prose: true
     description: The principle stated precisely enough to be applied to a specific regime
   - name: contested
     type: text
+    prose: true
     description: What is disputed about the principle, and by whom
 # `edges:` below names the relationships this class is *defined by* — the ones a reader needs to
 # understand what it connects to. It is not the permitted set. A large share of the corpus's edges

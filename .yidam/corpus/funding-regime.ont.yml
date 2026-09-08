@@ -22,12 +22,14 @@ properties:
     description: Last fiscal period, or "current" if still in effect
   - name: distribution_logic
     type: text
+    prose: true
     description: How the regime decides what each agency receives, in two or three sentences
   - name: status
     type: string
     description: current | superseded | partially-implemented | never-fully-funded
   - name: boundary_note
     type: text
+    prose: true
     description: Where this regime's boundary is contested or blurred — a successor that phased in over several years, or a period the department funded by freeze rather than by formula
 # `edges:` below names the relationships this class is *defined by* — the ones a reader needs to
 # understand what it connects to. It is not the permitted set. A large share of the corpus's edges

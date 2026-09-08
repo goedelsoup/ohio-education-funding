@@ -39,12 +39,15 @@ properties:
     description: The date the publisher finalized the text, and any amendment dates
   - name: eligibility
     type: text
+    prose: true
     description: Which students the model text makes eligible
   - name: award_basis
     type: text
+    prose: true
     description: How the model sets the amount that follows a student
   - name: district_funding_effect
     type: text
+    prose: true
     description: >-
       What the model does to the resident district's funding — whether the award is deducted from
       the district, who keeps any remainder, and whether the student stays in the district's
@@ -53,9 +56,11 @@ properties:
       the department's own calculator, so a claim here is falsifiable rather than atmospheric.
   - name: private_school_regulation
     type: text
+    prose: true
     description: What the model requires of, or forbids regulators from imposing on, participating schools
   - name: adoption_evidence
     type: text
+    prose: true
     description: >-
       What is established about whether any Ohio instrument was drawn from this text. `[open]`
       throughout the class; see the class description for why the field is mandatory rather than

@@ -46,6 +46,9 @@
             "type": "string",
             "minLength": 1
           },
+          "prose": {
+            "type": "boolean"
+          },
           "description": {
             "type": "string",
             "minLength": 1

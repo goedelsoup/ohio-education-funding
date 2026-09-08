@@ -49,6 +49,7 @@ properties:
     description: Date the agency was chartered or organized
   - name: roles
     type: text
+    prose: true
     description: Contingent roles the agency plays or has played, each with the fiscal periods it applied
   - name: series_path
     type: string

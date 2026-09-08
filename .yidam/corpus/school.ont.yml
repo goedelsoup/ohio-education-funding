@@ -37,6 +37,7 @@ properties:
     description: Building enrollment, on the report card's count, with the year
   - name: performance
     type: text
+    prose: true
     description: >-
       Performance Index and component ratings, with the years. Three consecutive years is the
       span both the CSI escalation and the academic distress trigger read.
@@ -47,6 +48,7 @@ properties:
       three rated components, not a descriptive statistic.
   - name: roles
     type: text
+    prose: true
     description: >-
       Contingent identifications and the periods they applied — CSI, TSI, ATSI, Title I served.
   - name: series_path

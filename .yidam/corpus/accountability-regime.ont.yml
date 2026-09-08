@@ -29,12 +29,15 @@ properties:
     description: The statute or federal act establishing it
   - name: measure
     type: text
+    prose: true
     description: What is measured, on what scale, and at what unit
   - name: identification
     type: text
+    prose: true
     description: How schools or districts are selected for consequence, including thresholds
   - name: effective
     type: text
+    prose: true
     description: The period it governs, and what it superseded
 edge_policy: characteristic
 edges:
