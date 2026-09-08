@@ -65,6 +65,36 @@ findings: |
   [verified for the rates — [the FY2026 model](../../catalog/dew-fy26-funding-calculator.md) and
   the FY2027 one, tested in `crates/project`; inference for the mechanism]
 
+  The 17.5% is the July-to-June mean of the monthly series, and the choice is worth half the
+  figure: the June-point alignment of the same
+  [monthly series](../../catalog/eia-diesel-prices.md) over those two years gives **+39.6%**, under which the
+  rider rate rose about an eighth as fast as fuel rather than a quarter. The convention is the
+  right one — fuel is bought all year, so a flow is averaged where an index is read at a point —
+  but a comparison that rests on it should say so. [verified — `crates/dispersion` and
+  `crates/connect`]
+
+  ### Fuel is a cost the rates cannot be shown to track
+
+  The rates are trimmed means of what districts spent, so the obvious question is how much of a
+  fuel movement reaches them. **Fifteen years of the F-33's transportation column cannot answer
+  it, and that is a measurement rather than a gap.** Real per-pupil transportation spending was
+  regressed on the [Midwest diesel series](../../catalog/eia-diesel-prices.md), collapsed to
+  fiscal years, under eight specifications — two alignments, the thirteen NCES
+  years against all fifteen, with a linear trend and without — and none reaches `|t| = 1.5`. The
+  slope does not even hold its sign: over all fifteen years with a trend it is **-$2.49 per
+  dollar-per-gallon under the June point and +$9.66 under the mean**.
+
+  What the panel does support is a trend, significant in every specification that includes one
+  at `t = 2.1` to `3.6`: real per-pupil transportation drifts up about $4 to $5 a year whatever
+  diesel does. A pass-through estimated here would be reporting that drift.
+
+  This is not evidence that districts are indifferent to fuel, and the bias runs the other way —
+  every slope is fitted to retail diesel, and Ohio refunds districts the 47-cent motor fuel tax,
+  so a district's bill moves further than the series does. The true coefficient is larger than
+  any of these and still not identified. It is a statement about what fifteen annual
+  observations of a survey can carry, and it is why the pass-through is carried here as
+  unquantified rather than as a number with a wide interval. [verified — `crates/dispersion`]
+
   ### The appropriation began binding, and the year is known
 
   Special education transportation prorated at **1.0 in FY2026 and 0.917459740976215 in
