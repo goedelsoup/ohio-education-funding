@@ -218,6 +218,38 @@ findings: |
   So a district's fitted growth rate is now nearly spent by the second projected year instead of
   the fourth, and a long horizon sits closer to the last observation — which is what fourteen
   years of Ohio enrollment say it should do.
+
+  **AND THE TWO QUESTIONS THAT DECISION LEFT OPEN ARE ANSWERED — ONE NO, ONE YES.**
+  [verified — `crates/project`]
+
+  *A damping per district is noise.* Fitted on each district's own history it looks **15.3%**
+  better than the single constant and is **3.6% worse** out of sample. More than two thirds of
+  districts fit a boundary of the grid — 316 of 602 at zero, 101 at one — which is what an
+  unidentified parameter looks like when it is fitted anyway. Fifteen forecasts cannot locate a
+  decay rate. The feed keeps one damping, now for a reason rather than for want of trying.
+
+  *A longer fitting window is worth more than the damping was, and blending beats replacing.*
+  Weighting the three-point rate against the district's whole-history rate:
+
+  | weight on the three-point rate | mean absolute log error |
+  |---|--:|
+  | 1.0 — what the projections do | 0.04033 |
+  | **0.3** | **0.03855** |
+  | 0.0 — long history alone | 0.03881 |
+
+  Discarding the recent rate is **worse** than keeping about a third of it, so three points carry
+  real information about where a district is now and not enough to stand alone. At 0.3 the gain is
+  **4.6%**, larger than the 2.4% that moving the damping bought. Re-tuning the damping on top
+  moves the optimum to 0.40 and buys a further 0.18%, which is not worth a second change to a
+  published constant.
+
+  **[open]** Whether to put the blend in the feed. It would mean shrinking an *enrolled ADM* rate
+  toward a *`V33` fall membership* rate. The two count nearly the same children — their FY2024
+  levels correlate at **0.9997** across 608 districts — but their two-year growth rates correlate
+  at only **0.287**, which is simultaneously the best evidence that a two-year rate is mostly noise
+  and the reason the substitution cannot be made mechanically. That the two series share a long-run
+  trend while differing in short-run noise is an assumption this corpus cannot test, because only
+  three years of ADM exist.
 figures:
   - key: project/districts-on-the-guarantee
     value: 294
