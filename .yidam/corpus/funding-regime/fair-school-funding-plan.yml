@@ -66,9 +66,34 @@ findings: |
   So the plan reaches 100% phase-in of a computed amount that nearly half of districts do not
   receive, priced from inputs five years stale. A regime designed to fund every district at its
   own costed requirement ends its phase-in with half the state still on a floor inherited from
-  the regime it replaced. [inference] Whether that reflects a formula that would cut those
-  districts absent the guarantee, or enrollment decline outrunning the formula, or both, is not
-  established here and is the sharpest open question about the plan. [open]
+  the regime it replaced. [inference]
+
+  ### What holds them there is property wealth, not enrollment decline
+
+  Both candidate causes are real and they point the same way, so the question is which dominates.
+  Splitting the 609 districts at the median of each: [verified — `foundation`, pinned by test]
+
+                            enrollment falling fast    stable or rising
+      wealthy (> median)              79%                     65%
+      poor    (< median)              35%                     15%
+
+  **Holding enrollment constant, being wealthy adds about 45 points to the chance of being on the
+  guarantee; holding wealth constant, fast decline adds about 15.** By property-wealth quartile
+  the guarantee rate rises monotonically from **13% in the poorest to 76% in the wealthiest**; by
+  enrollment-decline quartile it runs 58% in the fastest-declining against 31% among growing
+  districts — a real spread and a far narrower one.
+  [verified — `foundation`, pinned by test]
+
+  These are not marginal cases. The median guaranteed district is held **more than three times**
+  above what the formula would give it, so the guarantee is the operative funding mechanism for
+  those districts rather than a rounding buffer. [verified — `foundation`, pinned by test] And
+  removing it strengthens the association between wealth and aid, from −0.605 to −0.662: the
+  formula equalizes more than realized funding does, and the guarantee is what separates the two.
+  [verified — `foundation`, pinned by test]
+
+  So the answer is both causes and neither framing. Three-quarters of Ohio's wealthiest districts
+  are held above what the plan computes for them, and a floor inherited from the regime the plan
+  replaced is doing most of its work for the districts the plan would fund least. [inference]
 figures:
   - key: project/districts-on-the-guarantee
     value: 294
