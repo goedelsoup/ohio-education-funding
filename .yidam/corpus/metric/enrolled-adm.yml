@@ -153,6 +153,18 @@ findings: |
   A longer fitting window is the larger of the two available improvements and is free — the
   observations are already committed. [verified — `crates/project`]
 
+  **AND THE GUARANTEE ABSORBS MOST OF THE ERROR, WHICH BOUNDS WHAT IT COSTS.** [verified —
+  `crates/project`]
+  At the feed's FY2036 horizon, moving the damping from 0.85 to 0.30 moves statewide ADM by
+  **+4.66%** — 61,297 pupils — and realized state aid by only **+1.05%**, or $75.4m. The
+  enrollment error is four times the aid error for the reason this node already gives: the
+  guarantee pays a fixed amount to about half the state, so state cost is far less sensitive to
+  enrollment than the enrollment forecast is uncertain. The constant is wrong and the consequence
+  is bounded, and both halves belong in the same sentence.
+
+  What moves most is not a dollar figure. **47 districts** change guarantee status at the horizon
+  — 367 against 320 — and that is a count the site publishes.
+
   **[open]** Whether to move the constant. It is left at 0.85 for now: changing it moves every
   projection in the published feed, which is a decision to record rather than a number to edit,
   and this file's business was the measurement.

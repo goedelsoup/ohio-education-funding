@@ -51,6 +51,27 @@
 //! three points, 0.05990 on the full history — which is the one part of the current design this
 //! confirms outright.
 //!
+//! # And what moves, which is the half the constant's own comment asked for
+//!
+//! "Replace it with a fitted number **and see what moves**". At the feed's FY2036 horizon,
+//! moving the damping from 0.85 to 0.30 moves:
+//!
+//! | | 0.85 — what ships | 0.30 — fitted | difference |
+//! |---|--:|--:|--:|
+//! | statewide ADM | 1,315,656 | 1,376,953 | **+4.66%** — 61,297 pupils |
+//! | realized state aid | \$7,154.7m | \$7,230.1m | **+1.05%** — \$75.4m |
+//! | districts on the guarantee | 367 | 320 | **−47** |
+//!
+//! **The enrollment error is four times the aid error, and the reason is already in the corpus.**
+//! `the_forecast_interval_is_narrower_than_the_enrollment_interval_that_drives_it` establishes
+//! that the guarantee makes state cost far less sensitive to enrollment than the enrollment
+//! forecast is uncertain, because it pays a fixed amount to about half the state. That absorbs
+//! most of this too. A projection error of 61,297 pupils reaches the appropriation as \$75.4m.
+//!
+//! So the constant is wrong and the consequence is bounded, and both halves belong in the same
+//! sentence. The number that moves most is not a dollar figure at all: **47 districts** change
+//! guarantee status at the horizon, and that is a count the site publishes.
+//!
 //! # What this does not do
 //!
 //! It does not change the constant. Moving `DEFAULT_DAMPING` moves every projection in the
@@ -59,7 +80,9 @@
 
 use dispersion::ohio_panel::{self, PanelRow};
 use edfund_core::FiscalYear;
-use project::series::{self, Method, Observation, Prior, DEFAULT_DAMPING};
+use project::policy::Policy;
+use project::series::{self, Method, Observation, Prior, DEFAULT_DAMPING, ONE_SIGMA};
+use project::{panel, report};
 use std::collections::BTreeMap;
 
 /// Every fiscal year the panel carries, oldest first. FY2014 is absent from the archive.
@@ -349,4 +372,50 @@ fn the_straight_line_is_worse_than_every_damping_and_worse_the_longer_it_is_fitt
         linear(None) > linear(Some(3)),
         "and worse still on the full history"
     );
+}
+
+/// What moves in the published feed if the damping moves — the half the constant's comment asked
+/// for and this file had not supplied.
+///
+/// Measured through `report::forecast` at the feed's own FY2036 horizon under current law, so
+/// these are the figures the page would print. The enrollment difference is large and the aid
+/// difference is not, which is the guarantee doing what the corpus already says it does.
+#[test]
+fn moving_the_damping_moves_the_enrollment_four_times_as_much_as_the_aid() {
+    let districts = panel::panel();
+    let prior = report::enrollment_growth_prior(&districts, ONE_SIGMA);
+    let at = |damping: f64| {
+        report::forecast(
+            &districts,
+            &Policy::current_law(),
+            FiscalYear(2036),
+            Method::Damped { rate: 0.0, damping },
+            prior,
+        )
+    };
+    let shipped = at(DEFAULT_DAMPING);
+    let fitted = at(0.30);
+
+    let adm_move = fitted.adm / shipped.adm - 1.0;
+    let aid_move = fitted.realized_aid / shipped.realized_aid - 1.0;
+    assert!(
+        (0.04..0.055).contains(&adm_move),
+        "ADM should move about 4.7%; it moves {:+.2}%",
+        adm_move * 100.0
+    );
+    assert!(
+        (0.008..0.014).contains(&aid_move),
+        "aid should move about 1.05%; it moves {:+.2}%",
+        aid_move * 100.0
+    );
+    assert!(
+        adm_move > aid_move * 3.0,
+        "the guarantee should absorb most of it: ADM {:+.2}% against aid {:+.2}%",
+        adm_move * 100.0,
+        aid_move * 100.0
+    );
+
+    // The count that moves most, and the one the site prints.
+    assert_eq!(shipped.on_guarantee, 367);
+    assert_eq!(fitted.on_guarantee, 320);
 }

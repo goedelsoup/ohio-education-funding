@@ -108,6 +108,12 @@ impl Method {
 /// observation forward unchanged — the fitted rate is worth roughly one year and 0.85 carries
 /// three-quarters of it into the third.
 ///
+/// What moving it would move, measured at the feed's FY2036 horizon: statewide ADM by +4.66%
+/// (61,297 pupils) and realized state aid by +1.05% ($75.4m). The enrollment error is four times
+/// the aid error because the guarantee absorbs most of it, so the constant is wrong and the
+/// consequence is bounded. The largest movement is a count rather than a dollar figure — 47
+/// districts change guarantee status.
+///
 /// The value is left alone here deliberately. Changing it moves every projection in the
 /// published feed, which is a decision to be recorded in `.yidam/decisions/` rather than a
 /// constant to be edited; what was missing was the measurement, and the measurement is now in
