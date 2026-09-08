@@ -53,12 +53,13 @@ Fields per connector: key, status, source count, corpus classes fed; then every 
 | [`dew-foundation`](sources/dew-foundation.md) | **wired** | 10 | education-agency, revenue-stream, metric, program |
 | `dew-report-card` | **wired** | 7 | metric, education-agency |
 | [`bls-cpi`](sources/bls-cpi.md) | **wired** | 1 | metric, fiscal-period |
-| `eia-diesel` | parsed | 1 | metric, fiscal-period |
+| `eia-diesel` | **wired** | 1 | metric, fiscal-period |
 | `dew-five-year-forecast` | **wired** | 2 | education-agency, revenue-stream, metric, fiscal-period |
 | [`tax-abstract`](sources/tax-abstract.md) | **wired** | 4 | revenue-stream, parameter, metric |
 | [`tax-casino`](sources/tax-casino.md) | **wired**, in part | 16 | revenue-stream, education-agency, metric |
 | [`dew-payment-reports`](sources/dew-payment-reports.md) | declared | 0 | program, education-agency, revenue-stream |
 | `dew-scholarship-reports` | **wired**, in part | 1 | program |
+| `dew-facts-and-figures` | **wired**, in part | 1 | metric, program |
 | `lsc-catalog` | **wired**, in part | 18 | fiscal-period, program, legislation, parameter |
 | [`lsc-budget`](sources/lsc-budget.md) | **wired**, in part | 31 | legislation, fiscal-period, program, parameter |
 | [`ohio-laws`](sources/ohio-laws.md) | **wired** | 35 | legislation, parameter, formula-component |
@@ -73,13 +74,14 @@ Fields per connector: key, status, source count, corpus classes fed; then every 
 | `dew-child-nutrition` | **wired**, in part | 34 | education-agency, metric, formula-component |
 | `dew-school-improvement` | **wired**, in part | 3 | school, education-agency, accountability-regime |
 
-22 connectors, 229 sources between them. 18 are wired and 4 are not; 10 of the wired ones reach only part of what they feed, and say so below.
+23 connectors, 230 sources between them. 20 are wired and 3 are not; 11 of the wired ones reach only part of what they feed, and say so below.
 
 **What is blocked, in the registry's own words.**
 
 - `tax-casino` — still blocked on: wired for every per-district distribution the department publishes as a workbook — eighteen of them, the August 2015 distribution through the January 2024 one. It stops there because the department's own casino page stops there, and the distributions before it have no machine-readable twin: January 2015 and earlier are `Final SD Distribution` PDFs
 - `dew-payment-reports` — blocked on: the deduct-era reports (1999-2021) are behind OH|ID authentication on the department's reports portal; the current-era ones are open and indexed but post-date the deduction entirely. The portal is an obstacle to an unattended agent and not to a person who holds an OH|ID account, so wiring this means a human fetching the files into the cache and a refresh path that says so — `edfund-connect fetch` will not re-run it
 - `dew-scholarship-reports` — still blocked on: wired for the statewide and program-level aggregates, which is what the department publishes openly. Per-district participation is a different file and is not here: the annual report cites two routes for it and both 404, so the breakdown was published, is still referenced by a current departmental document, and has been withdrawn. See `dew-payment-reports` for the deduct-era half of the same gap
+- `dew-facts-and-figures` — still blocked on: Only the current edition. The department replaces the sheet in place and the prior-year URLs return an identical 1,245-byte 404, so this is a series with one retrievable member.
 - `lsc-catalog` — still blocked on: wired for the education volume of every edition that has one — 2006 and 2008 through 2025, eighteen distinct documents — the 2012 URL serves the 2011 file byte for byte, and 2007 has no edition at all. The Catalog is a standing reference restated each edition rather than a record of what one act appropriated, so it does not replace `lsc-budget`'s greenbooks and is not a substitute for the session laws before FY2002
 - `lsc-budget` — still blocked on: wired for the appropriation-line series FY1999 through FY2027, from the 124th General Assembly's greenbook to the 136th's workbooks. The two bienniums the greenbook route cannot reach — FY2006-07, whose greenbook has no line-item table, and FY2012-13, whose workbook variants LSC serves as one file — are both carried by the Catalog of Budget Line Items, which was probed and is not blocked, and is now extracted: eighteen distinct editions, 2006 and 2008 through 2025 less the 2012 URL, which serves the 2011 document byte for byte. See the `lsc-catalog` connector and `the-catalog-of-budget-line-items`. Before FY1999 there is still nothing — the Foundation Program era, DeRolph I and the equal yield formula need the session laws, and the Catalog's earliest edition reaches FY2002. The per-district simulations named in earlier versions of this string are not LSC's and have been removed from it
 - `ohio-session-laws` — still blocked on: wired for the two acts whose education tables are printed once and reconcile exactly — H.B. 215 of the 122nd and H.B. 282 of the 123rd — which gives enacted line items for FY1998, FY2000 and FY2001. FY1999 is enacted as a single undifferentiated line and was itemised later by H.B. 650 and corrected by H.B. 770, both of which print every amended row twice, struck and inserted, and need a reader that tells the two apart. And the floor is the publisher's: the legislature's own version index stops at the 122nd General Assembly, so no act before 1997 is served in any form
@@ -90,7 +92,7 @@ Fields per connector: key, status, source count, corpus classes fed; then every 
 - `dew-child-nutrition` — still blocked on: wired for every October the archive holds, 1998 through 2014, across all three of the streams the report splits into from 2012. Three things it still cannot reach: October 2014 is where the directory stops, nine years short of the corpus's FY2024 observations; the three split Octobers have a band and not a poverty share, because community-eligibility sponsors collect no applications at all; and the 1998-2000 files state no sponsor type, so some thirty-five sponsors a year predate the FY2001 file they borrow one from and stay untyped
 - `dew-school-improvement` — still blocked on: wired for the current identification lists only. The department republishes each list in place under a dated filename rather than archiving prior cycles, so there is no history here: a school that exited before this file was written is indistinguishable from one never identified
 
-11 of them have no long form in [`sources/`](sources/): `dew-report-card`, `eia-diesel`, `dew-five-year-forecast`, `dew-scholarship-reports`, `lsc-catalog`, `ohio-session-laws`, `ohio-bills`, `ohio-auditor`, `census-geography`, `dew-child-nutrition`, `dew-school-improvement`. Those are the connectors added after the original nine stubs, whose prose was never written — the decision record is the only account of why each exists.
+12 of them have no long form in [`sources/`](sources/): `dew-report-card`, `eia-diesel`, `dew-five-year-forecast`, `dew-scholarship-reports`, `dew-facts-and-figures`, `lsc-catalog`, `ohio-session-laws`, `ohio-bills`, `ohio-auditor`, `census-geography`, `dew-child-nutrition`, `dew-school-improvement`. Those are the connectors added after the original nine stubs, whose prose was never written — the decision record is the only account of why each exists.
 <!-- /REGEN -->
 
 A `declared` connector says **what blocks it** — that string is a field on the record, and a

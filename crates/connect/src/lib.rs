@@ -1212,6 +1212,22 @@ pub fn rebuild(root: &Path) -> Result<Vec<Rebuilt>, RebuildError> {
         Err(cause) => Rebuilt::skipped(fixtures::CORRECTIONS_FIXTURE, cause),
     });
 
+    // The one statewide table here. Skipped rather than fatal on the same two counts the
+    // corrective act is: the PDF may not be cached, and `pdftotext` may not be installed.
+    let landscape = registered("education-landscape-2024");
+    out.push(match cache::pdf_text(root, landscape) {
+        Ok(text) => match fixtures::build_landscape_channels(&text) {
+            Ok(rows) => csv_fixture(
+                root,
+                fixtures::LANDSCAPE_FIXTURE,
+                fixtures::LANDSCAPE_HEADER,
+                &rows,
+            )?,
+            Err(layout) => return Err(RebuildError::Layout(layout)),
+        },
+        Err(cause) => Rebuilt::skipped(fixtures::LANDSCAPE_FIXTURE, cause),
+    });
+
     // Sixteen school years of the federal agency directory, Ohio only. The one fixture here whose
     // point is *membership* rather than any figure: which agencies existed in which year.
     out.push(match ccd_directory(root) {

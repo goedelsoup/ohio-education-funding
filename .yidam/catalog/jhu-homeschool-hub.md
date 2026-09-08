@@ -36,6 +36,12 @@ That figure is `[verified]` — retrieved and read directly from the department'
 and the workbook's 2023-24 cell matches it to the student, which is what identifies this series as
 the department's numbers carried forward rather than an independent estimate.
 
+**That fact sheet is now registered and pinned**, as `education-landscape-2024`, with its own
+entry at [`dew-education-landscape`](dew-education-landscape.md) and its School Options table
+committed as a fixture. When this entry was written the one verified figure in it rested on a
+live URL and nothing else — which, given that every prior-year edition of the same sheet now
+returns a 404, was one link-rot away from being unverifiable. It no longer is.
+
 Every other year, and the whole district sheet, rests on the aggregator alone. The department's
 [Home Schooling](https://education.ohio.gov/Topics/Ohio-Education-Options/Home-Schooling) topic
 page carries no counts, its home-education fact sheet carries no counts, and the

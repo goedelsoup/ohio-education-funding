@@ -165,6 +165,46 @@ findings: |
   What moves most is not a dollar figure. **47 districts** change guarantee status at the horizon
   — 367 against 320 — and that is a count the site publishes.
 
+  **THE LARGEST POPULATION OUTSIDE THE COUNT HAS NO PER-DISTRICT RECORD AT ALL.** [verified —
+  `crates/project`]
+  ADM counts children a district enrolls. The department's own annual fact sheet counts, in one
+  table and one year, every way an Ohio child is schooled instead — 173,156 in chartered private
+  schools, 150,914 on vouchers, 116,973 in community schools, 79,006 on inter-district open
+  enrolment, 49,524 in joint vocational districts, and **53,051 in home education**, against a
+  statewide enrolment of 1,665,521.
+
+  That 1,665,521 is Ohio's *public* enrolment: the community schools are inside it, and home
+  education, the chartered private schools and the voucher students at them are not. So home
+  education is 3.2% of the public system rather than 3.2% of Ohio's children — the second
+  denominator is larger and nothing published states it. On the first, it is larger than the
+  joint vocational districts, larger than every Ohio e-school together, and larger than four of
+  the five voucher programmes. **It is also
+  the only one of the thirteen channels with no per-district record anywhere.** Community schools
+  report through EMIS; vouchers are administered per student; open enrolment names both districts.
+  A home-education notice is filed with the district of residence under R.C. 3321.042 and no
+  statute requires anyone to forward it to the state as a count. EMIS carries withdrawal reason
+  `43 — Transferred to Home Education`, which is a flow rather than a stock: a child who begins
+  at six and never enrolls is permanently invisible to it.
+
+  **And it grew by a factor of about 1.8 in five years, in one step that never reversed.**
+  [inference — a secondary compilation, anchored on one verified year]
+  33,328 in 2019-20 to 61,009 in 2024-25, with the step in 2020-21. The series is an aggregator's
+  and cannot be verified, but its 2023-24 member is 53,051 and the department's sheet says 53,051,
+  which is what identifies it as Ohio's numbers carried forward. Against the committed F-33 panel,
+  district enrolment fell 62,609 between FY2020 and FY2024 while home education rose about 19,700
+  — **roughly 31% of the decline in magnitude**. That is a size comparison and not a
+  decomposition: districts also lost pupils to community schools, to vouchers, and to a falling
+  birth cohort, and nothing here apportions between them. What it establishes is that a channel
+  carrying no ADM, in no enrolment file, reported per district nowhere, is of the same order as a
+  third of the enrolment loss that half the state's guarantee status turns on. See
+  [dew-education-landscape](../../catalog/dew-education-landscape.md) and
+  [jhu-homeschool-hub](../../catalog/jhu-homeschool-hub.md).
+
+  **[open]** Where home education is concentrated. A population spread across some 600 districts
+  is thin almost everywhere and heavy somewhere, and the concentration is what a denominator
+  question needs. Only the department can answer it — tracked at
+  [#257](https://github.com/goedelsoup/ohio-education-funding/issues/257).
+
   **[open]** Whether to move the constant. It is left at 0.85 for now: changing it moves every
   projection in the published feed, which is a decision to record rather than a number to edit,
   and this file's business was the measurement.

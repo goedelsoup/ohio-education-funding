@@ -33,6 +33,7 @@ Sorted by: type, then slug.
 | [`cupp-district-profile-report`](cupp-district-profile-report.md) | District Profile Report — the "Cupp Report" | 5 |
 | [`derolph-litigation-record`](derolph-litigation-record.md) | DeRolph Litigation Record | 5 |
 | [`dew-academic-distress-commission`](dew-academic-distress-commission.md) | Academic Distress Commission — the department's commission page | 3 |
+| [`dew-education-landscape`](dew-education-landscape.md) | Ohio's Education Landscape — the department's own count of every school option | 1 |
 | [`dew-expenditure-expanded-list`](dew-expenditure-expanded-list.md) | FY2025 Expenditure Expanded List | 1 |
 | [`dew-five-year-forecast`](dew-five-year-forecast.md) | Five-year forecast filings — the department's republished submissions | 3 |
 | [`dew-fy26-funding-calculator`](dew-fy26-funding-calculator.md) | FY26 TRAD State Foundation Funding Calculator — recovered from the archive | 1 |
@@ -52,7 +53,7 @@ Sorted by: type, then slug.
 | [`fordham-base-cost-critique`](fordham-base-cost-critique.md) | Fordham Institute — Ohio Base Cost Model Commentary | 2 |
 | [`fordham-house-bridge-commentary`](fordham-house-bridge-commentary.md) | Fordham Institute — "Ohio House puts the brakes on Cupp-Patterson" | 2 |
 | [`heritage-education-freedom-report-card`](heritage-education-freedom-report-card.md) | Heritage Foundation — Education Freedom Report Card (2023, 2nd edition) | 1 |
-| [`jhu-homeschool-hub`](jhu-homeschool-hub.md) | Johns Hopkins Homeschool Hub — state and district home-education counts | 0 |
+| [`jhu-homeschool-hub`](jhu-homeschool-hub.md) | Johns Hopkins Homeschool Hub — state and district home-education counts | 1 |
 | [`lsc-appropriation-spreadsheet`](lsc-appropriation-spreadsheet.md) | LSC appropriation spreadsheet | 3 |
 | [`lsc-catalog-of-budget-line-items`](lsc-catalog-of-budget-line-items.md) | Catalog of Budget Line Items — what each appropriation line was given | 10 |
 | [`lsc-dew-redbook`](lsc-dew-redbook.md) | LSC Redbook — Ohio Department of Education and Workforce | 7 |
@@ -68,7 +69,7 @@ Sorted by: type, then slug.
 | [`ohio-revised-code`](ohio-revised-code.md) | Ohio Revised Code — the sections this corpus cites | 19 |
 | [`ohio-session-laws`](ohio-session-laws.md) | Ohio session laws — the appropriation acts themselves | 3 |
 
-45 entries, 2 not yet cited by any corpus node. 229 retrieved files are pinned by SHA-256 in [`crates/connect/source-digests.txt`](../../crates/connect/source-digests.txt).
+46 entries, 1 not yet cited by any corpus node. 230 retrieved files are pinned by SHA-256 in [`crates/connect/source-digests.txt`](../../crates/connect/source-digests.txt).
 <!-- /REGEN -->
 
 ## Adding a source

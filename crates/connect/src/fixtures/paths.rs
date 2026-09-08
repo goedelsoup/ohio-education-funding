@@ -22,6 +22,15 @@ pub const GRADE_BANDS_FIXTURE: &str = "crates/foundation/fixtures/fy24-district-
 /// Where the per-district financial panel is written, relative to the repository root.
 pub const FINANCE_FIXTURE: &str = "crates/project/fixtures/district-finances.csv";
 
+/// Every way an Ohio child is schooled outside a traditional district, as the department counts
+/// them, relative to the repository root.
+///
+/// Statewide rather than per-agency, which is unusual here and is the point: the sheet prints
+/// home education, vouchers, community schools, chartered private schools and open enrolment in
+/// one table, so the channels can be read against each other. The department publishes a
+/// home-education count nowhere else in machine-reachable form.
+pub const LANDSCAPE_FIXTURE: &str = "crates/project/fixtures/education-landscape-channels.csv";
+
 /// Where the SD-1 taxable value and taxes charged panel is written, relative to the root.
 pub const SD1_FIXTURE: &str = "crates/dispersion/fixtures/sd1-district-taxes.csv";
 
@@ -188,6 +197,7 @@ pub const REBUILT: &[&str] = &[
     REPORT_CARD_FIXTURE,
     FUNCTIONS_FIXTURE,
     FINANCE_FIXTURE,
+    LANDSCAPE_FIXTURE,
     SD1_FIXTURE,
     CASINO_FIXTURE,
     LSC_GREENBOOK_FIXTURE,
