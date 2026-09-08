@@ -38,14 +38,14 @@ properties:
     **Projected ADM** carries the observed series forward under a damped trend:
 
         rate  = (ADM[last] / ADM[first]) ^ (1 / years) - 1
-        value = ADM[last] * PROD over h of (1 + rate * damping^h),   damping = 0.85
+        value = ADM[last] * PROD over h of (1 + rate * damping^h),   damping = 0.30
 
     Damped because enrollment trends do not persist: a district losing 2% a year does not lose
     2% a year forever, since the decline is driven by cohorts moving through and by housing stock
     that eventually turns over. Undamped extrapolation is the standard way to produce a confident
-    and absurd number at a ten-year horizon. 0.85 is a convention, not an estimate — three
-    observations per district cannot identify a damping parameter, and it is named as a constant
-    so a phase with a real history can replace it and see what moves.
+    and absurd number at a ten-year horizon. The damping was 0.85 for as long as it was a
+    convention rather than an estimate; it is 0.30 since being fitted against fourteen years of
+    the F-33 panel, which is recorded under the findings below.
   inputs: |
     The `ADM Data` sheet of the FY2027 calculator,
     [dew-fy27-funding-calculator](../../catalog/dew-fy27-funding-calculator.md): FY2024, FY2025
@@ -113,9 +113,9 @@ findings: |
   as enrollment does; the widening gap between the two is the guarantee.
 
   **REMOVING THE GUARANTEE NEARLY DOUBLES THE STATE'S EXPOSURE TO ENROLLMENT FORECAST ERROR.**
-  [inference — a forecast] At FY2032 enrollment, total state aid under current law is $7,125M in
-  a band of $6,889M to $7,379M (±3.4%). With the guarantee removed the same forecast error
-  produces ±5.9%. The guarantee is a shock absorber for the *appropriation* as well as for the
+  [inference — a forecast] At FY2032 enrollment, total state aid under current law is $7,230M in
+  a band of $7,017M to $7,486M (±3.2%). With the guarantee removed the same forecast error
+  produces ±5.9%, on a band 1.8 times as wide. The guarantee is a shock absorber for the *appropriation* as well as for the
   district, and that is not usually how it is argued about. Recorded in full at
   [guarantee phase-out](../scenario/guarantee-phase-out.yml).
 
@@ -139,7 +139,7 @@ findings: |
   |---|--:|
   | 0.20 — the fitted optimum | 0.04031 |
   | 0.30 | 0.04033 |
-  | **0.85 — what the projections use** | **0.04441** |
+  | **0.85 — the convention it replaced** | **0.04441** |
   | 1.00 — undamped | 0.04874 |
   | carrying the last observation forward | 0.04340 |
 
