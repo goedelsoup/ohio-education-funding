@@ -12,7 +12,9 @@ pub(super) const DIESEL: Connector = Connector {
     key: "eia-diesel",
     publisher: "U.S. Energy Information Administration",
     feeds: &["metric", "fiscal-period"],
-    status: Status::Parsed,
+    status: Status::Wired {
+        still_blocked: None,
+    },
     note: "The cost side of the transportation rates. Ohio's school buses run on diesel and \
            the rate that reimburses them is a trimmed mean of last year's spending, so the \
            price and the payment are a year apart by construction.",
