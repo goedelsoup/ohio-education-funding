@@ -124,9 +124,50 @@ findings: |
 
   See [dew-mr81-enrollment-archive](../../catalog/dew-mr81-enrollment-archive.md).
 
-  **[open]** Whether a damped trend is the right method, which needs an enrollment history longer
-  than three points — `nces-ccd` is where one would come from, and it is also what would handle
-  district consolidation, without which a long series is silently wrong.
+  **THE METHOD IS RIGHT AND THE CONSTANT IS NOT.** [verified — `crates/project`]
+  This was carried as open for want of an enrollment history longer than three points. The
+  history arrived from a different direction than the one expected: not `nces-ccd`, but the F-33
+  panel, once it was extended past FY2022 — `V33` fall membership for **602 districts across
+  fourteen years**, keyed on `LEAID`, which is also what answers the consolidation worry, since
+  a district that stops being surveyed simply leaves the population rather than distorting it.
+
+  Backtested over **13,244 out-of-sample forecasts** — six origins from FY2013 to FY2019,
+  horizons of one to five years, the two pandemic years dropped as targets because no method
+  predicts a school closure:
+
+  | damping | mean absolute log error |
+  |---|--:|
+  | 0.20 — the fitted optimum | 0.04031 |
+  | 0.30 | 0.04033 |
+  | **0.85 — what the projections use** | **0.04441** |
+  | 1.00 — undamped | 0.04874 |
+  | carrying the last observation forward | 0.04340 |
+
+  Damping is the right shape: at its optimum it beats a flat carry-forward by 7.1%, and an
+  undamped trend and a least-squares straight line are both worse than either. **But 0.85 damps
+  too weakly to collect that gain**, costs about a tenth of the error against the optimum, and on
+  three of the four metrics tried is beaten by making no forecast at all. Ohio district
+  enrollment is close enough to a random walk that a fitted growth rate is worth carrying for
+  about a year; 0.85 carries three-quarters of it into the third.
+
+  A longer fitting window is the larger of the two available improvements and is free — the
+  observations are already committed. [verified — `crates/project`]
+
+  **AND THE GUARANTEE ABSORBS MOST OF THE ERROR, WHICH BOUNDS WHAT IT COSTS.** [verified —
+  `crates/project`]
+  At the feed's FY2036 horizon, moving the damping from 0.85 to 0.30 moves statewide ADM by
+  **+4.66%** — 61,297 pupils — and realized state aid by only **+1.05%**, or $75.4m. The
+  enrollment error is four times the aid error for the reason this node already gives: the
+  guarantee pays a fixed amount to about half the state, so state cost is far less sensitive to
+  enrollment than the enrollment forecast is uncertain. The constant is wrong and the consequence
+  is bounded, and both halves belong in the same sentence.
+
+  What moves most is not a dollar figure. **47 districts** change guarantee status at the horizon
+  — 367 against 320 — and that is a count the site publishes.
+
+  **[open]** Whether to move the constant. It is left at 0.85 for now: changing it moves every
+  projection in the published feed, which is a decision to record rather than a number to edit,
+  and this file's business was the measurement.
 figures:
   - key: project/districts-on-the-guarantee
     value: 294

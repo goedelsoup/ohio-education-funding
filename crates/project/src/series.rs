@@ -93,9 +93,31 @@ impl Method {
 /// The default damping factor.
 ///
 /// A convention, not an estimate. Three observations per district cannot identify a damping
-/// parameter, and there is no Ohio-specific study here to borrow one from; 0.85 is the value
+/// parameter, and there was no Ohio-specific study here to borrow one from; 0.85 is the value
 /// damped-trend forecasting commonly defaults to. It is named as a constant so that a future
-/// phase with a real enrollment history can replace it with a fitted number and see what moves.
+/// phase with a real enrollment history could replace it with a fitted number and see what
+/// moves.
+///
+/// # The history arrived, and the number does not survive it
+///
+/// The F-33 panel now carries fourteen years of `V33` fall membership for 602 districts, which
+/// is the history that sentence was waiting for.
+/// `tests/the_damping_nobody_fitted.rs` backtests this constant over 13,244 out-of-sample
+/// forecasts and finds the error-minimising value at **0.2 to 0.3**. At 0.85 the mean absolute
+/// log error is about a tenth higher than at the optimum, and higher than carrying the last
+/// observation forward unchanged — the fitted rate is worth roughly one year and 0.85 carries
+/// three-quarters of it into the third.
+///
+/// What moving it would move, measured at the feed's FY2036 horizon: statewide ADM by +4.66%
+/// (61,297 pupils) and realized state aid by +1.05% ($75.4m). The enrollment error is four times
+/// the aid error because the guarantee absorbs most of it, so the constant is wrong and the
+/// consequence is bounded. The largest movement is a count rather than a dollar figure — 47
+/// districts change guarantee status.
+///
+/// The value is left alone here deliberately. Changing it moves every projection in the
+/// published feed, which is a decision to be recorded in `.yidam/decisions/` rather than a
+/// constant to be edited; what was missing was the measurement, and the measurement is now in
+/// that file.
 pub const DEFAULT_DAMPING: f64 = 0.85;
 
 /// One standard deviation. Covers about 68% of a normal distribution.
