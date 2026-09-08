@@ -28,6 +28,7 @@ properties:
     description: Designation of the budget act funding this period
   - name: context
     type: text
+    prose: true
     description: What was distinctive about this period for education funding
 # `edges:` below names the relationships this class is *defined by* — the ones a reader needs to
 # understand what it connects to. It is not the permitted set. A large share of the corpus's edges

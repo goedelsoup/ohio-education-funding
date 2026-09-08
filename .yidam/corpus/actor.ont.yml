@@ -22,9 +22,11 @@ properties:
     description: Date the institution was created
   - name: authority
     type: text
+    prose: true
     description: What this institution has the power to do within the funding system
   - name: publishes
     type: text
+    prose: true
     description: The data series and reports this institution issues, if any
 # `edges:` below names the relationships this class is *defined by* — the ones a reader needs to
 # understand what it connects to. It is not the permitted set. A large share of the corpus's edges

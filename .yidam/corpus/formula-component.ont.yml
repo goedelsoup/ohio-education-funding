@@ -16,6 +16,7 @@ properties:
     description: The component's name as it appears in statute or department documentation
   - name: function
     type: text
+    prose: true
     description: What calculation step the component performs and on what inputs
   - name: statutory_basis
     type: string

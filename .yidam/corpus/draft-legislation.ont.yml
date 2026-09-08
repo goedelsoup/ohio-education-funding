@@ -62,23 +62,27 @@ properties:
       sponsors and never will.
   - name: status
     type: text
+    prose: true
     description: >-
       Where the draft stands — introduced, reported out of committee, passed one chamber, died
       with the session, or never introduced. The field that stops a reader taking a proposal for
       a statute on a page that otherwise looks like one.
   - name: text_read
     type: text
+    prose: true
     description: >-
       Which version of the text this node was written from, and the digest pinning the bytes.
       Load-bearing here in a way it is not for an enacted act: a pending bill's text moves under
       its own URL as it is amended, so "the bill says" without a version names a moving target.
   - name: question
     type: text
+    prose: true
     description: >-
       What the draft is constructed to test. For a hypothetical or counterfactual draft this is
       the reason it exists; for an introduced bill it is what reading it is expected to settle.
   - name: provisions
     type: text
+    prose: true
     description: >-
       Each provision: what it does, the Revised Code section it would amend or `uncodified`, the
       parameter it binds, the baseline value and the proposed one, and whether the calculators
@@ -86,6 +90,7 @@ properties:
       of them, so this is where the prose meets the simulation.
   - name: unpriced
     type: text
+    prose: true
     description: >-
       The provisions the calculators cannot run, and what each would need before they could.
       Mandatory on every node in the class, including the ones where the answer is none. A cost

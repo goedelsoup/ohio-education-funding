@@ -1,0 +1,137 @@
+id: the-prose-a-node-holds
+summary: >-
+  Every check that read this corpus's prose read `description` and nothing else, and this corpus
+  writes in four fields. The ontology now declares which top-level keys hold prose and which
+  properties do: `summary`, `findings` and `revisions` universally, and 51 of the 54 properties
+  the classes declare as `type: text`. Nothing gates differently. What moves is the text an index
+  would be built from, which very nearly doubles: 462K characters to 919K.
+context: |
+  yidam's prose checks named one key. `node-too-long` counted the lines of `description`,
+  `missing-description` reported a node that had none, and `yidam embed` composed the text an
+  index is built from out of the label and that one field. Meanwhile the claim counter reads the
+  whole file, which is why 780 `[verified]` tags are counted across prose the length checks could
+  not see.
+
+  This corpus has written in four fields since
+  [`the-four-genres-of-a-description`](the-four-genres-of-a-description.yml) split them:
+  `summary` leads a page, `description` is the body, `findings` is what the corpus established
+  itself, and `revisions` records what it withdrew. All 129 nodes carry `summary` and
+  `description`, 91 carry `findings`, and 36 carry `revisions`.
+
+  The gap was already measured, from the other side and without a name for it. The kuten record
+  put the median node at 118 lines against a band of 35 to 62, and observed that the median
+  `description` is 21 lines while all four prose fields together run to 34 — "yidam 0.10.0
+  narrowed `node-too-long` to the description for exactly this reason, and this band still reads
+  the whole file, so the two disagree about what a node's length is."
+
+  A fifth of what any corpus writes is not at the top level at all. Upstream measured 2,763 nodes
+  across sixteen corpora: 68.6% hold a block scalar nested inside another key and 83% of that
+  sits under `properties:`. Here it is 129 of 129 nodes and 246,194 characters — a `sensitivity`
+  that explains what moves when a parameter moves, a `caveats` that says how a metric misleads, a
+  `vetoes` that is the only place six line-item vetoes are written down. Nothing that read prose
+  could see any of it.
+
+  yidam cli/v0.11.0 (RFC-0031) gives the ontology two ways to say so, and both were absent rather
+  than declined: absent both declarations the effective set is `[description]`, which is exactly
+  what 0.10.0 did.
+decision: |
+  **The four top-level fields are declared universally.** `.yidam/corpus/universal.yml` carries
+  `prose: [summary, findings, revisions]`. The effective set is `{description} ∪ universal ∪
+  class`, so `description` is never listed and naming the other three does not unname it.
+  Universal rather than per class for the reason `seeded_because` is: these are how this corpus
+  writes any node, and declaring them in eighteen ontologies would be eighteen copies of one
+  decision with a nineteenth class silently missing them.
+
+  `revisions` is a list of records rather than a paragraph, and it is declared anyway. A
+  withdrawal says why the corpus no longer stands behind a claim, in prose, with the test or
+  source that settled it — 67 of them across 36 nodes. That is the node saying something.
+
+  **A property is prose when the class declared it `type: text`, with three exceptions.** 51 of
+  54 flagged, and the rule is the corpus's own vocabulary rather than a judgement made 54 times:
+  `text` is what this corpus already writes when a value is sentences, `string` is what it writes
+  when a value is a name, a code or a path. The three excluded are named here rather than left to
+  a reader to notice:
+
+  - `formula-component/function_tex` — LaTeX. `\begin{aligned}` and `\text{...}` are markup, and
+    embedding them would put macro names into the text an index searches. The prose that explains
+    the same calculation is in `function`, which *is* flagged.
+  - `parameter/written_as` — the phrases a formula writes a parameter as, one per line. A naming
+    alias, median 39 characters.
+  - `draft-legislation/sponsors` — a roster, median 6 characters, usually "None."
+
+  There is no universal form of the property declaration, and upstream is right that there should
+  not be: a property belongs to the class that declared it, and two classes can use one name for
+  different things. `parameter/kind` is 761 characters of argument about what kind of parameter
+  it is; `fiscal-period/kind` is the word "biennium". They are `text` and `string` respectively,
+  which is the distinction doing the work.
+
+  **`web/src/lib/schema/corpus.ts` learns the field first.** `OntologyPropertySchema` is
+  `.strict()`, so a `prose:` key in an ontology is a validation failure until the Zod schema
+  accepts it, and `.yidam/schemas/corpus-ontology.json` is generated from that schema and read by
+  the editor over `*.ont.yml`. Declaring in the corpus before widening the schema would have
+  underlined 51 lines in the author's editor and failed `pnpm test:unit`. `readOntology` is
+  deliberately not changed: it maps a fixed set of keys onto the class page, and how the corpus is
+  measured is not something that page has a reason to render.
+
+  `OntologyClassSchema` is not widened. A class may declare its own top-level `prose:` upstream,
+  and no class here has a key the universal three do not already cover. Declaring the shape before
+  anything uses it would be a schema saying more than the corpus has decided.
+consequences: |
+  **Nothing gates differently, and that was checked rather than assumed.** `yidam lint` holds at
+  493 findings with no errors, the same six checks at the same counts, before and after. No
+  `node-too-long` finding appears: the median node's four prose fields run to 34 lines and the
+  ceiling is well above that, so the number this corpus was measured on being wrong never meant it
+  was over.
+
+  **The text an index would be built from very nearly doubles.** Across the same 174 files
+  `yidam embed` writes 461,947 characters at this pin with neither declaration, 745,906 with the
+  three top-level fields, and **918,794 with the property flags as well** — +99%, and the two
+  halves are 284K and 173K. What stays out of reach is the 30K in `string`-typed properties that
+  the alternatives below decline to flag, plus prose under `links:` and under coined top-level
+  keys, which upstream puts at 17% of the nested prose it measured and ships no mechanism for.
+
+  **That growth buys nothing today.** There is no vector index here and `.yidam/config.toml`
+  says why: `index-build` needs the `index` feature, which
+  is not in the released binary's default set, and `[due] index_after` is omitted rather than set
+  so no clock reports a debt nobody intends to pay. `.yidam/embeddings/` is a derived artifact and
+  git-ignores as one. The declaration is what makes the measurement honest; the index is a
+  separate decision and still not taken.
+
+  **`missing-description` can now be satisfied by a property.** A node whose substance is a
+  transcription under `properties:` stops being reported as having said nothing. None is today —
+  all 129 carry both `summary` and `description` — so this is a hole closed before anything fell
+  in it.
+
+  **Two files hold one rule, and now they hold two.** `universal.yml` already restated
+  `UNIVERSAL_PROPERTIES` and `OBSERVATION_PROPERTY` from `web/src/lib/schema/corpus.ts`, with a
+  comment saying to change both together. `prose:` adds a second such pair — the corpus declares
+  it, the Zod schema permits it — and the same warning applies. The site does not read the
+  declaration, so a drift here is a validator disagreeing about what an ontology may say rather
+  than two validators disagreeing about the corpus.
+alternatives: |
+  **Declare the top-level fields and stop.** The smaller change, and it needs no schema work at
+  all: `universal.yml` is read by yidam and by nothing in `web/`, so `prose:` could have been
+  added to it without touching `OntologyPropertySchema` or regenerating the editor schemas.
+  Declined because it reaches 462K to 746K and leaves the other 173K — a fifth of what this corpus
+  writes — in exactly the state the change is meant to fix. The property declarations are where
+  the measurement was furthest wrong, and they are the half that needed the schema work.
+
+  **Flag every property carrying a block scalar.** 129 of 129 nodes hold one, so the mechanical
+  rule is available and would have needed no exception list. Declined because it is not a rule
+  about prose: `function_tex` is 14 multi-line LaTeX values and `simulation_key` is a
+  single-token identifier that happens to be written as a block in places. A rule that cannot tell
+  a paragraph from a macro is a rule that puts `\begin{aligned}` into an index.
+
+  **Flag the `string` properties that carry prose too.** `program/mechanism`,
+  `program/appropriation_line`, `formula-component/statutory_basis`, `parameter/statutory_basis`
+  and `revenue-stream/legal_basis` are declared `string` and hold paragraphs — about 30K
+  characters between them. Declined here, and it is the honest half of the rule above: if `text`
+  means prose then those five are mistyped, and the fix is `yidam migrate retype`, not a `prose:`
+  flag that would make the two declarations disagree on the same property. That is its own
+  question and its own commit.
+
+  **Restate `prose:` in the site's own vocabulary check.** `web/src/lib/schema/corpus.ts` holds
+  the second copy of the universal-property rule and could hold a third of this one, checking that
+  a flagged property really does carry prose. Declined: there is nothing to check it against
+  except length, the site renders these values already without needing to know, and a third
+  validator that measures a different thing is how the first two came to disagree.

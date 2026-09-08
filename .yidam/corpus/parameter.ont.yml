@@ -20,6 +20,7 @@ properties:
     description: dollars-per-pupil | ratio | mills | percent | count
   - name: kind
     type: text
+    prose: true
     description: >-
       What sort of thing sets this value, and therefore what would have to happen for it to
       change: legislated | delegated | measured | uncodified. Ohio's funding parameters are four
@@ -34,6 +35,7 @@ properties:
       "not in law" are different claims that this taxonomy has already conflated once.
   - name: series
     type: text
+    prose: true
     description: Value per fiscal period, with the enactment that set each value
   - name: statutory_basis
     type: string
@@ -55,6 +57,7 @@ properties:
       be an alias without linking every other component's supplements.
   - name: sensitivity
     type: text
+    prose: true
     description: What moves when this parameter moves, and which agencies feel it most
 # `edges:` below names the relationships this class is *defined by* — the ones a reader needs to
 # understand what it connects to. It is not the permitted set. A large share of the corpus's edges

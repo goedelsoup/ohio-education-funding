@@ -10,12 +10,25 @@
   "root": "<ROOT>",
   "gate": {
     "passed": false,
-    "new_violations": 2,
-    "baselined_violations": 0,
+    "new_violations": 1,
+    "baselined_violations": 2,
     "stale_baseline_entries": [],
-    "expired_baseline_entries": []
+    "expired_baseline_entries": [
+      {
+        "check": "dangling-edge",
+        "node": ".yidam/corpus/concept/low-flow.yml",
+        "commits": 3
+      }
+    ]
   },
   "checks": [
+    {
+      "id": "malformed-yaml",
+      "title": "File that is not the YAML it is read as",
+      "severity": "error",
+      "rationale": "A file the parser rejects reaches every other check as an empty record, and an empty record is not the same claim as an empty file. On an instance that reads as a node declaring nothing, so the report contradicts the file it names. On a `<class>.ont.yml` it reads as a class declaring no properties and licensing no edges, which is indistinguishable from an ontology nobody has filled in — and five checks that gate on those declarations find nothing to check and pass. That is a false negative in a gate, produced by a typo, and nothing else in the report can say it happened. Every other finding about the file is suppressed: fix the parse error and they come back, correct this time.",
+      "violations": []
+    },
     {
       "id": "missing-class",
       "title": "Instance declaring no class",
@@ -47,7 +60,7 @@
           "node": ".yidam/corpus/concept/low-flow.yml",
           "detail": "target does not exist: ../concept/assimilative-capacit.yml",
           "severity": "error",
-          "in_baseline": false,
+          "in_baseline": true,
           "span": {
             "line": 9
           }
@@ -69,25 +82,13 @@
       "violations": [
         {
           "node": ".yidam/corpus/concept/low-flow.yml",
-          "detail": "`datum` is declared by `.yidam/corpus/concept.ont.yml` and this instance does not carry it",
-          "severity": "warn",
-          "in_baseline": false
-        },
-        {
-          "node": ".yidam/corpus/concept/mixing-zone.yml",
-          "detail": "`datum` is declared by `.yidam/corpus/concept.ont.yml` and this instance does not carry it",
-          "severity": "warn",
+          "detail": "`datum` is declared by `.yidam/corpus/concept.ont.yml` as `required: true` and this instance does not carry it",
+          "severity": "error",
           "in_baseline": false
         },
         {
           "node": ".yidam/corpus/concept/mixing-zone.yml",
           "detail": "`claim_tag` is declared by `.yidam/corpus/concept.ont.yml` and this instance does not carry it",
-          "severity": "warn",
-          "in_baseline": false
-        },
-        {
-          "node": ".yidam/corpus/concept/tailwater.yml",
-          "detail": "`datum` is declared by `.yidam/corpus/concept.ont.yml` and this instance does not carry it",
           "severity": "warn",
           "in_baseline": false
         },
@@ -117,7 +118,7 @@
       "id": "unimplemented-class",
       "title": "Class naming an implementation the code does not define",
       "severity": "error",
-      "rationale": "A class declaring `implemented_by:` has stated a fact about `crates/`,\n            foundational_type: None,\n            dead_alignment_fields: vec![], and a tree with no type of that name contradicts it — which is what this check's siblings gate on, and an omission is not. A class that declares nothing is not checked, and that silence is measured rather than timid: across twelve derived corpora 129 of 157 declared classes have no type bearing their name, and matching every language in the tree raises it to 88%. Their ontologies model a domain and their code models the pipeline that gathers evidence about it, so a class without a type is the normal case and reporting it would call four fifths of every ontology debt. A rename is invisible: the tree is scanned rather than a diff, so a class implemented under a new name is simply found.",
+      "rationale": "A class declaring `implemented_by:` has stated a fact about `crates/`, and a tree with no type of that name contradicts it — which is what this check's siblings gate on, and an omission is not. A class that declares nothing is not checked, and that silence is measured rather than timid: across twelve derived corpora 129 of 157 declared classes have no type bearing their name, and matching every language in the tree raises it to 88%. Their ontologies model a domain and their code models the pipeline that gathers evidence about it, so a class without a type is the normal case and reporting it would call four fifths of every ontology debt. A rename is invisible: the tree is scanned rather than a diff, so a class implemented under a new name is simply found.",
       "violations": []
     },
     {
@@ -204,7 +205,7 @@
       "id": "missing-description",
       "title": "Instance with no description",
       "severity": "warn",
-      "rationale": "The description is the node's content. An instance with properties and links but nothing said about it records that something exists without recording what is known about it.",
+      "rationale": "The prose is the node's content. An instance with properties and links but nothing said about it records that something exists without recording what is known about it. What counts as prose is what the ontology declares — a node carrying a `summary` and no `description` has said something, and reporting it here would report the corpus using a vocabulary it declared.",
       "violations": []
     },
     {
@@ -341,7 +342,7 @@
           "node": ".yidam/sangha/resolutions/silt-budget.md",
           "detail": "`ma/dredger` is read as a tip and `electors.md` registers no such branch",
           "severity": "error",
-          "in_baseline": false,
+          "in_baseline": true,
           "span": {
             "line": 6
           }
@@ -442,14 +443,14 @@
       "id": "slid-line-citation",
       "title": "The quoted passage is not in the cited lines",
       "severity": "error",
-      "rationale": "An edit above a cited range moves the range off its passage without breaking anything a file-level check can see: the citation still resolves, the lines still hold text, and the text is now something else. Twelve citations rotted that way at once, silently, and two came to point at words written long after the arguments that cite them. Where the document quotes the passage it cites — the house style — the quote decides. Matched on words, in order, elisions honoured, so wrapping, emphasis and comment markers cannot manufacture a drift. Where the passage is still in the file and in exactly one place, the finding names the range it moved to: the same matching that found the drift decides it, and re-deriving that by hand was the whole recurring cost. That range is where the quoted words are and nothing wider, so a citation that deliberately spanned more than it quoted is widened back out by hand.",
+      "rationale": "An edit above a cited range moves the range off its passage without breaking anything a file-level check can see: the citation still resolves, the lines still hold text, and the text is now something else. Twelve citations rotted that way at once, silently, and two came to point at words written long after the arguments that cite them. Where the document quotes the passage it cites — the house style — the quote decides. That includes a fenced block the citation introduces, where the fence's tag names the cited file's language: the paragraph ends at the fence, so for as long as this read only inline quotes, the most explicit way of writing a quote down was the one form nothing checked, and three citations rotted inside it (#758). A `text` fence is a rendering rather than a transcription and is still not read — a format string's `{}` has become a value, and holding the file to the words it printed would report a drift no repair can clear. Matched on words, in order, elisions honoured, so wrapping, emphasis and comment markers cannot manufacture a drift. Where the passage is still in the file and in exactly one place, the finding names the range it moved to: the same matching that found the drift decides it, and re-deriving that by hand was the whole recurring cost. That range is where the quoted words are and nothing wider, so a citation that deliberately spanned more than it quoted is widened back out by hand.",
       "violations": []
     },
     {
       "id": "citation-label-not-cited",
       "title": "A citation's label names something its lines do not say",
       "severity": "error",
-      "rationale": "The strong anchor is a quote, and 119 of this repository's 150 line citations carry none. Each of those was checked for existence and nothing else, which leaves the whole of the interesting failure uncovered: a range that slides onto lines that are neither blank nor quoted is invisible to `dead-line-citation` and `slid-line-citation` at once. Seven citations had already rotted through that gap when a person found them by hand while looking at something else (#627), and six of the seven were labelled with the very check they cited. The label is the anchor they were carrying all along: the house writes a citation of code with its symbol in the label and its coordinate in the fragment, so the label is a claim about the target's content that a check can decide. Read only where nothing quotes the passage — a quote is better evidence and decides alone — and only where the label names a symbol rather than restating the line number, which is the other house form and 104 of the 119. Matched on words exactly as a quote is, so wrapping, emphasis and an argument list cannot manufacture a drift, and any one `::` segment is enough. Error, under the baseline ratchet like every other citation defect a person here can fix: this is a latch on a population that is already correct, not a backlog.",
+      "rationale": "The strong anchor is a quote, and 135 of this repository's 180 line citations carry none. Each of those was checked for existence and nothing else, which leaves the whole of the interesting failure uncovered: a range that slides onto lines that are neither blank nor quoted is invisible to `dead-line-citation` and `slid-line-citation` at once. Seven citations had already rotted through that gap when a person found them by hand while looking at something else (#627), and six of the seven were labelled with the very check they cited. The label is the anchor they were carrying all along: the house writes a citation of code with its symbol in the label and its coordinate in the fragment, so the label is a claim about the target's content that a check can decide. Read only where nothing quotes the passage — a quote is better evidence and decides alone — and only where the label names a symbol rather than restating the line number, which is the other house form and 108 of the 135. Matched on words exactly as a quote is, so wrapping, emphasis and an argument list cannot manufacture a drift, and any one `::` segment is enough. Error, under the baseline ratchet like every other citation defect a person here can fix: this is a latch on a population that is already correct, not a backlog.",
       "violations": []
     },
     {
@@ -463,7 +464,7 @@
       "id": "citation-range-stated-twice",
       "title": "A citation's label and its link name different lines",
       "severity": "error",
-      "rationale": "The house style states the cited range twice — `[`file.rs:12-19`](../file.rs#L12-L19)` — and 134 of the 149 line citations in this repository write both copies. Until #622 nothing read the left-hand one, so the two could disagree indefinitely: the scan sees the fragment, and the label is what a reader's eye lands on. The failure this forecloses is half a repair. A citation that slid is fixed by editing a number, and editing the one number that resolves leaves the other one lying. No citation disagreed on the day this landed, which is the point — it is a latch on a population that is already correct, not a backlog. A label that names no range is the other house form and not a finding: most citations of code label a symbol.",
+      "rationale": "The house style states the cited range twice — `[`file.rs:12-19`](../file.rs#L12-L19)` — and 150 of the 180 line citations in this repository write both copies. Until #622 nothing read the left-hand one, so the two could disagree indefinitely: the scan sees the fragment, and the label is what a reader's eye lands on. The failure this forecloses is half a repair. A citation that slid is fixed by editing a number, and editing the one number that resolves leaves the other one lying. No citation disagreed on the day this landed, which is the point — it is a latch on a population that is already correct, not a backlog. A label that names no range is the other house form and not a finding: most citations of code label a symbol.",
       "violations": []
     },
     {

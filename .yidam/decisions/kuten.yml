@@ -1,12 +1,13 @@
 id: kuten
 summary: >-
-  This corpus declares `inquiry` as what its loop is aimed at. Four of the five measures
-  diverge from the profile's bands, and two of the four are the `(scope)` suffix rather than
-  the practice: 73 commits written as `phase(<slug>):` settle a phase, which is 17.5% and
-  inside the declared band, and none of them is visible to a check that reads everything
-  before the first colon as the verb.
+  This corpus declares `inquiry` as what its loop is aimed at. Four of the five measures diverged
+  at adoption and one does now, and the corpus did not move under any of them: the profile is at
+  revision 2, the check learned to read a scoped verb, and 73 commits written `phase(<slug>):`
+  went from counting as nothing to counting as 17.1%. What survives is the off-vocabulary share,
+  which this record already said it would not close.
+
 kuten: inquiry
-revision: 1
+revision: 2
 context: |
   A yidam repository has always declared what it is *about* — the ontology, the classes, the
   edge policy — and never what its work is *for*. That second thing had exactly one value,
@@ -91,3 +92,56 @@ alternatives: |
   `questions_after = 200` against a proposed 100, `phases_after = 50` against 60, and
   `ttl_days = 730` against 180, each with an argument already written beside it, and it goes
   on omitting `index_after` for an index this repository has decided not to build.
+
+amendment: |
+  **Revision 2, adopted with the prelude at `2996286` (template `v0.5.0`).** The number beside
+  `kuten:` is copied from the vendored profile and never typed from memory, so it moves when the
+  profile does. Three of the four divergences above are gone and not one of them because this
+  corpus changed anything.
+
+  **`phase-commit-share` reads 17.1% and sits inside its band.** The paragraph above predicted
+  this and named the cause: GRAPH.md reads everything before the first `: ` as the verb, so each
+  of the 73 commits written `phase(<slug>):` counted as the unrecognized verb `phase(<slug>)` and
+  the share came out zero. Upstream fixed the predicate rather than the history. 75 of the 438
+  commits the check now measures — the 73 plus two written `phase:` bare — which is 17.1% against
+  a declared 12%–27%. The record said "on no reading of it is the answer zero", and the reading
+  the tool now takes is 17.1%.
+
+  **`nodes-per-commit` and `median-node-lines` are retired, not satisfied.** The profile's
+  `classes` slot is gone at revision 2 and the comment where the two bands stood is the finding:
+  both measured how old a repository is rather than how it works. Spearman rho(authored commits,
+  nodes per commit) = -0.886 across the fit's six members, the 1.12 ceiling came from the
+  youngest and the 0.50 floor from the second-oldest, and one member left both bands within six
+  hours of the fit that used it, having changed nothing about its practice. This repository had
+  argued the same thing from its own side — "a fact about the shape of the repository rather than
+  about the rate of inquiry" — and was answering a question that should not have been asked.
+
+  `median-node-lines` is worth one further note, because the disagreement it recorded is now
+  settled from the other end too. That paragraph observed that yidam 0.10.0 narrowed
+  `node-too-long` to the description while the band read the whole file, so the two disagreed
+  about what a node's length is. At this pin neither reads what it used to: the band is gone, and
+  the ontology declares which keys hold prose. See [the-prose-a-node-holds](the-prose-a-node-holds.yml).
+
+  **`off-vocabulary-share` survives, and the report now decomposes it.** 211 of 438 commits carry
+  a verb outside the closed set, which is 48.2% against a declared 0%–2%. 80 of those are a valid
+  verb wearing a conventional-commits scope — 73 `phase`, 3 `fix`, 2 `consume`, 1 `vendor`,
+  1 `migrate` — which the check itself now names as a spelling to repair rather than a vocabulary
+  being ignored. That leaves **131 genuinely outside, 29.9%**: `corpus` 40, `web` 32, `connect` 24,
+  `add` 16, `gate` 5, `wiki` 3, `perf` 2, and nine used once each. The answer is unchanged and so
+  is the ground for it — those commits are the artifact's work rather than the corpus's, history is
+  not rewritten to match a vocabulary it predates, and `web/tests/unit/commitVerbs.spec.ts` holds
+  the only thing that can be held.
+
+  **Why this is an amendment and not the superseding record `consequences:` calls for.** That
+  paragraph is about the decision, and the decision is unchanged: this corpus still declares
+  `inquiry`, and nothing here reverses what was chosen. What moved is the vintage of the profile
+  the declaration is read at, which is the case `amendment:` exists for. It also cannot be done
+  any other way — `doctor` reads `revision:` out of this file by name, so a record in a second
+  file would leave the warning standing and put two revisions in the corpus at once. The sentence
+  in `consequences:` stands for a change of practice, not for a re-vendor; "every consumer reads
+  revision 1" is now revision 2, and it is the same rule either way.
+
+  Two things this repository filed as upstream's to fix came back fixed, which is the second time
+  that has happened here after the three lint defects closed at 0.10.0. Nothing in `decision:` above
+  is edited: those are the measurements taken at adoption, and editing a recorded measurement to
+  match a later predicate is the one thing that table exists to prevent.

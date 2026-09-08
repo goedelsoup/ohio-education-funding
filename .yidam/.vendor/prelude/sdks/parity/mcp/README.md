@@ -40,7 +40,7 @@ The rule was unenforceable until a corpus existed on which some tier goes unback
 "capabilities": {
   "tools": {}, "resources": {},
   "yidam": {
-    "contract": "0.13.0",
+    "contract": "0.18.0",
     "corpus": {
       "domain": "streamflow",
       "commit": "a1b2c3d",
@@ -70,6 +70,138 @@ to distinguish "not stale" from "a server too old to say".
 the vector index is loaded, which is the same fact `degraded` reports per call. A server that
 declares `vector: false` is promising every `retrieve` will come back `degraded: true`, with
 the `reason` it names here. `reason` is null exactly when `vector` is true.
+
+## The codes a client branches on (contract 0.15.0)
+
+`query`'s `rejected.code` set is frozen and this file says, in as many words, that a client
+branches on it. Until 0.15.0 it froze names no server has ever answered with.
+
+| the reference server emits | 0.14.0 froze |
+|---|---|
+| `undeclared-property` | `unknown-property` |
+| `unlicensed-hop` | `unlicensed-edge` |
+| `unsatisfiable-predicate` | *(nothing)* |
+| `anchor-across` | *(described, never enumerated)* |
+| — | `edge-target-class` |
+
+All three departing names are **lint check ids**. They are what `yidam lint` reports about a
+corpus *file*, borrowed into a vocabulary that is about a rejected *step*, and one string
+cannot mean both. `edge-target-class` is not even a near miss: a declared relationship toward
+the wrong class is rejected `unlicensed-hop`, so no query path ever reached it.
+
+The list moved to the server's names rather than the other way. That is a change to a frozen
+set, and it removes nothing a conforming server could produce — a client that implemented
+`unknown-property` held a branch that could not be taken, which is the same defect as a
+missing one, arriving from the side nobody inspects. The near misses are why it lasted nine
+contract versions: `unknown-property` and `undeclared-property` read as the same thing to a
+person and as different strings to a `match`, so the `else` arm — usually *unknown rejection*
+— is where a misspelled property name arrived.
+
+`anchor-at-revision` and `history-unreadable` are **not** frozen, and a server MUST NOT
+answer with them. Both are about a revision, and no MCP call supplies one: `at` is null for a
+server answering about its loaded corpus.
+
+**The enumeration in `tools.json` is read mechanically.** It stays in the `notes` paragraph,
+because a structured field beside the sentence would be a second freeze of one list — the
+failure this file's own description names. So the sentence beginning *the codes are the
+contract's own (* is load-bearing: a gate extracts the names from that parenthesis and
+compares them, in both directions, against what the CLI emits. Reword that clause and the
+gate says so.
+
+## An ordering is `date`-only (contract 0.16.0)
+
+`<`, `<=`, `>` and `>=` arrived on the query language for `type: date` properties, and
+**`unordered-property` is the refusal everywhere else**. The declared types are `string`,
+`text`, `date`, `ref` and `claim`, with no numeric among them — an ordering that fell back to
+comparing text would be correct on `date` and a trap on the rest, ranking `10` before `9` and
+saying nothing about having done so. A plausible ordering of the wrong thing is worse than a
+refusal, and from outside it is indistinguishable from a right one.
+
+Two consequences for a conforming server:
+
+- **`unordered-property` joins the frozen set**, carrying the step, the property's declared
+  type, and the operators that *are* defined on it.
+- **`*` narrows by what its predicate can be asked, not by which classes declare the
+  property.** A class declaring `began` as `type: string` declares it and still cannot be
+  asked `began < 1900`. The `notes` sentence describing the `narrowed` diagnostic said
+  *declaring a property* until 0.16.0 and was false about the one class it named.
+
+## Comparing two dates (contract 0.17.0)
+
+0.16.0 froze the refusal and left the comparison itself unstated, which is half a
+specification: a server could refuse the right queries and answer the right ones differently.
+`corpus-dated/` is the fixture on which the difference is visible — no property in `corpus/`
+is `type: date`, so a server can implement no ordering at all, or implement one as a
+comparison of text, and pass every case beside it.
+
+**An ordering compares at the precision the two sides share.** A corpus writes a date to
+whatever precision it knows, and both `began: "1893"` and `began: "1893-04-01"` are legal —
+71 year-only values in one corpus #725 measured. So the comparison drops both sides to the
+coarser: `began >= 1893-06-01` **returns** a row that knows only `1893`. As text it does not,
+and a lexical server answers zero rows where a conforming one answers one. That shortfall is
+the dangerous kind: fewer rows reads as a corpus with less in it, not as a query answered
+wrongly.
+
+**This is not `=`'s rule, and the divergence is deliberate.** `=` compares at the precision
+the *query* wrote, so `began=1893-04-01` does not match `began: 1893`. An equality asked more
+precisely than the corpus knows is genuinely unanswerable; an ordering usually is not, since
+1893 falls before or after any day in 1900 whichever day it was. The consequence to know:
+where the corpus is coarser than the query, `<=` and `>=` can both hold for a value `=`
+rejects. `tenure/partial.yml` is in all three.
+
+**Absence takes two forms and they are not spellings of each other.** An absent property
+satisfies no operator, `!=` included — three-valued logic everywhere would make `!=` mean two
+things depending on the corpus. `prop?` tests the node's shape and takes no operand; the
+`prop>?value` affix widens one comparison to admit the absent, and it is the half of *began
+on or before it, ended after it or absent* that no conjunction of `=`, `!=` and `~` can
+express. Eleven classes across six measured corpora are shaped that way.
+
+A malformed stored value orders against nothing. The type is checked on write and the check
+reports rather than gates, so a query has to survive meeting one; guessing an answer for it
+would be the undercount's louder twin.
+
+## The other closed set (contract 0.18.0)
+
+`query` carries three closed vocabularies. Until 0.18.0 two of them were frozen by name here
+and one was not:
+
+| field | before | now |
+|---|---|---|
+| `rejected.code` | enumerated, compared | unchanged |
+| `absence.code` | enumerated, reached by cases | unchanged |
+| `diagnostics[].code` | **described in prose, enumerated nowhere** | enumerated, compared |
+| `diagnostics[].level` | **shape stated, values not** | `warn` or `info`, compared |
+
+`Diagnostic::code` in the CLI said *from a closed set, so a client can branch without
+matching prose* the whole time. The set was closed nowhere a client could read: three of the
+five codes were named in no document at all, and the two the contract did describe were
+described in English without the string a `match` would need.
+
+That is the same defect `rejected.code` had for nine versions, with **less** protection —
+there was no enumeration to diverge from, so nothing could be compared and nothing could go
+red. Each of the three unnamed codes arrived in a feature PR that changed no contract:
+`corpus-excluded` with `--across`, `ontology-moved` with `--at`, `trivial-predicate` with the
+operator rules.
+
+`ontology-moved` stays **out** of the frozen set, for the reason `anchor-at-revision` does: it
+reports that the vocabulary moved between the revision asked about and HEAD, and no MCP call
+names a revision.
+
+The levels are frozen for the same reason the codes are. RFC-0018 says an error is not a
+diagnostic — it is the rejection — and a server writing `error` here tells a client a query
+was refused, on the field that exists to say it ran.
+
+### What the 0.15.0 gate did not catch
+
+`unordered-property` shipped in the CLI one commit before the comparison that exists to
+freeze it, written as a string literal at its call site — invisible to the roster of names,
+so both lists agreed about a code neither had heard of and the gate passed.
+
+Naming the codes in one place only helps if nothing can name one somewhere else, which is a
+property of the type rather than of the discipline. The rejection code is now its own type
+with a private constructor: a literal at a call site does not compile, and the roster is the
+only place a code can be minted. The omission still possible is a code left out of the frozen
+list — and that is the one this gate reads.
 
 ## Querying a dependency, on request (contract 0.11.0)
 
@@ -481,8 +613,9 @@ holds when something echoes it back inside the act; for a human writing a commit
 asking, rather than by having remembered.
 
 **`claims` serves the tag or serves nothing.** There is no untagged arm, and the rule for what
-counts is the one the reports use — not the SDK's `extract_claims`, which is a line-oriented
-parser for the markdown node model and reads `class: gage` as a claim over a YAML instance.
+counts is the one the reports use — not a line-oriented markdown claim parser, which reads
+`class: gage` as a claim over a YAML instance. The SDK carried one until #714 retired the
+markdown node model it belonged to.
 The full predicate is in `tools.json`'s notes for the tool; the part most easily got wrong is
 that the invariant is *never make the corpus look better-evidenced than it is*, which is not
 the same as "when in doubt, drop it": dropping an `[open]` promotes too.

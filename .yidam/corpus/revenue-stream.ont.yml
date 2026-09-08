@@ -23,9 +23,11 @@ properties:
     description: Constitutional provision, Revised Code chapter, or federal statute authorizing the stream
   - name: restriction
     type: text
+    prose: true
     description: Whether funds are unrestricted general revenue or restricted to a stated purpose
   - name: growth_behavior
     type: text
+    prose: true
     description: How the stream's yield changes over time, and what constrains it
   - name: series_path
     type: string

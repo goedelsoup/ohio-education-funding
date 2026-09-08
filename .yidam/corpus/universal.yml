@@ -34,3 +34,26 @@ properties:
   - pattern: '^fy\d{4}(_\d{2})?_[a-z0-9_]+$'
     type: text
     description: A fiscal year's figures, pasted onto the node they describe
+
+# Which top-level keys hold prose, for every class.
+#
+# `node-too-long` and `missing-description` read `description` and nothing else, while the claim
+# counter reads the whole file. This corpus writes in four fields — `summary`, `description`,
+# `findings`, `revisions` — so the two have been answering about different documents, and the
+# kuten record measured the gap at 21 lines against 118 before it knew what to call it.
+#
+# The effective set is `{description} ∪ universal ∪ class`, so `description` is never listed and
+# naming the other three does not unname it. Universal rather than per class for the reason
+# `seeded_because` above is: all four are how this corpus writes any node, so declaring them in
+# eighteen ontologies would be eighteen copies of one decision and a nineteenth class would
+# silently not have them.
+#
+# `revisions` is a list of records rather than a paragraph, and it is here anyway: a withdrawal
+# says why the corpus no longer stands behind a claim, which is the node saying something. 67 of
+# them across 36 nodes.
+#
+# Adopted 2026-09-07 with yidam cli/v0.11.0, which added the mechanism — see
+# [`the-prose-a-node-holds`](../decisions/the-prose-a-node-holds.yml). Prose inside a *property*
+# is declared per property instead, on the class that owns it; there is no universal form of that
+# and the same record says why.
+prose: [summary, findings, revisions]
