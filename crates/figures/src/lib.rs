@@ -2372,6 +2372,59 @@ pub static FIGURES: &[Figure] = &[
         tolerance: 0.005,
         compute: |_| project::panel::TA_MEDIAN_WEALTH_PER_PUPIL,
     },
+    Figure {
+        key: "project/targeted-assistance-statewide-total",
+        owner: "crates/project",
+        unit: Unit::Dollars,
+        label: "FY2027 targeted assistance, summed over the panel",
+        pinned: 1_364_333_154.32,
+        tolerance: 0.005,
+        compute: |i| {
+            i.panel
+                .iter()
+                .map(|r| r.categoricals.targeted_assistance)
+                .sum()
+        },
+    },
+    Figure {
+        key: "project/gifted-statewide-total",
+        owner: "crates/project",
+        unit: Unit::Dollars,
+        label: "FY2027 gifted funding as the department pays it, summed over the panel",
+        pinned: 54_445_264.51,
+        tolerance: 0.005,
+        // The published column, not `Gifted::total()`. The six parts reconstruct it to 19 cents
+        // across 609 districts — the department's own rounding — so this is what it pays and the
+        // parts are how it got there. See `gifted-funding-rates.yml`.
+        compute: |i| i.panel.iter().map(|r| r.categoricals.gifted).sum(),
+    },
+    Figure {
+        key: "project/gifted-coordinator-aid-statewide",
+        owner: "crates/project",
+        unit: Unit::Dollars,
+        label: "FY2027 gifted coordinator units, what they pay statewide",
+        pinned: 13_995_587.23,
+        tolerance: 0.005,
+        compute: |i| i.panel.iter().map(|r| r.gifted.coordinator_aid).sum(),
+    },
+    Figure {
+        key: "project/gifted-specialist-k8-aid-statewide",
+        owner: "crates/project",
+        unit: Unit::Dollars,
+        label: "FY2027 gifted K-8 intervention specialist units, what they pay statewide",
+        pinned: 20_980_411.17,
+        tolerance: 0.005,
+        compute: |i| i.panel.iter().map(|r| r.gifted.specialist_k8_aid).sum(),
+    },
+    Figure {
+        key: "project/gifted-specialist-9-12-aid-statewide",
+        owner: "crates/project",
+        unit: Unit::Dollars,
+        label: "FY2027 gifted 9-12 intervention specialist units, what they pay statewide",
+        pinned: 12_633_770.59,
+        tolerance: 0.005,
+        compute: |i| i.panel.iter().map(|r| r.gifted.specialist_9_12_aid).sum(),
+    },
     // ---- crates/regime-diff ------------------------------------------------------------------
     Figure {
         key: "regime-diff/charge-off-districts-with-a-difference",

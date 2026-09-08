@@ -214,6 +214,29 @@ test("a scale word is a scale word and not the start of the next one", () => {
   ]);
 });
 
+test("a grade band is not a scale suffix, and the token boundary does not catch it", () => {
+  /*
+   * `\b` stops `more` from being read as millions because `m` is followed by `o`. It does NOT
+   * stop `K-8`, because `K` followed by `-` satisfies the boundary — so the scale group takes the
+   * `K` and a dollar amount beside a grade band reads a thousand times too large. `K-8` and `K-12`
+   * are ordinary words here, so this is the shape that would recur.
+   */
+  expect(numerals("$20,980,411.17  K-8 intervention specialist units", "dollars")).toEqual([
+    { value: 20_980_411.17, precision: 0.005 },
+    // The band's own `8`, which is harmless: the caller looks for a numeral equal to the value
+    // it bound, not for the phrase to state exactly one.
+    { value: 8, precision: 0.5 },
+  ]);
+  // The band's own digits still read, where the unit admits them.
+  expect(numerals("K-8 intervention", "count")).toEqual([{ value: 8, precision: 0.5 }]);
+  expect(numerals("$1,200 across K-12", "dollars")).toEqual([
+    { value: 1_200, precision: 0.5 },
+    { value: 12, precision: 0.5 },
+  ]);
+  // And a genuine suffix is untouched: only `-` followed by a digit disqualifies it.
+  expect(numerals("$8.2m in aid", "dollars")).toEqual([{ value: 8.2e6, precision: 50_000 }]);
+});
+
 /**
  * A rank is not readable, in either form the corpus writes one.
  *

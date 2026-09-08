@@ -84,6 +84,24 @@ properties:
 
     Each unit amount is multiplied by the district's state share percentage. [verified]
 
+    What the programme pays, summed over the panel's 609 districts, and the three unit kinds
+    separately: [verified — crates/project]
+
+      $54,445,264.51  gifted funding, statewide
+      $13,995,587.23  coordinator units
+      $20,980,411.17  K-8 intervention specialist units
+      $12,633,770.59  9-12 intervention specialist units
+
+    The three unit kinds are 87% of it; identification and referral are the remaining $6.8m
+    between them, and professional development is zero for every district. So a programme whose
+    two per-pupil rates are the part anyone can quote is overwhelmingly paid through the part
+    priced per post.
+
+    The six components reconstruct the department's published total to **19 cents** across all
+    609 districts, which is its own rounding rather than a disagreement. The figure above is the
+    published column, because that is what is paid; the parts are how it got there. [verified —
+    crates/project]
+
     FY2028 and thereafter: allocation, prices, identification and referral are each "determined
     by the general assembly", and the section states no value. [verified]
   statutory_basis: |
@@ -115,11 +133,6 @@ properties:
     does not respond to identifying more pupils until it crosses 42 of them — 0.3 of 140.
     [inference]
 unfilled:
-  - field: what the programme totals statewide
-    why: >-
-      `crates/project`'s panel computes gifted identification, referral and unit funding per
-      district; the figure manifest carries neither the total nor the split between the three
-      unit types.
   - field: why the three unit prices differ
     why: >-
       R.C. 3317.051(C)(1) states $85,776, $89,378 and $80,974 and gives no derivation. The Fair
@@ -136,6 +149,22 @@ figures:
     value: 0.34834053443544444
     field: findings
     as_written: "r = +0.35 against valuation"
+  - key: project/gifted-statewide-total
+    value: 54445264.51
+    field: series
+    as_written: "$54,445,264.51  gifted funding, statewide"
+  - key: project/gifted-coordinator-aid-statewide
+    value: 13995587.23
+    field: series
+    as_written: "$13,995,587.23  coordinator units"
+  - key: project/gifted-specialist-k8-aid-statewide
+    value: 20980411.17
+    field: series
+    as_written: "$20,980,411.17  K-8 intervention specialist units"
+  - key: project/gifted-specialist-9-12-aid-statewide
+    value: 12633770.59
+    field: series
+    as_written: "$12,633,770.59  9-12 intervention specialist units"
 links:
   - target: ../parameter.ont.yml
     relationship: instance-of
