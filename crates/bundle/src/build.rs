@@ -861,13 +861,18 @@ fn series_years(
             label: label_span(first, last, "FY"),
             source: "Census Bureau, Annual Survey of School System Finances".into(),
         });
-        // The cross-state comparison is one year of the same survey, and it is the *last* one.
-        // Separate from `history` because a card placing Ohio among the states is showing that
-        // year alone, and a chip reading FY2009-FY2022 there would be describing the wrong thing.
+        // The cross-state comparison is one year of the same survey. Separate from `history`
+        // because a card placing Ohio among the states is showing that year alone, and a chip
+        // reading FY2009-FY2024 there would be describing the wrong thing.
+        //
+        // It used to read `last` — the panel's own final year — on the assumption that the two
+        // files end together. They did until the panel reached FY2023 from the Bureau's file while
+        // the national district file stayed at NCES's FY2022, and the chip then labelled FY2022
+        // data FY2024. The year now comes from the module that owns that fixture.
         out.push(SeriesYear {
             series: "national".into(),
             kind: YearKind::Fiscal,
-            label: format!("FY{last}"),
+            label: format!("FY{}", dispersion::national_peers::FISCAL_YEAR),
             source: "Census Bureau, Annual Survey of School System Finances".into(),
         });
     }

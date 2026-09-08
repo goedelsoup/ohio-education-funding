@@ -144,13 +144,39 @@ findings: |
       2020       $9,262           43.8%       5.0%      $4,744
       2021       $9,384           41.1%       5.3%      $5,031
       2022       $9,590           46.4%       9.5%      $4,229
+      2023      $11,139           37.2%       8.2%      $6,082
+      2024      $11,586           37.2%       9.4%      $6,185
 
-  **The state's share of the gap it closes does not move**: 42.4% at the start, 46.4% at the end,
-  and never outside 40.0-46.5% in between. There is no trend, and the absence of one is the
-  finding rather than a null result.
+  **Through FY2022 the state's share of the gap it closes does not move**: 42.4% at the start,
+  46.4% at FY2022, and never outside 40.0-46.5% in between. There is no trend inside that window,
+  and the absence of one was the finding rather than a null result.
 
-  **The gap grows by two thirds** — $5,727 to $9,590 per pupil — so a constant rate leaves a
-  growing remainder. **The residual, what neither level closes, grows 56%** to $4,229 per pupil.
+  **The gap grows by two thirds across it** — $5,727 to $9,590 per pupil — so a constant rate
+  leaves a growing remainder. **The residual, what neither level closes, grows 56%** to $4,229 per
+  pupil.
+
+  ### And in the two years the panel could not see, the rate stops holding
+
+  [verified — `dispersion::ohio_panel::equalization_by_year`, pinned by test]
+
+  FY2023 and FY2024 are the first years of this series taken from the Bureau's own file rather
+  than NCES's, which stops at FY2022. They break the band in both directions at once: **the state
+  closes 37.2% of the gap in both years** — below every year since FY2011 — while **the gap is 16%
+  and 21% wider than FY2022's**. State gap-closing per pupil is *lower* in both than in FY2022,
+  $4,147 and $4,311 against $4,448, so the two movements compound rather than offset. **The
+  residual rises 46% in two years**, from $4,229 to $6,185 per pupil, the largest two-year move in
+  the series. [verified]
+
+  37.2% is not an unprecedented level. It is the level of FY2010 and FY2011, the ARRA years, which
+  is why the band above is stated from FY2012. What is unprecedented is reaching it while the gap
+  is at its widest: in FY2011 a 33.0% rate sat against a $6,142 gap, and in FY2024 a 37.2% rate
+  sits against one nearly twice that. [verified]
+
+  **Why is not established here.** Ohio's triennial property reappraisals landed across FY2023 and
+  would raise local revenue in the richest quartile mechanically — widening the gap with nothing
+  about state aid having changed — and the Fair School Funding Plan's own phase-in moves state aid
+  over the same years. Separating the two needs the valuation series beside this one, and two
+  observations cannot do it. The measurement is the claim; the cause is [open]
 
   Ohio's formula is doing the same proportional job against a larger problem. Both readings that
   were available before this run are wrong: equalization has not decayed, and it has not held.
@@ -198,6 +224,24 @@ findings: |
   learning. Whether that is the funding system compensating, or a growth measure normed in a way
   that removes level differences by construction, cannot be told from one cross-section. [open]
 revisions:
+  - was: |
+      "**The state's share of the gap it closes does not move**: 42.4% at the start, 46.4% at the
+      end, and never outside 40.0-46.5% in between. There is no trend, and the absence of one is
+      the finding rather than a null result." Stated of the whole series, because the whole series
+      was FY2012-FY2022.
+    now: |
+      It holds across FY2012-FY2022 and not after. FY2023 and FY2024 both close **37.2%**, outside
+      the band in the direction the passage argued could not be read from the data, and the
+      residual rises 46% in two years.
+    found_by: |
+      Extending `dispersion::ohio_panel` past FY2022. NCES stops there; the Census Bureau's own
+      individual unit file carries the same survey through FY2024, and the panel had stopped at
+      FY2022 because of the publisher rather than because of the survey.
+    reach: |
+      **No figure in this node changes.** Every value in the FY2012-FY2022 table is byte-identical
+      after the two years were added, which is the check that the change of publisher was
+      reconciled rather than absorbed. What changes is the scope of the sentence above it: "there
+      is no trend" is true of the window it was computed over and false of the series now held.
   - was: |
       "Across the ten years the survey covers, the state's share of Ohio school revenue falls in
       **nine of them**."

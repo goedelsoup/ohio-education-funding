@@ -144,7 +144,8 @@ revisions:
       answer to *DeRolph* was to reduce the state's share of school revenue.
     found_by: |
       `dispersion::ohio_panel`, pinned by test, over the Census Bureau's survey of Ohio school
-      systems FY2009-FY2022.
+      systems FY2009-FY2024. The figures quoted are the FY2012 and FY2022 endpoints; the panel
+      reached FY2024 afterwards, and the two added years do not move either of them.
     reach: |
       It does not establish that the reliance *causes* the disparity — that is the court's
       finding and this is a description of the aggregate. What it removes is the possibility

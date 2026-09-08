@@ -193,12 +193,40 @@ pub(super) const F33: Connector = Connector {
                 crate::fixtures::F33_OHIO_PANEL_FIXTURE,
             ],
             note: "The same survey NCES publishes keyed on `LEAID` rather than the Bureau's \
-               `IDCENSUS`, which is what makes the per-district join possible at all. \
+               `IDCENSUS`, and the last year NCES publishes it — FY2023 and FY2024 come from \
+               the Bureau's own file below. This is what makes the per-district join possible at all. \
                Tab-delimited, 354 columns, 19,572 agencies. The fixture keeps the 10,382 \
                that are comparable — `AGCHRT != 1` and `SCHLEV == 03`, so no charter \
                agencies and no non-unified districts — plus every Ohio agency. Leaving \
                charters in put Ohio's 200 smallest agencies at an 8% local share, which is \
                a fact about charter finance and not about school districts.",
+        },
+        Source {
+            key: "elsec23-districts",
+            title: None,
+            url: "https://www2.census.gov/programs-surveys/school-finances/tables/2023/\
+              secondary-education-finance/elsec23.xlsx",
+            filename: "elsec23.xlsx",
+            format: Format::Xlsx,
+            catalog: Some("census-f33-school-system-finances"),
+            fixtures: &[crate::fixtures::F33_OHIO_PANEL_FIXTURE],
+            note: "FY2023, and the first year of the panel NCES does not publish: `sdf23_1a.zip` \
+               404s under every naming FY2009-FY2022 answer to. The Bureau's own individual unit \
+               file reaches it — 14,088 systems, 183 columns, one sheet named for the year — and \
+               it carries `NCESID`, so the `LEAID`-to-IRN join survives the change of publisher.",
+        },
+        Source {
+            key: "elsec24-districts",
+            title: None,
+            url: "https://www2.census.gov/programs-surveys/school-finances/tables/2024/\
+              secondary-education-finance/elsec24.xlsx",
+            filename: "elsec24.xlsx",
+            format: Format::Xlsx,
+            catalog: Some("census-f33-school-system-finances"),
+            fixtures: &[crate::fixtures::F33_OHIO_PANEL_FIXTURE],
+            note: "FY2024, the same file a year on and 14,077 systems. It is the district cut of \
+               the year `f33-fy2024` above holds as a state table, so the two can be checked \
+               against each other on Ohio's totals.",
         },
     ],
 };

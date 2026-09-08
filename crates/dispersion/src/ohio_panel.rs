@@ -7,7 +7,7 @@
 //! other source is Ohio describing itself.
 //!
 //! This module answers a different question — **how Ohio changed** — and needs the opposite
-//! shape: only Ohio, but ten years of it. The two are separate fixtures for that reason rather
+//! shape: only Ohio, but fifteen years of it. The two are separate fixtures for that reason rather
 //! than one fixture with a filter.
 //!
 //! # Why it matters that the definitions are federal
@@ -20,10 +20,18 @@
 //! comparable state source of public school financial data was not available across the desired
 //! time period."
 //!
-//! # Three caveats, each capable of producing a wrong reading
+//! # Four caveats, each capable of producing a wrong reading
 //!
 //! **FY2014 is missing from the archive**, under every naming the neighbouring years use. Nine
 //! intervals across ten years, and one of them is two years wide. Nothing here interpolates it.
+//!
+//! **FY2023 and FY2024 come from a different publisher.** NCES stops at FY2022 — `sdf23_1a.zip`
+//! does not exist — and the Bureau's own individual unit file carries the same collection two
+//! years further on. It is the same survey and the same column names, and it differs in three
+//! ways that are reconciled in the extractor rather than left in the fixture: money in thousands,
+//! `NCESID` for `LEAID`, and `TCURELSC` inclusive of the `V91`/`V92` payments NCES nets out. It
+//! also does not carry Ohio's community schools at all, so the Bureau years hold 655 agencies
+//! against the NCES years' ~950 while the comparable count is unchanged at 609.
 //!
 //! **The denominator is the Bureau's** — `V33`, fall membership — and not Ohio's enrolled ADM. A
 //! per-pupil figure from this module must never be shown beside one from the funding model.
@@ -62,7 +70,12 @@ pub struct PanelRow {
     pub comparable: bool,
     /// `V33`, fall membership on the Bureau's count.
     pub enrollment: f64,
-    /// All revenue, from every source, in thousands of dollars.
+    /// All revenue, from every source, in dollars.
+    ///
+    /// Dollars, not the thousands this said until the Bureau's own file was spliced on. The
+    /// survey publishes thousands and NCES's rendering of it does not; a 327-pupil district at
+    /// $3,298,000 settles which one this fixture carries. The Bureau's years are multiplied on
+    /// the way in so that the column keeps meaning one thing across the seam.
     pub total_revenue: f64,
     /// The federal share of it.
     pub federal_revenue: f64,
@@ -74,12 +87,19 @@ pub struct PanelRow {
     /// dependent agency means the tax belongs to a parent government rather than that none was
     /// levied.
     pub property_tax: Option<f64>,
-    /// `TCURELSC` â current spending on elementary and secondary education, in thousands.
+    /// `TCURELSC` â current spending on elementary and secondary education, in dollars.
     ///
     /// Absent from this record until the real-spending trough was computed from it. That
     /// analysis lived in `tests/f33_ohio_panel_trough.rs` on a second, private parser of this
     /// same fixture â which read the column this reader did not carry, and disagreed with it
     /// about which rows are rows. See issue #157.
+    ///
+    /// **It is the one column the two publishers define differently**, and the only one the
+    /// extractor has to reconcile. The Bureau folds `V91` and `V92` — the instruction lines that
+    /// pay a private or a charter school to teach — inside `E13`; NCES nets them out. Across
+    /// FY2022, where both publish Ohio, the identity holds on all 710 shared agencies and in one
+    /// direction: the Bureau's total is NCES's plus `V91 + V92`. It moves 79 of them. This column
+    /// is NCES's definition in every year, the Bureau's years included.
     pub current_spending: Option<f64>,
     /// `V45` — support services, student transportation, in dollars.
     ///
@@ -332,13 +352,50 @@ pub fn unnamed_agencies() -> BTreeMap<u16, usize> {
 mod tests {
     use super::*;
 
+    /// Fifteen years and one hole, from two publishers of the same collection.
+    ///
+    /// FY2014 is absent because NCES never published it. FY2023 and FY2024 are present because
+    /// the *Bureau* did: `sdf23_1a.zip` does not exist under any naming the earlier years answer
+    /// to, and the panel stopped at FY2022 for that reason rather than because the survey did.
     #[test]
-    fn the_panel_holds_thirteen_years_and_names_the_one_it_does_not() {
+    fn the_panel_holds_fifteen_years_and_names_the_one_it_does_not() {
         let years: Vec<u16> = revenue_mix_by_year().keys().copied().collect();
         assert_eq!(
             years,
-            vec![2009, 2010, 2011, 2012, 2013, 2015, 2016, 2017, 2018, 2019, 2020, 2021, 2022],
+            vec![
+                2009, 2010, 2011, 2012, 2013, 2015, 2016, 2017, 2018, 2019, 2020, 2021, 2022, 2023,
+                2024
+            ],
             "FY2014 is absent from the archive and nothing should have invented it"
+        );
+    }
+
+    /// The change of publisher moved no row of the thirteen years that preceded it.
+    ///
+    /// The two files disagree in three places and each is reconciled in the builder: the Bureau
+    /// states money in thousands, keys on `NCESID`, and folds `V91` and `V92` — the instruction
+    /// lines that pay a private or charter school to teach — inside `E13` where NCES nets them
+    /// out. Left alone the third would have shifted `current_spending` upward on about one Ohio
+    /// district in eight, in one direction, at exactly the year the publisher changed: a break in
+    /// the series that looks like a finding.
+    ///
+    /// What this test can check from the fixture alone is the shape either side of the seam.
+    #[test]
+    fn the_bureau_years_carry_the_same_population_as_the_years_before_them() {
+        let mix = revenue_mix_by_year();
+        for year in [2023u16, 2024] {
+            assert_eq!(
+                mix[&year].districts, 609,
+                "FY{year} should hold Ohio's 609 districts"
+            );
+        }
+        // The Bureau does not survey Ohio's community schools at all — they are not governments —
+        // so its Ohio file is smaller than NCES's by the 324 agencies NCES flags `AGCHRT == 1`.
+        // Comparable count is what has to match; total agency count is not expected to.
+        let comparable: Vec<usize> = mix.values().map(|m| m.districts).collect();
+        assert!(
+            comparable.iter().all(|n| (609..=613).contains(n)),
+            "the comparable population moved outside 609-613: {comparable:?}"
         );
     }
 
@@ -448,7 +505,11 @@ mod tests {
 
         // And the state's share of it did not move much in either direction. Asserted as a band
         // rather than a trend, because there is no trend — that is the finding.
-        for (year, e) in by_year.iter().filter(|(y, _)| **y >= 2012) {
+        //
+        // The band is closed at FY2022 because that is where it stops holding: see
+        // [`the_band_stops_holding_in_the_two_years_the_panel_could_not_see`] below. Widening it
+        // to admit FY2023 would delete the finding rather than record it.
+        for (year, e) in by_year.iter().filter(|(y, _)| (2012..=2022).contains(*y)) {
             assert!(
                 e.state_share() > 0.38 && e.state_share() < 0.49,
                 "FY{year} state share is {:.3}, outside the band the corpus records",
@@ -465,8 +526,60 @@ mod tests {
         );
     }
 
+    /// **What the two Bureau years found: the rate that held for a decade does not hold in
+    /// FY2023 or FY2024, and the gap it is measured against grew faster than in any two-year
+    /// window on record.**
+    ///
+    /// | | gap | state closes | share | residual |
+    /// |---|---:|---:|---:|---:|
+    /// | FY2022 | $9,590 | $4,448 | 0.464 | $4,229 |
+    /// | FY2023 | $11,139 | $4,147 | **0.372** | $6,082 |
+    /// | FY2024 | $11,586 | $4,311 | **0.372** | $6,185 |
+    ///
+    /// State gap-closing per pupil is *lower* in both new years than in FY2022 while the gap is
+    /// 16% and 21% wider, so the residual — the part nobody closes — rises 46% in two years. 0.372
+    /// is not unprecedented: it is the level of FY2010 and FY2011, which is why the band in
+    /// [`the_equalization_rate_holds_while_the_gap_it_closes_grows`] starts at FY2012.
+    ///
+    /// **Not established here: why.** Ohio's triennial reappraisals landed across FY2023 and would
+    /// raise local revenue in the richest quartile mechanically, which would widen the gap without
+    /// anything about state aid having changed. Separating that from a change in the aid formula
+    /// needs the valuation series, and the two years are two observations. The measurement is the
+    /// claim; the cause is open.
+    #[test]
+    fn the_band_stops_holding_in_the_two_years_the_panel_could_not_see() {
+        let by_year = equalization_by_year();
+        let fy2022 = by_year[&2022];
+        for year in [2023u16, 2024] {
+            let e = by_year[&year];
+            assert!(
+                e.state_share() < 0.38,
+                "FY{year} state share is {:.3}, which would be inside the FY2012-FY2022 band",
+                e.state_share()
+            );
+            assert!(
+                e.gap > fy2022.gap * 1.15,
+                "FY{year} gap is {:.0} against FY2022's {:.0}",
+                e.gap,
+                fy2022.gap
+            );
+            assert!(
+                e.state_closes < fy2022.state_closes,
+                "FY{year} closes {:.0} against FY2022's {:.0}",
+                e.state_closes,
+                fy2022.state_closes
+            );
+        }
+        assert!(
+            by_year[&2024].residual() > fy2022.residual() * 1.4,
+            "the residual went from {:.0} to {:.0} in two years",
+            fy2022.residual(),
+            by_year[&2024].residual()
+        );
+    }
+
     /// **What the three added archives found: during ARRA the state closed a third of the local
-    /// gap, not the ~45% it closes in every other year on record.**
+    /// gap, not the ~45% it closes in every other year of the FY2012-FY2022 band.**
     ///
     /// FY2010 and FY2011 sit at 0.349 and 0.330 while federal gap-closing roughly doubles to
     /// 0.122 and 0.128. FY2009, before the money arrived, is an ordinary 0.472. The panel used to

@@ -1385,6 +1385,17 @@ const F33_PANEL_YEARS: &[(u16, &str)] = &[
     (2022, "sdf22-districts"),
 ];
 
+/// The years the Bureau publishes and NCES does not, with the sheet each one keeps its rows on.
+///
+/// `sdf23_1a.zip` does not exist — nor under any of the four namings FY2013 and FY2015 answered
+/// to — and the panel stopped at FY2022 for that reason rather than because the survey did. The
+/// Bureau's own individual unit file carries the same collection two years further on, keyed on
+/// `NCESID`, which is the column that makes the join survive the change of publisher.
+const F33_PANEL_YEARS_CENSUS: &[(u16, &str, &str)] = &[
+    (2023, "elsec23-districts", "elsec23"),
+    (2024, "elsec24-districts", "elsec24"),
+];
+
 /// Ohio across every year of the survey, from thirteen archives and sixteen directories.
 ///
 /// The directory is rebuilt here rather than read from its own committed fixture, so a rebuild
@@ -1400,12 +1411,26 @@ fn f33_ohio_panel(root: &Path) -> Result<Vec<Vec<String>>, String> {
         let survey = registered(key);
         surveys.push((*fiscal_year, zip_member(root, survey, ".txt")?));
     }
+    // The Bureau's years are workbooks rather than archives, so they are read the same way and
+    // held the same way, and the builder is told which publisher wrote each one.
+    let mut bureau = Vec::new();
+    for (fiscal_year, key, sheet) in F33_PANEL_YEARS_CENSUS {
+        bureau.push((*fiscal_year, sheet_rows(root, key, sheet)?));
+    }
     let years: Vec<fixtures::PanelYear<'_>> = surveys
         .iter()
         .map(|(fiscal_year, survey)| fixtures::PanelYear {
             fiscal_year: *fiscal_year,
-            survey,
+            source: fixtures::PanelSource::Nces(survey),
         })
+        .chain(
+            bureau
+                .iter()
+                .map(|(fiscal_year, rows)| fixtures::PanelYear {
+                    fiscal_year: *fiscal_year,
+                    source: fixtures::PanelSource::Census(rows),
+                }),
+        )
         .collect();
     fixtures::build_f33_ohio_panel(&years, &directory)
 }

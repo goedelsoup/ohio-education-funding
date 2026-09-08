@@ -20,9 +20,14 @@
 //!
 //! Three caveats travel with every figure this module produces.
 //!
-//! **The year is FY2022.** The funding model is FY2027. A district's national position is where it
-//! stood five years before the model it sits beside on the page, and nothing here bridges that —
-//! the F-33 is published years in arrears and this is the most recent complete file.
+//! **The year is FY2022** — [`FISCAL_YEAR`]. The funding model is FY2027. A district's national
+//! position is where it stood five years before the model it sits beside on the page, and nothing
+//! here bridges that — the F-33 is published years in arrears.
+//!
+//! It is no longer the most recent year of the *survey*: [`crate::ohio_panel`] runs to FY2024 from
+//! the Bureau's own file. It is the most recent year of the **national district file**, which NCES
+//! publishes and stopped at FY2022. The two dates were the same until they were not, and the
+//! bundle's chip for this series read the panel's last year until this constant existed.
 //!
 //! **The denominator is the federal one.** `V33` is fall membership as the Bureau counts it, not
 //! Ohio's enrolled ADM and not the report card's unweighted count. A per-pupil figure from this
@@ -35,6 +40,14 @@
 //! and extreme nationally, and that is the finding rather than a defect.
 
 use std::collections::BTreeMap;
+
+/// The fiscal year the national district fixture reports, which is not a column in it.
+///
+/// A single-year cut carries its year in its filename and nowhere else, so anything labelling this
+/// series has to be told. Declared here, beside the file, rather than inferred from a neighbouring
+/// series that happens to end in the same place — which is what the export bundle did, and what
+/// stopped being true the moment the Ohio panel gained FY2023.
+pub const FISCAL_YEAR: u16 = 2022;
 
 /// The national panel: every district the survey covers with usable enrolment and revenue.
 const FIXTURE: &str = include_str!("../fixtures/f33-districts-fy2022.csv");
