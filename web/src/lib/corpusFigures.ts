@@ -158,8 +158,17 @@ export function numerals(phrase: string, unit: Unit): Numeral[] {
    * and reads sixty-five million. With it the group backtracks to empty and the numeral is read as
    * the sixty-five it is — which is the behaviour a *rejection* would not have given, because a
    * dropped numeral is a phrase that silently states nothing.
+   *
+   * The `\b` is not sufficient on its own, and a grade band is what shows it. In
+   * `"$20,980,411.17  K-8 intervention specialist units"` the scale group takes the `K` of `K-8`
+   * — `\b` is satisfied, because `K` followed by `-` *is* a word boundary — and the phrase reads
+   * as twenty billion. A thousandfold misread, in a corpus where `K-8` and `K-12` are ordinary
+   * words. So a scale suffix immediately followed by `-` and a digit is not a scale suffix: it is
+   * the first half of a range token. `(?!-\d)` is what says so, and the group backtracks to empty
+   * exactly as it does for `more`.
    */
-  const pattern = /(\$)?(\d[\d,]*(?:\.\d+)?)(?:\s*(billion|million|thousand|bn|m|k))?\b(%)?/gi;
+  const pattern =
+    /(\$)?(\d[\d,]*(?:\.\d+)?)(?:\s*(billion|million|thousand|bn|m|k)(?!-\d))?\b(%)?/gi;
   const out: Numeral[] = [];
   for (const match of phrase.matchAll(pattern)) {
     const [, dollar, digits, scaleWord, percent] = match;

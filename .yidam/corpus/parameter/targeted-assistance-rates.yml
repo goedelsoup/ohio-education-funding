@@ -81,6 +81,13 @@ properties:
     crates/project]
       median weighted wealth            $392,151,306.63
       median weighted wealth per pupil     $276,708.97
+
+    What the two tiers pay together, summed over the panel's 609 districts: [verified —
+    crates/project]
+      targeted assistance, statewide  $1,364,333,154.32
+
+    The medians are inputs and this is the outcome, which is why the node carried the first two
+    for a year without the third.
   statutory_basis: |
     R.C. 3317.0217, read. (B) for the capacity tier including the size brackets, (C) for the
     wealth tier and its two coefficients, and (B)(1) for the 60/40 weighted wealth blend that
@@ -113,11 +120,6 @@ properties:
     *distribution* of Ohio's district wealth moves this programme with no enactment at all.
     [inference]
 unfilled:
-  - field: the targeted assistance total, statewide
-    why: >-
-      The corpus binds the capacity tier's two medians but not what the programme pays in
-      aggregate. `crates/project`'s panel computes it per district and the figure manifest has
-      no key for the sum.
   - field: the rates before FY2026
     why: >-
       H.B. 96's version is the one held. Prior versions of R.C. 3317.0217 in Ohio Laws' version
@@ -132,6 +134,10 @@ figures:
     value: 276708.97
     field: series
     as_written: "median weighted wealth per pupil     $276,708.97"
+  - key: project/targeted-assistance-statewide-total
+    value: 1364333154.32
+    field: series
+    as_written: "targeted assistance, statewide  $1,364,333,154.32"
 links:
   - target: ../parameter.ont.yml
     relationship: instance-of
