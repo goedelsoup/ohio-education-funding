@@ -17,11 +17,17 @@ description: |
   cost the Supreme Court of Ohio found had no derivation. [inference] The building conditions
   the court described in *DeRolph I* were the visible end of that chain.
 
-  It is also the right district against which to test whether anything changed. The [Fair
-  School Funding Plan](../funding-regime/fair-school-funding-plan.yml)'s local capacity measure
-  adds resident income to valuation, which should help a district whose community is poorer
-  than its property base suggests — and Perry County is a place where that gap is real.
-  [inference] Whether it did, and by how much, is unmeasured. [open]
+  It is also the district against which to test whether anything changed. The [Fair School
+  Funding Plan](../funding-regime/fair-school-funding-plan.yml)'s local capacity measure adds
+  resident income to valuation, replacing a
+  [charge-off](../formula-component/charge-off-local-share.yml) that saw property alone. **The
+  substitution charges this district more.** At FY2027 inputs the charge-off would ask $5,922.24
+  per pupil and local capacity asks $6,100.95, so the district loses **$178.71 per pupil** of
+  base cost aid to the change. [verified — `regime_diff`, pinned by test]
+
+  A measure blending property and income cannot lower a charge on a district that is low on
+  neither, and this district's valuation per pupil is above the statewide median.
+  [verified — see findings]
 
   **It is at the 20-mill floor — exactly.** TY2023 effective Class 1 millage of 20.000 against
   31.35 voted operating mills. [verified] Reduction factors have absorbed more than a third of
@@ -47,14 +53,49 @@ findings: |
   valuation. On property alone Northern Local is above median; on the outcome it spends $11,987
   per pupil, the lowest of the three exemplars and roughly $3,700 below the statewide median.
   [verified, inference for the interpretation]
+
+  **And the measure it made the case for does not reach it.** Of the four district exemplars, the
+  one local capacity charges *less* than the charge-off would is [Cleveland
+  Municipal](cleveland-municipal.yml), at $207.58 per pupil gained — an urban district whose
+  resident income is low against a property base inflated by commercial value. Northern Local
+  loses $178.71, [Toledo](toledo-city.yml) $56.75, and [Perrysburg](perrysburg-exempted-village.yml)
+  $1,435.26. [verified — `regime_diff`, pinned by test] The income term does the work the reform
+  advertised; which districts it reaches is a separate question from which districts are poor,
+  and on these four they do not coincide. [inference]
+revisions:
+  - was: |
+      "The Fair School Funding Plan's local capacity measure adds resident income to valuation,
+      which should help a district whose community is poorer than its property base suggests —
+      and Perry County is a place where that gap is real. Whether it did, and by how much, is
+      unmeasured."
+    now: |
+      It was measured and it runs the other way. Local capacity charges Northern Local **$178.71
+      per pupil more** than the charge-off would have, so the reform costs the *DeRolph* district
+      base cost aid rather than delivering it.
+    found_by: |
+      `regime_diff::at_fy2027` against the recognized TY2024 valuation base, the same comparison
+      the crate already ran for Ottawa Hills and Jefferson Township, now run for this district.
+      Pinned by `the_reform_charges_the_derolph_district_more_and_helps_cleveland_instead`.
+    reach: |
+      It does not impeach the measure, and it does not say the charge-off was fairer. The failed
+      step is the premise that this district is property-poor, which this node's own findings had
+      already withdrawn on the valuation figure without carrying the withdrawal into the question
+      resting on it. It is also a fact about FY2027 alone: the corpus holds no valuation series
+      reaching back to 1991, so nothing here bears on what either mechanism would have charged
+      when the case was filed.
+
 properties:
   seeded_because: |
-    The anchor case for the property-poor end of Ohio's distribution.
+    Seeded as the anchor case for the property-poor end of Ohio's distribution. It is no longer
+    that district on the standard measure — see `findings` — and is kept because what it is now
+    an anchor case for is more useful: a plaintiff district whose property base moved out from
+    under the claim the case rested on.
   irn: |
-    049056 [verified — appears as "Northern Local" in the FY2021 IDEA Part B allocation list].
-    Distinct from Hardin Northern Local (047498). County attribution to Perry is [inference]:
-    the allocation list gives no county, and confirmation should come from an `nces-ccd`
-    crosswalk before this IRN is used to key a series.
+    049056 [verified — appears as "Northern Local" in the FY2021 IDEA Part B allocation list,
+    and under that name and IRN in `crates/foundation/fixtures/fy27-department-model.csv`, which
+    also gives its county as Perry]. The department's own model carries 047498 separately as
+    "Hardin Northern Local", so the collision this field was written to warn about is closed
+    rather than outstanding, and the crosswalk it asked for is not needed to key a series.
   agency_type: local
   county: Perry
   typology: |
@@ -78,7 +119,7 @@ properties:
     Per-agency series are held by IRN across four committed fixtures, not one path: [verified]
       crates/foundation/fixtures/fy27-department-model.csv    FY2027 formula run, 609 districts
       crates/project/fixtures/district-finances.csv           FY2020-FY2024 actuals and balances
-      crates/dispersion/fixtures/f33-ohio-panel.csv           FY2012-FY2022 revenue, federal basis
+      crates/dispersion/fixtures/f33-ohio-panel.csv           FY2009-FY2024 revenue, federal basis
       crates/dispersion/fixtures/mr81-sponsor-panel.csv       1998-2014 free and reduced lunch
 unfilled:
   - field: the department's typology code

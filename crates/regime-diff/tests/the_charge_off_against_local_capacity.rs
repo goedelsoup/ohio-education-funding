@@ -404,3 +404,73 @@ fn a_floored_district_shows_the_difference_and_declines_to_explain_it() {
     let total = diff.total_difference().expect("both totals are computable");
     assert!((total + 3_102.58).abs() < 0.5, "{total:.2}");
 }
+
+/// **The corpus asked whether the reform helped the district that brought *DeRolph*. It did not.**
+///
+/// [`education-agency/northern-local-perry`] carried this as an open question: the Fair School
+/// Funding Plan's local capacity measure "adds resident income to valuation, which should help a
+/// district whose community is poorer than its property base suggests — and Perry County is a
+/// place where that gap is real. Whether it did, and by how much, is unmeasured."
+///
+/// It is measurable with the machinery two tests above, and the answer has the wrong sign.
+///
+/// | | valuation/pupil | charge-off | local capacity | effect on aid |
+/// |---|---:|---:|---:|---:|
+/// | Northern Local | $279,983 | $5,922.24 | $6,100.95 | **−$178.71** |
+/// | Cleveland Municipal | $184,904 | $3,654.90 | $3,447.32 | **+$207.58** |
+///
+/// Local capacity charges Northern Local **$179 per pupil more** than the charge-off asked, so
+/// the district *DeRolph* is named for loses base cost aid under the reform the case is usually
+/// said to have produced. The district it helps instead is Cleveland Municipal — an urban
+/// district whose income is low relative to a property base inflated by commercial value, which
+/// is the same mechanism the corpus predicted and a different district than it predicted it for.
+///
+/// # Why the prediction failed, and it is not the income term misbehaving
+///
+/// The premise was that Northern Local's community is poorer than its property base suggests. Its
+/// property base is the part that stopped being true: $279,983 per pupil is **above** the
+/// statewide median, and above Perrysburg Exempted Village's $270,202. A blend of two measures
+/// cannot rescue a district that is no longer low on either one. The node's own `findings` field
+/// already records the valuation half — "it is no longer property-poor by the standard measure" —
+/// and the open question was written against the older picture.
+///
+/// This is a fact about FY2027 and not about 1991. Nothing here bears on whether the charge-off
+/// was fair to this district when the case was filed; the corpus holds no valuation series
+/// reaching back that far.
+#[test]
+fn the_reform_charges_the_derolph_district_more_and_helps_cleveland_instead() {
+    let districts = panel();
+    let base = recognized();
+
+    let northern = find(&districts, "Northern Local");
+    let diff = at_fy2027(northern, TERMINAL_MILLS, ChargeOffBase::Recognized(&base));
+    let charge_off = diff.components[0].predecessor.expect("valued");
+    let capacity = diff.components[0].successor.expect("not at the floor");
+    assert!((charge_off - 5_922.24).abs() < 0.5, "{charge_off:.2}");
+    assert!((capacity - 6_100.95).abs() < 0.5, "{capacity:.2}");
+    // Negative is aid lost, as in the two tests above.
+    let effect = diff.total_difference().expect("both sides");
+    assert!(
+        (effect + 178.71).abs() < 0.5,
+        "the reform's effect on Northern Local is {effect:.2}"
+    );
+    assert!(
+        capacity > charge_off,
+        "local capacity charges it more, not less: {capacity:.2} against {charge_off:.2}"
+    );
+
+    // The one of the corpus's exemplars the reform does help is the urban district.
+    let cleveland = find(&districts, "Cleveland Municipal");
+    let cle = at_fy2027(cleveland, TERMINAL_MILLS, ChargeOffBase::Recognized(&base));
+    let cle_effect = cle.total_difference().expect("both sides");
+    assert!((cle_effect - 207.58).abs() < 0.5, "{cle_effect:.2}");
+    assert!(cle_effect > 0.0, "Cleveland should gain, not lose");
+
+    // And the premise that failed: the DeRolph district is not the property-poor one.
+    assert!(
+        northern.valuation_per_pupil > cleveland.valuation_per_pupil,
+        "Northern Local {:?} against Cleveland {:?}",
+        northern.valuation_per_pupil,
+        cleveland.valuation_per_pupil
+    );
+}
