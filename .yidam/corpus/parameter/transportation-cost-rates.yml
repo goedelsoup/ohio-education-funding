@@ -198,11 +198,6 @@ properties:
     appropriation, which is what the
     [proration factor](appropriation-proration-factor.yml) exists to handle. [inference]
 unfilled:
-  - field: the 180-day multiplier's authority
-    why: >-
-      It is in the calculator's per-mile base and in `crates/project`, and not in R.C. 3317.0212.
-      The department's transportation reporting instructions would say whether reported miles
-      are daily or annual, which is what decides whether the multiplier is an annualisation.
   - field: the FY2021 transportation guarantee
     why: >-
       Holds 38 districts and is absent from the section. H.B. 96's temporary law, which
