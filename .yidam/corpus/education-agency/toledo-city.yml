@@ -274,8 +274,11 @@ properties:
     Urban, very high poverty. Exact department typology code not yet entered.
   roles: |
     Major urban district throughout the period held [verified]. Subject of OCG fact-check
-    RL-2026-021 [verified]. Guarantee status in the FY2027 department model not yet read onto
-    this node. [open]
+    RL-2026-021 [verified]. **Not on the guarantee**: its `temp_transitional_aid_guarantee` in
+    `crates/foundation/fixtures/fy27-department-model.csv` is zero, so the formula rather than a
+    held-harmless amount determines its aid — the only one of the corpus's four district
+    exemplars of which that is true, and the poorest of the four on valuation per pupil
+    ($135,506, the 6th percentile). 294 of the model's 609 districts are on it. [verified]
   series_path: |
     crates/dispersion/fixtures/report-card-2425-district-data.csv and
     crates/dispersion/fixtures/expenditure-functions-fy25.csv, keyed by IRN 044909.
