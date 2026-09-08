@@ -44,6 +44,7 @@ findings: |
   date is established to the day, so the node carries no `established` date — the class
   declares that property a `date`, and a year is not one. [open]
 properties:
+  irn: 133413 [verified — `dispersion::lea_directory`, fifteen consecutive editions 2004-2018]
   agency_type: community
   county: Statewide (chartered in Franklin County)
   typology: Not applicable; e-school.
@@ -58,10 +59,14 @@ properties:
       crates/dispersion/fixtures/f33-ohio-panel.csv           FY2012-FY2022 revenue, federal basis
       crates/dispersion/fixtures/mr81-sponsor-panel.csv       1998-2014 free and reduced lunch
 unfilled:
-  - field: IRN
-    why: The school is closed and absent from the current directory; the number is in an archived edition.
   - field: exact opening and closing dates
     why: The year it opened and the month it closed are held; the days are not.
+  - field: the years before 2004
+    why: >-
+      The directory's first ECOT row is 2004-05 and this node dates the opening to 2000, so the
+      committed editions corroborate the closure and not the founding. Whether the CCD carried
+      Ohio's e-schools under another agency type before then, or not at all, is not established
+      here.
 links:
   - target: ../education-agency.ont.yml
     relationship: instance-of
