@@ -145,3 +145,22 @@ amendment: |
   that has happened here after the three lint defects closed at 0.10.0. Nothing in `decision:` above
   is edited: those are the measurements taken at adoption, and editing a recorded measurement to
   match a later predicate is the one thing that table exists to prevent.
+
+  **The practice converged on 2026-08-27, and the tail is now ratcheted.** Measured 2026-09-07:
+  `7d46e59` — `corpus: the district pair, and the hoist that had already happened` — is the last
+  commit here written outside the vocabulary, and all 39 commits after it conform, scopes
+  included. So the divergence is entirely historical. It is also permanent, and that is the point
+  worth recording: `off-vocabulary-share` is a ratio over *all* of history, so 211 of 443 cannot
+  re-enter a 0%–2% band whatever anyone does next — it would take on the order of ten thousand
+  further clean commits. The band is not a target and was never going to become one.
+
+  What can be held is the derivative rather than the level, so `web/tests/unit/commitVerbs.spec.ts`
+  now fails on any commit after `7d46e59` whose verb is outside the vocabulary or wearing a scope.
+  It forgives everything before the boundary — the part that cannot be fixed — and refuses to let
+  the share grow. The `web` CI job checks out with `fetch-depth: 0` for it, and the test asserts
+  the clone is not shallow rather than passing on an empty log.
+
+  This changes no measurement above and does not change what was decided; the answer to the
+  check's question is still that those 131 commits are the artifact's work and that history is not
+  rewritten to match a vocabulary it predates. What is new is that the question cannot be asked
+  again about anything committed from here.
