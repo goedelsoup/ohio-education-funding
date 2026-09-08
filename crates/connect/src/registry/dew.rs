@@ -162,6 +162,35 @@ pub(super) const FOUNDATION: Connector = Connector {
     ],
 };
 
+pub(super) const FACTS_AND_FIGURES: Connector = Connector {
+    key: "dew-facts-and-figures",
+    publisher: "Ohio Department of Education and Workforce",
+    feeds: &["metric", "program"],
+    status: Status::Wired {
+        still_blocked: Some(
+            "Only the current edition. The department replaces the sheet in place and the \
+             prior-year URLs return an identical 1,245-byte 404, so this is a series with one \
+             retrievable member.",
+        ),
+    },
+    note: "The annual fact sheet, and the only machine-reachable place the department \
+           publishes a home-education count.",
+    sources: &[Source {
+        key: "education-landscape-2024",
+        title: None,
+        url: "https://education.ohio.gov/getattachment/Topics/Data/\
+              Frequently-Requested-Data/Facts-and-Figures/\
+              Ohios-Education-Landscape-2023-2024.pdf.aspx?lang=en-US",
+        filename: "education-landscape-2024.pdf",
+        format: Format::Pdf,
+        catalog: Some("dew-education-landscape"),
+        fixtures: &[crate::fixtures::LANDSCAPE_FIXTURE],
+        note: "Two pages of statewide counts for 2023-2024. Its `School Options` table is \
+               the one that matters here: thirteen channels counted the same way in the same \
+               year, including the home-education figure that exists nowhere else.",
+    }],
+};
+
 pub(super) const REPORT_CARD: Connector = Connector {
     key: "dew-report-card",
     publisher: "Ohio Department of Education and Workforce",

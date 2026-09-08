@@ -196,6 +196,7 @@ pub const CONNECTORS: &[Connector] = &[
     tax::CASINO,
     dew::PAYMENT_REPORTS,
     dew::SCHOLARSHIP_REPORTS,
+    dew::FACTS_AND_FIGURES,
     lsc::CATALOG,
     lsc::BUDGET,
     assembly::LAWS,

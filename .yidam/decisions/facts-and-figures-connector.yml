@@ -1,0 +1,95 @@
+id: facts-and-figures-connector
+summary: >-
+  dew-facts-and-figures, for a two-page annual sheet whose School Options table is the only
+  machine-reachable home-education count Ohio publishes — and a series with exactly one
+  retrievable member, which is the reason to pin it rather than a reason not to.
+context: |
+  Home education was in this corpus only as an aggregator's series.
+  [`jhu-homeschool-hub`](../catalog/jhu-homeschool-hub.md) catalogues a Johns Hopkins workbook
+  compiling counts the states collect, with four documented defects in its Ohio district sheet and
+  a rule that nothing in it can be `[verified]`, because the source of record is elsewhere.
+
+  That entry named the one exception: `Home School — 53,051`, for 2023-24, in the department's own
+  *Ohio's Education Landscape* fact sheet. It called that figure `[verified]` on the strength of
+  having been read from the department's PDF — and then, in the same entry, recorded that **every
+  prior-year edition of that same sheet returns an identical 1,245-byte 404**, that the older
+  `2013-2014-WHERE-KIDS-COUNT` is gone the same way, and that both facts-and-figures index pages
+  archive nothing.
+
+  So the corpus's only verified home-education fact rested on a live URL with no digest behind it,
+  in a repository whose entire retrieval practice is pinning publications by SHA-256, and the
+  publisher's demonstrated habit is to replace the file in place. The gap was not noticed by any
+  gate: `catalog-uncited` reports registered sources nothing draws on, and this was the reverse —
+  something drawn on that was never registered.
+
+  Reading the sheet for that one cell showed the table around it is worth more than the cell. Its
+  **School Options** table counts thirteen channels — chartered private schools, five voucher
+  programmes, two kinds of community school, open enrolment, joint vocational districts and home
+  education — statewide, for one year, on one page, counted by one publisher.
+decision: |
+  Declare `dew-facts-and-figures` as a connector in its own right, `Wired` with a recorded
+  remainder, feeding `metric` and `program`, with *Ohio's Education Landscape 2023-2024* as its
+  single source, and commit its School Options table as a rebuilt fixture.
+
+  **Kept apart from `dew-foundation` deliberately.** Same department, and folding it in as a
+  fourteenth source was the obvious economy. `dew-foundation` is per-agency state aid — its note
+  says so — and every fixture it produces is keyed on a district. This one is statewide by
+  construction and keyed on nothing. A connector whose sources answer "how much does this district
+  get" and "how many Ohio children are schooled some other way" carries one status for two
+  questions, and the second is the one with a blocker.
+
+  **Parsed by column offset rather than by label.** The sheet is two-column and `pdftotext
+  -layout` interleaves them, so `Community Schools` appears twice on one line — 342 as a count of
+  schools on the left, 116,973 as an enrolment on the right. A label-first reader takes whichever
+  it meets first and produces a plausible wrong number. The `School Options` heading fixes the
+  column and everything is read from that offset rightward.
+
+  **The channel list is pinned.** A programme that stops being reported fails the build rather
+  than leaving the fixture a row shorter, on the same ground the scholarship report's reader
+  follows: an absent row and a renamed one look identical downstream.
+consequences: |
+  **The corpus's one verified home-education figure is now pinned by digest.** That is the whole
+  point. `education-landscape-2024` carries a SHA-256 and a byte length like every other
+  publication here, so the next edition replacing this one in place is a digest mismatch to read
+  rather than a number that quietly changed.
+
+  **Two internal identities are now asserted where the fixture is read.** The five voucher
+  programmes sum to the published voucher total exactly, and the two community-school types sum to
+  theirs. Both would break if a column shifted, and nothing else would notice.
+
+  **A cross-source check the corpus could not previously make.** The same five voucher programmes
+  appear in the 2025 Scholarship Annual Report for the *following* school year, and every one is
+  larger. Two independent department publications, consecutive years, the same five names, all
+  moving the same way — which is the corroboration that the fact sheet's table counts what it
+  appears to count.
+
+  **A series with one retrievable member, said as `still_blocked`.** The prior editions are gone
+  and the department archives nothing, so a refresh that finds no second year is not a failure to
+  look. This connector cannot become a time series from the publisher's side; it would take the
+  Internet Archive holding editions under a URL pattern the probe has not confirmed.
+
+  **What it still cannot answer is where.** Every figure is statewide. The concentration is the
+  interesting part for a funding question — a population across some 600 districts is thin almost
+  everywhere and heavy somewhere — and only a records request reaches it, tracked at
+  [#257](https://github.com/goedelsoup/ohio-education-funding/issues/257).
+alternatives: |
+  **Leave the figure as prose in the catalog entry.** Rejected. It was already being cited as
+  `[verified]`, and a verified claim whose evidence is an unpinned URL on a page that has eaten
+  every one of its predecessors is a claim with a countdown on it. The cost of registering is one
+  registry row and a decision record; the cost of not registering is discovering the loss later
+  with nothing to recover from.
+
+  **Fold the sheet into `dew-foundation` as another source.** Rejected, above: one status for two
+  access regimes and two kinds of question.
+
+  **Commit the Johns Hopkins workbook as the fixture instead, since it has twenty years.** Rejected
+  on the ground its own catalog entry gives: a Google Sheets export has no stable content address,
+  so nothing here could rebuild byte-identically from it, and its Ohio district sheet has four
+  documented defects including a year label that contradicts the workbook's own state total. The
+  series stays catalogued and `[inference]`; what is committed is the department's.
+
+  **Extract the whole sheet rather than the one table.** Rejected for now. The educator licensure
+  and demographic tables are real data and no question in this corpus asks them anything. A
+  fixture built for a question nobody has is a fixture nobody checks.
+connectors:
+  - dew-facts-and-figures
