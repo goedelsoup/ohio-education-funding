@@ -97,8 +97,26 @@ alternatives: |
   It would also mean a projection whose method varies by district, which the feed's single
   `damping` field cannot express and the page has no way to explain.
 
+  **Answered, and the answer is no.** `tests/the_two_questions_the_damping_left_open.rs`: fitted
+  per district it looks 15.3% better in sample and is 3.6% worse out of it, with more than two
+  thirds of districts landing on a boundary of the grid. The hint was wrong — the flatness is the
+  objective being insensitive, not the optimum varying. Nothing about the feed's single `damping`
+  field needs to change.
+
   **Lengthen the fitting window instead of moving the damping.** Not an alternative — it is a
   second, larger improvement that is still available. Fitting on the full history rather than
   three points lowers the error at every damping tried, and the observations are already
   committed. `HISTORY_YEARS` is three because that is what the department's model carries, so this
   needs the panel wired into the projection path and is a bigger change than a constant.
+
+  **Answered, and the answer is yes with a caveat that makes it a decision of its own.** The best
+  form is a *blend* rather than a replacement: three-tenths weight on the three-point rate and
+  seven-tenths on the district's whole history is worth **4.6%**, and beats both ends — discarding
+  the recent rate is worse than keeping a third of it. That is larger than the 2.4% this decision
+  bought.
+
+  The caveat is the join. The projection runs on enrolled ADM and the long rate is `V33` fall
+  membership; their FY2024 levels correlate at 0.9997 but their two-year growth rates correlate at
+  0.287. The disagreement is the best evidence that a two-year rate is mostly noise, and it is also
+  why the blend cannot be dropped in mechanically — it assumes the two series share a long-run
+  trend while differing in short-run noise, and only three years of ADM exist to test that with.

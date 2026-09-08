@@ -83,3 +83,28 @@ pub fn median(mut values: Vec<f64>) -> f64 {
 pub fn flat(document: &str) -> String {
     document.split_whitespace().collect::<Vec<&str>>().join(" ")
 }
+
+/// Pearson correlation over paired observations.
+///
+/// Here because two counts of the same children can agree on levels and disagree on changes, and
+/// saying so needs both numbers rather than a scatter nobody looks at. Panics on fewer than two
+/// pairs or a constant series, both of which are a caller mistake rather than a finding.
+pub fn correlation(pairs: &[(f64, f64)]) -> f64 {
+    assert!(pairs.len() > 1, "a correlation needs at least two pairs");
+    let n = pairs.len() as f64;
+    let (mx, my) = pairs
+        .iter()
+        .fold((0.0, 0.0), |(a, b), (x, y)| (a + x, b + y));
+    let (mx, my) = (mx / n, my / n);
+    let (mut sxy, mut sxx, mut syy) = (0.0, 0.0, 0.0);
+    for (x, y) in pairs {
+        sxy += (x - mx) * (y - my);
+        sxx += (x - mx).powi(2);
+        syy += (y - my).powi(2);
+    }
+    assert!(
+        sxx > 0.0 && syy > 0.0,
+        "a constant series has no correlation"
+    );
+    sxy / (sxx * syy).sqrt()
+}
