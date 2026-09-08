@@ -1,7 +1,11 @@
 //! The damping factor the projections ship with, measured against the enrollment history the
 //! corpus said it did not have.
 //!
-//! `series::DEFAULT_DAMPING` is 0.85 and says of itself: *"A convention, not an estimate. Three
+//! **The constant moved to 0.30 in `the-fitted-damping`; this file is what moved it, and is
+//! written in the tense it was measured in.** `THE_CONVENTION` below holds the 0.85 so that every
+//! claim about it stays an assertion.
+//!
+//! `series::DEFAULT_DAMPING` was 0.85 and said of itself: *"A convention, not an estimate. Three
 //! observations per district cannot identify a damping parameter, and there is no Ohio-specific
 //! study here to borrow one from; 0.85 is the value damped-trend forecasting commonly defaults
 //! to. It is named as a constant so that a future phase with a real enrollment history can
@@ -25,7 +29,7 @@
 //! | **0.20** | **0.04031** | best |
 //! | 0.30 | 0.04033 | +0.1% |
 //! | 0.50 | 0.04069 | +0.9% |
-//! | **0.85 — what ships** | **0.04441** | **+10.2%** |
+//! | **0.85 — the convention** | **0.04441** | **+10.2%** |
 //! | 1.00 — undamped | 0.04874 | +20.9% |
 //!
 //! The optimum sits at **0.2 to 0.3** and is flat across that range, and 0.85 costs about a
@@ -34,10 +38,10 @@
 //! close enough to a random walk that a fitted growth rate is worth carrying for about one year
 //! and should be nearly gone by the second; 0.85 carries three-quarters of it into the third.
 //!
-//! # And at 0.85 the method is beaten by doing nothing
+//! # And at 0.85 the method was beaten by doing nothing
 //!
-//! Carrying the last observation forward unchanged scores 0.04340. That is **better than what
-//! ships** on the mean of log error, on root-mean-square, and on mean absolute percentage error;
+//! Carrying the last observation forward unchanged scores 0.04340. That was **better than the
+//! convention** on the mean of log error, on root-mean-square, and on mean absolute percentage error;
 //! the enrollment-weighted mean is the one metric where 0.85 wins, by 1.3%, against the 9.9% by
 //! which damping at 0.30 wins it.
 //!
@@ -56,7 +60,7 @@
 //! "Replace it with a fitted number **and see what moves**". At the feed's FY2036 horizon,
 //! moving the damping from 0.85 to 0.30 moves:
 //!
-//! | | 0.85 — what ships | 0.30 — fitted | difference |
+//! | | 0.85 — the convention | 0.30 — fitted | difference |
 //! |---|--:|--:|--:|
 //! | statewide ADM | 1,315,656 | 1,376,953 | **+4.66%** — 61,297 pupils |
 //! | realized state aid | \$7,154.7m | \$7,230.1m | **+1.05%** — \$75.4m |
@@ -72,11 +76,15 @@
 //! sentence. The number that moves most is not a dollar figure at all: **47 districts** change
 //! guarantee status at the horizon, and that is a count the site publishes.
 //!
-//! # What this does not do
+//! # What this did, in the end
 //!
-//! It does not change the constant. Moving `DEFAULT_DAMPING` moves every projection in the
-//! published feed, which is a decision rather than a measurement, and the measurement is what
-//! was missing. The numbers to make it with are here.
+//! It did not change the constant. Moving `DEFAULT_DAMPING` moves every projection in the
+//! published feed, which is a decision rather than a measurement, and the measurement was what
+//! was missing. The numbers were left here for the decision to be made against.
+//!
+//! It was made: [`the-fitted-damping`](../../../.yidam/decisions/the-fitted-damping.yml) moved it
+//! to **0.30**, choosing between the two indistinguishable optima on the enrollment-weighted
+//! metric. One test's name stopped being true in the process, and says so.
 
 use dispersion::ohio_panel::{self, PanelRow};
 use edfund_core::FiscalYear;
@@ -89,6 +97,15 @@ use std::collections::BTreeMap;
 const PANEL_YEARS: [u16; 15] = [
     2009, 2010, 2011, 2012, 2013, 2015, 2016, 2017, 2018, 2019, 2020, 2021, 2022, 2023, 2024,
 ];
+
+/// The value this shipped with before it was fitted, kept so that the claims about it remain
+/// assertions rather than prose in a decision record.
+///
+/// Every test below that once read `DEFAULT_DAMPING` and meant "the convention" now reads this.
+/// The two were the same number until `the-fitted-damping` moved the constant to 0.30, and a file
+/// that quietly followed the constant would have turned findings about 0.85 into tautologies
+/// about whatever ships.
+const THE_CONVENTION: f64 = 0.85;
 
 /// The years a forecast is made from. FY2020 onward is excluded as an origin so that no fit is
 /// taken across the closure.
@@ -214,17 +231,20 @@ fn the_enrollment_history_is_now_long_enough_to_fit_a_damping_parameter() {
         602,
         "602 districts have an observation in all fourteen surveyed years"
     );
-    let (_, n) = score(&histories, Some(3), Some(DEFAULT_DAMPING));
+    let (_, n) = score(&histories, Some(3), Some(THE_CONVENTION));
     assert_eq!(n, 13_244, "the backtest should hold this many forecasts");
 }
 
-/// The fitted optimum is 0.2 to 0.3, and what ships is 0.85.
+/// The fitted optimum is 0.2 to 0.3, the convention was 0.85, and what ships is now the optimum.
 ///
 /// Stated as an interval containing the minimum rather than as a single value, because the
 /// objective is flat there — 0.00, 0.20 and 0.30 are within 0.3% of each other — and a test
-/// asserting one of them would fail on a rounding change while saying nothing more.
+/// asserting one of them would fail on a rounding change while saying nothing more. That
+/// flatness is also why `DEFAULT_DAMPING` is only asserted to be *inside* the interval: 0.20 and
+/// 0.30 are both defensible and `the-fitted-damping` chose between them on the
+/// enrollment-weighted metric, not on this one.
 #[test]
-fn the_error_minimising_damping_is_far_below_the_one_the_projections_use() {
+fn the_error_minimising_damping_is_far_below_the_convention_and_is_what_now_ships() {
     let histories = complete_histories();
     let grid: Vec<f64> = (0..=20).map(|i| f64::from(i) * 0.05).collect();
     let mut best = (f64::INFINITY, 0.0);
@@ -240,45 +260,59 @@ fn the_error_minimising_damping_is_far_below_the_one_the_projections_use() {
         best.1
     );
     assert!(
-        best.1 < DEFAULT_DAMPING,
-        "the fitted value {:.2} should be below the shipped {DEFAULT_DAMPING}",
+        best.1 < THE_CONVENTION,
+        "the fitted value {:.2} should be below the convention's {THE_CONVENTION}",
         best.1
     );
+    assert!(
+        (0.15..=0.35).contains(&DEFAULT_DAMPING),
+        "what ships ({DEFAULT_DAMPING}) should now sit inside the fitted interval"
+    );
 
-    let (shipped, _) = score(&histories, Some(3), Some(DEFAULT_DAMPING));
-    let cost = shipped / best.0 - 1.0;
+    let (convention, _) = score(&histories, Some(3), Some(THE_CONVENTION));
+    let cost = convention / best.0 - 1.0;
     assert!(
         (0.08..0.13).contains(&cost),
         "0.85 should cost about a tenth of the error against the optimum; it costs {:+.1}%",
         cost * 100.0
     );
+
+    let (shipping, _) = score(&histories, Some(3), Some(DEFAULT_DAMPING));
+    assert!(
+        shipping / best.0 - 1.0 < 0.005,
+        "what ships should now be within half a percent of the optimum; it is {:+.2}%",
+        (shipping / best.0 - 1.0) * 100.0
+    );
 }
 
-/// At 0.85 the method is beaten by carrying the last observation forward.
+/// At 0.85 the method was beaten by carrying the last observation forward. At what ships now it
+/// is not.
 ///
-/// The comparison that makes the finding actionable rather than academic: the shipped setting is
-/// not merely suboptimal, it is worse on this metric than the baseline that does no fitting at
-/// all. Damping at its own optimum is comfortably better than flat, which is why the conclusion
-/// is that the constant is wrong and not that the method is.
+/// **This test's name used to be `what_ships_is_worse_than_making_no_forecast_at_all`, and it was
+/// true.** `the-fitted-damping` made it false by moving the constant, which is the outcome the
+/// finding was for. Both halves are asserted rather than the second replacing the first: that the
+/// convention lost to a baseline that does no fitting at all is why the constant moved, and a
+/// file that dropped the claim would leave the decision record citing a measurement nothing
+/// checks.
 #[test]
-fn what_ships_is_worse_than_making_no_forecast_at_all() {
+fn what_used_to_ship_was_worse_than_making_no_forecast_at_all() {
     let histories = complete_histories();
-    let (shipped, _) = score(&histories, Some(3), Some(DEFAULT_DAMPING));
+    let (convention, _) = score(&histories, Some(3), Some(THE_CONVENTION));
     let (flat_error, _) = score(&histories, Some(3), None);
-    let (fitted, _) = score(&histories, Some(3), Some(0.30));
+    let (shipping, _) = score(&histories, Some(3), Some(DEFAULT_DAMPING));
 
     assert!(
-        shipped > flat_error,
-        "0.85 scores {shipped:.5} against flat's {flat_error:.5}"
+        convention > flat_error,
+        "0.85 scores {convention:.5} against flat's {flat_error:.5}"
     );
     assert!(
-        fitted < flat_error,
-        "damping at 0.30 scores {fitted:.5} and should beat flat's {flat_error:.5}"
+        shipping < flat_error,
+        "what ships scores {shipping:.5} and should now beat flat's {flat_error:.5}"
     );
     assert!(
-        flat_error / fitted - 1.0 > 0.05,
-        "the gain damping is leaving on the table should exceed 5%; it is {:+.1}%",
-        (flat_error / fitted - 1.0) * 100.0
+        flat_error / shipping - 1.0 > 0.05,
+        "the gain damping now collects should exceed 5%; it is {:+.1}%",
+        (flat_error / shipping - 1.0) * 100.0
     );
 }
 
@@ -292,7 +326,7 @@ fn a_longer_fitting_window_beats_a_better_damping_factor() {
     let histories = complete_histories();
     let (short_best, _) = score(&histories, Some(3), Some(0.20));
     let (long_best, _) = score(&histories, None, Some(0.30));
-    let (short_shipped, _) = score(&histories, Some(3), Some(DEFAULT_DAMPING));
+    let (short_shipped, _) = score(&histories, Some(3), Some(THE_CONVENTION));
 
     assert!(
         long_best < short_best,
@@ -374,12 +408,15 @@ fn the_straight_line_is_worse_than_every_damping_and_worse_the_longer_it_is_fitt
     );
 }
 
-/// What moves in the published feed if the damping moves — the half the constant's comment asked
-/// for and this file had not supplied.
+/// What the move actually moved — measured before it was made, and still asserted after.
 ///
-/// Measured through `report::forecast` at the feed's own FY2036 horizon under current law, so
-/// these are the figures the page would print. The enrollment difference is large and the aid
-/// difference is not, which is the guarantee doing what the corpus already says it does.
+/// Through `report::forecast` at the feed's own FY2036 horizon under current law, so these are
+/// the figures the page prints. The enrollment difference is large and the aid difference is
+/// not, which is the guarantee doing what the corpus already says it does.
+///
+/// Kept as a live comparison rather than retired once the constant moved: it is the evidence
+/// `the-fitted-damping` rests on, and the feed's own regression test against a change to
+/// `report::forecast` that would alter the size of the move without anyone noticing.
 #[test]
 fn moving_the_damping_moves_the_enrollment_four_times_as_much_as_the_aid() {
     let districts = panel::panel();
@@ -393,8 +430,8 @@ fn moving_the_damping_moves_the_enrollment_four_times_as_much_as_the_aid() {
             prior,
         )
     };
-    let shipped = at(DEFAULT_DAMPING);
-    let fitted = at(0.30);
+    let shipped = at(THE_CONVENTION);
+    let fitted = at(DEFAULT_DAMPING);
 
     let adm_move = fitted.adm / shipped.adm - 1.0;
     let aid_move = fitted.realized_aid / shipped.realized_aid - 1.0;

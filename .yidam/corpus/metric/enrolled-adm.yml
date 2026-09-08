@@ -205,9 +205,19 @@ findings: |
   question needs. Only the department can answer it — tracked at
   [#257](https://github.com/goedelsoup/ohio-education-funding/issues/257).
 
-  **[open]** Whether to move the constant. It is left at 0.85 for now: changing it moves every
-  projection in the published feed, which is a decision to record rather than a number to edit,
-  and this file's business was the measurement.
+  **AND THE CONSTANT MOVED.** [verified — `crates/project`]
+  It was left at 0.85 while only the measurement existed, because changing it moves every
+  projection in the published feed, which is a decision to record rather than a number to edit.
+  The decision is recorded at
+  [the-fitted-damping](../../decisions/the-fitted-damping.yml) and the value is now **0.30** —
+  chosen over the 0.20 that minimises the headline metric because the objective is flat between
+  them (0.04033 against 0.04031, which no honest reading distinguishes) and 0.30 is the optimum on
+  the enrollment-weighted metric, the one that governs a statewide total rather than a typical
+  district.
+
+  So a district's fitted growth rate is now nearly spent by the second projected year instead of
+  the fourth, and a long horizon sits closer to the last observation — which is what fourteen
+  years of Ohio enrollment say it should do.
 figures:
   - key: project/districts-on-the-guarantee
     value: 294

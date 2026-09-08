@@ -90,35 +90,43 @@ impl Method {
     }
 }
 
-/// The default damping factor.
+/// The default damping factor: how much of a fitted growth rate survives into each further year.
 ///
-/// A convention, not an estimate. Three observations per district cannot identify a damping
-/// parameter, and there was no Ohio-specific study here to borrow one from; 0.85 is the value
-/// damped-trend forecasting commonly defaults to. It is named as a constant so that a future
-/// phase with a real enrollment history could replace it with a fitted number and see what
-/// moves.
+/// **0.30, fitted, replacing the 0.85 this shipped with as a convention.** Recorded in
+/// [`.yidam/decisions/the-fitted-damping.yml`](../../../.yidam/decisions/the-fitted-damping.yml).
 ///
-/// # The history arrived, and the number does not survive it
+/// # What it used to say, and why it no longer says it
 ///
-/// The F-33 panel now carries fourteen years of `V33` fall membership for 602 districts, which
-/// is the history that sentence was waiting for.
-/// `tests/the_damping_nobody_fitted.rs` backtests this constant over 13,244 out-of-sample
-/// forecasts and finds the error-minimising value at **0.2 to 0.3**. At 0.85 the mean absolute
-/// log error is about a tenth higher than at the optimum, and higher than carrying the last
-/// observation forward unchanged — the fitted rate is worth roughly one year and 0.85 carries
-/// three-quarters of it into the third.
+/// It said: *"A convention, not an estimate. Three observations per district cannot identify a
+/// damping parameter, and there is no Ohio-specific study here to borrow one from; 0.85 is the
+/// value damped-trend forecasting commonly defaults to. It is named as a constant so that a
+/// future phase with a real enrollment history can replace it with a fitted number and see what
+/// moves."*
 ///
-/// What moving it would move, measured at the feed's FY2036 horizon: statewide ADM by +4.66%
-/// (61,297 pupils) and realized state aid by +1.05% ($75.4m). The enrollment error is four times
-/// the aid error because the guarantee absorbs most of it, so the constant is wrong and the
-/// consequence is bounded. The largest movement is a count rather than a dollar figure — 47
-/// districts change guarantee status.
+/// That history arrived when the F-33 panel was extended past FY2022 — `V33` fall membership for
+/// 602 districts across fourteen years. `tests/the_damping_nobody_fitted.rs` backtests the
+/// parameter over 13,244 out-of-sample forecasts and puts the error-minimising value at **0.2 to
+/// 0.3**, flat across that range, in all four metrics tried. At 0.85 the mean absolute log error
+/// was about a tenth higher than at the optimum, and higher than carrying the last observation
+/// forward unchanged: the fitted rate is worth roughly one year, and 0.85 carried three-quarters
+/// of it into the third.
 ///
-/// The value is left alone here deliberately. Changing it moves every projection in the
-/// published feed, which is a decision to be recorded in `.yidam/decisions/` rather than a
-/// constant to be edited; what was missing was the measurement, and the measurement is now in
-/// that file.
-pub const DEFAULT_DAMPING: f64 = 0.85;
+/// # Why 0.30 rather than 0.20
+///
+/// The objective is flat between them — 0.04033 against 0.04031 on the three-point window the
+/// callers use, a difference of 0.05% that no honest reading distinguishes. 0.30 is the optimum
+/// on the *enrollment-weighted* metric, which is the one that governs a statewide total rather
+/// than a typical district, and on the fit that uses the full history. It is also the smaller
+/// departure from the value it replaces, and the value whose consequence for the published feed
+/// was measured before the change was made.
+///
+/// # Damping is the right method, which is what makes this a wrong constant and not a wrong shape
+///
+/// At its optimum the damped trend beats a flat carry-forward by 7.1%. An undamped trend is 20.9%
+/// worse than the optimum, and a least-squares straight line is worse still and gets worse with
+/// more history — it projects a district through zero, which is the failure damping exists to
+/// prevent.
+pub const DEFAULT_DAMPING: f64 = 0.30;
 
 /// One standard deviation. Covers about 68% of a normal distribution.
 pub const ONE_SIGMA: f64 = 1.0;
