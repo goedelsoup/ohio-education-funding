@@ -2394,6 +2394,76 @@ pub static FIGURES: &[Figure] = &[
         compute: |_| mills_before(&bridge_implied_charge_off(), "Targeted Assistance"),
     },
     Figure {
+        key: "project/edchoice-full-award-ceiling",
+        owner: "crates/project",
+        unit: Unit::Ratio,
+        label: "Family income, as a multiple of the federal poverty guidelines, at or below which \
+                the EdChoice Expansion pays its full base amount",
+        pinned: 4.5,
+        tolerance: 0.0,
+        compute: |_| project::scholarship::FULL_AWARD_CEILING,
+    },
+    Figure {
+        key: "project/edchoice-minimum-award-threshold",
+        owner: "crates/project",
+        unit: Unit::Ratio,
+        label: "And where the award stops falling \u{2014} 7.82 times poverty, derived from the \
+                statute's own decay rate and its ten per cent floor, and stated nowhere in it",
+        pinned: 7.82193,
+        tolerance: 0.00001,
+        compute: |_| project::scholarship::minimum_award_threshold(),
+    },
+    Figure {
+        key: "project/edchoice-award-at-five-hundred-and-fifty-per-cent",
+        owner: "crates/project",
+        unit: Unit::Dollars,
+        label: "What a kindergarten-through-eight student at 550% of poverty is awarded \u{2014} \
+                half the base, because the curve halves for every further hundred points",
+        pinned: 2750.0,
+        tolerance: 0.005,
+        compute: |_| {
+            project::scholarship::expansion_award(project::scholarship::EDCHOICE_BASE_K8, 5.5)
+        },
+    },
+    Figure {
+        key: "project/edchoice-minimum-award-k8",
+        owner: "crates/project",
+        unit: Unit::Dollars,
+        label: "The smallest EdChoice Expansion award for grades kindergarten through eight \
+                \u{2014} a tenth of the base, and what every family above 782% of poverty gets",
+        pinned: 550.0,
+        tolerance: 0.005,
+        compute: |_| {
+            project::scholarship::expansion_award(project::scholarship::EDCHOICE_BASE_K8, 100.0)
+        },
+    },
+    Figure {
+        key: "project/jon-peterson-award-severest-category",
+        owner: "crates/project",
+        unit: Unit::Dollars,
+        label: "What the Jon Peterson formula computes for a category six student before its own \
+                ceiling \u{2014} $7,190 plus the largest supplement",
+        pinned: 39122.0,
+        tolerance: 0.005,
+        compute: |_| {
+            project::scholarship::JON_PETERSON_BASE + project::scholarship::JON_PETERSON_SUPPLEMENTS[5]
+        },
+    },
+    Figure {
+        key: "project/jon-peterson-ceiling-haircut",
+        owner: "crates/project",
+        unit: Unit::Dollars,
+        label: "How much the unindexed $34,000 ceiling takes off that award \u{2014} the ceiling \
+                already binds the severest category, before any year of indexing",
+        pinned: 5122.0,
+        tolerance: 0.005,
+        compute: |_| {
+            project::scholarship::JON_PETERSON_BASE
+                + project::scholarship::JON_PETERSON_SUPPLEMENTS[5]
+                - project::scholarship::jon_peterson_award(6)
+        },
+    },
+    Figure {
         key: "dispersion/the-two-poverty-measures-against-each-other",
         owner: "crates/dispersion",
         unit: Unit::Ratio,
