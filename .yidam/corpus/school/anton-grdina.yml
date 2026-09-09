@@ -35,15 +35,33 @@ description: |
 findings: |
   **That is not obviously a defect, and the corpus cannot tell.** CSI selects among **Title I
   served** schools, and neither the identification lists nor any fixture here carries a Title I
-  service flag. So the absence has at least three readings — the building is not Title I
+  service flag. So the absence had at least three readings — the building is not Title I
   served; it is served but was not in the bottom 5% of that population in the 2025 cycle; or it
-  was identified in an earlier cycle and exited. Nothing held distinguishes them, and the
-  department republishes each list in place rather than archiving cycles, so the history that
-  would settle it does not exist here. [open]
+  was identified in an earlier cycle and exited. The department republishes each list in place
+  rather than archiving cycles, so the history that would settle the third does not exist here.
 
-  What can be said is narrower and still worth saying: **a reader who treats the CSI list as
-  "the failing schools" will not find this building on it.** Cleveland has fifteen CSI
-  buildings and this is not one of them.
+  ### Two of the three readings are now much harder to hold
+
+  The building sits at rank **23 of the 3,151 buildings Ohio rated in 2024-25** — the bottom one
+  per cent — and **18 of the 22 buildings below it are on a federal list**. [verified —
+  [`crates/dispersion`](../../../crates/dispersion/tests/the_list_the_report_card_does_not_explain.rs),
+  which is the first reader the building extract has had and pins every figure this node states]
+
+  Sharper than the rank: **Alfred Benesch, operated by the same district, scores the same 36.8,
+  carries the same one star, and is CSI on the 2025 cycle by the direct route.** [verified] "Served
+  but outside the bottom 5%" would have to be true of a building in the bottom one per cent while
+  false of its neighbour at the same published score, under the same superintendent, in the same
+  year. It is not a reading the published rating can support, and this pair is one of six such
+  pairs inside a single district — see
+  [`accountability-regime/essa`](../accountability-regime/essa.yml).
+
+  What survives is **Title I service**, and the earlier-cycle exit — which the list makes look
+  rare, since it carries 100 schools that have not managed it in seven years. Which of the two is
+  not established. [open]
+
+  What can be said without either: **a reader who treats the CSI list as "the failing schools"
+  will not find this building on it.** Cleveland has fifteen CSI buildings and this is not one of
+  them.
 
   **The intervention connection is real and not yet traceable.** Cleveland Municipal is
   recorded as having been subject to state academic distress intervention "for part of the
@@ -51,6 +69,23 @@ findings: |
   performed, during the commission's tenure is exactly the question the accountability
   expansion exists to answer and cannot yet, because the corpus holds no commission timeline.
   [open]
+figures:
+  - key: dispersion/anton-grdina-rank
+    value: 23
+    field: findings
+    as_written: "rank **23 of the 3,151"
+  - key: dispersion/buildings-rated-on-achievement
+    value: 3151
+    field: findings
+    as_written: "3,151 buildings Ohio rated in 2024-25"
+  - key: dispersion/buildings-below-anton-grdina-identified
+    value: 18
+    field: findings
+    as_written: "**18 of the 22 buildings below it are on a federal list**"
+  - key: dispersion/csi-identified-since-2018
+    value: 100
+    field: findings
+    as_written: "carries 100 schools that have not managed it"
 properties:
   building_irn: 000828 [verified]
   district: Cleveland Municipal School District, IRN 043786. [verified]
@@ -65,7 +100,8 @@ properties:
   chronic_absenteeism: 66.7% in 2024-25. [verified]
   roles: |
     **On none of the three lists.** [verified — `dispersion::identified`, pinned by test] See the
-    description: absence is not evidence of not failing.
+    description: absence is not evidence of not failing, and this building is in the bottom one
+    per cent of the state's published index.
   series_path: crates/dispersion/fixtures/report-card-2425-buildings.csv, keyed by building IRN 000828. [verified]
 unfilled:
   - field: grade span

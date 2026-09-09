@@ -33,10 +33,54 @@ description: |
   It is recorded on both [Title I](../revenue-stream/title-i.yml) and
   [IDEA Part B](../revenue-stream/idea-part-b.yml). [verified as proposed]
 
-  **How many schools this could reach is knowable and not known.** 231 buildings are currently CSI
-  and some carry identifications from 2018 — seven years against exit criteria that allow three.
-  [verified] Whether any has been subjected to a rung of this ladder is not published in anything
-  the corpus holds. [open]
+  **How many schools this could reach is now known.** 231 buildings are currently CSI, and **127
+  of them were identified more than three years ago** — 100 in 2018 and 27 in 2022, holding 50,086
+  pupils between them. That is the population the trigger above already describes, and it is more
+  than half the tier. [verified —
+  [`crates/dispersion`](../../../crates/dispersion/tests/the_list_the_report_card_does_not_explain.rs)]
+  Whether any has been subjected to a rung of this ladder is still not published in anything the
+  corpus holds. [open]
+findings: |
+  ### Two thirds of the reachable population is already outside a school district
+
+  The three rungs that end a school as a district building are described above as transfers into
+  the community-school sector. Most of the schools they could reach are there already. **Of the
+  127 CSI schools past the three-year mark, 82 operate as their own local education agency** —
+  their building IRN and their LEA IRN are the same number — and they hold 30,085 of the 50,086
+  pupils. [verified —
+  [`crates/dispersion`](../../../crates/dispersion/tests/the_list_the_report_card_does_not_explain.rs)]
+
+  Every one of the 64 dropout recovery schools in that population is its own agency, as are 18 of
+  the 20 community schools; the 43 traditional district buildings are the only ones a conversion or
+  merger rung could move anywhere. For the other 82, rungs 14 and 15 have no district to move a
+  building out of, and the menu reduces to closure. [inference]
+
+  That is not a defect in the amendment — a state plan is written for every school it identifies,
+  and the sector mix of the identified population is not something a plan chooses. It is a caution
+  for this corpus: reading the ladder as a district-sector event mistakes the minority case for the
+  rule, and the [`deduction`](../../skills/deduction.md) stub the description points at is the
+  wrong instrument for two thirds of it. [inference]
+figures:
+  - key: dispersion/csi-past-the-three-year-exit
+    value: 127
+    field: description
+    as_written: "**127\n  of them were identified more than three years ago**"
+  - key: dispersion/csi-identified-since-2018
+    value: 100
+    field: description
+    as_written: "100 in 2018 and 27 in 2022"
+  - key: dispersion/csi-past-the-exit-pupils
+    value: 50086
+    field: description
+    as_written: "holding 50,086\n  pupils between them"
+  - key: dispersion/csi-past-the-exit-as-their-own-agency
+    value: 82
+    field: findings
+    as_written: "**Of the\n  127 CSI schools past the three-year mark, 82 operate as their own local education agency**"
+  - key: dispersion/csi-past-the-exit-pupils-outside-a-district
+    value: 30085
+    field: findings
+    as_written: "they hold 30,085 of the 50,086\n  pupils"
 properties:
   name: More rigorous interventions
   authority: |

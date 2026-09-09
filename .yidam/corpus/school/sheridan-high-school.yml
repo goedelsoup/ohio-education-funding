@@ -50,6 +50,20 @@ findings: |
   Which subgroup is not published on the CSI list — it appears on the ATSI list, which carries
   subgroup columns, and Sheridan's 2022 ATSI row is not in the current file because the
   department republishes each list in place rather than archiving cycles. [open]
+
+  ### It is the top of the band, and the band is most of the state
+
+  Sheridan's 89.9 is the **highest Performance Index on the Comprehensive Support list**, so this
+  building marks one edge of the range inside which the published rating stops predicting
+  membership. The other edge is 30.3, the lowest index on none of the three lists, and **1,958 of
+  the 3,151 rated buildings sit between them**. [verified —
+  [`crates/dispersion`](../../../crates/dispersion/tests/the_list_the_report_card_does_not_explain.rs)]
+
+  That the escalation route reaches this far up is not an artefact of one school. All 42
+  escalations were checked against the same rank order, and **every one of the 11 CSI schools
+  rated three stars or better arrived this way** — not one of the 189 direct identifications did,
+  and the highest-ranked escalation sits above the state median. [verified] The route is a second
+  population inside one tier, and Sheridan is its clearest case rather than its exception.
 revisions:
   - was: |
       Whether Sheridan had ever been federally identified was recorded as unknowable here,
@@ -66,6 +80,19 @@ revisions:
       student who attended it. Which subgroup triggered the 2022 ATSI identification is still
       not recoverable: it appears only on the ATSI list, and the department republishes each
       list in place rather than archiving cycles.
+figures:
+  - key: dispersion/csi-identification-overlap-band
+    value: 1958
+    field: findings
+    as_written: "**1,958 of\n  the 3,151 rated buildings sit between them**"
+  - key: dispersion/buildings-rated-on-achievement
+    value: 3151
+    field: findings
+    as_written: "the 3,151 rated buildings sit between them"
+  - key: dispersion/csi-escalated-above-two-stars
+    value: 11
+    field: findings
+    as_written: "every one of the 11 CSI schools"
 properties:
   building_irn: 034363 [verified]
   district: Northern Local School District (Perry County), IRN 049056. [verified]

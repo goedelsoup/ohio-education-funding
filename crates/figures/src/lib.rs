@@ -53,7 +53,7 @@
 
 #![forbid(unsafe_code)]
 
-use std::collections::{BTreeMap, HashMap};
+use std::collections::{BTreeMap, BTreeSet, HashMap};
 
 use edfund_core::FiscalYear;
 use project::budget_analysis::{
@@ -637,6 +637,78 @@ fn achievement_denominator(mut scores: Vec<f64>) -> f64 {
     scores.sort_by(|a, b| b.total_cmp(a));
     let top = (scores.len() * 2).div_ceil(100);
     scores[..top].iter().sum::<f64>() / top as f64
+}
+
+/// Every federal identification joined to the building the report card holds for it.
+///
+/// The join is total — all 408 identifications name a building on the 2024-25 card — which is
+/// what lets every count below be a count over one population. Asserted rather than assumed in
+/// `crates/dispersion/tests/the_list_the_report_card_does_not_explain.rs`.
+fn identified_buildings() -> Vec<(
+    dispersion::identified::Identified,
+    dispersion::building::Building,
+)> {
+    let by_irn: BTreeMap<String, dispersion::building::Building> =
+        dispersion::building::buildings()
+            .into_iter()
+            .map(|b| (b.irn.clone(), b))
+            .collect();
+    dispersion::identified::identifications()
+        .into_iter()
+        .filter_map(|i| by_irn.get(&i.building_irn).cloned().map(|b| (i, b)))
+        .collect()
+}
+
+/// The buildings on the Comprehensive Support list, with the identification that put them there.
+fn comprehensive_support() -> Vec<(
+    dispersion::identified::Identified,
+    dispersion::building::Building,
+)> {
+    identified_buildings()
+        .into_iter()
+        .filter(|(i, _)| i.status == "csi")
+        .collect()
+}
+
+/// The Comprehensive Support schools identified more than three years ago.
+///
+/// The trigger `intervention/more-rigorous-interventions` states — CSI, and no exit within three
+/// years — read off the one column that carries it. The 2025 cohorts are excluded whichever route
+/// they took, including the 42 whose ATSI clock started in 2022: the plan's three years run from
+/// the CSI identification, and theirs is 2025.
+fn past_the_three_year_exit() -> Vec<(
+    dispersion::identified::Identified,
+    dispersion::building::Building,
+)> {
+    comprehensive_support()
+        .into_iter()
+        .filter(|(i, _)| matches!(i.year_identified.as_str(), "2018" | "2022"))
+        .collect()
+}
+
+/// Every building IRN on any of the three federal lists.
+fn federally_listed() -> BTreeSet<String> {
+    dispersion::identified::identifications()
+        .into_iter()
+        .map(|i| i.building_irn)
+        .collect()
+}
+
+/// The 2024-25 Performance Index of a rated building.
+///
+/// # Panics
+///
+/// Only when called on a building [`dispersion::building::by_index`] did not drop, which is what
+/// every caller here does.
+fn building_index(b: &dispersion::building::Building) -> f64 {
+    b.performance_index.expect("by_index drops the unrated")
+}
+
+/// The median of a sample. Sorted here rather than by the caller, because every call site below
+/// wants the same thing and one of them getting the sort wrong would move a figure quietly.
+fn median(mut sample: Vec<f64>) -> f64 {
+    sample.sort_by(f64::total_cmp);
+    sample[sample.len() / 2]
 }
 
 /// The most common achievement star rating, and how many districts are rated at all.
@@ -1941,6 +2013,273 @@ pub static FIGURES: &[Figure] = &[
         compute: |_| {
             let (modal, rated) = modal_achievement_rating();
             modal as f64 / rated as f64
+        },
+    },
+    Figure {
+        key: "dispersion/report-card-buildings",
+        owner: "crates/dispersion",
+        unit: Unit::Count,
+        label: "Buildings on the 2024-25 report card \u{2014} the population federal \
+                identification selects from, and the denominator every share below is taken over",
+        pinned: 3318.0,
+        tolerance: 0.0,
+        compute: |_| dispersion::building::buildings().len() as f64,
+    },
+    Figure {
+        key: "dispersion/buildings-rated-on-achievement",
+        owner: "crates/dispersion",
+        unit: Unit::Count,
+        label: "Buildings the department gave a Performance Index and a star \u{2014} 167 fewer \
+                than it lists, and the population a rank order can be taken over",
+        pinned: 3151.0,
+        tolerance: 0.0,
+        compute: |_| dispersion::building::by_index().len() as f64,
+    },
+    Figure {
+        key: "dispersion/identifications",
+        owner: "crates/dispersion",
+        unit: Unit::Count,
+        label: "Federal identifications across the three tiers, every one of which names a \
+                building the report card carries",
+        pinned: 408.0,
+        tolerance: 0.0,
+        compute: |_| identified_buildings().len() as f64,
+    },
+    Figure {
+        key: "dispersion/csi-identified-since-2018",
+        owner: "crates/dispersion",
+        unit: Unit::Count,
+        label: "Comprehensive Support schools still carrying a 2018 identification \u{2014} \
+                seven years against exit criteria that allow three",
+        pinned: 100.0,
+        tolerance: 0.0,
+        compute: |_| {
+            comprehensive_support()
+                .iter()
+                .filter(|(i, _)| i.year_identified == "2018")
+                .count() as f64
+        },
+    },
+    Figure {
+        key: "dispersion/csi-2018-cohort-chronic-absenteeism-median",
+        owner: "crates/dispersion",
+        unit: Unit::Ratio,
+        label: "Median chronic absenteeism in that cohort, in percentage points \u{2014} what \
+                distinguishes the schools that have not exited, and it is not the index",
+        pinned: 80.7,
+        tolerance: 0.05,
+        compute: |_| {
+            median(
+                comprehensive_support()
+                    .iter()
+                    .filter(|(i, _)| i.year_identified == "2018")
+                    .filter_map(|(_, b)| b.chronic_absenteeism)
+                    .collect(),
+            )
+        },
+    },
+    Figure {
+        key: "dispersion/building-chronic-absenteeism-median",
+        owner: "crates/dispersion",
+        unit: Unit::Ratio,
+        label: "Median chronic absenteeism across every building in the state, in percentage \
+                points \u{2014} the comparison the cohort figure is only meaningful against",
+        pinned: 20.8,
+        tolerance: 0.05,
+        compute: |_| {
+            median(
+                dispersion::building::buildings()
+                    .iter()
+                    .filter_map(|b| b.chronic_absenteeism)
+                    .collect(),
+            )
+        },
+    },
+    Figure {
+        key: "dispersion/csi-escalated-above-two-stars",
+        owner: "crates/dispersion",
+        unit: Unit::Count,
+        label: "Comprehensive Support schools rated three stars or better \u{2014} every one of \
+                which arrived through a subgroup rather than by performing in the bottom 5%",
+        pinned: 11.0,
+        tolerance: 0.0,
+        compute: |_| {
+            comprehensive_support()
+                .iter()
+                .filter(|(_, b)| b.achievement_stars.is_some_and(|s| s >= 3.0))
+                .count() as f64
+        },
+    },
+    Figure {
+        key: "dispersion/csi-identification-overlap-band",
+        owner: "crates/dispersion",
+        unit: Unit::Count,
+        label: "Buildings between the lowest Performance Index on no federal list and the \
+                highest on the Comprehensive Support list \u{2014} the band inside which the \
+                published rating does not say who is identified",
+        pinned: 1958.0,
+        tolerance: 0.0,
+        compute: |_| {
+            let listed = federally_listed();
+            let in_csi: BTreeSet<String> =
+                comprehensive_support().into_iter().map(|(_, b)| b.irn).collect();
+            let rated = dispersion::building::by_index();
+            let floor = rated
+                .iter()
+                .filter(|b| !listed.contains(&b.irn))
+                .map(building_index)
+                .fold(f64::MAX, f64::min);
+            let ceiling = rated
+                .iter()
+                .filter(|b| in_csi.contains(&b.irn))
+                .map(building_index)
+                .fold(f64::MIN, f64::max);
+            rated.iter().filter(|b| (floor..=ceiling).contains(&building_index(b))).count() as f64
+        },
+    },
+    Figure {
+        key: "dispersion/csi-contested-index-values",
+        owner: "crates/dispersion",
+        unit: Unit::Count,
+        label: "Published Performance Index values carrying both a Comprehensive Support school \
+                and a building on no federal list \u{2014} exact agreement no threshold on the \
+                index can separate",
+        pinned: 113.0,
+        tolerance: 0.0,
+        compute: |_| {
+            let listed = federally_listed();
+            let in_csi: BTreeSet<String> =
+                comprehensive_support().into_iter().map(|(_, b)| b.irn).collect();
+            let mut at_value: BTreeMap<String, Vec<String>> = BTreeMap::new();
+            for building in dispersion::building::by_index() {
+                let index = building_index(&building);
+                at_value.entry(format!("{index:.1}")).or_default().push(building.irn);
+            }
+            at_value
+                .values()
+                .filter(|group| {
+                    group.iter().any(|irn| in_csi.contains(irn))
+                        && group.iter().any(|irn| !listed.contains(irn))
+                })
+                .count() as f64
+        },
+    },
+    Figure {
+        key: "dispersion/one-star-buildings",
+        owner: "crates/dispersion",
+        unit: Unit::Count,
+        label: "Buildings Ohio rates one star on achievement \u{2014} the state's own \
+                worst-rated population, and not the population the federal list holds",
+        pinned: 347.0,
+        tolerance: 0.0,
+        compute: |_| {
+            dispersion::building::buildings()
+                .iter()
+                .filter(|b| b.achievement_stars == Some(1.0))
+                .count() as f64
+        },
+    },
+    Figure {
+        key: "dispersion/one-star-buildings-on-no-federal-list",
+        owner: "crates/dispersion",
+        unit: Unit::Count,
+        label: "One-star buildings on none of the three federal lists \u{2014} nearly half the \
+                state's worst-rated buildings, outside the regime that identifies on that rating",
+        pinned: 164.0,
+        tolerance: 0.0,
+        compute: |_| {
+            let listed = federally_listed();
+            dispersion::building::buildings()
+                .iter()
+                .filter(|b| b.achievement_stars == Some(1.0) && !listed.contains(&b.irn))
+                .count() as f64
+        },
+    },
+    Figure {
+        key: "dispersion/anton-grdina-rank",
+        owner: "crates/dispersion",
+        unit: Unit::Count,
+        label: "Where the corpus's worst-performing exemplar building ranks on the published \
+                Performance Index \u{2014} the bottom one per cent, and on no federal list",
+        pinned: 23.0,
+        tolerance: 0.0,
+        compute: |_| {
+            dispersion::building::by_index()
+                .iter()
+                .position(|b| b.irn == "000828")
+                .expect("Anton Grdina is rated") as f64
+                + 1.0
+        },
+    },
+    Figure {
+        key: "dispersion/buildings-below-anton-grdina-identified",
+        owner: "crates/dispersion",
+        unit: Unit::Count,
+        label: "How many of the 22 buildings scoring below it are federally identified \u{2014} \
+                what makes its own absence a question about eligibility rather than performance",
+        pinned: 18.0,
+        tolerance: 0.0,
+        compute: |_| {
+            let listed = federally_listed();
+            let rated = dispersion::building::by_index();
+            let rank = rated
+                .iter()
+                .position(|b| b.irn == "000828")
+                .expect("Anton Grdina is rated");
+            rated[..rank].iter().filter(|b| listed.contains(&b.irn)).count() as f64
+        },
+    },
+    Figure {
+        key: "dispersion/csi-past-the-three-year-exit",
+        owner: "crates/dispersion",
+        unit: Unit::Count,
+        label: "Comprehensive Support schools identified more than three years ago \u{2014} the \
+                population the sixteen-rung intervention ladder can reach today",
+        pinned: 127.0,
+        tolerance: 0.0,
+        compute: |_| past_the_three_year_exit().len() as f64,
+    },
+    Figure {
+        key: "dispersion/csi-past-the-exit-pupils",
+        owner: "crates/dispersion",
+        unit: Unit::Count,
+        label: "Pupils enrolled in those schools \u{2014} a headcount off the report card, not an \
+                average daily membership",
+        pinned: 50086.0,
+        tolerance: 0.0,
+        compute: |_| {
+            past_the_three_year_exit().iter().filter_map(|(_, b)| b.enrollment).sum()
+        },
+    },
+    Figure {
+        key: "dispersion/csi-past-the-exit-as-their-own-agency",
+        owner: "crates/dispersion",
+        unit: Unit::Count,
+        label: "How many of them are their own local education agency \u{2014} already outside a \
+                school district, so the conversion and merger rungs have nowhere to move them",
+        pinned: 82.0,
+        tolerance: 0.0,
+        compute: |_| {
+            past_the_three_year_exit()
+                .iter()
+                .filter(|(i, _)| i.building_irn == i.lea_irn)
+                .count() as f64
+        },
+    },
+    Figure {
+        key: "dispersion/csi-past-the-exit-pupils-outside-a-district",
+        owner: "crates/dispersion",
+        unit: Unit::Count,
+        label: "Pupils in those self-operating schools \u{2014} three fifths of the population \
+                the ladder reaches",
+        pinned: 30085.0,
+        tolerance: 0.0,
+        compute: |_| {
+            past_the_three_year_exit()
+                .iter()
+                .filter(|(i, _)| i.building_irn == i.lea_irn)
+                .filter_map(|(_, b)| b.enrollment)
+                .sum()
         },
     },
     Figure {

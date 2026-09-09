@@ -23,8 +23,13 @@
 /// them changes no result today — an unparseable cell already yields `None` — but it is the
 /// difference between a convention that is recorded and one that is merely survived, and the
 /// next table to carry `NA` in a column this workspace does extract will find it handled.
+///
+/// `NC` is that next table. The Department of Education and Workforce writes it in the building
+/// report card wherever a measure was not calculated — 167 of 3,318 buildings carry it in both
+/// the Performance Index and the star rating — and it arrived here the way `NA` is described
+/// above, by a reader being written for a file the workspace had committed and never read.
 pub const MISSING: &[&str] = &[
-    "", "#N/A", "#DIV/0!", "#VALUE!", "#REF!", "#NULL!", "#NAME?", "N/A", "NA",
+    "", "#N/A", "#DIV/0!", "#VALUE!", "#REF!", "#NULL!", "#NAME?", "N/A", "NA", "NC",
 ];
 
 /// A count small enough that publishing it would identify students.

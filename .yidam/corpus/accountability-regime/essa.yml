@@ -39,12 +39,127 @@ description: |
   **Who is in it, as of the current lists:** 231 CSI, 117 ATSI, 60 TSI. [verified —
   `dispersion::identified`] Forty-two of the CSI schools arrived by escalation, having been ATSI
   and failed to exit within three years, which makes the subgroup route a sixth of the whole-school
-  tier rather than an edge case. Some carry identifications from 2018, against exit criteria that
-  allow three years.
+  tier rather than an edge case. A hundred carry identifications from 2018, against exit criteria
+  that allow three years.
 
   The intervention ladder itself has no node. It is sixteen items ranging from revised improvement
   plans to closure, and modelling it needs the `intervention` class instantiated per rung rather
   than once. [open]
+findings: |
+  ### What the published rating accounts for, and what it does not
+
+  The regime's coupling to Ohio's report card is this node's thesis, and both halves of it have
+  been committed since the building extract was wired — 408 identifications keyed on building IRN,
+  and 3,318 buildings on the 2024-25 report card. Nothing joined them until now, and every
+  identification names a building the report card carries. [verified —
+  [`crates/dispersion`](../../../crates/dispersion/tests/the_list_the_report_card_does_not_explain.rs),
+  which is also the first reader the building extract has had]
+
+  What the join cannot do is reproduce the department's cut. **Neither published building file
+  carries the overall rating**, which is the measure the plan identifies on; what is published is
+  the achievement component — a star rating and the Performance Index behind it. So the question
+  below is the weaker one: how much of the list the *published* rating accounts for. Much less
+  than this node's own summary would lead a reader to expect.
+
+  ### The list is three cycles deep and is not a bottom-five-per-cent snapshot
+
+  A reader who takes the 231 CSI schools as "the lowest 5%" is reading a cumulative list as a
+  current cut. The arithmetic refuses that reading without needing a Title I count at all: five
+  per cent of **every building in the state** is 165, and there are 231, so the 231 cannot be a
+  five per cent cut of anything. [verified] It does not on its own say what the excess is — the
+  graduation-rate and low-component routes above could carry a single cycle past the threshold.
+  What says it is the `year_identified` column, which puts three cycles on the list at once —
+
+      100  identified 2018, never exited
+       27  identified 2022, never exited
+       62  identified 2025, directly
+       42  ATSI 2022, escalated to CSI 2025
+
+  [verified — `crates/dispersion`]
+
+  **The 2018 cohort is an attendance population, not an achievement one.** Its median Performance
+  Index sits within three points of the cohorts identified since, but its median chronic
+  absenteeism is **80.7 against a statewide building median of 20.8**, both in percentage points,
+  and 81 of the hundred are above half. [verified] Seven years of comprehensive support against
+  exit criteria that allow three, and what distinguishes the schools that have not exited is
+  whether their students are present. [inference]
+
+  ### The two routes into the tier hold two different kinds of school
+
+  Every CSI school rated three stars or better arrived by subgroup escalation — 11 of them — and
+  **not one of the 189 direct identifications is rated above two stars**. [verified] Four of the 41
+  rated escalations fall in the bottom five per cent of buildings, against 75 of 185 direct ones,
+  and the highest-ranked escalation sits above the state median.
+  [Sheridan](../school/sheridan-high-school.yml) is the exemplar and the pattern is the file's: a
+  tier holding both is holding two findings under one name, and any consequence attached to
+  membership falls on both. [verified]
+
+  ### Between the worst unlisted building and the best listed one lies most of the state
+
+  The lowest Performance Index on none of the three lists is 30.3; the highest on the CSI list is
+  89.9, which is Sheridan. **Between them sit 1,958 of the 3,151 rated buildings**, and inside that
+  band the published achievement rating does not say who is identified. [verified]
+
+  The sharpest form of it is exact agreement. **113 published index values carry both a CSI school
+  and a building on no list at all**, and six of those pairs share an operating district —
+  Cleveland once, Toledo and Columbus twice each, Akron once — so the same superintendent runs
+  both. [verified]
+
+  And the state's own worst *achievement* rating and the federal list agree on two fifths of it:
+  Ohio rates 347 buildings at one star on that component, the CSI list holds 140 of them, and
+  **164 are on no federal list at all**. [verified] The tier itself splits 140 at one star, 86
+  above it, and five the department did not rate.
+
+  None of this shows the department erred. The rating that identifies is the overall one and this
+  is one component among the six R.C. 3302.03(D)(3) names; the eligible population is Title I
+  served schools and this is every building. What it bounds is what the **published** rating can
+  support — which is what a corpus quoting the published rating needs to know, and what the corpus
+  was assuming rather than measuring. [inference]
+figures:
+  - key: dispersion/report-card-buildings
+    value: 3318
+    field: findings
+    as_written: "3,318 buildings on the 2024-25 report card"
+  - key: dispersion/identifications
+    value: 408
+    field: findings
+    as_written: "408 identifications keyed on building IRN"
+  - key: dispersion/csi-identified-since-2018
+    value: 100
+    field: findings
+    as_written: "100  identified 2018, never exited"
+  - key: dispersion/csi-2018-cohort-chronic-absenteeism-median
+    value: 80.7
+    field: findings
+    as_written: "**80.7 against a statewide building median"
+  - key: dispersion/building-chronic-absenteeism-median
+    value: 20.8
+    field: findings
+    as_written: "statewide building median of 20.8**"
+  - key: dispersion/csi-escalated-above-two-stars
+    value: 11
+    field: findings
+    as_written: "— 11 of them —"
+  - key: dispersion/csi-identification-overlap-band
+    value: 1958
+    field: findings
+    as_written: "**Between them sit 1,958 of the 3,151 rated buildings**"
+  - key: dispersion/buildings-rated-on-achievement
+    value: 3151
+    field: findings
+    as_written: "1,958 of the 3,151 rated buildings"
+  - key: dispersion/csi-contested-index-values
+    value: 113
+    field: findings
+    as_written: "**113 published index values carry both a CSI school"
+  - key: dispersion/one-star-buildings
+    value: 347
+    field: findings
+    as_written: "Ohio rates 347 buildings at one star"
+  - key: dispersion/one-star-buildings-on-no-federal-list
+    value: 164
+    field: findings
+    as_written: "**164 are on no federal list at all**"
 properties:
   name: Every Student Succeeds Act
   level: federal
