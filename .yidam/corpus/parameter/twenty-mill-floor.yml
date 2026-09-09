@@ -32,8 +32,6 @@ description: |
 
   An absence of an effect in one group is not an absence of the mechanism, and the correction
   is recorded rather than quietly replaced because the wrong reading was the more natural one.
-
-  ### The floor is not written in mills
 findings: |
   **How much the reduction factors have actually taken: the median district has lost 42.4% of
   the millage its voters approved.** The median voted current operating rate is 42.31 mills
@@ -104,6 +102,45 @@ findings: |
   more consistent with rounding inside the reduction-factor computation than with a different
   base. [inference] Bradford Exempted Village, at 19.7247, is the one that a rounding account
   would not cover.
+
+  **And there is a term in the section the corpus's model does not carry, which would.** (E)(2)
+  does not require a district's own current-expense taxes to reach two per cent. It requires
+  them to reach it *"when combined with the **pre-1982 joint vocational taxes** against that
+  class"* — defined at (E)(1) as the amount by which a joint vocational district's TY1981
+  current-expense taxes exceeded two-tenths of one per cent of value, floored at zero.
+  [verified — `crates/project/tests/the_term_the_floor_model_omits.rs`]
+
+  This is not the combined-base hypothesis above wearing a different hat. That one changed the
+  denominator and was tested and failed; this adds to the numerator, and a district carrying a
+  positive amount of it may sit below twenty by exactly that much. Read backwards from the
+  fourteen shortfalls, the implied 1981 joint vocational rates run **2.006 to 2.278 mills** — a
+  hair above the two-mill figure the same section names, which is where a joint vocational
+  district's current-expense rate sits. Bradford implies 2.278, an ordinary rate rather than an
+  anomaly. [inference]
+
+  **What makes it worth naming rather than guessing is the bound.** No district that voted
+  twenty sits more than three tenths of a mill below the floor, and every district more than
+  half a mill below is one whose voters never approved twenty — the two populations do not
+  overlap. A floor being violated has no bound; an additive term left out of a model has a bound
+  the size of the term. [verified — computed]
+
+  Confirming it needs TY1981 joint vocational current-expense rates by district. No source the
+  corpus holds carries them, and the membership lists alone are unpopulated — see
+  [Eastland-Fairfield](../education-agency/eastland-fairfield-ctc.yml). So the cause is named
+  and its size is right, and it is not established. [open]
+
+  **The floor did not move in 2026 and its base did.** Division (E) now excludes from "taxes
+  charged and payable" any tax levied under R.C. 5705.194 or 5705.199 — emergency and substitute
+  levies — approved by electors before **1 January 2026**, until the first tax year from 2026 in
+  which R.C. 5715.24 applies in a county holding part of the district. [verified] A district
+  whose twenty mills included a pre-2026 emergency or substitute levy has that levy taken out of
+  the floor computation until its county's next reappraisal or update year, and may cross the
+  floor without any rate changing.
+
+  This is a second and distinct thing from (A)(1)'s exemption of fixed-sum levies from
+  *reduction*, which this node records above. One says such a levy is not reduced; the other
+  says it does not count toward the floor. A node recording the floor as "unmoved since 1976" is
+  exactly the node most likely to miss it. [inference]
 
   **The count is 21, not 20, on the later table.** Table SD-1's TY2024 figures add Kelleys
   Island Local, which the District Profile Report omits entirely: 10.15 effective Class 1 mills
@@ -214,6 +251,14 @@ figures:
     value: 14
     field: findings
     as_written: "The other 14 voted between 23 and 48 mills"
+  - key: dispersion/implied-1981-joint-vocational-rate-low
+    value: 2.006
+    field: findings
+    as_written: "run **2.006 to 2.278 mills**"
+  - key: dispersion/implied-1981-joint-vocational-rate-high
+    value: 2.278
+    field: findings
+    as_written: "Bradford implies 2.278"
   - key: dispersion/districts-at-twenty-mills-on-the-combined-base-ty2024
     value: 62
     field: findings
@@ -237,8 +282,14 @@ properties:
   series: |
     20 mills for city, local, and exempted village school districts; 2 mills for joint
     vocational school districts. In force continuously since Am. Sub. H.B. 920 (1976).
-    [verified] Amendments to the surrounding provisions since 1976 have not moved the floor
-    itself, but this should be confirmed against current R.C. 319.301. [open]
+    [verified]
+
+    **Confirmed against the current section.** The committed text of R.C. 319.301 is effective
+    **20 March 2026**, amended by H.B. 186 and H.B. 129 of the 136th General Assembly, and still
+    states two per cent and two-tenths of one per cent. Amendments to the surrounding provisions
+    have continued to this year and none has moved the floor. [verified —
+    `crates/project/tests/the_term_the_floor_model_omits.rs`] What one of them moved is the
+    *base*, which is in `findings`.
   statutory_basis: R.C. 319.301
   simulation_key: twenty_mill_floor
   sensitivity: |
