@@ -88,10 +88,11 @@ test("every bound figure in the corpus agrees with the crate it cites", () => {
  * greenbooks got theirs and `funding-regime/bridge-formula` became the fifty-ninth. 462/61 when
  * the scholarship award formula was read off the statute the corpus already held, and 468/61
  * when four parameters got their pre-FY2026 series out of the greenbooks, 470/61 at the
- * executive order the guarantee's base is defined to reach past.
+ * executive order the guarantee's base is defined to reach past, and 479/61 when targeted
+ * assistance's rates were read back as the millage LSC has always written them in.
  */
 test("the corpus binds no fewer figures than it did", () => {
-  expect(bindings.length, "470 bindings; raise this when you add one").toBeGreaterThanOrEqual(470);
+  expect(bindings.length, "479 bindings; raise this when you add one").toBeGreaterThanOrEqual(479);
   expect(
     corpus.nodes.filter((node) => node.figures.length > 0).length,
     "61 nodes carry bindings; raise this when a sixty-second does",
