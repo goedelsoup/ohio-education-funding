@@ -30,7 +30,73 @@ description: |
   Any statewide roll-up built from that list silently omits career-technical provision, and the
   omission would be undetectable without knowing to look for it.
 
-  IRN, member district list, enrollment, and funding series remain unpopulated. [open]
+findings: |
+  ### Why nothing here had ever found a joint vocational district
+
+  The federal directory does not type one as a district. It types it `4`, a **regional education
+  service agency** — the same code Ohio's educational service centres carry. **100 agencies hold
+  that code and 49 are joint vocational districts**; the other 51 are service centres. A reader
+  filtering on district type gets none of them and a reader filtering on `4` gets half a list of
+  something else. [verified —
+  [`crates/project`](../../../crates/project/tests/the_joint_vocational_district_the_corpus_held_nothing_about.rs)]
+
+  Two independent routes split the hundred and select the same forty-nine: the name, because a
+  service centre says so, and the levy, because a joint vocational district charges property tax
+  and a service centre does not — so exactly 49 of the 100 appear in the Auditor's district
+  finances at all. [verified] That is the whole of Ohio's joint vocational sector, nameable from
+  fixtures this repository already reads.
+
+  ### The funding series and the enrolment
+
+  Six closed fiscal years, FY2020 through FY2025, from the Auditor's district finances: property
+  tax from $16.0m to **$25.9m**, unrestricted state aid from $5.7m to **$12.1m**. State aid more
+  than doubled while the levy rose by three fifths, so the state share of this agency's revenue
+  rose over the six years — a statement that needs both halves, and the node held neither.
+  [verified]
+
+  Enrolment is two years of the Census F-33 panel: **1,160** in FY2023 and 1,354 in FY2024, with
+  total revenue rising from $35.0m to $42.9m. [verified]
+
+  **And the enrolment is exactly the trap this node's description warns about.** Current spending
+  over that count gives **$20,869** per pupil in FY2024 against a comparable-district median of
+  $15,426 — thirty-five per cent higher, on a head count that is not full-time equivalent because
+  these students are enrolled in their home districts too. The ratio is an artefact of the
+  denominator, and it is what a roll-up that treated a joint vocational district as a district
+  would publish. [verified]
+
+  ### How they are grouped for peer comparison, which the corpus had already decided
+
+  `typology` records the grouping as unresolved. The corpus's own F-33 panel settled it when it
+  was built and nobody read it back: **all 121 joint vocational rows in the panel are outside the
+  comparable set**, across 46 of the 49 districts and three fiscal years. They are not grouped for
+  peer comparison; they are excluded from it, and the per-pupil figure above is why. [verified]
+
+  ### The member list, narrowed
+
+  A joint vocational district's members are exactly the districts whose Table SD-1 rows carry its
+  levy — see [twenty-mill-floor](../parameter/twenty-mill-floor.yml), where that column pair is
+  read. So a candidate roster can be *tested*: sum its members' levies and compare against what
+  the district itself booked in property tax, with the rollback and homestead reimbursements added
+  back, because SD-1 reports taxes charged before those reductions and leaving them out biases
+  every comparison by about an eighth.
+
+  Taken against the whole of the county its own name points at, **12 of 24** joint vocational
+  districts reconcile in both quiet tax years. For those twelve the county *is* the membership.
+  For the other twelve the sign of the miss says which way the roster crosses the county line: a
+  county that sums high holds districts belonging to another joint vocational district, and one
+  that sums low has members outside it. Portage Lakes is the method catching itself — its name
+  carries a county word that is not its county, and it misses by 88%. [verified]
+
+  The threshold is not doing the work. The twelve run from 0.7% to 7.3% and the thirteenth is at
+  14.3%, with nothing in between, so the band sits in the widest gap the distribution has rather
+  than inside a cluster — and a test fails if that stops being true. [verified]
+
+  This district is one of the thirteen. Against Fairfield County alone it misses by 71%; adding
+  the seven Franklin County districts that carry a levy at two mills — and not the two at 1.8,
+  which is a different joint vocational district — brings it to within a tenth. So fourteen
+  districts in Franklin and Fairfield are members, and about a ninth of the levy comes from
+  outside them. [inference] The roster is not established, and the absence now has a size.
+  [open]
 properties:
   seeded_because: |
     JVSDs are funded on rules that differ from traditional districts in ways easy to overlook and
@@ -45,17 +111,85 @@ properties:
   county: Franklin and Fairfield
   typology: |
     Not applicable in the standard department typology, which classifies traditional districts.
-    How JVSDs are grouped for peer comparison is unresolved. [open]
+    How JVSDs are grouped for peer comparison was recorded here as unresolved; the corpus's own
+    F-33 panel had already resolved it by excluding every one of them from the comparable set.
+    [verified — see the findings]
   roles: |
     Career-technical provider to member districts [verified]. Subject to the 2-mill JVSD
     reduction-factor floor rather than the 20-mill floor [verified].
   series_path: |
     Per-agency series are held by IRN across four committed fixtures, not one path: [verified]
       crates/foundation/fixtures/fy27-department-model.csv    FY2027 formula run, 609 districts
-      crates/project/fixtures/district-finances.csv           FY2020-FY2024 actuals and balances
-      crates/dispersion/fixtures/f33-ohio-panel.csv           FY2012-FY2022 revenue, federal basis
+      crates/project/fixtures/district-finances.csv           FY2020-FY2025 actuals and balances
+      crates/dispersion/fixtures/f33-ohio-panel.csv           FY2023-FY2024 for this agency
       crates/dispersion/fixtures/mr81-sponsor-panel.csv       1998-2014 free and reduced lunch
+revisions:
+  - was: |
+      "IRN, member district list, enrollment, and funding series remain unpopulated." The node
+      said this while its own `irn` property carried 051003 and its own `series_path` named the
+      three fixtures the other fields are in.
+    now: |
+      Three of the four are populated: the agency is one of Ohio's 49 joint vocational districts
+      in the federal directory, the funding series is six closed fiscal years of the Auditor's
+      finances, and the enrolment is two years of the Census F-33 panel. The member district list
+      is still not held, and is now bounded rather than absent.
+    found_by: |
+      Asking what the CCD types a joint vocational district as. It is `4`, a regional education
+      service agency — the code Ohio's educational service centres carry — so every reader here
+      that filtered on a district type had been skipping them, and every fixture that holds them
+      holds them under a code half of which is something else.
+    reach: |
+      The node's own account of a joint vocational district is unchanged and is confirmed by the
+      numbers: the per-pupil figure its description warns about is thirty-five per cent above the
+      comparable median, and the corpus's F-33 panel excludes every joint vocational district for
+      that reason.
+figures:
+  - key: dispersion/joint-vocational-districts
+    value: 49
+    field: findings
+    as_written: "that code and 49 are joint vocational districts**"
+  - key: dispersion/regional-service-agencies
+    value: 100
+    field: findings
+    as_written: "**100 agencies hold"
+  - key: project/eastland-fairfield-property-tax-fy2025
+    value: 25891768
+    field: findings
+    as_written: "property\n  tax from $16.0m to **$25.9m**"
+  - key: project/eastland-fairfield-state-aid-fy2025
+    value: 12088067
+    field: findings
+    as_written: "unrestricted state aid from $5.7m to **$12.1m**"
+  - key: dispersion/eastland-fairfield-enrolment-fy2023
+    value: 1160
+    field: findings
+    as_written: "**1,160** in FY2023"
+  - key: dispersion/eastland-fairfield-spending-per-pupil-fy2024
+    value: 20869
+    field: findings
+    as_written: "**$20,869** per pupil in FY2024"
+  - key: dispersion/comparable-median-spending-per-pupil-fy2024
+    value: 15426
+    field: findings
+    as_written: "a comparable-district median of\n  $15,426"
+  - key: dispersion/joint-vocational-rows-outside-the-comparable-set
+    value: 121
+    field: findings
+    as_written: "**all 121 joint vocational rows in the panel are outside the"
+  - key: project/joint-vocational-rosters-reconciling-with-their-county
+    value: 12
+    field: findings
+    as_written: "**12 of 24**"
+  - key: project/joint-vocational-districts-named-for-one-county
+    value: 24
+    field: findings
+    as_written: "**12 of 24**"
 unfilled:
+  - field: the member districts outside Franklin and Fairfield
+    why: >-
+      The reconciliation bounds them at about a ninth of the levy and no committed source rosters
+      them. A joint vocational district's own board resolution or the department's career-technical
+      planning district list would settle it; neither is held.
   - field: established
     why: The department's district profile carries it; nobody has read it across.
 links:

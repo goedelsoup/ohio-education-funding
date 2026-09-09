@@ -99,14 +99,16 @@ test("every bound figure in the corpus agrees with the crate it cites", () => {
  * `litigation/cincinnati-v-walter-1979` became the sixty-third carrier — the first `litigation`
  * node to bind anything, and it binds a count of words in an opinion — and 507/63 when Table
  * SD-1's two taxes-charged columns turned out to be a joint vocational membership list, which
- * disconfirmed the term the twenty-mill floor's anomaly had been attributed to.
+ * disconfirmed the term the twenty-mill floor's anomaly had been attributed to — and 517/64 when
+ * `education-agency/eastland-fairfield-ctc` became the sixty-fourth carrier, three of its four
+ * unpopulated fields having been committed the whole time.
  */
 test("the corpus binds no fewer figures than it did", () => {
-  expect(bindings.length, "507 bindings; raise this when you add one").toBeGreaterThanOrEqual(507);
+  expect(bindings.length, "517 bindings; raise this when you add one").toBeGreaterThanOrEqual(517);
   expect(
     corpus.nodes.filter((node) => node.figures.length > 0).length,
-    "63 nodes carry bindings; raise this when a sixty-fourth does",
-  ).toBeGreaterThanOrEqual(63);
+    "64 nodes carry bindings; raise this when a sixty-fifth does",
+  ).toBeGreaterThanOrEqual(64);
   expect(
     new Set(bindings.map((binding) => binding.key)).size,
     "every figure the manifest exports is bound by some node",

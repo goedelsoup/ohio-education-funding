@@ -158,6 +158,13 @@ pub const CONSOLIDATION_CODE: &str = "5";
 /// The status code Ohio files for every departure instead.
 pub const CLOSED_CODE: &str = "2";
 
+/// The agency type Ohio files **both** joint vocational school districts and educational service
+/// centres under — a *regional education service agency*.
+///
+/// The type is the reason nothing here had ever found a joint vocational district: they are not
+/// filed as districts, and the type they are filed as is half something else.
+pub const SERVICE_AGENCY_CODE: &str = "4";
+
 /// One Ohio agency as one school year's directory describes it.
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct Agency {
@@ -296,6 +303,46 @@ pub fn consolidations_marked() -> Vec<Agency> {
         .into_iter()
         .filter(|a| a.status == CONSOLIDATION_CODE)
         .collect()
+}
+
+/// Ohio's joint vocational school districts, by IRN, as the directory's last year files them.
+///
+/// # Why a name test, and what checks it
+///
+/// The CCD types a joint vocational district and an educational service centre identically —
+/// both are [`SERVICE_AGENCY_CODE`] — so nothing in this file separates them. The name does: a
+/// service centre says so, and a career centre does not. That is a heuristic, and it is not left
+/// as one. A joint vocational district levies property tax and an educational service centre
+/// does not, so the Auditor's district finances split the same hundred agencies on a fact rather
+/// than on a word. The two routes agree exactly, and
+/// `crates/project/tests/the_joint_vocational_district_the_corpus_held_nothing_about.rs` is where
+/// they are made to.
+#[must_use]
+pub fn joint_vocational_districts() -> BTreeMap<String, String> {
+    service_agencies()
+        .into_iter()
+        .filter(|(_, name)| !names_a_service_centre(name))
+        .collect()
+}
+
+/// Every agency the directory's last year files under [`SERVICE_AGENCY_CODE`], by IRN.
+#[must_use]
+pub fn service_agencies() -> BTreeMap<String, String> {
+    panel()
+        .into_iter()
+        .filter(|a| a.opens == LAST_YEAR && a.agency_type == SERVICE_AGENCY_CODE)
+        .map(|a| (a.irn, a.name))
+        .collect()
+}
+
+/// Whether a service agency's name says it is an educational service centre.
+///
+/// Ohio writes it three ways and no more; a fourth spelling would show up as a joint vocational
+/// district with no property tax, which is what the cross-check catches.
+fn names_a_service_centre(name: &str) -> bool {
+    ["ESC", "Educational Service Center", "Service Center"]
+        .iter()
+        .any(|form| name.contains(form))
 }
 
 /// The transfer orders, as the Auditor of State recites them.

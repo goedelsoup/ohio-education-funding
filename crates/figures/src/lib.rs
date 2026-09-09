@@ -1112,6 +1112,49 @@ fn below_the_floor_in_every_tax_year(i: &Inputs) -> usize {
         .count()
 }
 
+/// Eastland-Fairfield's row in the F-33 Ohio panel for one fiscal year.
+fn eastland_fairfield(fiscal_year: u16) -> Option<dispersion::ohio_panel::PanelRow> {
+    dispersion::ohio_panel::panel()
+        .into_iter()
+        .find(|row| row.irn == "051003" && row.fiscal_year == fiscal_year)
+}
+
+/// One field of its last closed year in the Auditor's district finances.
+fn eastland_fairfield_finances(
+    pick: fn(&project::finances::YearRecord) -> Option<edfund_core::Dollars>,
+) -> f64 {
+    let panel = project::finances::finances();
+    project::finances::for_district(&panel, "051003")
+        .and_then(|d| d.years.last())
+        .and_then(pick)
+        .unwrap_or(f64::NAN)
+}
+
+/// Rows in the F-33 Ohio panel belonging to a joint vocational district.
+fn joint_vocational_panel_rows() -> usize {
+    let joint: BTreeSet<String> = dispersion::lea_directory::joint_vocational_districts()
+        .into_keys()
+        .collect();
+    dispersion::ohio_panel::panel()
+        .into_iter()
+        .filter(|row| joint.contains(&row.irn))
+        .count()
+}
+
+/// The median comparable district's current spending per pupil in one fiscal year.
+fn comparable_median_spending_per_pupil(fiscal_year: u16) -> f64 {
+    let mut per_pupil: Vec<f64> = dispersion::ohio_panel::panel()
+        .into_iter()
+        .filter(|row| row.comparable && row.fiscal_year == fiscal_year && row.enrollment > 0.0)
+        .filter_map(|row| Some(row.current_spending? / row.enrollment))
+        .collect();
+    per_pupil.sort_by(f64::total_cmp);
+    per_pupil
+        .get(per_pupil.len() / 2)
+        .copied()
+        .unwrap_or(f64::NAN)
+}
+
 /// Guarantee status, Performance Index and poverty over the districts carrying all three.
 fn guarantee_against_achievement(i: &Inputs) -> (Vec<f64>, Vec<f64>, Vec<f64>) {
     let (mut guarantee, mut index, mut poverty) = (Vec::new(), Vec::new(), Vec::new());
@@ -3177,6 +3220,111 @@ pub static FIGURES: &[Figure] = &[
     // And the term the two figures above size is disconfirmed. It belongs to the joint vocational
     // district rather than to the member, so it binds every member alike; these are the counts and
     // rates that show it does not.
+    // Ohio's joint vocational sector, which nothing here could find until the directory's agency
+    // type was read for what it actually holds.
+    Figure {
+        key: "dispersion/regional-service-agencies",
+        owner: "crates/dispersion",
+        unit: Unit::Count,
+        label: "Ohio agencies the federal directory types as regional education service agencies \
+                \u{2014} joint vocational districts and educational service centres together",
+        pinned: 100.0,
+        tolerance: 0.0,
+        compute: |_| dispersion::lea_directory::service_agencies().len() as f64,
+    },
+    Figure {
+        key: "dispersion/joint-vocational-districts",
+        owner: "crates/dispersion",
+        unit: Unit::Count,
+        label: "Of those, the joint vocational school districts \u{2014} the same 49 whether they \
+                are picked out by name or by whether they levy property tax",
+        pinned: 49.0,
+        tolerance: 0.0,
+        compute: |_| dispersion::lea_directory::joint_vocational_districts().len() as f64,
+    },
+    Figure {
+        key: "dispersion/joint-vocational-rows-outside-the-comparable-set",
+        owner: "crates/dispersion",
+        unit: Unit::Count,
+        label: "Joint vocational rows in the F-33 Ohio panel, every one of them marked outside \
+                the comparable set \u{2014} the peer-grouping question, already answered",
+        pinned: 121.0,
+        tolerance: 0.0,
+        compute: |_| joint_vocational_panel_rows() as f64,
+    },
+    Figure {
+        key: "dispersion/eastland-fairfield-enrolment-fy2023",
+        owner: "crates/dispersion",
+        unit: Unit::Count,
+        label: "Eastland-Fairfield's enrolment on the Census count, FY2023 \u{2014} a head count \
+                and not a full-time equivalent, which is what makes a ratio off it a trap",
+        pinned: 1_160.0,
+        tolerance: 0.0,
+        compute: |_| eastland_fairfield(2023).map_or(f64::NAN, |row| row.enrollment),
+    },
+    Figure {
+        key: "dispersion/eastland-fairfield-spending-per-pupil-fy2024",
+        owner: "crates/dispersion",
+        unit: Unit::Dollars,
+        label: "Its current spending over that count, FY2024 \u{2014} the double count the node's \
+                own description warns about, in one number",
+        pinned: 20_869.0,
+        tolerance: 1.0,
+        compute: |_| {
+            eastland_fairfield(2024)
+                .and_then(|row| Some(row.current_spending? / row.enrollment))
+                .unwrap_or(f64::NAN)
+        },
+    },
+    Figure {
+        key: "dispersion/comparable-median-spending-per-pupil-fy2024",
+        owner: "crates/dispersion",
+        unit: Unit::Dollars,
+        label: "The median of the comparable districts it is set against, FY2024",
+        pinned: 15_426.0,
+        tolerance: 1.0,
+        compute: |_| comparable_median_spending_per_pupil(2024),
+    },
+    Figure {
+        key: "project/eastland-fairfield-property-tax-fy2025",
+        owner: "crates/project",
+        unit: Unit::Dollars,
+        label: "Eastland-Fairfield's property tax in FY2025, the last closed year of the \
+                Auditor's finances \u{2014} the funding series the node recorded as unpopulated",
+        pinned: 25_891_768.0,
+        tolerance: 1.0,
+        compute: |_| eastland_fairfield_finances(|y| y.property_tax),
+    },
+    Figure {
+        key: "project/eastland-fairfield-state-aid-fy2025",
+        owner: "crates/project",
+        unit: Unit::Dollars,
+        label: "Its unrestricted state aid in the same year, which more than doubled over the six \
+                while the levy rose by three fifths",
+        pinned: 12_088_067.0,
+        tolerance: 1.0,
+        compute: |_| eastland_fairfield_finances(|y| y.unrestricted_aid),
+    },
+    Figure {
+        key: "project/joint-vocational-districts-named-for-one-county",
+        owner: "crates/project",
+        unit: Unit::Count,
+        label: "Joint vocational districts whose own name contains exactly one Ohio county, which \
+                is the only candidate roster a name gives you",
+        pinned: 24.0,
+        tolerance: 0.0,
+        compute: |_| project::joint_vocational::county_named().len() as f64,
+    },
+    Figure {
+        key: "project/joint-vocational-rosters-reconciling-with-their-county",
+        owner: "crates/project",
+        unit: Unit::Count,
+        label: "Of those, the ones whose levies reconcile against the district's own books \
+                \u{2014} the county is their whole membership and for the other twelve it is not",
+        pinned: 12.0,
+        tolerance: 0.0,
+        compute: |_| project::joint_vocational::reconciling().len() as f64,
+    },
     Figure {
         key: "dispersion/districts-in-a-joint-vocational-district",
         owner: "crates/dispersion",
