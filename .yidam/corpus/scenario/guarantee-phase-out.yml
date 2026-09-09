@@ -152,8 +152,22 @@ properties:
     The FY2032 band is not this district's uncertainty. Three observations cannot estimate a
     variance, so the interval rests on the cross-sectional spread of district growth rates used
     as a floor; a district with genuinely volatile enrollment has a wider true interval than
-    this reports. FY2026 is itself partly departmental estimate. The damping factor is a
-    convention rather than a fitted parameter. [open]
+    this reports. FY2026 is itself partly departmental estimate.
+
+    [verified] **It is a floor, and now a measured one.** Backtested against the F-33 panel,
+    realized forecast error is wider than the plus-or-minus one sigma band at every horizon from
+    one year to five, under the shipped method and under the one it replaced — the interval never
+    over-states. But the margin widens with the horizon, from 1.18x at one year to 1.40x at five,
+    because dispersion grows as `horizon^0.60` while the band widens as `horizon^0.50`. Coverage
+    falls from 67.3%, very nearly the 68.3% such a band should hold, to 55.8%. Measured in
+    `crates/project/tests/the_floor_the_interval_rests_on.rs`.
+
+    **[open]** Whether the widening rule should be recalibrated. This node's FY2032 leg is six
+    years out and the feed's horizon is ten, both past where six origins across fifteen surveyed
+    years can reach, so 1.40x is a lower bound on the shortfall at the horizons actually
+    published — and a weak one, under an exponent still climbing at the edge of the measurement.
+    Sigma, z and the square root are constants the web layer re-derives and must reproduce, so
+    moving them is a decision with a record rather than a consequence of a measurement.
 
     138 districts sit at the minimum state share and their response to a base cost increase
     cannot be computed, because the floor censors the quantity it would be computed from. They
