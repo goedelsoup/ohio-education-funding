@@ -100,17 +100,56 @@ findings: |
   two purposes, is exactly the kind of thing a single "categoricals" node would have hidden.
   [verified]
 
+  ### What it replaces, which is one of the two candidates and not the other
+
+  The charge-off era ran two components here, and the corpus had them as one question. They are
+  not alike. [verified —
+  [`crates/project`](../../../crates/project/tests/the_component_targeted_assistance_succeeded.rs)]
+
+  **Gap aid could not have had a successor.** LSC files it under the heading *"Charge-off
+  Supplement (Gap Aid)"* and defines it as the payment made *"to districts whose actual operating
+  revenue is lower than the local share assumed by the formula"*. It supplemented an assumption —
+  the 23-mill charge-off — and when
+  [the charge-off](../parameter/local-share-charge-off-millage.yml) went there was nothing left
+  to supplement. Its $73.5m across 145 districts in FY2008 is the last biennium any analysis
+  carries it.
+
+  **Parity aid is the ancestor, and three of this component's features are its.** Am. Sub. H.B.
+  94 created it to equalise *"an additional 9.5 mills (above the adequacy level) to the 80th
+  percentile district's wealth level"*, on *"a weighted average property wealth (2/3) and income
+  wealth (1/3)"*, reaching about 492 districts. A millage instrument, a blend of valuation with
+  income, and a rank threshold — which is what this component is.
+
+      FY2002  9.5 mills  2/3 : 1/3   the 80th percentile district   492 districts
+      FY2008  8.0 mills  —           the 80th percentile district   410 districts
+      FY2009  8.5 mills  75 : 25     the 80th percentile district   367 districts
+      FY2014  6 mills    1/2 : 1/2   the 490th lowest of 612        489 districts
+      FY2022  14 / 11.2  60 : 40     the median district
+
+  ### The threshold is what actually moved, and no analysis says so
+
+  The 490th lowest district of 612 sits **80.1%** of the way up that panel, which is parity aid's
+  threshold to within a district or two. So H.B. 59 renamed the component,
+  changed the blend and cut the rate, and left parity aid's threshold exactly where it was — 489
+  districts eligible against parity aid's 492 a decade earlier. [verified]
+
+  The Fair School Funding Plan is the act that moved it, from the wealth of a fairly rich district
+  down to the wealth of the middle one, and raised the rate from 6 mills to 14 to pay for the
+  shorter distance. That is a larger change than any of the rate changes in the series above, and
+  H.B. 110's analysis presents it as a new formula rather than as a moved threshold: the word
+  "percentile" does not appear in its account at all. [verified]
+
+  Whether the two are equivalent in effect — a longer distance charged softly against a shorter
+  one charged hard — is a distributional question this corpus can pose and has not run.
+  [inference for the framing; the comparison is unmade]
+
   ### Still open
 
-  What this component replaces. The charge-off era had its own equalisation and its own
-  supplement for districts the charge-off overcharged — gap aid, $73.5m across 145 districts in
-  FY2008 — and whether targeted assistance is the successor to that, to something else, or to
-  nothing is not established here. [open]
+  Whether the statewide medians are recomputed each year, and how far they move. Both are single
+  numbers that set the whole scale, and the sheet publishes a second pair **excluding North Bass
+  and Middle Bass** which no formula references. The exclusion is displayed and unused, which
+  suggests it was considered. [open]
 
-  Also open: whether the statewide medians are recomputed each year, and how far they move.
-  Both are single numbers that set the whole scale, and the sheet publishes a second pair
-  **excluding North Bass and Middle Bass** which no formula references. The exclusion is
-  displayed and unused, which suggests it was considered. [open]
 properties:
   name: Targeted assistance
   function: |
@@ -173,6 +212,22 @@ properties:
     eligibility test for all 609 districts; the decomposition is carried in
     `crates/project::panel::TargetedAssistance`. [verified — `crates/project`]
 figures:
+  - key: project/parity-aid-millage-fy2002
+    value: 9.5
+    field: findings
+    as_written: "FY2002  9.5 mills"
+  - key: project/parity-aid-districts-fy2002
+    value: 492
+    field: findings
+    as_written: "the 80th percentile district   492 districts"
+  - key: project/parity-aid-districts-fy2009
+    value: 367
+    field: findings
+    as_written: "75 : 25     the 80th percentile district   367 districts"
+  - key: project/the-threshold-targeted-assistance-inherited
+    value: 0.8006535947712419
+    field: findings
+    as_written: "sits **80.1%** of the way up"
   - key: project/targeted-assistance-median-weighted-wealth
     value: 392151306.63
     field: function
