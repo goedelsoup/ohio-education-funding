@@ -103,11 +103,12 @@ findings: |
   base. [inference] Bradford Exempted Village, at 19.7247, is the one that a rounding account
   would not cover.
 
-  **And there is a term in the section the corpus's model does not carry, which would.** (E)(2)
-  does not require a district's own current-expense taxes to reach two per cent. It requires
-  them to reach it *"when combined with the **pre-1982 joint vocational taxes** against that
-  class"* — defined at (E)(1) as the amount by which a joint vocational district's TY1981
-  current-expense taxes exceeded two-tenths of one per cent of value, floored at zero.
+  **And there is a term in the section the corpus's model does not carry, which looked as though
+  it would.** (E)(2) does not require a district's own current-expense taxes to reach two per
+  cent. It requires them to reach it *"when combined with the **pre-1982 joint vocational
+  taxes** against that class"* — defined at (E)(1) as the amount by which a joint vocational
+  district's TY1981 current-expense taxes exceeded two-tenths of one per cent of value, floored
+  at zero.
   [verified — `crates/project/tests/the_term_the_floor_model_omits.rs`]
 
   This is not the combined-base hypothesis above wearing a different hat. That one changed the
@@ -124,10 +125,63 @@ findings: |
   overlap. A floor being violated has no bound; an additive term left out of a model has a bound
   the size of the term. [verified — computed]
 
-  Confirming it needs TY1981 joint vocational current-expense rates by district. No source the
-  corpus holds carries them, and the membership lists alone are unpopulated — see
-  [Eastland-Fairfield](../education-agency/eastland-fairfield-ctc.yml). So the cause is named
-  and its size is right, and it is not established. [open]
+  Confirming it looked as though it needed TY1981 joint vocational current-expense rates by
+  district, which no source the corpus holds carries. It did not. The next section disconfirms the
+  term without them.
+
+  ### The term is disconfirmed, by a column that was in the fixture the whole time
+
+  The membership lists the paragraph above called unpopulated were never missing. Table SD-1
+  publishes taxes charged twice — once excluding joint vocational operating levies and once
+  including them — and the difference is the joint vocational levy on that district's own parcels.
+  **501 of 611 districts carry one in TY2024 and 110 carry none**, and the 110 concentrate where
+  career-technical education is not delivered by a joint vocational district: Cuyahoga, Stark,
+  Hancock, Summit and Franklin hold 57 of them between them. [verified —
+  [`crates/dispersion`](../../../crates/dispersion/tests/the_neighbour_that_sits_at_exactly_twenty.rs)]
+
+  The rosters at [Eastland-Fairfield](../education-agency/eastland-fairfield-ctc.yml) are still
+  unpopulated and none of this populates them. The abstract answers *whether a district is in a
+  joint vocational district*, and — below — *which districts are in the same one*, without ever
+  saying which one that is. That is all the argument needs.
+
+  Membership is recoverable more precisely than yes-or-no. A joint vocational district levies one
+  rate per class across the whole of its territory, so every member's levy is the same
+  `class1 mills x class1 value + class2 mills x class2 value`. Shelby County's eight districts fit
+  one such pair in every one of the four tax years — **2.67222** and 4.69303 mills in TY2024, with
+  no district off by more than twenty-five millionths of its own levy — and those rates sit far
+  enough above the two-mill floor of R.C. 319.301(E)(3) that the fit is not the trivial one any two
+  floored joint vocational districts would also pass. Eight districts explained by two numbers,
+  four years running, is co-membership. [verified]
+
+  **And co-membership kills the term.** The pre-1982 amount belongs to the joint vocational
+  district rather than to the member, so it is the same for every district in the group. Anna
+  Local's Class I charges come to twenty mills within four millionths in each of the four years.
+  Botkins, in the same joint vocational district, sits **0.0705 mills** below. The term cannot be
+  positive for Botkins and zero for Anna. Jefferson and Muskingum repeat the shape — Buckeye and
+  Franklin below the floor beside three and two districts at exactly twenty — on the weaker
+  evidence a fit at the two-mill floor gives. [verified]
+
+  **And six districts below the floor are in no joint vocational district at all**, so (E)(1),
+  which defines the term by reference to "the joint vocational school district of which the school
+  district is a part", has no referent for them: Middle Bass, North Bass, McComb, Fort Recovery,
+  Osnaburg and Morgan. McComb's **0.1076 mills** is the second largest shortfall among the
+  fourteen. [verified]
+
+  ### And the other candidate does not survive either
+
+  Rounding inside the reduction-factor computation was the second explanation, and it was given
+  eleven of the fourteen. R.C. 319.301(D)(1) recomputes the percentage every year against that
+  year's valuation, so a rounding residual is a fresh draw each year. It is not one. The published
+  Class I rate is Class I taxes charged over Class I value to within half a unit of its own
+  rounding in every tax year, so a rate below twenty is dollars that were not charged rather than a
+  rounding of the column. Computed that way, **17 districts sit below the floor in all four tax
+  years**, and Southern Local of Columbiana County reports 19.99959, 19.99961, 19.99961 and
+  19.99960 across them — a shortfall reproducing in the fifth decimal place through four annual
+  recomputations. [verified]
+
+  So both named candidates fail, and what is left is a different anomaly from the one recorded
+  above: stable per district, in the dollars rather than the presentation, and not a property of a
+  district's joint vocational district. What survives untouched is the bound. [open]
 
   **The floor did not move in 2026 and its base did.** Division (E) now excludes from "taxes
   charged and payable" any tax levied under R.C. 5705.194 or 5705.199 — emergency and substitute
@@ -202,6 +256,28 @@ revisions:
     reach: |
       The distributional findings above are unaffected; they were computed from published
       effective rates rather than from this reading of which levies the factors reach.
+  - was: |
+      The **pre-1982 joint vocational taxes** of R.C. 319.301(E)(2) were named as the term that
+      puts fourteen districts just below the twenty-mill floor, with implied 1981 rates of 2.006
+      to 2.278 mills read backwards from their shortfalls. Confirming it was recorded as needing
+      TY1981 rates by district, because "the membership lists alone are unpopulated".
+    now: |
+      The term is disconfirmed, and the rounding candidate beside it with it. The term belongs to
+      the joint vocational district, so it binds every member; Anna Local sits at twenty mills
+      within four millionths while Botkins, in the same joint vocational district, sits 0.0705
+      mills below. Six of the districts below the floor are in no joint vocational district at
+      all. And the shortfall reproduces in the fifth decimal place across four annual
+      recomputations, which a rounding residual does not.
+    found_by: |
+      Table SD-1's two taxes-charged columns, one excluding joint vocational operating levies and
+      one including them. The difference is a membership list, and a group of districts whose
+      levies fit one pair of class rates is one joint vocational district — which is how Anna and
+      Botkins were shown to share one without either being named.
+    reach: |
+      The anomaly is still unexplained and is now a different shape of anomaly: stable per
+      district, in the dollars rather than the presentation, and not a property of a district's
+      joint vocational district. The bound is untouched, and so is every distributional finding
+      above — none of them turned on the cause.
 figures:
   - key: dispersion/median-millage-reduction
     value: 0.42446
@@ -271,6 +347,34 @@ figures:
     value: 155
     field: findings
     as_written: "against **155** on the Class 1 rate"
+  - key: dispersion/districts-in-a-joint-vocational-district
+    value: 501
+    field: findings
+    as_written: "**501 of 611 districts carry one in TY2024"
+  - key: dispersion/districts-in-no-joint-vocational-district
+    value: 110
+    field: findings
+    as_written: "and 110 carry none**"
+  - key: dispersion/shelby-joint-vocational-class1-mills
+    value: 2.67222
+    field: findings
+    as_written: "**2.67222** and 4.69303 mills in TY2024"
+  - key: dispersion/shelby-joint-vocational-class2-mills
+    value: 4.69303
+    field: findings
+    as_written: "**2.67222** and 4.69303 mills in TY2024"
+  - key: dispersion/botkins-floor-shortfall-mills
+    value: 0.0705
+    field: findings
+    as_written: "sits **0.0705 mills** below"
+  - key: dispersion/mccomb-floor-shortfall-mills
+    value: 0.1076
+    field: findings
+    as_written: "McComb's **0.1076 mills** is the second largest shortfall"
+  - key: dispersion/districts-below-the-floor-in-every-tax-year
+    value: 17
+    field: findings
+    as_written: "**17 districts sit below the floor in all four tax"
 properties:
   name: Twenty-mill floor
   unit: mills
