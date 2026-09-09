@@ -152,6 +152,7 @@ export function compareForecast(
     meta.base_year,
     meta.method,
     meta.damping,
+    meta.shrink_weight,
     growthPrior(bundle.districts, meta.z),
     bundle.statewide.minimum_state_share,
   );

@@ -783,6 +783,15 @@ pub struct District {
     /// variability, which is exactly why the interval comes from the cross-sectional spread
     /// instead; see [`Projection::sigma`].
     pub adm_history: [f64; 3],
+    /// Long-run enrolment growth from fourteen years of the Census F-33 panel, or `null` where
+    /// the survey does not reach this district.
+    ///
+    /// What the district's own three-point rate is shrunk toward under the `shrunk` method. A
+    /// different count from `adm_history` — `V33` fall membership rather than enrolled ADM — and
+    /// so a rate rather than a level: the two are nearly the same population at 0.9997 on levels,
+    /// and not the same measure. A `null` here means the district is projected under `damped`
+    /// instead, at the same damping, which is what every district did before the shrink.
+    pub long_run_enrollment_rate: Option<f64>,
     /// Achievement, growth, and need. `None` for the three districts with no report card.
     pub outcome: Option<DistrictOutcome>,
     /// Six closed fiscal years of actuals, oldest first. Empty where no filing was found.

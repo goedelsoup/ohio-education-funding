@@ -158,6 +158,14 @@ use edfund_core::Dollars;
 /// consumer that rendered it beside the FY2027 calculator's output without saying which was
 /// which would present a measurement and a projection as the same kind of claim.
 ///
+/// `42.0.0` moved the enrollment forecast from `damped` to `shrunk`: each district's three-point
+/// rate is now weighted against a long-run one before it is carried. Two new fields — a
+/// `shrink_weight` on the projection block and a nullable `long_run_enrollment_rate` on every
+/// district — and a `method` string a consumer has not seen. Breaking rather than additive
+/// because a page that kept reproducing the old arithmetic from `adm_history` and `damping`
+/// alone would silently disagree with the checkpoints it is required to match, which is the one
+/// failure the checkpoint rule exists to make loud.
+///
 /// `4.0.0` added the projection axis: `adm_history` on every district, so the page can carry
 /// enrollment forward itself, and a `projection` block holding the forecast's method, its prior,
 /// and [`ForecastCheckpoint`]s the page must reproduce before it may draw a band. Breaking rather
@@ -174,7 +182,7 @@ use edfund_core::Dollars;
 /// from FY2022-FY2024 to FY2024-FY2026 — the years the department's `ADM Data` sheet declares.
 /// The values did not change; what they are called did, which is exactly the kind of silent
 /// meaning change the version guard exists for.
-pub const CONTRACT_VERSION: &str = "41.0.0";
+pub const CONTRACT_VERSION: &str = "42.0.0";
 
 mod model;
 mod serialize;

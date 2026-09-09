@@ -10,7 +10,7 @@ use project::drafts::{draft, drafts, price, Priced};
 use project::panel::{panel, MINIMUM_STATE_SHARE};
 use project::policy::{GuaranteeRule, Policy};
 use project::report::{run, Run};
-use project::series::{Method, DEFAULT_DAMPING};
+use project::series::{Method, DEFAULT_DAMPING, DEFAULT_SHRINK_WEIGHT};
 
 const USAGE: &str = "\
 edfund-project — what a policy change would do to Ohio school funding
@@ -33,7 +33,7 @@ DRAFTS
 
 OPTIONS
     --through <fy>         also forecast to this fiscal year, at projected enrollment
-    --method <m>           damped (default) | cagr | linear | flat
+    --method <m>           shrunk (default) | damped | cagr | linear | flat
     --districts <n>        list the n districts most affected
     --json                 machine-readable output
 
@@ -79,6 +79,14 @@ fn number(args: &[String], name: &str, default: f64) -> Result<f64, String> {
 
 fn method(raw: &str) -> Result<Method, String> {
     match raw {
+        // What the feed uses. `damped` stays reachable because it is what the projections did
+        // before the shrink, and a run that wants the old behaviour should be able to ask.
+        "shrunk" => Ok(Method::Shrunk {
+            rate: 0.0,
+            damping: DEFAULT_DAMPING,
+            weight: DEFAULT_SHRINK_WEIGHT,
+            toward: 0.0,
+        }),
         "damped" => Ok(Method::Damped {
             rate: 0.0,
             damping: DEFAULT_DAMPING,
@@ -142,7 +150,7 @@ fn execute(args: &[String]) -> Result<(), String> {
         }
         None => None,
     };
-    let method = method(value(args, "--method").unwrap_or("damped"))?;
+    let method = method(value(args, "--method").unwrap_or("shrunk"))?;
     let listed = number(args, "--districts", 0.0)? as usize;
 
     let districts = panel();

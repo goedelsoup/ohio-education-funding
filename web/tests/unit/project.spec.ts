@@ -46,7 +46,9 @@ const flat = { sigma: 0.02, z: 1 };
 
 test("the feed carries a projection block and forecasts to check it with", () => {
   expect(meta).not.toBeNull();
-  expect(meta.method).toBe("damped");
+  expect(meta.method).toBe("shrunk");
+  expect(meta.shrink_weight).toBeGreaterThan(0);
+  expect(meta.shrink_weight).toBeLessThan(1);
   expect(meta.checkpoints.length).toBeGreaterThan(0);
   expect(meta.horizon).toBeGreaterThan(meta.base_year);
 });
@@ -112,7 +114,7 @@ test("the interval widens with the square root of the horizon, not linearly", ()
 });
 
 test("a compound rate is fitted from the endpoints", () => {
-  const method = fit(series(2024, [100, 98, 96.04]), "cagr", 0.85);
+  const method = fit(series(2024, [100, 98, 96.04]), "cagr", 0.85, 1, null);
   expect(method.kind).toBe("cagr");
   expect(method.kind === "cagr" && method.rate).toBeCloseTo(-0.02, 12);
   const out = projectSeries(series(2024, [100, 98, 96.04]), 2027, "cagr", 0.85, {
@@ -173,6 +175,7 @@ test("the aid band is tighter than the enrollment band that drives it", () => {
     meta.base_year,
     meta.method,
     meta.damping,
+    meta.shrink_weight,
     prior,
     model,
   );
@@ -193,6 +196,7 @@ test("removing the guarantee widens the state's exposure to enrollment error", (
       meta.base_year,
       meta.method,
       meta.damping,
+      meta.shrink_weight,
       prior,
       model,
     );
@@ -211,6 +215,7 @@ test("the path carries every observed year before it starts forecasting", () => 
     meta.base_year,
     meta.method,
     meta.damping,
+    meta.shrink_weight,
     growthPrior(bundle.districts, meta.z),
     model,
   );
@@ -247,6 +252,7 @@ test("the observed years are the department's own enrolled ADM, not a re-derivat
     meta.base_year,
     meta.method,
     meta.damping,
+    meta.shrink_weight,
     growthPrior(bundle.districts, meta.z),
     model,
   );
@@ -333,4 +339,31 @@ test("every colour in a rendered chart is a custom property, not a literal", () 
   );
   expect(svg).toContain("var(--series-formula)");
   expect(svg.replace(/<style>[\s\S]*?<\/style>/g, "")).not.toMatch(/#[0-9a-f]{3,8}\b/i);
+});
+
+test("the shrunk method blends a district's own rate toward its long-run one", () => {
+  // The mirror of `Method::Shrunk` in `crates/project/src/series.rs`. A district falling 2% a
+  // year on three points, whose fourteen-year rate is flat, should carry three-tenths of the 2%.
+  const method = fit(series(2024, [100, 98, 96.04]), "shrunk", 0.3, 0.3, 0);
+  expect(method.kind).toBe("shrunk");
+  expect(method.kind === "shrunk" && method.rate).toBeCloseTo(0.3 * -0.02, 12);
+});
+
+test("a district the survey does not reach is projected damped rather than toward zero", () => {
+  // `null` is not "no growth". Shrinking toward a rate that was never measured would be a claim
+  // about that district; falling back to `damped` is what it did before the shrink existed.
+  const method = fit(series(2024, [100, 98, 96.04]), "shrunk", 0.3, 0.3, null);
+  expect(method.kind).toBe("damped");
+  expect(method.kind === "damped" && method.rate).toBeCloseTo(-0.02, 12);
+});
+
+test("shrinking to a weight of one reproduces the damped rate exactly", () => {
+  // The property that makes the contract change safe to read: a consumer that has not learned
+  // about the shrink, reading `shrink_weight: 1`, gets the arithmetic it had before.
+  const damped = fit(series(2024, [100, 98, 96.04]), "damped", 0.3, 1, null);
+  const shrunk = fit(series(2024, [100, 98, 96.04]), "shrunk", 0.3, 1, -0.5);
+  expect(shrunk.kind === "shrunk" && shrunk.rate).toBeCloseTo(
+    damped.kind === "damped" ? damped.rate : NaN,
+    12,
+  );
 });

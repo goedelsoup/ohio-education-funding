@@ -197,6 +197,7 @@ function renderCarriedForward(bundle: Bundle, d: District): string {
     meta.base_year,
     meta.method,
     meta.damping,
+    meta.shrink_weight,
     growthPrior(bundle.districts, meta.z),
     model,
   );

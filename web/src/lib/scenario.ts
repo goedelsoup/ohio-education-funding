@@ -307,6 +307,7 @@ export function renderProjection(bundle: Panel, levers: Levers, chip = ""): stri
     meta.base_year,
     meta.method,
     meta.damping,
+    meta.shrink_weight,
     prior,
     model,
   );
@@ -327,6 +328,7 @@ export function renderProjection(bundle: Panel, levers: Levers, chip = ""): stri
     meta.base_year,
     meta.method,
     meta.damping,
+    meta.shrink_weight,
     prior,
     model,
   );

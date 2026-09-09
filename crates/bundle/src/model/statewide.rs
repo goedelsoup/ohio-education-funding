@@ -265,10 +265,17 @@ pub struct Projection {
     ///
     /// Read from `project::statute`, which derives it from the committed extract.
     pub statute_ends: u16,
-    /// `damped`, `cagr`, `linear`, or `flat`.
+    /// `shrunk`, `damped`, `cagr`, `linear`, or `flat`.
     pub method: String,
     /// Per-year decay applied to the fitted growth rate. 1.0 is undamped.
     pub damping: f64,
+    /// Weight on a district's own three-point rate, under `shrunk`.
+    ///
+    /// The remainder goes to that district's `long_run_enrollment_rate`. 1.0 reproduces `damped`,
+    /// which is what the feed published before the shrink. Meaningless under the other methods
+    /// and carried anyway, because a consumer that reads it unconditionally should get the value
+    /// that makes the arithmetic right rather than a missing key.
+    pub shrink_weight: f64,
     /// Standard deviation of annual enrolled-ADM growth **across districts**.
     ///
     /// Not this district's variability — three observations cannot give that. It is how much

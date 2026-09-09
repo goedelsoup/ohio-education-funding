@@ -66,7 +66,7 @@ use project::panel::supplements::{PREK_SPED_APPROPRIATION, PREK_SPED_PRORATION};
 use project::panel::{panel, DistrictRecord, HISTORY_YEARS, MINIMUM_STATE_SHARE, MODEL_YEAR};
 use project::policy::{GuaranteeRule, Policy};
 use project::report::{enrollment_growth_prior, forecast, simulate};
-use project::series::{Method, DEFAULT_DAMPING, ONE_SIGMA};
+use project::series::{Method, DEFAULT_DAMPING, DEFAULT_SHRINK_WEIGHT, ONE_SIGMA};
 use project::session_laws;
 use scenario_delta::ScenarioDelta;
 
@@ -700,6 +700,7 @@ fn to_district(record: &DistrictRecord, joins: &Joins<'_>) -> District {
             (first > 0.0).then(|| last / first - 1.0)
         },
         adm_history: record.adm_history,
+        long_run_enrollment_rate: record.long_run_enrollment_rate,
         finances: money.map_or_else(Vec::new, |f| {
             f.years
                 .iter()
@@ -1730,9 +1731,13 @@ pub fn build() -> Bundle {
     // One method for the whole feed. A page that let the reader pick between damped and undamped
     // would be offering a choice whose consequences it has no basis to explain — three
     // observations per district cannot say which is right.
-    let method = Method::Damped {
+    let method = Method::Shrunk {
         rate: 0.0,
         damping: DEFAULT_DAMPING,
+        weight: DEFAULT_SHRINK_WEIGHT,
+        // Filled in per district by `DistrictRecord::projection_method`: the rate a district is
+        // shrunk toward is its own, and the feed chooses a method once.
+        toward: 0.0,
     };
     let prior = enrollment_growth_prior(&records, ONE_SIGMA);
     let projection = Projection {
@@ -1740,6 +1745,7 @@ pub fn build() -> Bundle {
         horizon: HORIZON.0,
         method: method.label().to_string(),
         damping: DEFAULT_DAMPING,
+        shrink_weight: DEFAULT_SHRINK_WEIGHT,
         sigma: prior.sigma,
         z: prior.z,
         prior_source: prior.source.to_string(),
