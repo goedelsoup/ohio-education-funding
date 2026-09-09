@@ -57,9 +57,16 @@ test("every bound figure in the corpus agrees with the crate it cites", () => {
  * The figure count is not the interesting one — `uncited-figure` already makes an unbound export a
  * failure, so the manifest cannot grow without the corpus. The binding count is: it is what stops a
  * node from dropping a `figures:` entry to make a red gate green.
+ *
+ * # It had drifted five under, which is the failure this comment describes
+ *
+ * The floor read 383 against 388 actual — five bindings of permitted regression, arrived at by
+ * raising the *declared* number rather than re-counting. The same slip then propagated: this
+ * branch added eighteen bindings and reached 401 from 383, when the count was 406. Both numbers
+ * below are re-counted rather than derived, and adding to a floor is how it goes wrong.
  */
 test("the corpus binds no fewer figures than it did", () => {
-  expect(bindings.length, "401 bindings; raise this when you add one").toBeGreaterThanOrEqual(401);
+  expect(bindings.length, "406 bindings; raise this when you add one").toBeGreaterThanOrEqual(406);
   expect(
     corpus.nodes.filter((node) => node.figures.length > 0).length,
     "52 nodes carry bindings; raise this when a fifty-third does",
