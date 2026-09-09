@@ -497,4 +497,44 @@ mod tests {
         assert_eq!(observations[0].fiscal_year, FiscalYear(2024));
         assert_eq!(observations[2].fiscal_year, FiscalYear(2026));
     }
+    /// A district the survey does not reach is projected damped, not shrunk toward zero.
+    ///
+    /// `None` is not "no growth". Every one of the 609 districts currently carries a long-run
+    /// rate, so this path is defence rather than a population — which is exactly why it needs a
+    /// test: nothing in the feed would notice if it started shrinking those districts toward a
+    /// rate nobody measured.
+    #[test]
+    fn a_district_with_no_long_run_rate_falls_back_to_damping_rather_than_to_zero() {
+        let mut record = panel().into_iter().next().expect("the panel is not empty");
+        let requested = Method::Shrunk {
+            rate: 0.0,
+            damping: 0.3,
+            weight: 0.3,
+            toward: 0.0,
+        };
+
+        record.long_run_enrollment_rate = Some(-0.011);
+        assert!(matches!(
+            record.projection_method(requested),
+            Method::Shrunk { toward, .. } if (toward + 0.011).abs() < f64::EPSILON
+        ));
+
+        record.long_run_enrollment_rate = None;
+        assert!(matches!(
+            record.projection_method(requested),
+            Method::Damped { damping, .. } if (damping - 0.3).abs() < f64::EPSILON
+        ));
+    }
+
+    /// Every district the department models has a rate to be shrunk toward.
+    #[test]
+    fn the_survey_reaches_every_district_in_the_model() {
+        let records = panel();
+        let without: Vec<&str> = records
+            .iter()
+            .filter(|r| r.long_run_enrollment_rate.is_none())
+            .map(|r| r.irn.as_str())
+            .collect();
+        assert!(without.is_empty(), "no long-run rate for {without:?}");
+    }
 }

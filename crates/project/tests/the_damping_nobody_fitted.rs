@@ -410,9 +410,14 @@ fn the_straight_line_is_worse_than_every_damping_and_worse_the_longer_it_is_fitt
 
 /// What the move actually moved — measured before it was made, and still asserted after.
 ///
-/// Through `report::forecast` at the feed's own FY2036 horizon under current law, so these are
-/// the figures the page prints. The enrollment difference is large and the aid difference is
-/// not, which is the guarantee doing what the corpus already says it does.
+/// Through `report::forecast` at the feed's own FY2036 horizon under current law. These were the
+/// figures the page printed when the damping was the only thing being changed; the feed has since
+/// moved to `Method::Shrunk` and prints different ones. Both damping values are still measured
+/// here under `Damped`, which is what makes this a comparison of the damping alone rather than of
+/// two changes at once.
+///
+/// The enrollment difference is large and the aid difference is not, which is the guarantee doing
+/// what the corpus already says it does.
 ///
 /// Kept as a live comparison rather than retired once the constant moved: it is the evidence
 /// `the-fitted-damping` rests on, and the feed's own regression test against a change to
