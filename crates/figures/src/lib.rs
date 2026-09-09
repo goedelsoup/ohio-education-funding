@@ -1043,6 +1043,75 @@ fn sd1_at_twenty(
         .count()
 }
 
+/// The Class I rate implied by the charges, in mills.
+///
+/// TY2023's workbook publishes the rate to two decimals and the shortfalls below are read in the
+/// fifth, so this recomputes rather than reading the column.
+fn sd1_class1_rate(row: &dispersion::sd1::TaxRow) -> Option<f64> {
+    let value = row.class1_value?;
+    let taxes = row.class1_taxes_charged?;
+    (value > 0.0).then(|| taxes / value * 1000.0)
+}
+
+/// How many districts carry a joint vocational operating levy in one tax year, and how many
+/// carry none.
+///
+/// The difference between Table SD-1's two taxes-charged columns is the joint vocational levy on
+/// a district's own parcels, so it is also the membership list the abstract never states.
+fn joint_vocational_membership(i: &Inputs, tax_year: u16) -> (usize, usize) {
+    let rows: Vec<&dispersion::sd1::TaxRow> = i
+        .sd1
+        .iter()
+        .filter(|row| row.tax_year == tax_year)
+        .collect();
+    let members = rows
+        .iter()
+        .filter(|row| dispersion::sd1::joint_vocational_tax(row).is_some_and(|tax| tax > 0.5))
+        .count();
+    (members, rows.len() - members)
+}
+
+/// The two class rates one county's districts fit, taken as one joint vocational district's.
+fn county_joint_vocational_fit(
+    i: &Inputs,
+    county: &str,
+    tax_year: u16,
+) -> Option<dispersion::sd1::JointVocationalFit> {
+    let group: Vec<&dispersion::sd1::TaxRow> = i
+        .sd1
+        .iter()
+        .filter(|row| row.tax_year == tax_year && row.county.eq_ignore_ascii_case(county))
+        .collect();
+    dispersion::sd1::joint_vocational_fit(&group)
+}
+
+/// How far one district sits below the twenty-mill floor, in mills.
+fn floor_shortfall(i: &Inputs, irn: &str, tax_year: u16) -> f64 {
+    i.sd1
+        .iter()
+        .find(|row| row.irn == irn && row.tax_year == tax_year)
+        .and_then(sd1_class1_rate)
+        .map_or(f64::NAN, |rate| 20.0 - rate)
+}
+
+/// Districts below the floor on the computed rate in every tax year the abstract carries.
+///
+/// The persistence is the point: R.C. 319.301(D)(1) recomputes the reduction percentage annually,
+/// so a rounding residual would not reproduce.
+fn below_the_floor_in_every_tax_year(i: &Inputs) -> usize {
+    let years = dispersion::sd1::tax_years();
+    let mut by_district: BTreeMap<&str, usize> = BTreeMap::new();
+    for row in &i.sd1 {
+        if sd1_class1_rate(row).is_some_and(|rate| rate < 20.0 - 5e-5) {
+            *by_district.entry(row.irn.as_str()).or_default() += 1;
+        }
+    }
+    by_district
+        .values()
+        .filter(|seen| **seen == years.len())
+        .count()
+}
+
 /// Guarantee status, Performance Index and poverty over the districts carrying all three.
 fn guarantee_against_achievement(i: &Inputs) -> (Vec<f64>, Vec<f64>, Vec<f64>) {
     let (mut guarantee, mut index, mut poverty) = (Vec::new(), Vec::new(), Vec::new());
@@ -3104,6 +3173,84 @@ pub static FIGURES: &[Figure] = &[
         pinned: 2.278,
         tolerance: 0.0005,
         compute: |i| implied_1981_rates(i).1,
+    },
+    // And the term the two figures above size is disconfirmed. It belongs to the joint vocational
+    // district rather than to the member, so it binds every member alike; these are the counts and
+    // rates that show it does not.
+    Figure {
+        key: "dispersion/districts-in-a-joint-vocational-district",
+        owner: "crates/dispersion",
+        unit: Unit::Count,
+        label: "Districts carrying a joint vocational operating levy in Table SD-1, TY2024 \u{2014} \
+                the membership the abstract never names and the column pair settles",
+        pinned: 501.0,
+        tolerance: 0.0,
+        compute: |i| joint_vocational_membership(i, 2024).0 as f64,
+    },
+    Figure {
+        key: "dispersion/districts-in-no-joint-vocational-district",
+        owner: "crates/dispersion",
+        unit: Unit::Count,
+        label: "Districts carrying none, TY2024 \u{2014} for which R.C. 319.301(E)(1) has no \
+                referent at all",
+        pinned: 110.0,
+        tolerance: 0.0,
+        compute: |i| joint_vocational_membership(i, 2024).1 as f64,
+    },
+    Figure {
+        key: "dispersion/shelby-joint-vocational-class1-mills",
+        owner: "crates/dispersion",
+        unit: Unit::Ratio,
+        label: "The Class I rate, in mills, that Shelby County's eight districts jointly fit in \
+                TY2024 \u{2014} two numbers explaining eight levies, which is co-membership",
+        pinned: 2.672_22,
+        tolerance: 0.000_005,
+        compute: |i| {
+            county_joint_vocational_fit(i, "Shelby", 2024).map_or(f64::NAN, |fit| fit.class1_mills)
+        },
+    },
+    Figure {
+        key: "dispersion/shelby-joint-vocational-class2-mills",
+        owner: "crates/dispersion",
+        unit: Unit::Ratio,
+        label: "The Class II rate of the same fit, in mills \u{2014} both far enough above the \
+                two-mill floor that the fit is not the trivial one",
+        pinned: 4.693_03,
+        tolerance: 0.000_005,
+        compute: |i| {
+            county_joint_vocational_fit(i, "Shelby", 2024).map_or(f64::NAN, |fit| fit.class2_mills)
+        },
+    },
+    Figure {
+        key: "dispersion/botkins-floor-shortfall-mills",
+        owner: "crates/dispersion",
+        unit: Unit::Ratio,
+        label: "How far Botkins Local sits below the twenty-mill floor, TY2024 \u{2014} in the \
+                same joint vocational district as Anna Local, which sits on it",
+        pinned: 0.0705,
+        tolerance: 0.000_05,
+        compute: |i| floor_shortfall(i, "049767", 2024),
+    },
+    Figure {
+        key: "dispersion/mccomb-floor-shortfall-mills",
+        owner: "crates/dispersion",
+        unit: Unit::Ratio,
+        label: "How far McComb Local sits below it \u{2014} the second largest shortfall of the \
+                fourteen, in a district that is part of no joint vocational district",
+        pinned: 0.1076,
+        tolerance: 0.000_05,
+        compute: |i| floor_shortfall(i, "047456", 2024),
+    },
+    Figure {
+        key: "dispersion/districts-below-the-floor-in-every-tax-year",
+        owner: "crates/dispersion",
+        unit: Unit::Count,
+        label: "Districts below the twenty-mill floor on the computed Class I rate in all four \
+                tax years \u{2014} a shortfall that survives four annual recomputations is not a \
+                rounding residual",
+        pinned: 17.0,
+        tolerance: 0.0,
+        compute: |i| below_the_floor_in_every_tax_year(i) as f64,
     },
     Figure {
         key: "dispersion/districts-at-twenty-mills-on-the-combined-base-ty2024",

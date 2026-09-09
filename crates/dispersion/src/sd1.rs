@@ -21,12 +21,18 @@
 //! values, separate charges and separate effective rates, and the twenty-mill floor is a Class I
 //! rule. A figure that mixes them is not a rate on anything.
 //!
-//! # The JVSD column is a superset
+//! # The JVSD column is a superset, and a membership list
 //!
 //! [`TaxRow::real_property_taxes_charged`] excludes joint vocational district operating levies
 //! and [`TaxRow::real_property_taxes_charged_with_jvsd`] includes them. The JVSD levy is charged
 //! to the same parcels; whether it belongs in "what this district's taxpayers pay for schools"
 //! depends on the question, and both are carried so a caller has to answer it.
+//!
+//! The difference between them is also the one thing the abstract never states outright: which
+//! joint vocational district a school district belongs to. It does not name one, and it does not
+//! have to — a district in none reports the same number twice, and a group of districts whose
+//! levies fit one pair of class rates is one joint vocational district. See
+//! [`joint_vocational_tax`] and [`joint_vocational_fit`].
 
 use std::collections::BTreeMap;
 use std::sync::OnceLock;
@@ -191,6 +197,94 @@ pub fn at(irn: &str, tax_year: u16) -> Option<TaxRow> {
 pub fn tax_years() -> Vec<u16> {
     let years: std::collections::BTreeSet<u16> = cached().iter().map(|row| row.tax_year).collect();
     years.into_iter().collect()
+}
+
+/// The joint vocational district operating tax charged against a district's real property.
+///
+/// The abstract never names a district's joint vocational district, and the corpus recorded the
+/// membership lists as unpopulated. It does not have to name it. The difference between the two
+/// taxes-charged columns *is* the joint vocational levy on that district's parcels, so a district
+/// that is part of no joint vocational district reports the same number twice and this returns
+/// zero. Membership is a column that was already here.
+#[must_use]
+pub fn joint_vocational_tax(row: &TaxRow) -> Option<f64> {
+    let with = row.real_property_taxes_charged_with_jvsd?;
+    let without = row.real_property_taxes_charged?;
+    Some((with - without).max(0.0))
+}
+
+/// One joint vocational district's two class rates, fitted to its member districts.
+#[derive(Debug, Clone, Copy, PartialEq)]
+pub struct JointVocationalFit {
+    /// The Class I rate in mills.
+    pub class1_mills: f64,
+    /// The Class II rate in mills.
+    pub class2_mills: f64,
+    /// The largest relative error the fit leaves on any district in the group.
+    pub worst_residual: f64,
+}
+
+/// Fit one pair of class rates to a group of districts' joint vocational taxes.
+///
+/// # Why a fit settles co-membership
+///
+/// A joint vocational district levies one rate per class across the whole of its territory, so
+/// every member district's joint vocational tax is `class1_mills * class1_value +
+/// class2_mills * class2_value` for the *same* two rates. Two unknowns explaining eight districts
+/// to the dollar is not something a coincidence does; a group drawn from two joint vocational
+/// districts leaves residuals in the tens of per cent.
+///
+/// The converse does not hold. Two joint vocational districts both pinned at the two-mill floor
+/// of R.C. 319.301(E)(3) have the same rates, so a clean fit at `(2.0, 2.0)` is evidence of
+/// nothing. A fit is a membership proof only where the rates it recovers are away from the floor.
+///
+/// Returns `None` if a district in the group is missing a value or reports no joint vocational
+/// tax, or if the two class values are collinear across the group.
+#[must_use]
+pub fn joint_vocational_fit(rows: &[&TaxRow]) -> Option<JointVocationalFit> {
+    let mut obs = Vec::with_capacity(rows.len());
+    for row in rows {
+        let (Some(one), Some(two)) = (row.class1_value, row.class2_value) else {
+            return None;
+        };
+        let tax = joint_vocational_tax(row)?;
+        if tax <= 0.0 {
+            return None;
+        }
+        obs.push((one, two, tax));
+    }
+    let (mut s11, mut s12, mut s22, mut t1, mut t2) = (0.0, 0.0, 0.0, 0.0, 0.0);
+    for &(one, two, tax) in &obs {
+        s11 += one * one;
+        s12 += one * two;
+        s22 += two * two;
+        t1 += one * tax;
+        t2 += two * tax;
+    }
+    let det = s11 * s22 - s12 * s12;
+    if det.abs() < 1.0 {
+        return None;
+    }
+    let rate1 = (s22 * t1 - s12 * t2) / det;
+    let rate2 = (s11 * t2 - s12 * t1) / det;
+    let worst = obs
+        .iter()
+        .map(|&(one, two, tax)| ((rate1 * one + rate2 * two) - tax).abs() / tax)
+        .fold(0.0_f64, f64::max);
+    Some(JointVocationalFit {
+        class1_mills: rate1 * 1000.0,
+        class2_mills: rate2 * 1000.0,
+        worst_residual: worst,
+    })
+}
+
+/// The districts of one county for one tax year, in file order.
+#[must_use]
+pub fn county(name: &str, tax_year: u16) -> Vec<&'static TaxRow> {
+    cached()
+        .iter()
+        .filter(|row| row.tax_year == tax_year && row.county.eq_ignore_ascii_case(name))
+        .collect()
 }
 
 #[cfg(test)]

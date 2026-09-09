@@ -97,10 +97,12 @@ test("every bound figure in the corpus agrees with the crate it cites", () => {
  * 496/62 when parity aid turned out to be what targeted assistance succeeded, and 499/62 at the
  * transportation proration that was an appropriation rather than a dial, and 500/63 when
  * `litigation/cincinnati-v-walter-1979` became the sixty-third carrier — the first `litigation`
- * node to bind anything, and it binds a count of words in an opinion.
+ * node to bind anything, and it binds a count of words in an opinion — and 507/63 when Table
+ * SD-1's two taxes-charged columns turned out to be a joint vocational membership list, which
+ * disconfirmed the term the twenty-mill floor's anomaly had been attributed to.
  */
 test("the corpus binds no fewer figures than it did", () => {
-  expect(bindings.length, "500 bindings; raise this when you add one").toBeGreaterThanOrEqual(500);
+  expect(bindings.length, "507 bindings; raise this when you add one").toBeGreaterThanOrEqual(507);
   expect(
     corpus.nodes.filter((node) => node.figures.length > 0).length,
     "63 nodes carry bindings; raise this when a sixty-fourth does",

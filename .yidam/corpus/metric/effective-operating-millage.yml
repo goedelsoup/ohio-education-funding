@@ -54,19 +54,23 @@ properties:
     with too tight a tolerance rejects good rows. [verified]
 
     Fourteen districts report effective Class 1 rates just below 20 mills despite having voted
-    between 23 and 48. Two candidates are now named and neither is established: rounding inside
-    the reduction-factor computation, which covers all but Bradford Exempted Village; and the
+    between 23 and 48. Two candidates were named for it and **both are now disconfirmed**. The
     **pre-1982 joint vocational taxes** that R.C. 319.301(E)(2) combines with a district's own
-    current-expense taxes before testing them against two per cent, which the corpus's model
-    omits and which is of the right size to cover all fourteen. [verified for the statutory term;
-    the identification is inference — see
+    current-expense taxes are in the section and the corpus's model does omit them — that much
+    still holds, at `crates/project/tests/the_term_the_floor_model_omits.rs`. But the term
+    belongs to a district's joint vocational district and so binds every member of it alike.
+    Anna Local sits on the floor while Botkins, in the same joint vocational district, sits
+    0.0705 mills below, and six of the districts below the floor are in no joint vocational
+    district at all. Rounding inside the reduction-factor computation fails for a separate
+    reason: R.C. 319.301(D)(1) recomputes the percentage annually, and seventeen districts are
+    below the floor in all four tax years. [verified — see
     [twenty-mill-floor](../parameter/twenty-mill-floor.yml) and
-    `crates/project/tests/the_term_the_floor_model_omits.rs`]
+    `crates/dispersion/tests/the_neighbour_that_sits_at_exactly_twenty.rs`]
 
-    The bound is what makes either candidate preferable to a broken floor: no district that
-    voted twenty sits more than three tenths of a mill below it, and every district more than
-    half a mill below never voted twenty. Confirming the joint vocational term needs TY1981
-    rates the corpus does not hold. [open]
+    What holds is the bound: no district that voted twenty sits more than three tenths of a mill
+    below it, and every district more than half a mill below never voted twenty. The cause is
+    unexplained, and what is known about it now is that it is stable per district rather than a
+    fresh error each year. [open]
 
     Tax year and fiscal year are offset; the FY2024 report carries TY2023 millage.
   calculator: millage
