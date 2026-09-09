@@ -250,6 +250,9 @@ pub struct Forecasts {
     /// FY2036 undamped, which the backtest finds very nearly unbiased and which the corpus
     /// quotes as the distance the damping holds the projection above.
     pub fy2036_undamped: project::report::EnrollmentEffect,
+    /// FY2032 with the guarantee removed — the other half of `scenario/guarantee-phase-out`'s
+    /// central comparison, and the run its "nearly doubles the state's exposure" rests on.
+    pub fy2032_guarantee_removed: project::report::EnrollmentEffect,
 }
 
 impl Inputs {
@@ -379,6 +382,16 @@ impl Inputs {
                     fy2036: run(2036, project::series::DEFAULT_DAMPING),
                     fy2036_at_the_old_convention: run(2036, THE_DAMPING_BEFORE_IT_WAS_FITTED),
                     fy2036_undamped: run(2036, 1.0),
+                    fy2032_guarantee_removed: project::report::forecast(
+                        &panel_for_forecasts,
+                        &project::policy::Policy {
+                            guarantee: project::policy::GuaranteeRule::Removed,
+                            ..project::policy::Policy::current_law()
+                        },
+                        FiscalYear(2032),
+                        shrunk(project::series::DEFAULT_DAMPING),
+                        prior,
+                    ),
                 }
             },
         }
@@ -3046,6 +3059,80 @@ pub static FIGURES: &[Figure] = &[
         pinned: 356.0,
         tolerance: 0.0,
         compute: |i| i.forecasts.fy2036_at_the_old_convention.on_guarantee as f64,
+    },
+    // The FY2032 aid band, which two nodes state and three paragraphs carry. It is the shape the
+    // whole mechanism was built for and it had no key: `scenario/guarantee-phase-out` says of its
+    // own guarantee count that it "is the one figure on this node that no test pinned", having
+    // already been corrected once from a wrong number nobody caught. The band beside it was in
+    // exactly the same position.
+    Figure {
+        key: "project/fy2032-aid-current-law",
+        owner: "crates/project",
+        unit: Unit::Dollars,
+        label: "Total realized state aid at FY2032 enrollment under current law, central estimate",
+        pinned: 7_233_134_576.709_7,
+        tolerance: 0.01,
+        compute: |i| i.forecasts.fy2032.realized_aid,
+    },
+    Figure {
+        key: "project/fy2032-aid-current-law-low",
+        owner: "crates/project",
+        unit: Unit::Dollars,
+        label: "The low end of the FY2032 current-law aid band, from the enrollment \
+                projection interval",
+        pinned: 7_017_027_223.415_9,
+        tolerance: 0.01,
+        compute: |i| i.forecasts.fy2032.low,
+    },
+    Figure {
+        key: "project/fy2032-aid-current-law-high",
+        owner: "crates/project",
+        unit: Unit::Dollars,
+        label: "The high end of the FY2032 current-law aid band \u{2014} asymmetric against \
+                the low end because the interval is multiplicative, which is why the corpus \
+                writes the half-width",
+        pinned: 7_493_506_524.902_3,
+        tolerance: 0.01,
+        compute: |i| i.forecasts.fy2032.high,
+    },
+    Figure {
+        key: "project/fy2032-aid-guarantee-removed",
+        owner: "crates/project",
+        unit: Unit::Dollars,
+        label: "Total realized state aid at FY2032 enrollment with the guarantee removed, \
+                central estimate",
+        pinned: 6_301_076_001.003_5,
+        tolerance: 0.01,
+        compute: |i| i.forecasts.fy2032_guarantee_removed.realized_aid,
+    },
+    Figure {
+        key: "project/fy2032-aid-guarantee-removed-low",
+        owner: "crates/project",
+        unit: Unit::Dollars,
+        label: "The low end of the FY2032 guarantee-removed aid band, which the corpus \
+                reports as nearly twice as wide as the current-law one",
+        pinned: 5_938_323_778.408_6,
+        tolerance: 0.01,
+        compute: |i| i.forecasts.fy2032_guarantee_removed.low,
+    },
+    Figure {
+        key: "project/fy2032-aid-guarantee-removed-high",
+        owner: "crates/project",
+        unit: Unit::Dollars,
+        label: "The high end of the FY2032 guarantee-removed aid band",
+        pinned: 6_685_987_536.547_3,
+        tolerance: 0.01,
+        compute: |i| i.forecasts.fy2032_guarantee_removed.high,
+    },
+    Figure {
+        key: "project/districts-on-the-guarantee-fy2032",
+        owner: "crates/project",
+        unit: Unit::Count,
+        label: "Districts the guarantee pays at FY2032 enrollment \u{2014} 294 at FY2027, so \
+                eighteen move onto it",
+        pinned: 312.0,
+        tolerance: 0.0,
+        compute: |i| i.forecasts.fy2032.on_guarantee as f64,
     },
     // `formula-component/fsfp-formula-transition-supplement`. The second hold-harmless, and the
     // node's point is that it is not nested inside the first.

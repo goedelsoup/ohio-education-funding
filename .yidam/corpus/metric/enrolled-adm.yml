@@ -339,3 +339,16 @@ figures:
     value: 93552.70023058914
     field: findings
     as_written: "the damping holds **93,553 pupils** above it"
+  # The FY2032 band, which this node states and `scenario/guarantee-phase-out` states twice more.
+  - key: project/fy2032-aid-current-law
+    value: 7233134576.709653
+    field: findings
+    as_written: "current law is $7,233M in a band of $7,017M to $7,494M"
+  - key: project/fy2032-aid-current-law-low
+    value: 7017027223.415896
+    field: findings
+    as_written: "current law is $7,233M in a band of $7,017M to $7,494M"
+  - key: project/fy2032-aid-current-law-high
+    value: 7493506524.902345
+    field: findings
+    as_written: "current law is $7,233M in a band of $7,017M to $7,494M"

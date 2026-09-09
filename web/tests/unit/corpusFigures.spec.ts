@@ -59,7 +59,7 @@ test("every bound figure in the corpus agrees with the crate it cites", () => {
  * node from dropping a `figures:` entry to make a red gate green.
  */
 test("the corpus binds no fewer figures than it did", () => {
-  expect(bindings.length, "391 bindings; raise this when you add one").toBeGreaterThanOrEqual(391);
+  expect(bindings.length, "401 bindings; raise this when you add one").toBeGreaterThanOrEqual(401);
   expect(
     corpus.nodes.filter((node) => node.figures.length > 0).length,
     "52 nodes carry bindings; raise this when a fifty-third does",
@@ -121,6 +121,43 @@ test("the guarantee's district count is bound in all ten nodes that state it", (
     "parameter/fsfp-phase-in-percentage",
     "parameter/guarantee-funding-base",
     "scenario/fsfp-input-year-refresh",
+    "scenario/guarantee-phase-out",
+  ]);
+});
+
+/**
+ * The FY2032 aid band is bound in both nodes that state it, and twice in the one that says it twice.
+ *
+ * `scenario/guarantee-phase-out` says of its own guarantee count that it "is the one figure on
+ * this node that no test pinned" — having already been corrected once, from `294 to 292`, a
+ * direction word that contradicted its own numbers and that nothing caught. The six band figures
+ * beside it were in exactly the same position, stated in two nodes and three paragraphs with no
+ * key between them, until the projected block was exported.
+ *
+ * # One carrier is still loose, and it is loose on purpose
+ *
+ * `guarantee-phase-out` states the same six numbers a third time, in its `results` property.
+ * Binding them there was tried and `field-unverified` refused it: a figure checked against a
+ * crate is offered as a verified claim, and a bare output table states none. No property block in
+ * this corpus carries a claim tag, so the alternative was to invent that convention inside a
+ * cleanup, which is worse than recording the hole.
+ *
+ * So a `results` table can still drift from the `findings` paragraph above it. What this test
+ * fixes is the shape that actually caused #120 — the same figure in two *nodes*, one corrected
+ * and one not.
+ */
+test("the FY2032 aid band is bound in both nodes that state it", () => {
+  const carriers = (key: string) =>
+    corpus.nodes
+      .filter((node) => node.figures.some((f) => f.key === key))
+      .map((node) => node.id)
+      .sort();
+
+  expect(carriers("project/fy2032-aid-current-law")).toEqual([
+    "metric/enrolled-adm",
+    "scenario/guarantee-phase-out",
+  ]);
+  expect(carriers("project/fy2032-aid-guarantee-removed")).toEqual([
     "scenario/guarantee-phase-out",
   ]);
 });

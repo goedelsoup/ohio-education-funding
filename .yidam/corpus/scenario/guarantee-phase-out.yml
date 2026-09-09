@@ -24,6 +24,39 @@ figures:
     value: 294
     field: description
     as_written: "paid to **294\n  districts**"
+  # The projection leg, on `findings`. The `results` property states the same six numbers and
+  # cannot be bound: `crossCheck` refuses a binding into a field that asserts no verified claim,
+  # and no property block in this corpus asserts one. See the carrier test for why that hole is
+  # left open rather than closed by inventing the convention. The tag is spelled out rather than
+  # written here because the claim-tag counter reads comments too.
+  - key: project/fy2032-aid-current-law
+    value: 7233134576.709653
+    field: findings
+    as_written: "**$7,233M, in a band of $7,017M to $7,494M**"
+  - key: project/fy2032-aid-current-law-low
+    value: 7017027223.415896
+    field: findings
+    as_written: "**$7,233M, in a band of $7,017M to $7,494M**"
+  - key: project/fy2032-aid-current-law-high
+    value: 7493506524.902345
+    field: findings
+    as_written: "**$7,233M, in a band of $7,017M to $7,494M**"
+  - key: project/fy2032-aid-guarantee-removed
+    value: 6301076001.003549
+    field: findings
+    as_written: "**$6,301M, in a band of $5,938M to $6,686M**"
+  - key: project/fy2032-aid-guarantee-removed-low
+    value: 5938323778.408624
+    field: findings
+    as_written: "**$6,301M, in a band of $5,938M to $6,686M**"
+  - key: project/fy2032-aid-guarantee-removed-high
+    value: 6685987536.547348
+    field: findings
+    as_written: "**$6,301M, in a band of $5,938M to $6,686M**"
+  - key: project/districts-on-the-guarantee-fy2032
+    value: 312
+    field: findings
+    as_written: "under current law, 294 to 312"
 
 findings: |
   ### The three policies are not variants of each other
@@ -91,8 +124,10 @@ findings: |
 
   This paragraph read "only two districts, 294 to 292" until the figures were rechecked against
   the model. That was wrong at the damping of the day as well: at 0.85 the count went 294 to 360,
-  and the direction word contradicted its own numbers. It is the one figure on this node that no
-  test pinned.
+  and the direction word contradicted its own numbers. It was the one figure on this node that no
+  test pinned, which is why it could be wrong in two ways at once and stay that way — it is bound
+  now, as `project/districts-on-the-guarantee-fy2032`, along with the six band figures beside it
+  that were in the same position.
 properties:
   name: Phasing out the temporary transitional aid guarantee
   question: |
