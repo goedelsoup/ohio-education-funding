@@ -320,8 +320,8 @@ Fields: count per claim tag across every node; then the unresolved marks by the 
 -->
 | Tag | Count | What it records |
 |---|--:|---|
-| `[verified]` | 1259 | supported by a committed primary source |
-| `[inference]` | 285 | drawn from verified facts, not witnessed |
+| `[verified]` | 1273 | supported by a committed primary source |
+| `[inference]` | 289 | drawn from verified facts, not witnessed |
 | `[open]` | 210 | a live question — unknown, contested, or being worked |
 | `[unentered]` | 0 | a knowable value nobody has typed in yet |
 
@@ -405,7 +405,7 @@ Sorted by: kind, then alphabetically.
 -->
 | Node | Class | Label | Out | In |
 |---|---|---|--:|--:|
-| [`essa`](accountability-regime/essa.yml) | accountability-regime | Every Student Succeeds Act | 6 | 6 |
+| [`essa`](accountability-regime/essa.yml) | accountability-regime | Every Student Succeeds Act | 7 | 7 |
 | [`ohio-report-card`](accountability-regime/ohio-report-card.yml) | accountability-regime | Ohio School Report Card | 7 | 3 |
 | [`department-of-education-and-workforce`](actor/department-of-education-and-workforce.yml) | actor | Department of Education and Workforce | 3 | 6 |
 | [`ohio-department-of-education`](actor/ohio-department-of-education.yml) | actor | Ohio Department of Education (superseded) | 2 | 2 |
@@ -531,9 +531,9 @@ Sorted by: kind, then alphabetically.
 | [`tpp-replacement-payments`](revenue-stream/tpp-replacement-payments.yml) | revenue-stream | Tangible Personal Property Tax Replacement Payments | 6 | 7 |
 | [`fsfp-input-year-refresh`](scenario/fsfp-input-year-refresh.yml) | scenario | FSFP Cost Input Refresh vs. Freeze | 9 | 8 |
 | [`guarantee-phase-out`](scenario/guarantee-phase-out.yml) | scenario | Phasing Out the Temporary Transitional Aid Guarantee | 11 | 4 |
-| [`anton-grdina`](school/anton-grdina.yml) | school | Anton Grdina | 6 | 1 |
+| [`anton-grdina`](school/anton-grdina.yml) | school | Anton Grdina | 7 | 1 |
 | [`barrington-road-elementary`](school/barrington-road-elementary.yml) | school | Barrington Road Elementary School | 4 | 2 |
-| [`sheridan-high-school`](school/sheridan-high-school.yml) | school | Sheridan High School | 6 | 1 |
+| [`sheridan-high-school`](school/sheridan-high-school.yml) | school | Sheridan High School | 6 | 2 |
 
 129 nodes across 18 classes, and **2 with nothing pointing at them** — counting a citation in somebody's prose as pointing. Whether that is a gap depends on the class: `web/tests/unit/reachability.spec.ts` holds every node to having an inbound *edge* and exempts `draft-legislation`, where a node with nothing pointing at it is the design.
 <!-- /REGEN -->

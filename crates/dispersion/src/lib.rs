@@ -31,6 +31,7 @@
 
 #![forbid(unsafe_code)]
 
+pub mod building;
 pub mod casino;
 pub mod census_states;
 pub mod functions;
