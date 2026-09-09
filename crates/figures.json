@@ -217,6 +217,7 @@
     {"key": "project/transportation-proration-earmark-fy2014", "owner": "crates/project", "unit": "dollars", "value": 413385915.0, "label": "The earmark the transportation proration divides by, FY2014"},
     {"key": "project/transportation-supplement-earmark-fy2014", "owner": "crates/project", "unit": "dollars", "value": 25300000.0, "label": "The earmark for the payment that undoes the proration, FY2014"},
     {"key": "project/transportation-proration-share-of-the-line", "owner": "crates/project", "unit": "share", "value": 0.8185640441270794, "label": "How much of ALI 200502 the proration's own denominator is, FY2014"},
+    {"key": "regime-diff/walter-in-derolph-i", "owner": "crates/regime-diff", "unit": "count", "value": 76, "label": "Times DeRolph I names Walter, in an opinion that never says overrule"},
     {"key": "project/gifted-statewide-total", "owner": "crates/project", "unit": "dollars", "value": 54445264.50999995, "label": "FY2027 gifted funding as the department pays it, summed over the panel"},
     {"key": "project/gifted-coordinator-aid-statewide", "owner": "crates/project", "unit": "dollars", "value": 13995587.23000003, "label": "FY2027 gifted coordinator units, what they pay statewide"},
     {"key": "project/gifted-specialist-k8-aid-statewide", "owner": "crates/project", "unit": "dollars", "value": 20980411.169999953, "label": "FY2027 gifted K-8 intervention specialist units, what they pay statewide"},

@@ -95,14 +95,16 @@ test("every bound figure in the corpus agrees with the crate it cites", () => {
  * 487/62 at the two supplements' own history, with no new carrier, and 492/62 when the F-33
  * panel's numerator was published beside the quotient the corpus had been carrying alone, and
  * 496/62 when parity aid turned out to be what targeted assistance succeeded, and 499/62 at the
- * transportation proration that was an appropriation rather than a dial.
+ * transportation proration that was an appropriation rather than a dial, and 500/63 when
+ * `litigation/cincinnati-v-walter-1979` became the sixty-third carrier — the first `litigation`
+ * node to bind anything, and it binds a count of words in an opinion.
  */
 test("the corpus binds no fewer figures than it did", () => {
-  expect(bindings.length, "499 bindings; raise this when you add one").toBeGreaterThanOrEqual(499);
+  expect(bindings.length, "500 bindings; raise this when you add one").toBeGreaterThanOrEqual(500);
   expect(
     corpus.nodes.filter((node) => node.figures.length > 0).length,
-    "62 nodes carry bindings; raise this when a sixty-third does",
-  ).toBeGreaterThanOrEqual(62);
+    "63 nodes carry bindings; raise this when a sixty-fourth does",
+  ).toBeGreaterThanOrEqual(63);
   expect(
     new Set(bindings.map((binding) => binding.key)).size,
     "every figure the manifest exports is bound by some node",

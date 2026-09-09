@@ -4004,6 +4004,23 @@ pub static FIGURES: &[Figure] = &[
         },
     },
     Figure {
+        key: "regime-diff/walter-in-derolph-i",
+        owner: "crates/regime-diff",
+        unit: Unit::Count,
+        label: "Times DeRolph I names Walter, in an opinion that never says overrule",
+        pinned: 76.0,
+        tolerance: 0.0,
+        compute: |_| {
+            let opinion = edfund_core::records::record(
+                include_str!("../../regime-diff/fixtures/derolph-opinions.txt"),
+                "derolph-i",
+            );
+            let flat = opinion.body.split_whitespace().collect::<Vec<_>>().join(" ");
+            assert_eq!(flat.to_lowercase().matches("overrul").count(), 0);
+            flat.matches("Walter").count() as f64
+        },
+    },
+    Figure {
         key: "project/gifted-statewide-total",
         owner: "crates/project",
         unit: Unit::Dollars,
