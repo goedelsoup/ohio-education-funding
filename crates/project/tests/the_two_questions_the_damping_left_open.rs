@@ -46,7 +46,7 @@
 //! **0.18%**. That is not worth a second change to a published constant, and it is the expected
 //! direction: a less noisy rate can be carried a little further before it stops helping.
 //!
-//! # What stands between this and the feed
+//! # What stood between this and the feed, and how it was crossed
 //!
 //! The projection runs on **enrolled ADM**, which the department publishes for three years. The
 //! long rate here is **`V33` fall membership**, which the Census publishes for fifteen. They are
@@ -59,10 +59,15 @@
 //!
 //! That is the strongest evidence here that the three-point window is noise-dominated — if a
 //! two-year rate were mostly signal, two measures of the same children would agree on it. But it
-//! is also exactly why the blend cannot be dropped into the feed as a mechanical change: it would
-//! mean shrinking an ADM rate toward an F-33 rate, and the assumption that the two series share a
-//! long-run trend while differing in short-run noise is one this repository cannot test, because
-//! only three years of ADM exist. Stated rather than assumed, and left to a decision.
+//! is also exactly why the blend could not be dropped into the feed as a mechanical change: it
+//! means shrinking an ADM rate toward an F-33 rate, and the assumption that the two series share
+//! a long-run trend while differing in short-run noise is one this repository cannot test,
+//! because only three years of ADM exist.
+//!
+//! It was made a decision rather than an improvement, and taken:
+//! [`the-shrunk-rate`](../../../.yidam/decisions/the-shrunk-rate.yml) owns the assumption and
+//! `Method::Shrunk` is what the feed now uses, at this weight. The numbers below are the evidence
+//! it rests on, so they stay measured here rather than moving into the record.
 //!
 //! [`the-fitted-damping`]: ../../../.yidam/decisions/the-fitted-damping.yml
 

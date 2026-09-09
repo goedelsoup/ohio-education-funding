@@ -613,4 +613,94 @@ mod tests {
                 < 1e-5
         );
     }
+    /// The shrink blends the series' own rate with the one it is pointed at.
+    ///
+    /// A district falling 2% a year over three points, whose long-run rate is flat, should carry
+    /// three-tenths of the 2%. Mirrored in `web/tests/unit/project.spec.ts`, which is the
+    /// implementation the published page runs — the two have to agree to the bit, and have twice
+    /// not: once over `mul_add` and once over the feed's decimal places.
+    #[test]
+    fn a_shrunk_rate_is_the_weighted_sum_of_its_own_and_the_one_it_points_at() {
+        let fitted = fit(
+            &series(2024, &[100.0, 98.0, 96.04]),
+            Method::Shrunk {
+                rate: 0.0,
+                damping: DEFAULT_DAMPING,
+                weight: 0.3,
+                toward: 0.0,
+            },
+        );
+        match fitted {
+            Method::Shrunk { rate, .. } => assert!(
+                (rate - 0.3 * -0.02).abs() < 1e-12,
+                "expected three-tenths of -2%, got {rate}"
+            ),
+            other => panic!("the method should stay shrunk; it is {}", other.label()),
+        }
+    }
+
+    /// A weight of one reproduces the damped rate exactly.
+    ///
+    /// The property that makes the contract change safe to read: a consumer that has not learned
+    /// about the shrink, reading `shrink_weight: 1`, gets the arithmetic it had before. It also
+    /// pins that `toward` cannot leak in through a rounding path when it is meant to be ignored.
+    #[test]
+    fn shrinking_at_a_weight_of_one_reproduces_the_damped_rate() {
+        let observations = series(2024, &[100.0, 98.0, 96.04]);
+        let damped = fit(
+            &observations,
+            Method::Damped {
+                rate: 0.0,
+                damping: DEFAULT_DAMPING,
+            },
+        );
+        let shrunk = fit(
+            &observations,
+            Method::Shrunk {
+                rate: 0.0,
+                damping: DEFAULT_DAMPING,
+                weight: 1.0,
+                toward: -0.5,
+            },
+        );
+        let (Method::Damped { rate: a, .. }, Method::Shrunk { rate: b, .. }) = (damped, shrunk)
+        else {
+            panic!("both fits should keep their variant");
+        };
+        assert!((a - b).abs() < f64::EPSILON, "{a} against {b}");
+    }
+
+    /// Shrinking carries exactly as damping does once the rate is settled.
+    #[test]
+    fn a_shrunk_projection_advances_like_a_damped_one_at_the_same_rate() {
+        let shrunk = project(
+            &series(2024, &[100.0, 98.0, 96.04]),
+            FiscalYear(2030),
+            Method::Shrunk {
+                rate: 0.0,
+                damping: DEFAULT_DAMPING,
+                weight: 1.0,
+                toward: 0.0,
+            },
+            prior(),
+        );
+        let damped = project(
+            &series(2024, &[100.0, 98.0, 96.04]),
+            FiscalYear(2030),
+            Method::Damped {
+                rate: 0.0,
+                damping: DEFAULT_DAMPING,
+            },
+            prior(),
+        );
+        for (s, d) in shrunk.iter().zip(&damped) {
+            assert!(
+                (s.point - d.point).abs() < f64::EPSILON,
+                "FY{}: {} against {}",
+                s.fiscal_year.0,
+                s.point,
+                d.point
+            );
+        }
+    }
 }
