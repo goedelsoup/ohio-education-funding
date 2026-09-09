@@ -52,6 +52,46 @@ findings: |
   instruction +25.7%, support +28.2%, other +11.4%. [verified] Support grew fastest, but only
   slightly, and from a smaller base.
 
+  ### Every dollar of the rise since FY2010 is the denominator
+
+  The federal district panel now runs FY2009 to FY2024 and carries the numerator beside the
+  quotient, which the statewide series does not. Over FY2010 to FY2024, on Ohio's comparable
+  districts: [verified —
+  [`crates/dispersion`](../../../crates/dispersion/tests/what_the_series_did_after_it_stopped.rs)]
+
+      real spending per pupil    +8.86%
+      real total spending        -1.11%   FY2024 is 0.9889 of FY2010
+      fall membership            -9.16%
+
+  Those are one statement, not three. A quotient's growth is its numerator's over its
+  denominator's, and the identity closes to the fourth decimal. Ohio's traditional districts
+  spent slightly *less* in FY2024, in constant dollars, than they spent in FY2010, and the
+  per-pupil rise is 152,889 fewer children.
+
+  This node already warns that per-pupil growth "is partly a numerator effect and partly a
+  denominator one, and attributing it wholly to spending decisions is wrong". On this population
+  over these years it is not partly. It is all of it.
+
+  Part of the enrolment fall is children moving rather than children not existing: 88,974 pupils
+  sat outside the comparable set in FY2010 against 134,885 in FY2022, about a third of the
+  district loss over the same span, and the rest is demographic. That changes what the arithmetic
+  is about and not the arithmetic. [verified]
+
+  ### So the rule has a third clause
+
+  The node's existing rules are name the index and name the window. The panel adds **name the
+  denominator** — and it is the same class of error as the weighted-versus-headcount confusion
+  this metric was built around, one level up. Per pupil and in total are two answers to "did Ohio
+  increase spending", they disagree in sign over a fifteen-year window, and neither is wrong.
+  [inference]
+
+  ### The pandemic year is the same error in miniature
+
+  FY2020 to FY2021 the panel's real spending per pupil is flat — up a seventh of one per cent —
+  while its real total spending falls **3.3%**. Fall membership dropped **54,777** pupils in a
+  single year and was still 43,000 short of FY2020 two years later. A reader with the per-pupil
+  series alone sees a year in which nothing happened. [verified]
+
   ### The disagreement about this series is periodic, not only definitional
 
   [OCG White Paper 015](../../catalog/ocg-white-paper-015.md) makes the best available case
@@ -120,6 +160,28 @@ findings: |
   a finding, which is the error this corpus most often finds in secondary reporting. Neither
   figure identifies an effect in either direction. [verified]
 figures:
+  # The federal district panel across all fifteen years it now holds: the numerator, the
+  # denominator, and the quotient the corpus used to carry alone.
+  - key: dispersion/panel-real-per-pupil-growth-fy2010-fy2024
+    value: 0.08858650183221317
+    field: findings
+    as_written: "real spending per pupil    +8.86%"
+  - key: dispersion/panel-real-total-fy2024-over-fy2010
+    value: 0.9889110408173625
+    field: findings
+    as_written: "FY2024 is 0.9889 of FY2010"
+  - key: dispersion/panel-enrolment-decline-fy2010-fy2024
+    value: 0.09156411626185512
+    field: findings
+    as_written: "fall membership            -9.16%"
+  - key: dispersion/panel-real-total-fall-fy2020-fy2021
+    value: 0.0333420335690118
+    field: findings
+    as_written: "real total spending falls **3.3%**"
+  - key: dispersion/panel-pupils-lost-fy2021
+    value: 54777
+    field: findings
+    as_written: "dropped **54,777** pupils"
   - key: dispersion/operating-expenditure-median
     value: 15646.0288
     field: findings
@@ -348,8 +410,20 @@ properties:
     Real spending peaked in FY2020, not FY2022. At $15,747 it stands about $433 above the
     FY2022 figure of $15,314. [verified — crates/deflator] Federal COVID relief arrived while
     prices were still low and was then eroded by the FY2021-22 inflation, so the nominal high and
-    the real high are two years apart. The FY2020 nominal input is a chart approximation, so the gap should be
-    confirmed against exact figures — but it exceeds the approximation error. [open]
+    the real high are two years apart.
+
+    **The federal district panel does not reproduce that peak.** On exact figures rather than
+    chart labels, FY2020 and FY2021 sit within $21 of each other, FY2022 is $112 below FY2020,
+    and FY2023 and FY2024 are both above everything before them. The dip after FY2020 is there
+    and it is a tenth the size; the summit is not. [verified —
+    [`crates/dispersion`](../../../crates/dispersion/tests/what_the_series_did_after_it_stopped.rs)]
+
+    The two are different entity sets, so this does not settle the Auditor's series — its wider
+    population includes the community schools and service centres the panel excludes, and those
+    were where a large part of the relief money landed. What it does settle is that "real spending
+    peaked in FY2020" cannot be carried as a general fact about Ohio: on the one exact per-district
+    record the corpus holds, it is false. Whether the Auditor's own population peaks there is still
+    unresolved and now has a specific shape. [open]
 
     **THE TROUGH HAS NOW BEEN LOCATED DISTRICT BY DISTRICT**, not from the Auditor's dashboard
     but from the federal survey underneath it: the Census F-33 district panel, extended back to
@@ -397,13 +471,17 @@ properties:
     not interchangeable and should never be quoted as one; that they agree on the shape is what
     licenses reading them together.
 
-    FY2014 is absent from the NCES archive under every naming the surrounding years use, so the
-    district measurement stops at FY2013 and understates the trough — the Auditor's series is
-    still falling between FY2012 and FY2014. [open]
+    FY2014 is absent from the NCES archive under every naming the surrounding years use. That
+    used to mean the district measurement stopped at FY2013, at the open end of the series. It
+    no longer does: the panel now runs to **FY2024**, FY2013 is the minimum of all fifteen years
+    it holds, and FY2015 — which the trough reading did not have — is 1.7% above it. The missing
+    year sits between two observed ones rather than beyond the last. It is still unpriced, and it
+    is a materially smaller unknown than it was. [open]
 
     Per-district series also exist on the Auditor's own dashboard, on the same entity basis as
-    the statewide series here, and remain unextracted. They would settle the last of it. [open]
-    [open]
+    the statewide series here, and remain unextracted. That is now the only route left to the
+    FY2020 question above, because the entity basis is what the two records disagree about; it is
+    no longer the route to a per-district series at all. [open]
   caveats: |
     Entity scope is wider than the 611 districts receiving foundation funding: it includes
     JVSDs, educational service centers, community schools, STEM schools, and state- and
