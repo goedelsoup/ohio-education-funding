@@ -111,6 +111,148 @@ fn two_of_the_three_qualifying_routes_do_not_require_a_good_rating() {
     );
 }
 
+/// The measure that takes a district's budget authority is paying it at the same time.
+///
+/// `intervention/academic-distress-commission` recorded that "a district can be receiving a
+/// supplement calculated from its rating in the years that rating is accumulating toward the loss
+/// of its budget authority", and that whether any district had been in both positions at once was
+/// "not established here and is checkable". It is checkable, the department's own FY2027 model is
+/// where, and the answer is yes.
+///
+/// Ohio has had three academic distress commissions. All three districts are in this panel:
+///
+///     East Cleveland   3 stars    progress 4   released           $55,029.14
+///     Lorain           2 stars    progress 2   dissolved by H.B. 33      $0
+///     Youngstown       2.5 stars  progress 3   still under one   $162,207.67
+///
+/// **Youngstown is under a commission today and is paid.** So the two positions are held at once,
+/// and the reason they can be is that the node's own framing — "the same number pays and takes" —
+/// is not quite right. **It is not the same number.** R.C. 3302.10 triggers on the *overall*
+/// rating. The supplement pays on the greater of the overall and progress ratings, gated by three
+/// routes, two of which read progress alone. Youngstown is taken by one component of the report
+/// card and paid by another, and every one of the fifteen districts below is paid the same way.
+///
+/// # And the threshold that pays is below the threshold that releases
+///
+/// R.C. 3302.10(N)(1) needs **three stars** to begin a transition out of a commission. 59
+/// districts in this panel sit below that — Youngstown among them at 2.5 — and 15 of them are
+/// paid, $3.0m in total, not one of them through the star route. A district can be too poorly
+/// rated to start its own release and well enough rated to be paid for its performance in the
+/// same year.
+///
+/// Two of the 59 are the department's own zero-fill rather than a rating: College Corner Local
+/// and Kelleys Island Local read 0 stars and 0 progress on the source sheet, and Kelleys Island
+/// has an ADM of 3.51. A report card cannot rate ten students it is not allowed to report.
+#[test]
+fn the_supplement_reaches_districts_the_same_report_card_put_under_state_control() {
+    let panel = panel::panel();
+    let district = |irn: &str| {
+        panel
+            .iter()
+            .find(|r| r.irn == irn)
+            .unwrap_or_else(|| panic!("{irn} is not in the FY2027 panel"))
+    };
+
+    // The three districts named by `catalog/dew-academic-distress-commission`.
+    let east_cleveland = &district("043901").performance;
+    let lorain = &district("044263").performance;
+    let youngstown = &district("045161").performance;
+
+    assert_eq!(
+        (east_cleveland.stars, east_cleveland.progress),
+        (Some(3.0), Some(4.0))
+    );
+    assert_eq!((lorain.stars, lorain.progress), (Some(2.0), Some(2.0)));
+    assert_eq!(
+        (youngstown.stars, youngstown.progress),
+        (Some(2.5), Some(3.0))
+    );
+
+    // The one still under a commission is the one that settles the question.
+    assert!(
+        youngstown.eligible && youngstown.amount > 0.0,
+        "Youngstown is under an academic distress commission and this asserts it is also paid"
+    );
+    assert!(
+        common::close(youngstown.amount, 162_207.67),
+        "Youngstown's supplement is {}",
+        youngstown.amount
+    );
+    assert!(
+        common::close(east_cleveland.amount, 55_029.14),
+        "East Cleveland's supplement is {}",
+        east_cleveland.amount
+    );
+    assert_eq!(
+        lorain.amount, 0.0,
+        "Lorain qualifies on none of the three routes"
+    );
+
+    // Not the same number: both paid districts are paid on progress, not on their overall rating.
+    for (name, supplement) in [
+        ("East Cleveland", east_cleveland),
+        ("Youngstown", youngstown),
+    ] {
+        assert_eq!(
+            supplement.route(),
+            Some("a progress rating of 3 or more"),
+            "{name} is paid on its progress rating, not on the rating that took its budget"
+        );
+    }
+
+    // R.C. 3302.10(N)(1)'s release threshold, against the supplement's own gates.
+    let below_release: Vec<_> = panel
+        .iter()
+        .filter(|r| r.performance.stars.is_some_and(|s| s < 3.0))
+        .collect();
+    let paid: Vec<_> = below_release
+        .iter()
+        .filter(|r| r.performance.eligible)
+        .collect();
+    assert_eq!(
+        below_release.len(),
+        59,
+        "districts below the release threshold"
+    );
+    assert_eq!(
+        paid.len(),
+        15,
+        "of those, districts paid a performance supplement"
+    );
+    let below_release_total = paid.iter().map(|r| r.performance.amount).sum::<f64>();
+    assert!(
+        common::close(below_release_total, 3_036_977.90),
+        "paid to districts that could not begin a release: {below_release_total}"
+    );
+    assert!(
+        paid.iter()
+            .all(|r| r.performance.route() != Some("an overall rating above 3.5 stars")),
+        "a district below three stars cannot reach the star route, so finding one would mean          the routes or the threshold have moved"
+    );
+
+    // And the trigger band itself: less than two stars for three years establishes a commission.
+    let at_the_trigger: Vec<_> = panel
+        .iter()
+        .filter(|r| r.performance.stars.is_some_and(|s| s <= 2.0))
+        .collect();
+    let paid_at_the_trigger: Vec<_> = at_the_trigger
+        .iter()
+        .filter(|r| r.performance.eligible)
+        .collect();
+    assert_eq!(at_the_trigger.len(), 15);
+    assert_eq!(
+        paid_at_the_trigger.len(),
+        1,
+        "exactly one district in the trigger band is paid"
+    );
+    assert_eq!(paid_at_the_trigger[0].name, "Jefferson Township Local");
+    assert!(
+        common::close(paid_at_the_trigger[0].performance.amount, 10_426.68),
+        "the trigger band's one paid district receives {}",
+        paid_at_the_trigger[0].performance.amount
+    );
+}
+
 /// The finding: a component of an equalising formula, distributed inversely to need.
 ///
 /// Sorted into quintiles by economically disadvantaged share, the mean performance supplement per

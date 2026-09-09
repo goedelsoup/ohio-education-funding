@@ -320,16 +320,16 @@ Fields: count per claim tag across every node; then the unresolved marks by the 
 -->
 | Tag | Count | What it records |
 |---|--:|---|
-| `[verified]` | 1248 | supported by a committed primary source |
-| `[inference]` | 282 | drawn from verified facts, not witnessed |
-| `[open]` | 211 | a live question — unknown, contested, or being worked |
+| `[verified]` | 1254 | supported by a committed primary source |
+| `[inference]` | 283 | drawn from verified facts, not witnessed |
+| `[open]` | 210 | a live question — unknown, contested, or being worked |
 | `[unentered]` | 0 | a knowable value nobody has typed in yet |
 
-211 unresolved marks, and every one of them is a live question. The fourth mark is gone from the prose: a field nobody has filled in is carried as `unfilled:` structure on the node it belongs to, which is what `[unentered]` used to say inline on an axis it did not belong to.
+210 unresolved marks, and every one of them is a live question. The fourth mark is gone from the prose: a field nobody has filled in is carried as `unfilled:` structure on the node it belongs to, which is what `[unentered]` used to say inline on an axis it did not belong to.
 
 | Field | `[open]` | `[unentered]` |
 |---|--:|--:|
-| `findings` | 68 | 0 |
+| `findings` | 67 | 0 |
 | `description` | 53 | 0 |
 | `series` | 11 | 0 |
 | `revisions` | 10 | 0 |
@@ -461,7 +461,7 @@ Sorted by: kind, then alphabetically.
 | [`evidence-based-model`](funding-regime/evidence-based-model.yml) | funding-regime | Evidence-Based Model | 5 | 8 |
 | [`fair-school-funding-plan`](funding-regime/fair-school-funding-plan.yml) | funding-regime | Fair School Funding Plan | 22 | 27 |
 | [`foundation-base-cost-formula`](funding-regime/foundation-base-cost-formula.yml) | funding-regime | Foundation Base Cost Formula | 8 | 13 |
-| [`academic-distress-commission`](intervention/academic-distress-commission.yml) | intervention | Academic Distress Commission | 7 | 4 |
+| [`academic-distress-commission`](intervention/academic-distress-commission.yml) | intervention | Academic Distress Commission | 8 | 4 |
 | [`lea-level-action`](intervention/lea-level-action.yml) | intervention | Additional Optional Action (LEA level) | 4 | 2 |
 | [`more-rigorous-interventions`](intervention/more-rigorous-interventions.yml) | intervention | More Rigorous Interventions (CSI) | 5 | 2 |
 | [`hb-1-2009`](legislation/hb-1-2009.yml) | legislation | Am. Sub. H.B. 1 (2009) — FY2010-11 Budget; Evidence-Based Model | 4 | 7 |
@@ -493,7 +493,7 @@ Sorted by: kind, then alphabetically.
 | [`general-fund-cash-balance`](metric/general-fund-cash-balance.yml) | metric | General Fund Cash Balance | 4 | 3 |
 | [`per-pupil-operating-expenditure`](metric/per-pupil-operating-expenditure.yml) | metric | Per-Pupil Operating Expenditure | 12 | 4 |
 | [`performance-index`](metric/performance-index.yml) | metric | Performance Index | 6 | 12 |
-| [`progress-value-added`](metric/progress-value-added.yml) | metric | Progress (Value-Added) | 5 | 5 |
+| [`progress-value-added`](metric/progress-value-added.yml) | metric | Progress (Value-Added) | 5 | 6 |
 | [`state-share-percentage`](metric/state-share-percentage.yml) | metric | State Share Percentage | 5 | 3 |
 | [`education-savings-account-act`](model-policy/education-savings-account-act.yml) | model-policy | Education Savings Account Act | 4 | 1 |
 | [`parental-choice-scholarship-act`](model-policy/parental-choice-scholarship-act.yml) | model-policy | Parental Choice Scholarship Program Act (Universal Eligibility) | 5 | 1 |
