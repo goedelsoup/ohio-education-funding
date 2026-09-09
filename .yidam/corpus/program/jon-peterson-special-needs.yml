@@ -69,9 +69,32 @@ properties:
     Scholarship Annual Report; the dollar figure is the sum of the report's six disability-category
     totals, which the report displays without totalling]
 
-    The statutory bound is the least of: the fees charged by the student's provider; or $7,190
-    plus a supplement determined by disability category — $2,855 for a disability specified in
-    R.C. 3317.013(A), and other amounts for other categories. [verified — R.C. 3317.022(A)(13)]
+    The statutory bound is the **least of three** things: the fees charged by the student's
+    provider; $7,190 plus a supplement determined by disability category; and **$34,000**.
+    [verified — R.C. 3317.022(A)(13), read by
+    [`crates/project`](../../../crates/project/tests/the_award_the_statute_computes.rs)] The six
+    supplements, which this node held only the first of —
+
+        category   supplement   base + supplement
+        one          $2,855        $10,045
+        two          $5,879        $13,069
+        three       $12,879        $20,069
+        four        $16,890        $24,080
+        five        $22,560        $29,750
+        six         $31,932        $39,122   capped at $34,000
+
+    **The formula already exceeds its own ceiling.** A category six student computes to $39,122
+    and is paid at most $34,000 — a $5,122 haircut on the most severely disabled category in the
+    programme, before any year of indexing. [verified] Category five is $4,250 below the ceiling
+    and rising.
+
+    That matters because the three terms are indexed differently. The $7,190 base rises with the
+    statewide average base cost per pupil; the six supplements rise with the special education
+    category amounts under R.C. 3317.022(A)(3); **the $34,000 ceiling carries no indexing clause
+    at all** — the same silence `program/autism-scholarship` records for its own $34,000, which is
+    the same figure in the adjacent division. [verified] Two indexed terms under an unindexed cap
+    means the cap binds progressively: it reaches category five next, and then each category in
+    turn. [inference]
 
     The award is therefore category-scaled in the same way the special education weights are, and
     the six category totals in the annual report are the only published decomposition of this
@@ -91,6 +114,15 @@ properties:
     a Legal Basis naming the establishing act, and is now retrievable — see
     [`the-catalog-of-budget-line-items`](../../decisions/the-catalog-of-budget-line-items.yml).
     Not yet extracted. [open]
+figures:
+  - key: project/jon-peterson-award-severest-category
+    value: 39122.0
+    field: amount
+    as_written: "computes to $39,122"
+  - key: project/jon-peterson-ceiling-haircut
+    value: 5122.0
+    field: amount
+    as_written: "a $5,122 haircut"
 links:
   - target: ../program.ont.yml
     relationship: instance-of

@@ -68,6 +68,7 @@ pub mod outcomes;
 pub mod panel;
 pub mod policy;
 pub mod report;
+pub mod scholarship;
 pub mod series;
 pub mod statute;
 

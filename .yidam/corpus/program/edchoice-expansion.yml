@@ -24,8 +24,10 @@ description: |
   2025](../litigation/vouchers-hurt-ohio-2025.yml), on Ohio constitutional grounds distinct
   from the federal question *Zelman* settled. That ruling is under appeal. [verified]
 
-  Award amounts by income band, participation counts by resident district, and total
-  appropriation by fiscal period are not held here. [open]
+  **There are no income bands.** The award is a continuous function of family income, and both
+  sections that compute it have been in the committed statute extract since it was wired — see the
+  findings. Participation counts by resident district and total appropriation by fiscal period are
+  still not held. [open]
 findings: |
   **Two advocacy scorecards rank Ohio on this program, and neither measures what this corpus
   measures.** ALEC's [Index of State Education
@@ -40,6 +42,56 @@ findings: |
   of its own advocates. That is a fact about the channel, not about whether Ohio's districts
   are adequately funded, and the ranks are two editions two years apart across the universal
   expansion — so they are not a series and differencing them would invent one. [inference]
+
+  ### The voucher ceiling is pegged to the public formula's own base cost
+
+  R.C. 3317.022 does not fix $5,500 and $7,500. It directs both to "increase in future fiscal years
+  by the same percentage that the statewide average base cost per pupil increases in future fiscal
+  years". [verified —
+  [`crates/project`](../../../crates/project/tests/the_award_the_statute_computes.rs)] Three
+  amounts in the section carry that clause — these two and the [Jon Peterson
+  base](jon-peterson-special-needs.yml) — and the two $34,000 special-needs ceilings carry none.
+
+  So raising base cost raises every EdChoice and pilot-project ceiling with it, automatically and
+  without a vote on the scholarship channel. The lever is a narrow one: it is the *statewide
+  average base cost per pupil* of R.C. 3317.018(A), so an
+  [input-year refresh](../scenario/fsfp-input-year-refresh.yml) that lifts that average carries the
+  voucher ceiling up with it, while the
+  [phase-in](../parameter/fsfp-phase-in-percentage.yml) does not — the phase-in interpolates a
+  district's *funding* toward the computed amount and leaves base cost per pupil where it is.
+  [inference] The two channels are not independent parameters of one budget; one is indexed to a
+  term inside the other.
+
+  That is a different relationship from the one the [deduction](../../skills/deduction.md) question
+  asks about. A deduction would make the scholarship a transfer *out of* a district's payment;
+  this makes the scholarship's ceiling a *function of* what districts are computed to need. The
+  corpus established the first is absent under the plan; the second is present and was not
+  recorded anywhere.
+
+  ### And the published average is not evidence about the ceiling
+
+  Every award is the **lesser** of the ceiling and the school's base tuition net of discounts, so
+  the 2025 report's $4,958.41 average for this programme is bounded above by a mix of two indexed
+  ceilings and by tuition, and cannot be read as saying which of the three binds. [inference] A
+  reader wanting to know how much of the ceiling is used needs tuition by school, which the corpus
+  does not hold.
+figures:
+  - key: project/edchoice-full-award-ceiling
+    value: 4.5
+    field: amount
+    as_written: "**0.5 raised to (income/poverty \u2212 4.5)**"
+  - key: project/edchoice-minimum-award-threshold
+    value: 7.82193
+    field: amount
+    as_written: "**7.82 times the federal poverty guidelines**"
+  - key: project/edchoice-award-at-five-hundred-and-fifty-per-cent
+    value: 2750.0
+    field: amount
+    as_written: "550%                 $2,750"
+  - key: project/edchoice-minimum-award-k8
+    value: 550.0
+    field: amount
+    as_written: "782.19% and above      $550"
 properties:
   name: EdChoice Expansion Scholarship
   mechanism: |
@@ -68,8 +120,39 @@ properties:
   eligibility: |
     Originally income-limited. Am. Sub. H.B. 33 (2023) made all Ohio students eligible, with
     award amount scaled by family income relative to the federal poverty level rather than
-    eligibility restricted by it. [verified] Exact bands not yet established. [open]
-  amount: Not yet populated. [open] Varies by grade band and family income.
+    eligibility restricted by it. [verified] There are no bands to establish — the scaling is
+    continuous. See `amount`.
+  amount: |
+    **A ceiling of $5,500 for grades kindergarten through eight and $7,500 for grades nine
+    through twelve, scaled down by family income above 450% of the federal poverty guidelines.**
+    [verified — R.C. 3317.022(A)(10)(a)(ii) and R.C. 3310.08, read by
+    [`crates/project`](../../../crates/project/tests/the_award_the_statute_computes.rs)]
+
+    The scaling is a curve, not a schedule. R.C. 3310.08 defines a "constant multiplier" of 0.50
+    and a "power equation" of the family's income-to-poverty multiple times its natural logarithm;
+    read back, the award is the base times **0.5 raised to (income/poverty − 4.5)**. It **halves
+    for every further hundred percentage points** of family income relative to poverty, and stops
+    at a "minimum amount" of a tenth of the base. [verified]
+
+        family income        K-8 award    9-12 award
+        up to 450% FPL       $5,500       $7,500
+        550%                 $2,750       $3,750
+        650%                 $1,375       $1,875
+        750%                   $687.50      $937.50
+        782.19% and above      $550         $750
+
+    The last row is derived rather than stated: the statute gives the floor as an amount and never
+    says at what income it binds. Solving the decay against the ten per cent floor puts it at
+    **7.82 times the federal poverty guidelines**, past which a family's income is no longer an
+    input to the award at all. [inference]
+
+    Two things bound what this can be used for. The award is the **lesser** of this and the
+    school's base tuition net of discounts, so it is a ceiling and not a payment; and the two base
+    amounts "shall increase in future fiscal years by the same percentage that the statewide
+    average base cost per pupil increases", so they are the enacted values and a later year's
+    payments must be compared against an indexed figure. [verified] The dollar value of 450% of
+    poverty is not here: it depends on family size, and the statute reaches it by pointing at
+    R.C. 5101.46.
   appropriation_line: |
     **No line of its own — it is paid from the foundation aid appropriation.** Five line items
     "are used to collectively support state foundation aid payments for all public school students
