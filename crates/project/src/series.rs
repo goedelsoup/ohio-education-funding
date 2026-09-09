@@ -11,6 +11,14 @@
 //! district is, but we know how much districts differ from one another, and that is a defensible
 //! floor on the uncertainty. Every [`Projection`] records the [`Prior`] that produced its
 //! interval, because an interval whose provenance is unstated is decoration.
+//!
+//! It is a floor, and `tests/the_floor_the_interval_rests_on.rs` measures by how much. Backtested
+//! on the F-33 panel, realized forecast error is wider than this band at every horizon from one
+//! to five years — but by 1.18x at one year and 1.40x at five, because the dispersion grows as
+//! `horizon^0.60` and [`Prior::spread`] widens as `horizon^0.50`. At one year the band is very
+//! nearly calibrated, covering 67.3% against the 68.3% a one-sigma interval should hold; at five
+//! it covers 55.8%. The horizons this crate publishes are further out than the backtest reaches,
+//! so those are lower bounds on the shortfall where it matters most.
 
 use edfund_core::FiscalYear;
 
@@ -202,6 +210,15 @@ impl Prior {
     /// Growth errors compound, so the band widens with the square root of the horizon rather
     /// than staying fixed — the standard random-walk result, and the reason a five-year
     /// projection is not five times as uncertain as a one-year one.
+    ///
+    /// District enrolment is not quite a random walk, and the exponent is where that shows.
+    /// `tests/the_floor_the_interval_rests_on.rs` fits **0.60** against the 0.50 used here:
+    /// forecast errors are positively autocorrelated, because a district whose trend is misjudged
+    /// stays misjudged rather than drawing a fresh error each year. The band is therefore too
+    /// narrow by a margin that grows with the horizon, which is a property of this rule and not
+    /// of `sigma` — no rescaling of the prior corrects a band that is the wrong shape in
+    /// `horizon`. Changing it is a decision with a record: the web layer re-derives this
+    /// arithmetic and must reproduce it.
     #[must_use]
     pub fn spread(&self, horizon: u16) -> f64 {
         self.z * self.sigma * f64::from(horizon).sqrt()
