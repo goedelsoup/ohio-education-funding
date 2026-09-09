@@ -156,14 +156,22 @@ findings: |
   **AND THE GUARANTEE ABSORBS MOST OF THE ERROR, WHICH BOUNDS WHAT IT COSTS.** [verified —
   `crates/project`]
   At the feed's FY2036 horizon, moving the damping from 0.85 to 0.30 moves statewide ADM by
-  **+4.66%** — 61,297 pupils — and realized state aid by only **+1.05%**, or $75.4m. The
-  enrollment error is four times the aid error for the reason this node already gives: the
-  guarantee pays a fixed amount to about half the state, so state cost is far less sensitive to
-  enrollment than the enrollment forecast is uncertain. The constant is wrong and the consequence
-  is bounded, and both halves belong in the same sentence.
+  **+3.38%** — 45,294 pupils — and realized state aid by **+1.42%**, or $101.0m. The enrollment
+  error is more than twice the aid error for the reason this node already gives: the guarantee
+  pays a fixed amount to about half the state, so state cost is far less sensitive to enrollment
+  than the enrollment forecast is uncertain. The constant was wrong and the consequence is
+  bounded, and both halves belong in the same sentence.
 
-  What moves most is not a dollar figure. **47 districts** change guarantee status at the horizon
-  — 367 against 320 — and that is a count the site publishes.
+  What moves most is not a dollar figure. **44 districts** change guarantee status at the horizon
+  — 356 against 312 — and that is a count the site publishes.
+
+  These figures are measured under `Method::Shrunk`, which is what the feed runs. The same move
+  under the plain `Method::Damped` that shipped when the damping was fitted gives +4.66% and
+  61,297 pupils, +1.05% and $75.4m, and 47 districts against 44 — and a four-to-one ratio of
+  enrollment to aid rather than this two-and-a-half. `the_damping_nobody_fitted` keeps those,
+  because they are the evidence [the-fitted-damping](../../decisions/the-fitted-damping.yml)
+  was decided on and a decision's evidence has to keep reproducing; the figures above are what
+  the same question answers today, pinned in `the_trend_the_damping_discards`.
 
   **THE LARGEST POPULATION OUTSIDE THE COUNT HAS NO PER-DISTRICT RECORD AT ALL.** [verified —
   `crates/project`]
@@ -256,6 +264,42 @@ findings: |
   share a long-run trend while differing in short-run noise, and only three years of ADM exist, so
   nothing here can test it. The disagreement is at once the best evidence that a two-year rate is
   mostly noise and the reason the substitution could not be made mechanically.
+
+  **AND THE THING NEITHER FITTING DECISION COULD SEE IS THAT THE PROJECTIONS RUN HIGH.**
+  [verified — `crates/project`]
+  Both were scored on mean absolute log error, which is blind to sign. The five-year backtest
+  bias falls monotonically as the damping rises — **+0.033** at a damping of zero, **+0.030** at
+  the shipped 0.30, **+0.002** undamped — so the damping causes it, and the undamped trend pays
+  for its lack of bias with 41% more dispersion. It is a bias-variance trade priced on one side.
+
+  The mechanism is arithmetic rather than anything about Ohio. Damping applies the fitted rate
+  for `(1 - d^h)/(1 - d)` year-equivalents whatever the horizon — **1.43 years at 0.30, for every
+  horizon past about six** — so a projection misses `h - 1.43` years of trend, and in a shrinking
+  population that miss is upward. Sorted by their own fifteen-year rate, the fastest-declining
+  quarter of districts are forecast **8.0% high** at five years and the flattest quarter 2.0%
+  low; the sign flips exactly where the growth rate does.
+
+  The districts forecast high are disproportionately the ones the guarantee protects, though not
+  by a clean gradient: at observed enrollment **57.2%** of the fastest-declining quarter are on
+  the guarantee against **34.2%** of the flattest, the two middle quarters sitting at 48.7% and
+  53.3%. The over-forecast therefore lands hardest where the guarantee is what pays, and the
+  error runs toward under-stating guarantee reliance.
+
+  **AND AT THE PUBLISHED HORIZON THE TREND IS SIMPLY GONE.** [verified — `crates/project`]
+  Statewide ADM projected by the shipped method falls 12,500 in the first year, 3,654 in the
+  second, 127 in the seventh, and **12 pupils in total between FY2032 and FY2036** — the two
+  years this repository publishes — across 609 districts, in a state whose F-33 panel records a
+  fall of 208,918 over fifteen years. The undamped trend reaches 1,290,680 at FY2036 against the
+  shipped 1,384,232, so the damping holds **93,552 pupils** above it.
+
+  This is not a defect in `series::advance`, which does what damping means. It is that a ten-year
+  panel drawn this way carries about four years of demographic content and six years of the same
+  number relabelled, and nothing said so. Measured in `the_trend_the_damping_discards`.
+
+  **[open]** Whether the point estimate should be de-biased. 0.30 minimises the error both
+  decisions were made on, the backtest reaches five years while the feed publishes ten, and
+  undamping trades a known bias for materially more dispersion. What is settled is the size and
+  the cause, not the remedy.
 figures:
   - key: project/districts-on-the-guarantee
     value: 294
