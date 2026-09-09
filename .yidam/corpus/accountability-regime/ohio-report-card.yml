@@ -88,6 +88,13 @@ findings: |
   [verified — computed] One district in five went backwards on the measure the star rating is
   awarded on while going forwards on the measure the corpus quotes.
 
+  **The count is exact and its edge is soft, so take the mechanism rather than the cut.** 28 of
+  the 425 districts that rose on the Index change share by less than a thousandth in either
+  direction, and the nearest changes by five millionths. What does not depend on where the cut
+  falls is the denominator itself: it rose **0.919 per cent**, so every district's share fell by
+  that much relative to its own Index, and the 121 are the subset whose gain did not cover it.
+  [verified — computed]
+
   This is a second and stronger reason for the rule
   [performance-index](../metric/performance-index.yml) already states as "use the Index, not the
   star rating". Coarseness was the first: a rating bins many districts together. Relativity is
@@ -119,6 +126,10 @@ figures:
     value: 121
     field: findings
     as_written: "121 of 607 districts improved on the Index"
+  - key: dispersion/achievement-denominator-drift
+    value: 0.919
+    field: findings
+    as_written: "it rose **0.919 per cent**"
   - key: dispersion/achievement-modal-rating-districts
     value: 227
     field: findings

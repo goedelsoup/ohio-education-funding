@@ -1829,18 +1829,59 @@ pub static FIGURES: &[Figure] = &[
         tolerance: 0.0,
         compute: |_| {
             let rows = dispersion::report_card::report_cards();
+            // The published maximum for the current year and the recomputed one for the earlier
+            // year, which is the only pair available: the department publishes the maximum for
+            // the year the card covers and no other. Recomputing *both* is the obvious
+            // alternative and is wrong here — it would divide 2024-25 by 109.8077 where the
+            // department divided by 109.8, and the count is decided at the fifth decimal place.
+            // `crates/dispersion/tests/the_weights_behind_the_index.rs` makes the same choice and
+            // pins how little room there is.
             let then = achievement_denominator(
                 rows.iter().filter_map(|c| c.performance_index_earliest).collect(),
             );
-            let now = achievement_denominator(
-                rows.iter().filter_map(|c| c.performance_index).collect(),
-            );
             rows.iter()
-                .filter(|c| match (c.performance_index_earliest, c.performance_index) {
-                    (Some(before), Some(after)) => after > before && after / now <= before / then,
-                    _ => false,
+                .filter(|c| {
+                    match (
+                        c.performance_index_earliest,
+                        c.performance_index,
+                        c.performance_index_maximum,
+                    ) {
+                        (Some(before), Some(after), Some(now)) => {
+                            after > before && after / now <= before / then
+                        }
+                        _ => false,
+                    }
                 })
                 .count() as f64
+        },
+    },
+    Figure {
+        key: "dispersion/achievement-denominator-drift",
+        owner: "crates/dispersion",
+        // Percentage points as a `Ratio`, and the two guards between them left no other choice.
+        // `Share` refuses anything under 0.02, because a share that small would survive its own
+        // hundredfold typo — and 0.00919 is under it. `Ratio` then refuses any prose numeral
+        // carrying a `%`, on the reading that a percent sign means the author meant a share. So a
+        // growth rate below two per cent, written with the sign, fits neither unit. The prose
+        // spells the words instead, which is this node's style for the statute's own "two per
+        // cent" anyway. If a third sub-percent rate wants binding, the gap is worth a unit rather
+        // than a third comment like this one.
+        unit: Unit::Ratio,
+        label: "How far the achievement denominator rose between 2022-23 and 2024-25, in per \
+                cent \u{2014} the amount every district\u{2019}s share fell relative to its own \
+                index, and the robust half of the finding the 121 counts",
+        pinned: 0.919,
+        tolerance: 0.005,
+        compute: |_| {
+            let rows = dispersion::report_card::report_cards();
+            let then = achievement_denominator(
+                rows.iter().filter_map(|c| c.performance_index_earliest).collect(),
+            );
+            let now = rows
+                .iter()
+                .find_map(|c| c.performance_index_maximum)
+                .expect("a published maximum");
+            (now / then - 1.0) * 100.0
         },
     },
     Figure {

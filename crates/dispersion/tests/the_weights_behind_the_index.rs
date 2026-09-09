@@ -310,7 +310,18 @@ fn the_published_percentage_is_the_index_over_that_denominator() {
 /// index over that window and declined as a share of the maximum. That is one district in five.
 ///
 /// The 2022-23 denominator is computed here the way the 2024-25 one was verified above, because
-/// the department publishes the maximum only for the current year.
+/// the department publishes the maximum only for the current year. The 2024-25 side uses the
+/// *published* 109.8 rather than the recomputed 109.8077 — a seventh of a per mille apart, which
+/// sounds like nothing and is not, because the nearest district sits five millionths from the
+/// boundary. `crates/figures` makes the same choice for the same reason.
+///
+/// # The count is exact and its edge is soft
+///
+/// 121 is arithmetic and reproduces every time, but it is not a partition of the state into two
+/// kinds of district. 28 of the 425 risers change share by less than a thousandth in either
+/// direction, and the nearest changes by 0.000005. The finding that survives is the direction and
+/// not the cut: the denominator rose 0.919%, so *every* district's share fell by that much
+/// relative to its own index, and 121 is the subset whose gain did not cover it.
 #[test]
 fn a_fifth_of_districts_rose_on_the_index_and_fell_on_the_share() {
     let rows = rated();
@@ -345,6 +356,34 @@ fn a_fifth_of_districts_rose_on_the_index_and_fell_on_the_share() {
     assert_eq!(
         fell_on_the_share, 121,
         "districts that improved absolutely and declined relatively"
+    );
+
+    // How much of the state sits close enough to the cut that the cut is not the finding.
+    let mut margins: Vec<f64> = rows
+        .iter()
+        .filter_map(|row| {
+            let (before, after) = (row.performance_index_earliest?, row.performance_index?);
+            (after > before).then_some(after / now - before / then)
+        })
+        .collect();
+    margins.sort_by(|a, b| a.abs().total_cmp(&b.abs()));
+    assert!(
+        margins[0].abs() < 1e-4,
+        "the nearest riser is {:.6} from the boundary, which is far enough that this file's \
+         warning about a soft edge has stopped being true",
+        margins[0]
+    );
+    assert_eq!(
+        margins.iter().filter(|m| m.abs() < 1e-3).count(),
+        28,
+        "risers within a thousandth of the boundary"
+    );
+
+    // And the part that does not depend on where the cut falls.
+    let drift = now / then - 1.0;
+    assert!(
+        (drift - 0.00919).abs() < 0.00005,
+        "the denominator rose {drift:.5}, not 0.00919"
     );
 }
 
