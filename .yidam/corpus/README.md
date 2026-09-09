@@ -320,19 +320,19 @@ Fields: count per claim tag across every node; then the unresolved marks by the 
 -->
 | Tag | Count | What it records |
 |---|--:|---|
-| `[verified]` | 1326 | supported by a committed primary source |
+| `[verified]` | 1337 | supported by a committed primary source |
 | `[inference]` | 304 | drawn from verified facts, not witnessed |
-| `[open]` | 205 | a live question — unknown, contested, or being worked |
+| `[open]` | 204 | a live question — unknown, contested, or being worked |
 | `[unentered]` | 0 | a knowable value nobody has typed in yet |
 
-205 unresolved marks, and every one of them is a live question. The fourth mark is gone from the prose: a field nobody has filled in is carried as `unfilled:` structure on the node it belongs to, which is what `[unentered]` used to say inline on an axis it did not belong to.
+204 unresolved marks, and every one of them is a live question. The fourth mark is gone from the prose: a field nobody has filled in is carried as `unfilled:` structure on the node it belongs to, which is what `[unentered]` used to say inline on an axis it did not belong to.
 
 | Field | `[open]` | `[unentered]` |
 |---|--:|--:|
 | `findings` | 68 | 0 |
 | `description` | 51 | 0 |
 | `revisions` | 10 | 0 |
-| `series` | 9 | 0 |
+| `series` | 8 | 0 |
 | `statutory_basis` | 6 | 0 |
 | `accountability_effect` | 6 | 0 |
 | `mechanism` | 5 | 0 |

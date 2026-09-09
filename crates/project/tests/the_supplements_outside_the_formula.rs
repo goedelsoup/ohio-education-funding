@@ -7,8 +7,10 @@
 //!
 //! Both are structurally unlike anything inside the formula, and in opposite ways:
 //!
-//! - the **performance supplement** is the only component in Ohio's school funding that pays on a
-//!   measured *outcome* rather than an input, and it is distributed **inversely to need**;
+//! - the **performance supplement** is the only component in Ohio's *current* school funding that
+//!   pays on a measured *outcome* rather than an input, and it is distributed **inversely to
+//!   need** — FY2016-19 had two more, and `the_supplements_before_this_biennium.rs` records that
+//!   both of those were multiplied by the state share index and this one is not;
 //! - the **enrollment growth supplement** is a **cliff**: 3% growth over three years pays $250 on
 //!   every pupil, and 2.95% pays nothing.
 //!
