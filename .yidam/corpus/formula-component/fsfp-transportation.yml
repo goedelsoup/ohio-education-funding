@@ -49,6 +49,18 @@ description: |
   district is owed but what there was to divide. See [appropriation proration
   factor](../parameter/appropriation-proration-factor.yml). [verified]
 figures:
+  - key: project/transportation-proration-earmark-fy2014
+    value: 413385915.0
+    field: findings
+    as_written: "$413,385,915 in FY2014"
+  - key: project/transportation-supplement-earmark-fy2014
+    value: 25300000.0
+    field: findings
+    as_written: "an earmark of its own \u2014 **$25,300,000**"
+  - key: project/transportation-proration-share-of-the-line
+    value: 0.8185640441270794
+    field: findings
+    as_written: "**82%** of ALI 200502"
   - key: project/transportation-floor-fy2023
     value: 33.33
     field: statutory_basis
@@ -139,11 +151,47 @@ findings: |
   mechanism of its own — `max(FY21 transportation - the five payments, 0)`, with no inputs
   besides the ones above. [verified]
 
-  ### Still open
+  ### The general proration factor is an appropriation, not a dial
 
-  What the general proration factor `[F3]` is for. It is 1.0 in FY2027 and it multiplies the
-  whole transportation total, so it is a dial that has been used and may be again; nothing here
-  records when. [open]
+  `[F3]` is what the corpus's
+  [proration factor](../parameter/appropriation-proration-factor.yml) node describes and LSC
+  states as a formula: *"Adjustment percentage = (Earmarked appropriation)/(Total statewide
+  allocation)"*, applied so as *"to keep the total statewide payment to the amount earmarked for
+  such purposes in item 200502"*. The instruction in the budget that revived the formula is
+  plainer still — *"ODE is required to prorate the calculated amount for each district to fit
+  within the appropriation."* Nobody chooses it. [verified —
+  [`crates/project`](../../../crates/project/tests/the_dial_that_was_an_appropriation.rs)]
+
+  **It was below one in FY2010, FY2011, FY2014 and FY2015, and the proof is a payment that only
+  exists when it is.** Each of those bienniums created a *supplemental transportation payment*
+  defined as `formula allocation − prorated aid`, paid to a targeted set of districts and, in
+  FY2014-15, given an earmark of its own — **$25,300,000**. A payment whose formula is the
+  difference between the full amount and the prorated one cannot exist unless the proration
+  binds, and is not worth appropriating for unless the difference is material. The factor itself
+  is published in neither biennium; the payment is. [verified]
+
+  Who it rescued changed with the instrument available. H.B. 1 selected on wealth per pupil and
+  ridership density, both at or below the median, using
+  [parity aid](fsfp-targeted-assistance.yml)'s wealth measure; H.B. 59 selected on a state share
+  index of 0.5 or greater and the same density test. Both mean "poor and sparse", reached two
+  ways. [verified]
+
+  ### What it divides by is an earmark inside the line, not the line
+
+  $413,385,915 in FY2014 — **82%** of ALI 200502. The rest of the line pays for special education
+  transportation, payments in lieu of transportation, driver training, and the supplement that
+  undoes the proration. The seven earmarks sum to the line, and the line is the figure
+  [`project::ledger`](../../../crates/project/tests/the_dial_that_was_an_appropriation.rs)
+  already held from a different document, to the dollar. [verified]
+
+  ### And for one biennium the line did not pay for transportation
+
+  *"In FY 2012 and FY 2013, the formula was not used and instead the appropriation for pupil
+  transportation provided funding for the bridge formula."* So there is no proration for those
+  years because there was no entitlement to divide, and ALI 200502 shows two ordinary-looking
+  years in which the money changed purpose entirely. An appropriation series read by line item
+  cannot see that, which is the general hazard
+  [the line origins](../../../crates/project/tests/the_line_origins.rs) exists for. [verified]
 properties:
   name: Transportation
   function: |

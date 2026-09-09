@@ -3956,6 +3956,54 @@ pub static FIGURES: &[Figure] = &[
         },
     },
     Figure {
+        key: "project/transportation-proration-earmark-fy2014",
+        owner: "crates/project",
+        unit: Unit::Dollars,
+        label: "The earmark the transportation proration divides by, FY2014",
+        pinned: 413_385_915.0,
+        tolerance: 0.005,
+        compute: |_| {
+            amount_after(
+                &project::greenbook::greenbook("hb59").flat(),
+                "Prorated Transportation Aid $ ",
+            )
+        },
+    },
+    Figure {
+        key: "project/transportation-supplement-earmark-fy2014",
+        owner: "crates/project",
+        unit: Unit::Dollars,
+        label: "The earmark for the payment that undoes the proration, FY2014",
+        pinned: 25_300_000.0,
+        tolerance: 0.005,
+        compute: |_| {
+            amount_after(
+                &project::greenbook::greenbook("hb59").flat(),
+                "Supplemental Transportation Aid $ ",
+            )
+        },
+    },
+    Figure {
+        key: "project/transportation-proration-share-of-the-line",
+        owner: "crates/project",
+        unit: Unit::Share,
+        label: "How much of ALI 200502 the proration's own denominator is, FY2014",
+        pinned: 0.818_564_044_127_079_4,
+        tolerance: 0.000_005,
+        compute: |_| {
+            let earmark = amount_after(
+                &project::greenbook::greenbook("hb59").flat(),
+                "Prorated Transportation Aid $ ",
+            );
+            let line = project::ledger::appropriations::lines()
+                .into_iter()
+                .find(|l| l.line_item == "200502" && l.fiscal_year == 2014 && l.kind == "enacted")
+                .expect("the ledger carries FY2014 pupil transportation")
+                .amount;
+            earmark / line
+        },
+    },
+    Figure {
         key: "project/gifted-statewide-total",
         owner: "crates/project",
         unit: Unit::Dollars,
