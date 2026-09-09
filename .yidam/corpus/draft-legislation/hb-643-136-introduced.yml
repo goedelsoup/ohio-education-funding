@@ -76,8 +76,39 @@ findings: |
   **And the listing endpoint cannot be used to tell a pending bill from an enacted one.** It
   reports a bill's *first* version rather than its current one, so H.B. 186 of this same General
   Assembly appears there as `As Introduced` and is in fact enrolled with an effective date of
-  20 March 2026. Only the per-bill version index distinguishes them, and reading status off the
-  listing would have recorded several enacted acts as proposals. [verified]
+  20 March 2026 — signed 19 December 2025, re-checked 9 September 2026. Only the per-bill version
+  index distinguishes them, and reading status off the listing would have recorded several enacted
+  acts as proposals. [verified]
+
+  ### The version index carries more than versions, which this node used to deny
+
+  Two of this node's open questions were open because the index was read as a list of documents.
+  It is a record, and it advertises its own continuations: `meetings/` and `amendments/`, plus the
+  sponsor roster with an `active` flag, the subject taxonomy, and an official
+  **`local_impact_statement`**. Both continuations answer for this bill, and the answer is `[]`.
+
+  **An empty array is only evidence if the endpoint fills.** It does: H.B. 96 returns 99 meetings
+  and H.B. 186 returns 14, against H.B. 643's zero. That control is what turns "no committee
+  history was retrieved" into "no committee history exists", and without it the two are the same
+  observation. [verified]
+
+  ### A pinned digest moved while the document did not
+
+  `00_IN` is the as-introduced version and cannot be amended, which is why this source was pinned
+  at all. Re-fetched three weeks later it hashes differently and is 11 bytes longer, and
+  `edfund-connect verify` reports *"The publication was revised — rebuild the fixtures and read
+  the diff before committing it."*
+
+  It was not revised. The department's exporter went from **LibreOffice 24.2.7.2 to 25.8.6.2**,
+  which reorders CSS properties inside `style` attributes and fills in an empty `<title>`.
+  Stripped of markup the two documents are **byte-identical across 3,798 characters**. [verified]
+
+  Two things follow. A digest over office-suite HTML pins the renderer as much as the document,
+  so drift on this host is not evidence that a bill changed — the diff has to be read, which is
+  what the tool's own message asks for and what this node records having done. And nothing here
+  would have noticed on its own: `fetch` is the only command that touches the network and
+  `verify` compares the *cache* against the manifest, so an upstream change is invisible until
+  somebody re-fetches. [verified]
 figures:
   - key: project/hb-643-provisions
     value: 1
@@ -92,23 +123,48 @@ properties:
   designation: H.B. 643
   general_assembly: 136th General Assembly
   sponsors: |
-    Representatives Pizzulli and Somani. [verified] Whether either has since withdrawn, and what
-    the committee referral was, is not established — the version index carries versions and not a
-    procedural history. [open]
+    Representatives **Justin Pizzulli** (R, district 90) and **Anita Somani** (D, district 8),
+    both recorded active, with no cosponsors. [verified] It is a two-member bipartisan pair, which
+    is worth stating for a bill that would put a ceiling back on a universal eligibility the
+    majority enacted.
+
+    Neither has withdrawn and the committee referral has produced nothing, which **is** readable
+    after all — see `status` below. The claim that the version index carries no procedural history
+    was wrong: the index carries the sponsor roster with an `active` flag, and it advertises two
+    further endpoints that carry the history itself.
   status: |
     **As introduced, and no further.** The version index holds one entry and no committee report,
-    floor vote, or effective date. [verified] Whether it is live or dead is not readable from the
-    text: a bill that is never reported out simply stops, and the General Assembly publishes no
-    marker for that. [open]
+    floor vote, or effective date, and `governor_signed_date`, `concurrence_date` and
+    `effective_date` are all null. [verified]
+
+    **The procedural history is readable, and it is empty.** The index advertises
+    `.../legislation/hb643/meetings/` and `.../legislation/hb643/amendments/`; both return `200`
+    with `[]`. That is a finding rather than a failure, because the same endpoints populate: H.B.
+    96 of this General Assembly returns **99** meetings and H.B. 186 returns **14**. So the bill
+    has been referred and never heard, rather than the endpoint being unimplemented. Retrieved
+    9 September 2026. [verified]
+
+    **What is still not readable is whether it is dead.** A bill that is never reported out simply
+    stops, and the General Assembly publishes no marker for that — zero meetings is the same
+    record for a bill that will be heard next month and one that never will. That distinction is
+    not in the data and no amount of endpoint enumeration produces it. [open]
   text_read: |
-    `hb643_00_IN`, retrieved 20 August 2026 from
+    `hb643_00_IN`, first retrieved 20 August 2026 from
     `search-prod.lis.state.oh.us/api/v2/general_assembly_136/legislation/hb643/00_IN/html/` and
-    pinned at SHA-256 `ea8896c5ed494308dbcf98b28bb90579391f89a87b749b465cef815ff8c632bb`, 11,817
-    bytes. [verified — `crates/connect/source-digests.txt`]
+    re-retrieved 9 September 2026. Pinned at SHA-256
+    `12d3a53247dea420f8210c2cc5daa9cc891500804c51b9c4494993b4d504bca8`, 11,828 bytes.
+    [verified — `crates/connect/source-digests.txt`]
 
     The digest is load-bearing rather than ceremonial. `00_IN` is stable, but a bill's *current*
     text moves under its own URL as it is amended, so a claim about "H.B. 643" that does not name
     a version names a moving target. See [`ohio-bills`](../../catalog/ohio-bills.md).
+
+    **And the digest moved without the bill moving.** The first pin was
+    `ea8896c5…`, 11,817 bytes. The document now served is 11 bytes longer and hashes differently,
+    and the whole of the difference is that the department's exporter went from LibreOffice
+    24.2.7.2 to 25.8.6.2 — CSS properties reordered inside `style` attributes, an empty `<title>`
+    filled in. Stripped of markup, the two are **byte-identical across 3,798 characters**. The
+    version is stable as a *bill*; the bytes are not. [verified]
   question: |
     What does a real pending bill about school funding look like when it reaches a model built
     around the foundation formula, and how much of one can that model actually price?

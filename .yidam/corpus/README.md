@@ -320,12 +320,12 @@ Fields: count per claim tag across every node; then the unresolved marks by the 
 -->
 | Tag | Count | What it records |
 |---|--:|---|
-| `[verified]` | 1219 | supported by a committed primary source |
+| `[verified]` | 1224 | supported by a committed primary source |
 | `[inference]` | 279 | drawn from verified facts, not witnessed |
-| `[open]` | 215 | a live question — unknown, contested, or being worked |
+| `[open]` | 214 | a live question — unknown, contested, or being worked |
 | `[unentered]` | 0 | a knowable value nobody has typed in yet |
 
-215 unresolved marks, and every one of them is a live question. The fourth mark is gone from the prose: a field nobody has filled in is carried as `unfilled:` structure on the node it belongs to, which is what `[unentered]` used to say inline on an axis it did not belong to.
+214 unresolved marks, and every one of them is a live question. The fourth mark is gone from the prose: a field nobody has filled in is carried as `unfilled:` structure on the node it belongs to, which is what `[unentered]` used to say inline on an axis it did not belong to.
 
 | Field | `[open]` | `[unentered]` |
 |---|--:|--:|
@@ -355,7 +355,6 @@ Fields: count per claim tag across every node; then the unresolved marks by the 
 | `typology` | 1 | 0 |
 | `trigger` | 1 | 0 |
 | `status` | 1 | 0 |
-| `sponsors` | 1 | 0 |
 | `remedy` | 1 | 0 |
 | `kind` | 1 | 0 |
 | `fiscal_effect` | 1 | 0 |
