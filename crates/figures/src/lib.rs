@@ -686,6 +686,33 @@ fn past_the_three_year_exit() -> Vec<(
         .collect()
 }
 
+/// The enacted and actual foundation funding appropriation for one fiscal year.
+///
+/// Line item 200550, which is the line the FY2020 spending controls landed on and the line the
+/// guarantee's statutory base is defined against.
+///
+/// # Panics
+///
+/// If the series does not carry both an enacted and an actual figure for that year.
+fn foundation_in(fiscal_year: u16) -> (f64, f64) {
+    let mut enacted = None;
+    let mut actual = None;
+    for line in project::ledger::appropriations::lines() {
+        if line.line_item != "200550" || line.fiscal_year != fiscal_year {
+            continue;
+        }
+        match line.kind.as_str() {
+            "enacted" => enacted = Some(line.amount),
+            "actual" => actual = Some(line.amount),
+            _ => {}
+        }
+    }
+    match (enacted, actual) {
+        (Some(enacted), Some(actual)) => (enacted, actual),
+        _ => panic!("FY{fiscal_year} does not carry both an enacted and an actual 200550"),
+    }
+}
+
 /// The first number LSC writes after `marker` in one of its budget analyses.
 ///
 /// Strips a leading `$` and any thousands separators, and stops at a trailing `%`, `,` or `.`
@@ -2581,6 +2608,32 @@ pub static FIGURES: &[Figure] = &[
                 .iter()
                 .filter(|book| book.flat().contains("$4,000 for each preschool"))
                 .count() as f64
+        },
+    },
+    Figure {
+        key: "project/foundation-funding-missed-in-fy2020",
+        owner: "crates/project",
+        unit: Unit::Dollars,
+        label: "How far foundation funding fell below its enacted FY2020 appropriation \u{2014} \
+                the year the guarantee's base is defined to exclude the reductions from",
+        pinned: 254956619.56,
+        tolerance: 0.005,
+        compute: |_| {
+            let (enacted, actual) = foundation_in(2020);
+            enacted - actual
+        },
+    },
+    Figure {
+        key: "project/foundation-funding-missed-in-fy2020-share",
+        owner: "crates/project",
+        unit: Unit::Ratio,
+        label: "The same as a share of the appropriation, in percentage points \u{2014} against a \
+                band of one point either way in every ordinary year of the two formula regimes",
+        pinned: 3.67,
+        tolerance: 0.005,
+        compute: |_| {
+            let (enacted, actual) = foundation_in(2020);
+            (enacted - actual) / enacted * 100.0
         },
     },
     Figure {
