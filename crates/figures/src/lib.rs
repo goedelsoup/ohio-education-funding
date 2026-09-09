@@ -597,6 +597,26 @@ fn lifted_off_the_guarantee(priced: &project::drafts::Priced) -> f64 {
 /// `crates/dispersion/tests/the_weights_behind_the_index.rs`, which is where that is established
 /// rather than assumed. This exists because the department publishes the maximum for the current
 /// year alone, so any earlier year's has to be recomputed the same way.
+/// The TY1981 joint vocational rates implied by the districts sitting just under the floor.
+///
+/// R.C. 319.301(E)(1) makes the omitted term the excess of a joint vocational district's TY1981
+/// current-expense taxes over two-tenths of one per cent of value. Adding a district's shortfall
+/// below twenty mills back onto that two-mill base gives the rate the term would have to have
+/// been. Returns the smallest and largest across the fourteen.
+fn implied_1981_rates(i: &Inputs) -> (f64, f64) {
+    let mut implied: Vec<f64> = i
+        .profile
+        .iter()
+        .filter(|d| d.below_twenty_mill_floor() && !d.never_voted_twenty_mills())
+        .filter_map(|d| Some(2.0 + (20.0 - d.effective_class1_millage?)))
+        .collect();
+    implied.sort_by(f64::total_cmp);
+    (
+        implied.first().copied().unwrap_or(f64::NAN),
+        implied.last().copied().unwrap_or(f64::NAN),
+    )
+}
+
 /// Districts below the three-star release threshold: how many, how many are paid, and how much.
 ///
 /// R.C. 3302.10(N)(1) needs three stars to *begin* a transition out of an academic distress
@@ -2205,6 +2225,31 @@ pub static FIGURES: &[Figure] = &[
         pinned: 155.0,
         tolerance: 0.0,
         compute: |i| sd1_at_twenty(i, 2024, |r| r.class1_rate) as f64,
+    },
+    // `parameter/twenty-mill-floor`. R.C. 319.301(E)(2) measures the floor on a district's own
+    // current-expense taxes *combined with* the pre-1982 joint vocational taxes, and the corpus's
+    // model carries only the first term. Read backwards from the fourteen districts sitting just
+    // under the floor, the omitted term implies 1981 joint vocational rates a hair above the two
+    // mills the same section names — which is what says the term is not the wrong size.
+    Figure {
+        key: "dispersion/implied-1981-joint-vocational-rate-low",
+        owner: "crates/dispersion",
+        unit: Unit::Ratio,
+        label: "The smallest TY1981 joint vocational current-expense rate, in mills, implied by \
+                a district sitting under the twenty-mill floor having voted past it",
+        pinned: 2.006,
+        tolerance: 0.0005,
+        compute: |i| implied_1981_rates(i).0,
+    },
+    Figure {
+        key: "dispersion/implied-1981-joint-vocational-rate-high",
+        owner: "crates/dispersion",
+        unit: Unit::Ratio,
+        label: "The largest of the same \u{2014} Bradford Exempted Village, the district a \
+                rounding account of the shortfalls cannot reach",
+        pinned: 2.278,
+        tolerance: 0.0005,
+        compute: |i| implied_1981_rates(i).1,
     },
     Figure {
         key: "dispersion/districts-at-twenty-mills-on-the-combined-base-ty2024",

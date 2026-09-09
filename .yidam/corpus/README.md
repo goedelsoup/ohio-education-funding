@@ -320,8 +320,8 @@ Fields: count per claim tag across every node; then the unresolved marks by the 
 -->
 | Tag | Count | What it records |
 |---|--:|---|
-| `[verified]` | 1254 | supported by a committed primary source |
-| `[inference]` | 283 | drawn from verified facts, not witnessed |
+| `[verified]` | 1259 | supported by a committed primary source |
+| `[inference]` | 285 | drawn from verified facts, not witnessed |
 | `[open]` | 210 | a live question — unknown, contested, or being worked |
 | `[unentered]` | 0 | a knowable value nobody has typed in yet |
 
@@ -329,9 +329,9 @@ Fields: count per claim tag across every node; then the unresolved marks by the 
 
 | Field | `[open]` | `[unentered]` |
 |---|--:|--:|
-| `findings` | 67 | 0 |
+| `findings` | 68 | 0 |
 | `description` | 53 | 0 |
-| `series` | 11 | 0 |
+| `series` | 10 | 0 |
 | `revisions` | 10 | 0 |
 | `statutory_basis` | 6 | 0 |
 | `accountability_effect` | 6 | 0 |
@@ -418,7 +418,7 @@ Sorted by: kind, then alphabetically.
 | [`hb-643-136-introduced`](draft-legislation/hb-643-136-introduced.yml) | draft-legislation | H.B. 643 (136th G.A., as introduced) | 3 | 0 |
 | [`hb-96-with-refreshed-inputs`](draft-legislation/hb-96-with-refreshed-inputs.yml) | draft-legislation | "Counterfactual: H.B. 96 with FY2024 Cost Inputs" | 6 | 1 |
 | [`cleveland-municipal`](education-agency/cleveland-municipal.yml) | education-agency | Cleveland Municipal School District | 3 | 8 |
-| [`eastland-fairfield-ctc`](education-agency/eastland-fairfield-ctc.yml) | education-agency | Eastland-Fairfield Career and Technical Schools | 3 | 2 |
+| [`eastland-fairfield-ctc`](education-agency/eastland-fairfield-ctc.yml) | education-agency | Eastland-Fairfield Career and Technical Schools | 3 | 3 |
 | [`electronic-classroom-of-tomorrow`](education-agency/electronic-classroom-of-tomorrow.yml) | education-agency | Electronic Classroom of Tomorrow (closed) | 2 | 1 |
 | [`northern-local-perry`](education-agency/northern-local-perry.yml) | education-agency | Northern Local School District (Perry County) | 9 | 13 |
 | [`perrysburg-exempted-village`](education-agency/perrysburg-exempted-village.yml) | education-agency | Perrysburg Exempted Village School District | 4 | 2 |
@@ -514,7 +514,7 @@ Sorted by: kind, then alphabetically.
 | [`special-education-category-multiples`](parameter/special-education-category-multiples.yml) | parameter | Special Education Category Multiples | 6 | 5 |
 | [`targeted-assistance-rates`](parameter/targeted-assistance-rates.yml) | parameter | Targeted Assistance Rates | 5 | 1 |
 | [`transportation-cost-rates`](parameter/transportation-cost-rates.yml) | parameter | Transportation Cost Rates | 5 | 1 |
-| [`twenty-mill-floor`](parameter/twenty-mill-floor.yml) | parameter | Twenty-Mill Floor | 4 | 8 |
+| [`twenty-mill-floor`](parameter/twenty-mill-floor.yml) | parameter | Twenty-Mill Floor | 5 | 8 |
 | [`autism-scholarship`](program/autism-scholarship.yml) | program | Autism Scholarship | 4 | 1 |
 | [`classroom-facilities-assistance`](program/classroom-facilities-assistance.yml) | program | Classroom Facilities Assistance Program | 3 | 2 |
 | [`cleveland-scholarship`](program/cleveland-scholarship.yml) | program | Cleveland Scholarship and Tutoring Program | 4 | 4 |

@@ -80,10 +80,11 @@ test("every bound figure in the corpus agrees with the crate it cites", () => {
  *
  * Both numbers were re-counted again at 415/53 when `accountability-regime/ohio-report-card`
  * became the fifty-third carrier, and at 423/54 when
- * `intervention/academic-distress-commission` became the fifty-fourth.
+ * `intervention/academic-distress-commission` became the fifty-fourth. 425 at the
+ * pre-1982 joint vocational term, with no new carrier.
  */
 test("the corpus binds no fewer figures than it did", () => {
-  expect(bindings.length, "423 bindings; raise this when you add one").toBeGreaterThanOrEqual(423);
+  expect(bindings.length, "425 bindings; raise this when you add one").toBeGreaterThanOrEqual(425);
   expect(
     corpus.nodes.filter((node) => node.figures.length > 0).length,
     "54 nodes carry bindings; raise this when a fifty-fifth does",
