@@ -795,6 +795,107 @@ fn capacity_aid(bill: &str) -> String {
     project::greenbook::greenbook(bill).flat()
 }
 
+/// The first `n` dollar amounts LSC prints after `marker`, in document order.
+///
+/// LSC publishes a parameter schedule as a table, and a table survives PDF extraction as a run
+/// of `$`-prefixed tokens in reading order with the row labels between them. Reading the run is
+/// what makes a figure below a check on the committed extract rather than a literal retyped from
+/// it — if the table loses a column under a re-extract, the arithmetic stops agreeing instead of
+/// quietly agreeing with a number nobody can find.
+///
+/// # Panics
+///
+/// If `marker` is absent, or fewer than `n` amounts follow it. Both mean the extract and this
+/// reader have come apart.
+fn dollars_after(passage: &str, marker: &str, n: usize) -> Vec<f64> {
+    let at = passage
+        .find(marker)
+        .unwrap_or_else(|| panic!("the analysis no longer says {marker:?}"));
+    let out: Vec<f64> = passage[at + marker.len()..]
+        .split_whitespace()
+        .filter_map(|token| token.strip_prefix('$'))
+        .filter_map(|token| token.replace(',', "").parse().ok())
+        .take(n)
+        .collect();
+    assert_eq!(out.len(), n, "only {} amounts follow {marker:?}", out.len());
+    out
+}
+
+/// A three-column LSC schedule's last column — the third of every group of three.
+fn last_column(amounts: &[f64]) -> Vec<f64> {
+    amounts.iter().skip(2).step_by(3).copied().collect()
+}
+
+/// The six special education weights of the Evidence-Based Model, off H.B. 1's own table.
+///
+/// The table prints prior law beside current law, so each row carries two numbers and the second
+/// is the one the 128th enacted. The Fair School Funding Plan's six are these six times a single
+/// constant, which is the figure this feeds.
+fn evidence_based_weights() -> [f64; 6] {
+    let lsc = project::greenbook::greenbook("hb1").flat();
+    let rows = [
+        "One \u{2013} Speech only",
+        "Two \u{2013} Specific learning disabled, developmentally disabled, other health \u{2013} minor",
+        "Three \u{2013} Hearing impaired, severe behavior disabled",
+        "Four \u{2013} Vision impaired, other health \u{2013} major",
+        "Five \u{2013} Orthopedically disabled, multi-disabled",
+        "Six \u{2013} Autism, traumatic brain injury, both visually and hearing impaired",
+    ];
+    let mut out = [0.0; 6];
+    for (slot, row) in out.iter_mut().zip(rows) {
+        let at = lsc
+            .find(row)
+            .unwrap_or_else(|| panic!("H.B. 1's weight table no longer has {row:?}"));
+        let pair: Vec<f64> = lsc[at + row.len()..]
+            .split_whitespace()
+            .filter_map(|token| token.parse().ok())
+            .take(2)
+            .collect();
+        assert_eq!(pair.len(), 2, "{row:?} no longer carries two weights");
+        *slot = pair[1];
+    }
+    out
+}
+
+/// The six special education per-pupil amounts of FY2017, the last year they moved.
+fn special_education_amounts_fy2017() -> Vec<f64> {
+    let lsc = project::greenbook::greenbook("hb64").flat();
+    last_column(&dollars_after(
+        &lsc,
+        "Special Education Per-Pupil Amounts Category FY 2015 FY 2016 FY 2017",
+        18,
+    ))
+}
+
+/// The five career-technical amounts and associated services in FY2017, likewise.
+fn career_technical_amounts_fy2017() -> Vec<f64> {
+    let lsc = project::greenbook::greenbook("hb64").flat();
+    last_column(&dollars_after(
+        &lsc,
+        "Career-Technical Education and Associated Services Per-Pupil Amounts Category FY 2015 \
+         FY 2016 FY 2017",
+        18,
+    ))
+}
+
+/// The single divisor a schedule of dollar amounts implies against a schedule of weights.
+///
+/// A schedule converted by dividing every amount by one number leaves the six agreeing to the
+/// rounding of a four-decimal weight. This returns their mean; the spread is what
+/// `crates/project/tests/the_weights_that_were_dollar_amounts.rs` asserts on.
+fn implied_divisor(dollars: &[f64], weights: &[f64]) -> f64 {
+    assert_eq!(dollars.len(), weights.len());
+    dollars.iter().zip(weights).map(|(d, w)| d / w).sum::<f64>() / dollars.len() as f64
+}
+
+/// The statewide average base cost per pupil in the plan's first year, as LSC states it.
+fn base_cost_fy2022() -> f64 {
+    amount_after(
+        &project::greenbook::greenbook("hb110").flat(),
+        "is used in the calculation of a number of other formula components, is estimated to be ",
+    )
+}
+
 /// Every building IRN on any of the three federal lists.
 fn federally_listed() -> BTreeSet<String> {
     dispersion::identified::identifications()
@@ -3581,6 +3682,79 @@ pub static FIGURES: &[Figure] = &[
                 "targeted assistance is estimated to be ",
             ) * 1_000_000.0;
             fy2027 / fy2022 - 1.0
+        },
+    },
+    Figure {
+        key: "project/special-education-weight-rescaling",
+        owner: "crates/project",
+        unit: Unit::Ratio,
+        label: "What the plan multiplied the 2009 special education weights by, all six alike",
+        pinned: 0.837_925_779_893_096_6,
+        tolerance: 0.000_005,
+        compute: |_| {
+            let then = evidence_based_weights();
+            project::panel::SPECIAL_EDUCATION_WEIGHTS
+                .iter()
+                .zip(then)
+                .map(|(now, was)| now / was)
+                .sum::<f64>()
+                / 6.0
+        },
+    },
+    Figure {
+        key: "project/special-education-raise-at-the-plan",
+        owner: "crates/project",
+        unit: Unit::Share,
+        label: "What the plan raised every special education category by, over the FY2017 amounts",
+        pinned: 0.111_183_608_345_807_1,
+        tolerance: 0.000_005,
+        compute: |_| {
+            let base = base_cost_fy2022();
+            let before = implied_divisor(
+                &special_education_amounts_fy2017(),
+                &evidence_based_weights(),
+            );
+            let rescaling = {
+                let then = evidence_based_weights();
+                project::panel::SPECIAL_EDUCATION_WEIGHTS
+                    .iter()
+                    .zip(then)
+                    .map(|(now, was)| now / was)
+                    .sum::<f64>()
+                    / 6.0
+            };
+            rescaling * base / before - 1.0
+        },
+    },
+    Figure {
+        key: "project/english-learner-amount-carried-into-the-plan",
+        owner: "crates/project",
+        unit: Unit::Dollars,
+        label: "The FY2015 English learner category 1 amount the plan's first weight re-expresses",
+        pinned: 1_515.0,
+        tolerance: 0.005,
+        compute: |_| {
+            dollars_after(
+                &project::greenbook::greenbook("hb59").flat(),
+                "1 LEP students in U.S. schools for no more than 180 days and not",
+                2,
+            )[1]
+        },
+    },
+    Figure {
+        key: "project/career-technical-base-cost-implied-fy2022",
+        owner: "crates/project",
+        unit: Unit::Dollars,
+        label: "The FY2022 career-technical base cost the plan's six weights imply, never stated",
+        pinned: 8_333.115_691_651_989,
+        tolerance: 0.005,
+        compute: |_| {
+            let weights: Vec<f64> = project::panel::CTE_WEIGHTS
+                .iter()
+                .copied()
+                .chain(std::iter::once(project::panel::CTE_ASSOCIATED_WEIGHT))
+                .collect();
+            implied_divisor(&career_technical_amounts_fy2017(), &weights)
         },
     },
     Figure {

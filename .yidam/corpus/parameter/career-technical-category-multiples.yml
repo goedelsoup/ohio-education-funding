@@ -44,6 +44,26 @@ findings: |
   extract this corpus took, or paid on a sheet the extract does not cover. Those are three
   different facts and the corpus cannot presently distinguish them. [open]
 
+  ### All six are the FY2017 amounts over one divisor, and that divisor is not published
+
+  Before FY2022 each category carried a per-pupil amount: $4,750 down to $1,200 in FY2014, with
+  $225 for associated services, raised 4 per cent a year to FY2017 and then held — H.B. 49 says
+  career-technical amounts *"remain unchanged from those used in FY 2017"*, and the Bridge
+  formula computed no categoricals at all. Divide each FY2017 amount by the weight that replaced
+  it and all six give the same number, **$8,333**, to a few parts in ten thousand. That is the
+  rounding of a four-decimal weight, not the residue of six separate decisions: this schedule was
+  converted, not repriced. [verified —
+  [`crates/project`](../../../crates/project/tests/the_weights_that_were_dollar_amounts.rs)]
+
+  The divisor is worth its own line because nothing states it. These weights multiply the
+  career-technical base cost, which R.C. 3317.014 names and does not compute and which LSC's
+  analysis defines only by cross-reference to the JVSD figure. So $8,333 is what the plan's own
+  arithmetic says the FY2022 career-technical base cost was, recovered from the schedule rather
+  than read anywhere — and against the $7,202 general base cost of the same year that is a
+  premium of 15.7%, where FY2027's is 19.6%. The gap between the two bases has widened by four
+  percentage points and no source in this corpus announces it. [verified for the arithmetic;
+  inference for the widening being unannounced]
+
   ### And the whole schedule is written for two years
 
   Divisions (C)(2), (D)(2) and (E)(1)(b) each say that for fiscal year 2028 and thereafter the
@@ -126,11 +146,17 @@ unfilled:
       R.C. 3317.014(E)(1)(a) sets it and this repository models nothing that pays it. The
       department's career technical planning district payments, if they are published, are
       where the value and its recipients would come from.
-  - field: the multiples before FY2026
+  - field: the career-technical base cost as the department computes it
     why: >-
-      H.B. 96 is the version held. Prior versions of R.C. 3317.014 are in Ohio Laws' version
-      archive for the section, which is where the FY2022-25 schedule would be read.
+      The FY2022 figure above is recovered from the weights rather than read. The department
+      publishes a JVSD base cost build-up somewhere in its model; the extract this corpus takes
+      of the FY2027 calculator carries the FY2027 result and not the method or the earlier years.
 figures:
+  - key: project/career-technical-base-cost-implied-fy2022
+    value: 8333.115691651989
+    field: findings
+    as_written: "the same number, **$8,333**, to a few"
+
   - key: project/career-technical-weight-category-one
     value: 0.623
     field: description
