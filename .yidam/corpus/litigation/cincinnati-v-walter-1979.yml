@@ -16,13 +16,77 @@ description: |
   text produced opposite results eighteen years apart, on facts that had changed in degree
   rather than in kind — the disparities were larger by 1997, and
   [H.B. 920](../legislation/hb-920-1976.yml)'s reduction factors had by then been operating for
-  two decades. [inference] Whether *DeRolph I* overruled *Walter* or distinguished it on the
-  evidentiary record is a question the opinions handle less cleanly than one might expect.
-  [open]
+  two decades. [inference]
 
-  The dissent in *Walter* is worth reading against the majority in *DeRolph I*. [open — the
-  corpus has not yet established the specific continuity, which would be a useful synthesis
-  node.]
+  **And *DeRolph I* neither overruled this decision nor merely distinguished it. It applied it.**
+  The word "overrule" does not appear in *DeRolph I* at all, in an opinion that names *Walter* 76
+  times. See `findings`. [verified —
+  [`crates/regime-diff`](../../../crates/regime-diff/tests/what_derolph_did_with_walter.rs)]
+findings: |
+  ### One standard, two records, two answers
+
+  Two sentences in the majority carry it. One keeps the law: *Walter*'s observations on judicial
+  power are *"as applicable today as they were at the time Walter was decided"*. The other applies
+  it — *"when we apply the tests of Miller and Walter as to what is meant by the words 'thorough
+  and efficient,' the evidence is overwhelming that many districts are 'starved for funds,' and
+  lack teachers, buildings, or equipment"*. Both quoted phrases are *Walter*'s own words for the
+  limit on legislative discretion, turned on a record eighteen years later. What the opinion says
+  changed is *"a statutory system for school funding that has since been repealed and replaced"*.
+  [verified]
+
+  So the answer the `[open]` was choosing between is a false pair. Overruling would have put the
+  change in the law and left the corpus reading two doctrines; distinguishing would have set
+  *Walter* aside. The opinion does neither: it takes *Walter*'s test as given and finds the facts
+  the other way, which is why the two cases can be read as one line of authority. [inference]
+
+  ### The disagreement below was entirely about whether the facts had moved
+
+  Three courts read this decision's reach three ways. The trial court *"found that Walter was not
+  controlling precedent"*; the court of appeals *"disagreed, concluding that the system of
+  educational funding had not substantially changed since Walter was decided"* and that it
+  therefore dictated the result; the Supreme Court agreed with the trial court that *Walter* *"is
+  confined to its own set of facts."* Nobody argued about what Article VI, Section 2 requires.
+  [verified]
+
+  The *DeRolph I* dissent makes the same point from the other side, answering the majority by
+  finding this decision's facts again rather than defending its law: *"as in Walter, plaintiffs
+  did not provide evidence that any student received fewer than the full number of days of
+  instruction required by law"*, and, quoting *Walter* directly, districts claiming to be starved
+  for funds that *"in fact offer programs and services in excess of state minimum standards."*
+  [verified]
+
+  ### It is also the authority that let the case be heard
+
+  The *DeRolph I* dissent argued the question was a nonjusticiable political one. The answer is
+  this decision: *"in 1979 … this court made clear that in certain instances we would have
+  jurisdiction to determine the constitutionality of Ohio's system of funding public schools."*
+  The precedent the state would have wanted is the precedent that opened the courthouse door.
+  [verified]
+
+  ### What had not happened since 1979 is a costing
+
+  *"[T]he General Assembly does not know the actual per-pupil cost of education in Ohio, since it
+  has not calculated the cost of a quality education since 1973-1974."* Written in 1997, about a
+  figure last computed twenty-four years earlier — six years before this case was even decided.
+  [verified]
+
+  That is this corpus's own subject arriving in the opinion. Every regime since builds a
+  [base cost per pupil](../parameter/base-cost-per-pupil.yml) and multiplies it; the court's
+  complaint is that in 1979 and in 1997 alike nobody had priced the thing being multiplied. It
+  dates the gap the FY2002 model was built to close. [inference]
+
+  ### Still open, and narrower
+
+  Reading this decision's dissent against the *DeRolph I* majority. *DeRolph I* quotes *Walter*
+  at length and never quotes its dissent, so the continuity cannot be established from what the
+  corpus holds — it needs *Walter* itself, which `ohio-courts` can reach and has not been asked
+  for. [open]
+figures:
+  - key: regime-diff/walter-in-derolph-i
+    value: 76
+    field: description
+    as_written: "names *Walter* 76 times"
+
 properties:
   case_name: Cincinnati City School Dist. Bd. of Edn. v. Walter
   citation: 58 Ohio St.2d 368 (1979)
