@@ -3842,6 +3842,66 @@ pub static FIGURES: &[Figure] = &[
         },
     },
     Figure {
+        key: "dispersion/panel-real-per-pupil-growth-fy2010-fy2024",
+        owner: "crates/dispersion",
+        unit: Unit::Share,
+        label: "Real spending per pupil on the comparable district panel, FY2010 to FY2024",
+        pinned: 0.088_586_501_832_213_17,
+        tolerance: 0.000_005,
+        compute: |_| {
+            let series = dispersion::ohio_panel::spending_by_year();
+            series[&2024].real_per_pupil / series[&2010].real_per_pupil - 1.0
+        },
+    },
+    Figure {
+        key: "dispersion/panel-real-total-fy2024-over-fy2010",
+        owner: "crates/dispersion",
+        unit: Unit::Ratio,
+        label: "Real total spending on the same panel in FY2024 as a multiple of FY2010's",
+        pinned: 0.988_911_040_817_362_5,
+        tolerance: 0.000_005,
+        compute: |_| {
+            let series = dispersion::ohio_panel::spending_by_year();
+            series[&2024].real_total / series[&2010].real_total
+        },
+    },
+    Figure {
+        key: "dispersion/panel-enrolment-decline-fy2010-fy2024",
+        owner: "crates/dispersion",
+        unit: Unit::Share,
+        label: "Fall membership lost on the same panel over the same years, which is the difference",
+        pinned: 0.091_564_116_261_855_12,
+        tolerance: 0.000_005,
+        compute: |_| {
+            let series = dispersion::ohio_panel::spending_by_year();
+            1.0 - series[&2024].enrollment / series[&2010].enrollment
+        },
+    },
+    Figure {
+        key: "dispersion/panel-real-total-fall-fy2020-fy2021",
+        owner: "crates/dispersion",
+        unit: Unit::Share,
+        label: "The pandemic year's fall in real total district spending, which per pupil hides",
+        pinned: 0.033_342_033_569_011_8,
+        tolerance: 0.000_005,
+        compute: |_| {
+            let series = dispersion::ohio_panel::spending_by_year();
+            1.0 - series[&2021].real_total / series[&2020].real_total
+        },
+    },
+    Figure {
+        key: "dispersion/panel-pupils-lost-fy2021",
+        owner: "crates/dispersion",
+        unit: Unit::Count,
+        label: "Fall membership the comparable panel lost in one year, FY2020 to FY2021",
+        pinned: 54_777.0,
+        tolerance: 0.0,
+        compute: |_| {
+            let series = dispersion::ohio_panel::spending_by_year();
+            series[&2020].enrollment - series[&2021].enrollment
+        },
+    },
+    Figure {
         key: "project/gifted-statewide-total",
         owner: "crates/project",
         unit: Unit::Dollars,

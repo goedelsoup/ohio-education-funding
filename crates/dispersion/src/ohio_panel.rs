@@ -227,6 +227,60 @@ pub fn revenue_mix_by_year() -> BTreeMap<u16, RevenueMix> {
     out
 }
 
+/// One year of the comparable panel's spending, in the two forms that answer different questions.
+#[derive(Debug, Clone, Copy, PartialEq, Default)]
+pub struct YearOfSpending {
+    /// Comparable districts reporting spending and enrolment.
+    pub districts: usize,
+    /// Fall membership, summed.
+    pub enrollment: f64,
+    /// Current spending for elementary and secondary education, summed, in nominal dollars.
+    pub total: f64,
+    /// The same total in [`trough::BASE_YEAR`] dollars.
+    pub real_total: f64,
+    /// `total / enrollment`, nominal.
+    pub per_pupil: f64,
+    /// The same per-pupil figure in [`trough::BASE_YEAR`] dollars.
+    pub real_per_pupil: f64,
+}
+
+/// Every year of the comparable panel, summed, nominal and real.
+///
+/// # Why both the total and the quotient
+///
+/// `metric/per-pupil-operating-expenditure` warns that per-pupil growth "is partly a numerator
+/// effect and partly a denominator one, and attributing it wholly to spending decisions is
+/// wrong". A series of quotients cannot show which, and the corpus carried only quotients. These
+/// carry the numerator and the denominator beside it, so a caller can say how a per-pupil change
+/// was produced rather than only that it happened.
+///
+/// The population is the same one [`trough::comparable`] uses and the same one the corpus's
+/// existing panel figures are computed over: comparable districts, named, reporting both
+/// enrolment and spending. Community schools are outside it in every year, which is what makes
+/// the fifteen years one population and also what makes an enrolment fall here not the same
+/// thing as an enrolment fall in Ohio.
+#[must_use]
+pub fn spending_by_year() -> BTreeMap<u16, YearOfSpending> {
+    let mut out: BTreeMap<u16, YearOfSpending> = BTreeMap::new();
+    for row in trough::comparable() {
+        let Some(spending) = row.current_spending else {
+            continue;
+        };
+        let year = out.entry(row.fiscal_year).or_default();
+        year.districts += 1;
+        year.enrollment += row.enrollment;
+        year.total += spending;
+    }
+    for (fiscal_year, year) in &mut out {
+        year.real_total = trough::real(year.total, *fiscal_year);
+        if year.enrollment > 0.0 {
+            year.per_pupil = year.total / year.enrollment;
+            year.real_per_pupil = trough::real(year.per_pupil, *fiscal_year);
+        }
+    }
+    out
+}
+
 /// How much of the local gap each level of government closed, in one year.
 #[derive(Debug, Clone, Copy, PartialEq, Default)]
 pub struct Equalization {
@@ -755,17 +809,25 @@ mod tests {
 ///
 /// [`trough::PEAK_YEAR`] to [`trough::BOTTOM_YEAR`], because **FY2014 is absent from the NCES archive** under
 /// every naming the surrounding years use. The Auditor's statewide series is still falling
-/// between FY2012 and FY2014, so this measurement stops short of the bottom and *understates*
+/// between FY2012 and FY2014, so this measurement may stop short of the bottom and *understate*
 /// the contraction. Stated rather than interpolated.
+///
+/// The gap is no longer at the end of the record. [`spending_by_year`] runs to FY2024, FY2013 is
+/// the minimum of all fifteen years, and FY2015 is 1.7% above it — so the unobserved year sits
+/// between two observed ones.
 pub mod trough {
     use super::{panel, PanelRow};
     use crate::percentile_sorted;
     use deflator::CpiSeries;
     use edfund_core::FiscalYear;
 
-    /// The year the real series peaks, on the Auditor's wider entity set and on this one.
+    /// The year the real series peaks *before the trough*, on both entity sets.
+    ///
+    /// Not the peak of the panel: [`super::spending_by_year`] runs to FY2024 and FY2024 is
+    /// higher. This names the top of the decade the contraction sits in, which is what the
+    /// contraction is measured from.
     pub const PEAK_YEAR: u16 = 2010;
-    /// The last year before the archive's gap, and as deep as this panel can see.
+    /// The bottom of the contraction, and the minimum of every year the panel holds.
     pub const BOTTOM_YEAR: u16 = 2013;
     /// The dollars every figure here is stated in.
     pub const BASE_YEAR: u16 = 2022;

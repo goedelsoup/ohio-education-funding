@@ -92,10 +92,11 @@ test("every bound figure in the corpus agrees with the crate it cites", () => {
  * assistance's rates were read back as the millage LSC has always written them in, and 483/62
  * when the fifteen categorical weights turned out to be the previous regime's dollar schedules
  * divided by a base cost — `english-learner-category-multiples` the sixty-second carrier — and
- * 487/62 at the two supplements' own history, with no new carrier.
+ * 487/62 at the two supplements' own history, with no new carrier, and 492/62 when the F-33
+ * panel's numerator was published beside the quotient the corpus had been carrying alone.
  */
 test("the corpus binds no fewer figures than it did", () => {
-  expect(bindings.length, "487 bindings; raise this when you add one").toBeGreaterThanOrEqual(487);
+  expect(bindings.length, "492 bindings; raise this when you add one").toBeGreaterThanOrEqual(492);
   expect(
     corpus.nodes.filter((node) => node.figures.length > 0).length,
     "62 nodes carry bindings; raise this when a sixty-third does",
