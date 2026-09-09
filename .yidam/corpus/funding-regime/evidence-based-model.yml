@@ -42,6 +42,19 @@ findings: |
   district's FY2027 funding, and it is there — sixteen years down, inside `[H2]`. What is not
   established is how much of any particular district's base is still the FY2011 term. [open]
 
+  ### The local share it subtracted was a charge-off, at a rate on two bases
+
+  The node states the *valuation* the local share used and never the rate. It was **22 mills, and
+  the base depended on where the district sat against the twenty-mill floor** — total taxable
+  valuation for a district whose class 1 effective current expense rate was 20.1 mills or lower,
+  recognized valuation for every other. [verified —
+  [`crates/project`](../../../crates/project/tests/the_charge_off_after_the_charge_off.rs)] Under
+  the law this regime replaced the rate was 23 mills of recognized valuation for all districts, so
+  the model both cut the rate and moved the districts nearest the floor onto the larger base — the
+  direction that surprises, since those are the districts least able to raise the revenue being
+  assumed. It is the only entry in this corpus's charge-off series that needs two rows. See
+  [`local-share-charge-off-millage`](../parameter/local-share-charge-off-millage.yml).
+
 properties:
   name: Evidence-Based Model
   effective_from: FY2010

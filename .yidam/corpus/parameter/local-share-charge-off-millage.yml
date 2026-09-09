@@ -18,15 +18,13 @@ description: |
   is legally unable to collect at that level. [verified] The shortfall is phantom revenue, and
   it is a direct arithmetic consequence of two provisions that were written independently.
 
-  The parameter is retired: the [Fair School Funding
-  Plan](../funding-regime/fair-school-funding-plan.yml) replaced the charge-off with a local
-  capacity measure. [verified] The node remains because it governs every state aid figure from
-  FY1992 through FY2021, and because the historical series is required for any
-  [`regime-diff`](../../skills/regime-diff.md) between the two approaches.
-
-  ### The series, sourced
-
-  ### The rate stopped moving because a court stopped it
+  The parameter is retired **for city, local and exempted village districts**: the [Fair School
+  Funding Plan](../funding-regime/fair-school-funding-plan.yml) replaced their charge-off with a
+  local capacity measure. [verified] It is not retired for joint vocational districts, whose local
+  share the plan still computes as a half-mill charge-off — see the findings. The node also
+  remains because it governs every state aid figure from FY1992 through FY2021, and because the
+  historical series is required for any [`regime-diff`](../../skills/regime-diff.md) between the
+  two approaches.
 
   ### The base changed while the rate stood still
 
@@ -38,14 +36,16 @@ description: |
   > district's inflationary increase in carryover real property (property that was taxed in the
   > year before) in the reappraisal or update year evenly over three-years instead of all at once.
 
-  ### Still open
+  ### The fourth era does not exist
 
-  The Evidence-Based Model years and the Bridge formula decade are not established. Secondary
-  reporting gives 22 mills for FY2010-11 under the Evidence-Based Model and 20 mills applied to
-  total valuation later, and neither is sourced well enough to commit here. [open] The corpus
-  deliberately holds three of the four eras rather than a complete series with one guessed
-  entry.
+  The corpus held three of four eras and declined to guess the fourth. There is no fourth entry.
+  The Evidence-Based Model kept a rate and forked its base; the Bridge formula replaced the rate
+  with an index yielding a different implied rate per district, and LSC says so in as many words.
+  The "20 mills applied to total valuation later" of secondary reporting is the **statewide average
+  of that spread**. [verified] The caution was right for a better reason than the one it gave.
 findings: |2
+    ### The series, sourced
+
       rate        when                                    authority
       20 mills    in force when DeRolph was filed, 1991   144 Ohio Laws, Part III, 3987, 4122
       20.5 mills  raised during the litigation            Am.Sub.H.B. 152, Sec. 36.12,
@@ -53,12 +53,20 @@ findings: |2
       23 mills    in force at DeRolph I, March 1997       R.C. 3317.022
       23 mills    FY2002-FY2007, by court order           DeRolph III, 93 Ohio St.3d 309, para 62
       23 mills    FY2008                                  LSC, School Funding Complete Resource
+      22 mills    FY2010-11, on two bases                 LSC, H.B. 1 greenbook, 128th G.A.
+      none        FY2012-FY2021                           LSC, H.B. 59 greenbook, 130th G.A.
+      0.5 mill    JVSDs, throughout and still             LSC, H.B. 110 greenbook, 134th G.A.
 
   [verified — [DeRolph I](../litigation/derolph-i-1997.yml) at ¶97 recites the progression with
   its session-law citations; the [LSC Complete
   Resource](../../catalog/lsc-school-funding-complete-resource.md) gives the rate and base
-  still operative in FY2008. Carried in
-  [`crates/regime-diff`](../../../crates/regime-diff/src/charge_off.rs).]
+  still operative in FY2008; the last three rows are LSC's own budget analyses, committed at
+  [`lsc-education-greenbooks.txt`](../../../crates/project/fixtures/lsc-education-greenbooks.txt)
+  and read by
+  [`crates/project`](../../../crates/project/tests/the_charge_off_after_the_charge_off.rs). Carried
+  in [`crates/regime-diff`](../../../crates/regime-diff/src/charge_off.rs).]
+
+  ### The rate stopped moving because a court stopped it
 
   Three changes in six years, then nothing for the remaining life of the mechanism, is a shape
   that reads as a policy nobody revisited. It is not. [DeRolph
@@ -163,6 +171,79 @@ findings: |2
   **Joint vocational school districts were charged off at 0.5 mills**, not the district rate.
   [verified — LSC] This is the one place the "uniform statewide" description is false, and a
   comparison run over JVSDs at the district rate is wrong by a factor of forty-six.
+
+  ### What happened after FY2009, from a source the node had not considered
+
+  The `statutory_basis` below says the operative text for this era "must come from the opinions or
+  from session law", because Ohio Laws' version archive for R.C. 3317.022 begins on 1 July 2014.
+  There is a third route, committed here the whole time and never read: LSC's education analysis of
+  every enacted budget act from the 124th General Assembly through the 135th — 12 documents
+  covering FY2002 through FY2025 without a gap. One test opens the file to check that each act the
+  budget Catalog cites has a node; nothing had read a sentence of it. [verified —
+  [`crates/project`](../../../crates/project/tests/the_charge_off_after_the_charge_off.rs)] An
+  analysis is not an act, and where the two differ the act governs; what an analysis gives that an
+  act does not is a *rate and a base stated in prose*, which is the shape a parameter series needs.
+
+  **The Evidence-Based Model kept the mechanism and forked its base.** Districts whose class 1
+  effective current expense rate is 20.1 mills or lower — at or very near the [twenty-mill
+  floor](twenty-mill-floor.yml) — were charged 22 mills of **total taxable valuation**; every other
+  district was charged 22 mills of **recognized valuation**. [verified] The node held the
+  recognized-valuation base as a single fact about FY2008 and could not have anticipated a rule
+  that assigns bases by floor status.
+
+  **There was a second charge-off the series never held.** Under the law the model replaced,
+  districts contributed 23 mills toward base cost *and up to 3.3 mills toward special education,
+  career-technical education and transportation*. [verified] The counterfactuals below are about
+  base cost and are right to use 23 mills; what is understated is the **total** local contribution
+  the mechanism asked for, which was up to 26.3 mills of the same valuation. [inference]
+
+  **And the exempt-property adjustment has a stated rule.** It is recorded below as open for want
+  of the department's list of affected districts. The list is still absent; the rule is not.
+  Above 25% of potential taxable value exempted from taxation, the excess over 25% comes off the
+  base before the charge-off is applied. [verified]
+
+  ### The Bridge formula has no charge-off rate, which is why none could be found
+
+  LSC, analysing H.B. 59 of the 130th:
+
+  > the state share index used for the opportunity grant does not result in a uniform charge-off
+  > rate. Rather, if a local share in FY 2014 were to be derived from the state share index and
+  > expressed as a charge-off of adjusted valuation, the charge-off rate would vary from 11.3 mills
+  > to 22.9 mills (excluding several outlier districts) with the statewide average charge-off being
+  > 20.6 mills.
+
+  [verified] Three things follow. The "20 mills applied to total valuation later" the node could
+  not source is **20.6 mills and a statewide average**, so entering it as a fourth row would state
+  a distribution's mean as a legislated rate. The spread is a factor of two across districts before
+  outliers. And *uniform* — which this node's own description calls the point of the parameter, the
+  policy judgment that every district contributes the yield of the same effort — is exactly what
+  LSC says the index does not produce.
+
+  **The word leaves the analyses a biennium before the reader would expect.** Counted across all
+  twelve: 35, 25, 3, 3, then **zero in the Evidence-Based Model's own greenbook**, then 11 in
+  H.B. 153 — of which every one is "charge-off *valuation*", the EBM's valuation measure carried
+  forward as an index, and not one a rate. H.B. 59 is the last analysis to write "charge-off rate"
+  at all, and writes it to say the formula no longer has one. [verified] That is weak evidence
+  about a mechanism and strong evidence about a search: the documents that would have carried the
+  number stopped discussing the subject, and a reader looking for a fourth rate was looking for the
+  wrong shape of thing. [inference]
+
+  ### For joint vocational districts it was never retired
+
+  The [Fair School Funding Plan](../funding-regime/fair-school-funding-plan.yml) replaced the
+  charge-off with local capacity for city, local and exempted village districts. It did not for
+  JVSDs. LSC, analysing the plan itself:
+
+  > Instead of a per-pupil local capacity amount, the local share of the base cost for JVSDs is
+  > calculated by multiplying a 1/2 mill by the lesser of the district's three-year average
+  > valuation or most recent valuation. This is consistent with the prior formula for JVSDs.
+
+  [verified] So the mechanism this node describes in the past tense is how a whole class of
+  district was funded under the plan as enacted, and `series` below reaches further than "the
+  observed range" suggests. What did change is the base — the Bridge formula took the three-year
+  average, the plan takes the **lesser** of that and the most recent valuation, which is a guard
+  against a district's valuation falling. The same shape as everywhere else in this node: the rate
+  holds and the thing it multiplies moves. [verified]
 revisions:
   - was: |
       The charge-off was described as 23 mills against *total taxable value*, following DeRolph
@@ -176,6 +257,25 @@ revisions:
     reach: |
       Everything computed against the old base was computed against the wrong one, including
       the headline comparison below.
+  - was: |
+      The parameter was described as retired outright, the Fair School Funding Plan having
+      replaced the charge-off with a local capacity measure. The Evidence-Based Model and Bridge
+      formula rates were recorded as unestablished, on the ground that the operative text for the
+      era could only come from the opinions or from session law.
+    now: |
+      Retired for city, local and exempted village districts only: **the plan computes a joint
+      vocational district's local share as a half-mill charge-off**, which LSC describes as
+      "consistent with the prior formula for JVSDs". And the era is sourced — 22 mills on two
+      bases under the Evidence-Based Model, and no uniform rate at all under the Bridge formula.
+    found_by: |
+      LSC's education greenbooks for H.B. 1 of the 128th, H.B. 59 of the 130th and H.B. 110 of the
+      134th. Twelve of them have been committed in this repository since the Bridge decade was
+      written and nothing had ever read one.
+    reach: |
+      The series is complete and shorter than expected: there is no fourth rate to hold, because
+      the parameter stopped being a parameter in FY2010. The "20 mills" of secondary reporting is
+      a statewide average of a per-district spread. And a comparison that treats the charge-off as
+      wholly historical is wrong about every joint vocational district.
   - was: |
       "Against the counterfactual the median district is $289 per pupil better off under the
       plan", with 193 districts better off under the charge-off against 413 under the plan.
@@ -209,8 +309,16 @@ properties:
   unit: mills
   series: |
     20 mills (1991, at DeRolph filing) -> 20.5 mills (Am.Sub.H.B. 152) -> 23 mills (by 1997,
-    R.C. 3317.022) -> 23 mills on recognized valuation (FY2008). Evidence-Based Model and Bridge
-    formula era rates are [open]. JVSDs: 0.5 mills throughout the observed range.
+    R.C. 3317.022) -> 23 mills on recognized valuation (FY2008) -> **22 mills on two bases**
+    (FY2010-11, the Evidence-Based Model) -> **no rate at all** (FY2012-FY2021, the Bridge
+    formula). [verified] JVSDs: 0.5 mills throughout, and still, under the Fair School Funding
+    Plan as enacted.
+
+    The last two entries are why this is not a series of one kind of thing. The Evidence-Based
+    Model applies one rate to total taxable value at the twenty-mill floor and to recognized
+    valuation above it; the Bridge formula's state share index yields a different implied rate for
+    every district, 11.3 to 22.9 mills at FY2014, averaging 20.6 statewide. A reader wanting one
+    number for the Bridge decade should take none.
 
     The base matters as much as the rate: total taxable value in the DeRolph era, recognized
     valuation by FY2008 — the latter being total taxable value with a reappraisal's inflationary
@@ -220,8 +328,18 @@ properties:
     R.C. 3317.022, with the rate set by biennial session law. Ohio Laws citations for the
     1991-1997 progression are recited at DeRolph I, paragraph 97. Ohio Laws' online version
     archive for R.C. 3317.022 begins at 1 July 2014, after the mechanism was already retired, so
-    the operative text for the charge-off era is not retrievable from `codes.ohio.gov` and must
-    come from the opinions or from session law.
+    the operative text for the charge-off era is not retrievable from `codes.ohio.gov`.
+
+    It does not follow that it must come from the opinions or from session law, which is what this
+    field said. **LSC's education greenbook for each enacted budget act states the rate and the
+    base in prose**, and twelve of them — the 124th General Assembly through the 135th — are
+    committed at
+    [`lsc-education-greenbooks.txt`](../../../crates/project/fixtures/lsc-education-greenbooks.txt).
+    [verified — [`crates/project`](../../../crates/project/src/greenbook.rs)] An analysis is not an
+    act and the act governs where they differ, so a rate taken from here is LSC's account of the
+    law rather than the law. For a *parameter series* that is the right trade: session law states a
+    rate inside an appropriation act's amending title, and an analysis states it in a sentence
+    beside its base.
   simulation_key: charge_off_millage
   sensitivity: |
     Raising the charge-off rate shifts cost from the state to districts, and shifts it most to
@@ -239,6 +357,30 @@ properties:
     The same count on total taxable value is 81, which is the measure of how much a wrong
     valuation base moves a distributional result: a fifth of this finding was the base.
 figures:
+  - key: project/lsc-education-greenbooks
+    value: 12
+    field: findings
+    as_written: "12 documents covering FY2002 through FY2025"
+  - key: project/evidence-based-model-local-share-mills
+    value: 22
+    field: findings
+    as_written: "were charged 22 mills of **total taxable valuation**"
+  - key: project/prior-law-non-base-cost-charge-off-mills
+    value: 3.3
+    field: findings
+    as_written: "up to 3.3 mills toward special education"
+  - key: project/bridge-formula-implied-charge-off-low
+    value: 11.3
+    field: series
+    as_written: "11.3 to 22.9"
+  - key: project/bridge-formula-implied-charge-off-high
+    value: 22.9
+    field: series
+    as_written: "to 22.9 mills at FY2014"
+  - key: project/bridge-formula-implied-charge-off-average
+    value: 20.6
+    field: findings
+    as_written: "**20.6 mills and a statewide average**"
   - key: regime-diff/recognized-valuation-deferred-share
     value: 0.08196273
     field: findings
@@ -263,6 +405,18 @@ figures:
     value: 81
     field: sensitivity
     as_written: "The same count on total taxable value is 81"
+unfilled:
+  - field: the current text of R.C. 3317.16
+    why: >-
+      The joint vocational funding section, which is where the half-mill charge-off would sit in
+      current law. The statute extract holds 35 sections and cites this one seven times without
+      carrying it, so the plan-era JVSD rate rests on LSC's analysis of H.B. 110 rather than on the
+      section itself. Adding it to `ohio-laws` would settle whether the half-mill survived H.B. 33
+      and H.B. 96.
+  - field: the districts the exempt-property adjustment reaches
+    why: >-
+      The rule is sourced — above 25% of potential taxable value exempted, the excess comes off the
+      base — and the list of districts it binds is the department's and is not published.
 links:
   - target: ../parameter.ont.yml
     relationship: instance-of

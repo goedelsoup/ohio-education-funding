@@ -686,6 +686,41 @@ fn past_the_three_year_exit() -> Vec<(
         .collect()
 }
 
+/// The millage LSC states immediately before `tail` in one of its budget analyses.
+///
+/// These figures are read out of committed prose rather than computed over a table, which is the
+/// only form the charge-off's last two eras exist in: Ohio Laws' version archive for
+/// R.C. 3317.022 begins after the mechanism was retired. Parsing rather than pinning a literal is
+/// what makes the figure a check — if LSC's sentence changes shape under a re-extract, this fails
+/// instead of quietly agreeing with a number nobody can find any more.
+///
+/// # Panics
+///
+/// If `tail` is absent, or the token before the nearest preceding `mill` is not a number. Both
+/// mean the extract and this reader have come apart.
+fn mills_before(passage: &str, tail: &str) -> f64 {
+    let at = passage
+        .find(tail)
+        .unwrap_or_else(|| panic!("the analysis no longer says {tail:?}"));
+    let (head, _) = passage[..at]
+        .rsplit_once(" mill")
+        .unwrap_or_else(|| panic!("no millage is stated before {tail:?}"));
+    head.split_whitespace()
+        .next_back()
+        .and_then(|token| token.parse().ok())
+        .unwrap_or_else(|| panic!("what precedes 'mill' before {tail:?} is not a number"))
+}
+
+/// LSC's account of the local share the Evidence-Based Model set, as one paragraph.
+fn evidence_based_local_share() -> String {
+    project::greenbook::greenbook("hb1").around("Under prior law, school districts contributed", 9)
+}
+
+/// LSC's account of what the Bridge formula's state share index implies, as one paragraph.
+fn bridge_implied_charge_off() -> String {
+    project::greenbook::greenbook("hb59").around("Prior to FY 2010, the school funding formula", 11)
+}
+
 /// Every building IRN on any of the three federal lists.
 fn federally_listed() -> BTreeSet<String> {
     dispersion::identified::identifications()
@@ -2281,6 +2316,82 @@ pub static FIGURES: &[Figure] = &[
                 .filter_map(|(_, b)| b.enrollment)
                 .sum()
         },
+    },
+    Figure {
+        key: "project/lsc-education-greenbooks",
+        owner: "crates/project",
+        unit: Unit::Count,
+        label: "LSC education analyses committed \u{2014} one per enacted budget act from the \
+                124th General Assembly to the 135th, and the only source the charge-off's last \
+                two eras are stated in",
+        pinned: 12.0,
+        tolerance: 0.0,
+        compute: |_| project::greenbook::greenbooks().len() as f64,
+    },
+    Figure {
+        key: "project/evidence-based-model-local-share-mills",
+        owner: "crates/project",
+        unit: Unit::Ratio,
+        label: "The local share the Evidence-Based Model charged, in mills \u{2014} one rate \
+                against two bases, split by whether a district sits at the twenty-mill floor",
+        pinned: 22.0,
+        tolerance: 0.0005,
+        compute: |_| {
+            mills_before(
+                &evidence_based_local_share(),
+                "(2.2%) of total taxable valuation",
+            )
+        },
+    },
+    Figure {
+        key: "project/prior-law-non-base-cost-charge-off-mills",
+        owner: "crates/project",
+        unit: Unit::Ratio,
+        label: "The second charge-off before FY2010, in mills \u{2014} special education, \
+                career-technical education and transportation, which the corpus's series omits",
+        pinned: 3.3,
+        tolerance: 0.0005,
+        compute: |_| {
+            mills_before(
+                &evidence_based_local_share(),
+                "(0.33%) of their recognized",
+            )
+        },
+    },
+    Figure {
+        key: "project/bridge-formula-implied-charge-off-low",
+        owner: "crates/project",
+        unit: Unit::Ratio,
+        label: "The lowest charge-off rate the Bridge formula's state share index implies, in \
+                mills, at FY2014 \u{2014} the bottom of a spread that replaced a uniform rate",
+        pinned: 11.3,
+        tolerance: 0.0005,
+        compute: |_| mills_before(&bridge_implied_charge_off(), "to 22.9 mills"),
+    },
+    Figure {
+        key: "project/bridge-formula-implied-charge-off-high",
+        owner: "crates/project",
+        unit: Unit::Ratio,
+        label: "The highest, excluding outlier districts \u{2014} twice the lowest, which is what \
+                stops the average below from being a rate",
+        pinned: 22.9,
+        tolerance: 0.0005,
+        compute: |_| {
+            mills_before(
+                &bridge_implied_charge_off(),
+                "(excluding several outlier districts)",
+            )
+        },
+    },
+    Figure {
+        key: "project/bridge-formula-implied-charge-off-average",
+        owner: "crates/project",
+        unit: Unit::Ratio,
+        label: "The statewide average of that spread at FY2014, in mills \u{2014} the number \
+                secondary reporting rounds to twenty and states as though it were legislated",
+        pinned: 20.6,
+        tolerance: 0.0005,
+        compute: |_| mills_before(&bridge_implied_charge_off(), "Targeted Assistance"),
     },
     Figure {
         key: "dispersion/the-two-poverty-measures-against-each-other",
