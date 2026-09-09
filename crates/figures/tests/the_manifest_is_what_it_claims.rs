@@ -133,6 +133,49 @@ fn a_share_cannot_be_confused_with_a_percentage() {
     }
 }
 
+/// A pupil figure is fractional, tolerant, and could not have been a count.
+///
+/// `Unit::Pupils` exists because `a_count_is_whole_and_exact` refused the first projection figures
+/// this manifest carried, and it was right to: enrolled ADM is an *average* daily membership, and
+/// a projection of one is fractional twice over. The risk in adding a unit to dodge a failing
+/// invariant is that it becomes the drawer anything awkward goes into, so this states what the
+/// new unit is actually for and fails when something else is filed under it.
+///
+/// The tolerance floor is the half-unit the corpus writes a pupil figure to. A pupil figure with
+/// a tolerance of zero would be a count wearing the wrong label, which is the substitution this
+/// test exists to refuse.
+#[test]
+fn a_pupil_figure_is_measured_rather_than_counted() {
+    /// Below one pupil the manifest is claiming a precision an average daily membership does not
+    /// have; above a hundred it is not really pinning the figure.
+    const TOLERANCE: std::ops::RangeInclusive<f64> = 0.5..=100.0;
+
+    let mut seen = 0;
+    for f in FIGURES {
+        if f.unit != Unit::Pupils {
+            continue;
+        }
+        seen += 1;
+        assert!(
+            TOLERANCE.contains(&f.tolerance),
+            "{}: a pupil figure with a tolerance of {} \u{2014} outside {TOLERANCE:?}, and a \
+             tolerance of zero would be a count under the wrong label",
+            f.key,
+            f.tolerance
+        );
+        assert!(
+            f.pinned.abs() > 1.0,
+            "{}: pinned at {}, which is small enough to be a count of something",
+            f.key,
+            f.pinned
+        );
+    }
+    assert!(
+        seen >= 5,
+        "the projected block is five pupil figures; {seen} found, so one has changed unit"
+    );
+}
+
 /// Keys are unique, and each names the directory of the crate that owns it.
 ///
 /// The prefix is not decoration. It is what lets the consumer report "this node cites

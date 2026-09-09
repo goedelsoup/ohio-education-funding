@@ -67,6 +67,13 @@ mod json;
 
 pub use json::manifest;
 
+/// The damping `DEFAULT_DAMPING` replaced, restated rather than remembered.
+///
+/// Every "moving the damping from 0.85 to 0.30 moves" figure below is a difference against a run
+/// at this value. Not imported from anywhere, because there is nowhere to import it from: it is a
+/// number the repository no longer uses, kept because the corpus quotes differences against it.
+const THE_DAMPING_BEFORE_IT_WAS_FITTED: f64 = 0.85;
+
 /// The manifest schema version. Bump on any change to the fields an entry carries.
 ///
 /// Read by the consumer before it reads anything else, on the same rule
@@ -74,7 +81,7 @@ pub use json::manifest;
 /// the document should refuse to run rather than compare fields it may be misreading. A gate that
 /// silently passes because it could not find what it was looking for is the failure mode #125
 /// catalogued sixteen times.
-pub const CONTRACT_VERSION: &str = "1.0.0";
+pub const CONTRACT_VERSION: &str = "1.1.0";
 
 /// What a figure is measured in, which decides how prose is allowed to write it.
 ///
@@ -93,6 +100,15 @@ pub enum Unit {
     Share,
     /// A dimensionless number that is not a fraction of one — a correlation, a multiple.
     Ratio,
+    /// A number of pupils, which Ohio measures rather than counts.
+    ///
+    /// Not a [`Count`](Unit::Count), and the difference is the point. Enrolled ADM is an
+    /// *average* daily membership: a district of 327 children has a fractional ADM, and a
+    /// projection of one is fractional twice over. `Count` asserts a whole number of things and
+    /// compares exactly, which a measured quantity cannot satisfy and should not pretend to.
+    /// Prose writes this bare, like a count, and it is compared to the precision the prose
+    /// writes it to, like dollars.
+    Pupils,
 }
 
 impl Unit {
@@ -104,6 +120,7 @@ impl Unit {
             Self::Dollars => "dollars",
             Self::Share => "share",
             Self::Ratio => "ratio",
+            Self::Pupils => "pupils",
         }
     }
 }
@@ -210,6 +227,29 @@ pub struct Inputs {
     /// The median district's operating spending per headcount pupil, over the 607 the department
     /// rates. The line `perrysburg-exempted-village` places itself below.
     pub median_operating_per_pupil: f64,
+    /// The four projected runs `metric/enrolled-adm` quotes.
+    ///
+    /// The first projection figures in this manifest, and they are here because of how the ones
+    /// they replace went wrong. `the-shrunk-rate` changed the projection method, every figure in
+    /// that node's damping paragraph moved, and nothing said so — the numbers were quoted from a
+    /// test that pins the *previous* method on purpose, as the evidence `the-fitted-damping` was
+    /// decided on. Binding them is what makes the next change to a projection constant redden the
+    /// corpus rather than silently restate it.
+    pub forecasts: Forecasts,
+}
+
+/// The projected runs the manifest quotes, computed once because each walks all 609 districts.
+pub struct Forecasts {
+    /// FY2032 at the shipped method — the nearer of the two horizons this repository publishes.
+    pub fy2032: project::report::EnrollmentEffect,
+    /// FY2036 at the shipped method.
+    pub fy2036: project::report::EnrollmentEffect,
+    /// FY2036 at the 0.85 damping that shipped before `the-fitted-damping`, which is what the
+    /// corpus's "moving the damping from 0.85 to 0.30 moves" figures are differences against.
+    pub fy2036_at_the_old_convention: project::report::EnrollmentEffect,
+    /// FY2036 undamped, which the backtest finds very nearly unbiased and which the corpus
+    /// quotes as the distance the damping holds the projection above.
+    pub fy2036_undamped: project::report::EnrollmentEffect,
 }
 
 impl Inputs {
@@ -226,6 +266,7 @@ impl Inputs {
         // draft runs need it before that happens.
         let panel_for_drafts = panel.clone();
         let panel_for_reach = panel.clone();
+        let panel_for_forecasts = panel.clone();
         let recognized: HashMap<String, Recognition> = recognized_valuation::from_abstract(2024);
         let at_recognized = panel_at_fy2027(
             &panel,
@@ -309,6 +350,36 @@ impl Inputs {
                     .collect();
                 column.sort_by(|a, b| a.partial_cmp(b).expect("no NaN in a published dollar"));
                 dispersion::median(&column).expect("the function file is not empty")
+            },
+            forecasts: {
+                // `panel_for_forecasts` because `panel` has moved into the literal above.
+                let prior = project::report::enrollment_growth_prior(
+                    &panel_for_forecasts,
+                    project::series::ONE_SIGMA,
+                );
+                // `toward` is a placeholder: `DistrictRecord::projection_method` replaces it with
+                // the district's own long-run rate, which is the whole point of `Shrunk`.
+                let shrunk = |damping: f64| project::series::Method::Shrunk {
+                    rate: 0.0,
+                    damping,
+                    weight: project::series::DEFAULT_SHRINK_WEIGHT,
+                    toward: 0.0,
+                };
+                let run = |year: u16, damping: f64| {
+                    project::report::forecast(
+                        &panel_for_forecasts,
+                        &project::policy::Policy::current_law(),
+                        FiscalYear(year),
+                        shrunk(damping),
+                        prior,
+                    )
+                };
+                Forecasts {
+                    fy2032: run(2032, project::series::DEFAULT_DAMPING),
+                    fy2036: run(2036, project::series::DEFAULT_DAMPING),
+                    fy2036_at_the_old_convention: run(2036, THE_DAMPING_BEFORE_IT_WAS_FITTED),
+                    fy2036_undamped: run(2036, 1.0),
+                }
             },
         }
     }
@@ -2892,6 +2963,86 @@ pub static FIGURES: &[Figure] = &[
         pinned: 294.0,
         tolerance: 0.0,
         compute: |i| on_the_guarantee(i).len() as f64,
+    },
+    // The projected block. Tolerances are the half-unit the corpus writes each figure to, except
+    // the aid difference, which the corpus states to a tenth of a million.
+    Figure {
+        key: "project/statewide-adm-fy2032",
+        owner: "crates/project",
+        unit: Unit::Pupils,
+        label: "Statewide enrolled ADM projected to FY2032 by the shipped method",
+        pinned: 1_384_244.862_5,
+        tolerance: 0.5,
+        compute: |i| i.forecasts.fy2032.adm,
+    },
+    Figure {
+        key: "project/statewide-adm-fy2036",
+        owner: "crates/project",
+        unit: Unit::Pupils,
+        label: "Statewide enrolled ADM projected to FY2036, the feed's horizon \u{2014} twelve \
+                pupils below the FY2032 figure, four years earlier",
+        pinned: 1_384_232.417_4,
+        tolerance: 0.5,
+        compute: |i| i.forecasts.fy2036.adm,
+    },
+    Figure {
+        key: "project/statewide-adm-fy2036-undamped",
+        owner: "crates/project",
+        unit: Unit::Pupils,
+        label: "The same projection undamped, which the backtest finds very nearly unbiased",
+        pinned: 1_290_679.717_1,
+        tolerance: 0.5,
+        compute: |i| i.forecasts.fy2036_undamped.adm,
+    },
+    Figure {
+        key: "project/damping-holds-adm-above-the-undamped-trend",
+        owner: "crates/project",
+        unit: Unit::Pupils,
+        label: "Pupils the damping holds the FY2036 projection above the undamped trend",
+        pinned: 93_552.700_2,
+        tolerance: 0.5,
+        compute: |i| i.forecasts.fy2036.adm - i.forecasts.fy2036_undamped.adm,
+    },
+    Figure {
+        key: "project/damping-move-statewide-adm-fy2036",
+        owner: "crates/project",
+        unit: Unit::Pupils,
+        label: "Pupils that moving the damping from 0.85 to 0.30 adds to the FY2036 projection, \
+                under the shrunk rate the feed runs",
+        pinned: 45_293.897_0,
+        tolerance: 0.5,
+        compute: |i| i.forecasts.fy2036.adm - i.forecasts.fy2036_at_the_old_convention.adm,
+    },
+    Figure {
+        key: "project/damping-move-realized-aid-fy2036",
+        owner: "crates/project",
+        unit: Unit::Dollars,
+        label: "What the same move does to realized state aid at FY2036 \u{2014} a fifth of the \
+                enrollment move, because the guarantee absorbs most of it",
+        pinned: 101_033_524.939_1,
+        tolerance: 50_000.0,
+        compute: |i| {
+            i.forecasts.fy2036.realized_aid - i.forecasts.fy2036_at_the_old_convention.realized_aid
+        },
+    },
+    Figure {
+        key: "project/districts-on-the-guarantee-fy2036",
+        owner: "crates/project",
+        unit: Unit::Count,
+        label: "Districts the guarantee pays at FY2036 under the shipped projection",
+        pinned: 312.0,
+        tolerance: 0.0,
+        compute: |i| i.forecasts.fy2036.on_guarantee as f64,
+    },
+    Figure {
+        key: "project/districts-on-the-guarantee-fy2036-at-the-old-damping",
+        owner: "crates/project",
+        unit: Unit::Count,
+        label: "The same count at the 0.85 damping, which is the other end of the corpus's \
+                44-district move",
+        pinned: 356.0,
+        tolerance: 0.0,
+        compute: |i| i.forecasts.fy2036_at_the_old_convention.on_guarantee as f64,
     },
     // `formula-component/fsfp-formula-transition-supplement`. The second hold-harmless, and the
     // node's point is that it is not nested inside the first.

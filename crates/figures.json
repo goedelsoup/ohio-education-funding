@@ -1,5 +1,5 @@
 {
-  "contract": "1.0.0",
+  "contract": "1.1.0",
   "figures": [
     {"key": "bundle/median-federal-share-of-operating-spending", "owner": "crates/bundle", "unit": "share", "value": 0.04203840156654025, "label": "The median district's federal share of operating spending, 2024-25"},
     {"key": "bundle/max-federal-share-of-operating-spending", "owner": "crates/bundle", "unit": "share", "value": 0.29041969187179034, "label": "The highest federal share in the state — the most exposed district in Ohio to a decision Ohio does not make"},
@@ -188,6 +188,14 @@
     {"key": "project/house-districts-columbus-city-reaches", "owner": "crates/project", "unit": "count", "value": 11, "label": "House seats the most-divided school district has population in"},
     {"key": "project/ohio-under-eighteen-share", "owner": "crates/project", "unit": "share", "value": 0.21968677707056486, "label": "Ohio's under-18 share of population, which is the weight school funding is apportioned across House seats by — not total population, which would weight a seat full of retirees the same as one full of families"},
     {"key": "project/districts-on-the-guarantee", "owner": "crates/project", "unit": "count", "value": 294, "label": "Districts the temporary transitional aid guarantee pays in FY2027 -- the terminal year, at a phase-in of 100%"},
+    {"key": "project/statewide-adm-fy2032", "owner": "crates/project", "unit": "pupils", "value": 1384244.862512754, "label": "Statewide enrolled ADM projected to FY2032 by the shipped method"},
+    {"key": "project/statewide-adm-fy2036", "owner": "crates/project", "unit": "pupils", "value": 1384232.4173715815, "label": "Statewide enrolled ADM projected to FY2036, the feed's horizon — twelve pupils below the FY2032 figure, four years earlier"},
+    {"key": "project/statewide-adm-fy2036-undamped", "owner": "crates/project", "unit": "pupils", "value": 1290679.7171409924, "label": "The same projection undamped, which the backtest finds very nearly unbiased"},
+    {"key": "project/damping-holds-adm-above-the-undamped-trend", "owner": "crates/project", "unit": "pupils", "value": 93552.70023058914, "label": "Pupils the damping holds the FY2036 projection above the undamped trend"},
+    {"key": "project/damping-move-statewide-adm-fy2036", "owner": "crates/project", "unit": "pupils", "value": 45293.89703262714, "label": "Pupils that moving the damping from 0.85 to 0.30 adds to the FY2036 projection, under the shrunk rate the feed runs"},
+    {"key": "project/damping-move-realized-aid-fy2036", "owner": "crates/project", "unit": "dollars", "value": 101033524.93905258, "label": "What the same move does to realized state aid at FY2036 — a fifth of the enrollment move, because the guarantee absorbs most of it"},
+    {"key": "project/districts-on-the-guarantee-fy2036", "owner": "crates/project", "unit": "count", "value": 312, "label": "Districts the guarantee pays at FY2036 under the shipped projection"},
+    {"key": "project/districts-on-the-guarantee-fy2036-at-the-old-damping", "owner": "crates/project", "unit": "count", "value": 356, "label": "The same count at the 0.85 damping, which is the other end of the corpus's 44-district move"},
     {"key": "project/transition-supplement-total", "owner": "crates/project", "unit": "dollars", "value": 63578629.47000002, "label": "Line [K], the formula transition supplement, statewide"},
     {"key": "project/transition-supplement-districts", "owner": "crates/project", "unit": "count", "value": 144, "label": "Districts line [K] pays"},
     {"key": "project/transition-supplement-districts-off-the-guarantee", "owner": "crates/project", "unit": "count", "value": 17, "label": "Districts drawing line [K] that the guarantee does not pay -- the two hold-harmlesses are not nested"},
