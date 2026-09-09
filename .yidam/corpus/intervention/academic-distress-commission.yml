@@ -27,7 +27,7 @@ description: |
 
   ### The powers are fiscal, which is why the intervention belongs beside the funding
 
-  The CEO's enumerated powers under division (D) include defining employee responsibilities,
+  The CEO's enumerated powers under division (C)(1) include defining employee responsibilities,
   setting compensation, allocating teacher class loads, conducting evaluations, making
   reductions in staff, setting the calendar, contracting for services, modifying board policy,
   establishing grade configurations, determining curriculum, setting class sizes — and **"(j)
@@ -38,10 +38,14 @@ description: |
   supplements all compute an amount that arrives at a district whose spending decisions have
   been transferred to a state appointee. [inference]
 
-  There is also a fund of its own: the CEO "shall establish a separate fund to support
-  innovative education programs", holds **sole authority to disburse** from it until the
-  district exits, and every disbursement must support the approved improvement plan. Moneys
-  appropriated by the General Assembly for that purpose go into it. [verified]
+  There is also a fund of its own: under division (G)(2) the CEO "shall establish a separate
+  fund to support innovative education programs", holds **sole authority to disburse** from it
+  until the district exits, and every disbursement must support the approved improvement plan.
+  Moneys appropriated by the General Assembly for that purpose go into it. [verified]
+
+  **The powers escalate by year**, and division (K) replaces the elected board in year four — so
+  it is superseded on a schedule rather than at the trigger. Two other divisions move money past
+  the district. [verified] Both are set out below.
 findings: |
   **The same number pays and takes.** The overall rating under R.C. 3302.03 that sets this
   trigger is the rating the [FSFP performance
@@ -80,10 +84,35 @@ findings: |
   the complete history would put Cleveland in the wrong regime and lose the fact that Ohio has
   had two.
 
+  ### Getting out is harder than staying in
+
+  The exit criteria are division (N), and they are not the trigger run backwards. [verified]
+
+  A district *begins* a transition out when it receives an overall grade of "C" or higher, or an
+  overall performance rating of **three stars or higher**. That year starts a clock and,
+  expressly, "shall not count as one of the two consecutive school years" that follow: the
+  transition ends only after two further years at higher than "F", or **two stars or higher**.
+  Three years at the fastest, on two different thresholds. And division (N)(2) is the trap — a
+  single year back below two stars during the transition ends it, and the district "shall resume
+  being fully subject to this section at the point it began its transition", so the escalation
+  ladder in divisions (H) through (L) does not reset. It resumes where it stopped.
+
+  **Compare the two.** Entry is three consecutive years *below two stars*. Exit is one year *at
+  three stars* and then two years *at two stars*. So the band between two and three stars is
+  neither in nor out, and it is a trap for a district already inside: at two-and-a-half stars it
+  is not re-triggering, and it cannot start the exit clock either, because that needs three.
+  [inference] The section sets no maximum duration; how long a commission lasts is entirely what
+  division (N) makes of the ratings. Which years each of the three districts here cleared is not
+  established — the corpus holds no district's year-by-year overall rating, only the current
+  cross-section. [open]
+
+  There is one other exit, in division (O): if reconstitution or closure leaves the district
+  operating no schools at all, the commission ceases to exist. [verified] An intervention whose
+  most drastic power is closing schools terminates itself by exercising it.
+
   **What is still not established.** When each commission was established — the department's
   page gives the 2021 plan requirement and the 2023 dissolution and no start dates. [open]
-  Whether any commission changed outcomes, which is what the apparatus rests on. [open] And the
-  exit criteria, in later divisions of the section this node has not transcribed. [open]
+  Whether any commission changed outcomes, which is what the apparatus rests on. [open]
 properties:
   name: Academic distress commission
   authority: R.C. 3302.10, effective 3 October 2023 in its current form. [verified]
@@ -94,6 +123,20 @@ properties:
     existed for at least four years, in which case the old commission is abolished and a new one
     appointed. [verified]
   unit: education-agency
+  exit: |
+    Division (N). A transition out **begins** when the district receives an overall grade of "C"
+    or higher under R.C. 3302.03(C)(3), or an overall performance rating of three stars or higher
+    under (D)(3). It **ends** after two further consecutive school years at higher than "F", or at
+    two stars or higher — the qualifying year expressly not counting as one of the two. A single
+    year back below the trigger during the transition ends it and returns the district to the
+    escalation division it had reached, which does not reset. [verified]
+
+    Minimum three years, on two thresholds: three stars once, then two stars twice. Entry is
+    three consecutive years below two stars, so the two-to-three star band accumulates toward
+    neither. [inference]
+
+    Division (O) is the other exit: a district left operating no schools, by reconstitution or
+    closure, ends its own commission. [verified]
   powers: |
     Exercised by a chief executive officer appointed by the commission and paid by the department.
     Employee responsibilities and job descriptions; compensation; teacher class loads; evaluations;
@@ -104,15 +147,42 @@ properties:
 
     Any previously appointed improvement coordinator under R.C. 3302.04(A) is terminated.
     [verified]
+
+    **Divisions (H) through (L) add to that list by year**, each keyed to the district's report
+    card for its first, second, third, fourth and fifth year under the section. Year one: the CEO
+    may *reconstitute* any school — change its mission, replace its principal or a majority of its
+    staff, contract its operations to a nonprofit or for-profit manager, reopen it as a community
+    or STEM school, or permanently close it — and may reopen a collective bargaining agreement to
+    renegotiate. Year two: the CEO may unilaterally limit, suspend or alter any provision of that
+    agreement, outside bargaining, short of cutting base hourly pay or insurance. Year three:
+    continue those alterations. **Year four: a new board of education is appointed** under R.C.
+    3302.11, while the CEO retains complete control until relinquishing it under division (N).
+    Year five and after: everything already unlocked. [verified]
   fiscal_effect: |
     Transfers the power to create the district's budget from the elected board to a state-appointed
     chief executive officer whose salary the department pays. [verified] Establishes a separate
     innovation fund the CEO alone may disburse, holding any moneys the General Assembly
-    appropriates for the purpose. [verified] Does not alter what the funding formula computes for
-    the district — only who decides how it is spent. [inference]
+    appropriates for the purpose. [verified]
+
+    **And it moves money past the district, which this node previously denied.** The field read
+    "does not alter what the funding formula computes for the district — only who decides how it
+    is spent", as an inference, until R.C. 3302.10 was read past its powers list. Two divisions
+    contradict it. Division (G)(3) makes **every student entitled to attend school in the
+    district** eligible for [EdChoice](../program/edchoice-scholarship.yml) for as long as the
+    district is subject to the section — a scholarship deduction switched on by a rating, against
+    a district already judged to be failing. Division (M) then makes community schools, STEM
+    schools, chartered nonpublic schools and *other school districts* enrolling the district's
+    residents eligible for an "academic performance bonus" in any year the General Assembly
+    appropriates for one, from the second year of the commission onward. [verified]
+
+    So the section appoints a manager for the district and pays its alternatives. Neither channel
+    is in the funding formula, and the first is a deduction the formula does not see coming.
+    [inference]
 unfilled:
-  - field: exit criteria
-    why: Not transcribed here; the later divisions of R.C. 3302.10 carry them.
+  - field: the commissions' start dates
+    why: >-
+      The department's page gives the 2021 plan requirement and the 2023 dissolution and no
+      establishment dates, so no commission here can be placed on the fiscal-period axis.
 links:
   - target: ../intervention.ont.yml
     relationship: instance-of

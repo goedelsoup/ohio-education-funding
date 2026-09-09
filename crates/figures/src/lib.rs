@@ -589,6 +589,33 @@ fn lifted_off_the_guarantee(priced: &project::drafts::Priced) -> f64 {
 /// `−0.846` and `+0.375`, and the consumer's numeral reader does not read a sign — so a figure
 /// pinned negative could not be bound to the sentence that states it without the check ignoring
 /// direction, which is the one thing #120 was about.
+/// The achievement denominator for a year: the mean of the highest two per cent of district
+/// scores, with the two per cent taken as a ceiling.
+///
+/// R.C. 3302.03(D)(1)(c) defines it and does not say how to round "two per cent"; the department
+/// publishes the 2024-25 value and only the ceiling reproduces it. See
+/// `crates/dispersion/tests/the_weights_behind_the_index.rs`, which is where that is established
+/// rather than assumed. This exists because the department publishes the maximum for the current
+/// year alone, so any earlier year's has to be recomputed the same way.
+fn achievement_denominator(mut scores: Vec<f64>) -> f64 {
+    scores.sort_by(|a, b| b.total_cmp(a));
+    let top = (scores.len() * 2).div_ceil(100);
+    scores[..top].iter().sum::<f64>() / top as f64
+}
+
+/// The most common achievement star rating, and how many districts are rated at all.
+fn modal_achievement_rating() -> (usize, usize) {
+    let mut counts = [0usize; 6];
+    let mut rated = 0;
+    for card in dispersion::report_card::report_cards() {
+        if let Some(stars) = card.achievement_stars {
+            counts[stars as usize] += 1;
+            rated += 1;
+        }
+    }
+    (counts.into_iter().max().unwrap_or(0), rated)
+}
+
 fn outcome_correlation(
     i: &Inputs,
     x: fn(
@@ -1737,6 +1764,147 @@ pub static FIGURES: &[Figure] = &[
                 |c, _| c.economically_disadvantaged,
                 |c| c.performance_index,
             )
+        },
+    },
+    // `accountability-regime/ohio-report-card`. The achievement component is awarded on the Index
+    // over a statewide maximum refitted every year, so the rating is a share and the Index is a
+    // level. Bound here because the whole finding is a comparison of two years of a denominator,
+    // and a report-card refresh moves both ends of it without touching a word of the prose.
+    Figure {
+        key: "dispersion/achievement-maximum-2425",
+        owner: "crates/dispersion",
+        unit: Unit::Ratio,
+        label: "The statewide achievement denominator for 2024-25 \u{2014} the average of the \
+                highest two per cent of district Performance Index scores, as published",
+        pinned: 109.8,
+        tolerance: 0.05,
+        compute: |_| {
+            let published: Vec<f64> = dispersion::report_card::report_cards()
+                .iter()
+                .filter_map(|c| c.performance_index_maximum)
+                .collect();
+            assert!(
+                published.windows(2).all(|w| w[0] == w[1]),
+                "the maximum is one statewide number and this file no longer says so"
+            );
+            published[0]
+        },
+    },
+    Figure {
+        key: "dispersion/achievement-maximum-2223",
+        owner: "crates/dispersion",
+        unit: Unit::Ratio,
+        label: "The same denominator two years earlier, recomputed because the department \
+                publishes the maximum for the current year alone",
+        pinned: 108.8,
+        tolerance: 0.05,
+        compute: |_| {
+            achievement_denominator(
+                dispersion::report_card::report_cards()
+                    .iter()
+                    .filter_map(|c| c.performance_index_earliest)
+                    .collect(),
+            )
+        },
+    },
+    Figure {
+        key: "dispersion/achievement-top-districts-averaged",
+        owner: "crates/dispersion",
+        unit: Unit::Count,
+        label: "How many districts the statute\u{2019}s highest two per cent resolves to \u{2014} \
+                the ceiling of two per cent of 607, and the only count that reproduces the \
+                published maximum",
+        pinned: 13.0,
+        tolerance: 0.0,
+        compute: |_| (dispersion::report_card::report_cards().len() * 2).div_ceil(100) as f64,
+    },
+    Figure {
+        key: "dispersion/districts-rising-on-index-and-falling-on-share",
+        owner: "crates/dispersion",
+        unit: Unit::Count,
+        label: "Districts that improved on the Performance Index between 2022-23 and 2024-25 and \
+                declined as a share of the year's maximum \u{2014} the cost of an annually \
+                refitted denominator",
+        pinned: 121.0,
+        tolerance: 0.0,
+        compute: |_| {
+            let rows = dispersion::report_card::report_cards();
+            // The published maximum for the current year and the recomputed one for the earlier
+            // year, which is the only pair available: the department publishes the maximum for
+            // the year the card covers and no other. Recomputing *both* is the obvious
+            // alternative and is wrong here — it would divide 2024-25 by 109.8077 where the
+            // department divided by 109.8, and the count is decided at the fifth decimal place.
+            // `crates/dispersion/tests/the_weights_behind_the_index.rs` makes the same choice and
+            // pins how little room there is.
+            let then = achievement_denominator(
+                rows.iter().filter_map(|c| c.performance_index_earliest).collect(),
+            );
+            rows.iter()
+                .filter(|c| {
+                    match (
+                        c.performance_index_earliest,
+                        c.performance_index,
+                        c.performance_index_maximum,
+                    ) {
+                        (Some(before), Some(after), Some(now)) => {
+                            after > before && after / now <= before / then
+                        }
+                        _ => false,
+                    }
+                })
+                .count() as f64
+        },
+    },
+    Figure {
+        key: "dispersion/achievement-denominator-drift",
+        owner: "crates/dispersion",
+        // Percentage points as a `Ratio`, and the two guards between them left no other choice.
+        // `Share` refuses anything under 0.02, because a share that small would survive its own
+        // hundredfold typo — and 0.00919 is under it. `Ratio` then refuses any prose numeral
+        // carrying a `%`, on the reading that a percent sign means the author meant a share. So a
+        // growth rate below two per cent, written with the sign, fits neither unit. The prose
+        // spells the words instead, which is this node's style for the statute's own "two per
+        // cent" anyway. If a third sub-percent rate wants binding, the gap is worth a unit rather
+        // than a third comment like this one.
+        unit: Unit::Ratio,
+        label: "How far the achievement denominator rose between 2022-23 and 2024-25, in per \
+                cent \u{2014} the amount every district\u{2019}s share fell relative to its own \
+                index, and the robust half of the finding the 121 counts",
+        pinned: 0.919,
+        tolerance: 0.005,
+        compute: |_| {
+            let rows = dispersion::report_card::report_cards();
+            let then = achievement_denominator(
+                rows.iter().filter_map(|c| c.performance_index_earliest).collect(),
+            );
+            let now = rows
+                .iter()
+                .find_map(|c| c.performance_index_maximum)
+                .expect("a published maximum");
+            (now / then - 1.0) * 100.0
+        },
+    },
+    Figure {
+        key: "dispersion/achievement-modal-rating-districts",
+        owner: "crates/dispersion",
+        unit: Unit::Count,
+        label: "Districts holding the most common achievement star rating \u{2014} the number \
+                R.C. 3302.03(D)(4)(b) requires stay under half the state",
+        pinned: 227.0,
+        tolerance: 0.0,
+        compute: |_| modal_achievement_rating().0 as f64,
+    },
+    Figure {
+        key: "dispersion/achievement-modal-rating-share",
+        owner: "crates/dispersion",
+        unit: Unit::Share,
+        label: "The same as a share of the rated districts \u{2014} how much room the statute's \
+                distributional constraint actually has",
+        pinned: 0.37397,
+        tolerance: 0.0005,
+        compute: |_| {
+            let (modal, rated) = modal_achievement_rating();
+            modal as f64 / rated as f64
         },
     },
     Figure {

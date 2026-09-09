@@ -27,10 +27,117 @@ description: |
   requires preliminary report card data to districts not later than the thirty-first of July each
   year. [verified]
 
-  What the components are, how the overall rating is computed from them, and how the star
-  thresholds are set are in the section and not yet transcribed here. [open] Whether the
-  2022-23 change of scale moved any district across the distress trigger is not established and
-  is exactly the kind of question the two-regime model exists to ask. [open]
+  **The rating is built from six components and none of them is scored on a fixed standard.**
+  The section names the components and weights them, delegates every threshold to administrative
+  rule, and scores achievement against a maximum refitted annually — so a rating is a position in
+  a distribution rather than a level. What that costs is measured below. [verified — computed;
+  see
+  [`crates/dispersion/tests/the_weights_behind_the_index.rs`](../../../crates/dispersion/tests/the_weights_behind_the_index.rs)]
+
+  Whether the 2022-23 change of scale moved any district across the distress trigger is not
+  established and is exactly the kind of question the two-regime model exists to ask. [open]
+findings: |
+  ### Six components, weighted as proportions rather than percentages
+
+  R.C. 3302.03(D)(3) groups the report card's measures into gap closing, achievement, progress,
+  graduation, early literacy, and college/career/workforce/military readiness. Division (D)(3)(g)
+  then builds the overall rating out of them without ever printing a percentage: achievement and
+  progress carry equal weight, and each remaining component carries **half** of achievement's.
+  That is 2:2:1:1:1 under (g)(i) — 28.6% each to achievement and progress and 14.3% to each of
+  the other three — or 2:2:1:1:1:1 under (g)(ii), which is 25% and 12.5% and applies only where
+  the Joint Committee on Agency Rule Review approved the department's readiness rules.
+  [verified]
+
+  Which of the two governs the 2024-25 report card is not established here. Division (D)(3)(f)
+  makes it turn on a single administrative event — the committee approving or disapproving the
+  rules the department was directed to propose — and the difference is whether the overall
+  rating has five components or six, so it moves every district's rating. The department's own
+  achievement download carries the achievement component alone and cannot answer it; the
+  committee's docket can. [open]
+
+  ### The star thresholds are not in the section, and their absence is the design
+
+  Division (D)(4)(a) delegates the "performance criteria, benchmarks, and rating system" to rules
+  adopted under Chapter 119. What the statute sets instead is a *shape*: (D)(4)(b) requires the
+  department to use prior years and simulations so that there is "meaningful differentiation"
+  and that, outside one named exception, "more than half of all districts or buildings do not
+  earn the same performance rating in any component or overall"; division (M) requires the
+  benchmarks be reviewed at least every three years. The cutpoints are meant to move. [verified]
+  A star rating is a position in a distribution the department is under a duty to spread, and not
+  a level. Anyone reading one as a fixed standard is reading the wrong kind of number.
+
+  ### The achievement component is scored against the top of the state, refitted every year
+
+  R.C. 3302.03(D)(1)(c) does not award the achievement rating on the Performance Index. It
+  awards it on the Index divided by a *maximum*, and defines that maximum as "the average of the
+  highest two per cent of performance index scores achieved by a district for the school year
+  for which a report card is issued." One number for the whole state, recomputed annually.
+  [verified]
+
+  The department publishes it. For 2024-25 it is **109.8**, identical on all 607 district rows.
+  The statute says "two per cent" and does not say how to round it; two per cent of 607 is
+  12.14, and the file decides: the mean of the top 13 scores is 109.81 and rounds to what was
+  published, while the top 12 give 109.9 and the top 14 give 109.7. The department takes the
+  ceiling. [verified — computed; see
+  [`crates/dispersion/tests/the_weights_behind_the_index.rs`](../../../crates/dispersion/tests/the_weights_behind_the_index.rs)]
+
+  **So the rating is a share and the Index is a level, and they can move in opposite
+  directions.** The denominator was 108.8 in 2022-23 and 109.8 in 2024-25 — a point, against a
+  median district's whole three-year range of 2.1 points on the Index itself. **121 of 607
+  districts improved on the Index over that window and declined as a share of the maximum.**
+  [verified — computed] One district in five went backwards on the measure the star rating is
+  awarded on while going forwards on the measure the corpus quotes.
+
+  **The count is exact and its edge is soft, so take the mechanism rather than the cut.** 28 of
+  the 425 districts that rose on the Index change share by less than a thousandth in either
+  direction, and the nearest changes by five millionths. What does not depend on where the cut
+  falls is the denominator itself: it rose **0.919 per cent**, so every district's share fell by
+  that much relative to its own Index, and the 121 are the subset whose gain did not cover it.
+  [verified — computed]
+
+  This is a second and stronger reason for the rule
+  [performance-index](../metric/performance-index.yml) already states as "use the Index, not the
+  star rating". Coarseness was the first: a rating bins many districts together. Relativity is
+  the second: a rating is scored against a denominator that other districts move. [inference]
+
+  ### The distributional constraint does not bind
+
+  Division (D)(4)(b)'s requirement that "more than half of all districts or buildings do not
+  earn the same performance rating" is satisfied on the achievement component with room to
+  spare — the modal rating is four stars at 227 of 607, or 37.4%. [verified — computed] It is a
+  weak constraint, and the same column shows why: on that component three districts hold one
+  star and 91 hold five. Nothing in the section requires the scale to be centred, only that it
+  not collapse, and the corpus holds no year in which any component came close to collapsing.
+
+figures:
+  - key: dispersion/achievement-maximum-2425
+    value: 109.8
+    field: findings
+    as_written: "For 2024-25 it is **109.8**"
+  - key: dispersion/achievement-maximum-2223
+    value: 108.8
+    field: findings
+    as_written: "The denominator was 108.8 in 2022-23"
+  - key: dispersion/achievement-top-districts-averaged
+    value: 13
+    field: findings
+    as_written: "the mean of the top 13 scores"
+  - key: dispersion/districts-rising-on-index-and-falling-on-share
+    value: 121
+    field: findings
+    as_written: "121 of 607 districts improved on the Index"
+  - key: dispersion/achievement-denominator-drift
+    value: 0.919
+    field: findings
+    as_written: "it rose **0.919 per cent**"
+  - key: dispersion/achievement-modal-rating-districts
+    value: 227
+    field: findings
+    as_written: "the modal rating is four stars at 227 of 607"
+  - key: dispersion/achievement-modal-rating-share
+    value: 0.37397
+    field: findings
+    as_written: "or 37.4%"
 properties:
   name: Ohio School Report Card
   level: state
@@ -38,9 +145,16 @@ properties:
   measure: |
     An overall rating for each district and school building. Expressed as a letter grade under
     division (C)(3) and as a star rating under division (D)(3); the star scale replaced letter
-    grades for the 2022-23 report cards and both remain in the section. [verified] Components
-    include achievement, progress, gap closing, graduation, early literacy and chronic
-    absenteeism; the corpus holds [performance index](../metric/performance-index.yml) and
+    grades for the 2022-23 report cards and both remain in the section. [verified]
+
+    Six components under division (D)(3): gap closing, achievement, progress, graduation, early
+    literacy, and college/career/workforce/military readiness. [verified] Chronic absenteeism
+    is *not* one of them — R.C. 3302.03(D)(3)(a)(ii) makes it one of six met-or-not-met measures
+    inside gap closing, alongside the gifted indicator, English-language-proficiency improvement,
+    and subgroup targets for graduation, achievement and progress. This node listed it as a
+    component until the section was read against the list. [verified]
+
+    The corpus holds [performance index](../metric/performance-index.yml) and
     [progress](../metric/progress-value-added.yml) as metrics and not the others.
   identification: |
     The rating is not itself an identification. It is the input two identification systems consume:

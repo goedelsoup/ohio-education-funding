@@ -77,13 +77,16 @@ test("every bound figure in the corpus agrees with the crate it cites", () => {
  * So this was the repository's only hand-maintained exact ratchet, which is why it was the one
  * that drifted. A floor that must equal its count needs re-counting; a floor that only guards
  * against vacuity does not.
+ *
+ * Both numbers were re-counted again at 415/53, when `accountability-regime/ohio-report-card`
+ * became the fifty-third carrier.
  */
 test("the corpus binds no fewer figures than it did", () => {
-  expect(bindings.length, "406 bindings; raise this when you add one").toBeGreaterThanOrEqual(406);
+  expect(bindings.length, "415 bindings; raise this when you add one").toBeGreaterThanOrEqual(415);
   expect(
     corpus.nodes.filter((node) => node.figures.length > 0).length,
-    "52 nodes carry bindings; raise this when a fifty-third does",
-  ).toBeGreaterThanOrEqual(52);
+    "53 nodes carry bindings; raise this when a fifty-fourth does",
+  ).toBeGreaterThanOrEqual(53);
   expect(
     new Set(bindings.map((binding) => binding.key)).size,
     "every figure the manifest exports is bound by some node",

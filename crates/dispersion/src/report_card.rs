@@ -46,7 +46,10 @@ unweighted_adm_fy25,weighted_adm_fy25,operating_expenditures_fy25,\
 exp_per_equivalent_pupil_fy25,exp_per_equivalent_pupil_federal_fy25,\
 exp_per_equivalent_pupil_state_local_fy25,progress_composite_2425,progress_effect_size_2425,\
 progress_effect_size_1yr_2425,econ_disadvantaged_pct_2425,english_learner_pct_2425,\
-students_with_disabilities_pct_2425";
+students_with_disabilities_pct_2425,achievement_star_rating_2425,\
+performance_index_percent_2425,performance_index_maximum_2425,pct_not_tested_2425,\
+pct_limited_2425,pct_basic_2425,pct_proficient_2425,pct_accomplished_2425,pct_advanced_2425,\
+pct_advanced_plus_2425";
 
 /// What the report card publishes for one district.
 #[derive(Debug, Clone, PartialEq)]
@@ -67,7 +70,12 @@ pub struct ReportCard {
     /// measured as well as how far they moved — so it does not compare districts.
     /// [`ReportCard::progress_effect_size`] is the one that does.
     pub progress_composite: Option<f64>,
-    /// Value-added effect size, 2024-25 — already a three-year average as published.
+    /// Value-added effect size, 2024-25 — already a three-year average as published, and not an
+    /// average of equal thirds.
+    ///
+    /// R.C. 3302.03(D)(1)(d) weights the most recent year at fifty per cent and each of the other
+    /// two at twenty-five, so half the measure is one year of data. Where only two years exist the
+    /// split is 67/33, and where only one does the measure is that year.
     ///
     /// Ohio's growth measure, and it ranks districts differently enough from the Performance
     /// Index that an outcome-based adequacy standard has to choose one.
@@ -103,6 +111,31 @@ pub struct ReportCard {
     pub english_learner: Option<f64>,
     /// Students with disabilities share, 2024-25, as a percentage.
     pub students_with_disabilities: Option<f64>,
+    /// The achievement component's star rating, 2024-25 — one to five, whole stars.
+    ///
+    /// Not the district's *overall* rating, which this file does not carry. Achievement is one
+    /// of the components R.C. 3302.03(D)(3) groups the report card into, and the overall rating
+    /// is a weighted blend of it and four or five others.
+    pub achievement_stars: Option<f64>,
+    /// The Performance Index as a percentage of [`ReportCard::performance_index_maximum`].
+    ///
+    /// This, and not [`ReportCard::performance_index`], is what the achievement star rating is
+    /// awarded on — R.C. 3302.03(D)(3)(b). It is a share of the top of the state in the same
+    /// year, so it moves when other districts move.
+    pub performance_index_percent: Option<f64>,
+    /// The statewide achievement denominator for 2024-25: 109.8, on every row.
+    ///
+    /// R.C. 3302.03(D)(1)(c) defines it as the average of the highest two per cent of district
+    /// scores for the year. It is refitted annually, which is why the percentage above is not a
+    /// level. Summing this column measures nothing.
+    pub performance_index_maximum: Option<f64>,
+    /// The seven achievement-level shares the index is built from, as percentages, in the
+    /// department's own order: not tested, limited, basic, proficient, accomplished, advanced,
+    /// advanced plus.
+    ///
+    /// Published to one decimal and independently rounded, so they sum to between 99.8 and
+    /// 100.2 rather than to 100. Anything reconstructed from them inherits that.
+    pub levels: [Option<f64>; 7],
 }
 
 impl ReportCard {
@@ -165,6 +198,11 @@ mod column {
     pub const ECON_DISADVANTAGED: usize = 14;
     pub const ENGLISH_LEARNER: usize = 15;
     pub const STUDENTS_WITH_DISABILITIES: usize = 16;
+    pub const ACHIEVEMENT_STARS: usize = 17;
+    pub const PERFORMANCE_INDEX_PERCENT: usize = 18;
+    pub const PERFORMANCE_INDEX_MAXIMUM: usize = 19;
+    /// First of the seven level shares; the rest follow it in the department's order.
+    pub const LEVELS: usize = 20;
 }
 
 /// Every district the report card covers.
@@ -213,6 +251,10 @@ fn parse() -> Vec<ReportCard> {
                 economically_disadvantaged: row.num(column::ECON_DISADVANTAGED),
                 english_learner: row.num(column::ENGLISH_LEARNER),
                 students_with_disabilities: row.num(column::STUDENTS_WITH_DISABILITIES),
+                achievement_stars: row.num(column::ACHIEVEMENT_STARS),
+                performance_index_percent: row.num(column::PERFORMANCE_INDEX_PERCENT),
+                performance_index_maximum: row.num(column::PERFORMANCE_INDEX_MAXIMUM),
+                levels: std::array::from_fn(|i| row.num(column::LEVELS + i)),
             })
         })
         .collect()

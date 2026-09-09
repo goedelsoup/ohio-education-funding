@@ -125,6 +125,14 @@ findings: |
   the district-weighted and student-weighted views of every relationship here diverge, and why
   neither can be quoted alone.
 figures:
+  - key: dispersion/achievement-maximum-2223
+    value: 108.8
+    field: series
+    as_written: "from 108.8 to 109.8 across these same three years"
+  - key: dispersion/achievement-maximum-2425
+    value: 109.8
+    field: series
+    as_written: "from 108.8 to 109.8 across these same three years"
   - key: dispersion/performance-index-tracks-poverty
     value: 0.84596
     field: findings
@@ -182,9 +190,30 @@ properties:
     achievement level carries a weight that rises with the level; a district's score is the
     weighted count divided by the number of students expected to be tested.
 
-    The exact level weights and the untested-student treatment are set by DEW and are not
-    transcribed here — they are a report-card methodology parameter, they have changed across
-    report-card redesigns, and a series that spans a redesign is broken. [open]
+    **The weights are one hundred for proficient and tenths from there.** They are published
+    nowhere this corpus holds, so they are not transcribed; they are *recovered*. The department
+    prints each district's Index beside the seven achievement-level shares it was computed from,
+    607 times over, which is an overdetermined system in seven unknowns. Least squares on it
+    returns, taking proficient as the reference: [verified — computed; see
+    [`crates/dispersion/tests/the_weights_behind_the_index.rs`](../../../crates/dispersion/tests/the_weights_behind_the_index.rs)]
+
+        not tested    0.0        accomplished  1.1
+        limited       0.3        advanced      1.2
+        basic         0.6        advanced plus 1.3
+        proficient    1.0
+
+    Every slope lands within a hundredth of an exact tenth and the all-proficient score within
+    two tenths of 100, and those weights then reproduce all 607 published scores inside the
+    publication's own rounding — half a tenth per share, times the sum of the weights. A vector
+    differing by a few thousandths per level would fit as well, so the round numbers are the
+    reading rather than the measurement; what is established is that no *other* term is in the
+    sum. [verified]
+
+    **The untested-student treatment is the sharp end of it, and it is not neutral.** An
+    untested student carries 0.0 — below limited's 0.3, which is the worst a tested student can
+    produce. A district's Index falls further for failing to test a student than for testing
+    that student and having them score at the bottom. [verified] The department publishes the
+    not-tested share as a level of its own, which is why this is recoverable at all.
 
     Reported per district per school year. The 2024-2025 field is
     `Performance Index Score 2024-2025`.
@@ -218,9 +247,16 @@ properties:
 
     **Three years are held and all three are read.** Adjacent-year correlations +0.988 and
     +0.989; 2022-23 against 2024-25 +0.981; median within-district three-year range 2.1 points.
-    Whether the three sit on one report-card methodology is not established, and a redesign
-    inside the window would show up as exactly this kind of stability if the redesign preserved
-    ranks. [open]
+
+    All three sit inside one statutory regime: R.C. 3302.03(D) governs "the 2021-2022 school
+    year and each school year thereafter", so no scale change spans this window and the
+    stability is not a redesign preserving ranks. [verified] The section does leave the
+    department free to move the benchmarks under division (M), and the corpus can check only the
+    2024-25 weights, because the level shares are published for the current year alone — so a
+    change in the weights inside the window is unruled-out rather than ruled out. What is *not*
+    unruled-out is a break one layer up: the denominator the star rating is scored against moved
+    from 108.8 to 109.8 across these same three years. See
+    [ohio-report-card](../accountability-regime/ohio-report-card.yml). [verified]
   caveats: |
     **It is mostly a poverty measurement.** 71.6% of its cross-district variance is the
     economically disadvantaged share. Any use of this metric that does not say so is reporting
@@ -242,10 +278,13 @@ properties:
     out. All 607 match the report card's spending and Expanded List files on IRN with no losses;
     606 of them match the Cupp Report. [verified]
 
-    **Redesign breaks.** Ohio has changed report-card methodology more than once. Comparing the
-    Index across a redesign is a definitional break of the kind
+    **Redesign breaks.** Ohio has changed report-card methodology more than once, and comparing
+    the Index across a redesign is a definitional break of the kind
     [`metric/ACTIONS`](ACTIONS.md) requires be recorded rather than smoothed. The three years in
-    the fixture are not established to be on one methodology. [open]
+    the fixture are not one of those breaks — R.C. 3302.03(D) covers all three — but the star
+    rating computed from them is not comparable across them, because its denominator is refitted
+    annually. [verified] The break to watch for is at 2021-22, where division (D) replaced
+    division (C) and letter grades became stars; nothing before that year is held here.
   calculator: |
     Published, not computed — the corpus reads this metric rather than deriving it. Distribution
     and association statistics over it are `dispersion`, which gained `rank_correlation` and

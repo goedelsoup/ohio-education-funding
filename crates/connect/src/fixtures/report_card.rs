@@ -36,15 +36,55 @@ pub const REPORT_CARD_HEADER: &[&str] = &[
     "econ_disadvantaged_pct_2425",
     "english_learner_pct_2425",
     "students_with_disabilities_pct_2425",
+    "achievement_star_rating_2425",
+    "performance_index_percent_2425",
+    "performance_index_maximum_2425",
+    "pct_not_tested_2425",
+    "pct_limited_2425",
+    "pct_basic_2425",
+    "pct_proficient_2425",
+    "pct_accomplished_2425",
+    "pct_advanced_2425",
+    "pct_advanced_plus_2425",
 ];
 
 /// Column positions in the Achievement download's `Performance_Index` sheet.
+///
+/// # The maximum is a statewide scalar, and that is the point of carrying it
+///
+/// `MAXIMUM` repeats one value — 109.8 — on all 607 rows, which is normally the signature of a
+/// comparison band rather than district data (see [`spending_columns`]). Here the repetition is
+/// the fact worth having. R.C. 3302.03(D)(1)(c) defines the achievement denominator as "the
+/// average of the highest two per cent of performance index scores achieved by a district for
+/// the school year for which a report card is issued", so it is one number per year, refitted
+/// annually to the top of the distribution. `PERCENT` is the score over it, and the pair is
+/// what makes the achievement component a *relative* measure. Carrying only the score would
+/// leave the corpus unable to say so.
+///
+/// The seven level shares are what the index is built from. Their weights are not published
+/// anywhere this corpus holds; they are recovered from these columns in
+/// [`crates/dispersion/tests/the_weights_behind_the_index.rs`](../../../dispersion/tests/the_weights_behind_the_index.rs).
 mod achievement_columns {
     pub const IRN: usize = 0;
     pub const NAME: usize = 1;
+    pub const STAR_RATING: usize = 4;
+    pub const PERCENT: usize = 5;
     pub const PI_2425: usize = 6;
+    pub const MAXIMUM: usize = 7;
+    /// The seven achievement levels, in the order the sheet prints them: not tested, limited,
+    /// basic, proficient, accomplished, advanced, advanced plus.
+    pub const LEVELS: std::ops::Range<usize> = 8..15;
     pub const PI_2324: usize = 15;
     pub const PI_2223: usize = 16;
+}
+
+/// The star count out of a rating cell.
+///
+/// The department writes these as `3  Stars` — two spaces, and singular at one — so the number
+/// is the leading token. Parsed as a float rather than an integer because the *overall* rating
+/// under R.C. 3302.03(D)(3)(g) carries half-stars even though the component ratings here do not.
+fn stars(cell: &str) -> Option<f64> {
+    cell.split_whitespace().next()?.parse().ok()
 }
 
 /// Column positions in `DISTRICT_SPENDING_PER_PUPIL`.
@@ -293,7 +333,15 @@ pub fn build_report_card_extract<'a>(
                 format_value(share(ECONOMIC_DISADVANTAGE), 1),
                 format_value(share(ENGLISH_LEARNER), 1),
                 format_value(share(STUDENTS_WITH_DISABILITIES), 1),
+                format_value(stars(cell(row, achievement_columns::STAR_RATING)), 1),
+                format_value(number(cell(row, achievement_columns::PERCENT)), 1),
+                format_value(number(cell(row, achievement_columns::MAXIMUM)), 1),
             ]
+            .into_iter()
+            .chain(
+                achievement_columns::LEVELS.map(|index| format_value(number(cell(row, index)), 1)),
+            )
+            .collect()
         })
         .collect()
 }
