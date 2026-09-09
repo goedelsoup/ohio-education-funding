@@ -2964,15 +2964,18 @@ pub static FIGURES: &[Figure] = &[
         tolerance: 0.0,
         compute: |i| on_the_guarantee(i).len() as f64,
     },
-    // The projected block. Tolerances are the half-unit the corpus writes each figure to, except
-    // the aid difference, which the corpus states to a tenth of a million.
+    // The projected block. `tolerance` is how far the calculator may drift from the pin, not how
+    // precisely the corpus writes the figure — the prose comparison is a separate half-step check
+    // in `corpusFigures.ts`. `report::forecast` is deterministic over a committed panel, so the
+    // only slack these need is the pin's own written precision, and a cent is the convention every
+    // other exact figure here uses.
     Figure {
         key: "project/statewide-adm-fy2032",
         owner: "crates/project",
         unit: Unit::Pupils,
         label: "Statewide enrolled ADM projected to FY2032 by the shipped method",
         pinned: 1_384_244.862_5,
-        tolerance: 0.5,
+        tolerance: 0.01,
         compute: |i| i.forecasts.fy2032.adm,
     },
     Figure {
@@ -2982,7 +2985,7 @@ pub static FIGURES: &[Figure] = &[
         label: "Statewide enrolled ADM projected to FY2036, the feed's horizon \u{2014} twelve \
                 pupils below the FY2032 figure, four years earlier",
         pinned: 1_384_232.417_4,
-        tolerance: 0.5,
+        tolerance: 0.01,
         compute: |i| i.forecasts.fy2036.adm,
     },
     Figure {
@@ -2991,7 +2994,7 @@ pub static FIGURES: &[Figure] = &[
         unit: Unit::Pupils,
         label: "The same projection undamped, which the backtest finds very nearly unbiased",
         pinned: 1_290_679.717_1,
-        tolerance: 0.5,
+        tolerance: 0.01,
         compute: |i| i.forecasts.fy2036_undamped.adm,
     },
     Figure {
@@ -3000,7 +3003,7 @@ pub static FIGURES: &[Figure] = &[
         unit: Unit::Pupils,
         label: "Pupils the damping holds the FY2036 projection above the undamped trend",
         pinned: 93_552.700_2,
-        tolerance: 0.5,
+        tolerance: 0.01,
         compute: |i| i.forecasts.fy2036.adm - i.forecasts.fy2036_undamped.adm,
     },
     Figure {
@@ -3010,17 +3013,17 @@ pub static FIGURES: &[Figure] = &[
         label: "Pupils that moving the damping from 0.85 to 0.30 adds to the FY2036 projection, \
                 under the shrunk rate the feed runs",
         pinned: 45_293.897_0,
-        tolerance: 0.5,
+        tolerance: 0.01,
         compute: |i| i.forecasts.fy2036.adm - i.forecasts.fy2036_at_the_old_convention.adm,
     },
     Figure {
         key: "project/damping-move-realized-aid-fy2036",
         owner: "crates/project",
         unit: Unit::Dollars,
-        label: "What the same move does to realized state aid at FY2036 \u{2014} a fifth of the \
-                enrollment move, because the guarantee absorbs most of it",
+        label: "What the same move does to realized state aid at FY2036 \u{2014} proportionally \
+                about two fifths of the enrollment move, because the guarantee absorbs most of it",
         pinned: 101_033_524.939_1,
-        tolerance: 50_000.0,
+        tolerance: 0.01,
         compute: |i| {
             i.forecasts.fy2036.realized_aid - i.forecasts.fy2036_at_the_old_convention.realized_aid
         },

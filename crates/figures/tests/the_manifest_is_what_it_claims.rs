@@ -141,14 +141,20 @@ fn a_share_cannot_be_confused_with_a_percentage() {
 /// invariant is that it becomes the drawer anything awkward goes into, so this states what the
 /// new unit is actually for and fails when something else is filed under it.
 ///
-/// The tolerance floor is the half-unit the corpus writes a pupil figure to. A pupil figure with
-/// a tolerance of zero would be a count wearing the wrong label, which is the substitution this
-/// test exists to refuse.
+/// What separates it from a count is the **pin**, not the tolerance.
+///
+/// The first draft of this test asserted a tolerance floor of half a pupil, on the reasoning that
+/// a tolerance of zero would be a count under the wrong label. That was the wrong quantity:
+/// `tolerance` bounds calculator drift against the pin, and how precisely prose may write the
+/// figure is a separate half-step check on the consumer side. Conflating them bought 494 ppm of
+/// silent slack on a figure the calculator computes exactly. So the assertions below are on the
+/// pin — fractional, because an average daily membership is — and the tolerance is held *tight*
+/// rather than loose, at the cent-scale convention the exact dollar figures here already use.
 #[test]
 fn a_pupil_figure_is_measured_rather_than_counted() {
-    /// Below one pupil the manifest is claiming a precision an average daily membership does not
-    /// have; above a hundred it is not really pinning the figure.
-    const TOLERANCE: std::ops::RangeInclusive<f64> = 0.5..=100.0;
+    /// Loose enough for the pin's own written precision, tight enough that a calculator moving
+    /// by a whole pupil is a failure. Every other exactly-computed figure here uses 0.01.
+    const TOLERANCE_CEILING: f64 = 1.0;
 
     let mut seen = 0;
     for f in FIGURES {
@@ -157,17 +163,18 @@ fn a_pupil_figure_is_measured_rather_than_counted() {
         }
         seen += 1;
         assert!(
-            TOLERANCE.contains(&f.tolerance),
-            "{}: a pupil figure with a tolerance of {} \u{2014} outside {TOLERANCE:?}, and a \
-             tolerance of zero would be a count under the wrong label",
-            f.key,
-            f.tolerance
-        );
-        assert!(
-            f.pinned.abs() > 1.0,
-            "{}: pinned at {}, which is small enough to be a count of something",
+            f.pinned.fract() != 0.0,
+            "{}: pinned at {}, a whole number of things \u{2014} which is a `Count`, and \
+             comparing it exactly is stricter than this unit allows",
             f.key,
             f.pinned
+        );
+        assert!(
+            f.tolerance > 0.0 && f.tolerance <= TOLERANCE_CEILING,
+            "{}: a pupil figure with a tolerance of {} \u{2014} zero makes it a count, and past \
+             {TOLERANCE_CEILING} it stops pinning the calculator",
+            f.key,
+            f.tolerance
         );
     }
     assert!(
