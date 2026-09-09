@@ -89,14 +89,16 @@ test("every bound figure in the corpus agrees with the crate it cites", () => {
  * the scholarship award formula was read off the statute the corpus already held, and 468/61
  * when four parameters got their pre-FY2026 series out of the greenbooks, 470/61 at the
  * executive order the guarantee's base is defined to reach past, and 479/61 when targeted
- * assistance's rates were read back as the millage LSC has always written them in.
+ * assistance's rates were read back as the millage LSC has always written them in, and 483/62
+ * when the fifteen categorical weights turned out to be the previous regime's dollar schedules
+ * divided by a base cost — `english-learner-category-multiples` the sixty-second carrier.
  */
 test("the corpus binds no fewer figures than it did", () => {
-  expect(bindings.length, "479 bindings; raise this when you add one").toBeGreaterThanOrEqual(479);
+  expect(bindings.length, "483 bindings; raise this when you add one").toBeGreaterThanOrEqual(483);
   expect(
     corpus.nodes.filter((node) => node.figures.length > 0).length,
-    "61 nodes carry bindings; raise this when a sixty-second does",
-  ).toBeGreaterThanOrEqual(61);
+    "62 nodes carry bindings; raise this when a sixty-third does",
+  ).toBeGreaterThanOrEqual(62);
   expect(
     new Set(bindings.map((binding) => binding.key)).size,
     "every figure the manifest exports is bound by some node",

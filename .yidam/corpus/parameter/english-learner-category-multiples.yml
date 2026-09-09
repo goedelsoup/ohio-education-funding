@@ -39,6 +39,26 @@ findings: |
   English learner population has changed since 2021 — and the years since include a period of
   substantial change in arrivals — is funded for the population it had. [verified]
 
+  ### They are the 2015 dollars over a new denominator, and nothing else changed
+
+  Before FY2022 the three categories carried per-pupil amounts rather than weights: $1,500,
+  $1,125 and $750 in FY2014, raised once to **$1,515**, $1,136 and $758 in FY2015 and then held —
+  H.B. 64 says the amounts *"remain unchanged from those used in FY 2015"*, H.B. 49 says the same
+  of FY2017, and the Bridge formula computed no categoricals at all. The plan divided those
+  amounts by the FY2022 statewide average base cost per pupil of $7,202 and called the quotients
+  weights: 1515 ÷ 7202 is 0.2104, 1136 ÷ 7202 is 0.1577, 758 ÷ 7202 is 0.1053. Every one lands
+  inside forty cents of the amount it replaced. [verified —
+  [`crates/project`](../../../crates/project/tests/the_weights_that_were_dollar_amounts.rs)]
+
+  So English learner funding was carried across the regime change at exactly its 2015 value. The
+  conversion to weights is what made it move afterwards: a dollar amount stays where it is put,
+  and a weight rises whenever base cost does. The plan gave this schedule no increase and gave it
+  an escalator, which are different gifts and only the second is visible in the numbers. The
+  companion arithmetic on
+  [special education](special-education-category-multiples.yml) — the same conversion, but with a
+  scalar attached — shows what an increase looks like when one is given. [verified for the
+  arithmetic; inference for the reading]
+
   ### And the definitions stop at FY2027
 
   Divisions (B) and (C) each state their criterion "for fiscal years 2026 and 2027" and then
@@ -94,9 +114,16 @@ unfilled:
     why: >-
       Divisions (B) and (C) hand them to the General Assembly and the section names no
       successor. The budget act that covers FY2028-29 is where they would first appear.
-  - field: the multiples before FY2026
+  - field: why the amounts stopped rising after FY2015
     why: >-
-      Prior versions of R.C. 3317.016 in Ohio Laws' version archive for the section.
+      The committed analyses record that they did — H.B. 64 froze them and no later act moved
+      them — and none of them gives a reason. Whether the freeze was deliberate or the residue of
+      a budget that raised only what it named is not distinguishable from an analysis.
+figures:
+  - key: project/english-learner-amount-carried-into-the-plan
+    value: 1515.0
+    field: findings
+    as_written: "raised once to **$1,515**"
 links:
   - target: ../parameter.ont.yml
     relationship: instance-of

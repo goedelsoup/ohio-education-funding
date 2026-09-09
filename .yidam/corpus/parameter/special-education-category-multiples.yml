@@ -40,11 +40,50 @@ findings: |
   Whether the durability is deliberate or an artefact of the section not having needed
   amendment is not established, and the two are not distinguishable from the text. [open]
 
+  ### The six ratios are the General Assembly's of 2001, carried and never repriced
+
+  Every one of the plan's six is **0.8379** times the corresponding weight in the Evidence-Based
+  Model of 2009 — the same constant on all six, agreeing to a part in eight thousand. The plan
+  did not re-derive this schedule; it rescaled it. In dollars that is a rise of **11.1%** on the
+  FY2017 amounts, identical for every category, which is what a single scalar means and a
+  different act from repricing. [verified —
+  [`crates/project`](../../../crates/project/tests/the_weights_that_were_dollar_amounts.rs)]
+
+  Those 2009 weights are in turn the FY2002 schedule with one change: category two roughly
+  doubled, from 0.3691 to 0.7374, and the other five moved by less than 3 per cent. So the ratios
+  Ohio prices disability with in FY2027 are the ratios the 124th General Assembly set, carried
+  through four regimes and re-expressed twice. [verified]
+
+  ### And for eight years the schedule was dollars, not multiples
+
+  FY2014 through FY2021 each category carried a per-pupil amount instead of a weight: $1,503 to
+  $24,407 in FY2014, rising 2 per cent a year to FY2017 and then frozen — H.B. 49 holds them at
+  the FY2017 figures and the Bridge formula computed no categoricals at all. Those amounts are
+  the 2009 weights times a single per-pupil figure, $5,171 in FY2014 and $5,431 in FY2017, so
+  even the regime that paid in dollars was paying the same six ratios. [verified]
+
+  That is why "the multiples before FY2022" had no answer in the form it was asked: for eight
+  years there were none. The ratios, which is what the question was after, never went away.
+
+  ### What moved was which children are in which category
+
+  H.B. 1 reassigned vision-impaired and orthopedically disabled pupils to categories with a
+  higher weight, and LSC records it in a sentence rather than a number: in FY2002 category three
+  read *"hearing impaired, vision impaired, severe behavior handicapped"* and category four
+  *"orthopedically handicapped, other health – major"*; by FY2010 vision impaired had moved into
+  category four, where it still is. No weight in any of the four schedules records that, and for
+  a child it is the larger change of the two. [verified]
+
   ### And the range has never been priced
 
   Naming the categories settles what is being ordered; it does not say what any of it costs. No
   source this corpus holds prices a category, so whether a sixteen-fold funding range tracks a
   sixteen-fold difference in the cost of educating a child is unanswered. [open]
+
+  The history above narrows where an answer could be. Four regimes have applied these six ratios
+  and none of them derived them: 2009 rescaled 2001 by category, 2013 converted them to dollars,
+  2021 converted them back to weights. Whatever costing sits under the schedule, if one does, is
+  older than every source in this corpus. [inference]
 properties:
   name: Special education category multiples
   unit: ratio
@@ -102,17 +141,30 @@ properties:
     children are placed in Category 6 moves more money than a large change in Category 2.
     [inference]
 unfilled:
-  - field: the multiples before FY2022
+  - field: what set the 0.8379 rescaling
     why: >-
-      The Fair School Funding Plan's schedule is the one held here. What the categories were
-      weighted at under the foundation base cost formula is in the prior versions of R.C.
-      3317.013, and Ohio Laws' version archive for the section is the place to read them.
+      The committed analyses establish that the plan multiplied the 2009 schedule by one
+      constant; none of them says why that constant. The Fair School Funding Plan workgroup's
+      own materials, which this corpus does not hold, are where a rationale would be.
+  - field: the schedule before FY2002
+    why: >-
+      The earliest committed LSC analysis is the 124th General Assembly's, and it states the six
+      as already settled rather than as new. Whether the 124th set them or inherited them is a
+      question for the analyses of the 123rd and earlier, which the extract does not reach.
   - field: what a category costs
     why: >-
       No source this corpus holds prices a disability category. A costing study, or the
       department's own build-up if one exists, is what would settle whether the range tracks
       cost.
 figures:
+  - key: project/special-education-weight-rescaling
+    value: 0.8379257798930966
+    field: findings
+    as_written: "is **0.8379** times the corresponding weight"
+  - key: project/special-education-raise-at-the-plan
+    value: 0.1111836083458071
+    field: findings
+    as_written: "a rise of **11.1%** on the"
   - key: project/special-education-weight-category-one
     value: 0.2435
     field: description
