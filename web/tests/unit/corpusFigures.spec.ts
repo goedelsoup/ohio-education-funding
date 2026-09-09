@@ -61,9 +61,22 @@ test("every bound figure in the corpus agrees with the crate it cites", () => {
  * # It had drifted five under, which is the failure this comment describes
  *
  * The floor read 383 against 388 actual — five bindings of permitted regression, arrived at by
- * raising the *declared* number rather than re-counting. The same slip then propagated: this
- * branch added eighteen bindings and reached 401 from 383, when the count was 406. Both numbers
- * below are re-counted rather than derived, and adding to a floor is how it goes wrong.
+ * raising the *declared* number rather than re-counting. The same slip then propagated: the branch
+ * that found it added eighteen bindings and reached 401 from 383, when the count was 406. Both
+ * numbers below are re-counted rather than derived, and adding to a floor is how it goes wrong.
+ *
+ * The obvious next question — whether the repository's other floors had drifted the same way — was
+ * asked and the answer is no. There are two more in `web/tests/`, and both are *deliberately* below
+ * their measured value with a stated reason: `legislationCoverage`'s `COVERAGE_FLOOR` is 0.71
+ * against 0.7148, rounded down because it tracks a share that only rises, and `links`'
+ * `EMITTED_FLOOR` is 25 against 27, loose on purpose because "pinning it exactly would make the
+ * test fail on a correct change". Neither is a count of a committed artefact. On the Rust side
+ * every `FLOOR`/`MINIMUM` is a statutory parameter — the twenty-mill floor, the staffing minima —
+ * and the one test-side floor is derived rather than typed.
+ *
+ * So this was the repository's only hand-maintained exact ratchet, which is why it was the one
+ * that drifted. A floor that must equal its count needs re-counting; a floor that only guards
+ * against vacuity does not.
  */
 test("the corpus binds no fewer figures than it did", () => {
   expect(bindings.length, "406 bindings; raise this when you add one").toBeGreaterThanOrEqual(406);
