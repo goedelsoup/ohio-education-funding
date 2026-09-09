@@ -94,10 +94,11 @@ test("every bound figure in the corpus agrees with the crate it cites", () => {
  * divided by a base cost — `english-learner-category-multiples` the sixty-second carrier — and
  * 487/62 at the two supplements' own history, with no new carrier, and 492/62 when the F-33
  * panel's numerator was published beside the quotient the corpus had been carrying alone, and
- * 496/62 when parity aid turned out to be what targeted assistance succeeded.
+ * 496/62 when parity aid turned out to be what targeted assistance succeeded, and 499/62 at the
+ * transportation proration that was an appropriation rather than a dial.
  */
 test("the corpus binds no fewer figures than it did", () => {
-  expect(bindings.length, "496 bindings; raise this when you add one").toBeGreaterThanOrEqual(496);
+  expect(bindings.length, "499 bindings; raise this when you add one").toBeGreaterThanOrEqual(499);
   expect(
     corpus.nodes.filter((node) => node.figures.length > 0).length,
     "62 nodes carry bindings; raise this when a sixty-third does",
