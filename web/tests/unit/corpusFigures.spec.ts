@@ -91,10 +91,11 @@ test("every bound figure in the corpus agrees with the crate it cites", () => {
  * executive order the guarantee's base is defined to reach past, and 479/61 when targeted
  * assistance's rates were read back as the millage LSC has always written them in, and 483/62
  * when the fifteen categorical weights turned out to be the previous regime's dollar schedules
- * divided by a base cost — `english-learner-category-multiples` the sixty-second carrier.
+ * divided by a base cost — `english-learner-category-multiples` the sixty-second carrier — and
+ * 487/62 at the two supplements' own history, with no new carrier.
  */
 test("the corpus binds no fewer figures than it did", () => {
-  expect(bindings.length, "483 bindings; raise this when you add one").toBeGreaterThanOrEqual(483);
+  expect(bindings.length, "487 bindings; raise this when you add one").toBeGreaterThanOrEqual(487);
   expect(
     corpus.nodes.filter((node) => node.figures.length > 0).length,
     "62 nodes carry bindings; raise this when a sixty-third does",

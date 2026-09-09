@@ -10,10 +10,13 @@ description: |
   third route the department computes on its own sheet. $55.7m statewide to 427 of 609
   districts. [verified]
 
-  **It is the only component of Ohio's funding formula that pays on a measured outcome.**
-  Everything else prices an input — pupils, categories, miles, poverty — or holds a district at
-  a historical amount. This prices the report card. [verified for the mechanism; inference for
-  the "only"]
+  **It is the only component of Ohio's *current* funding formula that pays on a measured
+  outcome.** Everything else prices an input — pupils, categories, miles, poverty — or holds a
+  district at a historical amount. This prices the report card. [verified for the mechanism;
+  verified for the "only" within FY2026-27]
+
+  The qualifier is load-bearing. FY2016 through FY2019 had two such components, and they were
+  built the other way round; see `findings`. [verified]
 
   Neither the $13 nor the two thresholds is in R.C. 3317. The department computes the supplement
   on its own sheet and reports it as line [O]; the authority is H.B. 96's temporary law, which
@@ -29,6 +32,30 @@ findings: |
   The mechanism is qualification rather than rate: 94% of the least-poor fifth qualifies against
   **47%** of the poorest. The rate is the same $13 everywhere and the outcome it is paid on is
   not evenly distributed. [verified]
+
+  ### Ohio has paid on outcomes before, and that time it equalised the payment
+
+  Am. Sub. H.B. 64 added a **graduation bonus** and a **third grade reading bonus** for FY2016,
+  and Am. Sub. H.B. 49 carried both into FY2018-19. Each paid 7.5% of the formula amount times a
+  count of the pupils who cleared the bar — graduates, or third-graders proficient in reading —
+  and each was then multiplied by the district's **state share index**. [verified —
+  [`crates/project`](../../../crates/project/tests/the_supplements_before_this_biennium.rs)]
+
+  That last term is the whole difference. LSC makes its role explicit by describing a version
+  without it: the STEM school payment, it writes, is *"identical to the calculation of the payment
+  for traditional districts except that it does not use the state share index."* The state share
+  index is Ohio's wealth equaliser, so the FY2016 bonuses paid more per qualifying pupil in poorer
+  districts and less in wealthier ones — on top of a qualification rate that already favoured the
+  wealthy. [verified]
+
+  The present supplement drops the term. $13 a pupil is $13 a pupil at any valuation, which is
+  why the gradient below runs the way it does. Ohio has paid on a measured outcome twice, and the
+  regressive result is not a property of paying on outcomes; it is a property of paying gross.
+  [verified for the mechanism; inference for the reading]
+
+  The two bonuses ended with the Bridge formula, which computed no formula components at all, and
+  nothing replaced them until FY2026. So this is a mechanism the state has adopted, abandoned and
+  readopted, and the readoption is the version without the equaliser. [verified]
 
   ### Which makes it the one line where the formula's gradient runs the wrong way
 
@@ -111,11 +138,21 @@ unfilled:
       H.B. 96's temporary law is where the rate and the three routes live and `codes.ohio.gov`
       does not carry it. The enrolled act as published by the General Assembly would fix the
       wording of the third route, which is the one this corpus describes least precisely.
-  - field: the FY2022-25 values
+  - field: why the state share index was dropped
     why: >-
-      No version archive exists for an uncodified parameter. The prior budget act and its LSC
-      greenbook are where an earlier rate would be.
+      The FY2016-19 bonuses carried it and this one does not, and no analysis this corpus holds
+      records the change being made or argued. The FY2026-27 enrolled act's temporary law and the
+      testimony on it are where a reason would be.
+  - field: what the two earlier bonuses paid, by district
+    why: >-
+      The analyses give the formula and not the distribution, so the FY2016-19 gradient cannot be
+      compared with the FY2027 one. The department's payment reports for those years would settle
+      whether equalising was enough to reverse it.
 figures:
+  - key: project/outcome-bonus-share-of-the-formula-amount
+    value: 0.075
+    field: findings
+    as_written: "paid 7.5% of the formula amount"
   - key: project/performance-supplement-total
     value: 55676980.25
     field: series

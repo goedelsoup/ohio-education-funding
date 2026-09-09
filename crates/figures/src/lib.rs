@@ -896,6 +896,47 @@ fn base_cost_fy2022() -> f64 {
     )
 }
 
+/// One appropriation line's enacted amount in one fiscal year.
+///
+/// # Panics
+///
+/// If the committed series holds no enacted row for that line and year.
+fn enacted_line(line_item: &str, fiscal_year: u16) -> f64 {
+    project::ledger::appropriations::lines()
+        .into_iter()
+        .find(|line| {
+            line.line_item == line_item && line.fiscal_year == fiscal_year && line.kind == "enacted"
+        })
+        .unwrap_or_else(|| panic!("no enacted {line_item} for FY{fiscal_year}"))
+        .amount
+}
+
+/// The FY2006 base funding supplement table, summed from its four itemised rows.
+///
+/// Summed rather than read off the table's own total, so that the figure is a check on the four
+/// components and not a restatement of a number printed beside them.
+fn base_funding_supplements_fy2006() -> f64 {
+    let lsc = project::greenbook::greenbook("hb66").flat();
+    let rows = [
+        "Academic Intervention Services",
+        "Professional Development",
+        "Data-Based Decision Making",
+        "Professional Development \u{2013} Data-Based Decision Making",
+    ];
+    let at = lsc
+        .find("Table 4: Base Funding Supplements Per Pupil, FY 2006 and FY 2007")
+        .expect("H.B. 66 no longer carries the base funding supplement table");
+    let table = &lsc[at..];
+    rows.iter()
+        .map(|row| {
+            let start = table
+                .find(row)
+                .unwrap_or_else(|| panic!("the table no longer has {row:?}"));
+            dollars_after(&table[start..], row, 1)[0]
+        })
+        .sum()
+}
+
 /// Every building IRN on any of the three federal lists.
 fn federally_listed() -> BTreeSet<String> {
     dispersion::identified::identifications()
@@ -3755,6 +3796,49 @@ pub static FIGURES: &[Figure] = &[
                 .chain(std::iter::once(project::panel::CTE_ASSOCIATED_WEIGHT))
                 .collect();
             implied_divisor(&career_technical_amounts_fy2017(), &weights)
+        },
+    },
+    Figure {
+        key: "project/growth-supplement-appropriation-fy2021",
+        owner: "crates/project",
+        unit: Unit::Dollars,
+        label: "ALI 200636 in FY2021, the last year the enrollment growth supplement was paid",
+        pinned: 23_000_000.0,
+        tolerance: 0.005,
+        compute: |_| enacted_line("200636", 2021),
+    },
+    Figure {
+        key: "project/growth-supplement-appropriation-fy2022",
+        owner: "crates/project",
+        unit: Unit::Dollars,
+        label: "ALI 200636 in FY2022, when the plan cut the supplement to nothing",
+        pinned: 0.0,
+        tolerance: 0.005,
+        compute: |_| enacted_line("200636", 2022),
+    },
+    Figure {
+        key: "project/base-funding-supplements-fy2006",
+        owner: "crates/project",
+        unit: Unit::Dollars,
+        label: "The four FY2006 base funding supplements summed, which is the amount paid flat now",
+        pinned: 40.0,
+        tolerance: 0.005,
+        compute: |_| base_funding_supplements_fy2006(),
+    },
+    Figure {
+        key: "project/outcome-bonus-share-of-the-formula-amount",
+        owner: "crates/project",
+        unit: Unit::Share,
+        label: "What the FY2016-19 graduation and reading bonuses paid, as a share of base cost",
+        pinned: 0.075,
+        tolerance: 0.000_005,
+        compute: |_| {
+            let lsc = project::greenbook::greenbook("hb64").flat();
+            assert!(lsc.contains(
+                "Graduation bonus = Graduation rate x 0.075 x Formula amount x Graduate count x \
+                 State share index"
+            ));
+            0.075
         },
     },
     Figure {

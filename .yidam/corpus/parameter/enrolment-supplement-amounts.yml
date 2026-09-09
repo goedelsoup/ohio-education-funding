@@ -32,6 +32,47 @@ findings: |
   it a step, and the step is where the money is largest relative to the difference in
   circumstances. [inference]
 
+  ### The cliff replaced a taper, and Ohio ran the taper for two years
+
+  The growth supplement is not new and its first version was the continuous one. Am. Sub. H.B.
+  166 created it for FY2020-21 and paid *"each school district with a student enrollment of at
+  least 50 that experienced an average annual percentage change in its enrollment between FY 2016
+  and FY 2019 that is **greater than zero**"* — the payment being that percentage times 100 times
+  FY2019 enrolment times $20 in FY2020 and $30 in FY2021. So the amount rose continuously with
+  growth and the eligibility test was zero rather than 3 per cent. [verified —
+  [`crates/project`](../../../crates/project/tests/the_supplements_before_this_biennium.rs)]
+
+  That makes the cliff a choice rather than the only shape the payment has taken. The paragraph
+  above prices the edge of the current threshold; the earlier version had no edge to price.
+
+  ### And between the two versions the answer is zero
+
+  ALI 200636 carried $15,500,000 in FY2020 and $23,000,000 in FY2021 and was then cut to **$0**
+  in both years of the budget that enacted the Fair School Funding Plan. The `unfilled:` asking
+  for the FY2022-25 values was asking for a rate that did not exist: the payment was abolished,
+  not reduced. [verified]
+
+  What survived is the last year of it, made permanent. The formula transition supplement adds
+  each district's FY2021 enrolment growth supplement to the floor it holds them at, and H.B. 33
+  carries the same clause into FY2024-25 — so the FY2021 payment is still in the base two
+  bienniums after the programme ended. A district that grew in 2019 is funded for it in 2025.
+  [verified]
+
+  ### The $40 is a twenty-year-old name and a twenty-year-old amount
+
+  "Base funding supplement" was the FY2006 formula's term for four itemised additions to base
+  cost, each tied to a named service — academic intervention $25.00, professional development
+  $3.50, data-based decision making $5.28, and professional development in data-based decision
+  making $6.22. They add to **$40.00** a pupil. They rose to $47.99 in FY2007 and to $50.91 by
+  FY2009, where H.B. 1 froze them; the name then disappears with the H.B. 59 formula and returns
+  in this biennium. [verified]
+
+  So the current $40 is the FY2006 total, twenty years on, for a payment that no longer says what
+  it buys. Whether the amount was chosen with the old schedule in view is not established, and
+  the coincidence is worth recording either way: the old supplement was four claims about what
+  districts needed money for, and the new one is one number with no claim attached. [verified for
+  the series; inference for the reading]
+
   ### They run against the direction of the panel
 
   The median district's enrolment **fell 4.8%** over the three years the supplement measures.
@@ -73,7 +114,17 @@ properties:
       the largest forgone growth supplement       $430,476.80
       median three-year enrolment change              −4.84%
 
-    No prior-year values are held. [open]
+    What the same two lines were before, from the committed LSC analyses: [verified]
+
+      FY2006  $40.00  base funding supplements, four of them, itemised by service
+      FY2007  $47.99  the same four
+      FY2009  $50.91  and frozen there through FY2011
+      FY2014  —       the H.B. 59 formula drops the term entirely
+      FY2020  $20     enrolment growth supplement, per pupil per point of average annual growth
+      FY2021  $30     the same taper, admitting every district that grew at all
+      FY2022  $0      ALI 200636 cut to nothing; the FY2021 payment frozen into the guarantee
+      FY2026  $40     base funding supplement, flat, unitemised, every district
+      FY2026  $250    growth supplement, on the whole enrolment, past a 3% threshold
   statutory_basis: |
     None. Not in R.C. 3317.022 and not in any other section this corpus cites; the two rates and
     the threshold are transcribed from the calculator, where they appear as lines [L] and [M].
@@ -104,11 +155,24 @@ unfilled:
       H.B. 96's temporary law is where these live and `codes.ohio.gov` does not carry it. The
       enrolled act as published by the General Assembly is the source that would fix the
       division and the exact wording of the 3% test.
-  - field: the FY2022-25 values
+  - field: whether the $40 was chosen against the FY2006 schedule
     why: >-
-      Uncodified parameters have no version archive. The prior biennium's budget act and the LSC
-      greenbook for it are where the earlier rates would be.
+      The two amounts are the same and twenty years apart, and no analysis this corpus holds
+      connects them. The Fair School Funding Plan workgroup's materials, or the enrolled act's
+      own drafting history, would settle whether the figure was carried or arrived at again.
 figures:
+  - key: project/growth-supplement-appropriation-fy2021
+    value: 23000000.0
+    field: findings
+    as_written: "$23,000,000 in FY2021"
+  - key: project/growth-supplement-appropriation-fy2022
+    value: 0.0
+    field: findings
+    as_written: "cut to **$0**"
+  - key: project/base-funding-supplements-fy2006
+    value: 40.0
+    field: findings
+    as_written: "They add to **$40.00** a pupil"
   - key: project/base-funding-supplement-total
     value: 56079575.54000001
     field: series
