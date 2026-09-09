@@ -86,10 +86,11 @@ test("every bound figure in the corpus agrees with the crate it cites", () => {
  * fifty-fifth carrier, the two `school/` nodes it settles the fifty-sixth and fifty-seventh,
  * and `intervention/more-rigorous-interventions` the fifty-eighth. 456/59 when the LSC
  * greenbooks got theirs and `funding-regime/bridge-formula` became the fifty-ninth. 462/61 when
- * the scholarship award formula was read off the statute the corpus already held.
+ * the scholarship award formula was read off the statute the corpus already held, and 468/61
+ * when four parameters got their pre-FY2026 series out of the greenbooks.
  */
 test("the corpus binds no fewer figures than it did", () => {
-  expect(bindings.length, "462 bindings; raise this when you add one").toBeGreaterThanOrEqual(462);
+  expect(bindings.length, "468 bindings; raise this when you add one").toBeGreaterThanOrEqual(468);
   expect(
     corpus.nodes.filter((node) => node.figures.length > 0).length,
     "61 nodes carry bindings; raise this when a sixty-second does",

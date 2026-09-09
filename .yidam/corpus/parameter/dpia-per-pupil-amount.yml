@@ -70,6 +70,8 @@ properties:
     deliberately assigns the decision, and "the department decided" is a different and more
     answerable provenance than "nobody has found it".
   series: |
+    FY2022  $422   set by H.B. 110, raised from $272 under the
+                   formula it replaced                              [verified]
     FY2026  $422   R.C. 3317.022(A)(4)(a)(i)                        [verified]
     FY2027  $422   the same division, same two-year scope           [verified]
     FY2028  —      an amount calculated in a manner determined by
@@ -125,11 +127,16 @@ unfilled:
       The weights are the department's decision under R.C. 3317.03(B)(21) and are not in the
       Revised Code. A rule in the Administrative Code, or the department's certification
       guidance, is where the decision would be written down.
-  - field: the $422 before FY2026
+  - field: the amount before FY2022, under the programme's earlier names
     why: >-
-      Prior versions of R.C. 3317.022 in Ohio Laws' version archive for the section. The
-      programme predates the Fair School Funding Plan under other names.
+      $272 is the figure the plan raised from and is now sourced; what it was before that is not.
+      The programme predates the Fair School Funding Plan under other names, and no analysis in
+      the committed greenbook series discusses it under any of them.
 figures:
+  - key: project/dpia-amount-before-the-plan
+    value: 272.0
+    field: series
+    as_written: "raised from $272 under the"
   - key: project/dpia-economically-disadvantaged-adm-statewide
     value: 856236
     field: series

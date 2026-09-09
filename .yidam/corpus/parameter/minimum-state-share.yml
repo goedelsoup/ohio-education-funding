@@ -66,8 +66,11 @@ properties:
     [the four kinds of parameter](../../decisions/the-four-kinds-of-parameter.yml) distinguishes
     "in the Revised Code" from "in a budget act" and this is both at once.
   series: |
-    FY2022  0.05   as the Fair School Funding Plan was enacted      [inference — carried by
-                   `crates/project`, not read from the enacting act]
+    FY2022  0.05   H.B. 110, stated in its greenbook as a formula
+                   box rather than as a rate                        [verified]
+    FY2023  0.05   unchanged                                        [verified]
+    FY2024  0.10   raised by H.B. 33; reaches 55 districts (9%)     [verified]
+    FY2025  0.10   the same, reaching 68 districts (11%)            [verified]
     FY2026  0.10   R.C. 3317.017(C), as amended by H.B. 96          [verified]
     FY2027  0.10   the same section, the same two-year scope        [verified]
     FY2028  —      the section does not apply                       [verified]
@@ -76,6 +79,18 @@ properties:
     repository first established the value. The section says it too, and the section is the
     stronger source: a departmental note records what the department did, and the statute
     records what it was told to do. [verified]
+
+    **The two-branch form is as old as the parameter.** `statutory_basis` below observes that the
+    current section states the floor twice — a 0.90 threshold on the capacity ratio and a 0.10
+    floor on the percentage — and that the two are algebraically equivalent. H.B. 110's greenbook
+    writes the FY2022 rule in exactly that shape, as a pair of branches at **95% and 5%**:
+
+        If Per-pupil local capacity amount / District's base cost per pupil > 95%, then
+          Per-pupil state share of base cost = District's base cost per pupil x 5%
+
+    [verified] So the floor has never been a rule bolted onto the formula; it is the second branch
+    of the state share itself, and doubling it in FY2024 moved the threshold from 95% to 90% at the
+    same time. [inference]
   statutory_basis: |
     R.C. 3317.017(B)(1) and (C), read. Both divisions state the floor, once as a threshold on
     the capacity-to-base-cost ratio (0.90) and once as a floor on the resulting percentage
@@ -105,17 +120,21 @@ properties:
     Interacts with the guarantee. A district on both the floor and the guarantee is insulated
     twice, and the two mechanisms are usually described separately. [inference]
 unfilled:
-  - field: the enacting act and division that set 5%
+  - field: the division of R.C. 3317.017 that set 5%
     why: >-
-      This repository carries the 5% figure in `crates/project` and in prose, without a citation
-      to H.B. 110 of the 134th General Assembly or to the version of R.C. 3317.017 it enacted.
-      Ohio Laws' version archive for the section is where the FY2022 text would be read.
-  - field: the value for FY2023 through FY2025
-    why: >-
-      Between the enactment and the current biennium the floor moved from 5% to 10% and the
-      corpus does not hold which budget act moved it or whether it moved once. The intervening
-      versions of R.C. 3317.017 would settle it.
+      The act is settled — H.B. 110 of the 134th, whose LSC greenbook states the floor as a
+      formula box — and the division within the section it enacted is not. Ohio Laws' version
+      archive for the section is where the FY2022 text would be read; a greenbook states a rule
+      and not the division that carries it.
 figures:
+  - key: project/districts-at-the-five-per-cent-floor-fy2024
+    value: 55
+    field: series
+    as_written: "raised by H.B. 33; reaches 55 districts (9%)"
+  - key: project/districts-at-the-five-per-cent-floor-fy2025
+    value: 68
+    field: series
+    as_written: "the same, reaching 68 districts (11%)"
   - key: project/districts-at-the-minimum-state-share
     value: 138
     field: description
