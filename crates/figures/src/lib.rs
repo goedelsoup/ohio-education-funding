@@ -3902,6 +3902,60 @@ pub static FIGURES: &[Figure] = &[
         },
     },
     Figure {
+        key: "project/parity-aid-millage-fy2002",
+        owner: "crates/project",
+        unit: Unit::Ratio,
+        label: "Parity aid's millage in FY2002, the first ancestor of targeted assistance",
+        pinned: 9.5,
+        tolerance: 0.0005,
+        compute: |_| {
+            mills_before(
+                &project::greenbook::greenbook("hb94").flat(),
+                "(above the adequacy level) to the 80th percentile",
+            )
+        },
+    },
+    Figure {
+        key: "project/parity-aid-districts-fy2002",
+        owner: "crates/project",
+        unit: Unit::Count,
+        label: "Districts eligible for parity aid in FY2002, of about 612",
+        pinned: 492.0,
+        tolerance: 0.0,
+        compute: |_| {
+            amount_after(
+                &project::greenbook::greenbook("hb94").flat(),
+                "Overall, about ",
+            )
+        },
+    },
+    Figure {
+        key: "project/parity-aid-districts-fy2009",
+        owner: "crates/project",
+        unit: Unit::Count,
+        label: "Districts eligible for parity aid in FY2009, its last year as a district payment",
+        pinned: 367.0,
+        tolerance: 0.0,
+        compute: |_| {
+            amount_after(
+                &project::greenbook::greenbook("hb119").flat(),
+                "lowest wealth districts in FY 2008 and the ",
+            )
+        },
+    },
+    Figure {
+        key: "project/the-threshold-targeted-assistance-inherited",
+        owner: "crates/project",
+        unit: Unit::Share,
+        label: "The 490th lowest district of the era's panel, which is parity aid's own threshold",
+        pinned: 0.800_653_594_771_241_9,
+        tolerance: 0.000_005,
+        compute: |_| {
+            let districts = dispersion::ohio_panel::spending_by_year()[&2013].districts;
+            490.0 / districts as f64
+        },
+    },
+    Figure {
         key: "project/gifted-statewide-total",
         owner: "crates/project",
         unit: Unit::Dollars,
