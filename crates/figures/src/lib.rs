@@ -597,6 +597,22 @@ fn lifted_off_the_guarantee(priced: &project::drafts::Priced) -> f64 {
 /// `crates/dispersion/tests/the_weights_behind_the_index.rs`, which is where that is established
 /// rather than assumed. This exists because the department publishes the maximum for the current
 /// year alone, so any earlier year's has to be recomputed the same way.
+/// Districts below the three-star release threshold: how many, how many are paid, and how much.
+///
+/// R.C. 3302.10(N)(1) needs three stars to *begin* a transition out of an academic distress
+/// commission, and the performance supplement's progress routes need nothing of the overall
+/// rating at all. The gap between the two is what this counts.
+fn below_the_release_threshold(i: &Inputs) -> (usize, usize, f64) {
+    let below: Vec<_> = i
+        .panel
+        .iter()
+        .filter(|r| r.performance.stars.is_some_and(|s| s < 3.0))
+        .collect();
+    let paid: Vec<_> = below.iter().filter(|r| r.performance.eligible).collect();
+    let total = paid.iter().map(|r| r.performance.amount).sum();
+    (below.len(), paid.len(), total)
+}
+
 fn achievement_denominator(mut scores: Vec<f64>) -> f64 {
     scores.sort_by(|a, b| b.total_cmp(a));
     let top = (scores.len() * 2).div_ceil(100);
@@ -2323,6 +2339,54 @@ pub static FIGURES: &[Figure] = &[
         pinned: 55_676_980.0,
         tolerance: 1.0,
         compute: |i| i.panel.iter().map(|r| r.performance.amount).sum(),
+    },
+    // `intervention/academic-distress-commission` and the performance supplement's own node.
+    // The supplement reaches districts the same report card put under state control,
+    // which is checkable only because the FY2027 model carries the ratings and the payment on one
+    // row. Bound in both nodes that state it.
+    Figure {
+        key: "project/performance-supplement-to-youngstown",
+        owner: "crates/project",
+        unit: Unit::Dollars,
+        label: "What the FY2027 model pays the one district still under an academic distress \
+                commission",
+        pinned: 162_207.67,
+        tolerance: 0.01,
+        compute: |i| {
+            i.panel
+                .iter()
+                .find(|r| r.irn == "045161")
+                .map_or(0.0, |r| r.performance.amount)
+        },
+    },
+    Figure {
+        key: "project/districts-below-the-release-threshold",
+        owner: "crates/project",
+        unit: Unit::Count,
+        label: "Districts rated below the three stars R.C. 3302.10(N)(1) requires to begin a \
+                transition out of an academic distress commission",
+        pinned: 59.0,
+        tolerance: 0.0,
+        compute: |i| below_the_release_threshold(i).0 as f64,
+    },
+    Figure {
+        key: "project/districts-below-the-release-threshold-paid",
+        owner: "crates/project",
+        unit: Unit::Count,
+        label: "How many of those are paid a performance supplement anyway \u{2014} none of them \
+                through the star route",
+        pinned: 15.0,
+        tolerance: 0.0,
+        compute: |i| below_the_release_threshold(i).1 as f64,
+    },
+    Figure {
+        key: "project/performance-supplement-below-the-release-threshold",
+        owner: "crates/project",
+        unit: Unit::Dollars,
+        label: "What those districts receive between them",
+        pinned: 3_036_977.90,
+        tolerance: 0.01,
+        compute: |i| below_the_release_threshold(i).2,
     },
     Figure {
         key: "project/performance-supplement-least-poor-quintile",

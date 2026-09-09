@@ -47,12 +47,40 @@ description: |
   it is superseded on a schedule rather than at the trigger. Two other divisions move money past
   the district. [verified] Both are set out below.
 findings: |
-  **The same number pays and takes.** The overall rating under R.C. 3302.03 that sets this
-  trigger is the rating the [FSFP performance
-  supplement](../formula-component/fsfp-performance-supplement.yml) pays on. A district can be
-  receiving a supplement calculated from its rating in the years that rating is accumulating
-  toward the loss of its budget authority. Whether any district has been in both positions at
-  once is not established here and is checkable. [open]
+  ### It pays and takes at once, and it is not the same number
+
+  This node used to say "the same number pays and takes", and asked whether any district had
+  been in both positions at once. It was checkable. **Youngstown City is under an academic
+  distress commission today and the department's FY2027 model pays it $162,207.67** on the
+  [performance supplement](../formula-component/fsfp-performance-supplement.yml). All three
+  districts that have had a commission are in that model: [verified — computed; see
+  [`crates/project/tests/the_supplements_outside_the_formula.rs`](../../../crates/project/tests/the_supplements_outside_the_formula.rs)]
+
+      East Cleveland   3 stars    progress 4   released                 $55,029.14
+      Lorain           2 stars    progress 2   dissolved by H.B. 33            $0
+      Youngstown       2.5 stars  progress 3   still under one         $162,207.67
+
+  **But it is not the same number, and that is why both positions can be held at once.** R.C.
+  3302.10 triggers on the *overall* rating. The supplement pays on the greater of the overall and
+  progress ratings, gated by three routes, two of which read progress alone — and both paid
+  districts here qualify on the progress route, neither on the star route. Youngstown is taken by
+  one component of the report card and paid by another. The corpus already holds why the two can
+  disagree: the same spending variable carries **−0.073** against
+  [attainment](../metric/performance-index.yml) and **+0.209** against
+  [growth](../metric/progress-value-added.yml). [verified]
+
+  **The threshold that pays sits below the threshold that releases.** Division (N)(1) needs three
+  stars to *begin* a transition out. 59 districts sit below that — Youngstown among them at 2.5 —
+  and **15 of them are paid, $3,036,977.90 between them, not one through the star route.** A
+  district can be too poorly rated to start its own release and well enough rated to be paid for
+  its performance in the same year. [verified — computed]
+
+  In the trigger band itself — R.C. 3302.10(A)(1) establishes a commission after three
+  consecutive years below two stars — 15 districts sit at two stars or fewer, and exactly one is
+  paid: **Jefferson Township Local, $10,426.68**, on a progress rating of 3 against an overall of
+  2. [verified — computed] Two of the 59 are the department's own zero-fill rather than a rating:
+  College Corner Local and Kelleys Island Local read 0 stars, and Kelleys Island has an ADM of
+  3.51. A report card cannot rate students it is forbidden to report.
 
   ### Who has actually been under one
 
@@ -113,6 +141,23 @@ findings: |
   **What is still not established.** When each commission was established — the department's
   page gives the 2021 plan requirement and the 2023 dissolution and no start dates. [open]
   Whether any commission changed outcomes, which is what the apparatus rests on. [open]
+figures:
+  - key: project/performance-supplement-to-youngstown
+    value: 162207.67
+    field: findings
+    as_written: "model pays it $162,207.67"
+  - key: project/districts-below-the-release-threshold
+    value: 59
+    field: findings
+    as_written: "59 districts sit below that"
+  - key: project/districts-below-the-release-threshold-paid
+    value: 15
+    field: findings
+    as_written: "**15 of them are paid"
+  - key: project/performance-supplement-below-the-release-threshold
+    value: 3036977.90
+    field: findings
+    as_written: "$3,036,977.90 between them"
 properties:
   name: Academic distress commission
   authority: R.C. 3302.10, effective 3 October 2023 in its current form. [verified]

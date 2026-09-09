@@ -45,6 +45,34 @@ findings: |
   says so. The progress routes are what hold the gradient to 2.56 rather than whatever it would
   otherwise be. [inference on the mechanism, [verified] on the measurement]
 
+  ### It pays districts the same report card put under state control
+
+  Ohio has had three academic distress commissions — a state takeover of a district's budget
+  authority, triggered by R.C. 3302.10 on three consecutive years below two stars. All three
+  districts are in the FY2027 model, and **the one still under a commission is paid**: Youngstown
+  City, 2.5 stars and a progress rating of 3, **$162,207.67**. East Cleveland, released, takes
+  $55,029.14. Lorain, whose commission an act of the General Assembly dissolved, qualifies on
+  none of the three routes and takes nothing. [verified —
+  `crates/project/tests/the_supplements_outside_the_formula.rs`]
+
+  **The reason both positions can be held at once is that the two mechanisms read different
+  numbers.** R.C. 3302.10 triggers on the overall rating. This supplement pays on the greater of
+  the overall and progress ratings, through three routes, two of which read progress alone — and
+  both paid districts above qualify on progress, neither on stars. The two components disagree
+  by design, which is exactly what [progress-value-added](../metric/progress-value-added.yml)
+  records: the same spending variable carries −0.073 against attainment and +0.209 against
+  growth.
+
+  **And the paying threshold sits below the releasing one.** R.C. 3302.10(N)(1) needs three stars
+  to *begin* a transition out of a commission. **59 districts are rated below that and 15 of them
+  are paid, $3,036,977.90 between them** — not one through the star route, because a district
+  below three stars cannot reach it. [verified — computed] That is 5.5% of the statewide
+  supplement going to districts too poorly rated to start their own release.
+
+  It is not an inconsistency in the statute. R.C. 3302.10 is about control and R.C. 3317's
+  supplement is about payment, and nothing requires them to use the same measure. It is worth
+  recording that they do not, because the corpus had assumed they did. [inference]
+
   ### The gradient is real and the size is not
 
   Whether the supplement is large enough to matter distributionally has two halves, and they
@@ -66,6 +94,22 @@ findings: |
   different object from a regressive program. The gradient is measured; whether it moves any
   district's position is not. [open]
 figures:
+  - key: project/performance-supplement-to-youngstown
+    value: 162207.67
+    field: findings
+    as_written: "a progress rating of 3, **$162,207.67**"
+  - key: project/districts-below-the-release-threshold
+    value: 59
+    field: findings
+    as_written: "**59 districts are rated below that"
+  - key: project/districts-below-the-release-threshold-paid
+    value: 15
+    field: findings
+    as_written: "15 of them are paid"
+  - key: project/performance-supplement-below-the-release-threshold
+    value: 3036977.90
+    field: findings
+    as_written: "$3,036,977.90 between them**"
   - key: project/performance-supplement-total
     value: 55676980.25
     field: description

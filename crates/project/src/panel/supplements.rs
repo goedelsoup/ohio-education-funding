@@ -44,7 +44,13 @@ use edfund_core::{Adm, Dollars};
 /// distributed inversely to need, and no published figure says so.
 #[derive(Debug, Clone, Copy, PartialEq, Default)]
 pub struct PerformanceSupplement {
-    /// `O1` — the overall rating, 0 to 5 in half steps. `None` for the one district rated `N/A`.
+    /// `O1` — the overall rating, 0 to 5 in half steps.
+    ///
+    /// `Option` because the sheet may leave it blank, though the FY2027 panel does not: every
+    /// district carries a number. Two of them carry a department-written **0** that is not a
+    /// rating — College Corner Local and Kelleys Island Local, the latter with an ADM of 3.51.
+    /// A report card cannot rate students it is forbidden to report, so a zero here means
+    /// unrated, and any count of districts "below" a star threshold includes those two.
     pub stars: Option<f64>,
     /// `O2`/`O3` — the progress component rating, and the year before it.
     pub progress: Option<f64>,
