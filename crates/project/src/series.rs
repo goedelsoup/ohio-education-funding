@@ -12,13 +12,13 @@
 //! floor on the uncertainty. Every [`Projection`] records the [`Prior`] that produced its
 //! interval, because an interval whose provenance is unstated is decoration.
 //!
-//! It is a floor, and `tests/the_floor_the_interval_rests_on.rs` measures by how much. Backtested
-//! on the F-33 panel, realized forecast error is wider than this band at every horizon from one
-//! to five years — but by 1.18x at one year and 1.40x at five, because the dispersion grows as
-//! `horizon^0.60` and [`Prior::spread`] widens as `horizon^0.50`. At one year the band is very
-//! nearly calibrated, covering 67.3% against the 68.3% a one-sigma interval should hold; at five
-//! it covers 55.8%. The horizons this crate publishes are further out than the backtest reaches,
-//! so those are lower bounds on the shortfall where it matters most.
+//! It is a floor, and `tests/the_floor_the_interval_rests_on.rs` measured by how much: the band
+//! held 67.3% of out-of-sample forecasts at one year and **55.8%** at five, against the 68.3% a
+//! one-sigma interval claims, because it widened as `horizon^0.50` while the error grew faster.
+//! [`HORIZON_EXPONENT`] is the fix and is fitted to that coverage; the shortfall is now under
+//! three points at every horizon the backtest reaches. The horizons this crate publishes are
+//! further out than that, so the fit is extrapolated where it matters most — but extrapolated
+//! from an exponent the data supports rather than one it contradicts.
 
 use edfund_core::FiscalYear;
 
@@ -183,6 +183,34 @@ pub const DEFAULT_SHRINK_WEIGHT: f64 = 0.30;
 /// One standard deviation. Covers about 68% of a normal distribution.
 pub const ONE_SIGMA: f64 = 1.0;
 
+/// How fast the interval widens with the horizon.
+///
+/// **0.65, fitted to coverage.** A random walk would put this at 0.5, and that is what shipped
+/// until `tests/the_floor_the_interval_rests_on.rs` measured what the band actually held: 67.3%
+/// of out-of-sample forecasts at one year, falling to **55.8%** at five, against the 68.3% a
+/// one-sigma interval claims. School enrolment is not a random walk — a district whose trend is
+/// misjudged stays misjudged, so errors are positively autocorrelated and each year's is not
+/// drawn fresh.
+///
+/// Fitted against **coverage** rather than against the dispersion of the error, which are not the
+/// same target because the error distribution is not normal: matching its standard deviation
+/// would give 0.60 and still leave the band mis-covering. At 0.65 coverage runs 67.3%, 70.4%,
+/// 71.2%, 68.4%, 66.5% over horizons one to five — never more than **2.9 points** from 68.3%,
+/// against 12.5 at 0.50.
+///
+/// The surface is flat from about 0.63 to 0.66 and the third digit is not identified. 0.64
+/// minimises the worst horizon and 0.65 the average one; the rounder value is taken, the same
+/// tie-break [`DEFAULT_DAMPING`] records.
+///
+/// [`Prior::sigma`] does **not** move with it. It is the cross-sectional spread of district
+/// growth, recomputed from the panel with its provenance printed beside every interval, and
+/// replacing it with a backtest constant would trade a stated source for a fitted one. Only the
+/// shape in the horizon was wrong.
+///
+/// Recorded in
+/// [`.yidam/decisions/the-widening-rule.yml`](../../../.yidam/decisions/the-widening-rule.yml).
+pub const HORIZON_EXPONENT: f64 = 0.65;
+
 /// The dispersion used to widen a projection, and where it came from.
 #[derive(Debug, Clone, Copy, PartialEq)]
 pub struct Prior {
@@ -207,21 +235,21 @@ impl Prior {
 
     /// The multiplicative half-width after `horizon` years.
     ///
-    /// Growth errors compound, so the band widens with the square root of the horizon rather
-    /// than staying fixed — the standard random-walk result, and the reason a five-year
-    /// projection is not five times as uncertain as a one-year one.
+    /// Growth errors compound, so the band widens with the horizon rather than staying fixed —
+    /// the reason a five-year projection is not five times as uncertain as a one-year one.
     ///
-    /// District enrolment is not quite a random walk, and the exponent is where that shows.
-    /// `tests/the_floor_the_interval_rests_on.rs` fits **0.60** against the 0.50 used here:
-    /// forecast errors are positively autocorrelated, because a district whose trend is misjudged
-    /// stays misjudged rather than drawing a fresh error each year. The band is therefore too
-    /// narrow by a margin that grows with the horizon, which is a property of this rule and not
-    /// of `sigma` — no rescaling of the prior corrects a band that is the wrong shape in
-    /// `horizon`. Changing it is a decision with a record: the web layer re-derives this
-    /// arithmetic and must reproduce it.
+    /// The exponent is [`HORIZON_EXPONENT`] and is **0.65, fitted**, not the 0.5 a random walk
+    /// would give and that this used until the band's coverage was measured. District enrolment
+    /// is not a random walk: a district whose trend is misjudged stays misjudged, so the errors
+    /// are positively autocorrelated and a square root widens too slowly. See that constant for
+    /// the fit, and `tests/the_floor_the_interval_rests_on.rs` for what 0.5 was holding.
+    ///
+    /// No rescaling of `sigma` could have fixed this — a band that is the wrong shape in the
+    /// horizon is wrong at a different amount in each year — which is why the exponent moved and
+    /// the prior's provenance did not.
     #[must_use]
     pub fn spread(&self, horizon: u16) -> f64 {
-        self.z * self.sigma * f64::from(horizon).sqrt()
+        self.z * self.sigma * f64::from(horizon).powf(HORIZON_EXPONENT)
     }
 }
 
@@ -520,8 +548,15 @@ mod tests {
         assert!(far_damped < 96.04, "it is still a decline");
     }
 
+    /// Sub-linear, but faster than a random walk.
+    ///
+    /// The two bounds are the point. A band that widened linearly would be claiming each year's
+    /// error is added whole, and one that widened as a square root would be claiming they are
+    /// drawn independently — [`HORIZON_EXPONENT`] says neither is true, and this pins the
+    /// consequence at the ratio rather than at the constant, so a change to the exponent has to
+    /// be argued here as well as declared there.
     #[test]
-    fn the_interval_widens_with_the_square_root_of_the_horizon() {
+    fn the_interval_widens_faster_than_a_square_root_and_slower_than_linearly() {
         let out = project(
             &series(2024, &[100.0, 100.0, 100.0]),
             FiscalYear(2030),
@@ -532,8 +567,16 @@ mod tests {
             out.iter().filter(|p| p.basis == Basis::Projected).collect();
         let first = forecast[0].relative_width();
         let fourth = forecast[3].relative_width();
-        // Four years out is twice as wide as one year out, not four times.
-        assert!((fourth / first - 2.0).abs() < 0.05, "{first} {fourth}");
+        let ratio = fourth / first;
+        assert!(
+            ratio > 2.0 && ratio < 4.0,
+            "four years out should be between twice and four times one year out, is {ratio}"
+        );
+        assert!(
+            (ratio - 4f64.powf(HORIZON_EXPONENT)).abs() < 0.01,
+            "and specifically 4^{HORIZON_EXPONENT}, which is {}, not {ratio}",
+            4f64.powf(HORIZON_EXPONENT)
+        );
     }
 
     #[test]

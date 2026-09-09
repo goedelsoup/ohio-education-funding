@@ -68,14 +68,28 @@ export interface Projected {
 }
 
 /**
+ * How fast the interval widens with the horizon. Mirrors `project::series::HORIZON_EXPONENT`.
+ *
+ * 0.65, fitted to the band's measured coverage. A random walk would give 0.5 and that is what
+ * shipped, holding 67.3% of out-of-sample forecasts at one year and 55.8% at five against the
+ * 68.3% a one-sigma interval claims. School enrolment is not a random walk: a district whose
+ * trend is misjudged stays misjudged, so a square root widens too slowly.
+ *
+ * `Math.pow` and Rust's `f64::powf` agree to twenty places on every integer horizon this feed
+ * publishes, which is the property the reproduction check depends on and the reason this could be
+ * an exponent rather than a lookup table.
+ */
+export const HORIZON_EXPONENT = 0.65;
+
+/**
  * The multiplicative half width after `horizon` years.
  *
- * Growth errors compound, so the band widens with the square root of the horizon rather than
- * staying fixed — the standard random-walk result, and the reason a five-year projection is not
- * five times as uncertain as a one-year one.
+ * Growth errors compound, so the band widens with the horizon rather than staying fixed — the
+ * reason a five-year projection is not five times as uncertain as a one-year one. See
+ * {@link HORIZON_EXPONENT} for why the shape is not a square root.
  */
 export function spread(prior: Prior, horizon: number): number {
-  return prior.z * prior.sigma * Math.sqrt(horizon);
+  return prior.z * prior.sigma * Math.pow(horizon, HORIZON_EXPONENT);
 }
 
 /** Standard deviation over `n − 1`. */

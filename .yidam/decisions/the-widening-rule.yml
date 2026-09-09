@@ -1,0 +1,96 @@
+id: the-widening-rule
+summary: >-
+  The projection band widens as horizon^0.65 rather than as a square root — the second parameter
+  in this repository replaced by a fitted value, and the first fitted against what a band is for
+  rather than against what it is made of.
+context: |
+  `project::series::Prior::spread` draws every interval this repository publishes:
+  `z * sigma * horizon^k`. `sigma` is the cross-sectional spread of district annual enrolled-ADM
+  growth, recomputed from the panel with its provenance printed beside each interval. `k` was
+  **0.5**, and said why: *"Growth errors compound, so the band widens with the square root of the
+  horizon rather than staying fixed — the standard random-walk result."*
+
+  That is a claim about school districts, and it had never been checked. #289 checked it. The band
+  is a **floor**, as the module doc says — realized out-of-sample error is wider than the interval
+  at every horizon from one year to five, under the shipped method and the one it replaced. But it
+  is a floor that sinks:
+
+      horizon    coverage under horizon^0.50
+      1 year               67.3%
+      2                    66.1%
+      3                    63.8%
+      4                    60.6%
+      5                    55.8%
+
+  against the **68.3%** a one-sigma interval claims. At one year the prior is very nearly
+  calibrated — a spread taken across districts turns out to be about the right size for one
+  district's one-year error — and everything the rule was doing wrong, it was doing to the years
+  after the first.
+
+  The mechanism is that forecast errors are **positively autocorrelated**: a district whose trend
+  is misjudged stays misjudged, so the random-walk assumption that each year's error is drawn
+  fresh is what a school district does not do.
+decision: |
+  Set the exponent to **0.65**, as `project::series::HORIZON_EXPONENT`, mirrored by
+  `HORIZON_EXPONENT` in `web/src/lib/project.ts`.
+
+      horizon    horizon^0.50    horizon^0.65
+      1               67.3%           67.3%
+      2               66.1%           70.4%
+      3               63.8%           71.2%
+      4               60.6%           68.4%
+      5               55.8%           66.5%
+      worst gap      12.5 pts         2.9 pts
+
+  **Fitted against coverage, not against dispersion.** Matching the standard deviation of the
+  error gives 0.60 and still leaves the band mis-covering, because the error distribution is not
+  normal — the two targets would agree if it were. Coverage is what a band promises, so coverage
+  is what was fitted.
+
+  `sigma` does not move. It is a measured quantity with a stated source, and replacing it with a
+  backtest constant would trade provenance for fit. Only the shape in the horizon was wrong, and a
+  band that is the wrong shape cannot be corrected by rescaling: it is wrong by a different amount
+  in every year.
+consequences: |
+  The published FY2032 bands widen. Central estimates do not move at all — the exponent touches
+  only the interval:
+
+      current law         $7,233M   $7,017M-$7,494M  ->  $6,958M-$7,582M   ±3.3% -> ±4.3%
+      guarantee removed   $6,301M   $5,938M-$6,686M  ->  $5,831M-$6,809M   ±5.9% -> ±7.8%
+
+  The finding those figures carry survives: the guarantee-removed band is 1.80 times as wide as
+  the current-law one, against 1.79 before, so *"removing the guarantee nearly doubles the state's
+  exposure to enrollment forecast error"* is unchanged.
+
+  Four of the figures #291 bound moved, and the manifest said so before anything else did —
+  `the_manifest_reproduces_its_pins` failed naming the key, both values and the distance, on the
+  first run after the exponent changed. That is the mechanism working on the next change after it
+  was built, rather than in principle.
+
+  `Math.pow` and Rust's `f64::powf` agree to twenty places on every integer horizon this feed
+  publishes, so the exponent could be an exponent rather than a lookup table and the feed
+  reproduction check is unaffected.
+alternatives: |
+  **Leave it.** The band was still a floor, which is the safe direction to be wrong in. Rejected
+  because 55.8% coverage on a stated 68% interval is not a conservative interval, it is a
+  mislabelled one, and the label is what a reader acts on.
+
+  **Rescale `sigma` instead.** Would fix one horizon and miss the rest, since the defect grows
+  with the horizon. It also costs the prior its provenance.
+
+  **Fit to the dispersion (0.60).** The obvious move and the wrong target; see the decision.
+
+  **0.64.** Minimises the worst horizon where 0.65 minimises the average. The surface is flat from
+  about 0.63 to 0.66 and the third digit is not identified, so the rounder value is taken — the
+  same tie-break `the-fitted-damping` records.
+open: |
+  The fit uses horizons one to five, which is as far as six origins across fifteen surveyed years
+  reach. The FY2032 leg is **six** years out and the feed's horizon is **ten**. The exponent is
+  extrapolated there under both rules; what changed is that it is now extrapolated from a value
+  the data supports rather than one it contradicts inside the measured range.
+
+  Whether the band should be asymmetric is not addressed. It is multiplicative, so it already is
+  in dollars, but the *log* error has a growing positive mean — see
+  `the_bias_no_single_damping_can_remove` — and an interval centred on a biased point estimate
+  inherits that bias whatever its width.
+supersedes: []

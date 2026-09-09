@@ -1,82 +1,74 @@
-//! Whether the projection band is the floor it says it is.
+//! What the projection band held, which was not what it claimed, and what it holds now.
 //!
 //! [`project::series`] states plainly where its interval comes from: *"we do not know how
 //! variable this district is, but we know how much districts differ from one another, and that
 //! is a defensible floor on the uncertainty."* [`report::enrollment_growth_prior`] builds it —
 //! the cross-sectional standard deviation of district annual enrolled-ADM growth over the three
-//! years the department publishes, widened by the square root of the horizon.
+//! years the department publishes, widened by the horizon.
 //!
-//! Two claims live in that sentence and neither had been checked. That the band is a **floor**:
-//! true forecast error is at least this wide. And that `sqrt(horizon)` is how it should widen.
-//! The F-33 panel can now check both, because the same fourteen years of district enrolment that
-//! fitted the damping (see [`the-fitted-damping`]) also hold what actually happened after every
-//! forecast a backtest can make.
+//! Two claims lived in that sentence and neither had been checked. That the band is a **floor**:
+//! true forecast error is at least this wide. And that a **square root** is how it should widen.
+//! The F-33 panel that fitted the damping can check both. The first held. The second did not, and
+//! [`series::HORIZON_EXPONENT`] is what came of it.
 //!
-//! # The floor holds, at every horizon, under both methods
+//! # The floor holds, at every horizon, under both methods and both rules
 //!
-//! Realized dispersion of out-of-sample log forecast error, against the band the production
-//! prior claims at the same horizon. σ = 0.0242, z = 1.
+//! Realized out-of-sample error is wider than the interval drawn around it at every horizon from
+//! one year to five, under the shipped `Shrunk` method and the `Damped` one it replaced, before
+//! the exponent moved and after. **The band never over-states.** That is the one claim in the
+//! sentence that survived, and it survives the fix as well — widening the band did not overshoot
+//! into claiming more precision than the errors show.
 //!
-//! | horizon | claimed ±1σ | realized, as shipped | ratio | coverage |
-//! |---|--:|--:|--:|--:|
-//! | 1 year | 0.0242 | 0.0285 | 1.18× | 67.3% |
-//! | 2 | 0.0342 | 0.0407 | 1.19× | 66.1% |
-//! | 3 | 0.0419 | 0.0522 | 1.25× | 63.8% |
-//! | 4 | 0.0484 | 0.0645 | 1.33× | 60.6% |
-//! | 5 | 0.0541 | 0.0756 | 1.40× | 55.8% |
+//! # But under a square root it lost coverage with every year
 //!
-//! **The band never over-states.** That is the claim, and it survives: at no horizon, under
-//! either the shipped `Shrunk` method or the plain `Damped` one it replaced, is realized error
-//! narrower than the interval drawn around it.
+//! A one-sigma band should hold about **68.3%**. What it held:
 //!
-//! # But it is a floor that sinks, and the square root is why
+//! | horizon | `horizon^0.50` — what shipped | `horizon^0.65` — fitted |
+//! |---|--:|--:|
+//! | 1 year | 67.3% | 67.3% |
+//! | 2 | 66.1% | 70.4% |
+//! | 3 | 63.8% | 71.2% |
+//! | 4 | 60.6% | 68.4% |
+//! | 5 | **55.8%** | **66.5%** |
+//! | worst gap from 68.3% | **12.5 pts** | **2.9 pts** |
 //!
-//! A ±1σ band on a normal should cover 68.3%. At one year the prior covers **67.3%** — very
-//! nearly calibrated, which is the more surprising half of this result: a spread taken across
-//! districts turns out to be about the right size for a single district's one-year error. By
-//! five years it covers **55.8%**.
+//! At one year the two are identical and always will be — `1^k` is 1 for every `k` — which is
+//! also the more surprising half of the original result: a spread taken *across districts* turns
+//! out to be very nearly the right size for *one* district's one-year error. Everything the
+//! exponent was doing wrong, it was doing to the years after the first.
 //!
-//! The decay is not in σ, it is in the widening rule. Realized dispersion grows as
-//! **`horizon^0.60`**, not the `horizon^0.50` [`Prior::spread`] applies. Forecast errors are
-//! positively autocorrelated — a district whose trend is misjudged stays misjudged, and the
-//! random-walk assumption that each year's error is drawn fresh is what a school district does
-//! not do.
+//! # Fitted to coverage, which is not the same as fitted to dispersion
 //!
-//! This is stable rather than an artefact of one period. At five years, by origin:
+//! Realized dispersion grows as **`horizon^0.60`**, and matching it would have been the obvious
+//! move. It is the wrong target: the error distribution is not normal, so a band matching its
+//! standard deviation does not hold the share of it a normal band would. Fitted against coverage
+//! directly the answer is **0.65**, and the surface is flat from about 0.63 to 0.66 — 0.64
+//! minimises the worst horizon and 0.65 the average one.
 //!
-//! | origin → target | ratio |
-//! |---|--:|
-//! | FY2013 → FY2018 | 1.34× |
-//! | FY2015 → FY2020 | 1.44× |
-//! | FY2018 → FY2023 | 1.36× |
-//! | FY2019 → FY2024 | 1.36× |
+//! The mechanism behind both numbers is the same. Forecast errors are positively autocorrelated:
+//! a district whose trend is misjudged stays misjudged, and the random-walk assumption that each
+//! year's error is drawn fresh is what a school district does not do.
 //!
-//! # The published horizons are past where this can see
+//! This was stable rather than an artefact of one period. Under the square root at five years, by
+//! origin: FY2013 1.34x, FY2015 1.44x, FY2018 1.36x, FY2019 1.36x.
+//!
+//! # The published horizons are still past where this can see
 //!
 //! Five years is as far as six origins across fifteen surveyed years will reach. The FY2032 leg
-//! in [`scenario/guarantee-phase-out`] is **six**, and the feed's horizon is FY2036, which is
-//! **ten**. 1.40× is therefore a lower bound on how much the band under-states there, and under
-//! an exponent that is still climbing at the edge of the measurement it is a weak one.
+//! in [`scenario/guarantee-phase-out`] is **six** and the feed's horizon is FY2036, which is
+//! **ten**. The fit is extrapolated there either way — but from an exponent the data supports
+//! rather than one it contradicts inside the measured range.
 //!
 //! # A bias the mean absolute error could not show
 //!
 //! Mean log error runs −0.005 at one year to **+0.023** at five: the method increasingly
-//! over-forecasts, predicting more children than arrive. [`the-fitted-damping`] and
-//! [`the-shrunk-rate`] both scored on *absolute* error, which is blind to sign, so neither would
-//! have found this. It is small against the dispersion — a fifth of it at five years — but it is
-//! one-directional, and Ohio enrolment has been falling for the whole panel.
+//! over-forecasts. [`the-fitted-damping`] and [`the-shrunk-rate`] both scored on *absolute*
+//! error, which is blind to sign, so neither would have found this.
+//! `the_bias_no_single_damping_can_remove` takes it from here, and the answer is that no value of
+//! the damping removes it.
 //!
 //! The shrink helps here too, on a metric it was not chosen for: against the plain damped method
-//! it cuts the five-year bias from +0.030 to +0.023 and the dispersion at every horizon. That is
-//! independent evidence for a decision taken on other grounds.
-//!
-//! # What this does not do
-//!
-//! It does not recalibrate anything. σ, z and the square root are published constants that the
-//! web layer re-derives and must reproduce, and moving them is a decision with a record, not a
-//! consequence of a test file. What is settled here is that the sentence describing them is
-//! true, that it is true by a measured margin, and that the margin is a function of horizon
-//! nobody had looked at.
+//! it cuts the five-year bias from +0.030 to +0.023 and the dispersion at every horizon.
 //!
 //! [`the-fitted-damping`]: ../../../.yidam/decisions/the-fitted-damping.yml
 //! [`the-shrunk-rate`]: ../../../.yidam/decisions/the-shrunk-rate.yml
@@ -110,6 +102,26 @@ const SHIPPING_WEIGHT: f64 = 0.30;
 
 /// The fraction of a normal distribution inside ±1σ, which is what the band claims to draw.
 const NORMAL_ONE_SIGMA_COVERAGE: f64 = 0.683;
+
+/// The exponent the band widened by before it was fitted, pinned rather than imported.
+///
+/// The same reasoning as `THE_CONVENTION` in [`the_damping_nobody_fitted`]: this file's findings
+/// are about a rule the repository no longer uses, and a file that followed
+/// [`series::HORIZON_EXPONENT`] would turn them into tautologies about whatever ships. The
+/// *prior* is deliberately still imported — it is what the exponent multiplies, its provenance
+/// did not change with the fit, and a recalibration of it should fail this file rather than slip
+/// past.
+const THE_RANDOM_WALK: f64 = 0.5;
+
+/// The band a given exponent draws at `horizon`, from the production prior.
+fn band(prior: Prior, horizon: u16, exponent: f64) -> f64 {
+    prior.z * prior.sigma * f64::from(horizon).powf(exponent)
+}
+
+/// The share of out-of-sample errors that band holds.
+fn coverage(errors: &[f64], width: f64) -> f64 {
+    errors.iter().filter(|e| e.abs() <= width).count() as f64 / errors.len() as f64
+}
 
 /// One district's enrolment history, keyed by fiscal year.
 type History = BTreeMap<u16, f64>;
@@ -264,16 +276,20 @@ fn realized_forecast_error_is_wider_than_the_band_at_every_horizon() {
     }
 }
 
-/// It is a floor by 1.18x at one year and 1.40x at five, as shipped.
+/// Under the square root the floor sank from 1.18x at one year to 1.40x at five.
 ///
-/// The margin is the finding, not just its sign: a floor 18% below the truth is a usable
-/// interval and one 40% below it is not the same object.
+/// The margin was the finding, not just its sign: a floor 18% below the truth is a usable
+/// interval and one 40% below it is not the same object. Measured against `THE_RANDOM_WALK`
+/// rather than the shipped exponent, because this is a statement about the rule that was
+/// replaced.
 #[test]
-fn the_margin_widens_from_one_fifth_to_two_fifths_across_five_years() {
+fn the_square_root_rule_sank_from_one_fifth_to_two_fifths_across_five_years() {
     let histories = complete_histories();
     let prior = prior();
-    let ratio =
-        |horizon| stdev(&log_errors(&histories, Shape::Shrunk, horizon)) / prior.spread(horizon);
+    let ratio = |horizon| {
+        stdev(&log_errors(&histories, Shape::Shrunk, horizon))
+            / band(prior, horizon, THE_RANDOM_WALK)
+    };
     let (one, five) = (ratio(1), ratio(5));
     assert!(
         (one - 1.18).abs() < 0.02,
@@ -285,43 +301,109 @@ fn the_margin_widens_from_one_fifth_to_two_fifths_across_five_years() {
     );
     assert!(
         five > one,
-        "the floor should sink with horizon: {one:.3}x at one year, {five:.3}x at five"
+        "the floor should sink with horizon under the old rule: {one:.3}x then {five:.3}x"
     );
 }
 
-/// Coverage is very nearly right at one year and has lost a ninth of itself by five.
+/// It lost coverage with every year, from 67.3% to 55.8%.
 ///
 /// A cross-sectional spread being the correct size for one district's one-year error is not
-/// something the sentence claimed — it claimed only a floor — so this is the prior doing better
-/// than advertised at the horizon nobody publishes, and worse at the ones that are published.
+/// something the sentence claimed — it claimed only a floor — so the prior was doing better than
+/// advertised at the horizon nobody publishes, and worse at the ones that are.
 #[test]
-fn the_one_year_band_is_nearly_calibrated_and_the_five_year_band_is_not() {
+fn the_square_root_rule_lost_coverage_with_every_year() {
     let histories = complete_histories();
     let prior = prior();
-    let coverage = |horizon| {
-        let errors = log_errors(&histories, Shape::Shrunk, horizon);
-        let claimed = prior.spread(horizon);
-        errors.iter().filter(|e| e.abs() <= claimed).count() as f64 / errors.len() as f64
+    let held = |horizon| {
+        coverage(
+            &log_errors(&histories, Shape::Shrunk, horizon),
+            band(prior, horizon, THE_RANDOM_WALK),
+        )
     };
-    let (one, five) = (coverage(1), coverage(5));
+    let (one, five) = (held(1), held(5));
     assert!(
         (one - NORMAL_ONE_SIGMA_COVERAGE).abs() < 0.02,
-        "one-year coverage {one:.3} should sit within a couple of points of {NORMAL_ONE_SIGMA_COVERAGE}"
+        "one-year coverage {one:.3} should sit within a couple of points of \
+         {NORMAL_ONE_SIGMA_COVERAGE}"
     );
     assert!(
         (0.50..0.60).contains(&five),
         "five-year coverage should be near 0.558, is {five:.3}"
     );
+    for pair in (1..=5u16).map(held).collect::<Vec<_>>().windows(2) {
+        assert!(
+            pair[1] < pair[0],
+            "coverage should fall at every step under the old rule: {:.3} then {:.3}",
+            pair[0],
+            pair[1]
+        );
+    }
 }
 
-/// Dispersion grows as `horizon^0.60`, and `Prior::spread` widens it as `horizon^0.50`.
+/// What ships holds it flat instead — never more than three points from where it should be.
+///
+/// The fix and its acceptance test. `1^k` is 1 for every `k`, so the one-year figure is untouched
+/// by construction and the whole of the improvement is in the years after the first, which is
+/// where the whole of the defect was.
+#[test]
+fn the_fitted_exponent_holds_coverage_within_three_points_at_every_horizon() {
+    let histories = complete_histories();
+    let prior = prior();
+    let held: Vec<f64> = (1..=5u16)
+        .map(|h| coverage(&log_errors(&histories, Shape::Shrunk, h), prior.spread(h)))
+        .collect();
+
+    let worst = held
+        .iter()
+        .map(|c| (c - NORMAL_ONE_SIGMA_COVERAGE).abs())
+        .fold(0.0f64, f64::max);
+    assert!(
+        worst < 0.03,
+        "the fitted rule should hold coverage within three points; worst is {:.1} points, from \
+         {held:?}",
+        worst * 100.0
+    );
+
+    let was_worst = (1..=5u16)
+        .map(|h| {
+            coverage(
+                &log_errors(&histories, Shape::Shrunk, h),
+                band(prior, h, THE_RANDOM_WALK),
+            )
+        })
+        .map(|c| (c - NORMAL_ONE_SIGMA_COVERAGE).abs())
+        .fold(0.0f64, f64::max);
+    assert!(
+        was_worst > worst * 3.0,
+        "and it should be several times better than the square root's {:.1} points",
+        was_worst * 100.0
+    );
+
+    assert!(
+        (held[0]
+            - coverage(
+                &log_errors(&histories, Shape::Shrunk, 1),
+                band(prior, 1, THE_RANDOM_WALK)
+            ))
+        .abs()
+            < 1e-12,
+        "one year is identical under both rules, because 1 to any power is 1"
+    );
+}
+
+/// Dispersion grows as `horizon^0.60`, where the square root assumed 0.50.
 ///
 /// The exponent is fitted by least squares on the logs of the five measured dispersions. That
 /// errors compound faster than a random walk is the mechanism behind every row of the coverage
 /// table, and it is a property of the widening rule rather than of sigma — no rescaling of the
 /// prior fixes a band that is the wrong shape in the horizon.
+///
+/// **This is not the number that shipped**, and the difference is the point: 0.60 is what matches
+/// the *dispersion* of the error, and `HORIZON_EXPONENT` is 0.65 because it is fitted to
+/// *coverage*. The two would agree if the errors were normal. They are not, so the band that
+/// matches the standard deviation is not the band that holds 68% of the mass.
 #[test]
-fn the_dispersion_grows_faster_than_the_square_root_the_band_assumes() {
+fn the_dispersion_grows_faster_than_the_square_root_the_band_used_to_assume() {
     let histories = complete_histories();
     let points: Vec<(f64, f64)> = (1..=5u16)
         .map(|h| {
@@ -344,15 +426,17 @@ fn the_dispersion_grows_faster_than_the_square_root_the_band_assumes() {
         "the fitted exponent should be about 0.60, is {exponent:.3}"
     );
     assert!(
-        exponent > 0.5,
-        "a square-root band assumes 0.5 and the data says {exponent:.3}; if this ever drops to \
-         0.5 the widening rule has become right and this whole file is stale"
+        exponent > THE_RANDOM_WALK,
+        "a square-root band assumed 0.5 and the data says {exponent:.3}"
     );
 }
 
-/// The five-year shortfall is not one bad period: four origins give 1.34x to 1.44x.
+/// The square root's five-year shortfall was not one bad period: four origins gave 1.34x to 1.44x.
+///
+/// Against `THE_RANDOM_WALK`, like the two above it — a statement about the rule that was
+/// replaced, and the reason the replacement is a fit rather than a patch over one odd window.
 #[test]
-fn the_five_year_shortfall_holds_across_every_origin_that_reaches_that_far() {
+fn the_square_root_shortfall_held_across_every_origin_that_reaches_that_far() {
     let histories = complete_histories();
     let prior = prior();
     let mut measured = Vec::new();
@@ -380,7 +464,7 @@ fn the_five_year_shortfall_holds_across_every_origin_that_reaches_that_far() {
         if errors.len() < 2 {
             continue;
         }
-        measured.push((origin, stdev(&errors) / prior.spread(5)));
+        measured.push((origin, stdev(&errors) / band(prior, 5, THE_RANDOM_WALK)));
     }
     assert_eq!(
         measured.len(),
