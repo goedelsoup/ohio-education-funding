@@ -89,8 +89,22 @@ impl<'a> Greenbook<'a> {
             .collect()
     }
 
+    /// The whole analysis with its line breaks collapsed to single spaces.
+    ///
+    /// These come out of PDFs, so a sentence routinely spans three lines with a page footer in
+    /// the middle and a phrase-level search over [`Greenbook::body`] misses most of what is
+    /// there. Flattening first is what a quotation should be checked against; the caller who
+    /// wants the publisher's own line breaks still has `body`.
+    #[must_use]
+    pub fn flat(&self) -> String {
+        self.body.split_whitespace().collect::<Vec<_>>().join(" ")
+    }
+
     /// The analysis from the first line matching `subject`, for `lines` lines, whitespace
     /// collapsed — the form a quotation is checked against.
+    ///
+    /// Line-anchored, so `subject` must fall inside one of the publisher's own lines.
+    /// [`Greenbook::flat`] is what to search when it may not.
     ///
     /// Returns an empty string where the subject does not appear, because a caller asking for
     /// context around an absent phrase is asking a question whose answer is "it is not there".

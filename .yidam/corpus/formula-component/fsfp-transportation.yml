@@ -49,6 +49,10 @@ description: |
   district is owed but what there was to divide. See [appropriation proration
   factor](../parameter/appropriation-proration-factor.yml). [verified]
 figures:
+  - key: project/transportation-floor-fy2023
+    value: 33.33
+    field: statutory_basis
+    as_written: "climbed from 33.33 to 50 percentage points"
   - key: project/model-districts
     value: 609
     field: findings
@@ -207,6 +211,15 @@ properties:
     and the 0.15 multiplier the corpus carries. [verified] The 50% floor is in the section too.
     Whether the rider weights and the guarantee are statutory has not been separated out here.
     [open]
+
+    **The 50% floor is the last term of a schedule, not a standing rule.** LSC's H.B. 33 analysis:
+    "The minimum state share for transportation increases from 33.33% in FY 2023 to 37.50% in
+    FY 2024 and 41.67% in FY 2025", and [H.B. 96](../legislation/hb-96-2025.yml) carries it to
+    45.83% and then 50%. [verified —
+    [`crates/project`](../../../crates/project/tests/the_parameters_before_this_biennium.rs)] The
+    five published values are eight through twelve twenty-fourths rounded to two places, so the
+    floor has climbed from 33.33 to 50 percentage points in equal annual steps of a twenty-fourth
+    — one schedule set across two budget acts rather than five separate decisions. [inference]
   calculator: |
     Not a standalone crate. Carried in `crates/project::panel::Transportation` and reproduced for
     all 609 districts in `crates/project/tests/transportation.rs`, including both supplements, the

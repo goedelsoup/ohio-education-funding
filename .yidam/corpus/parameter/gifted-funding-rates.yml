@@ -71,6 +71,19 @@ properties:
     always does. The corpus's `deflator` is the tool for that and no constant-dollar companion
     series exists here yet.
   series: |
+    Before the plan, and the first two years of it — LSC's H.B. 110 analysis, which prints each
+    new rate beside the one it replaced:
+
+      gifted identification    $5.50 -> $24.00 per enrolled ADM, grades K-6
+      gifted referral          new   -> $2.50 per enrolled ADM
+      professional development new   -> $7.00 in FY2022, $14.00 in FY2023
+      specialist unit ratio    new   -> one unit per 140 identified gifted pupils, K-12
+
+    [verified] Professional development is the one that kept moving: $21 in FY2024 and $28 in
+    FY2025 under H.B. 33, then repealed by [H.B. 96](../legislation/hb-96-2025.yml). It ran four
+    years, quadrupled, and stopped. [verified] Identification and referral have not moved since
+    FY2022.
+
     Per pupil, R.C. 3317.022(A)(6)(a), FY2026-27:
 
       $24.00   gifted identification, on enrolled ADM for grades K-6
@@ -137,10 +150,17 @@ unfilled:
     why: >-
       R.C. 3317.051(C)(1) states $85,776, $89,378 and $80,974 and gives no derivation. The Fair
       School Funding Plan workgroup's costing papers are where a salary basis would be.
-  - field: the rates before FY2026
+  - field: the three unit prices before FY2026
     why: >-
-      Prior versions of R.C. 3317.051 and 3317.022 in Ohio Laws' version archive.
+      The per-pupil rates and the 1:140 ratio are sourced back to FY2022 from LSC's H.B. 110
+      analysis. The three **unit** prices are not: that analysis states the specialist ratio and
+      the salary it associates with a unit changed, without printing the coordinator, K-8 and 9-12
+      figures separately. Prior versions of R.C. 3317.051 would give them.
 figures:
+  - key: project/gifted-identification-before-the-plan
+    value: 5.5
+    field: series
+    as_written: "gifted identification    $5.50 -> $24.00"
   - key: project/gifted-identification-falls-with-poverty
     value: 0.6725985512946641
     field: findings

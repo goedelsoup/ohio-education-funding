@@ -45,6 +45,25 @@ findings: |
 
   That is a constraint with no term in the formula, which is what
   [the proration factor](appropriation-proration-factor.yml) exists for.
+  ### The rule is older than the reason given for it
+
+  Both figures in this section are now sourced back to **Am. Sub. H.B. 59 of the 130th General
+  Assembly**, the FY2014-15 budget — 6 consecutive enacted budgets state the same $4,000 flat
+  grant and the same 0.5 multiplier, across the change from the Bridge formula to the Fair School
+  Funding Plan and across the change from a state share *index* to a state share *percentage* in
+  the term the halving is applied to. [verified —
+  [`crates/project`](../../../crates/project/tests/the_parameters_before_this_biennium.rs)]
+
+  What moved is the justification. H.B. 59's analysis states the rule and no reason: *"Special
+  education aid is then multiplied by 0.5."* The clause this node quotes — "to reflect the half-day
+  nature of those programs" — first appears in H.B. 64 of the 131st and has been repeated verbatim
+  in every analysis since. [verified]
+
+  That is worth recording because a reader who finds the rationale in the current document will
+  date the rule to it, and the rule is two years older. It also bears on the substance: a
+  justification supplied a biennium after the fact is a justification that was not the reason the
+  rule was adopted, whatever its merits since. [inference]
+
 properties:
   name: Preschool special education amounts
   unit: dollars-per-pupil
@@ -60,6 +79,8 @@ properties:
     the plan that does *not* expire; the halving that this section applies to them does. So the
     same six numbers have two different lives depending on which section is applying them.
   series: |
+    FY2014  $4,000  the earliest analysis in the committed greenbook series to state it
+    FY2016  $4,000  and every enacted budget since, unbroken to FY2025
     FY2026  $4,000  flat, per preschool child with a disability, no state share applied
     FY2027  $4,000  the same
     FY2028  —       a formula specified by the general assembly
@@ -100,15 +121,17 @@ properties:
     proration factor before it runs into anything else. [verified for the overrun; inference for
     the consequence]
 unfilled:
-  - field: the flat grant before FY2026
+  - field: the flat grant and the halving before FY2014
     why: >-
-      Prior versions of R.C. 3317.0213 in Ohio Laws' version archive. A flat nominal grant is
-      the kind of figure a constant-dollar series would say most about, and none is held.
-  - field: whether the 0.50 has always been 0.50
-    why: >-
-      Same source. The halving is the substantive policy in this section and its history is not
-      held here.
+      Both are now sourced back to Am. Sub. H.B. 59 of the 130th, the earliest enacted budget
+      whose LSC analysis discusses the component at all. Six consecutive analyses state them and
+      none before H.B. 59 mentions either, so FY2014 is where the *evidence* starts and not where
+      the practice does. Prior versions of R.C. 3317.0213 would reach further.
 figures:
+  - key: project/analyses-stating-the-preschool-flat-grant
+    value: 6
+    field: findings
+    as_written: "budget \u2014 6 consecutive enacted budgets state"
   - key: project/prek-sped-program-total-fy2027
     value: 148408183.76000014
     field: series

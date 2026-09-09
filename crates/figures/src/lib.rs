@@ -686,6 +686,34 @@ fn past_the_three_year_exit() -> Vec<(
         .collect()
 }
 
+/// The first number LSC writes after `marker` in one of its budget analyses.
+///
+/// Strips a leading `$` and any thousands separators, and stops at a trailing `%`, `,` or `.`
+/// that is not a decimal point. Parsed rather than pinned for the reason [`mills_before`] is: a
+/// figure the corpus can only get from prose should fail when the prose moves, not agree with a
+/// sentence nobody can find.
+///
+/// # Panics
+///
+/// If `marker` is absent, or nothing parseable follows it.
+fn amount_after(passage: &str, marker: &str) -> f64 {
+    let at = passage
+        .find(marker)
+        .unwrap_or_else(|| panic!("the analysis no longer says {marker:?}"));
+    let rest = &passage[at + marker.len()..];
+    let token: String = rest
+        .trim_start()
+        .trim_start_matches('$')
+        .chars()
+        .take_while(|c| c.is_ascii_digit() || *c == '.' || *c == ',')
+        .filter(|c| *c != ',')
+        .collect();
+    token
+        .trim_end_matches('.')
+        .parse()
+        .unwrap_or_else(|_| panic!("what follows {marker:?} is not a number: {token:?}"))
+}
+
 /// The millage LSC states immediately before `tail` in one of its budget analyses.
 ///
 /// These figures are read out of committed prose rather than computed over a table, which is the
@@ -2461,6 +2489,98 @@ pub static FIGURES: &[Figure] = &[
             project::scholarship::JON_PETERSON_BASE
                 + project::scholarship::JON_PETERSON_SUPPLEMENTS[5]
                 - project::scholarship::jon_peterson_award(6)
+        },
+    },
+    Figure {
+        key: "project/dpia-amount-before-the-plan",
+        owner: "crates/project",
+        unit: Unit::Dollars,
+        label: "The per-pupil economically disadvantaged amount the Fair School Funding Plan \
+                replaced \u{2014} what $422 was raised from, and the only prior value the corpus \
+                holds",
+        pinned: 272.0,
+        tolerance: 0.005,
+        compute: |_| {
+            amount_after(
+                &project::greenbook::greenbook("hb110").flat(),
+                "with the base per-pupil amount increased from ",
+            )
+        },
+    },
+    Figure {
+        key: "project/gifted-identification-before-the-plan",
+        owner: "crates/project",
+        unit: Unit::Dollars,
+        label: "The per-pupil gifted identification rate before the plan raised it to $24 \
+                \u{2014} a more-than-fourfold increase, and the rate a series would start from",
+        pinned: 5.5,
+        tolerance: 0.005,
+        compute: |_| {
+            amount_after(
+                &project::greenbook::greenbook("hb110").flat(),
+                "gifted identification funds from ",
+            )
+        },
+    },
+    Figure {
+        key: "project/districts-at-the-five-per-cent-floor-fy2024",
+        owner: "crates/project",
+        unit: Unit::Count,
+        label: "Districts the minimum state share reached in FY2024, the first year at ten per \
+                cent \u{2014} what makes the floor a live parameter rather than a formality",
+        pinned: 55.0,
+        tolerance: 0.0,
+        compute: |_| {
+            amount_after(
+                &project::greenbook::greenbook("hb33").flat(),
+                "The minimum state share percentage applies to an estimated ",
+            )
+        },
+    },
+    Figure {
+        key: "project/districts-at-the-five-per-cent-floor-fy2025",
+        owner: "crates/project",
+        unit: Unit::Count,
+        label: "And in FY2025 \u{2014} thirteen more districts in one year, on a floor that did \
+                not move",
+        pinned: 68.0,
+        tolerance: 0.0,
+        compute: |_| {
+            amount_after(
+                &project::greenbook::greenbook("hb33").flat(),
+                "districts in FY 2024 and ",
+            )
+        },
+    },
+    Figure {
+        key: "project/transportation-floor-fy2023",
+        owner: "crates/project",
+        unit: Unit::Ratio,
+        label: "The minimum transportation state share in FY2023, in percentage points \u{2014} \
+                the first term of a schedule that reaches fifty per cent in FY2027",
+        pinned: 33.33,
+        tolerance: 0.005,
+        compute: |_| {
+            amount_after(
+                &project::greenbook::greenbook("hb33").flat(),
+                "The minimum state share for transportation increases from ",
+            )
+        },
+    },
+    Figure {
+        key: "project/analyses-stating-the-preschool-flat-grant",
+        owner: "crates/project",
+        unit: Unit::Count,
+        label: "Consecutive enacted budget analyses stating the $4,000 preschool grant and its \
+                half-day multiplier \u{2014} FY2014 through FY2025, across a change of funding \
+                regime",
+        pinned: 6.0,
+        tolerance: 0.0,
+        compute: |_| {
+            project::greenbook::greenbooks()
+                .iter()
+                .filter(|book| book.flat().contains("$4,000 for each preschool"))
+                .count() as f64
         },
     },
     Figure {
