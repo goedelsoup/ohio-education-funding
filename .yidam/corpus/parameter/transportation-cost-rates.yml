@@ -135,11 +135,27 @@ findings: |
   [verified — [the department's own explanation](../../catalog/dew-sfpr-line-by-line.md),
   FY2022 through FY2026, tested in `crates/project`]
 
-  The FY2021 transportation guarantee — the line that holds 38 districts at their FY2021
-  payment — is likewise absent from the section, as is the 0.91746 factor on special education
-  transportation. Both behave like the enrolment and performance supplements: alive in the
-  calculator and not in permanent law. [verified that they are absent; inference for the
-  parallel]
+  The 0.91746 factor on special education transportation is likewise absent from the section, and
+  behaves like the enrolment and performance supplements: alive in the calculator and not in
+  permanent law. [verified that it is absent; inference for the parallel]
+
+  **The transportation guarantee is not.** The line that holds 38 districts at their FY2021
+  payment was recorded here as absent from permanent law on the same ground, and it is one section
+  away, at **R.C. 3317.019(A)(2)** — which the corpus has held in its committed statute extract
+  the whole time. The search missed it because the statute does not call it a guarantee: it is *"temporary
+  transitional transportation aid"*, and the word **guarantee appears nowhere in the section**.
+  [verified — [`crates/project`](../../../crates/project/tests/the_year_the_guarantee_holds_to.rs)]
+
+  What it pays is the FY2020 amount under H.B. 166's Section 265.220(A)(2) — *"prior to any
+  funding reductions authorized by Executive Order 2020-19D"* — less the district's FY2019 payment
+  under a division of R.C. 3314.091 repealed in 2021, less its current-year payment under
+  R.C. 3317.0212, floored at zero. [verified] Three subtractions reaching three years, two of them
+  through provisions that no longer exist.
+
+  The calculator labels the line FY2021 and the statute anchors it to FY2020. Under
+  [H.B. 166](../legislation/hb-166-2019.yml) both years were held at FY2019, which would make the
+  two labels the same number; the corpus holds no per-district figure that would confirm it.
+  [inference]
 
   ### This closes an open question the component carried
 
@@ -228,10 +244,12 @@ properties:
     appropriation, which is what the
     [proration factor](appropriation-proration-factor.yml) exists to handle. [inference]
 unfilled:
-  - field: the FY2021 transportation guarantee
+  - field: whether the calculator's FY2021 label and the statute's FY2020 anchor are one number
     why: >-
-      Holds 38 districts and is absent from the section. H.B. 96's temporary law, which
-      `codes.ohio.gov` does not carry, is where the enrolled act would have it.
+      The guarantee itself is no longer unfilled — it is R.C. 3317.019(A)(2), read and pinned.
+      What is not established is the identification: the department's line says FY2021 and the
+      section says FY2020 before the executive order's reductions. Confirming it needs a
+      per-district FY2020 or FY2021 transportation figure, which no committed source carries.
   - field: the rates before FY2026
     why: >-
       FY2026's are now committed, from an archived copy of that year's model — $1,275.000 per
@@ -253,7 +271,7 @@ figures:
   - key: project/districts-on-the-transportation-guarantee
     value: 38
     field: findings
-    as_written: "the line that holds 38 districts at their FY2021\n  payment"
+    as_written: "The line that holds 38 districts at their FY2021\n  payment"
 links:
   - target: ../parameter.ont.yml
     relationship: instance-of

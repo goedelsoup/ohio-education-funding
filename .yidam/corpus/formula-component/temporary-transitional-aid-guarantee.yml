@@ -37,7 +37,9 @@ description: |
   formula grows past a level set in 2020. On the FY2027 evidence, for half of these districts
   that is not close. [inference]
 
-  Still open: whether the statute or subsequent budget acts contemplate re-basing. [open]
+  Whether the statute or subsequent budget acts contemplate re-basing is answered in the findings:
+  the statute does not, and the acts did — every biennium for a decade, and not once since FY2022.
+
 findings: |
   ### The limit case, and the panel cannot see it
 
@@ -254,6 +256,24 @@ findings: |
   100%. The phase-in gap closes and the guarantee does not; the mechanism that carries
   districts to full funding is the hold-harmless rather than the formula. Any account that
   treats FY2027 as the year the question resolves has the direction backwards. [inference]
+  ### Re-basing, which the statute leaves out and the budget acts kept doing
+
+  **The statute does not contemplate re-basing; it contemplates expiring.** R.C. 3317.019 is
+  scoped to "fiscal years 2026 and 2027" in every division that pays anything, names no later
+  year, and carries no provision for moving the base — the one adjustment it does allow runs the
+  other way, for a district joining a newly established joint vocational district. [verified —
+  [`crates/project`](../../../crates/project/tests/the_year_the_guarantee_holds_to.rs)] What
+  happens after FY2027 is not a re-basing rule but the absence of a section, which is the handover
+  the whole plan is written with.
+
+  **Subsequent budget acts contemplated it constantly, and then stopped.** Four consecutive acts
+  each re-read the anchor onto the year before their own biennium — H.B. 59 onto FY2013, H.B. 64
+  onto FY2015, H.B. 49 onto FY2017, H.B. 166 onto FY2019 — and the three plan-era budgets have
+  re-read it none. [verified — the anchor chain in
+  [`bridge-formula`](../funding-regime/bridge-formula.yml)] So re-basing is what Ohio did every
+  two years for a decade and has not done since FY2022. That is a fact about practice rather than
+  about statutory design, and it is the answer to the question this node asked. [inference]
+
 figures:
   - key: project/guarantee-predicts-achievement-raw
     value: 0.18686
