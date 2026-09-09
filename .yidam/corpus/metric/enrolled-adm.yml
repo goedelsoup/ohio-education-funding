@@ -296,10 +296,26 @@ findings: |
   panel drawn this way carries about four years of demographic content and six years of the same
   number relabelled, and nothing said so. Measured in `the_trend_the_damping_discards`.
 
-  **[open]** Whether the point estimate should be de-biased. 0.30 minimises the error both
-  decisions were made on, the backtest reaches five years while the feed publishes ten, and
-  undamping trades a known bias for materially more dispersion. What is settled is the size and
-  the cause, not the remedy.
+  **AND IT CANNOT BE DE-BIASED BY CHOOSING A DIFFERENT DAMPING.** [verified — `crates/project`]
+  That was left open and the answer is no. **The damping that zeroes the bias rises with the
+  horizon** — there is no crossing at all at one or two years, then 0.32 at three, 0.64 at four,
+  0.79 at five — so any single value is over-damped for the near years and under-damped for the
+  far ones. Choosing 0.79 to zero the five-year bias puts −0.010 on the second. At one year the
+  parameter is not connected to the outcome at all: `series::advance` decays the rate from the
+  second step, so the one-year bias is **−0.00492104 at every damping to the last digit**, a floor
+  the constant cannot reach and negative where the long-horizon bias is positive.
+
+  The fair worry — that a criterion blind to sign also chose badly — does not hold either.
+  Root mean squared log error prices bias and variance together and puts the optimum at **0.45**
+  against absolute error's **0.40**. At the shipped 0.30 the squared bias is 0.0000190 against a
+  variance of 0.0029624, **six-tenths of one percent of the mean squared error**. Scored on four-
+  and five-year forecasts alone the optimum is 0.55 and 0.30 costs 1.4% — the strongest case for
+  moving the constant, and not a strong one, since the feed publishes every year from FY2027 to
+  FY2036 and the surface is flat from about 0.30 to 0.55.
+
+  A remedy would have to be a **horizon-dependent** damping: a change to the shape of
+  `Method::Damped` and its TypeScript mirror, resting on a five-year backtest extrapolated to a
+  ten-year horizon. Measured in `the_bias_no_single_damping_can_remove`.
 figures:
   - key: project/districts-on-the-guarantee
     value: 294
