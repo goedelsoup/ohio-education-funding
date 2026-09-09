@@ -237,10 +237,14 @@ properties:
       two-year gain                       r +0.968 with it   sd 0.0899
       one-year gain                       r +0.904 with it   sd 0.0989
 
-    The headline figure is a three-year average. Shorter windows are noisier, as a gain measure
-    over fewer cohorts should be, and all three rank districts nearly alike. Whether growth is
-    stable across *separate* years — as distinct from across nested windows ending in the same
-    year — is still not answerable from this file. [open]
+    The headline figure is a three-year average, and it is **not** an average of equal thirds:
+    R.C. 3302.03(D)(1)(d) directs the department to weight the most recent year at fifty per cent
+    and each of the other two at twenty-five. [verified] Half the measure is one year, so it
+    smooths less than three years of data suggests — and where only two years exist the statute
+    puts 67% on the recent one. Shorter windows are noisier, as a gain measure over fewer cohorts
+    should be, and all three rank districts nearly alike. Whether growth is stable across
+    *separate* years — as distinct from across nested windows ending in the same year — is still
+    not answerable from this file. [open]
   caveats: |
     **Centred by construction.** Ohio's value-added model is normed so the state average is
     approximately zero. This measure ranks districts against each other and cannot say whether

@@ -47,13 +47,18 @@ const CITED: &[&str] = &[
     "3317.03",
     "319.301",
     "5705.391",
-    // The casino tax and the school share of it. Not part of the formula — which is the finding
-    // the `casino-tax-distribution` node rests on — but cited by it, and the extract holds what
-    // the corpus cites.
+    // The report card and what it triggers. Cited by `ohio-report-card` for the six components,
+    // the 2:2:1:1:1 weighting of the overall rating, and the delegation of the star thresholds to
+    // administrative rule; by `academic-distress-commission` for the trigger, the escalation
+    // ladder and division (N)'s exit; and by `metric/performance-index` for the annually refitted
+    // maximum the achievement rating is awarded against.
     "3302.01",
     "3302.03",
     "3302.10",
     "3302.12",
+    // The two constitutional earmarks — lottery profits and the casino tax — and the school share
+    // of each. Not part of the formula, which is the finding the `casino-tax-distribution` node
+    // rests on, but cited by it, and the extract holds what the corpus cites.
     "3770.06",
     // The motor fuel excise tax, at 47 cents a gallon on diesel and refundable to school
     // districts. Cited by `eia-diesel-prices` for why a retail price is not what a district pays

@@ -30,7 +30,11 @@ walking the amendment history of a section rather than reading any single bill.
 
 ## Status
 
-**Wired**, for the current text of fourteen named sections. See
+**Wired**, for the current text of the sections the corpus cites — 35 as of this writing, and
+deliberately not stated as a count anywhere a reader might trust it. The registry names them and
+[`crates/project/tests/the_statute_behind_the_weights.rs`](../../project/tests/the_statute_behind_the_weights.rs)
+asserts the extract holds *those* sections and no others, because a count in prose goes stale the
+first time a section is added and says nothing about which. See
 [`catalog/ohio-revised-code`](../../../.yidam/catalog/ohio-revised-code.md) and
 [`decisions/reading-the-statute`](../../../.yidam/decisions/reading-the-statute.yml).
 

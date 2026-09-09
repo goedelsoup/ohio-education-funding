@@ -5,9 +5,16 @@
 **Location.** `codes.ohio.gov/ohio-revised-code/section-<number>`, one page per section.
 
 **What it contains.** The current text of each section, its **effective date**, and the **act that
-last amended it**. Fourteen sections are retrieved: the Chapter 3317 foundation program sections
-the formula components rest on, R.C. 319.301 for H.B. 920 and the twenty-mill floor, and
-R.C. 5705.391 for the five-year forecast.
+last amended it**. Thirty-five sections are retrieved: the Chapter 3317 foundation program
+sections the formula components rest on, the Chapter 3310 scholarship sections, R.C. 319.301 for
+H.B. 920 and the twenty-mill floor, R.C. 5705.391 for the five-year forecast, the Chapter 5753
+casino sections, and R.C. 3302.01, 3302.03, 3302.10 and 3302.12 for the report card and the
+academic distress commission.
+
+This entry said "fourteen" for as long as the extract held fourteen, and kept saying it through
+three additions. The list is the record and the count is not: the registry names the sections and
+[`crates/project/tests/the_statute_behind_the_weights.rs`](../../crates/project/tests/the_statute_behind_the_weights.rs)
+asserts the extract holds those and no others, which is a check the number above cannot be.
 
 **The recorded blocker was a statement about a convenience, not about the data.** This connector
 sat `Declared` since genesis on "codes.ohio.gov serves HTML with no bulk export; section history
