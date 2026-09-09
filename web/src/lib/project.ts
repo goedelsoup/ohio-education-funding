@@ -28,13 +28,25 @@ export interface Observation {
 }
 
 /** Which method to carry a series forward with. Mirrors `Method::label()` in the Rust. */
-export type MethodKind = "last-observed" | "cagr" | "damped" | "linear";
+export type MethodKind =
+  | "last-observed"
+  | "cagr"
+  | "damped"
+  | "shrunk"
+  | "linear";
 
 /** A method with its parameters fitted to a particular series. */
 export type Method =
   | { kind: "last-observed" }
   | { kind: "cagr"; rate: number }
   | { kind: "damped"; rate: number; damping: number }
+  | {
+      kind: "shrunk";
+      rate: number;
+      damping: number;
+      weight: number;
+      toward: number;
+    }
   | { kind: "linear"; slope: number; intercept: number };
 
 /** The dispersion a projection's interval rests on. */
@@ -108,6 +120,8 @@ export function fit(
   observations: Observation[],
   kind: MethodKind,
   damping: number,
+  shrinkWeight: number,
+  toward: number | null,
 ): Method {
   if (observations.length < 2) return { kind: "last-observed" };
   const first = observations[0]!;
@@ -125,6 +139,22 @@ export function fit(
         rate: compoundRate(first.value, last.value, years),
         damping,
       };
+    case "shrunk": {
+      const own = compoundRate(first.value, last.value, years);
+      // A district the survey does not reach falls back to `damped`, exactly as
+      // `DistrictRecord::projection_method` does. Shrinking toward a zero it never measured would
+      // be a claim about that district rather than an absence of one.
+      if (toward === null) {
+        return { kind: "damped", rate: own, damping };
+      }
+      return {
+        kind: "shrunk",
+        rate: shrinkWeight * own + (1 - shrinkWeight) * toward,
+        damping,
+        weight: shrinkWeight,
+        toward,
+      };
+    }
     case "linear": {
       const [slope, intercept] = leastSquares(observations);
       return { kind: "linear", slope, intercept };
@@ -139,6 +169,7 @@ export function advance(base: number, method: Method, horizon: number): number {
       return base;
     case "cagr":
       return base * Math.pow(1 + method.rate, horizon);
+    case "shrunk":
     case "damped": {
       // Per year, not once: the rate decays as it is applied. Enrollment trends do not persist,
       // and undamped extrapolation is the standard way to produce a confident absurd number.
@@ -167,6 +198,8 @@ export function projectSeries(
   kind: MethodKind,
   damping: number,
   prior: Prior,
+  shrinkWeight = 1,
+  toward: number | null = null,
 ): Projected[] {
   const out: Projected[] = observations.map((o) => ({
     fiscalYear: o.fiscalYear,
@@ -178,7 +211,7 @@ export function projectSeries(
   const last = observations[observations.length - 1];
   if (!last) return out;
 
-  const fitted = fit(observations, kind, damping);
+  const fitted = fit(observations, kind, damping, shrinkWeight, toward);
   for (let year = last.fiscalYear + 1; year <= through; year++) {
     const horizon = year - last.fiscalYear;
     const point = advance(last.value, fitted, horizon);
@@ -261,6 +294,7 @@ export function forecast(
   baseYear: number,
   kind: MethodKind,
   damping: number,
+  shrinkWeight: number,
   prior: Prior,
   modelMinimumStateShare: number,
 ): EnrollmentEffect {
@@ -278,6 +312,8 @@ export function forecast(
       kind,
       damping,
       prior,
+      shrinkWeight,
+      d.long_run_enrollment_rate ?? null,
     );
     const projected = series.find((p) => p.fiscalYear === through && !p.observed);
     if (!projected) continue;
@@ -330,6 +366,7 @@ export function forecastPath(
   baseYear: number,
   kind: MethodKind,
   damping: number,
+  shrinkWeight: number,
   prior: Prior,
   modelMinimumStateShare: number,
 ): EnrollmentEffect[] {
@@ -372,6 +409,7 @@ export function forecastPath(
         baseYear,
         kind,
         damping,
+        shrinkWeight,
         prior,
         modelMinimumStateShare,
       ),

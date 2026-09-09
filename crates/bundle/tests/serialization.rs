@@ -224,6 +224,7 @@ fn sample() -> District {
         economically_disadvantaged: Some(0.3881),
         enrollment_change: Some(-0.03),
         adm_history: [2_173.0, 2_140.0, 2_107.8],
+        long_run_enrollment_rate: None,
         finances: vec![FinanceYear {
             fiscal_year: 2025,
             state_aid: Some(10_252_524.0),
@@ -534,6 +535,7 @@ fn projection() -> Projection {
         horizon: 2036,
         method: "damped".into(),
         damping: 0.30,
+        shrink_weight: 0.30,
         sigma: 0.023_456_7,
         z: 1.0,
         prior_source: "cross-sectional spread of district annual enrolled-ADM growth".into(),

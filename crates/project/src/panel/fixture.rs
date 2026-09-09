@@ -204,6 +204,9 @@ pub fn panel() -> Vec<DistrictRecord> {
 
 /// The fixture, read.
 fn parse() -> Vec<DistrictRecord> {
+    // Resolved once rather than per row: it walks the whole F-33 panel, and the model has 609
+    // rows. Keyed on IRN, which is what this fixture carries.
+    let long_run = dispersion::ohio_panel::long_run_enrollment_rates();
     edfund_core::csv::rows(FIXTURE, EXPECTED_HEADER)
         .filter_map(|row| {
             let base_cost_adm = row.num(column::BASE_COST_ADM)?;
@@ -380,6 +383,7 @@ fn parse() -> Vec<DistrictRecord> {
                     row.required(column::ADM_FY25),
                     row.required(column::ADM_FY26),
                 ],
+                long_run_enrollment_rate: long_run.get(row.str(column::IRN)).copied(),
                 current_year_adm: row.required(column::ADM_FY26),
                 valuation_per_pupil: row.num(column::VALUATION_PER_PUPIL),
             })

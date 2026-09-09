@@ -113,8 +113,8 @@ findings: |
   as enrollment does; the widening gap between the two is the guarantee.
 
   **REMOVING THE GUARANTEE NEARLY DOUBLES THE STATE'S EXPOSURE TO ENROLLMENT FORECAST ERROR.**
-  [inference — a forecast] At FY2032 enrollment, total state aid under current law is $7,230M in
-  a band of $7,017M to $7,486M (±3.2%). With the guarantee removed the same forecast error
+  [inference — a forecast] At FY2032 enrollment, total state aid under current law is $7,233M in
+  a band of $7,017M to $7,494M (±3.3%). With the guarantee removed the same forecast error
   produces ±5.9%, on a band 1.8 times as wide. The guarantee is a shock absorber for the *appropriation* as well as for the
   district, and that is not usually how it is argued about. Recorded in full at
   [guarantee phase-out](../scenario/guarantee-phase-out.yml).
@@ -243,13 +243,19 @@ findings: |
   moves the optimum to 0.40 and buys a further 0.18%, which is not worth a second change to a
   published constant.
 
-  **[open]** Whether to put the blend in the feed. It would mean shrinking an *enrolled ADM* rate
-  toward a *`V33` fall membership* rate. The two count nearly the same children — their FY2024
-  levels correlate at **0.9997** across 608 districts — but their two-year growth rates correlate
-  at only **0.287**, which is simultaneously the best evidence that a two-year rate is mostly noise
-  and the reason the substitution cannot be made mechanically. That the two series share a long-run
-  trend while differing in short-run noise is an assumption this corpus cannot test, because only
-  three years of ADM exist.
+  **AND THE BLEND IS NOW WHAT THE PROJECTIONS USE.** [verified — `crates/project`]
+  Recorded at [the-shrunk-rate](../../decisions/the-shrunk-rate.yml). Every district's rate is
+  three-tenths its own FY2024-FY2026 history and seven-tenths its fourteen-year rate in the F-33
+  panel. Statewide ADM at FY2032 moves from 1,376,970 to **1,384,245** and the count on the
+  guarantee from 320 to **312**; aid moves $3M, because the guarantee absorbs most of it.
+
+  **It rests on one assumption, and the assumption is why this took a decision rather than a
+  patch.** The projection runs on enrolled ADM and the long rate is `V33` fall membership. The two
+  count nearly the same children — their FY2024 levels correlate at **0.9997** across 608
+  districts — but their two-year growth rates correlate at only **0.287**. The shrink assumes they
+  share a long-run trend while differing in short-run noise, and only three years of ADM exist, so
+  nothing here can test it. The disagreement is at once the best evidence that a two-year rate is
+  mostly noise and the reason the substitution could not be made mechanically.
 figures:
   - key: project/districts-on-the-guarantee
     value: 294

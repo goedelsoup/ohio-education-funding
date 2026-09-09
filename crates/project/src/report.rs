@@ -189,6 +189,8 @@ pub fn forecast(
     let mut on_guarantee = 0;
 
     for record in panel {
+        // Per district, because `Method::Shrunk` carries a `toward` the feed cannot choose once.
+        let method = record.projection_method(method);
         let series = project(&record.adm_observations(), through, method, prior);
         let Some(projected) = series
             .iter()

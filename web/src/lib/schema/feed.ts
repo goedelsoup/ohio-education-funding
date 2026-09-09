@@ -727,6 +727,7 @@ export const DistrictSchema = z
      * of the panel.
      */
     adm_history: z.tuple([num, num, num]),
+    long_run_enrollment_rate: num.nullable(),
     /** Achievement, growth, and need. `null` for the three districts with no report card. */
     outcome: DistrictOutcomeSchema.nullable(),
     /**
@@ -1087,8 +1088,9 @@ export const ProjectionMetaSchema = z
     base_year: z.number().int(),
     /** The furthest year the checkpoints reach, and the furthest this page should offer. */
     horizon: z.number().int(),
-    method: z.enum(["last-observed", "cagr", "damped", "linear"]),
+    method: z.enum(["last-observed", "cagr", "damped", "shrunk", "linear"]),
     damping: num,
+    shrink_weight: num,
     /**
      * Standard deviation of annual enrolled-ADM growth **across districts** — not within one.
      * Three observations cannot give a district's own variability.

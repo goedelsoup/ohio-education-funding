@@ -156,6 +156,21 @@ impl<'a> Obj<'a> {
         self.out.push_str(&share(v));
     }
 
+    /// A fraction that may be absent, to eight places, emitted as `null` when it is.
+    ///
+    /// [`Self::opt`] rounds to four like [`Self::num`], which is right for dollars and wrong for a
+    /// rate: a district shrinking 1.23456% a year would be stored as -0.0123 and a consumer
+    /// reproducing the projection from it would miss the feed's own checkpoints by about a
+    /// millionth — six thousand dollars on seven billion, which is what the reproduction check
+    /// exists to refuse.
+    pub(crate) fn opt_share(&mut self, k: &str, v: Option<f64>) {
+        self.key(k);
+        match v {
+            Some(v) if v.is_finite() => self.out.push_str(&super::serialize::share(v)),
+            _ => self.out.push_str("null"),
+        }
+    }
+
     /// A count that may be absent, emitted as `null` when it is.
     pub(crate) fn opt_count(&mut self, k: &str, v: Option<impl core::fmt::Display>) {
         self.key(k);

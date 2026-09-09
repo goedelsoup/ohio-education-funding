@@ -319,6 +319,15 @@ export const FIELD_DENOMINATORS: Record<string, DenominatorKey | null> = {
   "senate_districts[].adm": null,
   "senate_districts[].members[].adm": null,
 
+  // Long-run enrolment growth, from fourteen years of the Census F-33 panel, and what a
+  // district's own three-point rate is shrunk toward under the `shrunk` method. Dimensionless
+  // for the same reason the changes below are: both ends are the same count in different years,
+  // so the denominator cancels. Worth saying that it is a *different* count from every other
+  // pupil figure here — `V33` fall membership rather than enrolled ADM — which is exactly why
+  // it is published as a rate and never as a level: a rate composes with an ADM level and a
+  // count from another survey does not.
+  "districts[].long_run_enrollment_rate": null,
+
   // The three-year enrolment change the growth supplement's 3% cliff is tested against.
   // Dimensionless: both ends are the same count in different years, so the denominator cancels.
   // It is not the same measure as `enrollment_change`, which is the one-year FY25-to-FY26 change

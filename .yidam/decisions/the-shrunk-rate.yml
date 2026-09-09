@@ -1,0 +1,93 @@
+id: the-shrunk-rate
+summary: >-
+  Every district's three-point growth rate is now shrunk three-tenths of the way from its own
+  recent history toward fourteen years of the Census F-33 panel — worth 4.6% of forecast error,
+  and resting on one assumption this repository cannot test.
+context: |
+  [`the-fitted-damping`](the-fitted-damping.yml) moved the damping from a convention to a fitted
+  value and named two things it had not done. Both were then measured, in
+  `crates/project/tests/the_two_questions_the_damping_left_open.rs`.
+
+  **A damping per district is noise.** Fitted on each district's own history it scores 15.3%
+  better in sample and 3.6% *worse* out of it, with 316 of 602 districts landing on 0.00 and 101
+  on 1.00 — more than two thirds on a boundary, which is what an unidentified parameter looks like
+  when it is fitted anyway. That question is closed and the feed keeps one damping.
+
+  **The fitting window is the larger prize.** A rate fitted over the three years the department
+  publishes is an endpoint ratio across two years, the noisiest estimator available. Weighting it
+  against the same district's fourteen-year rate:
+
+      weight on the three-point rate    mean absolute log error
+      1.0   what the projections did            0.04033
+      0.5                                       0.03874
+      0.3                                       0.03855
+      0.2                                       0.03857
+      0.0   long history alone                  0.03881
+
+  **The blend beats both ends.** Discarding the recent rate is worse than keeping about a third of
+  it, so three points do carry real information about where a district is now — just not enough to
+  stand alone. At 0.3 the gain is 4.6%, larger than the 2.4% that fitting the damping bought.
+decision: |
+  Add `Method::Shrunk` and make it what the feed uses, at `DEFAULT_SHRINK_WEIGHT = 0.30`.
+
+  **The damping does not move again.** Re-tuning it on top of the blend puts the optimum at 0.40
+  and buys a further 0.18%. One change at a time, and a fifth of a percent does not justify moving
+  a published constant twice in a week.
+
+  **A separate variant rather than a quieter `Damped`.** The projection is still a damped trend
+  and only the rate estimator changed, which argued for leaving the method label alone. Against
+  that: the published feed is required to be reproducible, and a consumer fitting a rate from
+  `adm_history` and `damping` as before would now get a different number with nothing in the feed
+  to say why. The method name is how that consumer finds out.
+
+  **A rate, per district, nullable.** `long_run_enrollment_rate` is `V33` fall membership and
+  `adm_history` is enrolled ADM. A level from one cannot be spliced onto the other, and a rate can
+  be composed with it, so the panel publishes a rate and never a series. A district the survey
+  does not reach is projected `damped` at the same damping — the behaviour it had before — rather
+  than shrunk toward a zero nobody measured, which would be a claim about that district rather
+  than an absence of one. All 609 currently have one, so the fallback is defence and not a
+  population.
+consequences: |
+  **The assumption this rests on, stated because it cannot be tested.** Enrolled ADM and `V33`
+  fall membership count nearly the same children — at FY2024 their levels correlate at **0.9997**
+  across 608 districts — and their two-year growth rates correlate at only **0.287**. The shrink
+  assumes the two series share a long-run trend while differing in short-run noise. Only three
+  years of ADM exist, so nothing here can check that. The disagreement is simultaneously the best
+  evidence that a two-year rate is mostly noise and the reason this is a decision rather than a
+  mechanical improvement.
+
+  **What moved in the feed.** FY2032, current law: ADM 1,376,970 to **1,384,245**, aid $7,230M to
+  **$7,233M**, districts on the guarantee 320 to **312**. The enrollment moves and the aid barely
+  does, for the reason
+  [`metric/enrolled-adm`](../corpus/metric/enrolled-adm.yml) already gives: the guarantee pays a
+  fixed amount that enrollment does not enter to about half the state.
+
+  **The feed contract breaks to 42.0.0.** Two new fields — `shrink_weight` on the projection block
+  and a nullable `long_run_enrollment_rate` on every district — and a `method` string no consumer
+  has seen. Breaking rather than additive because a page that kept reproducing the old arithmetic
+  would disagree with the checkpoints it is required to match, which is the one failure the
+  checkpoint rule exists to make loud.
+
+  **Two precision traps, both caught by the reproduction check rather than by review.** The Rust
+  first wrote the blend as `mul_add`, which rounds once where the TypeScript mirror rounds twice;
+  and the rate was first serialized through the feed's four-decimal number writer, which is right
+  for dollars and wrong for a rate. Each put the page about a millionth away from the feed — six
+  thousand dollars on seven billion — and each was reported as a failure to reproduce. The second
+  is the trap `serialize::share` was already written to avoid for a different field.
+alternatives: |
+  **Replace the three-point rate rather than shrink it.** Rejected on measurement: the long rate
+  alone scores 0.03881 against the blend's 0.03855, so it is worse than keeping a third of the
+  recent one. This is the result that makes "lengthen the fitting window" the wrong description of
+  what was done.
+
+  **Keep `Method::Damped` and blend silently.** Rejected: it would leave the feed unreproducible
+  by its own documented arithmetic. See above.
+
+  **Publish the district's whole `V33` series rather than a rate.** Rejected. It invites splicing
+  two different counts into one series, and the levels being 0.9997 correlated is exactly what
+  would make that look reasonable and be wrong.
+
+  **Wait for a longer ADM series.** The honest alternative, and rejected because the wait has no
+  end in sight: the department publishes three years and replaces the file in place. If a longer
+  ADM history ever arrives, the right move is to refit the weight against it and to check the
+  assumption above rather than to keep this number.

@@ -343,6 +343,7 @@ impl Bundle {
                     pr.count("horizon", p.horizon);
                     pr.text("method", &p.method);
                     pr.num("damping", p.damping);
+                    pr.num("shrink_weight", p.shrink_weight);
                     // Six places, not the four `num` gives: sigma is a growth rate around 0.02,
                     // and rounding it to 0.0234 would move a ten-year band by enough to fail its
                     // own checkpoint.
@@ -980,6 +981,7 @@ impl Bundle {
                         history.num(value);
                     }
                 }
+                o.opt_share("long_run_enrollment_rate", d.long_run_enrollment_rate);
                 match &d.outcome {
                     None => o.raw("outcome", "null"),
                     Some(out) => {

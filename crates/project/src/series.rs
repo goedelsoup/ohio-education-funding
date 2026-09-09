@@ -66,6 +66,30 @@ pub enum Method {
         /// Fitted value at the last observed year.
         intercept: f64,
     },
+    /// A damped trend whose fitted rate is shrunk toward a longer-run one before it is carried.
+    ///
+    /// A rate fitted over the three years the department's model publishes is an endpoint ratio
+    /// across two years, which is the noisiest estimator available — two counts of nearly the
+    /// same children over the same two years agree on levels at 0.9997 and on rates at 0.287.
+    /// Shrinking it toward a rate fitted over fourteen years lowers out-of-sample forecast error
+    /// by about 4.6%, and beats both ends: discarding the recent rate is worse than keeping about
+    /// a third of it, because three points do carry real information about where a district is
+    /// now.
+    ///
+    /// Carried exactly as [`Self::Damped`] once the rate is settled. The variant is separate
+    /// because the published feed has to say how the rate was reached — a consumer reproducing a
+    /// projection from the same observations would otherwise get a different number and have no
+    /// way to see why.
+    Shrunk {
+        /// The rate actually carried, after shrinking.
+        rate: f64,
+        /// Per-year decay applied to it, as [`Self::Damped`].
+        damping: f64,
+        /// Weight on the series' own fitted rate. The remainder goes to [`Self::Shrunk::toward`].
+        weight: f64,
+        /// The longer-run rate being shrunk toward, from a series this one does not carry.
+        toward: f64,
+    },
     /// A rate supplied by the caller rather than fitted from the data.
     ///
     /// Used where the corpus has one observation and no history — assessed valuation, most
@@ -84,6 +108,7 @@ impl Method {
             Self::LastObserved => "last-observed",
             Self::Cagr { .. } => "cagr",
             Self::Damped { .. } => "damped",
+            Self::Shrunk { .. } => "shrunk",
             Self::LinearTrend { .. } => "linear",
             Self::Assumed { .. } => "assumed",
         }
@@ -127,6 +152,25 @@ impl Method {
 /// more history — it projects a district through zero, which is the failure damping exists to
 /// prevent.
 pub const DEFAULT_DAMPING: f64 = 0.30;
+
+/// How much of a district's own three-point rate survives the shrink toward its long-run one.
+///
+/// **0.30, fitted.** `tests/the_two_questions_the_damping_left_open.rs` sweeps the weight over
+/// 13,244 out-of-sample forecasts and puts the minimum at 0.3, flat from 0.2 to 0.4, worth
+/// **4.6%** against the unshrunk rate this replaces — larger than the 2.4% that fitting
+/// [`DEFAULT_DAMPING`] bought.
+///
+/// **The blend beats both ends, which is why this is not zero.** Dropping the recent rate
+/// entirely scores worse than keeping about a third of it: three points carry real information
+/// about where a district is now, and not enough of it to stand alone. A weight of 1.0 is the
+/// behaviour before [`Method::Shrunk`] existed.
+///
+/// Recorded in [`.yidam/decisions/the-shrunk-rate.yml`](../../../.yidam/decisions/the-shrunk-rate.yml),
+/// which owns the assumption the shrink rests on: that enrolled ADM and `V33` fall membership
+/// share a long-run trend while differing in short-run noise. Their levels agree at 0.9997 and
+/// their two-year rates at 0.287, and only three years of ADM exist, so that cannot be tested
+/// here.
+pub const DEFAULT_SHRINK_WEIGHT: f64 = 0.30;
 
 /// One standard deviation. Covers about 68% of a normal distribution.
 pub const ONE_SIGMA: f64 = 1.0;
@@ -278,6 +322,21 @@ fn fit(observations: &[Observation], requested: Method) -> Method {
             rate: compound_rate(first.value, last.value, years),
             damping,
         },
+        Method::Shrunk {
+            damping,
+            weight,
+            toward,
+            ..
+        } => Method::Shrunk {
+            // Written out rather than as `mul_add`. The fused form rounds once and the
+            // TypeScript mirror in `web/src/lib/project.ts` cannot, so the two implementations
+            // disagreed by about a millionth — six thousand dollars on seven billion, which the
+            // feed's reproduction check reports as a failure and is right to.
+            rate: weight * compound_rate(first.value, last.value, years) + (1.0 - weight) * toward,
+            damping,
+            weight,
+            toward,
+        },
         Method::LinearTrend { .. } => {
             let (slope, intercept) = least_squares(observations);
             Method::LinearTrend { slope, intercept }
@@ -323,7 +382,7 @@ fn advance(base: f64, method: Method, horizon: u16) -> f64 {
         Method::Cagr { rate } | Method::Assumed { rate } => {
             base * (1.0 + rate).powi(i32::from(horizon))
         }
-        Method::Damped { rate, damping } => {
+        Method::Shrunk { rate, damping, .. } | Method::Damped { rate, damping } => {
             let mut value = base;
             let mut step = rate;
             for _ in 0..horizon {

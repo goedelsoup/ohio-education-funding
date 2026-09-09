@@ -19,7 +19,7 @@ use crate::panel::supplements::{
     PerformanceSupplement, PreschoolSpecialEducation, Supplements, Transition, Transportation,
 };
 use crate::panel::{HISTORY_YEARS, MINIMUM_STATE_SHARE};
-use crate::series::Observation;
+use crate::series::{Method, Observation};
 
 /// One district as the department modelled it.
 #[derive(Debug, Clone, PartialEq)]
@@ -172,6 +172,14 @@ pub struct DistrictRecord {
     pub guarantee: Dollars,
     /// Enrolled ADM in each of [`HISTORY_YEARS`].
     pub adm_history: [Adm; 3],
+    /// Long-run enrolment growth, from fourteen years of the F-33 panel. `None` where the survey
+    /// does not reach this district.
+    ///
+    /// A rate rather than a series, and from a different count than [`Self::adm_history`] — `V33`
+    /// fall membership rather than enrolled ADM. The two are nearly the same population and are
+    /// not the same measure; see [`dispersion::ohio_panel::long_run_enrollment_rates`] for what
+    /// that costs and why a rate is the only thing safe to carry across.
+    pub long_run_enrollment_rate: Option<f64>,
     /// Current-year enrolled ADM — the last of [`HISTORY_YEARS`].
     ///
     /// Distinct from base cost ADM and used as a distinct denominator: R.C. 3317.017 multiplies
@@ -298,6 +306,37 @@ impl DistrictRecord {
     pub fn implied_local_capacity_per_pupil(&self) -> Option<Dollars> {
         (!self.at_minimum_state_share() && self.current_year_adm > 0.0)
             .then(|| self.base_cost_per_pupil - self.base_cost_state_share / self.current_year_adm)
+    }
+
+    /// The method this district should actually be projected under.
+    ///
+    /// [`Method::Shrunk`] names a weight but cannot name what to shrink *toward* — that is a
+    /// per-district number, and the method is chosen once for the whole feed. This fills it in.
+    ///
+    /// A district the survey does not reach falls back to [`Method::Damped`] at the same damping,
+    /// which is what it was projected under before shrinking existed. Silently leaving it at
+    /// `Shrunk` with a zero `toward` would shrink its rate toward *no growth*, which is a claim
+    /// about a district rather than an absence of one.
+    #[must_use]
+    pub fn projection_method(&self, requested: Method) -> Method {
+        match (requested, self.long_run_enrollment_rate) {
+            (
+                Method::Shrunk {
+                    rate,
+                    damping,
+                    weight,
+                    ..
+                },
+                Some(toward),
+            ) => Method::Shrunk {
+                rate,
+                damping,
+                weight,
+                toward,
+            },
+            (Method::Shrunk { damping, .. }, None) => Method::Damped { rate: 0.0, damping },
+            (other, _) => other,
+        }
     }
 
     /// Enrolled ADM as a series, for [`crate::series::project`].

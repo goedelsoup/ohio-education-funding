@@ -78,4 +78,6 @@ pub use outcomes::{joined, report_cards, Joined, ReportCard};
 pub use panel::{panel, DistrictRecord};
 pub use policy::{GuaranteeRule, Outcome, Policy};
 pub use report::{forecast, run, simulate, EnrollmentEffect, PolicyEffect, Run, Totals};
-pub use series::{Basis, Method, Observation, Prior, Projection, DEFAULT_DAMPING};
+pub use series::{
+    Basis, Method, Observation, Prior, Projection, DEFAULT_DAMPING, DEFAULT_SHRINK_WEIGHT,
+};

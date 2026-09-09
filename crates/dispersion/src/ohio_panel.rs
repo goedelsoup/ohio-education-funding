@@ -330,6 +330,66 @@ pub fn equalization_by_year() -> BTreeMap<u16, Equalization> {
     out
 }
 
+/// Long-run enrolment growth rate per district, keyed on Ohio's IRN.
+///
+/// The endpoint compound rate over every year the panel holds for an agency — fourteen surveyed
+/// years between FY2009 and FY2024, FY2014 excepted. Comparable districts only, so it means what
+/// every other figure taken from this panel means.
+///
+/// # Why a rate and not a series
+///
+/// The consumer is a projection that runs on **enrolled ADM**, and this is `V33` fall membership.
+/// The two count nearly the same children — at FY2024 their levels correlate at 0.9997 across 608
+/// districts — but they are not the same measure, and handing out levels would invite someone to
+/// splice them onto an ADM series. A rate composes with an ADM level and a count does not.
+///
+/// Their two-year *rates* correlate at only 0.287, which is the finding that makes this function
+/// worth having: a rate fitted over two or three points is mostly noise in either measure, and a
+/// long-run rate is what a short one should be shrunk toward. The assumption that the two series
+/// share a long-run trend while differing in short-run noise is recorded, and cannot be tested
+/// from here — only three years of ADM exist.
+///
+/// Keyed on IRN rather than `LEAID` because that is what the department's model uses. An agency
+/// the FY2022-23 directory does not carry has no IRN in this panel and is absent here rather than
+/// keyed on an empty string.
+#[must_use]
+pub fn long_run_enrollment_rates() -> BTreeMap<String, f64> {
+    let mut history: BTreeMap<String, BTreeMap<u16, f64>> = BTreeMap::new();
+    let mut irn_of: BTreeMap<String, String> = BTreeMap::new();
+    let rows = panel();
+    for row in rows.iter().filter(|r| r.comparable) {
+        if !row.irn.is_empty() {
+            irn_of.insert(row.leaid.clone(), row.irn.clone());
+        }
+    }
+    for row in rows.iter().filter(|r| r.comparable) {
+        if row.enrollment <= 0.0 {
+            continue;
+        }
+        if let Some(irn) = irn_of.get(&row.leaid) {
+            history
+                .entry(irn.clone())
+                .or_default()
+                .insert(row.fiscal_year, row.enrollment);
+        }
+    }
+    history
+        .into_iter()
+        .filter_map(|(irn, years)| {
+            let (first_year, first) = years.iter().next()?;
+            let (last_year, last) = years.iter().next_back()?;
+            let span = f64::from(last_year.checked_sub(*first_year)?);
+            // A single year, or a year that somehow repeated, carries no rate. Absent rather than
+            // zero: zero is a district that held steady, and saying that of one we cannot measure
+            // would be a claim.
+            if span <= 0.0 || *first <= 0.0 || *last <= 0.0 {
+                return None;
+            }
+            Some((irn, (last / first).powf(1.0 / span) - 1.0))
+        })
+        .collect()
+}
+
 /// Agencies per year no directory names, which should be none.
 ///
 /// Kept after the thing it measured went to zero, because zero is the claim. The extractor
