@@ -320,19 +320,19 @@ Fields: count per claim tag across every node; then the unresolved marks by the 
 -->
 | Tag | Count | What it records |
 |---|--:|---|
-| `[verified]` | 1273 | supported by a committed primary source |
-| `[inference]` | 289 | drawn from verified facts, not witnessed |
-| `[open]` | 210 | a live question — unknown, contested, or being worked |
+| `[verified]` | 1287 | supported by a committed primary source |
+| `[inference]` | 292 | drawn from verified facts, not witnessed |
+| `[open]` | 208 | a live question — unknown, contested, or being worked |
 | `[unentered]` | 0 | a knowable value nobody has typed in yet |
 
-210 unresolved marks, and every one of them is a live question. The fourth mark is gone from the prose: a field nobody has filled in is carried as `unfilled:` structure on the node it belongs to, which is what `[unentered]` used to say inline on an axis it did not belong to.
+208 unresolved marks, and every one of them is a live question. The fourth mark is gone from the prose: a field nobody has filled in is carried as `unfilled:` structure on the node it belongs to, which is what `[unentered]` used to say inline on an axis it did not belong to.
 
 | Field | `[open]` | `[unentered]` |
 |---|--:|--:|
 | `findings` | 68 | 0 |
-| `description` | 53 | 0 |
-| `series` | 10 | 0 |
+| `description` | 52 | 0 |
 | `revisions` | 10 | 0 |
+| `series` | 9 | 0 |
 | `statutory_basis` | 6 | 0 |
 | `accountability_effect` | 6 | 0 |
 | `mechanism` | 5 | 0 |
@@ -364,7 +364,7 @@ Fields: count per claim tag across every node; then the unresolved marks by the 
 | `appropriation_line` | 1 | 0 |
 | `appropriating_bill` | 1 | 0 |
 
-**69 recorded withdrawals across 37 nodes.** A claim the corpus published and no longer stands behind is kept in a `revisions:` block rather than edited out, with the test or source that settled it — see [`the-four-genres-of-a-description`](../decisions/the-four-genres-of-a-description.yml). Counted here for the same reason the tags above are: how often this corpus has corrected itself is a fact about it, and one nobody would think to update by hand.
+**70 recorded withdrawals across 37 nodes.** A claim the corpus published and no longer stands behind is kept in a `revisions:` block rather than edited out, with the test or source that settled it — see [`the-four-genres-of-a-description`](../decisions/the-four-genres-of-a-description.yml). Counted here for the same reason the tags above are: how often this corpus has corrected itself is a fact about it, and one nobody would think to update by hand.
 <!-- /REGEN -->
 
 ## Relationship vocabulary
@@ -456,9 +456,9 @@ Sorted by: kind, then alphabetically.
 | [`fsfp-transportation`](formula-component/fsfp-transportation.yml) | formula-component | FSFP Transportation | 7 | 5 |
 | [`guarantee-open-enrolment-clawback`](formula-component/guarantee-open-enrolment-clawback.yml) | formula-component | Guarantee Open Enrolment Clawback | 3 | 2 |
 | [`temporary-transitional-aid-guarantee`](formula-component/temporary-transitional-aid-guarantee.yml) | formula-component | Temporary Transitional Aid Guarantee | 11 | 16 |
-| [`bridge-formula`](funding-regime/bridge-formula.yml) | funding-regime | Bridge Formula | 12 | 20 |
+| [`bridge-formula`](funding-regime/bridge-formula.yml) | funding-regime | Bridge Formula | 13 | 20 |
 | [`equal-yield-formula`](funding-regime/equal-yield-formula.yml) | funding-regime | Equal Yield Formula | 3 | 2 |
-| [`evidence-based-model`](funding-regime/evidence-based-model.yml) | funding-regime | Evidence-Based Model | 5 | 8 |
+| [`evidence-based-model`](funding-regime/evidence-based-model.yml) | funding-regime | Evidence-Based Model | 6 | 8 |
 | [`fair-school-funding-plan`](funding-regime/fair-school-funding-plan.yml) | funding-regime | Fair School Funding Plan | 22 | 27 |
 | [`foundation-base-cost-formula`](funding-regime/foundation-base-cost-formula.yml) | funding-regime | Foundation Base Cost Formula | 8 | 13 |
 | [`academic-distress-commission`](intervention/academic-distress-commission.yml) | intervention | Academic Distress Commission | 8 | 4 |
@@ -507,7 +507,7 @@ Sorted by: kind, then alphabetically.
 | [`gifted-funding-rates`](parameter/gifted-funding-rates.yml) | parameter | Gifted Funding Rates | 3 | 1 |
 | [`guarantee-funding-base`](parameter/guarantee-funding-base.yml) | parameter | Guarantee Funding Base | 6 | 7 |
 | [`local-capacity-percentage`](parameter/local-capacity-percentage.yml) | parameter | Local Capacity Percentage | 5 | 3 |
-| [`local-share-charge-off-millage`](parameter/local-share-charge-off-millage.yml) | parameter | Local Share Charge-Off Millage | 8 | 5 |
+| [`local-share-charge-off-millage`](parameter/local-share-charge-off-millage.yml) | parameter | Local Share Charge-Off Millage | 8 | 7 |
 | [`minimum-state-share`](parameter/minimum-state-share.yml) | parameter | Minimum State Share | 9 | 3 |
 | [`performance-supplement-rate`](parameter/performance-supplement-rate.yml) | parameter | Performance Supplement Rate | 5 | 1 |
 | [`preschool-special-education-amounts`](parameter/preschool-special-education-amounts.yml) | parameter | Preschool Special Education Amounts | 5 | 2 |

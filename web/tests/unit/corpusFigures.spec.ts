@@ -84,14 +84,15 @@ test("every bound figure in the corpus agrees with the crate it cites", () => {
  * pre-1982 joint vocational term, with no new carrier. 448/58 when the
  * building report card got its first reader: `accountability-regime/essa` became the
  * fifty-fifth carrier, the two `school/` nodes it settles the fifty-sixth and fifty-seventh,
- * and `intervention/more-rigorous-interventions` the fifty-eighth.
+ * and `intervention/more-rigorous-interventions` the fifty-eighth. 456/59 when the LSC
+ * greenbooks got theirs and `funding-regime/bridge-formula` became the fifty-ninth.
  */
 test("the corpus binds no fewer figures than it did", () => {
-  expect(bindings.length, "448 bindings; raise this when you add one").toBeGreaterThanOrEqual(448);
+  expect(bindings.length, "456 bindings; raise this when you add one").toBeGreaterThanOrEqual(456);
   expect(
     corpus.nodes.filter((node) => node.figures.length > 0).length,
-    "58 nodes carry bindings; raise this when a fifty-ninth does",
-  ).toBeGreaterThanOrEqual(58);
+    "59 nodes carry bindings; raise this when a sixtieth does",
+  ).toBeGreaterThanOrEqual(59);
   expect(
     new Set(bindings.map((binding) => binding.key)).size,
     "every figure the manifest exports is bound by some node",

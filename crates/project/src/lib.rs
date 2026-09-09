@@ -61,6 +61,7 @@ pub mod cli;
 pub mod crosswalk;
 pub mod drafts;
 pub mod finances;
+pub mod greenbook;
 pub mod ledger;
 pub mod legislative_district;
 pub mod outcomes;

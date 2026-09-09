@@ -106,6 +106,42 @@ findings: |
   [verified] Ohio therefore entered the Fair School Funding Plan having distributed aid on the
   basis of history rather than need for the better part of ten years, which is why the plan's
   designers treated recosting from current data as the point of the exercise. [inference]
+  ### The regime that has no charge-off rate, said so at the time
+
+  Ohio funded base cost by charging every district a uniform rate against valuation from 1992 to
+  FY2009, and [`local-share-charge-off-millage`](../parameter/local-share-charge-off-millage.yml)
+  left that decade's rate unestablished because no source stated it. Nothing states it because
+  there is nothing to state. LSC, in the H.B. 59 greenbook:
+
+  > the state share index used for the opportunity grant does not result in a uniform charge-off
+  > rate. Rather, if a local share in FY 2014 were to be derived from the state share index and
+  > expressed as a charge-off of adjusted valuation, the charge-off rate would vary from 11.3 mills
+  > to 22.9 mills (excluding several outlier districts) with the statewide average charge-off being
+  > 20.6 mills.
+
+  [verified —
+  [`crates/project`](../../../crates/project/tests/the_charge_off_after_the_charge_off.rs)]
+
+  **This is the decade's substantive change and the node did not hold it.** The anchor chain above
+  is what the guarantee did; the state share index is what the *formula* did, and replacing a
+  uniform rate with an index means the local share stopped being one policy judgment applied to
+  every district and became a per-district number. Two districts with the same valuation per pupil
+  could be charged different effective rates because the index reads income as well. The spread is
+  a factor of two before outliers. [inference]
+
+  It also explains a citation this corpus would otherwise repeat: secondary accounts of the era
+  give "20 mills", which is 20.6 rounded and is a **statewide average of a distribution**. Quoting
+  it as this regime's charge-off rate states a mean as a parameter. [verified]
+
+figures:
+  - key: project/bridge-formula-implied-charge-off-low
+    value: 11.3
+    field: findings
+    as_written: "would vary from 11.3 mills"
+  - key: project/bridge-formula-implied-charge-off-average
+    value: 20.6
+    field: findings
+    as_written: "which is 20.6 rounded"
 properties:
   name: Bridge Formula
   effective_from: FY2012
