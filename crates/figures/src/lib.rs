@@ -776,6 +776,25 @@ fn bridge_implied_charge_off() -> String {
     project::greenbook::greenbook("hb59").around("Prior to FY 2010, the school funding formula", 11)
 }
 
+/// LSC's account of the targeted assistance payment the Fair School Funding Plan enacted.
+///
+/// The whole component, both tiers, from the sentence that says what it replaced. Flattened
+/// rather than line-anchored because the millage sentences run three of the publisher's lines
+/// each with a page footer inside one of them.
+fn plan_targeted_assistance() -> String {
+    project::greenbook::greenbook("hb110").flat()
+}
+
+/// LSC's account of the targeted assistance the plan replaced — Am. Sub. H.B. 59 of the 130th.
+fn first_targeted_assistance() -> String {
+    project::greenbook::greenbook("hb59").flat()
+}
+
+/// LSC's account of capacity aid, the component the plan's capacity tier descends from.
+fn capacity_aid(bill: &str) -> String {
+    project::greenbook::greenbook(bill).flat()
+}
+
 /// Every building IRN on any of the three federal lists.
 fn federally_listed() -> BTreeSet<String> {
     dispersion::identified::identifications()
@@ -3438,6 +3457,130 @@ pub static FIGURES: &[Figure] = &[
                 .iter()
                 .map(|r| r.categoricals.targeted_assistance)
                 .sum()
+        },
+    },
+    Figure {
+        key: "project/targeted-assistance-wealth-millage",
+        owner: "crates/project",
+        unit: Unit::Ratio,
+        label: "The wealth tier's rate against the median district, as LSC states it: 14 mills",
+        pinned: 14.0,
+        tolerance: 0.0005,
+        compute: |_| {
+            mills_before(
+                &plan_targeted_assistance(),
+                "and the district\u{2019}s weighted wealth per pupil multiplied by 11.2 mills",
+            )
+        },
+    },
+    Figure {
+        key: "project/targeted-assistance-district-millage",
+        owner: "crates/project",
+        unit: Unit::Ratio,
+        label: "The wealth tier's rate against the district's own wealth: 11.2 mills",
+        pinned: 11.2,
+        tolerance: 0.0005,
+        compute: |_| {
+            mills_before(
+                &plan_targeted_assistance(),
+                "This calculation is summarized below. Before any guarantees or phase-ins, the \
+                 wealth amount",
+            )
+        },
+    },
+    Figure {
+        key: "project/targeted-assistance-capacity-millage",
+        owner: "crates/project",
+        unit: Unit::Ratio,
+        label: "The capacity tier's rate against the gap to median weighted wealth: 8 mills",
+        pinned: 8.0,
+        tolerance: 0.0005,
+        compute: |_| {
+            mills_before(
+                &plan_targeted_assistance(),
+                "multiplied by the difference between the statewide median district\u{2019}s \
+                 weighted wealth and the district\u{2019}s weighted wealth",
+            )
+        },
+    },
+    Figure {
+        key: "project/first-targeted-assistance-millage",
+        owner: "crates/project",
+        unit: Unit::Ratio,
+        label: "The target millage of the FY2014 targeted assistance this one replaced: 6 mills",
+        pinned: 6.0,
+        tolerance: 0.0005,
+        compute: |_| mills_before(&first_targeted_assistance(), "in each fiscal year. As a result"),
+    },
+    Figure {
+        key: "project/capacity-aid-multiplier-fy2016",
+        owner: "crates/project",
+        unit: Unit::Ratio,
+        label: "Capacity aid's multiplier in FY2016, the first of the three it had",
+        pinned: 2.75,
+        tolerance: 0.0005,
+        compute: |_| amount_after(&capacity_aid("hb64"), "Capacity aid multiplier = "),
+    },
+    Figure {
+        key: "project/capacity-aid-multiplier-fy2017",
+        owner: "crates/project",
+        unit: Unit::Ratio,
+        label: "Capacity aid's multiplier in FY2017",
+        pinned: 3.5,
+        tolerance: 0.0005,
+        compute: |_| {
+            amount_after(
+                &capacity_aid("hb49"),
+                "computing capacity aid funds from ",
+            )
+        },
+    },
+    Figure {
+        key: "project/capacity-aid-multiplier-fy2018",
+        owner: "crates/project",
+        unit: Unit::Ratio,
+        label: "Capacity aid's multiplier in FY2018 and FY2019, the last of the three",
+        pinned: 4.0,
+        tolerance: 0.0005,
+        compute: |_| {
+            amount_after(
+                &capacity_aid("hb49"),
+                "capacity aid funds from 3.5 in FY 2017 to ",
+            )
+        },
+    },
+    Figure {
+        key: "project/targeted-assistance-fy2022-estimate",
+        owner: "crates/project",
+        unit: Unit::Dollars,
+        label: "Targeted assistance in FY2022 as LSC estimated it, before guarantees or phase-ins",
+        pinned: 988_400_000.0,
+        tolerance: 0.005,
+        compute: |_| {
+            amount_after(
+                &plan_targeted_assistance(),
+                "targeted assistance is estimated to be ",
+            ) * 1_000_000.0
+        },
+    },
+    Figure {
+        key: "project/targeted-assistance-growth-since-the-plan",
+        owner: "crates/project",
+        unit: Unit::Share,
+        label: "The growth in targeted assistance from FY2022 to FY2027, with no rate changed",
+        pinned: 0.380_345_158_154_592_9,
+        tolerance: 0.000_005,
+        compute: |i| {
+            let fy2027: f64 = i
+                .panel
+                .iter()
+                .map(|r| r.categoricals.targeted_assistance)
+                .sum();
+            let fy2022 = amount_after(
+                &plan_targeted_assistance(),
+                "targeted assistance is estimated to be ",
+            ) * 1_000_000.0;
+            fy2027 / fy2022 - 1.0
         },
     },
     Figure {

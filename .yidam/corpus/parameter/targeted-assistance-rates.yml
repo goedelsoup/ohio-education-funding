@@ -1,9 +1,9 @@
 class: parameter
 label: Targeted Assistance Rates
 summary: >-
-  Two tiers with different arithmetic: a capacity tier charging 0.008 against the gap to median
-  weighted wealth, and a wealth tier whose two coefficients deliberately differ — 0.014 against
-  the median and 0.0112 against the district. The mismatch is the policy.
+  Millage, written as decimals: 8 mills on the gap to median weighted wealth, and 14 mills on the
+  median against 11.2 on the district's own. The 0.8 eligibility floor is those two divided —
+  neither gate in the section is a separate decision.
 description: |
   Targeted assistance pays a district the sum of a capacity amount and a wealth amount, and the
   two are built differently. [verified — R.C. 3317.0217]
@@ -26,7 +26,28 @@ description: |
   That asymmetry is easy to read as a transcription error and it is in the statute. Both figures
   appear in the same bracketed expression in division (C)(4)(b), to four and three decimals
   respectively. [verified]
+
+  **They are mills, and this section is the one document that does not say so.** R.C. 3317.0217
+  uses the word "mill" nowhere. LSC's analysis of the act that enacted it states the same three
+  rates as *"multiplied by 14 mills"*, *"multiplied by 11.2 mills"* and *"equal to 8 mills"*, and
+  so does every account of every ancestor this component has had. Read in mills the wealth tier
+  says something plain: charge the median district 14, credit the district its own 11.2, pay the
+  difference. [verified —
+  [`crates/project`](../../../crates/project/tests/the_component_that_was_two_components.rs)]
 findings: |
+  ### Neither eligibility gate is a decision
+
+  The wealth bracket reaches zero exactly where a district's wealth is 1.25 times the median — a
+  wealth index of 0.8 — because 11.2 divided by 14 is 0.8. The floor stated in division (C)(4)(a)
+  is the two coefficients and nothing else, and a proposal that "keeps the 0.8 eligibility floor"
+  while moving either rate has described something that cannot be done.
+
+  The capacity tier's index test at 1.0 has the same shape: its bracket is `median − district`,
+  which is zero at the median. Both gates prevent a negative payment; neither excludes a district
+  that would otherwise have been paid. So the section states nine constants and has seven degrees
+  of freedom. [verified —
+  [`crates/project`](../../../crates/project/tests/the_component_that_was_two_components.rs)]
+
   ### The size ramp is a cliff and a ramp, not one shape
 
   Below 200 ADM a district gets nothing from the capacity tier. At 200 it gets 5%. That is a
@@ -45,9 +66,53 @@ findings: |
   draw on the same certified data and produce different quantities, both called weighted wealth
   in the ordinary sense, and a reader who carries one definition into the other section will be
   wrong about which districts are poor. [verified]
+  ### Three arithmetics since FY2014, and the committed analyses hold all three
+
+  The `unfilled:` on this node sent the reader to Ohio Laws' version archive. The twelve LSC
+  analyses this repository already holds carry more than a schedule of rates — they carry the
+  component's shape, biennium by biennium. [verified —
+  [`crates/project`](../../../crates/project/tests/the_component_that_was_two_components.rs)]
+
+  **FY2014-15, Am. Sub. H.B. 59.** Two tiers, neither of them these. Tier one blended valuation
+  and income **50/50** rather than 60/40, indexed against the *statewide* wealth per pupil rather
+  than the median, equalised to the wealth of the **490th lowest** district rather than to the
+  median district's, and charged **6 mills**. The wealth index then entered the payment a second
+  time as a multiplier, so that tier was progressive in wealth twice over where the current one is
+  linear in the district's own. Tier two paid up to 40 per cent of tier one again to districts
+  whose property is at least a tenth agricultural — a term the plan has no counterpart for.
+
+  **FY2016-19, Am. Sub. H.B. 64 and Am. Sub. H.B. 49.** Targeted assistance keeps running and a
+  second component joins it: capacity aid, charged on what a district raises with **one mill**,
+  scaled by a ratio capped at 2.5, then multiplied by a dial the General Assembly turned twice in
+  the four years the component existed — **2.75** in FY2016, **3.5** in FY2017, **4.0** in FY2018
+  and FY2019.
+
+  **FY2022, Am. Sub. H.B. 110.** *"The budget replaces the targeted assistance and capacity aid
+  components of the previous formula with a targeted assistance payment consisting of a 'wealth
+  amount' and a 'capacity amount.'"* The nine constants this node carries are that act's, and its
+  analysis states every one of them, in mills.
+
+  FY2020-21 names neither, which is [the bridge formula](../funding-regime/bridge-formula.yml)
+  doing what that node records — paying the prior year rather than computing one. And H.B. 33
+  describes neither component at all, so the FY2024-25 evidence is *absent* rather than contrary:
+  LSC writes about what an act changed, and this section was not amended.
+
+  ### Nothing has moved and the programme has grown by a third
+
+  LSC estimated targeted assistance at **$988.4 million** in FY2022 before guarantees and
+  phase-ins — $738.5m of it the wealth amount, $250.0m the capacity amount. The FY2027 panel
+  computes $1,364,333,154.32 for the same two tiers under the same nine constants, which is
+  **38%** more. [verified — crates/project]
+
+  The medians are what moved. Both tiers pay a *difference* between the median district's wealth
+  and the district's own, so a statewide revaluation that lifts every district's property value
+  proportionally lifts every gap proportionally and raises the programme's cost with no enactment
+  at all. An equalisation programme built on a wealth gap rather than on a revenue shortfall gets
+  more expensive as the tax base it equalises grows. [inference]
+
 properties:
   name: Targeted assistance rates
-  unit: ratio
+  unit: mills
   kind: |
     **Legislated, and expiring.** Every coefficient and every bracket is a digit in R.C.
     3317.0217, so only an act moves them while they apply — and the section opens *"This section
@@ -77,6 +142,19 @@ properties:
 
     FY2026 and FY2027 only. [verified]
 
+    The same nine, every year the plan has run. Am. Sub. H.B. 110 enacted them for FY2022 and
+    stated each in mills; no later act's analysis restates any of them. [verified]
+
+    What the section replaced, in the unit LSC used for it: [verified]
+      FY2014-15  6 mills   tier one, to the 490th lowest district, on a 50/50 wealth blend
+      FY2014-19  40%       tier two, of tier one, at a tenth agricultural property or more
+      FY2016-19  one mill  capacity aid, on three-year average valuation
+      FY2016     2.75      the capacity aid multiplier
+      FY2017     3.5       the same dial
+      FY2018-19  4.0       the same dial, and the last value it took
+      FY2020-21  —         the Bridge formula computed neither
+      FY2022     14 mills / 11.2 mills / 8 mills, and one payment instead of two
+
     FY2027 medians, from the department's model rather than from statute. [verified —
     crates/project]
       median weighted wealth            $392,151,306.63
@@ -88,6 +166,12 @@ properties:
 
     The medians are inputs and this is the outcome, which is why the node carried the first two
     for a year without the third.
+
+    What LSC estimated the same two tiers at when the plan began, before guarantees or phase-ins:
+    [verified — crates/project]
+      FY2022  targeted assistance   $988.4 million
+      FY2022  the wealth amount     $738.5 million
+      FY2022  the capacity amount   $250.0 million
   statutory_basis: |
     R.C. 3317.0217, read. (B) for the capacity tier including the size brackets, (C) for the
     wealth tier and its two coefficients, and (B)(1) for the 60/40 weighted wealth blend that
@@ -120,12 +204,54 @@ properties:
     *distribution* of Ohio's district wealth moves this programme with no enactment at all.
     [inference]
 unfilled:
-  - field: the rates before FY2026
+  - field: the divisions each rate sits in, before FY2026
     why: >-
-      H.B. 96's version is the one held. Prior versions of R.C. 3317.0217 in Ohio Laws' version
-      archive would give the FY2022-25 schedule, and the section's own two-year scope means each
-      biennium has one.
+      The committed LSC analyses settle the rates and the shape for every biennium since FY2014,
+      but a greenbook states a formula rather than citing a division. Which division of which
+      prior section carried the 6 mills, or the capacity aid multiplier, is still only in Ohio
+      Laws' version archive.
+  - field: whether tier one survived FY2019 unchanged
+    why: >-
+      H.B. 49 restates only the capacity aid multiplier; it does not restate tier one's target
+      millage, and LSC writes about what an act changed. Silence is evidence the rate held and it
+      is not proof, and the FY2020-21 analysis computes neither component.
 figures:
+  - key: project/targeted-assistance-wealth-millage
+    value: 14.0
+    field: series
+    as_written: "FY2022     14 mills"
+  - key: project/targeted-assistance-district-millage
+    value: 11.2
+    field: series
+    as_written: "14 mills / 11.2 mills"
+  - key: project/targeted-assistance-capacity-millage
+    value: 8.0
+    field: series
+    as_written: "11.2 mills / 8 mills"
+  - key: project/first-targeted-assistance-millage
+    value: 6.0
+    field: series
+    as_written: "FY2014-15  6 mills"
+  - key: project/capacity-aid-multiplier-fy2016
+    value: 2.75
+    field: series
+    as_written: "FY2016     2.75      the capacity aid multiplier"
+  - key: project/capacity-aid-multiplier-fy2017
+    value: 3.5
+    field: series
+    as_written: "FY2017     3.5       the same dial"
+  - key: project/capacity-aid-multiplier-fy2018
+    value: 4.0
+    field: series
+    as_written: "FY2018-19  4.0       the same dial"
+  - key: project/targeted-assistance-fy2022-estimate
+    value: 988400000.0
+    field: series
+    as_written: "FY2022  targeted assistance   $988.4 million"
+  - key: project/targeted-assistance-growth-since-the-plan
+    value: 0.3803451581545929
+    field: findings
+    as_written: "which is\n  **38%** more"
   - key: project/targeted-assistance-median-weighted-wealth
     value: 392151306.63298076
     field: series
