@@ -32,27 +32,27 @@ figures:
   - key: project/fy2032-aid-current-law
     value: 7233134576.709653
     field: findings
-    as_written: "**$7,233M, in a band of $7,017M to $7,494M**"
+    as_written: "**$7,233M, in a band of $6,958M to $7,582M**"
   - key: project/fy2032-aid-current-law-low
-    value: 7017027223.415896
+    value: 6957859359.941219
     field: findings
-    as_written: "**$7,233M, in a band of $7,017M to $7,494M**"
+    as_written: "**$7,233M, in a band of $6,958M to $7,582M**"
   - key: project/fy2032-aid-current-law-high
-    value: 7493506524.902345
+    value: 7581865913.570096
     field: findings
-    as_written: "**$7,233M, in a band of $7,017M to $7,494M**"
+    as_written: "**$7,233M, in a band of $6,958M to $7,582M**"
   - key: project/fy2032-aid-guarantee-removed
     value: 6301076001.003549
     field: findings
-    as_written: "**$6,301M, in a band of $5,938M to $6,686M**"
+    as_written: "**$6,301M, in a band of $5,831M to $6,809M**"
   - key: project/fy2032-aid-guarantee-removed-low
-    value: 5938323778.408624
+    value: 5830740283.83787
     field: findings
-    as_written: "**$6,301M, in a band of $5,938M to $6,686M**"
+    as_written: "**$6,301M, in a band of $5,831M to $6,809M**"
   - key: project/fy2032-aid-guarantee-removed-high
-    value: 6685987536.547348
+    value: 6809351272.337828
     field: findings
-    as_written: "**$6,301M, in a band of $5,938M to $6,686M**"
+    as_written: "**$6,301M, in a band of $5,831M to $6,809M**"
   - key: project/districts-on-the-guarantee-fy2032
     value: 312
     field: findings
@@ -108,8 +108,8 @@ findings: |
   This is the projection leg and is reported apart from everything above. Carrying each
   district's enrollment forward to **FY2032** by a damped trend from its own FY2024-FY2026
   history — statewide ADM falls 1.3% — state aid under current law is **$7,233M, in a band of
-  $7,017M to $7,494M** (±3.3%). With the guarantee removed the same enrollment forecast gives
-  **$6,301M, in a band of $5,938M to $6,686M** (±5.9%). [inference — a forecast, with the
+  $6,958M to $7,582M** (±4.3%). With the guarantee removed the same enrollment forecast gives
+  **$6,301M, in a band of $5,831M to $6,809M** (±7.8%). [inference — a forecast, with the
   caveats below]
 
   **Removing the guarantee nearly doubles the state's exposure to enrollment forecast error.**
@@ -171,8 +171,8 @@ properties:
     +10%        +$569.7M          207            $62.9M
     +20%       +$1,294.6M         156            $72.5M
 
-    FY2032 at projected enrollment, current law: $7,233M in a band of $7,017M to $7,494M.
-    The same with the guarantee removed: $6,301M in a band of $5,938M to $6,686M.
+    FY2032 at projected enrollment, current law: $7,233M in a band of $6,958M to $7,582M.
+    The same with the guarantee removed: $6,301M in a band of $5,831M to $6,809M.
   confidence: |
     The simulation figures are exact against the department's model and carry no interval.
 
@@ -197,12 +197,18 @@ properties:
     falls from 67.3%, very nearly the 68.3% such a band should hold, to 55.8%. Measured in
     `crates/project/tests/the_floor_the_interval_rests_on.rs`.
 
-    **[open]** Whether the widening rule should be recalibrated. This node's FY2032 leg is six
-    years out and the feed's horizon is ten, both past where six origins across fifteen surveyed
-    years can reach, so 1.40x is a lower bound on the shortfall at the horizons actually
-    published — and a weak one, under an exponent still climbing at the edge of the measurement.
-    Sigma, z and the square root are constants the web layer re-derives and must reproduce, so
-    moving them is a decision with a record rather than a consequence of a measurement.
+    [verified] **And the widening rule was recalibrated**, which was the open question here.
+    The square root held 55.8% of forecasts at five years against the 68.3% it claimed; fitted to
+    coverage the exponent is **0.65**, which holds it within 2.9 points at every horizon the
+    backtest reaches. Sigma does not move — it is a measured quantity with a stated source, and
+    only the shape in the horizon was wrong. The bands above are the widened ones. Recorded at
+    [the-widening-rule](../../decisions/the-widening-rule.yml).
+
+    **[open]** Whether the exponent holds past five years. The fit uses horizons one to five,
+    which is as far as six origins across fifteen surveyed years reach; this node's leg is six and
+    the feed's horizon is ten. It is extrapolated there either way, and what changed is that it is
+    extrapolated from a value the data supports rather than one it contradicts inside the measured
+    range.
 
     138 districts sit at the minimum state share and their response to a base cost increase
     cannot be computed, because the floor censors the quantity it would be computed from. They

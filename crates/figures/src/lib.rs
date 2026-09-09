@@ -3080,7 +3080,7 @@ pub static FIGURES: &[Figure] = &[
         unit: Unit::Dollars,
         label: "The low end of the FY2032 current-law aid band, from the enrollment \
                 projection interval",
-        pinned: 7_017_027_223.415_9,
+        pinned: 6_957_859_359.941_2,
         tolerance: 0.01,
         compute: |i| i.forecasts.fy2032.low,
     },
@@ -3090,8 +3090,8 @@ pub static FIGURES: &[Figure] = &[
         unit: Unit::Dollars,
         label: "The high end of the FY2032 current-law aid band \u{2014} asymmetric against \
                 the low end because the interval is multiplicative, which is why the corpus \
-                writes the half-width",
-        pinned: 7_493_506_524.902_3,
+                writes the half-width. Widened when `HORIZON_EXPONENT` was fitted",
+        pinned: 7_581_865_913.570_1,
         tolerance: 0.01,
         compute: |i| i.forecasts.fy2032.high,
     },
@@ -3111,7 +3111,7 @@ pub static FIGURES: &[Figure] = &[
         unit: Unit::Dollars,
         label: "The low end of the FY2032 guarantee-removed aid band, which the corpus \
                 reports as nearly twice as wide as the current-law one",
-        pinned: 5_938_323_778.408_6,
+        pinned: 5_830_740_283.837_9,
         tolerance: 0.01,
         compute: |i| i.forecasts.fy2032_guarantee_removed.low,
     },
@@ -3120,7 +3120,7 @@ pub static FIGURES: &[Figure] = &[
         owner: "crates/project",
         unit: Unit::Dollars,
         label: "The high end of the FY2032 guarantee-removed aid band",
-        pinned: 6_685_987_536.547_3,
+        pinned: 6_809_351_272.337_8,
         tolerance: 0.01,
         compute: |i| i.forecasts.fy2032_guarantee_removed.high,
     },
