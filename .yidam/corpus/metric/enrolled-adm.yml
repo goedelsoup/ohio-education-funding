@@ -290,7 +290,7 @@ findings: |
   second, 127 in the seventh, and **12 pupils in total between FY2032 and FY2036** — the two
   years this repository publishes — across 609 districts, in a state whose F-33 panel records a
   fall of 208,918 over fifteen years. The undamped trend reaches 1,290,680 at FY2036 against the
-  shipped 1,384,232, so the damping holds **93,552 pupils** above it.
+  shipped 1,384,232, so the damping holds **93,553 pupils** above it.
 
   This is not a defect in `series::advance`, which does what damping means. It is that a ten-year
   panel drawn this way carries about four years of demographic content and six years of the same
@@ -305,3 +305,50 @@ figures:
     value: 294
     field: findings
     as_written: "For the 294 districts it funds"
+  # The projected block. Every one of these moved when `the-shrunk-rate` changed the method and
+  # none of them said so, because a projection figure had never been bound before.
+  - key: project/damping-move-statewide-adm-fy2036
+    value: 45293.89703262714
+    field: findings
+    as_written: "**+3.38%** — 45,294 pupils —"
+  - key: project/damping-move-realized-aid-fy2036
+    value: 101033524.93905258
+    field: findings
+    as_written: "realized state aid by **+1.42%**, or $101.0m"
+  - key: project/districts-on-the-guarantee-fy2036-at-the-old-damping
+    value: 356
+    field: findings
+    as_written: "356 against 312"
+  - key: project/districts-on-the-guarantee-fy2036
+    value: 312
+    field: findings
+    as_written: "356 against 312"
+  - key: project/statewide-adm-fy2032
+    value: 1384244.862512754
+    field: findings
+    as_written: "moves from 1,376,970 to **1,384,245**"
+  - key: project/statewide-adm-fy2036
+    value: 1384232.4173715815
+    field: findings
+    as_written: "against the shipped 1,384,232"
+  - key: project/statewide-adm-fy2036-undamped
+    value: 1290679.7171409924
+    field: findings
+    as_written: "The undamped trend reaches 1,290,680 at FY2036"
+  - key: project/damping-holds-adm-above-the-undamped-trend
+    value: 93552.70023058914
+    field: findings
+    as_written: "the damping holds **93,553 pupils** above it"
+  # The FY2032 band, which this node states and `scenario/guarantee-phase-out` states twice more.
+  - key: project/fy2032-aid-current-law
+    value: 7233134576.709653
+    field: findings
+    as_written: "current law is $7,233M in a band of $7,017M to $7,494M"
+  - key: project/fy2032-aid-current-law-low
+    value: 7017027223.415896
+    field: findings
+    as_written: "current law is $7,233M in a band of $7,017M to $7,494M"
+  - key: project/fy2032-aid-current-law-high
+    value: 7493506524.902345
+    field: findings
+    as_written: "current law is $7,233M in a band of $7,017M to $7,494M"
