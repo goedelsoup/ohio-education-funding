@@ -46,6 +46,45 @@ rather than its current one, so H.B. 186 of the 136th appears there as `As Intro
 fact enrolled with an effective date of 20 March 2026. Reading a bill's status off the listing
 would record several enacted acts as pending.
 
+## The index is a record, not a list, and it carries the procedural history
+
+Reading it as a list of documents is what left `hb-643-136-introduced` with two open questions it
+did not need. Each entry also carries the sponsor roster with an `active` flag and party, the
+subject taxonomy, an official **`local_impact_statement`**, `governor_signed_date`,
+`concurrence_date` and `effective_date` — and it advertises two continuations:
+
+    meetings     /api/v2/general_assembly_{GA}/legislation/{bill}/meetings/
+    amendments   /api/v2/general_assembly_{GA}/legislation/{bill}/amendments/
+
+`meetings` is the committee history: date, time, chair, and whether the sitting was cancelled.
+
+**An empty array from either is only evidence once the endpoint is shown to fill.** Measured
+9 September 2026: H.B. 96 of the 136th returns **99** meetings, H.B. 186 returns **14**, and
+H.B. 643 returns **0**. Without that control, "no committee history was retrieved" and "no
+committee history exists" are the same observation, and only the second is a finding.
+
+What the endpoints still cannot say is whether a bill is *dead*. Zero meetings is the same record
+for one that will be heard next month and one that never will, and the General Assembly publishes
+no marker for the difference.
+
+## A digest here pins the renderer as well as the document
+
+`00_IN` cannot be amended, which is the whole reason it is safe to pin. It still moved.
+
+`hb643-136-introduced` was pinned 20 August 2026 at `ea8896c5…`, 11,817 bytes. Re-fetched
+9 September it is `12d3a532…`, 11,828 bytes, and `edfund-connect verify` reports *"The
+publication was revised."* It was not. The department's exporter went from **LibreOffice
+24.2.7.2 to 25.8.6.2**, which reorders CSS properties inside `style` attributes and fills in an
+empty `<title>`. Stripped of markup the two are byte-identical across 3,798 characters.
+
+So a digest mismatch on this host is a prompt to read the diff, not a finding on its own — which
+is what the tool's message asks for. Expect the four enrolled PDFs from the same service to drift
+for the same reason whenever that exporter is upgraded.
+
+**And nothing here notices unprompted.** `fetch` is the only command that touches the network;
+`verify` compares the *cache* against the manifest. An upstream change is invisible until someone
+re-fetches, so the digests are a cache-integrity check and not a freshness check.
+
 ## What this can be trusted for, and what it cannot
 
 **It can be trusted for what a sponsor proposed.** The text is the document, served as HTML with
