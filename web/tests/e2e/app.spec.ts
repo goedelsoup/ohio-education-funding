@@ -422,6 +422,48 @@ test.describe("the chrome above the fold", () => {
     ]);
   });
 
+  test("the header's one outbound link is the repository, and it is not a button", async ({
+    page,
+  }) => {
+    /*
+     * Every figure on this site names the crate that computes it, and for a long time a reader
+     * following that attribution had nowhere to go. This is the somewhere — the only link in the
+     * chrome that leaves the site, so it is worth asserting that it is still the only one.
+     *
+     * It is checked as chrome rather than as a control. The mark sits next to the theme button
+     * and wore the same pill for a while, which said it acted on the page; it does not, it leaves.
+     * So: no border, an accessible name, since it has no word of its own, and `noopener` on the
+     * new tab.
+     */
+    await page.setViewportSize({ width: 1000, height: 800 });
+    await page.goto("/district/043786");
+
+    const outbound = await page.evaluate(() => {
+      const links = [...document.querySelectorAll("header.site a")].filter(
+        (a) => new URL((a as HTMLAnchorElement).href).origin !== location.origin,
+      ) as HTMLAnchorElement[];
+      return links.map((a) => ({
+        href: a.href,
+        name: a.getAttribute("aria-label"),
+        rel: a.rel,
+        target: a.target,
+        border: getComputedStyle(a).borderTopWidth,
+        text: a.textContent!.trim(),
+      }));
+    });
+
+    expect(outbound).toEqual([
+      {
+        href: "https://github.com/goedelsoup/ohio-education-funding",
+        name: "Source on GitHub",
+        rel: "noopener noreferrer",
+        target: "_blank",
+        border: "0px",
+        text: "",
+      },
+    ]);
+  });
+
   test("keyboard focus never lands under the header", async ({ page }) => {
     /*
      * The same question as the fragment, asked the other way. A reader tabbing down a long page

@@ -151,13 +151,27 @@ header.site {
   border-bottom: 1px solid var(--border);
   margin-bottom: var(--space-8);
 }
+/*
+ * Half a gap below the nav's breakpoint, a whole one above it.
+ *
+ * At 360px there are 320px inside the padding and the four children want 270.85 of them — the
+ * brand at 141.77, the collapsed nav at 65.22, the repository mark at 32 and the theme button at
+ * 31.86. Three 16px gaps put that at 318.85, which fits by a pixel and a bit; before the mark
+ * lost its pill it was 321, and the row wrapped on the odd pixel into 92px of header instead of
+ * 52, with the `h1` forty pixels further down, on the narrowest phone and nowhere else.
+ *
+ * A pixel is not a fit. The brand's width is whatever `system-ui` renders it at on the reader's
+ * machine — a different face on Android than on this one — so the number measured here is not a
+ * promise about theirs. Halving the gap below 700px turns that pixel into 25 of them, which is
+ * slack, and slack is the property worth having.
+ */
 .site-inner {
   max-width: var(--wrap-wide);
   margin: 0 auto;
   padding: .6rem var(--space-7);
   display: flex;
   align-items: center;
-  gap: 1rem;
+  gap: .5rem;
   flex-wrap: wrap;
 }
 .brand { font-weight: var(--weight-bold); letter-spacing: var(--tracking-tight); color: var(--text-primary); text-decoration: none; }
@@ -214,6 +228,7 @@ header.site nav { display: flex; gap: .15rem; margin-right: auto; }
 .site-inner:has(.menu-all[open]) { align-items: flex-start; }
 
 @media (min-width: 700px) {
+  .site-inner { gap: 1rem; }
   .menu-all > summary { display: none; }
   .menu-all::details-content { content-visibility: visible; block-size: auto; }
   .menu-all > .menu-groups { flex-direction: row; padding: 0; }
@@ -385,6 +400,36 @@ td.year { font-family: var(--font-mono); color: var(--text-annotation); white-sp
   padding: var(--space-1) .5rem;
   line-height: var(--leading-tight);
 }
+
+/*
+ * The repository mark: a chrome link, and not a control.
+ *
+ * It wore `.ghost` and read as a third button. The pill is what the theme toggle uses to say it
+ * acts on the page, and the same border around the octocat claimed that of a link whose whole
+ * behaviour is to leave. So the mark sets its own colour and drops the underline, which is what
+ * every other chrome link here does — position is the affordance.
+ *
+ * The padding stays although it now draws nothing: it is what makes a 16px glyph a 32px target,
+ * which is the theme button's size and the floor a finger needs.
+ *
+ * `inline-flex` and a `block` child are what keep the row one row. An inline `<svg>` sits on the
+ * baseline and the line box then reserves descender space under it, which is a taller box than
+ * the button beside it and a taller header than 52px. Laying the box out instead of the line
+ * takes that away.
+ *
+ * Focus is drawn rather than inherited. `a:focus-visible` thickens an underline, and this link
+ * has no word to underline — without a ring of its own a keyboard reader would lose it.
+ */
+.mark {
+  display: inline-flex;
+  align-items: center;
+  padding: var(--space-1) .5rem;
+  color: var(--text-secondary);
+  text-decoration: none;
+}
+.mark svg { display: block; width: 1rem; height: 1rem; }
+.mark:hover { color: var(--text-primary); }
+.mark:focus-visible { outline: 2px solid var(--focus-ring); outline-offset: 2px; }
 
 /*
  * A link is the ink with a rule under it. The rule is the affordance; the colour is not.
