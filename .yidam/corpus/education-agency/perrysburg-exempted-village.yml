@@ -36,8 +36,34 @@ description: |
   share whose denominator is the whole enrollment cannot compare two districts serving very
   different fractions of the population it is meant to describe.
 
-  Not yet held: valuation per pupil, millage, guarantee status, and anything before FY2024.
-  [open]
+findings: |
+  ### What it is worth, what it taxes, and what has happened to it
+
+  All three were recorded as not held and all three are committed. Perrysburg's assessed
+  valuation is **$270,202 per pupil**, against Toledo's $135,506 — twice as much. But it is not
+  taxing itself less to get there: its effective Class I operating rate is **39.15 mills** against
+  Toledo's 35.5476, the higher of the two, and H.B. 920 has removed about the same fraction of
+  each district's voted millage. Neither is on the twenty-mill floor. The disparity between the
+  pair is the base, not the rate. [verified —
+  [`crates/dispersion`](../../../crates/dispersion/tests/the_pair_and_its_fifteen_years.rs)]
+
+  **And the fifteen years the node could not see are the equity claim in miniature.** From FY2009
+  to FY2024, both districts lost state revenue per pupil in constant dollars — Perrysburg by
+  22.75% and Toledo by 34.3%. Only one of them replaced it: Perrysburg's local revenue per pupil
+  rose **22.3% in real terms** while Toledo's fell 8.14%, and Perrysburg's enrolment grew 20%
+  while Toledo's fell 21%. The state's real contribution retreated from both; the tax base
+  decided who could follow. [verified]
+
+  Two cautions travel with that series. The survey's state revenue column is every dollar the
+  state sent, capital included, so one district-year of it is not that district's foundation aid —
+  Carey Exempted Village reports $21.0m of state revenue against $8.0m of current spending in a
+  building year. And FY2014 is absent from the archive. [verified]
+
+  Perrysburg spends **73.11%** of its operating money in the classroom, which puts it at percentile 95.0 of
+  Ohio's 606 districts; Toledo's 63.43% is at percentile 18.5. That is the pair standing at
+  the two ends of the relationship
+  [`progress-value-added`](../metric/progress-value-added.yml) measures across the state.
+  [verified]
 revisions:
   - was: |
       Toledo spends $6,173 more per pupil than Perrysburg.
@@ -51,6 +77,46 @@ revisions:
       One dollar on one figure, stated in this node and in [Toledo](toledo-city.yml). Nothing
       reads the gap to the dollar, and the function shares beside it are untouched. [verified]
 figures:
+  - key: dispersion/perrysburg-valuation-per-pupil
+    value: 270202.3301
+    field: findings
+    as_written: "valuation is **$270,202 per pupil**, against Toledo's $135,506"
+  - key: dispersion/toledo-valuation-per-pupil
+    value: 135506.3197
+    field: findings
+    as_written: "against Toledo's $135,506 — twice as much"
+  - key: dispersion/perrysburg-effective-millage
+    value: 39.15
+    field: findings
+    as_written: "effective Class I operating rate is **39.15 mills** against"
+  - key: dispersion/toledo-effective-millage
+    value: 35.5476
+    field: findings
+    as_written: "Toledo's 35.5476, the higher of the two"
+  - key: dispersion/perrysburg-state-revenue-real-change-negative
+    value: 0.22751
+    field: findings
+    as_written: "22.75% and Toledo by 34.3%"
+  - key: dispersion/toledo-state-revenue-real-change-negative
+    value: 0.34329
+    field: findings
+    as_written: "22.75% and Toledo by 34.3%"
+  - key: dispersion/perrysburg-local-revenue-real-change
+    value: 0.22336
+    field: findings
+    as_written: "rose **22.3% in real terms** while Toledo's fell 8.14%"
+  - key: dispersion/toledo-local-revenue-real-change-negative
+    value: 0.08141
+    field: findings
+    as_written: "while Toledo's fell 8.14%"
+  - key: dispersion/perrysburg-classroom-share-percentile
+    value: 95.041
+    field: findings
+    as_written: "which puts it at percentile 95.0 of"
+  - key: dispersion/toledo-classroom-share-percentile
+    value: 18.512
+    field: findings
+    as_written: "Toledo's 63.43% is at percentile 18.5."
   - key: dispersion/perrysburg-operating-per-headcount-pupil
     value: 14632.16
     field: description

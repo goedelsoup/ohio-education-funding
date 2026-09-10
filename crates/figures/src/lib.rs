@@ -248,6 +248,8 @@ pub struct Inputs {
     /// FY2025 spending by function joined to the report card, and the models that take the
     /// corpus's published spending coefficient apart.
     pub composition: Composition,
+    /// The corpus's worked pair, over the fifteen years its two nodes said they could not see.
+    pub pair: Pair,
     /// Every state's Education Finance Incentive Grant equity factor, widest spread first.
     ///
     /// Computed once because each call walks all 10,739 rows of the national district panel, and
@@ -265,6 +267,27 @@ pub struct Inputs {
     /// decided on. Binding them is what makes the next change to a projection constant redden the
     /// corpus rather than silently restate it.
     pub forecasts: Forecasts,
+}
+
+/// Toledo and Perrysburg on the four measures their nodes recorded as not held.
+///
+/// The histories are held rather than recomputed because each walks the whole fifteen-year panel,
+/// and the step measure walks it seven times.
+pub struct Pair {
+    /// Toledo's wealth, millage, floor status and spending composition.
+    pub toledo: dispersion::exemplars::Standing,
+    /// Perrysburg's.
+    pub perrysburg: dispersion::exemplars::Standing,
+    /// Toledo's state revenue per pupil across the panel's span, nominal and real.
+    pub toledo_state: dispersion::exemplars::Change,
+    /// And its local revenue.
+    pub toledo_local: dispersion::exemplars::Change,
+    /// Perrysburg's state revenue.
+    pub perrysburg_state: dispersion::exemplars::Change,
+    /// And its local revenue, the one that goes the other way.
+    pub perrysburg_local: dispersion::exemplars::Change,
+    /// Every comparable district's FY2016 step, smallest first.
+    pub step: Vec<(String, f64, f64)>,
 }
 
 /// The four models that answer `metric/progress-value-added`'s largest recorded omission.
@@ -406,6 +429,19 @@ impl Inputs {
                     .collect();
                 column.sort_by(|a, b| a.partial_cmp(b).expect("no NaN in a published dollar"));
                 dispersion::median(&column).expect("the function file is not empty")
+            },
+            pair: {
+                use dispersion::exemplars::{self, PERRYSBURG, TOLEDO};
+                Pair {
+                    toledo: exemplars::standing(TOLEDO).expect("Toledo joins all three panels"),
+                    perrysburg: exemplars::standing(PERRYSBURG)
+                        .expect("Perrysburg joins all three panels"),
+                    toledo_state: exemplars::change(TOLEDO, |y| y.state),
+                    toledo_local: exemplars::change(TOLEDO, |y| y.local),
+                    perrysburg_state: exemplars::change(PERRYSBURG, |y| y.state),
+                    perrysburg_local: exemplars::change(PERRYSBURG, |y| y.local),
+                    step: exemplars::fy2016_step(),
+                }
             },
             composition: {
                 let districts = dispersion::composition::frame();
@@ -2430,6 +2466,132 @@ pub static FIGURES: &[Figure] = &[
         pinned: 0.2016,
         tolerance: 0.0005,
         compute: |i| operating_dispersion(i).coefficient_of_variation,
+    },
+    // The pair's fifteen years, and the four measures its two nodes recorded as not held. Real
+    // changes are exported as magnitudes with the direction in the key, except Perrysburg's local
+    // revenue, which is the one that rises and whose sign is the finding.
+    Figure {
+        key: "dispersion/toledo-state-revenue-real-change-negative",
+        owner: "crates/dispersion",
+        unit: Unit::Share,
+        label: "Toledo City state revenue per pupil, FY2009 to FY2024, in constant dollars \u{2014} \
+                negative",
+        pinned: 0.34329,
+        tolerance: 0.0005,
+        compute: |i| i.pair.toledo_state.real.abs(),
+    },
+    Figure {
+        key: "dispersion/perrysburg-state-revenue-real-change-negative",
+        owner: "crates/dispersion",
+        unit: Unit::Share,
+        label: "Perrysburg Exempted Village state revenue per pupil over the same span \u{2014} \
+                also negative",
+        pinned: 0.22751,
+        tolerance: 0.0005,
+        compute: |i| i.pair.perrysburg_state.real.abs(),
+    },
+    Figure {
+        key: "dispersion/toledo-local-revenue-real-change-negative",
+        owner: "crates/dispersion",
+        unit: Unit::Share,
+        label: "Toledo City local revenue per pupil over the same span, in constant dollars \
+                \u{2014} negative",
+        pinned: 0.08141,
+        tolerance: 0.0005,
+        compute: |i| i.pair.toledo_local.real.abs(),
+    },
+    Figure {
+        key: "dispersion/perrysburg-local-revenue-real-change",
+        owner: "crates/dispersion",
+        unit: Unit::Share,
+        label: "Perrysburg Exempted Village local revenue per pupil over the same span \u{2014} \
+                the one series of the four that rises",
+        pinned: 0.22336,
+        tolerance: 0.0005,
+        compute: |i| i.pair.perrysburg_local.real,
+    },
+    Figure {
+        key: "dispersion/toledo-valuation-per-pupil",
+        owner: "crates/dispersion",
+        unit: Unit::Dollars,
+        label: "Toledo City assessed valuation per pupil, TY2023",
+        pinned: 135_506.32,
+        tolerance: 1.0,
+        compute: |i| i.pair.toledo.valuation_per_pupil,
+    },
+    Figure {
+        key: "dispersion/perrysburg-valuation-per-pupil",
+        owner: "crates/dispersion",
+        unit: Unit::Dollars,
+        label: "Perrysburg Exempted Village assessed valuation per pupil, TY2023",
+        pinned: 270_202.33,
+        tolerance: 1.0,
+        compute: |i| i.pair.perrysburg.valuation_per_pupil,
+    },
+    Figure {
+        key: "dispersion/toledo-effective-millage",
+        owner: "crates/dispersion",
+        unit: Unit::Ratio,
+        label: "Toledo City effective Class I operating millage, TY2023",
+        pinned: 35.5476,
+        tolerance: 0.0005,
+        compute: |i| i.pair.toledo.effective_millage,
+    },
+    Figure {
+        key: "dispersion/perrysburg-effective-millage",
+        owner: "crates/dispersion",
+        unit: Unit::Ratio,
+        label: "Perrysburg Exempted Village effective Class I operating millage, TY2023 \u{2014} \
+                the higher of the two",
+        pinned: 39.15,
+        tolerance: 0.0005,
+        compute: |i| i.pair.perrysburg.effective_millage,
+    },
+    Figure {
+        key: "dispersion/toledo-classroom-share-percentile",
+        owner: "crates/dispersion",
+        unit: Unit::Ratio,
+        label: "Where Toledo City's classroom share sits among the 606 districts, as a percentile",
+        pinned: 18.512,
+        tolerance: 0.05,
+        compute: |i| i.pair.toledo.classroom_share_percentile,
+    },
+    Figure {
+        key: "dispersion/perrysburg-classroom-share-percentile",
+        owner: "crates/dispersion",
+        unit: Unit::Ratio,
+        label: "And where Perrysburg Exempted Village's sits",
+        pinned: 95.041,
+        tolerance: 0.05,
+        compute: |i| i.pair.perrysburg.classroom_share_percentile,
+    },
+    Figure {
+        key: "dispersion/fy2016-step-districts",
+        owner: "crates/dispersion",
+        unit: Unit::Count,
+        label: "Districts whose state revenue per pupil fell more than a fifth across FY2016 and \
+                stayed down",
+        pinned: 27.0,
+        tolerance: 0.0,
+        compute: |i| i.pair.step.iter().filter(|s| s.1 < -0.20).count() as f64,
+    },
+    Figure {
+        key: "dispersion/fy2016-step-pupil-share",
+        owner: "crates/dispersion",
+        unit: Unit::Share,
+        label: "The share of the panel's pupils those districts hold",
+        pinned: 0.06700,
+        tolerance: 0.0005,
+        compute: |i| {
+            let all: f64 = i.pair.step.iter().map(|s| s.2).sum();
+            i.pair
+                .step
+                .iter()
+                .filter(|s| s.1 < -0.20)
+                .map(|s| s.2)
+                .sum::<f64>()
+                / all
+        },
     },
     // What the money was spent on, entered into the model that only knew how much. The coefficients
     // are standardised — standard deviations of outcome per standard deviation of predictor — so

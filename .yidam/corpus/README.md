@@ -320,7 +320,7 @@ Fields: count per claim tag across every node; then the unresolved marks by the 
 -->
 | Tag | Count | What it records |
 |---|--:|---|
-| `[verified]` | 1418 | supported by a committed primary source |
+| `[verified]` | 1426 | supported by a committed primary source |
 | `[inference]` | 313 | drawn from verified facts, not witnessed |
 | `[open]` | 194 | a live question — unknown, contested, or being worked |
 | `[unentered]` | 0 | a knowable value nobody has typed in yet |
@@ -329,8 +329,8 @@ Fields: count per claim tag across every node; then the unresolved marks by the 
 
 | Field | `[open]` | `[unentered]` |
 |---|--:|--:|
-| `findings` | 70 | 0 |
-| `description` | 47 | 0 |
+| `findings` | 71 | 0 |
+| `description` | 46 | 0 |
 | `revisions` | 10 | 0 |
 | `series` | 7 | 0 |
 | `statutory_basis` | 6 | 0 |
@@ -419,8 +419,8 @@ Sorted by: kind, then alphabetically.
 | [`eastland-fairfield-ctc`](education-agency/eastland-fairfield-ctc.yml) | education-agency | Eastland-Fairfield Career and Technical Schools | 3 | 3 |
 | [`electronic-classroom-of-tomorrow`](education-agency/electronic-classroom-of-tomorrow.yml) | education-agency | Electronic Classroom of Tomorrow (closed) | 2 | 1 |
 | [`northern-local-perry`](education-agency/northern-local-perry.yml) | education-agency | Northern Local School District (Perry County) | 9 | 13 |
-| [`perrysburg-exempted-village`](education-agency/perrysburg-exempted-village.yml) | education-agency | Perrysburg Exempted Village School District | 4 | 2 |
-| [`toledo-city`](education-agency/toledo-city.yml) | education-agency | Toledo City School District | 3 | 3 |
+| [`perrysburg-exempted-village`](education-agency/perrysburg-exempted-village.yml) | education-agency | Perrysburg Exempted Village School District | 5 | 2 |
+| [`toledo-city`](education-agency/toledo-city.yml) | education-agency | Toledo City School District | 4 | 3 |
 | [`upper-arlington-city`](education-agency/upper-arlington-city.yml) | education-agency | Upper Arlington City School District | 3 | 8 |
 | [`fy2002-03`](fiscal-period/fy2002-03.yml) | fiscal-period | FY2002-2003 Biennium | 4 | 2 |
 | [`fy2004-05`](fiscal-period/fy2004-05.yml) | fiscal-period | FY2004-2005 Biennium | 5 | 2 |
@@ -491,7 +491,7 @@ Sorted by: kind, then alphabetically.
 | [`general-fund-cash-balance`](metric/general-fund-cash-balance.yml) | metric | General Fund Cash Balance | 5 | 3 |
 | [`per-pupil-operating-expenditure`](metric/per-pupil-operating-expenditure.yml) | metric | Per-Pupil Operating Expenditure | 12 | 5 |
 | [`performance-index`](metric/performance-index.yml) | metric | Performance Index | 6 | 12 |
-| [`progress-value-added`](metric/progress-value-added.yml) | metric | Progress (Value-Added) | 5 | 6 |
+| [`progress-value-added`](metric/progress-value-added.yml) | metric | Progress (Value-Added) | 5 | 7 |
 | [`state-share-percentage`](metric/state-share-percentage.yml) | metric | State Share Percentage | 5 | 3 |
 | [`education-savings-account-act`](model-policy/education-savings-account-act.yml) | model-policy | Education Savings Account Act | 4 | 1 |
 | [`parental-choice-scholarship-act`](model-policy/parental-choice-scholarship-act.yml) | model-policy | Parental Choice Scholarship Program Act (Universal Eligibility) | 5 | 1 |
@@ -526,7 +526,7 @@ Sorted by: kind, then alphabetically.
 | [`lottery-profits`](revenue-stream/lottery-profits.yml) | revenue-stream | Lottery Profits Education Fund | 4 | 1 |
 | [`state-foundation-aid`](revenue-stream/state-foundation-aid.yml) | revenue-stream | State Foundation Aid | 5 | 21 |
 | [`title-i`](revenue-stream/title-i.yml) | revenue-stream | Title I, Part A | 5 | 5 |
-| [`tpp-replacement-payments`](revenue-stream/tpp-replacement-payments.yml) | revenue-stream | Tangible Personal Property Tax Replacement Payments | 6 | 7 |
+| [`tpp-replacement-payments`](revenue-stream/tpp-replacement-payments.yml) | revenue-stream | Tangible Personal Property Tax Replacement Payments | 6 | 8 |
 | [`fsfp-input-year-refresh`](scenario/fsfp-input-year-refresh.yml) | scenario | FSFP Cost Input Refresh vs. Freeze | 9 | 9 |
 | [`guarantee-phase-out`](scenario/guarantee-phase-out.yml) | scenario | Phasing Out the Temporary Transitional Aid Guarantee | 11 | 4 |
 | [`anton-grdina`](school/anton-grdina.yml) | school | Anton Grdina | 7 | 1 |
