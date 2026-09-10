@@ -320,7 +320,7 @@ Fields: count per claim tag across every node; then the unresolved marks by the 
 -->
 | Tag | Count | What it records |
 |---|--:|---|
-| `[verified]` | 1426 | supported by a committed primary source |
+| `[verified]` | 1433 | supported by a committed primary source |
 | `[inference]` | 313 | drawn from verified facts, not witnessed |
 | `[open]` | 194 | a live question — unknown, contested, or being worked |
 | `[unentered]` | 0 | a knowable value nobody has typed in yet |
@@ -415,12 +415,12 @@ Sorted by: kind, then alphabetically.
 | [`fund-the-plan-and-retire-the-guarantee`](draft-legislation/fund-the-plan-and-retire-the-guarantee.yml) | draft-legislation | Fund the Plan and Retire the Guarantee | 8 | 0 |
 | [`hb-643-136-introduced`](draft-legislation/hb-643-136-introduced.yml) | draft-legislation | H.B. 643 (136th G.A., as introduced) | 3 | 0 |
 | [`hb-96-with-refreshed-inputs`](draft-legislation/hb-96-with-refreshed-inputs.yml) | draft-legislation | "Counterfactual: H.B. 96 with FY2024 Cost Inputs" | 6 | 1 |
-| [`cleveland-municipal`](education-agency/cleveland-municipal.yml) | education-agency | Cleveland Municipal School District | 3 | 8 |
+| [`cleveland-municipal`](education-agency/cleveland-municipal.yml) | education-agency | Cleveland Municipal School District | 4 | 8 |
 | [`eastland-fairfield-ctc`](education-agency/eastland-fairfield-ctc.yml) | education-agency | Eastland-Fairfield Career and Technical Schools | 3 | 3 |
 | [`electronic-classroom-of-tomorrow`](education-agency/electronic-classroom-of-tomorrow.yml) | education-agency | Electronic Classroom of Tomorrow (closed) | 2 | 1 |
 | [`northern-local-perry`](education-agency/northern-local-perry.yml) | education-agency | Northern Local School District (Perry County) | 9 | 13 |
 | [`perrysburg-exempted-village`](education-agency/perrysburg-exempted-village.yml) | education-agency | Perrysburg Exempted Village School District | 5 | 2 |
-| [`toledo-city`](education-agency/toledo-city.yml) | education-agency | Toledo City School District | 4 | 3 |
+| [`toledo-city`](education-agency/toledo-city.yml) | education-agency | Toledo City School District | 4 | 4 |
 | [`upper-arlington-city`](education-agency/upper-arlington-city.yml) | education-agency | Upper Arlington City School District | 3 | 8 |
 | [`fy2002-03`](fiscal-period/fy2002-03.yml) | fiscal-period | FY2002-2003 Biennium | 4 | 2 |
 | [`fy2004-05`](fiscal-period/fy2004-05.yml) | fiscal-period | FY2004-2005 Biennium | 5 | 2 |

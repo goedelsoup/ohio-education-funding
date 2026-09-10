@@ -38,11 +38,62 @@ findings: |
   the recovered money returned to those districts, and in what proportion, is unestablished.
   [open]
 
-  Peak enrollment and per-district deduction impact remain unpopulated. [open]
+  ### Peak enrollment, which the federal survey held all along
+
+  ECOT was a community school, so it is never `comparable` and every district measure in
+  `crates/dispersion` looks past it. The Census F-33 Ohio panel carries it anyway, for 8 years —
+  FY2009 through FY2017, with FY2014 absent as it is for every Ohio agency. [verified —
+  [`crates/dispersion`](../../../crates/dispersion/tests/the_series_the_panel_already_held.rs)]
+
+  **Enrollment peaked at 14,153 in FY2016**, nearly double its FY2009 count of 7,272. State
+  revenue peaked in the same year at **$109,371,000** — which is the survey's independent reading
+  of the "$108 million in state funding" the hearing officer's report gives, from a source this
+  corpus does not hold, and it is the year the State Board voted to claw $60 million of it back.
+  Two records of the same quantity, 1.3% apart. [verified]
+
+  Across those 8 years ECOT received **$666,576,000** of state money. In FY2016 that made it the
+  8th largest recipient of state education money among all 982 Ohio agencies the survey carries,
+  behind 7 city districts and ahead of the next community school by more than half again. One
+  online school, funded above every district in Ohio but seven. [verified]
+
+  ### And it was funded above the districts the money came out of
+
+  ECOT's state revenue per pupil ran between $7,249 and $7,913 across those years, against a
+  statewide district average between $5,241 and $6,036 — **1.3994 times the average district in
+  FY2016**, and never below 1.27 in any year the panel holds. Under the deduct mechanism that
+  money was subtracted from resident districts' foundation payments, so this is not an incidental
+  comparison: districts gave up state aid to fund a school receiving more per pupil than they
+  received themselves. [verified]
+
+  The aggregate draw is **0.0124 of everything Ohio's districts received in state money in
+  FY2016**, roughly double its FY2009 share. That is the total any per-district apportionment
+  would have to sum to. Which districts, and in what proportion, still needs the department's
+  deduct file and is not established here. [open]
 
   It opened in 2000 and closed in January 2018, but neither the charter date nor the closure
   date is established to the day, so the node carries no `established` date — the class
   declares that property a `date`, and a year is not one. [open]
+figures:
+  - key: dispersion/ecot-peak-enrolment
+    value: 14153
+    field: findings
+    as_written: "**Enrollment peaked at 14,153 in FY2016**"
+  - key: dispersion/ecot-peak-state-revenue
+    value: 109371000
+    field: findings
+    as_written: "peaked in the same year at **$109,371,000**"
+  - key: dispersion/ecot-state-revenue-total
+    value: 666576000
+    field: findings
+    as_written: "ECOT received **$666,576,000** of state money"
+  - key: dispersion/ecot-funding-against-the-average-district
+    value: 1.39937
+    field: findings
+    as_written: "**1.3994 times the average district in\n  FY2016**"
+  - key: dispersion/ecot-share-of-district-state-revenue
+    value: 0.01241
+    field: findings
+    as_written: "**0.0124 of everything Ohio's districts received in state money in\n  FY2016**"
 properties:
   irn: 133413 [verified — `dispersion::lea_directory`, fifteen consecutive editions 2004-2018]
   agency_type: community

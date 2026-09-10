@@ -65,6 +65,16 @@ pub const TOLEDO: &str = "044909";
 /// Perrysburg Exempted Village, IRN 045583 — the other half of the pair.
 pub const PERRYSBURG: &str = "045583";
 
+/// Cleveland Municipal, IRN 043786 — the corpus's third traditional exemplar.
+pub const CLEVELAND: &str = "043786";
+
+/// Electronic Classroom of Tomorrow, IRN 133413 — closed in January 2018.
+///
+/// A community school and therefore never `comparable`, which is why it is invisible to every
+/// district measure in this crate and present in the panel all the same. The panel carries it for
+/// FY2009 through FY2017 and stops, because the school did.
+pub const ECOT: &str = "133413";
+
 /// The first and last fiscal years the panel holds, which is the span every change here spans.
 pub const SPAN: [u16; 2] = [2009, 2024];
 
@@ -139,29 +149,98 @@ pub struct Change {
 /// # Panics
 ///
 /// If the panel does not carry `irn` in both of [`SPAN`]'s years, or if the deflator has no index
-/// for one of them — both of which mean the fixtures moved under this module.
+/// for one of them — both of which mean the fixtures moved under this module. Use
+/// [`change_between`] for an agency whose run is shorter than the panel's, which for a school
+/// that closed is every one of them.
 #[must_use]
 pub fn change(irn: &str, pick: fn(&Year) -> f64) -> Change {
+    change_between(irn, SPAN[0], SPAN[1], pick).expect("the panel carries this district throughout")
+}
+
+/// The same between any two years the panel holds for `irn`.
+///
+/// `None` where either year is missing for that agency, or where the first value is zero — which
+/// is the case for a school that opened or closed inside the span.
+#[must_use]
+pub fn change_between(
+    irn: &str,
+    from_year: u16,
+    to_year: u16,
+    pick: fn(&Year) -> f64,
+) -> Option<Change> {
     let years = history(irn);
-    let first = years
-        .iter()
-        .find(|y| y.fiscal_year == SPAN[0])
-        .expect("the panel opens at SPAN[0] for this district");
-    let last = years
-        .iter()
-        .find(|y| y.fiscal_year == SPAN[1])
-        .expect("the panel closes at SPAN[1] for this district");
+    let first = years.iter().find(|y| y.fiscal_year == from_year)?;
+    let last = years.iter().find(|y| y.fiscal_year == to_year)?;
     let (from, to) = (pick(first), pick(last));
+    if from == 0.0 {
+        return None;
+    }
     let cpi = deflator::CpiSeries::cpi_u_june();
     let real = cpi
-        .real_growth(from, FiscalYear(SPAN[0]), to, FiscalYear(SPAN[1]))
-        .expect("the deflator covers the panel's span");
-    Change {
+        .real_growth(from, FiscalYear(from_year), to, FiscalYear(to_year))
+        .ok()?;
+    Some(Change {
         from,
         to,
         nominal: to / from - 1.0,
         real: real.value,
+    })
+}
+
+/// The year one series peaks, and its value there.
+///
+/// `None` for an agency the panel does not carry. Ties go to the earlier year.
+#[must_use]
+pub fn peak(irn: &str, pick: fn(&Year) -> f64) -> Option<(u16, f64)> {
+    history(irn)
+        .into_iter()
+        .map(|y| (y.fiscal_year, pick(&y)))
+        .reduce(|best, next| if next.1 > best.1 { next } else { best })
+}
+
+/// State revenue and enrolment summed over the comparable districts, by fiscal year.
+///
+/// The denominator a community school's draw has to be read against: under the deduct mechanism
+/// that operated until the Fair School Funding Plan, every dollar a community school received was
+/// subtracted from a resident district's foundation payment, so its share of *this* total is what
+/// Ohio's districts gave up to it.
+#[must_use]
+pub fn district_state_revenue() -> std::collections::BTreeMap<u16, (f64, f64)> {
+    let mut out: std::collections::BTreeMap<u16, (f64, f64)> = std::collections::BTreeMap::new();
+    for row in ohio_panel::panel().iter().filter(|r| r.comparable) {
+        let entry = out.entry(row.fiscal_year).or_default();
+        entry.0 += row.state_revenue;
+        entry.1 += row.enrollment;
     }
+    out
+}
+
+/// An agency's state revenue as a fraction of what Ohio's districts received that year.
+///
+/// `None` where the panel does not carry the agency in `year`.
+#[must_use]
+pub fn share_of_district_state_revenue(irn: &str, year: u16) -> Option<f64> {
+    let row = history(irn).into_iter().find(|y| y.fiscal_year == year)?;
+    let (total, _) = *district_state_revenue().get(&year)?;
+    (total > 0.0).then(|| row.state * row.enrolment / total)
+}
+
+/// Where an agency ranks by state revenue among every Ohio agency the panel carries that year.
+///
+/// One-based, largest first, and over *all* agencies rather than the comparable ones — a
+/// community school is not a district and the question is how much money it received.
+#[must_use]
+pub fn rank_by_state_revenue(irn: &str, year: u16) -> Option<usize> {
+    let mut agencies: Vec<(f64, String)> = ohio_panel::panel()
+        .into_iter()
+        .filter(|r| r.fiscal_year == year)
+        .map(|r| (r.state_revenue, r.irn))
+        .collect();
+    agencies.sort_by(|a, b| b.0.total_cmp(&a.0));
+    agencies
+        .iter()
+        .position(|(_, key)| key == irn)
+        .map(|index| index + 1)
 }
 
 /// Where a district stands now, on the four measures its node recorded as not held.
