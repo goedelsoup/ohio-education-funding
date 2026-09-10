@@ -73,6 +73,7 @@ pub mod report;
 pub mod scholarship;
 pub mod series;
 pub mod statute;
+pub mod transfers;
 
 pub use ledger::{appropriations, budget_analysis, line_origins, session_laws};
 
