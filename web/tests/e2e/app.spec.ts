@@ -397,20 +397,46 @@ test.describe("the chrome above the fold", () => {
      * layout actually changed. 520px was 43px out and nothing looked at 520px.
      */
     const heights: string[] = [];
+    /*
+     * What the row was asked to hold, at each width, so a wrap says by how much.
+     *
+     * This is not asserted and cannot be: the brand is set in `system-ui`, which is a different
+     * typeface on the machine running this than on the machine reading it, and the runner's is
+     * wider than a Mac's. A header that wrapped used to report only that it was 92px instead of
+     * 52 — true, and no help at all in deciding how much room to find. These are the numbers that
+     * decide it, so they travel with the failure.
+     */
+    const room: string[] = [];
     for (const width of [360, 390, 480, 520, 700, 900, 1000, 1280]) {
       await page.setViewportSize({ width, height: 800 });
       await page.goto("/district/043786");
-      const state = await page.evaluate(() => ({
-        header: Math.round(document.querySelector("header.site")!.getBoundingClientRect().height),
-        h1: Math.round(document.querySelector("h1")!.getBoundingClientRect().top + window.scrollY),
-        sideways:
-          document.documentElement.scrollWidth > document.documentElement.clientWidth + 1,
-      }));
+      const state = await page.evaluate(() => {
+        const row = document.querySelector(".site-inner")!;
+        const style = getComputedStyle(row);
+        const inner =
+          row.clientWidth - parseFloat(style.paddingLeft) - parseFloat(style.paddingRight);
+        const children = [...row.children].map((child) => ({
+          what: child.className.split(" ")[0] || child.tagName.toLowerCase(),
+          w: child.getBoundingClientRect().width,
+        }));
+        const gaps = (children.length - 1) * parseFloat(style.columnGap);
+        const wants = children.reduce((total, child) => total + child.w, 0) + gaps;
+        return {
+          header: Math.round(document.querySelector("header.site")!.getBoundingClientRect().height),
+          h1: Math.round(document.querySelector("h1")!.getBoundingClientRect().top + window.scrollY),
+          sideways:
+            document.documentElement.scrollWidth > document.documentElement.clientWidth + 1,
+          room: `${Math.round(inner - wants)} spare (${Math.round(inner)} for ${children
+            .map((child) => `${child.what} ${Math.round(child.w)}`)
+            .join(" + ")} + ${Math.round(gaps)} gap)`,
+        };
+      });
       expect(state.sideways, `the document scrolls sideways at ${width}px`).toBe(false);
       heights.push(`${width}: header ${state.header}, h1 at ${state.h1}`);
+      room.push(`${width}: ${state.room}`);
     }
     // One row is 52px. Asserted as a set so a regression names the width it happened at.
-    expect(heights).toEqual([
+    expect(heights, `what the row was holding —\n${room.join("\n")}\n`).toEqual([
       "360: header 52, h1 at 80",
       "390: header 52, h1 at 80",
       "480: header 52, h1 at 80",
@@ -419,6 +445,65 @@ test.describe("the chrome above the fold", () => {
       "900: header 52, h1 at 80",
       "1000: header 52, h1 at 80",
       "1280: header 52, h1 at 80",
+    ]);
+  });
+
+  test("the header's one outbound link is the repository, and it is not a button", async ({
+    page,
+  }) => {
+    /*
+     * Every figure on this site names the crate that computes it, and for a long time a reader
+     * following that attribution had nowhere to go. This is the somewhere — the only link in the
+     * chrome that leaves the site, so it is worth asserting that it is still the only one.
+     *
+     * It is checked as chrome rather than as a control. The mark sits next to the theme button
+     * and wore the same pill for a while, which said it acted on the page; it does not, it leaves.
+     * So: no border, an accessible name, since it has no word of its own, and `noopener` on the
+     * new tab.
+     */
+    await page.setViewportSize({ width: 1000, height: 800 });
+    await page.goto("/district/043786");
+
+    /*
+     * Where it is, and where it is not. At 360px the bar spends 297 of its 320px on the brand,
+     * the collapsed nav and the theme button, and 23 spare does not hold a 32px mark and a gap —
+     * so it appears at 480px, where the same row has 95 to spare. Asserted at both ends because
+     * the header-height test only sees the consequence: a row that wrapped, not a row that was
+     * asked to hold one thing too many.
+     */
+    const mark = page.locator("header.site .mark");
+    for (const [width, shown] of [
+      [360, false],
+      [480, true],
+    ] as [number, boolean][]) {
+      await page.setViewportSize({ width, height: 800 });
+      expect(await mark.isVisible(), `the mark at ${width}px`).toBe(shown);
+    }
+    await page.setViewportSize({ width: 1000, height: 800 });
+
+    const outbound = await page.evaluate(() => {
+      const links = [...document.querySelectorAll("header.site a")].filter(
+        (a) => new URL((a as HTMLAnchorElement).href).origin !== location.origin,
+      ) as HTMLAnchorElement[];
+      return links.map((a) => ({
+        href: a.href,
+        name: a.getAttribute("aria-label"),
+        rel: a.rel,
+        target: a.target,
+        border: getComputedStyle(a).borderTopWidth,
+        text: a.textContent!.trim(),
+      }));
+    });
+
+    expect(outbound).toEqual([
+      {
+        href: "https://github.com/goedelsoup/ohio-education-funding",
+        name: "Source on GitHub",
+        rel: "noopener noreferrer",
+        target: "_blank",
+        border: "0px",
+        text: "",
+      },
     ]);
   });
 
@@ -995,8 +1080,8 @@ test.describe("with JavaScript disabled", () => {
     /*
      * The other half of the no-JS contract, at the width #189 was about.
      *
-     * Above 700px the five menus sit loose in the bar and the outer `<details>` is neutralised by
-     * CSS — its summary hidden, its content forced visible. Below 700px that CSS does not apply
+     * Above 820px the five menus sit loose in the bar and the outer `<details>` is neutralised by
+     * CSS — its summary hidden, its content forced visible. Below 820px that CSS does not apply
      * and the outer one is a real disclosure, so reaching `/counties` takes two opens rather than
      * one. Both have to work with JavaScript off, and only the wide path was covered.
      *
@@ -2627,8 +2712,8 @@ test.describe("the section menus", () => {
      *
      * # Two opens now, and the risk this guards went up rather than down
      *
-     * #189 folded the five menus into one outer disclosure below 700px, so reaching `Law` on a
-     * phone means opening `Menu` and then opening `Law` inside it. This test caught that change by
+     * #189 folded the five menus into one outer disclosure below the nav's breakpoint, so
+     * reaching `Law` on a phone means opening `Menu` and then opening `Law` inside it. This test caught that change by
      * timing out on a summary that is no longer rendered — which is the right failure, because the
      * thing it is about is now worse in principle: an open menu is nested one level deeper inside
      * the same sticky box, and the box still may not outgrow the screen.
