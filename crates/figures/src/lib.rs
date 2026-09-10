@@ -1112,6 +1112,14 @@ fn below_the_floor_in_every_tax_year(i: &Inputs) -> usize {
         .count()
 }
 
+/// One year of the relief control series.
+fn relief_aggregate(fiscal_year: u16, pick: fn(&project::esser::YearOfBoth) -> Option<f64>) -> f64 {
+    project::esser::federal_against_the_general_fund()
+        .get(&fiscal_year)
+        .and_then(pick)
+        .unwrap_or(f64::NAN)
+}
+
 /// Eastland-Fairfield's row in the F-33 Ohio panel for one fiscal year.
 fn eastland_fairfield(fiscal_year: u16) -> Option<dispersion::ohio_panel::PanelRow> {
     dispersion::ohio_panel::panel()
@@ -3222,6 +3230,73 @@ pub static FIGURES: &[Figure] = &[
     // rates that show it does not.
     // Ohio's joint vocational sector, which nothing here could find until the directory's agency
     // type was read for what it actually holds.
+    // The relief cliff, read against the fund the five-year forecasts report. The first two are
+    // the control: the grant never passed through the general fund, which is what makes the
+    // absence of a signal after it ended mean something.
+    Figure {
+        key: "project/relief-federal-revenue-fy2019",
+        owner: "crates/project",
+        unit: Unit::Dollars,
+        label: "Federal revenue to the 607 districts the relief join reaches, FY2019 \u{2014} the \
+                last year before the pandemic grants",
+        pinned: 1_579_183_000.0,
+        tolerance: 1.0,
+        compute: |_| relief_aggregate(project::esser::BASELINE_YEAR, |y| y.federal_revenue),
+    },
+    Figure {
+        key: "project/relief-federal-revenue-at-the-peak",
+        owner: "crates/project",
+        unit: Unit::Dollars,
+        label: "The same at the FY2022 peak \u{2014} a rise of 139% in three years",
+        pinned: 3_775_608_000.0,
+        tolerance: 1.0,
+        compute: |_| relief_aggregate(2022, |y| y.federal_revenue),
+    },
+    Figure {
+        key: "project/general-fund-revenue-at-the-relief-peak",
+        owner: "crates/project",
+        unit: Unit::Dollars,
+        label: "Their general fund revenue in the same year \u{2014} below what it was in FY2020, \
+                which is how the relief money is known never to have entered it",
+        pinned: 20_564_598_850.0,
+        tolerance: 1.0,
+        compute: |_| relief_aggregate(2022, |y| y.general_fund_revenue),
+    },
+    Figure {
+        key: "project/relief-exposure-against-later-spending",
+        owner: "crates/project",
+        unit: Unit::Ratio,
+        label: "Correlation between a district's relief per pupil and its general fund spending \
+                growth after the cliff \u{2014} the recurring-cost reading's prediction, tested",
+        pinned: 0.0274,
+        tolerance: 0.000_05,
+        compute: |_| project::esser::exposure_against_spending_growth(),
+    },
+    Figure {
+        key: "project/relief-cliff-districts",
+        owner: "crates/project",
+        unit: Unit::Count,
+        label: "Districts the Census panel and the five-year forecasts both reach in every year \
+                the comparison needs",
+        pinned: 607.0,
+        tolerance: 0.0,
+        compute: |_| project::esser::districts().len() as f64,
+    },
+    Figure {
+        key: "project/districts-spending-less-after-the-cliff",
+        owner: "crates/project",
+        unit: Unit::Count,
+        label: "Of those, the ones spending less from the general fund in FY2025 than FY2023 \
+                \u{2014} spread across every exposure quartile, not concentrated in the exposed one",
+        pinned: 27.0,
+        tolerance: 0.0,
+        compute: |_| {
+            project::esser::districts()
+                .iter()
+                .filter(|d| d.spending_growth < 0.0)
+                .count() as f64
+        },
+    },
     Figure {
         key: "dispersion/regional-service-agencies",
         owner: "crates/dispersion",

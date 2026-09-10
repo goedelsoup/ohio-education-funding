@@ -59,10 +59,47 @@ findings: |
   that has since contracted to its pre-pandemic level. Whatever the answer to "does the system
   equalize", it is worse than these figures after September 2024. [inference]
 
-  What this does not establish: how the cliff actually landed. Whether districts spent ESSER on
-  recurring or one-time costs, and which ones are now cutting, needs the FY2025 and FY2026
-  five-year forecasts read against the ESSER allocations — both of which exist, and neither of
-  which is joined here. [open]
+  ### How the cliff landed, on the fund the forecasts report
+
+  The join this node called for is run. The forecasts are six closed fiscal years of every
+  district's **general fund**, and the relief money is the federal column of the Census panel —
+  and the first thing the two together establish is that they never touched. Across 607
+  districts, federal revenue went from **$1.579bn** in FY2019 to $3.776bn at the FY2022 peak, a
+  rise of 139%; their general-fund revenue over the same span went $20.590bn to **$20.565bn**,
+  which is a fall. [verified —
+  [`crates/project`](../../../crates/project/tests/the_cliff_that_never_reached_the_general_fund.rs)]
+
+  That is the control and not a limitation. Ohio districts received relief into special revenue
+  funds, so a district that spent it on one-time costs leaves no general-fund trace at all. A
+  district that spent it on **recurring** costs — staff, programmes, interventions it meant to
+  keep — has to carry them somewhere once the grant ends, and the general fund is the somewhere.
+  So the recurring-cost reading makes a prediction: general-fund spending after the cliff should
+  grow faster where the relief was larger.
+
+  **It does not.** Splitting the 607 on relief per pupil, the median district's general-fund
+  spending grew this much from FY2023 to FY2025:
+
+      quartile        relief per pupil   FY2023-FY2025 spending   change in cash,
+                      (FY2019 to peak)   growth, median           in years of spending
+      least relieved            $808              20.2%                   -0.113
+      2nd                     $1,108              19.5%                   -0.094
+      3rd                     $1,496              24.6%                   -0.114
+      most relieved           $2,322              19.3%                   -0.097
+
+  The most exposed quartile received nearly three times what the least did and grew the slowest
+  of the four. The correlation between relief per pupil and later spending growth is **0.0274**.
+  The cash drawdown is the same tenth of a year of spending in every quartile, and it is
+  *shallower* in the most exposed one. [verified]
+
+  **Ohio's districts did not, as a population, move relief-funded costs onto the general fund in
+  proportion to what they received.** The 20% common growth is the Fair School Funding Plan's
+  phase-in arriving in the same years, and it arrives everywhere. [inference]
+
+  What the instrument cannot do is name the districts. Only **27 of 607** are spending less in
+  FY2025 than in FY2023 — hardly any district is cutting in nominal terms — and those 27 are
+  spread across all four exposure quartiles rather than concentrated in the exposed one. A
+  district-by-district answer needs the special revenue funds, which the five-year forecast does
+  not report and no source here carries. [open]
 properties:
   name: Elementary and Secondary School Emergency Relief Fund
   level: federal
@@ -90,6 +127,30 @@ unfilled:
   - field: an ESSER-specific series
     why: The federal channel is reported as one figure; separating it needs the allocation files, which no connector retrieves.
 figures:
+  - key: project/relief-federal-revenue-fy2019
+    value: 1579183000
+    field: findings
+    as_written: "**$1.579bn** in FY2019"
+  - key: project/relief-federal-revenue-at-the-peak
+    value: 3775608000
+    field: findings
+    as_written: "$3.776bn at the FY2022 peak"
+  - key: project/general-fund-revenue-at-the-relief-peak
+    value: 20564598850
+    field: findings
+    as_written: "went $20.590bn to **$20.565bn**"
+  - key: project/relief-exposure-against-later-spending
+    value: 0.0274
+    field: findings
+    as_written: "later spending growth is **0.0274**"
+  - key: project/districts-spending-less-after-the-cliff
+    value: 27
+    field: findings
+    as_written: "**27 of 607**"
+  - key: project/relief-cliff-districts
+    value: 607
+    field: findings
+    as_written: "**27 of 607**"
   - key: dispersion/ohio-federal-share-fy2022
     value: 0.1387
     field: findings
