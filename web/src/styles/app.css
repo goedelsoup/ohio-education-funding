@@ -151,34 +151,20 @@ header.site {
   border-bottom: 1px solid var(--border);
   margin-bottom: var(--space-8);
 }
-/*
- * Half a gap below the nav's breakpoint, a whole one above it.
- *
- * At 360px there are 320px inside the padding and the four children want 270.85 of them — the
- * brand at 141.77, the collapsed nav at 65.22, the repository mark at 32 and the theme button at
- * 31.86. Three 16px gaps put that at 318.85, which fits by a pixel and a bit; before the mark
- * lost its pill it was 321, and the row wrapped on the odd pixel into 92px of header instead of
- * 52, with the `h1` forty pixels further down, on the narrowest phone and nowhere else.
- *
- * A pixel is not a fit. The brand's width is whatever `system-ui` renders it at on the reader's
- * machine — a different face on Android than on this one — so the number measured here is not a
- * promise about theirs. Halving the gap below 700px turns that pixel into 25 of them, which is
- * slack, and slack is the property worth having.
- */
 .site-inner {
   max-width: var(--wrap-wide);
   margin: 0 auto;
   padding: .6rem var(--space-7);
   display: flex;
   align-items: center;
-  gap: .5rem;
+  gap: 1rem;
   flex-wrap: wrap;
 }
 .brand { font-weight: var(--weight-bold); letter-spacing: var(--tracking-tight); color: var(--text-primary); text-decoration: none; }
 header.site nav { display: flex; gap: .15rem; margin-right: auto; }
 
 /*
- * The five section menus, inside one disclosure below 700px and loose above it.
+ * The five section menus, inside one disclosure below 820px and loose above it.
  *
  * # What was wrong
  *
@@ -227,8 +213,24 @@ header.site nav { display: flex; gap: .15rem; margin-right: auto; }
  */
 .site-inner:has(.menu-all[open]) { align-items: flex-start; }
 
-@media (min-width: 700px) {
-  .site-inner { gap: 1rem; }
+/*
+ * # Why 820 and not 700
+ *
+ * The loose nav is 427px wide on the machine that runs the end-to-end suite. With the brand at
+ * 166, the theme button at 31 and three 16px gaps, the bar wanted 656 of the 660px inside a
+ * 700px viewport — four pixels spare, which is not a margin, it is a coincidence. The repository
+ * mark asked for 48 more and the row wrapped: 92px of header instead of 52.
+ *
+ * Those numbers are the runner's, and the point of them is that they are not this machine's —
+ * the same measurement on a Mac gives the brand 142px and 44px of room where the runner has
+ * none. `system-ui` is not a typeface, and a breakpoint chosen against one rendering of it is
+ * chosen against one reader. 820 leaves 76px at the runner's metrics, which is slack rather than
+ * a fit, and the header test prints what the row was holding when it stops being enough.
+ *
+ * The cost is that a reader between 700 and 819px gets the phone's disclosure. That is one click
+ * further to a section, on a window nobody's phone has and few laptops open to.
+ */
+@media (min-width: 820px) {
   .menu-all > summary { display: none; }
   .menu-all::details-content { content-visibility: visible; block-size: auto; }
   .menu-all > .menu-groups { flex-direction: row; padding: 0; }
@@ -419,15 +421,29 @@ td.year { font-family: var(--font-mono); color: var(--text-annotation); white-sp
  *
  * Focus is drawn rather than inherited. `a:focus-visible` thickens an underline, and this link
  * has no word to underline — without a ring of its own a keyboard reader would lose it.
+ *
+ * # And why it is not on the narrowest phones
+ *
+ * There is no room, and no arrangement of this row makes room. At 360px the bar has 320px inside
+ * its padding and already spends 297 of them on the runner's metrics — the brand at 166, the
+ * collapsed nav at 68, the theme button at 31 and two gaps. Twenty-three spare; the mark wants
+ * 32 and a gap. Closing the gaps and trimming the padding could buy it a pixel or two, at the
+ * price of a smaller tap target on exactly the devices that are touched, and it would wrap again
+ * on the next machine whose `system-ui` is a little wider than this one's.
+ *
+ * So it appears at 480px, where the same row has 95px spare. Below that the header is what it
+ * was before this link existed. A phone reader still reaches the repository — every figure's
+ * attribution and every corpus page links into it — just not from the chrome.
  */
 .mark {
-  display: inline-flex;
+  display: none;
   align-items: center;
   padding: var(--space-1) .5rem;
   color: var(--text-secondary);
   text-decoration: none;
 }
 .mark svg { display: block; width: 1rem; height: 1rem; }
+@media (min-width: 480px) { .mark { display: inline-flex; } }
 .mark:hover { color: var(--text-primary); }
 .mark:focus-visible { outline: 2px solid var(--focus-ring); outline-offset: 2px; }
 

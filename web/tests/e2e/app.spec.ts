@@ -464,6 +464,23 @@ test.describe("the chrome above the fold", () => {
     await page.setViewportSize({ width: 1000, height: 800 });
     await page.goto("/district/043786");
 
+    /*
+     * Where it is, and where it is not. At 360px the bar spends 297 of its 320px on the brand,
+     * the collapsed nav and the theme button, and 23 spare does not hold a 32px mark and a gap —
+     * so it appears at 480px, where the same row has 95 to spare. Asserted at both ends because
+     * the header-height test only sees the consequence: a row that wrapped, not a row that was
+     * asked to hold one thing too many.
+     */
+    const mark = page.locator("header.site .mark");
+    for (const [width, shown] of [
+      [360, false],
+      [480, true],
+    ] as [number, boolean][]) {
+      await page.setViewportSize({ width, height: 800 });
+      expect(await mark.isVisible(), `the mark at ${width}px`).toBe(shown);
+    }
+    await page.setViewportSize({ width: 1000, height: 800 });
+
     const outbound = await page.evaluate(() => {
       const links = [...document.querySelectorAll("header.site a")].filter(
         (a) => new URL((a as HTMLAnchorElement).href).origin !== location.origin,
@@ -1063,8 +1080,8 @@ test.describe("with JavaScript disabled", () => {
     /*
      * The other half of the no-JS contract, at the width #189 was about.
      *
-     * Above 700px the five menus sit loose in the bar and the outer `<details>` is neutralised by
-     * CSS — its summary hidden, its content forced visible. Below 700px that CSS does not apply
+     * Above 820px the five menus sit loose in the bar and the outer `<details>` is neutralised by
+     * CSS — its summary hidden, its content forced visible. Below 820px that CSS does not apply
      * and the outer one is a real disclosure, so reaching `/counties` takes two opens rather than
      * one. Both have to work with JavaScript off, and only the wide path was covered.
      *
@@ -2695,8 +2712,8 @@ test.describe("the section menus", () => {
      *
      * # Two opens now, and the risk this guards went up rather than down
      *
-     * #189 folded the five menus into one outer disclosure below 700px, so reaching `Law` on a
-     * phone means opening `Menu` and then opening `Law` inside it. This test caught that change by
+     * #189 folded the five menus into one outer disclosure below the nav's breakpoint, so
+     * reaching `Law` on a phone means opening `Menu` and then opening `Law` inside it. This test caught that change by
      * timing out on a summary that is no longer rendered — which is the right failure, because the
      * thing it is about is now worse in principle: an open menu is nested one level deeper inside
      * the same sticky box, and the box still may not outgrow the screen.
