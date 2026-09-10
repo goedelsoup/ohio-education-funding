@@ -62,6 +62,7 @@ pub mod crosswalk;
 pub mod drafts;
 pub mod finances;
 pub mod greenbook;
+pub mod joint_vocational;
 pub mod ledger;
 pub mod legislative_district;
 pub mod outcomes;
